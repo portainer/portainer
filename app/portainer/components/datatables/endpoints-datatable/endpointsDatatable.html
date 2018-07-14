@@ -3,12 +3,7 @@
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
         <div class="toolBarTitle">
-          <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.title }}
-        </div>
-        <div class="settings">
-          <span class="setting" ng-class="{ 'setting-active': $ctrl.state.displayTextFilter }" ng-click="$ctrl.updateDisplayTextFilter()" ng-if="$ctrl.showTextFilter">
-            <i class="fa fa-search" aria-hidden="true"></i> Search
-          </span>
+          <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }}
         </div>
       </div>
       <div class="actionBar" ng-if="$ctrl.endpointManagement">
@@ -20,7 +15,7 @@
           <i class="fa fa-plus space-right" aria-hidden="true"></i>Add endpoint
         </button>
       </div>
-      <div class="searchBar" ng-if="$ctrl.state.displayTextFilter">
+      <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
         <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus>
       </div>
@@ -37,6 +32,13 @@
                   Name
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('Type')">
+                  Type
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Type' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Type' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
@@ -65,6 +67,12 @@
                 </span>
                 <a ui-sref="portainer.endpoints.endpoint({id: item.Id})" ng-if="$ctrl.endpointManagement">{{ item.Name }}</a>
                 <span ng-if="!$ctrl.endpointManagement">{{ item.Name }}</span>
+              </td>
+              <td>
+                <span>
+                  <i ng-class="item.Type | endpointtypeicon" aria-hidden="true" style="margin-right: 2px;"></i>
+                  {{ item.Type | endpointtypename }}
+                </span>
               </td>
               <td>{{ item.URL | stripprotocol }}</td>
               <td>{{ item.GroupName }}</td>

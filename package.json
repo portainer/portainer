@@ -2,7 +2,7 @@
   "author": "Portainer.io",
   "name": "portainer",
   "homepage": "http://portainer.io",
-  "version": "1.17.1-dev",
+  "version": "1.18.2-dev",
   "repository": {
     "type": "git",
     "url": "git@github.com:portainer/portainer.git"
@@ -23,7 +23,7 @@
     "node": ">= 0.8.4"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free-webfonts": "^1.0.4",
+    "@fortawesome/fontawesome-free-webfonts": "^1.0.9",
     "@uirouter/angularjs": "~1.0.6",
     "angular": "~1.5.0",
     "angular-clipboard": "^1.6.2",
@@ -55,7 +55,7 @@
     "rdash-ui": "1.0.*",
     "splitargs": "github:deviantony/splitargs#~0.2.0",
     "toastr": "github:CodeSeven/toastr#~2.1.3",
-    "ui-select": "~0.19.6",
+    "ui-select": "^0.19.8",
     "xterm": "^3.1.0"
   },
   "devDependencies": {

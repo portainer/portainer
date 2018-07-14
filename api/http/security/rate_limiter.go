@@ -30,7 +30,7 @@ func (limiter *RateLimiter) LimitAccess(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ip := StripAddrPort(r.RemoteAddr)
 		if banned := limiter.Inc(ip); banned == true {
-			httperror.WriteErrorResponse(w, portainer.ErrResourceAccessDenied, http.StatusForbidden, nil)
+			httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrResourceAccessDenied)
 			return
 		}
 		next.ServeHTTP(w, r)

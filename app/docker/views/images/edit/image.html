@@ -1,5 +1,5 @@
 <rd-header>
-  <rd-header-title title="Image details"></rd-header-title>
+  <rd-header-title title-text="Image details"></rd-header-title>
   <rd-header-content>
     <a ui-sref="docker.images">Images</a> &gt; <a ui-sref="docker.images.image({id: image.Id})">{{ image.Id }}</a>
   </rd-header-content>
@@ -8,7 +8,7 @@
 <div class="row" ng-if="image.RepoTags.length > 0">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa fa-tags" title="Image tags"></rd-widget-header>
+      <rd-widget-header icon="fa fa-tags" title-text="Image tags"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <div class="form-group">
@@ -59,13 +59,15 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-tag" title="Tag the image"></rd-widget-header>
+      <rd-widget-header icon="fa-tag" title-text="Tag the image"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <!-- image-and-registry -->
-          <div class="form-group">
-            <por-image-registry image="formValues.Image" registry="formValues.Registry"></por-image-registry>
-          </div>
+          <por-image-registry
+            image="formValues.Image"
+            registry="formValues.Registry"
+            label-class="col-sm-1" input-class="col-sm-11 col-md-5"
+          ></por-image-registry>
           <!-- !image-and-registry -->
           <!-- tag-note -->
           <div class="form-group">
@@ -88,7 +90,7 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-clone" title="Image details"></rd-widget-header>
+      <rd-widget-header icon="fa-clone" title-text="Image details"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -129,7 +131,7 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-clone" title="Dockerfile details"></rd-widget-header>
+      <rd-widget-header icon="fa-clone" title-text="Dockerfile details"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -178,7 +180,7 @@
 <div class="row" ng-if="history.length > 0">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-clone" title="Image layers"></rd-widget-header>
+      <rd-widget-header icon="fa-clone" title-text="Image layers"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table id="image-layers" class="table">
           <thead>

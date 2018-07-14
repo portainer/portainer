@@ -4,6 +4,7 @@ angular.module('portainer.azure', ['portainer.app'])
 
   var azure = {
     name: 'azure',
+    url: '/azure',
     parent: 'root',
     abstract: true
   };

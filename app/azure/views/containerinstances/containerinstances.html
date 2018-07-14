@@ -1,5 +1,5 @@
 <rd-header>
-  <rd-header-title title="Container list">
+  <rd-header-title title-text="Container list">
     <a data-toggle="tooltip" title="Refresh" ui-sref="azure.containerinstances" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
@@ -10,9 +10,9 @@
 <div class="row">
   <div class="col-sm-12">
     <containergroups-datatable
-    title="Containers" title-icon="fa-server"
+    title-text="Containers" title-icon="fa-server"
     dataset="containerGroups" table-key="containergroups"
-    order-by="Name" show-text-filter="true"
+    order-by="Name" 
     remove-action="deleteAction"
     ></containergroups-datatable>
   </div>

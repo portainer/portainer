@@ -49,7 +49,7 @@ function ServiceViewModel(data, runningTasks, allTasks, nodes) {
     this.LogDriverName = '';
     this.LogDriverOpts = [];
   }
-    
+
   this.Constraints = data.Spec.TaskTemplate.Placement ? data.Spec.TaskTemplate.Placement.Constraints || [] : [];
   this.Preferences = data.Spec.TaskTemplate.Placement ? data.Spec.TaskTemplate.Placement.Preferences || [] : [];
   this.Platforms = data.Spec.TaskTemplate.Placement ? data.Spec.TaskTemplate.Placement.Platforms || [] : [];

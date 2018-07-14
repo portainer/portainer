@@ -1,5 +1,5 @@
 <rd-header>
-  <rd-header-title title="Image list">
+  <rd-header-title title-text="Image list">
     <a data-toggle="tooltip" title="Refresh" ui-sref="docker.images" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
@@ -10,14 +10,16 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-download" title="Pull image ">
+      <rd-widget-header icon="fa-download" title-text="Pull image ">
       </rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <!-- image-and-registry -->
-          <div class="form-group">
-            <por-image-registry image="formValues.Image" registry="formValues.Registry"></por-image-registry>
-          </div>
+          <por-image-registry
+            image="formValues.Image"
+            registry="formValues.Registry"
+            label-class="col-sm-1" input-class="col-sm-11 col-md-5"
+          ></por-image-registry>
           <!-- !image-and-registry -->
           <!-- tag-note -->
           <div class="form-group">
@@ -53,9 +55,9 @@
 <div class="row">
   <div class="col-sm-12">
     <images-datatable
-    title="Images" title-icon="fa-clone"
+    title-text="Images" title-icon="fa-clone"
     dataset="images" table-key="images"
-    order-by="RepoTags" show-text-filter="true"
+    order-by="RepoTags" 
     show-host-column="applicationState.endpoint.mode.agentProxy"
     remove-action="removeAction"
     force-remove-action="confirmRemovalAction"

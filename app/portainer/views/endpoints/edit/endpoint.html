@@ -1,5 +1,5 @@
 <rd-header>
-  <rd-header-title title="Endpoint details"></rd-header-title>
+  <rd-header-title title-text="Endpoint details"></rd-header-title>
   <rd-header-content>
     <a ui-sref="portainer.endpoints">Endpoints</a> &gt; <a ui-sref="portainer.endpoints.endpoint({id: endpoint.Id})">{{ endpoint.Name }}</a>
   </rd-header-content>
@@ -28,12 +28,12 @@
               <portainer-tooltip position="bottom" message="URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it."></portainer-tooltip>
             </label>
             <div class="col-sm-9 col-lg-10">
-              <input ng-disabled="endpointType === 'local'" type="text" class="form-control" id="endpoint_url" ng-model="endpoint.URL" placeholder="e.g. 10.0.0.10:2375 or mydocker.mydomain.com:2375">
+              <input ng-disabled="endpointType === 'local' || endpoint.Type === 3" type="text" class="form-control" id="endpoint_url" ng-model="endpoint.URL" placeholder="e.g. 10.0.0.10:2375 or mydocker.mydomain.com:2375">
             </div>
           </div>
           <!-- !endpoint-url-input -->
           <!-- endpoint-public-url-input -->
-          <div class="form-group">
+          <div class="form-group" ng-if="endpoint.Type !== 3">
             <label for="endpoint_public_url" class="col-sm-3 col-lg-2 control-label text-left">
               Public IP
               <portainer-tooltip position="bottom" message="URL or IP address where exposed containers will be reachable. This field is optional and will default to the endpoint URL."></portainer-tooltip>
@@ -42,9 +42,14 @@
               <input type="text" class="form-control" id="endpoint_public_url" ng-model="endpoint.PublicURL" placeholder="e.g. 10.0.0.10 or mydocker.mydomain.com">
             </div>
           </div>
+          <azure-endpoint-config ng-if="endpoint.Type === 3"
+            application-id="endpoint.AzureCredentials.ApplicationID"
+            tenant-id="endpoint.AzureCredentials.TenantID"
+            authentication-key="endpoint.AzureCredentials.AuthenticationKey"
+          ></azure-endpoint-config>
           <!-- !endpoint-public-url-input -->
           <div class="col-sm-12 form-section-title">
-            Grouping
+            Metadata
           </div>
           <!-- group -->
           <div class="form-group">
@@ -56,8 +61,16 @@
             </div>
           </div>
           <!-- !group -->
+          <!-- tags -->
+          <div class="form-group">
+            <tag-selector
+              tags="availableTags"
+              model="endpoint.Tags"
+            ></tag-selector>
+          </div>
+          <!-- !tags -->
           <!-- endpoint-security -->
-          <div ng-if="endpointType === 'remote'">
+          <div ng-if="endpointType === 'remote' && endpoint.Type !== 3">
             <div class="col-sm-12 form-section-title">
               Security
             </div>

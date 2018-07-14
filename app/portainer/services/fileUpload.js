@@ -28,10 +28,9 @@ angular.module('portainer.app')
     });
   };
 
-  service.createStack = function(stackName, swarmId, file, env) {
-    var endpointID = EndpointProvider.endpointID();
+  service.createSwarmStack = function(stackName, swarmId, file, env, endpointId) {
     return Upload.upload({
-      url: 'api/endpoints/' + endpointID + '/stacks?method=file',
+      url: 'api/stacks?method=file&type=1&endpointId=' + endpointId,
       data: {
         file: file,
         Name: stackName,
@@ -42,7 +41,19 @@ angular.module('portainer.app')
     });
   };
 
-  service.createEndpoint = function(name, type, URL, PublicURL, groupID, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
+  service.createComposeStack = function(stackName, file, env, endpointId) {
+    return Upload.upload({
+      url: 'api/stacks?method=file&type=2&endpointId=' + endpointId,
+      data: {
+        file: file,
+        Name: stackName,
+        Env: Upload.json(env)
+      },
+      ignoreLoadingBar: true
+    });
+  };
+
+  service.createEndpoint = function(name, type, URL, PublicURL, groupID, tags, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
     return Upload.upload({
       url: 'api/endpoints',
       data: {
@@ -51,6 +62,7 @@ angular.module('portainer.app')
         URL: URL,
         PublicURL: PublicURL,
         GroupID: groupID,
+        Tags: Upload.json(tags),
         TLS: TLS,
         TLSSkipVerify: TLSSkipVerify,
         TLSSkipClientVerify: TLSSkipClientVerify,
@@ -62,12 +74,14 @@ angular.module('portainer.app')
     });
   };
 
-  service.createAzureEndpoint = function(name, applicationId, tenantId, authenticationKey) {
+  service.createAzureEndpoint = function(name, applicationId, tenantId, authenticationKey, groupId, tags) {
     return Upload.upload({
       url: 'api/endpoints',
       data: {
         Name: name,
         EndpointType: 3,
+        GroupID: groupID,
+        Tags: Upload.json(tags),
         AzureApplicationID: applicationId,
         AzureTenantID: tenantId,
         AzureAuthenticationKey: authenticationKey

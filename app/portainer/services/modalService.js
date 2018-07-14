@@ -46,7 +46,7 @@ angular.module('portainer.app')
     applyBoxCSS(box);
   };
 
-  service.customPrompt = function(options) {
+  service.customPrompt = function(options, optionToggled) {
     var box = bootbox.prompt({
       title: options.title,
       inputType: options.inputType,
@@ -56,7 +56,7 @@ angular.module('portainer.app')
     });
     applyBoxCSS(box);
     box.find('.bootbox-body').prepend('<p>' + options.message + '</p>');
-    box.find('.bootbox-input-checkbox').prop('checked', true);
+    box.find('.bootbox-input-checkbox').prop('checked', optionToggled);
   };
 
   service.confirmAccessControlUpdate = function(callback, msg) {
@@ -139,7 +139,7 @@ angular.module('portainer.app')
         }
       },
       callback: callback
-    });
+    }, false);
   };
 
   service.confirmExperimentalFeature = function(callback) {
@@ -157,9 +157,16 @@ angular.module('portainer.app')
   };
 
   service.confirmServiceForceUpdate = function(message, callback) {
-    service.confirm({
+    service.customPrompt({
       title: 'Are you sure ?',
       message: message,
+      inputType: 'checkbox',
+      inputOptions: [
+        {
+          text: 'Pull latest image version<i></i>',
+          value: '1'
+        }
+      ],
       buttons: {
         confirm: {
           label: 'Update',
@@ -167,7 +174,7 @@ angular.module('portainer.app')
         }
       },
       callback: callback
-    });
+    }, false);
   };
 
   return service;

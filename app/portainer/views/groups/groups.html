@@ -1,5 +1,5 @@
 <rd-header>
-  <rd-header-title title="Endpoint groups">
+  <rd-header-title title-text="Endpoint groups">
     <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.groups" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
@@ -10,9 +10,9 @@
 <div class="row">
   <div class="col-sm-12">
     <groups-datatable
-    title="Endpoint groups" title-icon="fa-object-group"
+    title-text="Endpoint groups" title-icon="fa-object-group"
     dataset="groups" table-key="groups"
-    order-by="Name" show-text-filter="true"
+    order-by="Name" 
     access-management="applicationState.application.authentication"
     remove-action="removeAction"
     ></groups-datatable>

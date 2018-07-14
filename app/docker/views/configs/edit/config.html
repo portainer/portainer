@@ -1,5 +1,5 @@
 <rd-header>
-  <rd-header-title title="Config details">
+  <rd-header-title title-text="Config details">
     <a data-toggle="tooltip" title="Refresh" ui-sref="docker.configs.config({id: config.Id})" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
@@ -12,7 +12,7 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-file-code" title="Config details"></rd-widget-header>
+      <rd-widget-header icon="fa-file-code" title-text="Config details"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -65,7 +65,7 @@
 <div class="row" ng-if="config">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-file-code" title="Config content"></rd-widget-header>
+      <rd-widget-header icon="fa-file-code" title-text="Config content"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <div class="form-group">

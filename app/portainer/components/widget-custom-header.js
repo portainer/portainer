@@ -3,11 +3,11 @@ angular.module('portainer.app')
   var directive = {
     requires: '^rdWidget',
     scope: {
-      title: '=',
+      titleText: '=',
       icon: '='
     },
     transclude: true,
-    template: '<div class="widget-header"><div class="row"><span class="pull-left"><img class="custom-header-ico" ng-src="{{icon}}"></img> <span class="text-muted"> {{title}} </span> </span><span class="pull-right col-xs-6 col-sm-4" ng-transclude></span></div></div>',
+    template: '<div class="widget-header"><div class="row"><span class="pull-left"><img class="custom-header-ico" ng-src="{{icon}}" ng-if="icon"></img><i class="fa fa-rocket" aria-hidden="true" ng-if="!icon"></i> <span class="text-muted"> {{titleText}} </span> </span><span class="pull-right col-xs-6 col-sm-4" ng-transclude></span></div></div>',
     restrict: 'E'
   };
   return directive;

@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-file-alt" title="Log viewer settings"></rd-widget-header>
+      <rd-widget-header icon="fa-file-alt" title-text="Log viewer settings"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <div class="form-group">
@@ -12,6 +12,16 @@
               </label>
               <label class="switch" style="margin-left: 20px;">
                 <input type="checkbox" ng-model="$ctrl.state.logCollection" ng-change="$ctrl.state.autoScroll = $ctrl.state.logCollection; $ctrl.logCollectionChange($ctrl.state.logCollection)"><i></i>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <label for="tls" class="control-label text-left">
+                Wrap lines
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" ng-model="$ctrl.state.wrapLines"><i></i>
               </label>
             </div>
           </div>
@@ -62,7 +72,7 @@
 
 <div class="row" style="height:54%;">
   <div class="col-sm-12" style="height:100%;">
-    <pre class="log_viewer" scroll-glue="$ctrl.state.autoScroll" force-glue>
+    <pre ng-class="{ 'wrap_lines': $ctrl.state.wrapLines }" class="log_viewer" scroll-glue="$ctrl.state.autoScroll" force-glue>
       <div ng-repeat="line in $ctrl.state.filteredLogs = ($ctrl.data | filter:$ctrl.state.search) track by $index" class="line" ng-if="line"><p class="inner_line" ng-click="$ctrl.selectLine(line)" ng-class="{ 'line_selected': $ctrl.state.selectedLines.indexOf(line) > -1 }">{{ line }}</p></div>
       <div ng-if="!$ctrl.state.filteredLogs.length" class="line"><p class="inner_line">No log line matching the '{{ $ctrl.state.search }}' filter</p></div>
       <div ng-if="$ctrl.state.filteredLogs.length === 1 && !$ctrl.state.filteredLogs[0]" class="line"><p class="inner_line">No logs available</p></div>

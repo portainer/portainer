@@ -30,7 +30,7 @@ function (PaginationService, DatatableService) {
   this.selectAll = function() {
     for (var i = 0; i < this.state.filteredDataSet.length; i++) {
       var item = this.state.filteredDataSet[i];
-      if (item.Id && item.Checked !== this.state.selectAll) {
+      if (!(item.External && item.Type === 2) && item.Checked !== this.state.selectAll) {
         item.Checked = this.state.selectAll;
         this.selectItem(item);
       }
@@ -39,13 +39,6 @@ function (PaginationService, DatatableService) {
 
   this.changePaginationLimit = function() {
     PaginationService.setPaginationLimit(this.tableKey, this.state.paginatedItemLimit);
-  };
-
-  this.updateDisplayTextFilter = function() {
-    this.state.displayTextFilter = !this.state.displayTextFilter;
-    if (!this.state.displayTextFilter) {
-      delete this.state.textFilter;
-    }
   };
 
   this.$onInit = function() {

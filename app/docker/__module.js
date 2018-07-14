@@ -49,9 +49,6 @@ angular.module('portainer.docker', ['portainer.app'])
         templateUrl: 'app/docker/views/containers/containers.html',
         controller: 'ContainersController'
       }
-    },
-    params: {
-      selectedContainers: []
     }
   };
 
@@ -314,39 +311,6 @@ angular.module('portainer.docker', ['portainer.app'])
     }
   };
 
-  var stacks = {
-    name: 'docker.stacks',
-    url: '/stacks',
-    views: {
-      'content@': {
-        templateUrl: 'app/docker/views/stacks/stacks.html',
-        controller: 'StacksController'
-      }
-    }
-  };
-
-  var stack = {
-    name: 'docker.stacks.stack',
-    url: '/:id',
-    views: {
-      'content@': {
-        templateUrl: 'app/docker/views/stacks/edit/stack.html',
-        controller: 'StackController'
-      }
-    }
-  };
-
-  var stackCreation = {
-    name: 'docker.stacks.new',
-    url: '/new',
-    views: {
-      'content@': {
-        templateUrl: 'app/docker/views/stacks/create/createstack.html',
-        controller: 'CreateStackController'
-      }
-    }
-  };
-
   var swarm = {
     name: 'docker.swarm',
     url: '/swarm',
@@ -394,36 +358,6 @@ angular.module('portainer.docker', ['portainer.app'])
         templateUrl: 'app/docker/views/tasks/logs/tasklogs.html',
         controller: 'TaskLogsController'
       }
-    }
-  };
-
-  var templates = {
-    name: 'docker.templates',
-    url: '/templates',
-    views: {
-      'content@': {
-        templateUrl: 'app/docker/views/templates/templates.html',
-        controller: 'TemplatesController'
-      }
-    },
-    params: {
-      key: 'containers',
-      hide_descriptions: false
-    }
-  };
-
-  var templatesLinuxServer = {
-    name: 'docker.templates.linuxserver',
-    url: '/linuxserver',
-    views: {
-      'content@': {
-        templateUrl: 'app/docker/views/templates/templates.html',
-        controller: 'TemplatesController'
-      }
-    },
-    params: {
-      key: 'linuxserver.io',
-      hide_descriptions: true
     }
   };
 
@@ -489,16 +423,11 @@ angular.module('portainer.docker', ['portainer.app'])
   $stateRegistryProvider.register(service);
   $stateRegistryProvider.register(serviceCreation);
   $stateRegistryProvider.register(serviceLogs);
-  $stateRegistryProvider.register(stacks);
-  $stateRegistryProvider.register(stack);
-  $stateRegistryProvider.register(stackCreation);
   $stateRegistryProvider.register(swarm);
   $stateRegistryProvider.register(swarmVisualizer);
   $stateRegistryProvider.register(tasks);
   $stateRegistryProvider.register(task);
   $stateRegistryProvider.register(taskLogs);
-  $stateRegistryProvider.register(templates);
-  $stateRegistryProvider.register(templatesLinuxServer);
   $stateRegistryProvider.register(volumes);
   $stateRegistryProvider.register(volume);
   $stateRegistryProvider.register(volumeCreation);

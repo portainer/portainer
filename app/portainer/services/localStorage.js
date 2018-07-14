@@ -59,11 +59,29 @@ angular.module('portainer.app')
     storeDataTableSettings: function(key, data) {
       localStorageService.set('datatable_settings_' + key, data);
     },
+    getDataTableExpandedItems: function(key) {
+      return localStorageService.get('datatable_expandeditems_' + key);
+    },
+    storeDataTableExpandedItems: function(key, data) {
+      localStorageService.set('datatable_expandeditems_' + key, data);
+    },
+    getDataTableSelectedItems: function(key) {
+      return localStorageService.get('datatable_selecteditems_' + key);
+    },
+    storeDataTableSelectedItems: function(key, data) {
+      localStorageService.set('datatable_selecteditems_' + key, data);
+    },
     storeSwarmVisualizerSettings: function(key, data) {
       localStorageService.set('swarmvisualizer_' + key, data);
     },
     getSwarmVisualizerSettings: function(key) {
       return localStorageService.get('swarmvisualizer_' + key);
+    },
+    storeColumnVisibilitySettings: function(key, data) {
+      localStorageService.set('col_visibility_' + key, data);
+    },
+    getColumnVisibilitySettings: function(key) {
+      return localStorageService.get('col_visibility_' + key);
     },
     clean: function() {
       localStorageService.clearAll();

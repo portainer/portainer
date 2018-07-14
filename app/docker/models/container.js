@@ -1,7 +1,29 @@
+function createStatus(statusText) {
+  var status = _.toLower(statusText);
+
+  if (status.indexOf('paused') > -1) {
+    return 'paused';
+  } else if (status.indexOf('dead') > -1) {
+    return 'dead';
+  } else if (status.indexOf('created') > -1) {
+    return 'created';
+  } else if (status.indexOf('exited') > -1) {
+    return 'stopped';
+  } else if (status.indexOf('(healthy)') > -1) {
+    return 'healthy';
+  } else if (status.indexOf('(unhealthy)') > -1) {
+    return 'unhealthy';
+  } else if (status.indexOf('(health: starting)') > -1) {
+    return 'starting';
+  }
+  return 'running';
+}
+
 function ContainerViewModel(data) {
   this.Id = data.Id;
-  this.Status = data.Status;
+  this.Status = createStatus(data.Status);
   this.State = data.State;
+  this.Created = data.Created;
   this.Names = data.Names;
   // Unavailable in Docker < 1.10
   if (data.NetworkSettings && !_.isEmpty(data.NetworkSettings.Networks)) {

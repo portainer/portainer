@@ -187,6 +187,17 @@ angular.module('portainer.app', [])
     }
   };
 
+  var home = {
+    name: 'portainer.home',
+    url: '/home',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/home/home.html',
+        controller: 'HomeController'
+      }
+    }
+  };
+
   var registries = {
     name: 'portainer.registries',
     url: '/registries',
@@ -253,12 +264,56 @@ angular.module('portainer.app', [])
     }
   };
 
+  var stacks = {
+    name: 'portainer.stacks',
+    url: '/stacks',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/stacks/stacks.html',
+        controller: 'StacksController'
+      }
+    }
+  };
+
+  var stack = {
+    name: 'portainer.stacks.stack',
+    url: '/:name?id&type&external',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/stacks/edit/stack.html',
+        controller: 'StackController'
+      }
+    }
+  };
+
+  var stackCreation = {
+    name: 'portainer.stacks.new',
+    url: '/new',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/stacks/create/createstack.html',
+        controller: 'CreateStackController'
+      }
+    }
+  };
+
   var support = {
     name: 'portainer.support',
     url: '/support',
     views: {
       'content@': {
         templateUrl: 'app/portainer/views/support/support.html'
+      }
+    }
+  };
+
+  var tags = {
+    name: 'portainer.tags',
+    url: '/tags',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/tags/tags.html',
+        controller: 'TagsController'
       }
     }
   };
@@ -307,6 +362,43 @@ angular.module('portainer.app', [])
     }
   };
 
+  var templates = {
+    name: 'portainer.templates',
+    url: '/templates',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/templates/templates.html',
+        controller: 'TemplatesController'
+      }
+    },
+    params: {
+      key: 'containers',
+      hide_descriptions: false
+    }
+  };
+
+  var template = {
+    name: 'portainer.templates.template',
+    url: '/:id',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/templates/edit/template.html',
+        controller: 'TemplateController'
+      }
+    }
+  };
+
+  var templateCreation = {
+    name: 'portainer.templates.new',
+    url: '/new',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/templates/create/createtemplate.html',
+        controller: 'CreateTemplateController'
+      }
+    }
+  };
+
   $stateRegistryProvider.register(root);
   $stateRegistryProvider.register(portainer);
   $stateRegistryProvider.register(about);
@@ -323,15 +415,23 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(group);
   $stateRegistryProvider.register(groupAccess);
   $stateRegistryProvider.register(groupCreation);
+  $stateRegistryProvider.register(home);
   $stateRegistryProvider.register(registries);
   $stateRegistryProvider.register(registry);
   $stateRegistryProvider.register(registryAccess);
   $stateRegistryProvider.register(registryCreation);
   $stateRegistryProvider.register(settings);
   $stateRegistryProvider.register(settingsAuthentication);
+  $stateRegistryProvider.register(stacks);
+  $stateRegistryProvider.register(stack);
+  $stateRegistryProvider.register(stackCreation);
   $stateRegistryProvider.register(support);
+  $stateRegistryProvider.register(tags);
   $stateRegistryProvider.register(users);
   $stateRegistryProvider.register(user);
   $stateRegistryProvider.register(teams);
   $stateRegistryProvider.register(team);
+  $stateRegistryProvider.register(templates);
+  $stateRegistryProvider.register(template);
+  $stateRegistryProvider.register(templateCreation);
 }]);

@@ -1,17 +1,9 @@
 angular.module('portainer.app')
-.controller('CreateGroupController', ['$scope', '$state', 'GroupService', 'EndpointService', 'Notifications',
-function ($scope, $state, GroupService, EndpointService, Notifications) {
+.controller('CreateGroupController', ['$q', '$scope', '$state', 'GroupService', 'EndpointService', 'TagService', 'Notifications',
+function ($q, $scope, $state, GroupService, EndpointService, TagService, Notifications) {
 
   $scope.state = {
     actionInProgress: false
-  };
-
-  $scope.addLabel = function() {
-    $scope.model.Labels.push({ name: '', value: '' });
-  };
-
-  $scope.removeLabel = function(index) {
-    $scope.model.Labels.splice(index, 1);
   };
 
   $scope.create = function() {
@@ -40,10 +32,14 @@ function ($scope, $state, GroupService, EndpointService, Notifications) {
   function initView() {
     $scope.model = new EndpointGroupDefaultModel();
 
-    EndpointService.endpointsByGroup(1)
+    $q.all({
+      endpoints: EndpointService.endpointsByGroup(1),
+      tags: TagService.tagNames()
+    })
     .then(function success(data) {
-      $scope.availableEndpoints = data;
+      $scope.availableEndpoints = data.endpoints;
       $scope.associatedEndpoints = [];
+      $scope.availableTags = data.tags;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve endpoints');

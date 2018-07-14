@@ -123,6 +123,10 @@ a[ng-click]{
   color: #337ab7;
 }
 
+.text-warning {
+  color: #f0ad4e;
+}
+
 .widget .widget-body table tbody .image-tag {
   font-size: 90% !important;
   margin-right: 5px;
@@ -152,6 +156,8 @@ a[ng-click]{
 .template-list {
   display: flex;
   flex-direction: column;
+  padding: 10px;
+  border-top: 2px solid #e2e2e2;
 }
 
 .template-logo {
@@ -193,6 +199,11 @@ a[ng-click]{
 .template-title {
   font-size: 1.8em;
   font-weight: bold;
+}
+
+.template-type {
+  font-size: 0.9em;
+  padding-right: 1em;
 }
 
 .template-description {
@@ -304,8 +315,10 @@ ul.sidebar .sidebar-title {
   height: auto;
 }
 
-ul.sidebar .sidebar-title .endpoint-name {
+ul.sidebar .sidebar-title.endpoint-name {
   color: #fff;
+  text-align: center;
+  text-indent: 0;
 }
 
 ul.sidebar .sidebar-list a {
@@ -708,10 +721,13 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 .log_viewer {
   height:100%;
   overflow-y: scroll;
-  white-space: pre-wrap;
   color: black;
   font-size: .85em;
   background-color: white;
+}
+
+.log_viewer.wrap_lines {
+  white-space: pre-wrap;
 }
 
 .log_viewer .inner_line {
@@ -727,6 +743,28 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 
 .log_viewer .line_selected {
   background-color: #C5CAE9;
+}
+
+.row.header .meta .page {
+  padding-top: 7px;
+}
+
+.tag {
+  padding: 2px 6px;
+  color: white;
+  background-color: #337ab7;
+  border: 1px solid #2e6da4;
+  border-radius: 4px;
+}
+
+.template-envvar {
+  padding-bottom: 5px;
+}
+
+.line-separator{
+  border-bottom: 1px solid #777;
+  width: 50%;
+  margin: 20px auto 10px auto;
 }
 
 /*bootbox override*/
@@ -787,12 +825,12 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   font-weight: 600;
 }
 
-/* json-tree */
-
+/* json-tree override */
 json-tree {
   font-size: 13px;
   color: #30426a;
 }
+
 json-tree .key {
   color: #738bc0;
   padding-right: 5px;
@@ -803,7 +841,4 @@ json-tree .branch-preview {
   font-size: 11px;
   opacity: .5;
 }
-
-.row.header .meta .page {
-  padding-top: 7px;
-}
+/* !json-tree override */

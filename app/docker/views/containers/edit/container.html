@@ -1,5 +1,5 @@
 <rd-header>
-  <rd-header-title title="Container details">
+  <rd-header-title title-text="Container details">
   </rd-header-title>
   <rd-header-content>
     <a ui-sref="docker.containers">Containers</a> &gt; <a ui-sref="docker.containers.container({id: container.Id})">{{ container.Name|trimcontainername }}</a>
@@ -9,7 +9,7 @@
   <div class="row">
     <div class="col-lg-12 col-md-12 col-xs-12">
       <rd-widget>
-        <rd-widget-header icon="fa-cogs" title="Actions"></rd-widget-header>
+        <rd-widget-header icon="fa-cogs" title-text="Actions"></rd-widget-header>
         <rd-widget-body classes="padding">
           <div class="btn-group" role="group" aria-label="...">
             <button class="btn btn-success btn-sm" ng-click="start()" ng-disabled="container.State.Running"><i class="fa fa-play space-right" aria-hidden="true"></i>Start</button>
@@ -35,7 +35,7 @@
   <div class="row">
     <div class="col-lg-12 col-md-12 col-xs-12">
       <rd-widget>
-        <rd-widget-header icon="fa-server" title="Container status"></rd-widget-header>
+        <rd-widget-header icon="fa-server" title-text="Container status"></rd-widget-header>
         <rd-widget-body classes="no-padding">
           <table class="table">
             <tbody>
@@ -110,7 +110,7 @@
   <div ng-if="container.State.Health" class="row">
     <div class="col-lg-12 col-md-12 col-xs-12">
       <rd-widget>
-        <rd-widget-header icon="fa-server" title="Container health"></rd-widget-header>
+        <rd-widget-header icon="fa-server" title-text="Container health"></rd-widget-header>
         <rd-widget-body classes="no-padding">
           <table class="table">
             <tbody>
@@ -139,7 +139,7 @@
   <div class="row">
     <div class="col-lg-12 col-md-12 col-xs-12">
       <rd-widget>
-        <rd-widget-header icon="fa-clone" title="Create image"></rd-widget-header>
+        <rd-widget-header icon="fa-clone" title-text="Create image"></rd-widget-header>
         <rd-widget-body>
           <form class="form-horizontal">
             <!-- tag-description -->
@@ -153,9 +153,12 @@
             </div>
             <!-- !tag-description -->
             <!-- image-and-registry -->
-            <div class="form-group">
-              <por-image-registry image="config.Image" registry="config.Registry"></por-image-registry>
-            </div>
+            <por-image-registry
+              image="config.Image"
+              registry="config.Registry"
+              auto-complete="true"
+              label-class="col-sm-1" input-class="col-sm-11 col-md-5"
+            ></por-image-registry>
             <!-- !image-and-registry -->
             <!-- tag-note -->
             <div class="form-group">
@@ -178,7 +181,7 @@
   <div class="row">
     <div class="col-lg-12 col-md-12 col-xs-12">
       <rd-widget>
-        <rd-widget-header icon="fa-server" title="Container details"></rd-widget-header>
+        <rd-widget-header icon="fa-server" title-text="Container details"></rd-widget-header>
         <rd-widget-body classes="no-padding">
           <table class="table">
             <tbody>
@@ -247,7 +250,7 @@
   <div class="row" ng-if="container.Mounts.length > 0">
     <div class="col-lg-12 col-md-12 col-xs-12">
       <rd-widget>
-        <rd-widget-header icon="fa-cubes" title="Volumes"></rd-widget-header>
+        <rd-widget-header icon="fa-cubes" title-text="Volumes"></rd-widget-header>
         <rd-widget-body classes="no-padding">
           <table class="table">
             <thead>
@@ -272,7 +275,7 @@
   <div class="row">
     <div class="col-sm-12">
       <container-networks-datatable
-      title="Connected networks" title-icon="fa-sitemap"
+      title-text="Connected networks" title-icon="fa-sitemap"
       dataset="container.NetworkSettings.Networks" table-key="container-networks"
       container="container"
       available-networks="availableNetworks"

@@ -25,7 +25,7 @@ function ($scope, $state, NetworkService, Notifications, HttpRequestHelper) {
   };
 
   function initView() {
-    NetworkService.networks(true, true, true, true)
+    NetworkService.networks(true, true, true)
     .then(function success(data) {
       $scope.networks = data;
     })

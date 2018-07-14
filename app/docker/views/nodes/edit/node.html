@@ -1,5 +1,5 @@
 <rd-header>
-  <rd-header-title title="Node details">
+  <rd-header-title title-text="Node details">
     <a data-toggle="tooltip" title="Refresh" ui-sref="docker.nodes.node({id: node.Id})" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
@@ -16,7 +16,7 @@
     </div>
 
     <rd-widget ng-if="!loading">
-      <rd-widget-header icon="fa-object-group" title="Node does not exist"></rd-widget-header>
+      <rd-widget-header icon="fa-object-group" title-text="Node does not exist"></rd-widget-header>
       <rd-widget-body>
         <p>It looks like the node you wish to inspect does not exist.</p>
       </rd-widget-body>
@@ -27,7 +27,7 @@
 <div class="row" ng-if="node">
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-object-group" title="Node specification"></rd-widget-header>
+      <rd-widget-header icon="fa-object-group" title-text="Node specification"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -87,7 +87,7 @@
 <div class="row" ng-if="node && node.Role === 'manager'">
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-object-group" title="Manager status"></rd-widget-header>
+      <rd-widget-header icon="fa-object-group" title-text="Manager status"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -116,7 +116,7 @@
 <div class="row" ng-if="node">
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-object-group" title="Node description"></rd-widget-header>
+      <rd-widget-header icon="fa-object-group" title-text="Node description"></rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -146,7 +146,7 @@
 <div class="row" ng-if="node">
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-object-group" title="Engine labels"></rd-widget-header>
+      <rd-widget-header icon="fa-object-group" title-text="Engine labels"></rd-widget-header>
       <rd-widget-body ng-if="!node.EngineLabels || node.EngineLabels.length === 0">
         <p>There are no engine labels for this node.</p>
       </rd-widget-body>
@@ -173,7 +173,7 @@
 <div class="row" ng-if="node">
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-tasks" title="Node labels">
+      <rd-widget-header icon="fa-tasks" title-text="Node labels">
         <div class="nopadding">
           <a class="btn btn-default btn-sm pull-right" ng-click="addLabel(node)">
             <i class="fa fa-plus-circle" aria-hidden="true"></i> label
@@ -234,10 +234,10 @@
 <div class="row" ng-if="node && tasks.length > 0">
   <div class="col-sm-12">
     <node-tasks-datatable
-    title="Tasks" title-icon="fa-tasks"
+    title-text="Tasks" title-icon="fa-tasks"
     dataset="tasks" table-key="node-tasks"
     order-by="Updated" reverse-order="true"
-    show-text-filter="true"
+    
     ></node-tasks-datatable>
   </div>
 </div>

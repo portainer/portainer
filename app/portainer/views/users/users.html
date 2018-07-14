@@ -1,5 +1,5 @@
 <rd-header>
-  <rd-header-title title="Users">
+  <rd-header-title title-text="Users">
     <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.users" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
@@ -10,7 +10,7 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-plus" title="Add a new user">
+      <rd-widget-header icon="fa-plus" title-text="Add a new user">
       </rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
@@ -22,7 +22,7 @@
             </label>
             <div class="col-sm-8">
               <div class="input-group">
-                <input type="text" class="form-control" id="username" ng-model="formValues.Username" ng-change="checkUsernameValidity()" placeholder="e.g. jdoe">
+                <input type="text" class="form-control" id="username" ng-model="formValues.Username" ng-change="checkUsernameValidity()" placeholder="e.g. jdoe" auto-focus>
                 <span class="input-group-addon"><i ng-class="{true: 'fa fa-check green-icon', false: 'fa fa-times red-icon'}[state.validUsername]" aria-hidden="true"></i></span>
               </div>
             </div>
@@ -115,9 +115,9 @@
 <div class="row">
   <div class="col-sm-12">
     <users-datatable
-    title="Users" title-icon="fa-user"
+    title-text="Users" title-icon="fa-user"
     dataset="users" table-key="users"
-    order-by="Username" show-text-filter="true"
+    order-by="Username"
     authentication-method="AuthenticationMethod"
     remove-action="removeAction"
     ></users-datatable>

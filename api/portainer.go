@@ -1,7 +1,5 @@
 package portainer
 
-import "io"
-
 type (
 	// Pair defines a key/value string pair
 	Pair struct {
@@ -23,6 +21,7 @@ type (
 		NoAuth            *bool
 		NoAnalytics       *bool
 		Templates         *string
+		TemplateFile      *string
 		TLS               *bool
 		TLSSkipVerify     *bool
 		TLSCacert         *string
@@ -32,12 +31,15 @@ type (
 		SSLCert           *string
 		SSLKey            *string
 		SyncInterval      *string
+		Snapshot          *bool
+		SnapshotInterval  *string
 	}
 
 	// Status represents the application status.
 	Status struct {
 		Authentication     bool   `json:"Authentication"`
 		EndpointManagement bool   `json:"EndpointManagement"`
+		Snapshot           bool   `json:"Snapshot"`
 		Analytics          bool   `json:"Analytics"`
 		Version            string `json:"Version"`
 	}
@@ -73,16 +75,18 @@ type (
 
 	// Settings represents the application settings.
 	Settings struct {
-		TemplatesURL                       string               `json:"TemplatesURL"`
 		LogoURL                            string               `json:"LogoURL"`
 		BlackListedLabels                  []Pair               `json:"BlackListedLabels"`
-		DisplayExternalContributors        bool                 `json:"DisplayExternalContributors"`
 		AuthenticationMethod               AuthenticationMethod `json:"AuthenticationMethod"`
 		LDAPSettings                       LDAPSettings         `json:"LDAPSettings"`
 		AllowBindMountsForRegularUsers     bool                 `json:"AllowBindMountsForRegularUsers"`
 		AllowPrivilegedModeForRegularUsers bool                 `json:"AllowPrivilegedModeForRegularUsers"`
+		SnapshotInterval                   string               `json:"SnapshotInterval"`
+
 		// Deprecated fields
-		DisplayDonationHeader bool
+		DisplayDonationHeader       bool
+		DisplayExternalContributors bool
+		TemplatesURL                string
 	}
 
 	// User represents a user account.
@@ -134,16 +138,21 @@ type (
 	}
 
 	// StackID represents a stack identifier (it must be composed of Name + "_" + SwarmID to create a unique identifier).
-	StackID string
+	StackID int
+
+	// StackType represents the type of the stack (compose v2, stack deploy v3).
+	StackType int
 
 	// Stack represents a Docker stack created via docker stack deploy.
 	Stack struct {
-		ID          StackID `json:"Id"`
-		Name        string  `json:"Name"`
-		EntryPoint  string  `json:"EntryPoint"`
-		SwarmID     string  `json:"SwarmId"`
+		ID          StackID    `json:"Id"`
+		Name        string     `json:"Name"`
+		Type        StackType  `json:"Type"`
+		EndpointID  EndpointID `json:"EndpointId"`
+		SwarmID     string     `json:"SwarmId"`
+		EntryPoint  string     `json:"EntryPoint"`
+		Env         []Pair     `json:"Env"`
 		ProjectPath string
-		Env         []Pair `json:"Env"`
 	}
 
 	// RegistryID represents a registry identifier.
@@ -176,6 +185,9 @@ type (
 	// EndpointType represents the type of an endpoint.
 	EndpointType int
 
+	// EndpointStatus represents the status of an endpoint
+	EndpointStatus int
+
 	// Endpoint represents a Docker endpoint with all the info required
 	// to connect to it.
 	Endpoint struct {
@@ -190,6 +202,9 @@ type (
 		AuthorizedTeams  []TeamID            `json:"AuthorizedTeams"`
 		Extensions       []EndpointExtension `json:"Extensions"`
 		AzureCredentials AzureCredentials    `json:"AzureCredentials,omitempty"`
+		Tags             []string            `json:"Tags"`
+		Status           EndpointStatus      `json:"Status"`
+		Snapshots        []Snapshot          `json:"Snapshots"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
@@ -207,6 +222,21 @@ type (
 		AuthenticationKey string `json:"AuthenticationKey"`
 	}
 
+	// Snapshot represents a snapshot of a specific endpoint at a specific time
+	Snapshot struct {
+		Time                  int64  `json:"Time"`
+		DockerVersion         string `json:"DockerVersion"`
+		Swarm                 bool   `json:"Swarm"`
+		TotalCPU              int    `json:"TotalCPU"`
+		TotalMemory           int64  `json:"TotalMemory"`
+		RunningContainerCount int    `json:"RunningContainerCount"`
+		StoppedContainerCount int    `json:"StoppedContainerCount"`
+		VolumeCount           int    `json:"VolumeCount"`
+		ImageCount            int    `json:"ImageCount"`
+		ServiceCount          int    `json:"ServiceCount"`
+		StackCount            int    `json:"StackCount"`
+	}
+
 	// EndpointGroupID represents an endpoint group identifier.
 	EndpointGroupID int
 
@@ -217,7 +247,10 @@ type (
 		Description     string          `json:"Description"`
 		AuthorizedUsers []UserID        `json:"AuthorizedUsers"`
 		AuthorizedTeams []TeamID        `json:"AuthorizedTeams"`
-		Labels          []Pair          `json:"Labels"`
+		Tags            []string        `json:"Tags"`
+
+		// Deprecated fields
+		Labels []Pair `json:"Labels"`
 	}
 
 	// EndpointExtension represents a extension associated to an endpoint.
@@ -262,6 +295,88 @@ type (
 	TeamResourceAccess struct {
 		TeamID      TeamID              `json:"TeamId"`
 		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
+	}
+
+	// TagID represents a tag identifier.
+	TagID int
+
+	// Tag represents a tag that can be associated to a resource.
+	Tag struct {
+		ID   TagID
+		Name string `json:"Name"`
+	}
+
+	// TemplateID represents a template identifier.
+	TemplateID int
+
+	// TemplateType represents the type of a template.
+	TemplateType int
+
+	// Template represents an application template.
+	Template struct {
+		// Mandatory container/stack fields
+		ID                TemplateID   `json:"Id"`
+		Type              TemplateType `json:"type"`
+		Title             string       `json:"title"`
+		Description       string       `json:"description"`
+		AdministratorOnly bool         `json:"administrator_only"`
+
+		// Mandatory container fields
+		Image string `json:"image"`
+
+		// Mandatory stack fields
+		Repository TemplateRepository `json:"repository"`
+
+		// Optional stack/container fields
+		Name       string        `json:"name,omitempty"`
+		Logo       string        `json:"logo,omitempty"`
+		Env        []TemplateEnv `json:"env,omitempty"`
+		Note       string        `json:"note,omitempty"`
+		Platform   string        `json:"platform,omitempty"`
+		Categories []string      `json:"categories,omitempty"`
+
+		// Optional container fields
+		Registry      string           `json:"registry,omitempty"`
+		Command       string           `json:"command,omitempty"`
+		Network       string           `json:"network,omitempty"`
+		Volumes       []TemplateVolume `json:"volumes,omitempty"`
+		Ports         []string         `json:"ports,omitempty"`
+		Labels        []Pair           `json:"labels,omitempty"`
+		Privileged    bool             `json:"privileged,omitempty"`
+		Interactive   bool             `json:"interactive,omitempty"`
+		RestartPolicy string           `json:"restart_policy,omitempty"`
+		Hostname      string           `json:"hostname,omitempty"`
+	}
+
+	// TemplateEnv represents a template environment variable configuration.
+	TemplateEnv struct {
+		Name        string              `json:"name"`
+		Label       string              `json:"label,omitempty"`
+		Description string              `json:"description,omitempty"`
+		Default     string              `json:"default,omitempty"`
+		Preset      bool                `json:"preset,omitempty"`
+		Select      []TemplateEnvSelect `json:"select,omitempty"`
+	}
+
+	// TemplateVolume represents a template volume configuration.
+	TemplateVolume struct {
+		Container string `json:"container"`
+		Bind      string `json:"bind,omitempty"`
+		ReadOnly  bool   `json:"readonly,omitempty"`
+	}
+
+	// TemplateRepository represents the git repository configuration for a template.
+	TemplateRepository struct {
+		URL       string `json:"url"`
+		StackFile string `json:"stackfile"`
+	}
+
+	// TemplateEnvSelect represents text/value pair that will be displayed as a choice for the
+	// template user.
+	TemplateEnvSelect struct {
+		Text    string `json:"text"`
+		Value   string `json:"value"`
+		Default bool   `json:"default"`
 	}
 
 	// ResourceAccessLevel represents the level of control associated to a resource.
@@ -355,23 +470,24 @@ type (
 	// StackService represents a service for managing stack data.
 	StackService interface {
 		Stack(ID StackID) (*Stack, error)
+		StackByName(name string) (*Stack, error)
 		Stacks() ([]Stack, error)
-		StacksBySwarmID(ID string) ([]Stack, error)
 		CreateStack(stack *Stack) error
 		UpdateStack(ID StackID, stack *Stack) error
 		DeleteStack(ID StackID) error
+		GetNextIdentifier() int
 	}
 
 	// DockerHubService represents a service for managing the DockerHub object.
 	DockerHubService interface {
 		DockerHub() (*DockerHub, error)
-		StoreDockerHub(registry *DockerHub) error
+		UpdateDockerHub(registry *DockerHub) error
 	}
 
 	// SettingsService represents a service for managing application settings.
 	SettingsService interface {
 		Settings() (*Settings, error)
-		StoreSettings(settings *Settings) error
+		UpdateSettings(settings *Settings) error
 	}
 
 	// VersionService represents a service for managing version data.
@@ -388,6 +504,22 @@ type (
 		CreateResourceControl(rc *ResourceControl) error
 		UpdateResourceControl(ID ResourceControlID, resourceControl *ResourceControl) error
 		DeleteResourceControl(ID ResourceControlID) error
+	}
+
+	// TagService represents a service for managing tag data.
+	TagService interface {
+		Tags() ([]Tag, error)
+		CreateTag(tag *Tag) error
+		DeleteTag(ID TagID) error
+	}
+
+	// TemplateService represents a service for managing template data.
+	TemplateService interface {
+		Templates() ([]Template, error)
+		Template(ID TemplateID) (*Template, error)
+		CreateTemplate(template *Template) error
+		UpdateTemplate(ID TemplateID, template *Template) error
+		DeleteTemplate(ID TemplateID) error
 	}
 
 	// CryptoService represents a service for encrypting/hashing data.
@@ -413,19 +545,20 @@ type (
 
 	// FileService represents a service for managing files.
 	FileService interface {
-		GetFileContent(filePath string) (string, error)
+		GetFileContent(filePath string) ([]byte, error)
+		Rename(oldPath, newPath string) error
 		RemoveDirectory(directoryPath string) error
-		StoreTLSFile(folder string, fileType TLSFileType, r io.Reader) error
+		StoreTLSFileFromBytes(folder string, fileType TLSFileType, data []byte) (string, error)
 		GetPathForTLSFile(folder string, fileType TLSFileType) (string, error)
 		DeleteTLSFile(folder string, fileType TLSFileType) error
 		DeleteTLSFiles(folder string) error
 		GetStackProjectPath(stackIdentifier string) string
-		StoreStackFileFromString(stackIdentifier, fileName, stackFileContent string) (string, error)
-		StoreStackFileFromReader(stackIdentifier, fileName string, r io.Reader) (string, error)
+		StoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error)
 		KeyPairFilesExist() (bool, error)
 		StoreKeyPair(private, public []byte, privatePEMHeader, publicPEMHeader string) error
 		LoadKeyPair() ([]byte, []byte, error)
 		WriteJSONToFile(path string, content interface{}) error
+		FileExists(path string) (bool, error)
 	}
 
 	// GitService represents a service for managing Git.
@@ -434,9 +567,17 @@ type (
 		ClonePrivateRepositoryWithBasicAuth(repositoryURL, destination, username, password string) error
 	}
 
-	// EndpointWatcher represents a service to synchronize the endpoints via an external source.
-	EndpointWatcher interface {
-		WatchEndpointFile(endpointFilePath string) error
+	// JobScheduler represents a service to run jobs on a periodic basis.
+	JobScheduler interface {
+		ScheduleEndpointSyncJob(endpointFilePath, interval string) error
+		ScheduleSnapshotJob(interval string) error
+		UpdateSnapshotJob(interval string)
+		Start()
+	}
+
+	// Snapshotter represents a service used to create endpoint snapshots.
+	Snapshotter interface {
+		CreateSnapshot(endpoint *Endpoint) (*Snapshot, error)
 	}
 
 	// LDAPService represents a service used to authenticate users against a LDAP/AD.
@@ -446,22 +587,26 @@ type (
 		GetUserGroups(username string, settings *LDAPSettings) ([]string, error)
 	}
 
-	// StackManager represents a service to manage stacks.
-	StackManager interface {
+	// SwarmStackManager represents a service to manage Swarm stacks.
+	SwarmStackManager interface {
 		Login(dockerhub *DockerHub, registries []Registry, endpoint *Endpoint)
 		Logout(endpoint *Endpoint) error
 		Deploy(stack *Stack, prune bool, endpoint *Endpoint) error
 		Remove(stack *Stack, endpoint *Endpoint) error
 	}
+
+	// ComposeStackManager represents a service to manage Compose stacks.
+	ComposeStackManager interface {
+		Up(stack *Stack, endpoint *Endpoint) error
+		Down(stack *Stack, endpoint *Endpoint) error
+	}
 )
 
 const (
 	// APIVersion is the version number of the Portainer API.
-	APIVersion = "1.17.1-dev"
+	APIVersion = "1.18.2-dev"
 	// DBVersion is the version number of the Portainer database.
-	DBVersion = 11
-	// DefaultTemplatesURL represents the default URL for the templates definitions.
-	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
+	DBVersion = 12
 	// PortainerAgentHeader represents the name of the header available in any agent response
 	PortainerAgentHeader = "Portainer-Agent"
 	// PortainerAgentTargetHeader represent the name of the header containing the target node name.
@@ -473,6 +618,8 @@ const (
 	// PortainerAgentSignatureMessage represents the message used to create a digital signature
 	// to be used when communicating with an agent
 	PortainerAgentSignatureMessage = "Portainer-App"
+	// SupportedDockerAPIVersion is the minimum Docker API version supported by Portainer.
+	SupportedDockerAPIVersion = "1.24"
 )
 
 const (
@@ -546,4 +693,30 @@ const (
 	AgentOnDockerEnvironment
 	// AzureEnvironment represents an endpoint connected to an Azure environment
 	AzureEnvironment
+)
+
+const (
+	_ StackType = iota
+	// DockerSwarmStack represents a stack managed via docker stack
+	DockerSwarmStack
+	// DockerComposeStack represents a stack managed via docker-compose
+	DockerComposeStack
+)
+
+const (
+	_ TemplateType = iota
+	// ContainerTemplate represents a container template
+	ContainerTemplate
+	// SwarmStackTemplate represents a template used to deploy a Swarm stack
+	SwarmStackTemplate
+	// ComposeStackTemplate represents a template used to deploy a Compose stack
+	ComposeStackTemplate
+)
+
+const (
+	_ EndpointStatus = iota
+	// EndpointStatusUp is used to represent an available endpoint
+	EndpointStatusUp
+	// EndpointStatusDown is used to represent an unavailable endpoint
+	EndpointStatusDown
 )

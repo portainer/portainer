@@ -1,14 +1,22 @@
 <rd-header>
-  <rd-header-title title="Settings"></rd-header-title>
+  <rd-header-title title-text="Settings"></rd-header-title>
   <rd-header-content>Settings</rd-header-content>
 </rd-header>
 
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-cogs" title="Application settings"></rd-widget-header>
+      <rd-widget-header icon="fa-cogs" title-text="Application settings"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
+          <!-- snapshot-interval -->
+          <div class="form-group">
+            <label for="snapshot_interval" class="col-sm-2 control-label text-left">Snapshot interval</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" ng-model="settings.SnapshotInterval" id="snapshot_interval" placeholder="e.g. 15m">
+            </div>
+          </div>
+          <!-- !snapshot-interval -->
           <!-- logo -->
           <div class="form-group">
             <div class="col-sm-12">
@@ -63,47 +71,6 @@
             </div>
           </div>
           <!-- security -->
-          <!-- app-templates -->
-          <div class="col-sm-12 form-section-title">
-            App Templates
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label for="toggle_templates" class="control-label text-left">
-                Use custom templates
-              </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="toggle_templates" ng-model="formValues.customTemplates"><i></i>
-              </label>
-            </div>
-          </div>
-          <div ng-if="formValues.customTemplates">
-            <div class="form-group">
-              <span class="col-sm-12 text-muted small">
-                You can specify the URL to your own template definitions file here. See <a href="https://portainer.readthedocs.io/en/stable/templates.html" target="_blank">Portainer documentation</a> for more details.
-              </span>
-            </div>
-            <div class="form-group" >
-              <label for="templates_url" class="col-sm-1 control-label text-left">
-                URL
-              </label>
-              <div class="col-sm-11">
-                <input type="text" class="form-control" ng-model="settings.TemplatesURL" id="templates_url" placeholder="https://myserver.mydomain/templates.json">
-              </div>
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label for="toggle_external_contrib" class="control-label text-left">
-                Hide external contributions
-                <portainer-tooltip position="bottom" message="When enabled, external contributions such as LinuxServer.io will not be displayed in the sidebar."></portainer-tooltip>
-              </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="toggle_external_contrib" ng-model="formValues.externalContributions"><i></i>
-              </label>
-            </div>
-          </div>
-          <!-- !app-templates -->
           <!-- actions -->
           <div class="form-group">
             <div class="col-sm-12">
@@ -123,7 +90,7 @@
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-tags" title="Hidden containers"></rd-widget-header>
+      <rd-widget-header icon="fa-tags" title-text="Hidden containers"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal" ng-submit="addFilteredContainerLabel()" name="addTagForm">
           <div class="form-group">

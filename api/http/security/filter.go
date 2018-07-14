@@ -62,8 +62,7 @@ func FilterUsers(users []portainer.User, context *RestrictedRequestContext) []po
 
 // FilterRegistries filters registries based on user role and team memberships.
 // Non administrator users only have access to authorized registries.
-func FilterRegistries(registries []portainer.Registry, context *RestrictedRequestContext) ([]portainer.Registry, error) {
-
+func FilterRegistries(registries []portainer.Registry, context *RestrictedRequestContext) []portainer.Registry {
 	filteredRegistries := registries
 	if !context.IsAdmin {
 		filteredRegistries = make([]portainer.Registry, 0)
@@ -75,12 +74,30 @@ func FilterRegistries(registries []portainer.Registry, context *RestrictedReques
 		}
 	}
 
-	return filteredRegistries, nil
+	return filteredRegistries
+}
+
+// FilterTemplates filters templates based on the user role.
+// Non-administrato template do not have access to templates where the AdministratorOnly flag is set to true.
+func FilterTemplates(templates []portainer.Template, context *RestrictedRequestContext) []portainer.Template {
+	filteredTemplates := templates
+
+	if !context.IsAdmin {
+		filteredTemplates = make([]portainer.Template, 0)
+
+		for _, template := range templates {
+			if !template.AdministratorOnly {
+				filteredTemplates = append(filteredTemplates, template)
+			}
+		}
+	}
+
+	return filteredTemplates
 }
 
 // FilterEndpoints filters endpoints based on user role and team memberships.
 // Non administrator users only have access to authorized endpoints (can be inherited via endoint groups).
-func FilterEndpoints(endpoints []portainer.Endpoint, groups []portainer.EndpointGroup, context *RestrictedRequestContext) ([]portainer.Endpoint, error) {
+func FilterEndpoints(endpoints []portainer.Endpoint, groups []portainer.EndpointGroup, context *RestrictedRequestContext) []portainer.Endpoint {
 	filteredEndpoints := endpoints
 
 	if !context.IsAdmin {
@@ -89,18 +106,18 @@ func FilterEndpoints(endpoints []portainer.Endpoint, groups []portainer.Endpoint
 		for _, endpoint := range endpoints {
 			endpointGroup := getAssociatedGroup(&endpoint, groups)
 
-			if AuthorizedEndpointAccess(&endpoint, endpointGroup, context.UserID, context.UserMemberships) {
+			if authorizedEndpointAccess(&endpoint, endpointGroup, context.UserID, context.UserMemberships) {
 				filteredEndpoints = append(filteredEndpoints, endpoint)
 			}
 		}
 	}
 
-	return filteredEndpoints, nil
+	return filteredEndpoints
 }
 
 // FilterEndpointGroups filters endpoint groups based on user role and team memberships.
 // Non administrator users only have access to authorized endpoint groups.
-func FilterEndpointGroups(endpointGroups []portainer.EndpointGroup, context *RestrictedRequestContext) ([]portainer.EndpointGroup, error) {
+func FilterEndpointGroups(endpointGroups []portainer.EndpointGroup, context *RestrictedRequestContext) []portainer.EndpointGroup {
 	filteredEndpointGroups := endpointGroups
 
 	if !context.IsAdmin {
@@ -113,7 +130,7 @@ func FilterEndpointGroups(endpointGroups []portainer.EndpointGroup, context *Res
 		}
 	}
 
-	return filteredEndpointGroups, nil
+	return filteredEndpointGroups
 }
 
 func getAssociatedGroup(endpoint *portainer.Endpoint, groups []portainer.EndpointGroup) *portainer.EndpointGroup {

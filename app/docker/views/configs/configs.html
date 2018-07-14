@@ -1,5 +1,5 @@
 <rd-header>
-  <rd-header-title title="Configs list">
+  <rd-header-title title-text="Configs list">
     <a data-toggle="tooltip" title="Refresh" ui-sref="docker.configs" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
@@ -10,9 +10,9 @@
 <div class="row">
   <div class="col-sm-12">
     <configs-datatable
-    title="Configs" title-icon="fa-file-code"
+    title-text="Configs" title-icon="fa-file-code"
     dataset="configs" table-key="configs"
-    order-by="Name" show-text-filter="true"
+    order-by="Name" 
     show-ownership-column="applicationState.application.authentication"
     remove-action="removeAction"
     ></configs-datatable>
