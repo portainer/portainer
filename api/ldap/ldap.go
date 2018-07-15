@@ -126,13 +126,13 @@ func (*Service) GetUserGroups(username string, settings *portainer.LDAPSettings)
 		return nil, err
 	}
 
-	userGroups := getGroups(userDN, connection, settings.SearchSettings)
+	userGroups := getGroups(userDN, connection, settings.GroupSearchSettings)
 
 	return userGroups, nil
 }
 
 // Get a list of group names for specified user from LDAP/AD
-func getGroups(userDN string, conn *ldap.Conn, settings []portainer.LDAPSearchSettings) []string {
+func getGroups(userDN string, conn *ldap.Conn, settings []portainer.LDAPGroupSearchSettings) []string {
 	groups := make([]string, 0)
 
 	for _, searchSettings := range settings {

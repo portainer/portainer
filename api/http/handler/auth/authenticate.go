@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -57,13 +58,13 @@ func (handler *Handler) authenticate(w http.ResponseWriter, r *http.Request) *ht
 			if err != nil {
 				return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid credentials", err}
 			}
-		} else if err != nil {
+		} else if err != nil || u == nil {
 			return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid credentials", err}
 		}
 	} else {
 		err = handler.authInternal(u, payload.Password)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid credentials", err}
+			return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid credentials", portainer.ErrUnauthorized}
 		}
 	}
 
@@ -95,7 +96,7 @@ func (handler *Handler) authInternal(user *portainer.User, password string) erro
 
 func (handler *Handler) authLdap(user *portainer.User, username string, password string, settings *portainer.Settings) (*portainer.User, error) {
 	err := handler.LDAPService.AuthenticateUser(username, password, &settings.LDAPSettings)
-	if err == nil {
+	if err != nil {
 		return user, err
 	}
 
@@ -108,14 +109,11 @@ func (handler *Handler) authLdap(user *portainer.User, username string, password
 		if err == nil {
 			user, err = handler.UserService.UserByUsername(username)
 		}
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	err = handler.addUserIntoTeams(user, settings)
 	if err != nil {
-		return nil, err
+		log.Printf("Warning user adding to teams returned error: %s", err.Error())
 	}
 
 	return user, nil

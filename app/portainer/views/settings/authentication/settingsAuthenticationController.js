@@ -21,6 +21,14 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
   $scope.removeSearchConfiguration = function(index) {
     $scope.LDAPSettings.SearchSettings.splice(index, 1);
   };
+  
+  $scope.addGroupSearchConfiguration = function() {
+    $scope.LDAPSettings.GroupSearchSettings.push({ GroupBaseDN: '', GroupAttribute: '', GroupFilter: '' });
+  };
+
+  $scope.removeGroupSearchConfiguration = function(index) {
+    $scope.LDAPSettings.GroupSearchSettings.splice(index, 1);
+  };
 
   $scope.LDAPConnectivityCheck = function() {
     var settings = $scope.settings;

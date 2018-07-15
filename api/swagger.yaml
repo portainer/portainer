@@ -2896,6 +2896,9 @@ definitions:
         type: "string"
         example: "uid"
         description: "LDAP attribute which denotes the username"
+  LDAPGroupSearchSettings:
+    type: "object"
+    properties:
       GroupBaseDN:
         type: "string"
         example: "dc=ldap,dc=domain,dc=tld"
@@ -2934,6 +2937,10 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/LDAPSearchSettings"
+      GroupSearchSettings:
+        type: "array"
+        items:
+          $ref: "#/definitions/LDAPGroupSearchSettings"
 
   Settings:
     type: "object"
