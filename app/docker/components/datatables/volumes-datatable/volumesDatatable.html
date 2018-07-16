@@ -102,7 +102,7 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-change="$ctrl.selectItem(item)"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="docker.volumes.volume({ id: item.Id, nodeName: item.NodeName })" class="monospaced">{{ item.Id | truncate:25 }}</a>
+                <a ui-sref="docker.volumes.volume({ id: item.Id, nodeName: item.NodeName })" class="monospaced" title="{{ item.Id }}">{{ item.Id | truncate:40 }}</a>
                 <span style="margin-left: 10px;" class="label label-warning image-tag" ng-if="item.dangling">Unused</span>
               </td>
               <td>{{ item.StackName ? item.StackName : '-' }}</td>
