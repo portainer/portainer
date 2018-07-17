@@ -151,7 +151,6 @@ func getGroups(userDN string, conn *ldap.Conn, settings []portainer.LDAPGroupSea
 			continue
 		}
 
-		// Collect groups
 		for _, entry := range sr.Entries {
 			for _, attr := range entry.Attributes {
 				groups = append(groups, attr.Values[0])

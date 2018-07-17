@@ -8,9 +8,7 @@ func (m *Migrator) updateSettingsToVersion13() error {
 		return err
 	}
 
-	legacySettings.AuthenticationMethod = portainer.AuthenticationInternal
 	legacySettings.LDAPSettings = portainer.LDAPSettings{
-		TLSConfig: portainer.TLSConfiguration{},
 		GroupSearchSettings: []portainer.LDAPGroupSearchSettings{
 			portainer.LDAPGroupSearchSettings{},
 		},
