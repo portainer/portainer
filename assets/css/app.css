@@ -144,6 +144,9 @@ a[ng-click]{
   white-space: nowrap;
 }
 
+.widget .widget-body table tbody td p{
+  white-space: normal;
+}
 .template-widget {
   height: 100%;
 }
