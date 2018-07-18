@@ -144,9 +144,15 @@ a[ng-click]{
   white-space: nowrap;
 }
 
-.widget .widget-body table tbody td p{
+.widget .widget-body table tbody td p {
   white-space: normal;
 }
+
+.widget .widget-body table tbody td code {
+  white-space: normal;
+  word-break: break-all;
+}
+
 .template-widget {
   height: 100%;
 }
