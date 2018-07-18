@@ -1,0 +1,15 @@
+<rd-header>
+  <rd-header-title title-text="Volume browser"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="docker.volumes">Volumes</a> &gt; <a ui-sref="docker.volumes.volume({ id: volumeId })">{{ volumeId }}</a> &gt; browse
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <volume-browser
+      volume-id="volumeId"
+      node-name="nodeName"
+    ></volume-browser>
+  </div>
+</div>

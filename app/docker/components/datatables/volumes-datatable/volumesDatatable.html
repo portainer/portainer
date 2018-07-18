@@ -103,7 +103,10 @@
                   <label for="select_{{ $index }}"></label>
                 </span>
                 <a ui-sref="docker.volumes.volume({ id: item.Id, nodeName: item.NodeName })" class="monospaced">{{ item.Id | truncate:25 }}</a>
-                <span style="margin-left: 10px;" class="label label-warning image-tag" ng-if="item.dangling">Unused</span>
+                <a ui-sref="docker.volumes.volume.browse({ id: item.Id, nodeName: item.NodeName })" class="btn btn-xs btn-primary space-left" ng-if="$ctrl.showBrowseAction">
+                  <i class="fa fa-search"></i> browse</a>
+                </a>
+                <span style="margin-left: 10px;" class="label label-warning image-tag space-left" ng-if="item.dangling">Unused</span>
               </td>
               <td>{{ item.StackName ? item.StackName : '-' }}</td>
               <td>{{ item.Driver }}</td>

@@ -67,11 +67,7 @@ function ContainerServiceFactory($q, Container, ResourceControlService, LogHelpe
     var deferred = $q.defer();
     Container.create(configuration).$promise
     .then(function success(data) {
-      if (data.message) {
-        deferred.reject({ msg: data.message });
-      } else {
-        deferred.resolve(data);
-      }
+      deferred.resolve(data);
     })
     .catch(function error(err) {
       deferred.reject({ msg: 'Unable to create container', err: err });
