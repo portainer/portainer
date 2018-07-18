@@ -35,13 +35,13 @@ func (factory *ClientFactory) CreateClient(endpoint *portainer.Endpoint) (*clien
 		return createAgentClient(endpoint, factory.signatureService)
 	}
 
-	if strings.HasPrefix(endpoint.URL, "unix://") {
-		return createUnixSocketClient(endpoint)
+	if strings.HasPrefix(endpoint.URL, "unix://") || strings.HasPrefix(endpoint.URL, "npipe://") {
+		return createLocalClient(endpoint)
 	}
 	return createTCPClient(endpoint)
 }
 
-func createUnixSocketClient(endpoint *portainer.Endpoint) (*client.Client, error) {
+func createLocalClient(endpoint *portainer.Endpoint) (*client.Client, error) {
 	return client.NewClientWithOpts(
 		client.WithHost(endpoint.URL),
 		client.WithVersion(portainer.SupportedDockerAPIVersion),
