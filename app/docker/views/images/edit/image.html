@@ -137,7 +137,7 @@
           <tbody>
             <tr>
               <td>CMD</td>
-              <td><code>{{ image.Command|command }}</code></td>
+              <td style="width:auto;word-break:break-word;word-break:break-all;white-space:pre-wrap;"><code>{{ image.Command|command }}</code></td>
             </tr>
             <tr ng-if="image.Entrypoint">
               <td>ENTRYPOINT</td>
@@ -164,8 +164,8 @@
               <td>
                 <table class="table table-bordered table-condensed">
                   <tr ng-repeat="var in image.Env">
-                    <td>{{ var|key: '=' }}</td>
-                    <td>{{ var|value: '=' }}</td>
+                    <td style="width:auto;word-break:break-word;word-break:break-all;white-space:pre-wrap;">{{ var|key: '=' }}</td>
+                    <td style="width:auto;word-break:break-word;word-break:break-all;white-space:pre-wrap;">{{ var|value: '=' }}</td>
                   </tr>
                 </table>
               </td>
