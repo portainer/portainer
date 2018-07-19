@@ -39,6 +39,21 @@ function ($scope, $state, ImageService, Notifications, ModalService, HttpRequest
     });
   };
 
+
+  $scope.downloadAction = function (selectedItems) {
+    var nodeName = $scope.formValues.NodeName;
+    HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
+    ImageService.downloadImages(selectedItems)
+    .then(function success(data) {
+      Notifications.success('Images successfully downloaded');
+      // var file = new Blob([data], { type: 'application/x-tar' });
+      // saveAs(file, 'filename.tar');
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to download images');
+    });
+  };
+
   $scope.removeAction = function (selectedItems, force) {
     var actionCount = selectedItems.length;
     angular.forEach(selectedItems, function (image) {

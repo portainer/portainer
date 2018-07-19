@@ -10,6 +10,7 @@ angular.module('portainer.docker').component('imagesDatatable', {
     reverseOrder: '<',
     showHostColumn: '<',
     removeAction: '<',
+    downloadAction: '<',
     forceRemoveAction: '<'
   }
 });

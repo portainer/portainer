@@ -26,6 +26,10 @@ function ImageFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, HttpR
       headers: { 'X-Registry-Auth': HttpRequestHelper.registryAuthenticationHeader },
       ignoreLoadingBar: true
     },
+    download: {
+      method: 'GET', params: {action:'get', names: '@names'},
+      ignoreLoadingBar: false
+    },
     remove: {
       method: 'DELETE', params: {id: '@id', force: '@force'},
       isArray: true, transformResponse: deleteImageHandler
