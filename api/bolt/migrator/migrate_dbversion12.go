@@ -8,10 +8,8 @@ func (m *Migrator) updateSettingsToVersion13() error {
 		return err
 	}
 
-	legacySettings.LDAPSettings = portainer.LDAPSettings{
-		GroupSearchSettings: []portainer.LDAPGroupSearchSettings{
-			portainer.LDAPGroupSearchSettings{},
-		},
+	legacySettings.LDAPSettings.GroupSearchSettings = []portainer.LDAPGroupSearchSettings{
+		portainer.LDAPGroupSearchSettings{},
 	}
 
 	return m.settingsService.UpdateSettings(legacySettings)
