@@ -1,6 +1,7 @@
 package stacks
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -22,6 +23,7 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 	}
 
 	externalStack, _ := request.RetrieveBooleanQueryParameter(r, "external", true)
+	log.Printf("External stack value: %v", externalStack)
 	if externalStack {
 		return handler.deleteExternalStack(r, w, stackID)
 	}

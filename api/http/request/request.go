@@ -133,6 +133,9 @@ func RetrieveNumericQueryParameter(request *http.Request, name string, optional 
 	if err != nil {
 		return 0, err
 	}
+	if queryParameter == "" && optional {
+		return 0, nil
+	}
 	return strconv.Atoi(queryParameter)
 }
 
