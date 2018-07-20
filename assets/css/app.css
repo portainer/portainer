@@ -140,17 +140,13 @@ a[ng-click]{
   font-weight: normal;
 }
 
-.widget .widget-body table tbody td {
+.widget .widget-body .nowrap-cells tbody td {
   white-space: nowrap;
 }
 
-.widget .widget-body table tbody td p {
+.widget .widget-body table tbody td {
   white-space: normal;
-}
-
-.widget .widget-body table tbody td code {
-  white-space: normal;
-  word-break: break-all;
+  word-break: break-word;
 }
 
 .template-widget {
