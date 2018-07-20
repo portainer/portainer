@@ -1,5 +1,7 @@
 FROM microsoft/nanoserver
 
+USER ContainerAdministrator
+
 COPY dist /
 
 VOLUME C:\\data

@@ -57,7 +57,7 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
   service.createLocalEndpoint = function() {
     var deferred = $q.defer();
 
-    FileUploadService.createEndpoint('local', 1, 'unix:///var/run/docker.sock', '', 1, [], false)
+    FileUploadService.createEndpoint('local', 1, '', '', 1, [], false)
     .then(function success(response) {
       deferred.resolve(response.data);
     })

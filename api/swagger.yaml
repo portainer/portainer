@@ -247,7 +247,8 @@ paths:
       - name: "URL"
         in: "formData"
         type: "string"
-        description: "URL or IP address of a Docker host (example: docker.mydomain.tld:2375). Required if endpoint type is set to 1 or 2."
+        description: "URL or IP address of a Docker host (example: docker.mydomain.tld:2375).\
+          \ Defaults to local if not specified (Linux: /var/run/docker.sock, Windows: //./pipe/docker_engine)"
       - name: "PublicURL"
         in: "formData"
         type: "string"
