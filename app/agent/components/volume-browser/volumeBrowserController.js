@@ -13,7 +13,7 @@ function (HttpRequestHelper, VolumeBrowserService, FileSaver, Blob, ModalService
 
     VolumeBrowserService.rename(this.volumeId, filePath, newFilePath)
     .then(function success() {
-      Notifications.success('File successfully deleted', newFilePath);
+      Notifications.success('File successfully renamed', newFilePath);
       return VolumeBrowserService.ls(ctrl.volumeId, ctrl.state.path);
     })
     .then(function success(data) {
