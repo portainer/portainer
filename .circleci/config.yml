@@ -1,0 +1,19 @@
+#
+# Check https://circleci.com/docs/2.0/language-go/ for more details
+version: 2
+jobs:
+  build:
+    docker:
+      - image: portainer/golang-builder:ci
+    environment:
+      - GOARCH=amd64
+      - GOOS=linux
+    working_directory: /go/src/github.com/portainer
+    steps:
+      - checkout
+      - run: yarn
+      - run: yarn grunt build-webapp
+      - run: mv api portainer
+      - run: cd portainer && govend -v
+      - run: cd portainer && go build -o /tmp/portainer ./cmd/portainer/main.go
+
