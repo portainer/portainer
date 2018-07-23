@@ -186,7 +186,7 @@
     dataset="services" table-key="stack-services"
     order-by="Name"
     nodes="nodes"
-    agent-proxy="applicationState.endpoint.mode.agentProxy"
+    agent-proxy="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'"
     show-ownership-column="false"
     show-update-action="applicationState.endpoint.apiVersion >= 1.25"
     show-task-logs-button="applicationState.endpoint.apiVersion >= 1.30"

@@ -28,7 +28,7 @@
             </div>
           </div>
           <!-- !tag-note -->
-          <div ng-if="applicationState.endpoint.mode.agentProxy">
+          <div ng-if="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
             <div class="col-sm-12 form-section-title">
               Deployment
             </div>
@@ -57,8 +57,8 @@
     <images-datatable
     title-text="Images" title-icon="fa-clone"
     dataset="images" table-key="images"
-    order-by="RepoTags" 
-    show-host-column="applicationState.endpoint.mode.agentProxy"
+    order-by="RepoTags"
+    show-host-column="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'"
     remove-action="removeAction"
     force-remove-action="confirmRemovalAction"
     ></images-datatable>

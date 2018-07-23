@@ -119,7 +119,7 @@
             </div>
           </div>
           <!-- !internal -->
-          <div ng-if="applicationState.endpoint.mode.agentProxy && config.Driver !== 'overlay'">
+          <div ng-if="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && config.Driver !== 'overlay'">
             <div class="col-sm-12 form-section-title">
               Deployment
             </div>

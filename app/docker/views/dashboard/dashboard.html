@@ -3,14 +3,14 @@
   <rd-header-content>Endpoint summary</rd-header-content>
 </rd-header>
 
-<div class="row" ng-if="applicationState.endpoint.mode.agentProxy">
+<div class="row" ng-if="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
   <div class="col-sm-12">
     <dashboard-cluster-agent-info></dashboard-cluster-agent-info>
   </div>
 </div>
 
-<div class="row" ng-if="!applicationState.endpoint.mode.agentProxy">
-  <div class="col-sm-12" ng-if="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
+<div class="row" ng-if="!applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
+  <div class="col-sm-12">
     <rd-widget>
       <rd-widget-body>
         <div class="col-sm-12 form-section-title">
@@ -32,7 +32,9 @@
       </rd-widget-body>
     </rd-widget>
   </div>
+</div>
 
+<div class="row" ng-if="!applicationState.endpoint.mode.agentProxy || applicationState.endpoint.mode.provider !== 'DOCKER_SWARM_MODE'">
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-header icon="fa-tachometer-alt" title-text="Node info"></rd-widget-header>
