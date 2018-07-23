@@ -40,7 +40,7 @@
         <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus>
       </div>
 
-      <div class="template-list">
+      <div class="blocklist">
         <template-item
           ng-repeat="template in $ctrl.templates | filter: $ctrl.filterByType | filter:$ctrl.filterByCategory | filter:$ctrl.state.textFilter"
           model="template"
@@ -52,7 +52,7 @@
         <div ng-if="!$ctrl.templates" class="text-center text-muted">
           Loading...
         </div>
-        <div ng-if="($ctrl.templates | filter: $ctrl.filterByType | filter:$ctrl.filterByCategory | filter:$ctrl.state.textFilter).length == 0" class="text-center text-muted">
+        <div ng-if="($ctrl.templates | filter: $ctrl.filterByType | filter:$ctrl.filterByCategory | filter:$ctrl.state.textFilter).length === 0" class="text-center text-muted">
           No templates available.
         </div>
       </div>

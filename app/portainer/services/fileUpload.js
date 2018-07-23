@@ -80,7 +80,7 @@ angular.module('portainer.app')
       data: {
         Name: name,
         EndpointType: 3,
-        GroupID: groupID,
+        GroupID: groupId,
         Tags: Upload.json(tags),
         AzureApplicationID: applicationId,
         AzureTenantID: tenantId,

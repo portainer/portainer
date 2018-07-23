@@ -106,8 +106,12 @@ func initClientFactory(signatureService portainer.DigitalSignatureService) *dock
 	return docker.NewClientFactory(signatureService)
 }
 
-func initJobScheduler(endpointService portainer.EndpointService, clientFactory *docker.ClientFactory, flags *portainer.CLIFlags) (portainer.JobScheduler, error) {
-	jobScheduler := cron.NewJobScheduler(endpointService, clientFactory)
+func initSnapshotter(clientFactory *docker.ClientFactory) portainer.Snapshotter {
+	return docker.NewSnapshotter(clientFactory)
+}
+
+func initJobScheduler(endpointService portainer.EndpointService, snapshotter portainer.Snapshotter, flags *portainer.CLIFlags) (portainer.JobScheduler, error) {
+	jobScheduler := cron.NewJobScheduler(endpointService, snapshotter)
 
 	if *flags.ExternalEndpoints != "" {
 		log.Println("Using external endpoint definition. Endpoint management via the API will be disabled.")
@@ -394,7 +398,9 @@ func main() {
 
 	clientFactory := initClientFactory(digitalSignatureService)
 
-	jobScheduler, err := initJobScheduler(store.EndpointService, clientFactory, flags)
+	snapshotter := initSnapshotter(clientFactory)
+
+	jobScheduler, err := initJobScheduler(store.EndpointService, snapshotter, flags)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -498,6 +504,7 @@ func main() {
 		GitService:             gitService,
 		SignatureService:       digitalSignatureService,
 		JobScheduler:           jobScheduler,
+		Snapshotter:            snapshotter,
 		SSL:                    *flags.SSL,
 		SSLCert:                *flags.SSLCert,
 		SSLKey:                 *flags.SSLKey,

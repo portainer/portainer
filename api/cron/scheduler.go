@@ -4,7 +4,6 @@ import (
 	"log"
 
 	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/docker"
 	"github.com/robfig/cron"
 )
 
@@ -19,11 +18,11 @@ type JobScheduler struct {
 }
 
 // NewJobScheduler initializes a new service.
-func NewJobScheduler(endpointService portainer.EndpointService, clientFactory *docker.ClientFactory) *JobScheduler {
+func NewJobScheduler(endpointService portainer.EndpointService, snapshotter portainer.Snapshotter) *JobScheduler {
 	return &JobScheduler{
 		cron:            cron.New(),
 		endpointService: endpointService,
-		snapshotter:     docker.NewSnapshotter(clientFactory),
+		snapshotter:     snapshotter,
 	}
 }
 
