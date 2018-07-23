@@ -28,6 +28,22 @@ angular.module('portainer.app')
     });
   };
 
+  service.loadImages = function(file) {
+    var endpointID = EndpointProvider.endpointID();
+    Upload.setDefaults({ ngfMinSize: 10 });
+    return Upload.http({
+      url: 'api/endpoints/' + endpointID + '/docker/images/load',
+      headers : {
+        'Content-Type': file.type
+      },
+      data: file,
+      ignoreLoadingBar: true,
+      transformResponse: function(data, headers) {
+        return jsonObjectsToArrayHandler(data);
+      }
+    });
+  };
+
   service.createSwarmStack = function(stackName, swarmId, file, env, endpointId) {
     return Upload.upload({
       url: 'api/stacks?method=file&type=1&endpointId=' + endpointId,
