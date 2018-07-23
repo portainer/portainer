@@ -4,12 +4,6 @@ import (
 	"net/http"
 )
 
-const (
-// ErrDockerConfigIdentifierNotFound defines an error raised when Portainer is unable to find a config identifier
-// ErrDockerConfigIdentifierNotFound = portainer.Error("Docker config identifier not found")
-// configIdentifier                  = "ID"
-)
-
 // swarmInspectOperation extracts the response as a JSON object and rewrites the response based
 // on the current user role. Sensitive fields are deleted from the response for non-administrator users.
 func swarmInspectOperation(response *http.Response, executor *operationExecutor) error {
