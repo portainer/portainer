@@ -164,6 +164,9 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 				SearchSettings: []portainer.LDAPSearchSettings{
 					portainer.LDAPSearchSettings{},
 				},
+				GroupSearchSettings: []portainer.LDAPGroupSearchSettings{
+					portainer.LDAPGroupSearchSettings{},
+				},
 			},
 			AllowBindMountsForRegularUsers:     true,
 			AllowPrivilegedModeForRegularUsers: true,

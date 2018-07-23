@@ -102,10 +102,63 @@ func (*Service) AuthenticateUser(username, password string, settings *portainer.
 
 	err = connection.Bind(userDN, password)
 	if err != nil {
-		return err
+		return portainer.ErrUnauthorized
 	}
 
 	return nil
+}
+
+// GetUserGroups is used to retrieve user groups from LDAP/AD.
+func (*Service) GetUserGroups(username string, settings *portainer.LDAPSettings) ([]string, error) {
+	connection, err := createConnection(settings)
+	if err != nil {
+		return nil, err
+	}
+	defer connection.Close()
+
+	err = connection.Bind(settings.ReaderDN, settings.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	userDN, err := searchUser(username, connection, settings.SearchSettings)
+	if err != nil {
+		return nil, err
+	}
+
+	userGroups := getGroups(userDN, connection, settings.GroupSearchSettings)
+
+	return userGroups, nil
+}
+
+// Get a list of group names for specified user from LDAP/AD
+func getGroups(userDN string, conn *ldap.Conn, settings []portainer.LDAPGroupSearchSettings) []string {
+	groups := make([]string, 0)
+
+	for _, searchSettings := range settings {
+		searchRequest := ldap.NewSearchRequest(
+			searchSettings.GroupBaseDN,
+			ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
+			fmt.Sprintf("(&%s(%s=%s))", searchSettings.GroupFilter, searchSettings.GroupAttribute, userDN),
+			[]string{"cn"},
+			nil,
+		)
+
+		// Deliberately skip errors on the search request so that we can jump to other search settings
+		// if any issue arise with the current one.
+		sr, err := conn.Search(searchRequest)
+		if err != nil {
+			continue
+		}
+
+		for _, entry := range sr.Entries {
+			for _, attr := range entry.Attributes {
+				groups = append(groups, attr.Values[0])
+			}
+		}
+	}
+
+	return groups
 }
 
 // TestConnectivity is used to test a connection against the LDAP server using the credentials

@@ -91,6 +91,8 @@ func (server *Server) Start() error {
 	authHandler.JWTService = server.JWTService
 	authHandler.LDAPService = server.LDAPService
 	authHandler.SettingsService = server.SettingsService
+	authHandler.TeamService = server.TeamService
+	authHandler.TeamMembershipService = server.TeamMembershipService
 
 	var dockerHubHandler = dockerhub.NewHandler(requestBouncer)
 	dockerHubHandler.DockerHubService = server.DockerHubService

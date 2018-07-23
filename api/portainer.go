@@ -46,12 +46,13 @@ type (
 
 	// LDAPSettings represents the settings used to connect to a LDAP server.
 	LDAPSettings struct {
-		ReaderDN       string               `json:"ReaderDN"`
-		Password       string               `json:"Password"`
-		URL            string               `json:"URL"`
-		TLSConfig      TLSConfiguration     `json:"TLSConfig"`
-		StartTLS       bool                 `json:"StartTLS"`
-		SearchSettings []LDAPSearchSettings `json:"SearchSettings"`
+		ReaderDN            string                    `json:"ReaderDN"`
+		Password            string                    `json:"Password"`
+		URL                 string                    `json:"URL"`
+		TLSConfig           TLSConfiguration          `json:"TLSConfig"`
+		StartTLS            bool                      `json:"StartTLS"`
+		SearchSettings      []LDAPSearchSettings      `json:"SearchSettings"`
+		GroupSearchSettings []LDAPGroupSearchSettings `json:"GroupSearchSettings"`
 	}
 
 	// TLSConfiguration represents a TLS configuration.
@@ -68,6 +69,13 @@ type (
 		BaseDN            string `json:"BaseDN"`
 		Filter            string `json:"Filter"`
 		UserNameAttribute string `json:"UserNameAttribute"`
+	}
+
+	// LDAPGroupSearchSettings represents settings used to search for groups in a LDAP server.
+	LDAPGroupSearchSettings struct {
+		GroupBaseDN    string `json:"GroupBaseDN"`
+		GroupFilter    string `json:"GroupFilter"`
+		GroupAttribute string `json:"GroupAttribute"`
 	}
 
 	// Settings represents the application settings.
@@ -581,6 +589,7 @@ type (
 	LDAPService interface {
 		AuthenticateUser(username, password string, settings *LDAPSettings) error
 		TestConnectivity(settings *LDAPSettings) error
+		GetUserGroups(username string, settings *LDAPSettings) ([]string, error)
 	}
 
 	// SwarmStackManager represents a service to manage Swarm stacks.
@@ -602,7 +611,7 @@ const (
 	// APIVersion is the version number of the Portainer API.
 	APIVersion = "1.18.2-dev"
 	// DBVersion is the version number of the Portainer database.
-	DBVersion = 12
+	DBVersion = 13
 	// PortainerAgentHeader represents the name of the header available in any agent response
 	PortainerAgentHeader = "Portainer-Agent"
 	// PortainerAgentTargetHeader represent the name of the header containing the target node name.
