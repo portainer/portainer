@@ -119,7 +119,7 @@ a[ng-click]{
   color: white;
 }
 
-.fa.blue-icon {
+.fa.blue-icon, .fab.blue-icon {
   color: #337ab7;
 }
 
@@ -158,21 +158,13 @@ a[ng-click]{
   overflow-y: auto;
 }
 
-.template-list {
+.blocklist {
   display: flex;
   flex-direction: column;
   padding: 10px;
-  border-top: 2px solid #e2e2e2;
 }
 
-.template-logo {
-  width: 100%;
-  max-width: 60px;
-  height: 100%;
-  max-height: 60px;
-}
-
-.template-container {
+.blocklist-item {
   padding: 0.7rem;
   margin-bottom: 0.7rem;
   cursor: pointer;
@@ -181,44 +173,68 @@ a[ng-click]{
   box-shadow: 0 3px 10px -2px rgba(161, 170, 166, 0.5);
 }
 
-.template-container--selected {
+.blocklist-item--selected {
   border: 2px solid #333333;
   background-color: #ececec;
   color: #2d3e63;
 }
 
-.template-container:hover {
+.blocklist-item:hover {
   background-color: #ececec;
   color: #2d3e63;
 }
 
-.template-main {
+.blocklist-item-box {
   display: flex;
+}
+
+.blocklist-item-line.endpoint-item {
+  padding: 4px;
+}
+
+.blocklist-item-line {
+  display: flex;
+  justify-content: space-between;
+}
+
+.blocklist-item-logo {
+  width: 100%;
+  max-width: 60px;
+  height: 100%;
+  max-height: 60px;
+}
+
+.blocklist-item-logo.endpoint-item {
+  margin: 10px 4px 0 6px;
+}
+
+.blocklist-item-logo.endpoint-item.azure {
+  margin: 0 0 0 10px;
+}
+
+.blocklist-item-title {
+  font-size: 1.8em;
+  font-weight: bold;
+}
+
+.blocklist-item-title.endpoint-item {
+  font-size: 1em;
+  font-weight: bold;
+}
+
+.blocklist-item-subtitle {
+  font-size: 0.9em;
+  padding-right: 1em;
+}
+
+.blocklist-item-desc {
+  font-size: 0.9em;
+  padding-right: 1em;
 }
 
 .template-note {
   padding: 0.5em;
   font-size: 0.9em;
-}
-
-.template-title {
-  font-size: 1.8em;
-  font-weight: bold;
-}
-
-.template-type {
-  font-size: 0.9em;
-  padding-right: 1em;
-}
-
-.template-description {
-  font-size: 0.9em;
-  padding-right: 1em;
-}
-
-.template-line {
-  display: flex;
-  justify-content: space-between;
 }
 
 .nopadding {

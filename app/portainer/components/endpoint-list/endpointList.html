@@ -1,0 +1,32 @@
+<div class="datatable">
+  <rd-widget>
+    <rd-widget-body classes="no-padding">
+
+      <div class="toolBar">
+        <div class="toolBarTitle">
+          <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }}
+        </div>
+      </div>
+
+      <div class="searchBar">
+        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
+        <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search by name, group, tag..." auto-focus>
+      </div>
+
+      <div class="blocklist">
+        <endpoint-item
+          ng-repeat="endpoint in $ctrl.endpoints | filter:$ctrl.state.textFilter"
+          model="endpoint"
+          on-select="$ctrl.dashboardAction"
+        ></endpoint-item>
+        <div ng-if="!$ctrl.endpoints" class="text-center text-muted">
+          Loading...
+        </div>
+        <div ng-if="($ctrl.endpoints | filter:$ctrl.state.textFilter).length === 0" class="text-center text-muted">
+          No endpoint available.
+        </div>
+      </div>
+
+    </rd-widget-body>
+  </rd-widget>
+</div>

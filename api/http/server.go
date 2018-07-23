@@ -41,6 +41,7 @@ type Server struct {
 	CryptoService          portainer.CryptoService
 	SignatureService       portainer.DigitalSignatureService
 	JobScheduler           portainer.JobScheduler
+	Snapshotter            portainer.Snapshotter
 	DockerHubService       portainer.DockerHubService
 	EndpointService        portainer.EndpointService
 	EndpointGroupService   portainer.EndpointGroupService
@@ -100,6 +101,7 @@ func (server *Server) Start() error {
 	endpointHandler.EndpointGroupService = server.EndpointGroupService
 	endpointHandler.FileService = server.FileService
 	endpointHandler.ProxyManager = proxyManager
+	endpointHandler.Snapshotter = server.Snapshotter
 
 	var endpointGroupHandler = endpointgroups.NewHandler(requestBouncer)
 	endpointGroupHandler.EndpointGroupService = server.EndpointGroupService

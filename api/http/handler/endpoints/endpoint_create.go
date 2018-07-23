@@ -1,6 +1,7 @@
 package endpoints
 
 import (
+	"log"
 	"net/http"
 	"runtime"
 	"strconv"
@@ -224,9 +225,9 @@ func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) 
 		Snapshots:       []portainer.Snapshot{},
 	}
 
-	err := handler.EndpointService.CreateEndpoint(endpoint)
+	err := handler.snapshotAndPersistEndpoint(endpoint)
 	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint inside the database", err}
+		return nil, err
 	}
 
 	return endpoint, nil
@@ -266,9 +267,9 @@ func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload)
 		Snapshots:       []portainer.Snapshot{},
 	}
 
-	err = handler.EndpointService.CreateEndpoint(endpoint)
-	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint inside the database", err}
+	endpointCreationError := handler.snapshotAndPersistEndpoint(endpoint)
+	if endpointCreationError != nil {
+		return nil, endpointCreationError
 	}
 
 	filesystemError := handler.storeTLSFiles(endpoint, payload)
@@ -283,6 +284,26 @@ func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload)
 	}
 
 	return endpoint, nil
+}
+
+func (handler *Handler) snapshotAndPersistEndpoint(endpoint *portainer.Endpoint) *httperror.HandlerError {
+	snapshot, err := handler.Snapshotter.CreateSnapshot(endpoint)
+	endpoint.Status = portainer.EndpointStatusUp
+	if err != nil {
+		log.Printf("http error: endpoint snapshot error (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
+		endpoint.Status = portainer.EndpointStatusDown
+	}
+
+	if snapshot != nil {
+		endpoint.Snapshots = []portainer.Snapshot{*snapshot}
+	}
+
+	err = handler.EndpointService.CreateEndpoint(endpoint)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint inside the database", err}
+	}
+
+	return nil
 }
 
 func (handler *Handler) storeTLSFiles(endpoint *portainer.Endpoint, payload *endpointCreatePayload) *httperror.HandlerError {

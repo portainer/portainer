@@ -29,6 +29,7 @@ type Handler struct {
 	EndpointGroupService        portainer.EndpointGroupService
 	FileService                 portainer.FileService
 	ProxyManager                *proxy.Manager
+	Snapshotter                 portainer.Snapshotter
 }
 
 // NewHandler creates a handler to manage endpoint operations.
