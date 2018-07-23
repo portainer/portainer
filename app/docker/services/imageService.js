@@ -143,8 +143,10 @@ angular.module('portainer.docker')
     var names = ImageHelper.getImagesNamesForDownload(images);
     Image.download(names).$promise
     .then(function success(data) {
-      if (data[0].message) {
-        deferred.reject({ msg: data[0].message });
+      var err = data.length > 0 && data[data.length - 1].hasOwnProperty('message');
+      if (err) {
+        var detail = data[data.length - 1];
+        deferred.reject({ msg: detail.message });
       } else {
         deferred.resolve(data);
       }

@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ImagesController', ['$scope', '$state', 'ImageService', 'Notifications', 'ModalService', 'HttpRequestHelper',
-function ($scope, $state, ImageService, Notifications, ModalService, HttpRequestHelper) {
+.controller('ImagesController', ['$scope', '$state', 'ImageService', 'Notifications', 'ModalService', 'HttpRequestHelper', 'FileSaver',
+function ($scope, $state, ImageService, Notifications, ModalService, HttpRequestHelper, FileSaver) {
   $scope.state = {
     actionInProgress: false
   };
@@ -45,9 +45,9 @@ function ($scope, $state, ImageService, Notifications, ModalService, HttpRequest
     HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
     ImageService.downloadImages(selectedItems)
     .then(function success(data) {
+      var downloadData = new Blob([data.file], { type: 'application/x-tar' });
+      FileSaver.saveAs(downloadData, 'images.tar');
       Notifications.success('Images successfully downloaded');
-      // var file = new Blob([data], { type: 'application/x-tar' });
-      // saveAs(file, 'filename.tar');
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to download images');
