@@ -2897,6 +2897,21 @@ definitions:
         type: "string"
         example: "uid"
         description: "LDAP attribute which denotes the username"
+  LDAPGroupSearchSettings:
+    type: "object"
+    properties:
+      GroupBaseDN:
+        type: "string"
+        example: "dc=ldap,dc=domain,dc=tld"
+        description: "The distinguished name of the element from which the LDAP server will search for groups."
+      GroupFilter:
+        type: "string"
+        example: "(objectClass=account)"
+        description: "The LDAP search filter used to select group elements, optional."
+      GroupAttribute:
+        type: "string"
+        example: "member"
+        description: "LDAP attribute which denotes the group membership."
 
   LDAPSettings:
     type: "object"
@@ -2923,6 +2938,10 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/LDAPSearchSettings"
+      GroupSearchSettings:
+        type: "array"
+        items:
+          $ref: "#/definitions/LDAPGroupSearchSettings"
 
   Settings:
     type: "object"

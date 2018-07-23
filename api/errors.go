@@ -10,10 +10,11 @@ const (
 
 // User errors.
 const (
-	ErrUserAlreadyExists       = Error("User already exists")
-	ErrInvalidUsername         = Error("Invalid username. White spaces are not allowed")
-	ErrAdminAlreadyInitialized = Error("An administrator user already exists")
-	ErrAdminCannotRemoveSelf   = Error("Cannot remove your own user account. Contact another administrator")
+	ErrUserAlreadyExists          = Error("User already exists")
+	ErrInvalidUsername            = Error("Invalid username. White spaces are not allowed")
+	ErrAdminAlreadyInitialized    = Error("An administrator user already exists")
+	ErrAdminCannotRemoveSelf      = Error("Cannot remove your own user account. Contact another administrator")
+	ErrCannotRemoveLastLocalAdmin = Error("Cannot remove the last local administrator account")
 )
 
 // Team errors.
