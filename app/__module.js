@@ -15,6 +15,7 @@ angular.module('portainer', [
   'angular-json-tree',
   'angular-loading-bar',
   'angular-clipboard',
+  'ngFileSaver',
   'luegg.directives',
   'portainer.templates',
   'portainer.app',
