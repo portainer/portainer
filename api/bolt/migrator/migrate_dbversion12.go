@@ -8,6 +8,7 @@ func (m *Migrator) updateSettingsToVersion13() error {
 		return err
 	}
 
+	legacySettings.LDAPSettings.AutoCreateUsers = false
 	legacySettings.LDAPSettings.GroupSearchSettings = []portainer.LDAPGroupSearchSettings{
 		portainer.LDAPGroupSearchSettings{},
 	}

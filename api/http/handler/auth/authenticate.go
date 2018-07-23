@@ -56,7 +56,7 @@ func (handler *Handler) authenticate(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	if settings.AuthenticationMethod == portainer.AuthenticationLDAP {
-		if u == nil {
+		if u == nil && settings.LDAPSettings.AutoCreateUsers {
 			return handler.authenticateLDAPAndCreateUser(w, payload.Username, payload.Password, &settings.LDAPSettings)
 		}
 		return handler.authenticateLDAP(w, u, payload.Password, &settings.LDAPSettings)
