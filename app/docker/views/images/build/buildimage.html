@@ -194,7 +194,7 @@
                 </div>
               </div>
               <!-- !url -->
-              <div ng-if="applicationState.endpoint.mode.agentProxy">
+              <div ng-if="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
                 <div class="col-sm-12 form-section-title">
                   Deployment
                 </div>
