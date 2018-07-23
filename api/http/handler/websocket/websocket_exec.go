@@ -127,7 +127,7 @@ func (handler *Handler) proxyWebsocketRequest(w http.ResponseWriter, r *http.Req
 }
 
 func hijackExecStartOperation(websocketConn *websocket.Conn, endpoint *portainer.Endpoint, execID string) error {
-	dial, err := createDial(endpoint)
+	dial, err := initDial(endpoint)
 	if err != nil {
 		return err
 	}
@@ -158,7 +158,7 @@ func hijackExecStartOperation(websocketConn *websocket.Conn, endpoint *portainer
 	return nil
 }
 
-func createDial(endpoint *portainer.Endpoint) (net.Conn, error) {
+func initDial(endpoint *portainer.Endpoint) (net.Conn, error) {
 	url, err := url.Parse(endpoint.URL)
 	if err != nil {
 		return nil, err
@@ -170,26 +170,16 @@ func createDial(endpoint *portainer.Endpoint) (net.Conn, error) {
 		host = url.Path
 	}
 
-	var (
-		dial    net.Conn
-		dialErr error
-	)
-
 	if endpoint.TLSConfig.TLS {
 		tlsConfig, err := crypto.CreateTLSConfigurationFromDisk(endpoint.TLSConfig.TLSCACertPath, endpoint.TLSConfig.TLSCertPath, endpoint.TLSConfig.TLSKeyPath, endpoint.TLSConfig.TLSSkipVerify)
 		if err != nil {
 			return nil, err
 		}
-		dial, dialErr = tls.Dial(url.Scheme, host, tlsConfig)
-	} else {
-		if url.Scheme == "npipe" {
-			dial, dialErr = createWinDial(host)
-		} else {
-			dial, dialErr = net.Dial(url.Scheme, host)
-		}
+
+		return tls.Dial(url.Scheme, host, tlsConfig)
 	}
 
-	return dial, dialErr
+	return createDial(url.Scheme, host)
 }
 
 func createExecStartRequest(execID string) (*http.Request, error) {
