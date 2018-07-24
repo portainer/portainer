@@ -453,6 +453,7 @@ type (
 		UpdateEndpoint(ID EndpointID, endpoint *Endpoint) error
 		DeleteEndpoint(ID EndpointID) error
 		Synchronize(toCreate, toUpdate, toDelete []*Endpoint) error
+		GetNextIdentifier() int
 	}
 
 	// EndpointGroupService represents a service for managing endpoint group data.

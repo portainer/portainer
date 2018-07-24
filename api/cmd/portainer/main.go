@@ -281,7 +281,7 @@ func initKeyPair(fileService portainer.FileService, signatureService portainer.D
 	return generateAndStoreKeyPair(fileService, signatureService)
 }
 
-func createTLSSecuredEndpoint(flags *portainer.CLIFlags, endpointService portainer.EndpointService) error {
+func createTLSSecuredEndpoint(flags *portainer.CLIFlags, endpointService portainer.EndpointService, snapshotter portainer.Snapshotter) error {
 	tlsConfiguration := portainer.TLSConfiguration{
 		TLS:           *flags.TLS,
 		TLSSkipVerify: *flags.TLSSkipVerify,
@@ -295,7 +295,9 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, endpointService portain
 		tlsConfiguration.TLS = true
 	}
 
+	endpointID := endpointService.GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
+		ID:              portainer.EndpointID(endpointID),
 		Name:            "primary",
 		URL:             *flags.EndpointURL,
 		GroupID:         portainer.EndpointGroupID(1),
@@ -325,10 +327,10 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, endpointService portain
 		}
 	}
 
-	return endpointService.CreateEndpoint(endpoint)
+	return snapshotAndPersistEndpoint(endpoint, endpointService, snapshotter)
 }
 
-func createUnsecuredEndpoint(endpointURL string, endpointService portainer.EndpointService) error {
+func createUnsecuredEndpoint(endpointURL string, endpointService portainer.EndpointService, snapshotter portainer.Snapshotter) error {
 	if strings.HasPrefix(endpointURL, "tcp://") {
 		_, err := client.ExecutePingOperation(endpointURL, nil)
 		if err != nil {
@@ -336,7 +338,9 @@ func createUnsecuredEndpoint(endpointURL string, endpointService portainer.Endpo
 		}
 	}
 
+	endpointID := endpointService.GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
+		ID:              portainer.EndpointID(endpointID),
 		Name:            "primary",
 		URL:             endpointURL,
 		GroupID:         portainer.EndpointGroupID(1),
@@ -350,10 +354,25 @@ func createUnsecuredEndpoint(endpointURL string, endpointService portainer.Endpo
 		Snapshots:       []portainer.Snapshot{},
 	}
 
+	return snapshotAndPersistEndpoint(endpoint, endpointService, snapshotter)
+}
+
+func snapshotAndPersistEndpoint(endpoint *portainer.Endpoint, endpointService portainer.EndpointService, snapshotter portainer.Snapshotter) error {
+	snapshot, err := snapshotter.CreateSnapshot(endpoint)
+	endpoint.Status = portainer.EndpointStatusUp
+	if err != nil {
+		log.Printf("http error: endpoint snapshot error (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
+		endpoint.Status = portainer.EndpointStatusDown
+	}
+
+	if snapshot != nil {
+		endpoint.Snapshots = []portainer.Snapshot{*snapshot}
+	}
+
 	return endpointService.CreateEndpoint(endpoint)
 }
 
-func initEndpoint(flags *portainer.CLIFlags, endpointService portainer.EndpointService) error {
+func initEndpoint(flags *portainer.CLIFlags, endpointService portainer.EndpointService, snapshotter portainer.Snapshotter) error {
 	if *flags.EndpointURL == "" {
 		return nil
 	}
@@ -369,9 +388,9 @@ func initEndpoint(flags *portainer.CLIFlags, endpointService portainer.EndpointS
 	}
 
 	if *flags.TLS || *flags.TLSSkipVerify {
-		return createTLSSecuredEndpoint(flags, endpointService)
+		return createTLSSecuredEndpoint(flags, endpointService, snapshotter)
 	}
-	return createUnsecuredEndpoint(*flags.EndpointURL, endpointService)
+	return createUnsecuredEndpoint(*flags.EndpointURL, endpointService, snapshotter)
 }
 
 func main() {
@@ -437,7 +456,7 @@ func main() {
 
 	applicationStatus := initStatus(endpointManagement, *flags.Snapshot, flags)
 
-	err = initEndpoint(flags, store.EndpointService)
+	err = initEndpoint(flags, store.EndpointService, snapshotter)
 	if err != nil {
 		log.Fatal(err)
 	}

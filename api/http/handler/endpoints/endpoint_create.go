@@ -167,7 +167,9 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to authenticate against Azure", err}
 	}
 
+	endpointID := handler.EndpointService.GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
+		ID:               portainer.EndpointID(endpointID),
 		Name:             payload.Name,
 		URL:              payload.URL,
 		Type:             portainer.AzureEnvironment,
@@ -208,7 +210,9 @@ func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) 
 		}
 	}
 
+	endpointID := handler.EndpointService.GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
+		ID:        portainer.EndpointID(endpointID),
 		Name:      payload.Name,
 		URL:       payload.URL,
 		Type:      endpointType,
@@ -249,7 +253,9 @@ func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload)
 		endpointType = portainer.AgentOnDockerEnvironment
 	}
 
+	endpointID := handler.EndpointService.GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
+		ID:        portainer.EndpointID(endpointID),
 		Name:      payload.Name,
 		URL:       payload.URL,
 		Type:      endpointType,
@@ -267,20 +273,14 @@ func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload)
 		Snapshots:       []portainer.Snapshot{},
 	}
 
-	endpointCreationError := handler.snapshotAndPersistEndpoint(endpoint)
-	if endpointCreationError != nil {
-		return nil, endpointCreationError
-	}
-
 	filesystemError := handler.storeTLSFiles(endpoint, payload)
 	if err != nil {
-		handler.EndpointService.DeleteEndpoint(endpoint.ID)
 		return nil, filesystemError
 	}
 
-	err = handler.EndpointService.UpdateEndpoint(endpoint.ID, endpoint)
-	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint changes inside the database", err}
+	endpointCreationError := handler.snapshotAndPersistEndpoint(endpoint)
+	if endpointCreationError != nil {
+		return nil, endpointCreationError
 	}
 
 	return endpoint, nil
@@ -312,7 +312,6 @@ func (handler *Handler) storeTLSFiles(endpoint *portainer.Endpoint, payload *end
 	if !payload.TLSSkipVerify {
 		caCertPath, err := handler.FileService.StoreTLSFileFromBytes(folder, portainer.TLSFileCA, payload.TLSCACertFile)
 		if err != nil {
-			handler.EndpointService.DeleteEndpoint(endpoint.ID)
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist TLS CA certificate file on disk", err}
 		}
 		endpoint.TLSConfig.TLSCACertPath = caCertPath
@@ -321,14 +320,12 @@ func (handler *Handler) storeTLSFiles(endpoint *portainer.Endpoint, payload *end
 	if !payload.TLSSkipClientVerify {
 		certPath, err := handler.FileService.StoreTLSFileFromBytes(folder, portainer.TLSFileCert, payload.TLSCertFile)
 		if err != nil {
-			handler.EndpointService.DeleteEndpoint(endpoint.ID)
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist TLS certificate file on disk", err}
 		}
 		endpoint.TLSConfig.TLSCertPath = certPath
 
 		keyPath, err := handler.FileService.StoreTLSFileFromBytes(folder, portainer.TLSFileKey, payload.TLSKeyFile)
 		if err != nil {
-			handler.EndpointService.DeleteEndpoint(endpoint.ID)
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist TLS key file on disk", err}
 		}
 		endpoint.TLSConfig.TLSKeyPath = keyPath
