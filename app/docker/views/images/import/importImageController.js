@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ImportImageController', ['$scope', '$state', 'UploadService', 'Notifications', 'HttpRequestHelper',
-function ($scope, $state, UploadService, Notifications, HttpRequestHelper) {
+.controller('ImportImageController', ['$scope', '$state', 'ImageService', 'Notifications', 'HttpRequestHelper',
+function ($scope, $state, ImageService, Notifications, HttpRequestHelper) {
 
 	$scope.state = {
 		actionInProgress: false
@@ -17,16 +17,12 @@ function ($scope, $state, UploadService, Notifications, HttpRequestHelper) {
 		var nodeName = $scope.formValues.NodeName;
 		HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
 		var file = $scope.formValues.UploadFile;
-		UploadService.uploadImage(file)
-		.then(function success(data) {
-			if (data.hasError) {
-				Notifications.error('An error occured during upload', { msg: 'Please check build logs output' });
-			} else {
-				Notifications.success('Images successfully uploaded');
-			}
+		ImageService.uploadImage(file)
+		.then(function success() {
+			Notifications.success('Images successfully uploaded');
 		})
 		.catch(function error(err) {
-			Notifications.error('Failure', err, 'Unable to upload image');
+			Notifications.error('Failure', err.message, 'Unable to upload image');
 		})
 		.finally(function final() {
 			$scope.state.actionInProgress = false;

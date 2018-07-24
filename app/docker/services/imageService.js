@@ -1,5 +1,6 @@
 angular.module('portainer.docker')
-.factory('ImageService', ['$q', 'Image', 'ImageHelper', 'RegistryService', 'HttpRequestHelper', 'ContainerService', function ImageServiceFactory($q, Image, ImageHelper, RegistryService, HttpRequestHelper, ContainerService) {
+.factory('ImageService', ['$q', 'Image', 'ImageHelper', 'RegistryService', 'HttpRequestHelper', 'ContainerService', 'FileUploadService',
+  function ImageServiceFactory($q, Image, ImageHelper, RegistryService, HttpRequestHelper, ContainerService, FileUploadService) {
   'use strict';
   var service = {};
 
@@ -143,17 +144,24 @@ angular.module('portainer.docker')
     var names = ImageHelper.getImagesNamesForDownload(images);
     Image.download(names).$promise
     .then(function success(data) {
-      var err = data.length > 0 && data[data.length - 1].hasOwnProperty('message');
-      if (err) {
-        var detail = data[data.length - 1];
-        deferred.reject({ msg: detail.message });
-      } else {
-        deferred.resolve(data);
-      }
+      deferred.resolve(data);
     })
     .catch(function error(err) {
-      deferred.reject({ msg: 'Unable to download images', err: err });
+      deferred.reject(err);
     });
+    return deferred.promise;
+  };
+
+  service.uploadImage = function(file) {
+    var deferred = $q.defer();
+    FileUploadService.loadImages(file)
+    .then(function success(data) {
+      deferred.resolve();
+    })
+    .catch(function error(err) {
+      deferred.reject(err);
+    });
+
     return deferred.promise;
   };
 
