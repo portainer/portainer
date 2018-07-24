@@ -140,29 +140,12 @@ angular.module('portainer.docker')
   };
 
   service.downloadImages = function(images) {
-    var deferred = $q.defer();
     var names = ImageHelper.getImagesNamesForDownload(images);
-    Image.download(names).$promise
-    .then(function success(data) {
-      deferred.resolve(data);
-    })
-    .catch(function error(err) {
-      deferred.reject(err);
-    });
-    return deferred.promise;
+    return Image.download(names).$promise;
   };
 
   service.uploadImage = function(file) {
-    var deferred = $q.defer();
-    FileUploadService.loadImages(file)
-    .then(function success(data) {
-      deferred.resolve();
-    })
-    .catch(function error(err) {
-      deferred.reject(err);
-    });
-
-    return deferred.promise;
+    return FileUploadService.loadImages(file);
   };
 
   service.deleteImage = function(id, forceRemoval) {

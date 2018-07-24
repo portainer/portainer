@@ -41,8 +41,14 @@ function ($scope, $state, ImageService, Notifications, ModalService, HttpRequest
 
 
   $scope.downloadAction = function (selectedItems) {
-    var nodeName = $scope.formValues.NodeName;
-    HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
+    if (selectedItems.length >= 2 && selectedItems.map(function(item) {
+        return item.NodeName === selectedItems[0].NodeName;
+        }).includes(false)) {
+      Notifications.error('Failure', '', 'Can\'t download images from different nodes at the same time');
+      return;
+    }
+
+    HttpRequestHelper.setPortainerAgentTargetHeader(selectedItems[0].NodeName);
     ImageService.downloadImages(selectedItems)
     .then(function success(data) {
       var downloadData = new Blob([data.file], { type: 'application/x-tar' });
