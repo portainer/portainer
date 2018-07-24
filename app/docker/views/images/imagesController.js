@@ -39,14 +39,31 @@ function ($scope, $state, ImageService, Notifications, ModalService, HttpRequest
     });
   };
 
+  function isAuthorizedToDownload(selectedItems) {
+    var isFromDifferentNode = selectedItems.map(function(item) {
+        return item.NodeName === selectedItems[0].NodeName;
+      }).includes(false);
+
+    var hasNoneTag = selectedItems.map(function(item) {
+      return item.RepoTags.map(function(tag) {
+        return tag.includes('<none>');
+      }).includes(true);
+    }).includes(true);
+
+    if (isFromDifferentNode) {
+      Notifications.error('Failure', '', 'Can\'t download images from different nodes at the same time');
+      return false;
+    }
+    if (hasNoneTag) {
+      Notifications.error('Failure', '', 'Can\'t download images with none tags');
+      return false;
+    }
+    return true;
+  }
 
   $scope.downloadAction = function (selectedItems) {
-    if (selectedItems.length >= 2 && selectedItems.map(function(item) {
-        return item.NodeName === selectedItems[0].NodeName;
-        }).includes(false)) {
-      Notifications.error('Failure', '', 'Can\'t download images from different nodes at the same time');
+    if (!isAuthorizedToDownload(selectedItems))
       return;
-    }
 
     HttpRequestHelper.setPortainerAgentTargetHeader(selectedItems[0].NodeName);
     ImageService.downloadImages(selectedItems)
