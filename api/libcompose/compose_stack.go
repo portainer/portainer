@@ -27,17 +27,27 @@ func NewComposeStackManager(dataPath string) *ComposeStackManager {
 	}
 }
 
+func createClient(endpoint *portainer.Endpoint) (client.Factory, error) {
+	clientOpts := client.Options{
+		Host:       endpoint.URL,
+		APIVersion: portainer.SupportedDockerAPIVersion,
+	}
+
+	if endpoint.TLSConfig.TLS {
+		clientOpts.TLS = endpoint.TLSConfig.TLS
+		clientOpts.TLSVerify = !endpoint.TLSConfig.TLSSkipVerify
+		clientOpts.TLSCAFile = endpoint.TLSConfig.TLSCACertPath
+		clientOpts.TLSCertFile = endpoint.TLSConfig.TLSCertPath
+		clientOpts.TLSKeyFile = endpoint.TLSConfig.TLSKeyPath
+	}
+
+	return client.NewDefaultFactory(clientOpts)
+}
+
 // Up will deploy a compose stack (equivalent of docker-compose up)
 func (manager *ComposeStackManager) Up(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
-	clientFactory, err := client.NewDefaultFactory(client.Options{
-		TLS:         endpoint.TLSConfig.TLS,
-		TLSVerify:   endpoint.TLSConfig.TLSSkipVerify,
-		Host:        endpoint.URL,
-		TLSCAFile:   endpoint.TLSCACertPath,
-		TLSCertFile: endpoint.TLSCertPath,
-		TLSKeyFile:  endpoint.TLSKeyPath,
-		APIVersion:  portainer.SupportedDockerAPIVersion,
-	})
+
+	clientFactory, err := createClient(endpoint)
 	if err != nil {
 		return err
 	}
@@ -75,15 +85,7 @@ func (manager *ComposeStackManager) Up(stack *portainer.Stack, endpoint *portain
 
 // Down will shutdown a compose stack (equivalent of docker-compose down)
 func (manager *ComposeStackManager) Down(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
-	clientFactory, err := client.NewDefaultFactory(client.Options{
-		TLS:         endpoint.TLSConfig.TLS,
-		TLSVerify:   endpoint.TLSConfig.TLSSkipVerify,
-		Host:        endpoint.URL,
-		TLSCAFile:   endpoint.TLSCACertPath,
-		TLSCertFile: endpoint.TLSCertPath,
-		TLSKeyFile:  endpoint.TLSKeyPath,
-		APIVersion:  portainer.SupportedDockerAPIVersion,
-	})
+	clientFactory, err := createClient(endpoint)
 	if err != nil {
 		return err
 	}
