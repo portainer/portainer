@@ -90,6 +90,7 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 type composeStackFromGitRepositoryPayload struct {
 	Name                        string
 	RepositoryURL               string
+	RepositoryReferenceName     string
 	RepositoryAuthentication    bool
 	RepositoryUsername          string
 	RepositoryPassword          string
@@ -146,18 +147,20 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 
 	gitCloneParams := &cloneRepositoryParameters{
 		url:            payload.RepositoryURL,
+		referenceName:  payload.RepositoryReferenceName,
 		path:           projectPath,
 		authentication: payload.RepositoryAuthentication,
 		username:       payload.RepositoryUsername,
 		password:       payload.RepositoryPassword,
 	}
+
+	doCleanUp := true
+	defer handler.cleanUp(stack, &doCleanUp)
+
 	err = handler.cloneGitRepository(gitCloneParams)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to clone git repository", err}
 	}
-
-	doCleanUp := true
-	defer handler.cleanUp(stack, &doCleanUp)
 
 	config, configErr := handler.createComposeDeployConfig(r, stack, endpoint)
 	if configErr != nil {

@@ -7,6 +7,7 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
     StackFileContent: '',
     StackFile: null,
     RepositoryURL: '',
+    RepositoryReferenceName: '',
     RepositoryAuthentication: false,
     RepositoryUsername: '',
     RepositoryPassword: '',
@@ -55,6 +56,7 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
     } else if (method === 'repository') {
       var repositoryOptions = {
         RepositoryURL: $scope.formValues.RepositoryURL,
+        RepositoryReferenceName: $scope.formValues.RepositoryReferenceName,
         ComposeFilePathInRepository: $scope.formValues.ComposeFilePathInRepository,
         RepositoryAuthentication: $scope.formValues.RepositoryAuthentication,
         RepositoryUsername: $scope.formValues.RepositoryUsername,
@@ -77,6 +79,7 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
     } else if (method === 'repository') {
       var repositoryOptions = {
         RepositoryURL: $scope.formValues.RepositoryURL,
+        RepositoryReferenceName: $scope.formValues.RepositoryReferenceName,
         ComposeFilePathInRepository: $scope.formValues.ComposeFilePathInRepository,
         RepositoryAuthentication: $scope.formValues.RepositoryAuthentication,
         RepositoryUsername: $scope.formValues.RepositoryUsername,

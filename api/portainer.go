@@ -568,8 +568,8 @@ type (
 
 	// GitService represents a service for managing Git.
 	GitService interface {
-		ClonePublicRepository(repositoryURL, destination string) error
-		ClonePrivateRepositoryWithBasicAuth(repositoryURL, destination, username, password string) error
+		ClonePublicRepository(repositoryURL, referenceName string, destination string) error
+		ClonePrivateRepositoryWithBasicAuth(repositoryURL, referenceName string, destination, username, password string) error
 	}
 
 	// JobScheduler represents a service to run jobs on a periodic basis.

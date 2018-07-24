@@ -4180,6 +4180,10 @@ definitions:
         type: "string"
         example: "https://github.com/openfaas/faas"
         description: "URL of a Git repository hosting the Stack file. Required when using the 'repository' deployment method."
+      RepositoryReferenceName:
+        type: "string"
+        example: "refs/heads/master"
+        description: "Reference name of a Git repository hosting the Stack file. Used in 'repository' deployment method."
       ComposeFilePathInRepository:
         type: "string"
         example: "docker-compose.yml"
