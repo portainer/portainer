@@ -3,6 +3,7 @@ package auth
 import (
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/portainer/portainer"
@@ -56,8 +57,10 @@ func (handler *Handler) authenticate(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	if settings.AuthenticationMethod == portainer.AuthenticationLDAP {
-		if u == nil {
+		if u == nil && settings.LDAPSettings.AutoCreateUsers {
 			return handler.authenticateLDAPAndCreateUser(w, payload.Username, payload.Password, &settings.LDAPSettings)
+		} else if u == nil && !settings.LDAPSettings.AutoCreateUsers {
+			return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid credentials", portainer.ErrUnauthorized}
 		}
 		return handler.authenticateLDAP(w, u, payload.Password, &settings.LDAPSettings)
 	}
@@ -167,7 +170,7 @@ func (handler *Handler) addUserIntoTeams(user *portainer.User, settings *portain
 
 func teamExists(teamName string, ldapGroups []string) bool {
 	for _, group := range ldapGroups {
-		if group == teamName {
+		if strings.ToLower(group) == strings.ToLower(teamName) {
 			return true
 		}
 	}

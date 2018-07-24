@@ -1,9 +1,20 @@
+function SettingsViewModel(data) {
+  this.LogoURL = data.LogoURL;
+  this.BlackListedLabels = data.BlackListedLabels;
+  this.AuthenticationMethod = data.AuthenticationMethod;
+  this.LDAPSettings = data.LDAPSettings;
+  this.AllowBindMountsForRegularUsers = data.AllowBindMountsForRegularUsers;
+  this.AllowPrivilegedModeForRegularUsers = data.AllowPrivilegedModeForRegularUsers;
+  this.SnapshotInterval = data.SnapshotInterval;
+}
+
 function LDAPSettingsViewModel(data) {
   this.ReaderDN = data.ReaderDN;
   this.Password = data.Password;
   this.URL = data.URL;
   this.SearchSettings = data.SearchSettings;
   this.GroupSearchSettings = data.GroupSearchSettings;
+  this.AutoCreateUsers = data.AutoCreateUsers;
 }
 
 function LDAPSearchSettings(BaseDN, UsernameAttribute, Filter) {

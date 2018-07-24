@@ -50,10 +50,6 @@
           <div class="form-group" ng-if="settings.AuthenticationMethod === 2">
             <span class="col-sm-12 text-muted small">
               When using LDAP authentication, Portainer will delegate user authentication to a LDAP server and fallback to internal authentication if LDAP authentication fails.
-              <p style="margin-top:5px;">
-                <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                <u>Portainer will create user(s) automatically with standard user role and assign them to team(s) which matches to LDAP group name(s).</u>
-              </p>
             </span>
           </div>
 
@@ -179,6 +175,25 @@
               <div class="col-sm-9 col-lg-10">
                 <button type="button" class="btn btn-primary btn-sm" ng-click="LDAPConnectivityCheck()" ng-disabled="!LDAPSettings.URL || !LDAPSettings.ReaderDN || !LDAPSettings.Password || (!formValues.TLSCACert && !LDAPSettings.TLSConfig.TLSSkipVerify)">Test connectivity</button>
                 <i id="connectivityCheckSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
+              </div>
+            </div>
+
+            <div class="col-sm-12 form-section-title">
+              Automatic user provisioning
+            </div>
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                With automatic user provisioning enabled, Portainer will create user(s) automatically with standard user role and assign them to team(s) which matches to LDAP group name(s). If disabled, users must be created in Portainer beforehand.
+              </span>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label for="tls" class="control-label text-left">
+                  Automatic user provisioning
+                </label>
+                <label class="switch" style="margin-left: 20px;">
+                  <input type="checkbox" ng-model="LDAPSettings.AutoCreateUsers"><i></i>
+                </label>
               </div>
             </div>
 

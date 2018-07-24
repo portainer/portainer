@@ -53,6 +53,7 @@ type (
 		StartTLS            bool                      `json:"StartTLS"`
 		SearchSettings      []LDAPSearchSettings      `json:"SearchSettings"`
 		GroupSearchSettings []LDAPGroupSearchSettings `json:"GroupSearchSettings"`
+		AutoCreateUsers     bool                      `json:"AutoCreateUsers"`
 	}
 
 	// TLSConfiguration represents a TLS configuration.

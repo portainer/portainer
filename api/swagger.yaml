@@ -2942,6 +2942,10 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/LDAPGroupSearchSettings"
+      AutoCreateUsers:
+        type: "boolean"
+        example: "true"
+        description: "Automatically provision users and assign them to matching LDAP group names"
 
   Settings:
     type: "object"
