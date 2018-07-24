@@ -362,7 +362,6 @@ func snapshotAndPersistEndpoint(endpoint *portainer.Endpoint, endpointService po
 	endpoint.Status = portainer.EndpointStatusUp
 	if err != nil {
 		log.Printf("http error: endpoint snapshot error (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
-		endpoint.Status = portainer.EndpointStatusDown
 	}
 
 	if snapshot != nil {
