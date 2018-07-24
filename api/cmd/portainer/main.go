@@ -328,7 +328,6 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, endpointService portain
 	}
 
 	return snapshotAndPersistEndpoint(endpoint, endpointService, snapshotter)
-	// return endpointService.CreateEndpoint(endpoint)
 }
 
 func createUnsecuredEndpoint(endpointURL string, endpointService portainer.EndpointService, snapshotter portainer.Snapshotter) error {
@@ -356,7 +355,6 @@ func createUnsecuredEndpoint(endpointURL string, endpointService portainer.Endpo
 	}
 
 	return snapshotAndPersistEndpoint(endpoint, endpointService, snapshotter)
-	// return endpointService.CreateEndpoint(endpoint)
 }
 
 func snapshotAndPersistEndpoint(endpoint *portainer.Endpoint, endpointService portainer.EndpointService, snapshotter portainer.Snapshotter) error {
