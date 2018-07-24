@@ -282,6 +282,7 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     var payload = {
       Name: name,
       RepositoryURL: repositoryOptions.RepositoryURL,
+      RepositoryReferenceName: repositoryOptions.RepositoryReferenceName,
       ComposeFilePathInRepository: repositoryOptions.ComposeFilePathInRepository,
       RepositoryAuthentication: repositoryOptions.RepositoryAuthentication,
       RepositoryUsername: repositoryOptions.RepositoryUsername,
@@ -301,6 +302,7 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
         Name: name,
         SwarmID: swarm.Id,
         RepositoryURL: repositoryOptions.RepositoryURL,
+        RepositoryReferenceName: repositoryOptions.RepositoryReferenceName,
         ComposeFilePathInRepository: repositoryOptions.ComposeFilePathInRepository,
         RepositoryAuthentication: repositoryOptions.RepositoryAuthentication,
         RepositoryUsername: repositoryOptions.RepositoryUsername,
