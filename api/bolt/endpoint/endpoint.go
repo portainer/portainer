@@ -82,8 +82,11 @@ func (service *Service) CreateEndpoint(endpoint *portainer.Endpoint) error {
 	return service.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
-		id, _ := bucket.NextSequence()
-		endpoint.ID = portainer.EndpointID(id)
+		// We manually manage sequences for endpoints
+		err := bucket.SetSequence(uint64(endpoint.ID))
+		if err != nil {
+			return err
+		}
 
 		data, err := internal.MarshalObject(endpoint)
 		if err != nil {
@@ -92,6 +95,11 @@ func (service *Service) CreateEndpoint(endpoint *portainer.Endpoint) error {
 
 		return bucket.Put(internal.Itob(int(endpoint.ID)), data)
 	})
+}
+
+// GetNextIdentifier returns the next identifier for an endpoint.
+func (service *Service) GetNextIdentifier() int {
+	return internal.GetNextIdentifier(service.db, BucketName)
 }
 
 // Synchronize creates, updates and deletes endpoints inside a single transaction.
