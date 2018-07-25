@@ -145,7 +145,7 @@ angular.module('portainer.app')
   service.confirmEndpointSnapshot = function(callback) {
     service.confirm({
       title: 'Are you sure?',
-      message: 'Refreshing will send multiple poll requests to retrieve each endpoint information, this may take a few moments.',
+      message: 'Triggering a manual refresh will poll each endpoint to retrieve its information, this may take a few moments.',
       buttons: {
         confirm: {
           label: 'Continue',
