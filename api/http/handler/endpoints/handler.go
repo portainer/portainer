@@ -43,6 +43,8 @@ func NewHandler(bouncer *security.RequestBouncer, authorizeEndpointManagement bo
 
 	h.Handle("/endpoints",
 		bouncer.AdministratorAccess(httperror.LoggerHandler(h.endpointCreate))).Methods(http.MethodPost)
+	h.Handle("/endpoints/snapshot",
+		bouncer.AdministratorAccess(httperror.LoggerHandler(h.endpointSnapshot))).Methods(http.MethodPost)
 	h.Handle("/endpoints",
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointList))).Methods(http.MethodGet)
 	h.Handle("/endpoints/{id}",

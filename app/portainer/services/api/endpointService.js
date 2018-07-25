@@ -12,6 +12,10 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     return Endpoints.query({}).$promise;
   };
 
+  service.snapshot = function() {
+    return Endpoints.snapshot({}, {}).$promise;
+  };
+
   service.endpointsByGroup = function(groupId) {
     var deferred = $q.defer();
 
