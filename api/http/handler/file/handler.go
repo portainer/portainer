@@ -2,18 +2,22 @@ package file
 
 import (
 	"net/http"
+	"os"
+	"path"
 	"strings"
 )
 
 // Handler represents an HTTP API handler for managing static files.
 type Handler struct {
 	http.Handler
+	AssetPath string
 }
 
 // NewHandler creates a handler to serve static files.
 func NewHandler(assetPublicPath string) *Handler {
 	h := &Handler{
-		Handler: http.FileServer(http.Dir(assetPublicPath)),
+		Handler:   http.FileServer(http.Dir(assetPublicPath)),
+		AssetPath: assetPublicPath,
 	}
 	return h
 }
@@ -33,5 +37,11 @@ func (handler *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	} else {
 		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 	}
-	handler.Handler.ServeHTTP(w, r)
+
+	_, err := os.Open(path.Join(handler.AssetPath, path.Clean(r.URL.Path)))
+	if os.IsNotExist(err) {
+		http.ServeFile(w, r, path.Join(handler.AssetPath, "index.html"))
+	} else {
+		handler.Handler.ServeHTTP(w, r)
+	}
 }
