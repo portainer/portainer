@@ -11,6 +11,8 @@ angular.module('portainer.app').component('endpointList', {
     titleText: '@',
     titleIcon: '@',
     endpoints: '<',
-    dashboardAction: '<'
+    dashboardAction: '<',
+    snapshotAction: '<',
+    showSnapshotAction: '<'
   }
 });

@@ -142,14 +142,14 @@ angular.module('portainer.app')
     }, false);
   };
 
-  service.confirmExperimentalFeature = function(callback) {
+  service.confirmEndpointSnapshot = function(callback) {
     service.confirm({
-      title: 'Experimental feature',
-      message: 'This feature is currently experimental, please use with caution.',
+      title: 'Are you sure?',
+      message: 'Refreshing will send multiple poll requests to retrieve each endpoint information, this may take a few moments.',
       buttons: {
         confirm: {
           label: 'Continue',
-          className: 'btn-danger'
+          className: 'btn-primary'
         }
       },
       callback: callback

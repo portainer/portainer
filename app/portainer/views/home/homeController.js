@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('HomeController', ['$q', '$scope', '$state', 'Authentication', 'EndpointService', 'EndpointHelper', 'GroupService', 'Notifications', 'EndpointProvider', 'StateManager', 'ExtensionManager',
-function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, GroupService, Notifications, EndpointProvider, StateManager, ExtensionManager) {
+.controller('HomeController', ['$q', '$scope', '$state', 'Authentication', 'EndpointService', 'EndpointHelper', 'GroupService', 'Notifications', 'EndpointProvider', 'StateManager', 'ExtensionManager', 'ModalService',
+function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, GroupService, Notifications, EndpointProvider, StateManager, ExtensionManager, ModalService) {
 
   $scope.goToDashboard = function(endpoint) {
     EndpointProvider.setEndpointID(endpoint.Id);
@@ -10,6 +10,24 @@ function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, G
     } else {
       switchToDockerEndpoint(endpoint);
     }
+  };
+
+  function triggerSnapshot() {
+    EndpointService.snapshot()
+    .then(function success(data) {
+      Notifications.success('Success', 'Endpoints updated');
+      $state.reload();
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'An error occured during endpoint snapshot');
+    });
+  }
+
+  $scope.triggerSnapshot = function() {
+    ModalService.confirmEndpointSnapshot(function (result) {
+      if(!result) { return; }
+      triggerSnapshot();
+    });
   };
 
   function switchToAzureEndpoint(endpoint) {
