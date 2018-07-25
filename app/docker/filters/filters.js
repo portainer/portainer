@@ -218,6 +218,30 @@ angular.module('portainer.docker')
     return runningTasks;
   };
 })
+.filter('containerswithstatus', function () {
+  'use strict';
+  return function (containers, status) {
+    var containersWithStatus = 0;
+    for (var i = 0; i < containers.length; i++) {
+      var container = containers[i];
+      if (container.Status === status) {
+        containersWithStatus++;
+      }
+    }
+    return containersWithStatus;
+  };
+})
+.filter('imagestotalsize', function () {
+  'use strict';
+  return function (images) {
+    var totalImageSize = 0;
+    for (var i = 0; i < images.length; i++) {
+      var item = images[i];
+      totalImageSize += item.VirtualSize;
+    }
+    return totalImageSize;
+  };
+})
 .filter('tasknodename', function () {
   'use strict';
   return function (nodeId, nodes) {
