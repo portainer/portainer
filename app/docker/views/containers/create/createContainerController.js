@@ -16,7 +16,8 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     CpuLimit: 0,
     MemoryLimit: 0,
     MemoryReservation: 0,
-    NodeName: null
+    NodeName: null,
+    capabilities: null
   };
 
   $scope.extraNetworks = {};
@@ -48,7 +49,9 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       NetworkMode: 'bridge',
       Privileged: false,
       ExtraHosts: [],
-      Devices:[]
+      Devices: [],
+      CapAdd: [],
+      CapDrop: []
     },
     NetworkingConfig: {
       EndpointsConfig: {}
@@ -251,6 +254,15 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     }
   }
 
+  function prepareCapabilities(config) {
+    var allowed = $scope.formValues.capabilities.filter(function(item) {return item.allowed === true;});
+    var notAllowed = $scope.formValues.capabilities.filter(function(item) {return item.allowed === false;});
+
+    var getCapName = function(item) {return item.capability;};
+    config.HostConfig.CapAdd = allowed.map(getCapName);
+    config.HostConfig.CapDrop = notAllowed.map(getCapName);
+  }
+
   function prepareConfiguration() {
     var config = angular.copy($scope.config);
     config.Cmd = ContainerHelper.commandStringToArray(config.Cmd);
@@ -263,6 +275,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     prepareLabels(config);
     prepareDevices(config);
     prepareResources(config);
+    prepareCapabilities(config);
     return config;
   }
 

@@ -152,6 +152,7 @@
           <li class="interactive"><a data-target="#labels" data-toggle="tab">Labels</a></li>
           <li class="interactive"><a data-target="#restart-policy" data-toggle="tab">Restart policy</a></li>
           <li class="interactive"><a data-target="#runtime-resources" ng-click="refreshSlider()" data-toggle="tab">Runtime & Resources</a></li>
+          <li class="interactive"><a data-target="#container-capabilities" data-toggle="tab">Capabilities</a></li>
         </ul>
         <!-- tab-content -->
         <div class="tab-content">
@@ -585,6 +586,11 @@
             </form>
           </div>
           <!-- !tab-runtime-resources -->
+          <!-- tab-container-capabilities -->
+          <div class="tab-pane" id="container-capabilities">
+            <container-capabilities capabilities="formValues.capabilities" ></container-capabilities>
+          </div>
+          <!-- !tab-container-capabilities -->
         </div>
       </rd-widget-body>
     </rd-widget>
