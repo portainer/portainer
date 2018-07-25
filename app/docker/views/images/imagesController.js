@@ -2,7 +2,8 @@ angular.module('portainer.docker')
 .controller('ImagesController', ['$scope', '$state', 'ImageService', 'Notifications', 'ModalService', 'HttpRequestHelper', 'FileSaver',
 function ($scope, $state, ImageService, Notifications, ModalService, HttpRequestHelper, FileSaver) {
   $scope.state = {
-    actionInProgress: false
+    actionInProgress: false,
+    exportInProgress: false
   };
 
   $scope.formValues = {
@@ -66,6 +67,7 @@ function ($scope, $state, ImageService, Notifications, ModalService, HttpRequest
       return;
 
     HttpRequestHelper.setPortainerAgentTargetHeader(selectedItems[0].NodeName);
+    $scope.state.exportInProgress = true;
     ImageService.downloadImages(selectedItems)
     .then(function success(data) {
       var downloadData = new Blob([data.file], { type: 'application/x-tar' });
@@ -74,6 +76,9 @@ function ($scope, $state, ImageService, Notifications, ModalService, HttpRequest
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to download images');
+    })
+    .finally(function final() {
+      $scope.state.exportInProgress = false;
     });
   };
 

@@ -8,9 +8,6 @@
       </div>
       <div class="actionBar">
         <div class="btn-group">
-          <button type="button" class="btn btn-sm btn-primary" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.downloadAction($ctrl.state.selectedItems)">
-              <i class="fa fa-download space-right" aria-hidden="true"></i>Export
-            </button>
           <button type="button" class="btn btn-sm btn-danger"
             ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems, false)">
             <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
@@ -26,9 +23,17 @@
         <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.images.build">
           <i class="fa fa-plus space-right" aria-hidden="true"></i>Build a new image
         </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.images.import">
-            <i class="fa fa-plus space-right" aria-hidden="true"></i>Import images
+        <div class="btn-group">
+          <button type="button" class="btn btn-sm btn-primary" ng-disabled="$ctrl.exportInProgress" ui-sref="docker.images.import">
+              <i class="fa fa-upload space-right" aria-hidden="true"></i>Import
           </button>
+          <button type="button" class="btn btn-sm btn-primary" ng-disabled="$ctrl.state.selectedItemCount === 0 || $ctrl.exportInProgress"
+            ng-click="$ctrl.downloadAction($ctrl.state.selectedItems)" button-spinner="$ctrl.exportInProgress">
+              <i class="fa fa-download space-right" aria-hidden="true"></i>
+              <span ng-hide="$ctrl.exportInProgress">Export</span>
+              <span ng-show="$ctrl.exportInProgress">Export in progress...</span>
+          </button>
+        </div>
       </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>

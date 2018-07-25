@@ -29,7 +29,8 @@ function ImageFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, HttpR
     download: {
       method: 'GET', params: {action:'get', names: '@names'},
       transformResponse: imageGetResponse,
-      responseType: 'blob'
+      responseType: 'blob',
+      ignoreLoadingBar: true
     },
     remove: {
       method: 'DELETE', params: {id: '@id', force: '@force'},
