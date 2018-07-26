@@ -156,6 +156,20 @@ angular.module('portainer.app')
     });
   };
 
+  service.confirmImageExport = function(callback) {
+    service.confirm({
+      title: 'Caution',
+      message: 'The export may take several minutes, do not navigate away whilst the export is in progress.',
+      buttons: {
+        confirm: {
+          label: 'Continue',
+          className: 'btn-primary'
+        }
+      },
+      callback: callback
+    });
+  };
+
   service.confirmServiceForceUpdate = function(message, callback) {
     service.customPrompt({
       title: 'Are you sure ?',

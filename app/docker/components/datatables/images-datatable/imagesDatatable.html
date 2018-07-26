@@ -23,6 +23,17 @@
         <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.images.build">
           <i class="fa fa-plus space-right" aria-hidden="true"></i>Build a new image
         </button>
+        <div class="btn-group">
+          <button type="button" class="btn btn-sm btn-primary" ng-disabled="$ctrl.exportInProgress" ui-sref="docker.images.import">
+              <i class="fa fa-upload space-right" aria-hidden="true"></i>Import
+          </button>
+          <button type="button" class="btn btn-sm btn-primary" ng-disabled="$ctrl.state.selectedItemCount === 0 || $ctrl.exportInProgress"
+            ng-click="$ctrl.downloadAction($ctrl.state.selectedItems)" button-spinner="$ctrl.exportInProgress">
+              <i class="fa fa-download space-right" aria-hidden="true"></i>
+              <span ng-hide="$ctrl.exportInProgress">Export</span>
+              <span ng-show="$ctrl.exportInProgress">Export in progress...</span>
+          </button>
+        </div>
       </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
@@ -108,7 +119,7 @@
                 <span style="margin-left: 10px;" class="label label-warning image-tag" ng-if="::item.ContainerCount === 0">Unused</span>
               </td>
               <td>
-                <span class="label label-primary image-tag" ng-repeat="tag in (item | repotags)">{{ tag }}</span>
+                <span class="label label-primary image-tag" ng-repeat="tag in (item | repotags) track by $index">{{ tag }}</span>
               </td>
               <td>{{ item.VirtualSize | humansize }}</td>
               <td>{{ item.Created | getisodatefromtimestamp }}</td>

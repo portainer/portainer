@@ -184,6 +184,17 @@ angular.module('portainer.docker', ['portainer.app'])
     }
   };
 
+  var imageImport = {
+    name: 'docker.images.import',
+    url: '/import',
+    views: {
+      'content@': {
+        templateUrl: 'app/docker/views/images/import/importimage.html',
+        controller: 'ImportImageController'
+      }
+    }
+  };
+
   var networks = {
     name: 'docker.networks',
     url: '/networks',
@@ -422,6 +433,7 @@ angular.module('portainer.docker', ['portainer.app'])
   $stateRegistryProvider.register(images);
   $stateRegistryProvider.register(image);
   $stateRegistryProvider.register(imageBuild);
+  $stateRegistryProvider.register(imageImport);
   $stateRegistryProvider.register(networks);
   $stateRegistryProvider.register(network);
   $stateRegistryProvider.register(networkCreation);

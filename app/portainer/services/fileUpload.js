@@ -10,7 +10,6 @@ angular.module('portainer.app')
 
   service.buildImage = function(names, file, path) {
     var endpointID = EndpointProvider.endpointID();
-    Upload.setDefaults({ ngfMinSize: 10 });
     return Upload.http({
       url: 'api/endpoints/' + endpointID + '/docker/build',
       headers : {
@@ -25,6 +24,18 @@ angular.module('portainer.app')
       transformResponse: function(data, headers) {
         return jsonObjectsToArrayHandler(data);
       }
+    });
+  };
+
+  service.loadImages = function(file) {
+    var endpointID = EndpointProvider.endpointID();
+    return Upload.http({
+      url: 'api/endpoints/' + endpointID + '/docker/images/load',
+      headers : {
+        'Content-Type': file.type
+      },
+      data: file,
+      ignoreLoadingBar: true
     });
   };
 
