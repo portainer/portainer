@@ -119,7 +119,7 @@
                 <span style="margin-left: 10px;" class="label label-warning image-tag" ng-if="::item.ContainerCount === 0">Unused</span>
               </td>
               <td>
-                <span class="label label-primary image-tag" ng-repeat="tag in (item | repotags)">{{ tag }}</span>
+                <span class="label label-primary image-tag" ng-repeat="tag in (item | repotags) track by $index">{{ tag }}</span>
               </td>
               <td>{{ item.VirtualSize | humansize }}</td>
               <td>{{ item.Created | getisodatefromtimestamp }}</td>

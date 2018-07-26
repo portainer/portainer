@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ImagesController', ['$scope', '$state', 'ImageService', 'Notifications', 'ModalService', 'HttpRequestHelper', 'FileSaver',
-function ($scope, $state, ImageService, Notifications, ModalService, HttpRequestHelper, FileSaver) {
+.controller('ImagesController', ['$scope', '$state', 'ImageService', 'Notifications', 'ModalService', 'HttpRequestHelper', 'FileSaver', 'Blob',
+function ($scope, $state, ImageService, Notifications, ModalService, HttpRequestHelper, FileSaver, Blob) {
   $scope.state = {
     actionInProgress: false,
     exportInProgress: false
@@ -41,44 +41,53 @@ function ($scope, $state, ImageService, Notifications, ModalService, HttpRequest
   };
 
   function isAuthorizedToDownload(selectedItems) {
-    var isFromDifferentNode = selectedItems.map(function(item) {
-        return item.NodeName === selectedItems[0].NodeName;
-      }).includes(false);
 
-    var hasNoneTag = selectedItems.map(function(item) {
-      return item.RepoTags.map(function(tag) {
-        return tag.includes('<none>');
-      }).includes(true);
-    }).includes(true);
+    for (var i = 0; i < selectedItems.length; i++) {
+      var image = selectedItems[i];
 
-    if (isFromDifferentNode) {
-      Notifications.error('Failure', '', 'Can\'t download images from different nodes at the same time');
-      return false;
+      var untagged = _.find(image.RepoTags, function (item) {
+        return item.indexOf('<none>') > -1;
+      });
+
+      if (untagged) {
+        Notifications.warning('', 'Cannot download a untagged image');
+  			return false;
+      }
     }
-    if (hasNoneTag) {
-      Notifications.error('Failure', '', 'Can\'t download images with none tags');
-      return false;
+
+    if (_.uniqBy(selectedItems, 'NodeName').length > 1) {
+      Notifications.warning('', 'Cannot download images from different nodes at the same time');
+       return false;
     }
+
     return true;
   }
 
-  $scope.downloadAction = function (selectedItems) {
-    if (!isAuthorizedToDownload(selectedItems))
-      return;
-
-    HttpRequestHelper.setPortainerAgentTargetHeader(selectedItems[0].NodeName);
+  function exportImages(images) {
+    HttpRequestHelper.setPortainerAgentTargetHeader(images[0].NodeName);
     $scope.state.exportInProgress = true;
-    ImageService.downloadImages(selectedItems)
+    ImageService.downloadImages(images)
     .then(function success(data) {
       var downloadData = new Blob([data.file], { type: 'application/x-tar' });
       FileSaver.saveAs(downloadData, 'images.tar');
-      Notifications.success('Images successfully downloaded');
+      Notifications.success('Image(s) successfully downloaded');
     })
     .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to download images');
+      Notifications.error('Failure', err, 'Unable to download image(s)');
     })
     .finally(function final() {
       $scope.state.exportInProgress = false;
+    });
+  }
+
+  $scope.downloadAction = function (selectedItems) {
+    if (!isAuthorizedToDownload(selectedItems)) {
+      return;
+    }
+
+    ModalService.confirmImageExport(function (confirmed) {
+      if(!confirmed) { return; }
+      exportImages(selectedItems);
     });
   };
 
