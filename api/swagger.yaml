@@ -320,7 +320,7 @@ paths:
       summary: "Inspect an endpoint"
       description: |
         Retrieve details abount an endpoint.
-        **Access policy**: administrator
+        **Access policy**: restricted
       operationId: "EndpointInspect"
       produces:
       - "application/json"

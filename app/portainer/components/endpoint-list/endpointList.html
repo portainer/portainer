@@ -8,6 +8,12 @@
         </div>
       </div>
 
+      <div class="actionBar" ng-if="$ctrl.showSnapshotAction">
+        <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.snapshotAction()">
+          <i class="fa fa-sync space-right" aria-hidden="true"></i>Refresh
+        </button>
+      </div>
+
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
         <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search by name, group, tag..." auto-focus>

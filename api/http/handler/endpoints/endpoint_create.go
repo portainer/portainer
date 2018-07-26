@@ -57,6 +57,9 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 		return portainer.Error("Invalid Tags parameter")
 	}
 	payload.Tags = tags
+	if payload.Tags == nil {
+		payload.Tags = make([]string, 0)
+	}
 
 	useTLS, _ := request.RetrieveBooleanMultiPartFormValue(r, "TLS", true)
 	payload.TLS = useTLS
