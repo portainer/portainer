@@ -17,6 +17,7 @@ import (
 type composeStackFromFileContentPayload struct {
 	Name             string
 	StackFileContent string
+	Env              []portainer.Pair
 }
 
 func (payload *composeStackFromFileContentPayload) Validate(r *http.Request) error {
@@ -54,6 +55,7 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 		Type:       portainer.DockerComposeStack,
 		EndpointID: endpoint.ID,
 		EntryPoint: filesystem.ComposeFileDefaultName,
+		Env:        payload.Env,
 	}
 
 	stackFolder := strconv.Itoa(int(stack.ID))
@@ -88,10 +90,12 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 type composeStackFromGitRepositoryPayload struct {
 	Name                        string
 	RepositoryURL               string
+	RepositoryReferenceName     string
 	RepositoryAuthentication    bool
 	RepositoryUsername          string
 	RepositoryPassword          string
 	ComposeFilePathInRepository string
+	Env                         []portainer.Pair
 }
 
 func (payload *composeStackFromGitRepositoryPayload) Validate(r *http.Request) error {
@@ -135,6 +139,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 		Type:       portainer.DockerComposeStack,
 		EndpointID: endpoint.ID,
 		EntryPoint: payload.ComposeFilePathInRepository,
+		Env:        payload.Env,
 	}
 
 	projectPath := handler.FileService.GetStackProjectPath(strconv.Itoa(int(stack.ID)))
@@ -142,18 +147,20 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 
 	gitCloneParams := &cloneRepositoryParameters{
 		url:            payload.RepositoryURL,
+		referenceName:  payload.RepositoryReferenceName,
 		path:           projectPath,
 		authentication: payload.RepositoryAuthentication,
 		username:       payload.RepositoryUsername,
 		password:       payload.RepositoryPassword,
 	}
+
+	doCleanUp := true
+	defer handler.cleanUp(stack, &doCleanUp)
+
 	err = handler.cloneGitRepository(gitCloneParams)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to clone git repository", err}
 	}
-
-	doCleanUp := true
-	defer handler.cleanUp(stack, &doCleanUp)
 
 	config, configErr := handler.createComposeDeployConfig(r, stack, endpoint)
 	if configErr != nil {
@@ -177,6 +184,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 type composeStackFromFileUploadPayload struct {
 	Name             string
 	StackFileContent []byte
+	Env              []portainer.Pair
 }
 
 func (payload *composeStackFromFileUploadPayload) Validate(r *http.Request) error {
@@ -192,6 +200,12 @@ func (payload *composeStackFromFileUploadPayload) Validate(r *http.Request) erro
 	}
 	payload.StackFileContent = composeFileContent
 
+	var env []portainer.Pair
+	err = request.RetrieveMultiPartFormJSONValue(r, "Env", &env, true)
+	if err != nil {
+		return portainer.Error("Invalid Env parameter")
+	}
+	payload.Env = env
 	return nil
 }
 
@@ -220,6 +234,7 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 		Type:       portainer.DockerComposeStack,
 		EndpointID: endpoint.ID,
 		EntryPoint: filesystem.ComposeFileDefaultName,
+		Env:        payload.Env,
 	}
 
 	stackFolder := strconv.Itoa(int(stack.ID))

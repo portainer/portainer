@@ -86,6 +86,7 @@ function ($state, ContainerService, ModalService, Notifications, HttpRequestHelp
   function removeSelectedContainers(containers, cleanVolumes) {
     var actionCount = containers.length;
     angular.forEach(containers, function (container) {
+      HttpRequestHelper.setPortainerAgentTargetHeader(container.NodeName);
       ContainerService.remove(container, cleanVolumes)
       .then(function success() {
         Notifications.success('Container successfully removed', container.Names[0]);

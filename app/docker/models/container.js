@@ -23,6 +23,7 @@ function ContainerViewModel(data) {
   this.Id = data.Id;
   this.Status = createStatus(data.Status);
   this.State = data.State;
+  this.Created = data.Created;
   this.Names = data.Names;
   // Unavailable in Docker < 1.10
   if (data.NetworkSettings && !_.isEmpty(data.NetworkSettings.Networks)) {

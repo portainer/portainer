@@ -8,7 +8,6 @@ angular.module('portainer.app').component('usersDatatable', {
     tableKey: '@',
     orderBy: '@',
     reverseOrder: '<',
-    showTextFilter: '<',
     removeAction: '<',
     authenticationMethod: '<'
   }

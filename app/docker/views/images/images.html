@@ -15,9 +15,11 @@
       <rd-widget-body>
         <form class="form-horizontal">
           <!-- image-and-registry -->
-          <div class="form-group">
-            <por-image-registry image="formValues.Image" registry="formValues.Registry"></por-image-registry>
-          </div>
+          <por-image-registry
+            image="formValues.Image"
+            registry="formValues.Registry"
+            label-class="col-sm-1" input-class="col-sm-11 col-md-5"
+          ></por-image-registry>
           <!-- !image-and-registry -->
           <!-- tag-note -->
           <div class="form-group">
@@ -26,7 +28,7 @@
             </div>
           </div>
           <!-- !tag-note -->
-          <div ng-if="applicationState.endpoint.mode.agentProxy">
+          <div ng-if="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
             <div class="col-sm-12 form-section-title">
               Deployment
             </div>
@@ -55,10 +57,12 @@
     <images-datatable
     title-text="Images" title-icon="fa-clone"
     dataset="images" table-key="images"
-    order-by="RepoTags" show-text-filter="true"
-    show-host-column="applicationState.endpoint.mode.agentProxy"
+    order-by="RepoTags"
+    show-host-column="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'"
+    download-action="downloadAction"
     remove-action="removeAction"
     force-remove-action="confirmRemovalAction"
+    export-in-progress="state.exportInProgress"
     ></images-datatable>
   </div>
 </div>

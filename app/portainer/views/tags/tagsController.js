@@ -10,6 +10,17 @@ function ($scope, $state, TagService, Notifications) {
     Name: ''
   };
 
+  $scope.checkNameValidity = function(form) {
+    var valid = true;
+    for (var i = 0; i < $scope.tags.length; i++) {
+      if ($scope.formValues.Name === $scope.tags[i].Name) {
+        valid = false;
+        break;
+      }
+    }
+    form.name.$setValidity('validName', valid);
+  };
+
   $scope.removeAction = function (selectedItems) {
     var actionCount = selectedItems.length;
     angular.forEach(selectedItems, function (tag) {

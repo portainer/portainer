@@ -58,21 +58,6 @@ func (factory *proxyFactory) newDockerHTTPProxy(u *url.URL, enableSignature bool
 	return factory.createDockerReverseProxy(u, enableSignature)
 }
 
-func (factory *proxyFactory) newDockerSocketProxy(path string) http.Handler {
-	proxy := &socketProxy{}
-	transport := &proxyTransport{
-		enableSignature:        false,
-		ResourceControlService: factory.ResourceControlService,
-		TeamMembershipService:  factory.TeamMembershipService,
-		SettingsService:        factory.SettingsService,
-		RegistryService:        factory.RegistryService,
-		DockerHubService:       factory.DockerHubService,
-		dockerTransport:        newSocketTransport(path),
-	}
-	proxy.Transport = transport
-	return proxy
-}
-
 func (factory *proxyFactory) createDockerReverseProxy(u *url.URL, enableSignature bool) *httputil.ReverseProxy {
 	proxy := newSingleHostReverseProxyWithHostHeader(u)
 	transport := &proxyTransport{

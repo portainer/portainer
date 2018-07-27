@@ -12,10 +12,10 @@
     <networks-datatable
     title-text="Networks" title-icon="fa-sitemap"
     dataset="networks" table-key="networks"
-    order-by="Name" show-text-filter="true"
+    order-by="Name"
     remove-action="removeAction"
     show-ownership-column="applicationState.application.authentication"
-    show-host-column="applicationState.endpoint.mode.agentProxy"
+    show-host-column="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'"
     ></networks-datatable>
   </div>
 </div>

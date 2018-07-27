@@ -25,10 +25,12 @@ func hideFields(endpoint *portainer.Endpoint) {
 type Handler struct {
 	*mux.Router
 	authorizeEndpointManagement bool
+	requestBouncer              *security.RequestBouncer
 	EndpointService             portainer.EndpointService
 	EndpointGroupService        portainer.EndpointGroupService
 	FileService                 portainer.FileService
 	ProxyManager                *proxy.Manager
+	Snapshotter                 portainer.Snapshotter
 }
 
 // NewHandler creates a handler to manage endpoint operations.
@@ -36,14 +38,17 @@ func NewHandler(bouncer *security.RequestBouncer, authorizeEndpointManagement bo
 	h := &Handler{
 		Router: mux.NewRouter(),
 		authorizeEndpointManagement: authorizeEndpointManagement,
+		requestBouncer:              bouncer,
 	}
 
 	h.Handle("/endpoints",
 		bouncer.AdministratorAccess(httperror.LoggerHandler(h.endpointCreate))).Methods(http.MethodPost)
+	h.Handle("/endpoints/snapshot",
+		bouncer.AdministratorAccess(httperror.LoggerHandler(h.endpointSnapshot))).Methods(http.MethodPost)
 	h.Handle("/endpoints",
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointList))).Methods(http.MethodGet)
 	h.Handle("/endpoints/{id}",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.endpointInspect))).Methods(http.MethodGet)
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointInspect))).Methods(http.MethodGet)
 	h.Handle("/endpoints/{id}",
 		bouncer.AdministratorAccess(httperror.LoggerHandler(h.endpointUpdate))).Methods(http.MethodPut)
 	h.Handle("/endpoints/{id}/access",

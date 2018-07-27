@@ -1,8 +1,9 @@
 angular.module('portainer.docker')
-.controller('ImagesController', ['$scope', '$state', 'ImageService', 'Notifications', 'ModalService', 'HttpRequestHelper',
-function ($scope, $state, ImageService, Notifications, ModalService, HttpRequestHelper) {
+.controller('ImagesController', ['$scope', '$state', 'ImageService', 'Notifications', 'ModalService', 'HttpRequestHelper', 'FileSaver', 'Blob',
+function ($scope, $state, ImageService, Notifications, ModalService, HttpRequestHelper, FileSaver, Blob) {
   $scope.state = {
-    actionInProgress: false
+    actionInProgress: false,
+    exportInProgress: false
   };
 
   $scope.formValues = {
@@ -36,6 +37,57 @@ function ($scope, $state, ImageService, Notifications, ModalService, HttpRequest
     ModalService.confirmImageForceRemoval(function (confirmed) {
       if(!confirmed) { return; }
       $scope.removeAction(selectedItems, force);
+    });
+  };
+
+  function isAuthorizedToDownload(selectedItems) {
+
+    for (var i = 0; i < selectedItems.length; i++) {
+      var image = selectedItems[i];
+
+      var untagged = _.find(image.RepoTags, function (item) {
+        return item.indexOf('<none>') > -1;
+      });
+
+      if (untagged) {
+        Notifications.warning('', 'Cannot download a untagged image');
+  			return false;
+      }
+    }
+
+    if (_.uniqBy(selectedItems, 'NodeName').length > 1) {
+      Notifications.warning('', 'Cannot download images from different nodes at the same time');
+       return false;
+    }
+
+    return true;
+  }
+
+  function exportImages(images) {
+    HttpRequestHelper.setPortainerAgentTargetHeader(images[0].NodeName);
+    $scope.state.exportInProgress = true;
+    ImageService.downloadImages(images)
+    .then(function success(data) {
+      var downloadData = new Blob([data.file], { type: 'application/x-tar' });
+      FileSaver.saveAs(downloadData, 'images.tar');
+      Notifications.success('Image(s) successfully downloaded');
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to download image(s)');
+    })
+    .finally(function final() {
+      $scope.state.exportInProgress = false;
+    });
+  }
+
+  $scope.downloadAction = function (selectedItems) {
+    if (!isAuthorizedToDownload(selectedItems)) {
+      return;
+    }
+
+    ModalService.confirmImageExport(function (confirmed) {
+      if(!confirmed) { return; }
+      exportImages(selectedItems);
     });
   };
 

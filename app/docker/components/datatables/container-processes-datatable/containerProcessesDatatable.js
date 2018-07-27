@@ -8,7 +8,6 @@ angular.module('portainer.docker').component('containerProcessesDatatable', {
     headerset: '<',
     tableKey: '@',
     orderBy: '@',
-    reverseOrder: '<',
-    showTextFilter: '<'
+    reverseOrder: '<'
   }
 });

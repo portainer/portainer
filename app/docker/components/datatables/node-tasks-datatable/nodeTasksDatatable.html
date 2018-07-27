@@ -5,18 +5,13 @@
         <div class="toolBarTitle">
           <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }}
         </div>
-        <div class="settings">
-          <span class="setting" ng-class="{ 'setting-active': $ctrl.state.displayTextFilter }" ng-click="$ctrl.updateDisplayTextFilter()" ng-if="$ctrl.showTextFilter">
-            <i class="fa fa-search" aria-hidden="true"></i> Search
-          </span>
-        </div>
       </div>
-      <div class="searchBar" ng-if="$ctrl.state.displayTextFilter">
+      <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
         <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus>
       </div>
       <div class="table-responsive">
-        <table class="table table-hover">
+        <table class="table table-hover nowrap-cells">
           <thead>
             <tr>
               <th>

@@ -12,10 +12,7 @@ angular.module('portainer.docker')
     };
 
     if (type === 2) {
-      mode.provider = 'DOCKER_SWARM_MODE';
-      mode.role = 'MANAGER';
       mode.agentProxy = true;
-      return mode;
     }
 
     if (!info.Swarm || _.isEmpty(info.Swarm.NodeID)) {

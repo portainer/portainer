@@ -97,6 +97,7 @@ type swarmStackFromGitRepositoryPayload struct {
 	SwarmID                     string
 	Env                         []portainer.Pair
 	RepositoryURL               string
+	RepositoryReferenceName     string
 	RepositoryAuthentication    bool
 	RepositoryUsername          string
 	RepositoryPassword          string
@@ -156,18 +157,20 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 
 	gitCloneParams := &cloneRepositoryParameters{
 		url:            payload.RepositoryURL,
+		referenceName:  payload.RepositoryReferenceName,
 		path:           projectPath,
 		authentication: payload.RepositoryAuthentication,
 		username:       payload.RepositoryUsername,
 		password:       payload.RepositoryPassword,
 	}
+
+	doCleanUp := true
+	defer handler.cleanUp(stack, &doCleanUp)
+
 	err = handler.cloneGitRepository(gitCloneParams)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to clone git repository", err}
 	}
-
-	doCleanUp := true
-	defer handler.cleanUp(stack, &doCleanUp)
 
 	config, configErr := handler.createSwarmDeployConfig(r, stack, endpoint, false)
 	if configErr != nil {

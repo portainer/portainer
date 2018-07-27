@@ -8,7 +8,6 @@ angular.module('portainer.docker').component('secretsDatatable', {
     tableKey: '@',
     orderBy: '@',
     reverseOrder: '<',
-    showTextFilter: '<',
     showOwnershipColumn: '<',
     removeAction: '<'
   }

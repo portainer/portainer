@@ -5,6 +5,7 @@ import (
 	"path"
 	"path/filepath"
 
+	"github.com/portainer/libcompose/config"
 	"github.com/portainer/libcompose/docker"
 	"github.com/portainer/libcompose/docker/client"
 	"github.com/portainer/libcompose/docker/ctx"
@@ -26,19 +27,34 @@ func NewComposeStackManager(dataPath string) *ComposeStackManager {
 	}
 }
 
+func createClient(endpoint *portainer.Endpoint) (client.Factory, error) {
+	clientOpts := client.Options{
+		Host:       endpoint.URL,
+		APIVersion: portainer.SupportedDockerAPIVersion,
+	}
+
+	if endpoint.TLSConfig.TLS {
+		clientOpts.TLS = endpoint.TLSConfig.TLS
+		clientOpts.TLSVerify = !endpoint.TLSConfig.TLSSkipVerify
+		clientOpts.TLSCAFile = endpoint.TLSConfig.TLSCACertPath
+		clientOpts.TLSCertFile = endpoint.TLSConfig.TLSCertPath
+		clientOpts.TLSKeyFile = endpoint.TLSConfig.TLSKeyPath
+	}
+
+	return client.NewDefaultFactory(clientOpts)
+}
+
 // Up will deploy a compose stack (equivalent of docker-compose up)
 func (manager *ComposeStackManager) Up(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
-	clientFactory, err := client.NewDefaultFactory(client.Options{
-		TLS:         endpoint.TLSConfig.TLS,
-		TLSVerify:   endpoint.TLSConfig.TLSSkipVerify,
-		Host:        endpoint.URL,
-		TLSCAFile:   endpoint.TLSCACertPath,
-		TLSCertFile: endpoint.TLSCertPath,
-		TLSKeyFile:  endpoint.TLSKeyPath,
-		APIVersion:  "1.24",
-	})
+
+	clientFactory, err := createClient(endpoint)
 	if err != nil {
 		return err
+	}
+
+	env := make(map[string]string)
+	for _, envvar := range stack.Env {
+		env[envvar.Name] = envvar.Value
 	}
 
 	composeFilePath := path.Join(stack.ProjectPath, stack.EntryPoint)
@@ -46,8 +62,15 @@ func (manager *ComposeStackManager) Up(stack *portainer.Stack, endpoint *portain
 		ConfigDir: manager.dataPath,
 		Context: project.Context{
 			ComposeFiles: []string{composeFilePath},
-			EnvironmentLookup: &lookup.EnvfileLookup{
-				Path: filepath.Join(stack.ProjectPath, ".env"),
+			EnvironmentLookup: &lookup.ComposableEnvLookup{
+				Lookups: []config.EnvironmentLookup{
+					&lookup.EnvfileLookup{
+						Path: filepath.Join(stack.ProjectPath, ".env"),
+					},
+					&lookup.MapLookup{
+						Vars: env,
+					},
+				},
 			},
 			ProjectName: stack.Name,
 		},
@@ -62,15 +85,7 @@ func (manager *ComposeStackManager) Up(stack *portainer.Stack, endpoint *portain
 
 // Down will shutdown a compose stack (equivalent of docker-compose down)
 func (manager *ComposeStackManager) Down(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
-	clientFactory, err := client.NewDefaultFactory(client.Options{
-		TLS:         endpoint.TLSConfig.TLS,
-		TLSVerify:   endpoint.TLSConfig.TLSSkipVerify,
-		Host:        endpoint.URL,
-		TLSCAFile:   endpoint.TLSCACertPath,
-		TLSCertFile: endpoint.TLSCertPath,
-		TLSKeyFile:  endpoint.TLSKeyPath,
-		APIVersion:  "1.24",
-	})
+	clientFactory, err := createClient(endpoint)
 	if err != nil {
 		return err
 	}

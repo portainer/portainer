@@ -5,11 +5,6 @@
         <div class="toolBarTitle">
           <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }}
         </div>
-        <div class="settings">
-          <span class="setting" ng-class="{ 'setting-active': $ctrl.state.displayTextFilter }" ng-click="$ctrl.updateDisplayTextFilter()" ng-if="$ctrl.showTextFilter">
-            <i class="fa fa-search" aria-hidden="true"></i> Search
-          </span>
-        </div>
       </div>
       <div class="actionBar">
         <div class="btn-group">
@@ -28,13 +23,24 @@
         <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.images.build">
           <i class="fa fa-plus space-right" aria-hidden="true"></i>Build a new image
         </button>
+        <div class="btn-group">
+          <button type="button" class="btn btn-sm btn-primary" ng-disabled="$ctrl.exportInProgress" ui-sref="docker.images.import">
+              <i class="fa fa-upload space-right" aria-hidden="true"></i>Import
+          </button>
+          <button type="button" class="btn btn-sm btn-primary" ng-disabled="$ctrl.state.selectedItemCount === 0 || $ctrl.exportInProgress"
+            ng-click="$ctrl.downloadAction($ctrl.state.selectedItems)" button-spinner="$ctrl.exportInProgress">
+              <i class="fa fa-download space-right" aria-hidden="true"></i>
+              <span ng-hide="$ctrl.exportInProgress">Export</span>
+              <span ng-show="$ctrl.exportInProgress">Export in progress...</span>
+          </button>
+        </div>
       </div>
-      <div class="searchBar" ng-if="$ctrl.state.displayTextFilter">
+      <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
         <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus>
       </div>
       <div class="table-responsive">
-        <table class="table table-hover table-filters">
+        <table class="table table-hover table-filters nowrap-cells">
           <thead>
             <tr>
               <th uib-dropdown dropdown-append-to-body auto-close="disabled" popover-placement="bottom-left" is-open="$ctrl.filters.usage.open">
@@ -109,11 +115,11 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-change="$ctrl.selectItem(item)"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="docker.images.image({ id: item.Id, nodeName: item.NodeName })" class="monospaced">{{ item.Id | truncate:20 }}</a>
+                <a ui-sref="docker.images.image({ id: item.Id, nodeName: item.NodeName })" class="monospaced" title="{{ item.Id }}">{{ item.Id | truncate:40 }}</a>
                 <span style="margin-left: 10px;" class="label label-warning image-tag" ng-if="::item.ContainerCount === 0">Unused</span>
               </td>
               <td>
-                <span class="label label-primary image-tag" ng-repeat="tag in (item | repotags)">{{ tag }}</span>
+                <span class="label label-primary image-tag" ng-repeat="tag in (item | repotags) track by $index">{{ tag }}</span>
               </td>
               <td>{{ item.VirtualSize | humansize }}</td>
               <td>{{ item.Created | getisodatefromtimestamp }}</td>

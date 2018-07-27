@@ -40,6 +40,8 @@ type Server struct {
 	ComposeStackManager    portainer.ComposeStackManager
 	CryptoService          portainer.CryptoService
 	SignatureService       portainer.DigitalSignatureService
+	JobScheduler           portainer.JobScheduler
+	Snapshotter            portainer.Snapshotter
 	DockerHubService       portainer.DockerHubService
 	EndpointService        portainer.EndpointService
 	EndpointGroupService   portainer.EndpointGroupService
@@ -55,6 +57,7 @@ type Server struct {
 	TagService             portainer.TagService
 	TeamService            portainer.TeamService
 	TeamMembershipService  portainer.TeamMembershipService
+	TemplateService        portainer.TemplateService
 	UserService            portainer.UserService
 	Handler                *handler.Handler
 	SSL                    bool
@@ -89,6 +92,8 @@ func (server *Server) Start() error {
 	authHandler.JWTService = server.JWTService
 	authHandler.LDAPService = server.LDAPService
 	authHandler.SettingsService = server.SettingsService
+	authHandler.TeamService = server.TeamService
+	authHandler.TeamMembershipService = server.TeamMembershipService
 
 	var dockerHubHandler = dockerhub.NewHandler(requestBouncer)
 	dockerHubHandler.DockerHubService = server.DockerHubService
@@ -98,6 +103,7 @@ func (server *Server) Start() error {
 	endpointHandler.EndpointGroupService = server.EndpointGroupService
 	endpointHandler.FileService = server.FileService
 	endpointHandler.ProxyManager = proxyManager
+	endpointHandler.Snapshotter = server.Snapshotter
 
 	var endpointGroupHandler = endpointgroups.NewHandler(requestBouncer)
 	endpointGroupHandler.EndpointGroupService = server.EndpointGroupService
@@ -119,6 +125,7 @@ func (server *Server) Start() error {
 	settingsHandler.SettingsService = server.SettingsService
 	settingsHandler.LDAPService = server.LDAPService
 	settingsHandler.FileService = server.FileService
+	settingsHandler.JobScheduler = server.JobScheduler
 
 	var stackHandler = stacks.NewHandler(requestBouncer)
 	stackHandler.FileService = server.FileService
@@ -143,7 +150,7 @@ func (server *Server) Start() error {
 	var statusHandler = status.NewHandler(requestBouncer, server.Status)
 
 	var templatesHandler = templates.NewHandler(requestBouncer)
-	templatesHandler.SettingsService = server.SettingsService
+	templatesHandler.TemplateService = server.TemplateService
 
 	var uploadHandler = upload.NewHandler(requestBouncer)
 	uploadHandler.FileService = server.FileService

@@ -8,7 +8,6 @@ angular.module('portainer.app').component('teamsDatatable', {
     tableKey: '@',
     orderBy: '@',
     reverseOrder: '<',
-    showTextFilter: '<',
     removeAction: '<'
   }
 });

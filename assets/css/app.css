@@ -119,8 +119,12 @@ a[ng-click]{
   color: white;
 }
 
-.fa.blue-icon {
+.fa.blue-icon, .fab.blue-icon {
   color: #337ab7;
+}
+
+.text-warning {
+  color: #f0ad4e;
 }
 
 .widget .widget-body table tbody .image-tag {
@@ -136,8 +140,13 @@ a[ng-click]{
   font-weight: normal;
 }
 
-.widget .widget-body table tbody td {
+.widget .widget-body .nowrap-cells tbody td {
   white-space: nowrap;
+}
+
+.widget .widget-body table tbody td {
+  white-space: normal;
+  word-break: break-word;
 }
 
 .template-widget {
@@ -149,19 +158,13 @@ a[ng-click]{
   overflow-y: auto;
 }
 
-.template-list {
+.blocklist {
   display: flex;
   flex-direction: column;
+  padding: 10px;
 }
 
-.template-logo {
-  width: 100%;
-  max-width: 60px;
-  height: 100%;
-  max-height: 60px;
-}
-
-.template-container {
+.blocklist-item {
   padding: 0.7rem;
   margin-bottom: 0.7rem;
   cursor: pointer;
@@ -170,39 +173,68 @@ a[ng-click]{
   box-shadow: 0 3px 10px -2px rgba(161, 170, 166, 0.5);
 }
 
-.template-container--selected {
+.blocklist-item--selected {
   border: 2px solid #333333;
   background-color: #ececec;
   color: #2d3e63;
 }
 
-.template-container:hover {
+.blocklist-item:hover {
   background-color: #ececec;
   color: #2d3e63;
 }
 
-.template-main {
+.blocklist-item-box {
   display: flex;
+}
+
+.blocklist-item-line.endpoint-item {
+  padding: 4px;
+}
+
+.blocklist-item-line {
+  display: flex;
+  justify-content: space-between;
+}
+
+.blocklist-item-logo {
+  width: 100%;
+  max-width: 60px;
+  height: 100%;
+  max-height: 60px;
+}
+
+.blocklist-item-logo.endpoint-item {
+  margin: 10px 4px 0 6px;
+}
+
+.blocklist-item-logo.endpoint-item.azure {
+  margin: 0 0 0 10px;
+}
+
+.blocklist-item-title {
+  font-size: 1.8em;
+  font-weight: bold;
+}
+
+.blocklist-item-title.endpoint-item {
+  font-size: 1em;
+  font-weight: bold;
+}
+
+.blocklist-item-subtitle {
+  font-size: 0.9em;
+  padding-right: 1em;
+}
+
+.blocklist-item-desc {
+  font-size: 0.9em;
+  padding-right: 1em;
 }
 
 .template-note {
   padding: 0.5em;
   font-size: 0.9em;
-}
-
-.template-title {
-  font-size: 1.8em;
-  font-weight: bold;
-}
-
-.template-description {
-  font-size: 0.9em;
-  padding-right: 1em;
-}
-
-.template-line {
-  display: flex;
-  justify-content: space-between;
 }
 
 .nopadding {
@@ -304,8 +336,10 @@ ul.sidebar .sidebar-title {
   height: auto;
 }
 
-ul.sidebar .sidebar-title .endpoint-name {
+ul.sidebar .sidebar-title.endpoint-name {
   color: #fff;
+  text-align: center;
+  text-indent: 0;
 }
 
 ul.sidebar .sidebar-list a {
@@ -708,10 +742,13 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 .log_viewer {
   height:100%;
   overflow-y: scroll;
-  white-space: pre-wrap;
   color: black;
   font-size: .85em;
   background-color: white;
+}
+
+.log_viewer.wrap_lines {
+  white-space: pre-wrap;
 }
 
 .log_viewer .inner_line {
@@ -739,6 +776,16 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   background-color: #337ab7;
   border: 1px solid #2e6da4;
   border-radius: 4px;
+}
+
+.template-envvar {
+  padding-bottom: 5px;
+}
+
+.line-separator{
+  border-bottom: 1px solid #777;
+  width: 50%;
+  margin: 20px auto 10px auto;
 }
 
 /*bootbox override*/

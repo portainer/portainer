@@ -1,6 +1,7 @@
 package main // import "github.com/portainer/portainer"
 
 import (
+	"encoding/json"
 	"strings"
 
 	"github.com/portainer/portainer"
@@ -8,6 +9,7 @@ import (
 	"github.com/portainer/portainer/cli"
 	"github.com/portainer/portainer/cron"
 	"github.com/portainer/portainer/crypto"
+	"github.com/portainer/portainer/docker"
 	"github.com/portainer/portainer/exec"
 	"github.com/portainer/portainer/filesystem"
 	"github.com/portainer/portainer/git"
@@ -137,25 +139,41 @@ func initGitService() portainer.GitService {
 	return &git.Service{}
 }
 
-func initEndpointWatcher(endpointService portainer.EndpointService, externalEnpointFile string, syncInterval string) bool {
-	authorizeEndpointMgmt := true
-	if externalEnpointFile != "" {
-		authorizeEndpointMgmt = false
-		log.Println("Using external endpoint definition. Endpoint management via the API will be disabled.")
-		endpointWatcher := cron.NewWatcher(endpointService, syncInterval)
-		err := endpointWatcher.WatchEndpointFile(externalEnpointFile)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-	return authorizeEndpointMgmt
+func initClientFactory(signatureService portainer.DigitalSignatureService) *docker.ClientFactory {
+	return docker.NewClientFactory(signatureService)
 }
 
-func initStatus(authorizeEndpointMgmt bool, flags *portainer.CLIFlags) *portainer.Status {
+func initSnapshotter(clientFactory *docker.ClientFactory) portainer.Snapshotter {
+	return docker.NewSnapshotter(clientFactory)
+}
+
+func initJobScheduler(endpointService portainer.EndpointService, snapshotter portainer.Snapshotter, flags *portainer.CLIFlags) (portainer.JobScheduler, error) {
+	jobScheduler := cron.NewJobScheduler(endpointService, snapshotter)
+
+	if *flags.ExternalEndpoints != "" {
+		log.Println("Using external endpoint definition. Endpoint management via the API will be disabled.")
+		err := jobScheduler.ScheduleEndpointSyncJob(*flags.ExternalEndpoints, *flags.SyncInterval)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if *flags.Snapshot {
+		err := jobScheduler.ScheduleSnapshotJob(*flags.SnapshotInterval)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return jobScheduler, nil
+}
+
+func initStatus(endpointManagement, snapshot bool, flags *portainer.CLIFlags) *portainer.Status {
 	return &portainer.Status{
 		Analytics:          !*flags.NoAnalytics,
 		Authentication:     !*flags.NoAuth,
-		EndpointManagement: authorizeEndpointMgmt,
+		EndpointManagement: endpointManagement,
+		Snapshot:           snapshot,
 		Version:            portainer.APIVersion,
 	}
 }
@@ -180,23 +198,21 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 	_, err := settingsService.Settings()
 	if err == portainer.ErrObjectNotFound {
 		settings := &portainer.Settings{
-			LogoURL:                     *flags.Logo,
-			DisplayExternalContributors: false,
-			AuthenticationMethod:        portainer.AuthenticationInternal,
+			LogoURL:              *flags.Logo,
+			AuthenticationMethod: portainer.AuthenticationInternal,
 			LDAPSettings: portainer.LDAPSettings{
-				TLSConfig: portainer.TLSConfiguration{},
+				AutoCreateUsers: true,
+				TLSConfig:       portainer.TLSConfiguration{},
 				SearchSettings: []portainer.LDAPSearchSettings{
 					portainer.LDAPSearchSettings{},
+				},
+				GroupSearchSettings: []portainer.LDAPGroupSearchSettings{
+					portainer.LDAPGroupSearchSettings{},
 				},
 			},
 			AllowBindMountsForRegularUsers:     true,
 			AllowPrivilegedModeForRegularUsers: true,
-		}
-
-		if *flags.Templates != "" {
-			settings.TemplatesURL = *flags.Templates
-		} else {
-			settings.TemplatesURL = portainer.DefaultTemplatesURL
+			SnapshotInterval:                   *flags.SnapshotInterval,
 		}
 
 		if *flags.Labels != nil {
@@ -210,6 +226,58 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 		return err
 	}
 
+	return nil
+}
+
+func initTemplates(templateService portainer.TemplateService, fileService portainer.FileService, templateURL, templateFile string) error {
+
+	existingTemplates, err := templateService.Templates()
+	if err != nil {
+		return err
+	}
+
+	if len(existingTemplates) != 0 {
+		log.Printf("Templates already registered inside the database. Skipping template import.")
+		return nil
+	}
+
+	var templatesJSON []byte
+	if templateURL == "" {
+		return loadTemplatesFromFile(fileService, templateService, templateFile)
+	}
+
+	templatesJSON, err = client.Get(templateURL)
+	if err != nil {
+		log.Println("Unable to retrieve templates via HTTP")
+		return err
+	}
+
+	return unmarshalAndPersistTemplates(templateService, templatesJSON)
+}
+
+func loadTemplatesFromFile(fileService portainer.FileService, templateService portainer.TemplateService, templateFile string) error {
+	templatesJSON, err := fileService.GetFileContent(templateFile)
+	if err != nil {
+		log.Println("Unable to retrieve template via filesystem")
+		return err
+	}
+	return unmarshalAndPersistTemplates(templateService, templatesJSON)
+}
+
+func unmarshalAndPersistTemplates(templateService portainer.TemplateService, templateData []byte) error {
+	var templates []portainer.Template
+	err := json.Unmarshal(templateData, &templates)
+	if err != nil {
+		log.Println("Unable to parse templates file. Please review your template definition file.")
+		return err
+	}
+
+	for _, template := range templates {
+		err := templateService.CreateTemplate(&template)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -250,7 +318,7 @@ func initKeyPair(fileService portainer.FileService, signatureService portainer.D
 	return generateAndStoreKeyPair(fileService, signatureService)
 }
 
-func createTLSSecuredEndpoint(flags *portainer.CLIFlags, endpointService portainer.EndpointService) error {
+func createTLSSecuredEndpoint(flags *portainer.CLIFlags, endpointService portainer.EndpointService, snapshotter portainer.Snapshotter) error {
 	tlsConfiguration := portainer.TLSConfiguration{
 		TLS:           *flags.TLS,
 		TLSSkipVerify: *flags.TLSSkipVerify,
@@ -264,7 +332,9 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, endpointService portain
 		tlsConfiguration.TLS = true
 	}
 
+	endpointID := endpointService.GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
+		ID:              portainer.EndpointID(endpointID),
 		Name:            "primary",
 		URL:             *flags.EndpointURL,
 		GroupID:         portainer.EndpointGroupID(1),
@@ -274,6 +344,8 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, endpointService portain
 		AuthorizedTeams: []portainer.TeamID{},
 		Extensions:      []portainer.EndpointExtension{},
 		Tags:            []string{},
+		Status:          portainer.EndpointStatusUp,
+		Snapshots:       []portainer.Snapshot{},
 	}
 
 	if strings.HasPrefix(endpoint.URL, "tcp://") {
@@ -292,10 +364,10 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, endpointService portain
 		}
 	}
 
-	return endpointService.CreateEndpoint(endpoint)
+	return snapshotAndPersistEndpoint(endpoint, endpointService, snapshotter)
 }
 
-func createUnsecuredEndpoint(endpointURL string, endpointService portainer.EndpointService) error {
+func createUnsecuredEndpoint(endpointURL string, endpointService portainer.EndpointService, snapshotter portainer.Snapshotter) error {
 	if strings.HasPrefix(endpointURL, "tcp://") {
 		_, err := client.ExecutePingOperation(endpointURL, nil)
 		if err != nil {
@@ -303,7 +375,9 @@ func createUnsecuredEndpoint(endpointURL string, endpointService portainer.Endpo
 		}
 	}
 
+	endpointID := endpointService.GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
+		ID:              portainer.EndpointID(endpointID),
 		Name:            "primary",
 		URL:             endpointURL,
 		GroupID:         portainer.EndpointGroupID(1),
@@ -313,12 +387,28 @@ func createUnsecuredEndpoint(endpointURL string, endpointService portainer.Endpo
 		AuthorizedTeams: []portainer.TeamID{},
 		Extensions:      []portainer.EndpointExtension{},
 		Tags:            []string{},
+		Status:          portainer.EndpointStatusUp,
+		Snapshots:       []portainer.Snapshot{},
+	}
+
+	return snapshotAndPersistEndpoint(endpoint, endpointService, snapshotter)
+}
+
+func snapshotAndPersistEndpoint(endpoint *portainer.Endpoint, endpointService portainer.EndpointService, snapshotter portainer.Snapshotter) error {
+	snapshot, err := snapshotter.CreateSnapshot(endpoint)
+	endpoint.Status = portainer.EndpointStatusUp
+	if err != nil {
+		log.Printf("http error: endpoint snapshot error (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
+	}
+
+	if snapshot != nil {
+		endpoint.Snapshots = []portainer.Snapshot{*snapshot}
 	}
 
 	return endpointService.CreateEndpoint(endpoint)
 }
 
-func initEndpoint(flags *portainer.CLIFlags, endpointService portainer.EndpointService) error {
+func initEndpoint(flags *portainer.CLIFlags, endpointService portainer.EndpointService, snapshotter portainer.Snapshotter) error {
 	if *flags.EndpointURL == "" {
 		return nil
 	}
@@ -334,9 +424,9 @@ func initEndpoint(flags *portainer.CLIFlags, endpointService portainer.EndpointS
 	}
 
 	if *flags.TLS || *flags.TLSSkipVerify {
-		return createTLSSecuredEndpoint(flags, endpointService)
+		return createTLSSecuredEndpoint(flags, endpointService, snapshotter)
 	}
-	return createUnsecuredEndpoint(*flags.EndpointURL, endpointService)
+	return createUnsecuredEndpoint(*flags.EndpointURL, endpointService, snapshotter)
 }
 
 func main() {
@@ -349,21 +439,35 @@ func main() {
 
 	jwtService := initJWTService(!*flags.NoAuth)
 
+	ldapService := initLDAPService()
+
+	gitService := initGitService()
+
 	cryptoService := initCryptoService()
 
 	initDemoData(store, cryptoService)
 
 	digitalSignatureService := initDigitalSignatureService()
 
-	ldapService := initLDAPService()
-
-	gitService := initGitService()
-
-	authorizeEndpointMgmt := initEndpointWatcher(store.EndpointService, *flags.ExternalEndpoints, *flags.SyncInterval)
-
 	err := initKeyPair(fileService, digitalSignatureService)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	clientFactory := initClientFactory(digitalSignatureService)
+
+	snapshotter := initSnapshotter(clientFactory)
+
+	jobScheduler, err := initJobScheduler(store.EndpointService, snapshotter, flags)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	jobScheduler.Start()
+
+	endpointManagement := true
+	if *flags.ExternalEndpoints != "" {
+		endpointManagement = false
 	}
 
 	swarmStackManager, err := initSwarmStackManager(*flags.Assets, *flags.Data, digitalSignatureService, fileService)
@@ -372,6 +476,11 @@ func main() {
 	}
 
 	composeStackManager := initComposeStackManager(*flags.Data)
+
+	err = initTemplates(store.TemplateService, fileService, *flags.Templates, *flags.TemplateFile)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	err = initSettings(store.SettingsService, flags)
 	if err != nil {
@@ -383,9 +492,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	applicationStatus := initStatus(authorizeEndpointMgmt, flags)
+	applicationStatus := initStatus(endpointManagement, *flags.Snapshot, flags)
 
-	err = initEndpoint(flags, store.EndpointService)
+	err = initEndpoint(flags, store.EndpointService, snapshotter)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -396,7 +505,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		adminPasswordHash, err = cryptoService.Hash(content)
+		adminPasswordHash, err = cryptoService.Hash(string(content))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -431,7 +540,7 @@ func main() {
 		BindAddress:            *flags.Addr,
 		AssetsPath:             *flags.Assets,
 		AuthDisabled:           *flags.NoAuth,
-		EndpointManagement:     authorizeEndpointMgmt,
+		EndpointManagement:     endpointManagement,
 		UserService:            store.UserService,
 		TeamService:            store.TeamService,
 		TeamMembershipService:  store.TeamMembershipService,
@@ -443,6 +552,7 @@ func main() {
 		DockerHubService:       store.DockerHubService,
 		StackService:           store.StackService,
 		TagService:             store.TagService,
+		TemplateService:        store.TemplateService,
 		SwarmStackManager:      swarmStackManager,
 		ComposeStackManager:    composeStackManager,
 		CryptoService:          cryptoService,
@@ -451,6 +561,8 @@ func main() {
 		LDAPService:            ldapService,
 		GitService:             gitService,
 		SignatureService:       digitalSignatureService,
+		JobScheduler:           jobScheduler,
+		Snapshotter:            snapshotter,
 		SSL:                    *flags.SSL,
 		SSLCert:                *flags.SSLCert,
 		SSLKey:                 *flags.SSLKey,

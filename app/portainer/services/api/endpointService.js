@@ -12,6 +12,10 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     return Endpoints.query({}).$promise;
   };
 
+  service.snapshot = function() {
+    return Endpoints.snapshot({}, {}).$promise;
+  };
+
   service.endpointsByGroup = function(groupId) {
     var deferred = $q.defer();
 
@@ -57,7 +61,7 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
   service.createLocalEndpoint = function() {
     var deferred = $q.defer();
 
-    FileUploadService.createEndpoint('local', 1, 'unix:///var/run/docker.sock', '', 1, [], false)
+    FileUploadService.createEndpoint('local', 1, '', '', 1, [], false)
     .then(function success(response) {
       deferred.resolve(response.data);
     })

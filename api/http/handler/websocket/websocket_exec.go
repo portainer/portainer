@@ -80,7 +80,7 @@ func (handler *Handler) websocketExec(w http.ResponseWriter, r *http.Request) *h
 func (handler *Handler) handleRequest(w http.ResponseWriter, r *http.Request, params *webSocketExecRequestParams) error {
 	r.Header.Del("Origin")
 
-	if params.nodeName != "" {
+	if params.nodeName != "" || params.endpoint.Type == portainer.AgentOnDockerEnvironment {
 		return handler.proxyWebsocketRequest(w, r, params)
 	}
 
@@ -127,7 +127,7 @@ func (handler *Handler) proxyWebsocketRequest(w http.ResponseWriter, r *http.Req
 }
 
 func hijackExecStartOperation(websocketConn *websocket.Conn, endpoint *portainer.Endpoint, execID string) error {
-	dial, err := createDial(endpoint)
+	dial, err := initDial(endpoint)
 	if err != nil {
 		return err
 	}
@@ -158,16 +158,15 @@ func hijackExecStartOperation(websocketConn *websocket.Conn, endpoint *portainer
 	return nil
 }
 
-func createDial(endpoint *portainer.Endpoint) (net.Conn, error) {
+func initDial(endpoint *portainer.Endpoint) (net.Conn, error) {
 	url, err := url.Parse(endpoint.URL)
 	if err != nil {
 		return nil, err
 	}
 
-	var host string
-	if url.Scheme == "tcp" {
-		host = url.Host
-	} else if url.Scheme == "unix" {
+	host := url.Host
+
+	if url.Scheme == "unix" || url.Scheme == "npipe" {
 		host = url.Path
 	}
 
@@ -176,10 +175,11 @@ func createDial(endpoint *portainer.Endpoint) (net.Conn, error) {
 		if err != nil {
 			return nil, err
 		}
+
 		return tls.Dial(url.Scheme, host, tlsConfig)
 	}
 
-	return net.Dial(url.Scheme, host)
+	return createDial(url.Scheme, host)
 }
 
 func createExecStartRequest(execID string) (*http.Request, error) {

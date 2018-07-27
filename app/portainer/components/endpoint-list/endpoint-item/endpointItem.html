@@ -1,0 +1,77 @@
+<div class="blocklist-item" ng-click="$ctrl.onSelect($ctrl.model)">
+  <div class="blocklist-item-box">
+    <span ng-class="['blocklist-item-logo', 'endpoint-item', { azure: $ctrl.model.Type === 3 }]">
+      <i ng-class="$ctrl.model.Type | endpointtypeicon" class="fa-4x blue-icon" aria-hidden="true"></i>
+    </span>
+
+    <span class="col-sm-12">
+
+      <div class="blocklist-item-line endpoint-item">
+        <span>
+          <span class="blocklist-item-title endpoint-item">
+            {{ $ctrl.model.Name }}
+          </span>
+          <span class="space-left blocklist-item-subtitle">
+            <span class="label label-{{ $ctrl.model.Status|endpointstatusbadge }}">
+              {{ $ctrl.model.Status === 1 ? 'up' : 'down' }}
+            </span>
+            <span class="space-left small text-muted" ng-if="$ctrl.model.Snapshots[0]">
+              {{ $ctrl.model.Snapshots[0].Time | getisodatefromtimestamp }}
+            </span>
+
+          </span>
+        </span>
+        <span class="small">
+          Group: {{ $ctrl.model.GroupName }}
+        </span>
+      </div>
+
+      <div class="blocklist-item-line endpoint-item" ng-if="$ctrl.model.Snapshots[0]">
+        <span class="blocklist-item-desc">
+          <span>
+            <span style="padding: 0 7px 0 0;">
+              <i class="fa fa-th-list space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].StackCount }} stacks
+            </span>
+            <span style="padding: 0 7px 0 7px;" ng-if="$ctrl.model.Snapshots[0].Swarm">
+              <i class="fa fa-list-alt space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].ServiceCount }} services
+            </span>
+            <span style="padding: 0 7px 0 7px;">
+              <i class="fa fa-server space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].RunningContainerCount + $ctrl.model.Snapshots[0].StoppedContainerCount }} containers
+              <span ng-if="$ctrl.model.Snapshots[0].RunningContainerCount > 0 || $ctrl.model.Snapshots[0].StoppedContainerCount > 0">
+                -
+                <i class="fa fa-heartbeat green-icon" aria-hidden="true"></i> {{ $ctrl.model.Snapshots[0].RunningContainerCount }}
+                <i class="fa fa-heartbeat red-icon" aria-hidden="true"></i> {{ $ctrl.model.Snapshots[0].StoppedContainerCount }}
+              </span>
+            </span>
+            <span style="padding: 0 7px 0 7px;">
+              <i class="fa fa-cubes space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].VolumeCount }} volumes
+            </span>
+            <span style="padding: 0 7px 0 7px;">
+              <i class="fa fa-clone space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].ImageCount }} images
+            </span>
+          </span>
+        </span>
+        <span class="small text-muted">
+          {{ $ctrl.model.Snapshots[0].Swarm ? 'Swarm' : 'Standalone' }} {{ $ctrl.model.Snapshots[0].DockerVersion }} <span ng-if="$ctrl.model.Type === 2">+ <i class="fa fa-bolt" aria-hidden="true"></i>  Agent</span>
+        </span>
+      </div>
+
+      <div class="blocklist-item-line endpoint-item">
+        <span class="small text-muted">
+          <span class="small text-muted"><i class="fa fa-microchip"></i> {{ $ctrl.model.Snapshots[0].TotalCPU }}<i class="fa fa-memory space-left"></i> {{ $ctrl.model.Snapshots[0].TotalMemory | humansize }}</span>
+          <span class="space-left space-right">-</span>
+          <span ng-if="$ctrl.model.Tags.length === 0">
+            <i class="fa fa-tags" aria-hidden="true"></i> No tags
+          </span>
+          <span ng-if="$ctrl.model.Tags.length > 0">
+            <i class="fa fa-tags" aria-hidden="true"></i>
+            <span ng-repeat="tag in $ctrl.model.Tags">
+              {{ tag }}{{ $last? '' : ', ' }}
+            </span>
+          </span>
+        </span>
+      </div>
+
+    </span>
+  </div>
+</div>

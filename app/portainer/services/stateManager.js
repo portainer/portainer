@@ -25,8 +25,8 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
     LocalStorage.storeApplicationState(state.application);
   };
 
-  manager.updateExternalContributions = function(displayExternalContributors) {
-    state.application.displayExternalContributors = displayExternalContributors;
+  manager.updateSnapshotInterval = function(interval) {
+    state.application.snapshotInterval = interval;
     LocalStorage.storeApplicationState(state.application);
   };
 
@@ -34,9 +34,10 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
    state.application.authentication = status.Authentication;
    state.application.analytics = status.Analytics;
    state.application.endpointManagement = status.EndpointManagement;
+   state.application.snapshot = status.Snapshot;
    state.application.version = status.Version;
    state.application.logo = settings.LogoURL;
-   state.application.displayExternalContributors = settings.DisplayExternalContributors;
+   state.application.snapshotInterval = settings.SnapshotInterval;
    state.application.validity = moment().unix();
  }
 
@@ -116,14 +117,11 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
     return extensions;
   }
 
-  manager.updateEndpointState = function(loading, type, extensions) {
+  manager.updateEndpointState = function(name, type, extensions) {
     var deferred = $q.defer();
 
-    if (loading) {
-      state.loading = true;
-    }
-
     if (type === 3) {
+      state.endpoint.name = name;
       state.endpoint.mode = { provider: 'AZURE' };
       LocalStorage.storeEndpointState(state.endpoint);
       deferred.resolve();
@@ -138,6 +136,7 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
       var endpointMode = InfoHelper.determineEndpointMode(data.info, type);
       var endpointAPIVersion = parseFloat(data.version.ApiVersion);
       state.endpoint.mode = endpointMode;
+      state.endpoint.name = name;
       state.endpoint.apiVersion = endpointAPIVersion;
       state.endpoint.extensions = assignExtensions(extensions);
       LocalStorage.storeEndpointState(state.endpoint);

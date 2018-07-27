@@ -7,7 +7,6 @@ angular.module('extension.storidge').component('storidgeNodesDatatable', {
     dataset: '<',
     tableKey: '@',
     orderBy: '@',
-    reverseOrder: '<',
-    showTextFilter: '<'
+    reverseOrder: '<'
   }
 });

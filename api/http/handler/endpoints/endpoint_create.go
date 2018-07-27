@@ -1,9 +1,10 @@
 package endpoints
 
 import (
+	"log"
 	"net/http"
+	"runtime"
 	"strconv"
-	"strings"
 
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/crypto"
@@ -56,6 +57,9 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 		return portainer.Error("Invalid Tags parameter")
 	}
 	payload.Tags = tags
+	if payload.Tags == nil {
+		payload.Tags = make([]string, 0)
+	}
 
 	useTLS, _ := request.RetrieveBooleanMultiPartFormValue(r, "TLS", true)
 	payload.TLS = useTLS
@@ -109,7 +113,7 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 		}
 		payload.AzureAuthenticationKey = azureAuthenticationKey
 	default:
-		url, err := request.RetrieveMultiPartFormValue(r, "URL", false)
+		url, err := request.RetrieveMultiPartFormValue(r, "URL", true)
 		if err != nil {
 			return portainer.Error("Invalid endpoint URL")
 		}
@@ -166,7 +170,9 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to authenticate against Azure", err}
 	}
 
+	endpointID := handler.EndpointService.GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
+		ID:               portainer.EndpointID(endpointID),
 		Name:             payload.Name,
 		URL:              payload.URL,
 		Type:             portainer.AzureEnvironment,
@@ -177,6 +183,8 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 		Extensions:       []portainer.EndpointExtension{},
 		AzureCredentials: credentials,
 		Tags:             payload.Tags,
+		Status:           portainer.EndpointStatusUp,
+		Snapshots:        []portainer.Snapshot{},
 	}
 
 	err = handler.EndpointService.CreateEndpoint(endpoint)
@@ -190,7 +198,12 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
 	endpointType := portainer.DockerEnvironment
 
-	if !strings.HasPrefix(payload.URL, "unix://") {
+	if payload.URL == "" {
+		payload.URL = "unix:///var/run/docker.sock"
+		if runtime.GOOS == "windows" {
+			payload.URL = "npipe:////./pipe/docker_engine"
+		}
+	} else {
 		agentOnDockerEnvironment, err := client.ExecutePingOperation(payload.URL, nil)
 		if err != nil {
 			return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to ping Docker environment", err}
@@ -200,7 +213,9 @@ func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) 
 		}
 	}
 
+	endpointID := handler.EndpointService.GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
+		ID:        portainer.EndpointID(endpointID),
 		Name:      payload.Name,
 		URL:       payload.URL,
 		Type:      endpointType,
@@ -213,11 +228,13 @@ func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) 
 		AuthorizedTeams: []portainer.TeamID{},
 		Extensions:      []portainer.EndpointExtension{},
 		Tags:            payload.Tags,
+		Status:          portainer.EndpointStatusUp,
+		Snapshots:       []portainer.Snapshot{},
 	}
 
-	err := handler.EndpointService.CreateEndpoint(endpoint)
+	err := handler.snapshotAndPersistEndpoint(endpoint)
 	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint inside the database", err}
+		return nil, err
 	}
 
 	return endpoint, nil
@@ -239,7 +256,9 @@ func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload)
 		endpointType = portainer.AgentOnDockerEnvironment
 	}
 
+	endpointID := handler.EndpointService.GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
+		ID:        portainer.EndpointID(endpointID),
 		Name:      payload.Name,
 		URL:       payload.URL,
 		Type:      endpointType,
@@ -253,25 +272,41 @@ func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload)
 		AuthorizedTeams: []portainer.TeamID{},
 		Extensions:      []portainer.EndpointExtension{},
 		Tags:            payload.Tags,
-	}
-
-	err = handler.EndpointService.CreateEndpoint(endpoint)
-	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint inside the database", err}
+		Status:          portainer.EndpointStatusUp,
+		Snapshots:       []portainer.Snapshot{},
 	}
 
 	filesystemError := handler.storeTLSFiles(endpoint, payload)
 	if err != nil {
-		handler.EndpointService.DeleteEndpoint(endpoint.ID)
 		return nil, filesystemError
 	}
 
-	err = handler.EndpointService.UpdateEndpoint(endpoint.ID, endpoint)
-	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint changes inside the database", err}
+	endpointCreationError := handler.snapshotAndPersistEndpoint(endpoint)
+	if endpointCreationError != nil {
+		return nil, endpointCreationError
 	}
 
 	return endpoint, nil
+}
+
+func (handler *Handler) snapshotAndPersistEndpoint(endpoint *portainer.Endpoint) *httperror.HandlerError {
+	snapshot, err := handler.Snapshotter.CreateSnapshot(endpoint)
+	endpoint.Status = portainer.EndpointStatusUp
+	if err != nil {
+		log.Printf("http error: endpoint snapshot error (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
+		endpoint.Status = portainer.EndpointStatusDown
+	}
+
+	if snapshot != nil {
+		endpoint.Snapshots = []portainer.Snapshot{*snapshot}
+	}
+
+	err = handler.EndpointService.CreateEndpoint(endpoint)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint inside the database", err}
+	}
+
+	return nil
 }
 
 func (handler *Handler) storeTLSFiles(endpoint *portainer.Endpoint, payload *endpointCreatePayload) *httperror.HandlerError {
@@ -280,7 +315,6 @@ func (handler *Handler) storeTLSFiles(endpoint *portainer.Endpoint, payload *end
 	if !payload.TLSSkipVerify {
 		caCertPath, err := handler.FileService.StoreTLSFileFromBytes(folder, portainer.TLSFileCA, payload.TLSCACertFile)
 		if err != nil {
-			handler.EndpointService.DeleteEndpoint(endpoint.ID)
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist TLS CA certificate file on disk", err}
 		}
 		endpoint.TLSConfig.TLSCACertPath = caCertPath
@@ -289,14 +323,12 @@ func (handler *Handler) storeTLSFiles(endpoint *portainer.Endpoint, payload *end
 	if !payload.TLSSkipClientVerify {
 		certPath, err := handler.FileService.StoreTLSFileFromBytes(folder, portainer.TLSFileCert, payload.TLSCertFile)
 		if err != nil {
-			handler.EndpointService.DeleteEndpoint(endpoint.ID)
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist TLS certificate file on disk", err}
 		}
 		endpoint.TLSConfig.TLSCertPath = certPath
 
 		keyPath, err := handler.FileService.StoreTLSFileFromBytes(folder, portainer.TLSFileKey, payload.TLSKeyFile)
 		if err != nil {
-			handler.EndpointService.DeleteEndpoint(endpoint.ID)
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist TLS key file on disk", err}
 		}
 		endpoint.TLSConfig.TLSKeyPath = keyPath
