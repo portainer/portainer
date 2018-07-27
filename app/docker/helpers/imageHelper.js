@@ -25,6 +25,15 @@ angular.module('portainer.docker')
     };
   };
 
+  helper.getImagesNamesForDownload = function(images) {
+    var names = images.map(function(image) {
+      return image.RepoTags[0] !== '<none>:<none>' ? image.RepoTags[0] : image.Id;
+    });
+    return {
+      names: names
+    };
+  };
+
   function extractNameAndTag(imageName, registry) {
     var imageNameAndTag = imageName.split(':');
     var image = imageNameAndTag[0];

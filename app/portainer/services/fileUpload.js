@@ -10,7 +10,6 @@ angular.module('portainer.app')
 
   service.buildImage = function(names, file, path) {
     var endpointID = EndpointProvider.endpointID();
-    Upload.setDefaults({ ngfMinSize: 10 });
     return Upload.http({
       url: 'api/endpoints/' + endpointID + '/docker/build',
       headers : {
@@ -28,6 +27,18 @@ angular.module('portainer.app')
     });
   };
 
+  service.loadImages = function(file) {
+    var endpointID = EndpointProvider.endpointID();
+    return Upload.http({
+      url: 'api/endpoints/' + endpointID + '/docker/images/load',
+      headers : {
+        'Content-Type': file.type
+      },
+      data: file,
+      ignoreLoadingBar: true
+    });
+  };
+
   service.createSwarmStack = function(stackName, swarmId, file, env, endpointId) {
     return Upload.upload({
       url: 'api/stacks?method=file&type=1&endpointId=' + endpointId,
@@ -41,12 +52,13 @@ angular.module('portainer.app')
     });
   };
 
-  service.createComposeStack = function(stackName, file, endpointId) {
+  service.createComposeStack = function(stackName, file, env, endpointId) {
     return Upload.upload({
       url: 'api/stacks?method=file&type=2&endpointId=' + endpointId,
       data: {
         file: file,
-        Name: stackName
+        Name: stackName,
+        Env: Upload.json(env)
       },
       ignoreLoadingBar: true
     });
@@ -79,7 +91,7 @@ angular.module('portainer.app')
       data: {
         Name: name,
         EndpointType: 3,
-        GroupID: groupID,
+        GroupID: groupId,
         Tags: Upload.json(tags),
         AzureApplicationID: applicationId,
         AzureTenantID: tenantId,

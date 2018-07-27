@@ -63,9 +63,11 @@
       <rd-widget-body>
         <form class="form-horizontal">
           <!-- image-and-registry -->
-          <div class="form-group">
-            <por-image-registry image="formValues.Image" registry="formValues.Registry"></por-image-registry>
-          </div>
+          <por-image-registry
+            image="formValues.Image"
+            registry="formValues.Registry"
+            label-class="col-sm-1" input-class="col-sm-11 col-md-5"
+          ></por-image-registry>
           <!-- !image-and-registry -->
           <!-- tag-note -->
           <div class="form-group">
@@ -97,6 +99,11 @@
               <td>
                 {{ image.Id }}
                 <button class="btn btn-xs btn-danger" ng-click="removeImage(image.Id)"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this image</button>
+                <button class="btn btn-xs btn-primary" ng-click="exportImage(image)" button-spinner="$ctrl.exportInProgress" ng-disabled="state.exportInProgress">
+                    <i class="fa fa-download space-right" aria-hidden="true"></i>
+                    <span ng-hide="state.exportInProgress">Export this image</span>
+                    <span ng-show="state.exportInProgress">Export in progress...</span>
+                </button>
               </td>
             </tr>
             <tr ng-if="image.Parent">

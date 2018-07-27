@@ -41,13 +41,6 @@ function (PaginationService, DatatableService) {
     PaginationService.setPaginationLimit(this.tableKey, this.state.paginatedItemLimit);
   };
 
-  this.updateDisplayTextFilter = function() {
-    this.state.displayTextFilter = !this.state.displayTextFilter;
-    if (!this.state.displayTextFilter) {
-      delete this.state.textFilter;
-    }
-  };
-
   this.$onInit = function() {
     setDefaults(this);
 

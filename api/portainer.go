@@ -21,6 +21,7 @@ type (
 		NoAuth            *bool
 		NoAnalytics       *bool
 		Templates         *string
+		TemplateFile      *string
 		TLS               *bool
 		TLSSkipVerify     *bool
 		TLSCacert         *string
@@ -30,24 +31,29 @@ type (
 		SSLCert           *string
 		SSLKey            *string
 		SyncInterval      *string
+		Snapshot          *bool
+		SnapshotInterval  *string
 	}
 
 	// Status represents the application status.
 	Status struct {
 		Authentication     bool   `json:"Authentication"`
 		EndpointManagement bool   `json:"EndpointManagement"`
+		Snapshot           bool   `json:"Snapshot"`
 		Analytics          bool   `json:"Analytics"`
 		Version            string `json:"Version"`
 	}
 
 	// LDAPSettings represents the settings used to connect to a LDAP server.
 	LDAPSettings struct {
-		ReaderDN       string               `json:"ReaderDN"`
-		Password       string               `json:"Password"`
-		URL            string               `json:"URL"`
-		TLSConfig      TLSConfiguration     `json:"TLSConfig"`
-		StartTLS       bool                 `json:"StartTLS"`
-		SearchSettings []LDAPSearchSettings `json:"SearchSettings"`
+		ReaderDN            string                    `json:"ReaderDN"`
+		Password            string                    `json:"Password"`
+		URL                 string                    `json:"URL"`
+		TLSConfig           TLSConfiguration          `json:"TLSConfig"`
+		StartTLS            bool                      `json:"StartTLS"`
+		SearchSettings      []LDAPSearchSettings      `json:"SearchSettings"`
+		GroupSearchSettings []LDAPGroupSearchSettings `json:"GroupSearchSettings"`
+		AutoCreateUsers     bool                      `json:"AutoCreateUsers"`
 	}
 
 	// TLSConfiguration represents a TLS configuration.
@@ -66,18 +72,27 @@ type (
 		UserNameAttribute string `json:"UserNameAttribute"`
 	}
 
+	// LDAPGroupSearchSettings represents settings used to search for groups in a LDAP server.
+	LDAPGroupSearchSettings struct {
+		GroupBaseDN    string `json:"GroupBaseDN"`
+		GroupFilter    string `json:"GroupFilter"`
+		GroupAttribute string `json:"GroupAttribute"`
+	}
+
 	// Settings represents the application settings.
 	Settings struct {
-		TemplatesURL                       string               `json:"TemplatesURL"`
 		LogoURL                            string               `json:"LogoURL"`
 		BlackListedLabels                  []Pair               `json:"BlackListedLabels"`
-		DisplayExternalContributors        bool                 `json:"DisplayExternalContributors"`
 		AuthenticationMethod               AuthenticationMethod `json:"AuthenticationMethod"`
 		LDAPSettings                       LDAPSettings         `json:"LDAPSettings"`
 		AllowBindMountsForRegularUsers     bool                 `json:"AllowBindMountsForRegularUsers"`
 		AllowPrivilegedModeForRegularUsers bool                 `json:"AllowPrivilegedModeForRegularUsers"`
+		SnapshotInterval                   string               `json:"SnapshotInterval"`
+
 		// Deprecated fields
-		DisplayDonationHeader bool
+		DisplayDonationHeader       bool
+		DisplayExternalContributors bool
+		TemplatesURL                string
 	}
 
 	// User represents a user account.
@@ -176,6 +191,9 @@ type (
 	// EndpointType represents the type of an endpoint.
 	EndpointType int
 
+	// EndpointStatus represents the status of an endpoint
+	EndpointStatus int
+
 	// Endpoint represents a Docker endpoint with all the info required
 	// to connect to it.
 	Endpoint struct {
@@ -191,6 +209,8 @@ type (
 		Extensions       []EndpointExtension `json:"Extensions"`
 		AzureCredentials AzureCredentials    `json:"AzureCredentials,omitempty"`
 		Tags             []string            `json:"Tags"`
+		Status           EndpointStatus      `json:"Status"`
+		Snapshots        []Snapshot          `json:"Snapshots"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
@@ -206,6 +226,21 @@ type (
 		ApplicationID     string `json:"ApplicationID"`
 		TenantID          string `json:"TenantID"`
 		AuthenticationKey string `json:"AuthenticationKey"`
+	}
+
+	// Snapshot represents a snapshot of a specific endpoint at a specific time
+	Snapshot struct {
+		Time                  int64  `json:"Time"`
+		DockerVersion         string `json:"DockerVersion"`
+		Swarm                 bool   `json:"Swarm"`
+		TotalCPU              int    `json:"TotalCPU"`
+		TotalMemory           int64  `json:"TotalMemory"`
+		RunningContainerCount int    `json:"RunningContainerCount"`
+		StoppedContainerCount int    `json:"StoppedContainerCount"`
+		VolumeCount           int    `json:"VolumeCount"`
+		ImageCount            int    `json:"ImageCount"`
+		ServiceCount          int    `json:"ServiceCount"`
+		StackCount            int    `json:"StackCount"`
 	}
 
 	// EndpointGroupID represents an endpoint group identifier.
@@ -277,6 +312,79 @@ type (
 		Name string `json:"Name"`
 	}
 
+	// TemplateID represents a template identifier.
+	TemplateID int
+
+	// TemplateType represents the type of a template.
+	TemplateType int
+
+	// Template represents an application template.
+	Template struct {
+		// Mandatory container/stack fields
+		ID                TemplateID   `json:"Id"`
+		Type              TemplateType `json:"type"`
+		Title             string       `json:"title"`
+		Description       string       `json:"description"`
+		AdministratorOnly bool         `json:"administrator_only"`
+
+		// Mandatory container fields
+		Image string `json:"image"`
+
+		// Mandatory stack fields
+		Repository TemplateRepository `json:"repository"`
+
+		// Optional stack/container fields
+		Name       string        `json:"name,omitempty"`
+		Logo       string        `json:"logo,omitempty"`
+		Env        []TemplateEnv `json:"env,omitempty"`
+		Note       string        `json:"note,omitempty"`
+		Platform   string        `json:"platform,omitempty"`
+		Categories []string      `json:"categories,omitempty"`
+
+		// Optional container fields
+		Registry      string           `json:"registry,omitempty"`
+		Command       string           `json:"command,omitempty"`
+		Network       string           `json:"network,omitempty"`
+		Volumes       []TemplateVolume `json:"volumes,omitempty"`
+		Ports         []string         `json:"ports,omitempty"`
+		Labels        []Pair           `json:"labels,omitempty"`
+		Privileged    bool             `json:"privileged,omitempty"`
+		Interactive   bool             `json:"interactive,omitempty"`
+		RestartPolicy string           `json:"restart_policy,omitempty"`
+		Hostname      string           `json:"hostname,omitempty"`
+	}
+
+	// TemplateEnv represents a template environment variable configuration.
+	TemplateEnv struct {
+		Name        string              `json:"name"`
+		Label       string              `json:"label,omitempty"`
+		Description string              `json:"description,omitempty"`
+		Default     string              `json:"default,omitempty"`
+		Preset      bool                `json:"preset,omitempty"`
+		Select      []TemplateEnvSelect `json:"select,omitempty"`
+	}
+
+	// TemplateVolume represents a template volume configuration.
+	TemplateVolume struct {
+		Container string `json:"container"`
+		Bind      string `json:"bind,omitempty"`
+		ReadOnly  bool   `json:"readonly,omitempty"`
+	}
+
+	// TemplateRepository represents the git repository configuration for a template.
+	TemplateRepository struct {
+		URL       string `json:"url"`
+		StackFile string `json:"stackfile"`
+	}
+
+	// TemplateEnvSelect represents text/value pair that will be displayed as a choice for the
+	// template user.
+	TemplateEnvSelect struct {
+		Text    string `json:"text"`
+		Value   string `json:"value"`
+		Default bool   `json:"default"`
+	}
+
 	// ResourceAccessLevel represents the level of control associated to a resource.
 	ResourceAccessLevel int
 
@@ -345,6 +453,7 @@ type (
 		UpdateEndpoint(ID EndpointID, endpoint *Endpoint) error
 		DeleteEndpoint(ID EndpointID) error
 		Synchronize(toCreate, toUpdate, toDelete []*Endpoint) error
+		GetNextIdentifier() int
 	}
 
 	// EndpointGroupService represents a service for managing endpoint group data.
@@ -411,6 +520,15 @@ type (
 		DeleteTag(ID TagID) error
 	}
 
+	// TemplateService represents a service for managing template data.
+	TemplateService interface {
+		Templates() ([]Template, error)
+		Template(ID TemplateID) (*Template, error)
+		CreateTemplate(template *Template) error
+		UpdateTemplate(ID TemplateID, template *Template) error
+		DeleteTemplate(ID TemplateID) error
+	}
+
 	// CryptoService represents a service for encrypting/hashing data.
 	CryptoService interface {
 		Hash(data string) (string, error)
@@ -434,7 +552,7 @@ type (
 
 	// FileService represents a service for managing files.
 	FileService interface {
-		GetFileContent(filePath string) (string, error)
+		GetFileContent(filePath string) ([]byte, error)
 		Rename(oldPath, newPath string) error
 		RemoveDirectory(directoryPath string) error
 		StoreTLSFileFromBytes(folder string, fileType TLSFileType, data []byte) (string, error)
@@ -452,19 +570,28 @@ type (
 
 	// GitService represents a service for managing Git.
 	GitService interface {
-		ClonePublicRepository(repositoryURL, destination string) error
-		ClonePrivateRepositoryWithBasicAuth(repositoryURL, destination, username, password string) error
+		ClonePublicRepository(repositoryURL, referenceName string, destination string) error
+		ClonePrivateRepositoryWithBasicAuth(repositoryURL, referenceName string, destination, username, password string) error
 	}
 
-	// EndpointWatcher represents a service to synchronize the endpoints via an external source.
-	EndpointWatcher interface {
-		WatchEndpointFile(endpointFilePath string) error
+	// JobScheduler represents a service to run jobs on a periodic basis.
+	JobScheduler interface {
+		ScheduleEndpointSyncJob(endpointFilePath, interval string) error
+		ScheduleSnapshotJob(interval string) error
+		UpdateSnapshotJob(interval string)
+		Start()
+	}
+
+	// Snapshotter represents a service used to create endpoint snapshots.
+	Snapshotter interface {
+		CreateSnapshot(endpoint *Endpoint) (*Snapshot, error)
 	}
 
 	// LDAPService represents a service used to authenticate users against a LDAP/AD.
 	LDAPService interface {
 		AuthenticateUser(username, password string, settings *LDAPSettings) error
 		TestConnectivity(settings *LDAPSettings) error
+		GetUserGroups(username string, settings *LDAPSettings) ([]string, error)
 	}
 
 	// SwarmStackManager represents a service to manage Swarm stacks.
@@ -484,11 +611,9 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API.
-	APIVersion = "1.18.1"
+	APIVersion = "1.19.0"
 	// DBVersion is the version number of the Portainer database.
-	DBVersion = 12
-	// DefaultTemplatesURL represents the default URL for the templates definitions.
-	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates.json"
+	DBVersion = 13
 	// PortainerAgentHeader represents the name of the header available in any agent response
 	PortainerAgentHeader = "Portainer-Agent"
 	// PortainerAgentTargetHeader represent the name of the header containing the target node name.
@@ -500,6 +625,8 @@ const (
 	// PortainerAgentSignatureMessage represents the message used to create a digital signature
 	// to be used when communicating with an agent
 	PortainerAgentSignatureMessage = "Portainer-App"
+	// SupportedDockerAPIVersion is the minimum Docker API version supported by Portainer.
+	SupportedDockerAPIVersion = "1.24"
 )
 
 const (
@@ -581,4 +708,22 @@ const (
 	DockerSwarmStack
 	// DockerComposeStack represents a stack managed via docker-compose
 	DockerComposeStack
+)
+
+const (
+	_ TemplateType = iota
+	// ContainerTemplate represents a container template
+	ContainerTemplate
+	// SwarmStackTemplate represents a template used to deploy a Swarm stack
+	SwarmStackTemplate
+	// ComposeStackTemplate represents a template used to deploy a Compose stack
+	ComposeStackTemplate
+)
+
+const (
+	_ EndpointStatus = iota
+	// EndpointStatusUp is used to represent an available endpoint
+	EndpointStatusUp
+	// EndpointStatusDown is used to represent an unavailable endpoint
+	EndpointStatusDown
 )

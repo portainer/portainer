@@ -5,6 +5,6 @@ angular.module('portainer.agent')
     endpointId: EndpointProvider.endpointID
   },
   {
-    query: {method: 'GET', isArray: true}
+    query: { method: 'GET', isArray: true }
   });
 }]);

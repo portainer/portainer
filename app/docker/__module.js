@@ -184,6 +184,17 @@ angular.module('portainer.docker', ['portainer.app'])
     }
   };
 
+  var imageImport = {
+    name: 'docker.images.import',
+    url: '/import',
+    views: {
+      'content@': {
+        templateUrl: 'app/docker/views/images/import/importimage.html',
+        controller: 'ImportImageController'
+      }
+    }
+  };
+
   var networks = {
     name: 'docker.networks',
     url: '/networks',
@@ -361,36 +372,6 @@ angular.module('portainer.docker', ['portainer.app'])
     }
   };
 
-  var templates = {
-    name: 'docker.templates',
-    url: '/templates',
-    views: {
-      'content@': {
-        templateUrl: 'app/docker/views/templates/templates.html',
-        controller: 'TemplatesController'
-      }
-    },
-    params: {
-      key: 'containers',
-      hide_descriptions: false
-    }
-  };
-
-  var templatesLinuxServer = {
-    name: 'docker.templates.linuxserver',
-    url: '/linuxserver',
-    views: {
-      'content@': {
-        templateUrl: 'app/docker/views/templates/templates.html',
-        controller: 'TemplatesController'
-      }
-    },
-    params: {
-      key: 'linuxserver.io',
-      hide_descriptions: true
-    }
-  };
-
   var volumes = {
     name: 'docker.volumes',
     url: '/volumes',
@@ -409,6 +390,17 @@ angular.module('portainer.docker', ['portainer.app'])
       'content@': {
         templateUrl: 'app/docker/views/volumes/edit/volume.html',
         controller: 'VolumeController'
+      }
+    }
+  };
+
+  var volumeBrowse = {
+    name: 'docker.volumes.volume.browse',
+    url: '/browse',
+    views: {
+      'content@': {
+        templateUrl: 'app/docker/views/volumes/browse/browsevolume.html',
+        controller: 'BrowseVolumeController'
       }
     }
   };
@@ -441,6 +433,7 @@ angular.module('portainer.docker', ['portainer.app'])
   $stateRegistryProvider.register(images);
   $stateRegistryProvider.register(image);
   $stateRegistryProvider.register(imageBuild);
+  $stateRegistryProvider.register(imageImport);
   $stateRegistryProvider.register(networks);
   $stateRegistryProvider.register(network);
   $stateRegistryProvider.register(networkCreation);
@@ -458,9 +451,8 @@ angular.module('portainer.docker', ['portainer.app'])
   $stateRegistryProvider.register(tasks);
   $stateRegistryProvider.register(task);
   $stateRegistryProvider.register(taskLogs);
-  $stateRegistryProvider.register(templates);
-  $stateRegistryProvider.register(templatesLinuxServer);
   $stateRegistryProvider.register(volumes);
   $stateRegistryProvider.register(volume);
+  $stateRegistryProvider.register(volumeBrowse);
   $stateRegistryProvider.register(volumeCreation);
 }]);

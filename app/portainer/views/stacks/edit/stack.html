@@ -171,7 +171,7 @@
     <containers-datatable
       title-text="Containers" title-icon="fa-server"
       dataset="containers" table-key="stack-containers"
-      order-by="Status" show-text-filter="true"
+      order-by="Status"
       show-ownership-column="applicationState.application.authentication"
       show-host-column="false"
       show-add-action="false"
@@ -184,9 +184,9 @@
     <services-datatable
     title-text="Services" title-icon="fa-list-alt"
     dataset="services" table-key="stack-services"
-    order-by="Name" show-text-filter="true"
+    order-by="Name"
     nodes="nodes"
-    agent-proxy="applicationState.endpoint.mode.agentProxy"
+    agent-proxy="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'"
     show-ownership-column="false"
     show-update-action="applicationState.endpoint.apiVersion >= 1.25"
     show-task-logs-button="applicationState.endpoint.apiVersion >= 1.30"

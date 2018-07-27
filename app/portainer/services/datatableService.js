@@ -37,6 +37,10 @@ function DatatableServiceFactory(LocalStorage) {
     LocalStorage.storeDataTableExpandedItems(key, expandedItems);
   };
 
+  service.setColumnVisibilitySettings = function(key, columnVisibility) {
+    LocalStorage.storeColumnVisibilitySettings(key, columnVisibility);
+  };
+
   service.getDataTableExpandedItems = function(key) {
     return LocalStorage.getDataTableExpandedItems(key);
   };
@@ -47,6 +51,10 @@ function DatatableServiceFactory(LocalStorage) {
 
   service.getDataTableSelectedItems = function(key) {
     return LocalStorage.getDataTableSelectedItems(key);
+  };
+
+  service.getColumnVisibilitySettings = function(key) {
+    return LocalStorage.getColumnVisibilitySettings(key);
   };
 
   return service;

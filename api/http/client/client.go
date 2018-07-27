@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -59,6 +60,27 @@ func (client *HTTPClient) ExecuteAzureAuthenticationRequest(credentials *portain
 	}
 
 	return &token, nil
+}
+
+// Get executes a simple HTTP GET to the specified URL and returns
+// the content of the response body.
+func Get(url string) ([]byte, error) {
+	client := &http.Client{
+		Timeout: time.Second * 3,
+	}
+
+	response, err := client.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return body, nil
 }
 
 // ExecutePingOperation will send a SystemPing operation HTTP request to a Docker environment

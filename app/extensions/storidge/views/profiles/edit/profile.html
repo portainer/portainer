@@ -29,7 +29,7 @@
             </div>
           </div>
           <div class="form-group" ng-show="storidgeUpdateProfileForm.profile_directory.$invalid">
-            <div class="col-sm-12 small text-danger">
+            <div class="col-sm-12 small text-warning">
               <div ng-messages="storidgeUpdateProfileForm.profile_directory.$error">
                 <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
               </div>
@@ -44,7 +44,7 @@
             </div>
           </div>
           <div class="form-group" ng-show="storidgeUpdateProfileForm.profile_capacity.$invalid">
-            <div class="col-sm-12 small text-danger">
+            <div class="col-sm-12 small text-warning">
               <div ng-messages="storidgeUpdateProfileForm.profile_capacity.$error">
                 <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
                 <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Minimum value for capacity: 1.</p>
@@ -110,7 +110,7 @@
               </div>
             </div>
             <div class="form-group" ng-show="storidgeUpdateProfileForm.min_iops.$invalid">
-              <div class="col-sm-12 small text-danger">
+              <div class="col-sm-12 small text-warning">
                 <div ng-messages="storidgeUpdateProfileForm.min_iops.$error">
                   <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A value is required for Min IOPS.</p>
                   <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Minimum value for Min IOPS: 30.</p>
@@ -119,7 +119,7 @@
               </div>
             </div>
             <div class="form-group" ng-show="storidgeUpdateProfileForm.max_iops.$invalid">
-              <div class="col-sm-12 small text-danger">
+              <div class="col-sm-12 small text-warning">
                 <div ng-messages="storidgeUpdateProfileForm.max_iops.$error">
                   <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A value is required for Max IOPS.</p>
                   <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Minimum value for Max IOPS: 30.</p>
@@ -155,7 +155,7 @@
               </div>
             </div>
             <div class="form-group" ng-show="storidgeUpdateProfileForm.min_bandwidth.$invalid">
-              <div class="col-sm-12 small text-danger">
+              <div class="col-sm-12 small text-warning">
                 <div ng-messages="storidgeUpdateProfileForm.min_bandwidth.$error">
                   <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A value is required for Min bandwidth.</p>
                   <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Minimum value for Min bandwidth: 1.</p>
@@ -164,7 +164,7 @@
               </div>
             </div>
             <div class="form-group" ng-show="storidgeUpdateProfileForm.max_bandwidth.$invalid">
-              <div class="col-sm-12 small text-danger">
+              <div class="col-sm-12 small text-warning">
                 <div ng-messages="storidgeUpdateProfileForm.max_bandwidth.$error">
                   <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A value is required for Max bandwidth.</p>
                   <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Minimum value for Max bandwidth: 1.</p>

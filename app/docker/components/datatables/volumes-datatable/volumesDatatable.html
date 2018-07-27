@@ -5,11 +5,6 @@
         <div class="toolBarTitle">
           <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }}
         </div>
-        <div class="settings">
-          <span class="setting" ng-class="{ 'setting-active': $ctrl.state.displayTextFilter }" ng-click="$ctrl.updateDisplayTextFilter()" ng-if="$ctrl.showTextFilter">
-            <i class="fa fa-search" aria-hidden="true"></i> Search
-          </span>
-        </div>
       </div>
       <div class="actionBar">
         <button type="button" class="btn btn-sm btn-danger"
@@ -20,12 +15,12 @@
           <i class="fa fa-plus space-right" aria-hidden="true"></i>Add volume
         </button>
       </div>
-      <div class="searchBar" ng-if="$ctrl.state.displayTextFilter">
+      <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
         <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus>
       </div>
       <div class="table-responsive">
-        <table class="table table-hover table-filters">
+        <table class="table table-hover table-filters nowrap-cells">
           <thead>
             <tr>
               <th uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.filters.usage.open">
@@ -107,8 +102,11 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-change="$ctrl.selectItem(item)"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="docker.volumes.volume({ id: item.Id, nodeName: item.NodeName })" class="monospaced">{{ item.Id | truncate:25 }}</a>
-                <span style="margin-left: 10px;" class="label label-warning image-tag" ng-if="item.dangling">Unused</span>
+                <a ui-sref="docker.volumes.volume({ id: item.Id, nodeName: item.NodeName })" class="monospaced" title="{{ item.Id }}">{{ item.Id | truncate:40 }}</a>
+                <a ui-sref="docker.volumes.volume.browse({ id: item.Id, nodeName: item.NodeName })" class="btn btn-xs btn-primary space-left" ng-if="$ctrl.showBrowseAction">
+                  <i class="fa fa-search"></i> browse</a>
+                </a>
+                <span style="margin-left: 10px;" class="label label-warning image-tag space-left" ng-if="item.dangling">Unused</span>
               </td>
               <td>{{ item.StackName ? item.StackName : '-' }}</td>
               <td>{{ item.Driver }}</td>

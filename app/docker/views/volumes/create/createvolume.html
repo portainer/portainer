@@ -70,7 +70,7 @@
             <storidge-profile-selector storidge-profile="formValues.StoridgeProfile"></storidge-profile-selector>
           </div>
           <!-- storidge -->
-          <div ng-if="applicationState.endpoint.mode.agentProxy && formValues.Driver === 'local'">
+          <div ng-if="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && formValues.Driver === 'local'">
             <div class="col-sm-12 form-section-title">
               Deployment
             </div>

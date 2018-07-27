@@ -138,4 +138,13 @@ angular.module('portainer.app')
         return 'fa fa-eye';
     }
   };
+})
+.filter('endpointstatusbadge', function () {
+  'use strict';
+  return function (status) {
+    if (status === 2) {
+      return 'danger';
+    }
+    return 'success';
+  };
 });

@@ -1,5 +1,6 @@
 angular.module('portainer.docker')
-.factory('ImageService', ['$q', 'Image', 'ImageHelper', 'RegistryService', 'HttpRequestHelper', 'ContainerService', function ImageServiceFactory($q, Image, ImageHelper, RegistryService, HttpRequestHelper, ContainerService) {
+.factory('ImageService', ['$q', 'Image', 'ImageHelper', 'RegistryService', 'HttpRequestHelper', 'ContainerService', 'FileUploadService',
+  function ImageServiceFactory($q, Image, ImageHelper, RegistryService, HttpRequestHelper, ContainerService, FileUploadService) {
   'use strict';
   var service = {};
 
@@ -136,6 +137,15 @@ angular.module('portainer.docker')
   service.tagImage = function(id, image, registry) {
     var imageConfig = ImageHelper.createImageConfigForCommit(image, registry);
     return Image.tag({id: id, tag: imageConfig.tag, repo: imageConfig.repo}).$promise;
+  };
+
+  service.downloadImages = function(images) {
+    var names = ImageHelper.getImagesNamesForDownload(images);
+    return Image.download(names).$promise;
+  };
+
+  service.uploadImage = function(file) {
+    return FileUploadService.loadImages(file);
   };
 
   service.deleteImage = function(id, forceRemoval) {

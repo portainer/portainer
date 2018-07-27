@@ -1,14 +1,21 @@
-<div>
-  <label for="image_name" class="col-sm-1 control-label text-left">Name</label>
-  <div class="col-sm-11 col-md-6">
+<div class="form-group">
+  <label for="image_name" ng-class="$ctrl.labelClass" class="control-label text-left">Image</label>
+  <div ng-class="$ctrl.inputClass">
     <input type="text" class="form-control" uib-typeahead="image for image in $ctrl.availableImages | filter:$viewValue | limitTo:5"
-      ng-model="$ctrl.image" id="image_name" placeholder="e.g. myImage:myTag">
+      ng-model="$ctrl.image" name="image_name" placeholder="e.g. myImage:myTag" required>
   </div>
-  <label for="image_registry" class="col-sm-2 col-md-1 margin-sm-top control-label text-left">
+  <label for="image_registry" class="margin-sm-top control-label text-right" ng-class="$ctrl.labelClass">
     Registry
   </label>
-  <div class="col-sm-10 col-md-4 margin-sm-top">
+  <div ng-class="$ctrl.inputClass" class="margin-sm-top">
     <select ng-options="registry as registry.Name for registry in $ctrl.availableRegistries" ng-model="$ctrl.registry" id="image_registry"
       class="form-control"></select>
+  </div>
+</div>
+<div class="form-group" ng-show="$ctrl.form.image_name.$invalid">
+  <div class="col-sm-12 small text-warning">
+    <div ng-messages="$ctrl.form.image_name.$error">
+      <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Image name is required.</p>
+    </div>
   </div>
 </div>

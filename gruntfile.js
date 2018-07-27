@@ -31,6 +31,7 @@ module.exports = function (grunt) {
     'clean:all',
     'before-copy',
     'copy:assets',
+    'copy:templates',
     'after-copy'
   ]);
   grunt.registerTask('build', [
@@ -78,6 +79,7 @@ module.exports = function (grunt) {
 
   // Project configuration.
   grunt.initConfig({
+    root: 'dist',
     distdir: 'dist/public',
     shippedDockerVersion: '18.03.1-ce',
     pkg: grunt.file.readJSON('package.json'),
@@ -162,6 +164,11 @@ gruntfile_cfg.copy = {
       {dest: '<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'node_modules/rdash-ui/dist/fonts/'},
       {dest: '<%= distdir %>/images/', src: '**',                         expand: true, cwd: 'assets/images/'},
       {dest: '<%= distdir %>/ico',     src: '**',                         expand: true, cwd: 'assets/ico'}
+    ]
+  },
+  templates: {
+    files: [
+      { dest: '<%= root %>/', src: 'templates.json', cwd: '' }
     ]
   }
 };
@@ -269,7 +276,7 @@ function shell_buildBinary(p, a) {
 function shell_run(arch) {
   return [
     'docker rm -f portainer',
-    'docker run -d -p 9000:9000 -v $(pwd)/dist:/app -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer portainer/base /app/portainer-linux-' + arch + ' --no-analytics'
+    'docker run -d -p 9000:9000 -v $(pwd)/dist:/app -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer portainer/base /app/portainer-linux-' + arch + ' --no-analytics --template-file /app/templates.json'
   ].join(';');
 }
 

@@ -8,7 +8,6 @@ angular.module('portainer.app').component('stacksDatatable', {
     tableKey: '@',
     orderBy: '@',
     reverseOrder: '<',
-    showTextFilter: '<',
     showOwnershipColumn: '<',
     removeAction: '<'
   }

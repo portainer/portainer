@@ -4,6 +4,11 @@ angular.module('portainer.docker').component('porImageRegistry', {
   bindings: {
     'image': '=',
     'registry': '=',
-    'autoComplete': '<'
+    'autoComplete': '<',
+    'labelClass': '@',
+    'inputClass': '@'
+  },
+  require: {
+    form: '^form'
   }
 });

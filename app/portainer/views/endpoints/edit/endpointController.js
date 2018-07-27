@@ -67,7 +67,7 @@ function ($q, $scope, $state, $transition$, $filter, EndpointService, GroupServi
     })
     .then(function success(data) {
       var endpoint = data.endpoint;
-      if (endpoint.URL.indexOf('unix://') === 0) {
+      if (endpoint.URL.indexOf('unix://') === 0 || endpoint.URL.indexOf('npipe://') === 0) {
         $scope.endpointType = 'local';
       } else {
         $scope.endpointType = 'remote';

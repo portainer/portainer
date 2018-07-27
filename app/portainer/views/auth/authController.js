@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('AuthenticationController', ['$scope', '$state', '$transition$', '$window', '$timeout', '$sanitize', 'Authentication', 'Users', 'UserService', 'EndpointService', 'StateManager', 'EndpointProvider', 'Notifications', 'SettingsService', 'ExtensionManager',
-function ($scope, $state, $transition$, $window, $timeout, $sanitize, Authentication, Users, UserService, EndpointService, StateManager, EndpointProvider, Notifications, SettingsService, ExtensionManager) {
+.controller('AuthenticationController', ['$scope', '$state', '$transition$', '$sanitize', 'Authentication', 'UserService', 'EndpointService', 'StateManager', 'Notifications', 'SettingsService',
+function ($scope, $state, $transition$, $sanitize, Authentication, UserService, EndpointService, StateManager, Notifications, SettingsService) {
 
   $scope.logo = StateManager.getState().application.logo;
 
@@ -13,47 +13,13 @@ function ($scope, $state, $transition$, $window, $timeout, $sanitize, Authentica
     AuthenticationError: ''
   };
 
-  function redirectToDockerDashboard(endpoint) {
-    ExtensionManager.initEndpointExtensions(endpoint.Id)
-    .then(function success(data) {
-      var extensions = data;
-      return StateManager.updateEndpointState(true, endpoint.Type, extensions);
-    })
-    .then(function success(data) {
-      $state.go('docker.dashboard');
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
-    });
-  }
-
-  function redirectToAzureDashboard(endpoint) {
-    StateManager.updateEndpointState(false, endpoint.Type, [])
-    .then(function success(data) {
-      $state.go('azure.dashboard');
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
-    });
-  }
-
-  function redirectToDashboard(endpoint) {
-    EndpointProvider.setEndpointID(endpoint.Id);
-
-    if (endpoint.Type === 3) {
-      return redirectToAzureDashboard(endpoint);
-    }
-    redirectToDockerDashboard(endpoint);
-  }
-
   function unauthenticatedFlow() {
     EndpointService.endpoints()
     .then(function success(data) {
-      var endpoints = data;
-      if (endpoints.length > 0)  {
-        redirectToDashboard(endpoints[0]);
-      } else {
+      if (endpoints.length === 0) {
         $state.go('portainer.init.endpoint');
+      } else {
+        $state.go('portainer.home');
       }
     })
     .catch(function error(err) {
@@ -92,13 +58,10 @@ function ($scope, $state, $transition$, $window, $timeout, $sanitize, Authentica
     .then(function success(data) {
       var endpoints = data;
       var userDetails = Authentication.getUserDetails();
-      if (endpoints.length > 0)  {
-        redirectToDashboard(endpoints[0]);
-      } else if (endpoints.length === 0 && userDetails.role === 1) {
+      if (endpoints.length === 0 && userDetails.role === 1) {
         $state.go('portainer.init.endpoint');
-      } else if (endpoints.length === 0 && userDetails.role === 2) {
-        Authentication.logout();
-        $scope.state.AuthenticationError = 'User not allowed. Please contact your administrator.';
+      } else {
+        $state.go('portainer.home');
       }
     })
     .catch(function error() {
@@ -114,7 +77,7 @@ function ($scope, $state, $transition$, $window, $timeout, $sanitize, Authentica
     }
 
     if (Authentication.isAuthenticated()) {
-      $state.go('docker.dashboard');
+      $state.go('portainer.home');
     }
 
     var authenticationEnabled = $scope.applicationState.application.authentication;

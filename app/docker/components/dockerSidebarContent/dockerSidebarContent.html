@@ -2,10 +2,7 @@
   <a ui-sref="docker.dashboard" ui-sref-active="active">Dashboard <span class="menu-icon fa fa-tachometer-alt fa-fw"></span></a>
 </li>
 <li class="sidebar-list">
-  <a ui-sref="docker.templates" ui-sref-active="active">App Templates <span class="menu-icon fa fa-rocket fa-fw"></span></a>
-  <div class="sidebar-sublist" ng-if="$ctrl.sidebarToggledOn && $ctrl.externalContributions && ($ctrl.currentState === 'docker.templates' || $ctrl.currentState === 'docker.templates.linuxserver')">
-    <a ui-sref="docker.templates.linuxserver" ui-sref-active="active">LinuxServer.io</a>
-  </div>
+  <a ui-sref="portainer.templates" ui-sref-active="active">App Templates <span class="menu-icon fa fa-rocket fa-fw"></span></a>
 </li>
 <li class="sidebar-list">
   <a ui-sref="portainer.stacks" ui-sref-active="active">Stacks <span class="menu-icon fa fa-th-list fa-fw"></span></a>
