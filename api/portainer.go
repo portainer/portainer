@@ -611,7 +611,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API.
-	APIVersion = "1.19.1"
+	APIVersion = "1.19.2-dev"
 	// DBVersion is the version number of the Portainer database.
 	DBVersion = 13
 	// PortainerAgentHeader represents the name of the header available in any agent response
