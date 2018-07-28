@@ -31,7 +31,6 @@ module.exports = function (grunt) {
     'clean:all',
     'before-copy',
     'copy:assets',
-    'copy:templates',
     'after-copy'
   ]);
   grunt.registerTask('build', [
@@ -82,6 +81,7 @@ module.exports = function (grunt) {
     root: 'dist',
     distdir: 'dist/public',
     shippedDockerVersion: '18.03.1-ce',
+    shippedDockerVersionWindows: '17.09.0-ce',
     pkg: grunt.file.readJSON('package.json'),
     config: gruntfile_cfg.config,
     src: gruntfile_cfg.src,
@@ -122,7 +122,7 @@ gruntfile_cfg.src = {
 };
 
 gruntfile_cfg.clean = {
-  all: ['<%= distdir %>/../*'],
+  all: ['<%= root %>/*'],
   app: ['<%= distdir %>/*', '!<%= distdir %>/../portainer*', '!<%= distdir %>/../docker*'],
   tmpl: ['<%= distdir %>/templates'],
   tmp: ['<%= distdir %>/js/*', '!<%= distdir %>/js/app.*.js', '<%= distdir %>/css/*', '!<%= distdir %>/css/app.*.css']
@@ -163,12 +163,8 @@ gruntfile_cfg.copy = {
       {dest: '<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,eot,svg}', expand: true, cwd: 'node_modules/@fortawesome/fontawesome-free-webfonts/webfonts/'},
       {dest: '<%= distdir %>/fonts/',  src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'node_modules/rdash-ui/dist/fonts/'},
       {dest: '<%= distdir %>/images/', src: '**',                         expand: true, cwd: 'assets/images/'},
-      {dest: '<%= distdir %>/ico',     src: '**',                         expand: true, cwd: 'assets/ico'}
-    ]
-  },
-  templates: {
-    files: [
-      { dest: '<%= root %>/', src: 'templates.json', cwd: '' }
+      {dest: '<%= distdir %>/ico',     src: '**',                         expand: true, cwd: 'assets/ico'},
+      {dest: '<%= root %>/',          src: 'templates.json', cwd: ''}
     ]
   }
 };
@@ -285,11 +281,12 @@ function shell_downloadDockerBinary(p, a) {
   var as = { 'amd64': 'x86_64', 'arm': 'armhf', 'arm64': 'aarch64' };
   var ip = ((ps[p] === undefined) ? p : ps[p]);
   var ia = ((as[a] === undefined) ? a : as[a]);
+  var binaryVersion = (( p === 'windows' ? '<%= shippedDockerVersionWindows %>' : '<%= shippedDockerVersion %>' ));
   return [
-    'if [ -f '+(( p === 'win' ) ? 'dist/docker.exe' : 'dist/docker')+' ]; then',
+    'if [ -f '+(( p === 'windows' ) ? 'dist/docker.exe' : 'dist/docker')+' ]; then',
       'echo "Docker binary exists";',
     'else',
-      'build/download_docker_binary.sh ' + ip + ' ' + ia + ' <%= shippedDockerVersion %>;',
+      'build/download_docker_binary.sh ' + ip + ' ' + ia + ' ' + binaryVersion + ';',
     'fi'
   ].join(' ');
 }

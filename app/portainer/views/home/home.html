@@ -30,7 +30,7 @@
       title-text="Endpoints" title-icon="fa-plug"
       endpoints="endpoints"
       dashboard-action="goToDashboard"
-      show-snapshot-action="isAdmin"
+      show-snapshot-action="!applicationState.application.authentication || isAdmin"
       snapshot-action="triggerSnapshot"
     ></endpoint-list>
   </div>

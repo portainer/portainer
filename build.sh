@@ -14,7 +14,7 @@ function build_and_push_images() {
 function build_archive() {
   BUILD_FOLDER="${ARCHIVE_BUILD_FOLDER}/$1"
   rm -rf ${BUILD_FOLDER} && mkdir -pv ${BUILD_FOLDER}/portainer
-  mv dist/* ${BUILD_FOLDER}/portainer/
+  cp -r dist/* ${BUILD_FOLDER}/portainer/
   cd ${BUILD_FOLDER}
   tar cvpfz "portainer-${VERSION}-$1.tar.gz" portainer
   mv "portainer-${VERSION}-$1.tar.gz" ${ARCHIVE_BUILD_FOLDER}/
