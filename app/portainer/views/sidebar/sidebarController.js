@@ -16,17 +16,20 @@ function ($q, $scope, StateManager, Notifications, Authentication, UserService) 
     $scope.uiVersion = StateManager.getState().application.version;
     $scope.logo = StateManager.getState().application.logo;
 
-    var userDetails = Authentication.getUserDetails();
-    var isAdmin = userDetails.role === 1;
-    $scope.isAdmin = isAdmin;
+    var authenticationEnabled = $scope.applicationState.application.authentication;
+    if (authenticationEnabled) {
+      var userDetails = Authentication.getUserDetails();
+      var isAdmin = userDetails.role === 1;
+      $scope.isAdmin = isAdmin;
 
-    $q.when(!isAdmin ? UserService.userMemberships(userDetails.ID) : [])
-    .then(function success(data) {
-      checkPermissions(data);
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to retrieve user memberships');
-    });
+      $q.when(!isAdmin ? UserService.userMemberships(userDetails.ID) : [])
+      .then(function success(data) {
+        checkPermissions(data);
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to retrieve user memberships');
+      });
+    }
   }
 
   initView();
