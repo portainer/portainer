@@ -281,11 +281,12 @@ function shell_downloadDockerBinary(p, a) {
   var as = { 'amd64': 'x86_64', 'arm': 'armhf', 'arm64': 'aarch64' };
   var ip = ((ps[p] === undefined) ? p : ps[p]);
   var ia = ((as[a] === undefined) ? a : as[a]);
+  var binaryVersion = (( p === 'win' ? '<%= shippedDockerVersionWindows %>' : '<%= shippedDockerVersion %>' ));
   return [
     'if [ -f '+(( p === 'win' ) ? 'dist/docker.exe' : 'dist/docker')+' ]; then',
       'echo "Docker binary exists";',
     'else',
-      'build/download_docker_binary.sh ' + ip + ' ' + ia + (( p === 'win' ? '<%= shippedDockerVersionWindows %>' : '<%= shippedDockerVersion %>' )) + ';',
+      'build/download_docker_binary.sh ' + ip + ' ' + ia + ' ' + binaryVersion + ';',
     'fi'
   ].join(' ');
 }
