@@ -15,7 +15,7 @@ function ($scope, $state, $transition$, $sanitize, Authentication, UserService, 
 
   function unauthenticatedFlow() {
     EndpointService.endpoints()
-    .then(function success(data) {
+    .then(function success(endpoints) {
       if (endpoints.length === 0) {
         $state.go('portainer.init.endpoint');
       } else {
