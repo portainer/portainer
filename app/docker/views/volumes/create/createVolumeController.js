@@ -6,7 +6,8 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
     Driver: 'local',
     DriverOptions: [],
     AccessControlData: new AccessControlFormData(),
-    NodeName: null
+    NodeName: null,
+    NfsData: new VolumesNFSFormData()
   };
 
   $scope.state = {
@@ -37,7 +38,6 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
   }
 
   $scope.create = function () {
-
     var name = $scope.formValues.Name;
     var driver = $scope.formValues.Driver;
     var driverOptions = $scope.formValues.DriverOptions;
