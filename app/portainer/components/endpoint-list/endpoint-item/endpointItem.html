@@ -58,8 +58,12 @@
 
       <div class="blocklist-item-line endpoint-item">
         <span class="small text-muted">
-          <span class="small text-muted"><i class="fa fa-microchip"></i> {{ $ctrl.model.Snapshots[0].TotalCPU }}<i class="fa fa-memory space-left"></i> {{ $ctrl.model.Snapshots[0].TotalMemory | humansize }}</span>
-          <span class="space-left space-right">-</span>
+          <span ng-if="$ctrl.model.Type === 1 && !$ctrl.model.Snapshots[0].Swarm">
+            <span class="small text-muted">
+              <i class="fa fa-microchip"></i> {{ $ctrl.model.Snapshots[0].TotalCPU }}<i class="fa fa-memory space-left"></i> {{ $ctrl.model.Snapshots[0].TotalMemory | humansize }}
+            </span>
+            <span class="space-left space-right">-</span>
+          </span>
           <span ng-if="$ctrl.model.Tags.length === 0">
             <i class="fa fa-tags" aria-hidden="true"></i> No tags
           </span>

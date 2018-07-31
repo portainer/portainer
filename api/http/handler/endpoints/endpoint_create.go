@@ -174,7 +174,7 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 	endpoint := &portainer.Endpoint{
 		ID:               portainer.EndpointID(endpointID),
 		Name:             payload.Name,
-		URL:              payload.URL,
+		URL:              "https://management.azure.com",
 		Type:             portainer.AzureEnvironment,
 		GroupID:          portainer.EndpointGroupID(payload.GroupID),
 		PublicURL:        payload.PublicURL,
