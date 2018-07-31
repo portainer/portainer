@@ -27,8 +27,9 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 
 	filteredEndpoints := security.FilterEndpoints(endpoints, endpointGroups, securityContext)
 
-	for _, endpoint := range filteredEndpoints {
-		hideFields(&endpoint)
+	for idx := range filteredEndpoints {
+		hideFields(&filteredEndpoints[idx])
 	}
+
 	return response.JSON(w, filteredEndpoints)
 }
