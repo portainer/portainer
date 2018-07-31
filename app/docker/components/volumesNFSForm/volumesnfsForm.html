@@ -10,41 +10,78 @@
   </div>
   <!-- NFS-settings -->
   <div ng-show="$ctrl.data.useNFS">
-    <div class="col-sm-12 form-section-title">
-      NFS Settings
-    </div>
-    <!-- address-input -->
-    <div class="form-group col-md-6">
-      <label for="nfs_address" class="col-sm-1 control-label text-left">Address</label>
-      <div class="col-sm-11">
-        <input type="text" class="form-control" ng-model="$ctrl.data.serverAddress" id="nfs_address" placeholder="e.g. my.nfs-server.com OR xxx.xxx.xxx.xxx">
+    <ng-form class="form-horizontal" name="nfsInformationForm">
+      <div class="col-sm-12 form-section-title">
+        NFS Settings
       </div>
-    </div>
-    <!-- !address-input -->
-    <!-- version-input -->
-    <div class="form-group col-md-6">
-      <label for="nfs_version" class="col-sm-1 control-label text-left">Version</label>
-      <div class="col-sm-11">
-        <input type="number" class="form-control" ng-model="$ctrl.data.version" id="nfs_version" placeholder="e.g. 4 or 3">
+      <!-- address-input -->
+      <div class="form-group col-md-12">
+        <label for="nfs_address" class="col-sm-1 control-label text-left">Address</label>
+        <div class="col-sm-11">
+          <input type="text" class="form-control" ng-model="$ctrl.data.serverAddress" name="nfs_address" placeholder="e.g. my.nfs-server.com OR xxx.xxx.xxx.xxx"
+            required>
+        </div>
       </div>
-    </div>
-    <!-- !version-input -->
-    <!-- mount-point-input -->
-    <div class="form-group col-md-6">
-      <label for="nfs_mountpoint" class="col-sm-1 control-label text-left">Mount point</label>
-      <div class="col-sm-11">
-        <input type="text" class="form-control" ng-model="$ctrl.data.mountPoint" id="nfs_mountpoint" placeholder="e.g. :/export/share">
+      <div class="form-group col-md-12" ng-show="nfsInformationForm.nfs_address.$invalid">
+        <div class="small text-warning">
+          <div ng-messages="nfsInformationForm.nfs_address.$error">
+            <p ng-message="required">
+              <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+          </div>
+        </div>
       </div>
-    </div>
-    <!-- !mount-point-input -->
-    <!-- options-input -->
-    <div class="form-group col-md-6">
-      <label for="nfs_options" class="col-sm-1 control-label text-left">Options</label>
-      <div class="col-sm-11">
-        <input type="text" class="form-control" ng-model="$ctrl.data.options" id="nfs_options" placeholder="e.g. rw,noatime,tcp ...">
+      <!-- !address-input -->
+      <!-- version-input -->
+      <div class="form-group col-md-12">
+        <label for="nfs_version" class="col-sm-1 control-label text-left">Version</label>
+        <div class="col-sm-11">
+          <input type="number" class="form-control" ng-model="$ctrl.data.version" name="nfs_version" placeholder="e.g. 4 or 3" required>
+        </div>
       </div>
-    </div>
-    <!-- !options-input -->
+      <div class="form-group col-md-12" ng-show="nfsInformationForm.nfs_version.$invalid">
+        <div class="small text-warning">
+          <div ng-messages="nfsInformationForm.nfs_version.$error">
+            <p ng-message="required">
+              <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+          </div>
+        </div>
+      </div>
+      <!-- !version-input -->
+      <!-- mount-point-input -->
+      <div class="form-group col-md-12">
+        <label for="nfs_mountpoint" class="col-sm-1 control-label text-left">Mount point</label>
+        <div class="col-sm-11">
+          <input type="text" class="form-control" ng-model="$ctrl.data.mountPoint" name="nfs_mountpoint" placeholder="e.g. :/export/share"
+            required>
+        </div>
+      </div>
+      <div class="form-group col-md-12" ng-show="nfsInformationForm.nfs_mountpoint.$invalid">
+        <div class="small text-warning">
+          <div ng-messages="nfsInformationForm.nfs_mountpoint.$error">
+            <p ng-message="required">
+              <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+          </div>
+        </div>
+      </div>
+      <!-- !mount-point-input -->
+      <!-- options-input -->
+      <div class="form-group col-md-12">
+        <label for="nfs_options" class="col-sm-1 control-label text-left">Options</label>
+        <div class="col-sm-11">
+          <input type="text" class="form-control" ng-model="$ctrl.data.options" name="nfs_options" placeholder="e.g. rw,noatime,tcp ..."
+            required>
+        </div>
+      </div>
+      <div class="form-group col-md-12" ng-show="nfsInformationForm.nfs_options.$invalid">
+        <div class="small text-warning">
+          <div ng-messages="nfsInformationForm.nfs_options.$error">
+            <p ng-message="required">
+              <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+          </div>
+        </div>
+      </div>
+      <!-- !options-input -->
+    </ng-form>
   </div>
   <!-- !NFS-settings -->
 </div>
