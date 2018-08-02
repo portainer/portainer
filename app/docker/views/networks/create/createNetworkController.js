@@ -1,138 +1,194 @@
 angular.module('portainer.docker')
-.controller('CreateNetworkController', ['$q', '$scope', '$state', 'PluginService', 'Notifications', 'NetworkService', 'LabelHelper', 'Authentication', 'ResourceControlService', 'FormValidator', 'HttpRequestHelper',
-function ($q, $scope, $state, PluginService, Notifications, NetworkService, LabelHelper, Authentication, ResourceControlService, FormValidator, HttpRequestHelper) {
+  .controller('CreateNetworkController', ['$q', '$scope', '$state', 'PluginService', 'Notifications', 'NetworkService', 'LabelHelper', 'Authentication', 'ResourceControlService', 'FormValidator', 'HttpRequestHelper',
+    function ($q, $scope, $state, PluginService, Notifications, NetworkService, LabelHelper, Authentication, ResourceControlService, FormValidator, HttpRequestHelper) {
 
-  $scope.formValues = {
-    DriverOptions: [],
-    Subnet: '',
-    Gateway: '',
-    Labels: [],
-    AccessControlData: new AccessControlFormData(),
-    NodeName: null
-  };
+      $scope.formValues = {
+        DriverOptions: [],
+        Subnet: '',
+        Gateway: '',
+        IPRange: '',
+        AuxAddress: '',
+        Labels: [],
+        AccessControlData: new AccessControlFormData(),
+        NodeName: null,
+        Macvlan: new MacvlanFormData()
+      };
 
-  $scope.state = {
-    formValidationError: '',
-    actionInProgress: false
-  };
+      $scope.state = {
+        formValidationError: '',
+        actionInProgress: false
+      };
 
-  $scope.availableNetworkDrivers = [];
+      $scope.availableNetworkDrivers = [];
 
-  $scope.config = {
-    Driver: 'bridge',
-    CheckDuplicate: true,
-    Internal: false,
-    // Force IPAM Driver to 'default', should not be required.
-    // See: https://github.com/docker/docker/issues/25735
-    IPAM: {
-      Driver: 'default',
-      Config: []
-    },
-    Labels: {}
-  };
+      $scope.config = {
+        Driver: 'bridge',
+        CheckDuplicate: true,
+        Internal: false,
+        // Force IPAM Driver to 'default', should not be required.
+        // See: https://github.com/docker/docker/issues/25735
+        IPAM: {
+          Driver: 'default',
+          Config: []
+        },
+        Labels: {}
+      };
 
-  $scope.addDriverOption = function() {
-    $scope.formValues.DriverOptions.push({ name: '', value: '' });
-  };
+      $scope.addDriverOption = function () {
+        $scope.formValues.DriverOptions.push({
+          name: '',
+          value: ''
+        });
+      };
 
-  $scope.removeDriverOption = function(index) {
-    $scope.formValues.DriverOptions.splice(index, 1);
-  };
+      $scope.removeDriverOption = function (index) {
+        $scope.formValues.DriverOptions.splice(index, 1);
+      };
 
-  $scope.addLabel = function() {
-    $scope.formValues.Labels.push({ key: '', value: ''});
-  };
+      $scope.addLabel = function () {
+        $scope.formValues.Labels.push({
+          key: '',
+          value: ''
+        });
+      };
 
-  $scope.removeLabel = function(index) {
-    $scope.formValues.Labels.splice(index, 1);
-  };
+      $scope.removeLabel = function (index) {
+        $scope.formValues.Labels.splice(index, 1);
+      };
 
-  function prepareIPAMConfiguration(config) {
-    if ($scope.formValues.Subnet) {
-      var ipamConfig = {};
-      ipamConfig.Subnet = $scope.formValues.Subnet;
-      if ($scope.formValues.Gateway) {
-        ipamConfig.Gateway = $scope.formValues.Gateway  ;
+      function prepareIPAMConfiguration(config) {
+        if ($scope.formValues.Subnet) {
+          var ipamConfig = {};
+          ipamConfig.Subnet = $scope.formValues.Subnet;
+          if ($scope.formValues.Gateway) {
+            ipamConfig.Gateway = $scope.formValues.Gateway;
+          }
+          if ($scope.formValues.IPRange) {
+            ipamConfig.IPRange = $scope.formValues.IPRange;
+          }
+          if ($scope.formValues.AuxAddress) {
+            ipamConfig.AuxAddress = $scope.formValues.AuxAddress;
+          }
+          config.IPAM.Config.push(ipamConfig);
+        }
       }
-      config.IPAM.Config.push(ipamConfig);
+
+      function prepareDriverOptions(config) {
+        var options = {};
+        $scope.formValues.DriverOptions.forEach(function (option) {
+          options[option.name] = option.value;
+        });
+        config.Options = options;
+      }
+
+      function prepareLabelsConfig(config) {
+        config.Labels = LabelHelper.fromKeyValueToLabelHash($scope.formValues.Labels);
+      }
+
+      function prepareConfiguration() {
+        var config = angular.copy($scope.config);
+        prepareIPAMConfiguration(config);
+        prepareDriverOptions(config);
+        prepareLabelsConfig(config);
+        return config;
+      }
+
+      function modifyNetworkConfigurationForMacvlanConfigOnly(config, nodeName) {
+        config.ConfigOnly = true;
+        config.Name = nodeName + '/' + $scope.config.Name;
+      }
+
+      function modifyNetworkConfigurationForMacvlanConfigFrom(config, selectedNetworkConfig) {
+        config.ConfigFrom = {
+          Network: selectedNetworkConfig.Name
+        };
+        config.Scope = 'swarm';
+      }
+
+      function validateForm(accessControlData, isAdmin) {
+        $scope.state.formValidationError = '';
+        var error = '';
+        error = FormValidator.validateAccessControl(accessControlData, isAdmin);
+
+        if (error) {
+          $scope.state.formValidationError = error;
+          return false;
+        }
+        return true;
+      }
+
+      function createNetwork(networkConfiguration, userDetails, accessControlData, reload) {
+        $scope.state.actionInProgress = true;
+        NetworkService.create(networkConfiguration)
+          .then(function success(data) {
+            var networkIdentifier = data.Id;
+            var userId = userDetails.ID;
+            return ResourceControlService.applyResourceControl('network', networkIdentifier, userId, accessControlData, []);
+          })
+          .then(function success() {
+            Notifications.success('Network successfully created');
+            if (reload)
+              $state.go('docker.networks', {}, {
+                reload: true
+              });
+          })
+          .catch(function error(err) {
+            Notifications.error('Failure', err, 'An error occured during network creation');
+          })
+          .finally(function final() {
+            $scope.state.actionInProgress = false;
+          });
+      }
+
+      $scope.create = function () {
+        var networkConfiguration = prepareConfiguration();
+        var accessControlData = $scope.formValues.AccessControlData;
+        var userDetails = Authentication.getUserDetails();
+        var isAdmin = userDetails.role === 1;
+
+        if (!validateForm(accessControlData, isAdmin)) {
+          return;
+        }
+
+        if ($scope.config.Driver === 'macvlan') {
+          if ($scope.formValues.Macvlan.Scope === 'local') {
+            var selectedNodes = $scope.formValues.Macvlan.DatatableState.selectedItems;
+            selectedNodes.forEach(function (node, idx) {
+              var nodeName = node.Hostname;
+              HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
+
+              modifyNetworkConfigurationForMacvlanConfigOnly(networkConfiguration, nodeName);
+              createNetwork(networkConfiguration, userDetails, accessControlData, idx === selectedNodes.length - 1 ? true : false);
+            });
+          } else if ($scope.formValues.Macvlan.Scope === 'swarm') {
+            var selectedNetworkConfig = $scope.formValues.Macvlan.SelectedNetworkConfig;
+            HttpRequestHelper.setPortainerAgentTargetHeader(selectedNetworkConfig.NodeName);
+
+            modifyNetworkConfigurationForMacvlanConfigFrom(networkConfiguration, selectedNetworkConfig);
+            createNetwork(networkConfiguration, userDetails, accessControlData, true);
+          }
+        } else {
+          var nodeName = $scope.formValues.NodeName;
+          HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
+
+          createNetwork(networkConfiguration, userDetails, accessControlData, true);
+        }
+      };
+
+      function initView() {
+        var apiVersion = $scope.applicationState.endpoint.apiVersion;
+
+        PluginService.networkPlugins(apiVersion < 1.25)
+          .then(function success(data) {
+            if ($scope.applicationState.endpoint.mode.provider !== 'DOCKER_SWARM_MODE')
+              data.splice(data.indexOf('macvlan'), 1);
+            $scope.availableNetworkDrivers = data;
+          })
+          .catch(function error(err) {
+            Notifications.error('Failure', err, 'Unable to retrieve network drivers');
+          });
+      }
+
+      initView();
     }
-  }
-
-  function prepareDriverOptions(config) {
-    var options = {};
-    $scope.formValues.DriverOptions.forEach(function (option) {
-      options[option.name] = option.value;
-    });
-    config.Options = options;
-  }
-
-  function prepareLabelsConfig(config) {
-    config.Labels = LabelHelper.fromKeyValueToLabelHash($scope.formValues.Labels);
-  }
-
-  function prepareConfiguration() {
-    var config = angular.copy($scope.config);
-    prepareIPAMConfiguration(config);
-    prepareDriverOptions(config);
-    prepareLabelsConfig(config);
-    return config;
-  }
-
-  function validateForm(accessControlData, isAdmin) {
-    $scope.state.formValidationError = '';
-    var error = '';
-    error = FormValidator.validateAccessControl(accessControlData, isAdmin);
-
-    if (error) {
-      $scope.state.formValidationError = error;
-      return false;
-    }
-    return true;
-  }
-
-  $scope.create = function () {
-    var networkConfiguration = prepareConfiguration();
-    var accessControlData = $scope.formValues.AccessControlData;
-    var userDetails = Authentication.getUserDetails();
-    var isAdmin = userDetails.role === 1;
-
-    if (!validateForm(accessControlData, isAdmin)) {
-      return;
-    }
-
-    var nodeName = $scope.formValues.NodeName;
-    HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
-
-    $scope.state.actionInProgress = true;
-    NetworkService.create(networkConfiguration)
-    .then(function success(data) {
-      var networkIdentifier = data.Id;
-      var userId = userDetails.ID;
-      return ResourceControlService.applyResourceControl('network', networkIdentifier, userId, accessControlData, []);
-    })
-    .then(function success() {
-      Notifications.success('Network successfully created');
-      $state.go('docker.networks', {}, {reload: true});
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'An error occured during network creation');
-    })
-    .finally(function final() {
-      $scope.state.actionInProgress = false;
-    });
-  };
-
-  function initView() {
-    var apiVersion = $scope.applicationState.endpoint.apiVersion;
-
-    PluginService.networkPlugins(apiVersion < 1.25)
-    .then(function success(data){
-        $scope.availableNetworkDrivers = data;
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to retrieve network drivers');
-    });
-  }
-
-  initView();
-}]);
+  ]);

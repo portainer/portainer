@@ -23,4 +23,7 @@ function NetworkViewModel(data) {
       this.NodeName = data.Portainer.Agent.NodeName;
     }
   }
+
+  this.ConfigFrom = data.ConfigFrom;
+  this.ConfigOnly = data.ConfigOnly;
 }

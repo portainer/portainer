@@ -1,0 +1,90 @@
+<div>
+  <div class="col-sm-12 form-section-title">
+    MACVLAN settings
+  </div>
+  <!-- selector -->
+  <div class="col-sm-12">
+    <div class="form-group" style="margin-bottom: 0">
+      <div class="boxselector_wrapper">
+        <div>
+          <input type="radio" id="network_config" ng-model="$ctrl.data.Scope" value="local">
+          <label for="network_config">
+            <div class="boxselector_header">
+              <i class="fa fa-cog" aria-hidden="true" style="margin-right: 2px;"></i>
+              Configuration
+            </div>
+            <p>I want to configure a network before deploying it</p>
+          </label>
+        </div>
+        <div>
+          <input type="radio" id="network_deploy" ng-model="$ctrl.data.Scope" value="swarm">
+          <label for="network_deploy">
+            <div class="boxselector_header">
+              <i class="fa fa-sitemap" aria-hidden="true" style="margin-right: 2px;"></i>
+              Creation
+            </div>
+            <p>I want to create a network from a configuration</p>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- !selector -->
+
+  <ng-form name="macvlanConfigurationForm">
+    <input type="hidden" name="form_input_validator" ng-model="tmp" ng-required="$ctrl.formValidation()">
+    <!-- configuration-inputs -->
+    <div ng-show="$ctrl.data.Scope === 'local'">
+      <!-- network-card-input -->
+      <div class="form-group">
+        <label for="network_card" class="col-sm-3 col-lg-2 control-label text-left">Parent network card</label>
+        <div class="col-sm-9 col-lg-10">
+          <input type="text" class="form-control" name="network_card" ng-model="$ctrl.data.ParentNetworkCard" placeholder="e.g. eth0 or ens160 ...">
+        </div>
+      </div>
+      <!-- network-card-input -->
+      <!-- nodes-selector -->
+      <div class="form-group">
+        <div class="col-sm-12">
+          <macvlan-nodes-datatable title-text="Select nodes to deploy the configuration" title-icon="fa-hdd" dataset="$ctrl.nodes" table-key="nodes"
+            state="$ctrl.data.DatatableState" order-by="Hostname" show-ip-address-column="$ctrl.applicationState.endpoint.apiVersion >= 1.25"
+            access-to-node-details="!$ctrl.applicationState.application.authentication || $ctrl.isAdmin"></macvlan-nodes-datatable>
+        </div>
+      </div>
+      <div class="form-group" ng-show="macvlanConfigurationForm.form_input_validator.$invalid">
+        <div class="col-sm-12 small text-warning">
+          <div ng-messages="macvlanConfigurationForm.form_input_validator.$error">
+            <p ng-message="required">
+              <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> At least one node must be selected.</p>
+          </div>
+        </div>
+      </div>
+      <!-- !nodes-selector -->
+    </div>
+    <!-- configuration-inputs -->
+    <!-- deploy-inputs -->
+    <div ng-show="$ctrl.data.Scope === 'swarm'">
+      <!-- configuration-selector -->
+      <!-- network-input -->
+      <div class="form-group">
+          <label for="config_network" class="col-sm-2 col-lg-1 control-label text-left">Configuration</label>
+          <div class="col-sm-9">
+            <select class="form-control" ng-options="net.Name for net in $ctrl.availableNetworks" ng-model="$ctrl.data.SelectedNetworkConfig" id="config_network" >
+              <option selected disabled hidden value="">Select a network</option>
+            </select>
+          </div>
+        </div>
+        <!-- !network-input -->
+        <div class="form-group" ng-show="macvlanConfigurationForm.form_input_validator.$invalid">
+          <div class="col-sm-12 small text-warning">
+            <div ng-messages="macvlanConfigurationForm.form_input_validator.$error">
+              <p ng-message="required">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Select a configuration network.</p>
+            </div>
+          </div>
+        </div>
+        <!-- !configuration-selector -->
+    </div>
+    <!-- deploy-inputs -->
+  </ng-form>
+</div>
