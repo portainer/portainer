@@ -15,5 +15,7 @@ function determineOwnership(resourceControl) {
     return 'private';
   } else if (resourceControl.UserAccesses.length > 1 || resourceControl.TeamAccesses.length > 0) {
     return 'restricted';
+  } else if (resourceControl.Public) {
+    return 'public';
   }
 }

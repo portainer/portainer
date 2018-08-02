@@ -12,7 +12,7 @@ function ($q, $state, UserService, TeamService, ResourceControlService, Notifica
   };
 
   ctrl.formValues = {
-    Ownership: 'public',
+    Ownership: 'administrators',
     Ownership_Users: [],
     Ownership_Teams: []
   };
@@ -96,10 +96,10 @@ function ($q, $state, UserService, TeamService, ResourceControlService, Notifica
       if (resourceControl) {
         ctrl.formValues.Ownership = resourceControl.Ownership === 'private' ? 'restricted' : resourceControl.Ownership;
       } else {
-        ctrl.formValues.Ownership = 'public';
+        ctrl.formValues.Ownership = 'administrators';
       }
     } else {
-      ctrl.formValues.Ownership = 'public';
+      ctrl.formValues.Ownership = 'administrators';
     }
 
     ResourceControlService.retrieveOwnershipDetails(resourceControl)

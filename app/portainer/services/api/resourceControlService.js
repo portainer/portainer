@@ -58,7 +58,7 @@ angular.module('portainer.app')
 
   service.applyResourceControlChange = function(resourceControlType, resourceId, resourceControl, ownershipParameters) {
     if (resourceControl) {
-      if (ownershipParameters.ownership === 'public') {
+      if (ownershipParameters.ownership === 'administrators') {
         return service.deleteResourceControl(resourceControl.Id);
       } else {
         return service.updateResourceControl(ownershipParameters.administratorsOnly, ownershipParameters.authorizedUserIds,

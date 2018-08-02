@@ -31,21 +31,20 @@ func applyResourceAccessControlFromLabel(labelsObject, resourceObject map[string
 // access level for the user (granted or denied) as the second return value.
 // Returns a decorated object and authorized access (true) when a resource control is found to the specified resource
 // identifier and the user can access the resource.
-// Returns the original object and authorized access (true) when no resource control is found for the specified
+// Returns the original object and authorized access (false) when no resource control is found for the specified
 // resource identifier.
 // Returns the original object and denied access (false) when a resource control is associated to the resource
 // and the user cannot access the resource.
 func applyResourceAccessControl(resourceObject map[string]interface{}, resourceIdentifier string,
 	context *restrictedOperationContext) (map[string]interface{}, bool) {
 
-	authorizedAccess := true
+	authorizedAccess := context.isAdmin
 
 	resourceControl := getResourceControlByResourceID(resourceIdentifier, context.resourceControls)
 	if resourceControl != nil {
 		if context.isAdmin || canUserAccessResource(context.userID, context.userTeamIDs, resourceControl) {
 			resourceObject = decorateObject(resourceObject, resourceControl)
-		} else {
-			authorizedAccess = false
+			authorizedAccess = true
 		}
 	}
 
