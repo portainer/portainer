@@ -6,6 +6,8 @@ function SettingsViewModel(data) {
   this.AllowBindMountsForRegularUsers = data.AllowBindMountsForRegularUsers;
   this.AllowPrivilegedModeForRegularUsers = data.AllowPrivilegedModeForRegularUsers;
   this.SnapshotInterval = data.SnapshotInterval;
+  this.TemplatesURL = data.TemplatesURL;
+  this.ExternalTemplates = data.ExternalTemplates;
 }
 
 function LDAPSettingsViewModel(data) {
