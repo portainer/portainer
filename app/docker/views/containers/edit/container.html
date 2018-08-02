@@ -187,7 +187,7 @@
             <tbody>
               <tr>
                 <td>Image</td>
-                <td><a ui-sref="docker.images.image({ id: container.Image, nodeName: nodeName })">{{ container.Image }}</a></td>
+                <td><a ui-sref="docker.images.image({ id: container.Image, nodeName: nodeName })">{{ container.Config.Image}}@{{container.Image}}</a></td>
               </tr>
               <tr ng-if="portBindings.length > 0">
                 <td>Port configuration</td>
