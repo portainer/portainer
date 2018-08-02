@@ -1,5 +1,5 @@
 <div>
-  <div class="form-group">
+  <div class="form-group col-md-12">
     <label for="useNFS" class="control-label text-left">
       Use NFS volume
     </label>
@@ -51,7 +51,7 @@
       <div class="form-group col-md-12">
         <label for="nfs_mountpoint" class="col-sm-1 control-label text-left">Mount point</label>
         <div class="col-sm-11">
-          <input type="text" class="form-control" ng-model="$ctrl.data.mountPoint" name="nfs_mountpoint" placeholder="e.g. :/export/share"
+          <input type="text" class="form-control" ng-model="$ctrl.data.mountPoint" name="nfs_mountpoint" placeholder="e.g. /export/share or :/export/share"
             required>
         </div>
       </div>

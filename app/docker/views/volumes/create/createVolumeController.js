@@ -45,7 +45,8 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
     var options = 'addr=' + data.serverAddress + ',' + data.options;
     driverOptions.push({ name: 'o', value: options });
 
-    driverOptions.push({ name: 'device', value: data.mountPoint });
+    var mountPoint = data.mountPoint[0] === ':' ? data.mountPoint : ':' + data.mountPoint;
+    driverOptions.push({ name: 'device', value: mountPoint });
   }
 
   $scope.create = function () {

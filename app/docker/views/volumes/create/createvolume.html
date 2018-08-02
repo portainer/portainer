@@ -63,7 +63,7 @@
           </div>
           <!-- !driver-options -->
           <!-- nfs-management -->
-          <volumes-nfs-form data="formValues.NfsData"></volumes-nfs-form>
+          <volumes-nfs-form data="formValues.NfsData" ng-show="formValues.Driver === 'local'"></volumes-nfs-form>
           <!-- !nfs-management -->
           <!-- storidge -->
           <div ng-if="formValues.Driver === 'cio:latest'">
