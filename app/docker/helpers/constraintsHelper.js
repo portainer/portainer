@@ -7,6 +7,9 @@ function ConstraintModel(op, value) {
   this.op = op;
   this.value = value;
 }
+// node.id        node.id==2ivku8v2gvtg4
+// node.hostname  node.hostname!=node-2
+// node.role      node.role==manager
 // MISSING
 // node.labels    node.labels.security==high
 // engine.labels  engine.labels.operatingsystem==ubuntu 14.04
@@ -23,7 +26,16 @@ var patterns = {
   value: /(node\.(id|hostname|role)\s?(=|!)=\s?)/
 };
 
-
+function matchesConstraint(value, constraint) {
+  if (constraint) {
+    if ((constraint.op === ConstraintOperator.EQ &&
+        value !== constraint.value) ||
+      (constraint.op === ConstraintOperator.NEQ &&
+        value === constraint.value))
+      return false;
+  }
+  return true;
+}
 
 angular.module('portainer.docker')
   .factory('ConstraintsHelper', [function ConstraintsHelperFactory() {
@@ -53,31 +65,12 @@ angular.module('portainer.docker')
         if (service.Constraints === undefined || service.Constraints.length === 0) return true;
         var constraints = this.transformConstraints(angular.copy(service.Constraints));
 
-        // e.g. node.id==2ivku8v2gvtg4
-        if (constraints.nodeId) {
-          if ((constraints.nodeId.op === ConstraintOperator.EQ &&
-              node.Id !== constraints.nodeId.value) ||
-            (constraints.nodeId.op === ConstraintOperator.NEQ &&
-              node.Id === constraints.nodeId.value))
-            return false;
-        }
-        // e.g. node.hostname!=node-2
-        if (constraints.nodeHostname) {
-          if ((constraints.nodeHostname.op === ConstraintOperator.EQ &&
-              node.Hostname !== constraints.nodeHostname.value) ||
-            (constraints.nodeHostname.op === ConstraintOperator.NEQ &&
-              node.Hostname === constraints.nodeHostname.value))
-            return false;
-        }
-        // e.g. node.role==manager
-        if (constraints.nodeRole) {
-          if ((constraints.nodeRole.op === ConstraintOperator.EQ &&
-              node.Role !== constraints.nodeRole.value) ||
-            (constraints.nodeRole.op === ConstraintOperator.NEQ &&
-              node.Role === constraints.nodeRole.value))
-            return false;
-        }
-        return true;
+        if (matchesConstraint(node.Id, constraints.nodeId) &&
+          matchesConstraint(node.Hostname, constraints.nodeHostname) &&
+          matchesConstraint(node.Role, constraints.nodeRole)
+        )
+          return true;
+        return false;
       }
     };
   }]);
