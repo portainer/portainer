@@ -96,7 +96,7 @@
               <td>{{ item.Image | hideshasum }}</td>
               <td ng-controller="ServicesDatatableActionsController as actionCtrl">
                 {{ item.Mode }}
-                <code>{{ item.Tasks | runningtaskscount }}</code> / <code>{{ item.Mode === 'replicated' ? item.Replicas : ($ctrl.nodes | availablenodecount) }}</code>
+                <code>{{ item.Tasks | runningtaskscount }}</code> / <code>{{ item.Mode === 'replicated' ? item.Replicas : ($ctrl.nodes | availablenodecount:item) }}</code>
                 <span ng-if="item.Mode === 'replicated' && !item.Scale">
                   <a class="interactive" ng-click="item.Scale = true; item.ReplicaCount = item.Replicas; $event.stopPropagation();">
                     <i class="fa fa-arrows-alt-v" aria-hidden="true"></i> Scale

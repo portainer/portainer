@@ -192,26 +192,26 @@ angular.module('portainer.docker')
     return '';
   };
 })
-.filter('availablenodecount', function () {
+.filter('availablenodecount', ['ConstraintsHelper', function (ConstraintsHelper) {
   'use strict';
-  return function (nodes) {
+  return function (nodes, service) {
     var availableNodes = 0;
     for (var i = 0; i < nodes.length; i++) {
       var node = nodes[i];
-      if (node.Availability === 'active' && node.Status === 'ready') {
+      if (node.Availability === 'active' && node.Status === 'ready' && ConstraintsHelper.matchesServiceConstraints(service, node)) {
         availableNodes++;
       }
     }
     return availableNodes;
   };
-})
+}])
 .filter('runningtaskscount', function () {
   'use strict';
   return function (tasks) {
     var runningTasks = 0;
     for (var i = 0; i < tasks.length; i++) {
       var task = tasks[i];
-      if (task.Status.State === 'running') {
+      if (task.Status.State === 'running' && task.DesiredState === 'running') {
         runningTasks++;
       }
     }
