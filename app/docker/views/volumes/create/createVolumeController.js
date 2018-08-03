@@ -7,7 +7,7 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
     DriverOptions: [],
     AccessControlData: new AccessControlFormData(),
     NodeName: null,
-    NfsData: new VolumesNFSFormData()
+    NFSData: new VolumesNFSFormData()
   };
 
   $scope.state = {
@@ -38,7 +38,7 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
   }
 
   function prepareNFSConfiguration(driverOptions) {
-    var data = $scope.formValues.NfsData;
+    var data = $scope.formValues.NFSData;
 
     driverOptions.push({ name: 'type', value: data.version === 4 ? 'nfs4' : 'nfs' });
 
@@ -59,8 +59,9 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
       driverOptions.push({ name: 'profile', value: storidgeProfile.Name });
     }
 
-    if ($scope.formValues.NfsData.useNFS)
+    if ($scope.formValues.NFSData.useNFS) {
       prepareNFSConfiguration(driverOptions);
+    }
 
     var volumeConfiguration = VolumeService.createVolumeConfiguration(name, driver, driverOptions);
     var accessControlData = $scope.formValues.AccessControlData;
