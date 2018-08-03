@@ -218,6 +218,22 @@ angular.module('portainer.docker')
     return runningTasks;
   };
 })
+.filter('runningcontainers', function () {
+  'use strict';
+  return function runningContainersFilter(containers) {
+    return containers.filter(function (container) {
+      return container.State === 'running';
+    }).length;
+  };
+})
+.filter('stoppedcontainers', function () {
+  'use strict';
+  return function stoppedContainersFilter(containers) {
+    return containers.filter(function (container) {
+      return container.State !== 'running';
+    }).length;
+  };
+})
 .filter('containerswithstatus', function () {
   'use strict';
   return function (containers, status) {
