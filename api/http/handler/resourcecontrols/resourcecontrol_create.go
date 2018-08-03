@@ -12,12 +12,12 @@ import (
 )
 
 type resourceControlCreatePayload struct {
-	ResourceID         string
-	Type               string
-	AdministratorsOnly bool
-	Users              []int
-	Teams              []int
-	SubResourceIDs     []string
+	ResourceID     string
+	Type           string
+	Public         bool
+	Users          []int
+	Teams          []int
+	SubResourceIDs []string
 }
 
 func (payload *resourceControlCreatePayload) Validate(r *http.Request) error {
@@ -29,8 +29,8 @@ func (payload *resourceControlCreatePayload) Validate(r *http.Request) error {
 		return portainer.Error("Invalid type")
 	}
 
-	if len(payload.Users) == 0 && len(payload.Teams) == 0 && !payload.AdministratorsOnly {
-		return portainer.Error("Invalid resource control declaration. Must specify Users, Teams or AdministratorOnly")
+	if len(payload.Users) == 0 && len(payload.Teams) == 0 && !payload.Public {
+		return portainer.Error("Invalid resource control declaration. Must specify Users, Teams or Public")
 	}
 	return nil
 }
@@ -90,12 +90,12 @@ func (handler *Handler) resourceControlCreate(w http.ResponseWriter, r *http.Req
 	}
 
 	resourceControl := portainer.ResourceControl{
-		ResourceID:         payload.ResourceID,
-		SubResourceIDs:     payload.SubResourceIDs,
-		Type:               resourceControlType,
-		AdministratorsOnly: payload.AdministratorsOnly,
-		UserAccesses:       userAccesses,
-		TeamAccesses:       teamAccesses,
+		ResourceID:     payload.ResourceID,
+		SubResourceIDs: payload.SubResourceIDs,
+		Type:           resourceControlType,
+		Public:         payload.Public,
+		UserAccesses:   userAccesses,
+		TeamAccesses:   teamAccesses,
 	}
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)

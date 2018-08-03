@@ -1,6 +1,10 @@
 package proxy
 
-import "github.com/portainer/portainer"
+import (
+	"log"
+
+	"github.com/portainer/portainer"
+)
 
 type (
 	// ExtendedStack represents a stack combined with its associated access control
@@ -42,7 +46,7 @@ func applyResourceAccessControl(resourceObject map[string]interface{}, resourceI
 
 	resourceControl := getResourceControlByResourceID(resourceIdentifier, context.resourceControls)
 	if resourceControl != nil {
-		if context.isAdmin || canUserAccessResource(context.userID, context.userTeamIDs, resourceControl) {
+		if context.isAdmin || resourceControl.Public || canUserAccessResource(context.userID, context.userTeamIDs, resourceControl) {
 			resourceObject = decorateObject(resourceObject, resourceControl)
 			authorizedAccess = true
 		}
@@ -93,7 +97,8 @@ func canUserAccessResource(userID portainer.UserID, userTeamIDs []portainer.Team
 		}
 	}
 
-	return false
+	log.Printf("resourceControl.Public %+v\n", resourceControl.Public)
+	return resourceControl.Public
 }
 
 func decorateObject(object map[string]interface{}, resourceControl *portainer.ResourceControl) map[string]interface{} {

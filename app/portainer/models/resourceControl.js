@@ -4,18 +4,18 @@ function ResourceControlViewModel(data) {
   this.ResourceId = data.ResourceId;
   this.UserAccesses = data.UserAccesses;
   this.TeamAccesses = data.TeamAccesses;
-  this.AdministratorsOnly = data.AdministratorsOnly;
+  this.Public = data.Public;
   this.Ownership = determineOwnership(this);
 }
 
 function determineOwnership(resourceControl) {
-  if (resourceControl.AdministratorsOnly) {
-    return 'administrators';
+  if (resourceControl.Public) {
+    return 'public';
   } else if (resourceControl.UserAccesses.length === 1 && resourceControl.TeamAccesses.length === 0) {
     return 'private';
   } else if (resourceControl.UserAccesses.length > 1 || resourceControl.TeamAccesses.length > 0) {
     return 'restricted';
-  } else if (resourceControl.Public) {
-    return 'public';
+  } else {
+    return 'administrators';
   }
 }

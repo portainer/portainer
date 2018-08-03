@@ -214,7 +214,7 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
         var teams = resourceControl.TeamAccesses.map(function(t) {
           return t.TeamId;
         });
-        return ResourceControlService.createResourceControl(resourceControl.AdministratorsOnly,
+        return ResourceControlService.createResourceControl(resourceControl.Public,
           users, teams, containerIdentifier, 'container', []);
       }
     })

@@ -51,7 +51,7 @@ function ($q, $state, UserService, TeamService, ResourceControlService, Notifica
     return true;
   }
 
-  function processOwnershipFormValues() {
+  function processOwnershipFormValues() {    
     var userIds = [];
     angular.forEach(ctrl.formValues.Ownership_Users, function(user) {
       userIds.push(user.Id);
@@ -60,13 +60,14 @@ function ($q, $state, UserService, TeamService, ResourceControlService, Notifica
     angular.forEach(ctrl.formValues.Ownership_Teams, function(team) {
       teamIds.push(team.Id);
     });
-    var administratorsOnly = ctrl.formValues.Ownership === 'administrators' ? true : false;
+
+    var publicOnly = ctrl.formValues.Ownership === 'public' ? true : false;
 
     return {
       ownership: ctrl.formValues.Ownership,
-      authorizedUserIds: administratorsOnly ? [] : userIds,
-      authorizedTeamIds: administratorsOnly ? [] : teamIds,
-      administratorsOnly: administratorsOnly
+      authorizedUserIds: publicOnly ? [] : userIds,
+      authorizedTeamIds: publicOnly ? [] : teamIds,
+      publicOnly: publicOnly
     };
   }
 
@@ -101,6 +102,7 @@ function ($q, $state, UserService, TeamService, ResourceControlService, Notifica
     } else {
       ctrl.formValues.Ownership = 'administrators';
     }
+
 
     ResourceControlService.retrieveOwnershipDetails(resourceControl)
     .then(function success(data) {

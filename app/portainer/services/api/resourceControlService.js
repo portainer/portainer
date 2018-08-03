@@ -3,10 +3,10 @@ angular.module('portainer.app')
   'use strict';
   var service = {};
 
-  service.createResourceControl = function(administratorsOnly, userIDs, teamIDs, resourceID, type, subResourceIDs) {
+  service.createResourceControl = function(publicOnly, userIDs, teamIDs, resourceID, type, subResourceIDs) {
     var payload = {
       Type: type,
-      AdministratorsOnly: administratorsOnly,
+      Public: publicOnly,
       ResourceID: resourceID,
       Users: userIDs,
       Teams: teamIDs,
@@ -19,9 +19,9 @@ angular.module('portainer.app')
     return ResourceControl.remove({id: rcID}).$promise;
   };
 
-  service.updateResourceControl = function(admin, userIDs, teamIDs, resourceControlId) {
+  service.updateResourceControl = function(publicOnly, userIDs, teamIDs, resourceControlId) {
     var payload = {
-      AdministratorsOnly: admin,
+      Public: publicOnly,
       Users: userIDs,
       Teams: teamIDs
     };
@@ -35,10 +35,10 @@ angular.module('portainer.app')
 
     var authorizedUserIds = [];
     var authorizedTeamIds = [];
-    var administratorsOnly = false;
+    var publicOnly = false;
     switch (accessControlData.Ownership) {
-      case 'administrators':
-        administratorsOnly = true;
+      case 'public':
+        publicOnly = true;
         break;
       case 'private':
         authorizedUserIds.push(userId);
@@ -52,20 +52,20 @@ angular.module('portainer.app')
         });
         break;
     }
-    return service.createResourceControl(administratorsOnly, authorizedUserIds,
+    return service.createResourceControl(publicOnly, authorizedUserIds,
       authorizedTeamIds, resourceIdentifier, resourceControlType, subResources);
   };
 
-  service.applyResourceControlChange = function(resourceControlType, resourceId, resourceControl, ownershipParameters) {
+  service.applyResourceControlChange = function(resourceControlType, resourceId, resourceControl, ownershipParameters) {    
     if (resourceControl) {
       if (ownershipParameters.ownership === 'administrators') {
         return service.deleteResourceControl(resourceControl.Id);
       } else {
-        return service.updateResourceControl(ownershipParameters.administratorsOnly, ownershipParameters.authorizedUserIds,
+        return service.updateResourceControl(ownershipParameters.publicOnly, ownershipParameters.authorizedUserIds,
           ownershipParameters.authorizedTeamIds, resourceControl.Id);
       }
     } else {
-        return service.createResourceControl(ownershipParameters.administratorsOnly, ownershipParameters.authorizedUserIds,
+        return service.createResourceControl(ownershipParameters.publicOnly, ownershipParameters.authorizedUserIds,
           ownershipParameters.authorizedTeamIds, resourceId, resourceControlType);
     }
   };
