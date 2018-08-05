@@ -30,13 +30,16 @@ angular.module('portainer.app')
 
   service.applyResourceControl = function(resourceControlType, resourceIdentifier, userId, accessControlData, subResources) {
     if (!accessControlData.AccessControlEnabled) {
-      return;
+      accessControlData.Ownership = 'public';
     }
 
     var authorizedUserIds = [];
     var authorizedTeamIds = [];
     var publicOnly = false;
     switch (accessControlData.Ownership) {
+      case 'administrators':
+        //No resource control for administrators
+        return;
       case 'public':
         publicOnly = true;
         break;
