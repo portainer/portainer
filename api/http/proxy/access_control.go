@@ -1,8 +1,6 @@
 package proxy
 
 import (
-	"log"
-
 	"github.com/portainer/portainer"
 )
 
@@ -97,7 +95,6 @@ func canUserAccessResource(userID portainer.UserID, userTeamIDs []portainer.Team
 		}
 	}
 
-	log.Printf("resourceControl.Public %+v\n", resourceControl.Public)
 	return resourceControl.Public
 }
 

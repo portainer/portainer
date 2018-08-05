@@ -1,10 +1,12 @@
 package security
 
-import "github.com/portainer/portainer"
+import (
+	"github.com/portainer/portainer"
+)
 
 // AuthorizedResourceControlDeletion ensure that the user can delete a resource control object.
 // A non-administrator user cannot delete a resource control where:
-// * the AdministratorsOnly flag is set
+// * the Public flag is set
 // * he is not one of the users in the user accesses
 // * he is not a member of any team within the team accesses
 func AuthorizedResourceControlDeletion(resourceControl *portainer.ResourceControl, context *RestrictedRequestContext) bool {
@@ -12,7 +14,7 @@ func AuthorizedResourceControlDeletion(resourceControl *portainer.ResourceContro
 		return true
 	}
 
-	if resourceControl.AdministratorsOnly {
+	if resourceControl.Public {
 		return false
 	}
 
@@ -46,7 +48,7 @@ func AuthorizedResourceControlAccess(resourceControl *portainer.ResourceControl,
 		return true
 	}
 
-	if resourceControl.AdministratorsOnly {
+	if resourceControl.Public {
 		return false
 	}
 
@@ -92,7 +94,7 @@ func AuthorizedResourceControlUpdate(resourceControl *portainer.ResourceControl,
 
 // AuthorizedResourceControlCreation ensure that the user can create a resource control object.
 // A non-administrator user cannot create a resource control where:
-// * the AdministratorsOnly flag is set
+// * the Public flag is set false
 // * he wants to create a resource control without any user/team accesses
 // * he wants to add more than one user in the user accesses
 // * he wants tp add a user in the user accesses that is not corresponding to its id
@@ -102,8 +104,8 @@ func AuthorizedResourceControlCreation(resourceControl *portainer.ResourceContro
 		return true
 	}
 
-	if resourceControl.AdministratorsOnly {
-		return false
+	if resourceControl.Public {
+		return true
 	}
 
 	userAccessesCount := len(resourceControl.UserAccesses)
