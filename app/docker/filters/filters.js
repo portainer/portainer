@@ -234,19 +234,6 @@ angular.module('portainer.docker')
     }).length;
   };
 })
-.filter('containerswithstatus', function () {
-  'use strict';
-  return function (containers, status) {
-    var containersWithStatus = 0;
-    for (var i = 0; i < containers.length; i++) {
-      var container = containers[i];
-      if (container.Status === status) {
-        containersWithStatus++;
-      }
-    }
-    return containersWithStatus;
-  };
-})
 .filter('imagestotalsize', function () {
   'use strict';
   return function (images) {
