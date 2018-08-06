@@ -25,8 +25,9 @@ func (handler *Handler) templateList(w http.ResponseWriter, r *http.Request) *ht
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve templates from the database", err}
 		}
 	} else {
-		templateData, httpErr := client.Get(settings.TemplatesURL)
-		if httpErr != nil {
+		var templateData []byte
+		templateData, err = client.Get(settings.TemplatesURL)
+		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve external templates", err}
 		}
 
