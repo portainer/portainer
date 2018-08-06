@@ -230,7 +230,7 @@ angular.module('portainer.docker')
   'use strict';
   return function stoppedContainersFilter(containers) {
     return containers.filter(function (container) {
-      return container.State !== 'running';
+      return container.State === 'exited';
     }).length;
   };
 })
