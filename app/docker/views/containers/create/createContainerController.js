@@ -17,7 +17,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     MemoryLimit: 0,
     MemoryReservation: 0,
     NodeName: null,
-    capabilities: null
+    capabilities: []
   };
 
   $scope.extraNetworks = {};
@@ -491,6 +491,22 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     }
   }
 
+  function loadFromContainerCapabilities(d) {
+    if (d.HostConfig.CapAdd) {
+      d.HostConfig.CapAdd.forEach(function(cap) {
+        $scope.formValues.capabilities.push(new ContainerCapability(cap, true));
+      });
+    }
+    if (d.HostConfig.CapDrop) {
+      d.HostConfig.CapDrop.forEach(function(cap) {
+        $scope.formValues.capabilities.push(new ContainerCapability(cap, false));
+      });
+    }
+    $scope.formValues.capabilities.sort(function(a, b) {
+      return a.capability < b.capability ? -1 : 1;
+    });
+  }
+
   function loadFromContainerSpec() {
     // Get container
     Container.get({ id: $transition$.params().from }).$promise
@@ -511,6 +527,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       loadFromContainerDevices(d);
       loadFromContainerImageConfig(d);
       loadFromContainerResources(d);
+      loadFromContainerCapabilities(d);
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve container');
@@ -556,6 +573,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       } else {
         $scope.fromContainer = {};
         $scope.formValues.Registry = {};
+        $scope.formValues.capabilities = new ContainerCapabilities();
       }
     }, function(e) {
       Notifications.error('Failure', e, 'Unable to retrieve running containers');
