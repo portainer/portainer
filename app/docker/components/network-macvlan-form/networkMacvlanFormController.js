@@ -38,10 +38,9 @@ angular.module('portainer.docker')
             provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25
           )
           .then(function success(data) {
-            var configNetworks = data.filter(function (item) {
+            ctrl.availableNetworks = data.filter(function (item) {
               return item.ConfigOnly === true;
             });
-            ctrl.availableNetworks = configNetworks;
           })
           .catch(function error(err) {
             Notifications.error('Failure', err, 'Unable to retrieve networks');

@@ -1,7 +1,4 @@
 <div>
-  <div class="col-sm-12 form-section-title">
-    MACVLAN settings
-  </div>
   <!-- selector -->
   <div class="col-sm-12">
     <div class="form-group" style="margin-bottom: 0">
@@ -16,7 +13,7 @@
             <p>I want to configure a network before deploying it</p>
           </label>
         </div>
-        <div>
+        <div ng-show="$ctrl.availableNetworks.length > 0">
           <input type="radio" id="network_deploy" ng-model="$ctrl.data.Scope" value="swarm">
           <label for="network_deploy">
             <div class="boxselector_header">
@@ -39,15 +36,24 @@
       <div class="form-group">
         <label for="network_card" class="col-sm-3 col-lg-2 control-label text-left">Parent network card</label>
         <div class="col-sm-9 col-lg-10">
-          <input type="text" class="form-control" name="network_card" ng-model="$ctrl.data.ParentNetworkCard" placeholder="e.g. eth0 or ens160 ...">
+          <input type="text" class="form-control" name="network_card" ng-model="$ctrl.data.ParentNetworkCard" placeholder="e.g. eth0 or ens160 ..."
+            ng-required="$ctrl.data.Scope === 'local' && !$ctrl.data.ParentNetworkCard">
+        </div>
+      </div>
+      <div class="form-group" ng-show="macvlanConfigurationForm.network_card.$invalid">
+        <div class="col-sm-12 small text-warning">
+          <div ng-messages="macvlanConfigurationForm.network_card.$error">
+            <p ng-message="required">
+              <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Parent network card must be specified.</p>
+          </div>
         </div>
       </div>
       <!-- network-card-input -->
       <!-- nodes-selector -->
       <div class="form-group">
         <div class="col-sm-12">
-          <macvlan-nodes-datatable title-text="Select nodes to deploy the configuration" title-icon="fa-hdd" dataset="$ctrl.nodes" table-key="nodes"
-            state="$ctrl.data.DatatableState" order-by="Hostname" show-ip-address-column="$ctrl.applicationState.endpoint.apiVersion >= 1.25"
+          <macvlan-nodes-datatable title-text="Select the nodes where you want to deploy the local configuration" title-icon="fa-hdd"
+            dataset="$ctrl.nodes" table-key="nodes" state="$ctrl.data.DatatableState" order-by="Hostname" show-ip-address-column="$ctrl.applicationState.endpoint.apiVersion >= 1.25"
             access-to-node-details="!$ctrl.applicationState.application.authentication || $ctrl.isAdmin"></macvlan-nodes-datatable>
         </div>
       </div>
@@ -67,23 +73,24 @@
       <!-- configuration-selector -->
       <!-- network-input -->
       <div class="form-group">
-          <label for="config_network" class="col-sm-2 col-lg-1 control-label text-left">Configuration</label>
-          <div class="col-sm-9">
-            <select class="form-control" ng-options="net.Name for net in $ctrl.availableNetworks" ng-model="$ctrl.data.SelectedNetworkConfig" id="config_network" >
-              <option selected disabled hidden value="">Select a network</option>
-            </select>
+        <label for="config_network" class="col-sm-2 col-lg-1 control-label text-left">Configuration</label>
+        <div class="col-sm-9">
+          <select class="form-control" ng-options="net.Name for net in $ctrl.availableNetworks" ng-model="$ctrl.data.SelectedNetworkConfig"
+            id="config_network">
+            <option selected disabled hidden value="">Select a network</option>
+          </select>
+        </div>
+      </div>
+      <!-- !network-input -->
+      <div class="form-group" ng-show="macvlanConfigurationForm.form_input_validator.$invalid">
+        <div class="col-sm-12 small text-warning">
+          <div ng-messages="macvlanConfigurationForm.form_input_validator.$error">
+            <p ng-message="required">
+              <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Select a configuration network.</p>
           </div>
         </div>
-        <!-- !network-input -->
-        <div class="form-group" ng-show="macvlanConfigurationForm.form_input_validator.$invalid">
-          <div class="col-sm-12 small text-warning">
-            <div ng-messages="macvlanConfigurationForm.form_input_validator.$error">
-              <p ng-message="required">
-                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Select a configuration network.</p>
-            </div>
-          </div>
-        </div>
-        <!-- !configuration-selector -->
+      </div>
+      <!-- !configuration-selector -->
     </div>
     <!-- deploy-inputs -->
   </ng-form>

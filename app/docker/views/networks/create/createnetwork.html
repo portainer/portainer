@@ -12,46 +12,19 @@
         <form class="form-horizontal" name="networkCreationForm">
           <!-- name-input -->
           <div class="form-group">
-            <label for="network_name" class="col-sm-1 control-label text-left">Name</label>
-            <div class="col-sm-11">
+            <label for="network_name" class="col-sm-2 col-lg-1 control-label text-left">Name</label>
+            <div class="col-sm-10 col-lg-11">
               <input type="text" class="form-control" ng-model="config.Name" id="network_name" placeholder="e.g. myNetwork">
             </div>
           </div>
           <!-- !name-input -->
-          <div class="col-sm-12 form-section-title">
-            Network configuration
-          </div>
-          <!-- subnet-gateway-inputs -->
-          <div class="form-group">
-            <label for="network_subnet" class="col-sm-2 col-lg-1 control-label text-left">Subnet</label>
-            <div class="col-sm-4 col-lg-5">
-              <input type="text" class="form-control" ng-model="formValues.Subnet" id="network_subnet" placeholder="e.g. 172.20.0.0/16">
-            </div>
-            <label for="network_gateway" class="col-sm-2 col-lg-1 control-label text-left">Gateway</label>
-            <div class="col-sm-4 col-lg-5">
-              <input type="text" class="form-control" ng-model="formValues.Gateway" id="network_gateway" placeholder="e.g. 172.20.10.11">
-            </div>
-          </div>
-          <!-- !subnet-gateway-inputs -->
-          <!-- iprange-auxaddr-inputs -->
-          <div class="form-group">
-            <label for="network_iprange" class="col-sm-2 col-lg-1 control-label text-left">IP range</label>
-            <div class="col-sm-4 col-lg-5">
-              <input type="text" class="form-control" ng-model="formValues.IPRange" id="network_iprange" placeholder="e.g. 172.20.10.128/25">
-            </div>
-            <label for="network_auxaddr" class="col-sm-2 col-lg-1 control-label text-left">Aux address</label>
-            <div class="col-sm-4 col-lg-5">
-              <input type="text" class="form-control" ng-model="formValues.AuxAddress" id="network_auxaddr" placeholder="e.g. my-router:172.20.10.129">
-            </div>
-          </div>
-          <!-- !iprange-auxaddr-inputs -->
           <div class="col-sm-12 form-section-title">
             Driver configuration
           </div>
           <!-- driver-input -->
           <div class="form-group">
             <label for="network_driver" class="col-sm-2 col-lg-1 control-label text-left">Driver</label>
-            <div class="col-sm-11">
+            <div class="col-sm-10 col-lg-11">
               <select class="form-control" ng-options="driver for driver in availableNetworkDrivers" ng-model="config.Driver" ng-if="availableNetworkDrivers.length > 0">
                 <option disabled hidden value="">Select a driver</option>
               </select>
@@ -59,6 +32,9 @@
             </div>
           </div>
           <!-- !driver-input -->
+          <!-- macvlan-management -->
+          <network-macvlan-form ng-show="config.Driver === 'macvlan'" data="formValues.Macvlan" application-state="applicationState"></network-macvlan-form>
+          <!-- !macvlan-management -->
           <!-- driver-options -->
           <div class="form-group">
             <div class="col-sm-12" style="margin-top: 5px;">
@@ -89,9 +65,35 @@
             <!-- !driver-options-input-list -->
           </div>
           <!-- !driver-options -->
-          <!-- macvlan-management -->
-          <network-macvlan-form ng-show="config.Driver === 'macvlan'" data="formValues.Macvlan" application-state="applicationState"></network-macvlan-form>
-          <!-- !macvlan-management -->
+          <div ng-hide="config.Driver === 'macvlan' && formValues.Macvlan.Scope === 'swarm'">
+            <div class="col-sm-12 form-section-title">
+              Network configuration
+            </div>
+            <!-- subnet-gateway-inputs -->
+            <div class="form-group">
+              <label for="network_subnet" class="col-sm-2 col-lg-1 control-label text-left">Subnet</label>
+              <div class="col-sm-4 col-lg-5">
+                <input type="text" class="form-control" ng-model="formValues.Subnet" id="network_subnet" placeholder="e.g. 172.20.0.0/16">
+              </div>
+              <label for="network_gateway" class="col-sm-2 col-lg-1 control-label text-left">Gateway</label>
+              <div class="col-sm-4 col-lg-5">
+                <input type="text" class="form-control" ng-model="formValues.Gateway" id="network_gateway" placeholder="e.g. 172.20.10.11">
+              </div>
+            </div>
+            <!-- !subnet-gateway-inputs -->
+            <!-- iprange-auxaddr-inputs -->
+            <div class="form-group">
+              <label for="network_iprange" class="col-sm-2 col-lg-1 control-label text-left">IP range</label>
+              <div class="col-sm-4 col-lg-5">
+                <input type="text" class="form-control" ng-model="formValues.IPRange" id="network_iprange" placeholder="e.g. 172.20.10.128/25">
+              </div>
+              <label for="network_auxaddr" class="col-sm-2 col-lg-1 control-label text-left">Exclude IPs</label>
+              <div class="col-sm-4 col-lg-5">
+                <input type="text" class="form-control" ng-model="formValues.AuxAddress" id="network_auxaddr" placeholder="e.g. my-router=172.20.10.129">
+              </div>
+            </div>
+            <!-- !iprange-auxaddr-inputs -->
+          </div>
           <div class="col-sm-12 form-section-title">
             Advanced configuration
           </div>
@@ -153,8 +155,8 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !config.Name || (config.Driver === 'macvlan' && networkCreationForm.$invalid)" ng-click="create()"
-                button-spinner="state.actionInProgress">
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !config.Name || (config.Driver === 'macvlan' && networkCreationForm.$invalid)"
+                ng-click="create()" button-spinner="state.actionInProgress">
                 <span ng-hide="state.actionInProgress">Create the network</span>
                 <span ng-show="state.actionInProgress">Creating network...</span>
               </button>
