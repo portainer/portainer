@@ -115,8 +115,8 @@
             <i class="fa fa-server"></i>
           </div>
           <div class="pull-right">
-            <div><i class="fa fa-heartbeat space-right green-icon"></i>{{ containers | containerswithstatus:'running' }} running</div>
-            <div><i class="fa fa-heartbeat space-right red-icon"></i>{{ containers | containerswithstatus:'stopped' }} stopped</div>
+            <div><i class="fa fa-heartbeat space-right green-icon"></i>{{ containers | runningcontainers }} running</div>
+            <div><i class="fa fa-heartbeat space-right red-icon"></i>{{ containers | stoppedcontainers }} stopped</div>
           </div>
           <div class="title">{{ containers.length }}</div>
           <div class="comment">Containers</div>
