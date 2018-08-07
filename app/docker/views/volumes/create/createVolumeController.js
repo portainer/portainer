@@ -40,7 +40,7 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
   function prepareNFSConfiguration(driverOptions) {
     var data = $scope.formValues.NFSData;
 
-    driverOptions.push({ name: 'type', value: data.version === 4 ? 'nfs4' : 'nfs' });
+    driverOptions.push({ name: 'type', value: data.version.toLowerCase() });
 
     var options = 'addr=' + data.serverAddress + ',' + data.options;
     driverOptions.push({ name: 'o', value: options });

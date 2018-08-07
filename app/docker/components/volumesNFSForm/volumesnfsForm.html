@@ -16,8 +16,8 @@
       </div>
       <!-- address-input -->
       <div class="form-group col-md-12">
-        <label for="nfs_address" class="col-sm-1 control-label text-left">Address</label>
-        <div class="col-sm-11">
+        <label for="nfs_address" class="col-sm-2 col-md-1 control-label text-left">Address</label>
+        <div class="col-sm-10 col-md-11">
           <input type="text" class="form-control" ng-model="$ctrl.data.serverAddress" name="nfs_address" placeholder="e.g. my.nfs-server.com OR xxx.xxx.xxx.xxx"
             required>
         </div>
@@ -33,9 +33,10 @@
       <!-- !address-input -->
       <!-- version-input -->
       <div class="form-group col-md-12">
-        <label for="nfs_version" class="col-sm-1 control-label text-left">Version</label>
-        <div class="col-sm-11">
-          <input type="number" class="form-control" ng-model="$ctrl.data.version" name="nfs_version" placeholder="e.g. 4 or 3" required>
+        <label for="nfs_version" class="col-sm-2 col-md-1 control-label text-left">NFS Version</label>
+        <div class="col-sm-10 col-md-11">
+          <select class="form-control" ng-model="$ctrl.data.version" name="nfs_version" ng-options="version for version in $ctrl.data.versions"
+            required></select>
         </div>
       </div>
       <div class="form-group col-md-12" ng-show="nfsInformationForm.nfs_version.$invalid">
@@ -49,8 +50,8 @@
       <!-- !version-input -->
       <!-- mount-point-input -->
       <div class="form-group col-md-12">
-        <label for="nfs_mountpoint" class="col-sm-1 control-label text-left">Mount point</label>
-        <div class="col-sm-11">
+        <label for="nfs_mountpoint" class="col-sm-2 col-md-1 control-label text-left">Mount point</label>
+        <div class="col-sm-10 col-md-11">
           <input type="text" class="form-control" ng-model="$ctrl.data.mountPoint" name="nfs_mountpoint" placeholder="e.g. /export/share or :/export/share"
             required>
         </div>
@@ -66,8 +67,10 @@
       <!-- !mount-point-input -->
       <!-- options-input -->
       <div class="form-group col-md-12">
-        <label for="nfs_options" class="col-sm-1 control-label text-left">Options</label>
-        <div class="col-sm-11">
+        <label for="nfs_options" class="col-sm-2 col-md-1 control-label text-left">Options
+          <portainer-tooltip position="bottom" message="Comma separated list of options"></portainer-tooltip>
+        </label>
+        <div class="col-sm-10 col-md-11">
           <input type="text" class="form-control" ng-model="$ctrl.data.options" name="nfs_options" placeholder="e.g. rw,noatime,tcp ..."
             required>
         </div>
