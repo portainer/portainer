@@ -151,6 +151,7 @@ func (server *Server) Start() error {
 
 	var templatesHandler = templates.NewHandler(requestBouncer)
 	templatesHandler.TemplateService = server.TemplateService
+	templatesHandler.SettingsService = server.SettingsService
 
 	var uploadHandler = upload.NewHandler(requestBouncer)
 	uploadHandler.FileService = server.FileService
