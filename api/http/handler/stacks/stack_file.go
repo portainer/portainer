@@ -47,6 +47,8 @@ func (handler *Handler) stackFile(w http.ResponseWriter, r *http.Request) *httpe
 		} else {
 			return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
 		}
+	} else if !securityContext.IsAdmin {
+		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
 	}
 
 	stackFileContent, err := handler.FileService.GetFileContent(path.Join(stack.ProjectPath, stack.EntryPoint))

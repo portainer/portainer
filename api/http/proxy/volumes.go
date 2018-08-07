@@ -62,17 +62,17 @@ func volumeInspectOperation(response *http.Response, executor *operationExecutor
 
 	volumeID := responseObject[volumeIdentifier].(string)
 	responseObject, access := applyResourceAccessControl(responseObject, volumeID, executor.operationContext)
-	if !access {
-		return rewriteAccessDeniedResponse(response)
+	if access {
+		return rewriteResponse(response, responseObject, http.StatusOK)
 	}
 
 	volumeLabels := extractVolumeLabelsFromVolumeInspectObject(responseObject)
 	responseObject, access = applyResourceAccessControlFromLabel(volumeLabels, responseObject, volumeLabelForStackIdentifier, executor.operationContext)
-	if !access {
-		return rewriteAccessDeniedResponse(response)
+	if access {
+		return rewriteResponse(response, responseObject, http.StatusOK)
 	}
 
-	return rewriteResponse(response, responseObject, http.StatusOK)
+	return rewriteAccessDeniedResponse(response)
 }
 
 // extractVolumeLabelsFromVolumeInspectObject retrieve the Labels of the volume if present.
@@ -130,12 +130,13 @@ func filterVolumeList(volumeData []interface{}, context *restrictedOperationCont
 
 		volumeID := volumeObject[volumeIdentifier].(string)
 		volumeObject, access := applyResourceAccessControl(volumeObject, volumeID, context)
-		if access {
+		if !access {
 			volumeLabels := extractVolumeLabelsFromVolumeListObject(volumeObject)
 			volumeObject, access = applyResourceAccessControlFromLabel(volumeLabels, volumeObject, volumeLabelForStackIdentifier, context)
-			if access {
-				filteredVolumeData = append(filteredVolumeData, volumeObject)
-			}
+		}
+
+		if access {
+			filteredVolumeData = append(filteredVolumeData, volumeObject)
 		}
 	}
 

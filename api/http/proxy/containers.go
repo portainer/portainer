@@ -62,27 +62,27 @@ func containerInspectOperation(response *http.Response, executor *operationExecu
 
 	containerID := responseObject[containerIdentifier].(string)
 	responseObject, access := applyResourceAccessControl(responseObject, containerID, executor.operationContext)
-	if !access {
-		return rewriteAccessDeniedResponse(response)
+	if access {
+		return rewriteResponse(response, responseObject, http.StatusOK)
 	}
 
 	containerLabels := extractContainerLabelsFromContainerInspectObject(responseObject)
 	responseObject, access = applyResourceAccessControlFromLabel(containerLabels, responseObject, containerLabelForServiceIdentifier, executor.operationContext)
-	if !access {
-		return rewriteAccessDeniedResponse(response)
+	if access {
+		return rewriteResponse(response, responseObject, http.StatusOK)
 	}
 
 	responseObject, access = applyResourceAccessControlFromLabel(containerLabels, responseObject, containerLabelForSwarmStackIdentifier, executor.operationContext)
-	if !access {
-		return rewriteAccessDeniedResponse(response)
+	if access {
+		return rewriteResponse(response, responseObject, http.StatusOK)
 	}
 
 	responseObject, access = applyResourceAccessControlFromLabel(containerLabels, responseObject, containerLabelForComposeStackIdentifier, executor.operationContext)
-	if !access {
-		return rewriteAccessDeniedResponse(response)
+	if access {
+		return rewriteResponse(response, responseObject, http.StatusOK)
 	}
 
-	return rewriteResponse(response, responseObject, http.StatusOK)
+	return rewriteAccessDeniedResponse(response)
 }
 
 // extractContainerLabelsFromContainerInspectObject retrieve the Labels of the container if present.
@@ -148,18 +148,19 @@ func filterContainerList(containerData []interface{}, context *restrictedOperati
 
 		containerID := containerObject[containerIdentifier].(string)
 		containerObject, access := applyResourceAccessControl(containerObject, containerID, context)
-		if access {
+		if !access {
 			containerLabels := extractContainerLabelsFromContainerListObject(containerObject)
 			containerObject, access = applyResourceAccessControlFromLabel(containerLabels, containerObject, containerLabelForComposeStackIdentifier, context)
-			if access {
+			if !access {
 				containerObject, access = applyResourceAccessControlFromLabel(containerLabels, containerObject, containerLabelForServiceIdentifier, context)
-				if access {
+				if !access {
 					containerObject, access = applyResourceAccessControlFromLabel(containerLabels, containerObject, containerLabelForSwarmStackIdentifier, context)
-					if access {
-						filteredContainerData = append(filteredContainerData, containerObject)
-					}
 				}
 			}
+		}
+
+		if access {
+			filteredContainerData = append(filteredContainerData, containerObject)
 		}
 	}
 

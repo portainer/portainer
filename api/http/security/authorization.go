@@ -6,7 +6,7 @@ import (
 
 // AuthorizedResourceControlDeletion ensure that the user can delete a resource control object.
 // A non-administrator user cannot delete a resource control where:
-// * the Public flag is set
+// * the Public flag is false
 // * he is not one of the users in the user accesses
 // * he is not a member of any team within the team accesses
 func AuthorizedResourceControlDeletion(resourceControl *portainer.ResourceControl, context *RestrictedRequestContext) bool {
@@ -15,7 +15,7 @@ func AuthorizedResourceControlDeletion(resourceControl *portainer.ResourceContro
 	}
 
 	if resourceControl.Public {
-		return false
+		return true
 	}
 
 	userAccessesCount := len(resourceControl.UserAccesses)
@@ -49,34 +49,24 @@ func AuthorizedResourceControlAccess(resourceControl *portainer.ResourceControl,
 	}
 
 	if resourceControl.Public {
-		return false
+		return true
 	}
 
-	authorizedTeamAccess := false
 	for _, access := range resourceControl.TeamAccesses {
 		for _, membership := range context.UserMemberships {
 			if membership.TeamID == access.TeamID {
-				authorizedTeamAccess = true
-				break
+				return true
 			}
 		}
 	}
-	if !authorizedTeamAccess {
-		return false
-	}
 
-	authorizedUserAccess := false
 	for _, access := range resourceControl.UserAccesses {
 		if context.UserID == access.UserID {
-			authorizedUserAccess = true
-			break
+			return true
 		}
 	}
-	if !authorizedUserAccess {
-		return false
-	}
 
-	return true
+	return false
 }
 
 // AuthorizedResourceControlUpdate ensure that the user can update a resource control object.
@@ -128,19 +118,15 @@ func AuthorizedResourceControlCreation(resourceControl *portainer.ResourceContro
 
 	if teamAccessesCount > 0 {
 		for _, access := range resourceControl.TeamAccesses {
-			isMember := false
 			for _, membership := range context.UserMemberships {
 				if membership.TeamID == access.TeamID {
-					isMember = true
+					return true
 				}
-			}
-			if !isMember {
-				return false
 			}
 		}
 	}
 
-	return true
+	return false
 }
 
 // AuthorizedTeamManagement ensure that access to the management of the specified team is granted.

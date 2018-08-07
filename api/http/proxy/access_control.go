@@ -17,7 +17,7 @@ type (
 // It will retrieve an identifier from the labels object. If an identifier exists, it will check for
 // an existing resource control associated to it.
 // Returns a decorated object and authorized access (true) when a resource control is found and the user can access the resource.
-// Returns the original object and authorized access (true) when no resource control is found.
+// Returns the original object and denied access (false) when no resource control is found.
 // Returns the original object and denied access (false) when a resource control is found and the user cannot access the resource.
 func applyResourceAccessControlFromLabel(labelsObject, resourceObject map[string]interface{}, labelIdentifier string,
 	context *restrictedOperationContext) (map[string]interface{}, bool) {
@@ -26,7 +26,7 @@ func applyResourceAccessControlFromLabel(labelsObject, resourceObject map[string
 		resourceIdentifier := labelsObject[labelIdentifier].(string)
 		return applyResourceAccessControl(resourceObject, resourceIdentifier, context)
 	}
-	return resourceObject, true
+	return resourceObject, false
 }
 
 // applyResourceAccessControl returns an optionally decorated object as the first return value and the
@@ -133,7 +133,7 @@ func CanAccessStack(stack *portainer.Stack, resourceControl *portainer.ResourceC
 		return true
 	}
 
-	return false
+	return resourceControl.Public
 }
 
 // FilterStacks filters stacks based on user role and resource controls.
@@ -150,9 +150,9 @@ func FilterStacks(stacks []portainer.Stack, resourceControls []portainer.Resourc
 	for _, stack := range stacks {
 		extendedStack := ExtendedStack{stack, portainer.ResourceControl{}}
 		resourceControl := getResourceControlByResourceID(stack.Name, resourceControls)
-		if resourceControl == nil {
+		if resourceControl == nil && isAdmin {
 			filteredStacks = append(filteredStacks, extendedStack)
-		} else if resourceControl != nil && (isAdmin || canUserAccessResource(userID, userTeamIDs, resourceControl)) {
+		} else if resourceControl != nil && (isAdmin || resourceControl.Public || canUserAccessResource(userID, userTeamIDs, resourceControl)) {
 			extendedStack.ResourceControl = *resourceControl
 			filteredStacks = append(filteredStacks, extendedStack)
 		}
