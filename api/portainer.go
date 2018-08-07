@@ -287,7 +287,7 @@ type (
 		OwnerID     UserID              `json:"OwnerId,omitempty"`
 		AccessLevel ResourceAccessLevel `json:"AccessLevel,omitempty"`
 
-		// Deprecated in DBVersion == ?
+		// Deprecated in DBVersion == 14
 		AdministratorsOnly bool `json:"AdministratorsOnly,omitempty"`
 	}
 
@@ -616,7 +616,7 @@ const (
 	// APIVersion is the version number of the Portainer API.
 	APIVersion = "1.19.2-dev"
 	// DBVersion is the version number of the Portainer database.
-	DBVersion = 13
+	DBVersion = 14
 	// PortainerAgentHeader represents the name of the header available in any agent response
 	PortainerAgentHeader = "Portainer-Agent"
 	// PortainerAgentTargetHeader represent the name of the header containing the target node name.
