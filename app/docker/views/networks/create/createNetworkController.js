@@ -25,6 +25,7 @@ angular.module('portainer.docker')
         Driver: 'bridge',
         CheckDuplicate: true,
         Internal: false,
+        Attachable: false,
         // Force IPAM Driver to 'default', should not be required.
         // See: https://github.com/docker/docker/issues/25735
         IPAM: {
@@ -93,9 +94,9 @@ angular.module('portainer.docker')
         return config;
       }
 
-      function modifyNetworkConfigurationForMacvlanConfigOnly(config, nodeName) {
+      function modifyNetworkConfigurationForMacvlanConfigOnly(config) {
         config.ConfigOnly = true;
-        config.Name = nodeName + '/' + $scope.config.Name;
+        config.Options.parent = $scope.formValues.Macvlan.ParentNetworkCard;
       }
 
       function modifyNetworkConfigurationForMacvlanConfigFrom(config, selectedNetworkConfig) {
@@ -157,7 +158,7 @@ angular.module('portainer.docker')
               var nodeName = node.Hostname;
               HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
 
-              modifyNetworkConfigurationForMacvlanConfigOnly(networkConfiguration, nodeName);
+              modifyNetworkConfigurationForMacvlanConfigOnly(networkConfiguration);
               createNetwork(networkConfiguration, userDetails, accessControlData, idx === selectedNodes.length - 1 ? true : false);
             });
           } else if ($scope.formValues.Macvlan.Scope === 'swarm') {

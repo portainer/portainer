@@ -4,4 +4,5 @@ function MacvlanFormData() {
   this.DatatableState = {
     selectedItems: []
   };
+  this.ParentNetworkCard = '';
 }

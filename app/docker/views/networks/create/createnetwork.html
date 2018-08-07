@@ -130,13 +130,26 @@
               <label for="ownership" class="control-label text-left">
                 Restrict external access to the network
               </label>
-              <label class="switch" style="margin-left: 20px;">
+              <label name="ownership" class="switch" style="margin-left: 20px;">
                 <input type="checkbox" ng-model="config.Internal">
                 <i></i>
               </label>
             </div>
           </div>
           <!-- !internal -->
+          <!-- attachable -->
+          <div class="form-group">
+              <div class="col-sm-12">
+                <label for="attachable" class="control-label text-left">
+                  Enable manual container attachment
+                </label>
+                <label name="attachable" class="switch" style="margin-left: 20px;">
+                  <input type="checkbox" ng-model="config.Attachable">
+                  <i></i>
+                </label>
+              </div>
+            </div>
+            <!-- !attachable -->
           <div ng-if="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && config.Driver !== 'overlay' && config.Driver !== 'macvlan'">
             <div class="col-sm-12 form-section-title">
               Deployment
