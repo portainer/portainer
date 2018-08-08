@@ -195,13 +195,13 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
     var isRunning = container.State.Running;
 
     return stopContainerIfNeeded()
+      .then(renameContainer)
       .then(pullImageIfNeeded)
       .then(createContainer)
       .then(connectContainerToOtherNetworks)
-      .then(deleteOldContainer)
-      .then(renameContainer)
       .then(startContainerIfNeeded)
       .then(createResourceControlIFNeeded)
+      .then(deleteOldContainer)
       .then(notifyAndChangeView)
       .catch(onError);
 
@@ -212,7 +212,9 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
       return ContainerService.stopContainer(container.Id);
     }
 
-    
+    function renameContainer() {
+      return ContainerService.renameContainer(container.Id, container.Name + '-old');
+    }
 
     function pullImageIfNeeded() {
       if (!pullImage) {
@@ -229,8 +231,6 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
     }
 
     function createContainer() {
-      // change name of container (add -copy prefix)
-      config.name = config.name + '-copy';
       // leave only one network on the container (save the others for later)
       var networks = config.NetworkingConfig.EndpointsConfig;
       var networksNames = Object.keys(networks);
@@ -249,8 +249,8 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
       var networksNames = Object.keys(networks);
       return $q
         .all(networksNames.map(function connectToNetwork(name) {
-          NetworkService.connectContainer(name, newContainer.Id);
-        }))
+            NetworkService.connectContainer(name, newContainer.Id);
+          }))
         .then(function onConnectToNetworkSuccess() {
           return newContainer;
         });
@@ -264,17 +264,9 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
       );
     }
 
-    function renameContainer(newContainer) {
-      return ContainerService.renameContainer(newContainer.Id, container.Name).then(
-        function onRenameSuccess() {
-          return newContainer;
-        }
-      );
-    }
-
     function startContainerIfNeeded(newContainer) {
       if (!isRunning) {
-        return newContainer;
+        return $q.when(newContainer);
       }
       return ContainerService.startContainer(newContainer.Id).then(
         function onStartSuccess() {
@@ -290,10 +282,10 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
       }
       var containerIdentifier = newContainer.Id;
       var resourceControl = container.ResourceControl;
-      var users = resourceControl.UserAccesses.map(function (u) {
+      var users = resourceControl.UserAccesses.map(function(u) {
         return u.UserId;
       });
-      var teams = resourceControl.TeamAccesses.map(function (t) {
+      var teams = resourceControl.TeamAccesses.map(function(t) {
         return t.TeamId;
       });
       return ResourceControlService.createResourceControl(resourceControl.AdministratorsOnly, users, teams, containerIdentifier, 'container', []);
