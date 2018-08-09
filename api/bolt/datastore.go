@@ -21,6 +21,7 @@ import (
 	"github.com/portainer/portainer/bolt/template"
 	"github.com/portainer/portainer/bolt/user"
 	"github.com/portainer/portainer/bolt/version"
+	"github.com/portainer/portainer/bolt/webhooks"
 )
 
 const (
@@ -47,6 +48,7 @@ type Store struct {
 	TemplateService        *template.Service
 	UserService            *user.Service
 	VersionService         *version.Service
+	WebhookService         *webhooks.Service
 }
 
 // NewStore initializes a new Store and the associated services
@@ -138,6 +140,7 @@ func (store *Store) MigrateData() error {
 			StackService:           store.StackService,
 			UserService:            store.UserService,
 			VersionService:         store.VersionService,
+			WebhookService:         store.WebhookService,
 			FileService:            store.fileService,
 		}
 		migrator := migrator.NewMigrator(migratorParams)
@@ -231,6 +234,12 @@ func (store *Store) initServices() error {
 		return err
 	}
 	store.VersionService = versionService
+
+	webhookService, err := webhooks.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.WebhookService = webhookService
 
 	return nil
 }
