@@ -118,20 +118,23 @@ angular.module('portainer.docker')
         return true;
       }
 
-      function createNetwork(networkConfiguration, userDetails, accessControlData, reload) {
+      function createNetwork(context) {
+        HttpRequestHelper.setPortainerAgentTargetHeader(context.nodeName);
+
         $scope.state.actionInProgress = true;
-        NetworkService.create(networkConfiguration)
+        NetworkService.create(context.networkConfiguration)
           .then(function success(data) {
             var networkIdentifier = data.Id;
-            var userId = userDetails.ID;
-            return ResourceControlService.applyResourceControl('network', networkIdentifier, userId, accessControlData, []);
+            var userId = context.userDetails.ID;
+            return ResourceControlService.applyResourceControl('network', networkIdentifier, userId, context.accessControlData, []);
           })
           .then(function success() {
             Notifications.success('Network successfully created');
-            if (reload)
+            if (context.reload) {
               $state.go('docker.networks', {}, {
                 reload: true
               });
+            }
           })
           .catch(function error(err) {
             Notifications.error('Failure', err, 'An error occured during network creation');
@@ -151,28 +154,34 @@ angular.module('portainer.docker')
           return;
         }
 
+        var creationContext = {
+          nodeName: $scope.formValues.NodeName,
+          networkConfiguration: networkConfiguration,
+          userDetails: userDetails,
+          accessControlData: accessControlData,
+          reload: true
+        };
+
         if ($scope.config.Driver === 'macvlan') {
           if ($scope.formValues.Macvlan.Scope === 'local') {
-            var selectedNodes = $scope.formValues.Macvlan.DatatableState.selectedItems;
-            selectedNodes.forEach(function (node, idx) {
-              var nodeName = node.Hostname;
-              HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
-
-              modifyNetworkConfigurationForMacvlanConfigOnly(networkConfiguration);
-              createNetwork(networkConfiguration, userDetails, accessControlData, idx === selectedNodes.length - 1 ? true : false);
-            });
+            modifyNetworkConfigurationForMacvlanConfigOnly(networkConfiguration);
           } else if ($scope.formValues.Macvlan.Scope === 'swarm') {
             var selectedNetworkConfig = $scope.formValues.Macvlan.SelectedNetworkConfig;
-            HttpRequestHelper.setPortainerAgentTargetHeader(selectedNetworkConfig.NodeName);
-
             modifyNetworkConfigurationForMacvlanConfigFrom(networkConfiguration, selectedNetworkConfig);
-            createNetwork(networkConfiguration, userDetails, accessControlData, true);
+            creationContext.nodeName = selectedNetworkConfig.NodeName;
           }
-        } else {
-          var nodeName = $scope.formValues.NodeName;
-          HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
+        }
 
-          createNetwork(networkConfiguration, userDetails, accessControlData, true);
+        if ($scope.config.Driver === 'macvlan' && $scope.formValues.Macvlan.Scope === 'local' &&
+          $scope.applicationState.endpoint.mode.agentProxy && $scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
+          var selectedNodes = $scope.formValues.Macvlan.DatatableState.selectedItems;
+          selectedNodes.forEach(function (node, idx) {
+            creationContext.nodeName = node.Hostname;
+            creationContext.reload = idx === selectedNodes.length - 1 ? true : false;
+            createNetwork(creationContext);
+          });
+        } else {
+          createNetwork(creationContext);
         }
       };
 
@@ -181,8 +190,9 @@ angular.module('portainer.docker')
 
         PluginService.networkPlugins(apiVersion < 1.25)
           .then(function success(data) {
-            if ($scope.applicationState.endpoint.mode.provider !== 'DOCKER_SWARM_MODE')
+            if ($scope.applicationState.endpoint.mode.provider !== 'DOCKER_SWARM_MODE') {
               data.splice(data.indexOf('macvlan'), 1);
+            }
             $scope.availableNetworkDrivers = data;
           })
           .catch(function error(err) {
