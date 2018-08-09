@@ -31,15 +31,15 @@ func NewService(db *bolt.DB) (*Service, error) {
 
 // Webhook returns an webhook by ID.
 func (service *Service) Webhook(ID portainer.WebhookID) (*portainer.Webhook, error) {
-	var webhook *portainer.Webhook
+	var webhook portainer.Webhook
 	identifier := internal.Itob(int(ID))
 
-	err := internal.GetObject(service.db, BucketName, identifier, webhook)
+	err := internal.GetObject(service.db, BucketName, identifier, &webhook)
 	if err != nil {
 		return nil, err
 	}
 
-	return webhook, nil
+	return &webhook, nil
 }
 
 // Webhook returns an webhook by the Swarm ServiceID it is associated with.
