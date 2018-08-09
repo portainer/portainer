@@ -1,8 +1,7 @@
 package webhooks
 
 //TODO
-// * Generate random string for TokenData
-// * Take the endpoint ID in as post data
+// * Generate random string for TokenData for added security
 
 import (
 	"net/http"
@@ -19,12 +18,16 @@ var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456
 // Used for generating random token
 
 type webhookCreatePayload struct {
-	ServiceID string
+	ServiceID  string
+	EndpointID int
 }
 
 func (payload *webhookCreatePayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(string(payload.ServiceID)) {
+	if govalidator.IsNull(payload.ServiceID) {
 		return portainer.Error("Missing ServiceID")
+	}
+	if govalidator.IsNull(string(payload.EndpointID)) {
+		return portainer.Error("Missing EndpointID")
 	}
 	return nil
 }
@@ -44,13 +47,12 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{http.StatusConflict, "A webhooks with the same name already exists", portainer.ErrWebhookAlreadyExists}
 	}
 
-	token := "foo1234"                      //Replace with random token
-	var endpointID portainer.EndpointID = 1 // Replace with payload data
+	token := "foo1234" //Replace with random token
 
 	webhook = &portainer.Webhook{
 		TokenData:  token,
 		ServiceID:  payload.ServiceID,
-		EndpointID: endpointID, //
+		EndpointID: portainer.EndpointID(payload.EndpointID), //
 	}
 
 	err = handler.WebhookService.CreateWebhook(webhook)
