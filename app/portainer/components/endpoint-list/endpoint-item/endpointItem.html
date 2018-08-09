@@ -58,7 +58,7 @@
 
       <div class="blocklist-item-line endpoint-item">
         <span class="small text-muted">
-          <span ng-if="$ctrl.model.Type === 1 && !$ctrl.model.Snapshots[0].Swarm">
+          <span ng-if="$ctrl.model.Type === 1">
             <span class="small text-muted">
               <i class="fa fa-microchip"></i> {{ $ctrl.model.Snapshots[0].TotalCPU }}<i class="fa fa-memory space-left"></i> {{ $ctrl.model.Snapshots[0].TotalMemory | humansize }}
             </span>
