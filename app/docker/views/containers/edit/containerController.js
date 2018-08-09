@@ -200,10 +200,10 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
       .then(createContainer)
       .then(connectContainerToOtherNetworks)
       .then(startContainerIfNeeded)
-      .then(createResourceControlIFNeeded)
+      .then(createResourceControlIfNeeded)
       .then(deleteOldContainer)
       .then(notifyAndChangeView)
-      .catch(onError);
+      .catch(notifyOnError);
 
     function stopContainerIfNeeded() {
       if (!isRunning) {
@@ -220,12 +220,12 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
       if (!pullImage) {
         return $q.when();
       }
-      return getRegistery().then(function pullImage(containerRegistery) {
+      return getRegistry().then(function pullImage(containerRegistery) {
         return ImageService.pullImage(container.Config.Image, containerRegistery, true);
       });
     }
 
-    function getRegistery() {
+    function getRegistry() {
       // get container registery
       return RegistryService.retrieveRegistryFromRepository(container.Config.Image);
     }
@@ -238,19 +238,18 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
         config.NetworkingConfig.EndpointsConfig = {};
         config.NetworkingConfig.EndpointsConfig[networksNames[0]] = networks[0];
       }
-      // create container
       return $q.all([ContainerService.createContainer(config), networks]);
-      // return ContainerService.createContainer(config);
     }
 
-    function connectContainerToOtherNetworks(data) {
-      var newContainer = data[0];
-      var networks = data[1];
+    function connectContainerToOtherNetworks(createContainerData) {
+      var newContainer = createContainerData[0];
+      var networks = createContainerData[1];
       var networksNames = Object.keys(networks);
+      var connectionPromieses = networksNames.map(function connectToNetwork(name) {
+        NetworkService.connectContainer(name, newContainer.Id);
+      });
       return $q
-        .all(networksNames.map(function connectToNetwork(name) {
-            NetworkService.connectContainer(name, newContainer.Id);
-          }))
+        .all(connectionPromieses)
         .then(function onConnectToNetworkSuccess() {
           return newContainer;
         });
@@ -275,7 +274,7 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
       );
     }
 
-    function createResourceControlIFNeeded(newContainer) {
+    function createResourceControlIfNeeded(newContainer) {
       // create resource container (if needed)
       if (!container.ResourceControl) {
         return $q.when();
@@ -292,13 +291,11 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
     }
 
     function notifyAndChangeView() {
-      // notify and go to containers view
       Notifications.success('Container successfully re-created');
       $state.go('docker.containers', {}, { reload: true });
     }
 
-    function onError(err) {
-      // notify on error
+    function notifyOnError(err) {
       Notifications.error('Failure', err, 'Unable to re-create container');
       $scope.state.recreateContainerInProgress = false;
     }
