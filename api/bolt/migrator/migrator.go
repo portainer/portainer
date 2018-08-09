@@ -10,6 +10,7 @@ import (
 	"github.com/portainer/portainer/bolt/stack"
 	"github.com/portainer/portainer/bolt/user"
 	"github.com/portainer/portainer/bolt/version"
+	"github.com/portainer/portainer/bolt/webhooks"
 )
 
 type (
@@ -24,6 +25,7 @@ type (
 		stackService           *stack.Service
 		userService            *user.Service
 		versionService         *version.Service
+		webhookService         *webhooks.Service
 		fileService            portainer.FileService
 	}
 
@@ -38,6 +40,7 @@ type (
 		StackService           *stack.Service
 		UserService            *user.Service
 		VersionService         *version.Service
+		WebhookService         *webhooks.Service
 		FileService            portainer.FileService
 	}
 )
@@ -54,6 +57,7 @@ func NewMigrator(parameters *Parameters) *Migrator {
 		stackService:           parameters.StackService,
 		userService:            parameters.UserService,
 		versionService:         parameters.VersionService,
+		webhookService:         parameters.WebhookService,
 		fileService:            parameters.FileService,
 	}
 }

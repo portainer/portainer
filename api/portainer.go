@@ -220,6 +220,17 @@ type (
 		TLSKeyPath    string `json:"TLSKey,omitempty"`
 	}
 
+	// WebhookID represents an webhook identifier.
+	WebhookID int
+
+	// Webhook represents a url webhook that can be used to update a service
+	Webhook struct {
+		ID         WebhookID  `json:"Id"`
+		TokenData  string     `json:"Token"`      //The token used to identify the service
+		ServiceID  string     `json:"ServiceId"`  //The ID for the swarm service it belongs to
+		EndpointID EndpointID `json:"EndpointId"` //The ID for the endpoint that this service belongs to
+	}
+
 	// AzureCredentials represents the credentials used to connect to an Azure
 	// environment.
 	AzureCredentials struct {
@@ -501,6 +512,13 @@ type (
 	VersionService interface {
 		DBVersion() (int, error)
 		StoreDBVersion(version int) error
+	}
+
+	// WebhookService represents a service for managing webhook data.
+	WebhookService interface {
+		Webhook(ID WebhookID) (*Webhook, error)
+		CreateWebhook(portainer *Webhook) error
+		WebhookByServiceID(name string) (*Webhook, error)
 	}
 
 	// ResourceControlService represents a service for managing resource control data.
