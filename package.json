@@ -19,6 +19,11 @@
       "url": "https://raw.githubusercontent.com/portainer/portainer/develop/LICENSE"
     }
   ],
+  "scripts": {
+    "dev": "yarn grunt run-dev",
+    "clean-all": "yarn grunt clean:all",
+    "build": "yarn grunt build"
+  },
   "engines": {
     "node": ">= 0.8.4"
   },
