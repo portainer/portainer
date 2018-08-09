@@ -6,7 +6,8 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
     Driver: 'local',
     DriverOptions: [],
     AccessControlData: new AccessControlFormData(),
-    NodeName: null
+    NodeName: null,
+    NFSData: new VolumesNFSFormData()
   };
 
   $scope.state = {
@@ -36,8 +37,19 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
     return true;
   }
 
-  $scope.create = function () {
+  function prepareNFSConfiguration(driverOptions) {
+    var data = $scope.formValues.NFSData;
 
+    driverOptions.push({ name: 'type', value: data.version.toLowerCase() });
+
+    var options = 'addr=' + data.serverAddress + ',' + data.options;
+    driverOptions.push({ name: 'o', value: options });
+
+    var mountPoint = data.mountPoint[0] === ':' ? data.mountPoint : ':' + data.mountPoint;
+    driverOptions.push({ name: 'device', value: mountPoint });
+  }
+
+  $scope.create = function () {
     var name = $scope.formValues.Name;
     var driver = $scope.formValues.Driver;
     var driverOptions = $scope.formValues.DriverOptions;
@@ -45,6 +57,10 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
 
     if (driver === 'cio:latest' && storidgeProfile) {
       driverOptions.push({ name: 'profile', value: storidgeProfile.Name });
+    }
+
+    if ($scope.formValues.NFSData.useNFS) {
+      prepareNFSConfiguration(driverOptions);
     }
 
     var volumeConfiguration = VolumeService.createVolumeConfiguration(name, driver, driverOptions);
