@@ -197,7 +197,7 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
     return stopContainerIfNeeded()
       .then(renameContainer)
       .then(pullImageIfNeeded)
-      .then(createContainer)
+      .then(setMainNetworkAndCreateContainer)
       .then(connectContainerToOtherNetworks)
       .then(startContainerIfNeeded)
       .then(createResourceControlIfNeeded)
@@ -226,12 +226,10 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
     }
 
     function getRegistry() {
-      // get container registery
       return RegistryService.retrieveRegistryFromRepository(container.Config.Image);
     }
 
-    function createContainer() {
-      // leave only one network on the container (save the others for later)
+    function setMainNetworkAndCreateContainer() {
       var networks = config.NetworkingConfig.EndpointsConfig;
       var networksNames = Object.keys(networks);
       if (networksNames.length > 1) {
@@ -245,11 +243,10 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
       var newContainer = createContainerData[0];
       var networks = createContainerData[1];
       var networksNames = Object.keys(networks);
-      var connectionPromieses = networksNames.map(function connectToNetwork(name) {
+      var connectionPromises = networksNames.map(function connectToNetwork(name) {
         NetworkService.connectContainer(name, newContainer.Id);
       });
-      return $q
-        .all(connectionPromieses)
+      return $q.all(connectionPromises)
         .then(function onConnectToNetworkSuccess() {
           return newContainer;
         });
@@ -275,7 +272,6 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
     }
 
     function createResourceControlIfNeeded(newContainer) {
-      // create resource container (if needed)
       if (!container.ResourceControl) {
         return $q.when();
       }
