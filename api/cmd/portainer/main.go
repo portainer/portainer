@@ -514,6 +514,7 @@ func main() {
 		StackService:           store.StackService,
 		TagService:             store.TagService,
 		TemplateService:        store.TemplateService,
+		WebhookService:         store.WebhookService,
 		SwarmStackManager:      swarmStackManager,
 		ComposeStackManager:    composeStackManager,
 		CryptoService:          cryptoService,
