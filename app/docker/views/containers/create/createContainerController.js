@@ -16,7 +16,8 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     CpuLimit: 0,
     MemoryLimit: 0,
     MemoryReservation: 0,
-    NodeName: null
+    NodeName: null,
+    capabilities: []
   };
 
   $scope.extraNetworks = {};
@@ -48,7 +49,9 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       NetworkMode: 'bridge',
       Privileged: false,
       ExtraHosts: [],
-      Devices:[]
+      Devices: [],
+      CapAdd: [],
+      CapDrop: []
     },
     NetworkingConfig: {
       EndpointsConfig: {}
@@ -251,6 +254,15 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     }
   }
 
+  function prepareCapabilities(config) {
+    var allowed = $scope.formValues.capabilities.filter(function(item) {return item.allowed === true;});
+    var notAllowed = $scope.formValues.capabilities.filter(function(item) {return item.allowed === false;});
+
+    var getCapName = function(item) {return item.capability;};
+    config.HostConfig.CapAdd = allowed.map(getCapName);
+    config.HostConfig.CapDrop = notAllowed.map(getCapName);
+  }
+
   function prepareConfiguration() {
     var config = angular.copy($scope.config);
     config.Cmd = ContainerHelper.commandStringToArray(config.Cmd);
@@ -263,6 +275,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     prepareLabels(config);
     prepareDevices(config);
     prepareResources(config);
+    prepareCapabilities(config);
     return config;
   }
 
@@ -478,6 +491,22 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     }
   }
 
+  function loadFromContainerCapabilities(d) {
+    if (d.HostConfig.CapAdd) {
+      d.HostConfig.CapAdd.forEach(function(cap) {
+        $scope.formValues.capabilities.push(new ContainerCapability(cap, true));
+      });
+    }
+    if (d.HostConfig.CapDrop) {
+      d.HostConfig.CapDrop.forEach(function(cap) {
+        $scope.formValues.capabilities.push(new ContainerCapability(cap, false));
+      });
+    }
+    $scope.formValues.capabilities.sort(function(a, b) {
+      return a.capability < b.capability ? -1 : 1;
+    });
+  }
+
   function loadFromContainerSpec() {
     // Get container
     Container.get({ id: $transition$.params().from }).$promise
@@ -498,6 +527,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       loadFromContainerDevices(d);
       loadFromContainerImageConfig(d);
       loadFromContainerResources(d);
+      loadFromContainerCapabilities(d);
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve container');
@@ -543,6 +573,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       } else {
         $scope.fromContainer = {};
         $scope.formValues.Registry = {};
+        $scope.formValues.capabilities = new ContainerCapabilities();
       }
     }, function(e) {
       Notifications.error('Failure', e, 'Unable to retrieve running containers');
