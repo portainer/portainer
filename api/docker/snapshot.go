@@ -30,6 +30,11 @@ func snapshot(cli *client.Client) (*portainer.Snapshot, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		err = snapshotNodes(snapshot, cli)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	err = snapshotContainers(snapshot, cli)
@@ -61,6 +66,23 @@ func snapshotInfo(snapshot *portainer.Snapshot, cli *client.Client) error {
 	snapshot.DockerVersion = info.ServerVersion
 	snapshot.TotalCPU = info.NCPU
 	snapshot.TotalMemory = info.MemTotal
+	return nil
+}
+
+func snapshotNodes(snapshot *portainer.Snapshot, cli *client.Client) error {
+	nodes, err := cli.NodeList(context.Background(), types.NodeListOptions{})
+	if err != nil {
+		return err
+	}
+	var nanoCpus int64
+	var totalMem int64
+	for _, node := range nodes {
+		resources := node.Description.Resources
+		nanoCpus += resources.NanoCPUs
+		totalMem += resources.MemoryBytes
+	}
+	snapshot.TotalCPU = int(nanoCpus / 1e9)
+	snapshot.TotalMemory = totalMem
 	return nil
 }
 
