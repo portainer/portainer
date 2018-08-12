@@ -1,7 +1,6 @@
 package webhooks
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/portainer/portainer"
@@ -14,13 +13,12 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 	webhookID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Missing service id parameter", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Invalid service id parameter", err}
 	}
 
-	fmt.Println(webhookID)
 	webhook, err := handler.WebhookService.Webhook(portainer.WebhookID(webhookID))
 	if err != nil && err != portainer.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve webhooks from the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve webhook from the database", err}
 	}
 	serviceID := webhook.ServiceID
 	endpointID := webhook.EndpointID

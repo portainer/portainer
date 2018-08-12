@@ -24,10 +24,10 @@ type webhookCreatePayload struct {
 
 func (payload *webhookCreatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.ServiceID) {
-		return portainer.Error("Missing ServiceID")
+		return portainer.Error("Invalid ServiceID")
 	}
 	if govalidator.IsNull(string(payload.EndpointID)) {
-		return portainer.Error("Missing EndpointID")
+		return portainer.Error("Invalid EndpointID")
 	}
 	return nil
 }
@@ -41,10 +41,10 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 
 	webhook, err := handler.WebhookService.WebhookByServiceID(payload.ServiceID)
 	if err != nil && err != portainer.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve webhooks from the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve webhook from the database", err}
 	}
 	if webhook != nil {
-		return &httperror.HandlerError{http.StatusConflict, "A webhooks with the same name already exists", portainer.ErrWebhookAlreadyExists}
+		return &httperror.HandlerError{http.StatusConflict, "A webhook with the same name already exists", portainer.ErrWebhookAlreadyExists}
 	}
 
 	token := "foo1234" //Replace with random token
