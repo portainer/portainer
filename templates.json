@@ -634,7 +634,7 @@
     "categories": ["filesystem", "storage"],
     "platform": "linux",
     "logo": "https://portainer.io/images/logos/filebrowser.png",
-    "image": "hacdias/filemanager:latest",
+    "image": "filebrowser/filebrowser:latest",
     "ports": [
       "80/tcp"
     ],
