@@ -77,9 +77,8 @@ func snapshotNodes(snapshot *portainer.Snapshot, cli *client.Client) error {
 	var nanoCpus int64
 	var totalMem int64
 	for _, node := range nodes {
-		resources := node.Description.Resources
-		nanoCpus += resources.NanoCPUs
-		totalMem += resources.MemoryBytes
+		nanoCpus += node.Description.Resources.NanoCPUs
+		totalMem += node.Description.Resources.MemoryBytes
 	}
 	snapshot.TotalCPU = int(nanoCpus / 1e9)
 	snapshot.TotalMemory = totalMem
