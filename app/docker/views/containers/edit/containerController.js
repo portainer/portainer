@@ -192,40 +192,109 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
     var container = $scope.container;
     var config = ContainerHelper.configFromContainer(container.Model);
     $scope.state.recreateContainerInProgress = true;
-    ContainerService.remove(container, true)
-    .then(function success() {
-      return RegistryService.retrieveRegistryFromRepository(container.Config.Image);
-    })
-    .then(function success(data) {
-      return $q.when(!pullImage || ImageService.pullImage(container.Config.Image, data, true));
-    })
-    .then(function success() {
-      return ContainerService.createAndStartContainer(config);
-    })
-    .then(function success(data) {
-      if (!container.ResourceControl) {
-        return true;
-      } else {
-        var containerIdentifier = data.Id;
-        var resourceControl = container.ResourceControl;
-        var users = resourceControl.UserAccesses.map(function(u) {
-          return u.UserId;
-        });
-        var teams = resourceControl.TeamAccesses.map(function(t) {
-          return t.TeamId;
-        });
-        return ResourceControlService.createResourceControl(resourceControl.AdministratorsOnly,
-          users, teams, containerIdentifier, 'container', []);
+    var isRunning = container.State.Running;
+
+    return stopContainerIfNeeded()
+      .then(renameContainer)
+      .then(pullImageIfNeeded)
+      .then(setMainNetworkAndCreateContainer)
+      .then(connectContainerToOtherNetworks)
+      .then(startContainerIfNeeded)
+      .then(createResourceControlIfNeeded)
+      .then(deleteOldContainer)
+      .then(notifyAndChangeView)
+      .catch(notifyOnError);
+
+    function stopContainerIfNeeded() {
+      if (!isRunning) {
+        return $q.when();
       }
-    })
-    .then(function success(data) {
+      return ContainerService.stopContainer(container.Id);
+    }
+
+    function renameContainer() {
+      return ContainerService.renameContainer(container.Id, container.Name + '-old');
+    }
+
+    function pullImageIfNeeded() {
+      if (!pullImage) {
+        return $q.when();
+      }
+      return getRegistry().then(function pullImage(containerRegistery) {
+        return ImageService.pullImage(container.Config.Image, containerRegistery, true);
+      });
+    }
+
+    function getRegistry() {
+      return RegistryService.retrieveRegistryFromRepository(container.Config.Image);
+    }
+
+    function setMainNetworkAndCreateContainer() {
+      var networks = config.NetworkingConfig.EndpointsConfig;
+      var networksNames = Object.keys(networks);
+      if (networksNames.length > 1) {
+        config.NetworkingConfig.EndpointsConfig = {};
+        config.NetworkingConfig.EndpointsConfig[networksNames[0]] = networks[0];
+      }
+      return $q.all([ContainerService.createContainer(config), networks]);
+    }
+
+    function connectContainerToOtherNetworks(createContainerData) {
+      var newContainer = createContainerData[0];
+      var networks = createContainerData[1];
+      var networksNames = Object.keys(networks);
+      var connectionPromises = networksNames.map(function connectToNetwork(name) {
+        NetworkService.connectContainer(name, newContainer.Id);
+      });
+      return $q.all(connectionPromises)
+        .then(function onConnectToNetworkSuccess() {
+          return newContainer;
+        });
+    }
+
+    function deleteOldContainer(newContainer) {
+      return ContainerService.remove(container, true).then(
+        function onRemoveSuccess() {
+          return newContainer;
+        }
+      );
+    }
+
+    function startContainerIfNeeded(newContainer) {
+      if (!isRunning) {
+        return $q.when(newContainer);
+      }
+      return ContainerService.startContainer(newContainer.Id).then(
+        function onStartSuccess() {
+          return newContainer;
+        }
+      );
+    }
+
+    function createResourceControlIfNeeded(newContainer) {
+      if (!container.ResourceControl) {
+        return $q.when();
+      }
+      var containerIdentifier = newContainer.Id;
+      var resourceControl = container.ResourceControl;
+      var users = resourceControl.UserAccesses.map(function(u) {
+        return u.UserId;
+      });
+      var teams = resourceControl.TeamAccesses.map(function(t) {
+        return t.TeamId;
+      });
+      return ResourceControlService.createResourceControl(resourceControl.AdministratorsOnly, users, teams, containerIdentifier, 'container', []);
+    }
+
+    function notifyAndChangeView() {
       Notifications.success('Container successfully re-created');
-      $state.go('docker.containers', {}, {reload: true});
-    })
-    .catch(function error(err) {
+      $state.go('docker.containers', {}, { reload: true });
+    }
+
+    function notifyOnError(err) {
       Notifications.error('Failure', err, 'Unable to re-create container');
       $scope.state.recreateContainerInProgress = false;
-    });
+    }
   }
 
   $scope.recreate = function() {
