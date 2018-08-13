@@ -55,7 +55,7 @@
     "isteven-angular-multiselect": "~4.0.0",
     "jquery": "^3.3.1",
     "js-yaml": "~3.10.0",
-    "lodash": "4.12.0",
+    "lodash": "^4.17.10",
     "moment": "^2.21.0",
     "ng-file-upload": "~12.2.13",
     "rdash-ui": "1.0.*",
