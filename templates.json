@@ -502,6 +502,38 @@
   },
   {
     "type": 1,
+    "title": "Datadog agent",
+    "description": "Collect events and metrics",
+    "categories": ["Monitoring"],
+    "platform": "linux",
+    "logo": "https://portainer.io/images/logos/datadog_agent.png",
+    "image": "datadog/agent:latest",
+    "env": [
+      {
+        "name": "DD_API_KEY",
+        "label": "Datadog API key"
+      }
+    ],
+    "volumes": [
+      {
+        "container": "/var/run/docker.sock",
+        "bind": "/var/run/docker.sock",
+        "readonly": true
+      },
+      {
+        "container": "/host/sys/fs/cgroup",
+        "bind": "/sys/fs/cgroup",
+        "readonly": true
+      },
+      {
+        "container": "/host/proc",
+        "bind": "/proc",
+        "readonly": true
+      }
+    ]
+  },
+  {
+    "type": 1,
     "title": "Mautic",
     "description": "Open-source marketing automation platform",
     "categories": ["marketing"],
@@ -822,6 +854,24 @@
       {
         "name": "SPM_TOKEN",
         "label": "SPM monitoring token"
+      }
+    ]
+  },
+  {
+    "title": "Datadog agent",
+    "type": 2,
+    "categories": ["Monitoring"],
+    "description": "Collect events and metrics",
+    "logo": "https://portainer.io/images/logos/datadog_agent.png",
+    "platform": "linux",
+    "repository": {
+      "url": "https://github.com/portainer/templates",
+      "stackfile": "stacks/datadog-agent/docker-stack.yml"
+    },
+    "env": [
+      {
+        "name": "API_KEY",
+        "label": "Datadog API key"
       }
     ]
   }
