@@ -88,11 +88,11 @@ type (
 		AllowBindMountsForRegularUsers     bool                 `json:"AllowBindMountsForRegularUsers"`
 		AllowPrivilegedModeForRegularUsers bool                 `json:"AllowPrivilegedModeForRegularUsers"`
 		SnapshotInterval                   string               `json:"SnapshotInterval"`
+		TemplatesURL                       string               `json:"TemplatesURL"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
 		DisplayExternalContributors bool
-		TemplatesURL                string
 	}
 
 	// User represents a user account.

@@ -353,9 +353,9 @@
       templates="templates"
       select-action="selectTemplate"
       delete-action="deleteTemplate"
-      show-add-action="isAdmin"
-      show-update-action="isAdmin"
-      show-delete-action="isAdmin"
+      show-add-action="state.templateManagement && isAdmin"
+      show-update-action="state.templateManagement && isAdmin"
+      show-delete-action="state.templateManagement && isAdmin"
       show-swarm-stacks="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER' && applicationState.endpoint.apiVersion >= 1.25"
     ></template-list>
   </div>

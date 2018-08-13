@@ -19,6 +19,7 @@ type settingsUpdatePayload struct {
 	AllowBindMountsForRegularUsers     *bool
 	AllowPrivilegedModeForRegularUsers *bool
 	SnapshotInterval                   *string
+	TemplatesURL                       *string
 }
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
@@ -27,6 +28,9 @@ func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 	}
 	if payload.LogoURL != nil && *payload.LogoURL != "" && !govalidator.IsURL(*payload.LogoURL) {
 		return portainer.Error("Invalid logo URL. Must correspond to a valid URL format")
+	}
+	if payload.TemplatesURL != nil && *payload.TemplatesURL != "" && !govalidator.IsURL(*payload.TemplatesURL) {
+		return portainer.Error("Invalid external templates URL. Must correspond to a valid URL format")
 	}
 	return nil
 }
@@ -50,6 +54,10 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.LogoURL != nil {
 		settings.LogoURL = *payload.LogoURL
+	}
+
+	if payload.TemplatesURL != nil {
+		settings.TemplatesURL = *payload.TemplatesURL
 	}
 
 	if payload.BlackListedLabels != nil {

@@ -45,7 +45,10 @@
               <td>Endpoint</td>
               <td>
                 {{ endpoint.Name }}
-                <span class="small text-muted space-left"><i class="fa fa-microchip"></i> {{ info.NCPU }}<i class="fa fa-memory space-left"></i> {{ info.MemTotal | humansize }}</span>
+                <span class="small text-muted space-left">
+                    <i class="fa fa-microchip"></i> {{ endpoint.Snapshots[0].TotalCPU }}
+                    <i class="fa fa-memory space-left"></i> {{ endpoint.Snapshots[0].TotalMemory | humansize }}
+                </span>
                 <span class="small text-muted"> - {{ info.Swarm && info.Swarm.NodeID !== '' ? 'Swarm' : 'Standalone' }} {{ info.ServerVersion }} <span ng-if="endpoint.Type === 2">+ <i class="fa fa-bolt" aria-hidden="true"></i>  Agent</span></span>
               </td>
             </tr>
@@ -115,8 +118,8 @@
             <i class="fa fa-server"></i>
           </div>
           <div class="pull-right">
-            <div><i class="fa fa-heartbeat space-right green-icon"></i>{{ containers | containerswithstatus:'running' }} running</div>
-            <div><i class="fa fa-heartbeat space-right red-icon"></i>{{ containers | containerswithstatus:'stopped' }} stopped</div>
+            <div><i class="fa fa-heartbeat space-right green-icon"></i>{{ containers | runningcontainers }} running</div>
+            <div><i class="fa fa-heartbeat space-right red-icon"></i>{{ containers | stoppedcontainers }} stopped</div>
           </div>
           <div class="title">{{ containers.length }}</div>
           <div class="comment">Containers</div>

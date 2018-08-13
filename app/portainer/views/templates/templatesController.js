@@ -5,7 +5,8 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
     selectedTemplate: null,
     showAdvancedOptions: false,
     formValidationError: '',
-    actionInProgress: false
+    actionInProgress: false,
+    templateManagement: true
   };
 
   $scope.formValues = {
@@ -253,6 +254,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
       $scope.availableNetworks = networks;
       var settings = data.settings;
       $scope.allowBindMounts = settings.AllowBindMountsForRegularUsers;
+      $scope.state.templateManagement = !settings.ExternalTemplates;
     })
     .catch(function error(err) {
       $scope.templates = [];
