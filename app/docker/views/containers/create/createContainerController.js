@@ -690,7 +690,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
 
       function startContainerIfNeeded(newContainer) {
         var id = newContainer.Id;
-        if (oldContainer.State !== 'running') {
+        if (!oldContainer || oldContainer.State !== 'running') {
           return $q.when(id);
         }
         return ContainerService.startContainer(id)
@@ -729,6 +729,11 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     function removeOldContainer() {
       var deferred = $q.defer();
 
+      if (!oldContainer) {
+        deferred.resolve();
+        return;
+      }
+
       ContainerService.remove(oldContainer, true)
         .then(notifyOnRemoval)
         .catch(notifyOnRemoveError);
@@ -737,7 +742,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
 
       function notifyOnRemoval() {
         Notifications.success('Container Removed', oldContainer.Id);
-        deferred.resolve(true);
+        deferred.resolve();
       }
 
       function notifyOnRemoveError(err) {
