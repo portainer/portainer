@@ -40,17 +40,17 @@ func applyResourceAccessControlFromLabel(labelsObject, resourceObject map[string
 func applyResourceAccessControl(resourceObject map[string]interface{}, resourceIdentifier string,
 	context *restrictedOperationContext) (map[string]interface{}, bool) {
 
-	authorizedAccess := context.isAdmin
-
 	resourceControl := getResourceControlByResourceID(resourceIdentifier, context.resourceControls)
-	if resourceControl != nil {
-		if context.isAdmin || resourceControl.Public || canUserAccessResource(context.userID, context.userTeamIDs, resourceControl) {
-			resourceObject = decorateObject(resourceObject, resourceControl)
-			authorizedAccess = true
-		}
+	if resourceControl == nil {
+		return resourceObject, context.isAdmin
 	}
 
-	return resourceObject, authorizedAccess
+	if context.isAdmin || resourceControl.Public || canUserAccessResource(context.userID, context.userTeamIDs, resourceControl) {
+		resourceObject = decorateObject(resourceObject, resourceControl)
+		return resourceObject, true
+	}
+
+	return resourceObject, false
 }
 
 // decorateResourceWithAccessControlFromLabel will retrieve an identifier from the labels object. If an identifier exists,
@@ -124,6 +124,10 @@ func getResourceControlByResourceID(resourceID string, resourceControls []portai
 
 // CanAccessStack checks if a user can access a stack
 func CanAccessStack(stack *portainer.Stack, resourceControl *portainer.ResourceControl, userID portainer.UserID, memberships []portainer.TeamMembership) bool {
+	if resourceControl == nil {
+		return false
+	}
+
 	userTeamIDs := make([]portainer.TeamID, 0)
 	for _, membership := range memberships {
 		userTeamIDs = append(userTeamIDs, membership.TeamID)

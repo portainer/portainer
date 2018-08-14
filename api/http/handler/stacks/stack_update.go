@@ -62,12 +62,10 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
 
-	if resourceControl != nil {
-		if !securityContext.IsAdmin && !proxy.CanAccessStack(stack, resourceControl, securityContext.UserID, securityContext.UserMemberships) {
+	if !securityContext.IsAdmin {
+		if !proxy.CanAccessStack(stack, resourceControl, securityContext.UserID, securityContext.UserMemberships) {
 			return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
 		}
-	} else if !securityContext.IsAdmin {
-		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
 	}
 
 	// TODO: this is a work-around for stacks created with Portainer version >= 1.17.1

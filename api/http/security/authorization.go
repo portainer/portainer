@@ -10,11 +10,7 @@ import (
 // * he is not one of the users in the user accesses
 // * he is not a member of any team within the team accesses
 func AuthorizedResourceControlDeletion(resourceControl *portainer.ResourceControl, context *RestrictedRequestContext) bool {
-	if context.IsAdmin {
-		return true
-	}
-
-	if resourceControl.Public {
+	if context.IsAdmin || resourceControl.Public {
 		return true
 	}
 
@@ -44,11 +40,7 @@ func AuthorizedResourceControlDeletion(resourceControl *portainer.ResourceContro
 
 // AuthorizedResourceControlAccess checks whether the user can alter an existing resource control.
 func AuthorizedResourceControlAccess(resourceControl *portainer.ResourceControl, context *RestrictedRequestContext) bool {
-	if context.IsAdmin {
-		return true
-	}
-
-	if resourceControl.Public {
+	if context.IsAdmin || resourceControl.Public {
 		return true
 	}
 
@@ -90,11 +82,7 @@ func AuthorizedResourceControlUpdate(resourceControl *portainer.ResourceControl,
 // * he wants tp add a user in the user accesses that is not corresponding to its id
 // * he wants to add a team he is not a member of
 func AuthorizedResourceControlCreation(resourceControl *portainer.ResourceControl, context *RestrictedRequestContext) bool {
-	if context.IsAdmin {
-		return true
-	}
-
-	if resourceControl.Public {
+	if context.IsAdmin || resourceControl.Public {
 		return true
 	}
 
