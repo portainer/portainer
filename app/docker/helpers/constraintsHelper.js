@@ -1,40 +1,27 @@
-var ConstraintOperator = {
-  EQ: 'eq',
-  NEQ: 'neq'
-};
-
 function ConstraintModel(op, key, value) {
   this.op = op;
   this.value = value;
   this.key = key;
 }
-// node.id        node.id==2ivku8v2gvtg4
-// node.hostname  node.hostname!=node-2
-// node.role      node.role==manager
-// MISSING
-// node.labels    node.labels.security==high
-// engine.labels  engine.labels.operatingsystem==ubuntu 14.04
+
 var patterns = {
   id: {
-    nodeId: /(node\.id)/,
-    nodeHostname: /(node\.hostname)/,
-    nodeRole: /(node\.role)/,
-    nodeLabels: /(node\.labels)/,
-    engineLabels: /(node\.labels)/
+    nodeId: 'node.id',
+    nodeHostname: 'node.hostname',
+    nodeRole: 'node.role',
+    nodeLabels: 'node.labels.',
+    engineLabels: 'engine.labels.'
   },
   op: {
-    both: /(\s?(=|!)=\s?)/,
-    eq: /(\s?==\s?)/,
-    neq: /(\s?!=\s?)/
-  },
-  labelKey: /((node|engine)\.labels\.)/,
-  value: /((node\.(id|hostname|role|(labels\..*)))|(engine\.labels\..*))\s?(=|!)=\s?/
+    eq: '==',
+    neq: '!='
+  }
 };
 
 function matchesConstraint(value, constraint) {
-  if (constraint && ((constraint.op === ConstraintOperator.EQ &&
+  if (constraint && ((constraint.op === patterns.op.eq &&
         value !== constraint.value) ||
-      (constraint.op === ConstraintOperator.NEQ &&
+      (constraint.op === patterns.op.neq &&
         value === constraint.value))) {
     return false;
   }
@@ -51,38 +38,56 @@ function matchesLabel(labels, constraint) {
   return found !== undefined;
 }
 
+function extractValue(constraint, op) {
+  return constraint.split(op).pop().trim();
+}
+
+function extractCustomLabelKey(constraint, op, baseLabelKey) {
+  return constraint.split(op).shift().trim().replace(baseLabelKey, '');
+}
+
 angular.module('portainer.docker')
   .factory('ConstraintsHelper', [function ConstraintsHelperFactory() {
     'use strict';
     return {
       transformConstraints: function (constraints) {
         var transform = {};
-        angular.forEach(constraints, function (cons) {
-          var value = cons.replace(patterns.value, '').trim();
-          var key = cons.replace(patterns.labelKey, '').replace(patterns.op.both, '').replace(value, '');
+        for (var i = 0; i < constraints.length; i++) {
+          var constraint = constraints[i];
+
           var op;
-
-          if (cons.match(patterns.op.eq)) {
-            op = ConstraintOperator.EQ;
-          } else if (cons.match(patterns.op.NEQ)) {
-            op = ConstraintOperator.NEQ;
+          if (constraint.includes(patterns.op.eq)) {
+            op = patterns.op.eq;
+          } else if (constraint.includes(patterns.op.neq)) {
+            op = patterns.op.neq;
           }
 
-          if (cons.match(patterns.id.nodeId)) {
-            transform.nodeId = new ConstraintModel(op, key, value);
-          } else if (cons.match(patterns.id.nodeHostname)) {
-            transform.nodeHostname = new ConstraintModel(op, key, value);
-          } else if (cons.match(patterns.id.nodeRole)) {
-            transform.nodeRole = new ConstraintModel(op, key, value);
-          } else if (cons.match(patterns.id.nodeLabels)) {
-            transform.nodeLabels = new ConstraintModel(op, key, value);
-          } else if (cons.match(patterns.id.engineLabels)) {
-            transform.engineLabels = new ConstraintModel(op, key, value);
+          var value = extractValue(constraint, op);
+          var key = '';
+          switch (true) {
+            case constraint.includes(patterns.id.nodeId):
+              transform.nodeId = new ConstraintModel(op, key, value);
+              break;
+            case constraint.includes(patterns.id.nodeHostname):
+              transform.nodeHostname = new ConstraintModel(op, key, value);
+              break;
+            case constraint.includes(patterns.id.nodeRole):
+              transform.nodeRole = new ConstraintModel(op, key, value);
+              break;
+            case constraint.includes(patterns.id.nodeLabels):
+              key = extractCustomLabelKey(constraint, op, patterns.id.nodeLabels);
+              transform.nodeLabels = new ConstraintModel(op, key, value);
+              break;
+            case constraint.includes(patterns.id.engineLabels):
+              key = extractCustomLabelKey(constraint, op, patterns.id.engineLabels);
+              transform.engineLabels = new ConstraintModel(op, key, value);
+              break;
+            default:
+              break;
           }
-        });
+        }
         return transform;
       },
-
       matchesServiceConstraints: function (service, node) {
         if (service.Constraints === undefined || service.Constraints.length === 0) {
           return true;
