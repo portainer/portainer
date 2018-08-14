@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ContainerConsoleController', ['$scope', '$transition$', 'ContainerService', 'ImageService', 'EndpointProvider', 'Notifications', 'ContainerHelper', 'ExecService', 'HttpRequestHelper', 'LocalStorage',
-function ($scope, $transition$, ContainerService, ImageService, EndpointProvider, Notifications, ContainerHelper, ExecService, HttpRequestHelper, LocalStorage) {
+.controller('ContainerConsoleController', ['$scope', '$transition$', 'ContainerService', 'ImageService', 'EndpointProvider', 'Notifications', 'ContainerHelper', 'ExecService', 'HttpRequestHelper', 'LocalStorage', 'CONSOLE_COMMANDS_LABEL_PREFIX',
+function ($scope, $transition$, ContainerService, ImageService, EndpointProvider, Notifications, ContainerHelper, ExecService, HttpRequestHelper, LocalStorage, CONSOLE_COMMANDS_LABEL_PREFIX) {
   var socket, term;
 
   $scope.state = {
@@ -9,6 +9,7 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
   };
 
   $scope.formValues = {};
+  $scope.containerCommands = [];
 
   // Ensure the socket is closed before leaving the view
   $scope.$on('$stateChangeStart', function (event, next, current) {
@@ -106,8 +107,16 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
     })
     .then(function success(data) {
       var image = data;
+      var containerLabels = $scope.container.Config.Labels;
       $scope.imageOS = image.Os;
       $scope.formValues.command = image.Os === 'windows' ? 'powershell' : 'bash';
+      $scope.containerCommands = Object.keys(containerLabels)
+        .filter(function(l) {
+          return l.indexOf(CONSOLE_COMMANDS_LABEL_PREFIX) === 0;
+        })
+        .map(function(l) {
+          return {title: l.replace(CONSOLE_COMMANDS_LABEL_PREFIX, ''), command: containerLabels[l]};
+        });
       $scope.state.loaded = true;
     })
     .catch(function error(err) {
