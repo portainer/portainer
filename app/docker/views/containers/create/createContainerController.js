@@ -587,7 +587,8 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
 
     $scope.state.actionInProgress = true;
     HttpRequestHelper.setPortainerAgentTargetHeader($scope.formValues.NodeName);
-    return confirmCreateContainer()
+    return findCurrentContainer()
+      .then(confirmCreateContainer)
       .then(startCreationProcess)
       .catch(notifyOnError)
       .finally(final);
@@ -596,14 +597,30 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       $scope.state.actionInProgress = false;
     }
 
-    function startCreationProcess(confirmationData) {
-      if (!confirmationData || !confirmationData.confirmed) {
+    function findCurrentContainer() {
+      return Container.query({ all: 1, filters: { name: ['^/' + $scope.config.name + '$'] } })
+        .$promise
+        .then(function onQuerySuccess(containers) {
+          if (!containers.length) {
+            return;
+          }
+          oldContainer = containers[0];
+          return oldContainer;
+        })
+        .catch(notifyOnError);
+
+      function notifyOnError(err) {
+        Notifications.error('Failure', err, 'Unable to retrieve containers');
+      }
+    }
+
+    function startCreationProcess(confirmed) {
+      if (!confirmed) {
         return $q.when();
       }
       if (!validateAccessControl()) {
         return $q.when();
       }
-      oldContainer = confirmationData.container;
 
       return stopAndRenameContainer(oldContainer)
         .then(pullImageIfNeeded)
@@ -614,17 +631,16 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
         .then(onSuccess);
     }
 
-    function confirmCreateContainer() {
-      return findCurrentContainer()
-        .then(showConfirmationModal)
-        .catch(notifyOnError);
+    function confirmCreateContainer(container) {
+      if (!container) {
+        return $q.when(true);
+      }
 
-      function showConfirmationModal(containers) {
+      return showConfirmationModal();
+
+      function showConfirmationModal() {
         var deferred = $q.defer();
-        var existingContainer = containers[0];
-        if (!existingContainer) {
-          deferred.resolve({ confirmed: true, container: null });
-        }
+
         ModalService.confirm({
           title: 'Are you sure ?',
           message: 'A container with the same name already exists. Portainer can automatically remove it and re-create one. Do you want to replace it?',
@@ -635,19 +651,11 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
             }
           },
           callback: function onConfirm(confirmed) {
-            deferred.resolve({ confirmed: confirmed, container: existingContainer });
+            deferred.resolve(confirmed);
           }
         });
+
         return deferred.promise;
-
-      }
-
-      function findCurrentContainer() {
-        return Container.query({ all: 1, filters: { name: ['^/' + $scope.config.name + '$'] } }).$promise;
-      }
-
-      function notifyOnError(err) {
-        Notifications.error('Failure', err, 'Unable to retrieve containers');
       }
     }
 
@@ -671,7 +679,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     }
 
     function pullImageIfNeeded() {
-      return $q.when($scope.formValues.alwaysPull && 
+      return $q.when($scope.formValues.alwaysPull &&
         ImageService.pullImage($scope.config.Image, $scope.formValues.Registry, true));
     }
 
@@ -696,12 +704,12 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       var containerIdentifier = newContainerId;
       var userId = Authentication.getUserDetails().ID;
 
-      return ResourceControlService.applyResourceControl(
+      return $q.when(ResourceControlService.applyResourceControl(
         'container',
         containerIdentifier,
         userId,
         $scope.formValues.AccessControlData, []
-      ).then(function onApplyResourceControlSuccess() {
+      )).then(function onApplyResourceControlSuccess() {
         return newContainerId;
       });
     }
@@ -719,7 +727,6 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     }
 
     function removeOldContainer() {
-      console.log('remove old container');
       var deferred = $q.defer();
 
       ContainerService.remove(oldContainer, true)
