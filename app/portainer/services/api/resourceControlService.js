@@ -37,9 +37,6 @@ angular.module('portainer.app')
     var authorizedTeamIds = [];
     var publicOnly = false;
     switch (accessControlData.Ownership) {
-      case 'administrators':
-        //No resource control for administrators
-        return;
       case 'public':
         publicOnly = true;
         break;
@@ -54,7 +51,9 @@ angular.module('portainer.app')
           authorizedTeamIds.push(team.Id);
         });
         break;
-    }
+      default:
+        return;  
+      }
     return service.createResourceControl(publicOnly, authorizedUserIds,
       authorizedTeamIds, resourceIdentifier, resourceControlType, subResources);
   };
