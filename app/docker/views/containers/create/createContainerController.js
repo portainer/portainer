@@ -2,6 +2,8 @@ angular.module('portainer.docker')
 .controller('CreateContainerController', ['$q', '$scope', '$state', '$timeout', '$transition$', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'NetworkService', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'FormValidator', 'ModalService', 'RegistryService', 'SystemService', 'SettingsService', 'HttpRequestHelper',
 function ($q, $scope, $state, $timeout, $transition$, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, NetworkService, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, FormValidator, ModalService, RegistryService, SystemService, SettingsService, HttpRequestHelper) {
 
+  $scope.create = create;
+
   $scope.formValues = {
     alwaysPull: true,
     Console: 'none',
@@ -279,47 +281,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     return config;
   }
 
-  function confirmCreateContainer() {
-    var deferred = $q.defer();
-    Container.query({ all: 1, filters: {name: ['^/' + $scope.config.name + '$'] }}).$promise
-    .then(function success(data) {
-      var existingContainer = data[0];
-      if (existingContainer) {
-        ModalService.confirm({
-          title: 'Are you sure ?',
-          message: 'A container with the same name already exists. Portainer can automatically remove it and re-create one. Do you want to replace it?',
-          buttons: {
-            confirm: {
-              label: 'Replace',
-              className: 'btn-danger'
-            }
-          },
-          callback: function onConfirm(confirmed) {
-            if(!confirmed) { deferred.resolve(false); }
-            else {
-              // Remove old container
-              ContainerService.remove(existingContainer, true)
-              .then(function success(data) {
-                Notifications.success('Container Removed', existingContainer.Id);
-                deferred.resolve(true);
-              })
-              .catch(function error(err) {
-                deferred.reject({ msg: 'Unable to remove container', err: err });
-              });
-            }
-          }
-        });
-      } else {
-        deferred.resolve(true);
-      }
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to retrieve containers');
-      return undefined;
-    });
-    return deferred.promise;
-  }
-
+  
   function loadFromContainerCmd(d) {
     if ($scope.config.Cmd) {
       $scope.config.Cmd = ContainerHelper.commandArrayToString($scope.config.Cmd);
@@ -619,62 +581,179 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     return true;
   }
 
-  $scope.create = function () {
-    confirmCreateContainer()
-    .then(function success(confirm) {
-      if (!confirm) {
-        return false;
+
+  function create() {
+    var oldContainer = null;
+
+    $scope.state.actionInProgress = true;
+    HttpRequestHelper.setPortainerAgentTargetHeader($scope.formValues.NodeName);
+    return confirmCreateContainer()
+      .then(startCreationProcess)
+      .catch(notifyOnError)
+      .finally(final);
+
+    function final() {
+      $scope.state.actionInProgress = false;
+    }
+
+    function startCreationProcess(confirmationData) {
+      if (!confirmationData || !confirmationData.confirmed) {
+        return $q.when();
+      }
+      if (!validateAccessControl()) {
+        return $q.when();
+      }
+      oldContainer = confirmationData.container;
+
+      return stopAndRenameContainer(oldContainer)
+        .then(pullImageIfNeeded)
+        .then(createNewContainer)
+        .then(applyResourceControl)
+        .then(connectToExtraNetworks)
+        .then(removeOldContainer)
+        .then(onSuccess);
+    }
+
+    function confirmCreateContainer() {
+      return findCurrentContainer()
+        .then(showConfirmationModal)
+        .catch(notifyOnError);
+
+      function showConfirmationModal(containers) {
+        var deferred = $q.defer();
+        var existingContainer = containers[0];
+        if (!existingContainer) {
+          deferred.resolve({ confirmed: true, container: null });
+        }
+        ModalService.confirm({
+          title: 'Are you sure ?',
+          message: 'A container with the same name already exists. Portainer can automatically remove it and re-create one. Do you want to replace it?',
+          buttons: {
+            confirm: {
+              label: 'Replace',
+              className: 'btn-danger'
+            }
+          },
+          callback: function onConfirm(confirmed) {
+            deferred.resolve({ confirmed: confirmed, container: existingContainer });
+          }
+        });
+        return deferred.promise;
+
       }
 
+      function findCurrentContainer() {
+        return Container.query({ all: 1, filters: { name: ['^/' + $scope.config.name + '$'] } }).$promise;
+      }
+
+      function notifyOnError(err) {
+        Notifications.error('Failure', err, 'Unable to retrieve containers');
+      }
+    }
+
+    function stopAndRenameContainer(oldContainer) {
+      if (!oldContainer) {
+        return $q.when();
+      }
+      return stopContainerIfNeeded(oldContainer)
+        .then(renameContainer);
+    }
+
+    function stopContainerIfNeeded(oldContainer) {
+      if (oldContainer.State !== 'running') {
+        return $q.when();
+      }
+      return ContainerService.stopContainer(oldContainer.Id);
+    }
+
+    function renameContainer() {
+      return ContainerService.renameContainer(oldContainer.Id, oldContainer.Names[0].substring(1) + '-old');
+    }
+
+    function pullImageIfNeeded() {
+      return $q.when($scope.formValues.alwaysPull && 
+        ImageService.pullImage($scope.config.Image, $scope.formValues.Registry, true));
+    }
+
+    function createNewContainer() {
+      var config = prepareConfiguration();
+      return ContainerService.createContainer(config)
+        .then(startContainerIfNeeded);
+
+      function startContainerIfNeeded(newContainer) {
+        var id = newContainer.Id;
+        if (oldContainer.State !== 'running') {
+          return $q.when(id);
+        }
+        return ContainerService.startContainer(id)
+          .then(function onStartSuccess() {
+            return id;
+          });
+      }
+    }
+
+    function applyResourceControl(newContainerId) {
+      var containerIdentifier = newContainerId;
+      var userId = Authentication.getUserDetails().ID;
+
+      return ResourceControlService.applyResourceControl(
+        'container',
+        containerIdentifier,
+        userId,
+        $scope.formValues.AccessControlData, []
+      ).then(function onApplyResourceControlSuccess() {
+        return newContainerId;
+      });
+    }
+
+    function connectToExtraNetworks(newContainerId) {
+      if (!$scope.extraNetworks) {
+        return $q.when();
+      }
+
+      var connectionPromises = Object.keys($scope.extraNetworks).map(function (networkName) {
+        return NetworkService.connectContainer(networkName, newContainerId);
+      });
+
+      return $q.all(connectionPromises);
+    }
+
+    function removeOldContainer() {
+      console.log('remove old container');
+      var deferred = $q.defer();
+
+      ContainerService.remove(oldContainer, true)
+        .then(notifyOnRemoval)
+        .catch(notifyOnRemoveError);
+
+      return deferred.promise;
+
+      function notifyOnRemoval() {
+        Notifications.success('Container Removed', oldContainer.Id);
+        deferred.resolve(true);
+      }
+
+      function notifyOnRemoveError(err) {
+        deferred.reject({ msg: 'Unable to remove container', err: err });
+      }
+    }
+
+    function notifyOnError(err) {
+      Notifications.error('Failure', err, 'Unable to create container');
+    }
+
+    function validateAccessControl() {
       var accessControlData = $scope.formValues.AccessControlData;
       var userDetails = Authentication.getUserDetails();
       var isAdmin = userDetails.role === 1;
 
-      if (!validateForm(accessControlData, isAdmin)) {
-        return;
-      }
+      return validateForm(accessControlData, isAdmin);
+    }
 
-      $scope.state.actionInProgress = true;
-      var config = prepareConfiguration();
-      var nodeName = $scope.formValues.NodeName;
-      HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
-      createContainer(config, accessControlData);
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to create container');
-    });
-  };
-
-  function createContainer(config, accessControlData) {
-    var containerIdentifier;
-    $q.when(!$scope.formValues.alwaysPull || ImageService.pullImage($scope.config.Image, $scope.formValues.Registry, true))
-    .finally(function final() {
-      ContainerService.createAndStartContainer(config)
-      .then(function success(data) {
-        containerIdentifier = data.Id;
-        var userId = Authentication.getUserDetails().ID;
-        return ResourceControlService.applyResourceControl('container', containerIdentifier, userId, accessControlData, []);
-      })
-      .then(function success() {
-        if($scope.extraNetworks) {
-          return $q.all(
-            Object.keys($scope.extraNetworks).map(function(networkName) {
-              return NetworkService.connectContainer(networkName, containerIdentifier);
-            })
-          );
-        }
-      })
-      .then(function success() {
-        Notifications.success('Container successfully created');
-        $state.go('docker.containers', {}, {reload: true});
-      })
-      .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to create container');
-      })
-      .finally(function final() {
-        $scope.state.actionInProgress = false;
-      });
-    });
+    function onSuccess() {
+      Notifications.success('Container successfully created');
+      $state.go('docker.containers', {}, { reload: true });
+    }
   }
 
   initView();
