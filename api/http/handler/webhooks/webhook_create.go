@@ -52,7 +52,7 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 	webhook = &portainer.Webhook{
 		TokenData:  token,
 		ServiceID:  payload.ServiceID,
-		EndpointID: portainer.EndpointID(payload.EndpointID), //
+		EndpointID: portainer.EndpointID(payload.EndpointID),
 	}
 
 	err = handler.WebhookService.CreateWebhook(webhook)

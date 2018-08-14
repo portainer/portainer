@@ -42,7 +42,7 @@ func (service *Service) Webhook(ID portainer.WebhookID) (*portainer.Webhook, err
 	return &webhook, nil
 }
 
-// Webhook returns a webhook by the Swarm ServiceID it is associated with.
+// WebhookByServiceID returns a webhook by the Swarm ServiceID it is associated with.
 func (service *Service) WebhookByServiceID(ID string) (*portainer.Webhook, error) {
 	var webhook *portainer.Webhook
 
@@ -73,10 +73,40 @@ func (service *Service) WebhookByServiceID(ID string) (*portainer.Webhook, error
 	return webhook, err
 }
 
+// WebhookByToken returns a webhook by the random token it is associated with.
+func (service *Service) WebhookByToken(token string) (*portainer.Webhook, error) {
+	var webhook *portainer.Webhook
+
+	err := service.db.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(BucketName))
+		cursor := bucket.Cursor()
+
+		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
+			var w portainer.Webhook
+			err := internal.UnmarshalObject(v, &w)
+			if err != nil {
+				return err
+			}
+
+			if w.TokenData == token {
+				webhook = &w
+				break
+			}
+		}
+
+		if webhook == nil {
+			return portainer.ErrObjectNotFound
+		}
+
+		return nil
+	})
+
+	return webhook, err
+}
+
 // DeleteWebhook deletes a webhook.
-func (service *Service) DeleteWebhook(ID portainer.WebhookID) error {
-	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.db, BucketName, identifier)
+func (service *Service) DeleteWebhook(ID string) error {
+	return nil
 }
 
 // CreateWebhook assign an ID to a new webhook and saves it.
@@ -94,9 +124,4 @@ func (service *Service) CreateWebhook(webhook *portainer.Webhook) error {
 
 		return bucket.Put(internal.Itob(int(webhook.ID)), data)
 	})
-}
-
-// GetNextIdentifier returns the next identifier for a webhook.
-func (service *Service) GetNextIdentifier() int {
-	return internal.GetNextIdentifier(service.db, BucketName)
 }

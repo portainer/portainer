@@ -518,7 +518,9 @@ type (
 	WebhookService interface {
 		Webhook(ID WebhookID) (*Webhook, error)
 		CreateWebhook(portainer *Webhook) error
-		WebhookByServiceID(name string) (*Webhook, error)
+		WebhookByServiceID(serviceID string) (*Webhook, error)
+		WebhookByToken(token string) (*Webhook, error)
+		DeleteWebhook(serviceID string) error
 	}
 
 	// ResourceControlService represents a service for managing resource control data.

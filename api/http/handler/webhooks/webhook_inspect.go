@@ -10,7 +10,7 @@ import (
 )
 
 func (handler *Handler) webhookInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	serviceID, err := request.RetrieveRouteVariableValue(r, "id")
+	serviceID, err := request.RetrieveRouteVariableValue(r, "serviceID")
 
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Missing service id parameter", err}

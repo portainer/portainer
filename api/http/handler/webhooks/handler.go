@@ -33,9 +33,9 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	//Setting all handlers to public access for quick testing
 	h.Handle("/webhooks",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.webhookCreate))).Methods(http.MethodPost)
-	h.Handle("/webhook/{id}",
+	h.Handle("/webhook/{serviceID}",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.webhookInspect))).Methods(http.MethodGet)
-	h.Handle("/webhook/{id}",
+	h.Handle("/webhook/{token}",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.webhookExecute))).Methods(http.MethodPost)
 
 	return h

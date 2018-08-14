@@ -3,7 +3,6 @@ package proxy
 import (
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"path"
 	"regexp"
@@ -57,7 +56,6 @@ func (p *proxyTransport) RoundTrip(request *http.Request) (*http.Response, error
 }
 
 func (p *proxyTransport) executeDockerRequest(request *http.Request) (*http.Response, error) {
-	fmt.Println("Executing a docker request")
 	return p.dockerTransport.RoundTrip(request)
 }
 
