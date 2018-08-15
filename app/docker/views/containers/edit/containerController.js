@@ -312,7 +312,7 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
 
   function updateRestartPolicy(restartPolicy, maximumRetryCount) {
     // maximum retry count can be send only with `on-failue` policy
-    maximumRetryCount = restartPolicy === 'on-failue' ? maximumRetryCounts : undefined;
+    maximumRetryCount = restartPolicy === 'on-failure' ? maximumRetryCount : undefined;
     
     return ContainerService
       .updateRestartPolicy($scope.container.Id, restartPolicy, maximumRetryCount)
