@@ -1,0 +1,45 @@
+<div>
+  <table class="table table-bordered table-condensed" ng-if="!$ctrl.editMode">
+    <tr>
+      <td class="col-md-3">
+        <a href="" data-toggle="tooltip" title="Edit restart policy" ng-click="$ctrl.toggleEdit()">
+          <i class="fa fa-edit"></i>
+        </a>
+        <span>Name</span>
+      </td>
+      <td>{{$ctrl.name }}</td>
+    </tr>
+    <tr ng-if="$ctrl.name === 'on-failure'">
+      <td class="col-md-3">Maximum Retry Count</td>
+      <td>
+        {{ $ctrl.maximumRetryCount }}
+      </td>
+
+    </tr>
+  </table>
+  <table class="table table-bordered table-condensed" ng-if="$ctrl.editMode">
+    <tr>
+      <td class="col-md-3">
+        <span>Name</span>
+      </td>
+      <td>
+        <select ng-model="$ctrl.editModel.name">
+          <option value="no">None</option>
+          <option value="on-failure">On Failure</option>
+          <option value="always">Always</option>
+          <option value="unless-stopped">Unless Stopped</option>
+        </select>
+      </td>
+      <td class="col-md-2">
+        <button class="button" ng-click="$ctrl.save()">Save</button>
+      </td>
+    </tr>
+    <tr ng-if="$ctrl.editModel.name === 'on-failure'">
+      <td class="col-md-3">Maximum Retry Count</td>
+      <td>
+        <input type="number" ng-model="$ctrl.editModel.maximumRetryCount" />
+      </td>
+      <td class="col-md-2"></td>
+    </tr>
+  </table>
+</div>
