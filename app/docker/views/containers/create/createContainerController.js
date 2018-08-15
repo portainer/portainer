@@ -685,19 +685,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
 
     function createNewContainer() {
       var config = prepareConfiguration();
-      return ContainerService.createContainer(config)
-        .then(startContainerIfNeeded);
-
-      function startContainerIfNeeded(newContainer) {
-        var id = newContainer.Id;
-        if (!oldContainer || oldContainer.State !== 'running') {
-          return $q.when(id);
-        }
-        return ContainerService.startContainer(id)
-          .then(function onStartSuccess() {
-            return id;
-          });
-      }
+      return ContainerService.createAndStartContainer(config);
     }
 
     function applyResourceControl(newContainerId) {
