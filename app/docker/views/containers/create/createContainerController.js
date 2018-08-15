@@ -557,7 +557,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       var networks = data;
       networks.push({ Name: 'container' });
       $scope.availableNetworks = networks;
-      
+
       if (_.find(networks, {'Name': 'nat'})) {
         $scope.config.HostConfig.NetworkMode = 'nat';
       }
