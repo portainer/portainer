@@ -8,7 +8,7 @@ import (
 	"github.com/portainer/portainer/http/response"
 )
 
-// DELETE request on /api/webhook/:id
+// DELETE request on /api/webhook/:serviceID
 func (handler *Handler) webhookDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	serviceID, err := request.RetrieveRouteVariableValue(r, "serviceID")
 	if err != nil {

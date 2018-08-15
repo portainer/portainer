@@ -11,6 +11,7 @@ import (
 	"github.com/portainer/portainer/http/request"
 )
 
+// Acts on a passed in token UUID to restart the docker service
 func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 
 	webhookToken, err := request.RetrieveRouteVariableValue(r, "token")
