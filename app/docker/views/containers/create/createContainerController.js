@@ -48,6 +48,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       Binds: [],
       NetworkMode: 'bridge',
       Privileged: false,
+      Runtime: '',
       ExtraHosts: [],
       Devices: [],
       CapAdd: [],
@@ -556,13 +557,28 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       var networks = data;
       networks.push({ Name: 'container' });
       $scope.availableNetworks = networks;
-
+      
       if (_.find(networks, {'Name': 'nat'})) {
         $scope.config.HostConfig.NetworkMode = 'nat';
       }
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve networks');
+    });
+
+    SystemService.info()
+    .then(function success(data) {
+      var runtimes = data.Runtimes;
+      $scope.availableRuntimes = runtimes;
+      if ('runc' in runtimes) {
+        $scope.config.HostConfig.Runtime = 'runc';
+      }
+      else if (Object.keys(runtimes).length !== 0) {
+        $scope.config.HostConfig.Runtime = Object.keys(runtimes)[0];
+      }
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve runtimes');
     });
 
     Container.query({}, function (d) {
