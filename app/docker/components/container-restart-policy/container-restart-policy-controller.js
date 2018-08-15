@@ -27,8 +27,7 @@ angular
           ctrl.state.editMode = false;
           return;
         }
-        ctrl
-          .updateRestartPolicy(ctrl.state.editModel)
+        ctrl.updateRestartPolicy(ctrl.state.editModel)
           .then(function onUpdateSucceed() {
             ctrl.state.editMode = false;
           });
