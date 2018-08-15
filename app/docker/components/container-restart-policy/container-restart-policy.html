@@ -23,7 +23,7 @@
         <span>Name</span>
       </td>
       <td>
-        <select ng-model="$ctrl.editModel.name">
+        <select class="form-control" ng-model="$ctrl.editModel.name">
           <option value="no">None</option>
           <option value="on-failure">On Failure</option>
           <option value="always">Always</option>
@@ -31,13 +31,13 @@
         </select>
       </td>
       <td class="col-md-2">
-        <button class="button" ng-click="$ctrl.save()">Save</button>
+        <button class="btn btn-success" ng-click="$ctrl.save()">Save</button>
       </td>
     </tr>
     <tr ng-if="$ctrl.editModel.name === 'on-failure'">
       <td class="col-md-3">Maximum Retry Count</td>
       <td>
-        <input type="number" ng-model="$ctrl.editModel.maximumRetryCount" />
+        <input type="number" class="form-control" ng-model="$ctrl.editModel.maximumRetryCount" />
       </td>
       <td class="col-md-2"></td>
     </tr>
