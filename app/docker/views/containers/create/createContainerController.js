@@ -619,7 +619,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
         return $q.when();
       }
       if (!validateAccessControl()) {
-        return $q.reject({ msg: 'Not authorized' });
+        return $q.when();
       }
 
       return stopAndRenameContainer(oldContainer)
