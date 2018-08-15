@@ -6,7 +6,6 @@ import (
 	"github.com/gorilla/mux"
 	portainer "github.com/portainer/portainer"
 	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/proxy"
 	"github.com/portainer/portainer/http/security"
 )
 
@@ -14,7 +13,6 @@ import (
 type Handler struct {
 	*mux.Router
 	WebhookService  portainer.WebhookService
-	ProxyManager    *proxy.Manager
 	EndpointService portainer.EndpointService
 	requestBouncer  *security.RequestBouncer
 }
@@ -33,10 +31,14 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	//Setting all handlers to public access for quick testing
 	h.Handle("/webhooks",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.webhookCreate))).Methods(http.MethodPost)
+	h.Handle("/webhooks",
+		bouncer.PublicAccess(httperror.LoggerHandler(h.webhookList))).Methods(http.MethodGet)
 	h.Handle("/webhook/{serviceID}",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.webhookInspect))).Methods(http.MethodGet)
 	h.Handle("/webhook/{token}",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.webhookExecute))).Methods(http.MethodPost)
+	h.Handle("/webhook/{serviceID}",
+		bouncer.PublicAccess(httperror.LoggerHandler(h.webhookDelete))).Methods(http.MethodDelete)
 
 	return h
 }

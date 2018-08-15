@@ -1,8 +1,5 @@
 package webhooks
 
-//TODO
-// * Generate random string for TokenData for added security
-
 import (
 	"net/http"
 
@@ -11,6 +8,7 @@ import (
 	httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/request"
 	"github.com/portainer/portainer/http/response"
+	"github.com/satori/go.uuid"
 )
 
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
@@ -47,10 +45,13 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{http.StatusConflict, "A webhook with the same name already exists", portainer.ErrWebhookAlreadyExists}
 	}
 
-	token := "foo1234" //Replace with random token
+	token, err := uuid.NewV4()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusConflict, "Error creating unique token", err}
+	}
 
 	webhook = &portainer.Webhook{
-		TokenData:  token,
+		TokenData:  token.String(),
 		ServiceID:  payload.ServiceID,
 		EndpointID: portainer.EndpointID(payload.EndpointID),
 	}
@@ -62,5 +63,3 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 
 	return response.JSON(w, webhook)
 }
-
-// func randSeq(n int)

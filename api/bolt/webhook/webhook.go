@@ -29,6 +29,29 @@ func NewService(db *bolt.DB) (*Service, error) {
 	}, nil
 }
 
+//Webhooks returns an array of all webhooks
+func (service *Service) Webhooks() ([]portainer.Webhook, error) {
+	var webhooks = make([]portainer.Webhook, 0)
+
+	err := service.db.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(BucketName))
+
+		cursor := bucket.Cursor()
+		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
+			var webhook portainer.Webhook
+			err := internal.UnmarshalObject(v, &webhook)
+			if err != nil {
+				return err
+			}
+			webhooks = append(webhooks, webhook)
+		}
+
+		return nil
+	})
+
+	return webhooks, err
+}
+
 // Webhook returns a webhook by ID.
 func (service *Service) Webhook(ID portainer.WebhookID) (*portainer.Webhook, error) {
 	var webhook portainer.Webhook
@@ -105,8 +128,9 @@ func (service *Service) WebhookByToken(token string) (*portainer.Webhook, error)
 }
 
 // DeleteWebhook deletes a webhook.
-func (service *Service) DeleteWebhook(ID string) error {
-	return nil
+func (service *Service) DeleteWebhook(ID portainer.WebhookID) error {
+	identifier := internal.Itob(int(ID))
+	return internal.DeleteObject(service.db, BucketName, identifier)
 }
 
 // CreateWebhook assign an ID to a new webhook and saves it.

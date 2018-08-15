@@ -173,7 +173,6 @@ func (server *Server) Start() error {
 	var webhookHandler = webhooks.NewHandler(requestBouncer)
 	webhookHandler.WebhookService = server.WebhookService
 	webhookHandler.EndpointService = server.EndpointService
-	webhookHandler.ProxyManager = proxyManager
 
 	server.Handler = &handler.Handler{
 		AuthHandler:            authHandler,
