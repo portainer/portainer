@@ -1,43 +1,37 @@
 angular
   .module('portainer.docker')
   .controller('ContainerRestartPolicyController', [
-    ContainerRestartPolicyController
-  ]);
+    function ContainerRestartPolicyController() {
+      var ctrl = this;
 
-function ContainerRestartPolicyController() {
-  var vm = this;
-  /*
-  from bindings:
-  containerId - container id
-  name - restart policy name
-  maximumRetryCount
-  updateRestartPolicy: function to update the policy
-  */
-  vm.editMode = false;
-  vm.editModel = {};
+      this.state = {
+        editMode :false,
+        editModel :{}
+      };
+      
 
-  // methods
-  vm.toggleEdit = toggleEdit;
-  vm.save = save;
+      ctrl.toggleEdit = toggleEdit;
+      ctrl.save = save;
 
-  function toggleEdit() {
-    vm.editMode = true;
-    vm.editModel = {
-      name: vm.name,
-      maximumRetryCount: vm.maximumRetryCount
-    };
-  }
+      function toggleEdit() {
+        ctrl.state.editMode = true;
+        ctrl.state.editModel = {
+          name: ctrl.name,
+          maximumRetryCount: ctrl.maximumRetryCount
+        };
+      }
 
-  function save() {
-    if (
-      vm.editModel.name === vm.name &&
-      vm.editModel.maximumRetryCount === vm.maximumRetryCount
-    ) {
-      vm.editMode = false;
-      return;
+      function save() {
+        if (ctrl.state.editModel.name === ctrl.name &&
+            ctrl.state.editModel.maximumRetryCount === ctrl.maximumRetryCount) {
+          ctrl.state.editMode = false;
+          return;
+        }
+        ctrl
+          .updateRestartPolicy(ctrl.state.editModel)
+          .then(function onUpdateSucceed() {
+            ctrl.state.editMode = false;
+          });
+      }
     }
-    vm.updateRestartPolicy(vm.editModel).then(function onUpdateSucceed() {
-      vm.editMode = false;
-    });
-  }
-}
+  ]);
