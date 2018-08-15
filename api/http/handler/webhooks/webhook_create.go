@@ -11,10 +11,6 @@ import (
 	"github.com/satori/go.uuid"
 )
 
-var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
-
-// Used for generating random token
-
 type webhookCreatePayload struct {
 	ServiceID  string
 	EndpointID int

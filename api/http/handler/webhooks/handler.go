@@ -23,22 +23,15 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		Router:         mux.NewRouter(),
 		requestBouncer: bouncer,
 	}
-	// h.Handle("/webhooks",
-	// 	bouncer.RestrictedAccess(httperror.LoggerHandler(h.webhookCreate))).Methods(http.MethodPost)
-	// h.Handle("/webhook/{id}",
-	// 	bouncer.RestrictedAccess(httperror.LoggerHandler(h.webhookInspect))).Methods(http.MethodGet)
-
-	//Setting all handlers to public access for quick testing
 	h.Handle("/webhooks",
-		bouncer.PublicAccess(httperror.LoggerHandler(h.webhookCreate))).Methods(http.MethodPost)
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.webhookCreate))).Methods(http.MethodPost)
+	h.Handle("/webhook/{id}",
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.webhookInspect))).Methods(http.MethodGet)
 	h.Handle("/webhooks",
-		bouncer.PublicAccess(httperror.LoggerHandler(h.webhookList))).Methods(http.MethodGet)
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.webhookList))).Methods(http.MethodGet)
 	h.Handle("/webhook/{serviceID}",
-		bouncer.PublicAccess(httperror.LoggerHandler(h.webhookInspect))).Methods(http.MethodGet)
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.webhookDelete))).Methods(http.MethodDelete)
 	h.Handle("/webhook/{token}",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.webhookExecute))).Methods(http.MethodPost)
-	h.Handle("/webhook/{serviceID}",
-		bouncer.PublicAccess(httperror.LoggerHandler(h.webhookDelete))).Methods(http.MethodDelete)
-
 	return h
 }
