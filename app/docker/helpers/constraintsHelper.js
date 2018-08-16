@@ -19,20 +19,19 @@ var patterns = {
 };
 
 function matchesConstraint(value, constraint) {
-  if (constraint && ((constraint.op === patterns.op.eq &&
-        value !== constraint.value) ||
-      (constraint.op === patterns.op.neq &&
-        value === constraint.value))) {
-    return false;
+  if (!constraint ||
+    (constraint.op === patterns.op.eq && value === constraint.value) ||
+    (constraint.op === patterns.op.neq && value !== constraint.value)) {
+    return true;
   }
-  return true;
+  return false;
 }
 
 function matchesLabel(labels, constraint) {
   if (!constraint) {
     return true;
   }
-  var found = labels.find(function (label) {
+  var found = _.find(labels, function (label) {
     return label.key === constraint.key && label.value === constraint.value;
   });
   return found !== undefined;
