@@ -585,7 +585,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
   function create() {
     var oldContainer = null;
 
-    $scope.state.actionInProgress = true;
+    
     HttpRequestHelper.setPortainerAgentTargetHeader($scope.formValues.NodeName);
     return findCurrentContainer()
       .then(confirmCreateContainer)
@@ -621,7 +621,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       if (!validateAccessControl()) {
         return $q.when();
       }
-
+      $scope.state.actionInProgress = true;
       return stopAndRenameContainer(oldContainer)
         .then(pullImageIfNeeded)
         .then(createNewContainer)
