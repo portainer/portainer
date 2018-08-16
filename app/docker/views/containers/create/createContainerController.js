@@ -688,8 +688,8 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       return ContainerService.createAndStartContainer(config);
     }
 
-    function applyResourceControl(newContainerId) {
-      var containerIdentifier = newContainerId;
+    function applyResourceControl(newContainer) {
+      var containerIdentifier = newContainer.Id;
       var userId = Authentication.getUserDetails().ID;
 
       return $q.when(ResourceControlService.applyResourceControl(
@@ -698,7 +698,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
         userId,
         $scope.formValues.AccessControlData, []
       )).then(function onApplyResourceControlSuccess() {
-        return newContainerId;
+        return containerIdentifier;
       });
     }
 
