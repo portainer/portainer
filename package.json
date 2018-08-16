@@ -19,6 +19,11 @@
       "url": "https://raw.githubusercontent.com/portainer/portainer/develop/LICENSE"
     }
   ],
+  "scripts": {
+    "dev": "yarn grunt run-dev",
+    "clean-all": "yarn grunt clean:all",
+    "build": "yarn grunt build"
+  },
   "engines": {
     "node": ">= 0.8.4"
   },
@@ -50,7 +55,7 @@
     "isteven-angular-multiselect": "~4.0.0",
     "jquery": "^3.3.1",
     "js-yaml": "~3.10.0",
-    "lodash": "4.12.0",
+    "lodash": "^4.17.10",
     "moment": "^2.21.0",
     "ng-file-upload": "~12.2.13",
     "rdash-ui": "1.0.*",
