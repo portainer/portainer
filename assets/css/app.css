@@ -626,6 +626,12 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   box-shadow: 0 3px 10px -2px rgba(161, 170, 166, 0.5);
   position: relative;
 }
+.boxselector_wrapper label.boxselector_disabled {
+  background: #CACACA;
+  border-color: #787878;
+  color: #787878;
+  cursor: not-allowed;
+}
 
 .boxselector_wrapper input[type="radio"]:checked + label {
   background: #337ab7;
