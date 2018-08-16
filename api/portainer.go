@@ -226,9 +226,9 @@ type (
 	// Webhook represents a url webhook that can be used to update a service
 	Webhook struct {
 		ID         WebhookID  `json:"Id"`
-		TokenData  string     `json:"Token"`      //The token used to identify the service
-		ServiceID  string     `json:"ServiceId"`  //The ID for the swarm service it belongs to
-		EndpointID EndpointID `json:"EndpointId"` //The ID for the endpoint that this service belongs to
+		Token      string     `json:"Token"`
+		ServiceID  string     `json:"ServiceId"`
+		EndpointID EndpointID `json:"EndpointId"`
 	}
 
 	// AzureCredentials represents the credentials used to connect to an Azure

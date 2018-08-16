@@ -38,16 +38,16 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve webhook from the database", err}
 	}
 	if webhook != nil {
-		return &httperror.HandlerError{http.StatusConflict, "A webhook with the same name already exists", portainer.ErrWebhookAlreadyExists}
+		return &httperror.HandlerError{http.StatusConflict, "A webhook for this service already exists", portainer.ErrWebhookAlreadyExists}
 	}
 
 	token, err := uuid.NewV4()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusConflict, "Error creating unique token", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Error creating unique token", err}
 	}
 
 	webhook = &portainer.Webhook{
-		TokenData:  token.String(),
+		Token:      token.String(),
 		ServiceID:  payload.ServiceID,
 		EndpointID: portainer.EndpointID(payload.EndpointID),
 	}

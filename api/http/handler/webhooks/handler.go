@@ -12,9 +12,10 @@ import (
 // Handler is the HTTP handler used to handle webhook operations.
 type Handler struct {
 	*mux.Router
-	WebhookService  portainer.WebhookService
-	EndpointService portainer.EndpointService
-	requestBouncer  *security.RequestBouncer
+	WebhookService   portainer.WebhookService
+	EndpointService  portainer.EndpointService
+	requestBouncer   *security.RequestBouncer
+	SignatureService portainer.DigitalSignatureService
 }
 
 // NewHandler creates a handler to manage settings operations.

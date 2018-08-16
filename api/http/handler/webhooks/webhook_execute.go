@@ -5,10 +5,11 @@ import (
 	"net/http"
 
 	dockertypes "github.com/docker/docker/api/types"
-	docker "github.com/docker/docker/client"
-	"github.com/portainer/portainer"
+	portainer "github.com/portainer/portainer"
+	docker "github.com/portainer/portainer/docker"
 	httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/request"
+	"github.com/portainer/portainer/http/response"
 )
 
 // Acts on a passed in token UUID to restart the docker service
@@ -35,27 +36,15 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
-	var dockerClient *docker.Client
-	if endpoint.TLSConfig.TLS {
-		dockerClient, err = docker.NewClientWithOpts(docker.WithHost(endpoint.URL),
-			docker.WithTLSClientConfig(
-				endpoint.TLSConfig.TLSCACertPath,
-				endpoint.TLSConfig.TLSCertPath,
-				endpoint.TLSConfig.TLSKeyPath),
-		)
-	} else {
-		dockerClient, err = docker.NewClientWithOpts(docker.WithHost(endpoint.URL))
-	}
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Error creating docker client", err}
-	}
+	dockerFactory := docker.NewClientFactory(handler.SignatureService)
+	dockerClient, err := dockerFactory.CreateClient(endpoint)
 
-	service, _, err := dockerClient.ServiceInspectWithRaw(context.TODO(), serviceID, dockertypes.ServiceInspectOptions{InsertDefaults: true})
+	service, _, err := dockerClient.ServiceInspectWithRaw(context.Background(), serviceID, dockertypes.ServiceInspectOptions{InsertDefaults: true})
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Error looking up service", err}
 	}
 
-	resp, err := dockerClient.ServiceUpdate(context.TODO(), serviceID, service.Version, service.Spec, dockertypes.ServiceUpdateOptions{QueryRegistry: true})
+	resp, err := dockerClient.ServiceUpdate(context.Background(), serviceID, service.Version, service.Spec, dockertypes.ServiceUpdateOptions{QueryRegistry: true})
 
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Error updating service", err}
@@ -63,6 +52,6 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 	if resp.Warnings != nil {
 		//Log warnings
 	}
-	return nil
+	return response.Empty(w)
 
 }
