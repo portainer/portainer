@@ -48,6 +48,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       Binds: [],
       NetworkMode: 'bridge',
       Privileged: false,
+      Runtime: '',
       ExtraHosts: [],
       Devices: [],
       CapAdd: [],
@@ -581,6 +582,14 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
 
     SystemService.info()
     .then(function success(data) {
+      var runtimes = data.Runtimes;
+      $scope.availableRuntimes = runtimes;
+      if ('runc' in runtimes) {
+        $scope.config.HostConfig.Runtime = 'runc';
+      }
+      else if (Object.keys(runtimes).length !== 0) {
+        $scope.config.HostConfig.Runtime = Object.keys(runtimes)[0];
+      }
       $scope.state.sliderMaxCpu = 32;
       if (data.NCPU) {
         $scope.state.sliderMaxCpu = data.NCPU;
