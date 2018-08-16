@@ -15,6 +15,8 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
     leaveNetworkInProgress: false
   };
 
+  $scope.updateRestartPolicy = updateRestartPolicy;
+
   var update = function () {
     var nodeName = $transition$.params().nodeName;
     HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
@@ -307,6 +309,27 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
       recreateContainer(pullImage);
     });
   };
+
+  function updateRestartPolicy(restartPolicy, maximumRetryCount) {
+    maximumRetryCount = restartPolicy === 'on-failure' ? maximumRetryCount : undefined;
+    
+    return ContainerService
+      .updateRestartPolicy($scope.container.Id, restartPolicy, maximumRetryCount)
+      .then(onUpdateSuccess)
+      .catch(notifyOnError);
+
+    function onUpdateSuccess() {
+      $scope.container.HostConfig.RestartPolicy = {
+        Name: restartPolicy,
+        MaximumRetryCount: maximumRetryCount
+      };
+    }
+
+    function notifyOnError(err) {
+      Notifications.error('Failure', err, 'Unable to update restart policy');
+      return $q.reject(err);
+    }
+  }
 
   var provider = $scope.applicationState.endpoint.mode.provider;
   var apiVersion = $scope.applicationState.endpoint.apiVersion;
