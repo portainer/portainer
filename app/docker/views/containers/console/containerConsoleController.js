@@ -111,11 +111,11 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
       $scope.imageOS = image.Os;
       $scope.formValues.command = image.Os === 'windows' ? 'powershell' : 'bash';
       $scope.containerCommands = Object.keys(containerLabels)
-        .filter(function(l) {
-          return l.indexOf(CONSOLE_COMMANDS_LABEL_PREFIX) === 0;
+        .filter(function(label) {
+          return label.indexOf(CONSOLE_COMMANDS_LABEL_PREFIX) === 0;
         })
-        .map(function(l) {
-          return {title: l.replace(CONSOLE_COMMANDS_LABEL_PREFIX, ''), command: containerLabels[l]};
+        .map(function(label) {
+          return {title: label.replace(CONSOLE_COMMANDS_LABEL_PREFIX, ''), command: containerLabels[label]};
         });
       $scope.state.loaded = true;
     })
