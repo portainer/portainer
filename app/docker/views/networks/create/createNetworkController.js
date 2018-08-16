@@ -95,6 +95,8 @@ angular.module('portainer.docker')
       }
 
       function modifyNetworkConfigurationForMacvlanConfigOnly(config) {
+        config.Internal = null;
+        config.Attachable = null;
         config.ConfigOnly = true;
         config.Options.parent = $scope.formValues.Macvlan.ParentNetworkCard;
       }

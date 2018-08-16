@@ -125,7 +125,7 @@
           </div>
           <!-- !labels-->
           <!-- internal -->
-          <div class="form-group">
+          <div class="form-group" ng-hide="config.Driver === 'macvlan' && formValues.Macvlan.Scope === 'local'">
             <div class="col-sm-12">
               <label for="ownership" class="control-label text-left">
                 Restrict external access to the network
@@ -138,18 +138,18 @@
           </div>
           <!-- !internal -->
           <!-- attachable -->
-          <div class="form-group">
-              <div class="col-sm-12">
-                <label for="attachable" class="control-label text-left">
-                  Enable manual container attachment
-                </label>
-                <label name="attachable" class="switch" style="margin-left: 20px;">
-                  <input type="checkbox" ng-model="config.Attachable">
-                  <i></i>
-                </label>
-              </div>
+          <div class="form-group" ng-hide="config.Driver === 'macvlan' && formValues.Macvlan.Scope === 'local'">
+            <div class="col-sm-12">
+              <label for="attachable" class="control-label text-left">
+                Enable manual container attachment
+              </label>
+              <label name="attachable" class="switch" style="margin-left: 20px;">
+                <input type="checkbox" ng-model="config.Attachable">
+                <i></i>
+              </label>
             </div>
-            <!-- !attachable -->
+          </div>
+          <!-- !attachable -->
           <div ng-if="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && config.Driver !== 'overlay' && config.Driver !== 'macvlan'">
             <div class="col-sm-12 form-section-title">
               Deployment
