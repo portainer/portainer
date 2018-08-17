@@ -101,11 +101,11 @@
             <!-- !port-mapping-input-list -->
           </div>
           <!-- !port-mapping -->
-          <!-- service-restart -->
+          <!-- create-webhook -->
           <label class="switch" style="margin-left: 20px;">
-            <input name="servicerestart" type="checkbox" ng-model="$ctrl.formData.serviceRestartEnabled"><i></i>
+            <input name="servicerestart" type="checkbox" ng-model="$ctrl.formData.webhook"><i></i>
           </label>
-          <!-- !service-restart -->
+          <!-- !create-webhook  -->
           <!-- access-control -->
           <por-access-control-form form-data="formValues.AccessControlData" ng-if="applicationState.application.authentication"></por-access-control-form>
           <!-- !access-control -->
