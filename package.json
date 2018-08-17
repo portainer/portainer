@@ -22,7 +22,9 @@
   "scripts": {
     "dev": "yarn grunt run-dev",
     "clean-all": "yarn grunt clean:all",
-    "build": "yarn grunt build"
+    "build": "yarn grunt build",
+    "build-offline": "cd ./api/cmd/portainer && CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags '-s' && mv -b portainer ../../../dist/portainer-linux-amd64"
+
   },
   "engines": {
     "node": ">= 0.8.4"
