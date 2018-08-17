@@ -26,7 +26,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	}
 	h.Handle("/webhooks",
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.webhookCreate))).Methods(http.MethodPost)
-	h.Handle("/webhook/{id}",
+	h.Handle("/webhook/{serviceID}",
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.webhookInspect))).Methods(http.MethodGet)
 	h.Handle("/webhooks",
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.webhookList))).Methods(http.MethodGet)

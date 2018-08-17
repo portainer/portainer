@@ -111,7 +111,7 @@ func (service *Service) WebhookByToken(token string) (*portainer.Webhook, error)
 				return err
 			}
 
-			if w.TokenData == token {
+			if w.Token == token {
 				webhook = &w
 				break
 			}
