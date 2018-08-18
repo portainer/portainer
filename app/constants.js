@@ -15,4 +15,5 @@ angular.module('portainer')
 .constant('API_ENDPOINT_TEMPLATES', 'api/templates')
 .constant('DEFAULT_TEMPLATES_URL', 'https://raw.githubusercontent.com/portainer/templates/master/templates.json')
 .constant('PAGINATION_MAX_ITEMS', 10)
-.constant('APPLICATION_CACHE_VALIDITY', 3600);
+.constant('APPLICATION_CACHE_VALIDITY', 3600)
+.constant('CONSOLE_COMMANDS_LABEL_PREFIX', 'io.portainer.commands.');
