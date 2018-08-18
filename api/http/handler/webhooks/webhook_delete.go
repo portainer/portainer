@@ -3,6 +3,7 @@ package webhooks
 import (
 	"net/http"
 
+	"github.com/portainer/portainer"
 	httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/request"
 	"github.com/portainer/portainer/http/response"
@@ -10,16 +11,12 @@ import (
 
 // DELETE request on /api/webhook/:serviceID
 func (handler *Handler) webhookDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	serviceID, err := request.RetrieveRouteVariableValue(r, "id")
+	id, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid webhook id", err}
 	}
-	webhook, err := handler.WebhookService.WebhookByServiceID(serviceID)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find webhook to remove", err}
-	}
 
-	err = handler.WebhookService.DeleteWebhook(webhook.ID)
+	err = handler.WebhookService.DeleteWebhook(portainer.WebhookID(id))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the webhook from the database", err}
 	}

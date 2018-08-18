@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	dockertypes "github.com/docker/docker/api/types"
-	portainer "github.com/portainer/portainer"
+	"github.com/portainer/portainer"
 	httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/request"
 	"github.com/portainer/portainer/http/response"
