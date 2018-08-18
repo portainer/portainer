@@ -6,7 +6,6 @@ import (
 
 	dockertypes "github.com/docker/docker/api/types"
 	portainer "github.com/portainer/portainer"
-	docker "github.com/portainer/portainer/docker"
 	httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/request"
 	"github.com/portainer/portainer/http/response"
@@ -36,8 +35,7 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
-	dockerFactory := docker.NewClientFactory(handler.SignatureService)
-	dockerClient, err := dockerFactory.CreateClient(endpoint)
+	dockerClient, err := handler.DockerClientFactory.CreateClient(endpoint)
 
 	service, _, err := dockerClient.ServiceInspectWithRaw(context.Background(), serviceID, dockertypes.ServiceInspectOptions{InsertDefaults: true})
 	if err != nil {

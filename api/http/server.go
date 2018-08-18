@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/docker"
 	"github.com/portainer/portainer/http/handler"
 	"github.com/portainer/portainer/http/handler/auth"
 	"github.com/portainer/portainer/http/handler/dockerhub"
@@ -65,6 +66,7 @@ type Server struct {
 	SSL                    bool
 	SSLCert                string
 	SSLKey                 string
+	DockerClientFactory    *docker.ClientFactory
 }
 
 // Start starts the HTTP server
@@ -173,7 +175,7 @@ func (server *Server) Start() error {
 	var webhookHandler = webhooks.NewHandler(requestBouncer)
 	webhookHandler.WebhookService = server.WebhookService
 	webhookHandler.EndpointService = server.EndpointService
-	webhookHandler.SignatureService = server.SignatureService
+	webhookHandler.DockerClientFactory = server.DockerClientFactory
 
 	server.Handler = &handler.Handler{
 		AuthHandler:            authHandler,

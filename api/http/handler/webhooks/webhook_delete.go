@@ -10,9 +10,9 @@ import (
 
 // DELETE request on /api/webhook/:serviceID
 func (handler *Handler) webhookDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	serviceID, err := request.RetrieveRouteVariableValue(r, "serviceID")
+	serviceID, err := request.RetrieveRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid serviceID", err}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid webhook id", err}
 	}
 	webhook, err := handler.WebhookService.WebhookByServiceID(serviceID)
 	if err != nil {

@@ -23,6 +23,9 @@ func (payload *webhookCreatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(string(payload.EndpointID)) {
 		return portainer.Error("Invalid EndpointID")
 	}
+	if payload.EndpointID < 1 {
+		return portainer.Error("Invalid EndpointID " + string(payload.EndpointID))
+	}
 	return nil
 }
 
