@@ -1,0 +1,34 @@
+<div  id="service-webhook-url">
+  <rd-widget>
+    <rd-widget-header icon="fa-tasks" title-text="Webhook Callback URL">
+      <div class="nopadding" >
+        <a class="btn btn-default btn-sm pull-right" ng-click="isUpdating || addWebhook(service)" ng-disabled="(isUpdating || webhookURL)">
+          <i class="fa fa-plus-circle" aria-hidden="true"></i> webhook
+        </a>
+      </div>
+    </rd-widget-header>
+    <rd-widget-body ng-if="(!webhookURL && !isUpdating)">
+      <p>There is no webhook url for this service.</p>
+    </rd-widget-body>
+    <rd-widget-body ng-if="(isUpdating && !webhookURL)">
+      <p>URL WILL BE COMPUTED ON SAVE</p>
+    </rd-widget-body>
+    <rd-widget-body ng-if="webhookURL" classes="no-padding">
+      {{webhookURL}}
+    </rd-widget-body>
+    <rd-widget-footer>
+      <div class="btn-toolbar" role="toolbar">
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['Webhook'])" ng-click="updateService(service)">Apply changes</button>
+          <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a ng-click="cancelChanges(service, ['Webhook'])">Reset changes</a></li>
+            <li><a ng-click="cancelChanges(service)">Reset all changes</a></li>
+          </ul>
+        </div>
+      </div>
+    </rd-widget-footer>
+  </rd-widget>
+</div>

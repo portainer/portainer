@@ -1,9 +1,9 @@
 angular.module('portainer.app')
-.factory('Webhook', ['$resource', 'API_ENDPOINT_WEBHOOKS','EndpointProvider',
- function WebhooksFactory($resource, API_ENDPOINT_WEBHOOKS, EndpointProvider) {
+.factory('Webhook', ['$resource', 'API_ENDPOINT_WEBHOOK','EndpointProvider',
+ function WebhookFactory($resource, API_ENDPOINT_WEBHOOK, EndpointProvider) {
   'use strict';
-  return $resource(API_ENDPOINT_WEBHOOKS, {endpointId: EndpointProvider.endpointID}, {
-    query: { method: 'GET' },
-    create: { method: 'POST', params: { ServiceID: '@serviceID', EndpointId: '@endpointId'} }
+  return $resource(API_ENDPOINT_WEBHOOK + '/:serviceID', {}, {
+    get: { method: 'GET', params: {serviceID: '@serviceID'} } ,
+    delete: { method: 'DELETE' }
   });
 }]);

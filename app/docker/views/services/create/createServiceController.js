@@ -1,6 +1,6 @@
  angular.module('portainer.docker')
-.controller('CreateServiceController', ['$q', '$scope', '$state', '$timeout', 'Service', 'ServiceHelper', 'ConfigService', 'ConfigHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'LabelHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'FormValidator', 'PluginService', 'RegistryService', 'HttpRequestHelper', 'NodeService', 'SettingsService', 'Webhook',
-function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, ConfigHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, LabelHelper, Authentication, ResourceControlService, Notifications, FormValidator, PluginService, RegistryService, HttpRequestHelper, NodeService, SettingsService, Webhook) {
+.controller('CreateServiceController', ['$q', '$scope', '$state', '$timeout', 'Service', 'ServiceHelper', 'ConfigService', 'ConfigHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'LabelHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'FormValidator', 'PluginService', 'RegistryService', 'HttpRequestHelper', 'NodeService', 'SettingsService', 'WebhookService',
+function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, ConfigHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, LabelHelper, Authentication, ResourceControlService, Notifications, FormValidator, PluginService, RegistryService, HttpRequestHelper, NodeService, SettingsService, WebhookService) {
 
   $scope.formValues = {
     Name: '',
@@ -41,6 +41,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     RestartWindow: '0s',
     LogDriverName: '',
     LogDriverOpts: [],
+    Webhook: true,
   };
 
   $scope.state = {
@@ -426,12 +427,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     .then(function success(data) {
       var serviceIdentifier = data.ID;
       var userId = Authentication.getUserDetails().ID;
-      console.log($scope.applicationState.endpoint)
-      var webhook = Webhook.create({ServiceID: serviceIdentifier}).$promise
-      .then(function success() {
-        console.log(webhook.token);
-      })
-
+      WebhookService.createWebhook(serviceIdentifier);
       return ResourceControlService.applyResourceControl('service', serviceIdentifier, userId, accessControlData, []);
     })
     .then(function success() {

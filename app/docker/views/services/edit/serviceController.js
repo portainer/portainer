@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'ContainerService', 'TaskHelper', 'Notifications', 'ModalService', 'PluginService', 'Authentication', 'SettingsService', 'VolumeService', 'ImageHelper',
-function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, ContainerService, TaskHelper, Notifications, ModalService, PluginService, Authentication, SettingsService, VolumeService, ImageHelper) {
+.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'ContainerService', 'TaskHelper', 'Notifications', 'ModalService', 'PluginService', 'Authentication', 'SettingsService', 'VolumeService', 'ImageHelper', 'WebhookService',  'API_ENDPOINT_WEBHOOK',
+function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, ContainerService, TaskHelper, Notifications, ModalService, PluginService, Authentication, SettingsService, VolumeService, ImageHelper, WebhookService, API_ENDPOINT_WEBHOOK) {
 
   $scope.state = {
     updateInProgress: false,
@@ -206,6 +206,18 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   $scope.updateHostsEntry = function(service, entry) {
     updateServiceArray(service, 'Hosts', service.Hosts);
   };
+  // $scope.addWebhook = function addWebhook(service){
+  //     Webhooks.create({ServiceID: service.Id, EndpointID: 1 }).$promise //Again, how do we get the actual endpoint ID here????
+  //     .then(function success(data){
+  //       $scope.webhookToken = true;
+  //       $scope.webhookURL = $location.protocol() + "://" +  $location.host() + ":"
+  //       + $location.port() + "/" + API_ENDPOINT_WEBHOOK + "/" + data.Token;
+  //       initView();
+  //     })
+  //     .catch(function error(err) {
+  //       Notifications.error('Failure', err, 'Unable to create webhook', service.Name);
+  //     })
+  // };
 
   $scope.cancelChanges = function cancelChanges(service, keys) {
     if (keys) { // clean out the keys only from the list of modified keys
@@ -445,7 +457,8 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
         configs: apiVersion >= 1.30 ? ConfigService.configs() : [],
         availableImages: ImageService.images(),
         availableLoggingDrivers: PluginService.loggingPlugins(apiVersion < 1.25),
-        settings: SettingsService.publicSettings()
+        settings: SettingsService.publicSettings(),
+        webhook: WebhookService.webhook(service.Id)
       });
     })
     .then(function success(data) {
@@ -458,7 +471,10 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       $scope.allowBindMounts = data.settings.AllowBindMountsForRegularUsers;
       var userDetails = Authentication.getUserDetails();
       $scope.isAdmin = userDetails.role === 1;
-
+      if (data.webhook) {
+        $scope.webhookURL = $location.protocol() + "://" +  $location.host() + ":"
+        + $location.port() + "/" + API_ENDPOINT_WEBHOOK + "/" + data.webhook.Token;
+      }
       var tasks = data.tasks;
 
       if (agentProxy) {
@@ -499,6 +515,8 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       $scope.configs = [];
       Notifications.error('Failure', err, 'Unable to retrieve service details');
     });
+
+
   }
 
   $scope.updateServiceAttribute = function updateServiceAttribute(service, name) {
