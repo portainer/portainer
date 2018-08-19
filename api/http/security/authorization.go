@@ -1,19 +1,17 @@
 package security
 
-import "github.com/portainer/portainer"
+import (
+	"github.com/portainer/portainer"
+)
 
 // AuthorizedResourceControlDeletion ensure that the user can delete a resource control object.
 // A non-administrator user cannot delete a resource control where:
-// * the AdministratorsOnly flag is set
+// * the Public flag is false
 // * he is not one of the users in the user accesses
 // * he is not a member of any team within the team accesses
 func AuthorizedResourceControlDeletion(resourceControl *portainer.ResourceControl, context *RestrictedRequestContext) bool {
-	if context.IsAdmin {
+	if context.IsAdmin || resourceControl.Public {
 		return true
-	}
-
-	if resourceControl.AdministratorsOnly {
-		return false
 	}
 
 	userAccessesCount := len(resourceControl.UserAccesses)
@@ -42,39 +40,25 @@ func AuthorizedResourceControlDeletion(resourceControl *portainer.ResourceContro
 
 // AuthorizedResourceControlAccess checks whether the user can alter an existing resource control.
 func AuthorizedResourceControlAccess(resourceControl *portainer.ResourceControl, context *RestrictedRequestContext) bool {
-	if context.IsAdmin {
+	if context.IsAdmin || resourceControl.Public {
 		return true
 	}
 
-	if resourceControl.AdministratorsOnly {
-		return false
-	}
-
-	authorizedTeamAccess := false
 	for _, access := range resourceControl.TeamAccesses {
 		for _, membership := range context.UserMemberships {
 			if membership.TeamID == access.TeamID {
-				authorizedTeamAccess = true
-				break
+				return true
 			}
 		}
 	}
-	if !authorizedTeamAccess {
-		return false
-	}
 
-	authorizedUserAccess := false
 	for _, access := range resourceControl.UserAccesses {
 		if context.UserID == access.UserID {
-			authorizedUserAccess = true
-			break
+			return true
 		}
 	}
-	if !authorizedUserAccess {
-		return false
-	}
 
-	return true
+	return false
 }
 
 // AuthorizedResourceControlUpdate ensure that the user can update a resource control object.
@@ -92,18 +76,14 @@ func AuthorizedResourceControlUpdate(resourceControl *portainer.ResourceControl,
 
 // AuthorizedResourceControlCreation ensure that the user can create a resource control object.
 // A non-administrator user cannot create a resource control where:
-// * the AdministratorsOnly flag is set
+// * the Public flag is set false
 // * he wants to create a resource control without any user/team accesses
 // * he wants to add more than one user in the user accesses
 // * he wants tp add a user in the user accesses that is not corresponding to its id
 // * he wants to add a team he is not a member of
 func AuthorizedResourceControlCreation(resourceControl *portainer.ResourceControl, context *RestrictedRequestContext) bool {
-	if context.IsAdmin {
+	if context.IsAdmin || resourceControl.Public {
 		return true
-	}
-
-	if resourceControl.AdministratorsOnly {
-		return false
 	}
 
 	userAccessesCount := len(resourceControl.UserAccesses)
@@ -126,19 +106,15 @@ func AuthorizedResourceControlCreation(resourceControl *portainer.ResourceContro
 
 	if teamAccessesCount > 0 {
 		for _, access := range resourceControl.TeamAccesses {
-			isMember := false
 			for _, membership := range context.UserMemberships {
 				if membership.TeamID == access.TeamID {
-					isMember = true
+					return true
 				}
-			}
-			if !isMember {
-				return false
 			}
 		}
 	}
 
-	return true
+	return false
 }
 
 // AuthorizedTeamManagement ensure that access to the management of the specified team is granted.

@@ -274,18 +274,21 @@ type (
 
 	// ResourceControl represent a reference to a Docker resource with specific access controls
 	ResourceControl struct {
-		ID                 ResourceControlID    `json:"Id"`
-		ResourceID         string               `json:"ResourceId"`
-		SubResourceIDs     []string             `json:"SubResourceIds"`
-		Type               ResourceControlType  `json:"Type"`
-		AdministratorsOnly bool                 `json:"AdministratorsOnly"`
-		UserAccesses       []UserResourceAccess `json:"UserAccesses"`
-		TeamAccesses       []TeamResourceAccess `json:"TeamAccesses"`
+		ID             ResourceControlID    `json:"Id"`
+		ResourceID     string               `json:"ResourceId"`
+		SubResourceIDs []string             `json:"SubResourceIds"`
+		Type           ResourceControlType  `json:"Type"`
+		UserAccesses   []UserResourceAccess `json:"UserAccesses"`
+		TeamAccesses   []TeamResourceAccess `json:"TeamAccesses"`
+		Public         bool                 `json:"Public"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 2
 		OwnerID     UserID              `json:"OwnerId,omitempty"`
 		AccessLevel ResourceAccessLevel `json:"AccessLevel,omitempty"`
+
+		// Deprecated in DBVersion == 14
+		AdministratorsOnly bool `json:"AdministratorsOnly,omitempty"`
 	}
 
 	// ResourceControlType represents the type of resource associated to the resource control (volume, container, service...).
@@ -613,7 +616,7 @@ const (
 	// APIVersion is the version number of the Portainer API.
 	APIVersion = "1.19.2-dev"
 	// DBVersion is the version number of the Portainer database.
-	DBVersion = 13
+	DBVersion = 14
 	// PortainerAgentHeader represents the name of the header available in any agent response
 	PortainerAgentHeader = "Portainer-Agent"
 	// PortainerAgentTargetHeader represent the name of the header containing the target node name.

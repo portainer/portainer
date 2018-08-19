@@ -36,6 +36,10 @@ func (handler *Handler) stackInspect(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	extendedStack := proxy.ExtendedStack{*stack, portainer.ResourceControl{}}
+	if !securityContext.IsAdmin && resourceControl == nil {
+		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
+	}
+
 	if resourceControl != nil {
 		if securityContext.IsAdmin || proxy.CanAccessStack(stack, resourceControl, securityContext.UserID, securityContext.UserMemberships) {
 			extendedStack.ResourceControl = *resourceControl

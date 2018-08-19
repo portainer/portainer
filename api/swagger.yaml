@@ -3268,11 +3268,10 @@ definitions:
         example: "container"
         description: "Type of Docker resource. Valid values are: container, volume\
           \ service, secret, config or stack"
-      AdministratorsOnly:
+      Public:
         type: "boolean"
         example: true
-        description: "Restrict access to the associated resource to administrators\
-          \ only"
+        description: "Permit access to the associated resource to any user"
       Users:
         type: "array"
         description: "List of user identifiers with access to the associated resource"
@@ -3491,11 +3490,10 @@ definitions:
         example: "container"
         description: "Type of Docker resource. Valid values are: container, volume\
           \ service, secret, config or stack"
-      AdministratorsOnly:
+      Public:
         type: "boolean"
         example: true
-        description: "Restrict access to the associated resource to administrators\
-          \ only"
+        description: "Permit access to the associated resource to any user"
       Users:
         type: "array"
         description: "List of user identifiers with access to the associated resource"
@@ -3520,11 +3518,10 @@ definitions:
   ResourceControlUpdateRequest:
     type: "object"
     properties:
-      AdministratorsOnly:
+      Public:
         type: "boolean"
         example: false
-        description: "Restrict access to the associated resource to administrators\
-          \ only"
+        description: "Permit access to the associated resource to any user"
       Users:
         type: "array"
         description: "List of user identifiers with access to the associated resource"

@@ -65,12 +65,13 @@ func filterTaskList(taskData []interface{}, context *restrictedOperationContext)
 
 		serviceID := taskObject[taskServiceIdentifier].(string)
 		taskObject, access := applyResourceAccessControl(taskObject, serviceID, context)
-		if access {
+		if !access {
 			taskLabels := extractTaskLabelsFromTaskListObject(taskObject)
 			taskObject, access = applyResourceAccessControlFromLabel(taskLabels, taskObject, taskLabelForStackIdentifier, context)
-			if access {
-				filteredTaskData = append(filteredTaskData, taskObject)
-			}
+		}
+
+		if access {
+			filteredTaskData = append(filteredTaskData, taskObject)
 		}
 	}
 
