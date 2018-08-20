@@ -282,7 +282,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     return config;
   }
 
-  
+
   function loadFromContainerCmd(d) {
     if ($scope.config.Cmd) {
       $scope.config.Cmd = ContainerHelper.commandArrayToString($scope.config.Cmd);
@@ -374,7 +374,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     } else {
       $scope.formValues.MacAddress = '';
     }
-    
+
     // ExtraHosts
     if ($scope.config.HostConfig.ExtraHosts) {
       var extraHosts = $scope.config.HostConfig.ExtraHosts;
@@ -594,7 +594,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
   function create() {
     var oldContainer = null;
 
-    
+
     HttpRequestHelper.setPortainerAgentTargetHeader($scope.formValues.NodeName);
     return findCurrentContainer()
       .then(confirmCreateContainer)
@@ -631,8 +631,8 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
         return $q.when();
       }
       $scope.state.actionInProgress = true;
-      return stopAndRenameContainer(oldContainer)
-        .then(pullImageIfNeeded)
+      return pullImageIfNeeded()
+        .then(stopAndRenameContainer(oldContainer))
         .then(createNewContainer)
         .then(applyResourceControl)
         .then(connectToExtraNetworks)
