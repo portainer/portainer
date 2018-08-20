@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/security"
 )
 
@@ -19,7 +18,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		Router: mux.NewRouter(),
 	}
 	h.Handle("/motd",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.motd))).Methods(http.MethodGet)
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.motd))).Methods(http.MethodGet)
 
 	return h
 }
