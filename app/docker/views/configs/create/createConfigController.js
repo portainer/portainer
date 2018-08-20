@@ -1,7 +1,6 @@
 angular.module('portainer.docker')
-.controller('CreateConfigController', ['$scope', '$state', 'Notifications', 'ConfigService', 'Authentication', 'FormValidator', 'ResourceControlService',
-function ($scope, $state, Notifications, ConfigService, Authentication, FormValidator, ResourceControlService) {
-
+.controller('CreateConfigController', ['$scope', '$state', '$transition$', 'Notifications', 'ConfigService', 'Authentication', 'FormValidator', 'ResourceControlService',
+function ($scope, $state, $transition$, Notifications, ConfigService, Authentication, FormValidator, ResourceControlService) {
   $scope.formValues = {
     Name: '',
     Labels: [],
@@ -90,4 +89,30 @@ function ($scope, $state, Notifications, ConfigService, Authentication, FormVali
   $scope.editorUpdate = function(cm) {
     $scope.formValues.ConfigContent = cm.getValue();
   };
+
+  function initView() {
+    if ($transition$.params().id === '') {
+        // display code editor component in new configs
+        $scope.formValues.displayCodeEditor = true;
+    } else {
+      ConfigService.config($transition$.params().id)
+      .then(function success(data) {
+        $scope.formValues.Name = data.Name + "_Copy";
+        $scope.formValues.Data = data.Data;
+        $scope.formValues.Labels = [];
+        for (var label in data.Labels) {
+          $scope.formValues.Labels.push({ name: label, value: data.Labels[label]});
+        }
+        // display code editor only after config is loaded
+        $scope.formValues.displayCodeEditor = true;
+      })
+      .catch(function error(err) {
+        // display code editor component when unable to load config 
+        $scope.formValues.displayCodeEditor = true;
+        Notifications.error('Failure', err, 'Unable to clone config');
+      });
+    }
+  } 
+
+  initView();
 }]);

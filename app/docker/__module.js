@@ -32,7 +32,7 @@ angular.module('portainer.docker', ['portainer.app'])
 
   var configCreation = {
     name: 'docker.configs.new',
-    url: '/new',
+    url: '/new/:id',
     views: {
       'content@': {
         templateUrl: 'app/docker/views/configs/create/createconfig.html',
