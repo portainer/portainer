@@ -1,11 +1,12 @@
 angular.module('portainer.app')
-.factory('WebhookService', ['$q', 'Webhooks', 'EndpointProvider', function WebhookServiceFactory($q, Webhooks, EndpointProvider) {
+.factory('WebhookService', ['$q', 'Webhook','Webhooks', 'EndpointProvider', function WebhookServiceFactory($q, Webhook, Webhooks, EndpointProvider) {
   'use strict';
   var service = {};
   var endpointID = 1;
 
   service.webhook = function(serviceID) {
     var deferred = $q.defer();
+    console.log(EndpointProvider.endpointID)
     // var filters = { ServiceID: serviceID, EndpointID: EndpointProvider.endpointID };
     var filters = { ServiceID: serviceID, EndpointID: endpointID };
     var webhookData = {};
@@ -35,7 +36,7 @@ angular.module('portainer.app')
 
 
   service.deleteWebhook = function(id) {
-    return Webhooks.remove({id: id}).$promise;
+    return Webhook.remove({id: id}).$promise;
   };
 
   return service;

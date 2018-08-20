@@ -7,14 +7,17 @@
         </a>
       </div>
     </rd-widget-header>
-    <rd-widget-body ng-if="(!webhookURL && !isUpdating)">
+    <rd-widget-body ng-if="(!webhookURL && !isUpdating) && !(isAdding || isRemoving)">
       <p>There is no webhook url for this service.</p>
     </rd-widget-body>
-    <rd-widget-body ng-if="(isUpdating && !webhookURL)">
-      <p>URL WILL BE COMPUTED ON SAVE</p>
+    <rd-widget-body ng-if="(isAdding || isRemoving)">
+      <p>URL WILL BE UPDATE ON SAVE</p>
     </rd-widget-body>
-    <rd-widget-body ng-if="webhookURL" classes="no-padding">
+    <rd-widget-body ng-if="webhookURL && !(isAdding || isRemoving)" classes="no-padding">
       {{webhookURL}}
+      <button class="btn btn-sm btn-danger" type="button" ng-click="removeWebhook(service)" ng-disabled="isUpdating">
+        <i class="fa fa-trash" aria-hidden="true"></i>
+      </button>
     </rd-widget-body>
     <rd-widget-footer>
       <div class="btn-toolbar" role="toolbar">

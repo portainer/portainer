@@ -41,7 +41,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     RestartWindow: '0s',
     LogDriverName: '',
     LogDriverOpts: [],
-    Webhook: true,
+    Webhook: false,
   };
 
   $scope.state = {
@@ -427,7 +427,12 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     .then(function success(data) {
       var serviceIdentifier = data.ID;
       var userId = Authentication.getUserDetails().ID;
-      WebhookService.createWebhook(serviceIdentifier);
+      console.log($scope.formValues.Webhook)
+      if ($scope.formValues.Webhook) {
+        console.log("Creating a webhook")
+        WebhookService.createWebhook(serviceIdentifier);
+      }
+
       return ResourceControlService.applyResourceControl('service', serviceIdentifier, userId, accessControlData, []);
     })
     .then(function success() {
