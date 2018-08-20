@@ -3,7 +3,12 @@
     <rd-widget>
       <rd-widget-body>
         <div class="col-sm-12 form-section-title">
-          {{ $ctrl.titleText }}
+          <span style="float: left;">
+            {{ $ctrl.titleText }}
+          </span>
+          <span class="small" style="float: right;">
+            <a ng-click="$ctrl.dismissAction()"><i class="fa fa-times"></i> dismiss</a>
+          </span>
         </div>
         <div class="form-group">
           <ng-transclude></ng-transclude>
