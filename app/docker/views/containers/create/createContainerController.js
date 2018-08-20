@@ -475,7 +475,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     Container.get({ id: $transition$.params().from }).$promise
     .then(function success(d) {
       var fromContainer = new ContainerDetailsViewModel(d);
-      if (!fromContainer.ResourceControl) {
+      if (fromContainer.ResourceControl && fromContainer.ResourceControl.Public) {
         $scope.formValues.AccessControlData.AccessControlEnabled = false;
       }
       $scope.fromContainer = fromContainer;
