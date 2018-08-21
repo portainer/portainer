@@ -101,10 +101,11 @@ function ($scope, $state, $transition$, Notifications, ConfigService, Authentica
       $scope.formValues.Name = data.Name + '_copy';
       $scope.formValues.Data = data.Data;
       $scope.formValues.Labels = [];
-      for (var label in data.Labels) {
-        if (Object.prototype.hasOwnProperty.call(data.Labels, label)) {
-          $scope.formValues.Labels.push({ name: label, value: data.Labels[label]});
-        }
+      var labels = _.keys(data.Labels);
+      for (var i = 0; i < labels.length; i++) {
+        var labelName = labels[i];
+        var labelValue = data.Labels[labelName];
+        $scope.formValues.Labels.push({ name: labelName, value: labelValue});
       }
       $scope.formValues.displayCodeEditor = true;
     })
