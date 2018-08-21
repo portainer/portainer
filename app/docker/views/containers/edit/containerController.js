@@ -15,6 +15,8 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
     leaveNetworkInProgress: false
   };
 
+  $scope.updateRestartPolicy = updateRestartPolicy;
+
   var update = function () {
     var nodeName = $transition$.params().nodeName;
     HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
@@ -194,9 +196,9 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
     $scope.state.recreateContainerInProgress = true;
     var isRunning = container.State.Running;
 
-    return stopContainerIfNeeded()
+    return pullImageIfNeeded()
+      .then(stopContainerIfNeeded)
       .then(renameContainer)
-      .then(pullImageIfNeeded)
       .then(setMainNetworkAndCreateContainer)
       .then(connectContainerToOtherNetworks)
       .then(startContainerIfNeeded)
@@ -283,7 +285,7 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
       var teams = resourceControl.TeamAccesses.map(function(t) {
         return t.TeamId;
       });
-      return ResourceControlService.createResourceControl(resourceControl.AdministratorsOnly, users, teams, containerIdentifier, 'container', []);
+      return ResourceControlService.createResourceControl(resourceControl.Public, users, teams, containerIdentifier, 'container', []);
     }
 
     function notifyAndChangeView() {
@@ -307,6 +309,27 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
       recreateContainer(pullImage);
     });
   };
+
+  function updateRestartPolicy(restartPolicy, maximumRetryCount) {
+    maximumRetryCount = restartPolicy === 'on-failure' ? maximumRetryCount : undefined;
+
+    return ContainerService
+      .updateRestartPolicy($scope.container.Id, restartPolicy, maximumRetryCount)
+      .then(onUpdateSuccess)
+      .catch(notifyOnError);
+
+    function onUpdateSuccess() {
+      $scope.container.HostConfig.RestartPolicy = {
+        Name: restartPolicy,
+        MaximumRetryCount: maximumRetryCount
+      };
+    }
+
+    function notifyOnError(err) {
+      Notifications.error('Failure', err, 'Unable to update restart policy');
+      return $q.reject(err);
+    }
+  }
 
   var provider = $scope.applicationState.endpoint.mode.provider;
   var apiVersion = $scope.applicationState.endpoint.apiVersion;

@@ -65,6 +65,9 @@ function ContainerFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
     },
     inspect: {
       method: 'GET', params: { id: '@id', action: 'json' }
+    },
+    update: {
+      method: 'POST', params: { id: '@id', action: 'update'}
     }
   });
 }]);

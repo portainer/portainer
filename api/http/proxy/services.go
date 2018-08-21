@@ -53,17 +53,17 @@ func serviceInspectOperation(response *http.Response, executor *operationExecuto
 
 	serviceID := responseObject[serviceIdentifier].(string)
 	responseObject, access := applyResourceAccessControl(responseObject, serviceID, executor.operationContext)
-	if !access {
-		return rewriteAccessDeniedResponse(response)
+	if access {
+		return rewriteResponse(response, responseObject, http.StatusOK)
 	}
 
 	serviceLabels := extractServiceLabelsFromServiceInspectObject(responseObject)
 	responseObject, access = applyResourceAccessControlFromLabel(serviceLabels, responseObject, serviceLabelForStackIdentifier, executor.operationContext)
-	if !access {
-		return rewriteAccessDeniedResponse(response)
+	if access {
+		return rewriteResponse(response, responseObject, http.StatusOK)
 	}
 
-	return rewriteResponse(response, responseObject, http.StatusOK)
+	return rewriteAccessDeniedResponse(response)
 }
 
 // extractServiceLabelsFromServiceInspectObject retrieve the Labels of the service if present.
@@ -129,12 +129,13 @@ func filterServiceList(serviceData []interface{}, context *restrictedOperationCo
 
 		serviceID := serviceObject[serviceIdentifier].(string)
 		serviceObject, access := applyResourceAccessControl(serviceObject, serviceID, context)
-		if access {
+		if !access {
 			serviceLabels := extractServiceLabelsFromServiceListObject(serviceObject)
 			serviceObject, access = applyResourceAccessControlFromLabel(serviceLabels, serviceObject, serviceLabelForStackIdentifier, context)
-			if access {
-				filteredServiceData = append(filteredServiceData, serviceObject)
-			}
+		}
+
+		if access {
+			filteredServiceData = append(filteredServiceData, serviceObject)
 		}
 	}
 

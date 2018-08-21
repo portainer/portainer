@@ -11,12 +11,12 @@
               <td>
                 <i ng-class="$ctrl.resourceControl.Ownership | ownershipicon" aria-hidden="true" style="margin-right: 2px;"></i>
                 <span ng-if="!$ctrl.resourceControl">
-                  public
-                  <portainer-tooltip message="This resource can be managed by any user with access to this endpoint." position="bottom" style="margin-left: -3px;"></portainer-tooltip>
+                  administrators
+                  <portainer-tooltip message="This resource can only be managed by administrators." position="bottom" style="margin-left: -3px;"></portainer-tooltip>
                 </span>
                 <span ng-if="$ctrl.resourceControl">
                   {{ $ctrl.resourceControl.Ownership }}
-                  <portainer-tooltip ng-if="$ctrl.resourceControl.Ownership === 'administrators'" message="This resource can only be managed by administrators." position="bottom" style="margin-left: -3px;"></portainer-tooltip>
+                  <portainer-tooltip ng-if="$ctrl.resourceControl.Ownership === 'public'" message="This resource can be managed by any user with access to this endpoint." position="bottom" style="margin-left: -3px;"></portainer-tooltip>
                   <portainer-tooltip ng-if="$ctrl.resourceControl.Ownership === 'private'" message="Management of this resource is restricted to a single user." position="bottom" style="margin-left: -3px;"></portainer-tooltip>
                   <portainer-tooltip ng-if="$ctrl.resourceControl.Ownership === 'restricted'" message="This resource can be managed by a restricted set of users and/or teams." position="bottom" style="margin-left: -3px;"></portainer-tooltip>
                 </span>

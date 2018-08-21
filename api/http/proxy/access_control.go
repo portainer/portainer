@@ -1,6 +1,8 @@
 package proxy
 
-import "github.com/portainer/portainer"
+import (
+	"github.com/portainer/portainer"
+)
 
 type (
 	// ExtendedStack represents a stack combined with its associated access control
@@ -15,7 +17,7 @@ type (
 // It will retrieve an identifier from the labels object. If an identifier exists, it will check for
 // an existing resource control associated to it.
 // Returns a decorated object and authorized access (true) when a resource control is found and the user can access the resource.
-// Returns the original object and authorized access (true) when no resource control is found.
+// Returns the original object and denied access (false) when no resource control is found.
 // Returns the original object and denied access (false) when a resource control is found and the user cannot access the resource.
 func applyResourceAccessControlFromLabel(labelsObject, resourceObject map[string]interface{}, labelIdentifier string,
 	context *restrictedOperationContext) (map[string]interface{}, bool) {
@@ -24,32 +26,31 @@ func applyResourceAccessControlFromLabel(labelsObject, resourceObject map[string
 		resourceIdentifier := labelsObject[labelIdentifier].(string)
 		return applyResourceAccessControl(resourceObject, resourceIdentifier, context)
 	}
-	return resourceObject, true
+	return resourceObject, false
 }
 
 // applyResourceAccessControl returns an optionally decorated object as the first return value and the
 // access level for the user (granted or denied) as the second return value.
 // Returns a decorated object and authorized access (true) when a resource control is found to the specified resource
 // identifier and the user can access the resource.
-// Returns the original object and authorized access (true) when no resource control is found for the specified
+// Returns the original object and authorized access (false) when no resource control is found for the specified
 // resource identifier.
 // Returns the original object and denied access (false) when a resource control is associated to the resource
 // and the user cannot access the resource.
 func applyResourceAccessControl(resourceObject map[string]interface{}, resourceIdentifier string,
 	context *restrictedOperationContext) (map[string]interface{}, bool) {
 
-	authorizedAccess := true
-
 	resourceControl := getResourceControlByResourceID(resourceIdentifier, context.resourceControls)
-	if resourceControl != nil {
-		if context.isAdmin || canUserAccessResource(context.userID, context.userTeamIDs, resourceControl) {
-			resourceObject = decorateObject(resourceObject, resourceControl)
-		} else {
-			authorizedAccess = false
-		}
+	if resourceControl == nil {
+		return resourceObject, context.isAdmin
 	}
 
-	return resourceObject, authorizedAccess
+	if context.isAdmin || resourceControl.Public || canUserAccessResource(context.userID, context.userTeamIDs, resourceControl) {
+		resourceObject = decorateObject(resourceObject, resourceControl)
+		return resourceObject, true
+	}
+
+	return resourceObject, false
 }
 
 // decorateResourceWithAccessControlFromLabel will retrieve an identifier from the labels object. If an identifier exists,
@@ -94,7 +95,7 @@ func canUserAccessResource(userID portainer.UserID, userTeamIDs []portainer.Team
 		}
 	}
 
-	return false
+	return resourceControl.Public
 }
 
 func decorateObject(object map[string]interface{}, resourceControl *portainer.ResourceControl) map[string]interface{} {
@@ -123,6 +124,10 @@ func getResourceControlByResourceID(resourceID string, resourceControls []portai
 
 // CanAccessStack checks if a user can access a stack
 func CanAccessStack(stack *portainer.Stack, resourceControl *portainer.ResourceControl, userID portainer.UserID, memberships []portainer.TeamMembership) bool {
+	if resourceControl == nil {
+		return false
+	}
+
 	userTeamIDs := make([]portainer.TeamID, 0)
 	for _, membership := range memberships {
 		userTeamIDs = append(userTeamIDs, membership.TeamID)
@@ -132,7 +137,7 @@ func CanAccessStack(stack *portainer.Stack, resourceControl *portainer.ResourceC
 		return true
 	}
 
-	return false
+	return resourceControl.Public
 }
 
 // FilterStacks filters stacks based on user role and resource controls.
@@ -149,9 +154,9 @@ func FilterStacks(stacks []portainer.Stack, resourceControls []portainer.Resourc
 	for _, stack := range stacks {
 		extendedStack := ExtendedStack{stack, portainer.ResourceControl{}}
 		resourceControl := getResourceControlByResourceID(stack.Name, resourceControls)
-		if resourceControl == nil {
+		if resourceControl == nil && isAdmin {
 			filteredStacks = append(filteredStacks, extendedStack)
-		} else if resourceControl != nil && (isAdmin || canUserAccessResource(userID, userTeamIDs, resourceControl)) {
+		} else if resourceControl != nil && (isAdmin || resourceControl.Public || canUserAccessResource(userID, userTeamIDs, resourceControl)) {
 			extendedStack.ResourceControl = *resourceControl
 			filteredStacks = append(filteredStacks, extendedStack)
 		}
