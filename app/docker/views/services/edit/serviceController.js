@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'ContainerService', 'TaskHelper', 'Notifications', 'ModalService', 'PluginService', 'Authentication', 'SettingsService', 'VolumeService', 'ImageHelper', 'WebhookService', 'EndpointProvider', 'API_ENDPOINT_WEBHOOKS',
-function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, ContainerService, TaskHelper, Notifications, ModalService, PluginService, Authentication, SettingsService, VolumeService, ImageHelper, WebhookService, EndpointProvider, API_ENDPOINT_WEBHOOKS) {
+.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'ContainerService', 'TaskHelper', 'Notifications', 'ModalService', 'PluginService', 'Authentication', 'SettingsService', 'VolumeService', 'ImageHelper', 'WebhookService', 'EndpointProvider', 'API_ENDPOINT_WEBHOOKS', 'clipboard', 'API_ENDPOINT_WEBHOOKS',
+function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, ContainerService, TaskHelper, Notifications, ModalService, PluginService, Authentication, SettingsService, VolumeService, ImageHelper, WebhookService, EndpointProvider, API_ENDPOINT_WEBHOOKS, clipboard) {
 
   $scope.state = {
     updateInProgress: false,
@@ -208,11 +208,15 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   };
   $scope.addWebhook = function addWebhook(service){
     $scope.isAdding = true;
-    updateServiceArray(service, 'Webhook', service.webhook);
+    updateServiceArray(service, 'Webhooks', service.webhook);
   };
   $scope.removeWebhook = function removeWebhook(service){
     $scope.isRemoving = true;
-    updateServiceArray(service, 'Webhook', service.webhook);
+    updateServiceArray(service, 'Webhooks', service.webhook);
+  }
+  $scope.copyWebhook = function copyWebhook(){
+    console.log($scope.webhookURL);
+    clipboard.copyText($scope.webhookURL);
   }
 
   $scope.cancelChanges = function cancelChanges(service, keys) {
@@ -322,12 +326,11 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       Ports: service.Ports
     };
 
-    if ($scope.hasChanges(service, ['Webhook'])) {
+    if ($scope.hasChanges(service, ['Webhooks'])) {
       if($scope.webhookID) { //Webhook already exists we must be deleting it
         WebhookService.deleteWebhook($scope.webhookID);
       } else { // No webhook means are creating one
-        console.log()
-        WebhookService.createWebhook(service.Id)
+        WebhookService.createWebhook(service.Id,EndpointProvider.EndpointId)
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to create webhook', service.Name);
         })
@@ -483,6 +486,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       var userDetails = Authentication.getUserDetails();
       $scope.isAdmin = userDetails.role === 1;
       if (data.webhook) {
+        $scope.WebhookExists = true;
         $scope.webhookID = data.webhook.Id;
         $scope.webhookURL = $location.protocol() + "://" +  $location.host() + ":"
         + $location.port() + "/" + API_ENDPOINT_WEBHOOKS + "/" + data.webhook.Token;

@@ -2,12 +2,12 @@ angular.module('portainer.app')
 .factory('WebhookService', ['$q', 'Webhooks', 'EndpointProvider', function WebhookServiceFactory($q, Webhooks, EndpointProvider) {
   'use strict';
   var service = {};
-  var endpointID = 1; //Hard coded while I figure out why the EndpointProvider isn't doing what I expect
+  var temp_endpointID = 1; //Hard coded while I figure out why the EndpointProvider isn't doing what I expect
 
-  service.webhook = function(serviceID) {
+  service.webhook = function(serviceID, endpointID) {
     var deferred = $q.defer();
-    console.log(EndpointProvider.endpointID)
-    // var filters = { ServiceID: serviceID, EndpointID: EndpointProvider.endpointID }; //Doesn't work
+    console.log(endpointID);
+    endpointID = temp_endpointID;
     var filters = { ServiceID: serviceID, EndpointID: endpointID };
     var webhookData = {};
     Webhooks.query({filters:filters }).$promise
@@ -30,7 +30,9 @@ angular.module('portainer.app')
   }
 
 
-  service.createWebhook = function(serviceID) {
+  service.createWebhook = function(serviceID, endpointID) {
+    console.log(endpointID); //Returns undefined
+    endpointID = temp_endpointID;
     return Webhooks.create({ServiceID: serviceID, EndpointID: endpointID}).$promise;
   };
 

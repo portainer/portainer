@@ -72,6 +72,22 @@
               </td>
             </tr>
             <tr>
+              <td>Update webhook
+                <label class="switch" style="margin-left: 20px;">
+                  <input name="webhook" type="checkbox" ng-model="WebhookExists" ng-click="addWebhook(service)"><i>
+                </label>
+              </td>
+              <td>
+                <input class="form-control" type="text" ng-model="webhookURL"  ng-disabled="true"/>
+              </td>
+              <td>
+                <div class="md-checkbox">
+                  <input id="copy_webhook_to_clipboard" type="checkbox" ng-model="copy_webhook_to_clipboard" ng-change="copyWebhook()"/>
+                  <label for="copy_webhook_to_clipboard">Copy to clipboard</label>
+                </div>
+              </td>
+          </tr>
+            <tr>
               <td colspan="2">
                 <a ng-if="applicationState.endpoint.apiVersion >= 1.30" class="btn btn-primary btn-sm" type="button" ui-sref="docker.services.service.logs({id: service.Id})"><i class="fa fa-file-alt space-right" aria-hidden="true"></i>Service logs</a>
                 <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.updateInProgress || isUpdating" ng-click="forceUpdateService(service)" button-spinner="state.updateInProgress" ng-if="applicationState.endpoint.apiVersion >= 1.25">
@@ -93,7 +109,7 @@
         </p>
         <div class="btn-toolbar" role="toolbar">
           <div class="btn-group" role="group">
-            <button type="button" class="btn btn-primary" ng-disabled="!hasChanges(service, ['Mode', 'Replicas', 'Image', 'Name'])" ng-click="updateService(service)">Apply changes</button>
+            <button type="button" class="btn btn-primary" ng-disabled="!hasChanges(service, ['Mode', 'Replicas', 'Image', 'Name', 'Webhooks'])" ng-click="updateService(service)">Apply changes</button>
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <span class="caret"></span>
             </button>
@@ -126,7 +142,6 @@
           <li><a href ng-click="goToItem('service-configs')">Configs</a></li>
           <li ng-if="applicationState.endpoint.apiVersion >= 1.25"><a href ng-click="goToItem('service-secrets')">Secrets</a></li>
           <li><a href ng-click="goToItem('service-tasks')">Tasks</a></li>
-          <li><a href ng-click="goToItem('service-webhook')">Webhook</a></li>
         </ul>
       </rd-widget-body>
     </rd-widget>
@@ -177,6 +192,5 @@
     <div id="service-configs" class="padding-top" ng-include="'app/docker/views/services/edit/includes/configs.html'"></div>
     <div id="service-secrets" ng-if="applicationState.endpoint.apiVersion >= 1.25" class="padding-top" ng-include="'app/docker/views/services/edit/includes/secrets.html'"></div>
     <div id="service-tasks" class="padding-top" ng-include="'app/docker/views/services/edit/includes/tasks.html'"></div>
-    <div id="service-webhook" class="padding-top" ng-include="'app/docker/views/services/edit/includes/webhook.html'"></div>
   </div>
 </div>

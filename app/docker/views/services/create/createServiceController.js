@@ -1,6 +1,6 @@
  angular.module('portainer.docker')
-.controller('CreateServiceController', ['$q', '$scope', '$state', '$timeout', 'Service', 'ServiceHelper', 'ConfigService', 'ConfigHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'LabelHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'FormValidator', 'PluginService', 'RegistryService', 'HttpRequestHelper', 'NodeService', 'SettingsService', 'WebhookService',
-function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, ConfigHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, LabelHelper, Authentication, ResourceControlService, Notifications, FormValidator, PluginService, RegistryService, HttpRequestHelper, NodeService, SettingsService, WebhookService) {
+.controller('CreateServiceController', ['$q', '$scope', '$state', '$timeout', 'Service', 'ServiceHelper', 'ConfigService', 'ConfigHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'LabelHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'FormValidator', 'PluginService', 'RegistryService', 'HttpRequestHelper', 'NodeService', 'SettingsService', 'WebhookService','EndpointProvider',
+function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, ConfigHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, LabelHelper, Authentication, ResourceControlService, Notifications, FormValidator, PluginService, RegistryService, HttpRequestHelper, NodeService, SettingsService, WebhookService,EndpointProvider) {
 
   $scope.formValues = {
     Name: '',
@@ -428,7 +428,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
       var serviceIdentifier = data.ID;
       var userId = Authentication.getUserDetails().ID;
       if ($scope.formValues.Webhook) {
-        WebhookService.createWebhook(serviceIdentifier);
+        WebhookService.createWebhook(serviceIdentifier,EndpointProvider.endpointID);
       }
 
       return ResourceControlService.applyResourceControl('service', serviceIdentifier, userId, accessControlData, []);
