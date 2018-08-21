@@ -1,3 +1,5 @@
+/* exported ResourceGroupViewModel */
+
 function ResourceGroupViewModel(data, subscriptionId) {
   this.Id = data.id;
   this.SubscriptionId = subscriptionId;

@@ -1,3 +1,5 @@
+/* exported StoridgeCreateProfileRequest, StoridgeProfileDefaultModel, StoridgeProfileListModel, StoridgeProfileModel */
+
 function StoridgeProfileDefaultModel() {
   this.Directory = '/cio/';
   this.Capacity = 20;

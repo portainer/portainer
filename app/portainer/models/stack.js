@@ -1,3 +1,5 @@
+/* exported StackViewModel, ExternalStackViewModel */
+
 function StackViewModel(data) {
   this.Id = data.Id;
   this.Type = data.Type;

@@ -1,3 +1,5 @@
+/* exported jsonObjectsToArrayHandler, genericHandler, logsHandler, deleteImageHandler */
+
 function isJSONArray(jsonString) {
     return Object.prototype.toString.call(jsonString) === '[object Array]';
 }

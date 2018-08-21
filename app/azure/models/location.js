@@ -1,3 +1,5 @@
+/* exported LocationViewModel */
+
 function LocationViewModel(data) {
   this.Id = data.id;
   this.SubscriptionId = data.subscriptionId;

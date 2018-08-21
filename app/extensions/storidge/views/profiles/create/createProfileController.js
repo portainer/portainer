@@ -30,7 +30,7 @@ function ($scope, $state, $transition$, Notifications, StoridgeProfileService) {
 
     $scope.state.actionInProgress = true;
     StoridgeProfileService.create(profile)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Profile successfully created');
       $state.go('storidge.profiles');
     })

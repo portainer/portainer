@@ -1,3 +1,5 @@
+/* exported UserAccessViewModel, TeamAccessViewModel */
+
 function UserAccessViewModel(data) {
   this.Id = data.Id;
   this.Name = data.Username;

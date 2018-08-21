@@ -1,3 +1,5 @@
+/* exported ImageDetailsViewModel */
+
 function ImageDetailsViewModel(data) {
   this.Id = data.Id;
   this.Tag = data.Tag;

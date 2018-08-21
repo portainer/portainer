@@ -1,3 +1,5 @@
+/* exported VolumeViewModel */
+
 function VolumeViewModel(data) {
   this.Id = data.Name;
   this.Driver = data.Driver;

@@ -1,3 +1,5 @@
+/* exported EventViewModel */
+
 function createEventDetails(event) {
   var eventAttr = event.Actor.Attributes;
   var details = '';

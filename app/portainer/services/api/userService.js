@@ -83,7 +83,7 @@ angular.module('portainer.app')
         return service.updateUser(id, newPassword, undefined);
       }
     })
-    .then(function success(data) {
+    .then(function success() {
       deferred.resolve();
     })
     .catch(function error(err) {
@@ -142,7 +142,7 @@ angular.module('portainer.app')
     var deferred = $q.defer();
 
     Users.checkAdminUser({}).$promise
-    .then(function success(data) {
+    .then(function success() {
       deferred.resolve(true);
     })
     .catch(function error(err) {

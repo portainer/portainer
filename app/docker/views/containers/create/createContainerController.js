@@ -283,7 +283,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
   }
 
   
-  function loadFromContainerCmd(d) {
+  function loadFromContainerCmd() {
     if ($scope.config.Cmd) {
       $scope.config.Cmd = ContainerHelper.commandArrayToString($scope.config.Cmd);
     } else {
@@ -291,7 +291,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     }
   }
 
-  function loadFromContainerPortBindings(d) {
+  function loadFromContainerPortBindings() {
     var bindings = [];
     for (var p in $scope.config.HostConfig.PortBindings) {
       if ({}.hasOwnProperty.call($scope.config.HostConfig.PortBindings, p)) {
@@ -386,7 +386,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     }
   }
 
-  function loadFromContainerEnvironmentVariables(d) {
+  function loadFromContainerEnvironmentVariables() {
     var envArr = [];
     for (var e in $scope.config.Env) {
       if ({}.hasOwnProperty.call($scope.config.Env, e)) {
@@ -397,7 +397,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     $scope.config.Env = envArr;
   }
 
-  function loadFromContainerLabels(d) {
+  function loadFromContainerLabels() {
     for (var l in $scope.config.Labels) {
       if ({}.hasOwnProperty.call($scope.config.Labels, l)) {
         $scope.formValues.Labels.push({ name: l, value: $scope.config.Labels[l]});
@@ -405,7 +405,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     }
   }
 
-  function loadFromContainerConsole(d) {
+  function loadFromContainerConsole() {
     if ($scope.config.OpenStdin && $scope.config.Tty) {
       $scope.formValues.Console = 'both';
     } else if (!$scope.config.OpenStdin && $scope.config.Tty) {
@@ -417,7 +417,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     }
   }
 
-  function loadFromContainerDevices(d) {
+  function loadFromContainerDevices() {
     var path = [];
     for (var dev in $scope.config.HostConfig.Devices) {
       if ({}.hasOwnProperty.call($scope.config.HostConfig.Devices, dev)) {
@@ -428,7 +428,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     $scope.config.HostConfig.Devices = path;
   }
 
-  function loadFromContainerImageConfig(d) {
+  function loadFromContainerImageConfig() {
     var imageInfo = ImageHelper.extractImageAndRegistryFromRepository($scope.config.Image);
     RegistryService.retrieveRegistryFromRepository($scope.config.Image)
     .then(function success(data) {

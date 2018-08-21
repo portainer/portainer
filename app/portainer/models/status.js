@@ -1,3 +1,5 @@
+/* exported StatusViewModel */
+
 function StatusViewModel(data) {
   this.Authentication = data.Authentication;
   this.Snapshot = data.Snapshot;

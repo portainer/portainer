@@ -29,13 +29,13 @@ function ($scope, $state, EndpointService, StateManager, Notifications) {
   };
 
   $scope.createLocalEndpoint = function() {
-    var name = 'local';
-    var URL = '';
-    var endpoint;
+    // var name = 'local';
+    // var URL = '';
+    // var endpoint;
 
     $scope.state.actionInProgress = true;
     EndpointService.createLocalEndpoint()
-    .then(function success(data) {
+    .then(function success() {
       $state.go('portainer.home');
     })
     .catch(function error(err) {
@@ -78,11 +78,9 @@ function ($scope, $state, EndpointService, StateManager, Notifications) {
   };
 
   function createAzureEndpoint(name, applicationId, tenantId, authenticationKey) {
-    var endpoint;
-
     $scope.state.actionInProgress = true;
     EndpointService.createAzureEndpoint(name, applicationId, tenantId, authenticationKey, 1, [])
-    .then(function success(data) {
+    .then(function success() {
       $state.go('portainer.home');
     })
     .catch(function error(err) {
@@ -94,10 +92,9 @@ function ($scope, $state, EndpointService, StateManager, Notifications) {
   }
 
   function createRemoteEndpoint(name, type, URL, PublicURL, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
-    var endpoint;
     $scope.state.actionInProgress = true;
     EndpointService.createRemoteEndpoint(name, type, URL, PublicURL, 1, [], TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
-    .then(function success(data) {
+    .then(function success() {
       $state.go('portainer.home');
     })
     .catch(function error(err) {

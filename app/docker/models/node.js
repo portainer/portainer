@@ -1,3 +1,5 @@
+/* exported NodeViewModel */
+
 function NodeViewModel(data) {
   this.Model = data;
   this.Id = data.ID;

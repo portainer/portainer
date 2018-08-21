@@ -52,7 +52,7 @@ function (PaginationService, DatatableService) {
     PaginationService.setPaginationLimit(this.tableKey, this.state.paginatedItemLimit);
   };
 
-  this.applyFilters = function(value, index, array) {
+  this.applyFilters = function(value) {
     var volume = value;
     var filters = ctrl.filters;
     if ((volume.dangling && filters.usage.showUnusedVolumes)

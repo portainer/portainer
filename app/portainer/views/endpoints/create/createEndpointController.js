@@ -60,8 +60,6 @@ function ($q, $scope, $state, $filter, EndpointService, GroupService, TagService
   };
 
   function createAzureEndpoint(name, applicationId, tenantId, authenticationKey, groupId, tags) {
-    var endpoint;
-
     $scope.state.actionInProgress = true;
     EndpointService.createAzureEndpoint(name, applicationId, tenantId, authenticationKey, groupId, tags)
     .then(function success() {

@@ -36,7 +36,7 @@ function ($scope, $state, RegistryService, Notifications) {
 
     $scope.state.actionInProgress = true;
     RegistryService.createRegistry(registryName, registryURL, authentication, username, password)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Registry successfully created');
       $state.go('portainer.registries');
     })

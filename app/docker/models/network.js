@@ -1,3 +1,5 @@
+/* exported NetworkViewModel */
+
 function NetworkViewModel(data) {
   this.Id = data.Id;
   this.Name = data.Name;

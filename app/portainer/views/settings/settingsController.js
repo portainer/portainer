@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('SettingsController', ['$scope', '$state', 'Notifications', 'SettingsService', 'StateManager', 'DEFAULT_TEMPLATES_URL',
-function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_TEMPLATES_URL) {
+.controller('SettingsController', ['$scope', '$state', 'Notifications', 'SettingsService', 'StateManager', /*'DEFAULT_TEMPLATES_URL',*/
+function ($scope, $state, Notifications, SettingsService, StateManager/*, DEFAULT_TEMPLATES_URL*/) {
 
   $scope.state = {
     actionInProgress: false
@@ -53,7 +53,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager, DEFAULT_
 
   function updateSettings(settings) {
     SettingsService.update(settings)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Settings updated');
       StateManager.updateLogo(settings.LogoURL);
       StateManager.updateSnapshotInterval(settings.SnapshotInterval);

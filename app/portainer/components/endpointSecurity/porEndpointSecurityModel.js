@@ -1,3 +1,5 @@
+/* exported EndpointSecurityFormData */
+
 function EndpointSecurityFormData() {
   this.TLS = false;
   this.TLSMode = 'tls_client_ca';

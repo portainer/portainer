@@ -106,7 +106,6 @@ module.exports = function (grunt) {
 
 var autoprefixer = require('autoprefixer');
 var cssnano = require('cssnano');
-var fs = require('fs');
 
 gruntfile_cfg.config = {
   dev:  { options: { variables: { 'environment': 'development' }}},

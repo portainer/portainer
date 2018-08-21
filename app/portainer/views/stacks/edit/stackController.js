@@ -65,7 +65,7 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
 
     $scope.state.migrationInProgress = true;
     migrateRequest(stack, targetEndpointId)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Stack successfully migrated', stack.Name);
       $state.go('portainer.stacks', {}, {reload: true});
     })
@@ -108,7 +108,7 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
 
     $scope.state.actionInProgress = true;
     StackService.updateStack(stack, stackFile, env, prune)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Stack successfully deployed');
       $state.reload();
     })

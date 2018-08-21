@@ -1,3 +1,5 @@
+/* exported StoridgeEventModel */
+
 function StoridgeEventModel(data) {
   this.Time = data.time;
   this.Category = data.category;

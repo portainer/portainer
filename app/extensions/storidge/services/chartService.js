@@ -178,7 +178,7 @@ angular.module('extension.storidge')
     return label + ': ' + processedValue + '/s';
   }
 
-  function bytePerSecBasedAxisLabel(value, index, values) {
+  function bytePerSecBasedAxisLabel(value/*, index, values*/) {
     if (value > 5) {
       return filesize(value, {base: 10, round: 1});
     }
