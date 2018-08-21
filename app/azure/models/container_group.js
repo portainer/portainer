@@ -1,5 +1,3 @@
-/* exported CreateContainerGroupRequest, ContainerGroupDefaultModel, ContainerGroupViewModel */
-
 function ContainerGroupDefaultModel() {
   this.Location = '';
   this.OSType = 'Linux';
