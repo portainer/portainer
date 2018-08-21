@@ -1,5 +1,3 @@
-/* exported VolumesNFSFormData */
-
 function VolumesNFSFormData() {
   this.useNFS = false;
   this.serverAddress = '';

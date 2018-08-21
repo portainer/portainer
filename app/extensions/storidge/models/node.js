@@ -1,5 +1,3 @@
-/* exported StoridgeNodeModel */
-
 function StoridgeNodeModel(name, data) {
   this.Name = name;
   this.IP = data.ip;

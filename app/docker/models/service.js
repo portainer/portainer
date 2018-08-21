@@ -1,5 +1,3 @@
-/* exported ServiceViewModel */
-
 function ServiceViewModel(data, runningTasks, allTasks) {
   this.Model = data;
   this.Id = data.ID;

@@ -1,5 +1,3 @@
-/* exported TemplateDefaultModel, TemplateUpdateRequest, TemplateViewModel, TemplateCreateRequest */
-
 function TemplateDefaultModel() {
   this.Type = 1;
   this.AdministratorOnly = false;

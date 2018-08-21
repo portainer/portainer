@@ -1,5 +1,3 @@
-/* exported TaskViewModel */
-
 function TaskViewModel(data) {
   this.Id = data.ID;
   this.Created = data.CreatedAt;

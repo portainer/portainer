@@ -1,5 +1,3 @@
-/* exported TeamMembershipModel */
-
 function TeamMembershipModel(data) {
   this.Id = data.Id;
   this.UserId = data.UserID;

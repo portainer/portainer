@@ -1,5 +1,3 @@
-/* exported UserViewModel */
-
 function UserViewModel(data) {
   this.Id = data.Id;
   this.Username = data.Username;

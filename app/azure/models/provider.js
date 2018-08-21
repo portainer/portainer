@@ -1,5 +1,3 @@
-/* exported ContainerInstanceProviderViewModel */
-
 function ContainerInstanceProviderViewModel(data) {
   this.Id = data.id;
   this.Namespace = data.namespace;

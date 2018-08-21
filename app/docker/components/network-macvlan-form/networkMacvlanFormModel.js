@@ -1,5 +1,3 @@
-/* exported MacvlanFormData */
-
 function MacvlanFormData() {
   this.Scope = 'local';
   this.SelectedNetworkConfig = '';

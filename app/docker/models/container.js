@@ -1,5 +1,3 @@
-/* exported ContainerDetailsViewModel, ContainerStatsViewModel, ContainerViewModel */
-
 function createStatus(statusText) {
   var status = _.toLower(statusText);
 

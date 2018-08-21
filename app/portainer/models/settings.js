@@ -1,5 +1,3 @@
-/* exported SettingsViewModel, LDAPSettingsViewModel, LDAPSearchSettings, LDAPGroupSearchSettings */
-
 function SettingsViewModel(data) {
   this.LogoURL = data.LogoURL;
   this.BlackListedLabels = data.BlackListedLabels;

@@ -1,5 +1,3 @@
-/* exported ContainerCapabilities */
-
 var capDesc = {
     'SETPCAP': 'Modify process capabilities.',
     'MKNOD': 'Create special files using mknod(2).',

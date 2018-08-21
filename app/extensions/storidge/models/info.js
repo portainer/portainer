@@ -1,5 +1,3 @@
-/* exported StoridgeInfoModel */
-
 function StoridgeInfoModel(data) {
   this.Domain = data.domain;
   this.Nodes = data.nodes;

@@ -1,5 +1,3 @@
-/* exported ImageLayerViewModel */
-
 function ImageLayerViewModel(order, data) {
   this.Order = order;
   this.Id = data.Id;

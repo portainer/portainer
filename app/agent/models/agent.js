@@ -1,5 +1,3 @@
-/* exported AgentViewModel */
-
 function AgentViewModel(data) {
   this.IPAddress = data.IPAddress;
 	this.NodeName = data.NodeName;

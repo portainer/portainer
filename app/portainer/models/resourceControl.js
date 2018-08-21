@@ -1,5 +1,3 @@
-/* exported ResourceControlViewModel */
-
 function ResourceControlViewModel(data) {
   this.Id = data.Id;
   this.Type = data.Type;

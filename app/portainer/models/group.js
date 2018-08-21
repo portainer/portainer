@@ -1,5 +1,3 @@
-/* exported EndpointGroupDefaultModel, EndpointGroupModel, EndpointGroupCreateRequest, EndpointGroupUpdateRequest */
-
 function EndpointGroupDefaultModel() {
   this.Name = '';
   this.Description = '';

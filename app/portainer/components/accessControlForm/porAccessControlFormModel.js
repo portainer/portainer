@@ -1,5 +1,3 @@
-/* exported AccessControlFormData */
-
 function AccessControlFormData() {
   this.AccessControlEnabled = true;
   this.Ownership = 'private';

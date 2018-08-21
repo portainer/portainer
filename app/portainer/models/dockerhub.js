@@ -1,5 +1,3 @@
-/* exported DockerHubViewModel */
-
 function DockerHubViewModel(data) {
   this.Name = 'DockerHub';
   this.URL = '';

@@ -1,5 +1,3 @@
-/* exported ConfigViewModel */
-
 function ConfigViewModel(data) {
   this.Id = data.ID;
   this.CreatedAt = data.CreatedAt;

@@ -1,5 +1,3 @@
-/* exported RegistryViewModel */
-
 function RegistryViewModel(data) {
   this.Id = data.Id;
   this.Name = data.Name;
