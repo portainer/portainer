@@ -36,7 +36,7 @@ angular.module('portainer.app')
 
 
   service.deleteWebhook = function(id) {
-    return Webhook.remove({id: id}).$promise;
+    return Webhooks.remove({id: id}).$promise;
   };
 
   return service;
