@@ -207,15 +207,12 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     updateServiceArray(service, 'Hosts', service.Hosts);
   };
   $scope.addWebhook = function addWebhook(service){
-    $scope.isAdding = true;
     updateServiceArray(service, 'Webhooks', service.webhook);
   };
   $scope.removeWebhook = function removeWebhook(service){
-    $scope.isRemoving = true;
     updateServiceArray(service, 'Webhooks', service.webhook);
   }
   $scope.copyWebhook = function copyWebhook(){
-    console.log($scope.webhookURL);
     clipboard.copyText($scope.webhookURL);
   }
 
@@ -329,15 +326,14 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     if ($scope.hasChanges(service, ['Webhooks'])) {
       if($scope.webhookID) { //Webhook already exists we must be deleting it
         WebhookService.deleteWebhook($scope.webhookID);
+        $scope.webhookURL = null;
+        $scope.webhookID = null;
       } else { // No webhook means are creating one
-        WebhookService.createWebhook(service.Id,EndpointProvider.EndpointId)
+        WebhookService.createWebhook(service.Id,EndpointProvider.endpointID())
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to create webhook', service.Name);
         })
       }
-      $scope.isAdding = false;
-      $scope.isRemoving = false;
-      $scope.webhookURL = null;
     }
 
     Service.update({ id: service.Id, version: service.Version }, config, function (data) {
@@ -367,6 +363,9 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     $scope.state.deletionInProgress = true;
     ServiceService.remove($scope.service)
     .then(function success(data) {
+      if ($scope.webhookID){
+        WebhookService.deleteWebhook($scope.webhookID);
+      }
       Notifications.success('Service successfully deleted');
       $state.go('docker.services', {});
     })
@@ -472,7 +471,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
         availableImages: ImageService.images(),
         availableLoggingDrivers: PluginService.loggingPlugins(apiVersion < 1.25),
         settings: SettingsService.publicSettings(),
-        webhook: WebhookService.webhook(service.Id)
+        webhook: WebhookService.webhook(service.Id,EndpointProvider.endpointID())
       });
     })
     .then(function success(data) {

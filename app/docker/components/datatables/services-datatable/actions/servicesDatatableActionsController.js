@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ServicesDatatableActionsController', ['$state', 'ServiceService', 'ServiceHelper', 'Notifications', 'ModalService', 'ImageHelper',
-function ($state, ServiceService, ServiceHelper, Notifications, ModalService, ImageHelper) {
+.controller('ServicesDatatableActionsController', ['$state', 'ServiceService', 'ServiceHelper', 'Notifications', 'ModalService', 'ImageHelper','WebhookService','EndpointProvider',
+function ($state, ServiceService, ServiceHelper, Notifications, ModalService, ImageHelper, WebhookService, EndpointProvider) {
 
   this.scaleAction = function scaleService(service) {
     var config = ServiceHelper.serviceToConfig(service.Model);
@@ -73,6 +73,13 @@ function ($state, ServiceService, ServiceHelper, Notifications, ModalService, Im
     angular.forEach(services, function (service) {
       ServiceService.remove(service)
       .then(function success() {
+        WebhookService.webhook(service.Id, EndpointProvider.endpointID())
+        .then(function success(data){
+          var webhookID = data.Id;
+          if (webhookID){
+            WebhookService.deleteWebhook(webhookID);
+          }
+        });
         Notifications.success('Service successfully removed', service.Name);
       })
       .catch(function error(err) {

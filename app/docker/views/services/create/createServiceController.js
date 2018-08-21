@@ -428,7 +428,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
       var serviceIdentifier = data.ID;
       var userId = Authentication.getUserDetails().ID;
       if ($scope.formValues.Webhook) {
-        WebhookService.createWebhook(serviceIdentifier,EndpointProvider.endpointID);
+        WebhookService.createWebhook(serviceIdentifier,EndpointProvider.endpointID());
       }
 
       return ResourceControlService.applyResourceControl('service', serviceIdentifier, userId, accessControlData, []);

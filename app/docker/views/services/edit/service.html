@@ -81,10 +81,9 @@
                 <input class="form-control" type="text" ng-model="webhookURL"  ng-disabled="true"/>
               </td>
               <td>
-                <div class="md-checkbox">
-                  <input id="copy_webhook_to_clipboard" type="checkbox" ng-model="copy_webhook_to_clipboard" ng-change="copyWebhook()"/>
-                  <label for="copy_webhook_to_clipboard">Copy to clipboard</label>
-                </div>
+                <button type="button" class="btn btn-primary btn-sm" ng-if="webhookURL" ng-click="copyWebhook()" >
+                  <span ng-hide="!webhookURL"><i class="fa fa-file-alt space-right" aria-hidden="true"></i>Copy to clipboard</span>
+                </button>
               </td>
           </tr>
             <tr>
