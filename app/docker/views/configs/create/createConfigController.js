@@ -91,28 +91,28 @@ function ($scope, $state, $transition$, Notifications, ConfigService, Authentica
   };
 
   function initView() {
-    if ($transition$.params().id === '') {
-        // display code editor component in new configs
+    if (!$transition$.params().id) {
         $scope.formValues.displayCodeEditor = true;
-    } else {
-      ConfigService.config($transition$.params().id)
-      .then(function success(data) {
-        $scope.formValues.Name = data.Name + "_Copy";
-        $scope.formValues.Data = data.Data;
-        $scope.formValues.Labels = [];
-        for (var label in data.Labels) {
+        return;
+    }
+
+    ConfigService.config($transition$.params().id)
+    .then(function success(data) {
+      $scope.formValues.Name = data.Name + '_copy';
+      $scope.formValues.Data = data.Data;
+      $scope.formValues.Labels = [];
+      for (var label in data.Labels) {
+        if (Object.prototype.hasOwnProperty.call(data.Labels, label)) {
           $scope.formValues.Labels.push({ name: label, value: data.Labels[label]});
         }
-        // display code editor only after config is loaded
-        $scope.formValues.displayCodeEditor = true;
-      })
-      .catch(function error(err) {
-        // display code editor component when unable to load config 
-        $scope.formValues.displayCodeEditor = true;
-        Notifications.error('Failure', err, 'Unable to clone config');
-      });
-    }
-  } 
+      }
+      $scope.formValues.displayCodeEditor = true;
+    })
+    .catch(function error(err) {
+      $scope.formValues.displayCodeEditor = true;
+      Notifications.error('Failure', err, 'Unable to clone config');
+    });
+  }
 
   initView();
 }]);
