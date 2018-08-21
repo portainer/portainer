@@ -7,7 +7,7 @@ type (
 		Value string `json:"value"`
 	}
 
-	// CLIFlags represents the available flags on the CLI.
+	// CLIFlags represents the available flags on the CLI
 	CLIFlags struct {
 		Addr              *string
 		AdminPassword     *string
@@ -35,7 +35,7 @@ type (
 		SnapshotInterval  *string
 	}
 
-	// Status represents the application status.
+	// Status represents the application status
 	Status struct {
 		Authentication     bool   `json:"Authentication"`
 		EndpointManagement bool   `json:"EndpointManagement"`
@@ -44,7 +44,7 @@ type (
 		Version            string `json:"Version"`
 	}
 
-	// LDAPSettings represents the settings used to connect to a LDAP server.
+	// LDAPSettings represents the settings used to connect to a LDAP server
 	LDAPSettings struct {
 		ReaderDN            string                    `json:"ReaderDN"`
 		Password            string                    `json:"Password"`
@@ -56,7 +56,7 @@ type (
 		AutoCreateUsers     bool                      `json:"AutoCreateUsers"`
 	}
 
-	// TLSConfiguration represents a TLS configuration.
+	// TLSConfiguration represents a TLS configuration
 	TLSConfiguration struct {
 		TLS           bool   `json:"TLS"`
 		TLSSkipVerify bool   `json:"TLSSkipVerify"`
@@ -65,21 +65,21 @@ type (
 		TLSKeyPath    string `json:"TLSKey,omitempty"`
 	}
 
-	// LDAPSearchSettings represents settings used to search for users in a LDAP server.
+	// LDAPSearchSettings represents settings used to search for users in a LDAP server
 	LDAPSearchSettings struct {
 		BaseDN            string `json:"BaseDN"`
 		Filter            string `json:"Filter"`
 		UserNameAttribute string `json:"UserNameAttribute"`
 	}
 
-	// LDAPGroupSearchSettings represents settings used to search for groups in a LDAP server.
+	// LDAPGroupSearchSettings represents settings used to search for groups in a LDAP server
 	LDAPGroupSearchSettings struct {
 		GroupBaseDN    string `json:"GroupBaseDN"`
 		GroupFilter    string `json:"GroupFilter"`
 		GroupAttribute string `json:"GroupAttribute"`
 	}
 
-	// Settings represents the application settings.
+	// Settings represents the application settings
 	Settings struct {
 		LogoURL                            string               `json:"LogoURL"`
 		BlackListedLabels                  []Pair               `json:"BlackListedLabels"`
@@ -95,7 +95,7 @@ type (
 		DisplayExternalContributors bool
 	}
 
-	// User represents a user account.
+	// User represents a user account
 	User struct {
 		ID       UserID   `json:"Id"`
 		Username string   `json:"Username"`
@@ -110,10 +110,10 @@ type (
 	// or a regular user
 	UserRole int
 
-	// AuthenticationMethod represents the authentication method used to authenticate a user.
+	// AuthenticationMethod represents the authentication method used to authenticate a user
 	AuthenticationMethod int
 
-	// Team represents a list of user accounts.
+	// Team represents a list of user accounts
 	Team struct {
 		ID   TeamID `json:"Id"`
 		Name string `json:"Name"`
@@ -136,20 +136,20 @@ type (
 	// MembershipRole represents the role of a user within a team
 	MembershipRole int
 
-	// TokenData represents the data embedded in a JWT token.
+	// TokenData represents the data embedded in a JWT token
 	TokenData struct {
 		ID       UserID
 		Username string
 		Role     UserRole
 	}
 
-	// StackID represents a stack identifier (it must be composed of Name + "_" + SwarmID to create a unique identifier).
+	// StackID represents a stack identifier (it must be composed of Name + "_" + SwarmID to create a unique identifier)
 	StackID int
 
-	// StackType represents the type of the stack (compose v2, stack deploy v3).
+	// StackType represents the type of the stack (compose v2, stack deploy v3)
 	StackType int
 
-	// Stack represents a Docker stack created via docker stack deploy.
+	// Stack represents a Docker stack created via docker stack deploy
 	Stack struct {
 		ID          StackID    `json:"Id"`
 		Name        string     `json:"Name"`
@@ -161,11 +161,11 @@ type (
 		ProjectPath string
 	}
 
-	// RegistryID represents a registry identifier.
+	// RegistryID represents a registry identifier
 	RegistryID int
 
 	// Registry represents a Docker registry with all the info required
-	// to connect to it.
+	// to connect to it
 	Registry struct {
 		ID              RegistryID `json:"Id"`
 		Name            string     `json:"Name"`
@@ -178,24 +178,24 @@ type (
 	}
 
 	// DockerHub represents all the required information to connect and use the
-	// Docker Hub.
+	// Docker Hub
 	DockerHub struct {
 		Authentication bool   `json:"Authentication"`
 		Username       string `json:"Username"`
 		Password       string `json:"Password,omitempty"`
 	}
 
-	// EndpointID represents an endpoint identifier.
+	// EndpointID represents an endpoint identifier
 	EndpointID int
 
-	// EndpointType represents the type of an endpoint.
+	// EndpointType represents the type of an endpoint
 	EndpointType int
 
 	// EndpointStatus represents the status of an endpoint
 	EndpointStatus int
 
 	// Endpoint represents a Docker endpoint with all the info required
-	// to connect to it.
+	// to connect to it
 	Endpoint struct {
 		ID               EndpointID          `json:"Id"`
 		Name             string              `json:"Name"`
@@ -243,10 +243,10 @@ type (
 		StackCount            int    `json:"StackCount"`
 	}
 
-	// EndpointGroupID represents an endpoint group identifier.
+	// EndpointGroupID represents an endpoint group identifier
 	EndpointGroupID int
 
-	// EndpointGroup represents a group of endpoints.
+	// EndpointGroup represents a group of endpoints
 	EndpointGroup struct {
 		ID              EndpointGroupID `json:"Id"`
 		Name            string          `json:"Name"`
@@ -259,17 +259,17 @@ type (
 		Labels []Pair `json:"Labels"`
 	}
 
-	// EndpointExtension represents a extension associated to an endpoint.
+	// EndpointExtension represents a extension associated to an endpoint
 	EndpointExtension struct {
 		Type EndpointExtensionType `json:"Type"`
 		URL  string                `json:"URL"`
 	}
 
 	// EndpointExtensionType represents the type of an endpoint extension. Only
-	// one extension of each type can be associated to an endpoint.
+	// one extension of each type can be associated to an endpoint
 	EndpointExtensionType int
 
-	// ResourceControlID represents a resource control identifier.
+	// ResourceControlID represents a resource control identifier
 	ResourceControlID int
 
 	// ResourceControl represent a reference to a Docker resource with specific access controls
@@ -291,37 +291,37 @@ type (
 		AdministratorsOnly bool `json:"AdministratorsOnly,omitempty"`
 	}
 
-	// ResourceControlType represents the type of resource associated to the resource control (volume, container, service...).
+	// ResourceControlType represents the type of resource associated to the resource control (volume, container, service...)
 	ResourceControlType int
 
-	// UserResourceAccess represents the level of control on a resource for a specific user.
+	// UserResourceAccess represents the level of control on a resource for a specific user
 	UserResourceAccess struct {
 		UserID      UserID              `json:"UserId"`
 		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
 	}
 
-	// TeamResourceAccess represents the level of control on a resource for a specific team.
+	// TeamResourceAccess represents the level of control on a resource for a specific team
 	TeamResourceAccess struct {
 		TeamID      TeamID              `json:"TeamId"`
 		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
 	}
 
-	// TagID represents a tag identifier.
+	// TagID represents a tag identifier
 	TagID int
 
-	// Tag represents a tag that can be associated to a resource.
+	// Tag represents a tag that can be associated to a resource
 	Tag struct {
 		ID   TagID
 		Name string `json:"Name"`
 	}
 
-	// TemplateID represents a template identifier.
+	// TemplateID represents a template identifier
 	TemplateID int
 
-	// TemplateType represents the type of a template.
+	// TemplateType represents the type of a template
 	TemplateType int
 
-	// Template represents an application template.
+	// Template represents an application template
 	Template struct {
 		// Mandatory container/stack fields
 		ID                TemplateID   `json:"Id"`
@@ -357,7 +357,7 @@ type (
 		Hostname      string           `json:"hostname,omitempty"`
 	}
 
-	// TemplateEnv represents a template environment variable configuration.
+	// TemplateEnv represents a template environment variable configuration
 	TemplateEnv struct {
 		Name        string              `json:"name"`
 		Label       string              `json:"label,omitempty"`
@@ -367,41 +367,41 @@ type (
 		Select      []TemplateEnvSelect `json:"select,omitempty"`
 	}
 
-	// TemplateVolume represents a template volume configuration.
+	// TemplateVolume represents a template volume configuration
 	TemplateVolume struct {
 		Container string `json:"container"`
 		Bind      string `json:"bind,omitempty"`
 		ReadOnly  bool   `json:"readonly,omitempty"`
 	}
 
-	// TemplateRepository represents the git repository configuration for a template.
+	// TemplateRepository represents the git repository configuration for a template
 	TemplateRepository struct {
 		URL       string `json:"url"`
 		StackFile string `json:"stackfile"`
 	}
 
 	// TemplateEnvSelect represents text/value pair that will be displayed as a choice for the
-	// template user.
+	// template user
 	TemplateEnvSelect struct {
 		Text    string `json:"text"`
 		Value   string `json:"value"`
 		Default bool   `json:"default"`
 	}
 
-	// ResourceAccessLevel represents the level of control associated to a resource.
+	// ResourceAccessLevel represents the level of control associated to a resource
 	ResourceAccessLevel int
 
 	// TLSFileType represents a type of TLS file required to connect to a Docker endpoint.
-	// It can be either a TLS CA file, a TLS certificate file or a TLS key file.
+	// It can be either a TLS CA file, a TLS certificate file or a TLS key file
 	TLSFileType int
 
-	// CLIService represents a service for managing CLI.
+	// CLIService represents a service for managing CLI
 	CLIService interface {
 		ParseFlags(version string) (*CLIFlags, error)
 		ValidateFlags(flags *CLIFlags) error
 	}
 
-	// DataStore defines the interface to manage the data.
+	// DataStore defines the interface to manage the data
 	DataStore interface {
 		Open() error
 		Init() error
@@ -409,12 +409,12 @@ type (
 		MigrateData() error
 	}
 
-	// Server defines the interface to serve the API.
+	// Server defines the interface to serve the API
 	Server interface {
 		Start() error
 	}
 
-	// UserService represents a service for managing user data.
+	// UserService represents a service for managing user data
 	UserService interface {
 		User(ID UserID) (*User, error)
 		UserByUsername(username string) (*User, error)
@@ -425,7 +425,7 @@ type (
 		DeleteUser(ID UserID) error
 	}
 
-	// TeamService represents a service for managing user data.
+	// TeamService represents a service for managing user data
 	TeamService interface {
 		Team(ID TeamID) (*Team, error)
 		TeamByName(name string) (*Team, error)
@@ -435,7 +435,7 @@ type (
 		DeleteTeam(ID TeamID) error
 	}
 
-	// TeamMembershipService represents a service for managing team membership data.
+	// TeamMembershipService represents a service for managing team membership data
 	TeamMembershipService interface {
 		TeamMembership(ID TeamMembershipID) (*TeamMembership, error)
 		TeamMemberships() ([]TeamMembership, error)
@@ -448,7 +448,7 @@ type (
 		DeleteTeamMembershipByTeamID(teamID TeamID) error
 	}
 
-	// EndpointService represents a service for managing endpoint data.
+	// EndpointService represents a service for managing endpoint data
 	EndpointService interface {
 		Endpoint(ID EndpointID) (*Endpoint, error)
 		Endpoints() ([]Endpoint, error)
@@ -459,7 +459,7 @@ type (
 		GetNextIdentifier() int
 	}
 
-	// EndpointGroupService represents a service for managing endpoint group data.
+	// EndpointGroupService represents a service for managing endpoint group data
 	EndpointGroupService interface {
 		EndpointGroup(ID EndpointGroupID) (*EndpointGroup, error)
 		EndpointGroups() ([]EndpointGroup, error)
@@ -468,7 +468,7 @@ type (
 		DeleteEndpointGroup(ID EndpointGroupID) error
 	}
 
-	// RegistryService represents a service for managing registry data.
+	// RegistryService represents a service for managing registry data
 	RegistryService interface {
 		Registry(ID RegistryID) (*Registry, error)
 		Registries() ([]Registry, error)
@@ -477,7 +477,7 @@ type (
 		DeleteRegistry(ID RegistryID) error
 	}
 
-	// StackService represents a service for managing stack data.
+	// StackService represents a service for managing stack data
 	StackService interface {
 		Stack(ID StackID) (*Stack, error)
 		StackByName(name string) (*Stack, error)
@@ -488,25 +488,25 @@ type (
 		GetNextIdentifier() int
 	}
 
-	// DockerHubService represents a service for managing the DockerHub object.
+	// DockerHubService represents a service for managing the DockerHub object
 	DockerHubService interface {
 		DockerHub() (*DockerHub, error)
 		UpdateDockerHub(registry *DockerHub) error
 	}
 
-	// SettingsService represents a service for managing application settings.
+	// SettingsService represents a service for managing application settings
 	SettingsService interface {
 		Settings() (*Settings, error)
 		UpdateSettings(settings *Settings) error
 	}
 
-	// VersionService represents a service for managing version data.
+	// VersionService represents a service for managing version data
 	VersionService interface {
 		DBVersion() (int, error)
 		StoreDBVersion(version int) error
 	}
 
-	// ResourceControlService represents a service for managing resource control data.
+	// ResourceControlService represents a service for managing resource control data
 	ResourceControlService interface {
 		ResourceControl(ID ResourceControlID) (*ResourceControl, error)
 		ResourceControlByResourceID(resourceID string) (*ResourceControl, error)
@@ -516,14 +516,14 @@ type (
 		DeleteResourceControl(ID ResourceControlID) error
 	}
 
-	// TagService represents a service for managing tag data.
+	// TagService represents a service for managing tag data
 	TagService interface {
 		Tags() ([]Tag, error)
 		CreateTag(tag *Tag) error
 		DeleteTag(ID TagID) error
 	}
 
-	// TemplateService represents a service for managing template data.
+	// TemplateService represents a service for managing template data
 	TemplateService interface {
 		Templates() ([]Template, error)
 		Template(ID TemplateID) (*Template, error)
@@ -532,13 +532,13 @@ type (
 		DeleteTemplate(ID TemplateID) error
 	}
 
-	// CryptoService represents a service for encrypting/hashing data.
+	// CryptoService represents a service for encrypting/hashing data
 	CryptoService interface {
 		Hash(data string) (string, error)
 		CompareHashAndData(hash string, data string) error
 	}
 
-	// DigitalSignatureService represents a service to manage digital signatures.
+	// DigitalSignatureService represents a service to manage digital signatures
 	DigitalSignatureService interface {
 		ParseKeyPair(private, public []byte) error
 		GenerateKeyPair() ([]byte, []byte, error)
@@ -547,13 +547,13 @@ type (
 		Sign(message string) (string, error)
 	}
 
-	// JWTService represents a service for managing JWT tokens.
+	// JWTService represents a service for managing JWT tokens
 	JWTService interface {
 		GenerateToken(data *TokenData) (string, error)
 		ParseAndVerifyToken(token string) (*TokenData, error)
 	}
 
-	// FileService represents a service for managing files.
+	// FileService represents a service for managing files
 	FileService interface {
 		GetFileContent(filePath string) ([]byte, error)
 		Rename(oldPath, newPath string) error
@@ -571,13 +571,13 @@ type (
 		FileExists(path string) (bool, error)
 	}
 
-	// GitService represents a service for managing Git.
+	// GitService represents a service for managing Git
 	GitService interface {
 		ClonePublicRepository(repositoryURL, referenceName string, destination string) error
 		ClonePrivateRepositoryWithBasicAuth(repositoryURL, referenceName string, destination, username, password string) error
 	}
 
-	// JobScheduler represents a service to run jobs on a periodic basis.
+	// JobScheduler represents a service to run jobs on a periodic basis
 	JobScheduler interface {
 		ScheduleEndpointSyncJob(endpointFilePath, interval string) error
 		ScheduleSnapshotJob(interval string) error
@@ -585,19 +585,19 @@ type (
 		Start()
 	}
 
-	// Snapshotter represents a service used to create endpoint snapshots.
+	// Snapshotter represents a service used to create endpoint snapshots
 	Snapshotter interface {
 		CreateSnapshot(endpoint *Endpoint) (*Snapshot, error)
 	}
 
-	// LDAPService represents a service used to authenticate users against a LDAP/AD.
+	// LDAPService represents a service used to authenticate users against a LDAP/AD
 	LDAPService interface {
 		AuthenticateUser(username, password string, settings *LDAPSettings) error
 		TestConnectivity(settings *LDAPSettings) error
 		GetUserGroups(username string, settings *LDAPSettings) ([]string, error)
 	}
 
-	// SwarmStackManager represents a service to manage Swarm stacks.
+	// SwarmStackManager represents a service to manage Swarm stacks
 	SwarmStackManager interface {
 		Login(dockerhub *DockerHub, registries []Registry, endpoint *Endpoint)
 		Logout(endpoint *Endpoint) error
@@ -605,7 +605,7 @@ type (
 		Remove(stack *Stack, endpoint *Endpoint) error
 	}
 
-	// ComposeStackManager represents a service to manage Compose stacks.
+	// ComposeStackManager represents a service to manage Compose stacks
 	ComposeStackManager interface {
 		Up(stack *Stack, endpoint *Endpoint) error
 		Down(stack *Stack, endpoint *Endpoint) error
@@ -613,13 +613,15 @@ type (
 )
 
 const (
-	// APIVersion is the version number of the Portainer API.
+	// APIVersion is the version number of the Portainer API
 	APIVersion = "1.19.2-dev"
-	// DBVersion is the version number of the Portainer database.
+	// DBVersion is the version number of the Portainer database
 	DBVersion = 14
+	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
+	MessageOfTheDayURL = "https://raw.githubusercontent.com/portainer/motd/master/message.html"
 	// PortainerAgentHeader represents the name of the header available in any agent response
 	PortainerAgentHeader = "Portainer-Agent"
-	// PortainerAgentTargetHeader represent the name of the header containing the target node name.
+	// PortainerAgentTargetHeader represent the name of the header containing the target node name
 	PortainerAgentTargetHeader = "X-PortainerAgent-Target"
 	// PortainerAgentSignatureHeader represent the name of the header containing the digital signature
 	PortainerAgentSignatureHeader = "X-PortainerAgent-Signature"
@@ -628,16 +630,16 @@ const (
 	// PortainerAgentSignatureMessage represents the message used to create a digital signature
 	// to be used when communicating with an agent
 	PortainerAgentSignatureMessage = "Portainer-App"
-	// SupportedDockerAPIVersion is the minimum Docker API version supported by Portainer.
+	// SupportedDockerAPIVersion is the minimum Docker API version supported by Portainer
 	SupportedDockerAPIVersion = "1.24"
 )
 
 const (
-	// TLSFileCA represents a TLS CA certificate file.
+	// TLSFileCA represents a TLS CA certificate file
 	TLSFileCA TLSFileType = iota
-	// TLSFileCert represents a TLS certificate file.
+	// TLSFileCert represents a TLS certificate file
 	TLSFileCert
-	// TLSFileKey represents a TLS key file.
+	// TLSFileKey represents a TLS key file
 	TLSFileKey
 )
 

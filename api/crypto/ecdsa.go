@@ -3,7 +3,6 @@ package crypto
 import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
-	"crypto/md5"
 	"crypto/rand"
 	"crypto/x509"
 	"encoding/base64"
@@ -97,9 +96,7 @@ func (service *ECDSAService) GenerateKeyPair() ([]byte, []byte, error) {
 // that hash.
 // It then encodes the generated signature in base64.
 func (service *ECDSAService) Sign(message string) (string, error) {
-	digest := md5.New()
-	digest.Write([]byte(message))
-	hash := digest.Sum(nil)
+	hash := HashFromBytes([]byte(message))
 
 	r := big.NewInt(0)
 	s := big.NewInt(0)

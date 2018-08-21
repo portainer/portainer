@@ -9,30 +9,22 @@
   </div>
 </div>
 
-<div class="row" ng-if="!applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
-  <div class="col-sm-12">
-    <rd-widget>
-      <rd-widget-body>
-        <div class="col-sm-12 form-section-title">
-          Information
-        </div>
-        <div class="form-group">
-          <span class="small">
-            <p class="text-muted" ng-if="applicationState.endpoint.mode.role === 'MANAGER'">
-              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-              Portainer is connected to a node that is part of a Swarm cluster. Some resources located on other nodes in the cluster might not be available for management, have a look
-              at <a href="http://portainer.readthedocs.io/en/stable/agent.html" target="_blank">our agent setup</a> for more details.
-            </p>
-            <p class="text-muted" ng-if="applicationState.endpoint.mode.role === 'WORKER'">
-              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-              Portainer is connected to a worker node. Swarm management features will not be available.
-            </p>
-          </span>
-        </div>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-</div>
+<information-panel
+  ng-if="!applicationState.UI.dismissedInfoPanels['docker-dashboard-info-01'] && !applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'"
+  title-text="Information"
+  dismiss-action="dismissInformationPanel('docker-dashboard-info-01')">
+  <span class="small">
+    <p class="text-muted" ng-if="applicationState.endpoint.mode.role === 'MANAGER'">
+      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+      Portainer is connected to a node that is part of a Swarm cluster. Some resources located on other nodes in the cluster might not be available for management, have a look
+      at <a href="http://portainer.readthedocs.io/en/stable/agent.html" target="_blank">our agent setup</a> for more details.
+    </p>
+    <p class="text-muted" ng-if="applicationState.endpoint.mode.role === 'WORKER'">
+      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+      Portainer is connected to a worker node. Swarm management features will not be available.
+    </p>
+  </span>
+</information-panel>
 
 <div class="row" ng-if="(!applicationState.endpoint.mode.agentProxy || applicationState.endpoint.mode.provider !== 'DOCKER_SWARM_MODE') && info && endpoint">
   <div class="col-sm-12">
