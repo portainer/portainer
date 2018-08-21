@@ -527,8 +527,6 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       $scope.configs = [];
       Notifications.error('Failure', err, 'Unable to retrieve service details');
     });
-
-
   }
 
   $scope.updateServiceAttribute = function updateServiceAttribute(service, name) {

@@ -28,7 +28,7 @@
             <tr>
               <td>Name</td>
               <td ng-if="applicationState.endpoint.apiVersion <= 1.24">
-                <input type="text" class="form-control" ng-model="service.Name" ng-change="updateServiceAttribute(service, 'Name')" ng-disabled="isUpdating">f
+                <input type="text" class="form-control" ng-model="service.Name" ng-change="updateServiceAttribute(service, 'Name')" ng-disabled="isUpdating">
               </td>
               <td ng-if="applicationState.endpoint.apiVersion >= 1.25">
                 {{ service.Name }}

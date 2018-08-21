@@ -1,18 +1,18 @@
 angular.module('portainer.app')
-.factory('WebhookService', ['$q', 'Webhook','Webhooks', 'EndpointProvider', function WebhookServiceFactory($q, Webhook, Webhooks, EndpointProvider) {
+.factory('WebhookService', ['$q', 'Webhooks', 'EndpointProvider', function WebhookServiceFactory($q, Webhooks, EndpointProvider) {
   'use strict';
   var service = {};
-  var endpointID = 1;
+  var endpointID = 1; //Hard coded while I figure out why the EndpointProvider isn't doing what I expect
 
   service.webhook = function(serviceID) {
     var deferred = $q.defer();
     console.log(EndpointProvider.endpointID)
-    // var filters = { ServiceID: serviceID, EndpointID: EndpointProvider.endpointID };
+    // var filters = { ServiceID: serviceID, EndpointID: EndpointProvider.endpointID }; //Doesn't work
     var filters = { ServiceID: serviceID, EndpointID: endpointID };
     var webhookData = {};
     Webhooks.query({filters:filters }).$promise
     .then(function success(data) {
-      if(data.length == 0)
+      if(data.length == 0) //No webhook exists, we capture the 404 here
       {
         return deferred.resolve(null);
       }

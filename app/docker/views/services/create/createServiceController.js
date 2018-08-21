@@ -427,9 +427,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     .then(function success(data) {
       var serviceIdentifier = data.ID;
       var userId = Authentication.getUserDetails().ID;
-      console.log($scope.formValues.Webhook)
       if ($scope.formValues.Webhook) {
-        console.log("Creating a webhook")
         WebhookService.createWebhook(serviceIdentifier);
       }
 
