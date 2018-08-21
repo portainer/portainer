@@ -233,9 +233,9 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
   function loadExternalSwarmStack(name) {
     var agentProxy = $scope.applicationState.endpoint.mode.agentProxy;
 
-    retrieveSwarmStackResources(name)
+    retrieveSwarmStackResources(name, agentProxy)
     .then(function success(data) {
-      assignSwarmStackResources(data);
+      assignSwarmStackResources(data, agentProxy);
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve stack details');
