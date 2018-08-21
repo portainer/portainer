@@ -100,7 +100,6 @@ function ($scope, $state, $transition$, Notifications, ConfigService, Authentica
     .then(function success(data) {
       $scope.formValues.Name = data.Name + '_copy';
       $scope.formValues.Data = data.Data;
-      $scope.formValues.Labels = [];
       var labels = _.keys(data.Labels);
       for (var i = 0; i < labels.length; i++) {
         var labelName = labels[i];
