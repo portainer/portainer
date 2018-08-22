@@ -35,12 +35,6 @@ angular.module('portainer.docker')
     for (var v in container.Mounts) {
       if ({}.hasOwnProperty.call(container.Mounts, v)) {
         var mount = container.Mounts[v];
-        // var volume = {
-        //   'type': mount.Type,
-        //   'name': mount.Name || mount.Source,
-        //   'containerPath': mount.Destination,
-        //   'readOnly': mount.RW === false
-        // };
         var name = mount.Name || mount.Source;
         var containerPath = mount.Destination;
         if (name && containerPath) {

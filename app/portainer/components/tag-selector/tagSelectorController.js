@@ -1,8 +1,6 @@
 angular.module('portainer.app')
 .controller('TagSelectorController', function () {
 
-  // var ctrl = this;
-
   this.$onChanges = function(changes) {
     if(angular.isDefined(changes.tags.currentValue)) {
       this.tags = _.difference(changes.tags.currentValue, this.model);
