@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('AuthenticationController', ['$scope', '$state', '$transition$', '$sanitize', 'Authentication', 'UserService', 'EndpointService', 'StateManager', 'Notifications', 'SettingsService',
-function ($scope, $state, $transition$, $sanitize, Authentication, UserService, EndpointService, StateManager, Notifications, SettingsService) {
+.controller('AuthenticationController', ['$scope', '$state', '$transition$', 'Authentication', 'UserService', 'EndpointService', 'StateManager', 'Notifications', 'SettingsService',
+function ($scope, $state, $transition$, Authentication, UserService, EndpointService, StateManager, Notifications, SettingsService) {
 
   $scope.logo = StateManager.getState().application.logo;
 
@@ -44,12 +44,7 @@ function ($scope, $state, $transition$, $sanitize, Authentication, UserService, 
     var password = $scope.formValues.Password;
 
     SettingsService.publicSettings()
-    .then(function success(data) {
-      var settings = data;
-      if (settings.AuthenticationMethod === 1) {
-        username = $sanitize(username);
-        password = $sanitize(password);
-      }
+    .then(function success() {
       return Authentication.login(username, password);
     })
     .then(function success() {
