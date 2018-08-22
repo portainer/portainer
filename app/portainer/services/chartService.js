@@ -139,14 +139,14 @@ angular.module('portainer.app')
     return label + ': ' + processedValue;
   }
 
-  function byteBasedAxisLabel(value/*, index, values*/) {
+  function byteBasedAxisLabel(value) {
     if (value > 5) {
       return filesize(value, {base: 10, round: 1});
     }
     return value.toFixed(1) + 'B';
   }
 
-  function percentageBasedAxisLabel(value/*, index, values*/) {
+  function percentageBasedAxisLabel(value) {
     if (value > 1) {
       return Math.round(value) + '%';
     }

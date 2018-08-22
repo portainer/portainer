@@ -58,7 +58,7 @@ angular.module('portainer.app')
     return Teams.remove({id: id}).$promise;
   };
 
-  service.updateTeam = function(id, name/*, members, leaders*/) {
+  service.updateTeam = function(id, name) {
     var payload = {
       Name: name
     };

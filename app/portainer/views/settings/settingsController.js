@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('SettingsController', ['$scope', '$state', 'Notifications', 'SettingsService', 'StateManager', /*'DEFAULT_TEMPLATES_URL',*/
-function ($scope, $state, Notifications, SettingsService, StateManager/*, DEFAULT_TEMPLATES_URL*/) {
+.controller('SettingsController', ['$scope', '$state', 'Notifications', 'SettingsService', 'StateManager', 
+function ($scope, $state, Notifications, SettingsService, StateManager) {
 
   $scope.state = {
     actionInProgress: false
