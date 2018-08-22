@@ -3,6 +3,7 @@ package registries
 import (
 	"github.com/portainer/portainer"
 	httperror "github.com/portainer/portainer/http/error"
+	"github.com/portainer/portainer/http/proxy"
 	"github.com/portainer/portainer/http/security"
 
 	"net/http"
@@ -18,6 +19,7 @@ func hideFields(registry *portainer.Registry) {
 type Handler struct {
 	*mux.Router
 	RegistryService portainer.RegistryService
+	ProxyManager    *proxy.Manager
 }
 
 // NewHandler creates a handler to manage registry operations.
@@ -38,6 +40,8 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AdministratorAccess(httperror.LoggerHandler(h.registryUpdateAccess))).Methods(http.MethodPut)
 	h.Handle("/registries/{id}",
 		bouncer.AdministratorAccess(httperror.LoggerHandler(h.registryDelete))).Methods(http.MethodDelete)
+	h.PathPrefix("/registries/{id}/v2").Handler(
+		bouncer.PublicAccess(httperror.LoggerHandler(h.proxyRequestsToRegistryAPI)))
 
 	return h
 }
