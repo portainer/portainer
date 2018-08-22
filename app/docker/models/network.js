@@ -4,6 +4,7 @@ function NetworkViewModel(data) {
   this.Scope = data.Scope;
   this.Driver = data.Driver;
   this.Attachable = data.Attachable;
+  this.Internal = data.Internal;
   this.IPAM = data.IPAM;
   this.Containers = data.Containers;
   this.Options = data.Options;
