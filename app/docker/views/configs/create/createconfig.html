@@ -20,12 +20,13 @@
           <!-- !name-input -->
           <!-- config-data -->
           <div class="form-group">
-            <div class="col-sm-12">
+            <div class="col-sm-12" ng-if="formValues.displayCodeEditor">
               <code-editor
                 identifier="config-creation-editor"
                 placeholder="Define or paste the content of your config here"
                 yml="false"
                 on-change="editorUpdate"
+                value="formValues.Data"
               ></code-editor>
             </div>
           </div>
