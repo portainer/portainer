@@ -4,7 +4,7 @@ function ($scope, $state, $transition$, VolumeService, ContainerService, Notific
 
   $scope.removeVolume = function removeVolume() {
     VolumeService.remove($scope.volume)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Volume successfully removed', $transition$.params().id);
       $state.go('docker.volumes', {});
     })

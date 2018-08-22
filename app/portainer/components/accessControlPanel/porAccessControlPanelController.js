@@ -22,7 +22,7 @@ function ($q, $state, UserService, TeamService, ResourceControlService, Notifica
   ctrl.authorizedTeams = [];
   ctrl.availableTeams = [];
 
-  ctrl.confirmUpdateOwnership = function (force) {
+  ctrl.confirmUpdateOwnership = function () {
     if (!validateForm()) {
       return;
     }
@@ -77,7 +77,7 @@ function ($q, $state, UserService, TeamService, ResourceControlService, Notifica
 
     ResourceControlService.applyResourceControlChange(ctrl.resourceType, resourceId,
       ctrl.resourceControl, ownershipParameters)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Access control successfully updated');
       $state.reload();
     })

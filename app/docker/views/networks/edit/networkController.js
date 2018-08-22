@@ -1,10 +1,10 @@
 angular.module('portainer.docker')
-.controller('NetworkController', ['$scope', '$state', '$transition$', '$filter', 'NetworkService', 'Container', 'ContainerHelper', 'Notifications', 'HttpRequestHelper',
-function ($scope, $state, $transition$, $filter, NetworkService, Container, ContainerHelper, Notifications, HttpRequestHelper) {
+.controller('NetworkController', ['$scope', '$state', '$transition$', '$filter', 'NetworkService', 'Container', 'Notifications', 'HttpRequestHelper',
+function ($scope, $state, $transition$, $filter, NetworkService, Container, Notifications, HttpRequestHelper) {
 
-  $scope.removeNetwork = function removeNetwork(networkId) {
+  $scope.removeNetwork = function removeNetwork() {
     NetworkService.remove($transition$.params().id, $transition$.params().id)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Network removed', $transition$.params().id);
       $state.go('docker.networks', {});
     })
@@ -16,7 +16,7 @@ function ($scope, $state, $transition$, $filter, NetworkService, Container, Cont
   $scope.containerLeaveNetwork = function containerLeaveNetwork(network, container) {
     HttpRequestHelper.setPortainerAgentTargetHeader(container.NodeName);
     NetworkService.disconnectContainer($transition$.params().id, container.Id, false)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Container left network', $transition$.params().id);
       $state.go('docker.networks.network', { id: network.Id }, { reload: true });
     })

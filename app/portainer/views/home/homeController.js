@@ -22,7 +22,7 @@ function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, G
 
   function triggerSnapshot() {
     EndpointService.snapshot()
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Success', 'Endpoints updated');
       $state.reload();
     })

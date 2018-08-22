@@ -142,7 +142,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     $scope.formValues.ContainerLabels.splice(index, 1);
   };
 
-  $scope.addLogDriverOpt = function(value) {
+  $scope.addLogDriverOpt = function() {
     $scope.formValues.LogDriverOpts.push({ name: '', value: ''});
   };
 
@@ -492,7 +492,6 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
 
   function initView() {
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
-    var provider = $scope.applicationState.endpoint.mode.provider;
 
     $q.all({
       volumes: VolumeService.volumes(),

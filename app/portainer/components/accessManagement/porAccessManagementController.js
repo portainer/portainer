@@ -52,7 +52,7 @@ function (AccessService, Notifications) {
     }
 
     ctrl.updateAccess({ userAccesses: authorizedUserIDs, teamAccesses: authorizedTeamIDs })
-    .then(function success(data) {
+    .then(function success() {
       removeFromAccesses(access, ctrl.accesses);
       ctrl.authorizedAccesses.push(access);
       Notifications.success('Accesses successfully updated');
@@ -74,7 +74,7 @@ function (AccessService, Notifications) {
     }
 
     ctrl.updateAccess({ userAccesses: authorizedUserIDs, teamAccesses: authorizedTeamIDs })
-    .then(function success(data) {
+    .then(function success() {
       removeFromAccesses(access, ctrl.authorizedAccesses);
       ctrl.accesses.push(access);
       Notifications.success('Accesses successfully updated');
@@ -96,7 +96,7 @@ function (AccessService, Notifications) {
 
   ctrl.unauthorizeAllAccesses = function() {
     ctrl.updateAccess({ userAccesses: [], teamAccesses: [] })
-    .then(function success(data) {
+    .then(function success() {
       moveAccesses(ctrl.authorizedAccesses, ctrl.accesses);
       Notifications.success('Accesses successfully updated');
     })
@@ -111,7 +111,7 @@ function (AccessService, Notifications) {
     var authorizedTeamIDs = accessData.teamIDs;
 
     ctrl.updateAccess({ userAccesses: authorizedUserIDs, teamAccesses: authorizedTeamIDs })
-    .then(function success(data) {
+    .then(function success() {
       moveAccesses(ctrl.accesses, ctrl.authorizedAccesses);
       Notifications.success('Accesses successfully updated');
     })

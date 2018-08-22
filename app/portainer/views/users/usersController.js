@@ -38,7 +38,7 @@ function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershi
       teamIds.push(team.Id);
     });
     UserService.createUser(username, password, role, teamIds)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('User successfully created', username);
       $state.reload();
     })

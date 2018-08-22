@@ -30,7 +30,7 @@ function ($q, $scope, $state, TeamService, UserService, ModalService, Notificati
 
     $scope.state.actionInProgress = true;
     TeamService.createTeam(teamName, leaderIds)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Team successfully created', teamName);
       $state.reload();
     })

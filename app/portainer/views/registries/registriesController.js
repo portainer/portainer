@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('RegistriesController', ['$q', '$scope', '$state', 'RegistryService', 'DockerHubService', 'ModalService', 'Notifications', 'PaginationService',
-function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, Notifications, PaginationService) {
+.controller('RegistriesController', ['$q', '$scope', '$state', 'RegistryService', 'DockerHubService', 'ModalService', 'Notifications',
+function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, Notifications) {
 
   $scope.state = {
     actionInProgress: false
@@ -15,7 +15,7 @@ function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, N
     dockerhub.Password = $scope.formValues.dockerHubPassword;
     $scope.state.actionInProgress = true;
     DockerHubService.update(dockerhub)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('DockerHub registry updated');
     })
     .catch(function error(err) {

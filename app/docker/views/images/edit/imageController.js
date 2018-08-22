@@ -29,7 +29,7 @@ function ($q, $scope, $transition$, $state, $timeout, ImageService, RegistryServ
 		var registry = $scope.formValues.Registry;
 
 		ImageService.tagImage($transition$.params().id, image, registry.URL)
-		.then(function success(data) {
+		.then(function success() {
 			Notifications.success('Image successfully tagged');
 			$state.go('docker.images.image', {id: $transition$.params().id}, {reload: true});
 		})
@@ -45,7 +45,7 @@ function ($q, $scope, $transition$, $state, $timeout, ImageService, RegistryServ
 			var registry = data;
 			return ImageService.pushImage(repository, registry);
 		})
-		.then(function success(data) {
+		.then(function success() {
 			Notifications.success('Image successfully pushed', repository);
 		})
 		.catch(function error(err) {
@@ -63,7 +63,7 @@ function ($q, $scope, $transition$, $state, $timeout, ImageService, RegistryServ
 			var registry = data;
 			return ImageService.pullImage(repository, registry, false);
 		})
-		.then(function success(data) {
+		.then(function success() {
 			Notifications.success('Image successfully pulled', repository);
 		})
 		.catch(function error(err) {
