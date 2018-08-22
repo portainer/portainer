@@ -196,9 +196,9 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
     $scope.state.recreateContainerInProgress = true;
     var isRunning = container.State.Running;
 
-    return stopContainerIfNeeded()
+    return pullImageIfNeeded()
+      .then(stopContainerIfNeeded)
       .then(renameContainer)
-      .then(pullImageIfNeeded)
       .then(setMainNetworkAndCreateContainer)
       .then(connectContainerToOtherNetworks)
       .then(startContainerIfNeeded)
@@ -312,7 +312,7 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
 
   function updateRestartPolicy(restartPolicy, maximumRetryCount) {
     maximumRetryCount = restartPolicy === 'on-failure' ? maximumRetryCount : undefined;
-    
+
     return ContainerService
       .updateRestartPolicy($scope.container.Id, restartPolicy, maximumRetryCount)
       .then(onUpdateSuccess)

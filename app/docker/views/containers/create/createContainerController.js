@@ -374,7 +374,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     } else {
       $scope.formValues.MacAddress = '';
     }
-    
+
     // ExtraHosts
     if ($scope.config.HostConfig.ExtraHosts) {
       var extraHosts = $scope.config.HostConfig.ExtraHosts;
@@ -475,7 +475,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     Container.get({ id: $transition$.params().from }).$promise
     .then(function success(d) {
       var fromContainer = new ContainerDetailsViewModel(d);
-      if (!fromContainer.ResourceControl) {
+      if (fromContainer.ResourceControl && fromContainer.ResourceControl.Public) {
         $scope.formValues.AccessControlData.AccessControlEnabled = false;
       }
       $scope.fromContainer = fromContainer;
@@ -594,7 +594,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
   function create() {
     var oldContainer = null;
 
-    
+
     HttpRequestHelper.setPortainerAgentTargetHeader($scope.formValues.NodeName);
     return findCurrentContainer()
       .then(confirmCreateContainer)
@@ -631,8 +631,8 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
         return $q.when();
       }
       $scope.state.actionInProgress = true;
-      return stopAndRenameContainer(oldContainer)
-        .then(pullImageIfNeeded)
+      return pullImageIfNeeded()
+        .then(stopAndRenameContainer(oldContainer))
         .then(createNewContainer)
         .then(applyResourceControl)
         .then(connectToExtraNetworks)

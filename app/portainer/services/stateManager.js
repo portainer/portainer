@@ -9,7 +9,20 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
     loading: true,
     application: {},
     endpoint: {},
-    UI: {}
+    UI: {
+      dismissedInfoPanels: {},
+      dismissedInfoHash: ''
+    }
+  };
+
+  manager.dismissInformationPanel = function(id) {
+    state.UI.dismissedInfoPanels[id] = true;
+    LocalStorage.storeUIState(state.UI);
+  };
+
+  manager.dismissImportantInformation = function(hash) {
+    state.UI.dismissedInfoHash = hash;
+    LocalStorage.storeUIState(state.UI);
   };
 
   manager.getState = function() {
@@ -67,6 +80,11 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
 
   manager.initialize = function () {
     var deferred = $q.defer();
+
+    var UIState = LocalStorage.getUIState();
+    if (UIState) {
+      state.UI = UIState;
+    }
 
     var endpointState = LocalStorage.getEndpointState();
     if (endpointState) {

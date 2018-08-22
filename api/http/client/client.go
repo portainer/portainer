@@ -13,6 +13,10 @@ import (
 	"github.com/portainer/portainer"
 )
 
+const (
+	errInvalidResponseStatus = portainer.Error("Invalid response status (expecting 200)")
+)
+
 // HTTPClient represents a client to send HTTP requests.
 type HTTPClient struct {
 	*http.Client
@@ -74,6 +78,10 @@ func Get(url string) ([]byte, error) {
 		return nil, err
 	}
 	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return nil, errInvalidResponseStatus
+	}
 
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
