@@ -17,7 +17,7 @@ function ($q, $scope, $state, $transition$, GroupService, EndpointService, TagSe
 
     $scope.state.actionInProgress = true;
     GroupService.updateGroup(model, associatedEndpoints)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Group successfully updated');
       $state.go('portainer.groups', {}, {reload: true});
     })

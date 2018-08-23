@@ -97,7 +97,7 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
       var cacheValidity = now - applicationState.validity;
       if (cacheValidity > APPLICATION_CACHE_VALIDITY) {
         loadApplicationState()
-        .then(function success(data) {
+        .then(function success() {
           deferred.resolve(state);
         })
         .catch(function error(err) {
@@ -110,7 +110,7 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
       }
     } else {
       loadApplicationState()
-      .then(function success(data) {
+      .then(function success() {
         deferred.resolve(state);
       })
       .catch(function error(err) {

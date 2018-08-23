@@ -1,7 +1,6 @@
 angular.module('portainer.docker')
-.controller('CreateConfigController', ['$scope', '$state', 'Notifications', 'ConfigService', 'Authentication', 'FormValidator', 'ResourceControlService',
-function ($scope, $state, Notifications, ConfigService, Authentication, FormValidator, ResourceControlService) {
-
+.controller('CreateConfigController', ['$scope', '$state', '$transition$', 'Notifications', 'ConfigService', 'Authentication', 'FormValidator', 'ResourceControlService',
+function ($scope, $state, $transition$, Notifications, ConfigService, Authentication, FormValidator, ResourceControlService) {
   $scope.formValues = {
     Name: '',
     Labels: [],
@@ -90,4 +89,30 @@ function ($scope, $state, Notifications, ConfigService, Authentication, FormVali
   $scope.editorUpdate = function(cm) {
     $scope.formValues.ConfigContent = cm.getValue();
   };
+
+  function initView() {
+    if (!$transition$.params().id) {
+        $scope.formValues.displayCodeEditor = true;
+        return;
+    }
+
+    ConfigService.config($transition$.params().id)
+    .then(function success(data) {
+      $scope.formValues.Name = data.Name + '_copy';
+      $scope.formValues.Data = data.Data;
+      var labels = _.keys(data.Labels);
+      for (var i = 0; i < labels.length; i++) {
+        var labelName = labels[i];
+        var labelValue = data.Labels[labelName];
+        $scope.formValues.Labels.push({ name: labelName, value: labelValue});
+      }
+      $scope.formValues.displayCodeEditor = true;
+    })
+    .catch(function error(err) {
+      $scope.formValues.displayCodeEditor = true;
+      Notifications.error('Failure', err, 'Unable to clone config');
+    });
+  }
+
+  initView();
 }]);

@@ -6,7 +6,7 @@ function ($state, ServiceService, ServiceHelper, Notifications, ModalService, Im
     var config = ServiceHelper.serviceToConfig(service.Model);
     config.Mode.Replicated.Replicas = service.Replicas;
     ServiceService.update(service, config)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Service successfully scaled', 'New replica count: ' + service.Replicas);
       $state.reload();
     })
@@ -53,7 +53,7 @@ function ($state, ServiceService, ServiceHelper, Notifications, ModalService, Im
       // value or an increment of the counter value to force an update.
       config.TaskTemplate.ForceUpdate++;
       ServiceService.update(service, config)
-      .then(function success(data) {
+      .then(function success() {
         Notifications.success('Service successfully updated', service.Name);
       })
       .catch(function error(err) {

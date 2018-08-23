@@ -31,7 +31,7 @@ function ($q, $scope, $state, AzureService, Notifications) {
 
     $scope.state.actionInProgress = true;
     AzureService.createContainerGroup(model, subscriptionId, resourceGroupName)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Container successfully created', model.Name);
       $state.go('azure.containerinstances');
     })

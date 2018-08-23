@@ -12,7 +12,7 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
   $scope.containerCommands = [];
 
   // Ensure the socket is closed before leaving the view
-  $scope.$on('$stateChangeStart', function (event, next, current) {
+  $scope.$on('$stateChangeStart', function () {
     if (socket && socket !== null) {
       socket.close();
     }
@@ -69,7 +69,7 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
     socket = new WebSocket(url);
 
     $scope.state.connected = true;
-    socket.onopen = function(evt) {
+    socket.onopen = function() {
       term = new Terminal();
 
       term.on('data', function (data) {
@@ -88,10 +88,10 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
       socket.onmessage = function (e) {
         term.write(e.data);
       };
-      socket.onerror = function (error) {
+      socket.onerror = function () {
         $scope.state.connected = false;
       };
-      socket.onclose = function(evt) {
+      socket.onclose = function() {
         $scope.state.connected = false;
       };
     };

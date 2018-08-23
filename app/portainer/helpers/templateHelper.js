@@ -1,5 +1,5 @@
 angular.module('portainer.app')
-.factory('TemplateHelper', ['$filter', function TemplateHelperFactory($filter) {
+.factory('TemplateHelper', [function TemplateHelperFactory() {
   'use strict';
   var helper = {};
 
@@ -57,7 +57,7 @@ angular.module('portainer.app')
     return labels;
   };
 
-  helper.EnvToStringArray = function(templateEnvironment, containerMapping) {
+  helper.EnvToStringArray = function(templateEnvironment) {
     var env = [];
     templateEnvironment.forEach(function(envvar) {
       if (envvar.value || envvar.set) {

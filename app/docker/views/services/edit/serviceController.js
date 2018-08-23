@@ -125,7 +125,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       updateServiceArray(service, 'ServiceMounts', service.ServiceMounts);
     }
   };
-  $scope.updateMount = function updateMount(service, mount) {
+  $scope.updateMount = function updateMount(service) {
     updateServiceArray(service, 'ServiceMounts', service.ServiceMounts);
   };
   $scope.addPlacementConstraint = function addPlacementConstraint(service) {
@@ -138,7 +138,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       updateServiceArray(service, 'ServiceConstraints', service.ServiceConstraints);
     }
   };
-  $scope.updatePlacementConstraint = function(service, constraint) {
+  $scope.updatePlacementConstraint = function(service) {
     updateServiceArray(service, 'ServiceConstraints', service.ServiceConstraints);
   };
 
@@ -152,7 +152,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       updateServiceArray(service, 'ServicePreferences', service.ServicePreferences);
     }
   };
-  $scope.updatePlacementPreference = function(service, constraint) {
+  $scope.updatePlacementPreference = function(service) {
     updateServiceArray(service, 'ServicePreferences', service.ServicePreferences);
   };
 
@@ -162,7 +162,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     }
     service.Ports.push({ PublishedPort: '', TargetPort: '', Protocol: 'tcp', PublishMode: 'ingress' });
   };
-  $scope.updatePublishedPort = function updatePublishedPort(service, portMapping) {
+  $scope.updatePublishedPort = function updatePublishedPort(service) {
     updateServiceArray(service, 'Ports', service.Ports);
   };
   $scope.removePortPublishedBinding = function removePortPublishedBinding(service, index) {
@@ -203,7 +203,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       updateServiceArray(service, 'Hosts', service.Hosts);
     }
   };
-  $scope.updateHostsEntry = function(service, entry) {
+  $scope.updateHostsEntry = function(service) {
     updateServiceArray(service, 'Hosts', service.Hosts);
   };
   $scope.updateWebhook = function updateWebhook(service){
@@ -363,10 +363,10 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   function removeService() {
     $scope.state.deletionInProgress = true;
     ServiceService.remove($scope.service)
-    .then(function success(data) {
-      if ($scope.webhookID){
-        WebhookService.deleteWebhook($scope.webhookID);
-      }
+    .then(function success() {
+      return $q.when($scope.webhookID && WebhookService.deleteWebhook($scope.webhookID));
+    })
+    .then(function success() {
       Notifications.success('Service successfully deleted');
       $state.go('docker.services', {});
     })
@@ -403,7 +403,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     config.TaskTemplate.ForceUpdate++;
     $scope.state.updateInProgress = true;
     ServiceService.update(service, config)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Service successfully updated', service.Name);
       $scope.cancelChanges({});
       initView();

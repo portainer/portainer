@@ -48,7 +48,7 @@ function initAnalytics(Analytics, $rootScope) {
   Analytics.offline(false);
   Analytics.registerScriptTags();
   Analytics.registerTrackers();
-  $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
+  $rootScope.$on('$stateChangeSuccess', function (event, toState) {
     Analytics.trackPage(toState.url);
     Analytics.pageView();
   });

@@ -114,8 +114,9 @@ func (bouncer *RequestBouncer) EndpointAccess(r *http.Request, endpoint *portain
 // mwSecureHeaders provides secure headers middleware for handlers.
 func mwSecureHeaders(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("X-Content-Type-Options", "nosniff")
 		w.Header().Add("X-Frame-Options", "DENY")
+		w.Header().Add("X-XSS-Protection", "1; mode=block")
+		w.Header().Add("X-Content-Type-Options", "nosniff")
 		next.ServeHTTP(w, r)
 	})
 }

@@ -31,7 +31,7 @@ function ($scope, $state, $transition$, Notifications, StoridgeProfileService, M
 
     $scope.state.updateInProgress = true;
     StoridgeProfileService.update(profile)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Profile successfully updated');
       $state.go('storidge.profiles');
     })
@@ -58,7 +58,7 @@ function ($scope, $state, $transition$, Notifications, StoridgeProfileService, M
 
     $scope.state.deleteInProgress = true;
     StoridgeProfileService.delete(profile.Name)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Profile successfully deleted');
       $state.go('storidge.profiles');
     })
