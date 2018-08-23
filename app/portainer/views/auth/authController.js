@@ -47,7 +47,7 @@ function ($scope, $state, $transition$, Authentication, UserService, EndpointSer
 
     SettingsService.publicSettings()
     .then(function login() {
-      return Authentication.login(username, password)
+      return Authentication.login(username, password);
     })
     .then(function onSuccesfulLogin() {
       return EndpointService.endpoints()
