@@ -17,6 +17,10 @@
                 <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
                 <input type="password" class="form-control" ng-model="formValues.currentPassword" id="current_password">
               </div>
+              <div class="form-check">
+                <input type="checkbox" id="change-password" name="change-password" class="form-check-input" ng-model="formValues.changePassword" />
+                <label for="change-password" class="form-check-label">Password from before v1.19.2</label>
+              </div>
             </div>
           </div>
           <!-- !current-password-input -->

@@ -1,12 +1,14 @@
 angular.module('portainer.app')
-.controller('AuthenticationController', ['$scope', '$state', '$transition$', 'Authentication', 'UserService', 'EndpointService', 'StateManager', 'Notifications', 'SettingsService',
-function ($scope, $state, $transition$, Authentication, UserService, EndpointService, StateManager, Notifications, SettingsService) {
+.controller('AuthenticationController', 
+['$scope', '$state', '$transition$', 'Authentication', 'UserService', 'EndpointService', 'StateManager', 'Notifications', 'SettingsService', '$sanitize',
+function ($scope, $state, $transition$, Authentication, UserService, EndpointService, StateManager, Notifications, SettingsService, $sanitize) {
 
   $scope.logo = StateManager.getState().application.logo;
 
   $scope.formValues = {
     Username: '',
-    Password: ''
+    Password: '',
+    changePassword: false
   };
 
   $scope.state = {
@@ -45,19 +47,23 @@ function ($scope, $state, $transition$, Authentication, UserService, EndpointSer
 
     SettingsService.publicSettings()
     .then(function success() {
+      if ($scope.formValues.changePassword) {
+        password = $sanitize(password);
+      }
       return Authentication.login(username, password);
     })
-    .then(function success() {
-      return EndpointService.endpoints();
-    })
-    .then(function success(data) {
-      var endpoints = data;
-      var userDetails = Authentication.getUserDetails();
-      if (endpoints.length === 0 && userDetails.role === 1) {
-        $state.go('portainer.init.endpoint');
-      } else {
-        $state.go('portainer.home');
+    .then(function onSuccesfulLogin() {
+      if ($scope.formValues.changePassword) {
+        return $state.go('portainer.account');
       }
+      return EndpointService.endpoints()
+      .then(function onEndpointsLoaded(endpoints) {
+          var userDetails = Authentication.getUserDetails();
+          if (endpoints.length === 0 && userDetails.role === 1) {
+            return $state.go('portainer.init.endpoint');
+          }
+          return $state.go('portainer.home');
+        });
     })
     .catch(function error() {
       $scope.state.AuthenticationError = 'Invalid credentials';
