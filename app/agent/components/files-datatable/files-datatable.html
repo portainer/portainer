@@ -41,20 +41,20 @@
             </tr>
           </thead>
           <tbody>
-            <tr ng-if="$ctrl.volumeBrowser.state.path !== '/'">
+            <tr ng-if="!$ctrl.isRoot">
               <td colspan="4">
-                <a ng-click="$ctrl.volumeBrowser.up()"><i class="fa fa-level-up-alt space-right"></i>Go to parent</a>
+                <a ng-click="$ctrl.goToParent()"><i class="fa fa-level-up-alt space-right"></i>Go to parent</a>
               </td>
             </tr>
             <tr ng-repeat="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder))">
               <td>
                 <span ng-if="item.edit">
-                  <input class="input-sm" type="text" ng-model="item.newName" on-enter-key="$ctrl.volumeBrowser.rename(item.Name, item.newName); item.edit = false;" auto-focus />
+                  <input class="input-sm" type="text" ng-model="item.newName" on-enter-key="$ctrl.rename({name: item.Name, newName: item.newName}); item.edit = false;" auto-focus />
                   <a class="interactive" ng-click="item.edit = false;"><i class="fa fa-times"></i></a>
-                  <a class="interactive" ng-click="$ctrl.volumeBrowser.rename(item.Name, item.newName); item.edit = false;"><i class="fa fa-check-square"></i></a>
+                  <a class="interactive" ng-click="$ctrl.rename({name: item.Name, newName: item.newName}); item.edit = false;"><i class="fa fa-check-square"></i></a>
                 </span>
                 <span ng-if="!item.edit && item.Dir">
-                  <a ng-click="$ctrl.volumeBrowser.browse(item.Name)"><i class="fa fa-folder space-right" aria-hidden="true"></i>{{ item.Name }}</a>
+                  <a ng-click="$ctrl.browse({name: item.Name})"><i class="fa fa-folder space-right" aria-hidden="true"></i>{{ item.Name }}</a>
                 </span>
                 <span ng-if="!item.edit && !item.Dir">
                   <i class="fa fa-file space-right" aria-hidden="true"></i>{{ item.Name }}
@@ -65,13 +65,13 @@
                 {{ item.ModTime | getisodatefromtimestamp }}
               </td>
               <td>
-                <btn class="btn btn-xs btn-primary space-right" ng-click="$ctrl.volumeBrowser.download(item.Name)" ng-if="!item.Dir">
+                <btn class="btn btn-xs btn-primary space-right" ng-click="$ctrl.download({ name: item.Name })" ng-if="!item.Dir">
                   <i class="fa fa-download" aria-hidden="true"></i> Download
                 </btn>
                 <btn class="btn btn-xs btn-primary space-right" ng-click="item.newName = item.Name; item.edit = true">
                   <i class="fa fa-edit" aria-hidden="true"></i> Rename
                 </btn>
-                <btn class="btn btn-xs btn-danger" ng-click="$ctrl.volumeBrowser.delete(item.Name)">
+                <btn class="btn btn-xs btn-danger" ng-click="$ctrl.delete({ name: item.Name })">
                   <i class="fa fa-trash" aria-hidden="true"></i> Delete
                 </btn>
               </td>
