@@ -19,6 +19,7 @@
     </azure-sidebar-content>
     <docker-sidebar-content ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider !== 'AZURE'"
       endpoint-api-version="applicationState.endpoint.apiVersion"
+      is-agent="applicationState.endpoint.mode.agentProxy"
       swarm-management="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'"
       standalone-management="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE' || applicationState.endpoint.mode.provider === 'VMWARE_VIC'"
       admin-access="!applicationState.application.authentication || isAdmin"

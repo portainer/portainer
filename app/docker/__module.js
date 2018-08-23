@@ -416,6 +416,17 @@ angular.module('portainer.docker', ['portainer.app'])
     }
   };
 
+  var host = {
+    name: 'docker.host',
+    url: '/host',
+    views: {
+      'content@': {
+        templateUrl: 'app/docker/views/host/host.html',
+        controller: 'HostController'
+      }
+    }
+  };
+
   $stateRegistryProvider.register(configs);
   $stateRegistryProvider.register(config);
   $stateRegistryProvider.register(configCreation);
@@ -455,4 +466,5 @@ angular.module('portainer.docker', ['portainer.app'])
   $stateRegistryProvider.register(volume);
   $stateRegistryProvider.register(volumeBrowse);
   $stateRegistryProvider.register(volumeCreation);
+  $stateRegistryProvider.register(host);
 }]);
