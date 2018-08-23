@@ -11,6 +11,7 @@ angular.module('portainer.agent').component('filesDatatable', {
 
     isRoot: '<',
     goToParent: '&',
+    browse: '&',
     rename: '&',
     download: '&',
     delete: '&'
