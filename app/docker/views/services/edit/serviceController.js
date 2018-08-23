@@ -206,16 +206,16 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   $scope.updateHostsEntry = function(service) {
     updateServiceArray(service, 'Hosts', service.Hosts);
   };
+
   $scope.updateWebhook = function updateWebhook(service){
-    if ($scope.WebhookExists) { //Webhook exists so we must be deleting it
+    if ($scope.WebhookExists) {
       WebhookService.deleteWebhook($scope.webhookID);
       $scope.webhookURL = null;
       $scope.webhookID = null;
       $scope.WebhookExists = false;
-    } else { //No webhook means we create a new one
+    } else {
       WebhookService.createWebhook(service.Id,EndpointProvider.endpointID())
       .then(function success(data) {
-        console.log(data);
         $scope.WebhookExists = true;
         $scope.webhookID = data.Id;
         $scope.webhookURL = WebhookHelper.returnWebhookUrl(data.Token);
@@ -223,12 +223,14 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       .catch(function error(err) {
         Notifications.error('Failure', err, 'Unable to create webhook', service.Name);
       });
-  }
+    }
+  };
 
-}
   $scope.copyWebhook = function copyWebhook(){
     clipboard.copyText($scope.webhookURL);
-  }
+    $('#copyNotification').show();
+    $('#copyNotification').fadeOut(2000);
+  };
 
   $scope.cancelChanges = function cancelChanges(service, keys) {
     if (keys) { // clean out the keys only from the list of modified keys

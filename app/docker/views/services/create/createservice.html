@@ -105,13 +105,17 @@
           <div class="col-sm-12 form-section-title">
             Webhooks
           </div>
-            <label class="control-label text-left">
-              Create update webhook
-              <portainer-tooltip position="top" message="Creates a public webhook that can be used to update the service. It will use the latest version of the service image."></portainer-tooltip>
-            </label>
-            <label class="switch" style="margin-left: 20px;">
-            <input name="webhook" type="checkbox" ng-model="formValues.Webhook"><i></i>
-          </label>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <label class="control-label text-left">
+                Create update webhook
+                <portainer-tooltip position="top" message="Creates a public webhook that can be used to update the service. It will use the latest version of the service image."></portainer-tooltip>
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" ng-model="formValues.Webhook"><i></i>
+              </label>
+            </div>
+          </div>
           <!-- !create-webhook  -->
           <!-- access-control -->
           <por-access-control-form form-data="formValues.AccessControlData" ng-if="applicationState.application.authentication"></por-access-control-form>
