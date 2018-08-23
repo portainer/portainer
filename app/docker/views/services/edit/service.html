@@ -77,12 +77,12 @@
                   <input name="webhook" type="checkbox" ng-model="WebhookExists" ng-click="addWebhook(service)"><i>
                 </label>
               </td>
-              <td>
-                <input class="form-control" type="text" ng-model="webhookURL"  ng-disabled="true"/>
+              <td ng-hide="!webhookURL">
+                <input  class="form-control" type="text" ng-model="webhookURL"  ng-disabled="true"/>
               </td>
-              <td>
+              <td style='border-bottom: 1px solid #ddd;'>
                 <button type="button" class="btn btn-primary btn-sm" ng-if="webhookURL" ng-click="copyWebhook()" >
-                  <span ng-hide="!webhookURL"><i class="fa fa-file-alt space-right" aria-hidden="true"></i>Copy to clipboard</span>
+                  <span><i class="fa fa-file-alt space-right" aria-hidden="true"></i>Copy to clipboard</span>
                 </button>
               </td>
           </tr>
