@@ -65,6 +65,17 @@ angular.module('portainer.app', [])
     }
   };
 
+  var changePassword = {
+    name: 'portainer.changePassword',
+    url: '/change-password',
+    views: {
+      'content@': {
+        component: 'changePasswordView'
+      },
+      'sidebar@': {}
+    }
+  };
+
   var init = {
     name: 'portainer.init',
     abstract: true,
@@ -404,6 +415,7 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(about);
   $stateRegistryProvider.register(account);
   $stateRegistryProvider.register(authentication);
+  $stateRegistryProvider.register(changePassword);
   $stateRegistryProvider.register(init);
   $stateRegistryProvider.register(initEndpoint);
   $stateRegistryProvider.register(initAdmin);

@@ -46,16 +46,10 @@ function ($scope, $state, $transition$, Authentication, UserService, EndpointSer
     var password = $scope.formValues.Password;
 
     SettingsService.publicSettings()
-    .then(function success() {
-      if ($scope.formValues.changePassword) {
-        password = $sanitize(password);
-      }
-      return Authentication.login(username, password);
+    .then(function login() {
+      return Authentication.login(username, password)
     })
     .then(function onSuccesfulLogin() {
-      if ($scope.formValues.changePassword) {
-        return $state.go('portainer.account');
-      }
       return EndpointService.endpoints()
       .then(function onEndpointsLoaded(endpoints) {
           var userDetails = Authentication.getUserDetails();
@@ -63,6 +57,12 @@ function ($scope, $state, $transition$, Authentication, UserService, EndpointSer
             return $state.go('portainer.init.endpoint');
           }
           return $state.go('portainer.home');
+        });
+    })
+    .catch(function onLoginFailed() {
+      return Authentication.login(username, $sanitize(password))
+        .then(function onSanitiziedLoginSuccess() {
+          $state.go('portainer.changePassword');
         });
     })
     .catch(function error() {
