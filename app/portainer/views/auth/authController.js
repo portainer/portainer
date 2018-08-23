@@ -7,8 +7,7 @@ function ($scope, $state, $transition$, Authentication, UserService, EndpointSer
 
   $scope.formValues = {
     Username: '',
-    Password: '',
-    changePassword: false
+    Password: ''
   };
 
   $scope.state = {
@@ -47,7 +46,7 @@ function ($scope, $state, $transition$, Authentication, UserService, EndpointSer
 
     SettingsService.publicSettings()
     .then(function login() {
-      return Authentication.login(username, password)
+      return Authentication.login(username, password);
     })
     .then(function onSuccesfulLogin() {
       return EndpointService.endpoints()
