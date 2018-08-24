@@ -1,0 +1,82 @@
+<rd-header>
+  <rd-header-title title-text="Repository image">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.registries.registry.repository.image" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>
+    <a ui-sref="portainer.registries">Registries</a> &gt;
+    <a ui-sref="portainer.registries.registry({id: registry.Id})">{{ registry.Name }}</a> &gt;
+    <a ui-sref="portainer.registries.registry.images({id: registry.Id})">{{ image.Name }} </a> &gt;
+    <a ui-sref="portainer.registries.registry.repository.image()">{{ image.Id }} </a>
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-8">
+    <rd-widget>
+      <rd-widget-header icon="fa-info" title-text="Image information">
+      </rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Repository</td>
+              <td>{{ image.Name }}</td>
+            </tr>
+            <tr>
+              <td>ID</td>
+              <td>
+                {{ image.Id }}
+                <button class="btn btn-xs btn-danger" ng-click="removeImage()">
+                  <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this image
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>Size</td>
+              <td>{{ image.Size|humansize }}</td>
+            </tr>
+            <tr>
+              <td>Created</td>
+              <td>{{ image.Created|getisodate }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+
+  <div class="col-sm-4">
+    <rd-widget>
+      <rd-widget-header icon="fa-plus" title-text="Add tag">
+      </rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <div class="form-group">
+            <label for="tag" class="col-sm-3 col-lg-2 control-label text-left">Tag</label>
+            <div class="col-sm-9 col-lg-10">
+              <input type="text" class="form-control" id="tag" ng-model="formValues.Tag">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !formValues.Tag" ng-click="addTag()"
+                button-spinner="state.actionInProgress">
+                <span ng-hide="state.actionInProgress">Add tag</span>
+                <span ng-show="state.actionInProgress">Adding tag...</span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <registries-image-tags-datatable title-text="Tags" title-icon="fa-tags" dataset="image.Tags" table-key="images.Tags" order-by="Name"
+      remove-action="removeTags" retag-action="retagAction"></registries-image-tags-datatable>
+  </div>
+</div>

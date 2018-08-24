@@ -1,0 +1,21 @@
+<rd-header>
+  <rd-header-title title-text="Registry images">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.registries.registry.images" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>
+      <a ui-sref="portainer.registries">Registries</a> &gt; <a ui-sref="portainer.registries.registry({id: registry.Id})">{{ registry.Name }}</a> &gt; Images
+    </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <registry-images-datatable
+    title-text="Images" title-icon="fa-clone"
+    dataset="images" table-key="registryImages"
+    order-by="Name" 
+    remove-action="removeImages"
+    ></registry-images-datatable>
+  </div>
+</div>
