@@ -181,7 +181,7 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 		if *flags.Templates != "" {
 			settings.TemplatesURL = *flags.Templates
 		}
-		
+
 		if *flags.Labels != nil {
 			settings.BlackListedLabels = *flags.Labels
 		} else {
