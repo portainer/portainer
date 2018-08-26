@@ -74,7 +74,7 @@
             <tr>
               <td colspan="{{webhookURL ? '1' : '2'}}">
                 Update webhook
-                <portainer-tooltip position="top" message="A public webhook that can be used to update the service. It will use the latest version of the service image."></portainer-tooltip>
+                <portainer-tooltip position="top" message="Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and re-deploy this service."></portainer-tooltip>
                 <label class="switch" style="margin-left: 20px;">
                   <input type="checkbox" ng-model="WebhookExists" ng-click="updateWebhook(service)"><i></i>
                 </label>
