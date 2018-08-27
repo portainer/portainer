@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('AuthenticationController', ['$scope', '$state', '$transition$', '$sanitize', 'Authentication', 'UserService', 'EndpointService', 'StateManager', 'Notifications', 'SettingsService',
-function ($scope, $state, $transition$, $sanitize, Authentication, UserService, EndpointService, StateManager, Notifications, SettingsService) {
+.controller('AuthenticationController', ['$scope', '$state', '$transition$', '$sanitize', 'Authentication', 'UserService', 'EndpointService', 'StateManager', 'Notifications',
+function ($scope, $state, $transition$, $sanitize, Authentication, UserService, EndpointService, StateManager, Notifications) {
 
   $scope.logo = StateManager.getState().application.logo;
 
@@ -43,15 +43,7 @@ function ($scope, $state, $transition$, $sanitize, Authentication, UserService, 
     var username = $scope.formValues.Username;
     var password = $scope.formValues.Password;
 
-    SettingsService.publicSettings()
-    .then(function success(data) {
-      var settings = data;
-      if (settings.AuthenticationMethod === 1) {
-        username = $sanitize(username);
-        password = $sanitize(password);
-      }
-      return Authentication.login(username, password);
-    })
+    Authentication.login(username, password)
     .then(function success() {
       return EndpointService.endpoints();
     })
@@ -65,8 +57,39 @@ function ($scope, $state, $transition$, $sanitize, Authentication, UserService, 
       }
     })
     .catch(function error() {
-      $scope.state.AuthenticationError = 'Invalid credentials';
+      Authentication.login($sanitize(username), $sanitize(password))
+      .then(function success() {
+        $state.go('portainer.updatePassword');
+      })
+      .catch(function error() {
+        $scope.state.AuthenticationError = 'Invalid credentials';
+      });
     });
+
+    // SettingsService.publicSettings()
+    // .then(function success(data) {
+    //   var settings = data;
+    //   if (settings.AuthenticationMethod === 1) {
+    //     username = $sanitize(username);
+    //     password = $sanitize(password);
+    //   }
+    //   return Authentication.login(username, password);
+    // })
+    // .then(function success() {
+    //   return EndpointService.endpoints();
+    // })
+    // .then(function success(data) {
+    //   var endpoints = data;
+    //   var userDetails = Authentication.getUserDetails();
+    //   if (endpoints.length === 0 && userDetails.role === 1) {
+    //     $state.go('portainer.init.endpoint');
+    //   } else {
+    //     $state.go('portainer.home');
+    //   }
+    // })
+    // .catch(function error() {
+    //   $scope.state.AuthenticationError = 'Invalid credentials';
+    // });
   };
 
   function initView() {
