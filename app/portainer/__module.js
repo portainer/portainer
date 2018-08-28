@@ -385,10 +385,6 @@ angular.module('portainer.app', [])
         templateUrl: 'app/portainer/views/templates/templates.html',
         controller: 'TemplatesController'
       }
-    },
-    params: {
-      key: 'containers',
-      hide_descriptions: false
     }
   };
 
