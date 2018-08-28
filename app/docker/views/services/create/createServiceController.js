@@ -41,7 +41,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     RestartWindow: '0s',
     LogDriverName: '',
     LogDriverOpts: [],
-    Webhook: false,
+    Webhook: false
   };
 
   $scope.state = {
