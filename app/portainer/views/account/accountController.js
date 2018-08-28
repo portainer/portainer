@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('AccountController', ['$scope', '$state', '$sanitize', 'Authentication', 'UserService', 'Notifications', 'SettingsService',
-function ($scope, $state, $sanitize, Authentication, UserService, Notifications, SettingsService) {
+.controller('AccountController', ['$scope', '$state', 'Authentication', 'UserService', 'Notifications', 'SettingsService',
+function ($scope, $state, Authentication, UserService, Notifications, SettingsService) {
   $scope.formValues = {
     currentPassword: '',
     newPassword: '',
@@ -9,10 +9,8 @@ function ($scope, $state, $sanitize, Authentication, UserService, Notifications,
 
   $scope.updatePassword = function() {
     $scope.invalidPassword = false;
-    var currentPassword = $sanitize($scope.formValues.currentPassword);
-    var newPassword = $sanitize($scope.formValues.newPassword);
 
-    UserService.updateUserPassword($scope.userID, currentPassword, newPassword)
+    UserService.updateUserPassword($scope.userID, $scope.formValues.currentPassword, $scope.formValues.newPassword)
     .then(function success() {
       Notifications.success('Success', 'Password successfully updated');
       $state.reload();

@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('UsersController', ['$q', '$scope', '$state', '$sanitize', 'UserService', 'TeamService', 'TeamMembershipService', 'ModalService', 'Notifications', 'Authentication', 'SettingsService',
-function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershipService, ModalService, Notifications, Authentication, SettingsService) {
+.controller('UsersController', ['$q', '$scope', '$state', 'UserService', 'TeamService', 'TeamMembershipService', 'ModalService', 'Notifications', 'Authentication', 'SettingsService',
+function ($q, $scope, $state, UserService, TeamService, TeamMembershipService, ModalService, Notifications, Authentication, SettingsService) {
   $scope.state = {
     userCreationError: '',
     validUsername: false,
@@ -30,8 +30,8 @@ function ($q, $scope, $state, $sanitize, UserService, TeamService, TeamMembershi
   $scope.addUser = function() {
     $scope.state.actionInProgress = true;
     $scope.state.userCreationError = '';
-    var username = $sanitize($scope.formValues.Username);
-    var password = $sanitize($scope.formValues.Password);
+    var username = $scope.formValues.Username;
+    var password = $scope.formValues.Password;
     var role = $scope.formValues.Administrator ? 1 : 2;
     var teamIds = [];
     angular.forEach($scope.formValues.Teams, function(team) {
