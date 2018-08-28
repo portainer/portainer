@@ -65,40 +65,6 @@ angular.module('portainer.app', [])
     }
   };
 
-  var init = {
-    name: 'portainer.init',
-    abstract: true,
-    url: '/init',
-    data: {
-      requiresLogin: false
-    },
-    views: {
-      'sidebar@': {}
-    }
-  };
-
-  var initEndpoint = {
-    name: 'portainer.init.endpoint',
-    url: '/endpoint',
-    views: {
-      'content@': {
-        templateUrl: 'app/portainer/views/init/endpoint/initEndpoint.html',
-        controller: 'InitEndpointController'
-      }
-    }
-  };
-
-  var initAdmin = {
-    name: 'portainer.init.admin',
-    url: '/admin',
-    views: {
-      'content@': {
-        templateUrl: 'app/portainer/views/init/admin/initAdmin.html',
-        controller: 'InitAdminController'
-      }
-    }
-  };
-
   var endpoints = {
     name: 'portainer.endpoints',
     url: '/endpoints',
@@ -194,6 +160,40 @@ angular.module('portainer.app', [])
       'content@': {
         templateUrl: 'app/portainer/views/home/home.html',
         controller: 'HomeController'
+      }
+    }
+  };
+
+  var init = {
+    name: 'portainer.init',
+    abstract: true,
+    url: '/init',
+    data: {
+      requiresLogin: false
+    },
+    views: {
+      'sidebar@': {}
+    }
+  };
+
+  var initEndpoint = {
+    name: 'portainer.init.endpoint',
+    url: '/endpoint',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/init/endpoint/initEndpoint.html',
+        controller: 'InitEndpointController'
+      }
+    }
+  };
+
+  var initAdmin = {
+    name: 'portainer.init.admin',
+    url: '/admin',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/init/admin/initAdmin.html',
+        controller: 'InitAdminController'
       }
     }
   };
@@ -318,6 +318,21 @@ angular.module('portainer.app', [])
     }
   };
 
+  var updatePassword = {
+    name: 'portainer.updatePassword',
+    url: '/update-password',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/update-password/updatePassword.html',
+        controller: 'UpdatePasswordController'
+      },
+      'sidebar@': {}
+    },
+    params: {
+      password: ''
+    }
+  };
+
   var users = {
     name: 'portainer.users',
     url: '/users',
@@ -370,10 +385,6 @@ angular.module('portainer.app', [])
         templateUrl: 'app/portainer/views/templates/templates.html',
         controller: 'TemplatesController'
       }
-    },
-    params: {
-      key: 'containers',
-      hide_descriptions: false
     }
   };
 
@@ -404,9 +415,6 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(about);
   $stateRegistryProvider.register(account);
   $stateRegistryProvider.register(authentication);
-  $stateRegistryProvider.register(init);
-  $stateRegistryProvider.register(initEndpoint);
-  $stateRegistryProvider.register(initAdmin);
   $stateRegistryProvider.register(endpoints);
   $stateRegistryProvider.register(endpoint);
   $stateRegistryProvider.register(endpointAccess);
@@ -416,6 +424,9 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(groupAccess);
   $stateRegistryProvider.register(groupCreation);
   $stateRegistryProvider.register(home);
+  $stateRegistryProvider.register(init);
+  $stateRegistryProvider.register(initEndpoint);
+  $stateRegistryProvider.register(initAdmin);
   $stateRegistryProvider.register(registries);
   $stateRegistryProvider.register(registry);
   $stateRegistryProvider.register(registryAccess);
@@ -427,6 +438,7 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(stackCreation);
   $stateRegistryProvider.register(support);
   $stateRegistryProvider.register(tags);
+  $stateRegistryProvider.register(updatePassword);
   $stateRegistryProvider.register(users);
   $stateRegistryProvider.register(user);
   $stateRegistryProvider.register(teams);
