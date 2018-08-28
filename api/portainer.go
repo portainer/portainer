@@ -223,12 +223,16 @@ type (
 	// WebhookID represents an webhook identifier.
 	WebhookID int
 
+	// WebhookType represents the type of resource a webhook is related to
+	WebhookType int
+
 	// Webhook represents a url webhook that can be used to update a service
 	Webhook struct {
-		ID         WebhookID  `json:"Id"`
-		Token      string     `json:"Token"`
-		ServiceID  string     `json:"ServiceId"`
-		EndpointID EndpointID `json:"EndpointId"`
+		ID          WebhookID   `json:"Id"`
+		Token       string      `json:"Token"`
+		ResourceID  string      `json:"ResourceId"`
+		EndpointID  EndpointID  `json:"EndpointId"`
+		WebhookType WebhookType `json:"Type"`
 	}
 
 	// AzureCredentials represents the credentials used to connect to an Azure
@@ -522,7 +526,7 @@ type (
 		Webhooks() ([]Webhook, error)
 		Webhook(ID WebhookID) (*Webhook, error)
 		CreateWebhook(portainer *Webhook) error
-		WebhookByServiceID(serviceID string) (*Webhook, error)
+		WebhookByResourceID(resourceID string) (*Webhook, error)
 		WebhookByToken(token string) (*Webhook, error)
 		DeleteWebhook(serviceID WebhookID) error
 	}
@@ -752,4 +756,10 @@ const (
 	EndpointStatusUp
 	// EndpointStatusDown is used to represent an unavailable endpoint
 	EndpointStatusDown
+)
+
+const (
+	_ WebhookType = iota
+	// ServiceWebhook is a webhook for restarting a docker service
+	ServiceWebhook
 )

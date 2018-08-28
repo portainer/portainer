@@ -12,19 +12,16 @@ import (
 )
 
 type webhookCreatePayload struct {
-	ServiceID  string
+	ResourceID string
 	EndpointID int
 }
 
 func (payload *webhookCreatePayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.ServiceID) {
-		return portainer.Error("Invalid ServiceID")
+	if govalidator.IsNull(payload.ResourceID) {
+		return portainer.Error("Invalid ResourceID")
 	}
 	if govalidator.IsNull(string(payload.EndpointID)) {
 		return portainer.Error("Invalid EndpointID")
-	}
-	if payload.EndpointID < 1 {
-		return portainer.Error("Invalid EndpointID " + string(payload.EndpointID))
 	}
 	return nil
 }
@@ -36,12 +33,12 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	webhook, err := handler.WebhookService.WebhookByServiceID(payload.ServiceID)
+	webhook, err := handler.WebhookService.WebhookByResourceID(payload.ResourceID)
 	if err != nil && err != portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "An error occurred retrieving webhooks from the database", err}
 	}
 	if webhook != nil {
-		return &httperror.HandlerError{http.StatusConflict, "A webhook for this service already exists", portainer.ErrWebhookAlreadyExists}
+		return &httperror.HandlerError{http.StatusConflict, "A webhook for this resource already exists", portainer.ErrWebhookAlreadyExists}
 	}
 
 	token, err := uuid.NewV4()
@@ -50,9 +47,10 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	webhook = &portainer.Webhook{
-		Token:      token.String(),
-		ServiceID:  payload.ServiceID,
-		EndpointID: portainer.EndpointID(payload.EndpointID),
+		Token:       token.String(),
+		ResourceID:  payload.ResourceID,
+		EndpointID:  portainer.EndpointID(payload.EndpointID),
+		WebhookType: portainer.ServiceWebhook,
 	}
 
 	err = handler.WebhookService.CreateWebhook(webhook)

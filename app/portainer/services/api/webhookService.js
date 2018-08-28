@@ -5,7 +5,7 @@ angular.module('portainer.app')
 
   service.webhook = function(serviceID, endpointID) {
     var deferred = $q.defer();
-    var filters = { ServiceID: serviceID, EndpointID: endpointID };
+    var filters = { ResourceID: serviceID, EndpointID: endpointID };
     var webhookData = {};
     Webhooks.query({filters:filters }).$promise
     .then(function success(data) {
@@ -28,7 +28,7 @@ angular.module('portainer.app')
 
 
   service.createWebhook = function(serviceID, endpointID) {
-    return Webhooks.create({ServiceID: serviceID, EndpointID: endpointID}).$promise;
+    return Webhooks.create({ResourceID: serviceID, EndpointID: endpointID}).$promise;
   };
 
 

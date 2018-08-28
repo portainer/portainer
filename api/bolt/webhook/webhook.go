@@ -65,8 +65,8 @@ func (service *Service) Webhook(ID portainer.WebhookID) (*portainer.Webhook, err
 	return &webhook, nil
 }
 
-// WebhookByServiceID returns a webhook by the Swarm ServiceID it is associated with.
-func (service *Service) WebhookByServiceID(ID string) (*portainer.Webhook, error) {
+// WebhookByResourceID returns a webhook by the ResourceID it is associated with.
+func (service *Service) WebhookByResourceID(ID string) (*portainer.Webhook, error) {
 	var webhook *portainer.Webhook
 
 	err := service.db.View(func(tx *bolt.Tx) error {
@@ -80,7 +80,7 @@ func (service *Service) WebhookByServiceID(ID string) (*portainer.Webhook, error
 				return err
 			}
 
-			if w.ServiceID == ID {
+			if w.ResourceID == ID {
 				webhook = &w
 				break
 			}

@@ -26,7 +26,7 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve webhook from the database", err}
 	}
 
-	serviceID := webhook.ServiceID
+	resourceID := webhook.ResourceID
 	endpointID := webhook.EndpointID
 
 	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
@@ -38,7 +38,7 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 
 	dockerClient, err := handler.DockerClientFactory.CreateClient(endpoint)
 
-	service, _, err := dockerClient.ServiceInspectWithRaw(context.Background(), serviceID, dockertypes.ServiceInspectOptions{InsertDefaults: true})
+	service, _, err := dockerClient.ServiceInspectWithRaw(context.Background(), resourceID, dockertypes.ServiceInspectOptions{InsertDefaults: true})
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Error looking up service", err}
 	}
@@ -46,7 +46,7 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 	service.Spec.TaskTemplate.ForceUpdate++
 
 	service.Spec.TaskTemplate.ContainerSpec.Image = strings.Split(service.Spec.TaskTemplate.ContainerSpec.Image, "@sha")[0]
-	resp, err := dockerClient.ServiceUpdate(context.Background(), serviceID, service.Version, service.Spec, dockertypes.ServiceUpdateOptions{QueryRegistry: true})
+	resp, err := dockerClient.ServiceUpdate(context.Background(), resourceID, service.Version, service.Spec, dockertypes.ServiceUpdateOptions{QueryRegistry: true})
 
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Error updating service", err}

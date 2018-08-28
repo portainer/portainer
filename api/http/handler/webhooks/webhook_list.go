@@ -10,7 +10,7 @@ import (
 )
 
 type webhookListOperationFilters struct {
-	ServiceID  string `json:"ServiceID"`
+	ResourceID string `json:"ResourceID"`
 	EndpointID int    `json:"EndpointID"`
 }
 
@@ -32,13 +32,13 @@ func (handler *Handler) webhookList(w http.ResponseWriter, r *http.Request) *htt
 }
 
 func filterWebhooks(webhooks []portainer.Webhook, filters *webhookListOperationFilters) []portainer.Webhook {
-	if filters.EndpointID == 0 && filters.ServiceID == "" {
+	if filters.EndpointID == 0 && filters.ResourceID == "" {
 		return webhooks
 	}
 
 	filteredWebhooks := make([]portainer.Webhook, 0, len(webhooks))
 	for _, webhook := range webhooks {
-		if webhook.EndpointID == portainer.EndpointID(filters.EndpointID) && webhook.ServiceID == string(filters.ServiceID) {
+		if webhook.EndpointID == portainer.EndpointID(filters.EndpointID) && webhook.ResourceID == string(filters.ResourceID) {
 			filteredWebhooks = append(filteredWebhooks, webhook)
 		}
 	}
