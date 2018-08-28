@@ -43,6 +43,8 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusInternalServerError, "Error looking up service", err}
 	}
 
+	service.Spec.TaskTemplate.ForceUpdate++
+
 	service.Spec.TaskTemplate.ContainerSpec.Image = strings.Split(service.Spec.TaskTemplate.ContainerSpec.Image, "@sha")[0]
 	resp, err := dockerClient.ServiceUpdate(context.Background(), serviceID, service.Version, service.Spec, dockertypes.ServiceUpdateOptions{QueryRegistry: true})
 
