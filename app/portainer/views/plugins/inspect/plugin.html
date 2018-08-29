@@ -1,0 +1,70 @@
+<rd-header>
+  <rd-header-title title-text="Plugin details"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="portainer.plugins">Portainer plugins</a> &gt; {{ plugin.Name }}
+  </rd-header-content>
+</rd-header>
+
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+
+        <div style="display: flex;">
+
+          <div style="flex-grow: 3;">
+
+            <div class="form-group">
+              <span class="text-muted">
+                {{ plugin.Name }}
+              </span>
+            </div>
+
+
+            <div class="form-group">
+              <span class="small text-muted">
+                {{ plugin.ShortDescription }}
+              </span>
+            </div>
+
+          </div>
+
+          <div style="flex-grow: 1; border-left: 1px solid black; margin: 10px; padding: 5px;">
+            <span style="font-size: 150%;">
+              {{ plugin.Price }}
+            </span>
+            <span class="">
+              <a class="btn btn-primary" href="#" target="_blank">
+                Buy
+              </a>
+            </span>
+          </div>
+
+
+        </div>
+
+
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+        <div class="col-sm-12 form-section-title">
+          <span>
+            Description
+          </span>
+        </div>
+        <div class="form-group">
+          <span class="small text-muted">
+            {{ plugin.Description }}
+          </span>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

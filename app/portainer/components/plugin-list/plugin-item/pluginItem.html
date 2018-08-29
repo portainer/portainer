@@ -1,0 +1,31 @@
+<!-- plugin -->
+<div class="blocklist-item" ng-click="$ctrl.goToPluginView()">
+  <div class="blocklist-item-box">
+    <!-- plugin-image -->
+    <span class="blocklist-item-logo">
+      <i class="fa fa-bolt fa-4x blue-icon" style="margin-left: 14px;" aria-hidden="true"></i>
+    </span>
+    <!-- !plugin-image -->
+    <!-- plugin-details -->
+    <span class="col-sm-12">
+      <!-- blocklist-item-line1 -->
+      <div class="blocklist-item-line">
+        <span>
+          <span class="blocklist-item-title">
+            {{ $ctrl.model.Name }}
+          </span>
+        </span>
+      </div>
+      <!-- !blocklist-item-line1 -->
+      <!-- blocklist-item-line2 -->
+      <div class="blocklist-item-line">
+        <span class="blocklist-item-desc">
+          {{ $ctrl.model.ShortDescription }}
+        </span>
+      </div>
+      <!-- !blocklist-item-line2 -->
+    </span>
+    <!-- !plugin-details -->
+  </div>
+  <!-- !plugin -->
+</div>

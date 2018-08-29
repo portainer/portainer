@@ -1,0 +1,52 @@
+<rd-header>
+  <rd-header-title title-text="Plugins"></rd-header-title>
+  <rd-header-content>Portainer plugins</rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+
+    <rd-widget>
+      <rd-widget-body>
+
+        <form class="form-horizontal" name="pluginEnableForm">
+          <div class="col-sm-12 form-section-title">
+            Enable plugin
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-12">
+              <span class="small text-muted">
+                Ensure that you have a valid license. Click on the plugin of your choice to retrieve a license.
+              </span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="plugin_license" class="col-sm-2 control-label text-left">License</label>
+            <div class="col-sm-10">
+              <input type="text" name="plugin_license" class="form-control" ng-model="formValues.License" placeholder="abhejd-745457-idu57" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-primary btn-sm" ng-click="enablePlugin()" ng-disabled="state.actionInProgress || !pluginEnableForm.$valid" button-spinner="state.actionInProgress" style="margin-left: 0px;">
+                <span ng-hide="state.actionInProgress">Enable plugin</span>
+                <span ng-show="state.actionInProgress">Enabling plugin...</span>
+              </button>
+            </div>
+          </div>
+
+        </form>
+
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <plugin-list></plugin-list>
+  </div>
+</div>
