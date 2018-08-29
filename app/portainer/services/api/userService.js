@@ -73,24 +73,12 @@ angular.module('portainer.app')
   };
 
   service.updateUserPassword = function(id, currentPassword, newPassword) {
-    var deferred = $q.defer();
+    var payload = {
+      Password: currentPassword,
+      NewPassword: newPassword
+    };
 
-    Users.checkPassword({id: id}, {password: currentPassword}).$promise
-    .then(function success(data) {
-      if (!data.valid) {
-        deferred.reject({invalidPassword: true});
-      } else {
-        return service.updateUser(id, newPassword, undefined);
-      }
-    })
-    .then(function success() {
-      deferred.resolve();
-    })
-    .catch(function error(err) {
-      deferred.reject({msg: 'Unable to update user password', err: err});
-    });
-
-    return deferred.promise;
+    return Users.updatePassword({ id: id }, payload).$promise;
   };
 
   service.userMemberships = function(id) {

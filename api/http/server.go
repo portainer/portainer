@@ -159,7 +159,7 @@ func (server *Server) Start() error {
 	var uploadHandler = upload.NewHandler(requestBouncer)
 	uploadHandler.FileService = server.FileService
 
-	var userHandler = users.NewHandler(requestBouncer)
+	var userHandler = users.NewHandler(requestBouncer, rateLimiter)
 	userHandler.UserService = server.UserService
 	userHandler.TeamService = server.TeamService
 	userHandler.TeamMembershipService = server.TeamMembershipService
