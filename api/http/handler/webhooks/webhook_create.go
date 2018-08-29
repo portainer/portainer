@@ -12,8 +12,9 @@ import (
 )
 
 type webhookCreatePayload struct {
-	ResourceID string
-	EndpointID int
+	ResourceID  string
+	EndpointID  int
+	WebhookType int
 }
 
 func (payload *webhookCreatePayload) Validate(r *http.Request) error {
@@ -22,6 +23,9 @@ func (payload *webhookCreatePayload) Validate(r *http.Request) error {
 	}
 	if govalidator.IsNull(string(payload.EndpointID)) {
 		return portainer.Error("Invalid EndpointID")
+	}
+	if govalidator.IsNull(string(payload.WebhookType)) {
+		return portainer.Error("Invalid WebhookType")
 	}
 	return nil
 }
@@ -50,7 +54,7 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 		Token:       token.String(),
 		ResourceID:  payload.ResourceID,
 		EndpointID:  portainer.EndpointID(payload.EndpointID),
-		WebhookType: portainer.ServiceWebhook,
+		WebhookType: portainer.WebhookType(payload.WebhookType),
 	}
 
 	err = handler.WebhookService.CreateWebhook(webhook)

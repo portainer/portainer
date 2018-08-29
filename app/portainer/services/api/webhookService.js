@@ -27,8 +27,8 @@ angular.module('portainer.app')
   };
 
 
-  service.createWebhook = function(serviceID, endpointID) {
-    return Webhooks.create({ResourceID: serviceID, EndpointID: endpointID}).$promise;
+  service.createServiceWebhook = function(serviceID, endpointID) {
+    return Webhooks.create({ResourceID: serviceID, EndpointID: endpointID, WebhookType:1}).$promise;
   };
 
 

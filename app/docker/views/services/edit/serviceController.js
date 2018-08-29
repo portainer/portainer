@@ -214,7 +214,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       $scope.webhookID = null;
       $scope.WebhookExists = false;
     } else {
-      WebhookService.createWebhook(service.Id,EndpointProvider.endpointID())
+      WebhookService.createServiceWebhook(service.Id,EndpointProvider.endpointID())
       .then(function success(data) {
         $scope.WebhookExists = true;
         $scope.webhookID = data.Id;

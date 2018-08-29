@@ -28,6 +28,7 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 
 	resourceID := webhook.ResourceID
 	endpointID := webhook.EndpointID
+	webhookType := webhook.WebhookType
 
 	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
 	if err == portainer.ErrObjectNotFound {
@@ -35,8 +36,20 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
+	switch webhookType {
+	case portainer.ServiceWebhook:
+		return handler.executeServiceWebhook(w, endpoint, resourceID)
+	default:
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unsupported webhook type", err}
+	}
 
+}
+
+func (handler *Handler) executeServiceWebhook(w http.ResponseWriter, endpoint *portainer.Endpoint, resourceID string) *httperror.HandlerError {
 	dockerClient, err := handler.DockerClientFactory.CreateClient(endpoint)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Error creating docker client", err}
+	}
 
 	service, _, err := dockerClient.ServiceInspectWithRaw(context.Background(), resourceID, dockertypes.ServiceInspectOptions{InsertDefaults: true})
 	if err != nil {
