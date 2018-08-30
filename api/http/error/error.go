@@ -16,7 +16,8 @@ type (
 		Err        error
 	}
 	errorResponse struct {
-		Err string `json:"err,omitempty"`
+		Err     string `json:"err,omitempty"`
+		Details string `json:"details,omitempty"`
 	}
 )
 
@@ -31,7 +32,7 @@ func writeErrorResponse(rw http.ResponseWriter, err *HandlerError) {
 	log.Printf("http error: %s (err=%s) (code=%d)\n", err.Message, err.Err, err.StatusCode)
 	rw.Header().Set("Content-Type", "application/json")
 	rw.WriteHeader(err.StatusCode)
-	json.NewEncoder(rw).Encode(&errorResponse{Err: err.Message})
+	json.NewEncoder(rw).Encode(&errorResponse{Err: err.Message, Details: err.Err.Error()})
 }
 
 // WriteError is a convenience function that creates a new HandlerError before calling writeErrorResponse.

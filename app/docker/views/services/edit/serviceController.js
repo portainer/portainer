@@ -209,10 +209,15 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
 
   $scope.updateWebhook = function updateWebhook(service){
     if ($scope.WebhookExists) {
-      WebhookService.deleteWebhook($scope.webhookID);
-      $scope.webhookURL = null;
-      $scope.webhookID = null;
-      $scope.WebhookExists = false;
+      WebhookService.deleteWebhook($scope.webhookID)
+      .then(function success() {
+        $scope.webhookURL = null;
+        $scope.webhookID = null;
+        $scope.WebhookExists = false;
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to delete webhook');
+      });
     } else {
       WebhookService.createServiceWebhook(service.Id,EndpointProvider.endpointID())
       .then(function success(data) {
@@ -221,7 +226,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
         $scope.webhookURL = WebhookHelper.returnWebhookUrl(data.Token);
       })
       .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to create webhook', service.Name);
+        Notifications.error('Failure', err, 'Unable to create webhook');
       });
     }
   };
@@ -474,7 +479,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
         availableImages: ImageService.images(),
         availableLoggingDrivers: PluginService.loggingPlugins(apiVersion < 1.25),
         settings: SettingsService.publicSettings(),
-        webhook: WebhookService.webhook(service.Id,EndpointProvider.endpointID())
+        webhooks: WebhookService.webhooks(service.Id, EndpointProvider.endpointID())
       });
     })
     .then(function success(data) {
@@ -487,11 +492,14 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       $scope.allowBindMounts = data.settings.AllowBindMountsForRegularUsers;
       var userDetails = Authentication.getUserDetails();
       $scope.isAdmin = userDetails.role === 1;
-      if (data.webhook) {
+
+      if (data.webhooks.length > 0) {
+        var webhook = data.webhooks[0];
         $scope.WebhookExists = true;
-        $scope.webhookID = data.webhook.Id;
-        $scope.webhookURL = WebhookHelper.returnWebhookUrl(data.webhook.Token);
+        $scope.webhookID = webhook.Id;
+        $scope.webhookURL = WebhookHelper.returnWebhookUrl(webhook.Token);
       }
+
       var tasks = data.tasks;
 
       if (agentProxy) {

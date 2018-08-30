@@ -423,14 +423,15 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     var registry = $scope.formValues.Registry;
     var authenticationDetails = registry.Authentication ? RegistryService.encodedCredentials(registry) : '';
     HttpRequestHelper.setRegistryAuthenticationHeader(authenticationDetails);
+
+    var serviceIdentifier;
     Service.create(config).$promise
     .then(function success(data) {
-      var serviceIdentifier = data.ID;
+      serviceIdentifier = data.ID;
+      return $q.when($scope.formValues.Webhook && WebhookService.createServiceWebhook(serviceIdentifier, EndpointProvider.endpointID()));
+    })
+    .then(function success() {
       var userId = Authentication.getUserDetails().ID;
-      if ($scope.formValues.Webhook) {
-        WebhookService.createServiceWebhook(serviceIdentifier,EndpointProvider.endpointID());
-      }
-
       return ResourceControlService.applyResourceControl('service', serviceIdentifier, userId, accessControlData, []);
     })
     .then(function success() {
