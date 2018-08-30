@@ -21,10 +21,10 @@ func (payload *webhookCreatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.ResourceID) {
 		return portainer.Error("Invalid ResourceID")
 	}
-	if govalidator.IsNull(string(payload.EndpointID)) {
+	if payload.EndpointID == 0 {
 		return portainer.Error("Invalid EndpointID")
 	}
-	if govalidator.IsNull(string(payload.WebhookType)) {
+	if payload.WebhookType != 1 {
 		return portainer.Error("Invalid WebhookType")
 	}
 	return nil

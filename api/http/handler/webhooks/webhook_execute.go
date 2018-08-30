@@ -40,7 +40,7 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 	case portainer.ServiceWebhook:
 		return handler.executeServiceWebhook(w, endpoint, resourceID)
 	default:
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unsupported webhook type", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unsupported webhook type", portainer.ErrUnsupportedWebhookType}
 	}
 
 }
@@ -59,13 +59,7 @@ func (handler *Handler) executeServiceWebhook(w http.ResponseWriter, endpoint *p
 	service.Spec.TaskTemplate.ForceUpdate++
 
 	service.Spec.TaskTemplate.ContainerSpec.Image = strings.Split(service.Spec.TaskTemplate.ContainerSpec.Image, "@sha")[0]
-	resp, err := dockerClient.ServiceUpdate(context.Background(), resourceID, service.Version, service.Spec, dockertypes.ServiceUpdateOptions{QueryRegistry: true})
+	dockerClient.ServiceUpdate(context.Background(), resourceID, service.Version, service.Spec, dockertypes.ServiceUpdateOptions{QueryRegistry: true})
 
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Error updating service", err}
-	}
-	if resp.Warnings != nil {
-		//Log warnings
-	}
 	return response.Empty(w)
 }

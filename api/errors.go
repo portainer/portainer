@@ -96,5 +96,6 @@ func (e Error) Error() string { return string(e) }
 
 // Webhook errors
 const (
-	ErrWebhookAlreadyExists = Error("A webhook for this resource already exists")
+	ErrWebhookAlreadyExists   = Error("A webhook for this resource already exists")
+	ErrUnsupportedWebhookType = Error("Webhooks for this resource are not currently supported")
 )
