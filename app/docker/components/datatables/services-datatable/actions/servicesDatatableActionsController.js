@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ServicesDatatableActionsController', ['$state', 'ServiceService', 'ServiceHelper', 'Notifications', 'ModalService', 'ImageHelper','WebhookService','EndpointProvider',
-function ($state, ServiceService, ServiceHelper, Notifications, ModalService, ImageHelper, WebhookService, EndpointProvider) {
+.controller('ServicesDatatableActionsController', ['$q', '$state', 'ServiceService', 'ServiceHelper', 'Notifications', 'ModalService', 'ImageHelper','WebhookService','EndpointProvider',
+function ($q, $state, ServiceService, ServiceHelper, Notifications, ModalService, ImageHelper, WebhookService, EndpointProvider) {
 
   this.scaleAction = function scaleService(service) {
     var config = ServiceHelper.serviceToConfig(service.Model);
@@ -71,15 +71,15 @@ function ($state, ServiceService, ServiceHelper, Notifications, ModalService, Im
   function removeServices(services) {
     var actionCount = services.length;
     angular.forEach(services, function (service) {
+
       ServiceService.remove(service)
       .then(function success() {
-        WebhookService.webhook(service.Id, EndpointProvider.endpointID())
-        .then(function success(data){
-          var webhookID = data.Id;
-          if (webhookID){
-            WebhookService.deleteWebhook(webhookID);
-          }
-        });
+        return WebhookService.webhooks(service.Id, EndpointProvider.endpointID());
+      })
+      .then(function success(data) {
+        return $q.when(data.length !== 0 && WebhookService.deleteWebhook(data[0].Id));
+      })
+      .then(function success() {
         Notifications.success('Service successfully removed', service.Name);
       })
       .catch(function error(err) {

@@ -3,37 +3,30 @@ angular.module('portainer.app')
   'use strict';
   var service = {};
 
-  service.webhook = function(serviceID, endpointID) {
+  service.webhooks = function(serviceID, endpointID) {
     var deferred = $q.defer();
     var filters = { ResourceID: serviceID, EndpointID: endpointID };
-    var webhookData = {};
-    Webhooks.query({filters:filters }).$promise
+
+    Webhooks.query({ filters:filters }).$promise
     .then(function success(data) {
-      if(data.length === 0) //No webhook exists, we capture the 404 here
-      {
-        return deferred.resolve(null);
-      }
-      if(data.length > 1){
-        deferred.reject({msg: 'Error retrieving webhooks. Multiple exist for this service'});
-      }
-      webhookData.Token = data[0].Token;
-      webhookData.Id = data[0].Id;
-      deferred.resolve(webhookData);
+      var webhooks = data.map(function (item) {
+        return new WebhookViewModel(item);
+      });
+      deferred.resolve(webhooks);
     })
     .catch(function error(err) {
-      deferred.reject({msg: 'Unable to retrieve webhook ' + err});
+      deferred.reject({msg: 'Unable to retrieve webhooks', err: err});
     });
+
     return deferred.promise;
   };
 
-
   service.createServiceWebhook = function(serviceID, endpointID) {
-    return Webhooks.create({ResourceID: serviceID, EndpointID: endpointID, WebhookType:1}).$promise;
+    return Webhooks.create({ ResourceID: serviceID, EndpointID: endpointID, WebhookType: 1 }).$promise;
   };
 
-
   service.deleteWebhook = function(id) {
-    return Webhooks.remove({id: id}).$promise;
+    return Webhooks.remove({ id: id }).$promise;
   };
 
   return service;
