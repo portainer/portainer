@@ -22,7 +22,7 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 	}
 
 	webhook, err := handler.WebhookService.WebhookByToken(webhookToken)
-	if err != nil && err != portainer.ErrObjectNotFound {
+	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve webhook from the database", err}
 	}
 
