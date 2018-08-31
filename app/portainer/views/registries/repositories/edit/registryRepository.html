@@ -1,0 +1,88 @@
+<rd-header>
+  <rd-header-title title-text="Repository">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.registries.registry.repository" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>
+    <a ui-sref="portainer.registries">Registries</a> &gt;
+    <a ui-sref="portainer.registries.registry.repositories({id: registry.Id})">{{ registry.Name }}</a> &gt;
+    <a ui-sref="portainer.registries.registry.repository()">{{ repository.Name }} </a>
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-8">
+    <rd-widget>
+      <rd-widget-header icon="fa-info" title-text="Repository information">
+      </rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Repository</td>
+              <td>
+                {{ repository.Name }}
+                <button class="btn btn-xs btn-danger" ng-click="">
+                  <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this repository
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>Tags count</td>
+              <td>{{ repository.Tags.length }}</td>
+            </tr>
+            <tr>
+              <td>Images count</td>
+              <td>{{ repository.Images.length }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+
+  <div class="col-sm-4">
+    <rd-widget>
+      <rd-widget-header icon="fa-plus" title-text="Add tag">
+      </rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <div class="form-group">
+            <label for="tag" class="col-sm-3 col-lg-2 control-label text-left">Tag</label>
+            <div class="col-sm-9 col-lg-10">
+              <input type="text" class="form-control" id="tag" ng-model="formValues.Tag">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="image" class="col-sm-3 col-lg-2 control-label text-left">Image</label>
+            <ui-select class="col-sm-9 col-lg-10" ng-model="formValues.SelectedImage" id="image">
+              <ui-select-match placeholder="Select an image" allow-clear="true">
+                <span>{{ $select.selected }}</span>
+              </ui-select-match>
+              <ui-select-choices repeat="image in (repository.Images | filter: $select.search)">
+                <span>{{ image }}</span>
+              </ui-select-choices>
+            </ui-select>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !formValues.Tag || !formValues.SelectedImage"
+                ng-click="addTag()" button-spinner="state.actionInProgress">
+                <span ng-hide="state.actionInProgress">Add tag</span>
+                <span ng-show="state.actionInProgress">Adding tag...</span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <registries-repository-tags-datatable title-text="Tags" title-icon="fa-tags" dataset="tags" table-key="registryRepositoryTags"
+      order-by="Name" remove-action="removeTags" retag-action="retagAction"></registries-repository-tags-datatable>
+  </div>
+</div>

@@ -3,6 +3,7 @@ package proxy
 import (
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 
 	"github.com/orcaman/concurrent-map"
@@ -15,6 +16,7 @@ type (
 		proxyFactory     *proxyFactory
 		proxies          cmap.ConcurrentMap
 		extensionProxies cmap.ConcurrentMap
+		registryProxies  cmap.ConcurrentMap
 	}
 
 	// ManagerParams represents the required parameters to create a new Manager instance.
@@ -33,6 +35,7 @@ func NewManager(parameters *ManagerParams) *Manager {
 	return &Manager{
 		proxies:          cmap.New(),
 		extensionProxies: cmap.New(),
+		registryProxies:  cmap.New(),
 		proxyFactory: &proxyFactory{
 			ResourceControlService: parameters.ResourceControlService,
 			TeamMembershipService:  parameters.TeamMembershipService,
@@ -106,6 +109,27 @@ func (manager *Manager) CreateAndRegisterExtensionProxy(key, extensionAPIURL str
 	proxy := manager.proxyFactory.newHTTPProxy(extensionURL)
 	manager.extensionProxies.Set(key, proxy)
 	return proxy, nil
+}
+
+// CreateAndRegisterRegistryProxy creates a new HTTP reverse proxy for a registry and adds it to the registered proxies.
+func (manager *Manager) CreateAndRegisterRegistryProxy(registry *portainer.Registry) (http.Handler, error) {
+	registryURL, err := url.Parse("http://" + registry.URL)
+	if err != nil {
+		return nil, err
+	}
+
+	proxy := manager.proxyFactory.newHTTPProxy(registryURL)
+	manager.registryProxies.Set(strconv.Itoa(int(registry.ID)), proxy)
+	return proxy, nil
+}
+
+// GetRegistryProxy returns the registry proxy associated to a key
+func (manager *Manager) GetRegistryProxy(key string) http.Handler {
+	proxy, ok := manager.registryProxies.Get(key)
+	if !ok {
+		return nil
+	}
+	return proxy.(http.Handler)
 }
 
 // GetExtensionProxy returns the extension proxy associated to a key

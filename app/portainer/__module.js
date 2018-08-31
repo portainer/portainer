@@ -242,6 +242,29 @@ angular.module('portainer.app', [])
     }
   };
 
+
+  var registryRepositories = {
+    name: 'portainer.registries.registry.repositories',
+    url: '/repositories',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/registries/repositories/registryRepositories.html',
+        controller: 'RegistryRepositoriesController'
+      }
+    }
+  };
+
+  var registryRepositoryTags = {
+    name: 'portainer.registries.registry.repository',
+    url: '/:repository',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/registries/repositories/edit/registryRepository.html',
+        controller: 'RegistryRepositoryController'
+      }
+    }
+  };
+
   var settings = {
     name: 'portainer.settings',
     url: '/settings',
@@ -431,6 +454,8 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(registry);
   $stateRegistryProvider.register(registryAccess);
   $stateRegistryProvider.register(registryCreation);
+  $stateRegistryProvider.register(registryRepositories);
+  $stateRegistryProvider.register(registryRepositoryTags);
   $stateRegistryProvider.register(settings);
   $stateRegistryProvider.register(settingsAuthentication);
   $stateRegistryProvider.register(stacks);
