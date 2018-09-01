@@ -327,9 +327,6 @@ angular.module('portainer.app', [])
         controller: 'UpdatePasswordController'
       },
       'sidebar@': {}
-    },
-    params: {
-      password: ''
     }
   };
 
