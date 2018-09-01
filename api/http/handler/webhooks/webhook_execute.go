@@ -22,7 +22,10 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 	}
 
 	webhook, err := handler.WebhookService.WebhookByToken(webhookToken)
-	if err != nil {
+
+	if err == portainer.ErrObjectNotFound {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a webhook with this token", err}
+	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve webhook from the database", err}
 	}
 
@@ -59,7 +62,9 @@ func (handler *Handler) executeServiceWebhook(w http.ResponseWriter, endpoint *p
 	service.Spec.TaskTemplate.ForceUpdate++
 
 	service.Spec.TaskTemplate.ContainerSpec.Image = strings.Split(service.Spec.TaskTemplate.ContainerSpec.Image, "@sha")[0]
-	dockerClient.ServiceUpdate(context.Background(), resourceID, service.Version, service.Spec, dockertypes.ServiceUpdateOptions{QueryRegistry: true})
-
+	_, err = dockerClient.ServiceUpdate(context.Background(), resourceID, service.Version, service.Spec, dockertypes.ServiceUpdateOptions{QueryRegistry: true})
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Error updating service", err}
+	}
 	return response.Empty(w)
 }
