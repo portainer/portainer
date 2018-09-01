@@ -53,6 +53,7 @@ func (handler *Handler) executeServiceWebhook(w http.ResponseWriter, endpoint *p
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Error creating docker client", err}
 	}
+	defer dockerClient.Close()
 
 	service, _, err := dockerClient.ServiceInspectWithRaw(context.Background(), resourceID, dockertypes.ServiceInspectOptions{InsertDefaults: true})
 	if err != nil {
