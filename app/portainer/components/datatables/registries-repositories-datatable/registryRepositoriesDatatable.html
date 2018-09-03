@@ -6,11 +6,6 @@
           <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }}
         </div>
       </div>
-      <div class="actionBar">
-        <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
-          <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
-        </button>
-      </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
         <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus>
@@ -56,7 +51,7 @@
               <td colspan="5" class="text-center text-muted">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-              <td colspan="5" class="text-center text-muted">No image available.</td>
+              <td colspan="5" class="text-center text-muted">No repository available.</td>
             </tr>
           </tbody>
         </table>

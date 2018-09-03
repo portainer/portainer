@@ -23,8 +23,12 @@ angular.module('portainer.app')
           })
           .then(function success(data) {
             var repositories = data.map(function (item) {
+              if (!item.tags) {
+                return;
+              }
               return new RegistryRepositoryViewModel(item);
             });
+            repositories = _.without(repositories, undefined);
             deferred.resolve(repositories);
           })
           .catch(function error(err) {

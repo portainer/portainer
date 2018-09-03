@@ -16,7 +16,6 @@ angular.module('portainer.app')
       };
 
       $scope.$watch('tags.length', function () {
-        console.log('watch');
         var images = $scope.tags.map(function (item) {
           return item.ImageId;
         });
@@ -61,58 +60,63 @@ angular.module('portainer.app')
           });
       };
 
-      // $scope.removeTags = function (selectedItems) {
-      //   ModalService.confirmDeletion(
-      //     'Are you sure you want to remove the selected tags ?',
-      //     function onConfirm(confirmed) {
-      //       if (!confirmed) {
-      //         return;
-      //       }
-      //       var promises = [];
-      //       var uniqItems = _.uniqBy(selectedItems, 'Digest');
-      //       uniqItems.map(function (item) {
-      //         promises.push(LocalRegistryService.deleteManifest($scope.registryId, $scope.image.Name, item.Digest));
-      //       });
-      //       $q.all(promises)
-      //         .then(function success() {
-      //           var promises = [];
-      //           var tagsToReupload = _.differenceBy($scope.image.Tags, selectedItems, 'Value');
-      //           tagsToReupload.map(function (item) {
-      //             promises.push(LocalRegistryService.addTag($scope.registryId, $scope.image.Name, item.Value, $scope.image.ManifestV2));
-      //           });
-      //           return $q.all(promises);
-      //         })
-      //         .then(function success(data) {
-      //           Notifications.success('Success', 'Tags successfully deleted');
-      //           $state.reload();
-      //         })
-      //         .catch(function error(err) {
-      //           Notifications.error('Failure', err, 'Unable to delete tags');
-      //         });
-      //     });
-      // };
+      $scope.removeTags = function (selectedItems) {
+        ModalService.confirmDeletion(
+          'Are you sure you want to remove the selected tags ?',
+          function onConfirm(confirmed) {
+            if (!confirmed) {
+              return;
+            }
+            var promises = [];
+            var uniqItems = _.uniqBy(selectedItems, 'Digest');
+            uniqItems.map(function (item) {
+              promises.push(LocalRegistryService.deleteManifest($scope.registryId, $scope.repository.Name, item.Digest));
+            });
+            $q.all(promises)
+              .then(function success() {
+                var promises = [];
+                var tagsToReupload = _.differenceBy($scope.tags, selectedItems, 'Name');
+                tagsToReupload.map(function (item) {
+                  promises.push(LocalRegistryService.addTag($scope.registryId, $scope.repository.Name, item.Name, item.ManifestV2));
+                });
+                return $q.all(promises);
+              })
+              .then(function success(data) {
+                Notifications.success('Success', 'Tags successfully deleted');
+                $state.reload();
+              })
+              .catch(function error(err) {
+                Notifications.error('Failure', err, 'Unable to delete tags');
+              });
+          });
+      };
 
-      // $scope.removeImage = function () {
-      //   ModalService.confirmDeletion(
-      //     'This action will only remove the manifests linked to this image. You need to manually trigger a garbage collector pass on your registry to remove orphan layers and really remove the image content.',
-      //     function onConfirm(confirmed) {
-      //       if (!confirmed) {
-      //         return;
-      //       }
-      //       LocalRegistryService.deleteManifest($scope.registryId, $scope.image.Name, $scope.image.Digest)
-      //         .then(function success(data) {
-      //           Notifications.success('Success', 'Image sucessfully removed');
-      //           $state.go('portainer.registries.registry.images', {
-      //             id: $scope.registryId
-      //           }, {
-      //             reload: true
-      //           });
-      //         }).catch(function error(err) {
-      //           Notifications.error('Failure', err, 'Unable to delete image');
-      //         });
-      //     }
-      //   );
-      // };
+      $scope.removeRepository = function () {
+        ModalService.confirmDeletion(
+          'This action will only remove the manifests linked to this repository. You need to manually trigger a garbage collector pass on your registry to remove orphan layers and really remove the images content. THIS ACTION CAN NOT BE UNDONE',
+          function onConfirm(confirmed) {
+            if (!confirmed) {
+              return;
+            }
+            var promises = [];
+            var uniqItems = _.uniqBy($scope.tags, 'Digest');
+            uniqItems.map(function (item) {
+              promises.push(LocalRegistryService.deleteManifest($scope.registryId, $scope.repository.Name, item.Digest));
+            });
+            $q.all(promises)
+              .then(function success(data) {
+                Notifications.success('Success', 'Repository sucessfully removed');
+                $state.go('portainer.registries.registry.repositories', {
+                  id: $scope.registryId
+                }, {
+                  reload: true
+                });
+              }).catch(function error(err) {
+                Notifications.error('Failure', err, 'Unable to delete repository');
+              });
+          }
+        );
+      };
 
       function initView() {
         var registryId = $scope.registryId = $transition$.params().id;
