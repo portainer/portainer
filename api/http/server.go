@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/docker"
 	"github.com/portainer/portainer/http/handler"
 	"github.com/portainer/portainer/http/handler/auth"
 	"github.com/portainer/portainer/http/handler/dockerhub"
@@ -23,6 +24,7 @@ import (
 	"github.com/portainer/portainer/http/handler/templates"
 	"github.com/portainer/portainer/http/handler/upload"
 	"github.com/portainer/portainer/http/handler/users"
+	"github.com/portainer/portainer/http/handler/webhooks"
 	"github.com/portainer/portainer/http/handler/websocket"
 	"github.com/portainer/portainer/http/proxy"
 	"github.com/portainer/portainer/http/security"
@@ -60,10 +62,12 @@ type Server struct {
 	TeamMembershipService  portainer.TeamMembershipService
 	TemplateService        portainer.TemplateService
 	UserService            portainer.UserService
+	WebhookService         portainer.WebhookService
 	Handler                *handler.Handler
 	SSL                    bool
 	SSLCert                string
 	SSLKey                 string
+	DockerClientFactory    *docker.ClientFactory
 }
 
 // Start starts the HTTP server
@@ -171,6 +175,11 @@ func (server *Server) Start() error {
 	websocketHandler.EndpointService = server.EndpointService
 	websocketHandler.SignatureService = server.SignatureService
 
+	var webhookHandler = webhooks.NewHandler(requestBouncer)
+	webhookHandler.WebhookService = server.WebhookService
+	webhookHandler.EndpointService = server.EndpointService
+	webhookHandler.DockerClientFactory = server.DockerClientFactory
+
 	server.Handler = &handler.Handler{
 		AuthHandler:            authHandler,
 		DockerHubHandler:       dockerHubHandler,
@@ -191,6 +200,7 @@ func (server *Server) Start() error {
 		UploadHandler:          uploadHandler,
 		UserHandler:            userHandler,
 		WebSocketHandler:       websocketHandler,
+		WebhookHandler:         webhookHandler,
 	}
 
 	if server.SSL {
