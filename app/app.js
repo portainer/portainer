@@ -12,7 +12,7 @@ function ($rootScope, $state, Authentication, authManager, StateManager, Endpoin
     }
     if (state.application.analytics) {
       initAnalytics(Analytics, $rootScope);
-    } 
+    }
   })
   .catch(function error(err) {
     Notifications.error('Failure', err, 'Unable to retrieve application settings');
