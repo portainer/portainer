@@ -1,0 +1,58 @@
+<rd-header>
+  <rd-header-title title-text="SSH keys">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.deploykeys" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>SSH keys management</rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-plus" title-text="Add a new key">
+      </rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal" name="deploykeyCreationForm" ng-submit="createDeploykey()">
+          <!-- name-input -->
+          <div class="form-group">
+            <label for="name" class="col-sm-2 control-label text-left">
+              Key Name
+            </label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" name="name" ng-model="formValues.Name" ng-change="checkNameValidity(deploykeyCreationForm)" placeholder="Abcd" required auto-focus />
+            </div>
+          </div>
+          <div class="form-group" ng-show="deploykeyCreationForm.name.$invalid">
+            <div class="col-sm-12 small text-warning">
+              <div ng-messages="deploykeyCreationForm.name.$error">
+                <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                <p ng-message="validName"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This key already exists.</p>
+              </div>
+            </div>
+          </div>
+          <!-- !name-input -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !deploykeyCreationForm.$valid" ng-click="createDeploykey()" button-spinner="state.actionInProgress">
+                <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Create key</span>
+                <span ng-show="state.actionInProgress">Creating key...</span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <deploykeys-datatable
+    title-text="Keys" title-icon="fa-tags"
+    dataset="deploykeys" table-key="deploykeys"
+    order-by="Name" 
+    remove-action="removeAction"
+    ></deploykeys-datatable>
+  </div>
+</div> 

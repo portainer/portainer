@@ -1,0 +1,201 @@
+<rd-header>
+  <rd-header-title title-text="Storidge monitor">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="storidge.monitor" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>
+    <a ui-sref="storidge.cluster">Storidge</a> &gt; <a ui-sref="storidge.monitor">Cluster monitoring</a>
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-md-4 col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-tachometer-alt" title-text="Cluster capacity"></rd-widget-header>
+      <rd-widget-body>
+        <div class="chart-container" style="position: relative;">
+          <canvas id="capacityChart" width="770" height="400"></canvas>
+        </div>
+        <div style="margin-top: 10px;" ng-if="info">
+          <table class="table">
+            <tbody>
+              <tr>
+                <td>Capacity available</td>
+                <td>{{ ((info.FreeCapacity * 100) / info.TotalCapacity).toFixed(1) }}%</td>
+              </tr>
+              <tr>
+                <td>Provisioned capacity</td>
+                <td>
+                  {{ info.ProvisionedCapacity | humansize }}
+                  <span ng-if="+(info.ProvisionedCapacity) >= +(info.TotalCapacity)">
+                    <i class="fa fa-exclamation-triangle red-icon" aria-hidden="true" style="margin-left: 2px;"></i>
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td>Total capacity</td>
+                <td>{{ info.TotalCapacity | humansize }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+  <div class="col-md-4 col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-chart-area" title-text="IOPS usage"></rd-widget-header>
+      <rd-widget-body>
+        <div class="chart-container" style="position: relative;">
+          <canvas id="iopsChart" width="770" height="400"></canvas>
+        </div>
+        <div style="margin-top: 10px;" ng-if="info">
+          <table class="table">
+            <tbody>
+              <tr>
+                <td>IOPS available</td>
+                <td>{{ ((info.FreeIOPS * 100) / info.TotalIOPS).toFixed(1) }}%</td>
+              </tr>
+              <tr>
+                <td>Provisioned IOPS</td>
+                <td>
+                  {{ info.ProvisionedIOPS | number }}
+                  <span ng-if="+(info.ProvisionedIOPS) >= +(info.TotalIOPS)">
+                    <i class="fa fa-exclamation-triangle red-icon" aria-hidden="true" style="margin-left: 2px;"></i>
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td>Total IOPS</td>
+                <td>{{ info.TotalIOPS | number }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+  <div class="col-md-4 col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-chart-area" title-text="Bandwith usage"></rd-widget-header>
+      <rd-widget-body>
+        <div class="chart-container" style="position: relative;">
+          <canvas id="bandwithChart" width="770" height="400"></canvas>
+        </div>
+        <div style="margin-top: 10px;" ng-if="info">
+          <table class="table">
+            <tbody>
+              <tr>
+                <td>Bandwidth available</td>
+                <td>{{ ((info.FreeBandwidth * 100) / info.TotalBandwidth).toFixed(1) }}%</td>
+              </tr>
+              <tr>
+                <td>Provisioned bandwidth</td>
+                <td>
+                  {{ info.ProvisionedBandwidth | humansize }}
+                  <span ng-if="+(info.ProvisionedBandwidth) >= +(info.TotalBandwidth)">
+                    <i class="fa fa-exclamation-triangle red-icon" aria-hidden="true" style="margin-left: 2px;"></i>
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td>Total bandwidth</td>
+                <td>{{ info.TotalBandwidth | humansize }} /s</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <storidge-cluster-events-datatable
+    title-text="Cluster events" title-icon="fa-history"
+    dataset="events" table-key="storidge_cluster_events"
+    order-by="Time"  reverse-order="true"
+    ></storidge-cluster-events-datatable>
+  </div>
+</div>
+
+<!-- <div class="row">
+  <div class="col-md-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-history" title-text="Cluster events">
+        <div class="pull-right">
+          Items per page:
+          <select ng-model="state.pagination_count" ng-change="changePaginationCount()">
+            <option value="0">All</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </rd-widget-header>
+      <rd-widget-taskbar classes="col-lg-12">
+        <div class="pull-right">
+          <input type="text" id="filter" ng-model="state.filter" placeholder="Filter..." class="form-control input-sm" />
+        </div>
+      </rd-widget-taskbar>
+      <rd-widget-body classes="no-padding">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>
+                  <a ng-click="order('Time')">
+                    Date
+                    <span ng-show="sortType == 'Time' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortType == 'Time' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  </a>
+                </th>
+                <th>
+                  <a ng-click="order('Category')">
+                    Category
+                    <span ng-show="sortType == 'Category' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortType == 'Category' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  </a>
+                </th>
+                <th>
+                  <a ng-click="order('Module')">
+                    Module
+                    <span ng-show="sortType == 'Module' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortType == 'Module' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  </a>
+                </th>
+                <th>
+                  <a ng-click="order('Content')">
+                    Content
+                    <span ng-show="sortType == 'Content' && !sortReverse" class="glyphicon glyphicon-chevron-down"></span>
+                    <span ng-show="sortType == 'Content' && sortReverse" class="glyphicon glyphicon-chevron-up"></span>
+                  </a>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr dir-paginate="event in (events | filter:state.filter | orderBy:sortType:sortReverse | itemsPerPage: state.pagination_count)">
+                <td>{{ event.Time }}</td>
+                <td>{{ event.Category }}</td>
+                <td>{{ event.Module }}</td>
+                <td>{{ event.Content }}</td>
+              </tr>
+              <tr ng-if="!events">
+                <td colspan="4" class="text-center text-muted">Loading...</td>
+              </tr>
+              <tr ng-if="events.length === 0">
+                <td colspan="4" class="text-center text-muted">No events available.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div ng-if="events" class="pull-left pagination-controls">
+            <dir-pagination-controls></dir-pagination-controls>
+          </div>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div> -->

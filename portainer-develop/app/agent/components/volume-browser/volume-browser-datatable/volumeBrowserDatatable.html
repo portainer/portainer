@@ -1,0 +1,90 @@
+<div class="datatable">
+  <rd-widget>
+    <rd-widget-body classes="no-padding">
+      <div class="toolBar">
+        <div class="toolBarTitle">
+          <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }}
+        </div>
+      </div>
+      <div class="searchBar">
+        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
+        <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus>
+      </div>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('Name')">
+                  Name
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('Size')">
+                  Size
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Size' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Size' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('ModTime')">
+                  Last modification
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ModTime' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ModTime' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-if="$ctrl.volumeBrowser.state.path !== '/'">
+              <td colspan="4">
+                <a ng-click="$ctrl.volumeBrowser.up()"><i class="fa fa-level-up-alt space-right"></i>Go to parent</a>
+              </td>
+            </tr>
+            <tr ng-repeat="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder))">
+              <td>
+                <span ng-if="item.edit">
+                  <input class="input-sm" type="text" ng-model="item.newName" on-enter-key="$ctrl.volumeBrowser.rename(item.Name, item.newName); item.edit = false;" auto-focus />
+                  <a class="interactive" ng-click="item.edit = false;"><i class="fa fa-times"></i></a>
+                  <a class="interactive" ng-click="$ctrl.volumeBrowser.rename(item.Name, item.newName); item.edit = false;"><i class="fa fa-check-square"></i></a>
+                </span>
+                <span ng-if="!item.edit && item.Dir">
+                  <a ng-click="$ctrl.volumeBrowser.browse(item.Name)"><i class="fa fa-folder space-right" aria-hidden="true"></i>{{ item.Name }}</a>
+                </span>
+                <span ng-if="!item.edit && !item.Dir">
+                  <i class="fa fa-file space-right" aria-hidden="true"></i>{{ item.Name }}
+                </span>
+              </td>
+              <td>{{ item.Size | humansize }}</td>
+              <td>
+                {{ item.ModTime | getisodatefromtimestamp }}
+              </td>
+              <td>
+                <btn class="btn btn-xs btn-primary space-right" ng-click="$ctrl.volumeBrowser.download(item.Name)" ng-if="!item.Dir">
+                  <i class="fa fa-download" aria-hidden="true"></i> Download
+                </btn>
+                <btn class="btn btn-xs btn-primary space-right" ng-click="item.newName = item.Name; item.edit = true">
+                  <i class="fa fa-edit" aria-hidden="true"></i> Rename
+                </btn>
+                <btn class="btn btn-xs btn-danger" ng-click="$ctrl.volumeBrowser.delete(item.Name)">
+                  <i class="fa fa-trash" aria-hidden="true"></i> Delete
+                </btn>
+              </td>
+            </tr>
+            <tr ng-if="!$ctrl.dataset">
+              <td colspan="5" class="text-center text-muted">Loading...</td>
+            </tr>
+            <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
+              <td colspan="5" class="text-center text-muted">No files found.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </rd-widget-body>
+  </rd-widget>
+</div>

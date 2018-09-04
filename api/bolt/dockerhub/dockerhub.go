@@ -42,6 +42,7 @@ func (service *Service) DockerHub() (*portainer.DockerHub, error) {
 	return &dockerhub, nil
 }
 
+
 // UpdateDockerHub updates a DockerHub object.
 func (service *Service) UpdateDockerHub(dockerhub *portainer.DockerHub) error {
 	return internal.UpdateObject(service.db, BucketName, []byte(dockerHubKey), dockerhub)

@@ -1,0 +1,244 @@
+<rd-header>
+  <rd-header-title title-text="Create endpoint"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="portainer.endpoints">Endpoints</a> &gt; Add endpoint
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+        <form class="form-horizontal" name="endpointCreationForm">
+          <div class="col-sm-12 form-section-title">
+            Environment type
+          </div>
+          <div class="form-group"></div>
+          <div class="form-group" style="margin-bottom: 0">
+            <div class="boxselector_wrapper">
+              <div>
+                <input type="radio" id="docker_endpoint" ng-model="state.EnvironmentType" value="docker">
+                <label for="docker_endpoint">
+                  <div class="boxselector_header">
+                    <i class="fab fa-docker" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Docker
+                  </div>
+                  <p>Docker environment</p>
+                </label>
+              </div>
+              <div>
+                <input type="radio" id="agent_endpoint" ng-model="state.EnvironmentType" value="agent">
+                <label for="agent_endpoint">
+                  <div class="boxselector_header">
+                    <i class="fa fa-bolt" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Agent
+                  </div>
+                  <p>Portainer agent</p>
+                </label>
+              </div>
+              <div>
+                <input type="radio" id="azure_endpoint" ng-model="state.EnvironmentType" value="azure">
+                <label for="azure_endpoint">
+                  <div class="boxselector_header">
+                    <i class="fab fa-microsoft" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Azure
+                  </div>
+                  <p>Connect to Microsoft Azure ACI</p>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div ng-if="state.EnvironmentType === 'docker'">
+            <div class="col-sm-12 form-section-title" >
+              Important notice
+            </div>
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                The Docker API must be exposed over TCP. You can find more information about how to expose the Docker API over TCP <a href="https://docs.docker.com/engine/security/https/" target="_blank">in the Docker documentation</a>.
+              </span>
+            </div>
+          </div>
+          <div ng-if="state.EnvironmentType === 'agent'">
+            <div class="col-sm-12 form-section-title" >
+              Information
+            </div>
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                If you have started Portainer in the same overlay network as the agent, you can use <code>tasks.AGENT_SERVICE_NAME:AGENT_SERVICE_PORT</code> as the
+                endpoint URL format.
+              </span>
+            </div>
+          </div>
+          <div ng-if="state.EnvironmentType === 'azure'">
+            <div class="col-sm-12 form-section-title" >
+              Information
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <span class="small">
+                  <p class="text-muted">
+                    <i class="fa fa-flask orange-icon" aria-hidden="true" style="margin-right: 2px;"></i> This feature is experimental.
+                  </p>
+                  <p class="text-primary">
+                    Connect to Microsoft Azure to manage Azure Container Instances (ACI).
+                  </p>
+                  <p class="text-muted">
+                    <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Have a look at <a href="https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal" target="_blank">the Azure documentation</a> to retrieve
+                    the credentials required below.
+                  </p>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-12 form-section-title">
+            Environment details
+          </div>
+          <!-- name-input -->
+          <div class="form-group">
+            <label for="container_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
+            <div class="col-sm-9 col-lg-10">
+              <input type="text" class="form-control" name="container_name" ng-model="formValues.Name" placeholder="e.g. docker-prod01" required auto-focus>
+            </div>
+          </div>
+          <div class="form-group" ng-show="endpointCreationForm.container_name.$invalid">
+            <div class="col-sm-12 small text-warning">
+              <div ng-messages="endpointCreationForm.container_name.$error">
+                <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+              </div>
+            </div>
+          </div>
+          <!-- !name-input -->
+          <!-- endpoint-url-input -->
+          <div ng-if="state.EnvironmentType === 'docker' || state.EnvironmentType === 'agent'">
+            <div class="form-group">
+              <label for="endpoint_url" class="col-sm-3 col-lg-2 control-label text-left">
+                Endpoint URL
+                <portainer-tooltip position="bottom" message="URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it."></portainer-tooltip>
+              </label>
+              <div class="col-sm-9 col-lg-10">
+                <input ng-if="state.EnvironmentType === 'docker'" type="text" class="form-control" name="endpoint_url" ng-model="formValues.URL" placeholder="e.g. 10.0.0.10:2375 or mydocker.mydomain.com:2375" required>
+                <input ng-if="state.EnvironmentType === 'agent'" type="text" class="form-control" name="endpoint_url" ng-model="formValues.URL" placeholder="e.g. 10.0.0.10:9001 or tasks.portainer_agent:9001" required>
+              </div>
+            </div>
+            <div class="form-group" ng-show="endpointCreationForm.endpoint_url.$invalid">
+              <div class="col-sm-12 small text-warning">
+                <div ng-messages="endpointCreationForm.endpoint_url.$error">
+                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- !endpoint-url-input -->
+          <!-- endpoint-public-url-input -->
+          <div ng-if="state.EnvironmentType === 'docker' || state.EnvironmentType === 'agent'">
+            <div class="form-group">
+              <label for="endpoint_public_url" class="col-sm-3 col-lg-2 control-label text-left">
+                Public IP
+                <portainer-tooltip position="bottom" message="URL or IP address where exposed containers will be reachable. This field is optional and will default to the endpoint URL."></portainer-tooltip>
+              </label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="text" class="form-control" id="endpoint_public_url" ng-model="formValues.PublicURL" placeholder="e.g. 10.0.0.10 or mydocker.mydomain.com">
+              </div>
+            </div>
+          </div>
+          <!-- !endpoint-public-url-input -->
+          <!-- azure-details -->
+          <div ng-if="state.EnvironmentType === 'azure'">
+            <!-- applicationId-input -->
+            <div class="form-group">
+              <label for="azure_credential_appid" class="col-sm-3 col-lg-2 control-label text-left">Application ID</label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="text" class="form-control" name="azure_credential_appid" ng-model="formValues.AzureApplicationId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" required>
+              </div>
+            </div>
+            <div class="form-group" ng-show="endpointCreationForm.azure_credential_appid.$invalid">
+              <div class="col-sm-12 small text-warning">
+                <div ng-messages="endpointCreationForm.azure_credential_appid.$error">
+                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                </div>
+              </div>
+            </div>
+            <!-- !applicationId-input -->
+            <!-- tenantId-input -->
+            <div class="form-group">
+              <label for="azure_credential_tenantid" class="col-sm-3 col-lg-2 control-label text-left">Tenant ID</label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="text" class="form-control" name="azure_credential_tenantid" ng-model="formValues.AzureTenantId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" required>
+              </div>
+            </div>
+            <div class="form-group" ng-show="endpointCreationForm.azure_credential_tenantid.$invalid">
+              <div class="col-sm-12 small text-warning">
+                <div ng-messages="endpointCreationForm.azure_credential_tenantid.$error">
+                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                </div>
+              </div>
+            </div>
+            <!-- !tenantId-input -->
+            <!-- authenticationkey-input -->
+            <div class="form-group">
+              <label for="azure_credential_authkey" class="col-sm-3 col-lg-2 control-label text-left">Authentication key</label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="text" class="form-control" name="azure_credential_authkey" ng-model="formValues.AzureAuthenticationKey" placeholder="cOrXoK/1D35w8YQ8nH1/8ZGwzz45JIYD5jxHKXEQknk=" required>
+              </div>
+            </div>
+            <div class="form-group" ng-show="endpointCreationForm.azure_credential_authkey.$invalid">
+              <div class="col-sm-12 small text-warning">
+                <div ng-messages="endpointCreationForm.azure_credential_authkey.$error">
+                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                </div>
+              </div>
+            </div>
+            <!-- !authenticationkey-input -->
+          </div>
+          <!-- !azure-details -->
+          <!-- endpoint-security -->
+          <por-endpoint-security ng-if="state.EnvironmentType === 'docker'" form-data="formValues.SecurityFormData"></por-endpoint-security>
+          <!-- !endpoint-security -->
+          <div class="col-sm-12 form-section-title">
+            Metadata
+          </div>
+          <!-- group -->
+          <div class="form-group">
+            <label for="endpoint_group" class="col-sm-3 col-lg-2 control-label text-left">
+              Group
+            </label>
+            <div class="col-sm-9 col-lg-10">
+              <select ng-options="group.Id as group.Name for group in groups" ng-model="formValues.GroupId" id="endpoint_group" class="form-control"></select>
+            </div>
+          </div>
+          <!-- !group -->
+          <!-- tags -->
+          <div class="form-group">
+            <tag-selector
+              tags="availableTags"
+              model="formValues.Tags"
+            ></tag-selector>
+          </div>
+          <!-- !tags -->
+          <div class="col-sm-12 form-section-title">
+            Actions
+          </div>
+          <!-- actions -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button ng-if="state.EnvironmentType === 'docker'" type="submit" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !endpointCreationForm.$valid || (formValues.TLS && ((formValues.TLSVerify && !formValues.TLSCACert) || (formValues.TLSClientCert && (!formValues.TLSCert || !formValues.TLSKey))))" ng-click="addDockerEndpoint()" button-spinner="state.actionInProgress">
+                <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Add endpoint</span>
+                <span ng-show="state.actionInProgress">Creating endpoint...</span>
+              </button>
+              <button ng-if="state.EnvironmentType === 'agent'" type="submit" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !endpointCreationForm.$valid" ng-click="addAgentEndpoint()" button-spinner="state.actionInProgress">
+                <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Add endpoint</span>
+                <span ng-show="state.actionInProgress">Creating endpoint...</span>
+              </button>
+              <button ng-if="state.EnvironmentType === 'azure'" type="submit" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !endpointCreationForm.$valid" ng-click="addAzureEndpoint()" button-spinner="state.actionInProgress">
+                <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Add endpoint</span>
+                <span ng-show="state.actionInProgress">Creating endpoint...</span>
+              </button>
+            </div>
+          </div>
+          <!-- !actions -->
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

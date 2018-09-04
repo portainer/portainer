@@ -1,0 +1,28 @@
+<rd-header>
+  <rd-header-title title-text="Template details">
+    <a data-toggle="tooltip" title-text="Refresh" ui-sref="portainer.templates.template({id: template.Id})" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>
+    <a ui-sref="portainer.templates">Templates</a> &gt; {{ ::template.Title }}</a>
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+        <template-form
+          model="template"
+          categories="categories"
+          networks="networks"
+          form-action="update"
+          show-type-selector="false"
+          form-action-label="Update the template"
+          action-in-progress="state.actionInProgress"
+        ></template-form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

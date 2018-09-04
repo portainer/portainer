@@ -1,0 +1,56 @@
+<!-- template -->
+<div ng-class="{ 'blocklist-item--selected': $ctrl.model.Selected }" class="blocklist-item" ng-click="$ctrl.onSelect($ctrl.model)">
+  <div class="blocklist-item-box">
+    <!-- template-image -->
+    <span ng-if="$ctrl.model.Logo">
+      <img class="blocklist-item-logo" ng-src="{{ $ctrl.model.Logo }}" />
+    </span>
+    <span class="blocklist-item-logo" ng-if="!$ctrl.model.Logo">
+      <i class="fa fa-rocket fa-4x blue-icon" aria-hidden="true"></i>
+    </span>
+    <!-- !template-image -->
+    <!-- template-details -->
+    <span class="col-sm-12">
+      <!-- blocklist-item-line1 -->
+      <div class="blocklist-item-line">
+        <span>
+          <span class="blocklist-item-title">
+            {{ $ctrl.model.Title }}
+          </span>
+          <span class="space-left blocklist-item-subtitle">
+            <span>
+              <i class="fab fa-linux" aria-hidden="true" ng-if="$ctrl.model.Platform === 'linux' || !$ctrl.model.Platform"></i>
+              <span ng-if="!$ctrl.model.Platform"> &amp; </span>
+              <i class="fab fa-windows" aria-hidden="true" ng-if="$ctrl.model.Platform === 'windows' || !$ctrl.model.Platform"></i>
+            </span>
+            <span>
+              {{ $ctrl.model.Type === 1 ? 'container' : 'stack' }}
+            </span>
+          </span>
+        </span>
+        <span class="text-small">
+          <a ui-sref="portainer.templates.template({ id: $ctrl.model.Id })" class="btn btn-xs btn-primary" ng-click="$event.stopPropagation();" ng-if="$ctrl.showUpdateAction">
+            <i class="fa fa-edit" aria-hidden="true"></i>
+            Update
+          </a>
+          <btn class="btn btn-xs btn-danger" ng-click="$event.stopPropagation(); $ctrl.onDelete($ctrl.model)" ng-if="$ctrl.showDeleteAction">
+            <i class="fa fa-trash" aria-hidden="true"></i> Delete
+          </btn>
+        </span>
+      </div>
+      <!-- !blocklist-item-line1 -->
+      <!-- blocklist-item-line2 -->
+      <div class="blocklist-item-line">
+        <span class="blocklist-item-desc">
+          {{ $ctrl.model.Description }}
+        </span>
+        <span class="small text-muted" ng-if="$ctrl.model.Categories.length > 0">
+          {{ $ctrl.model.Categories.join(', ') }}
+        </span>
+      </div>
+      <!-- !blocklist-item-line2 -->
+    </span>
+    <!-- !template-details -->
+  </div>
+  <!-- !template -->
+</div>

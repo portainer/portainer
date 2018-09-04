@@ -1,0 +1,59 @@
+<rd-header>
+  <rd-header-title title-text="Tags">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.tags" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>Tag management</rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-plus" title-text="Add a new tag">
+      </rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal" name="tagCreationForm" ng-submit="createTag()">
+          <!-- name-input -->
+          <div class="form-group">
+            <label for="name" class="col-sm-2 control-label text-left">
+              Name
+            </label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" name="name" ng-model="formValues.Name" ng-change="checkNameValidity(tagCreationForm)" placeholder="org/acme" required auto-focus />
+            </div>
+          </div>
+          <div class="form-group" ng-show="tagCreationForm.name.$invalid">
+            <div class="col-sm-12 small text-warning">
+              <div ng-messages="tagCreationForm.name.$error">
+                <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                <p ng-message="validName"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This tag already exists.</p>
+              </div>
+            </div>
+          </div>
+          <!-- !name-input -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !tagCreationForm.$valid" ng-click="createTag()" button-spinner="state.actionInProgress">
+                <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Create tag</span>
+                <span ng-show="state.actionInProgress">Creating tag...</span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="col-sm-12">
+    <tags-datatable
+    title-text="Tags" title-icon="fa-tags"
+    dataset="tags" table-key="tags"
+    order-by="Name" 
+    remove-action="removeAction"
+    ></tags-datatable>
+  </div>
+</div>

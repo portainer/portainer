@@ -1,6 +1,7 @@
 package user
 
 import (
+	"fmt"
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/bolt/internal"
 
@@ -38,7 +39,7 @@ func (service *Service) User(ID portainer.UserID) (*portainer.User, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	fmt.Printf("helloe");
 	return &user, nil
 }
 

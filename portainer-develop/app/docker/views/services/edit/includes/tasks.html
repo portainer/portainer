@@ -1,0 +1,12 @@
+<div ng-if="tasks.length > 0 && nodes" id="service-tasks">
+  <tasks-datatable
+    title-text="Tasks" title-icon="fa-tasks"
+    dataset="tasks" table-key="service-tasks"
+    order-by="Updated" reverse-order="true"
+    nodes="nodes"
+    
+    show-slot-column="service.Mode !== 'global'"
+    show-logs-button="applicationState.endpoint.apiVersion >= 1.30"
+    agent-proxy="applicationState.endpoint.mode.agentProxy"
+  ></tasks-datatable>
+</div>

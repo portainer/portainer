@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/docker"
 	"github.com/portainer/portainer/http/handler"
 	"github.com/portainer/portainer/http/handler/auth"
 	"github.com/portainer/portainer/http/handler/dockerhub"
@@ -24,10 +23,10 @@ import (
 	"github.com/portainer/portainer/http/handler/templates"
 	"github.com/portainer/portainer/http/handler/upload"
 	"github.com/portainer/portainer/http/handler/users"
-	"github.com/portainer/portainer/http/handler/webhooks"
 	"github.com/portainer/portainer/http/handler/websocket"
 	"github.com/portainer/portainer/http/proxy"
 	"github.com/portainer/portainer/http/security"
+	"github.com/portainer/portainer/http/handler/deploykeys"
 
 	"net/http"
 	"path/filepath"
@@ -58,16 +57,15 @@ type Server struct {
 	StackService           portainer.StackService
 	SwarmStackManager      portainer.SwarmStackManager
 	TagService             portainer.TagService
+	DeploykeyService       portainer.DeploykeyService
 	TeamService            portainer.TeamService
 	TeamMembershipService  portainer.TeamMembershipService
 	TemplateService        portainer.TemplateService
 	UserService            portainer.UserService
-	WebhookService         portainer.WebhookService
 	Handler                *handler.Handler
 	SSL                    bool
 	SSLCert                string
 	SSLKey                 string
-	DockerClientFactory    *docker.ClientFactory
 }
 
 // Start starts the HTTP server
@@ -148,6 +146,9 @@ func (server *Server) Start() error {
 	var tagHandler = tags.NewHandler(requestBouncer)
 	tagHandler.TagService = server.TagService
 
+	var deploykeyHandler = deploykeys.NewHandler(requestBouncer)
+	deploykeyHandler.DeploykeyService = server.DeploykeyService
+
 	var teamHandler = teams.NewHandler(requestBouncer)
 	teamHandler.TeamService = server.TeamService
 	teamHandler.TeamMembershipService = server.TeamMembershipService
@@ -175,11 +176,6 @@ func (server *Server) Start() error {
 	websocketHandler.EndpointService = server.EndpointService
 	websocketHandler.SignatureService = server.SignatureService
 
-	var webhookHandler = webhooks.NewHandler(requestBouncer)
-	webhookHandler.WebhookService = server.WebhookService
-	webhookHandler.EndpointService = server.EndpointService
-	webhookHandler.DockerClientFactory = server.DockerClientFactory
-
 	server.Handler = &handler.Handler{
 		AuthHandler:            authHandler,
 		DockerHubHandler:       dockerHubHandler,
@@ -200,7 +196,7 @@ func (server *Server) Start() error {
 		UploadHandler:          uploadHandler,
 		UserHandler:            userHandler,
 		WebSocketHandler:       websocketHandler,
-		WebhookHandler:         webhookHandler,
+		DeploykeyHandler:       deploykeyHandler,
 	}
 
 	if server.SSL {

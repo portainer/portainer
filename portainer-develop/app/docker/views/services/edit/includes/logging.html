@@ -1,0 +1,65 @@
+<div id="service-logging-driver">
+    <rd-widget>
+      <rd-widget-header icon="fa-tasks" title-text="Logging driver">        
+      </rd-widget-header>      
+      <rd-widget-body classes="no-padding">
+        <div class="form-inline" style="padding: 10px;">
+          Driver:
+          <select class="form-control" ng-model="service.LogDriverName" ng-change="updateLogDriverName(service)" ng-disabled="isUpdating">
+            <option selected value="">Default logging driver</option>  
+            <option ng-repeat="driver in availableLoggingDrivers" ng-value="driver">{{ driver }}</option>                              
+            <option value="none">none</option>
+          </select>
+          <a class="btn btn-default btn-sm" ng-click="!service.LogDriverName || service.LogDriverName === 'none' || addLogDriverOpt(service)">
+            <i class="fa fa-plus-circle" aria-hidden="true"></i> add logging driver option
+          </a>
+        </div>
+        <table class="table" >
+          <thead>
+            <tr>
+              <th>Option</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="option in service.LogDriverOpts">
+              <td>
+                <div class="input-group input-group-sm">
+                  <span class="input-group-addon fit-text-size">name</span>
+                  <input type="text" class="form-control" ng-model="option.key" ng-disabled="option.added || isUpdating" placeholder="e.g. FOO">
+                </div>
+              </td>
+              <td>
+                <div class="input-group input-group-sm">
+                  <span class="input-group-addon fit-text-size">value</span>
+                  <input type="text" class="form-control" ng-model="option.value" ng-change="updateLogDriverOpt(service, option)" placeholder="e.g. bar" ng-disabled="isUpdating">
+                  <span class="input-group-btn">
+                    <button class="btn btn-sm btn-danger" type="button" ng-click="removeLogDriverOpt(service, $index)" ng-disabled="isUpdating">
+                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button>
+                  </span>
+                </div>
+              </td>
+            </tr>
+            <tr ng-if="service.LogDriverOpts.length === 0">
+                <td colspan="6" class="text-center text-muted">No options associated to this logging driver.</td>
+              </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+      <rd-widget-footer>
+        <div class="btn-toolbar" role="toolbar">
+          <div class="btn-group" role="group">
+            <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['LogDriverName', 'LogDriverOpts'])" ng-click="updateService(service)">Apply changes</button>
+            <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a ng-click="cancelChanges(service, ['LogDriverName', 'LogDriverOpts'])">Reset changes</a></li>
+              <li><a ng-click="cancelChanges(service)">Reset all changes</a></li>
+            </ul>
+          </div>
+        </div>
+      </rd-widget-footer>
+    </rd-widget>
+  </div>

@@ -1,0 +1,46 @@
+<rd-widget>
+  <rd-widget-header icon="fa-users" title-text="Access management"></rd-widget-header>
+  <rd-widget-body>
+    <form class="form-horizontal">
+      <div class="small text-muted">
+        <p>You can select which user or team can access this {{ $ctrl.entityType }} by moving them to the authorized accesses table. Simply click
+        on a user or team entry to move it from one table to the other.</p>
+        <p ng-if="$ctrl.inheritFrom">
+          <b>Note</b>: accesses tagged as <code>inherited</code> are inherited from the group accesses and cannot be remove at the endpoint level.
+        </p>
+      </div>
+      <div class="form-group" style="margin-top: 20px;">
+        <!-- available-endpoints -->
+        <div class="col-sm-6">
+          <div class="text-center small text-muted">Users and teams</div>
+          <div class="text-center small text-muted" style="margin-top: 5px;">
+            <button class="btn btn-primary btn-sm" ng-click="$ctrl.authorizeAllAccesses()" ng-disabled="$ctrl.accesses.length ===  0"><i class="fa fa-user-plus space-right" aria-hidden="true"></i>Authorize all</button>
+          </div>
+          <div style="margin-top: 10px;">
+            <access-table
+              dataset="$ctrl.accesses"
+              entry-click="$ctrl.authorizeAccess"
+              empty-dataset-message="No user or team available"
+            ></access-table>
+          </div>
+        </div>
+        <!-- !available-endpoints -->
+        <!-- associated-endpoints -->
+        <div class="col-sm-6">
+          <div class="text-center small text-muted">Authorized users and teams</div>
+          <div class="text-center small text-muted" style="margin-top: 5px;">
+            <button class="btn btn-primary btn-sm" ng-click="$ctrl.unauthorizeAllAccesses()" ng-disabled="$ctrl.authorizedAccesses.length ===  0"><i class="fa fa-user-times space-right" aria-hidden="true"></i>Deny all</button>
+          </div>
+          <div style="margin-top: 10px;">
+            <access-table
+              dataset="$ctrl.authorizedAccesses"
+              entry-click="$ctrl.unauthorizeAccess"
+              empty-dataset-message="No authorized user or team"
+            ></access-table>
+          </div>
+        </div>
+        <!-- !associated-endpoints -->
+      </div>
+    </form>
+  </rd-widget-body>
+</rd-widget>

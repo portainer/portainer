@@ -178,10 +178,6 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 			SnapshotInterval:                   *flags.SnapshotInterval,
 		}
 
-		if *flags.Templates != "" {
-			settings.TemplatesURL = *flags.Templates
-		}
-
 		if *flags.Labels != nil {
 			settings.BlackListedLabels = *flags.Labels
 		} else {
@@ -505,7 +501,6 @@ func main() {
 		StackService:           store.StackService,
 		TagService:             store.TagService,
 		TemplateService:        store.TemplateService,
-		WebhookService:         store.WebhookService,
 		SwarmStackManager:      swarmStackManager,
 		ComposeStackManager:    composeStackManager,
 		CryptoService:          cryptoService,
@@ -519,7 +514,7 @@ func main() {
 		SSL:                    *flags.SSL,
 		SSLCert:                *flags.SSLCert,
 		SSLKey:                 *flags.SSLKey,
-		DockerClientFactory:    clientFactory,
+		DeploykeyService:       store.Deploykey,
 	}
 
 	log.Printf("Starting Portainer %s on %s", portainer.APIVersion, *flags.Addr)

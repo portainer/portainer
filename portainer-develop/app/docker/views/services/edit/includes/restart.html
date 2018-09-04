@@ -1,0 +1,76 @@
+<div id="service-restart-policy">
+  <rd-widget>
+    <rd-widget-header icon="fa-list-alt" title-text="Restart policy">
+    </rd-widget-header>
+    <rd-widget-body classes="no-padding">
+      <table class="table">
+        <tbody>
+          <tr>
+            <td>Restart condition</td>
+            <td>
+              <div class="input-group input-group-sm">
+                <select class="selectpicker form-control" ng-model="service.RestartCondition" ng-change="updateServiceAttribute(service, 'RestartCondition')" ng-disabled="isUpdating">
+                  <option value="none">None</option>
+                  <option value="on-failure">On failure</option>
+                  <option value="any">Any</option>
+                </select>
+              </div>
+            </td>
+            <td>
+              <p class="small text-muted" style="margin-top: 10px;">
+                Condition for restart.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td>Restart delay</td>
+            <td>
+              <input class="input-sm" type="text" ng-model="service.RestartDelay" ng-change="updateServiceAttribute(service, 'RestartDelay')" ng-pattern="/^([0-9]+)(h|m|s|ms|us|ns)$/i" ng-disabled="isUpdating"/>
+            </td>
+            <td>
+              <p class="small text-muted" style="margin-top: 10px;">
+                Delay between restart attempts expressed by a number followed by unit (ns|us|ms|s|m|h). Default value is 5s, 5 seconds.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td>Restart max attempts</td>
+            <td>
+              <input class="input-sm" type="number" ng-model="service.RestartMaxAttempts" ng-change="updateServiceAttribute(service, 'RestartMaxAttempts')" ng-disabled="isUpdating"/>
+            </td>
+            <td>
+              <p class="small text-muted" style="margin-top: 10px;">
+                Maximum attempts to restart a given task before giving up (default value is 0, which means unlimited).
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td>Restart window</td>
+            <td>
+              <input class="input-sm" type="text" ng-model="service.RestartWindow" ng-change="updateServiceAttribute(service, 'RestartWindow')" ng-pattern="/^([0-9]+)(h|m|s|ms|us|ns)$/i" ng-disabled="isUpdating"/>
+            </td>
+            <td>
+              <p class="small text-muted" style="margin-top: 10px;">
+                Time window to evaluate restart attempts expressed by a number followed by unit (ns|us|ms|s|m|h). Default value is 0 seconds, which is unbounded.
+              </p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </rd-widget-body>
+    <rd-widget-footer>
+      <div class="btn-toolbar" role="toolbar">
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['RestartCondition', 'RestartDelay', 'RestartMaxAttempts', 'RestartWindow'])" ng-click="updateService(service)">Apply changes</button>
+          <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a ng-click="cancelChanges(service, ['RestartCondition', 'RestartDelay', 'RestartMaxAttempts', 'RestartWindow'])">Reset changes</a></li>
+            <li><a ng-click="cancelChanges(service)">Reset all changes</a></li>
+          </ul>
+        </div>
+      </div>
+    </rd-widget-footer>
+  </rd-widget>
+</div>

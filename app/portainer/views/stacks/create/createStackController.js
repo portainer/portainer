@@ -8,13 +8,36 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
     StackFile: null,
     RepositoryURL: '',
     RepositoryReferenceName: '',
-    RepositoryAuthentication: false,
     RepositoryUsername: '',
     RepositoryPassword: '',
     Env: [],
     ComposeFilePathInRepository: 'docker-compose.yml',
-    AccessControlData: new AccessControlFormData()
+    AccessControlData: new AccessControlFormData(),
+    stackAuthenticationControlFormData: new stackAuthenticationControlFormData(),
+    selectsshIdvalue:'',
+    newSSHkeyvalues:'',
+    newsshkeydiv:false,
+    RepositoryAuthentication:''
   };
+
+  var data = [
+    {
+      "sshId":"1",
+      "name":"Hello"
+    },
+    {
+      "sshId":"2",
+      "name":"Good"
+    },
+    {
+      "sshId":"3",
+      "name":"Best"
+    },
+    {
+      "sshId":"4",
+      "name":"Dev"
+    }
+    ];
 
   $scope.state = {
     Method: 'editor',
@@ -57,8 +80,7 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
       var repositoryOptions = {
         RepositoryURL: $scope.formValues.RepositoryURL,
         RepositoryReferenceName: $scope.formValues.RepositoryReferenceName,
-        ComposeFilePathInRepository: $scope.formValues.ComposeFilePathInRepository,
-        RepositoryAuthentication: $scope.formValues.RepositoryAuthentication,
+        ComposeFilePathInRepository: $scope.formValues.ComposeFilePathInRepository,      
         RepositoryUsername: $scope.formValues.RepositoryUsername,
         RepositoryPassword: $scope.formValues.RepositoryPassword
       };
@@ -80,8 +102,7 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
       var repositoryOptions = {
         RepositoryURL: $scope.formValues.RepositoryURL,
         RepositoryReferenceName: $scope.formValues.RepositoryReferenceName,
-        ComposeFilePathInRepository: $scope.formValues.ComposeFilePathInRepository,
-        RepositoryAuthentication: $scope.formValues.RepositoryAuthentication,
+        ComposeFilePathInRepository: $scope.formValues.ComposeFilePathInRepository,        
         RepositoryUsername: $scope.formValues.RepositoryUsername,
         RepositoryPassword: $scope.formValues.RepositoryPassword
       };
@@ -133,9 +154,21 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
     $scope.formValues.StackFileContent = cm.getValue();
   };
 
+
+  $scope.formValues.categories = data;
+  
+  $scope.formValues.change = function(id){
+    $scope.formValues.selectsshIdvalue = id; 
+  }
+  $scope.formValues.generateNewKey = function(name){    
+    $scope.formValues.newSSHkeyvalues = name; 
+    $scope.formValues.newsshkeydiv = true; 
+  }
+
   function initView() {
     var endpointMode = $scope.applicationState.endpoint.mode;
     $scope.state.StackType = 2;
+    $scope.formValues.RepositoryAuthentication = '1';
     if (endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER') {
       $scope.state.StackType = 1;
     }

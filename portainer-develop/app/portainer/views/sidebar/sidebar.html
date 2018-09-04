@@ -1,0 +1,74 @@
+<!-- Sidebar -->
+<div id="sidebar-wrapper">
+  <div class="sidebar-header">
+    <a ui-sref="portainer.home">
+      <img ng-if="logo" ng-src="{{ logo }}" class="img-responsive logo">
+      <img ng-if="!logo" src="images/logo.png" class="img-responsive logo" alt="Portainer">
+    </a>
+    <a ng-click="toggleSidebar()"><span class="menu-icon glyphicon glyphicon-transfer"></span></a>
+  </div>
+  <div class="sidebar-content">
+  <ul class="sidebar">
+    <li class="sidebar-list">
+      <a ui-sref="portainer.home" ui-sref-active="active">Home <span class="menu-icon fa fa-home fa-fw"></span></a>
+    </li>
+    <li class="sidebar-title endpoint-name" ng-if="applicationState.endpoint.name">
+      <span class="fa fa-plug space-right"></span>{{ applicationState.endpoint.name }}
+    </li>
+    <azure-sidebar-content ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider === 'AZURE'">
+    </azure-sidebar-content>
+    <docker-sidebar-content ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider !== 'AZURE'"
+      endpoint-api-version="applicationState.endpoint.apiVersion"
+      swarm-management="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'"
+      standalone-management="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE' || applicationState.endpoint.mode.provider === 'VMWARE_VIC'"
+      admin-access="!applicationState.application.authentication || isAdmin"
+    ></docker-sidebar-content>
+    <li class="sidebar-title" ng-if="applicationState.endpoint.mode && applicationState.endpoint.extensions.length > 0">
+      <span>Extensions</span>
+    </li>
+    <li class="sidebar-list" ng-if="applicationState.endpoint.mode && applicationState.endpoint.extensions.indexOf('storidge') !== -1 && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
+      <a ui-sref="storidge.cluster" ui-sref-active="active">Storidge <span class="menu-icon fa fa-bolt fa-fw"></span></a>
+      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'storidge.cluster' || $state.current.name === 'storidge.profiles' || $state.current.name === 'storidge.monitor' || $state.current.name === 'storidge.profiles.new' || $state.current.name === 'storidge.profiles.profile')">
+        <a ui-sref="storidge.monitor" ui-sref-active="active">Monitor</a>
+      </div>
+      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'storidge.cluster' || $state.current.name === 'storidge.profiles' || $state.current.name === 'storidge.monitor' || $state.current.name === 'storidge.profiles.new' || $state.current.name === 'storidge.profiles.profile')">
+        <a ui-sref="storidge.profiles" ui-sref-active="active">Profiles</a>
+      </div>
+    </li>
+    <li class="sidebar-title" ng-if="!applicationState.application.authentication || isAdmin || isTeamLeader">
+      <span>Settings</span>
+    </li>
+    <li class="sidebar-list" ng-if="applicationState.application.authentication && (isAdmin || isTeamLeader)">
+      <a ui-sref="portainer.users" ui-sref-active="active">Users <span class="menu-icon fa fa-users fa-fw"></span></a>
+      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'portainer.users' || $state.current.name === 'portainer.users.user' || $state.current.name === 'portainer.teams' || $state.current.name === 'portainer.teams.team')">
+        <a ui-sref="portainer.teams" ui-sref-active="active">Teams</a>
+      </div>
+    </li>
+    <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
+      <a ui-sref="portainer.endpoints" ui-sref-active="active">Endpoints <span class="menu-icon fa fa-plug fa-fw"></span></a>
+      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'portainer.endpoints' || $state.current.name === 'portainer.endpoints.endpoint' || $state.current.name === 'portainer.endpoints.new' || $state.current.name === 'portainer.endpoints.endpoint.access' || $state.current.name === 'portainer.groups' || $state.current.name === 'portainer.groups.group' || $state.current.name === 'portainer.groups.group.access' || $state.current.name === 'portainer.groups.new' || $state.current.name === 'portainer.tags')">
+        <a ui-sref="portainer.groups" ui-sref-active="active">Groups</a>
+      </div>
+      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'portainer.endpoints' || $state.current.name === 'portainer.endpoints.endpoint' || $state.current.name === 'portainer.endpoints.new' || $state.current.name === 'portainer.endpoints.endpoint.access' || $state.current.name === 'portainer.groups' || $state.current.name === 'portainer.groups.group' || $state.current.name === 'portainer.groups.group.access' || $state.current.name === 'portainer.groups.new' || $state.current.name === 'portainer.tags')">
+        <a ui-sref="portainer.tags" ui-sref-active="active">Tags</a>
+      </div>
+    </li>
+    <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
+      <a ui-sref="portainer.registries" ui-sref-active="active">Registries <span class="menu-icon fa fa-database fa-fw"></span></a>
+    </li>
+    <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
+      <a ui-sref="portainer.settings" ui-sref-active="active">Settings <span class="menu-icon fa fa-cogs fa-fw"></span></a>
+      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'portainer.settings' || $state.current.name === 'portainer.settings.authentication' || $state.current.name === 'portainer.about') && applicationState.application.authentication && isAdmin">
+        <a ui-sref="portainer.settings.authentication" ui-sref-active="active">Authentication</a></div>
+      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'portainer.settings' || $state.current.name === 'portainer.settings.authentication' || $state.current.name === 'portainer.about')">
+        <a ui-sref="portainer.about" ui-sref-active="active">About</a>
+      </div>
+    </li>
+  </ul>
+  <div class="sidebar-footer-content">
+    <img src="images/logo_small.png" class="img-responsive logo" alt="Portainer">
+    <span class="version">{{ uiVersion }}</span>
+  </div>
+  </div>
+</div>
+<!-- End Sidebar -->

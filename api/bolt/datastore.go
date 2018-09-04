@@ -21,7 +21,7 @@ import (
 	"github.com/portainer/portainer/bolt/template"
 	"github.com/portainer/portainer/bolt/user"
 	"github.com/portainer/portainer/bolt/version"
-	"github.com/portainer/portainer/bolt/webhook"
+	"github.com/portainer/portainer/bolt/deploykey"
 )
 
 const (
@@ -48,7 +48,7 @@ type Store struct {
 	TemplateService        *template.Service
 	UserService            *user.Service
 	VersionService         *version.Service
-	WebhookService         *webhook.Service
+	DeploykeyService             *deploykey.Service
 }
 
 // NewStore initializes a new Store and the associated services
@@ -234,11 +234,11 @@ func (store *Store) initServices() error {
 	}
 	store.VersionService = versionService
 
-	webhookService, err := webhook.NewService(store.db)
+	deploykeyService, err := deploykey.NewService(store.db)
 	if err != nil {
 		return err
 	}
-	store.WebhookService = webhookService
+	store.DeploykeyService = deploykeyService
 
 	return nil
 }

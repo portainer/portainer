@@ -64,7 +64,10 @@ const (
 const (
 	ErrTagAlreadyExists = Error("A tag already exists with this name")
 )
-
+// SSH Key errors
+const (
+	ErrDeploykeyAlreadyExists = Error("A key already exists with this name")
+)
 // Endpoint extensions error
 const (
 	ErrEndpointExtensionNotSupported      = Error("This extension is not supported")
@@ -93,9 +96,3 @@ type Error string
 
 // Error returns the error message.
 func (e Error) Error() string { return string(e) }
-
-// Webhook errors
-const (
-	ErrWebhookAlreadyExists   = Error("A webhook for this resource already exists")
-	ErrUnsupportedWebhookType = Error("Webhooks for this resource are not currently supported")
-)
