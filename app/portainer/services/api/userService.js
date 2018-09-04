@@ -9,6 +9,7 @@ angular.module('portainer.app')
     Users.query({}).$promise
     .then(function success(data) {
       var users = data.map(function (user) {
+        console.log(user);
         return new UserViewModel(user);
       });
       if (!includeAdministrators) {
@@ -17,6 +18,7 @@ angular.module('portainer.app')
       deferred.resolve(users);
     })
     .catch(function error(err) {
+      console.log(user);
       deferred.reject({ msg: 'Unable to retrieve users', err: err });
     });
 

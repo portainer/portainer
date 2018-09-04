@@ -1,0 +1,92 @@
+{
+  "author": "Portainer.io",
+  "name": "portainer",
+  "homepage": "http://portainer.io",
+  "version": "1.19.2-dev",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:portainer/portainer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/portainer/portainer/issues"
+  },
+  "config": {
+    "GA_ID": "UA-84944922-2"
+  },
+  "licenses": [
+    {
+      "type": "Zlib",
+      "url": "https://raw.githubusercontent.com/portainer/portainer/develop/LICENSE"
+    }
+  ],
+  "scripts": {
+    "dev": "yarn grunt run-dev",
+    "clean-all": "yarn grunt clean:all",
+    "build": "yarn grunt build",
+    "build-offline": "cd ./api/cmd/portainer && CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags '-s' && mv -b portainer ../../../dist/portainer-linux-amd64"
+
+  },
+  "engines": {
+    "node": ">= 0.8.4"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free-webfonts": "^1.0.9",
+    "@uirouter/angularjs": "~1.0.6",
+    "angular": "~1.5.0",
+    "angular-clipboard": "^1.6.2",
+    "angular-cookies": "~1.5.0",
+    "angular-file-saver": "^1.1.3",
+    "angular-google-analytics": "github:revolunet/angular-google-analytics#~1.1.9",
+    "angular-json-tree": "1.0.1",
+    "angular-jwt": "~0.1.8",
+    "angular-loading-bar": "~0.9.0",
+    "angular-local-storage": "~0.5.2",
+    "angular-messages": "~1.5.0",
+    "angular-mocks": "~1.5.0",
+    "angular-resource": "~1.5.0",
+    "angular-sanitize": "~1.5.0",
+    "angular-ui-bootstrap": "~2.5.0",
+    "angular-utils-pagination": "~0.11.1",
+    "angularjs-scroll-glue": "^2.2.0",
+    "angularjs-slider": "^6.4.0",
+    "bootbox": "^4.4.0",
+    "bootstrap": "~3.3.6",
+    "chart.js": "~2.6.0",
+    "codemirror": "~5.30.0",
+    "filesize": "~3.3.0",
+    "isteven-angular-multiselect": "~4.0.0",
+    "jquery": "^3.3.1",
+    "js-yaml": "~3.10.0",
+    "lodash": "^4.17.10",
+    "moment": "^2.21.0",
+    "ng-file-upload": "~12.2.13",
+    "rdash-ui": "1.0.*",
+    "splitargs": "github:deviantony/splitargs#~0.2.0",
+    "toastr": "github:CodeSeven/toastr#~2.1.3",
+    "ui-select": "^0.19.8",
+    "xterm": "^3.1.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^7.1.1",
+    "cssnano": "^3.10.0",
+    "eslint": "^3.19.0",
+    "grunt": "~0.4.0",
+    "grunt-cli": "^1.2.0",
+    "grunt-config": "^1.0.0",
+    "grunt-contrib-clean": "~0.4.0",
+    "grunt-contrib-concat": "~0.1.3",
+    "grunt-contrib-copy": "~0.4.0",
+    "grunt-contrib-jshint": "^1.1.0",
+    "grunt-contrib-uglify": "^0.9.2",
+    "grunt-contrib-watch": "~0.3.1",
+    "grunt-filerev": "^2.3.1",
+    "grunt-html2js": "~0.1.0",
+    "grunt-karma": "~0.4.4",
+    "grunt-postcss": "^0.8.0",
+    "grunt-replace": "^1.0.1",
+    "grunt-shell": "^1.1.2",
+    "grunt-usemin": "^3.1.1",
+    "gruntify-eslint": "^3.1.0",
+    "load-grunt-tasks": "^3.5.2"
+  }
+}

@@ -1,0 +1,34 @@
+<rd-header>
+  <rd-header-title title-text="Endpoint group access"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="portainer.groups">Groups</a> &gt; <a ui-sref="portainer.groups.group({id: group.Id})">{{ group.Name }}</a> &gt; Access management
+  </rd-header-content>
+</rd-header>
+
+<div class="row" ng-if="group">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-object-group" title-text="Group"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Name</td>
+              <td>
+                {{ group.Name }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-if="group">
+  <div class="col-sm-12">
+    <por-access-management
+      ng-if="group" access-controlled-entity="group" entity-type="group" update-access="updateAccess(userAccesses, teamAccesses)"
+    ></por-access-management>
+  </div>
+</div>

@@ -22,8 +22,8 @@ import (
 	"github.com/portainer/portainer/http/handler/templates"
 	"github.com/portainer/portainer/http/handler/upload"
 	"github.com/portainer/portainer/http/handler/users"
-	"github.com/portainer/portainer/http/handler/webhooks"
 	"github.com/portainer/portainer/http/handler/websocket"
+	"github.com/portainer/portainer/http/handler/deploykeys"
 )
 
 // Handler is a collection of all the service handlers.
@@ -48,7 +48,7 @@ type Handler struct {
 	UploadHandler          *upload.Handler
 	UserHandler            *users.Handler
 	WebSocketHandler       *websocket.Handler
-	WebhookHandler         *webhooks.Handler
+	DeploykeyHandler             *deploykeys.Handler
 }
 
 // ServeHTTP delegates a request to the appropriate subhandler.
@@ -97,8 +97,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.TeamMembershipHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/websocket"):
 		http.StripPrefix("/api", h.WebSocketHandler).ServeHTTP(w, r)
-	case strings.HasPrefix(r.URL.Path, "/api/webhooks"):
-		http.StripPrefix("/api", h.WebhookHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/deploykeys"):
+		http.StripPrefix("/api", h.DeploykeyHandler).ServeHTTP(w, r)		
 	case strings.HasPrefix(r.URL.Path, "/"):
 		h.FileHandler.ServeHTTP(w, r)
 	}

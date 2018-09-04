@@ -1,0 +1,20 @@
+<rd-widget>
+  <rd-widget-header icon="fa-tachometer-alt" title-text="Cluster information"></rd-widget-header>
+  <rd-widget-body classes="no-padding">
+    <table class="table">
+      <tbody>
+        <tr>
+          <td>Nodes in the cluster</td>
+          <td>{{ $ctrl.agentCount }}</td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <div class="btn-group" role="group" aria-label="...">
+              <a ui-sref="docker.swarm.visualizer"><i class="fa fa-object-group space-right" aria-hidden="true"></i>Go to cluster visualizer</a>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </rd-widget-body>
+</rd-widget>

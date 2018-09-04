@@ -1,0 +1,95 @@
+package portainer
+
+// General errors.
+const (
+	ErrUnauthorized           = Error("Unauthorized")
+	ErrResourceAccessDenied   = Error("Access denied to resource")
+	ErrObjectNotFound         = Error("Object not found inside the database")
+	ErrMissingSecurityContext = Error("Unable to find security details in request context")
+)
+
+// User errors.
+const (
+	ErrUserAlreadyExists          = Error("User already exists")
+	ErrInvalidUsername            = Error("Invalid username. White spaces are not allowed")
+	ErrAdminAlreadyInitialized    = Error("An administrator user already exists")
+	ErrAdminCannotRemoveSelf      = Error("Cannot remove your own user account. Contact another administrator")
+	ErrCannotRemoveLastLocalAdmin = Error("Cannot remove the last local administrator account")
+)
+
+// Team errors.
+const (
+	ErrTeamAlreadyExists = Error("Team already exists")
+)
+
+// TeamMembership errors.
+const (
+	ErrTeamMembershipAlreadyExists = Error("Team membership already exists for this user and team")
+)
+
+// ResourceControl errors.
+const (
+	ErrResourceControlAlreadyExists = Error("A resource control is already applied on this resource")
+	ErrInvalidResourceControlType   = Error("Unsupported resource control type")
+)
+
+// Endpoint errors.
+const (
+	ErrEndpointAccessDenied = Error("Access denied to endpoint")
+)
+
+// Azure environment errors
+const (
+	ErrAzureInvalidCredentials = Error("Invalid Azure credentials")
+)
+
+// Endpoint group errors.
+const (
+	ErrCannotRemoveDefaultGroup = Error("Cannot remove the default endpoint group")
+)
+
+// Registry errors.
+const (
+	ErrRegistryAlreadyExists = Error("A registry is already defined for this URL")
+)
+
+// Stack errors
+const (
+	ErrStackAlreadyExists              = Error("A stack already exists with this name")
+	ErrComposeFileNotFoundInRepository = Error("Unable to find a Compose file in the repository")
+	ErrStackNotExternal                = Error("Not an external stack")
+)
+
+// Tag errors
+const (
+	ErrTagAlreadyExists = Error("A tag already exists with this name")
+)
+
+// Endpoint extensions error
+const (
+	ErrEndpointExtensionNotSupported      = Error("This extension is not supported")
+	ErrEndpointExtensionAlreadyAssociated = Error("This extension is already associated to the endpoint")
+)
+
+// Crypto errors.
+const (
+	ErrCryptoHashFailure = Error("Unable to hash data")
+)
+
+// JWT errors.
+const (
+	ErrSecretGeneration   = Error("Unable to generate secret key")
+	ErrInvalidJWTToken    = Error("Invalid JWT token")
+	ErrMissingContextData = Error("Unable to find JWT data in request context")
+)
+
+// File errors.
+const (
+	ErrUndefinedTLSFileType = Error("Undefined TLS file type")
+)
+
+// Error represents an application error.
+type Error string
+
+// Error returns the error message.
+func (e Error) Error() string { return string(e) }

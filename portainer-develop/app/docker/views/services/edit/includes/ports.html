@@ -1,0 +1,80 @@
+<div>
+  <rd-widget>
+    <rd-widget-header icon="fa-tasks" title-text="Published ports">
+      <div class="nopadding">
+        <a class="btn btn-default btn-sm pull-right" ng-click="isUpdating ||addPublishedPort(service)" ng-disabled="isUpdating">
+          <i class="fa fa-plus-circle" aria-hidden="true"></i> port mapping
+        </a>
+      </div>
+    </rd-widget-header>
+    <rd-widget-body ng-if="!service.Ports || service.Ports.length === 0">
+      <p>This service has no ports published.</p>
+    </rd-widget-body>
+    <rd-widget-body ng-if="service.Ports && service.Ports.length > 0" classes="no-padding">
+      <table class="table" >
+        <thead>
+          <tr>
+            <th>Host port</th>
+            <th>Container port</th>
+            <th>Protocol</th>
+            <th>Publish mode</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="portBinding in service.Ports">
+            <td>
+              <div class="input-group input-group-sm">
+                <span class="input-group-addon">host</span>
+                <input type="number" class="form-control" ng-model="portBinding.PublishedPort" placeholder="e.g. 8080" ng-change="updatePublishedPort(service, mapping)" ng-disabled="isUpdating">
+              </div>
+            </td>
+            <td>
+              <div class="input-group input-group-sm">
+                <span class="input-group-addon">container</span>
+                <input type="number" class="form-control" ng-model="portBinding.TargetPort" placeholder="e.g. 80" ng-change="updatePublishedPort(service, mapping)" ng-disabled="isUpdating">
+              </div>
+            </td>
+            <td>
+              <div class="input-group input-group-sm">
+                <select class="selectpicker form-control" ng-model="portBinding.Protocol" ng-change="updatePublishedPort(service, mapping)" ng-disabled="isUpdating">
+                  <option value="tcp">tcp</option>
+                  <option value="udp">udp</option>
+                </select>
+              </div>
+            </td>
+            <td>
+              <div class="input-group input-group-sm">
+                <select class="selectpicker form-control" ng-model="portBinding.PublishMode" ng-change="updatePublishedPort(service, mapping)" ng-disabled="isUpdating">
+                  <option value="ingress">ingress</option>
+                  <option value="host">host</option>
+                </select>
+              </div>
+            </td>
+            <td>
+              <span class="input-group-btn">
+                <button class="btn btn-sm btn-danger" type="button" ng-click="removePortPublishedBinding(service, $index)" ng-disabled="isUpdating">
+                  <i class="fa fa-trash" aria-hidden="true"></i>
+                </button>
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </rd-widget-body>
+    <rd-widget-footer>
+      <div class="btn-toolbar" role="toolbar">
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['Ports'])" ng-click="updateService(service)">Apply changes</button>
+          <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a ng-click="cancelChanges(service, ['Ports'])">Reset changes</a></li>
+            <li><a ng-click="cancelChanges(service)">Reset all changes</a></li>
+          </ul>
+        </div>
+      </div>
+    </rd-widget-footer>
+  </rd-widget>
+</div>

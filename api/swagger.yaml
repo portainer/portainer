@@ -95,6 +95,8 @@ tags:
   description: "Upload files"
 - name: "websocket"
   description: "Create exec sessions using websockets"
+- name: "deploykeys"
+  description: "Manage deploykeys"
 schemes:
 - "http"
 - "https"
@@ -1336,7 +1338,7 @@ paths:
         in: "formData"
         type: "string"
         description: "Swarm cluster identifier. Required when method equals file and type equals 1."
-      - name: "file"
+      - name: "StackFileContent"
         in: "formData"
         type: "file"
         description: "Stack file. Required when method equals file."
@@ -2097,6 +2099,99 @@ paths:
       - name: "id"
         in: "path"
         description: "Tag identifier"
+        required: true
+        type: "integer"
+      responses:
+        204:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+
+  /deploykeys:
+    get:
+      deploykeys:
+      - "deploykeys"
+      summary: "List deploykeys"
+      description: |
+        List deploykeys.
+        **Access policy**: administrator
+      operationId: "DeploykeyList"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/DeploykeyListResponse"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    post:
+      deploykeys:
+      - "deploykeys"
+      summary: "Create a new key"
+      description: |
+        Create a new key.
+        **Access policy**: administrator
+      operationId: "DeploykeyCreate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Deploykey details"
+        required: true
+        schema:
+          $ref: "#/definitions/DeploykeyCreateRequest"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Deploykey"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        409:
+          description: "Conflict"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "A deploykey with the specified name already exists"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /deploykeys/{id}:
+    delete:
+      deploykeys:
+      - "deploykeys"
+      summary: "Remove a deploykey"
+      description: |
+        Remove a deploykey.
+        **Access policy**: administrator
+      operationId: "DeploykeyDelete"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Deploykey identifier"
         required: true
         type: "integer"
       responses:

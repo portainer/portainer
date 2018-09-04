@@ -220,21 +220,6 @@ type (
 		TLSKeyPath    string `json:"TLSKey,omitempty"`
 	}
 
-	// WebhookID represents an webhook identifier.
-	WebhookID int
-
-	// WebhookType represents the type of resource a webhook is related to
-	WebhookType int
-
-	// Webhook represents a url webhook that can be used to update a service
-	Webhook struct {
-		ID          WebhookID   `json:"Id"`
-		Token       string      `json:"Token"`
-		ResourceID  string      `json:"ResourceId"`
-		EndpointID  EndpointID  `json:"EndpointId"`
-		WebhookType WebhookType `json:"Type"`
-	}
-
 	// AzureCredentials represents the credentials used to connect to an Azure
 	// environment.
 	AzureCredentials struct {
@@ -327,6 +312,15 @@ type (
 	// Tag represents a tag that can be associated to a resource
 	Tag struct {
 		ID   TagID
+		Name string `json:"Name"`
+	}
+
+	// DeploykeyID represents a key identifier
+	DeploykeyID int
+
+	// Deploykey represents a key that can be associated to a resource
+	Deploykey struct {
+		ID   DeploykeyID
 		Name string `json:"Name"`
 	}
 
@@ -439,6 +433,13 @@ type (
 		UpdateUser(ID UserID, user *User) error
 		DeleteUser(ID UserID) error
 	}
+	// DeploykeyService represents a service for managing key data
+	DeploykeyService interface {	
+			
+		Deploykeys() ([]Deploykey, error)
+		CreateDeploykey(deploykey *Deploykey) error
+		DeleteDeploykey(ID DeploykeyID) error
+	}
 
 	// TeamService represents a service for managing user data
 	TeamService interface {
@@ -521,16 +522,6 @@ type (
 		StoreDBVersion(version int) error
 	}
 
-	// WebhookService represents a service for managing webhook data.
-	WebhookService interface {
-		Webhooks() ([]Webhook, error)
-		Webhook(ID WebhookID) (*Webhook, error)
-		CreateWebhook(portainer *Webhook) error
-		WebhookByResourceID(resourceID string) (*Webhook, error)
-		WebhookByToken(token string) (*Webhook, error)
-		DeleteWebhook(serviceID WebhookID) error
-	}
-
 	// ResourceControlService represents a service for managing resource control data
 	ResourceControlService interface {
 		ResourceControl(ID ResourceControlID) (*ResourceControl, error)
@@ -547,6 +538,8 @@ type (
 		CreateTag(tag *Tag) error
 		DeleteTag(ID TagID) error
 	}
+
+	
 
 	// TemplateService represents a service for managing template data
 	TemplateService interface {
@@ -756,10 +749,4 @@ const (
 	EndpointStatusUp
 	// EndpointStatusDown is used to represent an unavailable endpoint
 	EndpointStatusDown
-)
-
-const (
-	_ WebhookType = iota
-	// ServiceWebhook is a webhook for restarting a docker service
-	ServiceWebhook
 )

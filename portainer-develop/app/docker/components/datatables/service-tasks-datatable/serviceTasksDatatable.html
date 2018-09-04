@@ -1,0 +1,82 @@
+<div style="background-color: #d5e8f3; padding: 2px">
+  <table class="table table-condensed table-hover nowrap-cells">
+    <thead style="background-color: #e7f6ff">
+      <tr>
+        <th uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.filters.state.open" style="width: 10%;">
+          <a ng-click="$ctrl.changeOrderBy('Status.State')">
+            Status
+            <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status.State' && !$ctrl.state.reverseOrder"></i>
+            <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status.State' && $ctrl.state.reverseOrder"></i>
+          </a>
+          <span class="space-left">
+            <span uib-dropdown-toggle class="table-filter" ng-if="!$ctrl.filters.state.enabled">Filter <i class="fa fa-filter" aria-hidden="true"></i></span>
+            <span uib-dropdown-toggle class="table-filter filter-active" ng-if="$ctrl.filters.state.enabled">Filter <i class="fa fa-check" aria-hidden="true"></i></span>
+          </span>
+          <div class="dropdown-menu" uib-dropdown-menu>
+            <div class="tableMenu">
+              <div class="menuHeader">
+                Filter by state
+              </div>
+              <div class="menuContent">
+                <div class="md-checkbox" ng-repeat="filter in $ctrl.filters.state.values track by $index">
+                  <input id="filter_state_{{ $ctrl.serviceId }}_{{ $index }}" type="checkbox" ng-model="filter.display" ng-change="$ctrl.onStateFilterChange()"/>
+                  <label for="filter_state_{{ $ctrl.serviceId }}_{{ $index }}">{{ filter.label }}</label>
+                </div>
+              </div>
+              <div>
+                <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.filters.state.open = false;">Close</a>
+              </div>
+            </div>
+          </div>
+        </th>
+        <th style="width: 22%;">Task</th>
+        <th>Actions</th>
+        <th>
+          <a ng-click="$ctrl.changeOrderBy('Slot')">
+            Slot
+            <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Slot' && !$ctrl.state.reverseOrder"></i>
+            <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Slot' && $ctrl.state.reverseOrder"></i>
+          </a>
+        </th>
+        <th>
+          <a ng-click="$ctrl.changeOrderBy('NodeId')">
+            Node
+            <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeId' && !$ctrl.state.reverseOrder"></i>
+            <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeId' && $ctrl.state.reverseOrder"></i>
+          </a>
+        </th>
+        <th>
+          <a ng-click="$ctrl.changeOrderBy('Updated')">
+            Last Update
+            <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Updated' && !$ctrl.state.reverseOrder"></i>
+            <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Updated' && $ctrl.state.reverseOrder"></i>
+          </a>
+        </th>
+      </tr>
+    </thead>
+    <tbody style="background-color: #f1f9fd;">
+      <tr ng-repeat="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter: $ctrl.applyFilters | filter:$ctrl.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder))">
+        <td class="text-center">
+          <span class="label label-{{ item.Status.State | taskstatusbadge }} space-right">{{ item.Status.State }}</span>
+        </td>
+        <td>
+          <a ng-if="!$ctrl.agentProxy || !item.Container" ui-sref="docker.tasks.task({id: item.Id})" class="monospaced">{{ item.Id }}Roz</a>
+          <a ng-if="$ctrl.agentProxy && item.Container" ui-sref="docker.containers.container({ id: item.Container.Id, nodeName: item.Container.NodeName })" class="monospaced">{{ item.Id }}Doz</a>
+        </td>
+        <td>
+          <div class="btn-group btn-group-xs" role="group" aria-label="..." >
+            <a style="margin: 0 2.5px;" ui-sref="docker.containers.container.logs({ id: item.Container.Id, nodeName: item.Container.NodeName })" title="Logs" ng-if="$ctrl.agentProxy"><i class="fa fa-file-alt space-right" aria-hidden="true"></i></a>
+            <a style="margin: 0 2.5px;" ui-sref="docker.tasks.task.logs({ id: item.Id })" title="Logs" ng-if="!$ctrl.agentProxy && $ctrl.showTaskLogsButton && item.Status.State|taskhaslogs"><i class="fa fa-file-alt space-right" aria-hidden="true"></i></a>
+            <a style="margin: 0 2.5px;" ui-sref="docker.containers.container.console({ id: item.Container.Id, nodeName: item.Container.NodeName })" title="Console" ng-if="$ctrl.agentProxy && item.Status.State === 'running'"><i class="fa fa-terminal space-right" aria-hidden="true"></i></a>
+          </div>
+        </td>
+        <td>{{ item.Slot ? item.Slot : '-' }}</td>
+        <td>{{ item.NodeId | tasknodename: $ctrl.nodes }}</td>
+        <td>{{ item.Updated | getisodate }}</td>
+      </tr>
+      <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
+        <td colspan="5" class="text-center text-muted">No task matching filter.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
