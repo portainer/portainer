@@ -129,13 +129,12 @@ angular.module('portainer.docker', ['portainer.app'])
     }
   };
 
-  var engine = {
-    name: 'docker.engine',
-    url: '/engine',
+  var host = {
+    name: 'docker.host',
+    url: '/host',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/engine/engine.html',
-        controller: 'EngineController'
+        component: 'hostView'
       }
     }
   };
@@ -428,7 +427,7 @@ angular.module('portainer.docker', ['portainer.app'])
   $stateRegistryProvider.register(containerStats);
   $stateRegistryProvider.register(docker);
   $stateRegistryProvider.register(dashboard);
-  $stateRegistryProvider.register(engine);
+  $stateRegistryProvider.register(host);
   $stateRegistryProvider.register(events);
   $stateRegistryProvider.register(images);
   $stateRegistryProvider.register(image);

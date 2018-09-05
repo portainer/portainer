@@ -1,5 +1,5 @@
 angular.module('portainer.docker')
-.controller('EngineController', ['$q', '$scope', 'SystemService', 'Notifications',
+.controller('HostController', ['$q', '$scope', 'SystemService', 'Notifications',
 function ($q, $scope, SystemService, Notifications) {
 
   function initView() {
