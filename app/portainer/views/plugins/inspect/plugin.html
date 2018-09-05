@@ -13,38 +13,42 @@
 
         <div style="display: flex;">
 
-          <div style="flex-grow: 3;">
+          <div style="flex-grow: 4;">
 
             <div class="form-group">
-              <span class="text-muted">
-                {{ plugin.Name }}
-              </span>
+              <div class="text-muted" style="font-size: 150%;">
+                {{ plugin.Name }} plugin
+              </div>
+
+              <div class="small text-muted" style="margin-top: 5px;">
+                By <a href="https://portainer.io" href="_blank">Portainer.io</a>
+              </div>
             </div>
 
+          </div>
 
-            <div class="form-group">
-              <span class="small text-muted">
+          <div style="flex-grow: 1; border-left: 1px solid #777;">
+
+            <div class="form-group" style="margin-left: 40px;">
+
+              <div style="font-size: 125%; border-bottom: 2px solid #2d3e63; padding-bottom: 5px;">
+                {{ plugin.Price }}
+              </div>
+
+              <div class="small text-muted" style="margin-top: 15px;">
                 {{ plugin.ShortDescription }}
-              </span>
+              </div>
+
+              <div style="margin-top: 15px;">
+                <a class="btn btn-primary btn-sm" style="width: 100%;" href="#" target="_blank">
+                  Enable
+                </a>
+              </div>
+
             </div>
 
           </div>
-
-          <div style="flex-grow: 1; border-left: 1px solid black; margin: 10px; padding: 5px;">
-            <span style="font-size: 150%;">
-              {{ plugin.Price }}
-            </span>
-            <span class="">
-              <a class="btn btn-primary" href="#" target="_blank">
-                Buy
-              </a>
-            </span>
-          </div>
-
-
         </div>
-
-
       </rd-widget-body>
     </rd-widget>
   </div>
