@@ -7,6 +7,11 @@ angular.module('portainer.app')
     get: { method: 'GET', params: { id: '@id' } },
     update: { method: 'PUT', params: { id: '@id' } },
     updateAccess: { method: 'PUT', params: { id: '@id', action: 'access' } },
-    remove: { method: 'DELETE', params: { id: '@id'} }
+    remove: { method: 'DELETE', params: { id: '@id'} },
+    version: { method: 'GET', params: { id: '@id', action: 'v2/' },
+      transformResponse: function (data, headers) {
+        return { version: headers('docker-distribution-api-version') ? headers('docker-distribution-api-version') : 1 };
+      }
+    }
   });
 }]);
