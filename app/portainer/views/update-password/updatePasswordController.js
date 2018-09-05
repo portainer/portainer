@@ -1,22 +1,22 @@
 angular.module('portainer.app')
-.controller('UpdatePasswordController', ['$scope', '$state', '$transition$', 'UserService', 'Authentication', 'Notifications',
-function UpdatePasswordController($scope, $state, $transition$, UserService, Authentication, Notifications) {
+.controller('UpdatePasswordController', ['$scope', '$state', '$transition$', '$sanitize', 'UserService', 'Authentication', 'Notifications',
+function UpdatePasswordController($scope, $state, $transition$, $sanitize, UserService, Authentication, Notifications) {
 
   $scope.formValues = {
+    CurrentPassword: '',
     Password: '',
     ConfirmPassword: ''
   };
 
   $scope.state = {
-    actionInProgress: false,
-    currentPassword: ''
+    actionInProgress: false
   };
 
   $scope.updatePassword = function() {
     var userId = Authentication.getUserDetails().ID;
 
     $scope.state.actionInProgress = true;
-    UserService.updateUserPassword(userId, $scope.state.currentPassword, $scope.formValues.Password)
+    UserService.updateUserPassword(userId, $sanitize($scope.formValues.CurrentPassword), $scope.formValues.Password)
     .then(function success() {
       $state.go('portainer.home');
     })
@@ -32,8 +32,6 @@ function UpdatePasswordController($scope, $state, $transition$, UserService, Aut
     if (!Authentication.isAuthenticated()) {
       $state.go('portainer.auth');
     }
-
-    $scope.state.currentPassword = $transition$.params().password;
   }
 
   initView();
