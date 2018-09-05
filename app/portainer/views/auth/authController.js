@@ -30,7 +30,7 @@ function ($q, $scope, $state, $transition$, $sanitize, Authentication, UserServi
         return $q.reject();
       })
       .then(function success() {
-        $state.go('portainer.updatePassword', { password: $sanitize(password) });
+        $state.go('portainer.updatePassword');
       })
       .catch(function error() {
         $scope.state.AuthenticationError = 'Invalid credentials';
