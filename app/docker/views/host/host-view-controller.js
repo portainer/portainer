@@ -17,7 +17,7 @@ angular.module('portainer.docker').controller('HostViewController', [
       })
         .then(function success(data) {
           ctrl.engineDetails = buildEngineDetails(data);
-          ctrl.hostDetails = buildHostDetails(data);
+          ctrl.hostDetails = buildHostDetails(data.info);
         })
         .catch(function error(err) {
           Notifications.error(
@@ -42,8 +42,18 @@ angular.module('portainer.docker').controller('HostViewController', [
       };
     }
 
-    function buildHostDetails() {
-      return {};
+    function buildHostDetails(info) {
+      return {
+        os: {
+          arch: info.Architecture,
+          type: info.OSType,
+          name: info.OperatingSystem
+        },
+        name: info.Name,
+        kernelVersion: info.KernelVersion,
+        totalCPU: info.NCPU,
+        totalMemory: info.MemTotal
+      };
     }
   }
 ]);

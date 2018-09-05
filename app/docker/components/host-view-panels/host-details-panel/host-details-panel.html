@@ -23,7 +23,7 @@
             </tr>
             <tr>
               <td>Total memory</td>
-              <td>{{ $ctrl.host.totalMemory }}</td>
+              <td>{{ $ctrl.host.totalMemory | humansize }}</td>
             </tr>
             <tr ng-if="$ctrl.isAgent">
               <td>Physical device information</td>
