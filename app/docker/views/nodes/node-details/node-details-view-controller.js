@@ -8,7 +8,6 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
 
     function initView() {
       NodeService.node($stateParams.id).then(function(node) {
-        console.log(node)
         ctrl.hostDetails = buildHostDetails(node);
         ctrl.engineDetails = buildEngineDetails(node);
         ctrl.nodeDetails = buildNodeDetails(node);

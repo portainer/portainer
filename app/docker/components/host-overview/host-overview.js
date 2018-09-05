@@ -5,7 +5,6 @@ angular.module('portainer.docker').component('hostOverview', {
     hostDetails: '<',
     engineDetails: '<',
     nodeDetails: '<',
-    isSwarm: '<',
     isAgent: '<'
   }
 });
