@@ -1,5 +1,5 @@
 <rd-header>
-  <rd-header-title title-text="Host details">
+  <rd-header-title title-text="Host overview">
     <a data-toggle="tooltip" title="Refresh" ui-sref="docker.host" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
@@ -7,6 +7,8 @@
   <rd-header-content>Docker</rd-header-content>
 </rd-header>
 
+<host-details-panel host="$ctrl.hostDetails"></host-details-panel>
 
+<engine-details-panel engine="$ctrl.engineDetails"></engine-details-panel>
 
-
+<swarm-node-details-panel node="$ctrl.nodeDetails" ng-if="$ctrl.isSwarm"></swarm-node-details-panel>
