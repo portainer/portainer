@@ -1,0 +1,37 @@
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-code" title-text="Node Details"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Node name</td>
+              <td>{{ $ctrl.details.name }}</td>
+            </tr>
+            <tr>
+              <td>Role</td>
+              <td>{{ $ctrl.details.role }} {{ $ctrl.state.managerAddress }}</td>
+            </tr>
+            <tr>
+              <td>Availability</td>
+              <td>{{ $ctrl.details.availability }}</td>
+            </tr>
+            <tr>
+              <td>Status</td>
+              <td>{{ $ctrl.details.status }}</td>
+            </tr>
+            <tr>
+              <td>Engine Labels</td>
+              <td>{{ $ctrl.details.engineLabels | commaSeperated }}</td>
+            </tr>
+            <tr>
+              <td>Node Labels</td>
+              <td>{{ $ctrl.details.nodeLabels | commaSeperated }} </td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
