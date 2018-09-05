@@ -72,6 +72,24 @@
               </td>
             </tr>
             <tr>
+              <td colspan="{{webhookURL ? '1' : '2'}}">
+                Service webhook
+                <portainer-tooltip position="top" message="Webhook (or callback URI) used to automate the update of this service. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and re-deploy this service."></portainer-tooltip>
+                <label class="switch" style="margin-left: 20px;">
+                  <input type="checkbox" ng-model="WebhookExists" ng-click="updateWebhook(service)"><i></i>
+                </label>
+              </td>
+              <td ng-if="webhookURL">
+                <span class="text-muted">{{ webhookURL | truncatelr }}</span>
+                <button type="button" class="btn btn-sm btn-primary btn-sm space-left" ng-if="webhookURL" ng-click="copyWebhook()" >
+                  <span><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy link</span>
+                </button>
+                <span>
+                  <i id="copyNotification" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none;"></i>
+                </span>
+              </td>
+          </tr>
+            <tr>
               <td colspan="2">
                 <a ng-if="applicationState.endpoint.apiVersion >= 1.30" class="btn btn-primary btn-sm" type="button" ui-sref="docker.services.service.logs({id: service.Id})"><i class="fa fa-file-alt space-right" aria-hidden="true"></i>Service logs</a>
                 <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.updateInProgress || isUpdating" ng-click="forceUpdateService(service)" button-spinner="state.updateInProgress" ng-if="applicationState.endpoint.apiVersion >= 1.25">
@@ -93,7 +111,7 @@
         </p>
         <div class="btn-toolbar" role="toolbar">
           <div class="btn-group" role="group">
-            <button type="button" class="btn btn-primary" ng-disabled="!hasChanges(service, ['Mode', 'Replicas', 'Image', 'Name'])" ng-click="updateService(service)">Apply changes</button>
+            <button type="button" class="btn btn-primary" ng-disabled="!hasChanges(service, ['Mode', 'Replicas', 'Image', 'Name', 'Webhooks'])" ng-click="updateService(service)">Apply changes</button>
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <span class="caret"></span>
             </button>
