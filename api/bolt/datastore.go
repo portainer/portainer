@@ -16,6 +16,7 @@ import (
 	"github.com/portainer/portainer/bolt/settings"
 	"github.com/portainer/portainer/bolt/stack"
 	"github.com/portainer/portainer/bolt/tag"
+	"github.com/portainer/portainer/bolt/deploykey"
 	"github.com/portainer/portainer/bolt/team"
 	"github.com/portainer/portainer/bolt/teammembership"
 	"github.com/portainer/portainer/bolt/template"
@@ -43,6 +44,7 @@ type Store struct {
 	SettingsService        *settings.Service
 	StackService           *stack.Service
 	TagService             *tag.Service
+	DeploykeyService       *deploykey.Service
 	TeamMembershipService  *teammembership.Service
 	TeamService            *team.Service
 	TemplateService        *template.Service
@@ -100,6 +102,7 @@ func (store *Store) Init() error {
 			AuthorizedUsers: []portainer.UserID{},
 			AuthorizedTeams: []portainer.TeamID{},
 			Tags:            []string{},
+			Deploykeys:      []string{},
 		}
 
 		return store.EndpointGroupService.CreateEndpointGroup(unassignedGroup)
@@ -203,6 +206,12 @@ func (store *Store) initServices() error {
 		return err
 	}
 	store.TagService = tagService
+
+	deploykeyService, err := deploykey.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.DeploykeyService = deploykeyService
 
 	teammembershipService, err := teammembership.NewService(store.db)
 	if err != nil {

@@ -504,6 +504,7 @@ func main() {
 		DockerHubService:       store.DockerHubService,
 		StackService:           store.StackService,
 		TagService:             store.TagService,
+		DeploykeyService:       store.DeploykeyService,
 		TemplateService:        store.TemplateService,
 		WebhookService:         store.WebhookService,
 		SwarmStackManager:      swarmStackManager,

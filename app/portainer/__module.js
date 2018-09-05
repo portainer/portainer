@@ -318,6 +318,17 @@ angular.module('portainer.app', [])
     }
   };
 
+  var deploykeys = {
+    name: 'portainer.deploykeys',
+    url: '/deploykeys',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/deploykeys/deploykeys.html',
+        controller: 'DeploykeysController'
+      }
+    }
+  };
+
   var updatePassword = {
     name: 'portainer.updatePassword',
     url: '/update-password',
@@ -438,6 +449,7 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(stackCreation);
   $stateRegistryProvider.register(support);
   $stateRegistryProvider.register(tags);
+  $stateRegistryProvider.register(deploykeys);
   $stateRegistryProvider.register(updatePassword);
   $stateRegistryProvider.register(users);
   $stateRegistryProvider.register(user);

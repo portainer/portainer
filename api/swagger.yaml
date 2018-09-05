@@ -83,6 +83,8 @@ tags:
   description: "Manage users"
 - name: "tags"
   description: "Manage tags"
+- name: "deploykeys"
+  description: "Manage deploykeys"  
 - name: "teams"
   description: "Manage teams"
 - name: "team_memberships"
@@ -2113,6 +2115,99 @@ paths:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
+/deploykeys:
+    get:
+      tags:
+      - "deploykeys"
+      summary: "List deploykeys"
+      description: |
+        List deploykeys.
+        **Access policy**: administrator
+      operationId: "DeploykeyList"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/DeploykeyListResponse"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    post:
+      tags:
+      - "deploykeys"
+      summary: "Create a new deploykey"
+      description: |
+        Create a new deploykey.
+        **Access policy**: administrator
+      operationId: "DeploykeyCreate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Deploykey details"
+        required: true
+        schema:
+          $ref: "#/definitions/DeploykeyCreateRequest"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Deploykey"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        409:
+          description: "Conflict"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "A deploykey with the specified name already exists"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /deploykeys/{id}:
+    delete:
+      tags:
+      - "deploykeys"
+      summary: "Remove a deploykey"
+      description: |
+        Remove a deploykey.
+        **Access policy**: administrator
+      operationId: "DeploykeyDelete"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Deploykey identifier"
+        required: true
+        type: "integer"
+      responses:
+        204:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+
 
   /teams:
     get:
@@ -2735,6 +2830,17 @@ definitions:
         type: "string"
         example: "org/acme"
         description: "Tag name"
+  Deploykey:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        example: 1
+        description: "Deploykey identifier"
+      Name:
+        type: "string"
+        example: "abcd"
+        description: "Deploykey name"        
   Team:
     type: "object"
     properties:
@@ -3682,6 +3788,12 @@ definitions:
     type: "array"
     items:
       $ref: "#/definitions/Tag"
+
+  DeploykeyListResponse:
+    type: "array"
+    items:
+      $ref: "#/definitions/Deploykey"
+
   TagCreateRequest:
     type: "object"
     required:
@@ -3691,6 +3803,17 @@ definitions:
         type: "string"
         example: "org/acme"
         description: "Name"
+
+  DeploykeyCreateRequest:
+    type: "object"
+    required:
+    - "Name"
+    properties:
+      Name:
+        type: "string"
+        example: "abcd"
+        description: "Name"
+
   TeamCreateRequest:
     type: "object"
     required:

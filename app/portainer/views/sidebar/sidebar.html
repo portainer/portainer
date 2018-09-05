@@ -63,6 +63,9 @@
       <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'portainer.settings' || $state.current.name === 'portainer.settings.authentication' || $state.current.name === 'portainer.about')">
         <a ui-sref="portainer.about" ui-sref-active="active">About</a>
       </div>
+      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'portainer.settings' || $state.current.name === 'portainer.settings.authentication' || $state.current.name === 'portainer.about' || $state.current.name === 'portainer.deploykeys')">
+        <a ui-sref="portainer.deploykeys" ui-sref-active="active">Deploy Key</a>
+      </div>
     </li>
   </ul>
   <div class="sidebar-footer-content">

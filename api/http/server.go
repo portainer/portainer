@@ -19,6 +19,7 @@ import (
 	"github.com/portainer/portainer/http/handler/stacks"
 	"github.com/portainer/portainer/http/handler/status"
 	"github.com/portainer/portainer/http/handler/tags"
+	"github.com/portainer/portainer/http/handler/deploykeys"
 	"github.com/portainer/portainer/http/handler/teammemberships"
 	"github.com/portainer/portainer/http/handler/teams"
 	"github.com/portainer/portainer/http/handler/templates"
@@ -58,6 +59,7 @@ type Server struct {
 	StackService           portainer.StackService
 	SwarmStackManager      portainer.SwarmStackManager
 	TagService             portainer.TagService
+	DeploykeyService       portainer.DeploykeyService
 	TeamService            portainer.TeamService
 	TeamMembershipService  portainer.TeamMembershipService
 	TemplateService        portainer.TemplateService
@@ -148,6 +150,9 @@ func (server *Server) Start() error {
 	var tagHandler = tags.NewHandler(requestBouncer)
 	tagHandler.TagService = server.TagService
 
+	var deploykeyHandler = deploykeys.NewHandler(requestBouncer)
+	deploykeyHandler.DeploykeyService = server.DeploykeyService
+
 	var teamHandler = teams.NewHandler(requestBouncer)
 	teamHandler.TeamService = server.TeamService
 	teamHandler.TeamMembershipService = server.TeamMembershipService
@@ -194,6 +199,7 @@ func (server *Server) Start() error {
 		StatusHandler:          statusHandler,
 		StackHandler:           stackHandler,
 		TagHandler:             tagHandler,
+		DeploykeyHandler:       deploykeyHandler,
 		TeamHandler:            teamHandler,
 		TeamMembershipHandler:  teamMembershipHandler,
 		TemplatesHandler:       templatesHandler,

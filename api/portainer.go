@@ -330,6 +330,15 @@ type (
 		Name string `json:"Name"`
 	}
 
+	// DeploykeyID represents a key identifier
+	DeploykeyID int
+
+	// Deploykey represents a key that can be associated to a resource
+	Deploykey struct {
+		ID   DeploykeyID
+		Name string `json:"Name"`
+	}
+
 	// TemplateID represents a template identifier
 	TemplateID int
 
@@ -546,6 +555,13 @@ type (
 		Tags() ([]Tag, error)
 		CreateTag(tag *Tag) error
 		DeleteTag(ID TagID) error
+	}
+
+	// DeploykeyService represents a service for managing key data
+	DeploykeyService interface {
+		Deploykeys() ([]Deploykey, error)
+		CreateDeploykey(deploykey *Deploykey) error
+		DeleteDeploykey(ID DeploykeyID) error
 	}
 
 	// TemplateService represents a service for managing template data
