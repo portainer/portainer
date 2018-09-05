@@ -52,6 +52,11 @@ func snapshot(cli *client.Client) (*portainer.Snapshot, error) {
 		return nil, err
 	}
 
+	err = snapshotNetworks(snapshot, cli)
+	if err != nil {
+		return nil, err
+	}
+
 	snapshot.Time = time.Now().Unix()
 	return snapshot, nil
 }
@@ -66,6 +71,7 @@ func snapshotInfo(snapshot *portainer.Snapshot, cli *client.Client) error {
 	snapshot.DockerVersion = info.ServerVersion
 	snapshot.TotalCPU = info.NCPU
 	snapshot.TotalMemory = info.MemTotal
+	snapshot.SnapshotRaw.Engine = info
 	return nil
 }
 
@@ -132,6 +138,7 @@ func snapshotContainers(snapshot *portainer.Snapshot, cli *client.Client) error 
 	snapshot.RunningContainerCount = runningContainers
 	snapshot.StoppedContainerCount = stoppedContainers
 	snapshot.StackCount += len(stacks)
+	snapshot.SnapshotRaw.Containers = containers
 	return nil
 }
 
@@ -142,6 +149,7 @@ func snapshotImages(snapshot *portainer.Snapshot, cli *client.Client) error {
 	}
 
 	snapshot.ImageCount = len(images)
+	snapshot.SnapshotRaw.Images = images
 	return nil
 }
 
@@ -152,5 +160,15 @@ func snapshotVolumes(snapshot *portainer.Snapshot, cli *client.Client) error {
 	}
 
 	snapshot.VolumeCount = len(volumes.Volumes)
+	snapshot.SnapshotRaw.Volumes = volumes
+	return nil
+}
+
+func snapshotNetworks(snapshot *portainer.Snapshot, cli *client.Client) error {
+	networks, err := cli.NetworkList(context.Background(), types.NetworkListOptions{})
+	if err != nil {
+		return err
+	}
+	snapshot.SnapshotRaw.Networks = networks
 	return nil
 }
