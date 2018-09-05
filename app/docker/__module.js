@@ -238,8 +238,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/:id',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/nodes/edit/node.html',
-        controller: 'NodeController'
+        component: 'nodeDetailsView'
       }
     }
   };
