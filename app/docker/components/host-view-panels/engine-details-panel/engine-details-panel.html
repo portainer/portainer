@@ -23,11 +23,11 @@
             </tr>
             <tr>
               <td>Volume Plugins</td>
-              <td>{{ $ctrl.engine.volumePlugins }}</td>
+              <td>{{ $ctrl.engine.volumePlugins | commaSeperated }}</td>
             </tr>
             <tr>
               <td>Network Plugins</td>
-              <td>{{ $ctrl.engine.networkPlugins }}</td>
+              <td>{{ $ctrl.engine.networkPlugins | commaSeperated }}</td>
             </tr>
           </tbody>
         </table>
