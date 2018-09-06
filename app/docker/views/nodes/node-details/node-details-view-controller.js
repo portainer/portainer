@@ -1,20 +1,9 @@
 angular.module('portainer.docker').controller('NodeDetailsViewController', [
-  '$stateParams',
-  'NodeService',
-  'NodeHelper',
-  'LabelHelper',
-  'Notifications',
-  '$state',
-  function NodeDetailsViewController(
-    $stateParams,
-    NodeService,
-    NodeHelper,
-    LabelHelper,
-    Notifications,
-    $state
-  ) {
+  '$stateParams', 'NodeService',  'LabelHelper', 'Notifications', '$state',
+  function NodeDetailsViewController($stateParams, NodeService, LabelHelper, Notifications, $state) {
     var ctrl = this;
     var originalNode;
+    
     ctrl.$onInit = initView;
     ctrl.updateLabels = updateLabels;
 
