@@ -6,5 +6,6 @@ angular.module('portainer.docker').component('hostOverview', {
     engineDetails: '<',
     nodeDetails: '<',
     isAgent: '<'
-  }
+  },
+  transclude: true
 });

@@ -2,5 +2,9 @@
   is-agent="$ctrl.state.isAgent"
   host-details="$ctrl.hostDetails"
   engine-details="$ctrl.engineDetails"
-  node-details="$ctrl.nodeDetails"
-></host-overview>
+>
+  <swarm-node-details-panel
+    details="$ctrl.nodeDetails"
+    on-changed-labels="$ctrl.updateLabels(labels)"
+  ></swarm-node-details-panel>
+</host-overview>
