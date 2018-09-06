@@ -1,0 +1,53 @@
+<div ng-if="!$ctrl.labels.length">
+  There are no labels for this node.
+</div>
+
+<table class="table" ng-if="$ctrl.labels.length">
+  <thead>
+    <tr>
+      <th>Label</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="label in $ctrl.labels">
+      <td>
+        <div class="input-group input-group-sm">
+          <span class="input-group-addon fit-text-size">Name</span>
+          <input type="text" class="form-control" ng-model="label.key" placeholder="e.g. com.example.foo"
+            ng-change="$ctrl.updateLabel(label)">
+        </div>
+      </td>
+      <td>
+        <div class="input-group input-group-sm">
+          <span class="input-group-addon fit-text-size">Value</span>
+          <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar"
+            ng-change="$ctrl.updateLabel(label)">
+          <span class="input-group-btn">
+            <button class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removeLabel($index)">
+              <i class="fa fa-trash" aria-hidden="true"></i>
+            </button>
+          </span>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td></td>
+      <td>
+        <div class="btn-toolbar" role="toolbar">
+          <div class="btn-group" role="group">
+            <button type="button" class="btn btn-primary btn-sm" ng-disabled="!$ctrl.hasChanges()"
+              ng-click="$ctrl.save()">Apply changes</button>
+            <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false">
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a ng-click="$ctrl.cancelChanges(node)">Reset changes</a></li>
+            </ul>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
