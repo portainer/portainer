@@ -6,6 +6,7 @@ angular.module('portainer.docker').factory('NodeService', [
 
     service.nodes = nodes;
     service.node = node;
+    service.updateNode = updateNode;
 
     function node(id) {
       var deferred = $q.defer();
@@ -36,6 +37,10 @@ angular.module('portainer.docker').factory('NodeService', [
         });
 
       return deferred.promise;
+    }
+
+    function updateNode(node) {
+      return Node.update({ id: node.Id, version: node.Version }, node).$promise;
     }
 
     return service;
