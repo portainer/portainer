@@ -1,11 +1,14 @@
 angular.module('portainer.docker').controller('NodeDetailsViewController', [
-  '$stateParams', 'NodeService',  'LabelHelper', 'Notifications', '$state',
-  function NodeDetailsViewController($stateParams, NodeService, LabelHelper, Notifications, $state) {
+  '$stateParams', 'NodeService',  'LabelHelper', 'Notifications', '$state', 'StateManager',
+  function NodeDetailsViewController($stateParams, NodeService, LabelHelper, Notifications, $state, StateManager) {
     var ctrl = this;
     var originalNode;
     
     ctrl.$onInit = initView;
     ctrl.updateLabels = updateLabels;
+    ctrl.state = {
+      isAgent: false
+    };
 
     function initView() {
       NodeService.node($stateParams.id).then(function(node) {
@@ -14,6 +17,9 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
         ctrl.engineDetails = buildEngineDetails(node);
         ctrl.nodeDetails = buildNodeDetails(node);
       });
+
+      var applicationState = StateManager.getState();
+      ctrl.state.isAgent = applicationState.endpoint.mode.agentProxy;
     }
 
     function buildHostDetails(node) {
@@ -37,8 +43,8 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
         // rootDirectory: node.DockerRootDir, TODO
         // storageDriver: node.Driver,
         // loggingDriver: node.LoggingDriver,
-        volumePlugins: getPlugins(node.Plugins, 'Volume'),
-        networkPlugins: getPlugins(node.Plugins, 'Network')
+        volumePlugins: transformPlugins(node.Plugins, 'Volume'),
+        networkPlugins: transformPlugins(node.Plugins, 'Network')
       };
     }
 
@@ -83,7 +89,7 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
       }
     }
 
-    function getPlugins(pluginsList, type) {
+    function transformPlugins(pluginsList, type) {
       return pluginsList
         .filter(function(plugin) {
           return plugin.Type === type;
