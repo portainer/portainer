@@ -1,13 +1,26 @@
 angular.module('portainer.docker').controller('NodeDetailsViewController', [
   '$stateParams',
   'NodeService',
-  function NodeDetailsViewController($stateParams, NodeService) {
+  'NodeHelper',
+  'LabelHelper',
+  'Notifications',
+  '$state',
+  function NodeDetailsViewController(
+    $stateParams,
+    NodeService,
+    NodeHelper,
+    LabelHelper,
+    Notifications,
+    $state
+  ) {
     var ctrl = this;
-
+    var originalNode;
     ctrl.$onInit = initView;
+    ctrl.updateLabels = updateLabels;
 
     function initView() {
       NodeService.node($stateParams.id).then(function(node) {
+        originalNode = node;
         ctrl.hostDetails = buildHostDetails(node);
         ctrl.engineDetails = buildEngineDetails(node);
         ctrl.nodeDetails = buildNodeDetails(node);
@@ -50,6 +63,35 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
         engineLabels: node.EngineLabels,
         nodeLabels: node.Labels
       };
+    }
+
+    function updateLabels(labels) {
+      originalNode.labels = labels;
+      updateNode(originalNode);
+    }
+
+    function updateNode(node) {
+      var config = {
+        Name: node.Name,
+        Availability: node.Availability,
+        Role: node.Role,
+        Labels: LabelHelper.fromKeyValueToLabelHash(node.Labels),
+        Id: node.Id,
+        Version: node.Version
+      };
+      
+      NodeService.updateNode(config)
+        .then(onUpdateSuccess)
+        .catch(notifyOnError);
+
+      function onUpdateSuccess() {
+        Notifications.success('Node successfully updated', 'Node updated');
+        $state.go('docker.nodes.node', { id: node.Id }, { reload: true });
+      }
+
+      function notifyOnError(error) {
+        Notifications.error('Failure', error, 'Failed to update node');
+      }
     }
 
     function getPlugins(pluginsList, type) {

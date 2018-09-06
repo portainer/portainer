@@ -3,6 +3,7 @@ angular.module('portainer.docker').component('swarmNodeDetailsPanel', {
     'app/docker/components/host-view-panels/swarm-node-details-panel/swarm-node-details-panel.html',
   controller: 'SwarmNodeDetailsPanelController',
   bindings: {
-    details: '<'
+    details: '<',
+    onChangedLabels: '&'
   }
 });

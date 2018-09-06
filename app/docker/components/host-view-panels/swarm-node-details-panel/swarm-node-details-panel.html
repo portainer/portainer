@@ -26,8 +26,19 @@
               <td>{{ $ctrl.details.engineLabels | commaSeperated }}</td>
             </tr>
             <tr>
-              <td>Node Labels</td>
-              <td>{{ $ctrl.details.nodeLabels | commaSeperated }} </td>
+              <td>
+                <div class="nopadding">
+                  <a class="btn btn-default btn-sm pull-right" ng-click="$ctrl.addLabel(node)">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i> label
+                  </a>
+                </div>
+                Node Labels
+              </td>
+              <td>
+                <node-labels-table 
+                  labels="$ctrl.details.nodeLabels"
+                  on-changed-labels="$ctrl.onChangedLabels(labels)"></node-labels-table>
+              </td>
             </tr>
           </tbody>
         </table>
