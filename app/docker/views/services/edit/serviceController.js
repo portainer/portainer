@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'ContainerService', 'TaskHelper', 'Notifications', 'ModalService', 'PluginService', 'Authentication', 'SettingsService', 'VolumeService', 'ImageHelper',
-function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, ContainerService, TaskHelper, Notifications, ModalService, PluginService, Authentication, SettingsService, VolumeService, ImageHelper) {
+.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'ContainerService', 'TaskHelper', 'Notifications', 'ModalService', 'PluginService', 'Authentication', 'SettingsService', 'VolumeService', 'ImageHelper', 'WebhookService', 'EndpointProvider', 'clipboard','WebhookHelper',
+function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, ContainerService, TaskHelper, Notifications, ModalService, PluginService, Authentication, SettingsService, VolumeService, ImageHelper, WebhookService, EndpointProvider, clipboard, WebhookHelper) {
 
   $scope.state = {
     updateInProgress: false,
@@ -207,6 +207,36 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     updateServiceArray(service, 'Hosts', service.Hosts);
   };
 
+  $scope.updateWebhook = function updateWebhook(service){
+    if ($scope.WebhookExists) {
+      WebhookService.deleteWebhook($scope.webhookID)
+      .then(function success() {
+        $scope.webhookURL = null;
+        $scope.webhookID = null;
+        $scope.WebhookExists = false;
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to delete webhook');
+      });
+    } else {
+      WebhookService.createServiceWebhook(service.Id,EndpointProvider.endpointID())
+      .then(function success(data) {
+        $scope.WebhookExists = true;
+        $scope.webhookID = data.Id;
+        $scope.webhookURL = WebhookHelper.returnWebhookUrl(data.Token);
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to create webhook');
+      });
+    }
+  };
+
+  $scope.copyWebhook = function copyWebhook(){
+    clipboard.copyText($scope.webhookURL);
+    $('#copyNotification').show();
+    $('#copyNotification').fadeOut(2000);
+  };
+
   $scope.cancelChanges = function cancelChanges(service, keys) {
     if (keys) { // clean out the keys only from the list of modified keys
       keys.forEach(function(key) {
@@ -341,6 +371,9 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     $scope.state.deletionInProgress = true;
     ServiceService.remove($scope.service)
     .then(function success() {
+      return $q.when($scope.webhookID && WebhookService.deleteWebhook($scope.webhookID));
+    })
+    .then(function success() {
       Notifications.success('Service successfully deleted');
       $state.go('docker.services', {});
     })
@@ -445,7 +478,8 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
         configs: apiVersion >= 1.30 ? ConfigService.configs() : [],
         availableImages: ImageService.images(),
         availableLoggingDrivers: PluginService.loggingPlugins(apiVersion < 1.25),
-        settings: SettingsService.publicSettings()
+        settings: SettingsService.publicSettings(),
+        webhooks: WebhookService.webhooks(service.Id, EndpointProvider.endpointID())
       });
     })
     .then(function success(data) {
@@ -458,6 +492,13 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       $scope.allowBindMounts = data.settings.AllowBindMountsForRegularUsers;
       var userDetails = Authentication.getUserDetails();
       $scope.isAdmin = userDetails.role === 1;
+
+      if (data.webhooks.length > 0) {
+        var webhook = data.webhooks[0];
+        $scope.WebhookExists = true;
+        $scope.webhookID = webhook.Id;
+        $scope.webhookURL = WebhookHelper.returnWebhookUrl(webhook.Token);
+      }
 
       var tasks = data.tasks;
 
