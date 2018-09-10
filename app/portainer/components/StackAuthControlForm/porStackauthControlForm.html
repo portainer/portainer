@@ -1,0 +1,63 @@
+<div>
+  <div class="form-group">
+        
+    <div style="margin-bottom: 0">
+        <div class="boxselector_wrapper">
+          <div>           
+            <input type="radio" id="registry_sshquay" ng-model="$ctrl.SSHRepositoryAuthentication" ng-value="1">
+            <label for="registry_sshquay">
+              <div class="boxselector_header">
+                <i class="fa fa-users" aria-hidden="true" style="margin-right: 2px;"></i>                      
+                Existing SSH key.
+              </div>                    
+            </label>
+          </div>
+          <div>
+            <input type="radio" id="registry_sshcustom" ng-model="$ctrl.SSHRepositoryAuthentication" ng-value="2">
+            <label for="registry_sshcustom">
+              <div class="boxselector_header">
+                <i class="fa fa-users" aria-hidden="true" style="margin-right: 2px;"></i>
+                Generate New SSH key
+              </div>
+              <p></p>
+            </label>
+          </div>
+        </div>
+      </div> 
+    </div>         
+    <div class="form-group" ng-if="$ctrl.SSHRepositoryAuthentication == '1'">              
+        <div class="col-sm-8">
+            <label for="stack_sshrepository_path" class="col-sm-2 control-label text-left">Select SSH Key </label>
+            <div class="col-sm-8">
+                <span ng-class="{ 'pull-right': $ctrl.showAddAction }" style="width: 25%;">
+                    <ui-select ng-model="$ctrl.selectedCategory" on-select="$ctrl.change($select.selected.sshId)">
+                      <ui-select-match placeholder="Select a category" allow-clear="true">
+                        <span>{{ $select.selected.name }}</span>
+                      </ui-select-match>
+                      <ui-select-choices  repeat="category in ($ctrl.categories | filter: $select.search)">
+                        <span>{{ category.name }}</span>
+                      </ui-select-choices>
+                    </ui-select>
+                  </span>
+            </div>                
+        </div>
+        <div class="col-sm-8">
+          <label for="stack_sshrepository_path" class="col-sm-2 control-label text-left">SSH Key </label>
+          <div class="col-sm-8">
+            <input type="text" class="form-control" value="{{$ctrl.selectsshIdvalue }}"  id="stack_sshrepository_path" placeholder="SSH Key" disabled>
+          </div>
+        </div>
+      </div>    
+      
+      <div ng-if="$ctrl.SSHRepositoryAuthentication == '2'">                                       
+          <div class="form-group" class="col-md-8">                  
+                <input type="button" class="btn btn-primary btn-sm" value="Genreate New SSH Key" ng-click="$ctrl.createNewkey()" />              
+          </div>                             
+          <div class="form-group" ng-if="$ctrl.newsshkeydiv" class="col-sm-8">
+              <label for="stack_newsshrepository_path" class="col-sm-3 control-label text-left">New SSH Key </label>
+              <div class="col-sm-8">
+                <input type="text" class="form-control" value="{{ $ctrl.newSSHkeyvalues }}"  id="stack_newsshrepository_path" placeholder="Public SSH Key" disabled>
+              </div>
+          </div>
+      </div> 
+</div>

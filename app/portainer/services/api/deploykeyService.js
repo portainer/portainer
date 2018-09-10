@@ -13,7 +13,7 @@ angular.module('portainer.app')
       deferred.resolve(deploykeys);
     })
     .catch(function error(err) {
-      deferred.reject({msg: 'Unable to retrieve deploykeys', err: err});
+      deferred.reject({msg: 'Unable to retrieve keys', err: err});
     });
     return deferred.promise;
   };
@@ -28,14 +28,16 @@ angular.module('portainer.app')
       deferred.resolve(deploykeys);
     })
     .catch(function error(err) {
-      deferred.reject({msg: 'Unable to retrieve deploykeys', err: err});
+      deferred.reject({msg: 'Unable to retrieve keys', err: err});
     });
     return deferred.promise;
   };
 
-  service.createDeploykey = function(name) {
+  service.createDeploykey = function(name, pubKey, priKey) {
     var payload = {
-      Name: name
+      Name: name,
+      Pubkey : pubKey,
+      Prikey : priKey,
     };
 
     return Deploykeys.create({}, payload).$promise;

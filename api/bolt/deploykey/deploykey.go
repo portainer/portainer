@@ -3,7 +3,6 @@ package deploykey
 import (
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/bolt/internal"
-
 	"github.com/boltdb/bolt"
 )
 

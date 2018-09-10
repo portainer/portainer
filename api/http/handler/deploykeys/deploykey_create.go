@@ -5,13 +5,14 @@ import (
 
 	"github.com/asaskevich/govalidator"
 	"github.com/portainer/portainer"
-	httperror "github.com/portainer/portainer/http/error"
+	 httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/request"
 	"github.com/portainer/portainer/http/response"
 )
-
 type deploykeyCreatePayload struct {
 	Name string
+	/*Pubkey string
+	Prikey string*/
 }
 
 func (payload *deploykeyCreatePayload) Validate(r *http.Request) error {
@@ -42,8 +43,10 @@ func (handler *Handler) deploykeyCreate(w http.ResponseWriter, r *http.Request) 
 
 	deploykey := &portainer.Deploykey{
 		Name: payload.Name,
+		/*Pubkey: payload.Pubkey,
+		Prikey: payload.Prikey,*/
 	}
-
+	//deploykey.Pubkey, deploykey.Prikey, err = handler.DigitalSignatureService.GenerateKeyPair()
 	err = handler.DeploykeyService.CreateDeploykey(deploykey)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the deploykey inside the database", err}

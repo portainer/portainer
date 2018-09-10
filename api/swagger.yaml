@@ -2136,6 +2136,13 @@ paths:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
+        404:
+          description: "Key not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"       
     post:
       tags:
       - "deploykeys"

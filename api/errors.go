@@ -65,6 +65,11 @@ const (
 	ErrTagAlreadyExists = Error("A tag already exists with this name")
 )
 
+// Deploykey errors
+const (
+	ErrDeploykeyAlreadyExists = Error("A key already exists with this name")
+)
+
 // Endpoint extensions error
 const (
 	ErrEndpointExtensionNotSupported      = Error("This extension is not supported")

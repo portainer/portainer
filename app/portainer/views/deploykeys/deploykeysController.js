@@ -44,7 +44,9 @@ function ($scope, $state, DeploykeyService, Notifications) {
 
   $scope.createDeploykey = function() {
     var deploykeyName = $scope.formValues.Name;
-    DeploykeyService.createDeploykey(deploykeyName)
+    var publickey = "";
+    var privatekey = "";
+    DeploykeyService.createDeploykey(deploykeyName, publickey, privatekey)
     .then(function success() {
       Notifications.success('Key successfully created', deploykeyName);
       $state.reload();

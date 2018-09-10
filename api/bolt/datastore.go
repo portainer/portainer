@@ -102,7 +102,6 @@ func (store *Store) Init() error {
 			AuthorizedUsers: []portainer.UserID{},
 			AuthorizedTeams: []portainer.TeamID{},
 			Tags:            []string{},
-			Deploykeys:      []string{},
 		}
 
 		return store.EndpointGroupService.CreateEndpointGroup(unassignedGroup)

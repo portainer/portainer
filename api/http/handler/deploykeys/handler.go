@@ -13,6 +13,7 @@ import (
 type Handler struct {
 	*mux.Router
 	DeploykeyService portainer.DeploykeyService
+	//DigitalSignatureService portainer.DigitalSignatureService
 }
 
 // NewHandler creates a handler to manage deploykey operations.
@@ -21,11 +22,11 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		Router: mux.NewRouter(),
 	}
 	h.Handle("/deploykeys",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.deploykeyCreate))).Methods(http.MethodPost)
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.deploykeyCreate))).Methods(http.MethodPost)
 	h.Handle("/deploykeys",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.deploykeyList))).Methods(http.MethodGet)
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.deploykeyList))).Methods(http.MethodGet)
 	h.Handle("/deploykeys/{id}",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.deploykeyDelete))).Methods(http.MethodDelete)
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.deploykeyDelete))).Methods(http.MethodDelete)
 
 	return h
 }

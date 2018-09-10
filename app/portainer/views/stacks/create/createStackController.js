@@ -12,32 +12,14 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
     RepositoryPassword: '',
     Env: [],
     ComposeFilePathInRepository: 'docker-compose.yml',
-    AccessControlData: new AccessControlFormData(),
-    stackAuthenticationControlFormData: new stackAuthenticationControlFormData(),
-    selectsshIdvalue:'',
-    newSSHkeyvalues:'',
-    newsshkeydiv:false,
+    AccessControlData: new AccessControlFormData(),  
+    StachauthControlData: new StackAuthControlFormData(),     
     RepositoryAuthentication:''
-  };
+  }; 
 
-  var data = [
-    {
-      "sshId":"1",
-      "name":"Hello"
-    },
-    {
-      "sshId":"2",
-      "name":"Good"
-    },
-    {
-      "sshId":"3",
-      "name":"Best"
-    },
-    {
-      "sshId":"4",
-      "name":"Dev"
-    }
-    ];
+  $scope.formValues.generateNewKey =function(){
+    StackService.setStackName($scope.formValues.Name);
+  } 
 
   $scope.state = {
     Method: 'editor',
@@ -56,7 +38,7 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
 
   function validateForm(accessControlData, isAdmin) {
     $scope.state.formValidationError = '';
-    var error = '';
+    var error = '';    
     error = FormValidator.validateAccessControl(accessControlData, isAdmin);
 
     if (error) {
@@ -115,6 +97,7 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
     var method = $scope.state.Method;
 
     var accessControlData = $scope.formValues.AccessControlData;
+    console.log(accessControlData);
     var userDetails = Authentication.getUserDetails();
     var isAdmin = userDetails.role === 1;
     var userId = userDetails.ID;
@@ -153,17 +136,6 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
   $scope.editorUpdate = function(cm) {
     $scope.formValues.StackFileContent = cm.getValue();
   };
-
-
-  $scope.formValues.categories = data;
-  
-  $scope.formValues.change = function(id){
-    $scope.formValues.selectsshIdvalue = id; 
-  }
-  $scope.formValues.generateNewKey = function(name){    
-    $scope.formValues.newSSHkeyvalues = name; 
-    $scope.formValues.newsshkeydiv = true; 
-  }
 
   function initView() {
     var endpointMode = $scope.applicationState.endpoint.mode;
