@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer"
 	"github.com/portainer/portainer/docker"
-	httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/security"
 )
 

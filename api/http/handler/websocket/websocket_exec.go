@@ -15,10 +15,10 @@ import (
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/websocket"
 	"github.com/koding/websocketproxy"
+	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/request"
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/crypto"
-	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/request"
 )
 
 type webSocketExecRequestParams struct {

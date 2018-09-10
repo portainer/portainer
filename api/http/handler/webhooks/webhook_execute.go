@@ -6,10 +6,10 @@ import (
 	"strings"
 
 	dockertypes "github.com/docker/docker/api/types"
+	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/request"
+	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer"
-	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/request"
-	"github.com/portainer/portainer/http/response"
 )
 
 // Acts on a passed in token UUID to restart the docker service
