@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	httperror "github.com/portainer/portainer/http/error"
+	httperror "github.com/portainer/libhttp/error"
 )
 
 type localProxy struct {

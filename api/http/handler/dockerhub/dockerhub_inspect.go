@@ -3,8 +3,8 @@ package dockerhub
 import (
 	"net/http"
 
-	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/response"
+	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/response"
 )
 
 // GET request on /api/dockerhub
