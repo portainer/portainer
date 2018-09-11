@@ -3,10 +3,10 @@ package endpointgroups
 import (
 	"net/http"
 
+	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/request"
+	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer"
-	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/request"
-	"github.com/portainer/portainer/http/response"
 )
 
 // DELETE request on /api/endpoint_groups/:id
