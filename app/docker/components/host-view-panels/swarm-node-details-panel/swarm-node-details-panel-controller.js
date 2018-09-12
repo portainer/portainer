@@ -21,7 +21,7 @@ angular
         }
         if (this.details.role === managerRole) {
           this.state.managerAddress =
-            '(Manager address: ' + this.details.managerAddress + ')';
+            '(' + this.details.managerAddress + ')';
         }
       }
 

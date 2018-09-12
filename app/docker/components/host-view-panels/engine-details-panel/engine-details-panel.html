@@ -5,19 +5,19 @@
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
-            <tr>
+            <tr ng-if="$ctrl.engine.releaseVersion">
               <td>Version</td>
-              <td>{{ $ctrl.engine.releaseVersion }} (API: {{ $ctrl.engine.apiVersion }})</td>
+              <td>{{ $ctrl.engine.releaseVersion }} <span ng-if="$ctrl.engine.apiVersion">(API: {{ $ctrl.engine.apiVersion }})</span></td>
             </tr>
-            <tr>
+            <tr ng-if="$ctrl.engine.rootDirectory">
               <td>Root directory</td>
               <td>{{ $ctrl.engine.rootDirectory }}</td>
             </tr>
-            <tr>
+            <tr ng-if="$ctrl.engine.storageDriver">
               <td>Storage Driver</td>
               <td>{{ $ctrl.engine.storageDriver }}</td>
             </tr>
-            <tr>
+            <tr ng-if="$ctrl.engine.loggingDriver">
               <td>Logging Driver</td>
               <td>{{ $ctrl.engine.loggingDriver }}</td>
             </tr>

@@ -5,38 +5,38 @@
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
-            <tr>
+            <tr ng-if="$ctrl.host.name">
               <td>Hostname</td>
               <td>{{ $ctrl.host.name }}</td>
             </tr>
-            <tr>
+            <tr ng-if="$ctrl.host.os">
               <td>OS Information</td>
               <td>{{ $ctrl.host.os.type }} {{$ctrl.host.os.arch}} {{$ctrl.host.os.name}}</td>
             </tr>
-            <tr>
+            <tr ng-if="$ctrl.host.kernelVersion">
               <td>Kernel Version</td>
               <td>{{ $ctrl.host.kernelVersion }}</td>
             </tr>
-            <tr>
+            <tr ng-if="$ctrl.host.totalCPU">
               <td>Total CPU</td>
               <td>{{ $ctrl.host.totalCPU }}</td>
             </tr>
-            <tr>
+            <tr ng-if="$ctrl.host.totalMemory">
               <td>Total memory</td>
               <td>{{ $ctrl.host.totalMemory | humansize }}</td>
             </tr>
-            <!-- <tr ng-if="$ctrl.isAgent">
+            <tr ng-if="$ctrl.host.physicalDeviceInfo">
               <td>Physical device information</td>
               <td>{{ $ctrl.host.physicalDeviceInfo }}</td>
             </tr>
-            <tr ng-if="$ctrl.isAgent">
+            <tr ng-if="$ctrl.host.pciDevices">
               <td>Installed PCI devices</td>
               <td>{{ $ctrl.host.pciDevices }}</td>
             </tr>
-            <tr ng-if="$ctrl.isAgent">
+            <tr ng-if="$ctrl.host.physicalDisk">
               <td>Physical disk</td>
               <td>{{ $ctrl.host.physicalDisk }}</td>
-            </tr> -->
+            </tr>
           </tbody>
         </table>
       </rd-widget-body>

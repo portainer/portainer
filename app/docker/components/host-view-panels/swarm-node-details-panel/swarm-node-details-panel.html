@@ -5,7 +5,7 @@
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
-            <tr>
+            <tr ng-if="$ctrl.details.name">
               <td>Node name</td>
               <td>{{ $ctrl.details.name }}</td>
             </tr>
