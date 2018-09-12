@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 
+	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/http/client"
-	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/response"
 	"github.com/portainer/portainer/http/security"
 )
 

@@ -1,12 +1,13 @@
 package stacks
 
 import (
+	"errors"
 	"log"
 	"net/http"
 
+	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/request"
 	"github.com/portainer/portainer"
-	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/request"
 )
 
 func (handler *Handler) cleanUp(stack *portainer.Stack, doCleanUp *bool) error {
@@ -57,7 +58,7 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 		return handler.createComposeStack(w, r, method, endpoint)
 	}
 
-	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: type. Value must be one of: 1 (Swarm stack) or 2 (Compose stack)", request.ErrInvalidQueryParameter}
+	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: type. Value must be one of: 1 (Swarm stack) or 2 (Compose stack)", errors.New(request.ErrInvalidQueryParameter)}
 }
 
 func (handler *Handler) createComposeStack(w http.ResponseWriter, r *http.Request, method string, endpoint *portainer.Endpoint) *httperror.HandlerError {
@@ -71,7 +72,7 @@ func (handler *Handler) createComposeStack(w http.ResponseWriter, r *http.Reques
 		return handler.createComposeStackFromFileUpload(w, r, endpoint)
 	}
 
-	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: method. Value must be one of: string, repository or file", request.ErrInvalidQueryParameter}
+	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: method. Value must be one of: string, repository or file", errors.New(request.ErrInvalidQueryParameter)}
 }
 
 func (handler *Handler) createSwarmStack(w http.ResponseWriter, r *http.Request, method string, endpoint *portainer.Endpoint) *httperror.HandlerError {
@@ -84,5 +85,5 @@ func (handler *Handler) createSwarmStack(w http.ResponseWriter, r *http.Request,
 		return handler.createSwarmStackFromFileUpload(w, r, endpoint)
 	}
 
-	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: method. Value must be one of: string, repository or file", request.ErrInvalidQueryParameter}
+	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: method. Value must be one of: string, repository or file", errors.New(request.ErrInvalidQueryParameter)}
 }
