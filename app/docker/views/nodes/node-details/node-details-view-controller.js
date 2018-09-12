@@ -63,7 +63,7 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
     }
 
     function updateLabels(labels) {
-      originalNode.labels = labels;
+      originalNode.Labels = labels;
       updateNode(originalNode);
     }
 
