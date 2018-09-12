@@ -1336,7 +1336,7 @@ paths:
         in: "formData"
         type: "string"
         description: "Swarm cluster identifier. Required when method equals file and type equals 1."
-      - name: "StackFileContent"
+      - name: "file"
         in: "formData"
         type: "file"
         description: "Stack file. Required when method equals file."

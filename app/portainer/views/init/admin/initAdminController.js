@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('InitAdminController', ['$scope', '$state', '$sanitize', 'Notifications', 'Authentication', 'StateManager', 'UserService', 'EndpointService',
-function ($scope, $state, $sanitize, Notifications, Authentication, StateManager, UserService, EndpointService) {
+.controller('InitAdminController', ['$scope', '$state', 'Notifications', 'Authentication', 'StateManager', 'UserService', 'EndpointService',
+function ($scope, $state, Notifications, Authentication, StateManager, UserService, EndpointService) {
 
   $scope.logo = StateManager.getState().application.logo;
 
@@ -15,8 +15,8 @@ function ($scope, $state, $sanitize, Notifications, Authentication, StateManager
   };
 
   $scope.createAdminUser = function() {
-    var username = $sanitize($scope.formValues.Username);
-    var password = $sanitize($scope.formValues.Password);
+    var username = $scope.formValues.Username;
+    var password = $scope.formValues.Password;
 
     $scope.state.actionInProgress = true;
     UserService.initAdministrator(username, password)

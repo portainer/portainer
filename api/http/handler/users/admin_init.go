@@ -39,7 +39,7 @@ func (handler *Handler) adminInit(w http.ResponseWriter, r *http.Request) *httpe
 	}
 
 	if len(users) != 0 {
-		return &httperror.HandlerError{http.StatusConflict, "Unable to retrieve users from the database", portainer.ErrAdminAlreadyInitialized}
+		return &httperror.HandlerError{http.StatusConflict, "Unable to create administrator user", portainer.ErrAdminAlreadyInitialized}
 	}
 
 	user := &portainer.User{

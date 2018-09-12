@@ -35,7 +35,7 @@ type endpointCreatePayload struct {
 func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 	name, err := request.RetrieveMultiPartFormValue(r, "Name", false)
 	if err != nil {
-		return portainer.Error("Invalid stack name")
+		return portainer.Error("Invalid endpoint name")
 	}
 	payload.Name = name
 
