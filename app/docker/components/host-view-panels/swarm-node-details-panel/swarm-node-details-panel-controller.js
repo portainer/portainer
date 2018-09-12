@@ -5,23 +5,18 @@ angular
       this.state = {
         managerAddress: ''
       };
-      this.$onInit = initView;
       this.$onChanges = $onChanges;
       this.addLabel = addLabel;
       this.updateNodeLabels = updateNodeLabels;
+      this.updateNodeAvailability = updateNodeAvailability;
       var managerRole = 'manager';
-
-      function initView() {
-        
-      }
 
       function $onChanges() {
         if (!this.details) {
           return;
         }
         if (this.details.role === managerRole) {
-          this.state.managerAddress =
-            '(' + this.details.managerAddress + ')';
+          this.state.managerAddress = '(' + this.details.managerAddress + ')';
         }
       }
 
@@ -35,7 +30,11 @@ angular
       }
 
       function updateNodeLabels(labels) {
-        this.onChangedLabels({labels: labels});
+        this.onChangedLabels({ labels: labels });
+      }
+
+      function updateNodeAvailability(availability) {
+        this.onChangedAvailability({ availability: availability });
       }
     }
   ]);

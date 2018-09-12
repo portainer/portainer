@@ -1,0 +1,21 @@
+<div class="input-group input-group-sm">
+  <select name="nodeAvailability" class="selectpicker form-control" ng-model="$ctrl.availability"
+    ng-change="$ctrl.onChange($event)">
+    <option value="active">Active</option>
+    <option value="pause">Pause</option>
+    <option value="drain">Drain</option>
+  </select>
+  <div class="btn-toolbar" role="toolbar">
+    <div class="btn-group" role="group">
+      <button type="button" class="btn btn-primary btn-sm" ng-disabled="!$ctrl.state.hasChanges"
+        ng-click="$ctrl.save()">Apply changes</button>
+      <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown"
+        aria-haspopup="true" aria-expanded="false">
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu">
+        <li><a ng-click="$ctrl.cancelChanges()">Reset changes</a></li>
+      </ul>
+    </div>
+  </div>
+</div>

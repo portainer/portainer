@@ -15,11 +15,16 @@
             </tr>
             <tr>
               <td>Availability</td>
-              <td>{{ $ctrl.details.availability }}</td>
+              <td>
+                <node-availability-select 
+                  on-save="$ctrl.updateNodeAvailability(availability)"
+                  availability="$ctrl.details.availability"
+                  original-value="$ctrl.details.availability"></node-availability-select>
+              </td>
             </tr>
             <tr>
               <td>Status</td>
-              <td>{{ $ctrl.details.status }}</td>
+              <td><span class="label label-{{ $ctrl.details.status | nodestatusbadge }}">{{ $ctrl.details.status }}</span></td>
             </tr>
             <tr>
               <td>Engine Labels</td>

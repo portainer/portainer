@@ -6,6 +6,8 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
     
     ctrl.$onInit = initView;
     ctrl.updateLabels = updateLabels;
+    ctrl.updateAvailability = updateAvailability;
+
     ctrl.state = {
       isAgent: false
     };
@@ -62,6 +64,11 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
 
     function updateLabels(labels) {
       originalNode.labels = labels;
+      updateNode(originalNode);
+    }
+
+    function updateAvailability(availability) {
+      originalNode.Availability = availability;
       updateNode(originalNode);
     }
 

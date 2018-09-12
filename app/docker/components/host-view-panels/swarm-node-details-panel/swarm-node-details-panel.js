@@ -4,6 +4,7 @@ angular.module('portainer.docker').component('swarmNodeDetailsPanel', {
   controller: 'SwarmNodeDetailsPanelController',
   bindings: {
     details: '<',
-    onChangedLabels: '&'
+    onChangedLabels: '&',
+    onChangedAvailability: '&'
   }
 });
