@@ -5,7 +5,7 @@
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
-            <tr ng-if="$ctrl.host.name">
+            <tr>
               <td>Hostname</td>
               <td>{{ $ctrl.host.name }}</td>
             </tr>
@@ -17,11 +17,11 @@
               <td>Kernel Version</td>
               <td>{{ $ctrl.host.kernelVersion }}</td>
             </tr>
-            <tr ng-if="$ctrl.host.totalCPU">
+            <tr>
               <td>Total CPU</td>
               <td>{{ $ctrl.host.totalCPU }}</td>
             </tr>
-            <tr ng-if="$ctrl.host.totalMemory">
+            <tr>
               <td>Total memory</td>
               <td>{{ $ctrl.host.totalMemory | humansize }}</td>
             </tr>
