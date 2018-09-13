@@ -13,6 +13,7 @@ import (
 	"github.com/portainer/portainer/http/handler/endpoints"
 	"github.com/portainer/portainer/http/handler/file"
 	"github.com/portainer/portainer/http/handler/motd"
+	"github.com/portainer/portainer/http/handler/plugins"
 	"github.com/portainer/portainer/http/handler/registries"
 	"github.com/portainer/portainer/http/handler/resourcecontrols"
 	"github.com/portainer/portainer/http/handler/settings"
@@ -122,6 +123,9 @@ func (server *Server) Start() error {
 
 	var motdHandler = motd.NewHandler(requestBouncer)
 
+	var pluginHandler = plugins.NewHandler(requestBouncer, server.Status)
+	pluginHandler.ProxyManager = proxyManager
+
 	var registryHandler = registries.NewHandler(requestBouncer)
 	registryHandler.RegistryService = server.RegistryService
 	registryHandler.ProxyManager = proxyManager
@@ -189,6 +193,7 @@ func (server *Server) Start() error {
 		EndpointProxyHandler:   endpointProxyHandler,
 		FileHandler:            fileHandler,
 		MOTDHandler:            motdHandler,
+		PluginHandler:          pluginHandler,
 		RegistryHandler:        registryHandler,
 		ResourceControlHandler: resourceControlHandler,
 		SettingsHandler:        settingsHandler,

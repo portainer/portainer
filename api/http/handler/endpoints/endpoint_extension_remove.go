@@ -9,6 +9,8 @@ import (
 	"github.com/portainer/portainer"
 )
 
+// TODO: should be removed (discuss with Edge)
+
 // DELETE request on /api/endpoints/:id/extensions/:extensionType
 func (handler *Handler) endpointExtensionRemove(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")

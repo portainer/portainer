@@ -42,7 +42,6 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 	}
 
 	handler.ProxyManager.DeleteProxy(string(endpointID))
-	handler.ProxyManager.DeleteExtensionProxies(string(endpointID))
 
 	return response.Empty(w)
 }

@@ -10,6 +10,8 @@ import (
 	"github.com/portainer/portainer"
 )
 
+// TODO: should be removed (discuss with Edge)
+
 type endpointExtensionAddPayload struct {
 	Type int
 	URL  string

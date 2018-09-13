@@ -1,6 +1,7 @@
 package registries
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -11,6 +12,9 @@ import (
 
 // request on /api/registries/:id/v2
 func (handler *Handler) proxyRequestsToRegistryAPI(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+
+	// TODO: should be updated
+
 	registryID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid registry identifier route variable", err}
@@ -23,18 +27,25 @@ func (handler *Handler) proxyRequestsToRegistryAPI(w http.ResponseWriter, r *htt
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a registry with the specified identifier inside the database", err}
 	}
 
-	id := strconv.Itoa(int(registryID))
-
-	var proxy http.Handler
-	proxy = handler.ProxyManager.GetRegistryProxy(id)
+	proxy := handler.ProxyManager.GetPluginProxy(portainer.RegistryManagementPlugin)
 	if proxy == nil {
-		proxy, err = handler.ProxyManager.CreateAndRegisterRegistryProxy(registry)
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to register registry proxy", err}
-		}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Registry management plugin is not enabled", errors.New("Plugin not enabled")}
 	}
 
-	http.StripPrefix("/registries/"+id, proxy).ServeHTTP(w, r)
+	id := strconv.Itoa(int(registryID))
+	r.Header.Set("X-RegistryManagement-Key", id)
+	r.Header.Set("X-RegistryManagement-URI", registry.URL)
 
+	//
+	// var proxy http.Handler
+	// proxy = handler.ProxyManager.GetRegistryProxy(id)
+	// if proxy == nil {
+	// 	proxy, err = handler.ProxyManager.CreateAndRegisterRegistryProxy(registry)
+	// 	if err != nil {
+	// 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to register registry proxy", err}
+	// 	}
+	// }
+	//
+	http.StripPrefix("/registries/"+id, proxy).ServeHTTP(w, r)
 	return nil
 }

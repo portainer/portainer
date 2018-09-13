@@ -42,6 +42,8 @@ type (
 		Snapshot           bool   `json:"Snapshot"`
 		Analytics          bool   `json:"Analytics"`
 		Version            string `json:"Version"`
+		// TODO: migrate data to initialize array
+		EnabledPlugins []PluginType `json:"EnabledPlugins"`
 	}
 
 	// LDAPSettings represents the settings used to connect to a LDAP server
@@ -274,6 +276,7 @@ type (
 		Labels []Pair `json:"Labels"`
 	}
 
+	// TODO: remove (discuss with Edge)
 	// EndpointExtension represents a extension associated to an endpoint
 	EndpointExtension struct {
 		Type EndpointExtensionType `json:"Type"`
@@ -283,6 +286,9 @@ type (
 	// EndpointExtensionType represents the type of an endpoint extension. Only
 	// one extension of each type can be associated to an endpoint
 	EndpointExtensionType int
+
+	// PluginType represents a type of plugin
+	PluginType int
 
 	// ResourceControlID represents a resource control identifier
 	ResourceControlID int
@@ -716,6 +722,7 @@ const (
 	ConfigResourceControl
 )
 
+// TODO: remove (discuss with Edge)
 const (
 	_ EndpointExtensionType = iota
 	// StoridgeEndpointExtension represents the Storidge extension
@@ -762,4 +769,10 @@ const (
 	_ WebhookType = iota
 	// ServiceWebhook is a webhook for restarting a docker service
 	ServiceWebhook
+)
+
+const (
+	_ PluginType = iota
+	// RegistryManagementPlugin represents the registry management plugin
+	RegistryManagementPlugin
 )

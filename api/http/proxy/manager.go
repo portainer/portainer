@@ -4,19 +4,21 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
-	"strings"
 
 	"github.com/orcaman/concurrent-map"
 	"github.com/portainer/portainer"
 )
 
+// TODO: remove comments
+
 type (
 	// Manager represents a service used to manage Docker proxies.
 	Manager struct {
-		proxyFactory     *proxyFactory
-		proxies          cmap.ConcurrentMap
-		extensionProxies cmap.ConcurrentMap
-		registryProxies  cmap.ConcurrentMap
+		proxyFactory  *proxyFactory
+		proxies       cmap.ConcurrentMap
+		pluginProxies cmap.ConcurrentMap
+		// extensionProxies cmap.ConcurrentMap
+		// registryProxies  cmap.ConcurrentMap
 	}
 
 	// ManagerParams represents the required parameters to create a new Manager instance.
@@ -33,9 +35,10 @@ type (
 // NewManager initializes a new proxy Service
 func NewManager(parameters *ManagerParams) *Manager {
 	return &Manager{
-		proxies:          cmap.New(),
-		extensionProxies: cmap.New(),
-		registryProxies:  cmap.New(),
+		proxies:       cmap.New(),
+		pluginProxies: cmap.New(),
+		// extensionProxies: cmap.New(),
+		// registryProxies:  cmap.New(),
 		proxyFactory: &proxyFactory{
 			ResourceControlService: parameters.ResourceControlService,
 			TeamMembershipService:  parameters.TeamMembershipService,
@@ -99,53 +102,66 @@ func (manager *Manager) DeleteProxy(key string) {
 	manager.proxies.Remove(key)
 }
 
-// CreateAndRegisterExtensionProxy creates a new HTTP reverse proxy for an extension and adds it to the registered proxies.
-func (manager *Manager) CreateAndRegisterExtensionProxy(key, extensionAPIURL string) (http.Handler, error) {
-	extensionURL, err := url.Parse(extensionAPIURL)
+func (manager *Manager) CreatePluginProxy(pluginType portainer.PluginType) (http.Handler, error) {
+	// TODO: should be stored in plugin definition somewhere?
+	pluginURL, err := url.Parse("http://localhost:7001")
 	if err != nil {
 		return nil, err
 	}
 
-	proxy := manager.proxyFactory.newHTTPProxy(extensionURL)
-	manager.extensionProxies.Set(key, proxy)
+	proxy := manager.proxyFactory.newHTTPProxy(pluginURL)
+	manager.pluginProxies.Set(strconv.Itoa(int(pluginType)), proxy)
+
+	// TODO: return nil
 	return proxy, nil
 }
 
-// CreateAndRegisterRegistryProxy creates a new HTTP reverse proxy for a registry and adds it to the registered proxies.
-func (manager *Manager) CreateAndRegisterRegistryProxy(registry *portainer.Registry) (http.Handler, error) {
-	registryURL, err := url.Parse("http://" + registry.URL)
-	if err != nil {
-		return nil, err
-	}
-
-	proxy := manager.proxyFactory.newHTTPProxy(registryURL)
-	manager.registryProxies.Set(strconv.Itoa(int(registry.ID)), proxy)
-	return proxy, nil
-}
-
-// GetRegistryProxy returns the registry proxy associated to a key
-func (manager *Manager) GetRegistryProxy(key string) http.Handler {
-	proxy, ok := manager.registryProxies.Get(key)
+func (manager *Manager) GetPluginProxy(pluginType portainer.PluginType) http.Handler {
+	proxy, ok := manager.pluginProxies.Get(strconv.Itoa(int(pluginType)))
 	if !ok {
 		return nil
 	}
 	return proxy.(http.Handler)
 }
 
-// GetExtensionProxy returns the extension proxy associated to a key
-func (manager *Manager) GetExtensionProxy(key string) http.Handler {
-	proxy, ok := manager.extensionProxies.Get(key)
-	if !ok {
-		return nil
-	}
-	return proxy.(http.Handler)
-}
+// // CreateAndRegisterExtensionProxy creates a new HTTP reverse proxy for an extension and adds it to the registered proxies.
+// func (manager *Manager) CreateAndRegisterExtensionProxy(key, extensionAPIURL string) (http.Handler, error) {
+// 	extensionURL, err := url.Parse(extensionAPIURL)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+//
+// 	proxy := manager.proxyFactory.newHTTPProxy(extensionURL)
+// 	manager.extensionProxies.Set(key, proxy)
+// 	return proxy, nil
+// }
+
+// // CreateAndRegisterRegistryProxy creates a new HTTP reverse proxy for a registry and adds it to the registered proxies.
+// func (manager *Manager) CreateAndRegisterRegistryProxy(registry *portainer.Registry) (http.Handler, error) {
+// 	registryURL, err := url.Parse("http://" + registry.URL)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+//
+// 	proxy := manager.proxyFactory.newHTTPProxy(registryURL)
+// 	manager.registryProxies.Set(strconv.Itoa(int(registry.ID)), proxy)
+// 	return proxy, nil
+// }
+//
+// // GetRegistryProxy returns the registry proxy associated to a key
+// func (manager *Manager) GetRegistryProxy(key string) http.Handler {
+// 	proxy, ok := manager.registryProxies.Get(key)
+// 	if !ok {
+// 		return nil
+// 	}
+// 	return proxy.(http.Handler)
+// }
 
 // DeleteExtensionProxies deletes all the extension proxies associated to a key
-func (manager *Manager) DeleteExtensionProxies(key string) {
-	for _, k := range manager.extensionProxies.Keys() {
-		if strings.Contains(k, key+"_") {
-			manager.extensionProxies.Remove(k)
-		}
-	}
-}
+// func (manager *Manager) DeleteExtensionProxies(key string) {
+// 	for _, k := range manager.extensionProxies.Keys() {
+// 		if strings.Contains(k, key+"_") {
+// 			manager.extensionProxies.Remove(k)
+// 		}
+// 	}
+// }
