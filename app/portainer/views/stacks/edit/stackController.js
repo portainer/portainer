@@ -14,6 +14,8 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
     Endpoint: null
   };
 
+  $scope.duplicateStack = duplicateStack;
+
   $scope.showEditor = function() {
     $scope.state.showEditorTab = true;
   };
@@ -263,6 +265,27 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
     } else {
       var stackId = $transition$.params().id;
       loadStack(stackId);
+    }
+  }
+
+  function duplicateStack() {
+    var stack = $scope.stack;
+    var targetEndpointId = $scope.formValues.Endpoint.Id;
+
+    $scope.state.duplicationInProgress = true;
+
+    StackService.duplicateStack(targetEndpointId, stack)
+      .then(onDuplicationSuccess)
+      .catch(notifyOnError);
+
+    function onDuplicationSuccess() {
+      Notifications.success('Stack successfully duplicated');
+      $state.go('portainer.stacks', {}, { reload: true });
+    }
+
+    function notifyOnError(err) {
+      Notifications.error('Failure', err, 'Unable to duplicate stack');
+      $scope.state.duplicationInProgress = false;
     }
   }
 
