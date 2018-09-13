@@ -270,9 +270,9 @@ angular.module('portainer.docker')
     return _.split(imageName, '@sha256')[0];
   };
 })
-.filter('commaSeperated', function commaSeperatedFilter() {
+.filter('commaSeparated', function commaSeparatedFilter() {
   'use strict';
-  return function commaSeperated(list) {
+  return function commaSeparated(list) {
     if (!list) {
       return list;
     }
