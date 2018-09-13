@@ -31,7 +31,7 @@
             </tr>
             <tr ng-if="$ctrl.host.pciDevices">
               <td>Installed PCI devices</td>
-              <td>{{ $ctrl.host.pciDevices }}</td>
+              <td>{{ $ctrl.host.pciDevices |commaSeperated }}</td>
             </tr>
             <tr ng-if="$ctrl.host.physicalDisk">
               <td>Physical disk</td>

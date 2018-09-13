@@ -1,9 +1,9 @@
 angular.module('portainer.docker').controller('NodeDetailsViewController', [
-  '$stateParams', 'NodeService',  'LabelHelper', 'Notifications', '$state', 'StateManager',
-  function NodeDetailsViewController($stateParams, NodeService, LabelHelper, Notifications, $state, StateManager) {
+  '$stateParams', 'NodeService', 'LabelHelper', 'Notifications', '$state', 'StateManager', 'AgentService',
+  function NodeDetailsViewController($stateParams, NodeService, LabelHelper, Notifications, $state, StateManager, AgentService) {
     var ctrl = this;
     var originalNode;
-    
+
     ctrl.$onInit = initView;
     ctrl.updateLabels = updateLabels;
     ctrl.updateAvailability = updateAvailability;
@@ -13,15 +13,30 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
     };
 
     function initView() {
-      NodeService.node($stateParams.id).then(function(node) {
+      var applicationState = StateManager.getState();
+      ctrl.state.isAgent = applicationState.endpoint.mode.agentProxy;
+
+      var nodeId = $stateParams.id;
+      NodeService.node(nodeId).then(function(node) {
         originalNode = node;
         ctrl.hostDetails = buildHostDetails(node);
         ctrl.engineDetails = buildEngineDetails(node);
         ctrl.nodeDetails = buildNodeDetails(node);
+        if (ctrl.state.isAgent) {
+          AgentService.hostInfo(nodeId).then(function onHostInfoLoad(agentHostInfo) {
+            console.log(agentHostInfo);
+            enhanceHostDetails(ctrl.hostDetails, agentHostInfo);
+          });
+        }
       });
 
-      var applicationState = StateManager.getState();
-      ctrl.state.isAgent = applicationState.endpoint.mode.agentProxy;
+      
+    }
+
+    function enhanceHostDetails(hostDetails, agentHostInfo) {
+      hostDetails.physicalDeviceInfo = agentHostInfo.PhysicalDeviceInfo;
+      hostDetails.pciDevices = agentHostInfo.InstalledPCIDevices;
+      hostDetails.physicalDisk = agentHostInfo.PhysicalDisk;
     }
 
     function buildHostDetails(node) {
@@ -81,7 +96,7 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
         Id: node.Id,
         Version: node.Version
       };
-      
+
       NodeService.updateNode(config)
         .then(onUpdateSuccess)
         .catch(notifyOnError);
