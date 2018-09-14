@@ -27,6 +27,11 @@ const (
 	ErrTeamMembershipAlreadyExists = Error("Team membership already exists for this user and team")
 )
 
+// Sshkey errors
+const (
+	ErrSshkeyAlreadyExists = Error("A key already exists with this name")
+)
+
 // ResourceControl errors.
 const (
 	ErrResourceControlAlreadyExists = Error("A resource control is already applied on this resource")

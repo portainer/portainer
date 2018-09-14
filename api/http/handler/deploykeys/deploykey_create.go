@@ -5,14 +5,15 @@ import (
 
 	"github.com/asaskevich/govalidator"
 	"github.com/portainer/portainer"
-	 httperror "github.com/portainer/portainer/http/error"
+	httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/request"
 	"github.com/portainer/portainer/http/response"
 )
+
 type deploykeyCreatePayload struct {
-	Name string
-	/*Pubkey string
-	Prikey string*/
+	Name           string
+	Publickeypath  string
+	Privatekeypath string
 }
 
 func (payload *deploykeyCreatePayload) Validate(r *http.Request) error {
@@ -25,6 +26,7 @@ func (payload *deploykeyCreatePayload) Validate(r *http.Request) error {
 // POST request on /api/deploykeys
 func (handler *Handler) deploykeyCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload deploykeyCreatePayload
+
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
@@ -41,10 +43,19 @@ func (handler *Handler) deploykeyCreate(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
+	//Pubkey, Prikey, errrrr := handler.DigitalSignatureService.GenerateKeyPair()
+
+	//if errrrr != nil {
+	//return &httperror.HandlerError{http.StatusBadRequest, "Invalid Ssh key  payload", errrrr}
+	//}
+
+	//encodedStr := hex.EncodeToString(Pubkey)
+	//encodedStr1 := hex.EncodeToString(Prikey)
+
 	deploykey := &portainer.Deploykey{
 		Name: payload.Name,
-		/*Pubkey: payload.Pubkey,
-		Prikey: payload.Prikey,*/
+		//Publickeypath:  encodedStr,
+		//Privatekeypath: encodedStr1,
 	}
 	//deploykey.Pubkey, deploykey.Prikey, err = handler.DigitalSignatureService.GenerateKeyPair()
 	err = handler.DeploykeyService.CreateDeploykey(deploykey)

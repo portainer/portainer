@@ -33,11 +33,9 @@ angular.module('portainer.app')
     return deferred.promise;
   };
 
-  service.createDeploykey = function(name, pubKey, priKey) {
+  service.createDeploykey = function(name) {
     var payload = {
       Name: name,
-      Pubkey : pubKey,
-      Prikey : priKey,
     };
 
     return Deploykeys.create({}, payload).$promise;

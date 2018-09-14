@@ -3,7 +3,7 @@ function SshkeyViewModel(data) {
     this.Name = data.Name;
     this.Privatekeypath = data.Privatekeypath;
     this.Publickeypath = data.Publickeypath;
-    this.userName = data.userName;
-    this.lastUsage = data.lastUsage;
+    this.UserName = data.UserName;
+    this.lastUsage = data.LastUsage;
   }
   

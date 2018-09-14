@@ -61,6 +61,8 @@ info:
 host: "portainer.domain"
 basePath: "/api"
 tags:
+- name: "sshkeys"
+  description: "Manage sshkeys"  
 - name: "auth"
   description: "Authenticate against Portainer HTTP API"
 - name: "dockerhub"
@@ -2214,7 +2216,105 @@ paths:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
-
+/sshkeys:
+    get:
+      tags:
+      - "sshkeys"
+      summary: "List sshkeys"
+      description: |
+        List sshkeys.
+        **Access policy**: administrator
+      operationId: "SshkeysList"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/SshkeyListResponse"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+        404:
+          description: "Key not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"       
+    post:
+      tags:
+      - "sshkeys"
+      summary: "Create a new sshkeys"
+      description: |
+        Create a new sshkeys.
+        **Access policy**: administrator
+      operationId: "SshkeyCreate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Sshkey details"
+        required: true
+        schema:
+          $ref: "#/definitions/SshkeyCreateRequest"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Sshkey"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        409:
+          description: "Conflict"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "A sshkeys with the specified name already exists"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /sshkeys/{id}:
+    delete:
+      tags:
+      - "sshkeys"
+      summary: "Remove a sshkeys"
+      description: |
+        Remove a sshkeys.
+        **Access policy**: administrator
+      operationId: "SshkeyDelete"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Sshkey identifier"
+        required: true
+        type: "integer"
+      responses:
+        204:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
 
   /teams:
     get:
@@ -2847,7 +2947,45 @@ definitions:
       Name:
         type: "string"
         example: "abcd"
-        description: "Deploykey name"        
+        description: "Deploykey name"     
+      Publickeypath:
+        type: "string"
+        example: "abcd"
+        description: "Public Key"
+      Privatekeypath:
+        type: "string"
+        example: "abcd"
+        description: "Private Key"
+        
+  Sshkey:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        example: 1
+        description: "Sshkey identifier"
+      Name:
+        type: "string"
+        example: "abcd"
+        description: "Sshkey name"  
+      Privatekeypath:
+        type: "string"
+        example: "abc@1dd45%"
+        description: "Sshkey private key path"        
+      Publickeypath:
+        type: "string"
+        example: "abc@1dd45%"
+        description: "Sshkey public key path"
+      UserName:
+        type: "string"
+        example: "abcd"
+        description: "Sshkey user name"
+      LastUsage:
+        type: "string"
+        example: "12:03:32"
+        description: "Sshkey user name"
+
+
   Team:
     type: "object"
     properties:
@@ -3801,6 +3939,11 @@ definitions:
     items:
       $ref: "#/definitions/Deploykey"
 
+  SshkeyListResponse:
+    type: "array"
+    items:
+      $ref: "#/definitions/Sshkey"
+
   TagCreateRequest:
     type: "object"
     required:
@@ -3820,6 +3963,40 @@ definitions:
         type: "string"
         example: "abcd"
         description: "Name"
+      Publickeypath:
+        type: "string"
+        example: "abcd"
+        description: "Public Key"
+      Privatekeypath:
+        type: "string"
+        example: "abcd"
+        description: "Private Key"    
+
+  SshkeyCreateRequest:
+    type: "object"    
+    required:
+    - "Name"
+    properties:
+      Name:
+        type: "string"
+        example: "abcd"
+        description: "Sshkey name"  
+      Privatekeypath:
+        type: "string"
+        example: "abc@1dd45%"
+        description: "Sshkey private key path"        
+      Publickeypath:
+        type: "string"
+        example: "abc@1dd45%"
+        description: "Sshkey public key path"
+      UserName:
+        type: "string"
+        example: "abcd"
+        description: "Sshkey user name"
+      LastUsage:
+        type: "string"
+        example: "12:03:32"
+        description: "Sshkey user name"
 
   TeamCreateRequest:
     type: "object"

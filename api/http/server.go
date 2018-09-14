@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/portainer/docker"
 	"github.com/portainer/portainer/http/handler"
 	"github.com/portainer/portainer/http/handler/auth"
+	"github.com/portainer/portainer/http/handler/deploykeys"
 	"github.com/portainer/portainer/http/handler/dockerhub"
 	"github.com/portainer/portainer/http/handler/endpointgroups"
 	"github.com/portainer/portainer/http/handler/endpointproxy"
@@ -16,10 +17,10 @@ import (
 	"github.com/portainer/portainer/http/handler/registries"
 	"github.com/portainer/portainer/http/handler/resourcecontrols"
 	"github.com/portainer/portainer/http/handler/settings"
+	"github.com/portainer/portainer/http/handler/sshkeys"
 	"github.com/portainer/portainer/http/handler/stacks"
 	"github.com/portainer/portainer/http/handler/status"
 	"github.com/portainer/portainer/http/handler/tags"
-	"github.com/portainer/portainer/http/handler/deploykeys"
 	"github.com/portainer/portainer/http/handler/teammemberships"
 	"github.com/portainer/portainer/http/handler/teams"
 	"github.com/portainer/portainer/http/handler/templates"
@@ -36,40 +37,43 @@ import (
 
 // Server implements the portainer.Server interface
 type Server struct {
-	BindAddress            string
-	AssetsPath             string
-	AuthDisabled           bool
-	EndpointManagement     bool
-	Status                 *portainer.Status
-	ComposeStackManager    portainer.ComposeStackManager
-	CryptoService          portainer.CryptoService
-	SignatureService       portainer.DigitalSignatureService
-	JobScheduler           portainer.JobScheduler
-	Snapshotter            portainer.Snapshotter
-	DockerHubService       portainer.DockerHubService
-	EndpointService        portainer.EndpointService
-	EndpointGroupService   portainer.EndpointGroupService
-	FileService            portainer.FileService
-	GitService             portainer.GitService
-	JWTService             portainer.JWTService
-	LDAPService            portainer.LDAPService
-	RegistryService        portainer.RegistryService
-	ResourceControlService portainer.ResourceControlService
-	SettingsService        portainer.SettingsService
-	StackService           portainer.StackService
-	SwarmStackManager      portainer.SwarmStackManager
-	TagService             portainer.TagService
-	DeploykeyService       portainer.DeploykeyService
-	TeamService            portainer.TeamService
-	TeamMembershipService  portainer.TeamMembershipService
-	TemplateService        portainer.TemplateService
-	UserService            portainer.UserService
-	WebhookService         portainer.WebhookService
-	Handler                *handler.Handler
-	SSL                    bool
-	SSLCert                string
-	SSLKey                 string
-	DockerClientFactory    *docker.ClientFactory
+	BindAddress             string
+	AssetsPath              string
+	AuthDisabled            bool
+	EndpointManagement      bool
+	Status                  *portainer.Status
+	ComposeStackManager     portainer.ComposeStackManager
+	CryptoService           portainer.CryptoService
+	SignatureService        portainer.DigitalSignatureService
+	DigitalSshkeyService    portainer.DigitalSshkeyService
+	JobScheduler            portainer.JobScheduler
+	Snapshotter             portainer.Snapshotter
+	DockerHubService        portainer.DockerHubService
+	EndpointService         portainer.EndpointService
+	EndpointGroupService    portainer.EndpointGroupService
+	FileService             portainer.FileService
+	GitService              portainer.GitService
+	JWTService              portainer.JWTService
+	LDAPService             portainer.LDAPService
+	RegistryService         portainer.RegistryService
+	ResourceControlService  portainer.ResourceControlService
+	SettingsService         portainer.SettingsService
+	StackService            portainer.StackService
+	SwarmStackManager       portainer.SwarmStackManager
+	TagService              portainer.TagService
+	DeploykeyService        portainer.DeploykeyService
+	SshkeyService           portainer.SshkeyService
+	TeamService             portainer.TeamService
+	TeamMembershipService   portainer.TeamMembershipService
+	TemplateService         portainer.TemplateService
+	UserService             portainer.UserService
+	WebhookService          portainer.WebhookService
+	Handler                 *handler.Handler
+	SSL                     bool
+	SSLCert                 string
+	SSLKey                  string
+	DockerClientFactory     *docker.ClientFactory
+	DigitalSignatureService portainer.DigitalSignatureService
 }
 
 // Start starts the HTTP server
@@ -152,6 +156,11 @@ func (server *Server) Start() error {
 
 	var deploykeyHandler = deploykeys.NewHandler(requestBouncer)
 	deploykeyHandler.DeploykeyService = server.DeploykeyService
+	deploykeyHandler.DigitalSignatureService = server.DigitalSignatureService
+
+	var sshkeyHandler = sshkeys.NewHandler(requestBouncer)
+	sshkeyHandler.SshkeyService = server.SshkeyService
+	sshkeyHandler.DigitalSshkeyService = server.DigitalSshkeyService
 
 	var teamHandler = teams.NewHandler(requestBouncer)
 	teamHandler.TeamService = server.TeamService
@@ -198,6 +207,7 @@ func (server *Server) Start() error {
 		SettingsHandler:        settingsHandler,
 		StatusHandler:          statusHandler,
 		StackHandler:           stackHandler,
+		SshkeyHandler:          sshkeyHandler,
 		TagHandler:             tagHandler,
 		DeploykeyHandler:       deploykeyHandler,
 		TeamHandler:            teamHandler,

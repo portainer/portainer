@@ -10,52 +10,28 @@ function ($q,$state,$scope, SshkeyService, StackService, UserService, TeamServic
   ctrl.newsshkeydiv = false;
   ctrl.SSHRepositoryAuthentication = '1';
 
-  
-  var data = [
-    {
-      "sshId":"1",
-      "name":"Hello"
-    },
-    {
-      "sshId":"2",
-      "name":"Good"
-    },
-    {
-      "sshId":"3",
-      "name":"Best"
-    },
-    {
-      "sshId":"4",
-      "name":"Dev"
-    }
-    ];
-    
-  ctrl.categories = data;
-
-  ctrl.change = function(id){      
-    ctrl.selectsshIdvalue = id; 
+  ctrl.change = function(publickeypath){      
+    ctrl.selectsshIdvalue = publickeypath; 
+    console.log(publickeypath);
   }
-  /*ctrl.generateNewKey = function(){    
-    ctrl.newSSHkeyvalues = StackService.getStackName() + '_deploy_key';        
-    ctrl.newsshkeydiv = true;     
-  }*/
 
 
   ctrl.createNewkey = function() {
     var createKeyName = StackService.getStackName() + '_deploy_key';
-    SshkeyService.createNewsshkey(createKeyName)
-    .then(function success() {
-      alert(createKeyName);
+    var userName = Authentication.getUserDetails().username;
+    SshkeyService.createNewsshkey(createKeyName,userName)
+    .then(function success() {      
       Notifications.success('Key successfully created', createKeyName);
       $state.reload();
     })
-    .catch(function error(err) {
+    .catch(function error(err) {      
       Notifications.error('Failure', err, 'Unable to create key');
     });
   }
 
   function initComponent() {
     var userDetails = Authentication.getUserDetails();
+    console.log(userDetails);
     var isAdmin = userDetails.role === 1 ? true: false;
     ctrl.isAdmin = isAdmin;
     
@@ -64,12 +40,11 @@ function ($q,$state,$scope, SshkeyService, StackService, UserService, TeamServic
     }
     SshkeyService.sshkeys()
     .then(function success(data) {
-      $scope.sshkeys = data;
-      console.log(data);
+      ctrl.categories = data;      
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve keys');
-      $scope.sshkeys = [];
+      ctrl.categories = [];
     });
   }
 

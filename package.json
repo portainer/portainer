@@ -24,7 +24,6 @@
     "clean-all": "yarn grunt clean:all",
     "build": "yarn grunt build",
     "build-offline": "cd ./api/cmd/portainer && CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags '-s' && mv -b portainer ../../../dist/portainer-linux-amd64"
-
   },
   "engines": {
     "node": ">= 0.8.4"
@@ -60,6 +59,7 @@
     "lodash": "^4.17.10",
     "moment": "^2.21.0",
     "ng-file-upload": "~12.2.13",
+    "ngclipboard": "^2.0.0",
     "rdash-ui": "1.0.*",
     "splitargs": "github:deviantony/splitargs#~0.2.0",
     "toastr": "github:CodeSeven/toastr#~2.1.3",

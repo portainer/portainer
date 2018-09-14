@@ -1,6 +1,6 @@
 angular.module('portainer.app').component('deploykeysDatatable', {
   templateUrl: 'app/portainer/components/datatables/deploykeys-datatable/deploykeysDatatable.html',
-  controller: 'GenericDatatableController',
+  controller: 'deploykeysDatatableController',
   bindings: {
     titleText: '@',
     titleIcon: '@',

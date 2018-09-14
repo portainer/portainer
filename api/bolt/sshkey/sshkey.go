@@ -1,14 +1,14 @@
-package deploykey
+package sshkey
 
 import (
-	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/bolt/internal"
+	"github.com/boltdb/bolt"
 )
 
 const (
 	// BucketName represents the name of the bucket where this service stores data.
-	BucketName = "deploykeys"
+	BucketName = "sshkeys"
 )
 
 // Service represents a service for managing endpoint data.
@@ -29,47 +29,47 @@ func NewService(db *bolt.DB) (*Service, error) {
 }
 
 // Keys return an array containing all the keys.
-func (service *Service) Deploykeys() ([]portainer.Deploykey, error) {
-	var deploykeys = make([]portainer.Deploykey, 0)
+func (service *Service) Sshkeys() ([]portainer.Sshkey, error) {
+	var sshkeys = make([]portainer.Sshkey, 0)
 
 	err := service.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var deploykey portainer.Deploykey
-			err := internal.UnmarshalObject(v, &deploykey)
+			var sshkey portainer.Sshkey
+			err := internal.UnmarshalObject(v, &sshkey)
 			if err != nil {
 				return err
 			}
-			deploykeys = append(deploykeys, deploykey)
+			sshkeys = append(sshkeys, sshkey)
 		}
 
 		return nil
 	})
 
-	return deploykeys, err
+	return sshkeys, err
 }
 
 // CreateKey creates a new key.
-func (service *Service) CreateDeploykey(deploykey *portainer.Deploykey) error {
+func (service *Service) CreateSshkey(sshkey *portainer.Sshkey) error {
 	return service.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		id, _ := bucket.NextSequence()
-		deploykey.ID = portainer.DeploykeyID(id)
+		sshkey.ID = portainer.SshkeyID(id)
 
-		data, err := internal.MarshalObject(deploykey)
+		data, err := internal.MarshalObject(sshkey)
 		if err != nil {
 			return err
 		}
 
-		return bucket.Put(internal.Itob(int(deploykey.ID)), data)
+		return bucket.Put(internal.Itob(int(sshkey.ID)), data)
 	})
 }
 
-// DeleteDeploykey deletes a key.
-func (service *Service) DeleteDeploykey(ID portainer.DeploykeyID) error {
+// DeleteSshkey deletes a key.
+func (service *Service) DeleteSshkey(ID portainer.SshkeyID) error {
 	identifier := internal.Itob(int(ID))
 	return internal.DeleteObject(service.db, BucketName, identifier)
 }

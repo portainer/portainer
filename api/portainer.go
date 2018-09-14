@@ -335,8 +335,23 @@ type (
 
 	// Deploykey represents a key that can be associated to a resource
 	Deploykey struct {
-		ID   DeploykeyID
-		Name string `json:"Name"`
+		ID             DeploykeyID
+		Name           string `json:"Name"`
+		Publickeypath  string `json:"Publickeypath"`
+		Privatekeypath string `json:"Privatekeypath"`
+	}
+
+	// SshkeyID represents a key identifier
+	SshkeyID int
+
+	// Sshkey represents a key that can be associated to a resource
+	Sshkey struct {
+		ID             SshkeyID
+		Name           string `json:"Name"`
+		Privatekeypath string `json:"Privatekeypath"`
+		Publickeypath  string `json:"Publickeypath"`
+		UserName       string `json:"UserName"`
+		LastUsage      string `json:"LastUsage"`
 	}
 
 	// TemplateID represents a template identifier
@@ -501,6 +516,13 @@ type (
 		DeleteRegistry(ID RegistryID) error
 	}
 
+	// SshkeyService represents a service for managing key data
+	SshkeyService interface {
+		Sshkeys() ([]Sshkey, error)
+		CreateSshkey(sshkey *Sshkey) error
+		DeleteSshkey(ID SshkeyID) error
+	}
+
 	// StackService represents a service for managing stack data
 	StackService interface {
 		Stack(ID StackID) (*Stack, error)
@@ -577,6 +599,15 @@ type (
 	CryptoService interface {
 		Hash(data string) (string, error)
 		CompareHashAndData(hash string, data string) error
+	}
+
+	//DigitalSshkeyService represents a service to manage digital sshkey
+	DigitalSshkeyService interface {
+		ParseKeyPair(private, public []byte) error
+		GenerateKeyPair() ([]byte, []byte, error)
+		EncodedPublicKey() string
+		PEMHeaders() (string, string)
+		Sign(message string) (string, error)
 	}
 
 	// DigitalSignatureService represents a service to manage digital signatures

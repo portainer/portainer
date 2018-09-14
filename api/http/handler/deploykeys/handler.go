@@ -12,8 +12,8 @@ import (
 // Handler is the HTTP handler used to handle deploykey operations.
 type Handler struct {
 	*mux.Router
-	DeploykeyService portainer.DeploykeyService
-	//DigitalSignatureService portainer.DigitalSignatureService
+	DeploykeyService        portainer.DeploykeyService
+	DigitalSignatureService portainer.DigitalSignatureService
 }
 
 // NewHandler creates a handler to manage deploykey operations.

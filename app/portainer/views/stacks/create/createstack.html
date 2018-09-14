@@ -202,7 +202,10 @@
             <!-- end user and passowrd-->
         
             <!-- SSH Authentication list -->
-            <por-stackauth-control-form form-data="formValues.StachauthControlData" ng-if="formValues.RepositoryAuthentication == '2' && formValues.stackAuthenticationControlEnabled"></por-stackauth-control-form>
+            <div class="form-group">
+              <por-stackauth-control-form form-data="formValues.StachauthControlData" ng-if="formValues.RepositoryAuthentication == '2' && formValues.stackAuthenticationControlEnabled"></por-stackauth-control-form>
+            </div>
+            
                                                
             <!-- end SSH Authentication -->    
             <!-- !authorized-users -->
