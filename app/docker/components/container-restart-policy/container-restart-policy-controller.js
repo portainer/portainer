@@ -18,7 +18,7 @@ angular
 
   this.$onInit = function() {
     ctrl.state.editModel = {
-      name: ctrl.name,
+      name: ctrl.name ? ctrl.name : 'no',
       maximumRetryCount: ctrl.maximumRetryCount
     };
   };
