@@ -56,6 +56,20 @@
                 </a>
               </th>
               <th>
+                <a ng-click="$ctrl.changeOrderBy('Attachable')">
+                  Attachable
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Attachable' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Attachable' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('Internal')">
+                  Internal
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Internal' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Internal' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
                 <a ng-click="$ctrl.changeOrderBy('IPAM.Driver')">
                   IPAM Driver
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAM.Driver' && !$ctrl.state.reverseOrder"></i>
@@ -104,6 +118,8 @@
               <td>{{ item.StackName ? item.StackName : '-' }}</td>
               <td>{{ item.Scope }}</td>
               <td>{{ item.Driver }}</td>
+              <td>{{ item.Attachable }}</td>
+              <td>{{ item.Internal }}</td>
               <td>{{ item.IPAM.Driver }}</td>
               <td>{{ item.IPAM.Config[0].Subnet ? item.IPAM.Config[0].Subnet : '-' }}</td>
               <td>{{ item.IPAM.Config[0].Gateway ? item.IPAM.Config[0].Gateway : '-' }}</td>
@@ -111,7 +127,7 @@
               <td ng-if="$ctrl.showOwnershipColumn">
                 <span>
                   <i ng-class="item.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
-                  {{ item.ResourceControl.Ownership ? item.ResourceControl.Ownership : item.ResourceControl.Ownership = 'public' }}
+                  {{ item.ResourceControl.Ownership ? item.ResourceControl.Ownership : item.ResourceControl.Ownership = 'administrators' }}
                 </span>
               </td>
             </tr>

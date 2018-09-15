@@ -215,6 +215,10 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 			SnapshotInterval:                   *flags.SnapshotInterval,
 		}
 
+		if *flags.Templates != "" {
+			settings.TemplatesURL = *flags.Templates
+		}
+
 		if *flags.Labels != nil {
 			settings.BlackListedLabels = *flags.Labels
 		} else {
@@ -230,6 +234,10 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 }
 
 func initTemplates(templateService portainer.TemplateService, fileService portainer.FileService, templateURL, templateFile string) error {
+	if templateURL != "" {
+		log.Printf("Portainer started with the --templates flag. Using external templates, template management will be disabled.")
+		return nil
+	}
 
 	existingTemplates, err := templateService.Templates()
 	if err != nil {
@@ -241,32 +249,14 @@ func initTemplates(templateService portainer.TemplateService, fileService portai
 		return nil
 	}
 
-	var templatesJSON []byte
-	if templateURL == "" {
-		return loadTemplatesFromFile(fileService, templateService, templateFile)
-	}
-
-	templatesJSON, err = client.Get(templateURL)
-	if err != nil {
-		log.Println("Unable to retrieve templates via HTTP")
-		return err
-	}
-
-	return unmarshalAndPersistTemplates(templateService, templatesJSON)
-}
-
-func loadTemplatesFromFile(fileService portainer.FileService, templateService portainer.TemplateService, templateFile string) error {
 	templatesJSON, err := fileService.GetFileContent(templateFile)
 	if err != nil {
-		log.Println("Unable to retrieve template via filesystem")
+		log.Println("Unable to retrieve template definitions via filesystem")
 		return err
 	}
-	return unmarshalAndPersistTemplates(templateService, templatesJSON)
-}
 
-func unmarshalAndPersistTemplates(templateService portainer.TemplateService, templateData []byte) error {
 	var templates []portainer.Template
-	err := json.Unmarshal(templateData, &templates)
+	err = json.Unmarshal(templatesJSON, &templates)
 	if err != nil {
 		log.Println("Unable to parse templates file. Please review your template definition file.")
 		return err
@@ -278,6 +268,7 @@ func unmarshalAndPersistTemplates(templateService portainer.TemplateService, tem
 			return err
 		}
 	}
+
 	return nil
 }
 
@@ -553,6 +544,7 @@ func main() {
 		StackService:           store.StackService,
 		TagService:             store.TagService,
 		TemplateService:        store.TemplateService,
+		WebhookService:         store.WebhookService,
 		SwarmStackManager:      swarmStackManager,
 		ComposeStackManager:    composeStackManager,
 		CryptoService:          cryptoService,
@@ -566,6 +558,7 @@ func main() {
 		SSL:                    *flags.SSL,
 		SSLCert:                *flags.SSLCert,
 		SSLKey:                 *flags.SSLKey,
+		DockerClientFactory:    clientFactory,
 	}
 
 	log.Printf("Starting Portainer %s on %s", portainer.APIVersion, *flags.Addr)

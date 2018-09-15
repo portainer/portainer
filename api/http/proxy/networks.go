@@ -53,17 +53,17 @@ func networkInspectOperation(response *http.Response, executor *operationExecuto
 
 	networkID := responseObject[networkIdentifier].(string)
 	responseObject, access := applyResourceAccessControl(responseObject, networkID, executor.operationContext)
-	if !access {
-		return rewriteAccessDeniedResponse(response)
+	if access {
+		return rewriteResponse(response, responseObject, http.StatusOK)
 	}
 
 	networkLabels := extractNetworkLabelsFromNetworkInspectObject(responseObject)
 	responseObject, access = applyResourceAccessControlFromLabel(networkLabels, responseObject, networkLabelForStackIdentifier, executor.operationContext)
-	if !access {
-		return rewriteAccessDeniedResponse(response)
+	if access {
+		return rewriteResponse(response, responseObject, http.StatusOK)
 	}
 
-	return rewriteResponse(response, responseObject, http.StatusOK)
+	return rewriteAccessDeniedResponse(response)
 }
 
 // extractNetworkLabelsFromNetworkInspectObject retrieve the Labels of the network if present.
@@ -121,12 +121,13 @@ func filterNetworkList(networkData []interface{}, context *restrictedOperationCo
 
 		networkID := networkObject[networkIdentifier].(string)
 		networkObject, access := applyResourceAccessControl(networkObject, networkID, context)
-		if access {
+		if !access {
 			networkLabels := extractNetworkLabelsFromNetworkListObject(networkObject)
 			networkObject, access = applyResourceAccessControlFromLabel(networkLabels, networkObject, networkLabelForStackIdentifier, context)
-			if access {
-				filteredNetworkData = append(filteredNetworkData, networkObject)
-			}
+		}
+
+		if access {
+			filteredNetworkData = append(filteredNetworkData, networkObject)
 		}
 	}
 

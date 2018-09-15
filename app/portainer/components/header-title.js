@@ -1,11 +1,11 @@
 angular.module('portainer.app')
-.directive('rdHeaderTitle', ['Authentication', 'StateManager', function rdHeaderTitle(Authentication, StateManager) {
+.directive('rdHeaderTitle', ['Authentication', function rdHeaderTitle(Authentication) {
   var directive = {
     requires: '^rdHeader',
     scope: {
       titleText: '@'
     },
-    link: function (scope, iElement, iAttrs) {
+    link: function (scope) {
       scope.username = Authentication.getUserDetails().username;
     },
     transclude: true,

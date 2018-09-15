@@ -59,7 +59,7 @@ angular.module('portainer.app')
     box.find('.bootbox-input-checkbox').prop('checked', optionToggled);
   };
 
-  service.confirmAccessControlUpdate = function(callback, msg) {
+  service.confirmAccessControlUpdate = function(callback) {
     service.confirm({
       title: 'Are you sure ?',
       message: 'Changing the ownership of this resource will potentially restrict its management to some users.',

@@ -10,6 +10,7 @@ import (
 	"github.com/portainer/portainer/http/handler/endpointproxy"
 	"github.com/portainer/portainer/http/handler/endpoints"
 	"github.com/portainer/portainer/http/handler/file"
+	"github.com/portainer/portainer/http/handler/motd"
 	"github.com/portainer/portainer/http/handler/registries"
 	"github.com/portainer/portainer/http/handler/resourcecontrols"
 	"github.com/portainer/portainer/http/handler/settings"
@@ -21,6 +22,7 @@ import (
 	"github.com/portainer/portainer/http/handler/templates"
 	"github.com/portainer/portainer/http/handler/upload"
 	"github.com/portainer/portainer/http/handler/users"
+	"github.com/portainer/portainer/http/handler/webhooks"
 	"github.com/portainer/portainer/http/handler/websocket"
 )
 
@@ -33,6 +35,7 @@ type Handler struct {
 	EndpointHandler        *endpoints.Handler
 	EndpointProxyHandler   *endpointproxy.Handler
 	FileHandler            *file.Handler
+	MOTDHandler            *motd.Handler
 	RegistryHandler        *registries.Handler
 	ResourceControlHandler *resourcecontrols.Handler
 	SettingsHandler        *settings.Handler
@@ -45,6 +48,7 @@ type Handler struct {
 	UploadHandler          *upload.Handler
 	UserHandler            *users.Handler
 	WebSocketHandler       *websocket.Handler
+	WebhookHandler         *webhooks.Handler
 }
 
 // ServeHTTP delegates a request to the appropriate subhandler.
@@ -67,6 +71,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		default:
 			http.StripPrefix("/api", h.EndpointHandler).ServeHTTP(w, r)
 		}
+	case strings.HasPrefix(r.URL.Path, "/api/motd"):
+		http.StripPrefix("/api", h.MOTDHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/registries"):
 		http.StripPrefix("/api", h.RegistryHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/resource_controls"):
@@ -91,6 +97,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.TeamMembershipHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/websocket"):
 		http.StripPrefix("/api", h.WebSocketHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/webhooks"):
+		http.StripPrefix("/api", h.WebhookHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/"):
 		h.FileHandler.ServeHTTP(w, r)
 	}

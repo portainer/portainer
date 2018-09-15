@@ -141,7 +141,7 @@ function (PaginationService, DatatableService, EndpointProvider) {
     PaginationService.setPaginationLimit(this.tableKey, this.state.paginatedItemLimit);
   };
 
-  this.applyFilters = function(value, index, array) {
+  this.applyFilters = function(value) {
     var container = value;
     var filters = ctrl.filters;
     for (var i = 0; i < filters.state.values.length; i++) {

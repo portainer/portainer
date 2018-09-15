@@ -1,8 +1,6 @@
 angular.module('portainer.app')
 .controller('TagSelectorController', function () {
 
-  var ctrl = this;
-
   this.$onChanges = function(changes) {
     if(angular.isDefined(changes.tags.currentValue)) {
       this.tags = _.difference(changes.tags.currentValue, this.model);
@@ -14,7 +12,7 @@ angular.module('portainer.app')
     noResult: false
   };
 
-  this.selectTag = function($item, $model, $label) {
+  this.selectTag = function($item) {
     this.state.selectedValue = '';
     this.model.push($item);
     this.tags = _.remove(this.tags, function(item) {

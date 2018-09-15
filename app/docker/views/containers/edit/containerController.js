@@ -15,6 +15,8 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
     leaveNetworkInProgress: false
   };
 
+  $scope.updateRestartPolicy = updateRestartPolicy;
+
   var update = function () {
     var nodeName = $transition$.params().nodeName;
     HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
@@ -54,7 +56,7 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
 
   function executeContainerAction(id, action, successMessage, errorMessage) {
     action(id)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success(successMessage, id);
       update();
     })
@@ -102,7 +104,7 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
   $scope.renameContainer = function () {
     var container = $scope.container;
     ContainerService.renameContainer($transition$.params().id, container.newContainerName)
-    .then(function success(data) {
+    .then(function success() {
       container.Name = container.newContainerName;
       Notifications.success('Container successfully renamed', container.Name);
     })
@@ -118,7 +120,7 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
   $scope.containerLeaveNetwork = function containerLeaveNetwork(container, networkId) {
     $scope.state.leaveNetworkInProgress = true;
     NetworkService.disconnectContainer(networkId, container.Id, false)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Container left network', container.Id);
       $state.reload();
     })
@@ -133,7 +135,7 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
   $scope.containerJoinNetwork = function containerJoinNetwork(container, networkId) {
     $scope.state.joinNetworkInProgress = true;
     NetworkService.connectContainer(networkId, container.Id)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Container joined network', container.Id);
       $state.reload();
     })
@@ -149,7 +151,7 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
     var image = $scope.config.Image;
     var registry = $scope.config.Registry;
     var imageConfig = ImageHelper.createImageConfigForCommit(image, registry.URL);
-    Commit.commitContainer({id: $transition$.params().id, tag: imageConfig.tag, repo: imageConfig.repo}, function (d) {
+    Commit.commitContainer({id: $transition$.params().id, tag: imageConfig.tag, repo: imageConfig.repo}, function () {
       update();
       Notifications.success('Container commited', $transition$.params().id);
     }, function (e) {
@@ -192,40 +194,109 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
     var container = $scope.container;
     var config = ContainerHelper.configFromContainer(container.Model);
     $scope.state.recreateContainerInProgress = true;
-    ContainerService.remove(container, true)
-    .then(function success() {
-      return RegistryService.retrieveRegistryFromRepository(container.Config.Image);
-    })
-    .then(function success(data) {
-      return $q.when(!pullImage || ImageService.pullImage(container.Config.Image, data, true));
-    })
-    .then(function success() {
-      return ContainerService.createAndStartContainer(config);
-    })
-    .then(function success(data) {
-      if (!container.ResourceControl) {
-        return true;
-      } else {
-        var containerIdentifier = data.Id;
-        var resourceControl = container.ResourceControl;
-        var users = resourceControl.UserAccesses.map(function(u) {
-          return u.UserId;
-        });
-        var teams = resourceControl.TeamAccesses.map(function(t) {
-          return t.TeamId;
-        });
-        return ResourceControlService.createResourceControl(resourceControl.AdministratorsOnly,
-          users, teams, containerIdentifier, 'container', []);
+    var isRunning = container.State.Running;
+
+    return pullImageIfNeeded()
+      .then(stopContainerIfNeeded)
+      .then(renameContainer)
+      .then(setMainNetworkAndCreateContainer)
+      .then(connectContainerToOtherNetworks)
+      .then(startContainerIfNeeded)
+      .then(createResourceControlIfNeeded)
+      .then(deleteOldContainer)
+      .then(notifyAndChangeView)
+      .catch(notifyOnError);
+
+    function stopContainerIfNeeded() {
+      if (!isRunning) {
+        return $q.when();
       }
-    })
-    .then(function success(data) {
+      return ContainerService.stopContainer(container.Id);
+    }
+
+    function renameContainer() {
+      return ContainerService.renameContainer(container.Id, container.Name + '-old');
+    }
+
+    function pullImageIfNeeded() {
+      if (!pullImage) {
+        return $q.when();
+      }
+      return getRegistry().then(function pullImage(containerRegistery) {
+        return ImageService.pullImage(container.Config.Image, containerRegistery, true);
+      });
+    }
+
+    function getRegistry() {
+      return RegistryService.retrieveRegistryFromRepository(container.Config.Image);
+    }
+
+    function setMainNetworkAndCreateContainer() {
+      var networks = config.NetworkingConfig.EndpointsConfig;
+      var networksNames = Object.keys(networks);
+      if (networksNames.length > 1) {
+        config.NetworkingConfig.EndpointsConfig = {};
+        config.NetworkingConfig.EndpointsConfig[networksNames[0]] = networks[0];
+      }
+      return $q.all([ContainerService.createContainer(config), networks]);
+    }
+
+    function connectContainerToOtherNetworks(createContainerData) {
+      var newContainer = createContainerData[0];
+      var networks = createContainerData[1];
+      var networksNames = Object.keys(networks);
+      var connectionPromises = networksNames.map(function connectToNetwork(name) {
+        NetworkService.connectContainer(name, newContainer.Id);
+      });
+      return $q.all(connectionPromises)
+        .then(function onConnectToNetworkSuccess() {
+          return newContainer;
+        });
+    }
+
+    function deleteOldContainer(newContainer) {
+      return ContainerService.remove(container, true).then(
+        function onRemoveSuccess() {
+          return newContainer;
+        }
+      );
+    }
+
+    function startContainerIfNeeded(newContainer) {
+      if (!isRunning) {
+        return $q.when(newContainer);
+      }
+      return ContainerService.startContainer(newContainer.Id).then(
+        function onStartSuccess() {
+          return newContainer;
+        }
+      );
+    }
+
+    function createResourceControlIfNeeded(newContainer) {
+      if (!container.ResourceControl) {
+        return $q.when();
+      }
+      var containerIdentifier = newContainer.Id;
+      var resourceControl = container.ResourceControl;
+      var users = resourceControl.UserAccesses.map(function(u) {
+        return u.UserId;
+      });
+      var teams = resourceControl.TeamAccesses.map(function(t) {
+        return t.TeamId;
+      });
+      return ResourceControlService.createResourceControl(resourceControl.Public, users, teams, containerIdentifier, 'container', []);
+    }
+
+    function notifyAndChangeView() {
       Notifications.success('Container successfully re-created');
-      $state.go('docker.containers', {}, {reload: true});
-    })
-    .catch(function error(err) {
+      $state.go('docker.containers', {}, { reload: true });
+    }
+
+    function notifyOnError(err) {
       Notifications.error('Failure', err, 'Unable to re-create container');
       $scope.state.recreateContainerInProgress = false;
-    });
+    }
   }
 
   $scope.recreate = function() {
@@ -238,6 +309,28 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
       recreateContainer(pullImage);
     });
   };
+
+  function updateRestartPolicy(restartPolicy, maximumRetryCount) {
+    maximumRetryCount = restartPolicy === 'on-failure' ? maximumRetryCount : undefined;
+
+    return ContainerService
+      .updateRestartPolicy($scope.container.Id, restartPolicy, maximumRetryCount)
+      .then(onUpdateSuccess)
+      .catch(notifyOnError);
+
+    function onUpdateSuccess() {
+      $scope.container.HostConfig.RestartPolicy = {
+        Name: restartPolicy,
+        MaximumRetryCount: maximumRetryCount
+      };
+      Notifications.success('Restart policy updated');
+    }
+
+    function notifyOnError(err) {
+      Notifications.error('Failure', err, 'Unable to update restart policy');
+      return $q.reject(err);
+    }
+  }
 
   var provider = $scope.applicationState.endpoint.mode.provider;
   var apiVersion = $scope.applicationState.endpoint.apiVersion;

@@ -1,0 +1,26 @@
+<div>
+  <table class="table table-bordered table-condensed">
+    <tr>
+      <td class="col-md-3">
+        <span>Name</span>
+      </td>
+      <td>
+        <select class="form-control" ng-model="$ctrl.state.editModel.name">
+          <option value="no">None</option>
+          <option value="on-failure">On Failure</option>
+          <option value="always">Always</option>
+          <option value="unless-stopped">Unless Stopped</option>
+        </select>
+      </td>
+      <td class="col-md-2">
+        <button class="btn btn-sm btn-primary" ng-click="$ctrl.save()">Update</button>
+      </td>
+    </tr>
+    <tr ng-if="$ctrl.state.editModel.name === 'on-failure'">
+      <td class="col-md-3">Maximum Retry Count</td>
+      <td colspan="2">
+        <input type="number" class="form-control" ng-model="$ctrl.state.editModel.maximumRetryCount" />
+      </td>
+    </tr>
+  </table>
+</div>

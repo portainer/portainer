@@ -52,7 +52,7 @@ function ($scope, $state, $transition$, LabelHelper, Node, NodeHelper, Task, Not
     config.Role = node.Role;
     config.Labels = LabelHelper.fromKeyValueToLabelHash(node.Labels);
 
-    Node.update({ id: node.Id, version: node.Version }, config, function (data) {
+    Node.update({ id: node.Id, version: node.Version }, config, function () {
       Notifications.success('Node successfully updated', 'Node updated');
       $state.go('docker.nodes.node', {id: node.Id}, {reload: true});
     }, function (e) {

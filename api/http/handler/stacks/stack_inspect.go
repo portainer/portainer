@@ -3,11 +3,11 @@ package stacks
 import (
 	"net/http"
 
+	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/request"
+	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer"
-	httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/proxy"
-	"github.com/portainer/portainer/http/request"
-	"github.com/portainer/portainer/http/response"
 	"github.com/portainer/portainer/http/security"
 )
 
@@ -36,6 +36,10 @@ func (handler *Handler) stackInspect(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	extendedStack := proxy.ExtendedStack{*stack, portainer.ResourceControl{}}
+	if !securityContext.IsAdmin && resourceControl == nil {
+		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
+	}
+
 	if resourceControl != nil {
 		if securityContext.IsAdmin || proxy.CanAccessStack(stack, resourceControl, securityContext.UserID, securityContext.UserMemberships) {
 			extendedStack.ResourceControl = *resourceControl

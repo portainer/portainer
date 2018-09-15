@@ -2,7 +2,7 @@
   "author": "Portainer.io",
   "name": "portainer",
   "homepage": "http://portainer.io",
-  "version": "1.19.1",
+  "version": "1.19.2",
   "repository": {
     "type": "git",
     "url": "git@github.com:portainer/portainer.git"
@@ -19,6 +19,13 @@
       "url": "https://raw.githubusercontent.com/portainer/portainer/develop/LICENSE"
     }
   ],
+  "scripts": {
+    "dev": "yarn grunt run-dev",
+    "clean-all": "yarn grunt clean:all",
+    "build": "yarn grunt build",
+    "build-offline": "cd ./api/cmd/portainer && CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags '-s' && mv -b portainer ../../../dist/portainer-linux-amd64"
+
+  },
   "engines": {
     "node": ">= 0.8.4"
   },
@@ -50,7 +57,7 @@
     "isteven-angular-multiselect": "~4.0.0",
     "jquery": "^3.3.1",
     "js-yaml": "~3.10.0",
-    "lodash": "4.12.0",
+    "lodash": "^4.17.10",
     "moment": "^2.21.0",
     "ng-file-upload": "~12.2.13",
     "rdash-ui": "1.0.*",

@@ -3,8 +3,8 @@ package registries
 import (
 	"net/http"
 
-	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/response"
+	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/http/security"
 )
 
@@ -22,8 +22,9 @@ func (handler *Handler) registryList(w http.ResponseWriter, r *http.Request) *ht
 
 	filteredRegistries := security.FilterRegistries(registries, securityContext)
 
-	for _, registry := range filteredRegistries {
-		hideFields(&registry)
+	for idx := range filteredRegistries {
+		hideFields(&filteredRegistries[idx])
 	}
-	return response.JSON(w, registries)
+
+	return response.JSON(w, filteredRegistries)
 }

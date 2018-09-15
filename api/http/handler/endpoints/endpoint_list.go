@@ -3,8 +3,8 @@ package endpoints
 import (
 	"net/http"
 
-	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/response"
+	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/http/security"
 )
 
@@ -27,8 +27,9 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 
 	filteredEndpoints := security.FilterEndpoints(endpoints, endpointGroups, securityContext)
 
-	for _, endpoint := range filteredEndpoints {
-		hideFields(&endpoint)
+	for idx := range filteredEndpoints {
+		hideFields(&filteredEndpoints[idx])
 	}
+
 	return response.JSON(w, filteredEndpoints)
 }

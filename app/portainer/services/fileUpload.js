@@ -21,7 +21,7 @@ angular.module('portainer.app')
         dockerfile: path
       },
       ignoreLoadingBar: true,
-      transformResponse: function(data, headers) {
+      transformResponse: function(data) {
         return jsonObjectsToArrayHandler(data);
       }
     });

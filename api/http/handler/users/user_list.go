@@ -3,8 +3,8 @@ package users
 import (
 	"net/http"
 
-	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/response"
+	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/http/security"
 )
 
@@ -22,8 +22,9 @@ func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httper
 
 	filteredUsers := security.FilterUsers(users, securityContext)
 
-	for _, user := range filteredUsers {
-		hideFields(&user)
+	for idx := range filteredUsers {
+		hideFields(&filteredUsers[idx])
 	}
+
 	return response.JSON(w, filteredUsers)
 }

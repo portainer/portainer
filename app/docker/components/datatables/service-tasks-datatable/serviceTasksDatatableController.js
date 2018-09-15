@@ -15,7 +15,7 @@ function (DatatableService) {
     }
   };
 
-  this.applyFilters = function(item, index, array) {
+  this.applyFilters = function(item) {
     var filters = ctrl.filters;
     for (var i = 0; i < filters.state.values.length; i++) {
       var filter = filters.state.values[i];
