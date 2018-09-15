@@ -20,6 +20,7 @@
     }
   ],
   "scripts": {
+    "grunt": "grunt",
     "dev": "yarn grunt run-dev",
     "clean-all": "yarn grunt clean:all",
     "build": "yarn grunt build",
