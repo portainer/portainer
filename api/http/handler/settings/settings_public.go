@@ -3,9 +3,9 @@ package settings
 import (
 	"net/http"
 
+	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer"
-	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/response"
 )
 
 type publicSettingsResponse struct {
@@ -13,6 +13,7 @@ type publicSettingsResponse struct {
 	AuthenticationMethod               portainer.AuthenticationMethod `json:"AuthenticationMethod"`
 	AllowBindMountsForRegularUsers     bool                           `json:"AllowBindMountsForRegularUsers"`
 	AllowPrivilegedModeForRegularUsers bool                           `json:"AllowPrivilegedModeForRegularUsers"`
+	ExternalTemplates                  bool                           `json:"ExternalTemplates"`
 }
 
 // GET request on /api/settings/public
@@ -27,6 +28,11 @@ func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *
 		AuthenticationMethod:               settings.AuthenticationMethod,
 		AllowBindMountsForRegularUsers:     settings.AllowBindMountsForRegularUsers,
 		AllowPrivilegedModeForRegularUsers: settings.AllowPrivilegedModeForRegularUsers,
+		ExternalTemplates:                  false,
+	}
+
+	if settings.TemplatesURL != "" {
+		publicSettings.ExternalTemplates = true
 	}
 
 	return response.JSON(w, publicSettings)

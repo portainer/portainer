@@ -9,30 +9,22 @@
   </div>
 </div>
 
-<div class="row" ng-if="!applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
-  <div class="col-sm-12">
-    <rd-widget>
-      <rd-widget-body>
-        <div class="col-sm-12 form-section-title">
-          Information
-        </div>
-        <div class="form-group">
-          <span class="small">
-            <p class="text-muted" ng-if="applicationState.endpoint.mode.role === 'MANAGER'">
-              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-              Portainer is connected to a node that is part of a Swarm cluster. Some resources located on other nodes in the cluster might not be available for management, have a look
-              at <a href="http://portainer.readthedocs.io/en/stable/agent.html" target="_blank">our agent setup</a> for more details.
-            </p>
-            <p class="text-muted" ng-if="applicationState.endpoint.mode.role === 'WORKER'">
-              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-              Portainer is connected to a worker node. Swarm management features will not be available.
-            </p>
-          </span>
-        </div>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-</div>
+<information-panel
+  ng-if="!applicationState.UI.dismissedInfoPanels['docker-dashboard-info-01'] && !applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'"
+  title-text="Information"
+  dismiss-action="dismissInformationPanel('docker-dashboard-info-01')">
+  <span class="small">
+    <p class="text-muted" ng-if="applicationState.endpoint.mode.role === 'MANAGER'">
+      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+      Portainer is connected to a node that is part of a Swarm cluster. Some resources located on other nodes in the cluster might not be available for management, have a look
+      at <a href="http://portainer.readthedocs.io/en/stable/agent.html" target="_blank">our agent setup</a> for more details.
+    </p>
+    <p class="text-muted" ng-if="applicationState.endpoint.mode.role === 'WORKER'">
+      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+      Portainer is connected to a worker node. Swarm management features will not be available.
+    </p>
+  </span>
+</information-panel>
 
 <div class="row" ng-if="(!applicationState.endpoint.mode.agentProxy || applicationState.endpoint.mode.provider !== 'DOCKER_SWARM_MODE') && info && endpoint">
   <div class="col-sm-12">
@@ -45,7 +37,10 @@
               <td>Endpoint</td>
               <td>
                 {{ endpoint.Name }}
-                <span class="small text-muted space-left"><i class="fa fa-microchip"></i> {{ info.NCPU }}<i class="fa fa-memory space-left"></i> {{ info.MemTotal | humansize }}</span>
+                <span class="small text-muted space-left">
+                    <i class="fa fa-microchip"></i> {{ endpoint.Snapshots[0].TotalCPU }}
+                    <i class="fa fa-memory space-left"></i> {{ endpoint.Snapshots[0].TotalMemory | humansize }}
+                </span>
                 <span class="small text-muted"> - {{ info.Swarm && info.Swarm.NodeID !== '' ? 'Swarm' : 'Standalone' }} {{ info.ServerVersion }} <span ng-if="endpoint.Type === 2">+ <i class="fa fa-bolt" aria-hidden="true"></i>  Agent</span></span>
               </td>
             </tr>
@@ -115,8 +110,8 @@
             <i class="fa fa-server"></i>
           </div>
           <div class="pull-right">
-            <div><i class="fa fa-heartbeat space-right green-icon"></i>{{ containers | containerswithstatus:'running' }} running</div>
-            <div><i class="fa fa-heartbeat space-right red-icon"></i>{{ containers | containerswithstatus:'stopped' }} stopped</div>
+            <div><i class="fa fa-heartbeat space-right green-icon"></i>{{ containers | runningcontainers }} running</div>
+            <div><i class="fa fa-heartbeat space-right red-icon"></i>{{ containers | stoppedcontainers }} stopped</div>
           </div>
           <div class="title">{{ containers.length }}</div>
           <div class="comment">Containers</div>

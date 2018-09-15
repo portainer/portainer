@@ -12,7 +12,7 @@ function ($q, $state, UserService, TeamService, ResourceControlService, Notifica
   };
 
   ctrl.formValues = {
-    Ownership: 'public',
+    Ownership: 'administrators',
     Ownership_Users: [],
     Ownership_Teams: []
   };
@@ -22,7 +22,7 @@ function ($q, $state, UserService, TeamService, ResourceControlService, Notifica
   ctrl.authorizedTeams = [];
   ctrl.availableTeams = [];
 
-  ctrl.confirmUpdateOwnership = function (force) {
+  ctrl.confirmUpdateOwnership = function () {
     if (!validateForm()) {
       return;
     }
@@ -51,7 +51,7 @@ function ($q, $state, UserService, TeamService, ResourceControlService, Notifica
     return true;
   }
 
-  function processOwnershipFormValues() {
+  function processOwnershipFormValues() {    
     var userIds = [];
     angular.forEach(ctrl.formValues.Ownership_Users, function(user) {
       userIds.push(user.Id);
@@ -60,13 +60,14 @@ function ($q, $state, UserService, TeamService, ResourceControlService, Notifica
     angular.forEach(ctrl.formValues.Ownership_Teams, function(team) {
       teamIds.push(team.Id);
     });
-    var administratorsOnly = ctrl.formValues.Ownership === 'administrators' ? true : false;
+
+    var publicOnly = ctrl.formValues.Ownership === 'public' ? true : false;
 
     return {
       ownership: ctrl.formValues.Ownership,
-      authorizedUserIds: administratorsOnly ? [] : userIds,
-      authorizedTeamIds: administratorsOnly ? [] : teamIds,
-      administratorsOnly: administratorsOnly
+      authorizedUserIds: publicOnly ? [] : userIds,
+      authorizedTeamIds: publicOnly ? [] : teamIds,
+      publicOnly: publicOnly
     };
   }
 
@@ -76,7 +77,7 @@ function ($q, $state, UserService, TeamService, ResourceControlService, Notifica
 
     ResourceControlService.applyResourceControlChange(ctrl.resourceType, resourceId,
       ctrl.resourceControl, ownershipParameters)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Access control successfully updated');
       $state.reload();
     })
@@ -96,11 +97,12 @@ function ($q, $state, UserService, TeamService, ResourceControlService, Notifica
       if (resourceControl) {
         ctrl.formValues.Ownership = resourceControl.Ownership === 'private' ? 'restricted' : resourceControl.Ownership;
       } else {
-        ctrl.formValues.Ownership = 'public';
+        ctrl.formValues.Ownership = 'administrators';
       }
     } else {
-      ctrl.formValues.Ownership = 'public';
+      ctrl.formValues.Ownership = 'administrators';
     }
+
 
     ResourceControlService.retrieveOwnershipDetails(resourceControl)
     .then(function success(data) {

@@ -9,7 +9,20 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
     loading: true,
     application: {},
     endpoint: {},
-    UI: {}
+    UI: {
+      dismissedInfoPanels: {},
+      dismissedInfoHash: ''
+    }
+  };
+
+  manager.dismissInformationPanel = function(id) {
+    state.UI.dismissedInfoPanels[id] = true;
+    LocalStorage.storeUIState(state.UI);
+  };
+
+  manager.dismissImportantInformation = function(hash) {
+    state.UI.dismissedInfoHash = hash;
+    LocalStorage.storeUIState(state.UI);
   };
 
   manager.getState = function() {
@@ -68,6 +81,11 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
   manager.initialize = function () {
     var deferred = $q.defer();
 
+    var UIState = LocalStorage.getUIState();
+    if (UIState) {
+      state.UI = UIState;
+    }
+
     var endpointState = LocalStorage.getEndpointState();
     if (endpointState) {
       state.endpoint = endpointState;
@@ -79,7 +97,7 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
       var cacheValidity = now - applicationState.validity;
       if (cacheValidity > APPLICATION_CACHE_VALIDITY) {
         loadApplicationState()
-        .then(function success(data) {
+        .then(function success() {
           deferred.resolve(state);
         })
         .catch(function error(err) {
@@ -92,7 +110,7 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
       }
     } else {
       loadApplicationState()
-      .then(function success(data) {
+      .then(function success() {
         deferred.resolve(state);
       })
       .catch(function error(err) {

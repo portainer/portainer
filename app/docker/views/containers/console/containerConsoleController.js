@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ContainerConsoleController', ['$scope', '$transition$', 'ContainerService', 'ImageService', 'EndpointProvider', 'Notifications', 'ContainerHelper', 'ExecService', 'HttpRequestHelper', 'LocalStorage',
-function ($scope, $transition$, ContainerService, ImageService, EndpointProvider, Notifications, ContainerHelper, ExecService, HttpRequestHelper, LocalStorage) {
+.controller('ContainerConsoleController', ['$scope', '$transition$', 'ContainerService', 'ImageService', 'EndpointProvider', 'Notifications', 'ContainerHelper', 'ExecService', 'HttpRequestHelper', 'LocalStorage', 'CONSOLE_COMMANDS_LABEL_PREFIX',
+function ($scope, $transition$, ContainerService, ImageService, EndpointProvider, Notifications, ContainerHelper, ExecService, HttpRequestHelper, LocalStorage, CONSOLE_COMMANDS_LABEL_PREFIX) {
   var socket, term;
 
   $scope.state = {
@@ -9,9 +9,10 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
   };
 
   $scope.formValues = {};
+  $scope.containerCommands = [];
 
   // Ensure the socket is closed before leaving the view
-  $scope.$on('$stateChangeStart', function (event, next, current) {
+  $scope.$on('$stateChangeStart', function () {
     if (socket && socket !== null) {
       socket.close();
     }
@@ -68,7 +69,7 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
     socket = new WebSocket(url);
 
     $scope.state.connected = true;
-    socket.onopen = function(evt) {
+    socket.onopen = function() {
       term = new Terminal();
 
       term.on('data', function (data) {
@@ -87,10 +88,10 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
       socket.onmessage = function (e) {
         term.write(e.data);
       };
-      socket.onerror = function (error) {
+      socket.onerror = function () {
         $scope.state.connected = false;
       };
-      socket.onclose = function(evt) {
+      socket.onclose = function() {
         $scope.state.connected = false;
       };
     };
@@ -106,8 +107,16 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
     })
     .then(function success(data) {
       var image = data;
+      var containerLabels = $scope.container.Config.Labels;
       $scope.imageOS = image.Os;
       $scope.formValues.command = image.Os === 'windows' ? 'powershell' : 'bash';
+      $scope.containerCommands = Object.keys(containerLabels)
+        .filter(function(label) {
+          return label.indexOf(CONSOLE_COMMANDS_LABEL_PREFIX) === 0;
+        })
+        .map(function(label) {
+          return {title: label.replace(CONSOLE_COMMANDS_LABEL_PREFIX, ''), command: containerLabels[label]};
+        });
       $scope.state.loaded = true;
     })
     .catch(function error(err) {

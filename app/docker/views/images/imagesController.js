@@ -21,7 +21,7 @@ function ($scope, $state, ImageService, Notifications, ModalService, HttpRequest
 
     $scope.state.actionInProgress = true;
     ImageService.pullImage(image, registry, false)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Image successfully pulled', image);
       $state.reload();
     })

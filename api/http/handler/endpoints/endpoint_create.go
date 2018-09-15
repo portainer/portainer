@@ -6,12 +6,12 @@ import (
 	"runtime"
 	"strconv"
 
+	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/request"
+	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/crypto"
 	"github.com/portainer/portainer/http/client"
-	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/request"
-	"github.com/portainer/portainer/http/response"
 )
 
 type endpointCreatePayload struct {
@@ -35,7 +35,7 @@ type endpointCreatePayload struct {
 func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 	name, err := request.RetrieveMultiPartFormValue(r, "Name", false)
 	if err != nil {
-		return portainer.Error("Invalid stack name")
+		return portainer.Error("Invalid endpoint name")
 	}
 	payload.Name = name
 
@@ -71,7 +71,7 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 		payload.TLSSkipClientVerify = skipTLSClientVerification
 
 		if !payload.TLSSkipVerify {
-			caCert, err := request.RetrieveMultiPartFormFile(r, "TLSCACertFile")
+			caCert, _, err := request.RetrieveMultiPartFormFile(r, "TLSCACertFile")
 			if err != nil {
 				return portainer.Error("Invalid CA certificate file. Ensure that the file is uploaded correctly")
 			}
@@ -79,13 +79,13 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 		}
 
 		if !payload.TLSSkipClientVerify {
-			cert, err := request.RetrieveMultiPartFormFile(r, "TLSCertFile")
+			cert, _, err := request.RetrieveMultiPartFormFile(r, "TLSCertFile")
 			if err != nil {
 				return portainer.Error("Invalid certificate file. Ensure that the file is uploaded correctly")
 			}
 			payload.TLSCertFile = cert
 
-			key, err := request.RetrieveMultiPartFormFile(r, "TLSKeyFile")
+			key, _, err := request.RetrieveMultiPartFormFile(r, "TLSKeyFile")
 			if err != nil {
 				return portainer.Error("Invalid key file. Ensure that the file is uploaded correctly")
 			}
@@ -174,7 +174,7 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 	endpoint := &portainer.Endpoint{
 		ID:               portainer.EndpointID(endpointID),
 		Name:             payload.Name,
-		URL:              payload.URL,
+		URL:              "https://management.azure.com",
 		Type:             portainer.AzureEnvironment,
 		GroupID:          portainer.EndpointGroupID(payload.GroupID),
 		PublicURL:        payload.PublicURL,

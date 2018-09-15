@@ -1,6 +1,6 @@
-angular.module('portainer.docker')
-.controller('CreateServiceController', ['$q', '$scope', '$state', '$timeout', 'Service', 'ServiceHelper', 'ConfigService', 'ConfigHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'LabelHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'FormValidator', 'PluginService', 'RegistryService', 'HttpRequestHelper', 'NodeService', 'SettingsService',
-function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, ConfigHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, LabelHelper, Authentication, ResourceControlService, Notifications, FormValidator, PluginService, RegistryService, HttpRequestHelper, NodeService, SettingsService) {
+ angular.module('portainer.docker')
+.controller('CreateServiceController', ['$q', '$scope', '$state', '$timeout', 'Service', 'ServiceHelper', 'ConfigService', 'ConfigHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'LabelHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'FormValidator', 'PluginService', 'RegistryService', 'HttpRequestHelper', 'NodeService', 'SettingsService', 'WebhookService','EndpointProvider',
+function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, ConfigHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, LabelHelper, Authentication, ResourceControlService, Notifications, FormValidator, PluginService, RegistryService, HttpRequestHelper, NodeService, SettingsService, WebhookService,EndpointProvider) {
 
   $scope.formValues = {
     Name: '',
@@ -40,7 +40,8 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     RestartMaxAttempts: 0,
     RestartWindow: '0s',
     LogDriverName: '',
-    LogDriverOpts: []
+    LogDriverOpts: [],
+    Webhook: false
   };
 
   $scope.state = {
@@ -142,7 +143,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     $scope.formValues.ContainerLabels.splice(index, 1);
   };
 
-  $scope.addLogDriverOpt = function(value) {
+  $scope.addLogDriverOpt = function() {
     $scope.formValues.LogDriverOpts.push({ name: '', value: ''});
   };
 
@@ -422,9 +423,14 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     var registry = $scope.formValues.Registry;
     var authenticationDetails = registry.Authentication ? RegistryService.encodedCredentials(registry) : '';
     HttpRequestHelper.setRegistryAuthenticationHeader(authenticationDetails);
+
+    var serviceIdentifier;
     Service.create(config).$promise
     .then(function success(data) {
-      var serviceIdentifier = data.ID;
+      serviceIdentifier = data.ID;
+      return $q.when($scope.formValues.Webhook && WebhookService.createServiceWebhook(serviceIdentifier, EndpointProvider.endpointID()));
+    })
+    .then(function success() {
       var userId = Authentication.getUserDetails().ID;
       return ResourceControlService.applyResourceControl('service', serviceIdentifier, userId, accessControlData, []);
     })
@@ -492,7 +498,6 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
 
   function initView() {
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
-    var provider = $scope.applicationState.endpoint.mode.provider;
 
     $q.all({
       volumes: VolumeService.volumes(),

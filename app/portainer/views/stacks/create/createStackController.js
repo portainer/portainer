@@ -114,7 +114,7 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
     }
     $scope.state.actionInProgress = true;
     action(name, method)
-    .then(function success(data) {
+    .then(function success() {
       return ResourceControlService.applyResourceControl('stack', name, userId, accessControlData, []);
     })
     .then(function success() {

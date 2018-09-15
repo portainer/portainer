@@ -5,8 +5,8 @@ import (
 	"sync"
 
 	"github.com/gorilla/mux"
+	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer"
-	httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/security"
 )
 

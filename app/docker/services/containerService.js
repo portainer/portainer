@@ -63,6 +63,14 @@ function ContainerServiceFactory($q, Container, ResourceControlService, LogHelpe
     return Container.rename({id: id, name: newContainerName }, {}).$promise;
   };
 
+  service.updateRestartPolicy = updateRestartPolicy;
+
+  function updateRestartPolicy(id, restartPolicy, maximumRetryCounts) {
+    return Container.update({ id: id },
+      { RestartPolicy: { Name: restartPolicy, MaximumRetryCount: maximumRetryCounts } }
+    ).$promise;
+  }
+
   service.createContainer = function(configuration) {
     var deferred = $q.defer();
     Container.create(configuration).$promise

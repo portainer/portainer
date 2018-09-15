@@ -4,11 +4,11 @@ import (
 	"net/http"
 	"strconv"
 
+	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/request"
+	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer"
-	httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/proxy"
-	"github.com/portainer/portainer/http/request"
-	"github.com/portainer/portainer/http/response"
 	"github.com/portainer/portainer/http/security"
 )
 
@@ -48,8 +48,8 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
 
-	if resourceControl != nil {
-		if !securityContext.IsAdmin && !proxy.CanAccessStack(stack, resourceControl, securityContext.UserID, securityContext.UserMemberships) {
+	if !securityContext.IsAdmin {
+		if !proxy.CanAccessStack(stack, resourceControl, securityContext.UserID, securityContext.UserMemberships) {
 			return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
 		}
 	}

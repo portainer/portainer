@@ -4,7 +4,7 @@ function ($scope, $transition$, $state, SecretService, Notifications) {
 
   $scope.removeSecret = function removeSecret(secretId) {
     SecretService.remove(secretId)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Secret successfully removed');
       $state.go('docker.secrets', {});
     })

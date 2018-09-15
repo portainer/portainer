@@ -45,7 +45,7 @@ function ($q, $scope, $state, $transition$, $filter, EndpointService, GroupServi
 
     $scope.state.actionInProgress = true;
     EndpointService.updateEndpoint(endpoint.Id, payload)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Endpoint updated', $scope.endpoint.Name);
       EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
       $state.go('portainer.endpoints', {}, {reload: true});

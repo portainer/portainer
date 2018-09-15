@@ -22,6 +22,7 @@ func (snapshotter *Snapshotter) CreateSnapshot(endpoint *portainer.Endpoint) (*p
 	if err != nil {
 		return nil, err
 	}
+	defer cli.Close()
 
 	return snapshot(cli)
 }
