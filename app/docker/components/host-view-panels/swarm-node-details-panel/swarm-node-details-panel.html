@@ -16,15 +16,15 @@
             <tr>
               <td>Availability</td>
               <td>
-                <node-availability-select 
-                  on-save="$ctrl.updateNodeAvailability(availability)"
-                  availability="$ctrl.details.availability"
-                  original-value="$ctrl.details.availability"></node-availability-select>
+                <node-availability-select on-save="$ctrl.updateNodeAvailability(availability)"
+                  availability="$ctrl.details.availability" original-value="$ctrl.details.availability">
+                </node-availability-select>
               </td>
             </tr>
             <tr>
               <td>Status</td>
-              <td><span class="label label-{{ $ctrl.details.status | nodestatusbadge }}">{{ $ctrl.details.status }}</span></td>
+              <td><span class="label label-{{ $ctrl.details.status | nodestatusbadge }}">{{
+                  $ctrl.details.status }}</span></td>
             </tr>
             <tr ng-if=" $ctrl.details.engineLabels.length">
               <td>Engine Labels</td>
@@ -39,14 +39,36 @@
                 </div>
                 Node Labels
               </td>
-              <td>
-                <node-labels-table 
-                  labels="$ctrl.details.nodeLabels"
+              <td></td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <node-labels-table labels="$ctrl.details.nodeLabels"
                   on-changed-labels="$ctrl.updateNodeLabels(labels)"></node-labels-table>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="btn-toolbar" role="toolbar">
+                  <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-primary btn-sm"
+                      ng-disabled="!$ctrl.state.hasChanges" ng-click="$ctrl.saveChanges()">
+                      Apply changes
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm dropdown-toggle"
+                      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li><a ng-click="$ctrl.cancelChanges()">Reset changes</a></li>
+                    </ul>
+                  </div>
+                </div>
               </td>
             </tr>
           </tbody>
         </table>
+
       </rd-widget-body>
     </rd-widget>
   </div>

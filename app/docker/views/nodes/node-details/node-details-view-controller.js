@@ -1,12 +1,9 @@
 angular.module('portainer.docker').controller('NodeDetailsViewController', [
-  '$stateParams', 'NodeService', 'LabelHelper', 'Notifications', '$state', 'StateManager', 'AgentService',
-  function NodeDetailsViewController($stateParams, NodeService, LabelHelper, Notifications, $state, StateManager, AgentService) {
+  '$stateParams', 'NodeService', 'StateManager', 'AgentService',
+  function NodeDetailsViewController($stateParams, NodeService, StateManager, AgentService) {
     var ctrl = this;
-    var originalNode;
 
     ctrl.$onInit = initView;
-    ctrl.updateLabels = updateLabels;
-    ctrl.updateAvailability = updateAvailability;
 
     ctrl.state = {
       isAgent: false
@@ -18,7 +15,7 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
 
       var nodeId = $stateParams.id;
       NodeService.node(nodeId).then(function(node) {
-        originalNode = node;
+        ctrl.originalNode = node;
         ctrl.hostDetails = buildHostDetails(node);
         ctrl.engineDetails = buildEngineDetails(node);
         ctrl.nodeDetails = buildNodeDetails(node);
@@ -76,39 +73,9 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
       };
     }
 
-    function updateLabels(labels) {
-      originalNode.Labels = labels;
-      updateNode(originalNode);
-    }
+    
 
-    function updateAvailability(availability) {
-      originalNode.Availability = availability;
-      updateNode(originalNode);
-    }
-
-    function updateNode(node) {
-      var config = {
-        Name: node.Name,
-        Availability: node.Availability,
-        Role: node.Role,
-        Labels: LabelHelper.fromKeyValueToLabelHash(node.Labels),
-        Id: node.Id,
-        Version: node.Version
-      };
-
-      NodeService.updateNode(config)
-        .then(onUpdateSuccess)
-        .catch(notifyOnError);
-
-      function onUpdateSuccess() {
-        Notifications.success('Node successfully updated', 'Node updated');
-        $state.go('docker.nodes.node', { id: node.Id }, { reload: true });
-      }
-
-      function notifyOnError(error) {
-        Notifications.error('Failure', error, 'Failed to update node');
-      }
-    }
+   
 
     function transformPlugins(pluginsList, type) {
       return pluginsList

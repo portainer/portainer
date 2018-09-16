@@ -3,14 +3,11 @@ angular.module('portainer.docker').controller('NodeLabelsTableController', [
     var ctrl = this;
     ctrl.removeLabel = removeLabel;
     ctrl.updateLabel = updateLabel;
-    ctrl.save = save;
-    ctrl.hasChanges = false;
-    ctrl.cancelChanges = cancelChanges;
 
     function removeLabel(index) {
       var label = ctrl.labels.splice(index, 1);
       if (label !== null) {
-        ctrl.hasChanges = true;
+      ctrl.onChangedLabels({ labels: ctrl.labels });
       }
     }
 
@@ -19,13 +16,11 @@ angular.module('portainer.docker').controller('NodeLabelsTableController', [
         label.value !== label.originalValue ||
         label.key !== label.originalKey
       ) {
-        ctrl.hasChanges = true;
+        ctrl.onChangedLabels({ labels: ctrl.labels });
       }
     }
 
-    function save() {
-      ctrl.onChangedLabels({ labels: ctrl.labels });
-    }
+   
 
     function cancelChanges() {
       ctrl.labels = ctrl.labels
