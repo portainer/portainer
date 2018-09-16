@@ -67,14 +67,18 @@
                       <span ng-hide="state.migrationInProgress"><i class="fa fa-long-arrow-alt-right space-right" aria-hidden="true"></i> Migrate</span>
                       <span ng-show="state.migrationInProgress">Migration in progress...</span>
                     </button>
-                    <button class="btn btn-sm btn-primary" ng-click="duplicateStack()" ng-disabled="!formValues.Endpoint || state.migrationInProgress" style="margin-top: 7px; margin-left: 0;" button-spinner="state.duplicationInProgress">
-                      <span ng-hide="state.duplicationInProgress"><i class="fa fa-long-arrow-alt-right space-right" aria-hidden="true"></i> Duplicate</span>
-                      <span ng-show="state.duplicationInProgress">Duplication in progress...</span>
-                    </button>
                   </div>
                 </div>
               </div>
               <!-- !stack-migration -->
+              <stack-duplication 
+                ng-if="!state.externalStack && endpoints.length > 0"
+                stack="stack"
+                endpoints="endpoints"
+                groups="groups"
+                on-duplicate="duplicateStack(name, endpointId, stack)"
+                >
+              </stack-duplication>
             </div>
           </uib-tab>
           <!-- !tab-info -->

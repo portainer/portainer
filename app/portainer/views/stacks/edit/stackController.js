@@ -268,18 +268,17 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
     }
   }
 
-  function duplicateStack() {
-    var stack = $scope.stack;
-    var targetEndpointId = $scope.formValues.Endpoint.Id;
+  function duplicateStack(name, endpointId, stack) {
 
     $scope.state.duplicationInProgress = true;
 
-    StackService.duplicateStack(targetEndpointId, stack)
+    StackService.duplicateStack(name, endpointId, stack)
       .then(onDuplicationSuccess)
       .catch(notifyOnError);
 
     function onDuplicationSuccess() {
       Notifications.success('Stack successfully duplicated');
+      EndpointProvider.setEndpointID(endpointId);
       $state.go('portainer.stacks', {}, { reload: true });
     }
 
