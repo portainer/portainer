@@ -26,7 +26,7 @@
               <td>Status</td>
               <td><span class="label label-{{ $ctrl.details.status | nodestatusbadge }}">{{ $ctrl.details.status }}</span></td>
             </tr>
-            <tr>
+            <tr ng-if=" $ctrl.details.engineLabels.length">
               <td>Engine Labels</td>
               <td>{{ $ctrl.details.engineLabels | commaSeparated }}</td>
             </tr>
