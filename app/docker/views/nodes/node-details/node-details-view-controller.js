@@ -23,8 +23,7 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
         ctrl.engineDetails = buildEngineDetails(node);
         ctrl.nodeDetails = buildNodeDetails(node);
         if (ctrl.state.isAgent) {
-          AgentService.hostInfo(nodeId).then(function onHostInfoLoad(agentHostInfo) {
-            console.log(agentHostInfo);
+          AgentService.hostInfo(node.Hostname).then(function onHostInfoLoad(agentHostInfo) {
             enhanceHostDetails(ctrl.hostDetails, agentHostInfo);
           });
         }

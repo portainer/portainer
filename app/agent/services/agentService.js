@@ -1,20 +1,15 @@
 angular.module('portainer.agent').factory('AgentService', [
-  '$q', 'Agent',
-  function AgentServiceFactory($q, Agent) {
+  '$q', 'Agent','HttpRequestHelper', 'Host',
+  function AgentServiceFactory($q, Agent, HttpRequestHelper, Host) {
     'use strict';
     var service = {};
 
     service.agents = agents;
     service.hostInfo = hostInfo;
 
-    function hostInfo() {
-      return $q.when({
-        PhysicalDeviceVendor: 'hello',
-        DeviceVersion: '1.9',
-        DeviceSerialNumber: '144f',
-        InstalledPCIDevices: ['usb', 'printer'],
-        PhysicalDisk: 'none'
-      });
+    function hostInfo(nodeName) {
+      HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
+      return Host.info().$promise;
     }
 
     function agents() {
