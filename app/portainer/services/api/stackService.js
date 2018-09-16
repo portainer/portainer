@@ -4,6 +4,8 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
   'use strict';
   var service = {};
 
+  service.duplicateStack = duplicateStack;
+
   service.stack = function(id) {
     var deferred = $q.defer();
 
@@ -320,6 +322,11 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
 
     return deferred.promise;
   };
+
+  function duplicateStack(name, stackFileContent, env, endpointId, type) {
+    var action = type === 1 ? service.createSwarmStackFromFileContent : service.createComposeStackFromFileContent;
+    return action(name, stackFileContent, env, endpointId);
+  }
 
   return service;
 }]);

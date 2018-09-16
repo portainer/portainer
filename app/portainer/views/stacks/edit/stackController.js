@@ -269,10 +269,11 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
   }
 
   function duplicateStack(name, endpointId, stack) {
-
     $scope.state.duplicationInProgress = true;
+    
+    var env = FormHelper.removeInvalidEnvVars($scope.stack.Env);
 
-    StackService.duplicateStack(name, endpointId, stack)
+    return StackService.duplicateStack(name, $scope.stackFileContent,  env, endpointId, stack.Type)
       .then(onDuplicationSuccess)
       .catch(notifyOnError);
 
@@ -284,7 +285,6 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
 
     function notifyOnError(err) {
       Notifications.error('Failure', err, 'Unable to duplicate stack');
-      $scope.state.duplicationInProgress = false;
     }
   }
 
