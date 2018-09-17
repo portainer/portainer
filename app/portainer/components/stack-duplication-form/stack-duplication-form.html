@@ -26,13 +26,17 @@
           </span>
           <span ng-show="$ctrl.state.migrationInProgress">Migration in progress...</span>
       </button>
-      <button class="btn btn-sm btn-primary" ng-click="$ctrl.duplicateStack()"
+      <button 
+        class="btn btn-sm btn-primary" 
+        ng-click="$ctrl.duplicateStack()"
         ng-disabled="!$ctrl.isFormValidForDuplication() || $ctrl.state.duplicationInProgress || $ctrl.state.migrationInProgress"
-        style="margin-top: 7px; margin-left: 0;" button-spinner="$ctrl.state.duplicationInProgress">
-        <span ng-hide="$ctrl.state.duplicationInProgress"><i class="fa fa-long-arrow-alt-right space-right"
-            aria-hidden="true"></i> Duplicate</span>
-        <span ng-show="$ctrl.state.duplicationInProgress">Duplication in
-          progress...</span>
+        style="margin-top: 7px; margin-left: 0;" 
+        button-spinner="$ctrl.state.duplicationInProgress">
+          <span ng-hide="$ctrl.state.duplicationInProgress">
+            <i class="fa fa-clone space-right"
+              aria-hidden="true"></i> Duplicate
+          </span>
+          <span ng-show="$ctrl.state.duplicationInProgress">Duplication in progress...</span>
       </button>
     </div>
   </div>
