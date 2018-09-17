@@ -80,7 +80,7 @@ module.exports = function (grunt) {
   grunt.initConfig({
     root: 'dist',
     distdir: 'dist/public',
-    shippedDockerVersion: '18.03.1-ce',
+    shippedDockerVersion: '18.06.1-ce',
     shippedDockerVersionWindows: '17.09.0-ce',
     pkg: grunt.file.readJSON('package.json'),
     config: gruntfile_cfg.config,
