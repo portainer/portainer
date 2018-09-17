@@ -46,39 +46,14 @@
                 </div>
               </div>
               <!-- !stack-details -->
-              <!-- stack-migration -->
-              <div ng-if="!state.externalStack && endpoints.length > 0">
-                <div class="col-sm-12 form-section-title">
-                  Stack migration
-                </div>
-                <div class="form-group">
-                  <span class="small" style="margin-top: 10px;">
-                    <p class="text-muted">
-                      This feature allows you to migrate this stack to an alternate compatible endpoint.
-                    </p>
-                  </span>
-                  <div>
-                    <endpoint-selector ng-if="endpoints && groups"
-                      model="formValues.Endpoint"
-                      endpoints="endpoints"
-                      groups="groups"
-                    ></endpoint-selector>
-                    <button class="btn btn-sm btn-primary" ng-click="migrateStack()" ng-disabled="!formValues.Endpoint || state.migrationInProgress" style="margin-top: 7px; margin-left: 0;" button-spinner="state.migrationInProgress">
-                      <span ng-hide="state.migrationInProgress"><i class="fa fa-long-arrow-alt-right space-right" aria-hidden="true"></i> Migrate</span>
-                      <span ng-show="state.migrationInProgress">Migration in progress...</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <!-- !stack-migration -->
-              <stack-duplication 
+              <stack-duplication-form 
                 ng-if="!state.externalStack && endpoints.length > 0"
-                stack="stack"
                 endpoints="endpoints"
                 groups="groups"
-                on-duplicate="duplicateStack(name, endpointId, stack)"
+                on-duplicate="duplicateStack(name, endpointId)"
+                on-migrate="migrateStack(name, endpointId)"
                 >
-              </stack-duplication>
+              </stack-duplication-form>
             </div>
           </uib-tab>
           <!-- !tab-info -->
