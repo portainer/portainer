@@ -257,6 +257,7 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
     var stackName = $transition$.params().name;
     $scope.stackName = stackName;
     var external = $transition$.params().external;
+    $scope.currentEndpointId = EndpointProvider.endpointID();
 
     if (external === 'true') {
       $scope.state.externalStack = true;

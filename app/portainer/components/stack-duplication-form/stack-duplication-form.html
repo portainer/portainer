@@ -17,7 +17,7 @@
       <endpoint-selector ng-if="$ctrl.endpoints && $ctrl.groups" model="$ctrl.formValues.endpoint"
         endpoints="$ctrl.endpoints" groups="$ctrl.groups"></endpoint-selector>
       <button class="btn btn-sm btn-primary" ng-click="$ctrl.migrateStack()"
-        ng-disabled="!$ctrl.isFormValidForMigration() || $ctrl.state.duplicationInProgress || $ctrl.state.migrationInProgress"
+        ng-disabled="$ctrl.isMigrationButtonDisabled()"
         style="margin-top: 7px; margin-left: 0;" 
         button-spinner="$ctrl.state.migrationInProgress">
           <span ng-hide="$ctrl.state.migrationInProgress">

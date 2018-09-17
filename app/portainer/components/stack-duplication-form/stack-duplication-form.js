@@ -6,6 +6,7 @@ angular.module('portainer.app').component('stackDuplicationForm', {
     onDuplicate: '&',
     onMigrate: '&',
     endpoints: '<',
-    groups: '<'
+    groups: '<',
+    currentEndpointId: '<'
   }
 });

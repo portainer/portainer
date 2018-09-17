@@ -17,12 +17,10 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
     ctrl.isFormValidForMigration = isFormValidForMigration;
     ctrl.duplicateStack = duplicateStack;
     ctrl.migrateStack = migrateStack;
+    ctrl.isMigrationButtonDisabled = isMigrationButtonDisabled;
 
     function isFormValidForMigration() {
-      return (
-        ctrl.formValues.endpoint &&
-        ctrl.formValues.endpoint.Id 
-      );
+      return ctrl.formValues.endpoint && ctrl.formValues.endpoint.Id;
     }
 
     function isFormValidForDuplication() {
@@ -31,7 +29,11 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
 
     function duplicateStack() {
       if (!ctrl.formValues.newName) {
-        Notifications.error('Failure', null, 'Stack name is required for duplication');
+        Notifications.error(
+          'Failure',
+          null,
+          'Stack name is required for duplication'
+        );
         return;
       }
       ctrl.state.duplicationInProgress = true;
@@ -55,6 +57,22 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
         .finally(function() {
           ctrl.state.migrationInProgress = false;
         });
+    }
+
+    function isMigrationButtonDisabled() {
+      return (
+        !ctrl.isFormValidForMigration() ||
+        ctrl.state.duplicationInProgress ||
+        ctrl.state.migrationInProgress ||
+        isTargetEndpointAndCurrentEquals()
+      );
+    }
+
+    function isTargetEndpointAndCurrentEquals() {
+      return (
+        ctrl.formValues.endpoint &&
+        ctrl.formValues.endpoint.Id === ctrl.currentEndpointId
+      );
     }
   }
 ]);

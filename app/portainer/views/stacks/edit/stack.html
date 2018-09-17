@@ -50,6 +50,7 @@
                 ng-if="!state.externalStack && endpoints.length > 0"
                 endpoints="endpoints"
                 groups="groups"
+                current-endpoint-id="currentEndpointId"
                 on-duplicate="duplicateStack(name, endpointId)"
                 on-migrate="migrateStack(name, endpointId)"
                 >
