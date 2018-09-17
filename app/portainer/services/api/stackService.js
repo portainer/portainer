@@ -35,7 +35,7 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     return deferred.promise;
   };
 
-  service.migrateSwarmStack = function(stack, targetEndpointId) {
+  service.migrateSwarmStack = function(stack, targetEndpointId, newName) {
     var deferred = $q.defer();
 
     EndpointProvider.setEndpointID(targetEndpointId);
@@ -48,7 +48,7 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
         return;
       }
 
-      return Stack.migrate({ id: stack.Id, endpointId: stack.EndpointId }, { EndpointID: targetEndpointId, SwarmID:  swarm.Id }).$promise;
+      return Stack.migrate({ id: stack.Id, endpointId: stack.EndpointId }, { EndpointID: targetEndpointId, SwarmID:  swarm.Id, Name: newName }).$promise;
     })
     .then(function success() {
       deferred.resolve();
@@ -63,12 +63,12 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     return deferred.promise;
   };
 
-  service.migrateComposeStack = function(stack, targetEndpointId) {
+  service.migrateComposeStack = function(stack, targetEndpointId, newName) {
     var deferred = $q.defer();
 
     EndpointProvider.setEndpointID(targetEndpointId);
 
-    Stack.migrate({ id: stack.Id, endpointId: stack.EndpointId }, { EndpointID: targetEndpointId }).$promise
+    Stack.migrate({ id: stack.Id, endpointId: stack.EndpointId }, { EndpointID: targetEndpointId, Name: newName }).$promise
     .then(function success() {
       deferred.resolve();
     })
