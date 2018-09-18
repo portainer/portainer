@@ -58,14 +58,14 @@
     </li>
     <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
       <a ui-sref="portainer.settings" ui-sref-active="active">Settings <span class="menu-icon fa fa-cogs fa-fw"></span></a>
-      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'portainer.settings' || $state.current.name === 'portainer.settings.authentication' || $state.current.name === 'portainer.about' || $state.current.name === 'portainer.deploykeys') && applicationState.application.authentication && isAdmin">
+      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'portainer.settings' || $state.current.name === 'portainer.settings.authentication' || $state.current.name === 'portainer.about') && applicationState.application.authentication && isAdmin">
         <a ui-sref="portainer.settings.authentication" ui-sref-active="active">Authentication</a></div>
-      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'portainer.settings' || $state.current.name === 'portainer.settings.authentication' || $state.current.name === 'portainer.about' || $state.current.name === 'portainer.deploykeys')">
+      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'portainer.settings' || $state.current.name === 'portainer.settings.authentication' || $state.current.name === 'portainer.about')">
         <a ui-sref="portainer.about" ui-sref-active="active">About</a>
       </div>
-      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'portainer.settings' || $state.current.name === 'portainer.settings.authentication' || $state.current.name === 'portainer.about' || $state.current.name === 'portainer.deploykeys') && isAdmin">
-        <a ui-sref="portainer.deploykeys" ui-sref-active="active">Deploy Key</a>
-      </div>
+    </li>
+    <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
+        <a ui-sref="portainer.deploykeys" ui-sref-active="active">Deploy Keys</a>
     </li>
   </ul>
   <div class="sidebar-footer-content">

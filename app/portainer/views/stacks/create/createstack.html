@@ -154,7 +154,7 @@
            <div class="form-group">
               <div class="col-sm-12">
                 <label for="userOwnership" class="control-label text-left">
-                  Authentication Method          
+                  Authentication          
                 </label>
                 <label class="switch" style="margin-left: 20px;">  
                   <input name="userOwnership" type="checkbox" ng-model="formValues.stackAuthenticationControlEnabled"><i></i>       
@@ -167,11 +167,9 @@
                     <input type="radio" id="registry_quay" ng-model="formValues.RepositoryAuthentication" ng-value="1">
                     <label for="registry_quay">
                       <div class="boxselector_header">
-                        <i class="fa fa-users" aria-hidden="true" style="margin-right: 2px;"></i>
-                        
-                        Credentials (user/password combo)
-                      </div>
-                      <p>Internal authentication mechanism</p>
+                        <i class="fa fa-users" aria-hidden="true" style="margin-right: 2px;"></i>                        
+                        Username and password authentication 
+                      </div>                      
                     </label>
                   </div>
                   <div>
@@ -179,9 +177,8 @@
                     <label for="registry_custom">
                       <div class="boxselector_header">
                         <i class="fa fa-users" aria-hidden="true" style="margin-right: 2px;"></i>
-                        SSH key (use a deploy key)
-                      </div>
-                      <p>LDAP authentication</p>
+                        Use a deploy key
+                      </div>                      
                     </label>
                   </div>
                 </div>

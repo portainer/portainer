@@ -17,7 +17,6 @@ import (
 	"github.com/portainer/portainer/http/handler/registries"
 	"github.com/portainer/portainer/http/handler/resourcecontrols"
 	"github.com/portainer/portainer/http/handler/settings"
-	"github.com/portainer/portainer/http/handler/sshkeys"
 	"github.com/portainer/portainer/http/handler/stacks"
 	"github.com/portainer/portainer/http/handler/status"
 	"github.com/portainer/portainer/http/handler/tags"
@@ -45,7 +44,7 @@ type Server struct {
 	ComposeStackManager     portainer.ComposeStackManager
 	CryptoService           portainer.CryptoService
 	SignatureService        portainer.DigitalSignatureService
-	DigitalSshkeyService    portainer.DigitalSshkeyService
+	DigitalDeploykeyService portainer.DigitalDeploykeyService
 	JobScheduler            portainer.JobScheduler
 	Snapshotter             portainer.Snapshotter
 	DockerHubService        portainer.DockerHubService
@@ -62,7 +61,6 @@ type Server struct {
 	SwarmStackManager       portainer.SwarmStackManager
 	TagService              portainer.TagService
 	DeploykeyService        portainer.DeploykeyService
-	SshkeyService           portainer.SshkeyService
 	TeamService             portainer.TeamService
 	TeamMembershipService   portainer.TeamMembershipService
 	TemplateService         portainer.TemplateService
@@ -156,11 +154,7 @@ func (server *Server) Start() error {
 
 	var deploykeyHandler = deploykeys.NewHandler(requestBouncer)
 	deploykeyHandler.DeploykeyService = server.DeploykeyService
-	deploykeyHandler.DigitalSignatureService = server.DigitalSignatureService
-
-	var sshkeyHandler = sshkeys.NewHandler(requestBouncer)
-	sshkeyHandler.SshkeyService = server.SshkeyService
-	sshkeyHandler.DigitalSshkeyService = server.DigitalSshkeyService
+	deploykeyHandler.DigitalDeploykeyService = server.DigitalDeploykeyService
 
 	var teamHandler = teams.NewHandler(requestBouncer)
 	teamHandler.TeamService = server.TeamService
@@ -207,9 +201,8 @@ func (server *Server) Start() error {
 		SettingsHandler:        settingsHandler,
 		StatusHandler:          statusHandler,
 		StackHandler:           stackHandler,
-		SshkeyHandler:          sshkeyHandler,
-		TagHandler:             tagHandler,
 		DeploykeyHandler:       deploykeyHandler,
+		TagHandler:             tagHandler,
 		TeamHandler:            teamHandler,
 		TeamMembershipHandler:  teamMembershipHandler,
 		TemplatesHandler:       templatesHandler,

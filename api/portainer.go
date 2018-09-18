@@ -330,23 +330,13 @@ type (
 		Name string `json:"Name"`
 	}
 
+
 	// DeploykeyID represents a key identifier
 	DeploykeyID int
 
 	// Deploykey represents a key that can be associated to a resource
 	Deploykey struct {
 		ID             DeploykeyID
-		Name           string `json:"Name"`
-		Publickeypath  string `json:"Publickeypath"`
-		Privatekeypath string `json:"Privatekeypath"`
-	}
-
-	// SshkeyID represents a key identifier
-	SshkeyID int
-
-	// Sshkey represents a key that can be associated to a resource
-	Sshkey struct {
-		ID             SshkeyID
 		Name           string `json:"Name"`
 		Privatekeypath string `json:"Privatekeypath"`
 		Publickeypath  string `json:"Publickeypath"`
@@ -516,11 +506,11 @@ type (
 		DeleteRegistry(ID RegistryID) error
 	}
 
-	// SshkeyService represents a service for managing key data
-	SshkeyService interface {
-		Sshkeys() ([]Sshkey, error)
-		CreateSshkey(sshkey *Sshkey) error
-		DeleteSshkey(ID SshkeyID) error
+	// DeploykeyService represents a service for managing key data
+	DeploykeyService interface {
+		Deploykeys() ([]Deploykey, error)
+		CreateDeploykey(deploykey *Deploykey) error
+		DeleteDeploykey(ID DeploykeyID) error
 	}
 
 	// StackService represents a service for managing stack data
@@ -578,13 +568,7 @@ type (
 		CreateTag(tag *Tag) error
 		DeleteTag(ID TagID) error
 	}
-
-	// DeploykeyService represents a service for managing key data
-	DeploykeyService interface {
-		Deploykeys() ([]Deploykey, error)
-		CreateDeploykey(deploykey *Deploykey) error
-		DeleteDeploykey(ID DeploykeyID) error
-	}
+	
 
 	// TemplateService represents a service for managing template data
 	TemplateService interface {
@@ -601,8 +585,8 @@ type (
 		CompareHashAndData(hash string, data string) error
 	}
 
-	//DigitalSshkeyService represents a service to manage digital sshkey
-	DigitalSshkeyService interface {
+	//DigitalDeploykeyService represents a service to manage digital deploykey
+	DigitalDeploykeyService interface {
 		ParseKeyPair(private, public []byte) error
 		GenerateKeyPair() ([]byte, []byte, error)
 		EncodedPublicKey() string

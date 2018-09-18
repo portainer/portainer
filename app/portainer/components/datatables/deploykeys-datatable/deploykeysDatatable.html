@@ -31,6 +31,9 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
+              <th>
+                  <a>Action</a>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -45,7 +48,7 @@
               <td>
                 <input style="display: none;" type="text" id="pubkey{{ $index }}" class="form-control"  ng-model="rootFolders" ng-init="rootFolders='{{ item.Publickeypath }}'" value="{{ item.Publickeypath }}"/>
                 <button type="button" class="btn btn-sm btn-information" ng-click = "$ctrl.copyToClipboard('pubkey'+$index)">
-                    <i class="fa fa-clipboard space-right" aria-hidden="true"></i>Copy to clipboard
+                    <i class="fas fa-key space-right" aria-hidden="true"></i>Copy to clipboard
                 </button>
               </td>
             </tr>

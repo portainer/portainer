@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/portainer/portainer/http/handler/auth"
-	"github.com/portainer/portainer/http/handler/deploykeys"
 	"github.com/portainer/portainer/http/handler/dockerhub"
 	"github.com/portainer/portainer/http/handler/endpointgroups"
 	"github.com/portainer/portainer/http/handler/endpointproxy"
@@ -15,7 +14,7 @@ import (
 	"github.com/portainer/portainer/http/handler/registries"
 	"github.com/portainer/portainer/http/handler/resourcecontrols"
 	"github.com/portainer/portainer/http/handler/settings"
-	"github.com/portainer/portainer/http/handler/sshkeys"
+	"github.com/portainer/portainer/http/handler/deploykeys"
 	"github.com/portainer/portainer/http/handler/stacks"
 	"github.com/portainer/portainer/http/handler/status"
 	"github.com/portainer/portainer/http/handler/tags"
@@ -44,8 +43,7 @@ type Handler struct {
 	StackHandler           *stacks.Handler
 	StatusHandler          *status.Handler
 	TagHandler             *tags.Handler
-	DeploykeyHandler       *deploykeys.Handler
-	SshkeyHandler          *sshkeys.Handler
+	DeploykeyHandler          *deploykeys.Handler
 	TeamMembershipHandler  *teammemberships.Handler
 	TeamHandler            *teams.Handler
 	TemplatesHandler       *templates.Handler
@@ -91,8 +89,6 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.TagHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/deploykeys"):
 		http.StripPrefix("/api", h.DeploykeyHandler).ServeHTTP(w, r)
-	case strings.HasPrefix(r.URL.Path, "/api/sshkeys"):
-		http.StripPrefix("/api", h.SshkeyHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/templates"):
 		http.StripPrefix("/api", h.TemplatesHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/upload"):

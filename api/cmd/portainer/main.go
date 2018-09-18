@@ -90,7 +90,7 @@ func initDigitalSignatureService() portainer.DigitalSignatureService {
 	return &crypto.ECDSAService{}
 }
 
-func initDigitalSshkeyService() portainer.DigitalSshkeyService {
+func initDigitalDeploykeyService() portainer.DigitalDeploykeyService {
 	return &crypto.ECDSAService{}
 }
 
@@ -405,7 +405,7 @@ func main() {
 
 	digitalSignatureService := initDigitalSignatureService()
 
-	digitalSshkeyService := initDigitalSshkeyService()
+	digitalDeploykeyService := initDigitalDeploykeyService()
 
 	err := initKeyPair(fileService, digitalSignatureService)
 	if err != nil {
@@ -510,8 +510,7 @@ func main() {
 		DockerHubService:       store.DockerHubService,
 		StackService:           store.StackService,
 		TagService:             store.TagService,
-		DeploykeyService:       store.DeploykeyService,
-		SshkeyService:          store.SshkeyService,
+		DeploykeyService:          store.DeploykeyService,
 		TemplateService:        store.TemplateService,
 		WebhookService:         store.WebhookService,
 		SwarmStackManager:      swarmStackManager,
@@ -522,7 +521,7 @@ func main() {
 		LDAPService:            ldapService,
 		GitService:             gitService,
 		SignatureService:       digitalSignatureService,
-		DigitalSshkeyService:   digitalSshkeyService,
+		DigitalDeploykeyService:   digitalDeploykeyService,
 		JobScheduler:           jobScheduler,
 		Snapshotter:            snapshotter,
 		SSL:                    *flags.SSL,

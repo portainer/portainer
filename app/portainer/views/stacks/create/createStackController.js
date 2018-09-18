@@ -97,7 +97,7 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
     var method = $scope.state.Method;
 
     var accessControlData = $scope.formValues.AccessControlData;
-    console.log(accessControlData);
+    
     var userDetails = Authentication.getUserDetails();
     var isAdmin = userDetails.role === 1;
     var userId = userDetails.ID;

@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('DeploykeysController', ['$scope', '$state', 'SshkeyService', 'Notifications', 'Authentication',
-function ($scope, $state, SshkeyService, Notifications, Authentication) {
+.controller('DeploykeysController', ['$scope', '$state', 'DeploykeyService', 'Notifications', 'Authentication',
+function ($scope, $state, DeploykeyService, Notifications, Authentication) {
 
   $scope.state = {
     actionInProgress: false
@@ -27,7 +27,7 @@ function ($scope, $state, SshkeyService, Notifications, Authentication) {
     console.log(selectedItems);
     angular.forEach(selectedItems, function (deploykey) {
       console.log(deploykey);
-      SshkeyService.deleteNewsshkey(deploykey.Id)
+      DeploykeyService.deleteNewdeploykey(deploykey.Id)
       .then(function success() {
         Notifications.success('Key successfully removed', deploykey.Name);
         var index = $scope.deploykeys.indexOf(deploykey);
@@ -48,7 +48,7 @@ function ($scope, $state, SshkeyService, Notifications, Authentication) {
   $scope.createDeploykey = function() {
     var deploykeyName = $scope.formValues.Name;
     var userName = Authentication.getUserDetails().username;
-    SshkeyService.createNewsshkey(deploykeyName,userName)
+    DeploykeyService.createNewdeploykey(deploykeyName,userName)
     .then(function success() {
       Notifications.success('Key successfully created', deploykeyName);
       $state.reload();
@@ -60,10 +60,8 @@ function ($scope, $state, SshkeyService, Notifications, Authentication) {
   };
 
   function initView() {
-    SshkeyService.sshkeys()
-    .then(function success(data) {
-      console.log("vasudev");
-      console.log(data);
+    DeploykeyService.deploykeys()
+    .then(function success(data) {            
       $scope.deploykeys = data;
     })
     .catch(function error(err) {

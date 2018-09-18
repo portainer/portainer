@@ -9,7 +9,7 @@ angular.module('portainer.app')
     .then(function success(data) {
       var deploykeys = data.map(function (item) {
         return new DeploykeyViewModel(item);
-      });
+      });            
       deferred.resolve(deploykeys);
     })
     .catch(function error(err) {
@@ -17,14 +17,14 @@ angular.module('portainer.app')
     });
     return deferred.promise;
   };
-
-  service.deploykeyNames = function() {
+  
+  service.createNewkeyNames = function() {
     var deferred = $q.defer();
     Deploykeys.query().$promise
     .then(function success(data) {
       var deploykeys = data.map(function (item) {
         return item.Name;
-      });
+      });      
       deferred.resolve(deploykeys);
     })
     .catch(function error(err) {
@@ -33,15 +33,15 @@ angular.module('portainer.app')
     return deferred.promise;
   };
 
-  service.createDeploykey = function(name) {
+  service.createNewdeploykey = function(name,UserName) {
     var payload = {
       Name: name,
+      userName: UserName
     };
-
     return Deploykeys.create({}, payload).$promise;
   };
 
-  service.deleteDeploykey = function(id) {
+  service.deleteNewdeploykey = function(id) {
     return Deploykeys.remove({id: id}).$promise;
   };
 

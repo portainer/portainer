@@ -1,7 +1,9 @@
 package deploykeys
 
 import (
+	"encoding/hex"
 	"net/http"
+	"time"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/portainer/portainer"
@@ -12,13 +14,15 @@ import (
 
 type deploykeyCreatePayload struct {
 	Name           string
-	Publickeypath  string
 	Privatekeypath string
+	Publickeypath  string
+	UserName       string
+	LastUsage      string
 }
 
 func (payload *deploykeyCreatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
-		return portainer.Error("Invalid deploykey name")
+		return portainer.Error("Invalid deploykey Name")
 	}
 	return nil
 }
@@ -26,7 +30,6 @@ func (payload *deploykeyCreatePayload) Validate(r *http.Request) error {
 // POST request on /api/deploykeys
 func (handler *Handler) deploykeyCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload deploykeyCreatePayload
-
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
@@ -43,25 +46,31 @@ func (handler *Handler) deploykeyCreate(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
-	//Pubkey, Prikey, errrrr := handler.DigitalSignatureService.GenerateKeyPair()
+	privatepath, pubkeypath, errrrr := handler.DigitalDeploykeyService.GenerateKeyPair()
 
-	//if errrrr != nil {
-	//return &httperror.HandlerError{http.StatusBadRequest, "Invalid Ssh key  payload", errrrr}
-	//}
+	if errrrr != nil {
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid  key  payload", errrrr}
+	}
 
-	//encodedStr := hex.EncodeToString(Pubkey)
-	//encodedStr1 := hex.EncodeToString(Prikey)
+	encodedStr := hex.EncodeToString(privatepath)
+	encodedStr1 := hex.EncodeToString(pubkeypath)
+	dateTime := time.Now().Local().Format("2006-01-02 15:04:05")
 
 	deploykey := &portainer.Deploykey{
-		Name: payload.Name,
-		//Publickeypath:  encodedStr,
-		//Privatekeypath: encodedStr1,
+		Name:           payload.Name,
+		Privatekeypath: encodedStr,
+		Publickeypath:  encodedStr1,
+		UserName:       payload.UserName,
+		LastUsage:      dateTime,
 	}
-	//deploykey.Pubkey, deploykey.Prikey, err = handler.DigitalSignatureService.GenerateKeyPair()
+
 	err = handler.DeploykeyService.CreateDeploykey(deploykey)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the deploykey inside the database", err}
 	}
 
 	return response.JSON(w, deploykey)
+}
+func BytesToString(data []byte) string {
+	return string(data[:])
 }
