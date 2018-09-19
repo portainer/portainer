@@ -24,6 +24,9 @@ func NewHandler(bouncer *security.RequestBouncer, status *portainer.Status) *Han
 		status: status,
 	}
 
+	// TODO: admin restricted
+	h.Handle("/plugins",
+		bouncer.PublicAccess(httperror.LoggerHandler(h.pluginList))).Methods(http.MethodGet)
 	h.Handle("/plugins",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.pluginCreate))).Methods(http.MethodPost)
 

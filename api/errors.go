@@ -88,6 +88,11 @@ const (
 	ErrUndefinedTLSFileType = Error("Undefined TLS file type")
 )
 
+// Plugin errors.
+const (
+	ErrPluginAlreadyEnabled = Error("This plugin is already enabled")
+)
+
 // Error represents an application error.
 type Error string
 

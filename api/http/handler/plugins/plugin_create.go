@@ -28,19 +28,36 @@ func (handler *Handler) pluginCreate(w http.ResponseWriter, r *http.Request) *ht
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	// syscall.Exec replaces the process, ForkExec could be tried?
-	// err = syscall.ForkExec("/plugins/plugin-registry-management", []string{"plugin-registry-management"}, os.Environ())
-	cmd := exec.Command("/plugins/plugin-registry-management")
-	// cmd.Start will not share logs with the main Portainer container.
-	err = cmd.Start()
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to execute plugin", err}
+	pluginType := portainer.PluginType(payload.PluginType)
+
+	for _, enabledPlugin := range handler.status.EnabledPlugins {
+		if enabledPlugin == pluginType {
+			return &httperror.HandlerError{http.StatusConflict, "Unable to enable plugin", portainer.ErrPluginAlreadyEnabled}
+		}
 	}
 
-	_, err = handler.ProxyManager.CreatePluginProxy(portainer.PluginType(payload.PluginType))
+	err = handler.enablePlugin(pluginType)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create proxy for the plugin", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to enable plugin", err}
 	}
 
+	handler.status.EnabledPlugins = append(handler.status.EnabledPlugins, pluginType)
 	return response.Empty(w)
+}
+
+func (handler *Handler) enablePlugin(pluginType portainer.PluginType) error {
+
+	// TODO: switch case on plugin type to download/enable correct plugin
+
+	// syscall.Exec replaces the process, ForkExec could be tried?
+	// Also should be relocated to another package
+	// err = syscall.ForkExec("/plugins/plugin-registry-management", []string{"plugin-registry-management"}, os.Environ())
+	cmd := exec.Command("/data/plugins/plugin-registry-management")
+	// cmd.Start will not share logs with the main Portainer container.
+	err := cmd.Start()
+	if err != nil {
+		return err
+	}
+
+	return handler.ProxyManager.CreatePluginProxy(pluginType)
 }

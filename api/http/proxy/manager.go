@@ -102,18 +102,17 @@ func (manager *Manager) DeleteProxy(key string) {
 	manager.proxies.Remove(key)
 }
 
-func (manager *Manager) CreatePluginProxy(pluginType portainer.PluginType) (http.Handler, error) {
+func (manager *Manager) CreatePluginProxy(pluginType portainer.PluginType) error {
 	// TODO: should be stored in plugin definition somewhere?
 	pluginURL, err := url.Parse("http://localhost:7001")
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	proxy := manager.proxyFactory.newHTTPProxy(pluginURL)
 	manager.pluginProxies.Set(strconv.Itoa(int(pluginType)), proxy)
 
-	// TODO: return nil
-	return proxy, nil
+	return nil
 }
 
 func (manager *Manager) GetPluginProxy(pluginType portainer.PluginType) http.Handler {
