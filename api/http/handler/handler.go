@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/portainer/portainer/http/handler/auth"
+	"github.com/portainer/portainer/http/handler/deploykeys"
 	"github.com/portainer/portainer/http/handler/dockerhub"
 	"github.com/portainer/portainer/http/handler/endpointgroups"
 	"github.com/portainer/portainer/http/handler/endpointproxy"
@@ -14,7 +15,6 @@ import (
 	"github.com/portainer/portainer/http/handler/registries"
 	"github.com/portainer/portainer/http/handler/resourcecontrols"
 	"github.com/portainer/portainer/http/handler/settings"
-	"github.com/portainer/portainer/http/handler/deploykeys"
 	"github.com/portainer/portainer/http/handler/stacks"
 	"github.com/portainer/portainer/http/handler/status"
 	"github.com/portainer/portainer/http/handler/tags"
@@ -43,7 +43,6 @@ type Handler struct {
 	StackHandler           *stacks.Handler
 	StatusHandler          *status.Handler
 	TagHandler             *tags.Handler
-	DeploykeyHandler          *deploykeys.Handler
 	TeamMembershipHandler  *teammemberships.Handler
 	TeamHandler            *teams.Handler
 	TemplatesHandler       *templates.Handler
@@ -51,6 +50,7 @@ type Handler struct {
 	UserHandler            *users.Handler
 	WebSocketHandler       *websocket.Handler
 	WebhookHandler         *webhooks.Handler
+	DeploykeyHandler       *deploykeys.Handler
 }
 
 // ServeHTTP delegates a request to the appropriate subhandler.

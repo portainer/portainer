@@ -8,19 +8,13 @@ function ($scope, $state, Authentication, UserService, Notifications, SettingsSe
   };
 
   $scope.updatePassword = function() {
-    $scope.invalidPassword = false;
-
     UserService.updateUserPassword($scope.userID, $scope.formValues.currentPassword, $scope.formValues.newPassword)
     .then(function success() {
       Notifications.success('Success', 'Password successfully updated');
       $state.reload();
     })
     .catch(function error(err) {
-      if (err.invalidPassword) {
-        $scope.invalidPassword = true;
-      } else {
-        Notifications.error('Failure', err, err.msg);
-      }
+      Notifications.error('Failure', err, err.msg);
     });
   };
 

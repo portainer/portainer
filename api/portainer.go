@@ -330,7 +330,6 @@ type (
 		Name string `json:"Name"`
 	}
 
-
 	// DeploykeyID represents a key identifier
 	DeploykeyID int
 
@@ -506,13 +505,6 @@ type (
 		DeleteRegistry(ID RegistryID) error
 	}
 
-	// DeploykeyService represents a service for managing key data
-	DeploykeyService interface {
-		Deploykeys() ([]Deploykey, error)
-		CreateDeploykey(deploykey *Deploykey) error
-		DeleteDeploykey(ID DeploykeyID) error
-	}
-
 	// StackService represents a service for managing stack data
 	StackService interface {
 		Stack(ID StackID) (*Stack, error)
@@ -568,7 +560,6 @@ type (
 		CreateTag(tag *Tag) error
 		DeleteTag(ID TagID) error
 	}
-	
 
 	// TemplateService represents a service for managing template data
 	TemplateService interface {
@@ -583,6 +574,13 @@ type (
 	CryptoService interface {
 		Hash(data string) (string, error)
 		CompareHashAndData(hash string, data string) error
+	}
+
+	// DeploykeyService represents a service for managing key data
+	DeploykeyService interface {
+		Deploykeys() ([]Deploykey, error)
+		CreateDeploykey(deploykey *Deploykey) error
+		DeleteDeploykey(ID DeploykeyID) error
 	}
 
 	//DigitalDeploykeyService represents a service to manage digital deploykey
@@ -670,7 +668,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "1.19.2-dev"
+	APIVersion = "1.20-dev"
 	// DBVersion is the version number of the Portainer database
 	DBVersion = 14
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved

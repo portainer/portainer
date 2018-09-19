@@ -65,7 +65,7 @@
         </td>
         <td>
           <div class="btn-group btn-group-xs" role="group" aria-label="..." >
-            <a style="margin: 0 2.5px;" ui-sref="docker.containers.container.logs({ id: item.Container.Id, nodeName: item.Container.NodeName })" title="Logs" ng-if="$ctrl.agentProxy"><i class="fa fa-file-alt space-right" aria-hidden="true"></i></a>
+            <a style="margin: 0 2.5px;" ui-sref="docker.containers.container.logs({ id: item.Container.Id, nodeName: item.Container.NodeName })" title="Logs" ng-if="$ctrl.agentProxy && item.Container.Id"><i class="fa fa-file-alt space-right" aria-hidden="true"></i></a>
             <a style="margin: 0 2.5px;" ui-sref="docker.tasks.task.logs({ id: item.Id })" title="Logs" ng-if="!$ctrl.agentProxy && $ctrl.showTaskLogsButton && item.Status.State|taskhaslogs"><i class="fa fa-file-alt space-right" aria-hidden="true"></i></a>
             <a style="margin: 0 2.5px;" ui-sref="docker.containers.container.console({ id: item.Container.Id, nodeName: item.Container.NodeName })" title="Console" ng-if="$ctrl.agentProxy && item.Status.State === 'running'"><i class="fa fa-terminal space-right" aria-hidden="true"></i></a>
           </div>

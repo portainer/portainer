@@ -27,11 +27,6 @@ const (
 	ErrTeamMembershipAlreadyExists = Error("Team membership already exists for this user and team")
 )
 
-// Sshkey errors
-const (
-	ErrSshkeyAlreadyExists = Error("A key already exists with this name")
-)
-
 // ResourceControl errors.
 const (
 	ErrResourceControlAlreadyExists = Error("A resource control is already applied on this resource")
@@ -70,11 +65,6 @@ const (
 	ErrTagAlreadyExists = Error("A tag already exists with this name")
 )
 
-// Deploykey errors
-const (
-	ErrDeploykeyAlreadyExists = Error("A key already exists with this name")
-)
-
 // Endpoint extensions error
 const (
 	ErrEndpointExtensionNotSupported      = Error("This extension is not supported")
@@ -108,4 +98,9 @@ func (e Error) Error() string { return string(e) }
 const (
 	ErrWebhookAlreadyExists   = Error("A webhook for this resource already exists")
 	ErrUnsupportedWebhookType = Error("Webhooks for this resource are not currently supported")
+)
+
+// Deploykey errors
+const (
+	ErrDeploykeyAlreadyExists = Error("A key already exists with this name")
 )

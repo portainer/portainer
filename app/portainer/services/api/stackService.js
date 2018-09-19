@@ -6,9 +6,9 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
 
   var stackName='';
   service.setStackName = function(sackname){    
-    stackName = sackname;
+    stackName = sackname;    
   }
-  service.getStackName = function(){
+  service.getStackName = function(){    
     return stackName;
   }
 

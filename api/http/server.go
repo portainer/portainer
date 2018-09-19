@@ -45,6 +45,7 @@ type Server struct {
 	CryptoService           portainer.CryptoService
 	SignatureService        portainer.DigitalSignatureService
 	DigitalDeploykeyService portainer.DigitalDeploykeyService
+	DeploykeyService        portainer.DeploykeyService
 	JobScheduler            portainer.JobScheduler
 	Snapshotter             portainer.Snapshotter
 	DockerHubService        portainer.DockerHubService
@@ -60,7 +61,6 @@ type Server struct {
 	StackService            portainer.StackService
 	SwarmStackManager       portainer.SwarmStackManager
 	TagService              portainer.TagService
-	DeploykeyService        portainer.DeploykeyService
 	TeamService             portainer.TeamService
 	TeamMembershipService   portainer.TeamMembershipService
 	TemplateService         portainer.TemplateService
@@ -71,7 +71,6 @@ type Server struct {
 	SSLCert                 string
 	SSLKey                  string
 	DockerClientFactory     *docker.ClientFactory
-	DigitalSignatureService portainer.DigitalSignatureService
 }
 
 // Start starts the HTTP server
@@ -152,10 +151,6 @@ func (server *Server) Start() error {
 	var tagHandler = tags.NewHandler(requestBouncer)
 	tagHandler.TagService = server.TagService
 
-	var deploykeyHandler = deploykeys.NewHandler(requestBouncer)
-	deploykeyHandler.DeploykeyService = server.DeploykeyService
-	deploykeyHandler.DigitalDeploykeyService = server.DigitalDeploykeyService
-
 	var teamHandler = teams.NewHandler(requestBouncer)
 	teamHandler.TeamService = server.TeamService
 	teamHandler.TeamMembershipService = server.TeamMembershipService
@@ -171,7 +166,7 @@ func (server *Server) Start() error {
 	var uploadHandler = upload.NewHandler(requestBouncer)
 	uploadHandler.FileService = server.FileService
 
-	var userHandler = users.NewHandler(requestBouncer)
+	var userHandler = users.NewHandler(requestBouncer, rateLimiter)
 	userHandler.UserService = server.UserService
 	userHandler.TeamService = server.TeamService
 	userHandler.TeamMembershipService = server.TeamMembershipService
@@ -188,6 +183,10 @@ func (server *Server) Start() error {
 	webhookHandler.EndpointService = server.EndpointService
 	webhookHandler.DockerClientFactory = server.DockerClientFactory
 
+	var deploykeyHandler = deploykeys.NewHandler(requestBouncer)
+	deploykeyHandler.DeploykeyService = server.DeploykeyService
+	deploykeyHandler.DigitalDeploykeyService = server.DigitalDeploykeyService
+
 	server.Handler = &handler.Handler{
 		AuthHandler:            authHandler,
 		DockerHubHandler:       dockerHubHandler,
@@ -201,7 +200,6 @@ func (server *Server) Start() error {
 		SettingsHandler:        settingsHandler,
 		StatusHandler:          statusHandler,
 		StackHandler:           stackHandler,
-		DeploykeyHandler:       deploykeyHandler,
 		TagHandler:             tagHandler,
 		TeamHandler:            teamHandler,
 		TeamMembershipHandler:  teamMembershipHandler,
@@ -210,6 +208,7 @@ func (server *Server) Start() error {
 		UserHandler:            userHandler,
 		WebSocketHandler:       websocketHandler,
 		WebhookHandler:         webhookHandler,
+		DeploykeyHandler:       deploykeyHandler,
 	}
 
 	if server.SSL {

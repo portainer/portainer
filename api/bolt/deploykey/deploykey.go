@@ -1,9 +1,9 @@
 package deploykey
 
 import (
+	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/bolt/internal"
-	"github.com/boltdb/bolt"
 )
 
 const (

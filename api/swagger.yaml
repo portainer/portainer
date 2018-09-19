@@ -54,15 +54,13 @@ info:
 
     **NOTE**: You can find more information on how to query the Docker API in the [Docker official documentation](https://docs.docker.com/engine/api/v1.30/) as well as in [this Portainer example](https://gist.github.com/deviantony/77026d402366b4b43fa5918d41bc42f8).
 
-  version: "1.19.2-dev"
+  version: "1.20-dev"
   title: "Portainer API"
   contact:
     email: "info@portainer.io"
 host: "portainer.domain"
 basePath: "/api"
 tags:
-- name: "deploykeys"
-  description: "Manage deploykeys"  
 - name: "auth"
   description: "Authenticate against Portainer HTTP API"
 - name: "dockerhub"
@@ -97,6 +95,9 @@ tags:
   description: "Upload files"
 - name: "websocket"
   description: "Create exec sessions using websockets"
+- name: "deploykeys"
+  description: "Manage deploykeys"  
+
 schemes:
 - "http"
 - "https"
@@ -2116,106 +2117,6 @@ paths:
           schema:
             $ref: "#/definitions/GenericError"
 
-/deploykeys:
-    get:
-      tags:
-      - "deploykeys"
-      summary: "List deploykeys"
-      description: |
-        List deploykeys.
-        **Access policy**: administrator
-      operationId: "DeploykeysList"
-      produces:
-      - "application/json"
-      parameters: []
-      responses:
-        200:
-          description: "Success"
-          schema:
-            $ref: "#/definitions/DeploykeyListResponse"
-        500:
-          description: "Server error"
-          schema:
-            $ref: "#/definitions/GenericError"
-        404:
-          description: "Key not found"
-          schema:
-            $ref: "#/definitions/GenericError"
-          examples:
-            application/json:
-              err: "Invalid request data format"       
-    post:
-      tags:
-      - "deploykeys"
-      summary: "Create a new deploykeys"
-      description: |
-        Create a new deploykeys.
-        **Access policy**: administrator
-      operationId: "DeploykeyCreate"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Deploykey details"
-        required: true
-        schema:
-          $ref: "#/definitions/DeploykeyCreateRequest"
-      responses:
-        200:
-          description: "Success"
-          schema:
-            $ref: "#/definitions/Deploykey"
-        400:
-          description: "Invalid request"
-          schema:
-            $ref: "#/definitions/GenericError"
-          examples:
-            application/json:
-              err: "Invalid request data format"
-        409:
-          description: "Conflict"
-          schema:
-            $ref: "#/definitions/GenericError"
-          examples:
-            application/json:
-              err: "A deploykeys with the specified name already exists"
-        500:
-          description: "Server error"
-          schema:
-            $ref: "#/definitions/GenericError"
-  /deploykeys/{id}:
-    delete:
-      tags:
-      - "deploykeys"
-      summary: "Remove a deploykeys"
-      description: |
-        Remove a deploykeys.
-        **Access policy**: administrator
-      operationId: "DeploykeyDelete"
-      parameters:
-      - name: "id"
-        in: "path"
-        description: "Deploykey identifier"
-        required: true
-        type: "integer"
-      responses:
-        204:
-          description: "Success"
-        400:
-          description: "Invalid request"
-          schema:
-            $ref: "#/definitions/GenericError"
-          examples:
-            application/json:
-              err: "Invalid request"
-        500:
-          description: "Server error"
-          schema:
-            $ref: "#/definitions/GenericError"
-
   /teams:
     get:
       tags:
@@ -2820,6 +2721,109 @@ paths:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
+
+  /deploykeys:
+      get:
+        tags:
+        - "deploykeys"
+        summary: "List deploykeys"
+        description: |
+          List deploykeys.
+          **Access policy**: administrator
+        operationId: "DeploykeysList"
+        produces:
+        - "application/json"
+        parameters: []
+        responses:
+          200:
+            description: "Success"
+            schema:
+              $ref: "#/definitions/DeploykeyListResponse"
+          500:
+            description: "Server error"
+            schema:
+              $ref: "#/definitions/GenericError"
+          404:
+            description: "Key not found"
+            schema:
+              $ref: "#/definitions/GenericError"
+            examples:
+              application/json:
+                err: "Invalid request data format"       
+      post:
+        tags:
+        - "deploykeys"
+        summary: "Create a new deploykeys"
+        description: |
+          Create a new deploykeys.
+          **Access policy**: administrator
+        operationId: "DeploykeyCreate"
+        consumes:
+        - "application/json"
+        produces:
+        - "application/json"
+        parameters:
+        - in: "body"
+          name: "body"
+          description: "Deploykey details"
+          required: true
+          schema:
+            $ref: "#/definitions/DeploykeyCreateRequest"
+        responses:
+          200:
+            description: "Success"
+            schema:
+              $ref: "#/definitions/Deploykey"
+          400:
+            description: "Invalid request"
+            schema:
+              $ref: "#/definitions/GenericError"
+            examples:
+              application/json:
+                err: "Invalid request data format"
+          409:
+            description: "Conflict"
+            schema:
+              $ref: "#/definitions/GenericError"
+            examples:
+              application/json:
+                err: "A deploykeys with the specified name already exists"
+          500:
+            description: "Server error"
+            schema:
+              $ref: "#/definitions/GenericError"
+
+  /deploykeys/{id}:
+      delete:
+        tags:
+        - "deploykeys"
+        summary: "Remove a deploykeys"
+        description: |
+          Remove a deploykeys.
+          **Access policy**: administrator
+        operationId: "DeploykeyDelete"
+        parameters:
+        - name: "id"
+          in: "path"
+          description: "Deploykey identifier"
+          required: true
+          type: "integer"
+        responses:
+          204:
+            description: "Success"
+          400:
+            description: "Invalid request"
+            schema:
+              $ref: "#/definitions/GenericError"
+            examples:
+              application/json:
+                err: "Invalid request"
+          500:
+            description: "Server error"
+            schema:
+              $ref: "#/definitions/GenericError"
+
+
 securityDefinitions:
   jwt:
     type: "apiKey"
@@ -2837,9 +2841,7 @@ definitions:
         type: "string"
         example: "org/acme"
         description: "Tag name"
- 
-        
-  Deploykey:
+   Deploykey:
     type: "object"
     properties:
       Id:
@@ -2866,7 +2868,6 @@ definitions:
         type: "string"
         example: "12:03:32"
         description: "Deploykey user name"
-
 
   Team:
     type: "object"
@@ -2949,7 +2950,7 @@ definitions:
         description: "Is analytics enabled"
       Version:
         type: "string"
-        example: "1.19.2-dev"
+        example: "1.20-dev"
         description: "Portainer API version"
   PublicSettingsInspectResponse:
     type: "object"
@@ -3815,24 +3816,12 @@ definitions:
     type: "array"
     items:
       $ref: "#/definitions/Tag"
-  
 
   DeploykeyListResponse:
     type: "array"
     items:
       $ref: "#/definitions/Deploykey"
-
-  TagCreateRequest:
-    type: "object"
-    required:
-    - "Name"
-    properties:
-      Name:
-        type: "string"
-        example: "org/acme"
-        description: "Name"
-
- 
+      
   DeploykeyCreateRequest:
     type: "object"    
     required:
@@ -3859,6 +3848,15 @@ definitions:
         example: "12:03:32"
         description: "Deploykey user name"
 
+  TagCreateRequest:
+    type: "object"
+    required:
+    - "Name"
+    properties:
+      Name:
+        type: "string"
+        example: "org/acme"
+        description: "Name"
   TeamCreateRequest:
     type: "object"
     required:
@@ -4445,3 +4443,4 @@ definitions:
         type: "string"
         example: "version: 3\n services:\n web:\n image:nginx"
         description: "Content of the Stack file."
+

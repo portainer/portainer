@@ -3,6 +3,7 @@ package users
 import (
 	"net/http"
 
+	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -10,20 +11,23 @@ import (
 	"github.com/portainer/portainer/http/security"
 )
 
-type userUpdatePayload struct {
-	Password string
-	Role     int
+type userUpdatePasswordPayload struct {
+	Password    string
+	NewPassword string
 }
 
-func (payload *userUpdatePayload) Validate(r *http.Request) error {
-	if payload.Role != 0 && payload.Role != 1 && payload.Role != 2 {
-		return portainer.Error("Invalid role value. Value must be one of: 1 (administrator) or 2 (regular user)")
+func (payload *userUpdatePasswordPayload) Validate(r *http.Request) error {
+	if govalidator.IsNull(payload.Password) {
+		return portainer.Error("Invalid current password")
+	}
+	if govalidator.IsNull(payload.NewPassword) {
+		return portainer.Error("Invalid new password")
 	}
 	return nil
 }
 
-// PUT request on /api/users/:id
-func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+// PUT request on /api/users/:id/passwd
+func (handler *Handler) userUpdatePassword(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	userID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid user identifier route variable", err}
@@ -38,14 +42,10 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update user", portainer.ErrUnauthorized}
 	}
 
-	var payload userUpdatePayload
+	var payload userUpdatePasswordPayload
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
-	}
-
-	if tokenData.Role != portainer.AdministratorRole && payload.Role != 0 {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update user to administrator role", portainer.ErrResourceAccessDenied}
 	}
 
 	user, err := handler.UserService.User(portainer.UserID(userID))
@@ -55,15 +55,14 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a user with the specified identifier inside the database", err}
 	}
 
-	if payload.Password != "" {
-		user.Password, err = handler.CryptoService.Hash(payload.Password)
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to hash user password", portainer.ErrCryptoHashFailure}
-		}
+	err = handler.CryptoService.CompareHashAndData(user.Password, payload.Password)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusForbidden, "Specified password do not match actual password", portainer.ErrUnauthorized}
 	}
 
-	if payload.Role != 0 {
-		user.Role = portainer.UserRole(payload.Role)
+	user.Password, err = handler.CryptoService.Hash(payload.NewPassword)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to hash user password", portainer.ErrCryptoHashFailure}
 	}
 
 	err = handler.UserService.UpdateUser(user.ID, user)
@@ -71,5 +70,5 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist user changes inside the database", err}
 	}
 
-	return response.JSON(w, user)
+	return response.Empty(w)
 }

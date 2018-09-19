@@ -4,9 +4,9 @@ import (
 	"log"
 	"net/http"
 
+	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer"
-	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/response"
 )
 
 // POST request on /api/endpoints/snapshot

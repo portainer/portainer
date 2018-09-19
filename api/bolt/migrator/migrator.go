@@ -178,7 +178,7 @@ func (m *Migrator) Migrate() error {
 		}
 	}
 
-	// 1.19.2-dev
+	// Portainer 1.19.2
 	if m.currentDBVersion < 14 {
 		err := m.updateResourceControlsToDBVersion14()
 		if err != nil {

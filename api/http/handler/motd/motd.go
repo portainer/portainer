@@ -3,10 +3,10 @@ package motd
 import (
 	"net/http"
 
+	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/crypto"
 	"github.com/portainer/portainer/http/client"
-	"github.com/portainer/portainer/http/response"
 )
 
 type motdResponse struct {

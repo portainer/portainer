@@ -44,13 +44,13 @@ type Store struct {
 	SettingsService        *settings.Service
 	StackService           *stack.Service
 	TagService             *tag.Service
-	DeploykeyService       *deploykey.Service
 	TeamMembershipService  *teammembership.Service
 	TeamService            *team.Service
 	TemplateService        *template.Service
 	UserService            *user.Service
 	VersionService         *version.Service
 	WebhookService         *webhook.Service
+	DeploykeyService       *deploykey.Service
 }
 
 // NewStore initializes a new Store and the associated services
@@ -206,12 +206,6 @@ func (store *Store) initServices() error {
 	}
 	store.TagService = tagService
 
-	deploykeyService, err := deploykey.NewService(store.db)
-	if err != nil {
-		return err
-	}
-	store.DeploykeyService = deploykeyService
-
 	teammembershipService, err := teammembership.NewService(store.db)
 	if err != nil {
 		return err
@@ -247,6 +241,12 @@ func (store *Store) initServices() error {
 		return err
 	}
 	store.WebhookService = webhookService
+
+	deploykeyService, err := deploykey.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.DeploykeyService = deploykeyService
 
 	return nil
 }
