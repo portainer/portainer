@@ -14,7 +14,24 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
     Endpoint: null
   };
 
-  $scope.duplicateStack = duplicateStack;
+  $scope.duplicateStack = function duplicateStack(name, endpointId) {
+    var stack = $scope.stack;
+    var env = FormHelper.removeInvalidEnvVars(stack.Env);
+
+    return StackService.duplicateStack(name, $scope.stackFileContent,  env, endpointId, stack.Type)
+      .then(onDuplicationSuccess)
+      .catch(notifyOnError);
+
+    function onDuplicationSuccess() {
+      Notifications.success('Stack successfully duplicated');
+      EndpointProvider.setEndpointID(endpointId);
+      $state.go('portainer.stacks', {}, { reload: true });
+    }
+
+    function notifyOnError(err) {
+      Notifications.error('Failure', err, 'Unable to duplicate stack');
+    }
+  };
 
   $scope.showEditor = function() {
     $scope.state.showEditorTab = true;
@@ -265,25 +282,6 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
     } else {
       var stackId = $transition$.params().id;
       loadStack(stackId);
-    }
-  }
-
-  function duplicateStack(name, endpointId) {
-    var stack = $scope.stack;
-    var env = FormHelper.removeInvalidEnvVars(stack.Env);
-
-    return StackService.duplicateStack(name, $scope.stackFileContent,  env, endpointId, stack.Type)
-      .then(onDuplicationSuccess)
-      .catch(notifyOnError);
-
-    function onDuplicationSuccess() {
-      Notifications.success('Stack successfully duplicated');
-      EndpointProvider.setEndpointID(endpointId);
-      $state.go('portainer.stacks', {}, { reload: true });
-    }
-
-    function notifyOnError(err) {
-      Notifications.error('Failure', err, 'Unable to duplicate stack');
     }
   }
 

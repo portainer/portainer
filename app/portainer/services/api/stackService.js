@@ -4,7 +4,6 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
   'use strict';
   var service = {};
 
-  service.duplicateStack = duplicateStack;
 
   service.stack = function(id) {
     var deferred = $q.defer();
@@ -47,7 +46,6 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
         deferred.reject({ msg: 'Target endpoint is located in the same Swarm cluster as the current endpoint', err: null });
         return;
       }
-
       return Stack.migrate({ id: stack.Id, endpointId: stack.EndpointId }, { EndpointID: targetEndpointId, SwarmID:  swarm.Id, Name: newName }).$promise;
     })
     .then(function success() {
@@ -323,7 +321,7 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     return deferred.promise;
   };
 
-  function duplicateStack(name, stackFileContent, env, endpointId, type) {
+  service.duplicateStack = function duplicateStack(name, stackFileContent, env, endpointId, type) {
     var action = type === 1 ? service.createSwarmStackFromFileContent : service.createComposeStackFromFileContent;
     return action(name, stackFileContent, env, endpointId);
   }

@@ -37,8 +37,7 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
         return;
       }
       ctrl.state.duplicationInProgress = true;
-      ctrl
-        .onDuplicate({
+      ctrl.onDuplicate({
           endpointId: ctrl.formValues.endpoint.Id,
           name: ctrl.formValues.newName ? ctrl.formValues.newName : undefined
         })
@@ -49,8 +48,7 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
 
     function migrateStack() {
       ctrl.state.migrationInProgress = true;
-      ctrl
-        .onMigrate({
+      ctrl.onMigrate({
           endpointId: ctrl.formValues.endpoint.Id,
           name: ctrl.formValues.newName ? ctrl.formValues.newName : undefined
         })
