@@ -1,0 +1,35 @@
+
+
+        
+    <div style="margin-bottom: 0">        
+         
+      <div class="form-group">              
+        <div class="col-sm-6">
+            <label for="stack_sshrepository_path" class="col-sm-4 control-label text-left">Select deploy key</label>
+            <div class="col-sm-8">
+                <span ng-class="{ 'pull-right': $ctrl.showAddAction }" style="width: 25%;">
+                    <ui-select ng-model="$ctrl.categories.selected" on-select="$ctrl.change($select.selected.Publickeypath, $select.selected.Privatekeypath)">
+                      <ui-select-match placeholder="Select a deploy key" allow-clear="true">
+                        <span>{{ $select.selected.Name }}</span>
+                      </ui-select-match>
+                      <ui-select-choices repeat="category as  category in ($ctrl.categories | filter: $select.search)" >
+                        <span>{{ category.Name }}</span>
+                      </ui-select-choices>                               
+                    </ui-select>
+                  </span>  
+                  <input style="display: none;" id="selPKey" value="{{$ctrl.categories.selected.Publickeypath}}" />
+            </div>                
+        </div> 
+        <div class="col-sm-2">                                                     
+            <button type="button" class="btn btn-primary btn-sm" ng-click="$ctrl.copytoclipboard($ctrl.categories.selected)">
+                <i class="fas fa-key space-right" aria-hidden="true"></i>Copy to clipboard
+            </button>
+        </div> 
+        <div class="col-sm-2">                                                     
+          <input type="button" class="btn btn-primary btn-sm" value="Generate a new deploy key" ng-click="$ctrl.createNewkey()"/>                      
+      </div>         
+      </div>               
+    </div> 
+           
+    
+

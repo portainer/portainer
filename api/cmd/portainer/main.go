@@ -94,6 +94,10 @@ func initCryptoService() portainer.CryptoService {
 	return &crypto.Service{}
 }
 
+func initDigitalDeploykeyService() portainer.DigitalDeploykeyService {
+	return &crypto.ECDSAService{}
+}
+
 func initLDAPService() portainer.LDAPService {
 	return &ldap.Service{}
 }
@@ -399,6 +403,8 @@ func main() {
 
 	cryptoService := initCryptoService()
 
+	digitalDeploykeyService := initDigitalDeploykeyService()
+
 	digitalSignatureService := initDigitalSignatureService()
 
 	err := initKeyPair(fileService, digitalSignatureService)
@@ -488,38 +494,40 @@ func main() {
 	}
 
 	var server portainer.Server = &http.Server{
-		Status:                 applicationStatus,
-		BindAddress:            *flags.Addr,
-		AssetsPath:             *flags.Assets,
-		AuthDisabled:           *flags.NoAuth,
-		EndpointManagement:     endpointManagement,
-		UserService:            store.UserService,
-		TeamService:            store.TeamService,
-		TeamMembershipService:  store.TeamMembershipService,
-		EndpointService:        store.EndpointService,
-		EndpointGroupService:   store.EndpointGroupService,
-		ResourceControlService: store.ResourceControlService,
-		SettingsService:        store.SettingsService,
-		RegistryService:        store.RegistryService,
-		DockerHubService:       store.DockerHubService,
-		StackService:           store.StackService,
-		TagService:             store.TagService,
-		TemplateService:        store.TemplateService,
-		WebhookService:         store.WebhookService,
-		SwarmStackManager:      swarmStackManager,
-		ComposeStackManager:    composeStackManager,
-		CryptoService:          cryptoService,
-		JWTService:             jwtService,
-		FileService:            fileService,
-		LDAPService:            ldapService,
-		GitService:             gitService,
-		SignatureService:       digitalSignatureService,
-		JobScheduler:           jobScheduler,
-		Snapshotter:            snapshotter,
-		SSL:                    *flags.SSL,
-		SSLCert:                *flags.SSLCert,
-		SSLKey:                 *flags.SSLKey,
-		DockerClientFactory:    clientFactory,
+		Status:                  applicationStatus,
+		BindAddress:             *flags.Addr,
+		AssetsPath:              *flags.Assets,
+		AuthDisabled:            *flags.NoAuth,
+		EndpointManagement:      endpointManagement,
+		UserService:             store.UserService,
+		TeamService:             store.TeamService,
+		TeamMembershipService:   store.TeamMembershipService,
+		EndpointService:         store.EndpointService,
+		EndpointGroupService:    store.EndpointGroupService,
+		DeploykeyService:        store.DeploykeyService,
+		ResourceControlService:  store.ResourceControlService,
+		SettingsService:         store.SettingsService,
+		RegistryService:         store.RegistryService,
+		DockerHubService:        store.DockerHubService,
+		StackService:            store.StackService,
+		TagService:              store.TagService,
+		TemplateService:         store.TemplateService,
+		DigitalDeploykeyService: digitalDeploykeyService,
+		WebhookService:          store.WebhookService,
+		SwarmStackManager:       swarmStackManager,
+		ComposeStackManager:     composeStackManager,
+		CryptoService:           cryptoService,
+		JWTService:              jwtService,
+		FileService:             fileService,
+		LDAPService:             ldapService,
+		GitService:              gitService,
+		SignatureService:        digitalSignatureService,
+		JobScheduler:            jobScheduler,
+		Snapshotter:             snapshotter,
+		SSL:                     *flags.SSL,
+		SSLCert:                 *flags.SSLCert,
+		SSLKey:                  *flags.SSLKey,
+		DockerClientFactory:     clientFactory,
 	}
 
 	log.Printf("Starting Portainer %s on %s", portainer.APIVersion, *flags.Addr)

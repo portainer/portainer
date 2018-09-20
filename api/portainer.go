@@ -330,6 +330,19 @@ type (
 		Name string `json:"Name"`
 	}
 
+	// DeploykeyID represents a key identifier
+	DeploykeyID int
+
+	// Deploykey represents a key that can be associated to a resource
+	Deploykey struct {
+		ID             DeploykeyID
+		Name           string `json:"Name"`
+		Privatekeypath string `json:"Privatekeypath"`
+		Publickeypath  string `json:"Publickeypath"`
+		UserName       string `json:"UserName"`
+		LastUsage      string `json:"LastUsage"`
+	}
+
 	// TemplateID represents a template identifier
 	TemplateID int
 
@@ -450,6 +463,13 @@ type (
 		DeleteTeam(ID TeamID) error
 	}
 
+	// DeploykeyService represents a service for managing key data
+	DeploykeyService interface {
+		Deploykeys() ([]Deploykey, error)
+		CreateDeploykey(deploykey *Deploykey) error
+		DeleteDeploykey(ID DeploykeyID) error
+	}
+
 	// TeamMembershipService represents a service for managing team membership data
 	TeamMembershipService interface {
 		TeamMembership(ID TeamMembershipID) (*TeamMembership, error)
@@ -565,6 +585,15 @@ type (
 
 	// DigitalSignatureService represents a service to manage digital signatures
 	DigitalSignatureService interface {
+		ParseKeyPair(private, public []byte) error
+		GenerateKeyPair() ([]byte, []byte, error)
+		EncodedPublicKey() string
+		PEMHeaders() (string, string)
+		Sign(message string) (string, error)
+	}
+
+	//DigitalDeploykeyService represents a service to manage digital deploykey
+	DigitalDeploykeyService interface {
 		ParseKeyPair(private, public []byte) error
 		GenerateKeyPair() ([]byte, []byte, error)
 		EncodedPublicKey() string

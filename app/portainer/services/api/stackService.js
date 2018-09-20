@@ -4,6 +4,14 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
   'use strict';
   var service = {};
 
+  var stackName='';
+  service.setStackName = function(sackname){    
+    stackName = sackname;
+  }
+  service.getStackName = function(){
+    return stackName;
+  }
+
   service.stack = function(id) {
     var deferred = $q.defer();
 

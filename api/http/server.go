@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/portainer/docker"
 	"github.com/portainer/portainer/http/handler"
 	"github.com/portainer/portainer/http/handler/auth"
+	"github.com/portainer/portainer/http/handler/deploykeys"
 	"github.com/portainer/portainer/http/handler/dockerhub"
 	"github.com/portainer/portainer/http/handler/endpointgroups"
 	"github.com/portainer/portainer/http/handler/endpointproxy"
@@ -35,39 +36,41 @@ import (
 
 // Server implements the portainer.Server interface
 type Server struct {
-	BindAddress            string
-	AssetsPath             string
-	AuthDisabled           bool
-	EndpointManagement     bool
-	Status                 *portainer.Status
-	ComposeStackManager    portainer.ComposeStackManager
-	CryptoService          portainer.CryptoService
-	SignatureService       portainer.DigitalSignatureService
-	JobScheduler           portainer.JobScheduler
-	Snapshotter            portainer.Snapshotter
-	DockerHubService       portainer.DockerHubService
-	EndpointService        portainer.EndpointService
-	EndpointGroupService   portainer.EndpointGroupService
-	FileService            portainer.FileService
-	GitService             portainer.GitService
-	JWTService             portainer.JWTService
-	LDAPService            portainer.LDAPService
-	RegistryService        portainer.RegistryService
-	ResourceControlService portainer.ResourceControlService
-	SettingsService        portainer.SettingsService
-	StackService           portainer.StackService
-	SwarmStackManager      portainer.SwarmStackManager
-	TagService             portainer.TagService
-	TeamService            portainer.TeamService
-	TeamMembershipService  portainer.TeamMembershipService
-	TemplateService        portainer.TemplateService
-	UserService            portainer.UserService
-	WebhookService         portainer.WebhookService
-	Handler                *handler.Handler
-	SSL                    bool
-	SSLCert                string
-	SSLKey                 string
-	DockerClientFactory    *docker.ClientFactory
+	BindAddress             string
+	AssetsPath              string
+	AuthDisabled            bool
+	EndpointManagement      bool
+	Status                  *portainer.Status
+	ComposeStackManager     portainer.ComposeStackManager
+	CryptoService           portainer.CryptoService
+	SignatureService        portainer.DigitalSignatureService
+	DigitalDeploykeyService portainer.DigitalDeploykeyService
+	JobScheduler            portainer.JobScheduler
+	Snapshotter             portainer.Snapshotter
+	DockerHubService        portainer.DockerHubService
+	EndpointService         portainer.EndpointService
+	EndpointGroupService    portainer.EndpointGroupService
+	FileService             portainer.FileService
+	GitService              portainer.GitService
+	JWTService              portainer.JWTService
+	LDAPService             portainer.LDAPService
+	RegistryService         portainer.RegistryService
+	ResourceControlService  portainer.ResourceControlService
+	SettingsService         portainer.SettingsService
+	StackService            portainer.StackService
+	SwarmStackManager       portainer.SwarmStackManager
+	TagService              portainer.TagService
+	TeamService             portainer.TeamService
+	TeamMembershipService   portainer.TeamMembershipService
+	TemplateService         portainer.TemplateService
+	UserService             portainer.UserService
+	WebhookService          portainer.WebhookService
+	DeploykeyService        portainer.DeploykeyService
+	Handler                 *handler.Handler
+	SSL                     bool
+	SSLCert                 string
+	SSLKey                  string
+	DockerClientFactory     *docker.ClientFactory
 }
 
 // Start starts the HTTP server
@@ -152,6 +155,10 @@ func (server *Server) Start() error {
 	teamHandler.TeamService = server.TeamService
 	teamHandler.TeamMembershipService = server.TeamMembershipService
 
+	var deploykeyHandler = deploykeys.NewHandler(requestBouncer)
+	deploykeyHandler.DeploykeyService = server.DeploykeyService
+	deploykeyHandler.DigitalDeploykeyService = server.DigitalDeploykeyService
+
 	var teamMembershipHandler = teammemberships.NewHandler(requestBouncer)
 	teamMembershipHandler.TeamMembershipService = server.TeamMembershipService
 	var statusHandler = status.NewHandler(requestBouncer, server.Status)
@@ -201,6 +208,7 @@ func (server *Server) Start() error {
 		UserHandler:            userHandler,
 		WebSocketHandler:       websocketHandler,
 		WebhookHandler:         webhookHandler,
+		DeploykeyHandler:       deploykeyHandler,
 	}
 
 	if server.SSL {

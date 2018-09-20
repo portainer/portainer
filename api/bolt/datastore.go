@@ -7,6 +7,7 @@ import (
 
 	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/bolt/deploykey"
 	"github.com/portainer/portainer/bolt/dockerhub"
 	"github.com/portainer/portainer/bolt/endpoint"
 	"github.com/portainer/portainer/bolt/endpointgroup"
@@ -49,6 +50,7 @@ type Store struct {
 	UserService            *user.Service
 	VersionService         *version.Service
 	WebhookService         *webhook.Service
+	DeploykeyService       *deploykey.Service
 }
 
 // NewStore initializes a new Store and the associated services
@@ -203,6 +205,12 @@ func (store *Store) initServices() error {
 		return err
 	}
 	store.TagService = tagService
+
+	deploykeyService, err := deploykey.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.DeploykeyService = deploykeyService
 
 	teammembershipService, err := teammembership.NewService(store.db)
 	if err != nil {

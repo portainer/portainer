@@ -76,6 +76,11 @@ const (
 	ErrCryptoHashFailure = Error("Unable to hash data")
 )
 
+// Deploykey errors
+const (
+	ErrDeploykeyAlreadyExists = Error("A key already exists with this name")
+)
+
 // JWT errors.
 const (
 	ErrSecretGeneration   = Error("Unable to generate secret key")

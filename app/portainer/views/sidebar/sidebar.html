@@ -64,6 +64,9 @@
         <a ui-sref="portainer.about" ui-sref-active="active">About</a>
       </div>
     </li>
+    <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
+        <a ui-sref="portainer.deploykeys" ui-sref-active="active">Deploy Keys</a>
+    </li>
   </ul>
   <div class="sidebar-footer-content">
     <img src="images/logo_small.png" class="img-responsive logo" alt="Portainer">
