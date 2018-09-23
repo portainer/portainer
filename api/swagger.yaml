@@ -4160,6 +4160,10 @@ definitions:
         type: "string"
         example: "jpofkc0i9uo9wtx1zesuk649w"
         description: "Swarm cluster identifier, must match the identifier of the cluster where the stack will be relocated"
+      Name:
+        type: "string"
+        example: "new-stack"
+        description: "If provided will rename the migrated stack"
   StackCreateRequest:
     type: "object"
     required:
