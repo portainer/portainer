@@ -48,7 +48,7 @@ angular.module('portainer.app').controller('EndpointListController', [
         return (
           groups.some(function(group) {
             return endpoint.GroupName.includes(group);
-          }) ||
+          }) &&
           tags.some(function(tag) {
             return endpoint.Tags.some(function(endpointTag) {
               return endpointTag.includes(tag);
