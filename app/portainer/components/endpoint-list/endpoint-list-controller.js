@@ -46,14 +46,14 @@ angular.module('portainer.app').controller('EndpointListController', [
 
       return endpoints.filter(function(endpoint) {
         return (
-          groups.some(function(group) {
+          (!groups.length || groups.some(function(group) {
             return endpoint.GroupName.includes(group);
-          }) &&
-          tags.some(function(tag) {
+          })) &&
+          (!tags.length || tags.some(function(tag) {
             return endpoint.Tags.some(function(endpointTag) {
               return endpointTag.includes(tag);
             });
-          })
+          }))
         );
       });
     }
