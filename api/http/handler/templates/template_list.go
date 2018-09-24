@@ -26,7 +26,7 @@ func (handler *Handler) templateList(w http.ResponseWriter, r *http.Request) *ht
 		}
 	} else {
 		var templateData []byte
-		templateData, err = client.Get(settings.TemplatesURL)
+		templateData, err = client.Get(settings.TemplatesURL, 0)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve external templates", err}
 		}
