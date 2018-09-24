@@ -90,7 +90,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case strings.HasPrefix(r.URL.Path, "/api/templates"):
 		http.StripPrefix("/api", h.TemplatesHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/deploykeys"):
-		http.StripPrefix("/api", h.DeploykeyHandler).ServeHT
+		http.StripPrefix("/api", h.DeploykeyHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/upload"):
 		http.StripPrefix("/api", h.UploadHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/users"):
