@@ -21,13 +21,14 @@ const (
 type Handler struct {
 	*mux.Router
 	authDisabled          bool
-	UserService           portainer.UserService
-	CryptoService         portainer.CryptoService
-	JWTService            portainer.JWTService
-	LDAPService           portainer.LDAPService
-	SettingsService       portainer.SettingsService
-	TeamService           portainer.TeamService
-	TeamMembershipService portainer.TeamMembershipService
+	UserService           	portainer.UserService
+	CryptoService         	portainer.CryptoService
+	JWTService            	portainer.JWTService
+	LDAPService           	portainer.LDAPService
+	SettingsService       	portainer.SettingsService
+	TeamService           	portainer.TeamService
+	TeamMembershipService   portainer.TeamMembershipService
+	//DigitalSignatureService portainer.DigitalSignatureService
 }
 
 // NewHandler creates a handler to manage authentication operations.

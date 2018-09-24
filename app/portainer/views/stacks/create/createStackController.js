@@ -8,13 +8,18 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
     StackFile: null,
     RepositoryURL: '',
     RepositoryReferenceName: '',
-    RepositoryAuthentication: false,
     RepositoryUsername: '',
     RepositoryPassword: '',
     Env: [],
     ComposeFilePathInRepository: 'docker-compose.yml',
-    AccessControlData: new AccessControlFormData()
-  };
+    AccessControlData: new AccessControlFormData(),  
+    StachauthControlData: new StackAuthControlFormData(),     
+    RepositoryAuthentication:''
+  }; 
+
+  $scope.formValues.generateNewKey =function(){
+    StackService.setStackName($scope.formValues.Name);
+  } 
 
   $scope.state = {
     Method: 'editor',
@@ -33,7 +38,7 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
 
   function validateForm(accessControlData, isAdmin) {
     $scope.state.formValidationError = '';
-    var error = '';
+    var error = '';    
     error = FormValidator.validateAccessControl(accessControlData, isAdmin);
 
     if (error) {
@@ -57,8 +62,7 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
       var repositoryOptions = {
         RepositoryURL: $scope.formValues.RepositoryURL,
         RepositoryReferenceName: $scope.formValues.RepositoryReferenceName,
-        ComposeFilePathInRepository: $scope.formValues.ComposeFilePathInRepository,
-        RepositoryAuthentication: $scope.formValues.RepositoryAuthentication,
+        ComposeFilePathInRepository: $scope.formValues.ComposeFilePathInRepository,      
         RepositoryUsername: $scope.formValues.RepositoryUsername,
         RepositoryPassword: $scope.formValues.RepositoryPassword
       };
@@ -80,8 +84,7 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
       var repositoryOptions = {
         RepositoryURL: $scope.formValues.RepositoryURL,
         RepositoryReferenceName: $scope.formValues.RepositoryReferenceName,
-        ComposeFilePathInRepository: $scope.formValues.ComposeFilePathInRepository,
-        RepositoryAuthentication: $scope.formValues.RepositoryAuthentication,
+        ComposeFilePathInRepository: $scope.formValues.ComposeFilePathInRepository,        
         RepositoryUsername: $scope.formValues.RepositoryUsername,
         RepositoryPassword: $scope.formValues.RepositoryPassword
       };
@@ -94,6 +97,7 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
     var method = $scope.state.Method;
 
     var accessControlData = $scope.formValues.AccessControlData;
+    
     var userDetails = Authentication.getUserDetails();
     var isAdmin = userDetails.role === 1;
     var userId = userDetails.ID;
@@ -136,6 +140,7 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
   function initView() {
     var endpointMode = $scope.applicationState.endpoint.mode;
     $scope.state.StackType = 2;
+    $scope.formValues.RepositoryAuthentication = '1';
     if (endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER') {
       $scope.state.StackType = 1;
     }

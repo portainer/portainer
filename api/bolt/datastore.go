@@ -7,6 +7,7 @@ import (
 
 	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/bolt/deploykey"
 	"github.com/portainer/portainer/bolt/dockerhub"
 	"github.com/portainer/portainer/bolt/endpoint"
 	"github.com/portainer/portainer/bolt/endpointgroup"
@@ -43,6 +44,7 @@ type Store struct {
 	SettingsService        *settings.Service
 	StackService           *stack.Service
 	TagService             *tag.Service
+	DeploykeyService       *deploykey.Service
 	TeamMembershipService  *teammembership.Service
 	TeamService            *team.Service
 	TemplateService        *template.Service
@@ -203,6 +205,12 @@ func (store *Store) initServices() error {
 		return err
 	}
 	store.TagService = tagService
+
+	deploykeyService, err := deploykey.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.DeploykeyService = deploykeyService
 
 	teammembershipService, err := teammembership.NewService(store.db)
 	if err != nil {

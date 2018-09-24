@@ -27,6 +27,11 @@ const (
 	ErrTeamMembershipAlreadyExists = Error("Team membership already exists for this user and team")
 )
 
+// Sshkey errors
+const (
+	ErrSshkeyAlreadyExists = Error("A key already exists with this name")
+)
+
 // ResourceControl errors.
 const (
 	ErrResourceControlAlreadyExists = Error("A resource control is already applied on this resource")
@@ -63,6 +68,11 @@ const (
 // Tag errors
 const (
 	ErrTagAlreadyExists = Error("A tag already exists with this name")
+)
+
+// Deploykey errors
+const (
+	ErrDeploykeyAlreadyExists = Error("A key already exists with this name")
 )
 
 // Endpoint extensions error

@@ -330,6 +330,20 @@ type (
 		Name string `json:"Name"`
 	}
 
+
+	// DeploykeyID represents a key identifier
+	DeploykeyID int
+
+	// Deploykey represents a key that can be associated to a resource
+	Deploykey struct {
+		ID             DeploykeyID
+		Name           string `json:"Name"`
+		Privatekeypath string `json:"Privatekeypath"`
+		Publickeypath  string `json:"Publickeypath"`
+		UserName       string `json:"UserName"`
+		LastUsage      string `json:"LastUsage"`
+	}
+
 	// TemplateID represents a template identifier
 	TemplateID int
 
@@ -492,6 +506,13 @@ type (
 		DeleteRegistry(ID RegistryID) error
 	}
 
+	// DeploykeyService represents a service for managing key data
+	DeploykeyService interface {
+		Deploykeys() ([]Deploykey, error)
+		CreateDeploykey(deploykey *Deploykey) error
+		DeleteDeploykey(ID DeploykeyID) error
+	}
+
 	// StackService represents a service for managing stack data
 	StackService interface {
 		Stack(ID StackID) (*Stack, error)
@@ -547,6 +568,7 @@ type (
 		CreateTag(tag *Tag) error
 		DeleteTag(ID TagID) error
 	}
+	
 
 	// TemplateService represents a service for managing template data
 	TemplateService interface {
@@ -561,6 +583,15 @@ type (
 	CryptoService interface {
 		Hash(data string) (string, error)
 		CompareHashAndData(hash string, data string) error
+	}
+
+	//DigitalDeploykeyService represents a service to manage digital deploykey
+	DigitalDeploykeyService interface {
+		ParseKeyPair(private, public []byte) error
+		GenerateKeyPair() ([]byte, []byte, error)
+		EncodedPublicKey() string
+		PEMHeaders() (string, string)
+		Sign(message string) (string, error)
 	}
 
 	// DigitalSignatureService represents a service to manage digital signatures
