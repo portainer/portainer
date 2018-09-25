@@ -21,29 +21,21 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
         ctrl.nodeDetails = buildNodeDetails(node);
         if (ctrl.state.isAgent) {
           AgentService.hostInfo(node.Hostname).then(function onHostInfoLoad(agentHostInfo) {
-            enhanceHostDetails(ctrl.hostDetails, agentHostInfo);
+            ctrl.devices = agentHostInfo.PCIDevices;
+            ctrl.disks = agentHostInfo.PhysicalDisks;
           });
         }
       });
-
-      
     }
 
-    function enhanceHostDetails(hostDetails, agentHostInfo) {
-      hostDetails.physicalDeviceInfo = agentHostInfo.PhysicalDeviceInfo;
-      hostDetails.pciDevices = agentHostInfo.InstalledPCIDevices;
-      hostDetails.physicalDisk = agentHostInfo.PhysicalDisk;
-    }
 
     function buildHostDetails(node) {
       return {
         os: {
           arch: node.PlatformArchitecture,
           type: node.PlatformOS
-          // name: node.OperatingSystem TODO
         },
         name: node.Hostname,
-        // kernelVersion: node.KernelVersion,
         totalCPU: node.CPUs / 1e9,
         totalMemory: node.Memory
       };
@@ -52,10 +44,6 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
     function buildEngineDetails(node) {
       return {
         releaseVersion: node.EngineVersion,
-        // apiVersion: versionDetails.ApiVersion, TODO
-        // rootDirectory: node.DockerRootDir, TODO
-        // storageDriver: node.Driver,
-        // loggingDriver: node.LoggingDriver,
         volumePlugins: transformPlugins(node.Plugins, 'Volume'),
         networkPlugins: transformPlugins(node.Plugins, 'Network')
       };
