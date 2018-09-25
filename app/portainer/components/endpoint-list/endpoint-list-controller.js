@@ -37,45 +37,18 @@ angular.module('portainer.app').controller('EndpointListController', [
       if (!endpoints || !endpoints.length || !filterValue) {
         return endpoints;
       }
-      var groups = parseGroups(filterValue);
-      var tags = parseTags(filterValue);
-
-      if (!tags.length && !groups.length) {
-        return $filter('filter')(endpoints, filterValue);
-      }
-
-      return endpoints.filter(function(endpoint) {
-        return (
-          (!groups.length || groups.some(function(group) {
-            return endpoint.GroupName.includes(group);
-          })) &&
-          (!tags.length || tags.some(function(tag) {
-            return endpoint.Tags.some(function(endpointTag) {
-              return endpointTag.includes(tag);
-            });
-          }))
-        );
+      var keywords = filterValue.split(' ');
+      return _.filter(endpoints, function(endpoint) {
+        return _.every(keywords, function(keyword) {
+          return (
+            _.includes(endpoint.Name, keyword) ||
+            _.includes(endpoint.GroupName, keyword) ||
+            _.some(endpoint.Tags, function(tag) {
+              return _.includes(tag, keyword);
+            })
+          );
+        });
       });
-    }
-
-    function parseGroups(filterValue) {
-      var groupRegex = /group:('((\w+\s*)+)'|(\w+))/g;
-      return parseFilter(groupRegex, filterValue);
-    }
-
-    function parseTags(filterValue) {
-      var tagRegex = /tag:('((.+\s*)+)'|(\w+-?)+)/g;
-      return parseFilter(tagRegex, filterValue);
-    }
-
-    function parseFilter(regex, filterValue) {
-      var match = regex.exec(filterValue);
-      var matches = [];
-      while (match) {
-        matches.push(match[1].replace(/\'/g, ''));
-        match = regex.exec(filterValue);
-      }
-      return matches;
     }
   }
 ]);
