@@ -17,6 +17,7 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
   $scope.duplicateStack = function duplicateStack(name, endpointId) {
     var stack = $scope.stack;
     var env = FormHelper.removeInvalidEnvVars(stack.Env);
+    EndpointProvider.setEndpointID(endpointId);
 
     return StackService.duplicateStack(name, $scope.stackFileContent,  env, endpointId, stack.Type)
       .then(onDuplicationSuccess)
@@ -24,8 +25,9 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
 
     function onDuplicationSuccess() {
       Notifications.success('Stack successfully duplicated');
-      EndpointProvider.setEndpointID(endpointId);
       $state.go('portainer.stacks', {}, { reload: true });
+      EndpointProvider.setEndpointID(stack.EndpointId);
+
     }
 
     function notifyOnError(err) {
