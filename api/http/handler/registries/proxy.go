@@ -1,7 +1,6 @@
 package registries
 
 import (
-	"errors"
 	"net/http"
 	"strconv"
 
@@ -27,9 +26,17 @@ func (handler *Handler) proxyRequestsToRegistryAPI(w http.ResponseWriter, r *htt
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a registry with the specified identifier inside the database", err}
 	}
 
-	proxy := handler.ProxyManager.GetPluginProxy(portainer.RegistryManagementPlugin)
+	//TODO: review that??
+	var proxy http.Handler
+	proxy = handler.ProxyManager.GetPluginProxy(portainer.RegistryManagementPlugin)
 	if proxy == nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Registry management plugin is not enabled", errors.New("Plugin not enabled")}
+		// TODO: plugin check should not be done this way
+		// return &httperror.HandlerError{http.StatusInternalServerError, "Registry management plugin is not enabled", errors.New("Plugin not enabled")}
+		err = handler.ProxyManager.CreatePluginProxy(portainer.RegistryManagementPlugin)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to register registry proxy", err}
+		}
+		proxy = handler.ProxyManager.GetPluginProxy(portainer.RegistryManagementPlugin)
 	}
 
 	id := strconv.Itoa(int(registryID))

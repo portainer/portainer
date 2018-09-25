@@ -42,8 +42,6 @@ type (
 		Snapshot           bool   `json:"Snapshot"`
 		Analytics          bool   `json:"Analytics"`
 		Version            string `json:"Version"`
-		// TODO: migrate data to initialize array
-		EnabledPlugins []PluginType `json:"EnabledPlugins"`
 	}
 
 	// LDAPSettings represents the settings used to connect to a LDAP server
@@ -287,9 +285,6 @@ type (
 	// one extension of each type can be associated to an endpoint
 	EndpointExtensionType int
 
-	// PluginType represents a type of plugin
-	PluginType int
-
 	// ResourceControlID represents a resource control identifier
 	ResourceControlID int
 
@@ -415,6 +410,21 @@ type (
 	// TLSFileType represents a type of TLS file required to connect to a Docker endpoint.
 	// It can be either a TLS CA file, a TLS certificate file or a TLS key file
 	TLSFileType int
+
+	// PluginID represents a plugin identifier
+	PluginID int
+
+	// Plugin represent a Portainer plugin
+	Plugin struct {
+		ID                PluginID `json:"Id"`
+		Enabled           bool     `json:"Enabled"`
+		Name              string   `json:"Name,omitempty"`
+		ShortDescription  string   `json:"ShortDescription,omitempty"`
+		Description       string   `json:"Description,omitempty"`
+		Price             string   `json:"Price,omitempty"`
+		LicenseCompany    string   `json:"LicenseCompany,omitempty"`
+		LicenseExpiration string   `json:"LicenseExpiration,omitempty"`
+	}
 
 	// CLIService represents a service for managing CLI
 	CLIService interface {
@@ -561,6 +571,14 @@ type (
 		CreateTemplate(template *Template) error
 		UpdateTemplate(ID TemplateID, template *Template) error
 		DeleteTemplate(ID TemplateID) error
+	}
+
+	// PluginService represents a service for managing plugin data
+	PluginService interface {
+		Plugins() ([]Plugin, error)
+		Persist(plugin *Plugin) error
+		// TODO: remove?
+		// DeletePlugin(ID PluginID) error
 	}
 
 	// CryptoService represents a service for encrypting/hashing data
@@ -772,7 +790,7 @@ const (
 )
 
 const (
-	_ PluginType = iota
+	_ PluginID = iota
 	// RegistryManagementPlugin represents the registry management plugin
 	RegistryManagementPlugin
 )

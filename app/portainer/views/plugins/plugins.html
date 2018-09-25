@@ -25,7 +25,15 @@
           <div class="form-group">
             <label for="plugin_license" class="col-sm-2 control-label text-left">License</label>
             <div class="col-sm-10">
-              <input type="text" name="plugin_license" class="form-control" ng-model="formValues.License" placeholder="abhejd-745457-idu57" required>
+              <input type="text" name="plugin_license" class="form-control" ng-model="formValues.License" ng-change="isValidLicenseFormat(pluginEnableForm)" required placeholder="1-Lyr6jRl1NqT/oBlQR8wjmMVJhXO5Uee5UfUTUfATCvxPseExvwOfXyckHzV+5rJDPO7waroT5ooAZV2XCsM">
+            </div>
+          </div>
+          <div class="form-group" ng-show="pluginEnableForm.plugin_license.$invalid">
+            <div class="col-sm-12 small text-warning">
+              <div ng-messages="pluginEnableForm.plugin_license.$error">
+                <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                <p ng-message="invalidLicense"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Invalid license format.</p>
+              </div>
             </div>
           </div>
 
@@ -45,10 +53,10 @@
   </div>
 </div>
 
-<div class="row">
+<div class="row" ng-if="plugins">
   <div class="col-sm-12">
     <plugin-list
-      enabled-plugins="enabledPlugins"
+      plugins="plugins"
     ></plugin-list>
   </div>
 </div>

@@ -18,7 +18,8 @@ func hideFields(registry *portainer.Registry) {
 type Handler struct {
 	*mux.Router
 	RegistryService portainer.RegistryService
-	ProxyManager    *proxy.Manager
+	// TODO: remove proxymanager ?
+	ProxyManager *proxy.Manager
 }
 
 // NewHandler creates a handler to manage registry operations.

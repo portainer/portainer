@@ -102,27 +102,29 @@ func (manager *Manager) DeleteProxy(key string) {
 	manager.proxies.Remove(key)
 }
 
-func (manager *Manager) CreatePluginProxy(pluginType portainer.PluginType) error {
+func (manager *Manager) CreatePluginProxy(pluginID portainer.PluginID) error {
 	// TODO: should be stored in plugin definition somewhere?
+	// otherwise needs a switch or something
 	pluginURL, err := url.Parse("http://localhost:7001")
 	if err != nil {
 		return err
 	}
 
 	proxy := manager.proxyFactory.newHTTPProxy(pluginURL)
-	manager.pluginProxies.Set(strconv.Itoa(int(pluginType)), proxy)
+	manager.pluginProxies.Set(strconv.Itoa(int(pluginID)), proxy)
 
 	return nil
 }
 
-func (manager *Manager) GetPluginProxy(pluginType portainer.PluginType) http.Handler {
-	proxy, ok := manager.pluginProxies.Get(strconv.Itoa(int(pluginType)))
+func (manager *Manager) GetPluginProxy(pluginID portainer.PluginID) http.Handler {
+	proxy, ok := manager.pluginProxies.Get(strconv.Itoa(int(pluginID)))
 	if !ok {
 		return nil
 	}
 	return proxy.(http.Handler)
 }
 
+// TODO: remove?
 // // CreateAndRegisterExtensionProxy creates a new HTTP reverse proxy for an extension and adds it to the registered proxies.
 // func (manager *Manager) CreateAndRegisterExtensionProxy(key, extensionAPIURL string) (http.Handler, error) {
 // 	extensionURL, err := url.Parse(extensionAPIURL)

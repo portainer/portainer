@@ -498,6 +498,7 @@ func main() {
 		TeamMembershipService:  store.TeamMembershipService,
 		EndpointService:        store.EndpointService,
 		EndpointGroupService:   store.EndpointGroupService,
+		PluginService:          store.PluginService,
 		ResourceControlService: store.ResourceControlService,
 		SettingsService:        store.SettingsService,
 		RegistryService:        store.RegistryService,

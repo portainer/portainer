@@ -61,9 +61,7 @@
                 <a ui-sref="portainer.registries.registry.access({id: item.Id})" ng-if="$ctrl.accessManagement">
                   <i class="fa fa-users" aria-hidden="true"></i> Manage access
                 </a>
-              </td>
-              <td ng-if="item.Version === 'registry/2.0'">
-                <a ui-sref="portainer.registries.registry.repositories({id: item.Id})">
+                <a ui-sref="portainer.registries.registry.repositories({id: item.Id})" ng-if="$ctrl.registryManagement" class="space-left">
                   <i class="fa fa-search" aria-hidden="true"></i> Browse
                 </a>
               </td>

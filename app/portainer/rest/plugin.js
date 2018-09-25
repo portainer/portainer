@@ -3,6 +3,7 @@ angular.module('portainer.app')
  function PortainerPluginFactory($resource, API_ENDPOINT_PLUGINS) {
   'use strict';
   return $resource(API_ENDPOINT_PLUGINS, {}, {
-    create: { method: 'POST' }
+    create: { method: 'POST' },
+    query: { method: 'GET', isArray: true }
   });
 }]);

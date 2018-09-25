@@ -13,22 +13,22 @@ import (
 // Handler is the HTTP handler used to handle plugin operations.
 type Handler struct {
 	*mux.Router
-	status       *portainer.Status
-	ProxyManager *proxy.Manager
+	PluginService portainer.PluginService
+	ProxyManager  *proxy.Manager
 }
 
 // NewHandler creates a handler to manage plugin operations.
-func NewHandler(bouncer *security.RequestBouncer, status *portainer.Status) *Handler {
+func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{
 		Router: mux.NewRouter(),
-		status: status,
 	}
 
-	// TODO: admin restricted
 	h.Handle("/plugins",
-		bouncer.PublicAccess(httperror.LoggerHandler(h.pluginList))).Methods(http.MethodGet)
+		bouncer.AdministratorAccess(httperror.LoggerHandler(h.pluginList))).Methods(http.MethodGet)
 	h.Handle("/plugins",
-		bouncer.PublicAccess(httperror.LoggerHandler(h.pluginCreate))).Methods(http.MethodPost)
+		bouncer.AdministratorAccess(httperror.LoggerHandler(h.pluginCreate))).Methods(http.MethodPost)
+	h.Handle("/plugins/{id}",
+		bouncer.AdministratorAccess(httperror.LoggerHandler(h.pluginInspect))).Methods(http.MethodGet)
 
 	return h
 }

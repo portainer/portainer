@@ -53,6 +53,7 @@ type Server struct {
 	GitService             portainer.GitService
 	JWTService             portainer.JWTService
 	LDAPService            portainer.LDAPService
+	PluginService          portainer.PluginService
 	RegistryService        portainer.RegistryService
 	ResourceControlService portainer.ResourceControlService
 	SettingsService        portainer.SettingsService
@@ -123,7 +124,8 @@ func (server *Server) Start() error {
 
 	var motdHandler = motd.NewHandler(requestBouncer)
 
-	var pluginHandler = plugins.NewHandler(requestBouncer, server.Status)
+	var pluginHandler = plugins.NewHandler(requestBouncer)
+	pluginHandler.PluginService = server.PluginService
 	pluginHandler.ProxyManager = proxyManager
 
 	var registryHandler = registries.NewHandler(requestBouncer)
