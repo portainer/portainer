@@ -9,14 +9,21 @@
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-body>
-        <form class="form-horizontal">
+        <form class="form-horizontal" name="stackCreationForm">
           <!-- name-input -->
-          <div class="form-group">
+          <div class="form-group" ng-class="{ 'has-error': stackCreationForm.name.$invalid }">
             <label for="stack_name" class="col-sm-1 control-label text-left">Name</label>
             <div class="col-sm-11">
-              <input type="text" class="form-control" ng-model="formValues.Name" id="stack_name" ng-change="formValues.generateNewKey()" placeholder="e.g. myStack" auto-focus>
+              <input type="text" class="form-control" ng-model="formValues.Name" name="name" id="stack_name" ng-change="formValues.generateNewKey()" placeholder="e.g. myStack" required auto-focus>
+            </div>           
+          </div>
+          <div class="form-group" ng-show="stackCreationForm.name.$invalid">
+            <div class="col-sm-12 small text-warning">
+              <div ng-messages="stackCreationForm.name.$error">
+                <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                <p ng-message="validName"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This tag already exists.</p>
+              </div>
             </div>
-            
           </div>
           <!-- !name-input -->
           <div class="form-group">
@@ -163,28 +170,34 @@
             </div> 
             <div class="form-group" style="margin-bottom: 0" ng-if="formValues.stackAuthenticationControlEnabled">
                 <div class="boxselector_wrapper">
+                    <div>
+                        <input type="radio" id="registry_custom" ng-model="formValues.RepositoryAuthentication" ng-value="1">
+                        <label for="registry_custom">
+                          <div class="boxselector_header">
+                            <i class="fa fas fa-key" aria-hidden="true" style="margin-right: 2px;"></i>
+                            Deploy key
+                          </div>  
+                          <p>
+                            Use a deploy key
+                          </p>                      
+                        </label>
+                      </div>
                   <div>           
-                    <input type="radio" id="registry_quay" ng-model="formValues.RepositoryAuthentication" ng-value="1">
+                    <input type="radio" id="registry_quay" ng-model="formValues.RepositoryAuthentication" ng-value="2">
                     <label for="registry_quay">
                       <div class="boxselector_header">
-                        <i class="fa fa-users" aria-hidden="true" style="margin-right: 2px;"></i>                        
+                        <i class="fa fas fa-unlock" aria-hidden="true" style="margin-right: 2px;"></i>                        
+                        Credentials
+                      </div>
+                      <p>
                         Username and password authentication 
-                      </div>                      
+                      </p>                      
                     </label>
-                  </div>
-                  <div>
-                    <input type="radio" id="registry_custom" ng-model="formValues.RepositoryAuthentication" ng-value="2">
-                    <label for="registry_custom">
-                      <div class="boxselector_header">
-                        <i class="fa fa-users" aria-hidden="true" style="margin-right: 2px;"></i>
-                        Use a deploy key
-                      </div>                      
-                    </label>
-                  </div>
+                  </div>                  
                 </div>
               </div>  
             <!-- user and password -->
-             <div class="form-group" ng-if="formValues.RepositoryAuthentication == '1' && formValues.stackAuthenticationControlEnabled">
+             <div class="form-group" ng-if="formValues.RepositoryAuthentication == '2' && formValues.stackAuthenticationControlEnabled">
                       <label for="repository_username" class="col-sm-1 control-label text-left">Username</label>
                       <div class="col-sm-11 col-md-5">                
                         <input type="text" class="form-control" ng-model="formData.RepositoryUsername" name="repository_username" placeholder="myGitUser">
@@ -200,7 +213,7 @@
         
             <!-- SSH Authentication list -->
             <div class="form-group">
-              <por-stackauth-control-form form-data="formValues.StachauthControlData" ng-if="formValues.RepositoryAuthentication == '2' && formValues.stackAuthenticationControlEnabled"></por-stackauth-control-form>
+              <por-stackauth-control-form form-data="formValues.StachauthControlData" ng-if="formValues.RepositoryAuthentication == '1' && formValues.stackAuthenticationControlEnabled"></por-stackauth-control-form>
             </div>
             
                                                

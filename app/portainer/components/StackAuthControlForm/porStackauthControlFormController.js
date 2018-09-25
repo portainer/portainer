@@ -7,6 +7,7 @@ function ($q,$state,$scope, DeploykeyService, StackService, UserService, TeamSer
   ctrl.newgenratedeploykey = [];
   ctrl.enableGenratekey = false;  
 
+  
 
   ctrl.copytoclipboard = function (){
     var $temp = $("<input>");
@@ -18,9 +19,18 @@ function ($q,$state,$scope, DeploykeyService, StackService, UserService, TeamSer
     
   }
 
+  ctrl.change = function(key){
+    if(key != ''){
+      $('.copyToClip').removeAttr("disabled")
+    }
+   else{
+    $('.copyToClip').attr('disabled','disabled');
+    }   
+  }
+
   ctrl.createNewkey = function() {    
     if(StackService.getStackName() == ''){
-      Notifications.error('Pleas Enter Stack Name!',''); 
+      $('#stack_name').focus();
     } else {
       var createKeyName = 'deploykey_' + StackService.getStackName();
       var userName = Authentication.getUserDetails().username;
@@ -28,7 +38,8 @@ function ($q,$state,$scope, DeploykeyService, StackService, UserService, TeamSer
       .then(function success(data) {      
         Notifications.success('Key successfully created', createKeyName);
         //$state.reload();        
-        getAlldeploykeydata(data)                   
+        getAlldeploykeydata(data)            
+        $('.copyToClip').removeAttr("disabled")       
       })
       .catch(function error(err) {      
         Notifications.error('Failure', err, 'Unable to create key');
