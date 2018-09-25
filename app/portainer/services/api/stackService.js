@@ -258,8 +258,7 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     var deferred = $q.defer();
 
     SwarmService.swarm()
-    .then(function success(data) {
-      var swarm = data;
+    .then(function success(swarm) {
       var payload = {
         Name: name,
         SwarmID: swarm.Id,
@@ -324,7 +323,7 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
   service.duplicateStack = function duplicateStack(name, stackFileContent, env, endpointId, type) {
     var action = type === 1 ? service.createSwarmStackFromFileContent : service.createComposeStackFromFileContent;
     return action(name, stackFileContent, env, endpointId);
-  }
+  };
 
   return service;
 }]);
