@@ -22,8 +22,13 @@
       <!-- !blocklist-item-line1 -->
       <!-- blocklist-item-line2 -->
       <div class="blocklist-item-line">
-        <span class="blocklist-item-desc">
-          {{ $ctrl.model.ShortDescription }}
+        <span>
+          <span class="blocklist-item-desc">
+            {{ $ctrl.model.ShortDescription }}
+          </span>
+        </span>
+        <span ng-if="$ctrl.model.LicenseCompany">
+          <span class="small text-muted">Licensed to {{ $ctrl.model.LicenseCompany }} - Expires on {{ $ctrl.model.LicenseExpiration }}</span>
         </span>
       </div>
       <!-- !blocklist-item-line2 -->

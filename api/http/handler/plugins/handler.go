@@ -23,10 +23,12 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		Router: mux.NewRouter(),
 	}
 
+	//TODO: admin access
+
 	h.Handle("/plugins",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.pluginList))).Methods(http.MethodGet)
+		bouncer.PublicAccess(httperror.LoggerHandler(h.pluginList))).Methods(http.MethodGet)
 	h.Handle("/plugins",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.pluginCreate))).Methods(http.MethodPost)
+		bouncer.PublicAccess(httperror.LoggerHandler(h.pluginCreate))).Methods(http.MethodPost)
 	h.Handle("/plugins/{id}",
 		bouncer.AdministratorAccess(httperror.LoggerHandler(h.pluginInspect))).Methods(http.MethodGet)
 

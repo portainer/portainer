@@ -32,8 +32,8 @@ const (
 	PrivateKeyFile = "portainer.key"
 	// PublicKeyFile represents the name on disk of the file containing the public key.
 	PublicKeyFile = "portainer.pub"
-	// PluginStorePath represents the subfolder where plugins binary are stored in the file store folder.
-	PluginStorePath = "plugins"
+	// BinaryStorePath represents the subfolder where binaries are stored in the file store folder.
+	BinaryStorePath = "bin"
 )
 
 // Service represents a service for managing files and directories.
@@ -65,7 +65,7 @@ func NewService(dataStorePath, fileStorePath string) (*Service, error) {
 		return nil, err
 	}
 
-	err = service.createDirectoryInStore(PluginStorePath)
+	err = service.createDirectoryInStore(BinaryStorePath)
 	if err != nil {
 		return nil, err
 	}

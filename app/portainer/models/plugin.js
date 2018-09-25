@@ -5,4 +5,6 @@ function PortainerPluginViewModel(data) {
   this.Description = data.Description;
   this.Price = data.Price;
   this.ShortDescription = data.ShortDescription;
+  this.LicenseCompany = data.LicenseCompany;
+  this.LicenseExpiration = data.LicenseExpiration;
 }

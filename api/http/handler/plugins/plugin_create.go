@@ -1,10 +1,12 @@
 package plugins
 
 import (
+	"bytes"
 	"errors"
 	"net/http"
 	"os/exec"
 	"strconv"
+	"strings"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
@@ -51,15 +53,16 @@ func (handler *Handler) pluginCreate(w http.ResponseWriter, r *http.Request) *ht
 		}
 	}
 
-	err = handler.enablePlugin(pluginId, payload.License)
+	p := &portainer.Plugin{
+		ID: pluginId,
+	}
+
+	err = handler.enablePlugin(p, payload.License)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to enable plugin", err}
 	}
 
-	p := &portainer.Plugin{
-		ID:      pluginId,
-		Enabled: true,
-	}
+	p.Enabled = true
 
 	err = handler.PluginService.Persist(p)
 	if err != nil {
@@ -69,12 +72,12 @@ func (handler *Handler) pluginCreate(w http.ResponseWriter, r *http.Request) *ht
 	return response.Empty(w)
 }
 
-func (handler *Handler) enablePlugin(pluginID portainer.PluginID, license string) error {
+func (handler *Handler) enablePlugin(plugin *portainer.Plugin, license string) error {
 
 	// TODO: switch case on plugin identifier to download/enable correct plugin
-	switch pluginID {
+	switch plugin.ID {
 	case portainer.RegistryManagementPlugin:
-		return handler.enableRegistryManagementPlugin(pluginID, license)
+		return handler.enableRegistryManagementPlugin(plugin, license)
 	default:
 		return errors.New("Unsupported plugin identifier")
 	}
@@ -82,42 +85,52 @@ func (handler *Handler) enablePlugin(pluginID portainer.PluginID, license string
 	// syscall.Exec replaces the process, ForkExec could be tried?
 	// Also should be relocated to another package
 	// err = syscall.ForkExec("/plugins/plugin-registry-management", []string{"plugin-registry-management"}, os.Environ())
-	// cmd := exec.Command("/data/plugins/plugin-registry-management")
+	// cmd := exec.Command("/data/bin/plugin-registry-management")
 	// // cmd.Start will not share logs with the main Portainer container.
 	// err := cmd.Start()
 	// if err != nil {
 	// 	return err
 	// }
 
-	return handler.ProxyManager.CreatePluginProxy(pluginID)
+	return nil
 }
 
-func (handler *Handler) enableRegistryManagementPlugin(pluginID portainer.PluginID, license string) error {
+func (handler *Handler) enableRegistryManagementPlugin(plugin *portainer.Plugin, license string) error {
 	// Download/untar
 	// TODO: replace location + constant for base (download.portainer.io ?)
 	// based on current platform+arch, should download the according zip (plugin-registry-manager-linux-amd64.zip)
-	data, err := client.Get("https://github.com/deviantony/xtrabackup-scripts/releases/download/3.1.6/rm01.zip", 30)
+	data, err := client.Get("https://github.com/deviantony/xtrabackup-scripts/releases/download/3.1.5/rm01.zip", 30)
 	if err != nil {
 		return err
 	}
 
-	err = archive.UnzipArchive(data, "/data/plugins")
+	// TODO: shoudd be relocated to another package, also use data folder constant (windows/linux differs)
+	err = archive.UnzipArchive(data, "/data/bin")
 	if err != nil {
 		return err
 	}
 
 	// TODO: if license check fails, need to be updated to use flags
+	// should probably download and use a specific license-checker binary
 
-	licenseValidationCommand := exec.Command("/data/plugins/plugin-registry-management", license, "--check")
+	licenseValidationCommand := exec.Command("/data/bin/plugin-registry-management", license, "--check")
+	cmdOutput := &bytes.Buffer{}
+	licenseValidationCommand.Stdout = cmdOutput
+
 	err = licenseValidationCommand.Run()
 	if err != nil {
 		return portainer.Error("Invalid license")
 	}
 
+	output := string(cmdOutput.Bytes())
+	licenseDetails := strings.Split(output, "|")
+	plugin.LicenseCompany = licenseDetails[0]
+	plugin.LicenseExpiration = licenseDetails[1]
+
 	// syscall.Exec replaces the process, ForkExec could be tried?
 	// Also should be relocated to another package
 	// err = syscall.ForkExec("/plugins/plugin-registry-management", []string{"plugin-registry-management"}, os.Environ())
-	cmd := exec.Command("/data/plugins/plugin-registry-management", license)
+	cmd := exec.Command("/data/bin/plugin-registry-management", license)
 
 	// cmd.Start will not share logs with the main Portainer container.
 	err = cmd.Start()
@@ -125,5 +138,5 @@ func (handler *Handler) enableRegistryManagementPlugin(pluginID portainer.Plugin
 		return err
 	}
 
-	return handler.ProxyManager.CreatePluginProxy(pluginID)
+	return handler.ProxyManager.CreatePluginProxy(plugin.ID)
 }

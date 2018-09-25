@@ -38,6 +38,8 @@ func (handler *Handler) pluginList(w http.ResponseWriter, r *http.Request) *http
 			for _, p := range storedPlugins {
 				if plugins[idx].ID == p.ID {
 					plugins[idx].Enabled = p.Enabled
+					plugins[idx].LicenseCompany = p.LicenseCompany
+					plugins[idx].LicenseExpiration = p.LicenseExpiration
 					break
 				}
 			}
