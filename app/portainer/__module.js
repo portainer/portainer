@@ -211,7 +211,7 @@ angular.module('portainer.app', [])
 
   var plugin = {
     name: 'portainer.plugins.plugin',
-    url: '/plugin',
+    url: '/plugin/:id',
     views: {
       'content@': {
         templateUrl: 'app/portainer/views/plugins/inspect/plugin.html',

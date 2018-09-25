@@ -23,7 +23,7 @@ angular.module('portainer.app')
     });
 
     return deferred.promise;
-  }
+  };
 
   service.store = function() {
     var deferred = $q.defer();
@@ -37,6 +37,21 @@ angular.module('portainer.app')
     })
     .catch(function error(err) {
       deferred.reject({msg: 'Unable to retrieve plugins', err: err});
+    });
+
+    return deferred.promise;
+  };
+
+  service.plugin = function(id, store) {
+    var deferred = $q.defer();
+
+    PortainerPlugin.get({ id: id, store: store }).$promise
+    .then(function success(data) {
+      var plugin = new PortainerPluginViewModel(data);
+      deferred.resolve(plugin);
+    })
+    .catch(function error(err) {
+      deferred.reject({msg: 'Unable to retrieve plugin details', err: err});
     });
 
     return deferred.promise;

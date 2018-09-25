@@ -15,7 +15,18 @@ function ($q, $scope, $transition$, PortainerPluginService, Notifications) {
   }
 
   function initView() {
-    $scope.plugin = $transition$.params().plugin;
+    if ($transition$.params().plugin.Id) {
+      $scope.plugin = $transition$.params().plugin;
+      return;
+    }
+
+    PortainerPluginService.plugin($transition$.params().id, true)
+    .then(function onSuccess(plugin) {
+      $scope.plugin = plugin;
+    })
+    .catch(function onError(err) {
+      Notifications.error('Failure', err, 'Unable to retrieve plugin information');
+    });
   }
 
   initView();

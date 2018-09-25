@@ -5,27 +5,13 @@ angular.module('portainer.app')
 
   service.registries = function() {
     var deferred = $q.defer();
-    var registries = [];
 
     Registries.query().$promise
     .then(function success(data) {
-      registries = data.map(function (item) {
+      var registries = data.map(function (item) {
         return new RegistryViewModel(item);
       });
-      var promises = [];
-      for (var i = 0; i < registries.length; i++) {
-        var registry = registries[i];
-        promises.push(Registries.version({id: registry.Id}).$promise);
-      }
-      $q.all(promises).then(function success(data) {
-        for (var i = 0; i < registries.length; i++) {
-          var registry = registries[i];
-          registry.Version = data[i].version;
-        }
-        deferred.resolve(registries);
-      }).catch(function error() {
-        deferred.resolve(registries);
-      });
+      deferred.resolve(registries);
     })
     .catch(function error(err) {
       deferred.reject({msg: 'Unable to retrieve registries', err: err});
