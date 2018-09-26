@@ -56,11 +56,13 @@ function (PaginationService, DatatableService) {
     ctrl.state.reverseOrder = ctrl.reverseOrder ? ctrl.reverseOrder : false;
   }
 
-  this.copyToClipboard = function(cpotyText){ 
+  this.copyToClipboard = function(cpotyText, indexNo){ 
     var $temp = $("<input>");
     $("body").append($temp);
     $temp.val($('#'+cpotyText).val()).select();
     document.execCommand("copy");
     $temp.remove();
+    $('#refreshRateChange'+indexNo).show();
+    $('#refreshRateChange'+indexNo).fadeOut(2000);
   }
 }]);
