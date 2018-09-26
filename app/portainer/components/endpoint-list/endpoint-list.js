@@ -12,6 +12,7 @@ angular.module('portainer.app').component('endpointList', {
     dashboardAction: '<',
     snapshotAction: '<',
     showSnapshotAction: '<',
-    editAction: '<'
+    editAction: '<',
+    isAdmin:'<'
   }
 });

@@ -26,7 +26,8 @@
           <span class="small">
             Group: {{ $ctrl.model.GroupName }}
           </span>
-          <button 
+          <button
+            ng-if="$ctrl.isAdmin" 
             class="btn btn-link btn-xs"
             ng-click="$ctrl.editEndpoint($event)"><i class="fa fa-pencil-alt"></i>
           </button>

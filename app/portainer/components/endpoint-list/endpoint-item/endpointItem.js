@@ -3,7 +3,8 @@ angular.module('portainer.app').component('endpointItem', {
   bindings: {
     model: '<',
     onSelect: '<',
-    onEdit: '<'
+    onEdit: '<',
+    isAdmin:'<'
   },
   controller: 'EndpointItemController'
 });
