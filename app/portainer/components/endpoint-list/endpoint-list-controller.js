@@ -40,11 +40,12 @@ angular.module('portainer.app').controller('EndpointListController', [
       var keywords = filterValue.split(' ');
       return _.filter(endpoints, function(endpoint) {
         return _.every(keywords, function(keyword) {
+          var lowerCaseKeyword = keyword.toLowerCase();
           return (
-            _.includes(endpoint.Name, keyword) ||
-            _.includes(endpoint.GroupName, keyword) ||
+            _.includes(endpoint.Name.toLowerCase(), lowerCaseKeyword) ||
+            _.includes(endpoint.GroupName.toLowerCase(), lowerCaseKeyword) ||
             _.some(endpoint.Tags, function(tag) {
-              return _.includes(tag, keyword);
+              return _.includes(tag.toLowerCase(), lowerCaseKeyword);
             })
           );
         });
