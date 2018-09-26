@@ -138,7 +138,7 @@ func (p *proxyTransport) proxyContainerRequest(request *http.Request) (*http.Res
 			action := path.Base(requestPath)
 
 			if action == "json" {
-				return p.rewriteOperation(request, containerInspectOperation)
+				return p.rewriteOperation(request, p.containerInspectOperation)
 			}
 			return p.restrictedOperation(request, containerID)
 		} else if match, _ := path.Match("/containers/*", requestPath); match {

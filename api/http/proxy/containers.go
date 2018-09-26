@@ -2,6 +2,8 @@ package proxy
 
 import (
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/portainer/portainer"
 )
@@ -48,7 +50,7 @@ func containerListOperation(response *http.Response, executor *operationExecutor
 // containerInspectOperation extracts the response as a JSON object, verify that the user
 // has access to the container based on resource control (check are done based on the containerID and optional Swarm service ID)
 // and either rewrite an access denied response or a decorated container.
-func containerInspectOperation(response *http.Response, executor *operationExecutor) error {
+func (p *proxyTransport) containerInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// ContainerInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/ContainerInspect
 	responseObject, err := getResponseAsJSONOBject(response)
@@ -61,12 +63,15 @@ func containerInspectOperation(response *http.Response, executor *operationExecu
 	}
 
 	containerID := responseObject[containerIdentifier].(string)
+	containerLabels := extractContainerLabelsFromContainerInspectObject(responseObject)
+
+	p.createResourceControlIfNeeded(containerID, containerLabels, responseObject)
+
 	responseObject, access := applyResourceAccessControl(responseObject, containerID, executor.operationContext)
 	if access {
 		return rewriteResponse(response, responseObject, http.StatusOK)
 	}
 
-	containerLabels := extractContainerLabelsFromContainerInspectObject(responseObject)
 	responseObject, access = applyResourceAccessControlFromLabel(containerLabels, responseObject, containerLabelForServiceIdentifier, executor.operationContext)
 	if access {
 		return rewriteResponse(response, responseObject, http.StatusOK)
@@ -83,6 +88,91 @@ func containerInspectOperation(response *http.Response, executor *operationExecu
 	}
 
 	return rewriteAccessDeniedResponse(response)
+}
+
+func (p *proxyTransport) createResourceControlIfNeeded(resourceID string, labelsObject map[string]interface{}, responseObject map[string]interface{}) error {
+	resourceControl, err := p.buildResourceControl(resourceID, nil, "container", labelsObject)
+	if err != nil {
+		return err
+	}
+	return p.ResourceControlService.CreateResourceControl(resourceControl)
+}
+
+func (p *proxyTransport) buildResourceControl(resourceID string, subResourceIDs []string, resourceControlTypeString string, labelsObject map[string]interface{}) (*portainer.ResourceControl, error) {
+	var resourceControlType portainer.ResourceControlType
+	switch resourceControlTypeString {
+	case "container":
+		resourceControlType = portainer.ContainerResourceControl
+	case "service":
+		resourceControlType = portainer.ServiceResourceControl
+	case "volume":
+		resourceControlType = portainer.VolumeResourceControl
+	case "network":
+		resourceControlType = portainer.NetworkResourceControl
+	case "secret":
+		resourceControlType = portainer.SecretResourceControl
+	case "stack":
+		resourceControlType = portainer.StackResourceControl
+	case "config":
+		resourceControlType = portainer.ConfigResourceControl
+	default:
+		return nil, portainer.ErrInvalidResourceControlType
+	}
+
+	rc, err := p.ResourceControlService.ResourceControlByResourceID(resourceID)
+	if err != nil && err != portainer.ErrObjectNotFound {
+		return nil, err
+	}
+	if rc != nil {
+		return nil, portainer.ErrResourceControlAlreadyExists
+	}
+
+	var userAccesses = make([]portainer.UserResourceAccess, 0)
+	usersString := labelsObject["io.portainer.uac.users"].(string)
+	usersIds := strings.Split(usersString, ",")
+	for _, v := range usersIds {
+		numberID, _ := strconv.Atoi(v)
+		userAccess := portainer.UserResourceAccess{
+			UserID:      portainer.UserID(numberID),
+			AccessLevel: portainer.ReadWriteAccessLevel,
+		}
+		userAccesses = append(userAccesses, userAccess)
+	}
+
+	var teamAccesses = make([]portainer.TeamResourceAccess, 0)
+	if labelsObject["io.portainer.uac.users"] != nil {
+		teamsString := labelsObject["io.portainer.uac.users"].(string)
+		teamsIds := strings.Split(teamsString, ",")
+		for _, v := range teamsIds {
+			numberID, _ := strconv.Atoi(v)
+			teamAccess := portainer.TeamResourceAccess{
+				TeamID:      portainer.TeamID(numberID),
+				AccessLevel: portainer.ReadWriteAccessLevel,
+			}
+			teamAccesses = append(teamAccesses, teamAccess)
+		}
+	}
+
+	publicAccess := false
+	if labelsObject["io.portainer.uac.public"] != nil {
+		publicAccessString := labelsObject["io.portainer.uac.public"].(string)
+		if publicAccessString == "true" {
+			publicAccess = true
+		} else {
+			publicAccess = false
+		}
+	}
+
+	resourceControl := portainer.ResourceControl{
+		ResourceID:     resourceID,
+		SubResourceIDs: subResourceIDs,
+		Type:           resourceControlType,
+		Public:         publicAccess,
+		UserAccesses:   userAccesses,
+		TeamAccesses:   teamAccesses,
+	}
+
+	return &resourceControl, nil
 }
 
 // extractContainerLabelsFromContainerInspectObject retrieve the Labels of the container if present.
