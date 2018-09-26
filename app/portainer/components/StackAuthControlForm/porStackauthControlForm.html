@@ -24,11 +24,15 @@
             <button disabled type="button" class="btn btn-primary btn-sm copyToClip" ng-click="$ctrl.copytoclipboard($ctrl.categories.selected)">
                 <i class="fas fa-key space-right" aria-hidden="true"></i>Copy to clipboard
             </button>
+            <span>
+              <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none;"></i>
+            </span>
         </div> 
       </div>               
       <div class="col-sm-2">                                                     
-        <input type="button" class="btn btn-primary btn-sm" value="Generate a new deploy key" ng-click="$ctrl.createNewkey()"/>                      
+        <input  type="button" class="btn btn-primary btn-sm" value="Generate a new deploy key" disabled id="btngeneratekey" ng-click="$ctrl.createNewkey()"/>                      
     </div>
+    <p id="warningStackname"><i class="fa fa-exclamation-triangle text-warning"></i> Please specify a stack name.</p>
     </div> 
            
     

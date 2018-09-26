@@ -19,6 +19,13 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
 
   $scope.formValues.generateNewKey =function(){
     StackService.setStackName($scope.formValues.Name);
+    if($('#stack_name').val() !=""){
+      $('#btngeneratekey').removeAttr("disabled")
+      $('#warningStackname').hide();
+    } else {
+      $('#btngeneratekey').attr('disabled','disabled');
+      $('#warningStackname').show();
+    }
   } 
 
   $scope.state = {

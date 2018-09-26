@@ -6,16 +6,17 @@ function ($q,$state,$scope, DeploykeyService, StackService, UserService, TeamSer
   ctrl.existingsshKey = [];
   ctrl.newgenratedeploykey = [];
   ctrl.enableGenratekey = false;  
-
+  ctrl.textEntered
   
-
+  
   ctrl.copytoclipboard = function (){
     var $temp = $("<input>");
     $("body").append($temp);
     $temp.val($('#selPKey').val()).select();
     document.execCommand("copy");
     $temp.remove();
-    Notifications.success('Copied!!!');
+    $('#refreshRateChange').show();
+    $('#refreshRateChange').fadeOut(2000);
     
   }
 
@@ -56,6 +57,15 @@ function ($q,$state,$scope, DeploykeyService, StackService, UserService, TeamSer
       ctrl.formData.Ownership = 'administrators';
     }
     
+    /*Enable / Disable deploykey button based on text entering in stack name textbox*/
+    if($('#stack_name').val() !=""){
+      $('#btngeneratekey').removeAttr("disabled")
+      $('#warningStackname').hide();
+    } else {
+      $('#btngeneratekey').attr('disabled','disabled');
+      $('#warningStackname').show();
+    }
+
     DeploykeyService.deploykeys()
     .then(function success(data) {
       ctrl.categories = data;                       
