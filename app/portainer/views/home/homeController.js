@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('HomeController', ['$q', '$scope', '$state', 'Authentication', 'EndpointService', 'EndpointHelper', 'GroupService', 'Notifications', 'EndpointProvider', 'StateManager', 'ExtensionManager', 'ModalService', 'MotdService',
-function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, GroupService, Notifications, EndpointProvider, StateManager, ExtensionManager, ModalService, MotdService) {
+.controller('HomeController', ['$q','$rootScope', '$scope', '$state', 'Authentication', 'EndpointService', 'EndpointHelper', 'GroupService', 'Notifications', 'EndpointProvider', 'StateManager', 'ExtensionManager', 'ModalService', 'MotdService',
+function ($q, $rootScope, $scope, $state, Authentication, EndpointService, EndpointHelper, GroupService, Notifications, EndpointProvider, StateManager, ExtensionManager, ModalService, MotdService) {
 
   $scope.goToDashboard = function(endpoint) {
     EndpointProvider.setEndpointID(endpoint.Id);
@@ -85,6 +85,7 @@ function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, G
       var groups = data.groups;
       EndpointHelper.mapGroupNameToEndpoint(endpoints, groups);
       $scope.endpoints = endpoints;
+      $rootScope.endpoints = endpoints;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve endpoint information');

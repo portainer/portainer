@@ -23,6 +23,7 @@ function ContainerServiceFactory($q, Container, ResourceControlService, LogHelpe
     var deferred = $q.defer();
     Container.query({ all : all, filters: filters }).$promise
     .then(function success(data) {
+      console.log(data);
       var containers = data.map(function (item) {
         return new ContainerViewModel(item);
       });

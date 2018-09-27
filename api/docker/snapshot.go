@@ -71,7 +71,7 @@ func snapshotInfo(snapshot *portainer.Snapshot, cli *client.Client) error {
 	snapshot.DockerVersion = info.ServerVersion
 	snapshot.TotalCPU = info.NCPU
 	snapshot.TotalMemory = info.MemTotal
-	snapshot.SnapshotRaw.Engine = info
+	snapshot.SnapshotRaw.Info = info
 	return nil
 }
 
