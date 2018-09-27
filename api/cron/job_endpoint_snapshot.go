@@ -32,18 +32,16 @@ func (job endpointSnapshotJob) Snapshot() error {
 			continue
 		}
 
-		go func() {
-			snapshot, err := job.snapshotter.CreateSnapshot(&endpoint)
-			endpoint.Status = portainer.EndpointStatusUp
-			if err != nil {
-				log.Printf("cron error: endpoint snapshot error (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
-				endpoint.Status = portainer.EndpointStatusDown
-			}
+		snapshot, err := job.snapshotter.CreateSnapshot(&endpoint)
+		endpoint.Status = portainer.EndpointStatusUp
+		if err != nil {
+			log.Printf("cron error: endpoint snapshot error (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
+			endpoint.Status = portainer.EndpointStatusDown
+		}
 
-			if snapshot != nil {
-				endpoint.Snapshots = []portainer.Snapshot{*snapshot}
-			}
-		}()
+		if snapshot != nil {
+			endpoint.Snapshots = []portainer.Snapshot{*snapshot}
+		}
 
 		err = job.endpointService.UpdateEndpoint(endpoint.ID, &endpoint)
 		if err != nil {

@@ -446,12 +446,10 @@ func main() {
 
 	applicationStatus := initStatus(endpointManagement, *flags.Snapshot, flags)
 
-	go func() {
-		err := initEndpoint(flags, store.EndpointService, snapshotter)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}()
+	err = initEndpoint(flags, store.EndpointService, snapshotter)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	adminPasswordHash := ""
 	if *flags.AdminPasswordFile != "" {
