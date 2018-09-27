@@ -1,0 +1,146 @@
+<rd-header>
+  <rd-header-title title-text="Configure registry"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="portainer.registries">Registries</a> &gt; <a ui-sref="portainer.registries.registry({id: registry.Id})">{{ registry.Name }}</a>
+  </rd-header-content>
+</rd-header>
+
+<!-- TODO: remove this view and all the related views/controllers/services to the app/plugins -->
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <div class="col-sm-12 form-section-title">
+            Information
+          </div>
+          <div class="form-group">
+            <span class="col-sm-12 text-muted small">
+              The following configuration will be used to access this <a href="https://docs.docker.com/registry/spec/api/" target="_blank">registry API</a> to provide Portainer management features.
+            </span>
+          </div>
+          <div class="col-sm-12 form-section-title">
+            Registry details
+          </div>
+          <!-- registry-url-input -->
+          <div class="form-group">
+            <label for="registry_url" class="col-sm-3 col-lg-2 control-label text-left">
+              Registry URL
+            </label>
+            <div class="col-sm-9 col-lg-10">
+              <input type="text" class="form-control" id="registry_url" ng-model="registry.URL" disabled>
+            </div>
+          </div>
+          <!-- !registry-url-input -->
+          <!-- authentication-checkbox -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <label for="registry_auth" class="control-label text-left">
+                Authentication
+                <portainer-tooltip position="bottom" message="Enable this option if you need to specify credentials to connect to this registry."></portainer-tooltip>
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" ng-model="formValues.Authentication"><i></i>
+              </label>
+            </div>
+          </div>
+          <!-- !authentication-checkbox -->
+          <!-- authentication-credentials -->
+          <div ng-if="formValues.Authentication">
+            <!-- credentials-user -->
+            <div class="form-group">
+              <label for="credentials_username" class="col-sm-3 col-lg-2 control-label text-left">Username</label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="text" class="form-control" id="credentials_username" ng-model="formValues.Username">
+              </div>
+            </div>
+            <!-- !credentials-user -->
+            <!-- credentials-password -->
+            <div class="form-group">
+              <label for="credentials_password" class="col-sm-3 col-lg-2 control-label text-left">Password</label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="password" class="form-control" id="credentials_password" ng-model="formValues.Password" placeholder="*******">
+              </div>
+            </div>
+            <!-- !credentials-password -->
+          </div>
+          <!-- !authentication-credentials -->
+          <!-- tls -->
+          <!-- tls-checkbox -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <label for="tls" class="control-label text-left">
+                TLS
+                <portainer-tooltip position="bottom" message="Enable this option if you need to connect to the registry API with TLS."></portainer-tooltip>
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" ng-model="formData.TLS"><i></i>
+              </label>
+            </div>
+          </div>
+          <!-- !tls-checkbox -->
+          <!-- tls-skip-verify -->
+          <div class="form-group" ng-if="formData.TLS">
+            <div class="col-sm-12">
+              <label for="tls" class="control-label text-left">
+                Skip certificate verification
+                <portainer-tooltip position="bottom" message="Skip the verification of the server TLS certificate. Not recommended on unsecured networks."></portainer-tooltip>
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" ng-model="formData.TLSSkipVerify"><i></i>
+              </label>
+            </div>
+          </div>
+          <!-- !tls-skip-verify -->
+          <div class="col-sm-12 form-section-title" ng-if="formData.TLS && !formData.TLSSkipVerify">
+            Required TLS files
+          </div>
+          <!-- tls-file-upload -->
+          <div ng-if="formData.TLS && !formData.TLSSkipVerify">
+            <div class="form-group">
+              <label for="tls_cert" class="col-sm-3 col-lg-2 control-label text-left">TLS certificate</label>
+              <div class="col-sm-9 col-lg-10">
+                <button class="btn btn-sm btn-primary" ngf-select ng-model="formData.TLSCertificate">Select file</button>
+                <span style="margin-left: 5px;">
+                  {{ formData.TLSCertificate.name }}
+                  <i class="fa fa-check green-icon" ng-if="formData.TLSCertificate && formData.TLSCertificate === registry.ManagementConfiguration.TLSConfig.TLSCertificate" aria-hidden="true"></i>
+                  <i class="fa fa-times red-icon" ng-if="!formData.TLSCertificate" aria-hidden="true"></i>
+                </span>
+              </div>
+            </div>
+            <!-- !tls-file-cert -->
+            <!-- tls-file-key -->
+            <div class="form-group">
+              <label class="col-sm-3 col-lg-2 control-label text-left">TLS key</label>
+              <div class="col-sm-9 col-lg-10">
+                <button class="btn btn-sm btn-primary" ngf-select ng-model="formData.TLSKey">Select file</button>
+                <span style="margin-left: 5px;">
+                  {{ formData.TLSKey.name }}
+                  <i class="fa fa-check green-icon" ng-if="formData.TLSKey && formData.TLSKey === registry.ManagementConfiguration.TLSConfig.TLSKey" aria-hidden="true"></i>
+                  <i class="fa fa-times red-icon" ng-if="!formData.TLSKey" aria-hidden="true"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+          <!-- !tls -->
+          <div class="col-sm-12 form-section-title">
+            Actions
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress" ng-click="TestConfiguration()" button-spinner="state.actionInProgress">
+                <span ng-hide="state.actionInProgress">Test configuration</span>
+                <span ng-show="state.actionInProgress">Test in progress...</span>
+              </button>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress" ng-click="updateConfiguration()" button-spinner="state.actionInProgress">
+                <span ng-hide="state.actionInProgress">Update configuration</span>
+                <span ng-show="state.actionInProgress">Updating configuration...</span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

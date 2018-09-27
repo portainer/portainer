@@ -18,6 +18,8 @@ func hideFields(registry *portainer.Registry) {
 type Handler struct {
 	*mux.Router
 	RegistryService portainer.RegistryService
+	FileService     portainer.FileService
+
 	// TODO: remove proxymanager ?
 	ProxyManager *proxy.Manager
 }
@@ -38,6 +40,8 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AdministratorAccess(httperror.LoggerHandler(h.registryUpdate))).Methods(http.MethodPut)
 	h.Handle("/registries/{id}/access",
 		bouncer.AdministratorAccess(httperror.LoggerHandler(h.registryUpdateAccess))).Methods(http.MethodPut)
+	h.Handle("/registries/{id}/configure",
+		bouncer.AdministratorAccess(httperror.LoggerHandler(h.registryConfigure))).Methods(http.MethodPost)
 	h.Handle("/registries/{id}",
 		bouncer.AdministratorAccess(httperror.LoggerHandler(h.registryDelete))).Methods(http.MethodDelete)
 	h.PathPrefix("/registries/{id}/v2").Handler(

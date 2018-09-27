@@ -167,14 +167,27 @@ type (
 	// Registry represents a Docker registry with all the info required
 	// to connect to it
 	Registry struct {
-		ID              RegistryID `json:"Id"`
-		Name            string     `json:"Name"`
-		URL             string     `json:"URL"`
-		Authentication  bool       `json:"Authentication"`
-		Username        string     `json:"Username"`
-		Password        string     `json:"Password,omitempty"`
-		AuthorizedUsers []UserID   `json:"AuthorizedUsers"`
-		AuthorizedTeams []TeamID   `json:"AuthorizedTeams"`
+		ID                      RegistryID                      `json:"Id"`
+		Name                    string                          `json:"Name"`
+		URL                     string                          `json:"URL"`
+		Authentication          bool                            `json:"Authentication"`
+		Username                string                          `json:"Username"`
+		Password                string                          `json:"Password,omitempty"`
+		AuthorizedUsers         []UserID                        `json:"AuthorizedUsers"`
+		AuthorizedTeams         []TeamID                        `json:"AuthorizedTeams"`
+		ManagementConfiguration RegistryManagementConfiguration `json:"ManagementConfiguration"`
+	}
+
+	// TODO: will require migration? or not, we check for nil in proxy first access
+	// Should also be hidden in API results
+
+	// RegistryManagementConfiguration represents a configuration that can be used to query
+	// the registry API via the registry management plugin.
+	RegistryManagementConfiguration struct {
+		Authentication bool             `json:"Authentication"`
+		Username       string           `json:"Username"`
+		Password       string           `json:"Password"`
+		TLSConfig      TLSConfiguration `json:"TLSConfig"`
 	}
 
 	// DockerHub represents all the required information to connect and use the

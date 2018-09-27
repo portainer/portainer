@@ -267,6 +267,16 @@ angular.module('portainer.app', [])
     }
   };
 
+  var registryConfiguration = {
+    name: 'portainer.registries.registry.configure',
+    url: '/configure',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/registries/configure/configureregistry.html',
+        controller: 'ConfigureRegistryController'
+      }
+    }
+  };
 
   var registryRepositories = {
     name: 'portainer.registries.registry.repositories',
@@ -477,6 +487,7 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(registries);
   $stateRegistryProvider.register(registry);
   $stateRegistryProvider.register(registryAccess);
+  $stateRegistryProvider.register(registryConfiguration);
   $stateRegistryProvider.register(registryCreation);
   $stateRegistryProvider.register(registryRepositories);
   $stateRegistryProvider.register(registryRepositoryTags);

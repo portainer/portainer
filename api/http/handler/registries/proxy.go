@@ -1,6 +1,7 @@
 package registries
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 
@@ -39,9 +40,31 @@ func (handler *Handler) proxyRequestsToRegistryAPI(w http.ResponseWriter, r *htt
 		proxy = handler.ProxyManager.GetPluginProxy(portainer.RegistryManagementPlugin)
 	}
 
+	managementConfiguration := &registry.ManagementConfiguration
+
+	if managementConfiguration == nil {
+		managementConfiguration = &portainer.RegistryManagementConfiguration{
+			TLSConfig: portainer.TLSConfiguration{
+				TLS: false,
+			},
+		}
+
+		if registry.Authentication {
+			managementConfiguration.Authentication = true
+			managementConfiguration.Username = registry.Username
+			managementConfiguration.Password = registry.Password
+		}
+	}
+
+	encodedConfiguration, err := json.Marshal(managementConfiguration)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to encode management configuration", err}
+	}
+
 	id := strconv.Itoa(int(registryID))
 	r.Header.Set("X-RegistryManagement-Key", id)
 	r.Header.Set("X-RegistryManagement-URI", registry.URL)
+	r.Header.Set("X-RegistryManagement-Config", string(encodedConfiguration))
 
 	//
 	// var proxy http.Handler

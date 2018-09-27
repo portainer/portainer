@@ -5,16 +5,32 @@
     </a>
   </rd-header-title>
   <rd-header-content>
-      <a ui-sref="portainer.registries">Registries</a> &gt; <a ui-sref="portainer.registries.registry({id: registry.Id})">{{ registry.Name }}</a> &gt; Repositories
-    </rd-header-content>
+    <a ui-sref="portainer.registries">Registries</a> &gt; <a ui-sref="portainer.registries.registry({id: registry.Id})">{{ registry.Name }}</a> &gt; Repositories
+  </rd-header-content>
 </rd-header>
 
 <div class="row">
+  <information-panel ng-if="state.displayInvalidConfigurationMessage" title-text="Registry management error">
+    <span class="small text-muted">
+      <p>
+        <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+        Portainer was not able to use this registry management features. You might need to update the configuration used by Portainer to access this registry.
+        <div style="margin-top: 7px;">
+          <a ui-sref="portainer.registries.registry.configure({id: registry.Id})">
+            <i class="fa fa-wrench" aria-hidden="true"></i> Configure this registry
+          </a>
+        </div>
+      </p>
+    </span>
+  </information-panel>
+</div>
+
+<div class="row" ng-if="repositories">
   <div class="col-sm-12">
     <registry-repositories-datatable
-    title-text="Repositories" title-icon="fa-book"
-    dataset="repositories" table-key="registryRepositories"
-    order-by="Name" 
-    ></registry-repositories-datatable>
+      title-text="Repositories" title-icon="fa-book"
+      dataset="repositories" table-key="registryRepositories"
+      order-by="Name">
+    </registry-repositories-datatable>
   </div>
 </div>

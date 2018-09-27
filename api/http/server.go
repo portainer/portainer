@@ -130,6 +130,7 @@ func (server *Server) Start() error {
 
 	var registryHandler = registries.NewHandler(requestBouncer)
 	registryHandler.RegistryService = server.RegistryService
+	registryHandler.FileService = server.FileService
 	registryHandler.ProxyManager = proxyManager
 
 	var resourceControlHandler = resourcecontrols.NewHandler(requestBouncer)
