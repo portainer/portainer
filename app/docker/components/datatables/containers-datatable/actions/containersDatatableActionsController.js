@@ -72,7 +72,7 @@ function ($state, ContainerService, ModalService, Notifications, HttpRequestHelp
         Notifications.success(successMessage, container.Names[0]);
       })
       .catch(function error(err) {
-        Notifications.error('Failure', err, errorMessage);
+        Notifications.error('Failure', err, `${errorMessage}:${container.Names[0]}`);
       })
       .finally(function final() {
         --actionCount;
