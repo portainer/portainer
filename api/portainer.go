@@ -639,7 +639,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "1.19.2-dev"
+	APIVersion = "1.20-dev"
 	// DBVersion is the version number of the Portainer database
 	DBVersion = 14
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved

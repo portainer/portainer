@@ -24,7 +24,7 @@ function build_archive() {
 function build_all() {
   mkdir -pv "${ARCHIVE_BUILD_FOLDER}"
   for tag in $@; do
-    grunt "release:`echo "$tag" | tr '-' ':'`"
+    yarn grunt "release:`echo "$tag" | tr '-' ':'`"
     name="portainer"; if [ "$(echo "$tag" | cut -c1)"  = "w" ]; then name="${name}.exe"; fi
     mv dist/portainer-$tag* dist/$name
     if [ `echo $tag | cut -d \- -f 1` == 'linux' ]; then build_and_push_images "$tag"; fi
