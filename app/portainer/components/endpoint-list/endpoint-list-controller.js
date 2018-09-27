@@ -1,6 +1,5 @@
 angular.module('portainer.app').controller('EndpointListController', [
-  '$filter',
-  function EndpointListController($filter) {
+  function EndpointListController() {
     var ctrl = this;
     ctrl.state = {
       textFilter: '',
