@@ -9,6 +9,3 @@ install:
   - yarn install
 build_script:
   - yarn grunt release:windows:amd64
-artifacts:
-  - path: ./
-    name: dist
