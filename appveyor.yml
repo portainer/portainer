@@ -1,0 +1,15 @@
+environment:
+  matrix:
+    - node_version: '10'
+branches:
+  only:
+    - master
+install:
+  - ps: 'Install-Product node $env:node_version'
+  - yarn install --frozen-lockfile
+build_script:
+  - yarn
+  - yarn build
+artifacts:
+  - path: ./
+    name: dist
