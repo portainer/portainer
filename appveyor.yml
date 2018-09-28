@@ -6,10 +6,9 @@ branches:
     - master
 install:
   - ps: 'Install-Product node $env:node_version'
-  - yarn install --frozen-lockfile
+  - yarn install
 build_script:
-  - yarn
-  - yarn build
+  - yarn release:windows:amd64
 artifacts:
   - path: ./
     name: dist
