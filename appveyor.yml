@@ -8,7 +8,7 @@ install:
   - ps: 'Install-Product node $env:node_version'
   - yarn install
 build_script:
-  - yarn release:windows:amd64
+  - yarn grunt release:windows:amd64
 artifacts:
   - path: ./
     name: dist
