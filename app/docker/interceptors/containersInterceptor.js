@@ -25,9 +25,6 @@ angular.module('portainer.app')
             });
             var data = endpoint.Snapshots[0].SnapshotRaw.Containers;
             if (endpoint !== undefined && data !== undefined) {
-              rejection.status = 200;
-              rejection.data = data;
-              console.log(rejection);
               return data;
             }
           }

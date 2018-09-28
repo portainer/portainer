@@ -57,6 +57,11 @@ func snapshot(cli *client.Client) (*portainer.Snapshot, error) {
 		return nil, err
 	}
 
+	err = snapshotVersion(snapshot, cli)
+	if err != nil {
+		return nil, err
+	}
+
 	snapshot.Time = time.Now().Unix()
 	return snapshot, nil
 }
@@ -170,5 +175,14 @@ func snapshotNetworks(snapshot *portainer.Snapshot, cli *client.Client) error {
 		return err
 	}
 	snapshot.SnapshotRaw.Networks = networks
+	return nil
+}
+
+func snapshotVersion(snapshot *portainer.Snapshot, cli *client.Client) error {
+	version, err := cli.ServerVersion(context.Background())
+	if err != nil {
+		return err
+	}
+	snapshot.SnapshotRaw.Version = version
 	return nil
 }

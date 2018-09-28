@@ -267,6 +267,7 @@ type (
 		Images     interface{} `json:"Images"`
 		Stacks     interface{} `json:"Stacks"`
 		Info       interface{} `json:"Info"`
+		Version    interface{} `json:"Version"`
 	}
 
 	// EndpointGroupID represents an endpoint group identifier

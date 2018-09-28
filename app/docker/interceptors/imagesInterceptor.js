@@ -15,7 +15,7 @@ angular.module('portainer.app')
       },
       responseError: function (rejection) {
         console.log('images reponse error');
-        
+
         if (rejection.status === 502) {
           if ($rootScope.endpoints !== undefined) {
             var endpointId = _.split(rejection.config.url, '/')[2];
@@ -25,9 +25,7 @@ angular.module('portainer.app')
             });
             var data = endpoint.Snapshots[0].SnapshotRaw.Images;
             if (endpoint !== undefined && data !== undefined) {
-              rejection.status = 200;
-              rejection.data = data;
-              console.log(rejection); return data;
+              return data;
             }
           }
         }
