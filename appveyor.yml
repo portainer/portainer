@@ -9,7 +9,6 @@ branches:
   only:
     - master
 install:
-  - ps: 'Install-Product node $env:node_version'
   - yarn install
 build_script:
   - yarn grunt release:windows:amd64
