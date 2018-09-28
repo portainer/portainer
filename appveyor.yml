@@ -5,7 +5,6 @@ image:
 environment:
   matrix:
     - ARCH: amd64
-    - node_version: '10'
 branches:
   only:
     - master
