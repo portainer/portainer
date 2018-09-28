@@ -2,9 +2,6 @@ version: 1.0.{build}
 image:
   - Visual Studio 2017
   - Ubuntu 1804
-environment:
-  matrix:
-    - ARCH: amd64
 branches:
   only:
     - master
