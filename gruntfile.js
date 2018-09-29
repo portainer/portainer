@@ -272,7 +272,7 @@ function shell_buildBinary(p, a) {
         'if ((Get-Item -Path '+(binfile+'.exe')+')) {',
           'Write-Host "Portainer binary exists',
         '} else {',
-          '& ".\\build\\build_in_container.ps1"',
+          '& ".\\build\\build_in_container.ps1" -platform '+ p +' -arch '+ a +'',
         '}'
       ].join(' ')
     }      
