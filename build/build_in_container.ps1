@@ -7,6 +7,8 @@ $binary = "portainer-$($platform)-$($arch)"
 
 New-Item -Name dist -ItemType Directory | Out-Null
 
+Switch-DockerLinux
+
 docker pull portainer/golang-builder:cross-platform
 
 docker run --rm -tv "$(pwd)\api:/src" -e BUILD_GOOS="$($platform)" -e BUILD_GOARCH="$($arch)" portainer/golang-builder:cross-platform /src/cmd/portainer
