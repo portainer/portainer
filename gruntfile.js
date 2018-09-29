@@ -258,14 +258,24 @@ gruntfile_cfg.replace = {
 };
 
 function shell_buildBinary(p, a) {
-  var binfile = 'dist/portainer-'+p+'-'+a;
-  return [
-    'if [ -f '+(( p === 'windows' ) ? binfile+'.exe' : binfile)+' ]; then',
-      'echo "Portainer binary exists";',
-    'else',
-      'build/build_in_container.sh ' + p + ' ' + a + ';',
-    'fi'
-  ].join(' ');
+    var binfile = 'portainer-'+p+'-'+a;
+    if (p === "linux") {
+      return [
+        'if [ -f '+(binfile)+' ]; then',
+          'echo "Portainer binary exists";',
+        'else',
+          'build/build_in_container.sh ' + p + ' ' + a + ';',
+        'fi'
+      ].join (' ')
+    } else {
+      return [
+        'if ((Get-Item -Path '+(binfile+'.exe')+')) {',
+          'Write-Host "Portainer binary exists',
+        '} else {',
+          '& ".\\build\\build_in_container.ps1"',
+        '}'
+      ].join(' ')
+    }      
 }
 
 function shell_run(arch) {
