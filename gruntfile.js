@@ -269,7 +269,7 @@ function shell_buildBinary(p, a) {
       ].join (' ')
     } else {
       return [
-        'powershell -Command "& {if ((Get-Item -Path '+(binfile+'.exe')+')) {',
+        'powershell -Command "& {if (Get-Item -Path '+(binfile+'.exe')+' -ErrorAction:SilentlyContinue) {',
           'Write-Host "Portainer binary exists"',
         '} else {',
           '& ".\\build\\build_in_container.ps1" -platform '+ p +' -arch '+ a +'',
