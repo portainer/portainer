@@ -10,4 +10,4 @@ branches:
 install:
   - yarn install
 build_script:
-  - yarn grunt release:windows:amd64
+  - yarn grunt release:linux:amd64
