@@ -11,9 +11,17 @@
             </tr>
           </thead>
           <tbody>
-            <tr ng-repeat="device in $ctrl.devices">
+            <tr ng-if="$ctrl.devices && $ctrl.devices.length" ng-repeat="device in $ctrl.devices">
               <td>{{device.Name}}</td>
               <td>{{device.Vendor}}</td>
+            </tr>
+            <tr ng-if="!$ctrl.devices">
+              <td colspan="6" class="text-center text-muted">Loading...</td>
+            </tr>
+            <tr ng-if="$ctrl.devices.length === 0">
+              <td colspan="6" class="text-center text-muted">
+                No device available.
+              </td>
             </tr>
           </tbody>
         </table>
