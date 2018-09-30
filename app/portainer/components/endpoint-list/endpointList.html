@@ -16,12 +16,17 @@
 
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search by name, group, tag..." auto-focus>
+        <input
+          type="text"
+          class="searchInput"
+          ng-model="$ctrl.state.textFilter"
+          ng-change="$ctrl.onFilterChanged()"
+          placeholder="Search by name, group, tag, status..." auto-focus>
       </div>
 
       <div class="blocklist">
         <endpoint-item
-          ng-repeat="endpoint in $ctrl.endpoints | filter:$ctrl.state.textFilter"
+          ng-repeat="endpoint in $ctrl.state.filteredEndpoints"
           model="endpoint"
           on-select="$ctrl.dashboardAction"
           on-edit="$ctrl.editAction"
@@ -30,7 +35,7 @@
         <div ng-if="!$ctrl.endpoints" class="text-center text-muted">
           Loading...
         </div>
-        <div ng-if="($ctrl.endpoints | filter:$ctrl.state.textFilter).length === 0" class="text-center text-muted">
+        <div ng-if="!$ctrl.state.filteredEndpoints.length" class="text-center text-muted">
           No endpoint available.
         </div>
       </div>
