@@ -11,9 +11,17 @@
             </tr>
           </thead>
           <tbody>
-            <tr ng-repeat="disk in $ctrl.disks">
+            <tr ng-if="$ctrl.disks" ng-repeat="disk in $ctrl.disks">
               <td>{{disk.Vendor}}</td>
               <td>{{disk.Size | humansize}}</td>
+            </tr>
+            <tr ng-if="!$ctrl.disks">
+              <td colspan="2" class="text-center text-muted">Loading...</td>
+            </tr>
+            <tr ng-if="$ctrl.disks.length === 0">
+              <td colspan="2" class="text-center text-muted">
+                No disks available.
+              </td>
             </tr>
           </tbody>
         </table>
