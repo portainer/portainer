@@ -2,7 +2,13 @@ angular.module('portainer.agent').controller('HostBrowserController', [
   'HostBrowserService',
   'Notifications',
   'FileSaver',
-  function HostBrowserController(HostBrowserService, Notifications, FileSaver) {
+  'ModalService',
+  function HostBrowserController(
+    HostBrowserService,
+    Notifications,
+    FileSaver,
+    ModalService
+  ) {
     var ctrl = this;
     ctrl.state = {
       path: '/'
@@ -12,7 +18,7 @@ angular.module('portainer.agent').controller('HostBrowserController', [
     ctrl.browse = browse;
     ctrl.renameFile = renameFile;
     ctrl.downloadFile = downloadFile;
-    ctrl.deleteFile = deleteFile;
+    ctrl.deleteFile = confirmDeleteFile;
     ctrl.isRoot = isRoot;
     ctrl.$onInit = $onInit;
 
@@ -73,7 +79,33 @@ angular.module('portainer.agent').controller('HostBrowserController', [
         });
     }
 
-    function deleteFile(name) {}
+    function confirmDeleteFile(name) {
+      var filePath = buildPath(ctrl.state.path, name);
+
+      ModalService.confirmDeletion(
+        'Are you sure that you want to delete ' + filePath + ' ?',
+        function onConfirm(confirmed) {
+          if (!confirmed) {
+            return;
+          }
+          return deleteFile(filePath);
+        }
+      );
+    }
+
+    function deleteFile(path) {
+      HostBrowserService.delete(path)
+        .then(function onDeleteSuccess() {
+          Notifications.success('File successfully deleted', path);
+          return HostBrowserService.ls(ctrl.state.path);
+        })
+        .then(function onFilesLoaded(data) {
+          ctrl.files = data;
+        })
+        .catch(function notifyOnError(err) {
+          Notifications.error('Failure', err, 'Unable to delete file');
+        });
+    }
 
     function $onInit() {
       getFilesForPath('/');
