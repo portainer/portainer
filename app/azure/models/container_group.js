@@ -15,7 +15,7 @@ function ContainerGroupDefaultModel() {
   this.Memory = 1;
 }
 
-function ContainerGroupViewModel(data, subscriptionId, resourceGroupName) {
+function ContainerGroupViewModel(data) {
   this.Id = data.id;
   this.Name = data.name;
   this.Location = data.location;

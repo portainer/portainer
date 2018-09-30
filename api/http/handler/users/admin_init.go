@@ -4,10 +4,10 @@ import (
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
+	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/request"
+	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer"
-	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/request"
-	"github.com/portainer/portainer/http/response"
 )
 
 type adminInitPayload struct {
@@ -39,7 +39,7 @@ func (handler *Handler) adminInit(w http.ResponseWriter, r *http.Request) *httpe
 	}
 
 	if len(users) != 0 {
-		return &httperror.HandlerError{http.StatusConflict, "Unable to retrieve users from the database", portainer.ErrAdminAlreadyInitialized}
+		return &httperror.HandlerError{http.StatusConflict, "Unable to create administrator user", portainer.ErrAdminAlreadyInitialized}
 	}
 
 	user := &portainer.User{

@@ -226,7 +226,7 @@
               <tr>
                 <td>Restart policies</td>
                 <td>
-                  <container-restart-policy 
+                  <container-restart-policy ng-if="container"
                     name="container.HostConfig.RestartPolicy.Name"
                     maximum-retry-count="container.HostConfig.RestartPolicy.MaximumRetryCount"
                     update-restart-policy="updateRestartPolicy(name, maximumRetryCount)">

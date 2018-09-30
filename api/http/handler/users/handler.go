@@ -1,8 +1,8 @@
 package users
 
 import (
+	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer"
-	httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/security"
 
 	"net/http"
@@ -26,7 +26,7 @@ type Handler struct {
 }
 
 // NewHandler creates a handler to manage user operations.
-func NewHandler(bouncer *security.RequestBouncer) *Handler {
+func NewHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimiter) *Handler {
 	h := &Handler{
 		Router: mux.NewRouter(),
 	}
@@ -43,7 +43,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h.Handle("/users/{id}/memberships",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.userMemberships))).Methods(http.MethodGet)
 	h.Handle("/users/{id}/passwd",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.userPassword))).Methods(http.MethodPost)
+		rateLimiter.LimitAccess(bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.userUpdatePassword)))).Methods(http.MethodPut)
 	h.Handle("/users/admin/check",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.adminCheck))).Methods(http.MethodGet)
 	h.Handle("/users/admin/init",

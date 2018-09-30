@@ -45,7 +45,7 @@ function ($scope, $state, TagService, Notifications) {
   $scope.createTag = function() {
     var tagName = $scope.formValues.Name;
     TagService.createTag(tagName)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Tag successfully created', tagName);
       $state.reload();
     })

@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('TeamsController', ['$q', '$scope', '$state', 'TeamService', 'UserService', 'ModalService', 'Notifications', 'Authentication',
-function ($q, $scope, $state, TeamService, UserService, ModalService, Notifications, Authentication) {
+.controller('TeamsController', ['$q', '$scope', '$state', '$sanitize', 'TeamService', 'UserService', 'ModalService', 'Notifications', 'Authentication',
+function ($q, $scope, $state, $sanitize, TeamService, UserService, ModalService, Notifications, Authentication) {
   $scope.state = {
     actionInProgress: false
   };
@@ -22,7 +22,7 @@ function ($q, $scope, $state, TeamService, UserService, ModalService, Notificati
   };
 
   $scope.addTeam = function() {
-    var teamName = $scope.formValues.Name;
+    var teamName = $sanitize($scope.formValues.Name);
     var leaderIds = [];
     angular.forEach($scope.formValues.Leaders, function(user) {
       leaderIds.push(user.Id);
@@ -30,7 +30,7 @@ function ($q, $scope, $state, TeamService, UserService, ModalService, Notificati
 
     $scope.state.actionInProgress = true;
     TeamService.createTeam(teamName, leaderIds)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Team successfully created', teamName);
       $state.reload();
     })

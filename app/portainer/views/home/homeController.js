@@ -22,7 +22,7 @@ function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, G
 
   function triggerSnapshot() {
     EndpointService.snapshot()
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Success', 'Endpoints updated');
       $state.reload();
     })
@@ -60,6 +60,12 @@ function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, G
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
     });
+  }
+
+  $scope.goToEdit = goToEdit;
+
+  function goToEdit(id) {
+    $state.go('portainer.endpoints.endpoint', { id: id });
   }
 
   function initView() {

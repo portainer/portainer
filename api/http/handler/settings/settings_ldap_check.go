@@ -3,11 +3,11 @@ package settings
 import (
 	"net/http"
 
+	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/request"
+	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/filesystem"
-	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/request"
-	"github.com/portainer/portainer/http/response"
 )
 
 type settingsLDAPCheckPayload struct {

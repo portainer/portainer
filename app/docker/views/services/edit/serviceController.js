@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'ContainerService', 'TaskHelper', 'Notifications', 'ModalService', 'PluginService', 'Authentication', 'SettingsService', 'VolumeService', 'ImageHelper',
-function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, ContainerService, TaskHelper, Notifications, ModalService, PluginService, Authentication, SettingsService, VolumeService, ImageHelper) {
+.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'ContainerService', 'TaskHelper', 'Notifications', 'ModalService', 'PluginService', 'Authentication', 'SettingsService', 'VolumeService', 'ImageHelper', 'WebhookService', 'EndpointProvider', 'clipboard','WebhookHelper',
+function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, ContainerService, TaskHelper, Notifications, ModalService, PluginService, Authentication, SettingsService, VolumeService, ImageHelper, WebhookService, EndpointProvider, clipboard, WebhookHelper) {
 
   $scope.state = {
     updateInProgress: false,
@@ -125,7 +125,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       updateServiceArray(service, 'ServiceMounts', service.ServiceMounts);
     }
   };
-  $scope.updateMount = function updateMount(service, mount) {
+  $scope.updateMount = function updateMount(service) {
     updateServiceArray(service, 'ServiceMounts', service.ServiceMounts);
   };
   $scope.addPlacementConstraint = function addPlacementConstraint(service) {
@@ -138,7 +138,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       updateServiceArray(service, 'ServiceConstraints', service.ServiceConstraints);
     }
   };
-  $scope.updatePlacementConstraint = function(service, constraint) {
+  $scope.updatePlacementConstraint = function(service) {
     updateServiceArray(service, 'ServiceConstraints', service.ServiceConstraints);
   };
 
@@ -152,7 +152,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       updateServiceArray(service, 'ServicePreferences', service.ServicePreferences);
     }
   };
-  $scope.updatePlacementPreference = function(service, constraint) {
+  $scope.updatePlacementPreference = function(service) {
     updateServiceArray(service, 'ServicePreferences', service.ServicePreferences);
   };
 
@@ -162,7 +162,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     }
     service.Ports.push({ PublishedPort: '', TargetPort: '', Protocol: 'tcp', PublishMode: 'ingress' });
   };
-  $scope.updatePublishedPort = function updatePublishedPort(service, portMapping) {
+  $scope.updatePublishedPort = function updatePublishedPort(service) {
     updateServiceArray(service, 'Ports', service.Ports);
   };
   $scope.removePortPublishedBinding = function removePortPublishedBinding(service, index) {
@@ -203,8 +203,38 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       updateServiceArray(service, 'Hosts', service.Hosts);
     }
   };
-  $scope.updateHostsEntry = function(service, entry) {
+  $scope.updateHostsEntry = function(service) {
     updateServiceArray(service, 'Hosts', service.Hosts);
+  };
+
+  $scope.updateWebhook = function updateWebhook(service){
+    if ($scope.WebhookExists) {
+      WebhookService.deleteWebhook($scope.webhookID)
+      .then(function success() {
+        $scope.webhookURL = null;
+        $scope.webhookID = null;
+        $scope.WebhookExists = false;
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to delete webhook');
+      });
+    } else {
+      WebhookService.createServiceWebhook(service.Id,EndpointProvider.endpointID())
+      .then(function success(data) {
+        $scope.WebhookExists = true;
+        $scope.webhookID = data.Id;
+        $scope.webhookURL = WebhookHelper.returnWebhookUrl(data.Token);
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to create webhook');
+      });
+    }
+  };
+
+  $scope.copyWebhook = function copyWebhook(){
+    clipboard.copyText($scope.webhookURL);
+    $('#copyNotification').show();
+    $('#copyNotification').fadeOut(2000);
   };
 
   $scope.cancelChanges = function cancelChanges(service, keys) {
@@ -340,7 +370,10 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   function removeService() {
     $scope.state.deletionInProgress = true;
     ServiceService.remove($scope.service)
-    .then(function success(data) {
+    .then(function success() {
+      return $q.when($scope.webhookID && WebhookService.deleteWebhook($scope.webhookID));
+    })
+    .then(function success() {
       Notifications.success('Service successfully deleted');
       $state.go('docker.services', {});
     })
@@ -377,7 +410,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     config.TaskTemplate.ForceUpdate++;
     $scope.state.updateInProgress = true;
     ServiceService.update(service, config)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Service successfully updated', service.Name);
       $scope.cancelChanges({});
       initView();
@@ -445,7 +478,8 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
         configs: apiVersion >= 1.30 ? ConfigService.configs() : [],
         availableImages: ImageService.images(),
         availableLoggingDrivers: PluginService.loggingPlugins(apiVersion < 1.25),
-        settings: SettingsService.publicSettings()
+        settings: SettingsService.publicSettings(),
+        webhooks: WebhookService.webhooks(service.Id, EndpointProvider.endpointID())
       });
     })
     .then(function success(data) {
@@ -458,6 +492,13 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       $scope.allowBindMounts = data.settings.AllowBindMountsForRegularUsers;
       var userDetails = Authentication.getUserDetails();
       $scope.isAdmin = userDetails.role === 1;
+
+      if (data.webhooks.length > 0) {
+        var webhook = data.webhooks[0];
+        $scope.WebhookExists = true;
+        $scope.webhookID = webhook.Id;
+        $scope.webhookURL = WebhookHelper.returnWebhookUrl(webhook.Token);
+      }
 
       var tasks = data.tasks;
 

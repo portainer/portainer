@@ -4,7 +4,7 @@ function ($scope, $transition$, $state, ConfigService, Notifications) {
 
   $scope.removeConfig = function removeConfig(configId) {
     ConfigService.remove(configId)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Config successfully removed');
       $state.go('docker.configs', {});
     })

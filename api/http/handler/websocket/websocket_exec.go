@@ -15,10 +15,10 @@ import (
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/websocket"
 	"github.com/koding/websocketproxy"
+	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/request"
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/crypto"
-	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/request"
 )
 
 type webSocketExecRequestParams struct {
@@ -252,7 +252,7 @@ func streamFromWebsocketConnToTCPConn(websocketConn *websocket.Conn, tcpConn net
 
 func streamFromTCPConnToWebsocketConn(websocketConn *websocket.Conn, br *bufio.Reader, errorChan chan error) {
 	for {
-		out := make([]byte, 1024)
+		out := make([]byte, 2048)
 		_, err := br.Read(out)
 		if err != nil {
 			errorChan <- err

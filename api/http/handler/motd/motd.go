@@ -3,10 +3,10 @@ package motd
 import (
 	"net/http"
 
+	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/crypto"
 	"github.com/portainer/portainer/http/client"
-	"github.com/portainer/portainer/http/response"
 )
 
 type motdResponse struct {
@@ -16,7 +16,7 @@ type motdResponse struct {
 
 func (handler *Handler) motd(w http.ResponseWriter, r *http.Request) {
 
-	motd, err := client.Get(portainer.MessageOfTheDayURL)
+	motd, err := client.Get(portainer.MessageOfTheDayURL, 0)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

@@ -38,7 +38,7 @@ function ($q, $scope, $state, Notifications, StoridgeProfileService) {
 
     $scope.state.actionInProgress = true;
     StoridgeProfileService.create(model)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Profile successfully created');
       $state.reload();
     })

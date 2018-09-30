@@ -52,7 +52,7 @@ function (PaginationService, DatatableService) {
     PaginationService.setPaginationLimit(this.tableKey, this.state.paginatedItemLimit);
   };
 
-  this.applyFilters = function(value, index, array) {
+  this.applyFilters = function(value) {
     var image = value;
     var filters = ctrl.filters;
     if ((image.ContainerCount === 0 && filters.usage.showUnusedImages)

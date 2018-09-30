@@ -15,7 +15,7 @@ function ($scope, $state, $transition$, $filter, RegistryService, Notifications)
     registry.Password = $scope.formValues.Password;
     $scope.state.actionInProgress = true;
     RegistryService.updateRegistry(registry)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Registry successfully updated');
       $state.go('portainer.registries');
     })

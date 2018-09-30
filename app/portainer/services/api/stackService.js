@@ -48,7 +48,7 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
 
       return Stack.migrate({ id: stack.Id, endpointId: stack.EndpointId }, { EndpointID: targetEndpointId, SwarmID:  swarm.Id }).$promise;
     })
-    .then(function success(data) {
+    .then(function success() {
       deferred.resolve();
     })
     .catch(function error(err) {
@@ -67,7 +67,7 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     EndpointProvider.setEndpointID(targetEndpointId);
 
     Stack.migrate({ id: stack.Id, endpointId: stack.EndpointId }, { EndpointID: targetEndpointId }).$promise
-    .then(function success(data) {
+    .then(function success() {
       deferred.resolve();
     })
     .catch(function error(err) {
@@ -204,7 +204,7 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     var deferred = $q.defer();
 
     Stack.remove({ id: stack.Id ? stack.Id : stack.Name, external: external, endpointId: endpointId }).$promise
-    .then(function success(data) {
+    .then(function success() {
       if (stack.ResourceControl && stack.ResourceControl.Id) {
         return ResourceControlService.deleteResourceControl(stack.ResourceControl.Id);
       }

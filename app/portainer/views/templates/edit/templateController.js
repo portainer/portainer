@@ -38,6 +38,12 @@ function ($q, $scope, $state, $transition$, TemplateService, TemplateHelper, Net
       )
     })
     .then(function success(data) {
+      var template = data.template;
+      if (template.Network) {
+        template.Network = _.find(data.networks, function(o) { return o.Name === template.Network; });
+      } else {
+        template.Network = _.find(data.networks, function(o) { return o.Name === 'bridge'; });
+      }
       $scope.categories = TemplateHelper.getUniqueCategories(data.templates);
       $scope.template = data.template;
       $scope.networks = data.networks;

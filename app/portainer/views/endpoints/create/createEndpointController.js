@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('CreateEndpointController', ['$q', '$scope', '$state', '$filter', 'EndpointService', 'GroupService', 'TagService', 'Notifications',
-function ($q, $scope, $state, $filter, EndpointService, GroupService, TagService, Notifications) {
+.controller('CreateEndpointController', ['$q', '$scope', '$state', '$filter', 'clipboard', 'EndpointService', 'GroupService', 'TagService', 'Notifications',
+function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService, TagService, Notifications) {
 
   $scope.state = {
     EnvironmentType: 'docker',
@@ -17,6 +17,12 @@ function ($q, $scope, $state, $filter, EndpointService, GroupService, TagService
     AzureTenantId: '',
     AzureAuthenticationKey: '',
     Tags: []
+  };
+
+  $scope.copyAgentCommand = function() {
+    clipboard.copyText('curl -L https://portainer.io/download/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent');
+    $('#copyNotification').show();
+    $('#copyNotification').fadeOut(2000);
   };
 
   $scope.addDockerEndpoint = function() {
@@ -60,8 +66,6 @@ function ($q, $scope, $state, $filter, EndpointService, GroupService, TagService
   };
 
   function createAzureEndpoint(name, applicationId, tenantId, authenticationKey, groupId, tags) {
-    var endpoint;
-
     $scope.state.actionInProgress = true;
     EndpointService.createAzureEndpoint(name, applicationId, tenantId, authenticationKey, groupId, tags)
     .then(function success() {

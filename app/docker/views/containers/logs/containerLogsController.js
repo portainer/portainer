@@ -27,10 +27,6 @@ function ($scope, $transition$, $interval, ContainerService, Notifications, Http
     }
   }
 
-  function update(logs) {
-    $scope.logs = logs;
-  }
-
   function setUpdateRepeater(skipHeaders) {
     var refreshRate = $scope.state.refreshRate;
     $scope.repeater = $interval(function() {
