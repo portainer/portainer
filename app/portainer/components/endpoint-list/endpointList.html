@@ -24,6 +24,8 @@
           ng-repeat="endpoint in $ctrl.endpoints | filter:$ctrl.state.textFilter"
           model="endpoint"
           on-select="$ctrl.dashboardAction"
+          on-edit="$ctrl.editAction"
+          is-admin="$ctrl.isAdmin"
         ></endpoint-item>
         <div ng-if="!$ctrl.endpoints" class="text-center text-muted">
           Loading...
