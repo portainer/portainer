@@ -38,6 +38,7 @@ angular.module('portainer.app').controller('EndpointListController', [
       }
       var keywords = filterValue.split(' ');
       return _.filter(endpoints, function(endpoint) {
+        var statusString = convertStatusToString(endpoint.Status);
         return _.every(keywords, function(keyword) {
           var lowerCaseKeyword = keyword.toLowerCase();
           return (
@@ -45,10 +46,15 @@ angular.module('portainer.app').controller('EndpointListController', [
             _.includes(endpoint.GroupName.toLowerCase(), lowerCaseKeyword) ||
             _.some(endpoint.Tags, function(tag) {
               return _.includes(tag.toLowerCase(), lowerCaseKeyword);
-            })
+            }) ||
+            _.includes(statusString, keyword)
           );
         });
       });
+    }
+
+    function convertStatusToString(status) {
+      return status === 1 ? 'up' : 'down';
     }
   }
 ]);
