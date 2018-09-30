@@ -7,10 +7,6 @@ $binary = "portainer-$($platform)-$($arch)"
 
 New-Item -Name dist -ItemType Directory | Out-Null
 
-docker pull portainer/golang-builder:cross-platform
-
-docker run --rm -tv "$(pwd)\api:/src" -e BUILD_GOOS="$($platform)" -e BUILD_GOARCH="$($arch)" portainer/golang-builder:cross-platform /src/cmd/portainer
+docker run --rm -e CGO_ENABLED=0 -v "$PWD/api/cmd/portainer":C:\gopath golang:1.9-nanoserver go build -v
 
 Move-Item -Path ".\api\cmd\portainer\$($binary)" -Destination dist/
-
-(Get-FileHash ".\$($binary)").Hash > portainer-checksum.txt
