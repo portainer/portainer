@@ -1,7 +1,8 @@
 angular.module('portainer.agent').controller('HostBrowserController', [
   'HostBrowserService',
   'Notifications',
-  function HostBrowserController(HostBrowserService, Notifications) {
+  'FileSaver',
+  function HostBrowserController(HostBrowserService, Notifications, FileSaver) {
     var ctrl = this;
     ctrl.state = {
       path: '/'
@@ -41,7 +42,9 @@ angular.module('portainer.agent').controller('HostBrowserController', [
     function renameFile(name, newName) {
       var isRoot = ctrl.isRoot();
       var filePath = isRoot ? '/' + name : this.state.path + '/' + file;
-      var newFilePath = isRoot ? '/' + newName : this.state.path + '/' + newName;
+      var newFilePath = isRoot
+        ? '/' + newName
+        : this.state.path + '/' + newName;
 
       HostBrowserService.rename(filePath, newFilePath)
         .then(function onRenameSuccess() {
@@ -56,7 +59,19 @@ angular.module('portainer.agent').controller('HostBrowserController', [
         });
     }
 
-    function downloadFile(name) {}
+    function downloadFile(file) {
+      var filePath = ctrl.isRoot() ? file : this.state.path + '/' + file;
+      HostBrowserService.get(filePath)
+        .then(function onFileReceived(data) {
+          var downloadData = new Blob([data.file], {
+            type: 'text/plain;charset=utf-8'
+          });
+          FileSaver.saveAs(downloadData, file);
+        })
+        .catch(function notifyOnError(err) {
+          Notifications.error('Failure', err, 'Unable to download file');
+        });
+    }
 
     function deleteFile(name) {}
 
