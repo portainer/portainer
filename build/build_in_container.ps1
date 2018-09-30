@@ -6,7 +6,6 @@ param (
 $binary = "portainer-$($platform)-$($arch)"
 
 New-Item -Name dist -Path "C:\projects\portainer" -ItemType Directory
-New-Item -Name portainer -ItemType Directory -Path "C:\projects\portainer\api\src\github.com\portainer"
 
 ls "C:\projects\portainer"
 ls "C:\projects\portainer\api"
