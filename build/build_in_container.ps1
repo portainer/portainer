@@ -5,12 +5,12 @@ param (
 
 $binary = "portainer-$($platform)-$($arch)"
 
-New-Item -Name dist -Path -ItemType Directory | Out-Null
-New-Item -Name portainer -ItemType Directory -Path C:\gopath\src\github.com\portainer | Out-Null
+New-Item -Name dist -Path "C:\projects\portainer" -ItemType Directory
+New-Item -Name portainer -ItemType Directory -Path "C:\projects\portainer\api\src\github.com\portainer"
 
-ls C:\projects\portainer
-ls C:\gopath\
+ls "C:\projects\portainer"
+ls "C:\projects\portainer\api"
 
-#docker run -e CGO_ENABLED=0 -e GOPATH=C:\gopath -v "$PWD\api:C:\gopath" -w C:\gopath\cmd\portainer golang:1.10.4-windowsservercore-ltsc2016 go get -t -d -v ./...; go build -v
+docker run -e CGO_ENABLED=0 -e GOPATH=C:\gopath -v "C:\projects\portainer\api:C:\gopath" -w C:\gopath\cmd\portainer golang:1.10.4-windowsservercore-ltsc2016 go get -t -d -v ./...; go build -v
 
-#Move-Item -Path "$PWD\api\cmd\portainer\$($binary)" -Destination dist/
+Move-Item -Path "C:\projects\portainer\api\cmd\portainer\$($binary)" -Destination "C:\projects\portainer\dist"
