@@ -1,14 +1,6 @@
 angular.module('portainer.agent').controller('HostBrowserController', [
-  'HostBrowserService',
-  'Notifications',
-  'FileSaver',
-  'ModalService',
-  function HostBrowserController(
-    HostBrowserService,
-    Notifications,
-    FileSaver,
-    ModalService
-  ) {
+  'HostBrowserService', 'Notifications', 'FileSaver', 'ModalService',
+  function HostBrowserController(HostBrowserService, Notifications, FileSaver, ModalService) {
     var ctrl = this;
     ctrl.state = {
       path: '/'
