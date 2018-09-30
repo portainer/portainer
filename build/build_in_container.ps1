@@ -7,6 +7,6 @@ $binary = "portainer-$($platform)-$($arch)"
 
 New-Item -Name dist -ItemType Directory | Out-Null
 
-docker run --rm -e CGO_ENABLED=0 -v "$PWD/api/cmd/portainer":C:\gopath golang:1.9-nanoserver go build -v
+docker run -e CGO_ENABLED=0 -v "$PWD\api:C:\gopath" golang:1.10-windowsservercore-1803 go get -t -d -v ./...; go build -v
 
-Move-Item -Path ".\api\cmd\portainer\$($binary)" -Destination dist/
+Move-Item -Path "$PWD\api\cmd\portainer\$($binary)" -Destination dist/
