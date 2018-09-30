@@ -1,0 +1,37 @@
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-code" title-text="Engine Details"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Version</td>
+              <td>{{ $ctrl.engine.releaseVersion }} <span ng-if="$ctrl.engine.apiVersion">(API: {{ $ctrl.engine.apiVersion }})</span></td>
+            </tr>
+            <tr ng-if="$ctrl.engine.rootDirectory">
+              <td>Root directory</td>
+              <td>{{ $ctrl.engine.rootDirectory }}</td>
+            </tr>
+            <tr ng-if="$ctrl.engine.storageDriver">
+              <td>Storage Driver</td>
+              <td>{{ $ctrl.engine.storageDriver }}</td>
+            </tr>
+            <tr ng-if="$ctrl.engine.loggingDriver">
+              <td>Logging Driver</td>
+              <td>{{ $ctrl.engine.loggingDriver }}</td>
+            </tr>
+            <tr>
+              <td>Volume Plugins</td>
+              <td>{{ $ctrl.engine.volumePlugins | commaSeparated }}</td>
+            </tr>
+            <tr>
+              <td>Network Plugins</td>
+              <td>{{ $ctrl.engine.networkPlugins | commaSeparated }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

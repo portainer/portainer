@@ -1,0 +1,13 @@
+<host-overview
+  is-agent="$ctrl.state.isAgent"
+  host-details="$ctrl.hostDetails"
+  engine-details="$ctrl.engineDetails"
+  refresh-url="docker.nodes.node"
+>
+  <devices-panel ng-if="$ctrl.state.isAgent" devices="$ctrl.devices"></devices-panel>
+  <disks-panel ng-if="$ctrl.state.isAgent" disks="$ctrl.disks"></disks-panel>
+  <swarm-node-details-panel
+    details="$ctrl.nodeDetails"
+    original-node="$ctrl.originalNode"
+  ></swarm-node-details-panel>
+</host-overview>
