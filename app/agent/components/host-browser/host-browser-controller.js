@@ -38,7 +38,23 @@ angular.module('portainer.agent').controller('HostBrowserController', [
         });
     }
 
-    function renameFile(name, newName) {}
+    function renameFile(name, newName) {
+      var isRoot = ctrl.isRoot();
+      var filePath = isRoot ? '/' + name : this.state.path + '/' + file;
+      var newFilePath = isRoot ? '/' + newName : this.state.path + '/' + newName;
+
+      HostBrowserService.rename(filePath, newFilePath)
+        .then(function onRenameSuccess() {
+          Notifications.success('File successfully renamed', newFilePath);
+          return HostBrowserService.ls(ctrl.state.path);
+        })
+        .then(function onFilesLoaded(files) {
+          ctrl.files = files;
+        })
+        .catch(function notifyOnError(err) {
+          Notifications.error('Failure', err, 'Unable to rename file');
+        });
+    }
 
     function downloadFile(name) {}
 
@@ -52,7 +68,7 @@ angular.module('portainer.agent').controller('HostBrowserController', [
       if (path.lastIndexOf('/') === 0) {
         return '/';
       }
-  
+
       var split = _.split(path, '/');
       return _.join(_.slice(split, 0, split.length - 1), '/');
     }
