@@ -60,7 +60,7 @@ angular.module('portainer.agent').controller('HostBrowserController', [
     }
 
     function downloadFile(file) {
-      var filePath = ctrl.isRoot() ? file : this.state.path + '/' + file;
+      var filePath = buildPath(ctrl.state.path, file);
       HostBrowserService.get(filePath)
         .then(function onFileReceived(data) {
           var downloadData = new Blob([data.file], {
