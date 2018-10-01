@@ -1,23 +1,44 @@
 version: 1.0.{build}
 image:
   - Visual Studio 2017
+  - Ubuntu
 environment:
+  matrix:
+    - ARCH: amd64
+    - ARCH: arm 
+    - ARCH: arm64
+    - ARCH: ppc64le
+    - ARCH: s390x
   DOCKER_HUB_USERNAME:
     secure: JapmC7j5F0mY3j/MVzU+Cw==
   DOCKER_HUB_PASSWORD:
     secure: QGlCLNWzPD0HL8ipkohVic45/yU3bVOdjn0IiV6NnSQ=
-  matrix:
-    - ARCH: amd64
+matrix:
+  exclude:
+    - image: Visual Studio 2017
+      ARCH: arm
+    - image: Visual Studio 2017
+      ARCH: arm64
+    - image: Visual Studio 2017
+      ARCH: ppc64le
+    - image: Visual Studio 2017
+      ARCH: s390x
 branches:
   only:
     - master
 install:
-  - yarn install
+  - ps: >- 
+      yarn install
 build_script:
-  - yarn grunt release:windows:amd64
-  - ls
+  - ps : >-
+      if (ENV:\APPVEYOR_BUILD_WORKER_IMAGE -eq 'Visual Studio 2017') {
+        $image = 'windows'
+      } else {
+        $image = 'linux'
+      }
+
+      yarn grunt release:$image:amd64
   - docker build -t ssbkang/portainer:develop-windows -f "build\windows2016\nanoserver\Dockerfile" .
 deploy_script:
-  - docker image ls
   - docker login -u "%DOCKER_HUB_USERNAME%" -p "%DOCKER_HUB_PASSWORD%"
   - docker push ssbkang/portainer:develop-windows
