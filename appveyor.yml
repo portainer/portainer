@@ -15,7 +15,7 @@ install:
   - yarn install
 build_script:
   - yarn grunt release:windows:amd64
-  - docker build -t ssbkang/portainer:develop-windows -f Dockerfile $PWD\build\windows2016\nanoserver
+  - docker build -t ssbkang/portainer:develop-windows -f Dockerfile .\build\windows2016\nanoserver
 deploy_script:
   - docker image ls
   - docker login -u "$env:DOCKER_HUB_USERNAME" -p "$env:DOCKER_HUB_PASSWORD"
