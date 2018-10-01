@@ -6,7 +6,7 @@ environment:
     secure: JapmC7j5F0mY3j/MVzU+Cw==
   DOCKER_HUB_PASSWORD:
     secure: QGlCLNWzPD0HL8ipkohVic45/yU3bVOdjn0IiV6NnSQ=
-  matrix:	
+  matrix:
     - ARCH: amd64
 branches:
   only:
