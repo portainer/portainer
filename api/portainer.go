@@ -429,16 +429,18 @@ type (
 
 	// Plugin represent a Portainer plugin
 	Plugin struct {
-		ID                PluginID `json:"Id"`
-		Enabled           bool     `json:"Enabled"`
-		Name              string   `json:"Name,omitempty"`
-		ShortDescription  string   `json:"ShortDescription,omitempty"`
-		Description       string   `json:"Description,omitempty"`
-		Price             string   `json:"Price,omitempty"`
-		LicenseCompany    string   `json:"LicenseCompany,omitempty"`
-		LicenseExpiration string   `json:"LicenseExpiration,omitempty"`
-		Version           string   `json:"Version"`
-		UpdateAvailable   bool     `json:"UpdateAvailable"`
+		ID               PluginID `json:"Id"`
+		Enabled          bool     `json:"Enabled"`
+		Name             string   `json:"Name,omitempty"`
+		ShortDescription string   `json:"ShortDescription,omitempty"`
+		Description      string   `json:"Description,omitempty"`
+		Price            string   `json:"Price,omitempty"`
+		// TODO: License struct? License{key, company, expiration}
+		License           string `json:"License,omitempty"`
+		LicenseCompany    string `json:"LicenseCompany,omitempty"`
+		LicenseExpiration string `json:"LicenseExpiration,omitempty"`
+		Version           string `json:"Version"`
+		UpdateAvailable   bool   `json:"UpdateAvailable"`
 	}
 
 	// CLIService represents a service for managing CLI

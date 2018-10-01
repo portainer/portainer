@@ -46,7 +46,10 @@
               </div>
 
               <div style="margin-top: 15px;" ng-if="plugin.Enabled && plugin.UpdateAvailable">
-                <button type="button" name="button" class="btn btn-primary btn-sm" style="width: 100%; margin-left: 0;">Update</button>
+                <button type="button" class="btn btn-primary btn-sm" ng-click="updatePlugin(plugin)" ng-disabled="state.updateInProgress" button-spinner="state.updateInProgress" style="width: 100%; margin-left: 0;">
+                  <span ng-hide="state.updateInProgress">Update</span>
+                  <span ng-show="state.updateInProgress">Updating plugin...</span>
+                </button>
               </div>
 
             </div>

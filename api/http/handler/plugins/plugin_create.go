@@ -122,6 +122,8 @@ func (handler *Handler) enableRegistryManagementPlugin(plugin *portainer.Plugin,
 		return portainer.Error("Invalid license")
 	}
 
+	plugin.License = license
+
 	output := string(cmdOutput.Bytes())
 	licenseDetails := strings.Split(output, "|")
 	plugin.LicenseCompany = licenseDetails[0]
@@ -138,6 +140,8 @@ func (handler *Handler) enableRegistryManagementPlugin(plugin *portainer.Plugin,
 	if err != nil {
 		return err
 	}
+
+	handler.pluginProcesses.Set(strconv.Itoa(int(plugin.ID)), cmd)
 
 	return handler.ProxyManager.CreatePluginProxy(plugin.ID)
 }

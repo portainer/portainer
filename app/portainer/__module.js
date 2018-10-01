@@ -217,9 +217,6 @@ angular.module('portainer.app', [])
         templateUrl: 'app/portainer/views/plugins/inspect/plugin.html',
         controller: 'PluginController'
       }
-    },
-    params: {
-      plugin: {}
     }
   };
 

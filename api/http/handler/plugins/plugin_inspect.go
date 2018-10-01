@@ -43,7 +43,7 @@ func (handler *Handler) pluginInspect(w http.ResponseWriter, r *http.Request) *h
 
 	storedPlugin, err := handler.PluginService.Plugin(pluginID)
 	if err == portainer.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a plugin with the specified identifier inside the database", err}
+		return response.JSON(w, plugin)
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a plugin with the specified identifier inside the database", err}
 	}

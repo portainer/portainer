@@ -7,6 +7,10 @@ angular.module('portainer.app')
     return PortainerPlugin.create({ license: license }).$promise;
   };
 
+  service.update = function(id, version) {
+    return PortainerPlugin.update({ id: id, version: version }).$promise;
+  };
+
   // TODO: same as store, except store = false, refactor
   service.plugins = function() {
     var deferred = $q.defer();

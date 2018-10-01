@@ -1,25 +1,29 @@
 angular.module('portainer.app')
-.controller('PluginController', ['$q', '$scope', '$transition$', 'PortainerPluginService', 'Notifications',
-function ($q, $scope, $transition$, PortainerPluginService, Notifications) {
+.controller('PluginController', ['$q', '$scope', '$transition$', '$state', 'PortainerPluginService', 'Notifications',
+function ($q, $scope, $transition$, $state, PortainerPluginService, Notifications) {
 
-  $scope.enablePlugin = enablePlugin;
+  $scope.state = {
+    updateInProgress: false
+  };
 
-  function enablePlugin(pluginType) {
-    PortainerPluginService.enable(pluginType)
+  $scope.updatePlugin = updatePlugin;
+
+  function updatePlugin(plugin) {
+    $scope.state.updateInProgress = true;
+    PortainerPluginService.update(plugin.Id, plugin.Version)
     .then(function onSuccess() {
-      Notifications.success('Plugin successfully enabled');
+      Notifications.success('Plugin successfully updated');
+      $state.reload();
     })
     .catch(function onError(err) {
-      Notifications.error('Failure', err, 'Unable to enable plugin');
+      Notifications.error('Failure', err, 'Unable to update plugin');
+    })
+    .finally(function final() {
+      $scope.state.updateInProgress = false;
     });
   }
 
   function initView() {
-    if ($transition$.params().plugin.Id) {
-      $scope.plugin = $transition$.params().plugin;
-      return;
-    }
-
     PortainerPluginService.plugin($transition$.params().id, true)
     .then(function onSuccess(plugin) {
       $scope.plugin = plugin;

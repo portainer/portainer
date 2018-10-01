@@ -126,6 +126,7 @@ func (server *Server) Start() error {
 
 	var pluginHandler = plugins.NewHandler(requestBouncer)
 	pluginHandler.PluginService = server.PluginService
+	pluginHandler.FileService = server.FileService
 	pluginHandler.ProxyManager = proxyManager
 
 	var registryHandler = registries.NewHandler(requestBouncer)

@@ -6,6 +6,6 @@ function ($state) {
   ctrl.goToPluginView = goToPluginView;
 
   function goToPluginView() {
-    $state.go('portainer.plugins.plugin', { id: ctrl.model.Id, plugin: ctrl.model });
+    $state.go('portainer.plugins.plugin', { id: ctrl.model.Id });
   }
 }]);

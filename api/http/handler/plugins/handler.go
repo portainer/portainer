@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/orcaman/concurrent-map"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/http/proxy"
@@ -13,14 +14,17 @@ import (
 // Handler is the HTTP handler used to handle plugin operations.
 type Handler struct {
 	*mux.Router
-	PluginService portainer.PluginService
-	ProxyManager  *proxy.Manager
+	PluginService   portainer.PluginService
+	FileService     portainer.FileService
+	ProxyManager    *proxy.Manager
+	pluginProcesses cmap.ConcurrentMap
 }
 
 // NewHandler creates a handler to manage plugin operations.
 func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{
-		Router: mux.NewRouter(),
+		Router:          mux.NewRouter(),
+		pluginProcesses: cmap.New(),
 	}
 
 	//TODO: admin access

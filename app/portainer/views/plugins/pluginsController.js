@@ -2,6 +2,10 @@ angular.module('portainer.app')
 .controller('PluginsController', ['$scope', '$state', 'PortainerPluginService', 'Notifications',
 function ($scope, $state, PortainerPluginService, Notifications) {
 
+  $scope.state = {
+    actionInProgress: false
+  };
+
   $scope.formValues = {
     License: ''
   };
@@ -19,6 +23,7 @@ function ($scope, $state, PortainerPluginService, Notifications) {
   $scope.enablePlugin = function() {
     var license = $scope.formValues.License;
 
+    $scope.state.actionInProgress = true;
     PortainerPluginService.enable(license)
     .then(function onSuccess() {
       Notifications.success('Plugin successfully enabled');
@@ -26,6 +31,9 @@ function ($scope, $state, PortainerPluginService, Notifications) {
     })
     .catch(function onError(err) {
       Notifications.error('Failure', err, 'Unable to enable plugin');
+    })
+    .finally(function final() {
+      $scope.state.actionInProgress = false;
     });
   };
 

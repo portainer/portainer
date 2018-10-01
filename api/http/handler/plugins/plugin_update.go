@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"os/exec"
+	"strconv"
 	"strings"
 
 	"github.com/asaskevich/govalidator"
@@ -49,6 +50,10 @@ func (handler *Handler) pluginUpdate(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	// TODO: remove existing plugin and upgrade to the new version
+	err = handler.updatePlugin(plugin)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to enable plugin", err}
+	}
 
 	err = handler.PluginService.Persist(plugin)
 	if err != nil {
@@ -82,10 +87,31 @@ func (handler *Handler) updatePlugin(plugin *portainer.Plugin) error {
 }
 
 func (handler *Handler) updateRegistryManagementPlugin(plugin *portainer.Plugin) error {
+
+	// TODO: kill/remove actual process/binary should be done after download/extract step
+	// so that if any issue arises during download/extract, we still have the plugin running
+	// Cannot do right now as there is a name conflict on the binary, need version in binary name
+
+	// TODO: stop the current process associated to the plugin
+	// to do so, must keep a reference to the exec.Command that was started in plugin_create (stored in the handler, might be relocated to a service after)
+	process, ok := handler.pluginProcesses.Get(strconv.Itoa(int(plugin.ID)))
+	if ok {
+		err := process.(*exec.Cmd).Process.Kill()
+		if err != nil {
+			return err
+		}
+	}
+
+	// TODO: remove the existing plugin binary from the filesystem
+	err := handler.FileService.RemoveDirectory("/data/bin/plugin-registry-management")
+	if err != nil {
+		return err
+	}
+
 	// Download/untar
 	// TODO: replace location + constant for base (download.portainer.io ?)
-	// based on current platform+arch, should download the according zip (plugin-registry-management-linux-amd64-1.0.1.zip)
-	data, err := client.Get("https://github.com/deviantony/xtrabackup-scripts/releases/download/3.1.5/rm01.zip", 30)
+	// based on current platform+arch+version, should download the according zip (plugin-registry-management-linux-amd64-1.0.1.zip)
+	data, err := client.Get("https://github.com/deviantony/xtrabackup-scripts/releases/download/3.1.5/rm0101.zip", 30)
 	if err != nil {
 		return err
 	}
@@ -96,15 +122,10 @@ func (handler *Handler) updateRegistryManagementPlugin(plugin *portainer.Plugin)
 		return err
 	}
 
-	// TODO: stop the current process associated to the plugin
-	// to do so, must keep a reference to the exec.Command that was started in plugin_create (stored in the handler, might be relocated to a service after)
-
-	// TODO: remove the existing plugin binary from the filesystem
-
 	// TODO: if license check fails, need to be updated to use flags
 	// should probably download and use a specific license-checker binary
 
-	licenseValidationCommand := exec.Command("/data/bin/plugin-registry-management", license, "--check")
+	licenseValidationCommand := exec.Command("/data/bin/plugin-registry-management", plugin.License, "--check")
 	cmdOutput := &bytes.Buffer{}
 	licenseValidationCommand.Stdout = cmdOutput
 
@@ -122,7 +143,7 @@ func (handler *Handler) updateRegistryManagementPlugin(plugin *portainer.Plugin)
 	// syscall.Exec replaces the process, ForkExec could be tried?
 	// Also should be relocated to another package
 	// err = syscall.ForkExec("/plugins/plugin-registry-management", []string{"plugin-registry-management"}, os.Environ())
-	cmd := exec.Command("/data/bin/plugin-registry-management", license)
+	cmd := exec.Command("/data/bin/plugin-registry-management", plugin.License)
 
 	// cmd.Start will not share logs with the main Portainer container.
 	err = cmd.Start()
