@@ -41,7 +41,7 @@ build_binary_script:
 
       Write-Host "$($image)"
 
-      yarn grunt release:$image:amd64  
+      yarn grunt release:$image:amd64
 deploy_docker_script:
   - docker build -t ssbkang/portainer:develop-windows -f "build\windows2016\nanoserver\Dockerfile" .
 push_docker_script:
