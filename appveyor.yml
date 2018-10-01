@@ -1,6 +1,11 @@
 version: 1.0.{build}
 image:
   - Visual Studio 2017
+environment:
+  DOCKER_HUB_USERNAME:
+    secure: JapmC7j5F0mY3j/MVzU+Cw==
+  DOCKER_HUB_PASSWORD:
+    secure: QGlCLNWzPD0HL8ipkohVic45/yU3bVOdjn0IiV6NnSQ=
 environment:	
   matrix:	
     - ARCH: amd64
@@ -11,3 +16,6 @@ install:
   - yarn install
 build_script:
   - yarn grunt release:windows:amd64
+deploy_script:
+  - docker login -u="$env:DOCKER_HUB_USERNAME" -p="$env:DOCKER_HUB_PASSWORD"
+  - docker push ssbkang/portainer:develop
