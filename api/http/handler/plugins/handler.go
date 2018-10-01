@@ -17,14 +17,13 @@ type Handler struct {
 	PluginService   portainer.PluginService
 	FileService     portainer.FileService
 	ProxyManager    *proxy.Manager
-	pluginProcesses cmap.ConcurrentMap
+	PluginProcesses *cmap.ConcurrentMap
 }
 
 // NewHandler creates a handler to manage plugin operations.
 func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{
-		Router:          mux.NewRouter(),
-		pluginProcesses: cmap.New(),
+		Router: mux.NewRouter(),
 	}
 
 	//TODO: admin access

@@ -1,7 +1,15 @@
 package http
 
 import (
+	"bytes"
+	"errors"
+	"log"
+	"os/exec"
+	"strconv"
+	"strings"
 	"time"
+
+	"github.com/orcaman/concurrent-map"
 
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/docker"
@@ -72,6 +80,73 @@ type Server struct {
 	DockerClientFactory    *docker.ClientFactory
 }
 
+// TODO: relocate
+func initPlugins(pluginService portainer.PluginService, proxyManager *proxy.Manager, pluginProcesses *cmap.ConcurrentMap) {
+
+	plugins, err := pluginService.Plugins()
+	if err != nil {
+		log.Printf("Plugin init error: \n", err)
+		return
+	}
+
+	for _, plugin := range plugins {
+		err := startPlugin(&plugin, proxyManager, pluginProcesses)
+		if err != nil {
+			log.Printf("Plugin init error: \n", err)
+			return
+		}
+	}
+
+}
+
+func startPlugin(plugin *portainer.Plugin, proxyManager *proxy.Manager, pluginProcesses *cmap.ConcurrentMap) error {
+
+	// TODO: switch case on plugin identifier to download/enable correct plugin
+	switch plugin.ID {
+	case portainer.RegistryManagementPlugin:
+		return startRegistryManagementPlugin(plugin, proxyManager, pluginProcesses)
+	default:
+		return errors.New("Unsupported plugin identifier")
+	}
+
+	return nil
+}
+
+func startRegistryManagementPlugin(plugin *portainer.Plugin, proxyManager *proxy.Manager, pluginProcesses *cmap.ConcurrentMap) error {
+	// TODO: if license check fails, need to be updated to use flags
+	// should probably download and use a specific license-checker binary
+
+	licenseValidationCommand := exec.Command("/data/bin/plugin-registry-management", plugin.License, "--check")
+	cmdOutput := &bytes.Buffer{}
+	licenseValidationCommand.Stdout = cmdOutput
+
+	err := licenseValidationCommand.Run()
+	if err != nil {
+		return portainer.Error("Invalid license")
+	}
+
+	output := string(cmdOutput.Bytes())
+	licenseDetails := strings.Split(output, "|")
+	plugin.LicenseCompany = licenseDetails[0]
+	plugin.LicenseExpiration = licenseDetails[1]
+	plugin.Version = licenseDetails[2]
+
+	// syscall.Exec replaces the process, ForkExec could be tried?
+	// Also should be relocated to another package
+	// err = syscall.ForkExec("/plugins/plugin-registry-management", []string{"plugin-registry-management"}, os.Environ())
+	cmd := exec.Command("/data/bin/plugin-registry-management", plugin.License)
+
+	// cmd.Start will not share logs with the main Portainer container.
+	err = cmd.Start()
+	if err != nil {
+		return err
+	}
+
+	pluginProcesses.Set(strconv.Itoa(int(plugin.ID)), cmd)
+
+	return proxyManager.CreatePluginProxy(plugin.ID)
+}
+
 // Start starts the HTTP server
 func (server *Server) Start() error {
 	requestBouncerParameters := &security.RequestBouncerParams{
@@ -92,6 +167,10 @@ func (server *Server) Start() error {
 	}
 	proxyManager := proxy.NewManager(proxyManagerParameters)
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
+
+	// TODO: relocate to a service ? ProcessService?
+	pluginProcesses := cmap.New()
+	go initPlugins(server.PluginService, proxyManager, &pluginProcesses)
 
 	var authHandler = auth.NewHandler(requestBouncer, rateLimiter, server.AuthDisabled)
 	authHandler.UserService = server.UserService
@@ -128,6 +207,7 @@ func (server *Server) Start() error {
 	pluginHandler.PluginService = server.PluginService
 	pluginHandler.FileService = server.FileService
 	pluginHandler.ProxyManager = proxyManager
+	pluginHandler.PluginProcesses = &pluginProcesses
 
 	var registryHandler = registries.NewHandler(requestBouncer)
 	registryHandler.RegistryService = server.RegistryService

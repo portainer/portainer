@@ -141,7 +141,7 @@ func (handler *Handler) enableRegistryManagementPlugin(plugin *portainer.Plugin,
 		return err
 	}
 
-	handler.pluginProcesses.Set(strconv.Itoa(int(plugin.ID)), cmd)
+	handler.PluginProcesses.Set(strconv.Itoa(int(plugin.ID)), cmd)
 
 	return handler.ProxyManager.CreatePluginProxy(plugin.ID)
 }

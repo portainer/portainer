@@ -94,7 +94,7 @@ func (handler *Handler) updateRegistryManagementPlugin(plugin *portainer.Plugin)
 
 	// TODO: stop the current process associated to the plugin
 	// to do so, must keep a reference to the exec.Command that was started in plugin_create (stored in the handler, might be relocated to a service after)
-	process, ok := handler.pluginProcesses.Get(strconv.Itoa(int(plugin.ID)))
+	process, ok := handler.PluginProcesses.Get(strconv.Itoa(int(plugin.ID)))
 	if ok {
 		err := process.(*exec.Cmd).Process.Kill()
 		if err != nil {
@@ -150,6 +150,8 @@ func (handler *Handler) updateRegistryManagementPlugin(plugin *portainer.Plugin)
 	if err != nil {
 		return err
 	}
+
+	handler.PluginProcesses.Set(strconv.Itoa(int(plugin.ID)), cmd)
 
 	return handler.ProxyManager.CreatePluginProxy(plugin.ID)
 }
