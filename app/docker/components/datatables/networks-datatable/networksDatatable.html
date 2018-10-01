@@ -6,7 +6,7 @@
           <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }}
         </div>
       </div>
-      <div class="actionBar">
+      <div class="actionBar" ng-if="$ctrl.endpointStatus === 1">
         <button type="button" class="btn btn-sm btn-danger"
           ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove

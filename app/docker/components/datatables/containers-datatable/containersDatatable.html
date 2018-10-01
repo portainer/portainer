@@ -99,7 +99,7 @@
           </span>
         </div>
       </div>
-      <containers-datatable-actions
+      <containers-datatable-actions ng-if="$ctrl.state.endpointStatus === 1"
         selected-items="$ctrl.state.selectedItems"
         selected-item-count="$ctrl.state.selectedItemCount"
         no-stopped-items-selected="$ctrl.state.noStoppedItemsSelected"

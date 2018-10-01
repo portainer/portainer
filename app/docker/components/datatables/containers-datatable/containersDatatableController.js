@@ -13,7 +13,8 @@ function (PaginationService, DatatableService, EndpointProvider) {
     noStoppedItemsSelected: true,
     noRunningItemsSelected: true,
     noPausedItemsSelected: true,
-    publicURL: EndpointProvider.endpointPublicURL()
+    publicURL: EndpointProvider.endpointPublicURL(),
+    endpointStatus: EndpointProvider.endpointStatus()
   };
 
   this.settings = {
@@ -204,7 +205,6 @@ function (PaginationService, DatatableService, EndpointProvider) {
   this.$onInit = function() {
     setDefaults(this);
     this.prepareTableFromDataset();
-
     var storedOrder = DatatableService.getDataTableOrder(this.tableKey);
     if (storedOrder !== null) {
       this.state.reverseOrder = storedOrder.reverse;

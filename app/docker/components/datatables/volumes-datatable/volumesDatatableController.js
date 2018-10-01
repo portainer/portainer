@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('VolumesDatatableController', ['PaginationService', 'DatatableService',
-function (PaginationService, DatatableService) {
+.controller('VolumesDatatableController', ['PaginationService', 'DatatableService', 'EndpointProvider',
+function (PaginationService, DatatableService, EndpointProvider) {
 
   var ctrl = this;
 
@@ -10,7 +10,8 @@ function (PaginationService, DatatableService) {
     paginatedItemLimit: PaginationService.getPaginationLimit(this.tableKey),
     displayTextFilter: false,
     selectedItemCount: 0,
-    selectedItems: []
+    selectedItems: [],
+    endpointStatus: EndpointProvider.endpointStatus()
   };
 
   this.filters = {

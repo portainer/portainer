@@ -1,12 +1,15 @@
 angular.module('portainer.app')
-.controller('HomeController', ['$q', '$scope', '$state', 'Authentication', 'EndpointService', 'EndpointHelper', 'GroupService', 'Notifications', 'EndpointProvider', 'StateManager', 'ExtensionManager', 'ModalService', 'MotdService', 'LocalStorage',
-function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, GroupService, Notifications, EndpointProvider, StateManager, ExtensionManager, ModalService, MotdService, LocalStorage) {
+.controller('HomeController', ['$q', '$scope', '$state', 'Authentication', 'EndpointService', 'EndpointHelper', 'GroupService', 'Notifications', 'EndpointProvider', 'StateManager', 'ExtensionManager', 'ModalService', 'MotdService',
+function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, GroupService, Notifications, EndpointProvider, StateManager, ExtensionManager, ModalService, MotdService) {
 
   $scope.goToDashboard = function(endpoint) {
     EndpointProvider.setEndpointID(endpoint.Id);
     EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
+    EndpointProvider.setEndpointStatus(endpoint.Status);
     if (endpoint.Type === 3) {
       switchToAzureEndpoint(endpoint);
+    } else if (endpoint.Type === 2 && endpoint.Status !== 1) {
+      Notifications.error('Failure', '', 'Endpoint is offline, connect to another swarm manager');
     } else {
       switchToDockerEndpoint(endpoint);
     }
@@ -85,7 +88,7 @@ function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, G
       var groups = data.groups;
       EndpointHelper.mapGroupNameToEndpoint(endpoints, groups);
       $scope.endpoints = endpoints;
-      LocalStorage.storeEndpoints(endpoints);
+      EndpointProvider.setEndpoints(endpoints);
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve endpoint information');

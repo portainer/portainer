@@ -95,6 +95,12 @@ angular.module('portainer.app')
     getEndpoints: function() {
       return localStorageService.get('ENDPOINTS_DATA');
     },
+    storeEndpointStatus: function(status) {
+      localStorageService.set('ENDPOINT_STATUS', status);
+    },
+    getEndpointStatus: function() {
+      return localStorageService.get('ENDPOINT_STATUS');
+    },
     clean: function() {
       localStorageService.clearAll();
     }

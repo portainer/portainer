@@ -1,17 +1,15 @@
 angular.module('portainer.app')
-  .factory('VersionInterceptor', ['$q', 'LocalStorage', function ($q, LocalStorage) {
+  .factory('VersionInterceptor', ['$q', 'EndpointProvider', function ($q, EndpointProvider) {
     return {
       responseError: function (rejection) {
-
         if (rejection.status === 502 || rejection.status === -1) {
-          var endpointId = LocalStorage.getEndpointID();
-          var endpoints = LocalStorage.getEndpoints();
-          var endpoint = _.find(endpoints, function (item) {
-            return item.Id === endpointId;
-          });
+          var endpoint = EndpointProvider.currentEndpoint();
           if (endpoint !== undefined) {
             var data = endpoint.Snapshots[0].SnapshotRaw.Version;
             if (data !== undefined) {
+              if (EndpointProvider.endpointStatus() === 1) {
+                EndpointProvider.setEndpointStatus(2);
+              }
               return data;
             }
           }
