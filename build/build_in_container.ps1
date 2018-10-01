@@ -7,6 +7,7 @@ $binary = "portainer-$($platform)-$($arch)"
 
 New-Item -Name dist -Path "C:\projects\portainer" -ItemType Directory
 
+ls $PWD
 ls "C:\projects\portainer"
 ls "C:\projects\portainer\api"
 
