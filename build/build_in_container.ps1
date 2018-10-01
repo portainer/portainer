@@ -16,7 +16,12 @@ Set-Location -Path "C:\projects\portainer\api\cmd\portainer"
 ls
 
 C:\go110\bin\go.exe get -t -d -v ./...
-C:\go110\bin\go.exe build -v
+
+ls
+
+ls C:\projects\portainer\src
+
+#C:\go110\bin\go.exe build -v
 
 ls C:\projects\portainer\dist
 
