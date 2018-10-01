@@ -17,4 +17,4 @@ build_script:
   - yarn grunt release:windows:amd64
 deploy_script:
   - docker login -u="$env:DOCKER_HUB_USERNAME" -p="$env:DOCKER_HUB_PASSWORD"
-  - docker push ssbkang/portainer:develop
+  - docker push ssbkang/portainer:develop-windows
