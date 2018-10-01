@@ -24,10 +24,8 @@ function ($scope, $state, DeploykeyService, Notifications, Authentication) {
   $scope.removeAction = function (selectedItems) {
     var actionCount = selectedItems.length;
     
-    console.log(selectedItems);
     angular.forEach(selectedItems, function (deploykey) {
-      console.log(deploykey);
-      DeploykeyService.deleteNewdeploykey(deploykey.Id)
+    DeploykeyService.deleteNewdeploykey(deploykey.Id)
       .then(function success() {
         Notifications.success('Key successfully removed', deploykey.Name);
         var index = $scope.deploykeys.indexOf(deploykey);
@@ -47,14 +45,13 @@ function ($scope, $state, DeploykeyService, Notifications, Authentication) {
 
   $scope.createDeploykey = function() {
     var deploykeyName = $scope.formValues.Name;
-    var userName = Authentication.getUserDetails().username;
-    DeploykeyService.createNewdeploykey(deploykeyName,userName)
+    var UserID = Authentication.getUserDetails().ID;
+    DeploykeyService.createNewdeploykey(deploykeyName,UserID)
     .then(function success() {
       Notifications.success('Key successfully created', deploykeyName);
       $state.reload();
     })
     .catch(function error(err) {
-      console.log(err);
       Notifications.error('Failure', err, 'Unable to create key');
     });
   };

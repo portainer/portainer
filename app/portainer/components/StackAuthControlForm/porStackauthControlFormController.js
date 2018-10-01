@@ -3,24 +3,22 @@ angular.module('portainer.app')
 function ($q,$state,$scope, DeploykeyService, StackService, UserService, TeamService, Notifications, Authentication, ResourceControlService) {
   var ctrl = this;
 
-  ctrl.existingsshKey = [];
-  ctrl.newgenratedeploykey = [];
-  ctrl.enableGenratekey = false;  
-  ctrl.textEntered
+  ctrl.formData.existingsshKey = [];
+  ctrl.formData.newgenratedeploykey = [];
+  ctrl.enableGenratekey = false;    
   
-  
-  ctrl.copytoclipboard = function (){
+  ctrl.formData.copytoclipboard = function (){
     var $temp = $("<input>");
     $("body").append($temp);
     $temp.val($('#selPKey').val()).select();
     document.execCommand("copy");
     $temp.remove();
     $('#refreshRateChange').show();
-    $('#refreshRateChange').fadeOut(2000);
+    $('#refreshRateChange').fadeOut(2000);   
     
   }
 
-  ctrl.change = function(key){
+  ctrl.formData.change = function(key){
     if(key != ''){
       $('.copyToClip').removeAttr("disabled")
     }
@@ -29,13 +27,13 @@ function ($q,$state,$scope, DeploykeyService, StackService, UserService, TeamSer
     }   
   }
 
-  ctrl.createNewkey = function() {    
+  ctrl.formData.createNewkey = function() {    
     if(StackService.getStackName() == ''){
       $('#stack_name').focus();
     } else {
       var createKeyName = 'deploykey_' + StackService.getStackName();
-      var userName = Authentication.getUserDetails().username;
-      DeploykeyService.createNewdeploykey(createKeyName,userName)
+      var userID = Authentication.getUserDetails().ID;
+      DeploykeyService.createNewdeploykey(createKeyName,userID)
       .then(function success(data) {      
         Notifications.success('Key successfully created', createKeyName);
         //$state.reload();        
@@ -68,24 +66,24 @@ function ($q,$state,$scope, DeploykeyService, StackService, UserService, TeamSer
 
     DeploykeyService.deploykeys()
     .then(function success(data) {
-      ctrl.categories = data;                       
+      ctrl.formData.GenrateSshkey = data;                       
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve keys');
-      ctrl.categories = [];
+      ctrl.formData.GenrateSshkey = [];
     });
   }
 
   function getAlldeploykeydata(getdata){
     DeploykeyService.deploykeys()
     .then(function success(data) {
-      ctrl.categories = data;                 
-      ctrl.categories.selected = getdata;//{value : ctrl.categories[data.length - 1]}
+      ctrl.formData.GenrateSshkey = data;                 
+      ctrl.formData.GenrateSshkey.selected = getdata;//{value : ctrl.formData.GenrateSshkey[data.length - 1]}
       
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve keys');
-      ctrl.categories = [];
+      ctrl.formData.GenrateSshkey = [];
     });      
   }
     

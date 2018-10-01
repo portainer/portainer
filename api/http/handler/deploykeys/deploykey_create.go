@@ -16,7 +16,7 @@ type deploykeyCreatePayload struct {
 	Name           string
 	Privatekeypath string
 	Publickeypath  string
-	UserName       string
+	UserID         int
 	LastUsage      string
 }
 
@@ -60,7 +60,7 @@ func (handler *Handler) deploykeyCreate(w http.ResponseWriter, r *http.Request) 
 		Name:           payload.Name,
 		Privatekeypath: encodedStr,
 		Publickeypath:  encodedStr1,
-		UserName:       payload.UserName,
+		UserID:         payload.UserID,
 		LastUsage:      dateTime,
 	}
 

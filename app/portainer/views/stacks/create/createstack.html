@@ -164,14 +164,14 @@
                   Authentication          
                 </label>
                 <label class="switch" style="margin-left: 20px;">  
-                  <input name="userOwnership" type="checkbox" ng-model="formValues.stackAuthenticationControlEnabled"><i></i>       
+                  <input name="userOwnership" type="checkbox" ng-model="formValues.RepositoryAuthentication" ng-change="formValues.authenticationEnable(formValues.RepositoryAuthentication)"><i></i>       
                 </label>
               </div>
             </div> 
-            <div class="form-group" style="margin-bottom: 0" ng-if="formValues.stackAuthenticationControlEnabled">
+            <div class="form-group" style="margin-bottom: 0" ng-if="formValues.RepositoryAuthentication">
                 <div class="boxselector_wrapper">
                     <div>
-                        <input type="radio" id="registry_custom" ng-model="formValues.RepositoryAuthentication" ng-value="1">
+                        <input type="radio" id="registry_custom" ng-model="formValues.stackAuthenticationControlEnabled" ng-value="1">
                         <label for="registry_custom">
                           <div class="boxselector_header">
                             <i class="fa fas fa-key" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -183,7 +183,7 @@
                         </label>
                       </div>
                   <div>           
-                    <input type="radio" id="registry_quay" ng-model="formValues.RepositoryAuthentication" ng-value="2">
+                    <input type="radio" id="registry_quay" ng-model="formValues.stackAuthenticationControlEnabled" ng-value="2">
                     <label for="registry_quay">
                       <div class="boxselector_header">
                         <i class="fa fas fa-unlock" aria-hidden="true" style="margin-right: 2px;"></i>                        
@@ -197,26 +197,25 @@
                 </div>
               </div>  
             <!-- user and password -->
-             <div class="form-group" ng-if="formValues.RepositoryAuthentication == '2' && formValues.stackAuthenticationControlEnabled">
+             <div class="form-group" ng-if="formValues.stackAuthenticationControlEnabled == '2' && formValues.RepositoryAuthentication">
                       <label for="repository_username" class="col-sm-1 control-label text-left">Username</label>
                       <div class="col-sm-11 col-md-5">                
-                        <input type="text" class="form-control" ng-model="formData.RepositoryUsername" name="repository_username" placeholder="myGitUser">
+                        <input type="text" class="form-control" ng-model="formValues.RepositoryUsername" name="repository_username" placeholder="myGitUser">
                       </div>
                       <label for="repository_password" class="col-sm-1 margin-sm-top control-label text-left">
                         Password
                       </label>
                       <div class="col-sm-11 col-md-5 margin-sm-top">
-                        <input type="password" class="form-control" ng-model="formData.RepositoryPassword" name="repository_password" placeholder="myPassword">
+                        <input type="password" class="form-control" ng-model="formValues.RepositoryPassword" name="repository_password" placeholder="myPassword">
                       </div>
               </div>
             <!-- end user and passowrd-->
         
             <!-- SSH Authentication list -->
             <div class="form-group">
-              <por-stackauth-control-form form-data="formValues.StachauthControlData" ng-if="formValues.RepositoryAuthentication == '1' && formValues.stackAuthenticationControlEnabled"></por-stackauth-control-form>
+              <por-stackauth-control-form form-data="formValues.StachauthControlData" ng-if="formValues.stackAuthenticationControlEnabled == '1' && formValues.RepositoryAuthentication"></por-stackauth-control-form>
             </div>
-            
-                                               
+                                                           
             <!-- end SSH Authentication -->    
             <!-- !authorized-users -->
           </div>

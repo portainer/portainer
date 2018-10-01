@@ -339,7 +339,7 @@ type (
 		Name           string `json:"Name"`
 		Privatekeypath string `json:"Privatekeypath"`
 		Publickeypath  string `json:"Publickeypath"`
-		UserName       string `json:"UserName"`
+		UserID         int    `json:"UserID"`
 		LastUsage      string `json:"LastUsage"`
 	}
 
@@ -629,6 +629,7 @@ type (
 	GitService interface {
 		ClonePublicRepository(repositoryURL, referenceName string, destination string) error
 		ClonePrivateRepositoryWithBasicAuth(repositoryURL, referenceName string, destination, username, password string) error
+		ClonePrivateRepositoryWithDeploykeyAuth(repositoryURL, referenceName string, destination, publickeypath, privatekeypath string) error
 	}
 
 	// JobScheduler represents a service to run jobs on a periodic basis

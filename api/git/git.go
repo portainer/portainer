@@ -32,6 +32,15 @@ func (service *Service) ClonePrivateRepositoryWithBasicAuth(repositoryURL, refer
 	return cloneRepository(repositoryURL, referenceName, destination)
 }
 
+
+// ClonePrivateRepositoryWithDeploykeyAuth clones a private git repository using the specified URL in the specified
+// destination folder. It will use the specified username and password for basic HTTP authentication.
+func (service *Service) ClonePrivateRepositoryWithDeploykeyAuth(repositoryURL, referenceName string, destination, publickeypath, privatekeypath string) error {
+	credentials := publickeypath + ":" + url.PathEscape(privatekeypath)
+	repositoryURL = strings.Replace(repositoryURL, "://", "://"+credentials+"@", 1)
+	return cloneRepository(repositoryURL, referenceName, destination)
+}
+
 func cloneRepository(repositoryURL, referenceName string, destination string) error {
 	options := &git.CloneOptions{
 		URL: repositoryURL,

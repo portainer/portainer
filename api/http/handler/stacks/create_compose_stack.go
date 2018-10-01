@@ -92,8 +92,11 @@ type composeStackFromGitRepositoryPayload struct {
 	RepositoryURL               string
 	RepositoryReferenceName     string
 	RepositoryAuthentication    bool
+	stackAuthenticationControlEnabled string
 	RepositoryUsername          string
 	RepositoryPassword          string
+	RepositoryPrivatekeypath    string 
+	RepositoryPublickeypath     string
 	ComposeFilePathInRepository string
 	Env                         []portainer.Pair
 }
@@ -105,8 +108,11 @@ func (payload *composeStackFromGitRepositoryPayload) Validate(r *http.Request) e
 	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
 		return portainer.Error("Invalid repository URL. Must correspond to a valid URL format")
 	}
-	if payload.RepositoryAuthentication && (govalidator.IsNull(payload.RepositoryUsername) || govalidator.IsNull(payload.RepositoryPassword)) {
+	if payload.RepositoryAuthentication && (govalidator.IsNull(payload.RepositoryUsername) || govalidator.IsNull(payload.RepositoryPassword)) && (payload.stackAuthenticationControlEnabled == "2") {
 		return portainer.Error("Invalid repository credentials. Username and password must be specified when authentication is enabled")
+	}
+	if payload.RepositoryAuthentication && (govalidator.IsNull(payload.RepositoryPrivatekeypath) || govalidator.IsNull(payload.RepositoryPublickeypath)) && (payload.stackAuthenticationControlEnabled == "1") {
+		return portainer.Error("Invalid repository credentials. Deploykey must be specified when authentication is enabled")
 	}
 	if govalidator.IsNull(payload.ComposeFilePathInRepository) {
 		payload.ComposeFilePathInRepository = filesystem.ComposeFileDefaultName
@@ -150,8 +156,11 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 		referenceName:  payload.RepositoryReferenceName,
 		path:           projectPath,
 		authentication: payload.RepositoryAuthentication,
+		stackAuthenticationEnabled: payload.stackAuthenticationControlEnabled, 
 		username:       payload.RepositoryUsername,
 		password:       payload.RepositoryPassword,
+		privatekeypath: payload.RepositoryPrivatekeypath,
+		publickeypath:  payload.RepositoryPublickeypath,
 	}
 
 	doCleanUp := true

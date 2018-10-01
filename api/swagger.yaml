@@ -2856,14 +2856,14 @@ definitions:
         type: "string"
         example: "abc@1dd45%"
         description: "Deploykey public key path"
-      UserName:
-        type: "string"
-        example: "abcd"
-        description: "Deploykey user name"
+      UserID:
+        type: "integer"
+        example: 1
+        description: "Deploykey user id"
       LastUsage:
         type: "string"
         example: "12:03:32"
-        description: "Deploykey user name"
+        description: " last usage deploykey  date"
 
 
   Team:
@@ -3853,14 +3853,14 @@ definitions:
         type: "string"
         example: "abc@1dd45%"
         description: "Deploykey public key path"
-      UserName:
-        type: "string"
-        example: "abcd"
-        description: "Deploykey user name"
+      UserID:
+        type: "integer"
+        example: 1
+        description: "Deploykey user id"
       LastUsage:
         type: "string"
         example: "12:03:32"
-        description: "Deploykey user name"
+        description: "last usage deploykey date"
 
   TeamCreateRequest:
     type: "object"
@@ -4362,7 +4362,11 @@ definitions:
         description: "Path to the Stack file inside the Git repository. Will default to 'docker-compose.yml' if not specified."
       RepositoryAuthentication:
         type: "boolean"
-        example: true
+        example: false
+        description: "Use basic authentication to clone the Git repository."
+      stackAuthenticationControlEnabled: 
+        type: "string"
+        example: "1"
         description: "Use basic authentication to clone the Git repository."
       RepositoryUsername:
         type: "string"
@@ -4371,7 +4375,15 @@ definitions:
       RepositoryPassword:
         type: "string"
         example: "myGitPassword"
-        description: "Password used in basic authentication. Required when RepositoryAuthentication is true."
+        description: "Password used in basic authentication. Required when RepositoryAuthentication is true." 
+      RepositoryPrivatekeypath: 
+        type: "string"
+        example: "myGitPrivatekeypath"
+        description: "Privatekeypath used in basic authentication. Required when RepositoryAuthentication is true." 
+      RepositoryPublickeypath:
+        type: "string"
+        example: "myGitPublickeypath"
+        description: "Publickeypath used in basic authentication. Required when RepositoryAuthentication is true."        
       Env:
         type: "array"
         description: "A list of environment variables used during stack deployment"

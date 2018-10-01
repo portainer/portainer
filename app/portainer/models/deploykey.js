@@ -3,7 +3,7 @@ function DeploykeyViewModel(data) {
     this.Name = data.Name;
     this.Privatekeypath = data.Privatekeypath;
     this.Publickeypath = data.Publickeypath;
-    this.UserName = data.UserName;
+    this.UserID = data.UserID;
     this.lastUsage = data.LastUsage;
   }
   

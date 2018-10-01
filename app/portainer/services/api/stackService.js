@@ -286,23 +286,26 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     return deferred.promise;
   };
 
-  service.createComposeStackFromGitRepository = function(name, repositoryOptions, env, endpointId) {
+  service.createComposeStackFromGitRepository = function(name, repositoryOptions, env, endpointId) {   
     var payload = {
       Name: name,
       RepositoryURL: repositoryOptions.RepositoryURL,
       RepositoryReferenceName: repositoryOptions.RepositoryReferenceName,
       ComposeFilePathInRepository: repositoryOptions.ComposeFilePathInRepository,
       RepositoryAuthentication: repositoryOptions.RepositoryAuthentication,
+      stackAuthenticationControlEnabled: repositoryOptions.stackAuthenticationControlEnabled,  
       RepositoryUsername: repositoryOptions.RepositoryUsername,
       RepositoryPassword: repositoryOptions.RepositoryPassword,
+      RepositoryPrivatekeypath: repositoryOptions.RepositoryPrivatekeypath,
+      RepositoryPublickeypath: repositoryOptions.RepositoryPublickeypath,
       Env: env
-    };
+    };   
+
     return Stack.create({ method: 'repository', type: 2, endpointId: endpointId }, payload).$promise;
   };
 
   service.createSwarmStackFromGitRepository = function(name, repositoryOptions, env, endpointId) {
     var deferred = $q.defer();
-
     SwarmService.swarm()
     .then(function success(data) {
       var swarm = data;
@@ -313,10 +316,14 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
         RepositoryReferenceName: repositoryOptions.RepositoryReferenceName,
         ComposeFilePathInRepository: repositoryOptions.ComposeFilePathInRepository,
         RepositoryAuthentication: repositoryOptions.RepositoryAuthentication,
+        stackAuthenticationControlEnabled: repositoryOptions.stackAuthenticationControlEnabled,
         RepositoryUsername: repositoryOptions.RepositoryUsername,
-        RepositoryPassword: repositoryOptions.RepositoryPassword,
+        RepositoryPassword: repositoryOptions.RepositoryPassword, 
+        RepositoryPrivatekeypath: repositoryOptions.RepositoryPrivatekeypath,
+        RepositoryPublickeypath: repositoryOptions.RepositoryPublickeypath,
         Env: env
       };
+            
       return Stack.create({ method: 'repository', type: 1, endpointId: endpointId }, payload).$promise;
     })
     .then(function success(data) {
