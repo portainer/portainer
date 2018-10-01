@@ -13,9 +13,11 @@ Set-Location -Path "C:\projects\portainer\api\cmd\portainer"
 
 ls
 
-Start-Process -FilePath "C:\go110\bin\go.exe" -ArgumentList "get -t -d -v ./..." -Wait
-Start-Process -FilePath "C:\go110\bin\go.exe" -ArgumentList "build -v" -Wait
+Start-Process -FilePath "C:\go110\bin\go.exe"
+#-ArgumentList "get -t -d -v ./..." -Wait
+#Start-Process -FilePath "C:\go110\bin\go.exe" -ArgumentList "build -v" -Wait
 
+ls C:\projects\portainer\dist
 
 #docker run -e CGO_ENABLED=0 -v "C:\projects\portainer\api:C:\gopath" -w C:\gopath\cmd\portainer golang:1.10.4-windowsservercore-ltsc2016 ls C:\gopath; ls C:\gopath\cmd\portainer; ls C:\gopath\src; go get -t -d -v ./...; go build -v
 
