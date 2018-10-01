@@ -22,11 +22,13 @@ type Service struct{}
 func searchUser(username string, conn *ldap.Conn, settings []portainer.LDAPSearchSettings) (string, error) {
 	var userDN string
 	found := false
+	usernameEscaped := ldap.EscapeFilter(username)
+
 	for _, searchSettings := range settings {
 		searchRequest := ldap.NewSearchRequest(
 			searchSettings.BaseDN,
 			ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
-			fmt.Sprintf("(&%s(%s=%s))", searchSettings.Filter, searchSettings.UserNameAttribute, username),
+			fmt.Sprintf("(&%s(%s=%s))", searchSettings.Filter, searchSettings.UserNameAttribute, usernameEscaped),
 			[]string{"dn"},
 			nil,
 		)
@@ -134,12 +136,13 @@ func (*Service) GetUserGroups(username string, settings *portainer.LDAPSettings)
 // Get a list of group names for specified user from LDAP/AD
 func getGroups(userDN string, conn *ldap.Conn, settings []portainer.LDAPGroupSearchSettings) []string {
 	groups := make([]string, 0)
+	userDNEscaped := ldap.EscapeFilter(userDN)
 
 	for _, searchSettings := range settings {
 		searchRequest := ldap.NewSearchRequest(
 			searchSettings.GroupBaseDN,
 			ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
-			fmt.Sprintf("(&%s(%s=%s))", searchSettings.GroupFilter, searchSettings.GroupAttribute, userDN),
+			fmt.Sprintf("(&%s(%s=%s))", searchSettings.GroupFilter, searchSettings.GroupAttribute, userDNEscaped),
 			[]string{"cn"},
 			nil,
 		)
