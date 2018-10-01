@@ -7,12 +7,16 @@ $binary = "portainer-$($platform)-$($arch)"
 
 New-Item -Name dist -Path "C:\projects\portainer" -ItemType Directory
 
-ls $PWD
 ls "C:\projects\portainer"
 ls "C:\projects\portainer\api"
 
 cd C:\go110
 ls C:\go110
+ls C:\go110\bin
+
+go get -t -d -v ./...
+
+go build -v
 
 #docker run -e CGO_ENABLED=0 -v "C:\projects\portainer\api:C:\gopath" -w C:\gopath\cmd\portainer golang:1.10.4-windowsservercore-ltsc2016 ls C:\gopath; ls C:\gopath\cmd\portainer; ls C:\gopath\src; go get -t -d -v ./...; go build -v
 
