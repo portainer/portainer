@@ -10,8 +10,8 @@ Set-Item env:GOPATH "C:\projects\portainer\api"
 New-Item -Name dist -Path "C:\projects\portainer" -ItemType Directory
 New-Item -Name portainer -Path "C:\projects\portainer\api\src\github.com\" -ItemType Directory
 
-Copy-Item -Path "C:\projects\portainer\api" -Destination "C:\projects\portainer\api\src\github.com\portainer" -Recurse -Force
-Rename-Item -Path "C:\projects\portainer\api\src\github.com\portainer\api" -NewName "portainer"
+Copy-Item -Path "C:\projects\portainer\api" -Destination "C:\projects\portainer\api\src\github.com\portainer" -Recurse -Force -ErrorAction:SilentlyContinue
+Rename-Item -Path "C:\projects\portainer\api\src\github.com\portainer\api" -NewName "portainer" -ErrorAction:SilentlyContinue
 
 ls "C:\projects\portainer\api\src\github.com\portainer\portainer\"
 
