@@ -590,6 +590,7 @@ type (
 
 	// PluginService represents a service for managing plugin data
 	PluginService interface {
+		Plugin(ID PluginID) (*Plugin, error)
 		Plugins() ([]Plugin, error)
 		Persist(plugin *Plugin) error
 		// TODO: remove?

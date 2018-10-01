@@ -2,8 +2,10 @@ package plugins
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
+	"github.com/coreos/go-semver/semver"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -20,7 +22,7 @@ func (handler *Handler) pluginInspect(w http.ResponseWriter, r *http.Request) *h
 	pluginID := portainer.PluginID(pluginIdentifier)
 
 	// TODO: store somewhere else + constant
-	pluginData, err := client.Get("https://gist.githubusercontent.com/deviantony/d1d0d59fa1b5d8fbc1c988ee51f9ff84/raw/74ea9046867d4379c982e7c0df3dae1d6e828a99/plugins.json", 30)
+	pluginData, err := client.Get("https://gist.githubusercontent.com/deviantony/d1d0d59fa1b5d8fbc1c988ee51f9ff84/raw/67d9b1f388cc4755d916eca33ce6c9fce39b0ebd/plugins.json", 30)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve plugin definitions", err}
 	}
@@ -37,6 +39,24 @@ func (handler *Handler) pluginInspect(w http.ResponseWriter, r *http.Request) *h
 			plugin = p
 			break
 		}
+	}
+
+	storedPlugin, err := handler.PluginService.Plugin(pluginID)
+	if err == portainer.ErrObjectNotFound {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a plugin with the specified identifier inside the database", err}
+	} else if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a plugin with the specified identifier inside the database", err}
+	}
+
+	plugin.Enabled = storedPlugin.Enabled
+
+	pluginVer := semver.New(plugin.Version)
+	log.Println(plugin.Version)
+	pVer := semver.New(storedPlugin.Version)
+	log.Println(storedPlugin.Version)
+
+	if pVer.LessThan(*pluginVer) {
+		plugin.UpdateAvailable = true
 	}
 
 	return response.JSON(w, plugin)

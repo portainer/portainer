@@ -29,6 +29,19 @@ func NewService(db *bolt.DB) (*Service, error) {
 	}, nil
 }
 
+// Plugin returns a plugin by ID
+func (service *Service) Plugin(ID portainer.PluginID) (*portainer.Plugin, error) {
+	var plugin portainer.Plugin
+	identifier := internal.Itob(int(ID))
+
+	err := internal.GetObject(service.db, BucketName, identifier, &plugin)
+	if err != nil {
+		return nil, err
+	}
+
+	return &plugin, nil
+}
+
 // Plugins return an array containing all the plugins.
 func (service *Service) Plugins() ([]portainer.Plugin, error) {
 	var plugins = make([]portainer.Plugin, 0)

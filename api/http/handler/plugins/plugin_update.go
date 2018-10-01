@@ -5,7 +5,6 @@ import (
 	"errors"
 	"net/http"
 	"os/exec"
-	"strconv"
 	"strings"
 
 	"github.com/asaskevich/govalidator"
@@ -17,54 +16,41 @@ import (
 	"github.com/portainer/portainer/http/client"
 )
 
-type pluginCreatePayload struct {
-	License string
+type pluginUpdatePayload struct {
+	Version string
 }
 
-func (payload *pluginCreatePayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.License) {
-		return portainer.Error("Invalid license")
+func (payload *pluginUpdatePayload) Validate(r *http.Request) error {
+	if govalidator.IsNull(payload.Version) {
+		return portainer.Error("Invalid plugin version")
 	}
 
 	return nil
 }
 
-func (handler *Handler) pluginCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	var payload pluginCreatePayload
-	err := request.DecodeAndValidateJSONPayload(r, &payload)
+func (handler *Handler) pluginUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	pluginIdentifier, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	if err != nil {
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid plugin identifier route variable", err}
+	}
+	pluginID := portainer.PluginID(pluginIdentifier)
+
+	var payload pluginUpdatePayload
+	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	pluginIdentifier, err := strconv.Atoi(string(payload.License[0]))
-	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid license format", err}
-	}
-	pluginId := portainer.PluginID(pluginIdentifier)
-
-	plugins, err := handler.PluginService.Plugins()
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve plugins status from the database", err}
+	plugin, err := handler.PluginService.Plugin(pluginID)
+	if err == portainer.ErrObjectNotFound {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a plugin with the specified identifier inside the database", err}
+	} else if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a plugin with the specified identifier inside the database", err}
 	}
 
-	for _, plugin := range plugins {
-		if plugin.ID == pluginId {
-			return &httperror.HandlerError{http.StatusConflict, "Unable to enable plugin", portainer.ErrPluginAlreadyEnabled}
-		}
-	}
+	// TODO: remove existing plugin and upgrade to the new version
 
-	p := &portainer.Plugin{
-		ID: pluginId,
-	}
-
-	err = handler.enablePlugin(p, payload.License)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to enable plugin", err}
-	}
-
-	p.Enabled = true
-
-	err = handler.PluginService.Persist(p)
+	err = handler.PluginService.Persist(plugin)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist plugin status inside the database", err}
 	}
@@ -72,12 +58,12 @@ func (handler *Handler) pluginCreate(w http.ResponseWriter, r *http.Request) *ht
 	return response.Empty(w)
 }
 
-func (handler *Handler) enablePlugin(plugin *portainer.Plugin, license string) error {
+func (handler *Handler) updatePlugin(plugin *portainer.Plugin) error {
 
 	// TODO: switch case on plugin identifier to download/enable correct plugin
 	switch plugin.ID {
 	case portainer.RegistryManagementPlugin:
-		return handler.enableRegistryManagementPlugin(plugin, license)
+		return handler.updateRegistryManagementPlugin(plugin)
 	default:
 		return errors.New("Unsupported plugin identifier")
 	}
@@ -95,10 +81,10 @@ func (handler *Handler) enablePlugin(plugin *portainer.Plugin, license string) e
 	return nil
 }
 
-func (handler *Handler) enableRegistryManagementPlugin(plugin *portainer.Plugin, license string) error {
+func (handler *Handler) updateRegistryManagementPlugin(plugin *portainer.Plugin) error {
 	// Download/untar
 	// TODO: replace location + constant for base (download.portainer.io ?)
-	// based on current platform+arch, should download the according zip (plugin-registry-manager-linux-amd64.zip)
+	// based on current platform+arch, should download the according zip (plugin-registry-management-linux-amd64-1.0.1.zip)
 	data, err := client.Get("https://github.com/deviantony/xtrabackup-scripts/releases/download/3.1.5/rm01.zip", 30)
 	if err != nil {
 		return err
