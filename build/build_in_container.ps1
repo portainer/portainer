@@ -13,11 +13,8 @@ Set-Location -Path "C:\projects\portainer\api\cmd\portainer"
 
 ls
 
-C:\go110\bin\go.exe
-
-Start-Process -FilePath "C:\go110\bin\go.exe"
-#-ArgumentList "get -t -d -v ./..." -Wait
-#Start-Process -FilePath "C:\go110\bin\go.exe" -ArgumentList "build -v" -Wait
+C:\go110\bin\go.exe get -t -d -v ./...
+C:\go110\bin\go.exe build -v
 
 ls C:\projects\portainer\dist
 
