@@ -3,7 +3,7 @@ param (
   [string]$arch
 )
 
-$binary = "portainer-$($platform)-$($arch)"
+$binary = "portainer.exe"
 
 Set-Item env:GOPATH "C:\projects\portainer\api"
 
