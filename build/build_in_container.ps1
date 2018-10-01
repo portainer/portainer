@@ -8,19 +8,15 @@ $binary = "portainer-$($platform)-$($arch)"
 Set-Item env:GOPATH "C:\projects\portainer\api"
 
 New-Item -Name dist -Path "C:\projects\portainer" -ItemType Directory
-#New-Item -Name portainer -Path "C:\projects\portainer\src\github.com\portainer" -ItemType Directory
 
 ls C:\projects\portainer
 
 Set-Location -Path "C:\projects\portainer\api\cmd\portainer"
-
-ls
+CMD /c "C:\projects\portainer\api\src\github.com\portainer\portainer" "C:\projects\portainer\api"
 
 C:\go110\bin\go.exe get -t -d -v ./...
 
 ls
-
-ls C:\projects\portainer\src
 
 #C:\go110\bin\go.exe build -v
 
