@@ -10,17 +10,14 @@ Set-Item env:GOPATH "C:\projects\portainer\api"
 New-Item -Name dist -Path "C:\projects\portainer" -ItemType Directory
 New-Item -Name portainer -Path "C:\projects\portainer\api\src\github.com\portainer\" -ItemType Directory
 
-Copy-Item -Path "C:\projects\portainer\api\*" -Destination "C:\projects\portainer\api\src\github.com\portainer\portainer\" -Recurse -Force
+Copy-Item -Path "C:\projects\portainer\api\*" -Destination "C:\projects\portainer\api\src\github.com\portainer\portainer\" -Recurse -Force | Out-Null
 
 ls "C:\projects\portainer\api\src\github.com\portainer\portainer\"
 
 Set-Location -Path "C:\projects\portainer\api\cmd\portainer"
 
 C:\go110\bin\go.exe get -t -d -v ./...
-
-ls
-
-#C:\go110\bin\go.exe build -v
+C:\go110\bin\go.exe build -v
 
 ls C:\projects\portainer\dist
 
