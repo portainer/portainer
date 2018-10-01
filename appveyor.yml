@@ -19,5 +19,5 @@ build_script:
   - docker build -t ssbkang/portainer:develop-windows -f "build\windows2016\nanoserver\Dockerfile" .
 deploy_script:
   - docker image ls
-  - docker login -u "$env:DOCKER_HUB_USERNAME" -p "$env:DOCKER_HUB_PASSWORD"
+  - docker login -u "%DOCKER_HUB_USERNAME%" -p "%DOCKER_HUB_PASSWORD%"
   - docker push ssbkang/portainer:develop-windows
