@@ -9,6 +9,8 @@ Set-Item env:GOPATH "C:\projects\portainer"
 
 New-Item -Name dist -Path "C:\projects\portainer" -ItemType Directory
 
+ls C:\projects\portainer
+
 Set-Location -Path "C:\projects\portainer\api\cmd\portainer"
 
 ls
