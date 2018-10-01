@@ -302,7 +302,7 @@ function shell_downloadDockerBinary(p, a) {
   } else {
     return [
       'powershell -Command "& {if (Get-Item -Path '+('dist/docker.exe')+' -ErrorAction:SilentlyContinue) {',
-        'Write-Host "Portainer binary exists"',
+        'Write-Host "Docker binary exists"',
       '} else {',
         '& ".\\build\\download_docker_binary.ps1" -docker_version '+ binaryVersion +'',
       '}}"'
