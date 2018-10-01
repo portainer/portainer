@@ -96,6 +96,11 @@ func (handler *Handler) updateRegistryManagementPlugin(plugin *portainer.Plugin)
 		return err
 	}
 
+	// TODO: stop the current process associated to the plugin
+	// to do so, must keep a reference to the exec.Command that was started in plugin_create (stored in the handler, might be relocated to a service after)
+
+	// TODO: remove the existing plugin binary from the filesystem
+
 	// TODO: if license check fails, need to be updated to use flags
 	// should probably download and use a specific license-checker binary
 
