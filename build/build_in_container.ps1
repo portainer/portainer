@@ -5,18 +5,17 @@ param (
 
 $binary = "portainer-$($platform)-$($arch)"
 
+Set-Item env:GOPATH "C:\projects\portainer"
+
 New-Item -Name dist -Path "C:\projects\portainer" -ItemType Directory
 
-ls "C:\projects\portainer"
-ls "C:\projects\portainer\api"
+Set-Location -Path "C:\projects\portainer\api\cmd\portainer"
 
-cd C:\go110
-ls C:\go110
-ls C:\go110\bin
+ls
 
-go get -t -d -v ./...
+Start-Process -FilePath "C:\go110\bin\go.exe" -ArgumentList "get -t -d -v ./..." -Wait
+Start-Process -FilePath "C:\go110\bin\go.exe" -ArgumentList "build -v" -Wait
 
-go build -v
 
 #docker run -e CGO_ENABLED=0 -v "C:\projects\portainer\api:C:\gopath" -w C:\gopath\cmd\portainer golang:1.10.4-windowsservercore-ltsc2016 ls C:\gopath; ls C:\gopath\cmd\portainer; ls C:\gopath\src; go get -t -d -v ./...; go build -v
 
