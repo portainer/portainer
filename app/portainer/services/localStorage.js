@@ -89,6 +89,12 @@ angular.module('portainer.app')
     getColumnVisibilitySettings: function(key) {
       return localStorageService.get('col_visibility_' + key);
     },
+    storeEndpoints: function(data) {
+      localStorageService.set('ENDPOINTS_DATA', data);
+    },
+    getEndpoints: function() {
+      return localStorageService.get('ENDPOINTS_DATA');
+    },
     clean: function() {
       localStorageService.clearAll();
     }

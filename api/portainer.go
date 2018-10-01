@@ -265,7 +265,6 @@ type (
 		Volumes    interface{} `json:"Volumes"`
 		Networks   interface{} `json:"Networks"`
 		Images     interface{} `json:"Images"`
-		Stacks     interface{} `json:"Stacks"`
 		Info       interface{} `json:"Info"`
 		Version    interface{} `json:"Version"`
 	}

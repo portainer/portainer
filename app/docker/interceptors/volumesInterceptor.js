@@ -1,30 +1,17 @@
 angular.module('portainer.app')
-  .factory('VolumesInterceptor', ['$q', '$rootScope', function ($q, $rootScope) {
+  .factory('VolumesInterceptor', ['$q', 'LocalStorage', function ($q, LocalStorage) {
     return {
-      request: function (request) {
-        console.log('volumes request');
-        return request;
-      },
-      requestError: function (rejection) {
-        console.log('volumes request error');
-        return $q.reject(rejection);
-      },
-      response: function (response) {
-        console.log('volumes response');
-        return response.resource;
-      },
       responseError: function (rejection) {
-        console.log('volumes reponse error');
 
-        if (rejection.status === 502) {
-          if ($rootScope.endpoints !== undefined) {
-            var endpointId = _.split(rejection.config.url, '/')[2];
-            endpointId = parseInt(endpointId, 10);
-            var endpoint = _.find($rootScope.endpoints, function (item) {
-              return item.Id === endpointId;
-            });
+        if (rejection.status === 502 || rejection.status === -1) {
+          var endpointId = LocalStorage.getEndpointID();
+          var endpoints = LocalStorage.getEndpoints();
+          var endpoint = _.find(endpoints, function (item) {
+            return item.Id === endpointId;
+          });
+          if (endpoint !== undefined) {
             var data = endpoint.Snapshots[0].SnapshotRaw.Volumes;
-            if (endpoint !== undefined && data !== undefined) {
+            if (data !== undefined) {
               return data;
             }
           }
