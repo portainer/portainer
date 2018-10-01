@@ -39,10 +39,14 @@
                 {{ plugin.ShortDescription }}
               </div>
 
-              <div style="margin-top: 15px;">
+              <div style="margin-top: 15px;" ng-if="!plugin.Enabled">
                 <a href="https://portainer.io" target="_blank" class="btn btn-primary btn-sm" style="width: 100%; margin-left: 0;">
                   Buy
                 </a>
+              </div>
+
+              <div style="margin-top: 15px;" ng-if="plugin.Enabled && plugin.UpdateAvailable">
+                <button type="button" name="button" class="btn btn-primary btn-sm" style="width: 100%; margin-left: 0;">Update</button>
               </div>
 
             </div>

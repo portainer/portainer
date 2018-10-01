@@ -437,6 +437,8 @@ type (
 		Price             string   `json:"Price,omitempty"`
 		LicenseCompany    string   `json:"LicenseCompany,omitempty"`
 		LicenseExpiration string   `json:"LicenseExpiration,omitempty"`
+		Version           string   `json:"Version"`
+		UpdateAvailable   bool     `json:"UpdateAvailable"`
 	}
 
 	// CLIService represents a service for managing CLI

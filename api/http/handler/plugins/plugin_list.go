@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/coreos/go-semver/semver"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -40,6 +41,14 @@ func (handler *Handler) pluginList(w http.ResponseWriter, r *http.Request) *http
 					plugins[idx].Enabled = p.Enabled
 					plugins[idx].LicenseCompany = p.LicenseCompany
 					plugins[idx].LicenseExpiration = p.LicenseExpiration
+
+					pluginVer := semver.New(plugins[idx].Version)
+					pVer := semver.New(p.Version)
+
+					if pVer.LessThan(*pluginVer) {
+						plugins[idx].UpdateAvailable = true
+					}
+
 					break
 				}
 			}
