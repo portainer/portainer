@@ -291,13 +291,23 @@ function shell_downloadDockerBinary(p, a) {
   var ip = ((ps[p] === undefined) ? p : ps[p]);
   var ia = ((as[a] === undefined) ? a : as[a]);
   var binaryVersion = (( p === 'windows' ? '<%= shippedDockerVersionWindows %>' : '<%= shippedDockerVersion %>' ));
-  return [
-    'if [ -f '+(( p === 'windows' ) ? 'dist/docker.exe' : 'dist/docker')+' ]; then',
-      'echo "Docker binary exists";',
-    'else',
-      'build/download_docker_binary.sh ' + ip + ' ' + ia + ' ' + binaryVersion + ';',
-    'fi'
-  ].join(' ');
+  if (p === "linux") {
+    return [
+      'if [ -f '+('dist/docker')+' ]; then',
+        'echo "Docker binary exists";',
+      'else',
+        'build/download_docker_binary.sh ' + ip + ' ' + ia + ' ' + binaryVersion + ';',
+      'fi'
+    ].join (' ')
+  } else {
+    return [
+      'powershell -Command "& {if (Get-Item -Path '+('dist/docker.exe')+' -ErrorAction:SilentlyContinue) {',
+        'Write-Host "Portainer binary exists"',
+      '} else {',
+        '& ".\\build\\download_docker_binary.ps1" -docker_version '+ binaryVersion +'',
+      '}}"'
+    ].join(' ')
+  }
 }
 
 gruntfile_cfg.shell = {
