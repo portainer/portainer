@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('StacksController', ['$scope', '$state', 'Notifications', 'StackService', 'ModalService', 'EndpointProvider',
-function ($scope, $state, Notifications, StackService, ModalService, EndpointProvider) {
+.controller('StacksController', ['$scope', '$state', 'Notifications', 'StackService', 'ModalService', 'EndpointProvider', 'StateManager',
+function ($scope, $state, Notifications, StackService, ModalService, EndpointProvider, StateManager) {
   $scope.removeAction = function(selectedItems) {
     ModalService.confirmDeletion(
       'Do you want to remove the selected stack(s)? Associated services will be removed as well.',
@@ -36,6 +36,7 @@ function ($scope, $state, Notifications, StackService, ModalService, EndpointPro
   function initView() {
     var endpointMode = $scope.applicationState.endpoint.mode;
     var endpointId = EndpointProvider.endpointID();
+    $scope.endpointStatus = StateManager.getState().endpoint.status;
 
     StackService.stacks(
       true,
