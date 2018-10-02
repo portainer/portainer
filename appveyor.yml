@@ -34,6 +34,9 @@ install:
 init:
   - echo $APPVEYOR_PULL_REQUEST_NUMBER
   - echo $APPVEYOR_REPO_BRANCH
+  - echo $APPVEYOR_REPO_COMMIT
+  - echo $ARCH
+  - IMAGE='linux' 
   - ps: if ((Get-Item ENV:CI_WINDOWS).Value) { Set-Item ENV:image -Value 'windows' } else { Set-Item ENV:image -Value 'linux' }
 build_script:
   - echo $image
