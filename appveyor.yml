@@ -41,8 +41,8 @@ init:
 build_script:
   - echo $IMAGE
   - echo $ARCH
-  - ps: CMD /c yarn grunt release:%IMAGE%:%ARCH%
   - yarn grunt release:$IMAGE:$ARCH
+  - ps: CMD /c yarn grunt release:%IMAGE%:%ARCH%
 #deploy_script:
 # 
 #  - docker build -t ssbkang/portainer:develop-windows -f "build\windows2016\nanoserver\Dockerfile" .
