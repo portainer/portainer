@@ -31,11 +31,13 @@ stack: node 9
 install:
   - yarn install
 init:
-  - echo "%APPVEYOR_PULL_REQUEST_NUMBER%"
-  - echo "%APPVEYOR_REPO_BRANCH%"
+  - echo %APPVEYOR_PULL_REQUEST_NUMBER%
+  - echo %APPVEYOR_REPO_BRANCH%
   - ps: if ((Get-Item ENV:APPVEYOR_BUILD_WORKER_IMAGE).Value -eq 'Visual Studio 2017') { Set-Item ENV:image -Value 'windows' } else { Set-Item ENV:image -Value 'linux' }
-build_script:  
-  - yarn grunt release:%image%:%arch%
+build_script:
+  - echo %image%
+  - echo %arch%
+  #- yarn grunt release:%image%:%arch%
 #deploy_script:
 # 
 #  - docker build -t ssbkang/portainer:develop-windows -f "build\windows2016\nanoserver\Dockerfile" .
