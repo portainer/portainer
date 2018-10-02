@@ -595,8 +595,7 @@ type (
 		Plugin(ID PluginID) (*Plugin, error)
 		Plugins() ([]Plugin, error)
 		Persist(plugin *Plugin) error
-		// TODO: remove?
-		// DeletePlugin(ID PluginID) error
+		DeletePlugin(ID PluginID) error
 	}
 
 	// CryptoService represents a service for encrypting/hashing data

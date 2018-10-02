@@ -52,7 +52,7 @@ func (handler *Handler) pluginUpdate(w http.ResponseWriter, r *http.Request) *ht
 	// TODO: remove existing plugin and upgrade to the new version
 	err = handler.updatePlugin(plugin)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to enable plugin", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update plugin", err}
 	}
 
 	err = handler.PluginService.Persist(plugin)

@@ -3,10 +3,27 @@ angular.module('portainer.app')
 function ($q, $scope, $transition$, $state, PortainerPluginService, Notifications) {
 
   $scope.state = {
-    updateInProgress: false
+    updateInProgress: false,
+    deleteInProgress: false
   };
 
   $scope.updatePlugin = updatePlugin;
+  $scope.deletePlugin = deletePlugin;
+
+  function deletePlugin(plugin) {
+    $scope.state.deleteInProgress = true;
+    PortainerPluginService.delete(plugin.Id)
+    .then(function onSuccess() {
+      Notifications.success('Plugin successfully deleted');
+      $state.reload();
+    })
+    .catch(function onError(err) {
+      Notifications.error('Failure', err, 'Unable to delete plugin');
+    })
+    .finally(function final() {
+      $scope.state.deleteInProgress = false;
+    });
+  }
 
   function updatePlugin(plugin) {
     $scope.state.updateInProgress = true;

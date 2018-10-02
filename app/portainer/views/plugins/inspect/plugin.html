@@ -52,6 +52,13 @@
                 </button>
               </div>
 
+              <div style="margin-top: 5px;" ng-if="plugin.Enabled">
+                <button type="button" class="btn btn-danger btn-sm" ng-click="deletePlugin(plugin)" ng-disabled="state.deleteInProgress" button-spinner="state.deleteInProgress" style="width: 100%; margin-left: 0;">
+                  <span ng-hide="state.deleteInProgress">Delete</span>
+                  <span ng-show="state.deleteInProgress">Deleting plugin...</span>
+                </button>
+              </div>
+
             </div>
 
           </div>

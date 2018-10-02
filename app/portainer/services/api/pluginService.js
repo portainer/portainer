@@ -11,6 +11,10 @@ angular.module('portainer.app')
     return PortainerPlugin.update({ id: id, version: version }).$promise;
   };
 
+  service.delete = function(id) {
+    return PortainerPlugin.delete({ id: id }).$promise;
+  };
+
   // TODO: same as store, except store = false, refactor
   service.plugins = function() {
     var deferred = $q.defer();

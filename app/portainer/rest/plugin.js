@@ -6,6 +6,7 @@ angular.module('portainer.app')
     create: { method: 'POST' },
     query: { method: 'GET', isArray: true },
     get: { method: 'GET', params: { id: '@id' } },
+    delete: { method: 'DELETE', params: { id: '@id' } },
     update: { method: 'POST', params: { id: '@id', action: 'update' } }
   });
 }]);

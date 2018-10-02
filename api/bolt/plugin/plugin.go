@@ -79,10 +79,8 @@ func (service *Service) Persist(plugin *portainer.Plugin) error {
 	})
 }
 
-// TODO: remove?
-//
-// // DeletePlugin deletes a Plugin.
-// func (service *Service) DeletePlugin(ID portainer.PluginID) error {
-// 	identifier := internal.Itob(int(ID))
-// 	return internal.DeleteObject(service.db, BucketName, identifier)
-// }
+// DeletePlugin deletes a Plugin.
+func (service *Service) DeletePlugin(ID portainer.PluginID) error {
+	identifier := internal.Itob(int(ID))
+	return internal.DeleteObject(service.db, BucketName, identifier)
+}

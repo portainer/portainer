@@ -102,6 +102,11 @@ func (manager *Manager) DeleteProxy(key string) {
 	manager.proxies.Remove(key)
 }
 
+// DeletePluginProxy deletes the plugin proxy associated to a key
+func (manager *Manager) DeletePluginProxy(key string) {
+	manager.pluginProxies.Remove(key)
+}
+
 func (manager *Manager) CreatePluginProxy(pluginID portainer.PluginID) error {
 	// TODO: should be stored in plugin definition somewhere?
 	// otherwise needs a switch or something

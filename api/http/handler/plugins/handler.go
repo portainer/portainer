@@ -34,6 +34,8 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.PublicAccess(httperror.LoggerHandler(h.pluginCreate))).Methods(http.MethodPost)
 	h.Handle("/plugins/{id}",
 		bouncer.AdministratorAccess(httperror.LoggerHandler(h.pluginInspect))).Methods(http.MethodGet)
+	h.Handle("/plugins/{id}",
+		bouncer.AdministratorAccess(httperror.LoggerHandler(h.pluginDelete))).Methods(http.MethodDelete)
 	h.Handle("/plugins/{id}/update",
 		bouncer.AdministratorAccess(httperror.LoggerHandler(h.pluginUpdate))).Methods(http.MethodPost)
 
