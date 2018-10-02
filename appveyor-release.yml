@@ -15,6 +15,8 @@ environment:
     secure: QGlCLNWzPD0HL8ipkohVic45/yU3bVOdjn0IiV6NnSQ=
   GITHUB_TOKEN:
     secure: yC+WkZ45ZI6a4adDsjJS71L9GvbPLjTC9Q1QpTQdsqVlBb6DjEPYg6NuJ79nNFeh
+  GITHUB_MANIFEST_URL:
+    secure: QBT01r3E0cgExWfzaQKDH6bRhEqNi1zAiSJ1SYhDWAomFndbyZ9xl5QwvPzTnA8L
   PORTAINER_VERSION: "1.19.2"
 matrix:
   exclude:
@@ -34,9 +36,10 @@ install:
   - yarn install
   - npm install -g rebase-docker-image
 init:
-  - ps: if ($isLinux) { Set-Item ENV:IMAGE -Value 'linux' } else { Set-Item ENV:IMAGE -Value 'windows' }
+  - sh: export IMAGE=linux; git clone -q --branch=master $GITHUB_MANIFEST_URL /home/appveyor/projects/docker-manifest
+  - cmd: set IMAGE=windows; git clone -q --branch=master %GITHUB_MANIFEST_URL% C:\projects\docker-manifest
 build_script:
-  - sh: yarn grunt release:$IMAGE:$ARCH
-  - cmd: yarn grunt release:%IMAGE%:%ARCH%
+  - sh: ls; yarn grunt release:$IMAGE:$ARCH
+  - cmd: dir; yarn grunt release:%IMAGE%:%ARCH%
   - sh: sudo bash build/build_container_image.sh $IMAGE $ARCH $PORTAINER_VERSION $DOCKER_USER $DOCKER_PASS
   - cmd: 'powershell -Command "& .\\build\\build_container_image.ps1"'
