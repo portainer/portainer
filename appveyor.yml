@@ -5,11 +5,10 @@ image:
 environment:
   matrix:
     - ARCH: amd64
-    - ARCH: arm 
-    - ARCH: arm64
-    - ARCH: ppc64le
-    - ARCH: s390x
-  NODEJS_VERSION: "8.12.0"
+    #- ARCH: arm 
+    #- ARCH: arm64
+    #- ARCH: ppc64le
+    #- ARCH: s390x
   DOCKER_HUB_USERNAME:
     secure: JapmC7j5F0mY3j/MVzU+Cw==
   DOCKER_HUB_PASSWORD:
@@ -31,6 +30,7 @@ branches:
 stack: node 9
 install:
   - yarn install
+  - npm install -g rebase-docker-image
 init:
   - echo $APPVEYOR_PULL_REQUEST_NUMBER
   - echo $APPVEYOR_REPO_BRANCH
@@ -38,7 +38,6 @@ init:
 build_script:
   - ps: if ($isLinux) { Set-Item ENV:IMAGE -Value 'linux'; sh -c 'yarn grunt release:$IMAGE:$ARCH' } else { Set-Item ENV:IMAGE -Value 'windows' }
   - cmd: yarn grunt release:%IMAGE%:%ARCH%
-deploy_script:
   - ps: |
       if ($isLinux) { $dockerfile_path = "build/linux/Dockerfile" } else { $dockerfile_path = "build\windows2016\nanoserver\Dockerfile" }
       docker build -t ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value)-$((Get-Item ENV:PORTAINER_VERSION).Value) -f "$($dockerfile_path)" .; 
@@ -46,3 +45,4 @@ deploy_script:
       docker login -u "$((Get-Item ENV:DOCKER_HUB_USERNAME).Value)" -p "$((Get-Item ENV:DOCKER_HUB_PASSWORD).Value)";
       docker push ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value)-$((Get-Item ENV:PORTAINER_VERSION).Value);
       docker push ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value);
+      if ($isWindows) { rebase-docker-image portainer/portainer:windows-amd64-1.19.2 -t portainer/portainer:windows1709-amd64-1.19.2 -b microsoft/nanoserver:1709 }
