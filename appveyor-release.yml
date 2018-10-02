@@ -38,5 +38,5 @@ init:
 build_script:
   - sh: yarn grunt release:$IMAGE:$ARCH
   - cmd: yarn grunt release:%IMAGE%:%ARCH%
-  - sh: build/build_container_image.sh
+  - sh: sudo build/build_container_image.sh
   - cmd: 'powershell -Command & ".\\build\\build_container_image.ps1"'
