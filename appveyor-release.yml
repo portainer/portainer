@@ -13,6 +13,8 @@ environment:
     secure: JapmC7j5F0mY3j/MVzU+Cw==
   DOCKER_PASS:
     secure: QGlCLNWzPD0HL8ipkohVic45/yU3bVOdjn0IiV6NnSQ=
+  GITHUB_TOKEN:
+    secure: yC+WkZ45ZI6a4adDsjJS71L9GvbPLjTC9Q1QpTQdsqVlBb6DjEPYg6NuJ79nNFeh
   PORTAINER_VERSION: "1.19.2"
 matrix:
   exclude:
@@ -34,6 +36,6 @@ install:
 init:
   - ps: if ($isLinux) { Set-Item ENV:IMAGE -Value 'linux' } else { Set-Item ENV:IMAGE -Value 'windows' }
 build_script:
-  - sh: sh -c 'yarn grunt release:$IMAGE:$ARCH'
+  - sh: yarn grunt release:$IMAGE:$ARCH
   - cmd: yarn grunt release:%IMAGE%:%ARCH%
-  - ps: if ($isLinux) { & ".\\build\\build_container_image.sh" } else { & ".\\build\\build_container_image.ps1" }
+  - ps: if ($isLinux) { & "./build/build_container_image.sh" } else { & ".\\build\\build_container_image.ps1" }
