@@ -1,16 +1,20 @@
 angular.module('portainer.docker').controller('HostViewController', [
-  '$q',
-  '$scope',
-  'SystemService',
-  'Notifications',
-  function HostViewController($q, $scope, SystemService, Notifications) {
+  '$q', 'SystemService', 'Notifications', 'StateManager', 'AgentService',
+  function HostViewController($q, SystemService, Notifications, StateManager, AgentService) {
     var ctrl = this;
     this.$onInit = initView;
 
+    ctrl.state = {
+      isAgent: false
+    };
+    
     this.engineDetails = {};
     this.hostDetails = {};
 
     function initView() {
+      var applicationState = StateManager.getState();
+      ctrl.state.isAgent = applicationState.endpoint.mode.agentProxy;
+
       $q.all({
         version: SystemService.version(),
         info: SystemService.info()
@@ -18,6 +22,13 @@ angular.module('portainer.docker').controller('HostViewController', [
         .then(function success(data) {
           ctrl.engineDetails = buildEngineDetails(data);
           ctrl.hostDetails = buildHostDetails(data.info);
+
+          if (ctrl.state.isAgent) {
+            return AgentService.hostInfo(data.info.Hostname).then(function onHostInfoLoad(agentHostInfo) {
+              ctrl.devices = agentHostInfo.PCIDevices;
+              ctrl.disks = agentHostInfo.PhysicalDisks;
+            });
+          }
         })
         .catch(function error(err) {
           Notifications.error(

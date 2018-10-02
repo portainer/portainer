@@ -4,6 +4,8 @@ angular.module('portainer.docker').component('hostOverview', {
   bindings: {
     hostDetails: '<',
     engineDetails: '<',
+    devices: '<',
+    disks: '<',
     isAgent: '<',
     refreshUrl: '@'
   },
