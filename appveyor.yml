@@ -14,7 +14,6 @@ environment:
     secure: JapmC7j5F0mY3j/MVzU+Cw==
   DOCKER_HUB_PASSWORD:
     secure: QGlCLNWzPD0HL8ipkohVic45/yU3bVOdjn0IiV6NnSQ=
-  #APPVEYOR_YML_DISABLE_PS_LINUX: true
 matrix:
   exclude:
     - image: Visual Studio 2017
@@ -36,7 +35,7 @@ init:
   - echo $APPVEYOR_REPO_BRANCH
   - echo $APPVEYOR_REPO_COMMIT
 build_script:
-  - ps: if ((Get-Item ENV:CI_WINDOWS).Value) { Set-Item ENV:IMAGE -Value 'windows'; CMD /c yarn grunt release:%IMAGE%:%ARCH% } else { Set-Item ENV:IMAGE -Value 'linux'; sh -c 'yarn grunt release:$IMAGE:$ARCH' }
+  - ps: if ((Get-Item ENV:APPVEYOR_BUILD_WORKER_IMAGE).Value -eq "Visual Studio 2017") { Set-Item ENV:IMAGE -Value 'windows'; CMD /c yarn grunt release:%IMAGE%:%ARCH% } else { Set-Item ENV:IMAGE -Value 'linux'; sh -c 'yarn grunt release:$IMAGE:$ARCH' }
   - echo $IMAGE
   - echo $ARCH
 #deploy_script:
