@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('ContainersDatatableController', ['PaginationService', 'DatatableService', 'EndpointProvider',
-function (PaginationService, DatatableService, EndpointProvider) {
+.controller('ContainersDatatableController', ['PaginationService', 'DatatableService', 'EndpointProvider', 'StateManager',
+function (PaginationService, DatatableService, EndpointProvider, StateManager) {
   var ctrl = this;
 
   this.state = {
@@ -14,7 +14,7 @@ function (PaginationService, DatatableService, EndpointProvider) {
     noRunningItemsSelected: true,
     noPausedItemsSelected: true,
     publicURL: EndpointProvider.endpointPublicURL(),
-    endpointStatus: EndpointProvider.endpointStatus()
+    endpointStatus: StateManager.getState().endpoint.status
   };
 
   this.settings = {

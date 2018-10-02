@@ -7,9 +7,6 @@ angular.module('portainer.app')
           if (endpoint !== undefined) {
             var data = endpoint.Snapshots[0].SnapshotRaw.Info;
             if (data !== undefined) {
-              if (EndpointProvider.endpointStatus() === 1) {
-                EndpointProvider.setEndpointStatus(2);
-              }
               return data;
             }
           }

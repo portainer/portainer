@@ -9,6 +9,7 @@ function ($scope, $q, ContainerService, ImageService, NetworkService, VolumeServ
   function initView() {
     var endpointMode = $scope.applicationState.endpoint.mode;
     var endpointId = EndpointProvider.endpointID();
+    // $scope.endpointStatus = StateManager.getState().endpoint.status;
 
     $q.all({
       containers: ContainerService.containers(1),
@@ -29,6 +30,7 @@ function ($scope, $q, ContainerService, ImageService, NetworkService, VolumeServ
       $scope.stackCount = data.stacks.length;
       $scope.info = data.info;
       $scope.endpoint = data.endpoint;
+      $scope.endpointStatus = StateManager.getState().endpoint.status;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to load dashboard data');

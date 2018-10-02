@@ -15,6 +15,11 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
     }
   };
 
+  manager.setEndpointStatus = function(status) {
+    state.endpoint.status = status;
+    LocalStorage.storeEndpointState(state.endpoint);
+  };
+
   manager.dismissInformationPanel = function(id) {
     state.UI.dismissedInfoPanels[id] = true;
     LocalStorage.storeUIState(state.UI);
@@ -135,12 +140,13 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
     return extensions;
   }
 
-  manager.updateEndpointState = function(name, type, extensions) {
+  manager.updateEndpointState = function(name, type, status, extensions) {
     var deferred = $q.defer();
 
     if (type === 3) {
       state.endpoint.name = name;
       state.endpoint.mode = { provider: 'AZURE' };
+      state.endpoint.status = status;
       LocalStorage.storeEndpointState(state.endpoint);
       deferred.resolve();
       return deferred.promise;
@@ -156,6 +162,7 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
       state.endpoint.mode = endpointMode;
       state.endpoint.name = name;
       state.endpoint.apiVersion = endpointAPIVersion;
+      state.endpoint.status = status;
       state.endpoint.extensions = assignExtensions(extensions);
       LocalStorage.storeEndpointState(state.endpoint);
       deferred.resolve();

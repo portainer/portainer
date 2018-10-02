@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('NetworksController', ['$scope', '$state', 'NetworkService', 'Notifications', 'HttpRequestHelper', 'EndpointProvider',
-function ($scope, $state, NetworkService, Notifications, HttpRequestHelper, EndpointProvider) {
+.controller('NetworksController', ['$scope', '$state', 'NetworkService', 'Notifications', 'HttpRequestHelper', 'StateManager',
+function ($scope, $state, NetworkService, Notifications, HttpRequestHelper, StateManager) {
 
   $scope.removeAction = function (selectedItems) {
     var actionCount = selectedItems.length;
@@ -25,7 +25,7 @@ function ($scope, $state, NetworkService, Notifications, HttpRequestHelper, Endp
   };
 
   function initView() {
-    $scope.endpointStatus = EndpointProvider.endpointStatus();
+    $scope.endpointStatus = StateManager.getState().endpoint.status;
     NetworkService.networks(true, true, true)
     .then(function success(data) {
       $scope.networks = data;

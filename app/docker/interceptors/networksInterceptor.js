@@ -1,5 +1,5 @@
 angular.module('portainer.app')
-  .factory('NetworksInterceptor', ['$q', 'EndpointProvider', function ($q, EndpointProvider) {
+  .factory('NetworksInterceptor', ['$q', 'EndpointProvider', 'StateManager', function ($q, EndpointProvider, StateManager) {
     return {
       responseError: function (rejection) {
         if (rejection.status === 502 || rejection.status === -1) {
@@ -7,8 +7,8 @@ angular.module('portainer.app')
           if (endpoint !== undefined) {
             var data = endpoint.Snapshots[0].SnapshotRaw.Networks;
             if (data !== undefined) {
-              if (EndpointProvider.endpointStatus() === 1) {
-                EndpointProvider.setEndpointStatus(2);
+              if (StateManager.getState().endpoint.status === 1) {
+                StateManager.setEndpointStatus(2);
               }
               return data;
             }

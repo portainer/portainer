@@ -214,13 +214,14 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-change="$ctrl.selectItem(item)"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="docker.containers.container({ id: item.Id, nodeName: item.NodeName })" title="{{ item | containername }}">{{ item | containername | truncate: $ctrl.settings.containerNameTruncateSize }}</a>
+                <a ng-if="$ctrl.state.endpointStatus === 1" ui-sref="docker.containers.container({ id: item.Id, nodeName: item.NodeName })" title="{{ item | containername }}">{{ item | containername | truncate: $ctrl.settings.containerNameTruncateSize }}</a>
+                <span ng-if="$ctrl.state.endpointStatus !== 1">{{ item | containername | truncate: $ctrl.settings.containerNameTruncateSize }}</span>
               </td>
               <td ng-show="$ctrl.columnVisibility.columns.state.display">
                 <span ng-if="['starting','healthy','unhealthy'].indexOf(item.Status) !== -1" class="label label-{{ item.Status|containerstatusbadge }} interactive" uib-tooltip="This container has a health check">{{ item.Status }}</span>
                 <span ng-if="['starting','healthy','unhealthy'].indexOf(item.Status) === -1" class="label label-{{ item.Status|containerstatusbadge }}">{{ item.Status }}</span>
               </td>
-              <td ng-if="$ctrl.settings.showQuickActionStats || $ctrl.settings.showQuickActionLogs || $ctrl.settings.showQuickActionConsole || $ctrl.settings.showQuickActionInspect" ng-show="$ctrl.columnVisibility.columns.actions.display">
+              <td ng-if="$ctrl.state.endpointStatus === 1 && ($ctrl.settings.showQuickActionStats || $ctrl.settings.showQuickActionLogs || $ctrl.settings.showQuickActionConsole || $ctrl.settings.showQuickActionInspect)" ng-show="$ctrl.columnVisibility.columns.actions.display">
                 <div class="btn-group btn-group-xs" role="group" aria-label="..." style="display:inline-flex;">
                   <a ng-if="$ctrl.settings.showQuickActionStats" style="margin: 0 2.5px;" ui-sref="docker.containers.container.stats({id: item.Id, nodeName: item.NodeName})" title="Stats"><i class="fa fa-chart-area space-right" aria-hidden="true"></i></a>
                   <a ng-if="$ctrl.settings.showQuickActionLogs" style="margin: 0 2.5px;" ui-sref="docker.containers.container.logs({id: item.Id, nodeName: item.NodeName})" title="Logs"><i class="fa fa-file-alt space-right" aria-hidden="true"></i></a>
@@ -228,8 +229,13 @@
                   <a ng-if="$ctrl.settings.showQuickActionInspect" style="margin: 0 2.5px;" ui-sref="docker.containers.container.inspect({id: item.Id, nodeName: item.NodeName})" title="Inspect"><i class="fa fa-info-circle space-right" aria-hidden="true"></i></a>
                 </div>
               </td>
+              <td ng-if="$ctrl.state.endpointStatus !== 1">
+              </td>
               <td ng-show="$ctrl.columnVisibility.columns.stack.display">{{ item.StackName ? item.StackName : '-' }}</td>
-              <td ng-show="$ctrl.columnVisibility.columns.image.display"><a ui-sref="docker.images.image({ id: item.Image })">{{ item.Image | trimshasum }}</a></td>
+              <td ng-show="$ctrl.columnVisibility.columns.image.display">
+                <a ng-if="$ctrl.state.endpointStatus === 1" ui-sref="docker.images.image({ id: item.Image })">{{ item.Image | trimshasum }}</a>
+                <span ng-if="$ctrl.state.endpointStatus !== 1">{{ item.Image | trimshasum }}</span>
+              </td>
               <td ng-show="$ctrl.columnVisibility.columns.created.display">
                   {{item.Created | getisodatefromtimestamp}}
               </td>

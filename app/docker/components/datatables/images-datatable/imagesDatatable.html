@@ -115,7 +115,8 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-change="$ctrl.selectItem(item)"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="docker.images.image({ id: item.Id, nodeName: item.NodeName })" class="monospaced" title="{{ item.Id }}">{{ item.Id | truncate:40 }}</a>
+                <a ng-if="$ctrl.state.endpointStatus === 1" ui-sref="docker.images.image({ id: item.Id, nodeName: item.NodeName })" class="monospaced" title="{{ item.Id }}">{{ item.Id | truncate:40 }}</a>
+                <span ng-if="$ctrl.state.endpointStatus !== 1">{{ item.Id | truncate:40 }}</span>
                 <span style="margin-left: 10px;" class="label label-warning image-tag" ng-if="::item.ContainerCount === 0">Unused</span>
               </td>
               <td>

@@ -6,7 +6,14 @@
   </rd-header-title>
   <rd-header-content>Volumes</rd-header-content>
 </rd-header>
-
+<information-panel title-text="Information" cant-dismiss="true" ng-if="endpointStatus !== 1">
+  <span class="small">
+    <p class="text-muted">
+      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+        Portainer is connected to a down endpoint. Modifications are disabled and you may have access to limited data.
+    </p>
+  </span>
+</information-panel>
 <div class="row">
   <div class="col-sm-12">
     <volumes-datatable

@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('StacksDatatableController', ['PaginationService', 'DatatableService', 'EndpointProvider',
-function (PaginationService, DatatableService, EndpointProvider) {
+.controller('StacksDatatableController', ['PaginationService', 'DatatableService', 'StateManager',
+function (PaginationService, DatatableService, StateManager) {
 
   this.state = {
     selectAll: false,
@@ -9,7 +9,7 @@ function (PaginationService, DatatableService, EndpointProvider) {
     displayTextFilter: false,
     selectedItemCount: 0,
     selectedItems: [],
-    endpointStatus: EndpointProvider.endpointStatus()
+    endpointStatus: StateManager.getState().endpoint.status
   };
 
   this.changeOrderBy = function(orderField) {

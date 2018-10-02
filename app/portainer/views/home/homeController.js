@@ -5,7 +5,6 @@ function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, G
   $scope.goToDashboard = function(endpoint) {
     EndpointProvider.setEndpointID(endpoint.Id);
     EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
-    EndpointProvider.setEndpointStatus(endpoint.Status);
     if (endpoint.Type === 3) {
       switchToAzureEndpoint(endpoint);
     } else if (endpoint.Type === 2 && endpoint.Status !== 1) {
@@ -42,7 +41,7 @@ function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, G
   };
 
   function switchToAzureEndpoint(endpoint) {
-    StateManager.updateEndpointState(endpoint.Name, endpoint.Type, [])
+    StateManager.updateEndpointState(endpoint.Name, endpoint.Type, endpoint.Status, [])
     .then(function success() {
       $state.go('azure.dashboard');
     })
@@ -55,7 +54,7 @@ function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, G
     ExtensionManager.initEndpointExtensions(endpoint.Id)
     .then(function success(data) {
       var extensions = data;
-      return StateManager.updateEndpointState(endpoint.Name, endpoint.Type, extensions);
+      return StateManager.updateEndpointState(endpoint.Name, endpoint.Type, endpoint.Status, extensions);
     })
     .then(function success() {
       $state.go('docker.dashboard');
