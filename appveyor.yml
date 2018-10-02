@@ -40,9 +40,14 @@ build_script:
   - cmd: yarn grunt release:%IMAGE%:%ARCH%
   - ps: |
       if ($isLinux) { $dockerfile_path = "build/linux/Dockerfile" } else { $dockerfile_path = "build\windows2016\nanoserver\Dockerfile" }
-      docker build -t ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value)-$((Get-Item ENV:PORTAINER_VERSION).Value) -f "$($dockerfile_path)" .; 
-      docker tag ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value)-$((Get-Item ENV:PORTAINER_VERSION).Value) ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value);
-      docker login -u "$((Get-Item ENV:DOCKER_HUB_USERNAME).Value)" -p "$((Get-Item ENV:DOCKER_HUB_PASSWORD).Value)";
-      docker push ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value)-$((Get-Item ENV:PORTAINER_VERSION).Value);
-      docker push ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value);
-      if ($isWindows) { rebase-docker-image portainer/portainer:windows-amd64-1.19.2 -t portainer/portainer:windows1709-amd64-1.19.2 -b microsoft/nanoserver:1709 }
+
+      docker build -t ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value)-$((Get-Item ENV:PORTAINER_VERSION).Value) -f "$($dockerfile_path)" .
+      docker tag ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value)-$((Get-Item ENV:PORTAINER_VERSION).Value) ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value)
+      docker login -u "$((Get-Item ENV:DOCKER_HUB_USERNAME).Value)" -p "$((Get-Item ENV:DOCKER_HUB_PASSWORD).Value)"
+      docker push ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value)-$((Get-Item ENV:PORTAINER_VERSION).Value)
+      docker push ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value)
+
+      if ($isWindows) { 
+        rebase-docker-image ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value) -t ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)1709-$((Get-Item ENV:ARCH).Value)-$((Get-Item ENV:PORTAINER_VERSION).Value) -b microsoft/nanoserver:1709
+        rebase-docker-image ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value) -t ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)1803-$((Get-Item ENV:ARCH).Value)-$((Get-Item ENV:PORTAINER_VERSION).Value) -b microsoft/nanoserver:1803
+      }
