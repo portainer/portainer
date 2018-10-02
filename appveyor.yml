@@ -30,7 +30,7 @@ branches:
 install:
   - ps: >- 
       yarn install
-      Install-Product node $env:NODEJS_VERSION
+      yarn add Install-Product node $env:NODEJS_VERSION
 build_script:
   - ps : >-
       if ((Get-Item ENV:APPVEYOR_BUILD_WORKER_IMAGE).Value -eq 'Visual Studio 2017') { Set-Item ENV:image -Value 'windows' } else { Set-Item ENV:image -Value 'linux' }
