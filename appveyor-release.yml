@@ -1,6 +1,6 @@
 version: 1.0.{build}
 image:
-  - Visual Studio 2017
+  #- Visual Studio 2017
   - Ubuntu
 environment:
   matrix:
@@ -38,4 +38,5 @@ init:
 build_script:
   - sh: yarn grunt release:$IMAGE:$ARCH
   - cmd: yarn grunt release:%IMAGE%:%ARCH%
-  - ps: if ($isLinux) { & "./build/build_container_image.sh" } else { & ".\\build\\build_container_image.ps1" }
+  - sh: build/build_container_image.sh
+  - ps: '& ".\\build\\build_container_image.ps1"'
