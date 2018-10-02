@@ -31,8 +31,10 @@ stack: node 9
 install:
   - yarn install
   - npm install -g rebase-docker-image
+init:
+  - ps: if ($isLinux) { Set-Item ENV:IMAGE -Value 'linux' } else { Set-Item ENV:IMAGE -Value 'windows' }
 build_script:
-  - ps: if ($isLinux) { Set-Item ENV:IMAGE -Value 'linux'; sh -c 'yarn grunt release:$IMAGE:$ARCH' } else { Set-Item ENV:IMAGE -Value 'windows' }
+  - sh: sh -c 'yarn grunt release:$IMAGE:$ARCH'
   - cmd: yarn grunt release:%IMAGE%:%ARCH%
   - ps: |
       if ($isLinux) { $dockerfile_path = "build/linux/Dockerfile" } else { $dockerfile_path = "build\windows2016\nanoserver\Dockerfile" }
