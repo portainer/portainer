@@ -39,12 +39,10 @@ init:
   - IMAGE='linux' 
   - ps: if ((Get-Item ENV:CI_WINDOWS).Value) { Set-Item ENV:image -Value 'windows' } else { Set-Item ENV:image -Value 'linux' }
 build_script:
-  - echo $image
-  - echo $arch
-  - echo %image%
-  - echo %arch%
-  - ps: CMD /c yarn grunt release:%image%:%arch%
-  - yarn grunt release:$image:$arch
+  - echo $IMAGE
+  - echo $ARCH
+  - ps: CMD /c yarn grunt release:%IMAGE%:%ARCH%
+  - yarn grunt release:$IMAGE:$arch
 #deploy_script:
 # 
 #  - docker build -t ssbkang/portainer:develop-windows -f "build\windows2016\nanoserver\Dockerfile" .
