@@ -49,11 +49,7 @@ angular.module('portainer.app').component('templateForm', {
     };
 
     this.changeEnvVarType = function(env) {
-      if (env.type === 1) {
-        env.preset = true;
-      } else if (env.type === 2) {
-        env.preset = false;
-      }
+      env.preset = env.type === 1;
     };
   },
   bindings: {
