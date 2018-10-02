@@ -5,14 +5,26 @@ angular.module('portainer.docker').controller('NodeBrowserController', [
   function NodeBrowserController(NodeService, HttpRequestHelper, $stateParams) {
     var ctrl = this;
 
+
+    ctrl.refreshList = refreshList;
     ctrl.$onInit = $onInit;
 
     function $onInit() {
       ctrl.nodeId = $stateParams.id;
+      loadNode();
+    }
+
+    function loadNode() {
       NodeService.node(ctrl.nodeId).then(function onNodeLoaded(node) {
         HttpRequestHelper.setPortainerAgentTargetHeader(node.Hostname);
         ctrl.node = node;
       });
     }
+
+    function refreshList() {
+
+    }
+
+
   }
 ]);

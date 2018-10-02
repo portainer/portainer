@@ -1,12 +1,13 @@
 angular.module('portainer.agent').factory('HostBrowserService', [
-  'Browse',
-  function HostBrowserServiceFactory(Browse) {
+  'Browse', 'Upload', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', '$q',
+  function HostBrowserServiceFactory(Browse, Upload, API_ENDPOINT_ENDPOINTS, EndpointProvider, $q) {
     var service = {};
 
     service.ls = ls;
     service.get = get;
     service.delete = deletePath;
     service.rename = rename;
+    service.upload = upload;
 
     function ls(path) {
       return Browse.ls({ path: path }).$promise;
@@ -26,6 +27,16 @@ angular.module('portainer.agent').factory('HostBrowserService', [
         NewFilePath: newPath
       };
       return Browse.rename({}, payload).$promise;
+    }
+
+    function upload(path, file, onProgress) {
+      var deferred = $q.defer();
+      var url = API_ENDPOINT_ENDPOINTS + '/' + EndpointProvider.endpointID() + '/docker/browse/put';
+      Upload.upload({
+        url: url,  
+        data: { file: file, Path: path }
+      }).then(deferred.resolve, deferred.reject, onProgress);
+      return deferred.promise;
     }
 
     return service;

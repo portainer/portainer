@@ -1,7 +1,20 @@
 <rd-widget>
   <rd-widget-header icon="fa-upload" title-text="File Uploader"></rd-widget-header>
 
-  <rd-widget-body classes="no-padding">
-
+  <rd-widget-body>
+    <div>
+      <button class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.file">
+        Select file
+      </button>
+      <span style="margin-left: 5px;">
+        {{ $ctrl.file.name }}
+        <i class="fa fa-circle-notch fa-spin" ng-if="$ctrl.state.uploadInProgress"></i>
+      </span>
+      <button 
+        ng-disabled="!$ctrl.file" 
+        class="btn btn-sm btn-success" ng-click="$ctrl.uploadFile()">
+        Upload
+      </button>
+    </div>
   </rd-widget-body>
 </rd-widget>

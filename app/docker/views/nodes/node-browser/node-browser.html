@@ -7,7 +7,9 @@
 
 <div class="row">
   <div class="col-sm-12">
-    <file-uploader></file-uploader>
+    <file-uploader
+     on-file-uploaded="$ctrl.refreshList"
+    ></file-uploader>
   </div>
 </div>
 
