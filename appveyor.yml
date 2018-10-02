@@ -31,13 +31,10 @@ install:
   - yarn install
   - ps: Install-Product node $env:NODEJS_VERSION
 build_script:
-  - ps : >-
-      if ((Get-Item ENV:APPVEYOR_BUILD_WORKER_IMAGE).Value -eq 'Visual Studio 2017') { Set-Item ENV:image -Value 'windows' } else { Set-Item ENV:image -Value 'linux' }
-#      $arch = (Get-Item ENV:ARCH).Value
-#      $command = "release:$($image):$($arch)"
-#      yarn grunt $command
+  - ps: if ((Get-Item ENV:APPVEYOR_BUILD_WORKER_IMAGE).Value -eq 'Visual Studio 2017') { Set-Item ENV:image -Value 'windows' } else { Set-Item ENV:image -Value 'linux' }
   - yarn grunt release:%image%:%arch%
-  - echo "%ARCH%"
+  - echo "%APPVEYOR_PULL_REQUEST_NUMBER%"
+  - echo "%APPVEYOR_REPO_BRANCH%"
 #deploy_script:
 #  - docker build -t ssbkang/portainer:develop-windows -f "build\windows2016\nanoserver\Dockerfile" .
 #  - docker login -u "%DOCKER_HUB_USERNAME%" -p "%DOCKER_HUB_PASSWORD%"
