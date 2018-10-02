@@ -1,6 +1,6 @@
 version: 1.0.{build}
 image:
-  - Visual Studio 2017
+  #- Visual Studio 2017
   - Ubuntu
 environment:
   matrix:
@@ -14,7 +14,7 @@ environment:
     secure: JapmC7j5F0mY3j/MVzU+Cw==
   DOCKER_HUB_PASSWORD:
     secure: QGlCLNWzPD0HL8ipkohVic45/yU3bVOdjn0IiV6NnSQ=
-  APPVEYOR_YML_DISABLE_PS_LINUX: true
+  #APPVEYOR_YML_DISABLE_PS_LINUX: true
 matrix:
   exclude:
     - image: Visual Studio 2017
@@ -35,8 +35,6 @@ init:
   - echo $APPVEYOR_PULL_REQUEST_NUMBER
   - echo $APPVEYOR_REPO_BRANCH
   - echo $APPVEYOR_REPO_COMMIT
-  - echo $ARCH
-  - IMAGE='linux' 
   - ps: if ((Get-Item ENV:CI_WINDOWS).Value) { Set-Item ENV:IMAGE -Value 'windows' } else { Set-Item ENV:IMAGE -Value 'linux' }
 build_script:
   - echo $IMAGE
@@ -44,7 +42,6 @@ build_script:
   - yarn grunt release:$IMAGE:$ARCH
   - ps: CMD /c yarn grunt release:%IMAGE%:%ARCH%
 #deploy_script:
-# 
 #  - docker build -t ssbkang/portainer:develop-windows -f "build\windows2016\nanoserver\Dockerfile" .
 #  - docker login -u "%DOCKER_HUB_USERNAME%" -p "%DOCKER_HUB_PASSWORD%"
 #  - docker push ssbkang/portainer:develop-windows
