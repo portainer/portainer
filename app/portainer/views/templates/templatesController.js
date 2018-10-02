@@ -125,13 +125,18 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
 
   function createStackFromTemplate(template, userId, accessControlData) {
     var stackName = $scope.formValues.name;
-
-    for (var i = 0; i < template.Env.length; i++) {
-      var envvar = template.Env[i];
-      if (envvar.preset) {
-        envvar.value = envvar.default;
-      }
-    }
+    var env =_.filter(
+        _.map(template.Env, function transformEnvVar(envvar) {
+          return {
+            name: envvar.name,
+            value:
+              envvar.preset || !envvar.value ? envvar.default : envvar.value
+          };
+        }),
+        function removeUndefinedVars(envvar) {
+          return envvar.value && envvar.name;
+        }
+      );
 
     var repositoryOptions = {
       RepositoryURL: template.Repository.url,
@@ -139,7 +144,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
     };
 
     var endpointId = EndpointProvider.endpointID();
-    StackService.createSwarmStackFromGitRepository(stackName, repositoryOptions, template.Env, endpointId)
+    StackService.createSwarmStackFromGitRepository(stackName, repositoryOptions, env, endpointId)
     .then(function success() {
       return ResourceControlService.applyResourceControl('stack', stackName, userId, accessControlData, []);
     })
