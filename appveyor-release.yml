@@ -1,7 +1,7 @@
 version: 1.0.{build}
 image:
-  - Visual Studio 2017
-  #- Ubuntu
+  #- Visual Studio 2017
+  - Ubuntu
 environment:
   matrix:
     - ARCH: amd64
