@@ -9,9 +9,9 @@ environment:
     #- ARCH: arm64
     #- ARCH: ppc64le
     #- ARCH: s390x
-  DOCKER_HUB_USERNAME:
+  DOCKER_USER:
     secure: JapmC7j5F0mY3j/MVzU+Cw==
-  DOCKER_HUB_PASSWORD:
+  DOCKER_PASS:
     secure: QGlCLNWzPD0HL8ipkohVic45/yU3bVOdjn0IiV6NnSQ=
   PORTAINER_VERSION: "1.19.2"
 matrix:
@@ -39,13 +39,11 @@ build_script:
 
       docker build -t ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value)-$((Get-Item ENV:PORTAINER_VERSION).Value) -f "$($dockerfile_path)" .
       docker tag ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value)-$((Get-Item ENV:PORTAINER_VERSION).Value) ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value)
-      docker login -u "$((Get-Item ENV:DOCKER_HUB_USERNAME).Value)" -p "$((Get-Item ENV:DOCKER_HUB_PASSWORD).Value)"
+      docker login -u "$((Get-Item ENV:DOCKER_USER).Value)" -p "$((Get-Item ENV:DOCKER_PASS).Value)"
       docker push ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value)-$((Get-Item ENV:PORTAINER_VERSION).Value)
       docker push ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value)
 
       if ($isWindows) { 
         rebase-docker-image ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value) -t ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)1709-$((Get-Item ENV:ARCH).Value)-$((Get-Item ENV:PORTAINER_VERSION).Value) -b microsoft/nanoserver:1709        
         rebase-docker-image ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value) -t ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)1803-$((Get-Item ENV:ARCH).Value)-$((Get-Item ENV:PORTAINER_VERSION).Value) -b microsoft/nanoserver:1803
-        docker push ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)1709-$((Get-Item ENV:ARCH).Value)-$((Get-Item ENV:PORTAINER_VERSION).Value)
-        docker push ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)1803-$((Get-Item ENV:ARCH).Value)-$((Get-Item ENV:PORTAINER_VERSION).Value)
       }
