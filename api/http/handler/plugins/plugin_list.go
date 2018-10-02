@@ -18,7 +18,7 @@ func (handler *Handler) pluginList(w http.ResponseWriter, r *http.Request) *http
 	storeDetails, _ := request.RetrieveBooleanQueryParameter(r, "store", true)
 	if storeDetails {
 		// TODO: store somewhere else + constant
-		pluginData, err := client.Get("https://gist.githubusercontent.com/deviantony/d1d0d59fa1b5d8fbc1c988ee51f9ff84/raw/67d9b1f388cc4755d916eca33ce6c9fce39b0ebd/plugins.json", 30)
+		pluginData, err := client.Get("https://gist.githubusercontent.com/deviantony/d1d0d59fa1b5d8fbc1c988ee51f9ff84/raw/115d49fc3474993bc6872417546a83acb65f5b77/plugins.json", 30)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve plugin definitions", err}
 		}
