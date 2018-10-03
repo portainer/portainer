@@ -685,6 +685,8 @@ const (
 	DBVersion = 14
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
 	MessageOfTheDayURL = "https://raw.githubusercontent.com/portainer/motd/master/message.html"
+	// PluginDefinitionsURL represents the URL where Portainer plugin definitions can be retrieved
+	PluginDefinitionsURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com/plugins.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response
 	PortainerAgentHeader = "Portainer-Agent"
 	// PortainerAgentTargetHeader represent the name of the header containing the target node name

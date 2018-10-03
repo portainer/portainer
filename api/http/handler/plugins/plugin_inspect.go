@@ -22,7 +22,7 @@ func (handler *Handler) pluginInspect(w http.ResponseWriter, r *http.Request) *h
 	pluginID := portainer.PluginID(pluginIdentifier)
 
 	// TODO: store somewhere else + constant
-	pluginData, err := client.Get("https://gist.githubusercontent.com/deviantony/d1d0d59fa1b5d8fbc1c988ee51f9ff84/raw/115d49fc3474993bc6872417546a83acb65f5b77/plugins.json", 30)
+	pluginData, err := client.Get(portainer.PluginDefinitionsURL, 30)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve plugin definitions", err}
 	}
