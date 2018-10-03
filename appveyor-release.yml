@@ -46,7 +46,7 @@ build_script:
   - cmd: powershell -Command "& .\\build\\build_container_image.ps1"
 deploy:
   release: Release $(PORTAINER_VERSION)
-  description: 'Latest Release'
+  description: ''
   provider: GitHub
   auth_token:
     secure: yC+WkZ45ZI6a4adDsjJS71L9GvbPLjTC9Q1QpTQdsqVlBb6DjEPYg6NuJ79nNFeh

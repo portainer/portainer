@@ -2,8 +2,6 @@ New-Item -Path portainer -ItemType Directory | Out-Null
 Copy-Item -Path dist\* -Destination portainer -Recurse
 tar -cvpf "portainer-$((Get-Item ENV:PORTAINER_VERSION).Value)-$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value).tar.gz" portainer
 
-ls
-
 docker build `
     -t ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value)-$((Get-Item ENV:PORTAINER_VERSION).Value) `
     -f build\windows2016\nanoserver\Dockerfile .
