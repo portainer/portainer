@@ -5,9 +5,9 @@ image:
 environment:
   matrix:
     - ARCH: amd64
-    - ARCH: arm 
-    - ARCH: arm64
-    - ARCH: ppc64le
+    #- ARCH: arm 
+    #- ARCH: arm64
+    #- ARCH: ppc64le
     - ARCH: s390x
   DOCKER_USER:
     secure: JapmC7j5F0mY3j/MVzU+Cw==
