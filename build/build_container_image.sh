@@ -1,8 +1,10 @@
 mkdir -pv portainer
+mkdir -pv bin
 cp -r dist/* portainer
 tar cvpfz "portainer-$3-$1-$2.tar.gz" portainer
+mv "portainer-$3-$1-$2.tar.gz" bin
 
-ls "portainer-$3-$1-$2.tar.gz"
+ls bin/"portainer-$3-$1-$2.tar.gz"
 
 docker build -t "ssbkang/portainer:$1-$2-$3" -f build/linux/Dockerfile .
 docker tag "ssbkang/portainer:$1-$2-$3" "ssbkang/portainer:$1-$2"
