@@ -84,7 +84,7 @@
             <div class="node_info">
               <div>
                 <div>
-                  <b>{{ node.Hostname }}</b>
+                  <b>{{ node.Name || node.Hostname }}</b>
                   <span class="node_platform">
                     <i class="fab fa-linux" aria-hidden="true" ng-if="node.PlatformOS === 'linux'"></i>
                     <i class="fab fa-windows" aria-hidden="true" ng-if="node.PlatformOS === 'windows'"></i>
