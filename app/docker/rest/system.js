@@ -7,6 +7,9 @@ angular.module('portainer.docker')
     endpointId: EndpointProvider.endpointID
   },
   {
+    ping: {
+      method: 'GET', params: { action: '_ping' }, ignoreLoadingBar: true
+    },
     info: {
       method: 'GET', params: { action: 'info' },
       ignoreLoadingBar: true, interceptor: InfoInterceptor

@@ -5,13 +5,20 @@ function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, G
   $scope.goToDashboard = function(endpoint) {
     EndpointProvider.setEndpointID(endpoint.Id);
     EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
-    if (endpoint.Type === 3) {
-      switchToAzureEndpoint(endpoint);
-    } else if (endpoint.Type === 2 && endpoint.Status !== 1) {
-      Notifications.error('Failure', '', 'Endpoint is offline, connect to another swarm manager');
-    } else {
-      switchToDockerEndpoint(endpoint);
-    }
+    StateManager.checkEndpointStatus()
+    .then(function sucess() {
+      endpoint.Status = 1;
+    }).catch(function error() {
+      endpoint.Status = 2;
+    }).finally(function () {
+      if (endpoint.Snapshots[0] && endpoint.Snapshots[0].Swarm === true && endpoint.Status === 2) {
+        Notifications.error('Failure', '', 'Endpoint is offline, connect to another swarm manager');
+      } else if (endpoint.Type === 3) {
+        switchToAzureEndpoint(endpoint);
+      } else {
+        switchToDockerEndpoint(endpoint);
+      }
+    });
   };
 
   $scope.dismissImportantInformation = function(hash) {

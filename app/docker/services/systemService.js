@@ -20,6 +20,10 @@ angular.module('portainer.docker')
     return System.info({}).$promise;
   };
 
+  service.ping = function() {
+    return System.ping({}).$promise;
+  };
+
   service.version = function() {
     return System.version({}).$promise;
   };

@@ -20,6 +20,10 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
     LocalStorage.storeEndpointState(state.endpoint);
   };
 
+  manager.checkEndpointStatus = function() {
+    return SystemService.ping();
+  };
+
   manager.dismissInformationPanel = function(id) {
     state.UI.dismissedInfoPanels[id] = true;
     LocalStorage.storeUIState(state.UI);
