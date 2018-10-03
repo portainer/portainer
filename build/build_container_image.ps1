@@ -7,3 +7,4 @@ rebase-docker-image ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item 
 rebase-docker-image ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value) -t ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)1709-$((Get-Item ENV:ARCH).Value) -b microsoft/nanoserver:1709
 rebase-docker-image ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value) -t ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)1803-$((Get-Item ENV:ARCH).Value)-$((Get-Item ENV:PORTAINER_VERSION).Value) -b microsoft/nanoserver:1803
 rebase-docker-image ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value) -t ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)1803-$((Get-Item ENV:ARCH).Value) -b microsoft/nanoserver:1803
+#docker manifest push C:\projects\docker-manifest\portainer\
