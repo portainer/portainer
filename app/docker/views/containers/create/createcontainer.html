@@ -309,7 +309,7 @@
                 <div class="col-sm-9">
                   <select class="form-control" ng-model="config.HostConfig.NetworkMode" id="container_network" ng-change="resetNetworkConfig()">
                     <option selected disabled hidden value="">Select a network</option>
-                    <option ng-repeat="net in availableNetworks" ng-value="net.Name">{{ net.Name }}</option>
+                    <option ng-repeat="net in availableNetworks | orderBy: 'Name'" ng-value="net.Name">{{ net.Name }}</option>
                   </select>
                 </div>
               </div>
