@@ -10,6 +10,6 @@ if [ "${2}" == 's390x' ] ; then
 
   chmod 755 manifest-tool-linux-amd64
   
-  ./manifest-tool-linux-amd64 push from-spec /home/appveyor/projects/docker-manifest/portainer-1-19-2.yml
-  ./manifest-tool-linux-amd64 push from-spec /home/appveyor/projects/docker-manifest/portainer.yml
+  ./manifest-tool-linux-amd64 push from-spec /home/appveyor/projects/docker-manifest/portainer/portainer-1-19-2.yml
+  ./manifest-tool-linux-amd64 push from-spec /home/appveyor/projects/docker-manifest/portainer/portainer.yml
 fi
