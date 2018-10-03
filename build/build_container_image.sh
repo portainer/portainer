@@ -1,3 +1,8 @@
+mkdir -pv portainer
+cp -r dist/* portainer
+cd portainer
+tar cvpfz "portainer-$3-$1-$2.tar.gz" portainer
+
 docker build -t "ssbkang/portainer:$1-$2-$3" -f build/linux/Dockerfile .
 docker tag "ssbkang/portainer:$1-$2-$3" "ssbkang/portainer:$1-$2"
 docker login -u "$4" -p "$5"
