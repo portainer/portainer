@@ -38,9 +38,6 @@ install:
 init:
   - sh: export IMAGE=linux
   - cmd: 'SET IMAGE=windows'
-  - ps: |
-      if (!(Test-Path ~/.docker)) { mkdir ~/.docker }
-      '{ "experimental": "enabled" }' | Out-File ~/.docker/config.json -Encoding Ascii
 build_script:
   - sh: yarn grunt release:$IMAGE:$ARCH
   - cmd: yarn grunt release:%IMAGE%:%ARCH%
