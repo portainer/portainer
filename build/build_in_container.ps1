@@ -19,3 +19,5 @@ C:\go\bin\go.exe get -t -d -v ./...
 C:\go\bin\go.exe build -v
 
 Move-Item -Path "C:\projects\portainer\api\cmd\portainer\$($binary)" -Destination "C:\projects\portainer\dist"
+
+ls "C:\projects\portainer\dist"
