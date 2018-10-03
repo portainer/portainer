@@ -1,4 +1,4 @@
-angular.module('portainer.app')
+angular.module('portainer.plugins.registrymanagement')
 .controller('RegistryRepositoriesController', ['$transition$', '$scope',  'RegistryService', 'LocalRegistryService', 'Notifications',
 function ($transition$, $scope, RegistryService, LocalRegistryService, Notifications) {
 

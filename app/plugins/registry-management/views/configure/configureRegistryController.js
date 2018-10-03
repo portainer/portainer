@@ -1,4 +1,4 @@
-angular.module('portainer.app')
+angular.module('portainer.plugins.registrymanagement')
 .controller('ConfigureRegistryController', ['$scope', '$state', '$transition$', 'RegistryService', 'Notifications',
 function ($scope, $state, $transition$, RegistryService, Notifications) {
 

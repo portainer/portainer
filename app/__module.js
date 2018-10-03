@@ -22,5 +22,6 @@ angular.module('portainer', [
   'portainer.agent',
   'portainer.azure',
   'portainer.docker',
+  'portainer.plugins',
   'extension.storidge',
   'rzModule']);
