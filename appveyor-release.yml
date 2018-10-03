@@ -47,7 +47,7 @@ deploy:
   provider: GitHub
   auth_token:
     secure: yC+WkZ45ZI6a4adDsjJS71L9GvbPLjTC9Q1QpTQdsqVlBb6DjEPYg6NuJ79nNFeh
-  artifact: /.*\.tar.gz/
+  artifact: portainer-$(PORTAINER_VERSION)-$(IMAGE)-$(ARCH).tar.gz
   draft: true
   prerelease: false
   on:
