@@ -36,10 +36,10 @@ install:
   - yarn install
   - npm install -g rebase-docker-image
 init:
-  - sh: export IMAGE=linux; git clone -q --branch=master $GITHUB_MANIFEST_URL /home/appveyor/projects/docker-manifest
+  - sh: export IMAGE=linux
   - cmd: 'powershell -Command "Set-Item ENV:IMAGE -Value linux'
 build_script:
-  - sh: ls /home/appveyor/projects/docker-manifest/portainer; yarn grunt release:$IMAGE:$ARCH
+  - sh: yarn grunt release:$IMAGE:$ARCH
   - cmd: yarn grunt release:%IMAGE%:%ARCH%
-  - sh: sudo bash build/build_container_image.sh $IMAGE $ARCH $PORTAINER_VERSION $DOCKER_USER $DOCKER_PASS
+  - sh: sudo bash build/build_container_image.sh $IMAGE $ARCH $PORTAINER_VERSION $DOCKER_USER $DOCKER_PASS $GITHUB_MANIFEST_URL
   - cmd: 'powershell -Command "& .\\build\\build_container_image.ps1"'

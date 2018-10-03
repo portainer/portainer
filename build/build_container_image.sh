@@ -5,6 +5,7 @@ docker push "ssbkang/portainer:$1-$2-$3"
 docker push "ssbkang/portainer:$1-$2"
 
 if [ "${2}" == 's390x' ] ; then
+  git clone -q --branch=master $6 /home/appveyor/projects/docker-manifest
   docker manifest push /home/appveyor/projects/docker-manifest/portainer-1-19-2.yml
   docker manifest push /home/appveyor/projects/docker-manifest/portainer.yml
 fi
