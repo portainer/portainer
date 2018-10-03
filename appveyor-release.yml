@@ -16,7 +16,6 @@ environment:
   GITHUB_MANIFEST_URL:
     secure: QBT01r3E0cgExWfzaQKDH6bRhEqNi1zAiSJ1SYhDWAomFndbyZ9xl5QwvPzTnA8L
   PORTAINER_VERSION: "1.19.2"
-  appveyor_repo_tag: true
 matrix:
   exclude:
     - image: Visual Studio 2017
@@ -53,4 +52,3 @@ deploy:
   prerelease: false
   on:
     branch: develop
-    appveyor_repo_tag: true
