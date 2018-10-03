@@ -30,6 +30,9 @@ branches:
   only:
     - develop
 stack: node 9
+artifacts:
+  - path: '*.tar.gz'
+    type: file
 install:
   - yarn install
   - npm install -g rebase-docker-image
