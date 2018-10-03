@@ -1,6 +1,10 @@
 angular.module('portainer.docker')
-.controller('DashboardController', ['$scope', '$q', 'ContainerService', 'ImageService', 'NetworkService', 'VolumeService', 'SystemService', 'ServiceService', 'StackService', 'EndpointService', 'Notifications', 'EndpointProvider',
-function ($scope, $q, ContainerService, ImageService, NetworkService, VolumeService, SystemService, ServiceService, StackService, EndpointService, Notifications, EndpointProvider) {
+.controller('DashboardController', ['$scope', '$q', 'ContainerService', 'ImageService', 'NetworkService', 'VolumeService', 'SystemService', 'ServiceService', 'StackService', 'EndpointService', 'Notifications', 'EndpointProvider', 'StateManager',
+function ($scope, $q, ContainerService, ImageService, NetworkService, VolumeService, SystemService, ServiceService, StackService, EndpointService, Notifications, EndpointProvider, StateManager) {
+
+  $scope.dismissInformationPanel = function(id) {
+    StateManager.dismissInformationPanel(id);
+  };
 
   function initView() {
     var endpointMode = $scope.applicationState.endpoint.mode;

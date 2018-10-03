@@ -30,7 +30,7 @@ function AzureServiceFactory($q, Azure, SubscriptionService, ResourceGroupServic
 
   service.aggregate = function(resourcesBySubcription) {
     var aggregatedResources = [];
-    Object.keys(resourcesBySubcription).forEach(function(key, index) {
+    Object.keys(resourcesBySubcription).forEach(function(key) {
       aggregatedResources = aggregatedResources.concat(resourcesBySubcription[key]);
     });
     return aggregatedResources;

@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 
+	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/http/client"
-	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/response"
 	"github.com/portainer/portainer/http/security"
 )
 
@@ -26,7 +26,7 @@ func (handler *Handler) templateList(w http.ResponseWriter, r *http.Request) *ht
 		}
 	} else {
 		var templateData []byte
-		templateData, err = client.Get(settings.TemplatesURL)
+		templateData, err = client.Get(settings.TemplatesURL, 0)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve external templates", err}
 		}

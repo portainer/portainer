@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/docker"
 	"github.com/portainer/portainer/http/handler"
 	"github.com/portainer/portainer/http/handler/auth"
 	"github.com/portainer/portainer/http/handler/dockerhub"
@@ -11,6 +12,7 @@ import (
 	"github.com/portainer/portainer/http/handler/endpointproxy"
 	"github.com/portainer/portainer/http/handler/endpoints"
 	"github.com/portainer/portainer/http/handler/file"
+	"github.com/portainer/portainer/http/handler/motd"
 	"github.com/portainer/portainer/http/handler/registries"
 	"github.com/portainer/portainer/http/handler/resourcecontrols"
 	"github.com/portainer/portainer/http/handler/settings"
@@ -22,6 +24,7 @@ import (
 	"github.com/portainer/portainer/http/handler/templates"
 	"github.com/portainer/portainer/http/handler/upload"
 	"github.com/portainer/portainer/http/handler/users"
+	"github.com/portainer/portainer/http/handler/webhooks"
 	"github.com/portainer/portainer/http/handler/websocket"
 	"github.com/portainer/portainer/http/proxy"
 	"github.com/portainer/portainer/http/security"
@@ -59,10 +62,12 @@ type Server struct {
 	TeamMembershipService  portainer.TeamMembershipService
 	TemplateService        portainer.TemplateService
 	UserService            portainer.UserService
+	WebhookService         portainer.WebhookService
 	Handler                *handler.Handler
 	SSL                    bool
 	SSLCert                string
 	SSLKey                 string
+	DockerClientFactory    *docker.ClientFactory
 }
 
 // Start starts the HTTP server
@@ -115,6 +120,8 @@ func (server *Server) Start() error {
 
 	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"))
 
+	var motdHandler = motd.NewHandler(requestBouncer)
+
 	var registryHandler = registries.NewHandler(requestBouncer)
 	registryHandler.RegistryService = server.RegistryService
 
@@ -156,7 +163,7 @@ func (server *Server) Start() error {
 	var uploadHandler = upload.NewHandler(requestBouncer)
 	uploadHandler.FileService = server.FileService
 
-	var userHandler = users.NewHandler(requestBouncer)
+	var userHandler = users.NewHandler(requestBouncer, rateLimiter)
 	userHandler.UserService = server.UserService
 	userHandler.TeamService = server.TeamService
 	userHandler.TeamMembershipService = server.TeamMembershipService
@@ -168,6 +175,11 @@ func (server *Server) Start() error {
 	websocketHandler.EndpointService = server.EndpointService
 	websocketHandler.SignatureService = server.SignatureService
 
+	var webhookHandler = webhooks.NewHandler(requestBouncer)
+	webhookHandler.WebhookService = server.WebhookService
+	webhookHandler.EndpointService = server.EndpointService
+	webhookHandler.DockerClientFactory = server.DockerClientFactory
+
 	server.Handler = &handler.Handler{
 		AuthHandler:            authHandler,
 		DockerHubHandler:       dockerHubHandler,
@@ -175,6 +187,7 @@ func (server *Server) Start() error {
 		EndpointHandler:        endpointHandler,
 		EndpointProxyHandler:   endpointProxyHandler,
 		FileHandler:            fileHandler,
+		MOTDHandler:            motdHandler,
 		RegistryHandler:        registryHandler,
 		ResourceControlHandler: resourceControlHandler,
 		SettingsHandler:        settingsHandler,
@@ -187,6 +200,7 @@ func (server *Server) Start() error {
 		UploadHandler:          uploadHandler,
 		UserHandler:            userHandler,
 		WebSocketHandler:       websocketHandler,
+		WebhookHandler:         webhookHandler,
 	}
 
 	if server.SSL {

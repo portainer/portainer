@@ -130,6 +130,7 @@
                 <span ng-hide="state.actionInProgress">Deploy the container</span>
                 <span ng-show="state.actionInProgress">Deployment in progress...</span>
               </button>
+              <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
             </div>
           </div>
           <!-- !actions -->
@@ -500,6 +501,17 @@
                 </div>
               </div>
               <!-- !privileged-mode -->
+              <!-- runtimes -->
+              <div class="form-group">
+                <label for="container_runtime" class="col-sm-2 col-lg-1 control-label text-left">Runtime</label>
+                <div class="col-sm-1">
+                  <select class="form-control" ng-model="config.HostConfig.Runtime" id="container_runtime">
+                    <option selected disabled hidden value="">Select a runtime</option>
+                    <option ng-repeat="(runtime, _) in availableRuntimes" ng-value="runtime">{{ runtime }}</option>
+                  </select>
+                </div>
+              </div>
+              <!-- !runtimes -->
             </form>
             <form class="form-horizontal" style="margin-top: 15px;">
               <!-- devices -->

@@ -3,17 +3,18 @@ package stacks
 import (
 	"net/http"
 
+	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/request"
+	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer"
-	httperror "github.com/portainer/portainer/http/error"
 	"github.com/portainer/portainer/http/proxy"
-	"github.com/portainer/portainer/http/request"
-	"github.com/portainer/portainer/http/response"
 	"github.com/portainer/portainer/http/security"
 )
 
 type stackMigratePayload struct {
 	EndpointID int
 	SwarmID    string
+	Name       string
 }
 
 func (payload *stackMigratePayload) Validate(r *http.Request) error {
@@ -89,11 +90,17 @@ func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *ht
 		stack.SwarmID = payload.SwarmID
 	}
 
+	oldName := stack.Name
+	if payload.Name != "" {
+		stack.Name = payload.Name
+	}
+
 	migrationError := handler.migrateStack(r, stack, targetEndpoint)
 	if migrationError != nil {
 		return migrationError
 	}
 
+	stack.Name = oldName
 	err = handler.deleteStack(stack, endpoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}

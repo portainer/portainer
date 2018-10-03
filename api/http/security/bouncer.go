@@ -1,8 +1,8 @@
 package security
 
 import (
+	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer"
-	httperror "github.com/portainer/portainer/http/error"
 
 	"net/http"
 	"strings"
@@ -114,8 +114,8 @@ func (bouncer *RequestBouncer) EndpointAccess(r *http.Request, endpoint *portain
 // mwSecureHeaders provides secure headers middleware for handlers.
 func mwSecureHeaders(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("X-XSS-Protection", "1; mode=block")
 		w.Header().Add("X-Content-Type-Options", "nosniff")
-		w.Header().Add("X-Frame-Options", "DENY")
 		next.ServeHTTP(w, r)
 	})
 }

@@ -3,10 +3,10 @@ package upload
 import (
 	"net/http"
 
+	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/request"
+	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer"
-	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/request"
-	"github.com/portainer/portainer/http/response"
 )
 
 // POST request on /api/upload/tls/{certificate:(?:ca|cert|key)}?folder=<folder>
@@ -21,7 +21,7 @@ func (handler *Handler) uploadTLS(w http.ResponseWriter, r *http.Request) *httpe
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: folder", err}
 	}
 
-	file, err := request.RetrieveMultiPartFormFile(r, "file")
+	file, _, err := request.RetrieveMultiPartFormFile(r, "file")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid certificate file. Ensure that the certificate file is uploaded correctly", err}
 	}

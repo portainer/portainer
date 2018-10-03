@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('HomeController', ['$q', '$scope', '$state', 'Authentication', 'EndpointService', 'EndpointHelper', 'GroupService', 'Notifications', 'EndpointProvider', 'StateManager', 'ExtensionManager', 'ModalService',
-function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, GroupService, Notifications, EndpointProvider, StateManager, ExtensionManager, ModalService) {
+.controller('HomeController', ['$q', '$scope', '$state', 'Authentication', 'EndpointService', 'EndpointHelper', 'GroupService', 'Notifications', 'EndpointProvider', 'StateManager', 'ExtensionManager', 'ModalService', 'MotdService',
+function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, GroupService, Notifications, EndpointProvider, StateManager, ExtensionManager, ModalService, MotdService) {
 
   $scope.goToDashboard = function(endpoint) {
     EndpointProvider.setEndpointID(endpoint.Id);
@@ -12,9 +12,17 @@ function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, G
     }
   };
 
+  $scope.dismissImportantInformation = function(hash) {
+    StateManager.dismissImportantInformation(hash);
+  };
+
+  $scope.dismissInformationPanel = function(id) {
+    StateManager.dismissInformationPanel(id);
+  };
+
   function triggerSnapshot() {
     EndpointService.snapshot()
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Success', 'Endpoints updated');
       $state.reload();
     })
@@ -54,8 +62,19 @@ function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, G
     });
   }
 
+  $scope.goToEdit = goToEdit;
+
+  function goToEdit(id) {
+    $state.go('portainer.endpoints.endpoint', { id: id });
+  }
+
   function initView() {
     $scope.isAdmin = Authentication.getUserDetails().role === 1;
+
+    MotdService.motd()
+    .then(function success(data) {
+      $scope.motd = data;
+    });
 
     $q.all({
       endpoints: EndpointService.endpoints(),

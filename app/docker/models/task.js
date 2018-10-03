@@ -5,6 +5,7 @@ function TaskViewModel(data) {
   this.Slot = data.Slot;
   this.Spec = data.Spec;
   this.Status = data.Status;
+  this.DesiredState = data.DesiredState;
   this.ServiceId = data.ServiceID;
   this.NodeId = data.NodeID;
   if (data.Status && data.Status.ContainerStatus && data.Status.ContainerStatus.ContainerID) {

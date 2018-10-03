@@ -45,7 +45,7 @@ function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMember
 
   $scope.promoteToLeader = function(user) {
     TeamMembershipService.updateMembership(user.MembershipId, user.Id, $scope.team.Id, 1)
-    .then(function success(data) {
+    .then(function success() {
       $scope.leaderCount++;
       user.TeamRole = 'Leader';
       Notifications.success('User is now team leader', user.Username);
@@ -57,7 +57,7 @@ function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMember
 
   $scope.demoteToMember = function(user) {
     TeamMembershipService.updateMembership(user.MembershipId, user.Id, $scope.team.Id, 2)
-    .then(function success(data) {
+    .then(function success() {
       user.TeamRole = 'Member';
       $scope.leaderCount--;
       Notifications.success('User is now team member', user.Username);
@@ -109,7 +109,7 @@ function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMember
       teamMembershipQueries.push(TeamMembershipService.deleteMembership(user.MembershipId));
     });
     $q.all(teamMembershipQueries)
-    .then(function success(data) {
+    .then(function success() {
       $scope.users = $scope.users.concat($scope.teamMembers);
       $scope.teamMembers = [];
       Notifications.success('All users successfully removed');
@@ -133,7 +133,7 @@ function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMember
 
   function deleteTeam() {
     TeamService.deleteTeam($scope.team.Id)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Team successfully deleted', $scope.team.Name);
       $state.go('portainer.teams');
     })

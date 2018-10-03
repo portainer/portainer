@@ -25,7 +25,7 @@ function ($q, $scope, $state, $transition$, UserService, ModalService, Notificat
   $scope.updatePermissions = function() {
     var role = $scope.formValues.Administrator ? 1 : 2;
     UserService.updateUser($scope.user.Id, undefined, role)
-    .then(function success(data) {
+    .then(function success() {
       var newRole = role === 1 ? 'administrator' : 'user';
       Notifications.success('Permissions successfully updated', $scope.user.Username + ' is now ' + newRole);
       $state.reload();
@@ -37,7 +37,7 @@ function ($q, $scope, $state, $transition$, UserService, ModalService, Notificat
 
   $scope.updatePassword = function() {
     UserService.updateUser($scope.user.Id, $scope.formValues.newPassword, undefined)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Password successfully updated');
       $state.reload();
     })
@@ -48,7 +48,7 @@ function ($q, $scope, $state, $transition$, UserService, ModalService, Notificat
 
   function deleteUser() {
     UserService.deleteUser($scope.user.Id)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('User successfully deleted', $scope.user.Username);
       $state.go('portainer.users');
     })

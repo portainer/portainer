@@ -7,7 +7,19 @@
   <rd-header-content>Endpoints</rd-header-content>
 </rd-header>
 
-<information-panel title-text="Information">
+<information-panel
+  ng-if="motd && applicationState.UI.dismissedInfoHash !== motd.Hash"
+  title-text="Important message"
+  dismiss-action="dismissImportantInformation(motd.Hash)">
+  <span class="text-muted">
+    <p ng-bind-html="motd.Message"></p>
+  </span>
+</information-panel>
+
+<information-panel
+  ng-if="!applicationState.UI.dismissedInfoPanels['home-info-01']"
+  title-text="Information"
+  dismiss-action="dismissInformationPanel('home-info-01')">
   <span class="small text-muted">
     <p ng-if="endpoints.length > 0">
       Welcome to Portainer ! Click on any endpoint in the list below to access management features.
@@ -32,6 +44,8 @@
       dashboard-action="goToDashboard"
       show-snapshot-action="!applicationState.application.authentication || isAdmin"
       snapshot-action="triggerSnapshot"
+      edit-action="goToEdit"
+      is-admin="isAdmin"
     ></endpoint-list>
   </div>
 </div>

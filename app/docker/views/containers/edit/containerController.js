@@ -15,6 +15,8 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
     leaveNetworkInProgress: false
   };
 
+  $scope.updateRestartPolicy = updateRestartPolicy;
+
   var update = function () {
     var nodeName = $transition$.params().nodeName;
     HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
@@ -54,7 +56,7 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
 
   function executeContainerAction(id, action, successMessage, errorMessage) {
     action(id)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success(successMessage, id);
       update();
     })
@@ -102,7 +104,7 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
   $scope.renameContainer = function () {
     var container = $scope.container;
     ContainerService.renameContainer($transition$.params().id, container.newContainerName)
-    .then(function success(data) {
+    .then(function success() {
       container.Name = container.newContainerName;
       Notifications.success('Container successfully renamed', container.Name);
     })
@@ -118,7 +120,7 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
   $scope.containerLeaveNetwork = function containerLeaveNetwork(container, networkId) {
     $scope.state.leaveNetworkInProgress = true;
     NetworkService.disconnectContainer(networkId, container.Id, false)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Container left network', container.Id);
       $state.reload();
     })
@@ -133,7 +135,7 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
   $scope.containerJoinNetwork = function containerJoinNetwork(container, networkId) {
     $scope.state.joinNetworkInProgress = true;
     NetworkService.connectContainer(networkId, container.Id)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Container joined network', container.Id);
       $state.reload();
     })
@@ -149,7 +151,7 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
     var image = $scope.config.Image;
     var registry = $scope.config.Registry;
     var imageConfig = ImageHelper.createImageConfigForCommit(image, registry.URL);
-    Commit.commitContainer({id: $transition$.params().id, tag: imageConfig.tag, repo: imageConfig.repo}, function (d) {
+    Commit.commitContainer({id: $transition$.params().id, tag: imageConfig.tag, repo: imageConfig.repo}, function () {
       update();
       Notifications.success('Container commited', $transition$.params().id);
     }, function (e) {
@@ -194,9 +196,9 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
     $scope.state.recreateContainerInProgress = true;
     var isRunning = container.State.Running;
 
-    return stopContainerIfNeeded()
+    return pullImageIfNeeded()
+      .then(stopContainerIfNeeded)
       .then(renameContainer)
-      .then(pullImageIfNeeded)
       .then(setMainNetworkAndCreateContainer)
       .then(connectContainerToOtherNetworks)
       .then(startContainerIfNeeded)
@@ -307,6 +309,28 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
       recreateContainer(pullImage);
     });
   };
+
+  function updateRestartPolicy(restartPolicy, maximumRetryCount) {
+    maximumRetryCount = restartPolicy === 'on-failure' ? maximumRetryCount : undefined;
+
+    return ContainerService
+      .updateRestartPolicy($scope.container.Id, restartPolicy, maximumRetryCount)
+      .then(onUpdateSuccess)
+      .catch(notifyOnError);
+
+    function onUpdateSuccess() {
+      $scope.container.HostConfig.RestartPolicy = {
+        Name: restartPolicy,
+        MaximumRetryCount: maximumRetryCount
+      };
+      Notifications.success('Restart policy updated');
+    }
+
+    function notifyOnError(err) {
+      Notifications.error('Failure', err, 'Unable to update restart policy');
+      return $q.reject(err);
+    }
+  }
 
   var provider = $scope.applicationState.endpoint.mode.provider;
   var apiVersion = $scope.applicationState.endpoint.apiVersion;

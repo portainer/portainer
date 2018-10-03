@@ -14,24 +14,47 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
     Endpoint: null
   };
 
+  $scope.duplicateStack = function duplicateStack(name, endpointId) {
+    var stack = $scope.stack;
+    var env = FormHelper.removeInvalidEnvVars(stack.Env);
+    EndpointProvider.setEndpointID(endpointId);
+
+    return StackService.duplicateStack(name, $scope.stackFileContent,  env, endpointId, stack.Type)
+      .then(onDuplicationSuccess)
+      .catch(notifyOnError);
+
+    function onDuplicationSuccess() {
+      Notifications.success('Stack successfully duplicated');
+      $state.go('portainer.stacks', {}, { reload: true });
+      EndpointProvider.setEndpointID(stack.EndpointId);
+
+    }
+
+    function notifyOnError(err) {
+      Notifications.error('Failure', err, 'Unable to duplicate stack');
+    }
+  };
+
   $scope.showEditor = function() {
     $scope.state.showEditorTab = true;
   };
 
-  $scope.migrateStack = function() {
-    ModalService.confirm({
-      title: 'Are you sure?',
-      message: 'This action will deploy a new instance of this stack on the target endpoint, please note that this does NOT relocate the content of any persistent volumes that may be attached to this stack.',
-      buttons: {
-        confirm: {
-          label: 'Migrate',
-          className: 'btn-danger'
+  $scope.migrateStack = function (name, endpointId) {
+    return $q(function (resolve) {
+      ModalService.confirm({
+        title: 'Are you sure?',
+        message: 'This action will deploy a new instance of this stack on the target endpoint, please note that this does NOT relocate the content of any persistent volumes that may be attached to this stack.',
+        buttons: {
+          confirm: {
+            label: 'Migrate',
+            className: 'btn-danger'
+          }
+        },
+        callback: function onConfirm(confirmed) {
+          if (!confirmed) { return resolve(); }
+          return resolve(migrateStack(name, endpointId));
         }
-      },
-      callback: function onConfirm(confirmed) {
-        if(!confirmed) { return; }
-        migrateStack();
-      }
+      });
     });
   };
 
@@ -45,9 +68,9 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
     );
   };
 
-  function migrateStack() {
+  function migrateStack(name, endpointId) {
     var stack = $scope.stack;
-    var targetEndpointId = $scope.formValues.Endpoint.Id;
+    var targetEndpointId = endpointId;
 
     var migrateRequest = StackService.migrateSwarmStack;
     if (stack.Type === 2) {
@@ -58,14 +81,14 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
     // The EndpointID property is not available for these stacks, we can pass
     // the current endpoint identifier as a part of the migrate request. It will be used if
     // the EndpointID property is not defined on the stack.
-    var endpointId = EndpointProvider.endpointID();
+    var originalEndpointId = EndpointProvider.endpointID();
     if (stack.EndpointId === 0) {
-      stack.EndpointId = endpointId;
+      stack.EndpointId = originalEndpointId;
     }
 
     $scope.state.migrationInProgress = true;
-    migrateRequest(stack, targetEndpointId)
-    .then(function success(data) {
+    return migrateRequest(stack, targetEndpointId, name)
+    .then(function success() {
       Notifications.success('Stack successfully migrated', stack.Name);
       $state.go('portainer.stacks', {}, {reload: true});
     })
@@ -108,7 +131,7 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
 
     $scope.state.actionInProgress = true;
     StackService.updateStack(stack, stackFile, env, prune)
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Stack successfully deployed');
       $state.reload();
     })
@@ -134,7 +157,6 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
 
   function loadStack(id) {
     var agentProxy = $scope.applicationState.endpoint.mode.agentProxy;
-    var endpointId = EndpointProvider.endpointID();
 
     $q.all({
       stack: StackService.stack(id),
@@ -143,9 +165,7 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
     })
     .then(function success(data) {
       var stack = data.stack;
-      $scope.endpoints = data.endpoints.filter(function(endpoint) {
-        return endpoint.Id !== endpointId;
-      });
+      $scope.endpoints = data.endpoints;
       $scope.groups = data.groups;
       $scope.stack = stack;
 
@@ -233,9 +253,9 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
   function loadExternalSwarmStack(name) {
     var agentProxy = $scope.applicationState.endpoint.mode.agentProxy;
 
-    retrieveSwarmStackResources(name)
+    retrieveSwarmStackResources(name, agentProxy)
     .then(function success(data) {
-      assignSwarmStackResources(data);
+      assignSwarmStackResources(data, agentProxy);
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve stack details');
@@ -256,6 +276,7 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
     var stackName = $transition$.params().name;
     $scope.stackName = stackName;
     var external = $transition$.params().external;
+    $scope.currentEndpointId = EndpointProvider.endpointID();
 
     if (external === 'true') {
       $scope.state.externalStack = true;

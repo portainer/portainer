@@ -223,21 +223,13 @@
                   </table>
                 </td>
               </tr>
-              <tr ng-if="container.HostConfig.RestartPolicy.Name !== 'no'">
+              <tr>
                 <td>Restart policies</td>
                 <td>
-                  <table class="table table-bordered table-condensed">
-                    <tr>
-                      <td class="col-md-3">Name</td>
-                      <td>{{ container.HostConfig.RestartPolicy.Name }}</td>
-                    </tr>
-                    <tr>
-                      <td class="col-md-3">MaximumRetryCount</td>
-                      <td>
-                        {{ container.HostConfig.RestartPolicy.MaximumRetryCount }}
-                      </td>
-                    </tr>
-                  </table>
+                  <container-restart-policy ng-if="container"
+                    name="container.HostConfig.RestartPolicy.Name"
+                    maximum-retry-count="container.HostConfig.RestartPolicy.MaximumRetryCount"
+                    update-restart-policy="updateRestartPolicy(name, maximumRetryCount)">
                 </td>
               </tr>
             </tbody>

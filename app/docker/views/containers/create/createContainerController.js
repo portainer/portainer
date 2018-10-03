@@ -2,6 +2,8 @@ angular.module('portainer.docker')
 .controller('CreateContainerController', ['$q', '$scope', '$state', '$timeout', '$transition$', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'NetworkService', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'FormValidator', 'ModalService', 'RegistryService', 'SystemService', 'SettingsService', 'HttpRequestHelper',
 function ($q, $scope, $state, $timeout, $transition$, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, NetworkService, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, FormValidator, ModalService, RegistryService, SystemService, SettingsService, HttpRequestHelper) {
 
+  $scope.create = create;
+
   $scope.formValues = {
     alwaysPull: true,
     Console: 'none',
@@ -48,6 +50,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       Binds: [],
       NetworkMode: 'bridge',
       Privileged: false,
+      Runtime: '',
       ExtraHosts: [],
       Devices: [],
       CapAdd: [],
@@ -279,48 +282,8 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     return config;
   }
 
-  function confirmCreateContainer() {
-    var deferred = $q.defer();
-    Container.query({ all: 1, filters: {name: ['^/' + $scope.config.name + '$'] }}).$promise
-    .then(function success(data) {
-      var existingContainer = data[0];
-      if (existingContainer) {
-        ModalService.confirm({
-          title: 'Are you sure ?',
-          message: 'A container with the same name already exists. Portainer can automatically remove it and re-create one. Do you want to replace it?',
-          buttons: {
-            confirm: {
-              label: 'Replace',
-              className: 'btn-danger'
-            }
-          },
-          callback: function onConfirm(confirmed) {
-            if(!confirmed) { deferred.resolve(false); }
-            else {
-              // Remove old container
-              ContainerService.remove(existingContainer, true)
-              .then(function success(data) {
-                Notifications.success('Container Removed', existingContainer.Id);
-                deferred.resolve(true);
-              })
-              .catch(function error(err) {
-                deferred.reject({ msg: 'Unable to remove container', err: err });
-              });
-            }
-          }
-        });
-      } else {
-        deferred.resolve(true);
-      }
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to retrieve containers');
-      return undefined;
-    });
-    return deferred.promise;
-  }
-
-  function loadFromContainerCmd(d) {
+  
+  function loadFromContainerCmd() {
     if ($scope.config.Cmd) {
       $scope.config.Cmd = ContainerHelper.commandArrayToString($scope.config.Cmd);
     } else {
@@ -328,7 +291,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     }
   }
 
-  function loadFromContainerPortBindings(d) {
+  function loadFromContainerPortBindings() {
     var bindings = [];
     for (var p in $scope.config.HostConfig.PortBindings) {
       if ({}.hasOwnProperty.call($scope.config.HostConfig.PortBindings, p)) {
@@ -411,7 +374,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     } else {
       $scope.formValues.MacAddress = '';
     }
-    
+
     // ExtraHosts
     if ($scope.config.HostConfig.ExtraHosts) {
       var extraHosts = $scope.config.HostConfig.ExtraHosts;
@@ -423,7 +386,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     }
   }
 
-  function loadFromContainerEnvironmentVariables(d) {
+  function loadFromContainerEnvironmentVariables() {
     var envArr = [];
     for (var e in $scope.config.Env) {
       if ({}.hasOwnProperty.call($scope.config.Env, e)) {
@@ -434,7 +397,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     $scope.config.Env = envArr;
   }
 
-  function loadFromContainerLabels(d) {
+  function loadFromContainerLabels() {
     for (var l in $scope.config.Labels) {
       if ({}.hasOwnProperty.call($scope.config.Labels, l)) {
         $scope.formValues.Labels.push({ name: l, value: $scope.config.Labels[l]});
@@ -442,7 +405,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     }
   }
 
-  function loadFromContainerConsole(d) {
+  function loadFromContainerConsole() {
     if ($scope.config.OpenStdin && $scope.config.Tty) {
       $scope.formValues.Console = 'both';
     } else if (!$scope.config.OpenStdin && $scope.config.Tty) {
@@ -454,7 +417,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     }
   }
 
-  function loadFromContainerDevices(d) {
+  function loadFromContainerDevices() {
     var path = [];
     for (var dev in $scope.config.HostConfig.Devices) {
       if ({}.hasOwnProperty.call($scope.config.HostConfig.Devices, dev)) {
@@ -465,7 +428,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     $scope.config.HostConfig.Devices = path;
   }
 
-  function loadFromContainerImageConfig(d) {
+  function loadFromContainerImageConfig() {
     var imageInfo = ImageHelper.extractImageAndRegistryFromRepository($scope.config.Image);
     RegistryService.retrieveRegistryFromRepository($scope.config.Image)
     .then(function success(data) {
@@ -512,7 +475,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     Container.get({ id: $transition$.params().from }).$promise
     .then(function success(d) {
       var fromContainer = new ContainerDetailsViewModel(d);
-      if (!fromContainer.ResourceControl) {
+      if (fromContainer.ResourceControl && fromContainer.ResourceControl.Public) {
         $scope.formValues.AccessControlData.AccessControlEnabled = false;
       }
       $scope.fromContainer = fromContainer;
@@ -581,6 +544,14 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
 
     SystemService.info()
     .then(function success(data) {
+      var runtimes = data.Runtimes;
+      $scope.availableRuntimes = runtimes;
+      if ('runc' in runtimes) {
+        $scope.config.HostConfig.Runtime = 'runc';
+      }
+      else if (Object.keys(runtimes).length !== 0) {
+        $scope.config.HostConfig.Runtime = Object.keys(runtimes)[0];
+      }
       $scope.state.sliderMaxCpu = 32;
       if (data.NCPU) {
         $scope.state.sliderMaxCpu = data.NCPU;
@@ -619,62 +590,179 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     return true;
   }
 
-  $scope.create = function () {
-    confirmCreateContainer()
-    .then(function success(confirm) {
-      if (!confirm) {
-        return false;
+
+  function create() {
+    var oldContainer = null;
+
+
+    HttpRequestHelper.setPortainerAgentTargetHeader($scope.formValues.NodeName);
+    return findCurrentContainer()
+      .then(confirmCreateContainer)
+      .then(startCreationProcess)
+      .catch(notifyOnError)
+      .finally(final);
+
+    function final() {
+      $scope.state.actionInProgress = false;
+    }
+
+    function findCurrentContainer() {
+      return Container.query({ all: 1, filters: { name: ['^/' + $scope.config.name + '$'] } })
+        .$promise
+        .then(function onQuerySuccess(containers) {
+          if (!containers.length) {
+            return;
+          }
+          oldContainer = containers[0];
+          return oldContainer;
+        })
+        .catch(notifyOnError);
+
+      function notifyOnError(err) {
+        Notifications.error('Failure', err, 'Unable to retrieve containers');
+      }
+    }
+
+    function startCreationProcess(confirmed) {
+      if (!confirmed) {
+        return $q.when();
+      }
+      if (!validateAccessControl()) {
+        return $q.when();
+      }
+      $scope.state.actionInProgress = true;
+      return pullImageIfNeeded()
+        .then(stopAndRenameContainer(oldContainer))
+        .then(createNewContainer)
+        .then(applyResourceControl)
+        .then(connectToExtraNetworks)
+        .then(removeOldContainer)
+        .then(onSuccess);
+    }
+
+    function confirmCreateContainer(container) {
+      if (!container) {
+        return $q.when(true);
       }
 
+      return showConfirmationModal();
+
+      function showConfirmationModal() {
+        var deferred = $q.defer();
+
+        ModalService.confirm({
+          title: 'Are you sure ?',
+          message: 'A container with the same name already exists. Portainer can automatically remove it and re-create one. Do you want to replace it?',
+          buttons: {
+            confirm: {
+              label: 'Replace',
+              className: 'btn-danger'
+            }
+          },
+          callback: function onConfirm(confirmed) {
+            deferred.resolve(confirmed);
+          }
+        });
+
+        return deferred.promise;
+      }
+    }
+
+    function stopAndRenameContainer(oldContainer) {
+      if (!oldContainer) {
+        return $q.when();
+      }
+      return stopContainerIfNeeded(oldContainer)
+        .then(renameContainer);
+    }
+
+    function stopContainerIfNeeded(oldContainer) {
+      if (oldContainer.State !== 'running') {
+        return $q.when();
+      }
+      return ContainerService.stopContainer(oldContainer.Id);
+    }
+
+    function renameContainer() {
+      return ContainerService.renameContainer(oldContainer.Id, oldContainer.Names[0].substring(1) + '-old');
+    }
+
+    function pullImageIfNeeded() {
+      return $q.when($scope.formValues.alwaysPull &&
+        ImageService.pullImage($scope.config.Image, $scope.formValues.Registry, true));
+    }
+
+    function createNewContainer() {
+      var config = prepareConfiguration();
+      return ContainerService.createAndStartContainer(config);
+    }
+
+    function applyResourceControl(newContainer) {
+      var containerIdentifier = newContainer.Id;
+      var userId = Authentication.getUserDetails().ID;
+
+      return $q.when(ResourceControlService.applyResourceControl(
+        'container',
+        containerIdentifier,
+        userId,
+        $scope.formValues.AccessControlData, []
+      )).then(function onApplyResourceControlSuccess() {
+        return containerIdentifier;
+      });
+    }
+
+    function connectToExtraNetworks(newContainerId) {
+      if (!$scope.extraNetworks) {
+        return $q.when();
+      }
+
+      var connectionPromises = Object.keys($scope.extraNetworks).map(function (networkName) {
+        return NetworkService.connectContainer(networkName, newContainerId);
+      });
+
+      return $q.all(connectionPromises);
+    }
+
+    function removeOldContainer() {
+      var deferred = $q.defer();
+
+      if (!oldContainer) {
+        deferred.resolve();
+        return;
+      }
+
+      ContainerService.remove(oldContainer, true)
+        .then(notifyOnRemoval)
+        .catch(notifyOnRemoveError);
+
+      return deferred.promise;
+
+      function notifyOnRemoval() {
+        Notifications.success('Container Removed', oldContainer.Id);
+        deferred.resolve();
+      }
+
+      function notifyOnRemoveError(err) {
+        deferred.reject({ msg: 'Unable to remove container', err: err });
+      }
+    }
+
+    function notifyOnError(err) {
+      Notifications.error('Failure', err, 'Unable to create container');
+    }
+
+    function validateAccessControl() {
       var accessControlData = $scope.formValues.AccessControlData;
       var userDetails = Authentication.getUserDetails();
       var isAdmin = userDetails.role === 1;
 
-      if (!validateForm(accessControlData, isAdmin)) {
-        return;
-      }
+      return validateForm(accessControlData, isAdmin);
+    }
 
-      $scope.state.actionInProgress = true;
-      var config = prepareConfiguration();
-      var nodeName = $scope.formValues.NodeName;
-      HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
-      createContainer(config, accessControlData);
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to create container');
-    });
-  };
-
-  function createContainer(config, accessControlData) {
-    var containerIdentifier;
-    $q.when(!$scope.formValues.alwaysPull || ImageService.pullImage($scope.config.Image, $scope.formValues.Registry, true))
-    .finally(function final() {
-      ContainerService.createAndStartContainer(config)
-      .then(function success(data) {
-        containerIdentifier = data.Id;
-        var userId = Authentication.getUserDetails().ID;
-        return ResourceControlService.applyResourceControl('container', containerIdentifier, userId, accessControlData, []);
-      })
-      .then(function success() {
-        if($scope.extraNetworks) {
-          return $q.all(
-            Object.keys($scope.extraNetworks).map(function(networkName) {
-              return NetworkService.connectContainer(networkName, containerIdentifier);
-            })
-          );
-        }
-      })
-      .then(function success() {
-        Notifications.success('Container successfully created');
-        $state.go('docker.containers', {}, {reload: true});
-      })
-      .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to create container');
-      })
-      .finally(function final() {
-        $scope.state.actionInProgress = false;
-      });
-    });
+    function onSuccess() {
+      Notifications.success('Container successfully created');
+      $state.go('docker.containers', {}, { reload: true });
+    }
   }
 
   initView();

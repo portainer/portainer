@@ -54,7 +54,7 @@ info:
 
     **NOTE**: You can find more information on how to query the Docker API in the [Docker official documentation](https://docs.docker.com/engine/api/v1.30/) as well as in [this Portainer example](https://gist.github.com/deviantony/77026d402366b4b43fa5918d41bc42f8).
 
-  version: "1.19.2-dev"
+  version: "1.20-dev"
   title: "Portainer API"
   contact:
     email: "info@portainer.io"
@@ -1336,7 +1336,7 @@ paths:
         in: "formData"
         type: "string"
         description: "Swarm cluster identifier. Required when method equals file and type equals 1."
-      - name: "StackFileContent"
+      - name: "file"
         in: "formData"
         type: "file"
         description: "Stack file. Required when method equals file."
@@ -2816,7 +2816,7 @@ definitions:
         description: "Is analytics enabled"
       Version:
         type: "string"
-        example: "1.19.2-dev"
+        example: "1.20-dev"
         description: "Portainer API version"
   PublicSettingsInspectResponse:
     type: "object"
@@ -4160,6 +4160,10 @@ definitions:
         type: "string"
         example: "jpofkc0i9uo9wtx1zesuk649w"
         description: "Swarm cluster identifier, must match the identifier of the cluster where the stack will be relocated"
+      Name:
+        type: "string"
+        example: "new-stack"
+        description: "If provided will rename the migrated stack"
   StackCreateRequest:
     type: "object"
     required:

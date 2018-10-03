@@ -6,11 +6,11 @@ import (
 	"strings"
 
 	"github.com/asaskevich/govalidator"
+	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/request"
+	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/filesystem"
-	httperror "github.com/portainer/portainer/http/error"
-	"github.com/portainer/portainer/http/request"
-	"github.com/portainer/portainer/http/response"
 	"github.com/portainer/portainer/http/security"
 )
 
@@ -194,7 +194,7 @@ func (payload *composeStackFromFileUploadPayload) Validate(r *http.Request) erro
 	}
 	payload.Name = name
 
-	composeFileContent, err := request.RetrieveMultiPartFormFile(r, "file")
+	composeFileContent, _, err := request.RetrieveMultiPartFormFile(r, "file")
 	if err != nil {
 		return portainer.Error("Invalid Compose file. Ensure that the Compose file is uploaded correctly")
 	}

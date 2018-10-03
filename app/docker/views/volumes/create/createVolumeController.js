@@ -82,7 +82,7 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
       var userId = userDetails.ID;
       return ResourceControlService.applyResourceControl('volume', volumeIdentifier, userId, accessControlData, []);
     })
-    .then(function success(data) {
+    .then(function success() {
       Notifications.success('Volume successfully created');
       $state.go('docker.volumes', {}, {reload: true});
     })
