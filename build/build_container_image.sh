@@ -5,8 +5,11 @@ docker push "ssbkang/portainer:$1-$2-$3"
 docker push "ssbkang/portainer:$1-$2"
 
 if [ "${2}" == 's390x' ] ; then
-  go get github.com/estesp/manifest-tool
+  wget https://github.com/estesp/manifest-tool/releases/download/v0.8.0/manifest-tool-linux-amd64
   git clone -q --branch=master $6 /home/appveyor/projects/docker-manifest
-  manifest-tool push from-spec /home/appveyor/projects/docker-manifest/portainer-1-19-2.yml
-  manifest-tool push from-spec /home/appveyor/projects/docker-manifest/portainer.yml
+
+  chmod 755 manifest-tool-linux-amd64
+  
+  ./manifest-tool-linux-amd64 push from-spec /home/appveyor/projects/docker-manifest/portainer-1-19-2.yml
+  ./manifest-tool-linux-amd64 push from-spec /home/appveyor/projects/docker-manifest/portainer.yml
 fi
