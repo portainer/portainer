@@ -15,28 +15,10 @@ angular.module('portainer.app')
     return PortainerPlugin.delete({ id: id }).$promise;
   };
 
-  // TODO: same as store, except store = false, refactor
-  service.plugins = function() {
+  service.plugins = function(store) {
     var deferred = $q.defer();
 
-    PortainerPlugin.query({ store: false }).$promise
-    .then(function success(data) {
-      var plugins = data.map(function (item) {
-        return new PortainerPluginViewModel(item);
-      });
-      deferred.resolve(plugins);
-    })
-    .catch(function error(err) {
-      deferred.reject({msg: 'Unable to retrieve plugins', err: err});
-    });
-
-    return deferred.promise;
-  };
-
-  service.store = function() {
-    var deferred = $q.defer();
-
-    PortainerPlugin.query({ store: true }).$promise
+    PortainerPlugin.query({ store: store }).$promise
     .then(function success(data) {
       var plugins = data.map(function (item) {
         return new PortainerPluginViewModel(item);

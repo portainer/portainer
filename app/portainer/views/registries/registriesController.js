@@ -61,7 +61,7 @@ function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, N
     $q.all({
       registries: RegistryService.registries(),
       dockerhub: DockerHubService.dockerhub(),
-      plugins: PortainerPluginService.plugins()
+      plugins: PortainerPluginService.plugins(false)
     })
     .then(function success(data) {
       $scope.registries = data.registries;

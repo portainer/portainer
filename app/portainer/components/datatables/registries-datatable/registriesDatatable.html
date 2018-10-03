@@ -65,8 +65,7 @@
                   <i class="fa fa-search" aria-hidden="true"></i> Browse
                 </a>
                 <a ui-sref="portainer.plugins.plugin({id: 1})" ng-if="!$ctrl.registryManagement" class="space-left">
-                  <!-- TODO: plugin-tooltip component -->
-                  <i class="fa fa-search" aria-hidden="true"></i> Browse ( <i class="fa fa-bolt orange-icon" aria-hidden="true" tooltip-append-to-body="true" tooltip-placement="bottom" tooltip-class="portainer-tooltip" uib-tooltip="Feature available via a plug-in"></i> )
+                  <i class="fa fa-search" aria-hidden="true"></i> Browse ( <plugin-tooltip></plugin-tooltip> )
                 </a>
               </td>
             </tr>

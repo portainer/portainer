@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 )
 
-// TODO: document with comment
+// UnzipArchive will unzip an archive from bytes into the dest destination folder on disk
 func UnzipArchive(archiveData []byte, dest string) error {
 	zipReader, err := zip.NewReader(bytes.NewReader(archiveData), int64(len(archiveData)))
 	if err != nil {

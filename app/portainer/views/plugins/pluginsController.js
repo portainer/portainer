@@ -11,7 +11,7 @@ function ($scope, $state, PortainerPluginService, Notifications) {
   };
 
   function initView() {
-    PortainerPluginService.store()
+    PortainerPluginService.plugins(true)
     .then(function onSuccess(data) {
       $scope.plugins = data;
     })
