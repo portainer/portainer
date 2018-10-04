@@ -12,9 +12,9 @@ if [ -z "$7"] ; then
   mkdir -pv portainer
   cp -r dist/* portainer
   tar cvpfz "portainer-$3-$1-$2.tar.gz" portainer
-  tag=$1-$2
+  tag="$1-$2"
 else
-  tag=$7
+  tag="$7"
 fi
 
 docker build -t "ssbkang/portainer:$1-$2-$3" -f build/linux/Dockerfile .
