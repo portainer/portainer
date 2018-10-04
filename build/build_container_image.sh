@@ -17,6 +17,7 @@ if [ ! -z "${APPVEYOR_PULL_REQUEST_NUMBER}" ] ; then
   docker build -t "ssbkang/portainer:$tag" -f build/linux/Dockerfile .
   docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
   docker push "ssbkang/portainer:$tag"
+else
   #mkdir -pv portainer
   #cp -r dist/* portainer
   #tar cvpfz "portainer-$3-$1-$2.tar.gz" portainer

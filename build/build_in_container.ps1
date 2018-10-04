@@ -3,6 +3,8 @@ param (
   [string]$arch
 )
 
+$ErrorActionPreference = "Stop";
+
 $binary = "portainer.exe"
 
 Set-Item env:GOPATH "C:\projects\portainer\api"
