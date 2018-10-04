@@ -1,4 +1,4 @@
-if [ ${7} ] ; then
+if [ $7 ] ; then
   tag="pr$7"
   docker build -t "ssbkang/portainer:$tag" -f build/linux/Dockerfile .
   docker login -u "$4" -p "$5"
@@ -25,4 +25,3 @@ else
     ./manifest-tool-linux-amd64 push from-spec /home/appveyor/projects/docker-manifest/portainer/portainer.yml
   fi
 fi
-
