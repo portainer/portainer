@@ -11,8 +11,6 @@ environment:
   GITHUB_MANIFEST_URL:
     secure: QBT01r3E0cgExWfzaQKDH6bRhEqNi1zAiSJ1SYhDWAomFndbyZ9xl5QwvPzTnA8L
   IMAGE: linux
-  auth_token:
-    secure: yC+WkZ45ZI6a4adDsjJS71L9GvbPLjTC9Q1QpTQdsqVlBb6DjEPYg6NuJ79nNFeh
 branches:
   only:
     - develop
@@ -23,3 +21,8 @@ build_script:
   - sh: echo APPVEYOR_PULL_REQUEST_TITLE $APPVEYOR_PULL_REQUEST_TITLE & echo APPVEYOR_PULL_REQUEST_NUMBER $APPVEYOR_PULL_REQUEST_NUMBER & echo APPVEYOR_PULL_REQUEST_HEAD_REPO_NAME $APPVEYOR_PULL_REQUEST_HEAD_REPO_NAME & echo APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH $APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH & echo APPVEYOR_REPO_BRANCH $APPVEYOR_REPO_BRANCH
   - sh: yarn grunt release:$IMAGE:$ARCH
   - sh: sudo bash build/build_container_image.sh $IMAGE $ARCH $PORTAINER_VERSION $DOCKER_USER $DOCKER_PASS $GITHUB_MANIFEST_URL $APPVEYOR_PULL_REQUEST_NUMBER
+notifications:
+  - provider: GitHubPullRequest
+    auth_token:
+      secure: yC+WkZ45ZI6a4adDsjJS71L9GvbPLjTC9Q1QpTQdsqVlBb6DjEPYg6NuJ79nNFeh
+    template: "{{#passed}}:white_check_mark:{{/passed}}{{#failed}}:x:{{/failed}} [Build {{&projectName}} {{buildVersion}} {{status}}]({{buildUrl}}) (commit {{commitUrl}} by @{{&commitAuthorUsername}})"
