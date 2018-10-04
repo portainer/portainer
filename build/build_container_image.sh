@@ -1,10 +1,9 @@
-if [ ! -z "${APPVEYOR_PULL_REQUEST_NUMBER}" ] ; then
+if [ "${APPVEYOR_PULL_REQUEST_NUMBER}" ]; then
   tag="pr${APPVEYOR_PULL_REQUEST_NUMBER}"
   docker build -t "ssbkang/portainer:$tag" -f build/linux/Dockerfile .
   docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
   docker push "ssbkang/portainer:$tag"
-
-elif [ -z "${APPVEYOR_PULL_REQUEST_NUMBER}" ] ; then
+else
   mkdir -pv portainer
   cp -r dist/* portainer
   tar cvpfz "portainer-$PORTAINER_VERSION-$IMAGE-$ARCH.tar.gz" portainer
