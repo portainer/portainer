@@ -16,6 +16,8 @@ stack: node 9
 install:
   - yarn install
 build_script:
+  - echo $DOCKER_USER
+  - echo $DOCKER_PASS
   - sh: yarn grunt release:$IMAGE:$ARCH
   - sh: sudo bash build/build_container_image.sh $IMAGE $ARCH '' $DOCKER_USER $DOCKER_PASS '' $APPVEYOR_PULL_REQUEST_NUMBER
 notifications:
