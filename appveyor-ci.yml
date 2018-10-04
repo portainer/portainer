@@ -17,7 +17,7 @@ install:
   - yarn install
 build_script:
   - sh: yarn grunt release:$IMAGE:$ARCH
-  - sh: sudo bash build/build_container_image.sh $IMAGE $ARCH ' ' $DOCKER_USER $DOCKER_PASS ' ' $APPVEYOR_PULL_REQUEST_NUMBER
+  - sh: sudo bash build/build_container_image.sh $IMAGE $ARCH 'input1' $DOCKER_USER $DOCKER_PASS 'input2' $APPVEYOR_PULL_REQUEST_NUMBER
 notifications:
   - provider: GitHubPullRequest
     auth_token:
