@@ -1,15 +1,18 @@
-echo $1
-echo $2
-echo $3
-echo $4
-echo $5
-echo $6
-echo $7
+IMAGE="$1"
+ARCH="$2"
+PORTAINER_VERSION="$3"
+DOCKER_USER="$4"
+DOCKER_PASS="$5"
+GITHUB_MANIFEST_URL="$6"
+APPVEYOR_PULL_REQUEST_NUMBER="$7"
 
-if [ $7 ] ; then
-  tag="pr$7"
+echo "${DOCKER_USER}"
+echo "${DOCKER_PASS}"
+
+if [ ${APPVEYOR_PULL_REQUEST_NUMBER} ] ; then
+  tag="pr${APPVEYOR_PULL_REQUEST_NUMBER}"
   docker build -t "ssbkang/portainer:$tag" -f build/linux/Dockerfile .
-  docker login -u "$4" -p "$5"
+  docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
   docker push "ssbkang/portainer:$tag"
 else
   echo "Don't"
