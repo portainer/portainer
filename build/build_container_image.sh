@@ -6,10 +6,7 @@ DOCKER_PASS="$5"
 GITHUB_MANIFEST_URL="$6"
 APPVEYOR_PULL_REQUEST_NUMBER="$7"
 
-echo "${DOCKER_USER}"
-echo "${DOCKER_PASS}"
-
-if [ ${APPVEYOR_PULL_REQUEST_NUMBER} ] ; then
+if [ ! -z "${APPVEYOR_PULL_REQUEST_NUMBER}" ] ; then
   tag="pr${APPVEYOR_PULL_REQUEST_NUMBER}"
   docker build -t "ssbkang/portainer:$tag" -f build/linux/Dockerfile .
   docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
