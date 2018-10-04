@@ -28,7 +28,7 @@ matrix:
       ARCH: s390x
 branches:
   only:
-    - develop
+    - master
 stack: node 9
 artifacts:
   - path: 'portainer-$(PORTAINER_VERSION)-$(IMAGE)-$(ARCH).tar.gz'
@@ -55,4 +55,4 @@ deploy:
   draft: true
   prerelease: false
   on:
-    branch: develop
+    branch: master
