@@ -1,4 +1,4 @@
-if [ -z "$7"] ; then
+if [ -z "${7}"] ; then
   mkdir -pv portainer
   cp -r dist/* portainer
   tar cvpfz "portainer-$3-$1-$2.tar.gz" portainer
@@ -19,7 +19,7 @@ if [ -z "$7"] ; then
     ./manifest-tool-linux-amd64 push from-spec /home/appveyor/projects/docker-manifest/portainer/portainer-1-19-2.yml
     ./manifest-tool-linux-amd64 push from-spec /home/appveyor/projects/docker-manifest/portainer/portainer.yml
   fi
-elif [ "$7" ] ; then
+else
   tag="pr$7"
   docker build -t "ssbkang/portainer:$tag" -f build/linux/Dockerfile .
   docker login -u "$4" -p "$5"
