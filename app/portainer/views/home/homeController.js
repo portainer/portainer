@@ -11,12 +11,22 @@ function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, G
     }).catch(function error() {
       endpoint.Status = 2;
     }).finally(function () {
-      if (endpoint.Snapshots[0] && endpoint.Snapshots[0].Swarm === true && endpoint.Status === 2) {
-        Notifications.error('Failure', '', 'Endpoint is offline, connect to another swarm manager');
-      } else if (endpoint.Type === 3) {
-        switchToAzureEndpoint(endpoint);
+      if (endpoint.Status === 1) {
+        if (endpoint.Type === 3) {
+          switchToAzureEndpoint(endpoint);
+        } else {
+          switchToDockerEndpoint(endpoint);
+        }
       } else {
-        switchToDockerEndpoint(endpoint);
+        if (endpoint.Type === 3) {
+          Notifications.error('Failure', '', 'Endpoint is unreachable. Offline browsing disabled for Azure endpoints.');
+        } else if (endpoint.Snapshots[0] && endpoint.Snapshots[0].Swarm === true) {
+          Notifications.error('Failure', '', 'Endpoint is unreachable. Connect to another swarm manager.');
+        } else if (!endpoint.Snashots[0]) {
+          Notifications.error('Failure', '', 'Endpoint is unreachable and there is no snapshot available for offline browsing.');
+        } else {
+          switchToDockerEndpoint(endpoint);
+        }
       }
     });
   };
