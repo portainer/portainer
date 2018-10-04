@@ -14,13 +14,12 @@ echo "${DOCKER_PASS}"
 echo "${GITHUB_MANIFEST_URL}"
 echo "${APPVEYOR_PULL_REQUEST_NUMBER}"
 
-if [ ! -z "${7}" ] ; then
+if [ ! -z "${APPVEYOR_PULL_REQUEST_NUMBER}" ] ; then
   tag="pr${APPVEYOR_PULL_REQUEST_NUMBER}"
   docker build -t "ssbkang/portainer:$tag" -f build/linux/Dockerfile .
   docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
   docker push "ssbkang/portainer:$tag"
 else
-  echo "Don't"
   #mkdir -pv portainer
   #cp -r dist/* portainer
   #tar cvpfz "portainer-$3-$1-$2.tar.gz" portainer
