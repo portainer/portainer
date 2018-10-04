@@ -255,10 +255,6 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     if ($scope.formValues.CpuLimit > 0) {
       config.HostConfig.NanoCpus = $scope.formValues.CpuLimit * 1000000000;
     }
-    // Runtime
-    if (config.HostConfig.Runtime === 'Default') {
-      config.HostConfig.Runtime = '';
-    }
   }
 
   function prepareCapabilities(config) {
@@ -549,8 +545,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     SystemService.info()
     .then(function success(data) {
       $scope.availableRuntimes = Object.keys(data.Runtimes);
-      $scope.availableRuntimes.unshift('Default');
-      $scope.config.HostConfig.Runtime = 'Default';
+      $scope.config.HostConfig.Runtime = '';
       $scope.state.sliderMaxCpu = 32;
       if (data.NCPU) {
         $scope.state.sliderMaxCpu = data.NCPU;
