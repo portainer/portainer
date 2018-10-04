@@ -81,6 +81,14 @@
                 <td>Finished</td>
                 <td>{{ container.State.FinishedAt|getisodate }}</td>
               </tr>
+              <tr ng-if="container.Model.Config.Labels['com.docker.compose.project']">
+                <td>Stack</td>
+                <td>{{ container.Model.Config.Labels["com.docker.compose.project"] }}</td>
+              </tr>
+              <tr ng-if="applicationState.endpoint.mode.agentProxy">
+                <td>Nodename</td>
+                <td>{{ container.NodeName }}</td>
+              </tr>
               <tr>
                 <td colspan="2">
                   <div class="btn-group" role="group" aria-label="...">
