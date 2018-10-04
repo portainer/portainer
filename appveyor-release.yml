@@ -28,7 +28,7 @@ matrix:
       ARCH: s390x
 branches:
   only:
-    - develop
+    - master
 stack: node 9
 artifacts:
   - path: 'portainer-$(PORTAINER_VERSION)-$(IMAGE)-$(ARCH).tar.gz'
@@ -42,7 +42,7 @@ init:
 build_script:
   - sh: yarn grunt release:$IMAGE:$ARCH
   - cmd: yarn grunt release:%IMAGE%:%ARCH%
-  - sh: sudo bash build/build_container_image.sh $IMAGE $ARCH $PORTAINER_VERSION $DOCKER_USER $DOCKER_PASS $GITHUB_MANIFEST_URL
+  - sh: sudo bash build/build_container_image.sh $IMAGE $ARCH $PORTAINER_VERSION $DOCKER_USER $DOCKER_PASS $GITHUB_MANIFEST_URL ' '
   - cmd: powershell -Command "& .\\build\\build_container_image.ps1"
 test: off
 deploy:
@@ -55,4 +55,4 @@ deploy:
   draft: true
   prerelease: false
   on:
-    branch: develop
+    branch: master

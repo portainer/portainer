@@ -2,6 +2,8 @@ param (
   [string]$docker_version
 )
 
+$ErrorActionPreference = "Stop";
+
 New-Item -Path "docker-binary" -ItemType Directory | Out-Null
 
 $download_folder = "C:\projects\portainer\docker-binary"
