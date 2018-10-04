@@ -1,3 +1,11 @@
+IMAGE="$1"	
+ARCH="$2"	
+PORTAINER_VERSION="$3"	
+DOCKER_USER="$4"	
+DOCKER_PASS="$5"	
+GITHUB_MANIFEST_URL="$6"	
+APPVEYOR_PULL_REQUEST_NUMBER="$7"
+
 if [ "${APPVEYOR_PULL_REQUEST_NUMBER}" ]; then
   tag="pr${APPVEYOR_PULL_REQUEST_NUMBER}"
   docker build -t "ssbkang/portainer:$tag" -f build/linux/Dockerfile .
