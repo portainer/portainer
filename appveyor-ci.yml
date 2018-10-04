@@ -22,4 +22,4 @@ notifications:
   - provider: GitHubPullRequest
     auth_token:
       secure: yC+WkZ45ZI6a4adDsjJS71L9GvbPLjTC9Q1QpTQdsqVlBb6DjEPYg6NuJ79nNFeh
-    template: "{{#passed}}:white_check_mark:{{/passed}}{{#failed}}:x:{{/failed}} [Build {{&projectName}} {{buildVersion}} {{status}}]({{buildUrl}}) Test the image ssbkang/portainer:pr$(APPVEYOR_PULL_REQUEST_NUMBER) (commit {{commitUrl}} by @{{&commitAuthorUsername}})"
+    template: "{{#passed}}:white_check_mark:{{/passed}}{{#failed}}:x:{{/failed}} [Build {{&projectName}} {{buildVersion}} {{status}}]({{buildUrl}}) (commit {{commitUrl}} by @{{&commitAuthorUsername}})"
