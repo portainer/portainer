@@ -11,10 +11,11 @@
       <rd-widget-body>
         <form class="form-horizontal">
           <!-- name-input -->
-          <div class="form-group">
+          <div ng-class="{'form-group': true, 'has-error': !stackNameAvailable, 'has-feedback': !stackNameAvailable}">
             <label for="stack_name" class="col-sm-1 control-label text-left">Name</label>
             <div class="col-sm-11">
-              <input type="text" class="form-control" ng-model="formValues.Name" id="stack_name" placeholder="e.g. myStack" auto-focus>
+              <input type="text" class="form-control" ng-model="formValues.Name" ng-change="stackNameChange(formValues.Name)" id="stack_name" placeholder="e.g. myStack" auto-focus>
+              <span ng-if="!stackNameAvailable" class="glyphicon glyphicon-remove form-control-feedback"></span>
             </div>
           </div>
           <!-- !name-input -->
@@ -213,7 +214,7 @@
               <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress
               || (state.Method === 'upload' && !formValues.StackFile)
               || (state.Method === 'repository' && ((!formValues.RepositoryURL || !formValues.ComposeFilePathInRepository) || (formValues.RepositoryAuthentication && (!formValues.RepositoryUsername || !formValues.RepositoryPassword))))
-              || !formValues.Name" ng-click="deployStack()" button-spinner="state.actionInProgress">
+              || !formValues.Name || !stackNameAvailable" ng-click="deployStack()" button-spinner="state.actionInProgress">
                 <span ng-hide="state.actionInProgress">Deploy the stack</span>
                 <span ng-show="state.actionInProgress">Deployment in progress...</span>
               </button>
