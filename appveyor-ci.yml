@@ -13,7 +13,7 @@ environment:
     secure: yC+WkZ45ZI6a4adDsjJS71L9GvbPLjTC9Q1QpTQdsqVlBb6DjEPYg6NuJ79nNFeh
 branches:
   only:
-    - $(APPVEYOR_PULL_REQUEST_NUMBER)
+    - develop
 stack: node 9
 install:
   - yarn install
