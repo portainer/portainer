@@ -14,7 +14,7 @@ if [ -z "$7"] ; then
   tar cvpfz "portainer-$3-$1-$2.tar.gz" portainer
   tag="$1-$2"
 else
-  tag="$7"
+  tag="PR-$7"
 fi
 
 docker build -t "ssbkang/portainer:$1-$2-$3" -f build/linux/Dockerfile .

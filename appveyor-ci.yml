@@ -8,6 +8,8 @@ environment:
     secure: JapmC7j5F0mY3j/MVzU+Cw==
   DOCKER_PASS:
     secure: QGlCLNWzPD0HL8ipkohVic45/yU3bVOdjn0IiV6NnSQ=
+  GITHUB_MANIFEST_URL:
+    secure: QBT01r3E0cgExWfzaQKDH6bRhEqNi1zAiSJ1SYhDWAomFndbyZ9xl5QwvPzTnA8L
   IMAGE: linux
   auth_token:
     secure: yC+WkZ45ZI6a4adDsjJS71L9GvbPLjTC9Q1QpTQdsqVlBb6DjEPYg6NuJ79nNFeh
