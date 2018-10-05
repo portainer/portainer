@@ -15,7 +15,12 @@ branches:
 stack: node 9
 install:
   - yarn install
+init:
+  - ps: >-
+      $if (!(Test-Path ~/.docker)) { mkdir ~/.docker }
+      Set-Content -Value '{ "experimental": "enabled" }' -Path ~/.docker/config.json -Encoding Ascii
 build_script:
+  - sh: cat ~/.docker/config.json
   - sh: yarn grunt release:$IMAGE:$ARCH
   - sh: sudo bash build/build_container_image.sh $IMAGE $ARCH ' ' $DOCKER_USER $DOCKER_PASS ' ' $APPVEYOR_PULL_REQUEST_NUMBER
 notifications:
