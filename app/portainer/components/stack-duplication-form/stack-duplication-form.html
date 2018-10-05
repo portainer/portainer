@@ -9,12 +9,15 @@
       </p>
     </span>
     <div>
-      <div ng-class="{'form-group': true, 'has-error': !$ctrl.stackNameAvailable, 'has-feedback': !$ctrl.stackNameAvailable}">
+      <div ng-class="{'form-group': true, 'has-warning': !$ctrl.stackNameAvailable, 'has-feedback': !$ctrl.stackNameAvailable}">
         <input class="form-control" placeholder="Stack name (optional for migration)" 
           aria-placeholder="Stack name"
           ng-change="$ctrl.stackNameChange($ctrl.formValues.newName)"
           ng-model="$ctrl.formValues.newName" />
-          <span ng-if="!$ctrl.stackNameAvailable" class="glyphicon glyphicon-remove form-control-feedback"></span>
+          <span ng-if="!$ctrl.stackNameAvailable" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+          <div ng-if="!$ctrl.stackNameAvailable" class="help-block">
+            The stack name can't be used to duplicate
+          </div>
       </div>
       <endpoint-selector ng-if="$ctrl.endpoints && $ctrl.groups" model="$ctrl.formValues.endpoint"
         endpoints="$ctrl.endpoints" groups="$ctrl.groups"></endpoint-selector>
