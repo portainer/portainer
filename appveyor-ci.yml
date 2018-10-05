@@ -17,7 +17,7 @@ install:
   - yarn install
 init:
   - ps: >-
-      $if (!(Test-Path ~/.docker)) { mkdir ~/.docker }
+      $if (!(Test-Path ~/.docker)) { mkdir ~/.docker };
       Set-Content -Value '{ "experimental": "enabled" }' -Path ~/.docker/config.json -Encoding Ascii
 build_script:
   - sh: cat ~/.docker/config.json
