@@ -89,17 +89,8 @@ function (PaginationService, DatatableService, EndpointProvider) {
   };
 
   this.ipComparator = function(ip1, ip2) {
-    if(this.state.orderBy !== 'IP') {
+    if(this.state.orderBy !== 'IP' || (!ip1 && !ip2)) {
       return ip1 - ip2;
-    }
-    if(!ip1) {
-      return -1;
-    }
-    if(!ip2) {
-      return 1;
-    }
-    if(!ip1 && !ip2) {
-      return 0;
     }
     
     var ip1Parts = ip1.split('.');
