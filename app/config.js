@@ -52,6 +52,7 @@ angular.module('portainer')
 
     cfpLoadingBarProvider.includeSpinner = false;
     cfpLoadingBarProvider.parentSelector = '#loadingbar-placeholder';
+    cfpLoadingBarProvider.latencyThreshold = 600;
 
     $urlRouterProvider.otherwise('/auth');
   }]);

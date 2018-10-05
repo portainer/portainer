@@ -9,7 +9,6 @@ function ($scope, $q, ContainerService, ImageService, NetworkService, VolumeServ
   function initView() {
     var endpointMode = $scope.applicationState.endpoint.mode;
     var endpointId = EndpointProvider.endpointID();
-    // $scope.endpointStatus = StateManager.getState().endpoint.status;
 
     $q.all({
       containers: ContainerService.containers(1),

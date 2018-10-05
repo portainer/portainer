@@ -9,7 +9,7 @@ function ContainerFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, C
   {
     query: {
       method: 'GET', params: { all: 0, action: 'json', filters: '@filters' },
-      isArray: true, interceptor: ContainersInterceptor
+      isArray: true, interceptor: ContainersInterceptor, timeout: 10000
     },
     get: {
       method: 'GET', params: { action: 'json' }

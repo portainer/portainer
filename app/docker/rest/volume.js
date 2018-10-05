@@ -7,7 +7,7 @@ angular.module('portainer.docker')
     endpointId: EndpointProvider.endpointID
   },
   {
-    query: { method: 'GET', interceptor: VolumesInterceptor},
+    query: { method: 'GET', interceptor: VolumesInterceptor, timeout: 10000},
     get: { method: 'GET', params: {id: '@id'} },
     create: {method: 'POST', params: {action: 'create'}, transformResponse: genericHandler, ignoreLoadingBar: true},
     remove: {

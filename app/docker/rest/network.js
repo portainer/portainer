@@ -8,7 +8,7 @@ function NetworkFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, Net
   },
   {
     query: {
-      method: 'GET', isArray: true, interceptor: NetworksInterceptor
+      method: 'GET', isArray: true, interceptor: NetworksInterceptor, timeout: 10000
     },
     get: {
       method: 'GET'

@@ -8,13 +8,12 @@ angular.module('portainer.docker')
   },
   {
     ping: {
-      method: 'GET', params: { action: '_ping' }, ignoreLoadingBar: true
+      method: 'GET', params: { action: '_ping' }, timeout: 10000
     },
     info: {
-      method: 'GET', params: { action: 'info' },
-      ignoreLoadingBar: true, interceptor: InfoInterceptor
+      method: 'GET', params: { action: 'info' }, timeout: 10000, interceptor: InfoInterceptor
     },
-    version: { method: 'GET', params: { action: 'version' }, ignoreLoadingBar: true, timeout: 4500, interceptor: VersionInterceptor },
+    version: { method: 'GET', params: { action: 'version' }, timeout: 4500, interceptor: VersionInterceptor },
     events: {
       method: 'GET', params: { action: 'events', since: '@since', until: '@until' },
       isArray: true, transformResponse: jsonObjectsToArrayHandler
