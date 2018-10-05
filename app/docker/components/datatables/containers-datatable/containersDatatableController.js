@@ -107,8 +107,8 @@ function (PaginationService, DatatableService, EndpointProvider) {
    
     var result = 0;
     for(var i = 0; i < ip1Parts.length; i++) {
-        var num1 = +ipAParts[i];
-        var num2 = +ipBParts[i];
+        var num1 = +ip1Parts[i];
+        var num2 = +ip2Parts[i];
       
         if(num1 != num2) {
           result = num1 - num2;
