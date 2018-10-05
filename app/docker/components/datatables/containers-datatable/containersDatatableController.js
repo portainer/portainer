@@ -110,14 +110,14 @@ function (PaginationService, DatatableService, EndpointProvider) {
         var num1 = +ip1Parts[i];
         var num2 = +ip2Parts[i];
       
-        if(num1 != num2) {
+        if(num1 !== num2) {
           result = num1 - num2;
           break;
         }
     }
     
     return result;
-  }
+  };
 
   this.toggleItemSelection = function(item) {
     if (item.Checked) {
