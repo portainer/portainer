@@ -9,7 +9,6 @@ environment:
     secure: JapmC7j5F0mY3j/MVzU+Cw==
   DOCKER_PASS:
     secure: QGlCLNWzPD0HL8ipkohVic45/yU3bVOdjn0IiV6NnSQ=
-  IMAGE: linux
 branches:
   only:
     - develop
@@ -17,6 +16,8 @@ stack: node 9
 install:
   - yarn install
 init:
+  - sh: export IMAGE=linux
+  - cmd: SET IMAGE=windows
   - ps: >-
       if (!(Test-Path ~/.docker)) { mkdir ~/.docker };
       Set-Content -Value '{ "experimental": "enabled" }' -Path ~/.docker/config.json -Encoding Ascii
