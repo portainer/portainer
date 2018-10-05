@@ -102,13 +102,13 @@ function (PaginationService, DatatableService, EndpointProvider) {
       return 0;
     }
     
-    ip1Parts = ip1.split('.');
-    ip2Parts = ip2.split('.');
+    var ip1Parts = ip1.split('.');
+    var ip2Parts = ip2.split('.');
    
-    let result = 0;
-    for(let i = 0; i < ip1Parts.length; i++) {
-        let num1 = +ipAParts[i];
-        let num2 = +ipBParts[i];
+    var result = 0;
+    for(var i = 0; i < ip1Parts.length; i++) {
+        var num1 = +ipAParts[i];
+        var num2 = +ipBParts[i];
       
         if(num1 != num2) {
           result = num1 - num2;
