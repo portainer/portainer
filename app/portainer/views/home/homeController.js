@@ -2,7 +2,17 @@ angular.module('portainer.app')
 .controller('HomeController', ['$q', '$scope', '$state', 'Authentication', 'EndpointService', 'EndpointHelper', 'GroupService', 'Notifications', 'EndpointProvider', 'StateManager', 'ExtensionManager', 'ModalService', 'MotdService',
 function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, GroupService, Notifications, EndpointProvider, StateManager, ExtensionManager, ModalService, MotdService) {
 
+  function notifyAndResetState(notification, backup) {
+    Notifications.error('Failure', '', notification);
+    EndpointProvider.setEndpointID(backup.id);
+    EndpointProvider.setEndpointPublicURL(backup.publicURL);
+  }
+
   $scope.goToDashboard = function(endpoint) {
+    var currentEndpointBackup = {
+      id: EndpointProvider.endpointID(),
+      publicURL: EndpointProvider.endpointPublicURL()
+    };
     EndpointProvider.setEndpointID(endpoint.Id);
     EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
     StateManager.checkEndpointStatus()
@@ -19,11 +29,11 @@ function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, G
         }
       } else {
         if (endpoint.Type === 3) {
-          Notifications.error('Failure', '', 'Endpoint is unreachable. Offline browsing disabled for Azure endpoints.');
+          notifyAndResetState('Endpoint is unreachable. Offline browsing disabled for Azure endpoints.', currentEndpointBackup);
         } else if (endpoint.Snapshots[0] && endpoint.Snapshots[0].Swarm === true) {
-          Notifications.error('Failure', '', 'Endpoint is unreachable. Connect to another swarm manager.');
+          notifyAndResetState('Endpoint is unreachable. Connect to another swarm manager.', currentEndpointBackup);
         } else if (!endpoint.Snapshots[0]) {
-          Notifications.error('Failure', '', 'Endpoint is unreachable and there is no snapshot available for offline browsing.');
+          notifyAndResetState('Endpoint is unreachable and there is no snapshot available for offline browsing.', currentEndpointBackup);
         } else {
           switchToDockerEndpoint(endpoint);
         }
