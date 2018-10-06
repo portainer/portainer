@@ -137,7 +137,7 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
 
   $scope.stackNameChange = function(name) {
     $scope.stackNameAvailable = $scope.stackNames.indexOf(name) === -1;
-  }
+  };
 
   function initView() {
     var endpointMode = $scope.applicationState.endpoint.mode;
@@ -146,15 +146,13 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
       $scope.state.StackType = 1;
     }
 
-    var endpointId = EndpointProvider.endpointID();
-
     StackService.stacks(
       true,
       endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER',
-      endpointId
+      0
     )
     .then(function success(data) {
-      $scope.stackNames = data.map(x => x.Name);
+      $scope.stackNames = data.map(function(x) {return x.Name;} );
     })
     .catch(function error(err) {
       $scope.stackNames = [];

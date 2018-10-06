@@ -1,6 +1,6 @@
 angular.module('portainer.app').controller('StackDuplicationFormController', [
-  'Notifications', 'StackService', 'EndpointProvider',
-  function StackDuplicationFormController(Notifications, StackService, EndpointProvider) {
+  'Notifications', 'StackService',
+  function StackDuplicationFormController(Notifications, StackService) {
     var ctrl = this;
 
     ctrl.state = {
@@ -22,10 +22,10 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
 
     ctrl.stackNameChange = function(name) {
       ctrl.stackNameAvailable = ctrl.stackNames.indexOf(name) === -1;
-    }
+    };
 
     function isFormValidForMigration() {
-      return ctrl.formValues.endpoint && ctrl.formValues.endpoint.Id && ctrl.stackNameAvailable;
+      return ctrl.formValues.endpoint && ctrl.formValues.endpoint.Id;
     }
 
     function isFormValidForDuplication() {
@@ -80,15 +80,14 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
 
     function initView() {
       var endpointMode = ctrl.applicationState.endpoint.mode;
-      var endpointId = EndpointProvider.endpointID();
   
       StackService.stacks(
         true,
         endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER',
-        endpointId
+        0
       )
       .then(function success(data) {
-        ctrl.stackNames = data.map(x => x.Name);
+        ctrl.stackNames = data.map(function(x) {return x.Name;});
       })
       .catch(function error(err) {
         ctrl.stacks = [];
