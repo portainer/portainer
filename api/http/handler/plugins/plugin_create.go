@@ -85,7 +85,7 @@ func (handler *Handler) enablePlugin(plugin *portainer.Plugin, license string) e
 	// syscall.Exec replaces the process, ForkExec could be tried?
 	// Also should be relocated to another package
 	// err = syscall.ForkExec("/plugins/plugin-registry-management", []string{"plugin-registry-management"}, os.Environ())
-	// cmd := exec.Command("/data/bin/plugin-registry-management")
+	// cmd := exec.Command("/data/bin/plugin-registry-management-linux-amd64-1.0.0")
 	// // cmd.Start will not share logs with the main Portainer container.
 	// err := cmd.Start()
 	// if err != nil {
@@ -99,7 +99,7 @@ func (handler *Handler) enableRegistryManagementPlugin(plugin *portainer.Plugin,
 	// Download/untar
 	// TODO: replace location + constant for base (download.portainer.io ?)
 	// based on current platform+arch, should download the according zip (plugin-registry-manager-linux-amd64.zip)
-	data, err := client.Get("https://github.com/deviantony/xtrabackup-scripts/releases/download/3.1.5/rm01.zip", 30)
+	data, err := client.Get("https://portainer-io-assets.sfo2.digitaloceanspaces.com/plugins/plugin-registry-management-linux-amd64-1.0.0.zip", 30)
 	if err != nil {
 		return err
 	}
@@ -110,7 +110,7 @@ func (handler *Handler) enableRegistryManagementPlugin(plugin *portainer.Plugin,
 		return err
 	}
 
-	licenseValidationCommand := exec.Command("/data/bin/plugin-registry-management", "-license", license, "-check")
+	licenseValidationCommand := exec.Command("/data/bin/plugin-registry-management-linux-amd64-1.0.0", "-license", license, "-check")
 	cmdOutput := &bytes.Buffer{}
 	licenseValidationCommand.Stdout = cmdOutput
 
@@ -130,7 +130,7 @@ func (handler *Handler) enableRegistryManagementPlugin(plugin *portainer.Plugin,
 	// syscall.Exec replaces the process, ForkExec could be tried?
 	// Also should be relocated to another package
 	// err = syscall.ForkExec("/plugins/plugin-registry-management", []string{"plugin-registry-management"}, os.Environ())
-	cmd := exec.Command("/data/bin/plugin-registry-management", "-license", license)
+	cmd := exec.Command("/data/bin/plugin-registry-management-linux-amd64-1.0.0", "-license", license)
 
 	// cmd.Start will not share logs with the main Portainer container.
 	err = cmd.Start()

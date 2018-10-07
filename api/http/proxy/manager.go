@@ -110,7 +110,9 @@ func (manager *Manager) DeletePluginProxy(key string) {
 func (manager *Manager) CreatePluginProxy(pluginID portainer.PluginID) error {
 	// TODO: should be stored in plugin definition somewhere?
 	// otherwise needs a switch or something
-	pluginURL, err := url.Parse("http://localhost:7001")
+
+	// TODO: should pass a secret as a header (license?) to prevent anybody from requesting it.
+	pluginURL, err := url.Parse("http://192.168.35.81:7001")
 	if err != nil {
 		return err
 	}

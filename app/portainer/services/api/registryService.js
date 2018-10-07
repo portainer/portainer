@@ -1,5 +1,5 @@
 angular.module('portainer.app')
-.factory('RegistryService', ['$q', 'Registries', 'DockerHubService', 'RegistryHelper', 'ImageHelper', function RegistryServiceFactory($q, Registries, DockerHubService, RegistryHelper, ImageHelper) {
+.factory('RegistryService', ['$q', 'Registries', 'DockerHubService', 'RegistryHelper', 'ImageHelper', 'FileUploadService', function RegistryServiceFactory($q, Registries, DockerHubService, RegistryHelper, ImageHelper, FileUploadService) {
   'use strict';
   var service = {};
 
@@ -52,6 +52,10 @@ angular.module('portainer.app')
 
   service.updateRegistry = function(registry) {
     return Registries.update({ id: registry.Id }, registry).$promise;
+  };
+
+  service.configureRegistry = function(id, registryManagementConfigurationModel) {
+    return FileUploadService.configureRegistry(id, registryManagementConfigurationModel);
   };
 
   service.createRegistry = function(name, URL, authentication, username, password) {

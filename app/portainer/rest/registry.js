@@ -13,6 +13,7 @@ angular.module('portainer.app')
       transformResponse: function (data, headers) {
         return { version: headers('docker-distribution-api-version') ? headers('docker-distribution-api-version') : 1 };
       }
-    }
+    },
+    configure: { method: 'POST', params: { id: '@id', action: 'configure' } }
   });
 }]);

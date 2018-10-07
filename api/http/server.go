@@ -116,7 +116,7 @@ func startRegistryManagementPlugin(plugin *portainer.Plugin, proxyManager *proxy
 	// TODO: if license check fails, need to be updated to use flags
 	// should probably download and use a specific license-checker binary
 
-	licenseValidationCommand := exec.Command("/data/bin/plugin-registry-management", plugin.License, "--check")
+	licenseValidationCommand := exec.Command("/data/bin/plugin-registry-management-linux-amd64-1.0.0", "-license", plugin.License, "-check")
 	cmdOutput := &bytes.Buffer{}
 	licenseValidationCommand.Stdout = cmdOutput
 
@@ -134,7 +134,7 @@ func startRegistryManagementPlugin(plugin *portainer.Plugin, proxyManager *proxy
 	// syscall.Exec replaces the process, ForkExec could be tried?
 	// Also should be relocated to another package
 	// err = syscall.ForkExec("/plugins/plugin-registry-management", []string{"plugin-registry-management"}, os.Environ())
-	cmd := exec.Command("/data/bin/plugin-registry-management", plugin.License)
+	cmd := exec.Command("/data/bin/plugin-registry-management-linux-amd64-1.0.0", plugin.License)
 
 	// cmd.Start will not share logs with the main Portainer container.
 	err = cmd.Start()

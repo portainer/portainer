@@ -15,6 +15,7 @@ type registryConfigurePayload struct {
 	Username       string
 	Password       string
 	TLS            bool
+	TLSSkipVerify  bool
 	TLSCertFile    []byte
 	TLSKeyFile     []byte
 }
@@ -37,7 +38,10 @@ func (payload *registryConfigurePayload) Validate(r *http.Request) error {
 	useTLS, _ := request.RetrieveBooleanMultiPartFormValue(r, "TLS", true)
 	payload.TLS = useTLS
 
-	if useTLS {
+	skipTLSVerify, _ := request.RetrieveBooleanMultiPartFormValue(r, "TLSSkipVerify", true)
+	payload.TLSSkipVerify = skipTLSVerify
+
+	if useTLS && !skipTLSVerify {
 		cert, _, err := request.RetrieveMultiPartFormFile(r, "TLSCertFile")
 		if err != nil {
 			return portainer.Error("Invalid certificate file. Ensure that the file is uploaded correctly")
@@ -54,15 +58,15 @@ func (payload *registryConfigurePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// PUT request on /api/registries/:id/configure
+// POST request on /api/registries/:id/configure
 func (handler *Handler) registryConfigure(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	registryID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid registry identifier route variable", err}
 	}
 
-	var payload registryConfigurePayload
-	err = request.DecodeAndValidateJSONPayload(r, &payload)
+	payload := &registryConfigurePayload{}
+	err = payload.Validate(r)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
@@ -87,24 +91,26 @@ func (handler *Handler) registryConfigure(w http.ResponseWriter, r *http.Request
 	if payload.TLS {
 		registry.ManagementConfiguration.TLSConfig = portainer.TLSConfiguration{
 			TLS:           true,
-			TLSSkipVerify: true,
+			TLSSkipVerify: payload.TLSSkipVerify,
 		}
 
-		// TODO: store in /data/tls/registry_ID ? If so, registry_ prefix should probably be a constant
-		// Or store somewhere else? /data/plugins/registrymanagement|1/registryid/
-		folder := "registry_" + strconv.Itoa(int(registry.ID))
+		if !payload.TLSSkipVerify {
+			// TODO: store in /data/tls/registry_ID ? If so, registry_ prefix should probably be a constant
+			// Or store somewhere else? /data/plugins/registrymanagement|1/registryid/
+			folder := "registry_" + strconv.Itoa(int(registry.ID))
 
-		certPath, err := handler.FileService.StoreTLSFileFromBytes(folder, portainer.TLSFileCert, payload.TLSCertFile)
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist TLS certificate file on disk", err}
-		}
-		registry.ManagementConfiguration.TLSConfig.TLSCertPath = certPath
+			certPath, err := handler.FileService.StoreTLSFileFromBytes(folder, portainer.TLSFileCert, payload.TLSCertFile)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist TLS certificate file on disk", err}
+			}
+			registry.ManagementConfiguration.TLSConfig.TLSCertPath = certPath
 
-		keyPath, err := handler.FileService.StoreTLSFileFromBytes(folder, portainer.TLSFileKey, payload.TLSKeyFile)
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist TLS key file on disk", err}
+			keyPath, err := handler.FileService.StoreTLSFileFromBytes(folder, portainer.TLSFileKey, payload.TLSKeyFile)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist TLS key file on disk", err}
+			}
+			registry.ManagementConfiguration.TLSConfig.TLSKeyPath = keyPath
 		}
-		registry.ManagementConfiguration.TLSConfig.TLSKeyPath = keyPath
 	}
 
 	err = handler.RegistryService.UpdateRegistry(registry.ID, registry)

@@ -41,18 +41,18 @@
                 <portainer-tooltip position="bottom" message="Enable this option if you need to specify credentials to connect to this registry."></portainer-tooltip>
               </label>
               <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" ng-model="formValues.Authentication"><i></i>
+                <input type="checkbox" ng-model="model.Authentication"><i></i>
               </label>
             </div>
           </div>
           <!-- !authentication-checkbox -->
           <!-- authentication-credentials -->
-          <div ng-if="formValues.Authentication">
+          <div ng-if="model.Authentication">
             <!-- credentials-user -->
             <div class="form-group">
               <label for="credentials_username" class="col-sm-3 col-lg-2 control-label text-left">Username</label>
               <div class="col-sm-9 col-lg-10">
-                <input type="text" class="form-control" id="credentials_username" ng-model="formValues.Username">
+                <input type="text" class="form-control" id="credentials_username" ng-model="model.Username">
               </div>
             </div>
             <!-- !credentials-user -->
@@ -60,7 +60,7 @@
             <div class="form-group">
               <label for="credentials_password" class="col-sm-3 col-lg-2 control-label text-left">Password</label>
               <div class="col-sm-9 col-lg-10">
-                <input type="password" class="form-control" id="credentials_password" ng-model="formValues.Password" placeholder="*******">
+                <input type="password" class="form-control" id="credentials_password" ng-model="model.Password" placeholder="*******">
               </div>
             </div>
             <!-- !credentials-password -->
@@ -75,37 +75,37 @@
                 <portainer-tooltip position="bottom" message="Enable this option if you need to connect to the registry API with TLS."></portainer-tooltip>
               </label>
               <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" ng-model="formData.TLS"><i></i>
+                <input type="checkbox" ng-model="model.TLS"><i></i>
               </label>
             </div>
           </div>
           <!-- !tls-checkbox -->
           <!-- tls-skip-verify -->
-          <div class="form-group" ng-if="formData.TLS">
+          <div class="form-group" ng-if="model.TLS">
             <div class="col-sm-12">
               <label for="tls" class="control-label text-left">
                 Skip certificate verification
                 <portainer-tooltip position="bottom" message="Skip the verification of the server TLS certificate. Not recommended on unsecured networks."></portainer-tooltip>
               </label>
               <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" ng-model="formData.TLSSkipVerify"><i></i>
+                <input type="checkbox" ng-model="model.TLSSkipVerify"><i></i>
               </label>
             </div>
           </div>
           <!-- !tls-skip-verify -->
-          <div class="col-sm-12 form-section-title" ng-if="formData.TLS && !formData.TLSSkipVerify">
+          <div class="col-sm-12 form-section-title" ng-if="model.TLS && !model.TLSSkipVerify">
             Required TLS files
           </div>
           <!-- tls-file-upload -->
-          <div ng-if="formData.TLS && !formData.TLSSkipVerify">
+          <div ng-if="model.TLS && !model.TLSSkipVerify">
             <div class="form-group">
               <label for="tls_cert" class="col-sm-3 col-lg-2 control-label text-left">TLS certificate</label>
               <div class="col-sm-9 col-lg-10">
-                <button class="btn btn-sm btn-primary" ngf-select ng-model="formData.TLSCertificate">Select file</button>
+                <button class="btn btn-sm btn-primary" ngf-select ng-model="model.TLSCertFile">Select file</button>
                 <span style="margin-left: 5px;">
-                  {{ formData.TLSCertificate.name }}
-                  <i class="fa fa-check green-icon" ng-if="formData.TLSCertificate && formData.TLSCertificate === registry.ManagementConfiguration.TLSConfig.TLSCertificate" aria-hidden="true"></i>
-                  <i class="fa fa-times red-icon" ng-if="!formData.TLSCertificate" aria-hidden="true"></i>
+                  {{ model.TLSCertFile.name }}
+                  <i class="fa fa-check green-icon" ng-if="model.TLSCertFile && model.TLSCertFile === registry.ManagementConfiguration.TLSConfig.TLSCertFile" aria-hidden="true"></i>
+                  <i class="fa fa-times red-icon" ng-if="!model.TLSCertFile" aria-hidden="true"></i>
                 </span>
               </div>
             </div>
@@ -114,11 +114,11 @@
             <div class="form-group">
               <label class="col-sm-3 col-lg-2 control-label text-left">TLS key</label>
               <div class="col-sm-9 col-lg-10">
-                <button class="btn btn-sm btn-primary" ngf-select ng-model="formData.TLSKey">Select file</button>
+                <button class="btn btn-sm btn-primary" ngf-select ng-model="model.TLSKeyFile">Select file</button>
                 <span style="margin-left: 5px;">
-                  {{ formData.TLSKey.name }}
-                  <i class="fa fa-check green-icon" ng-if="formData.TLSKey && formData.TLSKey === registry.ManagementConfiguration.TLSConfig.TLSKey" aria-hidden="true"></i>
-                  <i class="fa fa-times red-icon" ng-if="!formData.TLSKey" aria-hidden="true"></i>
+                  {{ model.TLSKeyFile.name }}
+                  <i class="fa fa-check green-icon" ng-if="model.TLSKeyFile && model.TLSKeyFile === registry.ManagementConfiguration.TLSConfig.TLSKeyFile" aria-hidden="true"></i>
+                  <i class="fa fa-times red-icon" ng-if="!model.TLSKeyFile" aria-hidden="true"></i>
                 </span>
               </div>
             </div>
@@ -129,13 +129,13 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress" ng-click="TestConfiguration()" button-spinner="state.actionInProgress">
-                <span ng-hide="state.actionInProgress">Test configuration</span>
-                <span ng-show="state.actionInProgress">Test in progress...</span>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.testInProgress" ng-click="testConfiguration()" button-spinner="state.testInProgress">
+                <span ng-hide="state.testInProgress">Test configuration</span>
+                <span ng-show="state.testInProgress">Test in progress...</span>
               </button>
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress" ng-click="updateConfiguration()" button-spinner="state.actionInProgress">
-                <span ng-hide="state.actionInProgress">Update configuration</span>
-                <span ng-show="state.actionInProgress">Updating configuration...</span>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.updateInProgress" ng-click="updateConfiguration()" button-spinner="state.updateInProgress">
+                <span ng-hide="state.updateInProgress">Update configuration</span>
+                <span ng-show="state.updateInProgress">Updating configuration...</span>
               </button>
             </div>
           </div>

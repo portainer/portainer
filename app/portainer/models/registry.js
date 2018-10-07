@@ -9,3 +9,13 @@ function RegistryViewModel(data) {
   this.AuthorizedTeams = data.AuthorizedTeams;
   this.Checked = false;
 }
+
+function RegistryManagementConfigurationModel() {
+  this.Authentication = false;
+  this.Username = '';
+  this.Password = '';
+  this.TLS = false;
+  this.TLSSkipVerify = false;
+  this.TLSCertFile = null;
+  this.TLSKeyFile = null;
+}

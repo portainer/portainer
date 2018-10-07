@@ -64,6 +64,13 @@ angular.module('portainer.app')
     });
   };
 
+  service.configureRegistry = function(registryId, registryManagementConfigurationModel) {
+    return Upload.upload({
+      url: 'api/registries/' + registryId + '/configure',
+      data: registryManagementConfigurationModel
+    });
+  };
+
   service.createEndpoint = function(name, type, URL, PublicURL, groupID, tags, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
     return Upload.upload({
       url: 'api/endpoints',

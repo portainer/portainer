@@ -1,5 +1,6 @@
-angular.module('portainer.app')
+angular.module('portainer.plugins.registrymanagement')
 .factory('LocalRegistryService', ['$q', 'RegistryCatalog', 'RegistryTags', 'RegistryManifests', 'LocalRegistryHelper',
+// TODO: rename service
 function LocalRegistryServiceFactory($q, RegistryCatalog, RegistryTags, RegistryManifests, LocalRegistryHelper) {
   'use strict';
   var service = {};

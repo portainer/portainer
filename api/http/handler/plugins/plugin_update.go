@@ -76,7 +76,7 @@ func (handler *Handler) updatePlugin(plugin *portainer.Plugin) error {
 	// syscall.Exec replaces the process, ForkExec could be tried?
 	// Also should be relocated to another package
 	// err = syscall.ForkExec("/plugins/plugin-registry-management", []string{"plugin-registry-management"}, os.Environ())
-	// cmd := exec.Command("/data/bin/plugin-registry-management")
+	// cmd := exec.Command("/data/bin/plugin-registry-management-linux-amd64-1.0.0")
 	// // cmd.Start will not share logs with the main Portainer container.
 	// err := cmd.Start()
 	// if err != nil {
@@ -103,7 +103,7 @@ func (handler *Handler) updateRegistryManagementPlugin(plugin *portainer.Plugin)
 	}
 
 	// TODO: remove the existing plugin binary from the filesystem
-	err := handler.FileService.RemoveDirectory("/data/bin/plugin-registry-management")
+	err := handler.FileService.RemoveDirectory("/data/bin/plugin-registry-management-linux-amd64-1.0.0")
 	if err != nil {
 		return err
 	}
@@ -111,7 +111,7 @@ func (handler *Handler) updateRegistryManagementPlugin(plugin *portainer.Plugin)
 	// Download/untar
 	// TODO: replace location + constant for base (download.portainer.io ?)
 	// based on current platform+arch+version, should download the according zip (plugin-registry-management-linux-amd64-1.0.1.zip)
-	data, err := client.Get("https://github.com/deviantony/xtrabackup-scripts/releases/download/3.1.5/rm0101.zip", 30)
+	data, err := client.Get("https://portainer-io-assets.sfo2.digitaloceanspaces.com/plugins/plugin-registry-management-linux-amd64-1.0.0.zip", 30)
 	if err != nil {
 		return err
 	}
@@ -122,7 +122,7 @@ func (handler *Handler) updateRegistryManagementPlugin(plugin *portainer.Plugin)
 		return err
 	}
 
-	licenseValidationCommand := exec.Command("/data/bin/plugin-registry-management", "-license", plugin.License, "-check")
+	licenseValidationCommand := exec.Command("/data/bin/plugin-registry-management-linux-amd64-1.0.0", "-license", plugin.License, "-check")
 	cmdOutput := &bytes.Buffer{}
 	licenseValidationCommand.Stdout = cmdOutput
 
@@ -140,7 +140,7 @@ func (handler *Handler) updateRegistryManagementPlugin(plugin *portainer.Plugin)
 	// syscall.Exec replaces the process, ForkExec could be tried?
 	// Also should be relocated to another package
 	// err = syscall.ForkExec("/plugins/plugin-registry-management", []string{"plugin-registry-management"}, os.Environ())
-	cmd := exec.Command("/data/bin/plugin-registry-management", "-license", plugin.License)
+	cmd := exec.Command("/data/bin/plugin-registry-management-linux-amd64-1.0.0", "-license", plugin.License)
 
 	// cmd.Start will not share logs with the main Portainer container.
 	err = cmd.Start()

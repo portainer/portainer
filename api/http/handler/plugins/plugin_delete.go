@@ -53,7 +53,7 @@ func (handler *Handler) deletePlugin(plugin *portainer.Plugin) error {
 	// syscall.Exec replaces the process, ForkExec could be tried?
 	// Also should be relocated to another package
 	// err = syscall.ForkExec("/plugins/plugin-registry-management", []string{"plugin-registry-management"}, os.Environ())
-	// cmd := exec.Command("/data/bin/plugin-registry-management")
+	// cmd := exec.Command("/data/bin/plugin-registry-management-linux-amd64-1.0.0")
 	// // cmd.Start will not share logs with the main Portainer container.
 	// err := cmd.Start()
 	// if err != nil {
@@ -80,7 +80,7 @@ func (handler *Handler) deleteRegistryManagementPlugin(plugin *portainer.Plugin)
 	}
 
 	// TODO: remove the existing plugin binary from the filesystem
-	err := handler.FileService.RemoveDirectory("/data/bin/plugin-registry-management")
+	err := handler.FileService.RemoveDirectory("/data/bin/plugin-registry-management-linux-amd64-1.0.0")
 	if err != nil {
 		return err
 	}
