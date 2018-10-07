@@ -13,7 +13,7 @@
             <div class="col-sm-5 col-lg-4">
               <select class="form-control" ng-model="$ctrl.selectedNetwork" id="container_network">
                 <option selected disabled hidden value="">Select a network</option>
-                <option ng-repeat="net in $ctrl.availableNetworks" ng-value="net.Id">{{ net.Name }}</option>
+                <option ng-repeat="net in $ctrl.availableNetworks | orderBy: 'Name'" ng-value="net.Id">{{ net.Name }}</option>
               </select>
             </div>
             <div class="col-sm-1">

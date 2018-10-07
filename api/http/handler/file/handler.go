@@ -34,7 +34,6 @@ func (handler *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 	}
 
-	w.Header().Add("X-Frame-Options", "DENY")
 	w.Header().Add("X-XSS-Protection", "1; mode=block")
 	w.Header().Add("X-Content-Type-Options", "nosniff")
 	handler.Handler.ServeHTTP(w, r)
