@@ -13,10 +13,10 @@ angular.module('portainer.agent').controller('FileUploaderController', [
       if (!file) {
         return;
       }
-      
+
       ctrl.state.uploadInProgress = true;
       $q.when(ctrl.uploadFile(file)).finally(function toggleProgress() {
-            ctrl.state.uploadInProgress = false;
+        ctrl.state.uploadInProgress = false;
       });
     }
   }
