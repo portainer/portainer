@@ -41,6 +41,7 @@ angular.module('portainer.app').component('templateForm', {
     };
 
     this.addEnvVarValue = function(env) {
+      env.select = env.select || [];
       env.select.push({ name: '', value: '' });
     };
 
