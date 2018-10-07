@@ -20,14 +20,15 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
         ctrl.engineDetails = buildEngineDetails(node);
         ctrl.nodeDetails = buildNodeDetails(node);
         if (ctrl.state.isAgent) {
-          AgentService.hostInfo(node.Hostname).then(function onHostInfoLoad(agentHostInfo) {
+          AgentService.hostInfo(node.Hostname).then(function onHostInfoLoad(
+            agentHostInfo
+          ) {
             ctrl.devices = agentHostInfo.PCIDevices;
             ctrl.disks = agentHostInfo.PhysicalDisks;
           });
         }
       });
     }
-
 
     function buildHostDetails(node) {
       return {
@@ -60,10 +61,6 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
         nodeLabels: node.Labels
       };
     }
-
-    
-
-   
 
     function transformPlugins(pluginsList, type) {
       return pluginsList
