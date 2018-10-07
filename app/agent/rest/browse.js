@@ -1,22 +1,22 @@
 angular.module('portainer.agent')
 .factory('Browse', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', function BrowseFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
   'use strict';
-  return $resource(API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/browse/:id/:action', {
+  return $resource(API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/browse/:action', {
     endpointId: EndpointProvider.endpointID
   },
   {
     ls: {
-      method: 'GET', isArray: true, params: { id: '@id', action: 'ls' }
+      method: 'GET', isArray: true, params: { action: 'ls' }
     },
     get: {
-      method: 'GET', params: { id: '@id', action: 'get' },
+      method: 'GET', params: { action: 'get' },
       transformResponse: browseGetResponse
     },
     delete: {
-      method: 'DELETE', params: { id: '@id', action: 'delete' }
+      method: 'DELETE', params: { action: 'delete' }
     },
     rename: {
-      method: 'PUT', params: { id: '@id', action: 'rename' }
+      method: 'PUT', params: { action: 'rename' }
     }
   });
 }]);
