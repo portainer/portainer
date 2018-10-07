@@ -8,7 +8,7 @@ angular.module('portainer.agent').factory('Host', [
         endpointId: EndpointProvider.endpointID
       },
       {
-        info: { method: 'GET', isArray: false, params: { action: 'info' } }
+        info: { method: 'GET', params: { action: 'info' } }
       }
     );
   }
