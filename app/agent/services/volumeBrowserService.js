@@ -4,15 +4,15 @@ angular.module('portainer.agent')
   var service = {};
 
   service.ls = function(volumeId, path) {
-    return Browse.ls({ 'id': volumeId, 'path': path }).$promise;
+    return Browse.ls({ volumeID: volumeId, path: path }).$promise;
   };
 
   service.get = function(volumeId, path) {
-    return Browse.get({ 'id': volumeId, 'path': path }).$promise;
+    return Browse.get({ volumeID: volumeId, path: path }).$promise;
   };
 
   service.delete = function(volumeId, path) {
-    return Browse.delete({ 'id': volumeId, 'path': path }).$promise;
+    return Browse.delete({ volumeID: volumeId, path: path }).$promise;
   };
 
   service.rename = function(volumeId, path, newPath) {
@@ -20,7 +20,7 @@ angular.module('portainer.agent')
       CurrentFilePath: path,
       NewFilePath: newPath
     };
-    return Browse.rename({ 'id': volumeId }, payload).$promise;
+    return Browse.rename({ volumeID: volumeId }, payload).$promise;
   };
 
   return service;
