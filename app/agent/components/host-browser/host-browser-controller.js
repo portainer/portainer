@@ -12,6 +12,7 @@ angular.module('portainer.agent').controller('HostBrowserController', [
     ctrl.downloadFile = downloadFile;
     ctrl.deleteFile = confirmDeleteFile;
     ctrl.isRoot = isRoot;
+    ctrl.onFileSelectedForUpload = onFileSelectedForUpload;
     ctrl.$onInit = $onInit;
 
     function goToParent() {
@@ -117,6 +118,24 @@ angular.module('portainer.agent').controller('HostBrowserController', [
         return parent + file;
       }
       return parent + '/' + file;
+    }
+
+    function onFileSelectedForUpload(file) {
+      HostBrowserService.upload(ctrl.state.path, file)
+        .then(function onFileUpload() {
+          onFileUploaded();
+        })
+        .catch(function onFileUpload(err) {
+          Notifications.error('Failure', err, 'Unable to upload file');
+        });
+    }
+
+    function onFileUploaded() {
+      refreshList();
+    }
+
+    function refreshList() {
+      getFilesForPath(ctrl.state.path);
     }
   }
 ]);

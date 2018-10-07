@@ -1,26 +1,23 @@
 angular.module('portainer.agent').controller('FileUploaderController', [
-  'HostBrowserService', 'Notifications',
-  function FileUploaderController(HostBrowserService, Notifications) {
+  '$q',
+  function FileUploaderController($q) {
     var ctrl = this;
 
     ctrl.state = {
       uploadInProgress: false
     };
 
-    ctrl.uploadFile = uploadFile;
+    ctrl.onFileSelected = onFileSelected;
 
-    function uploadFile() {
+    function onFileSelected(file) {
+      if (!file) {
+        return;
+      }
+      
       ctrl.state.uploadInProgress = true;
-      HostBrowserService.upload('/', ctrl.file)
-        .then(function onFileUpload() {
-          ctrl.onFileUploaded();
-        })
-        .catch(function onFileUpload(err) {
-          Notifications.error('Failure', err, 'Unable to upload file');
-        })
-        .finally(function toggleUploadProgress() {
-          ctrl.state.uploadInProgress = false;
-        });
+      $q.when(ctrl.uploadFile(file)).finally(function toggleProgress() {
+            ctrl.state.uploadInProgress = false;
+      });
     }
   }
 ]);

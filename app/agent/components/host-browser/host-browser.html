@@ -1,5 +1,5 @@
 <files-datatable
-  title-text="Host browser" title-icon="fa-file"
+  title-text="Host browser - {{$ctrl.state.path}}" title-icon="fa-file"
   dataset="$ctrl.files" table-key="host_browser"
   order-by="Dir"
   is-root="$ctrl.isRoot()"
@@ -8,4 +8,9 @@
   rename="$ctrl.renameFile(name, newName)"
   download="$ctrl.downloadFile(name)"
   delete="$ctrl.deleteFile(name)"
-></files-datatable>
+
+  is-upload-allowed="true"
+  on-file-selected-for-upload="$ctrl.onFileSelectedForUpload"
+>
+
+</files-datatable>
