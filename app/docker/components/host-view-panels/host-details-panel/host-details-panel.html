@@ -1,0 +1,34 @@
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-code" title-text="Host Details"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Hostname</td>
+              <td>{{ $ctrl.host.name }}</td>
+            </tr>
+            <tr ng-if="$ctrl.host.os">
+              <td>OS Information</td>
+              <td>{{ $ctrl.host.os.type }} {{$ctrl.host.os.arch}}
+                {{$ctrl.host.os.name}}</td>
+            </tr>
+            <tr ng-if="$ctrl.host.kernelVersion">
+              <td>Kernel Version</td>
+              <td>{{ $ctrl.host.kernelVersion }}</td>
+            </tr>
+            <tr>
+              <td>Total CPU</td>
+              <td>{{ $ctrl.host.totalCPU }}</td>
+            </tr>
+            <tr>
+              <td>Total memory</td>
+              <td>{{ $ctrl.host.totalMemory | humansize }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
