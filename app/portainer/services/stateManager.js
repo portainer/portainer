@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.factory('StateManager', ['$q', 'SystemService', 'InfoHelper', 'LocalStorage', 'SettingsService', 'StatusService', 'APPLICATION_CACHE_VALIDITY',
-function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, SettingsService, StatusService, APPLICATION_CACHE_VALIDITY) {
+.factory('StateManager', ['$q', 'SystemService', 'InfoHelper', 'LocalStorage', 'SettingsService', 'StatusService', 'EndpointService', 'APPLICATION_CACHE_VALIDITY',
+function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, SettingsService, StatusService, EndpointService, APPLICATION_CACHE_VALIDITY) {
   'use strict';
 
   var manager = {};
@@ -16,8 +16,11 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
   };
 
   manager.setEndpointStatus = function(status) {
-    state.endpoint.status = status;
-    LocalStorage.storeEndpointState(state.endpoint);
+    EndpointService.updateEndpoint(LocalStorage.getEndpointID(), {Status: status})
+    .then(function success() {
+      state.endpoint.status = status;
+      LocalStorage.storeEndpointState(state.endpoint);
+    });
   };
 
   manager.checkEndpointStatus = function() {

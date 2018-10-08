@@ -19,6 +19,7 @@ type endpointUpdatePayload struct {
 	TLS                    bool
 	TLSSkipVerify          bool
 	TLSSkipClientVerify    bool
+	Status                 int
 	AzureApplicationID     string
 	AzureTenantID          string
 	AzureAuthenticationKey string
@@ -71,6 +72,17 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.Tags != nil {
 		endpoint.Tags = payload.Tags
+	}
+
+	switch payload.Status {
+	case 1:
+		endpoint.Status = portainer.EndpointStatusUp
+		break
+	case 2:
+		endpoint.Status = portainer.EndpointStatusDown
+		break
+	default:
+		break
 	}
 
 	if endpoint.Type == portainer.AzureEnvironment {
