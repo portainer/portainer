@@ -2,8 +2,9 @@ angular.module('portainer.agent').controller('HostBrowserController', [
   'HostBrowserService', 'Notifications', 'FileSaver', 'ModalService',
   function HostBrowserController(HostBrowserService, Notifications, FileSaver, ModalService) {
     var ctrl = this;
+    var ROOT_PATH = '/host';
     ctrl.state = {
-      path: '/'
+      path: ROOT_PATH
     };
 
     ctrl.goToParent = goToParent;
@@ -14,13 +15,21 @@ angular.module('portainer.agent').controller('HostBrowserController', [
     ctrl.isRoot = isRoot;
     ctrl.onFileSelectedForUpload = onFileSelectedForUpload;
     ctrl.$onInit = $onInit;
+    ctrl.getRelativePath = getRelativePath;
+
+    function getRelativePath(path) {
+      path = path || ctrl.state.path;
+      var rootPathRegex = new RegExp('^' + ROOT_PATH + '\/?');
+      var relativePath = path.replace(rootPathRegex, '/');
+      return relativePath;
+    }
 
     function goToParent() {
       getFilesForPath(parentPath(this.state.path));
     }
 
     function isRoot() {
-      return ctrl.state.path === '/';
+      return ctrl.state.path === ROOT_PATH;
     }
 
     function browse(folder) {
@@ -39,15 +48,12 @@ angular.module('portainer.agent').controller('HostBrowserController', [
     }
 
     function renameFile(name, newName) {
-      var isRoot = ctrl.isRoot();
-      var filePath = isRoot ? '/' + name : this.state.path + '/' + file;
-      var newFilePath = isRoot
-        ? '/' + newName
-        : this.state.path + '/' + newName;
+      var filePath = buildPath(ctrl.state.path, name);
+      var newFilePath = buildPath(ctrl.state.path, newName);
 
       HostBrowserService.rename(filePath, newFilePath)
         .then(function onRenameSuccess() {
-          Notifications.success('File successfully renamed', newFilePath);
+          Notifications.success('File successfully renamed', getRelativePath(newFilePath));
           return HostBrowserService.ls(ctrl.state.path);
         })
         .then(function onFilesLoaded(files) {
@@ -76,7 +82,7 @@ angular.module('portainer.agent').controller('HostBrowserController', [
       var filePath = buildPath(ctrl.state.path, name);
 
       ModalService.confirmDeletion(
-        'Are you sure that you want to delete ' + filePath + ' ?',
+        'Are you sure that you want to delete ' + getRelativePath(filePath) + ' ?',
         function onConfirm(confirmed) {
           if (!confirmed) {
             return;
@@ -89,7 +95,7 @@ angular.module('portainer.agent').controller('HostBrowserController', [
     function deleteFile(path) {
       HostBrowserService.delete(path)
         .then(function onDeleteSuccess() {
-          Notifications.success('File successfully deleted', path);
+          Notifications.success('File successfully deleted', getRelativePath(path));
           return HostBrowserService.ls(ctrl.state.path);
         })
         .then(function onFilesLoaded(data) {
@@ -101,12 +107,12 @@ angular.module('portainer.agent').controller('HostBrowserController', [
     }
 
     function $onInit() {
-      getFilesForPath('/');
+      getFilesForPath(ROOT_PATH);
     }
 
     function parentPath(path) {
-      if (path.lastIndexOf('/') === 0) {
-        return '/';
+      if (path === ROOT_PATH) {
+        return ROOT_PATH;
       }
 
       var split = _.split(path, '/');
@@ -114,7 +120,7 @@ angular.module('portainer.agent').controller('HostBrowserController', [
     }
 
     function buildPath(parent, file) {
-      if (parent === '/') {
+      if (parent.lastIndexOf('/') === parent.length - 1) {
         return parent + file;
       }
       return parent + '/' + file;

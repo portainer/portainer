@@ -1,12 +1,8 @@
 angular.module('portainer.docker').controller('NodeBrowserController', [
-  'NodeService',
-  'HttpRequestHelper',
-  '$stateParams',
+  'NodeService', 'HttpRequestHelper', '$stateParams',
   function NodeBrowserController(NodeService, HttpRequestHelper, $stateParams) {
     var ctrl = this;
 
-
-    ctrl.refreshList = refreshList;
     ctrl.$onInit = $onInit;
 
     function $onInit() {
@@ -20,11 +16,5 @@ angular.module('portainer.docker').controller('NodeBrowserController', [
         ctrl.node = node;
       });
     }
-
-    function refreshList() {
-
-    }
-
-
   }
 ]);
