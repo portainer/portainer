@@ -28,7 +28,7 @@
             </tr>
             <tr ng-if=" $ctrl.details.engineLabels.length">
               <td>Engine Labels</td>
-              <td>{{ $ctrl.details.engineLabels | commaSeparated }}</td>
+              <td>{{ $ctrl.details.engineLabels | arraytostr:', ' }}</td>
             </tr>
             <tr>
               <td>

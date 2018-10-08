@@ -15,4 +15,7 @@
 
 <engine-details-panel engine="$ctrl.engineDetails"></engine-details-panel>
 
+<devices-panel ng-if="$ctrl.isAgent" devices="$ctrl.devices"></devices-panel>
+<disks-panel ng-if="$ctrl.isAgent" disks="$ctrl.disks"></disks-panel>
+
 <ng-transclude></ng-transclude>

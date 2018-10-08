@@ -3,9 +3,9 @@
   host-details="$ctrl.hostDetails"
   engine-details="$ctrl.engineDetails"
   refresh-url="docker.nodes.node"
+  disks="$ctrl.disks"
+  devices="$ctrl.devices"
 >
-  <devices-panel ng-if="$ctrl.state.isAgent" devices="$ctrl.devices"></devices-panel>
-  <disks-panel ng-if="$ctrl.state.isAgent" disks="$ctrl.disks"></disks-panel>
   <swarm-node-details-panel
     details="$ctrl.nodeDetails"
     original-node="$ctrl.originalNode"
