@@ -1,6 +1,7 @@
 package proxy
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -129,6 +130,7 @@ func (p *proxyTransport) buildResourceControl(resourceID string, subResourceIDs 
 
 	var userAccesses = make([]portainer.UserResourceAccess, 0)
 	usersString := labelsObject["io.portainer.uac.users"].(string)
+	log.Printf("users for resource %v: %v", resourceID, usersString)
 	usersIds := strings.Split(usersString, ",")
 	for _, v := range usersIds {
 		numberID, _ := strconv.Atoi(v)
@@ -140,8 +142,8 @@ func (p *proxyTransport) buildResourceControl(resourceID string, subResourceIDs 
 	}
 
 	var teamAccesses = make([]portainer.TeamResourceAccess, 0)
-	if labelsObject["io.portainer.uac.users"] != nil {
-		teamsString := labelsObject["io.portainer.uac.users"].(string)
+	if labelsObject["io.portainer.uac.teams"] != nil {
+		teamsString := labelsObject["io.portainer.uac.teams"].(string)
 		teamsIds := strings.Split(teamsString, ",")
 		for _, v := range teamsIds {
 			numberID, _ := strconv.Atoi(v)
