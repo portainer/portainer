@@ -4,7 +4,7 @@
       ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
-    <a title="Browse" ui-sref="docker.nodes.node.browse" ng-if="$ctrl.isAgent">
+    <a title="Browse" ui-sref="{{$ctrl.browseUrl}}" ng-if="$ctrl.isAgent">
       Browse
     </a>
   </rd-header-title>

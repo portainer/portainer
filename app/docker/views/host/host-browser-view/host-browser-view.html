@@ -1,0 +1,14 @@
+<rd-header>
+  <rd-header-title title-text="Host Browser"></rd-header-title>
+  <rd-header-content>
+      <a ui-sref="docker.nodes">Host</a> &gt; <a ui-sref="docker.host">{{ $ctrl.host.Hostname }}</a> &gt; browse
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <host-browser
+     ng-if="$ctrl.host"
+    ></host-browser>
+  </div>
+</div>
