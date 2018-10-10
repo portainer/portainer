@@ -141,7 +141,7 @@ angular.module('portainer.docker', ['portainer.app'])
 
   var hostBrowser = {
     name: 'docker.host.browser',
-    url: '/host/browser',
+    url: '/browser',
     views: {
       'content@': {
         component: 'hostBrowserView'
