@@ -7,7 +7,14 @@
   </rd-header-title>
   <rd-header-content>Docker</rd-header-content>
 </rd-header>
-
+<information-panel title-text="Offline mode" cant-dismiss="true" ng-if="$ctrl.endpointStatus !== 1">
+  <span class="small">
+    <p class="text-muted">
+      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+      This endpoint is currently offline (read-only). Data shown is based on the latest available snapshot.
+    </p>
+  </span>
+</information-panel>
 <host-details-panel 
   host="$ctrl.hostDetails" 
   is-agent="$ctrl.isAgent"

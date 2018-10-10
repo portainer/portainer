@@ -5,7 +5,8 @@ angular.module('portainer.docker').controller('HostViewController', [
     this.$onInit = initView;
 
     ctrl.state = {
-      isAgent: false
+      isAgent: false,
+      endpointStatus: 1
     };
     
     this.engineDetails = {};
@@ -14,6 +15,7 @@ angular.module('portainer.docker').controller('HostViewController', [
     function initView() {
       var applicationState = StateManager.getState();
       ctrl.state.isAgent = applicationState.endpoint.mode.agentProxy;
+      ctrl.state.endpointStatus = applicationState.endpoint.status;
 
       $q.all({
         version: SystemService.version(),
