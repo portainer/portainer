@@ -13,7 +13,7 @@ angular
 
       function loadInfo() {
         SystemService.info().then(function onInfoLoaded(host) {
-          HttpRequestHelper.setPortainerAgentTargetHeader(host.Hostname);
+          HttpRequestHelper.setPortainerAgentTargetHeader(host.Name);
           ctrl.host = host;
         });
       }
