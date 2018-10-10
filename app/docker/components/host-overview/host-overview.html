@@ -4,14 +4,14 @@
       ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
-    <a title="Browse" ui-sref="{{$ctrl.browseUrl}}" ng-if="$ctrl.isAgent">
-      Browse
-    </a>
   </rd-header-title>
   <rd-header-content>Docker</rd-header-content>
 </rd-header>
 
-<host-details-panel host="$ctrl.hostDetails" is-agent="$ctrl.isAgent"></host-details-panel>
+<host-details-panel 
+  host="$ctrl.hostDetails" 
+  is-agent="$ctrl.isAgent"
+  browse-url="{{$ctrl.browseUrl}}"></host-details-panel>
 
 <engine-details-panel engine="$ctrl.engineDetails"></engine-details-panel>
 
