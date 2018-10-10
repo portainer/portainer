@@ -1,3 +1,39 @@
+import angular from 'angular';
+import authenticationTemplate from "./views/auth/auth.html";
+import sidebarTemplate from './views/sidebar/sidebar.html';
+import aboutTemplate from './views/about/about.html';
+import accountTemplate from './views/account/account.html';
+import endpointsTemplate from './views/endpoints/endpoints.html';
+import endpointTemplate from './views/endpoints/edit/endpoint.html';
+import createendpointTemplate from './views/endpoints/create/createendpoint.html';
+import endpointAccessTemplate from './views/endpoints/access/endpointAccess.html';
+import groupsTemplate from './views/groups/groups.html';
+import groupTemplate from './views/groups/edit/group.html';
+import creategroupTemplate from './views/groups/create/creategroup.html';
+import groupAccessTemplate from './views/groups/access/groupAccess.html';
+import homeTemplate from './views/home/home.html';
+import initEndpointTemplate from './views/init/endpoint/initEndpoint.html';
+import initAdminTemplate from './views/init/admin/initAdmin.html';
+import registriesTemplate from './views/registries/registries.html';
+import registryTemplate from './views/registries/edit/registry.html';
+import createregistryTemplate from './views/registries/create/createregistry.html';
+import registryAccessTemplate from './views/registries/access/registryAccess.html';
+import settingsTemplate from './views/settings/settings.html';
+import settingsAuthenticationTemplate from './views/settings/authentication/settingsAuthentication.html';
+import stacksTemplate from './views/stacks/stacks.html';
+import stackTemplate from './views/stacks/edit/stack.html';
+import createstackTemplate from './views/stacks/create/createstack.html';
+import supportTemplate from './views/support/support.html';
+import tagsTemplate from './views/tags/tags.html';
+import updatePasswordTemplate from './views/update-password/updatePassword.html';
+import usersTemplate from './views/users/users.html';
+import userTemplate from './views/users/edit/user.html';
+import teamsTemplate from './views/teams/teams.html';
+import teamTemplate from './views/teams/edit/team.html';
+import templatesTemplate from './views/templates/templates.html';
+import templateTemplate from './views/templates/edit/template.html';
+import createtemplateTemplate from './views/templates/create/createtemplate.html';
+
 angular.module('portainer.app', [])
 .config(['$stateRegistryProvider', function ($stateRegistryProvider) {
   'use strict';
@@ -13,7 +49,7 @@ angular.module('portainer.app', [])
     },
     views: {
       'sidebar@': {
-        templateUrl: 'app/portainer/views/sidebar/sidebar.html',
+        templateUrl: sidebarTemplate,
         controller: 'SidebarController'
       }
     }
@@ -30,7 +66,7 @@ angular.module('portainer.app', [])
     url: '/about',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/about/about.html'
+        templateUrl: aboutTemplate,
       }
     }
   };
@@ -40,7 +76,7 @@ angular.module('portainer.app', [])
     url: '/account',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/account/account.html',
+        templateUrl: accountTemplate,
         controller: 'AccountController'
       }
     }
@@ -55,7 +91,7 @@ angular.module('portainer.app', [])
     },
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/auth/auth.html',
+        templateUrl: authenticationTemplate,
         controller: 'AuthenticationController'
       },
       'sidebar@': {}
@@ -70,7 +106,7 @@ angular.module('portainer.app', [])
     url: '/endpoints',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/endpoints/endpoints.html',
+        templateUrl: endpointsTemplate,
         controller: 'EndpointsController'
       }
     }
@@ -81,7 +117,7 @@ angular.module('portainer.app', [])
     url: '/:id',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/endpoints/edit/endpoint.html',
+        templateUrl: endpointTemplate,
         controller: 'EndpointController'
       }
     }
@@ -92,7 +128,7 @@ angular.module('portainer.app', [])
     url: '/new',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/endpoints/create/createendpoint.html',
+        templateUrl: createendpointTemplate,
         controller: 'CreateEndpointController'
       }
     }
@@ -103,7 +139,7 @@ angular.module('portainer.app', [])
     url: '/access',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/endpoints/access/endpointAccess.html',
+        templateUrl: endpointAccessTemplate,
         controller: 'EndpointAccessController'
       }
     }
@@ -114,7 +150,7 @@ angular.module('portainer.app', [])
     url: '/groups',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/groups/groups.html',
+        templateUrl: groupsTemplate,
         controller: 'GroupsController'
       }
     }
@@ -125,7 +161,7 @@ angular.module('portainer.app', [])
     url: '/:id',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/groups/edit/group.html',
+        templateUrl: groupTemplate,
         controller: 'GroupController'
       }
     }
@@ -136,7 +172,7 @@ angular.module('portainer.app', [])
     url: '/new',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/groups/create/creategroup.html',
+        templateUrl: creategroupTemplate,
         controller: 'CreateGroupController'
       }
     }
@@ -147,7 +183,7 @@ angular.module('portainer.app', [])
     url: '/access',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/groups/access/groupAccess.html',
+        templateUrl: groupAccessTemplate,
         controller: 'GroupAccessController'
       }
     }
@@ -158,7 +194,7 @@ angular.module('portainer.app', [])
     url: '/home',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/home/home.html',
+        templateUrl: homeTemplate,
         controller: 'HomeController'
       }
     }
@@ -181,7 +217,7 @@ angular.module('portainer.app', [])
     url: '/endpoint',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/init/endpoint/initEndpoint.html',
+        templateUrl: initEndpointTemplate,
         controller: 'InitEndpointController'
       }
     }
@@ -192,7 +228,7 @@ angular.module('portainer.app', [])
     url: '/admin',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/init/admin/initAdmin.html',
+        templateUrl: initAdminTemplate,
         controller: 'InitAdminController'
       }
     }
@@ -203,7 +239,7 @@ angular.module('portainer.app', [])
     url: '/registries',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/registries/registries.html',
+        templateUrl: registriesTemplate,
         controller: 'RegistriesController'
       }
     }
@@ -214,7 +250,7 @@ angular.module('portainer.app', [])
     url: '/:id',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/registries/edit/registry.html',
+        templateUrl: registryTemplate,
         controller: 'RegistryController'
       }
     }
@@ -225,7 +261,7 @@ angular.module('portainer.app', [])
     url: '/new',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/registries/create/createregistry.html',
+        templateUrl: createregistryTemplate,
         controller: 'CreateRegistryController'
       }
     }
@@ -236,7 +272,7 @@ angular.module('portainer.app', [])
     url: '/access',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/registries/access/registryAccess.html',
+        templateUrl: registryAccessTemplate,
         controller: 'RegistryAccessController'
       }
     }
@@ -247,7 +283,7 @@ angular.module('portainer.app', [])
     url: '/settings',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/settings/settings.html',
+        templateUrl: settingsTemplate,
         controller: 'SettingsController'
       }
     }
@@ -258,7 +294,7 @@ angular.module('portainer.app', [])
     url: '/auth',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/settings/authentication/settingsAuthentication.html',
+        templateUrl: settingsAuthenticationTemplate,
         controller: 'SettingsAuthenticationController'
       }
     }
@@ -269,7 +305,7 @@ angular.module('portainer.app', [])
     url: '/stacks',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/stacks/stacks.html',
+        templateUrl: stacksTemplate,
         controller: 'StacksController'
       }
     }
@@ -280,7 +316,7 @@ angular.module('portainer.app', [])
     url: '/:name?id&type&external',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/stacks/edit/stack.html',
+        templateUrl: stackTemplate,
         controller: 'StackController'
       }
     }
@@ -291,7 +327,7 @@ angular.module('portainer.app', [])
     url: '/newstack',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/stacks/create/createstack.html',
+        templateUrl: createstackTemplate,
         controller: 'CreateStackController'
       }
     }
@@ -302,7 +338,7 @@ angular.module('portainer.app', [])
     url: '/support',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/support/support.html'
+        templateUrl: supportTemplate,
       }
     }
   };
@@ -312,7 +348,7 @@ angular.module('portainer.app', [])
     url: '/tags',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/tags/tags.html',
+        templateUrl: tagsTemplate,
         controller: 'TagsController'
       }
     }
@@ -323,7 +359,7 @@ angular.module('portainer.app', [])
     url: '/update-password',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/update-password/updatePassword.html',
+        templateUrl: updatePasswordTemplate,
         controller: 'UpdatePasswordController'
       },
       'sidebar@': {}
@@ -335,7 +371,7 @@ angular.module('portainer.app', [])
     url: '/users',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/users/users.html',
+        templateUrl: usersTemplate,
         controller: 'UsersController'
       }
     }
@@ -346,7 +382,7 @@ angular.module('portainer.app', [])
     url: '/:id',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/users/edit/user.html',
+        templateUrl: userTemplate,
         controller: 'UserController'
       }
     }
@@ -357,7 +393,7 @@ angular.module('portainer.app', [])
     url: '/teams',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/teams/teams.html',
+        templateUrl: teamsTemplate,
         controller: 'TeamsController'
       }
     }
@@ -368,7 +404,7 @@ angular.module('portainer.app', [])
     url: '/:id',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/teams/edit/team.html',
+        templateUrl: teamTemplate,
         controller: 'TeamController'
       }
     }
@@ -379,7 +415,7 @@ angular.module('portainer.app', [])
     url: '/templates',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/templates/templates.html',
+        templateUrl: templatesTemplate,
         controller: 'TemplatesController'
       }
     }
@@ -390,7 +426,7 @@ angular.module('portainer.app', [])
     url: '/:id',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/templates/edit/template.html',
+        templateUrl: templateTemplate,
         controller: 'TemplateController'
       }
     }
@@ -401,7 +437,7 @@ angular.module('portainer.app', [])
     url: '/new',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/templates/create/createtemplate.html',
+        templateUrl: createtemplateTemplate,
         controller: 'CreateTemplateController'
       }
     }

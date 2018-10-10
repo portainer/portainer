@@ -23,9 +23,8 @@
     "grunt": "grunt",
     "dev": "yarn grunt run-dev",
     "clean-all": "yarn grunt clean:all",
-    "build": "yarn grunt build",
+    "build": "webpack",
     "build-offline": "cd ./api/cmd/portainer && CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags '-s' && mv -b portainer ../../../dist/portainer-linux-amd64"
-
   },
   "engines": {
     "node": ">= 0.8.4"
@@ -65,12 +64,18 @@
     "splitargs": "github:deviantony/splitargs#~0.2.0",
     "toastr": "github:CodeSeven/toastr#~2.1.3",
     "ui-select": "^0.19.8",
+    "webpack": "^4.20.2",
+    "webpack-cli": "^3.1.2",
     "xterm": "^3.1.0"
   },
   "devDependencies": {
+    "auto-ngtemplate-loader": "^1.3.0",
     "autoprefixer": "^7.1.1",
+    "css-loader": "^1.0.0",
     "cssnano": "^3.10.0",
     "eslint": "^3.19.0",
+    "eslint-loader": "^2.1.1",
+    "file-loader": "^1.1.11",
     "grunt": "~0.4.0",
     "grunt-cli": "^1.2.0",
     "grunt-config": "^1.0.0",
@@ -88,6 +93,11 @@
     "grunt-shell": "^1.1.2",
     "grunt-usemin": "^3.1.1",
     "gruntify-eslint": "^3.1.0",
-    "load-grunt-tasks": "^3.5.2"
+    "html-loader": "^0.5.5",
+    "html-webpack-plugin": "^3.2.0",
+    "load-grunt-tasks": "^3.5.2",
+    "ngtemplate-loader": "^2.0.1",
+    "style-loader": "^0.23.1",
+    "url-loader": "^1.1.1"
   }
 }

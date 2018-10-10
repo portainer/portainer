@@ -1,5 +1,7 @@
+import angular from 'angular';
+import template from './endpointList.html'
 angular.module('portainer.app').component('endpointList', {
-  templateUrl: 'app/portainer/components/endpoint-list/endpointList.html',
+  templateUrl: template,
   controller: 'EndpointListController',
   bindings: {
     titleText: '@',

@@ -1,4 +1,4 @@
-function ServiceViewModel(data, runningTasks, allTasks) {
+export function ServiceViewModel(data, runningTasks, allTasks) {
   this.Model = data;
   this.Id = data.ID;
   this.Tasks = [];

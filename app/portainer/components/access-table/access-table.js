@@ -1,5 +1,5 @@
 angular.module('portainer.app').component('accessTable', {
-  templateUrl: 'app/portainer/components/access-table/accessTable.html',
+  templateUrl: './accessTable.html',
   controller: function() {
     this.state = {
       orderBy: 'Name',

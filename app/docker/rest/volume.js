@@ -1,3 +1,6 @@
+import angular from 'angular';
+import { genericHandler } from './response/handlers';
+
 angular.module('portainer.docker')
 .factory('Volume', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', function VolumeFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
   'use strict';

@@ -1,4 +1,4 @@
-function ContainerGroupDefaultModel() {
+export function ContainerGroupDefaultModel() {
   this.Location = '';
   this.OSType = 'Linux';
   this.Name = '';
@@ -15,7 +15,7 @@ function ContainerGroupDefaultModel() {
   this.Memory = 1;
 }
 
-function ContainerGroupViewModel(data) {
+export function ContainerGroupViewModel(data) {
   this.Id = data.id;
   this.Name = data.name;
   this.Location = data.location;
@@ -23,7 +23,7 @@ function ContainerGroupViewModel(data) {
   this.Ports = data.properties.ipAddress.ports;
 }
 
-function CreateContainerGroupRequest(model) {
+export function CreateContainerGroupRequest(model) {
   this.location = model.Location;
 
   var containerPorts = [];

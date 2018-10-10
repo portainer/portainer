@@ -1,5 +1,5 @@
 angular.module('portainer.app').component('codeEditor', {
-  templateUrl: 'app/portainer/components/code-editor/codeEditor.html',
+  templateUrl: './codeEditor.html',
   controller: 'CodeEditorController',
   bindings: {
     identifier: '@',

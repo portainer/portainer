@@ -1,5 +1,5 @@
 angular.module('portainer.agent').component('filesDatatable', {
-  templateUrl: 'app/agent/components/files-datatable/files-datatable.html',
+  templateUrl: './files-datatable.html',
   controller: 'GenericDatatableController',
   bindings: {
     titleText: '@',

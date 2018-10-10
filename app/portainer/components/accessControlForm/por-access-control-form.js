@@ -1,5 +1,5 @@
 angular.module('portainer.app').component('porAccessControlForm', {
-  templateUrl: 'app/portainer/components/accessControlForm/porAccessControlForm.html',
+  templateUrl: './porAccessControlForm.html',
   controller: 'porAccessControlFormController',
   bindings: {
     // This object will be populated with the form data.

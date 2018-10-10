@@ -19,7 +19,7 @@ function createStatus(statusText) {
   return 'running';
 }
 
-function ContainerViewModel(data) {
+export function ContainerViewModel(data) {
   this.Id = data.Id;
   this.Status = createStatus(data.Status);
   this.State = data.State;
@@ -62,7 +62,7 @@ function ContainerViewModel(data) {
   }
 }
 
-function ContainerStatsViewModel(data) {
+export function ContainerStatsViewModel(data) {
   this.Date = data.read;
   this.MemoryUsage = data.memory_stats.usage;
   this.PreviousCPUTotalUsage = data.precpu_stats.cpu_usage.total_usage;
@@ -75,7 +75,7 @@ function ContainerStatsViewModel(data) {
   this.Networks = _.values(data.networks);
 }
 
-function ContainerDetailsViewModel(data) {
+export function ContainerDetailsViewModel(data) {
   this.Model = data;
   this.Id = data.Id;
   this.State = data.State;

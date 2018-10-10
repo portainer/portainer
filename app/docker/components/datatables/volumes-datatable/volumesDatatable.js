@@ -1,5 +1,5 @@
 angular.module('portainer.docker').component('volumesDatatable', {
-  templateUrl: 'app/docker/components/datatables/volumes-datatable/volumesDatatable.html',
+  templateUrl: './volumesDatatable.html',
   controller: 'VolumesDatatableController',
   bindings: {
     titleText: '@',

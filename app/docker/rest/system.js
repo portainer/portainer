@@ -1,3 +1,6 @@
+import angular from 'angular';
+import { jsonObjectsToArrayHandler } from './response/handlers';
+
 angular.module('portainer.docker')
 .factory('System', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', function SystemFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
   'use strict';

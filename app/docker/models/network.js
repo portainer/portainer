@@ -1,4 +1,4 @@
-function NetworkViewModel(data) {
+export function NetworkViewModel(data) {
   this.Id = data.Id;
   this.Name = data.Name;
   this.Scope = data.Scope;

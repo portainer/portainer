@@ -1,3 +1,6 @@
+import angular from 'angular';
+import { jsonObjectsToArrayHandler } from '../../docker/rest/response/handlers';
+
 angular.module('portainer.app')
 .factory('FileUploadService', ['$q', 'Upload', 'EndpointProvider', function FileUploadFactory($q, Upload, EndpointProvider) {
   'use strict';

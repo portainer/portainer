@@ -1,4 +1,4 @@
-function NodeViewModel(data) {
+export function NodeViewModel(data) {
   this.Model = data;
   this.Id = data.ID;
   this.Version = data.Version.Index;

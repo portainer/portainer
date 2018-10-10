@@ -1,4 +1,4 @@
-function StatusViewModel(data) {
+export function StatusViewModel(data) {
   this.Authentication = data.Authentication;
   this.Snapshot = data.Snapshot;
   this.EndpointManagement = data.EndpointManagement;

@@ -1,5 +1,5 @@
 angular.module('extension.storidge').component('storidgeProfileSelector', {
-  templateUrl: 'app/extensions/storidge/components/profileSelector/storidgeProfileSelector.html',
+  templateUrl: './storidgeProfileSelector.html',
   controller: 'StoridgeProfileSelectorController',
   bindings: {
     'storidgeProfile': '='

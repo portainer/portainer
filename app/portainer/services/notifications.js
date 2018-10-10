@@ -1,3 +1,6 @@
+import angular from 'angular';
+import toastr from 'toastr';
+
 angular.module('portainer.app')
 .factory('Notifications', ['$sanitize', function NotificationsFactory($sanitize) {
   'use strict';

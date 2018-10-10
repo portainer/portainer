@@ -14,7 +14,7 @@ angular.module('portainer.azure', ['portainer.app'])
     url: '/containerinstances',
     views: {
       'content@': {
-        templateUrl: 'app/azure/views/containerinstances/containerinstances.html',
+        templateUrl: './views/containerinstances/containerinstances.html',
         controller: 'AzureContainerInstancesController'
       }
     }
@@ -25,7 +25,7 @@ angular.module('portainer.azure', ['portainer.app'])
     url: '/new/',
     views: {
       'content@': {
-        templateUrl: 'app/azure/views/containerinstances/create/createcontainerinstance.html',
+        templateUrl: './views/containerinstances/create/createcontainerinstance.html',
         controller: 'AzureCreateContainerInstanceController'
       }
     }
@@ -36,7 +36,7 @@ angular.module('portainer.azure', ['portainer.app'])
     url: '/dashboard',
     views: {
       'content@': {
-        templateUrl: 'app/azure/views/dashboard/dashboard.html',
+        templateUrl: './views/dashboard/dashboard.html',
         controller: 'AzureDashboardController'
       }
     }

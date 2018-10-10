@@ -1,3 +1,6 @@
+import angular from 'angular';
+import { DockerHubViewModel } from '../../models/dockerhub';
+
 angular.module('portainer.app')
 .factory('DockerHubService', ['$q', 'DockerHub', function DockerHubServiceFactory($q, DockerHub) {
   'use strict';

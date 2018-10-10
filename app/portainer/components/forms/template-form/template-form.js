@@ -1,5 +1,5 @@
 angular.module('portainer.app').component('templateForm', {
-  templateUrl: 'app/portainer/components/forms/template-form/templateForm.html',
+  templateUrl: './templateForm.html',
   controller: function() {
     this.state = {
       collapseTemplate: false,

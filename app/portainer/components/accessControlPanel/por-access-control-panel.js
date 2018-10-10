@@ -1,5 +1,5 @@
 angular.module('portainer.app').component('porAccessControlPanel', {
-  templateUrl: 'app/portainer/components/accessControlPanel/porAccessControlPanel.html',
+  templateUrl: './porAccessControlPanel.html',
   controller: 'porAccessControlPanelController',
   bindings: {
     // The component will use this identifier when updating the resource control object.

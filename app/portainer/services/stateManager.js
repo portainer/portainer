@@ -1,3 +1,6 @@
+import angular from 'angular';
+import moment from 'moment';
+
 angular.module('portainer.app')
 .factory('StateManager', ['$q', 'SystemService', 'InfoHelper', 'LocalStorage', 'SettingsService', 'StatusService', 'APPLICATION_CACHE_VALIDITY',
 function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, SettingsService, StatusService, APPLICATION_CACHE_VALIDITY) {

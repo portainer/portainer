@@ -51,7 +51,7 @@ function TemplateUpdateRequest(model) {
   this.id = model.Id;
 }
 
-function TemplateViewModel(data) {
+export function TemplateViewModel(data) {
   this.Id = data.Id;
   this.Title = data.title;
   this.Type = data.type;

@@ -1,3 +1,6 @@
+import angular from 'angular';
+import { NetworkViewModel } from '../models/network';
+
 angular.module('portainer.docker')
 .factory('NetworkService', ['$q', 'Network', function NetworkServiceFactory($q, Network) {
   'use strict';

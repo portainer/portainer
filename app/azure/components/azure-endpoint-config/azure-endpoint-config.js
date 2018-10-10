@@ -4,5 +4,5 @@ angular.module('portainer.azure').component('azureEndpointConfig', {
     tenantId: '=',
     authenticationKey: '='
   },
-  templateUrl: 'app/azure/components/azure-endpoint-config/azureEndpointConfig.html'
+  templateUrl: './azureEndpointConfig.html'
 });

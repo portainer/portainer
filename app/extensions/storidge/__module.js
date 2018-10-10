@@ -14,7 +14,7 @@ angular.module('extension.storidge', [])
     url: '/profiles',
     views: {
       'content@': {
-        templateUrl: 'app/extensions/storidge/views/profiles/profiles.html',
+        templateUrl: './views/profiles/profiles.html',
         controller: 'StoridgeProfilesController'
       }
     }
@@ -25,7 +25,7 @@ angular.module('extension.storidge', [])
     url: '/:id',
     views: {
       'content@': {
-        templateUrl: 'app/extensions/storidge/views/profiles/edit/profile.html',
+        templateUrl: './views/profiles/edit/profile.html',
         controller: 'StoridgeProfileController'
       }
     }
@@ -39,7 +39,7 @@ angular.module('extension.storidge', [])
     },
     views: {
       'content@': {
-        templateUrl: 'app/extensions/storidge/views/profiles/create/createprofile.html',
+        templateUrl: './views/profiles/create/createprofile.html',
         controller: 'StoridgeCreateProfileController'
       }
     }
@@ -50,7 +50,7 @@ angular.module('extension.storidge', [])
     url: '/cluster',
     views: {
       'content@': {
-        templateUrl: 'app/extensions/storidge/views/cluster/cluster.html',
+        templateUrl: './views/cluster/cluster.html',
         controller: 'StoridgeClusterController'
       }
     }
@@ -61,7 +61,7 @@ angular.module('extension.storidge', [])
     url: '/events',
     views: {
       'content@': {
-        templateUrl: 'app/extensions/storidge/views/monitor/monitor.html',
+        templateUrl: './views/monitor/monitor.html',
         controller: 'StoridgeMonitorController'
       }
     }

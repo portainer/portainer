@@ -1,4 +1,4 @@
-function ImageViewModel(data) {
+export function ImageViewModel(data) {
   this.Id = data.Id;
   this.Tag = data.Tag;
   this.Repository = data.Repository;

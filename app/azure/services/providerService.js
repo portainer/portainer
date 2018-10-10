@@ -1,3 +1,6 @@
+import angular from 'angular';
+import { ContainerInstanceProviderViewModel } from '../models/provider';
+
 angular.module('portainer.azure')
 .factory('ProviderService', ['$q', 'Provider', function ProviderServiceFactory($q, Provider) {
   'use strict';

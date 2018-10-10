@@ -1,4 +1,4 @@
-function ResourceControlViewModel(data) {
+export function ResourceControlViewModel(data) {
   this.Id = data.Id;
   this.Type = data.Type;
   this.ResourceId = data.ResourceId;

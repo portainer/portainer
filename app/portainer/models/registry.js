@@ -1,4 +1,4 @@
-function RegistryViewModel(data) {
+export function RegistryViewModel(data) {
   this.Id = data.Id;
   this.Name = data.Name;
   this.URL = data.URL;

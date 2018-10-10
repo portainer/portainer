@@ -1,4 +1,4 @@
-function WebhookViewModel(data) {
+export function WebhookViewModel(data) {
   this.Id = data.Id;
   this.Token = data.Token;
   this.ResourceId = data.ResourceID;

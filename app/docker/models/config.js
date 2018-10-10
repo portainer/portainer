@@ -1,4 +1,4 @@
-function ConfigViewModel(data) {
+export function ConfigViewModel(data) {
   this.Id = data.ID;
   this.CreatedAt = data.CreatedAt;
   this.UpdatedAt = data.UpdatedAt;

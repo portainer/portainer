@@ -1,3 +1,6 @@
+import angular from 'angular';
+import { logsHandler, genericHandler } from "./response/handlers";
+
 angular.module('portainer.docker')
 .factory('Container', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider',
 function ContainerFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {

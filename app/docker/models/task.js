@@ -1,4 +1,4 @@
-function TaskViewModel(data) {
+export function TaskViewModel(data) {
   this.Id = data.ID;
   this.Created = data.CreatedAt;
   this.Updated = data.UpdatedAt;

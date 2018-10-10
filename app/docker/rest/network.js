@@ -1,3 +1,6 @@
+import angular from 'angular';
+import { genericHandler } from './response/handlers';
+
 angular.module('portainer.docker')
 .factory('Network', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider',
 function NetworkFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {

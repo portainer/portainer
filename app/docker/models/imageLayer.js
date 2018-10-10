@@ -1,4 +1,4 @@
-function ImageLayerViewModel(order, data) {
+export function ImageLayerViewModel(order, data) {
   this.Order = order;
   this.Id = data.Id;
   this.Created = data.Created;

@@ -1,3 +1,6 @@
+import angular from 'angular';
+import { ContainerDetailsViewModel, ContainerViewModel } from '../models/container';
+
 angular.module('portainer.docker')
 .factory('ContainerService', ['$q', 'Container', 'ResourceControlService', 'LogHelper',
 function ContainerServiceFactory($q, Container, ResourceControlService, LogHelper) {

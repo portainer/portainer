@@ -1,4 +1,4 @@
-function UserViewModel(data) {
+export function UserViewModel(data) {
   this.Id = data.Id;
   this.Username = data.Username;
   this.Role = data.Role;
