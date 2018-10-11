@@ -1,3 +1,6 @@
+import angular from 'angular';
+import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
+
 angular.module('portainer.docker')
 .controller('CreateSecretController', ['$scope', '$state', 'Notifications', 'SecretService', 'LabelHelper', 'Authentication', 'ResourceControlService', 'FormValidator',
 function ($scope, $state, Notifications, SecretService, LabelHelper, Authentication, ResourceControlService, FormValidator) {

@@ -1,3 +1,7 @@
+import angular from 'angular';
+import _ from 'lodash';
+import { AccessControlFormData } from '../../components/accessControlForm/porAccessControlFormModel';
+
 angular.module('portainer.app')
 .controller('TemplatesController', ['$scope', '$q', '$state', '$transition$', '$anchorScroll', 'ContainerService', 'ImageService', 'NetworkService', 'TemplateService', 'TemplateHelper', 'VolumeService', 'Notifications', 'ResourceControlService', 'Authentication', 'FormValidator', 'SettingsService', 'StackService', 'EndpointProvider', 'ModalService',
 function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, ImageService, NetworkService, TemplateService, TemplateHelper, VolumeService, Notifications, ResourceControlService, Authentication, FormValidator, SettingsService, StackService, EndpointProvider, ModalService) {

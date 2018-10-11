@@ -1,3 +1,6 @@
+import angular from 'angular';
+import moment from 'moment';
+
 angular.module('portainer.docker')
 .controller('EventsController', ['$scope', 'Notifications', 'SystemService',
 function ($scope, Notifications, SystemService) {

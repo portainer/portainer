@@ -1,3 +1,6 @@
+import angular from 'angular';
+import moment from 'moment';
+
 angular.module('extension.storidge')
 .controller('StoridgeMonitorController', ['$q', '$scope', '$interval', '$document', 'Notifications', 'StoridgeClusterService', 'StoridgeChartService',
 function ($q, $scope, $interval, $document, Notifications, StoridgeClusterService, StoridgeChartService) {

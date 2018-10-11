@@ -1,5 +1,5 @@
 import angular from 'angular';
-import { ContainerDetailsViewModel, ContainerViewModel } from '../models/container';
+import { ContainerDetailsViewModel, ContainerViewModel, ContainerStatsViewModel } from '../models/container';
 
 angular.module('portainer.docker')
 .factory('ContainerService', ['$q', 'Container', 'ResourceControlService', 'LogHelper',

@@ -1,3 +1,6 @@
+import angular from 'angular';
+import _ from 'lodash';
+
 angular.module('portainer.agent').controller('HostBrowserController', [
   'HostBrowserService', 'Notifications', 'FileSaver', 'ModalService',
   function HostBrowserController(HostBrowserService, Notifications, FileSaver, ModalService) {

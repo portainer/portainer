@@ -1,3 +1,5 @@
+import { ResourceControlViewModel } from '../../portainer/models/resourceControl'
+
 export function SecretViewModel(data) {
   this.Id = data.ID;
   this.CreatedAt = data.CreatedAt;

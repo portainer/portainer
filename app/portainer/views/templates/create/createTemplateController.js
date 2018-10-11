@@ -1,3 +1,6 @@
+import angular from 'angular';
+import { TemplateDefaultModel } from "../../../models/template";
+
 angular.module('portainer.app')
 .controller('CreateTemplateController', ['$q', '$scope', '$state', 'TemplateService', 'TemplateHelper', 'NetworkService', 'Notifications',
 function ($q, $scope, $state, TemplateService, TemplateHelper, NetworkService, Notifications) {

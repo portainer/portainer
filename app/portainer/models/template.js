@@ -1,4 +1,6 @@
-function TemplateDefaultModel() {
+import _ from 'lodash';
+
+export function TemplateDefaultModel() {
   this.Type = 1;
   this.AdministratorOnly = false;
   this.Title = '';
@@ -46,7 +48,7 @@ function TemplateCreateRequest(model) {
   this.Volumes = model.Volumes;
 }
 
-function TemplateUpdateRequest(model) {
+export function TemplateUpdateRequest(model) {
   TemplateCreateRequest.call(this, model);
   this.id = model.Id;
 }

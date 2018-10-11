@@ -23,7 +23,7 @@ export function ImageViewModel(data) {
   }
 }
 
-function ImageBuildModel(data) {
+export function ImageBuildModel(data) {
   this.hasError = false;
   var buildLogs = [];
 

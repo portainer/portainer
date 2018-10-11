@@ -1,3 +1,6 @@
+import angular from 'angular';
+import { ImageBuildModel } from "../models/image";
+
 angular.module('portainer.docker')
 .factory('BuildService', ['$q', 'Build', 'FileUploadService', function BuildServiceFactory($q, Build, FileUploadService) {
   'use strict';
