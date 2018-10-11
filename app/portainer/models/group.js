@@ -1,10 +1,10 @@
-function EndpointGroupDefaultModel() {
+export function EndpointGroupDefaultModel() {
   this.Name = '';
   this.Description = '';
   this.Tags = [];
 }
 
-function EndpointGroupModel(data) {
+export function EndpointGroupModel(data) {
   this.Id = data.Id;
   this.Name = data.Name;
   this.Description = data.Description;
@@ -13,14 +13,14 @@ function EndpointGroupModel(data) {
   this.AuthorizedTeams = data.AuthorizedTeams;
 }
 
-function EndpointGroupCreateRequest(model, endpoints) {
+export function EndpointGroupCreateRequest(model, endpoints) {
   this.Name = model.Name;
   this.Description = model.Description;
   this.Tags = model.Tags;
   this.AssociatedEndpoints = endpoints;
 }
 
-function EndpointGroupUpdateRequest(model, endpoints) {
+export function EndpointGroupUpdateRequest(model, endpoints) {
   this.id = model.Id;
   this.Name = model.Name;
   this.Description = model.Description;

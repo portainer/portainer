@@ -1,3 +1,6 @@
+import angular from 'angular';
+import _ from 'lodash';
+
 angular.module('portainer.app').component('groupForm', {
   templateUrl: './groupForm.html',
   controller: function() {

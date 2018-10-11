@@ -14,7 +14,7 @@ export function TemplateDefaultModel() {
   this.Registry = {};
 }
 
-function TemplateCreateRequest(model) {
+export function TemplateCreateRequest(model) {
   this.Type = model.Type;
   this.Name = model.Name;
   this.Hostname = model.Hostname;

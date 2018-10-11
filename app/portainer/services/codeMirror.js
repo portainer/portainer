@@ -1,3 +1,7 @@
+import angular from 'angular';
+import _ from 'lodash';
+import CodeMirror from 'codemirror';
+
 angular.module('portainer.app')
 .factory('CodeMirrorService', function CodeMirrorService() {
   'use strict';

@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 export function ContainerInstanceProviderViewModel(data) {
   this.Id = data.id;
   this.Namespace = data.namespace;

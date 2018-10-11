@@ -1,3 +1,6 @@
+import angular from 'angular';
+import { AccessControlFormData } from '../../../components/accessControlForm/porAccessControlFormModel';
+
 angular.module('portainer.app')
 .controller('CreateStackController', ['$scope', '$state', 'StackService', 'Authentication', 'Notifications', 'FormValidator', 'ResourceControlService', 'FormHelper', 'EndpointProvider',
 function ($scope, $state, StackService, Authentication, Notifications, FormValidator, ResourceControlService, FormHelper, EndpointProvider) {

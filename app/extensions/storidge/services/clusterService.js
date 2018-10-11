@@ -1,3 +1,7 @@
+import angular from 'angular';
+import { StoridgeInfoModel } from '../models/info';
+import { StoridgeEventModel } from '../models/events';
+
 angular.module('extension.storidge')
 .factory('StoridgeClusterService', ['$q', 'Storidge', function StoridgeClusterServiceFactory($q, Storidge) {
   'use strict';

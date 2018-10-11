@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 function ConstraintModel(op, key, value) {
   this.op = op;
   this.value = value;

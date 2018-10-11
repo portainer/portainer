@@ -1,3 +1,6 @@
+import angular from 'angular';
+import _ from 'lodash';
+
 angular.module('portainer.app')
 .factory('ResourceControlService', ['$q', 'ResourceControl', 'UserService', 'TeamService', 'ResourceControlHelper', function ResourceControlServiceFactory($q, ResourceControl, UserService, TeamService, ResourceControlHelper) {
   'use strict';

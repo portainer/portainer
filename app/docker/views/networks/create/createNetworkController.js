@@ -1,3 +1,7 @@
+import angular from 'angular';
+import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
+import { MacvlanFormData } from '../../../components/network-macvlan-form/networkMacvlanFormModel';
+
 angular.module('portainer.docker')
   .controller('CreateNetworkController', ['$q', '$scope', '$state', 'PluginService', 'Notifications', 'NetworkService', 'LabelHelper', 'Authentication', 'ResourceControlService', 'FormValidator', 'HttpRequestHelper',
     function ($q, $scope, $state, PluginService, Notifications, NetworkService, LabelHelper, Authentication, ResourceControlService, FormValidator, HttpRequestHelper) {

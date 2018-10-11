@@ -38,7 +38,7 @@ var capDesc = {
     'BLOCK_SUSPEND': 'Employ features that can block system suspend.'
 };
 
-function ContainerCapabilities() {
+export function ContainerCapabilities() {
     // all capabilities can be found at https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities
     return [
         new ContainerCapability('SETPCAP', true),

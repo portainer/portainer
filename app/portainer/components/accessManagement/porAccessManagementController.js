@@ -1,3 +1,6 @@
+import angular from 'angular';
+import _ from 'lodash';
+
 angular.module('portainer.app')
 .controller('porAccessManagementController', ['AccessService', 'Notifications',
 function (AccessService, Notifications) {

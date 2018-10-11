@@ -1,3 +1,8 @@
+import angular from 'angular';
+import _ from 'lodash';
+import { ContainerCapabilities } from '../../../models/containerCapabilities';
+import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
+
 angular.module('portainer.docker')
 .controller('CreateContainerController', ['$q', '$scope', '$state', '$timeout', '$transition$', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'NetworkService', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'FormValidator', 'ModalService', 'RegistryService', 'SystemService', 'SettingsService', 'HttpRequestHelper',
 function ($q, $scope, $state, $timeout, $transition$, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, NetworkService, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, FormValidator, ModalService, RegistryService, SystemService, SettingsService, HttpRequestHelper) {

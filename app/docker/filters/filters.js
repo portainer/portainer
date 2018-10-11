@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 function includeString(text, values) {
   return values.some(function(val){
     return text.indexOf(val) !== -1;
@@ -258,7 +260,7 @@ angular.module('portainer.docker')
 .filter('imagelayercommand', function () {
   'use strict';
   return function (createdBy) {
-	  return createdBy.replace('/bin/sh -c #(nop) ', '').replace('/bin/sh -c ', 'RUN ');
+    return createdBy.replace('/bin/sh -c #(nop) ', '').replace('/bin/sh -c ', 'RUN ');
   };
 })
 .filter('trimshasum', function () {

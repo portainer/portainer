@@ -1,3 +1,8 @@
+import angular from 'angular';
+import moment from 'moment';
+import _ from 'lodash';
+import filesize from 'filesize';
+
 angular.module('portainer.app')
 .filter('truncate', function () {
   'use strict';

@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.docker')
 .controller('SwarmController', ['$q', '$scope', 'SystemService', 'NodeService', 'Notifications', 'StateManager', 'Authentication',
 function ($q, $scope, SystemService, NodeService, Notifications, StateManager, Authentication) {
@@ -28,7 +30,7 @@ function ($q, $scope, SystemService, NodeService, Notifications, StateManager, A
     // If connected to a replica, information for node1 is available at element #5
     // The next 10 elements are information related to the node
     var node_offset = info[0][1] === 'primary' ? 4 : 5;
-    for (i = 0; i < node_count; i++) {
+    for (let i = 0; i < node_count; i++) {
       extractNodeInfo(info, node_offset);
       node_offset += 9;
     }

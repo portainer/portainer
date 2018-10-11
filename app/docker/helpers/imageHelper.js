@@ -1,3 +1,6 @@
+import angular from 'angular';
+import _ from 'lodash';
+
 angular.module('portainer.docker')
 .factory('ImageHelper', [function ImageHelperFactory() {
   'use strict';

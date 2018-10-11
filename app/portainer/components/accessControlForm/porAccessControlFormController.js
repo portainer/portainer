@@ -1,3 +1,6 @@
+import angular from 'angular';
+import _ from 'lodash';
+
 angular.module('portainer.app')
 .controller('porAccessControlFormController', ['$q', 'UserService', 'TeamService', 'Notifications', 'Authentication', 'ResourceControlService',
 function ($q, UserService, TeamService, Notifications, Authentication, ResourceControlService) {

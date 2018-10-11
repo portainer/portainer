@@ -1,3 +1,6 @@
+import angular from 'angular';
+import _ from 'lodash';
+
 angular.module('portainer.app')
 .controller('TemplateController', ['$q', '$scope', '$state', '$transition$', 'TemplateService', 'TemplateHelper', 'NetworkService', 'Notifications',
 function ($q, $scope, $state, $transition$, TemplateService, TemplateHelper, NetworkService, Notifications) {

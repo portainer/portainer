@@ -1,3 +1,6 @@
+import angular from 'angular';
+import _ from 'lodash';
+
 angular.module('portainer.docker')
 .controller('ImageController', ['$q', '$scope', '$transition$', '$state', '$timeout', 'ImageService', 'RegistryService', 'Notifications', 'HttpRequestHelper', 'ModalService', 'FileSaver', 'Blob',
 function ($q, $scope, $transition$, $state, $timeout, ImageService, RegistryService, Notifications, HttpRequestHelper, ModalService, FileSaver, Blob) {

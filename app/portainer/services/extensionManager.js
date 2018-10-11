@@ -1,3 +1,6 @@
+import angular from 'angular';
+import _ from 'lodash';
+
 angular.module('portainer.app')
 .factory('ExtensionManager', ['$q', 'PluginService', 'SystemService', 'ExtensionService',
 function ExtensionManagerFactory($q, PluginService, SystemService, ExtensionService) {

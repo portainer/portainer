@@ -1,3 +1,10 @@
+import angular from 'angular';
+import {
+  TemplateViewModel,
+  TemplateCreateRequest,
+  TemplateUpdateRequest
+} from '../../models/template';
+
 angular.module('portainer.app')
 .factory('TemplateService', ['$q', 'Templates', 'TemplateHelper', 'ImageHelper', 'ContainerHelper',
 function TemplateServiceFactory($q, Templates, TemplateHelper, ImageHelper, ContainerHelper) {

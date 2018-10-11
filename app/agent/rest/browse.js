@@ -1,3 +1,6 @@
+import angular from 'angular';
+import { browseGetResponse } from './response/browse';
+
 angular.module('portainer.agent')
 .factory('Browse', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', function BrowseFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
   'use strict';

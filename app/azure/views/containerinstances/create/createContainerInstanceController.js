@@ -1,3 +1,6 @@
+import angular from 'angular';
+import { ContainerGroupDefaultModel } from '../../../models/container_group';
+
 angular.module('portainer.azure')
 .controller('AzureCreateContainerInstanceController', ['$q', '$scope', '$state', 'AzureService', 'Notifications',
 function ($q, $scope, $state, AzureService, Notifications) {

@@ -1,3 +1,5 @@
+import bootbox from 'bootbox';
+
 angular.module('portainer.app')
 .factory('ModalService', [function ModalServiceFactory() {
   'use strict';

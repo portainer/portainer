@@ -1,4 +1,8 @@
- angular.module('portainer.docker')
+import angular from 'angular';
+import _ from 'lodash';
+import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
+
+angular.module('portainer.docker')
 .controller('CreateServiceController', ['$q', '$scope', '$state', '$timeout', 'Service', 'ServiceHelper', 'ConfigService', 'ConfigHelper', 'SecretHelper', 'SecretService', 'VolumeService', 'NetworkService', 'ImageHelper', 'LabelHelper', 'Authentication', 'ResourceControlService', 'Notifications', 'FormValidator', 'PluginService', 'RegistryService', 'HttpRequestHelper', 'NodeService', 'SettingsService', 'WebhookService','EndpointProvider',
 function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, ConfigHelper, SecretHelper, SecretService, VolumeService, NetworkService, ImageHelper, LabelHelper, Authentication, ResourceControlService, Notifications, FormValidator, PluginService, RegistryService, HttpRequestHelper, NodeService, SettingsService, WebhookService,EndpointProvider) {
 
