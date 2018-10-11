@@ -3,7 +3,8 @@ angular.module('portainer.app')
 function ($scope, $state, PortainerPluginService, Notifications) {
 
   $scope.state = {
-    actionInProgress: false
+    actionInProgress: false,
+    currentDate: moment().format('YYYY-MM-dd')
   };
 
   $scope.formValues = {
