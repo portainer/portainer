@@ -68,6 +68,7 @@ type Server struct {
 	SSLCert                string
 	SSLKey                 string
 	DockerClientFactory    *docker.ClientFactory
+	JobService             portainer.JobService
 }
 
 // Start starts the HTTP server
@@ -109,6 +110,7 @@ func (server *Server) Start() error {
 	endpointHandler.FileService = server.FileService
 	endpointHandler.ProxyManager = proxyManager
 	endpointHandler.Snapshotter = server.Snapshotter
+	endpointHandler.JobService = server.JobService
 
 	var endpointGroupHandler = endpointgroups.NewHandler(requestBouncer)
 	endpointGroupHandler.EndpointGroupService = server.EndpointGroupService

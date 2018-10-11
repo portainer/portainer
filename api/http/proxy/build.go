@@ -43,7 +43,7 @@ func buildOperation(request *http.Request) error {
 		dockerfileContent = []byte(req.Content)
 	}
 
-	buffer, err := archive.TarFileInBuffer(dockerfileContent, "Dockerfile")
+	buffer, err := archive.TarFileInBuffer(dockerfileContent, "Dockerfile", 0600)
 	if err != nil {
 		return err
 	}
