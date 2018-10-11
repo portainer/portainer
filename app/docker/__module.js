@@ -139,6 +139,16 @@ angular.module('portainer.docker', ['portainer.app'])
     }
   };
 
+  var hostBrowser = {
+    name: 'docker.host.browser',
+    url: '/browser',
+    views: {
+      'content@': {
+        component: 'hostBrowserView'
+      }
+    }
+  };
+
   var events = {
     name: 'docker.events',
     url: '/events',
@@ -239,6 +249,16 @@ angular.module('portainer.docker', ['portainer.app'])
     views: {
       'content@': {
         component: 'nodeDetailsView'
+      }
+    }
+  };
+
+  var nodeBrowser = {
+    name: 'docker.nodes.node.browse',
+    url: '/browse',
+    views: {
+      'content@': {
+        component: 'nodeBrowserView'
       }
     }
   };
@@ -414,6 +434,8 @@ angular.module('portainer.docker', ['portainer.app'])
     }
   };
 
+  
+
   $stateRegistryProvider.register(configs);
   $stateRegistryProvider.register(config);
   $stateRegistryProvider.register(configCreation);
@@ -427,6 +449,7 @@ angular.module('portainer.docker', ['portainer.app'])
   $stateRegistryProvider.register(docker);
   $stateRegistryProvider.register(dashboard);
   $stateRegistryProvider.register(host);
+  $stateRegistryProvider.register(hostBrowser);
   $stateRegistryProvider.register(events);
   $stateRegistryProvider.register(images);
   $stateRegistryProvider.register(image);
@@ -437,6 +460,7 @@ angular.module('portainer.docker', ['portainer.app'])
   $stateRegistryProvider.register(networkCreation);
   $stateRegistryProvider.register(nodes);
   $stateRegistryProvider.register(node);
+  $stateRegistryProvider.register(nodeBrowser);
   $stateRegistryProvider.register(secrets);
   $stateRegistryProvider.register(secret);
   $stateRegistryProvider.register(secretCreation);

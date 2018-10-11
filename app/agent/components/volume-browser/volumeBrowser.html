@@ -1,5 +1,11 @@
-<volume-browser-datatable
+<files-datatable
   title-text="Volume browser" title-icon="fa-file"
   dataset="$ctrl.files" table-key="volume_browser"
   order-by="Dir"
-></volume-browser-datatable>
+  is-root="$ctrl.state.path === '/'"
+  go-to-parent="$ctrl.up()"
+  browse="$ctrl.browse(name)"
+  rename="$ctrl.rename(name, newName)"
+  download="$ctrl.download(name)"
+  delete="$ctrl.delete(name)"
+></files-datatable>
