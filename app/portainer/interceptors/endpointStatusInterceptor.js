@@ -7,7 +7,8 @@ angular.module('portainer.app')
         _.includes(url, '/volumes') ||
         _.includes(url, '/networks') ||
         _.includes(url, '/info') ||
-        _.includes(url, '/version')
+        _.includes(url, '/version') ||
+        _.includes(url, '/_ping')
       ));
     }
 

@@ -6,12 +6,14 @@ function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, G
     Notifications.error('Failure', '', notification);
     EndpointProvider.setEndpointID(backup.id);
     EndpointProvider.setEndpointPublicURL(backup.publicURL);
+    StateManager.setEndpointStatus(backup.status);
   }
 
   $scope.goToDashboard = function(endpoint) {
     var currentEndpointBackup = {
       id: EndpointProvider.endpointID(),
-      publicURL: EndpointProvider.endpointPublicURL()
+      publicURL: EndpointProvider.endpointPublicURL(),
+      status: StateManager.getState().endpoint.status
     };
     EndpointProvider.setEndpointID(endpoint.Id);
     EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
