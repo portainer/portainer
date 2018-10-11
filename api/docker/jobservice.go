@@ -34,7 +34,6 @@ func NewJobService(dockerClientFactory *ClientFactory) *JobService {
 func (service *JobService) Execute(endpoint *portainer.Endpoint, image string, script []byte) error {
 	buffer, err := archive.TarFileInBuffer(script, "script.sh", 0700)
 	if err != nil {
-		// TODO: better error handling in all handler
 		return tarFileError
 	}
 
