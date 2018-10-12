@@ -1,6 +1,6 @@
 angular.module('portainer.docker').controller('HostViewController', [
-  '$q', 'SystemService', 'Notifications', 'StateManager', 'AgentService',
-  function HostViewController($q, SystemService, Notifications, StateManager, AgentService) {
+  '$q', 'SystemService', 'Notifications', 'StateManager', 'AgentService', 'EndpointProvider',
+  function HostViewController($q, SystemService, Notifications, StateManager, AgentService, EndpointProvider) {
     var ctrl = this;
     this.$onInit = initView;
 
@@ -15,7 +15,6 @@ angular.module('portainer.docker').controller('HostViewController', [
     function initView() {
       var applicationState = StateManager.getState();
       ctrl.state.isAgent = applicationState.endpoint.mode.agentProxy;
-      ctrl.state.endpointStatus = applicationState.endpoint.status;
 
       $q.all({
         version: SystemService.version(),
@@ -24,6 +23,7 @@ angular.module('portainer.docker').controller('HostViewController', [
         .then(function success(data) {
           ctrl.engineDetails = buildEngineDetails(data);
           ctrl.hostDetails = buildHostDetails(data.info);
+          ctrl.endpointStatus = EndpointProvider.endpointStatus();
 
           if (ctrl.state.isAgent) {
             return AgentService.hostInfo(data.info.Hostname).then(function onHostInfoLoad(agentHostInfo) {
