@@ -7,14 +7,32 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
     StackFileContent: '',
     StackFile: null,
     RepositoryURL: '',
-    RepositoryReferenceName: '',
-    RepositoryAuthentication: false,
+    RepositoryReferenceName: "",
     RepositoryUsername: '',
     RepositoryPassword: '',
     Env: [],
     ComposeFilePathInRepository: 'docker-compose.yml',
-    AccessControlData: new AccessControlFormData()
-  };
+    AccessControlData: new AccessControlFormData(),  
+    StachauthControlData: new StackAuthControlFormData(),     
+    RepositoryAuthentication:false,
+    stackAuthenticationControlEnabled:''
+  }; 
+  var stateChangeKey = false;
+  $scope.formValues.generateNewKey =function(){
+    StackService.setStackName($scope.formValues.Name);
+    if($('#stack_name').val() !=""){
+      $('#btngeneratekey').removeAttr("disabled")
+      $('#warningStackname').hide();
+    } else {
+      $('#btngeneratekey').attr('disabled','disabled');
+      $('#warningStackname').show();
+    }
+  } 
+
+  $scope.formValues.authenticationEnable =function (vale){    
+    $scope.formValues.stackAuthenticationControlEnabled = '1';
+     stateChangeKey = vale;
+  }
 
   $scope.state = {
     Method: 'editor',
@@ -33,7 +51,7 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
 
   function validateForm(accessControlData, isAdmin) {
     $scope.state.formValidationError = '';
-    var error = '';
+    var error = '';    
     error = FormValidator.validateAccessControl(accessControlData, isAdmin);
 
     if (error) {
@@ -44,8 +62,11 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
   }
 
   function createSwarmStack(name, method) {
+    
     var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
     var endpointId = EndpointProvider.endpointID();
+
+    var StachauthControlData = $scope.formValues.StachauthControlData;
 
     if (method === 'editor') {
       var stackFileContent = $scope.formValues.StackFileContent;
@@ -53,38 +74,76 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
     } else if (method === 'upload') {
       var stackFile = $scope.formValues.StackFile;
       return StackService.createSwarmStackFromFileUpload(name, stackFile, env, endpointId);
-    } else if (method === 'repository') {
+    } else if (method === 'repository') {    
+      
+      var prKey = "";
+      var pubKey =  "";
+      
+      if($scope.formValues.stackAuthenticationControlEnabled == 2){
+        prKey = "";
+        pubKey = ""
+        
+      } else if($scope.formValues.stackAuthenticationControlEnabled == 1) {
+        prKey = StachauthControlData.GenrateSshkey['selected'].Privatekeypath;
+        pubKey = StachauthControlData.GenrateSshkey['selected'].Publickeypath;
+      } 
+
       var repositoryOptions = {
         RepositoryURL: $scope.formValues.RepositoryURL,
         RepositoryReferenceName: $scope.formValues.RepositoryReferenceName,
         ComposeFilePathInRepository: $scope.formValues.ComposeFilePathInRepository,
-        RepositoryAuthentication: $scope.formValues.RepositoryAuthentication,
+        RepositoryAuthentication : $scope.formValues.RepositoryAuthentication,
+        stackAuthenticationControlEnabled : stateChangeKey,       
         RepositoryUsername: $scope.formValues.RepositoryUsername,
-        RepositoryPassword: $scope.formValues.RepositoryPassword
+        RepositoryPassword: $scope.formValues.RepositoryPassword,
+        RepositoryPrivatekeypath: prKey, 
+        RepositoryPublickeypath: pubKey    
+
       };
+      
       return StackService.createSwarmStackFromGitRepository(name, repositoryOptions, env, endpointId);
     }
   }
 
-  function createComposeStack(name, method) {
-    var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);
+  function createComposeStack(name, method) {   
+   
+    var env = FormHelper.removeInvalidEnvVars($scope.formValues.Env);    
     var endpointId = EndpointProvider.endpointID();
-
+    
+    var StachauthControlData = $scope.formValues.StachauthControlData;    
+        
     if (method === 'editor') {
       var stackFileContent = $scope.formValues.StackFileContent;
       return StackService.createComposeStackFromFileContent(name, stackFileContent, env, endpointId);
     } else if (method === 'upload') {
       var stackFile = $scope.formValues.StackFile;
       return StackService.createComposeStackFromFileUpload(name, stackFile, env, endpointId);
-    } else if (method === 'repository') {
+    } else if (method === 'repository') {   
+      
+      var prKey = "";
+      var pubKey =  "";
+      
+      if($scope.formValues.stackAuthenticationControlEnabled == 2){
+        prKey = "";
+        pubKey = ""
+        
+      } else if($scope.formValues.stackAuthenticationControlEnabled == 1) {
+        prKey = StachauthControlData.GenrateSshkey['selected'].Privatekeypath;
+        pubKey = StachauthControlData.GenrateSshkey['selected'].Publickeypath;        
+      } 
+               
       var repositoryOptions = {
         RepositoryURL: $scope.formValues.RepositoryURL,
         RepositoryReferenceName: $scope.formValues.RepositoryReferenceName,
-        ComposeFilePathInRepository: $scope.formValues.ComposeFilePathInRepository,
-        RepositoryAuthentication: $scope.formValues.RepositoryAuthentication,
+        ComposeFilePathInRepository: $scope.formValues.ComposeFilePathInRepository, 
+        RepositoryAuthentication : $scope.formValues.RepositoryAuthentication,
+        stackAuthenticationControlEnabled : stateChangeKey,              
         RepositoryUsername: $scope.formValues.RepositoryUsername,
-        RepositoryPassword: $scope.formValues.RepositoryPassword
-      };
+        RepositoryPassword: $scope.formValues.RepositoryPassword,
+        RepositoryPrivatekeypath: prKey, 
+        RepositoryPublickeypath: pubKey       
+      };    
+      
       return StackService.createComposeStackFromGitRepository(name, repositoryOptions, env, endpointId);
     }
   }
@@ -94,6 +153,7 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
     var method = $scope.state.Method;
 
     var accessControlData = $scope.formValues.AccessControlData;
+    
     var userDetails = Authentication.getUserDetails();
     var isAdmin = userDetails.role === 1;
     var userId = userDetails.ID;
@@ -136,6 +196,7 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
   function initView() {
     var endpointMode = $scope.applicationState.endpoint.mode;
     $scope.state.StackType = 2;
+    
     if (endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER') {
       $scope.state.StackType = 1;
     }

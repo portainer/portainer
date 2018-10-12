@@ -71,6 +71,11 @@ const (
 	ErrEndpointExtensionAlreadyAssociated = Error("This extension is already associated to the endpoint")
 )
 
+// Deploykey errors
+const (
+	ErrDeploykeyAlreadyExists = Error("A key already exists with this name")
+)
+
 // Crypto errors.
 const (
 	ErrCryptoHashFailure = Error("Unable to hash data")
