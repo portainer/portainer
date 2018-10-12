@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-  .controller('SidebarController', ['$q', '$transitions', '$scope', 'StateManager', 'Notifications', 'Authentication', 'UserService', 'EndpointProvider',
-    function ($q, $transitions, $scope, StateManager, Notifications, Authentication, UserService, EndpointProvider) {
+  .controller('SidebarController', ['$q', '$scope', 'StateManager', 'Notifications', 'Authentication', 'UserService',
+    function ($q, $scope, StateManager, Notifications, Authentication, UserService) {
 
       function checkPermissions(memberships) {
         var isLeader = false;
@@ -12,14 +12,9 @@ angular.module('portainer.app')
         $scope.isTeamLeader = isLeader;
       }
 
-      $transitions.onSuccess({to: '**'}, function() {
-        $scope.endpointStatus = EndpointProvider.endpointStatus();
-      });
-
       function initView() {
         $scope.uiVersion = StateManager.getState().application.version;
         $scope.logo = StateManager.getState().application.logo;
-        $scope.endpointStatus = EndpointProvider.endpointStatus();
 
         var authenticationEnabled = $scope.applicationState.application.authentication;
         if (authenticationEnabled) {

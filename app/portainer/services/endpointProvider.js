@@ -7,16 +7,25 @@ angular.module('portainer.app')
   service.initialize = function() {
     var endpointID = LocalStorage.getEndpointID();
     var endpointPublicURL = LocalStorage.getEndpointPublicURL();
+    var endpointStatus = LocalStorage.getEndpointStatus();
+
     if (endpointID) {
       endpoint.ID = endpointID;
     }
     if (endpointPublicURL) {
       endpoint.PublicURL = endpointPublicURL;
     }
+    if (endpointStatus) {
+      endpoint.Status = endpointStatus;
+    }
   };
 
   service.clean = function() {
     endpoint = {};
+  };
+
+  service.endpoint = function() {
+    return endpoint;
   };
 
   service.endpointID = function() {
