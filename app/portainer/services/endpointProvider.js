@@ -20,6 +20,9 @@ angular.module('portainer.app')
   };
 
   service.endpointID = function() {
+    if (endpoint.ID === undefined) {
+      endpoint.ID = LocalStorage.getEndpointID();
+    }
     return endpoint.ID;
   };
 
@@ -29,6 +32,9 @@ angular.module('portainer.app')
   };
 
   service.endpointPublicURL = function() {
+    if (endpoint.PublicURL === undefined) {
+      endpoint.PublicURL = LocalStorage.getEndpointPublicURL();
+    }
     return endpoint.PublicURL;
   };
 
@@ -43,6 +49,18 @@ angular.module('portainer.app')
 
   service.setEndpoints = function(data) {
     LocalStorage.storeEndpoints(data);
+  };
+
+  service.endpointStatus = function() {
+    if (endpoint.Status === undefined) {
+      endpoint.Status = LocalStorage.getEndpointStatus();
+    }
+    return endpoint.Status;
+  };
+
+  service.setEndpointStatus = function(status) {
+    endpoint.Status = status;
+    LocalStorage.storeEndpointStatus(status);
   };
 
   service.currentEndpoint = function() {

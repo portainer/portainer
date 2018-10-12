@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.factory('StateManager', ['$q', 'SystemService', 'InfoHelper', 'LocalStorage', 'SettingsService', 'StatusService', 'EndpointService', 'APPLICATION_CACHE_VALIDITY',
-function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, SettingsService, StatusService, EndpointService, APPLICATION_CACHE_VALIDITY) {
+.factory('StateManager', ['$q', 'SystemService', 'InfoHelper', 'LocalStorage', 'SettingsService', 'StatusService', 'APPLICATION_CACHE_VALIDITY',
+function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, SettingsService, StatusService, APPLICATION_CACHE_VALIDITY) {
   'use strict';
 
   var manager = {};
@@ -13,18 +13,6 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
       dismissedInfoPanels: {},
       dismissedInfoHash: ''
     }
-  };
-
-  manager.setEndpointStatus = function(status) {
-    EndpointService.updateEndpoint(LocalStorage.getEndpointID(), {Status: status})
-    .then(function success() {
-      state.endpoint.status = status;
-      LocalStorage.storeEndpointState(state.endpoint);
-    });
-  };
-
-  manager.checkEndpointStatus = function() {
-    return SystemService.ping();
   };
 
   manager.dismissInformationPanel = function(id) {
@@ -147,13 +135,12 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
     return extensions;
   }
 
-  manager.updateEndpointState = function(name, type, status, extensions) {
+  manager.updateEndpointState = function(name, type, extensions) {
     var deferred = $q.defer();
 
     if (type === 3) {
       state.endpoint.name = name;
       state.endpoint.mode = { provider: 'AZURE' };
-      state.endpoint.status = status;
       LocalStorage.storeEndpointState(state.endpoint);
       deferred.resolve();
       return deferred.promise;
@@ -169,7 +156,6 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
       state.endpoint.mode = endpointMode;
       state.endpoint.name = name;
       state.endpoint.apiVersion = endpointAPIVersion;
-      state.endpoint.status = status;
       state.endpoint.extensions = assignExtensions(extensions);
       LocalStorage.storeEndpointState(state.endpoint);
       deferred.resolve();

@@ -1,9 +1,9 @@
 angular.module('portainer.docker')
-.controller('ContainersController', ['$scope', 'ContainerService', 'Notifications', 'StateManager',
-function ($scope, ContainerService, Notifications, StateManager) {
+.controller('ContainersController', ['$scope', 'ContainerService', 'Notifications', 'EndpointProvider',
+function ($scope, ContainerService, Notifications, EndpointProvider) {
 
   function initView() {
-    $scope.endpointStatus = StateManager.getState().endpoint.status;
+    $scope.endpointStatus = EndpointProvider.endpointStatus();
     ContainerService.containers(1)
     .then(function success(data) {
       $scope.containers = data;

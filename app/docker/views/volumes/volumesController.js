@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('VolumesController', ['$q', '$scope', '$state', 'VolumeService', 'ServiceService', 'VolumeHelper', 'Notifications', 'HttpRequestHelper', 'StateManager',
-function ($q, $scope, $state, VolumeService, ServiceService, VolumeHelper, Notifications, HttpRequestHelper, StateManager) {
+.controller('VolumesController', ['$q', '$scope', '$state', 'VolumeService', 'ServiceService', 'VolumeHelper', 'Notifications', 'HttpRequestHelper', 'EndpointProvider',
+function ($q, $scope, $state, VolumeService, ServiceService, VolumeHelper, Notifications, HttpRequestHelper, EndpointProvider) {
 
   $scope.removeAction = function (selectedItems) {
     var actionCount = selectedItems.length;
@@ -27,7 +27,7 @@ function ($q, $scope, $state, VolumeService, ServiceService, VolumeHelper, Notif
   function initView() {
     var endpointProvider = $scope.applicationState.endpoint.mode.provider;
     var endpointRole = $scope.applicationState.endpoint.mode.role;
-    $scope.endpointStatus = StateManager.getState().endpoint.status;
+    $scope.endpointStatus = EndpointProvider.endpointStatus();
 
     $q.all({
       attached: VolumeService.volumes({ filters: { 'dangling': ['false'] } }),

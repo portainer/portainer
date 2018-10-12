@@ -1,5 +1,5 @@
 angular.module('portainer.app')
-  .factory('EndpointStatusInterceptor', ['$q', '$injector', function ($q, $injector) {
+  .factory('EndpointStatusInterceptor', ['$q', '$injector', 'EndpointProvider', function ($q, $injector, EndpointProvider) {
     function canBeOffline(url) {
       return (_.startsWith(url, 'api/') && (
         _.includes(url, '/containers') ||
@@ -7,25 +7,26 @@ angular.module('portainer.app')
         _.includes(url, '/volumes') ||
         _.includes(url, '/networks') ||
         _.includes(url, '/info') ||
-        _.includes(url, '/version') ||
-        _.includes(url, '/_ping')
+        _.includes(url, '/version')
       ));
     }
 
     return {
       response: function (response) {
-        var StateManager = $injector.get('StateManager');
+        var EndpointService = $injector.get('EndpointService');
         var url = response.config.url;
-        if (response.status === 200 && canBeOffline(url) && StateManager.getState().endpoint.status === 2) {
-          StateManager.setEndpointStatus(1);
+        if (response.status === 200 && canBeOffline(url) && EndpointProvider.endpointStatus() === 2) {
+          EndpointProvider.setEndpointStatus(1);
+          EndpointService.updateEndpoint(EndpointProvider.endpointID(), {Status: 1});
         }
         return response || $q.when(response);
       },
       responseError: function (rejection) {
-        var StateManager = $injector.get('StateManager');
+        var EndpointService = $injector.get('EndpointService');
         var url = rejection.config.url;
-        if ((rejection.status === 502 || rejection.status === -1) && canBeOffline(url) && StateManager.getState().endpoint.status === 1) {
-          StateManager.setEndpointStatus(2);
+        if ((rejection.status === 502 || rejection.status === -1) && canBeOffline(url) && EndpointProvider.endpointStatus() === 1) {
+          EndpointProvider.setEndpointStatus(2);
+          EndpointService.updateEndpoint(EndpointProvider.endpointID(), {Status: 2});
         }
         return $q.reject(rejection);
       }

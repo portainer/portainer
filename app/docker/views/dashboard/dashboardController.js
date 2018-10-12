@@ -29,7 +29,7 @@ function ($scope, $q, ContainerService, ImageService, NetworkService, VolumeServ
       $scope.stackCount = data.stacks.length;
       $scope.info = data.info;
       $scope.endpoint = data.endpoint;
-      $scope.endpointStatus = StateManager.getState().endpoint.status;
+      $scope.endpointStatus = EndpointProvider.endpointStatus();
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to load dashboard data');

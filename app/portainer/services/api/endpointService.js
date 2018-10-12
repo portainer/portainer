@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.factory('EndpointService', ['$q', 'Endpoints', 'FileUploadService',
-function EndpointServiceFactory($q, Endpoints, FileUploadService) {
+.factory('EndpointService', ['$q', 'Endpoints', 'FileUploadService', 'SystemService',
+function EndpointServiceFactory($q, Endpoints, FileUploadService, SystemService) {
   'use strict';
   var service = {};
 
@@ -14,6 +14,10 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
 
   service.snapshot = function() {
     return Endpoints.snapshot({}, {}).$promise;
+  };
+
+  service.checkEndpointStatus = function(endpointId) {
+    return SystemService.ping(endpointId);
   };
 
   service.endpointsByGroup = function(groupId) {

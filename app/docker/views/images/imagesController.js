@@ -1,10 +1,10 @@
 angular.module('portainer.docker')
-.controller('ImagesController', ['$scope', '$state', 'ImageService', 'Notifications', 'ModalService', 'HttpRequestHelper', 'FileSaver', 'Blob', 'StateManager',
-function ($scope, $state, ImageService, Notifications, ModalService, HttpRequestHelper, FileSaver, Blob, StateManager) {
+.controller('ImagesController', ['$scope', '$state', 'ImageService', 'Notifications', 'ModalService', 'HttpRequestHelper', 'FileSaver', 'Blob', 'EndpointProvider',
+function ($scope, $state, ImageService, Notifications, ModalService, HttpRequestHelper, FileSaver, Blob, EndpointProvider) {
   $scope.state = {
     actionInProgress: false,
     exportInProgress: false,
-    endpointStatus: StateManager.getState().endpoint.status
+    endpointStatus: EndpointProvider.endpointStatus()
   };
 
   $scope.formValues = {

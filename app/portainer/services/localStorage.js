@@ -14,6 +14,18 @@ angular.module('portainer.app')
     getEndpointPublicURL: function() {
       return localStorageService.get('ENDPOINT_PUBLIC_URL');
     },
+    storeEndpointStatus: function(status) {
+      localStorageService.set('ENDPOINT_STATUS', status);
+    },
+    getEndpointStatus: function() {
+      return localStorageService.get('ENDPOINT_STATUS');
+    },
+    storeEndpoints: function(data) {
+      localStorageService.set('ENDPOINTS_DATA', data);
+    },
+    getEndpoints: function() {
+      return localStorageService.get('ENDPOINTS_DATA');
+    },
     storeEndpointState: function(state) {
       localStorageService.set('ENDPOINT_STATE', state);
     },
@@ -88,12 +100,6 @@ angular.module('portainer.app')
     },
     getColumnVisibilitySettings: function(key) {
       return localStorageService.get('col_visibility_' + key);
-    },
-    storeEndpoints: function(data) {
-      localStorageService.set('ENDPOINTS_DATA', data);
-    },
-    getEndpoints: function() {
-      return localStorageService.get('ENDPOINTS_DATA');
     },
     clean: function() {
       localStorageService.clearAll();

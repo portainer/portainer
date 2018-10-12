@@ -7,9 +7,6 @@ angular.module('portainer.docker')
     endpointId: EndpointProvider.endpointID
   },
   {
-    ping: {
-      method: 'GET', params: { action: '_ping' }, timeout: 10000
-    },
     info: {
       method: 'GET', params: { action: 'info' }, timeout: 10000, interceptor: InfoInterceptor
     },
