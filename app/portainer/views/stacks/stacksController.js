@@ -36,7 +36,6 @@ function ($scope, $state, Notifications, StackService, ModalService, EndpointPro
   function initView() {
     var endpointMode = $scope.applicationState.endpoint.mode;
     var endpointId = EndpointProvider.endpointID();
-    $scope.endpointStatus = EndpointProvider.endpointStatus();
 
     StackService.stacks(
       true,
@@ -46,6 +45,7 @@ function ($scope, $state, Notifications, StackService, ModalService, EndpointPro
     .then(function success(data) {
       var stacks = data;
       $scope.stacks = stacks;
+      $scope.endpointStatus = EndpointProvider.endpointStatus();
     })
     .catch(function error(err) {
       $scope.stacks = [];

@@ -27,7 +27,6 @@ function ($q, $scope, $state, VolumeService, ServiceService, VolumeHelper, Notif
   function initView() {
     var endpointProvider = $scope.applicationState.endpoint.mode.provider;
     var endpointRole = $scope.applicationState.endpoint.mode.role;
-    $scope.endpointStatus = EndpointProvider.endpointStatus();
 
     $q.all({
       attached: VolumeService.volumes({ filters: { 'dangling': ['false'] } }),
@@ -36,6 +35,7 @@ function ($q, $scope, $state, VolumeService, ServiceService, VolumeHelper, Notif
     })
     .then(function success(data) {
       var services = data.services;
+      $scope.endpointStatus = EndpointProvider.endpointStatus();
       $scope.volumes = data.attached.map(function(volume) {
         volume.dangling = false;
         return volume;

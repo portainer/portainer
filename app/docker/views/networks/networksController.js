@@ -25,10 +25,10 @@ function ($scope, $state, NetworkService, Notifications, HttpRequestHelper, Endp
   };
 
   function initView() {
-    $scope.endpointStatus = EndpointProvider.endpointStatus();
     NetworkService.networks(true, true, true)
     .then(function success(data) {
       $scope.networks = data;
+      $scope.endpointStatus = EndpointProvider.endpointStatus();
     })
     .catch(function error(err) {
       $scope.networks = [];

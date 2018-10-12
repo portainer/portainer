@@ -3,8 +3,7 @@ angular.module('portainer.docker')
 function ($scope, $state, ImageService, Notifications, ModalService, HttpRequestHelper, FileSaver, Blob, EndpointProvider) {
   $scope.state = {
     actionInProgress: false,
-    exportInProgress: false,
-    endpointStatus: EndpointProvider.endpointStatus()
+    exportInProgress: false
   };
 
   $scope.formValues = {
@@ -118,6 +117,7 @@ function ($scope, $state, ImageService, Notifications, ModalService, HttpRequest
     ImageService.images(true)
     .then(function success(data) {
       $scope.images = data;
+      $scope.state.endpointStatus = EndpointProvider.endpointStatus();
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve images');
