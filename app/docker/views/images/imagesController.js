@@ -113,6 +113,8 @@ function ($scope, $state, ImageService, Notifications, ModalService, HttpRequest
     });
   };
 
+  $scope.state.endpointStatus = 1;
+
   function initView() {
     ImageService.images(true)
     .then(function success(data) {

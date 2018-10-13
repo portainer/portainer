@@ -6,6 +6,8 @@ function ($scope, $q, ContainerService, ImageService, NetworkService, VolumeServ
     StateManager.dismissInformationPanel(id);
   };
 
+  $scope.endpointStatus = 1;
+
   function initView() {
     var endpointMode = $scope.applicationState.endpoint.mode;
     var endpointId = EndpointProvider.endpointID();

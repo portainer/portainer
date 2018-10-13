@@ -33,6 +33,8 @@ function ($scope, $state, Notifications, StackService, ModalService, EndpointPro
     });
   }
 
+  $scope.endpointStatus = 1;
+
   function initView() {
     var endpointMode = $scope.applicationState.endpoint.mode;
     var endpointId = EndpointProvider.endpointID();

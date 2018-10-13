@@ -24,6 +24,8 @@ function ($scope, $state, NetworkService, Notifications, HttpRequestHelper, Endp
     });
   };
 
+  $scope.endpointStatus = 1;
+
   function initView() {
     NetworkService.networks(true, true, true)
     .then(function success(data) {

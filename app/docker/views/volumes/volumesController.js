@@ -24,6 +24,8 @@ function ($q, $scope, $state, VolumeService, ServiceService, VolumeHelper, Notif
     });
   };
 
+  $scope.endpointStatus = 1;
+
   function initView() {
     var endpointProvider = $scope.applicationState.endpoint.mode.provider;
     var endpointRole = $scope.applicationState.endpoint.mode.role;

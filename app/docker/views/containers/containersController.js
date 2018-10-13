@@ -2,6 +2,8 @@ angular.module('portainer.docker')
 .controller('ContainersController', ['$scope', 'ContainerService', 'Notifications', 'EndpointProvider',
 function ($scope, ContainerService, Notifications, EndpointProvider) {
 
+  $scope.endpointStatus = 1;
+
   function initView() {
     ContainerService.containers(1)
     .then(function success(data) {
