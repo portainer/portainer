@@ -1,12 +1,13 @@
 <host-overview
-  is-agent="$ctrl.state.isAgent"
-  host-details="$ctrl.hostDetails"
   engine-details="$ctrl.engineDetails"
+  host-details="$ctrl.hostDetails"
+  is-agent="$ctrl.state.isAgent"
   disks="$ctrl.disks"
   devices="$ctrl.devices"
-
   refresh-url="docker.nodes.node"
   browse-url="docker.nodes.node.browse"
+  is-admin="$ctrl.state.isAdmin"
+  jobs="$ctrl.jobs"
 >
   <swarm-node-details-panel
     details="$ctrl.nodeDetails"
