@@ -16,7 +16,7 @@
           ng-model="$ctrl.formValues.newName" />
           <span ng-if="!$ctrl.stackNameAvailable" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
           <div ng-if="!$ctrl.stackNameAvailable" class="help-block">
-            The stack name can't be used to duplicate
+            This stack name is already used
           </div>
       </div>
       <endpoint-selector ng-if="$ctrl.endpoints && $ctrl.groups" model="$ctrl.formValues.endpoint"
