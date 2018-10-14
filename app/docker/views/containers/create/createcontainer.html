@@ -503,11 +503,11 @@
               <!-- !privileged-mode -->
               <!-- runtimes -->
               <div class="form-group">
-                <label for="container_runtime" class="col-sm-2 col-lg-1 control-label text-left">Runtime</label>
-                <div class="col-sm-1">
-                  <select class="form-control" ng-model="config.HostConfig.Runtime" id="container_runtime">
-                    <option selected disabled hidden value="">Select a runtime</option>
-                    <option ng-repeat="(runtime, _) in availableRuntimes" ng-value="runtime">{{ runtime }}</option>
+                <label for="container_runtime" class="col-sm-1 control-label text-left">Runtime</label>
+                <div class="col-sm-11">
+                  <select class="form-control" ng-model="config.HostConfig.Runtime"
+                    id="container_runtime" ng-options="runtime for runtime in availableRuntimes">
+                    <option selected value="">Default</option>
                   </select>
                 </div>
               </div>

@@ -11,7 +11,10 @@
   <rd-header-content>Docker</rd-header-content>
 </rd-header>
 
-<host-details-panel host="$ctrl.hostDetails" is-agent="$ctrl.isAgent"></host-details-panel>
+<host-details-panel 
+  host="$ctrl.hostDetails" 
+  is-agent="$ctrl.isAgent"
+  browse-url="{{$ctrl.browseUrl}}"></host-details-panel>
 
 <engine-details-panel engine="$ctrl.engineDetails"></engine-details-panel>
 

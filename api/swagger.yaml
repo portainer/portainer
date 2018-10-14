@@ -4273,7 +4273,7 @@ definitions:
       Prune:
         type: "boolean"
         example: false
-        description: "Prune services that are no longer referenced"
+        description: "Prune services that are no longer referenced (only available for Swarm stacks)"
   StackFileInspectResponse:
     type: "object"
     properties:
