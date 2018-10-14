@@ -54,7 +54,6 @@ func (service *JobService) Execute(endpoint *portainer.Endpoint, image string, s
 		Tty:          true,
 		WorkingDir:   "/tmp",
 		Image:        image,
-		// TODO: can be useful to specify an id there? task exec id?
 		Labels: map[string]string{
 			"io.portainer.job.endpoint": strconv.Itoa(int(endpoint.ID)),
 		},
