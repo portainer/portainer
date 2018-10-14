@@ -3,38 +3,22 @@ package endpoints
 import (
 	"errors"
 	"net/http"
-	"strings"
 
+	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer"
 )
 
-type endpointJobPayload struct {
-	Image string
-}
-
 type endpointJobFromFilePayload struct {
-	endpointJobPayload
-	File []byte
+	Image string
+	File  []byte
 }
 
 type endpointJobFromFileContentPayload struct {
-	endpointJobPayload
+	Image       string
 	FileContent string
-}
-
-func (payload endpointJobPayload) Validate(r *http.Request) error {
-	image, _ := request.RetrieveMultiPartFormValue(r, "Image", true)
-
-	if strings.TrimSpace(image) != "" {
-		payload.Image = image
-	} else {
-		payload.Image = "ubuntu:latest"
-	}
-
-	return nil
 }
 
 func (payload *endpointJobFromFilePayload) Validate(r *http.Request) error {
@@ -44,27 +28,25 @@ func (payload *endpointJobFromFilePayload) Validate(r *http.Request) error {
 	}
 	payload.File = file
 
-	// TODO why doesn't it work? why image is empty?
-	return payload.endpointJobPayload.Validate(r)
+	image, err := request.RetrieveMultiPartFormValue(r, "Image", false)
+	if err != nil {
+		return portainer.Error("Invalid image name")
+	}
+	payload.Image = image
+
+	return nil
 }
 
 func (payload *endpointJobFromFileContentPayload) Validate(r *http.Request) error {
-	fileContent, err := request.RetrieveMultiPartFormValue(r, "FileContent", false)
-	if err != nil {
+	if govalidator.IsNull(payload.FileContent) {
 		return portainer.Error("Invalid script file content")
 	}
-	payload.FileContent = fileContent
 
-	image, _ := request.RetrieveMultiPartFormValue(r, "Image", true)
-
-	if strings.TrimSpace(image) != "" {
-		payload.Image = image
-	} else {
-		payload.Image = "ubuntu:latest"
+	if govalidator.IsNull(payload.Image) {
+		return portainer.Error("Invalid image name")
 	}
 
 	return nil
-	// return payload.endpointJobPayload.Validate(r)
 }
 
 // POST request on /api/endpoints/:id/job?method
@@ -117,23 +99,15 @@ func (handler *Handler) executeJobFromFile(w http.ResponseWriter, r *http.Reques
 }
 
 func (handler *Handler) executeJobFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint) *httperror.HandlerError {
-	payload := &endpointJobFromFileContentPayload{}
-	err := payload.Validate(r)
+	var payload endpointJobFromFileContentPayload
+	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{
-			StatusCode: http.StatusBadRequest,
-			Message:    "Invalid request payload",
-			Err:        err,
-		}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
 	err = handler.JobService.Execute(endpoint, payload.Image, []byte(payload.FileContent))
 	if err != nil {
-		return &httperror.HandlerError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    "Failed executing job",
-			Err:        err,
-		}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Failed executing job", err}
 	}
 
 	return response.Empty(w)
