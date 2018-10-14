@@ -2,6 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackBuildNotifierPlugin = require('webpack-build-notifier');
 const CleanTerminalPlugin = require('clean-terminal-webpack-plugin');
+const { ProvidePlugin } = require('webpack');
 
 module.exports = {
   entry: './app/__module.js',
@@ -58,6 +59,12 @@ module.exports = {
       logo: path.resolve('./assets/favicon-32x32.png'),
       suppressSuccess: true
     }),
-    new CleanTerminalPlugin()
+    new CleanTerminalPlugin(),
+    new ProvidePlugin({
+      $: 'jquery',
+      jQuery: 'jquery',
+      'window.jQuery': 'jquery',
+      // angular: 'angular'
+    })
   ]
 };

@@ -2,8 +2,7 @@ import '../assets/css/vendor.css';
 import '../assets/css/app.css';
 
 import angular from 'angular';
-
-import 'angular-ui-bootstrap';
+window.angular = angular;
 import '@uirouter/angularjs';
 import 'ui-select';
 import 'isteven-angular-multiselect/isteven-multi-select.js';
@@ -23,6 +22,7 @@ import 'angular-file-saver';
 import 'angularjs-scroll-glue';
 import 'angularjs-slider';
 
+import './vendors';
 import './agent/_module';
 import './azure/_module';
 import './docker/__module';

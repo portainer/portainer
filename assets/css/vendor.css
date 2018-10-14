@@ -1,4 +1,3 @@
-@import url('../../node_modules/rdash-ui/dist/css/rdash.css');
 @import url('../../node_modules/ui-select/dist/select.css');
 @import url('../../node_modules/bootstrap/dist/css/bootstrap.css');
 @import url('../../node_modules/isteven-angular-multiselect/isteven-multi-select.css');
@@ -12,3 +11,4 @@
 @import url('../../node_modules/codemirror/addon/lint/lint.css');
 @import url('../../node_modules/angular-json-tree/dist/angular-json-tree.css');
 @import url('../../node_modules/angular-loading-bar/build/loading-bar.css');
+@import url('../../node_modules/rdash-ui/dist/css/rdash.css');

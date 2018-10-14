@@ -1,4 +1,5 @@
 import angular from 'angular';
+import './datatable.css';
 
 angular.module('portainer.app')
 .controller('GenericDatatableController', ['PaginationService', 'DatatableService',
