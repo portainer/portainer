@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackBuildNotifierPlugin = require('webpack-build-notifier');
+const CleanTerminalPlugin = require('clean-terminal-webpack-plugin');
 
 module.exports = {
   entry: './app/__module.js',
@@ -52,10 +53,11 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './app/index.html'
     }),
-      new WebpackBuildNotifierPlugin({
-        title: "My Project Webpack Build",
-        logo: path.resolve("./assets/favicon-32x32.png"),
-        suppressSuccess: true
-      })
+    new WebpackBuildNotifierPlugin({
+      title: 'My Project Webpack Build',
+      logo: path.resolve('./assets/favicon-32x32.png'),
+      suppressSuccess: true
+    }),
+    new CleanTerminalPlugin()
   ]
 };

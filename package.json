@@ -69,6 +69,7 @@
   "devDependencies": {
     "auto-ngtemplate-loader": "^1.3.0",
     "autoprefixer": "^7.1.1",
+    "clean-terminal-webpack-plugin": "^1.1.0",
     "css-loader": "^1.0.0",
     "cssnano": "^3.10.0",
     "eslint": "^3.19.0",
