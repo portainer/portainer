@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="portainer">
+<html lang="en" ng-app="<%= name %>">
 <head>
   <meta charset="utf-8">
   <title>Portainer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
-  <meta name="author" content="Portainer.io">
+  <meta name="author" content="<%= author %>">
 
 
   <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -15,13 +15,13 @@
 
 
   <!-- Fav and touch icons -->
-  <link rel="apple-touch-icon" sizes="180x180" href="ico/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="ico/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="ico/favicon-16x16.png">
-  <link rel="manifest" href="ico/manifest.json">
-  <link rel="mask-icon" href="ico/safari-pinned-tab.svg" color="#5bbad5">
-  <link rel="shortcut icon" href="ico/favicon.ico">
-  <meta name="msapplication-config" content="ico/browserconfig.xml">
+  <link rel="apple-touch-icon" sizes="180x180" href="${require('../assets/ico/apple-touch-icon.png')}">
+  <link rel="icon" type="image/png" sizes="32x32" href="${require('../assets/ico/favicon-32x32.png')}">
+  <link rel="icon" type="image/png" sizes="16x16" href="${require('../assets/ico/favicon-16x16.png')}">
+  <link rel="manifest" href="${require('../assets/ico/manifest.json')}">
+  <link rel="mask-icon" href="${require('../assets/ico/safari-pinned-tab.svg')}" color="#5bbad5">
+  <link rel="shortcut icon" href="${require('file-loader!../assets/ico/favicon.ico')}">
+  <meta name="msapplication-config" content="${require('file-loader!../assets/ico/browserconfig.xml')}">
   <meta name="theme-color" content="#ffffff">
 </head>
 

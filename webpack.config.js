@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackBuildNotifierPlugin = require('webpack-build-notifier');
 const CleanTerminalPlugin = require('clean-terminal-webpack-plugin');
 const { ProvidePlugin } = require('webpack');
+const npmPackage = require('./package.json');
 
 module.exports = {
   entry: './app/__module.js',
@@ -52,7 +53,11 @@ module.exports = {
   mode: 'development',
   plugins: [
     new HtmlWebpackPlugin({
-      template: './app/index.html'
+      template: './app/index.html',
+      templateParameters: {
+        name: npmPackage.name,
+        author: npmPackage.author
+      }
     }),
     new WebpackBuildNotifierPlugin({
       title: 'My Project Webpack Build',
@@ -63,7 +68,7 @@ module.exports = {
     new ProvidePlugin({
       $: 'jquery',
       jQuery: 'jquery',
-      'window.jQuery': 'jquery',
+      'window.jQuery': 'jquery'
       // angular: 'angular'
     })
   ]
