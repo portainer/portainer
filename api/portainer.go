@@ -635,6 +635,11 @@ type (
 		Up(stack *Stack, endpoint *Endpoint) error
 		Down(stack *Stack, endpoint *Endpoint) error
 	}
+
+	// JobService represtents a service that manages job execution on hosts
+	JobService interface {
+		Execute(endpoint *Endpoint, image string, script []byte) error
+	}
 )
 
 const (

@@ -164,6 +164,17 @@ angular.module('portainer.app', [])
     }
   };
 
+  var hostJobCreation = {
+    name: 'portainer.newjob',
+    url: '/newjob',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/jobs/create/createjob.html',
+        controller: 'CreateJobController'
+      }
+    }
+  };
+
   var init = {
     name: 'portainer.init',
     abstract: true,
@@ -421,6 +432,7 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(groupAccess);
   $stateRegistryProvider.register(groupCreation);
   $stateRegistryProvider.register(home);
+  $stateRegistryProvider.register(hostJobCreation);
   $stateRegistryProvider.register(init);
   $stateRegistryProvider.register(initEndpoint);
   $stateRegistryProvider.register(initAdmin);
