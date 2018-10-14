@@ -1,3 +1,6 @@
+import angular from 'angular';
+import { EventViewModel } from '../models/event';
+
 angular.module('portainer.docker')
 .factory('SystemService', ['$q', 'System', function SystemServiceFactory($q, System) {
   'use strict';

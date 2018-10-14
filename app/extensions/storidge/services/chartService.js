@@ -1,3 +1,7 @@
+import angular from 'angular';
+import Chart from 'chart.js';
+import filesize from 'filesize';
+
 angular.module('extension.storidge')
 .factory('StoridgeChartService', [function StoridgeChartService() {
   'use strict';

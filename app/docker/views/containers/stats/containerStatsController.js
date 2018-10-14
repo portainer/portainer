@@ -1,3 +1,6 @@
+import angular from 'angular';
+import moment from 'moment';
+
 angular.module('portainer.docker')
 .controller('ContainerStatsController', ['$q', '$scope', '$transition$', '$document', '$interval', 'ContainerService', 'ChartService', 'Notifications', 'HttpRequestHelper',
 function ($q, $scope, $transition$, $document, $interval, ContainerService, ChartService, Notifications, HttpRequestHelper) {

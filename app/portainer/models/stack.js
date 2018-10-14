@@ -1,3 +1,5 @@
+import { ResourceControlViewModel } from '../../portainer/models/resourceControl';
+
 export function StackViewModel(data) {
   this.Id = data.Id;
   this.Type = data.Type;

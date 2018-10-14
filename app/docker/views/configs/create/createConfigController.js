@@ -1,3 +1,7 @@
+import angular from 'angular';
+import _ from 'lodash';
+import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
+
 angular.module('portainer.docker')
 .controller('CreateConfigController', ['$scope', '$state', '$transition$', 'Notifications', 'ConfigService', 'Authentication', 'FormValidator', 'ResourceControlService',
 function ($scope, $state, $transition$, Notifications, ConfigService, Authentication, FormValidator, ResourceControlService) {

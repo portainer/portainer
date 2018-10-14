@@ -1,3 +1,6 @@
+import _ from 'lodash';
+import { ResourceControlViewModel } from '../../portainer/models/resourceControl';
+
 function createStatus(statusText) {
   var status = _.toLower(statusText);
 

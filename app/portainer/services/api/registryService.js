@@ -1,3 +1,6 @@
+import angular from 'angular';
+import { RegistryViewModel } from '../../models/registry';
+
 angular.module('portainer.app')
 .factory('RegistryService', ['$q', 'Registries', 'DockerHubService', 'RegistryHelper', 'ImageHelper', function RegistryServiceFactory($q, Registries, DockerHubService, RegistryHelper, ImageHelper) {
   'use strict';

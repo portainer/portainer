@@ -1,3 +1,10 @@
+import angular from 'angular';
+import {
+  StoridgeCreateProfileRequest,
+  StoridgeProfileListModel,
+  StoridgeProfileModel
+} from '../models/profile';
+
 angular.module('extension.storidge')
 .factory('StoridgeProfileService', ['$q', 'Storidge', function StoridgeProfileServiceFactory($q, Storidge) {
   'use strict';

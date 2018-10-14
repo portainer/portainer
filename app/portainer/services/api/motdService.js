@@ -1,3 +1,6 @@
+import angular from 'angular';
+import { MotdViewModel } from '../../models/motd';
+
 angular.module('portainer.app')
 .factory('MotdService', ['$q', 'Motd', function MotdServiceFactory($q, Motd) {
   'use strict';

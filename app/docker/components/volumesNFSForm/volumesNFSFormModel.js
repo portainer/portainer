@@ -1,4 +1,4 @@
-function VolumesNFSFormData() {
+export function VolumesNFSFormData() {
   this.useNFS = false;
   this.serverAddress = '';
   this.mountPoint = '';

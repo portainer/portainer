@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.docker')
 .controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'ContainerService', 'TaskHelper', 'Notifications', 'ModalService', 'PluginService', 'Authentication', 'SettingsService', 'VolumeService', 'ImageHelper', 'WebhookService', 'EndpointProvider', 'clipboard','WebhookHelper',
 function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, ContainerService, TaskHelper, Notifications, ModalService, PluginService, Authentication, SettingsService, VolumeService, ImageHelper, WebhookService, EndpointProvider, clipboard, WebhookHelper) {
@@ -542,12 +544,13 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     });
   }
 
-  $scope.updateServiceAttribute = function updateServiceAttribute(service, name) {
+  $scope.updateServiceAttribute = updateServiceAttribute;
+  function updateServiceAttribute(service, name) {
     if (service[name] !== originalService[name] || !(name in originalService)) {
       service.hasChanges = true;
     }
     previousServiceValues.push(name);
-  };
+  }
 
   function updateServiceArray(service, name) {
     previousServiceValues.push(name);

@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 function isJSONArray(jsonString) {
     return Object.prototype.toString.call(jsonString) === '[object Array]';
 }
@@ -9,7 +11,9 @@ function isJSON(jsonString) {
         return o;
     }
   }
-  catch (e) { }
+  catch (e) {
+    //empty
+  }
   return false;
 }
 

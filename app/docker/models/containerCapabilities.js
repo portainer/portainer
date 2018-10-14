@@ -83,7 +83,7 @@ export function ContainerCapabilities() {
     });
 }
 
-function ContainerCapability(cap, allowed) {
+export function ContainerCapability(cap, allowed) {
     this.capability = cap;
     this.allowed = allowed;
     this.description = capDesc[cap];

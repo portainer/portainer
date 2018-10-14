@@ -2,13 +2,6 @@ import '../assets/css/vendor.css';
 import '../assets/css/app.css';
 
 import angular from 'angular';
-window.angular = angular; // FIX
-
-import moment from 'moment';
-window.moment = moment;
-
-import filesize from 'filesize';
-window.filesize = filesize;
 
 import 'angular-ui-bootstrap';
 import '@uirouter/angularjs';
