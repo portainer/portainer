@@ -67,8 +67,7 @@ func (service *JobService) Execute(endpoint *portainer.Endpoint, image string, s
 	}
 
 	hostConfig := &container.HostConfig{
-		// TODO: want to define all sys bind mounts here (/usr, /etc, ...)
-		Binds:       []string{"/:/host", "/etc:/etc:ro", "/usr:/usr:ro"},
+		Binds:       []string{"/:/host", "/etc:/etc:ro", "/usr:/usr:ro", "/run:/run:ro", "/sbin:/sbin:ro", "/var:/var:ro"},
 		NetworkMode: "host",
 		Privileged:  true,
 	}
