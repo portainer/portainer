@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app')
 .factory('LocalStorage', ['localStorageService', function LocalStorageFactory(localStorageService) {
   'use strict';

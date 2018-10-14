@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('extension.storidge')
 .factory('Storidge', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', function StoridgeFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
   'use strict';

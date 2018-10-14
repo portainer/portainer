@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.docker')
 .factory('Swarm', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', function SwarmFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
   'use strict';

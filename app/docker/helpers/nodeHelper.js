@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.docker')
 .factory('NodeHelper', [function NodeHelperFactory() {
   'use strict';

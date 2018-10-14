@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app')
 .controller('UsersController', ['$q', '$scope', '$state', 'UserService', 'TeamService', 'TeamMembershipService', 'ModalService', 'Notifications', 'Authentication', 'SettingsService',
 function ($q, $scope, $state, UserService, TeamService, TeamMembershipService, ModalService, Notifications, Authentication, SettingsService) {

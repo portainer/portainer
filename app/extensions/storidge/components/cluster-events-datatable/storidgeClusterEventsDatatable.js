@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('extension.storidge').component('storidgeClusterEventsDatatable', {
   templateUrl: './storidgeClusterEventsDatatable.html',
   controller: 'GenericDatatableController',

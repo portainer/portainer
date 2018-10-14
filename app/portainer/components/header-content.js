@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app')
 .directive('rdHeaderContent', ['Authentication', function rdHeaderContent(Authentication) {
   var directive = {

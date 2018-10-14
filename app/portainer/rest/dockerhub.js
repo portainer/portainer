@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app')
 .factory('DockerHub', ['$resource', 'API_ENDPOINT_DOCKERHUB', function DockerHubFactory($resource, API_ENDPOINT_DOCKERHUB) {
   'use strict';

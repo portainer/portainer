@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.docker')
 .factory('ExecService', ['$q', '$timeout', 'Exec', function ExecServiceFactory($q, $timeout, Exec) {
   'use strict';

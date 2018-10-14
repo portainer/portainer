@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app')
 .controller('GroupAccessController', ['$scope', '$transition$', 'GroupService', 'Notifications',
 function ($scope, $transition$, GroupService, Notifications) {

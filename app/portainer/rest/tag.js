@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app')
 .factory('Tags', ['$resource', 'API_ENDPOINT_TAGS', function TagsFactory($resource, API_ENDPOINT_TAGS) {
   'use strict';

@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app')
 .controller('RegistryController', ['$scope', '$state', '$transition$', '$filter', 'RegistryService', 'Notifications',
 function ($scope, $state, $transition$, $filter, RegistryService, Notifications) {

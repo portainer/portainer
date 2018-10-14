@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.docker')
 .controller('ContainerInspectController', ['$scope', '$transition$', 'Notifications', 'ContainerService', 'HttpRequestHelper',
 function ($scope, $transition$, Notifications, ContainerService, HttpRequestHelper) {

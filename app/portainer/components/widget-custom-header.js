@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app')
 .directive('rdWidgetCustomHeader', function rdWidgetCustomHeader() {
   var directive = {

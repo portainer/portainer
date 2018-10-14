@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.docker')
 .factory('Secret', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', function SecretFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
   'use strict';

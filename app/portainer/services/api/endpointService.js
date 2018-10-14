@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app')
 .factory('EndpointService', ['$q', 'Endpoints', 'FileUploadService',
 function EndpointServiceFactory($q, Endpoints, FileUploadService) {

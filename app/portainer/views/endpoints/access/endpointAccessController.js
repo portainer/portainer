@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app')
 .controller('EndpointAccessController', ['$scope', '$transition$', 'EndpointService', 'GroupService', 'Notifications',
 function ($scope, $transition$, EndpointService, GroupService, Notifications) {

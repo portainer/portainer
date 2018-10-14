@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app')
 .directive('rdWidgetBody', function rdWidgetBody() {
   var directive = {

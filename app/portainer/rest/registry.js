@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app')
 .factory('Registries', ['$resource', 'API_ENDPOINT_REGISTRIES', function RegistriesFactory($resource, API_ENDPOINT_REGISTRIES) {
   'use strict';

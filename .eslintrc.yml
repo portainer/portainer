@@ -4,7 +4,7 @@ env:
   node: true
   
 globals:
-  # angular: true
+  angular: true
 #   $: true
 #   _: true
 #   moment: true

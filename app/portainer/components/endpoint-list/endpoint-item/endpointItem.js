@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app').component('endpointItem', {
   templateUrl: './endpointItem.html',
   bindings: {

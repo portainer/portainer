@@ -1,3 +1,4 @@
+import angular from 'angular';
 import _ from 'lodash';
 
 function ConstraintModel(op, key, value) {

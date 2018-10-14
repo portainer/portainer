@@ -1,3 +1,4 @@
+import angular from 'angular';
 import Chart from 'chart.js';
 import filesize from 'filesize';
 

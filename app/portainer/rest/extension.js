@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app')
 .factory('Extensions', ['$resource', 'EndpointProvider', 'API_ENDPOINT_ENDPOINTS', function Extensions($resource, EndpointProvider, API_ENDPOINT_ENDPOINTS) {
   'use strict';

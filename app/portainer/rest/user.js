@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app')
 .factory('Users', ['$resource', 'API_ENDPOINT_USERS', function UsersFactory($resource, API_ENDPOINT_USERS) {
   'use strict';

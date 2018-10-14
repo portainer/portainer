@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.docker')
 .factory('Config', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', function ConfigFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
   'use strict';

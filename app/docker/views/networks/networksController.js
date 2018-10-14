@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.docker')
 .controller('NetworksController', ['$scope', '$state', 'NetworkService', 'Notifications', 'HttpRequestHelper',
 function ($scope, $state, NetworkService, Notifications, HttpRequestHelper) {

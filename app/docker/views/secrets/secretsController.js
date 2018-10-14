@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.docker')
 .controller('SecretsController', ['$scope', '$state', 'SecretService', 'Notifications',
 function ($scope, $state, SecretService, Notifications) {

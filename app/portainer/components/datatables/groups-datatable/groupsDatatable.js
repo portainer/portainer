@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app').component('groupsDatatable', {
   templateUrl: './groupsDatatable.html',
   controller: 'GenericDatatableController',

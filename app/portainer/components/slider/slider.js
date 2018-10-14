@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app').component('slider', {
   templateUrl: './slider.html',
   controller: 'SliderController',

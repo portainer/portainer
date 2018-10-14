@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app')
 .factory('EndpointGroups', ['$resource', 'API_ENDPOINT_ENDPOINT_GROUPS', function EndpointGroupsFactory($resource, API_ENDPOINT_ENDPOINT_GROUPS) {
   'use strict';

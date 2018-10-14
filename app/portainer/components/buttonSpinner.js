@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app')
 .directive('buttonSpinner', function buttonSpinner() {
   var directive = {

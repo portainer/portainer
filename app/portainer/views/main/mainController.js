@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app')
 .controller('MainController', ['$scope', '$cookieStore', 'StateManager',
 function ($scope, $cookieStore, StateManager) {

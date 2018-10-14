@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app')
 .factory('WebhookHelper', ['$location', 'API_ENDPOINT_WEBHOOKS', function WebhookHelperFactory($location,API_ENDPOINT_WEBHOOKS) {
   'use strict';

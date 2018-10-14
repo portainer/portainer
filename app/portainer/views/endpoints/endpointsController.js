@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app')
 .controller('EndpointsController', ['$q', '$scope', '$state', 'EndpointService', 'GroupService', 'EndpointHelper', 'Notifications',
 function ($q, $scope, $state, EndpointService, GroupService, EndpointHelper, Notifications) {

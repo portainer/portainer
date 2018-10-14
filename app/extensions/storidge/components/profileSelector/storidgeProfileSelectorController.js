@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('extension.storidge')
 .controller('StoridgeProfileSelectorController', ['StoridgeProfileService', 'Notifications',
 function (StoridgeProfileService, Notifications) {

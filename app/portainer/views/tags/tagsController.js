@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app')
 .controller('TagsController', ['$scope', '$state', 'TagService', 'Notifications',
 function ($scope, $state, TagService, Notifications) {

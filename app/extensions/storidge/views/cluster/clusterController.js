@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('extension.storidge')
 .controller('StoridgeClusterController', ['$q', '$scope', '$state', 'Notifications', 'StoridgeClusterService', 'StoridgeNodeService', 'ModalService',
 function ($q, $scope, $state, Notifications, StoridgeClusterService, StoridgeNodeService, ModalService) {

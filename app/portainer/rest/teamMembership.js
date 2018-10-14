@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app')
 .factory('TeamMemberships', ['$resource', 'API_ENDPOINT_TEAM_MEMBERSHIPS', function TeamMembershipsFactory($resource, API_ENDPOINT_TEAM_MEMBERSHIPS) {
   'use strict';

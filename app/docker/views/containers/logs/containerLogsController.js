@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.docker')
 .controller('ContainerLogsController', ['$scope', '$transition$', '$interval', 'ContainerService', 'Notifications', 'HttpRequestHelper',
 function ($scope, $transition$, $interval, ContainerService, Notifications, HttpRequestHelper) {

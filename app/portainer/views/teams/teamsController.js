@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app')
 .controller('TeamsController', ['$q', '$scope', '$state', '$sanitize', 'TeamService', 'UserService', 'ModalService', 'Notifications', 'Authentication',
 function ($q, $scope, $state, $sanitize, TeamService, UserService, ModalService, Notifications, Authentication) {

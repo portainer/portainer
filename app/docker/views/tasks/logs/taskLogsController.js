@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.docker')
 .controller('TaskLogsController', ['$scope', '$transition$', '$interval', 'TaskService', 'ServiceService', 'Notifications',
 function ($scope, $transition$, $interval, TaskService, ServiceService, Notifications) {

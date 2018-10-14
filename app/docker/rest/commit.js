@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.docker')
 .factory('Commit', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', function CommitFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
   'use strict';

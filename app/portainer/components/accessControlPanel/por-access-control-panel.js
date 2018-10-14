@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app').component('porAccessControlPanel', {
   templateUrl: './porAccessControlPanel.html',
   controller: 'porAccessControlPanelController',

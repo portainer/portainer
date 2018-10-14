@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app')
 .controller('CodeEditorController', ['$document', 'CodeMirrorService',
 function ($document, CodeMirrorService) {

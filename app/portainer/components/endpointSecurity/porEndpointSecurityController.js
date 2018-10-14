@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app')
 .controller('porEndpointSecurityController', [function () {
   var ctrl = this;

@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.docker').component('logViewer', {
   templateUrl: './logViewer.html',
   controller: 'LogViewerController',

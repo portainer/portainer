@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app')
 .factory('Status', ['$resource', 'API_ENDPOINT_STATUS', function StatusFactory($resource, API_ENDPOINT_STATUS) {
   'use strict';

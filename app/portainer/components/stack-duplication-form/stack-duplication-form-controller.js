@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app').controller('StackDuplicationFormController', [
   'Notifications',
   function StackDuplicationFormController(Notifications) {

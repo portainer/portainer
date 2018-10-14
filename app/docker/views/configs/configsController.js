@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.docker')
 .controller('ConfigsController', ['$scope', '$state', 'ConfigService', 'Notifications',
 function ($scope, $state, ConfigService, Notifications) {

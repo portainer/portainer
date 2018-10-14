@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.docker')
 .controller('ImportImageController', ['$scope', '$state', 'ImageService', 'Notifications', 'HttpRequestHelper',
 function ($scope, $state, ImageService, Notifications, HttpRequestHelper) {
