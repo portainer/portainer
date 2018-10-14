@@ -84,6 +84,7 @@ func (server *Server) Start() error {
 		TeamMembershipService: server.TeamMembershipService,
 		EndpointGroupService:  server.EndpointGroupService,
 		AuthDisabled:          server.AuthDisabled,
+		SettingsService:       server.SettingsService,
 	}
 	requestBouncer := security.NewRequestBouncer(requestBouncerParameters)
 

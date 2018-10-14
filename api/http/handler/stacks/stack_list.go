@@ -41,7 +41,7 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 	}
 
 	filteredStacks := proxy.FilterStacks(stacks, resourceControls, securityContext.IsAdmin,
-		securityContext.UserID, securityContext.UserMemberships)
+		securityContext.UserID, securityContext.UserMemberships, securityContext.IsPublicByDefault)
 
 	return response.JSON(w, filteredStacks)
 }

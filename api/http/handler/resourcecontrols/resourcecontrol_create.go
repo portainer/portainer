@@ -29,9 +29,6 @@ func (payload *resourceControlCreatePayload) Validate(r *http.Request) error {
 		return portainer.Error("Invalid type")
 	}
 
-	if len(payload.Users) == 0 && len(payload.Teams) == 0 && !payload.Public {
-		return portainer.Error("Invalid resource control declaration. Must specify Users, Teams or Public")
-	}
 	return nil
 }
 

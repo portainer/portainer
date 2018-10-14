@@ -20,6 +20,7 @@ type settingsUpdatePayload struct {
 	AllowBindMountsForRegularUsers     *bool
 	AllowPrivilegedModeForRegularUsers *bool
 	EnableHostManagementFeatures       *bool
+	ResourcesArePublicByDefault        *bool
 	SnapshotInterval                   *string
 	TemplatesURL                       *string
 }
@@ -94,6 +95,10 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.EnableHostManagementFeatures != nil {
 		settings.EnableHostManagementFeatures = *payload.EnableHostManagementFeatures
+	}
+
+	if payload.ResourcesArePublicByDefault != nil {
+		settings.ResourcesArePublicByDefault = *payload.ResourcesArePublicByDefault
 	}
 
 	if payload.SnapshotInterval != nil && *payload.SnapshotInterval != settings.SnapshotInterval {

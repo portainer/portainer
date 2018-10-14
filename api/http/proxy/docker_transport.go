@@ -26,10 +26,11 @@ type (
 		SignatureService       portainer.DigitalSignatureService
 	}
 	restrictedOperationContext struct {
-		isAdmin          bool
-		userID           portainer.UserID
-		userTeamIDs      []portainer.TeamID
-		resourceControls []portainer.ResourceControl
+		isAdmin           bool
+		isPublicByDefault bool
+		userID            portainer.UserID
+		userTeamIDs       []portainer.TeamID
+		resourceControls  []portainer.ResourceControl
 	}
 	registryAccessContext struct {
 		isAdmin         bool
@@ -343,7 +344,7 @@ func (p *proxyTransport) restrictedOperation(request *http.Request, resourceID s
 			return nil, err
 		}
 
-		resourceControl := getResourceControlByResourceID(resourceID, resourceControls)
+		resourceControl := getResourceControlByResourceID(resourceID, resourceControls, false)
 		if resourceControl != nil && !canUserAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
 			return writeAccessDeniedResponse()
 		}
@@ -472,10 +473,14 @@ func (p *proxyTransport) createOperationContext(request *http.Request) (*restric
 		return nil, err
 	}
 
+	settings, err := p.SettingsService.Settings()
+	isPublicByDefault := settings.ResourcesArePublicByDefault
+
 	operationContext := &restrictedOperationContext{
-		isAdmin:          true,
-		userID:           tokenData.ID,
-		resourceControls: resourceControls,
+		isAdmin:           true,
+		isPublicByDefault: isPublicByDefault,
+		userID:            tokenData.ID,
+		resourceControls:  resourceControls,
 	}
 
 	if tokenData.Role != portainer.AdministratorRole {

@@ -80,6 +80,17 @@
             Security
           </div>
           <div class="form-group">
+              <div class="col-sm-12">
+                <label for="toggle_publicbydefault" class="control-label text-left">
+                  Make externally created resources public by default
+                  <portainer-tooltip position="bottom" message="When enabled, all resources created outside of Portainer will be publicly available through Portainer."></portainer-tooltip>
+                </label>
+                <label class="switch" style="margin-left: 20px;">
+                  <input type="checkbox" name="toggle_publicbydefault" ng-model="formValues.resourcesArePublicByDefault" ng-change="confirmPublicByDefaultUpdate()"><i></i>
+                </label>
+              </div>
+            </div>
+          <div class="form-group">
             <div class="col-sm-12">
               <label for="toggle_allowbindmounts" class="control-label text-left">
                 Disable bind mounts for non-administrators

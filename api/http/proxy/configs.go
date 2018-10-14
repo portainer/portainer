@@ -25,7 +25,7 @@ func configListOperation(response *http.Response, executor *operationExecutor) e
 	}
 
 	if executor.operationContext.isAdmin {
-		responseArray, err = decorateConfigList(responseArray, executor.operationContext.resourceControls)
+		responseArray, err = decorateConfigList(responseArray, executor.operationContext)
 	} else {
 		responseArray, err = filterConfigList(responseArray, executor.operationContext)
 	}
@@ -63,7 +63,7 @@ func configInspectOperation(response *http.Response, executor *operationExecutor
 // decorateConfigList loops through all configs and decorates any config with an existing resource control.
 // Resource controls checks are based on: resource identifier.
 // Config object schema reference: https://docs.docker.com/engine/api/v1.30/#operation/ConfigList
-func decorateConfigList(configData []interface{}, resourceControls []portainer.ResourceControl) ([]interface{}, error) {
+func decorateConfigList(configData []interface{}, context *restrictedOperationContext) ([]interface{}, error) {
 	decoratedConfigData := make([]interface{}, 0)
 
 	for _, config := range configData {
@@ -74,7 +74,7 @@ func decorateConfigList(configData []interface{}, resourceControls []portainer.R
 		}
 
 		configID := configObject[configIdentifier].(string)
-		configObject = decorateResourceWithAccessControl(configObject, configID, resourceControls)
+		configObject = decorateResourceWithAccessControl(configObject, configID, context)
 
 		decoratedConfigData = append(decoratedConfigData, configObject)
 	}

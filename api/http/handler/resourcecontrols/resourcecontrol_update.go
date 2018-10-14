@@ -17,9 +17,6 @@ type resourceControlUpdatePayload struct {
 }
 
 func (payload *resourceControlUpdatePayload) Validate(r *http.Request) error {
-	if len(payload.Users) == 0 && len(payload.Teams) == 0 && !payload.Public {
-		return portainer.Error("Invalid resource control declaration. Must specify Users, Teams or Public")
-	}
 	return nil
 }
 

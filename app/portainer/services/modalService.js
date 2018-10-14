@@ -201,5 +201,33 @@ angular.module('portainer.app')
     }, false);
   };
 
+  service.confirmPublicByDefaultUpdateEnable = function(callback) {
+    service.confirm({
+      title: 'Are you sure ?',
+      message: 'Enabling the this settings will potentially change some administrators limited resources to public. Please review all resources ownership after changing this setting.',
+      buttons: {
+        confirm: {
+          label: 'Enable',
+          className: 'btn-danger'
+        }
+      },
+      callback: callback
+    });
+  };
+
+  service.confirmPublicByDefaultUpdateDisable = function(callback) {
+    service.confirm({
+      title: 'Are you sure ?',
+      message: 'Disabling the this settings will potentially limit some public listed resources to administrators only. Please review all resources ownership after changing this setting.',
+      buttons: {
+        confirm: {
+          label: 'Disable',
+          className: 'btn-danger'
+        }
+      },
+      callback: callback
+    });
+  };
+
   return service;
 }]);

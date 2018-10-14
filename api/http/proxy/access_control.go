@@ -33,17 +33,16 @@ func applyResourceAccessControlFromLabel(labelsObject, resourceObject map[string
 // access level for the user (granted or denied) as the second return value.
 // Returns a decorated object and authorized access (true) when a resource control is found to the specified resource
 // identifier and the user can access the resource.
+// Returns the original object and authorized access (true) when no resource control is found for the specified
+// resource identifier and ResourcesArePublicByDefault is true
 // Returns the original object and authorized access (false) when no resource control is found for the specified
-// resource identifier.
+// resource identifier and ResourcesArePublicByDefault is false
 // Returns the original object and denied access (false) when a resource control is associated to the resource
 // and the user cannot access the resource.
 func applyResourceAccessControl(resourceObject map[string]interface{}, resourceIdentifier string,
 	context *restrictedOperationContext) (map[string]interface{}, bool) {
 
-	resourceControl := getResourceControlByResourceID(resourceIdentifier, context.resourceControls)
-	if resourceControl == nil {
-		return resourceObject, context.isAdmin
-	}
+	resourceControl := getResourceControlByResourceID(resourceIdentifier, context.resourceControls, context.isPublicByDefault)
 
 	if context.isAdmin || resourceControl.Public || canUserAccessResource(context.userID, context.userTeamIDs, resourceControl) {
 		resourceObject = decorateObject(resourceObject, resourceControl)
@@ -58,11 +57,11 @@ func applyResourceAccessControl(resourceObject map[string]interface{}, resourceI
 // decorated. If no identifier can be found in the labels or no resource control is associated to the identifier, the resource
 // object will not be changed.
 func decorateResourceWithAccessControlFromLabel(labelsObject, resourceObject map[string]interface{}, labelIdentifier string,
-	resourceControls []portainer.ResourceControl) map[string]interface{} {
+	context *restrictedOperationContext) map[string]interface{} {
 
 	if labelsObject != nil && labelsObject[labelIdentifier] != nil {
 		resourceIdentifier := labelsObject[labelIdentifier].(string)
-		resourceObject = decorateResourceWithAccessControl(resourceObject, resourceIdentifier, resourceControls)
+		resourceObject = decorateResourceWithAccessControl(resourceObject, resourceIdentifier, context)
 	}
 
 	return resourceObject
@@ -71,13 +70,11 @@ func decorateResourceWithAccessControlFromLabel(labelsObject, resourceObject map
 // decorateResourceWithAccessControl will check if a resource control is associated to the specified resource identifier.
 // If a resource control is found, the resource object will be decorated, otherwise it will not be changed.
 func decorateResourceWithAccessControl(resourceObject map[string]interface{}, resourceIdentifier string,
-	resourceControls []portainer.ResourceControl) map[string]interface{} {
+	context *restrictedOperationContext) map[string]interface{} {
 
-	resourceControl := getResourceControlByResourceID(resourceIdentifier, resourceControls)
-	if resourceControl != nil {
-		return decorateObject(resourceObject, resourceControl)
-	}
-	return resourceObject
+	resourceControl := getResourceControlByResourceID(resourceIdentifier, context.resourceControls, context.isPublicByDefault)
+
+	return decorateObject(resourceObject, resourceControl)
 }
 
 func canUserAccessResource(userID portainer.UserID, userTeamIDs []portainer.TeamID, resourceControl *portainer.ResourceControl) bool {
@@ -108,7 +105,7 @@ func decorateObject(object map[string]interface{}, resourceControl *portainer.Re
 	return object
 }
 
-func getResourceControlByResourceID(resourceID string, resourceControls []portainer.ResourceControl) *portainer.ResourceControl {
+func getResourceControlByResourceID(resourceID string, resourceControls []portainer.ResourceControl, isPublicByDefault bool) *portainer.ResourceControl {
 	for _, resourceControl := range resourceControls {
 		if resourceID == resourceControl.ResourceID {
 			return &resourceControl
@@ -119,7 +116,17 @@ func getResourceControlByResourceID(resourceID string, resourceControls []portai
 			}
 		}
 	}
-	return nil
+
+	resourceControl := &portainer.ResourceControl{
+		ID:             1,
+		ResourceID:     resourceID,
+		SubResourceIDs: []string{},
+		Type:           portainer.DynamicResourceControl,
+		UserAccesses:   []portainer.UserResourceAccess{},
+		TeamAccesses:   []portainer.TeamResourceAccess{},
+		Public:         isPublicByDefault,
+	}
+	return resourceControl
 }
 
 // CanAccessStack checks if a user can access a stack
@@ -142,7 +149,7 @@ func CanAccessStack(stack *portainer.Stack, resourceControl *portainer.ResourceC
 
 // FilterStacks filters stacks based on user role and resource controls.
 func FilterStacks(stacks []portainer.Stack, resourceControls []portainer.ResourceControl, isAdmin bool,
-	userID portainer.UserID, memberships []portainer.TeamMembership) []ExtendedStack {
+	userID portainer.UserID, memberships []portainer.TeamMembership, IsPublicByDefault bool) []ExtendedStack {
 
 	filteredStacks := make([]ExtendedStack, 0)
 
@@ -153,10 +160,8 @@ func FilterStacks(stacks []portainer.Stack, resourceControls []portainer.Resourc
 
 	for _, stack := range stacks {
 		extendedStack := ExtendedStack{stack, portainer.ResourceControl{}}
-		resourceControl := getResourceControlByResourceID(stack.Name, resourceControls)
-		if resourceControl == nil && isAdmin {
-			filteredStacks = append(filteredStacks, extendedStack)
-		} else if resourceControl != nil && (isAdmin || resourceControl.Public || canUserAccessResource(userID, userTeamIDs, resourceControl)) {
+		resourceControl := getResourceControlByResourceID(stack.Name, resourceControls, IsPublicByDefault)
+		if isAdmin || resourceControl.Public || canUserAccessResource(userID, userTeamIDs, resourceControl) {
 			extendedStack.ResourceControl = *resourceControl
 			filteredStacks = append(filteredStacks, extendedStack)
 		}

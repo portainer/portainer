@@ -25,7 +25,7 @@ func networkListOperation(response *http.Response, executor *operationExecutor) 
 	}
 
 	if executor.operationContext.isAdmin {
-		responseArray, err = decorateNetworkList(responseArray, executor.operationContext.resourceControls)
+		responseArray, err = decorateNetworkList(responseArray, executor.operationContext)
 	} else {
 		responseArray, err = filterNetworkList(responseArray, executor.operationContext)
 	}
@@ -83,7 +83,7 @@ func extractNetworkLabelsFromNetworkListObject(responseObject map[string]interfa
 // decorateNetworkList loops through all networks and decorates any network with an existing resource control.
 // Resource controls checks are based on: resource identifier, stack identifier (from label).
 // Network object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/NetworkList
-func decorateNetworkList(networkData []interface{}, resourceControls []portainer.ResourceControl) ([]interface{}, error) {
+func decorateNetworkList(networkData []interface{}, context *restrictedOperationContext) ([]interface{}, error) {
 	decoratedNetworkData := make([]interface{}, 0)
 
 	for _, network := range networkData {
@@ -94,10 +94,10 @@ func decorateNetworkList(networkData []interface{}, resourceControls []portainer
 		}
 
 		networkID := networkObject[networkIdentifier].(string)
-		networkObject = decorateResourceWithAccessControl(networkObject, networkID, resourceControls)
+		networkObject = decorateResourceWithAccessControl(networkObject, networkID, context)
 
 		networkLabels := extractNetworkLabelsFromNetworkListObject(networkObject)
-		networkObject = decorateResourceWithAccessControlFromLabel(networkLabels, networkObject, networkLabelForStackIdentifier, resourceControls)
+		networkObject = decorateResourceWithAccessControlFromLabel(networkLabels, networkObject, networkLabelForStackIdentifier, context)
 
 		decoratedNetworkData = append(decoratedNetworkData, networkObject)
 	}

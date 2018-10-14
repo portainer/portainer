@@ -6,6 +6,7 @@ export function SettingsViewModel(data) {
   this.OAuthSettings = new OAuthSettingsViewModel(data.OAuthSettings);
   this.AllowBindMountsForRegularUsers = data.AllowBindMountsForRegularUsers;
   this.AllowPrivilegedModeForRegularUsers = data.AllowPrivilegedModeForRegularUsers;
+  this.ResourcesArePublicByDefault = data.ResourcesArePublicByDefault;
   this.SnapshotInterval = data.SnapshotInterval;
   this.TemplatesURL = data.TemplatesURL;
   this.ExternalTemplates = data.ExternalTemplates;

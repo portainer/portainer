@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('SettingsController', ['$scope', '$state', 'Notifications', 'SettingsService', 'StateManager', 
-function ($scope, $state, Notifications, SettingsService, StateManager) {
+.controller('SettingsController', ['$scope', '$state', 'Notifications', 'ModalService', 'SettingsService', 'StateManager',
+function ($scope, $state, Notifications, ModalService, SettingsService, StateManager) {
 
   $scope.state = {
     actionInProgress: false
@@ -8,6 +8,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager) {
 
   $scope.formValues = {
     customLogo: false,
+    resourcesArePublicByDefault: false,
     externalTemplates: false,
     restrictBindMounts: false,
     restrictPrivilegedMode: false,
@@ -34,6 +35,28 @@ function ($scope, $state, Notifications, SettingsService, StateManager) {
     updateSettings(settings);
   };
 
+  $scope.confirmPublicByDefaultUpdate = function () {
+    if ($scope.formValues.resourcesArePublicByDefault) {
+      ModalService.confirmPublicByDefaultUpdateEnable(function (confirmed) {
+        if(confirmed) {
+          var settings = $scope.settings;
+          settings.ResourcesArePublicByDefault = $scope.formValues.resourcesArePublicByDefault;
+        } else {
+          initView();
+        }
+      });
+    } else {
+      ModalService.confirmPublicByDefaultUpdateDisable(function (confirmed) {
+        if(confirmed) {
+          var settings = $scope.settings;
+          settings.ResourcesArePublicByDefault = $scope.formValues.resourcesArePublicByDefault;
+        } else {
+          initView();
+        }
+      });
+    }
+  };
+
   $scope.saveApplicationSettings = function() {
     var settings = $scope.settings;
 
@@ -45,6 +68,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager) {
       settings.TemplatesURL = '';
     }
 
+    settings.ResourcesArePublicByDefault = $scope.formValues.resourcesArePublicByDefault;
     settings.AllowBindMountsForRegularUsers = !$scope.formValues.restrictBindMounts;
     settings.AllowPrivilegedModeForRegularUsers = !$scope.formValues.restrictPrivilegedMode;
     settings.EnableHostManagementFeatures = $scope.formValues.enableHostManagementFeatures;
@@ -81,6 +105,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager) {
       if (settings.TemplatesURL !== '') {
         $scope.formValues.externalTemplates = true;
       }
+      $scope.formValues.resourcesArePublicByDefault = settings.ResourcesArePublicByDefault;
       $scope.formValues.restrictBindMounts = !settings.AllowBindMountsForRegularUsers;
       $scope.formValues.restrictPrivilegedMode = !settings.AllowPrivilegedModeForRegularUsers;
       $scope.formValues.enableHostManagementFeatures = settings.EnableHostManagementFeatures;

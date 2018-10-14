@@ -3038,6 +3038,10 @@ definitions:
         type: "integer"
         example: 1
         description: "Active authentication method for the Portainer instance. Valid values are: 1 for managed or 2 for LDAP."
+      ResourcesArePublicByDefault:
+        type: "boolean"
+        example: false
+        description: "Whether default ownership for externally created resources is public"
       AllowBindMountsForRegularUsers:
         type: "boolean"
         example: false
@@ -3180,6 +3184,10 @@ definitions:
         description: "Active authentication method for the Portainer instance. Valid values are: 1 for managed or 2 for LDAP."
       LDAPSettings:
         $ref: "#/definitions/LDAPSettings"
+      ResourcesArePublicByDefault:
+        type: "boolean"
+        example: false
+        description: "Whether default ownership for externally created resources is public"
       AllowBindMountsForRegularUsers:
         type: "boolean"
         example: false
@@ -3777,6 +3785,10 @@ definitions:
         description: "Active authentication method for the Portainer instance. Valid values are: 1 for managed or 2 for LDAP."
       LDAPSettings:
         $ref: "#/definitions/LDAPSettings"
+      ResourcesArePublicByDefault:
+        type: "boolean"
+        example: false
+        description: "Whether default ownership for externally created resources is public"
       AllowBindMountsForRegularUsers:
         type: "boolean"
         example: true

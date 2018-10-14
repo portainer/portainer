@@ -16,6 +16,7 @@ type (
 		teamMembershipService portainer.TeamMembershipService
 		endpointGroupService  portainer.EndpointGroupService
 		authDisabled          bool
+		settingsService       portainer.SettingsService
 	}
 
 	// RequestBouncerParams represents the required parameters to create a new RequestBouncer instance.
@@ -25,15 +26,17 @@ type (
 		TeamMembershipService portainer.TeamMembershipService
 		EndpointGroupService  portainer.EndpointGroupService
 		AuthDisabled          bool
+		SettingsService       portainer.SettingsService
 	}
 
 	// RestrictedRequestContext is a data structure containing information
 	// used in RestrictedAccess
 	RestrictedRequestContext struct {
-		IsAdmin         bool
-		IsTeamLeader    bool
-		UserID          portainer.UserID
-		UserMemberships []portainer.TeamMembership
+		IsAdmin           bool
+		IsPublicByDefault bool
+		IsTeamLeader      bool
+		UserID            portainer.UserID
+		UserMemberships   []portainer.TeamMembership
 	}
 )
 
@@ -45,6 +48,7 @@ func NewRequestBouncer(parameters *RequestBouncerParams) *RequestBouncer {
 		teamMembershipService: parameters.TeamMembershipService,
 		endpointGroupService:  parameters.EndpointGroupService,
 		authDisabled:          parameters.AuthDisabled,
+		settingsService:       parameters.SettingsService,
 	}
 }
 
@@ -230,9 +234,16 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 }
 
 func (bouncer *RequestBouncer) newRestrictedContextRequest(userID portainer.UserID, userRole portainer.UserRole) (*RestrictedRequestContext, error) {
+	settings, err := bouncer.settingsService.Settings()
+	if err != nil {
+		return nil, err
+	}
+	IsPublicByDefault := settings.ResourcesArePublicByDefault
+
 	requestContext := &RestrictedRequestContext{
-		IsAdmin: true,
-		UserID:  userID,
+		IsAdmin:           true,
+		UserID:            userID,
+		IsPublicByDefault: IsPublicByDefault,
 	}
 
 	if userRole != portainer.AdministratorRole {

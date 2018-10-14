@@ -30,7 +30,7 @@ func volumeListOperation(response *http.Response, executor *operationExecutor) e
 		volumeData := responseObject["Volumes"].([]interface{})
 
 		if executor.operationContext.isAdmin {
-			volumeData, err = decorateVolumeList(volumeData, executor.operationContext.resourceControls)
+			volumeData, err = decorateVolumeList(volumeData, executor.operationContext)
 		} else {
 			volumeData, err = filterVolumeList(volumeData, executor.operationContext)
 		}
@@ -92,7 +92,7 @@ func extractVolumeLabelsFromVolumeListObject(responseObject map[string]interface
 // decorateVolumeList loops through all volumes and decorates any volume with an existing resource control.
 // Resource controls checks are based on: resource identifier, stack identifier (from label).
 // Volume object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/VolumeList
-func decorateVolumeList(volumeData []interface{}, resourceControls []portainer.ResourceControl) ([]interface{}, error) {
+func decorateVolumeList(volumeData []interface{}, context *restrictedOperationContext) ([]interface{}, error) {
 	decoratedVolumeData := make([]interface{}, 0)
 
 	for _, volume := range volumeData {
@@ -103,10 +103,10 @@ func decorateVolumeList(volumeData []interface{}, resourceControls []portainer.R
 		}
 
 		volumeID := volumeObject[volumeIdentifier].(string)
-		volumeObject = decorateResourceWithAccessControl(volumeObject, volumeID, resourceControls)
+		volumeObject = decorateResourceWithAccessControl(volumeObject, volumeID, context)
 
 		volumeLabels := extractVolumeLabelsFromVolumeListObject(volumeObject)
-		volumeObject = decorateResourceWithAccessControlFromLabel(volumeLabels, volumeObject, volumeLabelForStackIdentifier, resourceControls)
+		volumeObject = decorateResourceWithAccessControlFromLabel(volumeLabels, volumeObject, volumeLabelForStackIdentifier, context)
 
 		decoratedVolumeData = append(decoratedVolumeData, volumeObject)
 	}

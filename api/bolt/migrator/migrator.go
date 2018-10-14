@@ -188,10 +188,14 @@ func (m *Migrator) Migrate() error {
 
 	// Portainer 1.19.2
 	if m.currentDBVersion < 14 {
+		/* Portainer 1.21
+		 * Disabled to allow user avoid losing admin resource controls when
+		 * updating from < 1.19.2 version
 		err := m.updateResourceControlsToDBVersion14()
 		if err != nil {
 			return err
 		}
+		*/
 	}
 
 	// Portainer 1.20.0
@@ -217,6 +221,14 @@ func (m *Migrator) Migrate() error {
 	// Portainer 1.20.1
 	if m.currentDBVersion < 17 {
 		err := m.updateExtensionsToDBVersion17()
+		if err != nil {
+			return err
+		}
+	}
+
+	// Portainer 1.21
+	if m.currentDBVersion < 18 {
+		err := m.updateSettingsToDBVersion18()
 		if err != nil {
 			return err
 		}

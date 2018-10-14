@@ -102,6 +102,7 @@ type (
 		OAuthSettings                      OAuthSettings        `json:"OAuthSettings"`
 		AllowBindMountsForRegularUsers     bool                 `json:"AllowBindMountsForRegularUsers"`
 		AllowPrivilegedModeForRegularUsers bool                 `json:"AllowPrivilegedModeForRegularUsers"`
+		ResourcesArePublicByDefault        bool                 `json:"ResourcesArePublicByDefault"`
 		SnapshotInterval                   string               `json:"SnapshotInterval"`
 		TemplatesURL                       string               `json:"TemplatesURL"`
 		EnableHostManagementFeatures       bool                 `json:"EnableHostManagementFeatures"`
@@ -796,7 +797,7 @@ const (
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "1.20.2"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 17
+	DBVersion = 18
 	// AssetsServerURL represents the URL of the Portainer asset server
 	AssetsServerURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com"
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
@@ -877,6 +878,8 @@ const (
 	StackResourceControl
 	// ConfigResourceControl represents a resource control associated to a Docker config
 	ConfigResourceControl
+	// DynamicResourceControl represents a resource control which is generated based on ResourcesArePublicByDefault value
+	DynamicResourceControl
 )
 
 const (

@@ -25,7 +25,7 @@ func secretListOperation(response *http.Response, executor *operationExecutor) e
 	}
 
 	if executor.operationContext.isAdmin {
-		responseArray, err = decorateSecretList(responseArray, executor.operationContext.resourceControls)
+		responseArray, err = decorateSecretList(responseArray, executor.operationContext)
 	} else {
 		responseArray, err = filterSecretList(responseArray, executor.operationContext)
 	}
@@ -63,7 +63,7 @@ func secretInspectOperation(response *http.Response, executor *operationExecutor
 // decorateSecretList loops through all secrets and decorates any secret with an existing resource control.
 // Resource controls checks are based on: resource identifier.
 // Secret object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/SecretList
-func decorateSecretList(secretData []interface{}, resourceControls []portainer.ResourceControl) ([]interface{}, error) {
+func decorateSecretList(secretData []interface{}, context *restrictedOperationContext) ([]interface{}, error) {
 	decoratedSecretData := make([]interface{}, 0)
 
 	for _, secret := range secretData {
@@ -74,7 +74,7 @@ func decorateSecretList(secretData []interface{}, resourceControls []portainer.R
 		}
 
 		secretID := secretObject[secretIdentifier].(string)
-		secretObject = decorateResourceWithAccessControl(secretObject, secretID, resourceControls)
+		secretObject = decorateResourceWithAccessControl(secretObject, secretID, context)
 
 		decoratedSecretData = append(decoratedSecretData, secretObject)
 	}

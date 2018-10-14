@@ -39,6 +39,9 @@ angular.module('portainer.app')
     var authorizedTeamIds = [];
     var publicOnly = false;
     switch (accessControlData.Ownership) {
+      case 'administrators':
+        publicOnly = false;
+        break;
       case 'public':
         publicOnly = true;
         break;
@@ -61,16 +64,20 @@ angular.module('portainer.app')
   };
 
   service.applyResourceControlChange = function(resourceControlType, resourceId, resourceControl, ownershipParameters) {    
-    if (resourceControl) {
+    if (resourceControl && resourceControl.Type !== 8) {
       if (ownershipParameters.ownership === 'administrators') {
-        return service.deleteResourceControl(resourceControl.Id);
+        return service.updateResourceControl(ownershipParameters.publicOnly, [], [], resourceControl.Id);
       } else {
         return service.updateResourceControl(ownershipParameters.publicOnly, ownershipParameters.authorizedUserIds,
           ownershipParameters.authorizedTeamIds, resourceControl.Id);
       }
     } else {
+      if (ownershipParameters.ownership === 'administrators') {
+        return service.createResourceControl(ownershipParameters.publicOnly, [], [], resourceId, resourceControlType);
+      } else {
         return service.createResourceControl(ownershipParameters.publicOnly, ownershipParameters.authorizedUserIds,
           ownershipParameters.authorizedTeamIds, resourceId, resourceControlType);
+      }
     }
   };
 

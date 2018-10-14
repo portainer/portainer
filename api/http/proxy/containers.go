@@ -27,7 +27,7 @@ func containerListOperation(response *http.Response, executor *operationExecutor
 	}
 
 	if executor.operationContext.isAdmin {
-		responseArray, err = decorateContainerList(responseArray, executor.operationContext.resourceControls)
+		responseArray, err = decorateContainerList(responseArray, executor.operationContext)
 	} else {
 		responseArray, err = filterContainerList(responseArray, executor.operationContext)
 	}
@@ -108,7 +108,7 @@ func extractContainerLabelsFromContainerListObject(responseObject map[string]int
 // decorateContainerList loops through all containers and decorates any container with an existing resource control.
 // Resource controls checks are based on: resource identifier, service identifier (from label), stack identifier (from label).
 // Container object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ContainerList
-func decorateContainerList(containerData []interface{}, resourceControls []portainer.ResourceControl) ([]interface{}, error) {
+func decorateContainerList(containerData []interface{}, context *restrictedOperationContext) ([]interface{}, error) {
 	decoratedContainerData := make([]interface{}, 0)
 
 	for _, container := range containerData {
@@ -119,12 +119,12 @@ func decorateContainerList(containerData []interface{}, resourceControls []porta
 		}
 
 		containerID := containerObject[containerIdentifier].(string)
-		containerObject = decorateResourceWithAccessControl(containerObject, containerID, resourceControls)
+		containerObject = decorateResourceWithAccessControl(containerObject, containerID, context)
 
 		containerLabels := extractContainerLabelsFromContainerListObject(containerObject)
-		containerObject = decorateResourceWithAccessControlFromLabel(containerLabels, containerObject, containerLabelForServiceIdentifier, resourceControls)
-		containerObject = decorateResourceWithAccessControlFromLabel(containerLabels, containerObject, containerLabelForSwarmStackIdentifier, resourceControls)
-		containerObject = decorateResourceWithAccessControlFromLabel(containerLabels, containerObject, containerLabelForComposeStackIdentifier, resourceControls)
+		containerObject = decorateResourceWithAccessControlFromLabel(containerLabels, containerObject, containerLabelForServiceIdentifier, context)
+		containerObject = decorateResourceWithAccessControlFromLabel(containerLabels, containerObject, containerLabelForSwarmStackIdentifier, context)
+		containerObject = decorateResourceWithAccessControlFromLabel(containerLabels, containerObject, containerLabelForComposeStackIdentifier, context)
 
 		decoratedContainerData = append(decoratedContainerData, containerObject)
 	}

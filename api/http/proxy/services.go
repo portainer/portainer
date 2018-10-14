@@ -25,7 +25,7 @@ func serviceListOperation(response *http.Response, executor *operationExecutor) 
 	}
 
 	if executor.operationContext.isAdmin {
-		responseArray, err = decorateServiceList(responseArray, executor.operationContext.resourceControls)
+		responseArray, err = decorateServiceList(responseArray, executor.operationContext)
 	} else {
 		responseArray, err = filterServiceList(responseArray, executor.operationContext)
 	}
@@ -91,7 +91,7 @@ func extractServiceLabelsFromServiceListObject(responseObject map[string]interfa
 // decorateServiceList loops through all services and decorates any service with an existing resource control.
 // Resource controls checks are based on: resource identifier, stack identifier (from label).
 // Service object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ServiceList
-func decorateServiceList(serviceData []interface{}, resourceControls []portainer.ResourceControl) ([]interface{}, error) {
+func decorateServiceList(serviceData []interface{}, context *restrictedOperationContext) ([]interface{}, error) {
 	decoratedServiceData := make([]interface{}, 0)
 
 	for _, service := range serviceData {
@@ -102,10 +102,10 @@ func decorateServiceList(serviceData []interface{}, resourceControls []portainer
 		}
 
 		serviceID := serviceObject[serviceIdentifier].(string)
-		serviceObject = decorateResourceWithAccessControl(serviceObject, serviceID, resourceControls)
+		serviceObject = decorateResourceWithAccessControl(serviceObject, serviceID, context)
 
 		serviceLabels := extractServiceLabelsFromServiceListObject(serviceObject)
-		serviceObject = decorateResourceWithAccessControlFromLabel(serviceLabels, serviceObject, serviceLabelForStackIdentifier, resourceControls)
+		serviceObject = decorateResourceWithAccessControlFromLabel(serviceLabels, serviceObject, serviceLabelForStackIdentifier, context)
 
 		decoratedServiceData = append(decoratedServiceData, serviceObject)
 	}
