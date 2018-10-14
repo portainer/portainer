@@ -39,7 +39,7 @@ func (service *JobService) Execute(endpoint *portainer.Endpoint, image string, s
 
 	// TODO this will run only bash scripts
 	cmd := make([]string, 2)
-	cmd[0] = "bash"
+	cmd[0] = "sh"
 	cmd[1] = "/tmp/script.sh"
 
 	_, imagePullErr := cli.ImagePull(context.Background(), image, types.ImagePullOptions{})
