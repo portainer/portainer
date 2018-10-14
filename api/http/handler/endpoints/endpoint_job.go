@@ -50,7 +50,7 @@ func (payload *endpointJobFromFileContentPayload) Validate(r *http.Request) erro
 }
 
 // POST request on /api/endpoints/:id/job?method
-func (handler *Handler) endpointCommand(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) endpointJob(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint identifier route variable", err}

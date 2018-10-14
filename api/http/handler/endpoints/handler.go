@@ -61,6 +61,6 @@ func NewHandler(bouncer *security.RequestBouncer, authorizeEndpointManagement bo
 	h.Handle("/endpoints/{id}/extensions/{extensionType}",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointExtensionRemove))).Methods(http.MethodDelete)
 	h.Handle("/endpoints/{id}/job",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.endpointCommand))).Methods(http.MethodPost)
+		bouncer.AdministratorAccess(httperror.LoggerHandler(h.endpointJob))).Methods(http.MethodPost)
 	return h
 }
