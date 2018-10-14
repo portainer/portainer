@@ -24,25 +24,28 @@ func NewJobService(dockerClientFactory *ClientFactory) *JobService {
 }
 
 func (service *JobService) Execute(endpoint *portainer.Endpoint, image string, script []byte) error {
-	buffer, err := archive.TarFileInBuffer(script, "script.sh", 0700)
-	if err != nil {
-		return err
+	buffer, createFileErr := archive.TarFileInBuffer(script, "script.sh", 0700)
+	if createFileErr != nil {
+		return createFileErr
 	}
 
-	cli, err := service.DockerClientFactory.CreateClient(endpoint)
-	if err != nil {
-		return err
+	cli, createClientErr := service.DockerClientFactory.CreateClient(endpoint)
+	if createClientErr != nil {
+		return createClientErr
 	}
 	defer cli.Close()
 
 	// containerName := "test"
 
-	// TODO this will run bash scripts
+	// TODO this will run only bash scripts
 	cmd := make([]string, 2)
 	cmd[0] = "bash"
 	cmd[1] = "/tmp/script.sh"
 
-	// TODO pull image
+	_, imagePullErr := cli.ImagePull(context.Background(), image, types.ImagePullOptions{})
+	if imagePullErr != nil {
+		return imagePullErr
+	}
 
 	containerConfig := &container.Config{
 		AttachStdin:  true,
@@ -66,21 +69,21 @@ func (service *JobService) Execute(endpoint *portainer.Endpoint, image string, s
 
 	networkConfig := &network.NetworkingConfig{}
 
-	body, err := cli.ContainerCreate(context.Background(), containerConfig, hostConfig, networkConfig, "")
-	if err != nil {
-		return err
+	body, containerCreateErr := cli.ContainerCreate(context.Background(), containerConfig, hostConfig, networkConfig, "")
+	if containerCreateErr != nil {
+		return containerCreateErr
 	}
 
 	copyOptions := types.CopyToContainerOptions{}
-	err = cli.CopyToContainer(context.Background(), body.ID, "/tmp", bytes.NewReader(buffer), copyOptions)
-	if err != nil {
-		return err
+	copyErr := cli.CopyToContainer(context.Background(), body.ID, "/tmp", bytes.NewReader(buffer), copyOptions)
+	if copyErr != nil {
+		return copyErr
 	}
 
 	startOptions := types.ContainerStartOptions{}
-	err = cli.ContainerStart(context.Background(), body.ID, startOptions)
-	if err != nil {
-		return err
+	containerStartErr := cli.ContainerStart(context.Background(), body.ID, startOptions)
+	if containerStartErr != nil {
+		return containerStartErr
 	}
 
 	return nil
