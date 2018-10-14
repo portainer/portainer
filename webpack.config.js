@@ -13,11 +13,11 @@ module.exports = {
         test: /\.js$/,
         exclude: /node_modules/,
         use: [
-          'auto-ngtemplate-loader'
-          // {
-          //   enforce: 'pre',
-          //   loader: 'eslint-loader'
-          // }
+          'auto-ngtemplate-loader',
+          {
+            // enforce: 'pre',
+            loader: 'eslint-loader'
+          }
         ]
       },
       {

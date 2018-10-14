@@ -20,7 +20,7 @@ parserOptions:
     modules: true
 
 # # http://eslint.org/docs/rules/
-# rules:
+rules:
 #   # Possible Errors
 #   no-await-in-loop: off
 #   no-cond-assign: error
@@ -32,7 +32,7 @@ parserOptions:
 #   no-dupe-keys: error
 #   no-duplicate-case: error
 #   no-empty-character-class: error
-#   no-empty: error
+  no-empty: warn
 #   no-ex-assign: error
 #   no-extra-boolean-cast: error
 #   no-extra-parens: off
