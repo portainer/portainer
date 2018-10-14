@@ -33,8 +33,10 @@
           <!-- name-input -->
           <div class="form-group">
             <label for="container_name" class="col-sm-2 control-label text-left">Name</label>
-            <div class="col-sm-10">
-              <input type="text" name="container_name" class="form-control" ng-model="formValues.name" placeholder="e.g. myStack" required>
+            <div class="col-sm-10" ng-class="{'form-group': true, 'has-error': !state.stackNameAvailable, 'has-feedback': !state.stackNameAvailable}">
+              <input type="text" name="container_name" class="form-control" ng-model="formValues.name"
+                ng-change="stackNameChange(formValues.name)" placeholder="e.g. myStack" required>
+                <span ng-if="!state.stackNameAvailable" class="glyphicon glyphicon-remove form-control-feedback"></span>
             </div>
           </div>
           <!-- !name-input -->
@@ -62,7 +64,7 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !formValues.name" ng-click="createTemplate()" button-spinner="state.actionInProgress">
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !formValues.name || !state.stackNameAvailable" ng-click="createTemplate()" button-spinner="state.actionInProgress">
                 <span ng-hide="state.actionInProgress">Deploy the stack</span>
                 <span ng-show="state.actionInProgress">Deployment in progress...</span>
               </button>
