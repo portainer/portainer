@@ -1,5 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const WebpackBuildNotifierPlugin = require('webpack-build-notifier');
 
 module.exports = {
   entry: './app/__module.js',
@@ -50,6 +51,11 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: './app/index.html'
-    })
+    }),
+      new WebpackBuildNotifierPlugin({
+        title: "My Project Webpack Build",
+        logo: path.resolve("./assets/favicon-32x32.png"),
+        suppressSuccess: true
+      })
   ]
 };
