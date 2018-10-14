@@ -13,14 +13,6 @@ import (
 	"github.com/portainer/portainer/archive"
 )
 
-const (
-	tarFileError           = portainer.Error("Script file creation failed")
-	clientCreationError    = portainer.Error("Error creating docker client")
-	containerCreationError = portainer.Error("Container creation failed")
-	copyError              = portainer.Error("Copying file to container failed")
-	containerStartError    = portainer.Error("Container failed to start")
-)
-
 type JobService struct {
 	DockerClientFactory *ClientFactory
 }
@@ -34,12 +26,12 @@ func NewJobService(dockerClientFactory *ClientFactory) *JobService {
 func (service *JobService) Execute(endpoint *portainer.Endpoint, image string, script []byte) error {
 	buffer, err := archive.TarFileInBuffer(script, "script.sh", 0700)
 	if err != nil {
-		return tarFileError
+		return err
 	}
 
 	cli, err := service.DockerClientFactory.CreateClient(endpoint)
 	if err != nil {
-		return clientCreationError
+		return err
 	}
 	defer cli.Close()
 
@@ -76,19 +68,19 @@ func (service *JobService) Execute(endpoint *portainer.Endpoint, image string, s
 
 	body, err := cli.ContainerCreate(context.Background(), containerConfig, hostConfig, networkConfig, "")
 	if err != nil {
-		return containerCreationError
+		return err
 	}
 
 	copyOptions := types.CopyToContainerOptions{}
 	err = cli.CopyToContainer(context.Background(), body.ID, "/tmp", bytes.NewReader(buffer), copyOptions)
 	if err != nil {
-		return copyError
+		return err
 	}
 
 	startOptions := types.ContainerStartOptions{}
 	err = cli.ContainerStart(context.Background(), body.ID, startOptions)
 	if err != nil {
-		return containerStartError
+		return err
 	}
 
 	return nil
