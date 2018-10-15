@@ -3,12 +3,14 @@ package docker
 import (
 	"bytes"
 	"context"
+	"io"
 	"strconv"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/strslice"
+	"github.com/docker/docker/client"
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/archive"
 )
@@ -37,15 +39,12 @@ func (service *JobService) Execute(endpoint *portainer.Endpoint, image string, s
 
 	// containerName := "test"
 
+	pullImage(cli, image)
+
 	// TODO this will run only bash scripts
 	cmd := make([]string, 2)
 	cmd[0] = "sh"
 	cmd[1] = "/tmp/script.sh"
-
-	_, err = cli.ImagePull(context.Background(), image, types.ImagePullOptions{})
-	if err != nil {
-		return err
-	}
 
 	containerConfig := &container.Config{
 		AttachStdin:  true,
@@ -83,6 +82,25 @@ func (service *JobService) Execute(endpoint *portainer.Endpoint, image string, s
 	err = cli.ContainerStart(context.Background(), body.ID, startOptions)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func pullImage(cli *client.Client, image string) error {
+	imageReadCloser, err := cli.ImagePull(context.Background(), image, types.ImagePullOptions{})
+	defer imageReadCloser.Close()
+
+	if err != nil {
+		return err
+	}
+	r := make([]byte, 256)
+	_, err = imageReadCloser.Read(r)
+	for err != io.EOF {
+		if err != nil {
+			return err
+		}
+		_, err = imageReadCloser.Read(r)
 	}
 
 	return nil
