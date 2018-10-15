@@ -15,16 +15,19 @@ import (
 	"github.com/portainer/portainer/archive"
 )
 
+// JobService represnts a service that handles jobs on the host
 type JobService struct {
 	DockerClientFactory *ClientFactory
 }
 
+// NewJobService returns a pointer to a new job service
 func NewJobService(dockerClientFactory *ClientFactory) *JobService {
 	return &JobService{
 		DockerClientFactory: dockerClientFactory,
 	}
 }
 
+// Execute will execute a script on the endpoint host with the supplied image as a container
 func (service *JobService) Execute(endpoint *portainer.Endpoint, image string, script []byte) error {
 	buffer, err := archive.TarFileInBuffer(script, "script.sh", 0700)
 	if err != nil {
@@ -36,8 +39,6 @@ func (service *JobService) Execute(endpoint *portainer.Endpoint, image string, s
 		return err
 	}
 	defer cli.Close()
-
-	// containerName := "test"
 
 	pullImage(cli, image)
 
