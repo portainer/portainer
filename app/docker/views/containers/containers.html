@@ -6,7 +6,7 @@
   </rd-header-title>
   <rd-header-content>Containers</rd-header-content>
 </rd-header>
-<information-panel title-text="Offline mode" cant-dismiss="true" ng-if="endpointStatus !== 1">
+<information-panel title-text="Offline mode" cant-dismiss="true" ng-if="offlineMode">
   <span class="small">
     <p class="text-muted">
       <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -23,6 +23,7 @@
       show-ownership-column="applicationState.application.authentication"
       show-host-column="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'"
       show-add-action="true"
+      offline-mode="offlineMode"
     ></containers-datatable>
   </div>
 </div>

@@ -259,7 +259,7 @@ type (
 		SnapshotRaw           SnapshotRaw `json:"SnapshotRaw"`
 	}
 
-	// SnapshotRaw represents all the information related to a snapshot
+	// SnapshotRaw represents all the information related to a snapshot as returned by the Docker API
 	SnapshotRaw struct {
 		Containers interface{} `json:"Containers"`
 		Volumes    interface{} `json:"Volumes"`

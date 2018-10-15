@@ -33,7 +33,7 @@ function ($scope, $state, Notifications, StackService, ModalService, EndpointPro
     });
   }
 
-  $scope.endpointStatus = 1;
+  $scope.offlineMode = false;
 
   function initView() {
     var endpointMode = $scope.applicationState.endpoint.mode;
@@ -47,7 +47,7 @@ function ($scope, $state, Notifications, StackService, ModalService, EndpointPro
     .then(function success(data) {
       var stacks = data;
       $scope.stacks = stacks;
-      $scope.endpointStatus = EndpointProvider.endpointStatus();
+      $scope.offlineMode = EndpointProvider.offlineMode();
     })
     .catch(function error(err) {
       $scope.stacks = [];

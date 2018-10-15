@@ -6,7 +6,7 @@ angular.module('portainer.docker').controller('HostViewController', [
 
     ctrl.state = {
       isAgent: false,
-      endpointStatus: 1
+      offlineMode: false
     };
 
     this.engineDetails = {};
@@ -23,7 +23,7 @@ angular.module('portainer.docker').controller('HostViewController', [
         .then(function success(data) {
           ctrl.engineDetails = buildEngineDetails(data);
           ctrl.hostDetails = buildHostDetails(data.info);
-          ctrl.state.endpointStatus = EndpointProvider.endpointStatus();
+          ctrl.state.offlineMode = EndpointProvider.offlineMode();
 
           if (ctrl.state.isAgent) {
             return AgentService.hostInfo(data.info.Hostname).then(function onHostInfoLoad(agentHostInfo) {

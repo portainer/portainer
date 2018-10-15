@@ -1,7 +1,7 @@
 <li class="sidebar-list">
   <a ui-sref="docker.dashboard" ui-sref-active="active">Dashboard <span class="menu-icon fa fa-tachometer-alt fa-fw"></span></a>
 </li>
-<li class="sidebar-list" ng-if="$ctrl.endpointStatus === 1">
+<li class="sidebar-list" ng-if="!$ctrl.offlineMode">
   <a ui-sref="portainer.templates" ui-sref-active="active">App Templates <span class="menu-icon fa fa-rocket fa-fw"></span></a>
 </li>
 <li class="sidebar-list">
@@ -28,7 +28,7 @@
 <li class="sidebar-list" ng-if="$ctrl.endpointApiVersion >= 1.25 && $ctrl.swarmManagement">
   <a ui-sref="docker.secrets" ui-sref-active="active">Secrets <span class="menu-icon fa fa-user-secret fa-fw"></span></a>
 </li>
-<li class="sidebar-list" ng-if="$ctrl.standaloneManagement && $ctrl.adminAccess && $ctrl.endpointStatus === 1">
+<li class="sidebar-list" ng-if="$ctrl.standaloneManagement && $ctrl.adminAccess && !$ctrl.offlineMode">
   <a ui-sref="docker.events" ui-sref-active="active">Events <span class="menu-icon fa fa-history fa-fw"></span></a>
 </li>
 <li class="sidebar-list" ng-if="$ctrl.swarmManagement">

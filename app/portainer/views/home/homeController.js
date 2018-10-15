@@ -1,11 +1,31 @@
 angular.module('portainer.app')
-  .controller('HomeController', ['$q', '$scope', '$state', 'Authentication', 'EndpointService', 'EndpointHelper', 'GroupService', 'Notifications', 'EndpointProvider', 'StateManager', 'ExtensionManager', 'ModalService', 'MotdService',
-    function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, GroupService, Notifications, EndpointProvider, StateManager, ExtensionManager, ModalService, MotdService) {
+  .controller('HomeController', ['$q', '$scope', '$state', 'Authentication', 'EndpointService', 'EndpointHelper', 'GroupService', 'Notifications', 'EndpointProvider', 'StateManager', 'ExtensionManager', 'ModalService', 'MotdService', 'SystemService',
+    function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, GroupService, Notifications, EndpointProvider, StateManager, ExtensionManager, ModalService, MotdService, SystemService) {
+
+      function endpointIsOnline(endpoint) {
+        if (endpoint.Type === 3) {
+          switchToAzureEndpoint(endpoint);
+        } else {
+          switchToDockerEndpoint(endpoint);
+        }
+      }
+
+      function endpointIsOffline(endpoint) {
+        if (endpoint.Type === 3) {
+          Notifications.error('Failure', '', 'Endpoint is unreachable. Offline browsing disabled for Azure endpoints.');
+        } else if (endpoint.Snapshots[0] && endpoint.Snapshots[0].Swarm === true) {
+          Notifications.error('Failure', '', 'Endpoint is unreachable. Connect to another swarm manager.');
+        } else if (!endpoint.Snapshots[0]) {
+          Notifications.error('Failure', '', 'Endpoint is unreachable and there is no snapshot available for offline browsing.');
+        } else {
+          switchToDockerEndpoint(endpoint);
+        }
+      }
 
       $scope.goToDashboard = function (endpoint) {
         var status = 1;
 
-        EndpointService.checkEndpointStatus(endpoint.Id)
+        SystemService.ping(endpoint.Id)
           .then(function sucess() {
             status = 1;
           }).catch(function error() {
@@ -18,21 +38,9 @@ angular.module('portainer.app')
               endpoint.Status = status;
             }
             if (status === 1) {
-              if (endpoint.Type === 3) {
-                switchToAzureEndpoint(endpoint);
-              } else {
-                switchToDockerEndpoint(endpoint);
-              }
+              endpointIsOnline(endpoint);
             } else {
-              if (endpoint.Type === 3) {
-                Notifications.error('Failure', '', 'Endpoint is unreachable. Offline browsing disabled for Azure endpoints.');
-              } else if (endpoint.Snapshots[0] && endpoint.Snapshots[0].Swarm === true) {
-                Notifications.error('Failure', '', 'Endpoint is unreachable. Connect to another swarm manager.');
-              } else if (!endpoint.Snapshots[0]) {
-                Notifications.error('Failure', '', 'Endpoint is unreachable and there is no snapshot available for offline browsing.');
-              } else {
-                switchToDockerEndpoint(endpoint);
-              }
+              endpointIsOffline(endpoint);
             }
           });
       };
@@ -68,7 +76,7 @@ angular.module('portainer.app')
       function switchToAzureEndpoint(endpoint) {
         EndpointProvider.setEndpointID(endpoint.Id);
         EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
-        EndpointProvider.setEndpointStatus(endpoint.Status);
+        EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
         StateManager.updateEndpointState(endpoint.Name, endpoint.Type, [])
           .then(function success() {
             $state.go('azure.dashboard');
@@ -81,7 +89,7 @@ angular.module('portainer.app')
       function switchToDockerEndpoint(endpoint) {
         EndpointProvider.setEndpointID(endpoint.Id);
         EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
-        EndpointProvider.setEndpointStatus(endpoint.Status);
+        EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
         ExtensionManager.initEndpointExtensions(endpoint.Id)
           .then(function success(data) {
             var extensions = data;

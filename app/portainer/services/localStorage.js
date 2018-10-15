@@ -14,11 +14,11 @@ angular.module('portainer.app')
     getEndpointPublicURL: function() {
       return localStorageService.get('ENDPOINT_PUBLIC_URL');
     },
-    storeEndpointStatus: function(status) {
-      localStorageService.set('ENDPOINT_STATUS', status);
+    storeOfflineMode: function(isOffline) {
+      localStorageService.set('ENDPOINT_OFFLINE_MODE', isOffline);
     },
-    getEndpointStatus: function() {
-      return localStorageService.get('ENDPOINT_STATUS');
+    getOfflineMode: function() {
+      return localStorageService.get('ENDPOINT_OFFLINE_MODE');
     },
     storeEndpoints: function(data) {
       localStorageService.set('ENDPOINTS_DATA', data);

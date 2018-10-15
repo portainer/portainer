@@ -22,7 +22,7 @@
       swarm-management="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'"
       standalone-management="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE' || applicationState.endpoint.mode.provider === 'VMWARE_VIC'"
       admin-access="!applicationState.application.authentication || isAdmin"
-      endpoint-status="endpointState.Status"
+      offline-mode="endpointState.OfflineMode"
     ></docker-sidebar-content>
     <li class="sidebar-title" ng-if="applicationState.endpoint.mode && applicationState.endpoint.extensions.length > 0">
       <span>Extensions</span>

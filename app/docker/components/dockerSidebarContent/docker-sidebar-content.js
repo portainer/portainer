@@ -5,6 +5,6 @@ angular.module('portainer.docker').component('dockerSidebarContent', {
     swarmManagement: '<',
     standaloneManagement: '<',
     adminAccess: '<',
-    endpointStatus: '<'
+    offlineMode: '<'
   }
 });

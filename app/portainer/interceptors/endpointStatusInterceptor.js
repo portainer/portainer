@@ -15,18 +15,18 @@ angular.module('portainer.app')
       response: function (response) {
         var EndpointService = $injector.get('EndpointService');
         var url = response.config.url;
-        if (response.status === 200 && canBeOffline(url) && EndpointProvider.endpointStatus() === 2) {
-          EndpointProvider.setEndpointStatus(1);
-          EndpointService.updateEndpoint(EndpointProvider.endpointID(), {Status: 1});
+        if (response.status === 200 && canBeOffline(url) && EndpointProvider.offlineMode()) {
+          EndpointProvider.setOfflineMode(false);
+          EndpointService.updateEndpoint(EndpointProvider.endpointID(), {Status: EndpointProvider.endpointStatusFromOfflineMode(false)});
         }
         return response || $q.when(response);
       },
       responseError: function (rejection) {
         var EndpointService = $injector.get('EndpointService');
         var url = rejection.config.url;
-        if ((rejection.status === 502 || rejection.status === -1) && canBeOffline(url) && EndpointProvider.endpointStatus() === 1) {
-          EndpointProvider.setEndpointStatus(2);
-          EndpointService.updateEndpoint(EndpointProvider.endpointID(), {Status: 2});
+        if ((rejection.status === 502 || rejection.status === -1) && canBeOffline(url) && !EndpointProvider.offlineMode()) {
+          EndpointProvider.setOfflineMode(true);
+          EndpointService.updateEndpoint(EndpointProvider.endpointID(), {Status: EndpointProvider.endpointStatusFromOfflineMode(true)});
         }
         return $q.reject(rejection);
       }

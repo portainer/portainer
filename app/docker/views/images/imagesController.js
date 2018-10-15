@@ -113,13 +113,13 @@ function ($scope, $state, ImageService, Notifications, ModalService, HttpRequest
     });
   };
 
-  $scope.state.endpointStatus = 1;
+  $scope.offlineMode = false;
 
   function initView() {
     ImageService.images(true)
     .then(function success(data) {
       $scope.images = data;
-      $scope.state.endpointStatus = EndpointProvider.endpointStatus();
+      $scope.offlineMode = EndpointProvider.offlineMode();
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve images');

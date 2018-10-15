@@ -24,7 +24,7 @@ function ($q, $scope, $state, VolumeService, ServiceService, VolumeHelper, Notif
     });
   };
 
-  $scope.endpointStatus = 1;
+  $scope.offlineMode = false;
 
   function initView() {
     var endpointProvider = $scope.applicationState.endpoint.mode.provider;
@@ -37,7 +37,7 @@ function ($q, $scope, $state, VolumeService, ServiceService, VolumeHelper, Notif
     })
     .then(function success(data) {
       var services = data.services;
-      $scope.endpointStatus = EndpointProvider.endpointStatus();
+      $scope.offlineMode = EndpointProvider.offlineMode();
       $scope.volumes = data.attached.map(function(volume) {
         volume.dangling = false;
         return volume;

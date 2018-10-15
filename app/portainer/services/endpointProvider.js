@@ -7,7 +7,7 @@ angular.module('portainer.app')
   service.initialize = function() {
     var endpointID = LocalStorage.getEndpointID();
     var endpointPublicURL = LocalStorage.getEndpointPublicURL();
-    var endpointStatus = LocalStorage.getEndpointStatus();
+    var offlineMode = LocalStorage.getOfflineMode();
 
     if (endpointID) {
       endpoint.ID = endpointID;
@@ -15,8 +15,8 @@ angular.module('portainer.app')
     if (endpointPublicURL) {
       endpoint.PublicURL = endpointPublicURL;
     }
-    if (endpointStatus) {
-      endpoint.Status = endpointStatus;
+    if (offlineMode) {
+      endpoint.OfflineMode = offlineMode;
     }
   };
 
@@ -60,16 +60,23 @@ angular.module('portainer.app')
     LocalStorage.storeEndpoints(data);
   };
 
-  service.endpointStatus = function() {
-    if (endpoint.Status === undefined) {
-      endpoint.Status = LocalStorage.getEndpointStatus();
-    }
-    return endpoint.Status;
+  service.offlineMode = function() {
+    return endpoint.OfflineMode;
   };
 
-  service.setEndpointStatus = function(status) {
-    endpoint.Status = status;
-    LocalStorage.storeEndpointStatus(status);
+  service.endpointStatusFromOfflineMode = function(isOffline) {
+    return isOffline ? 2 : 1;
+  };
+
+  service.setOfflineMode = function(isOffline) {
+    endpoint.OfflineMode = isOffline;
+    LocalStorage.storeOfflineMode(isOffline);
+  };
+
+  service.setOfflineModeFromStatus = function(status) {
+    var isOffline = status !== 1;
+    endpoint.OfflineMode = isOffline;
+    LocalStorage.storeOfflineMode(isOffline);
   };
 
   service.currentEndpoint = function() {

@@ -6,7 +6,7 @@ angular.module('portainer.docker').component('hostOverview', {
     devices: '<',
     disks: '<',
     isAgent: '<',
-    endpointStatus: '<',
+    offlineMode: '<',
     refreshUrl: '@',
     browseUrl: '@'
   },

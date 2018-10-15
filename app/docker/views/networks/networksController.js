@@ -24,13 +24,13 @@ function ($scope, $state, NetworkService, Notifications, HttpRequestHelper, Endp
     });
   };
 
-  $scope.endpointStatus = 1;
+  $scope.offlineMode = false;
 
   function initView() {
     NetworkService.networks(true, true, true)
     .then(function success(data) {
       $scope.networks = data;
-      $scope.endpointStatus = EndpointProvider.endpointStatus();
+      $scope.offlineMode = EndpointProvider.offlineMode();
     })
     .catch(function error(err) {
       $scope.networks = [];

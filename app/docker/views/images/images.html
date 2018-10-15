@@ -7,7 +7,7 @@
   <rd-header-content>Images</rd-header-content>
 </rd-header>
 
-<div class="row" ng-if="state.endpointStatus === 1">
+<div class="row" ng-if="!offlineMode">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-header icon="fa-download" title-text="Pull image ">
@@ -51,7 +51,7 @@
     </rd-widget>
   </div>
 </div>
-<information-panel title-text="Offline mode" cant-dismiss="true" ng-if="state.endpointStatus !== 1">
+<information-panel title-text="Offline mode" cant-dismiss="true" ng-if="offlineMode">
   <span class="small">
     <p class="text-muted">
       <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -70,6 +70,7 @@
     remove-action="removeAction"
     force-remove-action="confirmRemovalAction"
     export-in-progress="state.exportInProgress"
+    offline-mode="offlineMode"
     ></images-datatable>
   </div>
 </div>

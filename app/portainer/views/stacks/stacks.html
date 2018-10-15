@@ -6,7 +6,7 @@
   </rd-header-title>
   <rd-header-content>Stacks</rd-header-content>
 </rd-header>
-<information-panel title-text="Offline mode" cant-dismiss="true" ng-if="endpointStatus !== 1">
+<information-panel title-text="Offline mode" cant-dismiss="true" ng-if="offlineMode">
   <span class="small">
     <p class="text-muted">
       <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -22,6 +22,7 @@
     order-by="Name" 
     remove-action="removeAction"
     show-ownership-column="applicationState.application.authentication"
+    offline-mode="offlineMode"
     ></stacks-datatable>
   </div>
 </div>

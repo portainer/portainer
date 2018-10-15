@@ -13,8 +13,7 @@ function (PaginationService, DatatableService, EndpointProvider) {
     noStoppedItemsSelected: true,
     noRunningItemsSelected: true,
     noPausedItemsSelected: true,
-    publicURL: EndpointProvider.endpointPublicURL(),
-    endpointStatus: EndpointProvider.endpointStatus()
+    publicURL: EndpointProvider.endpointPublicURL()
   };
 
   this.settings = {
