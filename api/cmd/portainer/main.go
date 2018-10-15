@@ -94,6 +94,11 @@ func initCryptoService() portainer.CryptoService {
 	return &crypto.Service{}
 }
 
+func initDigitalDeploykeyService() portainer.DigitalDeploykeyService {
+	return &crypto.ECDSAService{}
+}
+
+
 func initLDAPService() portainer.LDAPService {
 	return &ldap.Service{}
 }
@@ -401,6 +406,8 @@ func main() {
 
 	digitalSignatureService := initDigitalSignatureService()
 
+	digitalDeploykeyService := initDigitalDeploykeyService()
+
 	err := initKeyPair(fileService, digitalSignatureService)
 	if err != nil {
 		log.Fatal(err)
@@ -498,6 +505,8 @@ func main() {
 		TeamMembershipService:  store.TeamMembershipService,
 		EndpointService:        store.EndpointService,
 		EndpointGroupService:   store.EndpointGroupService,
+		DeploykeyService:        store.DeploykeyService,
+		DigitalDeploykeyService: digitalDeploykeyService,
 		ResourceControlService: store.ResourceControlService,
 		SettingsService:        store.SettingsService,
 		RegistryService:        store.RegistryService,

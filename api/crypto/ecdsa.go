@@ -1,4 +1,4 @@
-package crypto
+package crypto	
 
 import (
 	"crypto/ecdsa"
@@ -8,6 +8,8 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"math/big"
+	"io/ioutil"	
+	"log"	
 )
 
 const (
@@ -91,6 +93,29 @@ func (service *ECDSAService) GenerateKeyPair() ([]byte, []byte, error) {
 	return private, public, nil
 }
 
+// GenerateKeyPair will create a new key pair using ECDSA.
+func (service *ECDSAService) GenerateSshKey() ([]byte, error) {
+	//savePublicFileTo := "./id_ecdsa_test.pub"
+
+	pubkeyCurve := elliptic.P256()
+
+	byteKeys, err := ecdsa.GenerateKey(pubkeyCurve, rand.Reader)
+	if err != nil {
+		return nil,err
+	}
+
+	publicKeyBytes, err := generateECDSAPublicKey(&byteKeys.PublicKey)
+	if err != nil {
+		return nil,err
+	}
+	log.Println(publicKeyBytes)
+	err = writeKeyToFile(publicKeyBytes,"./testFile" )
+	if err != nil {
+		return nil,err
+	}
+	return publicKeyBytes, nil
+}
+
 // Sign creates a signature from a message.
 // It automatically hash the message using MD5 and creates a signature from
 // that hash.
@@ -119,4 +144,23 @@ func (service *ECDSAService) Sign(message string) (string, error) {
 	signature := append(rBytesPadded, sBytesPadded...)
 
 	return base64.RawStdEncoding.EncodeToString(signature), nil
+}
+
+func generateECDSAPublicKey(privatekey *ecdsa.PublicKey) ([]byte, error) {
+	publicRsaKey, err := NewPublicKey(privatekey)
+	if err != nil {
+		return nil, err
+	}	
+	pubKeyBytes := MarshalAuthorizedKey(publicRsaKey)	
+	return pubKeyBytes, nil
+}
+// writePemToFile writes keys to a file
+func writeKeyToFile(keyBytes []byte, saveFileTo string) error {
+	log.Println("hey")
+	err := ioutil.WriteFile(saveFileTo, keyBytes, 0777)
+	log.Println("here")
+	if err != nil {
+		return err
+	}		
+	return nil
 }
