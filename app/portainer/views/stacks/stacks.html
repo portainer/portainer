@@ -6,14 +6,7 @@
   </rd-header-title>
   <rd-header-content>Stacks</rd-header-content>
 </rd-header>
-<information-panel title-text="Offline mode" cant-dismiss="true" ng-if="offlineMode">
-  <span class="small">
-    <p class="text-muted">
-      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-      This endpoint is currently offline (read-only). Data shown is based on the latest available snapshot.
-    </p>
-  </span>
-</information-panel>
+<information-panel-offline ng-if="offlineMode"></information-panel-offline>
 <div class="row">
   <div class="col-sm-12">
     <stacks-datatable
