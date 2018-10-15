@@ -89,11 +89,11 @@ func (service *JobService) Execute(endpoint *portainer.Endpoint, image string, s
 
 func pullImage(cli *client.Client, image string) error {
 	imageReadCloser, err := cli.ImagePull(context.Background(), image, types.ImagePullOptions{})
-	defer imageReadCloser.Close()
-
 	if err != nil {
 		return err
 	}
+
+	defer imageReadCloser.Close()
 	r := make([]byte, 256)
 	_, err = imageReadCloser.Read(r)
 	for err != io.EOF {
