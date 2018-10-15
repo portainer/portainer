@@ -64,6 +64,17 @@ angular.module('portainer.app')
     });
   };
 
+  service.createHostJob = function (imageName, file, endpointId) {
+    return Upload.upload({
+      url: 'api/endpoints/' + endpointId + '/job?method=file',
+      data: {
+        File: file,
+        Image: imageName
+      },
+      ignoreLoadingBar: true
+    });
+  };
+
   service.createEndpoint = function(name, type, URL, PublicURL, groupID, tags, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
     return Upload.upload({
       url: 'api/endpoints',

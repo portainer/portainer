@@ -26,13 +26,17 @@
               <td>Total memory</td>
               <td>{{ $ctrl.host.totalMemory | humansize }}</td>
             </tr>
-            <tr ng-if="$ctrl.isAgent">
+            <tr>
               <td colspan="2">
-                <button 
-                  class="btn btn-primary btn-sm"
-                  title="Browse" 
-                  ui-sref="{{$ctrl.browseUrl}}">
+                <button
+                    class="btn btn-primary btn-sm"
+                    title="Browse"
+                    ng-if="$ctrl.isAgent"
+                    ui-sref="{{$ctrl.browseUrl}}">
                   Browse
+                </button>
+                <button class="btn btn-primary btn-sm" title="Execute job" ui-sref="portainer.newjob" ng-if="$ctrl.isAdmin">
+                  Execute job
                 </button>
               </td>
             </tr>

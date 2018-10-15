@@ -11,9 +11,12 @@
 <host-details-panel 
   host="$ctrl.hostDetails" 
   is-agent="$ctrl.isAgent"
+  is-admin="$ctrl.isAdmin"
   browse-url="{{$ctrl.browseUrl}}"></host-details-panel>
 
 <engine-details-panel engine="$ctrl.engineDetails"></engine-details-panel>
+
+<jobs-datatable title-text="Jobs" title-icon="fa-tasks" dataset="$ctrl.jobs" table-key="jobs" order-by="Status" ng-if="$ctrl.jobs"></jobs-datatable>
 
 <devices-panel ng-if="$ctrl.isAgent" devices="$ctrl.devices"></devices-panel>
 <disks-panel ng-if="$ctrl.isAgent" disks="$ctrl.disks"></disks-panel>

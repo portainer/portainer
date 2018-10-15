@@ -1,24 +1,34 @@
 angular.module('portainer.docker').controller('NodeDetailsViewController', [
-  '$stateParams', 'NodeService', 'StateManager', 'AgentService',
-  function NodeDetailsViewController($stateParams, NodeService, StateManager, AgentService) {
+  '$q', '$stateParams', 'NodeService', 'StateManager', 'AgentService', 'ContainerService', 'Authentication',
+  function NodeDetailsViewController($q, $stateParams, NodeService, StateManager, AgentService, ContainerService, Authentication) {
     var ctrl = this;
 
     ctrl.$onInit = initView;
 
     ctrl.state = {
-      isAgent: false
+      isAgent: false,
+      isAdmin: false
     };
 
     function initView() {
       var applicationState = StateManager.getState();
       ctrl.state.isAgent = applicationState.endpoint.mode.agentProxy;
+      ctrl.state.isAdmin = Authentication.getUserDetails().role === 1;
 
       var nodeId = $stateParams.id;
-      NodeService.node(nodeId).then(function(node) {
+      $q.all({
+        node: NodeService.node(nodeId),
+        jobs: ContainerService.containers(true, {
+          label: ['io.portainer.job.endpoint']
+        })
+      }).
+      then(function (data) {
+        var node = data.node;
         ctrl.originalNode = node;
         ctrl.hostDetails = buildHostDetails(node);
         ctrl.engineDetails = buildEngineDetails(node);
         ctrl.nodeDetails = buildNodeDetails(node);
+        ctrl.jobs = data.jobs;
         if (ctrl.state.isAgent) {
           AgentService.hostInfo(node.Hostname).then(function onHostInfoLoad(
             agentHostInfo

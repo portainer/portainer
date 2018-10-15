@@ -1,27 +1,32 @@
 angular.module('portainer.docker').controller('HostViewController', [
-  '$q', 'SystemService', 'Notifications', 'StateManager', 'AgentService',
-  function HostViewController($q, SystemService, Notifications, StateManager, AgentService) {
+  '$q', 'SystemService', 'Notifications', 'StateManager', 'AgentService', 'ContainerService', 'Authentication',
+  function HostViewController($q, SystemService, Notifications, StateManager, AgentService, ContainerService, Authentication) {
     var ctrl = this;
     this.$onInit = initView;
 
     ctrl.state = {
-      isAgent: false
+      isAgent: false,
+      isAdmin: false
     };
-    
+
     this.engineDetails = {};
     this.hostDetails = {};
 
     function initView() {
       var applicationState = StateManager.getState();
       ctrl.state.isAgent = applicationState.endpoint.mode.agentProxy;
-
+      ctrl.state.isAdmin = Authentication.getUserDetails().role === 1;
       $q.all({
-        version: SystemService.version(),
-        info: SystemService.info()
-      })
+          version: SystemService.version(),
+          info: SystemService.info(),
+          jobs: ContainerService.containers(true, {
+            label: ['io.portainer.job.endpoint']
+          })
+        })
         .then(function success(data) {
           ctrl.engineDetails = buildEngineDetails(data);
           ctrl.hostDetails = buildHostDetails(data.info);
+          ctrl.jobs = data.jobs;
 
           if (ctrl.state.isAgent) {
             return AgentService.hostInfo(data.info.Hostname).then(function onHostInfoLoad(agentHostInfo) {
