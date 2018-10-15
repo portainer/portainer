@@ -6,7 +6,7 @@
           <span style="float: left;">
             {{ $ctrl.titleText }}
           </span>
-          <span class="small" style="float: right;" ng-if="!$ctrl.cantDismiss">
+          <span class="small" style="float: right;" ng-if="$ctrl.dismissAction">
             <a ng-click="$ctrl.dismissAction()"><i class="fa fa-times"></i> dismiss</a>
           </span>
         </div>
