@@ -3,8 +3,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackBuildNotifierPlugin = require('webpack-build-notifier');
 const CleanTerminalPlugin = require('clean-terminal-webpack-plugin');
 const { ProvidePlugin } = require('webpack');
-const npmPackage = require('./package.json');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
+const npmPackage = require('./package.json');
 module.exports = {
   entry: './app/__module.js',
   output: {
@@ -46,7 +47,7 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader?sourceMap']
+        use: [MiniCssExtractPlugin.loader, 'css-loader?sourceMap']
       }
     ]
   },
@@ -70,6 +71,12 @@ module.exports = {
       jQuery: 'jquery',
       'window.jQuery': 'jquery'
       // angular: 'angular'
+    }),
+    new MiniCssExtractPlugin({
+      // Options similar to the same options in webpackOptions.output
+      // both options are optional
+      filename: "[name].css",
+      chunkFilename: "[id].css"
     })
   ]
 };
