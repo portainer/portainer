@@ -4,6 +4,7 @@ function ($scope, $transition$, $interval, ServiceService, Notifications) {
   $scope.state = {
     refreshRate: 3,
     lineCount: 2000,
+    sinceTimestamp: "1970-01-01T00:00:00",
     displayTimestamps: false
   };
 
@@ -30,7 +31,7 @@ function ($scope, $transition$, $interval, ServiceService, Notifications) {
   function setUpdateRepeater() {
     var refreshRate = $scope.state.refreshRate;
     $scope.repeater = $interval(function() {
-      ServiceService.logs($transition$.params().id, 1, 1, $scope.state.displayTimestamps ? 1 : 0, $scope.state.lineCount)
+      ServiceService.logs($transition$.params().id, 1, 1, $scope.state.displayTimestamps ? 1 : 0, strToTimestamp($scope.state.sinceTimestamp), $scope.state.lineCount)
       .then(function success(data) {
         $scope.logs = data;
       })
@@ -42,7 +43,7 @@ function ($scope, $transition$, $interval, ServiceService, Notifications) {
   }
 
   function startLogPolling() {
-    ServiceService.logs($transition$.params().id, 1, 1, $scope.state.displayTimestamps ? 1 : 0, $scope.state.lineCount)
+    ServiceService.logs($transition$.params().id, 1, 1, $scope.state.displayTimestamps ? 1 : 0, strToTimestamp($scope.state.sinceTimestamp), $scope.state.lineCount)
     .then(function success(data) {
       $scope.logs = data;
       setUpdateRepeater();

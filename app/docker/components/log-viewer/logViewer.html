@@ -51,6 +51,14 @@
               <input class="form-control" type="number" name="lines_count" ng-model="$ctrl.lineCount" placeholder="Enter no of lines...">
             </div>
           </div>
+          <div class="form-group">
+            <label for="since_timestamp" class="col-sm-1 control-label text-left">
+              Since
+            </label>
+            <div class="col-sm-11">
+              <input class="form-control" type="text" name="since_timestamp" ng-model="$ctrl.sinceTimestamp" placeholder="Only return logs since the datetime you enter...">
+            </div>
+          </div>
           <div class="form-group" ng-if="$ctrl.state.copySupported">
             <label class="col-sm-1 control-label text-left">
               Actions
