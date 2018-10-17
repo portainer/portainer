@@ -20,12 +20,16 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
         ctrl.engineDetails = buildEngineDetails(node);
         ctrl.nodeDetails = buildNodeDetails(node);
         if (ctrl.state.isAgent) {
-          AgentService.hostInfo(node.Hostname).then(function onHostInfoLoad(
-            agentHostInfo
-          ) {
-            ctrl.devices = agentHostInfo.PCIDevices;
-            ctrl.disks = agentHostInfo.PhysicalDisks;
-          });
+          var agentApiVersion = applicationState.endpoint.agentApiVersion;
+          ctrl.state.agentApiVersion = agentApiVersion;
+          if (agentApiVersion < 2) {
+            return;
+          }
+          AgentService.hostInfo(node.Hostname)
+            .then(function onHostInfoLoad(agentHostInfo) {
+                ctrl.devices = agentHostInfo.PCIDevices;
+                ctrl.disks = agentHostInfo.PhysicalDisks;
+              });
         }
       });
     }

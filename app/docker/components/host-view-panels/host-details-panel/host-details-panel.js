@@ -3,7 +3,7 @@ angular.module('portainer.docker').component('hostDetailsPanel', {
     'app/docker/components/host-view-panels/host-details-panel/host-details-panel.html',
   bindings: {
     host: '<',
-    isAgent: '<',
+    isBrowseEnabled: '<',
     browseUrl: '@'
   }
 });
