@@ -15,7 +15,6 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
     }
   };
 
-
   manager.dismissInformationPanel = function(id) {
     state.UI.dismissedInfoPanels[id] = true;
     LocalStorage.storeUIState(state.UI);
