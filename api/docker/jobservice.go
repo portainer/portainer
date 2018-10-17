@@ -42,11 +42,6 @@ func (service *JobService) Execute(endpoint *portainer.Endpoint, image string, s
 
 	pullImage(cli, image)
 
-	// TODO this will run only bash scripts
-	cmd := make([]string, 2)
-	cmd[0] = "sh"
-	cmd[1] = "/tmp/script.sh"
-
 	containerConfig := &container.Config{
 		AttachStdin:  true,
 		AttachStdout: true,
@@ -57,7 +52,7 @@ func (service *JobService) Execute(endpoint *portainer.Endpoint, image string, s
 		Labels: map[string]string{
 			"io.portainer.job.endpoint": strconv.Itoa(int(endpoint.ID)),
 		},
-		Cmd: strslice.StrSlice(cmd),
+		Cmd: strslice.StrSlice([]string{"sh", "/tmp/script.sh"}),
 	}
 
 	hostConfig := &container.HostConfig{
