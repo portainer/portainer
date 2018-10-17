@@ -40,7 +40,10 @@ func (service *JobService) Execute(endpoint *portainer.Endpoint, image string, s
 	}
 	defer cli.Close()
 
-	pullImage(cli, image)
+	err = pullImage(cli, image)
+	if err != nil {
+		return err
+	}
 
 	containerConfig := &container.Config{
 		AttachStdin:  true,
