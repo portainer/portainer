@@ -19,12 +19,12 @@ angular.module('portainer.agent').factory('AgentService', [
     }
 
     function agents() {
-      var agentVersion = getAgentApiVersion();
-
       var deferred = $q.defer();
+
+      var agentVersion = getAgentApiVersion();
       var service = agentVersion > 1 ? Agent : AgentVersion1;
       
-      service.query({version: agentVersion})
+      service.query({ version: agentVersion })
         .$promise.then(function success(data) {
           var agents = data.map(function(item) {
             return new AgentViewModel(item);
