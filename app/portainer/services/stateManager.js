@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.factory('StateManager', ['$q', 'SystemService', 'InfoHelper', 'LocalStorage', 'SettingsService', 'StatusService', 'APPLICATION_CACHE_VALIDITY', 'AgentService',
-function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, SettingsService, StatusService, APPLICATION_CACHE_VALIDITY, AgentService) {
+.factory('StateManager', ['$q', 'SystemService', 'InfoHelper', 'LocalStorage', 'SettingsService', 'StatusService', 'APPLICATION_CACHE_VALIDITY', 'AgentPingService',
+function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, SettingsService, StatusService, APPLICATION_CACHE_VALIDITY, AgentPingService) {
   'use strict';
 
   var manager = {};
@@ -14,6 +14,7 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
       dismissedInfoHash: ''
     }
   };
+
 
   manager.dismissInformationPanel = function(id) {
     state.UI.dismissedInfoPanels[id] = true;
@@ -159,7 +160,7 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
       state.endpoint.extensions = assignExtensions(extensions);
 
       if (endpointMode.agentProxy) {
-        return AgentService.ping().then(function onPingSuccess(data) {
+        return AgentPingService.ping().then(function onPingSuccess(data) {
           state.endpoint.agentVersion = data.version;
         });
       }

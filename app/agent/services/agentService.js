@@ -1,26 +1,30 @@
 angular.module('portainer.agent').factory('AgentService', [
-  '$q', 'Agent','HttpRequestHelper', 'Host', 'Ping',
-  function AgentServiceFactory($q, Agent, HttpRequestHelper, Host, Ping) {
+  '$q', 'Agent', 'AgentVersion1', 'HttpRequestHelper', 'Host', 'HostVersion1', 'StateManager',
+  function AgentServiceFactory($q, Agent, AgentVersion1, HttpRequestHelper, Host, HostVersion1, StateManager) {
     'use strict';
     var service = {};
 
     service.agents = agents;
     service.hostInfo = hostInfo;
-    service.ping = ping;
 
-    function ping() {
-      return Ping.ping().$promise;
+    function getAgentApiVersion() {
+      var state = StateManager.getState();
+      return state.endpoint.agentVersion;
     }
 
     function hostInfo(nodeName) {
+      var agentVersion = getAgentApiVersion();
       HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
-      return Host.info().$promise;
+      return Host.info({version: agentVersion}).$promise;
     }
 
     function agents() {
-      var deferred = $q.defer();
+      var agentVersion = getAgentApiVersion();
 
-      Agent.query({})
+      var deferred = $q.defer();
+      var service = agentVersion > 1 ? Agent : AgentVersion1;
+      
+      service.query({version: agentVersion})
         .$promise.then(function success(data) {
           var agents = data.map(function(item) {
             return new AgentViewModel(item);
