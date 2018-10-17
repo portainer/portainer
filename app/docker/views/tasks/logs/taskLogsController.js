@@ -4,7 +4,7 @@ function ($scope, $transition$, $interval, TaskService, ServiceService, Notifica
   $scope.state = {
     refreshRate: 3,
     lineCount: 100,
-    sinceTimestamp: "1970-01-01T00:00:00",
+    sinceTimestamp: '1970-01-01T00:00:00',
     displayTimestamps: false
   };
 
