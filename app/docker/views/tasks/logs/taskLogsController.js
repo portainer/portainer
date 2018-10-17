@@ -4,7 +4,7 @@ function ($scope, $transition$, $interval, TaskService, ServiceService, Notifica
   $scope.state = {
     refreshRate: 3,
     lineCount: 100,
-    sinceTimestamp: '1970-01-01T00:00:00',
+    sinceTimestamp: moment().subtract(1, 'days').format(),
     displayTimestamps: false
   };
 
@@ -31,7 +31,7 @@ function ($scope, $transition$, $interval, TaskService, ServiceService, Notifica
   function setUpdateRepeater() {
     var refreshRate = $scope.state.refreshRate;
     $scope.repeater = $interval(function() {
-      TaskService.logs($transition$.params().id, 1, 1, $scope.state.displayTimestamps ? 1 : 0, strToTimestamp($scope.state.sinceTimestamp), $scope.state.lineCount)
+      TaskService.logs($transition$.params().id, 1, 1, $scope.state.displayTimestamps ? 1 : 0, moment($scope.state.sinceTimestamp).unix(), $scope.state.lineCount)
       .then(function success(data) {
         $scope.logs = data;
       })
@@ -43,7 +43,7 @@ function ($scope, $transition$, $interval, TaskService, ServiceService, Notifica
   }
 
   function startLogPolling() {
-    TaskService.logs($transition$.params().id, 1, 1, $scope.state.displayTimestamps ? 1 : 0, strToTimestamp($scope.state.sinceTimestamp), $scope.state.lineCount)
+    TaskService.logs($transition$.params().id, 1, 1, $scope.state.displayTimestamps ? 1 : 0, moment($scope.state.sinceTimestamp).unix(), $scope.state.lineCount)
     .then(function success(data) {
       $scope.logs = data;
       setUpdateRepeater();

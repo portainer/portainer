@@ -20,12 +20,6 @@ function hashToHexColor(hash) {
   return color;
 }
 
-function strToTimestamp(str) {
-  var dt = new Date(str);
-  var timestamp = dt.getTime()/1000 - dt.getTimezoneOffset()*60;
-  return timestamp;
-}
-
 angular.module('portainer.docker')
 .filter('visualizerTask', function () {
   'use strict';
