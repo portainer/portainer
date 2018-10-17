@@ -1,11 +1,16 @@
 angular.module('portainer.agent').factory('AgentService', [
-  '$q', 'Agent','HttpRequestHelper', 'Host',
-  function AgentServiceFactory($q, Agent, HttpRequestHelper, Host) {
+  '$q', 'Agent','HttpRequestHelper', 'Host', 'Ping',
+  function AgentServiceFactory($q, Agent, HttpRequestHelper, Host, Ping) {
     'use strict';
     var service = {};
 
     service.agents = agents;
     service.hostInfo = hostInfo;
+    service.ping = ping;
+
+    function ping() {
+      return Ping.ping().$promise;
+    }
 
     function hostInfo(nodeName) {
       HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
