@@ -46,7 +46,7 @@ angular.module('portainer.app')
             }
           })
           .catch(function error(err) {
-            Notifications.warning('Deployment error', err.data.err);
+            Notifications.error('Job execution failure', err.data.err);
           })
           .finally(function final() {
             $scope.state.actionInProgress = false;

@@ -9,6 +9,11 @@
               {{ $ctrl.titleText }}
             </div>
           </div>
+          <div class="actionBar">
+            <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.purgeAction()">
+              <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Purge jobs
+            </button>
+          </div>
           <div class="searchBar">
             <i class="fa fa-search searchIcon" aria-hidden="true"></i>
             <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus>

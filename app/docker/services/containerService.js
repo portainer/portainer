@@ -186,5 +186,9 @@ function ContainerServiceFactory($q, Container, ResourceControlService, LogHelpe
     return Container.inspect({ id: id }).$promise;
   };
 
+  service.purgeCompletedJobs = function() {
+    return Container.prune({filters: {label: ['io.portainer.job.endpoint']}}).$promise;
+  };
+
   return service;
 }]);

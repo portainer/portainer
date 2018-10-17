@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-  .controller('JobsDatatableController', ['$q', 'PaginationService', 'DatatableService', 'EndpointProvider',
-    function ($q, PaginationService, DatatableService, EndpointProvider) {
+  .controller('JobsDatatableController', ['$q', '$state', 'PaginationService', 'DatatableService', 'EndpointProvider', 'ContainerService', 'ModalService', 'Notifications',
+    function ($q, $state, PaginationService, DatatableService, EndpointProvider, ContainerService, ModalService, Notifications) {
       var ctrl = this;
 
       this.state = {
@@ -76,6 +76,44 @@ angular.module('portainer.docker')
             this.filters.state.enabled = true;
           }
         }
+      };
+
+      function confirmPurgeJobs() {
+        return showConfirmationModal();
+
+        function showConfirmationModal() {
+          var deferred = $q.defer();
+
+          ModalService.confirm({
+            title: 'Are you sure ?',
+            message: 'Purging jobs will remove all stopped jobs containers. Be sure to save your jobs logs if needed before performing this action.',
+            buttons: {
+              confirm: {
+                label: 'Purge',
+                className: 'btn-danger'
+              }
+            },
+            callback: function onConfirm(confirmed) {
+              deferred.resolve(confirmed);
+            }
+          });
+
+          return deferred.promise;
+        }
+      }
+
+      this.purgeAction = function () {
+        confirmPurgeJobs().then(function success(confirmed) {
+          if (!confirmed) {
+            return $q.when();
+          }
+          ContainerService.purgeCompletedJobs().then(function success() {
+            Notifications.success('Success', 'Jobs sucessfully purged.');
+            $state.reload();
+          }).catch(function error(err) {
+            Notifications.error('Failure', err.message, 'Unable to purge jobs');
+          });
+        });
       };
 
       this.$onInit = function () {
