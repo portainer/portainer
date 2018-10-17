@@ -18,10 +18,10 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
     ctrl.duplicateStack = duplicateStack;
     ctrl.migrateStack = migrateStack;
     ctrl.isMigrationButtonDisabled = isMigrationButtonDisabled;
-    ctrl.stackNameAvailable = true;
+    ctrl.state.stackNameAvailable = true;
 
-    ctrl.stackNameChange = function(name) {
-      ctrl.stackNameAvailable = ctrl.stackNames.indexOf(name) === -1;
+    ctrl.onStackNameChange = function(name) {
+      ctrl.state.stackNameAvailable = ctrl.stackNames.indexOf(name) === -1;
     };
 
     function isFormValidForMigration() {
@@ -29,7 +29,7 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
     }
 
     function isFormValidForDuplication() {
-      return isFormValidForMigration() && ctrl.formValues.newName && ctrl.stackNameAvailable;
+      return isFormValidForMigration() && ctrl.formValues.newName && ctrl.state.stackNameAvailable;
     }
 
     function duplicateStack() {
@@ -79,13 +79,7 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
     }
 
     function initView() {
-      var endpointMode = ctrl.applicationState.endpoint.mode;
-  
-      StackService.stacks(
-        true,
-        endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER',
-        0
-      )
+      StackService.stacks(true, true, 0)
       .then(function success(data) {
         ctrl.stackNames = data.map(function(x) {return x.Name;});
       })

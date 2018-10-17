@@ -23,7 +23,7 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
     StackType: null
   };
 
-  $scope.stackNameAvailable = true;
+  $scope.state.stackNameAvailable = true;
 
   $scope.addEnvironmentVariable = function() {
     $scope.formValues.Env.push({ name: '', value: ''});
@@ -135,8 +135,8 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
     $scope.formValues.StackFileContent = cm.getValue();
   };
 
-  $scope.stackNameChange = function(name) {
-    $scope.stackNameAvailable = $scope.stackNames.indexOf(name) === -1;
+  $scope.onStackNameChange = function(name) {
+    $scope.state.stackNameAvailable = $scope.stackNames.indexOf(name) === -1;
   };
 
   function initView() {
@@ -146,11 +146,7 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
       $scope.state.StackType = 1;
     }
 
-    StackService.stacks(
-      true,
-      endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER',
-      0
-    )
+    StackService.stacks(true, true, 0)
     .then(function success(data) {
       $scope.stackNames = data.map(function(x) {return x.Name;} );
     })

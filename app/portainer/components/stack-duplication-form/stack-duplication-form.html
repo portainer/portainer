@@ -9,13 +9,15 @@
       </p>
     </span>
     <div>
-      <div ng-class="{'form-group': true, 'has-warning': !$ctrl.stackNameAvailable, 'has-feedback': !$ctrl.stackNameAvailable}">
+      <div ng-class="{'form-group': true, 'has-warning': !$ctrl.state.stackNameAvailable, 'has-feedback': !$ctrl.state.stackNameAvailable}">
         <input class="form-control" placeholder="Stack name (optional for migration)" 
           aria-placeholder="Stack name"
-          ng-change="$ctrl.stackNameChange($ctrl.formValues.newName)"
+          ng-change="$ctrl.onStackNameChange($ctrl.formValues.newName)"
           ng-model="$ctrl.formValues.newName" />
-          <span ng-if="!$ctrl.stackNameAvailable" class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
-          <div ng-if="!$ctrl.stackNameAvailable" class="help-block">
+          <span ng-if="!$ctrl.state.stackNameAvailable" class="form-control-feedback">
+            <i class="fa fa-minus-circle"></i>
+          </span>
+          <div ng-if="!$ctrl.state.stackNameAvailable" class="help-block">
             This stack name is already used
           </div>
       </div>

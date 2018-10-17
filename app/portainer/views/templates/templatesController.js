@@ -48,7 +48,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
     $scope.state.selectedTemplate.Labels.splice(index, 1);
   };
 
-  $scope.stackNameChange = function(name) {
+  $scope.onStackNameChange = function(name) {
     $scope.state.stackNameAvailable = $scope.stackNames.indexOf(name) === -1;
   };
 
@@ -247,11 +247,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
         false,
         endpointMode.provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25
       ),
-      stacks: StackService.stacks(
-        true,
-        endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER',
-        0
-      ),
+      stacks: StackService.stacks(true, true, 0),
       settings: SettingsService.publicSettings()
     })
     .then(function success(data) {
