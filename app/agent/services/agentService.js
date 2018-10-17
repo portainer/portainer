@@ -15,7 +15,7 @@ angular.module('portainer.agent').factory('AgentService', [
     function hostInfo(nodeName) {
       var agentVersion = getAgentApiVersion();
       HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
-      return Host.info({version: agentVersion}).$promise;
+      return Host.info({ version: agentVersion }).$promise;
     }
 
     function agents() {
