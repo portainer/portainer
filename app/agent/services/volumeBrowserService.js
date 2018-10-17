@@ -6,7 +6,7 @@ angular.module('portainer.agent').factory('VolumeBrowserService', [
 
     function getAgentApiVersion() {
       var state = StateManager.getState();
-      return state.endpoint.agentVersion;
+      return state.endpoint.agentApiVersion;
     }
 
     function getBrowseService() {

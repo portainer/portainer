@@ -1,6 +1,6 @@
 angular.module('portainer.agent').factory('AgentService', [
-  '$q', 'Agent', 'AgentVersion1', 'HttpRequestHelper', 'Host', 'HostVersion1', 'StateManager',
-  function AgentServiceFactory($q, Agent, AgentVersion1, HttpRequestHelper, Host, HostVersion1, StateManager) {
+  '$q', 'Agent', 'AgentVersion1', 'HttpRequestHelper', 'Host', 'StateManager',
+  function AgentServiceFactory($q, Agent, AgentVersion1, HttpRequestHelper, Host, StateManager) {
     'use strict';
     var service = {};
 
@@ -9,7 +9,7 @@ angular.module('portainer.agent').factory('AgentService', [
 
     function getAgentApiVersion() {
       var state = StateManager.getState();
-      return state.endpoint.agentVersion;
+      return state.endpoint.agentApiVersion;
     }
 
     function hostInfo(nodeName) {

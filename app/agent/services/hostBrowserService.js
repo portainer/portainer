@@ -11,7 +11,7 @@ angular.module('portainer.agent').factory('HostBrowserService', [
 
     function getAgentApiVersion() {
       var state = StateManager.getState();
-      return state.endpoint.agentVersion;
+      return state.endpoint.agentApiVersion;
     }
 
     function ls(path) {

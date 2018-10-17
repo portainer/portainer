@@ -161,7 +161,7 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
 
       if (endpointMode.agentProxy) {
         return AgentPingService.ping().then(function onPingSuccess(data) {
-          state.endpoint.agentVersion = data.version;
+          state.endpoint.agentApiVersion = data.version;
         });
       }
       
