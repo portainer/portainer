@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"io"
+	"io/ioutil"
 	"strconv"
 
 	"github.com/docker/docker/api/types"
@@ -93,13 +94,9 @@ func pullImage(cli *client.Client, image string) error {
 	}
 
 	defer imageReadCloser.Close()
-	r := make([]byte, 256)
-	_, err = imageReadCloser.Read(r)
-	for err != io.EOF {
-		if err != nil {
-			return err
-		}
-		_, err = imageReadCloser.Read(r)
+	_, err = io.Copy(ioutil.Discard, imageReadCloser)
+	if err != nil {
+		return err
 	}
 
 	return nil
