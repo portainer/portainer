@@ -7,9 +7,12 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 const npmPackage = require('./package.json');
 module.exports = {
-  entry: './app/__module.js',
+  entry: {
+    vendors: './app/vendors.js',
+    main: './app/__module.js',
+  },
   output: {
-    filename: 'main.js',
+    filename: '[name].[hash].js',
     path: path.resolve(__dirname, 'dist/public')
   },
   module: {
