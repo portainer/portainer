@@ -39,5 +39,22 @@ else
     
     ./manifest-tool-linux-amd64 push from-spec /home/appveyor/projects/docker-manifest/portainer/portainer-1-19-2.yml
     ./manifest-tool-linux-amd64 push from-spec /home/appveyor/projects/docker-manifest/portainer/portainer.yml
+
+
+    docker -D manifest create "ssbkang/portainer:latest" \
+    "ssbkang/portainer:pr${APPVEYOR_PULL_REQUEST_NUMBER}-linux-amd64" \
+    "ssbkang/portainer:pr${APPVEYOR_PULL_REQUEST_NUMBER}-windows-amd64" \
+    "ssbkang/portainer:pr${APPVEYOR_PULL_REQUEST_NUMBER}-windows1709-amd64" \
+    "ssbkang/portainer:pr${APPVEYOR_PULL_REQUEST_NUMBER}-windows1803-amd64"
+
+    docker manifest push "ssbkang/portainer:$env:APPVEYOR_REPO_TAG_NAME"
+
+    docker -D manifest create "ssbkang/portainer:${PORTAINER_VERSION}" \
+    "ssbkang/portainer:-linux-amd64" \
+    "ssbkang/portainer:-windows-amd64" \
+    "ssbkang/portainer:-windows1709-amd64" \
+    "ssbkang/portainer:-windows1803-amd64"
+
+    docker manifest push "ssbkang/portainer:$env:APPVEYOR_REPO_TAG_NAME"
   fi
 fi

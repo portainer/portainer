@@ -7,7 +7,7 @@ $ErrorActionPreference = "Stop";
 
 $binary = "portainer.exe"
 
-Set-Item env:GOPATH ".\api\"
+Set-Item env:GOPATH "$PWD\api\"
 
 New-Item -Name dist -Path "." -ItemType Directory | Out-Null
 New-Item -Name portainer -Path "api\src\github.com\" -ItemType Directory | Out-Null
