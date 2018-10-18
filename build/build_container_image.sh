@@ -18,7 +18,7 @@ if [ "${APPVEYOR_PULL_REQUEST_NUMBER}" ]; then
     "ssbkang/portainer:pr${APPVEYOR_PULL_REQUEST_NUMBER}-windows1709-amd64" \
     "ssbkang/portainer:pr${APPVEYOR_PULL_REQUEST_NUMBER}-windows1803-amd64"
 
-  docker manifest push "ssbkang/portainer:$env:APPVEYOR_REPO_TAG_NAME"
+  docker manifest push "ssbkang/portainer:pr${APPVEYOR_PULL_REQUEST_NUMBER}"
 else
   mkdir -pv portainer
   cp -r dist/* portainer
