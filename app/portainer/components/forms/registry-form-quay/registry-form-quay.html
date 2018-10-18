@@ -1,0 +1,48 @@
+<form class="form-horizontal" name="registryFormQuay" ng-submit="$ctrl.formAction()">
+  <div class="col-sm-12 form-section-title">
+    Quay account details
+  </div>
+  <!-- credentials-user -->
+  <div class="form-group">
+    <label for="username" class="col-sm-3 col-lg-2 control-label text-left">Username</label>
+    <div class="col-sm-9 col-lg-10">
+      <input type="text" class="form-control" id="username" name="username" ng-model="$ctrl.model.Username" required auto-focus>
+    </div>
+  </div>
+  <div class="form-group" ng-show="registryFormQuay.username.$invalid">
+    <div class="col-sm-12 small text-warning">
+      <div ng-messages="registryFormQuay.username.$error">
+        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+      </div>
+    </div>
+  </div>
+  <!-- !credentials-user -->
+  <!-- credentials-password -->
+  <div class="form-group">
+    <label for="password" class="col-sm-3 col-lg-2 control-label text-left">Password</label>
+    <div class="col-sm-9 col-lg-10">
+      <input type="password" class="form-control" id="password" name="password" ng-model="$ctrl.model.Password" required>
+    </div>
+  </div>
+  <div class="form-group" ng-show="registryFormQuay.password.$invalid">
+    <div class="col-sm-12 small text-warning">
+      <div ng-messages="registryFormQuay.password.$error">
+        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+      </div>
+    </div>
+  </div>
+  <!-- !credentials-password -->
+  <!-- actions -->
+  <div class="col-sm-12 form-section-title">
+    Actions
+  </div>
+  <div class="form-group">
+    <div class="col-sm-12">
+      <button type="submit" class="btn btn-primary btn-sm" ng-click="$ctrl.formAction()" ng-disabled="$ctrl.actionInProgress || !registryFormQuay.$valid" button-spinner="$ctrl.actionInProgress">
+        <span ng-hide="$ctrl.actionInProgress">{{ $ctrl.formActionLabel }}</span>
+        <span ng-show="$ctrl.actionInProgress">In progress...</span>
+      </button>
+    </div>
+  </div>
+  <!-- !actions -->
+</form>

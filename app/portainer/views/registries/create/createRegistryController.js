@@ -2,46 +2,38 @@ angular.module('portainer.app')
 .controller('CreateRegistryController', ['$scope', '$state', 'RegistryService', 'Notifications',
 function ($scope, $state, RegistryService, Notifications) {
 
+  $scope.selectQuayRegistry = selectQuayRegistry;
+  $scope.selectAzureRegistry = selectAzureRegistry;
+  $scope.selectCustomRegistry = selectCustomRegistry;
+  $scope.create = createRegistry;
+
   $scope.state = {
     actionInProgress: false
   };
 
-  $scope.formValues = {
-    Type: 1,
-    Name: 'Quay',
-    URL: 'quay.io',
-    Authentication: true,
-    Username: '',
-    Password: ''
-  };
+  function selectQuayRegistry() {
+    $scope.model.Name = 'Quay';
+    $scope.model.URL = 'quay.io';
+    $scope.model.Authentication = true;
+  }
 
-  $scope.selectQuayRegistry = function() {
-    $scope.formValues.Name = 'Quay';
-    $scope.formValues.URL = 'quay.io';
-    $scope.formValues.Authentication = true;
-  };
+  function selectAzureRegistry() {
+    $scope.model.Name = '';
+    $scope.model.URL = '';
+    $scope.model.Authentication = true;
+  }
 
-  $scope.selectAzureRegistry = function() {
-    $scope.formValues.Name = 'Azure';
-    $scope.formValues.URL = '';
-    $scope.formValues.Authentication = true;
-  };
+  function selectCustomRegistry() {
+    $scope.model.Name = '';
+    $scope.model.URL = '';
+    $scope.model.Authentication = false;
+  }
 
-  $scope.selectCustomRegistry = function() {
-    $scope.formValues.Name = '';
-    $scope.formValues.URL = '';
-    $scope.formValues.Authentication = false;
-  };
-
-  $scope.addRegistry = function() {
-    var registryName = $scope.formValues.Name;
-    var registryURL = $scope.formValues.URL.replace(/^https?\:\/\//i, '');
-    var authentication = $scope.formValues.Authentication;
-    var username = $scope.formValues.Username;
-    var password = $scope.formValues.Password;
+  function createRegistry() {
+    $scope.model.URL = $scope.model.URL.replace(/^https?\:\/\//i, '');
 
     $scope.state.actionInProgress = true;
-    RegistryService.createRegistry(registryName, registryURL, authentication, username, password)
+    RegistryService.createRegistry($scope.model)
     .then(function success() {
       Notifications.success('Registry successfully created');
       $state.go('portainer.registries');
@@ -52,5 +44,11 @@ function ($scope, $state, RegistryService, Notifications) {
     .finally(function final() {
       $scope.state.actionInProgress = false;
     });
-  };
+  }
+
+  function initView() {
+    $scope.model = new RegistryDefaultModel();
+  }
+
+  initView();
 }]);

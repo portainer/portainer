@@ -58,17 +58,9 @@ angular.module('portainer.app')
     return FileUploadService.configureRegistry(id, registryManagementConfigurationModel);
   };
 
-  service.createRegistry = function(name, URL, authentication, username, password) {
-    var payload = {
-      Name: name,
-      URL: URL,
-      Authentication: authentication
-    };
-    if (authentication) {
-      payload.Username = username;
-      payload.Password = password;
-    }
-    return Registries.create({}, payload).$promise;
+  service.createRegistry = function(model) {
+    var payload = new RegistryCreateRequest(model);
+    return Registries.create(payload).$promise;
   };
 
   service.retrieveRegistryFromRepository = function(repository) {

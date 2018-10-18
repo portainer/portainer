@@ -19,3 +19,23 @@ function RegistryManagementConfigurationModel() {
   this.TLSCertFile = null;
   this.TLSKeyFile = null;
 }
+
+function RegistryDefaultModel() {
+  this.Type = 3;
+  this.URL = '';
+  this.Name = '';
+  this.Authentication = false;
+  this.Username = '';
+  this.Password = '';
+}
+
+function RegistryCreateRequest(model) {
+  this.Name = model.Name;
+  this.Type = model.Type;
+  this.URL = model.URL;
+  this.Authentication = model.Authentication;
+  if (model.Authentication) {
+    this.Username = model.Username;
+    this.Password = model.Password;
+  }
+}

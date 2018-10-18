@@ -1,0 +1,105 @@
+<form class="form-horizontal" name="registryFormCustom" ng-submit="$ctrl.formAction()">
+  <div class="col-sm-12 form-section-title">
+    Important notice
+  </div>
+  <div class="form-group">
+    <span class="col-sm-12 text-muted small">
+      Docker requires you to connect to a <a href="https://docs.docker.com/registry/deploying/#running-a-domain-registry" target="_blank">secure registry</a>.
+      You can find more information about how to connect to an insecure registry <a href="https://docs.docker.com/registry/insecure/" target="_blank">in the Docker documentation</a>.
+    </span>
+  </div>
+  <div class="col-sm-12 form-section-title">
+    Custom registry details
+  </div>
+  <!-- name-input -->
+  <div class="form-group">
+    <label for="name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
+    <div class="col-sm-9 col-lg-10">
+      <input type="text" class="form-control" id="name" name="name" ng-model="$ctrl.model.Name" placeholder="my-custom-registry" required auto-focus>
+    </div>
+  </div>
+  <div class="form-group" ng-show="registryFormCustom.name.$invalid">
+    <div class="col-sm-12 small text-warning">
+      <div ng-messages="registryFormCustom.name.$error">
+        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+      </div>
+    </div>
+  </div>
+  <!-- !name-input -->
+  <!-- url-input -->
+  <div class="form-group" ng-if="$ctrl.model.Type === 2 || $ctrl.model.Type === 3">
+    <label for="url" class="col-sm-3 col-lg-2 control-label text-left">
+      Registry URL
+      <portainer-tooltip position="bottom" message="URL or IP address of a Docker registry. Any protocol will be stripped."></portainer-tooltip>
+    </label>
+    <div class="col-sm-9 col-lg-10">
+      <input type="text" class="form-control" id="url" name="url" ng-model="$ctrl.model.URL" placeholder="10.0.0.10:5000 or myregistry.domain.tld" required>
+    </div>
+  </div>
+  <div class="form-group" ng-show="registryFormCustom.url.$invalid">
+    <div class="col-sm-12 small text-warning">
+      <div ng-messages="registryFormCustom.url.$error">
+        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+      </div>
+    </div>
+  </div>
+  <!-- url-input -->
+  <!-- authentication-checkbox -->
+  <div class="form-group">
+    <div class="col-sm-12">
+      <label for="registry_auth" class="control-label text-left">
+        Authentication
+        <portainer-tooltip position="bottom" message="Enable this option if you need to specify credentials to connect to this registry."></portainer-tooltip>
+      </label>
+      <label class="switch" style="margin-left: 20px;">
+        <input type="checkbox" ng-model="$ctrl.model.Authentication"><i></i>
+      </label>
+    </div>
+  </div>
+  <!-- !authentication-checkbox -->
+  <div ng-if="$ctrl.model.Authentication">
+    <!-- credentials-user -->
+    <div class="form-group">
+      <label for="username" class="col-sm-3 col-lg-2 control-label text-left">Username</label>
+      <div class="col-sm-9 col-lg-10">
+        <input type="text" class="form-control" id="username" name="username" ng-model="$ctrl.model.Username" required>
+      </div>
+    </div>
+    <div class="form-group" ng-show="registryFormCustom.username.$invalid">
+      <div class="col-sm-12 small text-warning">
+        <div ng-messages="registryFormCustom.username.$error">
+          <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+        </div>
+      </div>
+    </div>
+    <!-- !credentials-user -->
+    <!-- credentials-password -->
+    <div class="form-group">
+      <label for="password" class="col-sm-3 col-lg-2 control-label text-left">Password</label>
+      <div class="col-sm-9 col-lg-10">
+        <input type="password" class="form-control" id="password" name="password" ng-model="$ctrl.model.Password" required>
+      </div>
+    </div>
+    <div class="form-group" ng-show="registryFormCustom.password.$invalid">
+      <div class="col-sm-12 small text-warning">
+        <div ng-messages="registryFormCustom.password.$error">
+          <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+        </div>
+      </div>
+    </div>
+    <!-- !credentials-password -->
+  </div>
+  <!-- actions -->
+  <div class="col-sm-12 form-section-title">
+    Actions
+  </div>
+  <div class="form-group">
+    <div class="col-sm-12">
+      <button type="submit" class="btn btn-primary btn-sm" ng-click="$ctrl.formAction()" ng-disabled="$ctrl.actionInProgress || !registryFormCustom.$valid" button-spinner="$ctrl.actionInProgress">
+        <span ng-hide="$ctrl.actionInProgress">{{ $ctrl.formActionLabel }}</span>
+        <span ng-show="$ctrl.actionInProgress">In progress...</span>
+      </button>
+    </div>
+  </div>
+  <!-- !actions -->
+</form>

@@ -1,0 +1,81 @@
+<form class="form-horizontal" name="registryFormAzure" ng-submit="$ctrl.formAction()">
+  <div class="col-sm-12 form-section-title">
+    Azure registry details
+  </div>
+  <!-- name-input -->
+  <div class="form-group">
+    <label for="name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
+    <div class="col-sm-9 col-lg-10">
+      <input type="text" class="form-control" id="name" name="name" ng-model="$ctrl.model.Name" placeholder="my-azure-registry" required auto-focus>
+    </div>
+  </div>
+  <div class="form-group" ng-show="registryFormAzure.name.$invalid">
+    <div class="col-sm-12 small text-warning">
+      <div ng-messages="registryFormAzure.name.$error">
+        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+      </div>
+    </div>
+  </div>
+  <!-- !name-input -->
+  <!-- url-input -->
+  <div class="form-group" ng-if="$ctrl.model.Type === 2 || $ctrl.model.Type === 3">
+    <label for="url" class="col-sm-3 col-lg-2 control-label text-left">
+      Registry URL
+      <portainer-tooltip position="bottom" message="URL of an Azure Container Registry. Any protocol will be stripped."></portainer-tooltip>
+    </label>
+    <div class="col-sm-9 col-lg-10">
+      <input type="text" class="form-control" id="url" name="url" ng-model="$ctrl.model.URL" placeholder="myproject.azurecr.io" required>
+    </div>
+  </div>
+  <div class="form-group" ng-show="registryFormAzure.url.$invalid">
+    <div class="col-sm-12 small text-warning">
+      <div ng-messages="registryFormAzure.url.$error">
+        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+      </div>
+    </div>
+  </div>
+  <!-- url-input -->
+  <!-- credentials-user -->
+  <div class="form-group">
+    <label for="username" class="col-sm-3 col-lg-2 control-label text-left">Username</label>
+    <div class="col-sm-9 col-lg-10">
+      <input type="text" class="form-control" id="username" name="username" ng-model="$ctrl.model.Username" required>
+    </div>
+  </div>
+  <div class="form-group" ng-show="registryFormAzure.username.$invalid">
+    <div class="col-sm-12 small text-warning">
+      <div ng-messages="registryFormAzure.username.$error">
+        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+      </div>
+    </div>
+  </div>
+  <!-- !credentials-user -->
+  <!-- credentials-password -->
+  <div class="form-group">
+    <label for="password" class="col-sm-3 col-lg-2 control-label text-left">Password</label>
+    <div class="col-sm-9 col-lg-10">
+      <input type="password" class="form-control" id="password" name="password" ng-model="$ctrl.model.Password" required>
+    </div>
+  </div>
+  <div class="form-group" ng-show="registryFormAzure.password.$invalid">
+    <div class="col-sm-12 small text-warning">
+      <div ng-messages="registryFormAzure.password.$error">
+        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+      </div>
+    </div>
+  </div>
+  <!-- !credentials-password -->
+  <!-- actions -->
+  <div class="col-sm-12 form-section-title">
+    Actions
+  </div>
+  <div class="form-group">
+    <div class="col-sm-12">
+      <button type="submit" class="btn btn-primary btn-sm" ng-click="$ctrl.formAction()" ng-disabled="$ctrl.actionInProgress || !registryFormAzure.$valid" button-spinner="$ctrl.actionInProgress">
+        <span ng-hide="$ctrl.actionInProgress">{{ $ctrl.formActionLabel }}</span>
+        <span ng-show="$ctrl.actionInProgress">In progress...</span>
+      </button>
+    </div>
+  </div>
+  <!-- !actions -->
+</form>
