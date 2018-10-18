@@ -4,14 +4,14 @@
   </div>
   <!-- name-input -->
   <div class="form-group">
-    <label for="name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
+    <label for="registry_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="name" name="name" ng-model="$ctrl.model.Name" placeholder="my-azure-registry" required auto-focus>
+      <input type="text" class="form-control" id="registry_name" name="registry_name" ng-model="$ctrl.model.Name" placeholder="my-azure-registry" required auto-focus>
     </div>
   </div>
-  <div class="form-group" ng-show="registryFormAzure.name.$invalid">
+  <div class="form-group" ng-show="registryFormAzure.registry_name.$invalid">
     <div class="col-sm-12 small text-warning">
-      <div ng-messages="registryFormAzure.name.$error">
+      <div ng-messages="registryFormAzure.registry_name.$error">
         <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
       </div>
     </div>
@@ -19,17 +19,17 @@
   <!-- !name-input -->
   <!-- url-input -->
   <div class="form-group" ng-if="$ctrl.model.Type === 2 || $ctrl.model.Type === 3">
-    <label for="url" class="col-sm-3 col-lg-2 control-label text-left">
+    <label for="registry_url" class="col-sm-3 col-lg-2 control-label text-left">
       Registry URL
       <portainer-tooltip position="bottom" message="URL of an Azure Container Registry. Any protocol will be stripped."></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="url" name="url" ng-model="$ctrl.model.URL" placeholder="myproject.azurecr.io" required>
+      <input type="text" class="form-control" id="registry_url" name="registry_url" ng-model="$ctrl.model.URL" placeholder="myproject.azurecr.io" required>
     </div>
   </div>
-  <div class="form-group" ng-show="registryFormAzure.url.$invalid">
+  <div class="form-group" ng-show="registryFormAzure.registry_url.$invalid">
     <div class="col-sm-12 small text-warning">
-      <div ng-messages="registryFormAzure.url.$error">
+      <div ng-messages="registryFormAzure.registry_url.$error">
         <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
       </div>
     </div>
@@ -37,14 +37,14 @@
   <!-- url-input -->
   <!-- credentials-user -->
   <div class="form-group">
-    <label for="username" class="col-sm-3 col-lg-2 control-label text-left">Username</label>
+    <label for="registry_username" class="col-sm-3 col-lg-2 control-label text-left">Username</label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="username" name="username" ng-model="$ctrl.model.Username" required>
+      <input type="text" class="form-control" id="registry_username" name="registry_username" ng-model="$ctrl.model.Username" required>
     </div>
   </div>
-  <div class="form-group" ng-show="registryFormAzure.username.$invalid">
+  <div class="form-group" ng-show="registryFormAzure.registry_username.$invalid">
     <div class="col-sm-12 small text-warning">
-      <div ng-messages="registryFormAzure.username.$error">
+      <div ng-messages="registryFormAzure.registry_username.$error">
         <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
       </div>
     </div>
@@ -52,14 +52,14 @@
   <!-- !credentials-user -->
   <!-- credentials-password -->
   <div class="form-group">
-    <label for="password" class="col-sm-3 col-lg-2 control-label text-left">Password</label>
+    <label for="registry_password" class="col-sm-3 col-lg-2 control-label text-left">Password</label>
     <div class="col-sm-9 col-lg-10">
-      <input type="password" class="form-control" id="password" name="password" ng-model="$ctrl.model.Password" required>
+      <input type="registry_password" class="form-control" id="registry_password" name="registry_password" ng-model="$ctrl.model.Password" required>
     </div>
   </div>
-  <div class="form-group" ng-show="registryFormAzure.password.$invalid">
+  <div class="form-group" ng-show="registryFormAzure.registry_password.$invalid">
     <div class="col-sm-12 small text-warning">
-      <div ng-messages="registryFormAzure.password.$error">
+      <div ng-messages="registryFormAzure.registry_password.$error">
         <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
       </div>
     </div>

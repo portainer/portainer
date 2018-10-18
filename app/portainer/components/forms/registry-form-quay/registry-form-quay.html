@@ -4,14 +4,14 @@
   </div>
   <!-- credentials-user -->
   <div class="form-group">
-    <label for="username" class="col-sm-3 col-lg-2 control-label text-left">Username</label>
+    <label for="registry_username" class="col-sm-3 col-lg-2 control-label text-left">Username</label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="username" name="username" ng-model="$ctrl.model.Username" required auto-focus>
+      <input type="text" class="form-control" id="registry_username" name="registry_username" ng-model="$ctrl.model.Username" required auto-focus>
     </div>
   </div>
-  <div class="form-group" ng-show="registryFormQuay.username.$invalid">
+  <div class="form-group" ng-show="registryFormQuay.registry_username.$invalid">
     <div class="col-sm-12 small text-warning">
-      <div ng-messages="registryFormQuay.username.$error">
+      <div ng-messages="registryFormQuay.registry_username.$error">
         <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
       </div>
     </div>
@@ -19,14 +19,14 @@
   <!-- !credentials-user -->
   <!-- credentials-password -->
   <div class="form-group">
-    <label for="password" class="col-sm-3 col-lg-2 control-label text-left">Password</label>
+    <label for="registry_password" class="col-sm-3 col-lg-2 control-label text-left">Password</label>
     <div class="col-sm-9 col-lg-10">
-      <input type="password" class="form-control" id="password" name="password" ng-model="$ctrl.model.Password" required>
+      <input type="registry_password" class="form-control" id="registry_password" name="registry_password" ng-model="$ctrl.model.Password" required>
     </div>
   </div>
-  <div class="form-group" ng-show="registryFormQuay.password.$invalid">
+  <div class="form-group" ng-show="registryFormQuay.registry_password.$invalid">
     <div class="col-sm-12 small text-warning">
-      <div ng-messages="registryFormQuay.password.$error">
+      <div ng-messages="registryFormQuay.registry_password.$error">
         <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
       </div>
     </div>
