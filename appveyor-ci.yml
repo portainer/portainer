@@ -16,6 +16,7 @@ branches:
 stack: node 9
 install:
   - yarn install
+  - npm install -g rebase-docker-image
 init:
   - sh: export IMAGE=linux
   - cmd: SET IMAGE=windows
