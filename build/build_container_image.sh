@@ -32,29 +32,28 @@ else
   docker push "ssbkang/portainer:$IMAGE-$ARCH"
 
   if [ "${2}" == 's390x' ] ; then
-    wget https://github.com/estesp/manifest-tool/releases/download/v0.8.0/manifest-tool-linux-amd64
-    git clone -q --branch=master $6 /home/appveyor/projects/docker-manifest
-
-    chmod 755 manifest-tool-linux-amd64
-    
-    ./manifest-tool-linux-amd64 push from-spec /home/appveyor/projects/docker-manifest/portainer/portainer-1-19-2.yml
-    ./manifest-tool-linux-amd64 push from-spec /home/appveyor/projects/docker-manifest/portainer/portainer.yml
-
-
     docker -D manifest create "ssbkang/portainer:latest" \
-    "ssbkang/portainer:pr${APPVEYOR_PULL_REQUEST_NUMBER}-linux-amd64" \
-    "ssbkang/portainer:pr${APPVEYOR_PULL_REQUEST_NUMBER}-windows-amd64" \
-    "ssbkang/portainer:pr${APPVEYOR_PULL_REQUEST_NUMBER}-windows1709-amd64" \
-    "ssbkang/portainer:pr${APPVEYOR_PULL_REQUEST_NUMBER}-windows1803-amd64"
+      "ssbkang/portainer:linux-amd64" \
+      "ssbkang/portainer:linux-arm" \
+      "ssbkang/portainer:linux-arm64" \
+      "ssbkang/portainer:linux-ppc64le" \
+      "ssbkang/portainer:linux-s390x" \
+      "ssbkang/portainer:windows-amd64" \
+      "ssbkang/portainer:windows1709-amd64" \
+      "ssbkang/portainer:windows1803-amd64"
 
-    docker manifest push "ssbkang/portainer:$env:APPVEYOR_REPO_TAG_NAME"
+    docker manifest push "ssbkang/portainer:latest"
 
     docker -D manifest create "ssbkang/portainer:${PORTAINER_VERSION}" \
-    "ssbkang/portainer:-linux-amd64" \
-    "ssbkang/portainer:-windows-amd64" \
-    "ssbkang/portainer:-windows1709-amd64" \
-    "ssbkang/portainer:-windows1803-amd64"
+      "ssbkang/portainer:linux-amd64-${PORTAINER_VERSION}" \
+      "ssbkang/portainer:linux-arm-${PORTAINER_VERSION}" \
+      "ssbkang/portainer:linux-arm64-${PORTAINER_VERSION}" \
+      "ssbkang/portainer:linux-ppc64le-${PORTAINER_VERSION}" \
+      "ssbkang/portainer:linux-s390x-${PORTAINER_VERSION}" \
+      "ssbkang/portainer:windows-amd64-${PORTAINER_VERSION}" \
+      "ssbkang/portainer:windows1709-amd64-${PORTAINER_VERSION}" \
+      "ssbkang/portainer:windows1803-amd64-${PORTAINER_VERSION}"
 
-    docker manifest push "ssbkang/portainer:$env:APPVEYOR_REPO_TAG_NAME"
+    docker manifest push "ssbkang/portainer:${PORTAINER_VERSION}
   fi
 fi
