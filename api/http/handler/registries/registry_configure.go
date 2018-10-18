@@ -41,19 +41,20 @@ func (payload *registryConfigurePayload) Validate(r *http.Request) error {
 	skipTLSVerify, _ := request.RetrieveBooleanMultiPartFormValue(r, "TLSSkipVerify", true)
 	payload.TLSSkipVerify = skipTLSVerify
 
-	if useTLS && !skipTLSVerify {
-		cert, _, err := request.RetrieveMultiPartFormFile(r, "TLSCertFile")
-		if err != nil {
-			return portainer.Error("Invalid certificate file. Ensure that the file is uploaded correctly")
-		}
-		payload.TLSCertFile = cert
-
-		key, _, err := request.RetrieveMultiPartFormFile(r, "TLSKeyFile")
-		if err != nil {
-			return portainer.Error("Invalid key file. Ensure that the file is uploaded correctly")
-		}
-		payload.TLSKeyFile = key
-	}
+	// TODO: fixme
+	// if useTLS && !skipTLSVerify {
+	// 	cert, _, err := request.RetrieveMultiPartFormFile(r, "TLSCertFile")
+	// 	if err != nil {
+	// 		return portainer.Error("Invalid certificate file. Ensure that the file is uploaded correctly")
+	// 	}
+	// 	payload.TLSCertFile = cert
+	//
+	// 	key, _, err := request.RetrieveMultiPartFormFile(r, "TLSKeyFile")
+	// 	if err != nil {
+	// 		return portainer.Error("Invalid key file. Ensure that the file is uploaded correctly")
+	// 	}
+	// 	payload.TLSKeyFile = key
+	// }
 
 	return nil
 }
@@ -77,6 +78,8 @@ func (handler *Handler) registryConfigure(w http.ResponseWriter, r *http.Request
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a registry with the specified identifier inside the database", err}
 	}
+
+	registry.ManagementConfiguration.Type = registry.Type
 
 	if payload.Authentication {
 		registry.ManagementConfiguration.Authentication = true

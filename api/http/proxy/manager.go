@@ -112,7 +112,7 @@ func (manager *Manager) CreatePluginProxy(pluginID portainer.PluginID) error {
 	// otherwise needs a switch or something
 
 	// TODO: should pass a secret as a header (license?) to prevent anybody from requesting it.
-	pluginURL, err := url.Parse("http://192.168.35.81:7001")
+	pluginURL, err := url.Parse("http://192.168.178.142:7001")
 	if err != nil {
 		return err
 	}

@@ -18,6 +18,7 @@ function ($scope, $state, $transition$, RegistryService, LocalRegistryService, N
       return LocalRegistryService.repositories($scope.registry.Id);
     })
     .then(function success(data) {
+      // TODO: remove
       console.log(data);
     })
     .catch(function error(err) {
@@ -34,16 +35,13 @@ function ($scope, $state, $transition$, RegistryService, LocalRegistryService, N
 
   function initView() {
     var registryId = $transition$.params().id;
-    var model = new RegistryManagementConfigurationModel();
 
     RegistryService.registry(registryId)
     .then(function success(data) {
       var registry = data;
-      $scope.registry = data;
-      if (registry.Authentication) {
-        model.Authentication = true;
-        model.Username = registry.Username;
-      }
+      var model = new RegistryManagementConfigurationDefaultModel(registry);
+
+      $scope.registry = registry;
       $scope.model = model;
     })
     .catch(function error(err) {

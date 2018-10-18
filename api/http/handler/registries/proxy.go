@@ -79,6 +79,6 @@ func (handler *Handler) proxyRequestsToRegistryAPI(w http.ResponseWriter, r *htt
 
 	// TODO: /v2 required for standard docker registry
 
-	http.StripPrefix("/registries/"+id+"/v2", proxy).ServeHTTP(w, r)
+	http.StripPrefix("/registries/"+id, proxy).ServeHTTP(w, r)
 	return nil
 }

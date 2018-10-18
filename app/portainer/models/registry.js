@@ -1,5 +1,6 @@
 function RegistryViewModel(data) {
   this.Id = data.Id;
+  this.Type = data.Type;
   this.Name = data.Name;
   this.URL = data.URL;
   this.Authentication = data.Authentication;
@@ -10,14 +11,24 @@ function RegistryViewModel(data) {
   this.Checked = false;
 }
 
-function RegistryManagementConfigurationModel() {
+function RegistryManagementConfigurationDefaultModel(registry) {
   this.Authentication = false;
-  this.Username = '';
   this.Password = '';
   this.TLS = false;
   this.TLSSkipVerify = false;
   this.TLSCertFile = null;
   this.TLSKeyFile = null;
+
+  if (registry.Type === 1 || registry.Type === 2 ) {
+    this.Authentication = true;
+    this.Username = registry.Username;
+    this.TLS = true;
+  }
+
+  if (registry.Type === 3 && registry.Authentication) {
+    this.Authentication = true;
+    this.Username = registry.Username;
+  }
 }
 
 function RegistryDefaultModel() {

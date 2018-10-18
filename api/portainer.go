@@ -187,6 +187,7 @@ type (
 	// RegistryManagementConfiguration represents a configuration that can be used to query
 	// the registry API via the registry management plugin.
 	RegistryManagementConfiguration struct {
+		Type           RegistryType     `json:"Type"`
 		Authentication bool             `json:"Authentication"`
 		Username       string           `json:"Username"`
 		Password       string           `json:"Password"`
