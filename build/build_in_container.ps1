@@ -7,6 +7,7 @@ $ErrorActionPreference = "Stop";
 
 $binary = "portainer.exe"
 
+(Get-ITEM -Path env:APPVEYOR_BUILD_FOLDER ).Value
 Set-Item env:GOPATH "$PWD\api\"
 
 New-Item -Name dist -Path "." -ItemType Directory | Out-Null
