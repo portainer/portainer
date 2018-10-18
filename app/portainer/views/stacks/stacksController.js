@@ -34,7 +34,6 @@ function ($scope, $state, Notifications, StackService, ModalService, EndpointPro
   }
 
   function initView() {
-    var endpointMode = $scope.applicationState.endpoint.mode;
     var endpointId = EndpointProvider.endpointID();
 
     StackService.stacks(true, true, endpointId)
