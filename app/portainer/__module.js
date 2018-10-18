@@ -309,8 +309,8 @@ angular.module('portainer.app', [])
   };
 
   var stackCreation = {
-    name: 'portainer.stacks.new',
-    url: '/new',
+    name: 'portainer.newstack',
+    url: '/newstack',
     views: {
       'content@': {
         templateUrl: 'app/portainer/views/stacks/create/createstack.html',

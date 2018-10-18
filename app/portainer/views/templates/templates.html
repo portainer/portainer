@@ -111,7 +111,7 @@
           <div class="form-group">
             <label for="container_network" class="col-sm-2 control-label text-left">Network</label>
             <div class="col-sm-10">
-              <select class="form-control" ng-options="net.Name for net in availableNetworks" ng-model="formValues.network">
+              <select class="form-control" ng-options="net.Name for net in availableNetworks | orderBy: 'Name'" ng-model="formValues.network">
                 <option disabled hidden value="">Select a network</option>
               </select>
             </div>

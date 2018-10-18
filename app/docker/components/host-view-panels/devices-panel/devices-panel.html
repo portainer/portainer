@@ -1,0 +1,31 @@
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-code" title-text="PCI Devices"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Vendor</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-if="$ctrl.devices && $ctrl.devices.length" ng-repeat="device in $ctrl.devices">
+              <td>{{device.Name}}</td>
+              <td>{{device.Vendor}}</td>
+            </tr>
+            <tr ng-if="!$ctrl.devices">
+              <td colspan="2" class="text-center text-muted">Loading...</td>
+            </tr>
+            <tr ng-if="$ctrl.devices.length === 0">
+              <td colspan="2" class="text-center text-muted">
+                No device available.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
