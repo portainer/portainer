@@ -164,22 +164,25 @@ type (
 	// RegistryID represents a registry identifier
 	RegistryID int
 
+	// RegistryType represents a type of registry
+	RegistryType int
+
 	// Registry represents a Docker registry with all the info required
 	// to connect to it
 	Registry struct {
-		ID                      RegistryID                      `json:"Id"`
-		Name                    string                          `json:"Name"`
-		URL                     string                          `json:"URL"`
-		Authentication          bool                            `json:"Authentication"`
-		Username                string                          `json:"Username"`
-		Password                string                          `json:"Password,omitempty"`
-		AuthorizedUsers         []UserID                        `json:"AuthorizedUsers"`
-		AuthorizedTeams         []TeamID                        `json:"AuthorizedTeams"`
+		ID              RegistryID   `json:"Id"`
+		Type            RegistryType `json:"Type"`
+		Name            string       `json:"Name"`
+		URL             string       `json:"URL"`
+		Authentication  bool         `json:"Authentication"`
+		Username        string       `json:"Username"`
+		Password        string       `json:"Password,omitempty"`
+		AuthorizedUsers []UserID     `json:"AuthorizedUsers"`
+		AuthorizedTeams []TeamID     `json:"AuthorizedTeams"`
+		// TODO: will require migration? or not, we check for nil in proxy first access
+		// Should also be hidden in API results
 		ManagementConfiguration RegistryManagementConfiguration `json:"ManagementConfiguration"`
 	}
-
-	// TODO: will require migration? or not, we check for nil in proxy first access
-	// Should also be hidden in API results
 
 	// RegistryManagementConfiguration represents a configuration that can be used to query
 	// the registry API via the registry management plugin.
@@ -812,4 +815,14 @@ const (
 	_ PluginID = iota
 	// RegistryManagementPlugin represents the registry management plugin
 	RegistryManagementPlugin
+)
+
+const (
+	_ RegistryType = iota
+	// QuayRegistry represents a Quay.io registry
+	QuayRegistry
+	// AzureRegistry represents an ACR registry
+	AzureRegistry
+	// CustomRegistry represents a custom registry
+	CustomRegistry
 )

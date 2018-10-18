@@ -17,7 +17,7 @@
           <div class="form-group" style="margin-bottom: 0">
             <div class="boxselector_wrapper">
               <div ng-click="selectQuayRegistry()">
-                <input type="radio" id="registry_quay" ng-model="state.RegistryType" value="quay">
+                <input type="radio" id="registry_quay" ng-model="formValues.Type" ng-value="1">
                 <label for="registry_quay">
                   <div class="boxselector_header">
                     <i class="fa fa-database" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -26,8 +26,18 @@
                   <p>Quay container registry</p>
                 </label>
               </div>
+              <div ng-click="selectAzureRegistry()">
+                <input type="radio" id="registry_azure" ng-model="formValues.Type" ng-value="2">
+                <label for="registry_azure">
+                  <div class="boxselector_header">
+                    <i class="fab fa-microsoft" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Azure
+                  </div>
+                  <p>Azure container registry</p>
+                </label>
+              </div>
               <div ng-click="selectCustomRegistry()">
-                <input type="radio" id="registry_custom" ng-model="state.RegistryType" value="custom">
+                <input type="radio" id="registry_custom" ng-model="formValues.Type" ng-value="3">
                 <label for="registry_custom">
                   <div class="boxselector_header">
                     <i class="fa fa-database" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -38,10 +48,10 @@
               </div>
             </div>
           </div>
-          <div class="col-sm-12 form-section-title" ng-if="state.RegistryType === 'custom'">
+          <div class="col-sm-12 form-section-title" ng-if="formValues.Type === 3">
             Important notice
           </div>
-          <div class="form-group" ng-if="state.RegistryType === 'custom'">
+          <div class="form-group" ng-if="formValues.Type === 3">
             <span class="col-sm-12 text-muted small">
               Docker requires you to connect to a <a href="https://docs.docker.com/registry/deploying/#running-a-domain-registry" target="_blank">secure registry</a>.
               You can find more information about how to connect to an insecure registry <a href="https://docs.docker.com/registry/insecure/" target="_blank">in the Docker documentation</a>.
@@ -51,7 +61,7 @@
             Registry details
           </div>
           <!-- name-input -->
-          <div class="form-group" ng-if="state.RegistryType === 'custom'">
+          <div class="form-group" ng-if="formValues.Type === 3">
             <label for="registry_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
             <div class="col-sm-9 col-lg-10">
               <input type="text" class="form-control" id="registry_name" ng-model="formValues.Name" placeholder="e.g. my-registry">
@@ -59,7 +69,7 @@
           </div>
           <!-- !name-input -->
           <!-- registry-url-input -->
-          <div class="form-group" ng-if="state.RegistryType === 'custom'">
+          <div class="form-group" ng-if="formValues.Type === 2 || formValues.Type === 3">
             <label for="registry_url" class="col-sm-3 col-lg-2 control-label text-left">
               Registry URL
               <portainer-tooltip position="bottom" message="URL or IP address of a Docker registry. Any protocol will be stripped."></portainer-tooltip>
@@ -70,7 +80,7 @@
           </div>
           <!-- !registry-url-input -->
           <!-- authentication-checkbox -->
-          <div class="form-group" ng-if="state.RegistryType === 'custom'">
+          <div class="form-group" ng-if="formValues.Type === 3">
             <div class="col-sm-12">
               <label for="registry_auth" class="control-label text-left">
                 Authentication
@@ -83,7 +93,7 @@
           </div>
           <!-- !authentication-checkbox -->
           <!-- authentication-credentials -->
-          <div ng-if="formValues.Authentication || state.RegistryType === 'quay'">
+          <div ng-if="formValues.Authentication || formValues.Type === 1">
             <!-- credentials-user -->
             <div class="form-group">
               <label for="credentials_username" class="col-sm-3 col-lg-2 control-label text-left">Username</label>

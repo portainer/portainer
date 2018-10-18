@@ -12,6 +12,7 @@ import (
 
 func hideFields(registry *portainer.Registry) {
 	registry.Password = ""
+	registry.ManagementConfiguration = portainer.RegistryManagementConfiguration{}
 }
 
 // Handler is the HTTP handler used to handle registry operations.

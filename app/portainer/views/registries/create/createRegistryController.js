@@ -3,11 +3,11 @@ angular.module('portainer.app')
 function ($scope, $state, RegistryService, Notifications) {
 
   $scope.state = {
-    RegistryType: 'quay',
     actionInProgress: false
   };
 
   $scope.formValues = {
+    Type: 1,
     Name: 'Quay',
     URL: 'quay.io',
     Authentication: true,
@@ -18,6 +18,12 @@ function ($scope, $state, RegistryService, Notifications) {
   $scope.selectQuayRegistry = function() {
     $scope.formValues.Name = 'Quay';
     $scope.formValues.URL = 'quay.io';
+    $scope.formValues.Authentication = true;
+  };
+
+  $scope.selectAzureRegistry = function() {
+    $scope.formValues.Name = 'Azure';
+    $scope.formValues.URL = '';
     $scope.formValues.Authentication = true;
   };
 
