@@ -7,10 +7,18 @@ GITHUB_MANIFEST_URL="$6"
 APPVEYOR_PULL_REQUEST_NUMBER="$7"
 
 if [ "${APPVEYOR_PULL_REQUEST_NUMBER}" ]; then
-  tag="pr${APPVEYOR_PULL_REQUEST_NUMBER}"
+  tag="pr${APPVEYOR_PULL_REQUEST_NUMBER}-$IMAGE-$ARCH"
   docker build -t "ssbkang/portainer:$tag" -f build/linux/Dockerfile .
   docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
   docker push "ssbkang/portainer:$tag"
+
+  docker -D manifest create "ssbkang/portainer:pr${APPVEYOR_PULL_REQUEST_NUMBER}" \
+    "ssbkang/portainer:pr${APPVEYOR_PULL_REQUEST_NUMBER}-linux-amd64" \
+    "ssbkang/portainer:pr${APPVEYOR_PULL_REQUEST_NUMBER}-windows-amd64" \
+    "ssbkang/portainer:pr${APPVEYOR_PULL_REQUEST_NUMBER}-windows1709-amd64" \
+    "ssbkang/portainer:pr${APPVEYOR_PULL_REQUEST_NUMBER}-windows1803-amd64"
+
+  docker manifest push "ssbkang/portainer:$env:APPVEYOR_REPO_TAG_NAME"
 else
   mkdir -pv portainer
   cp -r dist/* portainer

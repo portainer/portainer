@@ -1,5 +1,6 @@
 version: 1.0.{build}
 image:
+  - Visual Studio 2017
   - Ubuntu
 environment:
   matrix:
@@ -8,7 +9,6 @@ environment:
     secure: JapmC7j5F0mY3j/MVzU+Cw==
   DOCKER_PASS:
     secure: QGlCLNWzPD0HL8ipkohVic45/yU3bVOdjn0IiV6NnSQ=
-  IMAGE: linux
 branches:
   only:
     - develop
@@ -16,13 +16,16 @@ stack: node 9
 install:
   - yarn install
 init:
+  - sh: export IMAGE=linux
+  - cmd: SET IMAGE=windows
   - ps: >-
-      $if (!(Test-Path ~/.docker)) { mkdir ~/.docker }
+      if (!(Test-Path ~/.docker)) { mkdir ~/.docker };
       Set-Content -Value '{ "experimental": "enabled" }' -Path ~/.docker/config.json -Encoding Ascii
 build_script:
-  - sh: cat ~/.docker/config.json
   - sh: yarn grunt release:$IMAGE:$ARCH
+  - cmd: yarn grunt release:%IMAGE%:%ARCH%
   - sh: sudo bash build/build_container_image.sh $IMAGE $ARCH ' ' $DOCKER_USER $DOCKER_PASS ' ' $APPVEYOR_PULL_REQUEST_NUMBER
+  - cmd: powershell -Command "& .\\build\\build_container_image.ps1"
 notifications:
   - provider: GitHubPullRequest
     auth_token:
