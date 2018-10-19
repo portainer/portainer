@@ -26,6 +26,7 @@ func CreateTLSConfigurationFromBytes(caCert, cert, key []byte, skipClientVerific
 		config.RootCAs = caCertPool
 	}
 
+	config.MinVersion = tls.VersionTLS11  // feat2359 removed deprecated TLS1.0 protocol
 	return config, nil
 }
 
@@ -54,6 +55,7 @@ func CreateTLSConfigurationFromDisk(caCertPath, certPath, keyPath string, skipSe
 		caCertPool.AppendCertsFromPEM(caCert)
 		config.RootCAs = caCertPool
 	}
-
+	
+	config.MinVersion = tls.VersionTLS11  // feat2359 removed deprecated TLS1.0 protocol
 	return config, nil
 }
