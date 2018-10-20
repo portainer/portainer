@@ -7,7 +7,7 @@ angular.module('portainer.app')
 
     var service = {};
 
-    function defaultChartOptions(pos, tooltipCallback, scalesCallback, isStacked = false) {
+    function defaultChartOptions(pos, tooltipCallback, scalesCallback, isStacked) {
       return {
         animation: { duration: 0 },
         responsiveAnimationDuration: 0,
