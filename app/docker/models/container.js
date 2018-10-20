@@ -64,7 +64,6 @@ function ContainerViewModel(data) {
 
 function ContainerStatsViewModel(data) {
   this.Date = data.read;
-  // Page cache is intentionally excluded to avoid misinterpretation of memory usage.
   this.MemoryUsage = data.memory_stats.usage - data.memory_stats.stats.cache;
   this.MemoryCache = data.memory_stats.stats.cache;
   this.PreviousCPUTotalUsage = data.precpu_stats.cpu_usage.total_usage;
