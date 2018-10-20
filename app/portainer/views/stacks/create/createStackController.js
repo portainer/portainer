@@ -20,10 +20,9 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
     Method: 'editor',
     formValidationError: '',
     actionInProgress: false,
-    StackType: null
+    StackType: null,
+    stackNameAvailable: true
   };
-
-  $scope.state.stackNameAvailable = true;
 
   $scope.addEnvironmentVariable = function() {
     $scope.formValues.Env.push({ name: '', value: ''});
