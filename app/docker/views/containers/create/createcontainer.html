@@ -146,7 +146,7 @@
       <rd-widget-header icon="fa-cog" title-text="Advanced container settings"></rd-widget-header>
       <rd-widget-body>
         <ul class="nav nav-pills nav-justified">
-          <li class="active interactive"><a data-target="#command" data-toggle="tab">Command</a></li>
+          <li class="active interactive"><a data-target="#command" data-toggle="tab">Command and logging</a></li>
           <li class="interactive"><a data-target="#volumes" data-toggle="tab">Volumes</a></li>
           <li class="interactive"><a data-target="#network" data-toggle="tab">Network</a></li>
           <li class="interactive"><a data-target="#env" data-toggle="tab">Env</a></li>
@@ -162,7 +162,7 @@
             <form class="form-horizontal" style="margin-top: 15px;">
               <!-- command-input -->
               <div class="form-group">
-                <label for="container_command" class="col-sm-2 col-lg-1 control-label text-left">Command</label>
+                <label for="container_command" class="col-sm-2 col-lg-1 control-label text-left">Command and logging</label>
                 <div class="col-sm-9">
                   <input type="text" class="form-control" ng-model="config.Cmd" id="container_command" placeholder="e.g. /usr/bin/nginx -t -c /mynginx.conf">
                 </div>
@@ -221,6 +221,59 @@
                 </div>
               </div>
               <!-- !console -->
+
+              <div class="col-sm-12 form-section-title">
+                Logging
+              </div>
+              <!-- logging-driver -->
+              <div class="form-group">
+                <label for="log-driver" class="col-sm-2 col-lg-1 control-label text-left">Driver</label>
+                <div class="col-sm-4">
+                  <select class="form-control" ng-model="formValues.LogDriverName" id="log-driver">
+                    <option selected value="">Default logging driver</option>
+                    <option ng-repeat="driver in availableLoggingDrivers" ng-value="driver">{{ driver }}</option>
+                    <option value="none">none</option>
+                  </select>
+                </div>
+                <div class="col-sm-5">
+                  <p class="small text-muted">
+                  Logging driver for container that will override the default docker daemon driver. Select Default logging driver if you don't want to override it. Supported logging drivers can be found <a href="https://docs.docker.com/engine/admin/logging/overview/#supported-logging-drivers" target="_blank">in the Docker documentation</a>.
+                  </p>
+                </div>
+              </div>
+              <!-- !logging-driver -->
+              <!-- logging-opts -->
+              <div class="form-group">
+                <div class="col-sm-12" style="margin-top: 5px;">
+                  <label class="control-label text-left">
+                    Options
+                    <portainer-tooltip position="top" message="Add button is disabled unless a driver other than none or default is selected. Options are specific to the selected driver, refer to the driver documentation."></portainer-tooltip>
+                  </label>
+                  <span class="label label-default interactive" style="margin-left: 10px;" ng-click="!formValues.LogDriverName || formValues.LogDriverName === 'none' || addLogDriverOpt(formValues.LogDriverName)">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i> add logging driver option
+                  </span>
+                </div>
+                <!-- logging-opts-input-list -->
+                <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                  <div ng-repeat="opt in formValues.LogDriverOpts" style="margin-top: 2px;">
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">option</span>
+                      <input type="text" class="form-control" ng-model="opt.name" placeholder="e.g. FOO">
+                    </div>
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">value</span>
+                      <input type="text" class="form-control" ng-model="opt.value" placeholder="e.g. bar">
+                    </div>
+                    <button class="btn btn-sm btn-danger" type="button" ng-click="removeLogDriverOpt($index)">
+                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- logging-opts-input-list -->
+              </div>
+              <!-- !logging-opts -->
+
+
             </form>
           </div>
           <!-- !tab-command -->
