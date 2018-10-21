@@ -17,11 +17,10 @@ angular.module('portainer.agent').factory('AgentPing', [
               return instance;
             },
             responseError: function versionResponseError(error) {
-              // 404 or 403 - agent is up - set version to 1
-              if (error.status === 404 || error.status === 403) {
+              // 404 - agent is up - set version to 1
+              if (error.status === 404) {
                 return { version: 1 };
               }
-              // anything else reject
               return $q.reject(error);
             }
           }
