@@ -220,6 +220,16 @@ type (
 		TLSKeyPath    string `json:"TLSKey,omitempty"`
 	}
 
+	ScheduleID int
+
+	Schedule struct {
+		ID         ScheduleID   `json:"Id"`
+		Name       string       `json:"Name"`
+		Endpoints  []EndpointID `json:"Endpoints"`
+		Schedule   string       `json:"Schedule"`
+		ScriptPath string       `json:"ScriptPath"`
+	}
+
 	// WebhookID represents an webhook identifier.
 	WebhookID int
 
