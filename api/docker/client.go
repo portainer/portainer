@@ -97,7 +97,7 @@ func httpClient(endpoint *portainer.Endpoint) (*http.Client, error) {
 	}
 
 	return &http.Client{
-		Timeout:   time.Second * 10,
+		Timeout:   time.Second * 100,
 		Transport: transport,
 	}, nil
 }
