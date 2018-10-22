@@ -636,7 +636,7 @@ type (
 		Down(stack *Stack, endpoint *Endpoint) error
 	}
 
-	// JobService represtents a service that manages job execution on hosts
+	// JobService represents a service to manage job execution on hosts
 	JobService interface {
 		Execute(endpoint *Endpoint, image string, script []byte) error
 	}
