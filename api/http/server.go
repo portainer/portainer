@@ -15,6 +15,7 @@ import (
 	"github.com/portainer/portainer/http/handler/motd"
 	"github.com/portainer/portainer/http/handler/registries"
 	"github.com/portainer/portainer/http/handler/resourcecontrols"
+	"github.com/portainer/portainer/http/handler/schedules"
 	"github.com/portainer/portainer/http/handler/settings"
 	"github.com/portainer/portainer/http/handler/stacks"
 	"github.com/portainer/portainer/http/handler/status"
@@ -182,6 +183,8 @@ func (server *Server) Start() error {
 	webhookHandler.EndpointService = server.EndpointService
 	webhookHandler.DockerClientFactory = server.DockerClientFactory
 
+	schedulesHandler := schedules.NewHandler(requestBouncer)
+
 	server.Handler = &handler.Handler{
 		AuthHandler:            authHandler,
 		DockerHubHandler:       dockerHubHandler,
@@ -203,6 +206,7 @@ func (server *Server) Start() error {
 		UserHandler:            userHandler,
 		WebSocketHandler:       websocketHandler,
 		WebhookHandler:         webhookHandler,
+		SchedulesHanlder:       schedulesHandler,
 	}
 
 	if server.SSL {
