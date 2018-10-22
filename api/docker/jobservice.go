@@ -92,8 +92,8 @@ func pullImage(cli *client.Client, image string) error {
 	if err != nil {
 		return err
 	}
-
 	defer imageReadCloser.Close()
+
 	_, err = io.Copy(ioutil.Discard, imageReadCloser)
 	if err != nil {
 		return err
