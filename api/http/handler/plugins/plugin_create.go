@@ -127,9 +127,12 @@ func (handler *Handler) enableRegistryManagementPlugin(plugin *portainer.Plugin,
 	plugin.LicenseExpiration = licenseDetails[1]
 	plugin.Version = licenseDetails[2]
 
+	// TODO: find the correct way to start the plugin process
 	// syscall.Exec replaces the process, ForkExec could be tried?
 	// Also should be relocated to another package
 	// err = syscall.ForkExec("/plugins/plugin-registry-management", []string{"plugin-registry-management"}, os.Environ())
+
+	// TODO: logs must be available (redirect on FS?)
 	cmd := exec.Command("/data/bin/plugin-registry-management-linux-amd64-1.0.0", "-license", license)
 
 	// cmd.Start will not share logs with the main Portainer container.
