@@ -4,7 +4,11 @@ function (DatatableService) {
   var ctrl = this;
 
   this.state = {
-    orderBy: this.orderBy
+    orderBy: this.orderBy,
+    showQuickActionStats: true,
+    showQuickActionLogs: true,
+    showQuickActionConsole: true,
+    showQuickActionInspect: true
   };
 
   this.filters = {
