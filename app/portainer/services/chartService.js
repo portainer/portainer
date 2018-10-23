@@ -80,10 +80,10 @@ angular.module('portainer.app')
               label: 'Cache',
               data: [],
               fill: true,
-              backgroundColor: 'rgba(211,211,211,0.4)',
-              borderColor: 'rgba(211,211,211,0.6)',
-              pointBackgroundColor: 'rgba(211,211,211,1)',
-              pointBorderColor: 'rgba(211,211,211,1)',
+              backgroundColor: 'rgba(255,180,174,0.4)',
+              borderColor: 'rgba(255,180,174,0.6)',
+              pointBackgroundColor: 'rgba(255,180,174,1)',
+              pointBorderColor: 'rgba(255,180,174,1)',
               pointRadius: 2,
               borderWidth: 2
             }
