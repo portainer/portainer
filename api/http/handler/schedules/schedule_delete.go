@@ -15,18 +15,10 @@ func (handler *Handler) deleteSchedule(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: id", err}
 	}
 
-	err = deleteScheduleMock(portainer.ScheduleID(id))
+	err = handler.scheduleService.DeleteSchedule(portainer.ScheduleID(id))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Failed deleting schedule", err}
 	}
 
-	return response.JSON(w, nil)
-}
-
-func deleteScheduleMock(id portainer.ScheduleID) error {
-	if 0 > int(id) || int(id) > len(mockSchedules) {
-		return portainer.Error("Schedule not found")
-	}
-	mockSchedules = append(mockSchedules[:int(id)], mockSchedules[int(id)+1:]...)
-	return nil
+	return response.Empty(w)
 }
