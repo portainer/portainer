@@ -28,13 +28,13 @@ var mockSchedules []*portainer.Schedule = []*portainer.Schedule{
 
 type Handler struct {
 	*mux.Router
-	// scheduleService portainer.ScheduleService
+	scheduleService portainer.ScheduleService
 }
 
-func NewHandler(bouncer *security.RequestBouncer /* scheduleService portainer.ScheduleService*/) *Handler {
+func NewHandler(bouncer *security.RequestBouncer, scheduleService portainer.ScheduleService) *Handler {
 	h := &Handler{
-		Router: mux.NewRouter(),
-		// scheduleService: scheduleService
+		Router:          mux.NewRouter(),
+		scheduleService: scheduleService,
 	}
 
 	h.Handle("/schedules",

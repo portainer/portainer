@@ -551,6 +551,17 @@ type (
 		DeleteResourceControl(ID ResourceControlID) error
 	}
 
+	// ScheduleService represents a service for managing schedule data
+	ScheduleService interface {
+		Schedule(ID ScheduleID) (*Schedule, error)
+		Schedules() ([]Schedule, error)
+		CreateSchedule(schedule *Schedule) error
+		UpdateSchedule(ID ScheduleID, schedule *Schedule) error
+		DeleteSchedule(ID ScheduleID) error
+		Synchronize(toCreate, toUpdate, toDelete []*Schedule) error
+		GetNextIdentifier() int
+	}
+
 	// TagService represents a service for managing tag data
 	TagService interface {
 		Tags() ([]Tag, error)

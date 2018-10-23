@@ -55,6 +55,7 @@ type Server struct {
 	LDAPService            portainer.LDAPService
 	RegistryService        portainer.RegistryService
 	ResourceControlService portainer.ResourceControlService
+	ScheduleService        portainer.ScheduleService
 	SettingsService        portainer.SettingsService
 	StackService           portainer.StackService
 	SwarmStackManager      portainer.SwarmStackManager
@@ -183,7 +184,7 @@ func (server *Server) Start() error {
 	webhookHandler.EndpointService = server.EndpointService
 	webhookHandler.DockerClientFactory = server.DockerClientFactory
 
-	schedulesHandler := schedules.NewHandler(requestBouncer)
+	schedulesHandler := schedules.NewHandler(requestBouncer, server.ScheduleService)
 
 	server.Handler = &handler.Handler{
 		AuthHandler:            authHandler,

@@ -509,6 +509,7 @@ func main() {
 		RegistryService:        store.RegistryService,
 		DockerHubService:       store.DockerHubService,
 		StackService:           store.StackService,
+		ScheduleService:        store.ScheduleService,
 		TagService:             store.TagService,
 		TemplateService:        store.TemplateService,
 		WebhookService:         store.WebhookService,
