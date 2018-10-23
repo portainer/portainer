@@ -1,8 +1,10 @@
 angular.module('portainer.agent')
-.factory('Agent', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', function AgentFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
+.factory('Agent', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', 'StateManager',
+  function AgentFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, StateManager) {
   'use strict';
   return $resource(API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/v:version/agents', {
-    endpointId: EndpointProvider.endpointID
+    endpointId: EndpointProvider.endpointID,
+    version: StateManager.getAgentApiVersion
   },
   {
     query: { method: 'GET', isArray: true }

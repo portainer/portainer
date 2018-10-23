@@ -178,5 +178,9 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
     return deferred.promise;
   };
 
+  manager.getAgentApiVersion = function getAgentApiVersion() {
+    return state.endpoint.agentApiVersion;
+  };
+
   return manager;
 }]);

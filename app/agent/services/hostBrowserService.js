@@ -9,41 +9,34 @@ angular.module('portainer.agent').factory('HostBrowserService', [
     service.rename = rename;
     service.upload = upload;
 
-    function getAgentApiVersion() {
-      var state = StateManager.getState();
-      return state.endpoint.agentApiVersion;
-    }
-
     function ls(path) {
-      var agentVersion = getAgentApiVersion();
-      return Browse.ls({ path: path, version: agentVersion }).$promise;
+      return Browse.ls({ path: path }).$promise;
     }
 
     function get(path) {
-      var agentVersion = getAgentApiVersion();
-      return Browse.get({ path: path, version: agentVersion  }).$promise;
+      return Browse.get({ path: path }).$promise;
     }
 
     function deletePath(path) {
-      var agentVersion = getAgentApiVersion();
-      return Browse.delete({ path: path, version: agentVersion  }).$promise;
+      return Browse.delete({ path: path }).$promise;
     }
 
     function rename(path, newPath) {
-      var agentVersion = getAgentApiVersion();
       var payload = {
         CurrentFilePath: path,
         NewFilePath: newPath
       };
-      return Browse.rename({ version: agentVersion }, payload).$promise;
+      return Browse.rename({}, payload).$promise;
     }
 
     function upload(path, file, onProgress) {
       var deferred = $q.defer();
-      var agentVersion = getAgentApiVersion();
+      var agentVersion = StateManager.getAgentApiVersion();
       var url =
-        API_ENDPOINT_ENDPOINTS + '/' +
-        EndpointProvider.endpointID() + '/docker' +
+        API_ENDPOINT_ENDPOINTS +
+        '/' +
+        EndpointProvider.endpointID() +
+        '/docker' +
         (agentVersion > 1 ? '/v' + agentVersion : '') +
         '/browse/put';
 
