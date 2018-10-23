@@ -5,7 +5,8 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
 
     ctrl.state = {
       duplicationInProgress: false,
-      migrationInProgress: false
+      migrationInProgress: false,
+      stackNameAvailable: true
     };
 
     ctrl.formValues = {
@@ -18,8 +19,7 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
     ctrl.duplicateStack = duplicateStack;
     ctrl.migrateStack = migrateStack;
     ctrl.isMigrationButtonDisabled = isMigrationButtonDisabled;
-    ctrl.state.stackNameAvailable = true;
-
+    
     ctrl.onStackNameChange = function(name) {
       ctrl.state.stackNameAvailable = ctrl.stackNames.indexOf(name) === -1;
     };
