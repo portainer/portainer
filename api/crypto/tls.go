@@ -26,7 +26,7 @@ func CreateTLSConfigurationFromBytes(caCert, cert, key []byte, skipClientVerific
 		config.RootCAs = caCertPool
 	}
 
-	config.MinVersion = tls.VersionTLS11  // feat2359 removed deprecated TLS1.0 protocol
+	config.MinVersion = tls.VersionTLS11
 	return config, nil
 }
 
