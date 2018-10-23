@@ -47,10 +47,10 @@ func (handler *Handler) updateSchedule(w http.ResponseWriter, r *http.Request) *
 
 	if payload.Schedule != "" {
 		schedule.Schedule = payload.Schedule
+		// TODO update payload in cron
 	}
 
-	// TODO update payload in DB and in cron
-	mockSchedules = append(append(mockSchedules[:id], schedule), mockSchedules[id+1:]...)
+	handler.scheduleService.UpdateSchedule(portainer.ScheduleID(id), schedule)
 
 	return response.JSON(w, schedule)
 }
