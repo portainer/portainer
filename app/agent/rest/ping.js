@@ -3,10 +3,9 @@ angular.module('portainer.agent').factory('AgentPing', [
   function AgentPingFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, $q) {
     'use strict';
     return $resource(
-      API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/v2/ping',
+      API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/ping',
       { 
-        endpointId: EndpointProvider.endpointID,
-        
+        endpointId: EndpointProvider.endpointID
       },
       {
         ping: {
