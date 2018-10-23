@@ -6,7 +6,8 @@ angular.module('portainer.docker').component('hostOverview', {
     devices: '<',
     disks: '<',
     isAgent: '<',
-    refreshUrl: '@'
+    refreshUrl: '@',
+    browseUrl: '@'
   },
   transclude: true
 });

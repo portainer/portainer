@@ -495,6 +495,71 @@ paths:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
+  /endpoints/{id}/job:
+    post:
+      tags:
+      - "endpoints"
+      summary: "Execute a job on the endpoint host"
+      description: |
+        Execute a job (script) on the underlying host of the endpoint.
+        **Access policy**: administrator
+      operationId: "EndpointJob"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Endpoint identifier"
+        required: true
+        type: "integer"
+      - name: "method"
+        in: "query"
+        description: "Job execution method. Possible values: file or string."
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Job details. Required when method equals string."
+        required: true
+        schema:
+          $ref: "#/definitions/EndpointJobRequest"
+      - name: "Image"
+        in: "formData"
+        type: "string"
+        description: "Container image which will be used to execute the job. Required when method equals file."
+      - name: "file"
+        in: "formData"
+        type: "file"
+        description: "Job script file. Required when method equals file."
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Endpoint"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        403:
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/GenericError"
+        404:
+          description: "Endpoint not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Endpoint not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
   /endpoint_groups:
     get:
       tags:
@@ -4164,6 +4229,20 @@ definitions:
         type: "string"
         example: "new-stack"
         description: "If provided will rename the migrated stack"
+  EndpointJobRequest:
+    type: "object"
+    required:
+    - "Image"
+    - "FileContent"
+    properties:
+      Image:
+        type: "string"
+        example: "ubuntu:latest"
+        description: "Container image which will be used to execute the job"
+      FileContent:
+        type: "string"
+        example: "ls -lah /host/tmp"
+        description: "Content of the job script"
   StackCreateRequest:
     type: "object"
     required:
@@ -4273,7 +4352,7 @@ definitions:
       Prune:
         type: "boolean"
         example: false
-        description: "Prune services that are no longer referenced"
+        description: "Prune services that are no longer referenced (only available for Swarm stacks)"
   StackFileInspectResponse:
     type: "object"
     properties:
