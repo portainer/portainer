@@ -64,7 +64,7 @@ function ContainerViewModel(data) {
 
 function ContainerStatsViewModel(data) {
   this.Date = data.read;
-  this.MemoryUsage = data.memory_stats.usage;
+  this.MemoryUsage = data.memory_stats.usage - data.memory_stats.stats.cache;
   this.PreviousCPUTotalUsage = data.precpu_stats.cpu_usage.total_usage;
   this.PreviousCPUSystemUsage = data.precpu_stats.system_cpu_usage;
   this.CurrentCPUTotalUsage = data.cpu_stats.cpu_usage.total_usage;

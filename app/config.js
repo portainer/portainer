@@ -14,9 +14,6 @@ angular.module('portainer')
     jwtOptionsProvider.config({
       tokenGetter: ['LocalStorage', function(LocalStorage) {
         return LocalStorage.getJWT();
-      }],
-      unauthenticatedRedirector: ['$state', function($state) {
-        $state.go('portainer.auth', {error: 'Your session has expired'});
       }]
     });
     $httpProvider.interceptors.push('jwtInterceptor');
