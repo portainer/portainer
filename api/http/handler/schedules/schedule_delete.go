@@ -14,10 +14,18 @@ func (handler *Handler) deleteSchedule(w http.ResponseWriter, r *http.Request) *
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: id", err}
 	}
+	scheduleId := portainer.ScheduleID(id)
+	err = handler.scheduleService.DeleteSchedule(scheduleId)
 
-	err = handler.scheduleService.DeleteSchedule(portainer.ScheduleID(id))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Failed deleting schedule", err}
+	}
+
+	// TODO remove schedule from cron
+
+	err = handler.fileService.RemoveDirectory(handler.fileService.GetScheduleProjectPath(scheduleId))
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Failed deleting schedule file", err}
 	}
 
 	return response.Empty(w)

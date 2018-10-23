@@ -128,12 +128,17 @@ func (handler *Handler) createSchedule(name string, endpoints []portainer.Endpoi
 		ID:        portainer.ScheduleID(handler.scheduleService.GetNextIdentifier()),
 	}
 
-	err := handler.scheduleService.CreateSchedule(schedule)
+	scriptPath, err := handler.fileService.StoreScheduleFileFromBytes(schedule.ID, "script.sh", file)
+	if err != nil {
+		return nil, err
+	}
+	schedule.ScriptPath = scriptPath
+
+	err = handler.scheduleService.CreateSchedule(schedule)
 	if err != nil {
 		return nil, err
 	}
 	// TODO add to cron
-	// TODO save file to fs
 
 	return schedule, nil
 }

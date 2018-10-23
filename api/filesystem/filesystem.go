@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"io/ioutil"
+	"strconv"
 
 	"github.com/portainer/portainer"
 
@@ -32,6 +33,8 @@ const (
 	PrivateKeyFile = "portainer.key"
 	// PublicKeyFile represents the name on disk of the file containing the public key.
 	PublicKeyFile = "portainer.pub"
+	// ScheduleStorePath represents the subfolder where schedule scripts are stored
+	ScheduleStorePath = "schedules"
 )
 
 // Service represents a service for managing files and directories.
@@ -317,4 +320,30 @@ func (service *Service) getContentFromPEMFile(filePath string) ([]byte, error) {
 
 	block, _ := pem.Decode(fileContent)
 	return block.Bytes, nil
+}
+
+// GetScheduleProjectPath returns the absolute path on the FS for a schedule based
+// on its identifier.
+func (service *Service) GetScheduleProjectPath(scheduleIdentifier portainer.ScheduleID) string {
+	return path.Join(service.fileStorePath, ScheduleStorePath, strconv.Itoa(int(scheduleIdentifier)))
+}
+
+// StoreScheduleFileFromBytes creates a subfolder in the ComposeStorePath and stores a new file from bytes.
+// It returns the path to the folder where the file is stored.
+func (service *Service) StoreScheduleFileFromBytes(scheduleIdentifier portainer.ScheduleID, fileName string, data []byte) (string, error) {
+	scheduleStorePath := path.Join(ScheduleStorePath, strconv.Itoa(int(scheduleIdentifier)))
+	err := service.createDirectoryInStore(scheduleStorePath)
+	if err != nil {
+		return "", err
+	}
+
+	filePath := path.Join(scheduleStorePath, fileName)
+	r := bytes.NewReader(data)
+
+	err = service.createFileInStore(filePath, r)
+	if err != nil {
+		return "", err
+	}
+
+	return path.Join(service.fileStorePath, filePath), nil
 }
