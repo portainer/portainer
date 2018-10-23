@@ -383,6 +383,10 @@ func initEndpoint(flags *portainer.CLIFlags, endpointService portainer.EndpointS
 	return createUnsecuredEndpoint(*flags.EndpointURL, endpointService, snapshotter)
 }
 
+func initJobService(dockerClientFactory *docker.ClientFactory) portainer.JobService {
+	return docker.NewJobService(dockerClientFactory)
+}
+
 func main() {
 	flags := initCLI()
 
@@ -407,6 +411,8 @@ func main() {
 	}
 
 	clientFactory := initClientFactory(digitalSignatureService)
+
+	jobService := initJobService(clientFactory)
 
 	snapshotter := initSnapshotter(clientFactory)
 
@@ -521,6 +527,7 @@ func main() {
 		SSLCert:                *flags.SSLCert,
 		SSLKey:                 *flags.SSLKey,
 		DockerClientFactory:    clientFactory,
+		JobService:             jobService,
 	}
 
 	log.Printf("Starting Portainer %s on %s", portainer.APIVersion, *flags.Addr)
