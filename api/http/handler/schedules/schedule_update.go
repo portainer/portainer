@@ -31,7 +31,7 @@ func (handler *Handler) updateSchedule(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	schedule, err := findSchedule(portainer.ScheduleID(id))
+	schedule, err := handler.scheduleService.Schedule(portainer.ScheduleID(id))
 
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Can't find schedule", err}
