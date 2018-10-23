@@ -75,7 +75,7 @@ func (payload *scheduleFromFileContentPayload) Validate(r *http.Request) error {
 }
 
 // POST /api/schedules?method=file/string
-func (handler *Handler) createSchedule(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) createScheduleHandler(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	method, err := request.RetrieveQueryParameter(r, "method", false)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: method", err}
@@ -98,7 +98,7 @@ func (handler *Handler) createScheduleFromFileContent(w http.ResponseWriter, r *
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	schedule, err := createSchedule(payload.Name, payload.Endpoints, payload.Schedule, []byte(payload.FileContent))
+	schedule, err := handler.createSchedule(payload.Name, payload.Endpoints, payload.Schedule, []byte(payload.FileContent))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Failed executing job", err}
 	}
@@ -112,7 +112,7 @@ func (handler *Handler) createScheduleFromFile(w http.ResponseWriter, r *http.Re
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	schedule, err := createSchedule(payload.Name, payload.Endpoints, payload.Schedule, payload.File)
+	schedule, err := handler.createSchedule(payload.Name, payload.Endpoints, payload.Schedule, payload.File)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Failed executing job", err}
 	}
@@ -120,15 +120,20 @@ func (handler *Handler) createScheduleFromFile(w http.ResponseWriter, r *http.Re
 	return response.JSON(w, schedule)
 }
 
-func createSchedule(name string, endpoints []portainer.EndpointID, scheduleCron string, file []byte) (*portainer.Schedule, error) {
+func (handler *Handler) createSchedule(name string, endpoints []portainer.EndpointID, scheduleCron string, file []byte) (*portainer.Schedule, error) {
 	schedule := &portainer.Schedule{
 		Name:      name,
 		Endpoints: endpoints,
 		Schedule:  scheduleCron,
-		ID:        portainer.ScheduleID(len(mockSchedules)),
+		ID:        portainer.ScheduleID(handler.scheduleService.GetNextIdentifier()),
 	}
 
-	mockSchedules = append(mockSchedules, schedule)
+	err := handler.scheduleService.CreateSchedule(schedule)
+	if err != nil {
+		return nil, err
+	}
+	// TODO add to cron
+	// TODO save file to fs
 
 	return schedule, nil
 }

@@ -41,7 +41,7 @@ func NewHandler(bouncer *security.RequestBouncer, scheduleService portainer.Sche
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.listSchedules))).Methods(http.MethodGet)
 
 	h.Handle("/schedules",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.createSchedule))).Methods(http.MethodPost)
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.createScheduleHandler))).Methods(http.MethodPost)
 
 	h.Handle("/schedules/{id}",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.inspectSchedule))).Methods(http.MethodGet)

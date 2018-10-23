@@ -5,16 +5,11 @@ import (
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
-
-	"github.com/portainer/portainer"
 )
 
-func listSchedulesMock() ([]*portainer.Schedule, error) {
-	return mockSchedules, nil
-}
-
+// GET request on /api/schedules
 func (handler *Handler) listSchedules(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	schedules, err := listSchedulesMock()
+	schedules, err := handler.scheduleService.Schedules()
 
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve schedules from the database", err}
