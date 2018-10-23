@@ -558,7 +558,6 @@ type (
 		CreateSchedule(schedule *Schedule) error
 		UpdateSchedule(ID ScheduleID, schedule *Schedule) error
 		DeleteSchedule(ID ScheduleID) error
-		Synchronize(toCreate, toUpdate, toDelete []*Schedule) error
 		GetNextIdentifier() int
 	}
 
