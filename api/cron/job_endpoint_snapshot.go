@@ -10,13 +10,15 @@ type (
 	endpointSnapshotJob struct {
 		endpointService portainer.EndpointService
 		snapshotter     portainer.Snapshotter
+		interval        string
 	}
 )
 
-func newEndpointSnapshotJob(endpointService portainer.EndpointService, snapshotter portainer.Snapshotter) endpointSnapshotJob {
+func newEndpointSnapshotJob(endpointService portainer.EndpointService, snapshotter portainer.Snapshotter, interval string) endpointSnapshotJob {
 	return endpointSnapshotJob{
 		endpointService: endpointService,
 		snapshotter:     snapshotter,
+		interval:        interval,
 	}
 }
 
