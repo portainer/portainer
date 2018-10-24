@@ -110,8 +110,8 @@ func initSnapshotter(clientFactory *docker.ClientFactory) portainer.Snapshotter 
 	return docker.NewSnapshotter(clientFactory)
 }
 
-func initJobScheduler(endpointService portainer.EndpointService, snapshotter portainer.Snapshotter, flags *portainer.CLIFlags) (portainer.JobScheduler, error) {
-	jobScheduler := cron.NewJobScheduler(endpointService, snapshotter)
+func initJobScheduler(endpointService portainer.EndpointService, snapshotter portainer.Snapshotter, fileService portainer.FileService, jobService portainer.JobService, scheduleService portainer.ScheduleService, flags *portainer.CLIFlags) (portainer.JobScheduler, error) {
+	jobScheduler := cron.NewJobScheduler(endpointService, snapshotter, fileService, jobService, scheduleService)
 
 	if *flags.ExternalEndpoints != "" {
 		log.Println("Using external endpoint definition. Endpoint management via the API will be disabled.")
@@ -416,7 +416,7 @@ func main() {
 
 	snapshotter := initSnapshotter(clientFactory)
 
-	jobScheduler, err := initJobScheduler(store.EndpointService, snapshotter, flags)
+	jobScheduler, err := initJobScheduler(store.EndpointService, snapshotter, fileService, jobService, store.ScheduleService, flags)
 	if err != nil {
 		log.Fatal(err)
 	}

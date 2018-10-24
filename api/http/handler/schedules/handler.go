@@ -30,13 +30,15 @@ type Handler struct {
 	*mux.Router
 	scheduleService portainer.ScheduleService
 	fileService     portainer.FileService
+	scheduler       portainer.JobScheduler
 }
 
-func NewHandler(bouncer *security.RequestBouncer, scheduleService portainer.ScheduleService, fileService portainer.FileService) *Handler {
+func NewHandler(bouncer *security.RequestBouncer, scheduleService portainer.ScheduleService, fileService portainer.FileService, scheduler portainer.JobScheduler) *Handler {
 	h := &Handler{
 		Router:          mux.NewRouter(),
 		scheduleService: scheduleService,
 		fileService:     fileService,
+		scheduler:       scheduler,
 	}
 
 	h.Handle("/schedules",

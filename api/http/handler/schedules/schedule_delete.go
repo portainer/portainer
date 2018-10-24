@@ -21,7 +21,7 @@ func (handler *Handler) deleteSchedule(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusInternalServerError, "Failed deleting schedule", err}
 	}
 
-	// TODO remove schedule from cron
+	handler.scheduler.UnscheduleScriptJob(scheduleId)
 
 	err = handler.fileService.RemoveDirectory(handler.fileService.GetScheduleProjectPath(scheduleId))
 	if err != nil {

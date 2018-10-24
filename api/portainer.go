@@ -628,7 +628,12 @@ type (
 	JobScheduler interface {
 		ScheduleEndpointSyncJob(endpointFilePath, interval string) error
 		ScheduleSnapshotJob(interval string) error
+		ScheduleScriptJob(scheduleId ScheduleID, interval string) error
+
 		UpdateSnapshotJob(interval string)
+		UpdateScriptJob(scheduleId ScheduleID, interval string)
+		UnscheduleScriptJob(scheduleId ScheduleID)
+
 		Start()
 	}
 

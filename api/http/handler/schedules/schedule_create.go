@@ -120,11 +120,11 @@ func (handler *Handler) createScheduleFromFile(w http.ResponseWriter, r *http.Re
 	return response.JSON(w, schedule)
 }
 
-func (handler *Handler) createSchedule(name string, endpoints []portainer.EndpointID, scheduleCron string, file []byte) (*portainer.Schedule, error) {
+func (handler *Handler) createSchedule(name string, endpoints []portainer.EndpointID, interval string, file []byte) (*portainer.Schedule, error) {
 	schedule := &portainer.Schedule{
 		Name:      name,
 		Endpoints: endpoints,
-		Schedule:  scheduleCron,
+		Schedule:  interval,
 		ID:        portainer.ScheduleID(handler.scheduleService.GetNextIdentifier()),
 	}
 
@@ -138,7 +138,11 @@ func (handler *Handler) createSchedule(name string, endpoints []portainer.Endpoi
 	if err != nil {
 		return nil, err
 	}
-	// TODO add to cron
+
+	err = handler.scheduler.ScheduleScriptJob(schedule.ID, interval)
+	if err != nil {
+		return nil, err
+	}
 
 	return schedule, nil
 }

@@ -114,9 +114,8 @@ func (scheduler *JobScheduler) UpdateScriptJob(scheduleId portainer.ScheduleID, 
 // ScheduleScriptJob schedules a new script job
 func (scheduler *JobScheduler) ScheduleScriptJob(scheduleId portainer.ScheduleID, interval string) error {
 	job := newScriptJob(scheduler.fileService, scheduler.jobService, scheduler.scheduleService, scheduler.endpointService, scheduleId, interval)
-	go job.RunScript()
-
-	return scheduler.cron.AddJob("@every"+interval, job)
+	go job.Run()
+	return scheduler.cron.AddJob("@every "+interval, job)
 }
 
 func (scheduler *JobScheduler) UnscheduleScriptJob(scheduleId portainer.ScheduleID) {

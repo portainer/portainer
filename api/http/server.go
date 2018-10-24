@@ -184,7 +184,7 @@ func (server *Server) Start() error {
 	webhookHandler.EndpointService = server.EndpointService
 	webhookHandler.DockerClientFactory = server.DockerClientFactory
 
-	schedulesHandler := schedules.NewHandler(requestBouncer, server.ScheduleService, server.FileService)
+	schedulesHandler := schedules.NewHandler(requestBouncer, server.ScheduleService, server.FileService, server.JobScheduler)
 
 	server.Handler = &handler.Handler{
 		AuthHandler:            authHandler,
