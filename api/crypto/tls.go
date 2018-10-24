@@ -55,7 +55,7 @@ func CreateTLSConfigurationFromDisk(caCertPath, certPath, keyPath string, skipSe
 		caCertPool.AppendCertsFromPEM(caCert)
 		config.RootCAs = caCertPool
 	}
-	
+
 	config.MinVersion = tls.VersionTLS11
 	return config, nil
 }
