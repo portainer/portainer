@@ -100,5 +100,18 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     return deferred.promise;
   };
 
+  service.executeJobFromFileUpload = function (image, jobFile, endpointId) {
+    return FileUploadService.executeEndpointJob(image, jobFile, endpointId);
+  };
+
+  service.executeJobFromFileContent = function (image, jobFileContent, endpointId) {
+    var payload = {
+      Image: image,
+      FileContent: jobFileContent
+    };
+
+    return Endpoints.executeJob({ id: endpointId, method: 'string' }, payload).$promise;
+  };
+
   return service;
 }]);

@@ -102,7 +102,7 @@
               || !formValues.Image"
                 ng-click="executeScript()" button-spinner="state.actionInProgress">
                 <span ng-hide="state.actionInProgress">Execute</span>
-                <span ng-show="state.actionInProgress">Starting job ...</span>
+                <span ng-show="state.actionInProgress">Starting job...</span>
               </button>
               <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">
                 {{ state.formValidationError }}

@@ -1,13 +1,12 @@
 angular.module('portainer.docker')
-  .controller('JobsDatatableController', ['$q', '$state', 'PaginationService', 'DatatableService', 'EndpointProvider', 'ContainerService', 'ModalService', 'Notifications',
-    function ($q, $state, PaginationService, DatatableService, EndpointProvider, ContainerService, ModalService, Notifications) {
+  .controller('JobsDatatableController', ['$q', '$state', 'PaginationService', 'DatatableService', 'ContainerService', 'ModalService', 'Notifications',
+    function ($q, $state, PaginationService, DatatableService, ContainerService, ModalService, Notifications) {
       var ctrl = this;
 
       this.state = {
         orderBy: this.orderBy,
         paginatedItemLimit: PaginationService.getPaginationLimit(this.tableKey),
-        displayTextFilter: false,
-        publicURL: EndpointProvider.endpointPublicURL()
+        displayTextFilter: false
       };
 
       this.filters = {
@@ -86,7 +85,7 @@ angular.module('portainer.docker')
 
           ModalService.confirm({
             title: 'Are you sure ?',
-            message: 'Purging jobs will remove all stopped jobs containers. Be sure to save your jobs logs if needed before performing this action.',
+            message: 'Clearing job history will remove all stopped jobs containers.',
             buttons: {
               confirm: {
                 label: 'Purge',
@@ -107,11 +106,11 @@ angular.module('portainer.docker')
           if (!confirmed) {
             return $q.when();
           }
-          ContainerService.purgeCompletedJobs().then(function success() {
-            Notifications.success('Success', 'Jobs sucessfully purged.');
+          ContainerService.prune({ label: ['io.portainer.job.endpoint'] }).then(function success() {
+            Notifications.success('Success', 'Job hisotry cleared');
             $state.reload();
           }).catch(function error(err) {
-            Notifications.error('Failure', err.message, 'Unable to purge jobs');
+            Notifications.error('Failure', err.message, 'Unable to clear job history');
           });
         });
       };

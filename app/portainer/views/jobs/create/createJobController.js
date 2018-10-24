@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-  .controller('CreateJobController', ['$scope', '$state', 'JobService', 'Authentication', 'Notifications', 'EndpointProvider', 'StateManager',
-    function ($scope, $state, JobService, Authentication, Notifications, EndpointProvider, StateManager) {
+  .controller('CreateJobController', ['$scope', '$state', 'EndpointService', 'Authentication', 'Notifications', 'EndpointProvider', 'StateManager',
+    function ($scope, $state, EndpointService, Authentication, Notifications, EndpointProvider, StateManager) {
 
       $scope.formValues = {
         Image: 'ubuntu:latest',
@@ -19,10 +19,10 @@ angular.module('portainer.app')
 
         if (method === 'editor') {
           var jobFileContent = $scope.formValues.JobFileContent;
-          return JobService.createJobFromFileContent(image, jobFileContent, endpointId);
+          return EndpointService.executeJobFromFileContent(image, jobFileContent, endpointId);
         } else if (method === 'upload') {
           var jobFile = $scope.formValues.JobFile;
-          return JobService.createJobFromFileUpload(image, jobFile, endpointId);
+          return EndpointService.executeJobFromFileUpload(image, jobFile, endpointId);
         }
       }
 
