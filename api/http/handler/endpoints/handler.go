@@ -31,6 +31,7 @@ type Handler struct {
 	FileService                 portainer.FileService
 	ProxyManager                *proxy.Manager
 	Snapshotter                 portainer.Snapshotter
+	JobService                  portainer.JobService
 }
 
 // NewHandler creates a handler to manage endpoint operations.
@@ -59,6 +60,7 @@ func NewHandler(bouncer *security.RequestBouncer, authorizeEndpointManagement bo
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointExtensionAdd))).Methods(http.MethodPost)
 	h.Handle("/endpoints/{id}/extensions/{extensionType}",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.endpointExtensionRemove))).Methods(http.MethodDelete)
-
+	h.Handle("/endpoints/{id}/job",
+		bouncer.AdministratorAccess(httperror.LoggerHandler(h.endpointJob))).Methods(http.MethodPost)
 	return h
 }
