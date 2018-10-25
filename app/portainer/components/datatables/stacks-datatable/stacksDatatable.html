@@ -58,7 +58,8 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-change="$ctrl.selectItem(item)" ng-disabled="item.External && item.Type === 2"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="portainer.stacks.stack({ name: item.Name, id: item.Id, type: item.Type, external: item.External })">{{ item.Name }}</a>
+                <a ng-if="!$ctrl.offlineMode" ui-sref="portainer.stacks.stack({ name: item.Name, id: item.Id, type: item.Type, external: item.External })">{{ item.Name }}</a>
+                <span ng-if="$ctrl.offlineMode">{{ item.Name }}</span>
               </td>
               <td>{{ item.Type === 1 ? 'Swarm' : 'Compose' }}</td>
               <td>
