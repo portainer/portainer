@@ -3,6 +3,11 @@ angular.module('portainer.docker')
 function (clipboard) {
 
   this.state = {
+    availableSinceDatetime: [
+      moment().subtract(10, 'minutes').format(),
+      moment().subtract(4, 'hours').format(),
+      moment().subtract(1, 'days').format()
+    ],
     copySupported: clipboard.supported,
     logCollection: true,
     autoScroll: true,
