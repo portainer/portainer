@@ -1,6 +1,6 @@
 angular.module('portainer.agent').factory('VolumeBrowserService', [
-  'StateManager', 'Browse', 'BrowseVersion1',
-  function VolumeBrowserServiceFactory(StateManager, Browse, BrowseVersion1) {
+  'StateManager', 'Browse', 'BrowseVersion1', '$q', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', 'Upload',
+  function VolumeBrowserServiceFactory(StateManager, Browse, BrowseVersion1, $q, API_ENDPOINT_ENDPOINTS, EndpointProvider, Upload) {
     'use strict';
     var service = {};
 
@@ -32,6 +32,29 @@ angular.module('portainer.agent').factory('VolumeBrowserService', [
         NewFilePath: newPath
       };
       return getBrowseService().rename({ volumeID: volumeId, version: getAgentApiVersion() }, payload).$promise;
+    };
+
+    service.upload = function upload(path, file, volumeId, onProgress) {
+      var deferred = $q.defer();
+      var agentVersion = StateManager.getAgentApiVersion();
+      if (agentVersion <2) {
+        deferred.reject('upload is not supported on this agent version');
+        return;
+      }
+      var url =
+        API_ENDPOINT_ENDPOINTS +
+        '/' +
+        EndpointProvider.endpointID() +
+        '/docker' +
+        '/v' + agentVersion +
+        '/browse/put?volumeID=' +
+        volumeId;
+
+      Upload.upload({
+        url: url,
+        data: { file: file, Path: path }
+      }).then(deferred.resolve, deferred.reject, onProgress);
+      return deferred.promise;
     };
 
     return service;
