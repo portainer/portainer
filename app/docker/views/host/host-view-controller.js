@@ -20,25 +20,25 @@ angular.module('portainer.docker').controller('HostViewController', [
         version: SystemService.version(),
         info: SystemService.info()
       })
-        .then(function success(data) {
-          ctrl.engineDetails = buildEngineDetails(data);
-          ctrl.hostDetails = buildHostDetails(data.info);
-          ctrl.state.offlineMode = EndpointProvider.offlineMode();
+      .then(function success(data) {
+        ctrl.engineDetails = buildEngineDetails(data);
+        ctrl.hostDetails = buildHostDetails(data.info);
+        ctrl.state.offlineMode = EndpointProvider.offlineMode();
 
-          if (ctrl.state.isAgent) {
-            return AgentService.hostInfo(data.info.Hostname).then(function onHostInfoLoad(agentHostInfo) {
-              ctrl.devices = agentHostInfo.PCIDevices;
-              ctrl.disks = agentHostInfo.PhysicalDisks;
-            });
-          }
-        })
-        .catch(function error(err) {
-          Notifications.error(
-            'Failure',
-            err,
-            'Unable to retrieve engine details'
-          );
-        });
+        if (ctrl.state.isAgent && !ctrl.state.offlineMode) {
+          return AgentService.hostInfo(data.info.Hostname).then(function onHostInfoLoad(agentHostInfo) {
+            ctrl.devices = agentHostInfo.PCIDevices;
+            ctrl.disks = agentHostInfo.PhysicalDisks;
+          });
+        }
+      })
+      .catch(function error(err) {
+        Notifications.error(
+          'Failure',
+          err,
+          'Unable to retrieve engine details'
+        );
+      });
     }
 
     function buildEngineDetails(data) {

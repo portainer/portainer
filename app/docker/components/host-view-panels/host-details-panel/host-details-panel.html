@@ -26,11 +26,11 @@
               <td>Total memory</td>
               <td>{{ $ctrl.host.totalMemory | humansize }}</td>
             </tr>
-            <tr ng-if="$ctrl.isAgent">
+            <tr ng-if="$ctrl.isAgent && !$ctrl.offlineMode">
               <td colspan="2">
-                <button 
+                <button
                   class="btn btn-primary btn-sm"
-                  title="Browse" 
+                  title="Browse"
                   ui-sref="{{$ctrl.browseUrl}}">
                   Browse
                 </button>

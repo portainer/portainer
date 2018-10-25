@@ -4,6 +4,7 @@ angular.module('portainer.docker').component('hostDetailsPanel', {
   bindings: {
     host: '<',
     isAgent: '<',
+    offlineMode: '<',
     browseUrl: '@'
   }
 });
