@@ -32,20 +32,20 @@ angular.module('portainer.docker').controller('HostViewController', [
         ctrl.hostDetails = buildHostDetails(data.info);
         ctrl.jobs = data.jobs;
 
-          if (ctrl.state.isAgent && agentApiVersion > 1) {
-            return AgentService.hostInfo(data.info.Hostname).then(function onHostInfoLoad(agentHostInfo) {
-              ctrl.devices = agentHostInfo.PCIDevices;
-              ctrl.disks = agentHostInfo.PhysicalDisks;
-            });
-          }
-        })
-        .catch(function error(err) {
-          Notifications.error(
-            'Failure',
-            err,
-            'Unable to retrieve engine details'
-          );
-        });
+        if (ctrl.state.isAgent && agentApiVersion > 1) {
+          return AgentService.hostInfo(data.info.Hostname).then(function onHostInfoLoad(agentHostInfo) {
+            ctrl.devices = agentHostInfo.PCIDevices;
+            ctrl.disks = agentHostInfo.PhysicalDisks;
+          });
+        }
+      })
+      .catch(function error(err) {
+        Notifications.error(
+          'Failure',
+          err,
+          'Unable to retrieve engine details'
+        );
+      });
     }
 
     function buildEngineDetails(data) {

@@ -26,12 +26,12 @@
               <td>Total memory</td>
               <td>{{ $ctrl.host.totalMemory | humansize }}</td>
             </tr>
-            <tr ng-if="$ctrl.isBrowseEnabled">
+            <tr>
               <td colspan="2">
                 <button
                     class="btn btn-primary btn-sm"
                     title="Browse"
-                    ng-if="$ctrl.isAgent"
+                    ng-if="$ctrl.isBrowseEnabled"
                     ui-sref="{{$ctrl.browseUrl}}">
                   Browse
                 </button>
@@ -40,7 +40,6 @@
                 </button>
               </td>
             </tr>
-
           </tbody>
         </table>
       </rd-widget-body>

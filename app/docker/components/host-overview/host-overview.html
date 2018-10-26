@@ -10,10 +10,10 @@
 
 <host-details-panel
   host="$ctrl.hostDetails"
-  is-agent="$ctrl.isAgent"
   job-capability="$ctrl.jobCapability"
   is-browse-enabled="$ctrl.isAgent && $ctrl.agentApiVersion > 1"
-  browse-url="{{$ctrl.browseUrl}}"></host-details-panel>
+  browse-url="{{$ctrl.browseUrl}}"
+></host-details-panel>
 
 <engine-details-panel engine="$ctrl.engineDetails"></engine-details-panel>
 
