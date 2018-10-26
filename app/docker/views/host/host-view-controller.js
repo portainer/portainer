@@ -10,10 +10,14 @@ angular.module('portainer.docker').controller('HostViewController', [
     
     this.engineDetails = {};
     this.hostDetails = {};
+    this.devices = null;
+    this.disks = null;
 
     function initView() {
       var applicationState = StateManager.getState();
       ctrl.state.isAgent = applicationState.endpoint.mode.agentProxy;
+      var agentApiVersion = applicationState.endpoint.agentApiVersion;
+      ctrl.state.agentApiVersion = agentApiVersion;
 
       $q.all({
         version: SystemService.version(),
@@ -23,7 +27,7 @@ angular.module('portainer.docker').controller('HostViewController', [
           ctrl.engineDetails = buildEngineDetails(data);
           ctrl.hostDetails = buildHostDetails(data.info);
 
-          if (ctrl.state.isAgent) {
+          if (ctrl.state.isAgent && agentApiVersion > 1) {
             return AgentService.hostInfo(data.info.Hostname).then(function onHostInfoLoad(agentHostInfo) {
               ctrl.devices = agentHostInfo.PCIDevices;
               ctrl.disks = agentHostInfo.PhysicalDisks;

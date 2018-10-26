@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.factory('StateManager', ['$q', 'SystemService', 'InfoHelper', 'LocalStorage', 'SettingsService', 'StatusService', 'APPLICATION_CACHE_VALIDITY',
-function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, SettingsService, StatusService, APPLICATION_CACHE_VALIDITY) {
+.factory('StateManager', ['$q', 'SystemService', 'InfoHelper', 'LocalStorage', 'SettingsService', 'StatusService', 'APPLICATION_CACHE_VALIDITY', 'AgentPingService',
+function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, SettingsService, StatusService, APPLICATION_CACHE_VALIDITY, AgentPingService) {
   'use strict';
 
   var manager = {};
@@ -157,6 +157,14 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
       state.endpoint.name = name;
       state.endpoint.apiVersion = endpointAPIVersion;
       state.endpoint.extensions = assignExtensions(extensions);
+
+      if (endpointMode.agentProxy) {
+        return AgentPingService.ping().then(function onPingSuccess(data) {
+          state.endpoint.agentApiVersion = data.version;
+        });
+      }
+      
+    }).then(function () {
       LocalStorage.storeEndpointState(state.endpoint);
       deferred.resolve();
     })
@@ -168,6 +176,10 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
     });
 
     return deferred.promise;
+  };
+
+  manager.getAgentApiVersion = function getAgentApiVersion() {
+    return state.endpoint.agentApiVersion;
   };
 
   return manager;

@@ -10,12 +10,12 @@
 
 <host-details-panel 
   host="$ctrl.hostDetails" 
-  is-agent="$ctrl.isAgent"
+  is-browse-enabled="$ctrl.isAgent && $ctrl.agentApiVersion > 1"
   browse-url="{{$ctrl.browseUrl}}"></host-details-panel>
 
 <engine-details-panel engine="$ctrl.engineDetails"></engine-details-panel>
 
-<devices-panel ng-if="$ctrl.isAgent" devices="$ctrl.devices"></devices-panel>
-<disks-panel ng-if="$ctrl.isAgent" disks="$ctrl.disks"></disks-panel>
+<devices-panel ng-if="$ctrl.isAgent && $ctrl.agentApiVersion > 1" devices="$ctrl.devices"></devices-panel>
+<disks-panel ng-if="$ctrl.isAgent && $ctrl.agentApiVersion > 1" disks="$ctrl.disks"></disks-panel>
 
 <ng-transclude></ng-transclude>
