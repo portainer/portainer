@@ -15,14 +15,14 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
       ctrl.state.isAgent = applicationState.endpoint.mode.agentProxy;
       ctrl.state.isAdmin = Authentication.getUserDetails().role === 1;
 
+      var fetchJobs = ctrl.state.isAdmin && ctrl.state.isAgent;
+
       var nodeId = $stateParams.id;
       $q.all({
         node: NodeService.node(nodeId),
-        jobs: ContainerService.containers(true, {
-          label: ['io.portainer.job.endpoint']
-        })
-      }).
-      then(function (data) {
+        jobs: fetchJobs ? ContainerService.containers(true, { label: ['io.portainer.job.endpoint'] }) : []
+      })
+      .then(function (data) {
         var node = data.node;
         ctrl.originalNode = node;
         ctrl.hostDetails = buildHostDetails(node);
@@ -74,12 +74,12 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
 
     function transformPlugins(pluginsList, type) {
       return pluginsList
-        .filter(function(plugin) {
-          return plugin.Type === type;
-        })
-        .map(function(plugin) {
-          return plugin.Name;
-        });
+      .filter(function(plugin) {
+        return plugin.Type === type;
+      })
+      .map(function(plugin) {
+        return plugin.Name;
+      });
     }
   }
 ]);

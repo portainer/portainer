@@ -11,17 +11,17 @@
 <host-details-panel
   host="$ctrl.hostDetails"
   is-agent="$ctrl.isAgent"
-  is-admin="$ctrl.isAdmin"
+  job-capability="$ctrl.jobCapability"
   browse-url="{{$ctrl.browseUrl}}"></host-details-panel>
 
 <engine-details-panel engine="$ctrl.engineDetails"></engine-details-panel>
 
 <jobs-datatable
-  ng-if="$ctrl.isAdmin && $ctrl.jobs"
+  ng-if="$ctrl.jobCapability && $ctrl.jobs"
   title-text="Jobs" title-icon="fa-tasks"
   dataset="$ctrl.jobs"
   table-key="jobs"
-  order-by="Created" reverse-order="true" 
+  order-by="Created" reverse-order="true"
 ></jobs-datatable>
 
 <devices-panel ng-if="$ctrl.isAgent" devices="$ctrl.devices"></devices-panel>

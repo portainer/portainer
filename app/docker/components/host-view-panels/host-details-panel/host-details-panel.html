@@ -35,7 +35,7 @@
                     ui-sref="{{$ctrl.browseUrl}}">
                   Browse
                 </button>
-                <button class="btn btn-primary btn-sm" title="Execute job" ui-sref="portainer.newjob" ng-if="$ctrl.isAdmin">
+                <button class="btn btn-primary btn-sm" title="Execute job" ui-sref="portainer.newjob" ng-if="$ctrl.jobCapability">
                   Execute job
                 </button>
               </td>

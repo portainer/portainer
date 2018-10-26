@@ -7,7 +7,7 @@
 
   refresh-url="docker.nodes.node"
   browse-url="docker.nodes.node.browse"
-  is-admin="$ctrl.state.isAdmin"
+  job-capability="$ctrl.state.isAdmin && $ctrl.state.isAgent"
   jobs="$ctrl.jobs"
 >
   <swarm-node-details-panel

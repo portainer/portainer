@@ -2,11 +2,12 @@ angular.module('portainer.docker').controller('HostViewController', [
   '$q', 'SystemService', 'Notifications', 'StateManager', 'AgentService', 'ContainerService', 'Authentication',
   function HostViewController($q, SystemService, Notifications, StateManager, AgentService, ContainerService, Authentication) {
     var ctrl = this;
+
     this.$onInit = initView;
 
     ctrl.state = {
       isAgent: false,
-      isAdmin: false
+      isAdmin : false
     };
 
     this.engineDetails = {};
@@ -16,32 +17,31 @@ angular.module('portainer.docker').controller('HostViewController', [
       var applicationState = StateManager.getState();
       ctrl.state.isAgent = applicationState.endpoint.mode.agentProxy;
       ctrl.state.isAdmin = Authentication.getUserDetails().role === 1;
-      $q.all({
-          version: SystemService.version(),
-          info: SystemService.info(),
-          jobs: ContainerService.containers(true, {
-            label: ['io.portainer.job.endpoint']
-          })
-        })
-        .then(function success(data) {
-          ctrl.engineDetails = buildEngineDetails(data);
-          ctrl.hostDetails = buildHostDetails(data.info);
-          ctrl.jobs = data.jobs;
 
-          if (ctrl.state.isAgent) {
-            return AgentService.hostInfo(data.info.Hostname).then(function onHostInfoLoad(agentHostInfo) {
-              ctrl.devices = agentHostInfo.PCIDevices;
-              ctrl.disks = agentHostInfo.PhysicalDisks;
-            });
-          }
-        })
-        .catch(function error(err) {
-          Notifications.error(
-            'Failure',
-            err,
-            'Unable to retrieve engine details'
-          );
-        });
+      $q.all({
+        version: SystemService.version(),
+        info: SystemService.info(),
+        jobs: ctrl.state.isAdmin ? ContainerService.containers(true, { label: ['io.portainer.job.endpoint'] }) : []
+      })
+      .then(function success(data) {
+        ctrl.engineDetails = buildEngineDetails(data);
+        ctrl.hostDetails = buildHostDetails(data.info);
+        ctrl.jobs = data.jobs;
+
+        if (ctrl.state.isAgent) {
+          return AgentService.hostInfo(data.info.Hostname).then(function onHostInfoLoad(agentHostInfo) {
+            ctrl.devices = agentHostInfo.PCIDevices;
+            ctrl.disks = agentHostInfo.PhysicalDisks;
+          });
+        }
+      })
+      .catch(function error(err) {
+        Notifications.error(
+          'Failure',
+          err,
+          'Unable to retrieve engine details'
+        );
+      });
     }
 
     function buildEngineDetails(data) {
