@@ -26,7 +26,7 @@
               <td>Total memory</td>
               <td>{{ $ctrl.host.totalMemory | humansize }}</td>
             </tr>
-            <tr>
+            <tr ng-if="$ctrl.isBrowseEnabled">
               <td colspan="2">
                 <button
                     class="btn btn-primary btn-sm"

@@ -1,10 +1,8 @@
 angular.module('portainer.agent')
-.factory('Browse', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', 'StateManager',
-  function BrowseFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, StateManager) {
+.factory('BrowseVersion1', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', function BrowseFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
   'use strict';
-  return $resource(API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/v:version/browse/:action', {
-    endpointId: EndpointProvider.endpointID,
-    version: StateManager.getAgentApiVersion
+  return $resource(API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/browse/:volumeID/:action', {
+    endpointId: EndpointProvider.endpointID
   },
   {
     ls: {

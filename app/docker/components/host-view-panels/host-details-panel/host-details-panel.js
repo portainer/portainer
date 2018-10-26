@@ -5,6 +5,7 @@ angular.module('portainer.docker').component('hostDetailsPanel', {
     host: '<',
     isAgent: '<',
     jobCapability: '<',
+    isBrowseEnabled: '<',
     browseUrl: '@'
   }
 });
