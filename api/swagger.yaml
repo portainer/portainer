@@ -265,7 +265,7 @@ paths:
       - name: "TLSSkipVerify"
         in: "formData"
         type: "string"
-        description: "Skip server verification when using TLS" (example: false)
+        description: "Skip server verification when using TLS (example: false)"
       - name: "TLSCACertFile"
         in: "formData"
         type: "file"
@@ -3848,9 +3848,9 @@ definitions:
   TemplateCreateRequest:
     type: "object"
     required:
-      - "type"
-      - "title"
-      - "description"
+    - "type"
+    - "title"
+    - "description"
     properties:
       type:
         type: "integer"
@@ -4202,7 +4202,7 @@ definitions:
   TemplateRepository:
     type: "object"
     required:
-      - "URL"
+    - "URL"
     properties:
       URL:
         type: "string"
