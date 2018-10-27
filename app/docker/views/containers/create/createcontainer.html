@@ -146,7 +146,7 @@
       <rd-widget-header icon="fa-cog" title-text="Advanced container settings"></rd-widget-header>
       <rd-widget-body>
         <ul class="nav nav-pills nav-justified">
-          <li class="active interactive"><a data-target="#command" data-toggle="tab">Command and logging</a></li>
+          <li class="active interactive"><a data-target="#command" data-toggle="tab">Command & logging</a></li>
           <li class="interactive"><a data-target="#volumes" data-toggle="tab">Volumes</a></li>
           <li class="interactive"><a data-target="#network" data-toggle="tab">Network</a></li>
           <li class="interactive"><a data-target="#env" data-toggle="tab">Env</a></li>
@@ -162,7 +162,7 @@
             <form class="form-horizontal" style="margin-top: 15px;">
               <!-- command-input -->
               <div class="form-group">
-                <label for="container_command" class="col-sm-2 col-lg-1 control-label text-left">Command and logging</label>
+                <label for="container_command" class="col-sm-2 col-lg-1 control-label text-left">Command & logging</label>
                 <div class="col-sm-9">
                   <input type="text" class="form-control" ng-model="config.Cmd" id="container_command" placeholder="e.g. /usr/bin/nginx -t -c /mynginx.conf">
                 </div>
@@ -237,7 +237,7 @@
                 </div>
                 <div class="col-sm-5">
                   <p class="small text-muted">
-                  Logging driver for container that will override the default docker daemon driver. Select Default logging driver if you don't want to override it. Supported logging drivers can be found <a href="https://docs.docker.com/engine/admin/logging/overview/#supported-logging-drivers" target="_blank">in the Docker documentation</a>.
+                  Logging driver that will override the default docker daemon driver. Select Default logging driver if you don't want to override it. Supported logging drivers can be found <a href="https://docs.docker.com/engine/admin/logging/overview/#supported-logging-drivers" target="_blank">in the Docker documentation</a>.
                   </p>
                 </div>
               </div>
