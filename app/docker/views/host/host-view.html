@@ -7,7 +7,8 @@
   devices="$ctrl.devices"
   refresh-url="docker.host"
   browse-url="docker.host.browser"
-  is-job-enabled="$ctrl.state.isAdmin"
+  offline-mode="$ctrl.state.offlineMode"
+  is-job-enabled="$ctrl.state.isAdmin && !$ctrl.state.offlineMode"
   job-url="docker.host.job"
   jobs="$ctrl.jobs"
 ></host-overview>

@@ -245,17 +245,28 @@ type (
 
 	// Snapshot represents a snapshot of a specific endpoint at a specific time
 	Snapshot struct {
-		Time                  int64  `json:"Time"`
-		DockerVersion         string `json:"DockerVersion"`
-		Swarm                 bool   `json:"Swarm"`
-		TotalCPU              int    `json:"TotalCPU"`
-		TotalMemory           int64  `json:"TotalMemory"`
-		RunningContainerCount int    `json:"RunningContainerCount"`
-		StoppedContainerCount int    `json:"StoppedContainerCount"`
-		VolumeCount           int    `json:"VolumeCount"`
-		ImageCount            int    `json:"ImageCount"`
-		ServiceCount          int    `json:"ServiceCount"`
-		StackCount            int    `json:"StackCount"`
+		Time                  int64       `json:"Time"`
+		DockerVersion         string      `json:"DockerVersion"`
+		Swarm                 bool        `json:"Swarm"`
+		TotalCPU              int         `json:"TotalCPU"`
+		TotalMemory           int64       `json:"TotalMemory"`
+		RunningContainerCount int         `json:"RunningContainerCount"`
+		StoppedContainerCount int         `json:"StoppedContainerCount"`
+		VolumeCount           int         `json:"VolumeCount"`
+		ImageCount            int         `json:"ImageCount"`
+		ServiceCount          int         `json:"ServiceCount"`
+		StackCount            int         `json:"StackCount"`
+		SnapshotRaw           SnapshotRaw `json:"SnapshotRaw"`
+	}
+
+	// SnapshotRaw represents all the information related to a snapshot as returned by the Docker API
+	SnapshotRaw struct {
+		Containers interface{} `json:"Containers"`
+		Volumes    interface{} `json:"Volumes"`
+		Networks   interface{} `json:"Networks"`
+		Images     interface{} `json:"Images"`
+		Info       interface{} `json:"Info"`
+		Version    interface{} `json:"Version"`
 	}
 
 	// EndpointGroupID represents an endpoint group identifier
