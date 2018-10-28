@@ -70,7 +70,7 @@ rules:
 #   no-case-declarations: error
 #   no-div-regex: error
 #   no-else-return: off
-#   no-empty-function: off
+  no-empty-function: warn
 #   no-empty-pattern: error
 #   no-eq-null: error
 #   no-eval: error
