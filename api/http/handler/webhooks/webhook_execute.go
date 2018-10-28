@@ -49,7 +49,7 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 }
 
 func (handler *Handler) executeServiceWebhook(w http.ResponseWriter, endpoint *portainer.Endpoint, resourceID string) *httperror.HandlerError {
-	dockerClient, err := handler.DockerClientFactory.CreateClient(endpoint)
+	dockerClient, err := handler.DockerClientFactory.CreateClient(endpoint, "")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Error creating docker client", err}
 	}

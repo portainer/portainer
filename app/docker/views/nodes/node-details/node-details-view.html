@@ -5,10 +5,10 @@
   engine-details="$ctrl.engineDetails"
   disks="$ctrl.disks"
   devices="$ctrl.devices"
-
   refresh-url="docker.nodes.node"
   browse-url="docker.nodes.node.browse"
-  job-capability="$ctrl.state.isAdmin && $ctrl.state.isAgent"
+  is-job-enabled="$ctrl.state.isAdmin && $ctrl.state.isAgent"
+  job-url="docker.nodes.node.job"
   jobs="$ctrl.jobs"
 >
   <swarm-node-details-panel

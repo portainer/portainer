@@ -26,16 +26,12 @@
               <td>Total memory</td>
               <td>{{ $ctrl.host.totalMemory | humansize }}</td>
             </tr>
-            <tr>
+            <tr ng-if="$ctrl.isBrowseEnabled || $ctrl.isJobEnabled">
               <td colspan="2">
-                <button
-                    class="btn btn-primary btn-sm"
-                    title="Browse"
-                    ng-if="$ctrl.isBrowseEnabled"
-                    ui-sref="{{$ctrl.browseUrl}}">
+                <button class="btn btn-primary btn-sm" title="Browse" ng-if="$ctrl.isBrowseEnabled" ui-sref="{{$ctrl.browseUrl}}">
                   Browse
                 </button>
-                <button class="btn btn-primary btn-sm" title="Execute job" ui-sref="portainer.newjob" ng-if="$ctrl.jobCapability">
+                <button class="btn btn-primary btn-sm" title="Execute job" ng-if="$ctrl.isJobEnabled" ui-sref="{{$ctrl.jobUrl}}">
                   Execute job
                 </button>
               </td>

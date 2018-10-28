@@ -35,11 +35,12 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
           if (agentApiVersion < 2) {
             return;
           }
+
           AgentService.hostInfo(node.Hostname)
-            .then(function onHostInfoLoad(agentHostInfo) {
-                ctrl.devices = agentHostInfo.PCIDevices;
-                ctrl.disks = agentHostInfo.PhysicalDisks;
-              });
+          .then(function onHostInfoLoad(agentHostInfo) {
+            ctrl.devices = agentHostInfo.PCIDevices;
+            ctrl.disks = agentHostInfo.PhysicalDisks;
+          });
         }
       });
     }

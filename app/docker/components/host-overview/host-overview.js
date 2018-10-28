@@ -9,7 +9,8 @@ angular.module('portainer.docker').component('hostOverview', {
     agentApiVersion: '<',
     refreshUrl: '@',
     browseUrl: '@',
-    jobCapability: '<',
+    jobUrl: '@',
+    isJobEnabled: '<',
     jobs: '<'
   },
   transclude: true

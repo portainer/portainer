@@ -64,9 +64,9 @@ angular.module('portainer.app')
     });
   };
 
-  service.executeEndpointJob = function (imageName, file, endpointId) {
+  service.executeEndpointJob = function (imageName, file, endpointId, nodeName) {
     return Upload.upload({
-      url: 'api/endpoints/' + endpointId + '/job?method=file',
+      url: 'api/endpoints/' + endpointId + '/job?method=file&nodeName=' + nodeName,
       data: {
         File: file,
         Image: imageName

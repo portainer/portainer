@@ -49,7 +49,7 @@ func (payload *endpointJobFromFileContentPayload) Validate(r *http.Request) erro
 	return nil
 }
 
-// POST request on /api/endpoints/:id/job?method
+// POST request on /api/endpoints/:id/job?method&nodeName
 func (handler *Handler) endpointJob(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
@@ -60,6 +60,9 @@ func (handler *Handler) endpointJob(w http.ResponseWriter, r *http.Request) *htt
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: method", err}
 	}
+
+	// TODO: do something with nodename
+	nodeName, _ := request.RetrieveQueryParameter(r, "nodeName", true)
 
 	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
 	if err == portainer.ErrObjectNotFound {
@@ -75,22 +78,22 @@ func (handler *Handler) endpointJob(w http.ResponseWriter, r *http.Request) *htt
 
 	switch method {
 	case "file":
-		return handler.executeJobFromFile(w, r, endpoint)
+		return handler.executeJobFromFile(w, r, endpoint, nodeName)
 	case "string":
-		return handler.executeJobFromFileContent(w, r, endpoint)
+		return handler.executeJobFromFileContent(w, r, endpoint, nodeName)
 	}
 
 	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: method. Value must be one of: string or file", errors.New(request.ErrInvalidQueryParameter)}
 }
 
-func (handler *Handler) executeJobFromFile(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint) *httperror.HandlerError {
+func (handler *Handler) executeJobFromFile(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, nodeName string) *httperror.HandlerError {
 	payload := &endpointJobFromFilePayload{}
 	err := payload.Validate(r)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	err = handler.JobService.Execute(endpoint, payload.Image, payload.File)
+	err = handler.JobService.Execute(endpoint, nodeName, payload.Image, payload.File)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Failed executing job", err}
 	}
@@ -98,14 +101,14 @@ func (handler *Handler) executeJobFromFile(w http.ResponseWriter, r *http.Reques
 	return response.Empty(w)
 }
 
-func (handler *Handler) executeJobFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint) *httperror.HandlerError {
+func (handler *Handler) executeJobFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, nodeName string) *httperror.HandlerError {
 	var payload endpointJobFromFileContentPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	err = handler.JobService.Execute(endpoint, payload.Image, []byte(payload.FileContent))
+	err = handler.JobService.Execute(endpoint, nodeName, payload.Image, []byte(payload.FileContent))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Failed executing job", err}
 	}

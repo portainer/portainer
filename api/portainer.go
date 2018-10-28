@@ -638,7 +638,7 @@ type (
 
 	// JobService represents a service to manage job execution on hosts
 	JobService interface {
-		Execute(endpoint *Endpoint, image string, script []byte) error
+		Execute(endpoint *Endpoint, nodeName, image string, script []byte) error
 	}
 )
 
