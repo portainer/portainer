@@ -9,6 +9,7 @@ angular.module('portainer.app')
     update: { method: 'PUT', params: { id: '@id' } },
     updateAccess: { method: 'PUT', params: { id: '@id', action: 'access' } },
     remove: { method: 'DELETE', params: { id: '@id'} },
-    snapshot: { method: 'POST', params: { id: 'snapshot' }}
+    snapshot: { method: 'POST', params: { id: 'snapshot' }},
+    executeJob: { method: 'POST', ignoreLoadingBar: true, params: { id: '@id', action: 'job' } }
   });
 }]);

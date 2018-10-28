@@ -1,21 +1,21 @@
 import angular from 'angular';
 
 angular.module('portainer.docker').controller('NodeBrowserController', [
-  'NodeService', 'HttpRequestHelper', '$stateParams',
-  function NodeBrowserController(NodeService, HttpRequestHelper, $stateParams) {
+  '$stateParams', 'NodeService', 'HttpRequestHelper', 'Notifications',
+  function NodeBrowserController($stateParams, NodeService, HttpRequestHelper, Notifications) {
     var ctrl = this;
-
     ctrl.$onInit = $onInit;
 
     function $onInit() {
       ctrl.nodeId = $stateParams.id;
-      loadNode();
-    }
 
-    function loadNode() {
-      NodeService.node(ctrl.nodeId).then(function onNodeLoaded(node) {
+      NodeService.node(ctrl.nodeId)
+      .then(function onNodeLoaded(node) {
         HttpRequestHelper.setPortainerAgentTargetHeader(node.Hostname);
         ctrl.node = node;
+      })
+      .catch(function onError(err) {
+        Notifications.error('Unable to retrieve host information', err);
       });
     }
   }

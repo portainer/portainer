@@ -189,5 +189,9 @@ function ContainerServiceFactory($q, Container, ResourceControlService, LogHelpe
     return Container.inspect({ id: id }).$promise;
   };
 
+  service.prune = function(filters) {
+    return Container.prune({ filters: filters }).$promise;
+  };
+
   return service;
 }]);

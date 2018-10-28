@@ -71,6 +71,9 @@ function ContainerFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
     },
     update: {
       method: 'POST', params: { id: '@id', action: 'update'}
+    },
+    prune: {
+      method: 'POST', params: { action: 'prune', filters: '@filters' }
     }
   });
 }]);

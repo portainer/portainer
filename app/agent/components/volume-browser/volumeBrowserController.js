@@ -87,6 +87,16 @@ function (HttpRequestHelper, VolumeBrowserService, FileSaver, Blob, ModalService
     });
   }
 
+  this.onFileSelectedForUpload = function onFileSelectedForUpload(file) {
+    VolumeBrowserService.upload(ctrl.state.path, file, ctrl.volumeId)
+      .then(function onFileUpload() {
+        onFileUploaded();
+      })
+      .catch(function onFileUpload(err) {
+        Notifications.error('Failure', err, 'Unable to upload file');
+      });
+  };
+
   function parentPath(path) {
     if (path.lastIndexOf('/') === 0) {
       return '/';
@@ -114,5 +124,15 @@ function (HttpRequestHelper, VolumeBrowserService, FileSaver, Blob, ModalService
       Notifications.error('Failure', err, 'Unable to browse volume');
     });
   };
+
+  function onFileUploaded() {
+    refreshList();
+  }
+
+  function refreshList() {
+    browse(ctrl.state.path);
+  }
+
+  
 
 }]);

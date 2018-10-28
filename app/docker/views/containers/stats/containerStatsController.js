@@ -34,9 +34,8 @@ function ($q, $scope, $transition$, $document, $interval, ContainerService, Char
 
   function updateMemoryChart(stats, chart) {
     var label = moment(stats.Date).format('HH:mm:ss');
-    var value = stats.MemoryUsage;
 
-    ChartService.UpdateMemoryChart(label, value, chart);
+    ChartService.UpdateMemoryChart(label, stats.MemoryUsage, stats.MemoryCache, chart);
   }
 
   function updateCPUChart(stats, chart) {

@@ -11,14 +11,25 @@
   <rd-header-content>Docker</rd-header-content>
 </rd-header>
 
-<host-details-panel 
-  host="$ctrl.hostDetails" 
-  is-agent="$ctrl.isAgent"
-  browse-url="{{$ctrl.browseUrl}}"></host-details-panel>
+<host-details-panel
+  host="$ctrl.hostDetails"
+  is-browse-enabled="$ctrl.isAgent && $ctrl.agentApiVersion > 1"
+  browse-url="{{$ctrl.browseUrl}}"
+  is-job-enabled="$ctrl.isJobEnabled"
+  job-url="{{$ctrl.jobUrl}}"
+></host-details-panel>
 
 <engine-details-panel engine="$ctrl.engineDetails"></engine-details-panel>
 
-<devices-panel ng-if="$ctrl.isAgent" devices="$ctrl.devices"></devices-panel>
-<disks-panel ng-if="$ctrl.isAgent" disks="$ctrl.disks"></disks-panel>
+<jobs-datatable
+  ng-if="$ctrl.isJobEnabled && $ctrl.jobs"
+  title-text="Jobs" title-icon="fa-tasks"
+  dataset="$ctrl.jobs"
+  table-key="jobs"
+  order-by="Created" reverse-order="true"
+></jobs-datatable>
+
+<devices-panel ng-if="$ctrl.isAgent && $ctrl.agentApiVersion > 1" devices="$ctrl.devices"></devices-panel>
+<disks-panel ng-if="$ctrl.isAgent && $ctrl.agentApiVersion > 1" disks="$ctrl.disks"></disks-panel>
 
 <ng-transclude></ng-transclude>

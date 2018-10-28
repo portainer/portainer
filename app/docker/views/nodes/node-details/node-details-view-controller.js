@@ -1,30 +1,45 @@
 import angular from 'angular';
 
 angular.module('portainer.docker').controller('NodeDetailsViewController', [
-  '$stateParams', 'NodeService', 'StateManager', 'AgentService',
-  function NodeDetailsViewController($stateParams, NodeService, StateManager, AgentService) {
+  '$q', '$stateParams', 'NodeService', 'StateManager', 'AgentService', 'ContainerService', 'Authentication',
+  function NodeDetailsViewController($q, $stateParams, NodeService, StateManager, AgentService, ContainerService, Authentication) {
     var ctrl = this;
 
     ctrl.$onInit = initView;
 
     ctrl.state = {
-      isAgent: false
+      isAgent: false,
+      isAdmin: false
     };
 
     function initView() {
       var applicationState = StateManager.getState();
       ctrl.state.isAgent = applicationState.endpoint.mode.agentProxy;
+      ctrl.state.isAdmin = Authentication.getUserDetails().role === 1;
+
+      var fetchJobs = ctrl.state.isAdmin && ctrl.state.isAgent;
 
       var nodeId = $stateParams.id;
-      NodeService.node(nodeId).then(function(node) {
+      $q.all({
+        node: NodeService.node(nodeId),
+        jobs: fetchJobs ? ContainerService.containers(true, { label: ['io.portainer.job.endpoint'] }) : []
+      })
+      .then(function (data) {
+        var node = data.node;
         ctrl.originalNode = node;
         ctrl.hostDetails = buildHostDetails(node);
         ctrl.engineDetails = buildEngineDetails(node);
         ctrl.nodeDetails = buildNodeDetails(node);
+        ctrl.jobs = data.jobs;
         if (ctrl.state.isAgent) {
-          AgentService.hostInfo(node.Hostname).then(function onHostInfoLoad(
-            agentHostInfo
-          ) {
+          var agentApiVersion = applicationState.endpoint.agentApiVersion;
+          ctrl.state.agentApiVersion = agentApiVersion;
+          if (agentApiVersion < 2) {
+            return;
+          }
+
+          AgentService.hostInfo(node.Hostname)
+          .then(function onHostInfoLoad(agentHostInfo) {
             ctrl.devices = agentHostInfo.PCIDevices;
             ctrl.disks = agentHostInfo.PhysicalDisks;
           });
@@ -66,12 +81,12 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
 
     function transformPlugins(pluginsList, type) {
       return pluginsList
-        .filter(function(plugin) {
-          return plugin.Type === type;
-        })
-        .map(function(plugin) {
-          return plugin.Name;
-        });
+      .filter(function(plugin) {
+        return plugin.Type === type;
+      })
+      .map(function(plugin) {
+        return plugin.Name;
+      });
     }
   }
 ]);

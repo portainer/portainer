@@ -6,8 +6,8 @@ import { ContainerDetailsViewModel } from '../../../models/container';
 
 
 angular.module('portainer.docker')
-.controller('CreateContainerController', ['$q', '$scope', '$state', '$timeout', '$transition$', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'NetworkService', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'FormValidator', 'ModalService', 'RegistryService', 'SystemService', 'SettingsService', 'HttpRequestHelper',
-function ($q, $scope, $state, $timeout, $transition$, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, NetworkService, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, FormValidator, ModalService, RegistryService, SystemService, SettingsService, HttpRequestHelper) {
+.controller('CreateContainerController', ['$q', '$scope', '$state', '$timeout', '$transition$', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'NetworkService', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'FormValidator', 'ModalService', 'RegistryService', 'SystemService', 'SettingsService', 'PluginService', 'HttpRequestHelper',
+function ($q, $scope, $state, $timeout, $transition$, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, NetworkService, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, FormValidator, ModalService, RegistryService, SystemService, SettingsService, PluginService, HttpRequestHelper) {
 
   $scope.create = create;
 
@@ -26,7 +26,9 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     MemoryLimit: 0,
     MemoryReservation: 0,
     NodeName: null,
-    capabilities: []
+    capabilities: [],
+    LogDriverName: '',
+    LogDriverOpts: []
   };
 
   $scope.extraNetworks = {};
@@ -115,6 +117,14 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
 
   $scope.removeDevice = function(index) {
     $scope.config.HostConfig.Devices.splice(index, 1);
+  };
+
+  $scope.addLogDriverOpt = function() {
+    $scope.formValues.LogDriverOpts.push({ name: '', value: ''});
+  };
+
+  $scope.removeLogDriverOpt = function(index) {
+    $scope.formValues.LogDriverOpts.splice(index, 1);
   };
 
   $scope.fromContainerMultipleNetworks = false;
@@ -264,6 +274,23 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     }
   }
 
+  function prepareLogDriver(config) {
+    var logOpts = {};
+    if ($scope.formValues.LogDriverName) {
+      config.HostConfig.LogConfig = { Type: $scope.formValues.LogDriverName };
+      if ($scope.formValues.LogDriverName !== 'none') {
+        $scope.formValues.LogDriverOpts.forEach(function (opt) {
+          if (opt.name) {
+            logOpts[opt.name] = opt.value;
+          }
+        });
+        if (Object.keys(logOpts).length !== 0 && logOpts.constructor === Object) {
+          config.HostConfig.LogConfig.Config = logOpts;
+        }
+      }
+    }
+  }
+
   function prepareCapabilities(config) {
     var allowed = $scope.formValues.capabilities.filter(function(item) {return item.allowed === true;});
     var notAllowed = $scope.formValues.capabilities.filter(function(item) {return item.allowed === false;});
@@ -285,6 +312,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     prepareLabels(config);
     prepareDevices(config);
     prepareResources(config);
+    prepareLogDriver(config);
     prepareCapabilities(config);
     return config;
   }
@@ -573,6 +601,11 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve application settings');
+    });
+
+    PluginService.loggingPlugins(apiVersion < 1.25)
+    .then(function success(loggingDrivers) {
+      $scope.availableLoggingDrivers = loggingDrivers;
     });
 
     var userDetails = Authentication.getUserDetails();
