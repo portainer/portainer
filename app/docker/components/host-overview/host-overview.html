@@ -12,15 +12,23 @@
 
 <host-details-panel
   host="$ctrl.hostDetails"
-  is-agent="$ctrl.isAgent"
-  offline-mode="$ctrl.offlineMode"
+  is-browse-enabled="$ctrl.isAgent && $ctrl.agentApiVersion > 1 && !$ctrl.offlineMode"
   browse-url="{{$ctrl.browseUrl}}"
+  is-job-enabled="$ctrl.isJobEnabled && !$ctrl.offlineMode"
+  job-url="{{$ctrl.jobUrl}}"
 ></host-details-panel>
 
 <engine-details-panel engine="$ctrl.engineDetails"></engine-details-panel>
 
-<devices-panel ng-if="$ctrl.isAgent && !$ctrl.offlineMode" devices="$ctrl.devices"></devices-panel>
+<jobs-datatable
+  ng-if="$ctrl.isJobEnabled && $ctrl.jobs && !$ctrl.offlineMode"
+  title-text="Jobs" title-icon="fa-tasks"
+  dataset="$ctrl.jobs"
+  table-key="jobs"
+  order-by="Created" reverse-order="true"
+></jobs-datatable>
 
-<disks-panel ng-if="$ctrl.isAgent && !$ctrl.offlineMode" disks="$ctrl.disks"></disks-panel>
+<devices-panel ng-if="$ctrl.isAgent && $ctrl.agentApiVersion > 1 && !$ctrl.offlineMode" devices="$ctrl.devices"></devices-panel>
+<disks-panel ng-if="$ctrl.isAgent && $ctrl.agentApiVersion > 1 && !$ctrl.offlineMode" disks="$ctrl.disks"></disks-panel>
 
 <ng-transclude></ng-transclude>

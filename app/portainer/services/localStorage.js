@@ -101,6 +101,12 @@ angular.module('portainer.app')
     getColumnVisibilitySettings: function(key) {
       return localStorageService.get('col_visibility_' + key);
     },
+    storeJobImage: function(data) {
+      localStorageService.set('job_image', data);
+    },
+    getJobImage: function() {
+      return localStorageService.get('job_image');
+    },
     clean: function() {
       localStorageService.clearAll();
     }

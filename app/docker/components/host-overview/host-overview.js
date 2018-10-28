@@ -7,8 +7,12 @@ angular.module('portainer.docker').component('hostOverview', {
     disks: '<',
     isAgent: '<',
     offlineMode: '<',
+    agentApiVersion: '<',
     refreshUrl: '@',
-    browseUrl: '@'
+    browseUrl: '@',
+    jobUrl: '@',
+    isJobEnabled: '<',
+    jobs: '<'
   },
   transclude: true
 });
