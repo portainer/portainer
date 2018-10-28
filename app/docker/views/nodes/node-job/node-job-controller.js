@@ -1,6 +1,6 @@
-angular.module('portainer.docker').controller('NodeBrowserController', [
+angular.module('portainer.docker').controller('NodeJobController', [
   '$stateParams', 'NodeService', 'HttpRequestHelper', 'Notifications',
-  function NodeBrowserController($stateParams, NodeService, HttpRequestHelper, Notifications) {
+  function NodeJobController($stateParams, NodeService, HttpRequestHelper, Notifications) {
     var ctrl = this;
     ctrl.$onInit = $onInit;
 

@@ -1,6 +1,6 @@
-angular.module('portainer.docker').controller('HostBrowserViewController', [
+angular.module('portainer.docker').controller('HostJobController', [
   'SystemService', 'Notifications',
-  function HostBrowserViewController(SystemService, Notifications) {
+  function HostJobController(SystemService, Notifications) {
     var ctrl = this;
     ctrl.$onInit = $onInit;
 

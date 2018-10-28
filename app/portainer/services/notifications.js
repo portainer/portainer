@@ -13,7 +13,9 @@ angular.module('portainer.app')
 
   service.error = function(title, e, fallbackText) {
     var msg = fallbackText;
-    if (e.data && e.data.message) {
+    if (e.data && e.data.details) {
+      msg = e.data.details;
+    } else if (e.data && e.data.message) {
       msg = e.data.message;
     } else if (e.message) {
       msg = e.message;
