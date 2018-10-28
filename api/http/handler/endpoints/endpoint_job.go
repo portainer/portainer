@@ -61,7 +61,6 @@ func (handler *Handler) endpointJob(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: method", err}
 	}
 
-	// TODO: do something with nodename
 	nodeName, _ := request.RetrieveQueryParameter(r, "nodeName", true)
 
 	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))

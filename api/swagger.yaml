@@ -519,6 +519,11 @@ paths:
         description: "Job execution method. Possible values: file or string."
         required: true
         type: "string"
+      - name: "nodeName"
+        in: "query"
+        description: "Optional. Hostname of a node when targeting a Portainer agent cluster."
+        required: true
+        type: "string"        
       - in: "body"
         name: "body"
         description: "Job details. Required when method equals string."
