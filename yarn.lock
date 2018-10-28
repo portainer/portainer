@@ -1219,6 +1219,13 @@ clean-terminal-webpack-plugin@^1.1.0:
   resolved "https://registry.yarnpkg.com/clean-terminal-webpack-plugin/-/clean-terminal-webpack-plugin-1.1.0.tgz#5c345af8ae52c276d7a8076382e79df8850896a8"
   integrity sha512-aobm7IUmpaZi4g7yFeSyrGne1GBUF0Bw47cSj/xaFA/l8Zm/rM529v/HJKIjMqplbvzX/hepBIY4Cq4YtyyCrw==
 
+clean-webpack-plugin@^0.1.19:
+  version "0.1.19"
+  resolved "https://registry.yarnpkg.com/clean-webpack-plugin/-/clean-webpack-plugin-0.1.19.tgz#ceda8bb96b00fe168e9b080272960d20fdcadd6d"
+  integrity sha512-M1Li5yLHECcN2MahoreuODul5LkjohJGFxLPTjl3j1ttKrF5rgjZET1SJduuqxLAuT1gAPOdkhg03qcaaU1KeA==
+  dependencies:
+    rimraf "^2.6.1"
+
 cli-cursor@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/cli-cursor/-/cli-cursor-1.0.2.tgz#64da3f7d56a54412e59794bd62dc35295e8f2987"
