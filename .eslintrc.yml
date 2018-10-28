@@ -3,13 +3,6 @@ env:
   jquery: true
   node: true
   
-globals:
-  angular: true
-#   $: true
-#   _: true
-#   moment: true
-#   filesize: true
-#   splitargs: true
 extends:
   - 'eslint:recommended'
 
@@ -122,7 +115,7 @@ rules:
 #   no-unused-labels: off
 #   no-useless-call: error
 #   no-useless-concat: error
-#   no-useless-escape: off
+  no-useless-escape: off
 #   no-useless-return: off
 #   no-void: error
 #   no-warning-comments: off
