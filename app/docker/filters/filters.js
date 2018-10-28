@@ -21,12 +21,6 @@ function hashToHexColor(hash) {
 }
 
 angular.module('portainer.docker')
-.filter('humanizeDatetime', function () {
-  'use strict';
-  return function (dt) {
-    return moment(dt).fromNow();
-  };
-})
 .filter('visualizerTask', function () {
   'use strict';
   return function (text) {

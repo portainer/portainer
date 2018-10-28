@@ -4,9 +4,10 @@ function (clipboard) {
 
   this.state = {
     availableSinceDatetime: [
-      moment().subtract(10, 'minutes').format(),
-      moment().subtract(4, 'hours').format(),
-      moment().subtract(1, 'days').format()
+      { desc: 'Last day', value: moment().subtract(1, 'days').format() },
+      { desc: 'Last 4 hours', value: moment().subtract(4, 'hours').format() },
+      { desc: 'Last hour', value: moment().subtract(1, 'hours').format() },
+      { desc: 'Last 10 minutes', value: moment().subtract(10, 'minutes').format() }
     ],
     copySupported: clipboard.supported,
     logCollection: true,

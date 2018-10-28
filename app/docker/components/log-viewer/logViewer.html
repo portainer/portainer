@@ -37,17 +37,14 @@
           </div>
           <div class="form-group">
             <label for="logs_since" class="col-sm-1 control-label text-left">
-              Since
+              Fetch
             </label>
             <div class="col-sm-2">
               <select class="form-control" ng-model="$ctrl.sinceTimestamp" id="logs_since">
-                <option selected value="">all</option>
-                <option ng-repeat="dt in $ctrl.state.availableSinceDatetime" ng-value="dt" title="{{ dt }}">{{ dt | humanizeDatetime }}</option>
+                <option selected value="">All logs</option>
+                <option ng-repeat="dt in $ctrl.state.availableSinceDatetime" ng-value="dt.value" title="{{ dt.value }}">{{ dt.desc }}</option>
               </select>
             </div>
-            <label for="logs_since" class="col-sm-1 control-label text-left">
-              <portainer-tooltip position="right" message="Only return logs since the datetime you choose..."></portainer-tooltip>
-            </label>
           </div>
           <div class="form-group">
             <label for="logs_search" class="col-sm-1 control-label text-left">

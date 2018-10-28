@@ -4,7 +4,7 @@ function ($scope, $transition$, $interval, ServiceService, Notifications) {
   $scope.state = {
     refreshRate: 3,
     lineCount: 100,
-    sinceTimestamp: moment().subtract(1, 'days').format(),
+    sinceTimestamp: '',
     displayTimestamps: false
   };
 
