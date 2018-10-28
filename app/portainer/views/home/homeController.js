@@ -2,28 +2,38 @@ angular.module('portainer.app')
 .controller('HomeController', ['$q', '$scope', '$state', 'Authentication', 'EndpointService', 'EndpointHelper', 'GroupService', 'Notifications', 'EndpointProvider', 'StateManager', 'ExtensionManager', 'ModalService', 'MotdService', 'SystemService',
 function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, GroupService, Notifications, EndpointProvider, StateManager, ExtensionManager, ModalService, MotdService, SystemService) {
 
-  // function endpointIsOnline(endpoint) {
-  //   if (endpoint.Type === 3) {
-  //     switchToAzureEndpoint(endpoint);
-  //   } else {
-  //     switchToDockerEndpoint(endpoint);
-  //   }
-  // }
-  //
-  // function endpointIsOffline(endpoint) {
-  //   if (endpoint.Type === 3) {
-  //     Notifications.error('Failure', '', 'Endpoint is unreachable. Offline browsing disabled for Azure endpoints.');
-  //   } else if (endpoint.Snapshots[0] && endpoint.Snapshots[0].Swarm === true) {
-  //     Notifications.error('Failure', '', 'Endpoint is unreachable. Connect to another swarm manager.');
-  //   } else if (!endpoint.Snapshots[0]) {
-  //     Notifications.error('Failure', '', 'Endpoint is unreachable and there is no snapshot available for offline browsing.');
-  //   } else {
-  //     switchToDockerEndpoint(endpoint);
-  //   }
-  // }
-
   $scope.goToEdit = function(id) {
     $state.go('portainer.endpoints.endpoint', { id: id });
+  };
+
+  $scope.goToDashboard = function (endpoint) {
+    if (endpoint.Type === 3) {
+      return switchToAzureEndpoint(endpoint);
+    }
+
+    checkEndpointStatus(endpoint)
+    .then(function sucess() {
+      return switchToDockerEndpoint(endpoint);
+    }).catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to verify endpoint status');
+    });
+  };
+
+  $scope.dismissImportantInformation = function (hash) {
+    StateManager.dismissImportantInformation(hash);
+  };
+
+  $scope.dismissInformationPanel = function (id) {
+    StateManager.dismissInformationPanel(id);
+  };
+
+  $scope.triggerSnapshot = function () {
+    ModalService.confirmEndpointSnapshot(function (result) {
+      if (!result) {
+        return;
+      }
+      triggerSnapshot();
+    });
   };
 
   function checkEndpointStatus(endpoint) {
@@ -89,36 +99,6 @@ function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, G
       Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
     });
   }
-
-  $scope.goToDashboard = function (endpoint) {
-    if (endpoint.Type === 3) {
-      return switchToAzureEndpoint(endpoint);
-    }
-
-    checkEndpointStatus(endpoint)
-    .then(function sucess() {
-      return switchToDockerEndpoint(endpoint);
-    }).catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to verify endpoint status');
-    });
-  };
-
-  $scope.dismissImportantInformation = function (hash) {
-    StateManager.dismissImportantInformation(hash);
-  };
-
-  $scope.dismissInformationPanel = function (id) {
-    StateManager.dismissInformationPanel(id);
-  };
-
-  $scope.triggerSnapshot = function () {
-    ModalService.confirmEndpointSnapshot(function (result) {
-      if (!result) {
-        return;
-      }
-      triggerSnapshot();
-    });
-  };
 
   function triggerSnapshot() {
     EndpointService.snapshot()
