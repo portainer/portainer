@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular
 .module('portainer.docker')
 .controller('ContainerRestartPolicyController', [function ContainerRestartPolicyController() {

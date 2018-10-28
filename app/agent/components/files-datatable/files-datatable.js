@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.agent').component('filesDatatable', {
   templateUrl: './files-datatable.html',
   controller: 'GenericDatatableController',

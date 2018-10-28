@@ -1,5 +1,5 @@
 import '../assets/css/app.css';
-
+import angular from 'angular';
 
 import './agent/_module';
 import './azure/_module';

@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.azure')
 .controller('AzureContainerInstancesController', ['$scope', '$state', 'AzureService', 'Notifications',
 function ($scope, $state, AzureService, Notifications) {

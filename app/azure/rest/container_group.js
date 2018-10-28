@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.azure')
 .factory('ContainerGroup', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider',
 function ContainerGroupFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {

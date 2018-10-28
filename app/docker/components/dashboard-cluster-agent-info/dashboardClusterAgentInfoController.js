@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.docker')
 .controller('DashboardClusterAgentInfoController', ['AgentService', 'Notifications',
 function (AgentService, Notifications) {

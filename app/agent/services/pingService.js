@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.agent').service('AgentPingService', [
   'AgentPing',
   function AgentPingService(AgentPing) {

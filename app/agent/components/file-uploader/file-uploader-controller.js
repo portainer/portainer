@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.agent').controller('FileUploaderController', [
   '$q',
   function FileUploaderController($q) {

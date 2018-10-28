@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.azure')
 .factory('Location', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider',
 function LocationFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {

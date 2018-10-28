@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.docker').component('imagesDatatable', {
   templateUrl: './imagesDatatable.html',
   controller: 'ImagesDatatableController',

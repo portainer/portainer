@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.app')
 .controller('JobFormController', ['$state', 'LocalStorage', 'EndpointService', 'EndpointProvider', 'Notifications',
 function ($state, LocalStorage, EndpointService, EndpointProvider, Notifications) {

@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.docker')
 .controller('ContainersDatatableActionsController', ['$state', 'ContainerService', 'ModalService', 'Notifications', 'HttpRequestHelper',
 function ($state, ContainerService, ModalService, Notifications, HttpRequestHelper) {

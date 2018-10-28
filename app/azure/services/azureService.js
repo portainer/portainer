@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.azure')
 .factory('AzureService', ['$q', 'Azure', 'SubscriptionService', 'ResourceGroupService', 'ContainerGroupService', 'ProviderService',
 function AzureServiceFactory($q, Azure, SubscriptionService, ResourceGroupService, ContainerGroupService, ProviderService) {

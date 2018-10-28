@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.azure').component('containergroupsDatatable', {
   templateUrl: './containerGroupsDatatable.html',
   controller: 'GenericDatatableController',

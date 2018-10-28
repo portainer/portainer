@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.agent').component('volumeBrowser', {
   templateUrl: './volumeBrowser.html',
   controller: 'VolumeBrowserController',

@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.docker')
 .controller('ServicesDatatableActionsController', ['$q', '$state', 'ServiceService', 'ServiceHelper', 'Notifications', 'ModalService', 'ImageHelper','WebhookService','EndpointProvider',
 function ($q, $state, ServiceService, ServiceHelper, Notifications, ModalService, ImageHelper, WebhookService, EndpointProvider) {

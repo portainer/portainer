@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.azure')
 .factory('Provider', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider',
 function ProviderFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {

@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer')
 .constant('API_ENDPOINT_AUTH', 'api/auth')
 .constant('API_ENDPOINT_DOCKERHUB', 'api/dockerhub')

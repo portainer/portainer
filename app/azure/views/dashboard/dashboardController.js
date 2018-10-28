@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.azure')
 .controller('AzureDashboardController', ['$scope', 'AzureService', 'Notifications',
 function ($scope, AzureService, Notifications) {

@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.docker').controller('NodeJobController', [
   '$stateParams', 'NodeService', 'HttpRequestHelper', 'Notifications',
   function NodeJobController($stateParams, NodeService, HttpRequestHelper, Notifications) {

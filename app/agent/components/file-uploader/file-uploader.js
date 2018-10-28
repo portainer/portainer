@@ -1,3 +1,5 @@
+import angular from 'angular';
+ 
 angular.module('portainer.agent').component('fileUploader', {
   templateUrl: './file-uploader.html',
   controller: 'FileUploaderController',
