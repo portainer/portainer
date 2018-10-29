@@ -67,8 +67,11 @@
     "xterm": "^3.1.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.1.2",
+    "@babel/preset-env": "^7.1.0",
     "auto-ngtemplate-loader": "^1.3.0",
     "autoprefixer": "^7.1.1",
+    "babel-loader": "^8.0.4",
     "clean-terminal-webpack-plugin": "^1.1.0",
     "clean-webpack-plugin": "^0.1.19",
     "css-loader": "^1.0.0",

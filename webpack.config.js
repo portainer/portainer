@@ -5,7 +5,7 @@ const WebpackBuildNotifierPlugin = require('webpack-build-notifier');
 const CleanTerminalPlugin = require('clean-terminal-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-// const WebpackBundleAnalyzer = require('webpack-bundle-analyzer');
+// const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const npmPackage = require('./package.json');
 
 module.exports = {
@@ -22,6 +22,7 @@ module.exports = {
         test: /\.js$/,
         exclude: /node_modules/,
         use: [
+          'babel-loader',
           'auto-ngtemplate-loader',
           {
             // enforce: 'pre',
@@ -97,7 +98,7 @@ module.exports = {
     }),
     new CleanWebpackPlugin(['dist/public']),
     new ContextReplacementPlugin(/moment[\/\\]locale$/, /en/),
-    // new WebpackBundleAnalyzer()
+    // new BundleAnalyzerPlugin()
   ],
   optimization: {
     splitChunks: {
