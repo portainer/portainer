@@ -5,7 +5,7 @@ const WebpackBuildNotifierPlugin = require('webpack-build-notifier');
 const CleanTerminalPlugin = require('clean-terminal-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-
+// const WebpackBundleAnalyzer = require('webpack-bundle-analyzer');
 const npmPackage = require('./package.json');
 
 module.exports = {
@@ -97,6 +97,7 @@ module.exports = {
     }),
     new CleanWebpackPlugin(['dist/public']),
     new ContextReplacementPlugin(/moment[\/\\]locale$/, /en/),
+    // new WebpackBundleAnalyzer()
   ],
   optimization: {
     splitChunks: {
