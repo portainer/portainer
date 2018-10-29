@@ -140,7 +140,7 @@ function ContainerServiceFactory($q, Container, ResourceControlService, LogHelpe
     return deferred.promise;
   };
 
-  service.logs = function(id, stdout, stderr, timestamps, tail, stripHeaders) {
+  service.logs = function(id, stdout, stderr, timestamps, since, tail, stripHeaders) {
     var deferred = $q.defer();
 
     var parameters = {
@@ -148,6 +148,7 @@ function ContainerServiceFactory($q, Container, ResourceControlService, LogHelpe
       stdout: stdout || 0,
       stderr: stderr || 0,
       timestamps: timestamps || 0,
+      since: since || 0,
       tail: tail || 'all'
     };
 
