@@ -64,8 +64,8 @@
           <a ng-if="$ctrl.agentProxy && item.Container" ui-sref="docker.containers.container({ id: item.Container.Id, nodeName: item.Container.NodeName })" class="monospaced">{{ item.Id }}Doz</a>
         </td>
         <td>
-          <container-quick-actions ng-if="!$ctrl.agentProxy || !item.Container" container-id="item.ContainerId" task-id="item.Id" status="item.Status.State" settings="$ctrl.state"></container-quick-actions>
-          <container-quick-actions ng-if="$ctrl.agentProxy && item.Container" container-id="item.Container.Id" node-name="item.Container.NodeName" status="item.Status.State" settings="$ctrl.state"></container-quick-actions>
+          <container-quick-actions ng-if="!$ctrl.agentProxy || !item.Container" container-id="item.ContainerId" task-id="item.Id" status="item.Status.State" state="$ctrl.state"></container-quick-actions>
+          <container-quick-actions ng-if="$ctrl.agentProxy && item.Container" container-id="item.Container.Id" node-name="item.Container.NodeName" status="item.Status.State" state="$ctrl.state"></container-quick-actions>
         </td>
         <td>{{ item.Slot ? item.Slot : '-' }}</td>
         <td>{{ item.NodeId | tasknodename: $ctrl.nodes }}</td>
