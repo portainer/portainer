@@ -1,12 +1,13 @@
 const path = require('path');
+const { ProvidePlugin, ContextReplacementPlugin } = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackBuildNotifierPlugin = require('webpack-build-notifier');
 const CleanTerminalPlugin = require('clean-terminal-webpack-plugin');
-const { ProvidePlugin } = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 const npmPackage = require('./package.json');
+
 module.exports = {
   entry: {
     main: './app/__module.js'
@@ -94,7 +95,8 @@ module.exports = {
       chunkFilename: '[id].css',
       sourceMap: true
     }),
-    new CleanWebpackPlugin(['dist/public'])
+    new CleanWebpackPlugin(['dist/public']),
+    new ContextReplacementPlugin(/moment[\/\\]locale$/, /en/),
   ],
   optimization: {
     splitChunks: {
