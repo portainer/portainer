@@ -1,7 +1,10 @@
 angular.module('portainer.app')
 .controller('SchedulesController', ['$scope', '$state', 'Notifications', 'ModalService', 'ScheduleService',
 function ($scope, $state, Notifications, ModalService, ScheduleService) {
-  $scope.removeAction = function(selectedItems) {
+
+  $scope.removeAction = removeAction;
+
+  function removeAction(selectedItems) {
     ModalService.confirmDeletion(
       'Do you want to remove the selected schedule(s) ?',
       function onConfirm(confirmed) {
@@ -9,7 +12,7 @@ function ($scope, $state, Notifications, ModalService, ScheduleService) {
         deleteSelectedSchedules(selectedItems);
       }
     );
-  };
+  }
 
   function deleteSelectedSchedules(schedules) {
     var endpointId = EndpointProvider.endpointID();

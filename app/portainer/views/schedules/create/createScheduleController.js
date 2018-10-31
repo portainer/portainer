@@ -6,9 +6,11 @@ function ($q, $scope, Notifications, EndpointService, GroupService) {
     actionInProgress: false
   };
 
-  $scope.create = function() {
+  $scope.create = create;
+
+  function create() {
     // var model = $scope.model;
-  };
+  }
 
   function initView() {
     $scope.model = new ScheduleDefaultModel();

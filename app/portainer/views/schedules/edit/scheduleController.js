@@ -6,9 +6,11 @@ function ($q, $scope, $transition$, Notifications, EndpointService, GroupService
     actionInProgress: false
   };
 
-  $scope.update = function() {
+  $scope.update = update;
+
+  function update() {
     // var model = $scope.schedule;
-  };
+  }
 
   function initView() {
     var id = $transition$.params().id;
