@@ -62,7 +62,7 @@
     "ng-file-upload": "~12.2.13",
     "rdash-ui": "1.0.*",
     "splitargs": "github:deviantony/splitargs#~0.2.0",
-    "toastr": "github:CodeSeven/toastr#~2.1.3",
+    "toastr": "^2.1.4",
     "ui-select": "^0.19.8",
     "xterm": "^3.1.0"
   },
@@ -108,5 +108,8 @@
     "webpack-build-notifier": "^0.1.30",
     "webpack-bundle-analyzer": "^3.0.3",
     "webpack-cli": "^3.1.2"
+  },
+  "resolutions": {
+    "jquery": "^3.3.1"
   }
 }

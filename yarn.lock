@@ -5116,12 +5116,7 @@ isteven-angular-multiselect@~4.0.0:
   resolved "https://registry.yarnpkg.com/isteven-angular-multiselect/-/isteven-angular-multiselect-4.0.0.tgz#70276da5ff3bc4d9a0887dc585ee26a1a26a8ed6"
   integrity sha1-cCdtpf87xNmgiH3Fhe4moaJqjtY=
 
-jquery@>=1.12.0:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.2.1.tgz#5c4d9de652af6cd0a770154a631bba12b015c787"
-  integrity sha1-XE2d5lKvbNCncBVKYxu6ErAVx4c=
-
-jquery@^3.3.1:
+jquery@>=1.12.0, jquery@^3.3.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.3.1.tgz#958ce29e81c9790f31be7792df5d4d95fc57fbca"
   integrity sha512-Ubldcmxp5np52/ENotGxlLe6aGMvmF4R8S6tZjsP6Knsaxd/xp3Zrh50cG93lR6nPXyUFwzN3ZSOQI0wRJNdGg==
@@ -8622,9 +8617,10 @@ to-regex@^3.0.1, to-regex@^3.0.2:
     regex-not "^1.0.2"
     safe-regex "^1.1.0"
 
-"toastr@github:CodeSeven/toastr#~2.1.3":
-  version "2.1.3"
-  resolved "https://codeload.github.com/CodeSeven/toastr/tar.gz/154358244d380445d742a3f539877a1aa7f954cf"
+toastr@^2.1.4:
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/toastr/-/toastr-2.1.4.tgz#8b43be64fb9d0c414871446f2db8e8ca4e95f181"
+  integrity sha1-i0O+ZPudDEFIcURvLbjoyk6V8YE=
   dependencies:
     jquery ">=1.12.0"
 
