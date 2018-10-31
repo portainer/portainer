@@ -54,6 +54,6 @@ else
       "ssbkang/portainer:windows1709-amd64-${PORTAINER_VERSION}" \
       "ssbkang/portainer:windows1803-amd64-${PORTAINER_VERSION}"
 
-    docker manifest push "ssbkang/portainer:${PORTAINER_VERSION}
+    docker manifest push "ssbkang/portainer:${PORTAINER_VERSION}"
   fi
 fi
