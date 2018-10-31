@@ -332,6 +332,19 @@ type (
 		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
 	}
 
+	// DeploykeyID represents a key identifier
+	DeploykeyID int
+
+	// Deploykey represents a key that can be associated to a resource
+	Deploykey struct {
+		ID             DeploykeyID
+		Name           string `json:"Name"`
+		Privatekeypath string `json:"Privatekeypath"`
+		Publickeypath  string `json:"Publickeypath"`
+		UserID         int    `json:"UserID"`
+		LastUsage      string `json:"LastUsage"`
+	}
+
 	// TagID represents a tag identifier
 	TagID int
 
@@ -461,6 +474,13 @@ type (
 		DeleteTeam(ID TeamID) error
 	}
 
+	// DeploykeyService represents a service for managing key data
+	DeploykeyService interface {
+		Deploykeys() ([]Deploykey, error)
+		CreateDeploykey(deploykey *Deploykey) error
+		DeleteDeploykey(ID DeploykeyID) error
+	}
+
 	// TeamMembershipService represents a service for managing team membership data
 	TeamMembershipService interface {
 		TeamMembership(ID TeamMembershipID) (*TeamMembership, error)
@@ -583,6 +603,16 @@ type (
 		Sign(message string) (string, error)
 	}
 
+	//DigitalDeploykeyService represents a service to manage digital deploykey
+	DigitalDeploykeyService interface {
+		ParseKeyPair(private, public []byte) error
+		GenerateKeyPair() ([]byte, []byte, error)
+		GenerateSshKey()([]byte, error)
+		EncodedPublicKey() string
+		PEMHeaders() (string, string)
+		Sign(message string) (string, error)
+	}
+	
 	// JWTService represents a service for managing JWT tokens
 	JWTService interface {
 		GenerateToken(data *TokenData) (string, error)

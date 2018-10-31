@@ -4,6 +4,13 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
   'use strict';
   var service = {};
 
+  var stackName='';
+  service.setStackName = function(sackname){    
+    stackName = sackname;
+  }
+  service.getStackName = function(){
+    return stackName;
+  }
 
   service.stack = function(id) {
     var deferred = $q.defer();
@@ -34,7 +41,7 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     return deferred.promise;
   };
 
-  service.migrateSwarmStack = function(stack, targetEndpointId, newName) {
+  service.migrateSwarmStack = function(stack, targetEndpointId) {
     var deferred = $q.defer();
 
     EndpointProvider.setEndpointID(targetEndpointId);
@@ -46,7 +53,8 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
         deferred.reject({ msg: 'Target endpoint is located in the same Swarm cluster as the current endpoint', err: null });
         return;
       }
-      return Stack.migrate({ id: stack.Id, endpointId: stack.EndpointId }, { EndpointID: targetEndpointId, SwarmID:  swarm.Id, Name: newName }).$promise;
+
+      return Stack.migrate({ id: stack.Id, endpointId: stack.EndpointId }, { EndpointID: targetEndpointId, SwarmID:  swarm.Id }).$promise;
     })
     .then(function success() {
       deferred.resolve();
@@ -61,12 +69,12 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     return deferred.promise;
   };
 
-  service.migrateComposeStack = function(stack, targetEndpointId, newName) {
+  service.migrateComposeStack = function(stack, targetEndpointId) {
     var deferred = $q.defer();
 
     EndpointProvider.setEndpointID(targetEndpointId);
 
-    Stack.migrate({ id: stack.Id, endpointId: stack.EndpointId }, { EndpointID: targetEndpointId, Name: newName }).$promise
+    Stack.migrate({ id: stack.Id, endpointId: stack.EndpointId }, { EndpointID: targetEndpointId }).$promise
     .then(function success() {
       deferred.resolve();
     })
@@ -258,7 +266,8 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     var deferred = $q.defer();
 
     SwarmService.swarm()
-    .then(function success(swarm) {
+    .then(function success(data) {
+      var swarm = data;
       var payload = {
         Name: name,
         SwarmID: swarm.Id,
@@ -277,23 +286,26 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     return deferred.promise;
   };
 
-  service.createComposeStackFromGitRepository = function(name, repositoryOptions, env, endpointId) {
+  service.createComposeStackFromGitRepository = function(name, repositoryOptions, env, endpointId) {   
     var payload = {
       Name: name,
       RepositoryURL: repositoryOptions.RepositoryURL,
       RepositoryReferenceName: repositoryOptions.RepositoryReferenceName,
       ComposeFilePathInRepository: repositoryOptions.ComposeFilePathInRepository,
       RepositoryAuthentication: repositoryOptions.RepositoryAuthentication,
+      stackAuthenticationControlEnabled: repositoryOptions.stackAuthenticationControlEnabled,  
       RepositoryUsername: repositoryOptions.RepositoryUsername,
       RepositoryPassword: repositoryOptions.RepositoryPassword,
+      RepositoryPrivatekeypath: repositoryOptions.RepositoryPrivatekeypath,
+      RepositoryPublickeypath: repositoryOptions.RepositoryPublickeypath,
       Env: env
-    };
+    };   
+
     return Stack.create({ method: 'repository', type: 2, endpointId: endpointId }, payload).$promise;
   };
 
   service.createSwarmStackFromGitRepository = function(name, repositoryOptions, env, endpointId) {
     var deferred = $q.defer();
-
     SwarmService.swarm()
     .then(function success(data) {
       var swarm = data;
@@ -304,10 +316,14 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
         RepositoryReferenceName: repositoryOptions.RepositoryReferenceName,
         ComposeFilePathInRepository: repositoryOptions.ComposeFilePathInRepository,
         RepositoryAuthentication: repositoryOptions.RepositoryAuthentication,
+        stackAuthenticationControlEnabled: repositoryOptions.stackAuthenticationControlEnabled,
         RepositoryUsername: repositoryOptions.RepositoryUsername,
-        RepositoryPassword: repositoryOptions.RepositoryPassword,
+        RepositoryPassword: repositoryOptions.RepositoryPassword, 
+        RepositoryPrivatekeypath: repositoryOptions.RepositoryPrivatekeypath,
+        RepositoryPublickeypath: repositoryOptions.RepositoryPublickeypath,
         Env: env
       };
+            
       return Stack.create({ method: 'repository', type: 1, endpointId: endpointId }, payload).$promise;
     })
     .then(function success(data) {
@@ -318,11 +334,6 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
     });
 
     return deferred.promise;
-  };
-
-  service.duplicateStack = function duplicateStack(name, stackFileContent, env, endpointId, type) {
-    var action = type === 1 ? service.createSwarmStackFromFileContent : service.createComposeStackFromFileContent;
-    return action(name, stackFileContent, env, endpointId);
   };
 
   return service;

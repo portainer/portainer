@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/portainer/docker"
 	"github.com/portainer/portainer/http/handler"
 	"github.com/portainer/portainer/http/handler/auth"
+	"github.com/portainer/portainer/http/handler/deploykeys"
 	"github.com/portainer/portainer/http/handler/dockerhub"
 	"github.com/portainer/portainer/http/handler/endpointgroups"
 	"github.com/portainer/portainer/http/handler/endpointproxy"
@@ -48,6 +49,7 @@ type Server struct {
 	DockerHubService       portainer.DockerHubService
 	EndpointService        portainer.EndpointService
 	EndpointGroupService   portainer.EndpointGroupService
+	DigitalDeploykeyService portainer.DigitalDeploykeyService
 	FileService            portainer.FileService
 	GitService             portainer.GitService
 	JWTService             portainer.JWTService
@@ -62,6 +64,7 @@ type Server struct {
 	TeamMembershipService  portainer.TeamMembershipService
 	TemplateService        portainer.TemplateService
 	UserService            portainer.UserService
+	DeploykeyService       portainer.DeploykeyService
 	WebhookService         portainer.WebhookService
 	Handler                *handler.Handler
 	SSL                    bool
@@ -154,6 +157,10 @@ func (server *Server) Start() error {
 	teamHandler.TeamService = server.TeamService
 	teamHandler.TeamMembershipService = server.TeamMembershipService
 
+	var deploykeyHandler = deploykeys.NewHandler(requestBouncer)
+	deploykeyHandler.DeploykeyService = server.DeploykeyService
+	deploykeyHandler.DigitalDeploykeyService = server.DigitalDeploykeyService
+
 	var teamMembershipHandler = teammemberships.NewHandler(requestBouncer)
 	teamMembershipHandler.TeamMembershipService = server.TeamMembershipService
 	var statusHandler = status.NewHandler(requestBouncer, server.Status)
@@ -203,6 +210,7 @@ func (server *Server) Start() error {
 		UserHandler:            userHandler,
 		WebSocketHandler:       websocketHandler,
 		WebhookHandler:         webhookHandler,
+		DeploykeyHandler:       deploykeyHandler,
 	}
 
 	if server.SSL {

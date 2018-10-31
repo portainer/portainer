@@ -61,6 +61,8 @@ info:
 host: "portainer.domain"
 basePath: "/api"
 tags:
+- name: "deploykeys"
+  description: "Manage deploykeys" 
 - name: "auth"
   description: "Authenticate against Portainer HTTP API"
 - name: "dockerhub"
@@ -2493,6 +2495,105 @@ paths:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
+  /deploykeys:
+    get:
+      tags:
+      - "deploykeys"
+      summary: "List deploykeys"
+      description: |
+        List deploykeys.
+        **Access policy**: administrator
+      operationId: "DeploykeysList"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/DeploykeyListResponse"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+        404:
+          description: "Key not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"       
+    post:
+      tags:
+      - "deploykeys"
+      summary: "Create a new deploykeys"
+      description: |
+        Create a new deploykeys.
+        **Access policy**: administrator
+      operationId: "DeploykeyCreate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Deploykey details"
+        required: true
+        schema:
+          $ref: "#/definitions/DeploykeyCreateRequest"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Deploykey"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        409:
+          description: "Conflict"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "A deploykeys with the specified name already exists"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /deploykeys/{id}:
+    delete:
+      tags:
+      - "deploykeys"
+      summary: "Remove a deploykeys"
+      description: |
+        Remove a deploykeys.
+        **Access policy**: administrator
+      operationId: "DeploykeyDelete"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Deploykey identifier"
+        required: true
+        type: "integer"
+      responses:
+        204:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
 
   /teams/{id}/memberships:
     get:
@@ -2937,6 +3038,35 @@ definitions:
         type: "string"
         example: "org/acme"
         description: "Tag name"
+        
+  Deploykey:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        example: 1
+        description: "Deploykey identifier"
+      Name:
+        type: "string"
+        example: "abcd"
+        description: "Deploykey name"  
+      Privatekeypath:
+        type: "string"
+        example: "abc@1dd45%"
+        description: "Deploykey private key path"        
+      Publickeypath:
+        type: "string"
+        example: "abc@1dd45%"
+        description: "Deploykey public key path"
+      UserID:
+        type: "integer"
+        example: 1
+        description: "Deploykey user id"
+      LastUsage:
+        type: "string"
+        example: "12:03:32"
+        description: " last usage deploykey  date"
+
   Team:
     type: "object"
     properties:
@@ -3919,6 +4049,37 @@ definitions:
     type: "array"
     items:
       $ref: "#/definitions/TeamMembership"
+  DeploykeyListResponse:
+    type: "array"
+    items:
+      $ref: "#/definitions/Deploykey"
+
+  DeploykeyCreateRequest:
+    type: "object"    
+    required:
+    - "Name"
+    properties:
+      Name:
+        type: "string"
+        example: "abcd"
+        description: "Deploykey name"  
+      Privatekeypath:
+        type: "string"
+        example: "abc@1dd45%"
+        description: "Deploykey private key path"        
+      Publickeypath:
+        type: "string"
+        example: "abc@1dd45%"
+        description: "Deploykey public key path"
+      UserID:
+        type: "integer"
+        example: 1
+        description: "Deploykey user id"
+      LastUsage:
+        type: "string"
+        example: "12:03:32"
+        description: "last usage deploykey date"
+
 
   TeamMembershipCreateRequest:
     type: "object"
