@@ -78,6 +78,10 @@ function (PaginationService, DatatableService, EndpointProvider) {
     }
   };
 
+  this.onTextFilterChange = function() {
+    DatatableService.setDataTableTextFilters(this.tableKey, this.state.textFilter);
+  };
+
   this.onColumnVisibilityChange = function()  {
     DatatableService.setColumnVisibilitySettings(this.tableKey, this.columnVisibility);
   };
@@ -227,6 +231,11 @@ function (PaginationService, DatatableService, EndpointProvider) {
       this.columnVisibility = storedColumnVisibility;
     }
     this.columnVisibility.state.open = false;
+
+    var textFilter = DatatableService.getDataTableTextFilters(this.tableKey);
+    if (textFilter !== null) {
+      this.state.textFilter = textFilter;
+    }
   };
 
   function setDefaults(ctrl) {

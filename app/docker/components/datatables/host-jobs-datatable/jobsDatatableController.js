@@ -17,6 +17,10 @@ angular.module('portainer.docker')
         }
       };
 
+      this.onTextFilterChange = function() {
+        DatatableService.setDataTableTextFilters(this.tableKey, this.state.textFilter);
+      };
+
       this.changeOrderBy = function (orderField) {
         this.state.reverseOrder = this.state.orderBy === orderField ? !this.state.reverseOrder : false;
         this.state.orderBy = orderField;
@@ -130,6 +134,11 @@ angular.module('portainer.docker')
           this.updateStoredFilters(storedFilters.state.values);
         }
         this.filters.state.open = false;
+
+        var textFilter = DatatableService.getDataTableTextFilters(this.tableKey);
+        if (textFilter !== null) {
+          this.state.textFilter = textFilter;
+        }
       };
 
       function setDefaults(ctrl) {

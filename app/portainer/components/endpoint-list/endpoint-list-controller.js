@@ -1,5 +1,5 @@
-angular.module('portainer.app').controller('EndpointListController', [
-  function EndpointListController() {
+angular.module('portainer.app').controller('EndpointListController', ['DatatableService',
+  function EndpointListController(DatatableService) {
     var ctrl = this;
     ctrl.state = {
       textFilter: '',
@@ -7,7 +7,7 @@ angular.module('portainer.app').controller('EndpointListController', [
     };
 
     ctrl.$onChanges = $onChanges;
-    ctrl.onFilterChanged = onFilterChanged;
+    ctrl.onTextFilterChange = onTextFilterChange;
 
     function $onChanges(changesObj) {
       handleEndpointsChange(changesObj.endpoints);
@@ -21,15 +21,16 @@ angular.module('portainer.app').controller('EndpointListController', [
         return;
       }
 
-      onFilterChanged();
+      onTextFilterChange();
     }
 
-    function onFilterChanged() {
+    function onTextFilterChange() {
       var filterValue = ctrl.state.textFilter;
       ctrl.state.filteredEndpoints = filterEndpoints(
         ctrl.endpoints,
         filterValue
       );
+      DatatableService.setDataTableTextFilters(this.tableKey, this.state.textFilter);
     }
 
     function filterEndpoints(endpoints, filterValue) {
@@ -56,5 +57,13 @@ angular.module('portainer.app').controller('EndpointListController', [
     function convertStatusToString(status) {
       return status === 1 ? 'up' : 'down';
     }
+
+    this.$onInit = function() {
+      var textFilter = DatatableService.getDataTableTextFilters(this.tableKey);
+      if (textFilter !== null) {
+        this.state.textFilter = textFilter;
+        onTextFilterChange();
+      }
+    };
   }
 ]);

@@ -11,6 +11,10 @@ function (PaginationService, DatatableService) {
     selectedItems: []
   };
 
+  this.onTextFilterChange = function() {
+    DatatableService.setDataTableTextFilters(this.tableKey, this.state.textFilter);
+  };
+
   this.changeOrderBy = function(orderField) {
     this.state.reverseOrder = this.state.orderBy === orderField ? !this.state.reverseOrder : false;
     this.state.orderBy = orderField;
@@ -48,6 +52,11 @@ function (PaginationService, DatatableService) {
     if (storedOrder !== null) {
       this.state.reverseOrder = storedOrder.reverse;
       this.state.orderBy = storedOrder.orderBy;
+    }
+
+    var textFilter = DatatableService.getDataTableTextFilters(this.tableKey);
+    if (textFilter !== null) {
+      this.state.textFilter = textFilter;
     }
   };
 

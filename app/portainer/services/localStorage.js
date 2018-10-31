@@ -65,6 +65,12 @@ angular.module('portainer.app')
     storeDataTableOrder: function(key, data) {
       localStorageService.set('datatable_order_' + key, data);
     },
+    getDataTableTextFilters: function(key) {
+      return localStorageService.get('datatable_text_filter_' + key);
+    },
+    storeDataTableTextFilters: function(key, data) {
+      localStorageService.set('datatable_text_filter_' + key, data);
+    },
     getDataTableFilters: function(key) {
       return localStorageService.get('datatable_filters_' + key);
     },

@@ -13,6 +13,14 @@ function DatatableServiceFactory(LocalStorage) {
     return LocalStorage.getDataTableSettings(key);
   };
 
+  service.setDataTableTextFilters = function(key, filters) {
+    LocalStorage.storeDataTableTextFilters(key, filters);
+  };
+
+  service.getDataTableTextFilters = function(key) {
+    return LocalStorage.getDataTableTextFilters(key);
+  };
+
   service.setDataTableFilters = function(key, filters) {
     LocalStorage.storeDataTableFilters(key, filters);
   };
