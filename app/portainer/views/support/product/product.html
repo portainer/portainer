@@ -1,0 +1,73 @@
+<rd-header>
+  <rd-header-title title-text="Support option details"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="portainer.support">Portainer support</a> &gt; {{ product.Name }}
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+
+        <div style="display: flex;">
+
+          <div style="flex-grow: 4;">
+
+            <div class="form-group">
+              <div class="text-muted" style="font-size: 150%;">
+                {{ product.Name }}
+              </div>
+
+              <div class="small text-muted" style="margin-top: 5px;">
+                By <a href="https://portainer.io" href="_blank">Portainer.io</a>
+              </div>
+            </div>
+
+          </div>
+
+          <div style="flex-grow: 1; border-left: 1px solid #777;">
+
+            <div class="form-group" style="margin-left: 40px;">
+
+              <div style="font-size: 125%; border-bottom: 2px solid #2d3e63; padding-bottom: 5px;">
+                {{ product.Price }}
+              </div>
+
+              <div class="small text-muted" style="margin-top: 15px;">
+                {{ product.ShortDescription }}
+              </div>
+
+              <div style="margin-top: 15px;" ng-if="!product.Enabled">
+                <a href="https://2-portainer.pi.bypronto.com/product/portainer-business-support/" target="_blank" class="btn btn-primary btn-sm" style="width: 100%; margin-left: 0;">
+                  Buy
+                </a>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-if="product">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+        <div class="col-sm-12 form-section-title">
+          <span>
+            Description
+          </span>
+        </div>
+        <div class="form-group">
+          <span class="small text-muted">
+            {{ product.Description }}
+          </span>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

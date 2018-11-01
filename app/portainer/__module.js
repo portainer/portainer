@@ -324,7 +324,22 @@ angular.module('portainer.app', [])
     url: '/support',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/support/support.html'
+        templateUrl: 'app/portainer/views/support/support.html',
+        controller: 'SupportController'
+      }
+    },
+    params: {
+      product: {}
+    }
+  };
+
+  var supportProduct = {
+    name: 'portainer.support.product',
+    url: '/product',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/support/product/product.html',
+        controller: 'SupportProductController'
       }
     }
   };
@@ -458,6 +473,7 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(stack);
   $stateRegistryProvider.register(stackCreation);
   $stateRegistryProvider.register(support);
+  $stateRegistryProvider.register(supportProduct);
   $stateRegistryProvider.register(tags);
   $stateRegistryProvider.register(updatePassword);
   $stateRegistryProvider.register(users);

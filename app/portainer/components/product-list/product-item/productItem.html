@@ -1,0 +1,41 @@
+<!-- plugin -->
+<div class="blocklist-item" ng-click="$ctrl.goTo($ctrl.model)">
+  <div class="blocklist-item-box">
+    <!-- plugin-image -->
+    <span class="blocklist-item-logo">
+      <i class="fa fa-bolt fa-4x blue-icon" style="margin-left: 14px;" aria-hidden="true"></i>
+    </span>
+    <!-- !plugin-image -->
+    <!-- plugin-details -->
+    <span class="col-sm-12">
+      <!-- blocklist-item-line1 -->
+      <div class="blocklist-item-line">
+        <span>
+          <span class="blocklist-item-title">
+            {{ $ctrl.model.Name }}
+          </span>
+        </span>
+        <span>
+          <span class="label label-danger" ng-if="$ctrl.model.Enabled && $ctrl.model.Expired">expired</span>
+          <span class="label label-success" ng-if="$ctrl.model.Enabled && !$ctrl.model.Expired">enabled</span>
+          <span class="label label-primary" ng-if="$ctrl.model.Enabled && $ctrl.model.UpdateAvailable && !$ctrl.model.Expired">update available</span>
+        </span>
+      </div>
+      <!-- !blocklist-item-line1 -->
+      <!-- blocklist-item-line2 -->
+      <div class="blocklist-item-line">
+        <span>
+          <span class="blocklist-item-desc">
+            {{ $ctrl.model.ShortDescription }}
+          </span>
+        </span>
+        <span ng-if="$ctrl.model.LicenseCompany">
+          <span class="small text-muted">Licensed to {{ $ctrl.model.LicenseCompany }} - Expires on {{ $ctrl.model.LicenseExpiration }}</span>
+        </span>
+      </div>
+      <!-- !blocklist-item-line2 -->
+    </span>
+    <!-- !plugin-details -->
+  </div>
+  <!-- !plugin -->
+</div>
