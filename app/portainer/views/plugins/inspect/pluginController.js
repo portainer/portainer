@@ -7,6 +7,10 @@ function ($q, $scope, $transition$, $state, PortainerPluginService, Notification
     deleteInProgress: false
   };
 
+  $scope.formValues = {
+    instances: 1
+  };
+
   $scope.updatePlugin = updatePlugin;
   $scope.deletePlugin = deletePlugin;
 
