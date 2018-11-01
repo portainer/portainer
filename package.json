@@ -107,7 +107,8 @@
     "webpack": "^4.20.2",
     "webpack-build-notifier": "^0.1.30",
     "webpack-bundle-analyzer": "^3.0.3",
-    "webpack-cli": "^3.1.2"
+    "webpack-cli": "^3.1.2",
+    "webpack-merge": "^4.1.4"
   },
   "resolutions": {
     "jquery": "^3.3.1"
