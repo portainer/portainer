@@ -23,7 +23,8 @@
     "grunt": "grunt",
     "dev": "yarn grunt run-dev",
     "clean-all": "yarn grunt clean:all",
-    "build": "webpack",
+    "dev:client": "webpack",
+    "build:client": "webpack --config ./webpack/webpack.production.js",
     "build-offline": "cd ./api/cmd/portainer && CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags '-s' && mv -b portainer ../../../dist/portainer-linux-amd64"
   },
   "engines": {
