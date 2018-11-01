@@ -23,21 +23,21 @@ function ($q, $scope, $transition$, $document, $interval, ContainerService, Char
     if (stats.Networks.length > 0) {
       var rx = stats.Networks[0].rx_bytes;
       var tx = stats.Networks[0].tx_bytes;
-      var label = moment(stats.Date).format('HH:mm:ss');
+      var label = moment(stats.read).format('HH:mm:ss');
 
       ChartService.UpdateNetworkChart(label, rx, tx, chart);
     }
   }
 
   function updateMemoryChart(stats, chart) {
-    var label = moment(stats.Date).format('HH:mm:ss');
+    var label = moment(stats.read).format('HH:mm:ss');
 
     ChartService.UpdateMemoryChart(label, stats.MemoryUsage, stats.MemoryCache, chart);
   }
 
   function updateCPUChart(stats, chart) {
-    var label = moment(stats.Date).format('HH:mm:ss');
-    var value = calculateCPUPercentUnix(stats);
+    var label = moment(stats.read).format('HH:mm:ss');
+    var value = stats.isWindows ? calculateCPUPercentWindows(stats) : calculateCPUPercentUnix(stats);
 
     ChartService.UpdateCPUChart(label, value, chart);
   }
@@ -53,6 +53,17 @@ function ($q, $scope, $transition$, $document, $interval, ContainerService, Char
 
     return cpuPercent;
   }
+
+  function calculateCPUPercentWindows(stats) {
+    var possIntervals = stats.NumProcs * parseFloat(
+      moment(stats.read, "YYYY-MM-DDTHH:mm:ss.SSSSSSSSSZ").valueOf() - moment(stats.preread, "YYYY-MM-DDTHH:mm:ss.SSSSSSSSSZ").valueOf());
+    var windowsCpuUsage = 0.0;
+    if(possIntervals > 0) {
+      windowsCpuUsage = parseFloat(stats.CurrentCPUTotalUsage - stats.PreviousCPUTotalUsage) / parseFloat(possIntervals * 100);
+    }
+    return windowsCpuUsage;
+  }
+
 
   $scope.changeUpdateRepeater = function() {
     var networkChart = $scope.networkChart;

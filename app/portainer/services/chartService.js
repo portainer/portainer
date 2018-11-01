@@ -150,11 +150,17 @@ angular.module('portainer.app')
     service.UpdateMemoryChart = function UpdateChart(label, memoryValue, cacheValue, chart) {
       chart.data.labels.push(label);
       chart.data.datasets[0].data.push(memoryValue);
-      chart.data.datasets[1].data.push(cacheValue);
+      
+      if(cacheValue) {
+        chart.data.datasets[1].data.push(cacheValue);
+      } else { // cache values are not available for Windows
+        chart.data.datasets.splice(1, 1);
+      }
 
       if (chart.data.datasets[0].data.length > CHART_LIMIT) {
         chart.data.labels.pop();
         chart.data.datasets[0].data.pop();
+        chart.data.datasets[1].data.pop();
       }
 
       chart.update(0);
