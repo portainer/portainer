@@ -56,7 +56,7 @@ function ($q, $scope, $transition$, $document, $interval, ContainerService, Char
 
   function calculateCPUPercentWindows(stats) {
     var possIntervals = stats.NumProcs * parseFloat(
-      moment(stats.read, "YYYY-MM-DDTHH:mm:ss.SSSSSSSSSZ").valueOf() - moment(stats.preread, "YYYY-MM-DDTHH:mm:ss.SSSSSSSSSZ").valueOf());
+      moment(stats.read, 'YYYY-MM-DDTHH:mm:ss.SSSSSSSSSZ').valueOf() - moment(stats.preread, 'YYYY-MM-DDTHH:mm:ss.SSSSSSSSSZ').valueOf());
     var windowsCpuUsage = 0.0;
     if(possIntervals > 0) {
       windowsCpuUsage = parseFloat(stats.CurrentCPUTotalUsage - stats.PreviousCPUTotalUsage) / parseFloat(possIntervals * 100);
