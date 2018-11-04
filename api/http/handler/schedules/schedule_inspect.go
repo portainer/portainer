@@ -10,15 +10,18 @@ import (
 	"github.com/portainer/libhttp/request"
 )
 
-func (handler *Handler) inspectSchedule(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	id, err := request.RetrieveNumericRouteVariableValue(r, "id")
+func (handler *Handler) scheduleInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	scheduleId, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: id", err}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid schedule identifier route variable", err}
 	}
 
-	schedule, err := handler.scheduleService.Schedule(portainer.ScheduleID(id))
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Schedule not found", err}
+	schedule, err := handler.ScheduleService.Schedule(portainer.ScheduleID(scheduleId))
+	if err == portainer.ErrObjectNotFound {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a schedule with the specified identifier inside the database", err}
+	} else if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a schedule with the specified identifier inside the database", err}
 	}
+
 	return response.JSON(w, schedule)
 }

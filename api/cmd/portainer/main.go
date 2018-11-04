@@ -110,25 +110,64 @@ func initSnapshotter(clientFactory *docker.ClientFactory) portainer.Snapshotter 
 	return docker.NewSnapshotter(clientFactory)
 }
 
-func initJobScheduler(endpointService portainer.EndpointService, snapshotter portainer.Snapshotter, fileService portainer.FileService, jobService portainer.JobService, scheduleService portainer.ScheduleService, flags *portainer.CLIFlags) (portainer.JobScheduler, error) {
-	jobScheduler := cron.NewJobScheduler(endpointService, snapshotter, fileService, jobService, scheduleService)
+func initJobScheduler(endpointService portainer.EndpointService, snapshotter portainer.Snapshotter, flags *portainer.CLIFlags) (portainer.JobScheduler, error) {
+	jobScheduler := cron.NewJobScheduler()
 
 	if *flags.ExternalEndpoints != "" {
 		log.Println("Using external endpoint definition. Endpoint management via the API will be disabled.")
-		err := jobScheduler.ScheduleEndpointSyncJob(*flags.ExternalEndpoints, *flags.SyncInterval)
+
+		endpointSyncTaskContext := &cron.EndpointSyncTaskContext{
+			EndpointService:  endpointService,
+			EndpointFilePath: *flags.ExternalEndpoints,
+		}
+		endpointSyncTask := cron.NewEndpointSyncTask(endpointSyncTaskContext)
+
+		err := jobScheduler.ScheduleTask("@every "+*flags.SyncInterval, endpointSyncTask)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	if *flags.Snapshot {
-		err := jobScheduler.ScheduleSnapshotJob(*flags.SnapshotInterval)
+
+		endpointSnapshotTaskContext := &cron.SnapshotTaskContext{
+			EndpointService: endpointService,
+			Snapshotter:     snapshotter,
+		}
+		endpointSnapshotTask := cron.NewSnapshotTask(endpointSnapshotTaskContext)
+
+		err := jobScheduler.ScheduleTask("@every "+*flags.SnapshotInterval, endpointSnapshotTask)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	return jobScheduler, nil
+}
+
+func loadSchedulesFromDatabase(jobScheduler portainer.JobScheduler, jobService portainer.JobService, scheduleService portainer.ScheduleService, endpointService portainer.EndpointService, fileService portainer.FileService) error {
+	schedules, err := scheduleService.Schedules()
+	if err != nil {
+		return err
+	}
+
+	for _, schedule := range schedules {
+		taskContext := &cron.ScriptTaskContext{
+			JobService:      jobService,
+			EndpointService: endpointService,
+			FileService:     fileService,
+			ScheduleID:      schedule.ID,
+			TargetEndpoints: schedule.Endpoints,
+		}
+
+		schedule.Task.(cron.ScriptTask).SetContext(taskContext)
+		err = jobScheduler.ScheduleTask(schedule.CronExpression, schedule.Task)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func initStatus(endpointManagement, snapshot bool, flags *portainer.CLIFlags) *portainer.Status {
@@ -416,7 +455,12 @@ func main() {
 
 	snapshotter := initSnapshotter(clientFactory)
 
-	jobScheduler, err := initJobScheduler(store.EndpointService, snapshotter, fileService, jobService, store.ScheduleService, flags)
+	jobScheduler, err := initJobScheduler(store.EndpointService, snapshotter, flags)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = loadSchedulesFromDatabase(jobScheduler, jobService, store.ScheduleService, store.EndpointService, fileService)
 	if err != nil {
 		log.Fatal(err)
 	}

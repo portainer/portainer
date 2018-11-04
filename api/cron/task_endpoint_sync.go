@@ -10,9 +10,13 @@ import (
 )
 
 type (
-	endpointSyncJob struct {
-		endpointService  portainer.EndpointService
-		endpointFilePath string
+	endpointSyncTask struct {
+		context *EndpointSyncTaskContext
+	}
+
+	EndpointSyncTaskContext struct {
+		EndpointService  portainer.EndpointService
+		EndpointFilePath string
 	}
 
 	synchronization struct {
@@ -32,21 +36,49 @@ type (
 	}
 )
 
-const (
-	// ErrEmptyEndpointArray is an error raised when the external endpoint source array is empty.
-	ErrEmptyEndpointArray = portainer.Error("External endpoint source is empty")
-)
+func NewEndpointSyncTask(context *EndpointSyncTaskContext) endpointSyncTask {
+	return endpointSyncTask{
+		context: context,
+	}
+}
 
-func newEndpointSyncJob(endpointFilePath string, endpointService portainer.EndpointService) endpointSyncJob {
-	return endpointSyncJob{
-		endpointService:  endpointService,
-		endpointFilePath: endpointFilePath,
+func (task endpointSyncTask) Run() {
+	data, err := ioutil.ReadFile(task.context.EndpointFilePath)
+	if endpointSyncError(err) {
+		return
+	}
+
+	var fileEndpoints []fileEndpoint
+	err = json.Unmarshal(data, &fileEndpoints)
+	if endpointSyncError(err) {
+		return
+	}
+
+	if len(fileEndpoints) == 0 {
+		log.Println("background task error (endpoint synchronization). External endpoint source is empty\n")
+		return
+	}
+
+	storedEndpoints, err := task.context.EndpointService.Endpoints()
+	if endpointSyncError(err) {
+		return
+	}
+
+	convertedFileEndpoints := convertFileEndpoints(fileEndpoints)
+
+	sync := prepareSyncData(storedEndpoints, convertedFileEndpoints)
+	if sync.requireSync() {
+		err = task.context.EndpointService.Synchronize(sync.endpointsToCreate, sync.endpointsToUpdate, sync.endpointsToDelete)
+		if endpointSyncError(err) {
+			return
+		}
+		log.Printf("Endpoint synchronization ended. [created: %v] [updated: %v] [deleted: %v]", len(sync.endpointsToCreate), len(sync.endpointsToUpdate), len(sync.endpointsToDelete))
 	}
 }
 
 func endpointSyncError(err error) bool {
 	if err != nil {
-		log.Printf("cron error: synchronization job error (err=%s)\n", err)
+		log.Printf("background task error (endpoint synchronization). Unable to synchronize endpoints (err=%s)\n", err)
 		return true
 	}
 	return false
@@ -126,8 +158,7 @@ func (sync synchronization) requireSync() bool {
 	return false
 }
 
-// TMP: endpointSyncJob method to access logger, should be generic
-func (job endpointSyncJob) prepareSyncData(storedEndpoints, fileEndpoints []portainer.Endpoint) *synchronization {
+func prepareSyncData(storedEndpoints, fileEndpoints []portainer.Endpoint) *synchronization {
 	endpointsToCreate := make([]*portainer.Endpoint, 0)
 	endpointsToUpdate := make([]*portainer.Endpoint, 0)
 	endpointsToDelete := make([]*portainer.Endpoint, 0)
@@ -163,44 +194,4 @@ func (job endpointSyncJob) prepareSyncData(storedEndpoints, fileEndpoints []port
 		endpointsToUpdate: endpointsToUpdate,
 		endpointsToDelete: endpointsToDelete,
 	}
-}
-
-func (job endpointSyncJob) Sync() error {
-	data, err := ioutil.ReadFile(job.endpointFilePath)
-	if endpointSyncError(err) {
-		return err
-	}
-
-	var fileEndpoints []fileEndpoint
-	err = json.Unmarshal(data, &fileEndpoints)
-	if endpointSyncError(err) {
-		return err
-	}
-
-	if len(fileEndpoints) == 0 {
-		return ErrEmptyEndpointArray
-	}
-
-	storedEndpoints, err := job.endpointService.Endpoints()
-	if endpointSyncError(err) {
-		return err
-	}
-
-	convertedFileEndpoints := convertFileEndpoints(fileEndpoints)
-
-	sync := job.prepareSyncData(storedEndpoints, convertedFileEndpoints)
-	if sync.requireSync() {
-		err = job.endpointService.Synchronize(sync.endpointsToCreate, sync.endpointsToUpdate, sync.endpointsToDelete)
-		if endpointSyncError(err) {
-			return err
-		}
-		log.Printf("Endpoint synchronization ended. [created: %v] [updated: %v] [deleted: %v]", len(sync.endpointsToCreate), len(sync.endpointsToUpdate), len(sync.endpointsToDelete))
-	}
-	return nil
-}
-
-func (job endpointSyncJob) Run() {
-	log.Println("cron: synchronization job started")
-	err := job.Sync()
-	endpointSyncError(err)
 }

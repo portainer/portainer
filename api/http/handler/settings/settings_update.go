@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/cron"
 	"github.com/portainer/portainer/filesystem"
 )
 
@@ -78,7 +79,11 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.SnapshotInterval != nil && *payload.SnapshotInterval != settings.SnapshotInterval {
 		settings.SnapshotInterval = *payload.SnapshotInterval
-		handler.JobScheduler.UpdateSnapshotJob(settings.SnapshotInterval)
+
+		err := handler.JobScheduler.UpdateScheduledTask(0, "@every "+*payload.SnapshotInterval, cron.NewSnapshotTask(nil))
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update task scheduler", err}
+		}
 	}
 
 	tlsError := handler.updateTLS(settings)

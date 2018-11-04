@@ -83,6 +83,7 @@ func (server *Server) Start() error {
 		AuthDisabled:          server.AuthDisabled,
 	}
 	requestBouncer := security.NewRequestBouncer(requestBouncerParameters)
+
 	proxyManagerParameters := &proxy.ManagerParams{
 		ResourceControlService: server.ResourceControlService,
 		TeamMembershipService:  server.TeamMembershipService,
@@ -92,6 +93,7 @@ func (server *Server) Start() error {
 		SignatureService:       server.SignatureService,
 	}
 	proxyManager := proxy.NewManager(proxyManagerParameters)
+
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
 
 	var authHandler = auth.NewHandler(requestBouncer, rateLimiter, server.AuthDisabled)
@@ -131,6 +133,13 @@ func (server *Server) Start() error {
 
 	var resourceControlHandler = resourcecontrols.NewHandler(requestBouncer)
 	resourceControlHandler.ResourceControlService = server.ResourceControlService
+
+	var schedulesHandler = schedules.NewHandler(requestBouncer)
+	schedulesHandler.ScheduleService = server.ScheduleService
+	schedulesHandler.EndpointService = server.EndpointService
+	schedulesHandler.FileService = server.FileService
+	schedulesHandler.JobService = server.JobService
+	schedulesHandler.JobScheduler = server.JobScheduler
 
 	var settingsHandler = settings.NewHandler(requestBouncer)
 	settingsHandler.SettingsService = server.SettingsService
@@ -183,8 +192,6 @@ func (server *Server) Start() error {
 	webhookHandler.WebhookService = server.WebhookService
 	webhookHandler.EndpointService = server.EndpointService
 	webhookHandler.DockerClientFactory = server.DockerClientFactory
-
-	schedulesHandler := schedules.NewHandler(requestBouncer, server.ScheduleService, server.FileService, server.JobScheduler)
 
 	server.Handler = &handler.Handler{
 		AuthHandler:            authHandler,

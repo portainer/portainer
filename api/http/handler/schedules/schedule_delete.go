@@ -9,23 +9,23 @@ import (
 	"github.com/portainer/portainer"
 )
 
-func (handler *Handler) deleteSchedule(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	id, err := request.RetrieveNumericRouteVariableValue(r, "id")
+func (handler *Handler) scheduleDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	scheduleId, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: id", err}
-	}
-	scheduleId := portainer.ScheduleID(id)
-	err = handler.scheduleService.DeleteSchedule(scheduleId)
-
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Failed deleting schedule", err}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid schedule identifier route variable", err}
 	}
 
-	handler.scheduler.UnscheduleScriptJob(scheduleId)
+	handler.JobScheduler.UnscheduleTask(portainer.ScheduleID(scheduleId))
 
-	err = handler.fileService.RemoveDirectory(handler.fileService.GetScheduleProjectPath(scheduleId))
+	scheduleFolder := handler.FileService.GetScheduleFolder(portainer.ScheduleID(scheduleId))
+	err = handler.FileService.RemoveDirectory(scheduleFolder)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Failed deleting schedule file", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the files associated to the schedule on the filesystem", err}
+	}
+
+	err = handler.ScheduleService.DeleteSchedule(portainer.ScheduleID(scheduleId))
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the schedule from the database", err}
 	}
 
 	return response.Empty(w)

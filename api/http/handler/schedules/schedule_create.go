@@ -1,6 +1,7 @@
 package schedules
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -8,36 +9,32 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/cron"
 )
 
 type scheduleFromFilePayload struct {
-	Name      string
-	Endpoints []portainer.EndpointID
-	Schedule  string
-	File      []byte
+	Name           string
+	Endpoints      []portainer.EndpointID
+	Image          string
+	CronExpression string
+	File           []byte
 }
 
 type scheduleFromFileContentPayload struct {
-	Name        string
-	Endpoints   []portainer.EndpointID
-	Schedule    string
-	FileContent string
+	Name           string
+	Endpoints      []portainer.EndpointID
+	CronExpression string
+	Image          string
+	FileContent    string
 }
 
 func (payload *scheduleFromFilePayload) Validate(r *http.Request) error {
-	file, _, err := request.RetrieveMultiPartFormFile(r, "File")
-	if err != nil {
-		return portainer.Error("Invalid Script file. Ensure that the file is uploaded correctly")
-	}
-	payload.File = file
-
 	name, err := request.RetrieveMultiPartFormValue(r, "Name", false)
 	if err != nil {
 		return err
 	}
 	payload.Name = name
 
-	// TODO retrieve array of strings?
 	var endpoints []portainer.EndpointID
 	err = request.RetrieveMultiPartFormJSONValue(r, "Endpoints", &endpoints, false)
 	if err != nil {
@@ -45,11 +42,23 @@ func (payload *scheduleFromFilePayload) Validate(r *http.Request) error {
 	}
 	payload.Endpoints = endpoints
 
-	schedule, err := request.RetrieveMultiPartFormValue(r, "Schedule", false)
+	cronExpression, err := request.RetrieveMultiPartFormValue(r, "Schedule", false)
 	if err != nil {
 		return err
 	}
-	payload.Schedule = schedule
+	payload.CronExpression = cronExpression
+
+	image, err := request.RetrieveMultiPartFormValue(r, "Image", false)
+	if err != nil {
+		return err
+	}
+	payload.Image = image
+
+	file, _, err := request.RetrieveMultiPartFormFile(r, "File")
+	if err != nil {
+		return portainer.Error("Invalid Script file. Ensure that the file is uploaded correctly")
+	}
+	payload.File = file
 
 	return nil
 }
@@ -58,27 +67,23 @@ func (payload *scheduleFromFileContentPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.FileContent) {
 		return portainer.Error("Invalid script file content")
 	}
-
 	if govalidator.IsNull(payload.Name) {
 		return portainer.Error("Invalid schedule name")
 	}
-
 	if payload.Endpoints == nil || len(payload.Endpoints) == 0 {
 		return portainer.Error("Invalid endpoints payload")
 	}
-
-	if govalidator.IsNull(payload.Schedule) {
-		return portainer.Error("Invalid schedule type")
+	if govalidator.IsNull(payload.CronExpression) {
+		return portainer.Error("Invalid cron expression")
 	}
-
 	return nil
 }
 
 // POST /api/schedules?method=file/string
-func (handler *Handler) createScheduleHandler(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) scheduleCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	method, err := request.RetrieveQueryParameter(r, "method", false)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: method", err}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: method. Valid values are: file or string", err}
 	}
 
 	switch method {
@@ -87,7 +92,7 @@ func (handler *Handler) createScheduleHandler(w http.ResponseWriter, r *http.Req
 	case "file":
 		return handler.createScheduleFromFile(w, r)
 	default:
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: method", err}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: method. Valid values are: file or string", errors.New(request.ErrInvalidQueryParameter)}
 	}
 }
 
@@ -98,10 +103,11 @@ func (handler *Handler) createScheduleFromFileContent(w http.ResponseWriter, r *
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	schedule, err := handler.createSchedule(payload.Name, payload.Endpoints, payload.Schedule, []byte(payload.FileContent))
+	schedule, err := handler.createSchedule(payload.Name, payload.Image, payload.CronExpression, payload.Endpoints, []byte(payload.FileContent))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Failed executing job", err}
 	}
+
 	return response.JSON(w, schedule)
 }
 
@@ -112,7 +118,7 @@ func (handler *Handler) createScheduleFromFile(w http.ResponseWriter, r *http.Re
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	schedule, err := handler.createSchedule(payload.Name, payload.Endpoints, payload.Schedule, payload.File)
+	schedule, err := handler.createSchedule(payload.Name, payload.Image, payload.CronExpression, payload.Endpoints, payload.File)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Failed executing job", err}
 	}
@@ -120,26 +126,31 @@ func (handler *Handler) createScheduleFromFile(w http.ResponseWriter, r *http.Re
 	return response.JSON(w, schedule)
 }
 
-func (handler *Handler) createSchedule(name string, endpoints []portainer.EndpointID, interval string, file []byte) (*portainer.Schedule, error) {
+func (handler *Handler) createSchedule(name, image, cronExpression string, endpoints []portainer.EndpointID, file []byte) (*portainer.Schedule, error) {
+	scheduleIdentifier := portainer.ScheduleID(handler.ScheduleService.GetNextIdentifier())
+
+	scriptPath, err := handler.FileService.StoreScheduledJobFileFromBytes(scheduleIdentifier, file)
+	if err != nil {
+		return nil, err
+	}
+
+	taskContext := handler.createTaskExecutionContext(scheduleIdentifier, endpoints)
+	task := cron.NewScriptTask(image, scriptPath, taskContext)
+
+	err = handler.JobScheduler.ScheduleTask(cronExpression, task)
+	if err != nil {
+		return nil, err
+	}
+
 	schedule := &portainer.Schedule{
-		Name:      name,
-		Endpoints: endpoints,
-		Schedule:  interval,
-		ID:        portainer.ScheduleID(handler.scheduleService.GetNextIdentifier()),
+		ID:             scheduleIdentifier,
+		Name:           name,
+		Endpoints:      endpoints,
+		CronExpression: cronExpression,
+		Task:           task,
 	}
 
-	scriptPath, err := handler.fileService.StoreScheduleFileFromBytes(schedule.ID, "script.sh", file)
-	if err != nil {
-		return nil, err
-	}
-	schedule.ScriptPath = scriptPath
-
-	err = handler.scheduleService.CreateSchedule(schedule)
-	if err != nil {
-		return nil, err
-	}
-
-	err = handler.scheduler.ScheduleScriptJob(schedule.ID, interval)
+	err = handler.ScheduleService.CreateSchedule(schedule)
 	if err != nil {
 		return nil, err
 	}

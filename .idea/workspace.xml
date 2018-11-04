@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="2a07e0a5-9048-4673-b188-c9be4a77e1e3" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/api/cron/task_script.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api/docker/job.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/cmd/portainer/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/cmd/portainer/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/cron/job.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/cron/scheduler.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/cron/scheduler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/docker/jobservice.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/filesystem/filesystem.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/filesystem/filesystem.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/schedules/handler.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/http/handler/schedules/handler.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/schedules/schedule_create.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/http/handler/schedules/schedule_create.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/schedules/schedule_delete.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/http/handler/schedules/schedule_delete.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/schedules/schedule_inspect.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/http/handler/schedules/schedule_inspect.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/schedules/schedule_list.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/http/handler/schedules/schedule_list.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/schedules/schedule_update.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/http/handler/schedules/schedule_update.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/http/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/http/server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/portainer.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/portainer.go" afterDir="false" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FUSProjectUsageTrigger">
+    <session id="-761515908">
+      <usages-collector id="statistics.lifecycle.project">
+        <counts>
+          <entry key="project.closed" value="2" />
+          <entry key="project.open.time.1" value="1" />
+          <entry key="project.open.time.5" value="1" />
+          <entry key="project.opened" value="2" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.open">
+        <counts>
+          <entry key="go" value="1" />
+          <entry key="js" value="1" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.open">
+        <counts>
+          <entry key="Go" value="1" />
+          <entry key="JavaScript" value="1" />
+        </counts>
+      </usages-collector>
+    </session>
+  </component>
+  <component name="FileEditorManager">
+    <leaf />
+  </component>
+  <component name="GOROOT" path="/usr/local/go" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER">
+    <gruntfile path="$PROJECT_DIR$/gruntfile.js" />
+  </component>
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER">
+    <package-json value="$PROJECT_DIR$/package.json" />
+  </component>
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="NodeModulesDirectoryManager">
+    <handled-path value="$PROJECT_DIR$/node_modules" />
+  </component>
+  <component name="NodePackageJsonFileManager">
+    <packageJsonPaths>
+      <path value="$PROJECT_DIR$/package.json" />
+    </packageJsonPaths>
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="x" value="260" />
+    <option name="y" value="53" />
+    <option name="width" value="1400" />
+    <option name="height" value="1000" />
+  </component>
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="portainer" type="b2602c69:ProjectViewProjectNode" />
+              <item name="portainer" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="portainer" type="b2602c69:ProjectViewProjectNode" />
+              <item name="portainer" type="462c0819:PsiDirectoryNode" />
+              <item name="api" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="configurable.Global.GOPATH.is.expanded" value="true" />
+    <property name="configurable.Module.GOPATH.is.expanded" value="false" />
+    <property name="configurable.Project.GOPATH.is.expanded" value="true" />
+    <property name="go.gopath.indexing.explicitly.defined" value="true" />
+    <property name="go.sdk.automatically.set" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="$PROJECT_DIR$/node_modules/eslint" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="260" y="53" width="1400" height="1000" extended-state="0" />
+    <layout>
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2533235" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="npm" order="2" side_tool="true" />
+      <window_info id="Grunt " order="3" side_tool="true" />
+      <window_info id="Favorites" order="4" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="Version Control" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Database Changes" order="8" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
+      <window_info anchor="bottom" id="Terminal" order="10" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Database" order="3" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/app/__module.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="15" column="14" lean-forward="true" selection-start-line="15" selection-start-column="14" selection-end-line="15" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/portainer.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="166">
+          <caret line="665" lean-forward="true" selection-start-line="665" selection-end-line="665" />
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>

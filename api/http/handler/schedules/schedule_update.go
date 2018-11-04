@@ -7,50 +7,81 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/cron"
 )
 
-type payload struct {
-	Name      string
-	Endpoints []portainer.EndpointID
-	Schedule  string
+type scheduleUpdatePayload struct {
+	Name           *string
+	CronExpression *string
+	Image          *string
+	Endpoints      []portainer.EndpointID
 }
 
-func (payload *payload) Validate(r *http.Request) error {
+func (payload *scheduleUpdatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-func (handler *Handler) updateSchedule(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	id, err := request.RetrieveNumericRouteVariableValue(r, "id")
+func (handler *Handler) scheduleUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	scheduleId, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid schedule identifier route variable", err}
 	}
 
-	var payload payload
+	var payload scheduleUpdatePayload
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	schedule, err := handler.scheduleService.Schedule(portainer.ScheduleID(id))
+	schedule, err := handler.ScheduleService.Schedule(portainer.ScheduleID(scheduleId))
+	if err == portainer.ErrObjectNotFound {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a schedule with the specified identifier inside the database", err}
+	} else if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a schedule with the specified identifier inside the database", err}
+	}
 
+	updateTaskSchedule := updateSchedule(schedule, &payload)
+	if updateTaskSchedule {
+		taskContext := handler.createTaskExecutionContext(schedule.ID, schedule.Endpoints)
+		schedule.Task.(cron.ScriptTask).SetContext(taskContext)
+
+		err := handler.JobScheduler.UpdateScheduledTask(schedule.ID, schedule.CronExpression, schedule.Task)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update task scheduler", err}
+		}
+	}
+
+	err = handler.ScheduleService.UpdateSchedule(portainer.ScheduleID(scheduleId), schedule)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Can't find schedule", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist schedule changes inside the database", err}
+	}
+
+	return response.JSON(w, schedule)
+}
+
+func updateSchedule(schedule *portainer.Schedule, payload *scheduleUpdatePayload) bool {
+	updateTaskSchedule := false
+
+	if payload.Name != nil {
+		schedule.Name = *payload.Name
 	}
 
 	if payload.Endpoints != nil {
 		schedule.Endpoints = payload.Endpoints
+		updateTaskSchedule = true
 	}
 
-	if payload.Name != "" {
-		schedule.Name = payload.Name
+	if payload.CronExpression != nil {
+		schedule.CronExpression = *payload.CronExpression
+		updateTaskSchedule = true
 	}
 
-	if payload.Schedule != "" {
-		schedule.Schedule = payload.Schedule
-		handler.scheduler.UpdateScriptJob(schedule.ID, schedule.Schedule)
+	if payload.Image != nil {
+		t := schedule.Task.(cron.ScriptTask)
+		t.Image = *payload.Image
+
+		updateTaskSchedule = true
 	}
 
-	handler.scheduleService.UpdateSchedule(portainer.ScheduleID(id), schedule)
-
-	return response.JSON(w, schedule)
+	return updateTaskSchedule
 }
