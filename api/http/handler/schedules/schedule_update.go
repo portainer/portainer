@@ -22,7 +22,7 @@ func (payload *scheduleUpdatePayload) Validate(r *http.Request) error {
 }
 
 func (handler *Handler) scheduleUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	scheduleId, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	scheduleID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid schedule identifier route variable", err}
 	}
@@ -33,7 +33,7 @@ func (handler *Handler) scheduleUpdate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	schedule, err := handler.ScheduleService.Schedule(portainer.ScheduleID(scheduleId))
+	schedule, err := handler.ScheduleService.Schedule(portainer.ScheduleID(scheduleID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a schedule with the specified identifier inside the database", err}
 	} else if err != nil {
@@ -51,7 +51,7 @@ func (handler *Handler) scheduleUpdate(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
-	err = handler.ScheduleService.UpdateSchedule(portainer.ScheduleID(scheduleId), schedule)
+	err = handler.ScheduleService.UpdateSchedule(portainer.ScheduleID(scheduleID), schedule)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist schedule changes inside the database", err}
 	}

@@ -640,9 +640,8 @@ type (
 	// JobScheduler represents a service to run jobs on a periodic basis
 	JobScheduler interface {
 		ScheduleTask(cronExpression string, task Task) error
-		UpdateScheduledTask(scheduleId ScheduleID, cronExpression string, updatedTask Task) error
-		UnscheduleTask(scheduleId ScheduleID)
-
+		UpdateScheduledTask(ID ScheduleID, cronExpression string, updatedTask Task) error
+		UnscheduleTask(ID ScheduleID)
 		Start()
 	}
 

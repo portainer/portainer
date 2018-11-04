@@ -10,10 +10,14 @@ import (
 )
 
 type (
-	endpointSyncTask struct {
+	// EndpointSyncTask represents a task used to synchronize endpoints
+	// based on an external file. It can be scheduled.
+	EndpointSyncTask struct {
 		context *EndpointSyncTaskContext
 	}
 
+	// EndpointSyncTaskContext represents the context required for the execution
+	// of an EndpointSyncTask.
 	EndpointSyncTaskContext struct {
 		EndpointService  portainer.EndpointService
 		EndpointFilePath string
@@ -36,13 +40,16 @@ type (
 	}
 )
 
-func NewEndpointSyncTask(context *EndpointSyncTaskContext) endpointSyncTask {
-	return endpointSyncTask{
+// NewEndpointSyncTask creates a new EndpointSyncTask using the specified
+// context.
+func NewEndpointSyncTask(context *EndpointSyncTaskContext) EndpointSyncTask {
+	return EndpointSyncTask{
 		context: context,
 	}
 }
 
-func (task endpointSyncTask) Run() {
+// Run triggers the execution of the endpoint synchronization process.
+func (task EndpointSyncTask) Run() {
 	data, err := ioutil.ReadFile(task.context.EndpointFilePath)
 	if endpointSyncError(err) {
 		return
@@ -55,7 +62,7 @@ func (task endpointSyncTask) Run() {
 	}
 
 	if len(fileEndpoints) == 0 {
-		log.Println("background task error (endpoint synchronization). External endpoint source is empty\n")
+		log.Println("background task error (endpoint synchronization). External endpoint source is empty")
 		return
 	}
 

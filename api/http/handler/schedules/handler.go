@@ -10,6 +10,7 @@ import (
 	"github.com/portainer/portainer/http/security"
 )
 
+// Handler is the HTTP handler used to handle schedule operations.
 type Handler struct {
 	*mux.Router
 	ScheduleService portainer.ScheduleService
@@ -19,6 +20,7 @@ type Handler struct {
 	JobScheduler    portainer.JobScheduler
 }
 
+// NewHandler creates a handler to manage schedule operations.
 func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{
 		Router: mux.NewRouter(),
