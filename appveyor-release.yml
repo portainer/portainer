@@ -28,7 +28,7 @@ matrix:
       ARCH: s390x
 branches:
   only:
-    - develop
+    - master
 stack: node 9
 artifacts:
   - path: 'portainer-$(PORTAINER_VERSION)-$(IMAGE)-$(ARCH).tar.gz'
@@ -45,7 +45,7 @@ init:
 build_script:
   - sh: yarn grunt release:$IMAGE:$ARCH
   - cmd: yarn grunt release:%IMAGE%:%ARCH%
-  - sh: sudo bash build/release-linux.sh $IMAGE $ARCH $PORTAINER_VERSION $DOCKER_USER $DOCKER_PASS $GITHUB_MANIFEST_URL ''
+  - sh: sudo bash build/release-linux.sh $IMAGE $ARCH $PORTAINER_VERSION $DOCKER_USER $DOCKER_PASS $GITHUB_MANIFEST_URL
   - cmd: powershell -Command "& .\\build\\release-windows.ps1"
 test: off
 deploy:
