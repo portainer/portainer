@@ -5,9 +5,12 @@ DOCKER_PASS="$4"
 APPVEYOR_PULL_REQUEST_NUMBER="$5"
 APPVEYOR_REPO_BRANCH="$6"
 
+echo "PR: $5"
+echo "Branch: $6"
+
 if [ "${APPVEYOR_PULL_REQUEST_NUMBER}" ]; then
   tag="pr${APPVEYOR_PULL_REQUEST_NUMBER}-$IMAGE-$ARCH"
-  manifest="${APPVEYOR_PULL_REQUEST_NUMBER}"
+  manifest="pr${APPVEYOR_PULL_REQUEST_NUMBER}"
 else
   tag="${APPVEYOR_REPO_BRANCH}-$IMAGE-$ARCH"
   manifest="${APPVEYOR_REPO_BRANCH}"
@@ -18,9 +21,9 @@ docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
 docker push "ssbkang/portainer:$tag"
 
 docker -D manifest create "ssbkang/portainer:$manifest" \
-  "ssbkang/portainer:$tag-linux-amd64" \
-  "ssbkang/portainer:$tag-windows-amd64" \
-  "ssbkang/portainer:$tag-windows1709-amd64" \
-  "ssbkang/portainer:$tag-windows1803-amd64"
+  "ssbkang/portainer:$manifest-linux-amd64" \
+  "ssbkang/portainer:$manifest-windows-amd64" \
+  "ssbkang/portainer:$manifest-windows1709-amd64" \
+  "ssbkang/portainer:$manifest-windows1803-amd64"
 
 docker manifest push "ssbkang/portainer:$manifest"
