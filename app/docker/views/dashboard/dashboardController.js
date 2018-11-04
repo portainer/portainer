@@ -6,6 +6,8 @@ function ($scope, $q, ContainerService, ImageService, NetworkService, VolumeServ
     StateManager.dismissInformationPanel(id);
   };
 
+  $scope.offlineMode = false;
+
   function initView() {
     var endpointMode = $scope.applicationState.endpoint.mode;
     var endpointId = EndpointProvider.endpointID();
@@ -29,6 +31,7 @@ function ($scope, $q, ContainerService, ImageService, NetworkService, VolumeServ
       $scope.stackCount = data.stacks.length;
       $scope.info = data.info;
       $scope.endpoint = data.endpoint;
+      $scope.offlineMode = EndpointProvider.offlineMode();
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to load dashboard data');

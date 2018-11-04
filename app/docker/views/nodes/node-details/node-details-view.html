@@ -1,12 +1,15 @@
 <host-overview
+  agent-api-version="$ctrl.state.agentApiVersion"
   is-agent="$ctrl.state.isAgent"
   host-details="$ctrl.hostDetails"
   engine-details="$ctrl.engineDetails"
   disks="$ctrl.disks"
   devices="$ctrl.devices"
-
   refresh-url="docker.nodes.node"
   browse-url="docker.nodes.node.browse"
+  is-job-enabled="$ctrl.state.isAdmin && $ctrl.state.isAgent"
+  job-url="docker.nodes.node.job"
+  jobs="$ctrl.jobs"
 >
   <swarm-node-details-panel
     details="$ctrl.nodeDetails"

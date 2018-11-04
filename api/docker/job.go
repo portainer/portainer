@@ -29,13 +29,13 @@ func NewJobService(dockerClientFactory *ClientFactory) *JobService {
 }
 
 // Execute will execute a script on the endpoint host with the supplied image as a container
-func (service *JobService) Execute(endpoint *portainer.Endpoint, image string, script []byte) error {
+func (service *JobService) Execute(endpoint *portainer.Endpoint, nodeName, image string, script []byte) error {
 	buffer, err := archive.TarFileInBuffer(script, "script.sh", 0700)
 	if err != nil {
 		return err
 	}
 
-	cli, err := service.DockerClientFactory.CreateClient(endpoint)
+	cli, err := service.DockerClientFactory.CreateClient(endpoint, nodeName)
 	if err != nil {
 		return err
 	}
