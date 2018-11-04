@@ -2,8 +2,8 @@ import angular from 'angular';
 import { logsHandler, genericHandler } from "./response/handlers";
 
 angular.module('portainer.docker')
-.factory('Container', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider',
-function ContainerFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
+.factory('Container', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', 'ContainersInterceptor',
+function ContainerFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, ContainersInterceptor) {
   'use strict';
   return $resource(API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/containers/:id/:action', {
     name: '@name',
@@ -12,7 +12,7 @@ function ContainerFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
   {
     query: {
       method: 'GET', params: { all: 0, action: 'json', filters: '@filters' },
-      isArray: true
+      isArray: true, interceptor: ContainersInterceptor, timeout: 10000
     },
     get: {
       method: 'GET', params: { action: 'json' }

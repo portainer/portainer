@@ -1,15 +1,16 @@
 import angular from 'angular';
 
 angular.module('portainer.docker').controller('HostViewController', [
-  '$q', 'SystemService', 'Notifications', 'StateManager', 'AgentService', 'ContainerService', 'Authentication',
-  function HostViewController($q, SystemService, Notifications, StateManager, AgentService, ContainerService, Authentication) {
+  '$q', 'SystemService', 'Notifications', 'StateManager', 'AgentService', 'ContainerService', 'Authentication', 'EndpointProvider',
+  function HostViewController($q, SystemService, Notifications, StateManager, AgentService, ContainerService, Authentication, EndpointProvider) {
     var ctrl = this;
 
     this.$onInit = initView;
 
     ctrl.state = {
       isAgent: false,
-      isAdmin : false
+      isAdmin : false,
+      offlineMode: false
     };
 
     this.engineDetails = {};
@@ -32,6 +33,7 @@ angular.module('portainer.docker').controller('HostViewController', [
       .then(function success(data) {
         ctrl.engineDetails = buildEngineDetails(data);
         ctrl.hostDetails = buildHostDetails(data.info);
+        ctrl.state.offlineMode = EndpointProvider.offlineMode();
         ctrl.jobs = data.jobs;
 
         if (ctrl.state.isAgent && agentApiVersion > 1) {

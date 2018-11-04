@@ -8,7 +8,7 @@
     <dashboard-cluster-agent-info></dashboard-cluster-agent-info>
   </div>
 </div>
-
+<information-panel-offline ng-if="offlineMode"></information-panel-offline>
 <information-panel
   ng-if="!applicationState.UI.dismissedInfoPanels['docker-dashboard-info-01'] && !applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'"
   title-text="Information"

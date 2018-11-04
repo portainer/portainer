@@ -138,11 +138,11 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
     return extensions;
   }
 
-  manager.updateEndpointState = function(name, type, extensions) {
+  manager.updateEndpointState = function(endpoint, extensions) {
     var deferred = $q.defer();
 
-    if (type === 3) {
-      state.endpoint.name = name;
+    if (endpoint.Type === 3) {
+      state.endpoint.name = endpoint.Name;
       state.endpoint.mode = { provider: 'AZURE' };
       LocalStorage.storeEndpointState(state.endpoint);
       deferred.resolve();
@@ -150,23 +150,23 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
     }
 
     $q.all({
-      version: SystemService.version(),
-      info: SystemService.info()
+      version: endpoint.Status === 1 ? SystemService.version() : $q.when(endpoint.Snapshots[0].SnapshotRaw.Version),
+      info: endpoint.Status === 1 ? SystemService.info() : $q.when(endpoint.Snapshots[0].SnapshotRaw.Info)
     })
     .then(function success(data) {
-      var endpointMode = InfoHelper.determineEndpointMode(data.info, type);
+      var endpointMode = InfoHelper.determineEndpointMode(data.info, endpoint.Type);
       var endpointAPIVersion = parseFloat(data.version.ApiVersion);
       state.endpoint.mode = endpointMode;
-      state.endpoint.name = name;
+      state.endpoint.name = endpoint.Name;
       state.endpoint.apiVersion = endpointAPIVersion;
       state.endpoint.extensions = assignExtensions(extensions);
 
-      if (endpointMode.agentProxy) {
+      if (endpointMode.agentProxy && endpoint.Status === 1) {
         return AgentPingService.ping().then(function onPingSuccess(data) {
           state.endpoint.agentApiVersion = data.version;
         });
       }
-      
+
     }).then(function () {
       LocalStorage.storeEndpointState(state.endpoint);
       deferred.resolve();

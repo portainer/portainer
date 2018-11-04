@@ -64,11 +64,8 @@
           <a ng-if="$ctrl.agentProxy && item.Container" ui-sref="docker.containers.container({ id: item.Container.Id, nodeName: item.Container.NodeName })" class="monospaced">{{ item.Id }}Doz</a>
         </td>
         <td>
-          <div class="btn-group btn-group-xs" role="group" aria-label="..." >
-            <a style="margin: 0 2.5px;" ui-sref="docker.containers.container.logs({ id: item.Container.Id, nodeName: item.Container.NodeName })" title="Logs" ng-if="$ctrl.agentProxy && item.Container.Id"><i class="fa fa-file-alt space-right" aria-hidden="true"></i></a>
-            <a style="margin: 0 2.5px;" ui-sref="docker.tasks.task.logs({ id: item.Id })" title="Logs" ng-if="!$ctrl.agentProxy && $ctrl.showTaskLogsButton && item.Status.State|taskhaslogs"><i class="fa fa-file-alt space-right" aria-hidden="true"></i></a>
-            <a style="margin: 0 2.5px;" ui-sref="docker.containers.container.console({ id: item.Container.Id, nodeName: item.Container.NodeName })" title="Console" ng-if="$ctrl.agentProxy && item.Status.State === 'running'"><i class="fa fa-terminal space-right" aria-hidden="true"></i></a>
-          </div>
+          <container-quick-actions ng-if="!$ctrl.agentProxy || !item.Container" container-id="item.ContainerId" task-id="item.Id" status="item.Status.State" state="$ctrl.state"></container-quick-actions>
+          <container-quick-actions ng-if="$ctrl.agentProxy && item.Container" container-id="item.Container.Id" node-name="item.Container.NodeName" status="item.Status.State" state="$ctrl.state"></container-quick-actions>
         </td>
         <td>{{ item.Slot ? item.Slot : '-' }}</td>
         <td>{{ item.NodeId | tasknodename: $ctrl.nodes }}</td>

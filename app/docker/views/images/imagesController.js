@@ -2,8 +2,8 @@ import angular from 'angular';
 import _ from 'lodash';
 
 angular.module('portainer.docker')
-.controller('ImagesController', ['$scope', '$state', 'ImageService', 'Notifications', 'ModalService', 'HttpRequestHelper', 'FileSaver', 'Blob',
-function ($scope, $state, ImageService, Notifications, ModalService, HttpRequestHelper, FileSaver, Blob) {
+.controller('ImagesController', ['$scope', '$state', 'ImageService', 'Notifications', 'ModalService', 'HttpRequestHelper', 'FileSaver', 'Blob', 'EndpointProvider',
+function ($scope, $state, ImageService, Notifications, ModalService, HttpRequestHelper, FileSaver, Blob, EndpointProvider) {
   $scope.state = {
     actionInProgress: false,
     exportInProgress: false
@@ -116,10 +116,13 @@ function ($scope, $state, ImageService, Notifications, ModalService, HttpRequest
     });
   };
 
+  $scope.offlineMode = false;
+
   function initView() {
     ImageService.images(true)
     .then(function success(data) {
       $scope.images = data;
+      $scope.offlineMode = EndpointProvider.offlineMode();
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve images');

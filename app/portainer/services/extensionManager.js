@@ -7,8 +7,13 @@ function ExtensionManagerFactory($q, PluginService, SystemService, ExtensionServ
   'use strict';
   var service = {};
 
-  service.initEndpointExtensions = function() {
+  service.initEndpointExtensions = function(endpoint) {
     var deferred = $q.defer();
+
+    if (endpoint.Status !== 1) {
+      deferred.resolve([]);
+      return deferred.promise;
+    }
 
     SystemService.version()
     .then(function success(data) {

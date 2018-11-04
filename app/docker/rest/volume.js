@@ -2,14 +2,15 @@ import angular from 'angular';
 import { genericHandler } from './response/handlers';
 
 angular.module('portainer.docker')
-.factory('Volume', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', function VolumeFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
+.factory('Volume', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', 'VolumesInterceptor',
+  function VolumeFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, VolumesInterceptor) {
   'use strict';
   return $resource(API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/volumes/:id/:action',
   {
     endpointId: EndpointProvider.endpointID
   },
   {
-    query: { method: 'GET' },
+    query: { method: 'GET', interceptor: VolumesInterceptor, timeout: 10000},
     get: { method: 'GET', params: {id: '@id'} },
     create: {method: 'POST', params: {action: 'create'}, transformResponse: genericHandler, ignoreLoadingBar: true},
     remove: {

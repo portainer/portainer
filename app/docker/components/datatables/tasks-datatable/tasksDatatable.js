@@ -2,7 +2,7 @@ import angular from 'angular';
 
 angular.module('portainer.docker').component('tasksDatatable', {
   templateUrl: './tasksDatatable.html',
-  controller: 'GenericDatatableController',
+  controller: 'TasksDatatableController',
   bindings: {
     titleText: '@',
     titleIcon: '@',

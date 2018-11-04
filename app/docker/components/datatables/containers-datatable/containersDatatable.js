@@ -12,6 +12,7 @@ angular.module('portainer.docker').component('containersDatatable', {
     reverseOrder: '<',
     showOwnershipColumn: '<',
     showHostColumn: '<',
-    showAddAction: '<'
+    showAddAction: '<',
+    offlineMode: '<'
   }
 });

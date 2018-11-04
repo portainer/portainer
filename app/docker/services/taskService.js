@@ -39,7 +39,7 @@ function TaskServiceFactory($q, Task, LogHelper) {
     return deferred.promise;
   };
 
-  service.logs = function(id, stdout, stderr, timestamps, tail) {
+  service.logs = function(id, stdout, stderr, timestamps, since, tail) {
     var deferred = $q.defer();
 
     var parameters = {
@@ -47,6 +47,7 @@ function TaskServiceFactory($q, Task, LogHelper) {
       stdout: stdout || 0,
       stderr: stderr || 0,
       timestamps: timestamps || 0,
+      since: since || 0,
       tail: tail || 'all'
     };
 

@@ -1,38 +1,39 @@
 import angular from 'angular';
 
 angular.module('portainer.app')
-.controller('SidebarController', ['$q', '$scope', 'StateManager', 'Notifications', 'Authentication', 'UserService',
-function ($q, $scope, StateManager, Notifications, Authentication, UserService) {
+  .controller('SidebarController', ['$q', '$scope', 'StateManager', 'Notifications', 'Authentication', 'UserService',
+    function ($q, $scope, StateManager, Notifications, Authentication, UserService) {
 
-  function checkPermissions(memberships) {
-    var isLeader = false;
-    angular.forEach(memberships, function(membership) {
-      if (membership.Role === 1) {
-        isLeader = true;
+      function checkPermissions(memberships) {
+        var isLeader = false;
+        angular.forEach(memberships, function (membership) {
+          if (membership.Role === 1) {
+            isLeader = true;
+          }
+        });
+        $scope.isTeamLeader = isLeader;
       }
-    });
-    $scope.isTeamLeader = isLeader;
-  }
 
-  function initView() {
-    $scope.uiVersion = StateManager.getState().application.version;
-    $scope.logo = StateManager.getState().application.logo;
+      function initView() {
+        $scope.uiVersion = StateManager.getState().application.version;
+        $scope.logo = StateManager.getState().application.logo;
 
-    var authenticationEnabled = $scope.applicationState.application.authentication;
-    if (authenticationEnabled) {
-      var userDetails = Authentication.getUserDetails();
-      var isAdmin = userDetails.role === 1;
-      $scope.isAdmin = isAdmin;
+        var authenticationEnabled = $scope.applicationState.application.authentication;
+        if (authenticationEnabled) {
+          var userDetails = Authentication.getUserDetails();
+          var isAdmin = userDetails.role === 1;
+          $scope.isAdmin = isAdmin;
 
-      $q.when(!isAdmin ? UserService.userMemberships(userDetails.ID) : [])
-      .then(function success(data) {
-        checkPermissions(data);
-      })
-      .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to retrieve user memberships');
-      });
+          $q.when(!isAdmin ? UserService.userMemberships(userDetails.ID) : [])
+            .then(function success(data) {
+              checkPermissions(data);
+            })
+            .catch(function error(err) {
+              Notifications.error('Failure', err, 'Unable to retrieve user memberships');
+            });
+        }
+      }
+
+      initView();
     }
-  }
-
-  initView();
-}]);
+  ]);

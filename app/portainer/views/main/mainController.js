@@ -1,8 +1,8 @@
 import angular from 'angular';
 
 angular.module('portainer.app')
-.controller('MainController', ['$scope', '$cookieStore', 'StateManager',
-function ($scope, $cookieStore, StateManager) {
+.controller('MainController', ['$scope', '$cookieStore', 'StateManager', 'EndpointProvider',
+function ($scope, $cookieStore, StateManager, EndpointProvider) {
 
   /**
   * Sidebar Toggle & Cookie Control
@@ -13,6 +13,7 @@ function ($scope, $cookieStore, StateManager) {
   };
 
   $scope.applicationState = StateManager.getState();
+  $scope.endpointState = EndpointProvider.endpoint();
 
   $scope.$watch($scope.getWidth, function(newValue) {
     if (newValue >= mobileView) {

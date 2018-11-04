@@ -5,7 +5,8 @@ angular.module('portainer.docker')
 function ($scope, $transition$, $interval, TaskService, ServiceService, Notifications) {
   $scope.state = {
     refreshRate: 3,
-    lineCount: 2000,
+    lineCount: 100,
+    sinceTimestamp: '',
     displayTimestamps: false
   };
 
@@ -32,7 +33,7 @@ function ($scope, $transition$, $interval, TaskService, ServiceService, Notifica
   function setUpdateRepeater() {
     var refreshRate = $scope.state.refreshRate;
     $scope.repeater = $interval(function() {
-      TaskService.logs($transition$.params().id, 1, 1, $scope.state.displayTimestamps ? 1 : 0, $scope.state.lineCount)
+      TaskService.logs($transition$.params().id, 1, 1, $scope.state.displayTimestamps ? 1 : 0, moment($scope.state.sinceTimestamp).unix(), $scope.state.lineCount)
       .then(function success(data) {
         $scope.logs = data;
       })
@@ -44,7 +45,7 @@ function ($scope, $transition$, $interval, TaskService, ServiceService, Notifica
   }
 
   function startLogPolling() {
-    TaskService.logs($transition$.params().id, 1, 1, $scope.state.displayTimestamps ? 1 : 0, $scope.state.lineCount)
+    TaskService.logs($transition$.params().id, 1, 1, $scope.state.displayTimestamps ? 1 : 0, moment($scope.state.sinceTimestamp).unix(), $scope.state.lineCount)
     .then(function success(data) {
       $scope.logs = data;
       setUpdateRepeater();
