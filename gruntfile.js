@@ -271,7 +271,7 @@ function shell_buildBinary(p, a) {
 function shell_run(arch) {
   return [
     'docker rm -f portainer',
-    'docker run -d -p 9000:9000 -v $(pwd)/dist:/app -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer portainer/base /app/portainer-linux-' + arch + ' --no-analytics --template-file /app/templates.json'
+    'docker run -d -p 9002:9000 -v $(pwd)/dist:/app -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer-mockup2 portainer/base /app/portainer-linux-' + arch + ' --no-analytics --template-file /app/templates.json'
   ].join(';');
 }
 
