@@ -46,7 +46,7 @@ func (task ScriptTask) Run() {
 			return
 		}
 
-		err = task.context.JobService.Execute(endpoint, task.Image, scriptFile)
+		err = task.context.JobService.Execute(endpoint, "", task.Image, scriptFile)
 		if err != nil {
 			log.Printf("scheduled task error (script execution). Unable to execute scrtip (endpoint=%s) (err=%s)\n", endpoint.Name, err)
 		}
