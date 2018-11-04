@@ -5,6 +5,8 @@ DOCKER_PASS="$4"
 APPVEYOR_PULL_REQUEST_NUMBER="$5"
 APPVEYOR_REPO_BRANCH="$6"
 
+env
+
 echo "PR: $5"
 echo "Branch: $6"
 

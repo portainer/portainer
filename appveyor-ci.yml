@@ -18,7 +18,7 @@ install:
   - yarn install
   - npm install -g rebase-docker-image
 init:
-  - sh: export IMAGE=linux; echo $APPVEYOR_PULL_REQUEST_NUMBER; echo $APPVEYOR_REPO_BRANCH
+  - sh: export IMAGE=linux
   - cmd: SET IMAGE=windows
   - ps: >-
       if (!(Test-Path ~/.docker)) { mkdir ~/.docker };
