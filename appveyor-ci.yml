@@ -1,6 +1,6 @@
 version: 1.0.{build}
-image:
-  #- Visual Studio 2017
+image: 
+  #- Visual Studio 2017 $APPVEYOR_REPO_BRANCH $APPVEYOR_PULL_REQUEST_NUMBER
   - Ubuntu
 environment:
   matrix:
@@ -18,7 +18,7 @@ install:
   - yarn install
   - npm install -g rebase-docker-image
 init:
-  - sh: export IMAGE=linux; echo $APPVEYOR_REPO_BRANCH; echo $APPVEYOR_PULL_REQUEST_NUMBER
+  - sh: export IMAGE=linux
   - cmd: SET IMAGE=windows
   - ps: >-
       if (!(Test-Path ~/.docker)) { mkdir ~/.docker };
@@ -26,5 +26,5 @@ init:
 build_script:
   - sh: yarn grunt release:$IMAGE:$ARCH
   - cmd: yarn grunt release:%IMAGE%:%ARCH%
-  - sh: sudo bash build/ci-linux.sh $IMAGE $ARCH $DOCKER_USER $DOCKER_PASS $APPVEYOR_REPO_BRANCH $APPVEYOR_PULL_REQUEST_NUMBER
+  - sh: sudo bash build/ci-linux.sh $IMAGE $ARCH $DOCKER_USER $DOCKER_PASS ' ' $APPVEYOR_REPO_BRANCH
   - cmd: powershell -Command "& .\\build\\ci-windows.ps1"
