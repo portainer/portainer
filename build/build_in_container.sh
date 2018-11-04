@@ -1,9 +1,11 @@
+export GOPATH="$APPVEYOR_BUILD_FOLDER/api"
 binary="portainer"
 
 mkdir -p dist
+mkdir -p api/src/github.com/portainer/portainer
 
-echo $APPVEYOR_BUILD_FOLDER
-export GOPATH="$APPVEYOR_BUILD_FOLDER/api"
+echo $GOPATH
+cp -R api/* api/src/github.com/portainer/portainer/
 
 cd 'api/cmd/portainer'
 
@@ -14,4 +16,4 @@ GOOS=$1 GOARCH=$2 CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags '-s'
 
 mv "api/cmd/portainer/$binary" dist/portainer
 
-#sha256sum "dist/$binary" > portainer-checksum.txt
+sha256sum "dist/$binary" > portainer-checksum.txt
