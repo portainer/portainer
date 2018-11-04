@@ -1,6 +1,6 @@
 version: 1.0.{build}
 image: 
-  #- Visual Studio 2017 $APPVEYOR_REPO_BRANCH $APPVEYOR_PULL_REQUEST_NUMBER
+  - Visual Studio 2017 $APPVEYOR_REPO_BRANCH $APPVEYOR_PULL_REQUEST_NUMBER
   - Ubuntu
 environment:
   matrix:
