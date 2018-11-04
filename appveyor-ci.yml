@@ -13,7 +13,9 @@ environment:
 branches:
   only:
     - develop
-stack: node 9
+stack: 
+  - node 9
+  - go 1.10
 install:
   - yarn install
   - npm install -g rebase-docker-image
