@@ -2,6 +2,9 @@ binary="portainer"
 
 mkdir -p dist
 
+echo $APPVEYOR_BUILD_FOLDER
+export GOPATH="$APPVEYOR_BUILD_FOLDER/api"
+
 cd 'api/cmd/portainer'
 
 go get -t -d -v ./...
