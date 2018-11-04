@@ -13,7 +13,7 @@ type SnapshotTaskContext struct {
 	Snapshotter     portainer.Snapshotter
 }
 
-// ScriptTask represents a task used to create endpoint snapshots.
+// SnapshotTask represents a task used to create endpoint snapshots.
 // It can be scheduled.
 type SnapshotTask struct {
 	context *SnapshotTaskContext
