@@ -1,4 +1,5 @@
 import angular from 'angular';
+import _ from 'lodash';
 
 angular.module('portainer.app')
 .factory('EndpointProvider', ['LocalStorage', function EndpointProviderFactory(LocalStorage) {
