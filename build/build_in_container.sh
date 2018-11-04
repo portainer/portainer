@@ -2,10 +2,10 @@ export GOPATH="$APPVEYOR_BUILD_FOLDER/api"
 binary="portainer"
 
 mkdir -p dist
-mkdir -p api/src/github.com/portainer/portainer
+mkdir -p api/src/github.com/portainer/
 
 echo $GOPATH
-cp -R api/* api/src/github.com/portainer/portainer/
+cp -R api/ api/src/github.com/portainer/portainer/
 
 cd 'api/cmd/portainer'
 
