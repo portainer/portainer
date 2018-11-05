@@ -1,77 +1,93 @@
 package cron
 
 import (
-	"log"
-
 	"github.com/portainer/portainer"
 	"github.com/robfig/cron"
 )
 
 // JobScheduler represents a service for managing crons.
 type JobScheduler struct {
-	cron            *cron.Cron
-	endpointService portainer.EndpointService
-	snapshotter     portainer.Snapshotter
-
-	endpointFilePath     string
-	endpointSyncInterval string
+	cron *cron.Cron
 }
 
 // NewJobScheduler initializes a new service.
-func NewJobScheduler(endpointService portainer.EndpointService, snapshotter portainer.Snapshotter) *JobScheduler {
+func NewJobScheduler() *JobScheduler {
 	return &JobScheduler{
-		cron:            cron.New(),
-		endpointService: endpointService,
-		snapshotter:     snapshotter,
+		cron: cron.New(),
 	}
 }
 
-// ScheduleEndpointSyncJob schedules a cron job to synchronize the endpoints from a file
-func (scheduler *JobScheduler) ScheduleEndpointSyncJob(endpointFilePath string, interval string) error {
-
-	scheduler.endpointFilePath = endpointFilePath
-	scheduler.endpointSyncInterval = interval
-
-	job := newEndpointSyncJob(endpointFilePath, scheduler.endpointService)
-
-	err := job.Sync()
-	if err != nil {
-		return err
-	}
-
-	return scheduler.cron.AddJob("@every "+interval, job)
-}
-
-// ScheduleSnapshotJob schedules a cron job to create endpoint snapshots
-func (scheduler *JobScheduler) ScheduleSnapshotJob(interval string) error {
-	job := newEndpointSnapshotJob(scheduler.endpointService, scheduler.snapshotter)
-	go job.Snapshot()
-
-	return scheduler.cron.AddJob("@every "+interval, job)
-}
-
-// UpdateSnapshotJob will update the schedules to match the new snapshot interval
-func (scheduler *JobScheduler) UpdateSnapshotJob(interval string) {
-	// TODO: the cron library do not support removing/updating schedules.
-	// As a work-around we need to re-create the cron and reschedule the jobs.
-	// We should update the library.
+// UpdateScheduledTask updates a specific scheduled task by re-creating a new cron
+// and adding all the existing jobs. It will then re-schedule the new task
+// based on the updatedTask parameter.
+// NOTE: the cron library do not support updating schedules directly
+// hence the work-around.
+func (scheduler *JobScheduler) UpdateScheduledTask(scheduleID portainer.ScheduleID, cronExpression string, updatedTask portainer.Task) error {
 	jobs := scheduler.cron.Entries()
-	scheduler.cron.Stop()
-
-	scheduler.cron = cron.New()
+	newCron := cron.New()
 
 	for _, job := range jobs {
-		switch job.Job.(type) {
-		case endpointSnapshotJob:
-			scheduler.ScheduleSnapshotJob(interval)
-		case endpointSyncJob:
-			scheduler.ScheduleEndpointSyncJob(scheduler.endpointFilePath, scheduler.endpointSyncInterval)
-		default:
-			log.Println("Unsupported job")
+
+		switch task := job.Job.(type) {
+		case ScriptTask:
+			if task.context.ScheduleID == scheduleID {
+				err := newCron.AddJob(cronExpression, updatedTask)
+				if err != nil {
+					return err
+				}
+
+				continue
+			}
+		case SnapshotTask:
+			_, ok := updatedTask.(SnapshotTask)
+			if ok {
+				err := newCron.AddJob(cronExpression, job.Job)
+				if err != nil {
+					return err
+				}
+
+				continue
+			}
 		}
+
+		newCron.Schedule(job.Schedule, job.Job)
 	}
 
+	scheduler.cron.Stop()
+	scheduler.cron = newCron
 	scheduler.cron.Start()
+	return nil
+}
+
+// UnscheduleTask remove a schedule by re-creating a new cron
+// and adding all the existing jobs except for the one specified via scheduleID.
+// NOTE: the cron library do not support removing schedules directly
+// hence the work-around.
+func (scheduler *JobScheduler) UnscheduleTask(scheduleID portainer.ScheduleID) {
+	jobs := scheduler.cron.Entries()
+
+	newCron := cron.New()
+
+	for _, job := range jobs {
+
+		switch task := job.Job.(type) {
+		case ScriptTask:
+			if task.context.ScheduleID == scheduleID {
+				continue
+			}
+		}
+
+		newCron.Schedule(job.Schedule, job.Job)
+	}
+
+	scheduler.cron.Stop()
+	scheduler.cron = newCron
+	scheduler.cron.Start()
+}
+
+// ScheduleTask adds a new task to be scheduled in the cron.
+func (scheduler *JobScheduler) ScheduleTask(cronExpression string, task portainer.Task) error {
+	return scheduler.cron.AddJob(cronExpression, task)
 }
 
 // Start starts the scheduled jobs
