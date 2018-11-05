@@ -27,7 +27,7 @@ matrix:
 branches:
   only:
     - develop
-stack: node 9
+stack: node 9, go 1.10
 artifacts:
   - path: 'portainer-$(PORTAINER_VERSION)-$(IMAGE)-$(ARCH).tar.gz'
     type: file
