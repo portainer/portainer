@@ -220,7 +220,19 @@ type (
 		TLSKeyPath    string `json:"TLSKey,omitempty"`
 	}
 
-	// WebhookID represents an webhook identifier.
+	// ScheduleID represents a schedule identifier.
+	ScheduleID int
+
+	// Schedule represents a task that is scheduled on one or multiple endpoints.
+	Schedule struct {
+		ID             ScheduleID   `json:"Id"`
+		Name           string       `json:"Name"`
+		Endpoints      []EndpointID `json:"Endpoints"`
+		CronExpression string       `json:"Schedule"`
+		Task           Task         `json:"Task"`
+	}
+
+	// WebhookID represents a webhook identifier.
 	WebhookID int
 
 	// WebhookType represents the type of resource a webhook is related to
@@ -552,6 +564,16 @@ type (
 		DeleteResourceControl(ID ResourceControlID) error
 	}
 
+	// ScheduleService represents a service for managing schedule data
+	ScheduleService interface {
+		Schedule(ID ScheduleID) (*Schedule, error)
+		Schedules() ([]Schedule, error)
+		CreateSchedule(schedule *Schedule) error
+		UpdateSchedule(ID ScheduleID, schedule *Schedule) error
+		DeleteSchedule(ID ScheduleID) error
+		GetNextIdentifier() int
+	}
+
 	// TagService represents a service for managing tag data
 	TagService interface {
 		Tags() ([]Tag, error)
@@ -605,6 +627,8 @@ type (
 		LoadKeyPair() ([]byte, []byte, error)
 		WriteJSONToFile(path string, content interface{}) error
 		FileExists(path string) (bool, error)
+		StoreScheduledJobFileFromBytes(scheduleIdentifier ScheduleID, data []byte) (string, error)
+		GetScheduleFolder(scheduleIdentifier ScheduleID) string
 	}
 
 	// GitService represents a service for managing Git
@@ -615,10 +639,15 @@ type (
 
 	// JobScheduler represents a service to run jobs on a periodic basis
 	JobScheduler interface {
-		ScheduleEndpointSyncJob(endpointFilePath, interval string) error
-		ScheduleSnapshotJob(interval string) error
-		UpdateSnapshotJob(interval string)
+		ScheduleTask(cronExpression string, task Task) error
+		UpdateScheduledTask(ID ScheduleID, cronExpression string, updatedTask Task) error
+		UnscheduleTask(ID ScheduleID)
 		Start()
+	}
+
+	// Task represents a process that can be scheduled
+	Task interface {
+		Run()
 	}
 
 	// Snapshotter represents a service used to create endpoint snapshots
