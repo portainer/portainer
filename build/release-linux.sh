@@ -2,8 +2,7 @@ IMAGE="$1"
 ARCH="$2"	
 PORTAINER_VERSION="$3"	
 DOCKER_USER="$4"	
-DOCKER_PASS="$5"	
-GITHUB_MANIFEST_URL="$6"
+DOCKER_PASS="$5"
 
 mkdir -pv portainer
 cp -r dist/* portainer

@@ -13,4 +13,4 @@ GOOS=$1 GOARCH=$2 CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags '-s'
 
 mv "$APPVEYOR_BUILD_FOLDER/api/cmd/portainer/$binary" "$APPVEYOR_BUILD_FOLDER/dist/portainer"
 
-sha256sum "$APPVEYOR_BUILD_FOLDER/dist/$binary" > portainer-checksum.txt
+#sha256sum "$APPVEYOR_BUILD_FOLDER/dist/$binary" > portainer-checksum.txt
