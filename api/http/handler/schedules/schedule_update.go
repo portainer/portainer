@@ -12,8 +12,8 @@ import (
 
 type scheduleUpdatePayload struct {
 	Name           *string
-	CronExpression *string
 	Image          *string
+	CronExpression *string
 	Endpoints      []portainer.EndpointID
 }
 

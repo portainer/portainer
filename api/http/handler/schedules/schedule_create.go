@@ -14,17 +14,17 @@ import (
 
 type scheduleFromFilePayload struct {
 	Name           string
-	Endpoints      []portainer.EndpointID
 	Image          string
 	CronExpression string
+	Endpoints      []portainer.EndpointID
 	File           []byte
 }
 
 type scheduleFromFileContentPayload struct {
 	Name           string
-	Endpoints      []portainer.EndpointID
 	CronExpression string
 	Image          string
+	Endpoints      []portainer.EndpointID
 	FileContent    string
 }
 
@@ -35,12 +35,11 @@ func (payload *scheduleFromFilePayload) Validate(r *http.Request) error {
 	}
 	payload.Name = name
 
-	var endpoints []portainer.EndpointID
-	err = request.RetrieveMultiPartFormJSONValue(r, "Endpoints", &endpoints, false)
+	image, err := request.RetrieveMultiPartFormValue(r, "Image", false)
 	if err != nil {
 		return err
 	}
-	payload.Endpoints = endpoints
+	payload.Image = image
 
 	cronExpression, err := request.RetrieveMultiPartFormValue(r, "Schedule", false)
 	if err != nil {
@@ -48,11 +47,12 @@ func (payload *scheduleFromFilePayload) Validate(r *http.Request) error {
 	}
 	payload.CronExpression = cronExpression
 
-	image, err := request.RetrieveMultiPartFormValue(r, "Image", false)
+	var endpoints []portainer.EndpointID
+	err = request.RetrieveMultiPartFormJSONValue(r, "Endpoints", &endpoints, false)
 	if err != nil {
 		return err
 	}
-	payload.Image = image
+	payload.Endpoints = endpoints
 
 	file, _, err := request.RetrieveMultiPartFormFile(r, "File")
 	if err != nil {
@@ -64,18 +64,26 @@ func (payload *scheduleFromFilePayload) Validate(r *http.Request) error {
 }
 
 func (payload *scheduleFromFileContentPayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.FileContent) {
-		return portainer.Error("Invalid script file content")
-	}
 	if govalidator.IsNull(payload.Name) {
 		return portainer.Error("Invalid schedule name")
 	}
-	if payload.Endpoints == nil || len(payload.Endpoints) == 0 {
-		return portainer.Error("Invalid endpoints payload")
+
+	if govalidator.IsNull(payload.Image) {
+		return portainer.Error("Invalid schedule image")
 	}
+
 	if govalidator.IsNull(payload.CronExpression) {
 		return portainer.Error("Invalid cron expression")
 	}
+
+	if payload.Endpoints == nil || len(payload.Endpoints) == 0 {
+		return portainer.Error("Invalid endpoints payload")
+	}
+
+	if govalidator.IsNull(payload.FileContent) {
+		return portainer.Error("Invalid script file content")
+	}
+
 	return nil
 }
 
