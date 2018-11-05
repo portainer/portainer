@@ -7,6 +7,9 @@ DOCKER_PASS="$5"
 mkdir -pv portainer
 cp -r dist/* portainer
 tar cvpfz "portainer-$PORTAINER_VERSION-$IMAGE-$ARCH.tar.gz" portainer
+
+#sha256sum "$APPVEYOR_BUILD_FOLDER/dist/$binary" > portainer-checksum.txt
+
 tag="$IMAGE-$ARCH"
 
 docker build -t "ssbkang/portainer:$IMAGE-$ARCH-$PORTAINER_VERSION" -f build/linux/Dockerfile .

@@ -22,5 +22,3 @@ C:\go\bin\go.exe get -t -d -v ./...
 C:\go\bin\go.exe build -v
 
 Move-Item -Path "$project_path\api\cmd\portainer\$($binary)" -Destination "dist"
-
-#(Get-FileHash "$project_path\dist\$($binary)").Hash > portainer-checksum.txt
