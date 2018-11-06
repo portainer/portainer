@@ -1,0 +1,27 @@
+<rd-header>
+  <rd-header-title title-text="Schedule details">
+    <a data-toggle="tooltip" title-text="Refresh" ui-sref="portainer.schedules.schedule({id: schedule.Id})" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>
+    <a ui-sref="portainer.schedules">Schedules</a> &gt; {{ ::schedule.Name }}</a>
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+        <schedule-form
+          model="schedule"
+          endpoints="endpoints"
+          groups="groups"
+          form-action="update"
+          form-action-label="Update schedule"
+          action-in-progress="state.actionInProgress"
+        ></schedule-form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

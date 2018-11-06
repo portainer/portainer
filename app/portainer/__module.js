@@ -242,6 +242,39 @@ angular.module('portainer.app', [])
     }
   };
 
+  var schedules = {
+    name: 'portainer.schedules',
+    url: '/schedules',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/schedules/schedules.html',
+        controller: 'SchedulesController'
+      }
+    }
+  };
+
+  var schedule = {
+    name: 'portainer.schedules.schedule',
+    url: '/:id',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/schedules/edit/schedule.html',
+        controller: 'ScheduleController'
+      }
+    }
+  };
+
+  var scheduleCreation  = {
+    name: 'portainer.schedules.new',
+    url: '/new',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/schedules/create/createschedule.html',
+        controller: 'CreateScheduleController'
+      }
+    }
+  };
+
   var settings = {
     name: 'portainer.settings',
     url: '/settings',
@@ -428,6 +461,9 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(registry);
   $stateRegistryProvider.register(registryAccess);
   $stateRegistryProvider.register(registryCreation);
+  $stateRegistryProvider.register(schedules);
+  $stateRegistryProvider.register(schedule);
+  $stateRegistryProvider.register(scheduleCreation);
   $stateRegistryProvider.register(settings);
   $stateRegistryProvider.register(settingsAuthentication);
   $stateRegistryProvider.register(stacks);
