@@ -7,7 +7,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 // const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const npmPackage = require('../package.json');
-const projectRoot = path.resolve( __dirname, '..');
+const projectRoot = path.resolve(__dirname, '..');
 
 module.exports = {
   entry: {
@@ -92,11 +92,9 @@ module.exports = {
     new ProvidePlugin({
       $: 'jquery',
       jQuery: 'jquery',
-      'window.jQuery': 'jquery'
+      'window.jQuery': 'jquery',
     }),
     new MiniCssExtractPlugin({
-      // Options similar to the same options in webpackOptions.output
-      // both options are optional
       filename: '[name].css',
       chunkFilename: '[id].css',
       sourceMap: true
