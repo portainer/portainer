@@ -1,6 +1,7 @@
 package schedules
 
 import (
+	"errors"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -15,7 +16,16 @@ func (handler *Handler) scheduleDelete(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid schedule identifier route variable", err}
 	}
 
-	handler.JobScheduler.UnscheduleTask(portainer.ScheduleID(scheduleID))
+	schedule, err := handler.ScheduleService.Schedule(portainer.ScheduleID(scheduleID))
+	if err == portainer.ErrObjectNotFound {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a schedule with the specified identifier inside the database", err}
+	} else if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a schedule with the specified identifier inside the database", err}
+	}
+
+	if schedule.JobType == portainer.SnapshotJobType || schedule.JobType == portainer.EndpointSyncJobType {
+		return &httperror.HandlerError{http.StatusBadRequest, "Cannot remove system schedules", errors.New("Cannot remove system schedule")}
+	}
 
 	scheduleFolder := handler.FileService.GetScheduleFolder(portainer.ScheduleID(scheduleID))
 	err = handler.FileService.RemoveDirectory(scheduleFolder)
