@@ -24,13 +24,17 @@
       <input type="text" class="form-control" ng-model="$ctrl.model.CronExpression" id="schedule_cron" name="schedule_cron" placeholder="0 2 * * *" required>
     </div>
   </div>
-  <!-- FIXME: add a note about supported cron rules -->
   <div class="form-group" ng-show="scheduleForm.schedule_cron.$invalid">
     <div class="col-sm-12 small text-warning">
       <div ng-messages="scheduleForm.schedule_cron.$error">
         <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
       </div>
     </div>
+  </div>
+  <div class="form-group">
+    <span class="col-sm-12 text-muted small">
+      You can refer to the <a href="https://godoc.org/github.com/robfig/cron#hdr-CRON_Expression_Format" target="_blank">following documentation</a> to get more information about the supported cron expression format.
+    </span>
   </div>
   <!-- !cron-input -->
   <div class="col-sm-12 form-section-title">
@@ -147,14 +151,13 @@
         ng-disabled="$ctrl.actionInProgress || !scheduleForm.$valid
         || $ctrl.model.Job.Endpoints.length === 0
         || ($ctrl.model.Job.Method === 'upload' && !$ctrl.model.Job.File)"
-        ng-click="$ctrl.formAction()" button-spinner="$ctrl.actionInProgress"
+        ng-click="$ctrl.action()" button-spinner="$ctrl.actionInProgress"
       >
         <span ng-hide="$ctrl.actionInProgress">{{ $ctrl.formActionLabel }}</span>
         <span ng-show="$ctrl.actionInProgress">In progress...</span>
       </button>
-      <span class="text-danger" ng-if="$ctrl.model.formValidationError" style="margin-left: 5px;">
-        <!-- FIXME: should be checked/generated -->
-        {{ $ctrl.model.formValidationError }}
+      <span class="text-danger" ng-if="$ctrl.state.formValidationError" style="margin-left: 5px;">
+        {{ $ctrl.state.formValidationError }}
       </span>
     </div>
   </div>
