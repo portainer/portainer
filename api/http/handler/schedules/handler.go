@@ -6,7 +6,6 @@ import (
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/cron"
 	"github.com/portainer/portainer/http/security"
 )
 
@@ -38,14 +37,4 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AdministratorAccess(httperror.LoggerHandler(h.scheduleDelete))).Methods(http.MethodDelete)
 
 	return h
-}
-
-func (handler *Handler) createTaskExecutionContext(scheduleID portainer.ScheduleID, endpoints []portainer.EndpointID) *cron.ScriptTaskContext {
-	return &cron.ScriptTaskContext{
-		JobService:      handler.JobService,
-		EndpointService: handler.EndpointService,
-		FileService:     handler.FileService,
-		ScheduleID:      scheduleID,
-		TargetEndpoints: endpoints,
-	}
 }

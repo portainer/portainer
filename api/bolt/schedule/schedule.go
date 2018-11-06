@@ -77,6 +77,32 @@ func (service *Service) Schedules() ([]portainer.Schedule, error) {
 	return schedules, err
 }
 
+// SchedulesByJobType return a array containing all the schedules
+// with the specified JobType.
+func (service *Service) SchedulesByJobType(jobType portainer.JobType) ([]portainer.Schedule, error) {
+	var schedules = make([]portainer.Schedule, 0)
+
+	err := service.db.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(BucketName))
+
+		cursor := bucket.Cursor()
+		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
+			var schedule portainer.Schedule
+			err := internal.UnmarshalObject(v, &schedule)
+			if err != nil {
+				return err
+			}
+			if schedule.JobType == jobType {
+				schedules = append(schedules, schedule)
+			}
+		}
+
+		return nil
+	})
+
+	return schedules, err
+}
+
 // CreateSchedule assign an ID to a new schedule and saves it.
 func (service *Service) CreateSchedule(schedule *portainer.Schedule) error {
 	return service.db.Update(func(tx *bolt.Tx) error {

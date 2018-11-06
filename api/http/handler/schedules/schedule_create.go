@@ -142,20 +142,27 @@ func (handler *Handler) createSchedule(name, image, cronExpression string, endpo
 		return nil, err
 	}
 
-	taskContext := handler.createTaskExecutionContext(scheduleIdentifier, endpoints)
-	task := cron.NewScriptTask(image, scriptPath, taskContext)
-
-	err = handler.JobScheduler.ScheduleTask(cronExpression, task)
-	if err != nil {
-		return nil, err
+	job := &portainer.ScriptExecutionJob{
+		Endpoints:  endpoints,
+		Image:      image,
+		ScriptPath: scriptPath,
+		ScheduleID: scheduleIdentifier,
 	}
 
 	schedule := &portainer.Schedule{
-		ID:             scheduleIdentifier,
-		Name:           name,
-		Endpoints:      endpoints,
-		CronExpression: cronExpression,
-		Task:           task,
+		ID:                 scheduleIdentifier,
+		Name:               name,
+		CronExpression:     cronExpression,
+		JobType:            portainer.ScriptExecutionJobType,
+		ScriptExecutionJob: job,
+	}
+
+	jobContext := cron.NewScriptExecutionJobContext(handler.JobService, handler.EndpointService, handler.FileService)
+	jobRunner := cron.NewScriptExecutionJobRunner(job, jobContext)
+
+	err = handler.JobScheduler.CreateSchedule(schedule, jobRunner)
+	if err != nil {
+		return nil, err
 	}
 
 	err = handler.ScheduleService.CreateSchedule(schedule)
