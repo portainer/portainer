@@ -16,6 +16,7 @@ type snapshotJobContext struct {
 	snapshotter     portainer.Snapshotter
 }
 
+// NewSnapshotJobContext returns a new context that can be used to execute a SnapshotJob
 func NewSnapshotJobContext(endpointService portainer.EndpointService, snapshotter portainer.Snapshotter) *snapshotJobContext {
 	return &snapshotJobContext{
 		endpointService: endpointService,
@@ -23,6 +24,7 @@ func NewSnapshotJobContext(endpointService portainer.EndpointService, snapshotte
 	}
 }
 
+// NewSnapshotJobRunner returns a new runner that can be scheduled
 func NewSnapshotJobRunner(job *portainer.SnapshotJob, context *snapshotJobContext) *snapshotJobRunner {
 	return &snapshotJobRunner{
 		job:     job,

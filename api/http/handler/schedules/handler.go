@@ -25,17 +25,16 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		Router: mux.NewRouter(),
 	}
 
-	// FIXME: Admin Access
 	h.Handle("/schedules",
-		bouncer.PublicAccess(httperror.LoggerHandler(h.scheduleList))).Methods(http.MethodGet)
+		bouncer.AdministratorAccess(httperror.LoggerHandler(h.scheduleList))).Methods(http.MethodGet)
 	h.Handle("/schedules",
-		bouncer.PublicAccess(httperror.LoggerHandler(h.scheduleCreate))).Methods(http.MethodPost)
+		bouncer.AdministratorAccess(httperror.LoggerHandler(h.scheduleCreate))).Methods(http.MethodPost)
 	h.Handle("/schedules/{id}",
-		bouncer.PublicAccess(httperror.LoggerHandler(h.scheduleInspect))).Methods(http.MethodGet)
+		bouncer.AdministratorAccess(httperror.LoggerHandler(h.scheduleInspect))).Methods(http.MethodGet)
 	h.Handle("/schedules/{id}",
-		bouncer.PublicAccess(httperror.LoggerHandler(h.scheduleUpdate))).Methods(http.MethodPut)
+		bouncer.AdministratorAccess(httperror.LoggerHandler(h.scheduleUpdate))).Methods(http.MethodPut)
 	h.Handle("/schedules/{id}",
-		bouncer.PublicAccess(httperror.LoggerHandler(h.scheduleDelete))).Methods(http.MethodDelete)
+		bouncer.AdministratorAccess(httperror.LoggerHandler(h.scheduleDelete))).Methods(http.MethodDelete)
 
 	return h
 }

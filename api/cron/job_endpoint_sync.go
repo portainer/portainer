@@ -19,6 +19,7 @@ type endpointSyncJobContext struct {
 	endpointFilePath string
 }
 
+// NewEndpointSyncJobContext returns a new context that can be used to execute a EndpointSyncJob
 func NewEndpointSyncJobContext(endpointService portainer.EndpointService, endpointFilePath string) *endpointSyncJobContext {
 	return &endpointSyncJobContext{
 		endpointService:  endpointService,
@@ -26,6 +27,7 @@ func NewEndpointSyncJobContext(endpointService portainer.EndpointService, endpoi
 	}
 }
 
+// NewEndpointSyncJobRunner returns a new runner that can be scheduled
 func NewEndpointSyncJobRunner(job *portainer.EndpointSyncJob, context *endpointSyncJobContext) *endpointSyncJobRunner {
 	return &endpointSyncJobRunner{
 		job:     job,

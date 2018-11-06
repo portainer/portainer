@@ -17,6 +17,7 @@ type scriptExecutionJobContext struct {
 	fileService     portainer.FileService
 }
 
+// NewScriptExecutionJobContext returns a new context that can be used to execute a ScriptExecutionJob
 func NewScriptExecutionJobContext(jobService portainer.JobService, endpointService portainer.EndpointService, fileService portainer.FileService) *scriptExecutionJobContext {
 	return &scriptExecutionJobContext{
 		jobService:      jobService,
@@ -25,6 +26,7 @@ func NewScriptExecutionJobContext(jobService portainer.JobService, endpointServi
 	}
 }
 
+// NewScriptExecutionJobRunner returns a new runner that can be scheduled
 func NewScriptExecutionJobRunner(job *portainer.ScriptExecutionJob, context *scriptExecutionJobContext) *scriptExecutionJobRunner {
 	return &scriptExecutionJobRunner{
 		job:     job,
