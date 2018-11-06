@@ -139,9 +139,9 @@ func loadSnapshotSystemSchedule(jobScheduler portainer.JobScheduler, snapshotter
 	}
 
 	snapshotJobContext := cron.NewSnapshotJobContext(endpointService, snapshotter)
-	snapshotJobRunner := cron.NewSnapshotJobRunner(snapshotJob, SnapshotJobContext)
+	snapshotJobRunner := cron.NewSnapshotJobRunner(snapshotJob, snapshotJobContext)
 
-	err = jobScheduler.CreateSchedule(snapshotSchedule, SnapshotJobRunner)
+	err = jobScheduler.CreateSchedule(snapshotSchedule, snapshotJobRunner)
 	if err != nil {
 		return err
 	}
@@ -176,9 +176,9 @@ func loadEndpointSyncSystemSchedule(jobScheduler portainer.JobScheduler, schedul
 	}
 
 	endpointSyncJobContext := cron.NewEndpointSyncJobContext(endpointService, *flags.ExternalEndpoints)
-	endpointSyncJobRunner := cron.NewEndpointSyncJobRunner(endpointSyncJob, EndpointSyncJobContext)
+	endpointSyncJobRunner := cron.NewEndpointSyncJobRunner(endpointSyncJob, endpointSyncJobContext)
 
-	err = jobScheduler.CreateSchedule(endointSyncSchedule, EndpointSyncJobRunner)
+	err = jobScheduler.CreateSchedule(endointSyncSchedule, endpointSyncJobRunner)
 	if err != nil {
 		return err
 	}

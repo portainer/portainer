@@ -77,21 +77,9 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if payload.SnapshotInterval != nil && *payload.SnapshotInterval != settings.SnapshotInterval {
-		settings.SnapshotInterval = *payload.SnapshotInterval
-
-		schedules, err := handler.ScheduleService.SchedulesByJobType(portainer.SnapshotJobType)
+		err := handler.updateSnapshotInterval(settings, *payload.SnapshotInterval)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve schedules from the database", err}
-		}
-
-		if len(schedules) != 0 {
-			snapshotSchedule := schedules[0]
-			snapshotSchedule.CronExpression = "@every " + *payload.SnapshotInterval
-
-			err := handler.JobScheduler.UpdateSchedule(&snapshotSchedule, nil)
-			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update job scheduler", err}
-			}
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update snapshot interval", err}
 		}
 	}
 
@@ -106,6 +94,27 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	return response.JSON(w, settings)
+}
+
+func (handler *Handler) updateSnapshotInterval(settings *portainer.Settings, snapshotInterval string) error {
+	settings.SnapshotInterval = snapshotInterval
+
+	schedules, err := handler.ScheduleService.SchedulesByJobType(portainer.SnapshotJobType)
+	if err != nil {
+		return err
+	}
+
+	if len(schedules) != 0 {
+		snapshotSchedule := schedules[0]
+		snapshotSchedule.CronExpression = "@every " + snapshotInterval
+
+		err := handler.JobScheduler.UpdateSchedule(&snapshotSchedule, nil)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (handler *Handler) updateTLS(settings *portainer.Settings) *httperror.HandlerError {
