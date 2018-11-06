@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('extension.storidge').component('storidgeProfilesDatatable', {
   templateUrl: './storidgeProfilesDatatable.html',
   controller: 'GenericDatatableController',

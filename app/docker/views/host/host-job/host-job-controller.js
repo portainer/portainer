@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.docker').controller('HostJobController', [
   'SystemService', 'Notifications',
   function HostJobController(SystemService, Notifications) {

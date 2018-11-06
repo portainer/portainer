@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.azure', ['portainer.app'])
 .config(['$stateRegistryProvider', function ($stateRegistryProvider) {
   'use strict';

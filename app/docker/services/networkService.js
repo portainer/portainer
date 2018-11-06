@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { NetworkViewModel } from '../models/network';
 
 angular.module('portainer.docker')

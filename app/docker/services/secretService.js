@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { SecretViewModel } from '../models/secret';
 
 angular.module('portainer.docker')

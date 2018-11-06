@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.app').controller('EndpointItemController', [
   function EndpointItemController() {
     var ctrl = this;

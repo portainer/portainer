@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.app').component('porEndpointSecurity', {
   templateUrl: './porEndpointSecurity.html',
   controller: 'porEndpointSecurityController',

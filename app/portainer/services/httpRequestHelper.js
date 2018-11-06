@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.app')
 .factory('HttpRequestHelper', [function HttpRequestHelper() {
   'use strict';

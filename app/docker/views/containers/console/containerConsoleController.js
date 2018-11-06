@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { Terminal } from 'xterm';
 
 angular.module('portainer.docker')

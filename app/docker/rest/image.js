@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { jsonObjectsToArrayHandler, deleteImageHandler } from './response/handlers';
 import { imageGetResponse } from './response/image';
 

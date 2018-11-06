@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { StoridgeNodeModel } from '../models/node';
 
 angular.module('extension.storidge')

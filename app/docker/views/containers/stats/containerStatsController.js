@@ -1,4 +1,3 @@
-import angular from 'angular';
 import moment from 'moment';
 
 angular.module('portainer.docker')

@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { AccessControlFormData } from '../../../components/accessControlForm/porAccessControlFormModel';
 
 angular.module('portainer.app')

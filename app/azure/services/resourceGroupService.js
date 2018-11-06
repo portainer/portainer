@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { ResourceGroupViewModel } from '../models/resource_group';
 
 angular.module('portainer.azure')

@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { SwarmViewModel } from '../models/swarm';
 
 angular.module('portainer.docker')

@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.app')
 .directive('rdWidgetTaskbar', function rdWidgetTaskbar() {
   var directive = {

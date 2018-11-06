@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('extension.storidge')
 .controller('StoridgeProfileController', ['$scope', '$state', '$transition$', 'Notifications', 'StoridgeProfileService', 'ModalService',
 function ($scope, $state, $transition$, Notifications, StoridgeProfileService, ModalService) {

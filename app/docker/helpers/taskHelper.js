@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.docker')
 .factory('TaskHelper', [function TaskHelperFactory() {
   'use strict';

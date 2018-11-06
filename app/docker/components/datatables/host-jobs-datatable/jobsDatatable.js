@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.docker').component('jobsDatatable', {
   templateUrl: './jobsDatatable.html',
   controller: 'JobsDatatableController',

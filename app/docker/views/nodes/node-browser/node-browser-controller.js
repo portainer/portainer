@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.docker').controller('NodeBrowserController', [
   '$stateParams', 'NodeService', 'HttpRequestHelper', 'Notifications',
   function NodeBrowserController($stateParams, NodeService, HttpRequestHelper, Notifications) {

@@ -1,4 +1,3 @@
-import angular from 'angular';
 import splitargs from 'splitargs/src/splitargs'
 
 angular.module('portainer.docker')

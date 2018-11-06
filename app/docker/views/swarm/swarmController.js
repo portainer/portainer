@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.docker')
 .controller('SwarmController', ['$q', '$scope', 'SystemService', 'NodeService', 'Notifications', 'StateManager', 'Authentication',
 function ($q, $scope, SystemService, NodeService, Notifications, StateManager, Authentication) {

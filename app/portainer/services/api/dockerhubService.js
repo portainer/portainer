@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { DockerHubViewModel } from '../../models/dockerhub';
 
 angular.module('portainer.app')

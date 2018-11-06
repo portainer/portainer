@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.docker')
 .factory('SecretHelper', [function SecretHelperFactory() {
   'use strict';

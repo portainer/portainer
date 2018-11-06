@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.app')
 .controller('StacksController', ['$scope', '$state', 'Notifications', 'StackService', 'ModalService', 'EndpointProvider',
 function ($scope, $state, Notifications, StackService, ModalService, EndpointProvider) {

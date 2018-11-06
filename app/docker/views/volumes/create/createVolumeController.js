@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
 import { VolumesNFSFormData } from '../../../components/volumesNFSForm/volumesNFSFormModel';
 

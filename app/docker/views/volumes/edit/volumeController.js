@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.docker')
 .controller('VolumeController', ['$scope', '$state', '$transition$', 'VolumeService', 'ContainerService', 'Notifications', 'HttpRequestHelper',
 function ($scope, $state, $transition$, VolumeService, ContainerService, Notifications, HttpRequestHelper) {

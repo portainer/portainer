@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.agent').factory('HostBrowserService', [
   'Browse', 'Upload', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', '$q', 'StateManager',
   function HostBrowserServiceFactory(Browse, Upload, API_ENDPOINT_ENDPOINTS, EndpointProvider, $q, StateManager) {

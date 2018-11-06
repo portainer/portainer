@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { genericHandler } from './response/handlers';
 
 angular.module('portainer.docker')

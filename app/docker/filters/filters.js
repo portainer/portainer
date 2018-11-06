@@ -1,4 +1,3 @@
-import angular from 'angular';
 import _ from 'lodash';
 
 function includeString(text, values) {

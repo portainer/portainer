@@ -1,4 +1,3 @@
-import angular from 'angular';
 import {
   EndpointGroupModel,
   EndpointGroupCreateRequest,

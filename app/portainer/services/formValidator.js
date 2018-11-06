@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.app')
 .factory('FormValidator', [function FormValidatorFactory() {
   'use strict';

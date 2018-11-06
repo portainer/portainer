@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { StoridgeInfoModel } from '../models/info';
 import { StoridgeEventModel } from '../models/events';
 

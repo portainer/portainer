@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.app').component('stacksDatatable', {
   templateUrl: './stacksDatatable.html',
   controller: 'StacksDatatableController',

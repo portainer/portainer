@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.app')
 .directive('rdWidget', function rdWidget() {
   var directive = {

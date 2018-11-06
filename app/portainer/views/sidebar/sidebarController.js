@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.app')
   .controller('SidebarController', ['$q', '$scope', 'StateManager', 'Notifications', 'Authentication', 'UserService',
     function ($q, $scope, StateManager, Notifications, Authentication, UserService) {

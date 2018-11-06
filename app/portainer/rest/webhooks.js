@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.app')
 .factory('Webhooks', ['$resource', 'API_ENDPOINT_WEBHOOKS',
  function WebhooksFactory($resource, API_ENDPOINT_WEBHOOKS) {

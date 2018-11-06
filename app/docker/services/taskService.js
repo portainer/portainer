@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { TaskViewModel } from '../models/task';
 
 angular.module('portainer.docker')

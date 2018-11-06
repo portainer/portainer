@@ -1,4 +1,3 @@
-import angular from 'angular';
 import moment from 'moment';
 import _ from 'lodash';
 import filesize from 'filesize';

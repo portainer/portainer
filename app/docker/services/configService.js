@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { ConfigViewModel } from '../models/config';
 
 angular.module('portainer.docker')

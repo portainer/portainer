@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { TagViewModel } from '../../models/tag';
 
 angular.module('portainer.app')

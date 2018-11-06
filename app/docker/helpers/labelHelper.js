@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.docker')
 .factory('LabelHelper', [function LabelHelperFactory() {
   'use strict';

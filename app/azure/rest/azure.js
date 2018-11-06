@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.azure')
 .factory('Azure', ['$http', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider',
 function AzureFactory($http, API_ENDPOINT_ENDPOINTS, EndpointProvider) {

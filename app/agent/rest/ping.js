@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.agent').factory('AgentPing', [
   '$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', '$q',
   function AgentPingFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, $q) {

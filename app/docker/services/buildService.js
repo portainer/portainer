@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { ImageBuildModel } from "../models/image";
 
 angular.module('portainer.docker')

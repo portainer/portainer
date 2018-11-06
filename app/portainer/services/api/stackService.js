@@ -1,4 +1,4 @@
-import angular from 'angular';
+
 import _ from 'lodash';
 import { StackViewModel, ExternalStackViewModel } from '../../models/stack';
 

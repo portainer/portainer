@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { ContainerDetailsViewModel, ContainerViewModel, ContainerStatsViewModel } from '../models/container';
 
 angular.module('portainer.docker')

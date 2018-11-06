@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.app')
 .factory('ExtensionService', ['Extensions', function ExtensionServiceFactory(Extensions) {
   'use strict';

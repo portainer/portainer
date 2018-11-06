@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { TeamViewModel } from '../../models/team';
 import { TeamMembershipModel } from '../../models/teamMembership';
 

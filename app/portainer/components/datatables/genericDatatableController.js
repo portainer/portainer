@@ -1,4 +1,3 @@
-import angular from 'angular';
 import './datatable.css';
 
 angular.module('portainer.app')

@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { EventViewModel } from '../models/event';
 
 angular.module('portainer.docker')

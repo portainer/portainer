@@ -2,7 +2,10 @@ env:
   browser: true
   jquery: true
   node: true
-  
+
+globals:
+  angular: true
+
 extends:
   - 'eslint:recommended'
 

@@ -1,4 +1,3 @@
-import angular from 'angular';
 import _ from 'lodash';
 import CodeMirror from 'codemirror';
 import 'codemirror/mode/yaml/yaml.js';

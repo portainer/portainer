@@ -1,4 +1,3 @@
-import angular from 'angular';
 import bootbox from 'bootbox';
 
 angular.module('portainer.app')

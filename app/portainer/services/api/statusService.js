@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { StatusViewModel } from "../../models/status";
 
 angular.module('portainer.app')

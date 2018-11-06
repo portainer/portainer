@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.docker').controller('HostViewController', [
   '$q', 'SystemService', 'Notifications', 'StateManager', 'AgentService', 'ContainerService', 'Authentication', 'EndpointProvider',
   function HostViewController($q, SystemService, Notifications, StateManager, AgentService, ContainerService, Authentication, EndpointProvider) {

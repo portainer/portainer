@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.agent')
 .factory('Agent', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', 'StateManager',
   function AgentFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, StateManager) {

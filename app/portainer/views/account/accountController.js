@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.app')
 .controller('AccountController', ['$scope', '$state', 'Authentication', 'UserService', 'Notifications', 'SettingsService',
 function ($scope, $state, Authentication, UserService, Notifications, SettingsService) {

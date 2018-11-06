@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.docker')
 .controller('VolumesDatatableController', ['PaginationService', 'DatatableService',
 function (PaginationService, DatatableService) {

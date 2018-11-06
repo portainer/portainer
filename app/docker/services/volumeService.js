@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { VolumeViewModel } from '../models/volume';
 
 angular.module('portainer.docker')

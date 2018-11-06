@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { MotdViewModel } from '../../models/motd';
 
 angular.module('portainer.app')

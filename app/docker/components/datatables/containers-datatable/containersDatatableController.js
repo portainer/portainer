@@ -1,6 +1,4 @@
-import angular from 'angular';
 import _ from 'lodash';
-
 
 angular.module('portainer.docker')
 .controller('ContainersDatatableController', ['PaginationService', 'DatatableService', 'EndpointProvider',

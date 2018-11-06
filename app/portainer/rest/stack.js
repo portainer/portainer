@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.app')
 .factory('Stack', ['$resource', 'EndpointProvider', 'API_ENDPOINT_STACKS', function StackFactory($resource, EndpointProvider, API_ENDPOINT_STACKS) {
   'use strict';

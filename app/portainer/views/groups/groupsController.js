@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.app')
 .controller('GroupsController', ['$scope', '$state', '$filter',  'GroupService', 'Notifications',
 function ($scope, $state, $filter, GroupService, Notifications) {

@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { ContainerGroupViewModel, CreateContainerGroupRequest } from '../models/container_group';
 
 angular.module('portainer.azure')

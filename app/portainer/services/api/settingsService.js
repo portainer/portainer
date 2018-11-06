@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { SettingsViewModel } from "../../models/settings";
 
 angular.module('portainer.app')

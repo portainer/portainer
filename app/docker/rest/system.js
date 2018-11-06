@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { jsonObjectsToArrayHandler } from './response/handlers';
 
 angular.module('portainer.docker')

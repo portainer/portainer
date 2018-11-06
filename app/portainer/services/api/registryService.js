@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { RegistryViewModel } from '../../models/registry';
 
 angular.module('portainer.app')

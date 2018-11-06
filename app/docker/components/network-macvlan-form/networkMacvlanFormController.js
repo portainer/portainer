@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.docker')
   .controller('NetworkMacvlanFormController', ['$q', 'NodeService', 'NetworkService', 'Notifications', 'StateManager', 'Authentication',
     function ($q, NodeService, NetworkService, Notifications, StateManager, Authentication) {

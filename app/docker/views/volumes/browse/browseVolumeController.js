@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.docker')
 .controller('BrowseVolumeController', ['$scope', '$transition$', 'StateManager',
 function ($scope, $transition$, StateManager) {

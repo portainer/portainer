@@ -1,4 +1,3 @@
-import angular from 'angular';
 import _ from 'lodash';
 import { UserAccessViewModel } from '../../models/access';
 import { TeamAccessViewModel } from '../../models/access';

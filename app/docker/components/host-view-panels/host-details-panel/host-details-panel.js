@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.docker').component('hostDetailsPanel', {
   templateUrl: './host-details-panel.html',
   bindings: {

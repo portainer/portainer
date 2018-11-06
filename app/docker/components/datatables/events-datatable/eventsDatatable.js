@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.docker').component('eventsDatatable', {
   templateUrl: './eventsDatatable.html',
   controller: 'GenericDatatableController',

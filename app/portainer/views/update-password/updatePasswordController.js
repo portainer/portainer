@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.app')
 .controller('UpdatePasswordController', ['$scope', '$state', '$transition$', '$sanitize', 'UserService', 'Authentication', 'Notifications',
 function UpdatePasswordController($scope, $state, $transition$, $sanitize, UserService, Authentication, Notifications) {

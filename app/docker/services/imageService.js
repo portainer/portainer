@@ -1,4 +1,3 @@
-import angular from 'angular';
 import _ from 'lodash';
 import { ImageViewModel } from '../models/image';
 import { ImageDetailsViewModel } from "../models/imageDetails";

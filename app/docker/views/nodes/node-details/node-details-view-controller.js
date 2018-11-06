@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.docker').controller('NodeDetailsViewController', [
   '$q', '$stateParams', 'NodeService', 'StateManager', 'AgentService', 'ContainerService', 'Authentication',
   function NodeDetailsViewController($q, $stateParams, NodeService, StateManager, AgentService, ContainerService, Authentication) {

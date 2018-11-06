@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { NodeViewModel } from '../models/node';
 
 angular.module('portainer.docker').factory('NodeService', [

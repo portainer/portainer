@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.docker')
 .factory('ConfigHelper', [function ConfigHelperFactory() {
   'use strict';

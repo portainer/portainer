@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { StoridgeProfileDefaultModel } from '../../models/profile';
 
 angular.module('extension.storidge')

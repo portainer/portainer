@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.agent')
 .controller('NodeSelectorController', ['AgentService', 'Notifications', function (AgentService, Notifications) {
   var ctrl = this;

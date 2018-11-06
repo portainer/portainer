@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.app').component('accessTable', {
   templateUrl: './accessTable.html',
   controller: function() {

@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.app')
 .controller('StacksDatatableController', ['PaginationService', 'DatatableService',
 function (PaginationService, DatatableService) {

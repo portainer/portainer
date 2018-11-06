@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { WebhookViewModel } from '../../models/webhook';
 
 angular.module('portainer.app')

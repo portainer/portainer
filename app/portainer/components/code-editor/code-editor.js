@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.app').component('codeEditor', {
   templateUrl: './codeEditor.html',
   controller: 'CodeEditorController',

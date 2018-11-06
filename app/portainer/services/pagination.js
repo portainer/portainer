@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.app')
 .factory('PaginationService', ['LocalStorage', 'PAGINATION_MAX_ITEMS',
 function PaginationServiceFactory(LocalStorage, PAGINATION_MAX_ITEMS) {

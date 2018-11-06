@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { ContainerInstanceProviderViewModel } from '../models/provider';
 
 angular.module('portainer.azure')

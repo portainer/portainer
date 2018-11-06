@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 angular.module('portainer.agent').factory('VolumeBrowserService', [
   'StateManager', 'Browse', 'BrowseVersion1', '$q', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', 'Upload',
   function VolumeBrowserServiceFactory(StateManager, Browse, BrowseVersion1, $q, API_ENDPOINT_ENDPOINTS, EndpointProvider, Upload) {

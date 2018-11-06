@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { ServiceViewModel } from '../models/service';
 
 

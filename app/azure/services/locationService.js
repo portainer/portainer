@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { LocationViewModel } from '../models/location';
 
 angular.module('portainer.azure')

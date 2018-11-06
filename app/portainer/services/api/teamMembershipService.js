@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { TeamMembershipModel } from '../../models/teamMembership';
 
 angular.module('portainer.app')

@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { TemplateDefaultModel } from "../../../models/template";
 
 angular.module('portainer.app')
