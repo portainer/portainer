@@ -3,6 +3,7 @@ package schedules
 import (
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
@@ -155,6 +156,7 @@ func (handler *Handler) createSchedule(name, image, cronExpression string, endpo
 		CronExpression:     cronExpression,
 		JobType:            portainer.ScriptExecutionJobType,
 		ScriptExecutionJob: job,
+		Created:            time.Now().Unix(),
 	}
 
 	jobContext := cron.NewScriptExecutionJobContext(handler.JobService, handler.EndpointService, handler.FileService)
