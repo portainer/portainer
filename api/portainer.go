@@ -251,6 +251,7 @@ type (
 		ID                 ScheduleID `json:"Id"`
 		Name               string
 		CronExpression     string
+		Created            int64
 		JobType            JobType
 		ScriptExecutionJob *ScriptExecutionJob
 		SnapshotJob        *SnapshotJob
