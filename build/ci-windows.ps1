@@ -15,10 +15,6 @@ if ($pull_request_number) {
   $tag_1803 = "$($branch_name)-$($os)1803-$($arch)"
 }
 
-ls
-
-ls dist
-
 docker build `
   -t ssbkang/portainer:$tag `
   -f build\windows2016\nanoserver\Dockerfile .
