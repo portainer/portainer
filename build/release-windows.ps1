@@ -7,8 +7,6 @@ tar cvpfz $binary portainer
 
 (Get-FileHash $binary).Hash > "portainer-$((Get-Item ENV:PORTAINER_VERSION).Value)-$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value)-checksum.txt"
 
-Get-Content "portainer-$((Get-Item ENV:PORTAINER_VERSION).Value)-$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value)-checksum.txt"
-
 docker build `
     -t ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value)-$((Get-Item ENV:PORTAINER_VERSION).Value) `
     -f build\windows2016\nanoserver\Dockerfile .
