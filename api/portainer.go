@@ -220,7 +220,44 @@ type (
 		TLSKeyPath    string `json:"TLSKey,omitempty"`
 	}
 
-	// WebhookID represents an webhook identifier.
+	// ScheduleID represents a schedule identifier.
+	ScheduleID int
+
+	// JobType represents a job type
+	JobType int
+
+	// ScriptExecutionJob represents a scheduled job that can execute a script via a privileged container
+	ScriptExecutionJob struct {
+		ScheduleID ScheduleID `json:"ScheduleId"`
+		Endpoints  []EndpointID
+		Image      string
+		ScriptPath string
+	}
+
+	// SnapshotJob represents a scheduled job that can create endpoint snapshots
+	SnapshotJob struct {
+		ScheduleID ScheduleID `json:"ScheduleId"`
+	}
+
+	// EndpointSyncJob represents a scheduled job that synchronize endpoints based on an external file
+	EndpointSyncJob struct {
+		ScheduleID ScheduleID `json:"ScheduleId"`
+	}
+
+	// Schedule represents a scheduled job.
+	// It only contains a pointer to one of the JobRunner implementations
+	// based on the JobType
+	Schedule struct {
+		ID                 ScheduleID `json:"Id"`
+		Name               string
+		CronExpression     string
+		JobType            JobType
+		ScriptExecutionJob *ScriptExecutionJob
+		SnapshotJob        *SnapshotJob
+		EndpointSyncJob    *EndpointSyncJob
+	}
+
+	// WebhookID represents a webhook identifier.
 	WebhookID int
 
 	// WebhookType represents the type of resource a webhook is related to
@@ -552,6 +589,17 @@ type (
 		DeleteResourceControl(ID ResourceControlID) error
 	}
 
+	// ScheduleService represents a service for managing schedule data
+	ScheduleService interface {
+		Schedule(ID ScheduleID) (*Schedule, error)
+		Schedules() ([]Schedule, error)
+		SchedulesByJobType(jobType JobType) ([]Schedule, error)
+		CreateSchedule(schedule *Schedule) error
+		UpdateSchedule(ID ScheduleID, schedule *Schedule) error
+		DeleteSchedule(ID ScheduleID) error
+		GetNextIdentifier() int
+	}
+
 	// TagService represents a service for managing tag data
 	TagService interface {
 		Tags() ([]Tag, error)
@@ -605,6 +653,8 @@ type (
 		LoadKeyPair() ([]byte, []byte, error)
 		WriteJSONToFile(path string, content interface{}) error
 		FileExists(path string) (bool, error)
+		StoreScheduledJobFileFromBytes(scheduleIdentifier ScheduleID, data []byte) (string, error)
+		GetScheduleFolder(scheduleIdentifier ScheduleID) string
 	}
 
 	// GitService represents a service for managing Git
@@ -615,10 +665,18 @@ type (
 
 	// JobScheduler represents a service to run jobs on a periodic basis
 	JobScheduler interface {
-		ScheduleEndpointSyncJob(endpointFilePath, interval string) error
-		ScheduleSnapshotJob(interval string) error
-		UpdateSnapshotJob(interval string)
+		CreateSchedule(schedule *Schedule, runner JobRunner) error
+		UpdateSchedule(schedule *Schedule, runner JobRunner) error
+		RemoveSchedule(ID ScheduleID)
 		Start()
+	}
+
+	// JobRunner represents a service that can be used to run a job
+	JobRunner interface {
+		Run()
+		GetScheduleID() ScheduleID
+		SetScheduleID(ID ScheduleID)
+		GetJobType() JobType
 	}
 
 	// Snapshotter represents a service used to create endpoint snapshots
@@ -778,4 +836,16 @@ const (
 	_ WebhookType = iota
 	// ServiceWebhook is a webhook for restarting a docker service
 	ServiceWebhook
+)
+
+const (
+	_ JobType = iota
+	// ScriptExecutionJobType is a non-system job used to execute a script against a list of
+	// endpoints via privileged containers
+	ScriptExecutionJobType
+	// SnapshotJobType is a system job used to create endpoint snapshots
+	SnapshotJobType
+	// EndpointSyncJobType is a system job used to synchronize endpoints from
+	// an external definition store
+	EndpointSyncJobType
 )

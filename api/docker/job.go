@@ -16,7 +16,7 @@ import (
 	"github.com/portainer/portainer/archive"
 )
 
-// JobService represnts a service that handles jobs on the host
+// JobService represents a service that handles the execution of jobs
 type JobService struct {
 	DockerClientFactory *ClientFactory
 }
