@@ -6,20 +6,22 @@ import (
 	"github.com/portainer/portainer"
 )
 
-type scriptExecutionJobRunner struct {
+// ScriptExecutionJobRunner is used to run a ScriptExecutionJob
+type ScriptExecutionJobRunner struct {
 	job     *portainer.ScriptExecutionJob
-	context *scriptExecutionJobContext
+	context *ScriptExecutionJobContext
 }
 
-type scriptExecutionJobContext struct {
+// ScriptExecutionJobContext represents the context of execution of a ScriptExecutionJob
+type ScriptExecutionJobContext struct {
 	jobService      portainer.JobService
 	endpointService portainer.EndpointService
 	fileService     portainer.FileService
 }
 
 // NewScriptExecutionJobContext returns a new context that can be used to execute a ScriptExecutionJob
-func NewScriptExecutionJobContext(jobService portainer.JobService, endpointService portainer.EndpointService, fileService portainer.FileService) *scriptExecutionJobContext {
-	return &scriptExecutionJobContext{
+func NewScriptExecutionJobContext(jobService portainer.JobService, endpointService portainer.EndpointService, fileService portainer.FileService) *ScriptExecutionJobContext {
+	return &ScriptExecutionJobContext{
 		jobService:      jobService,
 		endpointService: endpointService,
 		fileService:     fileService,
@@ -27,8 +29,8 @@ func NewScriptExecutionJobContext(jobService portainer.JobService, endpointServi
 }
 
 // NewScriptExecutionJobRunner returns a new runner that can be scheduled
-func NewScriptExecutionJobRunner(job *portainer.ScriptExecutionJob, context *scriptExecutionJobContext) *scriptExecutionJobRunner {
-	return &scriptExecutionJobRunner{
+func NewScriptExecutionJobRunner(job *portainer.ScriptExecutionJob, context *ScriptExecutionJobContext) *ScriptExecutionJobRunner {
+	return &ScriptExecutionJobRunner{
 		job:     job,
 		context: context,
 	}
@@ -37,7 +39,7 @@ func NewScriptExecutionJobRunner(job *portainer.ScriptExecutionJob, context *scr
 // Run triggers the execution of the job.
 // It will iterate through all the endpoints specified in the context to
 // execute the script associated to the job.
-func (runner *scriptExecutionJobRunner) Run() {
+func (runner *ScriptExecutionJobRunner) Run() {
 	scriptFile, err := runner.context.fileService.GetFileContent(runner.job.ScriptPath)
 	if err != nil {
 		log.Printf("scheduled job error (script execution). Unable to retrieve script file (err=%s)\n", err)
@@ -59,16 +61,16 @@ func (runner *scriptExecutionJobRunner) Run() {
 }
 
 // GetScheduleID returns the schedule identifier associated to the runner
-func (runner *scriptExecutionJobRunner) GetScheduleID() portainer.ScheduleID {
+func (runner *ScriptExecutionJobRunner) GetScheduleID() portainer.ScheduleID {
 	return runner.job.ScheduleID
 }
 
 // SetScheduleID sets the schedule identifier associated to the runner
-func (runner *scriptExecutionJobRunner) SetScheduleID(ID portainer.ScheduleID) {
+func (runner *ScriptExecutionJobRunner) SetScheduleID(ID portainer.ScheduleID) {
 	runner.job.ScheduleID = ID
 }
 
 // GetJobType returns the job type associated to the runner
-func (runner *scriptExecutionJobRunner) GetJobType() portainer.JobType {
+func (runner *ScriptExecutionJobRunner) GetJobType() portainer.JobType {
 	return portainer.ScriptExecutionJobType
 }

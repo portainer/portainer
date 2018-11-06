@@ -9,27 +9,29 @@ import (
 	"github.com/portainer/portainer"
 )
 
-type endpointSyncJobRunner struct {
+// EndpointSyncJobRunner is used to run a EndpointSyncJob
+type EndpointSyncJobRunner struct {
 	job     *portainer.EndpointSyncJob
-	context *endpointSyncJobContext
+	context *EndpointSyncJobContext
 }
 
-type endpointSyncJobContext struct {
+// EndpointSyncJobContext represents the context of execution of a EndpointSyncJob
+type EndpointSyncJobContext struct {
 	endpointService  portainer.EndpointService
 	endpointFilePath string
 }
 
 // NewEndpointSyncJobContext returns a new context that can be used to execute a EndpointSyncJob
-func NewEndpointSyncJobContext(endpointService portainer.EndpointService, endpointFilePath string) *endpointSyncJobContext {
-	return &endpointSyncJobContext{
+func NewEndpointSyncJobContext(endpointService portainer.EndpointService, endpointFilePath string) *EndpointSyncJobContext {
+	return &EndpointSyncJobContext{
 		endpointService:  endpointService,
 		endpointFilePath: endpointFilePath,
 	}
 }
 
 // NewEndpointSyncJobRunner returns a new runner that can be scheduled
-func NewEndpointSyncJobRunner(job *portainer.EndpointSyncJob, context *endpointSyncJobContext) *endpointSyncJobRunner {
-	return &endpointSyncJobRunner{
+func NewEndpointSyncJobRunner(job *portainer.EndpointSyncJob, context *EndpointSyncJobContext) *EndpointSyncJobRunner {
+	return &EndpointSyncJobRunner{
 		job:     job,
 		context: context,
 	}
@@ -52,22 +54,22 @@ type fileEndpoint struct {
 }
 
 // GetScheduleID returns the schedule identifier associated to the runner
-func (runner *endpointSyncJobRunner) GetScheduleID() portainer.ScheduleID {
+func (runner *EndpointSyncJobRunner) GetScheduleID() portainer.ScheduleID {
 	return runner.job.ScheduleID
 }
 
 // SetScheduleID sets the schedule identifier associated to the runner
-func (runner *endpointSyncJobRunner) SetScheduleID(ID portainer.ScheduleID) {
+func (runner *EndpointSyncJobRunner) SetScheduleID(ID portainer.ScheduleID) {
 	runner.job.ScheduleID = ID
 }
 
 // GetJobType returns the job type associated to the runner
-func (runner *endpointSyncJobRunner) GetJobType() portainer.JobType {
+func (runner *EndpointSyncJobRunner) GetJobType() portainer.JobType {
 	return portainer.EndpointSyncJobType
 }
 
 // Run triggers the execution of the endpoint synchronization process.
-func (runner *endpointSyncJobRunner) Run() {
+func (runner *EndpointSyncJobRunner) Run() {
 	data, err := ioutil.ReadFile(runner.context.endpointFilePath)
 	if endpointSyncError(err) {
 		return
