@@ -12,7 +12,7 @@ function ($q, $scope, $state, Notifications, EndpointService, GroupService, Sche
     var model = $scope.model;
 
     $scope.state.actionInProgress = true;
-    ScheduleService.createSchedule(model)
+    createSchedule(model)
     .then(function success() {
       Notifications.success('Schedule successfully created');
       $state.go('portainer.schedules', {}, {reload: true});
@@ -23,6 +23,13 @@ function ($q, $scope, $state, Notifications, EndpointService, GroupService, Sche
     .finally(function final() {
       $scope.state.actionInProgress = false;
     });
+  }
+
+  function createSchedule(model) {
+    if (model.Job.Method === 'editor') {
+      return ScheduleService.createScheduleFromFileContent(model);
+    }
+    return ScheduleService.createScheduleFromFileUpload(model);
   }
 
   function initView() {

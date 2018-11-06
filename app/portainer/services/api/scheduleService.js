@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.factory('ScheduleService', ['$q', 'Schedules',
-function ScheduleService($q, Schedules) {
+.factory('ScheduleService', ['$q', 'Schedules', 'FileUploadService',
+function ScheduleService($q, Schedules, FileUploadService) {
   'use strict';
   var service = {};
 
@@ -36,16 +36,20 @@ function ScheduleService($q, Schedules) {
     return deferred.promise;
   };
 
-  service.createSchedule = function(model) {
-    // var payload = new EndpointScheduleCreateRequest(model, endpoints);
-    return Schedules.create({ method: 'string' }, model).$promise;
+  service.createScheduleFromFileContent = function(model) {
+    var payload = new ScheduleCreateRequest(model);
+    return Schedules.create({ method: 'string' }, payload).$promise;
+  };
+
+  service.createScheduleFromFileUpload = function(model) {
+    var payload = new ScheduleCreateRequest(model);
+    return FileUploadService.createSchedule(payload);
   };
 
   service.updateSchedule = function(model) {
-    // var payload = new EndpointScheduleUpdateRequest(model, endpoints);
-    // return Schedules.update(payload).$promise;
+    var payload = new ScheduleUpdateRequest(model);
+    return Schedules.update(payload).$promise;
   };
-
 
   service.deleteSchedule = function(scheduleId) {
     return Schedules.remove({ id: scheduleId }).$promise;

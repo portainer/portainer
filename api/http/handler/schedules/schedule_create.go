@@ -32,32 +32,32 @@ type scheduleFromFileContentPayload struct {
 func (payload *scheduleFromFilePayload) Validate(r *http.Request) error {
 	name, err := request.RetrieveMultiPartFormValue(r, "Name", false)
 	if err != nil {
-		return err
+		return errors.New("Invalid name")
 	}
 	payload.Name = name
 
 	image, err := request.RetrieveMultiPartFormValue(r, "Image", false)
 	if err != nil {
-		return err
+		return errors.New("Invalid image")
 	}
 	payload.Image = image
 
-	cronExpression, err := request.RetrieveMultiPartFormValue(r, "Schedule", false)
+	cronExpression, err := request.RetrieveMultiPartFormValue(r, "CronExpression", false)
 	if err != nil {
-		return err
+		return errors.New("Invalid cron expression")
 	}
 	payload.CronExpression = cronExpression
 
 	var endpoints []portainer.EndpointID
 	err = request.RetrieveMultiPartFormJSONValue(r, "Endpoints", &endpoints, false)
 	if err != nil {
-		return err
+		return errors.New("Invalid endpoints")
 	}
 	payload.Endpoints = endpoints
 
-	file, _, err := request.RetrieveMultiPartFormFile(r, "File")
+	file, _, err := request.RetrieveMultiPartFormFile(r, "file")
 	if err != nil {
-		return portainer.Error("Invalid Script file. Ensure that the file is uploaded correctly")
+		return portainer.Error("Invalid script file. Ensure that the file is uploaded correctly")
 	}
 	payload.File = file
 

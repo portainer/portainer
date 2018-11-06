@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('ScheduleController', ['$q', '$scope', '$transition$', 'Notifications', 'EndpointService', 'GroupService', 'ScheduleService',
-function ($q, $scope, $transition$, Notifications, EndpointService, GroupService, ScheduleService) {
+.controller('ScheduleController', ['$q', '$scope', '$transition$', '$state', 'Notifications', 'EndpointService', 'GroupService', 'ScheduleService',
+function ($q, $scope, $transition$, $state, Notifications, EndpointService, GroupService, ScheduleService) {
 
   $scope.state = {
     actionInProgress: false
@@ -9,7 +9,20 @@ function ($q, $scope, $transition$, Notifications, EndpointService, GroupService
   $scope.update = update;
 
   function update() {
-    // var model = $scope.schedule;
+    var model = $scope.schedule;
+
+    $scope.state.actionInProgress = true;
+    ScheduleService.updateSchedule(model)
+    .then(function success() {
+      Notifications.success('Schedule successfully updated');
+      $state.go('portainer.schedules', {}, {reload: true});
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to update schedule');
+    })
+    .finally(function final() {
+      $scope.state.actionInProgress = false;
+    });
   }
 
   function initView() {

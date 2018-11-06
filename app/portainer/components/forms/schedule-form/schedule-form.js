@@ -4,7 +4,7 @@ angular.module('portainer.app').component('scheduleForm', {
     var ctrl = this;
 
     this.editorUpdate = function(cm) {
-      ctrl.model.FileContent = cm.getValue();
+      ctrl.model.Job.FileContent = cm.getValue();
     };
   },
   bindings: {

@@ -1,39 +1,47 @@
 function ScheduleDefaultModel() {
   this.Name = '';
-  this.Image = '';
   this.CronExpression = '';
+  this.JobType = 1;
+  this.Job = new ScriptExecutionDefaultJobModel();
+}
+
+function ScriptExecutionDefaultJobModel() {
+  this.Image = '';
   this.Endpoints = [];
   this.FileContent = '';
   this.File = null;
   this.Method = 'editor';
 }
 
-// function ScheduleDefaultModel() {
-//   this.Name = 'test01';
-//   this.Image = 'ubuntu:latest';
-//   this.CronExpression = '@every 2m';
-//   this.Endpoints = [1];
-//   this.FileContent = 'echo "ouimonsieur >> /host/tmp/toto"';
-//   this.File = null;
-//   this.Method = 'editor';
-// }
-
-
 function ScheduleModel(data) {
   this.Id = data.Id;
   this.Name = data.Name;
-  this.Image = '';
+  this.JobType = data.JobType;
   this.CronExpression = data.CronExpression;
-  this.Endpoints = [];
-  this.FileContent = '';
-  this.File = null;
+  this.Created = data.Created;
+  if (this.JobType === 1) {
+    this.Job = new ScriptExecutionJobModel(data.ScriptExecutionJob);
+  }
 }
 
-// function ScheduleCreateRequest(model) {
-//   this.Name = model.Name;
-//
-//   this.Name = model.Name;
-//   this.Description = model.Description;
-//   this.Tags = model.Tags;
-//   this.AssociatedEndpoints = endpoints;
-// }
+function ScriptExecutionJobModel(data) {
+  this.Image = data.Image;
+  this.Endpoints = data.Endpoints;
+}
+
+function ScheduleCreateRequest(model) {
+  this.Name = model.Name;
+  this.CronExpression = model.CronExpression;
+  this.Image = model.Job.Image;
+  this.Endpoints = model.Job.Endpoints;
+  this.FileContent = model.Job.FileContent;
+  this.File = model.Job.File;
+}
+
+function ScheduleUpdateRequest(model) {
+  this.id = model.Id;
+  this.Name = model.Name;
+  this.CronExpression = model.CronExpression;
+  this.Image = model.Job.Image;
+  this.Endpoints = model.Job.Endpoints;
+}

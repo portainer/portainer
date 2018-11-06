@@ -15,10 +15,9 @@ function ($scope, $state, Notifications, ModalService, ScheduleService) {
   }
 
   function deleteSelectedSchedules(schedules) {
-    var endpointId = EndpointProvider.endpointID();
     var actionCount = schedules.length;
     angular.forEach(schedules, function (schedule) {
-      ScheduleService.remove(schedule, schedule.External, endpointId)
+      ScheduleService.deleteSchedule(schedule.Id)
       .then(function success() {
         Notifications.success('Schedule successfully removed', schedule.Name);
         var index = $scope.schedules.indexOf(schedule);
