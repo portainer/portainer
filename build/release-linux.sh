@@ -7,7 +7,6 @@ DOCKER_PASS="$5"
 mkdir -pv portainer
 cp -r dist/* portainer
 
-## Build tar & checksums Binaries
 tar cvpfz "portainer-$PORTAINER_VERSION-$IMAGE-$ARCH.tar.gz" portainer
 sha256sum --tag "portainer-$PORTAINER_VERSION-$IMAGE-$ARCH.tar.gz" > "portainer-$PORTAINER_VERSION-$IMAGE-$ARCH-checksum.txt"
 
