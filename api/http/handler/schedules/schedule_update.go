@@ -40,14 +40,14 @@ func (handler *Handler) scheduleUpdate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a schedule with the specified identifier inside the database", err}
 	}
 
-	updateTaskSchedule := updateSchedule(schedule, &payload)
-	if updateTaskSchedule {
-		taskContext := handler.createTaskExecutionContext(schedule.ID, schedule.Endpoints)
-		schedule.Task.(cron.ScriptTask).SetContext(taskContext)
+	updateJobSchedule := updateSchedule(schedule, &payload)
+	if updateJobSchedule {
 
-		err := handler.JobScheduler.UpdateScheduledTask(schedule.ID, schedule.CronExpression, schedule.Task)
+		jobContext := cron.NewScriptExecutionJobContext(handler.JobService, handler.EndpointService, handler.FileService)
+		jobRunner := cron.NewScriptExecutionJobRunner(schedule.ScriptExecutionJob, jobContext)
+		err := handler.JobScheduler.UpdateSchedule(schedule, jobRunner)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update task scheduler", err}
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update job scheduler", err}
 		}
 	}
 
@@ -60,28 +60,26 @@ func (handler *Handler) scheduleUpdate(w http.ResponseWriter, r *http.Request) *
 }
 
 func updateSchedule(schedule *portainer.Schedule, payload *scheduleUpdatePayload) bool {
-	updateTaskSchedule := false
+	updateJobSchedule := false
 
 	if payload.Name != nil {
 		schedule.Name = *payload.Name
 	}
 
 	if payload.Endpoints != nil {
-		schedule.Endpoints = payload.Endpoints
-		updateTaskSchedule = true
+		schedule.ScriptExecutionJob.Endpoints = payload.Endpoints
+		updateJobSchedule = true
 	}
 
 	if payload.CronExpression != nil {
 		schedule.CronExpression = *payload.CronExpression
-		updateTaskSchedule = true
+		updateJobSchedule = true
 	}
 
 	if payload.Image != nil {
-		t := schedule.Task.(cron.ScriptTask)
-		t.Image = *payload.Image
-
-		updateTaskSchedule = true
+		schedule.ScriptExecutionJob.Image = *payload.Image
+		updateJobSchedule = true
 	}
 
-	return updateTaskSchedule
+	return updateJobSchedule
 }

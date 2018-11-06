@@ -5,52 +5,49 @@ import (
 	"github.com/robfig/cron"
 )
 
-// JobScheduler represents a service for managing crons.
+// JobScheduler represents a service for managing crons
 type JobScheduler struct {
 	cron *cron.Cron
 }
 
-// NewJobScheduler initializes a new service.
+// NewJobScheduler initializes a new service
 func NewJobScheduler() *JobScheduler {
 	return &JobScheduler{
 		cron: cron.New(),
 	}
 }
 
-// UpdateScheduledTask updates a specific scheduled task by re-creating a new cron
-// and adding all the existing jobs. It will then re-schedule the new task
-// based on the updatedTask parameter.
+// CreateSchedule schedules the execution of a job via a runner
+func (scheduler *JobScheduler) CreateSchedule(schedule *portainer.Schedule, runner portainer.JobRunner) error {
+	runner.SetScheduleID(schedule.ID)
+	return scheduler.cron.AddJob(schedule.CronExpression, runner)
+}
+
+// UpdateSchedule updates a specific scheduled job by re-creating a new cron
+// and adding all the existing jobs. It will then re-schedule the new job
+// via the specified JobRunner parameter.
 // NOTE: the cron library do not support updating schedules directly
-// hence the work-around.
-func (scheduler *JobScheduler) UpdateScheduledTask(scheduleID portainer.ScheduleID, cronExpression string, updatedTask portainer.Task) error {
-	jobs := scheduler.cron.Entries()
+// hence the work-around
+func (scheduler *JobScheduler) UpdateSchedule(schedule *portainer.Schedule, runner portainer.JobRunner) error {
+	cronEntries := scheduler.cron.Entries()
 	newCron := cron.New()
 
-	for _, job := range jobs {
+	for _, entry := range cronEntries {
 
-		switch task := job.Job.(type) {
-		case ScriptTask:
-			if task.context.ScheduleID == scheduleID {
-				err := newCron.AddJob(cronExpression, updatedTask)
-				if err != nil {
-					return err
-				}
+		if entry.Job.(portainer.JobRunner).GetScheduleID() == schedule.ID {
 
-				continue
+			var jobRunner cron.Job = runner
+			if entry.Job.(portainer.JobRunner).GetJobType() == portainer.SnapshotJobType {
+				jobRunner = entry.Job
 			}
-		case SnapshotTask:
-			_, ok := updatedTask.(SnapshotTask)
-			if ok {
-				err := newCron.AddJob(cronExpression, job.Job)
-				if err != nil {
-					return err
-				}
 
-				continue
+			err := newCron.AddJob(schedule.CronExpression, jobRunner)
+			if err != nil {
+				return err
 			}
 		}
 
-		newCron.Schedule(job.Schedule, job.Job)
+		newCron.Schedule(entry.Schedule, entry.Job)
 	}
 
 	scheduler.cron.Stop()
@@ -59,35 +56,26 @@ func (scheduler *JobScheduler) UpdateScheduledTask(scheduleID portainer.Schedule
 	return nil
 }
 
-// UnscheduleTask remove a schedule by re-creating a new cron
+// RemoveSchedule remove a scheduled job by re-creating a new cron
 // and adding all the existing jobs except for the one specified via scheduleID.
 // NOTE: the cron library do not support removing schedules directly
-// hence the work-around.
-func (scheduler *JobScheduler) UnscheduleTask(scheduleID portainer.ScheduleID) {
-	jobs := scheduler.cron.Entries()
-
+// hence the work-around
+func (scheduler *JobScheduler) RemoveSchedule(scheduleID portainer.ScheduleID) {
+	cronEntries := scheduler.cron.Entries()
 	newCron := cron.New()
 
-	for _, job := range jobs {
+	for _, entry := range cronEntries {
 
-		switch task := job.Job.(type) {
-		case ScriptTask:
-			if task.context.ScheduleID == scheduleID {
-				continue
-			}
+		if entry.Job.(portainer.JobRunner).GetScheduleID() == scheduleID {
+			continue
 		}
 
-		newCron.Schedule(job.Schedule, job.Job)
+		newCron.Schedule(entry.Schedule, entry.Job)
 	}
 
 	scheduler.cron.Stop()
 	scheduler.cron = newCron
 	scheduler.cron.Start()
-}
-
-// ScheduleTask adds a new task to be scheduled in the cron.
-func (scheduler *JobScheduler) ScheduleTask(cronExpression string, task portainer.Task) error {
-	return scheduler.cron.AddJob(cronExpression, task)
 }
 
 // Start starts the scheduled jobs

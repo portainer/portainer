@@ -8,7 +8,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/cron"
 	"github.com/portainer/portainer/filesystem"
 )
 
@@ -80,9 +79,19 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 	if payload.SnapshotInterval != nil && *payload.SnapshotInterval != settings.SnapshotInterval {
 		settings.SnapshotInterval = *payload.SnapshotInterval
 
-		err := handler.JobScheduler.UpdateScheduledTask(0, "@every "+*payload.SnapshotInterval, cron.NewSnapshotTask(nil))
+		schedules, err := handler.ScheduleService.SchedulesByJobType(portainer.SnapshotJobType)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update task scheduler", err}
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve schedules from the database", err}
+		}
+
+		if len(schedules) != 0 {
+			snapshotSchedule := schedules[0]
+			snapshotSchedule.CronExpression = "@every " + *payload.SnapshotInterval
+
+			err := handler.JobScheduler.UpdateSchedule(&snapshotSchedule, nil)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update job scheduler", err}
+			}
 		}
 	}
 

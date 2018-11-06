@@ -146,6 +146,7 @@ func (server *Server) Start() error {
 	settingsHandler.LDAPService = server.LDAPService
 	settingsHandler.FileService = server.FileService
 	settingsHandler.JobScheduler = server.JobScheduler
+	settingsHandler.ScheduleService = server.ScheduleService
 
 	var stackHandler = stacks.NewHandler(requestBouncer)
 	stackHandler.FileService = server.FileService

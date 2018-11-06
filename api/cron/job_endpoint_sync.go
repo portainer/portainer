@@ -9,48 +9,64 @@ import (
 	"github.com/portainer/portainer"
 )
 
-type (
-	// EndpointSyncTask represents a task used to synchronize endpoints
-	// based on an external file. It can be scheduled.
-	EndpointSyncTask struct {
-		context *EndpointSyncTaskContext
-	}
+type endpointSyncJobRunner struct {
+	job     *portainer.EndpointSyncJob
+	context *endpointSyncJobContext
+}
 
-	// EndpointSyncTaskContext represents the context required for the execution
-	// of an EndpointSyncTask.
-	EndpointSyncTaskContext struct {
-		EndpointService  portainer.EndpointService
-		EndpointFilePath string
-	}
+type endpointSyncJobContext struct {
+	endpointService  portainer.EndpointService
+	endpointFilePath string
+}
 
-	synchronization struct {
-		endpointsToCreate []*portainer.Endpoint
-		endpointsToUpdate []*portainer.Endpoint
-		endpointsToDelete []*portainer.Endpoint
+func NewEndpointSyncJobContext(endpointService portainer.EndpointService, endpointFilePath string) *endpointSyncJobContext {
+	return &endpointSyncJobContext{
+		endpointService:  endpointService,
+		endpointFilePath: endpointFilePath,
 	}
+}
 
-	fileEndpoint struct {
-		Name          string `json:"Name"`
-		URL           string `json:"URL"`
-		TLS           bool   `json:"TLS,omitempty"`
-		TLSSkipVerify bool   `json:"TLSSkipVerify,omitempty"`
-		TLSCACert     string `json:"TLSCACert,omitempty"`
-		TLSCert       string `json:"TLSCert,omitempty"`
-		TLSKey        string `json:"TLSKey,omitempty"`
-	}
-)
-
-// NewEndpointSyncTask creates a new EndpointSyncTask using the specified
-// context.
-func NewEndpointSyncTask(context *EndpointSyncTaskContext) EndpointSyncTask {
-	return EndpointSyncTask{
+func NewEndpointSyncJobRunner(job *portainer.EndpointSyncJob, context *endpointSyncJobContext) *endpointSyncJobRunner {
+	return &endpointSyncJobRunner{
+		job:     job,
 		context: context,
 	}
 }
 
+type synchronization struct {
+	endpointsToCreate []*portainer.Endpoint
+	endpointsToUpdate []*portainer.Endpoint
+	endpointsToDelete []*portainer.Endpoint
+}
+
+type fileEndpoint struct {
+	Name          string `json:"Name"`
+	URL           string `json:"URL"`
+	TLS           bool   `json:"TLS,omitempty"`
+	TLSSkipVerify bool   `json:"TLSSkipVerify,omitempty"`
+	TLSCACert     string `json:"TLSCACert,omitempty"`
+	TLSCert       string `json:"TLSCert,omitempty"`
+	TLSKey        string `json:"TLSKey,omitempty"`
+}
+
+// GetScheduleID returns the schedule identifier associated to the runner
+func (runner *endpointSyncJobRunner) GetScheduleID() portainer.ScheduleID {
+	return runner.job.ScheduleID
+}
+
+// SetScheduleID sets the schedule identifier associated to the runner
+func (runner *endpointSyncJobRunner) SetScheduleID(ID portainer.ScheduleID) {
+	runner.job.ScheduleID = ID
+}
+
+// GetJobType returns the job type associated to the runner
+func (runner *endpointSyncJobRunner) GetJobType() portainer.JobType {
+	return portainer.EndpointSyncJobType
+}
+
 // Run triggers the execution of the endpoint synchronization process.
-func (task EndpointSyncTask) Run() {
-	data, err := ioutil.ReadFile(task.context.EndpointFilePath)
+func (runner *endpointSyncJobRunner) Run() {
+	data, err := ioutil.ReadFile(runner.context.endpointFilePath)
 	if endpointSyncError(err) {
 		return
 	}
@@ -62,11 +78,11 @@ func (task EndpointSyncTask) Run() {
 	}
 
 	if len(fileEndpoints) == 0 {
-		log.Println("background task error (endpoint synchronization). External endpoint source is empty")
+		log.Println("background job error (endpoint synchronization). External endpoint source is empty")
 		return
 	}
 
-	storedEndpoints, err := task.context.EndpointService.Endpoints()
+	storedEndpoints, err := runner.context.endpointService.Endpoints()
 	if endpointSyncError(err) {
 		return
 	}
@@ -75,7 +91,7 @@ func (task EndpointSyncTask) Run() {
 
 	sync := prepareSyncData(storedEndpoints, convertedFileEndpoints)
 	if sync.requireSync() {
-		err = task.context.EndpointService.Synchronize(sync.endpointsToCreate, sync.endpointsToUpdate, sync.endpointsToDelete)
+		err = runner.context.endpointService.Synchronize(sync.endpointsToCreate, sync.endpointsToUpdate, sync.endpointsToDelete)
 		if endpointSyncError(err) {
 			return
 		}
@@ -85,7 +101,7 @@ func (task EndpointSyncTask) Run() {
 
 func endpointSyncError(err error) bool {
 	if err != nil {
-		log.Printf("background task error (endpoint synchronization). Unable to synchronize endpoints (err=%s)\n", err)
+		log.Printf("background job error (endpoint synchronization). Unable to synchronize endpoints (err=%s)\n", err)
 		return true
 	}
 	return false
