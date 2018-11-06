@@ -1,14 +1,14 @@
 version: 1.0.{build}
 image:
   - Visual Studio 2017
-  #- Ubuntu
+  - Ubuntu
 environment:
   matrix:
     - ARCH: amd64
-    - ARCH: arm 
-    - ARCH: arm64
-    - ARCH: ppc64le
-    - ARCH: s390x
+    #- ARCH: arm 
+    #- ARCH: arm64
+    #- ARCH: ppc64le
+    #- ARCH: s390x
   DOCKER_USER:
     secure: JapmC7j5F0mY3j/MVzU+Cw==
   DOCKER_PASS:
@@ -29,7 +29,7 @@ branches:
     - develop
 stack: node 9, go 1.10
 artifacts:
-  - path: 'portainer-$(PORTAINER_VERSION)-$(IMAGE)-$(ARCH).tar.gz'
+  - path: 'portainer-$(PORTAINER_VERSION)-$(IMAGE)-$(ARCH).*'
     type: file
 install:
   - yarn install
@@ -52,7 +52,7 @@ deploy:
   provider: GitHub
   auth_token:
     secure: CSp0bwpBUaXLRNaBikD2stTpiCu1so7MQg7k6LiAyDGTpZ+oewOlFE0zB4Pku3Od
-  artifact: 'portainer-$(PORTAINER_VERSION)-$(IMAGE)-$(ARCH).tar.gz'
+  artifact: 'portainer-$(PORTAINER_VERSION)-$(IMAGE)-$(ARCH).*'
   draft: true
   prerelease: false
   on:

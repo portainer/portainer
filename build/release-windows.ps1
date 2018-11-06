@@ -5,12 +5,7 @@ New-Item -Path portainer -ItemType Directory | Out-Null
 Copy-Item -Path dist\* -Destination portainer -Recurse
 tar cvpfz $binary portainer
 
-New-Item -Path checksums -ItemType Directory | Out-Null
-(Get-FileHash $binary).Hash > "checksums\$($binary)-checksum.txt"
-
-git add "checksums\$($binary)-checksum.txt"
-git commit -m "Updated checksum for $($binary)"
-git push origin develop
+(Get-FileHash $binary).Hash > "portainer-$((Get-Item ENV:PORTAINER_VERSION).Value)-$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value)-checksum.txt"
 
 docker build `
     -t ssbkang/portainer:$((Get-Item ENV:IMAGE).Value)-$((Get-Item ENV:ARCH).Value)-$((Get-Item ENV:PORTAINER_VERSION).Value) `
