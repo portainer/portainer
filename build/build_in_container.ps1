@@ -21,4 +21,6 @@ Set-Location -Path "$project_path\api\cmd\portainer"
 C:\go\bin\go.exe get -t -d -v ./...
 C:\go\bin\go.exe build -v
 
-Move-Item -Path "$project_path\api\cmd\portainer\$($binary)" -Destination "dist"
+Move-Item -Path "$project_path\api\cmd\portainer\$($binary)" -Destination "$project_path\dist"
+
+ls "$project_path\"
