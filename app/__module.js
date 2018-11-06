@@ -1,6 +1,4 @@
 import '../assets/css/app.css';
-import angular from 'angular';
-
 import './agent/_module';
 import './azure/_module';
 import './docker/__module';
@@ -26,7 +24,6 @@ angular.module('portainer', [
   'angular-clipboard',
   'ngFileSaver',
   'luegg.directives',
-  // 'portainer.templates',
   'portainer.app',
   'portainer.agent',
   'portainer.azure',

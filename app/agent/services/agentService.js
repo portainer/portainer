@@ -1,4 +1,3 @@
-import angular from 'angular';
 import { AgentViewModel } from '../models/agent';
 
 angular.module('portainer.agent').factory('AgentService', [

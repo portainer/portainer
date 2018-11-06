@@ -1,4 +1,3 @@
-
 import '../assets/css/vendor.css';
 
 import angular from 'angular';
