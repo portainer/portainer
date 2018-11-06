@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('CreateScheduleController', ['$q', '$scope', 'Notifications', 'EndpointService', 'GroupService',
-function ($q, $scope, Notifications, EndpointService, GroupService) {
+.controller('CreateScheduleController', ['$q', '$scope', '$state', 'Notifications', 'EndpointService', 'GroupService', 'ScheduleService',
+function ($q, $scope, $state, Notifications, EndpointService, GroupService, ScheduleService) {
 
   $scope.state = {
     actionInProgress: false
@@ -9,7 +9,20 @@ function ($q, $scope, Notifications, EndpointService, GroupService) {
   $scope.create = create;
 
   function create() {
-    // var model = $scope.model;
+    var model = $scope.model;
+
+    $scope.state.actionInProgress = true;
+    ScheduleService.createSchedule(model)
+    .then(function success() {
+      Notifications.success('Schedule successfully created');
+      $state.go('portainer.schedules', {}, {reload: true});
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to create schedule');
+    })
+    .finally(function final() {
+      $scope.state.actionInProgress = false;
+    });
   }
 
   function initView() {

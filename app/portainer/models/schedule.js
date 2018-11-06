@@ -1,22 +1,39 @@
 function ScheduleDefaultModel() {
   this.Name = '';
-  this.Cron = '';
-  this.Method = 'editor';
-  this.Endpoints = [];
   this.Image = '';
-  this.JobFileContent = '';
-  this.JobFile = null;
+  this.CronExpression = '';
+  this.Endpoints = [];
+  this.FileContent = '';
+  this.File = null;
+  this.Method = 'editor';
 }
 
-// TODO: remove
-function ScheduleDefaultMock() {
-  this.Id = 1;
-  this.Name = 'myschedule01';
-  this.Cron = '30 1 * * *';
-  this.Method = 'editor';
-  this.Image = 'ubuntu:latest';
-  this.Endpoints = [1];
-  this.JobFileContent = 'ls -lah /host/tmp';
-  this.JobFile = null;
-  this.Created = moment();
+// function ScheduleDefaultModel() {
+//   this.Name = 'test01';
+//   this.Image = 'ubuntu:latest';
+//   this.CronExpression = '@every 2m';
+//   this.Endpoints = [1];
+//   this.FileContent = 'echo "ouimonsieur >> /host/tmp/toto"';
+//   this.File = null;
+//   this.Method = 'editor';
+// }
+
+
+function ScheduleModel(data) {
+  this.Id = data.Id;
+  this.Name = data.Name;
+  this.Image = '';
+  this.CronExpression = data.CronExpression;
+  this.Endpoints = [];
+  this.FileContent = '';
+  this.File = null;
 }
+
+// function ScheduleCreateRequest(model) {
+//   this.Name = model.Name;
+//
+//   this.Name = model.Name;
+//   this.Description = model.Description;
+//   this.Tags = model.Tags;
+//   this.AssociatedEndpoints = endpoints;
+// }

@@ -21,7 +21,7 @@
   <div class="form-group">
     <label for="schedule_cron" class="col-sm-1 control-label text-left">Cron rule</label>
     <div class="col-sm-11">
-      <input type="text" class="form-control" ng-model="$ctrl.model.Cron" id="schedule_cron" name="schedule_cron" placeholder="0 2 * * *" required>
+      <input type="text" class="form-control" ng-model="$ctrl.model.CronExpression" id="schedule_cron" name="schedule_cron" placeholder="0 2 * * *" required>
     </div>
   </div>
   <div class="form-group" ng-show="scheduleForm.schedule_cron.$invalid">
@@ -97,7 +97,7 @@
           identifier="execute-schedule-editor"
           placeholder="# Define or paste the content of your script file here"
           on-change="$ctrl.editorUpdate"
-          value="$ctrl.model.JobFileContent"
+          value="$ctrl.model.FileContent"
         ></code-editor>
       </div>
     </div>
@@ -115,10 +115,10 @@
     </div>
     <div class="form-group">
       <div class="col-sm-12">
-        <button class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.model.JobFile">Select file</button>
+        <button class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.model.File">Select file</button>
         <span style="margin-left: 5px;">
-          {{ $ctrl.model.JobFile.name }}
-          <i class="fa fa-times red-icon" ng-if="!$ctrl.model.JobFile" aria-hidden="true"></i>
+          {{ $ctrl.model.File.name }}
+          <i class="fa fa-times red-icon" ng-if="!$ctrl.model.File" aria-hidden="true"></i>
         </span>
       </div>
     </div>
@@ -142,7 +142,7 @@
     <div class="col-sm-12">
       <button type="button" class="btn btn-primary btn-sm"
         ng-disabled="$ctrl.actionInProgress || !scheduleForm.$valid
-        || ($ctrl.model.Method === 'upload' && !$ctrl.model.JobFile)"
+        || ($ctrl.model.Method === 'upload' && !$ctrl.model.File)"
         ng-click="$ctrl.formAction()" button-spinner="$ctrl.actionInProgress"
       >
         <span ng-hide="$ctrl.actionInProgress">{{ $ctrl.formActionLabel }}</span>

@@ -60,7 +60,7 @@
                 <a ui-sref="portainer.schedules.schedule({id: item.Id})">{{ item.Name }}</a>
               </td>
               <td>
-                {{ item.Cron }}
+                {{ item.CronExpression }}
               </td>
               <td>{{ item.Created | getisodatefromtimestamp }}</td>
             </tr>
