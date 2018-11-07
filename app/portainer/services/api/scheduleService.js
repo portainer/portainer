@@ -55,5 +55,9 @@ function ScheduleService($q, Schedules, FileUploadService) {
     return Schedules.remove({ id: scheduleId }).$promise;
   };
 
+  service.getScriptFile = function(scheduleId) {
+    return Schedules.file({ id: scheduleId }).$promise;
+  };
+
   return service;
 }]);

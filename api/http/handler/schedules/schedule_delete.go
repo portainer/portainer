@@ -3,6 +3,7 @@ package schedules
 import (
 	"errors"
 	"net/http"
+	"strconv"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -27,7 +28,7 @@ func (handler *Handler) scheduleDelete(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusBadRequest, "Cannot remove system schedules", errors.New("Cannot remove system schedule")}
 	}
 
-	scheduleFolder := handler.FileService.GetScheduleFolder(portainer.ScheduleID(scheduleID))
+	scheduleFolder := handler.FileService.GetScheduleFolder(strconv.Itoa(scheduleID))
 	err = handler.FileService.RemoveDirectory(scheduleFolder)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the files associated to the schedule on the filesystem", err}

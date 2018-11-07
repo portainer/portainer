@@ -654,8 +654,8 @@ type (
 		LoadKeyPair() ([]byte, []byte, error)
 		WriteJSONToFile(path string, content interface{}) error
 		FileExists(path string) (bool, error)
-		StoreScheduledJobFileFromBytes(scheduleIdentifier ScheduleID, data []byte) (string, error)
-		GetScheduleFolder(scheduleIdentifier ScheduleID) string
+		StoreScheduledJobFileFromBytes(identifier string, data []byte) (string, error)
+		GetScheduleFolder(identifier string) string
 	}
 
 	// GitService represents a service for managing Git
