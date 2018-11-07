@@ -3,6 +3,7 @@ package schedules
 import (
 	"errors"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/asaskevich/govalidator"
@@ -138,7 +139,7 @@ func (handler *Handler) createScheduleFromFile(w http.ResponseWriter, r *http.Re
 func (handler *Handler) createSchedule(name, image, cronExpression string, endpoints []portainer.EndpointID, file []byte) (*portainer.Schedule, error) {
 	scheduleIdentifier := portainer.ScheduleID(handler.ScheduleService.GetNextIdentifier())
 
-	scriptPath, err := handler.FileService.StoreScheduledJobFileFromBytes(scheduleIdentifier, file)
+	scriptPath, err := handler.FileService.StoreScheduledJobFileFromBytes(strconv.Itoa(int(scheduleIdentifier)), file)
 	if err != nil {
 		return nil, err
 	}

@@ -35,6 +35,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AdministratorAccess(httperror.LoggerHandler(h.scheduleUpdate))).Methods(http.MethodPut)
 	h.Handle("/schedules/{id}",
 		bouncer.AdministratorAccess(httperror.LoggerHandler(h.scheduleDelete))).Methods(http.MethodDelete)
-
+	h.Handle("/schedules/{id}/file",
+		bouncer.AdministratorAccess(httperror.LoggerHandler(h.scheduleFile))).Methods(http.MethodGet)
 	return h
 }

@@ -27,6 +27,8 @@ function ScheduleModel(data) {
 function ScriptExecutionJobModel(data) {
   this.Image = data.Image;
   this.Endpoints = data.Endpoints;
+  this.FileContent = '';
+  this.Method = 'editor';
 }
 
 function ScheduleCreateRequest(model) {
@@ -44,4 +46,5 @@ function ScheduleUpdateRequest(model) {
   this.CronExpression = model.CronExpression;
   this.Image = model.Job.Image;
   this.Endpoints = model.Job.Endpoints;
+  this.FileContent = model.Job.FileContent;
 }

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"io/ioutil"
-	"strconv"
 
 	"github.com/portainer/portainer"
 
@@ -322,16 +321,15 @@ func (service *Service) getContentFromPEMFile(filePath string) ([]byte, error) {
 	return block.Bytes, nil
 }
 
-// GetScheduleFolder returns the absolute path on the FS for a schedule based
+// GetScheduleFolder returns the absolute path on the filesystem for a schedule based
 // on its identifier.
-func (service *Service) GetScheduleFolder(scheduleIdentifier portainer.ScheduleID) string {
-	return path.Join(service.fileStorePath, ScheduleStorePath, strconv.Itoa(int(scheduleIdentifier)))
+func (service *Service) GetScheduleFolder(identifier string) string {
+	return path.Join(service.fileStorePath, ScheduleStorePath, identifier)
 }
 
 // StoreScheduledJobFileFromBytes creates a subfolder in the ScheduleStorePath and stores a new file from bytes.
 // It returns the path to the folder where the file is stored.
-func (service *Service) StoreScheduledJobFileFromBytes(scheduleIdentifier portainer.ScheduleID, data []byte) (string, error) {
-	identifier := strconv.Itoa(int(scheduleIdentifier))
+func (service *Service) StoreScheduledJobFileFromBytes(identifier string, data []byte) (string, error) {
 	scheduleStorePath := path.Join(ScheduleStorePath, identifier)
 	err := service.createDirectoryInStore(scheduleStorePath)
 	if err != nil {

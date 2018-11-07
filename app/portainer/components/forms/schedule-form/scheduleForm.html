@@ -55,14 +55,14 @@
     </div>
   </div>
   <!-- !image-input -->
+  <div class="form-group">
+    <span class="col-sm-12 text-muted small">
+      This schedule will be executed via a privileged container on the target hosts. You can access the host filesystem under the
+      <code>/host</code> folder.
+    </span>
+  </div>
+  <!-- execution-method -->
   <div ng-if="!$ctrl.model.Id">
-    <div class="form-group">
-      <span class="col-sm-12 text-muted small">
-        This schedule will be executed via a privileged container on the target hosts. You can access the host filesystem under the
-        <code>/host</code> folder.
-      </span>
-    </div>
-    <!-- execution-method -->
     <div class="col-sm-12 form-section-title">
       Job content
     </div>
@@ -91,46 +91,46 @@
         </div>
       </div>
     </div>
-    <!-- !execution-method -->
-    <!-- web-editor -->
-    <div ng-show="$ctrl.model.Job.Method === 'editor'">
-      <div class="col-sm-12 form-section-title">
-        Web editor
-      </div>
-      <div class="form-group">
-        <div class="col-sm-12">
-          <code-editor
-            identifier="execute-schedule-editor"
-            placeholder="# Define or paste the content of your script file here"
-            on-change="$ctrl.editorUpdate"
-            value="$ctrl.model.Job.FileContent"
-          ></code-editor>
-        </div>
+  </div>
+  <!-- !execution-method -->
+  <!-- web-editor -->
+  <div ng-show="$ctrl.model.Job.Method === 'editor'">
+    <div class="col-sm-12 form-section-title">
+      Web editor
+    </div>
+    <div class="form-group">
+      <div class="col-sm-12">
+        <code-editor
+        identifier="execute-schedule-editor"
+        placeholder="# Define or paste the content of your script file here"
+        on-change="$ctrl.editorUpdate"
+        value="$ctrl.model.Job.FileContent"
+        ></code-editor>
       </div>
     </div>
-    <!-- !web-editor -->
-    <!-- upload -->
-    <div ng-show="$ctrl.model.Job.Method === 'upload'">
-      <div class="col-sm-12 form-section-title">
-        Upload
-      </div>
-      <div class="form-group">
-        <span class="col-sm-12 text-muted small">
-          You can upload a script file from your computer.
+  </div>
+  <!-- !web-editor -->
+  <!-- upload -->
+  <div ng-show="$ctrl.model.Job.Method === 'upload'">
+    <div class="col-sm-12 form-section-title">
+      Upload
+    </div>
+    <div class="form-group">
+      <span class="col-sm-12 text-muted small">
+        You can upload a script file from your computer.
+      </span>
+    </div>
+    <div class="form-group">
+      <div class="col-sm-12">
+        <button class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.model.Job.File">Select file</button>
+        <span style="margin-left: 5px;">
+          {{ $ctrl.model.Job.File.name }}
+          <i class="fa fa-times red-icon" ng-if="!$ctrl.model.Job.File" aria-hidden="true"></i>
         </span>
       </div>
-      <div class="form-group">
-        <div class="col-sm-12">
-          <button class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.model.Job.File">Select file</button>
-          <span style="margin-left: 5px;">
-            {{ $ctrl.model.Job.File.name }}
-            <i class="fa fa-times red-icon" ng-if="!$ctrl.model.Job.File" aria-hidden="true"></i>
-          </span>
-        </div>
-      </div>
     </div>
-    <!-- !upload -->
   </div>
+  <!-- !upload -->
   <div class="col-sm-12 form-section-title">
     Target endpoints
   </div>

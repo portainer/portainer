@@ -27,6 +27,7 @@ function ($q, $scope, $transition$, $state, Notifications, EndpointService, Grou
 
   function initView() {
     var id = $transition$.params().id;
+    var schedule = null;
 
     $q.all({
       schedule: ScheduleService.schedule(id),
@@ -34,9 +35,15 @@ function ($q, $scope, $transition$, $state, Notifications, EndpointService, Grou
       groups: GroupService.groups()
     })
     .then(function success(data) {
-      $scope.schedule = data.schedule;
+      schedule = data.schedule;
       $scope.endpoints = data.endpoints;
       $scope.groups = data.groups;
+
+      return ScheduleService.getScriptFile(schedule.Id);
+    })
+    .then(function success(data) {
+      schedule.Job.FileContent = data.ScheduleFileContent;
+      $scope.schedule = schedule;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve endpoint list');
