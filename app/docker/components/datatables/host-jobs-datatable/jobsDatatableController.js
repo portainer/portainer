@@ -107,7 +107,7 @@ angular.module('portainer.docker')
             return $q.when();
           }
           ContainerService.prune({ label: ['io.portainer.job.endpoint'] }).then(function success() {
-            Notifications.success('Success', 'Job hisotry cleared');
+            Notifications.success('Success', 'Job history cleared');
             $state.reload();
           }).catch(function error(err) {
             Notifications.error('Failure', err.message, 'Unable to clear job history');
