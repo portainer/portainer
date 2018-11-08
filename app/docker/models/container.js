@@ -63,9 +63,17 @@ function ContainerViewModel(data) {
 }
 
 function ContainerStatsViewModel(data) {
-  this.Date = data.read;
-  this.MemoryUsage = data.memory_stats.usage - data.memory_stats.stats.cache;
-  this.MemoryCache = data.memory_stats.stats.cache;
+  this.read = data.read;
+  this.preread = data.preread;
+  if(data.memory_stats.privateworkingset !== undefined) { // Windows
+    this.MemoryUsage = data.memory_stats.privateworkingset;
+    this.MemoryCache = 0;
+    this.NumProcs = data.num_procs;
+    this.isWindows = true;
+  } else { // Linux
+    this.MemoryUsage = data.memory_stats.usage - data.memory_stats.stats.cache;
+    this.MemoryCache = data.memory_stats.stats.cache;
+  }
   this.PreviousCPUTotalUsage = data.precpu_stats.cpu_usage.total_usage;
   this.PreviousCPUSystemUsage = data.precpu_stats.system_cpu_usage;
   this.CurrentCPUTotalUsage = data.cpu_stats.cpu_usage.total_usage;
