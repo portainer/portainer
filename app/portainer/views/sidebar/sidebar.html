@@ -12,9 +12,6 @@
     <li class="sidebar-list">
       <a ui-sref="portainer.home" ui-sref-active="active">Home <span class="menu-icon fa fa-home fa-fw"></span></a>
     </li>
-    <li class="sidebar-list">
-      <a ui-sref="portainer.schedules" ui-sref-active="active">Job scheduler <span class="menu-icon fa fa-clock fa-fw"></span></a>
-    </li>
     <li class="sidebar-title endpoint-name" ng-if="applicationState.endpoint.name">
       <span class="fa fa-plug space-right"></span>{{ applicationState.endpoint.name }}
     </li>
@@ -38,6 +35,12 @@
       <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'storidge.cluster' || $state.current.name === 'storidge.profiles' || $state.current.name === 'storidge.monitor' || $state.current.name === 'storidge.profiles.new' || $state.current.name === 'storidge.profiles.profile')">
         <a ui-sref="storidge.profiles" ui-sref-active="active">Profiles</a>
       </div>
+    </li>
+    <li class="sidebar-title" ng-if="!applicationState.application.authentication || isAdmin">
+      <span>Scheduler</span>
+    </li>
+    <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
+      <a ui-sref="portainer.schedules" ui-sref-active="active">Host jobs <span class="menu-icon fa fa-clock fa-fw"></span></a>
     </li>
     <li class="sidebar-title" ng-if="!applicationState.application.authentication || isAdmin || isTeamLeader">
       <span>Settings</span>
