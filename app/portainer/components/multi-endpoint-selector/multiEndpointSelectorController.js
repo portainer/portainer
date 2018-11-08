@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 angular.module('portainer.app')
 .controller('MultiEndpointSelectorController', function () {
   var ctrl = this;
