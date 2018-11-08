@@ -138,6 +138,14 @@ angular.module('portainer.app')
       });
     };
 
+    function LimitChartItems(chart, CHART_LIMIT) {
+      if (chart.data.datasets[0].data.length > CHART_LIMIT) {
+        chart.data.labels.pop();
+        chart.data.datasets[0].data.pop();
+        chart.data.datasets[1].data.pop();
+      }
+    }
+
     function UpdateChart(label, value, chart) {
       chart.data.labels.push(label);
       chart.data.datasets[0].data.push(value);
@@ -153,12 +161,14 @@ angular.module('portainer.app')
     service.UpdateMemoryChart = function UpdateChart(label, memoryValue, cacheValue, chart) {
       chart.data.labels.push(label);
       chart.data.datasets[0].data.push(memoryValue);
-      chart.data.datasets[1].data.push(cacheValue);
-
-      if (chart.data.datasets[0].data.length > CHART_LIMIT) {
-        chart.data.labels.pop();
-        chart.data.datasets[0].data.pop();
+      
+      if(cacheValue) {
+        chart.data.datasets[1].data.push(cacheValue);
+      } else { // cache values are not available for Windows
+        chart.data.datasets.splice(1, 1);
       }
+
+      LimitChartItems(chart);
 
       chart.update(0);
     };
@@ -169,11 +179,7 @@ angular.module('portainer.app')
       chart.data.datasets[0].data.push(rx);
       chart.data.datasets[1].data.push(tx);
 
-      if (chart.data.datasets[0].data.length > CHART_LIMIT) {
-        chart.data.labels.pop();
-        chart.data.datasets[0].data.pop();
-        chart.data.datasets[1].data.pop();
-      }
+      LimitChartItems(chart);
 
       chart.update(0);
     };

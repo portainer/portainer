@@ -2,6 +2,7 @@ package schedules
 
 import (
 	"net/http"
+	"strconv"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -15,6 +16,7 @@ type scheduleUpdatePayload struct {
 	Image          *string
 	CronExpression *string
 	Endpoints      []portainer.EndpointID
+	FileContent    *string
 }
 
 func (payload *scheduleUpdatePayload) Validate(r *http.Request) error {
@@ -41,8 +43,16 @@ func (handler *Handler) scheduleUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	updateJobSchedule := updateSchedule(schedule, &payload)
-	if updateJobSchedule {
 
+	if payload.FileContent != nil {
+		_, err := handler.FileService.StoreScheduledJobFileFromBytes(strconv.Itoa(scheduleID), []byte(*payload.FileContent))
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist script file changes on the filesystem", err}
+		}
+		updateJobSchedule = true
+	}
+
+	if updateJobSchedule {
 		jobContext := cron.NewScriptExecutionJobContext(handler.JobService, handler.EndpointService, handler.FileService)
 		jobRunner := cron.NewScriptExecutionJobRunner(schedule.ScriptExecutionJob, jobContext)
 		err := handler.JobScheduler.UpdateSchedule(schedule, jobRunner)

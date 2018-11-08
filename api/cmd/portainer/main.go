@@ -3,6 +3,7 @@ package main // import "github.com/portainer/portainer"
 import (
 	"encoding/json"
 	"strings"
+	"time"
 
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/bolt"
@@ -136,6 +137,7 @@ func loadSnapshotSystemSchedule(jobScheduler portainer.JobScheduler, snapshotter
 		CronExpression: "@every " + *flags.SnapshotInterval,
 		JobType:        portainer.SnapshotJobType,
 		SnapshotJob:    snapshotJob,
+		Created:        time.Now().Unix(),
 	}
 
 	snapshotJobContext := cron.NewSnapshotJobContext(endpointService, snapshotter)
@@ -173,6 +175,7 @@ func loadEndpointSyncSystemSchedule(jobScheduler portainer.JobScheduler, schedul
 		CronExpression:  "@every " + *flags.SyncInterval,
 		JobType:         portainer.EndpointSyncJobType,
 		EndpointSyncJob: endpointSyncJob,
+		Created:         time.Now().Unix(),
 	}
 
 	endpointSyncJobContext := cron.NewEndpointSyncJobContext(endpointService, *flags.ExternalEndpoints)
@@ -194,12 +197,14 @@ func loadSchedulesFromDatabase(jobScheduler portainer.JobScheduler, jobService p
 
 	for _, schedule := range schedules {
 
-		jobContext := cron.NewScriptExecutionJobContext(jobService, endpointService, fileService)
-		jobRunner := cron.NewScriptExecutionJobRunner(schedule.ScriptExecutionJob, jobContext)
+		if schedule.JobType == portainer.ScriptExecutionJobType {
+			jobContext := cron.NewScriptExecutionJobContext(jobService, endpointService, fileService)
+			jobRunner := cron.NewScriptExecutionJobRunner(schedule.ScriptExecutionJob, jobContext)
 
-		err = jobScheduler.CreateSchedule(&schedule, jobRunner)
-		if err != nil {
-			return err
+			err = jobScheduler.CreateSchedule(&schedule, jobRunner)
+			if err != nil {
+				return err
+			}
 		}
 	}
 

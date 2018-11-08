@@ -3,6 +3,8 @@ package schedules
 import (
 	"errors"
 	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
@@ -31,32 +33,32 @@ type scheduleFromFileContentPayload struct {
 func (payload *scheduleFromFilePayload) Validate(r *http.Request) error {
 	name, err := request.RetrieveMultiPartFormValue(r, "Name", false)
 	if err != nil {
-		return err
+		return errors.New("Invalid name")
 	}
 	payload.Name = name
 
 	image, err := request.RetrieveMultiPartFormValue(r, "Image", false)
 	if err != nil {
-		return err
+		return errors.New("Invalid image")
 	}
 	payload.Image = image
 
-	cronExpression, err := request.RetrieveMultiPartFormValue(r, "Schedule", false)
+	cronExpression, err := request.RetrieveMultiPartFormValue(r, "CronExpression", false)
 	if err != nil {
-		return err
+		return errors.New("Invalid cron expression")
 	}
 	payload.CronExpression = cronExpression
 
 	var endpoints []portainer.EndpointID
 	err = request.RetrieveMultiPartFormJSONValue(r, "Endpoints", &endpoints, false)
 	if err != nil {
-		return err
+		return errors.New("Invalid endpoints")
 	}
 	payload.Endpoints = endpoints
 
-	file, _, err := request.RetrieveMultiPartFormFile(r, "File")
+	file, _, err := request.RetrieveMultiPartFormFile(r, "file")
 	if err != nil {
-		return portainer.Error("Invalid Script file. Ensure that the file is uploaded correctly")
+		return portainer.Error("Invalid script file. Ensure that the file is uploaded correctly")
 	}
 	payload.File = file
 
@@ -137,7 +139,7 @@ func (handler *Handler) createScheduleFromFile(w http.ResponseWriter, r *http.Re
 func (handler *Handler) createSchedule(name, image, cronExpression string, endpoints []portainer.EndpointID, file []byte) (*portainer.Schedule, error) {
 	scheduleIdentifier := portainer.ScheduleID(handler.ScheduleService.GetNextIdentifier())
 
-	scriptPath, err := handler.FileService.StoreScheduledJobFileFromBytes(scheduleIdentifier, file)
+	scriptPath, err := handler.FileService.StoreScheduledJobFileFromBytes(strconv.Itoa(int(scheduleIdentifier)), file)
 	if err != nil {
 		return nil, err
 	}
@@ -155,6 +157,7 @@ func (handler *Handler) createSchedule(name, image, cronExpression string, endpo
 		CronExpression:     cronExpression,
 		JobType:            portainer.ScriptExecutionJobType,
 		ScriptExecutionJob: job,
+		Created:            time.Now().Unix(),
 	}
 
 	jobContext := cron.NewScriptExecutionJobContext(handler.JobService, handler.EndpointService, handler.FileService)
