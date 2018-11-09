@@ -5,6 +5,7 @@ angular.module('portainer.app').component('templateList', {
     titleText: '@',
     titleIcon: '@',
     templates: '<',
+    tableKey: '@',
     selectAction: '<',
     deleteAction: '<',
     showSwarmStacks: '<',
