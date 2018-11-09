@@ -47,7 +47,9 @@ angular.module('portainer.app')
         Name: payload.Name,
         CronExpression: payload.CronExpression,
         Image: payload.Image,
-        Endpoints: Upload.json(payload.Endpoints)
+        Endpoints: Upload.json(payload.Endpoints),
+        RetryCount: payload.RetryCount,
+        RetryInterval: payload.RetryInterval
       }
     });
   };

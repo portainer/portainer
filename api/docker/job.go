@@ -41,6 +41,11 @@ func (service *JobService) Execute(endpoint *portainer.Endpoint, nodeName, image
 	}
 	defer cli.Close()
 
+	_, err = cli.Ping(context.Background())
+	if err != nil {
+		return portainer.ErrUnableToPingEndpoint
+	}
+
 	err = pullImage(cli, image)
 	if err != nil {
 		return err

@@ -2,6 +2,7 @@ package cron
 
 import (
 	"log"
+	"time"
 
 	"github.com/portainer/portainer"
 )
@@ -46,6 +47,7 @@ func (runner *ScriptExecutionJobRunner) Run() {
 		return
 	}
 
+	targets := make([]*portainer.Endpoint, 0)
 	for _, endpointID := range runner.job.Endpoints {
 		endpoint, err := runner.context.endpointService.Endpoint(endpointID)
 		if err != nil {
@@ -53,11 +55,32 @@ func (runner *ScriptExecutionJobRunner) Run() {
 			return
 		}
 
-		err = runner.context.jobService.Execute(endpoint, "", runner.job.Image, scriptFile)
-		if err != nil {
-			log.Printf("scheduled job error (script execution). Unable to execute scrtip (endpoint=%s) (err=%s)\n", endpoint.Name, err)
+		targets = append(targets, endpoint)
+	}
+
+	runner.executeAndRetry(targets, scriptFile, 0)
+}
+
+func (runner *ScriptExecutionJobRunner) executeAndRetry(endpoints []*portainer.Endpoint, script []byte, retryCount int) {
+	retryTargets := make([]*portainer.Endpoint, 0)
+
+	for _, endpoint := range endpoints {
+		err := runner.context.jobService.Execute(endpoint, "", runner.job.Image, script)
+		if err == portainer.ErrUnableToPingEndpoint {
+			retryTargets = append(retryTargets, endpoint)
+		} else if err != nil {
+			log.Printf("scheduled job error (script execution). Unable to execute script (endpoint=%s) (err=%s)\n", endpoint.Name, err)
 		}
 	}
+
+	retryCount++
+	if retryCount >= runner.job.RetryCount {
+		return
+	}
+
+	time.Sleep(time.Duration(runner.job.RetryInterval) * time.Second)
+
+	runner.executeAndRetry(retryTargets, script, retryCount)
 }
 
 // GetScheduleID returns the schedule identifier associated to the runner
