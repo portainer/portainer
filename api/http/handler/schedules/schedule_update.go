@@ -17,6 +17,8 @@ type scheduleUpdatePayload struct {
 	CronExpression *string
 	Endpoints      []portainer.EndpointID
 	FileContent    *string
+	RetryCount     *int
+	RetryInterval  *int
 }
 
 func (payload *scheduleUpdatePayload) Validate(r *http.Request) error {
@@ -88,6 +90,16 @@ func updateSchedule(schedule *portainer.Schedule, payload *scheduleUpdatePayload
 
 	if payload.Image != nil {
 		schedule.ScriptExecutionJob.Image = *payload.Image
+		updateJobSchedule = true
+	}
+
+	if payload.RetryCount != nil {
+		schedule.ScriptExecutionJob.RetryCount = *payload.RetryCount
+		updateJobSchedule = true
+	}
+
+	if payload.RetryInterval != nil {
+		schedule.ScriptExecutionJob.RetryInterval = *payload.RetryInterval
 		updateJobSchedule = true
 	}
 

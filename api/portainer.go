@@ -228,10 +228,12 @@ type (
 
 	// ScriptExecutionJob represents a scheduled job that can execute a script via a privileged container
 	ScriptExecutionJob struct {
-		ScheduleID ScheduleID `json:"ScheduleId"`
-		Endpoints  []EndpointID
-		Image      string
-		ScriptPath string
+		ScheduleID    ScheduleID `json:"ScheduleId"`
+		Endpoints     []EndpointID
+		Image         string
+		ScriptPath    string
+		RetryCount    int
+		RetryInterval int
 	}
 
 	// SnapshotJob represents a scheduled job that can create endpoint snapshots
