@@ -6,7 +6,7 @@ angular.module('portainer.app')
     interceptor.responseError = responseErrorInterceptor;
 
     function responseErrorInterceptor(rejection) {
-      if (rejection.status === 502 || rejection.status === -1) {
+      if (rejection.status === 502 || rejection.status === 503 || rejection.status === -1) {
         var endpoint = EndpointProvider.currentEndpoint();
         if (endpoint !== undefined) {
           var data = endpoint.Snapshots[0].SnapshotRaw.Networks;
