@@ -101,6 +101,17 @@
               </label>
             </div>
           </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <label for="toggle_enableHostManagementFeatures" class="control-label text-left">
+                Enable host management features
+                <portainer-tooltip position="bottom" message="When enabled, host management features will be accessible"></portainer-tooltip>
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" name="toggle_enableHostManagementFeatures" ng-model="formValues.enableHostManagementFeatures"><i></i>
+              </label>
+            </div>
+          </div>
           <!-- security -->
           <!-- actions -->
           <div class="form-group">

@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('SchedulesController', ['$scope', '$state', 'Notifications', 'ModalService', 'ScheduleService',
-function ($scope, $state, Notifications, ModalService, ScheduleService) {
+.controller('SchedulesController', ['$scope', '$state', 'Notifications', 'ModalService', 'ScheduleService', 'StateManager',
+function ($scope, $state, Notifications, ModalService, ScheduleService, StateManager) {
 
   $scope.removeAction = removeAction;
 
@@ -36,6 +36,11 @@ function ($scope, $state, Notifications, ModalService, ScheduleService) {
   }
 
   function initView() {
+    var hostManagementFeatures = StateManager.getState().application.enableHostManagementFeatures;
+    if (!hostManagementFeatures) {
+      $state.go('portainer.home');
+    }
+
     ScheduleService.schedules()
     .then(function success(data) {
       $scope.schedules = data;

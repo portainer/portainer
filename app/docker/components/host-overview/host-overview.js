@@ -12,6 +12,7 @@ angular.module('portainer.docker').component('hostOverview', {
     browseUrl: '@',
     jobUrl: '@',
     isJobEnabled: '<',
+    hostFeaturesEnabled: '<',
     jobs: '<'
   },
   transclude: true

@@ -255,6 +255,7 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 			},
 			AllowBindMountsForRegularUsers:     true,
 			AllowPrivilegedModeForRegularUsers: true,
+			EnableHostManagementFeatures:       false,
 			SnapshotInterval:                   *flags.SnapshotInterval,
 		}
 

@@ -1,10 +1,15 @@
 angular.module('portainer.docker').controller('HostJobController', [
-  'SystemService', 'Notifications',
-  function HostJobController(SystemService, Notifications) {
+  '$state', 'SystemService', 'Notifications', 'StateManager',
+  function HostJobController($state, SystemService, Notifications, StateManager) {
     var ctrl = this;
     ctrl.$onInit = $onInit;
 
     function $onInit() {
+      var hostManagementFeatures = StateManager.getState().application.enableHostManagementFeatures;
+      if (!hostManagementFeatures) {
+        $state.go('portainer.home');
+      }
+
       SystemService.info()
       .then(function onInfoLoaded(host) {
         ctrl.host = host;
