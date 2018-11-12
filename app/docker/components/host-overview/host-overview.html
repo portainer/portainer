@@ -7,7 +7,7 @@
   </rd-header-title>
   <rd-header-content>Docker</rd-header-content>
 </rd-header>
-
+<rd-body>
 <information-panel-offline ng-if="$ctrl.offlineMode"></information-panel-offline>
 
 <host-details-panel
@@ -32,3 +32,4 @@
 <disks-panel ng-if="$ctrl.isAgent && $ctrl.agentApiVersion > 1 && !$ctrl.offlineMode && $ctrl.hostFeaturesEnabled" disks="$ctrl.disks"></disks-panel>
 
 <ng-transclude></ng-transclude>
+</rd-body>

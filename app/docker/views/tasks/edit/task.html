@@ -4,7 +4,7 @@
     <a ui-sref="docker.services">Services</a> &gt; <a ui-sref="docker.services.service({id: service.Id })">{{ service.Name }}</a> &gt; {{ task.Id }}
   </rd-header-content>
 </rd-header>
-
+<rd-body>
 <div class="row" ng-if="task && service">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
@@ -53,3 +53,4 @@
     </rd-widget>
   </div>
 </div>
+</rd-body>

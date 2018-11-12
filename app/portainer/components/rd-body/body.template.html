@@ -1,0 +1,22 @@
+<div class="page-wrapper" ng-show="viewLoading">
+    <!-- loading box -->
+    <div class="container simple-box">
+        <div class="col-md-6 col-md-offset-3 col-sm-6 col-sm-offset-3">
+            <!-- loading box logo -->
+            <div class="row">
+                <img ng-if="logo" ng-src="{{ logo }}" class="simple-box-logo">
+                <img ng-if="!logo" src="images/logo_alt.png" class="simple-box-logo" alt="Portainer">
+            </div>
+            <!-- !loading box logo -->
+            <!-- panel -->
+            <div class="row" style="text-align: center">
+                Loading data...
+                <i class="fa fa-spinner fa-spin" style="margin-left: 5px"></i>
+            </div>
+            <!-- !panel -->
+        </div>
+    </div>
+    <!-- !loading box -->
+</div>
+
+<div ng-transclude ng-show="!viewLoading"></div>

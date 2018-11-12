@@ -8,7 +8,7 @@
     <a ui-sref="docker.services">Services</a> &gt; <a ui-sref="docker.services.service({id: service.Id})">{{ service.Name }}</a>
   </rd-header-content>
 </rd-header>
-
+<rd-body>
 <div class="row">
   <div ng-if="isUpdating" class="col-lg-12 col-md-12 col-xs-12">
     <div class="alert alert-info" role="alert" id="service-update-alert">
@@ -196,3 +196,4 @@
     <div id="service-tasks" class="padding-top" ng-include="'app/docker/views/services/edit/includes/tasks.html'"></div>
   </div>
 </div>
+</rd-body>
