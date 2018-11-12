@@ -4,7 +4,7 @@
     <a ui-sref="docker.containers">Containers</a> &gt; <a ui-sref="docker.containers.container({id: container.Id})">{{ container.Name|trimcontainername }}</a> &gt; Console
   </rd-header-content>
 </rd-header>
-
+<rd-body>
 <div class="row" ng-if="state.loaded">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
@@ -73,3 +73,4 @@
     <div id="terminal-container" class="terminal-container"></div>
   </div>
 </div>
+</rd-body>

@@ -3,6 +3,7 @@
   <rd-header-content>Endpoint summary</rd-header-content>
 </rd-header>
 
+<rd-body>
 <div class="row" ng-if="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
   <div class="col-sm-12">
     <dashboard-cluster-agent-info></dashboard-cluster-agent-info>
@@ -162,3 +163,4 @@
     </a>
   </div>
 </div>
+</rd-body>

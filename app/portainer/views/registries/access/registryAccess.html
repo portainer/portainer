@@ -4,7 +4,7 @@
     <a ui-sref="portainer.registries">Registries</a> &gt; <a ui-sref="portainer.registries.registry({id: registry.Id})">{{ registry.Name }}</a> &gt; Access management
   </rd-header-content>
 </rd-header>
-
+<rd-body>
 <div class="row" ng-if="registry">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
@@ -41,3 +41,4 @@
 
 <por-access-management ng-if="registry" access-controlled-entity="registry" update-access="updateAccess(userAccesses, teamAccesses)">
 </por-access-management>
+</rd-body>
