@@ -92,7 +92,7 @@ func (handler *Handler) executeJobFromFile(w http.ResponseWriter, r *http.Reques
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	err = handler.JobService.Execute(endpoint, nodeName, payload.Image, payload.File)
+	err = handler.JobService.ExecuteScript(endpoint, nodeName, payload.Image, payload.File, 0)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Failed executing job", err}
 	}
@@ -107,7 +107,7 @@ func (handler *Handler) executeJobFromFileContent(w http.ResponseWriter, r *http
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	err = handler.JobService.Execute(endpoint, nodeName, payload.Image, []byte(payload.FileContent))
+	err = handler.JobService.ExecuteScript(endpoint, nodeName, payload.Image, []byte(payload.FileContent), 0)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Failed executing job", err}
 	}

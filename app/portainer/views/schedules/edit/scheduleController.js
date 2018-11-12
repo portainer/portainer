@@ -1,12 +1,13 @@
 angular.module('portainer.app')
-.controller('ScheduleController', ['$q', '$scope', '$transition$', '$state', 'Notifications', 'EndpointService', 'GroupService', 'ScheduleService',
-function ($q, $scope, $transition$, $state, Notifications, EndpointService, GroupService, ScheduleService) {
+.controller('ScheduleController', ['$q', '$scope', '$transition$', '$state', 'Notifications', 'EndpointService', 'GroupService', 'ScheduleService', 'EndpointProvider',
+function ($q, $scope, $transition$, $state, Notifications, EndpointService, GroupService, ScheduleService, EndpointProvider) {
 
   $scope.state = {
     actionInProgress: false
   };
 
   $scope.update = update;
+  $scope.goToContainerLogs = goToContainerLogs;
 
   function update() {
     var model = $scope.schedule;
@@ -25,25 +26,48 @@ function ($q, $scope, $transition$, $state, Notifications, EndpointService, Grou
     });
   }
 
+  function goToContainerLogs(endpointId, containerId) {
+    EndpointProvider.setEndpointID(endpointId);
+    $state.go('docker.containers.container.logs', { id: containerId });
+  }
+
+  function associateEndpointsToTasks(tasks, endpoints) {
+    for (var i = 0; i < tasks.length; i++) {
+      var task = tasks[i];
+
+      for (var j = 0; j < endpoints.length; j++) {
+        var endpoint = endpoints[j];
+
+        if (task.EndpointId === endpoint.Id) {
+          task.Endpoint = endpoint;
+          break;
+        }
+      }
+    }
+  }
+
   function initView() {
     var id = $transition$.params().id;
-    var schedule = null;
 
     $q.all({
       schedule: ScheduleService.schedule(id),
+      file: ScheduleService.getScriptFile(id),
+      tasks: ScheduleService.scriptExecutionTasks(id),
       endpoints: EndpointService.endpoints(),
       groups: GroupService.groups()
     })
     .then(function success(data) {
-      schedule = data.schedule;
+      var schedule = data.schedule;
+      schedule.Job.FileContent = data.file.ScheduleFileContent;
+
+      var endpoints = data.endpoints;
+      var tasks = data.tasks;
+      associateEndpointsToTasks(tasks, endpoints);
+
+      $scope.schedule = schedule;
+      $scope.tasks = data.tasks;
       $scope.endpoints = data.endpoints;
       $scope.groups = data.groups;
-
-      return ScheduleService.getScriptFile(schedule.Id);
-    })
-    .then(function success(data) {
-      schedule.Job.FileContent = data.ScheduleFileContent;
-      $scope.schedule = schedule;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve endpoint list');

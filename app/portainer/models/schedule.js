@@ -33,6 +33,13 @@ function ScriptExecutionJobModel(data) {
   this.RetryInterval = data.RetryInterval;
 }
 
+function ScriptExecutionTaskModel(data) {
+  this.Id = data.Id;
+  this.EndpointId = data.EndpointId;
+  this.Status = createStatus(data.Status);
+  this.Created = data.Created;
+}
+
 function ScheduleCreateRequest(model) {
   this.Name = model.Name;
   this.CronExpression = model.CronExpression;

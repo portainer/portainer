@@ -65,7 +65,7 @@ func (runner *ScriptExecutionJobRunner) executeAndRetry(endpoints []*portainer.E
 	retryTargets := make([]*portainer.Endpoint, 0)
 
 	for _, endpoint := range endpoints {
-		err := runner.context.jobService.Execute(endpoint, "", runner.job.Image, script)
+		err := runner.context.jobService.ExecuteScript(endpoint, "", runner.job.Image, script, runner.job.ScheduleID)
 		if err == portainer.ErrUnableToPingEndpoint {
 			retryTargets = append(retryTargets, endpoint)
 		} else if err != nil {
