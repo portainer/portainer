@@ -24,7 +24,7 @@
     "dev": "yarn grunt run-dev",
     "clean-all": "yarn grunt clean:all",
     "dev:client": "webpack",
-    "build:client": "webpack --config ./webpack/webpack.production.js",
+    "build:client": "webpack -p --config ./webpack/webpack.production.js",
     "build-offline": "cd ./api/cmd/portainer && CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags '-s' && mv -b portainer ../../../dist/portainer-linux-amd64"
   },
   "engines": {
@@ -101,6 +101,7 @@
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
     "load-grunt-tasks": "^3.5.2",
+    "lodash-webpack-plugin": "^0.11.5",
     "mini-css-extract-plugin": "^0.4.4",
     "ngtemplate-loader": "^2.0.1",
     "style-loader": "^0.23.1",

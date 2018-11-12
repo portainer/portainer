@@ -1,11 +1,12 @@
 const path = require('path');
-const { ProvidePlugin, ContextReplacementPlugin } = require('webpack');
+const { ProvidePlugin, IgnorePlugin } = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackBuildNotifierPlugin = require('webpack-build-notifier');
 const CleanTerminalPlugin = require('clean-terminal-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 // const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 const npmPackage = require('../package.json');
 const projectRoot = path.resolve(__dirname, '..');
 
@@ -92,7 +93,7 @@ module.exports = {
     new ProvidePlugin({
       $: 'jquery',
       jQuery: 'jquery',
-      'window.jQuery': 'jquery',
+      'window.jQuery': 'jquery'
     }),
     new MiniCssExtractPlugin({
       filename: '[name].css',
@@ -100,8 +101,9 @@ module.exports = {
       sourceMap: true
     }),
     new CleanWebpackPlugin(['dist/public']),
-    new ContextReplacementPlugin(/moment[\/\\]locale$/, /en/)
+    new IgnorePlugin(/^\.\/locale$/, /moment$/),
     // new BundleAnalyzerPlugin()
+    new LodashModuleReplacementPlugin()
   ],
   optimization: {
     splitChunks: {
