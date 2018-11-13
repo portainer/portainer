@@ -9,7 +9,7 @@ angular.module('portainer.app').controller('TemplateListController', ['Datatable
       showContainerTemplates: true
     };
 
-    function onTextFilterChange() {
+    this.onTextFilterChange = function() {
       DatatableService.setDataTableTextFilters(this.tableKey, this.state.textFilter);
     }
 
