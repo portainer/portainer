@@ -56,8 +56,8 @@ func (handler *Handler) scheduleUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if updateJobSchedule {
 		jobContext := cron.NewScriptExecutionJobContext(handler.JobService, handler.EndpointService, handler.FileService)
-		jobRunner := cron.NewScriptExecutionJobRunner(schedule.ScriptExecutionJob, jobContext)
-		err := handler.JobScheduler.UpdateSchedule(schedule, jobRunner)
+		jobRunner := cron.NewScriptExecutionJobRunner(schedule, jobContext)
+		err := handler.JobScheduler.UpdateJobSchedule(jobRunner)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update job scheduler", err}
 		}

@@ -30,7 +30,7 @@ func NewJobService(dockerClientFactory *ClientFactory) *JobService {
 
 // ExecuteScript will leverage a privileged container to execute a script against the specified endpoint/nodename.
 // It will copy the script content specified as a parameter inside a container based on the specified image and execute it.
-func (service *JobService) ExecuteScript(endpoint *portainer.Endpoint, nodeName, image string, script []byte, scheduleID portainer.ScheduleID) error {
+func (service *JobService) ExecuteScript(endpoint *portainer.Endpoint, nodeName, image string, script []byte, schedule *portainer.Schedule) error {
 	buffer, err := archive.TarFileInBuffer(script, "script.sh", 0700)
 	if err != nil {
 		return err
@@ -65,8 +65,8 @@ func (service *JobService) ExecuteScript(endpoint *portainer.Endpoint, nodeName,
 		Cmd: strslice.StrSlice([]string{"sh", "/tmp/script.sh"}),
 	}
 
-	if scheduleID != 0 {
-		containerConfig.Labels["io.portainer.schedule.id"] = strconv.Itoa(int(scheduleID))
+	if schedule != nil {
+		containerConfig.Labels["io.portainer.schedule.id"] = strconv.Itoa(int(schedule.ID))
 	}
 
 	hostConfig := &container.HostConfig{
@@ -80,6 +80,13 @@ func (service *JobService) ExecuteScript(endpoint *portainer.Endpoint, nodeName,
 	body, err := cli.ContainerCreate(context.Background(), containerConfig, hostConfig, networkConfig, "")
 	if err != nil {
 		return err
+	}
+
+	if schedule != nil {
+		err = cli.ContainerRename(context.Background(), body.ID, endpoint.Name+"_"+schedule.Name+"_"+body.ID)
+		if err != nil {
+			return err
+		}
 	}
 
 	copyOptions := types.CopyToContainerOptions{}

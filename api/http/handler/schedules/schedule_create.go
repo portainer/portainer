@@ -158,9 +158,9 @@ func (handler *Handler) createScheduleObjectFromFilePayload(payload *scheduleCre
 	scheduleIdentifier := portainer.ScheduleID(handler.ScheduleService.GetNextIdentifier())
 
 	job := &portainer.ScriptExecutionJob{
-		Endpoints:     payload.Endpoints,
-		Image:         payload.Image,
-		ScheduleID:    scheduleIdentifier,
+		Endpoints: payload.Endpoints,
+		Image:     payload.Image,
+		// ScheduleID:    scheduleIdentifier,
 		RetryCount:    payload.RetryCount,
 		RetryInterval: payload.RetryInterval,
 	}
@@ -181,9 +181,9 @@ func (handler *Handler) createScheduleObjectFromFileContentPayload(payload *sche
 	scheduleIdentifier := portainer.ScheduleID(handler.ScheduleService.GetNextIdentifier())
 
 	job := &portainer.ScriptExecutionJob{
-		Endpoints:     payload.Endpoints,
-		Image:         payload.Image,
-		ScheduleID:    scheduleIdentifier,
+		Endpoints: payload.Endpoints,
+		Image:     payload.Image,
+		// ScheduleID:    scheduleIdentifier,
 		RetryCount:    payload.RetryCount,
 		RetryInterval: payload.RetryInterval,
 	}
@@ -209,9 +209,9 @@ func (handler *Handler) addAndPersistSchedule(schedule *portainer.Schedule, file
 	schedule.ScriptExecutionJob.ScriptPath = scriptPath
 
 	jobContext := cron.NewScriptExecutionJobContext(handler.JobService, handler.EndpointService, handler.FileService)
-	jobRunner := cron.NewScriptExecutionJobRunner(schedule.ScriptExecutionJob, jobContext)
+	jobRunner := cron.NewScriptExecutionJobRunner(schedule, jobContext)
 
-	err = handler.JobScheduler.CreateSchedule(schedule, jobRunner)
+	err = handler.JobScheduler.ScheduleJob(jobRunner)
 	if err != nil {
 		return err
 	}

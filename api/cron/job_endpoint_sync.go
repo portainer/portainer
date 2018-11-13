@@ -11,8 +11,8 @@ import (
 
 // EndpointSyncJobRunner is used to run a EndpointSyncJob
 type EndpointSyncJobRunner struct {
-	job     *portainer.EndpointSyncJob
-	context *EndpointSyncJobContext
+	schedule *portainer.Schedule
+	context  *EndpointSyncJobContext
 }
 
 // EndpointSyncJobContext represents the context of execution of a EndpointSyncJob
@@ -30,10 +30,10 @@ func NewEndpointSyncJobContext(endpointService portainer.EndpointService, endpoi
 }
 
 // NewEndpointSyncJobRunner returns a new runner that can be scheduled
-func NewEndpointSyncJobRunner(job *portainer.EndpointSyncJob, context *EndpointSyncJobContext) *EndpointSyncJobRunner {
+func NewEndpointSyncJobRunner(schedule *portainer.Schedule, context *EndpointSyncJobContext) *EndpointSyncJobRunner {
 	return &EndpointSyncJobRunner{
-		job:     job,
-		context: context,
+		schedule: schedule,
+		context:  context,
 	}
 }
 
@@ -53,19 +53,9 @@ type fileEndpoint struct {
 	TLSKey        string `json:"TLSKey,omitempty"`
 }
 
-// GetScheduleID returns the schedule identifier associated to the runner
-func (runner *EndpointSyncJobRunner) GetScheduleID() portainer.ScheduleID {
-	return runner.job.ScheduleID
-}
-
-// SetScheduleID sets the schedule identifier associated to the runner
-func (runner *EndpointSyncJobRunner) SetScheduleID(ID portainer.ScheduleID) {
-	runner.job.ScheduleID = ID
-}
-
-// GetJobType returns the job type associated to the runner
-func (runner *EndpointSyncJobRunner) GetJobType() portainer.JobType {
-	return portainer.EndpointSyncJobType
+// GetSchedule returns the schedule associated to the runner
+func (runner *EndpointSyncJobRunner) GetSchedule() *portainer.Schedule {
+	return runner.schedule
 }
 
 // Run triggers the execution of the endpoint synchronization process.

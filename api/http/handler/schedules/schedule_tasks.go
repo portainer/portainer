@@ -1,6 +1,7 @@
 package schedules
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 	"strconv"
@@ -16,6 +17,7 @@ type taskContainer struct {
 	EndpointID portainer.EndpointID `json:"EndpointId"`
 	Status     string               `json:"Status"`
 	Created    float64              `json:"Created"`
+	Labels     map[string]string    `json:"Labels"`
 }
 
 // GET request on /api/schedules/:id/tasks
@@ -46,42 +48,40 @@ func (handler *Handler) scheduleTasks(w http.ResponseWriter, r *http.Request) *h
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 		}
 
-		endpointTasks := extractTasksFromSnasphot(endpoint, schedule.ID)
+		endpointTasks, err := extractTasksFromContainerSnasphot(endpoint, schedule.ID)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find extract schedule tasks from endpoint snapshot", err}
+		}
+
 		tasks = append(tasks, endpointTasks...)
 	}
 
 	return response.JSON(w, tasks)
 }
 
-// FIXME: refactor
-func extractTasksFromSnasphot(endpoint *portainer.Endpoint, scheduleID portainer.ScheduleID) []taskContainer {
+func extractTasksFromContainerSnasphot(endpoint *portainer.Endpoint, scheduleID portainer.ScheduleID) ([]taskContainer, error) {
 	endpointTasks := make([]taskContainer, 0)
 	if len(endpoint.Snapshots) == 0 {
-		return endpointTasks
+		return endpointTasks, nil
 	}
 
-	containerList := endpoint.Snapshots[0].SnapshotRaw.Containers.([]interface{})
+	b, err := json.Marshal(endpoint.Snapshots[0].SnapshotRaw.Containers)
+	if err != nil {
+		return nil, err
+	}
 
-	for _, container := range containerList {
-		containerObject := container.(map[string]interface{})
+	var containers []taskContainer
+	err = json.Unmarshal(b, &containers)
+	if err != nil {
+		return nil, err
+	}
 
-		labelsObject := containerObject["Labels"]
-		if labelsObject != nil {
-			labels := labelsObject.(map[string]interface{})
-
-			scheduleIdLabel := labels["io.portainer.schedule.id"]
-
-			if scheduleIdLabel != nil && scheduleIdLabel.(string) == strconv.Itoa(int(scheduleID)) {
-				task := taskContainer{
-					ID:         containerObject["Id"].(string),
-					EndpointID: endpoint.ID,
-					Status:     containerObject["Status"].(string),
-					Created:    containerObject["Created"].(float64),
-				}
-				endpointTasks = append(endpointTasks, task)
-			}
+	for _, container := range containers {
+		if container.Labels["io.portainer.schedule.id"] == strconv.Itoa(int(scheduleID)) {
+			container.EndpointID = endpoint.ID
+			endpointTasks = append(endpointTasks, container)
 		}
 	}
 
-	return endpointTasks
+	return endpointTasks, nil
 }

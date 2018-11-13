@@ -8,8 +8,8 @@ import (
 
 // SnapshotJobRunner is used to run a SnapshotJob
 type SnapshotJobRunner struct {
-	job     *portainer.SnapshotJob
-	context *SnapshotJobContext
+	schedule *portainer.Schedule
+	context  *SnapshotJobContext
 }
 
 // SnapshotJobContext represents the context of execution of a SnapshotJob
@@ -27,35 +27,25 @@ func NewSnapshotJobContext(endpointService portainer.EndpointService, snapshotte
 }
 
 // NewSnapshotJobRunner returns a new runner that can be scheduled
-func NewSnapshotJobRunner(job *portainer.SnapshotJob, context *SnapshotJobContext) *SnapshotJobRunner {
+func NewSnapshotJobRunner(schedule *portainer.Schedule, context *SnapshotJobContext) *SnapshotJobRunner {
 	return &SnapshotJobRunner{
-		job:     job,
-		context: context,
+		schedule: schedule,
+		context:  context,
 	}
 }
 
-// GetScheduleID returns the schedule identifier associated to the runner
-func (runner *SnapshotJobRunner) GetScheduleID() portainer.ScheduleID {
-	return runner.job.ScheduleID
+// GetSchedule returns the schedule associated to the runner
+func (runner *SnapshotJobRunner) GetSchedule() *portainer.Schedule {
+	return runner.schedule
 }
 
-// SetScheduleID sets the schedule identifier associated to the runner
-func (runner *SnapshotJobRunner) SetScheduleID(ID portainer.ScheduleID) {
-	runner.job.ScheduleID = ID
-}
-
-// GetJobType returns the job type associated to the runner
-func (runner *SnapshotJobRunner) GetJobType() portainer.JobType {
-	return portainer.EndpointSyncJobType
-}
-
-// Run triggers the execution of the job.
+// Run triggers the execution of the schedule.
 // It will iterate through all the endpoints available in the database to
 // create a snapshot of each one of them.
 func (runner *SnapshotJobRunner) Run() {
 	endpoints, err := runner.context.endpointService.Endpoints()
 	if err != nil {
-		log.Printf("background job error (endpoint snapshot). Unable to retrieve endpoint list (err=%s)\n", err)
+		log.Printf("background schedule error (endpoint snapshot). Unable to retrieve endpoint list (err=%s)\n", err)
 		return
 	}
 
@@ -67,7 +57,7 @@ func (runner *SnapshotJobRunner) Run() {
 		snapshot, err := runner.context.snapshotter.CreateSnapshot(&endpoint)
 		endpoint.Status = portainer.EndpointStatusUp
 		if err != nil {
-			log.Printf("background job error (endpoint snapshot). Unable to create snapshot (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
+			log.Printf("background schedule error (endpoint snapshot). Unable to create snapshot (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
 			endpoint.Status = portainer.EndpointStatusDown
 		}
 
@@ -77,7 +67,7 @@ func (runner *SnapshotJobRunner) Run() {
 
 		err = runner.context.endpointService.UpdateEndpoint(endpoint.ID, &endpoint)
 		if err != nil {
-			log.Printf("background job error (endpoint snapshot). Unable to update endpoint (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
+			log.Printf("background schedule error (endpoint snapshot). Unable to update endpoint (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
 			return
 		}
 	}
