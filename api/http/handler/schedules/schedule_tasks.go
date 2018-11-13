@@ -40,8 +40,8 @@ func (handler *Handler) scheduleTasks(w http.ResponseWriter, r *http.Request) *h
 
 	tasks := make([]taskContainer, 0)
 
-	for _, endpointId := range schedule.ScriptExecutionJob.Endpoints {
-		endpoint, err := handler.EndpointService.Endpoint(endpointId)
+	for _, endpointID := range schedule.ScriptExecutionJob.Endpoints {
+		endpoint, err := handler.EndpointService.Endpoint(endpointID)
 		if err == portainer.ErrObjectNotFound {
 			continue
 		} else if err != nil {
