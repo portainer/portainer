@@ -3,6 +3,7 @@ package endpoints
 import (
 	"log"
 	"net/http"
+	"time"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
@@ -21,18 +22,27 @@ func (handler *Handler) endpointSnapshot(w http.ResponseWriter, r *http.Request)
 			continue
 		}
 
-		snapshot, err := handler.Snapshotter.CreateSnapshot(&endpoint)
-		endpoint.Status = portainer.EndpointStatusUp
-		if err != nil {
-			log.Printf("http error: endpoint snapshot error (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
-			endpoint.Status = portainer.EndpointStatusDown
+		time.Sleep(10 * time.Second)
+
+		snapshot, snapshotError := handler.Snapshotter.CreateSnapshot(&endpoint)
+
+		latestEndpointReference, err := handler.EndpointService.Endpoint(endpoint.ID)
+		if latestEndpointReference == nil {
+			log.Printf("background schedule error (endpoint snapshot). Endpoint not found inside the database anymore (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
+			continue
+		}
+
+		latestEndpointReference.Status = portainer.EndpointStatusUp
+		if snapshotError != nil {
+			log.Printf("background schedule error (endpoint snapshot). Unable to create snapshot (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, snapshotError)
+			latestEndpointReference.Status = portainer.EndpointStatusDown
 		}
 
 		if snapshot != nil {
-			endpoint.Snapshots = []portainer.Snapshot{*snapshot}
+			latestEndpointReference.Snapshots = []portainer.Snapshot{*snapshot}
 		}
 
-		err = handler.EndpointService.UpdateEndpoint(endpoint.ID, &endpoint)
+		err = handler.EndpointService.UpdateEndpoint(latestEndpointReference.ID, latestEndpointReference)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint changes inside the database", err}
 		}

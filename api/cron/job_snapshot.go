@@ -42,6 +42,8 @@ func (runner *SnapshotJobRunner) GetSchedule() *portainer.Schedule {
 // Run triggers the execution of the schedule.
 // It will iterate through all the endpoints available in the database to
 // create a snapshot of each one of them.
+// As a snapshot can be a long process, to avoid any concurrency issue we
+// retrieve the latest version of the endpoint right after a snapshot.
 func (runner *SnapshotJobRunner) Run() {
 	endpoints, err := runner.context.endpointService.Endpoints()
 	if err != nil {
@@ -54,24 +56,25 @@ func (runner *SnapshotJobRunner) Run() {
 			continue
 		}
 
-		snapshot, err := runner.context.snapshotter.CreateSnapshot(&endpoint)
-		endpoint.Status = portainer.EndpointStatusUp
-		if err != nil {
-			log.Printf("background schedule error (endpoint snapshot). Unable to create snapshot (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
-			endpoint.Status = portainer.EndpointStatusDown
-		}
+		snapshot, snapshotError := runner.context.snapshotter.CreateSnapshot(&endpoint)
 
-		if snapshot != nil {
-			endpoint.Snapshots = []portainer.Snapshot{*snapshot}
-		}
-
-		storedEndpoint, err := runner.context.endpointService.Endpoint(endpoint.ID)
-		if storedEndpoint == nil {
+		latestEndpointReference, err := runner.context.endpointService.Endpoint(endpoint.ID)
+		if latestEndpointReference == nil {
 			log.Printf("background schedule error (endpoint snapshot). Endpoint not found inside the database anymore (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
 			continue
 		}
 
-		err = runner.context.endpointService.UpdateEndpoint(endpoint.ID, &endpoint)
+		latestEndpointReference.Status = portainer.EndpointStatusUp
+		if snapshotError != nil {
+			log.Printf("background schedule error (endpoint snapshot). Unable to create snapshot (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, snapshotError)
+			latestEndpointReference.Status = portainer.EndpointStatusDown
+		}
+
+		if snapshot != nil {
+			latestEndpointReference.Snapshots = []portainer.Snapshot{*snapshot}
+		}
+
+		err = runner.context.endpointService.UpdateEndpoint(latestEndpointReference.ID, latestEndpointReference)
 		if err != nil {
 			log.Printf("background schedule error (endpoint snapshot). Unable to update endpoint (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
 			return
