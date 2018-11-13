@@ -101,7 +101,7 @@ function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, G
   }
 
   function triggerSnapshot() {
-    EndpointService.snapshot()
+    EndpointService.snapshotEndpoints()
     .then(function success() {
       Notifications.success('Success', 'Endpoints updated');
       $state.reload();

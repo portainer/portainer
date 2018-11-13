@@ -1,48 +1,51 @@
 package endpoints
 
 import (
-	"log"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer"
 )
 
-// POST request on /api/endpoints/snapshot
+// POST request on /api/endpoints/:id/snapshot
 func (handler *Handler) endpointSnapshot(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpoints, err := handler.EndpointService.Endpoints()
+	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint identifier route variable", err}
 	}
 
-	for _, endpoint := range endpoints {
-		if endpoint.Type == portainer.AzureEnvironment {
-			continue
-		}
+	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
+	if err == portainer.ErrObjectNotFound {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
+	} else if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
+	}
 
-		snapshot, snapshotError := handler.Snapshotter.CreateSnapshot(&endpoint)
+	if endpoint.Type == portainer.AzureEnvironment {
+		return &httperror.HandlerError{http.StatusBadRequest, "Snapshots not supported for Azure endpoints", err}
+	}
 
-		latestEndpointReference, err := handler.EndpointService.Endpoint(endpoint.ID)
-		if latestEndpointReference == nil {
-			log.Printf("background schedule error (endpoint snapshot). Endpoint not found inside the database anymore (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
-			continue
-		}
+	snapshot, snapshotError := handler.Snapshotter.CreateSnapshot(endpoint)
 
-		latestEndpointReference.Status = portainer.EndpointStatusUp
-		if snapshotError != nil {
-			log.Printf("background schedule error (endpoint snapshot). Unable to create snapshot (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, snapshotError)
-			latestEndpointReference.Status = portainer.EndpointStatusDown
-		}
+	latestEndpointReference, err := handler.EndpointService.Endpoint(endpoint.ID)
+	if latestEndpointReference == nil {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
+	}
 
-		if snapshot != nil {
-			latestEndpointReference.Snapshots = []portainer.Snapshot{*snapshot}
-		}
+	latestEndpointReference.Status = portainer.EndpointStatusUp
+	if snapshotError != nil {
+		latestEndpointReference.Status = portainer.EndpointStatusDown
+	}
 
-		err = handler.EndpointService.UpdateEndpoint(latestEndpointReference.ID, latestEndpointReference)
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint changes inside the database", err}
-		}
+	if snapshot != nil {
+		latestEndpointReference.Snapshots = []portainer.Snapshot{*snapshot}
+	}
+
+	err = handler.EndpointService.UpdateEndpoint(latestEndpointReference.ID, latestEndpointReference)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint changes inside the database", err}
 	}
 
 	return response.Empty(w)

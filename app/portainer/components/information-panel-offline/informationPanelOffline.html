@@ -8,5 +8,8 @@
       <i class="fa fa-clock" aria-hidden="true" style="margin-right: 2px;"></i>
       Last snapshot: {{ $ctrl.snapshotTime | getisodatefromtimestamp }}
     </p>
+    <button type="button" class="btn btn-xs btn-primary" ng-click="$ctrl.triggerSnapshot()" ng-if="$ctrl.showRefreshButton">
+      <i class="fa fa-sync space-right" aria-hidden="true"></i>Refresh
+    </button>
   </span>
 </information-panel>
