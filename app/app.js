@@ -39,12 +39,15 @@ function initAuthentication(authManager, Authentication, $rootScope, $state) {
   authManager.checkAuthOnRefresh();
   Authentication.init();
 
+  // TODO: review and check if other URLs required
   // The unauthenticated event is broadcasted by the jwtInterceptor when
   // hitting a 401. We're using this instead of the usual combination of
   // authManager.redirectWhenUnauthenticated() + unauthenticatedRedirector
   // to have more controls on which URL should trigger the unauthenticated state.
-  $rootScope.$on('unauthenticated', function () {
-    $state.go('portainer.auth', {error: 'Your session has expired'});
+  $rootScope.$on('unauthenticated', function (event, data) {
+    if (!_.includes(data.config.url, '/v2/_catalog')) {
+      $state.go('portainer.auth', {error: 'Your session has expired'});
+    }
   });
 }
 
