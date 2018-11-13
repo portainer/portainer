@@ -36,6 +36,23 @@ function ScheduleService($q, Schedules, FileUploadService) {
     return deferred.promise;
   };
 
+  service.scriptExecutionTasks = function(scheduleId) {
+    var deferred = $q.defer();
+
+    Schedules.tasks({ id: scheduleId }).$promise
+    .then(function success(data) {
+      var tasks = data.map(function (item) {
+        return new ScriptExecutionTaskModel(item);
+      });
+      deferred.resolve(tasks);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to retrieve tasks associated to the schedule', err: err });
+    });
+
+    return deferred.promise;
+  };
+
   service.createScheduleFromFileContent = function(model) {
     var payload = new ScheduleCreateRequest(model);
     return Schedules.create({ method: 'string' }, payload).$promise;

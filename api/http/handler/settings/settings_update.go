@@ -108,7 +108,12 @@ func (handler *Handler) updateSnapshotInterval(settings *portainer.Settings, sna
 		snapshotSchedule := schedules[0]
 		snapshotSchedule.CronExpression = "@every " + snapshotInterval
 
-		err := handler.JobScheduler.UpdateSchedule(&snapshotSchedule, nil)
+		err := handler.JobScheduler.UpdateSystemJobSchedule(portainer.SnapshotJobType, snapshotSchedule.CronExpression)
+		if err != nil {
+			return err
+		}
+
+		err = handler.ScheduleService.UpdateSchedule(snapshotSchedule.ID, &snapshotSchedule)
 		if err != nil {
 			return err
 		}

@@ -8,6 +8,7 @@ function SchedulesFactory($resource, API_ENDPOINT_SCHEDULES) {
     get: { method: 'GET', params: { id: '@id' } },
     update: { method: 'PUT', params: { id: '@id' } },
     remove: { method: 'DELETE', params: { id: '@id'} },
-    file: { method: 'GET', params: { id : '@id', action: 'file' } }
+    file: { method: 'GET', params: { id : '@id', action: 'file' } },
+    tasks: { method: 'GET', isArray: true, params: { id : '@id', action: 'tasks' } }
   });
 }]);

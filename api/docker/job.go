@@ -18,24 +18,25 @@ import (
 
 // JobService represents a service that handles the execution of jobs
 type JobService struct {
-	DockerClientFactory *ClientFactory
+	dockerClientFactory *ClientFactory
 }
 
 // NewJobService returns a pointer to a new job service
 func NewJobService(dockerClientFactory *ClientFactory) *JobService {
 	return &JobService{
-		DockerClientFactory: dockerClientFactory,
+		dockerClientFactory: dockerClientFactory,
 	}
 }
 
-// Execute will execute a script on the endpoint host with the supplied image as a container
-func (service *JobService) Execute(endpoint *portainer.Endpoint, nodeName, image string, script []byte) error {
+// ExecuteScript will leverage a privileged container to execute a script against the specified endpoint/nodename.
+// It will copy the script content specified as a parameter inside a container based on the specified image and execute it.
+func (service *JobService) ExecuteScript(endpoint *portainer.Endpoint, nodeName, image string, script []byte, schedule *portainer.Schedule) error {
 	buffer, err := archive.TarFileInBuffer(script, "script.sh", 0700)
 	if err != nil {
 		return err
 	}
 
-	cli, err := service.DockerClientFactory.CreateClient(endpoint, nodeName)
+	cli, err := service.dockerClientFactory.CreateClient(endpoint, nodeName)
 	if err != nil {
 		return err
 	}
@@ -64,6 +65,10 @@ func (service *JobService) Execute(endpoint *portainer.Endpoint, nodeName, image
 		Cmd: strslice.StrSlice([]string{"sh", "/tmp/script.sh"}),
 	}
 
+	if schedule != nil {
+		containerConfig.Labels["io.portainer.schedule.id"] = strconv.Itoa(int(schedule.ID))
+	}
+
 	hostConfig := &container.HostConfig{
 		Binds:       []string{"/:/host", "/etc:/etc:ro", "/usr:/usr:ro", "/run:/run:ro", "/sbin:/sbin:ro", "/var:/var:ro"},
 		NetworkMode: "host",
@@ -77,6 +82,13 @@ func (service *JobService) Execute(endpoint *portainer.Endpoint, nodeName, image
 		return err
 	}
 
+	if schedule != nil {
+		err = cli.ContainerRename(context.Background(), body.ID, endpoint.Name+"_"+schedule.Name+"_"+body.ID)
+		if err != nil {
+			return err
+		}
+	}
+
 	copyOptions := types.CopyToContainerOptions{}
 	err = cli.CopyToContainer(context.Background(), body.ID, "/tmp", bytes.NewReader(buffer), copyOptions)
 	if err != nil {
@@ -84,12 +96,7 @@ func (service *JobService) Execute(endpoint *portainer.Endpoint, nodeName, image
 	}
 
 	startOptions := types.ContainerStartOptions{}
-	err = cli.ContainerStart(context.Background(), body.ID, startOptions)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return cli.ContainerStart(context.Background(), body.ID, startOptions)
 }
 
 func pullImage(cli *client.Client, image string) error {

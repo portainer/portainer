@@ -228,7 +228,6 @@ type (
 
 	// ScriptExecutionJob represents a scheduled job that can execute a script via a privileged container
 	ScriptExecutionJob struct {
-		ScheduleID    ScheduleID `json:"ScheduleId"`
 		Endpoints     []EndpointID
 		Image         string
 		ScriptPath    string
@@ -237,14 +236,10 @@ type (
 	}
 
 	// SnapshotJob represents a scheduled job that can create endpoint snapshots
-	SnapshotJob struct {
-		ScheduleID ScheduleID `json:"ScheduleId"`
-	}
+	SnapshotJob struct{}
 
 	// EndpointSyncJob represents a scheduled job that synchronize endpoints based on an external file
-	EndpointSyncJob struct {
-		ScheduleID ScheduleID `json:"ScheduleId"`
-	}
+	EndpointSyncJob struct{}
 
 	// Schedule represents a scheduled job.
 	// It only contains a pointer to one of the JobRunner implementations
@@ -668,18 +663,17 @@ type (
 
 	// JobScheduler represents a service to run jobs on a periodic basis
 	JobScheduler interface {
-		CreateSchedule(schedule *Schedule, runner JobRunner) error
-		UpdateSchedule(schedule *Schedule, runner JobRunner) error
-		RemoveSchedule(ID ScheduleID)
+		ScheduleJob(runner JobRunner) error
+		UpdateJobSchedule(runner JobRunner) error
+		UpdateSystemJobSchedule(jobType JobType, newCronExpression string) error
+		UnscheduleJob(ID ScheduleID)
 		Start()
 	}
 
 	// JobRunner represents a service that can be used to run a job
 	JobRunner interface {
 		Run()
-		GetScheduleID() ScheduleID
-		SetScheduleID(ID ScheduleID)
-		GetJobType() JobType
+		GetSchedule() *Schedule
 	}
 
 	// Snapshotter represents a service used to create endpoint snapshots
@@ -710,7 +704,7 @@ type (
 
 	// JobService represents a service to manage job execution on hosts
 	JobService interface {
-		Execute(endpoint *Endpoint, nodeName, image string, script []byte) error
+		ExecuteScript(endpoint *Endpoint, nodeName, image string, script []byte, schedule *Schedule) error
 	}
 )
 
