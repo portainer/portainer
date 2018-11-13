@@ -65,6 +65,12 @@ func (runner *SnapshotJobRunner) Run() {
 			endpoint.Snapshots = []portainer.Snapshot{*snapshot}
 		}
 
+		storedEndpoint, err := runner.context.endpointService.Endpoint(endpoint.ID)
+		if storedEndpoint == nil {
+			log.Printf("background schedule error (endpoint snapshot). Endpoint not found inside the database anymore (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
+			continue
+		}
+
 		err = runner.context.endpointService.UpdateEndpoint(endpoint.ID, &endpoint)
 		if err != nil {
 			log.Printf("background schedule error (endpoint snapshot). Unable to update endpoint (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
