@@ -3,7 +3,6 @@ package endpoints
 import (
 	"log"
 	"net/http"
-	"time"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
@@ -21,8 +20,6 @@ func (handler *Handler) endpointSnapshot(w http.ResponseWriter, r *http.Request)
 		if endpoint.Type == portainer.AzureEnvironment {
 			continue
 		}
-
-		time.Sleep(10 * time.Second)
 
 		snapshot, snapshotError := handler.Snapshotter.CreateSnapshot(&endpoint)
 
