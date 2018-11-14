@@ -83,7 +83,7 @@ func (service *JobService) ExecuteScript(endpoint *portainer.Endpoint, nodeName,
 	}
 
 	if schedule != nil {
-		err = cli.ContainerRename(context.Background(), body.ID, endpoint.Name+"_"+schedule.Name+"_"+body.ID)
+		err = cli.ContainerRename(context.Background(), body.ID, schedule.Name+"_"+body.ID)
 		if err != nil {
 			return err
 		}
