@@ -16,6 +16,7 @@ type Handler struct {
 	LDAPService     portainer.LDAPService
 	FileService     portainer.FileService
 	JobScheduler    portainer.JobScheduler
+	ScheduleService portainer.ScheduleService
 }
 
 // NewHandler creates a handler to manage settings operations.

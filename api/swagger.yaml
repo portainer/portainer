@@ -153,6 +153,8 @@ paths:
       operationId: "DockerHubInspect"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters: []
       responses:
         200:
@@ -175,6 +177,8 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - in: "body"
         name: "body"
@@ -211,6 +215,8 @@ paths:
       operationId: "EndpointList"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters: []
       responses:
         200:
@@ -233,6 +239,8 @@ paths:
       - "multipart/form-data"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - name: "Name"
         in: "formData"
@@ -265,7 +273,11 @@ paths:
       - name: "TLSSkipVerify"
         in: "formData"
         type: "string"
-        description: "Skip server verification when using TLS" (example: false)
+        description: "Skip server verification when using TLS (example: false)"
+      - name: "TLSSkipClientVerify"
+        in: "formData"
+        type: "string"
+        description: "Skip client verification when using TLS (example: false)"
       - name: "TLSCACertFile"
         in: "formData"
         type: "file"
@@ -324,6 +336,8 @@ paths:
       operationId: "EndpointInspect"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -365,6 +379,8 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -413,6 +429,8 @@ paths:
         Remove an endpoint.
         **Access policy**: administrator
       operationId: "EndpointDelete"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -460,6 +478,8 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -508,6 +528,8 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -517,6 +539,11 @@ paths:
       - name: "method"
         in: "query"
         description: "Job execution method. Possible values: file or string."
+        required: true
+        type: "string"
+      - name: "nodeName"
+        in: "query"
+        description: "Optional. Hostname of a node when targeting a Portainer agent cluster."
         required: true
         type: "string"
       - in: "body"
@@ -573,6 +600,8 @@ paths:
       operationId: "EndpointGroupList"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters: []
       responses:
         200:
@@ -595,6 +624,8 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - in: "body"
         name: "body"
@@ -629,6 +660,8 @@ paths:
       operationId: "EndpointGroupInspect"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -670,6 +703,8 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -720,6 +755,8 @@ paths:
         Remove an endpoint group.
         **Access policy**: administrator
       operationId: "EndpointGroupDelete"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -767,6 +804,8 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -815,6 +854,8 @@ paths:
       operationId: "RegistryList"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters: []
       responses:
         200:
@@ -837,6 +878,8 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - in: "body"
         name: "body"
@@ -878,6 +921,8 @@ paths:
       operationId: "RegistryInspect"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -919,6 +964,8 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -969,6 +1016,8 @@ paths:
         Remove a registry.
         **Access policy**: administrator
       operationId: "RegistryDelete"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -1009,6 +1058,8 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -1057,6 +1108,8 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - in: "body"
         name: "body"
@@ -1107,6 +1160,8 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -1157,6 +1212,8 @@ paths:
         Remove a resource control.
         **Access policy**: restricted
       operationId: "ResourceControlDelete"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -1202,6 +1259,8 @@ paths:
       operationId: "SettingsInspect"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters: []
       responses:
         200:
@@ -1224,6 +1283,8 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - in: "body"
         name: "body"
@@ -1258,6 +1319,8 @@ paths:
       operationId: "PublicSettingsInspect"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters: []
       responses:
         200:
@@ -1281,6 +1344,8 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - in: "body"
         name: "body"
@@ -1313,6 +1378,8 @@ paths:
       operationId: "StatusInspect"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters: []
       responses:
         200:
@@ -1336,6 +1403,8 @@ paths:
       operationId: "StackList"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - name: "filters"
         in: "query"
@@ -1368,6 +1437,8 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - name: "type"
         in: "query"
@@ -1447,6 +1518,8 @@ paths:
       operationId: "StackInspect"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -1492,6 +1565,8 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -1544,6 +1619,8 @@ paths:
         Remove a stack.
         **Access policy**: restricted
       operationId: "StackDelete"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -1594,6 +1671,8 @@ paths:
       operationId: "StackFileInspect"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -1639,6 +1718,8 @@ paths:
       operationId: "StackMigrate"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -1693,6 +1774,8 @@ paths:
       operationId: "UserList"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters: []
       responses:
         200:
@@ -1716,6 +1799,8 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - in: "body"
         name: "body"
@@ -1764,6 +1849,8 @@ paths:
       operationId: "UserInspect"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -1805,6 +1892,8 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -1855,6 +1944,8 @@ paths:
         Remove a user.
         **Access policy**: administrator
       operationId: "UserDelete"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -1893,6 +1984,8 @@ paths:
       operationId: "UserMembershipsInspect"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -1936,6 +2029,8 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -1983,6 +2078,8 @@ paths:
       operationId: "UserAdminCheck"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters: []
       responses:
         204:
@@ -2012,6 +2109,8 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - in: "body"
         name: "body"
@@ -2056,6 +2155,8 @@ paths:
       - multipart/form-data
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - in: "path"
         name: "certificate"
@@ -2097,6 +2198,8 @@ paths:
       operationId: "TagList"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters: []
       responses:
         200:
@@ -2119,6 +2222,8 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - in: "body"
         name: "body"
@@ -2158,6 +2263,8 @@ paths:
         Remove a tag.
         **Access policy**: administrator
       operationId: "TagDelete"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -2190,6 +2297,8 @@ paths:
       operationId: "TeamList"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters: []
       responses:
         200:
@@ -2212,6 +2321,8 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - in: "body"
         name: "body"
@@ -2260,6 +2371,8 @@ paths:
       operationId: "TeamInspect"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -2308,6 +2421,8 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -2349,6 +2464,8 @@ paths:
         Remove a team.
         **Access policy**: administrator
       operationId: "TeamDelete"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -2388,6 +2505,8 @@ paths:
       operationId: "TeamMembershipsInspect"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -2429,6 +2548,8 @@ paths:
       operationId: "TeamMembershipList"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters: []
       responses:
         200:
@@ -2458,6 +2579,8 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - in: "body"
         name: "body"
@@ -2508,6 +2631,8 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -2558,6 +2683,8 @@ paths:
         Remove a team membership. Access is only available to administrators leaders of the associated team.
         **Access policy**: restricted
       operationId: "TeamMembershipDelete"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -2604,6 +2731,8 @@ paths:
       operationId: "TemplateList"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       responses:
         200:
@@ -2626,6 +2755,8 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - in: "body"
         name: "body"
@@ -2667,6 +2798,8 @@ paths:
       operationId: "TemplateInspect"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -2715,6 +2848,8 @@ paths:
       - "application/json"
       produces:
       - "application/json"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -2763,6 +2898,8 @@ paths:
         Remove a template.
         **Access policy**: administrator
       operationId: "TemplateDelete"
+      security:
+      - jwt: []
       parameters:
       - name: "id"
         in: "path"
@@ -3848,9 +3985,9 @@ definitions:
   TemplateCreateRequest:
     type: "object"
     required:
-      - "type"
-      - "title"
-      - "description"
+    - "type"
+    - "title"
+    - "description"
     properties:
       type:
         type: "integer"
@@ -4202,7 +4339,7 @@ definitions:
   TemplateRepository:
     type: "object"
     required:
-      - "URL"
+    - "URL"
     properties:
       URL:
         type: "string"

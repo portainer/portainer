@@ -1,21 +1,17 @@
-angular
-  .module('portainer.docker')
-  .controller('HostBrowserViewController', [
-    'SystemService', 'HttpRequestHelper',
-    function HostBrowserViewController(SystemService, HttpRequestHelper) {
-      var ctrl = this;
+angular.module('portainer.docker').controller('HostBrowserViewController', [
+  'SystemService', 'Notifications',
+  function HostBrowserViewController(SystemService, Notifications) {
+    var ctrl = this;
+    ctrl.$onInit = $onInit;
 
-      ctrl.$onInit = $onInit;
-
-      function $onInit() {
-        loadInfo();
-      }
-
-      function loadInfo() {
-        SystemService.info().then(function onInfoLoaded(host) {
-          HttpRequestHelper.setPortainerAgentTargetHeader(host.Name);
-          ctrl.host = host;
-        });
-      }
+    function $onInit() {
+      SystemService.info()
+      .then(function onInfoLoaded(host) {
+        ctrl.host = host;
+      })
+      .catch(function onError(err) {
+        Notifications.error('Unable to retrieve host information', err);
+      });
     }
-  ]);
+  }
+]);

@@ -1,5 +1,5 @@
 angular.module('portainer.docker')
-.factory('SystemService', ['$q', 'System', function SystemServiceFactory($q, System) {
+.factory('SystemService', ['$q', 'System', 'SystemEndpoint', function SystemServiceFactory($q, System, SystemEndpoint) {
   'use strict';
   var service = {};
 
@@ -18,6 +18,10 @@ angular.module('portainer.docker')
 
   service.info = function() {
     return System.info({}).$promise;
+  };
+
+  service.ping = function(endpointId) {
+    return SystemEndpoint.ping({endpointId: endpointId}).$promise;
   };
 
   service.version = function() {
