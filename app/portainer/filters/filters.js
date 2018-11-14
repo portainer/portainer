@@ -93,6 +93,12 @@ angular.module('portainer.app')
     return ip.slice(0, ip.indexOf('/'));
   };
 })
+.filter('homeurlformat', function () {
+  'use strict';
+  return function (url) {
+    return url.slice(url.indexOf(':') + 3);
+  };
+})
 .filter('arraytostr', function () {
   'use strict';
   return function (arr, separator) {
