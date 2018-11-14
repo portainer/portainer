@@ -37,13 +37,17 @@ type scheduleCreateFromFileContentPayload struct {
 func (payload *scheduleCreateFromFilePayload) Validate(r *http.Request) error {
 	name, err := request.RetrieveMultiPartFormValue(r, "Name", false)
 	if err != nil {
-		return errors.New("Invalid name")
+		return errors.New("Invalid schedule name")
+	}
+
+	if !govalidator.Matches(name, `^[a-zA-Z0-9][a-zA-Z0-9_.-]+$`) {
+		return errors.New("Invalid schedule name format. Allowed characters are: [a-zA-Z0-9_.-]")
 	}
 	payload.Name = name
 
 	image, err := request.RetrieveMultiPartFormValue(r, "Image", false)
 	if err != nil {
-		return errors.New("Invalid image")
+		return errors.New("Invalid schedule image")
 	}
 	payload.Image = image
 
@@ -78,6 +82,10 @@ func (payload *scheduleCreateFromFilePayload) Validate(r *http.Request) error {
 func (payload *scheduleCreateFromFileContentPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
 		return portainer.Error("Invalid schedule name")
+	}
+
+	if !govalidator.Matches(payload.Name, `^[a-zA-Z0-9][a-zA-Z0-9_.-]+$`) {
+		return errors.New("Invalid schedule name format. Allowed characters are: [a-zA-Z0-9_.-]")
 	}
 
 	if govalidator.IsNull(payload.Image) {
