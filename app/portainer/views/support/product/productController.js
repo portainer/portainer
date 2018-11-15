@@ -4,7 +4,7 @@ function ($scope, $transition$) {
 
   $scope.formValues = {
     instances: 1,
-    hosts: 10
+    endpointCount: 10
   };
 
   function initView() {
