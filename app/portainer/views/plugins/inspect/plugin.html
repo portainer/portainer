@@ -5,7 +5,6 @@
   </rd-header-content>
 </rd-header>
 
-
 <div class="row" ng-if="plugin">
   <div class="col-sm-12">
     <rd-widget>
@@ -39,8 +38,15 @@
                 {{ plugin.ShortDescription }}
               </div>
 
-              <div style="margin-top: 15px;" ng-if="!plugin.Enabled">
-                <a href="https://portainer.io" target="_blank" class="btn btn-primary btn-sm" style="width: 100%; margin-left: 0;">
+              <div class="form-group">
+                <label for="instances_qty" class="col-sm-7 control-label text-left">Instances</label>
+                <div class="col-sm-5">
+                  <input type="number" class="form-control" ng-model="formValues.instances" id="instances_qty" placeholder="1">
+                </div>
+              </div>
+
+              <div style="margin-top: 15px;" ng-if="!plugin.Enabled" ng-disabled="!formValues.instances">
+                <a href="https://2-portainer.pi.bypronto.com/checkout/?add-to-cart=1164&quantity={{ formValues.instances }}" target="_blank" class="btn btn-primary btn-sm" style="width: 100%; margin-left: 0;">
                   Buy
                 </a>
               </div>
