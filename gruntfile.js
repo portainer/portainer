@@ -264,7 +264,7 @@ function shell_buildBinary(p, a) {
         'if [ -f '+(binfile)+' ]; then',
           'echo "Portainer binary exists";',
         'else',
-          'build/build_in_container.sh ' + p + ' ' + a + ';',
+          'build/build_binary.sh ' + p + ' ' + a + ';',
         'fi'
       ].join (' ')
     } else {
@@ -272,7 +272,7 @@ function shell_buildBinary(p, a) {
         'powershell -Command "& {if (Get-Item -Path '+(binfile+'.exe')+' -ErrorAction:SilentlyContinue) {',
           'Write-Host "Portainer binary exists"',
         '} else {',
-          '& ".\\build\\build_in_container.ps1" -platform '+ p +' -arch '+ a +'',
+          '& ".\\build\\build_binary.ps1" -platform '+ p +' -arch '+ a +'',
         '}}"'
       ].join(' ')
     }      
