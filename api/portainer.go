@@ -185,7 +185,7 @@ type (
 	}
 
 	// RegistryManagementConfiguration represents a configuration that can be used to query
-	// the registry API via the registry management plugin.
+	// the registry API via the registry management extension.
 	RegistryManagementConfiguration struct {
 		Type           RegistryType     `json:"Type"`
 		Authentication bool             `json:"Authentication"`
@@ -474,12 +474,12 @@ type (
 	// It can be either a TLS CA file, a TLS certificate file or a TLS key file
 	TLSFileType int
 
-	// PluginID represents a plugin identifier
-	PluginID int
+	// ExtensionID represents a extension identifier
+	ExtensionID int
 
-	// Plugin represent a Portainer plugin
-	Plugin struct {
-		ID               PluginID `json:"Id"`
+	// Extension represent a Portainer extension
+	Extension struct {
+		ID               ExtensionID `json:"Id"`
 		Enabled          bool     `json:"Enabled"`
 		Name             string   `json:"Name,omitempty"`
 		ShortDescription string   `json:"ShortDescription,omitempty"`
@@ -651,12 +651,12 @@ type (
 		DeleteTemplate(ID TemplateID) error
 	}
 
-	// PluginService represents a service for managing plugin data
-	PluginService interface {
-		Plugin(ID PluginID) (*Plugin, error)
-		Plugins() ([]Plugin, error)
-		Persist(plugin *Plugin) error
-		DeletePlugin(ID PluginID) error
+	// ExtensionService represents a service for managing extension data
+	ExtensionService interface {
+		Extension(ID ExtensionID) (*Extension, error)
+		Extensions() ([]Extension, error)
+		Persist(extension *Extension) error
+		DeleteExtension(ID ExtensionID) error
 	}
 
 	// CryptoService represents a service for encrypting/hashing data
@@ -760,8 +760,8 @@ const (
 	DBVersion = 14
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
 	MessageOfTheDayURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com/motd.html"
-	// PluginDefinitionsURL represents the URL where Portainer plugin definitions can be retrieved
-	PluginDefinitionsURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com/plugins.json"
+	// ExtensionDefinitionsURL represents the URL where Portainer extension definitions can be retrieved
+	ExtensionDefinitionsURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com/extensions.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response
 	PortainerAgentHeader = "Portainer-Agent"
 	// PortainerAgentTargetHeader represent the name of the header containing the target node name
@@ -884,9 +884,9 @@ const (
 )
 
 const (
-	_ PluginID = iota
-	// RegistryManagementPlugin represents the registry management plugin
-	RegistryManagementPlugin
+	_ ExtensionID = iota
+	// RegistryManagementExtension represents the registry management extension
+	RegistryManagementExtension
 )
 
 const (

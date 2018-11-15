@@ -11,7 +11,7 @@ import (
 	"github.com/portainer/portainer/bolt/endpoint"
 	"github.com/portainer/portainer/bolt/endpointgroup"
 	"github.com/portainer/portainer/bolt/migrator"
-	"github.com/portainer/portainer/bolt/plugin"
+	"github.com/portainer/portainer/bolt/extension"
 	"github.com/portainer/portainer/bolt/registry"
 	"github.com/portainer/portainer/bolt/resourcecontrol"
 	"github.com/portainer/portainer/bolt/schedule"
@@ -40,7 +40,7 @@ type Store struct {
 	DockerHubService       *dockerhub.Service
 	EndpointGroupService   *endpointgroup.Service
 	EndpointService        *endpoint.Service
-	PluginService          *plugin.Service
+	ExtensionService          *extension.Service
 	RegistryService        *registry.Service
 	ResourceControlService *resourcecontrol.Service
 	SettingsService        *settings.Service
@@ -178,11 +178,11 @@ func (store *Store) initServices() error {
 	}
 	store.EndpointService = endpointService
 
-	pluginService, err := plugin.NewService(store.db)
+	extensionService, err := extension.NewService(store.db)
 	if err != nil {
 		return err
 	}
-	store.PluginService = pluginService
+	store.ExtensionService = extensionService
 
 	registryService, err := registry.NewService(store.db)
 	if err != nil {

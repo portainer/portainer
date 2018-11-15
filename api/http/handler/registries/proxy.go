@@ -29,15 +29,15 @@ func (handler *Handler) proxyRequestsToRegistryAPI(w http.ResponseWriter, r *htt
 
 	//TODO: review that??
 	var proxy http.Handler
-	proxy = handler.ProxyManager.GetPluginProxy(portainer.RegistryManagementPlugin)
+	proxy = handler.ProxyManager.GetExtensionProxy(portainer.RegistryManagementExtension)
 	if proxy == nil {
-		// TODO: plugin check should not be done this way
-		// return &httperror.HandlerError{http.StatusInternalServerError, "Registry management plugin is not enabled", errors.New("Plugin not enabled")}
-		err = handler.ProxyManager.CreatePluginProxy(portainer.RegistryManagementPlugin)
+		// TODO: extension check should not be done this way
+		// return &httperror.HandlerError{http.StatusInternalServerError, "Registry management extension is not enabled", errors.New("Extension not enabled")}
+		err = handler.ProxyManager.CreateExtensionProxy(portainer.RegistryManagementExtension)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to register registry proxy", err}
 		}
-		proxy = handler.ProxyManager.GetPluginProxy(portainer.RegistryManagementPlugin)
+		proxy = handler.ProxyManager.GetExtensionProxy(portainer.RegistryManagementExtension)
 	}
 
 	managementConfiguration := &registry.ManagementConfiguration

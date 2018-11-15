@@ -16,7 +16,7 @@ type (
 	Manager struct {
 		proxyFactory  *proxyFactory
 		proxies       cmap.ConcurrentMap
-		pluginProxies cmap.ConcurrentMap
+		extensionProxies cmap.ConcurrentMap
 		// extensionProxies cmap.ConcurrentMap
 		// registryProxies  cmap.ConcurrentMap
 	}
@@ -36,7 +36,7 @@ type (
 func NewManager(parameters *ManagerParams) *Manager {
 	return &Manager{
 		proxies:       cmap.New(),
-		pluginProxies: cmap.New(),
+		extensionProxies: cmap.New(),
 		// extensionProxies: cmap.New(),
 		// registryProxies:  cmap.New(),
 		proxyFactory: &proxyFactory{
@@ -102,29 +102,29 @@ func (manager *Manager) DeleteProxy(key string) {
 	manager.proxies.Remove(key)
 }
 
-// DeletePluginProxy deletes the plugin proxy associated to a key
-func (manager *Manager) DeletePluginProxy(key string) {
-	manager.pluginProxies.Remove(key)
+// DeleteExtensionProxy deletes the extension proxy associated to a key
+func (manager *Manager) DeleteExtensionProxy(key string) {
+	manager.extensionProxies.Remove(key)
 }
 
-func (manager *Manager) CreatePluginProxy(pluginID portainer.PluginID) error {
-	// TODO: should be stored in plugin definition somewhere?
+func (manager *Manager) CreateExtensionProxy(extensionID portainer.ExtensionID) error {
+	// TODO: should be stored in extension definition somewhere?
 	// otherwise needs a switch or something
 
 	// TODO: should pass a secret as a header (license?) to prevent anybody from requesting it.
-	pluginURL, err := url.Parse("http://192.168.178.142:7001")
+	extensionURL, err := url.Parse("http://192.168.178.142:7001")
 	if err != nil {
 		return err
 	}
 
-	proxy := manager.proxyFactory.newHTTPProxy(pluginURL)
-	manager.pluginProxies.Set(strconv.Itoa(int(pluginID)), proxy)
+	proxy := manager.proxyFactory.newHTTPProxy(extensionURL)
+	manager.extensionProxies.Set(strconv.Itoa(int(extensionID)), proxy)
 
 	return nil
 }
 
-func (manager *Manager) GetPluginProxy(pluginID portainer.PluginID) http.Handler {
-	proxy, ok := manager.pluginProxies.Get(strconv.Itoa(int(pluginID)))
+func (manager *Manager) GetExtensionProxy(extensionID portainer.ExtensionID) http.Handler {
+	proxy, ok := manager.extensionProxies.Get(strconv.Itoa(int(extensionID)))
 	if !ok {
 		return nil
 	}

@@ -99,7 +99,7 @@ func (handler *Handler) registryConfigure(w http.ResponseWriter, r *http.Request
 
 		if !payload.TLSSkipVerify {
 			// TODO: store in /data/tls/registry_ID ? If so, registry_ prefix should probably be a constant
-			// Or store somewhere else? /data/plugins/registrymanagement|1/registryid/
+			// Or store somewhere else? /data/extensions/registrymanagement|1/registryid/
 			folder := "registry_" + strconv.Itoa(int(registry.ID))
 
 			certPath, err := handler.FileService.StoreTLSFileFromBytes(folder, portainer.TLSFileCert, payload.TLSCertFile)

@@ -198,24 +198,24 @@ angular.module('portainer.app', [])
     }
   };
 
-  var plugins = {
-    name: 'portainer.plugins',
-    url: '/plugins',
+  var extensions = {
+    name: 'portainer.extensions',
+    url: '/extensions',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/plugins/plugins.html',
-        controller: 'PluginsController'
+        templateUrl: 'app/portainer/views/extensions/extensions.html',
+        controller: 'ExtensionsController'
       }
     }
   };
 
-  var plugin = {
-    name: 'portainer.plugins.plugin',
-    url: '/plugin/:id',
+  var extension = {
+    name: 'portainer.extensions.extension',
+    url: '/extension/:id',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/plugins/inspect/plugin.html',
-        controller: 'PluginController'
+        templateUrl: 'app/portainer/views/extensions/inspect/extension.html',
+        controller: 'ExtensionController'
       }
     }
   };
@@ -494,8 +494,8 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(init);
   $stateRegistryProvider.register(initEndpoint);
   $stateRegistryProvider.register(initAdmin);
-  $stateRegistryProvider.register(plugins);
-  $stateRegistryProvider.register(plugin);
+  $stateRegistryProvider.register(extensions);
+  $stateRegistryProvider.register(extension);
   $stateRegistryProvider.register(registries);
   $stateRegistryProvider.register(registry);
   $stateRegistryProvider.register(registryAccess);

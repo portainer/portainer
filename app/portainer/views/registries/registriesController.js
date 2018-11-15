@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('RegistriesController', ['$q', '$scope', '$state', 'RegistryService', 'DockerHubService', 'ModalService', 'Notifications', 'PortainerPluginService',
-function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, Notifications, PortainerPluginService) {
+.controller('RegistriesController', ['$q', '$scope', '$state', 'RegistryService', 'DockerHubService', 'ModalService', 'Notifications', 'ExtensionService',
+function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, Notifications, ExtensionService) {
 
   $scope.state = {
     actionInProgress: false
@@ -61,12 +61,12 @@ function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, N
     $q.all({
       registries: RegistryService.registries(),
       dockerhub: DockerHubService.dockerhub(),
-      plugins: PortainerPluginService.plugins(false)
+      extensions: ExtensionService.extensions(false)
     })
     .then(function success(data) {
       $scope.registries = data.registries;
       $scope.dockerhub = data.dockerhub;
-      $scope.registryManagementAvailable = _.find(data.plugins, { Id: 1, Enabled: true }) ? true : false;
+      $scope.registryManagementAvailable = _.find(data.extensions, { Id: 1, Enabled: true }) ? true : false;
     })
     .catch(function error(err) {
       $scope.registries = [];

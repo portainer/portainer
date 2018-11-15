@@ -11,7 +11,7 @@ import (
 	"github.com/portainer/portainer/http/handler/endpoints"
 	"github.com/portainer/portainer/http/handler/file"
 	"github.com/portainer/portainer/http/handler/motd"
-	"github.com/portainer/portainer/http/handler/plugins"
+	"github.com/portainer/portainer/http/handler/extensions"
 	"github.com/portainer/portainer/http/handler/registries"
 	"github.com/portainer/portainer/http/handler/resourcecontrols"
 	"github.com/portainer/portainer/http/handler/schedules"
@@ -38,7 +38,7 @@ type Handler struct {
 	EndpointProxyHandler   *endpointproxy.Handler
 	FileHandler            *file.Handler
 	MOTDHandler            *motd.Handler
-	PluginHandler          *plugins.Handler
+	ExtensionHandler          *extensions.Handler
 	RegistryHandler        *registries.Handler
 	ResourceControlHandler *resourcecontrols.Handler
 	SettingsHandler        *settings.Handler
@@ -77,8 +77,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	case strings.HasPrefix(r.URL.Path, "/api/motd"):
 		http.StripPrefix("/api", h.MOTDHandler).ServeHTTP(w, r)
-	case strings.HasPrefix(r.URL.Path, "/api/plugins"):
-		http.StripPrefix("/api", h.PluginHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/extensions"):
+		http.StripPrefix("/api", h.ExtensionHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/registries"):
 		http.StripPrefix("/api", h.RegistryHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/resource_controls"):

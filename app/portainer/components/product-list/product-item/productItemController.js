@@ -4,10 +4,10 @@ function ($state) {
 
   var ctrl = this;
   ctrl.$onInit = $onInit;
-  ctrl.goToPluginView = goToPluginView;
+  ctrl.goToExtensionView = goToExtensionView;
 
-  function goToPluginView() {
-    $state.go('portainer.plugins.plugin', { id: ctrl.model.Id });
+  function goToExtensionView() {
+    $state.go('portainer.extensions.extension', { id: ctrl.model.Id });
   }
 
   function $onInit() {

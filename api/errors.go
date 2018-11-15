@@ -88,9 +88,9 @@ const (
 	ErrUndefinedTLSFileType = Error("Undefined TLS file type")
 )
 
-// Plugin errors.
+// Extension errors.
 const (
-	ErrPluginAlreadyEnabled = Error("This plugin is already enabled")
+	ErrExtensionAlreadyEnabled = Error("This extension is already enabled")
 )
 
 // Docker errors.

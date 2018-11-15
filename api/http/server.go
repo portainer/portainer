@@ -21,7 +21,7 @@ import (
 	"github.com/portainer/portainer/http/handler/endpoints"
 	"github.com/portainer/portainer/http/handler/file"
 	"github.com/portainer/portainer/http/handler/motd"
-	"github.com/portainer/portainer/http/handler/plugins"
+	"github.com/portainer/portainer/http/handler/extensions"
 	"github.com/portainer/portainer/http/handler/registries"
 	"github.com/portainer/portainer/http/handler/resourcecontrols"
 	"github.com/portainer/portainer/http/handler/schedules"
@@ -62,7 +62,7 @@ type Server struct {
 	GitService             portainer.GitService
 	JWTService             portainer.JWTService
 	LDAPService            portainer.LDAPService
-	PluginService          portainer.PluginService
+	ExtensionService          portainer.ExtensionService
 	RegistryService        portainer.RegistryService
 	ResourceControlService portainer.ResourceControlService
 	ScheduleService        portainer.ScheduleService
@@ -84,42 +84,42 @@ type Server struct {
 }
 
 // TODO: relocate
-func initPlugins(pluginService portainer.PluginService, proxyManager *proxy.Manager, pluginProcesses *cmap.ConcurrentMap) {
+func initExtensions(extensionService portainer.ExtensionService, proxyManager *proxy.Manager, extensionProcesses *cmap.ConcurrentMap) {
 
-	plugins, err := pluginService.Plugins()
+	extensions, err := extensionService.Extensions()
 	if err != nil {
-		log.Printf("Plugin init error: \n", err)
+		log.Printf("Extension init error: \n", err)
 		return
 	}
 
-	for _, plugin := range plugins {
-		err := startPlugin(&plugin, proxyManager, pluginProcesses)
+	for _, extension := range extensions {
+		err := startExtension(&extension, proxyManager, extensionProcesses)
 		if err != nil {
-			log.Printf("Plugin init error: \n", err)
+			log.Printf("Extension init error: \n", err)
 			return
 		}
 	}
 
 }
 
-func startPlugin(plugin *portainer.Plugin, proxyManager *proxy.Manager, pluginProcesses *cmap.ConcurrentMap) error {
+func startExtension(extension *portainer.Extension, proxyManager *proxy.Manager, extensionProcesses *cmap.ConcurrentMap) error {
 
-	// TODO: switch case on plugin identifier to download/enable correct plugin
-	switch plugin.ID {
-	case portainer.RegistryManagementPlugin:
-		return startRegistryManagementPlugin(plugin, proxyManager, pluginProcesses)
+	// TODO: switch case on extension identifier to download/enable correct extension
+	switch extension.ID {
+	case portainer.RegistryManagementExtension:
+		return startRegistryManagementExtension(extension, proxyManager, extensionProcesses)
 	default:
-		return errors.New("Unsupported plugin identifier")
+		return errors.New("Unsupported extension identifier")
 	}
 
 	return nil
 }
 
-func startRegistryManagementPlugin(plugin *portainer.Plugin, proxyManager *proxy.Manager, pluginProcesses *cmap.ConcurrentMap) error {
+func startRegistryManagementExtension(extension *portainer.Extension, proxyManager *proxy.Manager, extensionProcesses *cmap.ConcurrentMap) error {
 	// TODO: if license check fails, need to be updated to use flags
 	// should probably download and use a specific license-checker binary
 
-	licenseValidationCommand := exec.Command("/data/bin/plugin-registry-management-linux-amd64-1.0.0", "-license", plugin.License, "-check")
+	licenseValidationCommand := exec.Command("/data/bin/extension-registry-management-linux-amd64-1.0.0", "-license", extension.License, "-check")
 	cmdOutput := &bytes.Buffer{}
 	licenseValidationCommand.Stdout = cmdOutput
 
@@ -130,14 +130,14 @@ func startRegistryManagementPlugin(plugin *portainer.Plugin, proxyManager *proxy
 
 	output := string(cmdOutput.Bytes())
 	licenseDetails := strings.Split(output, "|")
-	plugin.LicenseCompany = licenseDetails[0]
-	plugin.LicenseExpiration = licenseDetails[1]
-	plugin.Version = licenseDetails[2]
+	extension.LicenseCompany = licenseDetails[0]
+	extension.LicenseExpiration = licenseDetails[1]
+	extension.Version = licenseDetails[2]
 
 	// syscall.Exec replaces the process, ForkExec could be tried?
 	// Also should be relocated to another package
-	// err = syscall.ForkExec("/plugins/plugin-registry-management", []string{"plugin-registry-management"}, os.Environ())
-	cmd := exec.Command("/data/bin/plugin-registry-management-linux-amd64-1.0.0", plugin.License)
+	// err = syscall.ForkExec("/extensions/extension-registry-management", []string{"extension-registry-management"}, os.Environ())
+	cmd := exec.Command("/data/bin/extension-registry-management-linux-amd64-1.0.0", extension.License)
 
 	// cmd.Start will not share logs with the main Portainer container.
 	err = cmd.Start()
@@ -145,9 +145,9 @@ func startRegistryManagementPlugin(plugin *portainer.Plugin, proxyManager *proxy
 		return err
 	}
 
-	pluginProcesses.Set(strconv.Itoa(int(plugin.ID)), cmd)
+	extensionProcesses.Set(strconv.Itoa(int(extension.ID)), cmd)
 
-	return proxyManager.CreatePluginProxy(plugin.ID)
+	return proxyManager.CreateExtensionProxy(extension.ID)
 }
 
 // Start starts the HTTP server
@@ -174,8 +174,8 @@ func (server *Server) Start() error {
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
 
 	// TODO: relocate to a service ? ProcessService?
-	pluginProcesses := cmap.New()
-	go initPlugins(server.PluginService, proxyManager, &pluginProcesses)
+	extensionProcesses := cmap.New()
+	go initExtensions(server.ExtensionService, proxyManager, &extensionProcesses)
 
 	var authHandler = auth.NewHandler(requestBouncer, rateLimiter, server.AuthDisabled)
 	authHandler.UserService = server.UserService
@@ -209,11 +209,11 @@ func (server *Server) Start() error {
 
 	var motdHandler = motd.NewHandler(requestBouncer)
 
-	var pluginHandler = plugins.NewHandler(requestBouncer)
-	pluginHandler.PluginService = server.PluginService
-	pluginHandler.FileService = server.FileService
-	pluginHandler.ProxyManager = proxyManager
-	pluginHandler.PluginProcesses = &pluginProcesses
+	var extensionHandler = extensions.NewHandler(requestBouncer)
+	extensionHandler.ExtensionService = server.ExtensionService
+	extensionHandler.FileService = server.FileService
+	extensionHandler.ProxyManager = proxyManager
+	extensionHandler.ExtensionProcesses = &extensionProcesses
 
 	var registryHandler = registries.NewHandler(requestBouncer)
 	registryHandler.RegistryService = server.RegistryService
@@ -291,7 +291,7 @@ func (server *Server) Start() error {
 		EndpointProxyHandler:   endpointProxyHandler,
 		FileHandler:            fileHandler,
 		MOTDHandler:            motdHandler,
-		PluginHandler:          pluginHandler,
+		ExtensionHandler:          extensionHandler,
 		RegistryHandler:        registryHandler,
 		ResourceControlHandler: resourceControlHandler,
 		SettingsHandler:        settingsHandler,
