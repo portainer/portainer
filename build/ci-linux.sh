@@ -13,16 +13,16 @@ else
   manifest="${APPVEYOR_REPO_BRANCH}"
 fi
 
-docker build -t "ssbkang/portainer:$tag" -f build/linux/Dockerfile .
+docker build -t "portainer/portainer:$tag" -f build/linux/Dockerfile .
 docker login -u "${DOCKER_USER}" -p "${DOCKER_PASS}"
-docker push "ssbkang/portainer:$tag"
+docker push "portainer/portainer:$tag"
 
 if [ "${2}" == 'amd64' ] ; then
-  docker -D manifest create "ssbkang/portainer:$manifest" \
-    "ssbkang/portainer:$manifest-linux-amd64" \
-    "ssbkang/portainer:$manifest-windows-amd64" \
-    "ssbkang/portainer:$manifest-windows1709-amd64" \
-    "ssbkang/portainer:$manifest-windows1803-amd64"
+  docker -D manifest create "portainer/portainer:$manifest" \
+    "portainer/portainer:$manifest-linux-amd64" \
+    "portainer/portainer:$manifest-windows-amd64" \
+    "portainer/portainer:$manifest-windows1709-amd64" \
+    "portainer/portainer:$manifest-windows1803-amd64"
 
-  docker manifest push "ssbkang/portainer:$manifest"
+  docker manifest push "portainer/portainer:$manifest"
 fi
