@@ -16,21 +16,21 @@ if ($pull_request_number) {
 }
 
 docker build `
-  -t ssbkang/portainer:$tag `
+  -t portainer/portainer:$tag `
   -f build\windows2016\nanoserver\Dockerfile .
     
 docker login `
   -u "$((Get-Item ENV:DOCKER_USER).Value)" `
   -p "$((Get-Item ENV:DOCKER_PASS).Value)"
   
-docker push ssbkang/portainer:$tag
+docker push portainer/portainer:$tag
 
 rebase-docker-image `
-  ssbkang/portainer:$tag `
-  -t ssbkang/portainer:$tag_1709 `
+  portainer/portainer:$tag `
+  -t portainer/portainer:$tag_1709 `
   -b microsoft/nanoserver:1709
     
 rebase-docker-image `
-  ssbkang/portainer:$tag `
-  -t ssbkang/portainer:$tag_1803 `
+  portainer/portainer:$tag `
+  -t portainer/portainer:$tag_1803 `
   -b microsoft/nanoserver:1803
