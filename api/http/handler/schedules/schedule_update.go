@@ -1,9 +1,11 @@
 package schedules
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
+	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -22,6 +24,9 @@ type scheduleUpdatePayload struct {
 }
 
 func (payload *scheduleUpdatePayload) Validate(r *http.Request) error {
+	if payload.Name != nil && !govalidator.Matches(*payload.Name, `^[a-zA-Z0-9][a-zA-Z0-9_.-]+$`) {
+		return errors.New("Invalid schedule name format. Allowed characters are: [a-zA-Z0-9_.-]")
+	}
 	return nil
 }
 
