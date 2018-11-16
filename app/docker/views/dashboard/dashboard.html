@@ -84,7 +84,7 @@
             <i class="fa fa-th-list"></i>
           </div>
           <div class="title">{{ stackCount }}</div>
-          <div class="comment">Stacks</div>
+          <div class="comment">Stack<span ng-if="stackCount === 0 || stackCount > 1">s</span></div>
         </rd-widget-body>
       </rd-widget>
     </a>
@@ -97,7 +97,7 @@
             <i class="fa fa-list-alt"></i>
           </div>
           <div class="title">{{ serviceCount }}</div>
-          <div class="comment">Services</div>
+          <div class="comment">Service<span ng-if="serviceCount === 0 || serviceCount > 1">s</span></div>
         </rd-widget-body>
       </rd-widget>
     </a>
@@ -114,7 +114,7 @@
             <div><i class="fa fa-heartbeat space-right red-icon"></i>{{ containers | stoppedcontainers }} stopped</div>
           </div>
           <div class="title">{{ containers.length }}</div>
-          <div class="comment">Containers</div>
+          <div class="comment">Container<span ng-if="containers.length === 0 || containers.length > 1">s</span></div>
         </rd-widget-body>
       </rd-widget>
     </a>
@@ -130,7 +130,7 @@
             <div><i class="fa fa-chart-pie space-right"></i>{{ images | imagestotalsize | humansize }}</div>
           </div>
           <div class="title">{{ images.length }}</div>
-          <div class="comment">Images</div>
+          <div class="comment">Image<span ng-if="images.length === 0 || images.length > 1">s</span></div>
         </rd-widget-body>
       </rd-widget>
     </a>
@@ -143,7 +143,7 @@
             <i class="fa fa-cubes"></i>
           </div>
           <div class="title">{{ volumeCount }}</div>
-          <div class="comment">Volumes</div>
+          <div class="comment">Volume<span ng-if="volumeCount === 0 || volumeCount > 1">s</span></div>
         </rd-widget-body>
       </rd-widget>
     </a>
@@ -156,7 +156,7 @@
             <i class="fa fa-sitemap"></i>
           </div>
           <div class="title">{{ networkCount }}</div>
-          <div class="comment">Networks</div>
+          <div class="comment">Network<span ng-if="networkCount === 0 || networkCount > 1">s</span></div>
         </rd-widget-body>
       </rd-widget>
     </a>
