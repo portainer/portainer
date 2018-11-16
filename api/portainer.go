@@ -480,11 +480,12 @@ type (
 	// Extension represent a Portainer extension
 	Extension struct {
 		ID               ExtensionID `json:"Id"`
-		Enabled          bool     `json:"Enabled"`
-		Name             string   `json:"Name,omitempty"`
-		ShortDescription string   `json:"ShortDescription,omitempty"`
-		Description      string   `json:"Description,omitempty"`
-		Price            string   `json:"Price,omitempty"`
+		Enabled          bool        `json:"Enabled"`
+		Name             string      `json:"Name,omitempty"`
+		ShortDescription string      `json:"ShortDescription,omitempty"`
+		Description      string      `json:"Description,omitempty"`
+		Price            string      `json:"Price,omitempty"`
+		Deal             bool        `json:"Deal,omitempty"`
 		// TODO: License struct? License{key, company, expiration}
 		License           string `json:"License,omitempty"`
 		LicenseCompany    string `json:"LicenseCompany,omitempty"`
