@@ -105,7 +105,11 @@ angular.module('portainer.docker')
         config.ConfigFrom = {
           Network: selectedNetworkConfig.Name
         };
-        config.Scope = 'swarm';
+        if ($scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE') {
+          config.Scope = 'swarm';
+        } else {
+          config.Scope = 'local';
+        }
       }
 
       function validateForm(accessControlData, isAdmin) {
@@ -192,9 +196,6 @@ angular.module('portainer.docker')
 
         PluginService.networkPlugins(apiVersion < 1.25)
           .then(function success(data) {
-            if ($scope.applicationState.endpoint.mode.provider !== 'DOCKER_SWARM_MODE') {
-              data.splice(data.indexOf('macvlan'), 1);
-            }
             $scope.availableNetworkDrivers = data;
           })
           .catch(function error(err) {
