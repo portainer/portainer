@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 
 	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/archive"
 
 	"io"
 	"os"
@@ -73,6 +74,21 @@ func NewService(dataStorePath, fileStorePath string) (*Service, error) {
 	}
 
 	return service, nil
+}
+
+// TODO: doc
+func (service *Service) GetBinaryFolder() string {
+	return path.Join(service.fileStorePath, BinaryStorePath)
+}
+
+// TODO: doc
+func (service *Service) ExtractExtensionArchive(data []byte) error {
+	err := archive.UnzipArchive(data, path.Join(service.fileStorePath, BinaryStorePath))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // RemoveDirectory removes a directory on the filesystem.

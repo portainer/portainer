@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-  .controller('RegistryRepositoryController', ['$q', '$scope', '$transition$', '$state', 'LocalRegistryService', 'RegistryService', 'LocalRegistryHelper', 'ModalService', 'Notifications',
-    function ($q, $scope, $transition$, $state, LocalRegistryService, RegistryService, LocalRegistryHelper, ModalService, Notifications) {
+  .controller('RegistryRepositoryController', ['$q', '$scope', '$transition$', '$state', 'RegistryAPIService', 'RegistryService', 'LocalRegistryHelper', 'ModalService', 'Notifications',
+    function ($q, $scope, $transition$, $state, RegistryAPIService, RegistryService, LocalRegistryHelper, ModalService, Notifications) {
 
       $scope.state = {
         actionInProgress: false
@@ -26,7 +26,7 @@ angular.module('portainer.app')
         var manifest = $scope.tags.find(function (item) {
           return item.ImageId === $scope.formValues.SelectedImage;
         }).ManifestV2;
-        LocalRegistryService.addTag($scope.registryId, $scope.repository.Name, $scope.formValues.Tag, manifest)
+        RegistryAPIService.addTag($scope.registryId, $scope.repository.Name, $scope.formValues.Tag, manifest)
           .then(function success(data) {
             Notifications.success('Success', 'Tag successfully added');
             $state.reload();
@@ -37,7 +37,7 @@ angular.module('portainer.app')
       };
 
       $scope.retagAction = function (tag) {
-        LocalRegistryService.deleteManifest($scope.registryId, $scope.repository.Name, tag.Digest)
+        RegistryAPIService.deleteManifest($scope.registryId, $scope.repository.Name, tag.Digest)
           .then(function success() {
             var promises = [];
             var tagsToAdd = $scope.tags.filter(function (item) {
@@ -45,7 +45,7 @@ angular.module('portainer.app')
             });
             tagsToAdd.map(function (item) {
               var tagValue = item.Modified && item.Name !== item.NewName ? item.NewName : item.Name;
-              promises.push(LocalRegistryService.addTag($scope.registryId, $scope.repository.Name, tagValue, item.ManifestV2));
+              promises.push(RegistryAPIService.addTag($scope.registryId, $scope.repository.Name, tagValue, item.ManifestV2));
             });
             return $q.all(promises);
           })
@@ -70,14 +70,14 @@ angular.module('portainer.app')
             var promises = [];
             var uniqItems = _.uniqBy(selectedItems, 'Digest');
             uniqItems.map(function (item) {
-              promises.push(LocalRegistryService.deleteManifest($scope.registryId, $scope.repository.Name, item.Digest));
+              promises.push(RegistryAPIService.deleteManifest($scope.registryId, $scope.repository.Name, item.Digest));
             });
             $q.all(promises)
               .then(function success() {
                 var promises = [];
                 var tagsToReupload = _.differenceBy($scope.tags, selectedItems, 'Name');
                 tagsToReupload.map(function (item) {
-                  promises.push(LocalRegistryService.addTag($scope.registryId, $scope.repository.Name, item.Name, item.ManifestV2));
+                  promises.push(RegistryAPIService.addTag($scope.registryId, $scope.repository.Name, item.Name, item.ManifestV2));
                 });
                 return $q.all(promises);
               })
@@ -101,7 +101,7 @@ angular.module('portainer.app')
             var promises = [];
             var uniqItems = _.uniqBy($scope.tags, 'Digest');
             uniqItems.map(function (item) {
-              promises.push(LocalRegistryService.deleteManifest($scope.registryId, $scope.repository.Name, item.Digest));
+              promises.push(RegistryAPIService.deleteManifest($scope.registryId, $scope.repository.Name, item.Digest));
             });
             $q.all(promises)
               .then(function success(data) {
@@ -123,7 +123,7 @@ angular.module('portainer.app')
         var repository = $scope.repository.Name = $transition$.params().repository;
         $q.all({
             registry: RegistryService.registry(registryId),
-            tags: LocalRegistryService.tags(registryId, repository)
+            tags: RegistryAPIService.tags(registryId, repository)
           })
           .then(function success(data) {
             $scope.registry = data.registry;
@@ -131,7 +131,7 @@ angular.module('portainer.app')
             $scope.tags = [];
             for (var i = 0; i < data.tags.length; i++) {
               var tag = data.tags[i];
-              LocalRegistryService.tag(registryId, repository, tag)
+              RegistryAPIService.tag(registryId, repository, tag)
                 .then(function success(data) {
                   $scope.tags.push(data);
                 })

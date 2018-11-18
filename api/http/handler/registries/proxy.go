@@ -12,9 +12,6 @@ import (
 
 // request on /api/registries/:id/v2
 func (handler *Handler) proxyRequestsToRegistryAPI(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-
-	// TODO: should be updated
-
 	registryID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid registry identifier route variable", err}
@@ -27,33 +24,25 @@ func (handler *Handler) proxyRequestsToRegistryAPI(w http.ResponseWriter, r *htt
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a registry with the specified identifier inside the database", err}
 	}
 
-	//TODO: review that??
+	_, err = handler.ExtensionService.Extension(portainer.RegistryManagementExtension)
+	if err == portainer.ErrObjectNotFound {
+		return &httperror.HandlerError{http.StatusNotFound, "Registry management extension is not enabled", err}
+	} else if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a extension with the specified identifier inside the database", err}
+	}
+
 	var proxy http.Handler
 	proxy = handler.ProxyManager.GetExtensionProxy(portainer.RegistryManagementExtension)
 	if proxy == nil {
-		// TODO: extension check should not be done this way
-		// return &httperror.HandlerError{http.StatusInternalServerError, "Registry management extension is not enabled", errors.New("Extension not enabled")}
-		err = handler.ProxyManager.CreateExtensionProxy(portainer.RegistryManagementExtension)
+		proxy, err = handler.ProxyManager.CreateExtensionProxy(portainer.RegistryManagementExtension)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to register registry proxy", err}
 		}
-		proxy = handler.ProxyManager.GetExtensionProxy(portainer.RegistryManagementExtension)
 	}
 
-	managementConfiguration := &registry.ManagementConfiguration
-
+	managementConfiguration := registry.ManagementConfiguration
 	if managementConfiguration == nil {
-		managementConfiguration = &portainer.RegistryManagementConfiguration{
-			TLSConfig: portainer.TLSConfiguration{
-				TLS: false,
-			},
-		}
-
-		if registry.Authentication {
-			managementConfiguration.Authentication = true
-			managementConfiguration.Username = registry.Username
-			managementConfiguration.Password = registry.Password
-		}
+		managementConfiguration = createDefaultManagementConfiguration(registry)
 	}
 
 	encodedConfiguration, err := json.Marshal(managementConfiguration)
@@ -66,17 +55,22 @@ func (handler *Handler) proxyRequestsToRegistryAPI(w http.ResponseWriter, r *htt
 	r.Header.Set("X-RegistryManagement-URI", registry.URL)
 	r.Header.Set("X-RegistryManagement-Config", string(encodedConfiguration))
 
-	//
-	// var proxy http.Handler
-	// proxy = handler.ProxyManager.GetRegistryProxy(id)
-	// if proxy == nil {
-	// 	proxy, err = handler.ProxyManager.CreateAndRegisterRegistryProxy(registry)
-	// 	if err != nil {
-	// 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to register registry proxy", err}
-	// 	}
-	// }
-	//
-
 	http.StripPrefix("/registries/"+id, proxy).ServeHTTP(w, r)
 	return nil
+}
+
+func createDefaultManagementConfiguration(registry *portainer.Registry) *portainer.RegistryManagementConfiguration {
+	config := &portainer.RegistryManagementConfiguration{
+		TLSConfig: portainer.TLSConfiguration{
+			TLS: false,
+		},
+	}
+
+	if registry.Authentication {
+		config.Authentication = true
+		config.Username = registry.Username
+		config.Password = registry.Password
+	}
+
+	return config
 }

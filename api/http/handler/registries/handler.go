@@ -12,17 +12,16 @@ import (
 
 func hideFields(registry *portainer.Registry) {
 	registry.Password = ""
-	registry.ManagementConfiguration = portainer.RegistryManagementConfiguration{}
+	registry.ManagementConfiguration = nil
 }
 
 // Handler is the HTTP handler used to handle registry operations.
 type Handler struct {
 	*mux.Router
-	RegistryService portainer.RegistryService
-	FileService     portainer.FileService
-
-	// TODO: remove proxymanager ?
-	ProxyManager *proxy.Manager
+	RegistryService  portainer.RegistryService
+	ExtensionService portainer.ExtensionService
+	FileService      portainer.FileService
+	ProxyManager     *proxy.Manager
 }
 
 // NewHandler creates a handler to manage registry operations.

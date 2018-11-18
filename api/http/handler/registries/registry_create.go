@@ -61,8 +61,6 @@ func (handler *Handler) registryCreate(w http.ResponseWriter, r *http.Request) *
 		Password:        payload.Password,
 		AuthorizedUsers: []portainer.UserID{},
 		AuthorizedTeams: []portainer.TeamID{},
-		// TODO: should be init? we check for nil before proxy.
-		// ManagementConfiguration: portainer.RegistryManagementConfiguration{},
 	}
 
 	err = handler.RegistryService.CreateRegistry(registry)

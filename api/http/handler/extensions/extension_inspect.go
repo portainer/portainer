@@ -2,7 +2,6 @@ package extensions
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/coreos/go-semver/semver"
@@ -21,7 +20,6 @@ func (handler *Handler) extensionInspect(w http.ResponseWriter, r *http.Request)
 	}
 	extensionID := portainer.ExtensionID(extensionIdentifier)
 
-	// TODO: store somewhere else + constant
 	extensionData, err := client.Get(portainer.ExtensionDefinitionsURL, 30)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve extension definitions", err}
@@ -51,9 +49,7 @@ func (handler *Handler) extensionInspect(w http.ResponseWriter, r *http.Request)
 	extension.Enabled = storedExtension.Enabled
 
 	extensionVer := semver.New(extension.Version)
-	log.Println(extension.Version)
 	pVer := semver.New(storedExtension.Version)
-	log.Println(storedExtension.Version)
 
 	if pVer.LessThan(*extensionVer) {
 		extension.UpdateAvailable = true

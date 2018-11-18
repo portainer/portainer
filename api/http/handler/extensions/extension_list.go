@@ -1,15 +1,12 @@
 package extensions
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/coreos/go-semver/semver"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/http/client"
 )
 
 // GET request on /api/extensions?store=<store>
@@ -17,15 +14,9 @@ func (handler *Handler) extensionList(w http.ResponseWriter, r *http.Request) *h
 
 	storeDetails, _ := request.RetrieveBooleanQueryParameter(r, "store", true)
 	if storeDetails {
-		extensionData, err := client.Get(portainer.ExtensionDefinitionsURL, 30)
+		extensions, err := handler.ExtensionManager.FetchExtensionDefinitions()
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve extension definitions", err}
-		}
-
-		var extensions []portainer.Extension
-		err = json.Unmarshal(extensionData, &extensions)
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to parse external extension definitions", err}
 		}
 
 		storedExtensions, err := handler.ExtensionService.Extensions()
@@ -38,8 +29,8 @@ func (handler *Handler) extensionList(w http.ResponseWriter, r *http.Request) *h
 			for _, p := range storedExtensions {
 				if extensions[idx].ID == p.ID {
 					extensions[idx].Enabled = p.Enabled
-					extensions[idx].LicenseCompany = p.LicenseCompany
-					extensions[idx].LicenseExpiration = p.LicenseExpiration
+					extensions[idx].License.Company = p.License.Company
+					extensions[idx].License.Expiration = p.License.Expiration
 
 					extensionVer := semver.New(extensions[idx].Version)
 					pVer := semver.New(p.Version)

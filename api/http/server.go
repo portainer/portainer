@@ -1,15 +1,7 @@
 package http
 
 import (
-	"bytes"
-	"errors"
-	"log"
-	"os/exec"
-	"strconv"
-	"strings"
 	"time"
-
-	"github.com/orcaman/concurrent-map"
 
 	"github.com/portainer/portainer"
 	"github.com/portainer/portainer/docker"
@@ -19,9 +11,9 @@ import (
 	"github.com/portainer/portainer/http/handler/endpointgroups"
 	"github.com/portainer/portainer/http/handler/endpointproxy"
 	"github.com/portainer/portainer/http/handler/endpoints"
+	"github.com/portainer/portainer/http/handler/extensions"
 	"github.com/portainer/portainer/http/handler/file"
 	"github.com/portainer/portainer/http/handler/motd"
-	"github.com/portainer/portainer/http/handler/extensions"
 	"github.com/portainer/portainer/http/handler/registries"
 	"github.com/portainer/portainer/http/handler/resourcecontrols"
 	"github.com/portainer/portainer/http/handler/schedules"
@@ -50,6 +42,7 @@ type Server struct {
 	AuthDisabled           bool
 	EndpointManagement     bool
 	Status                 *portainer.Status
+	ExtensionManager       portainer.ExtensionManager
 	ComposeStackManager    portainer.ComposeStackManager
 	CryptoService          portainer.CryptoService
 	SignatureService       portainer.DigitalSignatureService
@@ -62,7 +55,7 @@ type Server struct {
 	GitService             portainer.GitService
 	JWTService             portainer.JWTService
 	LDAPService            portainer.LDAPService
-	ExtensionService          portainer.ExtensionService
+	ExtensionService       portainer.ExtensionService
 	RegistryService        portainer.RegistryService
 	ResourceControlService portainer.ResourceControlService
 	ScheduleService        portainer.ScheduleService
@@ -81,73 +74,6 @@ type Server struct {
 	SSLKey                 string
 	DockerClientFactory    *docker.ClientFactory
 	JobService             portainer.JobService
-}
-
-// TODO: relocate
-func initExtensions(extensionService portainer.ExtensionService, proxyManager *proxy.Manager, extensionProcesses *cmap.ConcurrentMap) {
-
-	extensions, err := extensionService.Extensions()
-	if err != nil {
-		log.Printf("Extension init error: \n", err)
-		return
-	}
-
-	for _, extension := range extensions {
-		err := startExtension(&extension, proxyManager, extensionProcesses)
-		if err != nil {
-			log.Printf("Extension init error: \n", err)
-			return
-		}
-	}
-
-}
-
-func startExtension(extension *portainer.Extension, proxyManager *proxy.Manager, extensionProcesses *cmap.ConcurrentMap) error {
-
-	// TODO: switch case on extension identifier to download/enable correct extension
-	switch extension.ID {
-	case portainer.RegistryManagementExtension:
-		return startRegistryManagementExtension(extension, proxyManager, extensionProcesses)
-	default:
-		return errors.New("Unsupported extension identifier")
-	}
-
-	return nil
-}
-
-func startRegistryManagementExtension(extension *portainer.Extension, proxyManager *proxy.Manager, extensionProcesses *cmap.ConcurrentMap) error {
-	// TODO: if license check fails, need to be updated to use flags
-	// should probably download and use a specific license-checker binary
-
-	licenseValidationCommand := exec.Command("/data/bin/extension-registry-management-linux-amd64-1.0.0", "-license", extension.License, "-check")
-	cmdOutput := &bytes.Buffer{}
-	licenseValidationCommand.Stdout = cmdOutput
-
-	err := licenseValidationCommand.Run()
-	if err != nil {
-		return portainer.Error("Invalid license")
-	}
-
-	output := string(cmdOutput.Bytes())
-	licenseDetails := strings.Split(output, "|")
-	extension.LicenseCompany = licenseDetails[0]
-	extension.LicenseExpiration = licenseDetails[1]
-	extension.Version = licenseDetails[2]
-
-	// syscall.Exec replaces the process, ForkExec could be tried?
-	// Also should be relocated to another package
-	// err = syscall.ForkExec("/extensions/extension-registry-management", []string{"extension-registry-management"}, os.Environ())
-	cmd := exec.Command("/data/bin/extension-registry-management-linux-amd64-1.0.0", extension.License)
-
-	// cmd.Start will not share logs with the main Portainer container.
-	err = cmd.Start()
-	if err != nil {
-		return err
-	}
-
-	extensionProcesses.Set(strconv.Itoa(int(extension.ID)), cmd)
-
-	return proxyManager.CreateExtensionProxy(extension.ID)
 }
 
 // Start starts the HTTP server
@@ -172,10 +98,6 @@ func (server *Server) Start() error {
 	proxyManager := proxy.NewManager(proxyManagerParameters)
 
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
-
-	// TODO: relocate to a service ? ProcessService?
-	extensionProcesses := cmap.New()
-	go initExtensions(server.ExtensionService, proxyManager, &extensionProcesses)
 
 	var authHandler = auth.NewHandler(requestBouncer, rateLimiter, server.AuthDisabled)
 	authHandler.UserService = server.UserService
@@ -211,12 +133,11 @@ func (server *Server) Start() error {
 
 	var extensionHandler = extensions.NewHandler(requestBouncer)
 	extensionHandler.ExtensionService = server.ExtensionService
-	extensionHandler.FileService = server.FileService
-	extensionHandler.ProxyManager = proxyManager
-	extensionHandler.ExtensionProcesses = &extensionProcesses
+	extensionHandler.ExtensionManager = server.ExtensionManager
 
 	var registryHandler = registries.NewHandler(requestBouncer)
 	registryHandler.RegistryService = server.RegistryService
+	registryHandler.ExtensionService = server.ExtensionService
 	registryHandler.FileService = server.FileService
 	registryHandler.ProxyManager = proxyManager
 
@@ -291,7 +212,7 @@ func (server *Server) Start() error {
 		EndpointProxyHandler:   endpointProxyHandler,
 		FileHandler:            fileHandler,
 		MOTDHandler:            motdHandler,
-		ExtensionHandler:          extensionHandler,
+		ExtensionHandler:       extensionHandler,
 		RegistryHandler:        registryHandler,
 		ResourceControlHandler: resourceControlHandler,
 		SettingsHandler:        settingsHandler,

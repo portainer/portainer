@@ -9,11 +9,11 @@ angular.module('portainer.app')
     updateAccess: { method: 'PUT', params: { id: '@id', action: 'access' } },
     remove: { method: 'DELETE', params: { id: '@id'} },
     // TODO: remove?
-    version: { method: 'GET', params: { id: '@id', action: 'v2/' },
-      transformResponse: function (data, headers) {
-        return { version: headers('docker-distribution-api-version') ? headers('docker-distribution-api-version') : 1 };
-      }
-    },
+    // version: { method: 'GET', params: { id: '@id', action: 'v2/' },
+    //   transformResponse: function (data, headers) {
+    //     return { version: headers('docker-distribution-api-version') ? headers('docker-distribution-api-version') : 1 };
+    //   }
+    // },
     configure: { method: 'POST', params: { id: '@id', action: 'configure' } }
   });
 }]);

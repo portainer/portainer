@@ -1,6 +1,6 @@
 angular.module('portainer.extensions.registrymanagement')
-.controller('RegistryRepositoriesController', ['$transition$', '$scope',  'RegistryService', 'LocalRegistryService', 'Notifications',
-function ($transition$, $scope, RegistryService, LocalRegistryService, Notifications) {
+.controller('RegistryRepositoriesController', ['$transition$', '$scope',  'RegistryService', 'RegistryAPIService', 'Notifications',
+function ($transition$, $scope, RegistryService, RegistryAPIService, Notifications) {
 
   $scope.state = {
     displayInvalidConfigurationMessage: false
@@ -13,7 +13,7 @@ function ($transition$, $scope, RegistryService, LocalRegistryService, Notificat
     .then(function success(data) {
       $scope.registry = data;
 
-      LocalRegistryService.repositories(registryId)
+      RegistryAPIService.repositories(registryId)
       .then(function success(data) {
         $scope.repositories = data;
       })

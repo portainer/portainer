@@ -41,7 +41,7 @@ func (payload *registryConfigurePayload) Validate(r *http.Request) error {
 	skipTLSVerify, _ := request.RetrieveBooleanMultiPartFormValue(r, "TLSSkipVerify", true)
 	payload.TLSSkipVerify = skipTLSVerify
 
-	// TODO: fixme
+	// TODO: are we using this?
 	// if useTLS && !skipTLSVerify {
 	// 	cert, _, err := request.RetrieveMultiPartFormFile(r, "TLSCertFile")
 	// 	if err != nil {
@@ -98,7 +98,8 @@ func (handler *Handler) registryConfigure(w http.ResponseWriter, r *http.Request
 		}
 
 		if !payload.TLSSkipVerify {
-			// TODO: store in /data/tls/registry_ID ? If so, registry_ prefix should probably be a constant
+			// TODO: are we using this?
+			// store in /data/tls/registry_ID ? If so, registry_ prefix should probably be a constant
 			// Or store somewhere else? /data/extensions/registrymanagement|1/registryid/
 			folder := "registry_" + strconv.Itoa(int(registry.ID))
 
@@ -121,6 +122,5 @@ func (handler *Handler) registryConfigure(w http.ResponseWriter, r *http.Request
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist registry changes inside the database", err}
 	}
 
-	// TODO: Empty response? Or hide fields.
-	return response.JSON(w, registry)
+	return response.Empty(w)
 }

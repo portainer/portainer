@@ -170,18 +170,16 @@ type (
 	// Registry represents a Docker registry with all the info required
 	// to connect to it
 	Registry struct {
-		ID              RegistryID   `json:"Id"`
-		Type            RegistryType `json:"Type"`
-		Name            string       `json:"Name"`
-		URL             string       `json:"URL"`
-		Authentication  bool         `json:"Authentication"`
-		Username        string       `json:"Username"`
-		Password        string       `json:"Password,omitempty"`
-		AuthorizedUsers []UserID     `json:"AuthorizedUsers"`
-		AuthorizedTeams []TeamID     `json:"AuthorizedTeams"`
-		// TODO: will require migration? or not, we check for nil in proxy first access
-		// Should also be hidden in API results
-		ManagementConfiguration RegistryManagementConfiguration `json:"ManagementConfiguration"`
+		ID                      RegistryID                       `json:"Id"`
+		Type                    RegistryType                     `json:"Type"`
+		Name                    string                           `json:"Name"`
+		URL                     string                           `json:"URL"`
+		Authentication          bool                             `json:"Authentication"`
+		Username                string                           `json:"Username"`
+		Password                string                           `json:"Password,omitempty"`
+		AuthorizedUsers         []UserID                         `json:"AuthorizedUsers"`
+		AuthorizedTeams         []TeamID                         `json:"AuthorizedTeams"`
+		ManagementConfiguration *RegistryManagementConfiguration `json:"ManagementConfiguration"`
 	}
 
 	// RegistryManagementConfiguration represents a configuration that can be used to query
@@ -337,8 +335,7 @@ type (
 		Labels []Pair `json:"Labels"`
 	}
 
-	// TODO: remove (discuss with Edge)
-	// EndpointExtension represents a extension associated to an endpoint
+	// TODO: legacy extension management
 	EndpointExtension struct {
 		Type EndpointExtensionType `json:"Type"`
 		URL  string                `json:"URL"`
@@ -477,21 +474,25 @@ type (
 	// ExtensionID represents a extension identifier
 	ExtensionID int
 
-	// Extension represent a Portainer extension
+	// Extension represents a Portainer extension
 	Extension struct {
-		ID               ExtensionID `json:"Id"`
-		Enabled          bool        `json:"Enabled"`
-		Name             string      `json:"Name,omitempty"`
-		ShortDescription string      `json:"ShortDescription,omitempty"`
-		Description      string      `json:"Description,omitempty"`
-		Price            string      `json:"Price,omitempty"`
-		Deal             bool        `json:"Deal,omitempty"`
-		// TODO: License struct? License{key, company, expiration}
-		License           string `json:"License,omitempty"`
-		LicenseCompany    string `json:"LicenseCompany,omitempty"`
-		LicenseExpiration string `json:"LicenseExpiration,omitempty"`
-		Version           string `json:"Version"`
-		UpdateAvailable   bool   `json:"UpdateAvailable"`
+		ID               ExtensionID        `json:"Id"`
+		Enabled          bool               `json:"Enabled"`
+		Name             string             `json:"Name,omitempty"`
+		ShortDescription string             `json:"ShortDescription,omitempty"`
+		Description      string             `json:"Description,omitempty"`
+		Price            string             `json:"Price,omitempty"`
+		Deal             bool               `json:"Deal,omitempty"`
+		License          LicenseInformation `json:"License,omitempty"`
+		Version          string             `json:"Version"`
+		UpdateAvailable  bool               `json:"UpdateAvailable"`
+	}
+
+	// LicenseInformation represents information about an extension license
+	LicenseInformation struct {
+		LicenseKey string `json:"LicenseKey,omitempty"`
+		Company    string `json:"Company,omitempty"`
+		Expiration string `json:"Expiration,omitempty"`
 	}
 
 	// CLIService represents a service for managing CLI
@@ -699,6 +700,8 @@ type (
 		FileExists(path string) (bool, error)
 		StoreScheduledJobFileFromBytes(identifier string, data []byte) (string, error)
 		GetScheduleFolder(identifier string) string
+		ExtractExtensionArchive(data []byte) error
+		GetBinaryFolder() string
 	}
 
 	// GitService represents a service for managing Git
@@ -751,6 +754,13 @@ type (
 	// JobService represents a service to manage job execution on hosts
 	JobService interface {
 		ExecuteScript(endpoint *Endpoint, nodeName, image string, script []byte, schedule *Schedule) error
+	}
+
+	ExtensionManager interface {
+		FetchExtensionDefinitions() ([]Extension, error)
+		EnableExtension(extension *Extension, licenseKey string) error
+		DisableExtension(extension *Extension) error
+		UpdateExtension(extension *Extension, version string) error
 	}
 )
 
@@ -835,7 +845,6 @@ const (
 	ConfigResourceControl
 )
 
-// TODO: remove (discuss with Edge)
 const (
 	_ EndpointExtensionType = iota
 	// StoridgeEndpointExtension represents the Storidge extension

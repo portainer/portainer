@@ -1,4 +1,4 @@
-// TODO: this is a deprecated extension. It should be updated to a proper new extension.
+// TODO: legacy extension management
 angular.module('extension.storidge', [])
 .config(['$stateRegistryProvider', function ($stateRegistryProvider) {
   'use strict';

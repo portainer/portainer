@@ -1,6 +1,6 @@
 angular.module('portainer.extensions.registrymanagement')
-.controller('ConfigureRegistryController', ['$scope', '$state', '$transition$', 'RegistryService', 'LocalRegistryService', 'Notifications',
-function ($scope, $state, $transition$, RegistryService, LocalRegistryService, Notifications) {
+.controller('ConfigureRegistryController', ['$scope', '$state', '$transition$', 'RegistryService', 'RegistryAPIService', 'Notifications',
+function ($scope, $state, $transition$, RegistryService, RegistryAPIService, Notifications) {
 
   $scope.state = {
     testInProgress: false,
@@ -15,11 +15,7 @@ function ($scope, $state, $transition$, RegistryService, LocalRegistryService, N
 
     RegistryService.configureRegistry($scope.registry.Id, $scope.model)
     .then(function success() {
-      return LocalRegistryService.repositories($scope.registry.Id);
-    })
-    .then(function success(data) {
-      // TODO: remove
-      console.log(data);
+      return RegistryAPIService.repositories($scope.registry.Id);
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to test registry configuration');
@@ -30,7 +26,7 @@ function ($scope, $state, $transition$, RegistryService, LocalRegistryService, N
   }
 
   function updateConfiguration() {
-
+    // TODO: implement
   }
 
   function initView() {

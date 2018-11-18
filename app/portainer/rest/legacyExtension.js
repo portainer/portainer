@@ -1,4 +1,4 @@
-// TODO: this is a deprecated extension management service and should be removed
+// TODO: legacy extension management
 angular.module('portainer.app')
 .factory('LegacyExtensions', ['$resource', 'EndpointProvider', 'API_ENDPOINT_ENDPOINTS', function LegacyExtensions($resource, EndpointProvider, API_ENDPOINT_ENDPOINTS) {
   'use strict';

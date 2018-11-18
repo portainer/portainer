@@ -1,4 +1,4 @@
-// TODO: this is a deprecated extension management service and should be removed
+// TODO: legacy extension management
 angular.module('portainer.app')
 .factory('LegacyExtensionManager', ['$q', 'PluginService', 'SystemService', 'LegacyExtensionService',
 function ExtensionManagerFactory($q, PluginService, SystemService, LegacyExtensionService) {

@@ -1,5 +1,7 @@
 package endpoints
 
+// TODO: legacy extension management
+
 import (
 	"net/http"
 
@@ -9,8 +11,6 @@ import (
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer"
 )
-
-// TODO: should be removed (discuss with Edge)
 
 type endpointExtensionAddPayload struct {
 	Type int

@@ -4,20 +4,16 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/orcaman/concurrent-map"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/http/proxy"
 	"github.com/portainer/portainer/http/security"
 )
 
 // Handler is the HTTP handler used to handle extension operations.
 type Handler struct {
 	*mux.Router
-	ExtensionService   portainer.ExtensionService
-	FileService     portainer.FileService
-	ProxyManager    *proxy.Manager
-	ExtensionProcesses *cmap.ConcurrentMap
+	ExtensionService portainer.ExtensionService
+	ExtensionManager portainer.ExtensionManager
 }
 
 // NewHandler creates a handler to manage extension operations.
