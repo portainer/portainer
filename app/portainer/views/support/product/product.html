@@ -34,18 +34,18 @@
                 {{ product.Price }}
               </div>
 
-              <div class="small text-muted col-sm-12" style="margin-top: 15px;">
+              <div class="small text-muted col-sm-12" style="margin: 15px 0 15px 0;">
                 {{ product.ShortDescription }}
               </div>
 
-              <div style="margin-top: 10px; margin-bottom: 85px;">
+              <div style="margin-top: 10px; margin-bottom: 95px;">
                 <label for="endpoint_count" class="col-sm-7 control-label text-left" style="margin-top: 7px;">Endpoints</label>
                 <div class="col-sm-5">
                   <input type="number" class="form-control" ng-model="formValues.endpointCount" id="endpoint_count" placeholder="10" min="10">
                 </div>
               </div>
 
-              <div ng-disabled="!formValues.instances || !formValues.endpointCount">
+              <div style="margin-top: 15px;" ng-disabled="!formValues.instances || !formValues.endpointCount">
                 <a href="https://2-portainer.pi.bypronto.com/checkout/?add-to-cart={{ product.StoreID }}&quantity={{ formValues.endpointCount }}" target="_blank" class="btn btn-primary btn-sm" style="width: 100%; margin-left: 0;">
                   Buy
                 </a>
