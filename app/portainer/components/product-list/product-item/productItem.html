@@ -29,8 +29,8 @@
             {{ $ctrl.model.ShortDescription }}
           </span>
         </span>
-        <span ng-if="$ctrl.model.LicenseCompany">
-          <span class="small text-muted">Licensed to {{ $ctrl.model.LicenseCompany }} - Expires on {{ $ctrl.model.LicenseExpiration }}</span>
+        <span ng-if="$ctrl.model.License.Company">
+          <span class="small text-muted">Licensed to {{ $ctrl.model.License.Company }} - Expires on {{ $ctrl.model.License.Expiration }}</span>
         </span>
       </div>
       <!-- !blocklist-item-line2 -->

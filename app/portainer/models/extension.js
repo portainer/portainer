@@ -8,8 +8,7 @@ function ExtensionViewModel(data) {
   this.PriceDescription = 'Price per instance per month';
   this.Deal = data.Deal;
   this.ShortDescription = data.ShortDescription;
-  this.LicenseCompany = data.LicenseCompany;
-  this.LicenseExpiration = data.LicenseExpiration;
+  this.License = data.License;
   this.Version = data.Version;
   this.UpdateAvailable = data.UpdateAvailable;
 }

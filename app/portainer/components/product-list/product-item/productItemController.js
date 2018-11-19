@@ -11,7 +11,7 @@ function ($state) {
   }
 
   function $onInit() {
-    if (ctrl.currentDate === ctrl.model.LicenseExpiration) {
+    if (ctrl.currentDate === ctrl.model.License.Expiration) {
       ctrl.model.Expired = true;
     }
   }
