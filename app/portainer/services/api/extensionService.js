@@ -32,10 +32,10 @@ angular.module('portainer.app')
     return deferred.promise;
   };
 
-  service.extension = function(id, store) {
+  service.extension = function(id) {
     var deferred = $q.defer();
 
-    Extension.get({ id: id, store: store }).$promise
+    Extension.get({ id: id }).$promise
     .then(function success(data) {
       var extension = new ExtensionViewModel(data);
       deferred.resolve(extension);

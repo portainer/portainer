@@ -45,7 +45,7 @@ function ($q, $scope, $transition$, $state, ExtensionService, Notifications) {
   }
 
   function initView() {
-    ExtensionService.extension($transition$.params().id, true)
+    ExtensionService.extension($transition$.params().id)
     .then(function onSuccess(extension) {
       $scope.extension = extension;
     })

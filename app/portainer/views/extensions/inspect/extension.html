@@ -43,17 +43,22 @@
                 {{ extension.PriceDescription }}
               </div>
 
-              <div style="margin-top: 10px; margin-bottom: 95px;" ng-if="!extension.Enabled">
+              <div style="margin-top: 10px; margin-bottom: 95px;" ng-if="!extension.Enabled && extension.Available">
                 <label for="instances_qty" class="col-sm-7 control-label text-left" style="margin-top: 7px;">Instances</label>
                 <div class="col-sm-5">
                   <input type="number" class="form-control" ng-model="formValues.instances" id="instances_qty" placeholder="1" min="1">
                 </div>
               </div>
 
-              <div style="margin-top: 15px;" ng-if="!extension.Enabled" ng-disabled="!formValues.instances">
+              <div style="margin-top: 15px;" ng-if="!extension.Enabled && extension.Available">
+                <!-- TODO: inject storeID -->
                 <a href="https://2-portainer.pi.bypronto.com/checkout/?add-to-cart=1164&quantity={{ formValues.instances }}" target="_blank" class="btn btn-primary btn-sm" style="width: 100%; margin-left: 0;">
                   Buy
                 </a>
+              </div>
+
+              <div style="margin-top: 15px;" ng-if="!extension.Enabled && !extension.Available">
+                <btn class="btn btn-primary btn-sm" style="width: 100%; margin-left: 0;" disabled>Coming soon</btn>
               </div>
 
               <div style="margin-top: 15px;" ng-if="extension.Enabled && extension.UpdateAvailable">

@@ -482,7 +482,9 @@ type (
 		ShortDescription string             `json:"ShortDescription,omitempty"`
 		Description      string             `json:"Description,omitempty"`
 		Price            string             `json:"Price,omitempty"`
+		PriceDescription string             `json:"PriceDescription,omitempty"`
 		Deal             bool               `json:"Deal,omitempty"`
+		Available        bool               `json:"Available,omitempty"`
 		License          LicenseInformation `json:"License,omitempty"`
 		Version          string             `json:"Version"`
 		UpdateAvailable  bool               `json:"UpdateAvailable"`
