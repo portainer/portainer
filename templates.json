@@ -171,6 +171,23 @@
   },
   {
     "type": 1,
+    "title": "ELK",
+    "description": "Elasticsearch, Logstash, Kibana",
+    "note": "Check <a href=\"https://elk-docker.readthedocs.io/\" target=\"_blank\">elk-docker.readthedocs.io</a> for detais.",
+    "categories": ["database"],
+    "platform": "linux",
+    "logo": "https://portainer.io/images/logos/elasticsearch.png",
+    "image": "sebp/elk:latest",
+    "ports": [
+      "5044/tcp",
+      "5601/tcp",
+      "9200/tcp",
+      "9300/tcp"
+    ],
+    "volumes": [{"container": "/var/lib/elasticsearch"}]
+  },
+  {
+    "type": 1,
     "title": "Gitlab CE",
     "description": "Open-source end-to-end software development platform",
     "note": "Default username is <b>root</b>. Check the <a href=\"https://docs.gitlab.com/omnibus/docker/README.html#after-starting-a-container\" target=\"_blank\">Gitlab documentation</a> to get started.",
