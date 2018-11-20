@@ -7,6 +7,30 @@ angular.module('portainer.app').component('scheduleForm', {
       formValidationError: ''
     };
 
+    ctrl.formValues = {
+      datetime: '',
+      scheduleValue: '',
+      recurring: false,
+      cronMethod: 'basic'
+    };
+
+    ctrl.scheduleValues = [{
+        displayed: 'Every hour',
+        cron: '@hourly'
+      },
+      {
+        displayed: 'Every 2 hours',
+        cron: '<@every 2h'
+      }, {
+        displayed: 'Every day',
+        cron: '@daily'
+      }
+    ];
+
+    function datetimeToCron(datetime) {
+
+    }
+
     this.action = function() {
       ctrl.state.formValidationError = '';
 
@@ -15,6 +39,15 @@ angular.module('portainer.app').component('scheduleForm', {
         return;
       }
 
+      if (ctrl.formValues.cronMethod === 'basic') {
+        if (!ctrl.formValues.recurring) {
+          ctrl.model.CronExpression = datetimeToCron(ctrl.model.datetime);
+        } else {
+          ctrl.model.CronExpression = ctrl.formValues.scheduleValue.cron;
+        }
+      }
+      console.log(ctrl.model.CronExpression);
+      return;
       ctrl.formAction();
     };
 

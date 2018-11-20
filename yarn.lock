@@ -156,6 +156,10 @@ angular@1.x, angular@~1.5.0:
   version "1.5.11"
   resolved "https://registry.yarnpkg.com/angular/-/angular-1.5.11.tgz#8c5ba7386f15965c9acf3429f6881553aada30d6"
 
+angularjs-datetime-picker@^0.1.16:
+  version "0.1.16"
+  resolved "https://registry.yarnpkg.com/angularjs-datetime-picker/-/angularjs-datetime-picker-0.1.16.tgz#d9ba592b957f2d9ba4973823e38af42d9a15e52d"
+
 angularjs-scroll-glue@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/angularjs-scroll-glue/-/angularjs-scroll-glue-2.2.0.tgz#07d3399ac16ca874c63b6b5ee2ee30558b37e5d1"

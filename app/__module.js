@@ -15,6 +15,7 @@ angular.module('portainer', [
   'angular-json-tree',
   'angular-loading-bar',
   'angular-clipboard',
+  'angularjs-datetime-picker',
   'ngFileSaver',
   'luegg.directives',
   'portainer.templates',

@@ -32,6 +32,7 @@ css:
   - 'codemirror/addon/lint/lint.css'
   - 'angular-json-tree/dist/angular-json-tree.css'
   - 'angular-loading-bar/build/loading-bar.css'
+  - 'angularjs-datetime-picker/angularjs-datetime-picker.css'
 angular:
   - 'angular/angular.js'
   - 'angular-ui-bootstrap/dist/ui-bootstrap-tpls.js'
@@ -53,3 +54,4 @@ angular:
   - 'angularjs-scroll-glue/src/scrollglue.js'
   - 'angular-clipboard/angular-clipboard.js'
   - 'angular-file-saver/dist/angular-file-saver.bundle.js'
+  - 'angularjs-datetime-picker/angularjs-datetime-picker.js'

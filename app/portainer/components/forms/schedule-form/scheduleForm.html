@@ -18,24 +18,108 @@
   </div>
   <!-- !name-input -->
   <!-- cron-input -->
-  <div class="form-group">
-    <label for="schedule_cron" class="col-sm-1 control-label text-left">Cron rule</label>
-    <div class="col-sm-11">
-      <input type="text" class="form-control" ng-model="$ctrl.model.CronExpression" id="schedule_cron" name="schedule_cron" placeholder="0 2 * * *" required>
-    </div>
+  <!-- schedule-method-select -->
+  <div class="col-sm-12 form-section-title">
+    Schedule configuration
   </div>
-  <div class="form-group" ng-show="scheduleForm.schedule_cron.$invalid">
-    <div class="col-sm-12 small text-warning">
-      <div ng-messages="scheduleForm.schedule_cron.$error">
-        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+  <div class="form-group"></div>
+  <div class="form-group" style="margin-bottom: 0">
+    <div class="boxselector_wrapper">
+      <div>
+        <input type="radio" id="config_basic" ng-model="$ctrl.formValues.cronMethod" value="basic">
+        <label for="config_basic">
+          <div class="boxselector_header">
+            <i class="fa fa-calendar-alt" aria-hidden="true" style="margin-right: 2px;"></i>
+            Basic configuration
+          </div>
+          <p>Select date from calendar</p>
+        </label>
+      </div>
+      <div>
+        <input type="radio" id="config_advanced" ng-model="$ctrl.formValues.cronMethod" value="advanced">
+        <label for="config_advanced">
+          <div class="boxselector_header">
+            <i class="fa fa-edit" aria-hidden="true" style="margin-right: 2px;"></i>
+            Advanced configuration
+          </div>
+          <p>Write your own cron rule</p>
+        </label>
       </div>
     </div>
   </div>
-  <div class="form-group">
-    <span class="col-sm-12 text-muted small">
-      You can refer to the <a href="https://godoc.org/github.com/robfig/cron#hdr-CRON_Expression_Format" target="_blank">following documentation</a> to get more information about the supported cron expression format.
-    </span>
+  <!-- !schedule-method-select -->
+  <!-- basic-schedule -->
+  <div ng-if="$ctrl.formValues.cronMethod === 'basic'">
+    <div class="form-group">
+      <label for="recurring" class="col-sm-2 control-label text-left">Recurring schedule</label>
+      <div class="col-sm-10">
+        <label class="switch" style="margin-left: 20px;">
+          <input type="checkbox" name="recurring" ng-model="$ctrl.formValues.recurring"><i></i>
+        </label>
+      </div>
+    </div>
+    <!-- not-recurring -->
+    <div ng-if="!$ctrl.formValues.recurring">
+      <div class="form-group">
+        <label for="schedule_cron" class="col-sm-2 control-label text-left">Schedule date</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="datepicker" name="datepicker" readonly ng-model="$ctrl.formValues.datetime"
+            placeholder="2018-10-23 17:30" datetime-picker date-format="yyyy-MM-dd HH:mm" required />
+        </div>
+        <div ng-show="scheduleForm.datepicker.$invalid">
+          <div class="col-sm-12 small text-warning">
+            <div ng-messages="scheduleForm.datepicker.$error">
+              <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- !not-recurring -->
+    <!-- recurring -->
+    <div ng-if="$ctrl.formValues.recurring">
+      <div class="form-group">
+        <label for="schedule_value" class="col-sm-2 control-label text-left">Schedule time</label>
+        <div class="col-sm-10">
+          <select id="schedule_value" name="schedule_value" class="form-control"
+            ng-model="$ctrl.formValues.scheduleValue" ng-options="value.displayed for value in $ctrl.scheduleValues" required
+            ></select>
+        </div>
+        <div ng-show="scheduleForm.schedule_value.$invalid">
+          <div class="col-sm-12 small text-warning">
+            <div ng-messages="scheduleForm.schedule_value.$error">
+              <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- !recurring -->
   </div>
+  <!-- !basic-schedule -->
+  <!-- advanced-schedule -->
+  <div ng-if="$ctrl.formValues.cronMethod === 'advanced'">
+    <div class="form-group">
+      <label for="schedule_cron" class="col-sm-2 control-label text-left">Cron rule</label>
+      <div class="col-sm-10">
+        <input type="text" class="form-control" ng-model="$ctrl.model.CronExpression" id="schedule_cron" name="schedule_cron"
+          placeholder="0 2 * * *" required>
+      </div>
+    </div>
+    <div class="form-group" ng-show="scheduleForm.schedule_cron.$invalid">
+      <div class="col-sm-12 small text-warning">
+        <div ng-messages="scheduleForm.schedule_cron.$error">
+          <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <span class="col-sm-12 text-muted small">
+        You can refer to the <a href="https://godoc.org/github.com/robfig/cron#hdr-CRON_Expression_Format" target="_blank">following documentation</a> to get more information about the supported cron expression format.
+      </span>
+    </div>
+  </div>
+  <!-- !advanced-schedule -->
   <!-- !cron-input -->
   <div class="col-sm-12 form-section-title">
     Job configuration

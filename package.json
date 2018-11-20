@@ -25,7 +25,6 @@
     "clean-all": "yarn grunt clean:all",
     "build": "yarn grunt build",
     "build-offline": "cd ./api/cmd/portainer && CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags '-s' && mv -b portainer ../../../dist/portainer-linux-amd64"
-
   },
   "engines": {
     "node": ">= 0.8.4"
@@ -48,6 +47,7 @@
     "angular-sanitize": "~1.5.0",
     "angular-ui-bootstrap": "~2.5.0",
     "angular-utils-pagination": "~0.11.1",
+    "angularjs-datetime-picker": "^0.1.16",
     "angularjs-scroll-glue": "^2.2.0",
     "angularjs-slider": "^6.4.0",
     "bootbox": "^4.4.0",
