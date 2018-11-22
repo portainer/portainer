@@ -1,5 +1,6 @@
 function ScheduleDefaultModel() {
   this.Name = '';
+  this.Recurring = false;
   this.CronExpression = '';
   this.JobType = 1;
   this.Job = new ScriptExecutionDefaultJobModel();
@@ -16,6 +17,7 @@ function ScriptExecutionDefaultJobModel() {
 function ScheduleModel(data) {
   this.Id = data.Id;
   this.Name = data.Name;
+  this.Recurring = data.Recurring;
   this.JobType = data.JobType;
   this.CronExpression = data.CronExpression;
   this.Created = data.Created;
@@ -42,6 +44,7 @@ function ScriptExecutionTaskModel(data) {
 
 function ScheduleCreateRequest(model) {
   this.Name = model.Name;
+  this.Recurring = model.Recurring;
   this.CronExpression = model.CronExpression;
   this.Image = model.Job.Image;
   this.Endpoints = model.Job.Endpoints;
@@ -54,6 +57,7 @@ function ScheduleCreateRequest(model) {
 function ScheduleUpdateRequest(model) {
   this.id = model.Id;
   this.Name = model.Name;
+  this.Recurring = model.Recurring;
   this.CronExpression = model.CronExpression;
   this.Image = model.Job.Image;
   this.Endpoints = model.Job.Endpoints;

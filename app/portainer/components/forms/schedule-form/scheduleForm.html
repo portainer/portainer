@@ -54,12 +54,12 @@
       <label for="recurring" class="col-sm-2 control-label text-left">Recurring schedule</label>
       <div class="col-sm-10">
         <label class="switch" style="margin-left: 20px;">
-          <input type="checkbox" name="recurring" ng-model="$ctrl.formValues.recurring"><i></i>
+          <input type="checkbox" name="recurring" ng-model="$ctrl.model.Recurring"><i></i>
         </label>
       </div>
     </div>
     <!-- not-recurring -->
-    <div ng-if="!$ctrl.formValues.recurring">
+    <div ng-if="!$ctrl.model.Recurring">
       <div class="form-group">
         <label for="schedule_cron" class="col-sm-2 control-label text-left">Schedule date</label>
         <div class="col-sm-10">
@@ -77,7 +77,7 @@
     </div>
     <!-- !not-recurring -->
     <!-- recurring -->
-    <div ng-if="$ctrl.formValues.recurring">
+    <div ng-if="$ctrl.model.Recurring">
       <div class="form-group">
         <label for="schedule_value" class="col-sm-2 control-label text-left">Schedule time</label>
         <div class="col-sm-10">

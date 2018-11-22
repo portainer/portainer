@@ -7,28 +7,28 @@ angular.module('portainer.app').component('scheduleForm', {
       formValidationError: ''
     };
 
-    ctrl.formValues = {
-      datetime: '',
-      scheduleValue: '',
-      recurring: false,
-      cronMethod: 'basic'
-    };
-
     ctrl.scheduleValues = [{
         displayed: 'Every hour',
-        cron: '@hourly'
+        cron: '0 0 * * *'
       },
       {
         displayed: 'Every 2 hours',
-        cron: '<@every 2h'
+        cron: '0 0 0/2 * *'
       }, {
         displayed: 'Every day',
-        cron: '@daily'
+        cron: '0 0 0 * *'
       }
     ];
 
-    function datetimeToCron(datetime) {
+    ctrl.formValues = {
+      datetime: '',
+      scheduleValue: ctrl.scheduleValues[0],
+      cronMethod: 'basic'
+    };
 
+    function datetimeToCron(datetime) {
+      var date = moment(datetime);
+      return '0 '.concat(date.minutes(), ' ', date.hours(), ' ', date.date(), ' ', date.month());
     }
 
     this.action = function() {
@@ -40,14 +40,14 @@ angular.module('portainer.app').component('scheduleForm', {
       }
 
       if (ctrl.formValues.cronMethod === 'basic') {
-        if (!ctrl.formValues.recurring) {
-          ctrl.model.CronExpression = datetimeToCron(ctrl.model.datetime);
+        if (ctrl.model.Recurring === false) {
+          ctrl.model.CronExpression = datetimeToCron(ctrl.formValues.datetime);
         } else {
           ctrl.model.CronExpression = ctrl.formValues.scheduleValue.cron;
         }
+      } else {
+        ctrl.model.Recurring = true;
       }
-      console.log(ctrl.model.CronExpression);
-      return;
       ctrl.formAction();
     };
 
