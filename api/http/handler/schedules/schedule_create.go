@@ -18,6 +18,7 @@ type scheduleCreateFromFilePayload struct {
 	Name           string
 	Image          string
 	CronExpression string
+	Recurring      bool
 	Endpoints      []portainer.EndpointID
 	File           []byte
 	RetryCount     int
@@ -27,6 +28,7 @@ type scheduleCreateFromFilePayload struct {
 type scheduleCreateFromFileContentPayload struct {
 	Name           string
 	CronExpression string
+	Recurring      bool
 	Image          string
 	Endpoints      []portainer.EndpointID
 	FileContent    string
@@ -166,9 +168,8 @@ func (handler *Handler) createScheduleObjectFromFilePayload(payload *scheduleCre
 	scheduleIdentifier := portainer.ScheduleID(handler.ScheduleService.GetNextIdentifier())
 
 	job := &portainer.ScriptExecutionJob{
-		Endpoints: payload.Endpoints,
-		Image:     payload.Image,
-		// ScheduleID:    scheduleIdentifier,
+		Endpoints:     payload.Endpoints,
+		Image:         payload.Image,
 		RetryCount:    payload.RetryCount,
 		RetryInterval: payload.RetryInterval,
 	}
@@ -177,6 +178,7 @@ func (handler *Handler) createScheduleObjectFromFilePayload(payload *scheduleCre
 		ID:                 scheduleIdentifier,
 		Name:               payload.Name,
 		CronExpression:     payload.CronExpression,
+		Recurring:          payload.Recurring,
 		JobType:            portainer.ScriptExecutionJobType,
 		ScriptExecutionJob: job,
 		Created:            time.Now().Unix(),
@@ -189,9 +191,8 @@ func (handler *Handler) createScheduleObjectFromFileContentPayload(payload *sche
 	scheduleIdentifier := portainer.ScheduleID(handler.ScheduleService.GetNextIdentifier())
 
 	job := &portainer.ScriptExecutionJob{
-		Endpoints: payload.Endpoints,
-		Image:     payload.Image,
-		// ScheduleID:    scheduleIdentifier,
+		Endpoints:     payload.Endpoints,
+		Image:         payload.Image,
 		RetryCount:    payload.RetryCount,
 		RetryInterval: payload.RetryInterval,
 	}
@@ -200,6 +201,7 @@ func (handler *Handler) createScheduleObjectFromFileContentPayload(payload *sche
 		ID:                 scheduleIdentifier,
 		Name:               payload.Name,
 		CronExpression:     payload.CronExpression,
+		Recurring:          payload.Recurring,
 		JobType:            portainer.ScriptExecutionJobType,
 		ScriptExecutionJob: job,
 		Created:            time.Now().Unix(),

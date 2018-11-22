@@ -9,8 +9,9 @@ import (
 
 // ScriptExecutionJobRunner is used to run a ScriptExecutionJob
 type ScriptExecutionJobRunner struct {
-	schedule *portainer.Schedule
-	context  *ScriptExecutionJobContext
+	schedule     *portainer.Schedule
+	context      *ScriptExecutionJobContext
+	executedOnce bool
 }
 
 // ScriptExecutionJobContext represents the context of execution of a ScriptExecutionJob
@@ -32,8 +33,9 @@ func NewScriptExecutionJobContext(jobService portainer.JobService, endpointServi
 // NewScriptExecutionJobRunner returns a new runner that can be scheduled
 func NewScriptExecutionJobRunner(schedule *portainer.Schedule, context *ScriptExecutionJobContext) *ScriptExecutionJobRunner {
 	return &ScriptExecutionJobRunner{
-		schedule: schedule,
-		context:  context,
+		schedule:     schedule,
+		context:      context,
+		executedOnce: false,
 	}
 }
 
@@ -41,6 +43,11 @@ func NewScriptExecutionJobRunner(schedule *portainer.Schedule, context *ScriptEx
 // It will iterate through all the endpoints specified in the context to
 // execute the script associated to the job.
 func (runner *ScriptExecutionJobRunner) Run() {
+	if !runner.schedule.Recurring && runner.executedOnce {
+		return
+	}
+	runner.executedOnce = true
+
 	scriptFile, err := runner.context.fileService.GetFileContent(runner.schedule.ScriptExecutionJob.ScriptPath)
 	if err != nil {
 		log.Printf("scheduled job error (script execution). Unable to retrieve script file (err=%s)\n", err)

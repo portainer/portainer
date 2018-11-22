@@ -243,11 +243,13 @@ type (
 
 	// Schedule represents a scheduled job.
 	// It only contains a pointer to one of the JobRunner implementations
-	// based on the JobType
+	// based on the JobType.
+	// NOTE: The Recurring option is only used by ScriptExecutionJob at the moment
 	Schedule struct {
 		ID                 ScheduleID `json:"Id"`
 		Name               string
 		CronExpression     string
+		Recurring          bool
 		Created            int64
 		JobType            JobType
 		ScriptExecutionJob *ScriptExecutionJob
