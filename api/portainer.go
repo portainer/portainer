@@ -47,7 +47,7 @@ type (
 	// LDAPSettings represents the settings used to connect to a LDAP server
 	LDAPSettings struct {
 		ReaderDN            string                    `json:"ReaderDN"`
-		Password            string                    `json:"Password"`
+		Password            string                    `json:"Password,omitempty"`
 		URL                 string                    `json:"URL"`
 		TLSConfig           TLSConfiguration          `json:"TLSConfig"`
 		StartTLS            bool                      `json:"StartTLS"`
