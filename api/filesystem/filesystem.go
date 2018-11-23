@@ -32,6 +32,8 @@ const (
 	PrivateKeyFile = "portainer.key"
 	// PublicKeyFile represents the name on disk of the file containing the public key.
 	PublicKeyFile = "portainer.pub"
+	// ScheduleStorePath represents the subfolder where schedule files are stored.
+	ScheduleStorePath = "schedules"
 )
 
 // Service represents a service for managing files and directories.
@@ -317,4 +319,33 @@ func (service *Service) getContentFromPEMFile(filePath string) ([]byte, error) {
 
 	block, _ := pem.Decode(fileContent)
 	return block.Bytes, nil
+}
+
+// GetScheduleFolder returns the absolute path on the filesystem for a schedule based
+// on its identifier.
+func (service *Service) GetScheduleFolder(identifier string) string {
+	return path.Join(service.fileStorePath, ScheduleStorePath, identifier)
+}
+
+// StoreScheduledJobFileFromBytes creates a subfolder in the ScheduleStorePath and stores a new file from bytes.
+// It returns the path to the folder where the file is stored.
+func (service *Service) StoreScheduledJobFileFromBytes(identifier string, data []byte) (string, error) {
+	scheduleStorePath := path.Join(ScheduleStorePath, identifier)
+	err := service.createDirectoryInStore(scheduleStorePath)
+	if err != nil {
+		return "", err
+	}
+
+	filePath := path.Join(scheduleStorePath, createScheduledJobFileName(identifier))
+	r := bytes.NewReader(data)
+	err = service.createFileInStore(filePath, r)
+	if err != nil {
+		return "", err
+	}
+
+	return path.Join(service.fileStorePath, filePath), nil
+}
+
+func createScheduledJobFileName(identifier string) string {
+	return "job_" + identifier + ".sh"
 }

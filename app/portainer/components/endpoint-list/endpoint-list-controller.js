@@ -45,6 +45,7 @@ angular.module('portainer.app').controller('EndpointListController', ['Datatable
           return (
             _.includes(endpoint.Name.toLowerCase(), lowerCaseKeyword) ||
             _.includes(endpoint.GroupName.toLowerCase(), lowerCaseKeyword) ||
+            _.includes(endpoint.URL.toLowerCase(), lowerCaseKeyword) ||
             _.some(endpoint.Tags, function(tag) {
               return _.includes(tag.toLowerCase(), lowerCaseKeyword);
             }) ||

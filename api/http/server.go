@@ -15,6 +15,7 @@ import (
 	"github.com/portainer/portainer/http/handler/motd"
 	"github.com/portainer/portainer/http/handler/registries"
 	"github.com/portainer/portainer/http/handler/resourcecontrols"
+	"github.com/portainer/portainer/http/handler/schedules"
 	"github.com/portainer/portainer/http/handler/settings"
 	"github.com/portainer/portainer/http/handler/stacks"
 	"github.com/portainer/portainer/http/handler/status"
@@ -54,6 +55,7 @@ type Server struct {
 	LDAPService            portainer.LDAPService
 	RegistryService        portainer.RegistryService
 	ResourceControlService portainer.ResourceControlService
+	ScheduleService        portainer.ScheduleService
 	SettingsService        portainer.SettingsService
 	StackService           portainer.StackService
 	SwarmStackManager      portainer.SwarmStackManager
@@ -81,6 +83,7 @@ func (server *Server) Start() error {
 		AuthDisabled:          server.AuthDisabled,
 	}
 	requestBouncer := security.NewRequestBouncer(requestBouncerParameters)
+
 	proxyManagerParameters := &proxy.ManagerParams{
 		ResourceControlService: server.ResourceControlService,
 		TeamMembershipService:  server.TeamMembershipService,
@@ -90,6 +93,7 @@ func (server *Server) Start() error {
 		SignatureService:       server.SignatureService,
 	}
 	proxyManager := proxy.NewManager(proxyManagerParameters)
+
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
 
 	var authHandler = auth.NewHandler(requestBouncer, rateLimiter, server.AuthDisabled)
@@ -130,11 +134,19 @@ func (server *Server) Start() error {
 	var resourceControlHandler = resourcecontrols.NewHandler(requestBouncer)
 	resourceControlHandler.ResourceControlService = server.ResourceControlService
 
+	var schedulesHandler = schedules.NewHandler(requestBouncer)
+	schedulesHandler.ScheduleService = server.ScheduleService
+	schedulesHandler.EndpointService = server.EndpointService
+	schedulesHandler.FileService = server.FileService
+	schedulesHandler.JobService = server.JobService
+	schedulesHandler.JobScheduler = server.JobScheduler
+
 	var settingsHandler = settings.NewHandler(requestBouncer)
 	settingsHandler.SettingsService = server.SettingsService
 	settingsHandler.LDAPService = server.LDAPService
 	settingsHandler.FileService = server.FileService
 	settingsHandler.JobScheduler = server.JobScheduler
+	settingsHandler.ScheduleService = server.ScheduleService
 
 	var stackHandler = stacks.NewHandler(requestBouncer)
 	stackHandler.FileService = server.FileService
@@ -203,6 +215,7 @@ func (server *Server) Start() error {
 		UserHandler:            userHandler,
 		WebSocketHandler:       websocketHandler,
 		WebhookHandler:         webhookHandler,
+		SchedulesHanlder:       schedulesHandler,
 	}
 
 	if server.SSL {

@@ -1,0 +1,66 @@
+<rd-header>
+  <rd-header-title title-text="Schedule details">
+    <a data-toggle="tooltip" title-text="Refresh" ui-sref="portainer.schedules.schedule({id: schedule.Id})" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>
+    <a ui-sref="portainer.schedules">Schedules</a> &gt; {{ ::schedule.Name }}</a>
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+
+        <uib-tabset active="state.activeTab">
+          <uib-tab index="0">
+            <uib-tab-heading>
+              <i class="fa fa-wrench" aria-hidden="true"></i> Configuration
+            </uib-tab-heading>
+
+            <schedule-form
+              ng-if="schedule"
+              model="schedule"
+              endpoints="endpoints"
+              groups="groups"
+              form-action="update"
+              form-action-label="Update schedule"
+              action-in-progress="state.actionInProgress"
+            ></schedule-form>
+          </uib-tab>
+
+
+          <uib-tab index="1">
+            <uib-tab-heading>
+              <i class="fa fa-tasks" aria-hidden="true"></i> Tasks
+            </uib-tab-heading>
+
+            <div class="col-sm-12 form-section-title">
+              Information
+            </div>
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                Tasks are retrieved across all endpoints via snapshots. Data available in this view might not be up-to-date.
+              </span>
+            </div>
+
+            <div class="col-sm-12 form-section-title" style="margin-bottom: 20px;">
+              Tasks
+            </div>
+            <schedule-tasks-datatable
+              ng-if="tasks"
+              title-text="Tasks" title-icon="fa-tasks"
+              dataset="tasks"
+              table-key="schedule-tasks"
+              order-by="Status" reverse-order="true"
+              go-to-container-logs="goToContainerLogs"
+            ></schedule-tasks-datatable>
+          </uib-tab>
+
+        </uib-tabset>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

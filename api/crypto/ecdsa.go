@@ -8,6 +8,8 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"math/big"
+
+	"github.com/portainer/portainer"
 )
 
 const (
@@ -26,6 +28,15 @@ type ECDSAService struct {
 	privateKey    *ecdsa.PrivateKey
 	publicKey     *ecdsa.PublicKey
 	encodedPubKey string
+	secret        string
+}
+
+// NewECDSAService returns a pointer to a ECDSAService.
+// An optional secret can be specified
+func NewECDSAService(secret string) *ECDSAService {
+	return &ECDSAService{
+		secret: secret,
+	}
 }
 
 // EncodedPublicKey returns the encoded version of the public that can be used
@@ -91,11 +102,17 @@ func (service *ECDSAService) GenerateKeyPair() ([]byte, []byte, error) {
 	return private, public, nil
 }
 
-// Sign creates a signature from a message.
-// It automatically hash the message using MD5 and creates a signature from
+// CreateSignature creates a digital signature.
+// It automatically hash a specific message using MD5 and creates a signature from
 // that hash.
 // It then encodes the generated signature in base64.
-func (service *ECDSAService) Sign(message string) (string, error) {
+func (service *ECDSAService) CreateSignature() (string, error) {
+
+	message := portainer.PortainerAgentSignatureMessage
+	if service.secret != "" {
+		message = service.secret
+	}
+
 	hash := HashFromBytes([]byte(message))
 
 	r := big.NewInt(0)
