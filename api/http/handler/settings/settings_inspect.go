@@ -14,5 +14,6 @@ func (handler *Handler) settingsInspect(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve the settings from the database", err}
 	}
 
+	hideFields(settings)
 	return response.JSON(w, settings)
 }
