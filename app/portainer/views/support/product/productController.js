@@ -3,8 +3,7 @@ angular.module('portainer.app')
 function ($scope, $transition$) {
 
   $scope.formValues = {
-    instances: 1,
-    endpointCount: 10
+    hostCount: 10
   };
 
   function initView() {
