@@ -51,8 +51,7 @@
               </div>
 
               <div style="margin-top: 15px;" ng-if="!extension.Enabled && extension.Available">
-                <!-- TODO: inject storeID -->
-                <a href="https://2-portainer.pi.bypronto.com/checkout/?add-to-cart=1164&quantity={{ formValues.instances }}" target="_blank" class="btn btn-primary btn-sm" style="width: 100%; margin-left: 0;">
+                <a href="https://2-portainer.pi.bypronto.com/checkout/?add-to-cart={{ extension.ProductId }}&quantity={{ formValues.instances }}" target="_blank" class="btn btn-primary btn-sm" style="width: 100%; margin-left: 0;">
                   Buy
                 </a>
               </div>

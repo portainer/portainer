@@ -488,6 +488,7 @@ type (
 		License          LicenseInformation `json:"License,omitempty"`
 		Version          string             `json:"Version"`
 		UpdateAvailable  bool               `json:"UpdateAvailable"`
+		ProductID        int                `json:"ProductId,omitempty"`
 	}
 
 	// LicenseInformation represents information about an extension license
