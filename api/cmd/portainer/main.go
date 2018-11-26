@@ -2,6 +2,7 @@ package main // import "github.com/portainer/portainer"
 
 import (
 	"encoding/json"
+	"os"
 	"strings"
 	"time"
 
@@ -88,7 +89,7 @@ func initJWTService(authenticationEnabled bool) portainer.JWTService {
 }
 
 func initDigitalSignatureService() portainer.DigitalSignatureService {
-	return &crypto.ECDSAService{}
+	return crypto.NewECDSAService(os.Getenv("AGENT_SECRET"))
 }
 
 func initCryptoService() portainer.CryptoService {
@@ -141,9 +142,9 @@ func loadSnapshotSystemSchedule(jobScheduler portainer.JobScheduler, snapshotter
 	}
 
 	snapshotJobContext := cron.NewSnapshotJobContext(endpointService, snapshotter)
-	snapshotJobRunner := cron.NewSnapshotJobRunner(snapshotJob, snapshotJobContext)
+	snapshotJobRunner := cron.NewSnapshotJobRunner(snapshotSchedule, snapshotJobContext)
 
-	err = jobScheduler.CreateSchedule(snapshotSchedule, snapshotJobRunner)
+	err = jobScheduler.ScheduleJob(snapshotJobRunner)
 	if err != nil {
 		return err
 	}
@@ -179,9 +180,9 @@ func loadEndpointSyncSystemSchedule(jobScheduler portainer.JobScheduler, schedul
 	}
 
 	endpointSyncJobContext := cron.NewEndpointSyncJobContext(endpointService, *flags.ExternalEndpoints)
-	endpointSyncJobRunner := cron.NewEndpointSyncJobRunner(endpointSyncJob, endpointSyncJobContext)
+	endpointSyncJobRunner := cron.NewEndpointSyncJobRunner(endointSyncSchedule, endpointSyncJobContext)
 
-	err = jobScheduler.CreateSchedule(endointSyncSchedule, endpointSyncJobRunner)
+	err = jobScheduler.ScheduleJob(endpointSyncJobRunner)
 	if err != nil {
 		return err
 	}
@@ -199,9 +200,9 @@ func loadSchedulesFromDatabase(jobScheduler portainer.JobScheduler, jobService p
 
 		if schedule.JobType == portainer.ScriptExecutionJobType {
 			jobContext := cron.NewScriptExecutionJobContext(jobService, endpointService, fileService)
-			jobRunner := cron.NewScriptExecutionJobRunner(schedule.ScriptExecutionJob, jobContext)
+			jobRunner := cron.NewScriptExecutionJobRunner(&schedule, jobContext)
 
-			err = jobScheduler.CreateSchedule(&schedule, jobRunner)
+			err = jobScheduler.ScheduleJob(jobRunner)
 			if err != nil {
 				return err
 			}

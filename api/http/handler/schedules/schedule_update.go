@@ -1,9 +1,11 @@
 package schedules
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
+	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -17,9 +19,14 @@ type scheduleUpdatePayload struct {
 	CronExpression *string
 	Endpoints      []portainer.EndpointID
 	FileContent    *string
+	RetryCount     *int
+	RetryInterval  *int
 }
 
 func (payload *scheduleUpdatePayload) Validate(r *http.Request) error {
+	if payload.Name != nil && !govalidator.Matches(*payload.Name, `^[a-zA-Z0-9][a-zA-Z0-9_.-]+$`) {
+		return errors.New("Invalid schedule name format. Allowed characters are: [a-zA-Z0-9_.-]")
+	}
 	return nil
 }
 
@@ -54,8 +61,8 @@ func (handler *Handler) scheduleUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if updateJobSchedule {
 		jobContext := cron.NewScriptExecutionJobContext(handler.JobService, handler.EndpointService, handler.FileService)
-		jobRunner := cron.NewScriptExecutionJobRunner(schedule.ScriptExecutionJob, jobContext)
-		err := handler.JobScheduler.UpdateSchedule(schedule, jobRunner)
+		jobRunner := cron.NewScriptExecutionJobRunner(schedule, jobContext)
+		err := handler.JobScheduler.UpdateJobSchedule(jobRunner)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update job scheduler", err}
 		}
@@ -88,6 +95,16 @@ func updateSchedule(schedule *portainer.Schedule, payload *scheduleUpdatePayload
 
 	if payload.Image != nil {
 		schedule.ScriptExecutionJob.Image = *payload.Image
+		updateJobSchedule = true
+	}
+
+	if payload.RetryCount != nil {
+		schedule.ScriptExecutionJob.RetryCount = *payload.RetryCount
+		updateJobSchedule = true
+	}
+
+	if payload.RetryInterval != nil {
+		schedule.ScriptExecutionJob.RetryInterval = *payload.RetryInterval
 		updateJobSchedule = true
 	}
 

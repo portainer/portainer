@@ -47,7 +47,7 @@ type (
 	// LDAPSettings represents the settings used to connect to a LDAP server
 	LDAPSettings struct {
 		ReaderDN            string                    `json:"ReaderDN"`
-		Password            string                    `json:"Password"`
+		Password            string                    `json:"Password,omitempty"`
 		URL                 string                    `json:"URL"`
 		TLSConfig           TLSConfiguration          `json:"TLSConfig"`
 		StartTLS            bool                      `json:"StartTLS"`
@@ -228,21 +228,18 @@ type (
 
 	// ScriptExecutionJob represents a scheduled job that can execute a script via a privileged container
 	ScriptExecutionJob struct {
-		ScheduleID ScheduleID `json:"ScheduleId"`
-		Endpoints  []EndpointID
-		Image      string
-		ScriptPath string
+		Endpoints     []EndpointID
+		Image         string
+		ScriptPath    string
+		RetryCount    int
+		RetryInterval int
 	}
 
 	// SnapshotJob represents a scheduled job that can create endpoint snapshots
-	SnapshotJob struct {
-		ScheduleID ScheduleID `json:"ScheduleId"`
-	}
+	SnapshotJob struct{}
 
 	// EndpointSyncJob represents a scheduled job that synchronize endpoints based on an external file
-	EndpointSyncJob struct {
-		ScheduleID ScheduleID `json:"ScheduleId"`
-	}
+	EndpointSyncJob struct{}
 
 	// Schedule represents a scheduled job.
 	// It only contains a pointer to one of the JobRunner implementations
@@ -629,7 +626,7 @@ type (
 		GenerateKeyPair() ([]byte, []byte, error)
 		EncodedPublicKey() string
 		PEMHeaders() (string, string)
-		Sign(message string) (string, error)
+		CreateSignature() (string, error)
 	}
 
 	// JWTService represents a service for managing JWT tokens
@@ -666,18 +663,17 @@ type (
 
 	// JobScheduler represents a service to run jobs on a periodic basis
 	JobScheduler interface {
-		CreateSchedule(schedule *Schedule, runner JobRunner) error
-		UpdateSchedule(schedule *Schedule, runner JobRunner) error
-		RemoveSchedule(ID ScheduleID)
+		ScheduleJob(runner JobRunner) error
+		UpdateJobSchedule(runner JobRunner) error
+		UpdateSystemJobSchedule(jobType JobType, newCronExpression string) error
+		UnscheduleJob(ID ScheduleID)
 		Start()
 	}
 
 	// JobRunner represents a service that can be used to run a job
 	JobRunner interface {
 		Run()
-		GetScheduleID() ScheduleID
-		SetScheduleID(ID ScheduleID)
-		GetJobType() JobType
+		GetSchedule() *Schedule
 	}
 
 	// Snapshotter represents a service used to create endpoint snapshots
@@ -708,7 +704,7 @@ type (
 
 	// JobService represents a service to manage job execution on hosts
 	JobService interface {
-		Execute(endpoint *Endpoint, nodeName, image string, script []byte) error
+		ExecuteScript(endpoint *Endpoint, nodeName, image string, script []byte, schedule *Schedule) error
 	}
 )
 
@@ -718,7 +714,7 @@ const (
 	// DBVersion is the version number of the Portainer database
 	DBVersion = 14
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
-	MessageOfTheDayURL = "https://raw.githubusercontent.com/portainer/motd/master/message.html"
+	MessageOfTheDayURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com/motd.html"
 	// PortainerAgentHeader represents the name of the header available in any agent response
 	PortainerAgentHeader = "Portainer-Agent"
 	// PortainerAgentTargetHeader represent the name of the header containing the target node name

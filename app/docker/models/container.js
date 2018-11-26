@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { ResourceControlViewModel } from '../../portainer/models/resourceControl';
 
-function createStatus(statusText) {
+export function createStatus(statusText) {
   var status = _.toLower(statusText);
 
   if (status.indexOf('paused') > -1) {
@@ -74,8 +74,12 @@ export function ContainerStatsViewModel(data) {
     this.NumProcs = data.num_procs;
     this.isWindows = true;
   } else { // Linux
-    this.MemoryUsage = data.memory_stats.usage - data.memory_stats.stats.cache;
-    this.MemoryCache = data.memory_stats.stats.cache;
+    if (data.memory_stats.stats === undefined || data.memory_stats.usage === undefined) {
+      this.MemoryUsage = this.MemoryCache = 0;
+    } else {
+      this.MemoryUsage = data.memory_stats.usage - data.memory_stats.stats.cache;
+      this.MemoryCache = data.memory_stats.stats.cache;
+    }
   }
   this.PreviousCPUTotalUsage = data.precpu_stats.cpu_usage.total_usage;
   this.PreviousCPUSystemUsage = data.precpu_stats.system_cpu_usage;

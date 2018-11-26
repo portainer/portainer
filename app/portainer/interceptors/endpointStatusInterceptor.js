@@ -32,7 +32,7 @@ angular.module('portainer.app')
     function responseErrorInterceptor(rejection) {
       var EndpointService = $injector.get('EndpointService');
       var url = rejection.config.url;
-      if ((rejection.status === 502 || rejection.status === -1) && canBeOffline(url) && !EndpointProvider.offlineMode()) {
+      if ((rejection.status === 502 || rejection.status === 503 || rejection.status === -1) && canBeOffline(url) && !EndpointProvider.offlineMode()) {
         EndpointProvider.setOfflineMode(true);
         EndpointService.updateEndpoint(EndpointProvider.endpointID(), {Status: EndpointProvider.endpointStatusFromOfflineMode(true)});
       }

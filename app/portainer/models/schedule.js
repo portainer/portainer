@@ -1,3 +1,5 @@
+import { createStatus } from '../../docker/models/container';
+
 export function ScheduleDefaultModel() {
   this.Name = '';
   this.CronExpression = '';
@@ -29,6 +31,15 @@ function ScriptExecutionJobModel(data) {
   this.Endpoints = data.Endpoints;
   this.FileContent = '';
   this.Method = 'editor';
+  this.RetryCount = data.RetryCount;
+  this.RetryInterval = data.RetryInterval;
+}
+
+export function ScriptExecutionTaskModel(data) {
+  this.Id = data.Id;
+  this.EndpointId = data.EndpointId;
+  this.Status = createStatus(data.Status);
+  this.Created = data.Created;
 }
 
 export function ScheduleCreateRequest(model) {
@@ -37,6 +48,8 @@ export function ScheduleCreateRequest(model) {
   this.Image = model.Job.Image;
   this.Endpoints = model.Job.Endpoints;
   this.FileContent = model.Job.FileContent;
+  this.RetryCount = model.Job.RetryCount;
+  this.RetryInterval = model.Job.RetryInterval;
   this.File = model.Job.File;
 }
 
@@ -47,4 +60,6 @@ export function ScheduleUpdateRequest(model) {
   this.Image = model.Job.Image;
   this.Endpoints = model.Job.Endpoints;
   this.FileContent = model.Job.FileContent;
+  this.RetryCount = model.Job.RetryCount;
+  this.RetryInterval = model.Job.RetryInterval;
 }

@@ -65,7 +65,7 @@
     "splitargs": "github:deviantony/splitargs#~0.2.0",
     "toastr": "^2.1.4",
     "ui-select": "^0.19.8",
-    "xterm": "^3.1.0"
+    "xterm": "^3.8.0"
   },
   "devDependencies": {
     "@babel/core": "^7.1.2",

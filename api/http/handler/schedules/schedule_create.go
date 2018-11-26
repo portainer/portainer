@@ -14,32 +14,40 @@ import (
 	"github.com/portainer/portainer/cron"
 )
 
-type scheduleFromFilePayload struct {
+type scheduleCreateFromFilePayload struct {
 	Name           string
 	Image          string
 	CronExpression string
 	Endpoints      []portainer.EndpointID
 	File           []byte
+	RetryCount     int
+	RetryInterval  int
 }
 
-type scheduleFromFileContentPayload struct {
+type scheduleCreateFromFileContentPayload struct {
 	Name           string
 	CronExpression string
 	Image          string
 	Endpoints      []portainer.EndpointID
 	FileContent    string
+	RetryCount     int
+	RetryInterval  int
 }
 
-func (payload *scheduleFromFilePayload) Validate(r *http.Request) error {
+func (payload *scheduleCreateFromFilePayload) Validate(r *http.Request) error {
 	name, err := request.RetrieveMultiPartFormValue(r, "Name", false)
 	if err != nil {
-		return errors.New("Invalid name")
+		return errors.New("Invalid schedule name")
+	}
+
+	if !govalidator.Matches(name, `^[a-zA-Z0-9][a-zA-Z0-9_.-]+$`) {
+		return errors.New("Invalid schedule name format. Allowed characters are: [a-zA-Z0-9_.-]")
 	}
 	payload.Name = name
 
 	image, err := request.RetrieveMultiPartFormValue(r, "Image", false)
 	if err != nil {
-		return errors.New("Invalid image")
+		return errors.New("Invalid schedule image")
 	}
 	payload.Image = image
 
@@ -62,12 +70,22 @@ func (payload *scheduleFromFilePayload) Validate(r *http.Request) error {
 	}
 	payload.File = file
 
+	retryCount, _ := request.RetrieveNumericMultiPartFormValue(r, "RetryCount", true)
+	payload.RetryCount = retryCount
+
+	retryInterval, _ := request.RetrieveNumericMultiPartFormValue(r, "RetryInterval", true)
+	payload.RetryInterval = retryInterval
+
 	return nil
 }
 
-func (payload *scheduleFromFileContentPayload) Validate(r *http.Request) error {
+func (payload *scheduleCreateFromFileContentPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
 		return portainer.Error("Invalid schedule name")
+	}
+
+	if !govalidator.Matches(payload.Name, `^[a-zA-Z0-9][a-zA-Z0-9_.-]+$`) {
+		return errors.New("Invalid schedule name format. Allowed characters are: [a-zA-Z0-9_.-]")
 	}
 
 	if govalidator.IsNull(payload.Image) {
@@ -84,6 +102,10 @@ func (payload *scheduleFromFileContentPayload) Validate(r *http.Request) error {
 
 	if govalidator.IsNull(payload.FileContent) {
 		return portainer.Error("Invalid script file content")
+	}
+
+	if payload.RetryCount != 0 && payload.RetryInterval == 0 {
+		return portainer.Error("RetryInterval must be set")
 	}
 
 	return nil
@@ -107,71 +129,100 @@ func (handler *Handler) scheduleCreate(w http.ResponseWriter, r *http.Request) *
 }
 
 func (handler *Handler) createScheduleFromFileContent(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	var payload scheduleFromFileContentPayload
+	var payload scheduleCreateFromFileContentPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	schedule, err := handler.createSchedule(payload.Name, payload.Image, payload.CronExpression, payload.Endpoints, []byte(payload.FileContent))
+	schedule := handler.createScheduleObjectFromFileContentPayload(&payload)
+
+	err = handler.addAndPersistSchedule(schedule, []byte(payload.FileContent))
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Failed executing job", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to schedule script job", err}
 	}
 
 	return response.JSON(w, schedule)
 }
 
 func (handler *Handler) createScheduleFromFile(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	payload := &scheduleFromFilePayload{}
+	payload := &scheduleCreateFromFilePayload{}
 	err := payload.Validate(r)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	schedule, err := handler.createSchedule(payload.Name, payload.Image, payload.CronExpression, payload.Endpoints, payload.File)
+	schedule := handler.createScheduleObjectFromFilePayload(payload)
+
+	err = handler.addAndPersistSchedule(schedule, payload.File)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Failed executing job", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to schedule script job", err}
 	}
 
 	return response.JSON(w, schedule)
 }
 
-func (handler *Handler) createSchedule(name, image, cronExpression string, endpoints []portainer.EndpointID, file []byte) (*portainer.Schedule, error) {
+func (handler *Handler) createScheduleObjectFromFilePayload(payload *scheduleCreateFromFilePayload) *portainer.Schedule {
 	scheduleIdentifier := portainer.ScheduleID(handler.ScheduleService.GetNextIdentifier())
 
-	scriptPath, err := handler.FileService.StoreScheduledJobFileFromBytes(strconv.Itoa(int(scheduleIdentifier)), file)
-	if err != nil {
-		return nil, err
-	}
-
 	job := &portainer.ScriptExecutionJob{
-		Endpoints:  endpoints,
-		Image:      image,
-		ScriptPath: scriptPath,
-		ScheduleID: scheduleIdentifier,
+		Endpoints: payload.Endpoints,
+		Image:     payload.Image,
+		// ScheduleID:    scheduleIdentifier,
+		RetryCount:    payload.RetryCount,
+		RetryInterval: payload.RetryInterval,
 	}
 
 	schedule := &portainer.Schedule{
 		ID:                 scheduleIdentifier,
-		Name:               name,
-		CronExpression:     cronExpression,
+		Name:               payload.Name,
+		CronExpression:     payload.CronExpression,
 		JobType:            portainer.ScriptExecutionJobType,
 		ScriptExecutionJob: job,
 		Created:            time.Now().Unix(),
 	}
 
+	return schedule
+}
+
+func (handler *Handler) createScheduleObjectFromFileContentPayload(payload *scheduleCreateFromFileContentPayload) *portainer.Schedule {
+	scheduleIdentifier := portainer.ScheduleID(handler.ScheduleService.GetNextIdentifier())
+
+	job := &portainer.ScriptExecutionJob{
+		Endpoints: payload.Endpoints,
+		Image:     payload.Image,
+		// ScheduleID:    scheduleIdentifier,
+		RetryCount:    payload.RetryCount,
+		RetryInterval: payload.RetryInterval,
+	}
+
+	schedule := &portainer.Schedule{
+		ID:                 scheduleIdentifier,
+		Name:               payload.Name,
+		CronExpression:     payload.CronExpression,
+		JobType:            portainer.ScriptExecutionJobType,
+		ScriptExecutionJob: job,
+		Created:            time.Now().Unix(),
+	}
+
+	return schedule
+}
+
+func (handler *Handler) addAndPersistSchedule(schedule *portainer.Schedule, file []byte) error {
+	scriptPath, err := handler.FileService.StoreScheduledJobFileFromBytes(strconv.Itoa(int(schedule.ID)), file)
+	if err != nil {
+		return err
+	}
+
+	schedule.ScriptExecutionJob.ScriptPath = scriptPath
+
 	jobContext := cron.NewScriptExecutionJobContext(handler.JobService, handler.EndpointService, handler.FileService)
-	jobRunner := cron.NewScriptExecutionJobRunner(job, jobContext)
+	jobRunner := cron.NewScriptExecutionJobRunner(schedule, jobContext)
 
-	err = handler.JobScheduler.CreateSchedule(schedule, jobRunner)
+	err = handler.JobScheduler.ScheduleJob(jobRunner)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	err = handler.ScheduleService.CreateSchedule(schedule)
-	if err != nil {
-		return nil, err
-	}
-
-	return schedule, nil
+	return handler.ScheduleService.CreateSchedule(schedule)
 }

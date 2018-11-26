@@ -168,13 +168,13 @@ a[ng-click]{
   padding: 0.7rem;
   margin-bottom: 0.7rem;
   cursor: pointer;
-  border: 1px solid #333333;
+  border: 1px solid #cccccc;
   border-radius: 2px;
   box-shadow: 0 3px 10px -2px rgba(161, 170, 166, 0.5);
 }
 
 .blocklist-item--selected {
-  border: 2px solid #333333;
+  border: 2px solid #bbbbbb;
   background-color: #ececec;
   color: #2d3e63;
 }

@@ -9,6 +9,10 @@ import (
 	"github.com/portainer/portainer/http/security"
 )
 
+func hideFields(settings *portainer.Settings) {
+	settings.LDAPSettings.Password = ""
+}
+
 // Handler is the HTTP handler used to handle settings operations.
 type Handler struct {
 	*mux.Router

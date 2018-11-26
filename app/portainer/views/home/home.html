@@ -8,7 +8,7 @@
 </rd-header>
 
 <information-panel
-  ng-if="motd && applicationState.UI.dismissedInfoHash !== motd.Hash"
+  ng-if="motd && motd.Message !== '' && applicationState.UI.dismissedInfoHash !== motd.Hash"
   title-text="Important message"
   dismiss-action="dismissImportantInformation(motd.Hash)">
   <span class="text-muted">
