@@ -30,7 +30,7 @@ angular.module('portainer.app').controller('EndpointListController', ['Datatable
         ctrl.endpoints,
         filterValue
       );
-      DatatableService.setDataTableTextFilters(this.tableKey, this.state.textFilter);
+      DatatableService.setDataTableTextFilters(this.tableKey, filterValue);
     }
 
     function filterEndpoints(endpoints, filterValue) {
