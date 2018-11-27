@@ -39,7 +39,6 @@ function initAuthentication(authManager, Authentication, $rootScope, $state) {
   authManager.checkAuthOnRefresh();
   Authentication.init();
 
-  // TODO: review and check if other URLs required
   // The unauthenticated event is broadcasted by the jwtInterceptor when
   // hitting a 401. We're using this instead of the usual combination of
   // authManager.redirectWhenUnauthenticated() + unauthenticatedRedirector

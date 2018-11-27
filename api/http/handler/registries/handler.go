@@ -45,7 +45,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h.Handle("/registries/{id}",
 		bouncer.AdministratorAccess(httperror.LoggerHandler(h.registryDelete))).Methods(http.MethodDelete)
 	h.PathPrefix("/registries/{id}/v2").Handler(
-		bouncer.PublicAccess(httperror.LoggerHandler(h.proxyRequestsToRegistryAPI)))
+		bouncer.AdministratorAccess(httperror.LoggerHandler(h.proxyRequestsToRegistryAPI)))
 
 	return h
 }

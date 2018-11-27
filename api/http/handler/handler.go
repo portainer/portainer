@@ -9,9 +9,9 @@ import (
 	"github.com/portainer/portainer/http/handler/endpointgroups"
 	"github.com/portainer/portainer/http/handler/endpointproxy"
 	"github.com/portainer/portainer/http/handler/endpoints"
+	"github.com/portainer/portainer/http/handler/extensions"
 	"github.com/portainer/portainer/http/handler/file"
 	"github.com/portainer/portainer/http/handler/motd"
-	"github.com/portainer/portainer/http/handler/extensions"
 	"github.com/portainer/portainer/http/handler/registries"
 	"github.com/portainer/portainer/http/handler/resourcecontrols"
 	"github.com/portainer/portainer/http/handler/schedules"
@@ -38,7 +38,7 @@ type Handler struct {
 	EndpointProxyHandler   *endpointproxy.Handler
 	FileHandler            *file.Handler
 	MOTDHandler            *motd.Handler
-	ExtensionHandler          *extensions.Handler
+	ExtensionHandler       *extensions.Handler
 	RegistryHandler        *registries.Handler
 	ResourceControlHandler *resourcecontrols.Handler
 	SettingsHandler        *settings.Handler

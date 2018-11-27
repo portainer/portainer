@@ -1,8 +1,12 @@
 angular.module('portainer.extensions.registrymanagement')
-.factory('RegistryAPIService', ['$q', 'RegistryCatalog', 'RegistryTags', 'RegistryManifests', 'LocalRegistryHelper',
-function RegistryAPIServiceFactory($q, RegistryCatalog, RegistryTags, RegistryManifests, LocalRegistryHelper) {
+.factory('RegistryV2Service', ['$q', 'RegistryCatalog', 'RegistryTags', 'RegistryManifests', 'RegistryV2Helper',
+function RegistryV2ServiceFactory($q, RegistryCatalog, RegistryTags, RegistryManifests, RegistryV2Helper) {
   'use strict';
   var service = {};
+
+  service.ping = function(id) {
+    return RegistryCatalog.ping({ id: id }).$promise;
+  };
 
   service.repositories = function (id) {
     var deferred = $q.defer();
@@ -77,7 +81,7 @@ function RegistryAPIServiceFactory($q, RegistryCatalog, RegistryTags, RegistryMa
     };
     $q.all(promises)
     .then(function success(data) {
-      var tag = LocalRegistryHelper.manifestsToTag(data);
+      var tag = RegistryV2Helper.manifestsToTag(data);
       deferred.resolve(tag);
     }).catch(function error(err) {
       deferred.reject({

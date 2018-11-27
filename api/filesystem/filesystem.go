@@ -76,12 +76,13 @@ func NewService(dataStorePath, fileStorePath string) (*Service, error) {
 	return service, nil
 }
 
-// TODO: doc
+// GetBinaryFolder returns the full path to the binary store on the filesystem
 func (service *Service) GetBinaryFolder() string {
 	return path.Join(service.fileStorePath, BinaryStorePath)
 }
 
-// TODO: doc
+// ExtractExtensionArchive extracts the content of an extension archive
+// specified as raw data into the binary store on the filesystem
 func (service *Service) ExtractExtensionArchive(data []byte) error {
 	err := archive.UnzipArchive(data, path.Join(service.fileStorePath, BinaryStorePath))
 	if err != nil {

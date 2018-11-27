@@ -47,5 +47,20 @@ angular.module('portainer.app')
     return deferred.promise;
   };
 
+  service.registryManagementEnabled = function() {
+    var deferred = $q.defer();
+
+    service.extensions(false)
+    .then(function onSuccess(extensions) {
+      var extensionAvailable = _.find(extensions, { Id: 1, Enabled: true }) ? true : false;
+      deferred.resolve(extensionAvailable);
+    })
+    .catch(function onError(err) {
+      deferred.reject(err);
+    });
+
+    return deferred.promise;
+  };
+
   return service;
 }]);

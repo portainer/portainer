@@ -1,5 +1,5 @@
-angular.module('portainer.app')
-  .factory('LocalRegistryHelper', [function LocalRegistryHelperFactory() {
+angular.module('portainer.extensions.registrymanagement')
+  .factory('RegistryV2Helper', [function RegistryV2HelperFactory() {
     'use strict';
 
     var helper = {};
@@ -32,28 +32,6 @@ angular.module('portainer.app')
       var fsLayers = v1.fsLayers;
 
       return new RepositoryTagViewModel(name, imageId, os, arch, size, digest, repositoryName, fsLayers, history, v2);
-    };
-
-    function historyParsedToRaw(parsedHistory) {
-      var history = [];
-      for (var i = 0; i < parsedHistory.length; i++) {
-        var item = parsedHistory[i];
-        history.push({
-          v1Compatibility: angular.toJson(item)
-        });
-      }
-      return history;
-    }
-
-    helper.tagToManifest = function (tag) {
-      var manifest = {};
-      manifest.name = tag.RepositoryName;
-      manifest.tag = tag.Name;
-      manifest.fsLayers = tag.FsLayers;
-      manifest.history = historyParsedToRaw(tag.History);
-      manifest.schemaVersion = 1;
-      manifest.architecture = tag.Architecture;
-      return manifest;
     };
 
     return helper;

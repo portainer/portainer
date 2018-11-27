@@ -15,12 +15,13 @@
       <p>
         <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
         Portainer was not able to use this registry management features. You might need to update the configuration used by Portainer to access this registry.
-        <div style="margin-top: 7px;">
-          <a ui-sref="portainer.registries.registry.configure({id: registry.Id})">
-            <i class="fa fa-wrench" aria-hidden="true"></i> Configure this registry
-          </a>
-        </div>
       </p>
+      <p>Note: Portainer registry management features are only supported with registries exposing the <a href="https://docs.docker.com/registry/spec/api/" target="_blank">v2 registry API</a>.</p>
+      <div style="margin-top: 7px;">
+        <a ui-sref="portainer.registries.registry.configure({id: registry.Id})">
+          <i class="fa fa-wrench" aria-hidden="true"></i> Configure this registry
+        </a>
+      </div>
     </span>
   </information-panel>
 </div>

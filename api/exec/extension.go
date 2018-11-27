@@ -194,7 +194,6 @@ func validateLicense(binaryPath, licenseKey string) ([]string, error) {
 }
 
 func (manager *ExtensionManager) startExtensionProcess(extension *portainer.Extension, binaryPath string) error {
-	// TODO: logs must be available (redirect on FS?)
 	extensionProcess := exec.Command(binaryPath, "-license", extension.License.LicenseKey)
 	err := extensionProcess.Start()
 	if err != nil {

@@ -18,6 +18,7 @@ type registryConfigurePayload struct {
 	TLSSkipVerify  bool
 	TLSCertFile    []byte
 	TLSKeyFile     []byte
+	TLSCACertFile  []byte
 }
 
 func (payload *registryConfigurePayload) Validate(r *http.Request) error {
@@ -41,20 +42,25 @@ func (payload *registryConfigurePayload) Validate(r *http.Request) error {
 	skipTLSVerify, _ := request.RetrieveBooleanMultiPartFormValue(r, "TLSSkipVerify", true)
 	payload.TLSSkipVerify = skipTLSVerify
 
-	// TODO: are we using this?
-	// if useTLS && !skipTLSVerify {
-	// 	cert, _, err := request.RetrieveMultiPartFormFile(r, "TLSCertFile")
-	// 	if err != nil {
-	// 		return portainer.Error("Invalid certificate file. Ensure that the file is uploaded correctly")
-	// 	}
-	// 	payload.TLSCertFile = cert
-	//
-	// 	key, _, err := request.RetrieveMultiPartFormFile(r, "TLSKeyFile")
-	// 	if err != nil {
-	// 		return portainer.Error("Invalid key file. Ensure that the file is uploaded correctly")
-	// 	}
-	// 	payload.TLSKeyFile = key
-	// }
+	if useTLS && !skipTLSVerify {
+		cert, _, err := request.RetrieveMultiPartFormFile(r, "TLSCertFile")
+		if err != nil {
+			return portainer.Error("Invalid certificate file. Ensure that the file is uploaded correctly")
+		}
+		payload.TLSCertFile = cert
+
+		key, _, err := request.RetrieveMultiPartFormFile(r, "TLSKeyFile")
+		if err != nil {
+			return portainer.Error("Invalid key file. Ensure that the file is uploaded correctly")
+		}
+		payload.TLSKeyFile = key
+
+		ca, _, err := request.RetrieveMultiPartFormFile(r, "TLSCACertFile")
+		if err != nil {
+			return portainer.Error("Invalid CA certificate file. Ensure that the file is uploaded correctly")
+		}
+		payload.TLSCACertFile = ca
+	}
 
 	return nil
 }
@@ -79,7 +85,9 @@ func (handler *Handler) registryConfigure(w http.ResponseWriter, r *http.Request
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a registry with the specified identifier inside the database", err}
 	}
 
-	registry.ManagementConfiguration.Type = registry.Type
+	registry.ManagementConfiguration = &portainer.RegistryManagementConfiguration{
+		Type: registry.Type,
+	}
 
 	if payload.Authentication {
 		registry.ManagementConfiguration.Authentication = true
@@ -98,7 +106,7 @@ func (handler *Handler) registryConfigure(w http.ResponseWriter, r *http.Request
 		}
 
 		if !payload.TLSSkipVerify {
-			// TODO: are we using this?
+			// TODO: determine where to store this
 			// store in /data/tls/registry_ID ? If so, registry_ prefix should probably be a constant
 			// Or store somewhere else? /data/extensions/registrymanagement|1/registryid/
 			folder := "registry_" + strconv.Itoa(int(registry.ID))
@@ -114,6 +122,12 @@ func (handler *Handler) registryConfigure(w http.ResponseWriter, r *http.Request
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist TLS key file on disk", err}
 			}
 			registry.ManagementConfiguration.TLSConfig.TLSKeyPath = keyPath
+
+			cacertPath, err := handler.FileService.StoreTLSFileFromBytes(folder, portainer.TLSFileCA, payload.TLSCACertFile)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist TLS CA certificate file on disk", err}
+			}
+			registry.ManagementConfiguration.TLSConfig.TLSCACertPath = cacertPath
 		}
 	}
 

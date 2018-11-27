@@ -16,6 +16,7 @@ function RegistryManagementConfigurationDefaultModel(registry) {
   this.Password = '';
   this.TLS = false;
   this.TLSSkipVerify = false;
+  this.TLSCACertFile = null;
   this.TLSCertFile = null;
   this.TLSKeyFile = null;
 

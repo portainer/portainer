@@ -91,6 +91,7 @@ func (manager *Manager) GetExtensionProxy(extensionID portainer.ExtensionID) htt
 // registers it in the extension map associated to the specified extension identifier
 func (manager *Manager) CreateExtensionProxy(extensionID portainer.ExtensionID) (http.Handler, error) {
 	address := "http://localhost:" + extensionPorts[extensionID]
+
 	extensionURL, err := url.Parse(address)
 	if err != nil {
 		return nil, err

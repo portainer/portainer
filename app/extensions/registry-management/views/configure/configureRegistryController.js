@@ -1,10 +1,11 @@
 angular.module('portainer.extensions.registrymanagement')
-.controller('ConfigureRegistryController', ['$scope', '$state', '$transition$', 'RegistryService', 'RegistryAPIService', 'Notifications',
-function ($scope, $state, $transition$, RegistryService, RegistryAPIService, Notifications) {
+.controller('ConfigureRegistryController', ['$scope', '$state', '$transition$', 'RegistryService', 'RegistryV2Service', 'Notifications',
+function ($scope, $state, $transition$, RegistryService, RegistryV2Service, Notifications) {
 
   $scope.state = {
     testInProgress: false,
-    updateInProgress: false
+    updateInProgress: false,
+    validConfiguration : false
   };
 
   $scope.testConfiguration = testConfiguration;
@@ -15,10 +16,14 @@ function ($scope, $state, $transition$, RegistryService, RegistryAPIService, Not
 
     RegistryService.configureRegistry($scope.registry.Id, $scope.model)
     .then(function success() {
-      return RegistryAPIService.repositories($scope.registry.Id);
+      return RegistryV2Service.ping($scope.registry.Id);
+    })
+    .then(function success() {
+      Notifications.success('Success', 'Valid management configuration');
+      $scope.state.validConfiguration = true;
     })
     .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to test registry configuration');
+      Notifications.error('Failure', err, 'Invalid management configuration');
     })
     .finally(function final() {
       $scope.state.testInProgress = false;
@@ -26,7 +31,19 @@ function ($scope, $state, $transition$, RegistryService, RegistryAPIService, Not
   }
 
   function updateConfiguration() {
-    // TODO: implement
+    $scope.state.updateInProgress = true;
+
+    RegistryService.configureRegistry($scope.registry.Id, $scope.model)
+    .then(function success() {
+      Notifications.success('Success', 'Registry management configuration updated');
+      $state.go('portainer.registries.registry.repositories', { id: $scope.registry.Id }, {reload: true});
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to update registry management configuration');
+    })
+    .finally(function final() {
+      $scope.state.updateInProgress = false;
+    });
   }
 
   function initView() {

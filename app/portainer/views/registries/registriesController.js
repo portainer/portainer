@@ -61,12 +61,12 @@ function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, N
     $q.all({
       registries: RegistryService.registries(),
       dockerhub: DockerHubService.dockerhub(),
-      extensions: ExtensionService.extensions(false)
+      registryManagement: ExtensionService.registryManagementEnabled()
     })
     .then(function success(data) {
       $scope.registries = data.registries;
       $scope.dockerhub = data.dockerhub;
-      $scope.registryManagementAvailable = _.find(data.extensions, { Id: 1, Enabled: true }) ? true : false;
+      $scope.registryManagementAvailable = data.registryManagement;
     })
     .catch(function error(err) {
       $scope.registries = [];
