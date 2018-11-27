@@ -1,14 +1,10 @@
 angular.module('portainer.docker').controller('NodeBrowserController', [
-  '$state', '$stateParams', 'NodeService', 'HttpRequestHelper', 'Notifications', 'StateManager',
-  function NodeBrowserController($state, $stateParams, NodeService, HttpRequestHelper, Notifications, StateManager) {
+  '$stateParams', 'NodeService', 'HttpRequestHelper', 'Notifications',
+  function NodeBrowserController($stateParams, NodeService, HttpRequestHelper, Notifications) {
     var ctrl = this;
     ctrl.$onInit = $onInit;
 
     function $onInit() {
-      var hostManagementFeatures = StateManager.getState().application.enableHostManagementFeatures;
-      if (!hostManagementFeatures) {
-        $state.go('portainer.home');
-      }
       ctrl.nodeId = $stateParams.id;
 
       NodeService.node(ctrl.nodeId)
