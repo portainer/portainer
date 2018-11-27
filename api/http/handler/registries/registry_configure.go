@@ -106,24 +106,21 @@ func (handler *Handler) registryConfigure(w http.ResponseWriter, r *http.Request
 		}
 
 		if !payload.TLSSkipVerify {
-			// TODO: determine where to store this
-			// store in /data/tls/registry_ID ? If so, registry_ prefix should probably be a constant
-			// Or store somewhere else? /data/extensions/registrymanagement|1/registryid/
-			folder := "registry_" + strconv.Itoa(int(registry.ID))
+			folder := strconv.Itoa(int(registry.ID))
 
-			certPath, err := handler.FileService.StoreTLSFileFromBytes(folder, portainer.TLSFileCert, payload.TLSCertFile)
+			certPath, err := handler.FileService.StoreRegistryManagementFileFromBytes(folder, "cert.pem", payload.TLSCertFile)
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist TLS certificate file on disk", err}
 			}
 			registry.ManagementConfiguration.TLSConfig.TLSCertPath = certPath
 
-			keyPath, err := handler.FileService.StoreTLSFileFromBytes(folder, portainer.TLSFileKey, payload.TLSKeyFile)
+			keyPath, err := handler.FileService.StoreRegistryManagementFileFromBytes(folder, "key.pem", payload.TLSKeyFile)
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist TLS key file on disk", err}
 			}
 			registry.ManagementConfiguration.TLSConfig.TLSKeyPath = keyPath
 
-			cacertPath, err := handler.FileService.StoreTLSFileFromBytes(folder, portainer.TLSFileCA, payload.TLSCACertFile)
+			cacertPath, err := handler.FileService.StoreRegistryManagementFileFromBytes(folder, "ca.pem", payload.TLSCACertFile)
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist TLS CA certificate file on disk", err}
 			}

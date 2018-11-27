@@ -37,6 +37,9 @@ const (
 	BinaryStorePath = "bin"
 	// ScheduleStorePath represents the subfolder where schedule files are stored.
 	ScheduleStorePath = "schedules"
+	// ExtensionRegistryManagementStorePath represents the subfolder where files related to the
+	// registry management extension are stored.
+	ExtensionRegistryManagementStorePath = "extensions"
 )
 
 // Service represents a service for managing files and directories.
@@ -121,6 +124,27 @@ func (service *Service) StoreStackFileFromBytes(stackIdentifier, fileName string
 	}
 
 	return path.Join(service.fileStorePath, stackStorePath), nil
+}
+
+// StoreRegistryManagementFileFromBytes creates a subfolder in the
+// ExtensionRegistryManagementStorePath and stores a new file from bytes.
+// It returns the path to the folder where the file is stored.
+func (service *Service) StoreRegistryManagementFileFromBytes(folder, fileName string, data []byte) (string, error) {
+	extensionStorePath := path.Join(ExtensionRegistryManagementStorePath, folder)
+	err := service.createDirectoryInStore(extensionStorePath)
+	if err != nil {
+		return "", err
+	}
+
+	file := path.Join(extensionStorePath, fileName)
+	r := bytes.NewReader(data)
+
+	err = service.createFileInStore(file, r)
+	if err != nil {
+		return "", err
+	}
+
+	return path.Join(service.fileStorePath, file), nil
 }
 
 // StoreTLSFileFromBytes creates a folder in the TLSStorePath and stores a new file from bytes.
