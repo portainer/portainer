@@ -113,6 +113,14 @@ func (payload *scheduleCreateFromFileContentPayload) Validate(r *http.Request) e
 
 // POST /api/schedules?method=file/string
 func (handler *Handler) scheduleCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	settings, err := handler.SettingsService.Settings()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusServiceUnavailable, "Unable to retrieve settings", err}
+	}
+	if !settings.EnableHostManagementFeatures {
+		return &httperror.HandlerError{http.StatusServiceUnavailable, "Host management features are disabled", ErrHostManagementFeaturesDisabled}
+	}
+
 	method, err := request.RetrieveQueryParameter(r, "method", false)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: method. Valid values are: file or string", err}

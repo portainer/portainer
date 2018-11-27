@@ -140,6 +140,7 @@ func (server *Server) Start() error {
 	schedulesHandler.FileService = server.FileService
 	schedulesHandler.JobService = server.JobService
 	schedulesHandler.JobScheduler = server.JobScheduler
+	schedulesHandler.SettingsService = server.SettingsService
 
 	var settingsHandler = settings.NewHandler(requestBouncer)
 	settingsHandler.SettingsService = server.SettingsService

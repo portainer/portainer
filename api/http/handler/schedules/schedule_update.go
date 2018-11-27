@@ -31,6 +31,14 @@ func (payload *scheduleUpdatePayload) Validate(r *http.Request) error {
 }
 
 func (handler *Handler) scheduleUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	settings, err := handler.SettingsService.Settings()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusServiceUnavailable, "Unable to retrieve settings", err}
+	}
+	if !settings.EnableHostManagementFeatures {
+		return &httperror.HandlerError{http.StatusServiceUnavailable, "Host management features are disabled", ErrHostManagementFeaturesDisabled}
+	}
+
 	scheduleID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid schedule identifier route variable", err}
