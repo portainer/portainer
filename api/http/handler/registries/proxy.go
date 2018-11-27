@@ -61,6 +61,7 @@ func (handler *Handler) proxyRequestsToRegistryAPI(w http.ResponseWriter, r *htt
 
 func createDefaultManagementConfiguration(registry *portainer.Registry) *portainer.RegistryManagementConfiguration {
 	config := &portainer.RegistryManagementConfiguration{
+		Type: registry.Type,
 		TLSConfig: portainer.TLSConfiguration{
 			TLS: false,
 		},
