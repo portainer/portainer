@@ -10,6 +10,11 @@ angular.module('portainer.extensions.registrymanagement')
     ping: {
       method: 'GET',
       params: { id: '@id' }, timeout: 3500
+    },
+    pingWithForceNew: {
+      method: 'GET',
+      params: { id: '@id' }, timeout: 3500,
+      headers: { 'X-RegistryManagement-ForceNew': '1' }
     }
   },
   {

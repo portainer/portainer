@@ -4,7 +4,10 @@ function RegistryV2ServiceFactory($q, RegistryCatalog, RegistryTags, RegistryMan
   'use strict';
   var service = {};
 
-  service.ping = function(id) {
+  service.ping = function(id, forceNewConfig) {
+    if (forceNewConfig) {
+      return RegistryCatalog.pingWithForceNew({ id: id }).$promise;
+    }
     return RegistryCatalog.ping({ id: id }).$promise;
   };
 

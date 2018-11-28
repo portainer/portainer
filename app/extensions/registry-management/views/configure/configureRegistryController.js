@@ -16,7 +16,7 @@ function ($scope, $state, $transition$, RegistryService, RegistryV2Service, Noti
 
     RegistryService.configureRegistry($scope.registry.Id, $scope.model)
     .then(function success() {
-      return RegistryV2Service.ping($scope.registry.Id);
+      return RegistryV2Service.ping($scope.registry.Id, true);
     })
     .then(function success() {
       Notifications.success('Success', 'Valid management configuration');

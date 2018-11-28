@@ -13,7 +13,7 @@ function ($transition$, $scope, RegistryService, RegistryV2Service, Notification
     .then(function success(data) {
       $scope.registry = data;
 
-      RegistryV2Service.ping(registryId)
+      RegistryV2Service.ping(registryId, false)
       .then(function success() {
         return RegistryV2Service.repositories(registryId);
       })
