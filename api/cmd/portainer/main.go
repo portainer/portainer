@@ -601,7 +601,9 @@ func main() {
 		}
 	}
 
-	go terminateIfNoAdminCreated(store.UserService)
+	if !*flags.NoAuth {
+		go terminateIfNoAdminCreated(store.UserService)
+	}
 
 	var server portainer.Server = &http.Server{
 		Status:                 applicationStatus,
