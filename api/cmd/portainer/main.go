@@ -478,7 +478,7 @@ func terminateIfNoAdminCreated(userService portainer.UserService) {
 	}
 
 	if len(users) == 0 {
-		log.Fatal("Administrator account was not created")
+		log.Fatal("No administrator account was created after 5 min. Shutting down the Portainer instance for security reasons.")
 		return
 	}
 }
