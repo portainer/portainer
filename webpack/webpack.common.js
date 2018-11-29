@@ -107,7 +107,9 @@ module.exports = {
     new CleanWebpackPlugin(['dist/public']),
     new IgnorePlugin(/^\.\/locale$/, /moment$/),
     // new BundleAnalyzerPlugin()
-    new LodashModuleReplacementPlugin()
+    new LodashModuleReplacementPlugin({
+      shorthands: true
+    })
   ],
   optimization: {
     splitChunks: {
