@@ -1,0 +1,65 @@
+<div ng-if="service.ServiceGenericResources" id="service-generic-resources">
+  <rd-widget>
+    <rd-widget-header icon="fa-tasks" title-text="Generic resources">
+      <div class="nopadding">
+        <a class="btn btn-default btn-sm pull-right" ng-click="isUpdating || addGenericResource(service)" ng-disabled="isUpdating">
+          <i class="fa fa-plus-circle" aria-hidden="true"></i> generic resource
+        </a>
+      </div>
+    </rd-widget-header>
+    <rd-widget-body ng-if="service.ServiceGenericResources.length === 0">
+      <p>There are no generic resources for this service.</p>
+    </rd-widget-body>
+    <rd-widget-body ng-if="service.ServiceGenericResources.length > 0" classes="no-padding">
+      <table class="table" >
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Operator</th>
+            <th>Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="resource in service.ServiceGenericResources">
+            <td>
+              <div class="input-group input-group-sm">
+                <input type="text" class="form-control" ng-model="resource.key" placeholder="e.g. gpu" ng-change="updateGenericResource(service, resource)" ng-disabled="isUpdating">
+              </div>
+            </td><!--
+            <td>
+              <div class="input-group input-group-sm">
+                <select name="constraintOperator" class="form-control" ng-model="resource.operator" ng-change="updateGenericResource(service, resource)" ng-disabled="isUpdating">
+                  <option value="=">=</option>
+                </select>
+              </div>
+            </td>-->
+            <td>
+              <div class="input-group input-group-sm">
+                <input type="text" class="form-control" ng-model="resource.value" placeholder="e.g. 3" ng-change="updateGenericResource(service, resource)" ng-disabled="isUpdating">
+                <span class="input-group-btn">
+                    <button class="btn btn-sm btn-danger" type="button" ng-click="removeGenericResource(service, $index)" ng-disabled="isUpdating">
+                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button>
+                  </span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </rd-widget-body>
+    <rd-widget-footer>
+      <div class="btn-toolbar" role="toolbar">
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['ServiceGenericResources'])" ng-click="updateService(service)">Apply changes</button>
+          <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a ng-click="cancelChanges(service, ['ServiceGenericResources'])">Reset changes</a></li>
+            <li><a ng-click="cancelChanges(service)">Reset all changes</a></li>
+          </ul>
+        </div>
+      </div>
+    </rd-widget-footer>
+  </rd-widget>
+</div>

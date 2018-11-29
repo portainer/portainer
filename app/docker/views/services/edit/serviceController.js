@@ -128,6 +128,33 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   $scope.updateMount = function updateMount(service) {
     updateServiceArray(service, 'ServiceMounts', service.ServiceMounts);
   };
+
+
+
+
+
+
+
+
+
+
+  $scope.addGenericResource = function addGenericResource(service) {
+      service.ServiceGenericResources.push({key: '', value: ''});
+      updateServiceArray(service, 'ServiceGenericResources', service.ServiceGenericResources);
+  };
+  $scope.removeGenericResource = function removeGenericResource(service, index) {
+    var removedElement = service.ServiceGenericResources.splice(index, 1);
+    if (removedElement !== null) {
+      updateServiceArray(service, 'ServiceGenericResource', service.ServiceGenericResources);
+    }
+  };
+  $scope.updateGenericResource = function(service) {
+    updateServiceArray(service, 'ServiceGenericResource', service.ServiceGenericResources);
+  };
+
+
+
+
   $scope.addPlacementConstraint = function addPlacementConstraint(service) {
     service.ServiceConstraints.push({ key: '', operator: '==', value: '' });
     updateServiceArray(service, 'ServiceConstraints', service.ServiceConstraints);
@@ -155,6 +182,16 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   $scope.updatePlacementPreference = function(service) {
     updateServiceArray(service, 'ServicePreferences', service.ServicePreferences);
   };
+
+
+
+
+
+
+
+
+
+
 
   $scope.addPublishedPort = function addPublishedPort(service) {
     if (!service.Ports) {
@@ -302,6 +339,9 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       };
     }
 
+    config.TaskTemplate.Resources.Limits.GenericResources = ServiceHelper.translateKeyValueToGenericResources(input.GenericResources);
+    config.TaskTemplate.Resources.Reservations.GenericResources = ServiceHelper.translateKeyValueToGenericResources(input.GenericResources);
+
     if($scope.hasChanges(service, ['UpdateFailureAction', 'UpdateDelay', 'UpdateParallelism', 'UpdateOrder'])) {
       config.UpdateConfig = {
         Parallelism: service.UpdateParallelism,
@@ -431,6 +471,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     service.ServiceLabels = LabelHelper.fromLabelHashToKeyValue(service.Labels);
     service.ServiceContainerLabels = LabelHelper.fromLabelHashToKeyValue(service.ContainerLabels);
     service.ServiceMounts = angular.copy(service.Mounts);
+    service.ServiceGenericResources = ServiceHelper.translateKeyValueToGenericResources(service.GenericResources);
     service.ServiceConstraints = ServiceHelper.translateConstraintsToKeyValue(service.Constraints);
     service.ServicePreferences = ServiceHelper.translatePreferencesToKeyValue(service.Preferences);
     service.Hosts = ServiceHelper.translateHostsEntriesToHostnameIP(service.Hosts);

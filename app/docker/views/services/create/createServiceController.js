@@ -21,6 +21,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     HostsEntries: [],
     Ports: [],
     Parallelism: 1,
+    GenericResources: [],
     PlacementConstraints: [],
     PlacementPreferences: [],
     UpdateDelay: '0s',
@@ -109,6 +110,14 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
 
   $scope.removeEnvironmentVariable = function(index) {
     $scope.formValues.Env.splice(index, 1);
+  };
+
+  $scope.addGenericResource = function() {
+    $scope.formValues.GenericResources.push({key: '', value: ''});
+  };
+
+  $scope.removeGenericResource = function(index) {
+    $scope.formValues.GenericResources.splice(index, 1);
   };
 
   $scope.addPlacementConstraint = function() {
@@ -364,6 +373,14 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     }
   }
 
+
+    function prepareGenericResourcesConfig(config, input) {
+        config.TaskTemplate.Resources.Limits.GenericResources = ServiceHelper.translateKeyValueToGenericResources(input.GenericResources);
+        config.TaskTemplate.Resources.Reservations.GenericResources = ServiceHelper.translateKeyValueToGenericResources(input.GenericResources);
+    }
+
+
+
   function prepareLogDriverConfig(config, input) {
     var logOpts = {};
     if (input.LogDriverName) {
@@ -391,8 +408,12 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
         },
         Placement: {},
         Resources: {
-          Limits: {},
-          Reservations: {}
+          Limits: {
+            GenericResources: []
+          },
+          Reservations: {
+            GenericResources: []
+          }
         }
       },
       Mode: {},
@@ -411,6 +432,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     prepareConfigConfig(config, input);
     prepareSecretConfig(config, input);
     preparePlacementConfig(config, input);
+    prepareGenericResourcesConfig(config, input);
     prepareResourcesCpuConfig(config, input);
     prepareResourcesMemoryConfig(config, input);
     prepareRestartPolicy(config, input);
