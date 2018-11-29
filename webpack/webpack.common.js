@@ -97,7 +97,9 @@ module.exports = {
     new ProvidePlugin({
       $: 'jquery',
       jQuery: 'jquery',
-      'window.jQuery': 'jquery'
+      'window.jQuery': 'jquery',
+      'window.jsyaml': 'js-yaml',
+      'jsyaml': 'js-yaml'
     }),
     new MiniCssExtractPlugin({
       filename: '[name].[hash].css',
