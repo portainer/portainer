@@ -101,3 +101,22 @@
     </rd-widget>
   </div>
 </div>
+
+<div class="row" ng-if="extension">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+        <div class="col-sm-12 form-section-title">
+          <span>
+            Screenshots
+          </span>
+        </div>
+
+        <div ng-repeat="image in extension.Images" style="margin-top: 25px;">
+          <img ng-src="{{image}}" >
+        </div>
+
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
