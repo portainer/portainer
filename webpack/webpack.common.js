@@ -45,26 +45,7 @@ module.exports = {
           { loader: 'html-loader' }
         ]
       },
-      {
-        test: /\.(woff|woff2|eot|ttf|svg|)$/,
-        use: [
-          {
-            loader: 'url-loader',
-            options: { limit: 25000 }
-          }
-        ]
-      },
-      {
-        test: /\.(ico|png|jpg|gif)$/,
-        use: [
-          {
-            loader: 'url-loader',
-            options: {
-              limit: 25000
-            }
-          }
-        ]
-      },
+      
       {
         test: /.xml$/,
         use: 'file-loader'
