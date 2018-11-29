@@ -35,7 +35,8 @@ angular.module('portainer.app')
         'Content-Type': file.type
       },
       data: file,
-      ignoreLoadingBar: true
+      ignoreLoadingBar: true,
+      transformResponse: genericHandler
     });
   };
 
