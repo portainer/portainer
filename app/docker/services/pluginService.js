@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'lodash-es';
 import { PluginViewModel } from "../models/plugin";
 
 angular.module('portainer.docker')

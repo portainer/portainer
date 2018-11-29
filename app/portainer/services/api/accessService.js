@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'lodash-es';
 import { UserAccessViewModel } from '../../models/access';
 import { TeamAccessViewModel } from '../../models/access';
 

@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'lodash-es';
 import { ImageViewModel } from '../models/image';
 import { ImageDetailsViewModel } from "../models/imageDetails";
 import { ImageLayerViewModel } from "../models/imageLayer";

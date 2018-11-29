@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'lodash-es';
 
 export function ContainerInstanceProviderViewModel(data) {
   this.Id = data.id;

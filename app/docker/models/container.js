@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'lodash-es';
 import { ResourceControlViewModel } from '../../portainer/models/resourceControl';
 
 export function createStatus(statusText) {

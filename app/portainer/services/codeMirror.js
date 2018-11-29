@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'lodash-es';
 import CodeMirror from 'codemirror';
 import 'codemirror/mode/yaml/yaml.js';
 import 'codemirror/addon/lint/lint.js';

@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'lodash-es';
 
 function includeString(text, values) {
   return values.some(function(val){

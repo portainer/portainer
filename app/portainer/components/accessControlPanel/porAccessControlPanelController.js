@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'lodash-es';
 
 angular.module('portainer.app')
 .controller('porAccessControlPanelController', ['$q', '$state', 'UserService', 'TeamService', 'ResourceControlService', 'Notifications', 'Authentication', 'ModalService', 'FormValidator',

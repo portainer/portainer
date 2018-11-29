@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'lodash-es';
 
 angular.module('portainer.docker')
 .controller('porImageRegistryController', ['$q', 'RegistryService', 'DockerHubService', 'ImageService', 'Notifications',

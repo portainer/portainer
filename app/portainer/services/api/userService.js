@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'lodash-es';
 import { UserViewModel } from '../../models/user';
 import { TeamMembershipModel } from '../../models/teamMembership';
 

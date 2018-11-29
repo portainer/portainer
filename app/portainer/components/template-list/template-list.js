@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'lodash-es';
 
 angular.module('portainer.app').component('templateList', {
   templateUrl: './templateList.html',

@@ -1,5 +1,5 @@
 
-import _ from 'lodash';
+import _ from 'lodash-es';
 import { StackViewModel, ExternalStackViewModel } from '../../models/stack';
 
 angular.module('portainer.app')

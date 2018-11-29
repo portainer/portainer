@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'lodash-es';
 import { AccessControlFormData } from '../../components/accessControlForm/porAccessControlFormModel';
 
 angular.module('portainer.app')

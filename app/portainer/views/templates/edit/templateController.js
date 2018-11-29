@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'lodash-es';
 
 angular.module('portainer.app')
 .controller('TemplateController', ['$q', '$scope', '$state', '$transition$', 'TemplateService', 'TemplateHelper', 'NetworkService', 'Notifications',

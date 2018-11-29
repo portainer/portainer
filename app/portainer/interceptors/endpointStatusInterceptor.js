@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'lodash-es';
 
 angular.module('portainer.app')
   .factory('EndpointStatusInterceptor', ['$q', '$injector', 'EndpointProvider', function ($q, $injector, EndpointProvider) {

@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'lodash-es';
 import { ContainerCapabilities, ContainerCapability } from '../../../models/containerCapabilities';
 import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
 import { ContainerDetailsViewModel } from '../../../models/container';
