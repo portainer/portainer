@@ -22,7 +22,7 @@
   "scripts": {
     "grunt": "grunt",
     "start": "grunt run-dev",
-    "start:client": "webpack",
+    "start:client": "webpack-dev-server",
     "start:server": "yarn build:server:offline && grunt shell:run:amd64",
     "clean:all": "grunt clean:all",
     "build": "grunt build",
@@ -115,6 +115,7 @@
     "webpack-build-notifier": "^0.1.30",
     "webpack-bundle-analyzer": "^3.0.3",
     "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.10",
     "webpack-merge": "^4.1.4"
   },
   "resolutions": {

@@ -20,6 +20,10 @@ module.exports = webpackMerge(commonConfig, {
   devServer: {
     contentBase: path.join(__dirname, '.tmp'),
     compress: true,
-    port: 90000
+    port: 8999,
+    proxy:{
+      '/api': 'http://localhost:9000'
+    },
+    open: true,
   }
 });
