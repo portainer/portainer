@@ -71,19 +71,19 @@ angular.module('portainer.docker')
       keyValueGenericResources.forEach(function(resource) {
         if (resource.key && resource.key !== '' && resource.value && resource.value !== ''){
           if(!isNaN(resource.value) && parseInt(Number(resource.value)) == resource.value && !isNaN(parseInt(resource.value,10))){
-              resources.push({
-                  'DiscreteResourceSpec': {
-                      'Kind': resource.key,
-                      'Value': parseInt(resource.value)
-                  }
-              });
+            resources.push({
+              'DiscreteResourceSpec': {
+                'Kind': resource.key,
+                'Value': parseInt(resource.value)
+              }
+            });
           }
           else {
             resources.push({
-                'NamedResourceSpec': {
-                  'Kind': resource.key,
-                  'Value': resource.value
-                }
+              'NamedResourceSpec': {
+                'Kind': resource.key,
+                'Value': resource.value
+              }
             });
           }
         }
