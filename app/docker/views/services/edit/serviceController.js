@@ -129,15 +129,6 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     updateServiceArray(service, 'ServiceMounts', service.ServiceMounts);
   };
 
-
-
-
-
-
-
-
-
-
   $scope.addGenericResource = function addGenericResource(service) {
       service.ServiceGenericResources.push({key: '', value: ''});
       updateServiceArray(service, 'ServiceGenericResources', service.ServiceGenericResources);
@@ -151,9 +142,6 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   $scope.updateGenericResource = function(service) {
     updateServiceArray(service, 'ServiceGenericResource', service.ServiceGenericResources);
   };
-
-
-
 
   $scope.addPlacementConstraint = function addPlacementConstraint(service) {
     service.ServiceConstraints.push({ key: '', operator: '==', value: '' });
@@ -182,16 +170,6 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   $scope.updatePlacementPreference = function(service) {
     updateServiceArray(service, 'ServicePreferences', service.ServicePreferences);
   };
-
-
-
-
-
-
-
-
-
-
 
   $scope.addPublishedPort = function addPublishedPort(service) {
     if (!service.Ports) {
