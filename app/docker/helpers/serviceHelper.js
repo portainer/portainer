@@ -52,13 +52,6 @@ angular.module('portainer.docker')
     return [];
   };
 
-
-
-
-
-
-
-
   helper.translateKeyValueToPlacementConstraints = function(keyValueConstraints) {
     if (keyValueConstraints) {
       var constraints = [];
@@ -72,30 +65,33 @@ angular.module('portainer.docker')
     return [];
   };
 
-    // Reto
   helper.translateKeyValueToGenericResources = function(keyValueGenericResources) {
     if (keyValueGenericResources) {
       var resources = [];
       keyValueGenericResources.forEach(function(resource) {
         if (resource.key && resource.key !== '' && resource.value && resource.value !== ''){
-          resources.push({
-              'DiscreteResourceSpec': {
+          if(!isNaN(resource.value) && parseInt(Number(resource.value)) == resource.value && !isNaN(parseInt(resource.value,10))){
+              resources.push({
+                  'DiscreteResourceSpec': {
+                      'Kind': resource.key,
+                      'Value': parseInt(resource.value)
+                  }
+              });
+          }
+          else {
+            resources.push({
+                'NamedResourceSpec': {
                   'Kind': resource.key,
-                  'Value': parseInt(resource.value)
-              }
-          });
+                  'Value': resource.value
+                }
+            });
+          }
         }
       });
       return resources;
     }
     return [];
   }
-
-
-
-
-
-
 
   helper.translateEnvironmentVariables = function(env) {
     if (env) {

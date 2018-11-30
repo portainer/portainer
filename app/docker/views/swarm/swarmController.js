@@ -5,6 +5,7 @@ function ($q, $scope, SystemService, NodeService, Notifications, StateManager, A
   $scope.docker = {};
   $scope.swarm = {};
   $scope.totalCPU = 0;
+  $scope.totalGPU = 0;
   $scope.totalMemory = 0;
 
   function extractSwarmInfo(info) {
