@@ -17,6 +17,10 @@ type authenticatePayload struct {
 	Password string
 }
 
+type oauthPayload struct {
+	Code string
+}
+
 type authenticateResponse struct {
 	JWT string `json:"jwt"`
 }
@@ -27,6 +31,13 @@ func (payload *authenticatePayload) Validate(r *http.Request) error {
 	}
 	if govalidator.IsNull(payload.Password) {
 		return portainer.Error("Invalid password")
+	}
+	return nil
+}
+
+func (payload *oauthPayload) Validate(r *http.Request) error {
+	if govalidator.IsNull(payload.Code) {
+		return portainer.Error("Invalid OAuth authorization code")
 	}
 	return nil
 }
@@ -65,6 +76,7 @@ func (handler *Handler) authenticate(w http.ResponseWriter, r *http.Request) *ht
 		return handler.authenticateLDAP(w, u, payload.Password, &settings.LDAPSettings)
 	}
 
+
 	return handler.authenticateInternal(w, u, payload.Password)
 }
 
@@ -80,6 +92,58 @@ func (handler *Handler) authenticateLDAP(w http.ResponseWriter, user *portainer.
 	}
 
 	return handler.writeToken(w, user)
+}
+
+func (handler *Handler) authenticateOAuth(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	var payload oauthPayload
+	err := request.DecodeAndValidateJSONPayload(r, &payload)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+	}
+
+	settings, err := handler.SettingsService.Settings()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+	}
+
+	if settings.AuthenticationMethod != 3 {
+		return &httperror.HandlerError{http.StatusForbidden, "OAuth authentication is not being used", err}
+	}
+
+	token, err := handler.OAuthService.GetAccessToken(payload.Code, &settings.OAuthSettings)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid access token", portainer.ErrUnauthorized}
+	}
+
+	username, err := handler.OAuthService.GetUsername(token, &settings.OAuthSettings)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusForbidden, "Unable to acquire username", portainer.ErrUnauthorized}
+	}
+
+	u, err := handler.UserService.UserByUsername(username)
+	if err != nil && err != portainer.ErrObjectNotFound {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a user with the specified username from the database", err}
+	}
+
+	if u == nil && !settings.OAuthSettings.OAuthAutoCreateUsers {
+		return &httperror.HandlerError{http.StatusForbidden, "Unregistered account", portainer.ErrUnauthorized}
+	}
+
+	if u == nil {
+		user := &portainer.User{
+			Username: username,
+			Role:     portainer.StandardUserRole,
+		}
+
+		err = handler.UserService.CreateUser(user)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist user inside the database", err}
+		}
+
+		return handler.writeToken(w, user)
+	}
+
+	return handler.writeToken(w, u)
 }
 
 func (handler *Handler) authenticateInternal(w http.ResponseWriter, user *portainer.User, password string) *httperror.HandlerError {

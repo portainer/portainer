@@ -14,6 +14,10 @@ type publicSettingsResponse struct {
 	AllowBindMountsForRegularUsers     bool                           `json:"AllowBindMountsForRegularUsers"`
 	AllowPrivilegedModeForRegularUsers bool                           `json:"AllowPrivilegedModeForRegularUsers"`
 	ExternalTemplates                  bool                           `json:"ExternalTemplates"`
+	AuthorizationURI                   string                         `json:"AuthorizationURI"`
+	ClientID                           string                         `json:"ClientID"`
+	RedirectURI                        string                         `json:"RedirectURI"`
+	Scopes                             string                         `json:"Scopes"`
 }
 
 // GET request on /api/settings/public
@@ -29,6 +33,10 @@ func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *
 		AllowBindMountsForRegularUsers:     settings.AllowBindMountsForRegularUsers,
 		AllowPrivilegedModeForRegularUsers: settings.AllowPrivilegedModeForRegularUsers,
 		ExternalTemplates:                  false,
+		AuthorizationURI:                   settings.OAuthSettings.AuthorizationURI,
+		ClientID:                           settings.OAuthSettings.ClientID,
+		RedirectURI:                        settings.OAuthSettings.RedirectURI,
+		Scopes:                             settings.OAuthSettings.Scopes,
 	}
 
 	if settings.TemplatesURL != "" {

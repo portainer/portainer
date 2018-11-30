@@ -1,11 +1,12 @@
 angular.module('portainer.app')
-.factory('Authentication', ['$q', 'Auth', 'jwtHelper', 'LocalStorage', 'StateManager', 'EndpointProvider', function AuthenticationFactory($q, Auth, jwtHelper, LocalStorage, StateManager, EndpointProvider) {
+.factory('Authentication', ['$q', 'Auth', 'OAuth', 'jwtHelper', 'LocalStorage', 'StateManager', 'EndpointProvider', function AuthenticationFactory($q, Auth, OAuth, jwtHelper, LocalStorage, StateManager, EndpointProvider) {
   'use strict';
 
   var service = {};
   var user = {};
 
   service.init = init;
+  service.oAuthLogin = oAuthLogin;
   service.login = login;
   service.logout = logout;
   service.isAuthenticated = isAuthenticated;
@@ -20,6 +21,24 @@ angular.module('portainer.app')
       user.ID = tokenPayload.id;
       user.role = tokenPayload.role;
     }
+  }
+
+  function oAuthLogin(code) {
+    var deferred = $q.defer();
+
+    OAuth.login({code: code}).$promise
+    .then(function success(data) {
+      LocalStorage.storeJWT(data.jwt);
+      var tokenPayload = jwtHelper.decodeToken(data.jwt);
+      user.username = tokenPayload.username;
+      user.ID = tokenPayload.id;
+      user.role = tokenPayload.role;
+      deferred.resolve();
+    })
+    .catch(function error() {
+      deferred.reject();
+    });
+    return deferred.promise;
   }
 
   function login(username, password) {

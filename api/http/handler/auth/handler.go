@@ -25,6 +25,7 @@ type Handler struct {
 	CryptoService         portainer.CryptoService
 	JWTService            portainer.JWTService
 	LDAPService           portainer.LDAPService
+	OAuthService          portainer.OAuthService
 	SettingsService       portainer.SettingsService
 	TeamService           portainer.TeamService
 	TeamMembershipService portainer.TeamMembershipService
@@ -38,6 +39,8 @@ func NewHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimi
 	}
 	h.Handle("/auth",
 		rateLimiter.LimitAccess(bouncer.PublicAccess(httperror.LoggerHandler(h.authenticate)))).Methods(http.MethodPost)
+	h.Handle("/oauth",
+		rateLimiter.LimitAccess(bouncer.PublicAccess(httperror.LoggerHandler(h.authenticateOAuth)))).Methods(http.MethodPost)
 
 	return h
 }

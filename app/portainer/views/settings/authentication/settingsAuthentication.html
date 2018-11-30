@@ -37,6 +37,16 @@
                   <p>LDAP authentication</p>
                 </label>
               </div>
+              <div>
+                <input type="radio" id="registry_auth" ng-model="settings.AuthenticationMethod" ng-value="3">
+                <label for="registry_auth">
+                  <div class="boxselector_header">
+                    <i class="fa fa-users" aria-hidden="true" style="margin-right: 2px;"></i>
+                    OAuth
+                  </div>
+                  <p>OAuth authentication</p>
+                </label>
+              </div>
             </div>
           </div>
           <div class="col-sm-12 form-section-title">
@@ -50,6 +60,11 @@
           <div class="form-group" ng-if="settings.AuthenticationMethod === 2">
             <span class="col-sm-12 text-muted small">
               When using LDAP authentication, Portainer will delegate user authentication to a LDAP server and fallback to internal authentication if LDAP authentication fails.
+            </span>
+          </div>
+          <div class="form-group" ng-if="settings.AuthenticationMethod === 3">
+            <span class="col-sm-12 text-muted small">
+                When using OAuth authentication, Portainer will allow users to optionally authenticate with an OAuth authorization server.
             </span>
           </div>
 
@@ -306,7 +321,110 @@
             <!-- !group-search-settings -->
           </div>
 
-          <!-- actions -->
+          <div ng-if="settings.AuthenticationMethod === 3">
+
+            <div class="col-sm-12 form-section-title">
+              OAuth Configuration
+            </div>
+
+            <div class="form-group">
+              <label for="oauth_client_id" class="col-sm-3 col-lg-2 control-label text-left">
+                 Client ID
+                <portainer-tooltip position="bottom" message="Client ID that authorization server supports"></portainer-tooltip>
+              </label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="text" class="form-control" id="oauth_client_id" ng-model="OAuthSettings.ClientID" placeholder="xxxxxxxxxxxxxxxxxxxx">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="oauth_client_secret" class="col-sm-3 col-lg-2 control-label text-left">
+                Client Secret
+                <portainer-tooltip position="bottom" message="Client secret that authorization server supports"></portainer-tooltip>
+              </label>
+                <div class="col-sm-9 col-lg-10">
+                  <input type="password" class="form-control" id="oauth_client_secret" ng-model="OAuthSettings.ClientSecret" placeholder="xxxxxxxxxxxxxxxxxxxx">
+	            </div>
+            </div>
+
+            <div class="form-group">
+              <label for="oauth_authorization_uri" class="col-sm-3 col-lg-2 control-label text-left">
+                Authorization URI
+                <portainer-tooltip position="bottom" message="URI where the user is redirected in order to login with OAuth provider"></portainer-tooltip>
+              </label>
+                <div class="col-sm-9 col-lg-10">
+                  <input type="text" class="form-control" id="oauth_authorization_uri" ng-model="OAuthSettings.AuthorizationURI" placeholder="https://example.com/oauth/authorize">
+                </div>
+            </div>
+
+            <div class="form-group">
+              <label for="oauth_access_token_uri" class="col-sm-3 col-lg-2 control-label text-left">
+                Access Token URI
+                <portainer-tooltip position="bottom" message="URI where portainer will attempt to obtain an access token"></portainer-tooltip>
+              </label>
+	          <div class="col-sm-9 col-lg-10">
+                <input type="text" class="form-control" id="oauth_access_token_uri" ng-model="OAuthSettings.AccessTokenURI" placeholder="https://example.com/oauth/token">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="oauth_resource_uri" class="col-sm-3 col-lg-2 control-label text-left">
+                Resource URI
+                <portainer-tooltip position="bottom" message="URI where portainer will attempt to retrieve the user identifier value"></portainer-tooltip>
+              </label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="text" class="form-control" id="oauth_resource_uri" ng-model="OAuthSettings.ResourceURI" placeholder="https://example.com/user">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="oauth_redirect_uri" class="col-sm-3 col-lg-2 control-label text-left">
+                Redirect URI
+                <portainer-tooltip position="bottom" message="Set this as your portainer index"></portainer-tooltip>
+              </label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="text" class="form-control" id="oauth_redirect_uri" ng-model="OAuthSettings.RedirectURI" placeholder="http://yourportainer.com/">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="oauth_user_identifier" class="col-sm-3 col-lg-2 control-label text-left">
+                User Identifier
+                <portainer-tooltip position="bottom" message="Key that identifies the user in the resource server request"></portainer-tooltip>
+              </label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="text" class="form-control" id="oauth_user_identifier" ng-model="OAuthSettings.UserIdentifier" placeholder="id">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="oauth_scopes" class="col-sm-3 col-lg-2 control-label text-left">
+                Scopes
+                <portainer-tooltip position="bottom" message="Scopes that are required to obtain the user identifier separated by delimiter if server expects it"></portainer-tooltip>
+              </label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="text" class="form-control" id="oauth_scopes" ng-model="OAuthSettings.Scopes" placeholder="id,email,name">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                With automatic user provisioning enabled, Portainer will create user(s) automatically with standard user role. If disabled, users must be created in Portainer in order to login.
+              </span>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label for="oauth_provisioning">
+                  Automatic user provisioning
+                </label>
+                <label class="switch" style="margin-left: 20px">
+                  <input type="checkbox" ng-model="OAuthSettings.OAuthAutoCreateUsers"><i></i>
+                </label>
+              </div>
+            </div>
+          </div>
+
+            <!-- actions -->
           <div class="form-group">
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm" ng-click="saveSettings()" ng-disabled="state.actionInProgress" button-spinner="state.actionInProgress">
