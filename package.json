@@ -25,9 +25,9 @@
     "start:client": "webpack-dev-server",
     "start:server": "yarn build:server:offline && grunt shell:run:amd64",
     "clean:all": "grunt clean:all",
-    "build": "grunt build",
+    "build": "NODE_ENV=production grunt build",
     "build:server:offline": "cd ./api/cmd/portainer && CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags '-s' && mv -f portainer ../../../dist/portainer-linux-amd64",
-    "build:client": "grunt build-webapp"
+    "build:client": "NODE_ENV=production grunt build-webapp"
   },
   "engines": {
     "node": ">= 0.8.4"
