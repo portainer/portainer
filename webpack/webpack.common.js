@@ -84,7 +84,7 @@ module.exports = {
     }),
     new MiniCssExtractPlugin({
       filename: '[name].[hash].css',
-      chunkFilename: '[id].css',
+      chunkFilename: '[name].[id].css',
       sourceMap: true
     }),
     new CleanWebpackPlugin(['dist/public']),
