@@ -13,15 +13,15 @@ import (
 	"strings"
 )
 
-
 const (
 	// ErrInvalidCode defines an error raised when the user authorization code is invalid
 	ErrInvalidCode = portainer.Error("Authorization code is invalid")
 )
 
-type Service struct {}
+// OAuthService represents a service used to authenticate users against an authorization server
+type Service struct{}
 
-
+// GetAccessToken takes an access code and exchanges it for an access token from portainer OAuthSettings token endpoint
 func (*Service) GetAccessToken(code string, settings *portainer.OAuthSettings) (string, error) {
 	v := url.Values{}
 	v.Set("client_id", settings.ClientID)
@@ -71,6 +71,7 @@ func (*Service) GetAccessToken(code string, settings *portainer.OAuthSettings) (
 	return token, nil
 }
 
+// GetUsername takes a token and retrieves the portainer OAuthSettings user identifier from resource server.
 func (*Service) GetUsername(token string, settings *portainer.OAuthSettings) (string, error) {
 	req, err := http.NewRequest("GET", settings.ResourceURI, nil)
 	if err != nil {
@@ -78,7 +79,7 @@ func (*Service) GetUsername(token string, settings *portainer.OAuthSettings) (st
 	}
 
 	client := &http.Client{}
-	req.Header.Set("Authorization", "Bearer " + token)
+	req.Header.Set("Authorization", "Bearer "+token)
 	resp, err := client.Do(req)
 	if err != nil {
 		return "", err

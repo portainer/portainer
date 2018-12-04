@@ -702,6 +702,7 @@ type (
 		GetUserGroups(username string, settings *LDAPSettings) ([]string, error)
 	}
 
+	// OAuthService represents a service used to authenticate users against an authorization server
 	OAuthService interface {
 		GetAccessToken(code string, settings *OAuthSettings) (string, error)
 		GetUsername(token string, settings *OAuthSettings) (string, error)

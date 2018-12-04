@@ -76,7 +76,6 @@ func (handler *Handler) authenticate(w http.ResponseWriter, r *http.Request) *ht
 		return handler.authenticateLDAP(w, u, payload.Password, &settings.LDAPSettings)
 	}
 
-
 	return handler.authenticateInternal(w, u, payload.Password)
 }
 

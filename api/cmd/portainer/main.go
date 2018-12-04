@@ -19,8 +19,8 @@ import (
 	"github.com/portainer/portainer/http/client"
 	"github.com/portainer/portainer/jwt"
 	"github.com/portainer/portainer/ldap"
-	"github.com/portainer/portainer/oauth"
 	"github.com/portainer/portainer/libcompose"
+	"github.com/portainer/portainer/oauth"
 
 	"log"
 )
@@ -102,7 +102,7 @@ func initLDAPService() portainer.LDAPService {
 }
 
 func initOAuthService() portainer.OAuthService {
-	return &oauth.Service{};
+	return &oauth.Service{}
 }
 
 func initGitService() portainer.GitService {
@@ -259,7 +259,7 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 					portainer.LDAPGroupSearchSettings{},
 				},
 			},
-			OAuthSettings : portainer.OAuthSettings{},
+			OAuthSettings:                      portainer.OAuthSettings{},
 			AllowBindMountsForRegularUsers:     true,
 			AllowPrivilegedModeForRegularUsers: true,
 			SnapshotInterval:                   *flags.SnapshotInterval,
