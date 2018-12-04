@@ -18,7 +18,7 @@ const (
 	ErrInvalidCode = portainer.Error("Authorization code is invalid")
 )
 
-// OAuthService represents a service used to authenticate users against an authorization server
+// Service represents a service used to authenticate users against an authorization server
 type Service struct{}
 
 // GetAccessToken takes an access code and exchanges it for an access token from portainer OAuthSettings token endpoint
