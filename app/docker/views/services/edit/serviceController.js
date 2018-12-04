@@ -450,7 +450,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     service.ServiceLabels = LabelHelper.fromLabelHashToKeyValue(service.Labels);
     service.ServiceContainerLabels = LabelHelper.fromLabelHashToKeyValue(service.ContainerLabels);
     service.ServiceMounts = angular.copy(service.Mounts);
-    service.ServiceGenericResources = ServiceHelper.translateKeyValueToGenericResources(service.GenericResources);
+    service.ServiceGenericResources = angular.copy(service.GenericResources);
     service.ServiceConstraints = ServiceHelper.translateConstraintsToKeyValue(service.Constraints);
     service.ServicePreferences = ServiceHelper.translatePreferencesToKeyValue(service.Preferences);
     service.Hosts = ServiceHelper.translateHostsEntriesToHostnameIP(service.Hosts);
