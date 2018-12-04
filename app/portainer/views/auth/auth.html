@@ -28,7 +28,7 @@
             <!-- login button -->
             <div class="form-group">
               <div class="col-sm-12">
-                <a ng-href="{{ AuthorizationURI }}?response_type=code&client_id={{ ClientID }}&redirect_uri={{ RedirectURI }}&scope={{ Scopes }}"><div class="btn btn-primary btn-sm pull-right" ng-if="AuthenticationMethod === 3" style="margin-left:2px"><i class="fa fa-sign-in-alt" aria-hidden="true"></i> OAuth Login</div></a>
+                <a ng-href="{{ AuthorizationURI }}?response_type=code&client_id={{ ClientID }}&redirect_uri={{ RedirectURI }}&scope={{ Scopes }}&state=portainer"><div class="btn btn-primary btn-sm pull-right" ng-if="AuthenticationMethod === 3" style="margin-left:2px"><i class="fa fa-sign-in-alt" aria-hidden="true"></i> OAuth Login</div></a>
                 <button type="submit" class="btn btn-primary btn-sm pull-right" ng-click="authenticateUser()"><i class="fa fa-sign-in-alt" aria-hidden="true"></i> Login</button>
                   <span class="pull-left" style="margin: 5px;" ng-if="state.AuthenticationError">
                   <i class="fa fa-exclamation-triangle red-icon" aria-hidden="true" style="margin-right: 2px;"></i>

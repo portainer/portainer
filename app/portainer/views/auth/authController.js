@@ -124,7 +124,11 @@ function ($q, $scope, $state, $transition$, $sanitize, $location, $window, Authe
 
   function getParameter(param) {
     var URL = $location.absUrl();
-    var params = URL.split('?');
+    var params = URL.split('?')[1];
+    if (params === undefined) {
+      return null;
+    }
+    params = params.split('&');
     for (var i = 0; i < params.length; i++) {
       var parameter = params[i].split('=');
         if (parameter[0] === param) {
