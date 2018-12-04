@@ -21,7 +21,7 @@ angular.module('portainer.app').component('scheduleForm', {
     ];
 
     ctrl.formValues = {
-      datetime: '',
+      datetime: moment(),
       scheduleValue: ctrl.scheduleValues[0],
       cronMethod: 'basic'
     };

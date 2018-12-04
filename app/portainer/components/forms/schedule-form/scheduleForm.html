@@ -63,8 +63,7 @@
       <div class="form-group">
         <label for="schedule_cron" class="col-sm-2 control-label text-left">Schedule date</label>
         <div class="col-sm-10">
-          <input type="text" class="form-control" id="datepicker" name="datepicker" readonly ng-model="$ctrl.formValues.datetime"
-            placeholder="2018-10-23 17:30" datetime-picker date-format="yyyy-MM-dd HH:mm" required />
+            <circulartimepicker model="$ctrl.formValues.datetime" format="{momentFormat:'YYYY-MM-DD HH:mm'}"></circulartimepicker>
         </div>
         <div ng-show="scheduleForm.datepicker.$invalid">
           <div class="col-sm-12 small text-warning">

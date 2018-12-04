@@ -91,6 +91,14 @@ amdefine@>=0.0.4:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/amdefine/-/amdefine-1.0.1.tgz#4a5282ac164729e93619bcfd3ad151f817ce91f5"
 
+angular-circular-timepicker@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/angular-circular-timepicker/-/angular-circular-timepicker-0.3.0.tgz#1187339095f51b3762c62dd1b89bfd2ce84a26c0"
+  integrity sha1-EYczkJX1Gzdixi3RuJv9LOhKJsA=
+  dependencies:
+    angular "^1.4.9"
+    moment "^2.11.2"
+
 angular-clipboard@^1.6.2:
   version "1.6.2"
   resolved "https://registry.yarnpkg.com/angular-clipboard/-/angular-clipboard-1.6.2.tgz#4708e5a1dc94f3940ab89861ea1e19b26754154f"
@@ -156,9 +164,10 @@ angular@1.x, angular@~1.5.0:
   version "1.5.11"
   resolved "https://registry.yarnpkg.com/angular/-/angular-1.5.11.tgz#8c5ba7386f15965c9acf3429f6881553aada30d6"
 
-angularjs-datetime-picker-v2@^0.2.2:
-  version "0.2.2"
-  resolved "https://registry.yarnpkg.com/angularjs-datetime-picker-v2/-/angularjs-datetime-picker-v2-0.2.2.tgz#d390d8accf47530bd8dd292b504b29c120b8901e"
+angular@^1.4.9:
+  version "1.7.5"
+  resolved "https://registry.yarnpkg.com/angular/-/angular-1.7.5.tgz#d1c1c01c6f5dc835638f3f9aa51012857bdac49e"
+  integrity sha512-760183yxtGzni740IBTieNuWLtPNAoMqvmC0Z62UoU0I3nqk+VJuO3JbQAXOyvo3Oy/ZsdNQwrSTh/B0OQZjNw==
 
 angularjs-scroll-glue@^2.2.0:
   version "2.2.0"
@@ -2908,6 +2917,11 @@ mkdirp@0.x.x, mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.0, mkdirp@~0.5.1:
 moment@^2.10.6:
   version "2.14.1"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.14.1.tgz#b35b27c47e57ed2ddc70053d6b07becdb291741c"
+
+moment@^2.11.2:
+  version "2.22.2"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.22.2.tgz#3c257f9839fc0e93ff53149632239eb90783ff66"
+  integrity sha1-PCV/mDn8DpP/UxSWMiOeuQeD/2Y=
 
 moment@^2.21.0:
   version "2.21.0"
