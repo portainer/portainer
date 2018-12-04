@@ -317,8 +317,9 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       };
     }
 
-    config.TaskTemplate.Resources.Limits.GenericResources = ServiceHelper.translateKeyValueToGenericResources(input.GenericResources);
-    config.TaskTemplate.Resources.Reservations.GenericResources = ServiceHelper.translateKeyValueToGenericResources(input.GenericResources);
+    if ($scope.hasChanges(service, ['GenericResources'])) {
+        config.TaskTemplate.Resources.Reservations.GenericResources = service.GenericResources;
+    }
 
     if($scope.hasChanges(service, ['UpdateFailureAction', 'UpdateDelay', 'UpdateParallelism', 'UpdateOrder'])) {
       config.UpdateConfig = {

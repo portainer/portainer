@@ -374,7 +374,6 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
   }
 
   function prepareGenericResourcesConfig(config, input) {
-      config.TaskTemplate.Resources.Limits.GenericResources = ServiceHelper.translateKeyValueToGenericResources(input.GenericResources);
       config.TaskTemplate.Resources.Reservations.GenericResources = ServiceHelper.translateKeyValueToGenericResources(input.GenericResources);
   }
 

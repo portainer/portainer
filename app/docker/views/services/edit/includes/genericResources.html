@@ -19,15 +19,16 @@
           </tr>
         </thead>
         <tbody>
+
           <tr ng-repeat="resource in service.ServiceGenericResources">
-            <td>
+            <td ng-if="resource.hasOwnProperty('DiscreteResourceSpec')">
               <div class="input-group input-group-sm">
-                <input type="text" class="form-control" ng-model="resource.key" placeholder="e.g. gpu" ng-change="updateGenericResource(service, resource)" ng-disabled="isUpdating">
+                <input type="text" class="form-control" ng-model="resource.DiscreteResourceSpec.Kind" placeholder="e.g. gpu" ng-change="updateGenericResource(service, resource)" ng-disabled="isUpdating">
               </div>
             </td>
-            <td>
+            <td ng-if="resource.hasOwnProperty('DiscreteResourceSpec')">
               <div class="input-group input-group-sm">
-                <input type="text" class="form-control" ng-model="resource.value" placeholder="e.g. 3" ng-change="updateGenericResource(service, resource)" ng-disabled="isUpdating">
+                <input type="text" class="form-control" ng-model="resource.DiscreteResourceSpec.Value" placeholder="e.g. 3" ng-change="updateGenericResource(service, resource)" ng-disabled="isUpdating">
                 <span class="input-group-btn">
                     <button class="btn btn-sm btn-danger" type="button" ng-click="removeGenericResource(service, $index)" ng-disabled="isUpdating">
                       <i class="fa fa-trash" aria-hidden="true"></i>
@@ -35,7 +36,24 @@
                   </span>
               </div>
             </td>
+
+            <td ng-if="!resource.hasOwnProperty('DiscreteResourceSpec')">
+              <div class="input-group input-group-sm">
+                <input type="text" class="form-control" ng-model="resource.NamedResourceSpec.Kind" placeholder="e.g. gpu" ng-change="updateGenericResource(service, resource)" ng-disabled="isUpdating">
+              </div>
+            </td>
+            <td ng-if="resource.hasOwnProperty('NamedResourceSpec')">
+              <div class="input-group input-group-sm">
+                <input type="text" class="form-control" ng-model="resource.NamedResourceSpec.Value" placeholder="e.g. 3" ng-change="updateGenericResource(service, resource)" ng-disabled="isUpdating">
+                <span class="input-group-btn">
+                  <button class="btn btn-sm btn-danger" type="button" ng-click="removeGenericResource(service, $index)" ng-disabled="isUpdating">
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                  </button>
+                </span>
+              </div>
+            </td>
           </tr>
+
         </tbody>
       </table>
     </rd-widget-body>
