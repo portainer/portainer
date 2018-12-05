@@ -93,6 +93,11 @@ const (
 	ErrUnableToPingEndpoint = Error("Unable to communicate with the endpoint")
 )
 
+// Schedule errors.
+const (
+	ErrHostManagementFeaturesDisabled = Error("Host management features are disabled")
+)
+
 // Error represents an application error.
 type Error string
 

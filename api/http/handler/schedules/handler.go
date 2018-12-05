@@ -9,11 +9,6 @@ import (
 	"github.com/portainer/portainer/http/security"
 )
 
-const (
-	// ErrHostManagementFeaturesDisabled is an error raised when trying to access the schedule endpoints
-	ErrHostManagementFeaturesDisabled = portainer.Error("Host management features are disabled")
-)
-
 // Handler is the HTTP handler used to handle schedule operations.
 type Handler struct {
 	*mux.Router
