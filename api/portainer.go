@@ -89,6 +89,7 @@ type (
 		AllowPrivilegedModeForRegularUsers bool                 `json:"AllowPrivilegedModeForRegularUsers"`
 		SnapshotInterval                   string               `json:"SnapshotInterval"`
 		TemplatesURL                       string               `json:"TemplatesURL"`
+		EnableHostManagementFeatures       bool                 `json:"EnableHostManagementFeatures"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
@@ -712,7 +713,7 @@ const (
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "1.20-dev"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 14
+	DBVersion = 15
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
 	MessageOfTheDayURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com/motd.html"
 	// PortainerAgentHeader represents the name of the header available in any agent response

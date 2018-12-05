@@ -186,5 +186,13 @@ func (m *Migrator) Migrate() error {
 		}
 	}
 
+	// Portainer 1.20-dev
+	if m.currentDBVersion < 15 {
+		err := m.updateSettingsToDBVersion15()
+		if err != nil {
+			return err
+		}
+	}
+
 	return m.versionService.StoreDBVersion(portainer.DBVersion)
 }

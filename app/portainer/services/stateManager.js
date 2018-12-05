@@ -43,6 +43,11 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
     LocalStorage.storeApplicationState(state.application);
   };
 
+  manager.updateEnableHostManagementFeatures = function(enableHostManagementFeatures) {
+    state.application.enableHostManagementFeatures = enableHostManagementFeatures;
+    LocalStorage.storeApplicationState(state.application);
+  };
+
  function assignStateFromStatusAndSettings(status, settings) {
    state.application.authentication = status.Authentication;
    state.application.analytics = status.Analytics;
@@ -51,6 +56,7 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
    state.application.version = status.Version;
    state.application.logo = settings.LogoURL;
    state.application.snapshotInterval = settings.SnapshotInterval;
+   state.application.enableHostManagementFeatures = settings.EnableHostManagementFeatures;
    state.application.validity = moment().unix();
  }
 

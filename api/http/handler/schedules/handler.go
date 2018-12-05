@@ -14,6 +14,7 @@ type Handler struct {
 	*mux.Router
 	ScheduleService portainer.ScheduleService
 	EndpointService portainer.EndpointService
+	SettingsService portainer.SettingsService
 	FileService     portainer.FileService
 	JobService      portainer.JobService
 	JobScheduler    portainer.JobScheduler
