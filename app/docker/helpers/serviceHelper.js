@@ -65,33 +65,80 @@ angular.module('portainer.docker')
     return [];
   };
 
-  helper.translateKeyValueToGenericResources = function(keyValueGenericResources) {
-    if (keyValueGenericResources) {
-      var resources = [];
-      keyValueGenericResources.forEach(function(resource) {
-        if (resource.key && resource.key !== '' && resource.value && resource.value !== ''){
-          if(!isNaN(resource.value) && parseInt(Number(resource.value)) == resource.value && !isNaN(parseInt(resource.value,10))){
-            resources.push({
+  helper.changeResourceSpec = function(resource){
+      if(resource.spec === 'DiscreteResourceSpec'){
+          return ({
               'DiscreteResourceSpec': {
-                'Kind': resource.key,
-                'Value': parseInt(resource.value)
+                  'Kind' : resource.NamedResourceSpec.Kind,
+                  'Value' : parseInt(resource.NamedResourceSpec.Value, 10)
               }
-            });
-          }
-          else {
-            resources.push({
+          });
+      } else {
+          return ({
               'NamedResourceSpec': {
-                'Kind': resource.key,
-                'Value': resource.value
+                  'Kind': resource.DiscreteResourceSpec.Kind,
+                  'Value': resource.DiscreteResourceSpec.Value.toString()
               }
-            });
+          });
+      }
+  };
+
+  helper.transformGenericResources = function(resourceSpecs) {
+    if (resourceSpecs) {
+      var resources = [];
+      resourceSpecs.forEach(function(resource) {
+        if(resource.hasOwnProperty('spec') && !resource.hasOwnProperty(resource.spec)) { // changing resource spec
+          resources.push(helper.changeResourceSpec(resource));
+        } else if(resource.hasOwnProperty('DiscreteResourceSpec')){
+          if(resource.DiscreteResourceSpec.Kind !== '' && !isNaN(resource.DiscreteResourceSpec.Value) && parseInt(Number(resource.DiscreteResourceSpec.Value), 10).toString() === resource.DiscreteResourceSpec.Value && !isNaN(parseInt(resource.DiscreteResourceSpec.Value,10))){
+              resources.push({
+                'DiscreteResourceSpec': {
+                  'Kind': resource.DiscreteResourceSpec.Kind,
+                  'Value': parseInt(resource.DiscreteResourceSpec.Value, 10)
+                }
+              });
+          } else {
+            resources.push(resource);
+          }
+        } else if(resource.hasOwnProperty('NamedResourceSpec')) {
+          if(resource.NamedResourceSpec.Kind !== '' && resource.NamedResourceSpec.Value !== ''){
+            resources.push(resource);
           }
         }
       });
       return resources;
     }
     return [];
-  }
+  };
+
+  helper.translateKeyValueToGenericResources = function(keyValueGenericResources) {
+    if (keyValueGenericResources) {
+      var resources = [];
+      keyValueGenericResources.forEach(function(resource) {
+        if (resource.key && resource.key !==  '' && resource.value && resource.value !== '' && resource.spec && (resource.spec === 'NamedResourceSpec' || resource.spec === 'DiscreteResourceSpec')){
+          if(resource.spec === 'NamedResourceSpec'){
+            resources.push({
+                'NamedResourceSpec': {
+                  'Kind': resource.key,
+                  'Value': resource.value
+                }
+            });
+          } else {
+            if(!isNaN(resource.value) && parseInt(Number(resource.value), 10).toString() === resource.value && !isNaN(parseInt(resource.value,10))) { // only push if value is an int
+              resources.push({
+                'DiscreteResourceSpec': {
+                  'Kind': resource.key,
+                  'Value': parseInt(resource.value, 10)
+                }
+              });
+            }
+          }
+        }
+      });
+      return resources;
+    }
+    return [];
+  };
 
   helper.translateEnvironmentVariables = function(env) {
     if (env) {

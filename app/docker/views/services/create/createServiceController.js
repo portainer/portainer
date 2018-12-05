@@ -113,7 +113,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
   };
 
   $scope.addGenericResource = function() {
-    $scope.formValues.GenericResources.push({key: '', value: ''});
+    $scope.formValues.GenericResources.push({spec: '', key: '', value: ''});
   };
 
   $scope.removeGenericResource = function(index) {

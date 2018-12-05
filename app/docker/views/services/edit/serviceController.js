@@ -130,17 +130,17 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   };
 
   $scope.addGenericResource = function addGenericResource(service) {
-      service.ServiceGenericResources.push({key: '', value: ''});
+      service.ServiceGenericResources.push({spec: '', key: '', value: ''});
       updateServiceArray(service, 'ServiceGenericResources', service.ServiceGenericResources);
   };
   $scope.removeGenericResource = function removeGenericResource(service, index) {
     var removedElement = service.ServiceGenericResources.splice(index, 1);
     if (removedElement !== null) {
-      updateServiceArray(service, 'ServiceGenericResource', service.ServiceGenericResources);
+      updateServiceArray(service, 'ServiceGenericResources', service.ServiceGenericResources);
     }
   };
   $scope.updateGenericResource = function(service) {
-    updateServiceArray(service, 'ServiceGenericResource', service.ServiceGenericResources);
+    updateServiceArray(service, 'ServiceGenericResources', service.ServiceGenericResources);
   };
 
   $scope.addPlacementConstraint = function addPlacementConstraint(service) {
@@ -317,8 +317,8 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       };
     }
 
-    if ($scope.hasChanges(service, ['GenericResources'])) {
-        config.TaskTemplate.Resources.Reservations.GenericResources = service.GenericResources;
+    if ($scope.hasChanges(service, ['ServiceGenericResources'])) {
+        config.TaskTemplate.Resources.Reservations.GenericResources = ServiceHelper.transformGenericResources(service.ServiceGenericResources);
     }
 
     if($scope.hasChanges(service, ['UpdateFailureAction', 'UpdateDelay', 'UpdateParallelism', 'UpdateOrder'])) {

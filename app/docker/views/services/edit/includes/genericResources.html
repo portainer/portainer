@@ -14,6 +14,7 @@
       <table class="table" >
         <thead>
           <tr>
+            <th>Resource spec</th>
             <th>Name</th>
             <th>Value</th>
           </tr>
@@ -21,6 +22,12 @@
         <tbody>
 
           <tr ng-repeat="resource in service.ServiceGenericResources">
+            <td ng-if="resource.hasOwnProperty('DiscreteResourceSpec')">
+              <select name="resourceSpec" class="form-control" ng-model="resource.spec" ng-change="updateGenericResource(service, resource)" ng-disabled="isUpdating">
+                <option value="NamedResourceSpec">Named resource spec</option>
+                <option value="DiscreteResourceSpec" ng-selected="true">Discrete resource spec</option>
+              </select>
+            </td>
             <td ng-if="resource.hasOwnProperty('DiscreteResourceSpec')">
               <div class="input-group input-group-sm">
                 <input type="text" class="form-control" ng-model="resource.DiscreteResourceSpec.Kind" placeholder="e.g. gpu" ng-change="updateGenericResource(service, resource)" ng-disabled="isUpdating">
@@ -38,13 +45,19 @@
             </td>
 
             <td ng-if="!resource.hasOwnProperty('DiscreteResourceSpec')">
+              <select name="resourceSpec" class="form-control" ng-model="resource.spec" ng-change="updateGenericResource(service, resource)" ng-disabled="isUpdating">
+                <option value="NamedResourceSpec" ng-selected="true">Named resource spec</option>
+                <option value="DiscreteResourceSpec">Discrete resource spec</option>
+              </select>
+            </td>
+            <td ng-if="!resource.hasOwnProperty('DiscreteResourceSpec')">
               <div class="input-group input-group-sm">
                 <input type="text" class="form-control" ng-model="resource.NamedResourceSpec.Kind" placeholder="e.g. gpu" ng-change="updateGenericResource(service, resource)" ng-disabled="isUpdating">
               </div>
             </td>
-            <td ng-if="resource.hasOwnProperty('NamedResourceSpec')">
+            <td ng-if="!resource.hasOwnProperty('DiscreteResourceSpec')">
               <div class="input-group input-group-sm">
-                <input type="text" class="form-control" ng-model="resource.NamedResourceSpec.Value" placeholder="e.g. 3" ng-change="updateGenericResource(service, resource)" ng-disabled="isUpdating">
+                <input type="text" class="form-control" ng-model="resource.NamedResourceSpec.Value" placeholder="e.g. UUID1" ng-change="updateGenericResource(service, resource)" ng-disabled="isUpdating">
                 <span class="input-group-btn">
                   <button class="btn btn-sm btn-danger" type="button" ng-click="removeGenericResource(service, $index)" ng-disabled="isUpdating">
                     <i class="fa fa-trash" aria-hidden="true"></i>
