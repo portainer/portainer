@@ -21,10 +21,18 @@ angular.module('portainer.app').component('scheduleForm', {
     ];
 
     ctrl.formValues = {
-      datetime: moment(),
+      datetime: ctrl.model.CronExpression ? cronToDatetime(ctrl.model.CronExpression) : moment(),
       scheduleValue: ctrl.scheduleValues[0],
       cronMethod: 'basic'
     };
+
+    function cronToDatetime(cron) {
+      strings = cron.split(' ');
+      if (strings.length !== 5) {
+        return moment();
+      }
+      return moment(cron, "s m H D M");
+    }
 
     function datetimeToCron(datetime) {
       var date = moment(datetime);
