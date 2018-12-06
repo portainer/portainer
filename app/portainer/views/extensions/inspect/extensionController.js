@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('ExtensionController', ['$q', '$scope', '$transition$', '$state', 'ExtensionService', 'Notifications',
-function ($q, $scope, $transition$, $state, ExtensionService, Notifications) {
+.controller('ExtensionController', ['$q', '$scope', '$transition$', '$state', 'ExtensionService', 'Notifications', 'ModalService',
+function ($q, $scope, $transition$, $state, ExtensionService, Notifications, ModalService) {
 
   $scope.state = {
     updateInProgress: false,
@@ -13,6 +13,11 @@ function ($q, $scope, $transition$, $state, ExtensionService, Notifications) {
 
   $scope.updateExtension = updateExtension;
   $scope.deleteExtension = deleteExtension;
+  $scope.enlargeImage = enlargeImage;
+
+  function enlargeImage(image) {
+    ModalService.enlargeImage(image);
+  }
 
   function deleteExtension(extension) {
     $scope.state.deleteInProgress = true;
