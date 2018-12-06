@@ -32,8 +32,7 @@ css:
   - 'codemirror/addon/lint/lint.css'
   - 'angular-json-tree/dist/angular-json-tree.css'
   - 'angular-loading-bar/build/loading-bar.css'
-  - 'angular-circular-timepicker/dist/stylesheets/angular.circular.timepicker.css'
-
+  - 'angular-moment-picker/dist/angular-moment-picker.min.css'
 angular:
   - 'angular/angular.js'
   - 'angular-ui-bootstrap/dist/ui-bootstrap-tpls.js'
@@ -55,5 +54,4 @@ angular:
   - 'angularjs-scroll-glue/src/scrollglue.js'
   - 'angular-clipboard/angular-clipboard.js'
   - 'angular-file-saver/dist/angular-file-saver.bundle.js'
-  - 'angular-circular-timepicker/dist/javascript/angular.circular.timepicker.js'
-
+  - 'angular-moment-picker/dist/angular-moment-picker.min.js' 

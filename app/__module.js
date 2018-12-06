@@ -24,4 +24,5 @@ angular.module('portainer', [
   'portainer.docker',
   'extension.storidge',
   'rzModule',
-  'angular.circular.datetimepicker']);
+  'moment-picker'
+  ]);
