@@ -470,6 +470,21 @@ func initJobService(dockerClientFactory *docker.ClientFactory) portainer.JobServ
 	return docker.NewJobService(dockerClientFactory)
 }
 
+func terminateIfNoAdminCreated(userService portainer.UserService) {
+	timer1 := time.NewTimer(5 * time.Minute)
+	<-timer1.C
+
+	users, err := userService.UsersByRole(portainer.AdministratorRole)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if len(users) == 0 {
+		log.Fatal("No administrator account was created after 5 min. Shutting down the Portainer instance for security reasons.")
+		return
+	}
+}
+
 func main() {
 	flags := initCLI()
 
@@ -586,6 +601,10 @@ func main() {
 		} else {
 			log.Println("Instance already has an administrator user defined. Skipping admin password related flags.")
 		}
+	}
+
+	if !*flags.NoAuth {
+		go terminateIfNoAdminCreated(store.UserService)
 	}
 
 	var server portainer.Server = &http.Server{

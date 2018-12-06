@@ -15,7 +15,6 @@ angular.module('portainer', [
   'angular-json-tree',
   'angular-loading-bar',
   'angular-clipboard',
-  'angularjs-datetime-picker',
   'ngFileSaver',
   'luegg.directives',
   'portainer.templates',
@@ -24,4 +23,6 @@ angular.module('portainer', [
   'portainer.azure',
   'portainer.docker',
   'extension.storidge',
-  'rzModule']);
+  'rzModule',
+  'moment-picker'
+  ]);
