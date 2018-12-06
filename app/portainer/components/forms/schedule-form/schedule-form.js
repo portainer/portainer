@@ -31,12 +31,12 @@ angular.module('portainer.app').component('scheduleForm', {
       if (strings.length !== 5) {
         return moment();
       }
-      return moment(cron, "s m H D M");
+      return moment(cron, 's m H D M');
     }
 
     function datetimeToCron(datetime) {
       var date = moment(datetime);
-      return '0 '.concat(date.minutes(), ' ', date.hours(), ' ', date.date(), ' ', date.month());
+      return '0 '.concat(date.minutes(), ' ', date.hours(), ' ', date.date(), ' ', (date.month() + 1));
     }
 
     this.action = function() {
