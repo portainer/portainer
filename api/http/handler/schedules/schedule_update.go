@@ -17,6 +17,7 @@ type scheduleUpdatePayload struct {
 	Name           *string
 	Image          *string
 	CronExpression *string
+	Recurring      *bool
 	Endpoints      []portainer.EndpointID
 	FileContent    *string
 	RetryCount     *int
@@ -98,6 +99,11 @@ func updateSchedule(schedule *portainer.Schedule, payload *scheduleUpdatePayload
 
 	if payload.CronExpression != nil {
 		schedule.CronExpression = *payload.CronExpression
+		updateJobSchedule = true
+	}
+
+	if payload.Recurring != nil {
+		schedule.Recurring = *payload.Recurring
 		updateJobSchedule = true
 	}
 
