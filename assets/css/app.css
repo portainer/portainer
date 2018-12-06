@@ -799,6 +799,10 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 .modal-open {
   padding-right: 0 !important;
 }
+
+.image-zoom-modal .modal-dialog {
+  width: 80%;
+}
 /*!bootbox override*/
 
 /*angular-multi-select override*/
