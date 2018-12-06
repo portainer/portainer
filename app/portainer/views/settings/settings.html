@@ -105,7 +105,7 @@
             <div class="col-sm-12">
               <label for="toggle_enableHostManagementFeatures" class="control-label text-left">
                 Enable host management features
-                <portainer-tooltip position="bottom" message="Enables host management features: host scheduler, host browsing and command execution. Requires an agent setup."></portainer-tooltip>
+                <portainer-tooltip position="bottom" message="Enables host management features: host scheduler, host browsing and command execution. You'll need to set the CAP_HOST_MANAGEMENT variable when deploying the Portainer agent to use some of these features."></portainer-tooltip>
               </label>
               <label class="switch" style="margin-left: 20px;">
                 <input type="checkbox" name="toggle_enableHostManagementFeatures" ng-model="formValues.enableHostManagementFeatures"><i></i>
