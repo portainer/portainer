@@ -53,7 +53,7 @@ deploy:
   description: ''
   provider: GitHub
   auth_token:
-    secure: CSp0bwpBUaXLRNaBikD2stTpiCu1so7MQg7k6LiAyDGTpZ+oewOlFE0zB4Pku3Od
+    secure: BRYVGj94QlFBCMoO8yhSu+AGqKNV1+03LJEFrNUTRzo5erXfUHUIi/rgztnxfSGW
   artifact: /portainer-$(PORTAINER_VERSION)-$(IMAGE)-$(ARCH).*/
   draft: true
   prerelease: false
