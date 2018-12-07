@@ -18,7 +18,7 @@ func NewSnapshotter(clientFactory *ClientFactory) *Snapshotter {
 
 // CreateSnapshot creates a snapshot of a specific endpoint
 func (snapshotter *Snapshotter) CreateSnapshot(endpoint *portainer.Endpoint) (*portainer.Snapshot, error) {
-	cli, err := snapshotter.clientFactory.CreateClient(endpoint)
+	cli, err := snapshotter.clientFactory.CreateClient(endpoint, "")
 	if err != nil {
 		return nil, err
 	}

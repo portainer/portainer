@@ -8,7 +8,7 @@
 </rd-header>
 
 <information-panel
-  ng-if="motd && applicationState.UI.dismissedInfoHash !== motd.Hash"
+  ng-if="motd && motd.Message !== '' && applicationState.UI.dismissedInfoHash !== motd.Hash"
   title-text="Important message"
   dismiss-action="dismissImportantInformation(motd.Hash)">
   <span class="text-muted">
@@ -40,10 +40,12 @@
   <div class="col-sm-12">
     <endpoint-list
       title-text="Endpoints" title-icon="fa-plug"
-      endpoints="endpoints"
+      endpoints="endpoints" table-key="endpoints"
       dashboard-action="goToDashboard"
       show-snapshot-action="!applicationState.application.authentication || isAdmin"
       snapshot-action="triggerSnapshot"
+      edit-action="goToEdit"
+      is-admin="isAdmin"
     ></endpoint-list>
   </div>
 </div>

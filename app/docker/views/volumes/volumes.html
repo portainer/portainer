@@ -6,7 +6,7 @@
   </rd-header-title>
   <rd-header-content>Volumes</rd-header-content>
 </rd-header>
-
+<information-panel-offline ng-if="offlineMode"></information-panel-offline>
 <div class="row">
   <div class="col-sm-12">
     <volumes-datatable
@@ -17,6 +17,7 @@
       show-ownership-column="applicationState.application.authentication"
       show-host-column="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'"
       show-browse-action="applicationState.endpoint.mode.agentProxy"
+      offline-mode="offlineMode"
     ></volumes-datatable>
   </div>
 </div>

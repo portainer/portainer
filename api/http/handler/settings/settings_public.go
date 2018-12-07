@@ -13,6 +13,7 @@ type publicSettingsResponse struct {
 	AuthenticationMethod               portainer.AuthenticationMethod `json:"AuthenticationMethod"`
 	AllowBindMountsForRegularUsers     bool                           `json:"AllowBindMountsForRegularUsers"`
 	AllowPrivilegedModeForRegularUsers bool                           `json:"AllowPrivilegedModeForRegularUsers"`
+	EnableHostManagementFeatures       bool                           `json:"EnableHostManagementFeatures"`
 	ExternalTemplates                  bool                           `json:"ExternalTemplates"`
 }
 
@@ -28,6 +29,7 @@ func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *
 		AuthenticationMethod:               settings.AuthenticationMethod,
 		AllowBindMountsForRegularUsers:     settings.AllowBindMountsForRegularUsers,
 		AllowPrivilegedModeForRegularUsers: settings.AllowPrivilegedModeForRegularUsers,
+		EnableHostManagementFeatures:       settings.EnableHostManagementFeatures,
 		ExternalTemplates:                  false,
 	}
 

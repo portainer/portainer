@@ -47,7 +47,7 @@ type (
 	// LDAPSettings represents the settings used to connect to a LDAP server
 	LDAPSettings struct {
 		ReaderDN            string                    `json:"ReaderDN"`
-		Password            string                    `json:"Password"`
+		Password            string                    `json:"Password,omitempty"`
 		URL                 string                    `json:"URL"`
 		TLSConfig           TLSConfiguration          `json:"TLSConfig"`
 		StartTLS            bool                      `json:"StartTLS"`
@@ -89,6 +89,7 @@ type (
 		AllowPrivilegedModeForRegularUsers bool                 `json:"AllowPrivilegedModeForRegularUsers"`
 		SnapshotInterval                   string               `json:"SnapshotInterval"`
 		TemplatesURL                       string               `json:"TemplatesURL"`
+		EnableHostManagementFeatures       bool                 `json:"EnableHostManagementFeatures"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
@@ -220,7 +221,44 @@ type (
 		TLSKeyPath    string `json:"TLSKey,omitempty"`
 	}
 
-	// WebhookID represents an webhook identifier.
+	// ScheduleID represents a schedule identifier.
+	ScheduleID int
+
+	// JobType represents a job type
+	JobType int
+
+	// ScriptExecutionJob represents a scheduled job that can execute a script via a privileged container
+	ScriptExecutionJob struct {
+		Endpoints     []EndpointID
+		Image         string
+		ScriptPath    string
+		RetryCount    int
+		RetryInterval int
+	}
+
+	// SnapshotJob represents a scheduled job that can create endpoint snapshots
+	SnapshotJob struct{}
+
+	// EndpointSyncJob represents a scheduled job that synchronize endpoints based on an external file
+	EndpointSyncJob struct{}
+
+	// Schedule represents a scheduled job.
+	// It only contains a pointer to one of the JobRunner implementations
+	// based on the JobType.
+	// NOTE: The Recurring option is only used by ScriptExecutionJob at the moment
+	Schedule struct {
+		ID                 ScheduleID `json:"Id"`
+		Name               string
+		CronExpression     string
+		Recurring          bool
+		Created            int64
+		JobType            JobType
+		ScriptExecutionJob *ScriptExecutionJob
+		SnapshotJob        *SnapshotJob
+		EndpointSyncJob    *EndpointSyncJob
+	}
+
+	// WebhookID represents a webhook identifier.
 	WebhookID int
 
 	// WebhookType represents the type of resource a webhook is related to
@@ -245,17 +283,28 @@ type (
 
 	// Snapshot represents a snapshot of a specific endpoint at a specific time
 	Snapshot struct {
-		Time                  int64  `json:"Time"`
-		DockerVersion         string `json:"DockerVersion"`
-		Swarm                 bool   `json:"Swarm"`
-		TotalCPU              int    `json:"TotalCPU"`
-		TotalMemory           int64  `json:"TotalMemory"`
-		RunningContainerCount int    `json:"RunningContainerCount"`
-		StoppedContainerCount int    `json:"StoppedContainerCount"`
-		VolumeCount           int    `json:"VolumeCount"`
-		ImageCount            int    `json:"ImageCount"`
-		ServiceCount          int    `json:"ServiceCount"`
-		StackCount            int    `json:"StackCount"`
+		Time                  int64       `json:"Time"`
+		DockerVersion         string      `json:"DockerVersion"`
+		Swarm                 bool        `json:"Swarm"`
+		TotalCPU              int         `json:"TotalCPU"`
+		TotalMemory           int64       `json:"TotalMemory"`
+		RunningContainerCount int         `json:"RunningContainerCount"`
+		StoppedContainerCount int         `json:"StoppedContainerCount"`
+		VolumeCount           int         `json:"VolumeCount"`
+		ImageCount            int         `json:"ImageCount"`
+		ServiceCount          int         `json:"ServiceCount"`
+		StackCount            int         `json:"StackCount"`
+		SnapshotRaw           SnapshotRaw `json:"SnapshotRaw"`
+	}
+
+	// SnapshotRaw represents all the information related to a snapshot as returned by the Docker API
+	SnapshotRaw struct {
+		Containers interface{} `json:"Containers"`
+		Volumes    interface{} `json:"Volumes"`
+		Networks   interface{} `json:"Networks"`
+		Images     interface{} `json:"Images"`
+		Info       interface{} `json:"Info"`
+		Version    interface{} `json:"Version"`
 	}
 
 	// EndpointGroupID represents an endpoint group identifier
@@ -541,6 +590,17 @@ type (
 		DeleteResourceControl(ID ResourceControlID) error
 	}
 
+	// ScheduleService represents a service for managing schedule data
+	ScheduleService interface {
+		Schedule(ID ScheduleID) (*Schedule, error)
+		Schedules() ([]Schedule, error)
+		SchedulesByJobType(jobType JobType) ([]Schedule, error)
+		CreateSchedule(schedule *Schedule) error
+		UpdateSchedule(ID ScheduleID, schedule *Schedule) error
+		DeleteSchedule(ID ScheduleID) error
+		GetNextIdentifier() int
+	}
+
 	// TagService represents a service for managing tag data
 	TagService interface {
 		Tags() ([]Tag, error)
@@ -569,7 +629,7 @@ type (
 		GenerateKeyPair() ([]byte, []byte, error)
 		EncodedPublicKey() string
 		PEMHeaders() (string, string)
-		Sign(message string) (string, error)
+		CreateSignature() (string, error)
 	}
 
 	// JWTService represents a service for managing JWT tokens
@@ -594,6 +654,8 @@ type (
 		LoadKeyPair() ([]byte, []byte, error)
 		WriteJSONToFile(path string, content interface{}) error
 		FileExists(path string) (bool, error)
+		StoreScheduledJobFileFromBytes(identifier string, data []byte) (string, error)
+		GetScheduleFolder(identifier string) string
 	}
 
 	// GitService represents a service for managing Git
@@ -604,10 +666,17 @@ type (
 
 	// JobScheduler represents a service to run jobs on a periodic basis
 	JobScheduler interface {
-		ScheduleEndpointSyncJob(endpointFilePath, interval string) error
-		ScheduleSnapshotJob(interval string) error
-		UpdateSnapshotJob(interval string)
+		ScheduleJob(runner JobRunner) error
+		UpdateJobSchedule(runner JobRunner) error
+		UpdateSystemJobSchedule(jobType JobType, newCronExpression string) error
+		UnscheduleJob(ID ScheduleID)
 		Start()
+	}
+
+	// JobRunner represents a service that can be used to run a job
+	JobRunner interface {
+		Run()
+		GetSchedule() *Schedule
 	}
 
 	// Snapshotter represents a service used to create endpoint snapshots
@@ -635,15 +704,20 @@ type (
 		Up(stack *Stack, endpoint *Endpoint) error
 		Down(stack *Stack, endpoint *Endpoint) error
 	}
+
+	// JobService represents a service to manage job execution on hosts
+	JobService interface {
+		ExecuteScript(endpoint *Endpoint, nodeName, image string, script []byte, schedule *Schedule) error
+	}
 )
 
 const (
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "1.20-dev"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 14
+	DBVersion = 15
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
-	MessageOfTheDayURL = "https://raw.githubusercontent.com/portainer/motd/master/message.html"
+	MessageOfTheDayURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com/motd.html"
 	// PortainerAgentHeader represents the name of the header available in any agent response
 	PortainerAgentHeader = "Portainer-Agent"
 	// PortainerAgentTargetHeader represent the name of the header containing the target node name
@@ -762,4 +836,16 @@ const (
 	_ WebhookType = iota
 	// ServiceWebhook is a webhook for restarting a docker service
 	ServiceWebhook
+)
+
+const (
+	_ JobType = iota
+	// ScriptExecutionJobType is a non-system job used to execute a script against a list of
+	// endpoints via privileged containers
+	ScriptExecutionJobType
+	// SnapshotJobType is a system job used to create endpoint snapshots
+	SnapshotJobType
+	// EndpointSyncJobType is a system job used to synchronize endpoints from
+	// an external definition store
+	EndpointSyncJobType
 )

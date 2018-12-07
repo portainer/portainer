@@ -13,6 +13,7 @@ import (
 	"github.com/portainer/portainer/bolt/migrator"
 	"github.com/portainer/portainer/bolt/registry"
 	"github.com/portainer/portainer/bolt/resourcecontrol"
+	"github.com/portainer/portainer/bolt/schedule"
 	"github.com/portainer/portainer/bolt/settings"
 	"github.com/portainer/portainer/bolt/stack"
 	"github.com/portainer/portainer/bolt/tag"
@@ -49,6 +50,7 @@ type Store struct {
 	UserService            *user.Service
 	VersionService         *version.Service
 	WebhookService         *webhook.Service
+	ScheduleService        *schedule.Service
 }
 
 // NewStore initializes a new Store and the associated services
@@ -239,6 +241,12 @@ func (store *Store) initServices() error {
 		return err
 	}
 	store.WebhookService = webhookService
+
+	scheduleService, err := schedule.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.ScheduleService = scheduleService
 
 	return nil
 }

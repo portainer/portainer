@@ -1,24 +1,42 @@
-angular.module('portainer.agent')
-.factory('AgentService', ['$q', 'Agent', function AgentServiceFactory($q, Agent) {
-  'use strict';
-  var service = {};
+angular.module('portainer.agent').factory('AgentService', [
+  '$q', 'Agent', 'AgentVersion1', 'HttpRequestHelper', 'Host', 'StateManager',
+  function AgentServiceFactory($q, Agent, AgentVersion1, HttpRequestHelper, Host, StateManager) {
+    'use strict';
+    var service = {};
 
-  service.agents = function() {
-    var deferred = $q.defer();
+    service.agents = agents;
+    service.hostInfo = hostInfo;
 
-    Agent.query({}).$promise
-    .then(function success(data) {
-      var agents = data.map(function (item) {
-        return new AgentViewModel(item);
-      });
-      deferred.resolve(agents);
-    })
-    .catch(function error(err) {
-      deferred.reject({ msg: 'Unable to retrieve agents', err: err });
-    });
+    function getAgentApiVersion() {
+      var state = StateManager.getState();
+      return state.endpoint.agentApiVersion;
+    }
 
-    return deferred.promise;
-  };
+    function hostInfo(nodeName) {
+      HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
+      return Host.info().$promise;
+    }
 
-  return service;
-}]);
+    function agents() {
+      var deferred = $q.defer();
+
+      var agentVersion = getAgentApiVersion();
+      var service = agentVersion > 1 ? Agent : AgentVersion1;
+      
+      service.query({ version: agentVersion })
+        .$promise.then(function success(data) {
+          var agents = data.map(function(item) {
+            return new AgentViewModel(item);
+          });
+          deferred.resolve(agents);
+        })
+        .catch(function error(err) {
+          deferred.reject({ msg: 'Unable to retrieve agents', err: err });
+        });
+
+      return deferred.promise;
+    }
+
+    return service;
+  }
+]);

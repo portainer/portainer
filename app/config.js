@@ -14,12 +14,10 @@ angular.module('portainer')
     jwtOptionsProvider.config({
       tokenGetter: ['LocalStorage', function(LocalStorage) {
         return LocalStorage.getJWT();
-      }],
-      unauthenticatedRedirector: ['$state', function($state) {
-        $state.go('portainer.auth', {error: 'Your session has expired'});
       }]
     });
     $httpProvider.interceptors.push('jwtInterceptor');
+    $httpProvider.interceptors.push('EndpointStatusInterceptor');
     $httpProvider.defaults.headers.post['Content-Type'] = 'application/json';
     $httpProvider.defaults.headers.put['Content-Type'] = 'application/json';
     $httpProvider.defaults.headers.patch['Content-Type'] = 'application/json';
@@ -51,6 +49,7 @@ angular.module('portainer')
 
     cfpLoadingBarProvider.includeSpinner = false;
     cfpLoadingBarProvider.parentSelector = '#loadingbar-placeholder';
+    cfpLoadingBarProvider.latencyThreshold = 600;
 
     $urlRouterProvider.otherwise('/auth');
   }]);

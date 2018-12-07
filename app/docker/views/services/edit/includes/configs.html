@@ -5,7 +5,7 @@
     <rd-widget-body classes="no-padding">
       <div class="form-inline" style="padding: 10px;">
         Add a config:
-        <select class="form-control" ng-options="config.Name for config in configs" ng-model="newConfig">
+        <select class="form-control" ng-options="config.Name for config in configs | orderBy: 'Name'" ng-model="newConfig">
           <option selected disabled hidden value="">Select a config</option>
         </select>
         <a class="btn btn-default btn-sm" ng-click="addConfig(service, newConfig)">

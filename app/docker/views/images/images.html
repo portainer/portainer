@@ -7,7 +7,7 @@
   <rd-header-content>Images</rd-header-content>
 </rd-header>
 
-<div class="row">
+<div class="row" ng-if="!offlineMode">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-header icon="fa-download" title-text="Pull image ">
@@ -51,7 +51,7 @@
     </rd-widget>
   </div>
 </div>
-
+<information-panel-offline ng-if="offlineMode"></information-panel-offline>
 <div class="row">
   <div class="col-sm-12">
     <images-datatable
@@ -63,6 +63,7 @@
     remove-action="removeAction"
     force-remove-action="confirmRemovalAction"
     export-in-progress="state.exportInProgress"
+    offline-mode="offlineMode"
     ></images-datatable>
   </div>
 </div>

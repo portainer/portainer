@@ -10,7 +10,7 @@
       <div ng-repeat="config in formValues.Configs" style="margin-top: 2px;">
         <div class="input-group col-sm-4 input-group-sm">
           <span class="input-group-addon">config</span>
-          <select class="form-control" ng-model="config.model" ng-options="config.Name for config in availableConfigs">
+          <select class="form-control" ng-model="config.model" ng-options="config.Name for config in availableConfigs | orderBy: 'Name'">
             <option value="" selected="selected">Select a config</option>
           </select>
         </div>

@@ -14,6 +14,7 @@ import (
 type stackMigratePayload struct {
 	EndpointID int
 	SwarmID    string
+	Name       string
 }
 
 func (payload *stackMigratePayload) Validate(r *http.Request) error {
@@ -89,11 +90,17 @@ func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *ht
 		stack.SwarmID = payload.SwarmID
 	}
 
+	oldName := stack.Name
+	if payload.Name != "" {
+		stack.Name = payload.Name
+	}
+
 	migrationError := handler.migrateStack(r, stack, targetEndpoint)
 	if migrationError != nil {
 		return migrationError
 	}
 
+	stack.Name = oldName
 	err = handler.deleteStack(stack, endpoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
