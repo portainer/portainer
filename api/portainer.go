@@ -490,6 +490,7 @@ type (
 		UpdateAvailable  bool               `json:"UpdateAvailable"`
 		ProductID        int                `json:"ProductId,omitempty"`
 		Images           []string           `json:"Images,omitempty"`
+		Logo             string             `json:"Logo,omitempty"`
 	}
 
 	// LicenseInformation represents information about an extension license

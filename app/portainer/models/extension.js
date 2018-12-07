@@ -13,4 +13,5 @@ function ExtensionViewModel(data) {
   this.UpdateAvailable = data.UpdateAvailable;
   this.ProductId = data.ProductId;
   this.Images = data.Images;
+  this.Logo = data.Logo;
 }
