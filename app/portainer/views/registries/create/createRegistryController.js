@@ -19,12 +19,21 @@ function ($scope, $state, RegistryService, Notifications) {
     $scope.formValues.Name = 'Quay';
     $scope.formValues.URL = 'quay.io';
     $scope.formValues.Authentication = true;
+    $scope.formValues.Username = 'admin';
   };
 
   $scope.selectCustomRegistry = function() {
     $scope.formValues.Name = '';
     $scope.formValues.URL = '';
     $scope.formValues.Authentication = false;
+    $scope.formValues.Username = '';
+  };
+
+  $scope.selectGcrRegistry = function() {
+    $scope.formValues.Name = 'gcr.io/${PROJECT}';
+    $scope.formValues.URL = 'gcr.io/${PROJECT}';
+    $scope.formValues.Authentication = true;
+    $scope.formValues.Username = '_json_key';
   };
 
   $scope.addRegistry = function() {

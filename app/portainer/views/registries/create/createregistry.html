@@ -36,6 +36,16 @@
                   <p>Define your own registry</p>
                 </label>
               </div>
+              <div ng-click="selectGcrRegistry()">
+                <input type="radio" id="registry_gcr" ng-model="state.RegistryType" value="gcr">
+                <label for="registry_gcr">
+                  <div class="boxselector_header">
+                    <i class="fa fa-database" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Google container registry
+                  </div>
+                  <p>Google container registry</p>
+                </label>
+              </div>
             </div>
           </div>
           <div class="col-sm-12 form-section-title" ng-if="state.RegistryType === 'custom'">
@@ -51,7 +61,7 @@
             Registry details
           </div>
           <!-- name-input -->
-          <div class="form-group" ng-if="state.RegistryType === 'custom'">
+          <div class="form-group" ng-if="state.RegistryType != 'quay'">
             <label for="registry_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
             <div class="col-sm-9 col-lg-10">
               <input type="text" class="form-control" id="registry_name" ng-model="formValues.Name" placeholder="e.g. my-registry">
@@ -59,7 +69,7 @@
           </div>
           <!-- !name-input -->
           <!-- registry-url-input -->
-          <div class="form-group" ng-if="state.RegistryType === 'custom'">
+          <div class="form-group" ng-if="state.RegistryType != 'quay'">
             <label for="registry_url" class="col-sm-3 col-lg-2 control-label text-left">
               Registry URL
               <portainer-tooltip position="bottom" message="URL or IP address of a Docker registry. Any protocol will be stripped."></portainer-tooltip>
