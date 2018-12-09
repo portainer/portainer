@@ -18,6 +18,7 @@ type scheduleCreateFromFilePayload struct {
 	Name           string
 	Image          string
 	CronExpression string
+	Recurring      bool
 	Endpoints      []portainer.EndpointID
 	File           []byte
 	RetryCount     int
@@ -27,6 +28,7 @@ type scheduleCreateFromFilePayload struct {
 type scheduleCreateFromFileContentPayload struct {
 	Name           string
 	CronExpression string
+	Recurring      bool
 	Image          string
 	Endpoints      []portainer.EndpointID
 	FileContent    string
@@ -113,6 +115,14 @@ func (payload *scheduleCreateFromFileContentPayload) Validate(r *http.Request) e
 
 // POST /api/schedules?method=file/string
 func (handler *Handler) scheduleCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	settings, err := handler.SettingsService.Settings()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusServiceUnavailable, "Unable to retrieve settings", err}
+	}
+	if !settings.EnableHostManagementFeatures {
+		return &httperror.HandlerError{http.StatusServiceUnavailable, "Host management features are disabled", portainer.ErrHostManagementFeaturesDisabled}
+	}
+
 	method, err := request.RetrieveQueryParameter(r, "method", false)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: method. Valid values are: file or string", err}
@@ -166,9 +176,8 @@ func (handler *Handler) createScheduleObjectFromFilePayload(payload *scheduleCre
 	scheduleIdentifier := portainer.ScheduleID(handler.ScheduleService.GetNextIdentifier())
 
 	job := &portainer.ScriptExecutionJob{
-		Endpoints: payload.Endpoints,
-		Image:     payload.Image,
-		// ScheduleID:    scheduleIdentifier,
+		Endpoints:     payload.Endpoints,
+		Image:         payload.Image,
 		RetryCount:    payload.RetryCount,
 		RetryInterval: payload.RetryInterval,
 	}
@@ -177,6 +186,7 @@ func (handler *Handler) createScheduleObjectFromFilePayload(payload *scheduleCre
 		ID:                 scheduleIdentifier,
 		Name:               payload.Name,
 		CronExpression:     payload.CronExpression,
+		Recurring:          payload.Recurring,
 		JobType:            portainer.ScriptExecutionJobType,
 		ScriptExecutionJob: job,
 		Created:            time.Now().Unix(),
@@ -189,9 +199,8 @@ func (handler *Handler) createScheduleObjectFromFileContentPayload(payload *sche
 	scheduleIdentifier := portainer.ScheduleID(handler.ScheduleService.GetNextIdentifier())
 
 	job := &portainer.ScriptExecutionJob{
-		Endpoints: payload.Endpoints,
-		Image:     payload.Image,
-		// ScheduleID:    scheduleIdentifier,
+		Endpoints:     payload.Endpoints,
+		Image:         payload.Image,
 		RetryCount:    payload.RetryCount,
 		RetryInterval: payload.RetryInterval,
 	}
@@ -200,6 +209,7 @@ func (handler *Handler) createScheduleObjectFromFileContentPayload(payload *sche
 		ID:                 scheduleIdentifier,
 		Name:               payload.Name,
 		CronExpression:     payload.CronExpression,
+		Recurring:          payload.Recurring,
 		JobType:            portainer.ScriptExecutionJobType,
 		ScriptExecutionJob: job,
 		Created:            time.Now().Unix(),

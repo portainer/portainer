@@ -24,4 +24,6 @@ angular.module('portainer', [
   'portainer.docker',
   'portainer.extensions',
   'extension.storidge',
-  'rzModule']);
+  'rzModule',
+  'moment-picker'
+  ]);

@@ -89,6 +89,7 @@ type (
 		AllowPrivilegedModeForRegularUsers bool                 `json:"AllowPrivilegedModeForRegularUsers"`
 		SnapshotInterval                   string               `json:"SnapshotInterval"`
 		TemplatesURL                       string               `json:"TemplatesURL"`
+		EnableHostManagementFeatures       bool                 `json:"EnableHostManagementFeatures"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
@@ -258,11 +259,13 @@ type (
 
 	// Schedule represents a scheduled job.
 	// It only contains a pointer to one of the JobRunner implementations
-	// based on the JobType
+	// based on the JobType.
+	// NOTE: The Recurring option is only used by ScriptExecutionJob at the moment
 	Schedule struct {
 		ID                 ScheduleID `json:"Id"`
 		Name               string
 		CronExpression     string
+		Recurring          bool
 		Created            int64
 		JobType            JobType
 		ScriptExecutionJob *ScriptExecutionJob
@@ -774,7 +777,7 @@ const (
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "1.20-dev"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 14
+	DBVersion = 15
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
 	MessageOfTheDayURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com/motd.html"
 	// ExtensionDefinitionsURL represents the URL where Portainer extension definitions can be retrieved

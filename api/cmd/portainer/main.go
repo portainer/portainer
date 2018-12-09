@@ -136,6 +136,7 @@ func loadSnapshotSystemSchedule(jobScheduler portainer.JobScheduler, snapshotter
 		ID:             portainer.ScheduleID(scheduleService.GetNextIdentifier()),
 		Name:           "system_snapshot",
 		CronExpression: "@every " + *flags.SnapshotInterval,
+		Recurring:      true,
 		JobType:        portainer.SnapshotJobType,
 		SnapshotJob:    snapshotJob,
 		Created:        time.Now().Unix(),
@@ -174,6 +175,7 @@ func loadEndpointSyncSystemSchedule(jobScheduler portainer.JobScheduler, schedul
 		ID:              portainer.ScheduleID(scheduleService.GetNextIdentifier()),
 		Name:            "system_endpointsync",
 		CronExpression:  "@every " + *flags.SyncInterval,
+		Recurring:       true,
 		JobType:         portainer.EndpointSyncJobType,
 		EndpointSyncJob: endpointSyncJob,
 		Created:         time.Now().Unix(),
@@ -256,6 +258,7 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 			},
 			AllowBindMountsForRegularUsers:     true,
 			AllowPrivilegedModeForRegularUsers: true,
+			EnableHostManagementFeatures:       false,
 			SnapshotInterval:                   *flags.SnapshotInterval,
 		}
 

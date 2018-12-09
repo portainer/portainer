@@ -8,6 +8,7 @@ function SettingsViewModel(data) {
   this.SnapshotInterval = data.SnapshotInterval;
   this.TemplatesURL = data.TemplatesURL;
   this.ExternalTemplates = data.ExternalTemplates;
+  this.EnableHostManagementFeatures = data.EnableHostManagementFeatures;
 }
 
 function LDAPSettingsViewModel(data) {
