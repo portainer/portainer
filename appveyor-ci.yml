@@ -32,11 +32,9 @@ install:
   - yarn install
   - npm install -g rebase-docker-image
 init:
-  - sh: export IMAGE=linux
-      printenv
+  - sh: export IMAGE=linux && printenv
   - cmd: 
-      SET IMAGE=windows
-      SET
+      SET IMAGE=windows && SET
   - ps: >-
       if (!(Test-Path ~/.docker)) { mkdir ~/.docker };
       Set-Content -Value '{ "experimental": "enabled" }' -Path ~/.docker/config.json -Encoding Ascii      
