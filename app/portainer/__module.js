@@ -198,6 +198,28 @@ angular.module('portainer.app', [])
     }
   };
 
+  var extensions = {
+    name: 'portainer.extensions',
+    url: '/extensions',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/extensions/extensions.html',
+        controller: 'ExtensionsController'
+      }
+    }
+  };
+
+  var extension = {
+    name: 'portainer.extensions.extension',
+    url: '/extension/:id',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/extensions/inspect/extension.html',
+        controller: 'ExtensionController'
+      }
+    }
+  };
+
   var registries = {
     name: 'portainer.registries',
     url: '/registries',
@@ -335,7 +357,22 @@ angular.module('portainer.app', [])
     url: '/support',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/support/support.html'
+        templateUrl: 'app/portainer/views/support/support.html',
+        controller: 'SupportController'
+      }
+    },
+    params: {
+      product: {}
+    }
+  };
+
+  var supportProduct = {
+    name: 'portainer.support.product',
+    url: '/product',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/support/product/product.html',
+        controller: 'SupportProductController'
       }
     }
   };
@@ -457,6 +494,8 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(init);
   $stateRegistryProvider.register(initEndpoint);
   $stateRegistryProvider.register(initAdmin);
+  $stateRegistryProvider.register(extensions);
+  $stateRegistryProvider.register(extension);
   $stateRegistryProvider.register(registries);
   $stateRegistryProvider.register(registry);
   $stateRegistryProvider.register(registryAccess);
@@ -470,6 +509,7 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(stack);
   $stateRegistryProvider.register(stackCreation);
   $stateRegistryProvider.register(support);
+  $stateRegistryProvider.register(supportProduct);
   $stateRegistryProvider.register(tags);
   $stateRegistryProvider.register(updatePassword);
   $stateRegistryProvider.register(users);

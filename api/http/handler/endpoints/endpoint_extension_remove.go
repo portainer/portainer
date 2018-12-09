@@ -1,5 +1,7 @@
 package endpoints
 
+// TODO: legacy extension management
+
 import (
 	"net/http"
 

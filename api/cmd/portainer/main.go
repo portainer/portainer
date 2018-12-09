@@ -471,6 +471,24 @@ func initJobService(dockerClientFactory *docker.ClientFactory) portainer.JobServ
 	return docker.NewJobService(dockerClientFactory)
 }
 
+func initExtensionManager(fileService portainer.FileService, extensionService portainer.ExtensionService) (portainer.ExtensionManager, error) {
+	extensionManager := exec.NewExtensionManager(fileService, extensionService)
+
+	extensions, err := extensionService.Extensions()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, extension := range extensions {
+		err := extensionManager.EnableExtension(&extension, extension.License.LicenseKey)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return extensionManager, nil
+}
+
 func terminateIfNoAdminCreated(userService portainer.UserService) {
 	timer1 := time.NewTimer(5 * time.Minute)
 	<-timer1.C
@@ -505,6 +523,11 @@ func main() {
 	digitalSignatureService := initDigitalSignatureService()
 
 	err := initKeyPair(fileService, digitalSignatureService)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	extensionManager, err := initExtensionManager(fileService, store.ExtensionService)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -619,6 +642,7 @@ func main() {
 		TeamMembershipService:  store.TeamMembershipService,
 		EndpointService:        store.EndpointService,
 		EndpointGroupService:   store.EndpointGroupService,
+		ExtensionService:       store.ExtensionService,
 		ResourceControlService: store.ResourceControlService,
 		SettingsService:        store.SettingsService,
 		RegistryService:        store.RegistryService,
@@ -630,6 +654,7 @@ func main() {
 		WebhookService:         store.WebhookService,
 		SwarmStackManager:      swarmStackManager,
 		ComposeStackManager:    composeStackManager,
+		ExtensionManager:       extensionManager,
 		CryptoService:          cryptoService,
 		JWTService:             jwtService,
 		FileService:            fileService,

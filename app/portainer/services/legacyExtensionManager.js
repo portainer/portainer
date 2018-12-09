@@ -1,6 +1,7 @@
+// TODO: legacy extension management
 angular.module('portainer.app')
-.factory('ExtensionManager', ['$q', 'PluginService', 'SystemService', 'ExtensionService',
-function ExtensionManagerFactory($q, PluginService, SystemService, ExtensionService) {
+.factory('LegacyExtensionManager', ['$q', 'PluginService', 'SystemService', 'LegacyExtensionService',
+function ExtensionManagerFactory($q, PluginService, SystemService, LegacyExtensionService) {
   'use strict';
   var service = {};
 
@@ -60,7 +61,7 @@ function ExtensionManagerFactory($q, PluginService, SystemService, ExtensionServ
     .then(function success(data) {
       var managerIP = data.Swarm.NodeAddr;
       var storidgeAPIURL = 'tcp://' + managerIP + ':8282';
-      return ExtensionService.registerStoridgeExtension(storidgeAPIURL);
+      return LegacyExtensionService.registerStoridgeExtension(storidgeAPIURL);
     })
     .then(function success(data) {
       deferred.resolve(data);
@@ -73,7 +74,7 @@ function ExtensionManagerFactory($q, PluginService, SystemService, ExtensionServ
   }
 
   function deregisterStoridgeExtension() {
-    return ExtensionService.deregisterStoridgeExtension();
+    return LegacyExtensionService.deregisterStoridgeExtension();
   }
 
   return service;

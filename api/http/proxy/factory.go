@@ -25,7 +25,7 @@ type proxyFactory struct {
 
 func (factory *proxyFactory) newHTTPProxy(u *url.URL) http.Handler {
 	u.Scheme = "http"
-	return newSingleHostReverseProxyWithHostHeader(u)
+	return httputil.NewSingleHostReverseProxy(u)
 }
 
 func newAzureProxy(credentials *portainer.AzureCredentials) (http.Handler, error) {

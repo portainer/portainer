@@ -43,8 +43,10 @@ function initAuthentication(authManager, Authentication, $rootScope, $state) {
   // hitting a 401. We're using this instead of the usual combination of
   // authManager.redirectWhenUnauthenticated() + unauthenticatedRedirector
   // to have more controls on which URL should trigger the unauthenticated state.
-  $rootScope.$on('unauthenticated', function () {
-    $state.go('portainer.auth', {error: 'Your session has expired'});
+  $rootScope.$on('unauthenticated', function (event, data) {
+    if (!_.includes(data.config.url, '/v2/')) {
+      $state.go('portainer.auth', {error: 'Your session has expired'});
+    }
   });
 }
 

@@ -165,17 +165,32 @@ type (
 	// RegistryID represents a registry identifier
 	RegistryID int
 
+	// RegistryType represents a type of registry
+	RegistryType int
+
 	// Registry represents a Docker registry with all the info required
 	// to connect to it
 	Registry struct {
-		ID              RegistryID `json:"Id"`
-		Name            string     `json:"Name"`
-		URL             string     `json:"URL"`
-		Authentication  bool       `json:"Authentication"`
-		Username        string     `json:"Username"`
-		Password        string     `json:"Password,omitempty"`
-		AuthorizedUsers []UserID   `json:"AuthorizedUsers"`
-		AuthorizedTeams []TeamID   `json:"AuthorizedTeams"`
+		ID                      RegistryID                       `json:"Id"`
+		Type                    RegistryType                     `json:"Type"`
+		Name                    string                           `json:"Name"`
+		URL                     string                           `json:"URL"`
+		Authentication          bool                             `json:"Authentication"`
+		Username                string                           `json:"Username"`
+		Password                string                           `json:"Password,omitempty"`
+		AuthorizedUsers         []UserID                         `json:"AuthorizedUsers"`
+		AuthorizedTeams         []TeamID                         `json:"AuthorizedTeams"`
+		ManagementConfiguration *RegistryManagementConfiguration `json:"ManagementConfiguration"`
+	}
+
+	// RegistryManagementConfiguration represents a configuration that can be used to query
+	// the registry API via the registry management extension.
+	RegistryManagementConfiguration struct {
+		Type           RegistryType     `json:"Type"`
+		Authentication bool             `json:"Authentication"`
+		Username       string           `json:"Username"`
+		Password       string           `json:"Password"`
+		TLSConfig      TLSConfiguration `json:"TLSConfig"`
 	}
 
 	// DockerHub represents all the required information to connect and use the
@@ -323,7 +338,8 @@ type (
 		Labels []Pair `json:"Labels"`
 	}
 
-	// EndpointExtension represents a extension associated to an endpoint
+	// EndpointExtension represents a deprecated form of Portainer extension
+	// TODO: legacy extension management
 	EndpointExtension struct {
 		Type EndpointExtensionType `json:"Type"`
 		URL  string                `json:"URL"`
@@ -458,6 +474,35 @@ type (
 	// TLSFileType represents a type of TLS file required to connect to a Docker endpoint.
 	// It can be either a TLS CA file, a TLS certificate file or a TLS key file
 	TLSFileType int
+
+	// ExtensionID represents a extension identifier
+	ExtensionID int
+
+	// Extension represents a Portainer extension
+	Extension struct {
+		ID               ExtensionID        `json:"Id"`
+		Enabled          bool               `json:"Enabled"`
+		Name             string             `json:"Name,omitempty"`
+		ShortDescription string             `json:"ShortDescription,omitempty"`
+		Description      string             `json:"Description,omitempty"`
+		Price            string             `json:"Price,omitempty"`
+		PriceDescription string             `json:"PriceDescription,omitempty"`
+		Deal             bool               `json:"Deal,omitempty"`
+		Available        bool               `json:"Available,omitempty"`
+		License          LicenseInformation `json:"License,omitempty"`
+		Version          string             `json:"Version"`
+		UpdateAvailable  bool               `json:"UpdateAvailable"`
+		ProductID        int                `json:"ProductId,omitempty"`
+		Images           []string           `json:"Images,omitempty"`
+		Logo             string             `json:"Logo,omitempty"`
+	}
+
+	// LicenseInformation represents information about an extension license
+	LicenseInformation struct {
+		LicenseKey string `json:"LicenseKey,omitempty"`
+		Company    string `json:"Company,omitempty"`
+		Expiration string `json:"Expiration,omitempty"`
+	}
 
 	// CLIService represents a service for managing CLI
 	CLIService interface {
@@ -617,6 +662,14 @@ type (
 		DeleteTemplate(ID TemplateID) error
 	}
 
+	// ExtensionService represents a service for managing extension data
+	ExtensionService interface {
+		Extension(ID ExtensionID) (*Extension, error)
+		Extensions() ([]Extension, error)
+		Persist(extension *Extension) error
+		DeleteExtension(ID ExtensionID) error
+	}
+
 	// CryptoService represents a service for encrypting/hashing data
 	CryptoService interface {
 		Hash(data string) (string, error)
@@ -649,6 +702,7 @@ type (
 		DeleteTLSFiles(folder string) error
 		GetStackProjectPath(stackIdentifier string) string
 		StoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error)
+		StoreRegistryManagementFileFromBytes(folder, fileName string, data []byte) (string, error)
 		KeyPairFilesExist() (bool, error)
 		StoreKeyPair(private, public []byte, privatePEMHeader, publicPEMHeader string) error
 		LoadKeyPair() ([]byte, []byte, error)
@@ -656,6 +710,8 @@ type (
 		FileExists(path string) (bool, error)
 		StoreScheduledJobFileFromBytes(identifier string, data []byte) (string, error)
 		GetScheduleFolder(identifier string) string
+		ExtractExtensionArchive(data []byte) error
+		GetBinaryFolder() string
 	}
 
 	// GitService represents a service for managing Git
@@ -709,6 +765,14 @@ type (
 	JobService interface {
 		ExecuteScript(endpoint *Endpoint, nodeName, image string, script []byte, schedule *Schedule) error
 	}
+
+	// ExtensionManager represents a service used to manage extensions
+	ExtensionManager interface {
+		FetchExtensionDefinitions() ([]Extension, error)
+		EnableExtension(extension *Extension, licenseKey string) error
+		DisableExtension(extension *Extension) error
+		UpdateExtension(extension *Extension, version string) error
+	}
 )
 
 const (
@@ -718,6 +782,8 @@ const (
 	DBVersion = 15
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
 	MessageOfTheDayURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com/motd.html"
+	// ExtensionDefinitionsURL represents the URL where Portainer extension definitions can be retrieved
+	ExtensionDefinitionsURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com/extensions.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response
 	PortainerAgentHeader = "Portainer-Agent"
 	// PortainerAgentTargetHeader represent the name of the header containing the target node name
@@ -839,6 +905,12 @@ const (
 )
 
 const (
+	_ ExtensionID = iota
+	// RegistryManagementExtension represents the registry management extension
+	RegistryManagementExtension
+)
+
+const (
 	_ JobType = iota
 	// ScriptExecutionJobType is a non-system job used to execute a script against a list of
 	// endpoints via privileged containers
@@ -848,4 +920,14 @@ const (
 	// EndpointSyncJobType is a system job used to synchronize endpoints from
 	// an external definition store
 	EndpointSyncJobType
+)
+
+const (
+	_ RegistryType = iota
+	// QuayRegistry represents a Quay.io registry
+	QuayRegistry
+	// AzureRegistry represents an ACR registry
+	AzureRegistry
+	// CustomRegistry represents a custom registry
+	CustomRegistry
 )

@@ -1,5 +1,7 @@
 package endpointproxy
 
+// TODO: legacy extension management
+
 import (
 	"strconv"
 
@@ -42,9 +44,9 @@ func (handler *Handler) proxyRequestsToStoridgeAPI(w http.ResponseWriter, r *htt
 	proxyExtensionKey := string(endpoint.ID) + "_" + string(portainer.StoridgeEndpointExtension)
 
 	var proxy http.Handler
-	proxy = handler.ProxyManager.GetExtensionProxy(proxyExtensionKey)
+	proxy = handler.ProxyManager.GetLegacyExtensionProxy(proxyExtensionKey)
 	if proxy == nil {
-		proxy, err = handler.ProxyManager.CreateAndRegisterExtensionProxy(proxyExtensionKey, storidgeExtension.URL)
+		proxy, err = handler.ProxyManager.CreateLegacyExtensionProxy(proxyExtensionKey, storidgeExtension.URL)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create extension proxy", err}
 		}

@@ -80,6 +80,13 @@ angular.module('portainer.app')
     });
   };
 
+  service.configureRegistry = function(registryId, registryManagementConfigurationModel) {
+    return Upload.upload({
+      url: 'api/registries/' + registryId + '/configure',
+      data: registryManagementConfigurationModel
+    });
+  };
+
   service.executeEndpointJob = function (imageName, file, endpointId, nodeName) {
     return Upload.upload({
       url: 'api/endpoints/' + endpointId + '/job?method=file&nodeName=' + nodeName,

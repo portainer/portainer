@@ -59,6 +59,7 @@ html, body, #page-wrapper, #content-wrapper, .page-content, #view {
   margin-top: 5px;
   margin-bottom: 15px;
   color: #777;
+  padding-left: 0;
 }
 
 .form-horizontal .control-label.text-left{
@@ -797,6 +798,10 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 /*bootbox override*/
 .modal-open {
   padding-right: 0 !important;
+}
+
+.image-zoom-modal .modal-dialog {
+  width: 80%;
 }
 /*!bootbox override*/
 
