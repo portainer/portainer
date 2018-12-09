@@ -1,11 +1,11 @@
 version: 1.0.{build}
-image: 
+image:
   - Visual Studio 2017
   - Ubuntu
 environment:
   matrix:
     - ARCH: amd64
-    - ARCH: arm 
+    - ARCH: arm
     - ARCH: arm64
     - ARCH: ppc64le
     - ARCH: s390x
@@ -26,7 +26,7 @@ matrix:
 branches:
   except:
     - master
-stack: 
+stack:
   - node 9, go 1.10
 install:
   - yarn install
@@ -38,7 +38,7 @@ init:
       if (!(Test-Path ~/.docker)) { mkdir ~/.docker };
       Set-Content -Value '{ "experimental": "enabled" }' -Path ~/.docker/config.json -Encoding Ascii
 build_script:
-  - sh: yarn grunt release:$IMAGE:$ARCH
-  - cmd: yarn grunt release:%IMAGE%:%ARCH%
+  - sh: yarn grunt appveyorbuild:$IMAGE:$ARCH
+  - cmd: yarn grunt appveyorbuild:%IMAGE%:%ARCH%
   - sh: sudo bash build/ci-linux.sh $IMAGE $ARCH $DOCKER_USER $DOCKER_PASS $APPVEYOR_REPO_BRANCH $APPVEYOR_PULL_REQUEST_NUMBER
   - cmd: powershell -Command "& .\\build\\ci-windows.ps1"
