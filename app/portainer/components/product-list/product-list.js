@@ -4,7 +4,5 @@ angular.module('portainer.app').component('productList', {
     titleText: '@',
     products: '<',
     goTo: '<'
-    // extensions: '<',
-    // currentDate: '<'
   }
 });
