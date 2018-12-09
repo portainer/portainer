@@ -37,6 +37,7 @@ module.exports = function(grunt) {
     grunt.task.run([
       'config:prod',
       'clean:all',
+      'copy:templates',
       'shell:buildBinary:' + p + ':' + a,
       'shell:downloadDockerBinary:' + p + ':' + a,
       'webpack:prod'
