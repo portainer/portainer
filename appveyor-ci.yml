@@ -32,14 +32,13 @@ install:
   - yarn install
   - npm install -g rebase-docker-image
 init:
-  - sh: export IMAGE=linux && printenv
-  - cmd: 
-      SET IMAGE=windows && SET
+  - sh: export IMAGE=linux
+  - cmd: SET IMAGE=windows
   - ps: >-
       if (!(Test-Path ~/.docker)) { mkdir ~/.docker };
       Set-Content -Value '{ "experimental": "enabled" }' -Path ~/.docker/config.json -Encoding Ascii      
-#build_script:
-#  - sh: yarn grunt release:$IMAGE:$ARCH
-#  - cmd: yarn grunt release:%IMAGE%:%ARCH%
-#  - sh: sudo bash build/ci-linux.sh $IMAGE $ARCH $DOCKER_USER $DOCKER_PASS $APPVEYOR_REPO_BRANCH $APPVEYOR_PULL_REQUEST_NUMBER
-#  - cmd: powershell -Command "& .\\build\\ci-windows.ps1"
+build_script:
+  - sh: yarn grunt release:$IMAGE:$ARCH
+  - cmd: yarn grunt release:%IMAGE%:%ARCH%
+  - sh: sudo bash build/ci-linux.sh $IMAGE $ARCH $DOCKER_USER $DOCKER_PASS $APPVEYOR_REPO_BRANCH $APPVEYOR_PULL_REQUEST_NUMBER
+  - cmd: powershell -Command "& .\\build\\ci-windows.ps1"
