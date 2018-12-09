@@ -50,6 +50,7 @@ module.exports = function(grunt) {
   grunt.task.registerTask('release', 'release:<platform>:<arch>', function(p, a) {
     grunt.task.run(['config:prod', 'clean:all', 'shell:buildBinary:' + p + ':' + a, 'shell:downloadDockerBinary:' + p + ':' + a, 'before-copy', 'copy:assets', 'after-copy']);
   });
+
   grunt.registerTask('lint', ['eslint']);
   grunt.registerTask('run-dev', ['build', 'shell:run:' + arch, 'watch:build']);
   grunt.registerTask('clear', ['clean:app']);
