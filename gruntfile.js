@@ -50,6 +50,11 @@ module.exports = function(grunt) {
   grunt.task.registerTask('release', 'release:<platform>:<arch>', function(p, a) {
     grunt.task.run(['config:prod', 'clean:all', 'shell:buildBinary:' + p + ':' + a, 'shell:downloadDockerBinary:' + p + ':' + a, 'before-copy', 'copy:assets', 'after-copy']);
   });
+
+  grunt.task.registerTask('appveyorbuild', 'appveyorbuild:<platform>:<arch>', function(p, a) {
+    grunt.task.run(['config:prod', 'clean:all', 'shell:buildBinaryOnAppveyor:' + p + ':' + a, 'shell:downloadDockerBinary:' + p + ':' + a, 'before-copy', 'copy:assets', 'after-copy']);
+  });
+
   grunt.registerTask('lint', ['eslint']);
   grunt.registerTask('run-dev', ['build', 'shell:run:' + arch, 'watch:build']);
   grunt.registerTask('clear', ['clean:app']);
@@ -259,25 +264,48 @@ gruntfile_cfg.replace = {
 };
 
 function shell_buildBinary(p, a) {
-    var binfile = 'portainer-'+p+'-'+a;
-    if (p === "linux") {
-      return [
-        'if [ -f '+(binfile)+' ]; then',
-          'echo "Portainer binary exists";',
-        'else',
-          'build/build_binary.sh ' + p + ' ' + a + ';',
-        'fi'
-      ].join (' ')
-    } else {
-      return [
-        'powershell -Command "& {if (Get-Item -Path '+(binfile+'.exe')+' -ErrorAction:SilentlyContinue) {',
-          'Write-Host "Portainer binary exists"',
-        '} else {',
-          '& ".\\build\\build_binary.ps1" -platform '+ p +' -arch '+ a +'',
-        '}}"'
-      ].join(' ')
-    }   
+  var binfile = 'portainer-' + p + '-' + a;
+  if (p === 'linux') {
+    return [
+      'if [ -f ' + (binfile) + ' ]; then',
+      'echo "Portainer binary exists";',
+      'else',
+      'build/build_binary.sh ' + p + ' ' + a + ';',
+      'fi'
+    ].join(' ');
+  } else {
+    return [
+      'powershell -Command "& {if (Get-Item -Path ' + binfile + '.exe -ErrorAction:SilentlyContinue) {',
+      'Write-Host "Portainer binary exists"',
+      '} else {',
+      '& ".\\build\\build_binary.ps1" -platform ' + p + ' -arch ' + a + '',
+      '}}"'
+    ].join(' ');
+  }
 }
+
+function shell_buildBinaryOnAppveyor(p, a) {
+  var binfile = 'portainer-' + p + '-' + a;
+  if (p === 'linux') {
+    return [
+      'if [ -f ' + (binfile) + ' ]; then',
+      'echo "Portainer binary exists";',
+      'else',
+      'build/build_binary_appveyor.sh ' + p + ' ' + a + ';',
+      'fi'
+    ].join(' ');
+  } else {
+    return [
+      'powershell -Command "& {if (Get-Item -Path ' + binfile + '.exe -ErrorAction:SilentlyContinue) {',
+      'Write-Host "Portainer binary exists"',
+      '} else {',
+      '& ".\\build\\build_binary_appveyor.ps1" -platform ' + p + ' -arch ' + a + '',
+      '}}"'
+    ].join(' ');
+  }
+}
+
+
 
 function shell_run(arch) {
   return [
@@ -291,28 +319,29 @@ function shell_downloadDockerBinary(p, a) {
   var as = { 'amd64': 'x86_64', 'arm': 'armhf', 'arm64': 'aarch64' };
   var ip = ((ps[p] === undefined) ? p : ps[p]);
   var ia = ((as[a] === undefined) ? a : as[a]);
-  var binaryVersion = (( p === 'windows' ? '<%= shippedDockerVersionWindows %>' : '<%= shippedDockerVersion %>' ));
-  if (p === "linux") {
+  var binaryVersion = ((p === 'windows' ? '<%= shippedDockerVersionWindows %>' : '<%= shippedDockerVersion %>'));
+  if (p === 'linux') {
     return [
-      'if [ -f '+('dist/docker')+' ]; then',
-        'echo "Docker binary exists";',
+      'if [ -f dist/docker ]; then',
+      'echo "Docker binary exists";',
       'else',
-        'build/download_docker_binary.sh ' + ip + ' ' + ia + ' ' + binaryVersion + ';',
+      'build/download_docker_binary.sh ' + ip + ' ' + ia + ' ' + binaryVersion + ';',
       'fi'
-    ].join (' ')
+    ].join(' ');
   } else {
     return [
-      'powershell -Command "& {if (Get-Item -Path '+('dist/docker.exe')+' -ErrorAction:SilentlyContinue) {',
-        'Write-Host "Docker binary exists"',
+      'powershell -Command "& {if (Get-Item -Path dist/docker.exe -ErrorAction:SilentlyContinue) {',
+      'Write-Host "Docker binary exists"',
       '} else {',
-        '& ".\\build\\download_docker_binary.ps1" -docker_version '+ binaryVersion +'',
+      '& ".\\build\\download_docker_binary.ps1" -docker_version ' + binaryVersion + '',
       '}}"'
-    ].join(' ')
+    ].join(' ');
   }
 }
 
 gruntfile_cfg.shell = {
   buildBinary: { command: shell_buildBinary },
+  buildBinaryOnAppveyor: { command: shell_buildBinaryOnAppveyor },
   run: { command: shell_run },
   downloadDockerBinary: { command: shell_downloadDockerBinary }
 };
