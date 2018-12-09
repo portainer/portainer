@@ -338,6 +338,7 @@ type (
 		Labels []Pair `json:"Labels"`
 	}
 
+	// EndpointExtension represents a deprecated form of Portainer extension
 	// TODO: legacy extension management
 	EndpointExtension struct {
 		Type EndpointExtensionType `json:"Type"`
@@ -765,6 +766,7 @@ type (
 		ExecuteScript(endpoint *Endpoint, nodeName, image string, script []byte, schedule *Schedule) error
 	}
 
+	// ExtensionManager represents a service used to manage extensions
 	ExtensionManager interface {
 		FetchExtensionDefinitions() ([]Extension, error)
 		EnableExtension(extension *Extension, licenseKey string) error

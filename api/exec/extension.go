@@ -81,7 +81,7 @@ func (manager *ExtensionManager) FetchExtensionDefinitions() ([]portainer.Extens
 	return extensions, nil
 }
 
-// Enable extension will check for the existence of the extension binary on the filesystem
+// EnableExtension will check for the existence of the extension binary on the filesystem
 // first. If it does not exist, it will download it from the official Portainer assets server.
 // After installing the binary on the filesystem, it will execute the binary in license check
 // mode to validate the extension license. If the license is valid, it will then start

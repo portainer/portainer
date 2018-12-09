@@ -59,7 +59,7 @@ html, body, #page-wrapper, #content-wrapper, .page-content, #view {
   margin-top: 5px;
   margin-bottom: 15px;
   color: #777;
-  padding-left: 0px;
+  padding-left: 0;
 }
 
 .form-horizontal .control-label.text-left{

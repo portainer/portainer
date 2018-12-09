@@ -10,8 +10,8 @@ import (
 	"github.com/portainer/portainer/bolt/dockerhub"
 	"github.com/portainer/portainer/bolt/endpoint"
 	"github.com/portainer/portainer/bolt/endpointgroup"
-	"github.com/portainer/portainer/bolt/migrator"
 	"github.com/portainer/portainer/bolt/extension"
+	"github.com/portainer/portainer/bolt/migrator"
 	"github.com/portainer/portainer/bolt/registry"
 	"github.com/portainer/portainer/bolt/resourcecontrol"
 	"github.com/portainer/portainer/bolt/schedule"
@@ -40,7 +40,7 @@ type Store struct {
 	DockerHubService       *dockerhub.Service
 	EndpointGroupService   *endpointgroup.Service
 	EndpointService        *endpoint.Service
-	ExtensionService          *extension.Service
+	ExtensionService       *extension.Service
 	RegistryService        *registry.Service
 	ResourceControlService *resourcecontrol.Service
 	SettingsService        *settings.Service

@@ -34,7 +34,7 @@ func (handler *Handler) extensionCreate(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid license format", err}
 	}
-	extensionId := portainer.ExtensionID(extensionIdentifier)
+	extensionID := portainer.ExtensionID(extensionIdentifier)
 
 	extensions, err := handler.ExtensionService.Extensions()
 	if err != nil {
@@ -42,13 +42,13 @@ func (handler *Handler) extensionCreate(w http.ResponseWriter, r *http.Request) 
 	}
 
 	for _, existingExtension := range extensions {
-		if existingExtension.ID == extensionId {
+		if existingExtension.ID == extensionID {
 			return &httperror.HandlerError{http.StatusConflict, "Unable to enable extension", portainer.ErrExtensionAlreadyEnabled}
 		}
 	}
 
 	extension := &portainer.Extension{
-		ID: extensionId,
+		ID: extensionID,
 	}
 
 	extensionDefinitions, err := handler.ExtensionManager.FetchExtensionDefinitions()
