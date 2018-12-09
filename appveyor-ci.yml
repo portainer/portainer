@@ -28,6 +28,8 @@ branches:
     - master
 stack: 
   - node 9, go 1.10
+services:
+  - docker
 install:
   - yarn install
   - npm install -g rebase-docker-image
