@@ -46,6 +46,7 @@
     "angular-local-storage": "~0.5.2",
     "angular-messages": "~1.5.0",
     "angular-mocks": "~1.5.0",
+    "angular-moment-picker": "^0.10.2",
     "angular-resource": "~1.5.0",
     "angular-sanitize": "~1.5.0",
     "angular-ui-bootstrap": "~2.5.0",

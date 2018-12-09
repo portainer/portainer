@@ -941,6 +941,14 @@ angular-mocks@~1.5.0:
   resolved "https://registry.yarnpkg.com/angular-mocks/-/angular-mocks-1.5.11.tgz#a0e1dd0ea55fd77ee7a757d75536c5e964c86f81"
   integrity sha1-oOHdDqVf137np1fXVTbF6WTIb4E=
 
+angular-moment-picker@^0.10.2:
+  version "0.10.2"
+  resolved "https://registry.yarnpkg.com/angular-moment-picker/-/angular-moment-picker-0.10.2.tgz#54c8b3c228b33dffa3b7b3d0773a585323815c33"
+  integrity sha512-WvmrQM0zEcFqi50yDELaF34Ilrx4PtL7mWLcpTZCJGQDvMlIsxJrB30LxOkoJv8yrrLxD2s6nnR3t1/SqioWWw==
+  dependencies:
+    angular "^1.3"
+    moment "^2.16.0"
+
 angular-resource@~1.5.0:
   version "1.5.11"
   resolved "https://registry.yarnpkg.com/angular-resource/-/angular-resource-1.5.11.tgz#d93ea619184a2e0ee3ae338265758363172929f0"
@@ -965,6 +973,11 @@ angular@1.x, angular@~1.5.0:
   version "1.5.11"
   resolved "https://registry.yarnpkg.com/angular/-/angular-1.5.11.tgz#8c5ba7386f15965c9acf3429f6881553aada30d6"
   integrity sha1-jFunOG8VllyazzQp9ogVU6raMNY=
+
+angular@^1.3:
+  version "1.7.5"
+  resolved "https://registry.yarnpkg.com/angular/-/angular-1.7.5.tgz#d1c1c01c6f5dc835638f3f9aa51012857bdac49e"
+  integrity sha512-760183yxtGzni740IBTieNuWLtPNAoMqvmC0Z62UoU0I3nqk+VJuO3JbQAXOyvo3Oy/ZsdNQwrSTh/B0OQZjNw==
 
 angularjs-scroll-glue@^2.2.0:
   version "2.2.0"
@@ -7512,6 +7525,11 @@ moment@^2.10.6:
   version "2.14.1"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.14.1.tgz#b35b27c47e57ed2ddc70053d6b07becdb291741c"
   integrity sha1-s1snxH5X7S3ccAU9awe+zbKRdBw=
+
+moment@^2.16.0:
+  version "2.22.2"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.22.2.tgz#3c257f9839fc0e93ff53149632239eb90783ff66"
+  integrity sha1-PCV/mDn8DpP/UxSWMiOeuQeD/2Y=
 
 moment@^2.21.0:
   version "2.21.0"

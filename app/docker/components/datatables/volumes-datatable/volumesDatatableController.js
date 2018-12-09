@@ -22,6 +22,10 @@ function (PaginationService, DatatableService) {
     }
   };
 
+  this.onTextFilterChange = function() {
+    DatatableService.setDataTableTextFilters(this.tableKey, this.state.textFilter);
+  };
+
   this.changeOrderBy = function(orderField) {
     this.state.reverseOrder = this.state.orderBy === orderField ? !this.state.reverseOrder : false;
     this.state.orderBy = orderField;
@@ -86,6 +90,11 @@ function (PaginationService, DatatableService) {
       this.filters = storedFilters;
     }
     this.filters.usage.open = false;
+
+    var textFilter = DatatableService.getDataTableTextFilters(this.tableKey);
+    if (textFilter !== null) {
+      this.state.textFilter = textFilter;
+    }
   };
 
   function setDefaults(ctrl) {

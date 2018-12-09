@@ -45,7 +45,7 @@ module.exports = {
           { loader: 'html-loader' }
         ]
       },
-      
+
       {
         test: /.xml$/,
         use: 'file-loader'
@@ -79,8 +79,10 @@ module.exports = {
       $: 'jquery',
       jQuery: 'jquery',
       'window.jQuery': 'jquery',
+      'window.moment': 'moment',
+      moment: 'moment',
       'window.jsyaml': 'js-yaml',
-      'jsyaml': 'js-yaml'
+      jsyaml: 'js-yaml'
     }),
     new MiniCssExtractPlugin({
       filename: '[name].[hash].css',

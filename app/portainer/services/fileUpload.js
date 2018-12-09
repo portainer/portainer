@@ -1,4 +1,4 @@
-import { jsonObjectsToArrayHandler } from '../../docker/rest/response/handlers';
+import { jsonObjectsToArrayHandler, genericHandler } from '../../docker/rest/response/handlers';
 
 angular.module('portainer.app')
 .factory('FileUploadService', ['$q', 'Upload', 'EndpointProvider', function FileUploadFactory($q, Upload, EndpointProvider) {
@@ -37,7 +37,8 @@ angular.module('portainer.app')
         'Content-Type': file.type
       },
       data: file,
-      ignoreLoadingBar: true
+      ignoreLoadingBar: true,
+      transformResponse: genericHandler
     });
   };
 
@@ -78,6 +79,13 @@ angular.module('portainer.app')
         Env: Upload.json(env)
       },
       ignoreLoadingBar: true
+    });
+  };
+
+  service.configureRegistry = function(registryId, registryManagementConfigurationModel) {
+    return Upload.upload({
+      url: 'api/registries/' + registryId + '/configure',
+      data: registryManagementConfigurationModel
     });
   };
 

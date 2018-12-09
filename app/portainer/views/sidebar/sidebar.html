@@ -37,14 +37,17 @@
         <a ui-sref="storidge.profiles" ui-sref-active="active">Profiles</a>
       </div>
     </li>
-    <li class="sidebar-title" ng-if="!applicationState.application.authentication || isAdmin">
+    <li class="sidebar-title" ng-if="(!applicationState.application.authentication || isAdmin) && applicationState.application.enableHostManagementFeatures">
       <span>Scheduler</span>
     </li>
-    <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
+    <li class="sidebar-list" ng-if="(!applicationState.application.authentication || isAdmin) && applicationState.application.enableHostManagementFeatures">
       <a ui-sref="portainer.schedules" ui-sref-active="active">Host jobs <span class="menu-icon fa fa-clock fa-fw"></span></a>
     </li>
     <li class="sidebar-title" ng-if="!applicationState.application.authentication || isAdmin || isTeamLeader">
       <span>Settings</span>
+    </li>
+    <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
+      <a ui-sref="portainer.extensions" ui-sref-active="active">Extensions <span class="menu-icon fa fa-bolt fa-fw"></span></a>
     </li>
     <li class="sidebar-list" ng-if="applicationState.application.authentication && (isAdmin || isTeamLeader)">
       <a ui-sref="portainer.users" ui-sref-active="active">Users <span class="menu-icon fa fa-users fa-fw"></span></a>

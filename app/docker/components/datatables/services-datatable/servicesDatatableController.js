@@ -18,6 +18,10 @@ function (PaginationService, DatatableService, EndpointProvider) {
     publicURL: EndpointProvider.endpointPublicURL()
   };
 
+  this.onTextFilterChange = function() {
+    DatatableService.setDataTableTextFilters(this.tableKey, this.state.textFilter);
+  };
+
   this.changeOrderBy = function(orderField) {
     this.state.reverseOrder = this.state.orderBy === orderField ? !this.state.reverseOrder : false;
     this.state.orderBy = orderField;
@@ -110,6 +114,11 @@ function (PaginationService, DatatableService, EndpointProvider) {
     var storedExpandedItems = DatatableService.getDataTableExpandedItems(this.tableKey);
     if (storedExpandedItems !== null) {
       this.expandItems(storedExpandedItems);
+    }
+
+    var textFilter = DatatableService.getDataTableTextFilters(this.tableKey);
+    if (textFilter !== null) {
+      this.state.textFilter = textFilter;
     }
   };
 

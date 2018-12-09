@@ -1,3 +1,4 @@
+// TODO: legacy extension management
 angular.module('extension.storidge', [])
 .config(['$stateRegistryProvider', function ($stateRegistryProvider) {
   'use strict';

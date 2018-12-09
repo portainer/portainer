@@ -136,6 +136,7 @@ func loadSnapshotSystemSchedule(jobScheduler portainer.JobScheduler, snapshotter
 		ID:             portainer.ScheduleID(scheduleService.GetNextIdentifier()),
 		Name:           "system_snapshot",
 		CronExpression: "@every " + *flags.SnapshotInterval,
+		Recurring:      true,
 		JobType:        portainer.SnapshotJobType,
 		SnapshotJob:    snapshotJob,
 		Created:        time.Now().Unix(),
@@ -174,6 +175,7 @@ func loadEndpointSyncSystemSchedule(jobScheduler portainer.JobScheduler, schedul
 		ID:              portainer.ScheduleID(scheduleService.GetNextIdentifier()),
 		Name:            "system_endpointsync",
 		CronExpression:  "@every " + *flags.SyncInterval,
+		Recurring:       true,
 		JobType:         portainer.EndpointSyncJobType,
 		EndpointSyncJob: endpointSyncJob,
 		Created:         time.Now().Unix(),
@@ -256,6 +258,7 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 			},
 			AllowBindMountsForRegularUsers:     true,
 			AllowPrivilegedModeForRegularUsers: true,
+			EnableHostManagementFeatures:       false,
 			SnapshotInterval:                   *flags.SnapshotInterval,
 		}
 
@@ -468,6 +471,39 @@ func initJobService(dockerClientFactory *docker.ClientFactory) portainer.JobServ
 	return docker.NewJobService(dockerClientFactory)
 }
 
+func initExtensionManager(fileService portainer.FileService, extensionService portainer.ExtensionService) (portainer.ExtensionManager, error) {
+	extensionManager := exec.NewExtensionManager(fileService, extensionService)
+
+	extensions, err := extensionService.Extensions()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, extension := range extensions {
+		err := extensionManager.EnableExtension(&extension, extension.License.LicenseKey)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return extensionManager, nil
+}
+
+func terminateIfNoAdminCreated(userService portainer.UserService) {
+	timer1 := time.NewTimer(5 * time.Minute)
+	<-timer1.C
+
+	users, err := userService.UsersByRole(portainer.AdministratorRole)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if len(users) == 0 {
+		log.Fatal("No administrator account was created after 5 min. Shutting down the Portainer instance for security reasons.")
+		return
+	}
+}
+
 func main() {
 	flags := initCLI()
 
@@ -487,6 +523,11 @@ func main() {
 	digitalSignatureService := initDigitalSignatureService()
 
 	err := initKeyPair(fileService, digitalSignatureService)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	extensionManager, err := initExtensionManager(fileService, store.ExtensionService)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -586,6 +627,10 @@ func main() {
 		}
 	}
 
+	if !*flags.NoAuth {
+		go terminateIfNoAdminCreated(store.UserService)
+	}
+
 	var server portainer.Server = &http.Server{
 		Status:                 applicationStatus,
 		BindAddress:            *flags.Addr,
@@ -597,6 +642,7 @@ func main() {
 		TeamMembershipService:  store.TeamMembershipService,
 		EndpointService:        store.EndpointService,
 		EndpointGroupService:   store.EndpointGroupService,
+		ExtensionService:       store.ExtensionService,
 		ResourceControlService: store.ResourceControlService,
 		SettingsService:        store.SettingsService,
 		RegistryService:        store.RegistryService,
@@ -608,6 +654,7 @@ func main() {
 		WebhookService:         store.WebhookService,
 		SwarmStackManager:      swarmStackManager,
 		ComposeStackManager:    composeStackManager,
+		ExtensionManager:       extensionManager,
 		CryptoService:          cryptoService,
 		JWTService:             jwtService,
 		FileService:            fileService,

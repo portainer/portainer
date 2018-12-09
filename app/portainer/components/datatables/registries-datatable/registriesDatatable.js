@@ -9,6 +9,7 @@ angular.module('portainer.app').component('registriesDatatable', {
     orderBy: '@',
     reverseOrder: '<',
     accessManagement: '<',
-    removeAction: '<'
+    removeAction: '<',
+    registryManagement: '<'
   }
 });

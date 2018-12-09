@@ -2,6 +2,7 @@ import '../assets/css/vendor.css';
 
 import angular from 'angular';
 window.angular = angular;
+import 'moment';
 import '@uirouter/angularjs';
 import 'ui-select';
 import 'isteven-angular-multiselect/isteven-multi-select.js';
@@ -23,3 +24,4 @@ import 'angularjs-slider';
 import 'bootstrap/dist/js/bootstrap.js';
 import 'js-yaml/dist/js-yaml.js'
 import 'angular-ui-bootstrap';
+import 'angular-moment-picker';

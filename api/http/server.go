@@ -11,6 +11,7 @@ import (
 	"github.com/portainer/portainer/http/handler/endpointgroups"
 	"github.com/portainer/portainer/http/handler/endpointproxy"
 	"github.com/portainer/portainer/http/handler/endpoints"
+	"github.com/portainer/portainer/http/handler/extensions"
 	"github.com/portainer/portainer/http/handler/file"
 	"github.com/portainer/portainer/http/handler/motd"
 	"github.com/portainer/portainer/http/handler/registries"
@@ -41,6 +42,7 @@ type Server struct {
 	AuthDisabled           bool
 	EndpointManagement     bool
 	Status                 *portainer.Status
+	ExtensionManager       portainer.ExtensionManager
 	ComposeStackManager    portainer.ComposeStackManager
 	CryptoService          portainer.CryptoService
 	SignatureService       portainer.DigitalSignatureService
@@ -53,6 +55,7 @@ type Server struct {
 	GitService             portainer.GitService
 	JWTService             portainer.JWTService
 	LDAPService            portainer.LDAPService
+	ExtensionService       portainer.ExtensionService
 	RegistryService        portainer.RegistryService
 	ResourceControlService portainer.ResourceControlService
 	ScheduleService        portainer.ScheduleService
@@ -128,8 +131,15 @@ func (server *Server) Start() error {
 
 	var motdHandler = motd.NewHandler(requestBouncer)
 
+	var extensionHandler = extensions.NewHandler(requestBouncer)
+	extensionHandler.ExtensionService = server.ExtensionService
+	extensionHandler.ExtensionManager = server.ExtensionManager
+
 	var registryHandler = registries.NewHandler(requestBouncer)
 	registryHandler.RegistryService = server.RegistryService
+	registryHandler.ExtensionService = server.ExtensionService
+	registryHandler.FileService = server.FileService
+	registryHandler.ProxyManager = proxyManager
 
 	var resourceControlHandler = resourcecontrols.NewHandler(requestBouncer)
 	resourceControlHandler.ResourceControlService = server.ResourceControlService
@@ -140,6 +150,7 @@ func (server *Server) Start() error {
 	schedulesHandler.FileService = server.FileService
 	schedulesHandler.JobService = server.JobService
 	schedulesHandler.JobScheduler = server.JobScheduler
+	schedulesHandler.SettingsService = server.SettingsService
 
 	var settingsHandler = settings.NewHandler(requestBouncer)
 	settingsHandler.SettingsService = server.SettingsService
@@ -202,6 +213,7 @@ func (server *Server) Start() error {
 		EndpointProxyHandler:   endpointProxyHandler,
 		FileHandler:            fileHandler,
 		MOTDHandler:            motdHandler,
+		ExtensionHandler:       extensionHandler,
 		RegistryHandler:        registryHandler,
 		ResourceControlHandler: resourceControlHandler,
 		SettingsHandler:        settingsHandler,

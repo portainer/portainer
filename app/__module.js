@@ -30,8 +30,10 @@ angular.module('portainer', [
   'portainer.agent',
   'portainer.azure',
   'portainer.docker',
+  'portainer.extensions',
   'extension.storidge',
-  'rzModule'
+  'rzModule',
+  'moment-picker'
 ]);
 
 if (require) {

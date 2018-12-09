@@ -42,6 +42,7 @@ module.exports = function(grunt) {
       'webpack:prod'
     ]);
   });
+
   grunt.registerTask('lint', ['eslint']);
 
   grunt.registerTask('run-dev', [
@@ -55,7 +56,7 @@ module.exports = function(grunt) {
   grunt.initConfig({
     root: 'dist',
     distdir: 'dist/public',
-    shippedDockerVersion: '18.06.1-ce',
+    shippedDockerVersion: '18.09.0',
     shippedDockerVersionWindows: '17.09.0-ce',
     pkg: grunt.file.readJSON('package.json'),
     config: gruntfile_cfg.config,
@@ -155,7 +156,7 @@ function shell_downloadDockerBinary(p, a) {
     'if [ -f ' + (p === 'windows' ? 'dist/docker.exe' : 'dist/docker') + ' ]; then',
       'echo "Docker binary exists";',
     'else',
-      'build/download_docker_binary.sh ' + ip + ' ' + ia + ' ' + binaryVersion + ';',
+    'build/download_docker_binary.sh ' + ip + ' ' + ia + ' ' + binaryVersion + ';',
     'fi'
   ].join(' ');
 }

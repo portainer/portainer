@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('HomeController', ['$q', '$scope', '$state', 'Authentication', 'EndpointService', 'EndpointHelper', 'GroupService', 'Notifications', 'EndpointProvider', 'StateManager', 'ExtensionManager', 'ModalService', 'MotdService', 'SystemService',
-function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, GroupService, Notifications, EndpointProvider, StateManager, ExtensionManager, ModalService, MotdService, SystemService) {
+.controller('HomeController', ['$q', '$scope', '$state', 'Authentication', 'EndpointService', 'EndpointHelper', 'GroupService', 'Notifications', 'EndpointProvider', 'StateManager', 'LegacyExtensionManager', 'ModalService', 'MotdService', 'SystemService',
+function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, GroupService, Notifications, EndpointProvider, StateManager, LegacyExtensionManager, ModalService, MotdService, SystemService) {
 
   $scope.goToEdit = function(id) {
     $state.go('portainer.endpoints.endpoint', { id: id });
@@ -87,7 +87,7 @@ function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, G
     EndpointProvider.setEndpointID(endpoint.Id);
     EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
     EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
-    ExtensionManager.initEndpointExtensions(endpoint)
+    LegacyExtensionManager.initEndpointExtensions(endpoint)
     .then(function success(data) {
       var extensions = data;
       return StateManager.updateEndpointState(endpoint, extensions);

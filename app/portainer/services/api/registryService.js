@@ -1,7 +1,7 @@
-import { RegistryViewModel } from '../../models/registry';
+import { RegistryViewModel, RegistryCreateRequest } from '../../models/registry';
 
 angular.module('portainer.app')
-.factory('RegistryService', ['$q', 'Registries', 'DockerHubService', 'RegistryHelper', 'ImageHelper', function RegistryServiceFactory($q, Registries, DockerHubService, RegistryHelper, ImageHelper) {
+.factory('RegistryService', ['$q', 'Registries', 'DockerHubService', 'RegistryHelper', 'ImageHelper', 'FileUploadService', function RegistryServiceFactory($q, Registries, DockerHubService, RegistryHelper, ImageHelper, FileUploadService) {
   'use strict';
   var service = {};
 
@@ -56,17 +56,13 @@ angular.module('portainer.app')
     return Registries.update({ id: registry.Id }, registry).$promise;
   };
 
-  service.createRegistry = function(name, URL, authentication, username, password) {
-    var payload = {
-      Name: name,
-      URL: URL,
-      Authentication: authentication
-    };
-    if (authentication) {
-      payload.Username = username;
-      payload.Password = password;
-    }
-    return Registries.create({}, payload).$promise;
+  service.configureRegistry = function(id, registryManagementConfigurationModel) {
+    return FileUploadService.configureRegistry(id, registryManagementConfigurationModel);
+  };
+
+  service.createRegistry = function(model) {
+    var payload = new RegistryCreateRequest(model);
+    return Registries.create(payload).$promise;
   };
 
   service.retrieveRegistryFromRepository = function(repository) {
