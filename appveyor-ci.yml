@@ -10,9 +10,9 @@ environment:
     - ARCH: ppc64le
     - ARCH: s390x
   DOCKER_USER:
-    secure: JapmC7j5F0mY3j/MVzU+Cw==
+    secure: JoLlNth0020lwNUX/vj86Q==
   DOCKER_PASS:
-    secure: QGlCLNWzPD0HL8ipkohVic45/yU3bVOdjn0IiV6NnSQ=
+    secure: OuNetAYPCPoI1/WliGuWyNtvEmhei3d8s+nnjjNH6bY=
 matrix:
   exclude:
     - image: Visual Studio 2017
@@ -38,8 +38,8 @@ init:
   - ps: >-
       if (!(Test-Path ~/.docker)) { mkdir ~/.docker };
       Set-Content -Value '{ "experimental": "enabled" }' -Path ~/.docker/config.json -Encoding Ascii      
-build_script:
-  - sh: yarn grunt release:$IMAGE:$ARCH
-  - cmd: yarn grunt release:%IMAGE%:%ARCH%
-  - sh: sudo bash build/ci-linux.sh $IMAGE $ARCH $DOCKER_USER $DOCKER_PASS $APPVEYOR_REPO_BRANCH $APPVEYOR_PULL_REQUEST_NUMBER
-  - cmd: powershell -Command "& .\\build\\ci-windows.ps1"
+#build_script:
+#  - sh: yarn grunt release:$IMAGE:$ARCH
+#  - cmd: yarn grunt release:%IMAGE%:%ARCH%
+#  - sh: sudo bash build/ci-linux.sh $IMAGE $ARCH $DOCKER_USER $DOCKER_PASS $APPVEYOR_REPO_BRANCH $APPVEYOR_PULL_REQUEST_NUMBER
+#  - cmd: powershell -Command "& .\\build\\ci-windows.ps1"
