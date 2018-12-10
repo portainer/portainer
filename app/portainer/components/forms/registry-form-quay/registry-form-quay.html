@@ -38,7 +38,7 @@
   </div>
   <div class="form-group">
     <div class="col-sm-12">
-      <button type="submit" class="btn btn-primary btn-sm" ng-click="$ctrl.formAction()" ng-disabled="$ctrl.actionInProgress || !registryFormQuay.$valid" button-spinner="$ctrl.actionInProgress">
+      <button type="submit" class="btn btn-primary btn-sm" ng-disabled="$ctrl.actionInProgress || !registryFormQuay.$valid" button-spinner="$ctrl.actionInProgress">
         <span ng-hide="$ctrl.actionInProgress">{{ $ctrl.formActionLabel }}</span>
         <span ng-show="$ctrl.actionInProgress">In progress...</span>
       </button>
