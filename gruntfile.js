@@ -260,6 +260,7 @@ gruntfile_cfg.replace = {
 };
 
 function shell_buildBinary(p, a) {
+  console.log(process.env);
   var binfile = 'dist/portainer-' + p + '-' + a;
   return [
     'if [ -f ' + ((p === 'windows') ? binfile + '.exe' : binfile) + ' ]; then',
