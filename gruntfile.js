@@ -260,7 +260,6 @@ gruntfile_cfg.replace = {
 };
 
 function shell_buildBinary(p, a) {
-  console.log(process.env);
   var binfile = 'dist/portainer-' + p + '-' + a;
   return [
     'if [ -f ' + ((p === 'windows') ? binfile + '.exe' : binfile) + ' ]; then',
@@ -279,6 +278,7 @@ function shell_run(arch) {
 }
 
 function shell_downloadDockerBinary(p, a) {
+  console.log(process.env);
   var ps = { 'windows': 'win', 'darwin': 'mac' };
   var as = { 'amd64': 'x86_64', 'arm': 'armhf', 'arm64': 'aarch64' };
   var ip = ((ps[p] === undefined) ? p : ps[p]);
