@@ -2,8 +2,9 @@
 <div class="blocklist-item" ng-click="$ctrl.goToExtensionView()">
   <div class="blocklist-item-box">
     <!-- extension-image -->
-    <span ng-if="$ctrl.model.Logo">
-      <img class="blocklist-item-logo" ng-src="{{ $ctrl.model.Logo }}" />
+    <span ng-if="$ctrl.model.Logo" style="width: 75px; text-align: center;">
+      <!-- <img class="blocklist-item-logo" ng-src="{{ $ctrl.model.Logo }}" /> -->
+      <i class="{{ $ctrl.model.Logo }} fa fa-4x blue-icon" aria-hidden="true"></i>
     </span>
     <span class="blocklist-item-logo" ng-if="!$ctrl.model.Logo">
       <i class="fa fa-bolt fa-4x blue-icon" style="margin-left: 14px;" aria-hidden="true"></i>
