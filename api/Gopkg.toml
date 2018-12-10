@@ -1,0 +1,110 @@
+# Gopkg.toml example
+#
+# Refer to https://golang.github.io/dep/docs/Gopkg.toml.html
+# for detailed Gopkg.toml documentation.
+#
+# required = ["github.com/user/thing/cmd/thing"]
+# ignored = ["github.com/user/project/pkgX", "bitbucket.org/user/project/pkgA/pkgY"]
+#
+# [[constraint]]
+#   name = "github.com/user/project"
+#   version = "1.0.0"
+#
+# [[constraint]]
+#   name = "github.com/user/project2"
+#   branch = "dev"
+#   source = "github.com/myfork/project2"
+#
+# [[override]]
+#   name = "github.com/x/y"
+#   version = "2.4.0"
+#
+# [prune]
+#   non-go = false
+#   go-tests = true
+#   unused-packages = true
+
+
+[[constraint]]
+  name = "github.com/Microsoft/go-winio"
+  version = "0.3.9"
+
+[[constraint]]
+  name = "github.com/asaskevich/govalidator"
+  version = "9.0.0"
+
+[[constraint]]
+  name = "github.com/boltdb/bolt"
+  version = "1.3.1"
+
+[[constraint]]
+  name = "github.com/coreos/go-semver"
+  version = "0.2.0"
+
+[[constraint]]
+  name = "github.com/dgrijalva/jwt-go"
+  version = "3.2.0"
+
+[[constraint]]
+  name = "github.com/docker/docker"
+  version = "1.13.1"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/g07cha/defender"
+
+[[constraint]]
+  name = "github.com/gorilla/mux"
+  version = "1.6.2"
+
+[[constraint]]
+  name = "github.com/gorilla/securecookie"
+  version = "1.1.1"
+
+[[constraint]]
+  name = "github.com/gorilla/websocket"
+  version = "1.4.0"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/koding/websocketproxy"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/orcaman/concurrent-map"
+
+[[constraint]]
+  name = "github.com/portainer/libcompose"
+  version = "0.4.0"
+
+[[constraint]]
+  name = "github.com/portainer/libhttp"
+  version = "1.0.1"
+
+[[constraint]]
+  name = "github.com/robfig/cron"
+  version = "1.1.0"
+
+[[constraint]]
+  name = "github.com/satori/go.uuid"
+  version = "1.2.0"
+
+[[constraint]]
+  branch = "master"
+  name = "golang.org/x/crypto"
+
+[[constraint]]
+  name = "gopkg.in/alecthomas/kingpin.v2"
+  version = "2.2.6"
+
+[[constraint]]
+  name = "gopkg.in/ldap.v2"
+  version = "2.5.1"
+
+[[constraint]]
+  name = "gopkg.in/src-d/go-git.v4"
+  version = "4.8.1"
+
+[prune]
+  go-tests = true
+  unused-packages = true

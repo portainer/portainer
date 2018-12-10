@@ -1,0 +1,9 @@
+language: go
+
+go:
+  - "1.9"
+  - "1.10.x"
+  - master
+
+script:
+  - go test -v -race ./...
