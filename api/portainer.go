@@ -781,10 +781,12 @@ const (
 	APIVersion = "1.20-dev"
 	// DBVersion is the version number of the Portainer database
 	DBVersion = 15
+	// AssetsServerURL represents the URL of the Portainer asset server
+	AssetsServerURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com"
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
-	MessageOfTheDayURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com/motd.html"
+	MessageOfTheDayURL = AssetsServerURL + "/motd.html"
 	// ExtensionDefinitionsURL represents the URL where Portainer extension definitions can be retrieved
-	ExtensionDefinitionsURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com/extensions.json"
+	ExtensionDefinitionsURL = AssetsServerURL + "/extensions.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response
 	PortainerAgentHeader = "Portainer-Agent"
 	// PortainerAgentTargetHeader represent the name of the header containing the target node name
