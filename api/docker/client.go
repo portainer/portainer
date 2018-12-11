@@ -67,7 +67,7 @@ func createAgentClient(endpoint *portainer.Endpoint, signatureService portainer.
 		return nil, err
 	}
 
-	signature, err := signatureService.CreateSignature()
+	signature, err := signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
 	if err != nil {
 		return nil, err
 	}

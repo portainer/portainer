@@ -64,7 +64,7 @@ func (p *proxyTransport) proxyDockerRequest(request *http.Request) (*http.Respon
 	request.URL.Path = path
 
 	if p.enableSignature {
-		signature, err := p.SignatureService.CreateSignature()
+		signature, err := p.SignatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
 		if err != nil {
 			return nil, err
 		}
