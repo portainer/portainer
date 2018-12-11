@@ -485,6 +485,7 @@ type (
 		Name             string             `json:"Name,omitempty"`
 		ShortDescription string             `json:"ShortDescription,omitempty"`
 		Description      string             `json:"Description,omitempty"`
+		DescriptionURL   string             `json:"DescriptionURL,omitempty"`
 		Price            string             `json:"Price,omitempty"`
 		PriceDescription string             `json:"PriceDescription,omitempty"`
 		Deal             bool               `json:"Deal,omitempty"`
@@ -492,7 +493,7 @@ type (
 		License          LicenseInformation `json:"License,omitempty"`
 		Version          string             `json:"Version"`
 		UpdateAvailable  bool               `json:"UpdateAvailable"`
-		ProductID        int                `json:"ProductId,omitempty"`
+		ShopURL          string             `json:"ShopURL,omitempty"`
 		Images           []string           `json:"Images,omitempty"`
 		Logo             string             `json:"Logo,omitempty"`
 	}

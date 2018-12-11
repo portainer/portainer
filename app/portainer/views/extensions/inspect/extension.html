@@ -51,8 +51,14 @@
               </div>
 
               <div style="margin-top: 15px;" ng-if="!extension.Enabled && extension.Available">
-                <a href="https://2-portainer.pi.bypronto.com/checkout/?add-to-cart={{ extension.ProductId }}&quantity={{ formValues.instances }}" target="_blank" class="btn btn-primary btn-sm" style="width: 100%; margin-left: 0;">
+                <a href="{{ extension.ShopURL }}&quantity={{ formValues.instances }}" target="_blank" class="btn btn-primary btn-sm" style="width: 100%; margin-left: 0;">
                   Buy
+                </a>
+              </div>
+
+              <div style="margin-top: 10px;" ng-if="!extension.Enabled && extension.Available">
+                <a ui-sref="portainer.extensions" class="btn btn-primary btn-sm" style="width: 100%; margin-left: 0;">
+                  Add license key
                 </a>
               </div>
 
@@ -92,10 +98,16 @@
             Description
           </span>
         </div>
-        <div class="form-group">
-          <span class="small text-muted">
-            {{ extension.Description }}
-          </span>
+        <div class="form-group" ng-if="extension.Description">
+          <div class="text-muted" style="font-size: 90%;" ng-bind-html="extension.Description"></div>
+        </div>
+        <div class="form-group" ng-if="!extension.Description">
+          <div class="small text-muted">
+            <p>
+              <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true"></i>
+              Description for this extension unavailable at the moment.
+            </p>
+          </div>
         </div>
       </rd-widget-body>
     </rd-widget>
@@ -113,7 +125,7 @@
         </div>
         <div style="text-align: center;">
           <div ng-repeat="image in extension.Images" style="margin-top: 25px; cursor: zoom-in;">
-            <img ng-src="{{image}}" ng-click="enlargeImage(image)"/>
+            <img ng-src="{{image}}" ng-click="enlargeImage(image)" style="max-width: 1024px;" />
           </div>
         </div>
       </rd-widget-body>

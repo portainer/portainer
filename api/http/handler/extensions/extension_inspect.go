@@ -35,6 +35,10 @@ func (handler *Handler) extensionInspect(w http.ResponseWriter, r *http.Request)
 	for _, p := range extensions {
 		if p.ID == extensionID {
 			extension = p
+			if extension.DescriptionURL != "" {
+				description, _ := client.Get(extension.DescriptionURL, 10)
+				extension.Description = string(description)
+			}
 			break
 		}
 	}
