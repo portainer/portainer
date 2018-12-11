@@ -56,6 +56,12 @@
                 </a>
               </div>
 
+              <div style="margin-top: 10px;" ng-if="!extension.Enabled && extension.Available">
+                <a ui-sref="portainer.extensions" class="btn btn-primary btn-sm" style="width: 100%; margin-left: 0;">
+                  Add license key
+                </a>
+              </div>
+
               <div style="margin-top: 15px;" ng-if="!extension.Enabled && !extension.Available">
                 <btn class="btn btn-primary btn-sm" style="width: 100%; margin-left: 0;" disabled>Coming soon</btn>
               </div>
@@ -93,9 +99,7 @@
           </span>
         </div>
         <div class="form-group">
-          <span class="small text-muted">
-            {{ extension.Description }}
-          </span>
+          <span class="small text-muted" style="white-space: pre-line;">{{ extension.Description }}</span>
         </div>
       </rd-widget-body>
     </rd-widget>

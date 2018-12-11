@@ -1,5 +1,5 @@
 <!-- extension -->
-<div class="blocklist-item" ng-click="$ctrl.goToExtensionView()">
+<div class="blocklist-item" ng-click="$ctrl.goToExtensionView()" ng-class="{ 'blocklist-item--disabled': !$ctrl.model.Available }">
   <div class="blocklist-item-box">
     <!-- extension-image -->
     <span ng-if="$ctrl.model.Logo" style="width: 75px; text-align: center;">
