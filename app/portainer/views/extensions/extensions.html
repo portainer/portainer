@@ -61,7 +61,7 @@
   </div>
 </div>
 
-<div class="row" ng-if="extensions">
+<div class="row" ng-if="extensions && extensions.length > 0">
   <div class="col-sm-12">
     <extension-list
     current-date="state.currentDate"
@@ -69,3 +69,12 @@
     ></extension-list>
   </div>
 </div>
+
+<information-panel title-text="Error" ng-if="extensions && extensions.length === 0">
+  <span class="small text-muted">
+    <p>
+      <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true"></i>
+      Portainer must be connected to the Internet to fetch the list of available extensions.
+    </p>
+  </span>
+</information-panel>
