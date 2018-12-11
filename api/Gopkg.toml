@@ -45,9 +45,22 @@
   name = "github.com/dgrijalva/jwt-go"
   version = "3.2.0"
 
+# Unable to pin this package to a specific version as repository versions
+# are not valid semver: https://github.com/moby/moby/issues/37281
 [[constraint]]
   name = "github.com/docker/docker"
-  version = "1.13.1"
+  # This repository allows us to have a track of recent releases (tags not available in moby/moby)
+  # https://github.com/moby/moby/issues/33989#issuecomment-403873249
+  source = "https://github.com/docker/engine.git"
+  # This revision points to release v18.06.1-ce
+  revision = "320063a2ad06a1d8ada61c94c29dbe44e2d87473"
+
+# For some reason, the vendored Docker dependencies are using a specific version of
+# the distribution package.
+# Found via: https://github.com/moby/moby/blob/master/vendor.conf#L67
+[[override]]
+  name = "github.com/docker/distribution"
+  revision = "83389a148052d74ac602f5f1d62f86ff2f3c4aa5"
 
 [[constraint]]
   branch = "master"
@@ -75,7 +88,8 @@
 
 [[constraint]]
   name = "github.com/portainer/libcompose"
-  version = "0.4.0"
+  branch = "master"
+  #version = "0.4.0"
 
 [[constraint]]
   name = "github.com/portainer/libhttp"
