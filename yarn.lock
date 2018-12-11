@@ -5097,6 +5097,14 @@ grunt-contrib-watch@~0.3.1:
   dependencies:
     gaze "~0.3.3"
 
+grunt-env@^0.4.4:
+  version "0.4.4"
+  resolved "https://registry.yarnpkg.com/grunt-env/-/grunt-env-0.4.4.tgz#3b38843a8d737177ddc9f893879fb69ce1a0bc2f"
+  integrity sha1-OziEOo1zcXfdyfiTh5+2nOGgvC8=
+  dependencies:
+    ini "~1.3.0"
+    lodash "~2.4.1"
+
 grunt-filerev@^2.3.1:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/grunt-filerev/-/grunt-filerev-2.3.1.tgz#2990210f0b5a9edc5e7198987fd1c029c6d5f4df"
