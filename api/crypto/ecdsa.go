@@ -8,8 +8,6 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"math/big"
-
-	"github.com/portainer/portainer"
 )
 
 const (
@@ -105,10 +103,10 @@ func (service *ECDSAService) GenerateKeyPair() ([]byte, []byte, error) {
 // CreateSignature creates a digital signature.
 // It automatically hash a specific message using MD5 and creates a signature from
 // that hash.
+// If a secret is associated to the service, it will be used instead of the specified
+// message.
 // It then encodes the generated signature in base64.
-func (service *ECDSAService) CreateSignature() (string, error) {
-
-	message := portainer.PortainerAgentSignatureMessage
+func (service *ECDSAService) CreateSignature(message string) (string, error) {
 	if service.secret != "" {
 		message = service.secret
 	}
