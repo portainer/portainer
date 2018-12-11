@@ -142,6 +142,7 @@ func (store *Store) MigrateData() error {
 			ResourceControlService: store.ResourceControlService,
 			SettingsService:        store.SettingsService,
 			StackService:           store.StackService,
+			TemplateService:        store.TemplateService,
 			UserService:            store.UserService,
 			VersionService:         store.VersionService,
 			FileService:            store.fileService,
