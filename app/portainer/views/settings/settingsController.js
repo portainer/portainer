@@ -12,7 +12,8 @@ function ($scope, $state, Notifications, SettingsService, StateManager) {
     restrictBindMounts: false,
     restrictPrivilegedMode: false,
     labelName: '',
-    labelValue: ''
+    labelValue: '',
+    enableHostManagementFeatures: false
   };
 
   $scope.removeFilteredContainerLabel = function(index) {
@@ -46,6 +47,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager) {
 
     settings.AllowBindMountsForRegularUsers = !$scope.formValues.restrictBindMounts;
     settings.AllowPrivilegedModeForRegularUsers = !$scope.formValues.restrictPrivilegedMode;
+    settings.EnableHostManagementFeatures = $scope.formValues.enableHostManagementFeatures;
 
     $scope.state.actionInProgress = true;
     updateSettings(settings);
@@ -57,6 +59,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager) {
       Notifications.success('Settings updated');
       StateManager.updateLogo(settings.LogoURL);
       StateManager.updateSnapshotInterval(settings.SnapshotInterval);
+      StateManager.updateEnableHostManagementFeatures(settings.EnableHostManagementFeatures);
       $state.reload();
     })
     .catch(function error(err) {
@@ -80,6 +83,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager) {
       }
       $scope.formValues.restrictBindMounts = !settings.AllowBindMountsForRegularUsers;
       $scope.formValues.restrictPrivilegedMode = !settings.AllowPrivilegedModeForRegularUsers;
+      $scope.formValues.enableHostManagementFeatures = settings.EnableHostManagementFeatures;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve application settings');

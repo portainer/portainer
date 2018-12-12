@@ -52,6 +52,7 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to exec into container');
+      $scope.disconnect();
     });
   };
 

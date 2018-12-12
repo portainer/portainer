@@ -111,7 +111,7 @@
           <div class="form-group">
             <label for="container_network" class="col-sm-2 control-label text-left">Network</label>
             <div class="col-sm-10">
-              <select class="form-control" ng-options="net.Name for net in availableNetworks" ng-model="formValues.network">
+              <select class="form-control" ng-options="net.Name for net in availableNetworks | orderBy: 'Name'" ng-model="formValues.network">
                 <option disabled hidden value="">Select a network</option>
               </select>
             </div>
@@ -350,7 +350,7 @@
   <div class="col-sm-12">
     <template-list ng-if="templates"
       title-text="Templates" title-icon="fa-rocket"
-      templates="templates"
+      templates="templates" table-key="templates"
       select-action="selectTemplate"
       delete-action="deleteTemplate"
       show-add-action="state.templateManagement && isAdmin"

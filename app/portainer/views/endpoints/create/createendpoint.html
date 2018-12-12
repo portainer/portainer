@@ -64,8 +64,16 @@
             </div>
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
-                If you have started Portainer in the same overlay network as the agent, you can use <code>tasks.AGENT_SERVICE_NAME:AGENT_SERVICE_PORT</code> as the
-                endpoint URL format.
+                Ensure that you have deployed the Portainer agent in your cluster first. You can use execute the following command on any manager node to deploy it.
+                <div style="margin-top: 10px;">
+                  <code>
+                    curl -L https://portainer.io/download/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent
+                  </code>
+                  <span class="btn btn-primary btn-sm space-left" ng-click="copyAgentCommand()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy</span>
+                  <span>
+                    <i id="copyNotification" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none;"></i>
+                  </span>
+                </div>
               </span>
             </div>
           </div>

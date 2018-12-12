@@ -18,6 +18,7 @@ type settingsUpdatePayload struct {
 	LDAPSettings                       *portainer.LDAPSettings
 	AllowBindMountsForRegularUsers     *bool
 	AllowPrivilegedModeForRegularUsers *bool
+	EnableHostManagementFeatures       *bool
 	SnapshotInterval                   *string
 	TemplatesURL                       *string
 }
@@ -76,9 +77,15 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		settings.AllowPrivilegedModeForRegularUsers = *payload.AllowPrivilegedModeForRegularUsers
 	}
 
+	if payload.EnableHostManagementFeatures != nil {
+		settings.EnableHostManagementFeatures = *payload.EnableHostManagementFeatures
+	}
+
 	if payload.SnapshotInterval != nil && *payload.SnapshotInterval != settings.SnapshotInterval {
-		settings.SnapshotInterval = *payload.SnapshotInterval
-		handler.JobScheduler.UpdateSnapshotJob(settings.SnapshotInterval)
+		err := handler.updateSnapshotInterval(settings, *payload.SnapshotInterval)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update snapshot interval", err}
+		}
 	}
 
 	tlsError := handler.updateTLS(settings)
@@ -92,6 +99,32 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	return response.JSON(w, settings)
+}
+
+func (handler *Handler) updateSnapshotInterval(settings *portainer.Settings, snapshotInterval string) error {
+	settings.SnapshotInterval = snapshotInterval
+
+	schedules, err := handler.ScheduleService.SchedulesByJobType(portainer.SnapshotJobType)
+	if err != nil {
+		return err
+	}
+
+	if len(schedules) != 0 {
+		snapshotSchedule := schedules[0]
+		snapshotSchedule.CronExpression = "@every " + snapshotInterval
+
+		err := handler.JobScheduler.UpdateSystemJobSchedule(portainer.SnapshotJobType, snapshotSchedule.CronExpression)
+		if err != nil {
+			return err
+		}
+
+		err = handler.ScheduleService.UpdateSchedule(snapshotSchedule.ID, &snapshotSchedule)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (handler *Handler) updateTLS(settings *portainer.Settings) *httperror.HandlerError {

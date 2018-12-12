@@ -25,7 +25,7 @@ function TemplateCreateRequest(model) {
   this.Image = model.Image;
   this.Registry = model.Registry.URL;
   this.Command = model.Command;
-  this.Network = model.Network;
+  this.Network = model.Network && model.Network.Name;
   this.Privileged = model.Privileged;
   this.Interactive = model.Interactive;
   this.RestartPolicy = model.RestartPolicy;

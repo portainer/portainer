@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 
 	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/archive"
 
 	"io"
 	"os"
@@ -32,6 +33,13 @@ const (
 	PrivateKeyFile = "portainer.key"
 	// PublicKeyFile represents the name on disk of the file containing the public key.
 	PublicKeyFile = "portainer.pub"
+	// BinaryStorePath represents the subfolder where binaries are stored in the file store folder.
+	BinaryStorePath = "bin"
+	// ScheduleStorePath represents the subfolder where schedule files are stored.
+	ScheduleStorePath = "schedules"
+	// ExtensionRegistryManagementStorePath represents the subfolder where files related to the
+	// registry management extension are stored.
+	ExtensionRegistryManagementStorePath = "extensions"
 )
 
 // Service represents a service for managing files and directories.
@@ -63,7 +71,28 @@ func NewService(dataStorePath, fileStorePath string) (*Service, error) {
 		return nil, err
 	}
 
+	err = service.createDirectoryInStore(BinaryStorePath)
+	if err != nil {
+		return nil, err
+	}
+
 	return service, nil
+}
+
+// GetBinaryFolder returns the full path to the binary store on the filesystem
+func (service *Service) GetBinaryFolder() string {
+	return path.Join(service.fileStorePath, BinaryStorePath)
+}
+
+// ExtractExtensionArchive extracts the content of an extension archive
+// specified as raw data into the binary store on the filesystem
+func (service *Service) ExtractExtensionArchive(data []byte) error {
+	err := archive.UnzipArchive(data, path.Join(service.fileStorePath, BinaryStorePath))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // RemoveDirectory removes a directory on the filesystem.
@@ -95,6 +124,27 @@ func (service *Service) StoreStackFileFromBytes(stackIdentifier, fileName string
 	}
 
 	return path.Join(service.fileStorePath, stackStorePath), nil
+}
+
+// StoreRegistryManagementFileFromBytes creates a subfolder in the
+// ExtensionRegistryManagementStorePath and stores a new file from bytes.
+// It returns the path to the folder where the file is stored.
+func (service *Service) StoreRegistryManagementFileFromBytes(folder, fileName string, data []byte) (string, error) {
+	extensionStorePath := path.Join(ExtensionRegistryManagementStorePath, folder)
+	err := service.createDirectoryInStore(extensionStorePath)
+	if err != nil {
+		return "", err
+	}
+
+	file := path.Join(extensionStorePath, fileName)
+	r := bytes.NewReader(data)
+
+	err = service.createFileInStore(file, r)
+	if err != nil {
+		return "", err
+	}
+
+	return path.Join(service.fileStorePath, file), nil
 }
 
 // StoreTLSFileFromBytes creates a folder in the TLSStorePath and stores a new file from bytes.
@@ -317,4 +367,33 @@ func (service *Service) getContentFromPEMFile(filePath string) ([]byte, error) {
 
 	block, _ := pem.Decode(fileContent)
 	return block.Bytes, nil
+}
+
+// GetScheduleFolder returns the absolute path on the filesystem for a schedule based
+// on its identifier.
+func (service *Service) GetScheduleFolder(identifier string) string {
+	return path.Join(service.fileStorePath, ScheduleStorePath, identifier)
+}
+
+// StoreScheduledJobFileFromBytes creates a subfolder in the ScheduleStorePath and stores a new file from bytes.
+// It returns the path to the folder where the file is stored.
+func (service *Service) StoreScheduledJobFileFromBytes(identifier string, data []byte) (string, error) {
+	scheduleStorePath := path.Join(ScheduleStorePath, identifier)
+	err := service.createDirectoryInStore(scheduleStorePath)
+	if err != nil {
+		return "", err
+	}
+
+	filePath := path.Join(scheduleStorePath, createScheduledJobFileName(identifier))
+	r := bytes.NewReader(data)
+	err = service.createFileInStore(filePath, r)
+	if err != nil {
+		return "", err
+	}
+
+	return path.Join(service.fileStorePath, filePath), nil
+}
+
+func createScheduledJobFileName(identifier string) string {
+	return "job_" + identifier + ".sh"
 }

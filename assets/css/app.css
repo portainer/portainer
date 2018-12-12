@@ -59,6 +59,7 @@ html, body, #page-wrapper, #content-wrapper, .page-content, #view {
   margin-top: 5px;
   margin-bottom: 15px;
   color: #777;
+  padding-left: 0;
 }
 
 .form-horizontal .control-label.text-left{
@@ -168,13 +169,18 @@ a[ng-click]{
   padding: 0.7rem;
   margin-bottom: 0.7rem;
   cursor: pointer;
-  border: 1px solid #333333;
+  border: 1px solid #cccccc;
   border-radius: 2px;
   box-shadow: 0 3px 10px -2px rgba(161, 170, 166, 0.5);
 }
 
+.blocklist-item--disabled {
+  cursor: auto;
+  background-color: #ececec;
+}
+
 .blocklist-item--selected {
-  border: 2px solid #333333;
+  border: 2px solid #bbbbbb;
   background-color: #ececec;
   color: #2d3e63;
 }
@@ -797,6 +803,10 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 /*bootbox override*/
 .modal-open {
   padding-right: 0 !important;
+}
+
+.image-zoom-modal .modal-dialog {
+  width: 80%;
 }
 /*!bootbox override*/
 

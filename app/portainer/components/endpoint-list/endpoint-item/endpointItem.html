@@ -21,8 +21,16 @@
 
           </span>
         </span>
-        <span class="small">
-          Group: {{ $ctrl.model.GroupName }}
+        <span>
+
+          <span class="small">
+            Group: {{ $ctrl.model.GroupName }}
+          </span>
+          <button
+            ng-if="$ctrl.isAdmin" 
+            class="btn btn-link btn-xs"
+            ng-click="$ctrl.editEndpoint($event)"><i class="fa fa-pencil-alt"></i>
+          </button>
         </span>
       </div>
 
@@ -30,13 +38,13 @@
         <span class="blocklist-item-desc">
           <span>
             <span style="padding: 0 7px 0 0;">
-              <i class="fa fa-th-list space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].StackCount }} stacks
+              <i class="fa fa-th-list space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].StackCount }} {{ $ctrl.model.Snapshots[0].StackCount === 1 ? 'stack' : 'stacks' }}
             </span>
             <span style="padding: 0 7px 0 7px;" ng-if="$ctrl.model.Snapshots[0].Swarm">
-              <i class="fa fa-list-alt space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].ServiceCount }} services
+              <i class="fa fa-list-alt space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].ServiceCount }} {{ $ctrl.model.Snapshots[0].ServiceCount === 1 ? 'service' : 'services' }}
             </span>
             <span style="padding: 0 7px 0 7px;">
-              <i class="fa fa-server space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].RunningContainerCount + $ctrl.model.Snapshots[0].StoppedContainerCount }} containers
+              <i class="fa fa-server space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].RunningContainerCount + $ctrl.model.Snapshots[0].StoppedContainerCount }} {{ $ctrl.model.Snapshots[0].RunningContainerCount + $ctrl.model.Snapshots[0].StoppedContainerCount === 1 ? 'container' : 'containers' }}
               <span ng-if="$ctrl.model.Snapshots[0].RunningContainerCount > 0 || $ctrl.model.Snapshots[0].StoppedContainerCount > 0">
                 -
                 <i class="fa fa-heartbeat green-icon" aria-hidden="true"></i> {{ $ctrl.model.Snapshots[0].RunningContainerCount }}
@@ -44,10 +52,10 @@
               </span>
             </span>
             <span style="padding: 0 7px 0 7px;">
-              <i class="fa fa-cubes space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].VolumeCount }} volumes
+              <i class="fa fa-cubes space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].VolumeCount }} {{ $ctrl.model.Snapshots[0].VolumeCount === 1 ? 'volume' : 'volumes' }}
             </span>
             <span style="padding: 0 7px 0 7px;">
-              <i class="fa fa-clone space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].ImageCount }} images
+              <i class="fa fa-clone space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].ImageCount }} {{ $ctrl.model.Snapshots[0].ImageCount === 1 ? 'image' : 'images' }}
             </span>
           </span>
         </span>
@@ -73,6 +81,9 @@
               {{ tag }}{{ $last? '' : ', ' }}
             </span>
           </span>
+        </span>
+        <span class="small text-muted">
+          {{ $ctrl.model.URL | stripprotocol }}
         </span>
       </div>
 

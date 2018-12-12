@@ -1,0 +1,44 @@
+<div class="btn-group btn-group-xs" role="group" aria-label="..." style="display:inline-flex;">
+  <a 
+    ng-if="$ctrl.state.showQuickActionLogs && $ctrl.taskId === undefined" 
+    style="margin: 0 2.5px;" 
+    ui-sref="docker.containers.container.logs({id: $ctrl.containerId, nodeName: $ctrl.nodeName})" 
+    title="Logs">
+    <i class="fa fa-file-alt space-right" aria-hidden="true"></i>
+  </a>
+  <a 
+    ng-if="$ctrl.state.showQuickActionLogs && $ctrl.taskId !== undefined" 
+    style="margin: 0 2.5px;" 
+    ui-sref="docker.tasks.task.logs({id: $ctrl.taskId})" 
+    title="Logs">
+    <i class="fa fa-file-alt space-right" aria-hidden="true"></i>
+  </a>
+  <a 
+    ng-if="$ctrl.state.showQuickActionInspect && $ctrl.taskId === undefined" 
+    style="margin: 0 2.5px;" 
+    ui-sref="docker.containers.container.inspect({id: $ctrl.containerId, nodeName: $ctrl.nodeName})" 
+    title="Inspect">
+    <i class="fa fa-info-circle space-right" aria-hidden="true"></i>
+  </a>
+  <a 
+    ng-if="$ctrl.state.showQuickActionInspect && $ctrl.taskId !== undefined" 
+    style="margin: 0 2.5px;" 
+    ui-sref="docker.tasks.task({id: $ctrl.taskId})" 
+    title="Inspect">
+    <i class="fa fa-info-circle space-right" aria-hidden="true"></i>
+  </a>
+  <a 
+    ng-if="$ctrl.state.showQuickActionStats && ['starting', 'running', 'healthy', 'unhealthy'].indexOf($ctrl.status) !== -1" 
+    style="margin: 0 2.5px;" 
+    ui-sref="docker.containers.container.stats({id: $ctrl.containerId, nodeName: $ctrl.nodeName})" 
+    title="Stats">
+    <i class="fa fa-chart-area space-right" aria-hidden="true"></i>
+  </a>
+  <a 
+    ng-if="$ctrl.state.showQuickActionConsole && ['starting', 'running', 'healthy', 'unhealthy'].indexOf($ctrl.status) !== -1" 
+    style="margin: 0 2.5px;" 
+    ui-sref="docker.containers.container.console({id: $ctrl.containerId, nodeName: $ctrl.nodeName})" 
+    title="Console">
+    <i class="fa fa-terminal space-right" aria-hidden="true"></i>
+  </a>
+</div>

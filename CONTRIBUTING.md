@@ -77,14 +77,14 @@ The subject contains succinct description of the change:
 
 ## Contribution process
 
-Our contribution process is described below. Some of the steps can be visualized inside Github via specific `contrib/` labels, such as `contrib/func-review-in-progress` or `contrib/tech-review-approved`.
+Our contribution process is described below. Some of the steps can be visualized inside Github via specific `status/` labels, such as `status/1-functional-review` or `status/2-technical-review`.
 
 ### Bug report
 
-![portainer_bugreport_workflow](https://user-images.githubusercontent.com/5485061/43569306-5571b3a0-9637-11e8-8559-786cfc82a14f.png)
+![portainer_bugreport_workflow](https://user-images.githubusercontent.com/5485061/45727219-50190a00-bbf5-11e8-9fe8-3a563bb8d5d7.png)
 
 ### Feature request
 
-The feature request process is similar to the bug report process but has an extra functional validation before the technical validation.
+The feature request process is similar to the bug report process but has an extra functional validation before the technical validation as well as a documentation validation before the testing phase.
 
-![portainer_featurerequest_workflow](https://user-images.githubusercontent.com/5485061/43569315-5d30a308-9637-11e8-8292-3c62b5612925.png)
+![portainer_featurerequest_workflow](https://user-images.githubusercontent.com/5485061/45727229-5ad39f00-bbf5-11e8-9550-16ba66c50615.png)

@@ -35,7 +35,23 @@ angular.module('portainer.app')
         'Content-Type': file.type
       },
       data: file,
-      ignoreLoadingBar: true
+      ignoreLoadingBar: true,
+      transformResponse: genericHandler
+    });
+  };
+
+  service.createSchedule = function(payload) {
+    return Upload.upload({
+      url: 'api/schedules?method=file',
+      data: {
+        file: payload.File,
+        Name: payload.Name,
+        CronExpression: payload.CronExpression,
+        Image: payload.Image,
+        Endpoints: Upload.json(payload.Endpoints),
+        RetryCount: payload.RetryCount,
+        RetryInterval: payload.RetryInterval
+      }
     });
   };
 
@@ -59,6 +75,24 @@ angular.module('portainer.app')
         file: file,
         Name: stackName,
         Env: Upload.json(env)
+      },
+      ignoreLoadingBar: true
+    });
+  };
+
+  service.configureRegistry = function(registryId, registryManagementConfigurationModel) {
+    return Upload.upload({
+      url: 'api/registries/' + registryId + '/configure',
+      data: registryManagementConfigurationModel
+    });
+  };
+
+  service.executeEndpointJob = function (imageName, file, endpointId, nodeName) {
+    return Upload.upload({
+      url: 'api/endpoints/' + endpointId + '/job?method=file&nodeName=' + nodeName,
+      data: {
+        File: file,
+        Image: imageName
       },
       ignoreLoadingBar: true
     });

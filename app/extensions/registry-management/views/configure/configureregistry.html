@@ -1,0 +1,161 @@
+<rd-header>
+  <rd-header-title title-text="Configure registry"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="portainer.registries">Registries</a> &gt; <a ui-sref="portainer.registries.registry({id: registry.Id})">{{ registry.Name }}</a> &gt; Management configuration
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <div class="col-sm-12 form-section-title">
+            Information
+          </div>
+          <div class="form-group">
+            <span class="col-sm-12 text-muted small">
+              The following configuration will be used to access this <a href="https://docs.docker.com/registry/spec/api/" target="_blank">registry API</a> to provide Portainer management features.
+            </span>
+          </div>
+          <div class="col-sm-12 form-section-title">
+            Registry details
+          </div>
+          <!-- registry-url-input -->
+          <div class="form-group">
+            <label for="registry_url" class="col-sm-3 col-lg-2 control-label text-left">
+              Registry URL
+            </label>
+            <div class="col-sm-9 col-lg-10">
+              <input type="text" class="form-control" id="registry_url" ng-model="registry.URL" disabled>
+            </div>
+          </div>
+          <!-- !registry-url-input -->
+          <!-- authentication-checkbox -->
+          <div class="form-group" ng-if="registry.Type === 3">
+            <div class="col-sm-12">
+              <label for="registry_auth" class="control-label text-left">
+                Authentication
+                <portainer-tooltip position="bottom" message="Enable this option if you need to specify credentials to connect to this registry."></portainer-tooltip>
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" ng-model="model.Authentication"><i></i>
+              </label>
+            </div>
+          </div>
+          <!-- !authentication-checkbox -->
+          <!-- authentication-credentials -->
+          <div ng-if="model.Authentication">
+            <!-- credentials-user -->
+            <div class="form-group">
+              <label for="credentials_username" class="col-sm-3 col-lg-2 control-label text-left">Username</label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="text" class="form-control" id="credentials_username" ng-model="model.Username">
+              </div>
+            </div>
+            <!-- !credentials-user -->
+            <!-- credentials-password -->
+            <div class="form-group">
+              <label for="credentials_password" class="col-sm-3 col-lg-2 control-label text-left">Password</label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="password" class="form-control" id="credentials_password" ng-model="model.Password" placeholder="*******">
+              </div>
+            </div>
+            <!-- !credentials-password -->
+          </div>
+          <!-- !authentication-credentials -->
+          <!-- tls -->
+          <div ng-if="registry.Type === 3">
+            <!-- tls-checkbox -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label for="tls" class="control-label text-left">
+                  TLS
+                  <portainer-tooltip position="bottom" message="Enable this option if you need to connect to the registry API with TLS."></portainer-tooltip>
+                </label>
+                <label class="switch" style="margin-left: 20px;">
+                  <input type="checkbox" ng-model="model.TLS"><i></i>
+                </label>
+              </div>
+            </div>
+            <!-- !tls-checkbox -->
+            <!-- tls-skip-verify -->
+            <div class="form-group" ng-if="model.TLS">
+              <div class="col-sm-12">
+                <label for="tls" class="control-label text-left">
+                  Skip certificate verification
+                  <portainer-tooltip position="bottom" message="Skip the verification of the server TLS certificate. Not recommended on unsecured networks."></portainer-tooltip>
+                </label>
+                <label class="switch" style="margin-left: 20px;">
+                  <input type="checkbox" ng-model="model.TLSSkipVerify"><i></i>
+                </label>
+              </div>
+            </div>
+            <!-- !tls-skip-verify -->
+            <div class="col-sm-12 form-section-title" ng-if="model.TLS && !model.TLSSkipVerify">
+              Required TLS files
+            </div>
+            <!-- tls-file-upload -->
+            <div ng-if="model.TLS && !model.TLSSkipVerify">
+              <!-- tls-ca-file-cert -->
+              <div class="form-group">
+                <label for="tls_cert" class="col-sm-3 col-lg-2 control-label text-left">TLS CA certificate</label>
+                <div class="col-sm-9 col-lg-10">
+                  <button class="btn btn-sm btn-primary" ngf-select ng-model="model.TLSCACertFile">Select file</button>
+                  <span style="margin-left: 5px;">
+                    {{ model.TLSCACertFile.name }}
+                    <i class="fa fa-check green-icon" ng-if="model.TLSCACertFile && model.TLSCACertFile === registry.ManagementConfiguration.TLSConfig.TLSCACertFile" aria-hidden="true"></i>
+                    <i class="fa fa-times red-icon" ng-if="!model.TLSCACertFile" aria-hidden="true"></i>
+                  </span>
+                </div>
+              </div>
+              <!-- !tls-ca-file-cert -->
+              <!-- tls-file-cert -->
+              <div class="form-group">
+                <label for="tls_cert" class="col-sm-3 col-lg-2 control-label text-left">TLS certificate</label>
+                <div class="col-sm-9 col-lg-10">
+                  <button class="btn btn-sm btn-primary" ngf-select ng-model="model.TLSCertFile">Select file</button>
+                  <span style="margin-left: 5px;">
+                    {{ model.TLSCertFile.name }}
+                    <i class="fa fa-check green-icon" ng-if="model.TLSCertFile && model.TLSCertFile === registry.ManagementConfiguration.TLSConfig.TLSCertFile" aria-hidden="true"></i>
+                    <i class="fa fa-times red-icon" ng-if="!model.TLSCertFile" aria-hidden="true"></i>
+                  </span>
+                </div>
+              </div>
+              <!-- !tls-file-cert -->
+              <!-- tls-file-key -->
+              <div class="form-group">
+                <label class="col-sm-3 col-lg-2 control-label text-left">TLS key</label>
+                <div class="col-sm-9 col-lg-10">
+                  <button class="btn btn-sm btn-primary" ngf-select ng-model="model.TLSKeyFile">Select file</button>
+                  <span style="margin-left: 5px;">
+                    {{ model.TLSKeyFile.name }}
+                    <i class="fa fa-check green-icon" ng-if="model.TLSKeyFile && model.TLSKeyFile === registry.ManagementConfiguration.TLSConfig.TLSKeyFile" aria-hidden="true"></i>
+                    <i class="fa fa-times red-icon" ng-if="!model.TLSKeyFile" aria-hidden="true"></i>
+                  </span>
+                </div>
+              </div>
+              <!-- !tls-file-key -->
+            </div>
+          </div>
+          <!-- !tls -->
+          <div class="col-sm-12 form-section-title">
+            Actions
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.testInProgress" ng-click="testConfiguration()" button-spinner="state.testInProgress">
+                <span ng-hide="state.testInProgress">Test configuration</span>
+                <span ng-show="state.testInProgress">Test in progress...</span>
+              </button>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.updateInProgress || !state.validConfiguration" ng-click="updateConfiguration()" button-spinner="state.updateInProgress">
+                <span ng-hide="state.updateInProgress">Save configuration</span>
+                <span ng-show="state.updateInProgress">Saving configuration...</span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

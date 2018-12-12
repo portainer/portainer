@@ -25,6 +25,14 @@ angular.module('portainer.app')
     return buttons;
   };
 
+  service.enlargeImage = function(image) {
+    bootbox.dialog({
+      message: '<img src="' + image + '" style="width:100%" />',
+      className: 'image-zoom-modal',
+      onEscape: true
+    });
+  };
+
   service.confirm = function(options){
     var box = bootbox.confirm({
       title: options.title,

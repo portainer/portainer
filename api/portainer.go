@@ -47,7 +47,7 @@ type (
 	// LDAPSettings represents the settings used to connect to a LDAP server
 	LDAPSettings struct {
 		ReaderDN            string                    `json:"ReaderDN"`
-		Password            string                    `json:"Password"`
+		Password            string                    `json:"Password,omitempty"`
 		URL                 string                    `json:"URL"`
 		TLSConfig           TLSConfiguration          `json:"TLSConfig"`
 		StartTLS            bool                      `json:"StartTLS"`
@@ -89,6 +89,7 @@ type (
 		AllowPrivilegedModeForRegularUsers bool                 `json:"AllowPrivilegedModeForRegularUsers"`
 		SnapshotInterval                   string               `json:"SnapshotInterval"`
 		TemplatesURL                       string               `json:"TemplatesURL"`
+		EnableHostManagementFeatures       bool                 `json:"EnableHostManagementFeatures"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
@@ -164,17 +165,32 @@ type (
 	// RegistryID represents a registry identifier
 	RegistryID int
 
+	// RegistryType represents a type of registry
+	RegistryType int
+
 	// Registry represents a Docker registry with all the info required
 	// to connect to it
 	Registry struct {
-		ID              RegistryID `json:"Id"`
-		Name            string     `json:"Name"`
-		URL             string     `json:"URL"`
-		Authentication  bool       `json:"Authentication"`
-		Username        string     `json:"Username"`
-		Password        string     `json:"Password,omitempty"`
-		AuthorizedUsers []UserID   `json:"AuthorizedUsers"`
-		AuthorizedTeams []TeamID   `json:"AuthorizedTeams"`
+		ID                      RegistryID                       `json:"Id"`
+		Type                    RegistryType                     `json:"Type"`
+		Name                    string                           `json:"Name"`
+		URL                     string                           `json:"URL"`
+		Authentication          bool                             `json:"Authentication"`
+		Username                string                           `json:"Username"`
+		Password                string                           `json:"Password,omitempty"`
+		AuthorizedUsers         []UserID                         `json:"AuthorizedUsers"`
+		AuthorizedTeams         []TeamID                         `json:"AuthorizedTeams"`
+		ManagementConfiguration *RegistryManagementConfiguration `json:"ManagementConfiguration"`
+	}
+
+	// RegistryManagementConfiguration represents a configuration that can be used to query
+	// the registry API via the registry management extension.
+	RegistryManagementConfiguration struct {
+		Type           RegistryType     `json:"Type"`
+		Authentication bool             `json:"Authentication"`
+		Username       string           `json:"Username"`
+		Password       string           `json:"Password"`
+		TLSConfig      TLSConfiguration `json:"TLSConfig"`
 	}
 
 	// DockerHub represents all the required information to connect and use the
@@ -220,7 +236,44 @@ type (
 		TLSKeyPath    string `json:"TLSKey,omitempty"`
 	}
 
-	// WebhookID represents an webhook identifier.
+	// ScheduleID represents a schedule identifier.
+	ScheduleID int
+
+	// JobType represents a job type
+	JobType int
+
+	// ScriptExecutionJob represents a scheduled job that can execute a script via a privileged container
+	ScriptExecutionJob struct {
+		Endpoints     []EndpointID
+		Image         string
+		ScriptPath    string
+		RetryCount    int
+		RetryInterval int
+	}
+
+	// SnapshotJob represents a scheduled job that can create endpoint snapshots
+	SnapshotJob struct{}
+
+	// EndpointSyncJob represents a scheduled job that synchronize endpoints based on an external file
+	EndpointSyncJob struct{}
+
+	// Schedule represents a scheduled job.
+	// It only contains a pointer to one of the JobRunner implementations
+	// based on the JobType.
+	// NOTE: The Recurring option is only used by ScriptExecutionJob at the moment
+	Schedule struct {
+		ID                 ScheduleID `json:"Id"`
+		Name               string
+		CronExpression     string
+		Recurring          bool
+		Created            int64
+		JobType            JobType
+		ScriptExecutionJob *ScriptExecutionJob
+		SnapshotJob        *SnapshotJob
+		EndpointSyncJob    *EndpointSyncJob
+	}
+
+	// WebhookID represents a webhook identifier.
 	WebhookID int
 
 	// WebhookType represents the type of resource a webhook is related to
@@ -245,17 +298,28 @@ type (
 
 	// Snapshot represents a snapshot of a specific endpoint at a specific time
 	Snapshot struct {
-		Time                  int64  `json:"Time"`
-		DockerVersion         string `json:"DockerVersion"`
-		Swarm                 bool   `json:"Swarm"`
-		TotalCPU              int    `json:"TotalCPU"`
-		TotalMemory           int64  `json:"TotalMemory"`
-		RunningContainerCount int    `json:"RunningContainerCount"`
-		StoppedContainerCount int    `json:"StoppedContainerCount"`
-		VolumeCount           int    `json:"VolumeCount"`
-		ImageCount            int    `json:"ImageCount"`
-		ServiceCount          int    `json:"ServiceCount"`
-		StackCount            int    `json:"StackCount"`
+		Time                  int64       `json:"Time"`
+		DockerVersion         string      `json:"DockerVersion"`
+		Swarm                 bool        `json:"Swarm"`
+		TotalCPU              int         `json:"TotalCPU"`
+		TotalMemory           int64       `json:"TotalMemory"`
+		RunningContainerCount int         `json:"RunningContainerCount"`
+		StoppedContainerCount int         `json:"StoppedContainerCount"`
+		VolumeCount           int         `json:"VolumeCount"`
+		ImageCount            int         `json:"ImageCount"`
+		ServiceCount          int         `json:"ServiceCount"`
+		StackCount            int         `json:"StackCount"`
+		SnapshotRaw           SnapshotRaw `json:"SnapshotRaw"`
+	}
+
+	// SnapshotRaw represents all the information related to a snapshot as returned by the Docker API
+	SnapshotRaw struct {
+		Containers interface{} `json:"Containers"`
+		Volumes    interface{} `json:"Volumes"`
+		Networks   interface{} `json:"Networks"`
+		Images     interface{} `json:"Images"`
+		Info       interface{} `json:"Info"`
+		Version    interface{} `json:"Version"`
 	}
 
 	// EndpointGroupID represents an endpoint group identifier
@@ -274,7 +338,8 @@ type (
 		Labels []Pair `json:"Labels"`
 	}
 
-	// EndpointExtension represents a extension associated to an endpoint
+	// EndpointExtension represents a deprecated form of Portainer extension
+	// TODO: legacy extension management
 	EndpointExtension struct {
 		Type EndpointExtensionType `json:"Type"`
 		URL  string                `json:"URL"`
@@ -410,6 +475,36 @@ type (
 	// It can be either a TLS CA file, a TLS certificate file or a TLS key file
 	TLSFileType int
 
+	// ExtensionID represents a extension identifier
+	ExtensionID int
+
+	// Extension represents a Portainer extension
+	Extension struct {
+		ID               ExtensionID        `json:"Id"`
+		Enabled          bool               `json:"Enabled"`
+		Name             string             `json:"Name,omitempty"`
+		ShortDescription string             `json:"ShortDescription,omitempty"`
+		Description      string             `json:"Description,omitempty"`
+		DescriptionURL   string             `json:"DescriptionURL,omitempty"`
+		Price            string             `json:"Price,omitempty"`
+		PriceDescription string             `json:"PriceDescription,omitempty"`
+		Deal             bool               `json:"Deal,omitempty"`
+		Available        bool               `json:"Available,omitempty"`
+		License          LicenseInformation `json:"License,omitempty"`
+		Version          string             `json:"Version"`
+		UpdateAvailable  bool               `json:"UpdateAvailable"`
+		ShopURL          string             `json:"ShopURL,omitempty"`
+		Images           []string           `json:"Images,omitempty"`
+		Logo             string             `json:"Logo,omitempty"`
+	}
+
+	// LicenseInformation represents information about an extension license
+	LicenseInformation struct {
+		LicenseKey string `json:"LicenseKey,omitempty"`
+		Company    string `json:"Company,omitempty"`
+		Expiration string `json:"Expiration,omitempty"`
+	}
+
 	// CLIService represents a service for managing CLI
 	CLIService interface {
 		ParseFlags(version string) (*CLIFlags, error)
@@ -541,6 +636,17 @@ type (
 		DeleteResourceControl(ID ResourceControlID) error
 	}
 
+	// ScheduleService represents a service for managing schedule data
+	ScheduleService interface {
+		Schedule(ID ScheduleID) (*Schedule, error)
+		Schedules() ([]Schedule, error)
+		SchedulesByJobType(jobType JobType) ([]Schedule, error)
+		CreateSchedule(schedule *Schedule) error
+		UpdateSchedule(ID ScheduleID, schedule *Schedule) error
+		DeleteSchedule(ID ScheduleID) error
+		GetNextIdentifier() int
+	}
+
 	// TagService represents a service for managing tag data
 	TagService interface {
 		Tags() ([]Tag, error)
@@ -557,6 +663,14 @@ type (
 		DeleteTemplate(ID TemplateID) error
 	}
 
+	// ExtensionService represents a service for managing extension data
+	ExtensionService interface {
+		Extension(ID ExtensionID) (*Extension, error)
+		Extensions() ([]Extension, error)
+		Persist(extension *Extension) error
+		DeleteExtension(ID ExtensionID) error
+	}
+
 	// CryptoService represents a service for encrypting/hashing data
 	CryptoService interface {
 		Hash(data string) (string, error)
@@ -569,7 +683,7 @@ type (
 		GenerateKeyPair() ([]byte, []byte, error)
 		EncodedPublicKey() string
 		PEMHeaders() (string, string)
-		Sign(message string) (string, error)
+		CreateSignature(message string) (string, error)
 	}
 
 	// JWTService represents a service for managing JWT tokens
@@ -589,11 +703,16 @@ type (
 		DeleteTLSFiles(folder string) error
 		GetStackProjectPath(stackIdentifier string) string
 		StoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error)
+		StoreRegistryManagementFileFromBytes(folder, fileName string, data []byte) (string, error)
 		KeyPairFilesExist() (bool, error)
 		StoreKeyPair(private, public []byte, privatePEMHeader, publicPEMHeader string) error
 		LoadKeyPair() ([]byte, []byte, error)
 		WriteJSONToFile(path string, content interface{}) error
 		FileExists(path string) (bool, error)
+		StoreScheduledJobFileFromBytes(identifier string, data []byte) (string, error)
+		GetScheduleFolder(identifier string) string
+		ExtractExtensionArchive(data []byte) error
+		GetBinaryFolder() string
 	}
 
 	// GitService represents a service for managing Git
@@ -604,10 +723,17 @@ type (
 
 	// JobScheduler represents a service to run jobs on a periodic basis
 	JobScheduler interface {
-		ScheduleEndpointSyncJob(endpointFilePath, interval string) error
-		ScheduleSnapshotJob(interval string) error
-		UpdateSnapshotJob(interval string)
+		ScheduleJob(runner JobRunner) error
+		UpdateJobSchedule(runner JobRunner) error
+		UpdateSystemJobSchedule(jobType JobType, newCronExpression string) error
+		UnscheduleJob(ID ScheduleID)
 		Start()
+	}
+
+	// JobRunner represents a service that can be used to run a job
+	JobRunner interface {
+		Run()
+		GetSchedule() *Schedule
 	}
 
 	// Snapshotter represents a service used to create endpoint snapshots
@@ -635,15 +761,32 @@ type (
 		Up(stack *Stack, endpoint *Endpoint) error
 		Down(stack *Stack, endpoint *Endpoint) error
 	}
+
+	// JobService represents a service to manage job execution on hosts
+	JobService interface {
+		ExecuteScript(endpoint *Endpoint, nodeName, image string, script []byte, schedule *Schedule) error
+	}
+
+	// ExtensionManager represents a service used to manage extensions
+	ExtensionManager interface {
+		FetchExtensionDefinitions() ([]Extension, error)
+		EnableExtension(extension *Extension, licenseKey string) error
+		DisableExtension(extension *Extension) error
+		UpdateExtension(extension *Extension, version string) error
+	}
 )
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "1.19.2"
+	APIVersion = "1.20-dev"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 14
+	DBVersion = 15
+	// AssetsServerURL represents the URL of the Portainer asset server
+	AssetsServerURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com"
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
-	MessageOfTheDayURL = "https://raw.githubusercontent.com/portainer/motd/master/message.html"
+	MessageOfTheDayURL = AssetsServerURL + "/motd.html"
+	// ExtensionDefinitionsURL represents the URL where Portainer extension definitions can be retrieved
+	ExtensionDefinitionsURL = AssetsServerURL + "/extensions.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response
 	PortainerAgentHeader = "Portainer-Agent"
 	// PortainerAgentTargetHeader represent the name of the header containing the target node name
@@ -762,4 +905,32 @@ const (
 	_ WebhookType = iota
 	// ServiceWebhook is a webhook for restarting a docker service
 	ServiceWebhook
+)
+
+const (
+	_ ExtensionID = iota
+	// RegistryManagementExtension represents the registry management extension
+	RegistryManagementExtension
+)
+
+const (
+	_ JobType = iota
+	// ScriptExecutionJobType is a non-system job used to execute a script against a list of
+	// endpoints via privileged containers
+	ScriptExecutionJobType
+	// SnapshotJobType is a system job used to create endpoint snapshots
+	SnapshotJobType
+	// EndpointSyncJobType is a system job used to synchronize endpoints from
+	// an external definition store
+	EndpointSyncJobType
+)
+
+const (
+	_ RegistryType = iota
+	// QuayRegistry represents a Quay.io registry
+	QuayRegistry
+	// AzureRegistry represents an ACR registry
+	AzureRegistry
+	// CustomRegistry represents a custom registry
+	CustomRegistry
 )

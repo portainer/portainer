@@ -129,13 +129,32 @@ angular.module('portainer.docker', ['portainer.app'])
     }
   };
 
-  var engine = {
-    name: 'docker.engine',
-    url: '/engine',
+  var host = {
+    name: 'docker.host',
+    url: '/host',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/engine/engine.html',
-        controller: 'EngineController'
+        component: 'hostView'
+      }
+    }
+  };
+
+  var hostBrowser = {
+    name: 'docker.host.browser',
+    url: '/browser',
+    views: {
+      'content@': {
+        component: 'hostBrowserView'
+      }
+    }
+  };
+
+  var hostJob = {
+    name: 'docker.host.job',
+    url: '/job',
+    views: {
+      'content@': {
+        component: 'hostJobView'
       }
     }
   };
@@ -239,8 +258,27 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/:id',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/nodes/edit/node.html',
-        controller: 'NodeController'
+        component: 'nodeDetailsView'
+      }
+    }
+  };
+
+  var nodeBrowser = {
+    name: 'docker.nodes.node.browse',
+    url: '/browse',
+    views: {
+      'content@': {
+        component: 'nodeBrowserView'
+      }
+    }
+  };
+
+  var nodeJob = {
+    name: 'docker.nodes.node.job',
+    url: '/job',
+    views: {
+      'content@': {
+        component: 'nodeJobView'
       }
     }
   };
@@ -416,6 +454,8 @@ angular.module('portainer.docker', ['portainer.app'])
     }
   };
 
+
+
   $stateRegistryProvider.register(configs);
   $stateRegistryProvider.register(config);
   $stateRegistryProvider.register(configCreation);
@@ -428,7 +468,9 @@ angular.module('portainer.docker', ['portainer.app'])
   $stateRegistryProvider.register(containerStats);
   $stateRegistryProvider.register(docker);
   $stateRegistryProvider.register(dashboard);
-  $stateRegistryProvider.register(engine);
+  $stateRegistryProvider.register(host);
+  $stateRegistryProvider.register(hostBrowser);
+  $stateRegistryProvider.register(hostJob);
   $stateRegistryProvider.register(events);
   $stateRegistryProvider.register(images);
   $stateRegistryProvider.register(image);
@@ -439,6 +481,8 @@ angular.module('portainer.docker', ['portainer.app'])
   $stateRegistryProvider.register(networkCreation);
   $stateRegistryProvider.register(nodes);
   $stateRegistryProvider.register(node);
+  $stateRegistryProvider.register(nodeBrowser);
+  $stateRegistryProvider.register(nodeJob);
   $stateRegistryProvider.register(secrets);
   $stateRegistryProvider.register(secret);
   $stateRegistryProvider.register(secretCreation);

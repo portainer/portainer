@@ -93,6 +93,21 @@ const (
 	ErrNotAvailableInDemo = Error("This feature is not available in the demo version of Portainer")
 )
 
+// Extension errors.
+const (
+	ErrExtensionAlreadyEnabled = Error("This extension is already enabled")
+)
+
+// Docker errors.
+const (
+	ErrUnableToPingEndpoint = Error("Unable to communicate with the endpoint")
+)
+
+// Schedule errors.
+const (
+	ErrHostManagementFeaturesDisabled = Error("Host management features are disabled")
+)
+
 // Error represents an application error.
 type Error string
 

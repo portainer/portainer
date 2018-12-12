@@ -17,7 +17,7 @@
       </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus>
+        <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" ng-change="$ctrl.onTextFilterChange()" placeholder="Search..." auto-focus>
       </div>
       <div class="table-responsive">
         <table class="table table-hover nowrap-cells">
@@ -60,6 +60,12 @@
               <td>
                 <a ui-sref="portainer.registries.registry.access({id: item.Id})" ng-if="$ctrl.accessManagement">
                   <i class="fa fa-users" aria-hidden="true"></i> Manage access
+                </a>
+                <a ui-sref="portainer.registries.registry.repositories({id: item.Id})" ng-if="$ctrl.registryManagement" class="space-left">
+                  <i class="fa fa-search" aria-hidden="true"></i> Browse
+                </a>
+                <a ui-sref="portainer.extensions.extension({id: 1})" ng-if="!$ctrl.registryManagement" class="space-left" style="color: #767676" tooltip-append-to-body="true" tooltip-placement="bottom" tooltip-class="portainer-tooltip" uib-tooltip="Feature available via an extension">
+                  <i class="fa fa-search" aria-hidden="true"></i> Browse (extension)
                 </a>
               </td>
             </tr>

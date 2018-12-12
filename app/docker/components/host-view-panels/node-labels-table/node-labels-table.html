@@ -1,0 +1,35 @@
+<div ng-if="!$ctrl.labels.length">
+  There are no labels for this node.
+</div>
+
+<table class="table" ng-if="$ctrl.labels.length">
+  <thead>
+    <tr>
+      <th>Label</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="label in $ctrl.labels">
+      <td>
+        <div class="input-group input-group-sm">
+          <span class="input-group-addon fit-text-size">Name</span>
+          <input type="text" class="form-control" ng-model="label.key" placeholder="e.g. com.example.foo"
+            ng-change="$ctrl.updateLabel(label)">
+        </div>
+      </td>
+      <td>
+        <div class="input-group input-group-sm">
+          <span class="input-group-addon fit-text-size">Value</span>
+          <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar"
+            ng-change="$ctrl.updateLabel(label)">
+          <span class="input-group-btn">
+            <button class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removeLabel($index)">
+              <i class="fa fa-trash" aria-hidden="true"></i>
+            </button>
+          </span>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>

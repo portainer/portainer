@@ -41,4 +41,16 @@ function ($scope, $state, Notifications, Authentication, StateManager, UserServi
     });
   };
 
+  function createAdministratorFlow() {
+    UserService.administratorExists()
+    .then(function success(exists) {
+      if (exists) {
+        $state.go('portainer.home');
+      }
+    })
+    .catch(function error(err) {
+      Notifications.error('Failure', err, 'Unable to verify administrator account existence');
+    });
+  }
+  createAdministratorFlow();
 }]);

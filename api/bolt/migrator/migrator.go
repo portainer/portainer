@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/portainer/bolt/resourcecontrol"
 	"github.com/portainer/portainer/bolt/settings"
 	"github.com/portainer/portainer/bolt/stack"
+	"github.com/portainer/portainer/bolt/template"
 	"github.com/portainer/portainer/bolt/user"
 	"github.com/portainer/portainer/bolt/version"
 )
@@ -22,6 +23,7 @@ type (
 		resourceControlService *resourcecontrol.Service
 		settingsService        *settings.Service
 		stackService           *stack.Service
+		templateService        *template.Service
 		userService            *user.Service
 		versionService         *version.Service
 		fileService            portainer.FileService
@@ -36,6 +38,7 @@ type (
 		ResourceControlService *resourcecontrol.Service
 		SettingsService        *settings.Service
 		StackService           *stack.Service
+		TemplateService        *template.Service
 		UserService            *user.Service
 		VersionService         *version.Service
 		FileService            portainer.FileService
@@ -51,6 +54,7 @@ func NewMigrator(parameters *Parameters) *Migrator {
 		endpointService:        parameters.EndpointService,
 		resourceControlService: parameters.ResourceControlService,
 		settingsService:        parameters.SettingsService,
+		templateService:        parameters.TemplateService,
 		stackService:           parameters.StackService,
 		userService:            parameters.UserService,
 		versionService:         parameters.VersionService,
@@ -181,6 +185,19 @@ func (m *Migrator) Migrate() error {
 	// Portainer 1.19.2
 	if m.currentDBVersion < 14 {
 		err := m.updateResourceControlsToDBVersion14()
+		if err != nil {
+			return err
+		}
+	}
+
+	// Portainer 1.20-dev
+	if m.currentDBVersion < 15 {
+		err := m.updateSettingsToDBVersion15()
+		if err != nil {
+			return err
+		}
+
+		err = m.updateTemplatesToVersion15()
 		if err != nil {
 			return err
 		}

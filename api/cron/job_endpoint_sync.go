@@ -9,44 +9,93 @@ import (
 	"github.com/portainer/portainer"
 )
 
-type (
-	endpointSyncJob struct {
-		endpointService  portainer.EndpointService
-		endpointFilePath string
-	}
+// EndpointSyncJobRunner is used to run a EndpointSyncJob
+type EndpointSyncJobRunner struct {
+	schedule *portainer.Schedule
+	context  *EndpointSyncJobContext
+}
 
-	synchronization struct {
-		endpointsToCreate []*portainer.Endpoint
-		endpointsToUpdate []*portainer.Endpoint
-		endpointsToDelete []*portainer.Endpoint
-	}
+// EndpointSyncJobContext represents the context of execution of a EndpointSyncJob
+type EndpointSyncJobContext struct {
+	endpointService  portainer.EndpointService
+	endpointFilePath string
+}
 
-	fileEndpoint struct {
-		Name          string `json:"Name"`
-		URL           string `json:"URL"`
-		TLS           bool   `json:"TLS,omitempty"`
-		TLSSkipVerify bool   `json:"TLSSkipVerify,omitempty"`
-		TLSCACert     string `json:"TLSCACert,omitempty"`
-		TLSCert       string `json:"TLSCert,omitempty"`
-		TLSKey        string `json:"TLSKey,omitempty"`
-	}
-)
-
-const (
-	// ErrEmptyEndpointArray is an error raised when the external endpoint source array is empty.
-	ErrEmptyEndpointArray = portainer.Error("External endpoint source is empty")
-)
-
-func newEndpointSyncJob(endpointFilePath string, endpointService portainer.EndpointService) endpointSyncJob {
-	return endpointSyncJob{
+// NewEndpointSyncJobContext returns a new context that can be used to execute a EndpointSyncJob
+func NewEndpointSyncJobContext(endpointService portainer.EndpointService, endpointFilePath string) *EndpointSyncJobContext {
+	return &EndpointSyncJobContext{
 		endpointService:  endpointService,
 		endpointFilePath: endpointFilePath,
 	}
 }
 
+// NewEndpointSyncJobRunner returns a new runner that can be scheduled
+func NewEndpointSyncJobRunner(schedule *portainer.Schedule, context *EndpointSyncJobContext) *EndpointSyncJobRunner {
+	return &EndpointSyncJobRunner{
+		schedule: schedule,
+		context:  context,
+	}
+}
+
+type synchronization struct {
+	endpointsToCreate []*portainer.Endpoint
+	endpointsToUpdate []*portainer.Endpoint
+	endpointsToDelete []*portainer.Endpoint
+}
+
+type fileEndpoint struct {
+	Name          string `json:"Name"`
+	URL           string `json:"URL"`
+	TLS           bool   `json:"TLS,omitempty"`
+	TLSSkipVerify bool   `json:"TLSSkipVerify,omitempty"`
+	TLSCACert     string `json:"TLSCACert,omitempty"`
+	TLSCert       string `json:"TLSCert,omitempty"`
+	TLSKey        string `json:"TLSKey,omitempty"`
+}
+
+// GetSchedule returns the schedule associated to the runner
+func (runner *EndpointSyncJobRunner) GetSchedule() *portainer.Schedule {
+	return runner.schedule
+}
+
+// Run triggers the execution of the endpoint synchronization process.
+func (runner *EndpointSyncJobRunner) Run() {
+	data, err := ioutil.ReadFile(runner.context.endpointFilePath)
+	if endpointSyncError(err) {
+		return
+	}
+
+	var fileEndpoints []fileEndpoint
+	err = json.Unmarshal(data, &fileEndpoints)
+	if endpointSyncError(err) {
+		return
+	}
+
+	if len(fileEndpoints) == 0 {
+		log.Println("background job error (endpoint synchronization). External endpoint source is empty")
+		return
+	}
+
+	storedEndpoints, err := runner.context.endpointService.Endpoints()
+	if endpointSyncError(err) {
+		return
+	}
+
+	convertedFileEndpoints := convertFileEndpoints(fileEndpoints)
+
+	sync := prepareSyncData(storedEndpoints, convertedFileEndpoints)
+	if sync.requireSync() {
+		err = runner.context.endpointService.Synchronize(sync.endpointsToCreate, sync.endpointsToUpdate, sync.endpointsToDelete)
+		if endpointSyncError(err) {
+			return
+		}
+		log.Printf("Endpoint synchronization ended. [created: %v] [updated: %v] [deleted: %v]", len(sync.endpointsToCreate), len(sync.endpointsToUpdate), len(sync.endpointsToDelete))
+	}
+}
+
 func endpointSyncError(err error) bool {
 	if err != nil {
-		log.Printf("cron error: synchronization job error (err=%s)\n", err)
+		log.Printf("background job error (endpoint synchronization). Unable to synchronize endpoints (err=%s)\n", err)
 		return true
 	}
 	return false
@@ -126,8 +175,7 @@ func (sync synchronization) requireSync() bool {
 	return false
 }
 
-// TMP: endpointSyncJob method to access logger, should be generic
-func (job endpointSyncJob) prepareSyncData(storedEndpoints, fileEndpoints []portainer.Endpoint) *synchronization {
+func prepareSyncData(storedEndpoints, fileEndpoints []portainer.Endpoint) *synchronization {
 	endpointsToCreate := make([]*portainer.Endpoint, 0)
 	endpointsToUpdate := make([]*portainer.Endpoint, 0)
 	endpointsToDelete := make([]*portainer.Endpoint, 0)
@@ -163,44 +211,4 @@ func (job endpointSyncJob) prepareSyncData(storedEndpoints, fileEndpoints []port
 		endpointsToUpdate: endpointsToUpdate,
 		endpointsToDelete: endpointsToDelete,
 	}
-}
-
-func (job endpointSyncJob) Sync() error {
-	data, err := ioutil.ReadFile(job.endpointFilePath)
-	if endpointSyncError(err) {
-		return err
-	}
-
-	var fileEndpoints []fileEndpoint
-	err = json.Unmarshal(data, &fileEndpoints)
-	if endpointSyncError(err) {
-		return err
-	}
-
-	if len(fileEndpoints) == 0 {
-		return ErrEmptyEndpointArray
-	}
-
-	storedEndpoints, err := job.endpointService.Endpoints()
-	if endpointSyncError(err) {
-		return err
-	}
-
-	convertedFileEndpoints := convertFileEndpoints(fileEndpoints)
-
-	sync := job.prepareSyncData(storedEndpoints, convertedFileEndpoints)
-	if sync.requireSync() {
-		err = job.endpointService.Synchronize(sync.endpointsToCreate, sync.endpointsToUpdate, sync.endpointsToDelete)
-		if endpointSyncError(err) {
-			return err
-		}
-		log.Printf("Endpoint synchronization ended. [created: %v] [updated: %v] [deleted: %v]", len(sync.endpointsToCreate), len(sync.endpointsToUpdate), len(sync.endpointsToDelete))
-	}
-	return nil
-}
-
-func (job endpointSyncJob) Run() {
-	log.Println("cron: synchronization job started")
-	err := job.Sync()
-	endpointSyncError(err)
 }
