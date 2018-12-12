@@ -96,6 +96,7 @@ func initDemoData(store *bolt.Store, cryptoService portainer.CryptoService) erro
 		AuthorizedUsers: []portainer.UserID{},
 		AuthorizedTeams: []portainer.TeamID{},
 		Extensions:      []portainer.EndpointExtension{},
+		Tags:            []string{},
 	}
 
 	err = store.EndpointService.CreateEndpoint(localEndpoint)
@@ -187,6 +188,8 @@ func loadSnapshotSystemSchedule(jobScheduler portainer.JobScheduler, snapshotter
 	if err != nil {
 		return err
 	}
+
+	snapshotJobRunner.Run()
 
 	if len(schedules) == 0 {
 		return scheduleService.CreateSchedule(snapshotSchedule)
