@@ -57,6 +57,10 @@ func buildExtensionPath(binaryPath string, extension *portainer.Extension) strin
 	extensionFilename += "-" + runtime.GOOS + "-" + runtime.GOARCH
 	extensionFilename += "-" + extension.Version
 
+	if runtime.GOOS == "windows" {
+		extensionFilename += ".exe"
+	}
+
 	extensionPath := path.Join(
 		binaryPath,
 		extensionFilename)
