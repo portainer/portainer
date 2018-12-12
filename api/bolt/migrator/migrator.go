@@ -190,7 +190,7 @@ func (m *Migrator) Migrate() error {
 		}
 	}
 
-	// Portainer 1.20-dev
+	// Portainer 1.20.0
 	if m.currentDBVersion < 15 {
 		err := m.updateSettingsToDBVersion15()
 		if err != nil {
