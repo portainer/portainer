@@ -1,0 +1,125 @@
+<rd-header>
+  <rd-header-title title-text="Extensions"></rd-header-title>
+  <rd-header-content>Portainer extensions</rd-header-content>
+</rd-header>
+
+<information-panel title-text="Information">
+  <span class="text-muted" style="font-size: 90%;">
+    <p>
+    Portainer CE is a great way of managing clusters, provisioning containers and services and
+    managing container environment lifecycles. To extend the benefit of Portainer CE even
+    more, and to address the needs of larger, complex or critical environments, the Portainer
+    team provides a growing range of low-cost Extensions.
+    </p>
+
+    <p>
+    As the diagram shows, running a successful production container environment requires a
+    range of capability across a number of complex technical areas.
+    </p>
+
+    <p style="text-align: center; margin: 15px 0 15px 0;">
+      <img src="images/extensions_overview_diagram.png" alt="extensions overview">
+    </p>
+
+    <p>
+    Available through a simple subscription process from the menu, Portainer Extensions
+    answers this need and provides a simple way to enhance the functionality that Portainer
+    makes available through incremental capability in important areas.
+    </p>
+
+    <p>
+    The vision for Portainer is to be the standard management layer for container platforms. In
+    order to achieve this vision, Portainer CE will be extended across a range of new functional
+    areas. In order to ensure that Portainer remains the best choice for managing production
+    container platforms, the Portainer team have chosen a modular extensible design approach,
+    where additional capability can be added to the Portainer CE core as needed, and at very
+    low cost.
+    </p>
+
+    <p>
+    The advantage of an extensible design is clear: While a range of capability is available, only
+    necessary functionality is added as and when needed.
+    </p>
+
+    <p>
+    Our first extension is <a ui-sref="portainer.extensions.extension({id: 1})">Registry Manager</a>, available now. Others (such as
+    Single Sign On and Operations Management) are scheduled for the early part of 2019.
+    </p>
+
+    <p>
+    Portainer CE is the core of the Portainer management environments. Portainer CE will
+    continue to be developed and made freely available as part of our deep commitment to our
+    Open Source heritage and our user community. Portainer CE will always deliver great
+    functionality and remain the industry standard toolset for managing container-based
+    platforms.
+    </p>
+  </span>
+</information-panel>
+
+<div class="row">
+  <div class="col-sm-12">
+
+    <rd-widget>
+      <rd-widget-body>
+
+        <form class="form-horizontal" name="extensionEnableForm">
+          <div class="col-sm-12 form-section-title">
+            Enable extension
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-12">
+              <span class="small text-muted">
+                Ensure that you have a valid license.
+              </span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="extension_license" class="col-sm-2 control-label text-left">License</label>
+            <div class="col-sm-10">
+              <input type="text" name="extension_license" class="form-control" ng-model="formValues.License" ng-change="isValidLicenseFormat(extensionEnableForm)" required placeholder="Enter a license key here">
+            </div>
+          </div>
+
+          <div class="form-group" ng-show="extensionEnableForm.extension_license.$invalid">
+            <div class="col-sm-12 small text-warning">
+              <div ng-messages="extensionEnableForm.extension_license.$error">
+                <p ng-message="invalidLicense"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Invalid license format.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-primary btn-sm" ng-click="enableExtension()" ng-disabled="state.actionInProgress || !extensionEnableForm.$valid" button-spinner="state.actionInProgress" style="margin-left: 0px;">
+                <span ng-hide="state.actionInProgress">Enable extension</span>
+                <span ng-show="state.actionInProgress">Enabling extension...</span>
+              </button>
+            </div>
+          </div>
+
+        </form>
+
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-if="extensions && extensions.length > 0">
+  <div class="col-sm-12">
+    <extension-list
+    current-date="state.currentDate"
+    extensions="extensions"
+    ></extension-list>
+  </div>
+</div>
+
+<information-panel title-text="Error" ng-if="extensions && extensions.length === 0">
+  <span class="small text-muted">
+    <p>
+      <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true"></i>
+      Portainer must be connected to the Internet to fetch the list of available extensions.
+    </p>
+  </span>
+</information-panel>

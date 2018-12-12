@@ -27,12 +27,13 @@ func NewClientFactory(signatureService portainer.DigitalSignatureService) *Clien
 }
 
 // CreateClient is a generic function to create a Docker client based on
-// a specific endpoint configuration
-func (factory *ClientFactory) CreateClient(endpoint *portainer.Endpoint) (*client.Client, error) {
+// a specific endpoint configuration. The nodeName parameter can be used
+// with an agent enabled endpoint to target a specific node in an agent cluster.
+func (factory *ClientFactory) CreateClient(endpoint *portainer.Endpoint, nodeName string) (*client.Client, error) {
 	if endpoint.Type == portainer.AzureEnvironment {
 		return nil, unsupportedEnvironmentType
 	} else if endpoint.Type == portainer.AgentOnDockerEnvironment {
-		return createAgentClient(endpoint, factory.signatureService)
+		return createAgentClient(endpoint, factory.signatureService, nodeName)
 	}
 
 	if strings.HasPrefix(endpoint.URL, "unix://") || strings.HasPrefix(endpoint.URL, "npipe://") {
@@ -61,13 +62,13 @@ func createTCPClient(endpoint *portainer.Endpoint) (*client.Client, error) {
 	)
 }
 
-func createAgentClient(endpoint *portainer.Endpoint, signatureService portainer.DigitalSignatureService) (*client.Client, error) {
+func createAgentClient(endpoint *portainer.Endpoint, signatureService portainer.DigitalSignatureService, nodeName string) (*client.Client, error) {
 	httpCli, err := httpClient(endpoint)
 	if err != nil {
 		return nil, err
 	}
 
-	signature, err := signatureService.Sign(portainer.PortainerAgentSignatureMessage)
+	signature, err := signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
 	if err != nil {
 		return nil, err
 	}
@@ -75,6 +76,10 @@ func createAgentClient(endpoint *portainer.Endpoint, signatureService portainer.
 	headers := map[string]string{
 		portainer.PortainerAgentPublicKeyHeader: signatureService.EncodedPublicKey(),
 		portainer.PortainerAgentSignatureHeader: signature,
+	}
+
+	if nodeName != "" {
+		headers[portainer.PortainerAgentTargetHeader] = nodeName
 	}
 
 	return client.NewClientWithOpts(
@@ -97,7 +102,7 @@ func httpClient(endpoint *portainer.Endpoint) (*http.Client, error) {
 	}
 
 	return &http.Client{
-		Timeout:   time.Second * 10,
 		Transport: transport,
+		Timeout:   30 * time.Second,
 	}, nil
 }

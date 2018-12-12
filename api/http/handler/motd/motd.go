@@ -16,9 +16,9 @@ type motdResponse struct {
 
 func (handler *Handler) motd(w http.ResponseWriter, r *http.Request) {
 
-	motd, err := client.Get(portainer.MessageOfTheDayURL)
+	motd, err := client.Get(portainer.MessageOfTheDayURL, 0)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		response.JSON(w, &motdResponse{Message: ""})
 		return
 	}
 

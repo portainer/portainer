@@ -198,6 +198,28 @@ angular.module('portainer.app', [])
     }
   };
 
+  var extensions = {
+    name: 'portainer.extensions',
+    url: '/extensions',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/extensions/extensions.html',
+        controller: 'ExtensionsController'
+      }
+    }
+  };
+
+  var extension = {
+    name: 'portainer.extensions.extension',
+    url: '/extension/:id',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/extensions/inspect/extension.html',
+        controller: 'ExtensionController'
+      }
+    }
+  };
+
   var registries = {
     name: 'portainer.registries',
     url: '/registries',
@@ -238,6 +260,39 @@ angular.module('portainer.app', [])
       'content@': {
         templateUrl: 'app/portainer/views/registries/access/registryAccess.html',
         controller: 'RegistryAccessController'
+      }
+    }
+  };
+
+  var schedules = {
+    name: 'portainer.schedules',
+    url: '/schedules',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/schedules/schedules.html',
+        controller: 'SchedulesController'
+      }
+    }
+  };
+
+  var schedule = {
+    name: 'portainer.schedules.schedule',
+    url: '/:id',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/schedules/edit/schedule.html',
+        controller: 'ScheduleController'
+      }
+    }
+  };
+
+  var scheduleCreation  = {
+    name: 'portainer.schedules.new',
+    url: '/new',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/schedules/create/createschedule.html',
+        controller: 'CreateScheduleController'
       }
     }
   };
@@ -287,8 +342,8 @@ angular.module('portainer.app', [])
   };
 
   var stackCreation = {
-    name: 'portainer.stacks.new',
-    url: '/new',
+    name: 'portainer.newstack',
+    url: '/newstack',
     views: {
       'content@': {
         templateUrl: 'app/portainer/views/stacks/create/createstack.html',
@@ -302,7 +357,22 @@ angular.module('portainer.app', [])
     url: '/support',
     views: {
       'content@': {
-        templateUrl: 'app/portainer/views/support/support.html'
+        templateUrl: 'app/portainer/views/support/support.html',
+        controller: 'SupportController'
+      }
+    },
+    params: {
+      product: {}
+    }
+  };
+
+  var supportProduct = {
+    name: 'portainer.support.product',
+    url: '/product',
+    views: {
+      'content@': {
+        templateUrl: 'app/portainer/views/support/product/product.html',
+        controller: 'SupportProductController'
       }
     }
   };
@@ -424,16 +494,22 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(init);
   $stateRegistryProvider.register(initEndpoint);
   $stateRegistryProvider.register(initAdmin);
+  $stateRegistryProvider.register(extensions);
+  $stateRegistryProvider.register(extension);
   $stateRegistryProvider.register(registries);
   $stateRegistryProvider.register(registry);
   $stateRegistryProvider.register(registryAccess);
   $stateRegistryProvider.register(registryCreation);
+  $stateRegistryProvider.register(schedules);
+  $stateRegistryProvider.register(schedule);
+  $stateRegistryProvider.register(scheduleCreation);
   $stateRegistryProvider.register(settings);
   $stateRegistryProvider.register(settingsAuthentication);
   $stateRegistryProvider.register(stacks);
   $stateRegistryProvider.register(stack);
   $stateRegistryProvider.register(stackCreation);
   $stateRegistryProvider.register(support);
+  $stateRegistryProvider.register(supportProduct);
   $stateRegistryProvider.register(tags);
   $stateRegistryProvider.register(updatePassword);
   $stateRegistryProvider.register(users);

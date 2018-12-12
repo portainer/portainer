@@ -1,6 +1,6 @@
 angular.module('portainer.docker').component('tasksDatatable', {
   templateUrl: 'app/docker/components/datatables/tasks-datatable/tasksDatatable.html',
-  controller: 'GenericDatatableController',
+  controller: 'TasksDatatableController',
   bindings: {
     titleText: '@',
     titleIcon: '@',

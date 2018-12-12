@@ -15,6 +15,7 @@ import (
 
 const (
 	errInvalidResponseStatus = portainer.Error("Invalid response status (expecting 200)")
+	defaultHTTPTimeout       = 5
 )
 
 // HTTPClient represents a client to send HTTP requests.
@@ -26,7 +27,7 @@ type HTTPClient struct {
 func NewHTTPClient() *HTTPClient {
 	return &HTTPClient{
 		&http.Client{
-			Timeout: time.Second * 5,
+			Timeout: time.Second * time.Duration(defaultHTTPTimeout),
 		},
 	}
 }
@@ -67,10 +68,16 @@ func (client *HTTPClient) ExecuteAzureAuthenticationRequest(credentials *portain
 }
 
 // Get executes a simple HTTP GET to the specified URL and returns
-// the content of the response body.
-func Get(url string) ([]byte, error) {
+// the content of the response body. Timeout can be specified via the timeout parameter,
+// will default to defaultHTTPTimeout if set to 0.
+func Get(url string, timeout int) ([]byte, error) {
+
+	if timeout == 0 {
+		timeout = defaultHTTPTimeout
+	}
+
 	client := &http.Client{
-		Timeout: time.Second * 3,
+		Timeout: time.Second * time.Duration(timeout),
 	}
 
 	response, err := client.Get(url)
