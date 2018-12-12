@@ -13,7 +13,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('default', ['eslint', 'build']);
 
-  grunt.registerTask('build-webapp', ['config:prod', 'clean:all', 'copy:templates','webpack:prod']);
+  grunt.registerTask('build-webapp', ['config:prod','env:prod', 'clean:all', 'copy:templates','webpack:prod']);
 
   grunt.registerTask('build', [
     'config:dev',
@@ -36,6 +36,7 @@ module.exports = function(grunt) {
   ) {
     grunt.task.run([
       'config:prod',
+      'env:prod',
       'clean:all',
       'copy:templates',
       'shell:buildBinary:' + p + ':' + a,
@@ -66,12 +67,21 @@ module.exports = function(grunt) {
     eslint: gruntfile_cfg.eslint,
     shell: gruntfile_cfg.shell,
     copy: gruntfile_cfg.copy,
-    webpack: gruntfile_cfg.webpack
+    webpack: gruntfile_cfg.webpack,
+    env: gruntfile_cfg.env
   });
 };
 
 /***/
 
+gruntfile_cfg.env = {
+  dev: {
+    NODE_ENV: 'development'
+  },
+  prod: {
+    NODE_ENV: 'production'
+  }
+}
 
 gruntfile_cfg.webpack = {
   dev: webpackDevConfig,
