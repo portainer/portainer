@@ -203,5 +203,12 @@ func (m *Migrator) Migrate() error {
 		}
 	}
 
+	if m.currentDBVersion < 16 {
+		err := m.updateSettingsToDBVersion16()
+		if err != nil {
+			return err
+		}
+	}
+
 	return m.versionService.StoreDBVersion(portainer.DBVersion)
 }
