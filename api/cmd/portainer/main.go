@@ -116,9 +116,10 @@ func initJobScheduler() portainer.JobScheduler {
 	return cron.NewJobScheduler()
 }
 
-func loadSnapshotSystemSchedule(jobScheduler portainer.JobScheduler, snapshotter portainer.Snapshotter, scheduleService portainer.ScheduleService, endpointService portainer.EndpointService, flags *portainer.CLIFlags) error {
-	if !*flags.Snapshot {
-		return nil
+func loadSnapshotSystemSchedule(jobScheduler portainer.JobScheduler, snapshotter portainer.Snapshotter, scheduleService portainer.ScheduleService, endpointService portainer.EndpointService, settingsService portainer.SettingsService) error {
+	settings, err := settingsService.Settings()
+	if err != nil {
+		return err
 	}
 
 	schedules, err := scheduleService.SchedulesByJobType(portainer.SnapshotJobType)
@@ -126,20 +127,20 @@ func loadSnapshotSystemSchedule(jobScheduler portainer.JobScheduler, snapshotter
 		return err
 	}
 
-	if len(schedules) != 0 {
-		return nil
-	}
-
-	snapshotJob := &portainer.SnapshotJob{}
-
-	snapshotSchedule := &portainer.Schedule{
-		ID:             portainer.ScheduleID(scheduleService.GetNextIdentifier()),
-		Name:           "system_snapshot",
-		CronExpression: "@every " + *flags.SnapshotInterval,
-		Recurring:      true,
-		JobType:        portainer.SnapshotJobType,
-		SnapshotJob:    snapshotJob,
-		Created:        time.Now().Unix(),
+	var snapshotSchedule *portainer.Schedule
+	if len(schedules) == 0 {
+		snapshotJob := &portainer.SnapshotJob{}
+		snapshotSchedule = &portainer.Schedule{
+			ID:             portainer.ScheduleID(scheduleService.GetNextIdentifier()),
+			Name:           "system_snapshot",
+			CronExpression: "@every " + settings.SnapshotInterval,
+			Recurring:      true,
+			JobType:        portainer.SnapshotJobType,
+			SnapshotJob:    snapshotJob,
+			Created:        time.Now().Unix(),
+		}
+	} else {
+		snapshotSchedule = &schedules[0]
 	}
 
 	snapshotJobContext := cron.NewSnapshotJobContext(endpointService, snapshotter)
@@ -150,7 +151,10 @@ func loadSnapshotSystemSchedule(jobScheduler portainer.JobScheduler, snapshotter
 		return err
 	}
 
-	return scheduleService.CreateSchedule(snapshotSchedule)
+	if len(schedules) == 0 {
+		return scheduleService.CreateSchedule(snapshotSchedule)
+	}
+	return nil
 }
 
 func loadEndpointSyncSystemSchedule(jobScheduler portainer.JobScheduler, scheduleService portainer.ScheduleService, endpointService portainer.EndpointService, flags *portainer.CLIFlags) error {
@@ -538,25 +542,6 @@ func main() {
 
 	snapshotter := initSnapshotter(clientFactory)
 
-	jobScheduler := initJobScheduler()
-
-	err = loadSchedulesFromDatabase(jobScheduler, jobService, store.ScheduleService, store.EndpointService, fileService)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = loadEndpointSyncSystemSchedule(jobScheduler, store.ScheduleService, store.EndpointService, flags)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = loadSnapshotSystemSchedule(jobScheduler, snapshotter, store.ScheduleService, store.EndpointService, flags)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	jobScheduler.Start()
-
 	endpointManagement := true
 	if *flags.ExternalEndpoints != "" {
 		endpointManagement = false
@@ -578,6 +563,27 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	jobScheduler := initJobScheduler()
+
+	err = loadSchedulesFromDatabase(jobScheduler, jobService, store.ScheduleService, store.EndpointService, fileService)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = loadEndpointSyncSystemSchedule(jobScheduler, store.ScheduleService, store.EndpointService, flags)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if *flags.Snapshot {
+		err = loadSnapshotSystemSchedule(jobScheduler, snapshotter, store.ScheduleService, store.EndpointService, store.SettingsService)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	jobScheduler.Start()
 
 	err = initDockerHub(store.DockerHubService)
 	if err != nil {

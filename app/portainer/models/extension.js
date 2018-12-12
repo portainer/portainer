@@ -11,7 +11,7 @@ export function ExtensionViewModel(data) {
   this.License = data.License;
   this.Version = data.Version;
   this.UpdateAvailable = data.UpdateAvailable;
-  this.ProductId = data.ProductId;
+  this.ShopURL = data.ShopURL;
   this.Images = data.Images;
   this.Logo = data.Logo;
 }

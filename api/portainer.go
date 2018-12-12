@@ -485,6 +485,7 @@ type (
 		Name             string             `json:"Name,omitempty"`
 		ShortDescription string             `json:"ShortDescription,omitempty"`
 		Description      string             `json:"Description,omitempty"`
+		DescriptionURL   string             `json:"DescriptionURL,omitempty"`
 		Price            string             `json:"Price,omitempty"`
 		PriceDescription string             `json:"PriceDescription,omitempty"`
 		Deal             bool               `json:"Deal,omitempty"`
@@ -492,7 +493,7 @@ type (
 		License          LicenseInformation `json:"License,omitempty"`
 		Version          string             `json:"Version"`
 		UpdateAvailable  bool               `json:"UpdateAvailable"`
-		ProductID        int                `json:"ProductId,omitempty"`
+		ShopURL          string             `json:"ShopURL,omitempty"`
 		Images           []string           `json:"Images,omitempty"`
 		Logo             string             `json:"Logo,omitempty"`
 	}
@@ -682,7 +683,7 @@ type (
 		GenerateKeyPair() ([]byte, []byte, error)
 		EncodedPublicKey() string
 		PEMHeaders() (string, string)
-		CreateSignature() (string, error)
+		CreateSignature(message string) (string, error)
 	}
 
 	// JWTService represents a service for managing JWT tokens
@@ -777,13 +778,15 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "1.20-dev"
+	APIVersion = "1.20.0"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 15
+	DBVersion = 16
+	// AssetsServerURL represents the URL of the Portainer asset server
+	AssetsServerURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com"
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
-	MessageOfTheDayURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com/motd.html"
+	MessageOfTheDayURL = AssetsServerURL + "/motd.html"
 	// ExtensionDefinitionsURL represents the URL where Portainer extension definitions can be retrieved
-	ExtensionDefinitionsURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com/extensions.json"
+	ExtensionDefinitionsURL = AssetsServerURL + "/extensions.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response
 	PortainerAgentHeader = "Portainer-Agent"
 	// PortainerAgentTargetHeader represent the name of the header containing the target node name
