@@ -111,7 +111,7 @@ func (handler *Handler) proxyWebsocketRequest(w http.ResponseWriter, r *http.Req
 		}
 	}
 
-	signature, err := handler.SignatureService.CreateSignature()
+	signature, err := handler.SignatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
 	if err != nil {
 		return err
 	}
