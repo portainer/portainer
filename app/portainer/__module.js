@@ -55,7 +55,7 @@ angular.module('portainer.app', [])
     },
     views: {
       'content@': {
-        templateUrl: "./views/auth/auth.html",
+        templateUrl: './views/auth/auth.html',
         controller: 'AuthenticationController'
       },
       'sidebar@': {}

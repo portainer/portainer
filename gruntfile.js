@@ -13,7 +13,12 @@ module.exports = function(grunt) {
 
   grunt.registerTask('default', ['eslint', 'build']);
 
-  grunt.registerTask('build-webapp', ['config:prod','env:prod', 'clean:all', 'copy:templates','webpack:prod']);
+  grunt.registerTask('build-webapp', [
+    'config:prod',
+    'env:prod',
+    'clean:all',
+    'copy:templates',
+    'webpack:prod']);
 
   grunt.registerTask('build', [
     'config:dev',
@@ -30,20 +35,18 @@ module.exports = function(grunt) {
     'shell:run:' + arch
   ]);
 
-  grunt.task.registerTask('release', 'release:<platform>:<arch>', function(
-    p = 'linux',
-    a = arch
-  ) {
-    grunt.task.run([
-      'config:prod',
-      'env:prod',
-      'clean:all',
-      'copy:templates',
-      'shell:buildBinary:' + p + ':' + a,
-      'shell:downloadDockerBinary:' + p + ':' + a,
-      'webpack:prod'
-    ]);
-  });
+  grunt.task.registerTask('release', 'release:<platform>:<arch>',
+    function (p = 'linux', a = arch) {
+      grunt.task.run([
+        'config:prod',
+        'env:prod',
+        'clean:all',
+        'copy:templates',
+        'shell:buildBinary:' + p + ':' + a,
+        'shell:downloadDockerBinary:' + p + ':' + a,
+        'webpack:prod'
+      ]);
+    });
 
   grunt.registerTask('lint', ['eslint']);
 
