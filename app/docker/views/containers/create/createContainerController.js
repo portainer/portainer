@@ -659,7 +659,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       }
       $scope.state.actionInProgress = true;
       return pullImageIfNeeded()
-        .then(stopAndRenameContainer(oldContainer))
+        .then(stopAndRenameContainer.bind(null, oldContainer))
         .then(createNewContainer)
         .then(applyResourceControl)
         .then(connectToExtraNetworks)
