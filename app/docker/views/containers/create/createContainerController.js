@@ -621,9 +621,9 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
   function create() {
     var oldContainer = null;
 
-
     HttpRequestHelper.setPortainerAgentTargetHeader($scope.formValues.NodeName);
     return findCurrentContainer()
+      .then(setOldContainer)
       .then(confirmCreateContainer)
       .then(startCreationProcess)
       .catch(notifyOnError)
@@ -633,6 +633,11 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       $scope.state.actionInProgress = false;
     }
 
+    function setOldContainer(container) {
+      oldContainer = container;
+      return container;
+    }
+
     function findCurrentContainer() {
       return Container.query({ all: 1, filters: { name: ['^/' + $scope.config.name + '$'] } })
         .$promise
@@ -640,8 +645,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
           if (!containers.length) {
             return;
           }
-          oldContainer = containers[0];
-          return oldContainer;
+          return containers[0];
         })
         .catch(notifyOnError);
 
@@ -664,7 +668,32 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
         .then(applyResourceControl)
         .then(connectToExtraNetworks)
         .then(removeOldContainer)
-        .then(onSuccess);
+        .then(onSuccess)
+        .catch(onCreationProcessFail);
+    }
+
+    function onCreationProcessFail(error) {
+      var deferred = $q.defer();
+      removeNewContainer().then(restoreOldContainerName)
+        .then(function() {
+          deferred.reject(error);
+        })
+        .catch(function(restoreError) {
+          deferred.reject(restoreError);
+        });
+      return deferred.promise;
+    }
+
+    function removeNewContainer() {
+      return findCurrentContainer().then(function onConatinerLoaded(container) {
+        if (container.Id !== oldContainer.Id) {
+          return ContainerService.remove(container, true);
+        }
+      });
+    }
+
+    function restoreOldContainerName() {
+      return ContainerService.renameContainer(oldContainer.Id, oldContainer.Names[0].substring(1));
     }
 
     function confirmCreateContainer(container) {
