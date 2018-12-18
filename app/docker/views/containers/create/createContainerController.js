@@ -686,13 +686,16 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
 
     function removeNewContainer() {
       return findCurrentContainer().then(function onConatinerLoaded(container) {
-        if (container.Id !== oldContainer.Id) {
+        if (!oldContainer || container.Id !== oldContainer.Id) {
           return ContainerService.remove(container, true);
         }
       });
     }
 
     function restoreOldContainerName() {
+      if (!oldContainer) {
+        return;
+      }
       return ContainerService.renameContainer(oldContainer.Id, oldContainer.Names[0].substring(1));
     }
 
