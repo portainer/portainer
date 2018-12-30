@@ -71,7 +71,12 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if payload.OAuthSettings != nil {
+		clientSecret := payload.OAuthSettings.ClientSecret
+		if clientSecret == "" {
+			clientSecret = settings.OAuthSettings.ClientSecret
+		}
 		settings.OAuthSettings = *payload.OAuthSettings
+		settings.OAuthSettings.ClientSecret = clientSecret
 	}
 
 	if payload.AllowBindMountsForRegularUsers != nil {
