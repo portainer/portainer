@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('AuthenticationController', ['$q', '$scope', '$state', '$transition$', '$sanitize', 'Authentication', 'UserService', 'EndpointService', 'StateManager', 'Notifications', 'SettingsService',
-function ($q, $scope, $state, $transition$, $sanitize, Authentication, UserService, EndpointService, StateManager, Notifications, SettingsService) {
+.controller('AuthenticationController', ['$q', '$scope', '$state', '$transition$', '$sanitize', '$location', '$window', 'Authentication', 'UserService', 'EndpointService', 'StateManager', 'Notifications', 'SettingsService',
+function ($q, $scope, $state, $transition$, $sanitize, $location, $window, Authentication, UserService, EndpointService, StateManager, Notifications, SettingsService) {
 
   $scope.logo = StateManager.getState().application.logo;
 
@@ -12,6 +12,16 @@ function ($q, $scope, $state, $transition$, $sanitize, Authentication, UserServi
   $scope.state = {
     AuthenticationError: ''
   };
+  
+  SettingsService.publicSettings()
+  .then(function success(settings) {
+    $scope.AuthenticationMethod = settings.AuthenticationMethod;
+    $scope.ClientID = settings.ClientID;
+    $scope.RedirectURI = settings.RedirectURI;
+    $scope.Scopes = settings.Scopes;
+    $scope.AuthorizationURI = settings.AuthorizationURI;
+  });
+
 
   $scope.authenticateUser = function() {
     var username = $scope.formValues.Username;
@@ -74,6 +84,7 @@ function ($q, $scope, $state, $transition$, $sanitize, Authentication, UserServi
         $state.go('portainer.init.endpoint');
       } else {
         $state.go('portainer.home');
+        $window.location.search = '';
       }
     })
     .catch(function error(err) {
@@ -100,5 +111,35 @@ function ($q, $scope, $state, $transition$, $sanitize, Authentication, UserServi
     }
   }
 
+  function oAuthLogin(code) {
+    Authentication.oAuthLogin(code)
+    .then(function success() {
+      $state.go('portainer.home');
+      $window.location.search = '';
+    })
+    .catch(function error() {
+      $scope.state.AuthenticationError = 'Failed to authenticate with OAuth2 Provider';
+    });
+  }
+
+  function getParameter(param) {
+    var URL = $location.absUrl();
+    var params = URL.split('?')[1];
+    if (params === undefined) {
+      return null;
+    }
+    params = params.split('&');
+    for (var i = 0; i < params.length; i++) {
+      var parameter = params[i].split('=');
+        if (parameter[0] === param) {
+          return parameter[1].split('#')[0];
+        }
+    }
+    return null;
+  }
+
   initView();
+  if (getParameter('code') !== null) {
+    oAuthLogin(getParameter('code'));
+  }
 }]);
