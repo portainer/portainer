@@ -51,7 +51,6 @@ func (*Service) GetAccessToken(code string, settings *portainer.OAuthSettings) (
 	}
 
 	if r.StatusCode != http.StatusOK {
-		log.Printf("[Error] - request returned with bad status code %v, body is %v", r.StatusCode, string(body))
 		type ErrorMessage struct {
 			Message string
 			Type    string
@@ -157,7 +156,7 @@ func (*Service) GetUsername(token string, settings *portainer.OAuthSettings) (st
 
 	if !ok {
 		username, ok := datamap[settings.UserIdentifier].(float64)
-		if ok {
+		if ok && username != 0 {
 			return fmt.Sprint(int(username)), nil
 		}
 	}

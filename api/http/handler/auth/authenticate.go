@@ -111,11 +111,13 @@ func (handler *Handler) authenticateOAuth(w http.ResponseWriter, r *http.Request
 
 	token, err := handler.OAuthService.GetAccessToken(payload.Code, &settings.OAuthSettings)
 	if err != nil {
+		log.Printf("[DEBUG] - Failed retrieving access token: %v", err)
 		return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid access token", portainer.ErrUnauthorized}
 	}
 
 	username, err := handler.OAuthService.GetUsername(token, &settings.OAuthSettings)
 	if err != nil {
+		log.Printf("[DEBUG] - Failed acquiring username: %v", err)
 		return &httperror.HandlerError{http.StatusForbidden, "Unable to acquire username", portainer.ErrUnauthorized}
 	}
 
