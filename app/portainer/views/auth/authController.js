@@ -114,8 +114,9 @@ function (urlHelper, $q, $scope, $state, $stateParams, $sanitize, Authentication
   }
 
   function oAuthLogin(code) {
-    Authentication.oAuthLogin(code)
+    return Authentication.oAuthLogin(code)
     .then(function success() {
+      urlHelper.cleanParameters();
       $state.go('portainer.home');
     })
     .catch(function error() {

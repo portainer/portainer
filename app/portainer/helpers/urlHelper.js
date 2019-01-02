@@ -1,21 +1,24 @@
-angular.module('portainer.app').service('urlHelper', function urlHelper($location) {
-
+angular.module('portainer.app').service('urlHelper', function urlHelper($window) {
   this.getParameter = getParameter;
+  this.cleanParameters = cleanParameters;
 
   function getParameter(param) {
-    var url = $location.absUrl();
-    var index = url.indexOf('?');
-    if (index < 0) {
-      return;
-    }
-    var params = url.substring(index + 1);
-    params = params.split('&');
-    for (var i = 0; i < params.length; i++) {
-      var parameter = params[i].split('=');
-        if (parameter[0] === param) {
-          return parameter[1].split('#')[0];
-        }
-    }
-    return;
+    var parameters = extractParameters();
+    return parameters[param];
+  }
+
+  function extractParameters() {
+    var queryString = $window.location.search.replace(/.*?\?/,'').split('&');
+    return queryString.reduce(function(acc, keyValStr) {
+      var keyVal = keyValStr.split('=');
+      var key = keyVal[0];
+      var val = keyVal[1];
+      acc[key] = val;
+      return acc;
+    }, {});
+  }
+
+  function cleanParameters() {
+    $window.location.search = '';
   }
 });
