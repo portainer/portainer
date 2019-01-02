@@ -1,1 +1,3 @@
-angular.module('portainer.extensions.oauth', []);
+angular.module('portainer.extensions.oauth', [
+  'ngResource'
+]);
