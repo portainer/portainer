@@ -482,7 +482,6 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(about);
   $stateRegistryProvider.register(account);
   $stateRegistryProvider.register(authentication);
-  $stateRegistryProvider.register(otpAuth);
   $stateRegistryProvider.register(endpoints);
   $stateRegistryProvider.register(endpoint);
   $stateRegistryProvider.register(endpointAccess);
