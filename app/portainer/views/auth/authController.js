@@ -19,7 +19,7 @@ function ($q, $scope, $state, $transition$, $sanitize, Authentication, UserServi
 
     Authentication.login(username, password)
     .then(function success() {
-        checkForEndpoints();;
+      checkForEndpoints();
     })
     .catch(function error() {
       SettingsService.publicSettings()
