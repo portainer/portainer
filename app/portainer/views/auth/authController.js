@@ -18,11 +18,8 @@ function ($q, $scope, $state, $transition$, $sanitize, Authentication, UserServi
     var password = $scope.formValues.Password;
 
     Authentication.login(username, password)
-    .then(function onLoginSuccess(user) {
-      // if (!user.otpRequired) {
-        return checkForEndpoints();;
-      // }
-      // $state.go('portainer.otp')
+    .then(function success() {
+        checkForEndpoints();;
     })
     .catch(function error() {
       SettingsService.publicSettings()
@@ -47,7 +44,7 @@ function ($q, $scope, $state, $transition$, $sanitize, Authentication, UserServi
       if (endpoints.length === 0) {
         $state.go('portainer.init.endpoint');
       } else {
-        $state.go('portainer.home');
+        $state.go($stateParams.redirect ||'portainer.home');
       }
     })
     .catch(function error(err) {
