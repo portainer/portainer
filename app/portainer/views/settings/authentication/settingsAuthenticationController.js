@@ -15,7 +15,7 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
   };
 
   $scope.isOauthEnabled = function isOauthEnabled() {
-    return $scope.settings.AuthenticationMethod === 3;
+    return $scope.settings && $scope.settings.AuthenticationMethod === 3;
   };
 
   $scope.addSearchConfiguration = function() {

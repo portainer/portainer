@@ -317,7 +317,7 @@
             <!-- !group-search-settings -->
           </div>
 
-          <oauth-settings ng-if="settings.AuthenticationMethod === 3" settings="OAuthSettings"></oauth-settings>
+          <oauth-settings ng-if="isOauthEnabled()" settings="OAuthSettings"></oauth-settings>
 
             <!-- actions -->
           <div class="form-group">
