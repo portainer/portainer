@@ -1,7 +1,6 @@
 angular.module('portainer.app')
-.controller('AuthenticationController', ['$q', '$scope', '$state', '$transition$', '$sanitize', '$location', '$window', 'Authentication', 'UserService', 'EndpointService', 'StateManager', 'Notifications', 'SettingsService',
-function ($q, $scope, $state, $transition$, $sanitize, $location, $window, Authentication, UserService, EndpointService, StateManager, Notifications, SettingsService) {
-
+.controller('AuthenticationController', ['urlHelper','$q', '$scope', '$state', '$stateParams', '$sanitize', 'Authentication', 'UserService', 'EndpointService', 'StateManager', 'Notifications', 'SettingsService',
+function (urlHelper, $q, $scope, $state, $stateParams, $sanitize, Authentication, UserService, EndpointService, StateManager, Notifications, SettingsService) {
   $scope.logo = StateManager.getState().application.logo;
 
   $scope.formValues = {
@@ -13,14 +12,7 @@ function ($q, $scope, $state, $transition$, $sanitize, $location, $window, Authe
     AuthenticationError: ''
   };
   
-  SettingsService.publicSettings()
-  .then(function success(settings) {
-    $scope.AuthenticationMethod = settings.AuthenticationMethod;
-    $scope.ClientID = settings.ClientID;
-    $scope.RedirectURI = settings.RedirectURI;
-    $scope.Scopes = settings.Scopes;
-    $scope.AuthorizationURI = settings.AuthorizationURI;
-  });
+  
 
 
   $scope.authenticateUser = function() {
@@ -84,7 +76,6 @@ function ($q, $scope, $state, $transition$, $sanitize, $location, $window, Authe
         $state.go('portainer.init.endpoint');
       } else {
         $state.go('portainer.home');
-        $window.location.search = '';
       }
     })
     .catch(function error(err) {
@@ -93,9 +84,18 @@ function ($q, $scope, $state, $transition$, $sanitize, $location, $window, Authe
   }
 
   function initView() {
-    if ($transition$.params().logout || $transition$.params().error) {
+    SettingsService.publicSettings()
+      .then(function success(settings) {
+        $scope.AuthenticationMethod = settings.AuthenticationMethod;
+        $scope.ClientID = settings.ClientID;
+        $scope.RedirectURI = settings.RedirectURI;
+        $scope.Scopes = settings.Scopes;
+        $scope.AuthorizationURI = settings.AuthorizationURI;
+      });
+
+    if ($stateParams.logout || $stateParams.error) {
       Authentication.logout();
-      $scope.state.AuthenticationError = $transition$.params().error;
+      $scope.state.AuthenticationError = $stateParams.error;
       return;
     }
 
@@ -109,37 +109,23 @@ function ($q, $scope, $state, $transition$, $sanitize, $location, $window, Authe
     } else {
       authenticatedFlow();
     }
+
+    var code = urlHelper.getParameter('code');
+    if (code) {
+      oAuthLogin(code);
+    }
   }
 
   function oAuthLogin(code) {
     Authentication.oAuthLogin(code)
     .then(function success() {
       $state.go('portainer.home');
-      $window.location.search = '';
     })
     .catch(function error() {
       $scope.state.AuthenticationError = 'Failed to authenticate with OAuth2 Provider';
     });
   }
 
-  function getParameter(param) {
-    var URL = $location.absUrl();
-    var params = URL.split('?')[1];
-    if (params === undefined) {
-      return null;
-    }
-    params = params.split('&');
-    for (var i = 0; i < params.length; i++) {
-      var parameter = params[i].split('=');
-        if (parameter[0] === param) {
-          return parameter[1].split('#')[0];
-        }
-    }
-    return null;
-  }
 
   initView();
-  if (getParameter('code') !== null) {
-    oAuthLogin(getParameter('code'));
-  }
 }]);
