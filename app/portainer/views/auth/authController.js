@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('AuthenticationController', ['$q', '$scope', '$state', '$transition$', '$sanitize', 'Authentication', 'UserService', 'EndpointService', 'StateManager', 'Notifications', 'SettingsService',
-function ($q, $scope, $state, $transition$, $sanitize, Authentication, UserService, EndpointService, StateManager, Notifications, SettingsService) {
+.controller('AuthenticationController', ['$q', '$scope', '$state', '$transition$', '$sanitize', 'Authentication', 'UserService', 'EndpointService', 'StateManager', 'Notifications', 'SettingsService', '$stateParams',
+function ($q, $scope, $state, $transition$, $sanitize, Authentication, UserService, EndpointService, StateManager, Notifications, SettingsService, $stateParams) {
 
   $scope.logo = StateManager.getState().application.logo;
 
@@ -18,8 +18,11 @@ function ($q, $scope, $state, $transition$, $sanitize, Authentication, UserServi
     var password = $scope.formValues.Password;
 
     Authentication.login(username, password)
-    .then(function success() {
-      checkForEndpoints();
+    .then(function onLoginSuccess(user) {
+      // if (!user.otpRequired) {
+        return checkForEndpoints();;
+      // }
+      // $state.go('portainer.otp')
     })
     .catch(function error() {
       SettingsService.publicSettings()
@@ -73,7 +76,7 @@ function ($q, $scope, $state, $transition$, $sanitize, Authentication, UserServi
       if (endpoints.length === 0 && userDetails.role === 1) {
         $state.go('portainer.init.endpoint');
       } else {
-        $state.go('portainer.home');
+        $state.go($stateParams.redirect || 'portainer.home');
       }
     })
     .catch(function error(err) {
