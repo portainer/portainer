@@ -62,11 +62,7 @@
               When using LDAP authentication, Portainer will delegate user authentication to a LDAP server and fallback to internal authentication if LDAP authentication fails.
             </span>
           </div>
-          <div class="form-group" ng-if="settings.AuthenticationMethod === 3">
-            <span class="col-sm-12 text-muted small">
-                When using OAuth authentication, Portainer will allow users to optionally authenticate with an OAuth authorization server.
-            </span>
-          </div>
+          
 
           <div ng-if="settings.AuthenticationMethod === 2">
             <div class="col-sm-12 form-section-title">
