@@ -14,6 +14,10 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
     TLSCACert: ''
   };
 
+  $scope.isOauthEnabled = function isOauthEnabled() {
+    return $scope.settings.AuthenticationMethod === 3;
+  };
+
   $scope.addSearchConfiguration = function() {
     $scope.LDAPSettings.SearchSettings.push({ BaseDN: '', UserNameAttribute: '', Filter: '' });
   };

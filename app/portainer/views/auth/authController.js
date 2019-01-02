@@ -11,9 +11,6 @@ function (urlHelper, $q, $scope, $state, $stateParams, $sanitize, Authentication
   $scope.state = {
     AuthenticationError: ''
   };
-  
-  
-
 
   $scope.authenticateUser = function() {
     var username = $scope.formValues.Username;
