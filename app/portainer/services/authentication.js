@@ -18,33 +18,22 @@ function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManage
     var jwt = LocalStorage.getJWT();
 
     if (jwt) {
-      var tokenPayload = jwtHelper.decodeToken(jwt);
-      user.username = tokenPayload.username;
-      user.ID = tokenPayload.id;
-      user.role = tokenPayload.role;
+      setUser(jwt);
     }
   }
 
   function oAuthLogin(code) {
-    return OAuth.login({code: code}).$promise
-    .then(function success(data) {
-      LocalStorage.storeJWT(data.jwt);
-      var tokenPayload = jwtHelper.decodeToken(data.jwt);
-      user.username = tokenPayload.username;
-      user.ID = tokenPayload.id;
-      user.role = tokenPayload.role;
-    });
+    return OAuth.login({ code: code }).$promise
+      .then(function onLoginSuccess(response) {
+        return setUser(response.jwt);
+      });
   }
 
   function login(username, password) {
-    return Auth.login({username: username, password: password}).$promise
-    .then(function success(data) {
-      LocalStorage.storeJWT(data.jwt);
-      var tokenPayload = jwtHelper.decodeToken(data.jwt);
-      user.username = username;
-      user.ID = tokenPayload.id;
-      user.role = tokenPayload.role;
-    });
+    return Auth.login({ username: username, password: password }).$promise
+      .then(function onLoginSuccess(response) {
+        return setUser(response.jwt);
+      });
   }
 
   function logout() {
@@ -60,6 +49,14 @@ function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManage
 
   function getUserDetails() {
     return user;
+  }
+
+  function setUser(jwt) {
+    LocalStorage.storeJWT(jwt);
+    var tokenPayload = jwtHelper.decodeToken(jwt);
+    user.username = tokenPayload.username;
+    user.ID = tokenPayload.id;
+    user.role = tokenPayload.role;
   }
 
   return service;
