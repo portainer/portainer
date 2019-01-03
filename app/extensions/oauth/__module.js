@@ -1,3 +1,2 @@
-angular.module('portainer.extensions.oauth', [
-  'ngResource'
-]);
+angular.module('portainer.extensions.oauth', ['ngResource'])
+  .constant('API_ENDPOINT_OAUTH', 'api/oauth');
