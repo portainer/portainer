@@ -153,17 +153,17 @@ gruntfile_cfg.useminPrepare = {
 gruntfile_cfg.copy = {
   bundle: {
     files: [
-      { dest: '<%= distdir %>/js/', src: ['app.js'], expand: true, cwd: '.tmp/concat/js/' },
-      { dest: '<%= distdir %>/css/', src: ['app.css'], expand: true, cwd: '.tmp/concat/css/' }
+      { dest: '<%= distdir %>/assets/js/', src: ['app.js'], expand: true, cwd: '.tmp/concat/assets/js/' },
+      { dest: '<%= distdir %>/assets/css/', src: ['app.css'], expand: true, cwd: '.tmp/concat/assets/css/' }
     ]
   },
   assets: {
     files: [
-      { dest: '<%= distdir %>/fonts/', src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'node_modules/bootstrap/fonts/' },
-      { dest: '<%= distdir %>/fonts/', src: '*.{ttf,woff,woff2,eof,eot,svg}', expand: true, cwd: 'node_modules/@fortawesome/fontawesome-free-webfonts/webfonts/' },
-      { dest: '<%= distdir %>/fonts/', src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'node_modules/rdash-ui/dist/fonts/' },
-      { dest: '<%= distdir %>/images/', src: '**', expand: true, cwd: 'assets/images/' },
-      { dest: '<%= distdir %>/ico', src: '**', expand: true, cwd: 'assets/ico' },
+      { dest: '<%= distdir %>/assets/fonts/', src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'node_modules/bootstrap/fonts/' },
+      { dest: '<%= distdir %>/assets/webfonts/', src: '*.{ttf,woff,woff2,eof,eot,svg}', expand: true, cwd: 'node_modules/@fortawesome/fontawesome-free-webfonts/webfonts/' },
+      { dest: '<%= distdir %>/assets/fonts/', src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'node_modules/rdash-ui/dist/fonts/' },
+      { dest: '<%= distdir %>/assets/images/', src: '**', expand: true, cwd: 'assets/images/' },
+      { dest: '<%= distdir %>/assets/ico', src: '**', expand: true, cwd: 'assets/ico' },
       { dest: '<%= root %>/', src: 'templates.json', cwd: '' }
     ]
   }
@@ -221,7 +221,7 @@ gruntfile_cfg.postcss = {
         cssnano() // minify the result
       ]
     },
-    src: '.tmp/concat/css/app.css',
+    src: '.tmp/concat/assets/css/app.css',
     dest: '<%= distdir %>/css/app.css'
   }
 };
@@ -246,14 +246,14 @@ gruntfile_cfg.replace = {
       {
         expand: true,
         flatten: true,
-        src: ['.tmp/concat/js/app.js'],
-        dest: '.tmp/concat/js'
+        src: ['.tmp/concat/js/assets/app.js'],
+        dest: '.tmp/concat/js/assets'
       },
       {
         expand: true,
         flatten: true,
-        src: ['.tmp/concat/css/app.css'],
-        dest: '.tmp/concat/css'
+        src: ['.tmp/concat/css/assets/app.css'],
+        dest: '.tmp/concat/css/assets'
       }
     ]
   }

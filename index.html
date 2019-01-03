@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="<%= pkg.name %>">
+<base href="/index.html" />
 <head>
   <meta charset="utf-8">
   <title>Portainer</title>
@@ -7,7 +8,7 @@
   <meta name="description" content="">
   <meta name="author" content="<%= pkg.author %>">
 
-  <!-- build:css css/app.css -->
+  <!-- build:css assets/css/app.css -->
   <link href="css/vendor.css" rel="stylesheet">
   <link href="css/portainer.css" rel="stylesheet">
   <!-- endbuild -->
@@ -17,20 +18,20 @@
   <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
 
-  <!-- build:js js/app.js -->
+  <!-- build:js assets/js/app.js -->
   <script src="js/vendor.js"></script>
   <script src="js/angular.js"></script>
   <script src="js/portainer.js"></script>
   <!-- endbuild -->
 
   <!-- Fav and touch icons -->
-  <link rel="apple-touch-icon" sizes="180x180" href="ico/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="ico/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="ico/favicon-16x16.png">
-  <link rel="manifest" href="ico/manifest.json">
-  <link rel="mask-icon" href="ico/safari-pinned-tab.svg" color="#5bbad5">
-  <link rel="shortcut icon" href="ico/favicon.ico">
-  <meta name="msapplication-config" content="ico/browserconfig.xml">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/ico/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/ico/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/ico/favicon-16x16.png">
+  <link rel="manifest" href="assets/ico/manifest.json">
+  <link rel="mask-icon" href="assets/ico/safari-pinned-tab.svg" color="#5bbad5">
+  <link rel="shortcut icon" href="assets/ico/favicon.ico">
+  <meta name="msapplication-config" content="assets/ico/browserconfig.xml">
   <meta name="theme-color" content="#ffffff">
 </head>
 
@@ -52,7 +53,7 @@
               <!-- loading box logo -->
               <div class="row">
                 <img ng-if="logo" ng-src="{{ logo }}" class="simple-box-logo">
-                <img ng-if="!logo" src="images/logo_alt.png" class="simple-box-logo" alt="Portainer">
+                <img ng-if="!logo" src="assets/images/logo_alt.png" class="simple-box-logo" alt="Portainer">
               </div>
               <!-- !loading box logo -->
               <!-- panel -->

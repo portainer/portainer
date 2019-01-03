@@ -1,12 +1,14 @@
 angular.module('portainer')
-  .config(['$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', 'AnalyticsProvider', '$uibTooltipProvider', '$compileProvider', 'cfpLoadingBarProvider',
-  function ($urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider, $uibTooltipProvider, $compileProvider, cfpLoadingBarProvider) {
+  .config(['$locationProvider','$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', 'AnalyticsProvider', '$uibTooltipProvider', '$compileProvider', 'cfpLoadingBarProvider',
+  function ($locationProvider, $urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider, $uibTooltipProvider, $compileProvider, cfpLoadingBarProvider) {
     'use strict';
 
     var environment = '@@ENVIRONMENT';
     if (environment === 'production') {
       $compileProvider.debugInfoEnabled(false);
     }
+
+    $locationProvider.html5Mode(true);
 
     localStorageServiceProvider
     .setPrefix('portainer');
