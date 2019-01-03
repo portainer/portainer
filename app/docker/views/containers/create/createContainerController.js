@@ -686,7 +686,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
 
     function removeNewContainer() {
       return findCurrentContainer().then(function onConatinerLoaded(container) {
-        if (!oldContainer || container.Id !== oldContainer.Id) {
+        if (container && (!oldContainer || container.Id !== oldContainer.Id)) {
           return ContainerService.remove(container, true);
         }
       });
