@@ -665,7 +665,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       }
       $scope.state.actionInProgress = true;
       return pullImageIfNeeded()
-        .then(stopAndRenameContainer(oldContainer))
+        .then(stopAndRenameContainer)
         .then(createNewContainer)
         .then(applyResourceControl)
         .then(connectToExtraNetworks)
@@ -701,7 +701,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       }
     }
 
-    function stopAndRenameContainer(oldContainer) {
+    function stopAndRenameContainer() {
       if (!oldContainer) {
         return $q.when();
       }
