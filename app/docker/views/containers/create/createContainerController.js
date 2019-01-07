@@ -529,9 +529,9 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
   function loadFromContainerLogging(config) {
     var logConfig = config.HostConfig.LogConfig;
     $scope.formValues.LogDriverName = logConfig.Type;
-    $scope.formValues.LogDriverOpts = Object.keys(logConfig.Config).map(function(name){return {
+    $scope.formValues.LogDriverOpts = _.map(logConfig.Config, function(value, name){return {
       name: name,
-      value: logConfig.Config.value
+      value: value
     }});
   }
 
