@@ -342,7 +342,7 @@ angular.module('portainer.app', [])
   };
 
   var stackCreation = {
-    name: 'portainer.newstack',
+    name: 'portainer.stacks.newstack',
     url: '/newstack',
     views: {
       'content@': {
