@@ -509,6 +509,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       $scope.fromContainer = fromContainer;
       $scope.config = ContainerHelper.configFromContainer(fromContainer.Model);
       loadFromContainerCmd(d);
+      loadFromContainerLogging(d);
       loadFromContainerPortBindings(d);
       loadFromContainerVolumes(d);
       loadFromContainerNetworkConfig(d);
@@ -523,6 +524,15 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve container');
     });
+  }
+
+  function loadFromContainerLogging(config) {
+    var logConfig = config.HostConfig.LogConfig;
+    $scope.formValues.LogDriverName = logConfig.Type;
+    $scope.formValues.LogDriverOpts = Object.keys(logConfig.Config).map(function(name){return {
+      name: name,
+      value: logConfig.Config.value
+    }});
   }
 
   function initView() {
