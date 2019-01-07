@@ -327,6 +327,17 @@ angular.module('portainer.app', [])
         templateUrl: 'app/portainer/views/stacks/stacks.html',
         controller: 'StacksController'
       }
+    },
+    resolve: {
+      endpointID: ['EndpointProvider', '$state', 'Notifications', 
+        function (EndpointProvider, $state, Notifications) {
+          var id = EndpointProvider.endpointID();
+          if (!id) {
+            Notifications.warning('Endpoint is not set');
+            return $state.go('portainer.home');
+          }
+        }
+      ]
     }
   };
 
