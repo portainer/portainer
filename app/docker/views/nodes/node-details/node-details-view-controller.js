@@ -68,7 +68,6 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
     }
 
     function buildNodeDetails(node) {
-      console.log(node.EngineLabels);
       return {
         name: node.Name,
         role: node.Role,
