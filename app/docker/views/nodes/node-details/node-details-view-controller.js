@@ -28,6 +28,7 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
         ctrl.originalNode = node;
         ctrl.hostDetails = buildHostDetails(node);
         ctrl.engineDetails = buildEngineDetails(node);
+        ctrl.engineLabels = node.EngineLabels;
         ctrl.nodeDetails = buildNodeDetails(node);
         ctrl.jobs = data.jobs;
         if (ctrl.state.isAgent) {
@@ -67,13 +68,13 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
     }
 
     function buildNodeDetails(node) {
+      console.log(node.EngineLabels);
       return {
         name: node.Name,
         role: node.Role,
         managerAddress: node.ManagerAddr,
         availability: node.Availability,
         status: node.Status,
-        engineLabels: node.EngineLabels,
         nodeLabels: node.Labels
       };
     }

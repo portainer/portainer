@@ -26,10 +26,6 @@
               <td><span class="label label-{{ $ctrl.details.status | nodestatusbadge }}">{{
                   $ctrl.details.status }}</span></td>
             </tr>
-            <tr ng-if=" $ctrl.details.engineLabels.length">
-              <td>Engine Labels</td>
-              <td>{{ $ctrl.details.engineLabels | arraytostr:', ' }}</td>
-            </tr>
             <tr>
               <td>
                 <div class="nopadding">

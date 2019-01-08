@@ -1,0 +1,23 @@
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-code" title-text="Engine Labels"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Label</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="label in $ctrl.labels">
+              <td>{{label.key}}</td>
+              <td>{{label.value}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
