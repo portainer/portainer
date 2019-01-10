@@ -57,8 +57,12 @@ angular.module('portainer.docker')
     return servicePlugins(systemOnly, 'Volume', 'docker.volumedriver/1.0');
   };
 
-  service.networkPlugins = function(systemOnly) {
+  service.networkDrivers = function(systemOnly) {
     return servicePlugins(systemOnly, 'Network', 'docker.networkdriver/1.0');
+  };
+
+  service.networkScopes = function(systemOnly) {
+    return ['local', 'swarm'];
   };
 
   service.loggingPlugins = function(systemOnly) {
