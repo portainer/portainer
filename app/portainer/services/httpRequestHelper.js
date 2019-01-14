@@ -41,7 +41,7 @@ angular.module('portainer.app')
     headers.agentManagerOperation = set;
   };
 
-  service.portainerAgentTargetHeader = function() {
+  service.portainerAgentManagerOperation = function() {
     return headers.agentManagerOperation;
   };
 
