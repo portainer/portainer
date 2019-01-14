@@ -27,6 +27,9 @@ angular.module('portainer')
         request: function(config) {
           if (config.url.indexOf('/docker/') > -1) {
             config.headers['X-PortainerAgent-Target'] = HttpRequestHelper.portainerAgentTargetHeader();
+            if (HttpRequestHelper.portainerAgentManagerOperation()) {
+              config.headers['X-PortainerAgent-ManagerOperation'] = '1';
+            }
           }
           return config;
         }
