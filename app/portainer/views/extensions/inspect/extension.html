@@ -36,7 +36,9 @@
             <div class="form-group" style="margin-left: 40px;">
 
               <div style="font-size: 125%; border-bottom: 2px solid #2d3e63; padding-bottom: 5px;">
-                {{ extension.Enabled ? 'Enabled' : extension.Price }}
+                <span ng-if="extension.Enabled">Enabled</span>
+                <span ng-if="!extension.Enabled && extension.License.Expiration && !extension.License.Valid">Expired</span>
+                <span ng-if="!extension.Enabled && !extension.License.Expiration">{{ extension.Price }}</span>
               </div>
 
               <div class="small text-muted col-sm-12" style="margin: 15px 0 15px 0;" ng-if="!extension.Enabled">
