@@ -529,10 +529,12 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
   function loadFromContainerLogging(config) {
     var logConfig = config.HostConfig.LogConfig;
     $scope.formValues.LogDriverName = logConfig.Type;
-    $scope.formValues.LogDriverOpts = _.map(logConfig.Config, function(value, name){return {
-      name: name,
-      value: value
-    }});
+    $scope.formValues.LogDriverOpts = _.map(logConfig.Config, function (value, name) {
+      return {
+        name: name,
+        value: value
+      };
+    });
   }
 
   function initView() {
