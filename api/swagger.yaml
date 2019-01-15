@@ -3146,7 +3146,7 @@ definitions:
           $ref: "#/definitions/LDAPGroupSearchSettings"
       AutoCreateUsers:
         type: "boolean"
-        example: "true"
+        example: true
         description: "Automatically provision users and assign them to matching LDAP group names"
 
   Settings:
