@@ -1,5 +1,5 @@
 angular.module('portainer.app')
-  .factory('EndpointStatusInterceptor', ['$q', '$injector', 'EndpointProvider', function ($q, $injector, EndpointProvider) {
+  .factory('EndpointStatusInterceptor', ['$q', 'EndpointProvider', function ($q, EndpointProvider) {
     'use strict';
     var interceptor = {};
 

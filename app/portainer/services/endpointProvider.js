@@ -64,10 +64,6 @@ angular.module('portainer.app')
     return endpoint.OfflineMode;
   };
 
-  service.endpointStatusFromOfflineMode = function(isOffline) {
-    return isOffline ? 2 : 1;
-  };
-
   service.setOfflineMode = function(isOffline) {
     endpoint.OfflineMode = isOffline;
     LocalStorage.storeOfflineMode(isOffline);
