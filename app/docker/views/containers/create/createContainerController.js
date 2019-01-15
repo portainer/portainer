@@ -674,7 +674,8 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
 
     function onCreationProcessFail(error) {
       var deferred = $q.defer();
-      removeNewContainer().then(restoreOldContainerName)
+      removeNewContainer()
+        .then(restoreOldContainerName)
         .then(function() {
           deferred.reject(error);
         })
@@ -686,7 +687,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
 
     function removeNewContainer() {
       return findCurrentContainer().then(function onConatinerLoaded(container) {
-        if (!oldContainer || container.Id !== oldContainer.Id) {
+        if (container && (!oldContainer || container.Id !== oldContainer.Id)) {
           return ContainerService.remove(container, true);
         }
       });
