@@ -106,7 +106,7 @@ func (handler *Handler) authenticateOAuth(w http.ResponseWriter, r *http.Request
 	}
 
 	if settings.AuthenticationMethod != 3 {
-		return &httperror.HandlerError{http.StatusForbidden, "OAuth authentication is not being used", err}
+		return &httperror.HandlerError{http.StatusServiceUnavailable, "Authentication is not configured to use OAuth", err}
 	}
 
 	token, err := handler.OAuthService.GetAccessToken(payload.Code, &settings.OAuthSettings)
