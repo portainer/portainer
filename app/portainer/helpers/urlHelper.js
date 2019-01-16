@@ -2,13 +2,13 @@ angular.module('portainer.app').service('urlHelper', function urlHelper($window)
   this.getParameter = getParameter;
   this.cleanParameters = cleanParameters;
 
-  function getParameter(param) {
-    var parameters = extractParameters();
+  function getParameter(queryParams, param) {
+    var parameters = extractParameters(queryParams);
     return parameters[param];
   }
 
-  function extractParameters() {
-    var queryString = $window.location.search.replace(/.*?\?/,'').split('&');
+  function extractParameters(queryParams) {
+    var queryString = queryParams.replace(/.*?\?/,'').split('&');
     return queryString.reduce(function(acc, keyValStr) {
       var keyVal = keyValStr.split('=');
       var key = keyVal[0];

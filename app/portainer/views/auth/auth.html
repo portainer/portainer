@@ -28,11 +28,9 @@
             <!-- login button -->
             <div class="form-group">
               <div class="col-sm-12" >
-                <a ng-href="{{OAuthLoginURI}}" ng-if="AuthenticationMethod === 3">
-                  <div class="btn btn-primary btn-sm pull-left" style="margin-left:2px">
-                    <i class="fa fa-sign-in-alt" aria-hidden="true"></i> Login with OAuth
-                  </div>
-                </a>
+                <button class="btn btn-primary btn-sm pull-left" ng-click="oauthLogin()" style="margin-left:2px" ng-if="AuthenticationMethod === 3">
+                  <i class="fa fa-sign-in-alt" aria-hidden="true"></i> Login with OAuth
+                </button>
 
                 <button type="submit" class="btn btn-primary btn-sm pull-right" ng-click="authenticateUser()"><i class="fa fa-sign-in-alt" aria-hidden="true"></i> Login</button>
                 

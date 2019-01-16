@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('AuthenticationController', ['urlHelper','$q', '$scope', '$state', '$stateParams', '$sanitize', 'Authentication', 'UserService', 'EndpointService', 'StateManager', 'Notifications', 'SettingsService',
-function (urlHelper, $q, $scope, $state, $stateParams, $sanitize, Authentication, UserService, EndpointService, StateManager, Notifications, SettingsService) {
+.controller('AuthenticationController', ['$q', '$scope', '$state', '$stateParams', '$sanitize', 'Authentication', 'UserService', 'EndpointService', 'StateManager', 'Notifications', 'SettingsService',
+function ($q, $scope, $state, $stateParams, $sanitize, Authentication, UserService, EndpointService, StateManager, Notifications, SettingsService) {
   $scope.logo = StateManager.getState().application.logo;
 
   $scope.formValues = {
@@ -36,6 +36,17 @@ function (urlHelper, $q, $scope, $state, $stateParams, $sanitize, Authentication
       });
     });
   };
+
+  $scope.oauthLogin = function oauthLogin() {
+    return Authentication.OAuthLogin()
+    .then(function onLoginSuccess() {
+      return $state.go('portainer.home');
+    })
+    .catch(function onError(error) {
+      $scope.state.AuthenticationError = error.message;
+    });
+  };
+
 
   function unauthenticatedFlow() {
     EndpointService.endpoints()
@@ -104,23 +115,10 @@ function (urlHelper, $q, $scope, $state, $stateParams, $sanitize, Authentication
       authenticatedFlow();
     }
 
-    var code = urlHelper.getParameter('code');
-    if (code) {
-      oAuthLogin(code);
-    }
+    
   }
 
-  function oAuthLogin(code) {
-    return Authentication.OAuthLogin(code)
-    .then(function success() {
-      urlHelper.cleanParameters();
-      $state.go('portainer.home');
-    })
-    .catch(function error() {
-      $scope.state.AuthenticationError = 'Failed to authenticate with OAuth2 Provider';
-    });
-  }
-
+  
 
   initView();
 }]);
