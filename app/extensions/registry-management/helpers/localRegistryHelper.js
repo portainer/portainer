@@ -17,6 +17,10 @@ angular.module('portainer.extensions.registrymanagement')
       var v1 = manifests.v1;
       var v2 = manifests.v2;
 
+      if (v1.schemaVersion !== 1 || v2.schemaVersion !== 2) {
+        return null;
+      }
+
       var history = historyRawToParsed(v1.history);
       var imageId = history[0].id;
       var name = v1.tag;

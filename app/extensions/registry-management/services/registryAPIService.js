@@ -85,7 +85,14 @@ function RegistryV2ServiceFactory($q, RegistryCatalog, RegistryTags, RegistryMan
     $q.all(promises)
     .then(function success(data) {
       var tag = RegistryV2Helper.manifestsToTag(data);
-      deferred.resolve(tag);
+      if (tag === null) {
+        deferred.reject({
+          msg: 'Unable to retrieve tags, refresh the page',
+          err: err
+        });
+      } else {
+        deferred.resolve(tag);
+      }
     }).catch(function error(err) {
       deferred.reject({
         msg: 'Unable to retrieve tag ' + tag,

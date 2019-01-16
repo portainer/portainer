@@ -10,7 +10,9 @@ angular.module('portainer.extensions.registrymanagement')
         tag: '@tag'
       },
       headers: {
-        'Cache-Control': 'no-cache'
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': 0
       },
       transformResponse: function (data, headers) {
         var response = angular.fromJson(data);
@@ -27,7 +29,9 @@ angular.module('portainer.extensions.registrymanagement')
       },
       headers: {
         'Accept': 'application/vnd.docker.distribution.manifest.v2+json',
-        'Cache-Control': 'no-cache'
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': 0
       },
       transformResponse: function (data, headers) {
         var response = angular.fromJson(data);
