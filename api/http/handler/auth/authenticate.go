@@ -127,7 +127,7 @@ func (handler *Handler) authenticateOAuth(w http.ResponseWriter, r *http.Request
 	}
 
 	if u == nil && !settings.OAuthSettings.OAuthAutoCreateUsers {
-		return &httperror.HandlerError{http.StatusForbidden, "Unregistered account", portainer.ErrUnauthorized}
+		return &httperror.HandlerError{http.StatusForbidden, "Account must be created inside Portainer beforehand", portainer.ErrUnauthorized}
 	}
 
 	if u == nil {
