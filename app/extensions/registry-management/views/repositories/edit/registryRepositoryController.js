@@ -127,9 +127,9 @@ angular.module('portainer.app')
           })
           .then(function success(data) {
             $scope.registry = data.registry;
-            $scope.repository.Tags = data.tags;
+            $scope.repository.Tags = [].concat(data.tags || []);
             $scope.tags = [];
-            for (var i = 0; i < data.tags.length; i++) {
+            for (var i = 0; i < $scope.repository.Tags.length; i++) {
               var tag = data.tags[i];
               RegistryV2Service.tag(registryId, repository, tag)
                 .then(function success(data) {
