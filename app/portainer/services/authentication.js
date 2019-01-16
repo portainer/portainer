@@ -8,7 +8,7 @@ function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManage
   var user = {};
 
   service.init = init;
-  service.oAuthLogin = oAuthLogin;
+  service.OAuthLogin = OAuthLogin;
   service.login = login;
   service.logout = logout;
   service.isAuthenticated = isAuthenticated;
@@ -22,7 +22,7 @@ function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManage
     }
   }
 
-  function oAuthLogin(code) {
+  function OAuthLogin(code) {
     return OAuth.login({ code: code }).$promise
       .then(function onLoginSuccess(response) {
         return setUser(response.jwt);
