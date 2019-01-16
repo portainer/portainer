@@ -81,17 +81,9 @@ angular.module('portainer.app')
                 });
                 return $q.all(promises);
               })
-              .then(function success(data) {
+              .then(function success() {
                 Notifications.success('Success', 'Tags successfully deleted');
-                if (data.length === 0) {
-                  $state.go('portainer.registries.registry.repositories', {
-                    id: $scope.registryId
-                  }, {
-                    reload: true
-                  });
-                } else {
-                  $state.reload();
-                }
+                $state.reload();
               })
               .catch(function error(err) {
                 Notifications.error('Failure', err, 'Unable to delete tags');
