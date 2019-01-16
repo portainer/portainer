@@ -16,6 +16,16 @@ function SettingsViewModel(data) {
   this.EnableHostManagementFeatures = data.EnableHostManagementFeatures;
 }
 
+function PublicSettingsViewModel(settings) {
+  this.AllowBindMountsForRegularUsers = settings.AllowBindMountsForRegularUsers;
+  this.AllowPrivilegedModeForRegularUsers = settings.AllowPrivilegedModeForRegularUsers;
+  this.AuthenticationMethod = settings.AuthenticationMethod;
+  this.EnableHostManagementFeatures = settings.EnableHostManagementFeatures;
+  this.ExternalTemplates = settings.ExternalTemplates;
+  this.LogoURL = settings.LogoURL;
+  this.OAuthLoginURI = settings.OAuthLoginURI;
+}
+
 function LDAPSettingsViewModel(data) {
   this.ReaderDN = data.ReaderDN;
   this.Password = data.Password;
