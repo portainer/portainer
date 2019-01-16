@@ -3,5 +3,4 @@ angular.module('portainer.extensions.oauth').component('oauthSettings', {
   bindings: {
     settings: '<'
   }
-  // controller: 'oauthSettingsController'
 });

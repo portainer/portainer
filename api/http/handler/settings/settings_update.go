@@ -26,7 +26,7 @@ type settingsUpdatePayload struct {
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 	if *payload.AuthenticationMethod != 1 && *payload.AuthenticationMethod != 2 && *payload.AuthenticationMethod != 3 {
-		return portainer.Error("Invalid authentication method value. Value must be one of: 1 (internal) or 2 (LDAP/AD)")
+		return portainer.Error("Invalid authentication method value. Value must be one of: 1 (internal), 2 (LDAP/AD) or 3 (OAuth)")
 	}
 	if payload.LogoURL != nil && *payload.LogoURL != "" && !govalidator.IsURL(*payload.LogoURL) {
 		return portainer.Error("Invalid logo URL. Must correspond to a valid URL format")

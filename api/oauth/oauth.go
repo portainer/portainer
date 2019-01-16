@@ -18,7 +18,7 @@ import (
 
 const (
 	// ErrInvalidCode defines an error raised when the user authorization code is invalid
-	ErrInvalidCode = portainer.Error("Authorization code is invalid")
+	ErrInvalidCode = portainer.Error("Invalid OAuth authorization code")
 )
 
 // Service represents a service used to authenticate users against an authorization server
