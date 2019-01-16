@@ -84,10 +84,7 @@ function (urlHelper, $q, $scope, $state, $stateParams, $sanitize, Authentication
     SettingsService.publicSettings()
       .then(function success(settings) {
         $scope.AuthenticationMethod = settings.AuthenticationMethod;
-        $scope.ClientID = settings.ClientID;
-        $scope.RedirectURI = settings.RedirectURI;
-        $scope.Scopes = settings.Scopes;
-        $scope.AuthorizationURI = settings.AuthorizationURI;
+        $scope.OAuthLoginURI = settings.OAuthLoginURI;
       });
 
     if ($stateParams.logout || $stateParams.error) {

@@ -1,6 +1,7 @@
 package settings
 
 import (
+	"fmt"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -15,10 +16,7 @@ type publicSettingsResponse struct {
 	AllowPrivilegedModeForRegularUsers bool                           `json:"AllowPrivilegedModeForRegularUsers"`
 	EnableHostManagementFeatures       bool                           `json:"EnableHostManagementFeatures"`
 	ExternalTemplates                  bool                           `json:"ExternalTemplates"`
-	AuthorizationURI                   string                         `json:"AuthorizationURI"`
-	ClientID                           string                         `json:"ClientID"`
-	RedirectURI                        string                         `json:"RedirectURI"`
-	Scopes                             string                         `json:"Scopes"`
+	OAuthLoginURI                      string                         `json:"OAuthLoginURI"`
 }
 
 // GET request on /api/settings/public
@@ -35,10 +33,11 @@ func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *
 		AllowPrivilegedModeForRegularUsers: settings.AllowPrivilegedModeForRegularUsers,
 		EnableHostManagementFeatures:       settings.EnableHostManagementFeatures,
 		ExternalTemplates:                  false,
-		AuthorizationURI:                   settings.OAuthSettings.AuthorizationURI,
-		ClientID:                           settings.OAuthSettings.ClientID,
-		RedirectURI:                        settings.OAuthSettings.RedirectURI,
-		Scopes:                             settings.OAuthSettings.Scopes,
+		OAuthLoginURI: fmt.Sprintf("%s?response_type=code&client_id=%s&redirect_uri=%s&scope=%s&state=portainer",
+			settings.OAuthSettings.AuthorizationURI,
+			settings.OAuthSettings.ClientID,
+			settings.OAuthSettings.RedirectURI,
+			settings.OAuthSettings.Scopes),
 	}
 
 	if settings.TemplatesURL != "" {
