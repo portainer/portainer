@@ -37,10 +37,11 @@ func NewHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimi
 		Router:       mux.NewRouter(),
 		authDisabled: authDisabled,
 	}
+
+	h.Handle("/auth/oauth",
+		rateLimiter.LimitAccess(bouncer.PublicAccess(httperror.LoggerHandler(h.authenticateOAuth)))).Methods(http.MethodPost)
 	h.Handle("/auth",
 		rateLimiter.LimitAccess(bouncer.PublicAccess(httperror.LoggerHandler(h.authenticate)))).Methods(http.MethodPost)
-	h.Handle("/oauth",
-		rateLimiter.LimitAccess(bouncer.PublicAccess(httperror.LoggerHandler(h.authenticateOAuth)))).Methods(http.MethodPost)
 
 	return h
 }
