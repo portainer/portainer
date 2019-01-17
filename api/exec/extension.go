@@ -113,6 +113,7 @@ func (manager *ExtensionManager) EnableExtension(extension *portainer.Extension,
 		LicenseKey: licenseKey,
 		Company:    licenseDetails[0],
 		Expiration: licenseDetails[1],
+		Valid:      true,
 	}
 	extension.Version = licenseDetails[2]
 

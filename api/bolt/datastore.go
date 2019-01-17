@@ -139,6 +139,7 @@ func (store *Store) MigrateData() error {
 			DatabaseVersion:        version,
 			EndpointGroupService:   store.EndpointGroupService,
 			EndpointService:        store.EndpointService,
+			ExtensionService:       store.ExtensionService,
 			ResourceControlService: store.ResourceControlService,
 			SettingsService:        store.SettingsService,
 			StackService:           store.StackService,

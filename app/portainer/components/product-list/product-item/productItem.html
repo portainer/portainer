@@ -3,7 +3,7 @@
   <div class="blocklist-item-box">
     <!-- extension-image -->
     <span class="blocklist-item-logo">
-      <img class="blocklist-item-logo" src="images/support_{{ $ctrl.model.Id }}.png" />
+      <img class="blocklist-item-logo" ng-src="images/support_{{ $ctrl.model.Id }}.png" />
     </span>
     <!-- !extension-image -->
     <!-- extension-details -->
@@ -15,11 +15,6 @@
             {{ $ctrl.model.Name }}
           </span>
         </span>
-        <span>
-          <span class="label label-danger" ng-if="$ctrl.model.Enabled && $ctrl.model.Expired">expired</span>
-          <span class="label label-success" ng-if="$ctrl.model.Enabled && !$ctrl.model.Expired">enabled</span>
-          <span class="label label-primary" ng-if="$ctrl.model.Enabled && $ctrl.model.UpdateAvailable && !$ctrl.model.Expired">update available</span>
-        </span>
       </div>
       <!-- !blocklist-item-line1 -->
       <!-- blocklist-item-line2 -->
@@ -28,9 +23,6 @@
           <span class="blocklist-item-desc">
             {{ $ctrl.model.ShortDescription }}
           </span>
-        </span>
-        <span ng-if="$ctrl.model.License.Company">
-          <span class="small text-muted">Licensed to {{ $ctrl.model.License.Company }} - Expires on {{ $ctrl.model.License.Expiration }}</span>
         </span>
       </div>
       <!-- !blocklist-item-line2 -->
