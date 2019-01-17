@@ -5,7 +5,18 @@ angular.module('portainer.extensions.registrymanagement')
   {
     get: {
       method: 'GET',
-      params: { id: '@id', action: '_catalog' }
+      params: { id: '@id', action: '_catalog' },
+      interceptor: {
+        response: function versionInterceptor(response) {
+          var instance = response.data;
+          var link = response.headers('link');
+          if (link) {
+            instance.last = _.split(_.split(link, 'last=')[1], />|&/)[0];
+            instance.n = _.split(_.split(link, /\?n=|&n=/)[1], />|&/)[0];
+          }
+          return instance;
+        }
+      }
     },
     ping: {
       method: 'GET',
