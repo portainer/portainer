@@ -24,7 +24,7 @@ func (payload *oauthPayload) Validate(r *http.Request) error {
 	return nil
 }
 
-func (handler *Handler) authenticateOAuth(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload oauthPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
