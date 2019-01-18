@@ -8,7 +8,6 @@ import (
 	"mime"
 	"net/http"
 	"net/url"
-	"strings"
 
 	"github.com/portainer/portainer"
 	"golang.org/x/oauth2"
@@ -110,6 +109,7 @@ func buildConfig(oauthSettings *portainer.OAuthSettings) *oauth2.Config {
 		ClientSecret: oauthSettings.ClientSecret,
 		Endpoint:     endpoint,
 		RedirectURL:  oauthSettings.RedirectURI,
-		Scopes:       strings.Split(oauthSettings.Scopes, ","),
+		// TODO figure out how to handle different providers, see https://github.com/golang/oauth2/issues/119
+		Scopes: []string{oauthSettings.Scopes},
 	}
 }
