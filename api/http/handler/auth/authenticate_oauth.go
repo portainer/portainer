@@ -49,17 +49,17 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{http.StatusForbidden, "Unable to acquire username", portainer.ErrUnauthorized}
 	}
 
-	u, err := handler.UserService.UserByUsername(username)
+	user, err := handler.UserService.UserByUsername(username)
 	if err != nil && err != portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a user with the specified username from the database", err}
 	}
 
-	if u == nil && !settings.OAuthSettings.OAuthAutoCreateUsers {
+	if user == nil && !settings.OAuthSettings.OAuthAutoCreateUsers {
 		return &httperror.HandlerError{http.StatusForbidden, "Unregistered account", portainer.ErrUnauthorized}
 	}
 
-	if u == nil {
-		user := &portainer.User{
+	if user == nil {
+		user = &portainer.User{
 			Username: username,
 			Role:     portainer.StandardUserRole,
 		}
@@ -69,10 +69,9 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist user inside the database", err}
 		}
 
-		return handler.writeToken(w, user)
 	}
 
-	return handler.writeToken(w, u)
+	return handler.writeToken(w, user)
 }
 
 func (handler *Handler) loginOAuth(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -85,7 +84,7 @@ func (handler *Handler) loginOAuth(w http.ResponseWriter, r *http.Request) *http
 		return &httperror.HandlerError{http.StatusForbidden, "OAuth authentication is disabled", err}
 	}
 
-	url := handler.OAuthService.BuildLoginURL(settings.OAuthSettings)
+	url := handler.OAuthService.BuildLoginURL(&settings.OAuthSettings)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 	return nil
 }

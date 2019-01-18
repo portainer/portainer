@@ -766,7 +766,7 @@ type (
 	OAuthService interface {
 		GetAccessToken(code string, settings *OAuthSettings) (string, error)
 		GetUsername(token string, settings *OAuthSettings) (string, error)
-		BuildLoginURL(oauthSettings OAuthSettings) string
+		BuildLoginURL(oauthSettings *OAuthSettings) string
 	}
 
 	// SwarmStackManager represents a service to manage Swarm stacks
