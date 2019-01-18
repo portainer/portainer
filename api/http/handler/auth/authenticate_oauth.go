@@ -3,9 +3,6 @@ package auth
 import (
 	"log"
 	"net/http"
-	"strings"
-
-	"golang.org/x/oauth2"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
@@ -88,20 +85,7 @@ func (handler *Handler) loginOAuth(w http.ResponseWriter, r *http.Request) *http
 		return &httperror.HandlerError{http.StatusForbidden, "OAuth authentication is disabled", err}
 	}
 
-	endpoint := oauth2.Endpoint{
-		AuthURL:  settings.OAuthSettings.AuthorizationURI,
-		TokenURL: settings.OAuthSettings.AccessTokenURI,
-	}
-
-	oauthConfig := &oauth2.Config{
-		ClientID:     settings.OAuthSettings.ClientID,
-		ClientSecret: settings.OAuthSettings.ClientSecret,
-		Endpoint:     endpoint,
-		RedirectURL:  settings.OAuthSettings.RedirectURI,
-		Scopes:       strings.Split(settings.OAuthSettings.Scopes, ","),
-	}
-
-	url := oauthConfig.AuthCodeURL("portainer")
+	url := handler.OAuthService.BuildLoginURL(settings.OAuthSettings)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 	return nil
 }

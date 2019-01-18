@@ -165,3 +165,21 @@ func (*Service) GetUsername(token string, settings *portainer.OAuthSettings) (st
 		Body:     body,
 	}
 }
+
+// BuildLoginURL creates a login url for the oauth provider
+func (*Service) BuildLoginURL(oauthSettings portainer.OAuthSettings) string {
+	endpoint := oauth2.Endpoint{
+		AuthURL:  oauthSettings.AuthorizationURI,
+		TokenURL: oauthSettings.AccessTokenURI,
+	}
+
+	oauthConfig := &oauth2.Config{
+		ClientID:     oauthSettings.ClientID,
+		ClientSecret: oauthSettings.ClientSecret,
+		Endpoint:     endpoint,
+		RedirectURL:  oauthSettings.RedirectURI,
+		Scopes:       strings.Split(oauthSettings.Scopes, ","),
+	}
+
+	return oauthConfig.AuthCodeURL("portainer")
+}
