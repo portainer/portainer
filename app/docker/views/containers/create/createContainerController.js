@@ -493,6 +493,19 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
         $scope.formValues.capabilities.push(new ContainerCapability(cap, false));
       });
     }
+
+    function hasCapability(item) {
+      return item.capability === cap.capability;
+    }
+
+    var capabilities = new ContainerCapabilities();
+    for (var i = 0; i < capabilities.length; i++) {
+      var cap = capabilities[i];
+      if (!_.find($scope.formValues.capabilities, hasCapability)) {
+        $scope.formValues.capabilities.push(cap);
+      }
+    }
+
     $scope.formValues.capabilities.sort(function(a, b) {
       return a.capability < b.capability ? -1 : 1;
     });
