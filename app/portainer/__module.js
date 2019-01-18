@@ -329,11 +329,10 @@ angular.module('portainer.app', [])
       }
     },
     resolve: {
-      endpointID: ['EndpointProvider', '$state', 'Notifications', 
-        function (EndpointProvider, $state, Notifications) {
+      endpointID: ['EndpointProvider', '$state', 
+        function (EndpointProvider, $state) {
           var id = EndpointProvider.endpointID();
           if (!id) {
-            Notifications.warning('Endpoint is not set');
             return $state.go('portainer.home');
           }
         }

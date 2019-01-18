@@ -7,11 +7,10 @@ angular.module('portainer.docker', ['portainer.app'])
     parent: 'root',
     abstract: true,
     resolve: {
-      endpointID: ['EndpointProvider', '$state', 'Notifications', 
-        function (EndpointProvider, $state, Notifications) {
+      endpointID: ['EndpointProvider', '$state',
+        function (EndpointProvider, $state) {
           var id = EndpointProvider.endpointID();
           if (!id) {
-            Notifications.warning('Endpoint is not set');
             return $state.go('portainer.home');
           }
         }
