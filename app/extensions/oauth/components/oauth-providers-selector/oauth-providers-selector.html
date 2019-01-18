@@ -1,0 +1,17 @@
+<div class="col-sm-12 form-section-title">
+    Provider
+  </div>
+
+
+<div class="form-group">
+  <div class="col-sm-12">
+    <select
+      class="form-control"
+      id="oauth-provider-selector"
+      ng-model="$ctrl.selectedProvider"
+      ng-options="provider as provider for provider in $ctrl.providers"
+    >
+    <option value="">Custom</option>
+  </select>
+  </div>
+</div>
