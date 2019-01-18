@@ -1,28 +1,16 @@
 angular.module('portainer.extensions.oauth').service('OAuthService', [
-  'SettingsService', 'OAuth', 'urlHelper',
-  function OAuthService(SettingsService, OAuth, urlHelper) {
+  'API_ENDPOINT_OAUTH', 'OAuth', 'urlHelper', 'Notifications',
+  function OAuthService(API_ENDPOINT_OAUTH, OAuth, urlHelper, Notifications) {
     this.login = login;
 
     function login() {
-      return getLoginURI()
-        .then(function openPopup(loginUrl) {
-          var popup = window.open(loginUrl, 'login-popup', 'width=800, height=600');
-          if (!popup) {
-            throw new Error('Please enable popups for this page');
-          }
-          return waitForCode(popup);
-        })
-        .then(function onCodeReady(code) {
-          return OAuth.login({ code: code }).$promise;
-        });
-    }
-
-    function getLoginURI() {
-      return SettingsService.publicSettings().then(function onLoadSettings(settings) {
-        if (settings.AuthenticationMethod !== 3) {
-          throw new Error('OAuth is disabled');
-        }
-        return settings.OAuthLoginURI;
+      var loginUrl = API_ENDPOINT_OAUTH + '/login';
+      var popup = window.open(loginUrl, 'login-popup', 'width=800, height=600');
+      if (!popup) {
+        Notifications.warn('Please enable popups for this page');
+      }
+      return waitForCode(popup).then(function onCodeReady(code) {
+        return OAuth.validate({ code: code }).$promise;
       });
     }
 
@@ -49,5 +37,5 @@ angular.module('portainer.extensions.oauth').service('OAuthService', [
         }, interval);
       });
     }
-  }
+  },
 ]);

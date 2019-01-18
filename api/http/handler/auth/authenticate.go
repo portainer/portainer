@@ -17,10 +17,6 @@ type authenticatePayload struct {
 	Password string
 }
 
-type oauthPayload struct {
-	Code string
-}
-
 type authenticateResponse struct {
 	JWT string `json:"jwt"`
 }
@@ -31,13 +27,6 @@ func (payload *authenticatePayload) Validate(r *http.Request) error {
 	}
 	if govalidator.IsNull(payload.Password) {
 		return portainer.Error("Invalid password")
-	}
-	return nil
-}
-
-func (payload *oauthPayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.Code) {
-		return portainer.Error("Invalid OAuth authorization code")
 	}
 	return nil
 }

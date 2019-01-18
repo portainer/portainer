@@ -3,11 +3,26 @@ package auth
 import (
 	"log"
 	"net/http"
+	"strings"
 
+	"golang.org/x/oauth2"
+
+	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/portainer"
 )
+
+type oauthPayload struct {
+	Code string
+}
+
+func (payload *oauthPayload) Validate(r *http.Request) error {
+	if govalidator.IsNull(payload.Code) {
+		return portainer.Error("Invalid OAuth authorization code")
+	}
+	return nil
+}
 
 func (handler *Handler) authenticateOAuth(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload oauthPayload
@@ -61,4 +76,32 @@ func (handler *Handler) authenticateOAuth(w http.ResponseWriter, r *http.Request
 	}
 
 	return handler.writeToken(w, u)
+}
+
+func (handler *Handler) loginOAuth(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	settings, err := handler.SettingsService.Settings()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+	}
+
+	if settings.AuthenticationMethod != 3 {
+		return &httperror.HandlerError{http.StatusForbidden, "OAuth authentication is disabled", err}
+	}
+
+	endpoint := oauth2.Endpoint{
+		AuthURL:  settings.OAuthSettings.AuthorizationURI,
+		TokenURL: settings.OAuthSettings.AccessTokenURI,
+	}
+
+	oauthConfig := &oauth2.Config{
+		ClientID:     settings.OAuthSettings.ClientID,
+		ClientSecret: settings.OAuthSettings.ClientSecret,
+		Endpoint:     endpoint,
+		RedirectURL:  settings.OAuthSettings.RedirectURI,
+		Scopes:       strings.Split(settings.OAuthSettings.Scopes, ","),
+	}
+
+	url := oauthConfig.AuthCodeURL("portainer")
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+	return nil
 }
