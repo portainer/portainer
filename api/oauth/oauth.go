@@ -56,7 +56,11 @@ func (*Service) GetUsername(token string, settings *portainer.OAuthSettings) (st
 		}
 	}
 
-	content, _, _ := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+	content, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+	if err != nil {
+		return "", err
+	}
+
 	if content == "application/x-www-form-urlencoded" || content == "text/plain" {
 		values, err := url.ParseQuery(string(body))
 		if err != nil {
