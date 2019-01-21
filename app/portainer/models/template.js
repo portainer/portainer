@@ -66,7 +66,6 @@ function TemplateViewModel(data) {
   this.Hostname = data.hostname;
   this.Registry = data.registry ? { URL: data.registry } : {};
   this.Image = data.image;
-  this.Registry = data.registry ? data.registry : '';
   this.Command = data.command ? data.command : '';
   this.Network = data.network ? data.network : '';
   this.Privileged = data.privileged ? data.privileged : false;
