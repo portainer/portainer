@@ -14,10 +14,13 @@ function ($q, RegistryService, DockerHubService, ImageService, Notifications) {
       var registries = data.registries;
       ctrl.availableImages = ImageService.getUniqueTagListFromImages(data.availableImages);
       ctrl.availableRegistries = [dockerhub].concat(registries);
-      if (!ctrl.registry.Id) {
-        ctrl.registry = dockerhub;
-      } else {
+
+      if (ctrl.registry.Id) {
         ctrl.registry = _.find(ctrl.availableRegistries, { 'Id': ctrl.registry.Id });
+      } else if (ctrl.registry.URL) {
+        ctrl.registry = _.find(ctrl.availableRegistries, { 'URL': ctrl.registry.URL });
+      } else {
+        ctrl.registry = dockerhub;
       }
     })
     .catch(function error(err) {
