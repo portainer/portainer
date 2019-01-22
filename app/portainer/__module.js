@@ -327,6 +327,16 @@ angular.module('portainer.app', [])
         templateUrl: 'app/portainer/views/stacks/stacks.html',
         controller: 'StacksController'
       }
+    },
+    resolve: {
+      endpointID: ['EndpointProvider', '$state', 
+        function (EndpointProvider, $state) {
+          var id = EndpointProvider.endpointID();
+          if (!id) {
+            return $state.go('portainer.home');
+          }
+        }
+      ]
     }
   };
 
@@ -342,7 +352,7 @@ angular.module('portainer.app', [])
   };
 
   var stackCreation = {
-    name: 'portainer.newstack',
+    name: 'portainer.stacks.newstack',
     url: '/newstack',
     views: {
       'content@': {
