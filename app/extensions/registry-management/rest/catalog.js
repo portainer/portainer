@@ -1,13 +1,13 @@
 angular.module('portainer.extensions.registrymanagement')
-.factory('RegistryCatalog', ['$resource', 'API_ENDPOINT_REGISTRIES', 'RegistryAPILinkInterceptor',
-function RegistryCatalogFactory($resource, API_ENDPOINT_REGISTRIES, RegistryAPILinkInterceptor) {
+.factory('RegistryCatalog', ['$resource', 'API_ENDPOINT_REGISTRIES',
+function RegistryCatalogFactory($resource, API_ENDPOINT_REGISTRIES) {
   'use strict';
   return $resource(API_ENDPOINT_REGISTRIES + '/:id/v2/:action', {},
   {
     get: {
       method: 'GET',
       params: { id: '@id', action: '_catalog' },
-      interceptor: RegistryAPILinkInterceptor
+      transformResponse: linkGetResponse
     },
     ping: {
       method: 'GET',
