@@ -11,16 +11,33 @@ function RegistryV2ServiceFactory($q, RegistryCatalog, RegistryTags, RegistryMan
     return RegistryCatalog.ping({ id: id }).$promise;
   };
 
+  function getCatalog(id) {
+    var deferred = $q.defer();
+    var repositories = [];
+
+    _getCatalogPage({id: id}, deferred, repositories);
+
+    return deferred.promise;
+  }
+
+  function _getCatalogPage(params, deferred, repositories) {
+    RegistryCatalog.get(params).$promise.then(function(data) {
+      repositories = _.concat(repositories, data.repositories);
+      if (data.last && data.n) {
+        _getCatalogPage({id: params.id, n: data.n, last: data.last}, deferred, repositories);
+      } else {
+        deferred.resolve(repositories);
+      }
+    });
+  }
+
   service.repositories = function (id) {
     var deferred = $q.defer();
 
-    RegistryCatalog.get({
-      id: id
-    }).$promise
-    .then(function success(data) {
+    getCatalog(id).then(function success(data) {
       var promises = [];
-      for (var i = 0; i < data.repositories.length; i++) {
-        var repository = data.repositories[i];
+      for (var i = 0; i < data.length; i++) {
+        var repository = data[i];
         promises.push(RegistryTags.get({
           id: id,
           repository: repository
