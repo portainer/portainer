@@ -17,7 +17,21 @@ angular.module('portainer.app')
         Images: []
       };
 
-      $scope.$watch('tags.length', function () {
+      $scope.paginationAction = function (tags) {
+        RegistryV2Service.getTagsDetails($scope.registryId, $scope.repository.Name, tags)
+        .then(function success(data) {
+          for (var i = 0; i < data.length; i++) {
+            var idx = _.findIndex($scope.tags, {'Name': data[i].Name});
+            if (idx !== -1) {
+              $scope.tags[idx] = data[i];
+            }
+          }
+        }).catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to retrieve tags details');
+        });
+      };
+
+      $scope.$watch('tags', function () {
         var images = $scope.tags.map(function (item) {
           return item.ImageId;
         });
@@ -138,17 +152,9 @@ angular.module('portainer.app')
           .then(function success(data) {
             $scope.registry = data.registry;
             $scope.repository.Tags = [].concat(data.tags || []);
-            $scope.tags = [];
-            for (var i = 0; i < $scope.repository.Tags.length; i++) {
-              var tag = data.tags[i];
-              RegistryV2Service.tag(registryId, repository, tag)
-                .then(function success(data) {
-                  $scope.tags.push(data);
-                })
-                .catch(function error(err) {
-                  Notifications.error('Failure', err, 'Unable to retrieve tag information');
-                });
-            }
+            $scope.tags = $scope.repository.Tags.map(function (tag) {
+              return new RepositoryTagViewModel(tag);
+            });
           })
           .catch(function error(err) {
             Notifications.error('Failure', err, 'Unable to retrieve repository information');

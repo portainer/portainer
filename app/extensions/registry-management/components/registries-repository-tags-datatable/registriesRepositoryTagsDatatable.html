@@ -33,18 +33,10 @@
               </th>
               <th>Os/Architecture</th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('ImageId')">
                   Image ID
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ImageId' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ImageId' && $ctrl.state.reverseOrder"></i>
-                </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Size')">
                   Size
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Size' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Size' && $ctrl.state.reverseOrder"></i>
-                </a>
               </th>
               <th>Actions</th>
             </tr>
@@ -96,7 +88,6 @@
                 Items per page
               </span>
               <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
-                <option value="0">All</option>
                 <option value="10">10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>

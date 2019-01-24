@@ -1,5 +1,5 @@
 angular.module('portainer.app')
-.controller('RegistryRepositoriesDatatableController', ['$scope', '$controller',
+.controller('RegistryRepositoriesTagsDatatableController', ['$scope', '$controller',
   function($scope, $controller) {
     var ctrl = this;
 
@@ -17,7 +17,7 @@ angular.module('portainer.app')
     $scope.$watch(function() { return ctrl.state.filteredDataSet;},
       function(newValue, oldValue) {
         if (newValue && areDifferent(oldValue, newValue)) {
-          ctrl.paginationAction(_.filter(newValue, {'TagsCount':0}));
+          ctrl.paginationAction(_.filter(newValue, {'ImageId': ''}));
         }
       }, true);
   }

@@ -104,6 +104,17 @@ function RegistryV2ServiceFactory($q, RegistryCatalog, RegistryTags, RegistryMan
     return deferred.promise;
   };
 
+  service.getTagsDetails = function (id, repository, tags) {
+    var promises = [];
+
+    for (var i = 0; i < tags.length; i++) {
+      var tag = tags[i].Name;
+      promises.push(service.tag(id, repository, tag));
+    }
+
+    return $q.all(promises);
+  };
+
   service.tag = function (id, repository, tag) {
     var deferred = $q.defer();
 
