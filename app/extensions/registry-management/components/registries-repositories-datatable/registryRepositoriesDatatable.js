@@ -1,6 +1,6 @@
 angular.module('portainer.extensions.registrymanagement').component('registryRepositoriesDatatable', {
   templateUrl: './registryRepositoriesDatatable.html',
-  controller: 'GenericDatatableController',
+  controller: 'RegistryRepositoriesDatatableController',
   bindings: {
     titleText: '@',
     titleIcon: '@',
@@ -8,6 +8,6 @@ angular.module('portainer.extensions.registrymanagement').component('registryRep
     tableKey: '@',
     orderBy: '@',
     reverseOrder: '<',
-    removeAction: '<'
+    paginationAction: '<'
   }
 });

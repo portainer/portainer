@@ -34,20 +34,18 @@ function RegistryV2ServiceFactory($q, RegistryCatalog, RegistryTags, RegistryMan
     });
   }
 
-  service.repositories = function (id) {
+  service.getRepositoriesDetails = function (id, repositories) {
     var deferred = $q.defer();
+    var promises = [];
+    for (var i = 0; i < repositories.length; i++) {
+      var repository = repositories[i].Name;
+      promises.push(RegistryTags.get({
+        id: id,
+        repository: repository
+      }).$promise);
+    }
 
-    getCatalog(id).then(function success(data) {
-      var promises = [];
-      for (var i = 0; i < data.length; i++) {
-        var repository = data[i];
-        promises.push(RegistryTags.get({
-          id: id,
-          repository: repository
-        }).$promise);
-      }
-      return $q.all(promises);
-    })
+    $q.all(promises)
     .then(function success(data) {
       var repositories = data.map(function (item) {
         if (!item.tags) {
@@ -56,6 +54,25 @@ function RegistryV2ServiceFactory($q, RegistryCatalog, RegistryTags, RegistryMan
         return new RegistryRepositoryViewModel(item);
       });
       repositories = _.without(repositories, undefined);
+      deferred.resolve(repositories);
+    })
+    .catch(function error(err) {
+      deferred.reject({
+        msg: 'Unable to retrieve repositories',
+        err: err
+      });
+    });
+
+    return deferred.promise;
+  };
+
+  service.repositories = function (id) {
+    var deferred = $q.defer();
+
+    getCatalog(id).then(function success(data) {
+      var repositories = data.map(function (repositoryName) {
+        return new RegistryRepositoryViewModel(repositoryName);
+      });
       deferred.resolve(repositories);
     })
     .catch(function error(err) {
