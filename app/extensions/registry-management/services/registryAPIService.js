@@ -87,22 +87,28 @@ function RegistryV2ServiceFactory($q, RegistryCatalog, RegistryTags, RegistryMan
 
   service.tags = function (id, repository) {
     var deferred = $q.defer();
+    var tags = [];
 
-    RegistryTags.get({
-      id: id,
-      repository: repository
-    }).$promise
-    .then(function succes(data) {
-      deferred.resolve(data.tags);
+    _getTagsPage({id: id, repository: repository}, deferred, tags);
+
+    return deferred.promise;
+  };
+
+  function _getTagsPage(params, deferred, tags) {
+    RegistryTags.get(params).$promise.then(function(data) {
+      tags = _.concat(tags, data.tags);
+      if (data.last && data.n) {
+        _getTagsPage({id: params.id, n: data.n, last: data.last}, deferred, tags);
+      } else {
+        deferred.resolve(tags);
+      }
     }).catch(function error(err) {
       deferred.reject({
         msg: 'Unable to retrieve tags',
         err: err
       });
     });
-
-    return deferred.promise;
-  };
+  }
 
   service.getTagsDetails = function (id, repository, tags) {
     var promises = [];

@@ -4,7 +4,8 @@ angular.module('portainer.extensions.registrymanagement')
   return $resource(API_ENDPOINT_REGISTRIES + '/:id/v2/:repository/tags/list', {}, {
     get: {
       method: 'GET',
-      params: { id: '@id', repository: '@repository' }
+      params: { id: '@id', repository: '@repository' },
+      transformResponse: linkGetResponse
     }
   });
 }]);

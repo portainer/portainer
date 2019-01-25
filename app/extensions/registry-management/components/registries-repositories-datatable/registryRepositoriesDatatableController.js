@@ -4,6 +4,7 @@ angular.module('portainer.app')
     var ctrl = this;
 
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
+    this.state.orderBy = this.orderBy;
 
     function areDifferent(a, b) {
       if (!a || !b) {

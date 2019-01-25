@@ -5,7 +5,8 @@ angular.module('portainer.app')
     function ($q, $scope, $transition$, $state, RegistryV2Service, RegistryService, ModalService, Notifications) {
 
       $scope.state = {
-        actionInProgress: false
+        actionInProgress: false,
+        loading: false
       };
       $scope.formValues = {
         Tag: ''
@@ -18,6 +19,7 @@ angular.module('portainer.app')
       };
 
       $scope.paginationAction = function (tags) {
+        $scope.state.loading = true;
         RegistryV2Service.getTagsDetails($scope.registryId, $scope.repository.Name, tags)
         .then(function success(data) {
           for (var i = 0; i < data.length; i++) {
@@ -26,16 +28,17 @@ angular.module('portainer.app')
               $scope.tags[idx] = data[i];
             }
           }
+          $scope.state.loading = false;
         }).catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve tags details');
         });
       };
 
-      $scope.$watch('tags', function () {
+      $scope.$watchCollection('tags', function () {
         var images = $scope.tags.map(function (item) {
           return item.ImageId;
         });
-        $scope.repository.Images = _.uniq(images);
+        $scope.repository.Images = _.without(_.uniq(images), '');
       });
 
       $scope.addTag = function () {
@@ -151,10 +154,10 @@ angular.module('portainer.app')
           })
           .then(function success(data) {
             $scope.registry = data.registry;
-            $scope.repository.Tags = [].concat(data.tags || []);
-            $scope.tags = $scope.repository.Tags.map(function (tag) {
-              return new RepositoryTagViewModel(tag);
-            });
+            $scope.repository.Tags = [].concat(data.tags || []).sort();
+            for (var i = 0; i < $scope.repository.Tags.length; i++) {
+              $scope.tags.push(new RepositoryTagViewModel($scope.repository.Tags[i]));
+            }
           })
           .catch(function error(err) {
             Notifications.error('Failure', err, 'Unable to retrieve repository information');

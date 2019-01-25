@@ -3,11 +3,12 @@ angular.module('portainer.extensions.registrymanagement')
 function ($transition$, $scope, RegistryService, RegistryV2Service, Notifications, Authentication) {
 
   $scope.state = {
-    displayInvalidConfigurationMessage: false
+    displayInvalidConfigurationMessage: false,
+    loading: false
   };
 
-
   $scope.paginationAction = function (repositories) {
+    $scope.state.loading = true;
     RegistryV2Service.getRepositoriesDetails($scope.state.registryId, repositories)
     .then(function success(data) {
       for (var i = 0; i < data.length; i++) {
@@ -16,6 +17,7 @@ function ($transition$, $scope, RegistryService, RegistryV2Service, Notification
           $scope.repositories[idx].TagsCount = data[i].TagsCount;
         }
       }
+      $scope.state.loading = false;
     }).catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve repositories details');
     });
