@@ -23,7 +23,7 @@ function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManage
   }
 
   function OAuthLogin(code) {
-    return OAuth.login({ code: code }).$promise
+    return OAuth.validate({ code: code }).$promise
       .then(function onLoginSuccess(response) {
         return setUser(response.jwt);
       });
