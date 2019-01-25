@@ -228,8 +228,13 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
   function prepareLabels(config) {
     var labels = {};
     $scope.formValues.Labels.forEach(function (label) {
-      if (label.name && label.value) {
-        labels[label.name] = label.value;
+      if (label.name) {
+        if (label.value) {
+            labels[label.name] = label.value;
+        }
+        else {
+            labels[label.name] = '';
+        }
       }
     });
     config.Labels = labels;
