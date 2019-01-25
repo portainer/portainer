@@ -1,7 +1,7 @@
 angular.module('portainer.app')
 .factory('Authentication', [
-'Auth', 'OAuthService', 'jwtHelper', 'LocalStorage', 'StateManager', 'EndpointProvider', 
-function AuthenticationFactory(Auth, OAuthService, jwtHelper, LocalStorage, StateManager, EndpointProvider) {
+'Auth', 'OAuth', 'jwtHelper', 'LocalStorage', 'StateManager', 'EndpointProvider', 
+function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManager, EndpointProvider) {
   'use strict';
 
   var service = {};
@@ -13,8 +13,6 @@ function AuthenticationFactory(Auth, OAuthService, jwtHelper, LocalStorage, Stat
   service.logout = logout;
   service.isAuthenticated = isAuthenticated;
   service.getUserDetails = getUserDetails;
-  
-  
 
   function init() {
     var jwt = LocalStorage.getJWT();
@@ -24,10 +22,10 @@ function AuthenticationFactory(Auth, OAuthService, jwtHelper, LocalStorage, Stat
     }
   }
 
-  function OAuthLogin() {
-    return OAuthService.login()
-      .then(function onLoginSuccess(loginResponse) {
-        setUser(loginResponse.jwt);
+  function OAuthLogin(code) {
+    return OAuth.login({ code: code }).$promise
+      .then(function onLoginSuccess(response) {
+        return setUser(response.jwt);
       });
   }
 
