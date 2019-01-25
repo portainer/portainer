@@ -9,9 +9,9 @@
       class="form-control"
       id="oauth-provider-selector"
       ng-model="$ctrl.selectedProvider"
-      ng-options="provider as provider for provider in $ctrl.providers"
+      ng-change="$ctrl.onSelect($ctrl.selectedProvider)"
+      ng-options="provider as provider.name for provider in $ctrl.providers"
     >
-    <option value="">Custom </option>
   </select>
   </div>
 </div>
