@@ -2,9 +2,9 @@ export GOPATH="$AGENT_BUILDDIRECTORY/api"
 binary="portainer"
 
 mkdir -p dist
-mkdir -p api/src/github.com/portainer/
+#mkdir -p api/src/github.com/portainer/
 
-cp -R api/ api/src/github.com/portainer/portainer/
+#cp -R api/ api/src/github.com/portainer/portainer/
 
 cd 'api/cmd/portainer'
 
