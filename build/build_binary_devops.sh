@@ -14,7 +14,7 @@ ls -la api/src/github.com/portainer/portainer/
 cd 'api/cmd/portainer'
 
 pwd
-export GOPATH="$AGENT_BUILDDIRECTORY/api/src/github.com/portainer/portainer"
+
 go get -t -d -v ./...
 GOOS=$1 GOARCH=$2 CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags '-s'
 
