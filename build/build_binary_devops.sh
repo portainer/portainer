@@ -1,4 +1,4 @@
-#export GOPATH="$AGENT_BUILDDIRECTORY/api"
+export GOPATH="$AGENT_BUILDDIRECTORY/api"
 binary="portainer"
 
 ls -la api/
