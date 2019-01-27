@@ -12,4 +12,4 @@ cd 'api/cmd/portainer'
 go get -t -d -v ./...
 GOOS=$1 GOARCH=$2 CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags '-s'
 
-mv "$AGENT_BUILDDIRECTORY/api/cmd/portainer/$binary" "$AGENT_BUILDDIRECTORY/dist/portainer"
+mv "$BUILD_SOURCESDIRECTORY/api/cmd/portainer/$binary" "$BUILD_SOURCESDIRECTORY/dist/portainer"
