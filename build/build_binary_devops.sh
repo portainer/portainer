@@ -7,7 +7,7 @@ mkdir -p dist
 mkdir -p api/src/github.com/portainer/
 mkdir -p api/src/github.com/portainer/portainer
 
-cp -R api/* api/src/github.com/portainer/portainer/
+cp -r `ls -A | grep -v "src"` api/src/github.com/portainer/portainer/
 
 ls -la api/src/github.com/portainer/portainer/
 
