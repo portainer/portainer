@@ -18,8 +18,6 @@ Rename-Item -Path "$project_path\api\src\github.com\portainer\api" -NewName "por
 
 Set-Location -Path "$project_path\api\cmd\portainer"
 
-ls C:\go\bin\
-
 go.exe get -t -d -v ./...
 go.exe build -v
 
