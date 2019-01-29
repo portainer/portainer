@@ -63,7 +63,7 @@
         <a ui-sref="portainer.tags" ui-sref-active="active">Tags</a>
       </div>
     </li>
-    <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
+    <li class="sidebar-list" ng-if="applicationState.application.authentication">
       <a ui-sref="portainer.registries" ui-sref-active="active">Registries <span class="menu-icon fa fa-database fa-fw"></span></a>
     </li>
     <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">

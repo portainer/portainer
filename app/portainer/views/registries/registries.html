@@ -74,7 +74,7 @@
     title-text="Registries" title-icon="fa-database"
     dataset="registries" table-key="registries"
     order-by="Name"
-    access-management="applicationState.application.authentication"
+    access-management="applicationState.application.authentication && isAdmin"
     remove-action="removeAction"
     registry-management="registryManagementAvailable"
     ></registries-datatable>
