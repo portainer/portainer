@@ -140,7 +140,7 @@ func (manager *SwarmStackManager) updateDockerCLIConfiguration(dataPath string) 
 		return err
 	}
 
-	signature, err := manager.signatureService.CreateSignature()
+	signature, err := manager.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
 	if err != nil {
 		return err
 	}

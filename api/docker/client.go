@@ -3,6 +3,7 @@ package docker
 import (
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/docker/docker/client"
 	"github.com/portainer/portainer"
@@ -67,7 +68,7 @@ func createAgentClient(endpoint *portainer.Endpoint, signatureService portainer.
 		return nil, err
 	}
 
-	signature, err := signatureService.CreateSignature()
+	signature, err := signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
 	if err != nil {
 		return nil, err
 	}
@@ -102,5 +103,6 @@ func httpClient(endpoint *portainer.Endpoint) (*http.Client, error) {
 
 	return &http.Client{
 		Transport: transport,
+		Timeout:   30 * time.Second,
 	}, nil
 }

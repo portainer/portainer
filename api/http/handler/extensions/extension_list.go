@@ -22,7 +22,7 @@ func (handler *Handler) extensionList(w http.ResponseWriter, r *http.Request) *h
 	if storeDetails {
 		definitions, err := handler.ExtensionManager.FetchExtensionDefinitions()
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve extension definitions", err}
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve extensions", err}
 		}
 
 		for idx := range definitions {

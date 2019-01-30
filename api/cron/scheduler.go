@@ -39,6 +39,7 @@ func (scheduler *JobScheduler) UpdateSystemJobSchedule(jobType portainer.JobType
 			if err != nil {
 				return err
 			}
+			continue
 		}
 
 		newCron.Schedule(entry.Schedule, entry.Job)
@@ -72,6 +73,7 @@ func (scheduler *JobScheduler) UpdateJobSchedule(runner portainer.JobRunner) err
 			if err != nil {
 				return err
 			}
+			continue
 		}
 
 		newCron.Schedule(entry.Schedule, entry.Job)

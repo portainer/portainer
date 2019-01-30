@@ -45,39 +45,41 @@ func (runner *SnapshotJobRunner) GetSchedule() *portainer.Schedule {
 // As a snapshot can be a long process, to avoid any concurrency issue we
 // retrieve the latest version of the endpoint right after a snapshot.
 func (runner *SnapshotJobRunner) Run() {
-	endpoints, err := runner.context.endpointService.Endpoints()
-	if err != nil {
-		log.Printf("background schedule error (endpoint snapshot). Unable to retrieve endpoint list (err=%s)\n", err)
-		return
-	}
-
-	for _, endpoint := range endpoints {
-		if endpoint.Type == portainer.AzureEnvironment {
-			continue
-		}
-
-		snapshot, snapshotError := runner.context.snapshotter.CreateSnapshot(&endpoint)
-
-		latestEndpointReference, err := runner.context.endpointService.Endpoint(endpoint.ID)
-		if latestEndpointReference == nil {
-			log.Printf("background schedule error (endpoint snapshot). Endpoint not found inside the database anymore (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
-			continue
-		}
-
-		latestEndpointReference.Status = portainer.EndpointStatusUp
-		if snapshotError != nil {
-			log.Printf("background schedule error (endpoint snapshot). Unable to create snapshot (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, snapshotError)
-			latestEndpointReference.Status = portainer.EndpointStatusDown
-		}
-
-		if snapshot != nil {
-			latestEndpointReference.Snapshots = []portainer.Snapshot{*snapshot}
-		}
-
-		err = runner.context.endpointService.UpdateEndpoint(latestEndpointReference.ID, latestEndpointReference)
+	go func() {
+		endpoints, err := runner.context.endpointService.Endpoints()
 		if err != nil {
-			log.Printf("background schedule error (endpoint snapshot). Unable to update endpoint (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
+			log.Printf("background schedule error (endpoint snapshot). Unable to retrieve endpoint list (err=%s)\n", err)
 			return
 		}
-	}
+
+		for _, endpoint := range endpoints {
+			if endpoint.Type == portainer.AzureEnvironment {
+				continue
+			}
+
+			snapshot, snapshotError := runner.context.snapshotter.CreateSnapshot(&endpoint)
+
+			latestEndpointReference, err := runner.context.endpointService.Endpoint(endpoint.ID)
+			if latestEndpointReference == nil {
+				log.Printf("background schedule error (endpoint snapshot). Endpoint not found inside the database anymore (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
+				continue
+			}
+
+			latestEndpointReference.Status = portainer.EndpointStatusUp
+			if snapshotError != nil {
+				log.Printf("background schedule error (endpoint snapshot). Unable to create snapshot (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, snapshotError)
+				latestEndpointReference.Status = portainer.EndpointStatusDown
+			}
+
+			if snapshot != nil {
+				latestEndpointReference.Snapshots = []portainer.Snapshot{*snapshot}
+			}
+
+			err = runner.context.endpointService.UpdateEndpoint(latestEndpointReference.ID, latestEndpointReference)
+			if err != nil {
+				log.Printf("background schedule error (endpoint snapshot). Unable to update endpoint (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
+				return
+			}
+		}
+	}()
 }
