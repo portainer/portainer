@@ -285,11 +285,10 @@ function shell_buildBinary(p, a) {
 }
 
 function shell_buildBinaryOnDevOps(p, a) {
-  var binfile = 'portainer-' + p + '-' + a;
   if (p === 'linux') {
-    return 'build/build_binary_devops.sh ' + p + ' ' + a + ';'
+    return 'build/build_binary_devops.sh ' + p + ' ' + a + ';';
   } else {
-    return 'powershell -Command ".\\build\\build_binary_devops.ps1 -platform ' + p + ' -arch ' + a + '"'
+    return 'powershell -Command ".\\build\\build_binary_devops.ps1 -platform ' + p + ' -arch ' + a + '"';
   }
 }
 
