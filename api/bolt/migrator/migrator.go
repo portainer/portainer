@@ -214,6 +214,7 @@ func (m *Migrator) Migrate() error {
 		}
 	}
 
+	// Portainer 1.20.1
 	if m.currentDBVersion < 17 {
 		err := m.updateExtensionsToDBVersion17()
 		if err != nil {
