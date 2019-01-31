@@ -126,6 +126,7 @@ angular.module('portainer.docker')
 
       function createNetwork(context) {
         HttpRequestHelper.setPortainerAgentTargetHeader(context.nodeName);
+        HttpRequestHelper.setPortainerAgentManagerOperation(context.managerOperation);
 
         $scope.state.actionInProgress = true;
         NetworkService.create(context.networkConfiguration)
@@ -162,11 +163,16 @@ angular.module('portainer.docker')
 
         var creationContext = {
           nodeName: $scope.formValues.NodeName,
+          managerOperation: false,
           networkConfiguration: networkConfiguration,
           userDetails: userDetails,
           accessControlData: accessControlData,
           reload: true
         };
+
+        if ($scope.applicationState.endpoint.mode.agentProxy && $scope.applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && $scope.config.Driver === 'overlay') {
+          creationContext.managerOperation = true;
+        }
 
         if ($scope.config.Driver === 'macvlan') {
           if ($scope.formValues.Macvlan.Scope === 'local') {

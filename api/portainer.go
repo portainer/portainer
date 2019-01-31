@@ -503,6 +503,7 @@ type (
 		LicenseKey string `json:"LicenseKey,omitempty"`
 		Company    string `json:"Company,omitempty"`
 		Expiration string `json:"Expiration,omitempty"`
+		Valid      bool   `json:"Valid,omitempty"`
 	}
 
 	// CLIService represents a service for managing CLI
@@ -778,9 +779,9 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "1.20.0"
+	APIVersion = "1.20.1"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 15
+	DBVersion = 17
 	// AssetsServerURL represents the URL of the Portainer asset server
 	AssetsServerURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com"
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved

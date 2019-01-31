@@ -5,6 +5,7 @@ angular.module('portainer.app')
   var service = {};
   var headers = {};
   headers.agentTargetQueue = [];
+  headers.agentManagerOperation = false;
 
   service.registryAuthenticationHeader = function() {
     return headers.registryAuthentication;
@@ -36,9 +37,18 @@ angular.module('portainer.app')
     }
   };
 
-  service.resetAgentTargetQueue = function() {
+  service.setPortainerAgentManagerOperation = function(set) {
+    headers.agentManagerOperation = set;
+  };
+
+  service.portainerAgentManagerOperation = function() {
+    return headers.agentManagerOperation;
+  };
+
+  service.resetAgentHeaders = function() {
     headers.agentTargetQueue = [];
     delete headers.agentTargetLastValue;
+    headers.agentManagerOperation = false;
   };
 
   return service;
