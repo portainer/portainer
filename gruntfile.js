@@ -48,9 +48,18 @@ module.exports = function(grunt) {
       ]);
     });
 
-  grunt.task.registerTask('devopsbuild', 'devopsbuild:<platform>:<arch>', function(p, a) {
-    grunt.task.run(['config:prod', 'clean:all', 'shell:buildBinaryOnDevOps:' + p + ':' + a, 'shell:downloadDockerBinary:' + p + ':' + a, 'before-copy', 'copy:assets', 'after-copy']);
-  });
+  grunt.task.registerTask('devopsbuild', 'devopsbuild:<platform>:<arch>', 
+    function(p, a) {
+      grunt.task.run([
+        'config:prod',
+        'env:prod',
+        'clean:all',
+        'copy:templates',
+        'shell:buildBinaryOnDevOps:' + p + ':' + a,
+        'shell:downloadDockerBinary:' + p + ':' + a,
+        'webpack:prod'
+      ]);
+    });
 
   grunt.registerTask('lint', ['eslint']);
 

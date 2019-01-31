@@ -6,7 +6,7 @@ param (
 $ErrorActionPreference = "Stop";
 
 $binary = "portainer.exe"
-$project_path = (Get-ITEM -Path env:APPVEYOR_BUILD_FOLDER).Value
+$project_path = $((Get-Location).Path)
 
 New-Item -Name dist -Path "$project_path" -ItemType Directory | Out-Null
 Set-Location -Path "$project_path\api\cmd\portainer"
