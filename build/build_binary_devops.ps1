@@ -10,7 +10,7 @@ $project_path = (Get-ITEM -Path env:BUILD_SOURCESDIRECTORY).Value
 
 Set-Item env:GOPATH "$project_path\api"
 
-Test-Path New-Item -Name dist -Path "$project_path" -ItemType Directory -Force | Out-Null
+New-Item -Name dist -Path "$project_path" -ItemType Directory -Force | Out-Null
 New-Item -Name portainer -Path "$project_path\api\src\github.com\" -ItemType Directory | Out-Null
 
 Copy-Item -Path "$project_path\api" -Destination "$project_path\api\src\github.com\portainer" -Recurse -Force -ErrorAction:SilentlyContinue
