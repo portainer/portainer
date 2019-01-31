@@ -48,7 +48,7 @@ angular.module('portainer.app', [])
 
   var authentication = {
     name: 'portainer.auth',
-    url: '/auth',
+    url: '/auth?redirect',
     params: {
       logout: false,
       error: ''
@@ -87,7 +87,7 @@ angular.module('portainer.app', [])
     }
   };
 
-  var endpointCreation  = {
+  var endpointCreation = {
     name: 'portainer.endpoints.new',
     url: '/new',
     views: {
@@ -242,7 +242,7 @@ angular.module('portainer.app', [])
     }
   };
 
-  var registryCreation  = {
+  var registryCreation = {
     name: 'portainer.registries.new',
     url: '/new',
     views: {
@@ -286,7 +286,7 @@ angular.module('portainer.app', [])
     }
   };
 
-  var scheduleCreation  = {
+  var scheduleCreation = {
     name: 'portainer.schedules.new',
     url: '/new',
     views: {
@@ -327,6 +327,16 @@ angular.module('portainer.app', [])
         templateUrl: './views/stacks/stacks.html',
         controller: 'StacksController'
       }
+    },
+    resolve: {
+      endpointID: ['EndpointProvider', '$state', 
+        function (EndpointProvider, $state) {
+          var id = EndpointProvider.endpointID();
+          if (!id) {
+            return $state.go('portainer.home');
+          }
+        }
+      ]
     }
   };
 
@@ -342,7 +352,7 @@ angular.module('portainer.app', [])
   };
 
   var stackCreation = {
-    name: 'portainer.newstack',
+    name: 'portainer.stacks.newstack',
     url: '/newstack',
     views: {
       'content@': {

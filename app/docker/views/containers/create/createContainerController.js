@@ -499,6 +499,19 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
         $scope.formValues.capabilities.push(new ContainerCapability(cap, false));
       });
     }
+
+    function hasCapability(item) {
+      return item.capability === cap.capability;
+    }
+
+    var capabilities = new ContainerCapabilities();
+    for (var i = 0; i < capabilities.length; i++) {
+      var cap = capabilities[i];
+      if (!_.find($scope.formValues.capabilities, hasCapability)) {
+        $scope.formValues.capabilities.push(cap);
+      }
+    }
+
     $scope.formValues.capabilities.sort(function(a, b) {
       return a.capability < b.capability ? -1 : 1;
     });
@@ -515,6 +528,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       $scope.fromContainer = fromContainer;
       $scope.config = ContainerHelper.configFromContainer(fromContainer.Model);
       loadFromContainerCmd(d);
+      loadFromContainerLogging(d);
       loadFromContainerPortBindings(d);
       loadFromContainerVolumes(d);
       loadFromContainerNetworkConfig(d);
@@ -528,6 +542,17 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve container');
+    });
+  }
+
+  function loadFromContainerLogging(config) {
+    var logConfig = config.HostConfig.LogConfig;
+    $scope.formValues.LogDriverName = logConfig.Type;
+    $scope.formValues.LogDriverOpts = _.map(logConfig.Config, function (value, name) {
+      return {
+        name: name,
+        value: value
+      };
     });
   }
 
@@ -627,9 +652,9 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
   function create() {
     var oldContainer = null;
 
-
     HttpRequestHelper.setPortainerAgentTargetHeader($scope.formValues.NodeName);
     return findCurrentContainer()
+      .then(setOldContainer)
       .then(confirmCreateContainer)
       .then(startCreationProcess)
       .catch(notifyOnError)
@@ -639,6 +664,11 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       $scope.state.actionInProgress = false;
     }
 
+    function setOldContainer(container) {
+      oldContainer = container;
+      return container;
+    }
+
     function findCurrentContainer() {
       return Container.query({ all: 1, filters: { name: ['^/' + $scope.config.name + '$'] } })
         .$promise
@@ -646,8 +676,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
           if (!containers.length) {
             return;
           }
-          oldContainer = containers[0];
-          return oldContainer;
+          return containers[0];
         })
         .catch(notifyOnError);
 
@@ -670,7 +699,36 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
         .then(applyResourceControl)
         .then(connectToExtraNetworks)
         .then(removeOldContainer)
-        .then(onSuccess);
+        .then(onSuccess)
+        .catch(onCreationProcessFail);
+    }
+
+    function onCreationProcessFail(error) {
+      var deferred = $q.defer();
+      removeNewContainer()
+        .then(restoreOldContainerName)
+        .then(function() {
+          deferred.reject(error);
+        })
+        .catch(function(restoreError) {
+          deferred.reject(restoreError);
+        });
+      return deferred.promise;
+    }
+
+    function removeNewContainer() {
+      return findCurrentContainer().then(function onContainerLoaded(container) {
+        if (container && (!oldContainer || container.Id !== oldContainer.Id)) {
+          return ContainerService.remove(container, true);
+        }
+      });
+    }
+
+    function restoreOldContainerName() {
+      if (!oldContainer) {
+        return;
+      }
+      return ContainerService.renameContainer(oldContainer.Id, oldContainer.Names[0].substring(1));
     }
 
     function confirmCreateContainer(container) {

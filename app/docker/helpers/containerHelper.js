@@ -6,7 +6,7 @@ angular.module('portainer.docker')
   var helper = {};
 
   helper.commandStringToArray = function(command) {
-    return splitargs(command, undefined, true);
+    return splitargs(command);
   };
 
   helper.commandArrayToString = function(array) {

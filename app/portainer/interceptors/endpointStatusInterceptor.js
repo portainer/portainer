@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
 
 angular.module('portainer.app')
-  .factory('EndpointStatusInterceptor', ['$q', '$injector', 'EndpointProvider', function ($q, $injector, EndpointProvider) {
+  .factory('EndpointStatusInterceptor', ['$q', 'EndpointProvider', function ($q, EndpointProvider) {
     'use strict';
     var interceptor = {};
 
@@ -20,21 +20,17 @@ angular.module('portainer.app')
     }
 
     function responseInterceptor(response) {
-      var EndpointService = $injector.get('EndpointService');
       var url = response.config.url;
       if (response.status === 200 && canBeOffline(url) && EndpointProvider.offlineMode()) {
         EndpointProvider.setOfflineMode(false);
-        EndpointService.updateEndpoint(EndpointProvider.endpointID(), {Status: EndpointProvider.endpointStatusFromOfflineMode(false)});
       }
       return response || $q.when(response);
     }
 
     function responseErrorInterceptor(rejection) {
-      var EndpointService = $injector.get('EndpointService');
       var url = rejection.config.url;
       if ((rejection.status === 502 || rejection.status === 503 || rejection.status === -1) && canBeOffline(url) && !EndpointProvider.offlineMode()) {
         EndpointProvider.setOfflineMode(true);
-        EndpointService.updateEndpoint(EndpointProvider.endpointID(), {Status: EndpointProvider.endpointStatusFromOfflineMode(true)});
       }
       return $q.reject(rejection);
     }
