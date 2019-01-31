@@ -67,7 +67,7 @@
                 Ensure that you have deployed the Portainer agent in your cluster first. You can use execute the following command on any manager node to deploy it.
                 <div style="margin-top: 10px;">
                   <code>
-                    curl -L https://portainer.io/download/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent
+                    curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent
                   </code>
                   <span class="btn btn-primary btn-sm space-left" ng-click="copyAgentCommand()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy</span>
                   <span>

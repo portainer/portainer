@@ -5,7 +5,17 @@ angular.module('portainer.docker', ['portainer.app'])
   var docker = {
     name: 'docker',
     parent: 'root',
-    abstract: true
+    abstract: true,
+    resolve: {
+      endpointID: ['EndpointProvider', '$state',
+        function (EndpointProvider, $state) {
+          var id = EndpointProvider.endpointID();
+          if (!id) {
+            return $state.go('portainer.home');
+          }
+        }
+      ]
+    }
   };
 
   var configs = {

@@ -39,13 +39,9 @@
               <td>Internal</td>
               <td>{{ network.Internal }}</td>
             </tr>
-            <tr ng-if="network.IPAM.Config[0].Subnet">
-              <td>Subnet</td>
-              <td>{{ network.IPAM.Config[0].Subnet }}</td>
-            </tr>
-            <tr ng-if="network.IPAM.Config[0].Gateway">
-              <td>Gateway</td>
-              <td>{{ network.IPAM.Config[0].Gateway }}</td>
+            <tr ng-if="network.IPAM.Config.length > 0" ng-repeat="config in network.IPAM.Config">
+              <td>Subnet - {{ config.Subnet }}</td>
+              <td>Gateway - {{ config.Gateway }}</td>
             </tr>
           </tbody>
         </table>

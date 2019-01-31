@@ -30,7 +30,7 @@ function ($rootScope, $state, Authentication, authManager, StateManager, Endpoin
   };
 
   $transitions.onBefore({ to: 'docker.**' }, function() {
-    HttpRequestHelper.resetAgentTargetQueue();
+    HttpRequestHelper.resetAgentHeaders();
   });
 }]);
 
@@ -45,7 +45,7 @@ function initAuthentication(authManager, Authentication, $rootScope, $state) {
   // to have more controls on which URL should trigger the unauthenticated state.
   $rootScope.$on('unauthenticated', function (event, data) {
     if (!_.includes(data.config.url, '/v2/')) {
-      $state.go('portainer.auth', {error: 'Your session has expired'});
+      $state.go('portainer.auth', {error: 'Your session has expired', redirect: $state.current.name});
     }
   });
 }

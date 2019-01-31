@@ -1,10 +1,9 @@
-angular.module('portainer.docker')
-.factory('ContainerHelper', [function ContainerHelperFactory() {
+angular.module('portainer.docker').factory('ContainerHelper', [function ContainerHelperFactory() {
   'use strict';
   var helper = {};
 
   helper.commandStringToArray = function(command) {
-    return splitargs(command, undefined, true);
+    return splitargs(command);
   };
 
   helper.commandArrayToString = function(array) {
