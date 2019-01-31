@@ -10,13 +10,7 @@ function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, G
     if (endpoint.Type === 3) {
       return switchToAzureEndpoint(endpoint);
     }
-
-    checkEndpointStatus(endpoint)
-    .then(function sucess() {
-      return switchToDockerEndpoint(endpoint);
-    }).catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to verify endpoint status');
-    });
+    return switchToDockerEndpoint(endpoint);
   };
 
   $scope.dismissImportantInformation = function (hash) {
@@ -35,32 +29,6 @@ function ($q, $scope, $state, Authentication, EndpointService, EndpointHelper, G
       triggerSnapshot();
     });
   };
-
-  function checkEndpointStatus(endpoint) {
-    var deferred = $q.defer();
-
-    var status = 1;
-    SystemService.ping(endpoint.Id)
-    .then(function sucess() {
-      status = 1;
-    }).catch(function error() {
-      status = 2;
-    }).finally(function () {
-      if (endpoint.Status === status) {
-        deferred.resolve(endpoint);
-        return deferred.promise;
-      }
-
-      EndpointService.updateEndpoint(endpoint.Id, { Status: status })
-      .then(function sucess() {
-        deferred.resolve(endpoint);
-      }).catch(function error(err) {
-        deferred.reject({msg: 'Unable to update endpoint status', err: err});
-      });
-    });
-
-    return deferred.promise;
-  }
 
   function switchToAzureEndpoint(endpoint) {
     EndpointProvider.setEndpointID(endpoint.Id);
