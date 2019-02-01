@@ -1,3 +1,5 @@
+import _ from 'lodash-es';
+
 angular.module('portainer.extensions.registrymanagement')
 .controller('RegistryRepositoriesController', ['$transition$', '$scope',  'RegistryService', 'RegistryV2Service', 'Notifications', 'Authentication',
 function ($transition$, $scope, RegistryService, RegistryV2Service, Notifications, Authentication) {
