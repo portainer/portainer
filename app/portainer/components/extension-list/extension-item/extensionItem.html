@@ -21,10 +21,10 @@
         </span>
         <span>
           <span class="label label-primary" ng-if="!$ctrl.model.Enabled && !$ctrl.model.Available">coming soon</span>
-          <span class="label label-warning" ng-if="!$ctrl.model.Enabled && $ctrl.model.Deal">deal</span>
-          <span class="label label-danger" ng-if="$ctrl.model.Enabled && $ctrl.model.Expired">expired</span>
-          <span class="label label-success" ng-if="$ctrl.model.Enabled && !$ctrl.model.Expired">enabled</span>
-          <span class="label label-primary" ng-if="$ctrl.model.Enabled && $ctrl.model.UpdateAvailable && !$ctrl.model.Expired">update available</span>
+          <span class="label label-warning" ng-if="!$ctrl.model.Enabled && $ctrl.model.Deal && !$ctrl.model.License.Expiration">deal</span>
+          <span class="label label-danger" ng-if="!$ctrl.model.Enabled && $ctrl.model.License.Expiration && !$ctrl.model.License.Valid">expired</span>
+          <span class="label label-success" ng-if="$ctrl.model.Enabled && $ctrl.model.License.Valid">enabled</span>
+          <span class="label label-primary" ng-if="$ctrl.model.Enabled && $ctrl.model.License.Valid && $ctrl.model.UpdateAvailable">update available</span>
         </span>
       </div>
       <!-- !blocklist-item-line1 -->

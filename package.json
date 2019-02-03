@@ -2,7 +2,7 @@
   "author": "Portainer.io",
   "name": "portainer",
   "homepage": "http://portainer.io",
-  "version": "1.20.0",
+  "version": "1.20.1",
   "repository": {
     "type": "git",
     "url": "git@github.com:portainer/portainer.git"
@@ -52,7 +52,7 @@
     "angularjs-scroll-glue": "^2.2.0",
     "angularjs-slider": "^6.4.0",
     "bootbox": "^4.4.0",
-    "bootstrap": "~3.3.6",
+    "bootstrap": "^3.4.0",
     "chart.js": "~2.6.0",
     "codemirror": "~5.30.0",
     "filesize": "~3.3.0",

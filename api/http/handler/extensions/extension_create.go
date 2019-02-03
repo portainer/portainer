@@ -42,7 +42,7 @@ func (handler *Handler) extensionCreate(w http.ResponseWriter, r *http.Request) 
 	}
 
 	for _, existingExtension := range extensions {
-		if existingExtension.ID == extensionID {
+		if existingExtension.ID == extensionID && existingExtension.Enabled {
 			return &httperror.HandlerError{http.StatusConflict, "Unable to enable extension", portainer.ErrExtensionAlreadyEnabled}
 		}
 	}

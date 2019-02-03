@@ -874,5 +874,18 @@
         "label": "Datadog API key"
       }
     ]
+  },
+  {
+    "type": 1,
+    "title": "Sonatype Nexus3",
+    "description": "Sonatype Nexus3 registry manager",
+    "categories": ["docker"],
+    "platform": "linux",
+    "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/sonatype.png",
+    "image": "sonatype/nexus3:latest",
+    "ports": [
+      "8081/tcp"
+    ],
+    "volumes": [{ "container": "/nexus-data"}]
   }
 ]
