@@ -1,4 +1,4 @@
-function linkGetResponse(data, headers) {
+export default function linkGetResponse(data, headers) {
   var response = angular.fromJson(data);
   var link = headers('link');
   if (link) {

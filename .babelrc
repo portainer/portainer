@@ -1,5 +1,5 @@
 {
-  "plugins": ["lodash"],
+  "plugins": ["lodash", "angularjs-annotate"],
   "presets": [
     [
       "@babel/preset-env",
