@@ -56,7 +56,7 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('lint', ['eslint']);
-  grunt.registerTask('run-dev', ['build', 'shell:run:' + arch, 'watch:build']);
+  grunt.registerTask('run-dev', ['build', 'shell:run', 'watch:build']);
   grunt.registerTask('clear', ['clean:app']);
 
   // Load content of `vendor.yml` to src.jsVendor, src.cssVendor and src.angularVendor
@@ -264,7 +264,7 @@ gruntfile_cfg.replace = {
 };
 
 function shell_buildBinary(p, a) {
-  var binfile = 'dist/portainer-' + p + '-' + a;
+  var binfile = 'dist/portainer';
   if (p === 'linux') {
     return [
       'if [ -f ' + (binfile) + ' ]; then',
@@ -292,10 +292,10 @@ function shell_buildBinaryOnDevOps(p, a) {
   }
 }
 
-function shell_run(arch) {
+function shell_run() {
   return [
     'docker rm -f portainer',
-    'docker run -d -p 9000:9000 -v $(pwd)/dist:/app -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer portainer/base /app/portainer-linux-' + arch + ' --no-analytics --template-file /app/templates.json'
+    'docker run -d -p 9000:9000 -v $(pwd)/dist:/app -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer portainer/base /app/portainer --no-analytics --template-file /app/templates.json'
   ].join(';');
 }
 
