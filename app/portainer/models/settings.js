@@ -53,4 +53,5 @@ function OAuthSettingsViewModel(data) {
   this.UserIdentifier = data.UserIdentifier;
   this.Scopes = data.Scopes;
   this.OAuthAutoCreateUsers = data.OAuthAutoCreateUsers;
+  this.DefaultTeamID = data.DefaultTeamID;
 }

@@ -67,6 +67,7 @@ type (
 		UserIdentifier       string `json:"UserIdentifier"`
 		Scopes               string `json:"Scopes"`
 		OAuthAutoCreateUsers bool   `json:"OAuthAutoCreateUsers"`
+		DefaultTeamID        TeamID     `json:"DefaultTeamID"`
 	}
 
 	// TLSConfiguration represents a TLS configuration

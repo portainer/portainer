@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('SettingsAuthenticationController', ['$q', '$scope', 'Notifications', 'SettingsService', 'FileUploadService',
-function ($q, $scope, Notifications, SettingsService, FileUploadService) {
+.controller('SettingsAuthenticationController', ['$q', '$scope', 'Notifications', 'SettingsService', 'FileUploadService', 'TeamService',
+function ($q, $scope, Notifications, SettingsService, FileUploadService, TeamService) {
 
   $scope.state = {
     successfulConnectivityCheck: false,
@@ -96,9 +96,12 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
   }
 
   function initView() {
-    SettingsService.settings()
-    .then(function success(data) {
-      var settings = data;
+    $q.all({
+      settings: SettingsService.settings(),
+      teams: TeamService.teams()
+    }).then(function success(data) {
+      var settings = data.settings;
+      $scope.teams = data.teams;
       $scope.settings = settings;
       $scope.LDAPSettings = settings.LDAPSettings;
       $scope.OAuthSettings = settings.OAuthSettings;
