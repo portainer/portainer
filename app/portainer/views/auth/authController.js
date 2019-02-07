@@ -8,7 +8,8 @@ angular.module('portainer.app').controller('AuthenticationController', ['$q', '$
     };
 
     $scope.state = {
-      AuthenticationError: ''
+      AuthenticationError: '',
+      isInOAuthProcess: true
     };
 
     $scope.authenticateUser = function() {
@@ -89,6 +90,7 @@ angular.module('portainer.app').controller('AuthenticationController', ['$q', '$
       if ($stateParams.logout || $stateParams.error) {
         Authentication.logout();
         $scope.state.AuthenticationError = $stateParams.error;
+        $scope.state.isInOAuthProcess = false;
         return;
       }
 
@@ -106,6 +108,8 @@ angular.module('portainer.app').controller('AuthenticationController', ['$q', '$
       var code = urlHelper.getParameter('code');
       if (code) {
         oAuthLogin(code);
+      } else {
+        $scope.state.isInOAuthProcess = false;
       }
     }
 
@@ -117,6 +121,7 @@ angular.module('portainer.app').controller('AuthenticationController', ['$q', '$
         })
         .catch(function error() {
           $scope.state.AuthenticationError = 'Failed to authenticate with OAuth2 Provider';
+          $scope.state.isInOAuthProcess = false;
         });
     }
 
