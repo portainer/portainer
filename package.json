@@ -20,12 +20,11 @@
     }
   ],
   "scripts": {
-    "grunt": "grunt",
     "start": "grunt run-dev",
-    "start:server": "yarn build:server:offline && grunt shell:run:amd64",
+    "start:server": "yarn build:server:offline && grunt shell:run",
     "clean:all": "grunt clean:all",
     "build": "grunt build",
-    "build:server:offline": "cd ./api/cmd/portainer && CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags '-s' && mv -f portainer ../../../dist/portainer-linux-amd64"
+    "build:server:offline": "cd ./api/cmd/portainer && CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags '-s' && mv -f portainer ../../../dist/portainer"
   },
   "engines": {
     "node": ">= 0.8.4"
