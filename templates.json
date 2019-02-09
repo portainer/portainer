@@ -244,18 +244,34 @@
     "platform": "linux",
     "note": "Password needs to include at least 8 characters including uppercase, lowercase letters, base-10 digits and/or non-alphanumeric symbols.",
     "logo": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/logos/microsoft.png",
-    "image": "microsoft/mssql-server-linux:2017-GA",
+    "image": "mcr.microsoft.com/mssql/server:latest",
     "ports": [
       "1433/tcp"
     ],
     "env": [
       {
         "name": "ACCEPT_EULA",
-        "set": "Y"
+        "label": "Accept EULA",
+        "description": "set Y to accept End-User Licensing Agreement",
+        "default": "Y"
       },
       {
         "name": "SA_PASSWORD",
+        "description": "database system administrator (sa) password",
         "label": "SA password"
+      },
+      {
+        "name": "MSSQL_PID",
+        "label": "Product ID",
+        "description": "the edition to run (default is Developer Edition)",
+        "default": "Developer",
+        "select": [
+          {"value": "Developer", "text": "Developer Edition"},
+          {"value": "Express", "text": "Express Edition"},
+          {"value": "Standard", "text": "Standard Edition"},
+          {"value": "Enterprise", "text": "Enterprise Edition"},
+          {"value": "EnterpriseCore", "text": "Enterprise Edition Core"}
+        ]
       }
     ]
   },
@@ -274,10 +290,13 @@
     "env": [
       {
         "name": "ACCEPT_EULA",
-        "set": "Y"
+        "label": "Accept EULA",
+        "description": "set Y to accept End-User Licensing Agreement",
+        "default": "Y"
       },
       {
         "name": "sa_password",
+        "description": "database system administrator (sa) password",
         "label": "SA password"
       }
     ],
@@ -298,10 +317,13 @@
     "env": [
       {
         "name": "ACCEPT_EULA",
-        "set": "Y"
+        "label": "Accept EULA",
+        "description": "set Y to accept End-User Licensing Agreement",
+        "default": "Y"
       },
       {
         "name": "sa_password",
+        "description": "database system administrator (sa) password",
         "label": "SA password"
       }
     ],
