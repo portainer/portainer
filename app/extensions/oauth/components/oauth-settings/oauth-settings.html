@@ -1,5 +1,45 @@
 <div>
   <!-- <oauth-providers-selector on-select="$ctrl.onSelectProvider" selected-provider="$ctrl.settings.provider" providers="$ctrl.providers"></oauth-providers-selector> -->
+<div class="col-sm-12 form-section-title">
+  Automatic user provisioning
+</div>
+<div class="form-group">
+  <span class="col-sm-12 text-muted small">
+    With automatic user provisioning enabled, Portainer will create user(s) automatically with standard user role. If
+    disabled, users must be created in Portainer in order to login.
+  </span>
+</div>
+<div class="form-group">
+  <div class="col-sm-12">
+    <label for="oauth_provisioning"> Automatic user provisioning </label>
+    <label class="switch" style="margin-left: 20px">
+      <input type="checkbox" ng-model="$ctrl.settings.OAuthAutoCreateUsers" /><i></i>
+    </label>
+  </div>
+</div>
+
+<div ng-if="$ctrl.settings.OAuthAutoCreateUsers">
+  <div class="form-group">
+    <span class="col-sm-12 text-muted small">
+      The users created by the automatic provisioning feature can be added to a default team on creation. This setting is optional.
+    </span>
+  </div>
+  <div class="form-group">
+    <label for="team_provisioning" class="col-sm-2">Default team</label>
+    <span class="small text-muted" style="margin-left: 20px;" ng-if="$ctrl.teams.length === 0">
+      You have not yet created any team. Head over the <a ui-sref="portainer.teams">teams view</a> to manage user teams.
+    </span>
+    <button type="button" class="btn btn-sm btn-danger" ng-click="$ctrl.settings.DefaultTeamID = null" ng-disabled="!$ctrl.settings.DefaultTeamID"
+      ng-if="$ctrl.teams.length > 0">
+      <i class="fa fa-times" aria-hidden="true"></i>
+    </button>
+    <div class="col-sm-9 col-lg-9" ng-if="$ctrl.teams.length > 0">
+      <select class="form-control" ng-model="$ctrl.settings.DefaultTeamID" ng-options="team.Id as team.Name for team in $ctrl.teams">
+      </select>
+    </div>
+  </div>
+</div>
+
 
   <div class="col-sm-12 form-section-title">OAuth Configuration</div>
 
@@ -146,45 +186,6 @@
         ng-model="$ctrl.settings.Scopes"
         placeholder="id,email,name"
       />
-    </div>
-  </div>
-
-  <div class="col-sm-12 form-section-title">
-      Automatic user provisioning
-  </div>
-  <div class="form-group">
-    <span class="col-sm-12 text-muted small">
-      With automatic user provisioning enabled, Portainer will create user(s) automatically with standard user role. If
-      disabled, users must be created in Portainer in order to login.
-    </span>
-  </div>
-  <div class="form-group">
-    <div class="col-sm-12">
-      <label for="oauth_provisioning"> Automatic user provisioning </label>
-      <label class="switch" style="margin-left: 20px">
-        <input type="checkbox" ng-model="$ctrl.settings.OAuthAutoCreateUsers" /><i></i>
-      </label>
-    </div>
-  </div>
-
-  <div ng-if="$ctrl.settings.OAuthAutoCreateUsers">
-    <div class="form-group">
-      <span class="col-sm-12 text-muted small">
-        The users created by the automatic provisioning feature can be added to a default team on creation. This setting is optional.
-      </span>
-    </div>
-    <div class="form-group">
-      <label for="team_provisioning" class="col-sm-2 col-lg-1">Default team</label>
-      <div class="col-sm-1">
-        <button type="button" class="btn btn-sm btn-danger pull-right" ng-click="$ctrl.settings.DefaultTeamID = null"
-          ng-disabled="!$ctrl.settings.DefaultTeamID">
-          <i class="fa fa-times" aria-hidden="true"></i>
-        </button>
-      </div>
-      <div class="col-sm-9 col-lg-10">
-        <select class="form-control" ng-model="$ctrl.settings.DefaultTeamID" ng-options="team.Id as team.Name for team in $ctrl.teams">
-        </select>
-      </div>
     </div>
   </div>
 </div>
