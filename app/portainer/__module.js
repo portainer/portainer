@@ -457,6 +457,16 @@ angular.module('portainer.app', [])
   var templates = {
     name: 'portainer.templates',
     url: '/templates',
+    resolve: {
+      endpointID: ['EndpointProvider', '$state',
+        function (EndpointProvider, $state) {
+          var id = EndpointProvider.endpointID();
+          if (!id) {
+            return $state.go('portainer.home');
+          }
+        }
+      ]
+    },
     views: {
       'content@': {
         templateUrl: 'app/portainer/views/templates/templates.html',
