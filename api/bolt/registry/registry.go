@@ -93,3 +93,46 @@ func (service *Service) DeleteRegistry(ID portainer.RegistryID) error {
 	identifier := internal.Itob(int(ID))
 	return internal.DeleteObject(service.db, BucketName, identifier)
 }
+
+// Synchronize creates, updates and deletes registries inside a single transaction.
+func (service *Service) Synchronize(toCreate, toUpdate, toDelete []*portainer.Registry) error {
+	return service.db.Update(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(BucketName))
+
+		for _, registry := range toCreate {
+			id, _ := bucket.NextSequence()
+			registry.ID = portainer.RegistryID(id)
+
+			data, err := internal.MarshalObject(registry)
+			if err != nil {
+				return err
+			}
+
+			err = bucket.Put(internal.Itob(int(registry.ID)), data)
+			if err != nil {
+				return err
+			}
+		}
+
+		for _, endpoint := range toUpdate {
+			data, err := internal.MarshalObject(endpoint)
+			if err != nil {
+				return err
+			}
+
+			err = bucket.Put(internal.Itob(int(endpoint.ID)), data)
+			if err != nil {
+				return err
+			}
+		}
+
+		for _, endpoint := range toDelete {
+			err := bucket.Delete(internal.Itob(int(endpoint.ID)))
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+}

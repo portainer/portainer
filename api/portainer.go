@@ -588,6 +588,7 @@ type (
 		CreateRegistry(registry *Registry) error
 		UpdateRegistry(ID RegistryID, registry *Registry) error
 		DeleteRegistry(ID RegistryID) error
+		Synchronize(toCreate, toUpdate, toDelete []*Registry) error
 	}
 
 	// StackService represents a service for managing stack data
