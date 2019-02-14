@@ -256,7 +256,7 @@ type (
 	// SnapshotJob represents a scheduled job that can create endpoint snapshots
 	SnapshotJob struct{}
 
-	// EndpointSyncJob represents a scheduled job that synchronize endpoints based on an external file
+	// EndpointSyncJob represents a scheduled job that synchronizes endpoints based on an external file
 	EndpointSyncJob struct{}
 
 	// RegistrySyncJob represents a scheduled job that synchronizes registries based on an external file
