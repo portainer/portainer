@@ -29,11 +29,14 @@
     </li>
     <li class="sidebar-list" ng-if="applicationState.endpoint.mode && applicationState.endpoint.extensions.indexOf('storidge') !== -1 && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'">
       <a ui-sref="storidge.cluster" ui-sref-active="active">Storidge <span class="menu-icon fa fa-bolt fa-fw"></span></a>
-      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'storidge.cluster' || $state.current.name === 'storidge.profiles' || $state.current.name === 'storidge.monitor' || $state.current.name === 'storidge.profiles.new' || $state.current.name === 'storidge.profiles.profile')">
+      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'storidge.cluster' || $state.current.name === 'storidge.profiles' || $state.current.name === 'storidge.monitor' || $state.current.name === 'storidge.profiles.new' || $state.current.name === 'storidge.profiles.profile' || $state.current.name === 'storidge.drives' || $state.current.name === 'storidge.drives.drive')">
         <a ui-sref="storidge.monitor" ui-sref-active="active">Monitor</a>
       </div>
-      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'storidge.cluster' || $state.current.name === 'storidge.profiles' || $state.current.name === 'storidge.monitor' || $state.current.name === 'storidge.profiles.new' || $state.current.name === 'storidge.profiles.profile')">
+      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'storidge.cluster' || $state.current.name === 'storidge.profiles' || $state.current.name === 'storidge.monitor' || $state.current.name === 'storidge.profiles.new' || $state.current.name === 'storidge.profiles.profile' || $state.current.name === 'storidge.drives' || $state.current.name === 'storidge.drives.drive')">
         <a ui-sref="storidge.profiles" ui-sref-active="active">Profiles</a>
+      </div>
+      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'storidge.cluster' || $state.current.name === 'storidge.profiles' || $state.current.name === 'storidge.monitor' || $state.current.name === 'storidge.profiles.new' || $state.current.name === 'storidge.profiles.profile' || $state.current.name === 'storidge.drives' || $state.current.name === 'storidge.drives.drive')">
+        <a ui-sref="storidge.drives" ui-sref-active="active">Drives</a>
       </div>
     </li>
     <li class="sidebar-title" ng-if="(!applicationState.application.authentication || isAdmin) && applicationState.application.enableHostManagementFeatures">

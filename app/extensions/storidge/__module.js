@@ -32,6 +32,28 @@ angular.module('extension.storidge', [])
     }
   };
 
+  var drives = {
+    name: 'storidge.drives',
+    url: '/drives',
+    views: {
+      'content@': {
+        templateUrl: 'app/extensions/storidge/views/drives/drives.html',
+        controller: 'StoridgeDrivesController'
+      }
+    }
+  };
+
+  var drive = {
+    name: 'storidge.drives.drive',
+    url: '/:id',
+    views: {
+      'content@': {
+        templateUrl: 'app/extensions/storidge/views/drives/inspect/drive.html',
+        controller: 'StoridgeDriveController'
+      }
+    }
+  };
+
   var profileCreation = {
     name: 'storidge.profiles.new',
     url: '/new',
@@ -69,6 +91,8 @@ angular.module('extension.storidge', [])
   };
 
   $stateRegistryProvider.register(storidge);
+  $stateRegistryProvider.register(drives);
+  $stateRegistryProvider.register(drive);
   $stateRegistryProvider.register(profiles);
   $stateRegistryProvider.register(profile);
   $stateRegistryProvider.register(profileCreation);

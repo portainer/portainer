@@ -15,6 +15,11 @@ angular.module('extension.storidge')
     getProfile: { method: 'GET', params: { resource: 'profiles' } },
     createProfile: { method: 'POST', params: { resource: 'profiles' } },
     updateProfile: { method: 'PUT', params: { resource: 'profiles', id: '@name' } },
-    deleteProfile: { method: 'DELETE', params: { resource: 'profiles' } }
+    deleteProfile: { method: 'DELETE', params: { resource: 'profiles' } },
+    queryDrives: { method: 'GET', params: { resource: 'drives' } },
+    getDrive: { method: 'GET', params: { resource: 'drives', id: '@id' } },
+    addDrive: { method: 'POST', params: { resource: 'drives' } },
+    removeDrive: { method: 'DELETE', params: { resource: 'drives', id: '@id' } },
+    getNode: { method: 'GET', params: { resource: 'nodes', id: '@id' } }
   });
 }]);
