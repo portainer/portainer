@@ -2,6 +2,10 @@ angular.module('extension.storidge')
 .controller('StoridgeCreateProfileController', ['$scope', '$state', '$transition$', 'Notifications', 'StoridgeProfileService',
 function ($scope, $state, $transition$, Notifications, StoridgeProfileService) {
 
+  $scope.formValues = {
+    Labels: []
+  };
+
   $scope.state = {
     NoLimit: true,
     LimitIOPS: false,
@@ -15,6 +19,24 @@ function ($scope, $state, $transition$, Notifications, StoridgeProfileService) {
     { value: 3, label: '3-copy' }
   ];
 
+  $scope.addLabel = function() {
+    $scope.formValues.Labels.push({ name: '', value: ''});
+  };
+
+  $scope.removeLabel = function(index) {
+    $scope.formValues.Labels.splice(index, 1);
+  };
+
+  function prepareLabels(profile) {
+    var labels = {};
+    $scope.formValues.Labels.forEach(function (label) {
+      if (label.name && label.value) {
+        labels[label.name] = label.value;
+      }
+    });
+    profile.Labels = labels;
+  }
+
   $scope.create = function () {
     var profile = $scope.model;
 
@@ -27,6 +49,8 @@ function ($scope, $state, $transition$, Notifications, StoridgeProfileService) {
       delete profile.MinBandwidth;
       delete profile.MaxBandwidth;
     }
+
+    prepareLabels(profile);
 
     $scope.state.actionInProgress = true;
     StoridgeProfileService.create(profile)

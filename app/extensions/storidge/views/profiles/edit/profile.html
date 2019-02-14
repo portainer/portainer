@@ -84,6 +84,140 @@
             </div>
           </div>
           <!-- !type -->
+          <!-- Filesystem -->
+          <div class="form-group">
+              <label for="profile_filesystem" class="col-sm-2 col-lg-1 control-label text-left">Filesystem</label>
+              <div class="col-sm-10 col-lg-11">
+                <select name="profile_filesystem" ng-model="profile.Filesystem" class="form-control">
+                  <option value="btrfs">btrfs</option>
+                  <option value="ext4">ext4</option>
+                  <option value="xfs">xfs</option>
+                </select>
+              </div>
+            </div>
+            <!-- !Filesystem -->
+            <!-- snapshotEnabled -->
+            <div class="form-group">
+                <div class="col-sm-12">
+                  <label for="profile_snapshotEnabled" class="control-label text-left">
+                    Enable snapshots
+                  </label>
+                  <label class="switch" style="margin-left: 20px;">
+                    <input name="profile_snapshotEnabled" type="checkbox" ng-model="profile.SnapshotEnabled"><i></i>
+                  </label>
+                </div>
+              </div>
+            <!-- !snapshotEnabled -->
+            <!-- snapshotInterval -->
+            <div class="form-group" ng-if="profile.SnapshotEnabled">
+              <label for="profile_snapshotInterval" class="col-sm-2 col-lg-1 control-label text-left" style="margin-top: 20px;">
+                Snapshot interval
+              </label>
+              <div class="col-sm-4">
+                <slider model="profile.SnapshotInterval" floor="1" ceil="45000" step="1"></slider>
+              </div>
+              <div class="col-sm-2">
+                <input type="number" min="1" class="form-control" ng-model="profile.SnapshotInterval" id="profile_snapshotInterval">
+              </div>
+              <div class="col-sm-4">
+                <p class="small text-muted" style="margin-top: 7px;">
+                  Snapshot interval (<b>s</b>)
+                </p>
+              </div>
+            </div>
+            <!-- !snapshotInterval -->
+            <!-- snapshotMax -->
+            <div class="form-group" ng-if="profile.SnapshotEnabled">
+                <label for="profile_snapshotMax" class="col-sm-2 col-lg-1 control-label text-left" style="margin-top: 20px;">
+                  Snapshot max
+                </label>
+                <div class="col-sm-4">
+                  <slider model="profile.SnapshotMax" floor="1" ceil="100" step="1"></slider>
+                </div>
+                <div class="col-sm-2">
+                  <input type="number" min="1" class="form-control" ng-model="profile.SnapshotMax" id="profile_snapshotMax">
+                </div>
+                <div class="col-sm-4">
+                  <p class="small text-muted" style="margin-top: 7px;">
+                    Snapshot max (<b>count</b>)
+                  </p>
+                </div>
+              </div>
+            <!-- snapshotMax -->
+            <!-- encryptionEnabled -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label for="profile_encryptionEnabled" class="control-label text-left">
+                  Enable encryption
+                </label>
+                <label class="switch" style="margin-left: 20px;">
+                  <input name="profile_encryptionEnabled" type="checkbox" ng-model="profile.EncryptionEnabled"><i></i>
+                </label>
+              </div>
+            </div>
+            <!-- !encryptionEnabled -->
+            <!-- interfaceType -->
+            <div class="form-group">
+              <label for="profile_interfaceType" class="col-sm-2 col-lg-1 control-label text-left">Interface type</label>
+              <div class="col-sm-10 col-lg-11">
+                <input type="text" class="form-control" ng-model="profile.InterfaceType" name="profile_interfaceType" disabled>
+              </div>
+            </div>
+            <!-- !interfaceType -->
+            <!-- interfaceDriver -->
+            <div class="form-group">
+              <label for="profile_interfaceDriver" class="col-sm-2 col-lg-1 control-label text-left">Interface driver</label>
+              <div class="col-sm-10 col-lg-11">
+                <select name="profile_interfaceDriver" ng-model="profile.InterfaceDriver" class="form-control">
+                  <option value="ssd">macvlan</option>
+                  <option value="hdd">overlay</option>
+                </select>
+              </div>
+            </div>
+            <!-- !interfaceDriver -->
+            <!-- interfaceNetwork -->
+            <div class="form-group">
+              <label for="profile_interfaceNetwork" class="col-sm-2 col-lg-1 control-label text-left">Interface network</label>
+              <div class="col-sm-10 col-lg-11">
+                <input type="text" class="form-control" ng-model="profile.InterfaceNetwork" name="profile_interfaceNetwork" pattern="[a-zA-Z0-9]+">
+              </div>
+            </div>
+            <!-- !interfaceNetwork -->
+            <!-- interfaceConf -->
+            <div class="form-group">
+              <label for="profile_interfaceConf" class="col-sm-2 col-lg-1 control-label text-left">Interface conf</label>
+              <div class="col-sm-10 col-lg-11">
+                <input type="text" class="form-control" ng-model="profile.InterfaceConf" name="profile_interfaceConf">
+              </div>
+            </div>
+            <!-- !interfaceConf -->
+            <!-- labels -->
+            <div class="form-group">
+              <div class="col-sm-12" style="margin-top: 5px;">
+                <label class="control-label text-left">Labels</label>
+                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addLabel()">
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i> add label
+                </span>
+              </div>
+              <!-- labels-input-list -->
+              <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                <div ng-repeat="label in formValues.Labels" style="margin-top: 2px;">
+                  <div class="input-group col-sm-5 input-group-sm">
+                    <span class="input-group-addon">name</span>
+                    <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. com.example.foo">
+                  </div>
+                  <div class="input-group col-sm-5 input-group-sm">
+                    <span class="input-group-addon">value</span>
+                    <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar">
+                  </div>
+                  <button class="btn btn-sm btn-danger" type="button" ng-click="removeLabel($index)">
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+              <!-- !labels-input-list -->
+            </div>
+            <!-- !labels -->
           <!-- iops -->
           <div ng-if="!state.LimitBandwidth || state.NoLimit">
             <div class="col-sm-12 form-section-title">
