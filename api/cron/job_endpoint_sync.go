@@ -37,7 +37,7 @@ func NewEndpointSyncJobRunner(schedule *portainer.Schedule, context *EndpointSyn
 	}
 }
 
-type synchronization struct {
+type endpointSynchronization struct {
 	endpointsToCreate []*portainer.Endpoint
 	endpointsToUpdate []*portainer.Endpoint
 	endpointsToDelete []*portainer.Endpoint
@@ -83,7 +83,7 @@ func (runner *EndpointSyncJobRunner) Run() {
 
 	convertedFileEndpoints := convertFileEndpoints(fileEndpoints)
 
-	sync := prepareSyncData(storedEndpoints, convertedFileEndpoints)
+	sync := prepareEndpointSyncData(storedEndpoints, convertedFileEndpoints)
 	if sync.requireSync() {
 		err = runner.context.endpointService.Synchronize(sync.endpointsToCreate, sync.endpointsToUpdate, sync.endpointsToDelete)
 		if endpointSyncError(err) {
@@ -168,14 +168,14 @@ func mergeEndpointIfRequired(original, updated *portainer.Endpoint) *portainer.E
 	return endpoint
 }
 
-func (sync synchronization) requireSync() bool {
+func (sync endpointSynchronization) requireSync() bool {
 	if len(sync.endpointsToCreate) != 0 || len(sync.endpointsToUpdate) != 0 || len(sync.endpointsToDelete) != 0 {
 		return true
 	}
 	return false
 }
 
-func prepareSyncData(storedEndpoints, fileEndpoints []portainer.Endpoint) *synchronization {
+func prepareEndpointSyncData(storedEndpoints, fileEndpoints []portainer.Endpoint) *endpointSynchronization {
 	endpointsToCreate := make([]*portainer.Endpoint, 0)
 	endpointsToUpdate := make([]*portainer.Endpoint, 0)
 	endpointsToDelete := make([]*portainer.Endpoint, 0)
@@ -206,7 +206,7 @@ func prepareSyncData(storedEndpoints, fileEndpoints []portainer.Endpoint) *synch
 		}
 	}
 
-	return &synchronization{
+	return &endpointSynchronization{
 		endpointsToCreate: endpointsToCreate,
 		endpointsToUpdate: endpointsToUpdate,
 		endpointsToDelete: endpointsToDelete,
