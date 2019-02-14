@@ -196,6 +196,45 @@ func loadEndpointSyncSystemSchedule(jobScheduler portainer.JobScheduler, schedul
 	return scheduleService.CreateSchedule(endointSyncSchedule)
 }
 
+func loadRegistrySyncSystemSchedule(jobScheduler portainer.JobScheduler, scheduleService portainer.ScheduleService, registryService portainer.RegistryService, flags *portainer.CLIFlags) error {
+	if *flags.ExternalRegistries == "" {
+		return nil
+	}
+
+	log.Println("Using external registry definition. Registry management via the API will be disabled.")
+
+	schedules, err := scheduleService.SchedulesByJobType(portainer.RegistrySyncJobType)
+	if err != nil {
+		return err
+	}
+
+	if len(schedules) != 0 {
+		return nil
+	}
+
+	registrySyncJob := &portainer.RegistrySyncJob{}
+
+	registrySyncSchedule := &portainer.Schedule{
+		ID:              portainer.ScheduleID(scheduleService.GetNextIdentifier()),
+		Name:            "system_registrysync",
+		CronExpression:  "@every " + *flags.SyncInterval,
+		Recurring:       true,
+		JobType:         portainer.RegistrySyncJobType,
+		RegistrySyncJob: registrySyncJob,
+		Created:         time.Now().Unix(),
+	}
+
+	registrySyncJobContext := cron.NewRegistrySyncJobContext(registryService, *flags.ExternalRegistries)
+	registrySyncJobRunner := cron.NewRegistrySyncJobRunner(registrySyncSchedule, registrySyncJobContext)
+
+	err = jobScheduler.ScheduleJob(registrySyncJobRunner)
+	if err != nil {
+		return err
+	}
+
+	return scheduleService.CreateSchedule(registrySyncSchedule)
+}
+
 func loadSchedulesFromDatabase(jobScheduler portainer.JobScheduler, jobService portainer.JobService, scheduleService portainer.ScheduleService, endpointService portainer.EndpointService, fileService portainer.FileService) error {
 	schedules, err := scheduleService.Schedules()
 	if err != nil {
@@ -581,6 +620,11 @@ func main() {
 	}
 
 	err = loadEndpointSyncSystemSchedule(jobScheduler, store.ScheduleService, store.EndpointService, flags)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = loadRegistrySyncSystemSchedule(jobScheduler, store.ScheduleService, store.RegistryService, flags)
 	if err != nil {
 		log.Fatal(err)
 	}

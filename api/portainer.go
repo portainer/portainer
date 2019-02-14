@@ -259,6 +259,8 @@ type (
 	// EndpointSyncJob represents a scheduled job that synchronize endpoints based on an external file
 	EndpointSyncJob struct{}
 
+	// RegistrySyncJob represents a scheduled job that synchronizes registries based on an external file
+	RegistrySyncJob struct{}
 	// Schedule represents a scheduled job.
 	// It only contains a pointer to one of the JobRunner implementations
 	// based on the JobType.
@@ -273,6 +275,7 @@ type (
 		ScriptExecutionJob *ScriptExecutionJob
 		SnapshotJob        *SnapshotJob
 		EndpointSyncJob    *EndpointSyncJob
+		RegistrySyncJob    *RegistrySyncJob
 	}
 
 	// WebhookID represents a webhook identifier.
@@ -927,6 +930,9 @@ const (
 	// EndpointSyncJobType is a system job used to synchronize endpoints from
 	// an external definition store
 	EndpointSyncJobType
+	// RegistrySyncJobType is a system job used to synchronize registries from
+	// an external definition store
+	RegistrySyncJobType
 )
 
 const (
