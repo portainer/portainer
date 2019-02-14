@@ -10,6 +10,12 @@ import (
 	"github.com/portainer/portainer"
 )
 
+const (
+	// ErrRegistryManagementDisabled is an error raised when trying to access the registry management endpoints
+	// when the server has been started with the --external-registries flag
+	ErrRegistryManagementDisabled = portainer.Error("Registry management is disabled")
+)
+
 type registryCreatePayload struct {
 	Name           string
 	Type           int
@@ -36,6 +42,10 @@ func (payload *registryCreatePayload) Validate(r *http.Request) error {
 }
 
 func (handler *Handler) registryCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	if !handler.authorizeRegistryManagement {
+		return &httperror.HandlerError{http.StatusServiceUnavailable, "Registry management is disabled", ErrRegistryManagementDisabled}
+	}
+
 	var payload registryCreatePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {

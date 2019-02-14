@@ -11,6 +11,10 @@ import (
 
 // DELETE request on /api/registries/:id
 func (handler *Handler) registryDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	if !handler.authorizeRegistryManagement {
+		return &httperror.HandlerError{http.StatusServiceUnavailable, "Registry management is disabled", ErrRegistryManagementDisabled}
+	}
+
 	registryID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid registry identifier route variable", err}

@@ -136,7 +136,7 @@ func (server *Server) Start() error {
 	extensionHandler.ExtensionService = server.ExtensionService
 	extensionHandler.ExtensionManager = server.ExtensionManager
 
-	var registryHandler = registries.NewHandler(requestBouncer)
+	var registryHandler = registries.NewHandler(requestBouncer, server.RegistryManagement)
 	registryHandler.RegistryService = server.RegistryService
 	registryHandler.ExtensionService = server.ExtensionService
 	registryHandler.FileService = server.FileService

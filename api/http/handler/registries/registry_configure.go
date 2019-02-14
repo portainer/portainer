@@ -67,6 +67,10 @@ func (payload *registryConfigurePayload) Validate(r *http.Request) error {
 
 // POST request on /api/registries/:id/configure
 func (handler *Handler) registryConfigure(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	if !handler.authorizeRegistryManagement {
+		return &httperror.HandlerError{http.StatusServiceUnavailable, "Registry management is disabled", ErrRegistryManagementDisabled}
+	}
+
 	registryID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid registry identifier route variable", err}
