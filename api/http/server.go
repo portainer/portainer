@@ -41,6 +41,7 @@ type Server struct {
 	AssetsPath             string
 	AuthDisabled           bool
 	EndpointManagement     bool
+	RegistryManagement     bool
 	Status                 *portainer.Status
 	ExtensionManager       portainer.ExtensionManager
 	ComposeStackManager    portainer.ComposeStackManager

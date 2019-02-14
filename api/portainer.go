@@ -9,36 +9,38 @@ type (
 
 	// CLIFlags represents the available flags on the CLI
 	CLIFlags struct {
-		Addr              *string
-		AdminPassword     *string
-		AdminPasswordFile *string
-		Assets            *string
-		Data              *string
-		EndpointURL       *string
-		ExternalEndpoints *string
-		Labels            *[]Pair
-		Logo              *string
-		NoAuth            *bool
-		NoAnalytics       *bool
-		Templates         *string
-		TemplateFile      *string
-		TLS               *bool
-		TLSSkipVerify     *bool
-		TLSCacert         *string
-		TLSCert           *string
-		TLSKey            *string
-		SSL               *bool
-		SSLCert           *string
-		SSLKey            *string
-		SyncInterval      *string
-		Snapshot          *bool
-		SnapshotInterval  *string
+		Addr               *string
+		AdminPassword      *string
+		AdminPasswordFile  *string
+		Assets             *string
+		Data               *string
+		EndpointURL        *string
+		ExternalEndpoints  *string
+		ExternalRegistries *string
+		Labels             *[]Pair
+		Logo               *string
+		NoAuth             *bool
+		NoAnalytics        *bool
+		Templates          *string
+		TemplateFile       *string
+		TLS                *bool
+		TLSSkipVerify      *bool
+		TLSCacert          *string
+		TLSCert            *string
+		TLSKey             *string
+		SSL                *bool
+		SSLCert            *string
+		SSLKey             *string
+		SyncInterval       *string
+		Snapshot           *bool
+		SnapshotInterval   *string
 	}
 
 	// Status represents the application status
 	Status struct {
 		Authentication     bool   `json:"Authentication"`
 		EndpointManagement bool   `json:"EndpointManagement"`
+		RegistryManagement bool   `json:"RegistryManagement"`
 		Snapshot           bool   `json:"Snapshot"`
 		Analytics          bool   `json:"Analytics"`
 		Version            string `json:"Version"`

@@ -32,30 +32,31 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 	kingpin.Version(version)
 
 	flags := &portainer.CLIFlags{
-		Addr:              kingpin.Flag("bind", "Address and port to serve Portainer").Default(defaultBindAddress).Short('p').String(),
-		Assets:            kingpin.Flag("assets", "Path to the assets").Default(defaultAssetsDirectory).Short('a').String(),
-		Data:              kingpin.Flag("data", "Path to the folder where the data is stored").Default(defaultDataDirectory).Short('d').String(),
-		EndpointURL:       kingpin.Flag("host", "Endpoint URL").Short('H').String(),
-		ExternalEndpoints: kingpin.Flag("external-endpoints", "Path to a file defining available endpoints").String(),
-		NoAuth:            kingpin.Flag("no-auth", "Disable authentication").Default(defaultNoAuth).Bool(),
-		NoAnalytics:       kingpin.Flag("no-analytics", "Disable Analytics in app").Default(defaultNoAnalytics).Bool(),
-		TLS:               kingpin.Flag("tlsverify", "TLS support").Default(defaultTLS).Bool(),
-		TLSSkipVerify:     kingpin.Flag("tlsskipverify", "Disable TLS server verification").Default(defaultTLSSkipVerify).Bool(),
-		TLSCacert:         kingpin.Flag("tlscacert", "Path to the CA").Default(defaultTLSCACertPath).String(),
-		TLSCert:           kingpin.Flag("tlscert", "Path to the TLS certificate file").Default(defaultTLSCertPath).String(),
-		TLSKey:            kingpin.Flag("tlskey", "Path to the TLS key").Default(defaultTLSKeyPath).String(),
-		SSL:               kingpin.Flag("ssl", "Secure Portainer instance using SSL").Default(defaultSSL).Bool(),
-		SSLCert:           kingpin.Flag("sslcert", "Path to the SSL certificate used to secure the Portainer instance").Default(defaultSSLCertPath).String(),
-		SSLKey:            kingpin.Flag("sslkey", "Path to the SSL key used to secure the Portainer instance").Default(defaultSSLKeyPath).String(),
-		SyncInterval:      kingpin.Flag("sync-interval", "Duration between each synchronization via the external endpoints source").Default(defaultSyncInterval).String(),
-		Snapshot:          kingpin.Flag("snapshot", "Start a background job to create endpoint snapshots").Default(defaultSnapshot).Bool(),
-		SnapshotInterval:  kingpin.Flag("snapshot-interval", "Duration between each endpoint snapshot job").Default(defaultSnapshotInterval).String(),
-		AdminPassword:     kingpin.Flag("admin-password", "Hashed admin password").String(),
-		AdminPasswordFile: kingpin.Flag("admin-password-file", "Path to the file containing the password for the admin user").String(),
-		Labels:            pairs(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l')),
-		Logo:              kingpin.Flag("logo", "URL for the logo displayed in the UI").String(),
-		Templates:         kingpin.Flag("templates", "URL to the templates definitions.").Short('t').String(),
-		TemplateFile:      kingpin.Flag("template-file", "Path to the templates (app) definitions on the filesystem").Default(defaultTemplateFile).String(),
+		Addr:               kingpin.Flag("bind", "Address and port to serve Portainer").Default(defaultBindAddress).Short('p').String(),
+		Assets:             kingpin.Flag("assets", "Path to the assets").Default(defaultAssetsDirectory).Short('a').String(),
+		Data:               kingpin.Flag("data", "Path to the folder where the data is stored").Default(defaultDataDirectory).Short('d').String(),
+		EndpointURL:        kingpin.Flag("host", "Endpoint URL").Short('H').String(),
+		ExternalEndpoints:  kingpin.Flag("external-endpoints", "Path to a file defining available endpoints").String(),
+		ExternalRegistries: kingpin.Flag("external-registries", "Path to a file defining available registries").String(),
+		NoAuth:             kingpin.Flag("no-auth", "Disable authentication").Default(defaultNoAuth).Bool(),
+		NoAnalytics:        kingpin.Flag("no-analytics", "Disable Analytics in app").Default(defaultNoAnalytics).Bool(),
+		TLS:                kingpin.Flag("tlsverify", "TLS support").Default(defaultTLS).Bool(),
+		TLSSkipVerify:      kingpin.Flag("tlsskipverify", "Disable TLS server verification").Default(defaultTLSSkipVerify).Bool(),
+		TLSCacert:          kingpin.Flag("tlscacert", "Path to the CA").Default(defaultTLSCACertPath).String(),
+		TLSCert:            kingpin.Flag("tlscert", "Path to the TLS certificate file").Default(defaultTLSCertPath).String(),
+		TLSKey:             kingpin.Flag("tlskey", "Path to the TLS key").Default(defaultTLSKeyPath).String(),
+		SSL:                kingpin.Flag("ssl", "Secure Portainer instance using SSL").Default(defaultSSL).Bool(),
+		SSLCert:            kingpin.Flag("sslcert", "Path to the SSL certificate used to secure the Portainer instance").Default(defaultSSLCertPath).String(),
+		SSLKey:             kingpin.Flag("sslkey", "Path to the SSL key used to secure the Portainer instance").Default(defaultSSLKeyPath).String(),
+		SyncInterval:       kingpin.Flag("sync-interval", "Duration between each synchronization via the external endpoints source").Default(defaultSyncInterval).String(),
+		Snapshot:           kingpin.Flag("snapshot", "Start a background job to create endpoint snapshots").Default(defaultSnapshot).Bool(),
+		SnapshotInterval:   kingpin.Flag("snapshot-interval", "Duration between each endpoint snapshot job").Default(defaultSnapshotInterval).String(),
+		AdminPassword:      kingpin.Flag("admin-password", "Hashed admin password").String(),
+		AdminPasswordFile:  kingpin.Flag("admin-password-file", "Path to the file containing the password for the admin user").String(),
+		Labels:             pairs(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l')),
+		Logo:               kingpin.Flag("logo", "URL for the logo displayed in the UI").String(),
+		Templates:          kingpin.Flag("templates", "URL to the templates definitions.").Short('t').String(),
+		TemplateFile:       kingpin.Flag("template-file", "Path to the templates (app) definitions on the filesystem").Default(defaultTemplateFile).String(),
 	}
 
 	kingpin.Parse()
@@ -111,6 +112,11 @@ func (*Service) ValidateFlags(flags *portainer.CLIFlags) error {
 		return errAdminPassExcludeAdminPassFile
 	}
 
+	err = validateExternalRegistries(*flags.ExternalRegistries)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -137,6 +143,18 @@ func validateEndpointURL(endpointURL string) error {
 func validateExternalEndpoints(externalEndpoints string) error {
 	if externalEndpoints != "" {
 		if _, err := os.Stat(externalEndpoints); err != nil {
+			if os.IsNotExist(err) {
+				return errEndpointsFileNotFound
+			}
+			return err
+		}
+	}
+	return nil
+}
+
+func validateExternalRegistries(externalRegistries string) error {
+	if externalRegistries != "" {
+		if _, err := os.Stat(externalRegistries); err != nil {
 			if os.IsNotExist(err) {
 				return errEndpointsFileNotFound
 			}

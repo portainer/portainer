@@ -218,11 +218,12 @@ func loadSchedulesFromDatabase(jobScheduler portainer.JobScheduler, jobService p
 	return nil
 }
 
-func initStatus(endpointManagement, snapshot bool, flags *portainer.CLIFlags) *portainer.Status {
+func initStatus(endpointManagement, registryManagement, snapshot bool, flags *portainer.CLIFlags) *portainer.Status {
 	return &portainer.Status{
 		Analytics:          !*flags.NoAnalytics,
 		Authentication:     !*flags.NoAuth,
 		EndpointManagement: endpointManagement,
+		RegistryManagement: registryManagement,
 		Snapshot:           snapshot,
 		Version:            portainer.APIVersion,
 	}
@@ -550,6 +551,11 @@ func main() {
 		endpointManagement = false
 	}
 
+	registryManagement := true
+	if *flags.ExternalRegistries != "" {
+		registryManagement = false
+	}
+
 	swarmStackManager, err := initSwarmStackManager(*flags.Assets, *flags.Data, digitalSignatureService, fileService)
 	if err != nil {
 		log.Fatal(err)
@@ -593,7 +599,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	applicationStatus := initStatus(endpointManagement, *flags.Snapshot, flags)
+	applicationStatus := initStatus(endpointManagement, registryManagement, *flags.Snapshot, flags)
 
 	err = initEndpoint(flags, store.EndpointService, snapshotter)
 	if err != nil {
@@ -646,6 +652,7 @@ func main() {
 		AssetsPath:             *flags.Assets,
 		AuthDisabled:           *flags.NoAuth,
 		EndpointManagement:     endpointManagement,
+		RegistryManagement:     registryManagement,
 		UserService:            store.UserService,
 		TeamService:            store.TeamService,
 		TeamMembershipService:  store.TeamMembershipService,
