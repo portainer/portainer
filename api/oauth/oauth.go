@@ -23,9 +23,18 @@ type Service struct{}
 
 // GetAccessToken takes an access code and exchanges it for an access token from portainer OAuthSettings token endpoint
 func (*Service) GetAccessToken(code string, settings *portainer.OAuthSettings) (string, error) {
+	unescapedCode, err := url.QueryUnescape(code)
+	if err != nil {
+		return "", err
+	}
+
 	config := buildConfig(settings)
-	token, err := config.Exchange(context.Background(), code)
-	return token.AccessToken, err
+	token, err := config.Exchange(context.Background(), unescapedCode)
+	if err != nil {
+		return "", err
+	}
+
+	return token.AccessToken, nil
 }
 
 // GetUsername takes a token and retrieves the portainer OAuthSettings user identifier from resource server.
@@ -109,7 +118,6 @@ func buildConfig(oauthSettings *portainer.OAuthSettings) *oauth2.Config {
 		ClientSecret: oauthSettings.ClientSecret,
 		Endpoint:     endpoint,
 		RedirectURL:  oauthSettings.RedirectURI,
-		// TODO figure out how to handle different providers, see https://github.com/golang/oauth2/issues/119
-		Scopes: []string{oauthSettings.Scopes},
+		Scopes:       []string{oauthSettings.Scopes},
 	}
 }

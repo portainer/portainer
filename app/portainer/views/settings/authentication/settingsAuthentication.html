@@ -49,7 +49,7 @@
               </div>
             </div>
           </div>
-          
+
           <div ng-if="settings.AuthenticationMethod === 1">
             <div class="col-sm-12 form-section-title">
               Information
@@ -58,7 +58,7 @@
               When using internal authentication, Portainer will encrypt user passwords and store credentials locally.
             </div>
           </div>
-          
+
 
           <div ng-if="settings.AuthenticationMethod === 2">
             <div>
@@ -73,7 +73,7 @@
             <div class="col-sm-12 form-section-title">
               LDAP configuration
             </div>
-            
+
             <div class="form-group">
               <label for="ldap_url" class="col-sm-3 col-lg-2 control-label text-left">
                 LDAP Server
@@ -325,6 +325,9 @@
           <oauth-settings ng-if="isOauthEnabled()" settings="OAuthSettings" teams="teams"></oauth-settings>
 
             <!-- actions -->
+          <div class="col-sm-12 form-section-title">
+            Actions
+          </div>
           <div class="form-group">
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm" ng-click="saveSettings()" ng-disabled="state.actionInProgress" button-spinner="state.actionInProgress">

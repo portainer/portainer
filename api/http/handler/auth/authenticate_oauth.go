@@ -55,7 +55,7 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	if user == nil && !settings.OAuthSettings.OAuthAutoCreateUsers {
-		return &httperror.HandlerError{http.StatusForbidden, "Unregistered account", portainer.ErrUnauthorized}
+		return &httperror.HandlerError{http.StatusForbidden, "Account not created beforehand in Portainer and automatic user provisioning not enabled", portainer.ErrUnauthorized}
 	}
 
 	if user == nil {

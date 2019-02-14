@@ -120,7 +120,7 @@ angular.module('portainer.app').controller('AuthenticationController', ['$q', '$
           $state.go('portainer.home');
         })
         .catch(function error() {
-          $scope.state.AuthenticationError = 'Failed to authenticate with OAuth2 Provider';
+          $scope.state.AuthenticationError = 'Unable to login via OAuth';
           $scope.state.isInOAuthProcess = false;
         });
     }
