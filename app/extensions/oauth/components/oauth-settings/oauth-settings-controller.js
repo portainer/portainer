@@ -27,6 +27,10 @@ angular.module('portainer.extensions.oauth')
       ctrl.settings.ResourceURI = provider.resourceUrl;
       ctrl.settings.UserIdentifier = provider.userIdentifier;
       ctrl.settings.Scopes = provider.scopes;
+
+      if (provider.name === 'microsoft' && ctrl.state.microsoftTenantID !== '') {
+        onMicrosoftTenantIDChange();
+      }
     }
 
     function onInit() {
