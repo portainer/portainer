@@ -34,7 +34,7 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	if settings.AuthenticationMethod != 3 {
-		return &httperror.HandlerError{http.StatusForbidden, "OAuth authentication is not being used", err}
+		return &httperror.HandlerError{http.StatusForbidden, "OAuth authentication is not enabled", err}
 	}
 
 	token, err := handler.OAuthService.GetAccessToken(payload.Code, &settings.OAuthSettings)
@@ -69,6 +69,18 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist user inside the database", err}
 		}
 
+		if settings.OAuthSettings.DefaultTeamID != 0 {
+			membership := &portainer.TeamMembership{
+				UserID: user.ID,
+				TeamID: settings.OAuthSettings.DefaultTeamID,
+				Role:   portainer.TeamMember,
+			}
+
+			err = handler.TeamMembershipService.CreateTeamMembership(membership)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist team membership inside the database", err}
+			}
+		}
 	}
 
 	return handler.writeToken(w, user)
