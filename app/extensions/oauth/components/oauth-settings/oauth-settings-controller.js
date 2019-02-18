@@ -37,6 +37,14 @@ angular.module('portainer.extensions.oauth')
       if (ctrl.settings.RedirectURI === '') {
         ctrl.settings.RedirectURI = window.location.origin;
       }
-      ctrl.state.provider.authUrl = ctrl.settings.AuthorizationURI;
+      if (ctrl.settings.AuthorizationURI !== '') {
+        ctrl.state.provider.authUrl = ctrl.settings.AuthorizationURI;
+
+        if (ctrl.settings.AuthorizationURI.indexOf('login.microsoftonline.com') > -1) {
+          var tenantID = ctrl.settings.AuthorizationURI.match(/login.microsoftonline.com\/(.*?)\//)[1];
+          ctrl.state.microsoftTenantID = tenantID;
+          onMicrosoftTenantIDChange();
+        }
+      }
     }
   });
