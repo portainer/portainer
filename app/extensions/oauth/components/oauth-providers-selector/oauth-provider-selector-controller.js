@@ -8,7 +8,7 @@ angular.module('portainer.extensions.oauth')
         accessTokenUrl: 'https://login.microsoftonline.com/TENANT_ID/oauth2/token',
         resourceUrl: 'https://graph.windows.net/TENANT_ID/me?api-version=2013-11-08',
         userIdentifier: 'mail',
-        scope: 'id,email,name',
+        scopes: 'id,email,name',
         name: 'microsoft'
       },
       {
