@@ -1,7 +1,8 @@
 package auth
 
 import (
-	"log"
+	"encoding/json"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -21,6 +22,54 @@ func (payload *oauthPayload) Validate(r *http.Request) error {
 	return nil
 }
 
+func (handler *Handler) authenticateThroughExtension(code, licenseKey string, settings *portainer.OAuthSettings) (string, error) {
+	extensionURL := handler.ProxyManager.GetExtensionURL(portainer.OAuthAuthenticationExtension)
+
+	encodedConfiguration, err := json.Marshal(settings)
+	if err != nil {
+		return "", nil
+	}
+
+	req, err := http.NewRequest("GET", extensionURL+"/validate", nil)
+	if err != nil {
+		return "", err
+	}
+
+	client := &http.Client{}
+	req.Header.Set("X-OAuth-Config", string(encodedConfiguration))
+	req.Header.Set("X-OAuth-Code", code)
+	req.Header.Set("X-PortainerExtension-License", licenseKey)
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	type extensionResponse struct {
+		Username string `json:"Username,omitempty"`
+		Err      string `json:"err,omitempty"`
+		Details  string `json:"details,omitempty"`
+	}
+
+	var extResp extensionResponse
+	err = json.Unmarshal(body, &extResp)
+	if err != nil {
+		return "", err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return "", portainer.Error(extResp.Err + ":" + extResp.Details)
+	}
+
+	return extResp.Username, nil
+}
+
 func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	var payload oauthPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
@@ -37,16 +86,16 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{http.StatusForbidden, "OAuth authentication is not enabled", err}
 	}
 
-	token, err := handler.OAuthService.GetAccessToken(payload.Code, &settings.OAuthSettings)
-	if err != nil {
-		log.Printf("[DEBUG] - Failed retrieving access token: %v", err)
-		return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid access token", portainer.ErrUnauthorized}
+	extension, err := handler.ExtensionService.Extension(portainer.OAuthAuthenticationExtension)
+	if err == portainer.ErrObjectNotFound {
+		return &httperror.HandlerError{http.StatusNotFound, "Oauth authentication extension is not enabled", err}
+	} else if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a extension with the specified identifier inside the database", err}
 	}
 
-	username, err := handler.OAuthService.GetUsername(token, &settings.OAuthSettings)
+	username, err := handler.authenticateThroughExtension(payload.Code, extension.License.LicenseKey, &settings.OAuthSettings)
 	if err != nil {
-		log.Printf("[DEBUG] - Failed acquiring username: %v", err)
-		return &httperror.HandlerError{http.StatusForbidden, "Unable to acquire username", portainer.ErrUnauthorized}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to authenticate through OAuth", portainer.ErrUnauthorized}
 	}
 
 	user, err := handler.UserService.UserByUsername(username)
@@ -84,19 +133,4 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	return handler.writeToken(w, user)
-}
-
-func (handler *Handler) loginOAuth(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	settings, err := handler.SettingsService.Settings()
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
-	}
-
-	if settings.AuthenticationMethod != 3 {
-		return &httperror.HandlerError{http.StatusForbidden, "OAuth authentication is disabled", err}
-	}
-
-	url := handler.OAuthService.BuildLoginURL(&settings.OAuthSettings)
-	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
-	return nil
 }

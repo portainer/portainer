@@ -20,7 +20,6 @@ import (
 	"github.com/portainer/portainer/jwt"
 	"github.com/portainer/portainer/ldap"
 	"github.com/portainer/portainer/libcompose"
-	"github.com/portainer/portainer/oauth"
 
 	"log"
 )
@@ -99,10 +98,6 @@ func initCryptoService() portainer.CryptoService {
 
 func initLDAPService() portainer.LDAPService {
 	return &ldap.Service{}
-}
-
-func initOAuthService() portainer.OAuthService {
-	return &oauth.Service{}
 }
 
 func initGitService() portainer.GitService {
@@ -529,8 +524,6 @@ func main() {
 
 	ldapService := initLDAPService()
 
-	oauthService := initOAuthService()
-
 	gitService := initGitService()
 
 	cryptoService := initCryptoService()
@@ -676,7 +669,6 @@ func main() {
 		JWTService:             jwtService,
 		FileService:            fileService,
 		LDAPService:            ldapService,
-		OAuthService:           oauthService,
 		GitService:             gitService,
 		SignatureService:       digitalSignatureService,
 		JobScheduler:           jobScheduler,

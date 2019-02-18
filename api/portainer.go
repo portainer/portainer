@@ -67,7 +67,7 @@ type (
 		UserIdentifier       string `json:"UserIdentifier"`
 		Scopes               string `json:"Scopes"`
 		OAuthAutoCreateUsers bool   `json:"OAuthAutoCreateUsers"`
-		DefaultTeamID        TeamID     `json:"DefaultTeamID"`
+		DefaultTeamID        TeamID `json:"DefaultTeamID"`
 	}
 
 	// TLSConfiguration represents a TLS configuration
@@ -764,13 +764,6 @@ type (
 		GetUserGroups(username string, settings *LDAPSettings) ([]string, error)
 	}
 
-	// OAuthService represents a service used to authenticate users against an authorization server
-	OAuthService interface {
-		GetAccessToken(code string, settings *OAuthSettings) (string, error)
-		GetUsername(token string, settings *OAuthSettings) (string, error)
-		BuildLoginURL(oauthSettings *OAuthSettings) string
-	}
-
 	// SwarmStackManager represents a service to manage Swarm stacks
 	SwarmStackManager interface {
 		Login(dockerhub *DockerHub, registries []Registry, endpoint *Endpoint)
@@ -809,7 +802,8 @@ const (
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
 	MessageOfTheDayURL = AssetsServerURL + "/motd.html"
 	// ExtensionDefinitionsURL represents the URL where Portainer extension definitions can be retrieved
-	ExtensionDefinitionsURL = AssetsServerURL + "/extensions.json"
+	// TODO: UPDATE URL to production URL
+	ExtensionDefinitionsURL = AssetsServerURL + "/extensions-dev.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response
 	PortainerAgentHeader = "Portainer-Agent"
 	// PortainerAgentTargetHeader represent the name of the header containing the target node name
@@ -936,6 +930,8 @@ const (
 	_ ExtensionID = iota
 	// RegistryManagementExtension represents the registry management extension
 	RegistryManagementExtension
+	// OAuthAuthenticationExtension represents the OAuth authentication extension
+	OAuthAuthenticationExtension
 )
 
 const (
