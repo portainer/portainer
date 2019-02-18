@@ -29,13 +29,22 @@
             <div class="form-group">
               <div class="col-sm-12" >
                 <a ng-href="{{OAuthLoginURI}}" ng-if="AuthenticationMethod === 3">
-                  <div class="btn btn-primary btn-sm pull-left" style="margin-left:2px">
-                    <i class="fa fa-sign-in-alt" aria-hidden="true"></i> Login with OAuth
+                  <div class="btn btn-primary btn-sm pull-left" style="margin-left:2px" ng-if="state.OAuthProvider === 'Microsoft'">
+                    <i class="fab fa-microsoft" aria-hidden="true"></i> Login with Microsoft
+                  </div>
+                  <div class="btn btn-primary btn-sm pull-left" style="margin-left:2px" ng-if="state.OAuthProvider === 'Google'">
+                    <i class="fab fa-google" aria-hidden="true" ></i> Login with Google
+                  </div>
+                  <div class="btn btn-primary btn-sm pull-left" style="margin-left:2px" ng-if="state.OAuthProvider === 'Github'">
+                    <i class="fab fa-github" aria-hidden="true" ></i> Login with Github
+                  </div>
+                  <div class="btn btn-primary btn-sm pull-left" style="margin-left:2px" ng-if="state.OAuthProvider === ''">
+                    <i class="fa fa-sign-in-alt" aria-hidden="true" ></i> Login with OAuth
                   </div>
                 </a>
 
                 <button type="submit" class="btn btn-primary btn-sm pull-right" ng-click="authenticateUser()"><i class="fa fa-sign-in-alt" aria-hidden="true"></i> Login</button>
-                
+
                 <span class="pull-right" style="margin: 5px;" ng-if="state.AuthenticationError">
                   <i class="fa fa-exclamation-triangle red-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                   <span class="small text-danger">{{ state.AuthenticationError }}</span>
