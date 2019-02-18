@@ -1,6 +1,10 @@
-angular.module('portainer.app').service('urlHelper', function urlHelper($window) {
-  this.getParameter = getParameter;
-  this.cleanParameters = cleanParameters;
+angular.module('portainer.app')
+.factory('URLHelper', ['$window', function URLHelperFactory($window) {
+  'use strict';
+  var helper = {};
+
+  helper.getParameter = getParameter;
+  helper.cleanParameters = cleanParameters;
 
   function getParameter(param) {
     var parameters = extractParameters();
@@ -21,4 +25,6 @@ angular.module('portainer.app').service('urlHelper', function urlHelper($window)
   function cleanParameters() {
     $window.location.search = '';
   }
-});
+
+  return helper;
+}]);

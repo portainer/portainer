@@ -1,5 +1,5 @@
-angular.module('portainer.app').controller('AuthenticationController', ['$q', '$scope', '$state', '$stateParams', '$sanitize', 'Authentication', 'UserService', 'EndpointService', 'StateManager', 'Notifications', 'SettingsService', 'urlHelper',
-  function($q, $scope, $state, $stateParams, $sanitize, Authentication, UserService, EndpointService, StateManager, Notifications, SettingsService, urlHelper) {
+angular.module('portainer.app').controller('AuthenticationController', ['$q', '$scope', '$state', '$stateParams', '$sanitize', 'Authentication', 'UserService', 'EndpointService', 'StateManager', 'Notifications', 'SettingsService', 'URLHelper',
+  function($q, $scope, $state, $stateParams, $sanitize, Authentication, UserService, EndpointService, StateManager, Notifications, SettingsService, URLHelper) {
     $scope.logo = StateManager.getState().application.logo;
 
     $scope.formValues = {
@@ -105,7 +105,7 @@ angular.module('portainer.app').controller('AuthenticationController', ['$q', '$
         authenticatedFlow();
       }
 
-      var code = urlHelper.getParameter('code');
+      var code = URLHelper.getParameter('code');
       if (code) {
         oAuthLogin(code);
       } else {
@@ -116,7 +116,7 @@ angular.module('portainer.app').controller('AuthenticationController', ['$q', '$
     function oAuthLogin(code) {
       return Authentication.OAuthLogin(code)
         .then(function success() {
-          urlHelper.cleanParameters();
+          URLHelper.cleanParameters();
           $state.go('portainer.home');
         })
         .catch(function error() {
