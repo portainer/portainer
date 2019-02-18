@@ -35,7 +35,6 @@ angular.module('portainer.extensions.oauth')
     this.$onInit = onInit;
 
     function onInit() {
-      console.log(ctrl.provider.authUrl);
       if (ctrl.provider.authUrl) {
         ctrl.provider = getProviderByURL(ctrl.provider.authUrl);
       } else {
