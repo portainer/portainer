@@ -5,7 +5,7 @@
   <div class="form-group">
     <span class="col-sm-12 text-muted small">
       With automatic user provisioning enabled, Portainer will create user(s) automatically with standard user role. If
-      disabled, users must be created in Portainer in order to login.
+      disabled, users must be created beforehand in Portainer in order to login.
     </span>
   </div>
   <div class="form-group">
@@ -60,7 +60,7 @@
   <div class="form-group">
     <label for="oauth_client_id" class="col-sm-3 col-lg-2 control-label text-left">
       Client ID
-      <portainer-tooltip position="bottom" message="Client ID that authorization server supports"></portainer-tooltip>
+      <portainer-tooltip position="bottom" message="Public identifier of the OAuth application"></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
       <input
@@ -75,11 +75,7 @@
 
   <div class="form-group">
     <label for="oauth_client_secret" class="col-sm-3 col-lg-2 control-label text-left">
-      Client Secret
-      <portainer-tooltip
-      position="bottom"
-      message="Client secret that authorization server supports"
-      ></portainer-tooltip>
+      Client secret
     </label>
     <div class="col-sm-9 col-lg-10">
       <input
@@ -94,10 +90,10 @@
 
   <div class="form-group" ng-if="$ctrl.state.provider.name == 'custom' || $ctrl.state.overrideConfiguration">
     <label for="oauth_authorization_uri" class="col-sm-3 col-lg-2 control-label text-left">
-      Authorization URI
+      Authorization URL
       <portainer-tooltip
       position="bottom"
-      message="URI where the user is redirected in order to login with OAuth provider"
+      message="URL used to authenticate against the OAuth provider. Will redirect the user to the OAuth provider login view"
       ></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
@@ -113,10 +109,10 @@
 
   <div class="form-group" ng-if="$ctrl.state.provider.name == 'custom' || $ctrl.state.overrideConfiguration">
     <label for="oauth_access_token_uri" class="col-sm-3 col-lg-2 control-label text-left">
-      Access Token URI
+      Access token URL
       <portainer-tooltip
       position="bottom"
-      message="URI where portainer will attempt to obtain an access token"
+      message="URL used by Portainer to exchange a valid OAuth authentication code for an access token"
       ></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
@@ -132,10 +128,10 @@
 
   <div class="form-group" ng-if="$ctrl.state.provider.name == 'custom' || $ctrl.state.overrideConfiguration">
     <label for="oauth_resource_uri" class="col-sm-3 col-lg-2 control-label text-left">
-      Resource URI
+      Resource URL
       <portainer-tooltip
       position="bottom"
-      message="URI where portainer will attempt to retrieve the user identifier value"
+      message="URL used by Portainer to retrieve information about the authenticated user"
       ></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
@@ -151,8 +147,11 @@
 
   <div class="form-group" ng-if="$ctrl.state.provider.name == 'custom' || $ctrl.state.overrideConfiguration">
     <label for="oauth_redirect_uri" class="col-sm-3 col-lg-2 control-label text-left">
-      Redirect URI
-      <portainer-tooltip position="bottom" message="Set this as your portainer index"></portainer-tooltip>
+      Redirect URL
+      <portainer-tooltip
+      position="bottom"
+      message="URL used by the OAuth provider to redirect the user after successful authentication. Should be set to your Portainer instance URL"
+      ></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
       <input
@@ -167,10 +166,10 @@
 
   <div class="form-group" ng-if="$ctrl.state.provider.name == 'custom' || $ctrl.state.overrideConfiguration">
     <label for="oauth_user_identifier" class="col-sm-3 col-lg-2 control-label text-left">
-      User Identifier
+      User identifier
       <portainer-tooltip
       position="bottom"
-      message="Key that identifies the user in the resource server request"
+      message="Identifier that will be used by Portainer to create an account for the authenticated user. Retrieved from the resource server specified via the Resource URL field"
       ></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
@@ -189,7 +188,7 @@
       Scopes
       <portainer-tooltip
       position="bottom"
-      message="Scopes that are required to obtain the user identifier separated by delimiter if server expects it"
+      message="Scopes required by the OAuth provider to retrieve information about the authenticated user. Refer to your OAuth provider documentation for more information about this"
       ></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
