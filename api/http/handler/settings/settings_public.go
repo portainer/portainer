@@ -34,7 +34,7 @@ func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *
 		EnableHostManagementFeatures:       settings.EnableHostManagementFeatures,
 		ExternalTemplates:                  false,
 		// TODO: check if state=portainer useful or not
-		OAuthLoginURI: fmt.Sprintf("%s?response_type=code&client_id=%s&redirect_uri=%s&scope=%s&state=portainer",
+		OAuthLoginURI: fmt.Sprintf("%s?response_type=code&client_id=%s&redirect_uri=%s&scope=%s&state=portainer&prompt=login",
 			settings.OAuthSettings.AuthorizationURI,
 			settings.OAuthSettings.ClientID,
 			settings.OAuthSettings.RedirectURI,

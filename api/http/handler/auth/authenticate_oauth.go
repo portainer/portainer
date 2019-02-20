@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"log"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
@@ -83,7 +84,7 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	if settings.AuthenticationMethod != 3 {
-		return &httperror.HandlerError{http.StatusForbidden, "OAuth authentication is not enabled", err}
+		return &httperror.HandlerError{http.StatusForbidden, "OAuth authentication is not enabled", portainer.Error("OAuth authentication is not enabled")}
 	}
 
 	extension, err := handler.ExtensionService.Extension(portainer.OAuthAuthenticationExtension)
@@ -95,6 +96,7 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 
 	username, err := handler.authenticateThroughExtension(payload.Code, extension.License.LicenseKey, &settings.OAuthSettings)
 	if err != nil {
+		log.Printf("[DEBUG] - OAuth authentication error: %s", err)
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to authenticate through OAuth", portainer.ErrUnauthorized}
 	}
 
