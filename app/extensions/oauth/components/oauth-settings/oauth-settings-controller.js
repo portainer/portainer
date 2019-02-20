@@ -11,6 +11,7 @@ angular.module('portainer.extensions.oauth')
     this.$onInit = onInit;
     this.onSelectProvider = onSelectProvider;
     this.onMicrosoftTenantIDChange = onMicrosoftTenantIDChange;
+    this.resetProviderConfiguration = resetProviderConfiguration;
 
     function onMicrosoftTenantIDChange() {
       var tenantID = ctrl.state.microsoftTenantID;
@@ -20,13 +21,25 @@ angular.module('portainer.extensions.oauth')
       ctrl.settings.ResourceURI = _.replace('https://graph.windows.net/TENANT_ID/me?api-version=2013-11-08', 'TENANT_ID', tenantID);
     }
 
+    function resetProviderConfiguration() {
+      ctrl.settings.AuthorizationURI = ctrl.state.provider.authUrl;
+      ctrl.settings.AccessTokenURI = ctrl.state.provider.accessTokenUrl;
+      ctrl.settings.ResourceURI = ctrl.state.provider.resourceUrl;
+      ctrl.settings.UserIdentifier = ctrl.state.provider.userIdentifier;
+      ctrl.settings.Scopes = ctrl.state.provider.scopes;
+
+      if (ctrl.state.provider.name === 'microsoft' && ctrl.state.microsoftTenantID !== '') {
+        onMicrosoftTenantIDChange();
+      }
+    }
+
     function onSelectProvider(provider) {
       ctrl.state.provider = provider;
-      ctrl.settings.AuthorizationURI = provider.authUrl;
-      ctrl.settings.AccessTokenURI = provider.accessTokenUrl;
-      ctrl.settings.ResourceURI = provider.resourceUrl;
-      ctrl.settings.UserIdentifier = provider.userIdentifier;
-      ctrl.settings.Scopes = provider.scopes;
+      ctrl.settings.AuthorizationURI = ctrl.settings.AuthorizationURI === '' ? provider.authUrl : ctrl.settings.AuthorizationURI;
+      ctrl.settings.AccessTokenURI = ctrl.settings.AccessTokenURI === '' ? provider.accessTokenUrl : ctrl.settings.AccessTokenURI;
+      ctrl.settings.ResourceURI = ctrl.settings.ResourceURI === '' ? provider.resourceUrl : ctrl.settings.ResourceURI;
+      ctrl.settings.UserIdentifier = ctrl.settings.UserIdentifier === '' ? provider.userIdentifier : ctrl.settings.UserIdentifier;
+      ctrl.settings.Scopes = ctrl.settings.Scopes === '' ? provider.scopes : ctrl.settings.Scopes;
 
       if (provider.name === 'microsoft' && ctrl.state.microsoftTenantID !== '') {
         onMicrosoftTenantIDChange();
