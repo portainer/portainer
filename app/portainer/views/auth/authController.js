@@ -133,7 +133,6 @@ function($q, $scope, $state, $stateParams, $sanitize, Authentication, UserServic
     return Authentication.OAuthLogin(code)
     .then(function success() {
       URLHelper.cleanParameters();
-      $state.go('portainer.home');
     })
     .catch(function error() {
       $scope.state.AuthenticationError = 'Unable to login via OAuth';
