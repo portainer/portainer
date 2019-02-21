@@ -207,7 +207,7 @@
       <a class="small interactive" ng-if="!$ctrl.state.overrideConfiguration" ng-click="$ctrl.state.overrideConfiguration = true;">
         <i class="fa fa-wrench space-right" aria-hidden="true"></i> Override default configuration
       </a>
-      <a class="small interactive" ng-if="$ctrl.state.overrideConfiguration" ng-click="$ctrl.state.overrideConfiguration = false; $ctrl.resetProviderConfiguration()">
+      <a class="small interactive" ng-if="$ctrl.state.overrideConfiguration" ng-click="$ctrl.state.overrideConfiguration = false; $ctrl.useDefaultProviderConfiguration()">
         <i class="fa fa-cogs space-right" aria-hidden="true"></i> Use default configuration
       </a>
     </div>

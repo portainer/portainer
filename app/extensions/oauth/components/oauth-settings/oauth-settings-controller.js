@@ -11,7 +11,7 @@ angular.module('portainer.extensions.oauth')
     this.$onInit = onInit;
     this.onSelectProvider = onSelectProvider;
     this.onMicrosoftTenantIDChange = onMicrosoftTenantIDChange;
-    this.resetProviderConfiguration = resetProviderConfiguration;
+    this.useDefaultProviderConfiguration = useDefaultProviderConfiguration;
 
     function onMicrosoftTenantIDChange() {
       var tenantID = ctrl.state.microsoftTenantID;
@@ -21,7 +21,7 @@ angular.module('portainer.extensions.oauth')
       ctrl.settings.ResourceURI = _.replace('https://graph.windows.net/TENANT_ID/me?api-version=2013-11-08', 'TENANT_ID', tenantID);
     }
 
-    function resetProviderConfiguration() {
+    function useDefaultProviderConfiguration() {
       ctrl.settings.AuthorizationURI = ctrl.state.provider.authUrl;
       ctrl.settings.AccessTokenURI = ctrl.state.provider.accessTokenUrl;
       ctrl.settings.ResourceURI = ctrl.state.provider.resourceUrl;
@@ -33,8 +33,8 @@ angular.module('portainer.extensions.oauth')
       }
     }
 
-    function onSelectProvider(provider) {
-      ctrl.state.provider = provider;
+    function useExistingConfiguration() {
+      var provider = ctrl.state.provider;
       ctrl.settings.AuthorizationURI = ctrl.settings.AuthorizationURI === '' ? provider.authUrl : ctrl.settings.AuthorizationURI;
       ctrl.settings.AccessTokenURI = ctrl.settings.AccessTokenURI === '' ? provider.accessTokenUrl : ctrl.settings.AccessTokenURI;
       ctrl.settings.ResourceURI = ctrl.settings.ResourceURI === '' ? provider.resourceUrl : ctrl.settings.ResourceURI;
@@ -46,10 +46,21 @@ angular.module('portainer.extensions.oauth')
       }
     }
 
+    function onSelectProvider(provider, overrideConfiguration) {
+      ctrl.state.provider = provider;
+
+      if (overrideConfiguration) {
+        useDefaultProviderConfiguration();
+      } else {
+        useExistingConfiguration();
+      }
+    }
+
     function onInit() {
       if (ctrl.settings.RedirectURI === '') {
         ctrl.settings.RedirectURI = window.location.origin;
       }
+
       if (ctrl.settings.AuthorizationURI !== '') {
         ctrl.state.provider.authUrl = ctrl.settings.AuthorizationURI;
 

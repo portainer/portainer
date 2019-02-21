@@ -40,7 +40,7 @@ angular.module('portainer.extensions.oauth')
       } else {
         ctrl.provider = ctrl.providers[0];
       }
-      ctrl.onSelect(ctrl.provider);
+      ctrl.onSelect(ctrl.provider, false);
     }
 
     function getProviderByURL(providerAuthURL) {
