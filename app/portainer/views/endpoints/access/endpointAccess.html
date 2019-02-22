@@ -4,7 +4,7 @@
     <a ui-sref="portainer.endpoints">Endpoints</a> &gt; <a ui-sref="portainer.endpoints.endpoint({id: endpoint.Id})">{{ endpoint.Name }}</a> &gt; Access management
   </rd-header-content>
 </rd-header>
-
+<rd-body>
 <div class="row" ng-if="endpoint">
   <div class="col-sm-12">
     <rd-widget>
@@ -44,3 +44,4 @@
     ></por-access-management>
   </div>
 </div>
+</rd-body>

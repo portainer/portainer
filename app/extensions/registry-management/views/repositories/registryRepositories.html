@@ -8,7 +8,7 @@
     <a ui-sref="portainer.registries">Registries</a> &gt; <a ui-sref="portainer.registries.registry({id: registry.Id})">{{ registry.Name }}</a> &gt; Repositories
   </rd-header-content>
 </rd-header>
-
+<rd-body>
 <div class="row">
   <information-panel ng-if="state.displayInvalidConfigurationMessage" title-text="Registry management configuration required">
     <span class="small text-muted">
@@ -35,3 +35,4 @@
     </registry-repositories-datatable>
   </div>
 </div>
+</rd-body>
