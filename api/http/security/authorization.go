@@ -153,17 +153,17 @@ func authorizedEndpointAccess(endpoint *portainer.Endpoint, endpointGroup *porta
 	return true
 }
 
-// AuthorizedEndpointGroupAccess ensure that the user can access the specified endpoint group.
+// authorizedEndpointGroupAccess ensure that the user can access the specified endpoint group.
 // It will check if the user is part of the authorized users or part of a team that is
 // listed in the authorized teams.
-func AuthorizedEndpointGroupAccess(endpointGroup *portainer.EndpointGroup, userID portainer.UserID, memberships []portainer.TeamMembership) bool {
+func authorizedEndpointGroupAccess(endpointGroup *portainer.EndpointGroup, userID portainer.UserID, memberships []portainer.TeamMembership) bool {
 	return authorizedAccess(userID, memberships, endpointGroup.AuthorizedUsers, endpointGroup.AuthorizedTeams)
 }
 
-// AuthorizedRegistryAccess ensure that the user can access the specified registry.
+// authorizedRegistryAccess ensure that the user can access the specified registry.
 // It will check if the user is part of the authorized users or part of a team that is
 // listed in the authorized teams.
-func AuthorizedRegistryAccess(registry *portainer.Registry, userID portainer.UserID, memberships []portainer.TeamMembership) bool {
+func authorizedRegistryAccess(registry *portainer.Registry, userID portainer.UserID, memberships []portainer.TeamMembership) bool {
 	return authorizedAccess(userID, memberships, registry.AuthorizedUsers, registry.AuthorizedTeams)
 }
 
