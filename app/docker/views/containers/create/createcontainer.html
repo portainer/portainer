@@ -125,6 +125,17 @@
             Actions
           </div>
           <div class="form-group">
+            <!-- autoremove -->
+            <div class="col-sm-12">
+              <label for="ownership" class="control-label text-left">
+                Auto remove
+                <portainer-tooltip position="bottom" message="When enabled, Portainer will automatically remove the container when it exits. This is useful when you want to use the container only once."></portainer-tooltip>
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" ng-model="config.HostConfig.AutoRemove"><i></i>
+              </label>
+            </div>
+            <!-- !autoremove -->
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !config.Image || (!formValues.Registry && fromContainer)" ng-click="create()" button-spinner="state.actionInProgress">
                 <span ng-hide="state.actionInProgress">Deploy the container</span>

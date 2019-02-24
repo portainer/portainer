@@ -50,6 +50,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       PortBindings: [],
       PublishAllPorts: false,
       Binds: [],
+      AutoRemove: false,
       NetworkMode: 'bridge',
       Privileged: false,
       Runtime: '',
