@@ -28,7 +28,7 @@ type Handler struct {
 // NewHandler creates a handler to manage registry operations.
 func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{
-		Router: mux.NewRouter(),
+		Router:         mux.NewRouter(),
 		requestBouncer: bouncer,
 	}
 
