@@ -18,6 +18,7 @@ func hideFields(registry *portainer.Registry) {
 // Handler is the HTTP handler used to handle registry operations.
 type Handler struct {
 	*mux.Router
+	requestBouncer   *security.RequestBouncer
 	RegistryService  portainer.RegistryService
 	ExtensionService portainer.ExtensionService
 	FileService      portainer.FileService
@@ -27,7 +28,8 @@ type Handler struct {
 // NewHandler creates a handler to manage registry operations.
 func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{
-		Router: mux.NewRouter(),
+		Router:         mux.NewRouter(),
+		requestBouncer: bouncer,
 	}
 
 	h.Handle("/registries",
@@ -35,7 +37,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h.Handle("/registries",
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.registryList))).Methods(http.MethodGet)
 	h.Handle("/registries/{id}",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.registryInspect))).Methods(http.MethodGet)
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.registryInspect))).Methods(http.MethodGet)
 	h.Handle("/registries/{id}",
 		bouncer.AdministratorAccess(httperror.LoggerHandler(h.registryUpdate))).Methods(http.MethodPut)
 	h.Handle("/registries/{id}/access",
@@ -45,7 +47,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h.Handle("/registries/{id}",
 		bouncer.AdministratorAccess(httperror.LoggerHandler(h.registryDelete))).Methods(http.MethodDelete)
 	h.PathPrefix("/registries/{id}/v2").Handler(
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.proxyRequestsToRegistryAPI)))
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.proxyRequestsToRegistryAPI)))
 
 	return h
 }

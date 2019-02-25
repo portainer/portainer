@@ -1,6 +1,6 @@
 angular.module('portainer.extensions.registrymanagement')
-.controller('RegistryRepositoriesController', ['$transition$', '$scope',  'RegistryService', 'RegistryV2Service', 'Notifications',
-function ($transition$, $scope, RegistryService, RegistryV2Service, Notifications) {
+.controller('RegistryRepositoriesController', ['$transition$', '$scope',  'RegistryService', 'RegistryV2Service', 'Notifications', 'Authentication',
+function ($transition$, $scope, RegistryService, RegistryV2Service, Notifications, Authentication) {
 
   $scope.state = {
     displayInvalidConfigurationMessage: false
@@ -8,6 +8,13 @@ function ($transition$, $scope, RegistryService, RegistryV2Service, Notification
 
   function initView() {
     var registryId = $transition$.params().id;
+
+    var authenticationEnabled = $scope.applicationState.application.authentication;
+    if (authenticationEnabled) {
+      var userDetails = Authentication.getUserDetails();
+      var isAdmin = userDetails.role === 1;
+      $scope.isAdmin = isAdmin;
+    }
 
     RegistryService.registry(registryId)
     .then(function success(data) {
