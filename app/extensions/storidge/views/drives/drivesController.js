@@ -5,7 +5,7 @@ function ($q, $scope, $state, Notifications, ModalService, StoridgeDriveService)
   $scope.removeAction = function(selectedItems) {
     ModalService.confirm({
       title: 'Are you sure?',
-      message: 'Do you want really want to remove this drive from the storage pool?',
+      message: 'Do you want really want to remove the drives from the storage pool?',
       buttons: {
         confirm: {
           label: 'Remove',

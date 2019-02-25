@@ -79,6 +79,17 @@ angular.module('extension.storidge', [])
     }
   };
 
+  var node = {
+    name: 'storidge.cluster.node',
+    url: '/:name',
+    views: {
+      'content@': {
+        templateUrl: 'app/extensions/storidge/views/nodes/inspect/node.html',
+        controller: 'StoridgeNodeController'
+      }
+    }
+  };
+
   var monitor = {
     name: 'storidge.monitor',
     url: '/events',
@@ -97,5 +108,6 @@ angular.module('extension.storidge', [])
   $stateRegistryProvider.register(profile);
   $stateRegistryProvider.register(profileCreation);
   $stateRegistryProvider.register(cluster);
+  $stateRegistryProvider.register(node);
   $stateRegistryProvider.register(monitor);
 }]);

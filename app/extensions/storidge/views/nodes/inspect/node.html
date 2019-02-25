@@ -1,0 +1,147 @@
+<rd-header>
+  <rd-header-title title-text="Node details"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="storidge.cluster">Storidge</a> &gt; <a
+      ui-sref="storidge.cluster.node({id: node.Name})">{{ node.Name }}</a>
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-object-group" title-text="Node details"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Name</td>
+              <td>{{ node.Name }}</td>
+            </tr>
+            <tr>
+              <td>Domain</td>
+              <td>{{ node.Domain }}</td>
+            </tr>
+            <tr>
+              <td>Domain ID</td>
+              <td>{{ node.DomainID }}</td>
+            </tr>
+            <tr>
+              <td>Status</td>
+              <td>{{ node.Status }}</td>
+            </tr>
+            <tr>
+              <td>Metadata version</td>
+              <td>{{ node.MetadataVersion }}</td>
+            </tr>
+            <tr>
+              <td>Nodes</td>
+              <td>{{ node.Nodes }}</td>
+            </tr>
+            <tr>
+              <td>HDDs</td>
+              <td>{{ node.Hdds }}</td>
+            </tr>
+            <tr>
+              <td>SSDs</td>
+              <td>{{ node.Ssds }}</td>
+            </tr>
+            <tr>
+              <td>VDisks</td>
+              <td>{{ node.Vdisks }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-object-group" title-text="Bandwidth details"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Free</td>
+              <td>{{ node.FreeBandwidth }}</td>
+            </tr>
+            <tr>
+              <td>Used</td>
+              <td>{{ node.UsedBandwidth }}</td>
+            </tr>
+            <tr>
+              <td>Provisioned</td>
+              <td>{{ node.ProvisionedBandwidth }}</td>
+            </tr>
+            <tr>
+              <td>Total</td>
+              <td>{{ node.TotalBandwidth }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-object-group" title-text="Capacity details"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Free</td>
+              <td>{{ node.FreeCapacity }}</td>
+            </tr>
+            <tr>
+              <td>Used</td>
+              <td>{{ node.UsedCapacity }}</td>
+            </tr>
+            <tr>
+              <td>Provisioned</td>
+              <td>{{ node.ProvisionedCapacity }}</td>
+            </tr>
+            <tr>
+              <td>Total</td>
+              <td>{{ node.TotalCapacity }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-object-group" title-text="IOPS details"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Free</td>
+              <td>{{ node.FreeIOPS }}</td>
+            </tr>
+            <tr>
+              <td>Used</td>
+              <td>{{ node.UsedIOPS }}</td>
+            </tr>
+            <tr>
+              <td>Provisioned</td>
+              <td>{{ node.ProvisionedIOPS }}</td>
+            </tr>
+            <tr>
+              <td>Total</td>
+              <td>{{ node.TotalIOPS }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

@@ -10,7 +10,14 @@ angular.module('extension.storidge')
     queryEvents: { method: 'GET', params: { resource: 'clusters', action: 'events' }, timeout: 4500, ignoreLoadingBar: true, isArray: true },
     getVersion: { method: 'GET', params: { resource: 'clusters', action: 'version' } },
     getInfo: { method: 'GET', params: { resource: 'clusters', action: 'info' }, timeout: 4500, ignoreLoadingBar: true },
+
     queryNodes: { method: 'GET', params: { resource: 'nodes' } },
+    getNode: { method: 'GET', params: { resource: 'nodes', id: '@id' } },
+    addNode: { method: 'POST', params: { resource: 'nodes' } },
+    removeNode: { method: 'DELETE', params: { resource: 'nodes', id: '@id' } },
+    cordonNode: { method: 'POST', params : { resource: 'nodes', action:'cordon', id: '@id' } },
+    uncordonNode: { method: 'POST', params : { resource: 'nodes', action: 'uncordon', id:'@id' } },
+
     queryProfiles: { method: 'GET', params: { resource: 'profiles' } },
     getProfile: { method: 'GET', params: { resource: 'profiles' } },
     createProfile: { method: 'POST', params: { resource: 'profiles' } },
@@ -19,7 +26,6 @@ angular.module('extension.storidge')
     queryDrives: { method: 'GET', params: { resource: 'drives' } },
     getDrive: { method: 'GET', params: { resource: 'drives', id: '@id' } },
     addDrive: { method: 'POST', params: { resource: 'drives' } },
-    removeDrive: { method: 'DELETE', params: { resource: 'drives', id: '@id' } },
-    getNode: { method: 'GET', params: { resource: 'nodes', id: '@id' } }
+    removeDrive: { method: 'DELETE', params: { resource: 'drives', id: '@id' } }
   });
 }]);
