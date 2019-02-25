@@ -124,8 +124,8 @@
           <div class="col-sm-12 form-section-title">
             Actions
           </div>
+          <!-- autoremove -->
           <div class="form-group">
-            <!-- autoremove -->
             <div class="col-sm-12">
               <label for="ownership" class="control-label text-left">
                 Auto remove
@@ -135,7 +135,9 @@
                 <input type="checkbox" ng-model="config.HostConfig.AutoRemove"><i></i>
               </label>
             </div>
-            <!-- !autoremove -->
+          </div>
+          <!-- !autoremove -->
+          <div class="form-group">
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !config.Image || (!formValues.Registry && fromContainer)" ng-click="create()" button-spinner="state.actionInProgress">
                 <span ng-hide="state.actionInProgress">Deploy the container</span>
