@@ -43,7 +43,7 @@
   <div class="form-group" ng-if="$ctrl.state.provider.name == 'microsoft'">
     <label for="oauth_microsoft_tenant_id" class="col-sm-3 col-lg-2 control-label text-left">
       Tenant ID
-      <portainer-tooltip position="bottom" message="ID of the Azure AD directory in which you created the OAuth application"></portainer-tooltip>
+      <portainer-tooltip position="bottom" message="ID of the Azure Directory you wish to authenticate against. Also known as the Directory ID"></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
       <input
@@ -59,7 +59,7 @@
 
   <div class="form-group">
     <label for="oauth_client_id" class="col-sm-3 col-lg-2 control-label text-left">
-      Client ID
+      {{ $ctrl.state.provider.name == 'microsoft' ? 'Application ID' : 'Client ID' }}
       <portainer-tooltip position="bottom" message="Public identifier of the OAuth application"></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
@@ -75,7 +75,7 @@
 
   <div class="form-group">
     <label for="oauth_client_secret" class="col-sm-3 col-lg-2 control-label text-left">
-      Client secret
+      {{ $ctrl.state.provider.name == 'microsoft' ? 'Application key' : 'Client secret' }}
     </label>
     <div class="col-sm-9 col-lg-10">
       <input
