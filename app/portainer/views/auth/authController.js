@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('AuthenticationController', ['$q', '$scope', '$state', '$transition$', '$sanitize', 'Authentication', 'UserService', 'EndpointService', 'StateManager', 'Notifications', 'SettingsService', '$stateParams',
-function ($q, $scope, $state, $transition$, $sanitize, Authentication, UserService, EndpointService, StateManager, Notifications, SettingsService, $stateParams) {
+.controller('AuthenticationController', ['$q', '$scope', '$state', '$transition$', '$sanitize', 'Authentication', 'UserService', 'EndpointService', 'StateManager', 'Notifications', 'SettingsService',
+function ($q, $scope, $state, $transition$, $sanitize, Authentication, UserService, EndpointService, StateManager, Notifications, SettingsService) {
 
   $scope.logo = StateManager.getState().application.logo;
 
@@ -44,7 +44,7 @@ function ($q, $scope, $state, $transition$, $sanitize, Authentication, UserServi
       if (endpoints.length === 0) {
         $state.go('portainer.init.endpoint');
       } else {
-        $state.go($stateParams.redirect ||'portainer.home');
+        $state.go('portainer.home');
       }
     })
     .catch(function error(err) {
@@ -73,7 +73,7 @@ function ($q, $scope, $state, $transition$, $sanitize, Authentication, UserServi
       if (endpoints.length === 0 && userDetails.role === 1) {
         $state.go('portainer.init.endpoint');
       } else {
-        $state.go($stateParams.redirect || 'portainer.home');
+        $state.go('portainer.home');
       }
     })
     .catch(function error(err) {
