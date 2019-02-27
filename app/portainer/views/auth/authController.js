@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('AuthenticationController', ['$q', '$scope', '$state', '$transition$', '$sanitize', 'Authentication', 'UserService', 'EndpointService', 'StateManager', 'Notifications', 'SettingsService', '$stateParams',
-function ($q, $scope, $state, $transition$, $sanitize, Authentication, UserService, EndpointService, StateManager, Notifications, SettingsService, $stateParams) {
+.controller('AuthenticationController', ['$q', '$scope', '$state', '$transition$', '$sanitize', 'Authentication', 'UserService', 'EndpointService', 'EndpointHelper', 'StateManager', 'Notifications', 'SettingsService', '$stateParams',
+function ($q, $scope, $state, $transition$, $sanitize, Authentication, UserService, EndpointService, EndpointHelper, StateManager, Notifications, SettingsService, $stateParams) {
 
   $scope.logo = StateManager.getState().application.logo;
 
@@ -43,8 +43,13 @@ function ($q, $scope, $state, $transition$, $sanitize, Authentication, UserServi
     .then(function success(endpoints) {
       if (endpoints.length === 0) {
         $state.go('portainer.init.endpoint');
+      } else if ($stateParams.endpoint && $stateParams.redirect) {
+        var endpoint = angular.fromJson($stateParams.endpoint);
+        var redirectionParams = $stateParams.params ? angular.fromJson($stateParams.params) : {};
+        delete redirectionParams['#'];
+        EndpointHelper.activateEndpointAndRedirect(endpoint, $stateParams.redirect, redirectionParams);
       } else {
-        $state.go($stateParams.redirect ||'portainer.home');
+        $state.go('portainer.home');
       }
     })
     .catch(function error(err) {
@@ -72,8 +77,13 @@ function ($q, $scope, $state, $transition$, $sanitize, Authentication, UserServi
 
       if (endpoints.length === 0 && userDetails.role === 1) {
         $state.go('portainer.init.endpoint');
+      } else if ($stateParams.endpoint && $stateParams.redirect) {
+        var endpoint = angular.fromJson($stateParams.endpoint);
+        var redirectionParams = $stateParams.params ? angular.fromJson($stateParams.params) : {};
+        delete redirectionParams['#'];
+        EndpointHelper.activateEndpointAndRedirect(endpoint, $stateParams.redirect, redirectionParams);
       } else {
-        $state.go($stateParams.redirect || 'portainer.home');
+        $state.go('portainer.home');
       }
     })
     .catch(function error(err) {

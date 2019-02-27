@@ -48,7 +48,7 @@ angular.module('portainer.app', [])
 
   var authentication = {
     name: 'portainer.auth',
-    url: '/auth?redirect',
+    url: '/auth?redirect&params&endpoint',
     params: {
       logout: false,
       error: ''

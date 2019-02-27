@@ -8,7 +8,7 @@ function ($rootScope, $state, Authentication, authManager, StateManager, Endpoin
   StateManager.initialize()
   .then(function success(state) {
     if (state.application.authentication) {
-      initAuthentication(authManager, Authentication, $rootScope, $state);
+      initAuthentication(authManager, Authentication, $rootScope, $state, EndpointProvider);
     }
     if (state.application.analytics) {
       initAnalytics(Analytics, $rootScope);
@@ -35,7 +35,7 @@ function ($rootScope, $state, Authentication, authManager, StateManager, Endpoin
 }]);
 
 
-function initAuthentication(authManager, Authentication, $rootScope, $state) {
+function initAuthentication(authManager, Authentication, $rootScope, $state, EndpointProvider) {
   authManager.checkAuthOnRefresh();
   Authentication.init();
 
@@ -45,7 +45,9 @@ function initAuthentication(authManager, Authentication, $rootScope, $state) {
   // to have more controls on which URL should trigger the unauthenticated state.
   $rootScope.$on('unauthenticated', function (event, data) {
     if (!_.includes(data.config.url, '/v2/') && ($state.current.name !== 'portainer.auth')) {
-      $state.go('portainer.auth', {error: 'Your session has expired', redirect: $state.current.name});
+      var endpoint = angular.toJson(EndpointProvider.currentEndpoint());
+      var params = angular.toJson($state.params);
+      $state.go('portainer.auth', {error: 'Your session has expired', redirect: $state.current.name, params: params, endpoint: endpoint});
     }
   });
 }
