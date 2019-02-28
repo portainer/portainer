@@ -48,7 +48,7 @@ angular.module('portainer.app', [])
 
   var authentication = {
     name: 'portainer.auth',
-    url: '/auth?redirect',
+    url: '/auth',
     params: {
       logout: false,
       error: ''
@@ -329,7 +329,7 @@ angular.module('portainer.app', [])
       }
     },
     resolve: {
-      endpointID: ['EndpointProvider', '$state', 
+      endpointID: ['EndpointProvider', '$state',
         function (EndpointProvider, $state) {
           var id = EndpointProvider.endpointID();
           if (!id) {

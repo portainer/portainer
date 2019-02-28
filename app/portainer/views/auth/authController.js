@@ -45,7 +45,7 @@ function($q, $scope, $state, $stateParams, $sanitize, Authentication, UserServic
       if (endpoints.length === 0) {
         $state.go('portainer.init.endpoint');
       } else {
-        $state.go($stateParams.redirect || 'portainer.home');
+        $state.go('portainer.home');
       }
     })
     .catch(function error(err) {
@@ -74,7 +74,7 @@ function($q, $scope, $state, $stateParams, $sanitize, Authentication, UserServic
       if (endpoints.length === 0 && userDetails.role === 1) {
         $state.go('portainer.init.endpoint');
       } else {
-        $state.go($stateParams.redirect || 'portainer.home');
+        $state.go('portainer.home');
       }
     })
     .catch(function error(err) {

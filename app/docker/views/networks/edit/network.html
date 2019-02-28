@@ -20,7 +20,7 @@
               <td>ID</td>
               <td>
                 {{ network.Id }}
-                <button class="btn btn-xs btn-danger" ng-click="removeNetwork(network.Id)"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this network</button>
+                <button ng-if="allowRemove(network)" class="btn btn-xs btn-danger" ng-click="removeNetwork(network.Id)"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this network</button>
               </td>
             </tr>
             <tr>

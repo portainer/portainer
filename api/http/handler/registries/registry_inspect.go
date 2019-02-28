@@ -23,6 +23,11 @@ func (handler *Handler) registryInspect(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a registry with the specified identifier inside the database", err}
 	}
 
+	err = handler.requestBouncer.RegistryAccess(r, registry)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access registry", portainer.ErrEndpointAccessDenied}
+	}
+
 	hideFields(registry)
 	return response.JSON(w, registry)
 }

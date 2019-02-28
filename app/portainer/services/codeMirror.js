@@ -11,7 +11,13 @@ angular.module('portainer.app')
   var codeMirrorYAMLOptions = {
     mode: 'text/x-yaml',
     gutters: ['CodeMirror-lint-markers'],
-    lint: true
+    lint: true,
+    extraKeys: {
+      Tab: function(cm) {
+        var spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
+        cm.replaceSelection(spaces);
+      }
+    }
   };
 
   service.applyCodeMirrorOnElement = function(element, yamlLint, readOnly) {
