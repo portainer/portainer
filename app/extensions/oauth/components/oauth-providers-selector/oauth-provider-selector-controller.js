@@ -28,6 +28,11 @@ angular.module('portainer.extensions.oauth')
         name: 'github'
       },
       {
+        authUrl: '',
+        accessTokenUrl: '',
+        resourceUrl: '',
+        userIdentifier: '',
+        scopes: '',
         name: 'custom'
       }
     ];
@@ -53,6 +58,6 @@ angular.module('portainer.extensions.oauth')
       else if (providerAuthURL.indexOf('github.com') !== -1) {
         return ctrl.providers[2];
       }
-      return ctrl.provider[3];
+      return ctrl.providers[3];
     }
   });
