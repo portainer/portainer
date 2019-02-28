@@ -23,9 +23,22 @@ angular.module('extension.storidge')
     createProfile: { method: 'POST', params: { resource: 'profiles' } },
     updateProfile: { method: 'PUT', params: { resource: 'profiles', id: '@name' } },
     deleteProfile: { method: 'DELETE', params: { resource: 'profiles' } },
+
     queryDrives: { method: 'GET', params: { resource: 'drives' } },
     getDrive: { method: 'GET', params: { resource: 'drives', id: '@id' } },
     addDrive: { method: 'POST', params: { resource: 'drives' } },
-    removeDrive: { method: 'DELETE', params: { resource: 'drives', id: '@id' } }
+    removeDrive: { method: 'DELETE', params: { resource: 'drives', id: '@id' } },
+
+    queryVolumes: { method: 'GET', params: { resource: 'volumes' } },
+    createVolume: { method: 'POST', params: { resource: 'volumes' } },
+    getVolume: { method: 'GET', params: { resource: 'volumes', id: '@id' } },
+    updateVolume: { method: 'POST', params: { resource: 'volumes', id: '@name' } },
+    removeVolume: { method: 'DELETE', params: { resource: 'volumes' , id: '@id' } },
+
+    querySnapshots: { method: 'GET', params: { resource: 'volumes', id: '@id', action: 'snapshots' } },
+    createSnapshot: { method: 'POST', params: { resource: 'volumes', id: '@id', action: 'snapshot' } },
+    getSnapshot: { method: 'GET', params: { resource: 'snapshots', id: '@id' } },
+    removeSnapshot: { method: 'DELETE', params: { resource: 'snapshots', id: '@id'} }
+
   });
 }]);

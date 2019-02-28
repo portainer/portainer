@@ -1,6 +1,6 @@
 angular.module('extension.storidge')
-.controller('StoridgeDriveController', ['$scope', '$state', '$transition$', 'Notifications', 'StoridgeDriveService',
-function ($scope, $state, $transition$, Notifications, StoridgeDriveService) {
+.controller('StoridgeDriveController', ['$scope', '$state', '$transition$', 'Notifications', 'ModalService', 'StoridgeDriveService',
+function ($scope, $state, $transition$, Notifications, ModalService, StoridgeDriveService) {
 
   $scope.addDrive = function () {
     StoridgeDriveService.add($scope.drive.Device, $scope.drive.Node)

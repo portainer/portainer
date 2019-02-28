@@ -54,6 +54,17 @@ angular.module('extension.storidge', [])
     }
   };
 
+  var snapshot = {
+    name: 'docker.volumes.volume.snapshot',
+    url: '/:snapshotId',
+    views: {
+      'content@': {
+        templateUrl: 'app/extensions/storidge/views/snapshots/inspect/snapshot.html',
+        controller: 'StoridgeSnapshotController'
+      }
+    }
+  };
+
   var profileCreation = {
     name: 'storidge.profiles.new',
     url: '/new',
@@ -104,6 +115,7 @@ angular.module('extension.storidge', [])
   $stateRegistryProvider.register(storidge);
   $stateRegistryProvider.register(drives);
   $stateRegistryProvider.register(drive);
+  $stateRegistryProvider.register(snapshot);
   $stateRegistryProvider.register(profiles);
   $stateRegistryProvider.register(profile);
   $stateRegistryProvider.register(profileCreation);
