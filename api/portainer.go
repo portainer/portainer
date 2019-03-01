@@ -56,6 +56,20 @@ type (
 		AutoCreateUsers     bool                      `json:"AutoCreateUsers"`
 	}
 
+	// OAuthSettings represents the settings used to authorize with an authorization server
+	OAuthSettings struct {
+		ClientID             string `json:"ClientID"`
+		ClientSecret         string `json:"ClientSecret,omitempty"`
+		AccessTokenURI       string `json:"AccessTokenURI"`
+		AuthorizationURI     string `json:"AuthorizationURI"`
+		ResourceURI          string `json:"ResourceURI"`
+		RedirectURI          string `json:"RedirectURI"`
+		UserIdentifier       string `json:"UserIdentifier"`
+		Scopes               string `json:"Scopes"`
+		OAuthAutoCreateUsers bool   `json:"OAuthAutoCreateUsers"`
+		DefaultTeamID        TeamID `json:"DefaultTeamID"`
+	}
+
 	// TLSConfiguration represents a TLS configuration
 	TLSConfiguration struct {
 		TLS           bool   `json:"TLS"`
@@ -85,6 +99,7 @@ type (
 		BlackListedLabels                  []Pair               `json:"BlackListedLabels"`
 		AuthenticationMethod               AuthenticationMethod `json:"AuthenticationMethod"`
 		LDAPSettings                       LDAPSettings         `json:"LDAPSettings"`
+		OAuthSettings                      OAuthSettings        `json:"OAuthSettings"`
 		AllowBindMountsForRegularUsers     bool                 `json:"AllowBindMountsForRegularUsers"`
 		AllowPrivilegedModeForRegularUsers bool                 `json:"AllowPrivilegedModeForRegularUsers"`
 		SnapshotInterval                   string               `json:"SnapshotInterval"`
@@ -834,6 +849,8 @@ const (
 	AuthenticationInternal
 	// AuthenticationLDAP represents the LDAP authentication method (authentication against a LDAP server)
 	AuthenticationLDAP
+	//AuthenticationOAuth represents the OAuth authentication method (authentication against a authorization server)
+	AuthenticationOAuth
 )
 
 const (
@@ -912,6 +929,8 @@ const (
 	_ ExtensionID = iota
 	// RegistryManagementExtension represents the registry management extension
 	RegistryManagementExtension
+	// OAuthAuthenticationExtension represents the OAuth authentication extension
+	OAuthAuthenticationExtension
 )
 
 const (

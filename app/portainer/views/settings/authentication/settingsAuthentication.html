@@ -37,23 +37,49 @@
                   <p>LDAP authentication</p>
                 </label>
               </div>
+              <div ng-if="oauthAuthenticationAvailable">
+                <input type="radio" id="registry_auth" ng-model="settings.AuthenticationMethod" ng-value="3">
+                <label for="registry_auth">
+                  <div class="boxselector_header">
+                    <i class="fa fa-users" aria-hidden="true" style="margin-right: 2px;"></i>
+                    OAuth
+                  </div>
+                  <p>OAuth authentication</p>
+                </label>
+              </div>
+              <div style="color: #767676;" ng-click="goToOAuthExtensionView()" ng-if="!oauthAuthenticationAvailable">
+                <input type="radio" id="registry_auth" ng-model="settings.AuthenticationMethod" ng-value="3" disabled>
+                <label for="registry_auth" tooltip-append-to-body="true" tooltip-placement="bottom" tooltip-class="portainer-tooltip" uib-tooltip="Feature available via an extension" style="cursor:pointer; border-color: #767676">
+                  <div class="boxselector_header">
+                    <i class="fa fa-users" aria-hidden="true" style="margin-right: 2px;"></i>
+                    OAuth (extension)
+                  </div>
+                  <p>OAuth authentication</p>
+                </label>
+              </div>
             </div>
           </div>
-          <div class="col-sm-12 form-section-title">
-            Information
-          </div>
-          <div class="form-group" ng-if="settings.AuthenticationMethod === 1">
-            <span class="col-sm-12 text-muted small">
+
+          <div ng-if="settings.AuthenticationMethod === 1">
+            <div class="col-sm-12 form-section-title">
+              Information
+            </div>
+            <div class="form-group col-sm-12 text-muted small">
               When using internal authentication, Portainer will encrypt user passwords and store credentials locally.
-            </span>
-          </div>
-          <div class="form-group" ng-if="settings.AuthenticationMethod === 2">
-            <span class="col-sm-12 text-muted small">
-              When using LDAP authentication, Portainer will delegate user authentication to a LDAP server and fallback to internal authentication if LDAP authentication fails.
-            </span>
+            </div>
           </div>
 
+
           <div ng-if="settings.AuthenticationMethod === 2">
+            <div>
+              <div class="col-sm-12 form-section-title">
+                Information
+              </div>
+              <div class="form-group col-sm-12 text-muted small">
+                When using LDAP authentication, Portainer will delegate user authentication to a LDAP server and fallback to internal authentication if LDAP authentication fails.
+              </div>
+          </div>
+
             <div class="col-sm-12 form-section-title">
               LDAP configuration
             </div>
@@ -306,7 +332,12 @@
             <!-- !group-search-settings -->
           </div>
 
-          <!-- actions -->
+          <oauth-settings ng-if="isOauthEnabled()" settings="OAuthSettings" teams="teams"></oauth-settings>
+
+            <!-- actions -->
+          <div class="col-sm-12 form-section-title">
+            Actions
+          </div>
           <div class="form-group">
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm" ng-click="saveSettings()" ng-disabled="state.actionInProgress" button-spinner="state.actionInProgress">

@@ -1,7 +1,6 @@
 angular.module('portainer.app')
-.controller('AuthenticationController', ['$q', '$scope', '$state', '$transition$', '$sanitize', 'Authentication', 'UserService', 'EndpointService', 'StateManager', 'Notifications', 'SettingsService',
-function ($q, $scope, $state, $transition$, $sanitize, Authentication, UserService, EndpointService, StateManager, Notifications, SettingsService) {
-
+.controller('AuthenticationController', ['$q', '$scope', '$state', '$stateParams', '$sanitize', 'Authentication', 'UserService', 'EndpointService', 'StateManager', 'Notifications', 'SettingsService', 'URLHelper',
+function($q, $scope, $state, $stateParams, $sanitize, Authentication, UserService, EndpointService, StateManager, Notifications, SettingsService, URLHelper) {
   $scope.logo = StateManager.getState().application.logo;
 
   $scope.formValues = {
@@ -10,7 +9,9 @@ function ($q, $scope, $state, $transition$, $sanitize, Authentication, UserServi
   };
 
   $scope.state = {
-    AuthenticationError: ''
+    AuthenticationError: '',
+    isInOAuthProcess: true,
+    OAuthProvider: ''
   };
 
   $scope.authenticateUser = function() {
@@ -81,10 +82,31 @@ function ($q, $scope, $state, $transition$, $sanitize, Authentication, UserServi
     });
   }
 
+  function determineOauthProvider(LoginURI) {
+    if (LoginURI.indexOf('login.microsoftonline.com') !== -1) {
+      return 'Microsoft';
+    }
+    else if (LoginURI.indexOf('accounts.google.com') !== -1) {
+      return 'Google';
+    }
+    else if (LoginURI.indexOf('github.com') !== -1) {
+      return 'Github';
+    }
+    return 'OAuth';
+  }
+
   function initView() {
-    if ($transition$.params().logout || $transition$.params().error) {
+    SettingsService.publicSettings()
+    .then(function success(settings) {
+      $scope.AuthenticationMethod = settings.AuthenticationMethod;
+      $scope.OAuthLoginURI = settings.OAuthLoginURI;
+      $scope.state.OAuthProvider = determineOauthProvider(settings.OAuthLoginURI);
+    });
+
+    if ($stateParams.logout || $stateParams.error) {
       Authentication.logout();
-      $scope.state.AuthenticationError = $transition$.params().error;
+      $scope.state.AuthenticationError = $stateParams.error;
+      $scope.state.isInOAuthProcess = false;
       return;
     }
 
@@ -98,7 +120,26 @@ function ($q, $scope, $state, $transition$, $sanitize, Authentication, UserServi
     } else {
       authenticatedFlow();
     }
+
+    var code = URLHelper.getParameter('code');
+    if (code) {
+      oAuthLogin(code);
+    } else {
+      $scope.state.isInOAuthProcess = false;
+    }
   }
+
+  function oAuthLogin(code) {
+    return Authentication.OAuthLogin(code)
+    .then(function success() {
+      URLHelper.cleanParameters();
+    })
+    .catch(function error() {
+      $scope.state.AuthenticationError = 'Unable to login via OAuth';
+      $scope.state.isInOAuthProcess = false;
+    });
+  }
+
 
   initView();
 }]);

@@ -62,5 +62,20 @@ angular.module('portainer.app')
     return deferred.promise;
   };
 
+  service.OAuthAuthenticationEnabled = function() {
+    var deferred = $q.defer();
+
+    service.extensions(false)
+    .then(function onSuccess(extensions) {
+      var extensionAvailable = _.find(extensions, { Id: 2, Enabled: true }) ? true : false;
+      deferred.resolve(extensionAvailable);
+    })
+    .catch(function onError(err) {
+      deferred.reject(err);
+    });
+
+    return deferred.promise;
+  };
+
   return service;
 }]);
