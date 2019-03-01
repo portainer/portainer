@@ -98,7 +98,4 @@ function ($state, StoridgeVolumeService, Notifications) {
     });
   };
 
-  this.$onInit = function() {
-  };
-
 }]);

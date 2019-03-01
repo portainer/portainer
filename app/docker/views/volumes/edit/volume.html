@@ -54,6 +54,13 @@
 
 <div class="row" ng-if="isCioDriver">
   <div class="col-sm-12">
+    <storidge-snapshot-creation volume-id="storidgeVolume.Name">
+    </storidge-snapshot-creation>
+  </div>
+</div>
+
+<div class="row" ng-if="isCioDriver">
+  <div class="col-sm-12">
     <storidge-snapshots-datatable
       title-text="Snapshots" title-icon="fa-camera"
       dataset="storidgeSnapshots" table-key="storidgeSnapshots"
