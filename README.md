@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img title="portainer" src='https://portainer.io/images/logo_alt.png' />
+  <img title="portainer" src='https://github.com/portainer/portainer/blob/develop/assets/images/logo_alt.png?raw=true' />
 </p>
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/portainer/portainer.svg)](https://hub.docker.com/r/portainer/portainer/)
@@ -8,7 +8,6 @@
 [![Documentation Status](https://readthedocs.org/projects/portainer/badge/?version=stable)](http://portainer.readthedocs.io/en/stable/?badge=stable)
 [![Build Status](https://portainer.visualstudio.com/Portainer%20CI/_apis/build/status/Portainer%20CI?branchName=develop)](https://portainer.visualstudio.com/Portainer%20CI/_build/latest?definitionId=3&branchName=develop)
 [![Code Climate](https://codeclimate.com/github/portainer/portainer/badges/gpa.svg)](https://codeclimate.com/github/portainer/portainer)
-[![Gitter](https://badges.gitter.im/portainer/Lobby.svg)](https://gitter.im/portainer/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=YHXZJQNJQ36H6)
 
 **_Portainer_** is a lightweight management UI which allows you to **easily** manage your different Docker environments (Docker hosts or Swarm clusters).
@@ -41,7 +40,6 @@ Unlike the public demo, the playground sessions are deleted after 4 hours. Apart
 * Issues: https://github.com/portainer/portainer/issues
 * FAQ: https://portainer.readthedocs.io/en/latest/faq.html
 * Slack (chat): https://portainer.io/slack/
-* Gitter (chat): https://gitter.im/portainer/Lobby
 
 ## Reporting bugs and contributing
 

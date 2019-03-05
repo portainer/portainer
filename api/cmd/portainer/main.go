@@ -216,7 +216,7 @@ func loadEndpointSyncSystemSchedule(jobScheduler portainer.JobScheduler, schedul
 
 	endpointSyncJob := &portainer.EndpointSyncJob{}
 
-	endointSyncSchedule := &portainer.Schedule{
+	endpointSyncSchedule := &portainer.Schedule{
 		ID:              portainer.ScheduleID(scheduleService.GetNextIdentifier()),
 		Name:            "system_endpointsync",
 		CronExpression:  "@every " + *flags.SyncInterval,
@@ -227,14 +227,14 @@ func loadEndpointSyncSystemSchedule(jobScheduler portainer.JobScheduler, schedul
 	}
 
 	endpointSyncJobContext := cron.NewEndpointSyncJobContext(endpointService, *flags.ExternalEndpoints)
-	endpointSyncJobRunner := cron.NewEndpointSyncJobRunner(endointSyncSchedule, endpointSyncJobContext)
+	endpointSyncJobRunner := cron.NewEndpointSyncJobRunner(endpointSyncSchedule, endpointSyncJobContext)
 
 	err = jobScheduler.ScheduleJob(endpointSyncJobRunner)
 	if err != nil {
 		return err
 	}
 
-	return scheduleService.CreateSchedule(endointSyncSchedule)
+	return scheduleService.CreateSchedule(endpointSyncSchedule)
 }
 
 func loadSchedulesFromDatabase(jobScheduler portainer.JobScheduler, jobService portainer.JobService, scheduleService portainer.ScheduleService, endpointService portainer.EndpointService, fileService portainer.FileService) error {
@@ -301,6 +301,7 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 					portainer.LDAPGroupSearchSettings{},
 				},
 			},
+			OAuthSettings:                      portainer.OAuthSettings{},
 			AllowBindMountsForRegularUsers:     true,
 			AllowPrivilegedModeForRegularUsers: true,
 			EnableHostManagementFeatures:       false,

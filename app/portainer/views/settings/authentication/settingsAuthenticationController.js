@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('SettingsAuthenticationController', ['$q', '$scope', 'Notifications', 'SettingsService', 'FileUploadService',
-function ($q, $scope, Notifications, SettingsService, FileUploadService) {
+.controller('SettingsAuthenticationController', ['$q', '$scope', '$state', 'Notifications', 'SettingsService', 'FileUploadService', 'TeamService', 'ExtensionService',
+function($q, $scope, $state, Notifications, SettingsService, FileUploadService, TeamService, ExtensionService) {
 
   $scope.state = {
     successfulConnectivityCheck: false,
@@ -14,6 +14,14 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
     TLSCACert: ''
   };
 
+  $scope.goToOAuthExtensionView = function() {
+    $state.go('portainer.extensions.extension', { id: 2 });
+  };
+
+  $scope.isOauthEnabled = function isOauthEnabled() {
+    return $scope.settings && $scope.settings.AuthenticationMethod === 3;
+  };
+
   $scope.addSearchConfiguration = function() {
     $scope.LDAPSettings.SearchSettings.push({ BaseDN: '', UserNameAttribute: '', Filter: '' });
   };
@@ -21,7 +29,7 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
   $scope.removeSearchConfiguration = function(index) {
     $scope.LDAPSettings.SearchSettings.splice(index, 1);
   };
-  
+
   $scope.addGroupSearchConfiguration = function() {
     $scope.LDAPSettings.GroupSearchSettings.push({ GroupBaseDN: '', GroupAttribute: '', GroupFilter: '' });
   };
@@ -92,12 +100,19 @@ function ($q, $scope, Notifications, SettingsService, FileUploadService) {
   }
 
   function initView() {
-    SettingsService.settings()
+    $q.all({
+      settings: SettingsService.settings(),
+      teams: TeamService.teams(),
+      oauthAuthentication: ExtensionService.OAuthAuthenticationEnabled()
+    })
     .then(function success(data) {
-      var settings = data;
+      var settings = data.settings;
+      $scope.teams = data.teams;
       $scope.settings = settings;
       $scope.LDAPSettings = settings.LDAPSettings;
+      $scope.OAuthSettings = settings.OAuthSettings;
       $scope.formValues.TLSCACert = settings.LDAPSettings.TLSConfig.TLSCACert;
+      $scope.oauthAuthenticationAvailable = data.oauthAuthentication;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve application settings');
