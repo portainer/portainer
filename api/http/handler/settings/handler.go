@@ -11,6 +11,7 @@ import (
 
 func hideFields(settings *portainer.Settings) {
 	settings.LDAPSettings.Password = ""
+	settings.OAuthSettings.ClientSecret = ""
 }
 
 // Handler is the HTTP handler used to handle settings operations.

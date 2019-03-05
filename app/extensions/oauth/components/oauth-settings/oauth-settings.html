@@ -1,0 +1,215 @@
+<div>
+  <div class="col-sm-12 form-section-title">
+    Automatic user provisioning
+  </div>
+  <div class="form-group">
+    <span class="col-sm-12 text-muted small">
+      With automatic user provisioning enabled, Portainer will create user(s) automatically with standard user role. If
+      disabled, users must be created beforehand in Portainer in order to login.
+    </span>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-3 col-lg-2 control-label text-left">Automatic user provisioning</label>
+    <label class="switch" style="margin-left: 20px">
+      <input type="checkbox" ng-model="$ctrl.settings.OAuthAutoCreateUsers" /><i></i>
+    </label>
+  </div>
+
+  <div ng-if="$ctrl.settings.OAuthAutoCreateUsers">
+    <div class="form-group">
+      <span class="col-sm-12 text-muted small">
+        <p>The users created by the automatic provisioning feature can be added to a default team on creation.</p>
+        <p>By assigning newly created users to a team they will be able to access the environments associated to that team. This setting is optional and if not set newly created users won't be able to access any environments.</p>
+      </span>
+    </div>
+    <div class="form-group">
+      <label class="col-sm-3 col-lg-2 control-label text-left">Default team</label>
+      <span class="small text-muted" style="margin-left: 20px;" ng-if="$ctrl.teams.length === 0">
+        You have not yet created any team. Head over the <a ui-sref="portainer.teams">teams view</a> to manage user teams.
+      </span>
+      <button type="button" class="btn btn-sm btn-danger" ng-click="$ctrl.settings.DefaultTeamID = null" ng-disabled="!$ctrl.settings.DefaultTeamID" ng-if="$ctrl.teams.length > 0"><i class="fa fa-times" aria-hidden="true"></i></button>
+      <div class="col-sm-9 col-lg-9" ng-if="$ctrl.teams.length > 0">
+        <select class="form-control" ng-model="$ctrl.settings.DefaultTeamID" ng-options="team.Id as team.Name for team in $ctrl.teams">
+          <option value="">No team</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <oauth-providers-selector on-select="$ctrl.onSelectProvider" provider="$ctrl.state.provider"></oauth-providers-selector>
+
+  <div class="col-sm-12 form-section-title">OAuth Configuration</div>
+
+  <div class="form-group" ng-if="$ctrl.state.provider.name == 'microsoft'">
+    <label for="oauth_microsoft_tenant_id" class="col-sm-3 col-lg-2 control-label text-left">
+      Tenant ID
+      <portainer-tooltip position="bottom" message="ID of the Azure Directory you wish to authenticate against. Also known as the Directory ID"></portainer-tooltip>
+    </label>
+    <div class="col-sm-9 col-lg-10">
+      <input
+      type="text"
+      class="form-control"
+      id="oauth_microsoft_tenant_id"
+      placeholder="xxxxxxxxxxxxxxxxxxxx"
+      ng-model="$ctrl.state.microsoftTenantID"
+      ng-change="$ctrl.onMicrosoftTenantIDChange()"
+      />
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="oauth_client_id" class="col-sm-3 col-lg-2 control-label text-left">
+      {{ $ctrl.state.provider.name == 'microsoft' ? 'Application ID' : 'Client ID' }}
+      <portainer-tooltip position="bottom" message="Public identifier of the OAuth application"></portainer-tooltip>
+    </label>
+    <div class="col-sm-9 col-lg-10">
+      <input
+      type="text"
+      class="form-control"
+      id="oauth_client_id"
+      ng-model="$ctrl.settings.ClientID"
+      placeholder="xxxxxxxxxxxxxxxxxxxx"
+      />
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="oauth_client_secret" class="col-sm-3 col-lg-2 control-label text-left">
+      {{ $ctrl.state.provider.name == 'microsoft' ? 'Application key' : 'Client secret' }}
+    </label>
+    <div class="col-sm-9 col-lg-10">
+      <input
+      type="password"
+      class="form-control"
+      id="oauth_client_secret"
+      ng-model="$ctrl.settings.ClientSecret"
+      placeholder="xxxxxxxxxxxxxxxxxxxx"
+      />
+    </div>
+  </div>
+
+  <div class="form-group" ng-if="$ctrl.state.provider.name == 'custom' || $ctrl.state.overrideConfiguration">
+    <label for="oauth_authorization_uri" class="col-sm-3 col-lg-2 control-label text-left">
+      Authorization URL
+      <portainer-tooltip
+      position="bottom"
+      message="URL used to authenticate against the OAuth provider. Will redirect the user to the OAuth provider login view"
+      ></portainer-tooltip>
+    </label>
+    <div class="col-sm-9 col-lg-10">
+      <input
+      type="text"
+      class="form-control"
+      id="oauth_authorization_uri"
+      ng-model="$ctrl.settings.AuthorizationURI"
+      placeholder="https://example.com/oauth/authorize"
+      />
+    </div>
+  </div>
+
+  <div class="form-group" ng-if="$ctrl.state.provider.name == 'custom' || $ctrl.state.overrideConfiguration">
+    <label for="oauth_access_token_uri" class="col-sm-3 col-lg-2 control-label text-left">
+      Access token URL
+      <portainer-tooltip
+      position="bottom"
+      message="URL used by Portainer to exchange a valid OAuth authentication code for an access token"
+      ></portainer-tooltip>
+    </label>
+    <div class="col-sm-9 col-lg-10">
+      <input
+      type="text"
+      class="form-control"
+      id="oauth_access_token_uri"
+      ng-model="$ctrl.settings.AccessTokenURI"
+      placeholder="https://example.com/oauth/token"
+      />
+    </div>
+  </div>
+
+  <div class="form-group" ng-if="$ctrl.state.provider.name == 'custom' || $ctrl.state.overrideConfiguration">
+    <label for="oauth_resource_uri" class="col-sm-3 col-lg-2 control-label text-left">
+      Resource URL
+      <portainer-tooltip
+      position="bottom"
+      message="URL used by Portainer to retrieve information about the authenticated user"
+      ></portainer-tooltip>
+    </label>
+    <div class="col-sm-9 col-lg-10">
+      <input
+      type="text"
+      class="form-control"
+      id="oauth_resource_uri"
+      ng-model="$ctrl.settings.ResourceURI"
+      placeholder="https://example.com/user"
+      />
+    </div>
+  </div>
+
+  <div class="form-group" ng-if="$ctrl.state.provider.name == 'custom' || $ctrl.state.overrideConfiguration">
+    <label for="oauth_redirect_uri" class="col-sm-3 col-lg-2 control-label text-left">
+      Redirect URL
+      <portainer-tooltip
+      position="bottom"
+      message="URL used by the OAuth provider to redirect the user after successful authentication. Should be set to your Portainer instance URL"
+      ></portainer-tooltip>
+    </label>
+    <div class="col-sm-9 col-lg-10">
+      <input
+      type="text"
+      class="form-control"
+      id="oauth_redirect_uri"
+      ng-model="$ctrl.settings.RedirectURI"
+      placeholder="http://yourportainer.com/"
+      />
+    </div>
+  </div>
+
+  <div class="form-group" ng-if="$ctrl.state.provider.name == 'custom' || $ctrl.state.overrideConfiguration">
+    <label for="oauth_user_identifier" class="col-sm-3 col-lg-2 control-label text-left">
+      User identifier
+      <portainer-tooltip
+      position="bottom"
+      message="Identifier that will be used by Portainer to create an account for the authenticated user. Retrieved from the resource server specified via the Resource URL field"
+      ></portainer-tooltip>
+    </label>
+    <div class="col-sm-9 col-lg-10">
+      <input
+      type="text"
+      class="form-control"
+      id="oauth_user_identifier"
+      ng-model="$ctrl.settings.UserIdentifier"
+      placeholder="id"
+      />
+    </div>
+  </div>
+
+  <div class="form-group" ng-if="$ctrl.state.provider.name == 'custom' || $ctrl.state.overrideConfiguration">
+    <label for="oauth_scopes" class="col-sm-3 col-lg-2 control-label text-left">
+      Scopes
+      <portainer-tooltip
+      position="bottom"
+      message="Scopes required by the OAuth provider to retrieve information about the authenticated user. Refer to your OAuth provider documentation for more information about this"
+      ></portainer-tooltip>
+    </label>
+    <div class="col-sm-9 col-lg-10">
+      <input
+      type="text"
+      class="form-control"
+      id="oauth_scopes"
+      ng-model="$ctrl.settings.Scopes"
+      placeholder="id,email,name"
+      />
+    </div>
+  </div>
+
+  <div class="form-group" ng-if="$ctrl.state.provider.name != 'custom'">
+    <div class="col-sm-12">
+      <a class="small interactive" ng-if="!$ctrl.state.overrideConfiguration" ng-click="$ctrl.state.overrideConfiguration = true;">
+        <i class="fa fa-wrench space-right" aria-hidden="true"></i> Override default configuration
+      </a>
+      <a class="small interactive" ng-if="$ctrl.state.overrideConfiguration" ng-click="$ctrl.state.overrideConfiguration = false; $ctrl.useDefaultProviderConfiguration()">
+        <i class="fa fa-cogs space-right" aria-hidden="true"></i> Use default configuration
+      </a>
+    </div>
+  </div>
+</div>

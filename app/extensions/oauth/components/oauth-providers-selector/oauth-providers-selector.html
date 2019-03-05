@@ -1,0 +1,49 @@
+<div class="col-sm-12 form-section-title">
+  Provider
+</div>
+
+<div class="form-group"></div>
+<div class="form-group" style="margin-bottom: 0">
+  <div class="boxselector_wrapper">
+    <div ng-click="$ctrl.onSelect($ctrl.provider, true)">
+      <input type="radio" id="oauth_provider_microsoft" ng-model="$ctrl.provider" ng-value="$ctrl.providers[0]">
+      <label for="oauth_provider_microsoft">
+        <div class="boxselector_header">
+          <i class="fab fa-microsoft" aria-hidden="true" style="margin-right: 2px;"></i>
+          Microsoft
+        </div>
+        <p>Microsoft OAuth provider</p>
+      </label>
+    </div>
+    <div ng-click="$ctrl.onSelect($ctrl.provider, true)">
+      <input type="radio" id="oauth_provider_google" ng-model="$ctrl.provider" ng-value="$ctrl.providers[1]">
+      <label for="oauth_provider_google">
+        <div class="boxselector_header">
+          <i class="fab fa-google" aria-hidden="true" style="margin-right: 2px;"></i>
+          Google
+        </div>
+        <p>Google OAuth provider</p>
+      </label>
+    </div>
+    <div ng-click="$ctrl.onSelect($ctrl.provider, true)">
+      <input type="radio" id="oauth_provider_github" ng-model="$ctrl.provider" ng-value="$ctrl.providers[2]">
+      <label for="oauth_provider_github">
+        <div class="boxselector_header">
+          <i class="fab fa-github" aria-hidden="true" style="margin-right: 2px;"></i>
+          Github
+        </div>
+        <p>Github OAuth provider</p>
+      </label>
+    </div>
+    <div ng-click="$ctrl.onSelect($ctrl.provider, true)">
+      <input type="radio" id="oauth_provider_custom" ng-model="$ctrl.provider" ng-value="$ctrl.providers[3]">
+      <label for="oauth_provider_custom">
+        <div class="boxselector_header">
+          <i class="fa fa-user-check" aria-hidden="true" style="margin-right: 2px;"></i>
+          Custom
+        </div>
+        <p>Custom OAuth provider</p>
+      </label>
+    </div>
+  </div>
+</div>

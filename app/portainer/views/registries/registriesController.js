@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('RegistriesController', ['$q', '$scope', '$state', 'RegistryService', 'DockerHubService', 'ModalService', 'Notifications', 'ExtensionService',
-function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, Notifications, ExtensionService) {
+.controller('RegistriesController', ['$q', '$scope', '$state', 'RegistryService', 'DockerHubService', 'ModalService', 'Notifications', 'ExtensionService', 'Authentication',
+function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, Notifications, ExtensionService, Authentication) {
 
   $scope.state = {
     actionInProgress: false
@@ -67,6 +67,12 @@ function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, N
       $scope.registries = data.registries;
       $scope.dockerhub = data.dockerhub;
       $scope.registryManagementAvailable = data.registryManagement;
+      var authenticationEnabled = $scope.applicationState.application.authentication;
+      if (authenticationEnabled) {
+        var userDetails = Authentication.getUserDetails();
+        var isAdmin = userDetails.role === 1;
+        $scope.isAdmin = isAdmin;
+      }
     })
     .catch(function error(err) {
       $scope.registries = [];

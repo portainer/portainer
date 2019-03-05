@@ -56,6 +56,20 @@ type (
 		AutoCreateUsers     bool                      `json:"AutoCreateUsers"`
 	}
 
+	// OAuthSettings represents the settings used to authorize with an authorization server
+	OAuthSettings struct {
+		ClientID             string `json:"ClientID"`
+		ClientSecret         string `json:"ClientSecret,omitempty"`
+		AccessTokenURI       string `json:"AccessTokenURI"`
+		AuthorizationURI     string `json:"AuthorizationURI"`
+		ResourceURI          string `json:"ResourceURI"`
+		RedirectURI          string `json:"RedirectURI"`
+		UserIdentifier       string `json:"UserIdentifier"`
+		Scopes               string `json:"Scopes"`
+		OAuthAutoCreateUsers bool   `json:"OAuthAutoCreateUsers"`
+		DefaultTeamID        TeamID `json:"DefaultTeamID"`
+	}
+
 	// TLSConfiguration represents a TLS configuration
 	TLSConfiguration struct {
 		TLS           bool   `json:"TLS"`
@@ -85,6 +99,7 @@ type (
 		BlackListedLabels                  []Pair               `json:"BlackListedLabels"`
 		AuthenticationMethod               AuthenticationMethod `json:"AuthenticationMethod"`
 		LDAPSettings                       LDAPSettings         `json:"LDAPSettings"`
+		OAuthSettings                      OAuthSettings        `json:"OAuthSettings"`
 		AllowBindMountsForRegularUsers     bool                 `json:"AllowBindMountsForRegularUsers"`
 		AllowPrivilegedModeForRegularUsers bool                 `json:"AllowPrivilegedModeForRegularUsers"`
 		SnapshotInterval                   string               `json:"SnapshotInterval"`
@@ -779,15 +794,17 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "1.20.1"
+	APIVersion = "1.20.2"
 	// DBVersion is the version number of the Portainer database
 	DBVersion = 17
 	// AssetsServerURL represents the URL of the Portainer asset server
 	AssetsServerURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com"
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
 	MessageOfTheDayURL = AssetsServerURL + "/motd.html"
+	// MessageOfTheDayTitleURL represents the URL where Portainer MOTD title can be retrieved
+	MessageOfTheDayTitleURL = AssetsServerURL + "/motd-title.txt"
 	// ExtensionDefinitionsURL represents the URL where Portainer extension definitions can be retrieved
-	ExtensionDefinitionsURL = AssetsServerURL + "/extensions.json"
+	ExtensionDefinitionsURL = AssetsServerURL + "/extensions-1.20.2.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response
 	PortainerAgentHeader = "Portainer-Agent"
 	// PortainerAgentTargetHeader represent the name of the header containing the target node name
@@ -834,6 +851,8 @@ const (
 	AuthenticationInternal
 	// AuthenticationLDAP represents the LDAP authentication method (authentication against a LDAP server)
 	AuthenticationLDAP
+	//AuthenticationOAuth represents the OAuth authentication method (authentication against a authorization server)
+	AuthenticationOAuth
 )
 
 const (
@@ -912,6 +931,8 @@ const (
 	_ ExtensionID = iota
 	// RegistryManagementExtension represents the registry management extension
 	RegistryManagementExtension
+	// OAuthAuthenticationExtension represents the OAuth authentication extension
+	OAuthAuthenticationExtension
 )
 
 const (

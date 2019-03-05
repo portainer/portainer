@@ -1,11 +1,14 @@
 angular.module('portainer.app')
-.factory('Authentication', ['$q', 'Auth', 'jwtHelper', 'LocalStorage', 'StateManager', 'EndpointProvider', function AuthenticationFactory($q, Auth, jwtHelper, LocalStorage, StateManager, EndpointProvider) {
+.factory('Authentication', [
+'Auth', 'OAuth', 'jwtHelper', 'LocalStorage', 'StateManager', 'EndpointProvider', 
+function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManager, EndpointProvider) {
   'use strict';
 
   var service = {};
   var user = {};
 
   service.init = init;
+  service.OAuthLogin = OAuthLogin;
   service.login = login;
   service.logout = logout;
   service.isAuthenticated = isAuthenticated;
@@ -15,30 +18,22 @@ angular.module('portainer.app')
     var jwt = LocalStorage.getJWT();
 
     if (jwt) {
-      var tokenPayload = jwtHelper.decodeToken(jwt);
-      user.username = tokenPayload.username;
-      user.ID = tokenPayload.id;
-      user.role = tokenPayload.role;
+      setUser(jwt);
     }
   }
 
+  function OAuthLogin(code) {
+    return OAuth.validate({ code: code }).$promise
+      .then(function onLoginSuccess(response) {
+        return setUser(response.jwt);
+      });
+  }
+
   function login(username, password) {
-    var deferred = $q.defer();
-
-    Auth.login({username: username, password: password}).$promise
-    .then(function success(data) {
-      LocalStorage.storeJWT(data.jwt);
-      var tokenPayload = jwtHelper.decodeToken(data.jwt);
-      user.username = username;
-      user.ID = tokenPayload.id;
-      user.role = tokenPayload.role;
-      deferred.resolve();
-    })
-    .catch(function error() {
-      deferred.reject();
-    });
-
-    return deferred.promise;
+    return Auth.login({ username: username, password: password }).$promise
+      .then(function onLoginSuccess(response) {
+        return setUser(response.jwt);
+      });
   }
 
   function logout() {
@@ -54,6 +49,14 @@ angular.module('portainer.app')
 
   function getUserDetails() {
     return user;
+  }
+
+  function setUser(jwt) {
+    LocalStorage.storeJWT(jwt);
+    var tokenPayload = jwtHelper.decodeToken(jwt);
+    user.username = tokenPayload.username;
+    user.ID = tokenPayload.id;
+    user.role = tokenPayload.role;
   }
 
   return service;
