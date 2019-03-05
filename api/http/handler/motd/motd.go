@@ -10,7 +10,7 @@ import (
 )
 
 type motdResponse struct {
-	Title string `json:"Title"`
+	Title   string `json:"Title"`
 	Message string `json:"Message"`
 	Hash    []byte `json:"Hash"`
 }
