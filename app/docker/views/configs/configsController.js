@@ -1,38 +1,41 @@
-angular.module('portainer.docker')
-.controller('ConfigsController', ['$scope', '$state', 'ConfigService', 'Notifications',
-function ($scope, $state, ConfigService, Notifications) {
+import angular from 'angular';
 
-  $scope.removeAction = function (selectedItems) {
-    var actionCount = selectedItems.length;
-    angular.forEach(selectedItems, function (config) {
-      ConfigService.remove(config.Id)
-      .then(function success() {
-        Notifications.success('Config successfully removed', config.Name);
-        var index = $scope.configs.indexOf(config);
-        $scope.configs.splice(index, 1);
-      })
-      .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to remove config');
-      })
-      .finally(function final() {
-        --actionCount;
-        if (actionCount === 0) {
-          $state.reload();
-        }
-      });
-    });
-  };
+class ConfigsController {
 
-  function initView() {
-    ConfigService.configs()
-    .then(function success(data) {
-      $scope.configs = data;
-    })
-    .catch(function error(err) {
-      $scope.configs = [];
-      Notifications.error('Failure', err, 'Unable to retrieve configs');
-    });
+  /* @ngInject */
+  constructor($state, ConfigService, Notifications) {
+    this.$state = $state;
+    this.ConfigService = ConfigService;
+    this.Notifications = Notifications;
   }
 
-  initView();
-}]);
+  async $onInit() {
+    this.configs = [];
+    try {
+      this.configs = await this.ConfigService.configs();
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve configs');
+    }
+  }
+
+  async removeAction(selectedItems) {
+    let actionCount = selectedItems.length;
+    for (const config of selectedItems) {
+      try {
+        await this.ConfigService.remove(config.id);
+        this.Notifications.success('Config successfully removed', config.Name);
+        const index = this.configs.indexOf(config);
+        this.configs.splice(index, 1);
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to remove config');
+      } finally {
+        --actionCount;
+        if (actionCount === 0) {
+          this.$state.reload();
+        }
+      }
+    }
+  }
+}
+export default ConfigsController;
+angular.module('portainer.docker').controller('ConfigsController', ConfigsController);

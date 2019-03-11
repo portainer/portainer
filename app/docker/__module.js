@@ -24,7 +24,8 @@ angular.module('portainer.docker', ['portainer.app'])
     views: {
       'content@': {
         templateUrl: './views/configs/configs.html',
-        controller: 'ConfigsController'
+        controller: 'ConfigsController',
+        controllerAs: '$ctrl'
       }
     }
   };

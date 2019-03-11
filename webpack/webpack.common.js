@@ -108,5 +108,14 @@ module.exports = {
         }
       }
     }
-  }
+  },
+  resolve: {
+    alias: {
+      Agent: path.resolve(projectRoot, 'app/agent'),
+      Azure: path.resolve(projectRoot, 'app/azure'),
+      Docker: path.resolve(projectRoot, 'app/docker'),
+      Extensions: path.resolve(projectRoot, 'app/extensions'),
+      Portainer: path.resolve(projectRoot, 'app/portainer'),
+    }
+  },
 };
