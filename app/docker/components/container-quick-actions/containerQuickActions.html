@@ -28,14 +28,14 @@
     <i class="fa fa-info-circle space-right" aria-hidden="true"></i>
   </a>
   <a 
-    ng-if="$ctrl.state.showQuickActionStats && ['starting', 'running', 'healthy', 'unhealthy'].indexOf($ctrl.status) !== -1" 
+    ng-if="$ctrl.state.showQuickActionStats && ['starting', 'running', 'healthy', 'unhealthy'].indexOf($ctrl.status) !== -1 && $ctrl.taskId === undefined" 
     style="margin: 0 2.5px;" 
     ui-sref="docker.containers.container.stats({id: $ctrl.containerId, nodeName: $ctrl.nodeName})" 
     title="Stats">
     <i class="fa fa-chart-area space-right" aria-hidden="true"></i>
   </a>
   <a 
-    ng-if="$ctrl.state.showQuickActionConsole && ['starting', 'running', 'healthy', 'unhealthy'].indexOf($ctrl.status) !== -1" 
+    ng-if="$ctrl.state.showQuickActionConsole && ['starting', 'running', 'healthy', 'unhealthy'].indexOf($ctrl.status) !== -1 && $ctrl.taskId === undefined" 
     style="margin: 0 2.5px;" 
     ui-sref="docker.containers.container.console({id: $ctrl.containerId, nodeName: $ctrl.nodeName})" 
     title="Console">
