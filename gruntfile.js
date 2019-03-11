@@ -62,6 +62,8 @@ module.exports = function(grunt) {
     });
 
   grunt.registerTask('lint', ['eslint']);
+  grunt.registerTask('run-dev', ['build', 'shell:run', 'watch:build']);
+  grunt.registerTask('clear', ['clean:app']);
 
   grunt.registerTask('run-dev', [
     'config:dev',
@@ -74,7 +76,7 @@ module.exports = function(grunt) {
   grunt.initConfig({
     root: 'dist',
     distdir: 'dist/public',
-    shippedDockerVersion: '18.09.0',
+    shippedDockerVersion: '18.09.3',
     shippedDockerVersionWindows: '17.09.0-ce',
     pkg: grunt.file.readJSON('package.json'),
     config: gruntfile_cfg.config,
@@ -153,7 +155,7 @@ gruntfile_cfg.copy = {
 };
 
 function shell_buildBinary(p, a) {
-  var binfile = 'dist/portainer-' + p + '-' + a;
+  var binfile = 'dist/portainer';
   if (p === 'linux') {
     return [
       'if [ -f ' + (binfile) + ' ]; then',
@@ -181,12 +183,10 @@ function shell_buildBinaryOnDevOps(p, a) {
   }
 }
 
-function shell_run(arch) {
+function shell_run() {
   return [
     'docker rm -f portainer',
-    'docker run -d -p 9000:9000 -v $(pwd)/dist:/app -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer portainer/base /app/portainer-linux-' +
-      arch +
-      ' --no-analytics --template-file /app/templates.json'
+    'docker run -d -p 9000:9000 -v $(pwd)/dist:/app -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer portainer/base /app/portainer --no-analytics --template-file /app/templates.json'
   ].join(';');
 }
 

@@ -23,7 +23,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	}
 
 	h.Handle("/extensions",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.extensionList))).Methods(http.MethodGet)
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.extensionList))).Methods(http.MethodGet)
 	h.Handle("/extensions",
 		bouncer.AdministratorAccess(httperror.LoggerHandler(h.extensionCreate))).Methods(http.MethodPost)
 	h.Handle("/extensions/{id}",

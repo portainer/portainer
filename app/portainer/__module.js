@@ -48,7 +48,7 @@ angular.module('portainer.app', [])
 
   var authentication = {
     name: 'portainer.auth',
-    url: '/auth?redirect',
+    url: '/auth',
     params: {
       logout: false,
       error: ''
@@ -329,7 +329,7 @@ angular.module('portainer.app', [])
       }
     },
     resolve: {
-      endpointID: ['EndpointProvider', '$state', 
+      endpointID: ['EndpointProvider', '$state',
         function (EndpointProvider, $state) {
           var id = EndpointProvider.endpointID();
           if (!id) {
@@ -457,6 +457,16 @@ angular.module('portainer.app', [])
   var templates = {
     name: 'portainer.templates',
     url: '/templates',
+    resolve: {
+      endpointID: ['EndpointProvider', '$state',
+        function (EndpointProvider, $state) {
+          var id = EndpointProvider.endpointID();
+          if (!id) {
+            return $state.go('portainer.home');
+          }
+        }
+      ]
+    },
     views: {
       'content@': {
         templateUrl: './views/templates/templates.html',

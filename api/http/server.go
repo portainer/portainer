@@ -107,6 +107,8 @@ func (server *Server) Start() error {
 	authHandler.SettingsService = server.SettingsService
 	authHandler.TeamService = server.TeamService
 	authHandler.TeamMembershipService = server.TeamMembershipService
+	authHandler.ExtensionService = server.ExtensionService
+	authHandler.ProxyManager = proxyManager
 
 	var dockerHubHandler = dockerhub.NewHandler(requestBouncer)
 	dockerHubHandler.DockerHubService = server.DockerHubService

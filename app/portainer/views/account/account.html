@@ -56,6 +56,10 @@
                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                 You cannot change your password when using LDAP authentication.
               </span>
+              <span class="text-muted small" style="margin-left: 5px;" ng-if="AuthenticationMethod === 3 && userID !== 1">
+                <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                You cannot change your password when using OAuth authentication.
+              </span>
             </div>
           </div>
         </form>

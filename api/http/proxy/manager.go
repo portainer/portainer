@@ -12,7 +12,8 @@ import (
 // TODO: contain code related to legacy extension management
 
 var extensionPorts = map[portainer.ExtensionID]string{
-	portainer.RegistryManagementExtension: "7001",
+	portainer.RegistryManagementExtension:  "7001",
+	portainer.OAuthAuthenticationExtension: "7002",
 }
 
 type (
@@ -101,6 +102,11 @@ func (manager *Manager) CreateExtensionProxy(extensionID portainer.ExtensionID) 
 	manager.extensionProxies.Set(strconv.Itoa(int(extensionID)), proxy)
 
 	return proxy, nil
+}
+
+// GetExtensionURL retrieves the URL of an extension running locally based on the extension port table
+func (manager *Manager) GetExtensionURL(extensionID portainer.ExtensionID) string {
+	return "http://localhost:" + extensionPorts[extensionID]
 }
 
 // DeleteExtensionProxy deletes the extension proxy associated to an extension identifier

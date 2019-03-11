@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/http/proxy"
 	"github.com/portainer/portainer/http/security"
 )
 
@@ -28,6 +29,8 @@ type Handler struct {
 	SettingsService       portainer.SettingsService
 	TeamService           portainer.TeamService
 	TeamMembershipService portainer.TeamMembershipService
+	ExtensionService      portainer.ExtensionService
+	ProxyManager          *proxy.Manager
 }
 
 // NewHandler creates a handler to manage authentication operations.
@@ -36,6 +39,9 @@ func NewHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimi
 		Router:       mux.NewRouter(),
 		authDisabled: authDisabled,
 	}
+
+	h.Handle("/auth/oauth/validate",
+		rateLimiter.LimitAccess(bouncer.PublicAccess(httperror.LoggerHandler(h.validateOAuth)))).Methods(http.MethodPost)
 	h.Handle("/auth",
 		rateLimiter.LimitAccess(bouncer.PublicAccess(httperror.LoggerHandler(h.authenticate)))).Methods(http.MethodPost)
 

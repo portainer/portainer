@@ -41,6 +41,10 @@ func (handler *Handler) userDelete(w http.ResponseWriter, r *http.Request) *http
 }
 
 func (handler *Handler) deleteAdminUser(w http.ResponseWriter, user *portainer.User) *httperror.HandlerError {
+	if user.Password == "" {
+		return handler.deleteUser(w, user)
+	}
+
 	users, err := handler.UserService.Users()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve users from the database", err}
