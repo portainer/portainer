@@ -18,7 +18,7 @@ Rename-Item -Path "$project_path\api\src\github.com\portainer\api" -NewName "por
 
 Set-Location -Path "$project_path\api\cmd\portainer"
 
-go get -t -d -v ./...
-go build -v
+go.exe get -t -d -v ./...
+go.exe build -v
 
 Move-Item -Path "$project_path\api\cmd\portainer\$($binary)" -Destination "$project_path\dist"
