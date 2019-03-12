@@ -1,4 +1,3 @@
-
 <p align="center">
   <img title="portainer" src='https://github.com/portainer/portainer/blob/develop/assets/images/logo_alt.png?raw=true' />
 </p>
@@ -11,10 +10,8 @@
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=YHXZJQNJQ36H6)
 
 **_Portainer_** is a lightweight management UI which allows you to **easily** manage your different Docker environments (Docker hosts or Swarm clusters).
-
-**_Portainer_** is meant to be as **simple** to deploy as it is to use. It consists of a single container that can run on any Docker engine (can be deployed as Linux container or a Windows native container).
-
-**_Portainer_** allows you to manage your Docker containers, images, volumes, networks and more ! It is compatible with the *standalone Docker* engine and with *Docker Swarm mode*.
+**_Portainer_** is meant to be as **simple** to deploy as it is to use. It consists of a single container that can run on any Docker engine (can be deployed as Linux container or a Windows native container, supports other platforms too).
+**_Portainer_** allows you to manage your all your Docker resources (containers, images, volumes, networks and more) ! It is compatible with the *standalone Docker* engine and with *Docker Swarm mode*.
 
 ## Demo
 
