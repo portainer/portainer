@@ -18,9 +18,11 @@ function ($state, StoridgeVolumeService, Notifications) {
 
   this.initLabels = function() {
     var labels = this.volume.Labels;
-    this.formValues.Labels = Object.keys(labels).map(function(key) {
-      return { name:key, value:labels[key] };
-    });
+    if (labels) {
+      this.formValues.Labels = Object.keys(labels).map(function(key) {
+        return { name:key, value:labels[key] };
+      });
+    }
   };
 
   this.updateVolume = function() {
@@ -68,9 +70,13 @@ function ($state, StoridgeVolumeService, Notifications) {
     }
     if (volume.IOPSMin === data.IOPSMin || !volume.IOPSMin) {
       delete volume.IOPSMin;
+    } else {
+      volume.IOPSMin = volume.IOPSMin.toString();
     }
     if (volume.IOPSMax === data.IOPSMax || !volume.IOPSMax) {
       delete volume.IOPSMax;
+    } else {
+      volume.IOPSMax = volume.IOPSMax.toString();
     }
     if (volume.BandwidthMin === data.BandwidthMin || !volume.BandwidthMin) {
       delete volume.BandwidthMin;
@@ -78,6 +84,7 @@ function ($state, StoridgeVolumeService, Notifications) {
     if (volume.BandwidthMax === data.BandwidthMax || !volume.BandwidthMax) {
       delete volume.BandwidthMax;
     }
+    this.prepareLabels(volume);
     return volume;
   };
 
@@ -85,7 +92,6 @@ function ($state, StoridgeVolumeService, Notifications) {
     this.state.isUpdating = true;
 
     var volume = this.prepareVolume();
-    this.prepareLabels(volume);
     volume.Name = this.volume.Name;
     StoridgeVolumeService.update(volume)
     .then(function success() {
