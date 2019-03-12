@@ -50,6 +50,17 @@ function ($scope, $state, $transition$, Notifications, StoridgeProfileService) {
       delete profile.MaxBandwidth;
     }
 
+    if (profile.SnapshotEnabled && $scope.state.RecurringSnapshotEnabled) {
+      if (!profile.SnapshotInterval) {
+        profile.SnapshotInterval = 1;
+      }
+      profile.SnapshotInterval *= 60;
+    }
+
+    if (!$scope.state.RecurringSnapshotEnabled) {
+      profile.SnapshotInterval = 0;
+    }
+
     prepareLabels(profile);
 
     $scope.state.actionInProgress = true;

@@ -11,7 +11,8 @@ function ($scope, $state, $transition$, Notifications, StoridgeProfileService, M
     LimitIOPS: false,
     LimitBandwidth: false,
     updateInProgress: false,
-    deleteInProgress: false
+    deleteInProgress: false,
+    RecurringSnapshotEnabled: false
   };
 
   $scope.addLabel = function() {
@@ -55,6 +56,17 @@ function ($scope, $state, $transition$, Notifications, StoridgeProfileService, M
     if (!$scope.state.LimitBandwidth) {
       delete profile.MinBandwidth;
       delete profile.MaxBandwidth;
+    }
+
+    if (profile.SnapshotEnabled && $scope.state.RecurringSnapshotEnabled) {
+      if (!profile.SnapshotInterval) {
+        profile.SnapshotInterval = 1;
+      }
+      profile.SnapshotInterval *= 60;
+    }
+
+    if (!$scope.state.RecurringSnapshotEnabled) {
+      profile.SnapshotInterval = 0;
     }
 
     prepareLabels(profile);
@@ -110,6 +122,10 @@ function ($scope, $state, $transition$, Notifications, StoridgeProfileService, M
         $scope.state.LimitBandwidth = true;
       } else {
         $scope.state.NoLimit = true;
+      }
+      if (profile.SnapshotEnabled && profile.SnapshotInterval) {
+        $scope.state.RecurringSnapshotEnabled = true;
+        profile.SnapshotInterval /= 60;
       }
       initLabels(profile.Labels);
       $scope.profile = profile;
