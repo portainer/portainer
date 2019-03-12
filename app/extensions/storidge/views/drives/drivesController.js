@@ -59,6 +59,16 @@ function ($q, $scope, $state, Notifications, ModalService, StoridgeDriveService)
     });
   };
 
+  $scope.rescanAction = function () {
+    StoridgeDriveService.rescan()
+    .then(function sucess() {
+      $state.reload();
+    })
+    .catch(function error() {
+      Notifications.error('Failure', err, 'Unable to scan drives');
+    });
+  };
+
   function initView() {
     StoridgeDriveService.drives()
     .then(function success(data) {

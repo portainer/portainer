@@ -28,6 +28,7 @@ angular.module('extension.storidge')
     getDrive: { method: 'GET', params: { resource: 'drives', id: '@id' } },
     addDrive: { method: 'POST', params: { resource: 'drives' } },
     removeDrive: { method: 'DELETE', params: { resource: 'drives', id: '@id' } },
+    rescanDrives: { method: 'POST', params: { resource: 'drives', action: 'rescan' } },
 
     queryVolumes: { method: 'GET', params: { resource: 'volumes' } },
     createVolume: { method: 'POST', params: { resource: 'volumes' } },

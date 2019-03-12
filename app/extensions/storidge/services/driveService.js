@@ -69,5 +69,9 @@ angular.module('extension.storidge')
     return deferred.promise;
   };
 
+  service.rescan = function () {
+    return Storidge.rescanDrives().$promise;
+  };
+
   return service;
 }]);

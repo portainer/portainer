@@ -9,6 +9,7 @@ angular.module('extension.storidge').component('storidgeDrivesDatatable', {
     orderBy: '@',
     reverseOrder: '<',
     removeAction: '<',
-    addAction: '<'
+    addAction: '<',
+    rescanAction: '<'
   }
 });

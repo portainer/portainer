@@ -15,6 +15,9 @@
           ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.addAction($ctrl.state.selectedItems)">
           <i class="fa fa-plus space-right" aria-hidden="true"></i>Add to storage pool
         </button>
+        <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.rescanAction()">
+          <i class="fa fa-sync space-right" aria-hidden="true"></i>Rescan drives
+        </button>
       </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
