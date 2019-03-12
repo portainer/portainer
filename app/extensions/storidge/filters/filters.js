@@ -19,7 +19,15 @@ angular.module('extension.storidge')
     var status = _.toLower(text);
     if (status === 'maintenance') {
       return 'orange-icon';
-    } else if (status === 'alert') {
+    }
+    return 'green-icon';
+  };
+})
+.filter('clusterStatusBadge', function () {
+'use strict';
+  return function (text) {
+    var status = _.toLower(text);
+    if (status === 'alert') {
       return 'red-icon';
     }
     return 'green-icon';
