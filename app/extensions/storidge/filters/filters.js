@@ -12,4 +12,16 @@ angular.module('extension.storidge')
     }
     return 'info';
   };
+})
+.filter('nodeStatusBadge', function () {
+'use strict';
+  return function (text) {
+    var status = _.toLower(text);
+    if (status === 'maintenance') {
+      return 'orange-icon';
+    } else if (status === 'alert') {
+      return 'red-icon';
+    }
+    return 'green-icon';
+  };
 });

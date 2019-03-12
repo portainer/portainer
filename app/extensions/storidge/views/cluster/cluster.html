@@ -22,7 +22,7 @@
             </tr>
             <tr>
               <td>Status</td>
-              <td><i class="fa fa-heartbeat space-right green-icon"></i> {{ clusterInfo.Status }}</td>
+              <td><i class="fa fa-heartbeat space-right {{ clusterInfo.Status | nodeStatusBadge }}"></i> {{ clusterInfo.Status }}</td>
             </tr>
             <tr>
               <td>Version</td>
