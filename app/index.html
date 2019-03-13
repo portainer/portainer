@@ -1,9 +1,7 @@
-<!DOCTYPE html>
-<html lang="en" ng-app="<%= name %>">
+<!DOCTYPE html><html lang="en" ng-app="<%= name %>">
 <head>
   <meta charset="utf-8">
   <title>Portainer</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="">
   <meta name="author" content="<%= author %>">
 
@@ -31,10 +29,10 @@
   }"
   ng-cloak>
     <div id="sideview" ui-view="sidebar" ng-if="!applicationState.loading"></div>
-  
+
     <div id="content-wrapper">
       <div class="page-content">
-  
+
         <div class="page-wrapper" ng-if="applicationState.loading">
           <!-- loading box -->
           <div class="container simple-box">
@@ -55,12 +53,12 @@
           </div>
           <!-- !loading box -->
         </div>
-  
+
         <!-- Main Content -->
         <div id="view" ui-view="content" ng-if="!applicationState.loading"></div>
-  
+
       </div><!-- End Page Content -->
     </div><!-- End Content Wrapper -->
   </div><!-- End Page Wrapper -->
-</body>
-</html>
+
+</body></html>
