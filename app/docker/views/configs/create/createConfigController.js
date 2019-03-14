@@ -3,7 +3,7 @@ import { AccessControlFormData } from "Portainer/components/accessControlForm/po
 
 import angular from "angular";
 
-class CreateControllerConfig {
+class CreateConfigController {
   /* @ngInject */
   constructor(
     $state,
@@ -142,7 +142,7 @@ class CreateControllerConfig {
   }
 }
 
-export default CreateControllerConfig;
+export default CreateConfigController;
 angular
   .module("portainer.docker")
-  .controller("CreateControllerConfig", CreateControllerConfig);
+  .controller("CreateConfigController", CreateConfigController);
