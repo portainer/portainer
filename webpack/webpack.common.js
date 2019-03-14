@@ -39,7 +39,7 @@ module.exports = {
           {
             loader: 'ngtemplate-loader',
             options: {
-              relativeTo: projectRoot
+              relativeTo: projectRoot + '/'
             }
           },
           { loader: 'html-loader' }
