@@ -1,27 +1,33 @@
-angular.module('portainer.docker')
-.controller('ConfigController', ['$scope', '$transition$', '$state', 'ConfigService', 'Notifications',
-function ($scope, $transition$, $state, ConfigService, Notifications) {
+import angular from 'angular';
 
-  $scope.removeConfig = function removeConfig(configId) {
-    ConfigService.remove(configId)
-    .then(function success() {
-      Notifications.success('Config successfully removed');
-      $state.go('docker.configs', {});
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to remove config');
-    });
-  };
-
-  function initView() {
-    ConfigService.config($transition$.params().id)
-    .then(function success(data) {
-      $scope.config = data;
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to retrieve config details');
-    });
+class ConfigController {
+  /* @ngInject */
+  constructor($transition$, $state, ConfigService, Notifications) {
+    this.$transition$ = $transition$;
+    this.$state = $state;
+    this.ConfigService = ConfigService;
+    this.Notifications = Notifications;
   }
 
-  initView();
-}]);
+  async removeConfig(configId) {
+    try {
+      await this.ConfigService.remove(configId);
+      this.Notifications.success('Config successfully removed');
+      this.$state.go('docker.configs', {});
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to remove config');
+    }
+  }
+
+  async $onInit() {
+    try {
+      let data = await this.ConfigService.config(this.$transition$.params().id)
+      this.config = data;
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve config details');
+    }
+  }
+}
+
+export default ConfigController;
+angular.module('portainer.docker').controller('ConfigController', ConfigController);

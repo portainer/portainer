@@ -1,11 +1,11 @@
 <rd-header>
   <rd-header-title title-text="Config details">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="docker.configs.config({id: config.Id})" ui-sref-opts="{reload: true}">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="docker.configs.config({id: ctrl.config.Id})" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
   <rd-header-content>
-    <a ui-sref="docker.configs">Configs</a> &gt; <a ui-sref="docker.configs.config({id: config.Id})">{{ config.Name }}</a>
+    <a ui-sref="docker.configs">Configs</a> &gt; <a ui-sref="docker.configs.config({id: ctrl.config.Id})">{{ ctrl.config.Name }}</a>
   </rd-header-content>
 </rd-header>
 
@@ -18,29 +18,29 @@
           <tbody>
             <tr>
               <td>Name</td>
-              <td>{{ config.Name }}</td>
+              <td>{{ ctrl.config.Name }}</td>
             </tr>
             <tr>
               <td>ID</td>
               <td>
-                {{ config.Id }}
-                <button class="btn btn-xs btn-danger" ng-click="removeConfig(config.Id)"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this config</button>
-                <button class="btn btn-xs btn-primary" ui-sref="docker.configs.new({id: config.Id})"><i class="fa fa-copy space-right" aria-hidden="true"></i>Clone config</button>
+                {{ ctrl.config.Id }}
+                <button class="btn btn-xs btn-danger" ng-click="ctrl.removeConfig(ctrl.config.Id)"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this config</button>
+                <button class="btn btn-xs btn-primary" ui-sref="docker.configs.new({id: ctrl.config.Id})"><i class="fa fa-copy space-right" aria-hidden="true"></i>Clone config</button>
               </td>
             </tr>
             <tr>
               <td>Created</td>
-              <td>{{ config.CreatedAt | getisodate }}</td>
+              <td>{{ ctrl.config.CreatedAt | getisodate }}</td>
             </tr>
             <tr>
               <td>Last updated</td>
-              <td>{{ config.UpdatedAt | getisodate }}</td>
+              <td>{{ ctrl.config.UpdatedAt | getisodate }}</td>
             </tr>
-            <tr ng-if="!(config.Labels | emptyobject)">
+            <tr ng-if="!(ctrl.config.Labels | emptyobject)">
               <td>Labels</td>
               <td>
                 <table class="table table-bordered table-condensed">
-                  <tr ng-repeat="(k, v) in config.Labels">
+                  <tr ng-repeat="(k, v) in ctrl.config.Labels">
                     <td>{{ k }}</td>
                     <td>{{ v }}</td>
                   </tr>
@@ -56,14 +56,14 @@
 
 <!-- access-control-panel -->
 <por-access-control-panel
-  ng-if="config && applicationState.application.authentication"
-  resource-id="config.Id"
-  resource-control="config.ResourceControl"
+  ng-if="ctrl.config && applicationState.application.authentication"
+  resource-id="ctrl.config.Id"
+  resource-control="ctrl.config.ResourceControl"
   resource-type="'config'">
 </por-access-control-panel>
 <!-- !access-control-panel -->
 
-<div class="row" ng-if="config">
+<div class="row" ng-if="ctrl.config">
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-header icon="fa-file-code" title-text="Config content"></rd-widget-header>
@@ -75,7 +75,7 @@
                 identifier="config-editor"
                 yml="false"
                 read-only="true"
-                value="config.Data"
+                value="ctrl.config.Data"
               ></code-editor>
             </div>
           </div>
