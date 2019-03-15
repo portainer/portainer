@@ -21,4 +21,4 @@ Set-Location -Path "api\cmd\portainer"
 go.exe get -t -d -v ./...
 go.exe build -v
 
-Move-Item -Path "api\cmd\portainer\$($binary)" -Destination "dist"
+Move-Item -Path "$($binary)" -Destination "dist"
