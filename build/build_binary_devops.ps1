@@ -6,7 +6,7 @@ param (
 $ErrorActionPreference = "Stop";
 
 $binary = "portainer.exe"
-$go_path = (Get-ITEM -Path env:AGENT_HOME_DIRECTORY).Value
+$go_path = (Get-ITEM -Path env:AGENT_HOMEDIRECTORY).Value
 
 Set-Item env:GOPATH "$go_path\api"
 
