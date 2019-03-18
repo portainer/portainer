@@ -86,7 +86,9 @@ function ($scope, $state, $transition$, $q, ModalService, VolumeService, Contain
 
       if ($scope.isCioDriver) {
         $scope.storidgeVolume = data.storidgeVolume;
-        return StoridgeSnapshotService.snapshots(data.storidgeVolume.Vdisk);
+        if ($scope.storidgeVolume.SnapshotEnabled) {
+          return StoridgeSnapshotService.snapshots(data.storidgeVolume.Vdisk);
+        }
       }
     })
     .then(function success(data) {

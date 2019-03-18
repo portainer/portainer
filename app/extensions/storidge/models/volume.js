@@ -15,17 +15,17 @@ function StoridgeVolumeModel(data) {
   this.Vdisk = data.vdisk;
   this.Labels = data.labels;
 
-  // this.IP = data.ipaddr;
-  // this.Volume = data.volume;
-  // this.DriveType = data.type;
-  // this.Compression = data.compression;
-  // this.Dedup = data.dedup;
-  // this.Encryption = data.encryption;
-  // this.Replication = data.replication;
-  // this.Snapshot = data.snapshot;
-  // this.SnapshotInterval = data.snap_interval;
-  // this.SnapshotMax = data.snap_max;
-  // this.Filesystem = data.filesystem;
+  this.IP = data.ipaddr;
+  this.Volume = data.volume;
+  this.DriveType = data.type;
+  this.Compression = data.compression;
+  this.Dedup = data.dedup;
+  this.Encryption = data.encryption;
+  this.Replication = data.replication;
+  this.SnapshotEnabled = data.snapshot;
+  this.SnapshotInterval = data.snapshotinterval;
+  this.SnapshotMax = data.snapshotmax;
+  this.Filesystem = data.filesystem;
 }
 
 function StoridgeVolumeUpdateModel(data) {

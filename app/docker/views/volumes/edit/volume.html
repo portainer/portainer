@@ -54,12 +54,12 @@
 
 <div class="row" ng-if="isCioDriver">
   <div class="col-sm-12">
-    <storidge-snapshot-creation volume-id="storidgeVolume.Vdisk">
+    <storidge-snapshot-creation volume-id="storidgeVolume.Vdisk" ng-if="storidgeVolume.SnapshotEnabled">
     </storidge-snapshot-creation>
   </div>
 </div>
 
-<div class="row" ng-if="isCioDriver">
+<div class="row" ng-if="isCioDriver && storidgeVolume.SnapshotEnabled">
   <div class="col-sm-12">
     <storidge-snapshots-datatable
       title-text="Snapshots" title-icon="fa-camera"
