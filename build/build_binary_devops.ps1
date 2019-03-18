@@ -10,8 +10,8 @@ $go_path = "$($(Get-ITEM -Path env:AGENT_HOMEDIRECTORY).Value)\go"
 
 Set-Item env:GOPATH "$go_path"
 
-New-Item -Name dist -Path "." -ItemType Directory | Out-Null
-New-Item -Name portainer -Path "$go_path\src\github.com\" -ItemType Directory | Out-Null
+New-Item -Name dist -Path "." -ItemType Directory -Force | Out-Null
+New-Item -Name portainer -Path "$go_path\src\github.com\" -ItemType Directory -Force | Out-Null
 
 Copy-Item -Path "api" -Destination "$go_path\src\github.com\portainer" -Recurse -Force -ErrorAction:SilentlyContinue
 Rename-Item -Path "$go_path\src\github.com\portainer\api" -NewName "portainer" -ErrorAction:SilentlyContinue
