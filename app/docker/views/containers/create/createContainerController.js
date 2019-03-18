@@ -139,6 +139,9 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
 
   function preparePortBindings(config) {
     var bindings = {};
+    if (config.ExposedPorts == undefined) {
+      config.ExposedPorts = {};
+    }
     config.HostConfig.PortBindings.forEach(function (portBinding) {
       if (portBinding.containerPort) {
         var key = portBinding.containerPort + '/' + portBinding.protocol;
