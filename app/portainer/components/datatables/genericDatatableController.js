@@ -1,11 +1,11 @@
 angular.module('portainer.app')
-.controller('GenericDatatableController', ['PaginationService', 'DatatableService',
-function (PaginationService, DatatableService) {
+.controller('GenericDatatableController', ['PaginationService', 'DatatableService', 'PAGINATION_MAX_ITEMS',
+function (PaginationService, DatatableService, PAGINATION_MAX_ITEMS) {
 
   this.state = {
     selectAll: false,
     orderBy: this.orderBy,
-    paginatedItemLimit: PaginationService.getPaginationLimit(this.tableKey),
+    paginatedItemLimit: PAGINATION_MAX_ITEMS,
     displayTextFilter: false,
     selectedItemCount: 0,
     selectedItems: []
@@ -65,5 +65,6 @@ function (PaginationService, DatatableService) {
   function setDefaults(ctrl) {
     ctrl.showTextFilter = ctrl.showTextFilter ? ctrl.showTextFilter : false;
     ctrl.state.reverseOrder = ctrl.reverseOrder ? ctrl.reverseOrder : false;
+    ctrl.state.paginatedItemLimit = PaginationService.getPaginationLimit(ctrl.tableKey);
   }
 }]);
