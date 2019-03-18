@@ -43,9 +43,9 @@ function ($q, $scope, $state, Notifications, ModalService, StoridgeDriveService)
       return item.Status === 'available';
     });
     angular.forEach(selectedItems, function (drive) {
-      StoridgeDriveService.add(drive.Id)
+      StoridgeDriveService.add(drive.Device, drive.Node)
       .then(function success() {
-        Notifications.success('Drive successfully added', drive.Id);
+        Notifications.success('Drive ' + drive.Device + ' successfully added on node ' + drive.Node);
       })
       .catch(function error(err) {
         Notifications.error('Failure', err, 'Unable to add drive');
