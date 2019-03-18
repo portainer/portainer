@@ -1,5 +1,5 @@
 function StoridgeVolumeModel(data) {
-  this.Allocated = data['allocate%'];
+  this.Allocated = data['alloc percent'];
   this.Capacity = data.capacity;
   this.Directory = data.directory;
   this.IOPSMax = data.iopsmax;
@@ -23,8 +23,8 @@ function StoridgeVolumeModel(data) {
   this.Encryption = data.encryption;
   this.Replication = data.replication;
   this.SnapshotEnabled = data.snapshot;
-  this.SnapshotInterval = data.snapshotinterval;
-  this.SnapshotMax = data.snapshotmax;
+  this.SnapshotInterval = data.snapinterval;
+  this.SnapshotMax = data.snapmax;
   this.Filesystem = data.filesystem;
 }
 
