@@ -2,6 +2,7 @@ env:
   browser: true
   jquery: true
   node: true
+  es6: true
 
 globals:
   angular: true
@@ -20,7 +21,7 @@ rules:
 #   # Possible Errors
 #   no-await-in-loop: off
 #   no-cond-assign: error
-#   no-console: off
+  no-console: off
 #   no-constant-condition: error
 #   no-control-regex: error
 #   no-debugger: error

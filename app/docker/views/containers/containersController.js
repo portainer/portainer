@@ -1,20 +1,26 @@
-angular.module('portainer.docker')
-.controller('ContainersController', ['$scope', 'ContainerService', 'Notifications', 'EndpointProvider',
-function ($scope, ContainerService, Notifications, EndpointProvider) {
+import angular from 'angular';
 
-  $scope.offlineMode = false;
-
-  function initView() {
-    ContainerService.containers(1)
-    .then(function success(data) {
-      $scope.containers = data;
-      $scope.offlineMode = EndpointProvider.offlineMode();
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to retrieve containers');
-      $scope.containers = [];
-    });
+class ContainersController {
+  /* @ngInject */
+  constructor(ContainerService, Notifications, EndpointProvider) {
+    this.ContainerService = ContainerService;
+    this.Notifications = Notifications;
+    this.EndpointProvider = EndpointProvider;
+    this.offlineMode = false;
   }
 
-  initView();
-}]);
+  async $onInit() {
+    try {
+      let data = await this.ContainerService.containers(1);
+      this.containers = data;
+      this.offlineMode = this.EndpointProvider.offlineMode();
+    }
+    catch(err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve containers');
+      this.containers = [];
+    }
+  }
+}
+
+export default ContainersController;
+angular.module('portainer.docker').controller('ContainersController', ContainersController);

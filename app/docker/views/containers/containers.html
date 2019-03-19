@@ -6,17 +6,17 @@
   </rd-header-title>
   <rd-header-content>Containers</rd-header-content>
 </rd-header>
-<information-panel-offline ng-if="offlineMode"></information-panel-offline>
+<information-panel-offline ng-if="ctrl.offlineMode"></information-panel-offline>
 <div class="row">
-  <div class="col-sm-12" ng-if="containers">
+  <div class="col-sm-12" ng-if="ctrl.containers">
     <containers-datatable
       title-text="Containers" title-icon="fa-server"
-      dataset="containers" table-key="containers"
+      dataset="ctrl.containers" table-key="containers"
       order-by="Status"
       show-ownership-column="applicationState.application.authentication"
       show-host-column="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'"
       show-add-action="true"
-      offline-mode="offlineMode"
+      offline-mode="ctrl.offlineMode"
     ></containers-datatable>
   </div>
 </div>

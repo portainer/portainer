@@ -25,7 +25,7 @@ angular.module('portainer.docker', ['portainer.app'])
       'content@': {
         templateUrl: './views/configs/configs.html',
         controller: 'ConfigsController',
-        controllerAs: 'ctrl'
+        controllerAs: 'ctrl',
       }
     }
   };
@@ -37,7 +37,7 @@ angular.module('portainer.docker', ['portainer.app'])
       'content@': {
         templateUrl: './views/configs/edit/config.html',
         controller: 'ConfigController',
-        controllerAs: 'ctrl'
+        controllerAs: 'ctrl',
       }
     }
   };
@@ -49,7 +49,7 @@ angular.module('portainer.docker', ['portainer.app'])
       'content@': {
         templateUrl: './views/configs/create/createconfig.html',
         controller: 'CreateConfigController',
-        controllerAs: 'ctrl'
+        controllerAs: 'ctrl',
       }
     }
   };
@@ -60,7 +60,8 @@ angular.module('portainer.docker', ['portainer.app'])
     views: {
       'content@': {
         templateUrl: './views/containers/containers.html',
-        controller: 'ContainersController'
+        controller: 'ContainersController',
+        controllerAs: 'ctrl',
       }
     }
   };
@@ -92,8 +93,9 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/new?nodeName&from',
     views: {
       'content@': {
-        templateUrl: './views/containers/create/createcontainer.html',
-        controller: 'CreateContainerController'
+        templateUrl: './views/containers/create/createContainer.html',
+        controller: 'CreateContainerController',
+        controllerAs: 'ctrl',
       }
     }
   };
