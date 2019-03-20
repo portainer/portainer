@@ -5,15 +5,7 @@ import angular from "angular";
 
 class CreateConfigController {
   /* @ngInject */
-  constructor(
-    $state,
-    $transition$,
-    Notifications,
-    ConfigService,
-    Authentication,
-    FormValidator,
-    ResourceControlService
-  ) {
+  constructor($state, $transition$, Notifications, ConfigService, Authentication, FormValidator, ResourceControlService) {
     this.$state = $state;
     this.$transition$ = $transition$;
     this.Notifications = Notifications;
@@ -32,6 +24,8 @@ class CreateConfigController {
     this.state = {
       formValidationError: ""
     };
+
+    this.editorUpdate = this.editorUpdate.bind(this);
   }
 
   addLabel() {

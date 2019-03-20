@@ -7,6 +7,8 @@ class ConfigsController {
     this.$state = $state;
     this.ConfigService = ConfigService;
     this.Notifications = Notifications;
+
+    this.removeAction = this.removeAction.bind(this);
   }
 
   async $onInit() {
@@ -22,7 +24,7 @@ class ConfigsController {
     let actionCount = selectedItems.length;
     for (const config of selectedItems) {
       try {
-        await this.ConfigService.remove(config.id);
+        await this.ConfigService.remove(config.Id);
         this.Notifications.success('Config successfully removed', config.Name);
         const index = this.configs.indexOf(config);
         this.configs.splice(index, 1);
