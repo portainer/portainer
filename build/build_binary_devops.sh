@@ -3,9 +3,9 @@ export GOPATH="$BUILD_SOURCESDIRECTORY/api"
 binary="portainer"
 
 mkdir -p dist
-mkdir -p api/src/github.com/portainer/
+mkdir -p api/src/github.com/portainer/api
 
-cp -R api/ api/src/github.com/portainer/portainer/
+cp -R api/ api/src/github.com/portainer/portainer/api
 
 cd 'api/cmd/portainer'
 
