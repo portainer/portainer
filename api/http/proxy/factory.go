@@ -6,8 +6,8 @@ import (
 	"net/http/httputil"
 	"net/url"
 
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/crypto"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/crypto"
 )
 
 // AzureAPIBaseURL is the URL where Azure API requests will be proxied.

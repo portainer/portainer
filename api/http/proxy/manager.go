@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/orcaman/concurrent-map"
-	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/api"
 )
 
 // TODO: contain code related to legacy extension management

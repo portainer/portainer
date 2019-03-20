@@ -1,7 +1,7 @@
 package jwt
 
 import (
-	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/api"
 
 	"fmt"
 	"time"

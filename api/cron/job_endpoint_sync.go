@@ -6,7 +6,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/api"
 )
 
 // EndpointSyncJobRunner is used to run a EndpointSyncJob

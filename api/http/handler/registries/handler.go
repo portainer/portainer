@@ -5,9 +5,9 @@ import (
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/http/proxy"
-	"github.com/portainer/portainer/http/security"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/proxy"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 func hideFields(registry *portainer.Registry) {

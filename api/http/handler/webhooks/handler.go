@@ -5,9 +5,9 @@ import (
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	portainer "github.com/portainer/portainer"
-	"github.com/portainer/portainer/docker"
-	"github.com/portainer/portainer/http/security"
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/docker"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 // Handler is the HTTP handler used to handle webhook operations.

@@ -3,9 +3,9 @@ package endpointproxy
 import (
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/http/proxy"
-	"github.com/portainer/portainer/http/security"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/proxy"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 // Handler is the HTTP handler used to proxy requests to external APIs.
