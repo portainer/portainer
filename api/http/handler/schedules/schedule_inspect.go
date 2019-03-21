@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/api"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"

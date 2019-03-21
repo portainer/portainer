@@ -6,8 +6,8 @@ import (
 	"encoding/pem"
 	"io/ioutil"
 
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/archive"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/archive"
 
 	"io"
 	"os"

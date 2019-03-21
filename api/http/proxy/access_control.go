@@ -1,7 +1,7 @@
 package proxy
 
 import (
-	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/api"
 )
 
 type (
