@@ -1,5 +1,5 @@
 angular.module('portainer.docker').component('dockerSidebarContent', {
-  templateUrl: 'app/docker/components/dockerSidebarContent/dockerSidebarContent.html',
+  templateUrl: './dockerSidebarContent.html',
   bindings: {
     endpointApiVersion: '<',
     swarmManagement: '<',

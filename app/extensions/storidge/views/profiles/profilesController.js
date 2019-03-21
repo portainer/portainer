@@ -1,3 +1,5 @@
+import { StoridgeProfileDefaultModel } from '../../models/profile';
+
 angular.module('extension.storidge')
 .controller('StoridgeProfilesController', ['$q', '$scope', '$state', 'Notifications', 'StoridgeProfileService',
 function ($q, $scope, $state, Notifications, StoridgeProfileService) {

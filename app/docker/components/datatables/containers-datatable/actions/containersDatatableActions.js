@@ -1,5 +1,5 @@
 angular.module('portainer.docker').component('containersDatatableActions', {
-  templateUrl: 'app/docker/components/datatables/containers-datatable/actions/containersDatatableActions.html',
+  templateUrl: './containersDatatableActions.html',
   controller: 'ContainersDatatableActionsController',
   bindings: {
     selectedItems: '=',

@@ -1,4 +1,6 @@
-function StackViewModel(data) {
+import { ResourceControlViewModel } from '../../portainer/models/resourceControl';
+
+export function StackViewModel(data) {
   this.Id = data.Id;
   this.Type = data.Type;
   this.Name = data.Name;
@@ -12,7 +14,7 @@ function StackViewModel(data) {
   this.External = false;
 }
 
-function ExternalStackViewModel(name, type) {
+export function ExternalStackViewModel(name, type) {
   this.Name = name;
   this.Type = type;
   this.External = true;

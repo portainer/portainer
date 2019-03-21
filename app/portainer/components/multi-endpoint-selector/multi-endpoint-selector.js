@@ -1,5 +1,5 @@
 angular.module('portainer.app').component('multiEndpointSelector', {
-  templateUrl: 'app/portainer/components/multi-endpoint-selector/multiEndpointSelector.html',
+  templateUrl: './multiEndpointSelector.html',
   controller: 'MultiEndpointSelectorController',
   bindings: {
     'model': '=',

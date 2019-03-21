@@ -1,5 +1,5 @@
 angular.module('portainer.app').component('groupAssociationTable', {
-  templateUrl: 'app/portainer/components/group-association-table/groupAssociationTable.html',
+  templateUrl: './groupAssociationTable.html',
   controller: function() {
     this.state = {
       orderBy: 'Name',

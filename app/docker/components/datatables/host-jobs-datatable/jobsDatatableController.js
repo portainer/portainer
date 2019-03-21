@@ -1,3 +1,5 @@
+import _ from 'lodash-es';
+
 angular.module('portainer.docker')
   .controller('JobsDatatableController', ['$q', '$state', 'PaginationService', 'DatatableService', 'ContainerService', 'ModalService', 'Notifications',
     function ($q, $state, PaginationService, DatatableService, ContainerService, ModalService, Notifications) {
@@ -73,7 +75,7 @@ angular.module('portainer.docker')
 
         for (var i = 0; i < datasetFilters.length; i++) {
           var filter = datasetFilters[i];
-          existingFilter = _.find(storedFilters, ['label', filter.label]);
+          var existingFilter = _.find(storedFilters, ['label', filter.label]);
           if (existingFilter && !existingFilter.display) {
             filter.display = existingFilter.display;
             this.filters.state.enabled = true;

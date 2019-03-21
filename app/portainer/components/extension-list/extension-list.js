@@ -1,5 +1,5 @@
 angular.module('portainer.app').component('extensionList', {
-  templateUrl: 'app/portainer/components/extension-list/extensionList.html',
+  templateUrl: './extensionList.html',
   bindings: {
     extensions: '<',
     currentDate: '<'

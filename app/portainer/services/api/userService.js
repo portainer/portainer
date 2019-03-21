@@ -1,3 +1,7 @@
+import _ from 'lodash-es';
+import { UserViewModel } from '../../models/user';
+import { TeamMembershipModel } from '../../models/teamMembership';
+
 angular.module('portainer.app')
 .factory('UserService', ['$q', 'Users', 'UserHelper', 'TeamService', 'TeamMembershipService', function UserServiceFactory($q, Users, UserHelper, TeamService, TeamMembershipService) {
   'use strict';

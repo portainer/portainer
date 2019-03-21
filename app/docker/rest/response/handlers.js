@@ -9,14 +9,16 @@ function isJSON(jsonString) {
         return o;
     }
   }
-  catch (e) { }
+  catch (e) {
+    //empty
+  }
   return false;
 }
 
 // The Docker API often returns a list of JSON object.
 // This handler wrap the JSON objects in an array.
 // Used by the API in: Image push, Image create, Events query.
-function jsonObjectsToArrayHandler(data) {
+export function jsonObjectsToArrayHandler(data) {
   var str = '[' + data.replace(/\n/g, ' ').replace(/\}\s*\{/g, '}, {') + ']';
   return angular.fromJson(str);
 }
@@ -27,7 +29,7 @@ function jsonObjectsToArrayHandler(data) {
 // This handler ensure a valid JSON object is returned in any case.
 // Used by the API in: container deletion, network deletion, network creation, volume creation,
 // container exec, exec resize.
-function genericHandler(data) {
+export function genericHandler(data) {
   var response = {};
   // No data is returned when deletion is successful (Docker 1.9 -> 1.12)
   if (!data) {
@@ -46,7 +48,7 @@ function genericHandler(data) {
 
 // The Docker API returns the logs as a single string.
 // This handler wraps the data in a JSON object under the "logs" property.
-function logsHandler(data) {
+export function logsHandler(data) {
   return {
     logs: data
   };
@@ -57,7 +59,7 @@ function logsHandler(data) {
 // container the error (Docker = 1.12).
 // This handler returns the original array on success or a newly created array containing
 // only one JSON object with the field message filled with the error message on failure.
-function deleteImageHandler(data) {
+export function deleteImageHandler(data) {
   // A string is returned on failure (Docker < 1.12)
   var response = [];
   if (!isJSON(data)) {

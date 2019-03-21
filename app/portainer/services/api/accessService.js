@@ -1,3 +1,7 @@
+import _ from 'lodash-es';
+import { UserAccessViewModel } from '../../models/access';
+import { TeamAccessViewModel } from '../../models/access';
+
 angular.module('portainer.app')
 .factory('AccessService', ['$q', 'UserService', 'TeamService', function AccessServiceFactory($q, UserService, TeamService) {
   'use strict';

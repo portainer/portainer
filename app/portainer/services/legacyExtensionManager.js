@@ -1,3 +1,5 @@
+import _ from 'lodash-es';
+
 // TODO: legacy extension management
 angular.module('portainer.app')
 .factory('LegacyExtensionManager', ['$q', 'PluginService', 'SystemService', 'LegacyExtensionService',

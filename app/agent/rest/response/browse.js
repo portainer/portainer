@@ -2,7 +2,7 @@
 // ngResource will transform it as an array of chars.
 // This functions simply creates a response object and assign
 // the data to a field.
-function browseGetResponse(data) {
+export function browseGetResponse(data) {
   var response = {};
   response.file = data;
   return response;

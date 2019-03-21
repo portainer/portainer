@@ -1,4 +1,6 @@
-function TemplateDefaultModel() {
+import _ from 'lodash-es';
+
+export function TemplateDefaultModel() {
   this.Type = 1;
   this.AdministratorOnly = false;
   this.Title = '';
@@ -12,7 +14,7 @@ function TemplateDefaultModel() {
   this.Registry = {};
 }
 
-function TemplateCreateRequest(model) {
+export function TemplateCreateRequest(model) {
   this.Type = model.Type;
   this.Name = model.Name;
   this.Hostname = model.Hostname;
@@ -46,12 +48,12 @@ function TemplateCreateRequest(model) {
   this.Volumes = model.Volumes;
 }
 
-function TemplateUpdateRequest(model) {
+export function TemplateUpdateRequest(model) {
   TemplateCreateRequest.call(this, model);
   this.id = model.Id;
 }
 
-function TemplateViewModel(data) {
+export function TemplateViewModel(data) {
   this.Id = data.Id;
   this.Title = data.title;
   this.Type = data.type;

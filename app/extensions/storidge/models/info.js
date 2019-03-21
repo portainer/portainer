@@ -1,4 +1,4 @@
-function StoridgeInfoModel(data) {
+export function StoridgeInfoModel(data) {
   this.Domain = data.domain;
   this.Nodes = data.nodes;
   this.Status = data.status;

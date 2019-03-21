@@ -1,5 +1,5 @@
 angular.module('portainer.docker').component('volumesNfsForm', {
-  templateUrl: 'app/docker/components/volumesNFSForm/volumesnfsForm.html',
+  templateUrl: './volumesnfsForm.html',
   bindings: {
     data: '='
   }

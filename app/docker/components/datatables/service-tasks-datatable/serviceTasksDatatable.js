@@ -1,5 +1,5 @@
 angular.module('portainer.docker').component('serviceTasksDatatable', {
-  templateUrl: 'app/docker/components/datatables/service-tasks-datatable/serviceTasksDatatable.html',
+  templateUrl: './serviceTasksDatatable.html',
   controller: 'ServiceTasksDatatableController',
   bindings: {
     dataset: '<',
