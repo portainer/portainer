@@ -1,11 +1,11 @@
-export GOPATH="$BUILD_SOURCESDIRECTORY/api"
+export GOPATH="/tmp/go"
 
 binary="portainer"
 
 mkdir -p dist
-mkdir -p api/src/github.com/portainer/api
+mkdir -p ${GOPATH}/src/github.com/portainer/portainer
 
-cp -R api/ api/src/github.com/portainer/portainer/api
+cp -R api ${GOPATH}/src/github.com/portainer/portainer/api
 
 cd 'api/cmd/portainer'
 
