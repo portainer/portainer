@@ -7,7 +7,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
-	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/api"
 )
 
 func snapshot(cli *client.Client) (*portainer.Snapshot, error) {
