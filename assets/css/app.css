@@ -11,31 +11,10 @@ html, body, #page-wrapper, #content-wrapper, .page-content, #view {
   white-space: normal !important;
 }
 
-.messages {
-  max-height: 50px;
-  overflow-x: hidden;
-  overflow-y: scroll;
-}
-
-.legend .title {
-  padding: 0 0.3em;
-  margin: 0.5em;
-  border-style: solid;
-  border-width: 0 0 0 1em;
-}
-
-.logo {
-  display: inline;
-  max-width: 155px;
-  max-height: 55px;
-}
-
-.containerNameInput {
-  width: 85%;
-  border:none;
-  background:none;
-  border-bottom: 1px solid black;
-}
+.logo { display: inline; max-width: 155px; max-height: 55px; }
+.legend .title { padding: 0 0.3em; margin: 0.5em; border-style: solid; border-width: 0 0 0 1em; }
+.messages { max-height: 50px; overflow-x: hidden; overflow-y: scroll; }
+.containerNameInput { width: 85%; border:none; background:none; border-bottom: 1px solid black; }
 
 .containerNameInput:active, .containerNameInput:focus {
   outline:none;

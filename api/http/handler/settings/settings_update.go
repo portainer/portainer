@@ -7,8 +7,8 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/filesystem"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/filesystem"
 )
 
 type settingsUpdatePayload struct {
@@ -16,6 +16,7 @@ type settingsUpdatePayload struct {
 	BlackListedLabels                  []portainer.Pair
 	AuthenticationMethod               *int
 	LDAPSettings                       *portainer.LDAPSettings
+	OAuthSettings                      *portainer.OAuthSettings
 	AllowBindMountsForRegularUsers     *bool
 	AllowPrivilegedModeForRegularUsers *bool
 	EnableHostManagementFeatures       *bool
@@ -24,8 +25,8 @@ type settingsUpdatePayload struct {
 }
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
-	if *payload.AuthenticationMethod != 1 && *payload.AuthenticationMethod != 2 {
-		return portainer.Error("Invalid authentication method value. Value must be one of: 1 (internal) or 2 (LDAP/AD)")
+	if *payload.AuthenticationMethod != 1 && *payload.AuthenticationMethod != 2 && *payload.AuthenticationMethod != 3 {
+		return portainer.Error("Invalid authentication method value. Value must be one of: 1 (internal), 2 (LDAP/AD) or 3 (OAuth)")
 	}
 	if payload.LogoURL != nil && *payload.LogoURL != "" && !govalidator.IsURL(*payload.LogoURL) {
 		return portainer.Error("Invalid logo URL. Must correspond to a valid URL format")
@@ -72,6 +73,15 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		}
 		settings.LDAPSettings = *payload.LDAPSettings
 		settings.LDAPSettings.Password = ldapPassword
+	}
+
+	if payload.OAuthSettings != nil {
+		clientSecret := payload.OAuthSettings.ClientSecret
+		if clientSecret == "" {
+			clientSecret = settings.OAuthSettings.ClientSecret
+		}
+		settings.OAuthSettings = *payload.OAuthSettings
+		settings.OAuthSettings.ClientSecret = clientSecret
 	}
 
 	if payload.AllowBindMountsForRegularUsers != nil {

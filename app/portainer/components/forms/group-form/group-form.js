@@ -1,5 +1,7 @@
+import _ from 'lodash-es';
+
 angular.module('portainer.app').component('groupForm', {
-  templateUrl: 'app/portainer/components/forms/group-form/groupForm.html',
+  templateUrl: './groupForm.html',
   controller: function() {
     var ctrl = this;
 

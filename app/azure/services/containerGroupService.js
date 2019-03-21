@@ -1,3 +1,5 @@
+import { ContainerGroupViewModel, CreateContainerGroupRequest } from '../models/container_group';
+
 angular.module('portainer.azure')
 .factory('ContainerGroupService', ['$q', 'ContainerGroup', function ContainerGroupServiceFactory($q, ContainerGroup) {
   'use strict';

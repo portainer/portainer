@@ -1,4 +1,4 @@
-function StoridgeProfileDefaultModel() {
+export function StoridgeProfileDefaultModel() {
   this.Directory = '/cio/';
   this.Capacity = 20;
   this.Redundancy = 2;
@@ -20,12 +20,12 @@ function StoridgeProfileDefaultModel() {
   this.Labels = [];
 }
 
-function StoridgeProfileListModel(data) {
+export function StoridgeProfileListModel(data) {
   this.Name = data;
   this.Checked = false;
 }
 
-function StoridgeProfileModel(name, data) {
+export function StoridgeProfileModel(name, data) {
   this.Name = name;
   this.Directory = data.directory;
   this.Capacity = data.capacity;
@@ -75,7 +75,7 @@ function StoridgeProfileModel(name, data) {
   }
 }
 
-function StoridgeCreateProfileRequest(model) {
+export function StoridgeCreateProfileRequest(model) {
   this.name = model.Name;
   this.capacity = model.Capacity;
   this.directory = model.Directory;

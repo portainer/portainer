@@ -1,3 +1,5 @@
+import { StoridgeNodeModel } from '../models/node';
+
 angular.module('extension.storidge')
 .factory('StoridgeNodeService', ['$q', 'Storidge', function StoridgeNodeServiceFactory($q, Storidge) {
   'use strict';

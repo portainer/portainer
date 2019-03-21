@@ -1,3 +1,5 @@
+import { SecretViewModel } from '../models/secret';
+
 angular.module('portainer.docker')
 .factory('SecretService', ['$q', 'Secret', function SecretServiceFactory($q, Secret) {
   'use strict';

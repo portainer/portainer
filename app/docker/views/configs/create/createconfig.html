@@ -14,19 +14,19 @@
           <div class="form-group">
             <label for="config_name" class="col-sm-1 control-label text-left">Name</label>
             <div class="col-sm-11">
-              <input type="text" class="form-control" ng-model="formValues.Name" id="config_name" placeholder="e.g. myConfig">
+              <input type="text" class="form-control" ng-model="ctrl.formValues.Name" id="config_name" placeholder="e.g. myConfig">
             </div>
           </div>
           <!-- !name-input -->
           <!-- config-data -->
           <div class="form-group">
-            <div class="col-sm-12" ng-if="formValues.displayCodeEditor">
+            <div class="col-sm-12" ng-if="ctrl.formValues.displayCodeEditor">
               <code-editor
                 identifier="config-creation-editor"
                 placeholder="Define or paste the content of your config here"
                 yml="false"
-                on-change="editorUpdate"
-                value="formValues.Data"
+                on-change="ctrl.editorUpdate"
+                value="ctrl.formValues.Data"
               ></code-editor>
             </div>
           </div>
@@ -35,13 +35,13 @@
           <div class="form-group">
             <div class="col-sm-12" style="margin-top: 5px;">
               <label class="control-label text-left">Labels</label>
-              <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addLabel()">
+              <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addLabel()">
                 <i class="fa fa-plus-circle" aria-hidden="true"></i> add label
               </span>
             </div>
             <!-- labels-input-list -->
             <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-              <div ng-repeat="label in formValues.Labels" style="margin-top: 2px;">
+              <div ng-repeat="label in ctrl.formValues.Labels" style="margin-top: 2px;">
                 <div class="input-group col-sm-5 input-group-sm">
                   <span class="input-group-addon">name</span>
                   <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. com.example.foo">
@@ -50,7 +50,7 @@
                   <span class="input-group-addon">value</span>
                   <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar">
                 </div>
-                <button class="btn btn-sm btn-danger" type="button" ng-click="removeLabel($index)">
+                <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeLabel($index)">
                   <i class="fa fa-trash" aria-hidden="true"></i>
                 </button>
               </div>
@@ -59,7 +59,7 @@
           </div>
           <!-- !labels-->
           <!-- access-control -->
-          <por-access-control-form form-data="formValues.AccessControlData" ng-if="applicationState.application.authentication"></por-access-control-form>
+          <por-access-control-form form-data="ctrl.formValues.AccessControlData" ng-if="applicationState.application.authentication"></por-access-control-form>
           <!-- !access-control -->
           <!-- actions -->
           <div class="col-sm-12 form-section-title">
@@ -67,8 +67,8 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.Name" ng-click="create()">Create config</button>
-              <span class="text-danger" ng-if="state.formValidationError" style="margin-left: 5px;">{{ state.formValidationError }}</span>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!ctrl.formValues.Name" ng-click="ctrl.create()">Create config</button>
+              <span class="text-danger" ng-if="ctrl.state.formValidationError" style="margin-left: 5px;">{{ ctrl.state.formValidationError }}</span>
             </div>
           </div>
           <!-- !actions -->

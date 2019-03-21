@@ -1,4 +1,7 @@
-function createStatus(statusText) {
+import _ from 'lodash-es';
+import { ResourceControlViewModel } from '../../portainer/models/resourceControl';
+
+export function createStatus(statusText) {
   var status = _.toLower(statusText);
 
   if (status.indexOf('paused') > -1) {
@@ -19,7 +22,7 @@ function createStatus(statusText) {
   return 'running';
 }
 
-function ContainerViewModel(data) {
+export function ContainerViewModel(data) {
   this.Id = data.Id;
   this.Status = createStatus(data.Status);
   this.State = data.State;
@@ -62,7 +65,7 @@ function ContainerViewModel(data) {
   }
 }
 
-function ContainerStatsViewModel(data) {
+export function ContainerStatsViewModel(data) {
   this.read = data.read;
   this.preread = data.preread;
   if(data.memory_stats.privateworkingset !== undefined) { // Windows
@@ -88,7 +91,7 @@ function ContainerStatsViewModel(data) {
   this.Networks = _.values(data.networks);
 }
 
-function ContainerDetailsViewModel(data) {
+export function ContainerDetailsViewModel(data) {
   this.Model = data;
   this.Id = data.Id;
   this.State = data.State;

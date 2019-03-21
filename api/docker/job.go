@@ -12,8 +12,8 @@ import (
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/strslice"
 	"github.com/docker/docker/client"
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/archive"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/archive"
 )
 
 // JobService represents a service that handles the execution of jobs

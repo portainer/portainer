@@ -1,3 +1,8 @@
+import _ from 'lodash-es';
+import { ImageViewModel } from '../models/image';
+import { ImageDetailsViewModel } from "../models/imageDetails";
+import { ImageLayerViewModel } from "../models/imageLayer";
+
 angular.module('portainer.docker')
 .factory('ImageService', ['$q', 'Image', 'ImageHelper', 'RegistryService', 'HttpRequestHelper', 'ContainerService', 'FileUploadService',
   function ImageServiceFactory($q, Image, ImageHelper, RegistryService, HttpRequestHelper, ContainerService, FileUploadService) {

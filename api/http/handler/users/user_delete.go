@@ -6,8 +6,8 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/http/security"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 // DELETE request on /api/users/:id
@@ -41,6 +41,10 @@ func (handler *Handler) userDelete(w http.ResponseWriter, r *http.Request) *http
 }
 
 func (handler *Handler) deleteAdminUser(w http.ResponseWriter, user *portainer.User) *httperror.HandlerError {
+	if user.Password == "" {
+		return handler.deleteUser(w, user)
+	}
+
 	users, err := handler.UserService.Users()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve users from the database", err}

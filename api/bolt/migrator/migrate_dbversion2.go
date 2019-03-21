@@ -1,6 +1,6 @@
 package migrator
 
-import "github.com/portainer/portainer"
+import "github.com/portainer/portainer/api"
 
 func (m *Migrator) updateSettingsToDBVersion3() error {
 	legacySettings, err := m.settingsService.Settings()

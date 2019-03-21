@@ -5,12 +5,13 @@ import (
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/http/security"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 func hideFields(settings *portainer.Settings) {
 	settings.LDAPSettings.Password = ""
+	settings.OAuthSettings.ClientSecret = ""
 }
 
 // Handler is the HTTP handler used to handle settings operations.

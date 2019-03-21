@@ -9,7 +9,7 @@
 
 <information-panel
   ng-if="motd && motd.Message !== '' && applicationState.UI.dismissedInfoHash !== motd.Hash"
-  title-text="Important message"
+  title-text="{{ motd.Title }}"
   dismiss-action="dismissImportantInformation(motd.Hash)">
   <span class="text-muted">
     <p ng-bind-html="motd.Message"></p>

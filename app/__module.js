@@ -1,3 +1,12 @@
+import '../assets/css/app.css';
+import angular from 'angular';
+
+import './agent/_module';
+import './azure/_module';
+import './docker/__module';
+import './extensions/storidge/__module';
+import './portainer/__module';
+
 angular.module('portainer', [
   'ui.bootstrap',
   'ui.router',
@@ -17,7 +26,6 @@ angular.module('portainer', [
   'angular-clipboard',
   'ngFileSaver',
   'luegg.directives',
-  'portainer.templates',
   'portainer.app',
   'portainer.agent',
   'portainer.azure',
@@ -26,4 +34,11 @@ angular.module('portainer', [
   'extension.storidge',
   'rzModule',
   'moment-picker'
-  ]);
+]);
+
+if (require) {
+  var req = require.context('./', true, /^(.*\.(js$))[^.]*$/im);
+  req.keys().forEach(function(key) {
+    req(key);
+  });
+}

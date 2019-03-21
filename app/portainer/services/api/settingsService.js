@@ -1,3 +1,5 @@
+import { SettingsViewModel, PublicSettingsViewModel } from "../../models/settings";
+
 angular.module('portainer.app')
 .factory('SettingsService', ['$q', 'Settings', function SettingsServiceFactory($q, Settings) {
   'use strict';
@@ -27,7 +29,7 @@ angular.module('portainer.app')
 
     Settings.publicSettings().$promise
     .then(function success(data) {
-      var settings = new SettingsViewModel(data);
+      var settings = new PublicSettingsViewModel(data);
       deferred.resolve(settings);
     })
     .catch(function error(err) {

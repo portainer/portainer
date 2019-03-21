@@ -1,3 +1,5 @@
+import { SwarmViewModel } from '../models/swarm';
+
 angular.module('portainer.docker')
 .factory('SwarmService', ['$q', 'Swarm', function SwarmServiceFactory($q, Swarm) {
   'use strict';

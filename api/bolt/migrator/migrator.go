@@ -2,16 +2,16 @@ package migrator
 
 import (
 	"github.com/boltdb/bolt"
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/bolt/endpoint"
-	"github.com/portainer/portainer/bolt/endpointgroup"
-	"github.com/portainer/portainer/bolt/extension"
-	"github.com/portainer/portainer/bolt/resourcecontrol"
-	"github.com/portainer/portainer/bolt/settings"
-	"github.com/portainer/portainer/bolt/stack"
-	"github.com/portainer/portainer/bolt/template"
-	"github.com/portainer/portainer/bolt/user"
-	"github.com/portainer/portainer/bolt/version"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/bolt/endpoint"
+	"github.com/portainer/portainer/api/bolt/endpointgroup"
+	"github.com/portainer/portainer/api/bolt/extension"
+	"github.com/portainer/portainer/api/bolt/resourcecontrol"
+	"github.com/portainer/portainer/api/bolt/settings"
+	"github.com/portainer/portainer/api/bolt/stack"
+	"github.com/portainer/portainer/api/bolt/template"
+	"github.com/portainer/portainer/api/bolt/user"
+	"github.com/portainer/portainer/api/bolt/version"
 )
 
 type (

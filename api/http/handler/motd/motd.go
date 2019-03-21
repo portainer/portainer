@@ -4,12 +4,13 @@ import (
 	"net/http"
 
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/crypto"
-	"github.com/portainer/portainer/http/client"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/crypto"
+	"github.com/portainer/portainer/api/http/client"
 )
 
 type motdResponse struct {
+	Title   string `json:"Title"`
 	Message string `json:"Message"`
 	Hash    []byte `json:"Hash"`
 }
@@ -22,6 +23,12 @@ func (handler *Handler) motd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	title, err := client.Get(portainer.MessageOfTheDayTitleURL, 0)
+	if err != nil {
+		response.JSON(w, &motdResponse{Message: ""})
+		return
+	}
+
 	hash := crypto.HashFromBytes(motd)
-	response.JSON(w, &motdResponse{Message: string(motd), Hash: hash})
+	response.JSON(w, &motdResponse{Title: string(title), Message: string(motd), Hash: hash})
 }

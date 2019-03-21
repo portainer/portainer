@@ -1,3 +1,6 @@
+import _ from 'lodash-es';
+import { ExtensionViewModel } from '../../models/extension';
+
 angular.module('portainer.app')
 .factory('ExtensionService', ['$q', 'Extension', function ExtensionServiceFactory($q, Extension) {
   'use strict';
@@ -53,6 +56,21 @@ angular.module('portainer.app')
     service.extensions(false)
     .then(function onSuccess(extensions) {
       var extensionAvailable = _.find(extensions, { Id: 1, Enabled: true }) ? true : false;
+      deferred.resolve(extensionAvailable);
+    })
+    .catch(function onError(err) {
+      deferred.reject(err);
+    });
+
+    return deferred.promise;
+  };
+
+  service.OAuthAuthenticationEnabled = function() {
+    var deferred = $q.defer();
+
+    service.extensions(false)
+    .then(function onSuccess(extensions) {
+      var extensionAvailable = _.find(extensions, { Id: 2, Enabled: true }) ? true : false;
       deferred.resolve(extensionAvailable);
     })
     .catch(function onError(err) {

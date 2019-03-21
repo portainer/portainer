@@ -1,5 +1,5 @@
 angular.module('portainer.app').component('schedulesDatatable', {
-  templateUrl: 'app/portainer/components/datatables/schedules-datatable/schedulesDatatable.html',
+  templateUrl: './schedulesDatatable.html',
   controller: 'SchedulesDatatableController',
   bindings: {
     titleText: '@',

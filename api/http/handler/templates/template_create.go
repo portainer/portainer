@@ -7,8 +7,8 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/filesystem"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/filesystem"
 )
 
 type templateCreatePayload struct {

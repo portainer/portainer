@@ -1,3 +1,5 @@
+import { AgentViewModel } from '../models/agent';
+
 angular.module('portainer.agent').factory('AgentService', [
   '$q', 'Agent', 'AgentVersion1', 'HttpRequestHelper', 'Host', 'StateManager',
   function AgentServiceFactory($q, Agent, AgentVersion1, HttpRequestHelper, Host, StateManager) {

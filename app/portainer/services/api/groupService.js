@@ -1,3 +1,9 @@
+import {
+  EndpointGroupModel,
+  EndpointGroupCreateRequest,
+  EndpointGroupUpdateRequest
+} from '../../models/group';
+
 angular.module('portainer.app')
 .factory('GroupService', ['$q', 'EndpointGroups',
 function GroupService($q, EndpointGroups) {

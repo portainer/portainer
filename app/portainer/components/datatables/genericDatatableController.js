@@ -1,3 +1,5 @@
+import './datatable.css';
+
 angular.module('portainer.app')
 .controller('GenericDatatableController', ['PaginationService', 'DatatableService', 'PAGINATION_MAX_ITEMS',
 function (PaginationService, DatatableService, PAGINATION_MAX_ITEMS) {

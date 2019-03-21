@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 angular.module('portainer.docker')
 .controller('ServiceLogsController', ['$scope', '$transition$', '$interval', 'ServiceService', 'Notifications',
 function ($scope, $transition$, $interval, ServiceService, Notifications) {

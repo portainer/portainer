@@ -11,14 +11,15 @@ import (
 	"strings"
 
 	"github.com/orcaman/concurrent-map"
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/http/client"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/client"
 )
 
 var extensionDownloadBaseURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com/extensions/"
 
 var extensionBinaryMap = map[portainer.ExtensionID]string{
-	portainer.RegistryManagementExtension: "extension-registry-management",
+	portainer.RegistryManagementExtension:  "extension-registry-management",
+	portainer.OAuthAuthenticationExtension: "extension-oauth-authentication",
 }
 
 // ExtensionManager represents a service used to

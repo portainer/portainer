@@ -1,11 +1,12 @@
 package settings
 
 import (
+	"fmt"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/api"
 )
 
 type publicSettingsResponse struct {
@@ -15,6 +16,7 @@ type publicSettingsResponse struct {
 	AllowPrivilegedModeForRegularUsers bool                           `json:"AllowPrivilegedModeForRegularUsers"`
 	EnableHostManagementFeatures       bool                           `json:"EnableHostManagementFeatures"`
 	ExternalTemplates                  bool                           `json:"ExternalTemplates"`
+	OAuthLoginURI                      string                         `json:"OAuthLoginURI"`
 }
 
 // GET request on /api/settings/public
@@ -31,6 +33,11 @@ func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *
 		AllowPrivilegedModeForRegularUsers: settings.AllowPrivilegedModeForRegularUsers,
 		EnableHostManagementFeatures:       settings.EnableHostManagementFeatures,
 		ExternalTemplates:                  false,
+		OAuthLoginURI: fmt.Sprintf("%s?response_type=code&client_id=%s&redirect_uri=%s&scope=%s&prompt=login",
+			settings.OAuthSettings.AuthorizationURI,
+			settings.OAuthSettings.ClientID,
+			settings.OAuthSettings.RedirectURI,
+			settings.OAuthSettings.Scopes),
 	}
 
 	if settings.TemplatesURL != "" {

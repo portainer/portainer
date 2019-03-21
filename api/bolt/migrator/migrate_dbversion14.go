@@ -3,7 +3,7 @@ package migrator
 import (
 	"strings"
 
-	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/api"
 )
 
 func (m *Migrator) updateSettingsToDBVersion15() error {

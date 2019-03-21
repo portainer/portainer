@@ -1,3 +1,6 @@
+import { TeamViewModel } from '../../models/team';
+import { TeamMembershipModel } from '../../models/teamMembership';
+
 angular.module('portainer.app')
 .factory('TeamService', ['$q', 'Teams', 'TeamMembershipService', function TeamServiceFactory($q, Teams, TeamMembershipService) {
   'use strict';
