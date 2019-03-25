@@ -1,3 +1,5 @@
+import { StoridgeDriveModel } from '../models/drive';
+
 angular.module('extension.storidge')
 .factory('StoridgeDriveService', ['$q', 'Storidge', function StoridgeDriveServiceFactory($q, Storidge) {
   'use strict';

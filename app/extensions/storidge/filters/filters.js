@@ -1,3 +1,11 @@
+import _ from 'lodash-es';
+
+function includeString(text, values) {
+  return values.some(function(val){
+    return text.indexOf(val) !== -1;
+  });
+}
+
 angular.module('extension.storidge')
 .filter('drivestatusbadge', function () {
 'use strict';

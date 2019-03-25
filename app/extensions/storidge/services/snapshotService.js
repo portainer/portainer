@@ -1,3 +1,5 @@
+import { StoridgeSnapshotModel } from '../models/snapshot'
+
 angular.module('extension.storidge')
 .factory('StoridgeSnapshotService', ['$q', 'Storidge', function StoridgeSnapshotServiceFactory($q, Storidge) {
   'use strict';

@@ -1,4 +1,4 @@
-function StoridgeSnapshotModel(data) {
+export function StoridgeSnapshotModel(data) {
   this.Id = data.identifier;
   this.Date = data.date;
   this.Description = data.description;

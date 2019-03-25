@@ -37,7 +37,7 @@ angular.module('extension.storidge', [])
     url: '/drives',
     views: {
       'content@': {
-        templateUrl: 'app/extensions/storidge/views/drives/drives.html',
+        templateUrl: './views/drives/drives.html',
         controller: 'StoridgeDrivesController'
       }
     }
@@ -48,7 +48,7 @@ angular.module('extension.storidge', [])
     url: '/:id',
     views: {
       'content@': {
-        templateUrl: 'app/extensions/storidge/views/drives/inspect/drive.html',
+        templateUrl: './views/drives/inspect/drive.html',
         controller: 'StoridgeDriveController'
       }
     }
@@ -59,7 +59,7 @@ angular.module('extension.storidge', [])
     url: '/:snapshotId',
     views: {
       'content@': {
-        templateUrl: 'app/extensions/storidge/views/snapshots/inspect/snapshot.html',
+        templateUrl: './views/snapshots/inspect/snapshot.html',
         controller: 'StoridgeSnapshotController'
       }
     }
@@ -95,7 +95,7 @@ angular.module('extension.storidge', [])
     url: '/:name',
     views: {
       'content@': {
-        templateUrl: 'app/extensions/storidge/views/nodes/inspect/node.html',
+        templateUrl: './views/nodes/inspect/node.html',
         controller: 'StoridgeNodeController'
       }
     }

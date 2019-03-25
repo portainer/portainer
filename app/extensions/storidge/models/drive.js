@@ -1,4 +1,4 @@
-function StoridgeDriveModel(data) {
+export function StoridgeDriveModel(data) {
   this.Id = data.driveid;
   this.Node = data.node;
   this.Use = data.use;

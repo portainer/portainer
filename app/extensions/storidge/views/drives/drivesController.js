@@ -64,7 +64,7 @@ function ($q, $scope, $state, Notifications, ModalService, StoridgeDriveService)
     .then(function sucess() {
       $state.reload();
     })
-    .catch(function error() {
+    .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to scan drives');
     });
   };

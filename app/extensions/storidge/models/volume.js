@@ -1,4 +1,4 @@
-function StoridgeVolumeModel(data) {
+export function StoridgeVolumeModel(data) {
   this.Allocated = data['alloc percent'];
   this.Capacity = data.capacity;
   this.Directory = data.directory;
@@ -28,7 +28,7 @@ function StoridgeVolumeModel(data) {
   this.Filesystem = data.filesystem;
 }
 
-function StoridgeVolumeUpdateModel(data) {
+export function StoridgeVolumeUpdateModel(data) {
   this.name = data.Name;
   this.opts = {
     node: data.Node,

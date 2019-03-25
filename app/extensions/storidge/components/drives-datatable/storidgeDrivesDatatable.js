@@ -1,5 +1,5 @@
 angular.module('extension.storidge').component('storidgeDrivesDatatable', {
-  templateUrl: 'app/extensions/storidge/components/drives-datatable/storidgeDrivesDatatable.html',
+  templateUrl: './storidgeDrivesDatatable.html',
   controller: 'StoridgeDrivesDatatableController',
   bindings: {
     titleText: '@',

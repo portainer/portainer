@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('StoridgeSnapshotCreationController', ['StoridgeSnapshotService', 'Notifications',
-function (StoridgeSnapshotService, Notifications) {
+.controller('StoridgeSnapshotCreationController', ['StoridgeSnapshotService', 'Notifications', '$state',
+function (StoridgeSnapshotService, Notifications, $state) {
   var ctrl = this;
 
   this.formValues = {};

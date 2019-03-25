@@ -5,7 +5,7 @@ export function StoridgeNodeModel(name, data) {
   this.Status = data.status;
 }
 
-function StoridgeNodeDetailedModel(name, properties) {
+export function StoridgeNodeDetailedModel(name, properties) {
   this.Name = name;
   this.Domain = properties.domain;
   this.DomainID = properties.domainID;

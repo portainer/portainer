@@ -1,3 +1,5 @@
+import { StoridgeVolumeModel, StoridgeVolumeUpdateModel } from '../models/volume';
+
 angular.module('extension.storidge')
 .factory('StoridgeVolumeService', ['$q', 'Storidge', function StoridgeVolumeServiceFactory($q, Storidge) {
   'use strict';
