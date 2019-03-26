@@ -31,7 +31,6 @@ function ($state, StoridgeVolumeService, Notifications) {
       IOPSMin: this.volume.IOPSMin,
       IOPSMax: this.volume.IOPSMax,
       Node: this.volume.Node,
-      NodeID: this.volume.NodeID,
       Capacity: this.volume.Capacity,
       BandwidthMin: this.volume.BandwidthMin,
       BandwidthMax: this.volume.BandwidthMax,
@@ -61,9 +60,6 @@ function ($state, StoridgeVolumeService, Notifications) {
     
     if (volume.Node === data.Node || !volume.Node) {
       delete volume.Node;
-    }
-    if (volume.NodeID === data.NodeID || !volume.NodeID) {
-      delete volume.NodeID;
     }
     if (volume.Capacity === data.Capacity || !volume.Capacity) {
       delete volume.Capacity;

@@ -23,7 +23,7 @@
           <td>{{ $ctrl.volume.Name }}</td>
         </tr>
         <tr>
-          <td>Uuid</td>
+          <td>UUID</td>
           <td>{{ $ctrl.volume.Uuid }}</td>
         </tr>
         <tr>
@@ -67,10 +67,6 @@
           <td>{{ $ctrl.volume.Redundancy }}</td>
         </tr>
         <tr>
-          <td>Type</td>
-          <td>{{ $ctrl.volume.Type }}</td>
-        </tr>
-        <tr>
           <td>Vdisk</td>
           <td>{{ $ctrl.volume.Vdisk }}</td>
         </tr>
@@ -83,16 +79,8 @@
           <td>{{ $ctrl.volume.Volume}}</td>
         </tr>
         <tr>
-          <td>DriveType</td>
+          <td>Drive Type</td>
           <td>{{ $ctrl.volume.DriveType}}</td>
-        </tr>
-        <tr>
-          <td>Compression</td>
-          <td>{{ $ctrl.volume.Compression}}</td>
-        </tr>
-        <tr>
-          <td>Dedup</td>
-          <td>{{ $ctrl.volume.Dedup}}</td>
         </tr>
         <tr>
           <td>Encryption</td>
@@ -142,14 +130,6 @@
         </div>
       </div>
       <!-- !Node -->
-      <!-- Node ID -->
-      <div class="form-group">
-        <label for="volume_nodeid" class="col-sm-2 col-lg-1 control-label text-left">Node ID</label>
-        <div class="col-sm-10 col-lg-11">
-          <input type="text" class="form-control" ng-model="$ctrl.formValues.NodeID" name="volume_nodeid" placeholder="2">
-        </div>
-      </div>
-      <!-- !Node ID -->
       <!-- Capacity -->
       <div class="form-group">
         <label for="volume_capacity" class="col-sm-2 col-lg-1 control-label text-left">Capacity</label>

@@ -10,7 +10,6 @@ export function StoridgeVolumeModel(data) {
   this.NodeID = data.nodeid;
   this.Provisioning = data.provisioning;
   this.Redundancy = data.redundancy;
-  this.Type = data.type;
   this.Uuid = data.uuid;
   this.Vdisk = data.vdisk;
   this.Labels = data.labels;
@@ -18,8 +17,6 @@ export function StoridgeVolumeModel(data) {
   this.IP = data.ipaddr;
   this.Volume = data.volume;
   this.DriveType = data.type;
-  this.Compression = data.compression;
-  this.Dedup = data.dedup;
   this.Encryption = data.encryption;
   this.Replication = data.replication;
   this.SnapshotEnabled = data.snapshot;

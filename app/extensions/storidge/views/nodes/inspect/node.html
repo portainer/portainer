@@ -107,19 +107,19 @@
           <tbody>
             <tr>
               <td>Free</td>
-              <td>{{ node.FreeCapacity }}</td>
+              <td>{{ node.FreeCapacity | bytes }}</td>
             </tr>
             <tr>
               <td>Used</td>
-              <td>{{ node.UsedCapacity }}</td>
+              <td>{{ node.UsedCapacity | bytes }}</td>
             </tr>
             <tr>
               <td>Provisioned</td>
-              <td>{{ node.ProvisionedCapacity }}</td>
+              <td>{{ node.ProvisionedCapacity | bytes }}</td>
             </tr>
             <tr>
               <td>Total</td>
-              <td>{{ node.TotalCapacity }}</td>
+              <td>{{ node.TotalCapacity | bytes }}</td>
             </tr>
           </tbody>
         </table>
