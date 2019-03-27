@@ -19,7 +19,7 @@ function ($q, $scope, $state, Notifications, ModalService, StoridgeDriveService)
           return item.Status === 'faulty';
         });
         angular.forEach(selectedItems, function (drive) {
-          StoridgeDriveService.delete(drive.Id)
+          StoridgeDriveService.remove(drive.Id)
           .then(function success() {
             Notifications.success('Drive successfully removed', drive.Id);
           })

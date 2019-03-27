@@ -10,8 +10,8 @@ export function StoridgeProfileDefaultModel() {
   this.MaxBandwidth = 100;
   this.Filesystem = 'btrfs';
   this.SnapshotEnabled = false;
-  this.SnapshotInterval = 0;
-  this.SnapshotMax = 0;
+  this.SnapshotInterval = 1440;
+  this.SnapshotMax = 1;
   this.EncryptionEnabled = false;
   this.InterfaceType = 'nfs';
   this.InterfaceDriver = '';

@@ -35,6 +35,7 @@ function ($q, $scope, $state, Notifications, StoridgeProfileService) {
 
   $scope.create = function() {
     var model = new StoridgeProfileDefaultModel();
+    model.Labels = {};
     model.Name = $scope.formValues.Name;
     model.Directory = model.Directory + model.Name;
 

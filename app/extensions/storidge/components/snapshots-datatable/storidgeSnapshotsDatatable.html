@@ -8,7 +8,7 @@
       </div>
       <div class="actionBar">
         <button type="button" class="btn btn-sm btn-danger"
-          ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeSnapshot($ctrl.state.selectedItems)">
+          ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
       </div>
@@ -54,7 +54,7 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-change="$ctrl.selectItem(item)" ng-disabled="item.Status === 'normal'"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <!-- <a ui-sref="storidge.drives.drive({id: item.Id})"> {{ item.Id }}</a> -->
+                <a ui-sref="docker.volumes.volume.snapshot({snapshotId: item.Id})"> {{ item.Id }}</a>
               </td>
               <td>{{ item.Date }}</td>
               <td>{{ item.Description }}</td>

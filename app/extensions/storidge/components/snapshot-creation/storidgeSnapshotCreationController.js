@@ -10,7 +10,7 @@ function (StoridgeSnapshotService, Notifications, $state) {
 
   this.createSnapshot = function () {
     ctrl.state.actionInProgress = true;
-    StoridgeSnapshotService.create(ctrl.volumeId, ctrl.formValues.Comment)
+    StoridgeSnapshotService.create(ctrl.volumeId, ctrl.formValues.Description)
       .then(function success() {
         Notifications.success('Success', 'Snapshot successfully created');
         $state.reload();

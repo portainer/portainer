@@ -52,15 +52,19 @@ function ($scope, $state, $transition$, Notifications, StoridgeProfileService) {
       delete profile.MaxBandwidth;
     }
 
-    if (profile.SnapshotEnabled && $scope.state.RecurringSnapshotEnabled) {
-      if (!profile.SnapshotInterval) {
-        profile.SnapshotInterval = 1;
+    if (profile.SnapshotEnabled) {
+      if (!profile.SnapshotMax || profile.SnapshotMax <= 0) {
+        profile.SnapshotMax = 1;
       }
-      profile.SnapshotInterval *= 60;
-    }
-
-    if (!$scope.state.RecurringSnapshotEnabled) {
-      profile.SnapshotInterval = 0;
+      if (!$scope.state.RecurringSnapshotEnabled) {
+        delete profile.SnapshotInterval;
+      }
+      if ($scope.state.RecurringSnapshotEnabled && (!profile.SnapshotInterval || profile.SnapshotInterval <= 0)) {
+        profile.SnapshotInterval = 1440;
+      }
+    } else {
+      delete profile.SnapshotMax;
+      delete profile.SnapshotInterval;
     }
 
     prepareLabels(profile);

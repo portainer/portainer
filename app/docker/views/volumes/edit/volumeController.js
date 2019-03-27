@@ -22,7 +22,7 @@ function ($scope, $state, $transition$, $q, ModalService, VolumeService, Contain
           StoridgeSnapshotService.remove(item.Id)
           .then(function success() {
             Notifications.success('Snapshot successfully removed', item.Id);
-            var index = $scope.containerGroups.indexOf(item);
+            var index = $scope.storidgeSnapshots.indexOf(item);
             $scope.storidgeSnapshots.splice(index, 1);
           })
           .catch(function error(err) {

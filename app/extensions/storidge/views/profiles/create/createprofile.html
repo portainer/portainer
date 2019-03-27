@@ -105,31 +105,49 @@
           <!-- !Filesystem -->
           <!-- snapshotEnabled -->
           <div class="form-group">
-            <div class="col-sm-6">
-              <label for="profile_snapshotEnabled" class="control-label text-left">
-                Enable snapshots
-              </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input name="profile_snapshotEnabled" type="checkbox" ng-model="model.SnapshotEnabled"><i></i>
-              </label>
+            <label for="profile_snapshotEnabled" class="col-sm-2 col-lg-1 control-label text-left">
+              Enable snapshots
+            </label>
+            <label class="switch" style="margin-left: 20px;">
+              <input name="profile_snapshotEnabled" type="checkbox" ng-model="model.SnapshotEnabled"><i></i>
+            </label>
+          </div>
+          <!-- !snapshotEnabled -->
+          <!-- snapshotMax -->
+          <div class="form-group" ng-if="model.SnapshotEnabled">
+            <label for="profile_snapshotMax" class="col-sm-2 col-lg-1 control-label text-left" style="margin-top: 20px;">
+              Snapshot max
+            </label>
+            <div class="col-sm-4">
+              <slider model="model.SnapshotMax" floor="1" ceil="100" step="1"></slider>
             </div>
-            <div class="col-sm-6">
-              <label for="profile_recurringSnapshotEnabled" class="control-label text-left">
-                Enable periodic snapshots
-              </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input name="profile_recurringSnapshotEnabled" type="checkbox" ng-model="state.RecurringSnapshotEnabled"><i></i>
-              </label>
+            <div class="col-sm-2">
+              <input type="number" min="1" class="form-control" ng-model="model.SnapshotMax" id="profile_snapshotMax">
             </div>
+            <div class="col-sm-4">
+              <p class="small text-muted" style="margin-top: 7px;">
+                Snapshot max (<b>count</b>)
+              </p>
+            </div>
+          </div>
+          <!-- !snapshotMax -->
+          <!-- snapshotEnabled -->
+          <div class="form-group" ng-if="model.SnapshotEnabled">
+            <label for="profile_recurringSnapshotEnabled" class="col-sm-2 col-lg-1 control-label text-left">
+              Enable periodic snapshots
+            </label>
+            <label class="switch" style="margin-left: 20px;">
+              <input name="profile_recurringSnapshotEnabled" type="checkbox" ng-model="state.RecurringSnapshotEnabled"><i></i>
+            </label>
           </div>
           <!-- !snapshotEnabled -->
           <!-- snapshotInterval -->
-          <div class="form-group" ng-if="state.RecurringSnapshotEnabled">
+          <div class="form-group" ng-if="model.SnapshotEnabled && state.RecurringSnapshotEnabled">
             <label for="profile_snapshotInterval" class="col-sm-2 col-lg-1 control-label text-left" style="margin-top: 20px;">
               Snapshot interval
             </label>
             <div class="col-sm-4">
-              <slider model="model.SnapshotInterval" floor="1" ceil="750" step="1"></slider>
+              <slider model="model.SnapshotInterval" floor="1" ceil="2880" step="1"></slider>
             </div>
             <div class="col-sm-2">
               <input type="number" min="1" class="form-control" ng-model="model.SnapshotInterval" id="profile_snapshotInterval">
@@ -141,34 +159,14 @@
             </div>
           </div>
           <!-- !snapshotInterval -->
-          <!-- snapshotMax -->
-          <div class="form-group" ng-if="state.RecurringSnapshotEnabled">
-              <label for="profile_snapshotMax" class="col-sm-2 col-lg-1 control-label text-left" style="margin-top: 20px;">
-                Snapshot max
-              </label>
-              <div class="col-sm-4">
-                <slider model="model.SnapshotMax" floor="1" ceil="100" step="1"></slider>
-              </div>
-              <div class="col-sm-2">
-                <input type="number" min="1" class="form-control" ng-model="model.SnapshotMax" id="profile_snapshotMax">
-              </div>
-              <div class="col-sm-4">
-                <p class="small text-muted" style="margin-top: 7px;">
-                  Snapshot max (<b>count</b>)
-                </p>
-              </div>
-            </div>
-          <!-- snapshotMax -->
           <!-- encryptionEnabled -->
           <div class="form-group">
-            <div class="col-sm-12">
-              <label for="profile_encryptionEnabled" class="control-label text-left">
-                Enable encryption
-              </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input name="profile_encryptionEnabled" type="checkbox" ng-model="model.EncryptionEnabled"><i></i>
-              </label>
-            </div>
+            <label for="profile_encryptionEnabled" class="col-sm-2 col-lg-1 control-label text-left">
+              Enable encryption
+            </label>
+            <label class="switch" style="margin-left: 20px;">
+              <input name="profile_encryptionEnabled" type="checkbox" ng-model="model.EncryptionEnabled"><i></i>
+            </label>
           </div>
           <!-- !encryptionEnabled -->
           <!-- interfaceType -->
@@ -239,14 +237,14 @@
               IOPS
             </div>
             <div class="form-group">
-              <div class="col-sm-12">
+              <div class="col-md-1 col-sm-2">
                 <label for="permissions" class="control-label text-left">
                   Limit IOPS
                 </label>
-                <label class="switch" style="margin-left: 20px;">
-                  <input type="checkbox" ng-model="state.LimitIOPS" ng-change="state.NoLimit = (!state.LimitBandwidth && !state.LimitIOPS)"><i></i>
-                </label>
               </div>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" ng-model="state.LimitIOPS" ng-change="state.NoLimit = (!state.LimitBandwidth && !state.LimitIOPS)"><i></i>
+              </label>
             </div>
             <div class="form-group" ng-if="state.LimitIOPS">
               <label for="min_iops" class="col-sm-1 control-label text-left">Min</label>
@@ -284,14 +282,14 @@
               Bandwidth
             </div>
             <div class="form-group">
-              <div class="col-sm-12">
+              <div class="col-md-1 col-sm-2">
                 <label for="permissions" class="control-label text-left">
                   Limit bandwidth
                 </label>
-                <label class="switch" style="margin-left: 20px;">
-                  <input type="checkbox" ng-model="state.LimitBandwidth" ng-change="state.NoLimit = (!state.LimitBandwidth && !state.LimitIOPS)"><i></i>
-                </label>
               </div>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" ng-model="state.LimitBandwidth" ng-change="state.NoLimit = (!state.LimitBandwidth && !state.LimitIOPS)"><i></i>
+              </label>
             </div>
             <div class="form-group" ng-if="state.LimitBandwidth">
               <label for="min_bandwidth" class="col-sm-1 control-label text-left">Min</label>

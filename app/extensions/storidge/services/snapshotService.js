@@ -16,7 +16,13 @@ angular.module('extension.storidge')
     Storidge.querySnapshots({id: volumeId}).$promise
     .then(function success(data) {
       var snapshotsData = data.snapshots;
-      var snapshots = snapshotsData.map(function (snapshot) {
+      let snapshotsArray = [];
+      for (const key in snapshotsData) {
+        if (snapshotsData.hasOwnProperty(key)) {
+          snapshotsArray.push(snapshotsData[key]);
+        }
+      }
+      var snapshots = snapshotsArray.map(function (snapshot) {
         return new StoridgeSnapshotModel(snapshot);
       });
       deferred.resolve(snapshots);
@@ -43,9 +49,9 @@ angular.module('extension.storidge')
     return deferred.promise;
   }
   
-  function create(volumeId, comment) {
+  function create(volumeId, description) {
     var deferred = $q.defer();
-    Storidge.createSnapshot({id: volumeId, comment: comment}).$promise
+    Storidge.createSnapshot({id: volumeId, description: description}).$promise
     .then(function success(data) {
       deferred.resolve(data);
     })

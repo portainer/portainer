@@ -45,7 +45,6 @@ function ($scope, $state, $transition$, Notifications, StoridgeProfileService, M
   ];
 
   $scope.update = function() {
-
     var profile = $scope.profile;
 
     if (!$scope.state.LimitIOPS) {
@@ -58,15 +57,19 @@ function ($scope, $state, $transition$, Notifications, StoridgeProfileService, M
       delete profile.MaxBandwidth;
     }
 
-    if (profile.SnapshotEnabled && $scope.state.RecurringSnapshotEnabled) {
-      if (!profile.SnapshotInterval) {
-        profile.SnapshotInterval = 1;
+    if (profile.SnapshotEnabled) {
+      if (!profile.SnapshotMax || profile.SnapshotMax <= 0) {
+        profile.SnapshotMax = 1;
       }
-      profile.SnapshotInterval *= 60;
-    }
-
-    if (!$scope.state.RecurringSnapshotEnabled) {
-      profile.SnapshotInterval = 0;
+      if (!$scope.state.RecurringSnapshotEnabled) {
+        delete profile.SnapshotInterval;
+      }
+      if ($scope.state.RecurringSnapshotEnabled && (!profile.SnapshotInterval || profile.SnapshotInterval <= 0)) {
+        profile.SnapshotInterval = 1440;
+      }
+    } else {
+      delete profile.SnapshotMax;
+      delete profile.SnapshotInterval;
     }
 
     prepareLabels(profile);
@@ -123,9 +126,8 @@ function ($scope, $state, $transition$, Notifications, StoridgeProfileService, M
       } else {
         $scope.state.NoLimit = true;
       }
-      if (profile.SnapshotEnabled && profile.SnapshotInterval) {
+      if (profile.SnapshotEnabled && profile.SnapshotInterval !== 0) {
         $scope.state.RecurringSnapshotEnabled = true;
-        profile.SnapshotInterval /= 60;
       }
       initLabels(profile.Labels);
       $scope.profile = profile;

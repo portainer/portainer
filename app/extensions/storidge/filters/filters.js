@@ -21,12 +21,14 @@ angular.module('extension.storidge')
     return 'info';
   };
 })
-.filter('nodeStatusBadge', function () {
+.filter('storidgeNodeStatusBadge', function () {
 'use strict';
   return function (text) {
     var status = text ? _.toLower(text) : '';
-    if (status === 'maintenance') {
+    if (status === 'cordoned') {
       return 'orange-icon';
+    } else if (status === 'alert') {
+      return 'red-icon'
     }
     return 'green-icon';
   };
