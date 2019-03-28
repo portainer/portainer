@@ -15,10 +15,8 @@ export function StoridgeVolumeModel(data) {
   this.Labels = data.labels;
 
   this.IP = data.ipaddr;
-  this.Volume = data.volume;
   this.DriveType = data.type;
   this.Encryption = data.encryption;
-  this.Replication = data.replication;
   this.SnapshotEnabled = data.snapshot;
   this.SnapshotInterval = data.snapinterval;
   this.SnapshotMax = data.snapmax;

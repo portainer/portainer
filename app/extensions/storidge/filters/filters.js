@@ -1,24 +1,16 @@
 import _ from 'lodash-es';
 
-function includeString(text, values) {
-  return values.some(function(val){
-    return text.indexOf(val) !== -1;
-  });
-}
-
 angular.module('extension.storidge')
 .filter('drivestatusbadge', function () {
 'use strict';
   return function (text) {
     var status = text ? _.toLower(text) : '';
-    if (includeString(status, ['normal'])) {
-    return 'success';
-    } else if (includeString(status, ['available'])) {
-    return 'info';
-    } else if (includeString(status, ['faulty'])) {
-    return 'danger';
+    if (status === 'available') {
+      return 'info';
+    } else if (status === 'faulty') {
+      return 'danger';
     }
-    return 'info';
+    return 'success';
   };
 })
 .filter('storidgeNodeStatusBadge', function () {
@@ -27,7 +19,7 @@ angular.module('extension.storidge')
     var status = text ? _.toLower(text) : '';
     if (status === 'cordoned') {
       return 'orange-icon';
-    } else if (status === 'alert') {
+    } else if (status === 'leaving') {
       return 'red-icon'
     }
     return 'green-icon';

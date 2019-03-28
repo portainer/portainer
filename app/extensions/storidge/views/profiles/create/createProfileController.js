@@ -1,3 +1,4 @@
+import _ from 'lodash-es';
 import { StoridgeProfileDefaultModel } from '../../../models/profile';
 
 angular.module('extension.storidge')
@@ -86,7 +87,7 @@ function ($scope, $state, $transition$, Notifications, StoridgeProfileService) {
   $scope.updatedName = function() {
     if (!$scope.state.ManualInputDirectory) {
       var profile = $scope.model;
-      profile.Directory = '/cio/' + profile.Name;
+      profile.Directory = '/cio/' + (profile.Name ? _.toLower(profile.Name) : '');
     }
   };
 
@@ -99,7 +100,7 @@ function ($scope, $state, $transition$, Notifications, StoridgeProfileService) {
   function initView() {
     var profile = new StoridgeProfileDefaultModel();
     profile.Name = $transition$.params().profileName;
-    profile.Directory = '/cio/' + profile.Name;
+    profile.Directory = '/cio/' + _.toLower(profile.Name);
     $scope.model = profile;
   }
 

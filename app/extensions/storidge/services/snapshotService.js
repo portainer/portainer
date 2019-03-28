@@ -51,7 +51,7 @@ angular.module('extension.storidge')
   
   function create(volumeId, description) {
     var deferred = $q.defer();
-    Storidge.createSnapshot({id: volumeId, description: description}).$promise
+    Storidge.createSnapshot({id: volumeId, opts: {description: description}}).$promise
     .then(function success(data) {
       deferred.resolve(data);
     })
