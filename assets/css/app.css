@@ -129,6 +129,10 @@ a[ng-click]{
   word-break: break-word;
 }
 
+.widget .widget-body table.description-table {
+  table-layout: fixed;
+}
+
 .template-widget {
   height: 100%;
 }
