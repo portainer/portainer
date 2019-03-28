@@ -862,11 +862,3 @@ json-tree .branch-preview {
   opacity: .5;
 }
 /* !json-tree override */
-
-/* rdash-ui override */
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-  select {
-    font-family: inherit;
-  }
-}
-/* !rdash-ui override */
