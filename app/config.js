@@ -16,6 +16,7 @@ angular.module('portainer')
     .setPrefix('portainer');
 
     jwtOptionsProvider.config({
+      authHeader: 'JWT-Authorization',
       tokenGetter: ['LocalStorage', function(LocalStorage) {
         return LocalStorage.getJWT();
       }]

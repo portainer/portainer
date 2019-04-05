@@ -2,7 +2,6 @@ package security
 
 import (
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api"
 
 	"net/http"
 	"strings"
@@ -191,7 +190,7 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 			token = r.URL.Query().Get("token")
 
 			// Get token from the Authorization header
-			tokens, ok := r.Header["Authorization"]
+			tokens, ok := r.Header["JWT-Authorization"]
 			if ok && len(tokens) >= 1 {
 				token = tokens[0]
 				token = strings.TrimPrefix(token, "Bearer ")
