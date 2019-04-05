@@ -2,6 +2,7 @@ package security
 
 import (
 	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/portainer/api"
 
 	"net/http"
 	"strings"
