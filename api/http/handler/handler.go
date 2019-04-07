@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/portainer/portainer/api/http/handler/authorizationsets"
+
 	"github.com/portainer/portainer/api/http/handler/auth"
 	"github.com/portainer/portainer/api/http/handler/dockerhub"
 	"github.com/portainer/portainer/api/http/handler/endpointgroups"
@@ -32,32 +34,35 @@ import (
 type Handler struct {
 	AuthHandler *auth.Handler
 
-	DockerHubHandler       *dockerhub.Handler
-	EndpointGroupHandler   *endpointgroups.Handler
-	EndpointHandler        *endpoints.Handler
-	EndpointProxyHandler   *endpointproxy.Handler
-	FileHandler            *file.Handler
-	MOTDHandler            *motd.Handler
-	ExtensionHandler       *extensions.Handler
-	RegistryHandler        *registries.Handler
-	ResourceControlHandler *resourcecontrols.Handler
-	SettingsHandler        *settings.Handler
-	StackHandler           *stacks.Handler
-	StatusHandler          *status.Handler
-	TagHandler             *tags.Handler
-	TeamMembershipHandler  *teammemberships.Handler
-	TeamHandler            *teams.Handler
-	TemplatesHandler       *templates.Handler
-	UploadHandler          *upload.Handler
-	UserHandler            *users.Handler
-	WebSocketHandler       *websocket.Handler
-	WebhookHandler         *webhooks.Handler
-	SchedulesHanlder       *schedules.Handler
+	AuthorizationSetHandler *authorizationsets.Handler
+	DockerHubHandler        *dockerhub.Handler
+	EndpointGroupHandler    *endpointgroups.Handler
+	EndpointHandler         *endpoints.Handler
+	EndpointProxyHandler    *endpointproxy.Handler
+	FileHandler             *file.Handler
+	MOTDHandler             *motd.Handler
+	ExtensionHandler        *extensions.Handler
+	RegistryHandler         *registries.Handler
+	ResourceControlHandler  *resourcecontrols.Handler
+	SettingsHandler         *settings.Handler
+	StackHandler            *stacks.Handler
+	StatusHandler           *status.Handler
+	TagHandler              *tags.Handler
+	TeamMembershipHandler   *teammemberships.Handler
+	TeamHandler             *teams.Handler
+	TemplatesHandler        *templates.Handler
+	UploadHandler           *upload.Handler
+	UserHandler             *users.Handler
+	WebSocketHandler        *websocket.Handler
+	WebhookHandler          *webhooks.Handler
+	SchedulesHanlder        *schedules.Handler
 }
 
 // ServeHTTP delegates a request to the appropriate subhandler.
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch {
+	case strings.HasPrefix(r.URL.Path, "/api/authorization_sets"):
+		http.StripPrefix("/api", h.AuthorizationSetHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/auth"):
 		http.StripPrefix("/api", h.AuthHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/dockerhub"):

@@ -117,6 +117,8 @@ type (
 		Username string   `json:"Username"`
 		Password string   `json:"Password,omitempty"`
 		Role     UserRole `json:"Role"`
+		// TODO: rename?
+		Authorizations AuthorizationSet `json:"Authorizations"`
 	}
 
 	// UserID represents a user identifier
@@ -125,6 +127,25 @@ type (
 	// UserRole represents the role of a user. It can be either an administrator
 	// or a regular user
 	UserRole int
+
+	// TODO: rename all fields
+	UserAuthorizations struct {
+		DockerContainerPermissions UserPermissionSet
+		DockerImagePermissions     UserPermissionSet
+	}
+
+	AuthorizationSetID int
+
+	AuthorizationSet struct {
+		ID                                   AuthorizationSetID `json:"Id"`
+		Name                                 string             `json:"Name"`
+		PortainerAuthorizationSetPermissions UserPermissionSet  `json:"AuthorizationSetPermissions"`
+		DockerContainerPermissions           UserPermissionSet  `json:"ContainerPermissions"`
+		DockerImagePermissions               UserPermissionSet  `json:"ImagePermissions"`
+		TestMap                              map[string]bool    `json:"TestMap"`
+	}
+
+	UserPermissionSet int
 
 	// AuthenticationMethod represents the authentication method used to authenticate a user
 	AuthenticationMethod int
@@ -154,9 +175,10 @@ type (
 
 	// TokenData represents the data embedded in a JWT token
 	TokenData struct {
-		ID       UserID
-		Username string
-		Role     UserRole
+		ID             UserID
+		Username       string
+		Role           UserRole
+		Authorizations AuthorizationSet
 	}
 
 	// StackID represents a stack identifier (it must be composed of Name + "_" + SwarmID to create a unique identifier)
@@ -551,6 +573,14 @@ type (
 		DeleteUser(ID UserID) error
 	}
 
+	AuthorizationSetService interface {
+		AuthorizationSet(ID AuthorizationSetID) (*AuthorizationSet, error)
+		AuthorizationSets() ([]AuthorizationSet, error)
+		CreateAuthorizationSet(set *AuthorizationSet) error
+		UpdateAuthorizationSet(ID AuthorizationSetID, set *AuthorizationSet) error
+		DeleteAuthorizationSet(ID AuthorizationSetID) error
+	}
+
 	// TeamService represents a service for managing user data
 	TeamService interface {
 		Team(ID TeamID) (*Team, error)
@@ -843,6 +873,125 @@ const (
 	AdministratorRole
 	// StandardUserRole represents a regular user role
 	StandardUserRole
+)
+
+//type APIOperation string
+
+const (
+	APIOperational           = "oh"
+	DockerContainerArchiveOP = "ContainerArchive"
+)
+
+const (
+	_ UserPermissionSet = 1 << iota
+	DockerContainerArchiveInfo
+	DockerContainerList
+	DockerContainerExport
+	DockerContainerChanges
+	DockerContainerInspect
+	DockerContainerTop
+	DockerContainerLogs
+	DockerContainerStats
+	DockerContainerAttachWebsocket
+	DockerContainerArchive
+	DockerContainerCreate
+	DockerContainerPrune
+	DockerContainerKill
+	DockerContainerPause
+	DockerContainerUnpause
+	DockerContainerRestart
+	DockerContainerStart
+	DockerContainerStop
+	DockerContainerWait
+	DockerContainerResize
+	DockerContainerAttach
+	DockerContainerExec
+	DockerContainerRename
+	DockerContainerUpdate
+	DockerContainerPutContainerArchive
+	DockerContainerDelete
+)
+
+const (
+	_ UserPermissionSet = 1 << iota
+	DockerImageList
+	DockerImageSearch
+	DockerImageGetAll
+	DockerImageGet
+	DockerImageHistory
+	DockerImageInspect
+	DockerImageLoad
+	DockerImageCreate
+	DockerImagePrune
+	DockerImageDelete
+)
+
+const (
+	_ UserPermissionSet = 1 << iota
+	PortainerAuthorizationSetList
+	PortainerAuthorizationSetCreate
+	PortainerAuthorizationSetInspect
+	PortainerAuthorizationSetUpdate
+	PortainerAuthorizationSetDelete
+
+	PortainerAuthorizationRW = PortainerAuthorizationSetList | PortainerAuthorizationSetCreate | PortainerAuthorizationSetInspect | PortainerAuthorizationSetUpdate | PortainerAuthorizationSetDelete
+)
+
+const (
+	_ UserPermissionSet = 1 << iota
+	PortainerDockerHubInspect
+	PortainerDockerHubUpdate
+)
+
+const (
+	_ UserPermissionSet = 1 << iota
+	PortainerEndpointGroupCreate
+	PortainerEndpointGroupList
+	PortainerEndpointGroupDelete
+	PortainerEndpointGroupInspect
+	PortainerEndpointGroupEdit
+	PortainerEndpointGroupAccess
+)
+
+const (
+	_ UserPermissionSet = 1 << iota
+	PortainerEndpointList
+	PortainerEndpointCreate
+	PortainerEndpointExtensionDelete
+)
+
+const (
+	_ UserPermissionSet = 1 << iota
+	PortainerExtensionList
+
+	PortainerStackList
+
+	PortainerMOTD
+	// TODO: review this? Do we need to keep it?
+	PortainerAdmin
+)
+
+const (
+	_ UserPermissionSet = 1 << iota
+	DockerInfo
+	DockerVersion
+	DockerNetworks
+	DockerVolumes
+	DockerExec
+	DockerSwarm
+	DockerNodes
+	DockerServices
+	DockerSecrets
+	DockerConfigs
+	DockerTasks
+	DockerPlugins
+	DockerPing
+	DockerEvents
+	DockerSessions
+	DockerDistributions
+	DockerCommit
+	DockerBuilds
+	DockerSystem
 )
 
 const (

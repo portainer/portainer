@@ -16,9 +16,10 @@ type Service struct {
 }
 
 type claims struct {
-	UserID   int    `json:"id"`
-	Username string `json:"username"`
-	Role     int    `json:"role"`
+	UserID         int                        `json:"id"`
+	Username       string                     `json:"username"`
+	Role           int                        `json:"role"`
+	Authorizations portainer.AuthorizationSet `json:"authorizations"`
 	jwt.StandardClaims
 }
 
@@ -41,6 +42,7 @@ func (service *Service) GenerateToken(data *portainer.TokenData) (string, error)
 		int(data.ID),
 		data.Username,
 		int(data.Role),
+		data.Authorizations,
 		jwt.StandardClaims{
 			ExpiresAt: expireToken,
 		},
@@ -67,9 +69,10 @@ func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData,
 	if err == nil && parsedToken != nil {
 		if cl, ok := parsedToken.Claims.(*claims); ok && parsedToken.Valid {
 			tokenData := &portainer.TokenData{
-				ID:       portainer.UserID(cl.UserID),
-				Username: cl.Username,
-				Role:     portainer.UserRole(cl.Role),
+				ID:             portainer.UserID(cl.UserID),
+				Username:       cl.Username,
+				Role:           portainer.UserRole(cl.Role),
+				Authorizations: cl.Authorizations,
 			}
 			return tokenData, nil
 		}

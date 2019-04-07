@@ -58,6 +58,8 @@ func (bouncer *RequestBouncer) PublicAccess(h http.Handler) http.Handler {
 // AuthenticatedAccess defines a security check for private endpoints.
 // Authentication is required to access these endpoints.
 func (bouncer *RequestBouncer) AuthenticatedAccess(h http.Handler) http.Handler {
+	// TODO: enable this only if RBAC extension available
+	h = bouncer.mwCheckPermissions(h)
 	h = bouncer.mwCheckAuthentication(h)
 	h = mwSecureHeaders(h)
 	return h
@@ -141,6 +143,19 @@ func mwSecureHeaders(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("X-XSS-Protection", "1; mode=block")
 		w.Header().Add("X-Content-Type-Options", "nosniff")
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (bouncer *RequestBouncer) mwCheckPermissions(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		err := checkPermissions(r)
+		if err != nil {
+			// TODO: handle error message that could be raised in checkPermissions
+			httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrAuthorizationRequired)
+			return
+		}
+
 		next.ServeHTTP(w, r)
 	})
 }

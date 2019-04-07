@@ -98,8 +98,9 @@ func (handler *Handler) authenticateLDAPAndCreateUser(w http.ResponseWriter, use
 	}
 
 	user := &portainer.User{
-		Username: username,
-		Role:     portainer.StandardUserRole,
+		Username:       username,
+		Role:           portainer.StandardUserRole,
+		Authorizations: portainer.AuthorizationSet{},
 	}
 
 	err = handler.UserService.CreateUser(user)
@@ -117,9 +118,10 @@ func (handler *Handler) authenticateLDAPAndCreateUser(w http.ResponseWriter, use
 
 func (handler *Handler) writeToken(w http.ResponseWriter, user *portainer.User) *httperror.HandlerError {
 	tokenData := &portainer.TokenData{
-		ID:       user.ID,
-		Username: user.Username,
-		Role:     user.Role,
+		ID:             user.ID,
+		Username:       user.Username,
+		Role:           user.Role,
+		Authorizations: user.Authorizations,
 	}
 
 	token, err := handler.JWTService.GenerateToken(tokenData)

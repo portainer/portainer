@@ -3,8 +3,8 @@ package auth
 import (
 	"encoding/json"
 	"io/ioutil"
-	"net/http"
 	"log"
+	"net/http"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
@@ -111,8 +111,9 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 
 	if user == nil {
 		user = &portainer.User{
-			Username: username,
-			Role:     portainer.StandardUserRole,
+			Username:       username,
+			Role:           portainer.StandardUserRole,
+			Authorizations: portainer.AuthorizationSet{},
 		}
 
 		err = handler.UserService.CreateUser(user)

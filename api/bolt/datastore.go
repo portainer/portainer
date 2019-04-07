@@ -5,6 +5,8 @@ import (
 	"path"
 	"time"
 
+	"github.com/portainer/portainer/api/bolt/authorizationset"
+
 	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/dockerhub"
@@ -33,26 +35,27 @@ const (
 // Store defines the implementation of portainer.DataStore using
 // BoltDB as the storage system.
 type Store struct {
-	path                   string
-	db                     *bolt.DB
-	checkForDataMigration  bool
-	fileService            portainer.FileService
-	DockerHubService       *dockerhub.Service
-	EndpointGroupService   *endpointgroup.Service
-	EndpointService        *endpoint.Service
-	ExtensionService       *extension.Service
-	RegistryService        *registry.Service
-	ResourceControlService *resourcecontrol.Service
-	SettingsService        *settings.Service
-	StackService           *stack.Service
-	TagService             *tag.Service
-	TeamMembershipService  *teammembership.Service
-	TeamService            *team.Service
-	TemplateService        *template.Service
-	UserService            *user.Service
-	VersionService         *version.Service
-	WebhookService         *webhook.Service
-	ScheduleService        *schedule.Service
+	path                    string
+	db                      *bolt.DB
+	checkForDataMigration   bool
+	fileService             portainer.FileService
+	AuthorizationSetService *authorizationset.Service
+	DockerHubService        *dockerhub.Service
+	EndpointGroupService    *endpointgroup.Service
+	EndpointService         *endpoint.Service
+	ExtensionService        *extension.Service
+	RegistryService         *registry.Service
+	ResourceControlService  *resourcecontrol.Service
+	SettingsService         *settings.Service
+	StackService            *stack.Service
+	TagService              *tag.Service
+	TeamMembershipService   *teammembership.Service
+	TeamService             *team.Service
+	TemplateService         *template.Service
+	UserService             *user.Service
+	VersionService          *version.Service
+	WebhookService          *webhook.Service
+	ScheduleService         *schedule.Service
 }
 
 // NewStore initializes a new Store and the associated services
@@ -106,7 +109,32 @@ func (store *Store) Init() error {
 			Tags:            []string{},
 		}
 
-		return store.EndpointGroupService.CreateEndpointGroup(unassignedGroup)
+		err = store.EndpointGroupService.CreateEndpointGroup(unassignedGroup)
+		if err != nil {
+			return err
+		}
+	}
+
+	authorizationSets, err := store.AuthorizationSetService.AuthorizationSets()
+	if err != nil {
+		return err
+	}
+
+	if len(authorizationSets) == 0 {
+		administratorUserSet := &portainer.AuthorizationSet{
+			Name:                                 "Portainer administrator",
+			PortainerAuthorizationSetPermissions: portainer.PortainerAuthorizationRW,
+			TestMap: map[string]bool{
+				"t1": true,
+				"t2": true,
+				"t4": true,
+			},
+		}
+
+		err = store.AuthorizationSetService.CreateAuthorizationSet(administratorUserSet)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -162,6 +190,12 @@ func (store *Store) MigrateData() error {
 }
 
 func (store *Store) initServices() error {
+	authorizationsetService, err := authorizationset.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.AuthorizationSetService = authorizationsetService
+
 	dockerhubService, err := dockerhub.NewService(store.db)
 	if err != nil {
 		return err
