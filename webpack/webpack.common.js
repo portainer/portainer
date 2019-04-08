@@ -93,7 +93,8 @@ module.exports = {
     new IgnorePlugin(/^\.\/locale$/, /moment$/),
     // new BundleAnalyzerPlugin()
     new LodashModuleReplacementPlugin({
-      shorthands: true
+      shorthands: true,
+      collections: true
     })
   ],
   optimization: {
