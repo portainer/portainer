@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"os"
 	"os/exec"
 	"path"
 	"runtime"
@@ -201,6 +202,8 @@ func validateLicense(binaryPath, licenseKey string) ([]string, error) {
 
 func (manager *ExtensionManager) startExtensionProcess(extension *portainer.Extension, binaryPath string) error {
 	extensionProcess := exec.Command(binaryPath, "-license", extension.License.LicenseKey)
+	extensionProcess.Stdout = os.Stdout
+	extensionProcess.Stderr = os.Stderr
 	err := extensionProcess.Start()
 	if err != nil {
 		return err
