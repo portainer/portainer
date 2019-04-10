@@ -9,28 +9,28 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// Handler is the HTTP handler used to handle authorizationSet operations.
+// Handler is the HTTP handler used to handle role operations.
 type Handler struct {
 	*mux.Router
-	AuthorizationSetService portainer.AuthorizationSetService
+	RoleService portainer.RoleService
 }
 
 // TODO: disable authorization set management when RBAC extension is disabled
-// NewHandler creates a handler to manage authorizationSet operations.
+// NewHandler creates a handler to manage role operations.
 func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{
 		Router: mux.NewRouter(),
 	}
-	h.Handle("/authorization_sets",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.authorizationSetCreate))).Methods(http.MethodPost)
-	h.Handle("/authorization_sets",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.authorizationSetList))).Methods(http.MethodGet)
-	h.Handle("/authorization_sets/{id}",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.authorizationSetInspect))).Methods(http.MethodGet)
-	h.Handle("/authorization_sets/{id}",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.authorizationSetUpdate))).Methods(http.MethodPut)
-	h.Handle("/authorization_sets/{id}",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.authorizationSetDelete))).Methods(http.MethodDelete)
+	h.Handle("/roles",
+		bouncer.AdministratorAccess(httperror.LoggerHandler(h.roleCreate))).Methods(http.MethodPost)
+	h.Handle("/roles",
+		bouncer.AdministratorAccess(httperror.LoggerHandler(h.roleList))).Methods(http.MethodGet)
+	h.Handle("/roles/{id}",
+		bouncer.AdministratorAccess(httperror.LoggerHandler(h.roleInspect))).Methods(http.MethodGet)
+	h.Handle("/roles/{id}",
+		bouncer.AdministratorAccess(httperror.LoggerHandler(h.roleUpdate))).Methods(http.MethodPut)
+	h.Handle("/roles/{id}",
+		bouncer.AdministratorAccess(httperror.LoggerHandler(h.roleDelete))).Methods(http.MethodDelete)
 
 	return h
 }

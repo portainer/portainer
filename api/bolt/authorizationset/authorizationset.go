@@ -29,9 +29,9 @@ func NewService(db *bolt.DB) (*Service, error) {
 	}, nil
 }
 
-// AuthorizationSet returns a AuthorizationSet by ID
-func (service *Service) AuthorizationSet(ID portainer.AuthorizationSetID) (*portainer.AuthorizationSet, error) {
-	var set portainer.AuthorizationSet
+// Role returns a Role by ID
+func (service *Service) Role(ID portainer.RoleID) (*portainer.Role, error) {
+	var set portainer.Role
 	identifier := internal.Itob(int(ID))
 
 	err := internal.GetObject(service.db, BucketName, identifier, &set)
@@ -42,16 +42,16 @@ func (service *Service) AuthorizationSet(ID portainer.AuthorizationSetID) (*port
 	return &set, nil
 }
 
-// AuthorizationSets return an array containing all the sets.
-func (service *Service) AuthorizationSets() ([]portainer.AuthorizationSet, error) {
-	var sets = make([]portainer.AuthorizationSet, 0)
+// Roles return an array containing all the sets.
+func (service *Service) Roles() ([]portainer.Role, error) {
+	var sets = make([]portainer.Role, 0)
 
 	err := service.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var set portainer.AuthorizationSet
+			var set portainer.Role
 			err := internal.UnmarshalObject(v, &set)
 			if err != nil {
 				return err
@@ -65,19 +65,19 @@ func (service *Service) AuthorizationSets() ([]portainer.AuthorizationSet, error
 	return sets, err
 }
 
-// UpdateAuthorizationSet saves a AuthorizationSet.
-func (service *Service) UpdateAuthorizationSet(ID portainer.AuthorizationSetID, set *portainer.AuthorizationSet) error {
+// UpdateRole saves a Role.
+func (service *Service) UpdateRole(ID portainer.RoleID, set *portainer.Role) error {
 	identifier := internal.Itob(int(ID))
 	return internal.UpdateObject(service.db, BucketName, identifier, set)
 }
 
-// CreateAuthorizationSet creates a new AuthorizationSet.
-func (service *Service) CreateAuthorizationSet(set *portainer.AuthorizationSet) error {
+// CreateRole creates a new Role.
+func (service *Service) CreateRole(set *portainer.Role) error {
 	return service.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		id, _ := bucket.NextSequence()
-		set.ID = portainer.AuthorizationSetID(id)
+		set.ID = portainer.RoleID(id)
 
 		data, err := internal.MarshalObject(set)
 		if err != nil {
@@ -88,8 +88,8 @@ func (service *Service) CreateAuthorizationSet(set *portainer.AuthorizationSet) 
 	})
 }
 
-// DeleteAuthorizationSet deletes a AuthorizationSet.
-func (service *Service) DeleteAuthorizationSet(ID portainer.AuthorizationSetID) error {
+// DeleteRole deletes a Role.
+func (service *Service) DeleteRole(ID portainer.RoleID) error {
 	identifier := internal.Itob(int(ID))
 	return internal.DeleteObject(service.db, BucketName, identifier)
 }

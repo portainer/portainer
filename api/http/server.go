@@ -39,44 +39,44 @@ import (
 
 // Server implements the portainer.Server interface
 type Server struct {
-	BindAddress             string
-	AssetsPath              string
-	AuthDisabled            bool
-	EndpointManagement      bool
-	Status                  *portainer.Status
-	ExtensionManager        portainer.ExtensionManager
-	ComposeStackManager     portainer.ComposeStackManager
-	CryptoService           portainer.CryptoService
-	SignatureService        portainer.DigitalSignatureService
-	JobScheduler            portainer.JobScheduler
-	Snapshotter             portainer.Snapshotter
-	AuthorizationSetService portainer.AuthorizationSetService
-	DockerHubService        portainer.DockerHubService
-	EndpointService         portainer.EndpointService
-	EndpointGroupService    portainer.EndpointGroupService
-	FileService             portainer.FileService
-	GitService              portainer.GitService
-	JWTService              portainer.JWTService
-	LDAPService             portainer.LDAPService
-	ExtensionService        portainer.ExtensionService
-	RegistryService         portainer.RegistryService
-	ResourceControlService  portainer.ResourceControlService
-	ScheduleService         portainer.ScheduleService
-	SettingsService         portainer.SettingsService
-	StackService            portainer.StackService
-	SwarmStackManager       portainer.SwarmStackManager
-	TagService              portainer.TagService
-	TeamService             portainer.TeamService
-	TeamMembershipService   portainer.TeamMembershipService
-	TemplateService         portainer.TemplateService
-	UserService             portainer.UserService
-	WebhookService          portainer.WebhookService
-	Handler                 *handler.Handler
-	SSL                     bool
-	SSLCert                 string
-	SSLKey                  string
-	DockerClientFactory     *docker.ClientFactory
-	JobService              portainer.JobService
+	BindAddress            string
+	AssetsPath             string
+	AuthDisabled           bool
+	EndpointManagement     bool
+	Status                 *portainer.Status
+	ExtensionManager       portainer.ExtensionManager
+	ComposeStackManager    portainer.ComposeStackManager
+	CryptoService          portainer.CryptoService
+	SignatureService       portainer.DigitalSignatureService
+	JobScheduler           portainer.JobScheduler
+	Snapshotter            portainer.Snapshotter
+	RoleService            portainer.RoleService
+	DockerHubService       portainer.DockerHubService
+	EndpointService        portainer.EndpointService
+	EndpointGroupService   portainer.EndpointGroupService
+	FileService            portainer.FileService
+	GitService             portainer.GitService
+	JWTService             portainer.JWTService
+	LDAPService            portainer.LDAPService
+	ExtensionService       portainer.ExtensionService
+	RegistryService        portainer.RegistryService
+	ResourceControlService portainer.ResourceControlService
+	ScheduleService        portainer.ScheduleService
+	SettingsService        portainer.SettingsService
+	StackService           portainer.StackService
+	SwarmStackManager      portainer.SwarmStackManager
+	TagService             portainer.TagService
+	TeamService            portainer.TeamService
+	TeamMembershipService  portainer.TeamMembershipService
+	TemplateService        portainer.TemplateService
+	UserService            portainer.UserService
+	WebhookService         portainer.WebhookService
+	Handler                *handler.Handler
+	SSL                    bool
+	SSLCert                string
+	SSLKey                 string
+	DockerClientFactory    *docker.ClientFactory
+	JobService             portainer.JobService
 }
 
 // Start starts the HTTP server
@@ -111,10 +111,11 @@ func (server *Server) Start() error {
 	authHandler.TeamService = server.TeamService
 	authHandler.TeamMembershipService = server.TeamMembershipService
 	authHandler.ExtensionService = server.ExtensionService
+	authHandler.RoleService = server.RoleService
 	authHandler.ProxyManager = proxyManager
 
-	var authorizationSetHandler = authorizationsets.NewHandler(requestBouncer)
-	authorizationSetHandler.AuthorizationSetService = server.AuthorizationSetService
+	var roleHandler = authorizationsets.NewHandler(requestBouncer)
+	roleHandler.RoleService = server.RoleService
 
 	var dockerHubHandler = dockerhub.NewHandler(requestBouncer)
 	dockerHubHandler.DockerHubService = server.DockerHubService
@@ -214,29 +215,29 @@ func (server *Server) Start() error {
 	webhookHandler.DockerClientFactory = server.DockerClientFactory
 
 	server.Handler = &handler.Handler{
-		AuthorizationSetHandler: authorizationSetHandler,
-		AuthHandler:             authHandler,
-		DockerHubHandler:        dockerHubHandler,
-		EndpointGroupHandler:    endpointGroupHandler,
-		EndpointHandler:         endpointHandler,
-		EndpointProxyHandler:    endpointProxyHandler,
-		FileHandler:             fileHandler,
-		MOTDHandler:             motdHandler,
-		ExtensionHandler:        extensionHandler,
-		RegistryHandler:         registryHandler,
-		ResourceControlHandler:  resourceControlHandler,
-		SettingsHandler:         settingsHandler,
-		StatusHandler:           statusHandler,
-		StackHandler:            stackHandler,
-		TagHandler:              tagHandler,
-		TeamHandler:             teamHandler,
-		TeamMembershipHandler:   teamMembershipHandler,
-		TemplatesHandler:        templatesHandler,
-		UploadHandler:           uploadHandler,
-		UserHandler:             userHandler,
-		WebSocketHandler:        websocketHandler,
-		WebhookHandler:          webhookHandler,
-		SchedulesHanlder:        schedulesHandler,
+		RoleHandler:            roleHandler,
+		AuthHandler:            authHandler,
+		DockerHubHandler:       dockerHubHandler,
+		EndpointGroupHandler:   endpointGroupHandler,
+		EndpointHandler:        endpointHandler,
+		EndpointProxyHandler:   endpointProxyHandler,
+		FileHandler:            fileHandler,
+		MOTDHandler:            motdHandler,
+		ExtensionHandler:       extensionHandler,
+		RegistryHandler:        registryHandler,
+		ResourceControlHandler: resourceControlHandler,
+		SettingsHandler:        settingsHandler,
+		StatusHandler:          statusHandler,
+		StackHandler:           stackHandler,
+		TagHandler:             tagHandler,
+		TeamHandler:            teamHandler,
+		TeamMembershipHandler:  teamMembershipHandler,
+		TemplatesHandler:       templatesHandler,
+		UploadHandler:          uploadHandler,
+		UserHandler:            userHandler,
+		WebSocketHandler:       websocketHandler,
+		WebhookHandler:         webhookHandler,
+		SchedulesHanlder:       schedulesHandler,
 	}
 
 	if server.SSL {

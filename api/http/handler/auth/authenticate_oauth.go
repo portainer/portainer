@@ -111,9 +111,8 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 
 	if user == nil {
 		user = &portainer.User{
-			Username:       username,
-			Role:           portainer.StandardUserRole,
-			Authorizations: portainer.AuthorizationSet{},
+			Username: username,
+			Role:     portainer.StandardUserRole,
 		}
 
 		err = handler.UserService.CreateUser(user)

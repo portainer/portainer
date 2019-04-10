@@ -9,21 +9,21 @@ import (
 	"github.com/portainer/portainer/api"
 )
 
-// DELETE request on /api/authorizationSets/:id
-func (handler *Handler) authorizationSetDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	authorizationSetID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+// DELETE request on /api/roles/:id
+func (handler *Handler) roleDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	roleID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid authorization set identifier route variable", err}
 	}
 
-	_, err = handler.AuthorizationSetService.AuthorizationSet(portainer.AuthorizationSetID(authorizationSetID))
+	_, err = handler.RoleService.Role(portainer.RoleID(roleID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a authorization set with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a authorization set with the specified identifier inside the database", err}
 	}
 
-	err = handler.AuthorizationSetService.DeleteAuthorizationSet(portainer.AuthorizationSetID(authorizationSetID))
+	err = handler.RoleService.DeleteRole(portainer.RoleID(roleID))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to delete the authorization set from the database", err}
 	}

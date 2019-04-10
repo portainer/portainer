@@ -111,14 +111,33 @@ type (
 		DisplayExternalContributors bool
 	}
 
+	// Authorization represents an authorization associated to an operation
+	Authorization string
+
+	// Authorizations represents a set of authorizations associated to a role
+	Authorizations map[Authorization]bool
+
+	// RoleID represents a role identifier
+	RoleID int
+
+	// Role represents a set of authorizations that can be associated to a user or
+	// to a team.
+	Role struct {
+		ID             RoleID         `json:"Id"`
+		Name           string         `json:"Name"`
+		Authorizations Authorizations `json:"Authorizations"`
+	}
+
 	// User represents a user account
 	User struct {
 		ID       UserID   `json:"Id"`
 		Username string   `json:"Username"`
 		Password string   `json:"Password,omitempty"`
 		Role     UserRole `json:"Role"`
-		// TODO: rename?
-		Authorizations AuthorizationSet `json:"Authorizations"`
+		// TODO: find a better name for this one, override Role
+		// Should we roll with RoleID ?
+		//AccessRole Role `json:"AccessRole"`
+		RoleID RoleID `json:"RoleId"`
 	}
 
 	// UserID represents a user identifier
@@ -128,32 +147,14 @@ type (
 	// or a regular user
 	UserRole int
 
-	// TODO: rename all fields
-	UserAuthorizations struct {
-		DockerContainerPermissions UserPermissionSet
-		DockerImagePermissions     UserPermissionSet
-	}
-
-	AuthorizationSetID int
-
-	AuthorizationSet struct {
-		ID                                   AuthorizationSetID `json:"Id"`
-		Name                                 string             `json:"Name"`
-		PortainerAuthorizationSetPermissions UserPermissionSet  `json:"AuthorizationSetPermissions"`
-		DockerContainerPermissions           UserPermissionSet  `json:"ContainerPermissions"`
-		DockerImagePermissions               UserPermissionSet  `json:"ImagePermissions"`
-		TestMap                              map[string]bool    `json:"TestMap"`
-	}
-
-	UserPermissionSet int
-
 	// AuthenticationMethod represents the authentication method used to authenticate a user
 	AuthenticationMethod int
 
 	// Team represents a list of user accounts
 	Team struct {
-		ID   TeamID `json:"Id"`
-		Name string `json:"Name"`
+		ID     TeamID `json:"Id"`
+		Name   string `json:"Name"`
+		RoleID RoleID `json:"RoleId"`
 	}
 
 	// TeamID represents a team identifier
@@ -178,7 +179,7 @@ type (
 		ID             UserID
 		Username       string
 		Role           UserRole
-		Authorizations AuthorizationSet
+		Authorizations Authorizations
 	}
 
 	// StackID represents a stack identifier (it must be composed of Name + "_" + SwarmID to create a unique identifier)
@@ -573,12 +574,12 @@ type (
 		DeleteUser(ID UserID) error
 	}
 
-	AuthorizationSetService interface {
-		AuthorizationSet(ID AuthorizationSetID) (*AuthorizationSet, error)
-		AuthorizationSets() ([]AuthorizationSet, error)
-		CreateAuthorizationSet(set *AuthorizationSet) error
-		UpdateAuthorizationSet(ID AuthorizationSetID, set *AuthorizationSet) error
-		DeleteAuthorizationSet(ID AuthorizationSetID) error
+	RoleService interface {
+		Role(ID RoleID) (*Role, error)
+		Roles() ([]Role, error)
+		CreateRole(set *Role) error
+		UpdateRole(ID RoleID, set *Role) error
+		DeleteRole(ID RoleID) error
 	}
 
 	// TeamService represents a service for managing user data
@@ -875,125 +876,6 @@ const (
 	StandardUserRole
 )
 
-//type APIOperation string
-
-const (
-	APIOperational           = "oh"
-	DockerContainerArchiveOP = "ContainerArchive"
-)
-
-const (
-	_ UserPermissionSet = 1 << iota
-	DockerContainerArchiveInfo
-	DockerContainerList
-	DockerContainerExport
-	DockerContainerChanges
-	DockerContainerInspect
-	DockerContainerTop
-	DockerContainerLogs
-	DockerContainerStats
-	DockerContainerAttachWebsocket
-	DockerContainerArchive
-	DockerContainerCreate
-	DockerContainerPrune
-	DockerContainerKill
-	DockerContainerPause
-	DockerContainerUnpause
-	DockerContainerRestart
-	DockerContainerStart
-	DockerContainerStop
-	DockerContainerWait
-	DockerContainerResize
-	DockerContainerAttach
-	DockerContainerExec
-	DockerContainerRename
-	DockerContainerUpdate
-	DockerContainerPutContainerArchive
-	DockerContainerDelete
-)
-
-const (
-	_ UserPermissionSet = 1 << iota
-	DockerImageList
-	DockerImageSearch
-	DockerImageGetAll
-	DockerImageGet
-	DockerImageHistory
-	DockerImageInspect
-	DockerImageLoad
-	DockerImageCreate
-	DockerImagePrune
-	DockerImageDelete
-)
-
-const (
-	_ UserPermissionSet = 1 << iota
-	PortainerAuthorizationSetList
-	PortainerAuthorizationSetCreate
-	PortainerAuthorizationSetInspect
-	PortainerAuthorizationSetUpdate
-	PortainerAuthorizationSetDelete
-
-	PortainerAuthorizationRW = PortainerAuthorizationSetList | PortainerAuthorizationSetCreate | PortainerAuthorizationSetInspect | PortainerAuthorizationSetUpdate | PortainerAuthorizationSetDelete
-)
-
-const (
-	_ UserPermissionSet = 1 << iota
-	PortainerDockerHubInspect
-	PortainerDockerHubUpdate
-)
-
-const (
-	_ UserPermissionSet = 1 << iota
-	PortainerEndpointGroupCreate
-	PortainerEndpointGroupList
-	PortainerEndpointGroupDelete
-	PortainerEndpointGroupInspect
-	PortainerEndpointGroupEdit
-	PortainerEndpointGroupAccess
-)
-
-const (
-	_ UserPermissionSet = 1 << iota
-	PortainerEndpointList
-	PortainerEndpointCreate
-	PortainerEndpointExtensionDelete
-)
-
-const (
-	_ UserPermissionSet = 1 << iota
-	PortainerExtensionList
-
-	PortainerStackList
-
-	PortainerMOTD
-	// TODO: review this? Do we need to keep it?
-	PortainerAdmin
-)
-
-const (
-	_ UserPermissionSet = 1 << iota
-	DockerInfo
-	DockerVersion
-	DockerNetworks
-	DockerVolumes
-	DockerExec
-	DockerSwarm
-	DockerNodes
-	DockerServices
-	DockerSecrets
-	DockerConfigs
-	DockerTasks
-	DockerPlugins
-	DockerPing
-	DockerEvents
-	DockerSessions
-	DockerDistributions
-	DockerCommit
-	DockerBuilds
-	DockerSystem
-)
-
 const (
 	_ AuthenticationMethod = iota
 	// AuthenticationInternal represents the internal authentication method (authentication against Portainer API)
@@ -1104,4 +986,83 @@ const (
 	AzureRegistry
 	// CustomRegistry represents a custom registry
 	CustomRegistry
+)
+
+const (
+	// TODO: if we keep these ones, should it have a particular value?
+	OperationDockerContainers Authorization = "DockerContainer"
+	OperationDockerImages     Authorization = "DockerImages"
+
+	OperationDockerContainerArchiveInfo         Authorization = "DockerContainerArchiveInfo"
+	OperationDockerContainerList                Authorization = "DockerContainerList"
+	OperationDockerContainerExport              Authorization = "DockerContainerExport "
+	OperationDockerContainerChanges             Authorization = "DockerContainerChanges"
+	OperationDockerContainerInspect             Authorization = "DockerContainerInspect"
+	OperationDockerContainerTop                 Authorization = "DockerContainerTop"
+	OperationDockerContainerLogs                Authorization = "DockerContainerLogs"
+	OperationDockerContainerStats               Authorization = "DockerContainerStats"
+	OperationDockerContainerAttachWebsocket     Authorization = "DockerContainerAttachWebsocket"
+	OperationDockerContainerArchive             Authorization = "DockerContainerArchive"
+	OperationDockerContainerCreate              Authorization = "DockerContainerCreate"
+	OperationDockerContainerPrune               Authorization = "DockerContainerPrune"
+	OperationDockerContainerKill                Authorization = "DockerContainerKill"
+	OperationDockerContainerPause               Authorization = "DockerContainerPause"
+	OperationDockerContainerUnpause             Authorization = "DockerContainerUnpause"
+	OperationDockerContainerRestart             Authorization = "DockerContainerRestart"
+	OperationDockerContainerStart               Authorization = "DockerContainerStart"
+	OperationDockerContainerStop                Authorization = "DockerContainerStop"
+	OperationDockerContainerWait                Authorization = "DockerContainerWait"
+	OperationDockerContainerResize              Authorization = "DockerContainerResize"
+	OperationDockerContainerAttach              Authorization = "DockerContainerAttach"
+	OperationDockerContainerExec                Authorization = "DockerContainerExec"
+	OperationDockerContainerRename              Authorization = "DockerContainerRename"
+	OperationDockerContainerUpdate              Authorization = "DockerContainerUpdate"
+	OperationDockerContainerPutContainerArchive Authorization = "DockerContainerPutContainerArchive "
+	OperationDockerContainerDelete              Authorization = "DockerContainerDelete"
+	OperationDockerImageList                    Authorization = "DockerImageList "
+	OperationDockerImageSearch                  Authorization = "DockerImageSearch "
+	OperationDockerImageGetAll                  Authorization = "DockerImageGetAll"
+	OperationDockerImageGet                     Authorization = "DockerImageGet"
+	OperationDockerImageHistory                 Authorization = "DockerImageHistory"
+	OperationDockerImageInspect                 Authorization = "DockerImageInspect"
+	OperationDockerImageLoad                    Authorization = "DockerImageLoad"
+	OperationDockerImageCreate                  Authorization = "DockerImageCreate"
+	OperationDockerImagePrune                   Authorization = "DockerImagePrune"
+	OperationDockerImageDelete                  Authorization = "DockerImageDelete"
+	OperationPortainerDockerHubInspect          Authorization = "PortainerDockerHubInspect"
+	OperationPortainerDockerHubUpdate           Authorization = "PortainerDockerHubUpdate"
+	OperationPortainerEndpointGroupCreate       Authorization = "PortainerEndpointGroupCreate"
+	OperationPortainerEndpointGroupList         Authorization = "PortainerEndpointGroupList"
+	OperationPortainerEndpointGroupDelete       Authorization = "PortainerEndpointGroupDelete"
+	OperationPortainerEndpointGroupInspect      Authorization = "PortainerEndpointGroupInspect"
+	OperationPortainerEndpointGroupEdit         Authorization = "PortainerEndpointGroupEdit"
+	OperationPortainerEndpointGroupAccess       Authorization = "PortainerEndpointGroupAccess "
+	OperationPortainerEndpointList              Authorization = "PortainerEndpointList"
+	OperationPortainerEndpointCreate            Authorization = "PortainerEndpointCreate"
+	OperationPortainerEndpointExtensionDelete   Authorization = "PortainerEndpointExtensionDelete"
+	OperationPortainerExtensionList             Authorization = "PortainerExtensionList"
+	OperationPortainerStackList                 Authorization = "PortainerStackList"
+	OperationPortainerMOTD                      Authorization = "PortainerMOTD"
+	OperationPortainerRoleList                  Authorization = "PortainerRoleList"
+	OperationPortainerRoleInspect               Authorization = "PortainerRoleInspect"
+	OperationDockerInfo                         Authorization = "DockerInfo"
+	OperationDockerVersion                      Authorization = "DockerVersion"
+	OperationDockerNetworks                     Authorization = "DockerNetworks"
+	OperationDockerVolumes                      Authorization = "DockerVolumes"
+	OperationDockerExec                         Authorization = "DockerExec"
+	OperationDockerSwarm                        Authorization = "DockerSwarm"
+	OperationDockerNodes                        Authorization = "DockerNodes"
+	OperationDockerServices                     Authorization = "DockerServices"
+	OperationDockerSecrets                      Authorization = "DockerSecrets"
+	OperationDockerConfigs                      Authorization = "DockerConfigs"
+	OperationDockerTasks                        Authorization = "DockerTasks"
+	OperationDockerPlugins                      Authorization = "DockerPlugins"
+	OperationDockerPing                         Authorization = "DockerPing"
+	OperationDockerEvents                       Authorization = "DockerEvents"
+	OperationDockerSessions                     Authorization = "DockerSessions"
+	OperationDockerDistributions                Authorization = "DockerDistributions"
+	OperationDockerCommit                       Authorization = "DockerCommit"
+	OperationDockerBuilds                       Authorization = "DockerBuilds"
+	OperationDockerSystem                       Authorization = "DockerSystem"
+	OperationPortainerAdmin                     Authorization = "PortainerAdmin"
 )

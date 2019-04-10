@@ -7,12 +7,12 @@ import (
 	"github.com/portainer/libhttp/response"
 )
 
-// GET request on /api/AuthorizationSet
-func (handler *Handler) authorizationSetList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	authorizationSets, err := handler.AuthorizationSetService.AuthorizationSets()
+// GET request on /api/Role
+func (handler *Handler) roleList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	roles, err := handler.RoleService.Roles()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve authorization sets from the database", err}
 	}
 
-	return response.JSON(w, authorizationSets)
+	return response.JSON(w, roles)
 }

@@ -98,9 +98,8 @@ func (handler *Handler) authenticateLDAPAndCreateUser(w http.ResponseWriter, use
 	}
 
 	user := &portainer.User{
-		Username:       username,
-		Role:           portainer.StandardUserRole,
-		Authorizations: portainer.AuthorizationSet{},
+		Username: username,
+		Role:     portainer.StandardUserRole,
 	}
 
 	err = handler.UserService.CreateUser(user)
@@ -118,10 +117,30 @@ func (handler *Handler) authenticateLDAPAndCreateUser(w http.ResponseWriter, use
 
 func (handler *Handler) writeToken(w http.ResponseWriter, user *portainer.User) *httperror.HandlerError {
 	tokenData := &portainer.TokenData{
-		ID:             user.ID,
-		Username:       user.Username,
-		Role:           user.Role,
-		Authorizations: user.Authorizations,
+		ID:       user.ID,
+		Username: user.Username,
+		Role:     user.Role,
+	}
+
+	// TODO: only if extension is enabled
+	// If no role associated to the user, check for team auths
+	if user.RoleID == 0 {
+		//userMemberships, err := handler.TeamMembershipService.TeamMembershipsByUserID(user.ID)
+		//if err != nil {
+		//	return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user team memberships", err}
+		//}
+
+		// TODO: handle multiple team roles
+		//for _, membership := range userMemberships {
+		//
+		//}
+	} else {
+		userRole, err := handler.RoleService.Role(user.RoleID)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve authorizations associated to the user", err}
+		}
+
+		tokenData.Authorizations = userRole.Authorizations
 	}
 
 	token, err := handler.JWTService.GenerateToken(tokenData)

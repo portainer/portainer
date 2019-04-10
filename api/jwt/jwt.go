@@ -16,10 +16,10 @@ type Service struct {
 }
 
 type claims struct {
-	UserID         int                        `json:"id"`
-	Username       string                     `json:"username"`
-	Role           int                        `json:"role"`
-	Authorizations portainer.AuthorizationSet `json:"authorizations"`
+	UserID         int                      `json:"id"`
+	Username       string                   `json:"username"`
+	Role           int                      `json:"role"`
+	Authorizations portainer.Authorizations `json:"authorizations"`
 	jwt.StandardClaims
 }
 

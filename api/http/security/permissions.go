@@ -10,16 +10,6 @@ import (
 	"github.com/portainer/portainer/api"
 )
 
-type OperationDomain int
-
-const (
-	_ OperationDomain = iota
-	DockerContainerOperation
-	DockerImageOperation
-	DockerOperation
-	PortainerOperation
-)
-
 var dockerRule = regexp.MustCompile(`/(?P<identifier>\d+)/docker(?P<operation>/.*)`)
 var registryRule = regexp.MustCompile(`/registries/(?P<identifier>\d+)/v2(?P<operation>/.*)?`)
 
@@ -29,7 +19,7 @@ func checkPermissions(r *http.Request) error {
 		return err
 	}
 
-	authorized := authorizedOperation(r, &tokenData.Authorizations)
+	authorized := authorizedOperation(r, tokenData.Authorizations)
 	if !authorized {
 		return portainer.ErrAuthorizationRequired
 	}
@@ -37,136 +27,101 @@ func checkPermissions(r *http.Request) error {
 	return nil
 }
 
-func authorizedOperation(r *http.Request, authorizations *portainer.AuthorizationSet) bool {
+func authorizedOperation(r *http.Request, authorizations portainer.Authorizations) bool {
 	log.Printf("RBAC | Permission check for %s - %s", r.Method, r.URL.String())
-	operationPermission, domain := getOperationPermission(r.URL.String(), r.Method)
-	return roleAuthorized(operationPermission, domain, authorizations)
+	operationAuthorization := getOperationAuthorization(r.URL.String(), r.Method)
+	return authorizations[operationAuthorization]
 }
 
-func roleAuthorized(operationPermission portainer.UserPermissionSet, operationDomain OperationDomain, authorizations *portainer.AuthorizationSet) bool {
+func getOperationAuthorization(url, method string) portainer.Authorization {
 
-	//return authorizations[operationPermission]
-
-	switch operationDomain {
-	//case DockerOperation:
-	//	return operationPermission&authorizations.DockerContainerPermissions != 0
-	case DockerContainerOperation:
-		return operationPermission&authorizations.DockerContainerPermissions != 0
-	case DockerImageOperation:
-		return operationPermission&authorizations.DockerImagePermissions != 0
-	case PortainerOperation:
-		return operationPermission&authorizations.PortainerAuthorizationSetPermissions != 0
-	}
-
-	return false
-}
-
-func getOperationPermission(url, method string) (portainer.UserPermissionSet, OperationDomain) {
 	if dockerRule.MatchString(url) {
 		match := dockerRule.FindStringSubmatch(url)
-		return getDockerOperationPermission(strings.TrimPrefix(url, "/"+match[1]+"/docker"), method)
+		return getDockerOperationAuthorization(strings.TrimPrefix(url, "/"+match[1]+"/docker"), method)
 	} else if registryRule.MatchString(url) {
-		return portainer.PortainerAdmin, PortainerOperation
-	} else {
-		return getPortainerOperationPermission(url, method)
+		return getRegistryOperationAuthorization(url, method)
 	}
+	return getPortainerOperationAuthorization(url, method)
 }
 
-func getPortainerOperationPermission(url, method string) (portainer.UserPermissionSet, OperationDomain) {
+func getRegistryOperationAuthorization(url, method string) portainer.Authorization {
+	fmt.Printf("Registry operation: %s,%s\n", method, url)
+
+	//urlParts := strings.Split(url, "/")
+	//baseResource := urlParts[1]
+
+	permission := portainer.OperationPortainerAdmin
+
+	return permission
+}
+
+func getPortainerOperationAuthorization(url, method string) portainer.Authorization {
 	fmt.Printf("Portainer operation: %s,%s\n", method, url)
 
 	urlParts := strings.Split(url, "/")
 	baseResource := urlParts[1]
 
-	// TODO: review default permission
-	domain := PortainerOperation
-	permission := portainer.PortainerAdmin
+	permission := portainer.OperationPortainerAdmin
 
 	switch baseResource {
-	case "authorization_sets":
-		permission = portainerAuthorizationSetOperationPermission(url, method)
+	case "roles":
+		permission = portainerRoleOperationAuthorization(url, method)
 	}
 
-	return permission, domain
+	return permission
 }
 
-func getDockerOperationPermission(url, method string) (portainer.UserPermissionSet, OperationDomain) {
+func getDockerOperationAuthorization(url, method string) portainer.Authorization {
 	urlParts := strings.Split(url, "/")
 	baseResource := urlParts[1]
 
-	// TODO: review default permission
-	domain := PortainerOperation
-	permission := portainer.PortainerAdmin
-
 	switch baseResource {
 	case "containers":
-		permission = dockerContainerOperationPermission(url, method)
-		domain = DockerContainerOperation
+		return dockerContainerOperationAuthorization(url, method)
 	case "images":
-		permission = dockerImageOperationPermission(url, method)
-		domain = DockerImageOperation
+		return dockerImageOperationAuthorization(url, method)
 	case "networks":
-		permission = portainer.DockerNetworks
-		domain = DockerOperation
+		return portainer.OperationDockerNetworks
 	case "volumes":
-		permission = portainer.DockerVolumes
-		domain = DockerOperation
+		return portainer.OperationDockerVolumes
 	case "exec":
-		permission = portainer.DockerExec
-		domain = DockerOperation
+		return portainer.OperationDockerExec
 	case "swarm":
-		permission = portainer.DockerSwarm
-		domain = DockerOperation
+		return portainer.OperationDockerSwarm
 	case "nodes":
-		permission = portainer.DockerNodes
-		domain = DockerOperation
+		return portainer.OperationDockerNodes
 	case "services":
-		permission = portainer.DockerServices
-		domain = DockerOperation
+		return portainer.OperationDockerServices
 	case "secrets":
-		permission = portainer.DockerSecrets
-		domain = DockerOperation
+		return portainer.OperationDockerSecrets
 	case "configs":
-		permission = portainer.DockerConfigs
-		domain = DockerOperation
+		return portainer.OperationDockerConfigs
 	case "tasks":
-		permission = portainer.DockerTasks
-		domain = DockerOperation
+		return portainer.OperationDockerTasks
 	case "plugins":
-		permission = portainer.DockerPlugins
-		domain = DockerOperation
+		return portainer.OperationDockerPlugins
 	case "info":
-		permission = portainer.DockerInfo
-		domain = DockerOperation
+		return portainer.OperationDockerInfo
 	case "_ping":
-		permission = portainer.DockerPing
-		domain = DockerOperation
+		return portainer.OperationDockerPing
 	case "version":
-		permission = portainer.DockerVersion
-		domain = DockerOperation
+		return portainer.OperationDockerVersion
 	case "events":
-		permission = portainer.DockerEvents
-		domain = DockerOperation
+		return portainer.OperationDockerEvents
 	case "system/df":
-		permission = portainer.DockerSystem
-		domain = DockerOperation
+		return portainer.OperationDockerSystem
 	case "session":
-		permission = portainer.DockerSessions
-		domain = DockerOperation
+		return portainer.OperationDockerSessions
 	case "distribution":
-		permission = portainer.DockerDistributions
-		domain = DockerOperation
+		return portainer.OperationDockerDistributions
 	case "commit":
-		permission = portainer.DockerCommit
-		domain = DockerOperation
+		return portainer.OperationDockerCommit
 	case "build":
-		permission = portainer.DockerBuilds
-		domain = DockerOperation
+		return portainer.OperationDockerBuilds
+	default:
+		// TODO: review default
+		return portainer.OperationPortainerAdmin
 	}
-
-	fmt.Printf("Docker operation: %s | Base: %s\n", url, baseResource)
-
-	return permission, domain
 }
 
 // TODO: rename
@@ -180,31 +135,94 @@ func findNamedMatches(regex *regexp.Regexp, str string) map[string]string {
 	return results
 }
 
-func portainerAuthorizationSetOperationPermission(url, method string) portainer.UserPermissionSet {
-	routeResource := "authorization_sets"
+func portainerRoleOperationAuthorization(url, method string) portainer.Authorization {
+	routeResource := "roles"
 	routePattern := regexp.MustCompile(`/` + routeResource + `/(?P<resource>[^/]*)/?(?P<action>.*)?`)
 	lastMatch := findNamedMatches(routePattern, url)
-	fmt.Printf("AUTHORIZATIONSETS OPERATION: %s,%s | resource: %s | action: %s\n", method, url, lastMatch["resource"], lastMatch["action"])
+	fmt.Printf("PORTAINER ROLES OPERATION: %s,%s | resource: %s | action: %s\n", method, url, lastMatch["resource"], lastMatch["action"])
 	resource := lastMatch["resource"]
 	action := lastMatch["action"]
 
 	switch method {
 	case http.MethodGet:
 		if resource == "" && action == "" {
-			return portainer.PortainerAuthorizationSetList
+			return portainer.OperationPortainerRoleList
 		} else if resource != "" && action == "" {
-			return portainer.PortainerAuthorizationSetInspect
+			return portainer.OperationPortainerRoleInspect
 		}
 	}
 
-	return portainer.PortainerAdmin
+	return portainer.OperationPortainerAdmin
 }
 
 // Based on the routes available at
-// https://github.com/moby/moby/blob/c12f09bf99b54f274a5ae241dd154fa74020cbab/api/server/router/container/container.go#L31
-func dockerContainerOperationPermission(url, method string) portainer.UserPermissionSet {
+// https://github.com/moby/moby/blob/c12f09bf99/api/server/router/image/image.go#L26
+func dockerImageOperationAuthorization(url, method string) portainer.Authorization {
+	routeResource := "images"
+	routePattern := regexp.MustCompile(`/` + routeResource + `/(?P<resource>[^/]*)/?(?P<action>.*)?`)
+	lastMatch := findNamedMatches(routePattern, url)
+	fmt.Printf("IMAGE OPERATION: %s,%s | resource: %s | action: %s\n", method, url, lastMatch["resource"], lastMatch["action"])
+	resource := lastMatch["resource"]
+	action := lastMatch["action"]
 
-	// TODO: refactor/centralize
+	switch method {
+	case http.MethodGet:
+		//// GET
+		//router.NewGetRoute("/images/json", r.getImagesJSON),
+		//	router.NewGetRoute("/images/search", r.getImagesSearch),
+		//	router.NewGetRoute("/images/get", r.getImagesGet),
+		//	router.NewGetRoute("/images/{name:.*}/get", r.getImagesGet),
+		//	router.NewGetRoute("/images/{name:.*}/history", r.getImagesHistory),
+		//	router.NewGetRoute("/images/{name:.*}/json", r.getImagesByName),
+		switch action {
+		case "":
+			if resource == "json" {
+				return portainer.OperationDockerImageList
+			} else if resource == "search" {
+				return portainer.OperationDockerImageSearch
+			} else if resource == "get" {
+				return portainer.OperationDockerImageGetAll
+			}
+		case "get":
+			return portainer.OperationDockerImageGet
+		case "history":
+			return portainer.OperationDockerImageHistory
+		case "json":
+			return portainer.OperationDockerImageInspect
+		}
+	case http.MethodPost:
+		//// POST
+		//	router.NewPostRoute("/images/load", r.postImagesLoad),
+		//	router.NewPostRoute("/images/create", r.postImagesCreate),
+		//	router.NewPostRoute("/images/{name:.*}/push", r.postImagesPush),
+		//	router.NewPostRoute("/images/{name:.*}/tag", r.postImagesTag),
+		//	router.NewPostRoute("/images/prune", r.postImagesPrune),
+		switch action {
+		case "":
+			if resource == "load" {
+				return portainer.OperationDockerImageLoad
+			} else if resource == "create" {
+				return portainer.OperationDockerImageCreate
+			} else if resource == "prune" {
+				return portainer.OperationDockerImagePrune
+			}
+		case "push":
+		case "tag":
+		}
+	case http.MethodDelete:
+		//// DELETE
+		//	router.NewDeleteRoute("/images/{name:.*}", r.deleteImages)
+		if resource != "" && action == "" {
+			return portainer.OperationDockerImageDelete
+		}
+	}
+
+	return portainer.OperationDockerImages
+}
+
+// Based on the routes available at
+// https://github.com/moby/moby/blob/c12f09bf99/api/server/router/container/container.go#L31
+func dockerContainerOperationAuthorization(url, method string) portainer.Authorization {
 	routeResource := "containers"
 	routePattern := regexp.MustCompile(`/` + routeResource + `/(?P<resource>[^/]*)/?(?P<action>.*)?`)
 	lastMatch := findNamedMatches(routePattern, url)
@@ -217,7 +235,7 @@ func dockerContainerOperationPermission(url, method string) portainer.UserPermis
 		//// HEAD
 		//router.NewHeadRoute("/containers/{name:.*}/archive", r.headContainersArchive),
 		if action == "archive" {
-			return portainer.DockerContainerArchiveInfo
+			return portainer.OperationDockerContainerArchiveInfo
 		}
 	case http.MethodGet:
 		//// GET
@@ -234,24 +252,24 @@ func dockerContainerOperationPermission(url, method string) portainer.UserPermis
 		switch action {
 		case "":
 			if resource == "json" {
-				return portainer.DockerContainerList
+				return portainer.OperationDockerContainerList
 			}
 		case "export":
-			return portainer.DockerContainerExport
+			return portainer.OperationDockerContainerExport
 		case "changes":
-			return portainer.DockerContainerChanges
+			return portainer.OperationDockerContainerChanges
 		case "json":
-			return portainer.DockerContainerInspect
+			return portainer.OperationDockerContainerInspect
 		case "top":
-			return portainer.DockerContainerTop
+			return portainer.OperationDockerContainerTop
 		case "logs":
-			return portainer.DockerContainerLogs
+			return portainer.OperationDockerContainerLogs
 		case "stats":
-			return portainer.DockerContainerStats
+			return portainer.OperationDockerContainerStats
 		case "attach/ws":
-			return portainer.DockerContainerAttachWebsocket
+			return portainer.OperationDockerContainerAttachWebsocket
 		case "archive":
-			return portainer.DockerContainerArchive
+			return portainer.OperationDockerContainerArchive
 		}
 	case http.MethodPost:
 		//// POST
@@ -276,114 +294,49 @@ func dockerContainerOperationPermission(url, method string) portainer.UserPermis
 		switch action {
 		case "":
 			if resource == "create" {
-				return portainer.DockerContainerCreate
+				return portainer.OperationDockerContainerCreate
 			} else if resource == "prune" {
-				return portainer.DockerContainerPrune
+				return portainer.OperationDockerContainerPrune
 			}
 		case "kill":
-			return portainer.DockerContainerKill
+			return portainer.OperationDockerContainerKill
 		case "pause":
-			return portainer.DockerContainerPause
+			return portainer.OperationDockerContainerPause
 		case "unpause":
-			return portainer.DockerContainerUnpause
+			return portainer.OperationDockerContainerUnpause
 		case "restart":
-			return portainer.DockerContainerRestart
+			return portainer.OperationDockerContainerRestart
 		case "start":
-			return portainer.DockerContainerStart
+			return portainer.OperationDockerContainerStart
 		case "stop":
-			return portainer.DockerContainerStop
+			return portainer.OperationDockerContainerStop
 		case "wait":
-			return portainer.DockerContainerWait
+			return portainer.OperationDockerContainerWait
 		case "resize":
-			return portainer.DockerContainerResize
+			return portainer.OperationDockerContainerResize
 		case "attach":
-			return portainer.DockerContainerAttach
+			return portainer.OperationDockerContainerAttach
 		case "exec":
-			return portainer.DockerContainerExec
+			return portainer.OperationDockerContainerExec
 		case "rename":
-			return portainer.DockerContainerRename
+			return portainer.OperationDockerContainerRename
 		case "update":
-			return portainer.DockerContainerUpdate
+			return portainer.OperationDockerContainerUpdate
 		}
 	case http.MethodPut:
 		//// PUT
 		//	router.NewPutRoute("/containers/{name:.*}/archive", r.putContainersArchive),
 		if action == "archive" {
-			return portainer.DockerContainerPutContainerArchive
+			return portainer.OperationDockerContainerPutContainerArchive
 		}
 	case http.MethodDelete:
 		//// DELETE
 		//	router.NewDeleteRoute("/containers/{name:.*}", r.deleteContainers),
 		if resource != "" && action == "" {
-			return portainer.DockerContainerDelete
+			return portainer.OperationDockerContainerDelete
 		}
 	}
 
-	// TODO: default value?
-	return portainer.PortainerAdmin
-}
-
-func dockerImageOperationPermission(url, method string) portainer.UserPermissionSet {
-	// TODO: centralize
-	routeResource := "images"
-	routePattern := regexp.MustCompile(`/` + routeResource + `/(?P<resource>[^/]*)/?(?P<action>.*)?`)
-	lastMatch := findNamedMatches(routePattern, url)
-	fmt.Printf("IMAGE OPERATION: %s,%s | resource: %s | action: %s\n", method, url, lastMatch["resource"], lastMatch["action"])
-	resource := lastMatch["resource"]
-	action := lastMatch["action"]
-
-	switch method {
-	case http.MethodGet:
-		//// GET
-		//router.NewGetRoute("/images/json", r.getImagesJSON),
-		//	router.NewGetRoute("/images/search", r.getImagesSearch),
-		//	router.NewGetRoute("/images/get", r.getImagesGet),
-		//	router.NewGetRoute("/images/{name:.*}/get", r.getImagesGet),
-		//	router.NewGetRoute("/images/{name:.*}/history", r.getImagesHistory),
-		//	router.NewGetRoute("/images/{name:.*}/json", r.getImagesByName),
-		switch action {
-		case "":
-			if resource == "json" {
-				return portainer.DockerImageList
-			} else if resource == "search" {
-				return portainer.DockerImageSearch
-			} else if resource == "get" {
-				return portainer.DockerImageGetAll
-			}
-		case "get":
-			return portainer.DockerImageGet
-		case "history":
-			return portainer.DockerImageHistory
-		case "json":
-			return portainer.DockerImageInspect
-		}
-	case http.MethodPost:
-		//// POST
-		//	router.NewPostRoute("/images/load", r.postImagesLoad),
-		//	router.NewPostRoute("/images/create", r.postImagesCreate),
-		//	router.NewPostRoute("/images/{name:.*}/push", r.postImagesPush),
-		//	router.NewPostRoute("/images/{name:.*}/tag", r.postImagesTag),
-		//	router.NewPostRoute("/images/prune", r.postImagesPrune),
-		switch action {
-		case "":
-			if resource == "load" {
-				return portainer.DockerImageLoad
-			} else if resource == "create" {
-				return portainer.DockerImageCreate
-			} else if resource == "prune" {
-				return portainer.DockerImagePrune
-			}
-		case "push":
-		case "tag":
-		}
-	case http.MethodDelete:
-		//// DELETE
-		//	router.NewDeleteRoute("/images/{name:.*}", r.deleteImages)
-		if resource != "" && action == "" {
-			return portainer.DockerImageDelete
-		}
-	}
-
-	// TODO: default value?
-	return portainer.PortainerAdmin
+	// TODO: default generic resource operation?
+	return portainer.OperationDockerContainers
 }

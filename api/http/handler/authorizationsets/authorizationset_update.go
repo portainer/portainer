@@ -9,28 +9,28 @@ import (
 	"github.com/portainer/portainer/api"
 )
 
-type authorizationSetUpdatePayload struct {
+type roleUpdatePayload struct {
 	Name string
 }
 
-func (payload *authorizationSetUpdatePayload) Validate(r *http.Request) error {
+func (payload *roleUpdatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// PUT request on /api/AuthorizationSet/:id
-func (handler *Handler) authorizationSetUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	authorizationSetID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+// PUT request on /api/Role/:id
+func (handler *Handler) roleUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	roleID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid authorization set identifier route variable", err}
 	}
 
-	var payload authorizationSetUpdatePayload
+	var payload roleUpdatePayload
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	authorizationSet, err := handler.AuthorizationSetService.AuthorizationSet(portainer.AuthorizationSetID(authorizationSetID))
+	role, err := handler.RoleService.Role(portainer.RoleID(roleID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a authorization set with the specified identifier inside the database", err}
 	} else if err != nil {
@@ -38,13 +38,13 @@ func (handler *Handler) authorizationSetUpdate(w http.ResponseWriter, r *http.Re
 	}
 
 	if payload.Name != "" {
-		authorizationSet.Name = payload.Name
+		role.Name = payload.Name
 	}
 
-	err = handler.AuthorizationSetService.UpdateAuthorizationSet(authorizationSet.ID, authorizationSet)
+	err = handler.RoleService.UpdateRole(role.ID, role)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to persist authorization set changes inside the database", err}
 	}
 
-	return response.JSON(w, authorizationSet)
+	return response.JSON(w, role)
 }

@@ -35,27 +35,27 @@ const (
 // Store defines the implementation of portainer.DataStore using
 // BoltDB as the storage system.
 type Store struct {
-	path                    string
-	db                      *bolt.DB
-	checkForDataMigration   bool
-	fileService             portainer.FileService
-	AuthorizationSetService *authorizationset.Service
-	DockerHubService        *dockerhub.Service
-	EndpointGroupService    *endpointgroup.Service
-	EndpointService         *endpoint.Service
-	ExtensionService        *extension.Service
-	RegistryService         *registry.Service
-	ResourceControlService  *resourcecontrol.Service
-	SettingsService         *settings.Service
-	StackService            *stack.Service
-	TagService              *tag.Service
-	TeamMembershipService   *teammembership.Service
-	TeamService             *team.Service
-	TemplateService         *template.Service
-	UserService             *user.Service
-	VersionService          *version.Service
-	WebhookService          *webhook.Service
-	ScheduleService         *schedule.Service
+	path                   string
+	db                     *bolt.DB
+	checkForDataMigration  bool
+	fileService            portainer.FileService
+	RoleService            *authorizationset.Service
+	DockerHubService       *dockerhub.Service
+	EndpointGroupService   *endpointgroup.Service
+	EndpointService        *endpoint.Service
+	ExtensionService       *extension.Service
+	RegistryService        *registry.Service
+	ResourceControlService *resourcecontrol.Service
+	SettingsService        *settings.Service
+	StackService           *stack.Service
+	TagService             *tag.Service
+	TeamMembershipService  *teammembership.Service
+	TeamService            *team.Service
+	TemplateService        *template.Service
+	UserService            *user.Service
+	VersionService         *version.Service
+	WebhookService         *webhook.Service
+	ScheduleService        *schedule.Service
 }
 
 // NewStore initializes a new Store and the associated services
@@ -115,23 +115,21 @@ func (store *Store) Init() error {
 		}
 	}
 
-	authorizationSets, err := store.AuthorizationSetService.AuthorizationSets()
+	roles, err := store.RoleService.Roles()
 	if err != nil {
 		return err
 	}
 
-	if len(authorizationSets) == 0 {
-		administratorUserSet := &portainer.AuthorizationSet{
-			Name:                                 "Portainer administrator",
-			PortainerAuthorizationSetPermissions: portainer.PortainerAuthorizationRW,
-			TestMap: map[string]bool{
-				"t1": true,
-				"t2": true,
-				"t4": true,
+	if len(roles) == 0 {
+		administratorUserSet := &portainer.Role{
+			Name: "Portainer administrator",
+			Authorizations: map[portainer.Authorization]bool{
+				portainer.OperationPortainerAdmin:    true,
+				portainer.OperationPortainerRoleList: true,
 			},
 		}
 
-		err = store.AuthorizationSetService.CreateAuthorizationSet(administratorUserSet)
+		err = store.RoleService.CreateRole(administratorUserSet)
 		if err != nil {
 			return err
 		}
@@ -194,7 +192,7 @@ func (store *Store) initServices() error {
 	if err != nil {
 		return err
 	}
-	store.AuthorizationSetService = authorizationsetService
+	store.RoleService = authorizationsetService
 
 	dockerhubService, err := dockerhub.NewService(store.db)
 	if err != nil {

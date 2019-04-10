@@ -45,10 +45,7 @@ func (handler *Handler) adminInit(w http.ResponseWriter, r *http.Request) *httpe
 	user := &portainer.User{
 		Username: payload.Username,
 		Role:     portainer.AdministratorRole,
-		// TODO: use default set
-		Authorizations: portainer.AuthorizationSet{
-			PortainerAuthorizationSetPermissions: portainer.PortainerAuthorizationRW,
-		},
+		RoleID:   portainer.RoleID(1),
 	}
 
 	user.Password, err = handler.CryptoService.Hash(payload.Password)
