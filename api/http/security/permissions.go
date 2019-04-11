@@ -13,6 +13,26 @@ import (
 var dockerRule = regexp.MustCompile(`/(?P<identifier>\d+)/docker(?P<operation>/.*)`)
 var registryRule = regexp.MustCompile(`/registries/(?P<identifier>\d+)/v2(?P<operation>/.*)?`)
 
+func extractMatches(regex *regexp.Regexp, str string) map[string]string {
+	match := regex.FindStringSubmatch(str)
+
+	results := map[string]string{}
+	for i, name := range match {
+		results[regex.SubexpNames()[i]] = name
+	}
+	return results
+}
+
+func extractResourceAndActionFromURL(routeResource, url string) (string, string) {
+	routePattern := regexp.MustCompile(`/` + routeResource + `/(?P<resource>[^/]*)/?(?P<action>.*)?`)
+	urlComponents := extractMatches(routePattern, url)
+
+	// TODO: optional log statement for debug
+	//fmt.Printf("IMAGE OPERATION: %s,%s | resource: %s | action: %s\n", method, url, urlComponents["resource"], urlComponents["action"])
+
+	return urlComponents["resource"], urlComponents["action"]
+}
+
 func checkPermissions(r *http.Request) error {
 	tokenData, err := RetrieveTokenData(r)
 	if err != nil {
@@ -34,7 +54,6 @@ func authorizedOperation(r *http.Request, authorizations portainer.Authorization
 }
 
 func getOperationAuthorization(url, method string) portainer.Authorization {
-
 	if dockerRule.MatchString(url) {
 		match := dockerRule.FindStringSubmatch(url)
 		return getDockerOperationAuthorization(strings.TrimPrefix(url, "/"+match[1]+"/docker"), method)
@@ -61,14 +80,52 @@ func getPortainerOperationAuthorization(url, method string) portainer.Authorizat
 	urlParts := strings.Split(url, "/")
 	baseResource := urlParts[1]
 
-	permission := portainer.OperationPortainerAdmin
+	// TODO: consider public endpoints evolutions?
+	// right now, "status" and "auth" are not processed as they expose
+	// public endpoints. But what happens if we add POST "/status/newfeature" in the future?
 
 	switch baseResource {
+	case "dockerhub":
+		return portainerDockerhubOperationAuthorization(url, method)
+	case "endpoint_groups":
+		return portainerEndpointGroupOperationAuthorization(url, method)
+	case "endpoints":
+		return portainerEndpointOperationAuthorization(url, method)
+	case "motd":
+		return portainer.OperationPortainerMOTD
+	case "extensions":
+		return portainerExtensionOperationAuthorization(url, method)
+	case "registries":
+		return portainerRegistryOperationAuthorization(url, method)
+	case "resource_controls":
+		return portainerResourceControlOperationAuthorization(url, method)
 	case "roles":
-		permission = portainerRoleOperationAuthorization(url, method)
+		return portainerRoleOperationAuthorization(url, method)
+	case "schedules":
+		return portainerScheduleOperationAuthorization(url, method)
+	case "settings":
+		return portainerSettingsOperationAuthorization(url, method)
+	case "stacks":
+		return portainerStackOperationAuthorization(url, method)
+	case "tags":
+		return portainerTagOperationAuthorization(url, method)
+	case "templates":
+		return portainerTemplatesOperationAuthorization(url, method)
+	case "upload":
+		return portainerUploadOperationAuthorization(url, method)
+	case "users":
+		return portainerUserOperationAuthorization(url, method)
+	case "teams":
+		return portainerTeamOperationAuthorization(url, method)
+	case "team_memberships":
+		return portainerTeamMembershipOperationAuthorization(url, method)
+	case "websocket":
+		return portainerWebsocketOperationAuthorization(url, method)
+	case "webhooks":
+		return portainerWebhookOperationAuthorization(url, method)
 	}
 
-	return permission
+	return portainer.OperationPortainerAdmin
 }
 
 func getDockerOperationAuthorization(url, method string) portainer.Authorization {
@@ -129,23 +186,175 @@ func getDockerOperationAuthorization(url, method string) portainer.Authorization
 	}
 }
 
-func extractMatches(regex *regexp.Regexp, str string) map[string]string {
-	match := regex.FindStringSubmatch(str)
+func portainerDockerhubOperationAuthorization(url, method string) portainer.Authorization {
+	resource, action := extractResourceAndActionFromURL("dockerhub", url)
 
-	results := map[string]string{}
-	for i, name := range match {
-		results[regex.SubexpNames()[i]] = name
+	switch method {
+	case http.MethodGet:
+		if resource == "" && action == "" {
+			return portainer.OperationPortainerDockerHubInspect
+		}
+	case http.MethodPut:
+		if resource == "" && action == "" {
+			return portainer.OperationPortainerDockerHubUpdate
+		}
 	}
-	return results
+
+	return portainer.OperationPortainerAdmin
+}
+
+func portainerEndpointGroupOperationAuthorization(url, method string) portainer.Authorization {
+	resource, action := extractResourceAndActionFromURL("endpoint_groups", url)
+
+	switch method {
+	case http.MethodGet:
+		if resource == "" && action == "" {
+			return portainer.OperationPortainerEndpointGroupList
+		} else if resource != "" && action == "" {
+			return portainer.OperationPortainerEndpointGroupInspect
+		}
+	case http.MethodPost:
+		if resource == "" && action == "" {
+			return portainer.OperationPortainerEndpointGroupCreate
+		}
+	case http.MethodPut:
+		if resource != "" && action == "" {
+			return portainer.OperationPortainerEndpointGroupUpdate
+		} else if action == "access" {
+			return portainer.OperationPortainerEndpointGroupAccess
+		}
+	case http.MethodDelete:
+		if resource != "" && action == "" {
+			return portainer.OperationPortainerEndpointGroupDelete
+		}
+	}
+
+	return portainer.OperationPortainerAdmin
+}
+
+func portainerEndpointOperationAuthorization(url, method string) portainer.Authorization {
+	resource, action := extractResourceAndActionFromURL("endpoints", url)
+
+	switch method {
+	case http.MethodGet:
+		if resource == "" && action == "" {
+			return portainer.OperationPortainerEndpointList
+		} else if resource != "" && action == "" {
+			return portainer.OperationPortainerEndpointInspect
+		}
+	case http.MethodPost:
+		switch action {
+		case "":
+			if resource == "" {
+				return portainer.OperationPortainerEndpointCreate
+			}
+		case "extensions":
+			return portainer.OperationPortainerEndpointExtensionAdd
+		case "job":
+			return portainer.OperationPortainerEndpointJob
+		case "snapshot":
+			if resource == "" {
+				return portainer.OperationPortainerEndpointSnapshots
+			} else if resource != "" {
+				return portainer.OperationPortainerEndpointSnapshot
+			}
+		}
+	case http.MethodPut:
+		if resource != "" && action == "" {
+			return portainer.OperationPortainerEndpointUpdate
+		} else if action == "access" {
+			return portainer.OperationPortainerEndpointUpdateAccess
+		}
+	case http.MethodDelete:
+		if resource != "" && action == "" {
+			return portainer.OperationPortainerEndpointDelete
+			// TODO: check this one works
+		} else if resource == "extensions" {
+			return portainer.OperationPortainerEndpointExtensionRemove
+		}
+	}
+
+	return portainer.OperationPortainerAdmin
+}
+
+func portainerExtensionOperationAuthorization(url, method string) portainer.Authorization {
+	resource, action := extractResourceAndActionFromURL("extensions", url)
+
+	switch method {
+	case http.MethodGet:
+		if resource == "" && action == "" {
+			return portainer.OperationPortainerExtensionList
+		} else if resource != "" && action == "" {
+			return portainer.OperationPortainerExtensionInspect
+		}
+	case http.MethodPost:
+		if resource == "" && action == "" {
+			return portainer.OperationPortainerExtensionCreate
+		} else if action == "update" {
+			return portainer.OperationPortainerExtensionUpdate
+		}
+	case http.MethodDelete:
+		if resource != "" && action == "" {
+			return portainer.OperationPortainerExtensionDelete
+		}
+	}
+
+	return portainer.OperationPortainerAdmin
+}
+
+func portainerRegistryOperationAuthorization(url, method string) portainer.Authorization {
+	resource, action := extractResourceAndActionFromURL("registries", url)
+
+	switch method {
+	case http.MethodGet:
+		if resource == "" && action == "" {
+			return portainer.OperationPortainerRegistryList
+		} else if resource != "" && action == "" {
+			return portainer.OperationPortainerRegistryInspect
+		}
+	case http.MethodPost:
+		if resource == "" && action == "" {
+			return portainer.OperationPortainerRegistryCreate
+		} else if action == "configure" {
+			return portainer.OperationPortainerRegistryConfigure
+		}
+	case http.MethodPut:
+		if resource != "" && action == "" {
+			return portainer.OperationPortainerRegistryUpdate
+		} else if action == "access" {
+			return portainer.OperationPortainerRegistryUpdateAccess
+		}
+	case http.MethodDelete:
+		if resource != "" && action == "" {
+			return portainer.OperationPortainerRegistryDelete
+		}
+	}
+
+	return portainer.OperationPortainerAdmin
+}
+
+func portainerResourceControlOperationAuthorization(url, method string) portainer.Authorization {
+	resource, action := extractResourceAndActionFromURL("resource_controls", url)
+
+	switch method {
+	case http.MethodPost:
+		if resource == "" && action == "" {
+			return portainer.OperationPortainerResourceControlCreate
+		}
+	case http.MethodPut:
+		if resource != "" && action == "" {
+			return portainer.OperationPortainerResourceControlUpdate
+		}
+	case http.MethodDelete:
+		if resource != "" && action == "" {
+			return portainer.OperationPortainerResourceControlDelete
+		}
+	}
+	return portainer.OperationPortainerAdmin
 }
 
 func portainerRoleOperationAuthorization(url, method string) portainer.Authorization {
-	routeResource := "roles"
-	routePattern := regexp.MustCompile(`/` + routeResource + `/(?P<resource>[^/]*)/?(?P<action>.*)?`)
-	urlComponents := extractMatches(routePattern, url)
-	fmt.Printf("PORTAINER ROLES OPERATION: %s,%s | resource: %s | action: %s\n", method, url, urlComponents["resource"], urlComponents["action"])
-	resource := urlComponents["resource"]
-	action := urlComponents["action"]
+	resource, action := extractResourceAndActionFromURL("roles", url)
 
 	switch method {
 	case http.MethodGet:
@@ -154,19 +363,305 @@ func portainerRoleOperationAuthorization(url, method string) portainer.Authoriza
 		} else if resource != "" && action == "" {
 			return portainer.OperationPortainerRoleInspect
 		}
+	case http.MethodPost:
+		if resource == "" && action == "" {
+			return portainer.OperationPortainerRoleCreate
+		}
+	case http.MethodPut:
+		if resource != "" && action == "" {
+			return portainer.OperationPortainerRoleUpdate
+		}
+	case http.MethodDelete:
+		if resource != "" && action == "" {
+			return portainer.OperationPortainerRoleDelete
+		}
 	}
 
 	return portainer.OperationPortainerAdmin
 }
 
-func extractResourceAndActionFromURL(routeResource, url string) (string, string) {
-	routePattern := regexp.MustCompile(`/` + routeResource + `/(?P<resource>[^/]*)/?(?P<action>.*)?`)
-	urlComponents := extractMatches(routePattern, url)
+func portainerScheduleOperationAuthorization(url, method string) portainer.Authorization {
+	resource, action := extractResourceAndActionFromURL("schedules", url)
 
-	// TODO: optional log statement for debug
-	//fmt.Printf("IMAGE OPERATION: %s,%s | resource: %s | action: %s\n", method, url, urlComponents["resource"], urlComponents["action"])
+	switch method {
+	case http.MethodGet:
+		switch action {
+		case "":
+			if resource == "" {
+				return portainer.OperationPortainerScheduleList
+			} else {
+				return portainer.OperationPortainerScheduleInspect
+			}
+		case "file":
+			return portainer.OperationPortainerScheduleFile
+		case "tasks":
+			return portainer.OperationPortainerScheduleTasks
+		}
 
-	return urlComponents["resource"], urlComponents["action"]
+	case http.MethodPost:
+		if resource == "" && action == "" {
+			return portainer.OperationPortainerScheduleCreate
+		}
+	case http.MethodPut:
+		if resource != "" && action == "" {
+			return portainer.OperationPortainerScheduleUpdate
+		}
+	case http.MethodDelete:
+		if resource != "" && action == "" {
+			return portainer.OperationPortainerScheduleDelete
+		}
+	}
+
+	return portainer.OperationPortainerAdmin
+}
+
+func portainerSettingsOperationAuthorization(url, method string) portainer.Authorization {
+	resource, action := extractResourceAndActionFromURL("settings", url)
+
+	// TODO: /settings/public is a public endpoint
+
+	switch method {
+	case http.MethodGet:
+		if resource == "" && action == "" {
+			return portainer.OperationPortainerSettingsInspect
+		}
+	case http.MethodPut:
+		switch action {
+		case "":
+			if resource == "" {
+				return portainer.OperationPortainerSettingsUpdate
+			}
+			// TODO: validate this case will work for /settings/authentication/checkLDAP
+		case "checkLDAP":
+			return portainer.OperationPortainerSettingsLDAPCheck
+		}
+	}
+
+	return portainer.OperationPortainerAdmin
+}
+
+func portainerStackOperationAuthorization(url, method string) portainer.Authorization {
+	resource, action := extractResourceAndActionFromURL("stacks", url)
+
+	switch method {
+	case http.MethodGet:
+		switch action {
+		case "":
+			if resource == "" {
+				return portainer.OperationPortainerStackList
+			} else {
+				return portainer.OperationPortainerStackInspect
+			}
+		case "file":
+			return portainer.OperationPortainerStackFile
+		}
+
+	case http.MethodPost:
+		switch action {
+		case "":
+			if resource == "" {
+				return portainer.OperationPortainerStackCreate
+			}
+		case "migrate":
+			return portainer.OperationPortainerStackMigrate
+		}
+
+	case http.MethodPut:
+		if resource != "" && action == "" {
+			return portainer.OperationPortainerStackUpdate
+		}
+	case http.MethodDelete:
+		if resource != "" && action == "" {
+			return portainer.OperationPortainerStackDelete
+		}
+	}
+
+	return portainer.OperationPortainerAdmin
+}
+
+func portainerTagOperationAuthorization(url, method string) portainer.Authorization {
+	resource, action := extractResourceAndActionFromURL("tags", url)
+
+	switch method {
+	case http.MethodGet:
+		if resource == "" && action == "" {
+			return portainer.OperationPortainerTagList
+		}
+	case http.MethodPost:
+		if resource == "" && action == "" {
+			return portainer.OperationPortainerTagCreate
+		}
+	case http.MethodDelete:
+		if resource != "" && action == "" {
+			return portainer.OperationPortainerTagDelete
+		}
+	}
+
+	return portainer.OperationPortainerAdmin
+}
+
+func portainerTeamMembershipOperationAuthorization(url, method string) portainer.Authorization {
+	resource, action := extractResourceAndActionFromURL("team_memberships", url)
+
+	switch method {
+	case http.MethodGet:
+		if resource == "" && action == "" {
+			return portainer.OperationPortainerTeamMembershipList
+		}
+	case http.MethodPost:
+		if resource == "" && action == "" {
+			return portainer.OperationPortainerTeamMembershipCreate
+		}
+	case http.MethodPut:
+		if resource != "" && action == "" {
+			return portainer.OperationPortainerTeamMembershipUpdate
+		}
+	case http.MethodDelete:
+		if resource != "" && action == "" {
+			return portainer.OperationPortainerTeamMembershipDelete
+		}
+	}
+
+	return portainer.OperationPortainerAdmin
+}
+
+func portainerTeamOperationAuthorization(url, method string) portainer.Authorization {
+	resource, action := extractResourceAndActionFromURL("teams", url)
+
+	switch method {
+	case http.MethodGet:
+		switch action {
+		case "":
+			if resource == "" {
+				return portainer.OperationPortainerTeamList
+			} else {
+				return portainer.OperationPortainerTeamInspect
+			}
+		case "memberships":
+			return portainer.OperationPortainerTeamMemberships
+		}
+
+	case http.MethodPost:
+		if resource == "" && action == "" {
+			return portainer.OperationPortainerTeamCreate
+		}
+	case http.MethodPut:
+		if resource != "" && action == "" {
+			return portainer.OperationPortainerTeamUpdate
+		}
+	case http.MethodDelete:
+		if resource != "" && action == "" {
+			return portainer.OperationPortainerTeamDelete
+		}
+	}
+
+	return portainer.OperationPortainerAdmin
+}
+
+func portainerTemplatesOperationAuthorization(url, method string) portainer.Authorization {
+	resource, action := extractResourceAndActionFromURL("templates", url)
+
+	switch method {
+	case http.MethodGet:
+		if resource == "" && action == "" {
+			return portainer.OperationPortainerTemplateList
+		} else if resource != "" && action == "" {
+			return portainer.OperationPortainerTemplateInspect
+		}
+	case http.MethodPost:
+		if resource == "" && action == "" {
+			return portainer.OperationPortainerTemplateCreate
+		}
+	case http.MethodPut:
+		if resource != "" && action == "" {
+			return portainer.OperationPortainerTemplateUpdate
+		}
+	case http.MethodDelete:
+		if resource != "" && action == "" {
+			return portainer.OperationPortainerTemplateDelete
+		}
+	}
+
+	return portainer.OperationPortainerAdmin
+}
+
+func portainerUploadOperationAuthorization(url, method string) portainer.Authorization {
+	resource, _ := extractResourceAndActionFromURL("upload", url)
+
+	switch method {
+	case http.MethodPost:
+		if resource == "tls" {
+			return portainer.OperationPortainerUploadTLS
+		}
+	}
+
+	return portainer.OperationPortainerAdmin
+}
+
+func portainerUserOperationAuthorization(url, method string) portainer.Authorization {
+	resource, action := extractResourceAndActionFromURL("users", url)
+
+	switch method {
+	case http.MethodGet:
+		switch action {
+		case "":
+			if resource == "" {
+				return portainer.OperationPortainerUserList
+			} else {
+				return portainer.OperationPortainerUserInspect
+			}
+		case "memberships":
+			return portainer.OperationPortainerUserMemberships
+		}
+
+	case http.MethodPost:
+		if resource == "" && action == "" {
+			return portainer.OperationPortainerUserCreate
+		}
+	case http.MethodPut:
+		if resource != "" && action == "" {
+			return portainer.OperationPortainerUserUpdate
+		} else if resource != "" && action == "passwd" {
+			return portainer.OperationPortainerUserUpdatePassword
+		}
+	case http.MethodDelete:
+		if resource != "" && action == "" {
+			return portainer.OperationPortainerUserDelete
+		}
+	}
+
+	return portainer.OperationPortainerAdmin
+}
+
+func portainerWebsocketOperationAuthorization(url, method string) portainer.Authorization {
+	resource, _ := extractResourceAndActionFromURL("websocket", url)
+
+	if resource == "exec" {
+		return portainer.OperationPortainerWebsocketExec
+	}
+
+	return portainer.OperationPortainerAdmin
+}
+
+func portainerWebhookOperationAuthorization(url, method string) portainer.Authorization {
+	resource, action := extractResourceAndActionFromURL("webhooks", url)
+
+	switch method {
+	case http.MethodGet:
+		if resource == "" && action == "" {
+			return portainer.OperationPortainerWebhookList
+		}
+	case http.MethodPost:
+		if resource == "" && action == "" {
+			return portainer.OperationPortainerWebhookCreate
+		}
+	case http.MethodDelete:
+		if resource != "" && action == "" {
+			return portainer.OperationPortainerWebhookDelete
+		}
+	}
+
+	return portainer.OperationPortainerAdmin
 }
 
 // Based on the routes available at

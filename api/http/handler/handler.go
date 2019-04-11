@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/portainer/portainer/api/http/handler/schedules"
+
 	"github.com/portainer/portainer/api/http/handler/roles"
 
 	"github.com/portainer/portainer/api/http/handler/auth"
@@ -16,7 +18,6 @@ import (
 	"github.com/portainer/portainer/api/http/handler/motd"
 	"github.com/portainer/portainer/api/http/handler/registries"
 	"github.com/portainer/portainer/api/http/handler/resourcecontrols"
-	"github.com/portainer/portainer/api/http/handler/schedules"
 	"github.com/portainer/portainer/api/http/handler/settings"
 	"github.com/portainer/portainer/api/http/handler/stacks"
 	"github.com/portainer/portainer/api/http/handler/status"
@@ -32,9 +33,7 @@ import (
 
 // Handler is a collection of all the service handlers.
 type Handler struct {
-	AuthHandler *auth.Handler
-
-	RoleHandler            *roles.Handler
+	AuthHandler            *auth.Handler
 	DockerHubHandler       *dockerhub.Handler
 	EndpointGroupHandler   *endpointgroups.Handler
 	EndpointHandler        *endpoints.Handler
@@ -44,6 +43,8 @@ type Handler struct {
 	ExtensionHandler       *extensions.Handler
 	RegistryHandler        *registries.Handler
 	ResourceControlHandler *resourcecontrols.Handler
+	RoleHandler            *roles.Handler
+	SchedulesHanlder       *schedules.Handler
 	SettingsHandler        *settings.Handler
 	StackHandler           *stacks.Handler
 	StatusHandler          *status.Handler
@@ -55,14 +56,11 @@ type Handler struct {
 	UserHandler            *users.Handler
 	WebSocketHandler       *websocket.Handler
 	WebhookHandler         *webhooks.Handler
-	SchedulesHanlder       *schedules.Handler
 }
 
 // ServeHTTP delegates a request to the appropriate subhandler.
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch {
-	case strings.HasPrefix(r.URL.Path, "/api/roles"):
-		http.StripPrefix("/api", h.RoleHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/auth"):
 		http.StripPrefix("/api", h.AuthHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/dockerhub"):
@@ -80,14 +78,18 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		default:
 			http.StripPrefix("/api", h.EndpointHandler).ServeHTTP(w, r)
 		}
-	case strings.HasPrefix(r.URL.Path, "/api/motd"):
-		http.StripPrefix("/api", h.MOTDHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/extensions"):
 		http.StripPrefix("/api", h.ExtensionHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/motd"):
+		http.StripPrefix("/api", h.MOTDHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/registries"):
 		http.StripPrefix("/api", h.RegistryHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/resource_controls"):
 		http.StripPrefix("/api", h.ResourceControlHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/roles"):
+		http.StripPrefix("/api", h.RoleHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/schedules"):
+		http.StripPrefix("/api", h.SchedulesHanlder).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/settings"):
 		http.StripPrefix("/api", h.SettingsHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/stacks"):
@@ -110,8 +112,6 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.StripPrefix("/api", h.WebSocketHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/webhooks"):
 		http.StripPrefix("/api", h.WebhookHandler).ServeHTTP(w, r)
-	case strings.HasPrefix(r.URL.Path, "/api/schedules"):
-		http.StripPrefix("/api", h.SchedulesHanlder).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/"):
 		h.FileHandler.ServeHTTP(w, r)
 	}
