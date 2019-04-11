@@ -3,7 +3,7 @@ package http
 import (
 	"time"
 
-	"github.com/portainer/portainer/api/http/handler/authorizationsets"
+	"github.com/portainer/portainer/api/http/handler/roles"
 
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker"
@@ -114,7 +114,7 @@ func (server *Server) Start() error {
 	authHandler.RoleService = server.RoleService
 	authHandler.ProxyManager = proxyManager
 
-	var roleHandler = authorizationsets.NewHandler(requestBouncer)
+	var roleHandler = roles.NewHandler(requestBouncer)
 	roleHandler.RoleService = server.RoleService
 
 	var dockerHubHandler = dockerhub.NewHandler(requestBouncer)

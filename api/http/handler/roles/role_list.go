@@ -1,4 +1,4 @@
-package authorizationsets
+package roles
 
 import (
 	"net/http"

@@ -81,28 +81,30 @@ func getDockerOperationAuthorization(url, method string) portainer.Authorization
 	case "images":
 		return dockerImageOperationAuthorization(url, method)
 	case "networks":
-		return portainer.OperationDockerNetworks
+		return dockerNetworkOperationAuthorization(url, method)
 	case "volumes":
-		return portainer.OperationDockerVolumes
+		return dockerVolumeOperationAuthorization(url, method)
 	case "exec":
-		return portainer.OperationDockerExec
+		return dockerExecOperationAuthorization(url, method)
 	case "swarm":
-		return portainer.OperationDockerSwarm
+		return dockerSwarmOperationAuthorization(url, method)
 	case "nodes":
-		return portainer.OperationDockerNodes
+		return dockerNodeOperationAuthorization(url, method)
 	case "services":
-		return portainer.OperationDockerServices
+		return dockerServiceOperationAuthorization(url, method)
 	case "secrets":
-		return portainer.OperationDockerSecrets
+		return dockerSecretOperationAuthorization(url, method)
 	case "configs":
-		return portainer.OperationDockerConfigs
+		return dockerConfigOperationAuthorization(url, method)
 	case "tasks":
-		return portainer.OperationDockerTasks
+		return dockerTaskOperationAuthorization(url, method)
 	case "plugins":
-		return portainer.OperationDockerPlugins
+		return dockerPluginOperationAuthorization(url, method)
 	case "info":
 		return portainer.OperationDockerInfo
+		//return dockerInfoOperationAuthorization(url, method)
 	case "_ping":
+		//return dockerPingOperationAuthorization(url, method)
 		return portainer.OperationDockerPing
 	case "version":
 		return portainer.OperationDockerVersion
@@ -111,21 +113,23 @@ func getDockerOperationAuthorization(url, method string) portainer.Authorization
 	case "system/df":
 		return portainer.OperationDockerSystem
 	case "session":
-		return portainer.OperationDockerSessions
+		return dockerSessionOperationAuthorization(url, method)
 	case "distribution":
-		return portainer.OperationDockerDistributions
+		return dockerDistributionOperationAuthorization(url, method)
 	case "commit":
-		return portainer.OperationDockerCommit
+		return dockerCommitOperationAuthorization(url, method)
+		//return portainer.OperationDockerCommit
 	case "build":
-		return portainer.OperationDockerBuilds
+		return dockerBuildOperationAuthorization(url, method)
+		//return portainer.OperationDockerBuilds
 	default:
 		// TODO: review default
+		// should have a generic role for unsupported (future resources in the Docker API)
 		return portainer.OperationPortainerAdmin
 	}
 }
 
-// TODO: rename
-func findNamedMatches(regex *regexp.Regexp, str string) map[string]string {
+func extractMatches(regex *regexp.Regexp, str string) map[string]string {
 	match := regex.FindStringSubmatch(str)
 
 	results := map[string]string{}
@@ -138,10 +142,10 @@ func findNamedMatches(regex *regexp.Regexp, str string) map[string]string {
 func portainerRoleOperationAuthorization(url, method string) portainer.Authorization {
 	routeResource := "roles"
 	routePattern := regexp.MustCompile(`/` + routeResource + `/(?P<resource>[^/]*)/?(?P<action>.*)?`)
-	lastMatch := findNamedMatches(routePattern, url)
-	fmt.Printf("PORTAINER ROLES OPERATION: %s,%s | resource: %s | action: %s\n", method, url, lastMatch["resource"], lastMatch["action"])
-	resource := lastMatch["resource"]
-	action := lastMatch["action"]
+	urlComponents := extractMatches(routePattern, url)
+	fmt.Printf("PORTAINER ROLES OPERATION: %s,%s | resource: %s | action: %s\n", method, url, urlComponents["resource"], urlComponents["action"])
+	resource := urlComponents["resource"]
+	action := urlComponents["action"]
 
 	switch method {
 	case http.MethodGet:
@@ -155,15 +159,505 @@ func portainerRoleOperationAuthorization(url, method string) portainer.Authoriza
 	return portainer.OperationPortainerAdmin
 }
 
+func extractResourceAndActionFromURL(routeResource, url string) (string, string) {
+	routePattern := regexp.MustCompile(`/` + routeResource + `/(?P<resource>[^/]*)/?(?P<action>.*)?`)
+	urlComponents := extractMatches(routePattern, url)
+
+	// TODO: optional log statement for debug
+	//fmt.Printf("IMAGE OPERATION: %s,%s | resource: %s | action: %s\n", method, url, urlComponents["resource"], urlComponents["action"])
+
+	return urlComponents["resource"], urlComponents["action"]
+}
+
+// Based on the routes available at
+// https://github.com/moby/moby/blob/c12f09bf99/api/server/router/network/network.go#L29
+func dockerNetworkOperationAuthorization(url, method string) portainer.Authorization {
+	resource, action := extractResourceAndActionFromURL("networks", url)
+
+	switch method {
+	case http.MethodGet:
+		// GET
+		//router.NewGetRoute("/networks", r.getNetworksList),
+		//router.NewGetRoute("/networks/", r.getNetworksList),
+		//router.NewGetRoute("/networks/{id:.+}", r.getNetwork),
+		switch action {
+		case "":
+			if resource == "" {
+				return portainer.OperationDockerNetworkList
+			} else {
+				return portainer.OperationDockerNetworkInspect
+			}
+		}
+	case http.MethodPost:
+		//router.NewPostRoute("/networks/create", r.postNetworkCreate),
+		//router.NewPostRoute("/networks/{id:.*}/connect", r.postNetworkConnect),
+		//router.NewPostRoute("/networks/{id:.*}/disconnect", r.postNetworkDisconnect),
+		//router.NewPostRoute("/networks/prune", r.postNetworksPrune),
+		switch action {
+		case "":
+			if resource == "create" {
+				return portainer.OperationDockerNetworkCreate
+			} else if resource == "prune" {
+				return portainer.OperationDockerNetworkPrune
+			}
+		case "connect":
+			return portainer.OperationDockerNetworkConnect
+		case "disconnect":
+			return portainer.OperationDockerNetworkDisconnect
+		}
+	case http.MethodDelete:
+		// DELETE
+		// 	router.NewDeleteRoute("/networks/{id:.*}", r.deleteNetwork),
+		if resource != "" && action == "" {
+			return portainer.OperationDockerNetworkDelete
+		}
+	}
+
+	return portainer.OperationDockerNetworks
+}
+
+// Based on the routes available at
+// https://github.com/moby/moby/blob/c12f09bf99/api/server/router/volume/volume.go#L25
+func dockerVolumeOperationAuthorization(url, method string) portainer.Authorization {
+	resource, action := extractResourceAndActionFromURL("volumes", url)
+
+	switch method {
+	case http.MethodGet:
+		// GET
+		//router.NewGetRoute("/volumes", r.getVolumesList),
+		//	router.NewGetRoute("/volumes/{name:.*}", r.getVolumeByName),
+		switch action {
+		case "":
+			if resource == "" {
+				return portainer.OperationDockerVolumeList
+			} else {
+				return portainer.OperationDockerVolumeInspect
+			}
+		}
+	case http.MethodPost:
+		//router.NewPostRoute("/volumes/create", r.postVolumesCreate),
+		//	router.NewPostRoute("/volumes/prune", r.postVolumesPrune),
+		switch action {
+		case "":
+			if resource == "create" {
+				return portainer.OperationDockerVolumeCreate
+			} else if resource == "prune" {
+				return portainer.OperationDockerVolumePrune
+			}
+		}
+	case http.MethodDelete:
+		// DELETE
+		//router.NewDeleteRoute("/volumes/{name:.*}", r.deleteVolumes),
+		if resource != "" && action == "" {
+			return portainer.OperationDockerVolumeDelete
+		}
+	}
+
+	return portainer.OperationDockerVolumes
+}
+
+// Based on the routes available at
+// https://github.com/moby/moby/blob/c12f09bf99/api/server/router/container/container.go#L31
+func dockerExecOperationAuthorization(url, method string) portainer.Authorization {
+	_, action := extractResourceAndActionFromURL("exec", url)
+
+	switch method {
+	case http.MethodGet:
+		// GET
+		// 		router.NewGetRoute("/exec/{id:.*}/json", r.getExecByID),
+		if action == "json" {
+			return portainer.OperationDockerExecInspect
+		}
+	case http.MethodPost:
+		// POST
+		//router.NewPostRoute("/exec/{name:.*}/start", r.postContainerExecStart),
+		//	router.NewPostRoute("/exec/{name:.*}/resize", r.postContainerExecResize),
+		if action == "start" {
+			return portainer.OperationDockerExecStart
+		} else if action == "resize" {
+			return portainer.OperationDockerExecResize
+		}
+	}
+
+	return portainer.OperationDockerExec
+}
+
+// Based on the routes available at
+// https://github.com/moby/moby/blob/c12f09bf99/api/server/router/swarm/cluster.go#L25
+func dockerSwarmOperationAuthorization(url, method string) portainer.Authorization {
+	resource, action := extractResourceAndActionFromURL("swarm", url)
+
+	switch method {
+	case http.MethodGet:
+		// GET
+		//	router.NewGetRoute("/swarm", sr.inspectCluster),
+		//	router.NewGetRoute("/swarm/unlockkey", sr.getUnlockKey),
+
+		// TODO: example of potential Docker API evolution that we need to support
+		// What if Docker adds GET /swarm/newfeature ?
+		switch action {
+		case "":
+			if resource == "" {
+				return portainer.OperationDockerSwarmInspect
+			} else {
+				return portainer.OperationDockerSwarmUnlockKey
+			}
+		}
+	case http.MethodPost:
+		// POST
+		//router.NewPostRoute("/swarm/init", sr.initCluster),
+		//	router.NewPostRoute("/swarm/join", sr.joinCluster),
+		//	router.NewPostRoute("/swarm/leave", sr.leaveCluster),
+		//	router.NewPostRoute("/swarm/update", sr.updateCluster),
+		//	router.NewPostRoute("/swarm/unlock", sr.unlockCluster),
+		switch action {
+		case "":
+			switch resource {
+			case "init":
+				return portainer.OperationDockerSwarmInit
+			case "join":
+				return portainer.OperationDockerSwarmJoin
+			case "leave":
+				return portainer.OperationDockerSwarmLeave
+			case "update":
+				return portainer.OperationDockerSwarmUpdate
+			case "unlock":
+				return portainer.OperationDockerSwarmUnlock
+			}
+		}
+	}
+
+	return portainer.OperationDockerSwarm
+}
+
+// Based on the routes available at
+// https://github.com/moby/moby/blob/c12f09bf99/api/server/router/swarm/cluster.go#L25
+func dockerNodeOperationAuthorization(url, method string) portainer.Authorization {
+	resource, action := extractResourceAndActionFromURL("nodes", url)
+
+	switch method {
+	case http.MethodGet:
+		// GET
+		//router.NewGetRoute("/nodes", sr.getNodes),
+		//	router.NewGetRoute("/nodes/{id}", sr.getNode),
+		switch action {
+		case "":
+			if resource == "" {
+				return portainer.OperationDockerNodeList
+			} else {
+				return portainer.OperationDockerNodeInspect
+			}
+		}
+	case http.MethodPost:
+		// POST
+		//	router.NewPostRoute("/nodes/{id}/update", sr.updateNode)
+		if action == "update" {
+			return portainer.OperationDockerNodeUpdate
+		}
+	case http.MethodDelete:
+		// DELETE
+		//	router.NewDeleteRoute("/nodes/{id}", sr.removeNode),
+		if resource != "" {
+			return portainer.OperationDockerNodeDelete
+		}
+
+	}
+
+	return portainer.OperationDockerNodes
+}
+
+// Based on the routes available at
+// https://github.com/moby/moby/blob/c12f09bf99/api/server/router/swarm/cluster.go#L25
+func dockerServiceOperationAuthorization(url, method string) portainer.Authorization {
+	resource, action := extractResourceAndActionFromURL("services", url)
+
+	switch method {
+	case http.MethodGet:
+		//// GET
+		//router.NewGetRoute("/services", sr.getServices),
+		//	router.NewGetRoute("/services/{id}", sr.getService),
+		//	router.NewGetRoute("/services/{id}/logs", sr.getServiceLogs),
+		switch action {
+		case "":
+			if resource == "" {
+				return portainer.OperationDockerServiceList
+			} else {
+				return portainer.OperationDockerServiceInspect
+			}
+		case "logs":
+			return portainer.OperationDockerServiceLogs
+		}
+	case http.MethodPost:
+		//// POST
+		//	router.NewPostRoute("/services/create", sr.createService),
+		//	router.NewPostRoute("/services/{id}/update", sr.updateService),
+		switch action {
+		case "":
+			if resource == "create" {
+				return portainer.OperationDockerServiceCreate
+			}
+		case "update":
+			return portainer.OperationDockerServiceUpdate
+		}
+	case http.MethodDelete:
+		//// DELETE
+		//	router.NewDeleteRoute("/services/{id}", sr.removeService),
+		if resource != "" && action == "" {
+			return portainer.OperationDockerServiceDelete
+		}
+	}
+
+	return portainer.OperationDockerServices
+}
+
+// Based on the routes available at
+// https://github.com/moby/moby/blob/c12f09bf99/api/server/router/swarm/cluster.go#L25
+func dockerSecretOperationAuthorization(url, method string) portainer.Authorization {
+	resource, action := extractResourceAndActionFromURL("secrets", url)
+
+	switch method {
+	case http.MethodGet:
+		//// GET
+		//router.NewGetRoute("/secrets", sr.getSecrets),
+		//	router.NewGetRoute("/secrets/{id}", sr.getSecret),
+		switch action {
+		case "":
+			if resource == "" {
+				return portainer.OperationDockerSecretList
+			} else {
+				return portainer.OperationDockerSecretInspect
+			}
+		}
+	case http.MethodPost:
+		//// POST
+		//	router.NewPostRoute("/secrets/create", sr.createSecret),
+		//	router.NewPostRoute("/secrets/{id}/update", sr.updateSecret),
+		switch action {
+		case "":
+			if resource == "create" {
+				return portainer.OperationDockerSecretCreate
+			}
+		case "update":
+			return portainer.OperationDockerSecretUpdate
+		}
+	case http.MethodDelete:
+		//// DELETE
+		//	router.NewDeleteRoute("/secrets/{id}", sr.removeSecret),
+		if resource != "" && action == "" {
+			return portainer.OperationDockerSecretDelete
+		}
+	}
+
+	return portainer.OperationDockerSecrets
+}
+
+// Based on the routes available at
+// https://github.com/moby/moby/blob/c12f09bf99/api/server/router/swarm/cluster.go#L25
+func dockerConfigOperationAuthorization(url, method string) portainer.Authorization {
+	resource, action := extractResourceAndActionFromURL("configs", url)
+
+	switch method {
+	case http.MethodGet:
+		//// GET
+		//router.NewGetRoute("/configs", sr.getConfigs),
+		//	router.NewGetRoute("/configs/{id}", sr.getConfig),
+		switch action {
+		case "":
+			if resource == "" {
+				return portainer.OperationDockerConfigList
+			} else {
+				return portainer.OperationDockerConfigInspect
+			}
+		}
+	case http.MethodPost:
+		//// POST
+		//	router.NewPostRoute("/configs/create", sr.createConfig),
+		//	router.NewPostRoute("/configs/{id}/update", sr.updateConfig),
+		switch action {
+		case "":
+			if resource == "create" {
+				return portainer.OperationDockerConfigCreate
+			}
+		case "update":
+			return portainer.OperationDockerConfigUpdate
+		}
+	case http.MethodDelete:
+		//// DELETE
+		//	router.NewDeleteRoute("/configs/{id}", sr.removeConfig),
+		if resource != "" && action == "" {
+			return portainer.OperationDockerConfigDelete
+		}
+	}
+
+	return portainer.OperationDockerConfigs
+}
+
+// Based on the routes available at
+// https://github.com/moby/moby/blob/c12f09bf99/api/server/router/swarm/cluster.go#L25
+func dockerTaskOperationAuthorization(url, method string) portainer.Authorization {
+	resource, action := extractResourceAndActionFromURL("tasks", url)
+
+	switch method {
+	case http.MethodGet:
+		//// GET
+		//router.NewGetRoute("/tasks", sr.getTasks),
+		//	router.NewGetRoute("/tasks/{id}", sr.getTask),
+		//	router.NewGetRoute("/tasks/{id}/logs", sr.getTaskLogs),
+		switch action {
+		case "":
+			if resource == "" {
+				return portainer.OperationDockerTaskList
+			} else {
+				return portainer.OperationDockerTaskInspect
+			}
+		case "logs":
+			return portainer.OperationDockerTaskLogs
+		}
+	}
+
+	return portainer.OperationDockerTasks
+}
+
+// Based on the routes available at
+//https://github.com/moby/moby/blob/c12f09bf99/api/server/router/plugin/plugin.go#L25
+func dockerPluginOperationAuthorization(url, method string) portainer.Authorization {
+	resource, action := extractResourceAndActionFromURL("plugins", url)
+
+	switch method {
+	case http.MethodGet:
+		//// GET
+		//router.NewGetRoute("/plugins", r.listPlugins),
+		//	router.NewGetRoute("/plugins/{name:.*}/json", r.inspectPlugin),
+		//	router.NewGetRoute("/plugins/privileges", r.getPrivileges),
+		switch action {
+		case "":
+			if resource == "" {
+				return portainer.OperationDockerPluginList
+			} else if resource == "privileges" {
+				return portainer.OperationDockerPluginPrivileges
+			}
+		case "json":
+			return portainer.OperationDockerPluginInspect
+		}
+	case http.MethodPost:
+		//// POST
+		//	router.NewPostRoute("/plugins/pull", r.pullPlugin),
+		//	router.NewPostRoute("/plugins/create", r.createPlugin),
+		//	router.NewPostRoute("/plugins/{name:.*}/enable", r.enablePlugin),
+		//	router.NewPostRoute("/plugins/{name:.*}/disable", r.disablePlugin),
+		//	router.NewPostRoute("/plugins/{name:.*}/push", r.pushPlugin),
+		//	router.NewPostRoute("/plugins/{name:.*}/upgrade", r.upgradePlugin),
+		//	router.NewPostRoute("/plugins/{name:.*}/set", r.setPlugin),
+		switch action {
+		case "":
+			if resource == "pull" {
+				return portainer.OperationDockerPluginPull
+			} else if resource == "create" {
+				return portainer.OperationDockerPluginCreate
+			}
+		case "enable":
+			return portainer.OperationDockerPluginEnable
+		case "disable":
+			return portainer.OperationDockerPluginDisable
+		case "push":
+			return portainer.OperationDockerPluginPush
+		case "upgrade":
+			return portainer.OperationDockerPluginUpgrade
+		case "set":
+			return portainer.OperationDockerPluginSet
+		}
+	case http.MethodDelete:
+		//// DELETE
+		//	router.NewDeleteRoute("/plugins/{name:.*}", r.removePlugin),
+		if resource != "" && action == "" {
+			return portainer.OperationDockerPluginDelete
+		}
+	}
+
+	return portainer.OperationDockerPlugins
+}
+
+// Based on the routes available at
+// https://github.com/moby/moby/blob/c12f09bf99/api/server/router/session/session.go
+func dockerSessionOperationAuthorization(url, method string) portainer.Authorization {
+	resource, action := extractResourceAndActionFromURL("session", url)
+
+	switch method {
+	case http.MethodPost:
+		//// POST
+		//router.NewPostRoute("/session", r.startSession),
+		if action == "" && resource == "" {
+			return portainer.OperationDockerSessionStart
+		}
+	}
+
+	return portainer.OperationDockerSessions
+}
+
+// Based on the routes available at
+// https://github.com/moby/moby/blob/c12f09bf99/api/server/router/distribution/distribution.go#L26
+func dockerDistributionOperationAuthorization(url, method string) portainer.Authorization {
+	_, action := extractResourceAndActionFromURL("distribution", url)
+
+	switch method {
+	case http.MethodGet:
+		//// GET
+		//router.NewGetRoute("/distribution/{name:.*}/json", r.getDistributionInfo),
+		if action == "json" {
+			return portainer.OperationDockerDistributionInspect
+		}
+	}
+
+	return portainer.OperationDockerDistributions
+}
+
+// Based on the routes available at
+// https://github.com/moby/moby/blob/c12f09bf99/api/server/router/container/container.go#L31
+func dockerCommitOperationAuthorization(url, method string) portainer.Authorization {
+	resource, action := extractResourceAndActionFromURL("commit", url)
+
+	switch method {
+	case http.MethodPost:
+		//// POST
+		// router.NewPostRoute("/commit", r.postCommit),
+		if resource == "" && action == "" {
+			return portainer.OperationDockerImageCommit
+		}
+	}
+
+	return portainer.OperationDockerCommit
+}
+
+// Based on the routes available at
+// https://github.com/moby/moby/blob/c12f09bf99/api/server/router/build/build.go#L32
+func dockerBuildOperationAuthorization(url, method string) portainer.Authorization {
+	resource, action := extractResourceAndActionFromURL("build", url)
+
+	switch method {
+	case http.MethodPost:
+		//// POST
+		//	router.NewPostRoute("/build", r.postBuild),
+		//	router.NewPostRoute("/build/prune", r.postPrune),
+		//	router.NewPostRoute("/build/cancel", r.postCancel),
+		switch action {
+		case "":
+			if resource == "" {
+				return portainer.OperationDockerImageBuild
+			} else if resource == "prune" {
+				return portainer.OperationDockerBuildPrune
+			} else if resource == "cancel" {
+				return portainer.OperationDockerBuildCancel
+			}
+		}
+	}
+
+	return portainer.OperationDockerBuilds
+}
+
 // Based on the routes available at
 // https://github.com/moby/moby/blob/c12f09bf99/api/server/router/image/image.go#L26
 func dockerImageOperationAuthorization(url, method string) portainer.Authorization {
-	routeResource := "images"
-	routePattern := regexp.MustCompile(`/` + routeResource + `/(?P<resource>[^/]*)/?(?P<action>.*)?`)
-	lastMatch := findNamedMatches(routePattern, url)
-	fmt.Printf("IMAGE OPERATION: %s,%s | resource: %s | action: %s\n", method, url, lastMatch["resource"], lastMatch["action"])
-	resource := lastMatch["resource"]
-	action := lastMatch["action"]
+	resource, action := extractResourceAndActionFromURL("images", url)
 
 	switch method {
 	case http.MethodGet:
@@ -207,7 +701,9 @@ func dockerImageOperationAuthorization(url, method string) portainer.Authorizati
 				return portainer.OperationDockerImagePrune
 			}
 		case "push":
+			return portainer.OperationDockerImagePush
 		case "tag":
+			return portainer.OperationDockerImageTag
 		}
 	case http.MethodDelete:
 		//// DELETE
@@ -223,12 +719,7 @@ func dockerImageOperationAuthorization(url, method string) portainer.Authorizati
 // Based on the routes available at
 // https://github.com/moby/moby/blob/c12f09bf99/api/server/router/container/container.go#L31
 func dockerContainerOperationAuthorization(url, method string) portainer.Authorization {
-	routeResource := "containers"
-	routePattern := regexp.MustCompile(`/` + routeResource + `/(?P<resource>[^/]*)/?(?P<action>.*)?`)
-	lastMatch := findNamedMatches(routePattern, url)
-	fmt.Printf("CONTAINER OPERATION: %s,%s | resource: %s | action: %s\n", method, url, lastMatch["resource"], lastMatch["action"])
-	resource := lastMatch["resource"]
-	action := lastMatch["action"]
+	resource, action := extractResourceAndActionFromURL("containers", url)
 
 	switch method {
 	case http.MethodHead:

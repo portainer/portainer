@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/portainer/portainer/api/http/handler/authorizationsets"
+	"github.com/portainer/portainer/api/http/handler/roles"
 
 	"github.com/portainer/portainer/api/http/handler/auth"
 	"github.com/portainer/portainer/api/http/handler/dockerhub"
@@ -34,7 +34,7 @@ import (
 type Handler struct {
 	AuthHandler *auth.Handler
 
-	RoleHandler            *authorizationsets.Handler
+	RoleHandler            *roles.Handler
 	DockerHubHandler       *dockerhub.Handler
 	EndpointGroupHandler   *endpointgroups.Handler
 	EndpointHandler        *endpoints.Handler
