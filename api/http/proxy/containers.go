@@ -148,11 +148,14 @@ func filterContainerList(containerData []interface{}, context *restrictedOperati
 
 		containerID := containerObject[containerIdentifier].(string)
 		containerObject, access := applyResourceAccessControl(containerObject, containerID, context)
-		if !access {
-			containerLabels := extractContainerLabelsFromContainerListObject(containerObject)
+		containerLabels := extractContainerLabelsFromContainerListObject(containerObject)
+		if len(containerLabels) > 0 {
 			containerObject, access = applyResourceAccessControlFromLabel(containerLabels, containerObject, containerLabelForComposeStackIdentifier, context)
 			if !access {
-				containerObject, access = applyResourceAccessControlFromLabel(containerLabels, containerObject, containerLabelForServiceIdentifier, context)
+				// Skip isPublicByDefault value when checking service labels because other why container with resource control on stack level will be ignored.
+				tempContext := context
+				tempContext.isPublicByDefault = false
+				containerObject, access = applyResourceAccessControlFromLabel(containerLabels, containerObject, containerLabelForServiceIdentifier, tempContext)
 				if !access {
 					containerObject, access = applyResourceAccessControlFromLabel(containerLabels, containerObject, containerLabelForSwarmStackIdentifier, context)
 				}

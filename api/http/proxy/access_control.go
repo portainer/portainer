@@ -149,7 +149,7 @@ func CanAccessStack(stack *portainer.Stack, resourceControl *portainer.ResourceC
 
 // FilterStacks filters stacks based on user role and resource controls.
 func FilterStacks(stacks []portainer.Stack, resourceControls []portainer.ResourceControl, isAdmin bool,
-	userID portainer.UserID, memberships []portainer.TeamMembership, IsPublicByDefault bool) []ExtendedStack {
+	userID portainer.UserID, memberships []portainer.TeamMembership, isPublicByDefault bool) []ExtendedStack {
 
 	filteredStacks := make([]ExtendedStack, 0)
 
@@ -160,7 +160,7 @@ func FilterStacks(stacks []portainer.Stack, resourceControls []portainer.Resourc
 
 	for _, stack := range stacks {
 		extendedStack := ExtendedStack{stack, portainer.ResourceControl{}}
-		resourceControl := getResourceControlByResourceID(stack.Name, resourceControls, IsPublicByDefault)
+		resourceControl := getResourceControlByResourceID(stack.Name, resourceControls, isPublicByDefault)
 		if isAdmin || resourceControl.Public || canUserAccessResource(userID, userTeamIDs, resourceControl) {
 			extendedStack.ResourceControl = *resourceControl
 			filteredStacks = append(filteredStacks, extendedStack)

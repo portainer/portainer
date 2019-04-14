@@ -129,8 +129,9 @@ func filterServiceList(serviceData []interface{}, context *restrictedOperationCo
 
 		serviceID := serviceObject[serviceIdentifier].(string)
 		serviceObject, access := applyResourceAccessControl(serviceObject, serviceID, context)
-		if !access {
-			serviceLabels := extractServiceLabelsFromServiceListObject(serviceObject)
+		serviceLabels := extractServiceLabelsFromServiceListObject(serviceObject)
+
+		if len(serviceLabels) > 0 {
 			serviceObject, access = applyResourceAccessControlFromLabel(serviceLabels, serviceObject, serviceLabelForStackIdentifier, context)
 		}
 

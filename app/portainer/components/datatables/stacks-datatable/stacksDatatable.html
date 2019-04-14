@@ -69,7 +69,7 @@
                 <span ng-if="!item.External">Total</span>
               </td>
               <td ng-if="$ctrl.showOwnershipColumn">
-                <span>
+                <span ng-if="!item.External">
                   <i ng-class="item.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
                   {{ item.ResourceControl.Ownership ? item.ResourceControl.Ownership : item.ResourceControl.Ownership = 'administrators' }}
                 </span>
