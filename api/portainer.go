@@ -1013,7 +1013,7 @@ const (
 	OperationDockerContainerExec                Authorization = "DockerContainerExec"
 	OperationDockerContainerRename              Authorization = "DockerContainerRename"
 	OperationDockerContainerUpdate              Authorization = "DockerContainerUpdate"
-	OperationDockerContainerPutContainerArchive Authorization = "DockerContainerPutContainerArchive "
+	OperationDockerContainerPutContainerArchive Authorization = "DockerContainerPutContainerArchive"
 	OperationDockerContainerDelete              Authorization = "DockerContainerDelete"
 	OperationDockerImageList                    Authorization = "DockerImageList "
 	OperationDockerImageSearch                  Authorization = "DockerImageSearch "
@@ -1177,12 +1177,17 @@ const (
 	OperationPortainerWebhookCreate             Authorization = "PortainerWebhookCreate"
 	OperationPortainerWebhookDelete             Authorization = "PortainerWebhookDelete"
 
+	// TODO: single top-resource operation
+	OperationDockerPing    Authorization = "DockerPing"
+	OperationDockerInfo    Authorization = "DockerInfo"
+	OperationDockerEvents  Authorization = "DockerEvents"
+	OperationDockerSystem  Authorization = "DockerSystem"
+	OperationDockerVersion Authorization = "DockerVersion"
+
 	// TODO: generics, should be reviewed
 	// if we keep these ones, should it have a particular value?
 	OperationDockerContainers    Authorization = "DockerContainer"
 	OperationDockerImages        Authorization = "DockerImages"
-	OperationDockerInfo          Authorization = "DockerInfo"
-	OperationDockerVersion       Authorization = "DockerVersion"
 	OperationDockerNetworks      Authorization = "DockerNetworks"
 	OperationDockerVolumes       Authorization = "DockerVolumes"
 	OperationDockerExec          Authorization = "DockerExec"
@@ -1193,12 +1198,9 @@ const (
 	OperationDockerConfigs       Authorization = "DockerConfigs"
 	OperationDockerTasks         Authorization = "DockerTasks"
 	OperationDockerPlugins       Authorization = "DockerPlugins"
-	OperationDockerPing          Authorization = "DockerPing"
-	OperationDockerEvents        Authorization = "DockerEvents"
 	OperationDockerSessions      Authorization = "DockerSessions"
 	OperationDockerDistributions Authorization = "DockerDistributions"
 	OperationDockerCommit        Authorization = "DockerCommit"
 	OperationDockerBuilds        Authorization = "DockerBuilds"
-	OperationDockerSystem        Authorization = "DockerSystem"
 	OperationPortainerAdmin      Authorization = "PortainerAdmin"
 )

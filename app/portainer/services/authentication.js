@@ -13,6 +13,7 @@ function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManage
   service.logout = logout;
   service.isAuthenticated = isAuthenticated;
   service.getUserDetails = getUserDetails;
+  service.hasAuthorizations = hasAuthorizations;
 
   function init() {
     var jwt = LocalStorage.getJWT();
@@ -57,6 +58,18 @@ function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManage
     user.username = tokenPayload.username;
     user.ID = tokenPayload.id;
     user.role = tokenPayload.role;
+    user.authorizations = tokenPayload.authorizations;
+  }
+
+  function hasAuthorizations(authorization) {
+    console.log(authorization);
+    if (user.authorizations[authorization]) {
+      console.log('truedat');
+      return true;
+    }
+    console.log('nopedat');
+
+    return false;
   }
 
   return service;

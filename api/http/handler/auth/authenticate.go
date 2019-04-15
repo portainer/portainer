@@ -124,18 +124,33 @@ func (handler *Handler) writeToken(w http.ResponseWriter, user *portainer.User) 
 
 	// TODO: only if extension is enabled
 	// If no role associated to the user, check for team auths
+	associatedRole := 0
 	if user.RoleID == 0 {
-		//userMemberships, err := handler.TeamMembershipService.TeamMembershipsByUserID(user.ID)
-		//if err != nil {
-		//	return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user team memberships", err}
-		//}
+		userMemberships, err := handler.TeamMembershipService.TeamMembershipsByUserID(user.ID)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user team memberships", err}
+		}
 
-		// TODO: handle multiple team roles
+		// TODO: handle multiple team roles, at the moment only load from first available team
 		//for _, membership := range userMemberships {
 		//
 		//}
+
+		if len(userMemberships) > 0 {
+			team, err := handler.TeamService.Team(userMemberships[0].TeamID)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve team associated to the user", err}
+			}
+
+			associatedRole = int(team.RoleID)
+		}
+
 	} else {
-		userRole, err := handler.RoleService.Role(user.RoleID)
+		associatedRole = int(user.RoleID)
+	}
+
+	if associatedRole != 0 {
+		userRole, err := handler.RoleService.Role(portainer.RoleID(associatedRole))
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve authorizations associated to the user", err}
 		}

@@ -24,11 +24,11 @@ func extractMatches(regex *regexp.Regexp, str string) map[string]string {
 }
 
 func extractResourceAndActionFromURL(routeResource, url string) (string, string) {
-	routePattern := regexp.MustCompile(`/` + routeResource + `/(?P<resource>[^/]*)/?(?P<action>.*)?`)
+	routePattern := regexp.MustCompile(`/` + routeResource + `/(?P<resource>[^/?]*)/?(?P<action>[^?]*)?(\?.*)?`)
 	urlComponents := extractMatches(routePattern, url)
 
 	// TODO: optional log statement for debug
-	//fmt.Printf("IMAGE OPERATION: %s,%s | resource: %s | action: %s\n", method, url, urlComponents["resource"], urlComponents["action"])
+	fmt.Printf("[DEBUG] - RBAC | OPERATION: %s | resource: %s | action: %s\n", url, urlComponents["resource"], urlComponents["action"])
 
 	return urlComponents["resource"], urlComponents["action"]
 }
@@ -48,8 +48,9 @@ func checkPermissions(r *http.Request) error {
 }
 
 func authorizedOperation(r *http.Request, authorizations portainer.Authorizations) bool {
-	log.Printf("RBAC | Permission check for %s - %s", r.Method, r.URL.String())
+	log.Printf("[INFO] - RBAC | Permission check for %s - %s", r.Method, r.URL.String())
 	operationAuthorization := getOperationAuthorization(r.URL.String(), r.Method)
+	log.Printf("[DEBUG] - RBAC | Required authorization: %s\n", operationAuthorization)
 	return authorizations[operationAuthorization]
 }
 
@@ -66,6 +67,8 @@ func getOperationAuthorization(url, method string) portainer.Authorization {
 func getRegistryOperationAuthorization(url, method string) portainer.Authorization {
 	fmt.Printf("Registry operation: %s,%s\n", method, url)
 
+	// TODO: must be defined, at the moment only allowed to PortainerAdmin
+
 	//urlParts := strings.Split(url, "/")
 	//baseResource := urlParts[1]
 
@@ -75,10 +78,8 @@ func getRegistryOperationAuthorization(url, method string) portainer.Authorizati
 }
 
 func getPortainerOperationAuthorization(url, method string) portainer.Authorization {
-	fmt.Printf("Portainer operation: %s,%s\n", method, url)
-
 	urlParts := strings.Split(url, "/")
-	baseResource := urlParts[1]
+	baseResource := strings.Split(urlParts[1], "?")[0]
 
 	// TODO: consider public endpoints evolutions?
 	// right now, "status" and "auth" are not processed as they expose
@@ -130,7 +131,7 @@ func getPortainerOperationAuthorization(url, method string) portainer.Authorizat
 
 func getDockerOperationAuthorization(url, method string) portainer.Authorization {
 	urlParts := strings.Split(url, "/")
-	baseResource := urlParts[1]
+	baseResource := strings.Split(urlParts[1], "?")[0]
 
 	switch baseResource {
 	case "containers":
@@ -247,15 +248,15 @@ func portainerEndpointOperationAuthorization(url, method string) portainer.Autho
 		case "":
 			if resource == "" {
 				return portainer.OperationPortainerEndpointCreate
+			} else if resource == "snapshot" {
+				return portainer.OperationPortainerEndpointSnapshots
 			}
 		case "extensions":
 			return portainer.OperationPortainerEndpointExtensionAdd
 		case "job":
 			return portainer.OperationPortainerEndpointJob
 		case "snapshot":
-			if resource == "" {
-				return portainer.OperationPortainerEndpointSnapshots
-			} else if resource != "" {
+			if resource != "" {
 				return portainer.OperationPortainerEndpointSnapshot
 			}
 		}
@@ -269,7 +270,7 @@ func portainerEndpointOperationAuthorization(url, method string) portainer.Autho
 		if resource != "" && action == "" {
 			return portainer.OperationPortainerEndpointDelete
 			// TODO: check this one works
-		} else if resource == "extensions" {
+		} else if strings.HasPrefix(action, "extensions/") {
 			return portainer.OperationPortainerEndpointExtensionRemove
 		}
 	}
@@ -1203,9 +1204,13 @@ func dockerImageOperationAuthorization(url, method string) portainer.Authorizati
 	case http.MethodDelete:
 		//// DELETE
 		//	router.NewDeleteRoute("/images/{name:.*}", r.deleteImages)
-		if resource != "" && action == "" {
-			return portainer.OperationDockerImageDelete
-		}
+		// TODO: Handle with care, the name of the image can actually contain / and
+		// mess with the regexp recognition pattern.
+		// e.g: DELETE - /1/docker/images/192.168.178.142:8081/repository/repositorytest/test:latest?force=false
+		// Consider not returning by default if we want to support DELETE operations on other endpoints in the future
+		return portainer.OperationDockerImageDelete
+		//if resource != "" && action == "" {
+		//}
 	}
 
 	return portainer.OperationDockerImages
