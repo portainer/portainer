@@ -253,14 +253,13 @@ func streamFromWebsocketConnToTCPConn(websocketConn *websocket.Conn, tcpConn net
 
 func streamFromTCPConnToWebsocketConn(websocketConn *websocket.Conn, br *bufio.Reader, errorChan chan error) {
 	for {
-		out := make([]byte, 2048)
-		_, err := br.Read(out)
+		out, _, err := br.ReadRune()
 		if err != nil {
 			errorChan <- err
 			break
 		}
 
-		err = websocketConn.WriteMessage(websocket.TextMessage, out)
+		err = websocketConn.WriteMessage(websocket.TextMessage, []byte(string(out)))
 		if err != nil {
 			errorChan <- err
 			break
