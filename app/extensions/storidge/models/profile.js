@@ -13,7 +13,8 @@ export function StoridgeProfileDefaultModel() {
   this.SnapshotInterval = 1440;
   this.SnapshotMax = 1;
   this.EncryptionEnabled = false;
-  this.InterfaceType = 'nfs';
+  // this.InterfaceType = 'nfs';
+  this.InterfaceType = '';
   this.InterfaceDriver = '';
   this.InterfaceNetwork = '';
   this.InterfaceConf = '';
@@ -89,6 +90,7 @@ export function StoridgeCreateProfileRequest(model) {
     };
   }
 
+// TODO: investigate bandwith
   if (model.MinBandwidth && model.MaxBandwidth) {
     this.bandwidth = {
       min: model.MinBandwidth,
@@ -100,6 +102,7 @@ export function StoridgeCreateProfileRequest(model) {
 
   var service = {};
 
+// TODO: investigate snapshot
   service.snapshot = {
     enabled: model.SnapshotEnabled
   };
