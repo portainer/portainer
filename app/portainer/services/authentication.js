@@ -1,6 +1,6 @@
 angular.module('portainer.app')
 .factory('Authentication', [
-'Auth', 'OAuth', 'jwtHelper', 'LocalStorage', 'StateManager', 'EndpointProvider', 
+'Auth', 'OAuth', 'jwtHelper', 'LocalStorage', 'StateManager', 'EndpointProvider',
 function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManager, EndpointProvider) {
   'use strict';
 
@@ -62,13 +62,9 @@ function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManage
   }
 
   function hasAuthorizations(authorization) {
-    console.log(authorization);
     if (user.authorizations[authorization]) {
-      console.log('truedat');
       return true;
     }
-    console.log('nopedat');
-
     return false;
   }
 
