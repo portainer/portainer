@@ -13,7 +13,6 @@ export function StoridgeProfileDefaultModel() {
   this.SnapshotInterval = 1440;
   this.SnapshotMax = 1;
   this.EncryptionEnabled = false;
-  // this.InterfaceType = 'nfs';
   this.InterfaceType = '';
   this.InterfaceDriver = '';
   this.InterfaceNetwork = '';
@@ -118,11 +117,14 @@ export function StoridgeCreateProfileRequest(model) {
   this.service = service;
 
   this.interface = {
-    type: model.InterfaceType,
     driver: model.InterfaceDriver,
     network: model.InterfaceNetwork,
     conf: model.InterfaceConf
   };
+
+  if (model.InterfaceType) {
+    this.interface.type = model.InterfaceType;
+  }
 
   this.label = model.Labels;
 }

@@ -1,10 +1,10 @@
 export function StoridgeVolumeModel(data) {
-  this.Allocated = data['alloc percent'];
+  this.Allocated = data.allocated;
   this.Capacity = data.capacity;
   this.Directory = data.directory;
-  this.IOPSMax = data.iopsmax;
-  this.IOPSMin = data.iopsmin;
-  this.LocalDriveOnly = data.localdriveonly;
+  this.IOPSMax = data.maximumIOPS;
+  this.IOPSMin = data.minimumIOPS;
+  this.LocalDriveOnly = data.localDriveOnly;
   this.Name = data.name;
   this.Node = data.node;
   this.NodeID = data.nodeid;
@@ -15,11 +15,11 @@ export function StoridgeVolumeModel(data) {
   this.Labels = data.labels;
 
   this.IP = data.ipaddr;
-  this.DriveType = data.type;
+  this.DriveType = data.driveType;
   this.Encryption = data.encryption;
   this.SnapshotEnabled = data.snapshot;
-  this.SnapshotInterval = data.snapinterval;
-  this.SnapshotMax = data.snapmax;
+  this.SnapshotInterval = data.snapInterval;
+  this.SnapshotMax = data.maximumSnapshots;
   this.Filesystem = data.filesystem;
 }
 

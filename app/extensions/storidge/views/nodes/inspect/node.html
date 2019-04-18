@@ -11,15 +11,15 @@
     <rd-widget>
       <rd-widget-header icon="fa-object-group" title-text="Node details">
         <button type="button" class="btn btn-sm btn-danger"
-          ng-disabled="node.Status !== 'normal'" ng-click="removeNodeAction()">
+          ng-disabled="node.Status !== 'Normal'" ng-click="removeNodeAction()">
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove node
         </button>
         <button type="button" class="btn btn-sm btn-primary"
-          ng-disabled="node.Status !== 'normal'" ng-click="cordonNodeAction()">
+          ng-disabled="node.Status !== 'Normal'" ng-click="cordonNodeAction()">
           <i class="fas fa-wrench space-right" aria-hidden="true"></i>Enter maintenance mode
         </button>
         <button type="button" class="btn btn-sm btn-primary"
-          ng-disabled="node.Status !== 'cordoned'" ng-click="uncordonNodeAction()">
+          ng-disabled="node.Status !== 'Cordoned'" ng-click="uncordonNodeAction()">
           <i class="fa fa-power-off space-right" aria-hidden="true"></i>Exit maintenance mode
         </button>
       </rd-widget-header>
