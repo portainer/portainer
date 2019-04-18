@@ -89,7 +89,6 @@ export function StoridgeCreateProfileRequest(model) {
     };
   }
 
-// TODO: investigate bandwith
   if (model.MinBandwidth && model.MaxBandwidth) {
     this.bandwidth = {
       min: model.MinBandwidth,
@@ -101,7 +100,6 @@ export function StoridgeCreateProfileRequest(model) {
 
   var service = {};
 
-// TODO: investigate snapshot
   service.snapshot = {
     enabled: model.SnapshotEnabled
   };
