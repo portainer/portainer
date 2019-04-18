@@ -14,7 +14,9 @@ angular.module('portainer.docker')
       var labels = {};
       if (labelKV) {
         labelKV.forEach(function(label) {
-          labels[label.key] = label.value;
+          if (label.key) {
+            labels[label.key] = label.value;
+          }
         });
       }
       return labels;
