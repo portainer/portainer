@@ -1,11 +1,9 @@
 // +build windows
 
-package websocket
+package netdial
 
 import (
 	"net"
-
-	"github.com/Microsoft/go-winio"
 )
 
 func createDial(scheme, host string) (net.Conn, error) {

@@ -1,6 +1,6 @@
 // +build !windows
 
-package websocket
+package netdial
 
 import (
 	"net"
