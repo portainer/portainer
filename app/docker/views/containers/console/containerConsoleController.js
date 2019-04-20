@@ -44,8 +44,6 @@ function ($scope, $transition$, AttachService, ContainerService, ImageService, E
     var termHeight = 30;
 
     var attachId = $transition$.params().id;
-    var jwtToken = LocalStorage.getJWT();
-
 
     ContainerService.container(attachId).then((details)=> {
 
@@ -55,15 +53,13 @@ function ($scope, $transition$, AttachService, ContainerService, ImageService, E
         return;
       }
 
-      let params = {
-        token: jwtToken,
+      const params = {
+        token: LocalStorage.getJWT(),
         endpointId: EndpointProvider.endpointID(),
         id: attachId
       };
 
-      let param_string = Object.keys(params).map((k) => k + "=" + params[k]).join("&");
-
-      var url = window.location.href.split('#')[0] + 'api/websocket/attach?' + param_string;
+      var url = window.location.href.split('#')[0] + 'api/websocket/attach?' + (Object.keys(params).map((k) => k + "=" + params[k]).join("&"));
 
       if ($transition$.params().nodeName) {
         url += '&nodeName=' + $transition$.params().nodeName;
@@ -103,12 +99,17 @@ function ($scope, $transition$, AttachService, ContainerService, ImageService, E
       Cmd: ContainerHelper.commandStringToArray(command)
     };
 
-    var execId;
     ContainerService.createExec(execConfig)
     .then(function success(data) {
-      execId = data.Id;
-      var jwtToken = LocalStorage.getJWT();
-      var url = window.location.href.split('#')[0] + 'api/websocket/exec?id=' + execId + '&endpointId=' + EndpointProvider.endpointID() + '&token=' + jwtToken;
+
+      const params = {
+        token: LocalStorage.getJWT(),
+        endpointId: EndpointProvider.endpointID(),
+        id: data.Id
+      };
+
+      var url = window.location.href.split('#')[0] + 'api/websocket/exec?' + (Object.keys(params).map((k) => k + "=" + params[k]).join("&"));
+
       if ($transition$.params().nodeName) {
         url += '&nodeName=' + $transition$.params().nodeName;
       }
@@ -118,7 +119,7 @@ function ($scope, $transition$, AttachService, ContainerService, ImageService, E
         url = url.replace('http://', 'ws://');
       }
       initTerm(url, termHeight, termWidth);
-      return ExecService.resizeTTY(execId, termHeight, termWidth, 2000);
+      return ExecService.resizeTTY(params.id, termHeight, termWidth, 2000);
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to exec into container');
