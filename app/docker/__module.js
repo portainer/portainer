@@ -75,25 +75,13 @@ angular.module('portainer.docker', ['portainer.app'])
     }
   };
 
-  var containerExec = {
-    name: 'docker.containers.container.exec',
-    url: '/exec',
+  var containerConsole = {
+    name: 'docker.containers.container.console',
+    url: '/console',
     views: {
       'content@': {
-        templateUrl: './views/containers/exec/containerexec.html',
-        controller: 'ContainerExecController'
-      }
-    }
-  };
-
-
-  var containerAttach = {
-    name: 'docker.containers.container.attach',
-    url: '/attach',
-    views: {
-      'content@': {
-        templateUrl: './views/containers/attach/containerattach.html',
-        controller: 'ContainerAttachController'
+        templateUrl: './views/containers/console/containerconsole.html',
+        controller: 'ContainerConsoleController'
       }
     }
   };
@@ -485,8 +473,7 @@ angular.module('portainer.docker', ['portainer.app'])
   $stateRegistryProvider.register(configCreation);
   $stateRegistryProvider.register(containers);
   $stateRegistryProvider.register(container);
-  $stateRegistryProvider.register(containerExec);
-  $stateRegistryProvider.register(containerAttach);
+  $stateRegistryProvider.register(containerConsole);
   $stateRegistryProvider.register(containerCreation);
   $stateRegistryProvider.register(containerInspect);
   $stateRegistryProvider.register(containerLogs);

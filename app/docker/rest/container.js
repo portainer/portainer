@@ -73,10 +73,6 @@ function ContainerFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, C
     },
     prune: {
       method: 'POST', params: { action: 'prune', filters: '@filters' }
-    },
-    resize: {
-      method: 'POST', params: {id: '@id', action: 'resize', h: '@height', w: '@width'},
-      transformResponse: genericHandler, ignoreLoadingBar: true
     }
   });
 }]);

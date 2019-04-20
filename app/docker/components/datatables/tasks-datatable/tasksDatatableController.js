@@ -4,9 +4,8 @@ function (PaginationService, DatatableService) {
   this.state = {
     showQuickActionStats: true,
     showQuickActionLogs: true,
-    showQuickActionExec: true,
+    showQuickActionConsole: true,
     showQuickActionInspect: true,
-    showQuickActionAttach: true,
     selectAll: false,
     orderBy: this.orderBy,
     paginatedItemLimit: PaginationService.getPaginationLimit(this.tableKey),
