@@ -1,13 +1,14 @@
 import { Terminal } from 'xterm';
 
 angular.module('portainer.docker')
-.controller('ContainerConsoleController', ['$scope', '$transition$', 'ContainerService', 'ImageService', 'EndpointProvider', 'Notifications', 'ContainerHelper', 'ExecService', 'HttpRequestHelper', 'LocalStorage', 'CONSOLE_COMMANDS_LABEL_PREFIX',
+.controller('ContainerExecController', ['$scope', '$transition$', 'ContainerService', 'ImageService', 'EndpointProvider', 'Notifications', 'ContainerHelper', 'ExecService', 'HttpRequestHelper', 'LocalStorage', 'CONSOLE_COMMANDS_LABEL_PREFIX',
 function ($scope, $transition$, ContainerService, ImageService, EndpointProvider, Notifications, ContainerHelper, ExecService, HttpRequestHelper, LocalStorage, CONSOLE_COMMANDS_LABEL_PREFIX) {
   var socket, term;
 
   $scope.state = {
     loaded: false,
-    connected: false
+    connected: false,
+    connecting: false
   };
 
   $scope.formValues = {};
@@ -21,6 +22,12 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
   });
 
   $scope.connect = function() {
+    if ($scope.state.connecting || $scope.state.connected) {
+      return;
+    }
+
+    $scope.state.connecting = true;
+
     var termWidth = Math.floor(($('#terminal-container').width() - 20) / 8.39);
     var termHeight = 30;
     var command = $scope.formValues.isCustomCommand ?
@@ -59,20 +66,17 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
   };
 
   $scope.disconnect = function() {
-    $scope.state.connected = false;
     if (socket !== null) {
       socket.close();
-    }
-    if (term !== null) {
-      term.destroy();
     }
   };
 
   function initTerm(url, height, width) {
     socket = new WebSocket(url);
 
-    $scope.state.connected = true;
     socket.onopen = function() {
+      $scope.state.connected = true;
+      $scope.state.connecting = false;
       term = new Terminal();
 
       term.on('data', function (data) {
@@ -92,10 +96,16 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
         term.write(e.data);
       };
       socket.onerror = function () {
-        $scope.state.connected = false;
+        $scope.disconnect();
+        term.write("\n\r(connection error)");
       };
       socket.onclose = function() {
         $scope.state.connected = false;
+        $scope.state.connecting = false;
+        term.write("\n\r(connection closed)");
+        if (term !== null) {
+          term.dispose();
+        }
       };
     };
   }

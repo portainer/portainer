@@ -24,7 +24,8 @@ function (PaginationService, DatatableService, EndpointProvider) {
     containerNameTruncateSize: 32,
     showQuickActionStats: true,
     showQuickActionLogs: true,
-    showQuickActionConsole: true,
+    showQuickActionExec: true,
+    showQuickActionAttach: true,
     showQuickActionInspect: true
   };
 

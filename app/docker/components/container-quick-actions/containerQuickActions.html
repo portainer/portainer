@@ -35,10 +35,17 @@
     <i class="fa fa-chart-area space-right" aria-hidden="true"></i>
   </a>
   <a 
-    ng-if="$ctrl.state.showQuickActionConsole && ['starting', 'running', 'healthy', 'unhealthy'].indexOf($ctrl.status) !== -1 && $ctrl.taskId === undefined" 
+    ng-if="$ctrl.state.showQuickActionExec && ['starting', 'running', 'healthy', 'unhealthy'].indexOf($ctrl.status) !== -1 && $ctrl.taskId === undefined"
     style="margin: 0 2.5px;" 
-    ui-sref="docker.containers.container.console({id: $ctrl.containerId, nodeName: $ctrl.nodeName})" 
-    title="Console">
+    ui-sref="docker.containers.container.exec({id: $ctrl.containerId, nodeName: $ctrl.nodeName})"
+    title="Execute Command">
     <i class="fa fa-terminal space-right" aria-hidden="true"></i>
+  </a>
+  <a
+    ng-if="$ctrl.state.showQuickActionAttach && ['starting', 'running', 'healthy', 'unhealthy'].indexOf($ctrl.status) !== -1 && $ctrl.taskId === undefined"
+    style="margin: 0 2.5px;"
+    ui-sref="docker.containers.container.attach({id: $ctrl.containerId, nodeName: $ctrl.nodeName})"
+    title="Attach">
+    <i class="fa fa-plug space-right" aria-hidden="true"></i>
   </a>
 </div>

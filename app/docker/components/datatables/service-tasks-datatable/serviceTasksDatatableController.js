@@ -9,7 +9,8 @@ function (DatatableService) {
     orderBy: this.orderBy,
     showQuickActionStats: true,
     showQuickActionLogs: true,
-    showQuickActionConsole: true,
+    showQuickActionExec: true,
+    showQuickActionAttach: true,
     showQuickActionInspect: true
   };
 
