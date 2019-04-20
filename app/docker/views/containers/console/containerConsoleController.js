@@ -51,6 +51,7 @@ function ($scope, $transition$, AttachService, ContainerService, ImageService, E
 
       if (!details.State.Running) {
         Notifications.error("Failure", details, "Container is not running!");
+        $scope.disconnect();
         return;
       }
 
@@ -75,9 +76,10 @@ function ($scope, $transition$, AttachService, ContainerService, ImageService, E
       initTerm(url, termHeight, termWidth);
       return AttachService.resizeTTY(attachId, termHeight, termWidth, 2000);
     })
-        .catch(function error(err) {
-          Notifications.error('Error', err, 'Unable to retrieve container details');
-        });
+    .catch(function error(err) {
+        Notifications.error('Error', err, 'Unable to retrieve container details');
+        $scope.disconnect();
+    });
   };
 
   $scope.connectExec = function() {
@@ -125,14 +127,14 @@ function ($scope, $transition$, AttachService, ContainerService, ImageService, E
   };
 
   $scope.disconnect = function() {
-    if (socket !== null) {
+    if (socket) {
       socket.close();
     }
     if ($scope.state > states.disconnected) {
       $scope.state = states.disconnected;
       $scope.mode = modes.none;
-      term.write("\n\r(connection closed)");
-      if (term !== null) {
+      if (term) {
+        term.write("\n\r(connection closed)");
         term.dispose();
       }
     }
