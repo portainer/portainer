@@ -5,13 +5,13 @@
   </rd-header-content>
 </rd-header>
 
-<div class="row" ng-if="state.loaded">
+<div class="row" ng-if="state > states.unloaded && mode != modes.attach">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-terminal" title-text="Console"></rd-widget-header>
+      <rd-widget-header icon="fa-terminal" title-text="Execute"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
-          <div ng-if="!state.connected">
+          <div ng-if="state < states.connecting">
             <!-- command-list -->
               <div class="form-group">
                 <label for="command" class="col-lg-1 text-left col-sm-2 control-label">Command</label>
@@ -51,18 +51,40 @@
             </div>
             <div class="form-group">
               <div class="col-sm-12">
-                <button type="button" class="btn btn-primary" ng-disabled="state.connected" button-spinner="state.connected" ng-click="connect()">
+                <button type="button" class="btn btn-primary" ng-disabled="state.connecting || state.connected" ng-click="connectExec()">
                   <span ng-hide="state.leaveNetworkInProgress">Connect</span>
                   <span ng-show="state.leaveNetworkInProgress">Connecting...</span>
                 </button>
               </div>
             </div>
           </div>
-          <div ng-if="state.connected">
+          <div ng-if="state >= states.connecting">
             <label>Exec into container as <code>{{ ::formValues.user || 'default user' }}</code> using command <code>{{ formValues.isCustomCommand ? formValues.customCommand : formValues.command }}</code></label>
             <button type="button" class="btn btn-default" ng-click="disconnect()">Disconnect</button>
           </div>
         </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-if="state > states.unloaded && mode != modes.exec">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-terminal" title-text="Attach"></rd-widget-header>
+      <rd-widget-body>
+
+        <div ng-if="state < states.connecting">
+          <button type="button" class="btn btn-primary" ng-disabled="state.connecting || state.connected" ng-click="connectAttach()">
+            <span ng-hide="state.leaveNetworkInProgress">Connect</span>
+            <span ng-show="state.leaveNetworkInProgress">Connecting...</span>
+          </button>
+        </div>
+
+        <div ng-if="state >= states.connecting">
+          <label>Attached to Container</code></label>
+          <button type="button" class="btn btn-default" ng-click="disconnect()">Disconnect</button>
+        </div>
       </rd-widget-body>
     </rd-widget>
   </div>
