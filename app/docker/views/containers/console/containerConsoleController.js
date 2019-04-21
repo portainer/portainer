@@ -48,7 +48,7 @@ function ($scope, $transition$, AttachService, ContainerService, ImageService, E
     ContainerService.container(attachId).then((details)=> {
 
       if (!details.State.Running) {
-        Notifications.error("Failure", details, "Container is not running!");
+        Notifications.error("Failure", details, "Container " + attachId + " is not running!");
         $scope.disconnect();
         return;
       }
