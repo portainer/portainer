@@ -77,7 +77,7 @@ func (handler *Handler) handleAttachRequest(w http.ResponseWriter, r *http.Reque
 }
 
 func hijackAttachStartOperation(websocketConn *websocket.Conn, endpoint *portainer.Endpoint, attachID string) error {
-	dial, err := netdial.InitDial(endpoint)
+	dial, err := netdial.initDial(endpoint)
 	if err != nil {
 		return err
 	}

@@ -1,14 +1,14 @@
-package netdial
+package websocket
 
 import (
 	"crypto/tls"
-	"net"
-	"net/url"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
+	"net"
+	"net/url"
 )
 
-func InitDial(endpoint *portainer.Endpoint) (net.Conn, error) {
+func initDial(endpoint *portainer.Endpoint) (net.Conn, error) {
 	url, err := url.Parse(endpoint.URL)
 	if err != nil {
 		return nil, err
