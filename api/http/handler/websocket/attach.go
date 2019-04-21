@@ -11,7 +11,6 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/handler/websocket/netdial"
 )
 
 // websocketAttach handles GET requests on /websocket/attach?id=<attachID>&endpointId=<endpointID>&nodeName=<nodeName>&token=<token>
@@ -77,7 +76,7 @@ func (handler *Handler) handleAttachRequest(w http.ResponseWriter, r *http.Reque
 }
 
 func hijackAttachStartOperation(websocketConn *websocket.Conn, endpoint *portainer.Endpoint, attachID string) error {
-	dial, err := netdial.initDial(endpoint)
+	dial, err := initDial(endpoint)
 	if err != nil {
 		return err
 	}

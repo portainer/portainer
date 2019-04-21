@@ -13,7 +13,6 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/handler/websocket/netdial"
 )
 
 type execStartOperationPayload struct {
@@ -83,7 +82,7 @@ func (handler *Handler) handleExecRequest(w http.ResponseWriter, r *http.Request
 }
 
 func hijackExecStartOperation(websocketConn *websocket.Conn, endpoint *portainer.Endpoint, execID string) error {
-	dial, err := netdial.InitDial(endpoint)
+	dial, err := initDial(endpoint)
 	if err != nil {
 		return err
 	}
