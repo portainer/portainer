@@ -4,9 +4,8 @@ import (
 	"github.com/portainer/portainer/api"
 )
 
-
 type webSocketRequestParams struct {
-	ID   string
+	ID       string
 	nodeName string
 	endpoint *portainer.Endpoint
 }

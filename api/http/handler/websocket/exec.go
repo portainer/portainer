@@ -16,7 +16,6 @@ import (
 	"github.com/portainer/portainer/api/http/handler/websocket/netdial"
 )
 
-
 type execStartOperationPayload struct {
 	Tty    bool
 	Detach bool
@@ -55,7 +54,7 @@ func (handler *Handler) websocketExec(w http.ResponseWriter, r *http.Request) *h
 
 	params := &webSocketRequestParams{
 		endpoint: endpoint,
-		ID:   execID,
+		ID:       execID,
 		nodeName: r.FormValue("nodeName"),
 	}
 

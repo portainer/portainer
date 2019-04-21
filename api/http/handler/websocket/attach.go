@@ -1,7 +1,6 @@
 package websocket
 
 import (
-	"bytes"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -14,7 +13,6 @@ import (
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/handler/websocket/netdial"
 )
-
 
 // websocketAttach handles GET requests on /websocket/attach?id=<attachID>&endpointId=<endpointID>&nodeName=<nodeName>&token=<token>
 // If the nodeName query parameter is present, the request will be proxied to the underlying agent endpoint.
@@ -49,7 +47,7 @@ func (handler *Handler) websocketAttach(w http.ResponseWriter, r *http.Request) 
 
 	params := &webSocketRequestParams{
 		endpoint: endpoint,
-		ID:   attachID,
+		ID:       attachID,
 		nodeName: r.FormValue("nodeName"),
 	}
 

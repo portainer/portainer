@@ -4,9 +4,9 @@ import (
 	"crypto/tls"
 	"github.com/gorilla/websocket"
 	"github.com/koding/websocketproxy"
+	"github.com/portainer/portainer/api"
 	"net/http"
 	"net/url"
-	"github.com/portainer/portainer/api"
 )
 
 func (handler *Handler) proxyWebsocketRequest(w http.ResponseWriter, r *http.Request, params *webSocketRequestParams) error {
