@@ -1,8 +1,8 @@
 import { Terminal } from 'xterm';
 
 angular.module('portainer.docker')
-.controller('ContainerConsoleController', ['$scope', '$transition$', 'AttachService', 'ContainerService', 'ImageService', 'EndpointProvider', 'Notifications', 'ContainerHelper', 'ExecService', 'HttpRequestHelper', 'LocalStorage', 'CONSOLE_COMMANDS_LABEL_PREFIX',
-function ($scope, $transition$, AttachService, ContainerService, ImageService, EndpointProvider, Notifications, ContainerHelper, ExecService, HttpRequestHelper, LocalStorage, CONSOLE_COMMANDS_LABEL_PREFIX) {
+.controller('ContainerConsoleController', ['$scope', '$transition$', 'ContainerService', 'ImageService', 'EndpointProvider', 'Notifications', 'ContainerHelper', 'ExecService', 'HttpRequestHelper', 'LocalStorage', 'CONSOLE_COMMANDS_LABEL_PREFIX',
+function ($scope, $transition$, ContainerService, ImageService, EndpointProvider, Notifications, ContainerHelper, ExecService, HttpRequestHelper, LocalStorage, CONSOLE_COMMANDS_LABEL_PREFIX) {
   var socket, term;
 
   let states = Object.freeze({
@@ -70,7 +70,7 @@ function ($scope, $transition$, AttachService, ContainerService, ImageService, E
         url = url.replace('http://', 'ws://');
       }
       initTerm(url, termHeight, termWidth);
-      return AttachService.resizeTTY(attachId, termHeight, termWidth, 2000);
+      return ContainerService.resizeTTY(attachId, termHeight, termWidth, 2000);
     })
     .catch(function error(err) {
         Notifications.error('Error', err, 'Unable to retrieve container details');
