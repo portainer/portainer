@@ -11,7 +11,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"time"
-	
+	"ioutil"
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/websocket"
 	"github.com/koding/websocketproxy"
@@ -253,13 +253,17 @@ func streamFromWebsocketConnToTCPConn(websocketConn *websocket.Conn, tcpConn net
 
 func streamFromTCPConnToWebsocketConn(websocketConn *websocket.Conn, br *bufio.Reader, errorChan chan error) {
 	for {
-		out, _, err := br.ReadRune()
+		//out := make([]byte, 2048)
+		//_, err := br.Read(out)
+		out, err := ioutil.ReadAll(br)
+
+		print(string(out))
 		if err != nil {
 			errorChan <- err
 			break
 		}
 
-		err = websocketConn.WriteMessage(websocket.TextMessage, []byte(string(out)))
+		err = websocketConn.WriteMessage(websocket.TextMessage, out)
 		if err != nil {
 			errorChan <- err
 			break
