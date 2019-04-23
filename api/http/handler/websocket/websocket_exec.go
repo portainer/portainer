@@ -11,7 +11,8 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"time"
-	"strings"
+	"strings
+	"unicode/utf8"
 	
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/websocket"
