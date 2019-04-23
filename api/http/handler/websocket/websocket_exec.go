@@ -11,7 +11,6 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"time"
-	"strings
 	"unicode/utf8"
 	
 	"github.com/asaskevich/govalidator"
@@ -254,16 +253,10 @@ func streamFromWebsocketConnToTCPConn(websocketConn *websocket.Conn, tcpConn net
 }
 
 func streamFromTCPConnToWebsocketConn(websocketConn *websocket.Conn, br *bufio.Reader, errorChan chan error) {
-	fixUtf := func(r rune) rune {
-		if r == utf8.RuneError {
-			return -1
-		}
-		return r
-	}
 	for {
 		out := make([]byte, 2048)
 		_, err := br.Read(out)
-		out_str := strings.Map(fixUtf, string(out[:]))
+		out_str := validString(string(out[:]))
 		if err != nil {
 			errorChan <- err
 			break
@@ -275,4 +268,21 @@ func streamFromTCPConnToWebsocketConn(websocketConn *websocket.Conn, br *bufio.R
 			break
 		}
 	}
+}
+
+func validString(s string) string {
+	if !utf8.ValidString(s) {
+		v := make([]rune, 0, len(s))
+		for i, r := range s {
+			if r == utf8.RuneError {
+				_, size := utf8.DecodeRuneInString(s[i:])
+				if size == 1 {
+					continue
+				}
+			}
+			v = append(v, r)
+		}
+		s = string(v)
+	}
+	return s
 }
