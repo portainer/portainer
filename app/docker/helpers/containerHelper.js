@@ -54,5 +54,37 @@ angular.module('portainer.docker')
     return config;
   };
 
+  helper.parsePortRange = function(ports) {
+    if (!ports) {
+      return null;
+    }
+
+    var rangeIndex = ports.indexOf('-');
+    if (rangeIndex === -1) {
+      var port = parseInt(ports);
+      if (isNaN(port) || port <= 0 || port > 0xffff) {
+        return null;
+      }
+
+      return [port, port];
+    }
+
+    var startPort = parseInt(ports.substr(0, rangeIndex));
+    if (isNaN(startPort) || startPort <= 0 || startPort > 0xffff) {
+      return null;
+    }
+
+    var endPort = parseInt(ports.substr(rangeIndex + 1));
+    if (isNaN(endPort) || endPort <= 0 || endPort > 0xffff) {
+      return null;
+    }
+
+    if (endPort < startPort) {
+      return null;
+    }
+
+    return [startPort, endPort];
+  };
+
   return helper;
 }]);

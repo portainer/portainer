@@ -137,6 +137,23 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     $scope.imageConfig = imageConfig;
   }
 
+  function preparePortBinding(config, bindings, containerPort, hostIp, hostPort, protocol) {
+    var key = containerPort + '/' + protocol;
+    var binding = {};
+    if (hostIp) {
+      binding.HostIp = hostIp;
+      binding.HostPort = hostPort;
+    } else if (hostPort.indexOf(':') > -1) {
+      var hostAndPort = hostPort.split(':');
+      binding.HostIp = hostAndPort[0];
+      binding.HostPort = hostAndPort[1];
+    } else {
+      binding.HostPort = hostPort;
+    }
+    bindings[key] = [binding];
+    config.ExposedPorts[key] = {};
+  }
+
   function preparePortBindings(config) {
     var bindings = {};
     if (config.ExposedPorts === undefined) {
@@ -144,17 +161,60 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     }
     config.HostConfig.PortBindings.forEach(function (portBinding) {
       if (portBinding.containerPort) {
-        var key = portBinding.containerPort + '/' + portBinding.protocol;
-        var binding = {};
-        if (portBinding.hostPort && portBinding.hostPort.indexOf(':') > -1) {
-          var hostAndPort = portBinding.hostPort.split(':');
-          binding.HostIp = hostAndPort[0];
-          binding.HostPort = hostAndPort[1];
+        var containerPort = portBinding.containerPort;
+        var hostPort = portBinding.hostPort;
+        var containerPortRange = ContainerHelper.parsePortRange(containerPort);
+        if (containerPortRange && containerPortRange.length === 2) {
+          var startPort = containerPortRange[0];
+          var endPort = containerPortRange[1];
+          var hostIp = '';
+          var startHostPort = 0;
+          var endHostPort = 0;
+          if (hostPort) {
+            if (hostPort.indexOf(':') > -1) {
+              var hostAndPort = hostPort.split(':');
+              hostIp = hostAndPort[0];
+              hostPort = hostAndPort[1];
+            }
+
+            var hostPortRange = ContainerHelper.parsePortRange(hostPort);
+            if (hostPortRange && hostPortRange.length === 2) {
+              startHostPort = hostPortRange[0];
+              endHostPort = hostPortRange[1];
+            } else {
+              // Since we cannot properly handle errors here, we fallback to the raw input of the user
+              return preparePortBinding(config, bindings, containerPort, hostIp, hostPort, portBinding.protocol);
+            }
+
+            if ((endPort - startPort) !== (endHostPort - startHostPort)) {
+              // Allow host port range iff containerPort is not a range.
+              // In this case, use the host port range as the dynamic
+              // host port range to allocate into.
+              if (endPort !== startPort) {
+                // Since we cannot properly handle errors here, we fallback to the raw input of the user
+                return preparePortBinding(config, bindings, containerPort, hostIp, hostPort, portBinding.protocol);
+              }
+            }
+          }
+
+          for (var i = 0; i <= (endPort - startPort); i++) {
+            containerPort = (startPort + i).toString();
+            if (startHostPort > 0) {
+              hostPort = (startHostPort + i).toString();
+            }
+
+            // Set hostPort to a range only if there is a single container port
+            // and a dynamic host port.
+            if (startPort === endPort && startHostPort !== endHostPort) {
+              hostPort += '-' + endHostPort.toString();
+            }
+
+            preparePortBinding(config, bindings, containerPort, hostIp, hostPort, portBinding.protocol);
+          }
         } else {
-          binding.HostPort = portBinding.hostPort;
+          // Since we cannot properly handle errors here, we fallback to the raw input of the user
+          preparePortBinding(config, bindings, portBinding.containerPort, null, portBinding.hostPort, portBinding.protocol);
         }
-        bindings[key] = [binding];
-        config.ExposedPorts[key] = {};
       }
     });
     config.HostConfig.PortBindings = bindings;
