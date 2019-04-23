@@ -11,7 +11,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"time"
-	"ioutil"
+	"io/ioutil"
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/websocket"
 	"github.com/koding/websocketproxy"
