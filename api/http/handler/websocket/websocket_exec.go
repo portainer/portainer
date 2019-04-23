@@ -271,7 +271,5 @@ func streamFromTCPConnToWebsocketConn(websocketConn *websocket.Conn, br *bufio.R
 				byteBuf.Reset()
 			}
 		}
-
-
 	}
 }
