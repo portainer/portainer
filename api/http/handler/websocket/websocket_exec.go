@@ -260,9 +260,9 @@ func streamFromTCPConnToWebsocketConn(websocketConn *websocket.Conn, br *bufio.R
 			errorChan <- err
 			break
 		}		
-		if len(out) >0{
+		if len(out) > 0 {
 			byteBuf.Write(out)
-			if !isPrefix{
+			if !isPrefix {
 				err = websocketConn.WriteMessage(websocket.TextMessage, out)
 				if err != nil {
 					errorChan <- err
