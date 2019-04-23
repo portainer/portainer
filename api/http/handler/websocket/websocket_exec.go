@@ -253,10 +253,16 @@ func streamFromWebsocketConnToTCPConn(websocketConn *websocket.Conn, tcpConn net
 }
 
 func streamFromTCPConnToWebsocketConn(websocketConn *websocket.Conn, br *bufio.Reader, errorChan chan error) {
+	fixUtf := func(r rune) rune {
+		if r == utf8.RuneError {
+			return -1
+		}
+		return r
+	}
 	for {
 		out := make([]byte, 2048)
 		_, err := br.Read(out)
-		out_str := strings.ToValidUTF8(string(out[:]),nil)
+		out_str := strings.Map(fixUtf, string(out[:]))
 		if err != nil {
 			errorChan <- err
 			break
