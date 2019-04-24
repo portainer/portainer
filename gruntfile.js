@@ -48,7 +48,7 @@ module.exports = function(grunt) {
       ]);
     });
 
-  grunt.task.registerTask('devopsbuild', 'devopsbuild:<platform>:<arch>', 
+  grunt.task.registerTask('devopsbuild', 'devopsbuild:<platform>:<arch>',
     function(p, a) {
       grunt.task.run([
         'config:prod',
@@ -147,7 +147,7 @@ gruntfile_cfg.copy = {
     files: [
       {
         dest: '<%= root %>/',
-        src: 'templates.json', 
+        src: 'templates.json',
         cwd: ''
       }
     ]
@@ -186,7 +186,7 @@ function shell_buildBinaryOnDevOps(p, a) {
 function shell_run() {
   return [
     'docker rm -f portainer',
-    'docker run -d -p 9000:9000 -v $(pwd)/dist:/app -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer portainer/base /app/portainer --no-analytics --template-file /app/templates.json'
+    'docker run -d -p 9999:9999 -p 9000:9000 -v $(pwd)/dist:/app -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer portainer/base /app/portainer --no-analytics --template-file /app/templates.json'
   ].join(';');
 }
 

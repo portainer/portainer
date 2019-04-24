@@ -111,7 +111,7 @@ angular.module('portainer.app')
   return function (type) {
     if (type === 1) {
       return 'Docker';
-    } else if (type === 2) {
+    } else if (type === 2 || type === 4) {
       return 'Agent';
     } else if (type === 3) {
       return 'Azure ACI';

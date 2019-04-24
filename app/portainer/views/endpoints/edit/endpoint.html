@@ -6,6 +6,26 @@
 </rd-header>
 
 <div class="row">
+  <information-panel ng-if="endpoint.Type === 4" title-text="Deploy an agent">
+    <span class="small text-muted">
+      <p>
+        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+        Deploy an agent on your remote Docker environment using the following command to enable this endpoint:
+      </p>
+     <div style="margin-top: 10px;">
+       <code>
+         docker run -d -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker/volumes:/var/lib/docker/volumes -e TUNNELLING_MODE=1 -e AGENT_SECRET={{ endpoint.IoTKey }} portainer/pagent:intel
+       </code>
+       <span class="btn btn-primary btn-sm space-left" ng-click="copyAgentIoTCommand()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy</span>
+       <span>
+         <i id="copyNotification" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none;"></i>
+       </span>
+     </div>
+    </span>
+  </information-panel>
+</div>
+
+<div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-body>
@@ -22,7 +42,7 @@
           </div>
           <!-- !name-input -->
           <!-- endpoint-url-input -->
-          <div class="form-group">
+          <div class="form-group" ng-if="endpoint.Type !== 4">
             <label for="endpoint_url" class="col-sm-3 col-lg-2 control-label text-left">
               Endpoint URL
               <portainer-tooltip position="bottom" message="URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it."></portainer-tooltip>
@@ -70,7 +90,7 @@
           </div>
           <!-- !tags -->
           <!-- endpoint-security -->
-          <div ng-if="endpointType === 'remote' && endpoint.Type !== 3">
+          <div ng-if="endpointType === 'remote' && endpoint.Type !== 3 && endpoint.Type !== 4">
             <div class="col-sm-12 form-section-title">
               Security
             </div>

@@ -1,6 +1,8 @@
 package endpoints
 
 import (
+	"encoding/base64"
+	"strings"
 	"log"
 	"net/http"
 	"runtime"
@@ -41,7 +43,7 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 
 	endpointType, err := request.RetrieveNumericMultiPartFormValue(r, "EndpointType", false)
 	if err != nil || endpointType == 0 {
-		return portainer.Error("Invalid endpoint type value. Value must be one of: 1 (Docker environment), 2 (Agent environment) or 3 (Azure environment)")
+		return portainer.Error("Invalid endpoint type value. Value must be one of: 1 (Docker environment), 2 (Agent environment), 3 (Azure environment) or 4 (Agent IoT environment)")
 	}
 	payload.EndpointType = endpointType
 
@@ -149,6 +151,8 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 func (handler *Handler) createEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
 	if portainer.EndpointType(payload.EndpointType) == portainer.AzureEnvironment {
 		return handler.createAzureEndpoint(payload)
+	} else if portainer.EndpointType(payload.EndpointType) == portainer.AgentIoTEnvironment {
+		return handler.createAgentIoTEndpoint(payload)
 	}
 
 	if payload.TLS {
@@ -188,6 +192,38 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 	}
 
 	err = handler.EndpointService.CreateEndpoint(endpoint)
+	if err != nil {
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint inside the database", err}
+	}
+
+	return endpoint, nil
+}
+
+func (handler *Handler) createAgentIoTEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
+	endpointType := portainer.AgentIoTEnvironment
+	endpointID := handler.EndpointService.GetNextIdentifier()
+
+	iotKey := base64.RawStdEncoding.EncodeToString([]byte(strings.TrimPrefix(payload.URL, "tcp://") + ":9999:7777:random_secret"))
+
+	endpoint := &portainer.Endpoint{
+		ID:      portainer.EndpointID(endpointID),
+		Name:    payload.Name,
+		URL:     "tcp://localhost:7777",
+		Type:    endpointType,
+		GroupID: portainer.EndpointGroupID(payload.GroupID),
+		TLSConfig: portainer.TLSConfiguration{
+			TLS:           false,
+		},
+		AuthorizedUsers: []portainer.UserID{},
+		AuthorizedTeams: []portainer.TeamID{},
+		Extensions:      []portainer.EndpointExtension{},
+		Tags:            payload.Tags,
+		Status:          portainer.EndpointStatusUp,
+		Snapshots:       []portainer.Snapshot{},
+		IoTKey:          iotKey,
+	}
+
+	err := handler.EndpointService.CreateEndpoint(endpoint)
 	if err != nil {
 		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint inside the database", err}
 	}

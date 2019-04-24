@@ -6,6 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/jpillora/chisel/server"
+
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt"
 	"github.com/portainer/portainer/api/cli"
@@ -640,6 +642,12 @@ func main() {
 	if !*flags.NoAuth {
 		go terminateIfNoAdminCreated(store.UserService)
 	}
+
+	chiselServer, err := chserver.NewServer(&chserver.Config{Reverse: true})
+	if err != nil {
+		log.Fatal(err)
+	}
+	chiselServer.Start("0.0.0.0", "9999")
 
 	var server portainer.Server = &http.Server{
 		Status:                 applicationStatus,

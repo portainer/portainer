@@ -74,7 +74,8 @@
                   {{ item.Type | endpointtypename }}
                 </span>
               </td>
-              <td>{{ item.URL | stripprotocol }}</td>
+              <td ng-if="item.Type !== 4">{{ item.URL | stripprotocol }}</td>
+              <td ng-if="item.Type === 4">Tunnel</td>
               <td>{{ item.GroupName }}</td>
               <td>
                 <a ui-sref="portainer.endpoints.endpoint.access({id: item.Id})" ng-if="$ctrl.accessManagement">

@@ -1,8 +1,8 @@
 import { EndpointSecurityFormData } from '../../../components/endpointSecurity/porEndpointSecurityModel';
 
 angular.module('portainer.app')
-.controller('EndpointController', ['$q', '$scope', '$state', '$transition$', '$filter', 'EndpointService', 'GroupService', 'TagService', 'EndpointProvider', 'Notifications',
-function ($q, $scope, $state, $transition$, $filter, EndpointService, GroupService, TagService, EndpointProvider, Notifications) {
+.controller('EndpointController', ['$q', '$scope', '$state', '$transition$', '$filter', 'clipboard', 'EndpointService', 'GroupService', 'TagService', 'EndpointProvider', 'Notifications',
+function ($q, $scope, $state, $transition$, $filter, clipboard, EndpointService, GroupService, TagService, EndpointProvider, Notifications) {
 
   if (!$scope.applicationState.application.endpointManagement) {
     $state.go('portainer.endpoints');
@@ -15,6 +15,12 @@ function ($q, $scope, $state, $transition$, $filter, EndpointService, GroupServi
 
   $scope.formValues = {
     SecurityFormData: new EndpointSecurityFormData()
+  };
+
+  $scope.copyAgentIoTCommand = function() {
+    clipboard.copyText('docker run -d -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker/volumes:/var/lib/docker/volumes -e TUNNELLING_MODE=1 -e AGENT_SECRET=' + $scope.endpoint.IoTKey + ' portainer/pagent:intel');
+    $('#copyNotification').show();
+    $('#copyNotification').fadeOut(2000);
   };
 
   $scope.updateEndpoint = function() {

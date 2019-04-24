@@ -24,7 +24,7 @@ func (handler *Handler) proxyRequestsToDockerAPI(w http.ResponseWriter, r *http.
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
-	if endpoint.Status == portainer.EndpointStatusDown {
+	if endpoint.Type != 4 && endpoint.Status == portainer.EndpointStatusDown {
 		return &httperror.HandlerError{http.StatusServiceUnavailable, "Unable to query endpoint", errors.New("Endpoint is down")}
 	}
 

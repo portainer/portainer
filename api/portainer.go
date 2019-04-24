@@ -242,6 +242,7 @@ type (
 		Tags             []string            `json:"Tags"`
 		Status           EndpointStatus      `json:"Status"`
 		Snapshots        []Snapshot          `json:"Snapshots"`
+		IoTKey           string              `json:"IoTKey"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
@@ -893,6 +894,8 @@ const (
 	AgentOnDockerEnvironment
 	// AzureEnvironment represents an endpoint connected to an Azure environment
 	AzureEnvironment
+	// AgentIoTEnvironment represents an endpoint connected to an agent using a tunnel
+	AgentIoTEnvironment
 )
 
 const (
