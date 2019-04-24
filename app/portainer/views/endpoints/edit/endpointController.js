@@ -18,7 +18,7 @@ function ($q, $scope, $state, $transition$, $filter, clipboard, EndpointService,
   };
 
   $scope.copyAgentIoTCommand = function() {
-    clipboard.copyText('docker run -d -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker/volumes:/var/lib/docker/volumes --restart always -e TUNNELLING_MODE=1 -e AGENT_SECRET=' + $scope.endpoint.IoTKey + ' portainer/pagent:intel');
+    clipboard.copyText('docker run -d -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker/volumes:/var/lib/docker/volumes --restart always -e TUNNELLING_MODE=1 -e AGENT_SECRET=' + $scope.endpoint.IoTKey + ' -e CAP_HOST_MANAGEMENT=1 portainer/pagent:intel');
     $('#copyNotification').show();
     $('#copyNotification').fadeOut(2000);
   };
