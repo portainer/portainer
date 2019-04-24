@@ -390,22 +390,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
   }
 
   function loadFromContainerPortBindings() {
-    var bindings = [];
-    for (var p in $scope.config.HostConfig.PortBindings) {
-      if ({}.hasOwnProperty.call($scope.config.HostConfig.PortBindings, p)) {
-        var hostPort = '';
-        if ($scope.config.HostConfig.PortBindings[p][0].HostIp) {
-          hostPort = $scope.config.HostConfig.PortBindings[p][0].HostIp + ':';
-        }
-        hostPort += $scope.config.HostConfig.PortBindings[p][0].HostPort;
-        var b = {
-          'hostPort': hostPort,
-          'containerPort': p.split('/')[0],
-          'protocol': p.split('/')[1]
-        };
-        bindings.push(b);
-      }
-    }
+    var bindings = ContainerHelper.sortAndCombinePorts($scope.config.HostConfig.PortBindings);
     $scope.config.HostConfig.PortBindings = bindings;
   }
 

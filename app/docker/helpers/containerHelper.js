@@ -86,5 +86,85 @@ angular.module('portainer.docker')
     return [startPort, endPort];
   };
 
+  helper.createPortRange = function(portRange, port) {
+    var hostIp = null;
+    var colonIndex = portRange.indexOf(':');
+    if (colonIndex >= 0) {
+      hostIp = portRange.substr(0, colonIndex);
+      portRange = portRange.substr(colonIndex + 1);
+    }
+
+    var startPort;
+    var endPort;
+    port = (typeof port === 'number' ? port : parseInt(port));
+    portRange = helper.parsePortRange(portRange);
+    if (!portRange || portRange.length !== 2) {
+      var portSplit = portRange.split('-');
+      startPort = parseInt(portSplit[0]);
+      endPort = startPort;
+    } else {
+      startPort = portRange[0];
+      endPort = portRange[1];
+    }
+
+    if (port < startPort) {
+      startPort = port;
+    }
+    if (port > endPort) {
+      endPort = port;
+    }
+
+    if (hostIp) {
+      return hostIp + ':' + startPort + '-' + endPort;
+    } else {
+      return startPort + '-' + endPort;
+    }
+  };
+
+  helper.sortAndCombinePorts = function(portBindings) {
+    var bindings = [];
+    var previousHostPort = null;
+    var previousContainerPort = null;
+    Object.keys(portBindings).sort(function(x, y) {
+      var xSplit = x.split('/');
+      var ySplit = y.split('/');
+      var xPort = parseInt(xSplit[0]);
+      var yPort = parseInt(ySplit[0]);
+      return xPort - yPort;
+    }).forEach(function(portKey) {
+      if (!portBindings.hasOwnProperty(portKey)) {
+        return;
+      }
+
+      var portBinding = portBindings[portKey][0];
+      var hostPort = portBinding.HostPort;
+      var containerPort = portKey.split('/')[0];
+      var protocol = portKey.split('/')[1];
+
+      // NOTE: It must be == here, because we are comparing strings with integers
+      if (bindings.length > 0 && previousHostPort == (hostPort - 1) && previousContainerPort == (containerPort - 1)) {
+        bindings[bindings.length-1].hostPort = helper.createPortRange(bindings[bindings.length-1].hostPort, hostPort);
+        bindings[bindings.length-1].containerPort = helper.createPortRange(bindings[bindings.length-1].containerPort, containerPort);
+        previousHostPort = hostPort;
+        previousContainerPort = containerPort;
+        return;
+      }
+
+      if (portBinding.HostIp) {
+        hostPort = portBinding.HostIp + ':' + hostPort;
+      }
+
+      var binding = {
+        'hostPort': hostPort,
+        'containerPort': containerPort,
+        'protocol': protocol
+      };
+      bindings.push(binding);
+      previousHostPort = portBinding.HostPort;
+      previousContainerPort = containerPort;
+    });
+    return bindings;
+  };
+
   return helper;
 }]);
