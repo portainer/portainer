@@ -14,7 +14,7 @@
       </p>
      <div style="margin-top: 10px;">
        <code>
-         docker run -d -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker/volumes:/var/lib/docker/volumes -e TUNNELLING_MODE=1 -e AGENT_SECRET={{ endpoint.IoTKey }} portainer/pagent:intel
+         docker run -d -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker/volumes:/var/lib/docker/volumes --restart always -e TUNNELLING_MODE=1 -e AGENT_SECRET={{ endpoint.IoTKey }} portainer/pagent:intel
        </code>
        <span class="btn btn-primary btn-sm space-left" ng-click="copyAgentIoTCommand()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy</span>
        <span>
