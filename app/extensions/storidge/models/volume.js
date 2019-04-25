@@ -4,6 +4,8 @@ export function StoridgeVolumeModel(data) {
   this.Directory = data.directory;
   this.IOPSMax = data.maximumIOPS;
   this.IOPSMin = data.minimumIOPS;
+  this.BandwidthMin = data.minimumBandwidth;
+  this.BandwidthMax = data.maximumBandwidth;
   this.LocalDriveOnly = data.localDriveOnly;
   this.Name = data.name;
   this.Node = data.node;

@@ -100,7 +100,7 @@ function ($scope, $state, $transition$, Notifications, StoridgeProfileService) {
   function initView() {
     var profile = new StoridgeProfileDefaultModel();
     profile.Name = $transition$.params().profileName;
-    profile.Directory = '/cio/' + _.toLower(profile.Name);
+    profile.Directory = profile.Directory + _.toLower(profile.Name);
     $scope.model = profile;
   }
 
