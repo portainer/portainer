@@ -11,15 +11,15 @@
     <rd-widget>
       <rd-widget-header icon="fa-object-group" title-text="Node details">
         <button type="button" class="btn btn-sm btn-danger"
-          ng-disabled="node.Status !== 'Normal'" ng-click="removeNodeAction()">
+          ng-disabled="(node.Status | lowercase) !== 'normal'" ng-click="removeNodeAction()">
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove node
         </button>
         <button type="button" class="btn btn-sm btn-primary"
-          ng-disabled="node.Status !== 'Normal'" ng-click="cordonNodeAction()">
+          ng-disabled="(node.Status | lowercase) !== 'normal'" ng-click="cordonNodeAction()">
           <i class="fas fa-wrench space-right" aria-hidden="true"></i>Enter maintenance mode
         </button>
         <button type="button" class="btn btn-sm btn-primary"
-          ng-disabled="node.Status !== 'Cordoned'" ng-click="uncordonNodeAction()">
+          ng-disabled="(node.Status | lowercase) !== 'cordoned'" ng-click="uncordonNodeAction()">
           <i class="fa fa-power-off space-right" aria-hidden="true"></i>Exit maintenance mode
         </button>
       </rd-widget-header>
@@ -39,8 +39,18 @@
               <td>{{ node.DomainID }}</td>
             </tr>
             <tr>
-              <td>Status</td>
-              <td>{{ node.Status }}</td>
+              <td>Node status</td>
+              <td>
+                <i class="fa fa-heartbeat space-right {{ node.Status | storidgeNodeStatusBadge }}"></i>
+                {{ node.Status }}
+              </td>
+            </tr>
+            <tr>
+              <td>Cluster condition</td>
+              <td>
+                <i class="fa fa-heartbeat space-right {{ node.Condition | storidgeClusterConditionBadge }}"></i>
+                {{ node.Condition }}
+              </td>
             </tr>
             <tr>
               <td>Metadata version</td>

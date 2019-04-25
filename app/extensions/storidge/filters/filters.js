@@ -25,7 +25,7 @@ angular.module('extension.storidge')
     return 'green-icon';
   };
 })
-.filter('clusterStatusBadge', function () {
+.filter('storidgeClusterConditionBadge', function () {
 'use strict';
   return function (text) {
     var status = text ? _.toLower(text) : '';

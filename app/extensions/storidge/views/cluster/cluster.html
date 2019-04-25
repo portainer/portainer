@@ -21,8 +21,10 @@
               <td>{{ clusterInfo.Domain }}</td>
             </tr>
             <tr>
-              <td>Status</td>
-              <td><i class="fa fa-heartbeat space-right {{ clusterInfo.Status | clusterStatusBadge }}"></i> {{ clusterInfo.Status }}</td>
+              <td>Condition</td>
+              <td><i class="fa fa-heartbeat space-right {{ clusterInfo.Condition | storidgeClusterConditionBadge }}"></i>
+                {{ clusterInfo.Condition }}
+              </td>
             </tr>
             <tr>
               <td>Version</td>

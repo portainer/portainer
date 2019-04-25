@@ -7,6 +7,7 @@ export function StoridgeNodeModel(name, data) {
 
 export function StoridgeNodeDetailedModel(name, properties) {
   this.Name = name;
+  this.Condition = properties.condition;
   this.Domain = properties.domain;
   this.DomainID = properties.domainID;
   this.FreeBandwidth = properties.freeBandwidth;

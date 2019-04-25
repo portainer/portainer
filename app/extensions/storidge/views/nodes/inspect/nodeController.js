@@ -54,6 +54,9 @@ function ($scope, $state, $transition$, Notifications, StoridgeNodeService, Moda
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to put node in maintenance mode');
+    })
+    .finally(function final() {
+      $state.reload();
     });
   }
 
@@ -81,6 +84,9 @@ function ($scope, $state, $transition$, Notifications, StoridgeNodeService, Moda
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to put node out of maintenance mode');
+    })
+    .finally(function final() {
+      $state.reload();
     });
   }
 
