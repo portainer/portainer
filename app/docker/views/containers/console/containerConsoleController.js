@@ -146,6 +146,7 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
 
     socket.onopen = function() {
       $scope.state = states.connected;
+      $scope.$apply();
       term = new Terminal();
 
       term.on('data', function (data) {
@@ -166,10 +167,12 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
       };
       socket.onerror = function (err) {
         $scope.disconnect();
+        $scope.$apply();
         Notifications.error("Failure",err, "Connection error");
       };
       socket.onclose = function() {
         $scope.disconnect();
+        $scope.$apply();
       };
     };
   }
