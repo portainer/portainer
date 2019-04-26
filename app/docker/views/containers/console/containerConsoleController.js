@@ -52,14 +52,6 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
 
       var url = window.location.href.split('#')[0] + 'api/websocket/attach?' + (Object.keys(params).map((k) => k + "=" + params[k]).join("&"));
 
-      if ($transition$.params().nodeName) {
-        url += '&nodeName=' + $transition$.params().nodeName;
-      }
-      if (url.indexOf('https') > -1) {
-        url = url.replace('https://', 'wss://');
-      } else {
-        url = url.replace('http://', 'ws://');
-      }
       initTerm(url, termHeight, termWidth);
       return ContainerService.resizeTTY(attachId, termHeight, termWidth, 2000);
     })
@@ -100,14 +92,6 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
 
       var url = window.location.href.split('#')[0] + 'api/websocket/exec?' + (Object.keys(params).map((k) => k + "=" + params[k]).join("&"));
 
-      if ($transition$.params().nodeName) {
-        url += '&nodeName=' + $transition$.params().nodeName;
-      }
-      if (url.indexOf('https') > -1) {
-        url = url.replace('https://', 'wss://');
-      } else {
-        url = url.replace('http://', 'ws://');
-      }
       initTerm(url, termHeight, termWidth);
       return ExecService.resizeTTY(params.id, termHeight, termWidth, 2000);
     })
@@ -131,6 +115,16 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
   };
 
   function initTerm(url, height, width) {
+
+      if ($transition$.params().nodeName) {
+          url += '&nodeName=' + $transition$.params().nodeName;
+      }
+      if (url.indexOf('https') > -1) {
+          url = url.replace('https://', 'wss://');
+      } else {
+          url = url.replace('http://', 'ws://');
+      }
+
     socket = new WebSocket(url);
 
     socket.onopen = function() {
