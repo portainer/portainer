@@ -33,6 +33,7 @@
               <th>IP Address</th>
               <th>Gateway</th>
               <th>MAC Address</th>
+              <th>Aliases</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -42,6 +43,7 @@
               <td>{{ value.IPAddress || '-' }}</td>
               <td>{{ value.Gateway || '-' }}</td>
               <td>{{ value.MacAddress || '-' }}</td>
+              <td>{{ value.Aliases.join(', ') || '-' }}</td>
               <td>
                 <button type="button" class="btn btn-xs btn-danger" ng-disabled="$ctrl.leaveNetworkActionInProgress" button-spinner="$ctrl.leaveNetworkActionInProgress" ng-click="$ctrl.leaveNetworkAction($ctrl.container, key)">
                   <span ng-hide="$ctrl.leaveNetworkActionInProgress"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i> Leave network</span>
