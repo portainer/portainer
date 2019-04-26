@@ -54,6 +54,10 @@
                 <button type="button" class="btn btn-primary" ng-disabled="state.connecting || state.connected" ng-click="statebutton(false)">
                   <span>Connect</span>
                 </button>
+                <span class="small text-danger" ng-hide="container.State.Running">
+                  <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                  The container is not running.
+                </span>
               </div>
             </div>
           </div>

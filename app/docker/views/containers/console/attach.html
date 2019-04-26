@@ -11,6 +11,27 @@
       <rd-widget-header icon="fa-terminal" title-text="Attach"></rd-widget-header>
       <rd-widget-body>
 
+        <div class="small text-warning" ng-hide="container.Config.OpenStdin">
+          <p>
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+            The interactive-flag is not set. You might not be able to use the console properly.
+          </p>
+        </div>
+
+        <div class="small text-warning" ng-hide="container.Config.Tty">
+          <p>
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+            The TTY-flag is not set. You might not be able to use the console properly.
+          </p>
+        </div>
+
+        <div class="small text-danger" ng-hide="container.State.Running">
+          <p>
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+            The container is not running.
+          </p>
+        </div>
+
         <div>
           <!--<label ng-if="state === states.connected" >Attached to Container</label>-->
           <button type="button" class="btn btn-primary" ng-disabled="state.connecting || state.connected" ng-click="statebutton(true)">
