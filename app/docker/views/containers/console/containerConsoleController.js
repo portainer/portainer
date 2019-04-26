@@ -19,17 +19,6 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
   $scope.formValues = {};
   $scope.containerCommands = [];
 
-  $scope.statebutton = function(doattach) {
-    switch ($scope.state) {
-      case states.connected:
-        $scope.disconnect();
-        break;
-      case states.disconnected:
-        doattach ? $scope.connectAttach() : $scope.connectExec();
-        break;
-    }
-  }
-
   // Ensure the socket is closed before leaving the view
   $scope.$on('$stateChangeStart', function () {
     $scope.disconnect();
