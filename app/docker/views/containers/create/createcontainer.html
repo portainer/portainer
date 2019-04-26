@@ -430,6 +430,29 @@
                 </div>
               </div>
               <!-- !ipv6-input -->
+              <!-- extra-alias -->
+              <div class="form-group">
+                <div class="col-sm-12" style="margin-top: 5px;">
+                  <label class="control-label text-left">Aliases</label>
+                  <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addAlias()">
+                    <i class="fa fa-plus-circle" aria-hidden="true"></i> add additional entry
+                  </span>
+                </div>
+                <!-- extra-alias-input-list -->
+                <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                  <div ng-repeat="variable in formValues.Aliases" style="margin-top: 2px;">
+                    <div class="input-group col-sm-5 input-group-sm">
+                      <span class="input-group-addon">value</span>
+                      <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. host-alias">
+                    </div>
+                    <button class="btn btn-sm btn-danger" type="button" ng-click="removeAlias($index)">
+                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+                <!-- !extra-alias-input-list -->
+              </div>
+              <!-- !extra-alias -->
               <!-- extra-hosts-variables -->
               <div class="form-group">
                 <div class="col-sm-12" style="margin-top: 5px;">

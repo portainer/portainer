@@ -17,6 +17,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     NetworkContainer: '',
     Labels: [],
     ExtraHosts: [],
+    Aliases: [],
     MacAddress: '',
     IPv4: '',
     IPv6: '',
@@ -101,6 +102,14 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
 
   $scope.removeLabel = function(index) {
     $scope.formValues.Labels.splice(index, 1);
+  };
+
+  $scope.addAlias = function() {
+    $scope.formValues.Aliases.push({ value: '' });
+  };
+
+  $scope.removeAlias = function(index) {
+    $scope.formValues.Aliases.splice(index, 1);
   };
 
   $scope.addExtraHost = function() {
@@ -222,8 +231,19 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       IPAMConfig: {
         IPv4Address: $scope.formValues.IPv4,
         IPv6Address: $scope.formValues.IPv6
-      }
+      },
     };
+
+    var aliases = [];
+    $scope.formValues.Aliases.forEach(function (v) {
+      if (v.value) {
+        aliases.push(v.value);
+      }
+    });
+
+    if (aliases.length) {
+      config.NetworkingConfig.EndpointsConfig[networkMode].Aliases = aliases;
+    }
 
     $scope.formValues.ExtraHosts.forEach(function (v) {
     if (v.value) {
@@ -317,7 +337,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     return config;
   }
 
-  
+
   function loadFromContainerCmd() {
     if ($scope.config.Cmd) {
       $scope.config.Cmd = ContainerHelper.commandArrayToString($scope.config.Cmd);
@@ -408,6 +428,23 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       delete $scope.extraNetworks[Object.keys(d.NetworkSettings.Networks)[0]];
     } else {
       $scope.formValues.MacAddress = '';
+    }
+
+    // aliases
+    if ($scope.config.NetworkingConfig.EndpointsConfig[$scope.config.HostConfig.NetworkMode]) {
+      var networkConf = $scope.config.NetworkingConfig.EndpointsConfig[$scope.config.HostConfig.NetworkMode];
+      if (networkConf.Aliases && networkConf.Aliases.length) {
+        networkConf.Aliases.forEach(function (alias) {
+          // do not add the alias based on dockerId or hostname
+          if (alias === $scope.config.Hostname) {
+            return ;
+          }
+          if (d.Id.indexOf(alias) === 0) {
+            return ;
+          }
+          $scope.formValues.Aliases.push({value: alias});
+        });
+      }
     }
 
     // ExtraHosts
