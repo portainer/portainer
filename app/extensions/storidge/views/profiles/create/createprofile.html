@@ -173,7 +173,10 @@
           <div class="form-group">
             <label for="profile_interfaceType" class="col-sm-2 col-lg-1 control-label text-left">Interface type</label>
             <div class="col-sm-10 col-lg-11">
-              <input type="text" class="form-control" ng-model="model.InterfaceType" name="profile_interfaceType" disabled>
+              <select name="profile_interfaceType" ng-model="model.InterfaceType" class="form-control">
+                <option value=""></option>
+                <option value="nfs">nfs</option>
+              </select>
             </div>
           </div>
           <!-- !interfaceType -->
@@ -182,6 +185,7 @@
             <label for="profile_interfaceDriver" class="col-sm-2 col-lg-1 control-label text-left">Network driver</label>
             <div class="col-sm-10 col-lg-11">
               <select name="profile_interfaceDriver" ng-model="model.InterfaceDriver" class="form-control">
+                <option value=""></option>
                 <option value="macvlan">macvlan</option>
                 <option value="overlay">overlay</option>
               </select>
