@@ -12,20 +12,23 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
     "connected": 3,
   });
 
-  let modes = Object.freeze({
-    "none": 0,
-    "exec": 1,
-    "attach": 2
-  });
-
   $scope.states = states;
-  $scope.modes = modes;
 
   $scope.state = states.loaded;
-  $scope.mode = modes.none;
 
   $scope.formValues = {};
   $scope.containerCommands = [];
+
+  $scope.statebutton = function(doattach) {
+    switch ($scope.state) {
+      case states.connected:
+        $scope.disconnect();
+        break;
+      case states.disconnected:
+        doattach ? $scope.connectAttach() : $scope.connectExec();
+        break;
+    }
+  }
 
   // Ensure the socket is closed before leaving the view
   $scope.$on('$stateChangeStart', function () {
@@ -37,7 +40,6 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
       return;
     }
 
-    $scope.mode = modes.attach;
     $scope.state = states.connecting;
 
     var termWidth = Math.floor(($('#terminal-container').width() - 20) / 8.39);
@@ -83,7 +85,6 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
       return;
     }
 
-    $scope.mode = modes.exec;
     $scope.state = states.connecting;
     var termWidth = Math.floor(($('#terminal-container').width() - 20) / 8.39);
     var termHeight = 30;
@@ -133,7 +134,6 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
     }
     if ($scope.state > states.disconnected) {
       $scope.state = states.disconnected;
-      $scope.mode = modes.none;
       if (term) {
         term.write("\n\r(connection closed)");
         term.dispose();
