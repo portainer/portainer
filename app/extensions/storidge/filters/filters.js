@@ -31,6 +31,8 @@ angular.module('extension.storidge')
     var status = text ? _.toLower(text) : '';
     if (status === 'alert') {
       return 'red-icon';
+    } else if (status === 'warning') {
+      return 'orange-icon';
     }
     return 'green-icon';
   };
