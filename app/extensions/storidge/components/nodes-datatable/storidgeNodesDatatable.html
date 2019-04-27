@@ -61,6 +61,13 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('Availability')">
+                  Availability
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Availability' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Availability' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -73,6 +80,10 @@
               <td>
                 <i class="fa fa-heartbeat space-right {{ item.Status | storidgeNodeStatusBadge }}"></i>
                 {{ item.Status }}
+              </td>
+              <td>
+                <!-- <i class="fa fa-heartbeat space-right {{ item.Availability | storidgeNodeStatusBadge }}"></i> -->
+                {{ item.Availability }}
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">

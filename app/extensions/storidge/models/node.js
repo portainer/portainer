@@ -3,6 +3,7 @@ export function StoridgeNodeModel(name, data) {
   this.IP = data.ip;
   this.Role = data.role;
   this.Status = data.status;
+  this.Availability = data.availability;
 }
 
 export function StoridgeNodeDetailedModel(name, properties) {
