@@ -17,9 +17,9 @@ angular.module('extension.storidge')
 'use strict';
   return function (text) {
     var status = text ? _.toLower(text) : '';
-    if (status === 'cordoned') {
+    if (status === 'cordoned' || status === 'maintenance') {
       return 'orange-icon';
-    } else if (status === 'leaving') {
+    } else if (status === 'leaving' || status === 'failed') {
       return 'red-icon'
     }
     return 'green-icon';
