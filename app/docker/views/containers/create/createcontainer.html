@@ -371,8 +371,8 @@
               </div>
               <!-- network-input -->
               <div class="form-group">
-                <label for="container_network" class="col-sm-2 col-lg-1 control-label text-left">Network</label>
-                <div class="col-sm-9">
+                <label for="container_network" class="col-sm-3 col-lg-2 control-label text-left">Network</label>
+                <div class="col-sm-9 col-lg-10">
                   <select class="form-control" ng-model="config.HostConfig.NetworkMode" id="container_network" ng-change="resetNetworkConfig()">
                     <option selected disabled hidden value="">Select a network</option>
                     <option ng-repeat="net in availableNetworks | orderBy: 'Name'" ng-value="net.Name">{{ net.Name }}</option>
@@ -382,8 +382,8 @@
               <!-- !network-input -->
               <!-- container-name-input -->
               <div class="form-group" ng-if="config.HostConfig.NetworkMode == 'container'">
-                <label for="container_network_container" class="col-sm-2 col-lg-1 control-label text-left">Container</label>
-                <div class="col-sm-9">
+                <label for="container_network_container" class="col-sm-3 col-lg-2 control-label text-left">Container</label>
+                <div class="col-sm-9 col-lg-10">
                   <select ng-options="container|containername for container in runningContainers" class="form-control" ng-model="formValues.NetworkContainer">
                     <option selected disabled hidden value="">Select a container</option>
                   </select>
@@ -392,46 +392,42 @@
               <!-- !container-name-input -->
               <!-- hostname-input -->
               <div class="form-group">
-                <label for="container_hostname" class="col-sm-2 col-lg-1 control-label text-left">Hostname</label>
-                <div class="col-sm-9">
+                <label for="container_hostname" class="col-sm-3 col-lg-2 control-label text-left">Hostname</label>
+                <div class="col-sm-9 col-lg-4">
                   <input type="text" class="form-control" ng-model="config.Hostname" id="container_hostname" placeholder="e.g. web01">
                 </div>
-              </div>
               <!-- !hostname-input -->
               <!-- domainname-input -->
-              <div class="form-group">
-                <label for="container_domainname" class="col-sm-2 col-lg-1 control-label text-left">Domain Name</label>
-                <div class="col-sm-9">
+                <label for="container_domainname" class="col-sm-3 col-lg-2 control-label text-left">Domain Name</label>
+                <div class="col-sm-9 col-lg-4">
                   <input type="text" class="form-control" ng-model="config.Domainname" id="container_domainname" placeholder="e.g. example.com">
                 </div>
               </div>
               <!-- !domainname -->
               <!-- mac-address-input -->
               <div class="form-group">
-                <label for="container_macaddress" class="col-sm-2 col-lg-1 control-label text-left">Mac Address</label>
-                <div class="col-sm-9">
+                <label for="container_macaddress" class="col-sm-3 col-lg-2 control-label text-left">Mac Address</label>
+                <div class="col-sm-9 col-lg-4">
                   <input type="text" class="form-control" ng-model="formValues.MacAddress" id="container_macaddress" placeholder="e.g. 12-34-56-78-9a-bc">
                 </div>
-              </div>
               <!-- !mac-address-input -->
               <!-- ipv4-input -->
-              <div class="form-group">
-                <label for="container_ipv4" class="col-sm-2 col-lg-1 control-label text-left">IPv4 Address</label>
-                <div class="col-sm-9">
+                <label for="container_ipv4" class="col-sm-3 col-lg-2 control-label text-left">IPv4 Address</label>
+                <div class="col-sm-9 col-lg-4">
                   <input type="text" class="form-control" ng-model="formValues.IPv4" id="container_ipv4" placeholder="e.g. 172.20.0.7">
                 </div>
               </div>
               <!-- !ipv4-input -->
               <!-- ipv6-input -->
               <div class="form-group">
-                <label for="container_ipv6" class="col-sm-2 col-lg-1 control-label text-left">IPv6 Address</label>
-                <div class="col-sm-9">
+                <label for="container_ipv6" class="col-sm-3 col-lg-2 col-lg-offset-6 control-label text-left">IPv6 Address</label>
+                <div class="col-sm-9 col-lg-4">
                   <input type="text" class="form-control" ng-model="formValues.IPv6" id="container_ipv6" placeholder="e.g. a:b:c:d::1234">
                 </div>
               </div>
               <!-- !ipv6-input -->
               <!-- extra-alias -->
-              <div class="form-group">
+              <div class="form-group" ng-if="networkCanAlias(config.HostConfig.NetworkMode)">
                 <div class="col-sm-12" style="margin-top: 5px;">
                   <label class="control-label text-left">Aliases</label>
                   <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addAlias()">
@@ -441,13 +437,15 @@
                 <!-- extra-alias-input-list -->
                 <div class="col-sm-12 form-inline" style="margin-top: 10px;">
                   <div ng-repeat="variable in formValues.Aliases" style="margin-top: 2px;">
-                    <div class="input-group col-sm-5 input-group-sm">
+                    <div class="input-group col-sm-6 input-group-sm">
                       <span class="input-group-addon">value</span>
                       <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. host-alias">
+                      <span class="input-group-btn">
+                        <button class="btn btn-sm btn-danger" type="button" ng-click="removeAlias($index)">
+                          <i class="fa fa-trash" aria-hidden="true"></i>
+                        </button>
+                      </span>
                     </div>
-                    <button class="btn btn-sm btn-danger" type="button" ng-click="removeAlias($index)">
-                      <i class="fa fa-trash" aria-hidden="true"></i>
-                    </button>
                   </div>
                 </div>
                 <!-- !extra-alias-input-list -->
@@ -464,13 +462,15 @@
                 <!-- extra-hosts-input-list -->
                 <div class="col-sm-12 form-inline" style="margin-top: 10px;">
                   <div ng-repeat="variable in formValues.ExtraHosts" style="margin-top: 2px;">
-                    <div class="input-group col-sm-5 input-group-sm">
+                    <div class="input-group col-sm-6 input-group-sm">
                       <span class="input-group-addon">value</span>
                       <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. host:IP">
+                      <span class="input-group-btn">
+                        <button class="btn btn-sm btn-danger" type="button" ng-click="removeExtraHost($index)">
+                          <i class="fa fa-trash" aria-hidden="true"></i>
+                        </button>
+                      </span>
                     </div>
-                    <button class="btn btn-sm btn-danger" type="button" ng-click="removeExtraHost($index)">
-                      <i class="fa fa-trash" aria-hidden="true"></i>
-                    </button>
                   </div>
                 </div>
                 <!-- !extra-hosts-input-list -->

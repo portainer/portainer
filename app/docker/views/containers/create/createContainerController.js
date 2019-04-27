@@ -138,6 +138,11 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
 
   $scope.fromContainerMultipleNetworks = false;
 
+  function networkCanAlias(network) {
+    return ['bridge', 'none', 'host', 'container'].indexOf(network) === -1;  
+  }
+  $scope.networkCanAlias = networkCanAlias;
+
   function prepareImageConfig(config) {
     var image = config.Image;
     var registry = $scope.formValues.Registry;
@@ -234,15 +239,17 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       },
     };
 
-    var aliases = [];
-    $scope.formValues.Aliases.forEach(function (v) {
-      if (v.value) {
-        aliases.push(v.value);
+    if (networkCanAlias(networkMode)) {
+      var aliases = [];
+      $scope.formValues.Aliases.forEach(function (v) {
+        if (v.value) {
+          aliases.push(v.value);
+        }
+      });
+  
+      if (aliases.length) {
+        config.NetworkingConfig.EndpointsConfig[networkMode].Aliases = aliases;
       }
-    });
-
-    if (aliases.length) {
-      config.NetworkingConfig.EndpointsConfig[networkMode].Aliases = aliases;
     }
 
     $scope.formValues.ExtraHosts.forEach(function (v) {
@@ -433,6 +440,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     // aliases
     if ($scope.config.NetworkingConfig.EndpointsConfig[$scope.config.HostConfig.NetworkMode]) {
       var networkConf = $scope.config.NetworkingConfig.EndpointsConfig[$scope.config.HostConfig.NetworkMode];
+
       if (networkConf.Aliases && networkConf.Aliases.length) {
         networkConf.Aliases.forEach(function (alias) {
           // do not add the alias based on dockerId or hostname
