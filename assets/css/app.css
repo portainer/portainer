@@ -256,6 +256,12 @@ a[ng-click]{
   border-radius: 3px;
 }
 
+.btn-datatable {
+  padding: 2.6px 7.8px 3.9px;
+  line-height: 1;
+  margin: 0px 0px 0px 0px;
+}
+
 @media screen and (min-width: 1107px) {
   .btn-responsive {
     padding: 6px 12px;

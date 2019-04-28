@@ -43,7 +43,10 @@ export function StoridgeProfileModel(name, data) {
     this.MaxBandwidth = data.bandwidth.max;
   }
 
-  this.Filesystem = data.filesystem;
+  if (data.filesystem) {
+    this.Filesystem = data.filesystem.type;
+  }
+  // this.Filesystem = data.filesystem;
 
   var service = data.service;
 
@@ -96,7 +99,9 @@ export function StoridgeCreateProfileRequest(model) {
     };
   }
 
-  this.filesystem = model.Filesystem;
+  this.filesystem = {
+    type: model.Filesystem
+  };
 
   var service = {};
 

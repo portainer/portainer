@@ -10,10 +10,6 @@
         <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.rescanAction()">
           <i class="fa fa-sync space-right" aria-hidden="true"></i>Rescan drives
         </button>
-        <button type="button" class="btn btn-sm btn-primary"
-          ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.addAction($ctrl.state.selectedItems)">
-        <i class="fa fa-plus space-right" aria-hidden="true"></i>Add to storage pool
-      </button>
       </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
@@ -24,10 +20,6 @@
           <thead>
             <tr>
               <th>
-                <span class="md-checkbox">
-                  <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
-                  <label for="select_all"></label>
-                </span>
                 <a ng-click="$ctrl.changeOrderBy('Id')">
                   Id
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Id' && !$ctrl.state.reverseOrder"></i>
@@ -76,15 +68,14 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
+              <th>
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
             <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))" ng-class="{active: item.Checked}">
               <td>
-                <span class="md-checkbox">
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-change="$ctrl.selectItem(item)" ng-disabled="item.Status === 'normal'"/>
-                  <label for="select_{{ $index }}"></label>
-                </span>
                 <a ui-sref="storidge.drives.drive({id: item.Id})"> {{ item.Id }}</a>
               </td>
               <td>{{ item.Node }}</td>
@@ -94,6 +85,11 @@
               <td>{{ item.Type }}</td>
               <td>
                 <span class="label label-{{ item.Status|drivestatusbadge }}">{{ item.Status|capitalize }}</span>
+              </td>
+              <td>
+                <button ng-if="item.Status === 'available'" type="button" class="btn btn-sm btn-primary btn-datatable" ng-click="$ctrl.addAction(item)">
+                <i class="fa fa-plus space-right" aria-hidden="true"></i>Add to storage pool
+              </button>
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
