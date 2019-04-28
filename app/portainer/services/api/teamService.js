@@ -62,9 +62,10 @@ angular.module('portainer.app')
     return Teams.remove({id: id}).$promise;
   };
 
-  service.updateTeam = function(id, name) {
+  service.updateTeam = function(id, name, roleId) {
     var payload = {
-      Name: name
+      Name: name,
+      RoleId: roleId
     };
     return Teams.update({id: id}, payload).$promise;
   };

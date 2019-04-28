@@ -27,6 +27,17 @@
               <td>Total users in team</td>
               <td>{{ teamMembers.length }}</td>
             </tr>
+          <tr ng-if="rbacEnabled">
+            <td>
+              <label for="role" class="control-label text-left">
+                Role
+              </label>
+            </td>
+            <td>
+              <select ng-options="role.Id as role.Name for role in roles" ng-model="team.RoleId" id="role" class="form-control" ng-change="updateRole()">
+              </select>
+            </td>
+          </tr>
           </tbody>
         </table>
       </rd-widget-body>

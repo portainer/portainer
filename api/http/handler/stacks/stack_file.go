@@ -40,7 +40,7 @@ func (handler *Handler) stackFile(w http.ResponseWriter, r *http.Request) *httpe
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
 
-	// TODO: ugly?
+	// TODO: ugly way to upgrade context
 	if securityContext.Authorizations[portainer.AccessEnvironment] {
 		securityContext.IsAdmin = true
 	}

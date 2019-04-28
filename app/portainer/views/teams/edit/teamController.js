@@ -1,11 +1,12 @@
 angular.module('portainer.app')
-.controller('TeamController', ['$q', '$scope', '$state', '$transition$', 'TeamService', 'UserService', 'TeamMembershipService', 'ModalService', 'Notifications', 'PaginationService', 'Authentication',
-function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMembershipService, ModalService, Notifications, PaginationService, Authentication) {
+.controller('TeamController', ['$q', '$scope', '$state', '$transition$', 'TeamService', 'UserService', 'TeamMembershipService', 'ModalService', 'Notifications', 'PaginationService', 'Authentication', 'ExtensionService', 'RoleService',
+function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMembershipService, ModalService, Notifications, PaginationService, Authentication, ExtensionService, RoleService) {
 
   $scope.state = {
     pagination_count_users: PaginationService.getPaginationLimit('team_available_users'),
     pagination_count_members: PaginationService.getPaginationLimit('team_members')
   };
+
   $scope.sortTypeUsers = 'Username';
   $scope.sortReverseUsers = true;
   $scope.users = [];
@@ -180,16 +181,31 @@ function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMember
     }
   }
 
+  $scope.updateRole = function() {
+    TeamService.updateTeam($scope.team.Id, $scope.team.Name, $scope.team.RoleId)
+      .then(function success() {
+        Notifications.success('Success', 'Role successfully updated');
+        $state.reload();
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to update team role');
+      });
+  };
+
   function initView() {
-    $scope.isAdmin = Authentication.getUserDetails().role === 1 ? true: false;
+    $scope.isAdmin = Authentication.getUserDetails().role === 1;
     $q.all({
       team: TeamService.team($transition$.params().id),
       users: UserService.users(false),
-      memberships: TeamService.userMemberships($transition$.params().id)
+      memberships: TeamService.userMemberships($transition$.params().id),
+      rbac: ExtensionService.RBACEnabled(),
+      roles: RoleService.roles()
     })
     .then(function success(data) {
       var users = data.users;
       $scope.team = data.team;
+      $scope.rbacEnabled = data.rbac;
+      $scope.roles = data.roles;
       assignUsersAndMembers(users, data.memberships);
     })
     .catch(function error(err) {

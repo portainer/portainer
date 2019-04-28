@@ -10,7 +10,8 @@ import (
 )
 
 type teamUpdatePayload struct {
-	Name string
+	Name   string
+	RoleID int
 }
 
 func (payload *teamUpdatePayload) Validate(r *http.Request) error {
@@ -39,6 +40,10 @@ func (handler *Handler) teamUpdate(w http.ResponseWriter, r *http.Request) *http
 
 	if payload.Name != "" {
 		team.Name = payload.Name
+	}
+
+	if payload.RoleID != 0 {
+		team.RoleID = portainer.RoleID(payload.RoleID)
 	}
 
 	err = handler.TeamService.UpdateTeam(team.ID, team)
