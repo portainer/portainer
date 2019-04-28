@@ -86,6 +86,59 @@ angular.module('portainer.docker')
     return [startPort, endPort];
   };
 
+  helper.preparePortBindings = function(portBindings) {
+    var bindings = {};
+    portBindings.forEach(function (portBinding) {
+      if (portBinding.containerPort) {
+        var hostPort = portBinding.hostPort;
+        var containerPortRange = helper.parsePortRange(portBinding.containerPort);
+        if (!containerPortRange || containerPortRange.length !== 2) {
+          throw new Error('Invalid port specification: ' + portBinding.containerPort);
+        }
+
+        var startPort = containerPortRange[0];
+        var endPort = containerPortRange[1];
+        var hostIp = undefined;
+        var startHostPort = 0;
+        var endHostPort = 0;
+        if (hostPort) {
+          if (hostPort.indexOf(':') > -1) {
+            var hostAndPort = hostPort.split(':');
+            hostIp = hostAndPort[0];
+            hostPort = hostAndPort[1];
+          }
+
+          var hostPortRange = helper.parsePortRange(hostPort);
+          if (!hostPortRange || hostPortRange.length !== 2) {
+            throw new Error('Invalid port specification: ' + hostPort);
+          }
+
+          startHostPort = hostPortRange[0];
+          endHostPort = hostPortRange[1];
+          if ((endPort - startPort) !== (endHostPort - startHostPort)) {
+            if (endPort !== startPort) {
+              throw new Error('Invalid port specification: ' + hostPort);
+            }
+          }
+        }
+
+        for (var i = 0; i <= (endPort - startPort); i++) {
+          var containerPort = (startPort + i).toString();
+          if (startHostPort > 0) {
+            hostPort = (startHostPort + i).toString();
+          }
+          if (startPort === endPort && startHostPort !== endHostPort) {
+            hostPort += '-' + endHostPort.toString();
+          }
+
+          var key = containerPort + '/' + portBinding.protocol;
+          bindings[key] = [{ HostIp: hostIp, HostPort: hostPort }];
+        }
+      }
+    });
+    return bindings;
+  };
+
   helper.createPortRange = function(portRange, port) {
     var hostIp = null;
     var colonIndex = portRange.indexOf(':');
