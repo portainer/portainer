@@ -88,9 +88,9 @@
               </td>
               <td>
                 <button ng-if="item.Status === 'available'" type="button" class="btn btn-sm btn-primary btn-datatable"
-                  ng-click="$ctrl.addAction(item)" button-spinner="$ctrl.actionInProgress" ng-disabled="$ctrl.actionInProgress">
-                  <span ng-hide="$ctrl.actionInProgress"><i class="fa fa-plus space-right" aria-hidden="true"></i>Add to storage pool</span>
-                  <span ng-show="$ctrl.actionInProgress">Addition in progress...</span>
+                  ng-click="$ctrl.addAction(item, $index)" button-spinner="$ctrl.additionInProgress[$index]" ng-disabled="$ctrl.actionInProgress">
+                  <span ng-hide="$ctrl.additionInProgress[$index]"><i class="fa fa-plus space-right" aria-hidden="true"></i>Add to storage pool</span>
+                  <span ng-show="$ctrl.additionInProgress[$index]">Addition in progress...</span>
                 </button>
               </td>
             </tr>

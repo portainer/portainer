@@ -11,6 +11,7 @@ angular.module('extension.storidge').component('storidgeDrivesDatatable', {
     removeAction: '<',
     addAction: '<',
     rescanAction: '<',
-    actionInProgress: '<'
+    actionInProgress: '<',
+    additionInProgress: '<'
   }
 });
