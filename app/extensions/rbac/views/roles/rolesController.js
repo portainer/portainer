@@ -4,7 +4,7 @@ class RolesController {
 
   /* @ngInject */
   constructor($state, RoleService) {
-    this.$state = $state;
+    // this.$state = $state;
     this.RoleService = RoleService;
 
     // this.removeAction = this.removeAction.bind(this);

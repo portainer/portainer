@@ -25,7 +25,7 @@ type (
 		SettingsService        portainer.SettingsService
 		SignatureService       portainer.DigitalSignatureService
 	}
-	restrictedOperationContext struct {
+	restrictedDockerOperationContext struct {
 		isAdmin          bool
 		userID           portainer.UserID
 		userTeamIDs      []portainer.TeamID
@@ -44,7 +44,7 @@ type (
 		Serveraddress string `json:"serveraddress"`
 	}
 	operationExecutor struct {
-		operationContext *restrictedOperationContext
+		operationContext *restrictedDockerOperationContext
 		labelBlackList   []portainer.Pair
 	}
 	restrictedOperationRequest func(*http.Response, *operationExecutor) error
@@ -460,7 +460,7 @@ func (p *proxyTransport) createRegistryAccessContext(request *http.Request) (*re
 	return accessContext, nil
 }
 
-func (p *proxyTransport) createOperationContext(request *http.Request) (*restrictedOperationContext, error) {
+func (p *proxyTransport) createOperationContext(request *http.Request) (*restrictedDockerOperationContext, error) {
 	var err error
 	tokenData, err := security.RetrieveTokenData(request)
 	if err != nil {
@@ -472,7 +472,7 @@ func (p *proxyTransport) createOperationContext(request *http.Request) (*restric
 		return nil, err
 	}
 
-	operationContext := &restrictedOperationContext{
+	operationContext := &restrictedDockerOperationContext{
 		isAdmin:          true,
 		userID:           tokenData.ID,
 		resourceControls: resourceControls,
@@ -491,6 +491,10 @@ func (p *proxyTransport) createOperationContext(request *http.Request) (*restric
 			userTeamIDs = append(userTeamIDs, membership.TeamID)
 		}
 		operationContext.userTeamIDs = userTeamIDs
+	}
+
+	if tokenData.Authorizations[portainer.AccessEnvironment] {
+		operationContext.isAdmin = true
 	}
 
 	return operationContext, nil

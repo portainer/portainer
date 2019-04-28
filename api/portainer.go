@@ -136,7 +136,6 @@ type (
 		Role     UserRole `json:"Role"`
 		// TODO: find a better name for this one, override Role
 		// Should we roll with RoleID ?
-		//AccessRole Role `json:"AccessRole"`
 		RoleID RoleID `json:"RoleId"`
 	}
 
@@ -1015,8 +1014,8 @@ const (
 	OperationDockerContainerUpdate              Authorization = "DockerContainerUpdate"
 	OperationDockerContainerPutContainerArchive Authorization = "DockerContainerPutContainerArchive"
 	OperationDockerContainerDelete              Authorization = "DockerContainerDelete"
-	OperationDockerImageList                    Authorization = "DockerImageList "
-	OperationDockerImageSearch                  Authorization = "DockerImageSearch "
+	OperationDockerImageList                    Authorization = "DockerImageList"
+	OperationDockerImageSearch                  Authorization = "DockerImageSearch"
 	OperationDockerImageGetAll                  Authorization = "DockerImageGetAll"
 	OperationDockerImageGet                     Authorization = "DockerImageGet"
 	OperationDockerImageHistory                 Authorization = "DockerImageHistory"
@@ -1203,4 +1202,7 @@ const (
 	OperationDockerCommit        Authorization = "DockerCommit"
 	OperationDockerBuilds        Authorization = "DockerBuilds"
 	OperationPortainerAdmin      Authorization = "PortainerAdmin"
+
+	// TODO: authorization to access all resources inside an environment
+	AccessEnvironment Authorization = "EnvironmentAccess"
 )

@@ -40,6 +40,11 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
 
+	// TODO: ugly?
+	if securityContext.Authorizations[portainer.AccessEnvironment] {
+		securityContext.IsAdmin = true
+	}
+
 	filteredStacks := proxy.FilterStacks(stacks, resourceControls, securityContext.IsAdmin,
 		securityContext.UserID, securityContext.UserMemberships)
 

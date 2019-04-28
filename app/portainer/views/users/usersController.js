@@ -1,6 +1,8 @@
+import _ from 'lodash-es';
+
 angular.module('portainer.app')
-.controller('UsersController', ['$q', '$scope', '$state', 'UserService', 'TeamService', 'TeamMembershipService', 'ModalService', 'Notifications', 'Authentication', 'SettingsService',
-function ($q, $scope, $state, UserService, TeamService, TeamMembershipService, ModalService, Notifications, Authentication, SettingsService) {
+.controller('UsersController', ['$q', '$scope', '$state', 'UserService', 'TeamService', 'TeamMembershipService', 'ModalService', 'Notifications', 'Authentication', 'SettingsService', 'ExtensionService', 'RoleService',
+function ($q, $scope, $state, UserService, TeamService, TeamMembershipService, ModalService, Notifications, Authentication, SettingsService, ExtensionService, RoleService) {
   $scope.state = {
     userCreationError: '',
     validUsername: false,
@@ -12,7 +14,8 @@ function ($q, $scope, $state, UserService, TeamService, TeamMembershipService, M
     Password: '',
     ConfirmPassword: '',
     Administrator: false,
-    Teams: []
+    Teams: [],
+    RoleId: ''
   };
 
   $scope.checkUsernameValidity = function() {
@@ -34,10 +37,11 @@ function ($q, $scope, $state, UserService, TeamService, TeamMembershipService, M
     var password = $scope.formValues.Password;
     var role = $scope.formValues.Administrator ? 1 : 2;
     var teamIds = [];
+    var roleId = $scope.formValues.RoleId;
     angular.forEach($scope.formValues.Teams, function(team) {
       teamIds.push(team.Id);
     });
-    UserService.createUser(username, password, role, teamIds)
+    UserService.createUser(username, password, role, teamIds, roleId)
     .then(function success() {
       Notifications.success('User successfully created', username);
       $state.reload();
@@ -96,6 +100,16 @@ function ($q, $scope, $state, UserService, TeamService, TeamMembershipService, M
     }
   }
 
+  function associateRoles(users, roles) {
+    for (var i = 0; i < users.length; i++) {
+      var user = users[i];
+      var role = _.find(roles, { Id: user.RoleId });
+      if (role) {
+        user.RoleName = role.Name;
+      }
+    }
+  }
+
   function initView() {
     var userDetails = Authentication.getUserDetails();
     var isAdmin = userDetails.role === 1 ? true: false;
@@ -104,14 +118,19 @@ function ($q, $scope, $state, UserService, TeamService, TeamMembershipService, M
       users: UserService.users(true),
       teams: isAdmin ? TeamService.teams() : UserService.userLeadingTeams(userDetails.ID),
       memberships: TeamMembershipService.memberships(),
-      settings: SettingsService.publicSettings()
+      settings: SettingsService.publicSettings(),
+      rbac: ExtensionService.RBACEnabled(),
+      roles: RoleService.roles()
     })
     .then(function success(data) {
       var users = data.users;
       assignTeamLeaders(users, data.memberships);
+      associateRoles(users, data.roles);
       $scope.users = users;
       $scope.teams = data.teams;
       $scope.AuthenticationMethod = data.settings.AuthenticationMethod;
+      $scope.rbacEnabled = data.rbac;
+      $scope.roles = data.roles;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve users and teams');

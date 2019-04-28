@@ -119,7 +119,7 @@ func decorateVolumeList(volumeData []interface{}, resourceControls []portainer.R
 // Authorized volumes are decorated during the process.
 // Resource controls checks are based on: resource identifier, stack identifier (from label).
 // Volume object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/VolumeList
-func filterVolumeList(volumeData []interface{}, context *restrictedOperationContext) ([]interface{}, error) {
+func filterVolumeList(volumeData []interface{}, context *restrictedDockerOperationContext) ([]interface{}, error) {
 	filteredVolumeData := make([]interface{}, 0)
 
 	for _, volume := range volumeData {

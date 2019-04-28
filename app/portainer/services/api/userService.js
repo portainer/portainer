@@ -42,10 +42,20 @@ angular.module('portainer.app')
     return deferred.promise;
   };
 
-  service.createUser = function(username, password, role, teamIds) {
+  service.createUser = function(username, password, role, teamIds, roleId) {
     var deferred = $q.defer();
 
-    Users.create({}, {username: username, password: password, role: role}).$promise
+    var payload = {
+      username: username,
+      password: password,
+      role: role
+    };
+
+    if (roleId) {
+      payload.roleID = roleId;
+    }
+
+    Users.create({}, payload).$promise
     .then(function success(data) {
       var userId = data.Id;
       var teamMembershipQueries = [];

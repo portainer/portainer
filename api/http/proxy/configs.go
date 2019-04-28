@@ -87,7 +87,7 @@ func decorateConfigList(configData []interface{}, resourceControls []portainer.R
 // Authorized configs are decorated during the process.
 // Resource controls checks are based on: resource identifier.
 // Config object schema reference: https://docs.docker.com/engine/api/v1.30/#operation/ConfigList
-func filterConfigList(configData []interface{}, context *restrictedOperationContext) ([]interface{}, error) {
+func filterConfigList(configData []interface{}, context *restrictedDockerOperationContext) ([]interface{}, error) {
 	filteredConfigData := make([]interface{}, 0)
 
 	for _, config := range configData {

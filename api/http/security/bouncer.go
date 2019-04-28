@@ -34,6 +34,7 @@ type (
 		IsTeamLeader    bool
 		UserID          portainer.UserID
 		UserMemberships []portainer.TeamMembership
+		Authorizations  portainer.Authorizations
 	}
 )
 
@@ -170,7 +171,7 @@ func (bouncer *RequestBouncer) mwUpgradeToRestrictedRequest(next http.Handler) h
 			return
 		}
 
-		requestContext, err := bouncer.newRestrictedContextRequest(tokenData.ID, tokenData.Role)
+		requestContext, err := bouncer.newRestrictedContextRequest(tokenData.ID, tokenData.Role, tokenData.Authorizations)
 		if err != nil {
 			httperror.WriteError(w, http.StatusInternalServerError, "Unable to create restricted request context ", err)
 			return
@@ -244,10 +245,11 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 	})
 }
 
-func (bouncer *RequestBouncer) newRestrictedContextRequest(userID portainer.UserID, userRole portainer.UserRole) (*RestrictedRequestContext, error) {
+func (bouncer *RequestBouncer) newRestrictedContextRequest(userID portainer.UserID, userRole portainer.UserRole, authorizations portainer.Authorizations) (*RestrictedRequestContext, error) {
 	requestContext := &RestrictedRequestContext{
-		IsAdmin: true,
-		UserID:  userID,
+		IsAdmin:        true,
+		UserID:         userID,
+		Authorizations: authorizations,
 	}
 
 	if userRole != portainer.AdministratorRole {

@@ -61,10 +61,14 @@ function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManage
     user.authorizations = tokenPayload.authorizations;
   }
 
-  function hasAuthorizations(authorization) {
-    if (user.authorizations[authorization]) {
-      return true;
+  function hasAuthorizations(authorizations) {
+    for (var i = 0; i < authorizations.length; i++) {
+      var authorization = authorizations[i];
+      if (user.authorizations[authorization]) {
+        return true;
+      }
     }
+
     return false;
   }
 

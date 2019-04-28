@@ -110,7 +110,7 @@ func decorateNetworkList(networkData []interface{}, resourceControls []portainer
 // Authorized networks are decorated during the process.
 // Resource controls checks are based on: resource identifier, stack identifier (from label).
 // Network object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/NetworkList
-func filterNetworkList(networkData []interface{}, context *restrictedOperationContext) ([]interface{}, error) {
+func filterNetworkList(networkData []interface{}, context *restrictedDockerOperationContext) ([]interface{}, error) {
 	filteredNetworkData := make([]interface{}, 0)
 
 	for _, network := range networkData {

@@ -118,7 +118,7 @@ func decorateServiceList(serviceData []interface{}, resourceControls []portainer
 // Authorized services are decorated during the process.
 // Resource controls checks are based on: resource identifier, stack identifier (from label).
 // Service object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ServiceList
-func filterServiceList(serviceData []interface{}, context *restrictedOperationContext) ([]interface{}, error) {
+func filterServiceList(serviceData []interface{}, context *restrictedDockerOperationContext) ([]interface{}, error) {
 	filteredServiceData := make([]interface{}, 0)
 
 	for _, service := range serviceData {

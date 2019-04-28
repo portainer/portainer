@@ -137,7 +137,7 @@ func decorateContainerList(containerData []interface{}, resourceControls []porta
 // Authorized containers are decorated during the process.
 // Resource controls checks are based on: resource identifier, service identifier (from label), stack identifier (from label).
 // Container object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ContainerList
-func filterContainerList(containerData []interface{}, context *restrictedOperationContext) ([]interface{}, error) {
+func filterContainerList(containerData []interface{}, context *restrictedDockerOperationContext) ([]interface{}, error) {
 	filteredContainerData := make([]interface{}, 0)
 
 	for _, container := range containerData {

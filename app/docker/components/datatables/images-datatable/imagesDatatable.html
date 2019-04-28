@@ -6,8 +6,8 @@
           <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }}
         </div>
       </div>
-      <div class="actionBar" ng-if="!$ctrl.offlineMode">
-        <div class="btn-group">
+      <div class="actionBar" ng-if="!$ctrl.offlineMode" authorization="DockerImageDelete, DockerImageBuild, DockerImageLoad, DockerImageGet">
+        <div class="btn-group" authorization="DockerImageDelete">
           <button type="button" class="btn btn-sm btn-danger"
             ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems, false)">
             <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
@@ -20,15 +20,15 @@
             <li><a ng-click="$ctrl.forceRemoveAction($ctrl.state.selectedItems, true)" ng-disabled="$ctrl.state.selectedItemCount === 0">Force Remove</a></li>
           </ul>
         </div>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.images.build">
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.images.build" authorization="DockerImageBuild">
           <i class="fa fa-plus space-right" aria-hidden="true"></i>Build a new image
         </button>
         <div class="btn-group">
-          <button type="button" class="btn btn-sm btn-primary" ng-disabled="$ctrl.exportInProgress" ui-sref="docker.images.import">
+          <button type="button" class="btn btn-sm btn-primary" ng-disabled="$ctrl.exportInProgress" ui-sref="docker.images.import" authorization="DockerImageLoad">
               <i class="fa fa-upload space-right" aria-hidden="true"></i>Import
           </button>
           <button type="button" class="btn btn-sm btn-primary" ng-disabled="$ctrl.state.selectedItemCount === 0 || $ctrl.exportInProgress"
-            ng-click="$ctrl.downloadAction($ctrl.state.selectedItems)" button-spinner="$ctrl.exportInProgress">
+            ng-click="$ctrl.downloadAction($ctrl.state.selectedItems)" button-spinner="$ctrl.exportInProgress" authorization="DockerImageGet">
               <i class="fa fa-download space-right" aria-hidden="true"></i>
               <span ng-hide="$ctrl.exportInProgress">Export</span>
               <span ng-show="$ctrl.exportInProgress">Export in progress...</span>

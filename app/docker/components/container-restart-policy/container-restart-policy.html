@@ -5,14 +5,14 @@
         <span>Name</span>
       </td>
       <td>
-        <select class="form-control" ng-model="$ctrl.state.editModel.name">
+        <select class="form-control" ng-model="$ctrl.state.editModel.name" disable-authorization="DockerContainerUpdate">
           <option value="no">None</option>
           <option value="on-failure">On Failure</option>
           <option value="always">Always</option>
           <option value="unless-stopped">Unless Stopped</option>
         </select>
       </td>
-      <td class="col-md-2">
+      <td class="col-md-2" authorization="DockerContainerUpdate">
         <button class="btn btn-sm btn-primary" ng-click="$ctrl.save()">Update</button>
       </td>
     </tr>

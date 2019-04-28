@@ -8,7 +8,7 @@
           <tr>
             <td>Update Parallelism</td>
             <td>
-              <input class="input-sm" type="number" ng-model="service.UpdateParallelism" ng-change="updateServiceAttribute(service, 'UpdateParallelism')" ng-disabled="isUpdating"/>
+              <input class="input-sm" type="number" ng-model="service.UpdateParallelism" ng-change="updateServiceAttribute(service, 'UpdateParallelism')" disable-authorization="DockerServiceUpdate"/>
             </td>
             <td>
               <p class="small text-muted" style="margin-top: 10px;">
@@ -19,7 +19,7 @@
           <tr>
             <td>Update Delay</td>
             <td>
-              <input class="input-sm" type="text" ng-model="service.UpdateDelay" ng-change="updateServiceAttribute(service, 'UpdateDelay')" ng-pattern="/^([0-9]+)(h|m|s|ms|us|ns)$/i" ng-disabled="isUpdating"/>
+              <input class="input-sm" type="text" ng-model="service.UpdateDelay" ng-change="updateServiceAttribute(service, 'UpdateDelay')" ng-pattern="/^([0-9]+)(h|m|s|ms|us|ns)$/i" disable-authorization="DockerServiceUpdate"/>
             </td>
             <td>
               <p class="small text-muted" style="margin-top: 10px;">
@@ -32,11 +32,11 @@
             <td>
               <div class="form-group">
                 <label class="radio-inline">
-                  <input type="radio" name="failure_action" ng-model="service.UpdateFailureAction" value="continue" ng-change="updateServiceAttribute(service, 'UpdateFailureAction')" ng-disabled="isUpdating">
+                  <input type="radio" name="failure_action" ng-model="service.UpdateFailureAction" value="continue" ng-change="updateServiceAttribute(service, 'UpdateFailureAction')" disable-authorization="DockerServiceUpdate">
                   Continue
                 </label>
                 <label class="radio-inline">
-                  <input type="radio" name="failure_action" ng-model="service.UpdateFailureAction" value="pause" ng-change="updateServiceAttribute(service, 'UpdateFailureAction')" ng-disabled="isUpdating">
+                  <input type="radio" name="failure_action" ng-model="service.UpdateFailureAction" value="pause" ng-change="updateServiceAttribute(service, 'UpdateFailureAction')" disable-authorization="DockerServiceUpdate">
                   Pause
                 </label>
               </div>
@@ -52,11 +52,11 @@
             <td>
               <div class="form-group">
                 <label class="radio-inline">
-                  <input type="radio" name="updateconfig_order" ng-model="service.UpdateOrder" value="start-first" ng-change="updateServiceAttribute(service, 'UpdateOrder')" ng-disabled="isUpdating">
+                  <input type="radio" name="updateconfig_order" ng-model="service.UpdateOrder" value="start-first" ng-change="updateServiceAttribute(service, 'UpdateOrder')" disable-authorization="DockerServiceUpdate">
                   start-first
                 </label>
                 <label class="radio-inline">
-                  <input type="radio" name="updateconfig_order" ng-model="service.UpdateOrder" value="stop-first" ng-change="updateServiceAttribute(service, 'UpdateOrder')" ng-disabled="isUpdating">
+                  <input type="radio" name="updateconfig_order" ng-model="service.UpdateOrder" value="stop-first" ng-change="updateServiceAttribute(service, 'UpdateOrder')" disable-authorization="DockerServiceUpdate">
                   stop-first
                 </label>
               </div>
@@ -70,7 +70,7 @@
         </tbody>
       </table>
     </rd-widget-body>
-    <rd-widget-footer>
+    <rd-widget-footer authorization="DockerServiceUpdate">
       <div class="btn-toolbar" role="toolbar">
         <div class="btn-group" role="group">
           <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['UpdateFailureAction', 'UpdateDelay', 'UpdateParallelism', 'UpdateOrder'])" ng-click="updateService(service)">Apply changes</button>

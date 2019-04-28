@@ -80,5 +80,12 @@ angular.module('portainer.app')
     return deferred.promise;
   };
 
+  // TODO: implement extension check 
+  service.RBACEnabled = function() {
+    var deferred = $q.defer();
+    deferred.resolve(true);
+    return deferred.promise;
+  }
+
   return service;
 }]);

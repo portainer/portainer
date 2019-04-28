@@ -1,11 +1,15 @@
-// import { EndpointGroupDefaultModel } from '../../../models/group';
+import angular from 'angular';
 
-angular.module('portainer.extensions.rbac')
-.controller('CreateRoleController', [
-function () {
+class CreateRoleController {
 
-  function initView() {
-  }
-
-  initView();
-}]);
+  /* @ngInject */
+  // constructor() {
+  //
+  // }
+  //
+  // async $onInit() {
+  //
+  // }
+}
+export default CreateRoleController;
+angular.module('portainer.extensions.rbac').controller('CreateRoleController', CreateRoleController);

@@ -34,10 +34,11 @@ angular.module('portainer.app')
     return deferred.promise;
   };
 
-  service.createTeam = function(name, leaderIds) {
+  service.createTeam = function(name, leaderIds, roleId) {
     var deferred = $q.defer();
     var payload = {
-      Name: name
+      Name: name,
+      RoleId: roleId
     };
     Teams.create({}, payload).$promise
     .then(function success(data) {

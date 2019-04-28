@@ -52,7 +52,7 @@
           </div>
           <!-- !confirm-password-input -->
           <!-- admin-checkbox -->
-          <div class="form-group" ng-if="isAdmin">
+          <div class="form-group" ng-if="isAdmin && !rbacEnabled">
             <div class="col-sm-12">
               <label for="permissions" class="control-label text-left">
                 Administrator
@@ -64,6 +64,18 @@
             </div>
           </div>
           <!-- !admin-checkbox -->
+          <!-- roles -->
+          <div class="form-group" ng-if="rbacEnabled">
+            <label for="role" class="col-sm-3 col-lg-2 control-label text-left">
+              Role
+            </label>
+            <div class="col-sm-8">
+              <select ng-options="role.Id as role.Name for role in roles" ng-model="formValues.RoleId" id="role" class="form-control">
+                <option selected value="">No role</option>
+              </select>
+            </div>
+          </div>
+          <!-- !roles -->
           <!-- teams -->
           <div class="form-group" ng-if="!formValues.Administrator">
             <div class="col-sm-12">
@@ -120,6 +132,7 @@
     order-by="Username"
     authentication-method="AuthenticationMethod"
     remove-action="removeAction"
+    rbac-enabled="rbacEnabled"
     ></users-datatable>
   </div>
 </div>

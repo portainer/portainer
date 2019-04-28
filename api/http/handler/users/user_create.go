@@ -15,6 +15,7 @@ type userCreatePayload struct {
 	Username string
 	Password string
 	Role     int
+	RoleID   int
 }
 
 func (payload *userCreatePayload) Validate(r *http.Request) error {
@@ -60,6 +61,7 @@ func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *http
 	user = &portainer.User{
 		Username: payload.Username,
 		Role:     portainer.UserRole(payload.Role),
+		RoleID:   portainer.RoleID(payload.RoleID),
 	}
 
 	settings, err := handler.SettingsService.Settings()

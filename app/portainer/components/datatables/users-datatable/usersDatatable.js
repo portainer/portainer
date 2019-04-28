@@ -9,6 +9,7 @@ angular.module('portainer.app').component('usersDatatable', {
     orderBy: '@',
     reverseOrder: '<',
     removeAction: '<',
-    authenticationMethod: '<'
+    authenticationMethod: '<',
+    rbacEnabled: '<'
   }
 });
