@@ -87,9 +87,11 @@
                 <span class="label label-{{ item.Status|drivestatusbadge }}">{{ item.Status|capitalize }}</span>
               </td>
               <td>
-                <button ng-if="item.Status === 'available'" type="button" class="btn btn-sm btn-primary btn-datatable" ng-click="$ctrl.addAction(item)">
-                <i class="fa fa-plus space-right" aria-hidden="true"></i>Add to storage pool
-              </button>
+                <button ng-if="item.Status === 'available'" type="button" class="btn btn-sm btn-primary btn-datatable"
+                  ng-click="$ctrl.addAction(item)" button-spinner="$ctrl.actionInProgress" ng-disabled="$ctrl.actionInProgress">
+                  <span ng-hide="$ctrl.actionInProgress"><i class="fa fa-plus space-right" aria-hidden="true"></i>Add to storage pool</span>
+                  <span ng-show="$ctrl.actionInProgress">Addition in progress...</span>
+                </button>
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">

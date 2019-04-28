@@ -2,7 +2,12 @@ angular.module('extension.storidge')
 .controller('StoridgeDrivesController', ['$scope', '$state', 'Notifications', 'StoridgeDriveService',
 function ($scope, $state, Notifications, StoridgeDriveService) {
 
+  $scope.state = {
+    actionInProgress: false
+  };
+
   $scope.addAction = function (drive) {
+    $scope.state.actionInProgress = true;
     StoridgeDriveService.add(drive.Device, drive.Node)
     .then(function success() {
       Notifications.success('Drive ' + drive.Device + ' successfully added on node ' + drive.Node);
@@ -10,6 +15,9 @@ function ($scope, $state, Notifications, StoridgeDriveService) {
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to add drive');
+    })
+    .finally(function final() {
+      $scope.state.actionInProgress = false;
     });
   };
 

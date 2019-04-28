@@ -10,6 +10,7 @@ angular.module('extension.storidge').component('storidgeDrivesDatatable', {
     reverseOrder: '<',
     removeAction: '<',
     addAction: '<',
-    rescanAction: '<'
+    rescanAction: '<',
+    actionInProgress: '<'
   }
 });
