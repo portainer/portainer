@@ -1,7 +1,7 @@
 angular.module('portainer.app')
   .directive('authorization', ['Authentication', function(Authentication) {
     return {
-      restrict: 'AC',
+      restrict: 'A',
       link: function (scope, elem, attrs) {
 
         elem.hide();
