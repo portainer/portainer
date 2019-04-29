@@ -1,7 +1,7 @@
 angular.module('portainer.app')
   .directive('authorization', ['Authentication', function(Authentication) {
     return {
-      restrict: 'A',
+      restrict: 'AC',
       link: function (scope, elem, attrs) {
 
         elem.hide();
@@ -11,8 +11,13 @@ angular.module('portainer.app')
           authorizations[i] = authorizations[i].trim();
         }
 
-        if (Authentication.hasAuthorizations(authorizations)) {
+        var hasAuthorizations = Authentication.hasAuthorizations(authorizations);
+
+        if (hasAuthorizations) {
           elem.show();
+        } else if (!hasAuthorizations && elem[0].tagName === 'A') {
+          elem.show();
+          elem.addClass('portainer-disabled-link');
         }
       }
     }

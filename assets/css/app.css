@@ -63,6 +63,11 @@ a[ng-click]{
   margin-left: 5px;
 }
 
+.portainer-disabled-link {
+  color: gray;
+  pointer-events: none;
+}
+
 .tooltip.portainer-tooltip .tooltip-inner {
   font-family: Montserrat;
   background-color: #ffffff;

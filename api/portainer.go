@@ -990,7 +990,7 @@ const (
 const (
 	OperationDockerContainerArchiveInfo         Authorization = "DockerContainerArchiveInfo"
 	OperationDockerContainerList                Authorization = "DockerContainerList"
-	OperationDockerContainerExport              Authorization = "DockerContainerExport "
+	OperationDockerContainerExport              Authorization = "DockerContainerExport"
 	OperationDockerContainerChanges             Authorization = "DockerContainerChanges"
 	OperationDockerContainerInspect             Authorization = "DockerContainerInspect"
 	OperationDockerContainerTop                 Authorization = "DockerContainerTop"
