@@ -2,16 +2,7 @@ angular.module('extension.storidge')
 .controller('StoridgeDriveController', ['$scope', '$state', '$transition$', 'Notifications', 'ModalService', 'StoridgeDriveService',
 function ($scope, $state, $transition$, Notifications, ModalService, StoridgeDriveService) {
 
-  $scope.addDrive = function () {
-    StoridgeDriveService.add($scope.drive.Device, $scope.drive.Node)
-    .then(function () {
-      Notifications.success('Success', 'Drive added to storage pool');
-      $state.reload();
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to add drive to storage pool');
-    });
-  };
+  $scope.actionInProgress = false;
 
   $scope.removeDrive = function () {
     ModalService.confirm({
@@ -25,13 +16,17 @@ function ($scope, $state, $transition$, Notifications, ModalService, StoridgeDri
       },
       callback: function onConfirm(confirmed) {
         if(!confirmed) { return; }
+        $scope.actionInProgress = true;
         StoridgeDriveService.remove($scope.drive.Id)
         .then(function () {
           Notifications.success('Success', 'Drive removed from storage pool');
-          $state.reload();
+          $state.go('storidge.drives', {}, { reload:true });
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to remove drive from storage pool');
+        })
+        .finally(function final() {
+          $scope.actionInProgress = false;
         });
       }
     });

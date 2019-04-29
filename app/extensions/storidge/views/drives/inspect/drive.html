@@ -16,11 +16,9 @@
               <td>ID</td>
               <td>
                 {{ drive.Id }}
-                <button class="btn btn-xs btn-primary" ng-click="addDrive()" ng-if="drive.Status === 'available'">
-                  <i class="fa fa-plus space-right" aria-hidden="true"></i>Add to storage pool
-                </button>
-                <button class="btn btn-xs btn-danger" ng-click="removeDrive()" ng-if="drive.Status === 'faulty'">
-                  <i class="fa fa-trash space-right" aria-hidden="true"></i>Remove from storage pool
+                <button class="btn btn-xs btn-danger" ng-click="removeDrive()" ng-if="drive.Status === 'faulty'" button-spinner="actionInProgress" ng-disabled="actionInProgress">
+                  <span ng-hide="actionInProgress"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove from storage pool</span>
+                  <span ng-show="actionInProgress">Removal in progress...</span>
                 </button>
               </td>
             </tr>
