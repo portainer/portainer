@@ -14,7 +14,7 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
 
   $scope.states = states;
 
-  $scope.state = states.loaded;
+  $scope.state = states.unloaded;
 
   $scope.formValues = {};
   $scope.containerCommands = [];
@@ -114,6 +114,14 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
     }
   };
 
+  $scope.autoconnectAttachView = function() {
+    return $scope.initView().then(function success() {
+        if ($scope.container.State.Running) {
+            $scope.connectAttach();
+        }
+    });
+  };
+
   function initTerm(url, height, width) {
 
       if ($transition$.params().nodeName) {
@@ -160,9 +168,9 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
     };
   }
 
-  function initView() {
+  $scope.initView = function() {
     HttpRequestHelper.setPortainerAgentTargetHeader($transition$.params().nodeName);
-    ContainerService.container($transition$.params().id)
+    return ContainerService.container($transition$.params().id)
     .then(function success(data) {
       var container = data;
       $scope.container = container;
@@ -186,6 +194,4 @@ function ($scope, $transition$, ContainerService, ImageService, EndpointProvider
       Notifications.error('Error', err, 'Unable to retrieve container details');
     });
   }
-
-  initView();
 }]);

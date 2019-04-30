@@ -5,6 +5,8 @@
   </rd-header-content>
 </rd-header>
 
+<div ng-init="initView()" ng-if="state == states.unloaded"></div>
+
 <div class="row" ng-if="state > states.unloaded">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
