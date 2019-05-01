@@ -6,10 +6,9 @@ angular.module('portainer.docker')
       var socket, term;
 
       let states = Object.freeze({
-        "unloaded": 0,
-        "disconnected": 1,
-        "connecting": 2,
-        "connected": 3,
+        disconnected: 0,
+        connecting: 1,
+        connected: 2,
       });
 
       $scope.loaded = false;
