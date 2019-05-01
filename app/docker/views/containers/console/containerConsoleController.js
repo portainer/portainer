@@ -12,9 +12,9 @@ angular.module('portainer.docker')
         "connected": 3,
       });
 
+      $scope.loaded = false;
       $scope.states = states;
-
-      $scope.state = states.unloaded;
+      $scope.state = states.disconnected;
 
       $scope.formValues = {};
       $scope.containerCommands = [];
@@ -205,7 +205,7 @@ angular.module('portainer.docker')
                   command: containerLabels[label]
                 };
               });
-            $scope.state = states.disconnected;
+            $scope.loaded = true;
           })
           .catch(function error(err) {
             Notifications.error('Error', err, 'Unable to retrieve container details');
