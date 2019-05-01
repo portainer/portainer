@@ -3,7 +3,7 @@ angular.module('portainer.docker')
         'use strict';
         var service = {};
 
-        service.resizeTTY = function (execId, height, width, timeout) {
+        service.resizeTTY = function (execId, width, height, timeout) {
             var deferred = $q.defer();
 
             $timeout(function() {
