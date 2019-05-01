@@ -11,7 +11,7 @@
       <rd-widget-header icon="fa-terminal" title-text="Execute"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
-          <div ng-if="state < states.connecting">
+          <div ng-if="state === states.disconnected">
             <!-- command-list -->
               <div class="form-group">
                 <label for="command" class="col-lg-1 text-left col-sm-2 control-label">Command</label>
@@ -61,7 +61,7 @@
               </div>
             </div>
           </div>
-          <div ng-if="state >= states.connecting">
+          <div ng-if="state !== states.disconnected">
             <label>Exec into container as <code>{{ ::formValues.user || 'default user' }}</code> using command <code>{{ formValues.isCustomCommand ? formValues.customCommand : formValues.command }}</code></label>
             <button type="button" class="btn btn-primary" ng-click="disconnect()">
               <span ng-show="state === states.connected">Disconnect</span>
