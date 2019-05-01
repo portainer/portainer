@@ -106,6 +106,15 @@ angular.module('portainer.app')
     return '';
   };
 })
+.filter('labelsToStr', function () {
+  'use strict';
+  return function (arr, separator) {
+    if (arr) {
+      return _.join(arr.map((item) => item.key + ':' + item.value), separator);
+    }
+    return '';
+  };
+})
 .filter('endpointtypename', function () {
   'use strict';
   return function (type) {
