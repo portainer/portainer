@@ -34,7 +34,7 @@
 
         <button type="button" class="btn btn-primary" ng-disabled="state === states.connecting || !container.State.Running" ng-click="state == states.disconnected ? connectAttach() : disconnect()">
           <span ng-show="state === states.disconnected">Attach to Container</span>
-          <span ng-show="state === states.connected">Disattach</span>
+          <span ng-show="state === states.connected">Detach</span>
           <span ng-show="state === states.connecting">Attaching...</span>
         </button>
 
