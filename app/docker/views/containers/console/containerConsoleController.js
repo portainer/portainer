@@ -123,7 +123,7 @@ angular.module('portainer.docker')
 
         term.resize(termWidth, termHeight);
         term.fit();
-        restcall(termHeight + add, termWidth + add, 1);
+        restcall(termWidth + add, termHeight + add, 1);
       }
 
       function initTerm(url, resizeRestCall) {

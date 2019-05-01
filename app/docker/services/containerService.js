@@ -37,7 +37,7 @@ function ContainerServiceFactory($q, Container, ResourceControlService, LogHelpe
     return deferred.promise;
   };
 
-  service.resizeTTY = function (id, height, width, timeout) {
+  service.resizeTTY = function (id, width, height, timeout) {
     var deferred = $q.defer();
 
     $timeout(function() {
