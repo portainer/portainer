@@ -51,7 +51,7 @@
             </div>
             <div class="form-group">
               <div class="col-sm-12">
-                <button type="button" class="btn btn-primary" ng-disabled="state.connecting || state.connected || !container.State.Running" ng-click="connectExec()">
+                <button type="button" class="btn btn-primary" ng-disabled="!container.State.Running" ng-click="connectExec()">
                   <span>Connect</span>
                 </button>
                 <span class="small text-danger" ng-hide="container.State.Running">
@@ -63,7 +63,7 @@
           </div>
           <div ng-if="state >= states.connecting">
             <label>Exec into container as <code>{{ ::formValues.user || 'default user' }}</code> using command <code>{{ formValues.isCustomCommand ? formValues.customCommand : formValues.command }}</code></label>
-            <button type="button" class="btn btn-primary" ng-disabled="state.connecting || state.connected" ng-click="disconnect()">
+            <button type="button" class="btn btn-primary" ng-click="disconnect()">
               <span ng-show="state === states.connected">Disconnect</span>
               <span ng-show="state === states.connecting">Connecting...</span>
             </button>
