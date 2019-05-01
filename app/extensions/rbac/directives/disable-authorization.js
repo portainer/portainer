@@ -1,4 +1,4 @@
-angular.module('portainer.app')
+angular.module('portainer.extensions.rbac')
   .directive('disableAuthorization', ['Authentication', function(Authentication) {
     return {
       restrict: 'A',

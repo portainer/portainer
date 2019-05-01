@@ -1,4 +1,4 @@
-package authorizationset
+package role
 
 import (
 	"github.com/portainer/portainer/api"
@@ -9,7 +9,7 @@ import (
 
 const (
 	// BucketName represents the name of the bucket where this service stores data.
-	BucketName = "sets"
+	BucketName = "roles"
 )
 
 // Service represents a service for managing endpoint data.

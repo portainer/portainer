@@ -125,6 +125,7 @@ type (
 	Role struct {
 		ID             RoleID         `json:"Id"`
 		Name           string         `json:"Name"`
+		Description    string         `json:"Description"`
 		Authorizations Authorizations `json:"Authorizations"`
 	}
 
