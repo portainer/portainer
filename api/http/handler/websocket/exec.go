@@ -3,17 +3,15 @@ package websocket
 import (
 	"bytes"
 	"encoding/json"
-	"net"
-	"net/http"
-	"net/http/httputil"
-	"time"
-	"unicode/utf8"
-
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/websocket"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/portainer/api"
+	"net"
+	"net/http"
+	"net/http/httputil"
+	"time"
 )
 
 type execStartOperationPayload struct {
