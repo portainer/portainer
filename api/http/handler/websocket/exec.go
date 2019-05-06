@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"time"
+	"unicode/utf8"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/websocket"
