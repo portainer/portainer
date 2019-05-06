@@ -117,11 +117,13 @@ angular.module('portainer.docker')
 
       function resize(restcall, add) {
         add = add || 0;
-        var termWidth = Math.floor(($('#terminal-container').width() - 30) / 8.39);
-        var termHeight = 30;
 
-        term.resize(termWidth, termHeight);
         term.fit();
+        var termWidth = term.cols;
+        var termHeight = 30;
+        term.resize(termWidth, termHeight);
+
+
         restcall(termWidth + add, termHeight + add, 1);
       }
 
