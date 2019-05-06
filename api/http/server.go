@@ -81,15 +81,6 @@ type Server struct {
 
 // Start starts the HTTP server
 func (server *Server) Start() error {
-	requestBouncerParameters := &security.RequestBouncerParams{
-		JWTService:            server.JWTService,
-		UserService:           server.UserService,
-		TeamMembershipService: server.TeamMembershipService,
-		EndpointGroupService:  server.EndpointGroupService,
-		AuthDisabled:          server.AuthDisabled,
-	}
-	requestBouncer := security.NewRequestBouncer(requestBouncerParameters)
-
 	proxyManagerParameters := &proxy.ManagerParams{
 		ResourceControlService: server.ResourceControlService,
 		TeamMembershipService:  server.TeamMembershipService,
@@ -99,6 +90,17 @@ func (server *Server) Start() error {
 		SignatureService:       server.SignatureService,
 	}
 	proxyManager := proxy.NewManager(proxyManagerParameters)
+
+	requestBouncerParameters := &security.RequestBouncerParams{
+		JWTService:            server.JWTService,
+		UserService:           server.UserService,
+		TeamMembershipService: server.TeamMembershipService,
+		EndpointGroupService:  server.EndpointGroupService,
+		ExtensionService:      server.ExtensionService,
+		RBACExtensionURL:      proxyManager.GetExtensionURL(portainer.RBACExtension),
+		AuthDisabled:          server.AuthDisabled,
+	}
+	requestBouncer := security.NewRequestBouncer(requestBouncerParameters)
 
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
 

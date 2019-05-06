@@ -1,13 +1,15 @@
 package security
 
-import "github.com/portainer/portainer/api"
+import (
+	"github.com/portainer/portainer/api"
+)
 
 // FilterUserTeams filters teams based on user role.
 // non-administrator users only have access to team they are member of.
 func FilterUserTeams(teams []portainer.Team, context *RestrictedRequestContext) []portainer.Team {
 	filteredTeams := teams
 
-	if !context.IsAdmin {
+	if !context.IsAdmin && !context.Authorizations[portainer.AdministratorAccess] {
 		filteredTeams = make([]portainer.Team, 0)
 		for _, membership := range context.UserMemberships {
 			for _, team := range teams {
@@ -47,7 +49,7 @@ func FilterLeaderTeams(teams []portainer.Team, context *RestrictedRequestContext
 func FilterUsers(users []portainer.User, context *RestrictedRequestContext) []portainer.User {
 	filteredUsers := users
 
-	if !context.IsAdmin {
+	if !context.IsAdmin && !context.Authorizations[portainer.AdministratorAccess] {
 		filteredUsers = make([]portainer.User, 0)
 
 		for _, user := range users {
@@ -64,7 +66,7 @@ func FilterUsers(users []portainer.User, context *RestrictedRequestContext) []po
 // Non administrator users only have access to authorized registries.
 func FilterRegistries(registries []portainer.Registry, context *RestrictedRequestContext) []portainer.Registry {
 	filteredRegistries := registries
-	if !context.IsAdmin {
+	if !context.IsAdmin && !context.Authorizations[portainer.AdministratorAccess] {
 		filteredRegistries = make([]portainer.Registry, 0)
 
 		for _, registry := range registries {
@@ -78,11 +80,11 @@ func FilterRegistries(registries []portainer.Registry, context *RestrictedReques
 }
 
 // FilterTemplates filters templates based on the user role.
-// Non-administrato template do not have access to templates where the AdministratorOnly flag is set to true.
+// Non-administrator template do not have access to templates where the AdministratorOnly flag is set to true.
 func FilterTemplates(templates []portainer.Template, context *RestrictedRequestContext) []portainer.Template {
 	filteredTemplates := templates
 
-	if !context.IsAdmin {
+	if !context.IsAdmin && !context.Authorizations[portainer.AdministratorAccess] {
 		filteredTemplates = make([]portainer.Template, 0)
 
 		for _, template := range templates {
@@ -100,7 +102,7 @@ func FilterTemplates(templates []portainer.Template, context *RestrictedRequestC
 func FilterEndpoints(endpoints []portainer.Endpoint, groups []portainer.EndpointGroup, context *RestrictedRequestContext) []portainer.Endpoint {
 	filteredEndpoints := endpoints
 
-	if !context.IsAdmin {
+	if !context.IsAdmin && !context.Authorizations[portainer.AdministratorAccess] {
 		filteredEndpoints = make([]portainer.Endpoint, 0)
 
 		for _, endpoint := range endpoints {
@@ -120,7 +122,7 @@ func FilterEndpoints(endpoints []portainer.Endpoint, groups []portainer.Endpoint
 func FilterEndpointGroups(endpointGroups []portainer.EndpointGroup, context *RestrictedRequestContext) []portainer.EndpointGroup {
 	filteredEndpointGroups := endpointGroups
 
-	if !context.IsAdmin {
+	if !context.IsAdmin && !context.Authorizations[portainer.AdministratorAccess] {
 		filteredEndpointGroups = make([]portainer.EndpointGroup, 0)
 
 		for _, group := range endpointGroups {

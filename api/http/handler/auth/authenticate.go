@@ -122,42 +122,78 @@ func (handler *Handler) writeToken(w http.ResponseWriter, user *portainer.User) 
 		Role:     user.Role,
 	}
 
-	// TODO: only if extension is enabled
-	// If no role associated to the user, check for team auths
-	associatedRole := 0
+	_, err := handler.ExtensionService.Extension(portainer.RBACExtension)
+	if err == portainer.ErrObjectNotFound {
+		return handler.persistAndWriteToken(w, tokenData)
+	} else if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a extension with the specified identifier inside the database", err}
+	}
+
+	authorizations, err := handler.getUserAuthorizations(user)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve authorizations associated to the user", err}
+	}
+
+	tokenData.Authorizations = authorizations
+	return handler.persistAndWriteToken(w, tokenData)
+}
+
+// TODO: relocate this code?
+// Use elispsis via ... ? a,b,c,d... unlimited authorizations parameters
+func intersection(a, b portainer.Authorizations) portainer.Authorizations {
+	c := make(map[portainer.Authorization]bool)
+
+	for k := range b {
+		if _, ok := a[k]; ok {
+			c[k] = true
+		}
+	}
+	return c
+}
+
+func (handler *Handler) getUserAuthorizations(user *portainer.User) (portainer.Authorizations, error) {
+
+	var roleIdentifiers []portainer.RoleID
 	if user.RoleID == 0 {
 		userMemberships, err := handler.TeamMembershipService.TeamMembershipsByUserID(user.ID)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user team memberships", err}
+			return nil, err
 		}
 
-		// TODO: handle multiple team roles, at the moment only load from first available team
-		//for _, membership := range userMemberships {
-		//
-		//}
-
-		if len(userMemberships) > 0 {
-			team, err := handler.TeamService.Team(userMemberships[0].TeamID)
+		for _, membership := range userMemberships {
+			team, err := handler.TeamService.Team(membership.TeamID)
 			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve team associated to the user", err}
+				return nil, err
 			}
 
-			associatedRole = int(team.RoleID)
+			roleIdentifiers = append(roleIdentifiers, team.RoleID)
 		}
-
 	} else {
-		associatedRole = int(user.RoleID)
+		roleIdentifiers = append(roleIdentifiers, user.RoleID)
 	}
 
-	if associatedRole != 0 {
-		userRole, err := handler.RoleService.Role(portainer.RoleID(associatedRole))
+	var roleAuthorizations []portainer.Authorizations
+	for _, id := range roleIdentifiers {
+		role, err := handler.RoleService.Role(portainer.RoleID(id))
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve authorizations associated to the user", err}
+			return nil, err
 		}
 
-		tokenData.Authorizations = userRole.Authorizations
+		roleAuthorizations = append(roleAuthorizations, role.Authorizations)
 	}
 
+	processedAuthorizations := roleAuthorizations[0]
+	for idx, authorizations := range roleAuthorizations {
+		if idx == 0 {
+			continue
+		}
+		processedAuthorizations = intersection(processedAuthorizations, authorizations)
+	}
+
+	return processedAuthorizations, nil
+}
+
+func (handler *Handler) persistAndWriteToken(w http.ResponseWriter, tokenData *portainer.TokenData) *httperror.HandlerError {
 	token, err := handler.JWTService.GenerateToken(tokenData)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to generate JWT token", err}

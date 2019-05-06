@@ -317,6 +317,8 @@ func (store *Store) Init() error {
 				portainer.OperationDockerVersion:                      true,
 				portainer.OperationDockerEvents:                       true,
 				portainer.OperationDockerSystem:                       true,
+				portainer.AccessEnvironment:                           true,
+				portainer.AdministratorAccess:                         true,
 			},
 		}
 
@@ -726,7 +728,6 @@ func (store *Store) Init() error {
 				portainer.OperationPortainerWebhookList: true,
 				// portainer.OperationPortainerWebhookCreate:             true,
 				// portainer.OperationPortainerWebhookDelete:             true,
-
 				portainer.AccessEnvironment: true,
 			},
 		}

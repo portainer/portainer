@@ -15,6 +15,8 @@ type (
 		userService           portainer.UserService
 		teamMembershipService portainer.TeamMembershipService
 		endpointGroupService  portainer.EndpointGroupService
+		extensionService      portainer.ExtensionService
+		rbacExtensionClient   *rbacExtensionClient
 		authDisabled          bool
 	}
 
@@ -24,6 +26,8 @@ type (
 		UserService           portainer.UserService
 		TeamMembershipService portainer.TeamMembershipService
 		EndpointGroupService  portainer.EndpointGroupService
+		ExtensionService      portainer.ExtensionService
+		RBACExtensionURL      string
 		AuthDisabled          bool
 	}
 
@@ -45,6 +49,8 @@ func NewRequestBouncer(parameters *RequestBouncerParams) *RequestBouncer {
 		userService:           parameters.UserService,
 		teamMembershipService: parameters.TeamMembershipService,
 		endpointGroupService:  parameters.EndpointGroupService,
+		extensionService:      parameters.ExtensionService,
+		rbacExtensionClient:   newRBACExtensionClient(parameters.RBACExtensionURL),
 		authDisabled:          parameters.AuthDisabled,
 	}
 }
@@ -59,8 +65,7 @@ func (bouncer *RequestBouncer) PublicAccess(h http.Handler) http.Handler {
 // AuthenticatedAccess defines a security check for private endpoints.
 // Authentication is required to access these endpoints.
 func (bouncer *RequestBouncer) AuthenticatedAccess(h http.Handler) http.Handler {
-	// TODO: enable this only if RBAC extension available
-	h = bouncer.mwCheckPermissions(h)
+	h = bouncer.mwCheckAuthorizations(h)
 	h = bouncer.mwCheckAuthentication(h)
 	h = mwSecureHeaders(h)
 	return h
@@ -93,7 +98,7 @@ func (bouncer *RequestBouncer) EndpointAccess(r *http.Request, endpoint *portain
 		return err
 	}
 
-	if tokenData.Role == portainer.AdministratorRole {
+	if tokenData.Role == portainer.AdministratorRole || tokenData.Authorizations[portainer.AdministratorAccess] {
 		return nil
 	}
 
@@ -148,11 +153,32 @@ func mwSecureHeaders(next http.Handler) http.Handler {
 	})
 }
 
-func (bouncer *RequestBouncer) mwCheckPermissions(next http.Handler) http.Handler {
+func (bouncer *RequestBouncer) mwCheckAuthorizations(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := checkPermissions(r)
+		extension, err := bouncer.extensionService.Extension(portainer.RBACExtension)
+		if err == portainer.ErrObjectNotFound {
+			next.ServeHTTP(w, r)
+			return
+		} else if err != nil {
+			httperror.WriteError(w, http.StatusInternalServerError, "Unable to find a extension with the specified identifier inside the database", err)
+			return
+		}
+
+		tokenData, err := RetrieveTokenData(r)
 		if err != nil {
-			// TODO: handle error message that could be raised in checkPermissions
+			httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrResourceAccessDenied)
+			return
+		}
+
+		apiOperation := &portainer.APIOperation{
+			Path:           r.URL.String(),
+			Method:         r.Method,
+			Authorizations: tokenData.Authorizations,
+		}
+
+		bouncer.rbacExtensionClient.setLicenseKey(extension.License.LicenseKey)
+		err = bouncer.rbacExtensionClient.checkAuthorizations(apiOperation)
+		if err != nil {
 			httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrAuthorizationRequired)
 			return
 		}

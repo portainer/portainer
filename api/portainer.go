@@ -117,6 +117,14 @@ type (
 	// Authorizations represents a set of authorizations associated to a role
 	Authorizations map[Authorization]bool
 
+	// TODO: probably need a rename due to the fact that Authorizations are embedded
+	// APIOperation represent an operation at an API level
+	APIOperation struct {
+		Path           string
+		Method         string
+		Authorizations Authorizations
+	}
+
 	// RoleID represents a role identifier
 	RoleID int
 
@@ -835,7 +843,7 @@ const (
 	// MessageOfTheDayTitleURL represents the URL where Portainer MOTD title can be retrieved
 	MessageOfTheDayTitleURL = AssetsServerURL + "/motd-title.txt"
 	// ExtensionDefinitionsURL represents the URL where Portainer extension definitions can be retrieved
-	ExtensionDefinitionsURL = AssetsServerURL + "/extensions-1.20.2.json"
+	ExtensionDefinitionsURL = AssetsServerURL + "/extensions-1.20.3.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response
 	PortainerAgentHeader = "Portainer-Agent"
 	// PortainerAgentTargetHeader represent the name of the header containing the target node name
@@ -964,6 +972,8 @@ const (
 	RegistryManagementExtension
 	// OAuthAuthenticationExtension represents the OAuth authentication extension
 	OAuthAuthenticationExtension
+	// RBACExtension represents the RBAC extension
+	RBACExtension
 )
 
 const (
@@ -1204,6 +1214,8 @@ const (
 	OperationDockerBuilds        Authorization = "DockerBuilds"
 	OperationPortainerAdmin      Authorization = "PortainerAdmin"
 
-	// TODO: authorization to access all resources inside an environment
+	// TODO: authorization to access all resources inside an environment (rename?)
 	AccessEnvironment Authorization = "EnvironmentAccess"
+	// TODO: support AccessEndpoint to access all endpoints?
+	AdministratorAccess Authorization = "AdministratorAccess"
 )

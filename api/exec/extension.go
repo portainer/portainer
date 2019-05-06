@@ -20,6 +20,7 @@ var extensionDownloadBaseURL = "https://portainer-io-assets.sfo2.digitaloceanspa
 var extensionBinaryMap = map[portainer.ExtensionID]string{
 	portainer.RegistryManagementExtension:  "extension-registry-management",
 	portainer.OAuthAuthenticationExtension: "extension-oauth-authentication",
+	portainer.RBACExtension:                "extension-rbac",
 }
 
 // ExtensionManager represents a service used to
