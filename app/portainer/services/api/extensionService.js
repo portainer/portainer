@@ -50,6 +50,7 @@ angular.module('portainer.app')
     return deferred.promise;
   };
 
+  // TODO: create and call extensionEnabled function (refactor/centralize)
   service.registryManagementEnabled = function() {
     var deferred = $q.defer();
 
@@ -80,12 +81,20 @@ angular.module('portainer.app')
     return deferred.promise;
   };
 
-  // TODO: implement extension check 
   service.RBACEnabled = function() {
     var deferred = $q.defer();
-    deferred.resolve(true);
+
+    service.extensions(false)
+      .then(function onSuccess(extensions) {
+        var extensionAvailable = _.find(extensions, { Id: 3, Enabled: true }) ? true : false;
+        deferred.resolve(extensionAvailable);
+      })
+      .catch(function onError(err) {
+        deferred.reject(err);
+      });
+
     return deferred.promise;
-  }
+  };
 
   return service;
 }]);
