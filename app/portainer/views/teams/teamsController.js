@@ -89,7 +89,7 @@ function ($q, $scope, $state, TeamService, UserService, ModalService, Notificati
 
   function initView() {
     var userDetails = Authentication.getUserDetails();
-    var isAdmin = userDetails.role === 1 ? true: false;
+    var isAdmin = Authentication.isAdmin();
     $scope.isAdmin = isAdmin;
     $q.all({
       users: UserService.users(false),

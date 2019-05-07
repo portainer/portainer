@@ -69,9 +69,8 @@ function($q, $scope, $state, $stateParams, $sanitize, Authentication, UserServic
     EndpointService.endpoints()
     .then(function success(data) {
       var endpoints = data;
-      var userDetails = Authentication.getUserDetails();
 
-      if (endpoints.length === 0 && userDetails.role === 1) {
+      if (endpoints.length === 0 && Authentication.isAdmin()) {
         $state.go('portainer.init.endpoint');
       } else {
         $state.go('portainer.home');

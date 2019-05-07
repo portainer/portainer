@@ -13,6 +13,7 @@ function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManage
   service.logout = logout;
   service.isAuthenticated = isAuthenticated;
   service.getUserDetails = getUserDetails;
+  service.isAdmin = isAdmin;
   service.hasAuthorizations = hasAuthorizations;
 
   function init() {
@@ -61,7 +62,20 @@ function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManage
     user.authorizations = tokenPayload.authorizations;
   }
 
+  function isAdmin() {
+    let isAdmin = false;
+    if (user.authorizations) {
+      isAdmin = hasAuthorizations(['AdministratorAccess']);
+    } else if (user.role) {
+      isAdmin = user.role === 1;
+    }
+    return isAdmin;
+  }
+
   function hasAuthorizations(authorizations) {
+    if (!user.authorizations) {
+      return true;
+    }
     for (var i = 0; i < authorizations.length; i++) {
       var authorization = authorizations[i];
       if (user.authorizations[authorization]) {

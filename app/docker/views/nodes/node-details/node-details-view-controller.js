@@ -13,7 +13,7 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
     function initView() {
       var applicationState = StateManager.getState();
       ctrl.state.isAgent = applicationState.endpoint.mode.agentProxy;
-      ctrl.state.isAdmin = Authentication.getUserDetails().role === 1;
+      ctrl.state.isAdmin = Authentication.isAdmin();
       ctrl.state.enableHostManagementFeatures = applicationState.application.enableHostManagementFeatures;
 
       var fetchJobs = ctrl.state.isAdmin && ctrl.state.isAgent;

@@ -633,8 +633,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       $scope.availableLoggingDrivers = loggingDrivers;
     });
 
-    var userDetails = Authentication.getUserDetails();
-    $scope.isAdmin = userDetails.role === 1;
+    $scope.isAdmin = Authentication.isAdmin();
   }
 
   function validateForm(accessControlData, isAdmin) {
@@ -845,10 +844,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
 
     function validateAccessControl() {
       var accessControlData = $scope.formValues.AccessControlData;
-      var userDetails = Authentication.getUserDetails();
-      var isAdmin = userDetails.role === 1;
-
-      return validateForm(accessControlData, isAdmin);
+      return validateForm(accessControlData, $scope.isAdmin);
     }
 
     function onSuccess() {

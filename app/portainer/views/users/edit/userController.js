@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('UserController', ['$q', '$scope', '$state', '$transition$', 'UserService', 'ModalService', 'Notifications', 'SettingsService', 'ExtensionService', 'RoleService',
-function ($q, $scope, $state, $transition$, UserService, ModalService, Notifications, SettingsService, ExtensionService, RoleService) {
+.controller('UserController', ['$q', '$scope', '$state', '$transition$', 'UserService', 'ModalService', 'Notifications', 'SettingsService', 'ExtensionService', 'RoleService', 'Authentication',
+function ($q, $scope, $state, $transition$, UserService, ModalService, Notifications, SettingsService, ExtensionService, RoleService, Authentication) {
 
   $scope.state = {
     updatePasswordError: ''
@@ -84,7 +84,7 @@ function ($q, $scope, $state, $transition$, UserService, ModalService, Notificat
     .then(function success(data) {
       var user = data.user;
       $scope.user = user;
-      $scope.formValues.Administrator = user.Role === 1 ? true : false;
+      $scope.formValues.Administrator = Authentication.isAdmin();
       $scope.formValues.roleId = user.RoleId !== 0 ? user.RoleId : '';
       $scope.AuthenticationMethod = data.settings.AuthenticationMethod;
       $scope.rbacEnabled = data.rbac;

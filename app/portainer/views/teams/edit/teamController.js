@@ -193,7 +193,7 @@ function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMember
   };
 
   function initView() {
-    $scope.isAdmin = Authentication.getUserDetails().role === 1;
+    $scope.isAdmin = Authentication.isAdmin();
     $q.all({
       team: TeamService.team($transition$.params().id),
       users: UserService.users(false),
