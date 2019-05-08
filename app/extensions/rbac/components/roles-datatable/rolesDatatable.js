@@ -8,7 +8,6 @@ angular.module('portainer.extensions.rbac').component('rolesDatatable', {
     tableKey: '@',
     orderBy: '@',
     reverseOrder: '<',
-    removeAction: '<',
     rbacEnabled: '<'
   }
 });
