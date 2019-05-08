@@ -65,12 +65,6 @@ func (service *Service) Roles() ([]portainer.Role, error) {
 	return sets, err
 }
 
-// UpdateRole saves a Role.
-func (service *Service) UpdateRole(ID portainer.RoleID, set *portainer.Role) error {
-	identifier := internal.Itob(int(ID))
-	return internal.UpdateObject(service.db, BucketName, identifier, set)
-}
-
 // CreateRole creates a new Role.
 func (service *Service) CreateRole(set *portainer.Role) error {
 	return service.db.Update(func(tx *bolt.Tx) error {
@@ -86,10 +80,4 @@ func (service *Service) CreateRole(set *portainer.Role) error {
 
 		return bucket.Put(internal.Itob(int(set.ID)), data)
 	})
-}
-
-// DeleteRole deletes a Role.
-func (service *Service) DeleteRole(ID portainer.RoleID) error {
-	identifier := internal.Itob(int(ID))
-	return internal.DeleteObject(service.db, BucketName, identifier)
 }

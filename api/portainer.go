@@ -586,8 +586,6 @@ type (
 		Role(ID RoleID) (*Role, error)
 		Roles() ([]Role, error)
 		CreateRole(set *Role) error
-		UpdateRole(ID RoleID, set *Role) error
-		DeleteRole(ID RoleID) error
 	}
 
 	// TeamService represents a service for managing user data
