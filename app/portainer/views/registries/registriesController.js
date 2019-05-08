@@ -61,7 +61,7 @@ function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, N
     $q.all({
       registries: RegistryService.registries(),
       dockerhub: DockerHubService.dockerhub(),
-      registryManagement: ExtensionService.registryManagementEnabled()
+      registryManagement: ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.REGISTRY_MANAGEMENT)
     })
     .then(function success(data) {
       $scope.registries = data.registries;

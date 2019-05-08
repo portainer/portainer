@@ -68,6 +68,16 @@ a[ng-click]{
   pointer-events: none;
 }
 
+.portainer-disabled-datatable {
+  color: gray;
+}
+
+.portainer-disabled-datatable a {
+  color: gray;
+  pointer-events: none;
+}
+
+
 .tooltip.portainer-tooltip .tooltip-inner {
   font-family: Montserrat;
   background-color: #ffffff;

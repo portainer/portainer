@@ -6,6 +6,12 @@ angular.module('portainer.app')
   'use strict';
   var service = {};
 
+  service.EXTENSIONS = Object.freeze({
+    REGISTRY_MANAGEMENT: 1,
+    OAUTH_AUTHENTICATION: 2,
+    RBAC: 3
+  });
+
   service.enable = function(license) {
     return Extension.create({ license: license }).$promise;
   };
@@ -50,48 +56,17 @@ angular.module('portainer.app')
     return deferred.promise;
   };
 
-  // TODO: create and call extensionEnabled function (refactor/centralize)
-  service.registryManagementEnabled = function() {
+  service.extensionEnabled = function(extensionId) {
     var deferred = $q.defer();
 
     service.extensions(false)
     .then(function onSuccess(extensions) {
-      var extensionAvailable = _.find(extensions, { Id: 1, Enabled: true }) ? true : false;
+      var extensionAvailable = _.find(extensions, { Id: extensionId, Enabled: true }) ? true : false;
       deferred.resolve(extensionAvailable);
     })
     .catch(function onError(err) {
       deferred.reject(err);
     });
-
-    return deferred.promise;
-  };
-
-  service.OAuthAuthenticationEnabled = function() {
-    var deferred = $q.defer();
-
-    service.extensions(false)
-    .then(function onSuccess(extensions) {
-      var extensionAvailable = _.find(extensions, { Id: 2, Enabled: true }) ? true : false;
-      deferred.resolve(extensionAvailable);
-    })
-    .catch(function onError(err) {
-      deferred.reject(err);
-    });
-
-    return deferred.promise;
-  };
-
-  service.RBACEnabled = function() {
-    var deferred = $q.defer();
-
-    service.extensions(false)
-      .then(function onSuccess(extensions) {
-        var extensionAvailable = _.find(extensions, { Id: 3, Enabled: true }) ? true : false;
-        deferred.resolve(extensionAvailable);
-      })
-      .catch(function onError(err) {
-        deferred.reject(err);
-      });
 
     return deferred.promise;
   };

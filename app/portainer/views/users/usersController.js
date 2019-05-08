@@ -119,7 +119,7 @@ function ($q, $scope, $state, UserService, TeamService, TeamMembershipService, M
       teams: isAdmin ? TeamService.teams() : UserService.userLeadingTeams(userDetails.ID),
       memberships: TeamMembershipService.memberships(),
       settings: SettingsService.publicSettings(),
-      rbac: ExtensionService.RBACEnabled(),
+      rbac: ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.RBAC),
       roles: RoleService.roles()
     })
     .then(function success(data) {

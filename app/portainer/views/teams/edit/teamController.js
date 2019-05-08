@@ -198,7 +198,7 @@ function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMember
       team: TeamService.team($transition$.params().id),
       users: UserService.users(false),
       memberships: TeamService.userMemberships($transition$.params().id),
-      rbac: ExtensionService.RBACEnabled(),
+      rbac: ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.RBAC),
       roles: RoleService.roles()
     })
     .then(function success(data) {

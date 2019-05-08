@@ -94,7 +94,7 @@ function ($q, $scope, $state, TeamService, UserService, ModalService, Notificati
     $q.all({
       users: UserService.users(false),
       teams: isAdmin ? TeamService.teams() : UserService.userLeadingTeams(userDetails.ID),
-      rbac: ExtensionService.RBACEnabled(),
+      rbac: ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.RBAC),
       roles: RoleService.roles()
     })
     .then(function success(data) {
