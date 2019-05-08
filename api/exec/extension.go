@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/orcaman/concurrent-map"
 	"github.com/portainer/portainer/api"
@@ -206,6 +207,8 @@ func (manager *ExtensionManager) startExtensionProcess(extension *portainer.Exte
 	if err != nil {
 		return err
 	}
+
+	time.Sleep(3 * time.Second)
 
 	manager.processes.Set(processKey(extension.ID), extensionProcess)
 	return nil

@@ -122,12 +122,13 @@ func (handler *Handler) writeToken(w http.ResponseWriter, user *portainer.User) 
 		Role:     user.Role,
 	}
 
-	_, err := handler.ExtensionService.Extension(portainer.RBACExtension)
-	if err == portainer.ErrObjectNotFound {
-		return handler.persistAndWriteToken(w, tokenData)
-	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a extension with the specified identifier inside the database", err}
-	}
+	// TODO: remove
+	//_, err := handler.ExtensionService.Extension(portainer.RBACExtension)
+	//if err == portainer.ErrObjectNotFound {
+	//	return handler.persistAndWriteToken(w, tokenData)
+	//} else if err != nil {
+	//	return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a extension with the specified identifier inside the database", err}
+	//}
 
 	authorizations, err := handler.getUserAuthorizations(user)
 	if err != nil {
@@ -135,6 +136,10 @@ func (handler *Handler) writeToken(w http.ResponseWriter, user *portainer.User) 
 	}
 
 	tokenData.Authorizations = authorizations
+	if authorizations[portainer.AdministratorAccess] {
+		tokenData.Role = portainer.AdministratorRole
+	}
+
 	return handler.persistAndWriteToken(w, tokenData)
 }
 
@@ -152,7 +157,6 @@ func intersection(a, b portainer.Authorizations) portainer.Authorizations {
 }
 
 func (handler *Handler) getUserAuthorizations(user *portainer.User) (portainer.Authorizations, error) {
-
 	var roleIdentifiers []portainer.RoleID
 	if user.RoleID == 0 {
 		userMemberships, err := handler.TeamMembershipService.TeamMembershipsByUserID(user.ID)
@@ -182,12 +186,15 @@ func (handler *Handler) getUserAuthorizations(user *portainer.User) (portainer.A
 		roleAuthorizations = append(roleAuthorizations, role.Authorizations)
 	}
 
-	processedAuthorizations := roleAuthorizations[0]
-	for idx, authorizations := range roleAuthorizations {
-		if idx == 0 {
-			continue
+	var processedAuthorizations portainer.Authorizations
+	if len(roleAuthorizations) > 0 {
+		processedAuthorizations = roleAuthorizations[0]
+		for idx, authorizations := range roleAuthorizations {
+			if idx == 0 {
+				continue
+			}
+			processedAuthorizations = intersection(processedAuthorizations, authorizations)
 		}
-		processedAuthorizations = intersection(processedAuthorizations, authorizations)
 	}
 
 	return processedAuthorizations, nil

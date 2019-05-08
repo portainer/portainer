@@ -296,5 +296,9 @@ func (bouncer *RequestBouncer) newRestrictedContextRequest(userID portainer.User
 		requestContext.UserMemberships = memberships
 	}
 
+	if authorizations[portainer.AdministratorAccess] {
+		requestContext.IsAdmin = true
+	}
+
 	return requestContext, nil
 }
