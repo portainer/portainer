@@ -7,6 +7,18 @@
   <rd-header-content>Role management</rd-header-content>
 </rd-header>
 
+<information-panel ng-if="!ctrl.rbacEnabled" title-text="Information">
+  <span class="small">
+    <p class="text-muted">
+      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+      The <a ui-sref="portainer.extensions.extension({id: 3})"
+        tooltip-append-to-body="true" tooltip-placement="bottom" tooltip-class="portainer-tooltip"
+        uib-tooltip="Feature available via an extension">RBAC extension</a>
+        is required to use this feature.
+    </p>
+  </span>
+</information-panel>
+
 <div class="row">
   <div class="col-sm-12">
     <roles-datatable
@@ -14,6 +26,7 @@
     dataset="ctrl.roles" table-key="roles"
     order-by="Name"
     remove-action="ctrl.removeAction"
+    rbac-enabled="ctrl.rbacEnabled"
     ></roles-datatable>
   </div>
 </div>

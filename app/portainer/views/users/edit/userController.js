@@ -78,7 +78,7 @@ function ($q, $scope, $state, $transition$, UserService, ModalService, Notificat
     $q.all({
       user: UserService.user($transition$.params().id),
       settings: SettingsService.publicSettings(),
-      rbac: ExtensionService.RBACEnabled(),
+      rbac: ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.RBAC),
       roles: RoleService.roles()
     })
     .then(function success(data) {
