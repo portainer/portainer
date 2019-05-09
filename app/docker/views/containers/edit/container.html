@@ -84,10 +84,11 @@
               <tr>
                 <td colspan="2">
                   <div class="btn-group" role="group" aria-label="...">
-                    <a class="btn" type="button" ui-sref="docker.containers.container.stats({ id: container.Id })"><i class="fa fa-chart-area space-right" aria-hidden="true"></i>Stats</a>
                     <a class="btn" type="button" ui-sref="docker.containers.container.logs({ id: container.Id })"><i class="fa fa-file-alt space-right" aria-hidden="true"></i>Logs</a>
-                    <a class="btn" type="button" ui-sref="docker.containers.container.console({ id: container.Id })"><i class="fa fa-terminal space-right" aria-hidden="true"></i>Console</a>
                     <a class="btn" type="button" ui-sref="docker.containers.container.inspect({ id: container.Id })"><i class="fa fa-info-circle space-right" aria-hidden="true"></i>Inspect</a>
+                    <a class="btn" type="button" ui-sref="docker.containers.container.stats({ id: container.Id })"><i class="fa fa-chart-area space-right" aria-hidden="true"></i>Stats</a>
+                    <a class="btn" type="button" ui-sref="docker.containers.container.exec({ id: container.Id })"><i class="fa fa-terminal space-right" aria-hidden="true"></i>Exec</a>
+                    <a class="btn" type="button" ui-sref="docker.containers.container.attach({ id: container.Id })"><i class="fa fa-plug space-right" aria-hidden="true"></i>Attach</a>
                   </div>
                 </td>
               </tr>
@@ -177,7 +178,6 @@
       </rd-widget>
     </div>
   </div>
-
   <div class="row">
     <div class="col-lg-12 col-md-12 col-xs-12">
       <rd-widget>

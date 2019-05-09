@@ -1,3 +1,5 @@
+import _ from 'lodash-es';
+
 angular.module('portainer.app')
 .controller('porAccessManagementController', ['AccessService', 'Notifications',
 function (AccessService, Notifications) {
@@ -89,9 +91,11 @@ function (AccessService, Notifications) {
       var access = source[i];
       if (!access.Inherited) {
         target.push(access);
-        source.splice(i, 1);
       }
     }
+    _.remove(source, function(e){
+      return !e.Inherited
+    });
   }
 
   ctrl.unauthorizeAllAccesses = function() {

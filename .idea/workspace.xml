@@ -1,0 +1,1164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="9a8bc9c6-0a05-4b6a-bdd4-9a4576824164" name="Default" comment="change TCPConnToWebsocketConn read function to ReadRune">
+      <change beforePath="" afterPath="$PROJECT_DIR$/.babelrc" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/.eslintignore" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/.idea/portainer.iml" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/api/http/handler/websocket/attach.go" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/api/http/handler/websocket/hijack.go" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/api/http/handler/websocket/initdial.go" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/api/http/handler/websocket/proxy.go" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/api/http/handler/websocket/stream.go" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/api/http/handler/websocket/types.go" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/app/docker/views/containers/console/attach.html" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/app/vendors.js" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/postcss.config.js" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/webpack.config.js" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/webpack/webpack.common.js" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/webpack/webpack.develop.js" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/webpack/webpack.optimize.js" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/webpack/webpack.production.js" />
+      <change beforePath="$PROJECT_DIR$/.codeclimate.yml" afterPath="$PROJECT_DIR$/.codeclimate.yml" />
+      <change beforePath="$PROJECT_DIR$/.eslintrc.yml" afterPath="$PROJECT_DIR$/.eslintrc.yml" />
+      <change beforePath="$PROJECT_DIR$/.github/ISSUE_TEMPLATE/Bug_report.md" afterPath="$PROJECT_DIR$/.github/ISSUE_TEMPLATE/Bug_report.md" />
+      <change beforePath="$PROJECT_DIR$/.github/ISSUE_TEMPLATE/Custom.md" afterPath="$PROJECT_DIR$/.github/ISSUE_TEMPLATE/Custom.md" />
+      <change beforePath="$PROJECT_DIR$/.github/ISSUE_TEMPLATE/Feature_request.md" afterPath="$PROJECT_DIR$/.github/ISSUE_TEMPLATE/Feature_request.md" />
+      <change beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/datastore.go" afterPath="$PROJECT_DIR$/api/bolt/datastore.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/dockerhub/dockerhub.go" afterPath="$PROJECT_DIR$/api/bolt/dockerhub/dockerhub.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/endpoint/endpoint.go" afterPath="$PROJECT_DIR$/api/bolt/endpoint/endpoint.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/endpointgroup/endpointgroup.go" afterPath="$PROJECT_DIR$/api/bolt/endpointgroup/endpointgroup.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/extension/extension.go" afterPath="$PROJECT_DIR$/api/bolt/extension/extension.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/internal/db.go" afterPath="$PROJECT_DIR$/api/bolt/internal/db.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/migrator/migrate_dbversion0.go" afterPath="$PROJECT_DIR$/api/bolt/migrator/migrate_dbversion0.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/migrator/migrate_dbversion1.go" afterPath="$PROJECT_DIR$/api/bolt/migrator/migrate_dbversion1.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/migrator/migrate_dbversion10.go" afterPath="$PROJECT_DIR$/api/bolt/migrator/migrate_dbversion10.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/migrator/migrate_dbversion11.go" afterPath="$PROJECT_DIR$/api/bolt/migrator/migrate_dbversion11.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/migrator/migrate_dbversion12.go" afterPath="$PROJECT_DIR$/api/bolt/migrator/migrate_dbversion12.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/migrator/migrate_dbversion14.go" afterPath="$PROJECT_DIR$/api/bolt/migrator/migrate_dbversion14.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/migrator/migrate_dbversion2.go" afterPath="$PROJECT_DIR$/api/bolt/migrator/migrate_dbversion2.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/migrator/migrate_dbversion3.go" afterPath="$PROJECT_DIR$/api/bolt/migrator/migrate_dbversion3.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/migrator/migrate_dbversion7.go" afterPath="$PROJECT_DIR$/api/bolt/migrator/migrate_dbversion7.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/migrator/migrate_dbversion8.go" afterPath="$PROJECT_DIR$/api/bolt/migrator/migrate_dbversion8.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/migrator/migrate_dbversion9.go" afterPath="$PROJECT_DIR$/api/bolt/migrator/migrate_dbversion9.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/migrator/migrator.go" afterPath="$PROJECT_DIR$/api/bolt/migrator/migrator.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/registry/registry.go" afterPath="$PROJECT_DIR$/api/bolt/registry/registry.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/resourcecontrol/resourcecontrol.go" afterPath="$PROJECT_DIR$/api/bolt/resourcecontrol/resourcecontrol.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/schedule/schedule.go" afterPath="$PROJECT_DIR$/api/bolt/schedule/schedule.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/settings/settings.go" afterPath="$PROJECT_DIR$/api/bolt/settings/settings.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/stack/stack.go" afterPath="$PROJECT_DIR$/api/bolt/stack/stack.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/tag/tag.go" afterPath="$PROJECT_DIR$/api/bolt/tag/tag.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/team/team.go" afterPath="$PROJECT_DIR$/api/bolt/team/team.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/teammembership/teammembership.go" afterPath="$PROJECT_DIR$/api/bolt/teammembership/teammembership.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/template/template.go" afterPath="$PROJECT_DIR$/api/bolt/template/template.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/user/user.go" afterPath="$PROJECT_DIR$/api/bolt/user/user.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/version/version.go" afterPath="$PROJECT_DIR$/api/bolt/version/version.go" />
+      <change beforePath="$PROJECT_DIR$/api/bolt/webhook/webhook.go" afterPath="$PROJECT_DIR$/api/bolt/webhook/webhook.go" />
+      <change beforePath="$PROJECT_DIR$/api/cli/cli.go" afterPath="$PROJECT_DIR$/api/cli/cli.go" />
+      <change beforePath="$PROJECT_DIR$/api/cli/pairlist.go" afterPath="$PROJECT_DIR$/api/cli/pairlist.go" />
+      <change beforePath="$PROJECT_DIR$/api/cmd/portainer/main.go" afterPath="$PROJECT_DIR$/api/cmd/portainer/main.go" />
+      <change beforePath="$PROJECT_DIR$/api/cron/job_endpoint_sync.go" afterPath="$PROJECT_DIR$/api/cron/job_endpoint_sync.go" />
+      <change beforePath="$PROJECT_DIR$/api/cron/job_script_execution.go" afterPath="$PROJECT_DIR$/api/cron/job_script_execution.go" />
+      <change beforePath="$PROJECT_DIR$/api/cron/job_snapshot.go" afterPath="$PROJECT_DIR$/api/cron/job_snapshot.go" />
+      <change beforePath="$PROJECT_DIR$/api/cron/scheduler.go" afterPath="$PROJECT_DIR$/api/cron/scheduler.go" />
+      <change beforePath="$PROJECT_DIR$/api/docker/client.go" afterPath="$PROJECT_DIR$/api/docker/client.go" />
+      <change beforePath="$PROJECT_DIR$/api/docker/job.go" afterPath="$PROJECT_DIR$/api/docker/job.go" />
+      <change beforePath="$PROJECT_DIR$/api/docker/snapshot.go" afterPath="$PROJECT_DIR$/api/docker/snapshot.go" />
+      <change beforePath="$PROJECT_DIR$/api/docker/snapshotter.go" afterPath="$PROJECT_DIR$/api/docker/snapshotter.go" />
+      <change beforePath="$PROJECT_DIR$/api/exec/extension.go" afterPath="$PROJECT_DIR$/api/exec/extension.go" />
+      <change beforePath="$PROJECT_DIR$/api/exec/swarm_stack.go" afterPath="$PROJECT_DIR$/api/exec/swarm_stack.go" />
+      <change beforePath="$PROJECT_DIR$/api/filesystem/filesystem.go" afterPath="$PROJECT_DIR$/api/filesystem/filesystem.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/client/client.go" afterPath="$PROJECT_DIR$/api/http/client/client.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/auth/authenticate.go" afterPath="$PROJECT_DIR$/api/http/handler/auth/authenticate.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/auth/authenticate_oauth.go" afterPath="$PROJECT_DIR$/api/http/handler/auth/authenticate_oauth.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/auth/handler.go" afterPath="$PROJECT_DIR$/api/http/handler/auth/handler.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/dockerhub/dockerhub_update.go" afterPath="$PROJECT_DIR$/api/http/handler/dockerhub/dockerhub_update.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/dockerhub/handler.go" afterPath="$PROJECT_DIR$/api/http/handler/dockerhub/handler.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/endpointgroups/endpointgroup_create.go" afterPath="$PROJECT_DIR$/api/http/handler/endpointgroups/endpointgroup_create.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/endpointgroups/endpointgroup_delete.go" afterPath="$PROJECT_DIR$/api/http/handler/endpointgroups/endpointgroup_delete.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/endpointgroups/endpointgroup_inspect.go" afterPath="$PROJECT_DIR$/api/http/handler/endpointgroups/endpointgroup_inspect.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/endpointgroups/endpointgroup_list.go" afterPath="$PROJECT_DIR$/api/http/handler/endpointgroups/endpointgroup_list.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/endpointgroups/endpointgroup_update.go" afterPath="$PROJECT_DIR$/api/http/handler/endpointgroups/endpointgroup_update.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/endpointgroups/endpointgroup_update_access.go" afterPath="$PROJECT_DIR$/api/http/handler/endpointgroups/endpointgroup_update_access.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/endpointgroups/handler.go" afterPath="$PROJECT_DIR$/api/http/handler/endpointgroups/handler.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/endpointproxy/handler.go" afterPath="$PROJECT_DIR$/api/http/handler/endpointproxy/handler.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/endpointproxy/proxy_azure.go" afterPath="$PROJECT_DIR$/api/http/handler/endpointproxy/proxy_azure.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/endpointproxy/proxy_docker.go" afterPath="$PROJECT_DIR$/api/http/handler/endpointproxy/proxy_docker.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/endpointproxy/proxy_storidge.go" afterPath="$PROJECT_DIR$/api/http/handler/endpointproxy/proxy_storidge.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/endpoints/endpoint_create.go" afterPath="$PROJECT_DIR$/api/http/handler/endpoints/endpoint_create.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/endpoints/endpoint_delete.go" afterPath="$PROJECT_DIR$/api/http/handler/endpoints/endpoint_delete.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/endpoints/endpoint_extension_add.go" afterPath="$PROJECT_DIR$/api/http/handler/endpoints/endpoint_extension_add.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/endpoints/endpoint_extension_remove.go" afterPath="$PROJECT_DIR$/api/http/handler/endpoints/endpoint_extension_remove.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/endpoints/endpoint_inspect.go" afterPath="$PROJECT_DIR$/api/http/handler/endpoints/endpoint_inspect.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/endpoints/endpoint_job.go" afterPath="$PROJECT_DIR$/api/http/handler/endpoints/endpoint_job.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/endpoints/endpoint_list.go" afterPath="$PROJECT_DIR$/api/http/handler/endpoints/endpoint_list.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/endpoints/endpoint_snapshot.go" afterPath="$PROJECT_DIR$/api/http/handler/endpoints/endpoint_snapshot.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/endpoints/endpoint_snapshots.go" afterPath="$PROJECT_DIR$/api/http/handler/endpoints/endpoint_snapshots.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/endpoints/endpoint_update.go" afterPath="$PROJECT_DIR$/api/http/handler/endpoints/endpoint_update.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/endpoints/endpoint_update_access.go" afterPath="$PROJECT_DIR$/api/http/handler/endpoints/endpoint_update_access.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/endpoints/handler.go" afterPath="$PROJECT_DIR$/api/http/handler/endpoints/handler.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/extensions/extension_create.go" afterPath="$PROJECT_DIR$/api/http/handler/extensions/extension_create.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/extensions/extension_delete.go" afterPath="$PROJECT_DIR$/api/http/handler/extensions/extension_delete.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/extensions/extension_inspect.go" afterPath="$PROJECT_DIR$/api/http/handler/extensions/extension_inspect.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/extensions/extension_list.go" afterPath="$PROJECT_DIR$/api/http/handler/extensions/extension_list.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/extensions/extension_update.go" afterPath="$PROJECT_DIR$/api/http/handler/extensions/extension_update.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/extensions/handler.go" afterPath="$PROJECT_DIR$/api/http/handler/extensions/handler.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/handler.go" afterPath="$PROJECT_DIR$/api/http/handler/handler.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/motd/handler.go" afterPath="$PROJECT_DIR$/api/http/handler/motd/handler.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/motd/motd.go" afterPath="$PROJECT_DIR$/api/http/handler/motd/motd.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/registries/handler.go" afterPath="$PROJECT_DIR$/api/http/handler/registries/handler.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/registries/proxy.go" afterPath="$PROJECT_DIR$/api/http/handler/registries/proxy.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/registries/registry_configure.go" afterPath="$PROJECT_DIR$/api/http/handler/registries/registry_configure.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/registries/registry_create.go" afterPath="$PROJECT_DIR$/api/http/handler/registries/registry_create.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/registries/registry_delete.go" afterPath="$PROJECT_DIR$/api/http/handler/registries/registry_delete.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/registries/registry_inspect.go" afterPath="$PROJECT_DIR$/api/http/handler/registries/registry_inspect.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/registries/registry_list.go" afterPath="$PROJECT_DIR$/api/http/handler/registries/registry_list.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/registries/registry_update.go" afterPath="$PROJECT_DIR$/api/http/handler/registries/registry_update.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/registries/registry_update_access.go" afterPath="$PROJECT_DIR$/api/http/handler/registries/registry_update_access.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/resourcecontrols/handler.go" afterPath="$PROJECT_DIR$/api/http/handler/resourcecontrols/handler.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/resourcecontrols/resourcecontrol_create.go" afterPath="$PROJECT_DIR$/api/http/handler/resourcecontrols/resourcecontrol_create.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/resourcecontrols/resourcecontrol_delete.go" afterPath="$PROJECT_DIR$/api/http/handler/resourcecontrols/resourcecontrol_delete.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/resourcecontrols/resourcecontrol_update.go" afterPath="$PROJECT_DIR$/api/http/handler/resourcecontrols/resourcecontrol_update.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/schedules/handler.go" afterPath="$PROJECT_DIR$/api/http/handler/schedules/handler.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/schedules/schedule_create.go" afterPath="$PROJECT_DIR$/api/http/handler/schedules/schedule_create.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/schedules/schedule_delete.go" afterPath="$PROJECT_DIR$/api/http/handler/schedules/schedule_delete.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/schedules/schedule_file.go" afterPath="$PROJECT_DIR$/api/http/handler/schedules/schedule_file.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/schedules/schedule_inspect.go" afterPath="$PROJECT_DIR$/api/http/handler/schedules/schedule_inspect.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/schedules/schedule_list.go" afterPath="$PROJECT_DIR$/api/http/handler/schedules/schedule_list.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/schedules/schedule_tasks.go" afterPath="$PROJECT_DIR$/api/http/handler/schedules/schedule_tasks.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/schedules/schedule_update.go" afterPath="$PROJECT_DIR$/api/http/handler/schedules/schedule_update.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/settings/handler.go" afterPath="$PROJECT_DIR$/api/http/handler/settings/handler.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/settings/settings_ldap_check.go" afterPath="$PROJECT_DIR$/api/http/handler/settings/settings_ldap_check.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/settings/settings_public.go" afterPath="$PROJECT_DIR$/api/http/handler/settings/settings_public.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/settings/settings_update.go" afterPath="$PROJECT_DIR$/api/http/handler/settings/settings_update.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/stacks/create_compose_stack.go" afterPath="$PROJECT_DIR$/api/http/handler/stacks/create_compose_stack.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/stacks/create_swarm_stack.go" afterPath="$PROJECT_DIR$/api/http/handler/stacks/create_swarm_stack.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/stacks/handler.go" afterPath="$PROJECT_DIR$/api/http/handler/stacks/handler.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/stacks/stack_create.go" afterPath="$PROJECT_DIR$/api/http/handler/stacks/stack_create.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/stacks/stack_delete.go" afterPath="$PROJECT_DIR$/api/http/handler/stacks/stack_delete.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/stacks/stack_file.go" afterPath="$PROJECT_DIR$/api/http/handler/stacks/stack_file.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/stacks/stack_inspect.go" afterPath="$PROJECT_DIR$/api/http/handler/stacks/stack_inspect.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/stacks/stack_list.go" afterPath="$PROJECT_DIR$/api/http/handler/stacks/stack_list.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/stacks/stack_migrate.go" afterPath="$PROJECT_DIR$/api/http/handler/stacks/stack_migrate.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/stacks/stack_update.go" afterPath="$PROJECT_DIR$/api/http/handler/stacks/stack_update.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/status/handler.go" afterPath="$PROJECT_DIR$/api/http/handler/status/handler.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/tags/handler.go" afterPath="$PROJECT_DIR$/api/http/handler/tags/handler.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/tags/tag_create.go" afterPath="$PROJECT_DIR$/api/http/handler/tags/tag_create.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/tags/tag_delete.go" afterPath="$PROJECT_DIR$/api/http/handler/tags/tag_delete.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/teammemberships/handler.go" afterPath="$PROJECT_DIR$/api/http/handler/teammemberships/handler.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/teammemberships/teammembership_create.go" afterPath="$PROJECT_DIR$/api/http/handler/teammemberships/teammembership_create.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/teammemberships/teammembership_delete.go" afterPath="$PROJECT_DIR$/api/http/handler/teammemberships/teammembership_delete.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/teammemberships/teammembership_list.go" afterPath="$PROJECT_DIR$/api/http/handler/teammemberships/teammembership_list.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/teammemberships/teammembership_update.go" afterPath="$PROJECT_DIR$/api/http/handler/teammemberships/teammembership_update.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/teams/handler.go" afterPath="$PROJECT_DIR$/api/http/handler/teams/handler.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/teams/team_create.go" afterPath="$PROJECT_DIR$/api/http/handler/teams/team_create.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/teams/team_delete.go" afterPath="$PROJECT_DIR$/api/http/handler/teams/team_delete.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/teams/team_inspect.go" afterPath="$PROJECT_DIR$/api/http/handler/teams/team_inspect.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/teams/team_list.go" afterPath="$PROJECT_DIR$/api/http/handler/teams/team_list.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/teams/team_memberships.go" afterPath="$PROJECT_DIR$/api/http/handler/teams/team_memberships.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/teams/team_update.go" afterPath="$PROJECT_DIR$/api/http/handler/teams/team_update.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/templates/handler.go" afterPath="$PROJECT_DIR$/api/http/handler/templates/handler.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/templates/template_create.go" afterPath="$PROJECT_DIR$/api/http/handler/templates/template_create.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/templates/template_delete.go" afterPath="$PROJECT_DIR$/api/http/handler/templates/template_delete.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/templates/template_inspect.go" afterPath="$PROJECT_DIR$/api/http/handler/templates/template_inspect.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/templates/template_list.go" afterPath="$PROJECT_DIR$/api/http/handler/templates/template_list.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/templates/template_update.go" afterPath="$PROJECT_DIR$/api/http/handler/templates/template_update.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/upload/handler.go" afterPath="$PROJECT_DIR$/api/http/handler/upload/handler.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/upload/upload_tls.go" afterPath="$PROJECT_DIR$/api/http/handler/upload/upload_tls.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/users/admin_check.go" afterPath="$PROJECT_DIR$/api/http/handler/users/admin_check.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/users/admin_init.go" afterPath="$PROJECT_DIR$/api/http/handler/users/admin_init.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/users/handler.go" afterPath="$PROJECT_DIR$/api/http/handler/users/handler.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/users/user_create.go" afterPath="$PROJECT_DIR$/api/http/handler/users/user_create.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/users/user_delete.go" afterPath="$PROJECT_DIR$/api/http/handler/users/user_delete.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/users/user_inspect.go" afterPath="$PROJECT_DIR$/api/http/handler/users/user_inspect.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/users/user_list.go" afterPath="$PROJECT_DIR$/api/http/handler/users/user_list.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/users/user_memberships.go" afterPath="$PROJECT_DIR$/api/http/handler/users/user_memberships.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/users/user_update.go" afterPath="$PROJECT_DIR$/api/http/handler/users/user_update.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/users/user_update_password.go" afterPath="$PROJECT_DIR$/api/http/handler/users/user_update_password.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/webhooks/handler.go" afterPath="$PROJECT_DIR$/api/http/handler/webhooks/handler.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/webhooks/webhook_create.go" afterPath="$PROJECT_DIR$/api/http/handler/webhooks/webhook_create.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/webhooks/webhook_delete.go" afterPath="$PROJECT_DIR$/api/http/handler/webhooks/webhook_delete.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/webhooks/webhook_execute.go" afterPath="$PROJECT_DIR$/api/http/handler/webhooks/webhook_execute.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/webhooks/webhook_list.go" afterPath="$PROJECT_DIR$/api/http/handler/webhooks/webhook_list.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/websocket/handler.go" afterPath="$PROJECT_DIR$/api/http/handler/websocket/handler.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/websocket/websocket_dial.go" afterPath="$PROJECT_DIR$/api/http/handler/websocket/dial.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/websocket/websocket_dial_windows.go" afterPath="$PROJECT_DIR$/api/http/handler/websocket/dial_windows.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/handler/websocket/websocket_exec.go" afterPath="$PROJECT_DIR$/api/http/handler/websocket/exec.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/proxy/access_control.go" afterPath="$PROJECT_DIR$/api/http/proxy/access_control.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/proxy/azure_transport.go" afterPath="$PROJECT_DIR$/api/http/proxy/azure_transport.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/proxy/build.go" afterPath="$PROJECT_DIR$/api/http/proxy/build.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/proxy/configs.go" afterPath="$PROJECT_DIR$/api/http/proxy/configs.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/proxy/containers.go" afterPath="$PROJECT_DIR$/api/http/proxy/containers.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/proxy/docker_transport.go" afterPath="$PROJECT_DIR$/api/http/proxy/docker_transport.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/proxy/factory.go" afterPath="$PROJECT_DIR$/api/http/proxy/factory.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/proxy/manager.go" afterPath="$PROJECT_DIR$/api/http/proxy/manager.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/proxy/networks.go" afterPath="$PROJECT_DIR$/api/http/proxy/networks.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/proxy/registry.go" afterPath="$PROJECT_DIR$/api/http/proxy/registry.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/proxy/response.go" afterPath="$PROJECT_DIR$/api/http/proxy/response.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/proxy/secrets.go" afterPath="$PROJECT_DIR$/api/http/proxy/secrets.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/proxy/services.go" afterPath="$PROJECT_DIR$/api/http/proxy/services.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/proxy/tasks.go" afterPath="$PROJECT_DIR$/api/http/proxy/tasks.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/proxy/volumes.go" afterPath="$PROJECT_DIR$/api/http/proxy/volumes.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/security/authorization.go" afterPath="$PROJECT_DIR$/api/http/security/authorization.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/security/bouncer.go" afterPath="$PROJECT_DIR$/api/http/security/bouncer.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/security/context.go" afterPath="$PROJECT_DIR$/api/http/security/context.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/security/filter.go" afterPath="$PROJECT_DIR$/api/http/security/filter.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/security/rate_limiter.go" afterPath="$PROJECT_DIR$/api/http/security/rate_limiter.go" />
+      <change beforePath="$PROJECT_DIR$/api/http/server.go" afterPath="$PROJECT_DIR$/api/http/server.go" />
+      <change beforePath="$PROJECT_DIR$/api/jwt/jwt.go" afterPath="$PROJECT_DIR$/api/jwt/jwt.go" />
+      <change beforePath="$PROJECT_DIR$/api/ldap/ldap.go" afterPath="$PROJECT_DIR$/api/ldap/ldap.go" />
+      <change beforePath="$PROJECT_DIR$/api/libcompose/compose_stack.go" afterPath="$PROJECT_DIR$/api/libcompose/compose_stack.go" />
+      <change beforePath="$PROJECT_DIR$/app/__module.js" afterPath="$PROJECT_DIR$/app/__module.js" />
+      <change beforePath="$PROJECT_DIR$/app/agent/components/file-uploader/file-uploader.js" afterPath="$PROJECT_DIR$/app/agent/components/file-uploader/file-uploader.js" />
+      <change beforePath="$PROJECT_DIR$/app/agent/components/files-datatable/files-datatable.js" afterPath="$PROJECT_DIR$/app/agent/components/files-datatable/files-datatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/agent/components/host-browser/host-browser-controller.js" afterPath="$PROJECT_DIR$/app/agent/components/host-browser/host-browser-controller.js" />
+      <change beforePath="$PROJECT_DIR$/app/agent/components/host-browser/host-browser.js" afterPath="$PROJECT_DIR$/app/agent/components/host-browser/host-browser.js" />
+      <change beforePath="$PROJECT_DIR$/app/agent/components/node-selector/node-selector.js" afterPath="$PROJECT_DIR$/app/agent/components/node-selector/node-selector.js" />
+      <change beforePath="$PROJECT_DIR$/app/agent/components/volume-browser/volume-browser.js" afterPath="$PROJECT_DIR$/app/agent/components/volume-browser/volume-browser.js" />
+      <change beforePath="$PROJECT_DIR$/app/agent/components/volume-browser/volumeBrowserController.js" afterPath="$PROJECT_DIR$/app/agent/components/volume-browser/volumeBrowserController.js" />
+      <change beforePath="$PROJECT_DIR$/app/agent/models/agent.js" afterPath="$PROJECT_DIR$/app/agent/models/agent.js" />
+      <change beforePath="$PROJECT_DIR$/app/agent/rest/browse.js" afterPath="$PROJECT_DIR$/app/agent/rest/browse.js" />
+      <change beforePath="$PROJECT_DIR$/app/agent/rest/response/browse.js" afterPath="$PROJECT_DIR$/app/agent/rest/response/browse.js" />
+      <change beforePath="$PROJECT_DIR$/app/agent/rest/v1/browse.js" afterPath="$PROJECT_DIR$/app/agent/rest/v1/browse.js" />
+      <change beforePath="$PROJECT_DIR$/app/agent/services/agentService.js" afterPath="$PROJECT_DIR$/app/agent/services/agentService.js" />
+      <change beforePath="$PROJECT_DIR$/app/app.js" afterPath="$PROJECT_DIR$/app/app.js" />
+      <change beforePath="$PROJECT_DIR$/app/azure/_module.js" afterPath="$PROJECT_DIR$/app/azure/_module.js" />
+      <change beforePath="$PROJECT_DIR$/app/azure/components/azure-endpoint-config/azure-endpoint-config.js" afterPath="$PROJECT_DIR$/app/azure/components/azure-endpoint-config/azure-endpoint-config.js" />
+      <change beforePath="$PROJECT_DIR$/app/azure/components/azure-sidebar-content/azure-sidebar-content.js" afterPath="$PROJECT_DIR$/app/azure/components/azure-sidebar-content/azure-sidebar-content.js" />
+      <change beforePath="$PROJECT_DIR$/app/azure/components/datatables/containergroups-datatable/containerGroupsDatatable.js" afterPath="$PROJECT_DIR$/app/azure/components/datatables/containergroups-datatable/containerGroupsDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/azure/models/container_group.js" afterPath="$PROJECT_DIR$/app/azure/models/container_group.js" />
+      <change beforePath="$PROJECT_DIR$/app/azure/models/location.js" afterPath="$PROJECT_DIR$/app/azure/models/location.js" />
+      <change beforePath="$PROJECT_DIR$/app/azure/models/provider.js" afterPath="$PROJECT_DIR$/app/azure/models/provider.js" />
+      <change beforePath="$PROJECT_DIR$/app/azure/models/resource_group.js" afterPath="$PROJECT_DIR$/app/azure/models/resource_group.js" />
+      <change beforePath="$PROJECT_DIR$/app/azure/models/subscription.js" afterPath="$PROJECT_DIR$/app/azure/models/subscription.js" />
+      <change beforePath="$PROJECT_DIR$/app/azure/services/containerGroupService.js" afterPath="$PROJECT_DIR$/app/azure/services/containerGroupService.js" />
+      <change beforePath="$PROJECT_DIR$/app/azure/services/locationService.js" afterPath="$PROJECT_DIR$/app/azure/services/locationService.js" />
+      <change beforePath="$PROJECT_DIR$/app/azure/services/providerService.js" afterPath="$PROJECT_DIR$/app/azure/services/providerService.js" />
+      <change beforePath="$PROJECT_DIR$/app/azure/services/resourceGroupService.js" afterPath="$PROJECT_DIR$/app/azure/services/resourceGroupService.js" />
+      <change beforePath="$PROJECT_DIR$/app/azure/services/subscriptionService.js" afterPath="$PROJECT_DIR$/app/azure/services/subscriptionService.js" />
+      <change beforePath="$PROJECT_DIR$/app/azure/views/containerinstances/create/createContainerInstanceController.js" afterPath="$PROJECT_DIR$/app/azure/views/containerinstances/create/createContainerInstanceController.js" />
+      <change beforePath="$PROJECT_DIR$/app/config.js" afterPath="$PROJECT_DIR$/app/config.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/__module.js" afterPath="$PROJECT_DIR$/app/docker/__module.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/container-capabilities/container-capabilities.js" afterPath="$PROJECT_DIR$/app/docker/components/container-capabilities/container-capabilities.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/container-quick-actions/containerQuickActions.html" afterPath="$PROJECT_DIR$/app/docker/components/container-quick-actions/containerQuickActions.html" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/container-quick-actions/containerQuickActions.js" afterPath="$PROJECT_DIR$/app/docker/components/container-quick-actions/containerQuickActions.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/container-restart-policy/container-restart-policy.js" afterPath="$PROJECT_DIR$/app/docker/components/container-restart-policy/container-restart-policy.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/dashboard-cluster-agent-info/dashboard-cluster-agent-info.js" afterPath="$PROJECT_DIR$/app/docker/components/dashboard-cluster-agent-info/dashboard-cluster-agent-info.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/datatables/configs-datatable/configsDatatable.js" afterPath="$PROJECT_DIR$/app/docker/components/datatables/configs-datatable/configsDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/datatables/container-networks-datatable/containerNetworksDatatable.js" afterPath="$PROJECT_DIR$/app/docker/components/datatables/container-networks-datatable/containerNetworksDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/datatables/container-processes-datatable/containerProcessesDatatable.js" afterPath="$PROJECT_DIR$/app/docker/components/datatables/container-processes-datatable/containerProcessesDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/datatables/containers-datatable/actions/containersDatatableActions.js" afterPath="$PROJECT_DIR$/app/docker/components/datatables/containers-datatable/actions/containersDatatableActions.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/datatables/containers-datatable/containersDatatable.js" afterPath="$PROJECT_DIR$/app/docker/components/datatables/containers-datatable/containersDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/datatables/containers-datatable/containersDatatableController.js" afterPath="$PROJECT_DIR$/app/docker/components/datatables/containers-datatable/containersDatatableController.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/datatables/events-datatable/eventsDatatable.js" afterPath="$PROJECT_DIR$/app/docker/components/datatables/events-datatable/eventsDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/datatables/host-jobs-datatable/jobsDatatable.js" afterPath="$PROJECT_DIR$/app/docker/components/datatables/host-jobs-datatable/jobsDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/datatables/host-jobs-datatable/jobsDatatableController.js" afterPath="$PROJECT_DIR$/app/docker/components/datatables/host-jobs-datatable/jobsDatatableController.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/datatables/images-datatable/imagesDatatable.js" afterPath="$PROJECT_DIR$/app/docker/components/datatables/images-datatable/imagesDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/datatables/macvlan-nodes-datatable/macvlanNodesDatatable.js" afterPath="$PROJECT_DIR$/app/docker/components/datatables/macvlan-nodes-datatable/macvlanNodesDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/datatables/networks-datatable/networksDatatable.js" afterPath="$PROJECT_DIR$/app/docker/components/datatables/networks-datatable/networksDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/datatables/node-tasks-datatable/nodeTasksDatatable.js" afterPath="$PROJECT_DIR$/app/docker/components/datatables/node-tasks-datatable/nodeTasksDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/datatables/nodes-datatable/nodesDatatable.js" afterPath="$PROJECT_DIR$/app/docker/components/datatables/nodes-datatable/nodesDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/datatables/secrets-datatable/secretsDatatable.js" afterPath="$PROJECT_DIR$/app/docker/components/datatables/secrets-datatable/secretsDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/datatables/service-tasks-datatable/serviceTasksDatatable.html" afterPath="$PROJECT_DIR$/app/docker/components/datatables/service-tasks-datatable/serviceTasksDatatable.html" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/datatables/service-tasks-datatable/serviceTasksDatatable.js" afterPath="$PROJECT_DIR$/app/docker/components/datatables/service-tasks-datatable/serviceTasksDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/datatables/service-tasks-datatable/serviceTasksDatatableController.js" afterPath="$PROJECT_DIR$/app/docker/components/datatables/service-tasks-datatable/serviceTasksDatatableController.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/datatables/services-datatable/actions/servicesDatatableActions.js" afterPath="$PROJECT_DIR$/app/docker/components/datatables/services-datatable/actions/servicesDatatableActions.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/datatables/services-datatable/servicesDatatable.js" afterPath="$PROJECT_DIR$/app/docker/components/datatables/services-datatable/servicesDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/datatables/services-datatable/servicesDatatableController.js" afterPath="$PROJECT_DIR$/app/docker/components/datatables/services-datatable/servicesDatatableController.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/datatables/tasks-datatable/tasksDatatable.js" afterPath="$PROJECT_DIR$/app/docker/components/datatables/tasks-datatable/tasksDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/datatables/volumes-datatable/volumesDatatable.js" afterPath="$PROJECT_DIR$/app/docker/components/datatables/volumes-datatable/volumesDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/dockerSidebarContent/docker-sidebar-content.js" afterPath="$PROJECT_DIR$/app/docker/components/dockerSidebarContent/docker-sidebar-content.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/host-overview/host-overview.js" afterPath="$PROJECT_DIR$/app/docker/components/host-overview/host-overview.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/host-view-panels/devices-panel/devices-panel.js" afterPath="$PROJECT_DIR$/app/docker/components/host-view-panels/devices-panel/devices-panel.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/host-view-panels/disks-panel/disks-panel.js" afterPath="$PROJECT_DIR$/app/docker/components/host-view-panels/disks-panel/disks-panel.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/host-view-panels/engine-details-panel/engine-details-panel.js" afterPath="$PROJECT_DIR$/app/docker/components/host-view-panels/engine-details-panel/engine-details-panel.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/host-view-panels/host-details-panel/host-details-panel.js" afterPath="$PROJECT_DIR$/app/docker/components/host-view-panels/host-details-panel/host-details-panel.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/host-view-panels/node-availability-select/node-availability-select.js" afterPath="$PROJECT_DIR$/app/docker/components/host-view-panels/node-availability-select/node-availability-select.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/host-view-panels/node-labels-table/node-labels-table.js" afterPath="$PROJECT_DIR$/app/docker/components/host-view-panels/node-labels-table/node-labels-table.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/host-view-panels/swarm-node-details-panel/swarm-node-details-panel.html" afterPath="$PROJECT_DIR$/app/docker/components/host-view-panels/swarm-node-details-panel/swarm-node-details-panel.html" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/host-view-panels/swarm-node-details-panel/swarm-node-details-panel.js" afterPath="$PROJECT_DIR$/app/docker/components/host-view-panels/swarm-node-details-panel/swarm-node-details-panel.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/imageRegistry/por-image-registry.js" afterPath="$PROJECT_DIR$/app/docker/components/imageRegistry/por-image-registry.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/imageRegistry/porImageRegistryController.js" afterPath="$PROJECT_DIR$/app/docker/components/imageRegistry/porImageRegistryController.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/log-viewer/log-viewer.js" afterPath="$PROJECT_DIR$/app/docker/components/log-viewer/log-viewer.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/log-viewer/logViewerController.js" afterPath="$PROJECT_DIR$/app/docker/components/log-viewer/logViewerController.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/network-macvlan-form/network-macvlan-form.js" afterPath="$PROJECT_DIR$/app/docker/components/network-macvlan-form/network-macvlan-form.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/network-macvlan-form/networkMacvlanFormModel.js" afterPath="$PROJECT_DIR$/app/docker/components/network-macvlan-form/networkMacvlanFormModel.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/volumesNFSForm/volumes-nfs-form.js" afterPath="$PROJECT_DIR$/app/docker/components/volumesNFSForm/volumes-nfs-form.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/components/volumesNFSForm/volumesNFSFormModel.js" afterPath="$PROJECT_DIR$/app/docker/components/volumesNFSForm/volumesNFSFormModel.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/filters/filters.js" afterPath="$PROJECT_DIR$/app/docker/filters/filters.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/helpers/constraintsHelper.js" afterPath="$PROJECT_DIR$/app/docker/helpers/constraintsHelper.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/helpers/containerHelper.js" afterPath="$PROJECT_DIR$/app/docker/helpers/containerHelper.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/helpers/imageHelper.js" afterPath="$PROJECT_DIR$/app/docker/helpers/imageHelper.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/helpers/infoHelper.js" afterPath="$PROJECT_DIR$/app/docker/helpers/infoHelper.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/helpers/labelHelper.js" afterPath="$PROJECT_DIR$/app/docker/helpers/labelHelper.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/helpers/serviceHelper.js" afterPath="$PROJECT_DIR$/app/docker/helpers/serviceHelper.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/models/config.js" afterPath="$PROJECT_DIR$/app/docker/models/config.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/models/container.js" afterPath="$PROJECT_DIR$/app/docker/models/container.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/models/containerCapabilities.js" afterPath="$PROJECT_DIR$/app/docker/models/containerCapabilities.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/models/event.js" afterPath="$PROJECT_DIR$/app/docker/models/event.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/models/image.js" afterPath="$PROJECT_DIR$/app/docker/models/image.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/models/imageDetails.js" afterPath="$PROJECT_DIR$/app/docker/models/imageDetails.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/models/imageLayer.js" afterPath="$PROJECT_DIR$/app/docker/models/imageLayer.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/models/network.js" afterPath="$PROJECT_DIR$/app/docker/models/network.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/models/node.js" afterPath="$PROJECT_DIR$/app/docker/models/node.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/models/plugin.js" afterPath="$PROJECT_DIR$/app/docker/models/plugin.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/models/secret.js" afterPath="$PROJECT_DIR$/app/docker/models/secret.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/models/service.js" afterPath="$PROJECT_DIR$/app/docker/models/service.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/models/swarm.js" afterPath="$PROJECT_DIR$/app/docker/models/swarm.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/models/task.js" afterPath="$PROJECT_DIR$/app/docker/models/task.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/models/volume.js" afterPath="$PROJECT_DIR$/app/docker/models/volume.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/rest/build.js" afterPath="$PROJECT_DIR$/app/docker/rest/build.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/rest/container.js" afterPath="$PROJECT_DIR$/app/docker/rest/container.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/rest/exec.js" afterPath="$PROJECT_DIR$/app/docker/rest/exec.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/rest/image.js" afterPath="$PROJECT_DIR$/app/docker/rest/image.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/rest/network.js" afterPath="$PROJECT_DIR$/app/docker/rest/network.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/rest/response/handlers.js" afterPath="$PROJECT_DIR$/app/docker/rest/response/handlers.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/rest/response/image.js" afterPath="$PROJECT_DIR$/app/docker/rest/response/image.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/rest/service.js" afterPath="$PROJECT_DIR$/app/docker/rest/service.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/rest/system.js" afterPath="$PROJECT_DIR$/app/docker/rest/system.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/rest/task.js" afterPath="$PROJECT_DIR$/app/docker/rest/task.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/rest/volume.js" afterPath="$PROJECT_DIR$/app/docker/rest/volume.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/services/buildService.js" afterPath="$PROJECT_DIR$/app/docker/services/buildService.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/services/configService.js" afterPath="$PROJECT_DIR$/app/docker/services/configService.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/services/containerService.js" afterPath="$PROJECT_DIR$/app/docker/services/containerService.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/services/execService.js" afterPath="$PROJECT_DIR$/app/docker/services/execService.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/services/imageService.js" afterPath="$PROJECT_DIR$/app/docker/services/imageService.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/services/networkService.js" afterPath="$PROJECT_DIR$/app/docker/services/networkService.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/services/nodeService.js" afterPath="$PROJECT_DIR$/app/docker/services/nodeService.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/services/pluginService.js" afterPath="$PROJECT_DIR$/app/docker/services/pluginService.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/services/secretService.js" afterPath="$PROJECT_DIR$/app/docker/services/secretService.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/services/serviceService.js" afterPath="$PROJECT_DIR$/app/docker/services/serviceService.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/services/swarmService.js" afterPath="$PROJECT_DIR$/app/docker/services/swarmService.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/services/systemService.js" afterPath="$PROJECT_DIR$/app/docker/services/systemService.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/services/taskService.js" afterPath="$PROJECT_DIR$/app/docker/services/taskService.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/services/volumeService.js" afterPath="$PROJECT_DIR$/app/docker/services/volumeService.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/configs/configs.html" afterPath="$PROJECT_DIR$/app/docker/views/configs/configs.html" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/configs/configsController.js" afterPath="$PROJECT_DIR$/app/docker/views/configs/configsController.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/configs/create/createConfigController.js" afterPath="$PROJECT_DIR$/app/docker/views/configs/create/createConfigController.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/configs/create/createconfig.html" afterPath="$PROJECT_DIR$/app/docker/views/configs/create/createconfig.html" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/containers/console/containerConsoleController.js" afterPath="$PROJECT_DIR$/app/docker/views/containers/console/containerConsoleController.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/containers/console/containerconsole.html" afterPath="$PROJECT_DIR$/app/docker/views/containers/console/exec.html" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/containers/create/createContainerController.js" afterPath="$PROJECT_DIR$/app/docker/views/containers/create/createContainerController.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/containers/edit/container.html" afterPath="$PROJECT_DIR$/app/docker/views/containers/edit/container.html" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/containers/edit/containerController.js" afterPath="$PROJECT_DIR$/app/docker/views/containers/edit/containerController.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/containers/logs/containerLogsController.js" afterPath="$PROJECT_DIR$/app/docker/views/containers/logs/containerLogsController.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/containers/stats/containerStatsController.js" afterPath="$PROJECT_DIR$/app/docker/views/containers/stats/containerStatsController.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/events/eventsController.js" afterPath="$PROJECT_DIR$/app/docker/views/events/eventsController.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/host/host-browser-view/host-browser-view.js" afterPath="$PROJECT_DIR$/app/docker/views/host/host-browser-view/host-browser-view.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/host/host-job/host-job.js" afterPath="$PROJECT_DIR$/app/docker/views/host/host-job/host-job.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/host/host-view.js" afterPath="$PROJECT_DIR$/app/docker/views/host/host-view.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/images/edit/image.html" afterPath="$PROJECT_DIR$/app/docker/views/images/edit/image.html" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/images/edit/imageController.js" afterPath="$PROJECT_DIR$/app/docker/views/images/edit/imageController.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/images/imagesController.js" afterPath="$PROJECT_DIR$/app/docker/views/images/imagesController.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/networks/create/createNetworkController.js" afterPath="$PROJECT_DIR$/app/docker/views/networks/create/createNetworkController.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/networks/edit/networkController.js" afterPath="$PROJECT_DIR$/app/docker/views/networks/edit/networkController.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/nodes/node-browser/node-browser.js" afterPath="$PROJECT_DIR$/app/docker/views/nodes/node-browser/node-browser.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/nodes/node-details/node-details-view.js" afterPath="$PROJECT_DIR$/app/docker/views/nodes/node-details/node-details-view.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/nodes/node-job/node-job.js" afterPath="$PROJECT_DIR$/app/docker/views/nodes/node-job/node-job.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/secrets/create/createSecretController.js" afterPath="$PROJECT_DIR$/app/docker/views/secrets/create/createSecretController.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/services/create/createServiceController.js" afterPath="$PROJECT_DIR$/app/docker/views/services/create/createServiceController.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/services/edit/serviceController.js" afterPath="$PROJECT_DIR$/app/docker/views/services/edit/serviceController.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/services/logs/serviceLogsController.js" afterPath="$PROJECT_DIR$/app/docker/views/services/logs/serviceLogsController.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/swarm/swarmController.js" afterPath="$PROJECT_DIR$/app/docker/views/swarm/swarmController.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/tasks/logs/taskLogsController.js" afterPath="$PROJECT_DIR$/app/docker/views/tasks/logs/taskLogsController.js" />
+      <change beforePath="$PROJECT_DIR$/app/docker/views/volumes/create/createVolumeController.js" afterPath="$PROJECT_DIR$/app/docker/views/volumes/create/createVolumeController.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/oauth/components/oauth-providers-selector/oauth-providers-selector.js" afterPath="$PROJECT_DIR$/app/extensions/oauth/components/oauth-providers-selector/oauth-providers-selector.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/oauth/components/oauth-settings/oauth-settings-controller.js" afterPath="$PROJECT_DIR$/app/extensions/oauth/components/oauth-settings/oauth-settings-controller.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/oauth/components/oauth-settings/oauth-settings.js" afterPath="$PROJECT_DIR$/app/extensions/oauth/components/oauth-settings/oauth-settings.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/registry-management/_module.js" afterPath="$PROJECT_DIR$/app/extensions/registry-management/_module.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/registry-management/components/registries-repositories-datatable/registryRepositoriesDatatable.js" afterPath="$PROJECT_DIR$/app/extensions/registry-management/components/registries-repositories-datatable/registryRepositoriesDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/registry-management/components/registries-repository-tags-datatable/registriesRepositoryTagsDatatable.js" afterPath="$PROJECT_DIR$/app/extensions/registry-management/components/registries-repository-tags-datatable/registriesRepositoryTagsDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/registry-management/helpers/localRegistryHelper.js" afterPath="$PROJECT_DIR$/app/extensions/registry-management/helpers/localRegistryHelper.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/registry-management/models/registryRepository.js" afterPath="$PROJECT_DIR$/app/extensions/registry-management/models/registryRepository.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/registry-management/models/repositoryTag.js" afterPath="$PROJECT_DIR$/app/extensions/registry-management/models/repositoryTag.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/registry-management/rest/catalog.js" afterPath="$PROJECT_DIR$/app/extensions/registry-management/rest/catalog.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/registry-management/rest/transform/linkGetResponse.js" afterPath="$PROJECT_DIR$/app/extensions/registry-management/rest/transform/linkGetResponse.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/registry-management/services/registryAPIService.js" afterPath="$PROJECT_DIR$/app/extensions/registry-management/services/registryAPIService.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/registry-management/views/configure/configureRegistryController.js" afterPath="$PROJECT_DIR$/app/extensions/registry-management/views/configure/configureRegistryController.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/registry-management/views/repositories/edit/registryRepositoryController.js" afterPath="$PROJECT_DIR$/app/extensions/registry-management/views/repositories/edit/registryRepositoryController.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/storidge/__module.js" afterPath="$PROJECT_DIR$/app/extensions/storidge/__module.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/storidge/components/cluster-events-datatable/storidgeClusterEventsDatatable.js" afterPath="$PROJECT_DIR$/app/extensions/storidge/components/cluster-events-datatable/storidgeClusterEventsDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/storidge/components/nodes-datatable/storidgeNodesDatatable.js" afterPath="$PROJECT_DIR$/app/extensions/storidge/components/nodes-datatable/storidgeNodesDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/storidge/components/profileSelector/storidgeProfileSelector.js" afterPath="$PROJECT_DIR$/app/extensions/storidge/components/profileSelector/storidgeProfileSelector.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/storidge/components/profiles-datatable/storidgeProfilesDatatable.js" afterPath="$PROJECT_DIR$/app/extensions/storidge/components/profiles-datatable/storidgeProfilesDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/storidge/models/events.js" afterPath="$PROJECT_DIR$/app/extensions/storidge/models/events.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/storidge/models/info.js" afterPath="$PROJECT_DIR$/app/extensions/storidge/models/info.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/storidge/models/node.js" afterPath="$PROJECT_DIR$/app/extensions/storidge/models/node.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/storidge/models/profile.js" afterPath="$PROJECT_DIR$/app/extensions/storidge/models/profile.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/storidge/services/chartService.js" afterPath="$PROJECT_DIR$/app/extensions/storidge/services/chartService.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/storidge/services/clusterService.js" afterPath="$PROJECT_DIR$/app/extensions/storidge/services/clusterService.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/storidge/services/nodeService.js" afterPath="$PROJECT_DIR$/app/extensions/storidge/services/nodeService.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/storidge/services/profileService.js" afterPath="$PROJECT_DIR$/app/extensions/storidge/services/profileService.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/storidge/views/monitor/monitorController.js" afterPath="$PROJECT_DIR$/app/extensions/storidge/views/monitor/monitorController.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/storidge/views/profiles/create/createProfileController.js" afterPath="$PROJECT_DIR$/app/extensions/storidge/views/profiles/create/createProfileController.js" />
+      <change beforePath="$PROJECT_DIR$/app/extensions/storidge/views/profiles/profilesController.js" afterPath="$PROJECT_DIR$/app/extensions/storidge/views/profiles/profilesController.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/__module.js" afterPath="$PROJECT_DIR$/app/portainer/__module.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/access-table/access-table.js" afterPath="$PROJECT_DIR$/app/portainer/components/access-table/access-table.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/accessControlForm/por-access-control-form.js" afterPath="$PROJECT_DIR$/app/portainer/components/accessControlForm/por-access-control-form.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/accessControlForm/porAccessControlFormController.js" afterPath="$PROJECT_DIR$/app/portainer/components/accessControlForm/porAccessControlFormController.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/accessControlForm/porAccessControlFormModel.js" afterPath="$PROJECT_DIR$/app/portainer/components/accessControlForm/porAccessControlFormModel.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/accessControlPanel/por-access-control-panel.js" afterPath="$PROJECT_DIR$/app/portainer/components/accessControlPanel/por-access-control-panel.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/accessControlPanel/porAccessControlPanelController.js" afterPath="$PROJECT_DIR$/app/portainer/components/accessControlPanel/porAccessControlPanelController.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/accessManagement/por-access-management.js" afterPath="$PROJECT_DIR$/app/portainer/components/accessManagement/por-access-management.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/accessManagement/porAccessManagementController.js" afterPath="$PROJECT_DIR$/app/portainer/components/accessManagement/porAccessManagementController.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/code-editor/code-editor.js" afterPath="$PROJECT_DIR$/app/portainer/components/code-editor/code-editor.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/datatables/endpoints-datatable/endpointsDatatable.js" afterPath="$PROJECT_DIR$/app/portainer/components/datatables/endpoints-datatable/endpointsDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/datatables/genericDatatableController.js" afterPath="$PROJECT_DIR$/app/portainer/components/datatables/genericDatatableController.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/datatables/groups-datatable/groupsDatatable.js" afterPath="$PROJECT_DIR$/app/portainer/components/datatables/groups-datatable/groupsDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/datatables/registries-datatable/registriesDatatable.js" afterPath="$PROJECT_DIR$/app/portainer/components/datatables/registries-datatable/registriesDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/datatables/schedule-tasks-datatable/scheduleTasksDatatable.js" afterPath="$PROJECT_DIR$/app/portainer/components/datatables/schedule-tasks-datatable/scheduleTasksDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/datatables/schedules-datatable/schedulesDatatable.js" afterPath="$PROJECT_DIR$/app/portainer/components/datatables/schedules-datatable/schedulesDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/datatables/stacks-datatable/stacksDatatable.js" afterPath="$PROJECT_DIR$/app/portainer/components/datatables/stacks-datatable/stacksDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/datatables/tags-datatable/tagsDatatable.js" afterPath="$PROJECT_DIR$/app/portainer/components/datatables/tags-datatable/tagsDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/datatables/teams-datatable/teamsDatatable.js" afterPath="$PROJECT_DIR$/app/portainer/components/datatables/teams-datatable/teamsDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/datatables/users-datatable/usersDatatable.js" afterPath="$PROJECT_DIR$/app/portainer/components/datatables/users-datatable/usersDatatable.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/endpoint-list/endpoint-item/endpointItem.js" afterPath="$PROJECT_DIR$/app/portainer/components/endpoint-list/endpoint-item/endpointItem.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/endpoint-list/endpoint-list-controller.js" afterPath="$PROJECT_DIR$/app/portainer/components/endpoint-list/endpoint-list-controller.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/endpoint-list/endpoint-list.js" afterPath="$PROJECT_DIR$/app/portainer/components/endpoint-list/endpoint-list.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/endpoint-selector/endpoint-selector.js" afterPath="$PROJECT_DIR$/app/portainer/components/endpoint-selector/endpoint-selector.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/endpoint-selector/endpointSelectorController.js" afterPath="$PROJECT_DIR$/app/portainer/components/endpoint-selector/endpointSelectorController.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/endpointSecurity/por-endpoint-security.js" afterPath="$PROJECT_DIR$/app/portainer/components/endpointSecurity/por-endpoint-security.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/endpointSecurity/porEndpointSecurityModel.js" afterPath="$PROJECT_DIR$/app/portainer/components/endpointSecurity/porEndpointSecurityModel.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/extension-list/extension-item/extension-item.js" afterPath="$PROJECT_DIR$/app/portainer/components/extension-list/extension-item/extension-item.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/extension-list/extension-list.js" afterPath="$PROJECT_DIR$/app/portainer/components/extension-list/extension-list.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/forms/execute-job-form/execute-job-form.js" afterPath="$PROJECT_DIR$/app/portainer/components/forms/execute-job-form/execute-job-form.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/forms/group-form/group-form.js" afterPath="$PROJECT_DIR$/app/portainer/components/forms/group-form/group-form.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/forms/registry-form-azure/registry-form-azure.js" afterPath="$PROJECT_DIR$/app/portainer/components/forms/registry-form-azure/registry-form-azure.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/forms/registry-form-custom/registry-form-custom.js" afterPath="$PROJECT_DIR$/app/portainer/components/forms/registry-form-custom/registry-form-custom.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/forms/registry-form-quay/registry-form-quay.js" afterPath="$PROJECT_DIR$/app/portainer/components/forms/registry-form-quay/registry-form-quay.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/forms/schedule-form/schedule-form.js" afterPath="$PROJECT_DIR$/app/portainer/components/forms/schedule-form/schedule-form.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/forms/template-form/template-form.js" afterPath="$PROJECT_DIR$/app/portainer/components/forms/template-form/template-form.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/group-association-table/group-association-table.js" afterPath="$PROJECT_DIR$/app/portainer/components/group-association-table/group-association-table.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/information-panel-offline/informationPanelOffline.js" afterPath="$PROJECT_DIR$/app/portainer/components/information-panel-offline/informationPanelOffline.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/information-panel/information-panel.js" afterPath="$PROJECT_DIR$/app/portainer/components/information-panel/information-panel.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/multi-endpoint-selector/multi-endpoint-selector.js" afterPath="$PROJECT_DIR$/app/portainer/components/multi-endpoint-selector/multi-endpoint-selector.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/multi-endpoint-selector/multiEndpointSelectorController.js" afterPath="$PROJECT_DIR$/app/portainer/components/multi-endpoint-selector/multiEndpointSelectorController.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/product-list/product-item/product-item.js" afterPath="$PROJECT_DIR$/app/portainer/components/product-list/product-item/product-item.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/product-list/product-list.js" afterPath="$PROJECT_DIR$/app/portainer/components/product-list/product-list.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/slider/slider.js" afterPath="$PROJECT_DIR$/app/portainer/components/slider/slider.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/stack-duplication-form/stack-duplication-form.js" afterPath="$PROJECT_DIR$/app/portainer/components/stack-duplication-form/stack-duplication-form.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/tag-selector/tag-selector.js" afterPath="$PROJECT_DIR$/app/portainer/components/tag-selector/tag-selector.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/tag-selector/tagSelectorController.js" afterPath="$PROJECT_DIR$/app/portainer/components/tag-selector/tagSelectorController.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/template-list/template-item/template-item.js" afterPath="$PROJECT_DIR$/app/portainer/components/template-list/template-item/template-item.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/template-list/template-list-controller.js" afterPath="$PROJECT_DIR$/app/portainer/components/template-list/template-list-controller.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/components/template-list/template-list.js" afterPath="$PROJECT_DIR$/app/portainer/components/template-list/template-list.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/filters/filters.js" afterPath="$PROJECT_DIR$/app/portainer/filters/filters.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/helpers/endpointHelper.js" afterPath="$PROJECT_DIR$/app/portainer/helpers/endpointHelper.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/helpers/resourceControlHelper.js" afterPath="$PROJECT_DIR$/app/portainer/helpers/resourceControlHelper.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/helpers/stackHelper.js" afterPath="$PROJECT_DIR$/app/portainer/helpers/stackHelper.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/helpers/templateHelper.js" afterPath="$PROJECT_DIR$/app/portainer/helpers/templateHelper.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/interceptors/endpointStatusInterceptor.js" afterPath="$PROJECT_DIR$/app/portainer/interceptors/endpointStatusInterceptor.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/models/access.js" afterPath="$PROJECT_DIR$/app/portainer/models/access.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/models/dockerhub.js" afterPath="$PROJECT_DIR$/app/portainer/models/dockerhub.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/models/extension.js" afterPath="$PROJECT_DIR$/app/portainer/models/extension.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/models/group.js" afterPath="$PROJECT_DIR$/app/portainer/models/group.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/models/motd.js" afterPath="$PROJECT_DIR$/app/portainer/models/motd.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/models/registry.js" afterPath="$PROJECT_DIR$/app/portainer/models/registry.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/models/resourceControl.js" afterPath="$PROJECT_DIR$/app/portainer/models/resourceControl.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/models/schedule.js" afterPath="$PROJECT_DIR$/app/portainer/models/schedule.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/models/settings.js" afterPath="$PROJECT_DIR$/app/portainer/models/settings.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/models/stack.js" afterPath="$PROJECT_DIR$/app/portainer/models/stack.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/models/status.js" afterPath="$PROJECT_DIR$/app/portainer/models/status.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/models/tag.js" afterPath="$PROJECT_DIR$/app/portainer/models/tag.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/models/team.js" afterPath="$PROJECT_DIR$/app/portainer/models/team.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/models/teamMembership.js" afterPath="$PROJECT_DIR$/app/portainer/models/teamMembership.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/models/template.js" afterPath="$PROJECT_DIR$/app/portainer/models/template.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/models/user.js" afterPath="$PROJECT_DIR$/app/portainer/models/user.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/models/webhook.js" afterPath="$PROJECT_DIR$/app/portainer/models/webhook.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/services/api/accessService.js" afterPath="$PROJECT_DIR$/app/portainer/services/api/accessService.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/services/api/dockerhubService.js" afterPath="$PROJECT_DIR$/app/portainer/services/api/dockerhubService.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/services/api/extensionService.js" afterPath="$PROJECT_DIR$/app/portainer/services/api/extensionService.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/services/api/groupService.js" afterPath="$PROJECT_DIR$/app/portainer/services/api/groupService.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/services/api/motdService.js" afterPath="$PROJECT_DIR$/app/portainer/services/api/motdService.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/services/api/registryService.js" afterPath="$PROJECT_DIR$/app/portainer/services/api/registryService.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/services/api/resourceControlService.js" afterPath="$PROJECT_DIR$/app/portainer/services/api/resourceControlService.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/services/api/scheduleService.js" afterPath="$PROJECT_DIR$/app/portainer/services/api/scheduleService.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/services/api/settingsService.js" afterPath="$PROJECT_DIR$/app/portainer/services/api/settingsService.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/services/api/stackService.js" afterPath="$PROJECT_DIR$/app/portainer/services/api/stackService.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/services/api/statusService.js" afterPath="$PROJECT_DIR$/app/portainer/services/api/statusService.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/services/api/tagService.js" afterPath="$PROJECT_DIR$/app/portainer/services/api/tagService.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/services/api/teamMembershipService.js" afterPath="$PROJECT_DIR$/app/portainer/services/api/teamMembershipService.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/services/api/teamService.js" afterPath="$PROJECT_DIR$/app/portainer/services/api/teamService.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/services/api/templateService.js" afterPath="$PROJECT_DIR$/app/portainer/services/api/templateService.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/services/api/userService.js" afterPath="$PROJECT_DIR$/app/portainer/services/api/userService.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/services/api/webhookService.js" afterPath="$PROJECT_DIR$/app/portainer/services/api/webhookService.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/services/chartService.js" afterPath="$PROJECT_DIR$/app/portainer/services/chartService.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/services/codeMirror.js" afterPath="$PROJECT_DIR$/app/portainer/services/codeMirror.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/services/endpointProvider.js" afterPath="$PROJECT_DIR$/app/portainer/services/endpointProvider.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/services/fileUpload.js" afterPath="$PROJECT_DIR$/app/portainer/services/fileUpload.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/services/legacyExtensionManager.js" afterPath="$PROJECT_DIR$/app/portainer/services/legacyExtensionManager.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/services/modalService.js" afterPath="$PROJECT_DIR$/app/portainer/services/modalService.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/services/notifications.js" afterPath="$PROJECT_DIR$/app/portainer/services/notifications.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/services/stateManager.js" afterPath="$PROJECT_DIR$/app/portainer/services/stateManager.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/views/auth/auth.html" afterPath="$PROJECT_DIR$/app/portainer/views/auth/auth.html" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/views/endpoints/create/createEndpointController.js" afterPath="$PROJECT_DIR$/app/portainer/views/endpoints/create/createEndpointController.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/views/endpoints/edit/endpointController.js" afterPath="$PROJECT_DIR$/app/portainer/views/endpoints/edit/endpointController.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/views/extensions/extensionsController.js" afterPath="$PROJECT_DIR$/app/portainer/views/extensions/extensionsController.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/views/groups/create/createGroupController.js" afterPath="$PROJECT_DIR$/app/portainer/views/groups/create/createGroupController.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/views/init/admin/initAdmin.html" afterPath="$PROJECT_DIR$/app/portainer/views/init/admin/initAdmin.html" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/views/init/endpoint/initEndpoint.html" afterPath="$PROJECT_DIR$/app/portainer/views/init/endpoint/initEndpoint.html" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/views/init/endpoint/initEndpointController.js" afterPath="$PROJECT_DIR$/app/portainer/views/init/endpoint/initEndpointController.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/views/registries/create/createRegistryController.js" afterPath="$PROJECT_DIR$/app/portainer/views/registries/create/createRegistryController.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/views/schedules/create/createScheduleController.js" afterPath="$PROJECT_DIR$/app/portainer/views/schedules/create/createScheduleController.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/views/sidebar/sidebar.html" afterPath="$PROJECT_DIR$/app/portainer/views/sidebar/sidebar.html" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/views/stacks/create/createStackController.js" afterPath="$PROJECT_DIR$/app/portainer/views/stacks/create/createStackController.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/views/stacks/edit/stackController.js" afterPath="$PROJECT_DIR$/app/portainer/views/stacks/edit/stackController.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/views/teams/edit/teamController.js" afterPath="$PROJECT_DIR$/app/portainer/views/teams/edit/teamController.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/views/templates/create/createTemplateController.js" afterPath="$PROJECT_DIR$/app/portainer/views/templates/create/createTemplateController.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/views/templates/edit/templateController.js" afterPath="$PROJECT_DIR$/app/portainer/views/templates/edit/templateController.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/views/templates/templatesController.js" afterPath="$PROJECT_DIR$/app/portainer/views/templates/templatesController.js" />
+      <change beforePath="$PROJECT_DIR$/app/portainer/views/users/users.html" afterPath="$PROJECT_DIR$/app/portainer/views/users/users.html" />
+      <change beforePath="$PROJECT_DIR$/assets/css/app.css" afterPath="$PROJECT_DIR$/assets/css/app.css" />
+      <change beforePath="$PROJECT_DIR$/build/build_binary.ps1" afterPath="$PROJECT_DIR$/build/build_binary.ps1" />
+      <change beforePath="$PROJECT_DIR$/build/build_binary_devops.ps1" afterPath="$PROJECT_DIR$/build/build_binary_devops.ps1" />
+      <change beforePath="$PROJECT_DIR$/build/build_binary_devops.sh" afterPath="$PROJECT_DIR$/build/build_binary_devops.sh" />
+      <change beforePath="$PROJECT_DIR$/build/linux/Dockerfile" afterPath="$PROJECT_DIR$/build/linux/Dockerfile" />
+      <change beforePath="$PROJECT_DIR$/gruntfile.js" afterPath="$PROJECT_DIR$/gruntfile.js" />
+      <change beforePath="$PROJECT_DIR$/index.html" afterPath="$PROJECT_DIR$/app/index.html" />
+      <change beforePath="$PROJECT_DIR$/package.json" afterPath="$PROJECT_DIR$/package.json" />
+      <change beforePath="$PROJECT_DIR$/vendor.yml" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/yarn.lock" afterPath="$PROJECT_DIR$/yarn.lock" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="exec.go" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/api/http/handler/websocket/exec.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="540">
+              <caret line="36" column="0" lean-forward="true" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
+              <folding>
+                <element signature="e#19#316#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="handler.go" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/api/http/handler/websocket/handler.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="390">
+              <caret line="32" column="0" lean-forward="true" selection-start-line="32" selection-start-column="0" selection-end-line="32" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="stream.go" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/api/http/handler/websocket/stream.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="225">
+              <caret line="20" column="17" lean-forward="true" selection-start-line="20" selection-start-column="17" selection-end-line="20" selection-end-column="17" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>main</find>
+      <find>build_all</find>
+      <find>1024</find>
+      <find>20</find>
+      <find>websocketproxy</find>
+      <find>URL</find>
+      <find>ioutil</find>
+      <find>utf8</find>
+      <find>strings</find>
+      <find>websocketExec</find>
+      <find>handleExecRequest</find>
+      <find>websocket</find>
+      <find>hijackExecStartOperation</find>
+      <find>2048</find>
+      <find>streamFromTCPConnToWebsocketConn</find>
+    </findStrings>
+    <dirStrings>
+      <dir>$PROJECT_DIR$</dir>
+    </dirStrings>
+  </component>
+  <component name="GOROOT" path="/usr/local/Cellar/go/1.10.3/libexec" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="6b05a3588142a9279f4d363c8a679d3380243caf" />
+      </map>
+    </option>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/api/http/handler/websocket/handler.go" />
+        <option value="$PROJECT_DIR$/api/http/handler/websocket/websocket_exec.go" />
+        <option value="$PROJECT_DIR$/api/http/handler/websocket/stream.go" />
+        <option value="$PROJECT_DIR$/api/http/handler/websocket/exec.go" />
+      </list>
+    </option>
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="y" value="23" />
+    <option name="width" value="1920" />
+    <option name="height" value="1057" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+      <manualOrder />
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="Scratches" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="portainer" type="b2602c69:ProjectViewProjectNode" />
+              <item name="portainer" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="portainer" type="b2602c69:ProjectViewProjectNode" />
+              <item name="portainer" type="462c0819:PsiDirectoryNode" />
+              <item name="api" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="portainer" type="b2602c69:ProjectViewProjectNode" />
+              <item name="portainer" type="462c0819:PsiDirectoryNode" />
+              <item name="api" type="462c0819:PsiDirectoryNode" />
+              <item name="http" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="portainer" type="b2602c69:ProjectViewProjectNode" />
+              <item name="portainer" type="462c0819:PsiDirectoryNode" />
+              <item name="api" type="462c0819:PsiDirectoryNode" />
+              <item name="http" type="462c0819:PsiDirectoryNode" />
+              <item name="handler" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="portainer" type="b2602c69:ProjectViewProjectNode" />
+              <item name="portainer" type="462c0819:PsiDirectoryNode" />
+              <item name="api" type="462c0819:PsiDirectoryNode" />
+              <item name="http" type="462c0819:PsiDirectoryNode" />
+              <item name="handler" type="462c0819:PsiDirectoryNode" />
+              <item name="websocket" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="settings.editor.selected.configurable" value="settings.github" />
+    <property name="go.sdk.automatically.set" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="GO_FMT" value="false" />
+    <property name="SearchEverywhereHistoryKey" value="we&#9;FILE&#9;file:///Users/wangkai/Desktop/123/portainer/api/http/handler/websocket/websocket_exec.go" />
+    <property name="Git.Branch.Popup.ShowAllRemotes" value="true" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.selected.package.eslint" value="$PROJECT_DIR$/node_modules/eslint" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
+      <module name="portainer" />
+      <working_directory value="$PROJECT_DIR$/" />
+      <go_parameters value="-i" />
+      <kind value="FILE" />
+      <filePath value="$PROJECT_DIR$/" />
+      <directory value="$PROJECT_DIR$/" />
+    </configuration>
+    <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
+      <module name="portainer" />
+      <working_directory value="$PROJECT_DIR$/" />
+      <go_parameters value="-i" />
+      <framework value="gotest" />
+      <kind value="DIRECTORY" />
+    </configuration>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false">
+    <option name="remove_strategy" value="false" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="0" y="23" width="1920" height="1057" extended-state="0" />
+    <layout>
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1400426" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.17775467" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3773389" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="npm" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Grunt " active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+    </layout>
+    <layout-to-restore>
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="npm" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.35550934" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.124068156" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Grunt " active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="true" content_ui="tabs" />
+    </layout-to-restore>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ORDER">
+      <list>
+        <option value="0" />
+        <option value="2" />
+        <option value="3" />
+        <option value="1" />
+      </list>
+    </option>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="change TCPConnToWebsocketConn byte size" />
+    <MESSAGE value="change TCPConnToWebsocketConn read function to ReadRune" />
+    <option name="LAST_COMMIT_MESSAGE" value="change TCPConnToWebsocketConn read function to ReadRune" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <option name="time" value="1" />
+    </breakpoint-manager>
+    <watches-manager />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/api/docker/client.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/http/client/client.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="900">
+          <caret line="71" column="27" lean-forward="false" selection-start-line="71" selection-start-column="27" selection-end-line="71" selection-end-column="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/http/handler/websocket/websocket_dial.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/http/handler/websocket/handler.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="23" column="46" lean-forward="false" selection-start-line="23" selection-start-column="46" selection-end-line="23" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/http/handler/webhooks/webhook_create.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/http/handler/webhooks/webhook_delete.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/http/handler/webhooks/webhook_execute.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="675">
+          <caret line="55" column="30" lean-forward="false" selection-start-line="55" selection-start-column="30" selection-end-line="55" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/http/handler/websocket/websocket_exec.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3330">
+          <caret line="241" column="17" lean-forward="false" selection-start-line="241" selection-start-column="17" selection-end-line="241" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/docker/client.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="825">
+          <caret line="63" column="22" lean-forward="false" selection-start-line="63" selection-start-column="5" selection-end-line="63" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/http/client/client.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="900">
+          <caret line="71" column="27" lean-forward="true" selection-start-line="71" selection-start-column="27" selection-end-line="71" selection-end-column="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/http/handler/websocket/websocket_dial.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/http/handler/websocket/websocket_dial_windows.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/http/handler/websocket/handler.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="23" column="46" lean-forward="false" selection-start-line="23" selection-start-column="38" selection-end-line="23" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/http/handler/webhooks/webhook_create.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/http/handler/webhooks/webhook_delete.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/http/handler/websocket/websocket_exec.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1920">
+          <caret line="147" column="59" lean-forward="true" selection-start-line="147" selection-start-column="59" selection-end-line="147" selection-end-column="59" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/http/handler/webhooks/webhook_execute.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="34" column="0" lean-forward="true" selection-start-line="34" selection-start-column="0" selection-end-line="34" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CODE_OF_CONDUCT.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/bolt/dockerhub/dockerhub.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/cli/pairlist.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/swagger.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/errors.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build/download_docker_binary.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build/build_in_container.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build/linux/Dockerfile">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="11" column="0" lean-forward="true" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/distribution/portainer.spec">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/distribution/portainer.service">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.dockerignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.codeclimate.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.eslintrc.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="608">
+          <caret line="44" column="13" lean-forward="false" selection-start-line="44" selection-start-column="4" selection-end-line="44" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-757">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gruntfile.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/cli/cli.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="23" column="34" lean-forward="true" selection-start-line="23" selection-start-column="34" selection-end-line="23" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/vendor.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/exec/swarm_stack.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/archive/tar.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="14" lean-forward="false" selection-start-line="3" selection-start-column="14" selection-end-line="3" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/docker/client.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="840">
+          <caret line="64" column="22" lean-forward="false" selection-start-line="64" selection-start-column="22" selection-end-line="64" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/http/client/client.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1005">
+          <caret line="78" column="27" lean-forward="false" selection-start-line="78" selection-start-column="27" selection-end-line="78" selection-end-column="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/http/handler/websocket/websocket_dial.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/http/handler/webhooks/webhook_create.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/http/handler/webhooks/webhook_delete.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/http/handler/webhooks/webhook_execute.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="675">
+          <caret line="55" column="30" lean-forward="false" selection-start-line="55" selection-start-column="30" selection-end-line="55" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/http/handler/websocket/websocket_dial_windows.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/portainer.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="470">
+          <caret line="687" column="5" lean-forward="true" selection-start-line="687" selection-start-column="5" selection-end-line="687" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/http/handler/websocket/websocket_exec.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="248" column="28" lean-forward="true" selection-start-line="248" selection-start-column="28" selection-end-line="248" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/http/handler/websocket/handler.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="390">
+          <caret line="32" column="0" lean-forward="true" selection-start-line="32" selection-start-column="0" selection-end-line="32" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/http/handler/websocket/stream.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="20" column="17" lean-forward="true" selection-start-line="20" selection-start-column="17" selection-end-line="20" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/http/handler/websocket/exec.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="540">
+          <caret line="36" column="0" lean-forward="true" selection-start-line="36" selection-start-column="0" selection-end-line="36" selection-end-column="0" />
+          <folding>
+            <element signature="e#19#316#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>

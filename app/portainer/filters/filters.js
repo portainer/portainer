@@ -1,3 +1,7 @@
+import moment from 'moment';
+import _ from 'lodash-es';
+import filesize from 'filesize';
+
 angular.module('portainer.app')
 .filter('truncate', function () {
   'use strict';
@@ -98,6 +102,15 @@ angular.module('portainer.app')
   return function (arr, separator) {
     if (arr) {
       return _.join(arr, separator);
+    }
+    return '';
+  };
+})
+.filter('labelsToStr', function () {
+  'use strict';
+  return function (arr, separator) {
+    if (arr) {
+      return _.join(arr.map((item) => item.key + ':' + item.value), separator);
     }
     return '';
   };

@@ -1,3 +1,5 @@
+import { SubscriptionViewModel } from '../models/subscription';
+
 angular.module('portainer.azure')
 .factory('SubscriptionService', ['$q', 'Subscription', function SubscriptionServiceFactory($q, Subscription) {
   'use strict';

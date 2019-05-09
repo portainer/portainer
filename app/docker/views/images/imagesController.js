@@ -1,3 +1,5 @@
+import _ from 'lodash-es';
+
 angular.module('portainer.docker')
 .controller('ImagesController', ['$scope', '$state', 'ImageService', 'Notifications', 'ModalService', 'HttpRequestHelper', 'FileSaver', 'Blob', 'EndpointProvider',
 function ($scope, $state, ImageService, Notifications, ModalService, HttpRequestHelper, FileSaver, Blob, EndpointProvider) {
@@ -51,7 +53,7 @@ function ($scope, $state, ImageService, Notifications, ModalService, HttpRequest
 
       if (untagged) {
         Notifications.warning('', 'Cannot download a untagged image');
-  			return false;
+        return false;
       }
     }
 

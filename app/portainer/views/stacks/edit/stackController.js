@@ -121,7 +121,7 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
     var stack = $scope.stack;
 
     // TODO: this is a work-around for stacks created with Portainer version >= 1.17.1
-  	// The EndpointID property is not available for these stacks, we can pass
+    // The EndpointID property is not available for these stacks, we can pass
     // the current endpoint identifier as a part of the update request. It will be used if
     // the EndpointID property is not defined on the stack.
     var endpointId = EndpointProvider.endpointID();
@@ -239,7 +239,7 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
   function loadExternalStack(name) {
     var stackType = $transition$.params().type;
     if (!stackType || (stackType !== '1' && stackType !== '2')) {
-      Notifications.error('Failure', err, 'Invalid type URL parameter.');
+      Notifications.error('Failure', null, 'Invalid type URL parameter.');
       return;
     }
 

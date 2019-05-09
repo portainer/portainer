@@ -1,4 +1,4 @@
-function RepositoryTagViewModel(name, imageId, os, arch, size, digest, repositoryName, fsLayers, history, manifestv2) {
+export function RepositoryTagViewModel(name, imageId, os, arch, size, digest, repositoryName, fsLayers, history, manifestv2) {
     this.Name = name;
     this.ImageId = imageId;
     this.Os = os;

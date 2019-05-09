@@ -1,3 +1,6 @@
+import _ from 'lodash-es';
+import { ExtensionViewModel } from '../../models/extension';
+
 angular.module('portainer.app')
 .factory('ExtensionService', ['$q', 'Extension', function ExtensionServiceFactory($q, Extension) {
   'use strict';

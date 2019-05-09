@@ -1,5 +1,5 @@
 angular.module('portainer.app').component('extensionItem', {
-  templateUrl: 'app/portainer/components/extension-list/extension-item/extensionItem.html',
+  templateUrl: './extensionItem.html',
   controller: 'ExtensionItemController',
   bindings: {
     model: '<',

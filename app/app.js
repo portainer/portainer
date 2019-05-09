@@ -1,3 +1,5 @@
+import _ from 'lodash-es';
+
 angular.module('portainer')
 .run(['$rootScope', '$state', 'Authentication', 'authManager', 'StateManager', 'EndpointProvider', 'Notifications', 'Analytics', 'cfpLoadingBar', '$transitions', 'HttpRequestHelper',
 function ($rootScope, $state, Authentication, authManager, StateManager, EndpointProvider, Notifications, Analytics, cfpLoadingBar, $transitions, HttpRequestHelper) {

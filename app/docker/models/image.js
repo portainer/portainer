@@ -1,4 +1,4 @@
-function ImageViewModel(data) {
+export function ImageViewModel(data) {
   this.Id = data.Id;
   this.Tag = data.Tag;
   this.Repository = data.Repository;
@@ -23,7 +23,7 @@ function ImageViewModel(data) {
   }
 }
 
-function ImageBuildModel(data) {
+export function ImageBuildModel(data) {
   this.hasError = false;
   var buildLogs = [];
 

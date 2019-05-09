@@ -1,5 +1,5 @@
 angular.module('portainer.app').component('porEndpointSecurity', {
-  templateUrl: 'app/portainer/components/endpointSecurity/porEndpointSecurity.html',
+  templateUrl: './porEndpointSecurity.html',
   controller: 'porEndpointSecurityController',
   bindings: {
     // This object will be populated with the form data.

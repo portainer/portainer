@@ -149,7 +149,7 @@ function createEventDetails(event) {
   return details;
 }
 
-function EventViewModel(data) {
+export function EventViewModel(data) {
   // Type, Action, Actor unavailable in Docker < 1.10
   this.Time = data.time;
   if (data.Type) {

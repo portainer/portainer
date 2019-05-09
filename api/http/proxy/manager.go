@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/orcaman/concurrent-map"
-	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/api"
 )
 
 // TODO: contain code related to legacy extension management
@@ -104,6 +104,7 @@ func (manager *Manager) CreateExtensionProxy(extensionID portainer.ExtensionID) 
 	return proxy, nil
 }
 
+// GetExtensionURL retrieves the URL of an extension running locally based on the extension port table
 func (manager *Manager) GetExtensionURL(extensionID portainer.ExtensionID) string {
 	return "http://localhost:" + extensionPorts[extensionID]
 }

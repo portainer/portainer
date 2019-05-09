@@ -1,3 +1,5 @@
+import _ from 'lodash-es';
+
 angular.module('portainer.app')
 .factory('EndpointProvider', ['LocalStorage', function EndpointProviderFactory(LocalStorage) {
   'use strict';

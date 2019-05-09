@@ -23,8 +23,9 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/configs',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/configs/configs.html',
-        controller: 'ConfigsController'
+        templateUrl: './views/configs/configs.html',
+        controller: 'ConfigsController',
+        controllerAs: 'ctrl'
       }
     }
   };
@@ -34,7 +35,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/:id',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/configs/edit/config.html',
+        templateUrl: './views/configs/edit/config.html',
         controller: 'ConfigController'
       }
     }
@@ -45,8 +46,9 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/new?id',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/configs/create/createconfig.html',
-        controller: 'CreateConfigController'
+        templateUrl: './views/configs/create/createconfig.html',
+        controller: 'CreateConfigController',
+        controllerAs: 'ctrl'
       }
     }
   };
@@ -56,7 +58,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/containers',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/containers/containers.html',
+        templateUrl: './views/containers/containers.html',
         controller: 'ContainersController'
       }
     }
@@ -67,18 +69,29 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/:id?nodeName',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/containers/edit/container.html',
+        templateUrl: './views/containers/edit/container.html',
         controller: 'ContainerController'
       }
     }
   };
 
-  var containerConsole = {
-    name: 'docker.containers.container.console',
-    url: '/console',
+  var containerAttachConsole = {
+    name: 'docker.containers.container.attach',
+    url: '/attach',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/containers/console/containerconsole.html',
+        templateUrl: './views/containers/console/attach.html',
+        controller: 'ContainerConsoleController'
+      }
+    }
+  };
+
+  var containerExecConsole = {
+    name: 'docker.containers.container.exec',
+    url: '/exec',
+    views: {
+      'content@': {
+        templateUrl: './views/containers/console/exec.html',
         controller: 'ContainerConsoleController'
       }
     }
@@ -89,7 +102,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/new?nodeName&from',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/containers/create/createcontainer.html',
+        templateUrl: './views/containers/create/createcontainer.html',
         controller: 'CreateContainerController'
       }
     }
@@ -100,7 +113,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/inspect',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/containers/inspect/containerinspect.html',
+        templateUrl: './views/containers/inspect/containerinspect.html',
         controller: 'ContainerInspectController'
       }
     }
@@ -111,7 +124,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/logs',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/containers/logs/containerlogs.html',
+        templateUrl: './views/containers/logs/containerlogs.html',
         controller: 'ContainerLogsController'
       }
     }
@@ -122,7 +135,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/stats',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/containers/stats/containerstats.html',
+        templateUrl: './views/containers/stats/containerstats.html',
         controller: 'ContainerStatsController'
       }
     }
@@ -133,7 +146,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/dashboard',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/dashboard/dashboard.html',
+        templateUrl: './views/dashboard/dashboard.html',
         controller: 'DashboardController'
       }
     }
@@ -174,7 +187,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/events',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/events/events.html',
+        templateUrl: './views/events/events.html',
         controller: 'EventsController'
       }
     }
@@ -185,7 +198,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/images',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/images/images.html',
+        templateUrl: './views/images/images.html',
         controller: 'ImagesController'
       }
     }
@@ -196,7 +209,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/:id?nodeName',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/images/edit/image.html',
+        templateUrl: './views/images/edit/image.html',
         controller: 'ImageController'
       }
     }
@@ -207,7 +220,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/build',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/images/build/buildimage.html',
+        templateUrl: './views/images/build/buildimage.html',
         controller: 'BuildImageController'
       }
     }
@@ -218,7 +231,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/import',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/images/import/importimage.html',
+        templateUrl: './views/images/import/importimage.html',
         controller: 'ImportImageController'
       }
     }
@@ -229,7 +242,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/networks',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/networks/networks.html',
+        templateUrl: './views/networks/networks.html',
         controller: 'NetworksController'
       }
     }
@@ -240,7 +253,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/:id?nodeName',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/networks/edit/network.html',
+        templateUrl: './views/networks/edit/network.html',
         controller: 'NetworkController'
       }
     }
@@ -251,7 +264,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/new',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/networks/create/createnetwork.html',
+        templateUrl: './views/networks/create/createnetwork.html',
         controller: 'CreateNetworkController'
       }
     }
@@ -298,7 +311,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/secrets',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/secrets/secrets.html',
+        templateUrl: './views/secrets/secrets.html',
         controller: 'SecretsController'
       }
     }
@@ -309,7 +322,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/:id',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/secrets/edit/secret.html',
+        templateUrl: './views/secrets/edit/secret.html',
         controller: 'SecretController'
       }
     }
@@ -320,7 +333,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/new',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/secrets/create/createsecret.html',
+        templateUrl: './views/secrets/create/createsecret.html',
         controller: 'CreateSecretController'
       }
     }
@@ -331,7 +344,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/services',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/services/services.html',
+        templateUrl: './views/services/services.html',
         controller: 'ServicesController'
       }
     }
@@ -342,7 +355,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/:id',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/services/edit/service.html',
+        templateUrl: './views/services/edit/service.html',
         controller: 'ServiceController'
       }
     }
@@ -353,7 +366,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/new',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/services/create/createservice.html',
+        templateUrl: './views/services/create/createservice.html',
         controller: 'CreateServiceController'
       }
     }
@@ -364,7 +377,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/logs',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/services/logs/servicelogs.html',
+        templateUrl: './views/services/logs/servicelogs.html',
         controller: 'ServiceLogsController'
       }
     }
@@ -375,7 +388,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/swarm',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/swarm/swarm.html',
+        templateUrl: './views/swarm/swarm.html',
         controller: 'SwarmController'
       }
     }
@@ -386,7 +399,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/visualizer',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/swarm/visualizer/swarmvisualizer.html',
+        templateUrl: './views/swarm/visualizer/swarmvisualizer.html',
         controller: 'SwarmVisualizerController'
       }
     }
@@ -403,7 +416,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/:id',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/tasks/edit/task.html',
+        templateUrl: './views/tasks/edit/task.html',
         controller: 'TaskController'
       }
     }
@@ -414,7 +427,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/logs',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/tasks/logs/tasklogs.html',
+        templateUrl: './views/tasks/logs/tasklogs.html',
         controller: 'TaskLogsController'
       }
     }
@@ -425,7 +438,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/volumes',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/volumes/volumes.html',
+        templateUrl: './views/volumes/volumes.html',
         controller: 'VolumesController'
       }
     }
@@ -436,7 +449,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/:id?nodeName',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/volumes/edit/volume.html',
+        templateUrl: './views/volumes/edit/volume.html',
         controller: 'VolumeController'
       }
     }
@@ -447,7 +460,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/browse',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/volumes/browse/browsevolume.html',
+        templateUrl: './views/volumes/browse/browsevolume.html',
         controller: 'BrowseVolumeController'
       }
     }
@@ -458,7 +471,7 @@ angular.module('portainer.docker', ['portainer.app'])
     url: '/new',
     views: {
       'content@': {
-        templateUrl: 'app/docker/views/volumes/create/createvolume.html',
+        templateUrl: './views/volumes/create/createvolume.html',
         controller: 'CreateVolumeController'
       }
     }
@@ -471,7 +484,8 @@ angular.module('portainer.docker', ['portainer.app'])
   $stateRegistryProvider.register(configCreation);
   $stateRegistryProvider.register(containers);
   $stateRegistryProvider.register(container);
-  $stateRegistryProvider.register(containerConsole);
+  $stateRegistryProvider.register(containerExecConsole);
+  $stateRegistryProvider.register(containerAttachConsole);
   $stateRegistryProvider.register(containerCreation);
   $stateRegistryProvider.register(containerInspect);
   $stateRegistryProvider.register(containerLogs);

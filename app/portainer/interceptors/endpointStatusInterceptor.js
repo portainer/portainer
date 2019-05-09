@@ -1,3 +1,5 @@
+import _ from 'lodash-es';
+
 angular.module('portainer.app')
   .factory('EndpointStatusInterceptor', ['$q', 'EndpointProvider', function ($q, EndpointProvider) {
     'use strict';
