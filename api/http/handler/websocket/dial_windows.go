@@ -3,9 +3,8 @@
 package websocket
 
 import (
-	"net"
-
 	"github.com/Microsoft/go-winio"
+	"net"
 )
 
 func createDial(scheme, host string) (net.Conn, error) {
