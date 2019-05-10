@@ -27,7 +27,7 @@ func streamFromTCPConnToWebsocketConn(websocketConn *websocket.Conn, br *bufio.R
 	for {
 		out := make([]byte, 2048)
 		_, err := br.Read(out)
-		out_str := validString(string(out[:]))
+		processedOutput := validString(string(out[:]))
 		if err != nil {
 			errorChan <- err
 			break
