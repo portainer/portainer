@@ -33,7 +33,7 @@ func streamFromTCPConnToWebsocketConn(websocketConn *websocket.Conn, br *bufio.R
 			break
 		}
 
-		err = websocketConn.WriteMessage(websocket.TextMessage, []byte(out_str))
+		err = websocketConn.WriteMessage(websocket.TextMessage, []byte(processedOutput))
 		if err != nil {
 			errorChan <- err
 			break
