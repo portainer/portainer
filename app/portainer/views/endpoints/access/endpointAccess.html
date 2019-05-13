@@ -1,11 +1,11 @@
 <rd-header>
   <rd-header-title title-text="Endpoint access"></rd-header-title>
   <rd-header-content>
-    <a ui-sref="portainer.endpoints">Endpoints</a> &gt; <a ui-sref="portainer.endpoints.endpoint({id: endpoint.Id})">{{ endpoint.Name }}</a> &gt; Access management
+    <a ui-sref="portainer.endpoints">Endpoints</a> &gt; <a ui-sref="portainer.endpoints.endpoint({id: ctrl.endpoint.Id})">{{ ctrl.endpoint.Name }}</a> &gt; Access management
   </rd-header-content>
 </rd-header>
 
-<div class="row" ng-if="endpoint">
+<div class="row" ng-if="ctrl.endpoint">
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-header icon="fa-plug" title-text="Endpoint"></rd-widget-header>
@@ -15,19 +15,19 @@
             <tr>
               <td>Name</td>
               <td>
-                {{ endpoint.Name }}
+                {{ ctrl.endpoint.Name }}
               </td>
             </tr>
             <tr>
               <td>URL</td>
               <td>
-                {{ endpoint.URL | stripprotocol }}
+                {{ ctrl.endpoint.URL | stripprotocol }}
               </td>
             </tr>
             <tr>
               <td>Group</td>
               <td>
-                <a ui-sref="portainer.groups.group({ id: group.Id })">{{ group.Name }}</a>
+                <a ui-sref="portainer.groups.group({ id: ctrl.group.Id })">{{ ctrl.group.Name }}</a>
               </td>
             </tr>
           </tbody>
@@ -37,10 +37,70 @@
   </div>
 </div>
 
-<div class="row" ng-if="endpoint && group">
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-user-lock" title-text="Create access"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <div class="form-group">
+            <label class="col-sm-3 col-lg-2 control-label text-left">
+              Select user(s) and/or team(s)
+            </label>
+            <div class="col-sm-9 col-lg-4">
+              <span class="small text-muted" ng-if="ctrl.usersAndTeams.length === 0">
+                You have not yet created any user or team. Head over the <a ui-sref="portainer.users">users view</a> to manage
+                users, and to <a ui-sref="portainer.users">teams view</a> to manage teams.
+              </span>
+              <span isteven-multi-select ng-if="ctrl.usersAndTeams.length > 0" input-model="ctrl.usersAndTeams"
+                output-model="ctrl.formValues.multiselectOutput" button-label="icon '-' Name" item-label="icon '-' Name"
+                tick-property="ticked" helper-elements="filter" search-property="Name"
+                translation="{nothingSelected: 'Select one or more users and/or teams', search: 'Search...'}">
+              </span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-3 col-lg-2 control-label text-left">
+              Role
+            </label>
+            <div class="col-sm-9 col-lg-4">
+              <ui-select ng-model="ctrl.formValues.selectedRole">
+                <ui-select-match placeholder="Select a role">
+                  <span>{{ $select.selected.Name }}</span>
+                </ui-select-match>
+                <ui-select-choices repeat="role in (ctrl.roles | filter: $select.search)">
+                  <span>{{ role.Name }}</span>
+                </ui-select-choices>
+              </ui-select>
+            </div>
+          </div>
+
+          <!-- actions -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="submit" class="btn btn-primary btn-sm" ng-disabled="ctrl.state.actionInProgress"
+                ng-click="ctrl.addSelected()" button-spinner="ctrl.state.actionInProgress">
+                <span ng-hide="ctrl.state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Create
+                  access</span>
+                <span ng-show="ctrl.state.actionInProgress">Creating access...</span>
+              </button>
+            </div>
+          </div>
+          <!-- !actions -->
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
   <div class="col-sm-12">
-    <por-access-management
-      access-controlled-entity="endpoint" entity-type="endpoint" inherit-from="group" update-access="updateAccess(userAccesses, teamAccesses)"
-    ></por-access-management>
+    <access-datatable
+    title-text="Access" title-icon="fa-user-lock"
+    dataset="ctrl.formValues.selectedUserAndTeams" table-key="access"
+    order-by="Name"
+    rbac-enabled="ctrl.rbacEnabled"
+    ></access-datatable>
   </div>
 </div>
