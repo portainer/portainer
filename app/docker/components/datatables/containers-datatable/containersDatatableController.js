@@ -1,22 +1,20 @@
 import _ from 'lodash-es';
 
 angular.module('portainer.docker')
-.controller('ContainersDatatableController', ['PaginationService', 'DatatableService', 'EndpointProvider',
-function (PaginationService, DatatableService, EndpointProvider) {
+.controller('ContainersDatatableController', ['$scope', '$controller', 'DatatableService', 'EndpointProvider',
+function ($scope, $controller, DatatableService, EndpointProvider) {
+
+  const extendedCtrl = $controller('GenericDatatableController', {$scope: $scope});
+  angular.extend(this, extendedCtrl);
+
   var ctrl = this;
 
-  this.state = {
-    selectAll: false,
-    orderBy: this.orderBy,
-    paginatedItemLimit: PaginationService.getPaginationLimit(this.tableKey),
-    displayTextFilter: false,
-    selectedItemCount: 0,
-    selectedItems: [],
+  this.state = Object.assign(this.state, {
     noStoppedItemsSelected: true,
     noRunningItemsSelected: true,
     noPausedItemsSelected: true,
     publicURL: EndpointProvider.endpointPublicURL()
-  };
+  });
 
   this.settings = {
     open: false,
@@ -81,43 +79,12 @@ function (PaginationService, DatatableService, EndpointProvider) {
     }
   };
 
-  this.onTextFilterChange = function() {
-    DatatableService.setDataTableTextFilters(this.tableKey, this.state.textFilter);
-  };
-
   this.onColumnVisibilityChange = function()  {
     DatatableService.setColumnVisibilitySettings(this.tableKey, this.columnVisibility);
   };
 
-  this.changeOrderBy = function(orderField) {
-    this.state.reverseOrder = this.state.orderBy === orderField ? !this.state.reverseOrder : false;
-    this.state.orderBy = orderField;
-    DatatableService.setDataTableOrder(this.tableKey, orderField, this.state.reverseOrder);
-  };
-
-  this.toggleItemSelection = function(item) {
-    if (item.Checked) {
-      this.state.selectedItemCount++;
-      this.state.selectedItems.push(item);
-    } else {
-      this.state.selectedItems.splice(this.state.selectedItems.indexOf(item), 1);
-      this.state.selectedItemCount--;
-    }
-  };
-
-  this.selectItem = function(item) {
-    this.toggleItemSelection(item);
-    this.updateSelectionState();
-  };
-
   this.selectAll = function() {
-    for (var i = 0; i < this.state.filteredDataSet.length; i++) {
-      var item = this.state.filteredDataSet[i];
-      if (item.Checked !== this.state.selectAll) {
-        item.Checked = this.state.selectAll;
-        this.toggleItemSelection(item);
-      }
-    }
+    extendedCtrl.selectAll();
     this.updateSelectionState();
   };
 
@@ -142,10 +109,6 @@ function (PaginationService, DatatableService, EndpointProvider) {
     } else if (['running', 'healthy', 'unhealthy', 'starting'].indexOf(item.Status) !== -1) {
       this.state.noRunningItemsSelected = false;
     }
-  };
-
-  this.changePaginationLimit = function() {
-    PaginationService.setPaginationLimit(this.tableKey, this.state.paginatedItemLimit);
   };
 
   this.applyFilters = function(value) {
@@ -209,13 +172,8 @@ function (PaginationService, DatatableService, EndpointProvider) {
   };
 
   this.$onInit = function() {
-    setDefaults(this);
+    extendedCtrl.$onInit();
     this.prepareTableFromDataset();
-    var storedOrder = DatatableService.getDataTableOrder(this.tableKey);
-    if (storedOrder !== null) {
-      this.state.reverseOrder = storedOrder.reverse;
-      this.state.orderBy = storedOrder.orderBy;
-    }
 
     var storedFilters = DatatableService.getDataTableFilters(this.tableKey);
     if (storedFilters !== null) {
@@ -234,15 +192,5 @@ function (PaginationService, DatatableService, EndpointProvider) {
       this.columnVisibility = storedColumnVisibility;
     }
     this.columnVisibility.state.open = false;
-
-    var textFilter = DatatableService.getDataTableTextFilters(this.tableKey);
-    if (textFilter !== null) {
-      this.state.textFilter = textFilter;
-    }
   };
-
-  function setDefaults(ctrl) {
-    ctrl.showTextFilter = ctrl.showTextFilter ? ctrl.showTextFilter : false;
-    ctrl.state.reverseOrder = ctrl.reverseOrder ? ctrl.reverseOrder : false;
-  }
 }]);
