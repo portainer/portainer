@@ -7,7 +7,6 @@ export function UserViewModel(data) {
   } else {
     this.RoleName = 'user';
   }
-  this.RoleId = data.RoleId;
   this.AuthenticationMethod = data.AuthenticationMethod;
   this.Checked = false;
 }

@@ -19,7 +19,7 @@
                 <button class="btn btn-xs btn-danger" ng-click="deleteUser()"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this user</button>
               </td>
             </tr>
-            <tr ng-if="isAdmin && !rbacEnabled">
+            <tr ng-if="isAdmin">
               <td colspan="2">
                 <label for="permissions" class="control-label text-left">
                   Administrator
@@ -28,18 +28,6 @@
                 <label class="switch" style="margin-left: 20px;">
                   <input type="checkbox" ng-model="formValues.Administrator" ng-change="updatePermissions()"><i></i>
                 </label>
-              </td>
-            </tr>
-            <tr ng-if="rbacEnabled">
-              <td>
-                <label for="role" class="control-label text-left">
-                  Role
-                </label>
-              </td>
-              <td>
-                <select ng-options="role.Id as role.Name for role in roles" ng-model="formValues.roleId" id="role" class="form-control" ng-change="updateRole()">
-                  <option selected value="">No role</option>
-                </select>
               </td>
             </tr>
           </tbody>

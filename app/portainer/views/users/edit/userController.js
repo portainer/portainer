@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('UserController', ['$q', '$scope', '$state', '$transition$', 'UserService', 'ModalService', 'Notifications', 'SettingsService', 'ExtensionService', 'RoleService', 'Authentication',
-function ($q, $scope, $state, $transition$, UserService, ModalService, Notifications, SettingsService, ExtensionService, RoleService, Authentication) {
+.controller('UserController', ['$q', '$scope', '$state', '$transition$', 'UserService', 'ModalService', 'Notifications', 'SettingsService', 'Authentication',
+function ($q, $scope, $state, $transition$, UserService, ModalService, Notifications, SettingsService, Authentication) {
 
   $scope.state = {
     updatePasswordError: ''
@@ -9,8 +9,7 @@ function ($q, $scope, $state, $transition$, UserService, ModalService, Notificat
   $scope.formValues = {
     newPassword: '',
     confirmPassword: '',
-    Administrator: false,
-    roleId: '',
+    Administrator: false
   };
 
   $scope.deleteUser = function() {
@@ -34,22 +33,6 @@ function ($q, $scope, $state, $transition$, UserService, ModalService, Notificat
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to update user permissions');
     });
-  };
-
-  $scope.updateRole = function() {
-    var roleId = $scope.formValues.roleId;
-    if (roleId === '') {
-      roleId = 0;
-    }
-
-    UserService.updateUser($scope.user.Id, undefined, 0, roleId)
-      .then(function success() {
-        Notifications.success('Success', 'Role successfully updated');
-        $state.reload();
-      })
-      .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to update user role');
-      });
   };
 
   $scope.updatePassword = function() {
@@ -77,18 +60,13 @@ function ($q, $scope, $state, $transition$, UserService, ModalService, Notificat
   function initView() {
     $q.all({
       user: UserService.user($transition$.params().id),
-      settings: SettingsService.publicSettings(),
-      rbac: ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.RBAC),
-      roles: RoleService.roles()
+      settings: SettingsService.publicSettings()
     })
     .then(function success(data) {
       var user = data.user;
       $scope.user = user;
       $scope.formValues.Administrator = Authentication.isAdmin();
-      $scope.formValues.roleId = user.RoleId !== 0 ? user.RoleId : '';
       $scope.AuthenticationMethod = data.settings.AuthenticationMethod;
-      $scope.rbacEnabled = data.rbac;
-      $scope.roles = data.roles;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve user information');

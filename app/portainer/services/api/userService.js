@@ -42,7 +42,7 @@ angular.module('portainer.app')
     return deferred.promise;
   };
 
-  service.createUser = function(username, password, role, teamIds, roleId) {
+  service.createUser = function(username, password, role, teamIds) {
     var deferred = $q.defer();
 
     var payload = {
@@ -50,10 +50,6 @@ angular.module('portainer.app')
       password: password,
       role: role
     };
-
-    if (roleId) {
-      payload.roleID = roleId;
-    }
 
     Users.create({}, payload).$promise
     .then(function success(data) {
@@ -78,11 +74,10 @@ angular.module('portainer.app')
     return Users.remove({id: id}).$promise;
   };
 
-  service.updateUser = function(id, password, role, roleId) {
+  service.updateUser = function(id, password, role) {
     var query = {
       password: password,
-      role: role,
-      roleId: roleId
+      role: role
     };
     return Users.update({id: id}, query).$promise;
   };
