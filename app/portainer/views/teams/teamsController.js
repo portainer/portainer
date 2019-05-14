@@ -1,16 +1,13 @@
-import _ from 'lodash-es';
-
 angular.module('portainer.app')
-.controller('TeamsController', ['$q', '$scope', '$state', 'TeamService', 'UserService', 'ModalService', 'Notifications', 'Authentication', 'ExtensionService', 'RoleService',
-function ($q, $scope, $state, TeamService, UserService, ModalService, Notifications, Authentication, ExtensionService, RoleService) {
+.controller('TeamsController', ['$q', '$scope', '$state', 'TeamService', 'UserService', 'ModalService', 'Notifications', 'Authentication',
+function ($q, $scope, $state, TeamService, UserService, ModalService, Notifications, Authentication) {
   $scope.state = {
     actionInProgress: false
   };
 
   $scope.formValues = {
     Name: '',
-    Leaders: [],
-    RoleId: 1
+    Leaders: []
   };
 
   $scope.checkNameValidity = function(form) {
@@ -30,10 +27,9 @@ function ($q, $scope, $state, TeamService, UserService, ModalService, Notificati
     angular.forEach($scope.formValues.Leaders, function(user) {
       leaderIds.push(user.Id);
     });
-    var roleId = $scope.formValues.RoleId;
 
     $scope.state.actionInProgress = true;
-    TeamService.createTeam(teamName, leaderIds, roleId)
+    TeamService.createTeam(teamName, leaderIds)
     .then(function success() {
       Notifications.success('Team successfully created', teamName);
       $state.reload();
@@ -77,33 +73,18 @@ function ($q, $scope, $state, TeamService, UserService, ModalService, Notificati
     });
   }
 
-  function associateRoles(teams, roles) {
-    for (var i = 0; i < teams.length; i++) {
-      var team = teams[i];
-      var role = _.find(roles, { Id: team.RoleId });
-      if (role) {
-        team.RoleName = role.Name;
-      }
-    }
-  }
-
   function initView() {
     var userDetails = Authentication.getUserDetails();
     var isAdmin = Authentication.isAdmin();
     $scope.isAdmin = isAdmin;
     $q.all({
       users: UserService.users(false),
-      teams: isAdmin ? TeamService.teams() : UserService.userLeadingTeams(userDetails.ID),
-      rbac: ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.RBAC),
-      roles: RoleService.roles()
+      teams: isAdmin ? TeamService.teams() : UserService.userLeadingTeams(userDetails.ID)
     })
     .then(function success(data) {
       var teams = data.teams;
-      associateRoles(teams, data.roles);
       $scope.teams = teams;
       $scope.users = data.users;
-      $scope.rbacEnabled = data.rbac;
-      $scope.roles = data.roles;
     })
     .catch(function error(err) {
       $scope.teams = [];

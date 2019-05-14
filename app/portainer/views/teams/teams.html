@@ -30,16 +30,6 @@
             </div>
           </div>
           <!-- !name-input -->
-          <!-- roles -->
-          <div class="form-group" ng-if="rbacEnabled">
-            <label for="role" class="col-sm-2 control-label text-left">
-              Role
-            </label>
-            <div class="col-sm-10">
-              <select ng-options="role.Id as role.Name for role in roles" ng-model="formValues.RoleId" id="role" class="form-control"></select>
-            </div>
-          </div>
-          <!-- !roles -->
           <!-- team-leaders -->
           <div class="form-group" ng-if="users.length > 0">
             <div class="col-sm-12" >
@@ -83,7 +73,6 @@
     dataset="teams" table-key="teams"
     order-by="Name"
     remove-action="removeAction"
-    rbac-enabled="rbacEnabled"
     ></teams-datatable>
   </div>
 </div>
