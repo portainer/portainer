@@ -1,15 +1,13 @@
 import _ from 'lodash-es';
 
 angular.module('portainer.docker')
-  .controller('JobsDatatableController', ['$q', '$state', 'PaginationService', 'DatatableService', 'ContainerService', 'ModalService', 'Notifications',
-    function ($q, $state, PaginationService, DatatableService, ContainerService, ModalService, Notifications) {
-      var ctrl = this;
+  .controller('JobsDatatableController', ['$scope', '$controller', '$q', '$state', 'PaginationService', 'DatatableService', 'ContainerService', 'ModalService', 'Notifications',
+    function ($scope, $controller, $q, $state, PaginationService, DatatableService, ContainerService, ModalService, Notifications) {
 
-      this.state = {
-        orderBy: this.orderBy,
-        paginatedItemLimit: PaginationService.getPaginationLimit(this.tableKey),
-        displayTextFilter: false
-      };
+      const extendedCtrl = $controller('GenericDatatableController', {$scope: $scope});
+      angular.extend(this, extendedCtrl);
+
+      var ctrl = this;
 
       this.filters = {
         state: {
@@ -17,20 +15,6 @@ angular.module('portainer.docker')
           enabled: false,
           values: []
         }
-      };
-
-      this.onTextFilterChange = function() {
-        DatatableService.setDataTableTextFilters(this.tableKey, this.state.textFilter);
-      };
-
-      this.changeOrderBy = function (orderField) {
-        this.state.reverseOrder = this.state.orderBy === orderField ? !this.state.reverseOrder : false;
-        this.state.orderBy = orderField;
-        DatatableService.setDataTableOrder(this.tableKey, orderField, this.state.reverseOrder);
-      };
-
-      this.changePaginationLimit = function () {
-        PaginationService.setPaginationLimit(this.tableKey, this.state.paginatedItemLimit);
       };
 
       this.applyFilters = function (value) {
@@ -122,30 +106,13 @@ angular.module('portainer.docker')
       };
 
       this.$onInit = function () {
-        setDefaults(this);
-        this.prepareTableFromDataset();
-
-        var storedOrder = DatatableService.getDataTableOrder(this.tableKey);
-        if (storedOrder !== null) {
-          this.state.reverseOrder = storedOrder.reverse;
-          this.state.orderBy = storedOrder.orderBy;
-        }
+        extendedCtrl.$onInit();
 
         var storedFilters = DatatableService.getDataTableFilters(this.tableKey);
         if (storedFilters !== null) {
           this.updateStoredFilters(storedFilters.state.values);
         }
         this.filters.state.open = false;
-
-        var textFilter = DatatableService.getDataTableTextFilters(this.tableKey);
-        if (textFilter !== null) {
-          this.state.textFilter = textFilter;
-        }
       };
-
-      function setDefaults(ctrl) {
-        ctrl.showTextFilter = ctrl.showTextFilter ? ctrl.showTextFilter : false;
-        ctrl.state.reverseOrder = ctrl.reverseOrder ? ctrl.reverseOrder : false;
-      }
     }
   ]);
