@@ -1,4 +1,4 @@
-angular.module('portainer.extensions.rbac').component('accessDatatable', {
+angular.module('portainer.app').component('accessDatatable', {
   templateUrl: './accessDatatable.html',
   controller: 'GenericDatatableController',
   bindings: {
@@ -7,7 +7,9 @@ angular.module('portainer.extensions.rbac').component('accessDatatable', {
     dataset: '<',
     tableKey: '@',
     orderBy: '@',
+    removeAction: '<',
     reverseOrder: '<',
-    rbacEnabled: '<'
+    rbacEnabled: '<',
+    inheritFrom: '<'
   }
 });

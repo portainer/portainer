@@ -1,9 +1,14 @@
 angular.module('portainer.app')
-.controller('RegistryAccessController', ['$scope', '$transition$', 'RegistryService', 'Notifications',
-function ($scope, $transition$, RegistryService, Notifications) {
+.controller('RegistryAccessController', ['$scope', '$state', '$transition$', 'RegistryService', 'Notifications',
+function ($scope, $state, $transition$, RegistryService, Notifications) {
 
   $scope.updateAccess = function(authorizedUsers, authorizedTeams) {
-    return RegistryService.updateAccess($transition$.params().id, authorizedUsers, authorizedTeams);
+    RegistryService.updateAccess($transition$.params().id, authorizedUsers, authorizedTeams)
+    .then(() => {
+      Notifications.success("Accesses successfully updated");
+      $state.reload();
+    })
+    .catch((err) => Notifications.error("Failure", err, "Unable to update accesses"));
   };
 
   function initView() {

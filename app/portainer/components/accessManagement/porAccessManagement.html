@@ -1,46 +1,66 @@
-<rd-widget>
-  <rd-widget-header icon="fa-users" title-text="Access management"></rd-widget-header>
-  <rd-widget-body>
-    <form class="form-horizontal">
-      <div class="small text-muted">
-        <p>You can select which user or team can access this {{ $ctrl.entityType }} by moving them to the authorized accesses table. Simply click
-        on a user or team entry to move it from one table to the other.</p>
-        <p ng-if="$ctrl.inheritFrom">
-          <b>Note</b>: accesses tagged as <code>inherited</code> are inherited from the group accesses and cannot be remove at the endpoint level.
-        </p>
-      </div>
-      <div class="form-group" style="margin-top: 20px;">
-        <!-- available-endpoints -->
-        <div class="col-sm-6">
-          <div class="text-center small text-muted">Users and teams</div>
-          <div class="text-center small text-muted" style="margin-top: 5px;">
-            <button class="btn btn-primary btn-sm" ng-click="$ctrl.authorizeAllAccesses()" ng-disabled="$ctrl.accesses.length ===  0"><i class="fa fa-user-plus space-right" aria-hidden="true"></i>Authorize all</button>
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-user-lock" title-text="Create access"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <div class="form-group">
+            <label class="col-sm-3 col-lg-2 control-label text-left">
+              Select user(s) and/or team(s)
+            </label>
+            <div class="col-sm-9 col-lg-4">
+              <span class="small text-muted" ng-if="ctrl.accesses.length === 0">
+                You have not yet created any user or team. Head over the <a ui-sref="portainer.users">users view</a> to
+                manage
+                users, and to <a ui-sref="portainer.users">teams view</a> to manage teams.
+              </span>
+              <span isteven-multi-select ng-if="ctrl.accesses.length > 0" input-model="ctrl.accesses"
+                output-model="ctrl.formValues.multiselectOutput" button-label="icon '-' Name" item-label="icon '-' Name"
+                tick-property="ticked" helper-elements="filter" search-property="Name"
+                translation="{nothingSelected: 'Select one or more users and/or teams', search: 'Search...'}">
+              </span>
+            </div>
           </div>
-          <div style="margin-top: 10px;">
-            <access-table
-              dataset="$ctrl.accesses"
-              entry-click="$ctrl.authorizeAccess"
-              empty-dataset-message="No user or team available"
-            ></access-table>
+
+          <div class="form-group">
+            <label class="col-sm-3 col-lg-2 control-label text-left">
+              Role
+            </label>
+            <div class="col-sm-9 col-lg-4">
+              <ui-select ng-model="ctrl.formValues.selectedRole" ng-if="ctrl.rbacEnabled">
+                <ui-select-match placeholder="Select a role">
+                  <span>{{ $select.selected.Name }}</span>
+                </ui-select-match>
+                <ui-select-choices repeat="role in (ctrl.roles | filter: $select.search)">
+                  <span>{{ role.Name }}</span>
+                </ui-select-choices>
+              </ui-select>
+              <span class="small text-muted" ng-if="!ctrl.rbacEnabled">
+                  The <a ui-sref="portainer.extensions.extension({id: 3})">RBAC extension</a> is required to select a specific role.
+              </span>
+            </div>
           </div>
-        </div>
-        <!-- !available-endpoints -->
-        <!-- associated-endpoints -->
-        <div class="col-sm-6">
-          <div class="text-center small text-muted">Authorized users and teams</div>
-          <div class="text-center small text-muted" style="margin-top: 5px;">
-            <button class="btn btn-primary btn-sm" ng-click="$ctrl.unauthorizeAllAccesses()" ng-disabled="$ctrl.authorizedAccesses.length ===  0"><i class="fa fa-user-times space-right" aria-hidden="true"></i>Deny all</button>
+
+          <!-- actions -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="submit" class="btn btn-primary btn-sm" ng-disabled="ctrl.state.actionInProgress"
+                ng-click="ctrl.authorizeAccess()" button-spinner="ctrl.state.actionInProgress">
+                <span ng-hide="ctrl.state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Create
+                  access</span>
+                <span ng-show="ctrl.state.actionInProgress">Creating access...</span>
+              </button>
+            </div>
           </div>
-          <div style="margin-top: 10px;">
-            <access-table
-              dataset="$ctrl.authorizedAccesses"
-              entry-click="$ctrl.unauthorizeAccess"
-              empty-dataset-message="No authorized user or team"
-            ></access-table>
-          </div>
-        </div>
-        <!-- !associated-endpoints -->
-      </div>
-    </form>
-  </rd-widget-body>
-</rd-widget>
+          <!-- !actions -->
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-12">
+    <access-datatable title-text="Access" title-icon="fa-user-lock" dataset="ctrl.authorizedAccesses" table-key="{{ 'access_' + ctrl.entityType}}"
+      order-by="Name" rbac-enabled="ctrl.rbacEnabled" remove-action="ctrl.unauthorizeAccess" inherit-from="ctrl.inheritFrom"></access-datatable>
+  </div>
+</div>
