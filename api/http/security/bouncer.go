@@ -1,6 +1,8 @@
 package security
 
 import (
+	"log"
+
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer/api"
 
@@ -14,6 +16,7 @@ type (
 		jwtService            portainer.JWTService
 		userService           portainer.UserService
 		teamMembershipService portainer.TeamMembershipService
+		endpointService       portainer.EndpointService
 		endpointGroupService  portainer.EndpointGroupService
 		extensionService      portainer.ExtensionService
 		rbacExtensionClient   *rbacExtensionClient
@@ -25,6 +28,7 @@ type (
 		JWTService            portainer.JWTService
 		UserService           portainer.UserService
 		TeamMembershipService portainer.TeamMembershipService
+		EndpointService       portainer.EndpointService
 		EndpointGroupService  portainer.EndpointGroupService
 		ExtensionService      portainer.ExtensionService
 		RBACExtensionURL      string
@@ -34,11 +38,11 @@ type (
 	// RestrictedRequestContext is a data structure containing information
 	// used in RestrictedAccess
 	RestrictedRequestContext struct {
-		IsAdmin         bool
-		IsTeamLeader    bool
-		UserID          portainer.UserID
-		UserMemberships []portainer.TeamMembership
-		Authorizations  portainer.Authorizations
+		IsAdmin                bool
+		IsTeamLeader           bool
+		UserID                 portainer.UserID
+		UserMemberships        []portainer.TeamMembership
+		EndpointAuthorizations portainer.EndpointAuthorizations
 	}
 )
 
@@ -48,6 +52,7 @@ func NewRequestBouncer(parameters *RequestBouncerParams) *RequestBouncer {
 		jwtService:            parameters.JWTService,
 		userService:           parameters.UserService,
 		teamMembershipService: parameters.TeamMembershipService,
+		endpointService:       parameters.EndpointService,
 		endpointGroupService:  parameters.EndpointGroupService,
 		extensionService:      parameters.ExtensionService,
 		rbacExtensionClient:   newRBACExtensionClient(parameters.RBACExtensionURL),
@@ -65,16 +70,24 @@ func (bouncer *RequestBouncer) PublicAccess(h http.Handler) http.Handler {
 // AuthenticatedAccess defines a security check for private endpoints.
 // Authentication is required to access these endpoints.
 func (bouncer *RequestBouncer) AuthenticatedAccess(h http.Handler) http.Handler {
-	h = bouncer.mwCheckAuthorizations(h)
+	//h = bouncer.mwCheckAuthorizations(h)
 	h = bouncer.mwCheckAuthentication(h)
 	h = mwSecureHeaders(h)
+	return h
+}
+
+// TODO: document
+func (bouncer *RequestBouncer) AuthorizedAccess(h http.Handler) http.Handler {
+	h = bouncer.mwCheckPortainerAuthorizations(h)
+	h = bouncer.mwUpgradeToRestrictedRequest(h)
+	h = bouncer.AuthenticatedAccess(h)
 	return h
 }
 
 // RestrictedAccess defines a security check for restricted endpoints.
 // Authentication is required to access these endpoints.
 // The request context will be enhanced with a RestrictedRequestContext object
-// that might be used later to authorize/filter access to resources.
+// that might be used later to authorize/filter access to resources inside an endpoint.
 func (bouncer *RequestBouncer) RestrictedAccess(h http.Handler) http.Handler {
 	h = bouncer.mwUpgradeToRestrictedRequest(h)
 	h = bouncer.AuthenticatedAccess(h)
@@ -92,13 +105,14 @@ func (bouncer *RequestBouncer) AdministratorAccess(h http.Handler) http.Handler 
 // EndpointAccess retrieves the JWT token from the request context and verifies
 // that the user can access the specified endpoint.
 // An error is returned when access is denied.
+// TODO: rename to EndpointAccessAndAuth? Or something similar? And update documentation.
 func (bouncer *RequestBouncer) EndpointAccess(r *http.Request, endpoint *portainer.Endpoint) error {
 	tokenData, err := RetrieveTokenData(r)
 	if err != nil {
 		return err
 	}
 
-	if tokenData.Role == portainer.AdministratorRole || tokenData.Authorizations[portainer.AdministratorAccess] {
+	if tokenData.Role == portainer.AdministratorRole {
 		return nil
 	}
 
@@ -116,7 +130,57 @@ func (bouncer *RequestBouncer) EndpointAccess(r *http.Request, endpoint *portain
 		return portainer.ErrEndpointAccessDenied
 	}
 
+	err = bouncer.authorizedEndpointOperation(r, endpoint)
+	if err != nil {
+		return portainer.ErrAuthorizationRequired
+	}
+
 	return nil
+}
+
+func (bouncer *RequestBouncer) authorizedEndpointOperation(r *http.Request, endpoint *portainer.Endpoint) error {
+	// TODO: debug
+	log.Printf("Authorization check for URL: %s\n", r.URL.String())
+
+	// TODO: review
+	extension, err := bouncer.extensionService.Extension(portainer.RBACExtension)
+	if err == portainer.ErrObjectNotFound {
+		return nil
+	} else if err != nil {
+		//httperror.WriteError(w, http.StatusInternalServerError, "Unable to find a extension with the specified identifier inside the database", err)
+		return err
+	}
+
+	tokenData, err := RetrieveTokenData(r)
+	if err != nil {
+		//httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrResourceAccessDenied)
+		return err
+	}
+
+	if tokenData.Role == portainer.AdministratorRole {
+		//next.ServeHTTP(w, r)
+		return nil
+	}
+
+	//authorizations := tokenData.PortainerAuthorizations
+	//
+	//for k, v := range tokenData {
+	//	a[k] = v
+	//}
+	//
+	apiOperation := &portainer.APIOperationAuthorizationRequest{
+		Path:           r.URL.String(),
+		Method:         r.Method,
+		Authorizations: tokenData.EndpointAuthorizations[endpoint.ID],
+	}
+	//
+	bouncer.rbacExtensionClient.setLicenseKey(extension.License.LicenseKey)
+	return bouncer.rbacExtensionClient.checkAuthorizations(apiOperation)
+	//err = bouncer.rbacExtensionClient.checkAuthorizations(apiOperation)
+	//if err != nil {
+	//httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrAuthorizationRequired)
+	//return err
+	//}
 }
 
 // RegistryAccess retrieves the JWT token from the request context and verifies
@@ -153,8 +217,10 @@ func mwSecureHeaders(next http.Handler) http.Handler {
 	})
 }
 
-func (bouncer *RequestBouncer) mwCheckAuthorizations(next http.Handler) http.Handler {
+func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		// TODO: review
 		extension, err := bouncer.extensionService.Extension(portainer.RBACExtension)
 		if err == portainer.ErrObjectNotFound {
 			next.ServeHTTP(w, r)
@@ -170,18 +236,40 @@ func (bouncer *RequestBouncer) mwCheckAuthorizations(next http.Handler) http.Han
 			return
 		}
 
-		apiOperation := &portainer.APIOperation{
-			Path:           r.URL.String(),
-			Method:         r.Method,
-			Authorizations: tokenData.Authorizations,
+		if tokenData.Role == portainer.AdministratorRole {
+			next.ServeHTTP(w, r)
+			return
 		}
 
+		apiOperation := &portainer.APIOperationAuthorizationRequest{
+			Path:           r.URL.String(),
+			Method:         r.Method,
+			Authorizations: tokenData.PortainerAuthorizations,
+		}
+
+		// TODO: DEBUG
+		log.Printf("API Operation check: %+v\n", apiOperation)
+		//
 		bouncer.rbacExtensionClient.setLicenseKey(extension.License.LicenseKey)
 		err = bouncer.rbacExtensionClient.checkAuthorizations(apiOperation)
 		if err != nil {
 			httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrAuthorizationRequired)
 			return
 		}
+
+		//authorizations := tokenData.PortainerAuthorizations
+		//
+		//for k, v := range tokenData {
+		//	a[k] = v
+		//}
+		//
+		//apiOperation := &portainer.APIOperationAuthorizationRequest{
+		//	Path:                   r.URL.String(),
+		//	Method:                 r.Method,
+		//	EndpointAuthorizations: tokenData.EndpointAuthorizations,
+		//}
+		//
+		//bouncer.rbacExtensionClient.setLicenseKey(extension.License.LicenseKey)
 
 		next.ServeHTTP(w, r)
 	})
@@ -197,7 +285,7 @@ func (bouncer *RequestBouncer) mwUpgradeToRestrictedRequest(next http.Handler) h
 			return
 		}
 
-		requestContext, err := bouncer.newRestrictedContextRequest(tokenData.ID, tokenData.Role, tokenData.Authorizations)
+		requestContext, err := bouncer.newRestrictedContextRequest(tokenData.ID, tokenData.Role, tokenData.EndpointAuthorizations)
 		if err != nil {
 			httperror.WriteError(w, http.StatusInternalServerError, "Unable to create restricted request context ", err)
 			return
@@ -271,11 +359,11 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 	})
 }
 
-func (bouncer *RequestBouncer) newRestrictedContextRequest(userID portainer.UserID, userRole portainer.UserRole, authorizations portainer.Authorizations) (*RestrictedRequestContext, error) {
+func (bouncer *RequestBouncer) newRestrictedContextRequest(userID portainer.UserID, userRole portainer.UserRole, endpointAuthorizations portainer.EndpointAuthorizations) (*RestrictedRequestContext, error) {
 	requestContext := &RestrictedRequestContext{
-		IsAdmin:        true,
-		UserID:         userID,
-		Authorizations: authorizations,
+		IsAdmin:                true,
+		UserID:                 userID,
+		EndpointAuthorizations: endpointAuthorizations,
 	}
 
 	if userRole != portainer.AdministratorRole {
@@ -296,9 +384,10 @@ func (bouncer *RequestBouncer) newRestrictedContextRequest(userID portainer.User
 		requestContext.UserMemberships = memberships
 	}
 
-	if authorizations[portainer.AdministratorAccess] {
-		requestContext.IsAdmin = true
-	}
+	// TODO: remove?
+	//if authorizations[portainer.AdministratorAccess] {
+	//	requestContext.IsAdmin = true
+	//}
 
 	return requestContext, nil
 }

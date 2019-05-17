@@ -38,20 +38,21 @@ func (handler *Handler) endpointGroupUpdateAccess(w http.ResponseWriter, r *http
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint group with the specified identifier inside the database", err}
 	}
 
+	// TODO: support for roles to add
 	if payload.AuthorizedUsers != nil {
-		authorizedUserIDs := []portainer.UserID{}
+		userAccessPolicies := make(portainer.UserAccessPolicies)
 		for _, value := range payload.AuthorizedUsers {
-			authorizedUserIDs = append(authorizedUserIDs, portainer.UserID(value))
+			userAccessPolicies[portainer.UserID(value)] = portainer.AccessPolicy{}
 		}
-		endpointGroup.AuthorizedUsers = authorizedUserIDs
+		endpointGroup.UserAccessPolicies = userAccessPolicies
 	}
 
 	if payload.AuthorizedTeams != nil {
-		authorizedTeamIDs := []portainer.TeamID{}
+		teamAccessPolicies := make(portainer.TeamAccessPolicies)
 		for _, value := range payload.AuthorizedTeams {
-			authorizedTeamIDs = append(authorizedTeamIDs, portainer.TeamID(value))
+			teamAccessPolicies[portainer.TeamID(value)] = portainer.AccessPolicy{}
 		}
-		endpointGroup.AuthorizedTeams = authorizedTeamIDs
+		endpointGroup.TeamAccessPolicies = teamAccessPolicies
 	}
 
 	err = handler.EndpointGroupService.UpdateEndpointGroup(endpointGroup.ID, endpointGroup)

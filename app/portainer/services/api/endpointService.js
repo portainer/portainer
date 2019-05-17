@@ -37,8 +37,8 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     return deferred.promise;
   };
 
-  service.updateAccess = function(id, authorizedUserIDs, authorizedTeamIDs) {
-    return Endpoints.updateAccess({id: id}, {authorizedUsers: authorizedUserIDs, authorizedTeams: authorizedTeamIDs}).$promise;
+  service.updateAccess = function(id, authorizedUserIDs, authorizedTeamIDs, roleID) {
+    return Endpoints.updateAccess({id: id}, {authorizedUsers: authorizedUserIDs, authorizedTeams: authorizedTeamIDs, roleID: roleID}).$promise;
   };
 
   service.updateEndpoint = function(id, payload) {

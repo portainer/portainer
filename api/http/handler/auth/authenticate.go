@@ -117,28 +117,37 @@ func (handler *Handler) authenticateLDAPAndCreateUser(w http.ResponseWriter, use
 
 func (handler *Handler) writeToken(w http.ResponseWriter, user *portainer.User) *httperror.HandlerError {
 	tokenData := &portainer.TokenData{
-		ID:       user.ID,
-		Username: user.Username,
-		Role:     user.Role,
+		ID:                      user.ID,
+		Username:                user.Username,
+		Role:                    user.Role,
+		PortainerAuthorizations: user.PortainerAuthorizations,
 	}
 
-	// TODO: remove
-	//_, err := handler.ExtensionService.Extension(portainer.RBACExtension)
-	//if err == portainer.ErrObjectNotFound {
-	//	return handler.persistAndWriteToken(w, tokenData)
-	//} else if err != nil {
-	//	return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a extension with the specified identifier inside the database", err}
-	//}
+	// TODO: only when extension is enabled?
+	_, err := handler.ExtensionService.Extension(portainer.RBACExtension)
+	if err == portainer.ErrObjectNotFound {
+		return handler.persistAndWriteToken(w, tokenData)
+	} else if err != nil {
+		//httperror.WriteError(w, http.StatusInternalServerError, "", err)
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a extension with the specified identifier inside the database", err}
+	}
 
-	authorizations, err := handler.getUserAuthorizations(user)
+	endpointAuthorizations, err := handler.getAuthorizations(user)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve authorizations associated to the user", err}
 	}
+	tokenData.EndpointAuthorizations = endpointAuthorizations
 
-	tokenData.Authorizations = authorizations
-	if authorizations[portainer.AdministratorAccess] {
-		tokenData.Role = portainer.AdministratorRole
-	}
+	//authorizations, err := handler.getUserAuthorizations(user)
+	//if err != nil {
+	//	return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve authorizations associated to the user", err}
+	//}
+
+	//tokenData.Authorizations = authorizations
+	// TODO: remove?
+	//if authorizations[portainer.AdministratorAccess] {
+	//	tokenData.Role = portainer.AdministratorRole
+	//}
 
 	return handler.persistAndWriteToken(w, tokenData)
 }
@@ -156,26 +165,59 @@ func intersection(a, b portainer.Authorizations) portainer.Authorizations {
 	return c
 }
 
-func (handler *Handler) getUserAuthorizations(user *portainer.User) (portainer.Authorizations, error) {
-	var roleIdentifiers []portainer.RoleID
-	if user.RoleID == 0 {
-		userMemberships, err := handler.TeamMembershipService.TeamMembershipsByUserID(user.ID)
-		if err != nil {
-			return nil, err
-		}
+func (handler *Handler) getAuthorizations(user *portainer.User) (portainer.EndpointAuthorizations, error) {
+	endpointAuthorizations := make(portainer.EndpointAuthorizations)
 
-		for _, membership := range userMemberships {
-			team, err := handler.TeamService.Team(membership.TeamID)
-			if err != nil {
-				return nil, err
-			}
-
-			roleIdentifiers = append(roleIdentifiers, team.RoleID)
-		}
-	} else {
-		roleIdentifiers = append(roleIdentifiers, user.RoleID)
+	if user.Role == portainer.AdministratorRole {
+		return endpointAuthorizations, nil
 	}
 
+	userMemberships, err := handler.TeamMembershipService.TeamMembershipsByUserID(user.ID)
+	if err != nil {
+		return endpointAuthorizations, err
+	}
+
+	endpoints, err := handler.EndpointService.Endpoints()
+	if err != nil {
+		return endpointAuthorizations, err
+	}
+
+	// TODO: duplicate for endpoint groups
+	// access can be retrieved from endpoint group
+	for _, endpoint := range endpoints {
+		var roleIdentifiers []portainer.RoleID
+
+		// potential user override
+		// should be checked first and break for optimization
+		// then check teams if no override found
+		policy, ok := endpoint.UserAccessPolicies[user.ID]
+		if ok {
+			roleIdentifiers = append(roleIdentifiers, policy.RoleID)
+		}
+
+		// if no roles on user level, check at team level
+		if len(roleIdentifiers) == 0 {
+			for _, membership := range userMemberships {
+				policy, ok := endpoint.TeamAccessPolicies[membership.TeamID]
+				if ok {
+					// endpointAccess
+					// Potential multiple team access
+					roleIdentifiers = append(roleIdentifiers, policy.RoleID)
+				}
+			}
+		}
+
+		authorizations, err := handler.getEndpointAuthorizations(roleIdentifiers)
+		if err != nil {
+			return endpointAuthorizations, err
+		}
+		endpointAuthorizations[endpoint.ID] = authorizations
+	}
+
+	return endpointAuthorizations, nil
+}
+
+func (handler *Handler) getEndpointAuthorizations(roleIdentifiers []portainer.RoleID) (portainer.Authorizations, error) {
 	var roleAuthorizations []portainer.Authorizations
 	for _, id := range roleIdentifiers {
 		role, err := handler.RoleService.Role(portainer.RoleID(id))

@@ -23,10 +23,12 @@ func (handler *Handler) endpointInspect(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
-	err = handler.requestBouncer.EndpointAccess(r, endpoint)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", portainer.ErrEndpointAccessDenied}
-	}
+	//TODO: review? keep/remove?
+	// TODO: extra access mecanism
+	//err = handler.requestBouncer.EndpointAccess(r, endpoint)
+	//if err != nil {
+	//	return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", portainer.ErrEndpointAccessDenied}
+	//}
 
 	hideFields(endpoint)
 

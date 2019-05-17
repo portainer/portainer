@@ -59,9 +59,11 @@ class PorAccessManagementController {
   }
 
   authorizeAccess() {
+    // TODO: review
     var accessData = this._processAuthorizedIDs(null, this.authorizedAccesses);
     var authorizedUserIDs = accessData.userIDs;
     var authorizedTeamIDs = accessData.teamIDs;
+    var accessRole = this.formValues.selectedRole;
 
     for (const access of this.formValues.multiselectOutput) {
       if (this.rbacEnabled) {
@@ -73,10 +75,17 @@ class PorAccessManagementController {
         authorizedTeamIDs.push(access.Id);
       }
     }
-    this.updateAccess({
+
+    var accesses = {
       userAccesses: authorizedUserIDs,
-      teamAccesses: authorizedTeamIDs
-    });
+      teamAccesses: authorizedTeamIDs,
+    };
+
+    if (accessRole) {
+      accesses.role = accessRole.Id
+    }
+
+    this.updateAccess(accesses);
   }
 
   unauthorizeAccess(selectedAccesses) {

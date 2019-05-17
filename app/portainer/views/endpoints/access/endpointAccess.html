@@ -39,5 +39,5 @@
 </div>
 
 <por-access-management ng-if="ctrl.endpoint && ctrl.group" access-controlled-entity="ctrl.endpoint"
-  entity-type="endpoint" inherit-from="ctrl.group" update-access="ctrl.updateAccess(userAccesses, teamAccesses)">
+  entity-type="endpoint" inherit-from="ctrl.group" update-access="ctrl.updateAccess(userAccesses, teamAccesses, role)">
 </por-access-management>

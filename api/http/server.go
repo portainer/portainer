@@ -95,6 +95,7 @@ func (server *Server) Start() error {
 		JWTService:            server.JWTService,
 		UserService:           server.UserService,
 		TeamMembershipService: server.TeamMembershipService,
+		EndpointService:       server.EndpointService,
 		EndpointGroupService:  server.EndpointGroupService,
 		ExtensionService:      server.ExtensionService,
 		RBACExtensionURL:      proxyManager.GetExtensionURL(portainer.RBACExtension),
@@ -113,6 +114,7 @@ func (server *Server) Start() error {
 	authHandler.TeamService = server.TeamService
 	authHandler.TeamMembershipService = server.TeamMembershipService
 	authHandler.ExtensionService = server.ExtensionService
+	authHandler.EndpointService = server.EndpointService
 	authHandler.RoleService = server.RoleService
 	authHandler.ProxyManager = proxyManager
 

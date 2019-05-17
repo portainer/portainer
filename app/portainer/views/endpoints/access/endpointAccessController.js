@@ -21,12 +21,13 @@ class EndpointAccessController {
     }
   }
 
-  async updateAccess(authorizedUsers, authorizedTeams) {
+  async updateAccess(authorizedUsers, authorizedTeams, role) {
     try {
       await this.EndpointService.updateAccess(
         this.$transition$.params().id,
         authorizedUsers,
-        authorizedTeams
+        authorizedTeams,
+        role
       );
       this.Notifications.success("Accesses successfully updated");
       this.$state.reload();

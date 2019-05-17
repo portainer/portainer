@@ -38,20 +38,21 @@ func (handler *Handler) registryUpdateAccess(w http.ResponseWriter, r *http.Requ
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a registry with the specified identifier inside the database", err}
 	}
 
+	// TODO: support for roles to add
 	if payload.AuthorizedUsers != nil {
-		authorizedUserIDs := []portainer.UserID{}
+		userAccessPolicies := make(portainer.UserAccessPolicies)
 		for _, value := range payload.AuthorizedUsers {
-			authorizedUserIDs = append(authorizedUserIDs, portainer.UserID(value))
+			userAccessPolicies[portainer.UserID(value)] = portainer.AccessPolicy{}
 		}
-		registry.AuthorizedUsers = authorizedUserIDs
+		registry.UserAccessPolicies = userAccessPolicies
 	}
 
 	if payload.AuthorizedTeams != nil {
-		authorizedTeamIDs := []portainer.TeamID{}
+		teamAccessPolicies := make(portainer.TeamAccessPolicies)
 		for _, value := range payload.AuthorizedTeams {
-			authorizedTeamIDs = append(authorizedTeamIDs, portainer.TeamID(value))
+			teamAccessPolicies[portainer.TeamID(value)] = portainer.AccessPolicy{}
 		}
-		registry.AuthorizedTeams = authorizedTeamIDs
+		registry.TeamAccessPolicies = teamAccessPolicies
 	}
 
 	err = handler.RegistryService.UpdateRegistry(registry.ID, registry)

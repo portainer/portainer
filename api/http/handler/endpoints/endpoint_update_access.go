@@ -12,6 +12,7 @@ import (
 type endpointUpdateAccessPayload struct {
 	AuthorizedUsers []int
 	AuthorizedTeams []int
+	RoleID          int
 }
 
 func (payload *endpointUpdateAccessPayload) Validate(r *http.Request) error {
@@ -42,20 +43,29 @@ func (handler *Handler) endpointUpdateAccess(w http.ResponseWriter, r *http.Requ
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
+	// TODO: support for roles to add
 	if payload.AuthorizedUsers != nil {
-		authorizedUserIDs := []portainer.UserID{}
+		userAccessPolicies := make(portainer.UserAccessPolicies)
 		for _, value := range payload.AuthorizedUsers {
-			authorizedUserIDs = append(authorizedUserIDs, portainer.UserID(value))
+			policy := portainer.AccessPolicy{}
+			if payload.RoleID != 0 {
+				policy.RoleID = portainer.RoleID(payload.RoleID)
+			}
+			userAccessPolicies[portainer.UserID(value)] = policy
 		}
-		endpoint.AuthorizedUsers = authorizedUserIDs
+		endpoint.UserAccessPolicies = userAccessPolicies
 	}
 
 	if payload.AuthorizedTeams != nil {
-		authorizedTeamIDs := []portainer.TeamID{}
+		teamAccessPolicies := make(portainer.TeamAccessPolicies)
 		for _, value := range payload.AuthorizedTeams {
-			authorizedTeamIDs = append(authorizedTeamIDs, portainer.TeamID(value))
+			policy := portainer.AccessPolicy{}
+			if payload.RoleID != 0 {
+				policy.RoleID = portainer.RoleID(payload.RoleID)
+			}
+			teamAccessPolicies[portainer.TeamID(value)] = policy
 		}
-		endpoint.AuthorizedTeams = authorizedTeamIDs
+		endpoint.TeamAccessPolicies = teamAccessPolicies
 	}
 
 	err = handler.EndpointService.UpdateEndpoint(endpoint.ID, endpoint)

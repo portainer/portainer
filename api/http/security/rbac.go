@@ -31,8 +31,8 @@ func (client *rbacExtensionClient) setLicenseKey(licenseKey string) {
 	client.licenseKey = licenseKey
 }
 
-func (client *rbacExtensionClient) checkAuthorizations(apiOperation *portainer.APIOperation) error {
-	encodedOperation, err := json.Marshal(apiOperation)
+func (client *rbacExtensionClient) checkAuthorizations(authRequest *portainer.APIOperationAuthorizationRequest) error {
+	encodedAuthRequest, err := json.Marshal(authRequest)
 	if err != nil {
 		return err
 	}
@@ -42,7 +42,7 @@ func (client *rbacExtensionClient) checkAuthorizations(apiOperation *portainer.A
 		return err
 	}
 
-	req.Header.Set("X-RBAC-Operation", string(encodedOperation))
+	req.Header.Set("X-RBAC-AuthorizationRequest", string(encodedAuthRequest))
 	req.Header.Set("X-PortainerExtension-License", client.licenseKey)
 
 	resp, err := client.httpClient.Do(req)

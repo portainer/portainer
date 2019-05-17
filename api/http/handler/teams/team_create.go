@@ -11,8 +11,7 @@ import (
 )
 
 type teamCreatePayload struct {
-	Name   string
-	RoleID int
+	Name string
 }
 
 func (payload *teamCreatePayload) Validate(r *http.Request) error {
@@ -38,8 +37,7 @@ func (handler *Handler) teamCreate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	team = &portainer.Team{
-		Name:   payload.Name,
-		RoleID: portainer.RoleID(payload.RoleID),
+		Name: payload.Name,
 	}
 
 	err = handler.TeamService.CreateTeam(team)

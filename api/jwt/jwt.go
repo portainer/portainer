@@ -16,10 +16,11 @@ type Service struct {
 }
 
 type claims struct {
-	UserID         int                      `json:"id"`
-	Username       string                   `json:"username"`
-	Role           int                      `json:"role"`
-	Authorizations portainer.Authorizations `json:"authorizations"`
+	UserID                  int                              `json:"id"`
+	Username                string                           `json:"username"`
+	Role                    int                              `json:"role"`
+	EndpointAuthorizations  portainer.EndpointAuthorizations `json:"endpointAuthorizations"`
+	PortainerAuthorizations portainer.Authorizations         `json:"portainerAuthorizations"`
 	jwt.StandardClaims
 }
 
@@ -42,7 +43,8 @@ func (service *Service) GenerateToken(data *portainer.TokenData) (string, error)
 		int(data.ID),
 		data.Username,
 		int(data.Role),
-		data.Authorizations,
+		data.EndpointAuthorizations,
+		data.PortainerAuthorizations,
 		jwt.StandardClaims{
 			ExpiresAt: expireToken,
 		},
@@ -69,10 +71,11 @@ func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData,
 	if err == nil && parsedToken != nil {
 		if cl, ok := parsedToken.Claims.(*claims); ok && parsedToken.Valid {
 			tokenData := &portainer.TokenData{
-				ID:             portainer.UserID(cl.UserID),
-				Username:       cl.Username,
-				Role:           portainer.UserRole(cl.Role),
-				Authorizations: cl.Authorizations,
+				ID:                      portainer.UserID(cl.UserID),
+				Username:                cl.Username,
+				Role:                    portainer.UserRole(cl.Role),
+				EndpointAuthorizations:  cl.EndpointAuthorizations,
+				PortainerAuthorizations: cl.PortainerAuthorizations,
 			}
 			return tokenData, nil
 		}

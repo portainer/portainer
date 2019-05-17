@@ -111,41 +111,15 @@ type (
 		DisplayExternalContributors bool
 	}
 
-	// Authorization represents an authorization associated to an operation
-	Authorization string
-
-	// Authorizations represents a set of authorizations associated to a role
-	Authorizations map[Authorization]bool
-
-	// TODO: probably need a rename due to the fact that Authorizations are embedded
-	// APIOperation represent an operation at an API level
-	APIOperation struct {
-		Path           string
-		Method         string
-		Authorizations Authorizations
-	}
-
-	// RoleID represents a role identifier
-	RoleID int
-
-	// Role represents a set of authorizations that can be associated to a user or
-	// to a team.
-	Role struct {
-		ID             RoleID         `json:"Id"`
-		Name           string         `json:"Name"`
-		Description    string         `json:"Description"`
-		Authorizations Authorizations `json:"Authorizations"`
-	}
-
 	// User represents a user account
 	User struct {
 		ID       UserID   `json:"Id"`
 		Username string   `json:"Username"`
 		Password string   `json:"Password,omitempty"`
 		Role     UserRole `json:"Role"`
-		// TODO: find a better name for this one, override Role
-		// Should we roll with RoleID ?
-		RoleID RoleID `json:"RoleId"`
+		// TODO: database migration required
+		// non-admin users with default authorizations
+		PortainerAuthorizations Authorizations `json:"PortainerAuthorizations"`
 	}
 
 	// UserID represents a user identifier
@@ -160,9 +134,8 @@ type (
 
 	// Team represents a list of user accounts
 	Team struct {
-		ID     TeamID `json:"Id"`
-		Name   string `json:"Name"`
-		RoleID RoleID `json:"RoleId"`
+		ID   TeamID `json:"Id"`
+		Name string `json:"Name"`
 	}
 
 	// TeamID represents a team identifier
@@ -184,10 +157,13 @@ type (
 
 	// TokenData represents the data embedded in a JWT token
 	TokenData struct {
-		ID             UserID
-		Username       string
-		Role           UserRole
-		Authorizations Authorizations
+		ID                      UserID
+		Username                string
+		Role                    UserRole
+		EndpointAuthorizations  EndpointAuthorizations
+		PortainerAuthorizations Authorizations
+		// TODO: remove
+		//Authorizations Authorizations
 	}
 
 	// StackID represents a stack identifier (it must be composed of Name + "_" + SwarmID to create a unique identifier)
@@ -224,9 +200,15 @@ type (
 		Authentication          bool                             `json:"Authentication"`
 		Username                string                           `json:"Username"`
 		Password                string                           `json:"Password,omitempty"`
-		AuthorizedUsers         []UserID                         `json:"AuthorizedUsers"`
-		AuthorizedTeams         []TeamID                         `json:"AuthorizedTeams"`
 		ManagementConfiguration *RegistryManagementConfiguration `json:"ManagementConfiguration"`
+		UserAccessPolicies      UserAccessPolicies               `json:"UserAccessPolicies"`
+		TeamAccessPolicies      TeamAccessPolicies               `json:"TeamAccessPolicies"`
+
+		// Deprecated fields
+		// TODO: database migration required
+		// Deprecated in DBVersion == 18
+		AuthorizedUsers []UserID `json:"AuthorizedUsers"`
+		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
 	}
 
 	// RegistryManagementConfiguration represents a configuration that can be used to query
@@ -259,20 +241,20 @@ type (
 	// Endpoint represents a Docker endpoint with all the info required
 	// to connect to it
 	Endpoint struct {
-		ID               EndpointID          `json:"Id"`
-		Name             string              `json:"Name"`
-		Type             EndpointType        `json:"Type"`
-		URL              string              `json:"URL"`
-		GroupID          EndpointGroupID     `json:"GroupId"`
-		PublicURL        string              `json:"PublicURL"`
-		TLSConfig        TLSConfiguration    `json:"TLSConfig"`
-		AuthorizedUsers  []UserID            `json:"AuthorizedUsers"`
-		AuthorizedTeams  []TeamID            `json:"AuthorizedTeams"`
-		Extensions       []EndpointExtension `json:"Extensions"`
-		AzureCredentials AzureCredentials    `json:"AzureCredentials,omitempty"`
-		Tags             []string            `json:"Tags"`
-		Status           EndpointStatus      `json:"Status"`
-		Snapshots        []Snapshot          `json:"Snapshots"`
+		ID                 EndpointID          `json:"Id"`
+		Name               string              `json:"Name"`
+		Type               EndpointType        `json:"Type"`
+		URL                string              `json:"URL"`
+		GroupID            EndpointGroupID     `json:"GroupId"`
+		PublicURL          string              `json:"PublicURL"`
+		TLSConfig          TLSConfiguration    `json:"TLSConfig"`
+		Extensions         []EndpointExtension `json:"Extensions"`
+		AzureCredentials   AzureCredentials    `json:"AzureCredentials,omitempty"`
+		Tags               []string            `json:"Tags"`
+		Status             EndpointStatus      `json:"Status"`
+		Snapshots          []Snapshot          `json:"Snapshots"`
+		UserAccessPolicies UserAccessPolicies  `json:"UserAccessPolicies"`
+		TeamAccessPolicies TeamAccessPolicies  `json:"TeamAccessPolicies"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
@@ -280,7 +262,61 @@ type (
 		TLSCACertPath string `json:"TLSCACert,omitempty"`
 		TLSCertPath   string `json:"TLSCert,omitempty"`
 		TLSKeyPath    string `json:"TLSKey,omitempty"`
+
+		// TODO: database migration required
+		// Deprecated in DBVersion == 18
+		AuthorizedUsers []UserID `json:"AuthorizedUsers"`
+		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
 	}
+
+	// Authorization represents an authorization associated to an operation
+	Authorization string
+
+	// Authorizations represents a set of authorizations associated to a role
+	Authorizations map[Authorization]bool
+
+	// EndpointAuthorizations represents the authorizations associated to a set of endpoints
+	EndpointAuthorizations map[EndpointID]Authorizations
+
+	// APIOperationAuthorizationRequest represent an request for the authorization to execute an API operation
+	APIOperationAuthorizationRequest struct {
+		Path           string
+		Method         string
+		Authorizations Authorizations
+	}
+
+	// RoleID represents a role identifier
+	RoleID int
+
+	// Role represents a set of authorizations that can be associated to a user or
+	// to a team.
+	// TODO: that's an endpoint role? Add a type for different roles? Registry, endpoint...
+	Role struct {
+		ID          RoleID `json:"Id"`
+		Name        string `json:"Name"`
+		Description string `json:"Description"`
+		//DockerAuthorizations    Authorizations `json:"DockerAuthorizations"`
+		//PortainerAuthorizations Authorizations `json:"PortainerAuthorizations"`
+		//RegistryAuthorizations  Authorizations `json:"RegistryAuthorizations"`
+		Authorizations Authorizations `json:"Authorizations"`
+	}
+
+	AccessPolicy struct {
+		RoleID RoleID `json:"RoleId"`
+	}
+
+	UserAccessPolicies map[UserID]AccessPolicy
+	TeamAccessPolicies map[TeamID]AccessPolicy
+
+	//UserAccessPolicy struct {
+	//	UserID UserID `json:"UserId"`
+	//	RoleID RoleID `json:"RoleId"`
+	//}
+	//
+	//TeamAccessPolicy struct {
+	//	TeamID TeamID `json:"UserId"`
+	//	RoleID RoleID `json:"RoleId"`
+	//}
 
 	// ScheduleID represents a schedule identifier.
 	ScheduleID int
@@ -373,15 +409,20 @@ type (
 
 	// EndpointGroup represents a group of endpoints
 	EndpointGroup struct {
-		ID              EndpointGroupID `json:"Id"`
-		Name            string          `json:"Name"`
-		Description     string          `json:"Description"`
-		AuthorizedUsers []UserID        `json:"AuthorizedUsers"`
-		AuthorizedTeams []TeamID        `json:"AuthorizedTeams"`
-		Tags            []string        `json:"Tags"`
+		ID                 EndpointGroupID    `json:"Id"`
+		Name               string             `json:"Name"`
+		Description        string             `json:"Description"`
+		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
+		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
+		Tags               []string           `json:"Tags"`
 
 		// Deprecated fields
 		Labels []Pair `json:"Labels"`
+
+		// TODO: database migration required
+		// Deprecated in DBVersion == 18
+		AuthorizedUsers []UserID `json:"AuthorizedUsers"`
+		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
 	}
 
 	// EndpointExtension represents a deprecated form of Portainer extension
@@ -1215,5 +1256,6 @@ const (
 	// TODO: authorization to access all resources inside an environment (rename?)
 	AccessEnvironment Authorization = "EnvironmentAccess"
 	// TODO: support AccessEndpoint to access all endpoints?
+	// Should probably be removed now that we're leveraging the Admin property
 	AdministratorAccess Authorization = "AdministratorAccess"
 )

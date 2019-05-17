@@ -37,7 +37,7 @@ type Handler struct {
 // NewHandler creates a handler to manage endpoint operations.
 func NewHandler(bouncer *security.RequestBouncer, authorizeEndpointManagement bool) *Handler {
 	h := &Handler{
-		Router: mux.NewRouter(),
+		Router:                      mux.NewRouter(),
 		authorizeEndpointManagement: authorizeEndpointManagement,
 		requestBouncer:              bouncer,
 	}
@@ -47,9 +47,9 @@ func NewHandler(bouncer *security.RequestBouncer, authorizeEndpointManagement bo
 	h.Handle("/endpoints/snapshot",
 		bouncer.AdministratorAccess(httperror.LoggerHandler(h.endpointSnapshots))).Methods(http.MethodPost)
 	h.Handle("/endpoints",
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointList))).Methods(http.MethodGet)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointList))).Methods(http.MethodGet)
 	h.Handle("/endpoints/{id}",
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointInspect))).Methods(http.MethodGet)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointInspect))).Methods(http.MethodGet)
 	h.Handle("/endpoints/{id}",
 		bouncer.AdministratorAccess(httperror.LoggerHandler(h.endpointUpdate))).Methods(http.MethodPut)
 	h.Handle("/endpoints/{id}/access",

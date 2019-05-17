@@ -377,18 +377,18 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, endpointService portain
 
 	endpointID := endpointService.GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
-		ID:              portainer.EndpointID(endpointID),
-		Name:            "primary",
-		URL:             *flags.EndpointURL,
-		GroupID:         portainer.EndpointGroupID(1),
-		Type:            portainer.DockerEnvironment,
-		TLSConfig:       tlsConfiguration,
-		AuthorizedUsers: []portainer.UserID{},
-		AuthorizedTeams: []portainer.TeamID{},
-		Extensions:      []portainer.EndpointExtension{},
-		Tags:            []string{},
-		Status:          portainer.EndpointStatusUp,
-		Snapshots:       []portainer.Snapshot{},
+		ID:                 portainer.EndpointID(endpointID),
+		Name:               "primary",
+		URL:                *flags.EndpointURL,
+		GroupID:            portainer.EndpointGroupID(1),
+		Type:               portainer.DockerEnvironment,
+		TLSConfig:          tlsConfiguration,
+		UserAccessPolicies: portainer.UserAccessPolicies{},
+		TeamAccessPolicies: portainer.TeamAccessPolicies{},
+		Extensions:         []portainer.EndpointExtension{},
+		Tags:               []string{},
+		Status:             portainer.EndpointStatusUp,
+		Snapshots:          []portainer.Snapshot{},
 	}
 
 	if strings.HasPrefix(endpoint.URL, "tcp://") {
@@ -420,18 +420,18 @@ func createUnsecuredEndpoint(endpointURL string, endpointService portainer.Endpo
 
 	endpointID := endpointService.GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
-		ID:              portainer.EndpointID(endpointID),
-		Name:            "primary",
-		URL:             endpointURL,
-		GroupID:         portainer.EndpointGroupID(1),
-		Type:            portainer.DockerEnvironment,
-		TLSConfig:       portainer.TLSConfiguration{},
-		AuthorizedUsers: []portainer.UserID{},
-		AuthorizedTeams: []portainer.TeamID{},
-		Extensions:      []portainer.EndpointExtension{},
-		Tags:            []string{},
-		Status:          portainer.EndpointStatusUp,
-		Snapshots:       []portainer.Snapshot{},
+		ID:                 portainer.EndpointID(endpointID),
+		Name:               "primary",
+		URL:                endpointURL,
+		GroupID:            portainer.EndpointGroupID(1),
+		Type:               portainer.DockerEnvironment,
+		TLSConfig:          portainer.TLSConfiguration{},
+		UserAccessPolicies: portainer.UserAccessPolicies{},
+		TeamAccessPolicies: portainer.TeamAccessPolicies{},
+		Extensions:         []portainer.EndpointExtension{},
+		Tags:               []string{},
+		Status:             portainer.EndpointStatusUp,
+		Snapshots:          []portainer.Snapshot{},
 	}
 
 	return snapshotAndPersistEndpoint(endpoint, endpointService, snapshotter)
@@ -627,7 +627,6 @@ func main() {
 				Username: "admin",
 				Role:     portainer.AdministratorRole,
 				Password: adminPasswordHash,
-				RoleID:   portainer.RoleID(1),
 			}
 			err := store.UserService.CreateUser(user)
 			if err != nil {

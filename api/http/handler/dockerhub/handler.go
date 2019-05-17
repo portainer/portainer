@@ -25,7 +25,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		Router: mux.NewRouter(),
 	}
 	h.Handle("/dockerhub",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.dockerhubInspect))).Methods(http.MethodGet)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.dockerhubInspect))).Methods(http.MethodGet)
 	h.Handle("/dockerhub",
 		bouncer.AdministratorAccess(httperror.LoggerHandler(h.dockerhubUpdate))).Methods(http.MethodPut)
 

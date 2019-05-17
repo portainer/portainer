@@ -13,7 +13,6 @@ import (
 type userUpdatePayload struct {
 	Password string
 	Role     int
-	RoleID   int
 }
 
 func (payload *userUpdatePayload) Validate(r *http.Request) error {
@@ -65,10 +64,6 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 
 	if payload.Role != 0 {
 		user.Role = portainer.UserRole(payload.Role)
-	}
-
-	if payload.RoleID != -1 {
-		user.RoleID = portainer.RoleID(payload.RoleID)
 	}
 
 	err = handler.UserService.UpdateUser(user.ID, user)
