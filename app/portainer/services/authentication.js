@@ -59,21 +59,19 @@ function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManage
     user.username = tokenPayload.username;
     user.ID = tokenPayload.id;
     user.role = tokenPayload.role;
-    user.authorizations = tokenPayload.authorizations;
+    user.endpointAuthorizations = tokenPayload.endpointAuthorizations;
+    user.portainerAuthorizations = tokenPayload.portainerAuthorizations;
   }
 
   function isAdmin() {
-    let isAdmin = false;
-    if (user.authorizations) {
-      isAdmin = hasAuthorizations(['AdministratorAccess']);
-    } else if (user.role) {
-      isAdmin = user.role === 1;
+    if (user.role === 1) {
+      return true;
     }
-    return isAdmin;
+    return false;
   }
 
   function hasAuthorizations(authorizations) {
-    // TODO: must be reviewed to support endpoint authorizations
+    // TODO: must be reviewed to support endpoint authorizations from user.endpointAuthorizations (requires endpoint awareness)
     // if (!user.authorizations) {
     //   return true;
     // }
