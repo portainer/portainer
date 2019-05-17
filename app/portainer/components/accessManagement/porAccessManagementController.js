@@ -115,20 +115,21 @@ class PorAccessManagementController {
       this.rbacEnabled = await this.ExtensionService.extensionEnabled(
         this.ExtensionService.EXTENSIONS.RBAC
       );
-      const data = await this.AccessService.accesses(
-        entity.AuthorizedUsers,
-        entity.AuthorizedTeams,
-        parent ? parent.AuthorizedUsers : [],
-        parent ? parent.AuthorizedTeams : []
-      );
-      this.accesses = data.accesses;
-      this.authorizedAccesses = data.authorizedAccesses;
       if (this.rbacEnabled) {
         this.roles = await this.RoleService.roles();
         this.formValues = {
           selectedRole: this.roles[0]
         };
       }
+      const data = await this.AccessService.accesses(
+        entity.UserAccessPolicies,
+        entity.TeamAccessPolicies,
+        parent ? parent.AuthorizedUsers : [],
+        parent ? parent.AuthorizedTeams : [],
+        this.roles
+      );
+      this.accesses = data.accesses;
+      this.authorizedAccesses = data.authorizedAccesses;
     } catch (err) {
       this.accesses = [];
       this.authorizedAccesses = [];

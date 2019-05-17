@@ -7,17 +7,22 @@ angular.module('portainer.app')
   'use strict';
   var service = {};
 
-  function mapAccessData(accesses, authorizedIDs, inheritedIDs) {
+  function mapAccessData(accesses, authorizedIDs, inheritedIDs, roles) {
     var availableAccesses = [];
     var authorizedAccesses = [];
 
     for (var i = 0; i < accesses.length; i++) {
 
       var access = accesses[i];
+      // TODO: need refactor when inheritedIDs changes to object instead of array of ids
       if (_.includes(inheritedIDs, access.Id)) {
         access.Inherited = true;
         authorizedAccesses.push(access);
-      } else if (_.includes(authorizedIDs, access.Id)) {
+      } else if (authorizedIDs[access.Id]) {
+        if (roles.length) {
+          const role = _.find(roles, (role) => role.Id === authorizedIDs[access.Id].RoleId);
+          access.Role = role ? role : { Id: 0, Name: "-" };
+        }
         authorizedAccesses.push(access);
       } else {
         availableAccesses.push(access);
@@ -30,7 +35,7 @@ angular.module('portainer.app')
     };
   }
 
-  service.accesses = function(authorizedUserIDs, authorizedTeamIDs, inheritedUserIDs, inheritedTeamIDs) {
+  service.accesses = function(authorizedUserIDs, authorizedTeamIDs, inheritedUserIDs, inheritedTeamIDs, roles) {
     var deferred = $q.defer();
 
     $q.all({
@@ -45,8 +50,8 @@ angular.module('portainer.app')
         return new TeamAccessViewModel(team);
       });
 
-      var userAccessData = mapAccessData(userAccesses, authorizedUserIDs, inheritedUserIDs);
-      var teamAccessData = mapAccessData(teamAccesses, authorizedTeamIDs, inheritedTeamIDs);
+      var userAccessData = mapAccessData(userAccesses, authorizedUserIDs, inheritedUserIDs, roles);
+      var teamAccessData = mapAccessData(teamAccesses, authorizedTeamIDs, inheritedTeamIDs, roles);
 
       var accessData = {
         accesses: userAccessData.accesses.concat(teamAccessData.accesses),

@@ -71,19 +71,20 @@ function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManage
   }
 
   function hasAuthorizations(authorizations) {
-    // TODO: must be reviewed to support endpoint authorizations from user.endpointAuthorizations (requires endpoint awareness)
-    // if (!user.authorizations) {
-    //   return true;
-    // }
-    // for (var i = 0; i < authorizations.length; i++) {
-    //   var authorization = authorizations[i];
-    //   if (user.authorizations[authorization]) {
-    //     return true;
-    //   }
-    // }
-    //
-    // return false;
-    return true;
+    const endpointId = EndpointProvider.endpointID();
+    if (isAdmin()) {
+      return true;
+    }
+    if (!user.endpointAuthorizations || (user.endpointAuthorizations && !user.endpointAuthorizations[endpointId])) {
+      return false;
+    }
+    for (var i = 0; i < authorizations.length; i++) {
+      var authorization = authorizations[i];
+      if (user.endpointAuthorizations[endpointId][authorization]) {
+        return true;
+      }
+    }
+    return false;
   }
 
   return service;

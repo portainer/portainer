@@ -27,7 +27,7 @@
               Role
             </label>
             <div class="col-sm-9 col-lg-4">
-              <ui-select ng-model="ctrl.formValues.selectedRole" ng-if="ctrl.rbacEnabled">
+              <ui-select ng-model="ctrl.formValues.selectedRole" ng-if="ctrl.rbacEnabled" search-enabled="false">
                 <ui-select-match placeholder="Select a role">
                   <span>{{ $select.selected.Name }}</span>
                 </ui-select-match>
