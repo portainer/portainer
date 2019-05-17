@@ -875,7 +875,7 @@ func (store *Store) Init() error {
 				portainer.OperationPortainerWebhookList:           true,
 				portainer.OperationPortainerWebhookCreate:         true,
 
-				portainer.AccessEnvironment: true,
+				//portainer.AccessEnvironment: true,
 			},
 
 			// Portainer global authorizations

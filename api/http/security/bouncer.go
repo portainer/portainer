@@ -38,11 +38,10 @@ type (
 	// RestrictedRequestContext is a data structure containing information
 	// used in RestrictedAccess
 	RestrictedRequestContext struct {
-		IsAdmin                bool
-		IsTeamLeader           bool
-		UserID                 portainer.UserID
-		UserMemberships        []portainer.TeamMembership
-		EndpointAuthorizations portainer.EndpointAuthorizations
+		IsAdmin         bool
+		IsTeamLeader    bool
+		UserID          portainer.UserID
+		UserMemberships []portainer.TeamMembership
 	}
 )
 
@@ -249,7 +248,6 @@ func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler)
 
 		// TODO: DEBUG
 		log.Printf("API Operation check: %+v\n", apiOperation)
-		//
 		bouncer.rbacExtensionClient.setLicenseKey(extension.License.LicenseKey)
 		err = bouncer.rbacExtensionClient.checkAuthorizations(apiOperation)
 		if err != nil {
@@ -285,7 +283,7 @@ func (bouncer *RequestBouncer) mwUpgradeToRestrictedRequest(next http.Handler) h
 			return
 		}
 
-		requestContext, err := bouncer.newRestrictedContextRequest(tokenData.ID, tokenData.Role, tokenData.EndpointAuthorizations)
+		requestContext, err := bouncer.newRestrictedContextRequest(tokenData.ID, tokenData.Role)
 		if err != nil {
 			httperror.WriteError(w, http.StatusInternalServerError, "Unable to create restricted request context ", err)
 			return
@@ -359,11 +357,10 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 	})
 }
 
-func (bouncer *RequestBouncer) newRestrictedContextRequest(userID portainer.UserID, userRole portainer.UserRole, endpointAuthorizations portainer.EndpointAuthorizations) (*RestrictedRequestContext, error) {
+func (bouncer *RequestBouncer) newRestrictedContextRequest(userID portainer.UserID, userRole portainer.UserRole) (*RestrictedRequestContext, error) {
 	requestContext := &RestrictedRequestContext{
-		IsAdmin:                true,
-		UserID:                 userID,
-		EndpointAuthorizations: endpointAuthorizations,
+		IsAdmin: true,
+		UserID:  userID,
 	}
 
 	if userRole != portainer.AdministratorRole {
@@ -383,11 +380,6 @@ func (bouncer *RequestBouncer) newRestrictedContextRequest(userID portainer.User
 		requestContext.IsTeamLeader = isTeamLeader
 		requestContext.UserMemberships = memberships
 	}
-
-	// TODO: remove?
-	//if authorizations[portainer.AdministratorAccess] {
-	//	requestContext.IsAdmin = true
-	//}
 
 	return requestContext, nil
 }

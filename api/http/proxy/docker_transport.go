@@ -493,10 +493,5 @@ func (p *proxyTransport) createOperationContext(request *http.Request) (*restric
 		operationContext.userTeamIDs = userTeamIDs
 	}
 
-	// TODO: review?
-	//if tokenData.Authorizations[portainer.AccessEnvironment] {
-	//	operationContext.isAdmin = true
-	//}
-
 	return operationContext, nil
 }
