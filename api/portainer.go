@@ -162,8 +162,6 @@ type (
 		Role                    UserRole
 		EndpointAuthorizations  EndpointAuthorizations
 		PortainerAuthorizations Authorizations
-		// TODO: remove
-		//Authorizations Authorizations
 	}
 
 	// StackID represents a stack identifier (it must be composed of Name + "_" + SwarmID to create a unique identifier)
