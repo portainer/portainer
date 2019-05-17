@@ -53,7 +53,7 @@ angular.module('portainer.docker').factory('NodeService', [
         .then(function success(data) {
           for (var i = 0; i < data.length; ++i) {
             var node = data[i];
-            if (node.Availability === 'active' && node.Status === 'ready' && node.Addr !== '0.0.0.0') {
+            if (node.Role === 'manager' && node.Availability === 'active' && node.Status === 'ready' && node.Addr !== '0.0.0.0') {
               deferred.resolve(node);
               break;
             }
