@@ -95,6 +95,12 @@
               <div>CPU: {{ node.CPUs / 1000000000 }}</div>
               <div>Memory: {{ node.Memory|humansize: 2 }}</div>
               <div><span class="label label-{{ node.Status | nodestatusbadge }}">{{ node.Status }}</span></div>
+              <div class="node_labels" ng-if="node.Labels.length > 0">
+                <div>Labels:</div>
+                <div class="node_label" ng-repeat="label in node.Labels">
+                  {{ label.key }} = {{ label.value }}
+                </div>
+              </div>
             </div>
             <div class="tasks">
               <div class="task task_{{ task.Status.State | visualizerTask }}" style="border: 2px solid {{ task.ServiceId | visualizerTaskBorderColor }}" ng-repeat="task in node.Tasks | orderBy: 'ServiceName' | filter: (state.DisplayOnlyRunningTasks || '') && { Status: { State: 'running' } }">
