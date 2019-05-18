@@ -690,7 +690,6 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 
 .visualizer_container .node .node_info .node_label {
   font-style: italic;
-  font-style: 13px !important;
   color: #787878;
 }
 
