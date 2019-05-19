@@ -31,6 +31,7 @@ type Handler struct {
 	TeamMembershipService portainer.TeamMembershipService
 	ExtensionService      portainer.ExtensionService
 	EndpointService       portainer.EndpointService
+	EndpointGroupService  portainer.EndpointGroupService
 	RoleService           portainer.RoleService
 	ProxyManager          *proxy.Manager
 }

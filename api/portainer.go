@@ -1009,6 +1009,7 @@ const (
 	RegistryManagementExtension
 	// OAuthAuthenticationExtension represents the OAuth authentication extension
 	OAuthAuthenticationExtension
+	// TODO: rename?
 	// RBACExtension represents the RBAC extension
 	RBACExtension
 )

@@ -115,6 +115,7 @@ func (server *Server) Start() error {
 	authHandler.TeamMembershipService = server.TeamMembershipService
 	authHandler.ExtensionService = server.ExtensionService
 	authHandler.EndpointService = server.EndpointService
+	authHandler.EndpointGroupService = server.EndpointGroupService
 	authHandler.RoleService = server.RoleService
 	authHandler.ProxyManager = proxyManager
 
@@ -147,6 +148,9 @@ func (server *Server) Start() error {
 	var extensionHandler = extensions.NewHandler(requestBouncer)
 	extensionHandler.ExtensionService = server.ExtensionService
 	extensionHandler.ExtensionManager = server.ExtensionManager
+	extensionHandler.EndpointGroupService = server.EndpointGroupService
+	extensionHandler.EndpointService = server.EndpointService
+	extensionHandler.RegistryService = server.RegistryService
 
 	var registryHandler = registries.NewHandler(requestBouncer)
 	registryHandler.RegistryService = server.RegistryService

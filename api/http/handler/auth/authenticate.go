@@ -138,17 +138,6 @@ func (handler *Handler) writeToken(w http.ResponseWriter, user *portainer.User) 
 	}
 	tokenData.EndpointAuthorizations = endpointAuthorizations
 
-	//authorizations, err := handler.getUserAuthorizations(user)
-	//if err != nil {
-	//	return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve authorizations associated to the user", err}
-	//}
-
-	//tokenData.Authorizations = authorizations
-	// TODO: remove?
-	//if authorizations[portainer.AdministratorAccess] {
-	//	tokenData.Role = portainer.AdministratorRole
-	//}
-
 	return handler.persistAndWriteToken(w, tokenData)
 }
 
@@ -182,8 +171,19 @@ func (handler *Handler) getAuthorizations(user *portainer.User) (portainer.Endpo
 		return endpointAuthorizations, err
 	}
 
-	// TODO: duplicate for endpoint groups
-	// access can be retrieved from endpoint group
+	// TODO: refactor/cleanup
+	endpointGroups, err := handler.EndpointGroupService.EndpointGroups()
+	if err != nil {
+		return endpointAuthorizations, err
+	}
+
+	groupUserAccessPolicies := map[portainer.EndpointGroupID]portainer.UserAccessPolicies{}
+	groupTeamAccessPolicies := map[portainer.EndpointGroupID]portainer.TeamAccessPolicies{}
+	for _, endpointGroup := range endpointGroups {
+		groupUserAccessPolicies[endpointGroup.ID] = endpointGroup.UserAccessPolicies
+		groupTeamAccessPolicies[endpointGroup.ID] = endpointGroup.TeamAccessPolicies
+	}
+
 	for _, endpoint := range endpoints {
 		var roleIdentifiers []portainer.RoleID
 
@@ -195,7 +195,28 @@ func (handler *Handler) getAuthorizations(user *portainer.User) (portainer.Endpo
 			roleIdentifiers = append(roleIdentifiers, policy.RoleID)
 		}
 
-		// if no roles on user level, check at team level
+		// if no roles on user level, check at group level
+		if len(groupUserAccessPolicies[endpoint.GroupID]) > 0 {
+			policy, ok := groupUserAccessPolicies[endpoint.GroupID][user.ID]
+			if ok {
+				roleIdentifiers = append(roleIdentifiers, policy.RoleID)
+			}
+			// break if found?
+		}
+
+		if len(groupTeamAccessPolicies[endpoint.GroupID]) > 0 {
+			for _, membership := range userMemberships {
+				policy, ok := groupTeamAccessPolicies[endpoint.GroupID][membership.TeamID]
+				if ok {
+					// endpointAccess
+					// Potential multiple team access
+					roleIdentifiers = append(roleIdentifiers, policy.RoleID)
+				}
+			}
+			// break if found?
+		}
+
+		// if no roles on user level nor group level, check at team level
 		if len(roleIdentifiers) == 0 {
 			for _, membership := range userMemberships {
 				policy, ok := endpoint.TeamAccessPolicies[membership.TeamID]

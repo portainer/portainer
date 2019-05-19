@@ -12,8 +12,11 @@ import (
 // Handler is the HTTP handler used to handle extension operations.
 type Handler struct {
 	*mux.Router
-	ExtensionService portainer.ExtensionService
-	ExtensionManager portainer.ExtensionManager
+	ExtensionService     portainer.ExtensionService
+	ExtensionManager     portainer.ExtensionManager
+	EndpointGroupService portainer.EndpointGroupService
+	EndpointService      portainer.EndpointService
+	RegistryService      portainer.RegistryService
 }
 
 // NewHandler creates a handler to manage extension operations.
