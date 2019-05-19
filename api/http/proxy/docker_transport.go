@@ -24,12 +24,14 @@ type (
 		DockerHubService       portainer.DockerHubService
 		SettingsService        portainer.SettingsService
 		SignatureService       portainer.DigitalSignatureService
+		endpointIdentifier     portainer.EndpointID
 	}
 	restrictedDockerOperationContext struct {
-		isAdmin          bool
-		userID           portainer.UserID
-		userTeamIDs      []portainer.TeamID
-		resourceControls []portainer.ResourceControl
+		isAdmin                bool
+		endpointResourceAccess bool
+		userID                 portainer.UserID
+		userTeamIDs            []portainer.TeamID
+		resourceControls       []portainer.ResourceControl
 	}
 	registryAccessContext struct {
 		isAdmin         bool
@@ -473,13 +475,19 @@ func (p *proxyTransport) createOperationContext(request *http.Request) (*restric
 	}
 
 	operationContext := &restrictedDockerOperationContext{
-		isAdmin:          true,
-		userID:           tokenData.ID,
-		resourceControls: resourceControls,
+		isAdmin:                true,
+		userID:                 tokenData.ID,
+		resourceControls:       resourceControls,
+		endpointResourceAccess: false,
 	}
 
 	if tokenData.Role != portainer.AdministratorRole {
 		operationContext.isAdmin = false
+
+		_, ok := tokenData.EndpointAuthorizations[p.endpointIdentifier][portainer.AccessEnvironment]
+		if ok {
+			operationContext.endpointResourceAccess = true
+		}
 
 		teamMemberships, err := p.TeamMembershipService.TeamMembershipsByUserID(tokenData.ID)
 		if err != nil {

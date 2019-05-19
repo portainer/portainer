@@ -29,7 +29,7 @@ func volumeListOperation(response *http.Response, executor *operationExecutor) e
 	if responseObject["Volumes"] != nil {
 		volumeData := responseObject["Volumes"].([]interface{})
 
-		if executor.operationContext.isAdmin {
+		if executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess {
 			volumeData, err = decorateVolumeList(volumeData, executor.operationContext.resourceControls)
 		} else {
 			volumeData, err = filterVolumeList(volumeData, executor.operationContext)

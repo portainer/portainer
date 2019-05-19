@@ -136,14 +136,14 @@ func (manager *Manager) CreateLegacyExtensionProxy(key, extensionAPIURL string) 
 	return proxy, nil
 }
 
-func (manager *Manager) createDockerProxy(endpointURL *url.URL, tlsConfig *portainer.TLSConfiguration) (http.Handler, error) {
+func (manager *Manager) createDockerProxy(endpointURL *url.URL, tlsConfig *portainer.TLSConfiguration, endpointID portainer.EndpointID) (http.Handler, error) {
 	if endpointURL.Scheme == "tcp" {
 		if tlsConfig.TLS || tlsConfig.TLSSkipVerify {
-			return manager.proxyFactory.newDockerHTTPSProxy(endpointURL, tlsConfig, false)
+			return manager.proxyFactory.newDockerHTTPSProxy(endpointURL, tlsConfig, false, endpointID)
 		}
-		return manager.proxyFactory.newDockerHTTPProxy(endpointURL, false), nil
+		return manager.proxyFactory.newDockerHTTPProxy(endpointURL, false, endpointID), nil
 	}
-	return manager.proxyFactory.newLocalProxy(endpointURL.Path), nil
+	return manager.proxyFactory.newLocalProxy(endpointURL.Path, endpointID), nil
 }
 
 func (manager *Manager) createProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
@@ -154,10 +154,10 @@ func (manager *Manager) createProxy(endpoint *portainer.Endpoint) (http.Handler,
 
 	switch endpoint.Type {
 	case portainer.AgentOnDockerEnvironment:
-		return manager.proxyFactory.newDockerHTTPSProxy(endpointURL, &endpoint.TLSConfig, true)
+		return manager.proxyFactory.newDockerHTTPSProxy(endpointURL, &endpoint.TLSConfig, true, endpoint.ID)
 	case portainer.AzureEnvironment:
 		return newAzureProxy(&endpoint.AzureCredentials)
 	default:
-		return manager.createDockerProxy(endpointURL, &endpoint.TLSConfig)
+		return manager.createDockerProxy(endpointURL, &endpoint.TLSConfig, endpoint.ID)
 	}
 }

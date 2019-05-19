@@ -24,7 +24,7 @@ func configListOperation(response *http.Response, executor *operationExecutor) e
 		return err
 	}
 
-	if executor.operationContext.isAdmin {
+	if executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess {
 		responseArray, err = decorateConfigList(responseArray, executor.operationContext.resourceControls)
 	} else {
 		responseArray, err = filterConfigList(responseArray, executor.operationContext)

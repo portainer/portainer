@@ -24,7 +24,7 @@ func serviceListOperation(response *http.Response, executor *operationExecutor) 
 		return err
 	}
 
-	if executor.operationContext.isAdmin {
+	if executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess {
 		responseArray, err = decorateServiceList(responseArray, executor.operationContext.resourceControls)
 	} else {
 		responseArray, err = filterServiceList(responseArray, executor.operationContext)

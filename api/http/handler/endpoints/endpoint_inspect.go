@@ -25,7 +25,7 @@ func (handler *Handler) endpointInspect(w http.ResponseWriter, r *http.Request) 
 
 	//TODO: review? keep/remove?
 	// TODO: extra access mecanism
-	//err = handler.requestBouncer.EndpointAccess(r, endpoint)
+	//err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint)
 	//if err != nil {
 	//	return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", portainer.ErrEndpointAccessDenied}
 	//}

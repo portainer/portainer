@@ -26,7 +26,7 @@ func containerListOperation(response *http.Response, executor *operationExecutor
 		return err
 	}
 
-	if executor.operationContext.isAdmin {
+	if executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess {
 		responseArray, err = decorateContainerList(responseArray, executor.operationContext.resourceControls)
 	} else {
 		responseArray, err = filterContainerList(responseArray, executor.operationContext)

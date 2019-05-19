@@ -24,7 +24,7 @@ func networkListOperation(response *http.Response, executor *operationExecutor) 
 		return err
 	}
 
-	if executor.operationContext.isAdmin {
+	if executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess {
 		responseArray, err = decorateNetworkList(responseArray, executor.operationContext.resourceControls)
 	} else {
 		responseArray, err = filterNetworkList(responseArray, executor.operationContext)

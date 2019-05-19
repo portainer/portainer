@@ -25,7 +25,7 @@ func taskListOperation(response *http.Response, executor *operationExecutor) err
 		return err
 	}
 
-	if !executor.operationContext.isAdmin {
+	if !executor.operationContext.isAdmin && !executor.operationContext.endpointResourceAccess {
 		responseArray, err = filterTaskList(responseArray, executor.operationContext)
 		if err != nil {
 			return err

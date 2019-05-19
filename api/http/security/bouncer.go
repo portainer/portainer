@@ -101,11 +101,11 @@ func (bouncer *RequestBouncer) AdministratorAccess(h http.Handler) http.Handler 
 	return h
 }
 
-// EndpointAccess retrieves the JWT token from the request context and verifies
+// AuthorizedEndpointOperation retrieves the JWT token from the request context and verifies
 // that the user can access the specified endpoint.
 // An error is returned when access is denied.
 // TODO: rename to EndpointAccessAndAuth? Or something similar? And update documentation.
-func (bouncer *RequestBouncer) EndpointAccess(r *http.Request, endpoint *portainer.Endpoint) error {
+func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endpoint *portainer.Endpoint) error {
 	tokenData, err := RetrieveTokenData(r)
 	if err != nil {
 		return err

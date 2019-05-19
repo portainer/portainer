@@ -24,7 +24,7 @@ func secretListOperation(response *http.Response, executor *operationExecutor) e
 		return err
 	}
 
-	if executor.operationContext.isAdmin {
+	if executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess {
 		responseArray, err = decorateSecretList(responseArray, executor.operationContext.resourceControls)
 	} else {
 		responseArray, err = filterSecretList(responseArray, executor.operationContext)

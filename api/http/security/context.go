@@ -14,6 +14,8 @@ type (
 const (
 	contextAuthenticationKey contextKey = iota
 	contextRestrictedRequest
+	// TODO: remove
+	//contextEndpointKey
 )
 
 // storeTokenData stores a TokenData object inside the request context and returns the enhanced context.
@@ -31,6 +33,24 @@ func RetrieveTokenData(request *http.Request) (*portainer.TokenData, error) {
 	tokenData := contextData.(*portainer.TokenData)
 	return tokenData, nil
 }
+
+// TODO: remove
+
+//// TODO: doc
+//func storeEndpointContext(request *http.Request, endpointID portainer.EndpointID) context.Context {
+//	return context.WithValue(request.Context(), contextEndpointKey, endpointID)
+//}
+//
+//// TODO: doc
+//func RetrieveEndpointContext(request *http.Request) (portainer.EndpointID, error) {
+//	contextData := request.Context().Value(contextEndpointKey)
+//	if contextData == nil {
+//		return portainer.EndpointID(0), portainer.ErrMissingEndpointContext
+//	}
+//
+//	endpointID := contextData.(portainer.EndpointID)
+//	return endpointID, nil
+//}
 
 // storeRestrictedRequestContext stores a RestrictedRequestContext object inside the request context
 // and returns the enhanced context.
