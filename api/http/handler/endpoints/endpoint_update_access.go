@@ -15,6 +15,17 @@ type endpointUpdateAccessPayload struct {
 	RoleID          int
 }
 
+// TODO: remove this endpoint and use
+// endpointUpdate operation directly from frontend?
+type endpointUpdateAccessPayload2 struct {
+	UserAccessPolicies portainer.UserAccessPolicies
+	TeamAccessPolicies portainer.TeamAccessPolicies
+}
+
+func (payload *endpointUpdateAccessPayload2) Validate(r *http.Request) error {
+	return nil
+}
+
 func (payload *endpointUpdateAccessPayload) Validate(r *http.Request) error {
 	return nil
 }
@@ -30,7 +41,7 @@ func (handler *Handler) endpointUpdateAccess(w http.ResponseWriter, r *http.Requ
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint identifier route variable", err}
 	}
 
-	var payload endpointUpdateAccessPayload
+	var payload endpointUpdateAccessPayload2
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
@@ -43,30 +54,33 @@ func (handler *Handler) endpointUpdateAccess(w http.ResponseWriter, r *http.Requ
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
-	// TODO: support for roles to add
-	if payload.AuthorizedUsers != nil {
-		userAccessPolicies := make(portainer.UserAccessPolicies)
-		for _, value := range payload.AuthorizedUsers {
-			policy := portainer.AccessPolicy{}
-			if payload.RoleID != 0 {
-				policy.RoleID = portainer.RoleID(payload.RoleID)
-			}
-			userAccessPolicies[portainer.UserID(value)] = policy
-		}
-		endpoint.UserAccessPolicies = userAccessPolicies
-	}
+	// TODO: review
+	endpoint.UserAccessPolicies = payload.UserAccessPolicies
+	endpoint.TeamAccessPolicies = payload.TeamAccessPolicies
 
-	if payload.AuthorizedTeams != nil {
-		teamAccessPolicies := make(portainer.TeamAccessPolicies)
-		for _, value := range payload.AuthorizedTeams {
-			policy := portainer.AccessPolicy{}
-			if payload.RoleID != 0 {
-				policy.RoleID = portainer.RoleID(payload.RoleID)
-			}
-			teamAccessPolicies[portainer.TeamID(value)] = policy
-		}
-		endpoint.TeamAccessPolicies = teamAccessPolicies
-	}
+	//if payload.AuthorizedUsers != nil {
+	//	userAccessPolicies := make(portainer.UserAccessPolicies)
+	//	for _, value := range payload.AuthorizedUsers {
+	//		policy := portainer.AccessPolicy{}
+	//		if payload.RoleID != 0 {
+	//			policy.RoleID = portainer.RoleID(payload.RoleID)
+	//		}
+	//		userAccessPolicies[portainer.UserID(value)] = policy
+	//	}
+	//	endpoint.UserAccessPolicies = userAccessPolicies
+	//}
+	//
+	//if payload.AuthorizedTeams != nil {
+	//	teamAccessPolicies := make(portainer.TeamAccessPolicies)
+	//	for _, value := range payload.AuthorizedTeams {
+	//		policy := portainer.AccessPolicy{}
+	//		if payload.RoleID != 0 {
+	//			policy.RoleID = portainer.RoleID(payload.RoleID)
+	//		}
+	//		teamAccessPolicies[portainer.TeamID(value)] = policy
+	//	}
+	//	endpoint.TeamAccessPolicies = teamAccessPolicies
+	//}
 
 	err = handler.EndpointService.UpdateEndpoint(endpoint.ID, endpoint)
 	if err != nil {
