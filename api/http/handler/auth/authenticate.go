@@ -123,7 +123,6 @@ func (handler *Handler) writeToken(w http.ResponseWriter, user *portainer.User) 
 		PortainerAuthorizations: user.PortainerAuthorizations,
 	}
 
-	// TODO: only when extension is enabled?
 	_, err := handler.ExtensionService.Extension(portainer.RBACExtension)
 	if err == portainer.ErrObjectNotFound {
 		return handler.persistAndWriteToken(w, tokenData)

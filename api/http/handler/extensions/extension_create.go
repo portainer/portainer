@@ -120,26 +120,6 @@ func (handler *Handler) extensionCreate(w http.ResponseWriter, r *http.Request) 
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint access policies", err}
 			}
 		}
-
-		// TODO: review default policy for registries
-		//registries, err := handler.RegistryService.Registries()
-		//if err != nil {
-		//	return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
-		//}
-		//
-		//for _, registry := range registries {
-		//	for key := range registry.UserAccessPolicies {
-		//	}
-		//
-		//	for key := range registry.TeamAccessPolicies {
-		//	}
-		//
-		//	err := handler.RegistryService.UpdateRegistry(registry.ID, &registry)
-		//	if err != nil {
-		//		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update registry access policies", err}
-		//	}
-		//
-		//}
 	}
 
 	err = handler.ExtensionService.Persist(extension)

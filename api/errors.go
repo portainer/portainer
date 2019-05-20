@@ -7,8 +7,6 @@ const (
 	ErrAuthorizationRequired  = Error("Authorization required for this operation")
 	ErrObjectNotFound         = Error("Object not found inside the database")
 	ErrMissingSecurityContext = Error("Unable to find security details in request context")
-	//TODO: remove
-	//ErrMissingEndpointContext = Error("Unable to find endpoint identifier in request context")
 )
 
 // User errors.

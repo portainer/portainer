@@ -179,19 +179,6 @@ func authorizedAccess(userID portainer.UserID, memberships []portainer.TeamMembe
 			return true
 		}
 	}
-	// TODO: review/remove
-	//for _, userAccessPolicy := range userAccessPolicies {
-	//	if userAccessPolicy.UserID == userID {
-	//		return true
-	//	}
-	//}
 
-	//for _, membership := range memberships {
-	//	for _, teamAccessPolicy := range teamAccessPolicies {
-	//		if membership.TeamID == teamAccessPolicy.TeamID {
-	//			return true
-	//		}
-	//	}
-	//}
 	return false
 }

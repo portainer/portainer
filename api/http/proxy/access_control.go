@@ -45,7 +45,6 @@ func applyResourceAccessControl(resourceObject map[string]interface{}, resourceI
 		return resourceObject, context.isAdmin || context.endpointResourceAccess
 	}
 
-	// TODO: document the addition of context.endpointResourceAccess in method doc
 	if context.isAdmin || context.endpointResourceAccess || resourceControl.Public || canUserAccessResource(context.userID, context.userTeamIDs, resourceControl) {
 		resourceObject = decorateObject(resourceObject, resourceControl)
 		return resourceObject, true

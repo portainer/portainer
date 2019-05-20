@@ -1,8 +1,6 @@
 package security
 
 import (
-	"log"
-
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer/api"
 
@@ -104,7 +102,7 @@ func (bouncer *RequestBouncer) AdministratorAccess(h http.Handler) http.Handler 
 // AuthorizedEndpointOperation retrieves the JWT token from the request context and verifies
 // that the user can access the specified endpoint.
 // An error is returned when access is denied.
-// TODO: rename to EndpointAccessAndAuth? Or something similar? And update documentation.
+// If the RBAC extension is enabled, it will also validate that the user can execute the specified operation.
 func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endpoint *portainer.Endpoint) error {
 	tokenData, err := RetrieveTokenData(r)
 	if err != nil {
@@ -129,7 +127,7 @@ func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endp
 		return portainer.ErrEndpointAccessDenied
 	}
 
-	err = bouncer.authorizedEndpointOperation(r, endpoint)
+	err = bouncer.checkEndpointOperationAuthorization(r, endpoint)
 	if err != nil {
 		return portainer.ErrAuthorizationRequired
 	}
@@ -137,49 +135,31 @@ func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endp
 	return nil
 }
 
-func (bouncer *RequestBouncer) authorizedEndpointOperation(r *http.Request, endpoint *portainer.Endpoint) error {
-	// TODO: debug
-	log.Printf("Authorization check for URL: %s\n", r.URL.String())
-
-	// TODO: review
+func (bouncer *RequestBouncer) checkEndpointOperationAuthorization(r *http.Request, endpoint *portainer.Endpoint) error {
 	extension, err := bouncer.extensionService.Extension(portainer.RBACExtension)
 	if err == portainer.ErrObjectNotFound {
 		return nil
 	} else if err != nil {
-		//httperror.WriteError(w, http.StatusInternalServerError, "Unable to find a extension with the specified identifier inside the database", err)
 		return err
 	}
 
 	tokenData, err := RetrieveTokenData(r)
 	if err != nil {
-		//httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrResourceAccessDenied)
 		return err
 	}
 
 	if tokenData.Role == portainer.AdministratorRole {
-		//next.ServeHTTP(w, r)
 		return nil
 	}
 
-	//authorizations := tokenData.PortainerAuthorizations
-	//
-	//for k, v := range tokenData {
-	//	a[k] = v
-	//}
-	//
 	apiOperation := &portainer.APIOperationAuthorizationRequest{
 		Path:           r.URL.String(),
 		Method:         r.Method,
 		Authorizations: tokenData.EndpointAuthorizations[endpoint.ID],
 	}
-	//
+
 	bouncer.rbacExtensionClient.setLicenseKey(extension.License.LicenseKey)
-	return bouncer.rbacExtensionClient.checkAuthorizations(apiOperation)
-	//err = bouncer.rbacExtensionClient.checkAuthorizations(apiOperation)
-	//if err != nil {
-	//httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrAuthorizationRequired)
-	//return err
-	//}
+	return bouncer.rbacExtensionClient.checkAuthorization(apiOperation)
 }
 
 // RegistryAccess retrieves the JWT token from the request context and verifies
@@ -218,8 +198,6 @@ func mwSecureHeaders(next http.Handler) http.Handler {
 
 func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-		// TODO: review
 		extension, err := bouncer.extensionService.Extension(portainer.RBACExtension)
 		if err == portainer.ErrObjectNotFound {
 			next.ServeHTTP(w, r)
@@ -246,28 +224,12 @@ func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler)
 			Authorizations: tokenData.PortainerAuthorizations,
 		}
 
-		// TODO: DEBUG
-		log.Printf("API Operation check: %+v\n", apiOperation)
 		bouncer.rbacExtensionClient.setLicenseKey(extension.License.LicenseKey)
-		err = bouncer.rbacExtensionClient.checkAuthorizations(apiOperation)
+		err = bouncer.rbacExtensionClient.checkAuthorization(apiOperation)
 		if err != nil {
 			httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrAuthorizationRequired)
 			return
 		}
-
-		//authorizations := tokenData.PortainerAuthorizations
-		//
-		//for k, v := range tokenData {
-		//	a[k] = v
-		//}
-		//
-		//apiOperation := &portainer.APIOperationAuthorizationRequest{
-		//	Path:                   r.URL.String(),
-		//	Method:                 r.Method,
-		//	EndpointAuthorizations: tokenData.EndpointAuthorizations,
-		//}
-		//
-		//bouncer.rbacExtensionClient.setLicenseKey(extension.License.LicenseKey)
 
 		next.ServeHTTP(w, r)
 	})
