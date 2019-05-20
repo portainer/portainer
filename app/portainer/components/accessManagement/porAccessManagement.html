@@ -26,7 +26,7 @@
             </label>
             <div class="col-sm-9 col-lg-4">
               <select ng-if="ctrl.rbacEnabled" class="form-control" ng-model="ctrl.formValues.selectedRole"
-                ng-options="role.Nmae fo role in ctrl.roles">
+                ng-options="role.Name for role in ctrl.roles">
               </select>
               <span class="small text-muted" ng-if="!ctrl.rbacEnabled">
                   The <a ui-sref="portainer.extensions.extension({id: 3})">RBAC extension</a> is required to select a specific role.
@@ -54,6 +54,6 @@
 <div class="row">
   <div class="col-sm-12">
     <access-datatable title-text="Access" title-icon="fa-user-lock" dataset="ctrl.authorizedUsersAndTeams" table-key="{{ 'access_' + ctrl.entityType}}"
-      order-by="Name" rbac-enabled="ctrl.rbacEnabled" remove-action="ctrl.unauthorizeAccess" inherit-from="ctrl.inheritFrom"></access-datatable>
+      order-by="Name" rbac-enabled="ctrl.rbacEnabled && ctrl.entityType !== 'registry'" remove-action="ctrl.unauthorizeAccess" inherit-from="ctrl.inheritFrom"></access-datatable>
   </div>
 </div>
