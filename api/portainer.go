@@ -290,31 +290,20 @@ type (
 	// to a team.
 	// TODO: that's an endpoint role? Add a type for different roles? Registry, endpoint...
 	Role struct {
-		ID          RoleID `json:"Id"`
-		Name        string `json:"Name"`
-		Description string `json:"Description"`
-		//DockerAuthorizations    Authorizations `json:"DockerAuthorizations"`
-		//PortainerAuthorizations Authorizations `json:"PortainerAuthorizations"`
-		//RegistryAuthorizations  Authorizations `json:"RegistryAuthorizations"`
+		ID             RoleID         `json:"Id"`
+		Name           string         `json:"Name"`
+		Description    string         `json:"Description"`
 		Authorizations Authorizations `json:"Authorizations"`
 	}
 
+	// TODO: document
 	AccessPolicy struct {
 		RoleID RoleID `json:"RoleId"`
 	}
 
+	// TODO: document
 	UserAccessPolicies map[UserID]AccessPolicy
 	TeamAccessPolicies map[TeamID]AccessPolicy
-
-	//UserAccessPolicy struct {
-	//	UserID UserID `json:"UserId"`
-	//	RoleID RoleID `json:"RoleId"`
-	//}
-	//
-	//TeamAccessPolicy struct {
-	//	TeamID TeamID `json:"UserId"`
-	//	RoleID RoleID `json:"RoleId"`
-	//}
 
 	// ScheduleID represents a schedule identifier.
 	ScheduleID int
