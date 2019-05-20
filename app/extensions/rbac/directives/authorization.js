@@ -4,8 +4,13 @@ angular.module('portainer.extensions.rbac').directive('authorization', ['Authent
       restrict: 'A',
       link: async function(scope, elem, attrs) {
         elem.hide();
-        const rbacEnabled = await ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.RBAC);
-        if (!rbacEnabled) {
+        try {
+          const rbacEnabled = await ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.RBAC);
+          if (!rbacEnabled) {
+            elem.show();
+            return;
+          } 
+        } catch (err) {
           elem.show();
           return;
         }
