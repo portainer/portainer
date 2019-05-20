@@ -484,7 +484,7 @@ func (p *proxyTransport) createOperationContext(request *http.Request) (*restric
 	if tokenData.Role != portainer.AdministratorRole {
 		operationContext.isAdmin = false
 
-		_, ok := tokenData.EndpointAuthorizations[p.endpointIdentifier][portainer.AccessEnvironment]
+		_, ok := tokenData.EndpointAuthorizations[p.endpointIdentifier][portainer.EndpointResourcesAccess]
 		if ok {
 			operationContext.endpointResourceAccess = true
 		}

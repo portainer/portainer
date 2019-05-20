@@ -113,12 +113,10 @@ type (
 
 	// User represents a user account
 	User struct {
-		ID       UserID   `json:"Id"`
-		Username string   `json:"Username"`
-		Password string   `json:"Password,omitempty"`
-		Role     UserRole `json:"Role"`
-		// TODO: database migration required
-		// non-admin users with default authorizations
+		ID                      UserID         `json:"Id"`
+		Username                string         `json:"Username"`
+		Password                string         `json:"Password,omitempty"`
+		Role                    UserRole       `json:"Role"`
 		PortainerAuthorizations Authorizations `json:"PortainerAuthorizations"`
 	}
 
@@ -203,7 +201,6 @@ type (
 		TeamAccessPolicies      TeamAccessPolicies               `json:"TeamAccessPolicies"`
 
 		// Deprecated fields
-		// TODO: database migration required
 		// Deprecated in DBVersion == 18
 		AuthorizedUsers []UserID `json:"AuthorizedUsers"`
 		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
@@ -261,7 +258,6 @@ type (
 		TLSCertPath   string `json:"TLSCert,omitempty"`
 		TLSKeyPath    string `json:"TLSKey,omitempty"`
 
-		// TODO: database migration required
 		// Deprecated in DBVersion == 18
 		AuthorizedUsers []UserID `json:"AuthorizedUsers"`
 		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
@@ -288,7 +284,6 @@ type (
 
 	// Role represents a set of authorizations that can be associated to a user or
 	// to a team.
-	// TODO: that's an endpoint role? Add a type for different roles? Registry, endpoint...
 	Role struct {
 		ID             RoleID         `json:"Id"`
 		Name           string         `json:"Name"`
@@ -296,13 +291,14 @@ type (
 		Authorizations Authorizations `json:"Authorizations"`
 	}
 
-	// TODO: document
+	// AccessPolicy represent a policy that can be associated to a user or team
 	AccessPolicy struct {
 		RoleID RoleID `json:"RoleId"`
 	}
 
-	// TODO: document
+	// UserAccessPolicies represent the association of an access policy and a user
 	UserAccessPolicies map[UserID]AccessPolicy
+	// TeamAccessPolicies represent the association of an access policy and a team
 	TeamAccessPolicies map[TeamID]AccessPolicy
 
 	// ScheduleID represents a schedule identifier.
@@ -406,7 +402,6 @@ type (
 		// Deprecated fields
 		Labels []Pair `json:"Labels"`
 
-		// TODO: database migration required
 		// Deprecated in DBVersion == 18
 		AuthorizedUsers []UserID `json:"AuthorizedUsers"`
 		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
@@ -861,7 +856,7 @@ const (
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "1.20.2"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 17
+	DBVersion = 18
 	// AssetsServerURL represents the URL of the Portainer asset server
 	AssetsServerURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com"
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
@@ -998,7 +993,6 @@ const (
 	RegistryManagementExtension
 	// OAuthAuthenticationExtension represents the OAuth authentication extension
 	OAuthAuthenticationExtension
-	// TODO: rename?
 	// RBACExtension represents the RBAC extension
 	RBACExtension
 )
@@ -1126,124 +1120,102 @@ const (
 	OperationDockerDistributionInspect          Authorization = "DockerDistributionInspect"
 	OperationDockerBuildPrune                   Authorization = "DockerBuildPrune"
 	OperationDockerBuildCancel                  Authorization = "DockerBuildCancel"
-	OperationPortainerDockerHubInspect          Authorization = "PortainerDockerHubInspect"
-	OperationPortainerDockerHubUpdate           Authorization = "PortainerDockerHubUpdate"
-	OperationPortainerEndpointGroupCreate       Authorization = "PortainerEndpointGroupCreate"
-	OperationPortainerEndpointGroupList         Authorization = "PortainerEndpointGroupList"
-	OperationPortainerEndpointGroupDelete       Authorization = "PortainerEndpointGroupDelete"
-	OperationPortainerEndpointGroupInspect      Authorization = "PortainerEndpointGroupInspect"
-	OperationPortainerEndpointGroupUpdate       Authorization = "PortainerEndpointGroupEdit"
-	OperationPortainerEndpointGroupAccess       Authorization = "PortainerEndpointGroupAccess "
-	OperationPortainerEndpointList              Authorization = "PortainerEndpointList"
-	OperationPortainerEndpointInspect           Authorization = "PortainerEndpointInspect"
-	OperationPortainerEndpointCreate            Authorization = "PortainerEndpointCreate"
-	OperationPortainerEndpointExtensionAdd      Authorization = "PortainerEndpointExtensionAdd"
-	OperationPortainerEndpointJob               Authorization = "PortainerEndpointJob"
-	OperationPortainerEndpointSnapshots         Authorization = "PortainerEndpointSnapshots"
-	OperationPortainerEndpointSnapshot          Authorization = "PortainerEndpointSnapshot"
-	OperationPortainerEndpointUpdate            Authorization = "PortainerEndpointUpdate"
-	OperationPortainerEndpointUpdateAccess      Authorization = "PortainerEndpointUpdateAccess"
-	OperationPortainerEndpointDelete            Authorization = "PortainerEndpointDelete"
-	OperationPortainerEndpointExtensionRemove   Authorization = "PortainerEndpointExtensionRemove"
-	OperationPortainerExtensionList             Authorization = "PortainerExtensionList"
-	OperationPortainerExtensionInspect          Authorization = "PortainerExtensionInspect"
-	OperationPortainerExtensionCreate           Authorization = "PortainerExtensionCreate"
-	OperationPortainerExtensionUpdate           Authorization = "PortainerExtensionUpdate"
-	OperationPortainerExtensionDelete           Authorization = "PortainerExtensionDelete"
-	OperationPortainerMOTD                      Authorization = "PortainerMOTD"
-	OperationPortainerRegistryList              Authorization = "PortainerRegistryList"
-	OperationPortainerRegistryInspect           Authorization = "PortainerRegistryInspect"
-	OperationPortainerRegistryCreate            Authorization = "PortainerRegistryCreate"
-	OperationPortainerRegistryConfigure         Authorization = "PortainerRegistryConfigure"
-	OperationPortainerRegistryUpdate            Authorization = "PortainerRegistryUpdate"
-	OperationPortainerRegistryUpdateAccess      Authorization = "PortainerRegistryUpdateAccess"
-	OperationPortainerRegistryDelete            Authorization = "PortainerRegistryDelete"
-	OperationPortainerResourceControlCreate     Authorization = "PortainerResourceControlCreate"
-	OperationPortainerResourceControlUpdate     Authorization = "PortainerResourceControlUpdate"
-	OperationPortainerResourceControlDelete     Authorization = "PortainerResourceControlDelete"
-	OperationPortainerRoleList                  Authorization = "PortainerRoleList"
-	OperationPortainerRoleInspect               Authorization = "PortainerRoleInspect"
-	OperationPortainerRoleCreate                Authorization = "PortainerRoleCreate"
-	OperationPortainerRoleUpdate                Authorization = "PortainerRoleUpdate"
-	OperationPortainerRoleDelete                Authorization = "PortainerRoleDelete"
-	OperationPortainerScheduleList              Authorization = "PortainerScheduleList"
-	OperationPortainerScheduleInspect           Authorization = "PortainerScheduleInspect"
-	OperationPortainerScheduleFile              Authorization = "PortainerScheduleFile"
-	OperationPortainerScheduleTasks             Authorization = "PortainerScheduleTasks"
-	OperationPortainerScheduleCreate            Authorization = "PortainerScheduleCreate"
-	OperationPortainerScheduleUpdate            Authorization = "PortainerScheduleUpdate"
-	OperationPortainerScheduleDelete            Authorization = "PortainerScheduleDelete"
-	OperationPortainerSettingsInspect           Authorization = "PortainerSettingsInspect"
-	OperationPortainerSettingsUpdate            Authorization = "PortainerSettingsUpdate"
-	OperationPortainerSettingsLDAPCheck         Authorization = "PortainerSettingsLDAPCheck"
-	OperationPortainerStackList                 Authorization = "PortainerStackList"
-	OperationPortainerStackInspect              Authorization = "PortainerStackInspect"
-	OperationPortainerStackFile                 Authorization = "PortainerStackFile"
-	OperationPortainerStackCreate               Authorization = "PortainerStackCreate"
-	OperationPortainerStackMigrate              Authorization = "PortainerStackMigrate"
-	OperationPortainerStackUpdate               Authorization = "PortainerStackUpdate"
-	OperationPortainerStackDelete               Authorization = "PortainerStackDelete"
-	OperationPortainerTagList                   Authorization = "PortainerTagList"
-	OperationPortainerTagCreate                 Authorization = "PortainerTagCreate"
-	OperationPortainerTagDelete                 Authorization = "PortainerTagDelete"
-	OperationPortainerTeamMembershipList        Authorization = "PortainerTeamMembershipList"
-	OperationPortainerTeamMembershipCreate      Authorization = "PortainerTeamMembershipCreate"
-	OperationPortainerTeamMembershipUpdate      Authorization = "PortainerTeamMembershipUpdate"
-	OperationPortainerTeamMembershipDelete      Authorization = "PortainerTeamMembershipDelete"
-	OperationPortainerTeamList                  Authorization = "PortainerTeamList"
-	OperationPortainerTeamInspect               Authorization = "PortainerTeamInspect"
-	OperationPortainerTeamMemberships           Authorization = "PortainerTeamMemberships"
-	OperationPortainerTeamCreate                Authorization = "PortainerTeamCreate"
-	OperationPortainerTeamUpdate                Authorization = "PortainerTeamUpdate"
-	OperationPortainerTeamDelete                Authorization = "PortainerTeamDelete"
-	OperationPortainerTemplateList              Authorization = "PortainerTemplateList"
-	OperationPortainerTemplateInspect           Authorization = "PortainerTemplateInspect"
-	OperationPortainerTemplateCreate            Authorization = "PortainerTemplateCreate"
-	OperationPortainerTemplateUpdate            Authorization = "PortainerTemplateUpdate"
-	OperationPortainerTemplateDelete            Authorization = "PortainerTemplateDelete"
-	OperationPortainerUploadTLS                 Authorization = "PortainerUploadTLS"
-	OperationPortainerUserList                  Authorization = "PortainerUserList"
-	OperationPortainerUserInspect               Authorization = "PortainerUserInspect"
-	OperationPortainerUserMemberships           Authorization = "PortainerUserMemberships"
-	OperationPortainerUserCreate                Authorization = "PortainerUserCreate"
-	OperationPortainerUserUpdate                Authorization = "PortainerUserUpdate"
-	OperationPortainerUserUpdatePassword        Authorization = "PortainerUserUpdatePassword"
-	OperationPortainerUserDelete                Authorization = "PortainerUserDelete"
-	OperationPortainerWebsocketExec             Authorization = "PortainerWebsocketExec"
-	OperationPortainerWebhookList               Authorization = "PortainerWebhookList"
-	OperationPortainerWebhookCreate             Authorization = "PortainerWebhookCreate"
-	OperationPortainerWebhookDelete             Authorization = "PortainerWebhookDelete"
+	OperationDockerPing                         Authorization = "DockerPing"
+	OperationDockerInfo                         Authorization = "DockerInfo"
+	OperationDockerEvents                       Authorization = "DockerEvents"
+	OperationDockerSystem                       Authorization = "DockerSystem"
+	OperationDockerVersion                      Authorization = "DockerVersion"
 
-	// TODO: single top-resource operation
-	OperationDockerPing    Authorization = "DockerPing"
-	OperationDockerInfo    Authorization = "DockerInfo"
-	OperationDockerEvents  Authorization = "DockerEvents"
-	OperationDockerSystem  Authorization = "DockerSystem"
-	OperationDockerVersion Authorization = "DockerVersion"
+	OperationPortainerDockerHubInspect        Authorization = "PortainerDockerHubInspect"
+	OperationPortainerDockerHubUpdate         Authorization = "PortainerDockerHubUpdate"
+	OperationPortainerEndpointGroupCreate     Authorization = "PortainerEndpointGroupCreate"
+	OperationPortainerEndpointGroupList       Authorization = "PortainerEndpointGroupList"
+	OperationPortainerEndpointGroupDelete     Authorization = "PortainerEndpointGroupDelete"
+	OperationPortainerEndpointGroupInspect    Authorization = "PortainerEndpointGroupInspect"
+	OperationPortainerEndpointGroupUpdate     Authorization = "PortainerEndpointGroupEdit"
+	OperationPortainerEndpointGroupAccess     Authorization = "PortainerEndpointGroupAccess "
+	OperationPortainerEndpointList            Authorization = "PortainerEndpointList"
+	OperationPortainerEndpointInspect         Authorization = "PortainerEndpointInspect"
+	OperationPortainerEndpointCreate          Authorization = "PortainerEndpointCreate"
+	OperationPortainerEndpointExtensionAdd    Authorization = "PortainerEndpointExtensionAdd"
+	OperationPortainerEndpointJob             Authorization = "PortainerEndpointJob"
+	OperationPortainerEndpointSnapshots       Authorization = "PortainerEndpointSnapshots"
+	OperationPortainerEndpointSnapshot        Authorization = "PortainerEndpointSnapshot"
+	OperationPortainerEndpointUpdate          Authorization = "PortainerEndpointUpdate"
+	OperationPortainerEndpointUpdateAccess    Authorization = "PortainerEndpointUpdateAccess"
+	OperationPortainerEndpointDelete          Authorization = "PortainerEndpointDelete"
+	OperationPortainerEndpointExtensionRemove Authorization = "PortainerEndpointExtensionRemove"
+	OperationPortainerExtensionList           Authorization = "PortainerExtensionList"
+	OperationPortainerExtensionInspect        Authorization = "PortainerExtensionInspect"
+	OperationPortainerExtensionCreate         Authorization = "PortainerExtensionCreate"
+	OperationPortainerExtensionUpdate         Authorization = "PortainerExtensionUpdate"
+	OperationPortainerExtensionDelete         Authorization = "PortainerExtensionDelete"
+	OperationPortainerMOTD                    Authorization = "PortainerMOTD"
+	OperationPortainerRegistryList            Authorization = "PortainerRegistryList"
+	OperationPortainerRegistryInspect         Authorization = "PortainerRegistryInspect"
+	OperationPortainerRegistryCreate          Authorization = "PortainerRegistryCreate"
+	OperationPortainerRegistryConfigure       Authorization = "PortainerRegistryConfigure"
+	OperationPortainerRegistryUpdate          Authorization = "PortainerRegistryUpdate"
+	OperationPortainerRegistryUpdateAccess    Authorization = "PortainerRegistryUpdateAccess"
+	OperationPortainerRegistryDelete          Authorization = "PortainerRegistryDelete"
+	OperationPortainerResourceControlCreate   Authorization = "PortainerResourceControlCreate"
+	OperationPortainerResourceControlUpdate   Authorization = "PortainerResourceControlUpdate"
+	OperationPortainerResourceControlDelete   Authorization = "PortainerResourceControlDelete"
+	OperationPortainerRoleList                Authorization = "PortainerRoleList"
+	OperationPortainerRoleInspect             Authorization = "PortainerRoleInspect"
+	OperationPortainerRoleCreate              Authorization = "PortainerRoleCreate"
+	OperationPortainerRoleUpdate              Authorization = "PortainerRoleUpdate"
+	OperationPortainerRoleDelete              Authorization = "PortainerRoleDelete"
+	OperationPortainerScheduleList            Authorization = "PortainerScheduleList"
+	OperationPortainerScheduleInspect         Authorization = "PortainerScheduleInspect"
+	OperationPortainerScheduleFile            Authorization = "PortainerScheduleFile"
+	OperationPortainerScheduleTasks           Authorization = "PortainerScheduleTasks"
+	OperationPortainerScheduleCreate          Authorization = "PortainerScheduleCreate"
+	OperationPortainerScheduleUpdate          Authorization = "PortainerScheduleUpdate"
+	OperationPortainerScheduleDelete          Authorization = "PortainerScheduleDelete"
+	OperationPortainerSettingsInspect         Authorization = "PortainerSettingsInspect"
+	OperationPortainerSettingsUpdate          Authorization = "PortainerSettingsUpdate"
+	OperationPortainerSettingsLDAPCheck       Authorization = "PortainerSettingsLDAPCheck"
+	OperationPortainerStackList               Authorization = "PortainerStackList"
+	OperationPortainerStackInspect            Authorization = "PortainerStackInspect"
+	OperationPortainerStackFile               Authorization = "PortainerStackFile"
+	OperationPortainerStackCreate             Authorization = "PortainerStackCreate"
+	OperationPortainerStackMigrate            Authorization = "PortainerStackMigrate"
+	OperationPortainerStackUpdate             Authorization = "PortainerStackUpdate"
+	OperationPortainerStackDelete             Authorization = "PortainerStackDelete"
+	OperationPortainerTagList                 Authorization = "PortainerTagList"
+	OperationPortainerTagCreate               Authorization = "PortainerTagCreate"
+	OperationPortainerTagDelete               Authorization = "PortainerTagDelete"
+	OperationPortainerTeamMembershipList      Authorization = "PortainerTeamMembershipList"
+	OperationPortainerTeamMembershipCreate    Authorization = "PortainerTeamMembershipCreate"
+	OperationPortainerTeamMembershipUpdate    Authorization = "PortainerTeamMembershipUpdate"
+	OperationPortainerTeamMembershipDelete    Authorization = "PortainerTeamMembershipDelete"
+	OperationPortainerTeamList                Authorization = "PortainerTeamList"
+	OperationPortainerTeamInspect             Authorization = "PortainerTeamInspect"
+	OperationPortainerTeamMemberships         Authorization = "PortainerTeamMemberships"
+	OperationPortainerTeamCreate              Authorization = "PortainerTeamCreate"
+	OperationPortainerTeamUpdate              Authorization = "PortainerTeamUpdate"
+	OperationPortainerTeamDelete              Authorization = "PortainerTeamDelete"
+	OperationPortainerTemplateList            Authorization = "PortainerTemplateList"
+	OperationPortainerTemplateInspect         Authorization = "PortainerTemplateInspect"
+	OperationPortainerTemplateCreate          Authorization = "PortainerTemplateCreate"
+	OperationPortainerTemplateUpdate          Authorization = "PortainerTemplateUpdate"
+	OperationPortainerTemplateDelete          Authorization = "PortainerTemplateDelete"
+	OperationPortainerUploadTLS               Authorization = "PortainerUploadTLS"
+	OperationPortainerUserList                Authorization = "PortainerUserList"
+	OperationPortainerUserInspect             Authorization = "PortainerUserInspect"
+	OperationPortainerUserMemberships         Authorization = "PortainerUserMemberships"
+	OperationPortainerUserCreate              Authorization = "PortainerUserCreate"
+	OperationPortainerUserUpdate              Authorization = "PortainerUserUpdate"
+	OperationPortainerUserUpdatePassword      Authorization = "PortainerUserUpdatePassword"
+	OperationPortainerUserDelete              Authorization = "PortainerUserDelete"
+	OperationPortainerWebsocketExec           Authorization = "PortainerWebsocketExec"
+	OperationPortainerWebhookList             Authorization = "PortainerWebhookList"
+	OperationPortainerWebhookCreate           Authorization = "PortainerWebhookCreate"
+	OperationPortainerWebhookDelete           Authorization = "PortainerWebhookDelete"
 
-	// TODO: generics, should be reviewed
-	// if we keep these ones, should it have a particular value?
-	OperationDockerContainers    Authorization = "DockerContainer"
-	OperationDockerImages        Authorization = "DockerImages"
-	OperationDockerNetworks      Authorization = "DockerNetworks"
-	OperationDockerVolumes       Authorization = "DockerVolumes"
-	OperationDockerExec          Authorization = "DockerExec"
-	OperationDockerSwarm         Authorization = "DockerSwarm"
-	OperationDockerNodes         Authorization = "DockerNodes"
-	OperationDockerServices      Authorization = "DockerServices"
-	OperationDockerSecrets       Authorization = "DockerSecrets"
-	OperationDockerConfigs       Authorization = "DockerConfigs"
-	OperationDockerTasks         Authorization = "DockerTasks"
-	OperationDockerPlugins       Authorization = "DockerPlugins"
-	OperationDockerSessions      Authorization = "DockerSessions"
-	OperationDockerDistributions Authorization = "DockerDistributions"
-	OperationDockerCommit        Authorization = "DockerCommit"
-	OperationDockerBuilds        Authorization = "DockerBuilds"
-	OperationPortainerAdmin      Authorization = "PortainerAdmin"
+	OperationDockerUndefined    Authorization = "DockerUndefined"
+	OperationPortainerUndefined Authorization = "PortainerUndefined"
 
-	// TODO: authorization to access all resources inside an environment (rename?)
-	AccessEnvironment Authorization = "EnvironmentAccess"
-	// TODO: support AccessEndpoint to access all endpoints?
-	// Should probably be removed now that we're leveraging the Admin property
-	AdministratorAccess Authorization = "AdministratorAccess"
+	EndpointResourcesAccess Authorization = "EndpointResourcesAccess"
 )
