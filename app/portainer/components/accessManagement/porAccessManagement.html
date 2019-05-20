@@ -9,12 +9,10 @@
               Select user(s) and/or team(s)
             </label>
             <div class="col-sm-9 col-lg-4">
-              <span class="small text-muted" ng-if="ctrl.accesses.length === 0">
-                You have not yet created any user or team. Head over the <a ui-sref="portainer.users">users view</a> to
-                manage
-                users, and to <a ui-sref="portainer.users">teams view</a> to manage teams.
+              <span class="small text-muted" ng-if="ctrl.availableUsersAndTeams.length === 0">
+                No user nor team available.
               </span>
-              <span isteven-multi-select ng-if="ctrl.accesses.length > 0" input-model="ctrl.accesses"
+              <span isteven-multi-select ng-if="ctrl.availableUsersAndTeams.length > 0" input-model="ctrl.availableUsersAndTeams"
                 output-model="ctrl.formValues.multiselectOutput" button-label="icon '-' Name" item-label="icon '-' Name"
                 tick-property="ticked" helper-elements="filter" search-property="Name"
                 translation="{nothingSelected: 'Select one or more users and/or teams', search: 'Search...'}">
@@ -22,19 +20,14 @@
             </div>
           </div>
 
-          <div class="form-group">
+          <div class="form-group" ng-if="ctrl.entityType !== 'registry'">
             <label class="col-sm-3 col-lg-2 control-label text-left">
               Role
             </label>
             <div class="col-sm-9 col-lg-4">
-              <ui-select ng-model="ctrl.formValues.selectedRole" ng-if="ctrl.rbacEnabled" search-enabled="false">
-                <ui-select-match placeholder="Select a role">
-                  <span>{{ $select.selected.Name }}</span>
-                </ui-select-match>
-                <ui-select-choices repeat="role in (ctrl.roles | filter: $select.search)">
-                  <span>{{ role.Name }}</span>
-                </ui-select-choices>
-              </ui-select>
+              <select ng-if="ctrl.rbacEnabled" class="form-control" ng-model="ctrl.formValues.selectedRole"
+                ng-options="role.Nmae fo role in ctrl.roles">
+              </select>
               <span class="small text-muted" ng-if="!ctrl.rbacEnabled">
                   The <a ui-sref="portainer.extensions.extension({id: 3})">RBAC extension</a> is required to select a specific role.
               </span>
@@ -60,7 +53,7 @@
 </div>
 <div class="row">
   <div class="col-sm-12">
-    <access-datatable title-text="Access" title-icon="fa-user-lock" dataset="ctrl.authorizedAccesses" table-key="{{ 'access_' + ctrl.entityType}}"
+    <access-datatable title-text="Access" title-icon="fa-user-lock" dataset="ctrl.authorizedUsersAndTeams" table-key="{{ 'access_' + ctrl.entityType}}"
       order-by="Name" rbac-enabled="ctrl.rbacEnabled" remove-action="ctrl.unauthorizeAccess" inherit-from="ctrl.inheritFrom"></access-datatable>
   </div>
 </div>

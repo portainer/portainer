@@ -11,6 +11,8 @@ export function EndpointGroupModel(data) {
   this.Tags = data.Tags;
   this.AuthorizedUsers = data.AuthorizedUsers;
   this.AuthorizedTeams = data.AuthorizedTeams;
+  this.UserAccessPolicies = data.UserAccessPolicies;
+  this.TeamAccessPolicies = data.TeamAccessPolicies;
 }
 
 export function EndpointGroupCreateRequest(model, endpoints) {

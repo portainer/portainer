@@ -2,8 +2,8 @@ angular.module('portainer.app')
 .controller('GroupAccessController', ['$scope', '$state', '$transition$', 'GroupService', 'Notifications',
 function ($scope, $state, $transition$, GroupService, Notifications) {
 
-  $scope.updateAccess = function(authorizedUsers, authorizedTeams) {
-    GroupService.updateAccess($transition$.params().id, authorizedUsers, authorizedTeams)
+  $scope.updateAccess = function(userAccessPolicies, teamAccessPolicies) {
+    GroupService.updateAccess($transition$.params().id, userAccessPolicies, teamAccessPolicies)
     .then(() => {
       Notifications.success("Accesses successfully updated");
       $state.reload();

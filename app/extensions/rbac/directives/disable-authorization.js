@@ -1,8 +1,14 @@
 angular.module('portainer.extensions.rbac')
-  .directive('disableAuthorization', ['Authentication', function(Authentication) {
+  .directive('disableAuthorization', ['Authentication', 'ExtensionService', function(Authentication, ExtensionService) {
     return {
       restrict: 'A',
-      link: function (scope, elem, attrs) {
+      link: async function (scope, elem, attrs) {
+
+        const rbacEnabled = await ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.RBAC);
+        if (!rbacEnabled) {
+          elem.show();
+          return;
+        }
 
         var authorizations = attrs.disableAuthorization.split(",");
         for (var i = 0; i < authorizations.length; i++) {

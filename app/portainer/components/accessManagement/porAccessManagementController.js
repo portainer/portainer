@@ -13,97 +13,30 @@ class PorAccessManagementController {
     this.unauthorizeAccess = this.unauthorizeAccess.bind(this);
   }
 
-  _dispatchUserAndTeamIDs(accesses, users, teams) {
-    angular.forEach(accesses, function(access) {
-      if (access.Type === "user" && !access.Inherited) {
-        users.push(access.Id);
-      } else if (access.Type === "team" && !access.Inherited) {
-        teams.push(access.Id);
-      }
-    });
-  }
-
-  _processAuthorizedIDs(accesses, authorizedAccesses) {
-    var authorizedUserIDs = [];
-    var authorizedTeamIDs = [];
-    if (accesses) {
-      this._dispatchUserAndTeamIDs(
-        accesses,
-        authorizedUserIDs,
-        authorizedTeamIDs
-      );
-    }
-    if (authorizedAccesses) {
-      this._dispatchUserAndTeamIDs(
-        authorizedAccesses,
-        authorizedUserIDs,
-        authorizedTeamIDs
-      );
-    }
-    return {
-      userIDs: authorizedUserIDs,
-      teamIDs: authorizedTeamIDs
-    };
-  }
-
-  _removeFromAccesses(access, accesses) {
-    _.remove(accesses, function(n) {
-      return n.Id === access.Id && n.Type === access.Type;
-    });
-  }
-
-  _removeFromAccessIDs(accessId, accessIDs) {
-    _.remove(accessIDs, function(n) {
-      return n === accessId;
-    });
-  }
-
   authorizeAccess() {
-    // TODO: review
-    var accessData = this._processAuthorizedIDs(null, this.authorizedAccesses);
-    var authorizedUserIDs = accessData.userIDs;
-    var authorizedTeamIDs = accessData.teamIDs;
-    var accessRole = this.formValues.selectedRole;
-
-    for (const access of this.formValues.multiselectOutput) {
-      if (this.rbacEnabled) {
-        access.Role = this.formValues.selectedRole.Name;
-      }
-      if (access.Type === "user") {
-        authorizedUserIDs.push(access.Id);
-      } else if (access.Type === "team") {
-        authorizedTeamIDs.push(access.Id);
-      }
-    }
-
-    var accesses = {
-      userAccesses: authorizedUserIDs,
-      teamAccesses: authorizedTeamIDs,
-    };
-
-    if (accessRole) {
-      accesses.role = accessRole.Id
-    }
-
-    this.updateAccess(accesses);
+    const entity = this.accessControlledEntity;
+    const oldUserAccessPolicies = entity && entity.UserAccessPolicies ? entity.UserAccessPolicies : {};
+    const oldTeamAccessPolicies = entity && entity.TeamAccessPolicies ? entity.TeamAccessPolicies : {};
+    const selectedRole = this.rbacEnabled ? this.formValues.selectedRole.Id : 0;
+    const selectedUserAccesses = _.filter(this.formValues.multiselectOutput, (access) => access.Type === "user");
+    const selectedTeamAccesses = _.filter(this.formValues.multiselectOutput, (access) => access.Type === "team");
+    const accessPolicies = this.AccessService.generateAccessPolicies(oldUserAccessPolicies, oldTeamAccessPolicies, selectedUserAccesses, selectedTeamAccesses, selectedRole);
+    this.updateAccess(accessPolicies);
   }
 
   unauthorizeAccess(selectedAccesses) {
-    var accessData = this._processAuthorizedIDs(null, this.authorizedAccesses);
-    var authorizedUserIDs = accessData.userIDs;
-    var authorizedTeamIDs = accessData.teamIDs;
-
-    for (const access of selectedAccesses) {
-      if (access.Type === "user") {
-        this._removeFromAccessIDs(access.Id, authorizedUserIDs);
-      } else if (access.Type === "team") {
-        this._removeFromAccessIDs(access.Id, authorizedTeamIDs);
-      }
+    const entity = this.accessControlledEntity;
+    const userAccessPolicies = entity && entity.UserAccessPolicies ? entity.UserAccessPolicies : {};
+    const teamAccessPolicies = entity && entity.TeamAccessPolicies ? entity.TeamAccessPolicies : {};
+    const selectedUserAccesses = _.filter(selectedAccesses, (access) => access.Type === "user");
+    const selectedTeamAccesses = _.filter(selectedAccesses, (access) => access.Type === "team");
+    _.forEach(selectedUserAccesses, (access) => delete userAccessPolicies[access.Id]);
+    _.forEach(selectedTeamAccesses, (access) => delete teamAccessPolicies[access.Id]);
+    const accessPolicies = {
+      userAccessPolicies: userAccessPolicies,
+      teamAccessPolicies: teamAccessPolicies
     }
-    this.updateAccess({
-      userAccesses: authorizedUserIDs,
-      teamAccesses: authorizedTeamIDs
-    });
+    this.updateAccess(accessPolicies);
   }
 
   async $onInit() {
@@ -122,17 +55,17 @@ class PorAccessManagementController {
         };
       }
       const data = await this.AccessService.accesses(
-        entity.UserAccessPolicies,
-        entity.TeamAccessPolicies,
-        parent ? parent.AuthorizedUsers : [],
-        parent ? parent.AuthorizedTeams : [],
+        entity && entity.UserAccessPolicies ? entity.UserAccessPolicies : {},
+        entity && entity.TeamAccessPolicies ? entity.TeamAccessPolicies : {},
+        parent && parent.UserAccessPolicies ? parent.UserAccessPolicies : {},
+        parent && parent.TeamAccessPolicies ? parent.TeamAccessPolicies : {},
         this.roles
       );
-      this.accesses = data.accesses;
-      this.authorizedAccesses = data.authorizedAccesses;
+      this.availableUsersAndTeams = data.availableUsersAndTeams;
+      this.authorizedUsersAndTeams = data.authorizedUsersAndTeams;
     } catch (err) {
-      this.accesses = [];
-      this.authorizedAccesses = [];
+      this.availableUsersAndTeams = [];
+      this.authorizedUsersAndTeams = [];
       this.Notifications.error("Failure", err, "Unable to retrieve accesses");
     }
   }

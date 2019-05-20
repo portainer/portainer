@@ -44,8 +44,8 @@ angular.module('portainer.app')
     return btoa(JSON.stringify(credentials));
   };
 
-  service.updateAccess = function(id, authorizedUserIDs, authorizedTeamIDs) {
-    return Registries.updateAccess({id: id}, {authorizedUsers: authorizedUserIDs, authorizedTeams: authorizedTeamIDs}).$promise;
+  service.updateAccess = function(id, userAccessPolicies, teamAccessPolicies) {
+    return Registries.updateAccess({id: id}, {UserAccessPolicies: userAccessPolicies, TeamAccessPolicies: teamAccessPolicies}).$promise;
   };
 
   service.deleteRegistry = function(id) {

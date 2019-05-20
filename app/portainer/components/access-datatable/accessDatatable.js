@@ -1,6 +1,6 @@
 angular.module('portainer.app').component('accessDatatable', {
   templateUrl: './accessDatatable.html',
-  controller: 'GenericDatatableController',
+  controller: 'AccessDatatableController',
   bindings: {
     titleText: '@',
     titleIcon: '@',

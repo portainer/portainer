@@ -39,8 +39,8 @@ function GroupService($q, EndpointGroups) {
     return EndpointGroups.update(payload).$promise;
   };
 
-  service.updateAccess = function(groupId, authorizedUserIDs, authorizedTeamIDs) {
-    return EndpointGroups.updateAccess({ id: groupId }, { authorizedUsers: authorizedUserIDs, authorizedTeams: authorizedTeamIDs }).$promise;
+  service.updateAccess = function(groupId, userAccessPolicies, teamAccessPolicies) {
+    return EndpointGroups.updateAccess({ id: groupId }, {UserAccessPolicies: userAccessPolicies, TeamAccessPolicies: teamAccessPolicies}).$promise;
   };
 
   service.deleteGroup = function(groupId) {
