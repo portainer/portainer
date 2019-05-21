@@ -14,6 +14,8 @@ type endpointGroupUpdatePayload struct {
 	Description         string
 	AssociatedEndpoints []portainer.EndpointID
 	Tags                []string
+	UserAccessPolicies  portainer.UserAccessPolicies
+	TeamAccessPolicies  portainer.TeamAccessPolicies
 }
 
 func (payload *endpointGroupUpdatePayload) Validate(r *http.Request) error {
@@ -50,6 +52,14 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 
 	if payload.Tags != nil {
 		endpointGroup.Tags = payload.Tags
+	}
+
+	if payload.UserAccessPolicies != nil {
+		endpointGroup.UserAccessPolicies = payload.UserAccessPolicies
+	}
+
+	if payload.TeamAccessPolicies != nil {
+		endpointGroup.TeamAccessPolicies = payload.TeamAccessPolicies
 	}
 
 	err = handler.EndpointGroupService.UpdateEndpointGroup(endpointGroup.ID, endpointGroup)

@@ -53,7 +53,6 @@
       <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'portainer.users' || $state.current.name === 'portainer.users.user' || $state.current.name === 'portainer.teams' || $state.current.name === 'portainer.teams.team' || $state.current.name === 'portainer.roles' || $state.current.name === 'portainer.roles.role' || $state.current.name === 'portainer.roles.new')">
         <a ui-sref="portainer.teams" ui-sref-active="active">Teams</a>
       </div>
-      <!-- TODO: enable only on extension enabled -->
       <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'portainer.users' || $state.current.name === 'portainer.users.user' || $state.current.name === 'portainer.teams' || $state.current.name === 'portainer.teams.team' || $state.current.name === 'portainer.roles' || $state.current.name === 'portainer.roles.role' || $state.current.name === 'portainer.roles.new')">
         <a ui-sref="portainer.roles" ui-sref-active="active">Roles</a>
       </div>

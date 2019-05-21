@@ -10,22 +10,11 @@ import (
 )
 
 type endpointGroupUpdateAccessPayload struct {
-	AuthorizedUsers []int
-	AuthorizedTeams []int
-}
-
-func (payload *endpointGroupUpdateAccessPayload) Validate(r *http.Request) error {
-	return nil
-}
-
-// TODO: remove this endpoint and use
-// endpointUpdate operation directly from frontend?
-type endpointGroupUpdateAccessPayload2 struct {
 	UserAccessPolicies portainer.UserAccessPolicies
 	TeamAccessPolicies portainer.TeamAccessPolicies
 }
 
-func (payload *endpointGroupUpdateAccessPayload2) Validate(r *http.Request) error {
+func (payload *endpointGroupUpdateAccessPayload) Validate(r *http.Request) error {
 	return nil
 }
 
@@ -36,7 +25,7 @@ func (handler *Handler) endpointGroupUpdateAccess(w http.ResponseWriter, r *http
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint group identifier route variable", err}
 	}
 
-	var payload endpointGroupUpdateAccessPayload2
+	var payload endpointGroupUpdateAccessPayload
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
@@ -51,22 +40,6 @@ func (handler *Handler) endpointGroupUpdateAccess(w http.ResponseWriter, r *http
 
 	endpointGroup.UserAccessPolicies = payload.UserAccessPolicies
 	endpointGroup.TeamAccessPolicies = payload.TeamAccessPolicies
-	// TODO: review
-	//if payload.AuthorizedUsers != nil {
-	//	userAccessPolicies := make(portainer.UserAccessPolicies)
-	//	for _, value := range payload.AuthorizedUsers {
-	//		userAccessPolicies[portainer.UserID(value)] = portainer.AccessPolicy{}
-	//	}
-	//	endpointGroup.UserAccessPolicies = userAccessPolicies
-	//}
-	//
-	//if payload.AuthorizedTeams != nil {
-	//	teamAccessPolicies := make(portainer.TeamAccessPolicies)
-	//	for _, value := range payload.AuthorizedTeams {
-	//		teamAccessPolicies[portainer.TeamID(value)] = portainer.AccessPolicy{}
-	//	}
-	//	endpointGroup.TeamAccessPolicies = teamAccessPolicies
-	//}
 
 	err = handler.EndpointGroupService.UpdateEndpointGroup(endpointGroup.ID, endpointGroup)
 	if err != nil {

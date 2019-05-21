@@ -9,23 +9,14 @@ import (
 	"github.com/portainer/portainer/api"
 )
 
+//TODO: remove this API endpoint
+
 type registryUpdateAccessPayload struct {
-	AuthorizedUsers []int
-	AuthorizedTeams []int
-}
-
-func (payload *registryUpdateAccessPayload) Validate(r *http.Request) error {
-	return nil
-}
-
-// TODO: remove this endpoint and use
-// endpointUpdate operation directly from frontend?
-type registryUpdateAccessPayload2 struct {
 	UserAccessPolicies portainer.UserAccessPolicies
 	TeamAccessPolicies portainer.TeamAccessPolicies
 }
 
-func (payload *registryUpdateAccessPayload2) Validate(r *http.Request) error {
+func (payload *registryUpdateAccessPayload) Validate(r *http.Request) error {
 	return nil
 }
 
@@ -36,7 +27,7 @@ func (handler *Handler) registryUpdateAccess(w http.ResponseWriter, r *http.Requ
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid registry identifier route variable", err}
 	}
 
-	var payload registryUpdateAccessPayload2
+	var payload registryUpdateAccessPayload
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
@@ -51,22 +42,6 @@ func (handler *Handler) registryUpdateAccess(w http.ResponseWriter, r *http.Requ
 
 	registry.UserAccessPolicies = payload.UserAccessPolicies
 	registry.TeamAccessPolicies = payload.TeamAccessPolicies
-	// TODO: review
-	//if payload.AuthorizedUsers != nil {
-	//	userAccessPolicies := make(portainer.UserAccessPolicies)
-	//	for _, value := range payload.AuthorizedUsers {
-	//		userAccessPolicies[portainer.UserID(value)] = portainer.AccessPolicy{}
-	//	}
-	//	registry.UserAccessPolicies = userAccessPolicies
-	//}
-	//
-	//if payload.AuthorizedTeams != nil {
-	//	teamAccessPolicies := make(portainer.TeamAccessPolicies)
-	//	for _, value := range payload.AuthorizedTeams {
-	//		teamAccessPolicies[portainer.TeamID(value)] = portainer.AccessPolicy{}
-	//	}
-	//	registry.TeamAccessPolicies = teamAccessPolicies
-	//}
 
 	err = handler.RegistryService.UpdateRegistry(registry.ID, registry)
 	if err != nil {
