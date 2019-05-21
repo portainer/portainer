@@ -7,7 +7,14 @@ angular.module('portainer.app')
   'use strict';
   var service = {};
 
-  function mapAccessData(accesses, authorizedPolicies, inheritedPolicies, roles) {
+  function _getRole(roles, roleId) {
+    if (roles.length) {
+      const role = _.find(roles, (role) => role.Id === roleId);
+      return role ? role : { Id: 0, Name: "-" };
+    }
+  }
+
+  function _mapAccessData(accesses, authorizedPolicies, inheritedPolicies, roles) {
     var availableAccesses = [];
     var authorizedAccesses = [];
 
@@ -16,25 +23,20 @@ angular.module('portainer.app')
 
       const authorized = authorizedPolicies && authorizedPolicies[access.Id];
       const inherited = inheritedPolicies && inheritedPolicies[access.Id];
-      if (authorized) {
-        let access = _.clone(accesses[i]);
-        if (roles.length) {
-          const role = _.find(roles, (role) => role.Id === authorizedPolicies[access.Id].RoleId);
-          access.Role = role ? role : { Id: 0, Name: "-" };
-        }
+
+      if (authorized && inherited) {
+        access.Role = _getRole(roles, authorizedPolicies[access.Id].RoleId);
+        access.Override = true;
         authorizedAccesses.push(access);
-      }
-      if (inherited) {
-        let access = _.clone(accesses[i]);
-        if (roles.length) {
-          const role = _.find(roles, (role) => role.Id === inheritedPolicies[access.Id].RoleId);
-          access.Role = role ? role : { Id: 0, Name: "-" };
-        }
+      } else if (authorized && !inherited) {
+        access.Role = _getRole(roles, authorizedPolicies[access.Id].RoleId);
+        authorizedAccesses.push(access);
+      } else if (!authorized && inherited) {
+        access.Role = _getRole(roles, inheritedPolicies[access.Id].RoleId);
         access.Inherited = true;
         authorizedAccesses.push(access);
-      }
-      if (!authorized && !inherited) {
-        let access = _.clone(accesses[i]);
+        availableAccesses.push(access);
+      } else {
         availableAccesses.push(access);
       }
     }
@@ -60,8 +62,8 @@ angular.module('portainer.app')
         return new TeamAccessViewModel(team);
       });
 
-      var userAccessData = mapAccessData(userAccesses, authorizedUserPolicies, inheritedUserPolicies, roles);
-      var teamAccessData = mapAccessData(teamAccesses, authorizedTeamPolicies, inheritedTeamPolicies, roles);
+      var userAccessData = _mapAccessData(userAccesses, authorizedUserPolicies, inheritedUserPolicies, roles);
+      var teamAccessData = _mapAccessData(teamAccesses, authorizedTeamPolicies, inheritedTeamPolicies, roles);
 
       var accessData = {
         availableUsersAndTeams: userAccessData.available.concat(teamAccessData.available),
