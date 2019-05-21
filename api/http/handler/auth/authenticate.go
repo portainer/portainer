@@ -185,45 +185,53 @@ func (handler *Handler) getAuthorizations(user *portainer.User) (portainer.Endpo
 
 	for _, endpoint := range endpoints {
 		var roleIdentifiers []portainer.RoleID
+		override := false
 
-		// potential user override
-		// should be checked first and break for optimization
-		// then check teams if no override found
+		// user access on endpoint
 		policy, ok := endpoint.UserAccessPolicies[user.ID]
 		if ok {
 			roleIdentifiers = append(roleIdentifiers, policy.RoleID)
+			override = true
 		}
 
-		// if no roles on user level, check at group level
-		if len(groupUserAccessPolicies[endpoint.GroupID]) > 0 {
+		// user access on group
+		if !override {
 			policy, ok := groupUserAccessPolicies[endpoint.GroupID][user.ID]
 			if ok {
 				roleIdentifiers = append(roleIdentifiers, policy.RoleID)
+				override = true
 			}
-			// break if found?
 		}
 
-		if len(groupTeamAccessPolicies[endpoint.GroupID]) > 0 {
-			for _, membership := range userMemberships {
-				policy, ok := groupTeamAccessPolicies[endpoint.GroupID][membership.TeamID]
-				if ok {
-					// endpointAccess
-					// Potential multiple team access
-					roleIdentifiers = append(roleIdentifiers, policy.RoleID)
-				}
-			}
-			// break if found?
-		}
-
-		// if no roles on user level nor group level, check at team level
-		if len(roleIdentifiers) == 0 {
+		// team access on endpoint
+		// // if multiple teams, intersect
+		if !override {
+			// Potential multiple team access
 			for _, membership := range userMemberships {
 				policy, ok := endpoint.TeamAccessPolicies[membership.TeamID]
 				if ok {
-					// endpointAccess
-					// Potential multiple team access
 					roleIdentifiers = append(roleIdentifiers, policy.RoleID)
 				}
+			}
+
+			if len(roleIdentifiers) > 0 {
+				override = true
+			}
+		}
+
+		// team access on group
+		// // if multiple teams, intersect
+		if !override {
+			// Potential multiple team access
+			for _, membership := range userMemberships {
+				policy, ok := groupTeamAccessPolicies[endpoint.GroupID][membership.TeamID]
+				if ok {
+					roleIdentifiers = append(roleIdentifiers, policy.RoleID)
+				}
+			}
+
+			if len(roleIdentifiers) > 0 {
+				override = true
 			}
 		}
 
