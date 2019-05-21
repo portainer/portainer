@@ -25,5 +25,6 @@
   </div>
 </div>
 
-<por-access-management ng-if="group" access-controlled-entity="group" entity-type="group" update-access="updateAccess(userAccessPolicies, teamAccessPolicies)"
+<por-access-management ng-if="group" access-controlled-entity="group" entity-type="group" action-in-progress="state.actionInProgress"
+  update-access="updateAccess(userAccessPolicies, teamAccessPolicies)"
 ></por-access-management>

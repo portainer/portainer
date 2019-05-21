@@ -38,6 +38,6 @@
   </div>
 </div>
 
-<por-access-management ng-if="ctrl.endpoint && ctrl.group" access-controlled-entity="ctrl.endpoint"
+<por-access-management ng-if="ctrl.endpoint && ctrl.group" access-controlled-entity="ctrl.endpoint" action-in-progress="ctrl.state.actionInProgress"
   entity-type="endpoint" inherit-from="ctrl.group" update-access="ctrl.updateAccess(userAccessPolicies, teamAccessPolicies)">
 </por-access-management>

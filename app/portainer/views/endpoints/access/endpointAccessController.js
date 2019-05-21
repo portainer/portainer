@@ -11,6 +11,7 @@ class EndpointAccessController {
   }
 
   async $onInit() {
+    this.state = {actionInProgress: false};
     try {
       this.endpoint = await this.EndpointService.endpoint(
         this.$transition$.params().id
@@ -23,6 +24,7 @@ class EndpointAccessController {
 
   async updateAccess(userAccessPolicies, teamAccessPolicies) {
     try {
+      this.state.actionInProgress = true;
       await this.EndpointService.updateAccess(
         this.$transition$.params().id,
         userAccessPolicies,
@@ -31,6 +33,7 @@ class EndpointAccessController {
       this.Notifications.success("Accesses successfully updated");
       this.$state.reload();
     } catch (err) {
+      this.state.actionInProgress = false;
       this.Notifications.error("Failure", err, "Unable to update accesses");
     }
   }

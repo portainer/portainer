@@ -1,6 +1,6 @@
 <div class="row">
   <div class="col-sm-12">
-    <rd-widget>
+    <rd-widget ng-if="ctrl.availableUsersAndTeams">
       <rd-widget-header icon="fa-user-lock" title-text="Create access"></rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
@@ -37,8 +37,8 @@
           <!-- actions -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="submit" class="btn btn-primary btn-sm" ng-disabled="ctrl.state.actionInProgress"
-                ng-click="ctrl.authorizeAccess()" button-spinner="ctrl.state.actionInProgress">
+              <button type="submit" class="btn btn-primary btn-sm" ng-disabled="(ctrl.availableUsersAndTeams | filter:{ticked:true}).length === 0 || ctrl.actionInProgress"
+                ng-click="ctrl.authorizeAccess()" button-spinner="ctrl.actionInProgress">
                 <span ng-hide="ctrl.state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Create
                   access</span>
                 <span ng-show="ctrl.state.actionInProgress">Creating access...</span>
@@ -53,7 +53,7 @@
 </div>
 <div class="row">
   <div class="col-sm-12">
-    <access-datatable title-text="Access" title-icon="fa-user-lock" dataset="ctrl.authorizedUsersAndTeams" table-key="{{ 'access_' + ctrl.entityType}}"
+    <access-datatable ng-if="ctrl.authorizedUsersAndTeams" title-text="Access" title-icon="fa-user-lock" dataset="ctrl.authorizedUsersAndTeams" table-key="{{ 'access_' + ctrl.entityType}}"
       order-by="Name" rbac-enabled="ctrl.rbacEnabled && ctrl.entityType !== 'registry'" remove-action="ctrl.unauthorizeAccess" inherit-from="ctrl.inheritFrom"></access-datatable>
   </div>
 </div>

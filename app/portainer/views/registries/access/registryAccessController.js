@@ -3,15 +3,20 @@ angular.module('portainer.app')
 function ($scope, $state, $transition$, RegistryService, Notifications) {
 
   $scope.updateAccess = function(userAccessPolicies, teamAccessPolicies) {
+    $scope.state.actionInProgress = true;
     RegistryService.updateAccess($transition$.params().id, userAccessPolicies, teamAccessPolicies)
     .then(() => {
       Notifications.success("Accesses successfully updated");
       $state.reload();
     })
-    .catch((err) => Notifications.error("Failure", err, "Unable to update accesses"));
+    .catch((err) => {
+      $scope.state.actionInProgress = false;
+      Notifications.error("Failure", err, "Unable to update accesses");
+    });
   };
 
   function initView() {
+    $scope.state = {actionInProgress: false};
     RegistryService.registry($transition$.params().id)
     .then(function success(data) {
       $scope.registry = data;

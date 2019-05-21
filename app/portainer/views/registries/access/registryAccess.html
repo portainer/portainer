@@ -31,5 +31,6 @@
   </div>
 </div>
 
-<por-access-management ng-if="registry" access-controlled-entity="registry" entity-type="registry" update-access="updateAccess(userAccessPolicies, teamAccessPolicies)">
+<por-access-management ng-if="registry" access-controlled-entity="registry" entity-type="registry" action-in-progress="state.actionInProgress"
+  update-access="updateAccess(userAccessPolicies, teamAccessPolicies)">
 </por-access-management>
