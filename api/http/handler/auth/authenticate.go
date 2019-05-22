@@ -127,7 +127,6 @@ func (handler *Handler) writeToken(w http.ResponseWriter, user *portainer.User) 
 	if err == portainer.ErrObjectNotFound {
 		return handler.persistAndWriteToken(w, tokenData)
 	} else if err != nil {
-		//httperror.WriteError(w, http.StatusInternalServerError, "", err)
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a extension with the specified identifier inside the database", err}
 	}
 
@@ -140,22 +139,8 @@ func (handler *Handler) writeToken(w http.ResponseWriter, user *portainer.User) 
 	return handler.persistAndWriteToken(w, tokenData)
 }
 
-// TODO: relocate this code?
-// Use elispsis via ... ? a,b,c,d... unlimited authorizations parameters
-func intersection(a, b portainer.Authorizations) portainer.Authorizations {
-	c := make(map[portainer.Authorization]bool)
-
-	for k := range b {
-		if _, ok := a[k]; ok {
-			c[k] = true
-		}
-	}
-	return c
-}
-
 func (handler *Handler) getAuthorizations(user *portainer.User) (portainer.EndpointAuthorizations, error) {
-	endpointAuthorizations := make(portainer.EndpointAuthorizations)
-
+	endpointAuthorizations := portainer.EndpointAuthorizations{}
 	if user.Role == portainer.AdministratorRole {
 		return endpointAuthorizations, nil
 	}
@@ -170,104 +155,19 @@ func (handler *Handler) getAuthorizations(user *portainer.User) (portainer.Endpo
 		return endpointAuthorizations, err
 	}
 
-	// TODO: refactor/cleanup
 	endpointGroups, err := handler.EndpointGroupService.EndpointGroups()
 	if err != nil {
 		return endpointAuthorizations, err
 	}
 
-	groupUserAccessPolicies := map[portainer.EndpointGroupID]portainer.UserAccessPolicies{}
-	groupTeamAccessPolicies := map[portainer.EndpointGroupID]portainer.TeamAccessPolicies{}
-	for _, endpointGroup := range endpointGroups {
-		groupUserAccessPolicies[endpointGroup.ID] = endpointGroup.UserAccessPolicies
-		groupTeamAccessPolicies[endpointGroup.ID] = endpointGroup.TeamAccessPolicies
+	roles, err := handler.RoleService.Roles()
+	if err != nil {
+		return endpointAuthorizations, err
 	}
 
-	for _, endpoint := range endpoints {
-		var roleIdentifiers []portainer.RoleID
-		override := false
-
-		// user access on endpoint
-		policy, ok := endpoint.UserAccessPolicies[user.ID]
-		if ok {
-			roleIdentifiers = append(roleIdentifiers, policy.RoleID)
-			override = true
-		}
-
-		// user access on group
-		if !override {
-			policy, ok := groupUserAccessPolicies[endpoint.GroupID][user.ID]
-			if ok {
-				roleIdentifiers = append(roleIdentifiers, policy.RoleID)
-				override = true
-			}
-		}
-
-		// team access on endpoint
-		// // if multiple teams, intersect
-		if !override {
-			// Potential multiple team access
-			for _, membership := range userMemberships {
-				policy, ok := endpoint.TeamAccessPolicies[membership.TeamID]
-				if ok {
-					roleIdentifiers = append(roleIdentifiers, policy.RoleID)
-				}
-			}
-
-			if len(roleIdentifiers) > 0 {
-				override = true
-			}
-		}
-
-		// team access on group
-		// // if multiple teams, intersect
-		if !override {
-			// Potential multiple team access
-			for _, membership := range userMemberships {
-				policy, ok := groupTeamAccessPolicies[endpoint.GroupID][membership.TeamID]
-				if ok {
-					roleIdentifiers = append(roleIdentifiers, policy.RoleID)
-				}
-			}
-
-			if len(roleIdentifiers) > 0 {
-				override = true
-			}
-		}
-
-		authorizations, err := handler.getEndpointAuthorizations(roleIdentifiers)
-		if err != nil {
-			return endpointAuthorizations, err
-		}
-		endpointAuthorizations[endpoint.ID] = authorizations
-	}
+	endpointAuthorizations = getUserEndpointAuthorizations(user, endpoints, endpointGroups, roles, userMemberships)
 
 	return endpointAuthorizations, nil
-}
-
-func (handler *Handler) getEndpointAuthorizations(roleIdentifiers []portainer.RoleID) (portainer.Authorizations, error) {
-	var roleAuthorizations []portainer.Authorizations
-	for _, id := range roleIdentifiers {
-		role, err := handler.RoleService.Role(portainer.RoleID(id))
-		if err != nil {
-			return nil, err
-		}
-
-		roleAuthorizations = append(roleAuthorizations, role.Authorizations)
-	}
-
-	var processedAuthorizations portainer.Authorizations
-	if len(roleAuthorizations) > 0 {
-		processedAuthorizations = roleAuthorizations[0]
-		for idx, authorizations := range roleAuthorizations {
-			if idx == 0 {
-				continue
-			}
-			processedAuthorizations = intersection(processedAuthorizations, authorizations)
-		}
-	}
-
-	return processedAuthorizations, nil
 }
 
 func (handler *Handler) persistAndWriteToken(w http.ResponseWriter, tokenData *portainer.TokenData) *httperror.HandlerError {
