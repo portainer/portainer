@@ -70,55 +70,10 @@ func (handler *Handler) extensionCreate(w http.ResponseWriter, r *http.Request) 
 
 	extension.Enabled = true
 
-	// TODO: refactor/cleanup
 	if extension.ID == portainer.RBACExtension {
-		endpointGroups, err := handler.EndpointGroupService.EndpointGroups()
+		err = handler.upgradeRBACData()
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint groups from the database", err}
-		}
-
-		for _, endpointGroup := range endpointGroups {
-			for key := range endpointGroup.UserAccessPolicies {
-				tmp := endpointGroup.UserAccessPolicies[key]
-				tmp.RoleID = 4
-				endpointGroup.UserAccessPolicies[key] = tmp
-			}
-
-			for key := range endpointGroup.TeamAccessPolicies {
-				tmp := endpointGroup.TeamAccessPolicies[key]
-				tmp.RoleID = 4
-				endpointGroup.TeamAccessPolicies[key] = tmp
-			}
-
-			err := handler.EndpointGroupService.UpdateEndpointGroup(endpointGroup.ID, &endpointGroup)
-			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint group access policies", err}
-			}
-
-		}
-
-		endpoints, err := handler.EndpointService.Endpoints()
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
-		}
-
-		for _, endpoint := range endpoints {
-			for key := range endpoint.UserAccessPolicies {
-				tmp := endpoint.UserAccessPolicies[key]
-				tmp.RoleID = 4
-				endpoint.UserAccessPolicies[key] = tmp
-			}
-
-			for key := range endpoint.TeamAccessPolicies {
-				tmp := endpoint.TeamAccessPolicies[key]
-				tmp.RoleID = 4
-				endpoint.TeamAccessPolicies[key] = tmp
-			}
-
-			err := handler.EndpointService.UpdateEndpoint(endpoint.ID, &endpoint)
-			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint access policies", err}
-			}
+			return &httperror.HandlerError{http.StatusInternalServerError, "An error occured during database update", err}
 		}
 	}
 

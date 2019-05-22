@@ -6,7 +6,7 @@ function ($scope, $state, $transition$, GroupService, Notifications) {
     $scope.state.actionInProgress = true;
     GroupService.updateGroup($scope.group, $scope.group.AssociatedEndpoints)
     .then(() => {
-      Notifications.success("Accesses successfully updated");
+      Notifications.success("Access successfully updated");
       $state.reload();
     })
     .catch((err) => {

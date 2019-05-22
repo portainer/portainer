@@ -6,7 +6,7 @@ function ($scope, $state, $transition$, RegistryService, Notifications) {
     $scope.state.actionInProgress = true;
     RegistryService.updateRegistry($scope.registry)
     .then(() => {
-      Notifications.success("Accesses successfully updated");
+      Notifications.success("Access successfully updated");
       $state.reload();
     })
     .catch((err) => {
