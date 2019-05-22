@@ -2,7 +2,7 @@ import _ from 'lodash-es';
 import { ExtensionViewModel } from '../../models/extension';
 
 angular.module('portainer.app')
-.factory('ExtensionService', ['$q', 'Extension', function ExtensionServiceFactory($q, Extension) {
+.factory('ExtensionService', ['$q', 'Extension', 'StateManager', function ExtensionServiceFactory($q, Extension, StateManager) {
   'use strict';
   var service = {};
 
@@ -57,18 +57,13 @@ angular.module('portainer.app')
   };
 
   service.extensionEnabled = function(extensionId) {
-    var deferred = $q.defer();
+    return StateManager.getExtension(extensionId) ? true : false;
+  };
 
-    service.extensions(false)
-    .then(function onSuccess(extensions) {
-      var extensionAvailable = _.find(extensions, { Id: extensionId, Enabled: true }) ? true : false;
-      deferred.resolve(extensionAvailable);
-    })
-    .catch(function onError(err) {
-      deferred.reject(err);
-    });
-
-    return deferred.promise;
+  service.retrieveAndSaveEnabledExtensions = async function() {
+    const extensions = await service.extensions(false);
+    _.forEach(extensions, (ext) => delete ext.License);
+    StateManager.saveExtensions(extensions);
   };
 
   return service;
