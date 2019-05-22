@@ -16,49 +16,65 @@ class PorAccessManagementController {
 
   updateAction() {
     const entity = this.accessControlledEntity;
-    const oldUserAccessPolicies = entity && entity.UserAccessPolicies ? entity.UserAccessPolicies : {};
-    const oldTeamAccessPolicies = entity && entity.TeamAccessPolicies ? entity.TeamAccessPolicies : {};
+    const oldUserAccessPolicies = entity.UserAccessPolicies;
+    const oldTeamAccessPolicies = entity.TeamAccessPolicies;
     const updatedUserAccesses = _.filter(this.authorizedUsersAndTeams, {Updated: true, Type: 'user', Inherited: false});
     const updatedTeamAccesses = _.filter(this.authorizedUsersAndTeams, {Updated: true, Type: 'team', Inherited: false});
+
     const accessPolicies = this.AccessService.generateAccessPolicies(oldUserAccessPolicies, oldTeamAccessPolicies, updatedUserAccesses, updatedTeamAccesses);
-    this.updateAccess(accessPolicies);
+    this.accessControlledEntity.UserAccessPolicies = accessPolicies.userAccessPolicies;
+    this.accessControlledEntity.TeamAccessPolicies = accessPolicies.teamAccessPolicies;
+    this.updateAccess();
   }
 
   authorizeAccess() {
     const entity = this.accessControlledEntity;
-    const oldUserAccessPolicies = entity && entity.UserAccessPolicies ? entity.UserAccessPolicies : {};
-    const oldTeamAccessPolicies = entity && entity.TeamAccessPolicies ? entity.TeamAccessPolicies : {};
+    const oldUserAccessPolicies = entity.UserAccessPolicies;
+    const oldTeamAccessPolicies = entity.TeamAccessPolicies;
     const selectedRoleId = this.rbacEnabled ? this.formValues.selectedRole.Id : 0;
     const selectedUserAccesses = _.filter(this.formValues.multiselectOutput, (access) => access.Type === "user");
     const selectedTeamAccesses = _.filter(this.formValues.multiselectOutput, (access) => access.Type === "team");
+
     const accessPolicies = this.AccessService.generateAccessPolicies(oldUserAccessPolicies, oldTeamAccessPolicies, selectedUserAccesses, selectedTeamAccesses, selectedRoleId);
-    this.updateAccess(accessPolicies);
+    this.accessControlledEntity.UserAccessPolicies = accessPolicies.userAccessPolicies;
+    this.accessControlledEntity.TeamAccessPolicies = accessPolicies.teamAccessPolicies;
+    this.updateAccess();
   }
 
   unauthorizeAccess(selectedAccesses) {
     const entity = this.accessControlledEntity;
-    const userAccessPolicies = entity && entity.UserAccessPolicies ? entity.UserAccessPolicies : {};
-    const teamAccessPolicies = entity && entity.TeamAccessPolicies ? entity.TeamAccessPolicies : {};
+    const userAccessPolicies = entity.UserAccessPolicies;
+    const teamAccessPolicies = entity.TeamAccessPolicies;
     const selectedUserAccesses = _.filter(selectedAccesses, (access) => access.Type === "user");
     const selectedTeamAccesses = _.filter(selectedAccesses, (access) => access.Type === "team");
     _.forEach(selectedUserAccesses, (access) => delete userAccessPolicies[access.Id]);
     _.forEach(selectedTeamAccesses, (access) => delete teamAccessPolicies[access.Id]);
-    const accessPolicies = {
-      userAccessPolicies: userAccessPolicies,
-      teamAccessPolicies: teamAccessPolicies
-    }
-    this.updateAccess(accessPolicies);
+    this.updateAccess();
   }
 
   async $onInit() {
     const entity = this.accessControlledEntity;
+    if (!entity) {
+      this.Notifications.error("Failure", "Unable to retrieve accesses");
+      return;
+    }
+    if (!entity.UserAccessPolicies) {
+      entity.UserAccessPolicies = {}
+    }
+    if (!entity.TeamAccessPolicies) {
+      entity.TeamAccessPolicies = {};
+    }
     const parent = this.inheritFrom;
+    if (parent && !parent.UserAccessPolicies) {
+      parent.UserAccessPolicies = {}
+    }
+    if (parent && !parent.TeamAccessPolicies) {
+      parent.TeamAccessPolicies = {};
+    }
     this.roles = [];
     this.rbacEnabled = false;
     try {
-      this.rbacEnabled = await this.ExtensionService.extensionEnabled(
-        this.ExtensionService.EXTENSIONS.RBAC
-      );
+      this.rbacEnabled = await this.ExtensionService.extensionEnabled(this.ExtensionService.EXTENSIONS.RBAC);
       if (this.rbacEnabled) {
         this.roles = await this.RoleService.roles();
         this.formValues = {
@@ -66,10 +82,10 @@ class PorAccessManagementController {
         };
       }
       const data = await this.AccessService.accesses(
-        entity && entity.UserAccessPolicies ? entity.UserAccessPolicies : {},
-        entity && entity.TeamAccessPolicies ? entity.TeamAccessPolicies : {},
-        parent && parent.UserAccessPolicies ? parent.UserAccessPolicies : {},
-        parent && parent.TeamAccessPolicies ? parent.TeamAccessPolicies : {},
+        entity.UserAccessPolicies,
+        entity.TeamAccessPolicies,
+        parent ? parent.UserAccessPolicies : {},
+        parent ? parent.TeamAccessPolicies : {},
         this.roles
       );
       this.availableUsersAndTeams = data.availableUsersAndTeams;
