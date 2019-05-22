@@ -29,8 +29,6 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AdministratorAccess(httperror.LoggerHandler(h.endpointGroupInspect))).Methods(http.MethodGet)
 	h.Handle("/endpoint_groups/{id}",
 		bouncer.AdministratorAccess(httperror.LoggerHandler(h.endpointGroupUpdate))).Methods(http.MethodPut)
-	h.Handle("/endpoint_groups/{id}/access",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.endpointGroupUpdateAccess))).Methods(http.MethodPut)
 	h.Handle("/endpoint_groups/{id}",
 		bouncer.AdministratorAccess(httperror.LoggerHandler(h.endpointGroupDelete))).Methods(http.MethodDelete)
 

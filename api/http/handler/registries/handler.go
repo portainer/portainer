@@ -40,8 +40,6 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.registryInspect))).Methods(http.MethodGet)
 	h.Handle("/registries/{id}",
 		bouncer.AdministratorAccess(httperror.LoggerHandler(h.registryUpdate))).Methods(http.MethodPut)
-	h.Handle("/registries/{id}/access",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.registryUpdateAccess))).Methods(http.MethodPut)
 	h.Handle("/registries/{id}/configure",
 		bouncer.AdministratorAccess(httperror.LoggerHandler(h.registryConfigure))).Methods(http.MethodPost)
 	h.Handle("/registries/{id}",
