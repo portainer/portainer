@@ -8,6 +8,7 @@ class EndpointAccessController {
     this.Notifications = Notifications;
     this.EndpointService = EndpointService;
     this.GroupService = GroupService;
+    this.updateAccess = this.updateAccess.bind(this);
   }
 
   async $onInit() {
@@ -22,14 +23,10 @@ class EndpointAccessController {
     }
   }
 
-  async updateAccess(userAccessPolicies, teamAccessPolicies) {
+  async updateAccess() {
     try {
       this.state.actionInProgress = true;
-      await this.EndpointService.updateAccess(
-        this.$transition$.params().id,
-        userAccessPolicies,
-        teamAccessPolicies
-      );
+      await this.EndpointService.updateEndpoint(this.$transition$.params().id, this.endpoint);
       this.Notifications.success("Accesses successfully updated");
       this.$state.reload();
     } catch (err) {

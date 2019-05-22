@@ -5,9 +5,11 @@ angular.module('portainer.app').component('accessDatatable', {
     titleText: '@',
     titleIcon: '@',
     dataset: '<',
+    roles: '<',
     tableKey: '@',
     orderBy: '@',
     removeAction: '<',
+    updateAction: '<',
     reverseOrder: '<',
     rbacEnabled: '<',
     inheritFrom: '<'

@@ -11,16 +11,27 @@ class PorAccessManagementController {
     this.RoleService = RoleService;
     
     this.unauthorizeAccess = this.unauthorizeAccess.bind(this);
+    this.updateAction = this.updateAction.bind(this);
+  }
+
+  updateAction() {
+    const entity = this.accessControlledEntity;
+    const oldUserAccessPolicies = entity && entity.UserAccessPolicies ? entity.UserAccessPolicies : {};
+    const oldTeamAccessPolicies = entity && entity.TeamAccessPolicies ? entity.TeamAccessPolicies : {};
+    const updatedUserAccesses = _.filter(this.authorizedUsersAndTeams, {Updated: true, Type: 'user', Inherited: false});
+    const updatedTeamAccesses = _.filter(this.authorizedUsersAndTeams, {Updated: true, Type: 'team', Inherited: false});
+    const accessPolicies = this.AccessService.generateAccessPolicies(oldUserAccessPolicies, oldTeamAccessPolicies, updatedUserAccesses, updatedTeamAccesses);
+    this.updateAccess(accessPolicies);
   }
 
   authorizeAccess() {
     const entity = this.accessControlledEntity;
     const oldUserAccessPolicies = entity && entity.UserAccessPolicies ? entity.UserAccessPolicies : {};
     const oldTeamAccessPolicies = entity && entity.TeamAccessPolicies ? entity.TeamAccessPolicies : {};
-    const selectedRole = this.rbacEnabled ? this.formValues.selectedRole.Id : 0;
+    const selectedRoleId = this.rbacEnabled ? this.formValues.selectedRole.Id : 0;
     const selectedUserAccesses = _.filter(this.formValues.multiselectOutput, (access) => access.Type === "user");
     const selectedTeamAccesses = _.filter(this.formValues.multiselectOutput, (access) => access.Type === "team");
-    const accessPolicies = this.AccessService.generateAccessPolicies(oldUserAccessPolicies, oldTeamAccessPolicies, selectedUserAccesses, selectedTeamAccesses, selectedRole);
+    const accessPolicies = this.AccessService.generateAccessPolicies(oldUserAccessPolicies, oldTeamAccessPolicies, selectedUserAccesses, selectedTeamAccesses, selectedRoleId);
     this.updateAccess(accessPolicies);
   }
 

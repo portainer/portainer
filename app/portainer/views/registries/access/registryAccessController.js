@@ -2,9 +2,9 @@ angular.module('portainer.app')
 .controller('RegistryAccessController', ['$scope', '$state', '$transition$', 'RegistryService', 'Notifications',
 function ($scope, $state, $transition$, RegistryService, Notifications) {
 
-  $scope.updateAccess = function(userAccessPolicies, teamAccessPolicies) {
+  $scope.updateAccess = function() {
     $scope.state.actionInProgress = true;
-    RegistryService.updateAccess($transition$.params().id, userAccessPolicies, teamAccessPolicies)
+    RegistryService.updateRegistry($scope.registry)
     .then(() => {
       Notifications.success("Accesses successfully updated");
       $state.reload();

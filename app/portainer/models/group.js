@@ -28,4 +28,6 @@ export function EndpointGroupUpdateRequest(model, endpoints) {
   this.Description = model.Description;
   this.Tags = model.Tags;
   this.AssociatedEndpoints = endpoints;
+  this.UserAccessPolicies = model.UserAccessPolicies;
+  this.TeamAccessPolicies = model.TeamAccessPolicies;
 }

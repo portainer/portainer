@@ -80,10 +80,10 @@ angular.module('portainer.app')
   };
 
 
-  service.generateAccessPolicies = function(userAccessPolicies, teamAccessPolicies, selectedUserAccesses, selectedTeamAccesses, selectedRole) {
+  service.generateAccessPolicies = function(userAccessPolicies, teamAccessPolicies, selectedUserAccesses, selectedTeamAccesses, selectedRoleId) {
 
-    _.forEach(selectedUserAccesses, (access) => userAccessPolicies[access.Id] = {RoleId: selectedRole});
-    _.forEach(selectedTeamAccesses, (access) => teamAccessPolicies[access.Id] = {RoleId: selectedRole});
+    _.forEach(selectedUserAccesses, (access) => userAccessPolicies[access.Id] = {RoleId: selectedRoleId ? selectedRoleId : access.Role.Id});
+    _.forEach(selectedTeamAccesses, (access) => teamAccessPolicies[access.Id] = {RoleId: selectedRoleId ? selectedRoleId : access.Role.Id});
 
     const accessPolicies = {
       userAccessPolicies: userAccessPolicies,

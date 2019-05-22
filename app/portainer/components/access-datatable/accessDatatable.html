@@ -4,8 +4,8 @@
     </rd-widget-header>
     <rd-widget-body classes="no-padding">
       <div class="toolBar small" ng-if="$ctrl.inheritFrom">
-          Accesses tagged as <code>inherited</code> are inherited from the group accesses and cannot be
-          remove at the endpoint level.
+          Accesses tagged as <code>inherited</code> are inherited from the group accesses. They cannot be
+          removed nor modified at the endpoint level.
       </div>
       <div class="toolBar small" ng-if="$ctrl.inheritFrom">
         Accesses tagged as <code>override</code> are overriding the group accesses for the related users / teams.
@@ -14,6 +14,10 @@
         <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0"
           ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
+        </button>
+        <button ng-if="$ctrl.rbacEnabled" type="button" class="btn btn-sm btn-primary" ng-disabled="($ctrl.dataset | filter:{ Updated: true}).length === 0 "
+          ng-click="$ctrl.updateAction()">
+          <i class="fa fa-check space-right" aria-hidden="true"></i>Update
         </button>
       </div>
       <div class="searchBar">
@@ -76,7 +80,20 @@
                   style="font-size: 85% !important;">override</code></span>
               </td>
               <td>{{ item.Type }}</td>
-              <td ng-if="$ctrl.rbacEnabled">{{ item.Role.Name }}</td>
+              <td ng-if="$ctrl.rbacEnabled">
+                <span ng-if="!item.Updated">
+                  {{ item.Role.Name }}
+                  <a ng-if="!item.Inherited" class="interactive" ng-click="item.Updated = true; item.OldRole = item.Role; $event.stopPropagation();">
+                    <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                  </a>
+                </span>
+                <span ng-if="item.Updated">
+                  <select ng-model="item.Role"
+                    ng-options="role.Name for role in $ctrl.roles">
+                  </select>
+                  <a class="interactive" ng-click="item.Updated = false; item.Role = item.OldRole; item.OldRole = null; $event.stopPropagation();"><i class="fa fa-times"></i></a>
+                </span>
+              </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
               <td colspan="4" class="text-center text-muted">Loading...</td>
