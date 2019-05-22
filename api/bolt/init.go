@@ -11,12 +11,12 @@ func (store *Store) Init() error {
 
 	if len(groups) == 0 {
 		unassignedGroup := &portainer.EndpointGroup{
-			Name:            "Unassigned",
-			Description:     "Unassigned endpoints",
-			Labels:          []portainer.Pair{},
-			AuthorizedUsers: []portainer.UserID{},
-			AuthorizedTeams: []portainer.TeamID{},
-			Tags:            []string{},
+			Name:               "Unassigned",
+			Description:        "Unassigned endpoints",
+			Labels:             []portainer.Pair{},
+			UserAccessPolicies: portainer.UserAccessPolicies{},
+			TeamAccessPolicies: portainer.TeamAccessPolicies{},
+			Tags:               []string{},
 		}
 
 		err = store.EndpointGroupService.CreateEndpointGroup(unassignedGroup)
