@@ -1126,6 +1126,15 @@ const (
 	OperationDockerSystem                       Authorization = "DockerSystem"
 	OperationDockerVersion                      Authorization = "DockerVersion"
 
+	OperationDockerAgentPing         Authorization = "DockerAgentPing"
+	OperationDockerAgentList         Authorization = "DockerAgentList"
+	OperationDockerAgentHostInfo     Authorization = "DockerAgentHostInfo"
+	OperationDockerAgentBrowseDelete Authorization = "DockerAgentBrowseDelete"
+	OperationDockerAgentBrowseGet    Authorization = "DockerAgentBrowseGet"
+	OperationDockerAgentBrowseList   Authorization = "DockerAgentBrowseList"
+	OperationDockerAgentBrowsePut    Authorization = "DockerAgentBrowsePut"
+	OperationDockerAgentBrowseRename Authorization = "DockerAgentBrowseRename"
+
 	OperationPortainerDockerHubInspect        Authorization = "PortainerDockerHubInspect"
 	OperationPortainerDockerHubUpdate         Authorization = "PortainerDockerHubUpdate"
 	OperationPortainerEndpointGroupCreate     Authorization = "PortainerEndpointGroupCreate"
@@ -1214,8 +1223,9 @@ const (
 	OperationPortainerWebhookCreate           Authorization = "PortainerWebhookCreate"
 	OperationPortainerWebhookDelete           Authorization = "PortainerWebhookDelete"
 
-	OperationDockerUndefined    Authorization = "DockerUndefined"
-	OperationPortainerUndefined Authorization = "PortainerUndefined"
+	OperationDockerUndefined      Authorization = "DockerUndefined"
+	OperationDockerAgentUndefined Authorization = "DockerAgentUndefined"
+	OperationPortainerUndefined   Authorization = "PortainerUndefined"
 
 	EndpointResourcesAccess Authorization = "EndpointResourcesAccess"
 )
