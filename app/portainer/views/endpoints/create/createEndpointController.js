@@ -56,14 +56,14 @@ function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService,
     addEndpoint(name, 2, URL, publicURL, groupId, tags, true, true, true, null, null, null);
   };
 
-  $scope.addAgentIoTEndpoint = function() {
+  $scope.addAgentEdgeEndpoint = function() {
       var name = $scope.formValues.Name;
       var groupId = $scope.formValues.GroupId;
       var tags = $scope.formValues.Tags;
       var URL = window.location.hostname;
 
       addEndpoint(name, 4, URL, "", groupId, tags, false, false, false, null, null, null);
-  }
+  };
 
   $scope.addAzureEndpoint = function() {
     var name = $scope.formValues.Name;

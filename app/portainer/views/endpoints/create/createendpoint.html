@@ -37,13 +37,13 @@
                 </label>
               </div>
               <div>
-                <input type="radio" id="agent_iot_endpoint" ng-model="state.EnvironmentType" value="agent_iot">
-                <label for="agent_iot_endpoint">
+                <input type="radio" id="agent_edge_endpoint" ng-model="state.EnvironmentType" value="agent_edge">
+                <label for="agent_edge_endpoint">
                   <div class="boxselector_header">
-                    <i class="fa fa-bolt" aria-hidden="true" style="margin-right: 2px;"></i>
-                    Agent IoT
+                    <i class="fa fa-cloud" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Agent Edge
                   </div>
-                  <p>Portainer agent IoT</p>
+                  <p>Portainer agent Edge</p>
                 </label>
               </div>
               <div>
@@ -248,7 +248,7 @@
                 <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Add endpoint</span>
                 <span ng-show="state.actionInProgress">Creating endpoint...</span>
               </button>
-              <button ng-if="state.EnvironmentType === 'agent_iot'" type="submit" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !endpointCreationForm.$valid" ng-click="addAgentIoTEndpoint()" button-spinner="state.actionInProgress">
+              <button ng-if="state.EnvironmentType === 'agent_edge'" type="submit" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !endpointCreationForm.$valid" ng-click="addAgentEdgeEndpoint()" button-spinner="state.actionInProgress">
                 <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Add endpoint</span>
                 <span ng-show="state.actionInProgress">Creating endpoint...</span>
               </button>
