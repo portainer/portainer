@@ -58,6 +58,8 @@ function ($q, $scope, $state, $transition$, UserService, ModalService, Notificat
   }
 
   function initView() {
+    $scope.isAdmin = Authentication.isAdmin();
+
     $q.all({
       user: UserService.user($transition$.params().id),
       settings: SettingsService.publicSettings()
@@ -65,7 +67,7 @@ function ($q, $scope, $state, $transition$, UserService, ModalService, Notificat
     .then(function success(data) {
       var user = data.user;
       $scope.user = user;
-      $scope.formValues.Administrator = Authentication.isAdmin();
+      $scope.formValues.Administrator = user.Role === 1;
       $scope.AuthenticationMethod = data.settings.AuthenticationMethod;
     })
     .catch(function error(err) {
