@@ -5,14 +5,13 @@ import AccessViewerPolicyModel from '../../models/access'
 
 class AccessViewerController {
   /* @ngInject */
-  constructor(Notifications, ExtensionService, RoleService, UserService, EndpointService, GroupService, AccessService, TeamService, TeamMembershipService) {
+  constructor(Notifications, ExtensionService, RoleService, UserService, EndpointService, GroupService, TeamService, TeamMembershipService) {
     this.Notifications = Notifications;
     this.ExtensionService = ExtensionService;
     this.RoleService = RoleService;
     this.UserService = UserService;
     this.EndpointService = EndpointService;
     this.GroupService = GroupService;
-    this.AccessService = AccessService;
     this.TeamService = TeamService;
     this.TeamMembershipService = TeamMembershipService;
   }
@@ -44,13 +43,7 @@ class AccessViewerController {
 
       userRoles[endpoint.Id] = this.getRoleFromTeamEndpointGroupPolicies(userMemberships, endpoint);
     }
-
-    this.userRoles = _.map(_.toPairs(userRoles), ([id, role]) => {
-      role.EndpointId = id;
-      role.EndpointName = this.endpoints[id].Name;
-      role.RoleName = this.roles[role.RoleId].Name;
-      return role;
-    });
+    this.userRoles = _.values(userRoles);
   }
 
   findLowestRole(policies) {
