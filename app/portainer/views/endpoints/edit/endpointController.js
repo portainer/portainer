@@ -17,7 +17,7 @@ function ($q, $scope, $state, $transition$, $filter, clipboard, EndpointService,
     SecurityFormData: new EndpointSecurityFormData()
   };
 
-  $scope.copyAgentIoTCommand = function() {
+  $scope.copyAgentEdgeDeploymentCommand = function() {
     clipboard.copyText('docker run -d -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker/volumes:/var/lib/docker/volumes -v /:/host --restart always -e TUNNELLING_MODE=1 -e AGENT_SECRET=' + $scope.endpoint.IoTKey + ' -e CAP_HOST_MANAGEMENT=1 --name portainer_agent_iot portainer/pagent:intel');
     $('#copyNotification').show();
     $('#copyNotification').fadeOut(2000);

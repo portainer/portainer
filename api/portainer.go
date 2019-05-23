@@ -894,8 +894,8 @@ const (
 	AgentOnDockerEnvironment
 	// AzureEnvironment represents an endpoint connected to an Azure environment
 	AzureEnvironment
-	// AgentIoTEnvironment represents an endpoint connected to an agent using a tunnel
-	AgentIoTEnvironment
+	// AgentEdgeEnvironment represents an endpoint connected to an Edge agent
+	AgentEdgeEnvironment
 )
 
 const (

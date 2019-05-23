@@ -13,10 +13,18 @@
         Deploy an agent on your remote Docker environment using the following command to enable this endpoint:
       </p>
      <div style="margin-top: 10px;">
-       <code>
-         docker run -d -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker/volumes:/var/lib/docker/volumes -v /:/host --restart always -e TUNNELLING_MODE=1 -e AGENT_SECRET={{ endpoint.IoTKey }} -e CAP_HOST_MANAGEMENT=1 --name portainer_agent_iot portainer/pagent:intel
+       <code style=display:block;white-space:pre-wrap>
+         docker run -d -v /var/run/docker.sock:/var/run/docker.sock \
+         -v /var/lib/docker/volumes:/var/lib/docker/volumes \
+         -v /:/host \
+         --restart always \
+         -e TUNNELLING_MODE=1 \
+         -e AGENT_SECRET={{ endpoint.IoTKey }} \
+         -e CAP_HOST_MANAGEMENT=1 \
+         --name portainer_agent_edge \
+         portainer/pagent:edge
        </code>
-       <span class="btn btn-primary btn-sm space-left" ng-click="copyAgentIoTCommand()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy</span>
+       <span style="margin-top: 10px;" class="btn btn-primary btn-sm" ng-click="copyAgentEdgeDeploymentCommand()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy command</span>
        <span>
          <i id="copyNotification" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none;"></i>
        </span>

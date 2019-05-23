@@ -2,11 +2,11 @@ package endpoints
 
 import (
 	"encoding/base64"
-	"strings"
 	"log"
 	"net/http"
 	"runtime"
 	"strconv"
+	"strings"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -151,7 +151,7 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 func (handler *Handler) createEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
 	if portainer.EndpointType(payload.EndpointType) == portainer.AzureEnvironment {
 		return handler.createAzureEndpoint(payload)
-	} else if portainer.EndpointType(payload.EndpointType) == portainer.AgentIoTEnvironment {
+	} else if portainer.EndpointType(payload.EndpointType) == portainer.AgentEdgeEnvironment {
 		return handler.createAgentIoTEndpoint(payload)
 	}
 
@@ -200,7 +200,7 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 }
 
 func (handler *Handler) createAgentIoTEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
-	endpointType := portainer.AgentIoTEnvironment
+	endpointType := portainer.AgentEdgeEnvironment
 	endpointID := handler.EndpointService.GetNextIdentifier()
 
 	iotKey := base64.RawStdEncoding.EncodeToString([]byte(strings.TrimPrefix(payload.URL, "tcp://") + ":9999:7777:random_secret"))
@@ -212,7 +212,7 @@ func (handler *Handler) createAgentIoTEndpoint(payload *endpointCreatePayload) (
 		Type:    endpointType,
 		GroupID: portainer.EndpointGroupID(payload.GroupID),
 		TLSConfig: portainer.TLSConfiguration{
-			TLS:           false,
+			TLS: false,
 		},
 		AuthorizedUsers: []portainer.UserID{},
 		AuthorizedTeams: []portainer.TeamID{},
