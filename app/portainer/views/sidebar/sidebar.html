@@ -42,7 +42,7 @@
     <li class="sidebar-list" ng-if="(!applicationState.application.authentication || isAdmin) && applicationState.application.enableHostManagementFeatures">
       <a ui-sref="portainer.schedules" ui-sref-active="active">Host jobs <span class="menu-icon fa fa-clock fa-fw"></span></a>
     </li>
-    <li class="sidebar-title" ng-if="!applicationState.application.authentication">
+    <li class="sidebar-title">
       <span>Settings</span>
     </li>
     <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
@@ -66,7 +66,7 @@
         <a ui-sref="portainer.tags" ui-sref-active="active">Tags</a>
       </div>
     </li>
-    <li class="sidebar-list" ng-if="applicationState.application.authentication">
+    <li class="sidebar-list">
       <a ui-sref="portainer.registries" ui-sref-active="active">Registries <span class="menu-icon fa fa-database fa-fw"></span></a>
     </li>
     <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
