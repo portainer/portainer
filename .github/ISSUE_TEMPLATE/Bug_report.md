@@ -8,7 +8,9 @@ about: Create a bug report
 
 Thanks for reporting a bug for Portainer !
 
-Do you need help or have a question? Come chat with us on Slack http://portainer.io/slack/ or gitter https://gitter.im/portainer/Lobby.
+You can find more information about Portainer support framework policy here: https://www.portainer.io/2019/04/portainer-support-policy/
+
+Do you need help or have a question? Come chat with us on Slack http://portainer.io/slack/.
 
 Before opening a new issue, make sure that we do not have any duplicates
 already open. You can ensure this by searching the issue list for this
