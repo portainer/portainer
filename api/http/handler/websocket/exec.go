@@ -1,31 +1,19 @@
 package websocket
 
 import (
-	"bufio"
 	"bytes"
-	"crypto/tls"
 	"encoding/json"
-	"fmt"
 	"net"
 	"net/http"
 	"net/http/httputil"
-	"net/url"
 	"time"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/gorilla/websocket"
-	"github.com/koding/websocketproxy"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/crypto"
 )
-
-type webSocketExecRequestParams struct {
-	execID   string
-	nodeName string
-	endpoint *portainer.Endpoint
-}
 
 type execStartOperationPayload struct {
 	Tty    bool
@@ -63,13 +51,13 @@ func (handler *Handler) websocketExec(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", portainer.ErrEndpointAccessDenied}
 	}
 
-	params := &webSocketExecRequestParams{
+	params := &webSocketRequestParams{
 		endpoint: endpoint,
-		execID:   execID,
+		ID:       execID,
 		nodeName: r.FormValue("nodeName"),
 	}
 
-	err = handler.handleRequest(w, r, params)
+	err = handler.handleExecRequest(w, r, params)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "An error occured during websocket exec operation", err}
 	}
@@ -77,7 +65,7 @@ func (handler *Handler) websocketExec(w http.ResponseWriter, r *http.Request) *h
 	return nil
 }
 
-func (handler *Handler) handleRequest(w http.ResponseWriter, r *http.Request, params *webSocketExecRequestParams) error {
+func (handler *Handler) handleExecRequest(w http.ResponseWriter, r *http.Request, params *webSocketRequestParams) error {
 	r.Header.Del("Origin")
 
 	if params.nodeName != "" || (params.endpoint.Type == portainer.AgentOnDockerEnvironment || params.endpoint.Type == portainer.AgentIoTEnvironment) {
@@ -90,41 +78,7 @@ func (handler *Handler) handleRequest(w http.ResponseWriter, r *http.Request, pa
 	}
 	defer websocketConn.Close()
 
-	return hijackExecStartOperation(websocketConn, params.endpoint, params.execID)
-}
-
-func (handler *Handler) proxyWebsocketRequest(w http.ResponseWriter, r *http.Request, params *webSocketExecRequestParams) error {
-	agentURL, err := url.Parse(params.endpoint.URL)
-	if err != nil {
-		return err
-	}
-
-	agentURL.Scheme = "ws"
-	proxy := websocketproxy.NewProxy(agentURL)
-
-	if params.endpoint.TLSConfig.TLS || params.endpoint.TLSConfig.TLSSkipVerify {
-		agentURL.Scheme = "wss"
-		proxy.Dialer = &websocket.Dialer{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: params.endpoint.TLSConfig.TLSSkipVerify,
-			},
-		}
-	}
-
-	signature, err := handler.SignatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
-	if err != nil {
-		return err
-	}
-
-	proxy.Director = func(incoming *http.Request, out http.Header) {
-		out.Set(portainer.PortainerAgentPublicKeyHeader, handler.SignatureService.EncodedPublicKey())
-		out.Set(portainer.PortainerAgentSignatureHeader, signature)
-		out.Set(portainer.PortainerAgentTargetHeader, params.nodeName)
-	}
-
-	proxy.ServeHTTP(w, r)
-
-	return nil
+	return hijackExecStartOperation(websocketConn, params.endpoint, params.ID)
 }
 
 func hijackExecStartOperation(websocketConn *websocket.Conn, endpoint *portainer.Endpoint, execID string) error {
@@ -159,30 +113,6 @@ func hijackExecStartOperation(websocketConn *websocket.Conn, endpoint *portainer
 	return nil
 }
 
-func initDial(endpoint *portainer.Endpoint) (net.Conn, error) {
-	url, err := url.Parse(endpoint.URL)
-	if err != nil {
-		return nil, err
-	}
-
-	host := url.Host
-
-	if url.Scheme == "unix" || url.Scheme == "npipe" {
-		host = url.Path
-	}
-
-	if endpoint.TLSConfig.TLS {
-		tlsConfig, err := crypto.CreateTLSConfigurationFromDisk(endpoint.TLSConfig.TLSCACertPath, endpoint.TLSConfig.TLSCertPath, endpoint.TLSConfig.TLSKeyPath, endpoint.TLSConfig.TLSSkipVerify)
-		if err != nil {
-			return nil, err
-		}
-
-		return tls.Dial(url.Scheme, host, tlsConfig)
-	}
-
-	return createDial(url.Scheme, host)
-}
-
 func createExecStartRequest(execID string) (*http.Request, error) {
 	execStartOperationPayload := &execStartOperationPayload{
 		Tty:    true,
@@ -205,65 +135,4 @@ func createExecStartRequest(execID string) (*http.Request, error) {
 	request.Header.Set("Upgrade", "tcp")
 
 	return request, nil
-}
-
-func hijackRequest(websocketConn *websocket.Conn, httpConn *httputil.ClientConn, request *http.Request) error {
-	// Server hijacks the connection, error 'connection closed' expected
-	resp, err := httpConn.Do(request)
-	if err != httputil.ErrPersistEOF {
-		if err != nil {
-			return err
-		}
-		if resp.StatusCode != http.StatusSwitchingProtocols {
-			resp.Body.Close()
-			return fmt.Errorf("unable to upgrade to tcp, received %d", resp.StatusCode)
-		}
-	}
-
-	tcpConn, brw := httpConn.Hijack()
-	defer tcpConn.Close()
-
-	errorChan := make(chan error, 1)
-	go streamFromTCPConnToWebsocketConn(websocketConn, brw, errorChan)
-	go streamFromWebsocketConnToTCPConn(websocketConn, tcpConn, errorChan)
-
-	err = <-errorChan
-	if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseNoStatusReceived) {
-		return err
-	}
-
-	return nil
-}
-
-func streamFromWebsocketConnToTCPConn(websocketConn *websocket.Conn, tcpConn net.Conn, errorChan chan error) {
-	for {
-		_, in, err := websocketConn.ReadMessage()
-		if err != nil {
-			errorChan <- err
-			break
-		}
-
-		_, err = tcpConn.Write(in)
-		if err != nil {
-			errorChan <- err
-			break
-		}
-	}
-}
-
-func streamFromTCPConnToWebsocketConn(websocketConn *websocket.Conn, br *bufio.Reader, errorChan chan error) {
-	for {
-		out := make([]byte, 2048)
-		_, err := br.Read(out)
-		if err != nil {
-			errorChan <- err
-			break
-		}
-
-		err = websocketConn.WriteMessage(websocket.TextMessage, out)
-		if err != nil {
-			errorChan <- err
-			break
-		}
-	}
 }
