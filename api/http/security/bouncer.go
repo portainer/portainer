@@ -67,7 +67,6 @@ func (bouncer *RequestBouncer) PublicAccess(h http.Handler) http.Handler {
 // AuthenticatedAccess defines a security check for private endpoints.
 // Authentication is required to access these endpoints.
 func (bouncer *RequestBouncer) AuthenticatedAccess(h http.Handler) http.Handler {
-	//h = bouncer.mwCheckAuthorizations(h)
 	h = bouncer.mwCheckAuthentication(h)
 	h = mwSecureHeaders(h)
 	return h
@@ -101,9 +100,11 @@ func (bouncer *RequestBouncer) AdministratorAccess(h http.Handler) http.Handler 
 
 // AuthorizedEndpointOperation retrieves the JWT token from the request context and verifies
 // that the user can access the specified endpoint.
-// An error is returned when access is denied.
-// If the RBAC extension is enabled, it will also validate that the user can execute the specified operation.
-func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endpoint *portainer.Endpoint) error {
+// If the RBAC extension is enabled and the authorizationCheck flag is set,
+// it will also validate that the user can execute the specified operation.
+// An error is returned when access to the endpoint is denied or if the user do not have the required
+// authorization to execute the operation.
+func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endpoint *portainer.Endpoint, authorizationCheck bool) error {
 	tokenData, err := RetrieveTokenData(r)
 	if err != nil {
 		return err
@@ -127,9 +128,11 @@ func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endp
 		return portainer.ErrEndpointAccessDenied
 	}
 
-	err = bouncer.checkEndpointOperationAuthorization(r, endpoint)
-	if err != nil {
-		return portainer.ErrAuthorizationRequired
+	if authorizationCheck {
+		err = bouncer.checkEndpointOperationAuthorization(r, endpoint)
+		if err != nil {
+			return portainer.ErrAuthorizationRequired
+		}
 	}
 
 	return nil
@@ -198,15 +201,6 @@ func mwSecureHeaders(next http.Handler) http.Handler {
 
 func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		extension, err := bouncer.extensionService.Extension(portainer.RBACExtension)
-		if err == portainer.ErrObjectNotFound {
-			next.ServeHTTP(w, r)
-			return
-		} else if err != nil {
-			httperror.WriteError(w, http.StatusInternalServerError, "Unable to find a extension with the specified identifier inside the database", err)
-			return
-		}
-
 		tokenData, err := RetrieveTokenData(r)
 		if err != nil {
 			httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrResourceAccessDenied)
@@ -215,6 +209,15 @@ func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler)
 
 		if tokenData.Role == portainer.AdministratorRole {
 			next.ServeHTTP(w, r)
+			return
+		}
+
+		extension, err := bouncer.extensionService.Extension(portainer.RBACExtension)
+		if err == portainer.ErrObjectNotFound {
+			next.ServeHTTP(w, r)
+			return
+		} else if err != nil {
+			httperror.WriteError(w, http.StatusInternalServerError, "Unable to find a extension with the specified identifier inside the database", err)
 			return
 		}
 
