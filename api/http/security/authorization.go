@@ -79,7 +79,7 @@ func AuthorizedResourceControlUpdate(resourceControl *portainer.ResourceControl,
 // * the Public flag is set false
 // * he wants to create a resource control without any user/team accesses
 // * he wants to add more than one user in the user accesses
-// * he wants tp add a user in the user accesses that is not corresponding to its id
+// * he wants to add a user in the user accesses that is not corresponding to its id
 // * he wants to add a team he is not a member of
 func AuthorizedResourceControlCreation(resourceControl *portainer.ResourceControl, context *RestrictedRequestContext) bool {
 	if context.IsAdmin || resourceControl.Public {

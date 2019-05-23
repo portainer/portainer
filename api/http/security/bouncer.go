@@ -57,44 +57,31 @@ func NewRequestBouncer(parameters *RequestBouncerParams) *RequestBouncer {
 	}
 }
 
-// PublicAccess defines a security check for public endpoints.
+// PublicAccess defines a security check for public API endpoints.
 // No authentication is required to access these endpoints.
 func (bouncer *RequestBouncer) PublicAccess(h http.Handler) http.Handler {
 	h = mwSecureHeaders(h)
 	return h
 }
 
-// AuthenticatedAccess defines a security check for private endpoints.
+// AuthorizedAccess defines a security check for API endpoints that require an authorization check.
 // Authentication is required to access these endpoints.
-func (bouncer *RequestBouncer) AuthenticatedAccess(h http.Handler) http.Handler {
-	h = bouncer.mwCheckAuthentication(h)
-	h = mwSecureHeaders(h)
-	return h
-}
-
-// TODO: document
+// If the RBAC extension is enabled, authorizations are required to use these endpoints.
+// If the RBAC extension is not enabled, the administrator role is required to use these endpoints.
 func (bouncer *RequestBouncer) AuthorizedAccess(h http.Handler) http.Handler {
-	h = bouncer.mwCheckPortainerAuthorizations(h)
 	h = bouncer.mwUpgradeToRestrictedRequest(h)
-	h = bouncer.AuthenticatedAccess(h)
+	h = bouncer.mwCheckPortainerAuthorizations(h)
+	h = bouncer.mwAuthenticatedUser(h)
 	return h
 }
 
-// RestrictedAccess defines a security check for restricted endpoints.
+// RestrictedAccess defines a security check for restricted API endpoints.
 // Authentication is required to access these endpoints.
 // The request context will be enhanced with a RestrictedRequestContext object
 // that might be used later to authorize/filter access to resources inside an endpoint.
 func (bouncer *RequestBouncer) RestrictedAccess(h http.Handler) http.Handler {
 	h = bouncer.mwUpgradeToRestrictedRequest(h)
-	h = bouncer.AuthenticatedAccess(h)
-	return h
-}
-
-// AdministratorAccess defines a chain of middleware for restricted endpoints.
-// Authentication as well as administrator role are required to access these endpoints.
-func (bouncer *RequestBouncer) AdministratorAccess(h http.Handler) http.Handler {
-	h = mwCheckAdministratorRole(h)
-	h = bouncer.AuthenticatedAccess(h)
+	h = bouncer.mwAuthenticatedUser(h)
 	return h
 }
 
@@ -139,13 +126,6 @@ func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endp
 }
 
 func (bouncer *RequestBouncer) checkEndpointOperationAuthorization(r *http.Request, endpoint *portainer.Endpoint) error {
-	extension, err := bouncer.extensionService.Extension(portainer.RBACExtension)
-	if err == portainer.ErrObjectNotFound {
-		return nil
-	} else if err != nil {
-		return err
-	}
-
 	tokenData, err := RetrieveTokenData(r)
 	if err != nil {
 		return err
@@ -153,6 +133,13 @@ func (bouncer *RequestBouncer) checkEndpointOperationAuthorization(r *http.Reque
 
 	if tokenData.Role == portainer.AdministratorRole {
 		return nil
+	}
+
+	extension, err := bouncer.extensionService.Extension(portainer.RBACExtension)
+	if err == portainer.ErrObjectNotFound {
+		return nil
+	} else if err != nil {
+		return err
 	}
 
 	apiOperation := &portainer.APIOperationAuthorizationRequest{
@@ -190,15 +177,15 @@ func (bouncer *RequestBouncer) RegistryAccess(r *http.Request, registry *portain
 	return nil
 }
 
-// mwSecureHeaders provides secure headers middleware for handlers.
-func mwSecureHeaders(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("X-XSS-Protection", "1; mode=block")
-		w.Header().Add("X-Content-Type-Options", "nosniff")
-		next.ServeHTTP(w, r)
-	})
+func (bouncer *RequestBouncer) mwAuthenticatedUser(h http.Handler) http.Handler {
+	h = bouncer.mwCheckAuthentication(h)
+	h = mwSecureHeaders(h)
+	return h
 }
 
+// mwCheckPortainerAuthorizations will verify that the user has the required authorization to access
+// a specific API endpoint. It will leverage the RBAC extension authorization validation if the extension
+// is enabled.
 func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tokenData, err := RetrieveTokenData(r)
@@ -259,19 +246,6 @@ func (bouncer *RequestBouncer) mwUpgradeToRestrictedRequest(next http.Handler) h
 	})
 }
 
-// mwCheckAdministratorRole check the role of the user associated to the request
-func mwCheckAdministratorRole(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		tokenData, err := RetrieveTokenData(r)
-		if err != nil || tokenData.Role != portainer.AdministratorRole {
-			httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrResourceAccessDenied)
-			return
-		}
-
-		next.ServeHTTP(w, r)
-	})
-}
-
 // mwCheckAuthentication provides Authentication middleware for handlers
 func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -319,6 +293,15 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 		ctx := storeTokenData(r, tokenData)
 		next.ServeHTTP(w, r.WithContext(ctx))
 		return
+	})
+}
+
+// mwSecureHeaders provides secure headers middleware for handlers.
+func mwSecureHeaders(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("X-XSS-Protection", "1; mode=block")
+		w.Header().Add("X-Content-Type-Options", "nosniff")
+		next.ServeHTTP(w, r)
 	})
 }
 

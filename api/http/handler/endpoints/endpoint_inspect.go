@@ -25,7 +25,7 @@ func (handler *Handler) endpointInspect(w http.ResponseWriter, r *http.Request) 
 
 	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint, false)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", portainer.ErrEndpointAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
 	}
 
 	hideFields(endpoint)

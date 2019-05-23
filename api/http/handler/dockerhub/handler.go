@@ -27,7 +27,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h.Handle("/dockerhub",
 		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.dockerhubInspect))).Methods(http.MethodGet)
 	h.Handle("/dockerhub",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.dockerhubUpdate))).Methods(http.MethodPut)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.dockerhubUpdate))).Methods(http.MethodPut)
 
 	return h
 }
