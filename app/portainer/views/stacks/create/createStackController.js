@@ -22,7 +22,8 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
     Method: 'editor',
     formValidationError: '',
     actionInProgress: false,
-    StackType: null
+    StackType: null,
+    stackNameAvailable: true
   };
 
   $scope.addEnvironmentVariable = function() {
@@ -135,12 +136,25 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
     $scope.formValues.StackFileContent = cm.getValue();
   };
 
+  $scope.onStackNameChange = function(name) {
+    $scope.state.stackNameAvailable = $scope.stackNames.indexOf(name) === -1;
+  };
+
   function initView() {
     var endpointMode = $scope.applicationState.endpoint.mode;
     $scope.state.StackType = 2;
     if (endpointMode.provider === 'DOCKER_SWARM_MODE' && endpointMode.role === 'MANAGER') {
       $scope.state.StackType = 1;
     }
+
+    StackService.stacks(true, true, 0)
+    .then(function success(data) {
+      $scope.stackNames = data.map(function(x) {return x.Name;} );
+    })
+    .catch(function error(err) {
+      $scope.stackNames = [];
+      Notifications.error('Failure', err, 'Unable to retrieve stacks');
+    });
   }
 
   initView();

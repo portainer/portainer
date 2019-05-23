@@ -9,7 +9,8 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
     showAdvancedOptions: false,
     formValidationError: '',
     actionInProgress: false,
-    templateManagement: true
+    templateManagement: true,
+    stackNameAvailable: true
   };
 
   $scope.formValues = {
@@ -48,6 +49,10 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
 
   $scope.removeLabel = function(index) {
     $scope.state.selectedTemplate.Labels.splice(index, 1);
+  };
+
+  $scope.onStackNameChange = function(name) {
+    $scope.state.stackNameAvailable = $scope.stackNames.indexOf(name) === -1;
   };
 
   function validateForm(accessControlData, isAdmin) {
@@ -241,8 +246,8 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
 
     var endpointMode = $scope.applicationState.endpoint.mode;
     var apiVersion = $scope.applicationState.endpoint.apiVersion;
-
-    $q.all({
+    
+     $q.all({
       templates: TemplateService.templates(),
       volumes: VolumeService.getVolumes(),
       networks: NetworkService.networks(
@@ -250,6 +255,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
         false,
         endpointMode.provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25
       ),
+      stacks: StackService.stacks(true, true, 0),
       settings: SettingsService.publicSettings()
     })
     .then(function success(data) {
@@ -261,9 +267,11 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
       var settings = data.settings;
       $scope.allowBindMounts = settings.AllowBindMountsForRegularUsers;
       $scope.state.templateManagement = !settings.ExternalTemplates;
+      $scope.stackNames = data.stacks.map(function(x) {return x.Name;});
     })
     .catch(function error(err) {
       $scope.templates = [];
+      $scope.stackNames = [];
       Notifications.error('Failure', err, 'An error occured during apps initialization.');
     });
   }

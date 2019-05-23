@@ -1,11 +1,12 @@
 angular.module('portainer.app').controller('StackDuplicationFormController', [
-  'Notifications',
-  function StackDuplicationFormController(Notifications) {
+  'Notifications', 'StackService',
+  function StackDuplicationFormController(Notifications, StackService) {
     var ctrl = this;
 
     ctrl.state = {
       duplicationInProgress: false,
-      migrationInProgress: false
+      migrationInProgress: false,
+      stackNameAvailable: true
     };
 
     ctrl.formValues = {
@@ -18,13 +19,17 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
     ctrl.duplicateStack = duplicateStack;
     ctrl.migrateStack = migrateStack;
     ctrl.isMigrationButtonDisabled = isMigrationButtonDisabled;
+    
+    ctrl.onStackNameChange = function(name) {
+      ctrl.state.stackNameAvailable = ctrl.stackNames.indexOf(name) === -1;
+    };
 
     function isFormValidForMigration() {
       return ctrl.formValues.endpoint && ctrl.formValues.endpoint.Id;
     }
 
     function isFormValidForDuplication() {
-      return isFormValidForMigration() && ctrl.formValues.newName;
+      return isFormValidForMigration() && ctrl.formValues.newName && ctrl.state.stackNameAvailable;
     }
 
     function duplicateStack() {
@@ -72,5 +77,18 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
         ctrl.formValues.endpoint.Id === ctrl.currentEndpointId
       );
     }
+
+    function initView() {
+      StackService.stacks(true, true, 0)
+      .then(function success(data) {
+        ctrl.stackNames = data.map(function(x) {return x.Name;});
+      })
+      .catch(function error(err) {
+        ctrl.stacks = [];
+        Notifications.error('Failure', err, 'Unable to retrieve stacks');
+      });
+    }
+  
+    initView();
   }
 ]);
