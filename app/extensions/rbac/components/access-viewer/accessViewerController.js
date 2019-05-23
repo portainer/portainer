@@ -41,8 +41,12 @@ class AccessViewerController {
         continue;
       }
 
-      userRoles[endpoint.Id] = this.getRoleFromTeamEndpointGroupPolicies(userMemberships, endpoint);
+      role = this.getRoleFromTeamEndpointGroupPolicies(userMemberships, endpoint);
+      if (role) {
+        userRoles[endpoint.Id] = role;
+      }
     }
+
     this.userRoles = _.values(userRoles);
   }
 
