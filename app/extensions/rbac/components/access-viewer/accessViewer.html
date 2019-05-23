@@ -1,0 +1,39 @@
+<div class="row">
+  <div class="col-sm-12" style="margin-bottom: 0px;">
+    <rd-widget ng-if="ctrl.users">
+      <rd-widget-header icon="fa-user-lock" title-text="Access viewer"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <div class="form-group">
+            <label class="col-sm-3 col-lg-2 control-label text-left">
+              Select a user
+            </label>
+            <div class="col-sm-9 col-lg-4">
+              <span class="small text-muted" ng-if="ctrl.users.length === 0">
+                No user available.
+              </span>
+              <ui-select ng-model="ctrl.selectedUser" ng-change="ctrl.onUserSelect()">
+                <ui-select-match placeholder="Select a user">
+                  <span>{{ $select.selected.Username }}</span>
+                </ui-select-match>
+                <ui-select-choices repeat="item in (ctrl.users | filter: $select.search)">
+                  <span>{{ item.Username }}</span>
+                </ui-select-choices>
+              </ui-select>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-12">
+    <access-viewer-datatable ng-if="ctrl.users"
+      table-key="access_viewer"
+      dataset="ctrl.userRoles"
+      order-by="EndpointName"
+      >
+    </access-viewer-datatable>
+  </div>
+</div>
