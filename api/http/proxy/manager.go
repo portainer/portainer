@@ -132,7 +132,7 @@ func (manager *Manager) CreateLegacyExtensionProxy(key, extensionAPIURL string) 
 	}
 
 	proxy := manager.proxyFactory.newHTTPProxy(extensionURL)
-	manager.extensionProxies.Set(key, proxy)
+	manager.legacyExtensionProxies.Set(key, proxy)
 	return proxy, nil
 }
 

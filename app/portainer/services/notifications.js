@@ -21,6 +21,8 @@ angular.module('portainer.app')
       msg = e.data.details;
     } else if (e.data && e.data.message) {
       msg = e.data.message;
+    } else if (e.data && e.data.content) {
+      msg = e.data.content;
     } else if (e.message) {
       msg = e.message;
     } else if (e.err && e.err.data && e.err.data.message) {

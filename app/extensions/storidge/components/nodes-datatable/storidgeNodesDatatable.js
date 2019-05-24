@@ -1,8 +1,8 @@
 angular.module('extension.storidge').component('storidgeNodesDatatable', {
   templateUrl: './storidgeNodesDatatable.html',
-  controller: 'GenericDatatableController',
+  controller: 'StoridgeNodesDatatableController',
   bindings: {
-    title: '@',
+    titleText: '@',
     titleIcon: '@',
     dataset: '<',
     tableKey: '@',

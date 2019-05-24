@@ -41,7 +41,7 @@ func (handler *Handler) proxyRequestsToStoridgeAPI(w http.ResponseWriter, r *htt
 		return &httperror.HandlerError{http.StatusServiceUnavailable, "Storidge extension not supported on this endpoint", portainer.ErrEndpointExtensionNotSupported}
 	}
 
-	proxyExtensionKey := string(endpoint.ID) + "_" + string(portainer.StoridgeEndpointExtension)
+	proxyExtensionKey := strconv.Itoa(endpointID) + "_" + strconv.Itoa(int(portainer.StoridgeEndpointExtension)) + "_" + storidgeExtension.URL
 
 	var proxy http.Handler
 	proxy = handler.ProxyManager.GetLegacyExtensionProxy(proxyExtensionKey)

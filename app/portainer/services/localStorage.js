@@ -60,10 +60,10 @@ angular.module('portainer.app')
       localStorageService.remove('JWT');
     },
     storePaginationLimit: function(key, count) {
-      localStorageService.cookie.set('pagination_' + key, count);
+      localStorageService.set('datatable_pagination_' + key, count);
     },
     getPaginationLimit: function(key) {
-      return localStorageService.cookie.get('pagination_' + key);
+      return localStorageService.get('datatable_pagination_' + key);
     },
     getDataTableOrder: function(key) {
       return localStorageService.get('datatable_order_' + key);
