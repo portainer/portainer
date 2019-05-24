@@ -60,7 +60,7 @@
               <td>Replicas</td>
               <td>
                 <span ng-if="service.Mode === 'replicated'">
-                  <input class="input-sm" type="number" ng-model="service.Replicas" ng-change="updateServiceAttribute(service, 'Replicas')" ng-disabled="isUpdating" />
+                  <input class="input-sm" type="number" ng-model="service.Replicas" ng-change="updateServiceAttribute(service, 'Replicas')" disable-authorization="DockerServiceUpdate" />
                 </span>
               </td>
             </tr>
@@ -68,7 +68,7 @@
               <td>Image</td>
               <td>
                   <input type="text" class="form-control" uib-typeahead="image for image in availableImages | filter:$viewValue | limitTo:5"
-                    ng-model="service.Image" ng-change="updateServiceAttribute(service, 'Image')" id="image_name" ng-disabled="isUpdating">
+                    ng-model="service.Image" ng-change="updateServiceAttribute(service, 'Image')" id="image_name" disable-authorization="DockerServiceUpdate">
               </td>
             </tr>
             <tr>
@@ -76,7 +76,7 @@
                 Service webhook
                 <portainer-tooltip position="top" message="Webhook (or callback URI) used to automate the update of this service. Sending a POST request to this callback URI (without requiring any authentication) will pull the most up-to-date version of the associated image and re-deploy this service."></portainer-tooltip>
                 <label class="switch" style="margin-left: 20px;">
-                  <input type="checkbox" ng-model="WebhookExists" ng-click="updateWebhook(service)"><i></i>
+                  <input disable-authorization="DockerServiceUpdate" type="checkbox" ng-model="WebhookExists" ng-click="updateWebhook(service)"><i></i>
                 </label>
               </td>
               <td ng-if="webhookURL">
@@ -89,14 +89,14 @@
                 </span>
               </td>
           </tr>
-            <tr>
+            <tr authorization="DockerServiceLogs, DockerServiceUpdate, DockerServiceDelete">
               <td colspan="2">
-                <a ng-if="applicationState.endpoint.apiVersion >= 1.30" class="btn btn-primary btn-sm" type="button" ui-sref="docker.services.service.logs({id: service.Id})"><i class="fa fa-file-alt space-right" aria-hidden="true"></i>Service logs</a>
-                <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.updateInProgress || isUpdating" ng-click="forceUpdateService(service)" button-spinner="state.updateInProgress" ng-if="applicationState.endpoint.apiVersion >= 1.25">
+                <a authorization="DockerServiceLogs" ng-if="applicationState.endpoint.apiVersion >= 1.30" class="btn btn-primary btn-sm" type="button" ui-sref="docker.services.service.logs({id: service.Id})"><i class="fa fa-file-alt space-right" aria-hidden="true"></i>Service logs</a>
+                <button authorization="DockerServiceUpdate" type="button" class="btn btn-primary btn-sm" ng-disabled="state.updateInProgress || isUpdating" ng-click="forceUpdateService(service)" button-spinner="state.updateInProgress" ng-if="applicationState.endpoint.apiVersion >= 1.25">
                   <span ng-hide="state.updateInProgress"><i class="fa fa-sync space-right" aria-hidden="true"></i>Update the service</span>
                   <span ng-show="state.updateInProgress">Update in progress...</span>
                 </button>
-                <button type="button" class="btn btn-danger btn-sm" ng-disabled="state.deletionInProgress || isUpdating" ng-click="removeService()" button-spinner="state.deletionInProgress">
+                <button authorization="DockerServiceDelete" type="button" class="btn btn-danger btn-sm" ng-disabled="state.deletionInProgress || isUpdating" ng-click="removeService()" button-spinner="state.deletionInProgress">
                   <span ng-hide="state.deletionInProgress"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete the service</span>
                   <span ng-show="state.deletionInProgress">Deletion in progress...</span>
                 </button>
@@ -105,7 +105,7 @@
           </tbody>
         </table>
       </rd-widget-body>
-      <rd-widget-footer>
+      <rd-widget-footer authorization="DockerServiceUpdate">
         <p class="small text-muted">
           Do you need help? View the Docker Service documentation <a href="https://docs.docker.com/engine/reference/commandline/service_update/" target="self">here</a>.
         </p>

@@ -104,7 +104,8 @@ angular.module('portainer.app', [])
     views: {
       'content@': {
         templateUrl: './views/endpoints/access/endpointAccess.html',
-        controller: 'EndpointAccessController'
+        controller: 'EndpointAccessController',
+        controllerAs: 'ctrl'
       }
     }
   };

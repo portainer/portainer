@@ -14,6 +14,8 @@ type endpointGroupUpdatePayload struct {
 	Description         string
 	AssociatedEndpoints []portainer.EndpointID
 	Tags                []string
+	UserAccessPolicies  portainer.UserAccessPolicies
+	TeamAccessPolicies  portainer.TeamAccessPolicies
 }
 
 func (payload *endpointGroupUpdatePayload) Validate(r *http.Request) error {
@@ -52,20 +54,30 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 		endpointGroup.Tags = payload.Tags
 	}
 
+	if payload.UserAccessPolicies != nil {
+		endpointGroup.UserAccessPolicies = payload.UserAccessPolicies
+	}
+
+	if payload.TeamAccessPolicies != nil {
+		endpointGroup.TeamAccessPolicies = payload.TeamAccessPolicies
+	}
+
 	err = handler.EndpointGroupService.UpdateEndpointGroup(endpointGroup.ID, endpointGroup)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint group changes inside the database", err}
 	}
 
-	endpoints, err := handler.EndpointService.Endpoints()
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
-	}
-
-	for _, endpoint := range endpoints {
-		err = handler.updateEndpointGroup(endpoint, portainer.EndpointGroupID(endpointGroupID), payload.AssociatedEndpoints)
+	if payload.AssociatedEndpoints != nil {
+		endpoints, err := handler.EndpointService.Endpoints()
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint", err}
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
+		}
+
+		for _, endpoint := range endpoints {
+			err = handler.updateEndpointGroup(endpoint, portainer.EndpointGroupID(endpointGroupID), payload.AssociatedEndpoints)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint", err}
+			}
 		}
 	}
 

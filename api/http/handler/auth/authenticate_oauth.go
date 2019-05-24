@@ -3,8 +3,8 @@ package auth
 import (
 	"encoding/json"
 	"io/ioutil"
-	"net/http"
 	"log"
+	"net/http"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"

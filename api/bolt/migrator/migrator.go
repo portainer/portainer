@@ -6,6 +6,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/endpoint"
 	"github.com/portainer/portainer/api/bolt/endpointgroup"
 	"github.com/portainer/portainer/api/bolt/extension"
+	"github.com/portainer/portainer/api/bolt/registry"
 	"github.com/portainer/portainer/api/bolt/resourcecontrol"
 	"github.com/portainer/portainer/api/bolt/settings"
 	"github.com/portainer/portainer/api/bolt/stack"
@@ -22,6 +23,7 @@ type (
 		endpointGroupService   *endpointgroup.Service
 		endpointService        *endpoint.Service
 		extensionService       *extension.Service
+		registryService        *registry.Service
 		resourceControlService *resourcecontrol.Service
 		settingsService        *settings.Service
 		stackService           *stack.Service
@@ -38,6 +40,7 @@ type (
 		EndpointGroupService   *endpointgroup.Service
 		EndpointService        *endpoint.Service
 		ExtensionService       *extension.Service
+		RegistryService        *registry.Service
 		ResourceControlService *resourcecontrol.Service
 		SettingsService        *settings.Service
 		StackService           *stack.Service
@@ -56,6 +59,7 @@ func NewMigrator(parameters *Parameters) *Migrator {
 		endpointGroupService:   parameters.EndpointGroupService,
 		endpointService:        parameters.EndpointService,
 		extensionService:       parameters.ExtensionService,
+		registryService:        parameters.RegistryService,
 		resourceControlService: parameters.ResourceControlService,
 		settingsService:        parameters.SettingsService,
 		templateService:        parameters.TemplateService,
@@ -217,6 +221,29 @@ func (m *Migrator) Migrate() error {
 	// Portainer 1.20.1
 	if m.currentDBVersion < 17 {
 		err := m.updateExtensionsToDBVersion17()
+		if err != nil {
+			return err
+		}
+	}
+
+	// Portainer 1.20.2
+	if m.currentDBVersion < 18 {
+		err := m.updateUsersToDBVersion18()
+		if err != nil {
+			return err
+		}
+
+		err = m.updateEndpointsToDBVersion18()
+		if err != nil {
+			return err
+		}
+
+		err = m.updateEndpointGroupsToDBVersion18()
+		if err != nil {
+			return err
+		}
+
+		err = m.updateRegistriesToDBVersion18()
 		if err != nil {
 			return err
 		}

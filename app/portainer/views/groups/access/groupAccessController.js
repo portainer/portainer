@@ -1,14 +1,24 @@
 angular.module('portainer.app')
-.controller('GroupAccessController', ['$scope', '$transition$', 'GroupService', 'Notifications',
-function ($scope, $transition$, GroupService, Notifications) {
+.controller('GroupAccessController', ['$scope', '$state', '$transition$', 'GroupService', 'Notifications',
+function ($scope, $state, $transition$, GroupService, Notifications) {
 
-  $scope.updateAccess = function(authorizedUsers, authorizedTeams) {
-    return GroupService.updateAccess($transition$.params().id, authorizedUsers, authorizedTeams);
+  $scope.updateAccess = function() {
+    $scope.state.actionInProgress = true;
+    GroupService.updateGroup($scope.group, $scope.group.AssociatedEndpoints)
+    .then(() => {
+      Notifications.success("Access successfully updated");
+      $state.reload();
+    })
+    .catch((err) => {
+      $scope.state.actionInProgress = false;
+      Notifications.error("Failure", err, "Unable to update accesses");
+    });
   };
 
   function initView() {
     var groupId = $transition$.params().id;
 
+    $scope.state = {actionInProgress: false};
     GroupService.group(groupId)
     .then(function success(data) {
       $scope.group = data;

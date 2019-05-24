@@ -44,6 +44,12 @@ angular.module('portainer.app')
     getUIState: function() {
       return localStorageService.cookie.get('UI_STATE');
     },
+    storeExtensionState: function(state) {
+      localStorageService.set('EXTENSION_STATE', state);
+    },
+    getExtensionState: function() {
+      return localStorageService.get('EXTENSION_STATE');
+    },
     storeJWT: function(jwt) {
       localStorageService.set('JWT', jwt);
     },

@@ -1,7 +1,7 @@
 <div ng-if="service.ServicePreferences" id="service-placement-preferences">
   <rd-widget>
     <rd-widget-header icon="fa-tasks" title-text="Placement preferences">
-      <div class="nopadding">
+      <div class="nopadding" authorization="DockerServiceUpdate">
         <a class="btn btn-default btn-sm pull-right" ng-click="isUpdating || addPlacementPreference(service)" ng-disabled="isUpdating">
           <i class="fa fa-plus-circle" aria-hidden="true"></i> placement preference
         </a>
@@ -28,7 +28,7 @@
             <td>
               <div class="input-group input-group-sm">
                 <input type="text" class="form-control" ng-model="preference.value" placeholder="e.g. manager" ng-change="updatePlacementPreference(service, preference)" ng-disabled="isUpdating">
-                <span class="input-group-btn">
+                <span class="input-group-btn" authorization="DockerServiceUpdate">
                   <button class="btn btn-sm btn-danger" type="button" ng-click="removePlacementPreference(service, $index)" ng-disabled="isUpdating">
                     <i class="fa fa-trash" aria-hidden="true"></i>
                   </button>
@@ -39,7 +39,7 @@
         </tbody>
       </table>
     </rd-widget-body>
-    <rd-widget-footer>
+    <rd-widget-footer authorization="DockerServiceUpdate">
       <div class="btn-toolbar" role="toolbar">
         <div class="btn-group" role="group">
           <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['ServicePreferences'])" ng-click="updateService(service)">Apply changes</button>

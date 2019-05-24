@@ -117,11 +117,60 @@ func (handler *Handler) authenticateLDAPAndCreateUser(w http.ResponseWriter, use
 
 func (handler *Handler) writeToken(w http.ResponseWriter, user *portainer.User) *httperror.HandlerError {
 	tokenData := &portainer.TokenData{
-		ID:       user.ID,
-		Username: user.Username,
-		Role:     user.Role,
+		ID:                      user.ID,
+		Username:                user.Username,
+		Role:                    user.Role,
+		PortainerAuthorizations: user.PortainerAuthorizations,
 	}
 
+	_, err := handler.ExtensionService.Extension(portainer.RBACExtension)
+	if err == portainer.ErrObjectNotFound {
+		return handler.persistAndWriteToken(w, tokenData)
+	} else if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a extension with the specified identifier inside the database", err}
+	}
+
+	endpointAuthorizations, err := handler.getAuthorizations(user)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve authorizations associated to the user", err}
+	}
+	tokenData.EndpointAuthorizations = endpointAuthorizations
+
+	return handler.persistAndWriteToken(w, tokenData)
+}
+
+func (handler *Handler) getAuthorizations(user *portainer.User) (portainer.EndpointAuthorizations, error) {
+	endpointAuthorizations := portainer.EndpointAuthorizations{}
+	if user.Role == portainer.AdministratorRole {
+		return endpointAuthorizations, nil
+	}
+
+	userMemberships, err := handler.TeamMembershipService.TeamMembershipsByUserID(user.ID)
+	if err != nil {
+		return endpointAuthorizations, err
+	}
+
+	endpoints, err := handler.EndpointService.Endpoints()
+	if err != nil {
+		return endpointAuthorizations, err
+	}
+
+	endpointGroups, err := handler.EndpointGroupService.EndpointGroups()
+	if err != nil {
+		return endpointAuthorizations, err
+	}
+
+	roles, err := handler.RoleService.Roles()
+	if err != nil {
+		return endpointAuthorizations, err
+	}
+
+	endpointAuthorizations = getUserEndpointAuthorizations(user, endpoints, endpointGroups, roles, userMemberships)
+
+	return endpointAuthorizations, nil
+}
+
+func (handler *Handler) persistAndWriteToken(w http.ResponseWriter, tokenData *portainer.TokenData) *httperror.HandlerError {
 	token, err := handler.JWTService.GenerateToken(tokenData)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to generate JWT token", err}

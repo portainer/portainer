@@ -11,9 +11,7 @@ function ($transition$, $scope, RegistryService, RegistryV2Service, Notification
 
     var authenticationEnabled = $scope.applicationState.application.authentication;
     if (authenticationEnabled) {
-      var userDetails = Authentication.getUserDetails();
-      var isAdmin = userDetails.role === 1;
-      $scope.isAdmin = isAdmin;
+      $scope.isAdmin = Authentication.isAdmin();
     }
 
     RegistryService.registry(registryId)

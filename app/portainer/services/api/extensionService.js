@@ -2,9 +2,15 @@ import _ from 'lodash-es';
 import { ExtensionViewModel } from '../../models/extension';
 
 angular.module('portainer.app')
-.factory('ExtensionService', ['$q', 'Extension', function ExtensionServiceFactory($q, Extension) {
+.factory('ExtensionService', ['$q', 'Extension', 'StateManager', function ExtensionServiceFactory($q, Extension, StateManager) {
   'use strict';
   var service = {};
+
+  service.EXTENSIONS = Object.freeze({
+    REGISTRY_MANAGEMENT: 1,
+    OAUTH_AUTHENTICATION: 2,
+    RBAC: 3
+  });
 
   service.enable = function(license) {
     return Extension.create({ license: license }).$promise;
@@ -50,34 +56,14 @@ angular.module('portainer.app')
     return deferred.promise;
   };
 
-  service.registryManagementEnabled = function() {
-    var deferred = $q.defer();
-
-    service.extensions(false)
-    .then(function onSuccess(extensions) {
-      var extensionAvailable = _.find(extensions, { Id: 1, Enabled: true }) ? true : false;
-      deferred.resolve(extensionAvailable);
-    })
-    .catch(function onError(err) {
-      deferred.reject(err);
-    });
-
-    return deferred.promise;
+  service.extensionEnabled = function(extensionId) {
+    return StateManager.getExtension(extensionId) ? true : false;
   };
 
-  service.OAuthAuthenticationEnabled = function() {
-    var deferred = $q.defer();
-
-    service.extensions(false)
-    .then(function onSuccess(extensions) {
-      var extensionAvailable = _.find(extensions, { Id: 2, Enabled: true }) ? true : false;
-      deferred.resolve(extensionAvailable);
-    })
-    .catch(function onError(err) {
-      deferred.reject(err);
-    });
-
-    return deferred.promise;
+  service.retrieveAndSaveEnabledExtensions = async function() {
+    const extensions = await service.extensions(false);
+    _.forEach(extensions, (ext) => delete ext.License);
+    StateManager.saveExtensions(extensions);
   };
 
   return service;

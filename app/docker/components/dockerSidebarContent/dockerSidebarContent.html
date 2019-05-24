@@ -1,7 +1,7 @@
 <li class="sidebar-list">
   <a ui-sref="docker.dashboard" ui-sref-active="active">Dashboard <span class="menu-icon fa fa-tachometer-alt fa-fw"></span></a>
 </li>
-<li class="sidebar-list" ng-if="!$ctrl.offlineMode">
+<li class="sidebar-list" ng-if="!$ctrl.offlineMode" authorization="DockerContainerCreate, PortainerStackCreate">
   <a ui-sref="portainer.templates" ui-sref-active="active">App Templates <span class="menu-icon fa fa-rocket fa-fw"></span></a>
 </li>
 <li class="sidebar-list">

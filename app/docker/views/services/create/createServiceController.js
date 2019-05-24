@@ -467,12 +467,9 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
   }
 
   $scope.create = function createService() {
-
     var accessControlData = $scope.formValues.AccessControlData;
-    var userDetails = Authentication.getUserDetails();
-    var isAdmin = userDetails.role === 1;
 
-    if (!validateForm(accessControlData, isAdmin)) {
+    if (!validateForm(accessControlData, $scope.isAdmin)) {
       return;
     }
 
@@ -524,8 +521,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
       $scope.availableLoggingDrivers = data.availableLoggingDrivers;
       initSlidersMaxValuesBasedOnNodeData(data.nodes);
       $scope.allowBindMounts = data.settings.AllowBindMountsForRegularUsers;
-      var userDetails = Authentication.getUserDetails();
-      $scope.isAdmin = userDetails.role === 1;
+      $scope.isAdmin = Authentication.isAdmin();
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to initialize view');

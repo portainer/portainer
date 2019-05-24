@@ -24,14 +24,6 @@
                 {{ registry.URL }}
               </td>
             </tr>
-            <tr>
-              <td colspan="2">
-                <span class="small text-muted">
-                  You can select which user or team can access this registry by moving them to the authorized accesses table. Simply click
-                  on a user or team entry to move it from one table to the other.
-                </span>
-              </td>
-            </tr>
           </tbody>
         </table>
       </rd-widget-body>
@@ -39,5 +31,6 @@
   </div>
 </div>
 
-<por-access-management ng-if="registry" access-controlled-entity="registry" update-access="updateAccess(userAccesses, teamAccesses)">
+<por-access-management ng-if="registry" access-controlled-entity="registry" entity-type="registry" action-in-progress="state.actionInProgress"
+  update-access="updateAccess">
 </por-access-management>

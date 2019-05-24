@@ -90,7 +90,7 @@ function ($q, $state, UserService, TeamService, ResourceControlService, Notifica
 
   function initComponent() {
     var userDetails = Authentication.getUserDetails();
-    var isAdmin = userDetails.role === 1 ? true: false;
+    var isAdmin = Authentication.isAdmin();
     var userId = userDetails.ID;
     ctrl.isAdmin = isAdmin;
     var resourceControl = ctrl.resourceControl;

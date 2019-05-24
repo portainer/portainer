@@ -24,6 +24,8 @@ type endpointUpdatePayload struct {
 	AzureTenantID          *string
 	AzureAuthenticationKey *string
 	Tags                   []string
+	UserAccessPolicies     portainer.UserAccessPolicies
+	TeamAccessPolicies     portainer.TeamAccessPolicies
 }
 
 func (payload *endpointUpdatePayload) Validate(r *http.Request) error {
@@ -72,6 +74,14 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.Tags != nil {
 		endpoint.Tags = payload.Tags
+	}
+
+	if payload.UserAccessPolicies != nil {
+		endpoint.UserAccessPolicies = payload.UserAccessPolicies
+	}
+
+	if payload.TeamAccessPolicies != nil {
+		endpoint.TeamAccessPolicies = payload.TeamAccessPolicies
 	}
 
 	if payload.Status != nil {
