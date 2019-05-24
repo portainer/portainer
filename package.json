@@ -60,7 +60,7 @@
     "codemirror": "~5.30.0",
     "filesize": "~3.3.0",
     "isteven-angular-multiselect": "~4.0.0",
-    "jquery": "^3.3.1",
+    "jquery": "3.4.0",
     "js-yaml": "~3.10.0",
     "lodash-es": "^4.17.11",
     "moment": "^2.21.0",
