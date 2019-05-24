@@ -34,9 +34,9 @@
               dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit)) track by $index">
               <td>{{ item.EndpointName }}</td>
               <td>{{ item.RoleName }}</td>
-              <td>{{ item.TeamName ? 'Team' : 'User'}} <code ng-if="item.TeamName">{{ item.TeamName }}</code> access defined on {{item.AccessLocation}} <code ng-if="item.GroupName">{{item.GroupName}}</code>
+              <td>{{ item.TeamName ? 'Team' : 'User'}} <code ng-if="item.TeamName">{{ item.TeamName }}</code> access defined on {{ item.AccessLocation }} <code ng-if="item.GroupName">{{item.GroupName}}</code>
                 <a ng-if="item.AccessLocation === 'endpoint'" ui-sref="portainer.endpoints.endpoint.access({id: item.EndpointId})"><i style="margin-left: 5px;" class="fa fa-users" aria-hidden="true"></i> Manage access </a>
-                <a ng-if="item.AccessLocation === 'group'" ui-sref="portainer.groups.group.access({id: item.GroupId})"><i style="margin-left: 5px;" class="fa fa-users" aria-hidden="true"></i> Manage access </a>
+                <a ng-if="item.AccessLocation === 'endpoint group'" ui-sref="portainer.groups.group.access({id: item.GroupId})"><i style="margin-left: 5px;" class="fa fa-users" aria-hidden="true"></i> Manage access </a>
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
