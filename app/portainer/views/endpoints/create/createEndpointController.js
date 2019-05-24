@@ -94,9 +94,13 @@ function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService,
   function addEndpoint(name, type, URL, PublicURL, groupId, tags, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
     $scope.state.actionInProgress = true;
     EndpointService.createRemoteEndpoint(name, type, URL, PublicURL, groupId, tags, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
-    .then(function success() {
+    .then(function success(data) {
       Notifications.success('Endpoint created', name);
-      $state.go('portainer.endpoints', {}, {reload: true});
+      if (type === 4) {
+        $state.go('portainer.endpoints.endpoint', { id: data.Id });
+      } else {
+        $state.go('portainer.endpoints', {}, {reload: true});
+      }
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to create endpoint');

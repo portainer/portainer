@@ -43,7 +43,7 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 
 	endpointType, err := request.RetrieveNumericMultiPartFormValue(r, "EndpointType", false)
 	if err != nil || endpointType == 0 {
-		return portainer.Error("Invalid endpoint type value. Value must be one of: 1 (Docker environment), 2 (Agent environment), 3 (Azure environment) or 4 (Agent IoT environment)")
+		return portainer.Error("Invalid endpoint type value. Value must be one of: 1 (Docker environment), 2 (Agent environment), 3 (Azure environment) or 4 (Agent Edge environment)")
 	}
 	payload.EndpointType = endpointType
 
@@ -152,7 +152,7 @@ func (handler *Handler) createEndpoint(payload *endpointCreatePayload) (*portain
 	if portainer.EndpointType(payload.EndpointType) == portainer.AzureEnvironment {
 		return handler.createAzureEndpoint(payload)
 	} else if portainer.EndpointType(payload.EndpointType) == portainer.AgentEdgeEnvironment {
-		return handler.createAgentIoTEndpoint(payload)
+		return handler.createAgentEdgeEndpoint(payload)
 	}
 
 	if payload.TLS {
@@ -199,11 +199,11 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 	return endpoint, nil
 }
 
-func (handler *Handler) createAgentIoTEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
+func (handler *Handler) createAgentEdgeEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
 	endpointType := portainer.AgentEdgeEnvironment
 	endpointID := handler.EndpointService.GetNextIdentifier()
 
-	iotKey := base64.RawStdEncoding.EncodeToString([]byte(strings.TrimPrefix(payload.URL, "tcp://") + ":9999:7777:random_secret"))
+	edgeKey := base64.RawStdEncoding.EncodeToString([]byte(strings.TrimPrefix(payload.URL, "tcp://") + ":9999:7777:random_secret"))
 
 	endpoint := &portainer.Endpoint{
 		ID:      portainer.EndpointID(endpointID),
@@ -220,7 +220,7 @@ func (handler *Handler) createAgentIoTEndpoint(payload *endpointCreatePayload) (
 		Tags:            payload.Tags,
 		Status:          portainer.EndpointStatusUp,
 		Snapshots:       []portainer.Snapshot{},
-		IoTKey:          iotKey,
+		EdgeKey:         edgeKey,
 	}
 
 	err := handler.EndpointService.CreateEndpoint(endpoint)

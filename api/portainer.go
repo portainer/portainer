@@ -242,7 +242,7 @@ type (
 		Tags             []string            `json:"Tags"`
 		Status           EndpointStatus      `json:"Status"`
 		Snapshots        []Snapshot          `json:"Snapshots"`
-		IoTKey           string              `json:"IoTKey"`
+		EdgeKey          string              `json:"EdgeKey"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
