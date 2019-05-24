@@ -68,7 +68,7 @@ func (handler *Handler) websocketExec(w http.ResponseWriter, r *http.Request) *h
 func (handler *Handler) handleExecRequest(w http.ResponseWriter, r *http.Request, params *webSocketRequestParams) error {
 	r.Header.Del("Origin")
 
-	if params.nodeName != "" || (params.endpoint.Type == portainer.AgentOnDockerEnvironment || params.endpoint.Type == portainer.AgentEdgeEnvironment) {
+	if params.nodeName != "" || (params.endpoint.Type == portainer.AgentOnDockerEnvironment || params.endpoint.Type == portainer.EdgeAgentEnvironment) {
 		return handler.proxyWebsocketRequest(w, r, params)
 	}
 

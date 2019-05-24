@@ -43,7 +43,7 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 
 	endpointType, err := request.RetrieveNumericMultiPartFormValue(r, "EndpointType", false)
 	if err != nil || endpointType == 0 {
-		return portainer.Error("Invalid endpoint type value. Value must be one of: 1 (Docker environment), 2 (Agent environment), 3 (Azure environment) or 4 (Agent Edge environment)")
+		return portainer.Error("Invalid endpoint type value. Value must be one of: 1 (Docker environment), 2 (Agent environment), 3 (Azure environment) or 4 (Edge Agent environment)")
 	}
 	payload.EndpointType = endpointType
 
@@ -151,8 +151,8 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 func (handler *Handler) createEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
 	if portainer.EndpointType(payload.EndpointType) == portainer.AzureEnvironment {
 		return handler.createAzureEndpoint(payload)
-	} else if portainer.EndpointType(payload.EndpointType) == portainer.AgentEdgeEnvironment {
-		return handler.createAgentEdgeEndpoint(payload)
+	} else if portainer.EndpointType(payload.EndpointType) == portainer.EdgeAgentEnvironment {
+		return handler.createEdgeAgentEndpoint(payload)
 	}
 
 	if payload.TLS {
@@ -199,8 +199,8 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 	return endpoint, nil
 }
 
-func (handler *Handler) createAgentEdgeEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
-	endpointType := portainer.AgentEdgeEnvironment
+func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
+	endpointType := portainer.EdgeAgentEnvironment
 	endpointID := handler.EndpointService.GetNextIdentifier()
 
 	edgeKey := base64.RawStdEncoding.EncodeToString([]byte(strings.TrimPrefix(payload.URL, "tcp://") + ":9999:7777:random_secret"))

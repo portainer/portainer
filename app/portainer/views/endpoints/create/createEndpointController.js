@@ -56,7 +56,7 @@ function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService,
     addEndpoint(name, 2, URL, publicURL, groupId, tags, true, true, true, null, null, null);
   };
 
-  $scope.addAgentEdgeEndpoint = function() {
+  $scope.addEdgeAgentEndpoint = function() {
       var name = $scope.formValues.Name;
       var groupId = $scope.formValues.GroupId;
       var tags = $scope.formValues.Tags;

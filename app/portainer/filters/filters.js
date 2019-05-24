@@ -125,7 +125,7 @@ angular.module('portainer.app')
     } else if (type === 3) {
       return 'Azure ACI';
     } else if (type === 4) {
-      return 'Agent Edge';
+      return 'Edge Agent';
     }
     return '';
   };
