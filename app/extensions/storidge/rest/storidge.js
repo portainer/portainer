@@ -1,7 +1,7 @@
 angular.module('extension.storidge')
 .factory('Storidge', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', function StoridgeFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
   'use strict';
-  return $resource(API_ENDPOINT_ENDPOINTS + '/:endpointId/extensions/storidge/:resource/:id/:action', {
+  return $resource(API_ENDPOINT_ENDPOINTS + '/:endpointId/storidge/:resource/:id/:action', {
     endpointId: EndpointProvider.endpointID
   },
   {

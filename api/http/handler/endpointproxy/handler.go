@@ -26,7 +26,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.proxyRequestsToAzureAPI)))
 	h.PathPrefix("/{id}/docker").Handler(
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.proxyRequestsToDockerAPI)))
-	h.PathPrefix("/{id}/extensions/storidge").Handler(
+	h.PathPrefix("/{id}/storidge").Handler(
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.proxyRequestsToStoridgeAPI)))
 	return h
 }

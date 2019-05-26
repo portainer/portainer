@@ -164,6 +164,7 @@ func (store *Store) Init() error {
 				portainer.OperationPortainerWebhookList:               true,
 				portainer.OperationPortainerWebhookCreate:             true,
 				portainer.OperationPortainerWebhookDelete:             true,
+				portainer.OperationIntegrationStoridgeAdmin:           true,
 				portainer.EndpointResourcesAccess:                     true,
 			},
 		}

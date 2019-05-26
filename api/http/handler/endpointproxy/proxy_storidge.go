@@ -53,6 +53,6 @@ func (handler *Handler) proxyRequestsToStoridgeAPI(w http.ResponseWriter, r *htt
 	}
 
 	id := strconv.Itoa(endpointID)
-	http.StripPrefix("/"+id+"/extensions/storidge", proxy).ServeHTTP(w, r)
+	http.StripPrefix("/"+id+"/storidge", proxy).ServeHTTP(w, r)
 	return nil
 }

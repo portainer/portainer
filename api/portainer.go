@@ -1223,6 +1223,8 @@ const (
 	OperationPortainerWebhookCreate           Authorization = "PortainerWebhookCreate"
 	OperationPortainerWebhookDelete           Authorization = "PortainerWebhookDelete"
 
+	OperationIntegrationStoridgeAdmin Authorization = "IntegrationStoridgeAdmin"
+
 	OperationDockerUndefined      Authorization = "DockerUndefined"
 	OperationDockerAgentUndefined Authorization = "DockerAgentUndefined"
 	OperationPortainerUndefined   Authorization = "PortainerUndefined"
