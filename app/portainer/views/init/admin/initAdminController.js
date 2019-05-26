@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('InitAdminController', ['$scope', '$state', 'Notifications', 'Authentication', 'StateManager', 'UserService', 'EndpointService',
-function ($scope, $state, Notifications, Authentication, StateManager, UserService, EndpointService) {
+.controller('InitAdminController', ['$scope', '$state', 'Notifications', 'Authentication', 'StateManager', 'UserService', 'EndpointService', 'ExtensionService',
+function ($scope, $state, Notifications, Authentication, StateManager, UserService, EndpointService, ExtensionService) {
 
   $scope.logo = StateManager.getState().application.logo;
 
@@ -14,6 +14,14 @@ function ($scope, $state, Notifications, Authentication, StateManager, UserServi
     actionInProgress: false
   };
 
+  function retrieveAndSaveEnabledExtensions() {
+    try {
+      ExtensionService.retrieveAndSaveEnabledExtensions();
+    } catch (err) {
+      Notifications.error('Failure', err, 'Unable to retrieve enabled extensions');
+    }
+  }
+
   $scope.createAdminUser = function() {
     var username = $scope.formValues.Username;
     var password = $scope.formValues.Password;
@@ -24,6 +32,7 @@ function ($scope, $state, Notifications, Authentication, StateManager, UserServi
       return Authentication.login(username, password);
     })
     .then(function success() {
+      retrieveAndSaveEnabledExtensions();
       return EndpointService.endpoints();
     })
     .then(function success(data) {

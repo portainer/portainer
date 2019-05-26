@@ -63,6 +63,21 @@ a[ng-click]{
   margin-left: 5px;
 }
 
+.portainer-disabled-link {
+  color: gray;
+  pointer-events: none;
+}
+
+.portainer-disabled-datatable {
+  color: gray;
+}
+
+.portainer-disabled-datatable a {
+  color: gray;
+  pointer-events: none;
+}
+
+
 .tooltip.portainer-tooltip .tooltip-inner {
   font-family: Montserrat;
   background-color: #ffffff;
@@ -127,6 +142,10 @@ a[ng-click]{
 .widget .widget-body table tbody td {
   white-space: normal;
   word-break: break-word;
+}
+
+.widget .widget-body table.description-table {
+  table-layout: fixed;
 }
 
 .template-widget {
@@ -250,6 +269,12 @@ a[ng-click]{
   font-size: 12px;
   line-height: 1.5;
   border-radius: 3px;
+}
+
+.btn-datatable {
+  padding: 2.6px 7.8px 3.9px;
+  line-height: 1;
+  margin: 0px 0px 0px 0px;
 }
 
 @media screen and (min-width: 1107px) {

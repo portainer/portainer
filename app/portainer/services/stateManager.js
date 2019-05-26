@@ -1,3 +1,4 @@
+import _ from 'lodash-es';
 import moment from 'moment';
 
 angular.module('portainer.app')
@@ -14,7 +15,8 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
     UI: {
       dismissedInfoPanels: {},
       dismissedInfoHash: ''
-    }
+    },
+    extensions: []
   };
 
   manager.dismissInformationPanel = function(id) {
@@ -92,6 +94,11 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
     var UIState = LocalStorage.getUIState();
     if (UIState) {
       state.UI = UIState;
+    }
+
+    const extensionState = LocalStorage.getExtensionState();
+    if (extensionState) {
+      state.extensions = extensionState;
     }
 
     var endpointState = LocalStorage.getEndpointState();
@@ -188,6 +195,19 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
 
   manager.getAgentApiVersion = function getAgentApiVersion() {
     return state.endpoint.agentApiVersion;
+  };
+
+  manager.saveExtensions = function(extensions) {
+    state.extensions = extensions;
+    LocalStorage.storeExtensionState(state.extensions);
+  };
+
+  manager.getExtensions = function() {
+    return state.extensions;
+  };
+
+  manager.getExtension = function(extensionId) {
+    return _.find(state.extensions, { Id: extensionId, Enabled: true });
   };
 
   return manager;

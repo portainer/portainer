@@ -379,18 +379,18 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, endpointService portain
 
 	endpointID := endpointService.GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
-		ID:              portainer.EndpointID(endpointID),
-		Name:            "primary",
-		URL:             *flags.EndpointURL,
-		GroupID:         portainer.EndpointGroupID(1),
-		Type:            portainer.DockerEnvironment,
-		TLSConfig:       tlsConfiguration,
-		AuthorizedUsers: []portainer.UserID{},
-		AuthorizedTeams: []portainer.TeamID{},
-		Extensions:      []portainer.EndpointExtension{},
-		Tags:            []string{},
-		Status:          portainer.EndpointStatusUp,
-		Snapshots:       []portainer.Snapshot{},
+		ID:                 portainer.EndpointID(endpointID),
+		Name:               "primary",
+		URL:                *flags.EndpointURL,
+		GroupID:            portainer.EndpointGroupID(1),
+		Type:               portainer.DockerEnvironment,
+		TLSConfig:          tlsConfiguration,
+		UserAccessPolicies: portainer.UserAccessPolicies{},
+		TeamAccessPolicies: portainer.TeamAccessPolicies{},
+		Extensions:         []portainer.EndpointExtension{},
+		Tags:               []string{},
+		Status:             portainer.EndpointStatusUp,
+		Snapshots:          []portainer.Snapshot{},
 	}
 
 	if strings.HasPrefix(endpoint.URL, "tcp://") {
@@ -422,18 +422,18 @@ func createUnsecuredEndpoint(endpointURL string, endpointService portainer.Endpo
 
 	endpointID := endpointService.GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
-		ID:              portainer.EndpointID(endpointID),
-		Name:            "primary",
-		URL:             endpointURL,
-		GroupID:         portainer.EndpointGroupID(1),
-		Type:            portainer.DockerEnvironment,
-		TLSConfig:       portainer.TLSConfiguration{},
-		AuthorizedUsers: []portainer.UserID{},
-		AuthorizedTeams: []portainer.TeamID{},
-		Extensions:      []portainer.EndpointExtension{},
-		Tags:            []string{},
-		Status:          portainer.EndpointStatusUp,
-		Snapshots:       []portainer.Snapshot{},
+		ID:                 portainer.EndpointID(endpointID),
+		Name:               "primary",
+		URL:                endpointURL,
+		GroupID:            portainer.EndpointGroupID(1),
+		Type:               portainer.DockerEnvironment,
+		TLSConfig:          portainer.TLSConfiguration{},
+		UserAccessPolicies: portainer.UserAccessPolicies{},
+		TeamAccessPolicies: portainer.TeamAccessPolicies{},
+		Extensions:         []portainer.EndpointExtension{},
+		Tags:               []string{},
+		Status:             portainer.EndpointStatusUp,
+		Snapshots:          []portainer.Snapshot{},
 	}
 
 	return snapshotAndPersistEndpoint(endpoint, endpointService, snapshotter)
@@ -629,6 +629,23 @@ func main() {
 				Username: "admin",
 				Role:     portainer.AdministratorRole,
 				Password: adminPasswordHash,
+				PortainerAuthorizations: map[portainer.Authorization]bool{
+					portainer.OperationPortainerDockerHubInspect:        true,
+					portainer.OperationPortainerEndpointGroupList:       true,
+					portainer.OperationPortainerEndpointList:            true,
+					portainer.OperationPortainerEndpointInspect:         true,
+					portainer.OperationPortainerEndpointExtensionAdd:    true,
+					portainer.OperationPortainerEndpointExtensionRemove: true,
+					portainer.OperationPortainerExtensionList:           true,
+					portainer.OperationPortainerMOTD:                    true,
+					portainer.OperationPortainerRegistryList:            true,
+					portainer.OperationPortainerRegistryInspect:         true,
+					portainer.OperationPortainerTeamList:                true,
+					portainer.OperationPortainerTemplateList:            true,
+					portainer.OperationPortainerTemplateInspect:         true,
+					portainer.OperationPortainerUserList:                true,
+					portainer.OperationPortainerUserMemberships:         true,
+				},
 			}
 			err := store.UserService.CreateUser(user)
 			if err != nil {
@@ -655,6 +672,7 @@ func main() {
 		AssetsPath:             *flags.Assets,
 		AuthDisabled:           *flags.NoAuth,
 		EndpointManagement:     endpointManagement,
+		RoleService:            store.RoleService,
 		UserService:            store.UserService,
 		TeamService:            store.TeamService,
 		TeamMembershipService:  store.TeamMembershipService,

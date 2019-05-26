@@ -61,13 +61,6 @@ angular.module('portainer.app')
     return Teams.remove({id: id}).$promise;
   };
 
-  service.updateTeam = function(id, name) {
-    var payload = {
-      Name: name
-    };
-    return Teams.update({id: id}, payload).$promise;
-  };
-
   service.userMemberships = function(id) {
     var deferred = $q.defer();
     Teams.queryMemberships({id: id}).$promise

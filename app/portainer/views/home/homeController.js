@@ -112,7 +112,7 @@ angular.module('portainer.app')
       }
 
       function initView() {
-        $scope.isAdmin = Authentication.getUserDetails().role === 1;
+        $scope.isAdmin = Authentication.isAdmin();
 
         MotdService.motd()
           .then(function success(data) {

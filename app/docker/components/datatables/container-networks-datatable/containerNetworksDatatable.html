@@ -8,7 +8,7 @@
       </div>
       <div class="actionBar">
         <form class="form-horizontal">
-          <div class="row">
+          <div class="row" authorization="DockerNetworkConnect">
             <label for="container_network" class="col-sm-3 col-lg-2 control-label text-left">Join a network</label>
             <div class="col-sm-5 col-lg-4">
               <select class="form-control" ng-model="$ctrl.selectedNetwork" id="container_network">
@@ -42,7 +42,7 @@
               <td>{{ value.IPAddress || '-' }}</td>
               <td>{{ value.Gateway || '-' }}</td>
               <td>{{ value.MacAddress || '-' }}</td>
-              <td>
+              <td authorization="DockerNetworkDisconnect">
                 <button type="button" class="btn btn-xs btn-danger" ng-disabled="$ctrl.leaveNetworkActionInProgress" button-spinner="$ctrl.leaveNetworkActionInProgress" ng-click="$ctrl.leaveNetworkAction($ctrl.container, key)">
                   <span ng-hide="$ctrl.leaveNetworkActionInProgress"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i> Leave network</span>
                   <span ng-show="$ctrl.leaveNetworkActionInProgress">Leaving network...</span>

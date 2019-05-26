@@ -18,8 +18,8 @@ angular.module('portainer.app')
 
         var authenticationEnabled = $scope.applicationState.application.authentication;
         if (authenticationEnabled) {
-          var userDetails = Authentication.getUserDetails();
-          var isAdmin = userDetails.role === 1;
+          let userDetails = Authentication.getUserDetails();
+          let isAdmin = Authentication.isAdmin();
           $scope.isAdmin = isAdmin;
 
           $q.when(!isAdmin ? UserService.userMemberships(userDetails.ID) : [])

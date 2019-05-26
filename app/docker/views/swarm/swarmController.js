@@ -60,9 +60,7 @@ function ($q, $scope, SystemService, NodeService, Notifications, StateManager, A
 
   function initView() {
     if (StateManager.getState().application.authentication) {
-      var userDetails = Authentication.getUserDetails();
-      var isAdmin = userDetails.role === 1 ? true: false;
-      $scope.isAdmin = isAdmin;
+      $scope.isAdmin = Authentication.isAdmin();
     }
 
     var provider = $scope.applicationState.endpoint.mode.provider;

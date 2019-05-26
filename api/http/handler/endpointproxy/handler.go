@@ -23,10 +23,10 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		requestBouncer: bouncer,
 	}
 	h.PathPrefix("/{id}/azure").Handler(
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.proxyRequestsToAzureAPI)))
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.proxyRequestsToAzureAPI)))
 	h.PathPrefix("/{id}/docker").Handler(
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.proxyRequestsToDockerAPI)))
-	h.PathPrefix("/{id}/extensions/storidge").Handler(
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.proxyRequestsToStoridgeAPI)))
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.proxyRequestsToDockerAPI)))
+	h.PathPrefix("/{id}/storidge").Handler(
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.proxyRequestsToStoridgeAPI)))
 	return h
 }

@@ -1,7 +1,7 @@
 export function StoridgeInfoModel(data) {
   this.Domain = data.domain;
   this.Nodes = data.nodes;
-  this.Status = data.status;
+  this.Condition = data.condition;
   this.ProvisionedBandwidth = data.provisionedBandwidth;
   this.UsedBandwidth = data.usedBandwidth;
   this.FreeBandwidth = data.freeBandwidth;

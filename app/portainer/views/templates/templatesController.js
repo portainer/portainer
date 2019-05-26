@@ -167,9 +167,8 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
     var userDetails = Authentication.getUserDetails();
     var userId = userDetails.ID;
     var accessControlData = $scope.formValues.AccessControlData;
-    var isAdmin = userDetails.role === 1;
 
-    if (!validateForm(accessControlData, isAdmin)) {
+    if (!validateForm(accessControlData, $scope.isAdmin)) {
       return;
     }
 
@@ -236,8 +235,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
   }
 
   function initView() {
-    var userDetails = Authentication.getUserDetails();
-    $scope.isAdmin = userDetails.role === 1;
+    $scope.isAdmin = Authentication.isAdmin();
 
     var endpointMode = $scope.applicationState.endpoint.mode;
     var apiVersion = $scope.applicationState.endpoint.apiVersion;

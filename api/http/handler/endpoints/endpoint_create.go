@@ -176,19 +176,19 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 
 	endpointID := handler.EndpointService.GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
-		ID:               portainer.EndpointID(endpointID),
-		Name:             payload.Name,
-		URL:              "https://management.azure.com",
-		Type:             portainer.AzureEnvironment,
-		GroupID:          portainer.EndpointGroupID(payload.GroupID),
-		PublicURL:        payload.PublicURL,
-		AuthorizedUsers:  []portainer.UserID{},
-		AuthorizedTeams:  []portainer.TeamID{},
-		Extensions:       []portainer.EndpointExtension{},
-		AzureCredentials: credentials,
-		Tags:             payload.Tags,
-		Status:           portainer.EndpointStatusUp,
-		Snapshots:        []portainer.Snapshot{},
+		ID:                 portainer.EndpointID(endpointID),
+		Name:               payload.Name,
+		URL:                "https://management.azure.com",
+		Type:               portainer.AzureEnvironment,
+		GroupID:            portainer.EndpointGroupID(payload.GroupID),
+		PublicURL:          payload.PublicURL,
+		UserAccessPolicies: portainer.UserAccessPolicies{},
+		TeamAccessPolicies: portainer.TeamAccessPolicies{},
+		Extensions:         []portainer.EndpointExtension{},
+		AzureCredentials:   credentials,
+		Tags:               payload.Tags,
+		Status:             portainer.EndpointStatusUp,
+		Snapshots:          []portainer.Snapshot{},
 	}
 
 	err = handler.EndpointService.CreateEndpoint(endpoint)
@@ -260,12 +260,12 @@ func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) 
 		TLSConfig: portainer.TLSConfiguration{
 			TLS: false,
 		},
-		AuthorizedUsers: []portainer.UserID{},
-		AuthorizedTeams: []portainer.TeamID{},
-		Extensions:      []portainer.EndpointExtension{},
-		Tags:            payload.Tags,
-		Status:          portainer.EndpointStatusUp,
-		Snapshots:       []portainer.Snapshot{},
+		UserAccessPolicies: portainer.UserAccessPolicies{},
+		TeamAccessPolicies: portainer.TeamAccessPolicies{},
+		Extensions:         []portainer.EndpointExtension{},
+		Tags:               payload.Tags,
+		Status:             portainer.EndpointStatusUp,
+		Snapshots:          []portainer.Snapshot{},
 	}
 
 	err := handler.snapshotAndPersistEndpoint(endpoint)
@@ -304,12 +304,12 @@ func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload)
 			TLS:           payload.TLS,
 			TLSSkipVerify: payload.TLSSkipVerify,
 		},
-		AuthorizedUsers: []portainer.UserID{},
-		AuthorizedTeams: []portainer.TeamID{},
-		Extensions:      []portainer.EndpointExtension{},
-		Tags:            payload.Tags,
-		Status:          portainer.EndpointStatusUp,
-		Snapshots:       []portainer.Snapshot{},
+		UserAccessPolicies: portainer.UserAccessPolicies{},
+		TeamAccessPolicies: portainer.TeamAccessPolicies{},
+		Extensions:         []portainer.EndpointExtension{},
+		Tags:               payload.Tags,
+		Status:             portainer.EndpointStatusUp,
+		Snapshots:          []portainer.Snapshot{},
 	}
 
 	filesystemError := handler.storeTLSFiles(endpoint, payload)

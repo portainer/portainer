@@ -77,7 +77,7 @@ class CreateConfigController {
   async create() {
     let accessControlData = this.formValues.AccessControlData;
     let userDetails = this.Authentication.getUserDetails();
-    let isAdmin = userDetails.role === 1;
+    let isAdmin = this.Authentication.isAdmin();
 
     if (this.formValues.ConfigContent === "") {
       this.state.formValidationError = "Config content must not be empty";

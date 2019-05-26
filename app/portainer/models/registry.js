@@ -8,6 +8,8 @@ export function RegistryViewModel(data) {
   this.Password = data.Password;
   this.AuthorizedUsers = data.AuthorizedUsers;
   this.AuthorizedTeams = data.AuthorizedTeams;
+  this.UserAccessPolicies = data.UserAccessPolicies;
+  this.TeamAccessPolicies = data.TeamAccessPolicies;
   this.Checked = false;
 }
 

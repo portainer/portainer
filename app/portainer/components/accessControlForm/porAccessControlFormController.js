@@ -33,8 +33,7 @@ function ($q, UserService, TeamService, Notifications, Authentication, ResourceC
   }
 
   function initComponent() {
-    var userDetails = Authentication.getUserDetails();
-    var isAdmin = userDetails.role === 1 ? true: false;
+    var isAdmin = Authentication.isAdmin();
     ctrl.isAdmin = isAdmin;
 
     if (isAdmin) {

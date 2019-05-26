@@ -25,6 +25,18 @@ func (handler *Handler) stackInspect(w http.ResponseWriter, r *http.Request) *ht
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a stack with the specified identifier inside the database", err}
 	}
 
+	endpoint, err := handler.EndpointService.Endpoint(stack.EndpointID)
+	if err == portainer.ErrObjectNotFound {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
+	} else if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
+	}
+
+	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint, true)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
+	}
+
 	resourceControl, err := handler.ResourceControlService.ResourceControlByResourceID(stack.Name)
 	if err != nil && err != portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a resource control associated to the stack", err}

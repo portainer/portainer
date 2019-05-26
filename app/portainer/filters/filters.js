@@ -38,7 +38,7 @@ angular.module('portainer.app')
 .filter('capitalize', function () {
   'use strict';
   return function (text) {
-    return _.capitalize(text);
+    return text ? _.capitalize(text) : '';
   };
 })
 .filter('stripprotocol', function() {

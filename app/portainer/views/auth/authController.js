@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('AuthenticationController', ['$q', '$scope', '$state', '$stateParams', '$sanitize', 'Authentication', 'UserService', 'EndpointService', 'StateManager', 'Notifications', 'SettingsService', 'URLHelper',
-function($q, $scope, $state, $stateParams, $sanitize, Authentication, UserService, EndpointService, StateManager, Notifications, SettingsService, URLHelper) {
+.controller('AuthenticationController', ['$q', '$scope', '$state', '$stateParams', '$sanitize', 'Authentication', 'UserService', 'EndpointService', 'ExtensionService', 'StateManager', 'Notifications', 'SettingsService', 'URLHelper',
+function($q, $scope, $state, $stateParams, $sanitize, Authentication, UserService, EndpointService, ExtensionService, StateManager, Notifications, SettingsService, URLHelper) {
   $scope.logo = StateManager.getState().application.logo;
 
   $scope.formValues = {
@@ -14,12 +14,21 @@ function($q, $scope, $state, $stateParams, $sanitize, Authentication, UserServic
     OAuthProvider: ''
   };
 
+  function retrieveAndSaveEnabledExtensions() {
+    try {
+      ExtensionService.retrieveAndSaveEnabledExtensions();
+    } catch (err) {
+      Notifications.error('Failure', err, 'Unable to retrieve enabled extensions');
+    }
+  }
+
   $scope.authenticateUser = function() {
     var username = $scope.formValues.Username;
     var password = $scope.formValues.Password;
 
     Authentication.login(username, password)
     .then(function success() {
+      retrieveAndSaveEnabledExtensions();
       checkForEndpoints();
     })
     .catch(function error() {
@@ -31,6 +40,7 @@ function($q, $scope, $state, $stateParams, $sanitize, Authentication, UserServic
         return $q.reject();
       })
       .then(function success() {
+        retrieveAndSaveEnabledExtensions();
         $state.go('portainer.updatePassword');
       })
       .catch(function error() {
@@ -69,9 +79,8 @@ function($q, $scope, $state, $stateParams, $sanitize, Authentication, UserServic
     EndpointService.endpoints()
     .then(function success(data) {
       var endpoints = data;
-      var userDetails = Authentication.getUserDetails();
 
-      if (endpoints.length === 0 && userDetails.role === 1) {
+      if (endpoints.length === 0 && Authentication.isAdmin()) {
         $state.go('portainer.init.endpoint');
       } else {
         $state.go('portainer.home');
@@ -132,6 +141,7 @@ function($q, $scope, $state, $stateParams, $sanitize, Authentication, UserServic
   function oAuthLogin(code) {
     return Authentication.OAuthLogin(code)
     .then(function success() {
+      retrieveAndSaveEnabledExtensions();
       URLHelper.cleanParameters();
     })
     .catch(function error() {

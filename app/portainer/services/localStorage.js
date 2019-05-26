@@ -44,6 +44,12 @@ angular.module('portainer.app')
     getUIState: function() {
       return localStorageService.cookie.get('UI_STATE');
     },
+    storeExtensionState: function(state) {
+      localStorageService.set('EXTENSION_STATE', state);
+    },
+    getExtensionState: function() {
+      return localStorageService.get('EXTENSION_STATE');
+    },
     storeJWT: function(jwt) {
       localStorageService.set('JWT', jwt);
     },
@@ -54,10 +60,10 @@ angular.module('portainer.app')
       localStorageService.remove('JWT');
     },
     storePaginationLimit: function(key, count) {
-      localStorageService.cookie.set('pagination_' + key, count);
+      localStorageService.set('datatable_pagination_' + key, count);
     },
     getPaginationLimit: function(key) {
-      return localStorageService.cookie.get('pagination_' + key);
+      return localStorageService.get('datatable_pagination_' + key);
     },
     getDataTableOrder: function(key) {
       return localStorageService.get('datatable_order_' + key);

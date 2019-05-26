@@ -22,17 +22,15 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		Router: mux.NewRouter(),
 	}
 	h.Handle("/endpoint_groups",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.endpointGroupCreate))).Methods(http.MethodPost)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointGroupCreate))).Methods(http.MethodPost)
 	h.Handle("/endpoint_groups",
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointGroupList))).Methods(http.MethodGet)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointGroupList))).Methods(http.MethodGet)
 	h.Handle("/endpoint_groups/{id}",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.endpointGroupInspect))).Methods(http.MethodGet)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointGroupInspect))).Methods(http.MethodGet)
 	h.Handle("/endpoint_groups/{id}",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.endpointGroupUpdate))).Methods(http.MethodPut)
-	h.Handle("/endpoint_groups/{id}/access",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.endpointGroupUpdateAccess))).Methods(http.MethodPut)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointGroupUpdate))).Methods(http.MethodPut)
 	h.Handle("/endpoint_groups/{id}",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.endpointGroupDelete))).Methods(http.MethodDelete)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointGroupDelete))).Methods(http.MethodDelete)
 
 	return h
 }

@@ -24,12 +24,14 @@ type (
 		DockerHubService       portainer.DockerHubService
 		SettingsService        portainer.SettingsService
 		SignatureService       portainer.DigitalSignatureService
+		endpointIdentifier     portainer.EndpointID
 	}
-	restrictedOperationContext struct {
-		isAdmin          bool
-		userID           portainer.UserID
-		userTeamIDs      []portainer.TeamID
-		resourceControls []portainer.ResourceControl
+	restrictedDockerOperationContext struct {
+		isAdmin                bool
+		endpointResourceAccess bool
+		userID                 portainer.UserID
+		userTeamIDs            []portainer.TeamID
+		resourceControls       []portainer.ResourceControl
 	}
 	registryAccessContext struct {
 		isAdmin         bool
@@ -44,7 +46,7 @@ type (
 		Serveraddress string `json:"serveraddress"`
 	}
 	operationExecutor struct {
-		operationContext *restrictedOperationContext
+		operationContext *restrictedDockerOperationContext
 		labelBlackList   []portainer.Pair
 	}
 	restrictedOperationRequest func(*http.Response, *operationExecutor) error
@@ -460,7 +462,7 @@ func (p *proxyTransport) createRegistryAccessContext(request *http.Request) (*re
 	return accessContext, nil
 }
 
-func (p *proxyTransport) createOperationContext(request *http.Request) (*restrictedOperationContext, error) {
+func (p *proxyTransport) createOperationContext(request *http.Request) (*restrictedDockerOperationContext, error) {
 	var err error
 	tokenData, err := security.RetrieveTokenData(request)
 	if err != nil {
@@ -472,14 +474,20 @@ func (p *proxyTransport) createOperationContext(request *http.Request) (*restric
 		return nil, err
 	}
 
-	operationContext := &restrictedOperationContext{
-		isAdmin:          true,
-		userID:           tokenData.ID,
-		resourceControls: resourceControls,
+	operationContext := &restrictedDockerOperationContext{
+		isAdmin:                true,
+		userID:                 tokenData.ID,
+		resourceControls:       resourceControls,
+		endpointResourceAccess: false,
 	}
 
 	if tokenData.Role != portainer.AdministratorRole {
 		operationContext.isAdmin = false
+
+		_, ok := tokenData.EndpointAuthorizations[p.endpointIdentifier][portainer.EndpointResourcesAccess]
+		if ok {
+			operationContext.endpointResourceAccess = true
+		}
 
 		teamMemberships, err := p.TeamMembershipService.TeamMembershipsByUserID(tokenData.ID)
 		if err != nil {

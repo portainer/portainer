@@ -6,12 +6,12 @@
           <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }}
         </div>
       </div>
-      <div class="actionBar" ng-if="!$ctrl.offlineMode">
-        <button type="button" class="btn btn-sm btn-danger"
+      <div class="actionBar" ng-if="!$ctrl.offlineMode" authorization="DockerNetworkDelete, DockerNetworkCreate">
+        <button type="button" class="btn btn-sm btn-danger" authorization="DockerNetworkDelete"
           ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.networks.new">
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="docker.networks.new" authorization="DockerNetworkCreate">
           <i class="fa fa-plus space-right" aria-hidden="true"></i>Add network
         </button>
       </div>
