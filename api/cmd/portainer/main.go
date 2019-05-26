@@ -627,6 +627,23 @@ func main() {
 				Username: "admin",
 				Role:     portainer.AdministratorRole,
 				Password: adminPasswordHash,
+				PortainerAuthorizations: map[portainer.Authorization]bool{
+					portainer.OperationPortainerDockerHubInspect:        true,
+					portainer.OperationPortainerEndpointGroupList:       true,
+					portainer.OperationPortainerEndpointList:            true,
+					portainer.OperationPortainerEndpointInspect:         true,
+					portainer.OperationPortainerEndpointExtensionAdd:    true,
+					portainer.OperationPortainerEndpointExtensionRemove: true,
+					portainer.OperationPortainerExtensionList:           true,
+					portainer.OperationPortainerMOTD:                    true,
+					portainer.OperationPortainerRegistryList:            true,
+					portainer.OperationPortainerRegistryInspect:         true,
+					portainer.OperationPortainerTeamList:                true,
+					portainer.OperationPortainerTemplateList:            true,
+					portainer.OperationPortainerTemplateInspect:         true,
+					portainer.OperationPortainerUserList:                true,
+					portainer.OperationPortainerUserMemberships:         true,
+				},
 			}
 			err := store.UserService.CreateUser(user)
 			if err != nil {

@@ -100,6 +100,23 @@ func (handler *Handler) authenticateLDAPAndCreateUser(w http.ResponseWriter, use
 	user := &portainer.User{
 		Username: username,
 		Role:     portainer.StandardUserRole,
+		PortainerAuthorizations: map[portainer.Authorization]bool{
+			portainer.OperationPortainerDockerHubInspect:        true,
+			portainer.OperationPortainerEndpointGroupList:       true,
+			portainer.OperationPortainerEndpointList:            true,
+			portainer.OperationPortainerEndpointInspect:         true,
+			portainer.OperationPortainerEndpointExtensionAdd:    true,
+			portainer.OperationPortainerEndpointExtensionRemove: true,
+			portainer.OperationPortainerExtensionList:           true,
+			portainer.OperationPortainerMOTD:                    true,
+			portainer.OperationPortainerRegistryList:            true,
+			portainer.OperationPortainerRegistryInspect:         true,
+			portainer.OperationPortainerTeamList:                true,
+			portainer.OperationPortainerTemplateList:            true,
+			portainer.OperationPortainerTemplateInspect:         true,
+			portainer.OperationPortainerUserList:                true,
+			portainer.OperationPortainerUserMemberships:         true,
+		},
 	}
 
 	err = handler.UserService.CreateUser(user)
