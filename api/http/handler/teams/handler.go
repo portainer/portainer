@@ -23,17 +23,17 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		Router: mux.NewRouter(),
 	}
 	h.Handle("/teams",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.teamCreate))).Methods(http.MethodPost)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.teamCreate))).Methods(http.MethodPost)
 	h.Handle("/teams",
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.teamList))).Methods(http.MethodGet)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.teamList))).Methods(http.MethodGet)
 	h.Handle("/teams/{id}",
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.teamInspect))).Methods(http.MethodGet)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.teamInspect))).Methods(http.MethodGet)
 	h.Handle("/teams/{id}",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.teamUpdate))).Methods(http.MethodPut)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.teamUpdate))).Methods(http.MethodPut)
 	h.Handle("/teams/{id}",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.teamDelete))).Methods(http.MethodDelete)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.teamDelete))).Methods(http.MethodDelete)
 	h.Handle("/teams/{id}/memberships",
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.teamMemberships))).Methods(http.MethodGet)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.teamMemberships))).Methods(http.MethodGet)
 
 	return h
 }

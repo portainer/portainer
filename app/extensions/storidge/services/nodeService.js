@@ -1,4 +1,4 @@
-import { StoridgeNodeModel } from '../models/node';
+import { StoridgeNodeModel, StoridgeNodeDetailedModel } from '../models/node';
 
 angular.module('extension.storidge')
 .factory('StoridgeNodeService', ['$q', 'Storidge', function StoridgeNodeServiceFactory($q, Storidge) {
@@ -22,10 +22,41 @@ angular.module('extension.storidge')
       deferred.resolve(nodes);
     })
     .catch(function error(err) {
-      deferred.reject({ msg: 'Unable to retrieve Storidge profiles', err: err });
+      deferred.reject({ msg: 'Unable to retrieve Storidge nodes', err: err });
     });
 
     return deferred.promise;
+  };
+
+  service.node = function (id) {
+    var deferred = $q.defer();
+
+    Storidge.getNode({id:id}).$promise
+    .then(function success(data) {
+      var node = new StoridgeNodeDetailedModel(data.name, data.properties);
+      deferred.resolve(node);
+    })
+    .catch(function error(err) {
+      deferred.reject({ msg: 'Unable to retrieve Storidge node', err: err });
+    });
+
+    return deferred.promise;
+  };
+
+  service.add = function () {
+    return Storidge.addNode().$promise;
+  };
+
+  service.cordon = function (id) {
+    return Storidge.cordonNode({id: id}).$promise;
+  };
+
+  service.uncordon = function (id) {
+    return Storidge.uncordonNode({id: id}).$promise;
+  };
+
+  service.remove = function (id) {
+    return Storidge.removeNode({id:id}).$promise;
   };
 
   return service;

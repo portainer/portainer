@@ -75,14 +75,15 @@ function ($q, $scope, $state, TeamService, UserService, ModalService, Notificati
 
   function initView() {
     var userDetails = Authentication.getUserDetails();
-    var isAdmin = userDetails.role === 1 ? true: false;
+    var isAdmin = Authentication.isAdmin();
     $scope.isAdmin = isAdmin;
     $q.all({
       users: UserService.users(false),
       teams: isAdmin ? TeamService.teams() : UserService.userLeadingTeams(userDetails.ID)
     })
     .then(function success(data) {
-      $scope.teams = data.teams;
+      var teams = data.teams;
+      $scope.teams = teams;
       $scope.users = data.users;
     })
     .catch(function error(err) {

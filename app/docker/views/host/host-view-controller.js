@@ -19,7 +19,7 @@ angular.module('portainer.docker').controller('HostViewController', [
     function initView() {
       var applicationState = StateManager.getState();
       ctrl.state.isAgent = applicationState.endpoint.mode.agentProxy;
-      ctrl.state.isAdmin = Authentication.getUserDetails().role === 1;
+      ctrl.state.isAdmin = Authentication.isAdmin();
       var agentApiVersion = applicationState.endpoint.agentApiVersion;
       ctrl.state.agentApiVersion = agentApiVersion;
       ctrl.state.enableHostManagementFeatures = applicationState.application.enableHostManagementFeatures;

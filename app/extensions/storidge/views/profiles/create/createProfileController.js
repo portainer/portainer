@@ -1,8 +1,13 @@
+import _ from 'lodash-es';
 import { StoridgeProfileDefaultModel } from '../../../models/profile';
 
 angular.module('extension.storidge')
 .controller('StoridgeCreateProfileController', ['$scope', '$state', '$transition$', 'Notifications', 'StoridgeProfileService',
 function ($scope, $state, $transition$, Notifications, StoridgeProfileService) {
+
+  $scope.formValues = {
+    Labels: []
+  };
 
   $scope.state = {
     NoLimit: true,
@@ -17,6 +22,24 @@ function ($scope, $state, $transition$, Notifications, StoridgeProfileService) {
     { value: 3, label: '3-copy' }
   ];
 
+  $scope.addLabel = function() {
+    $scope.formValues.Labels.push({ name: '', value: ''});
+  };
+
+  $scope.removeLabel = function(index) {
+    $scope.formValues.Labels.splice(index, 1);
+  };
+
+  function prepareLabels(profile) {
+    var labels = {};
+    $scope.formValues.Labels.forEach(function (label) {
+      if (label.name && label.value) {
+        labels[label.name] = label.value;
+      }
+    });
+    profile.Labels = labels;
+  }
+
   $scope.create = function () {
     var profile = $scope.model;
 
@@ -29,6 +52,23 @@ function ($scope, $state, $transition$, Notifications, StoridgeProfileService) {
       delete profile.MinBandwidth;
       delete profile.MaxBandwidth;
     }
+
+    if (profile.SnapshotEnabled) {
+      if (!profile.SnapshotMax || profile.SnapshotMax <= 0) {
+        profile.SnapshotMax = 1;
+      }
+      if (!$scope.state.RecurringSnapshotEnabled) {
+        delete profile.SnapshotInterval;
+      }
+      if ($scope.state.RecurringSnapshotEnabled && (!profile.SnapshotInterval || profile.SnapshotInterval <= 0)) {
+        profile.SnapshotInterval = 1440;
+      }
+    } else {
+      delete profile.SnapshotMax;
+      delete profile.SnapshotInterval;
+    }
+
+    prepareLabels(profile);
 
     $scope.state.actionInProgress = true;
     StoridgeProfileService.create(profile)
@@ -47,7 +87,7 @@ function ($scope, $state, $transition$, Notifications, StoridgeProfileService) {
   $scope.updatedName = function() {
     if (!$scope.state.ManualInputDirectory) {
       var profile = $scope.model;
-      profile.Directory = '/cio/' + profile.Name;
+      profile.Directory = '/cio/' + (profile.Name ? _.toLower(profile.Name) : '');
     }
   };
 
@@ -60,7 +100,7 @@ function ($scope, $state, $transition$, Notifications, StoridgeProfileService) {
   function initView() {
     var profile = new StoridgeProfileDefaultModel();
     profile.Name = $transition$.params().profileName;
-    profile.Directory = '/cio/' + profile.Name;
+    profile.Directory = profile.Directory + _.toLower(profile.Name);
     $scope.model = profile;
   }
 

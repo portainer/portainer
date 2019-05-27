@@ -2,8 +2,8 @@ import _ from 'lodash-es';
 
 // TODO: legacy extension management
 angular.module('portainer.app')
-.factory('LegacyExtensionManager', ['$q', 'PluginService', 'SystemService', 'LegacyExtensionService',
-function ExtensionManagerFactory($q, PluginService, SystemService, LegacyExtensionService) {
+.factory('LegacyExtensionManager', ['$q', 'PluginService', 'SystemService', 'NodeService', 'LegacyExtensionService',
+function ExtensionManagerFactory($q, PluginService, SystemService, NodeService, LegacyExtensionService) {
   'use strict';
   var service = {};
 
@@ -59,9 +59,9 @@ function ExtensionManagerFactory($q, PluginService, SystemService, LegacyExtensi
   function registerStoridgeUsingSwarmManagerIP() {
     var deferred = $q.defer();
 
-    SystemService.info()
+    NodeService.getActiveManager()
     .then(function success(data) {
-      var managerIP = data.Swarm.NodeAddr;
+      var managerIP = data.Addr;
       var storidgeAPIURL = 'tcp://' + managerIP + ':8282';
       return LegacyExtensionService.registerStoridgeExtension(storidgeAPIURL);
     })

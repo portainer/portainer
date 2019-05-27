@@ -5,11 +5,12 @@ package proxy
 import (
 	"net"
 	"net/http"
-
 	"github.com/Microsoft/go-winio"
+	
+	portainer "github.com/portainer/portainer/api"
 )
 
-func (factory *proxyFactory) newLocalProxy(path string) http.Handler {
+func (factory *proxyFactory) newLocalProxy(path string, endpointID portainer.EndpointID) http.Handler {
 	proxy := &localProxy{}
 	transport := &proxyTransport{
 		enableSignature:        false,
@@ -19,6 +20,7 @@ func (factory *proxyFactory) newLocalProxy(path string) http.Handler {
 		RegistryService:        factory.RegistryService,
 		DockerHubService:       factory.DockerHubService,
 		dockerTransport:        newNamedPipeTransport(path),
+		endpointIdentifier:     endpointID,
 	}
 	proxy.Transport = transport
 	return proxy

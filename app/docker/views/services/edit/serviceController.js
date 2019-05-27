@@ -508,8 +508,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       $scope.availableLoggingDrivers = data.availableLoggingDrivers;
       $scope.availableVolumes = data.volumes;
       $scope.allowBindMounts = data.settings.AllowBindMountsForRegularUsers;
-      var userDetails = Authentication.getUserDetails();
-      $scope.isAdmin = userDetails.role === 1;
+      $scope.isAdmin = Authentication.isAdmin();
 
       if (data.webhooks.length > 0) {
         var webhook = data.webhooks[0];

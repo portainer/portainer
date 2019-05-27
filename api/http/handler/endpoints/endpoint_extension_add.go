@@ -50,9 +50,9 @@ func (handler *Handler) endpointExtensionAdd(w http.ResponseWriter, r *http.Requ
 	extensionType := portainer.EndpointExtensionType(payload.Type)
 
 	var extension *portainer.EndpointExtension
-	for _, ext := range endpoint.Extensions {
-		if ext.Type == extensionType {
-			extension = &ext
+	for idx := range endpoint.Extensions {
+		if endpoint.Extensions[idx].Type == extensionType {
+			extension = &endpoint.Extensions[idx]
 		}
 	}
 

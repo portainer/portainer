@@ -158,7 +158,7 @@ angular.module('portainer.docker')
         var networkConfiguration = prepareConfiguration();
         var accessControlData = $scope.formValues.AccessControlData;
         var userDetails = Authentication.getUserDetails();
-        var isAdmin = userDetails.role === 1;
+        var isAdmin = Authentication.isAdmin();
 
         if (!validateForm(accessControlData, isAdmin)) {
           return;

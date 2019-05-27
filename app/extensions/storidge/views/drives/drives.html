@@ -1,0 +1,24 @@
+<rd-header>
+  <rd-header-title title-text="Storidge drives">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="storidge.drives" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>
+    <a ui-sref="storidge.cluster">Storidge</a> &gt; <a ui-sref="storidge.drives">Drives</a>
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <storidge-drives-datatable
+    title-text="Drives" title-icon="fa-hdd"
+    dataset="drives" table-key="storidge_drives"
+    order-by="Id"
+    rescan-action="rescanAction"
+    add-action="addAction"
+    action-in-progress="state.actionInProgress"
+    addition-in-progress="state.additionInProgress"
+    ></storidge-drives-datatable>
+  </div>
+</div>

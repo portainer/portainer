@@ -4,5 +4,4 @@ export function StatusViewModel(data) {
   this.EndpointManagement = data.EndpointManagement;
   this.Analytics = data.Analytics;
   this.Version = data.Version;
-  this.EnabledExtensions = data.EnabledExtensions;
 }

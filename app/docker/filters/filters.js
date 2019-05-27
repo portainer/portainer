@@ -97,6 +97,18 @@ angular.module('portainer.docker')
     return 'success';
   };
 })
+.filter('dockerNodeAvailabilityBadge', function () {
+  'use strict';
+  return function (text) {
+    if (text === 'pause') {
+      return 'warning';
+    }
+    else if (text === 'drain') {
+      return 'danger';
+    }
+    return 'success';
+  };
+})
 .filter('trimcontainername', function () {
   'use strict';
   return function (name) {

@@ -32,6 +32,39 @@ angular.module('extension.storidge', [])
     }
   };
 
+  var drives = {
+    name: 'storidge.drives',
+    url: '/drives',
+    views: {
+      'content@': {
+        templateUrl: './views/drives/drives.html',
+        controller: 'StoridgeDrivesController'
+      }
+    }
+  };
+
+  var drive = {
+    name: 'storidge.drives.drive',
+    url: '/:id',
+    views: {
+      'content@': {
+        templateUrl: './views/drives/inspect/drive.html',
+        controller: 'StoridgeDriveController'
+      }
+    }
+  };
+
+  var snapshot = {
+    name: 'docker.volumes.volume.snapshot',
+    url: '/:snapshotId',
+    views: {
+      'content@': {
+        templateUrl: './views/snapshots/inspect/snapshot.html',
+        controller: 'StoridgeSnapshotController'
+      }
+    }
+  };
+
   var profileCreation = {
     name: 'storidge.profiles.new',
     url: '/new',
@@ -57,6 +90,17 @@ angular.module('extension.storidge', [])
     }
   };
 
+  var node = {
+    name: 'storidge.cluster.node',
+    url: '/:name',
+    views: {
+      'content@': {
+        templateUrl: './views/nodes/inspect/node.html',
+        controller: 'StoridgeNodeController'
+      }
+    }
+  };
+
   var monitor = {
     name: 'storidge.monitor',
     url: '/events',
@@ -69,9 +113,13 @@ angular.module('extension.storidge', [])
   };
 
   $stateRegistryProvider.register(storidge);
+  $stateRegistryProvider.register(drives);
+  $stateRegistryProvider.register(drive);
+  $stateRegistryProvider.register(snapshot);
   $stateRegistryProvider.register(profiles);
   $stateRegistryProvider.register(profile);
   $stateRegistryProvider.register(profileCreation);
   $stateRegistryProvider.register(cluster);
+  $stateRegistryProvider.register(node);
   $stateRegistryProvider.register(monitor);
 }]);
