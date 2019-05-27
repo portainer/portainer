@@ -33,7 +33,7 @@ func (store *Store) Init() error {
 	if len(roles) == 0 {
 		environmentAdministratorRole := &portainer.Role{
 			Name:        "Endpoint administrator",
-			Description: "Full control on all the resources inside an endpoint",
+			Description: "Full control of all resources in an endpoint",
 			Authorizations: map[portainer.Authorization]bool{
 				portainer.OperationDockerContainerArchiveInfo:         true,
 				portainer.OperationDockerContainerList:                true,
@@ -176,7 +176,7 @@ func (store *Store) Init() error {
 
 		environmentReadOnlyUserRole := &portainer.Role{
 			Name:        "Helpdesk",
-			Description: "Read-only authorizations on all the resources inside an endpoint",
+			Description: "Read-only access of all resources in an endpoint",
 			Authorizations: map[portainer.Authorization]bool{
 				portainer.OperationDockerContainerArchiveInfo: true,
 				portainer.OperationDockerContainerList:        true,
@@ -235,7 +235,7 @@ func (store *Store) Init() error {
 
 		standardUserRole := &portainer.Role{
 			Name:        "Standard user",
-			Description: "Regular user account restricted to access authorized resources",
+			Description: "Full control of assigned resources in an endpoint",
 			Authorizations: map[portainer.Authorization]bool{
 				portainer.OperationDockerContainerArchiveInfo:         true,
 				portainer.OperationDockerContainerList:                true,
@@ -371,7 +371,7 @@ func (store *Store) Init() error {
 
 		readOnlyUserRole := &portainer.Role{
 			Name:        "Read-only user",
-			Description: "Read-only user account restricted to access authorized resources",
+			Description: "Read-only access of assigned resources in an endpoint",
 			Authorizations: map[portainer.Authorization]bool{
 				portainer.OperationDockerContainerArchiveInfo: true,
 				portainer.OperationDockerContainerList:        true,
