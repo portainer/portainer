@@ -56,8 +56,13 @@ angular.module('portainer.app')
     return deferred.promise;
   };
 
-  service.extensionEnabled = function(extensionId) {
-    return StateManager.getExtension(extensionId) ? true : false;
+  service.extensionEnabled = async function(extensionId) {
+    if (extensionId === service.EXTENSIONS.RBAC) {
+      return StateManager.getExtension(extensionId) ? true : false;
+    } else {
+      const extension = await Extension.get({id: extensionId}).$promise;
+      return extension.Enabled;
+    }
   };
 
   service.retrieveAndSaveEnabledExtensions = async function() {
