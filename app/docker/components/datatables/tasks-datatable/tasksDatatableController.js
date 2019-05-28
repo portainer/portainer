@@ -6,6 +6,7 @@ function (PaginationService, DatatableService) {
     showQuickActionLogs: true,
     showQuickActionExec: true,
     showQuickActionInspect: true,
+    showQuickActionAttach: false,
     selectAll: false,
     orderBy: this.orderBy,
     paginatedItemLimit: PaginationService.getPaginationLimit(this.tableKey),

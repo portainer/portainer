@@ -10,7 +10,8 @@ function (DatatableService) {
     showQuickActionStats: true,
     showQuickActionLogs: true,
     showQuickActionExec: true,
-    showQuickActionInspect: true
+    showQuickActionInspect: true,
+    showQuickActionAttach: false
   };
 
   this.filters = {
