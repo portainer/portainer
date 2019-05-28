@@ -4,7 +4,7 @@ function (PaginationService, DatatableService) {
   this.state = {
     showQuickActionStats: true,
     showQuickActionLogs: true,
-    showQuickActionConsole: true,
+    showQuickActionExec: true,
     showQuickActionInspect: true,
     selectAll: false,
     orderBy: this.orderBy,
