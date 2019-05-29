@@ -1,4 +1,4 @@
-FROM ${IMAGE_TAG}
+FROM microsoft/nanoserver:sac2016
 
 COPY dist /
 
