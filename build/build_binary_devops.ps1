@@ -17,11 +17,12 @@ Copy-Item -Path "api" -Destination "$go_path\src\github.com\portainer\portainer\
 
 Set-Location -Path "api\cmd\portainer"
 
+Get-ChildItem env:
+
 ls
 ls "$go_path\src\github.com\portainer\portainer\api"
 
-
-go.exe get -t -d -v ./...
-go.exe build -v
+go get -t -d -v ./...
+go build -v
 
 Move-Item -Path "$($binary)" -Destination "dist"
