@@ -1,5 +1,3 @@
-ARG IMAGE_TAG=mcr.microsoft.com/windows/nanoserver:1903
-
 FROM ${IMAGE_TAG}
 
 COPY dist /
