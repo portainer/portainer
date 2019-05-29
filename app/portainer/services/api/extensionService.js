@@ -60,8 +60,9 @@ angular.module('portainer.app')
     if (extensionId === service.EXTENSIONS.RBAC) {
       return StateManager.getExtension(extensionId) ? true : false;
     } else {
-      const extension = await Extension.get({id: extensionId}).$promise;
-      return extension.Enabled;
+      const extensions = await service.extensions(false);
+      const extension = _.find(extensions, (ext) => ext.Id === extensionId);
+      return extension ? extension.Enabled : false;
     }
   };
 
