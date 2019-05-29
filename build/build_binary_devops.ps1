@@ -17,8 +17,7 @@ Copy-Item -Path "api" -Destination "$go_path\src\github.com\portainer\portainer\
 
 Set-Location -Path "api\cmd\portainer"
 
-#go get -t -d -v ./...
-go get -d -v ./...
+go get -t -d -v ./...
 go build -v
 
 Move-Item -Path "$($binary)" -Destination "dist"
