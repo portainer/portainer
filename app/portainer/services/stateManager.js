@@ -35,6 +35,7 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
 
   manager.clean = function () {
     state.endpoint = {};
+    state.extensions = [];
   };
 
   manager.updateLogo = function(logoURL) {

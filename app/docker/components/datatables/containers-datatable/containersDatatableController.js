@@ -24,8 +24,9 @@ function (PaginationService, DatatableService, EndpointProvider) {
     containerNameTruncateSize: 32,
     showQuickActionStats: true,
     showQuickActionLogs: true,
-    showQuickActionConsole: true,
-    showQuickActionInspect: true
+    showQuickActionExec: true,
+    showQuickActionInspect: true,
+    showQuickActionAttach: false
   };
 
   this.filters = {

@@ -30,7 +30,8 @@ angular.module('portainer.app')
         $scope.state.actionInProgress = true;
         ExtensionService.enable(license)
           .then(function onSuccess() {
-            ExtensionService.retrieveAndSaveEnabledExtensions();
+            return ExtensionService.retrieveAndSaveEnabledExtensions();
+          }).then(function () {
             Notifications.success('Extension successfully enabled');
             $state.reload();
           })
