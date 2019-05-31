@@ -28,7 +28,6 @@ type motdData struct {
 }
 
 func (handler *Handler) motd(w http.ResponseWriter, r *http.Request) {
-
 	motd, err := client.Get(portainer.MessageOfTheDayURL, 0)
 	if err != nil {
 		log.Println(err)
@@ -44,15 +43,14 @@ func (handler *Handler) motd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//return json.NewDecoder(r.Body).Deco
-	// de(target)
-
-	//title, err := client.Get(portainer.MessageOfTheDayTitleURL, 0)
-	//if err != nil {
-	//	response.JSON(w, &motdResponse{Message: ""})
-	//	return
-	//}
-
 	hash := crypto.HashFromBytes(motd)
-	response.JSON(w, &motdResponse{Title: data.Title, Message: strings.Join(data.Message, "\n"), Hash: hash, ContentLayout: data.ContentLayout, Style: data.Style})
+	resp := motdResponse{
+		Title:         data.Title,
+		Message:       strings.Join(data.Message, "\n"),
+		Hash:          hash,
+		ContentLayout: data.ContentLayout,
+		Style:         data.Style,
+	}
+
+	response.JSON(w, &resp)
 }
