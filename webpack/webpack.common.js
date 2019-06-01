@@ -1,5 +1,6 @@
 const path = require('path');
-const { ProvidePlugin, IgnorePlugin } = require('webpack');
+const pkg = require('../package.json');
+const { ProvidePlugin, IgnorePlugin, DefinePlugin } = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackBuildNotifierPlugin = require('webpack-build-notifier');
 const CleanTerminalPlugin = require('clean-terminal-webpack-plugin');
@@ -94,6 +95,9 @@ module.exports = {
     new LodashModuleReplacementPlugin({
       shorthands: true,
       collections: true
+    }),
+    new DefinePlugin({
+      __CONFIG_GA_ID: JSON.stringify(pkg.config.GA_ID),
     })
   ],
   optimization: {
