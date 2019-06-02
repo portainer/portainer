@@ -2,7 +2,6 @@ package motd
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"strings"
 
@@ -30,7 +29,6 @@ type motdData struct {
 func (handler *Handler) motd(w http.ResponseWriter, r *http.Request) {
 	motd, err := client.Get(portainer.MessageOfTheDayURL, 0)
 	if err != nil {
-		log.Println(err)
 		response.JSON(w, &motdResponse{Message: ""})
 		return
 	}
@@ -38,15 +36,16 @@ func (handler *Handler) motd(w http.ResponseWriter, r *http.Request) {
 	var data motdData
 	err = json.Unmarshal(motd, &data)
 	if err != nil {
-		log.Println(err)
 		response.JSON(w, &motdResponse{Message: ""})
 		return
 	}
 
-	hash := crypto.HashFromBytes(motd)
+	message := strings.Join(data.Message, "\n")
+
+	hash := crypto.HashFromBytes([]byte(message))
 	resp := motdResponse{
 		Title:         data.Title,
-		Message:       strings.Join(data.Message, "\n"),
+		Message:       message,
 		Hash:          hash,
 		ContentLayout: data.ContentLayout,
 		Style:         data.Style,
