@@ -860,9 +860,7 @@ const (
 	// AssetsServerURL represents the URL of the Portainer asset server
 	AssetsServerURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com"
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
-	MessageOfTheDayURL = AssetsServerURL + "/motd.html"
-	// MessageOfTheDayTitleURL represents the URL where Portainer MOTD title can be retrieved
-	MessageOfTheDayTitleURL = AssetsServerURL + "/motd-title.txt"
+	MessageOfTheDayURL = AssetsServerURL + "/motd.json"
 	// ExtensionDefinitionsURL represents the URL where Portainer extension definitions can be retrieved
 	ExtensionDefinitionsURL = AssetsServerURL + "/extensions-1.20.3.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response
