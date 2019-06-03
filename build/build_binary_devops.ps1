@@ -15,17 +15,9 @@ New-Item -Name portainer -Path "$go_path\src\github.com\portainer" -ItemType Dir
 
 Copy-Item -Path "api" -Destination "$go_path\src\github.com\portainer\portainer\api" -Recurse -Force -ErrorAction:SilentlyContinue
 
-dir
-
 Set-Location -Path "api\cmd\portainer"
 
 go get -t -d -v ./...
 go build -v
 
-dir
-
 Copy-Item -Path "portainer.exe" -Destination "$($env:BUILD_SOURCESDIRECTORY)\dist\portainer.exe" -Force -ErrorAction:SilentlyContinue
-
-Set-Location -Path "$($env:BUILD_SOURCESDIRECTORY)"
-
-dir
