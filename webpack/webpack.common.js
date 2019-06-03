@@ -10,6 +10,7 @@ const npmPackage = require('../package.json');
 const projectRoot = path.resolve(__dirname, '..');
 
 module.exports = {
+  stats: 'verbose',
   entry: {
     main: './app/__module.js'
   },
