@@ -22,6 +22,9 @@ Set-Location -Path "api\cmd\portainer"
 go get -t -d -v ./...
 go build -v
 
+pwd
+dir
+
 Move-Item -Path "$($binary)" -Destination "dist"
 
 dir dist
