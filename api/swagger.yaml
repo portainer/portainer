@@ -2964,7 +2964,29 @@ definitions:
         type: "string"
         example: "member"
         description: "LDAP attribute which denotes the group membership."
-
+  UserAccessPolicies:
+    type: "object"
+    description: "User access policies associated to a registry/endpoint/endpoint group. RoleID is not required for registry access policies and can be set to 0."
+    additionalProperties:
+      $ref: "#/definitions/AccessPolicy"
+    example:
+      1: { RoleID: 1 }
+      2: { RoleID: 3 }
+  TeamAccessPolicies:
+    type: "object"
+    description: "Team access policies associated to a registry/endpoint/endpoint group. RoleID is not required for registry access policies and can be set to 0."
+    additionalProperties:
+      $ref: "#/definitions/AccessPolicy"
+    example:
+      1: { RoleID: 1 }
+      2: { RoleID: 3 }
+  AccessPolicy:
+    type: "object"
+    properties:
+      RoleID:
+        type: "integer"
+        example: "1"
+        description: "Role identifier. Reference the role that will be associated to this access policy"
   LDAPSettings:
     type: "object"
     properties:
@@ -3416,40 +3438,10 @@ definitions:
         type: "string"
         example: "cOrXoK/1D35w8YQ8nH1/8ZGwzz45JIYD5jxHKXEQknk="
         description: "Azure authentication key"
-  EndpointAccessUpdateRequest:
-    type: "object"
-    properties:
-      AuthorizedUsers:
-        type: "array"
-        description: "List of user identifiers authorized to connect to this endpoint"
-        items:
-          type: "integer"
-          example: 1
-          description: "User identifier"
-      AuthorizedTeams:
-        type: "array"
-        description: "List of team identifiers authorized to connect to this endpoint"
-        items:
-          type: "integer"
-          example: 1
-          description: "Team identifier"
-  EndpointGroupAccessUpdateRequest:
-    type: "object"
-    properties:
-      AuthorizedUsers:
-        type: "array"
-        description: "List of user identifiers authorized to connect to this endpoint"
-        items:
-          type: "integer"
-          example: 1
-          description: "User identifier"
-      AuthorizedTeams:
-        type: "array"
-        description: "List of team identifiers authorized to connect to this endpoint"
-        items:
-          type: "integer"
-          example: 1
-          description: "Team identifier"
+      UserAccessPolicies:
+        $ref: "#/definitions/UserAccessPolicies"
+      TeamAccessPolicies:
+        $ref: "#/definitions/TeamAccessPolicies"
   RegistryCreateRequest:
     type: "object"
     required:
@@ -3514,23 +3506,10 @@ definitions:
         type: "string"
         example: "registry_password"
         description: "Password used to authenticate against this registry"
-  RegistryAccessUpdateRequest:
-    type: "object"
-    properties:
-      AuthorizedUsers:
-        type: "array"
-        description: "List of user identifiers authorized to use thi registry"
-        items:
-          type: "integer"
-          example: 1
-          description: "User identifier"
-      AuthorizedTeams:
-        type: "array"
-        description: "List of team identifiers authorized to use thi registry"
-        items:
-          type: "integer"
-          example: 1
-          description: "Team identifier"
+      UserAccessPolicies:
+        $ref: "#/definitions/UserAccessPolicies"
+      TeamAccessPolicies:
+        $ref: "#/definitions/TeamAccessPolicies"
   ResourceControlCreateRequest:
     type: "object"
     required:
@@ -3681,6 +3660,10 @@ definitions:
           type: "integer"
           example: 1
           description: "Endpoint identifier"
+      UserAccessPolicies:
+        $ref: "#/definitions/UserAccessPolicies"
+      TeamAccessPolicies:
+        $ref: "#/definitions/TeamAccessPolicies"
   UserCreateRequest:
     type: "object"
     required:
