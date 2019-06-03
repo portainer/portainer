@@ -15,16 +15,11 @@ New-Item -Name portainer -Path "$go_path\src\github.com\portainer" -ItemType Dir
 
 Copy-Item -Path "api" -Destination "$go_path\src\github.com\portainer\portainer\api" -Recurse -Force -ErrorAction:SilentlyContinue
 
-dir dist
-
 Set-Location -Path "api\cmd\portainer"
 
 go get -t -d -v ./...
 go build -v
 
-pwd
-dir
+Move-Item -Path "$($binary)" -Destination "..\..\dist"
 
-Move-Item -Path "$($binary)" -Destination "dist"
-
-dir dist
+dir "..\..\dist"
