@@ -38,6 +38,9 @@ module.exports = {
         use: [
           {
             loader: 'ngtemplate-loader',
+            options: {
+              relativeTo: path.resolve(__dirname, path.sep)
+            }
           },
           { loader: 'html-loader' }
         ]
