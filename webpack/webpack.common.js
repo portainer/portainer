@@ -10,7 +10,6 @@ const npmPackage = require('../package.json');
 const projectRoot = path.resolve(__dirname, '..');
 
 module.exports = {
-  stats: 'verbose',
   entry: {
     main: './app/__module.js'
   },
@@ -39,7 +38,7 @@ module.exports = {
           {
             loader: 'ngtemplate-loader',
             options: {
-              relativeTo: path.resolve(__dirname, path.sep)
+              relativeTo: projectRoot + '/'
             }
           },
           { loader: 'html-loader' }
