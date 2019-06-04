@@ -42,11 +42,11 @@
                 </div>
                 <div class="form-group">
                   {{ stackName }}
-                  <button class="btn btn-xs btn-danger" ng-click="removeStack()" ng-if="!state.externalStack || stack.Type === 1"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this stack</button>
+                  <button authorization="PortainerStackDelete" class="btn btn-xs btn-danger" ng-click="removeStack()" ng-if="!state.externalStack || stack.Type === 1"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this stack</button>
                 </div>
               </div>
               <!-- !stack-details -->
-              <stack-duplication-form 
+              <stack-duplication-form
                 ng-if="!state.externalStack && endpoints.length > 0"
                 endpoints="endpoints"
                 groups="groups"
@@ -86,7 +86,7 @@
                   Environment
                 </div>
                 <div class="form-group">
-                  <div class="col-sm-12" style="margin-top: 5px;">
+                  <div class="col-sm-12" style="margin-top: 5px;" authorization="PortainerStackUpdate">
                     <label class="control-label text-left">Environment variables</label>
                     <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addEnvironmentVariable()">
                       <i class="fa fa-plus-circle" aria-hidden="true"></i> add environment variable
@@ -103,7 +103,7 @@
                         <span class="input-group-addon">value</span>
                         <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. bar">
                       </div>
-                      <button class="btn btn-sm btn-danger" type="button" ng-click="removeEnvironmentVariable($index)">
+                      <button class="btn btn-sm btn-danger" type="button" ng-click="removeEnvironmentVariable($index)" authorization="PortainerStackUpdate">
                         <i class="fa fa-trash" aria-hidden="true"></i>
                       </button>
                     </div>
@@ -113,7 +113,7 @@
               </div>
               <!-- !environment-variables -->
               <!-- options -->
-              <div ng-if="stack.Type === 1 && applicationState.endpoint.apiVersion >= 1.27">
+              <div ng-if="stack.Type === 1 && applicationState.endpoint.apiVersion >= 1.27" authorization="PortainerStackUpdate">
                 <div class="col-sm-12 form-section-title">
                 Options
                 </div>
@@ -130,15 +130,17 @@
                 </div>
               </div>
               <!-- !options -->
-              <div class="col-sm-12 form-section-title">
-                Actions
-              </div>
-              <div class="form-group">
-                <div class="col-sm-12">
-                  <button type="button" class="btn btn-sm btn-primary" ng-disabled="state.actionInProgress" ng-click="deployStack()" button-spinner="state.actionInProgress">
-                    <span ng-hide="state.actionInProgress">Update the stack</span>
-                    <span ng-show="state.actionInProgress">Deployment in progress...</span>
-                  </button>
+              <div authorization="PortainerStackUpdate">
+                <div class="col-sm-12 form-section-title">
+                  Actions
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-12">
+                    <button type="button" class="btn btn-sm btn-primary" ng-disabled="state.actionInProgress" ng-click="deployStack()" button-spinner="state.actionInProgress">
+                      <span ng-hide="state.actionInProgress">Update the stack</span>
+                      <span ng-show="state.actionInProgress">Deployment in progress...</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </form>

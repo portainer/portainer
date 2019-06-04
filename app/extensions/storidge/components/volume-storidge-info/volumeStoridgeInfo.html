@@ -1,0 +1,198 @@
+<rd-widget>
+  <rd-widget-header icon="fa-cube" title-text="Storidge details">
+    <div class="form-group">
+      <div class="col-sm-12">
+        <button type="button" class="btn btn-primary btn-sm" ng-click="$ctrl.updateVolume()" ng-if="!$ctrl.state.updateInProgress">
+          <span>Update the volume</span>
+        </button>
+        <button type="button" class="btn btn-primary btn-sm" ng-click="$ctrl.confirmUpdate()" ng-if="$ctrl.state.updateInProgress" button-spinner="$ctrl.state.isUpdating">
+          <span ng-hide="$ctrl.state.isUpdating">Confirm</span>
+          <span ng-show="$ctrl.state.isUpdating">Updating the volume...</span>
+        </button>
+        <button type="button" class="btn btn-danger btn-sm" ng-click="$ctrl.cancelUpdate()" ng-if="$ctrl.state.updateInProgress" ng-disabled="$ctrl.state.isUpdating">
+          <span>Cancel</span>
+        </button>
+      </div>
+    </div>
+  </rd-widget-header>
+  <rd-widget-body classes="no-padding" ng-if="!$ctrl.state.updateInProgress">
+    <table class="table">
+      <tbody>
+        <tr>
+          <td>Name</td>
+          <td>{{ $ctrl.volume.Name }}</td>
+        </tr>
+        <tr>
+          <td>UUID</td>
+          <td>{{ $ctrl.volume.Uuid }}</td>
+        </tr>
+        <tr>
+          <td>Node</td>
+          <td>{{ $ctrl.volume.Node }}</td>
+        </tr>
+        <tr>
+          <td>Node ID</td>
+          <td>{{ $ctrl.volume.NodeID }}</td>
+        </tr>
+        <tr>
+          <td>Directory</td>
+          <td>{{ $ctrl.volume.Directory }}</td>
+        </tr>
+        <tr>
+          <td>Capacity</td>
+          <td>{{ $ctrl.volume.Capacity }}</td>
+        </tr>
+        <tr>
+          <td>Allocated</td>
+          <td>{{ $ctrl.volume.Allocated }}</td>
+        </tr>
+        <tr>
+          <td>IOPS Min</td>
+          <td>{{ $ctrl.volume.IOPSMin }}</td>
+        </tr>
+        <tr>
+          <td>IOPS Max</td>
+          <td>{{ $ctrl.volume.IOPSMax }}</td>
+        </tr>
+        <tr>
+          <td>Bandwidth Min</td>
+          <td>{{ $ctrl.volume.BandwidthMin }}</td>
+        </tr>
+        <tr>
+          <td>Bandwidth Max</td>
+          <td>{{ $ctrl.volume.BandwidthMax }}</td>
+        </tr>
+        <tr>
+          <td>Local Drive Only</td>
+          <td>{{ $ctrl.volume.LocalDriveOnly }}</td>
+        </tr>
+        <tr>
+          <td>Provisioning</td>
+          <td>{{ $ctrl.volume.Provisioning }}</td>
+        </tr>
+        <tr>
+          <td>Redundancy</td>
+          <td>{{ $ctrl.volume.Redundancy }}</td>
+        </tr>
+        <tr>
+          <td>Vdisk</td>
+          <td>{{ $ctrl.volume.Vdisk }}</td>
+        </tr>
+        <tr>
+          <td>IP</td>
+          <td>{{ $ctrl.volume.IP}}</td>
+        </tr>
+        <tr>
+          <td>Drive Type</td>
+          <td>{{ $ctrl.volume.DriveType}}</td>
+        </tr>
+        <tr>
+          <td>Encryption</td>
+          <td>{{ $ctrl.volume.Encryption}}</td>
+        </tr>
+        <tr>
+          <td>Snapshot Enabled</td>
+          <td>{{ $ctrl.volume.SnapshotEnabled}}</td>
+        </tr>
+        <tr>
+          <td>Snapshot Interval</td>
+          <td>{{ $ctrl.volume.SnapshotInterval}} minute(s)</td>
+        </tr>
+        <tr>
+          <td>Max Snapshots</td>
+          <td>{{ $ctrl.volume.SnapshotMax}}</td>
+        </tr>
+        <tr>
+          <td>Filesystem</td>
+          <td>{{ $ctrl.volume.Filesystem}}</td>
+        </tr>
+        <tr ng-if="$ctrl.volume.Labels">
+          <td>Labels</td>
+          <td>
+            <table class="table table-bordered table-condensed">
+              <tr ng-repeat="var in $ctrl.volume.Labels">
+                <td>{{ var|key: '=' }}</td>
+                <td>{{ var|value: '=' }}</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </rd-widget-body>
+  <rd-widget-body ng-if="$ctrl.state.updateInProgress">
+    <form class="form-horizontal" name="storidgeUpdateVolumeForm">
+      <!-- Node -->
+      <div class="form-group">
+        <label for="volume_node" class="col-sm-2 col-lg-1 control-label text-left">Node</label>
+        <div class="col-sm-10 col-lg-11">
+          <input type="text" class="form-control" ng-model="$ctrl.formValues.Node" name="volume_node" placeholder="2">
+        </div>
+      </div>
+      <!-- !Node -->
+      <!-- Capacity -->
+      <div class="form-group">
+        <label for="volume_capacity" class="col-sm-2 col-lg-1 control-label text-left">Capacity</label>
+        <div class="col-sm-10 col-lg-11">
+          <input type="text" class="form-control" ng-model="$ctrl.formValues.Capacity" name="volume_capacity" placeholder="2">
+        </div>
+      </div>
+      <!-- !Capacity -->
+      <!-- IOPS -->
+      <div class="form-group">
+        <label for="min_iops" class="col-sm-2 col-lg-1 control-label text-left">Min IOPS</label>
+        <div class="col-sm-10 col-lg-11">
+          <input type="number" class="form-control" ng-model="$ctrl.formValues.IOPSMin" name="min_iops" placeholder="100">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="max_iops" class="col-sm-2 col-lg-1 control-label text-left">Max IOPS</label>
+        <div class="col-sm-10 col-lg-11">
+          <input type="number" class="form-control" ng-model="$ctrl.formValues.IOPSMax" name="max_iops" placeholder="2000">
+        </div>
+      </div>
+      <!-- !IOPS -->
+      <!-- Bandwidth -->
+      <div class="form-group">
+        <label for="min_bandwidth" class="col-sm-2 col-lg-1 control-label text-left">Min Bandwidth</label>
+        <div class="col-sm-10 col-lg-11">
+          <input type="number" class="form-control" ng-model="$ctrl.formValues.BandwidthMin" name="min_bandwidth" placeholder="100">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="max_bandwidth" class="col-sm-2 col-lg-1 control-label text-left">Max Bandwidth</label>
+        <div class="col-sm-10 col-lg-11">
+          <input type="number" class="form-control" ng-model="$ctrl.formValues.BandwidthMax" name="max_bandwidth" placeholder="2000">
+        </div>
+      </div>
+      <!-- !Bandwidth -->
+      <!-- labels -->
+      <div class="form-group">
+        <div class="col-sm-12" style="margin-top: 5px;">
+          <label class="control-label text-left">Labels</label>
+          <span class="label label-default interactive" style="margin-left: 10px;" ng-click="$ctrl.addLabel()">
+            <i class="fa fa-plus-circle" aria-hidden="true"></i> add label
+          </span>
+        </div>
+        <!-- labels-input-list -->
+        <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+          <div ng-repeat="label in $ctrl.formValues.Labels" style="margin-top: 2px;">
+            <div class="input-group col-sm-5 input-group-sm">
+              <span class="input-group-addon">name</span>
+              <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. com.example.foo">
+            </div>
+            <div class="input-group col-sm-5 input-group-sm">
+              <span class="input-group-addon">value</span>
+              <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar">
+            </div>
+            <button class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removeLabel($index)">
+              <i class="fa fa-trash" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+        <!-- !labels-input-list -->
+      </div>
+      <!-- !labels -->
+    </form>
+  </rd-widget-body>
+</rd-widget>

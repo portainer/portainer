@@ -5,8 +5,8 @@ import (
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/http/security"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 func hideFields(settings *portainer.Settings) {
@@ -30,13 +30,13 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		Router: mux.NewRouter(),
 	}
 	h.Handle("/settings",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.settingsInspect))).Methods(http.MethodGet)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.settingsInspect))).Methods(http.MethodGet)
 	h.Handle("/settings",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.settingsUpdate))).Methods(http.MethodPut)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.settingsUpdate))).Methods(http.MethodPut)
 	h.Handle("/settings/public",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.settingsPublic))).Methods(http.MethodGet)
 	h.Handle("/settings/authentication/checkLDAP",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.settingsLDAPCheck))).Methods(http.MethodPut)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.settingsLDAPCheck))).Methods(http.MethodPut)
 
 	return h
 }

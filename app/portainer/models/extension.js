@@ -1,4 +1,4 @@
-function ExtensionViewModel(data) {
+export function ExtensionViewModel(data) {
   this.Id = data.Id;
   this.Name = data.Name;
   this.Enabled = data.Enabled;

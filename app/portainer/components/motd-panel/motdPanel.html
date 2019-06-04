@@ -1,0 +1,26 @@
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body classes="motd-body">
+        <style ng-if="$ctrl.motd.Style">
+          {{ $ctrl.motd.Style }}
+        </style>
+        <div ng-style="{{ $ctrl.motd.ContentLayout ? $ctrl.motd.ContentLayout : {} }}">
+          <div class="col-sm-12 form-section-title">
+            <span style="float: left;">
+              {{ $ctrl.motd.Title }}
+            </span>
+            <span class="small" style="float: right;" ng-if="$ctrl.dismissAction">
+              <a ng-click="$ctrl.dismissAction()"><i class="fa fa-times"></i> dismiss</a>
+            </span>
+          </div>
+          <div class="form-group">
+            <span class="text-muted">
+              <p ng-bind-html="$ctrl.motd.Message"></p>
+            </span>
+          </div>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

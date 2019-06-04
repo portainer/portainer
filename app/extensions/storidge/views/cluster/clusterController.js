@@ -24,6 +24,16 @@ function ($q, $scope, $state, Notifications, StoridgeClusterService, StoridgeNod
     });
   };
 
+  function rebootCluster() {
+    $scope.state.rebootInProgress = true;
+    StoridgeClusterService.reboot()
+    .finally(function final() {
+      $scope.state.rebootInProgress = false;
+      Notifications.success('Cluster successfully rebooted');
+      $state.reload();
+    });
+  }
+
   $scope.shutdownCluster = function() {
     ModalService.confirm({
       title: 'Are you sure?',
@@ -48,16 +58,6 @@ function ($q, $scope, $state, Notifications, StoridgeClusterService, StoridgeNod
       $scope.state.shutdownInProgress = false;
       Notifications.success('Cluster successfully shutdown');
       $state.go('docker.dashboard');
-    });
-  }
-
-  function rebootCluster() {
-    $scope.state.rebootInProgress = true;
-    StoridgeClusterService.reboot()
-    .finally(function final() {
-      $scope.state.rebootInProgress = false;
-      Notifications.success('Cluster successfully rebooted');
-      $state.reload();
     });
   }
 

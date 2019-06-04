@@ -1,3 +1,5 @@
+import { RepositoryTagViewModel } from '../models/repositoryTag';
+
 angular.module('portainer.extensions.registrymanagement')
   .factory('RegistryV2Helper', [function RegistryV2HelperFactory() {
     'use strict';

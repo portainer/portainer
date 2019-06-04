@@ -9,10 +9,11 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/orcaman/concurrent-map"
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/http/client"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/client"
 )
 
 var extensionDownloadBaseURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com/extensions/"
@@ -20,6 +21,7 @@ var extensionDownloadBaseURL = "https://portainer-io-assets.sfo2.digitaloceanspa
 var extensionBinaryMap = map[portainer.ExtensionID]string{
 	portainer.RegistryManagementExtension:  "extension-registry-management",
 	portainer.OAuthAuthenticationExtension: "extension-oauth-authentication",
+	portainer.RBACExtension:                "extension-rbac",
 }
 
 // ExtensionManager represents a service used to
@@ -205,6 +207,8 @@ func (manager *ExtensionManager) startExtensionProcess(extension *portainer.Exte
 	if err != nil {
 		return err
 	}
+
+	time.Sleep(3 * time.Second)
 
 	manager.processes.Set(processKey(extension.ID), extensionProcess)
 	return nil

@@ -1,3 +1,5 @@
+import { ResourceGroupViewModel } from '../models/resource_group';
+
 angular.module('portainer.azure')
 .factory('ResourceGroupService', ['$q', 'ResourceGroup', function ResourceGroupServiceFactory($q, ResourceGroup) {
   'use strict';

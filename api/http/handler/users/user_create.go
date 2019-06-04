@@ -7,8 +7,8 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/http/security"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 type userCreatePayload struct {
@@ -60,6 +60,23 @@ func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *http
 	user = &portainer.User{
 		Username: payload.Username,
 		Role:     portainer.UserRole(payload.Role),
+		PortainerAuthorizations: map[portainer.Authorization]bool{
+			portainer.OperationPortainerDockerHubInspect:        true,
+			portainer.OperationPortainerEndpointGroupList:       true,
+			portainer.OperationPortainerEndpointList:            true,
+			portainer.OperationPortainerEndpointInspect:         true,
+			portainer.OperationPortainerEndpointExtensionAdd:    true,
+			portainer.OperationPortainerEndpointExtensionRemove: true,
+			portainer.OperationPortainerExtensionList:           true,
+			portainer.OperationPortainerMOTD:                    true,
+			portainer.OperationPortainerRegistryList:            true,
+			portainer.OperationPortainerRegistryInspect:         true,
+			portainer.OperationPortainerTeamList:                true,
+			portainer.OperationPortainerTemplateList:            true,
+			portainer.OperationPortainerTemplateInspect:         true,
+			portainer.OperationPortainerUserList:                true,
+			portainer.OperationPortainerUserMemberships:         true,
+		},
 	}
 
 	settings, err := handler.SettingsService.Settings()

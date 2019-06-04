@@ -28,7 +28,7 @@ function ($q, $scope, SystemService, NodeService, Notifications, StateManager, A
     // If connected to a replica, information for node1 is available at element #5
     // The next 10 elements are information related to the node
     var node_offset = info[0][1] === 'primary' ? 4 : 5;
-    for (i = 0; i < node_count; i++) {
+    for (let i = 0; i < node_count; i++) {
       extractNodeInfo(info, node_offset);
       node_offset += 9;
     }
@@ -60,9 +60,7 @@ function ($q, $scope, SystemService, NodeService, Notifications, StateManager, A
 
   function initView() {
     if (StateManager.getState().application.authentication) {
-      var userDetails = Authentication.getUserDetails();
-      var isAdmin = userDetails.role === 1 ? true: false;
-      $scope.isAdmin = isAdmin;
+      $scope.isAdmin = Authentication.isAdmin();
     }
 
     var provider = $scope.applicationState.endpoint.mode.provider;

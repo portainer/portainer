@@ -1,3 +1,5 @@
+import _ from 'lodash-es';
+
 angular.module('portainer.agent')
 .controller('VolumeBrowserController', ['HttpRequestHelper', 'VolumeBrowserService', 'FileSaver', 'Blob', 'ModalService', 'Notifications',
 function (HttpRequestHelper, VolumeBrowserService, FileSaver, Blob, ModalService, Notifications) {

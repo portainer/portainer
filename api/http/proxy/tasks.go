@@ -3,7 +3,7 @@ package proxy
 import (
 	"net/http"
 
-	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/api"
 )
 
 const (
@@ -25,7 +25,7 @@ func taskListOperation(response *http.Response, executor *operationExecutor) err
 		return err
 	}
 
-	if !executor.operationContext.isAdmin {
+	if !executor.operationContext.isAdmin && !executor.operationContext.endpointResourceAccess {
 		responseArray, err = filterTaskList(responseArray, executor.operationContext)
 		if err != nil {
 			return err
@@ -54,7 +54,7 @@ func extractTaskLabelsFromTaskListObject(responseObject map[string]interface{}) 
 // Resource controls checks are based on: service identifier, stack identifier (from label).
 // Task object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/TaskList
 // any resource control giving access to the user based on the associated service identifier.
-func filterTaskList(taskData []interface{}, context *restrictedOperationContext) ([]interface{}, error) {
+func filterTaskList(taskData []interface{}, context *restrictedDockerOperationContext) ([]interface{}, error) {
 	filteredTaskData := make([]interface{}, 0)
 
 	for _, task := range taskData {

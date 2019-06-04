@@ -1,3 +1,5 @@
+import { AccessControlFormData } from '../../../components/accessControlForm/porAccessControlFormModel';
+
 angular.module('portainer.app')
 .controller('CreateStackController', ['$scope', '$state', 'StackService', 'Authentication', 'Notifications', 'FormValidator', 'ResourceControlService', 'FormHelper', 'EndpointProvider',
 function ($scope, $state, StackService, Authentication, Notifications, FormValidator, ResourceControlService, FormHelper, EndpointProvider) {
@@ -95,7 +97,7 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
 
     var accessControlData = $scope.formValues.AccessControlData;
     var userDetails = Authentication.getUserDetails();
-    var isAdmin = userDetails.role === 1;
+    var isAdmin = Authentication.isAdmin();
     var userId = userDetails.ID;
 
     if (method === 'editor' && $scope.formValues.StackFileContent === '') {

@@ -19,7 +19,7 @@ function StackDuplicationFormController($state, EndpointProvider, EndpointServic
 
   function onInit() {
     var endpointId = EndpointProvider.endpointID();
-    ctrl.showRefreshButton = Authentication.getUserDetails().role === 1;
+    ctrl.showRefreshButton = Authentication.isAdmin();
 
 
     EndpointService.endpoint(endpointId)

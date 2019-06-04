@@ -24,8 +24,8 @@
               <td>ID</td>
               <td>
                 {{ config.Id }}
-                <button class="btn btn-xs btn-danger" ng-click="removeConfig(config.Id)"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this config</button>
-                <button class="btn btn-xs btn-primary" ui-sref="docker.configs.new({id: config.Id})"><i class="fa fa-copy space-right" aria-hidden="true"></i>Clone config</button>
+                <button authorization="DockerConfigDelete" class="btn btn-xs btn-danger" ng-click="removeConfig(config.Id)"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this config</button>
+                <button authorization="DockerConfigCreate"class="btn btn-xs btn-primary" ui-sref="docker.configs.new({id: config.Id})"><i class="fa fa-copy space-right" aria-hidden="true"></i>Clone config</button>
               </td>
             </tr>
             <tr>

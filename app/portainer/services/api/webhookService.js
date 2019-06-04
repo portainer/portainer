@@ -1,3 +1,5 @@
+import { WebhookViewModel } from '../../models/webhook';
+
 angular.module('portainer.app')
 .factory('WebhookService', ['$q', 'Webhooks', function WebhookServiceFactory($q, Webhooks) {
   'use strict';

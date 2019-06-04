@@ -1,3 +1,5 @@
+import _ from 'lodash-es';
+
 angular.module('portainer.extensions.oauth')
   .controller('OAuthSettingsController', function OAuthSettingsController() {
     var ctrl = this;

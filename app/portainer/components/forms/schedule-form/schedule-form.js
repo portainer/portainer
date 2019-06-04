@@ -1,5 +1,7 @@
+import moment from 'moment';
+
 angular.module('portainer.app').component('scheduleForm', {
-  templateUrl: 'app/portainer/components/forms/schedule-form/scheduleForm.html',
+  templateUrl: './scheduleForm.html',
   controller: function() {
     var ctrl = this;
 
@@ -27,7 +29,7 @@ angular.module('portainer.app').component('scheduleForm', {
     };
 
     function cronToDatetime(cron) {
-      strings = cron.split(' ');
+      var strings = cron.split(' ');
       if (strings.length !== 5) {
         return moment();
       }

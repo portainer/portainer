@@ -61,7 +61,7 @@ function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, N
     $q.all({
       registries: RegistryService.registries(),
       dockerhub: DockerHubService.dockerhub(),
-      registryManagement: ExtensionService.registryManagementEnabled()
+      registryManagement: ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.REGISTRY_MANAGEMENT)
     })
     .then(function success(data) {
       $scope.registries = data.registries;
@@ -69,9 +69,7 @@ function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, N
       $scope.registryManagementAvailable = data.registryManagement;
       var authenticationEnabled = $scope.applicationState.application.authentication;
       if (authenticationEnabled) {
-        var userDetails = Authentication.getUserDetails();
-        var isAdmin = userDetails.role === 1;
-        $scope.isAdmin = isAdmin;
+        $scope.isAdmin = Authentication.isAdmin();
       }
     })
     .catch(function error(err) {

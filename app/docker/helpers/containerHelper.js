@@ -1,4 +1,7 @@
-angular.module('portainer.docker').factory('ContainerHelper', [function ContainerHelperFactory() {
+import splitargs from 'splitargs/src/splitargs'
+
+angular.module('portainer.docker')
+.factory('ContainerHelper', [function ContainerHelperFactory() {
   'use strict';
   var helper = {};
 

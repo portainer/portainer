@@ -1,3 +1,5 @@
+import { RegistryManagementConfigurationDefaultModel } from '../../../../portainer/models/registry';
+
 angular.module('portainer.extensions.registrymanagement')
 .controller('ConfigureRegistryController', ['$scope', '$state', '$transition$', 'RegistryService', 'RegistryV2Service', 'Notifications',
 function ($scope, $state, $transition$, RegistryService, RegistryV2Service, Notifications) {

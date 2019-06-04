@@ -3,7 +3,7 @@ package proxy
 import (
 	"net/http"
 
-	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/api"
 )
 
 const (
@@ -24,7 +24,7 @@ func secretListOperation(response *http.Response, executor *operationExecutor) e
 		return err
 	}
 
-	if executor.operationContext.isAdmin {
+	if executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess {
 		responseArray, err = decorateSecretList(responseArray, executor.operationContext.resourceControls)
 	} else {
 		responseArray, err = filterSecretList(responseArray, executor.operationContext)
@@ -87,7 +87,7 @@ func decorateSecretList(secretData []interface{}, resourceControls []portainer.R
 // Authorized secrets are decorated during the process.
 // Resource controls checks are based on: resource identifier.
 // Secret object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/SecretList
-func filterSecretList(secretData []interface{}, context *restrictedOperationContext) ([]interface{}, error) {
+func filterSecretList(secretData []interface{}, context *restrictedDockerOperationContext) ([]interface{}, error) {
 	filteredSecretData := make([]interface{}, 0)
 
 	for _, secret := range secretData {

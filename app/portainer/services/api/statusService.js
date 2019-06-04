@@ -1,3 +1,5 @@
+import { StatusViewModel } from "../../models/status";
+
 angular.module('portainer.app')
 .factory('StatusService', ['$q', 'Status', function StatusServiceFactory($q, Status) {
   'use strict';

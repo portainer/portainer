@@ -19,7 +19,7 @@
                 <button class="btn btn-xs btn-danger" ng-click="deleteUser()"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this user</button>
               </td>
             </tr>
-            <tr>
+            <tr ng-if="isAdmin">
               <td colspan="2">
                 <label for="permissions" class="control-label text-left">
                   Administrator

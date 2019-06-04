@@ -54,7 +54,7 @@ info:
 
     **NOTE**: You can find more information on how to query the Docker API in the [Docker official documentation](https://docs.docker.com/engine/api/v1.30/) as well as in [this Portainer example](https://gist.github.com/deviantony/77026d402366b4b43fa5918d41bc42f8).
 
-  version: "1.20.2"
+  version: "1.21.0"
   title: "Portainer API"
   contact:
     email: "info@portainer.io"
@@ -465,56 +465,6 @@ paths:
           examples:
             application/json:
               err: "Endpoint management is disabled"
-  /endpoints/{id}/access:
-    put:
-      tags:
-      - "endpoints"
-      summary: "Manage accesses to an endpoint"
-      description: |
-        Manage user and team accesses to an endpoint.
-        **Access policy**: administrator
-      operationId: "EndpointAccessUpdate"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      security:
-      - jwt: []
-      parameters:
-      - name: "id"
-        in: "path"
-        description: "Endpoint identifier"
-        required: true
-        type: "integer"
-      - in: "body"
-        name: "body"
-        description: "Authorizations details"
-        required: true
-        schema:
-          $ref: "#/definitions/EndpointAccessUpdateRequest"
-      responses:
-        200:
-          description: "Success"
-          schema:
-            $ref: "#/definitions/Endpoint"
-        400:
-          description: "Invalid request"
-          schema:
-            $ref: "#/definitions/GenericError"
-          examples:
-            application/json:
-              err: "Invalid request data format"
-        404:
-          description: "Endpoint not found"
-          schema:
-            $ref: "#/definitions/GenericError"
-          examples:
-            application/json:
-              err: "Endpoint not found"
-        500:
-          description: "Server error"
-          schema:
-            $ref: "#/definitions/GenericError"
   /endpoints/{id}/job:
     post:
       tags:
@@ -791,56 +741,6 @@ paths:
           examples:
             application/json:
               err: "EndpointGroup management is disabled"
-  /endpoint_groups/{id}/access:
-    put:
-      tags:
-      - "endpoint_groups"
-      summary: "Manage accesses to an endpoint group"
-      description: |
-        Manage user and team accesses to an endpoint group.
-        **Access policy**: administrator
-      operationId: "EndpointGroupAccessUpdate"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      security:
-      - jwt: []
-      parameters:
-      - name: "id"
-        in: "path"
-        description: "EndpointGroup identifier"
-        required: true
-        type: "integer"
-      - in: "body"
-        name: "body"
-        description: "Authorizations details"
-        required: true
-        schema:
-          $ref: "#/definitions/EndpointGroupAccessUpdateRequest"
-      responses:
-        200:
-          description: "Success"
-          schema:
-            $ref: "#/definitions/EndpointGroup"
-        400:
-          description: "Invalid request"
-          schema:
-            $ref: "#/definitions/GenericError"
-          examples:
-            application/json:
-              err: "Invalid request data format"
-        404:
-          description: "EndpointGroup not found"
-          schema:
-            $ref: "#/definitions/GenericError"
-          examples:
-            application/json:
-              err: "EndpointGroup not found"
-        500:
-          description: "Server error"
-          schema:
-            $ref: "#/definitions/GenericError"
   /registries:
     get:
       tags:
@@ -1034,56 +934,6 @@ paths:
           examples:
             application/json:
               err: "Invalid request"
-        404:
-          description: "Registry not found"
-          schema:
-            $ref: "#/definitions/GenericError"
-          examples:
-            application/json:
-              err: "Registry not found"
-        500:
-          description: "Server error"
-          schema:
-            $ref: "#/definitions/GenericError"
-  /registries/{id}/access:
-    put:
-      tags:
-      - "registries"
-      summary: "Manage accesses to a registry"
-      description: |
-        Manage user and team accesses to a registry.
-        **Access policy**: administrator
-      operationId: "RegistryAccessUpdate"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      security:
-      - jwt: []
-      parameters:
-      - name: "id"
-        in: "path"
-        description: "Registry identifier"
-        required: true
-        type: "integer"
-      - in: "body"
-        name: "body"
-        description: "Authorizations details"
-        required: true
-        schema:
-          $ref: "#/definitions/RegistryAccessUpdateRequest"
-      responses:
-        200:
-          description: "Success"
-          schema:
-            $ref: "#/definitions/Registry"
-        400:
-          description: "Invalid request"
-          schema:
-            $ref: "#/definitions/GenericError"
-          examples:
-            application/json:
-              err: "Invalid request data format"
         404:
           description: "Registry not found"
           schema:
@@ -3018,7 +2868,7 @@ definitions:
         description: "Is analytics enabled"
       Version:
         type: "string"
-        example: "1.20.2"
+        example: "1.21.0"
         description: "Portainer API version"
   PublicSettingsInspectResponse:
     type: "object"
@@ -3114,7 +2964,29 @@ definitions:
         type: "string"
         example: "member"
         description: "LDAP attribute which denotes the group membership."
-
+  UserAccessPolicies:
+    type: "object"
+    description: "User access policies associated to a registry/endpoint/endpoint group. RoleID is not required for registry access policies and can be set to 0."
+    additionalProperties:
+      $ref: "#/definitions/AccessPolicy"
+    example:
+      1: { RoleID: 1 }
+      2: { RoleID: 3 }
+  TeamAccessPolicies:
+    type: "object"
+    description: "Team access policies associated to a registry/endpoint/endpoint group. RoleID is not required for registry access policies and can be set to 0."
+    additionalProperties:
+      $ref: "#/definitions/AccessPolicy"
+    example:
+      1: { RoleID: 1 }
+      2: { RoleID: 3 }
+  AccessPolicy:
+    type: "object"
+    properties:
+      RoleID:
+        type: "integer"
+        example: "1"
+        description: "Role identifier. Reference the role that will be associated to this access policy"
   LDAPSettings:
     type: "object"
     properties:
@@ -3566,40 +3438,10 @@ definitions:
         type: "string"
         example: "cOrXoK/1D35w8YQ8nH1/8ZGwzz45JIYD5jxHKXEQknk="
         description: "Azure authentication key"
-  EndpointAccessUpdateRequest:
-    type: "object"
-    properties:
-      AuthorizedUsers:
-        type: "array"
-        description: "List of user identifiers authorized to connect to this endpoint"
-        items:
-          type: "integer"
-          example: 1
-          description: "User identifier"
-      AuthorizedTeams:
-        type: "array"
-        description: "List of team identifiers authorized to connect to this endpoint"
-        items:
-          type: "integer"
-          example: 1
-          description: "Team identifier"
-  EndpointGroupAccessUpdateRequest:
-    type: "object"
-    properties:
-      AuthorizedUsers:
-        type: "array"
-        description: "List of user identifiers authorized to connect to this endpoint"
-        items:
-          type: "integer"
-          example: 1
-          description: "User identifier"
-      AuthorizedTeams:
-        type: "array"
-        description: "List of team identifiers authorized to connect to this endpoint"
-        items:
-          type: "integer"
-          example: 1
-          description: "Team identifier"
+      UserAccessPolicies:
+        $ref: "#/definitions/UserAccessPolicies"
+      TeamAccessPolicies:
+        $ref: "#/definitions/TeamAccessPolicies"
   RegistryCreateRequest:
     type: "object"
     required:
@@ -3664,23 +3506,10 @@ definitions:
         type: "string"
         example: "registry_password"
         description: "Password used to authenticate against this registry"
-  RegistryAccessUpdateRequest:
-    type: "object"
-    properties:
-      AuthorizedUsers:
-        type: "array"
-        description: "List of user identifiers authorized to use thi registry"
-        items:
-          type: "integer"
-          example: 1
-          description: "User identifier"
-      AuthorizedTeams:
-        type: "array"
-        description: "List of team identifiers authorized to use thi registry"
-        items:
-          type: "integer"
-          example: 1
-          description: "Team identifier"
+      UserAccessPolicies:
+        $ref: "#/definitions/UserAccessPolicies"
+      TeamAccessPolicies:
+        $ref: "#/definitions/TeamAccessPolicies"
   ResourceControlCreateRequest:
     type: "object"
     required:
@@ -3831,6 +3660,10 @@ definitions:
           type: "integer"
           example: 1
           description: "Endpoint identifier"
+      UserAccessPolicies:
+        $ref: "#/definitions/UserAccessPolicies"
+      TeamAccessPolicies:
+        $ref: "#/definitions/TeamAccessPolicies"
   UserCreateRequest:
     type: "object"
     required:

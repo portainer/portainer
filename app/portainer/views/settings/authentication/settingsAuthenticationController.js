@@ -103,7 +103,7 @@ function($q, $scope, $state, Notifications, SettingsService, FileUploadService, 
     $q.all({
       settings: SettingsService.settings(),
       teams: TeamService.teams(),
-      oauthAuthentication: ExtensionService.OAuthAuthenticationEnabled()
+      oauthAuthentication: ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.OAUTH_AUTHENTICATION)
     })
     .then(function success(data) {
       var settings = data.settings;

@@ -1,3 +1,5 @@
+import linkGetResponse from './transform/linkGetResponse'
+
 angular.module('portainer.extensions.registrymanagement')
 .factory('RegistryCatalog', ['$resource', 'API_ENDPOINT_REGISTRIES',
 function RegistryCatalogFactory($resource, API_ENDPOINT_REGISTRIES) {

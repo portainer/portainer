@@ -1,7 +1,7 @@
 package docker
 
 import (
-	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/api"
 )
 
 // Snapshotter represents a service used to create endpoint snapshots

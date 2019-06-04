@@ -1,3 +1,6 @@
+import _ from 'lodash-es';
+import { PluginViewModel } from "../models/plugin";
+
 angular.module('portainer.docker')
 .factory('PluginService', ['$q', 'Plugin', 'SystemService', function PluginServiceFactory($q, Plugin, SystemService) {
   'use strict';

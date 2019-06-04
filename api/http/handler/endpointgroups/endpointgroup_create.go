@@ -7,7 +7,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/api"
 )
 
 type endpointGroupCreatePayload struct {
@@ -36,11 +36,11 @@ func (handler *Handler) endpointGroupCreate(w http.ResponseWriter, r *http.Reque
 	}
 
 	endpointGroup := &portainer.EndpointGroup{
-		Name:            payload.Name,
-		Description:     payload.Description,
-		AuthorizedUsers: []portainer.UserID{},
-		AuthorizedTeams: []portainer.TeamID{},
-		Tags:            payload.Tags,
+		Name:               payload.Name,
+		Description:        payload.Description,
+		UserAccessPolicies: portainer.UserAccessPolicies{},
+		TeamAccessPolicies: portainer.TeamAccessPolicies{},
+		Tags:               payload.Tags,
 	}
 
 	err = handler.EndpointGroupService.CreateEndpointGroup(endpointGroup)
