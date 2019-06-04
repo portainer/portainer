@@ -20,4 +20,4 @@ Set-Location -Path "api\cmd\portainer"
 go get -t -d -v ./...
 go build -v
 
-Move-Item -Path "$($binary)" -Destination "dist"
+Copy-Item -Path "portainer.exe" -Destination "$($env:BUILD_SOURCESDIRECTORY)\dist\portainer.exe" -Force -ErrorAction:SilentlyContinue
