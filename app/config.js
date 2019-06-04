@@ -40,7 +40,7 @@ angular.module('portainer')
       };
     }]);
 
-    AnalyticsProvider.setAccount('@@CONFIG_GA_ID');
+    AnalyticsProvider.setAccount({ tracker: __CONFIG_GA_ID, set: { anonymizeIp: true } });
     AnalyticsProvider.startOffline(true);
 
     toastr.options.timeOut = 3000;

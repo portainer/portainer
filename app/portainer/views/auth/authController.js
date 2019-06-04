@@ -14,9 +14,9 @@ function($q, $scope, $state, $stateParams, $sanitize, Authentication, UserServic
     OAuthProvider: ''
   };
 
-  function retrieveAndSaveEnabledExtensions() {
+  async function retrieveAndSaveEnabledExtensions() {
     try {
-      ExtensionService.retrieveAndSaveEnabledExtensions();
+      await ExtensionService.retrieveAndSaveEnabledExtensions();
     } catch (err) {
       Notifications.error('Failure', err, 'Unable to retrieve enabled extensions');
     }
@@ -28,7 +28,9 @@ function($q, $scope, $state, $stateParams, $sanitize, Authentication, UserServic
 
     Authentication.login(username, password)
     .then(function success() {
-      retrieveAndSaveEnabledExtensions();
+      return retrieveAndSaveEnabledExtensions();
+    })
+    .then(function () {
       checkForEndpoints();
     })
     .catch(function error() {
@@ -40,7 +42,9 @@ function($q, $scope, $state, $stateParams, $sanitize, Authentication, UserServic
         return $q.reject();
       })
       .then(function success() {
-        retrieveAndSaveEnabledExtensions();
+        return retrieveAndSaveEnabledExtensions();
+      })
+      .then(function() {
         $state.go('portainer.updatePassword');
       })
       .catch(function error() {
@@ -141,7 +145,9 @@ function($q, $scope, $state, $stateParams, $sanitize, Authentication, UserServic
   function oAuthLogin(code) {
     return Authentication.OAuthLogin(code)
     .then(function success() {
-      retrieveAndSaveEnabledExtensions();
+      return retrieveAndSaveEnabledExtensions();
+    })
+    .then(function() {
       URLHelper.cleanParameters();
     })
     .catch(function error() {

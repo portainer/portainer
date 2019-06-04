@@ -78,7 +78,6 @@ module.exports = function(grunt) {
     distdir: 'dist/public',
     shippedDockerVersion: '18.09.3',
     shippedDockerVersionWindows: '17.09.0-ce',
-    pkg: grunt.file.readJSON('package.json'),
     config: gruntfile_cfg.config,
     src: gruntfile_cfg.src,
     clean: gruntfile_cfg.clean,
@@ -99,7 +98,7 @@ gruntfile_cfg.env = {
   prod: {
     NODE_ENV: 'production'
   }
-}
+};
 
 gruntfile_cfg.webpack = {
   dev: webpackDevConfig,

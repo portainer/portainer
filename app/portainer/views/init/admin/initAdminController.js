@@ -14,9 +14,9 @@ function ($scope, $state, Notifications, Authentication, StateManager, UserServi
     actionInProgress: false
   };
 
-  function retrieveAndSaveEnabledExtensions() {
+  async function retrieveAndSaveEnabledExtensions() {
     try {
-      ExtensionService.retrieveAndSaveEnabledExtensions();
+      await ExtensionService.retrieveAndSaveEnabledExtensions();
     } catch (err) {
       Notifications.error('Failure', err, 'Unable to retrieve enabled extensions');
     }
@@ -32,7 +32,9 @@ function ($scope, $state, Notifications, Authentication, StateManager, UserServi
       return Authentication.login(username, password);
     })
     .then(function success() {
-      retrieveAndSaveEnabledExtensions();
+      return retrieveAndSaveEnabledExtensions();
+    })
+    .then(function () {
       return EndpointService.endpoints();
     })
     .then(function success(data) {

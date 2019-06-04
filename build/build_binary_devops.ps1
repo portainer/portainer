@@ -6,7 +6,7 @@ param (
 $ErrorActionPreference = "Stop";
 
 $binary = "portainer.exe"
-$go_path = "$($(Get-ITEM -Path env:AGENT_HOMEDIRECTORY).Value)\go"
+$go_path = "$($(Get-ITEM -Path env:AGENT_TEMPDIRECTORY).Value)\go"
 
 Set-Item env:GOPATH "$go_path"
 
@@ -17,7 +17,7 @@ Copy-Item -Path "api" -Destination "$go_path\src\github.com\portainer\portainer\
 
 Set-Location -Path "api\cmd\portainer"
 
-go.exe get -t -d -v ./...
-go.exe build -v
+go get -t -d -v ./...
+go build -v
 
-Move-Item -Path "$($binary)" -Destination "dist"
+Copy-Item -Path "portainer.exe" -Destination "$($env:BUILD_SOURCESDIRECTORY)\dist\portainer.exe" -Force -ErrorAction:SilentlyContinue
