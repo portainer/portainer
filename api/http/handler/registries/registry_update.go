@@ -7,15 +7,17 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/api"
 )
 
 type registryUpdatePayload struct {
-	Name           string
-	URL            string
-	Authentication bool
-	Username       string
-	Password       string
+	Name               string
+	URL                string
+	Authentication     bool
+	Username           string
+	Password           string
+	UserAccessPolicies portainer.UserAccessPolicies
+	TeamAccessPolicies portainer.TeamAccessPolicies
 }
 
 func (payload *registryUpdatePayload) Validate(r *http.Request) error {
@@ -71,6 +73,14 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 		registry.Authentication = false
 		registry.Username = ""
 		registry.Password = ""
+	}
+
+	if payload.UserAccessPolicies != nil {
+		registry.UserAccessPolicies = payload.UserAccessPolicies
+	}
+
+	if payload.TeamAccessPolicies != nil {
+		registry.TeamAccessPolicies = payload.TeamAccessPolicies
 	}
 
 	err = handler.RegistryService.UpdateRegistry(registry.ID, registry)

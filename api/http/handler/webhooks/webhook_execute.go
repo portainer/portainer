@@ -9,7 +9,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/api"
 )
 
 // Acts on a passed in token UUID to restart the docker service
@@ -39,16 +39,18 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
+
+	imageTag, _ := request.RetrieveQueryParameter(r, "tag", true)
+
 	switch webhookType {
 	case portainer.ServiceWebhook:
-		return handler.executeServiceWebhook(w, endpoint, resourceID)
+		return handler.executeServiceWebhook(w, endpoint, resourceID, imageTag)
 	default:
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unsupported webhook type", portainer.ErrUnsupportedWebhookType}
 	}
-
 }
 
-func (handler *Handler) executeServiceWebhook(w http.ResponseWriter, endpoint *portainer.Endpoint, resourceID string) *httperror.HandlerError {
+func (handler *Handler) executeServiceWebhook(w http.ResponseWriter, endpoint *portainer.Endpoint, resourceID string, imageTag string) *httperror.HandlerError {
 	dockerClient, err := handler.DockerClientFactory.CreateClient(endpoint, "")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Error creating docker client", err}
@@ -62,8 +64,14 @@ func (handler *Handler) executeServiceWebhook(w http.ResponseWriter, endpoint *p
 
 	service.Spec.TaskTemplate.ForceUpdate++
 
-	service.Spec.TaskTemplate.ContainerSpec.Image = strings.Split(service.Spec.TaskTemplate.ContainerSpec.Image, "@sha")[0]
+	if imageTag != "" {
+		service.Spec.TaskTemplate.ContainerSpec.Image = strings.Split(service.Spec.TaskTemplate.ContainerSpec.Image, ":")[0] + ":" + imageTag
+	} else {
+		service.Spec.TaskTemplate.ContainerSpec.Image = strings.Split(service.Spec.TaskTemplate.ContainerSpec.Image, "@sha")[0]
+	}
+
 	_, err = dockerClient.ServiceUpdate(context.Background(), resourceID, service.Version, service.Spec, dockertypes.ServiceUpdateOptions{QueryRegistry: true})
+
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Error updating service", err}
 	}

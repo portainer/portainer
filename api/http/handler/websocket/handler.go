@@ -4,8 +4,8 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/http/security"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 // Handler is the HTTP handler used to handle websocket operations.
@@ -25,6 +25,8 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		requestBouncer:     bouncer,
 	}
 	h.PathPrefix("/websocket/exec").Handler(
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.websocketExec)))
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.websocketExec)))
+	h.PathPrefix("/websocket/attach").Handler(
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.websocketAttach)))
 	return h
 }

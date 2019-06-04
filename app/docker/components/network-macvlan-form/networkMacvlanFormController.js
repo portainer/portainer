@@ -19,8 +19,7 @@ angular.module('portainer.docker')
 
       function initComponent() {
         if (StateManager.getState().application.authentication) {
-          var userDetails = Authentication.getUserDetails();
-          var isAdmin = userDetails.role === 1 ? true : false;
+          var isAdmin = Authentication.isAdmin();
           ctrl.isAdmin = isAdmin;
         }
         var provider = ctrl.applicationState.endpoint.mode.provider;

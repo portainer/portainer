@@ -1,0 +1,23 @@
+<rd-widget>
+  <rd-widget-header icon="fa-plus" title-text="Create snapshot">
+  </rd-widget-header>
+  <rd-widget-body>
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label for="description" class="col-sm-3 col-lg-2 control-label text-left">Description</label>
+        <div class="col-sm-9 col-lg-10">
+          <input type="text" class="form-control" id="description" ng-model="$ctrl.formValues.Description">
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-12">
+          <button type="button" class="btn btn-primary btn-sm" ng-disabled="$ctrl.state.actionInProgress"
+            ng-click="$ctrl.createSnapshot()" button-spinner="$ctrl.state.actionInProgress">
+            <span ng-hide="$ctrl.state.actionInProgress">Create snapshot</span>
+            <span ng-show="$ctrl.state.actionInProgress">Creating snapshot...</span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </rd-widget-body>
+</rd-widget>

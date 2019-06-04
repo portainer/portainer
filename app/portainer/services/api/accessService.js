@@ -1,32 +1,53 @@
+import _ from 'lodash-es';
+import { UserAccessViewModel } from '../../models/access';
+import { TeamAccessViewModel } from '../../models/access';
+
 angular.module('portainer.app')
 .factory('AccessService', ['$q', 'UserService', 'TeamService', function AccessServiceFactory($q, UserService, TeamService) {
   'use strict';
   var service = {};
 
-  function mapAccessData(accesses, authorizedIDs, inheritedIDs) {
+  function _getRole(roles, roleId) {
+    if (roles.length) {
+      const role = _.find(roles, (role) => role.Id === roleId);
+      return role ? role : { Id: 0, Name: "-" };
+    }
+  }
+
+  function _mapAccessData(accesses, authorizedPolicies, inheritedPolicies, roles) {
     var availableAccesses = [];
     var authorizedAccesses = [];
 
     for (var i = 0; i < accesses.length; i++) {
+      const access = accesses[i];
 
-      var access = accesses[i];
-      if (_.includes(inheritedIDs, access.Id)) {
+      const authorized = authorizedPolicies && authorizedPolicies[access.Id];
+      const inherited = inheritedPolicies && inheritedPolicies[access.Id];
+
+      if (authorized && inherited) {
+        access.Role = _getRole(roles, authorizedPolicies[access.Id].RoleId);
+        access.Override = true;
+        authorizedAccesses.push(access);
+      } else if (authorized && !inherited) {
+        access.Role = _getRole(roles, authorizedPolicies[access.Id].RoleId);
+        authorizedAccesses.push(access);
+      } else if (!authorized && inherited) {
+        access.Role = _getRole(roles, inheritedPolicies[access.Id].RoleId);
         access.Inherited = true;
         authorizedAccesses.push(access);
-      } else if (_.includes(authorizedIDs, access.Id)) {
-        authorizedAccesses.push(access);
+        availableAccesses.push(access);
       } else {
         availableAccesses.push(access);
       }
     }
 
     return {
-      accesses: availableAccesses,
-      authorizedAccesses: authorizedAccesses
+      available: availableAccesses,
+      authorized: authorizedAccesses
     };
   }
 
-  service.accesses = function(authorizedUserIDs, authorizedTeamIDs, inheritedUserIDs, inheritedTeamIDs) {
+  service.accesses = function(authorizedUserPolicies, authorizedTeamPolicies, inheritedUserPolicies, inheritedTeamPolicies, roles) {
     var deferred = $q.defer();
 
     $q.all({
@@ -41,12 +62,12 @@ angular.module('portainer.app')
         return new TeamAccessViewModel(team);
       });
 
-      var userAccessData = mapAccessData(userAccesses, authorizedUserIDs, inheritedUserIDs);
-      var teamAccessData = mapAccessData(teamAccesses, authorizedTeamIDs, inheritedTeamIDs);
+      var userAccessData = _mapAccessData(userAccesses, authorizedUserPolicies, inheritedUserPolicies, roles);
+      var teamAccessData = _mapAccessData(teamAccesses, authorizedTeamPolicies, inheritedTeamPolicies, roles);
 
       var accessData = {
-        accesses: userAccessData.accesses.concat(teamAccessData.accesses),
-        authorizedAccesses: userAccessData.authorizedAccesses.concat(teamAccessData.authorizedAccesses)
+        availableUsersAndTeams: userAccessData.available.concat(teamAccessData.available),
+        authorizedUsersAndTeams: userAccessData.authorized.concat(teamAccessData.authorized)
       };
 
       deferred.resolve(accessData);
@@ -57,6 +78,23 @@ angular.module('portainer.app')
 
     return deferred.promise;
   };
+
+
+  service.generateAccessPolicies = function(userAccessPolicies, teamAccessPolicies, selectedUserAccesses, selectedTeamAccesses, selectedRoleId) {
+
+    const newUserPolicies = _.clone(userAccessPolicies);
+    const newTeamPolicies = _.clone(teamAccessPolicies);
+
+    _.forEach(selectedUserAccesses, (access) => newUserPolicies[access.Id] = {RoleId: selectedRoleId ? selectedRoleId : access.Role.Id});
+    _.forEach(selectedTeamAccesses, (access) => newTeamPolicies[access.Id] = {RoleId: selectedRoleId ? selectedRoleId : access.Role.Id});
+
+    const accessPolicies = {
+      userAccessPolicies: newUserPolicies,
+      teamAccessPolicies: newTeamPolicies
+    };
+
+    return accessPolicies;
+  }
 
   return service;
 }]);

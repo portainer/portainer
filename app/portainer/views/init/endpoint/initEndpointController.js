@@ -1,3 +1,5 @@
+import _ from 'lodash-es';
+
 angular.module('portainer.app')
 .controller('InitEndpointController', ['$scope', '$state', 'EndpointService', 'StateManager', 'Notifications',
 function ($scope, $state, EndpointService, StateManager, Notifications) {

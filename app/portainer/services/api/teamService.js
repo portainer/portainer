@@ -1,3 +1,6 @@
+import { TeamViewModel } from '../../models/team';
+import { TeamMembershipModel } from '../../models/teamMembership';
+
 angular.module('portainer.app')
 .factory('TeamService', ['$q', 'Teams', 'TeamMembershipService', function TeamServiceFactory($q, Teams, TeamMembershipService) {
   'use strict';
@@ -56,13 +59,6 @@ angular.module('portainer.app')
 
   service.deleteTeam = function(id) {
     return Teams.remove({id: id}).$promise;
-  };
-
-  service.updateTeam = function(id, name) {
-    var payload = {
-      Name: name
-    };
-    return Teams.update({id: id}, payload).$promise;
   };
 
   service.userMemberships = function(id) {

@@ -3,7 +3,7 @@ package proxy
 import (
 	"net/http"
 
-	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/api"
 )
 
 const (
@@ -29,7 +29,7 @@ func volumeListOperation(response *http.Response, executor *operationExecutor) e
 	if responseObject["Volumes"] != nil {
 		volumeData := responseObject["Volumes"].([]interface{})
 
-		if executor.operationContext.isAdmin {
+		if executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess {
 			volumeData, err = decorateVolumeList(volumeData, executor.operationContext.resourceControls)
 		} else {
 			volumeData, err = filterVolumeList(volumeData, executor.operationContext)
@@ -119,7 +119,7 @@ func decorateVolumeList(volumeData []interface{}, resourceControls []portainer.R
 // Authorized volumes are decorated during the process.
 // Resource controls checks are based on: resource identifier, stack identifier (from label).
 // Volume object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/VolumeList
-func filterVolumeList(volumeData []interface{}, context *restrictedOperationContext) ([]interface{}, error) {
+func filterVolumeList(volumeData []interface{}, context *restrictedDockerOperationContext) ([]interface{}, error) {
 	filteredVolumeData := make([]interface{}, 0)
 
 	for _, volume := range volumeData {

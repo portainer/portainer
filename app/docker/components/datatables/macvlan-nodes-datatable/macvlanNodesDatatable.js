@@ -1,5 +1,5 @@
 angular.module('portainer.docker').component('macvlanNodesDatatable', {
-  templateUrl: 'app/docker/components/datatables/macvlan-nodes-datatable/macvlanNodesDatatable.html',
+  templateUrl: './macvlanNodesDatatable.html',
   controller: 'GenericDatatableController',
   bindings: {
     titleText: '@',

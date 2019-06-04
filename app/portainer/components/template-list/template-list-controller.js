@@ -1,3 +1,5 @@
+import _ from 'lodash-es';
+
 angular.module('portainer.app').controller('TemplateListController', ['DatatableService',
   function TemplateListController(DatatableService) {
     var ctrl = this;

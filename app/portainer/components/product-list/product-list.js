@@ -1,5 +1,5 @@
 angular.module('portainer.app').component('productList', {
-  templateUrl: 'app/portainer/components/product-list/productList.html',
+  templateUrl: './productList.html',
   bindings: {
     titleText: '@',
     products: '<',

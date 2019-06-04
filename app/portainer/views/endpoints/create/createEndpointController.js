@@ -1,3 +1,5 @@
+import { EndpointSecurityFormData } from '../../../components/endpointSecurity/porEndpointSecurityModel';
+
 angular.module('portainer.app')
 .controller('CreateEndpointController', ['$q', '$scope', '$state', '$filter', 'clipboard', 'EndpointService', 'GroupService', 'TagService', 'Notifications',
 function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService, TagService, Notifications) {

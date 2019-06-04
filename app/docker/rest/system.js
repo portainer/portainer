@@ -1,3 +1,5 @@
+import { jsonObjectsToArrayHandler } from './response/handlers';
+
 angular.module('portainer.docker')
 .factory('System', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', 'InfoInterceptor', 'VersionInterceptor',
   function SystemFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, InfoInterceptor, VersionInterceptor) {

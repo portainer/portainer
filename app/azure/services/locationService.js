@@ -1,3 +1,5 @@
+import { LocationViewModel } from '../models/location';
+
 angular.module('portainer.azure')
 .factory('LocationService', ['$q', 'Location', function LocationServiceFactory($q, Location) {
   'use strict';

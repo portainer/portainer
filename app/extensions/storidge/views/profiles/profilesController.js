@@ -1,3 +1,6 @@
+import _ from 'lodash-es';
+import { StoridgeProfileDefaultModel } from '../../models/profile';
+
 angular.module('extension.storidge')
 .controller('StoridgeProfilesController', ['$q', '$scope', '$state', 'Notifications', 'StoridgeProfileService',
 function ($q, $scope, $state, Notifications, StoridgeProfileService) {
@@ -33,8 +36,13 @@ function ($q, $scope, $state, Notifications, StoridgeProfileService) {
 
   $scope.create = function() {
     var model = new StoridgeProfileDefaultModel();
+    model.Labels = {};
     model.Name = $scope.formValues.Name;
-    model.Directory = model.Directory + model.Name;
+    model.Directory = model.Directory + _.toLower(model.Name);
+    delete model.MinBandwidth;
+    delete model.MaxBandwidth;
+    delete model.MinIOPS;
+    delete model.MaxIOPS;
 
     $scope.state.actionInProgress = true;
     StoridgeProfileService.create(model)

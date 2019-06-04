@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 angular.module('portainer.docker')
 .controller('LogViewerController', ['clipboard',
 function (clipboard) {

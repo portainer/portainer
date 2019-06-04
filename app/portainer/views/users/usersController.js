@@ -98,7 +98,7 @@ function ($q, $scope, $state, UserService, TeamService, TeamMembershipService, M
 
   function initView() {
     var userDetails = Authentication.getUserDetails();
-    var isAdmin = userDetails.role === 1 ? true: false;
+    var isAdmin = Authentication.isAdmin();
     $scope.isAdmin = isAdmin;
     $q.all({
       users: UserService.users(true),

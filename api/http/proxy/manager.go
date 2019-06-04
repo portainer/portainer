@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/orcaman/concurrent-map"
-	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/api"
 )
 
 // TODO: contain code related to legacy extension management
@@ -14,6 +14,7 @@ import (
 var extensionPorts = map[portainer.ExtensionID]string{
 	portainer.RegistryManagementExtension:  "7001",
 	portainer.OAuthAuthenticationExtension: "7002",
+	portainer.RBACExtension:                "7003",
 }
 
 type (
@@ -104,6 +105,7 @@ func (manager *Manager) CreateExtensionProxy(extensionID portainer.ExtensionID) 
 	return proxy, nil
 }
 
+// GetExtensionURL retrieves the URL of an extension running locally based on the extension port table
 func (manager *Manager) GetExtensionURL(extensionID portainer.ExtensionID) string {
 	return "http://localhost:" + extensionPorts[extensionID]
 }
@@ -130,18 +132,18 @@ func (manager *Manager) CreateLegacyExtensionProxy(key, extensionAPIURL string) 
 	}
 
 	proxy := manager.proxyFactory.newHTTPProxy(extensionURL)
-	manager.extensionProxies.Set(key, proxy)
+	manager.legacyExtensionProxies.Set(key, proxy)
 	return proxy, nil
 }
 
-func (manager *Manager) createDockerProxy(endpointURL *url.URL, tlsConfig *portainer.TLSConfiguration) (http.Handler, error) {
+func (manager *Manager) createDockerProxy(endpointURL *url.URL, tlsConfig *portainer.TLSConfiguration, endpointID portainer.EndpointID) (http.Handler, error) {
 	if endpointURL.Scheme == "tcp" {
 		if tlsConfig.TLS || tlsConfig.TLSSkipVerify {
-			return manager.proxyFactory.newDockerHTTPSProxy(endpointURL, tlsConfig, false)
+			return manager.proxyFactory.newDockerHTTPSProxy(endpointURL, tlsConfig, false, endpointID)
 		}
-		return manager.proxyFactory.newDockerHTTPProxy(endpointURL, false), nil
+		return manager.proxyFactory.newDockerHTTPProxy(endpointURL, false, endpointID), nil
 	}
-	return manager.proxyFactory.newLocalProxy(endpointURL.Path), nil
+	return manager.proxyFactory.newLocalProxy(endpointURL.Path, endpointID), nil
 }
 
 func (manager *Manager) createProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
@@ -152,10 +154,10 @@ func (manager *Manager) createProxy(endpoint *portainer.Endpoint) (http.Handler,
 
 	switch endpoint.Type {
 	case portainer.AgentOnDockerEnvironment:
-		return manager.proxyFactory.newDockerHTTPSProxy(endpointURL, &endpoint.TLSConfig, true)
+		return manager.proxyFactory.newDockerHTTPSProxy(endpointURL, &endpoint.TLSConfig, true, endpoint.ID)
 	case portainer.AzureEnvironment:
 		return newAzureProxy(&endpoint.AzureCredentials)
 	default:
-		return manager.createDockerProxy(endpointURL, &endpoint.TLSConfig)
+		return manager.createDockerProxy(endpointURL, &endpoint.TLSConfig, endpoint.ID)
 	}
 }

@@ -1,7 +1,7 @@
 <div class="datatable">
   <rd-widget>
     <rd-widget-header icon="{{$ctrl.titleIcon}}" title-text="{{ $ctrl.titleText }}">
-       <file-uploader ng-if="$ctrl.isUploadAllowed" on-file-selected="$ctrl.onFileSelectedForUpload">
+       <file-uploader authorization="DockerAgentBrowsePut" ng-if="$ctrl.isUploadAllowed" on-file-selected="$ctrl.onFileSelectedForUpload">
        </file-uploader>
     </rd-widget-header>
     <rd-widget-body classes="no-padding">
@@ -71,14 +71,14 @@
                 {{ item.ModTime | getisodatefromtimestamp }}
               </td>
               <td>
-                <btn class="btn btn-xs btn-primary space-right" ng-click="$ctrl.download({ name: item.Name })"
+                <btn authorization="DockerAgentBrowseGet" class="btn btn-xs btn-primary space-right" ng-click="$ctrl.download({ name: item.Name })"
                   ng-if="!item.Dir">
                   <i class="fa fa-download" aria-hidden="true"></i> Download
                 </btn>
-                <btn class="btn btn-xs btn-primary space-right" ng-click="item.newName = item.Name; item.edit = true">
+                <btn authorization="DockerAgentBrowseRename" class="btn btn-xs btn-primary space-right" ng-click="item.newName = item.Name; item.edit = true">
                   <i class="fa fa-edit" aria-hidden="true"></i> Rename
                 </btn>
-                <btn class="btn btn-xs btn-danger" ng-click="$ctrl.delete({ name: item.Name })">
+                <btn authorization="DockerAgentBrowseDelete" class="btn btn-xs btn-danger" ng-click="$ctrl.delete({ name: item.Name })">
                   <i class="fa fa-trash" aria-hidden="true"></i> Delete
                 </btn>
               </td>

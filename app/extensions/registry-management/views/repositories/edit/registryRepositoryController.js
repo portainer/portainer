@@ -1,3 +1,5 @@
+import _ from 'lodash-es';
+
 angular.module('portainer.app')
   .controller('RegistryRepositoryController', ['$q', '$scope', '$transition$', '$state', 'RegistryV2Service', 'RegistryService', 'ModalService', 'Notifications',
     function ($q, $scope, $transition$, $state, RegistryV2Service, RegistryService, ModalService, Notifications) {

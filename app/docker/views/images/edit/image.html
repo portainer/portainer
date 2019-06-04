@@ -1,4 +1,4 @@
-<rd-header>
+  <rd-header>
   <rd-header-title title-text="Image details"></rd-header-title>
   <rd-header-content>
     <a ui-sref="docker.images">Images</a> &gt; <a ui-sref="docker.images.image({id: image.Id})">{{ image.Id }}</a>
@@ -16,14 +16,14 @@
               <div class="pull-left" ng-repeat="tag in image.RepoTags" style="display:table">
                 <div class="input-group col-md-1" style="padding:0 15px">
                   <span class="input-group-addon">{{ tag }}</span>
-                  <span class="input-group-btn">
-                    <a data-toggle="tooltip" class="btn btn-primary interactive" title="Push to registry" ng-click="pushTag(tag)">
+                  <span class="input-group-btn" authorization="DockerImagePush, DockerImageCreate, DockerImageDelete">
+                    <a data-toggle="tooltip" class="btn btn-primary interactive" title="Push to registry" ng-click="pushTag(tag)" authorization="DockerImagePush">
                       <span class="fa fa-upload white-icon" aria-hidden="true"></span>
                     </a>
-                    <a data-toggle="tooltip" class="btn btn-primary interactive" title="Pull from registry" ng-click="pullTag(tag)">
+                    <a data-toggle="tooltip" class="btn btn-primary interactive" title="Pull from registry" ng-click="pullTag(tag)" authorization="DockerImageCreate">
                       <span class="fa fa-download white-icon" aria-hidden="true"></span>
                     </a>
-                    <a data-toggle="tooltip" class="btn btn-primary interactive" title="Remove tag" ng-click="removeTag(tag)">
+                    <a data-toggle="tooltip" class="btn btn-primary interactive" title="Remove tag" ng-click="removeTag(tag)" authorization="DockerImageDelete">
                       <span class="fa fa-trash-alt white-icon" aria-hidden="true"></span>
                     </a>
                   </span>
@@ -56,7 +56,7 @@
   </div>
 </div>
 
-<div class="row">
+<div class="row" authorization="DockerImageCreate">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-header icon="fa-tag" title-text="Tag the image"></rd-widget-header>
@@ -98,8 +98,8 @@
               <td>ID</td>
               <td>
                 {{ image.Id }}
-                <button class="btn btn-xs btn-danger" ng-click="removeImage(image.Id)"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this image</button>
-                <button class="btn btn-xs btn-primary" ng-click="exportImage(image)" button-spinner="$ctrl.exportInProgress" ng-disabled="state.exportInProgress">
+                <button authorization="DockerImageDelete" class="btn btn-xs btn-danger" ng-click="removeImage(image.Id)"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this image</button>
+                <button authorization="DockerImageGet" class="btn btn-xs btn-primary" ng-click="exportImage(image)" button-spinner="$ctrl.exportInProgress" ng-disabled="state.exportInProgress">
                     <i class="fa fa-download space-right" aria-hidden="true"></i>
                     <span ng-hide="state.exportInProgress">Export this image</span>
                     <span ng-show="state.exportInProgress">Export in progress...</span>
@@ -180,8 +180,8 @@
       </rd-widget-body>
     </rd-widget>
   </div>
-</div>
 
+</div>
 <div class="row" ng-if="history.length > 0">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>

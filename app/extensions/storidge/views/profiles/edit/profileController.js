@@ -2,13 +2,42 @@ angular.module('extension.storidge')
 .controller('StoridgeProfileController', ['$scope', '$state', '$transition$', 'Notifications', 'StoridgeProfileService', 'ModalService',
 function ($scope, $state, $transition$, Notifications, StoridgeProfileService, ModalService) {
 
+  $scope.formValues = {
+    Labels: []
+  };
+
   $scope.state = {
     NoLimit: false,
     LimitIOPS: false,
     LimitBandwidth: false,
     updateInProgress: false,
-    deleteInProgress: false
+    deleteInProgress: false,
+    RecurringSnapshotEnabled: false
   };
+
+  $scope.addLabel = function() {
+    $scope.formValues.Labels.push({ name: '', value: ''});
+  };
+
+  $scope.removeLabel = function(index) {
+    $scope.formValues.Labels.splice(index, 1);
+  };
+
+  function prepareLabels(profile) {
+    var labels = {};
+    $scope.formValues.Labels.forEach(function (label) {
+      if (label.name && label.value) {
+        labels[label.name] = label.value;
+      }
+    });
+    profile.Labels = labels;
+  }
+
+  function initLabels(labels) {
+    $scope.formValues.Labels = Object.keys(labels).map(function(key) {
+      return { name:key, value:labels[key] };
+    });
+  }
 
   $scope.RedundancyOptions = [
     { value: 2, label: '2-copy' },
@@ -16,7 +45,6 @@ function ($scope, $state, $transition$, Notifications, StoridgeProfileService, M
   ];
 
   $scope.update = function() {
-
     var profile = $scope.profile;
 
     if (!$scope.state.LimitIOPS) {
@@ -28,6 +56,23 @@ function ($scope, $state, $transition$, Notifications, StoridgeProfileService, M
       delete profile.MinBandwidth;
       delete profile.MaxBandwidth;
     }
+
+    if (profile.SnapshotEnabled) {
+      if (!profile.SnapshotMax || profile.SnapshotMax <= 0) {
+        profile.SnapshotMax = 1;
+      }
+      if (!$scope.state.RecurringSnapshotEnabled) {
+        delete profile.SnapshotInterval;
+      }
+      if ($scope.state.RecurringSnapshotEnabled && (!profile.SnapshotInterval || profile.SnapshotInterval <= 0)) {
+        profile.SnapshotInterval = 1440;
+      }
+    } else {
+      delete profile.SnapshotMax;
+      delete profile.SnapshotInterval;
+    }
+
+    prepareLabels(profile);
 
     $scope.state.updateInProgress = true;
     StoridgeProfileService.update(profile)
@@ -81,6 +126,10 @@ function ($scope, $state, $transition$, Notifications, StoridgeProfileService, M
       } else {
         $scope.state.NoLimit = true;
       }
+      if (profile.SnapshotEnabled && profile.SnapshotInterval !== 0) {
+        $scope.state.RecurringSnapshotEnabled = true;
+      }
+      initLabels(profile.Labels);
       $scope.profile = profile;
     })
     .catch(function error(err) {

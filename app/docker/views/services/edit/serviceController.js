@@ -1,3 +1,21 @@
+require('./includes/configs.html')
+require('./includes/constraints.html')
+require('./includes/container-specs.html')
+require('./includes/containerlabels.html')
+require('./includes/environmentvariables.html')
+require('./includes/hosts.html')
+require('./includes/logging.html')
+require('./includes/mounts.html')
+require('./includes/networks.html')
+require('./includes/placementPreferences.html')
+require('./includes/ports.html')
+require('./includes/resources.html')
+require('./includes/restart.html')
+require('./includes/secrets.html')
+require('./includes/servicelabels.html')
+require('./includes/tasks.html')
+require('./includes/updateconfig.html')
+
 angular.module('portainer.docker')
 .controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'ContainerService', 'TaskHelper', 'Notifications', 'ModalService', 'PluginService', 'Authentication', 'SettingsService', 'VolumeService', 'ImageHelper', 'WebhookService', 'EndpointProvider', 'clipboard','WebhookHelper',
 function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, ContainerService, TaskHelper, Notifications, ModalService, PluginService, Authentication, SettingsService, VolumeService, ImageHelper, WebhookService, EndpointProvider, clipboard, WebhookHelper) {
@@ -490,8 +508,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       $scope.availableLoggingDrivers = data.availableLoggingDrivers;
       $scope.availableVolumes = data.volumes;
       $scope.allowBindMounts = data.settings.AllowBindMountsForRegularUsers;
-      var userDetails = Authentication.getUserDetails();
-      $scope.isAdmin = userDetails.role === 1;
+      $scope.isAdmin = Authentication.isAdmin();
 
       if (data.webhooks.length > 0) {
         var webhook = data.webhooks[0];
@@ -542,12 +559,13 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     });
   }
 
-  $scope.updateServiceAttribute = function updateServiceAttribute(service, name) {
+  $scope.updateServiceAttribute = updateServiceAttribute;
+  function updateServiceAttribute(service, name) {
     if (service[name] !== originalService[name] || !(name in originalService)) {
       service.hasChanges = true;
     }
     previousServiceValues.push(name);
-  };
+  }
 
   function updateServiceArray(service, name) {
     previousServiceValues.push(name);

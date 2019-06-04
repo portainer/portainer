@@ -16,7 +16,7 @@
               <td>ID</td>
               <td>
                 {{ volume.Id }}
-                <button class="btn btn-xs btn-danger" ng-click="removeVolume()"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove this volume</button>
+                <button authorization="DockerVolumeDelete" class="btn btn-xs btn-danger" ng-click="removeVolume()"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove this volume</button>
               </td>
             </tr>
             <tr>
@@ -46,6 +46,31 @@
         </table>
       </rd-widget-body>
     </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-if="isCioDriver">
+  <div class="col-sm-12">
+    <volume-storidge-info volume="storidgeVolume">
+    </volume-storidge-info>
+  </div>
+</div>
+
+<div class="row" ng-if="isCioDriver">
+  <div class="col-sm-12">
+    <storidge-snapshot-creation volume-id="storidgeVolume.Vdisk" ng-if="storidgeVolume.SnapshotEnabled">
+    </storidge-snapshot-creation>
+  </div>
+</div>
+
+<div class="row" ng-if="isCioDriver && storidgeVolume.SnapshotEnabled">
+  <div class="col-sm-12">
+    <storidge-snapshots-datatable
+      title-text="Snapshots" title-icon="fa-camera"
+      dataset="storidgeSnapshots" table-key="storidgeSnapshots"
+      order-by="Id"
+      remove-action="removeSnapshot">
+    </storidge-snapshots-datatable>
   </div>
 </div>
 

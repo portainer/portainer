@@ -51,9 +51,9 @@
                 </div>
               </div>
 
-              <div style="margin-top: 15px;" ng-disabled="!formValues.hostCount">
-                <a href="https://portainer.io/checkout/?add-to-cart={{ product.ProductId }}&quantity={{ formValues.hostCount }}" target="_blank" class="btn btn-primary btn-sm" style="width: 100%; margin-left: 0;">
-                  Buy
+              <div style="margin-top: 15px;" >
+                <a href="https://portainer.io/checkout/?add-to-cart={{ product.ProductId }}&quantity={{ formValues.hostCount }}" target="_blank">
+                 <button ng-disabled="!formValues.hostCount || formValues.hostCount < 10" class="btn btn-primary btn-sm" style="width: 100%; margin-left: 0;">Buy</button>
                 </a>
               </div>
 

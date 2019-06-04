@@ -1,7 +1,7 @@
 package proxy
 
 import (
-	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/api"
 )
 
 type (
@@ -20,7 +20,7 @@ type (
 // Returns the original object and denied access (false) when no resource control is found.
 // Returns the original object and denied access (false) when a resource control is found and the user cannot access the resource.
 func applyResourceAccessControlFromLabel(labelsObject, resourceObject map[string]interface{}, labelIdentifier string,
-	context *restrictedOperationContext) (map[string]interface{}, bool) {
+	context *restrictedDockerOperationContext) (map[string]interface{}, bool) {
 
 	if labelsObject != nil && labelsObject[labelIdentifier] != nil {
 		resourceIdentifier := labelsObject[labelIdentifier].(string)
@@ -38,14 +38,14 @@ func applyResourceAccessControlFromLabel(labelsObject, resourceObject map[string
 // Returns the original object and denied access (false) when a resource control is associated to the resource
 // and the user cannot access the resource.
 func applyResourceAccessControl(resourceObject map[string]interface{}, resourceIdentifier string,
-	context *restrictedOperationContext) (map[string]interface{}, bool) {
+	context *restrictedDockerOperationContext) (map[string]interface{}, bool) {
 
 	resourceControl := getResourceControlByResourceID(resourceIdentifier, context.resourceControls)
 	if resourceControl == nil {
-		return resourceObject, context.isAdmin
+		return resourceObject, context.isAdmin || context.endpointResourceAccess
 	}
 
-	if context.isAdmin || resourceControl.Public || canUserAccessResource(context.userID, context.userTeamIDs, resourceControl) {
+	if context.isAdmin || context.endpointResourceAccess || resourceControl.Public || canUserAccessResource(context.userID, context.userTeamIDs, resourceControl) {
 		resourceObject = decorateObject(resourceObject, resourceControl)
 		return resourceObject, true
 	}

@@ -9,7 +9,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/api"
 )
 
 type endpointExtensionAddPayload struct {
@@ -50,9 +50,9 @@ func (handler *Handler) endpointExtensionAdd(w http.ResponseWriter, r *http.Requ
 	extensionType := portainer.EndpointExtensionType(payload.Type)
 
 	var extension *portainer.EndpointExtension
-	for _, ext := range endpoint.Extensions {
-		if ext.Type == extensionType {
-			extension = &ext
+	for idx := range endpoint.Extensions {
+		if endpoint.Extensions[idx].Type == extensionType {
+			extension = &endpoint.Extensions[idx]
 		}
 	}
 

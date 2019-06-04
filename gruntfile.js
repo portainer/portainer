@@ -1,3 +1,5 @@
+const webpackDevConfig = require('./webpack/webpack.develop');
+const webpackProdConfig = require('./webpack/webpack.production');
 var gruntfile_cfg = {};
 var loadGruntTasks = require('load-grunt-tasks');
 var os = require('os');
@@ -5,81 +7,70 @@ var arch = os.arch();
 if (arch === 'x64') arch = 'amd64';
 
 module.exports = function(grunt) {
-
   loadGruntTasks(grunt, {
     pattern: ['grunt-*', 'gruntify-*']
   });
 
   grunt.registerTask('default', ['eslint', 'build']);
-  grunt.registerTask('before-copy', [
-    'vendor',
-    'html2js',
-    'useminPrepare:release',
-    'concat',
-    'clean:tmpl',
-    'replace',
-    'postcss:build',
-    'uglify'
-  ]);
-  grunt.registerTask('after-copy', [
-    'filerev',
-    'usemin',
-    'clean:tmp'
-  ]);
+
   grunt.registerTask('build-webapp', [
     'config:prod',
+    'env:prod',
     'clean:all',
-    'before-copy',
-    'copy:assets',
-    'after-copy'
-  ]);
+    'copy:templates',
+    'webpack:prod']);
+
   grunt.registerTask('build', [
     'config:dev',
-    'clean:app',
     'shell:buildBinary:linux:' + arch,
     'shell:downloadDockerBinary:linux:' + arch,
-    'vendor',
-    'html2js',
-    'useminPrepare:dev',
-    'concat',
-    'clean:tmpl',
-    'replace',
-    'copy',
-    'after-copy'
+    'copy:templates',
+    'webpack:dev'
   ]);
-  grunt.task.registerTask('release', 'release:<platform>:<arch>', function(p, a) {
-    grunt.task.run(['config:prod', 'clean:all', 'shell:buildBinary:' + p + ':' + a, 'shell:downloadDockerBinary:' + p + ':' + a, 'before-copy', 'copy:assets', 'after-copy']);
-  });
 
-  grunt.task.registerTask('devopsbuild', 'devopsbuild:<platform>:<arch>', function(p, a) {
-    grunt.task.run(['config:prod', 'clean:all', 'shell:buildBinaryOnDevOps:' + p + ':' + a, 'shell:downloadDockerBinary:' + p + ':' + a, 'before-copy', 'copy:assets', 'after-copy']);
-  });
+  grunt.registerTask('build-server', [
+    'shell:buildBinary:linux:' + arch,
+    'shell:downloadDockerBinary:linux:' + arch,
+    'copy:templates',
+    'shell:run:' + arch
+  ]);
+
+  grunt.task.registerTask('release', 'release:<platform>:<arch>',
+    function (p = 'linux', a = arch) {
+      grunt.task.run([
+        'config:prod',
+        'env:prod',
+        'clean:all',
+        'copy:templates',
+        'shell:buildBinary:' + p + ':' + a,
+        'shell:downloadDockerBinary:' + p + ':' + a,
+        'webpack:prod'
+      ]);
+    });
+
+  grunt.task.registerTask('devopsbuild', 'devopsbuild:<platform>:<arch>', 
+    function(p, a) {
+      grunt.task.run([
+        'config:prod',
+        'env:prod',
+        'clean:all',
+        'copy:templates',
+        'shell:buildBinaryOnDevOps:' + p + ':' + a,
+        'shell:downloadDockerBinary:' + p + ':' + a,
+        'webpack:prod'
+      ]);
+    });
 
   grunt.registerTask('lint', ['eslint']);
   grunt.registerTask('run-dev', ['build', 'shell:run', 'watch:build']);
   grunt.registerTask('clear', ['clean:app']);
 
-  // Load content of `vendor.yml` to src.jsVendor, src.cssVendor and src.angularVendor
-  grunt.registerTask('vendor', function() {
-    var vendorFile = grunt.file.readYAML('vendor.yml');
-    for (var filelist in vendorFile) {
-      if (vendorFile.hasOwnProperty(filelist)) {
-        var list = vendorFile[filelist];
-        // Check if any of the files is missing
-        for (var itemIndex in list) {
-          if (list.hasOwnProperty(itemIndex)) {
-            var item = 'node_modules/' + list[itemIndex];
-            if (!grunt.file.exists(item)) {
-              grunt.fail.warn('Dependency file ' + item + ' not found.');
-            }
-            list[itemIndex] = item;
-          }
-        }
-        // If none is missing, save the list
-        grunt.config('src.' + filelist + 'Vendor', list);
-      }
-    }
-  });
+  grunt.registerTask('run-dev', [
+    'config:dev',
+    'build-server',
+    'webpack:devWatch'
+  ]);
+  grunt.registerTask('clear', ['clean:app']);
 
   // Project configuration.
   grunt.initConfig({
@@ -87,34 +78,37 @@ module.exports = function(grunt) {
     distdir: 'dist/public',
     shippedDockerVersion: '18.09.3',
     shippedDockerVersionWindows: '17.09.0-ce',
-    pkg: grunt.file.readJSON('package.json'),
     config: gruntfile_cfg.config,
     src: gruntfile_cfg.src,
     clean: gruntfile_cfg.clean,
-    useminPrepare: gruntfile_cfg.useminPrepare,
-    filerev: { files: { src: ['<%= distdir %>/js/*.js', '<%= distdir %>/css/*.css'] } },
-    usemin: { html: ['<%= distdir %>/index.html'] },
-    copy: gruntfile_cfg.copy,
     eslint: gruntfile_cfg.eslint,
-    html2js: gruntfile_cfg.html2js,
-    concat: gruntfile_cfg.concat,
-    uglify: gruntfile_cfg.uglify,
-    postcss: gruntfile_cfg.postcss,
-    watch: gruntfile_cfg.watch,
     shell: gruntfile_cfg.shell,
-    replace: gruntfile_cfg.replace
+    copy: gruntfile_cfg.copy,
+    webpack: gruntfile_cfg.webpack,
+    env: gruntfile_cfg.env
   });
-
 };
 
 /***/
 
-var autoprefixer = require('autoprefixer');
-var cssnano = require('cssnano');
+gruntfile_cfg.env = {
+  dev: {
+    NODE_ENV: 'development'
+  },
+  prod: {
+    NODE_ENV: 'production'
+  }
+};
+
+gruntfile_cfg.webpack = {
+  dev: webpackDevConfig,
+  prod: webpackProdConfig,
+  devWatch: Object.assign({ watch: true }, webpackDevConfig)
+};
 
 gruntfile_cfg.config = {
-  dev: { options: { variables: { 'environment': 'development' } } },
-  prod: { options: { variables: { 'environment': 'production' } } }
+  dev: { options: { variables: { environment: 'development' } } },
+  prod: { options: { variables: { environment: 'production' } } }
 };
 
 gruntfile_cfg.src = {
@@ -127,50 +121,18 @@ gruntfile_cfg.src = {
 
 gruntfile_cfg.clean = {
   all: ['<%= root %>/*'],
-  app: ['<%= distdir %>/*', '!<%= distdir %>/../portainer*', '!<%= distdir %>/../docker*'],
+  app: [
+    '<%= distdir %>/*',
+    '!<%= distdir %>/../portainer*',
+    '!<%= distdir %>/../docker*'
+  ],
   tmpl: ['<%= distdir %>/templates'],
-  tmp: ['<%= distdir %>/js/*', '!<%= distdir %>/js/app.*.js', '<%= distdir %>/css/*', '!<%= distdir %>/css/app.*.css']
-};
-
-gruntfile_cfg.useminPrepare = {
-  dev: {
-    src: '<%= src.html %>',
-    options: {
-      root: '<%= distdir %>',
-      flow: {
-        steps: {
-          js: ['concat'],
-          css: ['concat']
-        }
-      }
-    }
-  },
-  release: {
-    src: '<%= src.html %>',
-    options: {
-      root: '<%= distdir %>',
-      dest: '<%= distdir %>'
-    }
-  }
-};
-
-gruntfile_cfg.copy = {
-  bundle: {
-    files: [
-      { dest: '<%= distdir %>/js/', src: ['app.js'], expand: true, cwd: '.tmp/concat/js/' },
-      { dest: '<%= distdir %>/css/', src: ['app.css'], expand: true, cwd: '.tmp/concat/css/' }
-    ]
-  },
-  assets: {
-    files: [
-      { dest: '<%= distdir %>/fonts/', src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'node_modules/bootstrap/fonts/' },
-      { dest: '<%= distdir %>/fonts/', src: '*.{ttf,woff,woff2,eof,eot,svg}', expand: true, cwd: 'node_modules/@fortawesome/fontawesome-free-webfonts/webfonts/' },
-      { dest: '<%= distdir %>/fonts/', src: '*.{ttf,woff,woff2,eof,svg}', expand: true, cwd: 'node_modules/rdash-ui/dist/fonts/' },
-      { dest: '<%= distdir %>/images/', src: '**', expand: true, cwd: 'assets/images/' },
-      { dest: '<%= distdir %>/ico', src: '**', expand: true, cwd: 'assets/ico' },
-      { dest: '<%= root %>/', src: 'templates.json', cwd: '' }
-    ]
-  }
+  tmp: [
+    '<%= distdir %>/js/*',
+    '!<%= distdir %>/js/app.*.js',
+    '<%= distdir %>/css/*',
+    '!<%= distdir %>/css/app.*.css'
+  ]
 };
 
 gruntfile_cfg.eslint = {
@@ -178,86 +140,14 @@ gruntfile_cfg.eslint = {
   options: { configFile: '.eslintrc.yml' }
 };
 
-gruntfile_cfg.html2js = {
-  app: {
-    options: { base: '.' },
-    src: ['<%= src.tpl %>'],
-    dest: '<%= distdir %>/templates/app.js',
-    module: '<%= pkg.name %>.templates'
-  }
-};
 
-gruntfile_cfg.concat = {
-  vendor: {
-    files: {
-      '<%= distdir %>/css/<%= pkg.name %>.css': ['<%= src.cssVendor %>', '<%= src.css %>'],
-      '<%= distdir %>/js/vendor.js': ['<%= src.jsVendor %>'],
-      '<%= distdir %>/js/angular.js': ['<%= src.angularVendor %>']
-    }
-  },
-  dist: {
-    options: { process: true },
-    files: {
-      '<%= distdir %>/js/<%= pkg.name %>.js': ['<%= src.js %>', '<%= src.jsTpl %>'],
-      '<%= distdir %>/index.html': ['index.html']
-    }
-  }
-};
-
-gruntfile_cfg.uglify = {
-  dist: {
-    files: { '<%= distdir %>/js/<%= pkg.name %>.js': ['<%= src.js %>', '<%= src.jsTpl %>'] }
-  },
-  vendor: {
-    options: { preserveComments: 'some' }, // Preserve license comments
-    files: {
-      '<%= distdir %>/js/vendor.js': ['<%= src.jsVendor %>'],
-      '<%= distdir %>/js/angular.js': ['<%= src.angularVendor %>']
-    }
-  }
-};
-
-gruntfile_cfg.postcss = {
-  build: {
-    options: {
-      processors: [
-        autoprefixer({ browsers: 'last 2 versions' }), // add vendor prefixes
-        cssnano() // minify the result
-      ]
-    },
-    src: '.tmp/concat/css/app.css',
-    dest: '<%= distdir %>/css/app.css'
-  }
-};
-
-gruntfile_cfg.watch = {
-  build: {
-    files: ['<%= src.js %>', '<%= src.css %>', '<%= src.tpl %>', '<%= src.html %>'],
-    tasks: ['build']
-  }
-};
-
-gruntfile_cfg.replace = {
-  concat: {
-    options: {
-      patterns: [
-        { match: 'ENVIRONMENT', replacement: '<%= grunt.config.get("environment") %>' },
-        { match: 'CONFIG_GA_ID', replacement: '<%= pkg.config.GA_ID %>' },
-        { match: /..\/webfonts\//g, replacement: '../fonts/' }
-      ]
-    },
+gruntfile_cfg.copy = {
+  templates: {
     files: [
       {
-        expand: true,
-        flatten: true,
-        src: ['.tmp/concat/js/app.js'],
-        dest: '.tmp/concat/js'
-      },
-      {
-        expand: true,
-        flatten: true,
-        src: ['.tmp/concat/css/app.css'],
-        dest: '.tmp/concat/css'
+        dest: '<%= root %>/',
+        src: 'templates.json', 
+        cwd: ''
       }
     ]
   }
@@ -305,7 +195,7 @@ function shell_downloadDockerBinary(p, a) {
   var ip = ((ps[p] === undefined) ? p : ps[p]);
   var ia = ((as[a] === undefined) ? a : as[a]);
   var binaryVersion = ((p === 'windows' ? '<%= shippedDockerVersionWindows %>' : '<%= shippedDockerVersion %>'));
-  if (p === 'linux') {
+  if (p === 'linux' || p === 'mac') {
     return [
       'if [ -f dist/docker ]; then',
       'echo "Docker binary exists";',

@@ -6,24 +6,25 @@ import (
 	"time"
 
 	"github.com/boltdb/bolt"
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/bolt/dockerhub"
-	"github.com/portainer/portainer/bolt/endpoint"
-	"github.com/portainer/portainer/bolt/endpointgroup"
-	"github.com/portainer/portainer/bolt/extension"
-	"github.com/portainer/portainer/bolt/migrator"
-	"github.com/portainer/portainer/bolt/registry"
-	"github.com/portainer/portainer/bolt/resourcecontrol"
-	"github.com/portainer/portainer/bolt/schedule"
-	"github.com/portainer/portainer/bolt/settings"
-	"github.com/portainer/portainer/bolt/stack"
-	"github.com/portainer/portainer/bolt/tag"
-	"github.com/portainer/portainer/bolt/team"
-	"github.com/portainer/portainer/bolt/teammembership"
-	"github.com/portainer/portainer/bolt/template"
-	"github.com/portainer/portainer/bolt/user"
-	"github.com/portainer/portainer/bolt/version"
-	"github.com/portainer/portainer/bolt/webhook"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/bolt/dockerhub"
+	"github.com/portainer/portainer/api/bolt/endpoint"
+	"github.com/portainer/portainer/api/bolt/endpointgroup"
+	"github.com/portainer/portainer/api/bolt/extension"
+	"github.com/portainer/portainer/api/bolt/migrator"
+	"github.com/portainer/portainer/api/bolt/registry"
+	"github.com/portainer/portainer/api/bolt/resourcecontrol"
+	"github.com/portainer/portainer/api/bolt/role"
+	"github.com/portainer/portainer/api/bolt/schedule"
+	"github.com/portainer/portainer/api/bolt/settings"
+	"github.com/portainer/portainer/api/bolt/stack"
+	"github.com/portainer/portainer/api/bolt/tag"
+	"github.com/portainer/portainer/api/bolt/team"
+	"github.com/portainer/portainer/api/bolt/teammembership"
+	"github.com/portainer/portainer/api/bolt/template"
+	"github.com/portainer/portainer/api/bolt/user"
+	"github.com/portainer/portainer/api/bolt/version"
+	"github.com/portainer/portainer/api/bolt/webhook"
 )
 
 const (
@@ -37,6 +38,7 @@ type Store struct {
 	db                     *bolt.DB
 	checkForDataMigration  bool
 	fileService            portainer.FileService
+	RoleService            *role.Service
 	DockerHubService       *dockerhub.Service
 	EndpointGroupService   *endpointgroup.Service
 	EndpointService        *endpoint.Service
@@ -89,29 +91,6 @@ func (store *Store) Open() error {
 	return store.initServices()
 }
 
-// Init creates the default data set.
-func (store *Store) Init() error {
-	groups, err := store.EndpointGroupService.EndpointGroups()
-	if err != nil {
-		return err
-	}
-
-	if len(groups) == 0 {
-		unassignedGroup := &portainer.EndpointGroup{
-			Name:            "Unassigned",
-			Description:     "Unassigned endpoints",
-			Labels:          []portainer.Pair{},
-			AuthorizedUsers: []portainer.UserID{},
-			AuthorizedTeams: []portainer.TeamID{},
-			Tags:            []string{},
-		}
-
-		return store.EndpointGroupService.CreateEndpointGroup(unassignedGroup)
-	}
-
-	return nil
-}
-
 // Close closes the BoltDB database.
 func (store *Store) Close() error {
 	if store.db != nil {
@@ -140,6 +119,7 @@ func (store *Store) MigrateData() error {
 			EndpointGroupService:   store.EndpointGroupService,
 			EndpointService:        store.EndpointService,
 			ExtensionService:       store.ExtensionService,
+			RegistryService:        store.RegistryService,
 			ResourceControlService: store.ResourceControlService,
 			SettingsService:        store.SettingsService,
 			StackService:           store.StackService,
@@ -162,6 +142,12 @@ func (store *Store) MigrateData() error {
 }
 
 func (store *Store) initServices() error {
+	authorizationsetService, err := role.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.RoleService = authorizationsetService
+
 	dockerhubService, err := dockerhub.NewService(store.db)
 	if err != nil {
 		return err

@@ -1,3 +1,5 @@
+import _ from 'lodash-es';
+
 angular.module('portainer.app')
 .factory('StackHelper', [function StackHelperFactory() {
   'use strict';

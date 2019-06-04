@@ -1,3 +1,5 @@
+import { logsHandler } from './response/handlers';
+
 angular.module('portainer.docker')
 .factory('Task', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', function TaskFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
   'use strict';

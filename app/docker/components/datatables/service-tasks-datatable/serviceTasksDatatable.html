@@ -60,8 +60,8 @@
           <span class="label label-{{ item.Status.State | taskstatusbadge }} space-right">{{ item.Status.State }}</span>
         </td>
         <td>
-          <a ng-if="!$ctrl.agentProxy || !item.Container" ui-sref="docker.tasks.task({id: item.Id})" class="monospaced">{{ item.Id }}Roz</a>
-          <a ng-if="$ctrl.agentProxy && item.Container" ui-sref="docker.containers.container({ id: item.Container.Id, nodeName: item.Container.NodeName })" class="monospaced">{{ item.Id }}Doz</a>
+          <a ng-if="!$ctrl.agentProxy || !item.Container" ui-sref="docker.tasks.task({id: item.Id})" class="monospaced">{{ item.Id }}</a>
+          <a ng-if="$ctrl.agentProxy && item.Container" ui-sref="docker.containers.container({ id: item.Container.Id, nodeName: item.Container.NodeName })" class="monospaced">{{ item.Id }}</a>
         </td>
         <td>
           <container-quick-actions ng-if="!$ctrl.agentProxy || !item.Container" container-id="item.ContainerId" task-id="item.Id" status="item.Status.State" state="$ctrl.state"></container-quick-actions>

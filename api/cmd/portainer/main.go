@@ -1,4 +1,4 @@
-package main // import "github.com/portainer/portainer"
+package main
 
 import (
 	"encoding/json"
@@ -6,20 +6,20 @@ import (
 	"strings"
 	"time"
 
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/bolt"
-	"github.com/portainer/portainer/cli"
-	"github.com/portainer/portainer/cron"
-	"github.com/portainer/portainer/crypto"
-	"github.com/portainer/portainer/docker"
-	"github.com/portainer/portainer/exec"
-	"github.com/portainer/portainer/filesystem"
-	"github.com/portainer/portainer/git"
-	"github.com/portainer/portainer/http"
-	"github.com/portainer/portainer/http/client"
-	"github.com/portainer/portainer/jwt"
-	"github.com/portainer/portainer/ldap"
-	"github.com/portainer/portainer/libcompose"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/bolt"
+	"github.com/portainer/portainer/api/cli"
+	"github.com/portainer/portainer/api/cron"
+	"github.com/portainer/portainer/api/crypto"
+	"github.com/portainer/portainer/api/docker"
+	"github.com/portainer/portainer/api/exec"
+	"github.com/portainer/portainer/api/filesystem"
+	"github.com/portainer/portainer/api/git"
+	"github.com/portainer/portainer/api/http"
+	"github.com/portainer/portainer/api/http/client"
+	"github.com/portainer/portainer/api/jwt"
+	"github.com/portainer/portainer/api/ldap"
+	"github.com/portainer/portainer/api/libcompose"
 
 	"log"
 )
@@ -418,18 +418,18 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, endpointService portain
 
 	endpointID := endpointService.GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
-		ID:              portainer.EndpointID(endpointID),
-		Name:            "primary",
-		URL:             *flags.EndpointURL,
-		GroupID:         portainer.EndpointGroupID(1),
-		Type:            portainer.DockerEnvironment,
-		TLSConfig:       tlsConfiguration,
-		AuthorizedUsers: []portainer.UserID{},
-		AuthorizedTeams: []portainer.TeamID{},
-		Extensions:      []portainer.EndpointExtension{},
-		Tags:            []string{},
-		Status:          portainer.EndpointStatusUp,
-		Snapshots:       []portainer.Snapshot{},
+		ID:                 portainer.EndpointID(endpointID),
+		Name:               "primary",
+		URL:                *flags.EndpointURL,
+		GroupID:            portainer.EndpointGroupID(1),
+		Type:               portainer.DockerEnvironment,
+		TLSConfig:          tlsConfiguration,
+		UserAccessPolicies: portainer.UserAccessPolicies{},
+		TeamAccessPolicies: portainer.TeamAccessPolicies{},
+		Extensions:         []portainer.EndpointExtension{},
+		Tags:               []string{},
+		Status:             portainer.EndpointStatusUp,
+		Snapshots:          []portainer.Snapshot{},
 	}
 
 	if strings.HasPrefix(endpoint.URL, "tcp://") {
@@ -461,18 +461,18 @@ func createUnsecuredEndpoint(endpointURL string, endpointService portainer.Endpo
 
 	endpointID := endpointService.GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
-		ID:              portainer.EndpointID(endpointID),
-		Name:            "primary",
-		URL:             endpointURL,
-		GroupID:         portainer.EndpointGroupID(1),
-		Type:            portainer.DockerEnvironment,
-		TLSConfig:       portainer.TLSConfiguration{},
-		AuthorizedUsers: []portainer.UserID{},
-		AuthorizedTeams: []portainer.TeamID{},
-		Extensions:      []portainer.EndpointExtension{},
-		Tags:            []string{},
-		Status:          portainer.EndpointStatusUp,
-		Snapshots:       []portainer.Snapshot{},
+		ID:                 portainer.EndpointID(endpointID),
+		Name:               "primary",
+		URL:                endpointURL,
+		GroupID:            portainer.EndpointGroupID(1),
+		Type:               portainer.DockerEnvironment,
+		TLSConfig:          portainer.TLSConfiguration{},
+		UserAccessPolicies: portainer.UserAccessPolicies{},
+		TeamAccessPolicies: portainer.TeamAccessPolicies{},
+		Extensions:         []portainer.EndpointExtension{},
+		Tags:               []string{},
+		Status:             portainer.EndpointStatusUp,
+		Snapshots:          []portainer.Snapshot{},
 	}
 
 	return snapshotAndPersistEndpoint(endpoint, endpointService, snapshotter)
@@ -670,6 +670,23 @@ func main() {
 				Username: "admin",
 				Role:     portainer.AdministratorRole,
 				Password: adminPasswordHash,
+				PortainerAuthorizations: map[portainer.Authorization]bool{
+					portainer.OperationPortainerDockerHubInspect:        true,
+					portainer.OperationPortainerEndpointGroupList:       true,
+					portainer.OperationPortainerEndpointList:            true,
+					portainer.OperationPortainerEndpointInspect:         true,
+					portainer.OperationPortainerEndpointExtensionAdd:    true,
+					portainer.OperationPortainerEndpointExtensionRemove: true,
+					portainer.OperationPortainerExtensionList:           true,
+					portainer.OperationPortainerMOTD:                    true,
+					portainer.OperationPortainerRegistryList:            true,
+					portainer.OperationPortainerRegistryInspect:         true,
+					portainer.OperationPortainerTeamList:                true,
+					portainer.OperationPortainerTemplateList:            true,
+					portainer.OperationPortainerTemplateInspect:         true,
+					portainer.OperationPortainerUserList:                true,
+					portainer.OperationPortainerUserMemberships:         true,
+				},
 			}
 			err := store.UserService.CreateUser(user)
 			if err != nil {
@@ -690,6 +707,7 @@ func main() {
 		AssetsPath:             *flags.Assets,
 		AuthDisabled:           *flags.NoAuth,
 		EndpointManagement:     endpointManagement,
+		RoleService:            store.RoleService,
 		UserService:            store.UserService,
 		TeamService:            store.TeamService,
 		TeamMembershipService:  store.TeamMembershipService,

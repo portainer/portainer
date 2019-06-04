@@ -1,4 +1,6 @@
-function ScheduleDefaultModel() {
+import { createStatus } from '../../docker/models/container';
+
+export function ScheduleDefaultModel() {
   this.Name = '';
   this.Recurring = false;
   this.CronExpression = '';
@@ -14,7 +16,7 @@ function ScriptExecutionDefaultJobModel() {
   this.Method = 'editor';
 }
 
-function ScheduleModel(data) {
+export function ScheduleModel(data) {
   this.Id = data.Id;
   this.Name = data.Name;
   this.Recurring = data.Recurring;
@@ -35,14 +37,14 @@ function ScriptExecutionJobModel(data) {
   this.RetryInterval = data.RetryInterval;
 }
 
-function ScriptExecutionTaskModel(data) {
+export function ScriptExecutionTaskModel(data) {
   this.Id = data.Id;
   this.EndpointId = data.EndpointId;
   this.Status = createStatus(data.Status);
   this.Created = data.Created;
 }
 
-function ScheduleCreateRequest(model) {
+export function ScheduleCreateRequest(model) {
   this.Name = model.Name;
   this.Recurring = model.Recurring;
   this.CronExpression = model.CronExpression;
@@ -54,7 +56,7 @@ function ScheduleCreateRequest(model) {
   this.File = model.Job.File;
 }
 
-function ScheduleUpdateRequest(model) {
+export function ScheduleUpdateRequest(model) {
   this.id = model.Id;
   this.Name = model.Name;
   this.Recurring = model.Recurring;

@@ -1,4 +1,4 @@
-function RegistryViewModel(data) {
+export function RegistryViewModel(data) {
   this.Id = data.Id;
   this.Type = data.Type;
   this.Name = data.Name;
@@ -8,10 +8,12 @@ function RegistryViewModel(data) {
   this.Password = data.Password;
   this.AuthorizedUsers = data.AuthorizedUsers;
   this.AuthorizedTeams = data.AuthorizedTeams;
+  this.UserAccessPolicies = data.UserAccessPolicies;
+  this.TeamAccessPolicies = data.TeamAccessPolicies;
   this.Checked = false;
 }
 
-function RegistryManagementConfigurationDefaultModel(registry) {
+export function RegistryManagementConfigurationDefaultModel(registry) {
   this.Authentication = false;
   this.Password = '';
   this.TLS = false;
@@ -32,7 +34,7 @@ function RegistryManagementConfigurationDefaultModel(registry) {
   }
 }
 
-function RegistryDefaultModel() {
+export function RegistryDefaultModel() {
   this.Type = 3;
   this.URL = '';
   this.Name = '';
@@ -41,7 +43,7 @@ function RegistryDefaultModel() {
   this.Password = '';
 }
 
-function RegistryCreateRequest(model) {
+export function RegistryCreateRequest(model) {
   this.Name = model.Name;
   this.Type = model.Type;
   this.URL = model.URL;

@@ -1,0 +1,53 @@
+<rd-header>
+  <rd-header-title title-text="Snasphot details"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="docker.volumes">Volumes</a> &gt; <a ui-sref="docker.volumes.volume({id: volumeId})">{{ volumeId }}</a> &gt; Snapshots &gt; <a ui-sref="docker.volumes.volume.snapshot({id: snapshot.Id})">{{ snapshot.Id }}</a>
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-hdd" title-text="Snapshot details "></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>ID</td>
+              <td>
+                {{ snapshot.Id }}
+                <button class="btn btn-xs btn-danger" ng-click="removeSnapshot()">
+                  <i class="fa fa-trash space-right" aria-hidden="true"></i>Remove snapshot
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>Date</td>
+              <td>{{ snapshot.Date }}</td>
+            </tr>
+            <tr>
+              <td>Description</td>
+              <td>{{ snapshot.Description }}</td>
+            </tr>
+            <tr>
+              <td>SourceID</td>
+              <td>{{ snapshot.SourceID }}</td>
+            </tr>
+            <tr>
+              <td>Type</td>
+              <td>{{ snapshot.Type }}</td>
+            </tr>
+            <tr>
+              <td>Directory</td>
+              <td>{{ snapshot.Directory }}</td>
+            </tr>
+            <tr>
+              <td>Source</td>
+              <td>{{ snapshot.Source }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

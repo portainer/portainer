@@ -1,3 +1,5 @@
+import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
+
 angular.module('portainer.docker')
 .controller('CreateSecretController', ['$scope', '$state', 'Notifications', 'SecretService', 'LabelHelper', 'Authentication', 'ResourceControlService', 'FormValidator',
 function ($scope, $state, Notifications, SecretService, LabelHelper, Authentication, ResourceControlService, FormValidator) {
@@ -59,7 +61,7 @@ function ($scope, $state, Notifications, SecretService, LabelHelper, Authenticat
 
     var accessControlData = $scope.formValues.AccessControlData;
     var userDetails = Authentication.getUserDetails();
-    var isAdmin = userDetails.role === 1;
+    var isAdmin = Authentication.isAdmin();
 
     if (!validateForm(accessControlData, isAdmin)) {
       return;

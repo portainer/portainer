@@ -6,6 +6,7 @@ function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMember
     pagination_count_users: PaginationService.getPaginationLimit('team_available_users'),
     pagination_count_members: PaginationService.getPaginationLimit('team_members')
   };
+
   $scope.sortTypeUsers = 'Username';
   $scope.sortReverseUsers = true;
   $scope.users = [];
@@ -112,6 +113,7 @@ function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMember
     .then(function success() {
       $scope.users = $scope.users.concat($scope.teamMembers);
       $scope.teamMembers = [];
+      $scope.leaderCount = 0;
       Notifications.success('All users successfully removed');
     })
     .catch(function error(err) {
@@ -123,6 +125,9 @@ function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMember
     TeamMembershipService.deleteMembership(user.MembershipId)
     .then(function success() {
       removeUserFromArray(user.Id, $scope.teamMembers);
+      if (user.TeamRole === 'Leader') {
+        $scope.leaderCount--;
+      }
       $scope.users.push(user);
       Notifications.success('User removed from team', user.Username);
     })
@@ -177,7 +182,7 @@ function ($q, $scope, $state, $transition$, TeamService, UserService, TeamMember
   }
 
   function initView() {
-    $scope.isAdmin = Authentication.getUserDetails().role === 1 ? true: false;
+    $scope.isAdmin = Authentication.isAdmin();
     $q.all({
       team: TeamService.team($transition$.params().id),
       users: UserService.users(false),

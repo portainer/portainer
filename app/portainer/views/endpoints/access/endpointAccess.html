@@ -1,11 +1,12 @@
 <rd-header>
   <rd-header-title title-text="Endpoint access"></rd-header-title>
   <rd-header-content>
-    <a ui-sref="portainer.endpoints">Endpoints</a> &gt; <a ui-sref="portainer.endpoints.endpoint({id: endpoint.Id})">{{ endpoint.Name }}</a> &gt; Access management
+    <a ui-sref="portainer.endpoints">Endpoints</a> &gt; <a
+      ui-sref="portainer.endpoints.endpoint({id: ctrl.endpoint.Id})">{{ ctrl.endpoint.Name }}</a> &gt; Access management
   </rd-header-content>
 </rd-header>
 
-<div class="row" ng-if="endpoint">
+<div class="row" ng-if="ctrl.endpoint">
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-header icon="fa-plug" title-text="Endpoint"></rd-widget-header>
@@ -15,19 +16,19 @@
             <tr>
               <td>Name</td>
               <td>
-                {{ endpoint.Name }}
+                {{ ctrl.endpoint.Name }}
               </td>
             </tr>
             <tr>
               <td>URL</td>
               <td>
-                {{ endpoint.URL | stripprotocol }}
+                {{ ctrl.endpoint.URL | stripprotocol }}
               </td>
             </tr>
             <tr>
               <td>Group</td>
               <td>
-                <a ui-sref="portainer.groups.group({ id: group.Id })">{{ group.Name }}</a>
+                <a ui-sref="portainer.groups.group({ id: ctrl.group.Id })">{{ ctrl.group.Name }}</a>
               </td>
             </tr>
           </tbody>
@@ -37,10 +38,6 @@
   </div>
 </div>
 
-<div class="row" ng-if="endpoint && group">
-  <div class="col-sm-12">
-    <por-access-management
-      access-controlled-entity="endpoint" entity-type="endpoint" inherit-from="group" update-access="updateAccess(userAccesses, teamAccesses)"
-    ></por-access-management>
-  </div>
-</div>
+<por-access-management ng-if="ctrl.endpoint && ctrl.group" access-controlled-entity="ctrl.endpoint" action-in-progress="ctrl.state.actionInProgress"
+  entity-type="endpoint" inherit-from="ctrl.group" update-access="ctrl.updateAccess">
+</por-access-management>
