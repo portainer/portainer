@@ -1,3 +1,5 @@
+// TODO: legacy extension management
+
 angular.module('portainer.integrations.storidge', [])
 .config(['$stateRegistryProvider', function ($stateRegistryProvider) {
   'use strict';
