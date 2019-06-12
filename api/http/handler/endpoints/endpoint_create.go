@@ -2,7 +2,9 @@ package endpoints
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"log"
+	"math/rand"
 	"net/http"
 	"runtime"
 	"strconv"
@@ -199,16 +201,53 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 	return endpoint, nil
 }
 
+// TODO: relocate in a service
+// must be unique (e.g. not used / referenced)
+func randomInt(min, max int) int {
+	// should be randomize at service creation time?
+	// if not seeded, will always get same port order
+	// might not be a problem and maybe not required
+	//rand.Seed(time.Now().UnixNano())
+
+	return min + rand.Intn(max-min)
+}
+
 func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
 	endpointType := portainer.EdgeAgentEnvironment
 	endpointID := handler.EndpointService.GetNextIdentifier()
 
-	edgeKey := base64.RawStdEncoding.EncodeToString([]byte(strings.TrimPrefix(payload.URL, "tcp://") + ":9999:7777:random_secret"))
+	// get random port
+	// Dynamic ports (also called private ports) are 49152 to 65535.
+	// TODO: register this port somewhere
+	portnumber := randomInt(49152, 65535)
+
+	// TODO: review key creation mecanism
+	// payload.URL will match the browser IP/domain used when browsing Portainer
+	// when using localhost, this will match localhost and can cause an invalid setup with the Edge agent
+	// in this case, the TUNNEL_SERVER env var should be specified when using the agent.
+	// keyformat: PORTAINER_IP/DOMAIN:PORTAINER_PORT:LOCAL_ENDPOINT_PORT:TUNNEL_SERVER_FINGERPRINT:TUNNEL_CREDENTIALS
+	key := portainer.EdgeKey{
+		TunnelServerAddr:        strings.TrimPrefix(payload.URL, "tcp://"),
+		TunnelServerPort:        "8000",
+		TunnelPort:              strconv.Itoa(portnumber),
+		TunnelServerFingerprint: handler.TunnelServerFingerprint,
+		Credentials:             "agent@randomstring",
+	}
+
+	//edgeKey := base64.RawStdEncoding.EncodeToString([]byte(+":8000:" + strconv.Itoa(portnumber) + ":" + handler.TunnelServerFingerprint + ":"))
+
+	marshaledKey, err := json.Marshal(key)
+	if err != nil {
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to encode Edge key", err}
+	}
+
+	keyHash := crypto.HashFromBytes(marshaledKey)
+	encodedKey := base64.RawStdEncoding.EncodeToString(keyHash)
 
 	endpoint := &portainer.Endpoint{
 		ID:      portainer.EndpointID(endpointID),
 		Name:    payload.Name,
-		URL:     "tcp://localhost:7777",
+		URL:     "tcp://localhost:" + strconv.Itoa(portnumber),
 		Type:    endpointType,
 		GroupID: portainer.EndpointGroupID(payload.GroupID),
 		TLSConfig: portainer.TLSConfiguration{
@@ -220,10 +259,10 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		Tags:            payload.Tags,
 		Status:          portainer.EndpointStatusUp,
 		Snapshots:       []portainer.Snapshot{},
-		EdgeKey:         edgeKey,
+		EdgeKey:         string(encodedKey),
 	}
 
-	err := handler.EndpointService.CreateEndpoint(endpoint)
+	err = handler.EndpointService.CreateEndpoint(endpoint)
 	if err != nil {
 		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint inside the database", err}
 	}

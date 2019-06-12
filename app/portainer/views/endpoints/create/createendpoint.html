@@ -87,6 +87,16 @@
               </span>
             </div>
           </div>
+          <div ng-if="state.EnvironmentType === 'edge_agent'">
+            <div class="col-sm-12 form-section-title" >
+              Information
+            </div>
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                Allows you to create an endpoint that can be registered with an Edge agent. All the required information on how to connect an Edge agent to this endpoint will be available after endpoint creation.
+              </span>
+            </div>
+          </div>
           <div ng-if="state.EnvironmentType === 'azure'">
             <div class="col-sm-12 form-section-title" >
               Information

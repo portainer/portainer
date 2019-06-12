@@ -22,16 +22,14 @@ function ($q, $scope, $state, $transition$, $filter, clipboard, EndpointService,
     if ($scope.state.deploymentTab === 0) {
       clipboard.copyText('docker run -d -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker/volumes:/var/lib/docker/volumes -v /:/host --restart always -e EDGE=1 -e CAP_HOST_MANAGEMENT=1 --name portainer_agent_iot portainer/pagent:edge');
     } else {
-      clipboard.copyText('docker service create --name portainer_agent --network portainer_agent_network -e AGENT_CLUSTER_ADDR=tasks.portainer_agent -e EDGE=1 -e CAP_HOST_MANAGEMENT=1 --mode global --constraint \'node.platform.os == linux\' --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volume portainer/pagent:edge');
+      clipboard.copyText('docker service create --name portainer_edge_agent --network portainer_agent_network -e AGENT_CLUSTER_ADDR=tasks.portainer_agent -e EDGE=1 -e CAP_HOST_MANAGEMENT=1 --mode global --constraint \'node.platform.os == linux\' --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volume portainer/pagent:edge');
     }
-    $('#copyNotificationDeploymentCommand').show();
-    $('#copyNotificationDeploymentCommand').fadeOut(2500);
+    $('#copyNotificationDeploymentCommand').show().fadeOut(2500);
   };
 
   $scope.copyEdgeAgentKey = function() {
     clipboard.copyText($scope.endpoint.EdgeKey);
-    $('#copyNotificationEdgeKey').show();
-    $('#copyNotificationEdgeKey').fadeOut(2500);
+    $('#copyNotificationEdgeKey').show().fadeOut(2500);
   };
 
   $scope.updateEndpoint = function() {

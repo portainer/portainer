@@ -10,7 +10,7 @@
     <span class="small text-muted">
       <p>
         <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-        Deploy an agent on your remote Docker environment using the following command to enable this endpoint
+        Deploy the Edge agent on your remote Docker environment using the following command
       </p>
      <div style="margin-top: 10px;">
        <uib-tabset active="state.deploymentTab">
@@ -22,6 +22,7 @@
               --restart always \
               -e EDGE=1 \
               -e CAP_HOST_MANAGEMENT=1 \
+              -p 80:80 \
               --name portainer_edge_agent \
               portainer/pagent:edge
            </code>
@@ -29,12 +30,13 @@
           <uib-tab index="1" heading="Swarm">
            <code style=display:block;white-space:pre-wrap>
              docker service create \
-              --name portainer_agent \
+              --name portainer_edge_agent \
               --network portainer_agent_network \
               -e AGENT_CLUSTER_ADDR=tasks.portainer_agent \
               -e EDGE=1 \
               -e CAP_HOST_MANAGEMENT=1 \
               --mode global \
+              --publish mode=host,target=80,published=80 \
               --constraint 'node.platform.os == linux' \
               --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock \
               --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volumes \
@@ -54,7 +56,7 @@
       </div>
       <p>
         <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-        Use the following join token to associate an agent with this endpoint
+        Use the following join token to associate the Edge agent with this endpoint
       </p>
       <div style="margin-top: 10px;">
        <code style=display:block;white-space:pre-wrap>

@@ -32,6 +32,8 @@ type Handler struct {
 	ProxyManager                *proxy.Manager
 	Snapshotter                 portainer.Snapshotter
 	JobService                  portainer.JobService
+	// TODO: figure out a way to manage this (service?)
+	TunnelServerFingerprint string
 }
 
 // NewHandler creates a handler to manage endpoint operations.

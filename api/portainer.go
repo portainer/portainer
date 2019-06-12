@@ -10,6 +10,8 @@ type (
 	// CLIFlags represents the available flags on the CLI
 	CLIFlags struct {
 		Addr              *string
+		TunnelAddr        *string
+		TunnelPort        *string
 		AdminPassword     *string
 		AdminPasswordFile *string
 		Assets            *string
@@ -575,6 +577,15 @@ type (
 		Valid      bool   `json:"Valid,omitempty"`
 	}
 
+	// EdgeKey represent the information associated to an Edge key used by the Edge agent
+	EdgeKey struct {
+		TunnelServerAddr        string
+		TunnelServerPort        string
+		TunnelServerFingerprint string
+		TunnelPort              string
+		Credentials             string
+	}
+
 	// CLIService represents a service for managing CLI
 	CLIService interface {
 		ParseFlags(version string) (*CLIFlags, error)
@@ -592,6 +603,13 @@ type (
 	// Server defines the interface to serve the API
 	Server interface {
 		Start() error
+	}
+
+	// Tunnel server defines the interface for the reverse tunneling server used
+	// with Edge agents.
+	TunnelServer interface {
+		Start() error
+		GetFingerprint() string
 	}
 
 	// UserService represents a service for managing user data
