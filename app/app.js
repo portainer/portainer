@@ -31,7 +31,7 @@ function ($rootScope, $state, Authentication, authManager, StateManager, Endpoin
     }
   };
 
-  $transitions.onBefore({ to: 'docker.**' }, function() {
+  $transitions.onBefore({}, function() {
     HttpRequestHelper.resetAgentHeaders();
   });
 }]);
