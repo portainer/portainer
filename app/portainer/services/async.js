@@ -1,14 +1,14 @@
 angular.module('portainer').factory('$async', ['$q',
   function($q) {
-    return function(asyncFunc) {
-      const wrapper = function() {
+    return function(asyncFunc, ...args) {
+      const wrapper = function(params) {
         const deferred = $q.defer();
-        asyncFunc()
+        asyncFunc(params)
           .then(deferred.resolve)
           .catch(deferred.reject);
         return deferred.promise;
       };
-      wrapper().then(() => {
+      wrapper(...args).then(() => {
         /*no op*/
       });
     };
