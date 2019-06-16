@@ -577,15 +577,6 @@ type (
 		Valid      bool   `json:"Valid,omitempty"`
 	}
 
-	// EdgeKey represent the information associated to an Edge key used by the Edge agent
-	EdgeKey struct {
-		TunnelServerAddr        string
-		TunnelServerPort        string
-		TunnelServerFingerprint string
-		TunnelPort              string
-		Credentials             string
-	}
-
 	// CLIService represents a service for managing CLI
 	CLIService interface {
 		ParseFlags(version string) (*CLIFlags, error)

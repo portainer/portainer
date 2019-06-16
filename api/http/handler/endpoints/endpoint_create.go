@@ -2,7 +2,6 @@ package endpoints
 
 import (
 	"encoding/base64"
-	"encoding/json"
 	"log"
 	"math/rand"
 	"net/http"
@@ -221,28 +220,16 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 	// TODO: register this port somewhere
 	portnumber := randomInt(49152, 65535)
 
-	// TODO: review key creation mecanism
-	// payload.URL will match the browser IP/domain used when browsing Portainer
-	// when using localhost, this will match localhost and can cause an invalid setup with the Edge agent
-	// in this case, the TUNNEL_SERVER env var should be specified when using the agent.
-	// keyformat: PORTAINER_IP/DOMAIN:PORTAINER_PORT:LOCAL_ENDPOINT_PORT:TUNNEL_SERVER_FINGERPRINT:TUNNEL_CREDENTIALS
-	key := portainer.EdgeKey{
-		TunnelServerAddr:        strings.TrimPrefix(payload.URL, "tcp://"),
-		TunnelServerPort:        "8000",
-		TunnelPort:              strconv.Itoa(portnumber),
-		TunnelServerFingerprint: handler.TunnelServerFingerprint,
-		Credentials:             "agent@randomstring",
+	keyInformation := []string{
+		strings.TrimPrefix(payload.URL, "tcp://"),
+		"8000",
+		handler.TunnelServerFingerprint,
+		strconv.Itoa(portnumber),
+		"agent:randomstring",
 	}
 
-	//edgeKey := base64.RawStdEncoding.EncodeToString([]byte(+":8000:" + strconv.Itoa(portnumber) + ":" + handler.TunnelServerFingerprint + ":"))
-
-	marshaledKey, err := json.Marshal(key)
-	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to encode Edge key", err}
-	}
-
-	keyHash := crypto.HashFromBytes(marshaledKey)
-	encodedKey := base64.RawStdEncoding.EncodeToString(keyHash)
+	key := strings.Join(keyInformation, "|")
+	encodedKey := base64.RawStdEncoding.EncodeToString([]byte(key))
 
 	endpoint := &portainer.Endpoint{
 		ID:      portainer.EndpointID(endpointID),
@@ -262,7 +249,7 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		EdgeKey:         string(encodedKey),
 	}
 
-	err = handler.EndpointService.CreateEndpoint(endpoint)
+	err := handler.EndpointService.CreateEndpoint(endpoint)
 	if err != nil {
 		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint inside the database", err}
 	}
