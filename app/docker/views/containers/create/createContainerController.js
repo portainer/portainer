@@ -139,7 +139,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
 
   function preparePortBindings(config) {
     var bindings = {};
-    if (config.ExposedPorts == undefined) {
+    if (config.ExposedPorts === undefined) {
       config.ExposedPorts = {};
     }
     config.HostConfig.PortBindings.forEach(function (portBinding) {
