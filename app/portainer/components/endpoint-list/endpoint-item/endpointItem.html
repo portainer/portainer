@@ -64,6 +64,12 @@
         </span>
       </div>
 
+      <div class="blocklist-item-line endpoint-item" ng-if="!$ctrl.model.Snapshots[0]">
+        <span class="blocklist-item-desc">
+          No snapshot available
+        </span>
+      </div>
+
       <div class="blocklist-item-line endpoint-item">
         <span class="small text-muted">
           <span ng-if="$ctrl.model.Type === 1">
@@ -82,7 +88,7 @@
             </span>
           </span>
         </span>
-        <span class="small text-muted">
+        <span class="small text-muted" ng-if="$ctrl.model.Type !== $">
           {{ $ctrl.model.URL | stripprotocol }}
         </span>
       </div>
