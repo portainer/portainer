@@ -1,3 +1,9 @@
+/**
+ * Look a the following PR for how to use the wrapper
+ * and documentation about it
+ * https://github.com/portainer/portainer/pull/2945
+ */
+
 angular.module('portainer').factory('$async', ['$q',
   function($q) {
     return function(asyncFunc, ...args) {
