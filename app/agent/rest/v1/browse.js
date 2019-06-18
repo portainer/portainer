@@ -12,7 +12,8 @@ angular.module('portainer.agent')
     },
     get: {
       method: 'GET', params: { action: 'get' },
-      transformResponse: browseGetResponse
+      transformResponse: browseGetResponse,
+      responseType: 'arraybuffer'
     },
     delete: {
       method: 'DELETE', params: { action: 'delete' }
