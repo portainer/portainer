@@ -48,6 +48,14 @@
                 <input type="checkbox" ng-model="state.DisplayOnlyRunningTasks" ng-change="changeDisplayOnlyRunningTasks()"><i></i>
               </label>
             </div>
+            <div class="col-sm-12">
+              <label class="control-label text-left">
+                Display node labels
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" ng-model="state.DisplayNodeLabels" ng-change="changeDisplayNodeLabels()"><i></i>
+              </label>
+            </div>
           </div>
         </form>
         <form class="form-horizontal">
@@ -95,7 +103,7 @@
               <div>CPU: {{ node.CPUs / 1000000000 }}</div>
               <div>Memory: {{ node.Memory|humansize: 2 }}</div>
               <div><span class="label label-{{ node.Status | nodestatusbadge }}">{{ node.Status }}</span></div>
-              <div class="node_labels" ng-if="node.Labels.length > 0">
+              <div class="node_labels" ng-if="node.Labels.length > 0 && state.DisplayNodeLabels">
                 <div>Labels:</div>
                 <div class="node_label" ng-repeat="label in node.Labels">
                   {{ label.key }} = {{ label.value }}
