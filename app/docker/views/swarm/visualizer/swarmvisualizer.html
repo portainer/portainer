@@ -37,7 +37,7 @@
         </table>
         <form class="form-horizontal">
           <div class="col-sm-12 form-section-title">
-            Filters
+            Options
           </div>
           <div class="form-group">
             <div class="col-sm-12">
@@ -106,7 +106,12 @@
               <div class="node_labels" ng-if="node.Labels.length > 0 && state.DisplayNodeLabels">
                 <div>Labels:</div>
                 <div class="node_label" ng-repeat="label in node.Labels">
-                  {{ label.key }} = {{ label.value }}
+                  <span class="label_key">
+                    {{ label.key }}
+                  </span>
+                  <span class="label_value" ng-if="label.value">
+                    = {{ label.value }}
+                  </span>
                 </div>
               </div>
             </div>
