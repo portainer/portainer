@@ -55,6 +55,7 @@ function (PaginationService, DatatableService, PAGINATION_MAX_ITEMS) {
     if (event && this.state.selectAll && this.state.selectedItems.length !== this.state.filteredDataSet.length) {
       this.state.selectAll = false;
     }
+    this.onSelectionChanged();
   };
 
   this.selectAll = function() {
@@ -66,6 +67,7 @@ function (PaginationService, DatatableService, PAGINATION_MAX_ITEMS) {
         this.selectItem(item);
       }
     }
+    this.onSelectionChanged();
   };
 
   /**
@@ -79,6 +81,13 @@ function (PaginationService, DatatableService, PAGINATION_MAX_ITEMS) {
    * Override this method to prepare data table
    */
   this.prepareTableFromDataset = function() {
+    return;
+  }
+
+  /**
+   * Override this method to execute code after selection changed on datatable
+   */
+  this.onSelectionChanged = function () {
     return;
   }
 

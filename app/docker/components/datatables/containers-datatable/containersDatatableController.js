@@ -88,6 +88,10 @@ function ($scope, $controller, DatatableService, EndpointProvider) {
     this.updateSelectionState();
   };
 
+  this.onSelectionChanged = function() {
+    this.updateSelectionState();
+  }
+
   this.updateSelectionState = function() {
     this.state.noStoppedItemsSelected = true;
     this.state.noRunningItemsSelected = true;
