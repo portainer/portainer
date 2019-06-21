@@ -1,3 +1,4 @@
+import _ from 'lodash-es';
 import './datatable.css';
 
 function isBetween(value, a, b) {
@@ -35,30 +36,20 @@ function (PaginationService, DatatableService, PAGINATION_MAX_ITEMS) {
     if (event && event.originalEvent.shiftKey && this.state.firstClickedItem) {
       const firstItemIndex = this.state.filteredDataSet.indexOf(this.state.firstClickedItem);
       const lastItemIndex = this.state.filteredDataSet.indexOf(item);
-      const itemsInRange = this.state.filteredDataSet.filter((item, index) => {
+      const itemsInRange = _.filter(this.state.filteredDataSet, (item, index) => {
         return isBetween(index, firstItemIndex, lastItemIndex);
       });
+      const value = item.Checked;
 
-      let value = this.state.firstClickedItem.Checked;
-
-      // Calculate items that need to be added/removed
-      this.state.filteredDataSet.forEach((i) => {
+      _.forEach(itemsInRange, (i) => {
         if (!this.allowSelection(i)) {
           return;
         }
-        const inRange = itemsInRange.includes(i);
-        const inLastRange = this.state.lastItemsInRange.includes(i);
-        if(!inRange && inLastRange) {
-          i.Checked = !i.Checked;
-        } else if(inRange || inLastRange) {
-          i.Checked = value;
-        }
+        i.Checked = value;
       });
-      this.state.lastItemsInRange = itemsInRange
-    } else if(event) {
-      // Handle first/single select
       this.state.firstClickedItem = item;
-      this.state.lastItemsInRange = [item];
+    } else if (event) {
+      this.state.firstClickedItem = item;
     }
     this.state.selectedItems = this.state.filteredDataSet.filter(i => i.Checked);
     if (event && this.state.selectAll && this.state.selectedItems.length !== this.state.filteredDataSet.length) {
@@ -67,6 +58,7 @@ function (PaginationService, DatatableService, PAGINATION_MAX_ITEMS) {
   };
 
   this.selectAll = function() {
+    this.state.firstClickedItem = null;
     for (var i = 0; i < this.state.filteredDataSet.length; i++) {
       var item = this.state.filteredDataSet[i];
       if (this.allowSelection(item) && item.Checked !== this.state.selectAll) {
