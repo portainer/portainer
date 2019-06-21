@@ -47,12 +47,6 @@ angular.module('portainer.docker')
         this.filters.state.enabled = filtered;
       };
 
-      this.changeOrderBy = function(orderField) {
-        this.state.reverseOrder = this.state.orderBy === orderField ? !this.state.reverseOrder : false;
-        this.state.orderBy = orderField;
-        DatatableService.setDataTableOrder(this.tableKey, orderField, this.state.reverseOrder);
-      };
-
       this.prepareTableFromDataset = function() {
         var availableStateFilters = [];
         for (var i = 0; i < this.dataset.length; i++) {
