@@ -82,7 +82,7 @@
     "clean-webpack-plugin": "^0.1.19",
     "css-loader": "^1.0.0",
     "cssnano": "^3.10.0",
-    "eslint": "^3.19.0",
+    "eslint": "^4.18.2",
     "eslint-loader": "^2.1.1",
     "file-loader": "^1.1.11",
     "grunt": "~0.4.0",
