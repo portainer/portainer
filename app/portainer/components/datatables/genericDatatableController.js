@@ -101,6 +101,13 @@ function (PaginationService, DatatableService, PAGINATION_MAX_ITEMS) {
     this.state.paginatedItemLimit = PaginationService.getPaginationLimit(this.tableKey);
   }
 
+  /**
+   * Duplicate this function when extending GenericDatatableController
+   * Extending-controller's bindings are not accessible there
+   * For more details see the following comments
+   * https://github.com/portainer/portainer/pull/2877#issuecomment-503333425
+   * https://github.com/portainer/portainer/pull/2877#issuecomment-503537249
+   */
   this.$onInit = function() {
     this.setDefaults();
     this.prepareTableFromDataset();
@@ -121,8 +128,7 @@ function (PaginationService, DatatableService, PAGINATION_MAX_ITEMS) {
     if (storedFilters !== null) {
       this.filters = storedFilters;
     }
-
-    if(this.filters && this.filters.state) {
+    if (this.filters && this.filters.state) {
       this.filters.state.open = false;
     }
   };

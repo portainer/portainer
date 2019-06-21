@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('TasksDatatableController', ['$scope', '$controller',
-function ($scope, $controller) {
+.controller('TasksDatatableController', ['$scope', '$controller', 'DatatableService',
+function ($scope, $controller, DatatableService) {
 
   angular.extend(this, $controller('GenericDatatableController', {$scope: $scope}));
 
@@ -11,4 +11,29 @@ function ($scope, $controller) {
     showQuickActionInspect: true,
     showQuickActionAttach: false
   });
+
+  this.$onInit = function() {
+    this.setDefaults();
+    this.prepareTableFromDataset();
+
+    var storedOrder = DatatableService.getDataTableOrder(this.tableKey);
+    if (storedOrder !== null) {
+      this.state.reverseOrder = storedOrder.reverse;
+      this.state.orderBy = storedOrder.orderBy;
+    }
+
+    var textFilter = DatatableService.getDataTableTextFilters(this.tableKey);
+    if (textFilter !== null) {
+      this.state.textFilter = textFilter;
+      this.onTextFilterChange();
+    }
+
+    var storedFilters = DatatableService.getDataTableFilters(this.tableKey);
+    if (storedFilters !== null) {
+      this.filters = storedFilters;
+    }
+    if (this.filters && this.filters.state) {
+      this.filters.state.open = false;
+    }
+  };
 }]);

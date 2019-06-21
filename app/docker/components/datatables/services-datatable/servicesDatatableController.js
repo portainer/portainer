@@ -4,8 +4,7 @@ angular.module('portainer.docker')
 .controller('ServicesDatatableController', ['$scope', '$controller', 'DatatableService', 'EndpointProvider',
 function ($scope, $controller, DatatableService, EndpointProvider) {
 
-  const extendedCtrl = $controller('GenericDatatableController', {$scope: $scope});
-  angular.extend(this, extendedCtrl);
+  angular.extend(this, $controller('GenericDatatableController', {$scope: $scope}));
 
   var ctrl = this;
 
@@ -66,7 +65,28 @@ function ($scope, $controller, DatatableService, EndpointProvider) {
   };
 
   this.$onInit = function() {
-    extendedCtrl.$onInit();
+    this.setDefaults();
+    this.prepareTableFromDataset();
+
+    var storedOrder = DatatableService.getDataTableOrder(this.tableKey);
+    if (storedOrder !== null) {
+      this.state.reverseOrder = storedOrder.reverse;
+      this.state.orderBy = storedOrder.orderBy;
+    }
+
+    var textFilter = DatatableService.getDataTableTextFilters(this.tableKey);
+    if (textFilter !== null) {
+      this.state.textFilter = textFilter;
+      this.onTextFilterChange();
+    }
+
+    var storedFilters = DatatableService.getDataTableFilters(this.tableKey);
+    if (storedFilters !== null) {
+      this.filters = storedFilters;
+    }
+    if (this.filters && this.filters.state) {
+      this.filters.state.open = false;
+    }
 
     var storedExpandedItems = DatatableService.getDataTableExpandedItems(this.tableKey);
     if (storedExpandedItems !== null) {

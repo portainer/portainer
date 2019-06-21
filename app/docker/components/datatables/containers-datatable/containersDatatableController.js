@@ -4,8 +4,7 @@ angular.module('portainer.docker')
 .controller('ContainersDatatableController', ['$scope', '$controller', 'DatatableService', 'EndpointProvider',
 function ($scope, $controller, DatatableService, EndpointProvider) {
 
-  const extendedCtrl = $controller('GenericDatatableController', {$scope: $scope});
-  angular.extend(this, extendedCtrl);
+  angular.extend(this, $controller('GenericDatatableController', {$scope: $scope}));
 
   var ctrl = this;
 
@@ -171,25 +170,38 @@ function ($scope, $controller, DatatableService, EndpointProvider) {
   };
 
   this.$onInit = function() {
-    extendedCtrl.$onInit();
+    this.setDefaults();
     this.prepareTableFromDataset();
+
+    var storedOrder = DatatableService.getDataTableOrder(this.tableKey);
+    if (storedOrder !== null) {
+      this.state.reverseOrder = storedOrder.reverse;
+      this.state.orderBy = storedOrder.orderBy;
+    }
+
+    var textFilter = DatatableService.getDataTableTextFilters(this.tableKey);
+    if (textFilter !== null) {
+      this.state.textFilter = textFilter;
+      this.onTextFilterChange();
+    }
 
     var storedFilters = DatatableService.getDataTableFilters(this.tableKey);
     if (storedFilters !== null) {
+      this.filters = storedFilters;
+      this.filters.state.open = false;
       this.updateStoredFilters(storedFilters.state.values);
     }
-    this.filters.state.open = false;
 
     var storedSettings = DatatableService.getDataTableSettings(this.tableKey);
     if (storedSettings !== null) {
       this.settings = storedSettings;
+      this.settings.open = false;
     }
-    this.settings.open = false;
 
     var storedColumnVisibility = DatatableService.getColumnVisibilitySettings(this.tableKey);
     if (storedColumnVisibility !== null) {
       this.columnVisibility = storedColumnVisibility;
+      this.columnVisibility.state.open = false;
     }
-    this.columnVisibility.state.open = false;
   };
 }]);

@@ -1,6 +1,6 @@
 angular.module('portainer.integrations.storidge').component('storidgeSnapshotsDatatable', {
   templateUrl: './storidgeSnapshotsDatatable.html',
-  controller: 'StoridgeSnapshotsDatatableController',
+  controller: 'GenericDatatableController',
   bindings: {
     titleText: '@',
     titleIcon: '@',
