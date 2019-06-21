@@ -1,3 +1,5 @@
+import _ from 'lodash-es';
+
 angular.module('portainer.app')
 .controller('RegistryRepositoriesDatatableController', ['$scope', '$controller',
   function($scope, $controller) {

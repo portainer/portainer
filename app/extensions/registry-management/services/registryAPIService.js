@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { RegistryRepositoryViewModel } from '../models/registryRepository';
+import RegistryRepositoryViewModel from '../models/registryRepository';
 
 angular.module('portainer.extensions.registrymanagement')
 .factory('RegistryV2Service', ['$q', 'RegistryCatalog', 'RegistryTags', 'RegistryManifests', 'RegistryV2Helper',

@@ -1,4 +1,5 @@
 import _ from 'lodash-es';
+import RepositoryTagViewModel from '../../../models/repositoryTag';
 
 angular.module('portainer.app')
   .controller('RegistryRepositoryController', ['$q', '$scope', '$transition$', '$state', 'RegistryV2Service', 'RegistryService', 'ModalService', 'Notifications',
