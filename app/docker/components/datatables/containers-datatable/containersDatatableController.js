@@ -83,11 +83,6 @@ function ($scope, $controller, DatatableService, EndpointProvider) {
     DatatableService.setColumnVisibilitySettings(this.tableKey, this.columnVisibility);
   };
 
-  this.selectAll = function() {
-    extendedCtrl.selectAll();
-    this.updateSelectionState();
-  };
-
   this.onSelectionChanged = function() {
     this.updateSelectionState();
   }

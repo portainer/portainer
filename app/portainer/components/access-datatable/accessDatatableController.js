@@ -7,14 +7,8 @@ angular.module('portainer.app')
         return item.Inherited;
       };
 
-      this.selectAll = function() {
-        for (var i = 0; i < this.state.filteredDataSet.length; i++) {
-          var item = this.state.filteredDataSet[i];
-          if (!this.disableRemove(item) && item.Checked !== this.state.selectAll) {
-            item.Checked = this.state.selectAll;
-            this.selectItem(item);
-          }
-        }
+      this.allowSelection = function(item) {
+        return !this.disableRemove(item);
       };
   }
 ]);
