@@ -2,22 +2,67 @@ import _ from 'lodash-es';
 import RepositoryTagViewModel from '../../../models/repositoryTag';
 
 angular.module('portainer.app')
-  .controller('RegistryRepositoryController', ['$q', '$scope', '$transition$', '$state', 'RegistryV2Service', 'RegistryService', 'ModalService', 'Notifications',
-    function ($q, $scope, $transition$, $state, RegistryV2Service, RegistryService, ModalService, Notifications) {
+  .controller('RegistryRepositoryController', ['$q', '$async', '$scope', '$transition$', '$state', 'RegistryV2Service', 'RegistryService', 'ModalService', 'Notifications',
+    function ($q, $async, $scope, $transition$, $state, RegistryV2Service, RegistryService, ModalService, Notifications) {
 
       $scope.state = {
         actionInProgress: false,
-        loading: false
+        loading: false,
+        imageRetrieval: {
+          running: false,
+          progression: 0,
+          asyncIterator: null
+        }
       };
       $scope.formValues = {
         Tag: ''
       };
       $scope.tags = [];
+      $scope.backgroundTags = [];
       $scope.repository = {
         Name: [],
         Tags: [],
         Images: []
       };
+
+      $scope.test = function() {
+        return $async($scope.asyncTest);
+      }
+
+      $scope.asyncTest = async function() {
+        $scope.state.imageRetrieval.running = true;
+        $scope.state.imageRetrieval.asyncIterator = RegistryV2Service.test($scope.registryId, $scope.repository.Name, $scope.repository.Tags);
+        for await (const partialResult of $scope.state.imageRetrieval.asyncIterator) { 
+          if (typeof partialResult === 'number') {
+            $scope.state.imageRetrieval.progression = partialResult;
+          } else {
+            $scope.backgroundTags = partialResult;
+          }
+        }
+        $scope.state.imageRetrieval.running = false;
+        console.log('end of loop', $scope.backgroundTags);
+      };
+
+      // $scope.test = async function() {
+      //   const startTime = Date.now();
+      //   let steps = 100;
+      //   $scope.state.imageRetrieval.running = true;
+      //   let start = $scope.state.imageRetrieval.start = 0;
+      //   let end = $scope.state.imageRetrieval.end = $scope.state.imageRetrieval.start + steps;
+      //   let max = $scope.state.imageRetrieval.max = $scope.repository.Tags.length;
+      //   while (start < max) {
+      //     const tags = _.slice($scope.repository.Tags, start, end);
+      //     for await (const partialResult of RegistryV2Service.test($scope.registryId, $scope.repository.Name, tags)) {
+      //       $scope.backgroundTags = partialResult;
+      //     }
+      //     start = $scope.state.imageRetrieval.start = $scope.state.imageRetrieval.end;
+      //     end = $scope.state.imageRetrieval.end = start + steps;
+      //   }
+      //   $scope.state.imageRetrieval.running = false;
+      //   const endTime = Date.now();
+      //   console.log('elapsed time', endTime - startTime);
+      //   console.log($scope.tags);
+      // };
 
       $scope.paginationAction = function (tags) {
         $scope.state.loading = true;
@@ -146,25 +191,39 @@ angular.module('portainer.app')
         );
       };
 
-      function initView() {
+      async function initView() {
         var registryId = $scope.registryId = $transition$.params().id;
         var repository = $scope.repository.Name = $transition$.params().repository;
-        $q.all({
+        try {
+          const data = await $q.all({
             registry: RegistryService.registry(registryId),
             tags: RegistryV2Service.tags(registryId, repository)
-          })
-          .then(function success(data) {
-            $scope.registry = data.registry;
-            $scope.repository.Tags = [].concat(data.tags || []).sort();
-            for (var i = 0; i < $scope.repository.Tags.length; i++) {
-              $scope.tags.push(new RepositoryTagViewModel($scope.repository.Tags[i]));
-            }
-          })
-          .catch(function error(err) {
-            Notifications.error('Failure', err, 'Unable to retrieve repository information');
           });
+          $scope.registry = data.registry;
+          $scope.repository.Tags = [].concat(data.tags || []).sort();
+          for (var i = 0; i < $scope.repository.Tags.length; i++) {
+            $scope.tags.push(new RepositoryTagViewModel($scope.repository.Tags[i]));
+          }
+        } catch (err) {
+          Notifications.error('Failure', err, 'Unable to retrieve repository information');
+        }
       }
 
-      initView();
+      // TODO: refactor this to class to can have controllers lifecycle hooks
+
+      // $scope.$on('destroy', () => {
+      //   console.log('destroyedddddddddd');
+      //   $scope.state.imageRetrieval.asyncIterator.return();
+      // });
+
+      // this.$onDestroy = function() {
+      //   console.log('destroying');
+      //   $scope.state.imageRetrieval.asyncIterator.return();
+      // };
+
+      this.$onInit = function() {
+        $async(initView)
+        .then(() => $scope.test());
+      };
     }
   ]);

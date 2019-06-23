@@ -36,6 +36,10 @@
               <td>Images count</td>
               <td>{{ repository.Images.length }}</td>
             </tr>
+            <tr ng-if="state.imageRetrieval.running">
+              <td>Retrieving all images details</td>
+              <td>{{ state.imageRetrieval.progression }} / {{ repository.Tags.length }}</td>
+            </tr>
           </tbody>
         </table>
       </rd-widget-body>
