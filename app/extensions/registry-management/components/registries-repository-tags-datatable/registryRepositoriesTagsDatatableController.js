@@ -19,7 +19,7 @@ angular.module('portainer.app')
     $scope.$watch(function() { return ctrl.state.filteredDataSet;},
       function(newValue, oldValue) {
         if (newValue && areDifferent(oldValue, newValue)) {
-          ctrl.paginationAction(_.filter(newValue, {'ImageId': ''}));
+          ctrl.paginationAction(_.filter(newValue, {'Digest': ''}));
         }
       }, true);
   }

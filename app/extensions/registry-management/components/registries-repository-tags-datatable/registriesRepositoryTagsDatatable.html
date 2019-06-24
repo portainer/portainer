@@ -32,12 +32,8 @@
                 </a>
               </th>
               <th>Os/Architecture</th>
-              <th>
-                  Image ID
-              </th>
-              <th>
-                  Size
-              </th>
+              <th>Image ID</th>
+              <th>Compressed size</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -52,7 +48,7 @@
                 {{ item.Name }}
               </td>
               <td>{{ item.Os }}/{{ item.Architecture }}</td>
-              <td>{{ item.ImageId | truncate:40 }}</td>
+              <td>{{ item.Digest | trimshasum }}</td>
               <td>{{ item.Size | humansize }}</td>
               <td>
                 <span ng-if="!item.Modified">
