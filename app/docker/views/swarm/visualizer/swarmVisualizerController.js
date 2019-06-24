@@ -116,6 +116,10 @@ function ($q, $scope, $document, $interval, NodeService, ServiceService, TaskSer
     if (displayOnlyRunningTasks !== undefined && displayOnlyRunningTasks !== null)
         $scope.state.DisplayOnlyRunningTasks = displayOnlyRunningTasks;
 
+    var displayNodeLabels = LocalStorage.getSwarmVisualizerSettings('display_node_labels');
+    if (displayNodeLabels !== undefined && displayNodeLabels !== null)
+        $scope.state.DisplayNodeLabels = displayNodeLabels;
+
     var refreshRate = LocalStorage.getSwarmVisualizerSettings('refresh_rate');
     if (refreshRate !== undefined && refreshRate !== null)
         $scope.state.refreshRate = refreshRate;
