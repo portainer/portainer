@@ -193,47 +193,19 @@ angular.module('portainer.app')
           });
       }
 
-      // TODO: FIX TO WORK WITH PAGINATION AND LARGE REPOSITORIES
-      $scope.removeTags_old = function (selectedItems) {
-        ModalService.confirmDeletion(
-          'Are you sure you want to remove the selected tags ?',
-          function onConfirm(confirmed) {
-            if (!confirmed) {
-              return;
-            }
-            var promises = [];
-            var uniqItems = _.uniqBy(selectedItems, 'Digest');
-            uniqItems.map(function (item) {
-              promises.push(RegistryV2Service.deleteManifest($scope.registryId, $scope.repository.Name, item.Digest));
-            });
-            $q.all(promises)
-              .then(function success() {
-                var promises = [];
-                var tagsToReupload = _.differenceBy($scope.tags, selectedItems, 'Name');
-                tagsToReupload.map(function (item) {
-                  promises.push(RegistryV2Service.addTag($scope.registryId, $scope.repository.Name, item.Name, item.ManifestV2));
-                });
-                return $q.all(promises);
-              })
-              .then(function success(data) {
-                Notifications.success('Success', 'Tags successfully deleted');
-                if (data.length === 0) {
-                  $state.go('portainer.registries.registry.repositories', {
-                    id: $scope.registryId
-                  }, {
-                    reload: true
-                  });
-                } else {
-                  $state.reload();
-                }
-              })
-              .catch(function error(err) {
-                Notifications.error('Failure', err, 'Unable to delete tags');
-              });
-          });
-      };
+      async function removeRepositoryAsync() {
+        try {
+          const digests = _.uniqBy($scope.short.Tags, 'ImageDigest');
+          const promises = [];
+          _.map(digests, (item) => promises.push(RegistryV2Service.deleteManifest($scope.registryId, $scope.repository.Name, item.ImageDigest)));
+          await Promise.all(promises);
+          Notifications.success('Success', 'Repository sucessfully removed');
+          $state.go('portainer.registries.registry.repositories', {id: $scope.registryId}, {reload: true});
+        } catch (err) {
+          Notifications.error('Failure', err, 'Unable to delete repository');
+        }
+      }
 
-      // TODO: REFACTOR
       $scope.removeRepository = function () {
         ModalService.confirmDeletion(
           'This action will only remove the manifests linked to this repository. You need to manually trigger a garbage collector pass on your registry to remove orphan layers and really remove the images content. THIS ACTION CAN NOT BE UNDONE',
@@ -241,22 +213,7 @@ angular.module('portainer.app')
             if (!confirmed) {
               return;
             }
-            var promises = [];
-            var uniqItems = _.uniqBy($scope.tags, 'Digest');
-            uniqItems.map(function (item) {
-              promises.push(RegistryV2Service.deleteManifest($scope.registryId, $scope.repository.Name, item.Digest));
-            });
-            $q.all(promises)
-              .then(function success() {
-                Notifications.success('Success', 'Repository sucessfully removed');
-                $state.go('portainer.registries.registry.repositories', {
-                  id: $scope.registryId
-                }, {
-                  reload: true
-                });
-              }).catch(function error(err) {
-                Notifications.error('Failure', err, 'Unable to delete repository');
-              });
+            return $async(removeRepositoryAsync);
           }
         );
       };
@@ -268,7 +225,7 @@ angular.module('portainer.app')
           const tags = await RegistryV2Service.tags(registryId, repository);
           $scope.tags = [];
           $scope.repository.Tags = [];
-          $scope.repository.Tags = _.sortBy(_.concat($scope.repository.Tags, tags));
+          $scope.repository.Tags = _.sortBy(_.concat($scope.repository.Tags, _.without(tags, null)));
           _.map($scope.repository.Tags, (item) => $scope.tags.push(new RepositoryTagViewModel(item)));
         } catch (err) {
           Notifications.error('Failure', err, 'Unable to retrieve tags details');
