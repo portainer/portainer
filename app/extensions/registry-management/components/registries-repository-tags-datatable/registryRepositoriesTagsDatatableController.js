@@ -24,6 +24,7 @@ angular.module('portainer.app')
       function(newValue, oldValue) {
         if (newValue && newValue.length && areDifferent(oldValue, newValue)) {
           ctrl.paginationAction(_.filter(newValue, {'ImageId': ''}));
+          ctrl.resetSelectionState();
         }
       }, true);
   }

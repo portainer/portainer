@@ -18,22 +18,27 @@ angular.module('portainer.app')
         }
       };
       $scope.formValues = {
-        Tag: ''
+        Tag: '' // new tag name on add feature
       };
-      $scope.tags = [];
+      $scope.tags = []; // RepositoryTagViewModel (for datatable)
       $scope.short = {
-        Tags: [],
-        Images: []
+        Tags: [], // RepositoryShortTag
+        Images: [] // strings extracted from short.Tags
       };
       $scope.repository = {
-        Name: [],
-        Tags: [],
+        Name: '',
+        Tags: [], // string list
       };
 
       $scope.createAsyncGenerator = function () {
         $scope.state.tagsRetrieval.asyncGenerator =
           RegistryV2Service.shortTagsWithProgression($scope.registryId, $scope.repository.Name, $scope.repository.Tags);
       };
+
+      function resetFormValues() {
+        $scope.formValues.Tag = '';
+        delete $scope.formValues.SelectedImage;
+      }
 
       function resetTagsRetrievalState() {
         $scope.state.tagsRetrieval.running = false;
@@ -96,6 +101,7 @@ angular.module('portainer.app')
       };
 
       $scope.addTag = function () {
+        $scope.state.actionInProgress = true;
         const tag = $scope.short.Tags.find((item) => item.ImageId === $scope.formValues.SelectedImage);
         const manifest = tag.ManifestV2;
         RegistryV2Service.addTag($scope.registryId, $scope.repository.Name, $scope.formValues.Tag, manifest)
@@ -106,6 +112,9 @@ angular.module('portainer.app')
           })
           .catch(function error(err) {
             Notifications.error('Failure', err, 'Unable to add tag');
+          }).finally(() => {
+            $scope.state.actionInProgress = false;
+            resetFormValues();
           });
       };
 
@@ -143,8 +152,49 @@ angular.module('portainer.app')
         return $async(retagActionAsync);
       }
 
+      async function removeTagsAsync(selectedTags) {
+        try {
+          const deletedTagNames = _.map(selectedTags, 'Name');
+          const deletedShortTags = _.filter($scope.short.Tags, (item) => _.includes(deletedTagNames, item.Name));
+
+          const modifiedDigests = _.uniq(_.map(deletedShortTags, 'ImageDigest'));
+          const impactedTags = _.filter($scope.short.Tags, (item) => _.includes(modifiedDigests, item.ImageDigest));
+
+          const deletePromises = [];
+          _.map(modifiedDigests, (item) => deletePromises.push(RegistryV2Service.deleteManifest($scope.registryId, $scope.repository.Name, item)));
+          await Promise.all(deletePromises);
+
+          const tagsToKeep = _.without(impactedTags, ...deletedShortTags);
+          const addPromises = [];
+          _.map(tagsToKeep, (item) => {
+            addPromises.push(RegistryV2Service.addTag($scope.registryId, $scope.repository.Name, item.Name, item.ManifestV2))
+          });
+          await Promise.all(addPromises);
+          Notifications.success('Success', 'Tags successfully deleted');
+
+          _.map(deletedShortTags, (item) => {
+            const idx = _.findIndex($scope.short.Tags, (i) => i.Name === item.Name);
+            $scope.short.Tags.splice(idx, 1);
+          });
+          await loadRepositoryDetails();
+        } catch (err) {
+          Notifications.error('Failure', err, 'Unable to delete tags');
+        }
+      }
+
+      $scope.removeTags = function(selectedItems) {
+        ModalService.confirmDeletion(
+          'Are you sure you want to remove the selected tags ?',
+          (confirmed) => {
+            if (!confirmed) {
+              return;
+            }
+            return $async(removeTagsAsync, selectedItems);
+          });
+      }
+
       // TODO: FIX TO WORK WITH PAGINATION AND LARGE REPOSITORIES
-      $scope.removeTags = function (selectedItems) {
+      $scope.removeTags_old = function (selectedItems) {
         ModalService.confirmDeletion(
           'Are you sure you want to remove the selected tags ?',
           function onConfirm(confirmed) {
@@ -183,6 +233,7 @@ angular.module('portainer.app')
           });
       };
 
+      // TODO: REFACTOR
       $scope.removeRepository = function () {
         ModalService.confirmDeletion(
           'This action will only remove the manifests linked to this repository. You need to manually trigger a garbage collector pass on your registry to remove orphan layers and really remove the images content. THIS ACTION CAN NOT BE UNDONE',
@@ -214,9 +265,10 @@ angular.module('portainer.app')
         try {
           const registryId = $scope.registryId;
           const repository = $scope.repository.Name;
-          const tags = await RegistryV2Service.tags(registryId, repository)
+          const tags = await RegistryV2Service.tags(registryId, repository);
           $scope.tags = [];
-          $scope.repository.Tags = _.sortBy(_.concat([], tags || []), 'Name');
+          $scope.repository.Tags = [];
+          $scope.repository.Tags = _.sortBy(_.concat($scope.repository.Tags, tags));
           _.map($scope.repository.Tags, (item) => $scope.tags.push(new RepositoryTagViewModel(item)));
         } catch (err) {
           Notifications.error('Failure', err, 'Unable to retrieve tags details');
