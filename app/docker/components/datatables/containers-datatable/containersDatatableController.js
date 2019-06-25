@@ -95,6 +95,28 @@ function (PaginationService, DatatableService, EndpointProvider) {
     DatatableService.setDataTableOrder(this.tableKey, orderField, this.state.reverseOrder);
   };
 
+  this.ipComparator = function(ip1, ip2) {
+    if(this.state.orderBy !== 'IP' || (!ip1 && !ip2)) {
+      return ip1 - ip2;
+    }
+    
+    var ip1Parts = ip1.split('.');
+    var ip2Parts = ip2.split('.');
+   
+    var result = 0;
+    for(var i = 0; i < ip1Parts.length; i++) {
+        var num1 = +ip1Parts[i];
+        var num2 = +ip2Parts[i];
+      
+        if(num1 !== num2) {
+          result = num1 - num2;
+          break;
+        }
+    }
+    
+    return result;
+  };
+
   this.toggleItemSelection = function(item) {
     if (item.Checked) {
       this.state.selectedItemCount++;
