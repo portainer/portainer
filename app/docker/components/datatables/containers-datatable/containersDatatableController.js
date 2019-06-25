@@ -95,6 +95,12 @@ function (PaginationService, DatatableService, EndpointProvider) {
     DatatableService.setDataTableOrder(this.tableKey, orderField, this.state.reverseOrder);
   };
 
+  this.ipComparator = function(ip1, ip2) {
+    const num1 = Number(ip1.split(".").map((num) => (`000${num}`).slice(-3) ).join(""));
+    const num2 = Number(ip2.split(".").map((num) => (`000${num}`).slice(-3) ).join(""));
+    return num1-num2;	
+  }
+
   this.toggleItemSelection = function(item) {
     if (item.Checked) {
       this.state.selectedItemCount++;
