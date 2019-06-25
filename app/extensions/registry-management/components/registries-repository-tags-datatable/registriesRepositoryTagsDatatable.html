@@ -7,7 +7,7 @@
           $ctrl.titleText }}
         </div>
       </div>
-      <div class="actionBar">
+      <div class="actionBar" ng-if="$ctrl.advancedFeaturesAvailable">
         <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
@@ -34,7 +34,7 @@
               <th>Os/Architecture</th>
               <th>Image ID</th>
               <th>Compressed size</th>
-              <th>Actions</th>
+              <th ng-if="$ctrl.advancedFeaturesAvailable">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -50,7 +50,7 @@
               <td>{{ item.Os }}/{{ item.Architecture }}</td>
               <td>{{ item.ImageId | trimshasum }}</td>
               <td>{{ item.Size | humansize }}</td>
-              <td>
+              <td ng-if="$ctrl.advancedFeaturesAvailable">
                 <span ng-if="!item.Modified">
                   <a class="interactive" ng-click="item.Modified = true; item.NewName = item.Name; $event.stopPropagation();">
                     <i class="fa fa-tag" aria-hidden="true"></i> Retag

@@ -14,7 +14,8 @@ angular.module('portainer.extensions.registrymanagement')
             'Cache-Control': 'no-cache',
             'Authorization': 'Bearer ' + LocalStorage.getJWT()
           },
-          success: function (result) {
+          success: function (result, status, request) {
+            result.digest = request.getResponseHeader('Docker-Content-Digest');
             resolve(result);
           },
           error: function (error) {

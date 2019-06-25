@@ -7,18 +7,22 @@ angular.module('portainer.app')
     var ctrl = this;
     this.state.orderBy = this.orderBy;
 
+    function diff(item) {
+      return item.Name + item.ImageDigest;
+    }
+
     function areDifferent(a, b) {
       if (!a || !b) {
         return true;
       }
-      var namesA = a.map( function(x){ return x.Name; } ).sort();
-      var namesB = b.map( function(x){ return x.Name; } ).sort();
+      var namesA = _.sortBy(_.map(a, diff));
+      var namesB = _.sortBy(_.map(b, diff));
       return namesA.join(',') !== namesB.join(',');
     }
 
     $scope.$watch(function() { return ctrl.state.filteredDataSet;},
       function(newValue, oldValue) {
-        if (newValue && areDifferent(oldValue, newValue)) {
+        if (newValue && newValue.length && areDifferent(oldValue, newValue)) {
           ctrl.paginationAction(_.filter(newValue, {'ImageId': ''}));
         }
       }, true);

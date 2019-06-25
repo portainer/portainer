@@ -10,6 +10,7 @@ angular.module('portainer.extensions.registrymanagement').component('registriesR
     reverseOrder: '<',
     removeAction: '<',
     retagAction: '<',
+    advancedFeaturesAvailable: '<',
     paginationAction: '<',
     loading: '<'
   }

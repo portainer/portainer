@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import RepositoryTagViewModel from '../../../models/repositoryTag';
+import { RepositoryTagViewModel, RepositoryShortTag } from '../../../models/repositoryTag';
 
 angular.module('portainer.app')
   .controller('RegistryRepositoryController', ['$q', '$async', '$scope', '$transition$', '$state', 'RegistryV2Service', 'RegistryService', 'ModalService', 'Notifications',
@@ -62,10 +62,10 @@ angular.module('portainer.app')
       };
 
       $scope.retrieveTags = function() {
-        return $async($scope.retrieveTagsAsync);
+        return $async(retrieveTagsAsync);
       }
 
-      $scope.retrieveTagsAsync = async function() {
+      async function retrieveTagsAsync() {
         $scope.state.tagsRetrieval.running = true;
         const startTime = Date.now();
         for await (const partialResult of $scope.state.tagsRetrieval.asyncGenerator) { 
@@ -77,7 +77,7 @@ angular.module('portainer.app')
           }
         }
         $scope.state.tagsRetrieval.running = false;
-      };
+      }
 
       $scope.paginationAction = function (tags) {
         $scope.state.loading = true;
@@ -96,41 +96,52 @@ angular.module('portainer.app')
       };
 
       $scope.addTag = function () {
-        var manifest = $scope.short.Tags.find((item)  => item.ImageId === $scope.formValues.SelectedImage).ManifestV2;
+        const tag = $scope.short.Tags.find((item) => item.ImageId === $scope.formValues.SelectedImage);
+        const manifest = tag.ManifestV2;
         RegistryV2Service.addTag($scope.registryId, $scope.repository.Name, $scope.formValues.Tag, manifest)
           .then(function success() {
             Notifications.success('Success', 'Tag successfully added');
-            $state.reload();
+            $scope.short.Tags.push(new RepositoryShortTag($scope.formValues.Tag, tag.ImageId, tag.ImageDigest, tag.ManifestV2));
+            return $async(loadRepositoryDetails);
           })
           .catch(function error(err) {
             Notifications.error('Failure', err, 'Unable to add tag');
           });
       };
 
-      // TODO: FIX TO WORK WITH PAGINATION AND LARGE REPOSITORIES
-      $scope.retagAction = function (tag) {
-        RegistryV2Service.deleteManifest($scope.registryId, $scope.repository.Name, tag.ImageDigest)
-          .then(function success() {
-            var promises = [];
-            var tagsToAdd = $scope.tags.filter(function (item) {
-              return item.ImageDigest === tag.ImageDigest;
-            });
-            tagsToAdd.map(function (item) {
-              var tagValue = item.Modified && item.Name !== item.NewName ? item.NewName : item.Name;
-              promises.push(RegistryV2Service.addTag($scope.registryId, $scope.repository.Name, tagValue, item.ManifestV2));
-            });
-            return $q.all(promises);
-          })
-          .then(function success() {
-            Notifications.success('Success', 'Tag successfully modified');
-            $state.reload();
-          })
-          .catch(function error(err) {
-            Notifications.error('Failure', err, 'Unable to modify tag');
-            tag.Modified = false;
-            tag.NewValue = tag.Value;
+      async function retagActionAsync() {
+        try {
+          const modifiedTags = _.filter($scope.tags, (item) => item.Modified === true);
+          const modifiedDigests = _.uniq(_.map(modifiedTags, 'ImageDigest'));
+
+          const impactedTags = _.filter($scope.short.Tags, (item) => _.includes(modifiedDigests, item.ImageDigest));
+
+          const deletePromises = [];
+          _.map(modifiedDigests, (item) => deletePromises.push(RegistryV2Service.deleteManifest($scope.registryId, $scope.repository.Name, item)));
+          await Promise.all(deletePromises);
+
+          const addPromises = [];
+          _.map(impactedTags, (item) => {
+            const tagFromTable = _.find(modifiedTags, { 'Name': item.Name });
+            const name = tagFromTable && tagFromTable.Name !== tagFromTable.NewName ? tagFromTable.NewName : item.Name;
+            addPromises.push(RegistryV2Service.addTag($scope.registryId, $scope.repository.Name, name, item.ManifestV2))
           });
-      };
+          await Promise.all(addPromises);
+          Notifications.success('Success', 'Tags successfully renamed');
+
+          _.map(modifiedTags, (item) => {
+            const idx = _.findIndex($scope.short.Tags, (i) => i.Name === item.Name);
+            $scope.short.Tags[idx].Name = item.NewName;
+          });
+          await loadRepositoryDetails();
+        } catch (err) {
+          Notifications.error('Failure', err, 'Unable to rename tags');
+        }
+      }
+
+      $scope.retagAction = function() {
+        return $async(retagActionAsync);
+      }
 
       // TODO: FIX TO WORK WITH PAGINATION AND LARGE REPOSITORIES
       $scope.removeTags = function (selectedItems) {
@@ -199,19 +210,26 @@ angular.module('portainer.app')
         );
       };
 
-      async function initView() {
-        var registryId = $scope.registryId = $transition$.params().id;
-        var repository = $scope.repository.Name = $transition$.params().repository;
+      async function loadRepositoryDetails() {
         try {
-          const data = await $q.all({
-            registry: RegistryService.registry(registryId),
-            tags: RegistryV2Service.tags(registryId, repository)
-          });
-          $scope.registry = data.registry;
-          $scope.repository.Tags = [].concat(data.tags || []).sort();
-          for (var i = 0; i < $scope.repository.Tags.length; i++) {
-            $scope.tags.push(new RepositoryTagViewModel($scope.repository.Tags[i]));
-          }
+          const registryId = $scope.registryId;
+          const repository = $scope.repository.Name;
+          const tags = await RegistryV2Service.tags(registryId, repository)
+          $scope.tags = [];
+          $scope.repository.Tags = _.sortBy(_.concat([], tags || []), 'Name');
+          _.map($scope.repository.Tags, (item) => $scope.tags.push(new RepositoryTagViewModel(item)));
+        } catch (err) {
+          Notifications.error('Failure', err, 'Unable to retrieve tags details');
+        }
+      }
+
+      async function initView() {
+        try {
+          const registryId = $scope.registryId = $transition$.params().id;
+          $scope.repository.Name = $transition$.params().repository;
+
+          $scope.registry = await RegistryService.registry(registryId);
+          await loadRepositoryDetails();
           if ($scope.repository.Tags.length > $scope.state.tagsRetrieval.limit) {
             $scope.state.tagsRetrieval.auto = false;
           }

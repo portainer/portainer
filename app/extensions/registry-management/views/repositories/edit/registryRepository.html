@@ -16,7 +16,7 @@
     <span class="small text-muted">
       <p>
         <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-        Portainer needs to retrieve additional information to enable <code>tags addition</code> and <code>repository removal</code> features.<br>
+        Portainer needs to retrieve additional information to enable <code>tags modifications (addition, removal, rename)</code> and <code>repository removal</code> features.<br>
         As this repository contains more than <code>{{ state.tagsRetrieval.limit }}</code> tags, the additional retrieval wasn't started automatically.<br>
         Note: on very huge repositories the process can take a long time. Once started you can still navigate on this view. <br>
         Leaving this view will cancel the retrieval process.
@@ -103,6 +103,10 @@
 <div class="row">
   <div class="col-sm-12">
     <registries-repository-tags-datatable title-text="Tags" title-icon="fa-tags" dataset="tags" table-key="registryRepositoryTags"
-      order-by="Name" remove-action="removeTags" retag-action="retagAction" pagination-action="paginationAction" loading="state.loading"></registries-repository-tags-datatable>
+      order-by="Name" remove-action="removeTags" retag-action="retagAction"
+      advanced-features-available="short.Images.length > 0"
+      pagination-action="paginationAction"
+      loading="state.loading">
+    </registries-repository-tags-datatable>
   </div>
 </div>

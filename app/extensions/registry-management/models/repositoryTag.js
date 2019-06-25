@@ -1,4 +1,4 @@
-export default function RepositoryTagViewModel(name, os, arch, size, imageDigest, imageId, v2) {
+export function RepositoryTagViewModel(name, os, arch, size, imageDigest, imageId, v2) {
     this.Name = name;
     this.Os = os || '';
     this.Architecture = arch || '';
@@ -8,8 +8,9 @@ export default function RepositoryTagViewModel(name, os, arch, size, imageDigest
     this.ManifestV2 = v2 || {};
 }
 
-export function RepositoryShortTag(name, imageId, manifest) {
+export function RepositoryShortTag(name, imageId, imageDigest, manifest) {
     this.Name = name;
     this.ImageId = imageId;
+    this.ImageDigest = imageDigest;
     this.ManifestV2 = manifest;
 }

@@ -171,7 +171,7 @@ function RegistryV2ServiceFactory($q, $async, RegistryCatalog, RegistryTags, Reg
   service.shortTag = function(id, repository, tag) {
     return new Promise ((resolve, reject) => {
       RegistryManifestsJquery.get({id:id, repository: repository, tag: tag})
-      .then((data) => resolve(new RepositoryShortTag(tag, data.config.digest, data)))
+      .then((data) => resolve(new RepositoryShortTag(tag, data.config.digest, data.digest, data)))
       .catch((err) => reject(err))
     });
   };
