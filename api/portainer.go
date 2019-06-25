@@ -252,7 +252,7 @@ type (
 		Snapshots          []Snapshot          `json:"Snapshots"`
 		UserAccessPolicies UserAccessPolicies  `json:"UserAccessPolicies"`
 		TeamAccessPolicies TeamAccessPolicies  `json:"TeamAccessPolicies"`
-		EdgeKey            string
+		EdgeKey            string              `json:"EdgeKey"`
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
 		TLS           bool   `json:"TLS,omitempty"`
@@ -596,13 +596,6 @@ type (
 		Start() error
 	}
 
-	// Tunnel server defines the interface for the reverse tunneling server used
-	// with Edge agents.
-	TunnelServer interface {
-		Start() error
-		GetFingerprint() string
-	}
-
 	// UserService represents a service for managing user data
 	UserService interface {
 		User(ID UserID) (*User, error)
@@ -859,6 +852,15 @@ type (
 		DisableExtension(extension *Extension) error
 		UpdateExtension(extension *Extension, version string) error
 	}
+
+	ReverseTunnelService interface {
+		StartTunnelServer(addr, port string) error
+		GetServerFingerprint() string
+		GetServerPort() string
+		GetClientCredentials(endpointID EndpointID) string
+		UpdateTunnelState(endpointID EndpointID, state string)
+		GetTunnelState(endpointID EndpointID) (string, int)
+	}
 )
 
 const (
@@ -1026,6 +1028,12 @@ const (
 	AzureRegistry
 	// CustomRegistry represents a custom registry
 	CustomRegistry
+)
+
+const (
+	EdgeAgentIdle               string = "IDLE"
+	EdgeAgentManagementRequired string = "REQUIRED"
+	EdgeAgentActive             string = "ACTIVE"
 )
 
 const (

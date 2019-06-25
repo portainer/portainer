@@ -16,7 +16,7 @@
           <div class="form-group"></div>
           <div class="form-group" style="margin-bottom: 0">
             <div class="boxselector_wrapper">
-              <div>
+              <div ng-click="formValues.URL = '';">
                 <input type="radio" id="docker_endpoint" ng-model="state.EnvironmentType" value="docker">
                 <label for="docker_endpoint">
                   <div class="boxselector_header">
@@ -26,7 +26,7 @@
                   <p>Docker environment</p>
                 </label>
               </div>
-              <div>
+              <div ng-click="formValues.URL = '';">
                 <input type="radio" id="agent_endpoint" ng-model="state.EnvironmentType" value="agent">
                 <label for="agent_endpoint">
                   <div class="boxselector_header">
@@ -36,7 +36,7 @@
                   <p>Portainer agent</p>
                 </label>
               </div>
-              <div>
+              <div ng-click="setDefaultPortainerInstanceURL()">
                 <input type="radio" id="edge_agent_endpoint" ng-model="state.EnvironmentType" value="edge_agent">
                 <label for="edge_agent_endpoint">
                   <div class="boxselector_header">
@@ -93,7 +93,7 @@
             </div>
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
-                Allows you to create an endpoint that can be registered with an Edge agent. All the required information on how to connect an Edge agent to this endpoint will be available after endpoint creation.
+                Allows you to create an endpoint that can be registered with an Edge agent. The Edge agent will initiate the communications with the Portainer instance. All the required information on how to connect an Edge agent to this endpoint will be available after endpoint creation.
               </span>
             </div>
           </div>
@@ -158,6 +158,26 @@
             </div>
           </div>
           <!-- !endpoint-url-input -->
+          <!-- portainer-instance-input -->
+          <div ng-if="state.EnvironmentType === 'edge_agent'">
+            <div class="form-group">
+              <label for="endpoint_url" class="col-sm-3 col-lg-2 control-label text-left">
+                Portainer server URL
+                <portainer-tooltip position="bottom" message="URL of the Portainer instance that the agent will use to initiate the communications."></portainer-tooltip>
+              </label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="text" class="form-control" name="endpoint_url" ng-model="formValues.URL" placeholder="e.g. 10.0.0.10:9000 or portainer.mydomain.com" required>
+              </div>
+            </div>
+            <div class="form-group" ng-show="endpointCreationForm.endpoint_url.$invalid">
+              <div class="col-sm-12 small text-warning">
+                <div ng-messages="endpointCreationForm.endpoint_url.$error">
+                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- !portainer-instance-input -->
           <!-- endpoint-public-url-input -->
           <div ng-if="state.EnvironmentType === 'docker' || state.EnvironmentType === 'agent'">
             <div class="form-group">

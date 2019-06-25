@@ -1,6 +1,7 @@
 package proxy
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -21,6 +22,7 @@ type (
 	// Manager represents a service used to manage Docker proxies.
 	Manager struct {
 		proxyFactory           *proxyFactory
+		reverseTunnelService   portainer.ReverseTunnelService
 		proxies                cmap.ConcurrentMap
 		extensionProxies       cmap.ConcurrentMap
 		legacyExtensionProxies cmap.ConcurrentMap
@@ -34,6 +36,7 @@ type (
 		RegistryService        portainer.RegistryService
 		DockerHubService       portainer.DockerHubService
 		SignatureService       portainer.DigitalSignatureService
+		ReverseTunnelService   portainer.ReverseTunnelService
 	}
 )
 
@@ -51,6 +54,7 @@ func NewManager(parameters *ManagerParams) *Manager {
 			DockerHubService:       parameters.DockerHubService,
 			SignatureService:       parameters.SignatureService,
 		},
+		reverseTunnelService: parameters.ReverseTunnelService,
 	}
 }
 
@@ -136,6 +140,18 @@ func (manager *Manager) CreateLegacyExtensionProxy(key, extensionAPIURL string) 
 	return proxy, nil
 }
 
+func (manager *Manager) createEdgeProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
+	_, port := manager.reverseTunnelService.GetTunnelState(endpoint.ID)
+	// TODO: what if port == 0 ?
+
+	endpointURL, err := url.Parse(fmt.Sprintf("http://localhost:%d", port))
+	if err != nil {
+		return nil, err
+	}
+
+	return manager.proxyFactory.newDockerHTTPProxy(endpointURL, false, endpoint.ID), nil
+}
+
 func (manager *Manager) createDockerProxy(endpointURL *url.URL, tlsConfig *portainer.TLSConfiguration, endpointID portainer.EndpointID) (http.Handler, error) {
 	if endpointURL.Scheme == "tcp" {
 		if tlsConfig.TLS || tlsConfig.TLSSkipVerify {
@@ -147,6 +163,11 @@ func (manager *Manager) createDockerProxy(endpointURL *url.URL, tlsConfig *porta
 }
 
 func (manager *Manager) createProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
+	// TODO: refactor?
+	if endpoint.Type == portainer.EdgeAgentEnvironment {
+		return manager.createEdgeProxy(endpoint)
+	}
+
 	endpointURL, err := url.Parse(endpoint.URL)
 	if err != nil {
 		return nil, err

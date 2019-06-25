@@ -7,33 +7,52 @@
   <rd-header-content>Endpoints</rd-header-content>
 </rd-header>
 
-<motd-panel
-  ng-if="motd && motd.Message !== '' && applicationState.UI.dismissedInfoHash !== motd.Hash"
-  motd="motd"
-  dismiss-action="dismissImportantInformation(motd.Hash)">
-</motd-panel>
+<div class="page-wrapper" ng-if="state.connectingToEdgeEndpoint">
+  <!-- loading box -->
+  <div class="container simple-box">
+    <div class="col-md-6 col-md-offset-3 col-sm-6 col-sm-offset-3">
+      <!-- panel -->
+      <div class="row" style="text-align: center">
+        Connecting to the Edge endpoint...
+        <i class="fa fa-cog fa-spin" style="margin-left: 5px"></i>
+      </div>
+      <!-- !panel -->
+    </div>
+  </div>
+  <!-- !loading box -->
+</div>
 
-<information-panel
-  ng-if="!isAdmin && endpoints.length === 0"
-  title-text="Information">
+<div ng-if="!state.connectingToEdgeEndpoint">
+  <motd-panel
+          ng-if="motd && motd.Message !== '' && applicationState.UI.dismissedInfoHash !== motd.Hash"
+          motd="motd"
+          dismiss-action="dismissImportantInformation(motd.Hash)">
+  </motd-panel>
+
+  <information-panel
+          ng-if="!isAdmin && endpoints.length === 0"
+          title-text="Information">
   <span class="small text-muted">
     <p>
       <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
       You do not have access to any environment. Please contact your administrator.
     </p>
   </span>
-</information-panel>
+  </information-panel>
 
-<div class="row" ng-if="endpoints.length > 0">
-  <div class="col-sm-12">
-    <endpoint-list
-      title-text="Endpoints" title-icon="fa-plug"
-      endpoints="endpoints" table-key="endpoints"
-      dashboard-action="goToDashboard"
-      show-snapshot-action="!applicationState.application.authentication || isAdmin"
-      snapshot-action="triggerSnapshot"
-      edit-action="goToEdit"
-      is-admin="isAdmin"
-    ></endpoint-list>
+  <div class="row" ng-if="endpoints.length > 0">
+    <div class="col-sm-12">
+      <endpoint-list
+              title-text="Endpoints" title-icon="fa-plug"
+              endpoints="endpoints" table-key="endpoints"
+              dashboard-action="goToDashboard"
+              show-snapshot-action="!applicationState.application.authentication || isAdmin"
+              snapshot-action="triggerSnapshot"
+              edit-action="goToEdit"
+              is-admin="isAdmin"
+      ></endpoint-list>
+    </div>
   </div>
 </div>
+
+

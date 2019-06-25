@@ -1,6 +1,10 @@
 angular.module('portainer.app')
-  .controller('HomeController', ['$q', '$scope', '$state', 'Authentication', 'EndpointService', 'EndpointHelper', 'GroupService', 'Notifications', 'EndpointProvider', 'StateManager', 'LegacyExtensionManager', 'ModalService', 'MotdService', 'SystemService',
-    function($q, $scope, $state, Authentication, EndpointService, EndpointHelper, GroupService, Notifications, EndpointProvider, StateManager, LegacyExtensionManager, ModalService, MotdService, SystemService) {
+  .controller('HomeController', ['$q', '$scope', '$state', '$interval', 'Authentication', 'EndpointService', 'EndpointHelper', 'GroupService', 'Notifications', 'EndpointProvider', 'StateManager', 'LegacyExtensionManager', 'ModalService', 'MotdService', 'SystemService',
+    function($q, $scope, $state, $interval, Authentication, EndpointService, EndpointHelper, GroupService, Notifications, EndpointProvider, StateManager, LegacyExtensionManager, ModalService, MotdService, SystemService) {
+
+      $scope.state = {
+        connectingToEdgeEndpoint: false,
+      };
 
       $scope.goToEdit = function(id) {
         $state.go('portainer.endpoints.endpoint', { id: id });
@@ -9,6 +13,8 @@ angular.module('portainer.app')
       $scope.goToDashboard = function(endpoint) {
         if (endpoint.Type === 3) {
           return switchToAzureEndpoint(endpoint);
+        } else if (endpoint.Type === 4) {
+          return switchToEdgeEndpoint(endpoint);
         }
 
         checkEndpointStatus(endpoint)
@@ -41,7 +47,7 @@ angular.module('portainer.app')
 
         var status = 1;
         SystemService.ping(endpoint.Id)
-          .then(function sucess() {
+          .then(function success() {
             status = 1;
           }).catch(function error() {
             status = 2;
@@ -74,6 +80,54 @@ angular.module('portainer.app')
             Notifications.error('Failure', err, 'Unable to connect to the Azure endpoint');
           });
       }
+
+      // TODO: refactor?
+      // Update status to REQUIRED
+      // start a 10sec timeout loop
+      // send ping request
+      function switchToEdgeEndpoint(endpoint) {
+        // EndpointProvider.setEndpointID(endpoint.Id);
+        // EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
+        // EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
+
+        let connectionAttempts = 0;
+        let maxConnectionAttempts = 5;
+
+        EndpointService.updateStatus(endpoint.Id, "REQUIRED")
+          .then(function success() {
+            $scope.state.connectingToEdgeEndpoint = true;
+            return checkEndpointStatus(endpoint);
+          })
+          .then(function success(data) {
+            if (data.Status === 1) {
+              $scope.state.connectingToEdgeEndpoint = false;
+              switchToDockerEndpoint(endpoint);
+            } else {
+              connectionAttempts++;
+              let repeater = $interval(function() {
+                checkEndpointStatus(endpoint)
+                  .then(function(data2) {
+                    if (data2.Status === 1) {
+                      $interval.cancel(repeater);
+                      $scope.state.connectingToEdgeEndpoint = false;
+                      switchToDockerEndpoint(endpoint);
+                    } else {
+                      connectionAttempts++;
+                      if (connectionAttempts === maxConnectionAttempts) {
+                        $interval.cancel(repeater);
+                        Notifications.error('Failure', {}, 'Unable to connect to Edge endpoint');
+                        $scope.state.connectingToEdgeEndpoint = false;
+                      }
+                    }
+                  });
+              }, 2000, 5, false);
+            }
+          })
+          .catch(function error(err) {
+            Notifications.error('Failure', err, 'Unable to access endpoint');
+          });
+      }
+
 
       function switchToDockerEndpoint(endpoint) {
         if (endpoint.Status === 2 && endpoint.Snapshots[0] && endpoint.Snapshots[0].Swarm === true) {

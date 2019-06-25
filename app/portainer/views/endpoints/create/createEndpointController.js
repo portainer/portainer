@@ -1,4 +1,4 @@
-import { EndpointSecurityFormData } from '../../../components/endpointSecurity/porEndpointSecurityModel';
+import {EndpointSecurityFormData} from '../../../components/endpointSecurity/porEndpointSecurityModel';
 
 angular.module('portainer.app')
 .controller('CreateEndpointController', ['$q', '$scope', '$state', '$filter', 'clipboard', 'EndpointService', 'GroupService', 'TagService', 'Notifications',
@@ -25,6 +25,10 @@ function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService,
     clipboard.copyText('curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent');
     $('#copyNotification').show();
     $('#copyNotification').fadeOut(2000);
+  };
+
+  $scope.setDefaultPortainerInstanceURL = function() {
+    $scope.formValues.URL = window.location.origin;
   };
 
   $scope.addDockerEndpoint = function() {
@@ -60,7 +64,7 @@ function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService,
       var name = $scope.formValues.Name;
       var groupId = $scope.formValues.GroupId;
       var tags = $scope.formValues.Tags;
-      var URL = window.location.hostname;
+      var URL = $scope.formValues.URL;
 
       addEndpoint(name, 4, URL, "", groupId, tags, false, false, false, null, null, null);
   };

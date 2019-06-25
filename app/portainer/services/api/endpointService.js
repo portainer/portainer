@@ -20,6 +20,18 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     return Endpoints.snapshot({ id: endpointID }, {}).$promise;
   };
 
+  service.status = function(endpointID) {
+    return Endpoints.status({ id: endpointID });
+  };
+
+  service.updateStatus = function(endpointID, status) {
+    var payload = {
+      Status: status,
+    };
+
+    return Endpoints.updateStatus({ id: endpointID }, payload).$promise;
+  };
+
   service.endpointsByGroup = function(groupId) {
     var deferred = $q.defer();
 
@@ -79,7 +91,12 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
   service.createRemoteEndpoint = function(name, type, URL, PublicURL, groupID, tags, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
     var deferred = $q.defer();
 
-    FileUploadService.createEndpoint(name, type, 'tcp://' + URL, PublicURL, groupID, tags, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
+    var endpointURL = URL;
+    if (type !== 4) {
+      endpointURL = 'tcp://' + URL;
+    }
+
+    FileUploadService.createEndpoint(name, type, endpointURL, PublicURL, groupID, tags, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
     .then(function success(response) {
       deferred.resolve(response.data);
     })

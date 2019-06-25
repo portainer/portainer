@@ -7,9 +7,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/portainer/portainer/api/chisel"
+
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt"
-	"github.com/portainer/portainer/api/chisel"
 	"github.com/portainer/portainer/api/cli"
 	"github.com/portainer/portainer/api/cron"
 	"github.com/portainer/portainer/api/crypto"
@@ -658,51 +659,51 @@ func main() {
 		go terminateIfNoAdminCreated(store.UserService)
 	}
 
-	var tunnelServer portainer.TunnelServer = chisel.NewServer(*flags.TunnelAddr, *flags.TunnelPort)
-	err = tunnelServer.Start()
+	var reverseTunnelService portainer.ReverseTunnelService = chisel.NewService()
+	err = reverseTunnelService.StartTunnelServer(*flags.TunnelAddr, *flags.TunnelPort)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	var server portainer.Server = &http.Server{
-		TunnelServerFingerprint: tunnelServer.GetFingerprint(),
-		Status:                  applicationStatus,
-		BindAddress:             *flags.Addr,
-		AssetsPath:              *flags.Assets,
-		AuthDisabled:            *flags.NoAuth,
-		EndpointManagement:      endpointManagement,
-		RoleService:             store.RoleService,
-		UserService:             store.UserService,
-		TeamService:             store.TeamService,
-		TeamMembershipService:   store.TeamMembershipService,
-		EndpointService:         store.EndpointService,
-		EndpointGroupService:    store.EndpointGroupService,
-		ExtensionService:        store.ExtensionService,
-		ResourceControlService:  store.ResourceControlService,
-		SettingsService:         store.SettingsService,
-		RegistryService:         store.RegistryService,
-		DockerHubService:        store.DockerHubService,
-		StackService:            store.StackService,
-		ScheduleService:         store.ScheduleService,
-		TagService:              store.TagService,
-		TemplateService:         store.TemplateService,
-		WebhookService:          store.WebhookService,
-		SwarmStackManager:       swarmStackManager,
-		ComposeStackManager:     composeStackManager,
-		ExtensionManager:        extensionManager,
-		CryptoService:           cryptoService,
-		JWTService:              jwtService,
-		FileService:             fileService,
-		LDAPService:             ldapService,
-		GitService:              gitService,
-		SignatureService:        digitalSignatureService,
-		JobScheduler:            jobScheduler,
-		Snapshotter:             snapshotter,
-		SSL:                     *flags.SSL,
-		SSLCert:                 *flags.SSLCert,
-		SSLKey:                  *flags.SSLKey,
-		DockerClientFactory:     clientFactory,
-		JobService:              jobService,
+		ReverseTunnelService:   reverseTunnelService,
+		Status:                 applicationStatus,
+		BindAddress:            *flags.Addr,
+		AssetsPath:             *flags.Assets,
+		AuthDisabled:           *flags.NoAuth,
+		EndpointManagement:     endpointManagement,
+		RoleService:            store.RoleService,
+		UserService:            store.UserService,
+		TeamService:            store.TeamService,
+		TeamMembershipService:  store.TeamMembershipService,
+		EndpointService:        store.EndpointService,
+		EndpointGroupService:   store.EndpointGroupService,
+		ExtensionService:       store.ExtensionService,
+		ResourceControlService: store.ResourceControlService,
+		SettingsService:        store.SettingsService,
+		RegistryService:        store.RegistryService,
+		DockerHubService:       store.DockerHubService,
+		StackService:           store.StackService,
+		ScheduleService:        store.ScheduleService,
+		TagService:             store.TagService,
+		TemplateService:        store.TemplateService,
+		WebhookService:         store.WebhookService,
+		SwarmStackManager:      swarmStackManager,
+		ComposeStackManager:    composeStackManager,
+		ExtensionManager:       extensionManager,
+		CryptoService:          cryptoService,
+		JWTService:             jwtService,
+		FileService:            fileService,
+		LDAPService:            ldapService,
+		GitService:             gitService,
+		SignatureService:       digitalSignatureService,
+		JobScheduler:           jobScheduler,
+		Snapshotter:            snapshotter,
+		SSL:                    *flags.SSL,
+		SSLCert:                *flags.SSLCert,
+		SSLKey:                 *flags.SSLKey,
+		DockerClientFactory:    clientFactory,
+		JobService:             jobService,
 	}
 
 	log.Printf("Starting Portainer %s on %s", portainer.APIVersion, *flags.Addr)

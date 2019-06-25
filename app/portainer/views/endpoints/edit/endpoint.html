@@ -22,7 +22,7 @@
               --restart always \
               -e EDGE=1 \
               -e CAP_HOST_MANAGEMENT=1 \
-              -p 80:80 \
+              -p 8000:80 \
               --name portainer_edge_agent \
               portainer/pagent:edge
            </code>
@@ -41,7 +41,7 @@
               -e EDGE=1 \
               -e CAP_HOST_MANAGEMENT=1 \
               --mode global \
-              --publish mode=host,target=80,published=80 \
+              --publish mode=host,published=8000,target=80 \
               --constraint 'node.platform.os == linux' \
               --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock \
               --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volumes \
@@ -63,6 +63,9 @@
       <p>
         <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
         Use the following join token to associate the Edge agent with this endpoint
+      </p>
+      <p>
+          The agent will communicate with Portainer via <u>{{ edgeKeyDetails.instanceURL }}</u> and <u>tcp://{{ edgeKeyDetails.tunnelServerAddr }}</u>
       </p>
       <div style="margin-top: 10px;">
        <code style=display:block;white-space:pre-wrap>

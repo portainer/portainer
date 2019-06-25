@@ -2,9 +2,12 @@ package endpoints
 
 import (
 	"encoding/base64"
+	"errors"
+	"fmt"
 	"log"
-	"math/rand"
+	"net"
 	"net/http"
+	"net/url"
 	"runtime"
 	"strconv"
 	"strings"
@@ -200,41 +203,41 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 	return endpoint, nil
 }
 
-// TODO: relocate in a service
-// must be unique (e.g. not used / referenced)
-func randomInt(min, max int) int {
-	// should be randomize at service creation time?
-	// if not seeded, will always get same port order
-	// might not be a problem and maybe not required
-	//rand.Seed(time.Now().UnixNano())
-
-	return min + rand.Intn(max-min)
-}
-
 func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
 	endpointType := portainer.EdgeAgentEnvironment
 	endpointID := handler.EndpointService.GetNextIdentifier()
 
-	// get random port
-	// Dynamic ports (also called private ports) are 49152 to 65535.
-	// TODO: register this port somewhere
-	portnumber := randomInt(49152, 65535)
-
-	keyInformation := []string{
-		strings.TrimPrefix(payload.URL, "tcp://"),
-		"8000",
-		handler.TunnelServerFingerprint,
-		strconv.Itoa(portnumber),
-		"agent:randomstring",
+	portainerURL, err := url.Parse(payload.URL)
+	if err != nil {
+		return nil, &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint URL", err}
 	}
 
+	portainerHost, _, err := net.SplitHostPort(portainerURL.Host)
+	if err != nil {
+		portainerHost = portainerURL.Host
+	}
+
+	if portainerHost == "localhost" {
+		return nil, &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint URL", errors.New("cannot use localhost as endpoint URL")}
+	}
+
+	keyInformation := []string{
+		payload.URL,
+		fmt.Sprintf("%s:%s", portainerHost, handler.ReverseTunnelService.GetServerPort()),
+		handler.ReverseTunnelService.GetServerFingerprint(),
+		strconv.Itoa(endpointID),
+		handler.ReverseTunnelService.GetClientCredentials(portainer.EndpointID(endpointID)),
+	}
+
+	// portainer_instance_url|tunnel_server_addr|tunnel_server_fingerprint|endpoint_ID|client_credentials
 	key := strings.Join(keyInformation, "|")
 	encodedKey := base64.RawStdEncoding.EncodeToString([]byte(key))
 
 	endpoint := &portainer.Endpoint{
-		ID:      portainer.EndpointID(endpointID),
-		Name:    payload.Name,
-		URL:     "tcp://localhost:" + strconv.Itoa(portnumber),
+		ID:   portainer.EndpointID(endpointID),
+		Name: payload.Name,
+		// TODO: URL not set for this endpoint
+		//URL:     "tcp://localhost:" + strconv.Itoa(portnumber),
 		Type:    endpointType,
 		GroupID: portainer.EndpointGroupID(payload.GroupID),
 		TLSConfig: portainer.TLSConfiguration{
@@ -249,7 +252,7 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		EdgeKey:         string(encodedKey),
 	}
 
-	err := handler.EndpointService.CreateEndpoint(endpoint)
+	err = handler.EndpointService.CreateEndpoint(endpoint)
 	if err != nil {
 		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint inside the database", err}
 	}

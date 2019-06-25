@@ -32,8 +32,7 @@ type Handler struct {
 	ProxyManager                *proxy.Manager
 	Snapshotter                 portainer.Snapshotter
 	JobService                  portainer.JobService
-	// TODO: figure out a way to manage this (service?)
-	TunnelServerFingerprint string
+	ReverseTunnelService        portainer.ReverseTunnelService
 }
 
 // NewHandler creates a handler to manage endpoint operations.
@@ -64,5 +63,12 @@ func NewHandler(bouncer *security.RequestBouncer, authorizeEndpointManagement bo
 		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointJob))).Methods(http.MethodPost)
 	h.Handle("/endpoints/{id}/snapshot",
 		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointSnapshot))).Methods(http.MethodPost)
+
+	// TODO: new API operations. RBAC check?
+	h.Handle("/endpoints/{id}/status",
+		bouncer.PublicAccess(httperror.LoggerHandler(h.endpointStatusInspect))).Methods(http.MethodGet)
+	h.Handle("/endpoints/{id}/status",
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointStatusUpdate))).Methods(http.MethodPut)
+
 	return h
 }
