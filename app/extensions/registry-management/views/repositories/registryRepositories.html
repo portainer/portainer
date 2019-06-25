@@ -5,7 +5,7 @@
     </a>
   </rd-header-title>
   <rd-header-content>
-    <a ui-sref="portainer.registries">Registries</a> &gt; <a ng-if="isAdmin" ui-sref="portainer.registries.registry({id: registry.Id})">{{ registry.Name }}</a><span ng-if="!isAdmin">{{ registry.Name}}</span> &gt; Repositories
+    <a ui-sref="portainer.registries">Registries</a> &gt; <a ng-if="isAdmin" ui-sref="portainer.registries.registry({id: registry.Id})" ui-sref-opts="{reload:true}">{{ registry.Name }}</a><span ng-if="!isAdmin">{{ registry.Name}}</span> &gt; Repositories
   </rd-header-content>
 </rd-header>
 

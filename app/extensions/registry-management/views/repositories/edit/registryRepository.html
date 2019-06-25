@@ -12,6 +12,26 @@
 </rd-header>
 
 <div class="row">
+  <information-panel ng-if="!state.tagsRetrieval.auto" title-text="Information regarding repository size">
+    <span class="small text-muted">
+      <p>
+        <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+        Portainer needs to retrieve additional information to enable <code>tags addition</code> and <code>repository removal</code> features.<br>
+        As this repository contains more than <code>{{ state.tagsRetrieval.limit }}</code> tags, the additional retrieval wasn't started automatically.<br>
+        Note: on very huge repositories the process can take a long time. Once started you can still navigate on this view. <br>
+        Leaving this view will cancel the retrieval process.
+      </p>
+      <button class="btn btn-sm btn-primary" ng-if="!state.tagsRetrieval.running && short.Tags.length === 0"
+        ng-click="startStopRetrieval()">Start</button>
+      <button class="btn btn-sm btn-danger" ng-if="state.tagsRetrieval.running && state.tagsRetrieval.progression !== repository.Tags.length"
+        ng-click="startStopRetrieval()">Cancel</button>
+      <span ng-if="state.tagsRetrieval.running || short.Tags.length !== 0">
+        Retrieval status : {{ state.tagsRetrieval.progression }} / {{ repository.Tags.length }} - {{ state.tagsRetrieval.elapsedTime / 1000 }}s
+      </span>
+  </information-panel>
+</div>
+
+<div class="row">
   <div class="col-sm-8">
     <rd-widget>
       <rd-widget-header icon="fa-info" title-text="Repository information">
@@ -23,7 +43,7 @@
               <td>Repository</td>
               <td>
                 {{ repository.Name }}
-                <button class="btn btn-xs btn-danger" ng-click="removeRepository()">
+                <button class="btn btn-xs btn-danger" ng-if="!state.tagsRetrieval.running && state.tagsRetrieval.progression !== 0 && state.tagsRetrieval.progression === repository.Tags.length" ng-click="removeRepository()">
                   <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this repository
                 </button>
               </td>
@@ -34,11 +54,7 @@
             </tr>
             <tr>
               <td>Images count</td>
-              <td>{{ repository.Images.length }}</td>
-            </tr>
-            <tr ng-if="state.imageRetrieval.running">
-              <td>Retrieving all images details</td>
-              <td>{{ state.imageRetrieval.progression }} / {{ repository.Tags.length }}</td>
+              <td>{{ short.Images.length }}</td>
             </tr>
           </tbody>
         </table>
@@ -46,7 +62,7 @@
     </rd-widget>
   </div>
 
-  <div class="col-sm-4">
+  <div class="col-sm-4" ng-if="short.Images.length > 0">
     <rd-widget>
       <rd-widget-header icon="fa-plus" title-text="Add tag">
       </rd-widget-header>
@@ -64,8 +80,8 @@
               <ui-select-match placeholder="Select an image" allow-clear="true">
                 <span>{{ $select.selected }}</span>
               </ui-select-match>
-              <ui-select-choices repeat="image in (repository.Images | filter: $select.search)">
-                <span>{{ image }}</span>
+              <ui-select-choices repeat="image in (short.Images | filter: $select.search)">
+                <span>{{ image | trimshasum }}</span>
               </ui-select-choices>
             </ui-select>
           </div>

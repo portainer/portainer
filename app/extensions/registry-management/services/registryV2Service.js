@@ -1,11 +1,10 @@
 import _ from 'lodash-es';
-import partialAll from './partialAll';
 import { RepositoryShortTag } from '../models/repositoryTag';
 import RegistryRepositoryViewModel from '../models/registryRepository';
 
 angular.module('portainer.extensions.registrymanagement')
-.factory('RegistryV2Service', ['$q', '$async', 'RegistryCatalog', 'RegistryTags', 'RegistryManifests', 'RegistryV2Helper',
-function RegistryV2ServiceFactory($q, $async, RegistryCatalog, RegistryTags, RegistryManifests, RegistryV2Helper) {
+.factory('RegistryV2Service', ['$q', '$async', 'RegistryCatalog', 'RegistryTags', 'RegistryManifests', 'RegistryManifestsJquery', 'RegistryV2Helper',
+function RegistryV2ServiceFactory($q, $async, RegistryCatalog, RegistryTags, RegistryManifests, RegistryManifestsJquery, RegistryV2Helper) {
   'use strict';
   var service = {};
 
@@ -169,50 +168,35 @@ function RegistryV2ServiceFactory($q, $async, RegistryCatalog, RegistryTags, Reg
     }).$promise;
   };
 
-  /////////////////////////////////////////////////////////////////////////:
-
   service.shortTag = function(id, repository, tag) {
-    var deferred = $q.defer();
-
-    RegistryManifests.getV2({id:id, repository: repository, tag: tag}).$promise
-    .then((data) => {
-      deferred.resolve(new RepositoryShortTag(tag, data.config.digest))
-    })
-    .catch((err) => deferred.reject(err));
-    return deferred.promise;
+    return new Promise ((resolve, reject) => {
+      RegistryManifestsJquery.get({id:id, repository: repository, tag: tag})
+      .then((data) => resolve(new RepositoryShortTag(tag, data.config.digest, data)))
+      .catch((err) => reject(err))
+    });
   };
 
-  service.test = async function* (id, repository, tagsList) {
-    const startTime = Date.now();
-    let steps = 100;
+  service.shortTagsWithProgression = async function* (id, repository, tagsList) {
+    const step = 100;
     let start = 0;
-    let end = start + steps;
+    let end = start + step;
     let results = [];
     while (start < tagsList.length) {
       const tags = _.slice(tagsList, start, end);
-
-      let promises = [];
-      _.forEach(tags, (tag) => promises.push(service.shortTag(id, repository, tag)));
+      const promises = [];
+      for (let i = 0; i < tags.length; i++) {
+        promises.push(service.shortTag(id, repository, tags[i]));
+      }
       yield start;
-      for await (const partialResult of partialAll(promises)) {
-        results.push(partialResult);
+      const res = await $q.all(promises);
+      for (let i = 0; i < res.length; i++) {
+        results.push(res[i]);
       }
       start = end;
-      end = start + steps;
+      end = start + step;
     }
-    const endTime = Date.now();
-    console.log('elapsed time', endTime - startTime);
+    yield tagsList.length;
     yield _.sortBy(results, 'Name');
-  }
-
-  service.testPartial = async function* test(id, repository, tags) {
-    var promises = [];
-
-    _.forEach(tags, (tag) => promises.push(service.tag(id, repository, tag)));
-
-    for await (const partialResult of partialAll(promises)) {
-      yield partialResult;
-    }
   }
 
   return service;

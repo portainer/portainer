@@ -25,6 +25,11 @@ angular.module('portainer.extensions.registrymanagement')
         'Accept': 'application/vnd.docker.distribution.manifest.v2+json',
         'Cache-Control': 'no-cache'
       },
+      transformResponse: function (data, headers) {
+        var response = angular.fromJson(data);
+        response.digest = headers('docker-content-digest');
+        return response;
+      },
       ignoreLoadingBar: true
     },
     put: {

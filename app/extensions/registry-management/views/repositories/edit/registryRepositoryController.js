@@ -8,61 +8,79 @@ angular.module('portainer.app')
       $scope.state = {
         actionInProgress: false,
         loading: false,
-        imageRetrieval: {
+        tagsRetrieval: {
+          auto: true,
           running: false,
+          limit: 10,
           progression: 0,
-          asyncIterator: null
+          elapsedTime: 0,
+          asyncGenerator: null
         }
       };
       $scope.formValues = {
         Tag: ''
       };
       $scope.tags = [];
-      $scope.backgroundTags = [];
-      $scope.repository = {
-        Name: [],
+      $scope.short = {
         Tags: [],
         Images: []
       };
-
-      $scope.test = function() {
-        return $async($scope.asyncTest);
-      }
-
-      $scope.asyncTest = async function() {
-        $scope.state.imageRetrieval.running = true;
-        $scope.state.imageRetrieval.asyncIterator = RegistryV2Service.test($scope.registryId, $scope.repository.Name, $scope.repository.Tags);
-        for await (const partialResult of $scope.state.imageRetrieval.asyncIterator) { 
-          if (typeof partialResult === 'number') {
-            $scope.state.imageRetrieval.progression = partialResult;
-          } else {
-            $scope.backgroundTags = partialResult;
-          }
-        }
-        $scope.state.imageRetrieval.running = false;
-        console.log('end of loop', $scope.backgroundTags);
+      $scope.repository = {
+        Name: [],
+        Tags: [],
       };
 
-      // $scope.test = async function() {
-      //   const startTime = Date.now();
-      //   let steps = 100;
-      //   $scope.state.imageRetrieval.running = true;
-      //   let start = $scope.state.imageRetrieval.start = 0;
-      //   let end = $scope.state.imageRetrieval.end = $scope.state.imageRetrieval.start + steps;
-      //   let max = $scope.state.imageRetrieval.max = $scope.repository.Tags.length;
-      //   while (start < max) {
-      //     const tags = _.slice($scope.repository.Tags, start, end);
-      //     for await (const partialResult of RegistryV2Service.test($scope.registryId, $scope.repository.Name, tags)) {
-      //       $scope.backgroundTags = partialResult;
-      //     }
-      //     start = $scope.state.imageRetrieval.start = $scope.state.imageRetrieval.end;
-      //     end = $scope.state.imageRetrieval.end = start + steps;
-      //   }
-      //   $scope.state.imageRetrieval.running = false;
-      //   const endTime = Date.now();
-      //   console.log('elapsed time', endTime - startTime);
-      //   console.log($scope.tags);
-      // };
+      $scope.createAsyncGenerator = function () {
+        $scope.state.tagsRetrieval.asyncGenerator =
+          RegistryV2Service.shortTagsWithProgression($scope.registryId, $scope.repository.Name, $scope.repository.Tags);
+      };
+
+      function resetTagsRetrievalState() {
+        $scope.state.tagsRetrieval.running = false;
+        $scope.state.tagsRetrieval.progression = 0;
+        $scope.state.tagsRetrieval.elapsedTime = 0;
+      }
+
+      function computeImages() {
+        const images = _.map($scope.short.Tags, 'Digest');
+        $scope.short.Images = _.without(_.uniq(images), '');
+      }
+
+      $scope.startStopRetrieval = function () {
+        if ($scope.state.tagsRetrieval.running) {
+          $scope.state.tagsRetrieval.asyncGenerator.return();
+        } else {
+          $scope.retrieveTags().then(() => {
+            $scope.createAsyncGenerator();
+            if ($scope.short.Tags.length === 0) {
+              resetTagsRetrievalState();
+              console.log('reset');
+            } else {
+              computeImages();
+              console.log('compute images');
+            }
+          });
+        }
+      };
+
+      $scope.retrieveTags = function() {
+        return $async($scope.retrieveTagsAsync);
+      }
+
+      $scope.retrieveTagsAsync = async function() {
+        $scope.state.tagsRetrieval.running = true;
+        const startTime = Date.now();
+        for await (const partialResult of $scope.state.tagsRetrieval.asyncGenerator) { 
+          if (typeof partialResult === 'number') {
+            $scope.state.tagsRetrieval.progression = partialResult;
+            $scope.state.tagsRetrieval.elapsedTime = Date.now() - startTime;
+          } else {
+            $scope.short.Tags = partialResult;
+          }
+        }
+        $scope.state.tagsRetrieval.running = false;
+        console.log($scope.short.Tags);
+      };
 
       $scope.paginationAction = function (tags) {
         $scope.state.loading = true;
@@ -80,12 +98,12 @@ angular.module('portainer.app')
         });
       };
 
-      $scope.$watchCollection('tags', function () {
-        var images = $scope.tags.map(function (item) {
-          return item.ImageId;
-        });
-        $scope.repository.Images = _.without(_.uniq(images), '');
-      });
+      // $scope.$watchCollection('tags', function () {
+      //   var images = $scope.tags.map(function (item) {
+      //     return item.ImageId;
+      //   });
+      //   $scope.repository.Images = _.without(_.uniq(images), '');
+      // });
 
       $scope.addTag = function () {
         var manifest = $scope.tags.find(function (item) {
@@ -204,26 +222,26 @@ angular.module('portainer.app')
           for (var i = 0; i < $scope.repository.Tags.length; i++) {
             $scope.tags.push(new RepositoryTagViewModel($scope.repository.Tags[i]));
           }
+          if ($scope.repository.Tags.length > $scope.state.tagsRetrieval.limit) {
+            $scope.state.tagsRetrieval.auto = false;
+          }
+          $scope.createAsyncGenerator();
         } catch (err) {
           Notifications.error('Failure', err, 'Unable to retrieve repository information');
         }
       }
 
-      // TODO: refactor this to class to can have controllers lifecycle hooks
-
-      // $scope.$on('destroy', () => {
-      //   console.log('destroyedddddddddd');
-      //   $scope.state.imageRetrieval.asyncIterator.return();
-      // });
-
-      // this.$onDestroy = function() {
-      //   console.log('destroying');
-      //   $scope.state.imageRetrieval.asyncIterator.return();
-      // };
+      $scope.$on('$destroy', () => {
+        $scope.state.tagsRetrieval.asyncGenerator.return();
+      });
 
       this.$onInit = function() {
         $async(initView)
-        .then(() => $scope.test());
+        .then(() => {
+          if ($scope.state.tagsRetrieval.auto) {
+            $scope.startStopRetrieval();
+          }
+        });
       };
     }
   ]);
