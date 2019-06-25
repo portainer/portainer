@@ -48,7 +48,7 @@
                 {{ item.Name }}
               </td>
               <td>{{ item.Os }}/{{ item.Architecture }}</td>
-              <td>{{ item.Digest | trimshasum }}</td>
+              <td>{{ item.ImageId | trimshasum }}</td>
               <td>{{ item.Size | humansize }}</td>
               <td>
                 <span ng-if="!item.Modified">

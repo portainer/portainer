@@ -11,7 +11,7 @@ angular.module('portainer.app')
         tagsRetrieval: {
           auto: true,
           running: false,
-          limit: 10,
+          limit: 500,
           progression: 0,
           elapsedTime: 0,
           asyncGenerator: null
@@ -42,7 +42,7 @@ angular.module('portainer.app')
       }
 
       function computeImages() {
-        const images = _.map($scope.short.Tags, 'Digest');
+        const images = _.map($scope.short.Tags, 'ImageId');
         $scope.short.Images = _.without(_.uniq(images), '');
       }
 
@@ -54,10 +54,8 @@ angular.module('portainer.app')
             $scope.createAsyncGenerator();
             if ($scope.short.Tags.length === 0) {
               resetTagsRetrievalState();
-              console.log('reset');
             } else {
               computeImages();
-              console.log('compute images');
             }
           });
         }
@@ -79,7 +77,6 @@ angular.module('portainer.app')
           }
         }
         $scope.state.tagsRetrieval.running = false;
-        console.log($scope.short.Tags);
       };
 
       $scope.paginationAction = function (tags) {
@@ -98,17 +95,8 @@ angular.module('portainer.app')
         });
       };
 
-      // $scope.$watchCollection('tags', function () {
-      //   var images = $scope.tags.map(function (item) {
-      //     return item.ImageId;
-      //   });
-      //   $scope.repository.Images = _.without(_.uniq(images), '');
-      // });
-
       $scope.addTag = function () {
-        var manifest = $scope.tags.find(function (item) {
-          return item.ImageId === $scope.formValues.SelectedImage;
-        }).ManifestV2;
+        var manifest = $scope.short.Tags.find((item)  => item.ImageId === $scope.formValues.SelectedImage).ManifestV2;
         RegistryV2Service.addTag($scope.registryId, $scope.repository.Name, $scope.formValues.Tag, manifest)
           .then(function success() {
             Notifications.success('Success', 'Tag successfully added');
@@ -119,12 +107,13 @@ angular.module('portainer.app')
           });
       };
 
+      // TODO: FIX TO WORK WITH PAGINATION AND LARGE REPOSITORIES
       $scope.retagAction = function (tag) {
-        RegistryV2Service.deleteManifest($scope.registryId, $scope.repository.Name, tag.Digest)
+        RegistryV2Service.deleteManifest($scope.registryId, $scope.repository.Name, tag.ImageDigest)
           .then(function success() {
             var promises = [];
             var tagsToAdd = $scope.tags.filter(function (item) {
-              return item.Digest === tag.Digest;
+              return item.ImageDigest === tag.ImageDigest;
             });
             tagsToAdd.map(function (item) {
               var tagValue = item.Modified && item.Name !== item.NewName ? item.NewName : item.Name;
@@ -143,6 +132,7 @@ angular.module('portainer.app')
           });
       };
 
+      // TODO: FIX TO WORK WITH PAGINATION AND LARGE REPOSITORIES
       $scope.removeTags = function (selectedItems) {
         ModalService.confirmDeletion(
           'Are you sure you want to remove the selected tags ?',

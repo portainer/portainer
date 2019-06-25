@@ -78,7 +78,7 @@
             <label for="image" class="col-sm-3 col-lg-2 control-label text-left">Image</label>
             <ui-select class="col-sm-9 col-lg-10" ng-model="formValues.SelectedImage" id="image">
               <ui-select-match placeholder="Select an image" allow-clear="true">
-                <span>{{ $select.selected }}</span>
+                <span>{{ $select.selected | trimshasum }}</span>
               </ui-select-match>
               <ui-select-choices repeat="image in (short.Images | filter: $select.search)">
                 <span>{{ image | trimshasum }}</span>

@@ -24,9 +24,9 @@ angular.module('portainer.extensions.registrymanagement')
         };
       }).size;
       var imageId = v2.config.digest;
-      var digest = v2.digest;
+      var imageDigest = v2.digest;
 
-      return new RepositoryTagViewModel(name, os, arch, size, digest, imageId, v2);
+      return new RepositoryTagViewModel(name, os, arch, size, imageDigest, imageId, v2);
     };
 
     return helper;

@@ -160,11 +160,11 @@ function RegistryV2ServiceFactory($q, $async, RegistryCatalog, RegistryTags, Reg
     }, manifest).$promise;
   };
 
-  service.deleteManifest = function (id, repository, digest) {
+  service.deleteManifest = function (id, repository, imageDigest) {
     return RegistryManifests.delete({
       id: id,
       repository: repository,
-      tag: digest
+      tag: imageDigest
     }).$promise;
   };
 
