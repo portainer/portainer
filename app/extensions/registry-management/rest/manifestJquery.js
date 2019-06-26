@@ -1,3 +1,9 @@
+/**
+ * This service has been created to request the docker registry API
+ * without triggering AngularJS digest cycles
+ * For more information, see https://github.com/portainer/portainer/pull/2648#issuecomment-505644913
+ */
+
 import $ from "jquery";
 
 angular.module('portainer.extensions.registrymanagement')
@@ -12,6 +18,7 @@ angular.module('portainer.extensions.registrymanagement')
           headers: {
             'Accept': 'application/vnd.docker.distribution.manifest.v2+json',
             'Cache-Control': 'no-cache',
+            'If-Modified-Since':'Mon, 26 Jul 1997 05:00:00 GMT',
             'Authorization': 'Bearer ' + LocalStorage.getJWT()
           },
           success: function (result, status, request) {
