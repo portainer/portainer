@@ -4,8 +4,8 @@ import RegistryRepositoryViewModel from '../models/registryRepository';
 import genericAsyncGenerator from './genericAsyncGenerator';
 
 angular.module('portainer.extensions.registrymanagement')
-.factory('RegistryV2Service', ['$q', '$async', 'RegistryCatalog', 'RegistryTags', 'RegistryManifests', 'RegistryManifestsJquery', 'RegistryV2Helper',
-function RegistryV2ServiceFactory($q, $async, RegistryCatalog, RegistryTags, RegistryManifests, RegistryManifestsJquery, RegistryV2Helper) {
+.factory('RegistryV2Service', ['$q', '$async', 'RegistryCatalog', 'RegistryTags', 'RegistryManifestsJquery', 'RegistryV2Helper',
+function RegistryV2ServiceFactory($q, $async, RegistryCatalog, RegistryTags, RegistryManifestsJquery, RegistryV2Helper) {
   'use strict';
   var service = {};
 
