@@ -28,6 +28,7 @@
       <span ng-if="state.tagsRetrieval.running || short.Tags.length !== 0">
         Retrieval status : {{ state.tagsRetrieval.progression }} / {{ repository.Tags.length }} - {{ state.tagsRetrieval.elapsedTime / 1000 }}s
       </span>
+    </span>
   </information-panel>
 </div>
 
@@ -58,6 +59,20 @@
             </tr>
           </tbody>
         </table>
+      </rd-widget-body>
+    </rd-widget>
+    <rd-widget ng-if="state.tagsRetag.running">
+      <rd-widget-body>
+        <span class="small text-muted">
+          <p>
+            <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+            Retag in progress - don't leave or close this page, or all tags will be lost !
+          </p>
+          <button class="btn btn-sm btn-danger" ng-click="cancelRetagAction()">Cancel</button>
+          <span>
+            Operations status : {{ state.tagsRetag.progression }} / {{ state.tagsRetag.totalOps }} - {{ state.tagsRetag.elapsedTime / 1000 }}s
+          </span>
+        </span>
       </rd-widget-body>
     </rd-widget>
   </div>

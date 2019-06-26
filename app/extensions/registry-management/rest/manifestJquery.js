@@ -15,7 +15,7 @@ angular.module('portainer.extensions.registrymanagement')
     return API_ENDPOINT_REGISTRIES + '/' + params.id + '/v2/' + params.repository + '/manifests/'+ params.tag;
   }
 
-  function get(params) {
+  function _get(params) {
     return new Promise((resolve, reject) => {
       $.ajax({
         type: 'GET',
@@ -31,7 +31,7 @@ angular.module('portainer.extensions.registrymanagement')
     });
   }
 
-  function getV2(params) {
+  function _getV2(params) {
     return new Promise((resolve, reject) => {
       $.ajax({
         type: 'GET',
@@ -51,7 +51,7 @@ angular.module('portainer.extensions.registrymanagement')
     });
   }
 
-  function put(params, data) {
+  function _put(params, data) {
     const transformRequest = (d) => {
       return angular.toJson(d, 3);
     }
@@ -69,9 +69,21 @@ angular.module('portainer.extensions.registrymanagement')
     })
   }
 
+  function _delete(params) {
+    return new Promise((resolve, reject) => {
+      $.ajax({
+        type: 'DELETE',
+        url: buildUrl(params),
+        success: (result) => resolve(result),
+        error: (error) => reject(error)
+      });
+    })
+  }
+
   return {
-    get: get,
-    getV2: getV2,
-    put: put
+    get: _get,
+    getV2: _getV2,
+    put: _put,
+    delete: _delete
   }
 }]);

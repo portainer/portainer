@@ -1,6 +1,7 @@
 import _ from 'lodash-es';
 import { RepositoryShortTag } from '../models/repositoryTag';
 import RegistryRepositoryViewModel from '../models/registryRepository';
+import genericAsyncGenerator from './genericAsyncGenerator';
 
 angular.module('portainer.extensions.registrymanagement')
 .factory('RegistryV2Service', ['$q', '$async', 'RegistryCatalog', 'RegistryTags', 'RegistryManifests', 'RegistryManifestsJquery', 'RegistryV2Helper',
@@ -151,7 +152,7 @@ function RegistryV2ServiceFactory($q, $async, RegistryCatalog, RegistryTags, Reg
     return deferred.promise;
   };
 
-  service.addTag = function (id, repository, tag, manifest) {
+  service.addTag = function (id, repository, {tag, manifest}) {
     delete manifest.digest;
     return RegistryManifestsJquery.put({
       id: id,
@@ -161,11 +162,11 @@ function RegistryV2ServiceFactory($q, $async, RegistryCatalog, RegistryTags, Reg
   };
 
   service.deleteManifest = function (id, repository, imageDigest) {
-    return RegistryManifests.delete({
+    return RegistryManifestsJquery.delete({
       id: id,
       repository: repository,
       tag: imageDigest
-    }).$promise;
+    });
   };
 
   service.shortTag = function(id, repository, tag) {
@@ -176,27 +177,30 @@ function RegistryV2ServiceFactory($q, $async, RegistryCatalog, RegistryTags, Reg
     });
   };
 
-  service.shortTagsWithProgression = async function* (id, repository, tagsList) {
-    const step = 100;
-    let start = 0;
-    let end = start + step;
-    let results = [];
-    while (start < tagsList.length) {
-      const tags = _.slice(tagsList, start, end);
-      const promises = [];
-      for (let i = 0; i < tags.length; i++) {
-        promises.push(service.shortTag(id, repository, tags[i]));
-      }
-      yield start;
-      const res = await $q.all(promises);
-      for (let i = 0; i < res.length; i++) {
-        results.push(res[i]);
-      }
-      start = end;
-      end = start + step;
+  service.shortTagsWithProgress = async function* (id, repository, tagsList) {
+    yield* genericAsyncGenerator($q, tagsList, service.shortTag, [id, repository]);
+  }
+
+  service.retagWithProgress = async function* (id, repository, modifiedTags, modifiedDigests, impactedTags){
+    for await (const partialResult of genericAsyncGenerator($q, modifiedDigests, service.deleteManifest, [id, repository])) {
+      yield partialResult;
     }
-    yield tagsList.length;
-    yield _.sortBy(results, 'Name');
+
+    const progression = modifiedDigests.length;
+
+    const newTags = _.map(impactedTags, (item) => {
+      const tagFromTable = _.find(modifiedTags, { 'Name': item.Name });
+      const name = tagFromTable && tagFromTable.Name !== tagFromTable.NewName ? tagFromTable.NewName : item.Name;
+      return { tag: name, manifest: item.ManifestV2 };
+    });
+
+    for await (const partialResult of genericAsyncGenerator($q, newTags, service.addTag, [id, repository])) {
+      if (typeof partialResult === 'number') {
+        yield progression + partialResult;
+      } else {
+        yield partialResult;
+      }
+    }
   }
 
   return service;

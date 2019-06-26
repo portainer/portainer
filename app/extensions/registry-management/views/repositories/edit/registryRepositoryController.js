@@ -15,7 +15,14 @@ angular.module('portainer.app')
           progression: 0,
           elapsedTime: 0,
           asyncGenerator: null
-        }
+        },
+        tagsRetag: {
+          running: false,
+          progression: 0,
+          elapsedTime: 0,
+          totalOps: 0,
+          asyncGenerator: null
+        },
       };
       $scope.formValues = {
         Tag: '' // new tag name on add feature
@@ -30,10 +37,29 @@ angular.module('portainer.app')
         Tags: [], // string list
       };
 
-      $scope.createAsyncGenerator = function () {
-        $scope.state.tagsRetrieval.asyncGenerator =
-          RegistryV2Service.shortTagsWithProgression($scope.registryId, $scope.repository.Name, $scope.repository.Tags);
+      $scope.paginationAction = function (tags) {
+        $scope.state.loading = true;
+        RegistryV2Service.getTagsDetails($scope.registryId, $scope.repository.Name, tags)
+        .then(function success(data) {
+          for (var i = 0; i < data.length; i++) {
+            var idx = _.findIndex($scope.tags, {'Name': data[i].Name});
+            if (idx !== -1) {
+              $scope.tags[idx] = data[i];
+            }
+          }
+          $scope.state.loading = false;
+        }).catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to retrieve tags details');
+        });
       };
+
+      /**
+       * RETRIEVAL SECTION
+       */
+      function createRetrieveAsyncGenerator() {
+        $scope.state.tagsRetrieval.asyncGenerator =
+          RegistryV2Service.shortTagsWithProgress($scope.registryId, $scope.repository.Name, $scope.repository.Tags);
+      }
 
       function resetFormValues() {
         $scope.formValues.Tag = '';
@@ -55,8 +81,8 @@ angular.module('portainer.app')
         if ($scope.state.tagsRetrieval.running) {
           $scope.state.tagsRetrieval.asyncGenerator.return();
         } else {
-          $scope.retrieveTags().then(() => {
-            $scope.createAsyncGenerator();
+          retrieveTags().then(() => {
+            createRetrieveAsyncGenerator();
             if ($scope.short.Tags.length === 0) {
               resetTagsRetrievalState();
             } else {
@@ -66,45 +92,35 @@ angular.module('portainer.app')
         }
       };
 
-      $scope.retrieveTags = function() {
+      function retrieveTags() {
         return $async(retrieveTagsAsync);
       }
 
       async function retrieveTagsAsync() {
         $scope.state.tagsRetrieval.running = true;
         const startTime = Date.now();
-        for await (const partialResult of $scope.state.tagsRetrieval.asyncGenerator) { 
+        for await (const partialResult of $scope.state.tagsRetrieval.asyncGenerator) {
           if (typeof partialResult === 'number') {
             $scope.state.tagsRetrieval.progression = partialResult;
             $scope.state.tagsRetrieval.elapsedTime = Date.now() - startTime;
           } else {
-            $scope.short.Tags = partialResult;
+            $scope.short.Tags = _.sortBy(partialResult, 'Name');
           }
         }
         $scope.state.tagsRetrieval.running = false;
       }
+      /**
+       * !END RETRIEVAL SECTION
+       */
 
-      $scope.paginationAction = function (tags) {
-        $scope.state.loading = true;
-        RegistryV2Service.getTagsDetails($scope.registryId, $scope.repository.Name, tags)
-        .then(function success(data) {
-          for (var i = 0; i < data.length; i++) {
-            var idx = _.findIndex($scope.tags, {'Name': data[i].Name});
-            if (idx !== -1) {
-              $scope.tags[idx] = data[i];
-            }
-          }
-          $scope.state.loading = false;
-        }).catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to retrieve tags details');
-        });
-      };
-
+      /**
+       * ADD TAG SECTION
+       */
       $scope.addTag = function () {
         $scope.state.actionInProgress = true;
         const tag = $scope.short.Tags.find((item) => item.ImageId === $scope.formValues.SelectedImage);
         const manifest = tag.ManifestV2;
-        RegistryV2Service.addTag($scope.registryId, $scope.repository.Name, $scope.formValues.Tag, manifest)
+        RegistryV2Service.addTag($scope.registryId, $scope.repository.Name, {tag: $scope.formValues.Tag, manifest: manifest})
           .then(function success() {
             Notifications.success('Success', 'Tag successfully added');
             $scope.short.Tags.push(new RepositoryShortTag($scope.formValues.Tag, tag.ImageId, tag.ImageDigest, tag.ManifestV2));
@@ -117,25 +133,48 @@ angular.module('portainer.app')
             resetFormValues();
           });
       };
+      /**
+       * !END ADD TAG SECTION
+       */
+
+      /**
+       * RETAG SECTION
+       */
+      $scope.cancelRetagAction = function() {
+        ModalService.confirmDeletion(
+          'WARNING: stopping this operation will stop all the tags readdition and they will all be lost forever. Are you sure you want to do this?',
+          (confirmed) => {
+            if (!confirmed) {
+              return;
+            }
+            $scope.state.tagsRetag.asyncGenerator.return();
+          });
+      };
+
+      function createRetagAsyncGenerator(modifiedTags, modifiedDigests, impactedTags) {
+        $scope.state.tagsRetag.asyncGenerator =
+          RegistryV2Service.retagWithProgress($scope.registryId, $scope.repository.Name, modifiedTags, modifiedDigests, impactedTags);
+      }
 
       async function retagActionAsync() {
         try {
+          $scope.state.tagsRetag.running = true;
+          const startTime = Date.now();
           const modifiedTags = _.filter($scope.tags, (item) => item.Modified === true);
           const modifiedDigests = _.uniq(_.map(modifiedTags, 'ImageDigest'));
-
           const impactedTags = _.filter($scope.short.Tags, (item) => _.includes(modifiedDigests, item.ImageDigest));
 
-          const deletePromises = [];
-          _.map(modifiedDigests, (item) => deletePromises.push(RegistryV2Service.deleteManifest($scope.registryId, $scope.repository.Name, item)));
-          await Promise.all(deletePromises);
+          $scope.state.tagsRetag.totalOps = modifiedDigests.length + impactedTags.length;
 
-          const addPromises = [];
-          _.map(impactedTags, (item) => {
-            const tagFromTable = _.find(modifiedTags, { 'Name': item.Name });
-            const name = tagFromTable && tagFromTable.Name !== tagFromTable.NewName ? tagFromTable.NewName : item.Name;
-            addPromises.push(RegistryV2Service.addTag($scope.registryId, $scope.repository.Name, name, item.ManifestV2))
-          });
-          await Promise.all(addPromises);
+          createRetagAsyncGenerator(modifiedTags, modifiedDigests, impactedTags);
+
+          for await (const partialResult of $scope.state.tagsRetag.asyncGenerator) {
+            if (typeof partialResult === 'number') {
+              $scope.state.tagsRetag.progression = partialResult;
+              $scope.state.tagsRetag.elapsedTime = Date.now() - startTime;
+            }
+          }
+          $scope.state.tagsRetag.running = false;
           Notifications.success('Success', 'Tags successfully renamed');
 
           _.map(modifiedTags, (item) => {
@@ -151,7 +190,13 @@ angular.module('portainer.app')
       $scope.retagAction = function() {
         return $async(retagActionAsync);
       }
+      /**
+       * !END RETAG SECTION
+       */
 
+      /**
+       * REMOVE TAGS SECTION
+       */
       async function removeTagsAsync(selectedTags) {
         try {
           const deletedTagNames = _.map(selectedTags, 'Name');
@@ -192,7 +237,13 @@ angular.module('portainer.app')
             return $async(removeTagsAsync, selectedItems);
           });
       }
+      /**
+       * !END REMOVE TAGS SECTION
+       */
 
+      /**
+       * REMOVE REPOSITORY SECTION
+       */
       async function removeRepositoryAsync() {
         try {
           const digests = _.uniqBy($scope.short.Tags, 'ImageDigest');
@@ -217,7 +268,13 @@ angular.module('portainer.app')
           }
         );
       };
+      /**
+       * !END REMOVE REPOSITORY SECTION
+       */
 
+      /**
+       * INIT SECTION
+       */
       async function loadRepositoryDetails() {
         try {
           const registryId = $scope.registryId;
@@ -242,14 +299,19 @@ angular.module('portainer.app')
           if ($scope.repository.Tags.length > $scope.state.tagsRetrieval.limit) {
             $scope.state.tagsRetrieval.auto = false;
           }
-          $scope.createAsyncGenerator();
+          createRetrieveAsyncGenerator();
         } catch (err) {
           Notifications.error('Failure', err, 'Unable to retrieve repository information');
         }
       }
 
       $scope.$on('$destroy', () => {
-        $scope.state.tagsRetrieval.asyncGenerator.return();
+        if ($scope.state.tagsRetrieval.asyncGenerator) {
+          $scope.state.tagsRetrieval.asyncGenerator.return();
+        }
+        if ($scope.state.tagsRetag.asyncGenerator) {
+          $scope.state.tagsRetag.asyncGenerator.return();
+        }
       });
 
       this.$onInit = function() {
@@ -260,5 +322,8 @@ angular.module('portainer.app')
           }
         });
       };
+      /**
+       * !END INIT SECTION
+       */
     }
   ]);
