@@ -126,16 +126,16 @@ function RegistryV2ServiceFactory($q, $async, RegistryCatalog, RegistryTags, Reg
     var deferred = $q.defer();
 
     var promises = {
-      v1: RegistryManifests.get({
+      v1: RegistryManifestsJquery.get({
         id: id,
         repository: repository,
         tag: tag
-      }).$promise,
-      v2: RegistryManifests.getV2({
+      }),
+      v2: RegistryManifestsJquery.getV2({
         id: id,
         repository: repository,
         tag: tag
-      }).$promise
+      })
     };
     $q.all(promises)
     .then(function success(data) {
@@ -153,11 +153,11 @@ function RegistryV2ServiceFactory($q, $async, RegistryCatalog, RegistryTags, Reg
 
   service.addTag = function (id, repository, tag, manifest) {
     delete manifest.digest;
-    return RegistryManifests.put({
+    return RegistryManifestsJquery.put({
       id: id,
       repository: repository,
       tag: tag
-    }, manifest).$promise;
+    }, manifest);
   };
 
   service.deleteManifest = function (id, repository, imageDigest) {
@@ -170,7 +170,7 @@ function RegistryV2ServiceFactory($q, $async, RegistryCatalog, RegistryTags, Reg
 
   service.shortTag = function(id, repository, tag) {
     return new Promise ((resolve, reject) => {
-      RegistryManifestsJquery.get({id:id, repository: repository, tag: tag})
+      RegistryManifestsJquery.getV2({id:id, repository: repository, tag: tag})
       .then((data) => resolve(new RepositoryShortTag(tag, data.config.digest, data.digest, data)))
       .catch((err) => reject(err))
     });

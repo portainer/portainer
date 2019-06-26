@@ -1,8 +1,9 @@
 import _ from 'lodash-es';
+import $ from 'jquery';
 
 angular.module('portainer')
-.run(['$rootScope', '$state', '$interval', 'Authentication', 'authManager', 'StateManager', 'EndpointProvider', 'Notifications', 'Analytics', 'SystemService', 'cfpLoadingBar', '$transitions', 'HttpRequestHelper',
-function ($rootScope, $state, $interval, Authentication, authManager, StateManager, EndpointProvider, Notifications, Analytics, SystemService, cfpLoadingBar, $transitions, HttpRequestHelper) {
+.run(['$rootScope', '$state', '$interval', 'LocalStorage', 'Authentication', 'authManager', 'StateManager', 'EndpointProvider', 'Notifications', 'Analytics', 'SystemService', 'cfpLoadingBar', '$transitions', 'HttpRequestHelper',
+function ($rootScope, $state, $interval, LocalStorage, Authentication, authManager, StateManager, EndpointProvider, Notifications, Analytics, SystemService, cfpLoadingBar, $transitions, HttpRequestHelper) {
   'use strict';
 
   EndpointProvider.initialize();
@@ -40,6 +41,14 @@ function ($rootScope, $state, $interval, Authentication, authManager, StateManag
     ping(EndpointProvider, SystemService);
   }, 60 * 1000)
 
+  $(document).ajaxSend(function (event, jqXhr, jqOpts) {
+    const type = jqOpts.type === 'POST' || jqOpts.type === 'PUT' || jqOpts.type === 'PATCH';
+    const hasNoContentType = jqOpts.contentType !== 'application/json' && !jqOpts.headers['Content-Type'];
+    if (type && hasNoContentType) {
+      jqXhr.setRequestHeader('Content-Type', 'application/json');
+    }
+    jqXhr.setRequestHeader('Authorization', 'Bearer ' + LocalStorage.getJWT());
+  });
 }]);
 
 function ping(EndpointProvider, SystemService) {

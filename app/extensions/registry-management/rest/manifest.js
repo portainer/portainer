@@ -2,52 +2,6 @@ angular.module('portainer.extensions.registrymanagement')
 .factory('RegistryManifests', ['$resource', 'API_ENDPOINT_REGISTRIES', function RegistryManifestsFactory($resource, API_ENDPOINT_REGISTRIES) {
   'use strict';
   return $resource(API_ENDPOINT_REGISTRIES + '/:id/v2/:repository/manifests/:tag', {}, {
-    get: {
-      method: 'GET',
-      params: {
-        id: '@id',
-        repository: '@repository',
-        tag: '@tag'
-      },
-      headers: {
-        'Cache-Control': 'no-cache',
-        'If-Modified-Since':'Mon, 26 Jul 1997 05:00:00 GMT'
-      },
-      ignoreLoadingBar: true
-    },
-    getV2: {
-      method: 'GET',
-      params: {
-        id: '@id',
-        repository: '@repository',
-        tag: '@tag'
-      },
-      headers: {
-        'Accept': 'application/vnd.docker.distribution.manifest.v2+json',
-        'Cache-Control': 'no-cache',
-        'If-Modified-Since':'Mon, 26 Jul 1997 05:00:00 GMT'
-      },
-      transformResponse: function (data, headers) {
-        var response = angular.fromJson(data);
-        response.digest = headers('docker-content-digest');
-        return response;
-      },
-      ignoreLoadingBar: true
-    },
-    put: {
-      method: 'PUT',
-      params: {
-        id: '@id',
-        repository: '@repository',
-        tag: '@tag'
-      },
-      headers: {
-        'Content-Type': 'application/vnd.docker.distribution.manifest.v2+json'
-      },
-      transformRequest: function (data) {
-        return angular.toJson(data, 3);
-      }
-    },
     delete: {
       method: 'DELETE',
       params: {
