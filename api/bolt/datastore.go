@@ -7,6 +7,7 @@ import (
 
 	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/bolt/deploymentkey"
 	"github.com/portainer/portainer/api/bolt/dockerhub"
 	"github.com/portainer/portainer/api/bolt/endpoint"
 	"github.com/portainer/portainer/api/bolt/endpointgroup"
@@ -39,6 +40,7 @@ type Store struct {
 	checkForDataMigration  bool
 	fileService            portainer.FileService
 	RoleService            *role.Service
+	DeploymentKeyService   *deploymentkey.Service
 	DockerHubService       *dockerhub.Service
 	EndpointGroupService   *endpointgroup.Service
 	EndpointService        *endpoint.Service
@@ -147,6 +149,12 @@ func (store *Store) initServices() error {
 		return err
 	}
 	store.RoleService = authorizationsetService
+
+	deploymentkeyService, err := deploymentkey.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.DeploymentKeyService = deploymentkeyService
 
 	dockerhubService, err := dockerhub.NewService(store.db)
 	if err != nil {

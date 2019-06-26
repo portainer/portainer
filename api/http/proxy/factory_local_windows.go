@@ -3,10 +3,10 @@
 package proxy
 
 import (
+	"github.com/Microsoft/go-winio"
 	"net"
 	"net/http"
-	"github.com/Microsoft/go-winio"
-	
+
 	portainer "github.com/portainer/portainer/api"
 )
 

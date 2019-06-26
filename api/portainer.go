@@ -216,6 +216,18 @@ type (
 		TLSConfig      TLSConfiguration `json:"TLSConfig"`
 	}
 
+	// DeploymentKeyID represents
+	DeploymentKeyID int
+
+	// DeploymentKey represents the SSH key details that will be used to
+	// connect to GitHub for deployments based on private key clone
+	DeploymentKey struct {
+		ID         DeploymentKeyID `json:"Id`
+		Name       string          `json:"Name"`
+		PublicKey  string          `json:"PublicKey"`
+		PrivateKey string          `json:"PrivateKey"`
+	}
+
 	// DockerHub represents all the required information to connect and use the
 	// Docker Hub
 	DockerHub struct {
@@ -674,6 +686,15 @@ type (
 		GetNextIdentifier() int
 	}
 
+	// DeploymentKeyService represents a service for managing the DeploymentKey object
+	DeploymentKeyService interface {
+		DeploymentKey(ID DeploymentKeyID) (*DeploymentKey, error)
+		DeploymentKeyByName(name string) (*DeploymentKey, error)
+		DeploymentKeys() ([]DeploymentKey, error)
+		DeleteDeploymentKey(ID DeploymentKeyID) error
+		CreateDeploymentKey(deploymentkey *DeploymentKey) error
+	}
+
 	// DockerHubService represents a service for managing the DockerHub object
 	DockerHubService interface {
 		DockerHub() (*DockerHub, error)
@@ -876,7 +897,7 @@ const (
 	PortainerAgentSignatureMessage = "Portainer-App"
 	// SupportedDockerAPIVersion is the minimum Docker API version supported by Portainer
 	SupportedDockerAPIVersion = "1.24"
-	// ExtensionServer represents the server used by Portainer to communicate with extensions 
+	// ExtensionServer represents the server used by Portainer to communicate with extensions
 	ExtensionServer = "localhost"
 )
 
