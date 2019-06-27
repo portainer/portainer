@@ -92,13 +92,15 @@ angular.module('portainer.app')
         SystemService.ping(endpoint.Id)
           .then(function success() {
             endpoint.Status = 1;
-            switchToDockerEndpoint(endpoint);
+            // switchToDockerEndpoint(endpoint);
           })
           .catch(function error() {
-            Notifications.error('Failure', {}, 'Unable to connect to Edge endpoint');
+            endpoint.Status = 2;
+            // Notifications.error('Failure', {}, 'Unable to connect to Edge endpoint');
           })
           .finally(function final() {
             $scope.state.connectingToEdgeEndpoint = false;
+            switchToDockerEndpoint(endpoint);
           });
 
 
