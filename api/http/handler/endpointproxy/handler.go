@@ -11,9 +11,10 @@ import (
 // Handler is the HTTP handler used to proxy requests to external APIs.
 type Handler struct {
 	*mux.Router
-	requestBouncer  *security.RequestBouncer
-	EndpointService portainer.EndpointService
-	ProxyManager    *proxy.Manager
+	requestBouncer       *security.RequestBouncer
+	EndpointService      portainer.EndpointService
+	ProxyManager         *proxy.Manager
+	ReverseTunnelService portainer.ReverseTunnelService
 }
 
 // NewHandler creates a handler to proxy requests to external APIs.

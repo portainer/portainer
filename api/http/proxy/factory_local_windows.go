@@ -3,7 +3,6 @@
 package proxy
 
 import (
-	"github.com/Microsoft/go-winio"
 	"net"
 	"net/http"
 
@@ -19,6 +18,7 @@ func (factory *proxyFactory) newLocalProxy(path string, endpointID portainer.End
 		SettingsService:        factory.SettingsService,
 		RegistryService:        factory.RegistryService,
 		DockerHubService:       factory.DockerHubService,
+		ReverseTunnelService:   factory.ReverseTunnelService,
 		dockerTransport:        newNamedPipeTransport(path),
 		endpointIdentifier:     endpointID,
 	}

@@ -53,14 +53,15 @@ func NewManager(parameters *ManagerParams) *Manager {
 			RegistryService:        parameters.RegistryService,
 			DockerHubService:       parameters.DockerHubService,
 			SignatureService:       parameters.SignatureService,
+			ReverseTunnelService:   parameters.ReverseTunnelService,
 		},
 		reverseTunnelService: parameters.ReverseTunnelService,
 	}
 }
 
 // GetProxy returns the proxy associated to a key
-func (manager *Manager) GetProxy(key string) http.Handler {
-	proxy, ok := manager.proxies.Get(key)
+func (manager *Manager) GetProxy(endpoint *portainer.Endpoint) http.Handler {
+	proxy, ok := manager.proxies.Get(string(endpoint.ID))
 	if !ok {
 		return nil
 	}
@@ -80,8 +81,8 @@ func (manager *Manager) CreateAndRegisterProxy(endpoint *portainer.Endpoint) (ht
 }
 
 // DeleteProxy deletes the proxy associated to a key
-func (manager *Manager) DeleteProxy(key string) {
-	manager.proxies.Remove(key)
+func (manager *Manager) DeleteProxy(endpoint *portainer.Endpoint) {
+	manager.proxies.Remove(string(endpoint.ID))
 }
 
 // GetExtensionProxy returns an extension proxy associated to an extension identifier
@@ -142,7 +143,6 @@ func (manager *Manager) CreateLegacyExtensionProxy(key, extensionAPIURL string) 
 
 func (manager *Manager) createEdgeProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
 	_, port := manager.reverseTunnelService.GetTunnelState(endpoint.ID)
-	// TODO: what if port == 0 ?
 
 	endpointURL, err := url.Parse(fmt.Sprintf("http://localhost:%d", port))
 	if err != nil {

@@ -659,7 +659,7 @@ func main() {
 		go terminateIfNoAdminCreated(store.UserService)
 	}
 
-	var reverseTunnelService portainer.ReverseTunnelService = chisel.NewService()
+	var reverseTunnelService portainer.ReverseTunnelService = chisel.NewService(store.EndpointService, snapshotter)
 	err = reverseTunnelService.StartTunnelServer(*flags.TunnelAddr, *flags.TunnelPort)
 	if err != nil {
 		log.Fatal(err)

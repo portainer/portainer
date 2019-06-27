@@ -2,14 +2,32 @@ package websocket
 
 import (
 	"crypto/tls"
+	"fmt"
+	"net/http"
+	"net/url"
+
 	"github.com/gorilla/websocket"
 	"github.com/koding/websocketproxy"
 	"github.com/portainer/portainer/api"
-	"net/http"
-	"net/url"
 )
 
 func (handler *Handler) proxyWebsocketRequest(w http.ResponseWriter, r *http.Request, params *webSocketRequestParams) error {
+	// TODO: retrieve correct host/port combo for Edge agent
+	// works now, refactor?
+
+	if params.endpoint.Type == portainer.EdgeAgentEnvironment {
+		_, port := handler.ReverseTunnelService.GetTunnelState(params.endpoint.ID)
+		endpointURL, err := url.Parse(fmt.Sprintf("http://localhost:%d", port))
+		if err != nil {
+			return err
+		}
+
+		endpointURL.Scheme = "ws"
+		proxy := websocketproxy.NewProxy(endpointURL)
+		proxy.ServeHTTP(w, r)
+		return nil
+	}
+
 	agentURL, err := url.Parse(params.endpoint.URL)
 	if err != nil {
 		return err

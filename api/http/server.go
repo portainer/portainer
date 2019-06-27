@@ -143,6 +143,7 @@ func (server *Server) Start() error {
 	var endpointProxyHandler = endpointproxy.NewHandler(requestBouncer)
 	endpointProxyHandler.EndpointService = server.EndpointService
 	endpointProxyHandler.ProxyManager = proxyManager
+	endpointProxyHandler.ReverseTunnelService = server.ReverseTunnelService
 
 	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"))
 
@@ -219,6 +220,7 @@ func (server *Server) Start() error {
 	var websocketHandler = websocket.NewHandler(requestBouncer)
 	websocketHandler.EndpointService = server.EndpointService
 	websocketHandler.SignatureService = server.SignatureService
+	websocketHandler.ReverseTunnelService = server.ReverseTunnelService
 
 	var webhookHandler = webhooks.NewHandler(requestBouncer)
 	webhookHandler.WebhookService = server.WebhookService

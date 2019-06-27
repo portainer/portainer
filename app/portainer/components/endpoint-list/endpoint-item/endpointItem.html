@@ -11,14 +11,13 @@
           <span class="blocklist-item-title endpoint-item">
             {{ $ctrl.model.Name }}
           </span>
-          <span class="space-left blocklist-item-subtitle">
-            <span class="label label-{{ $ctrl.model.Status|endpointstatusbadge }}">
+          <span class="space-left blocklist-item-subtitle" ng-if="$ctrl.model.Type !== 4 || $ctrl.model.Snapshots[0]">
+            <span class="label label-{{ $ctrl.model.Status|endpointstatusbadge }}" ng-if="$ctrl.model.Type !== 4">
               {{ $ctrl.model.Status === 1 ? 'up' : 'down' }}
             </span>
             <span class="space-left small text-muted" ng-if="$ctrl.model.Snapshots[0]">
               {{ $ctrl.model.Snapshots[0].Time | getisodatefromtimestamp }}
             </span>
-
           </span>
         </span>
         <span>
@@ -88,7 +87,7 @@
             </span>
           </span>
         </span>
-        <span class="small text-muted" ng-if="$ctrl.model.Type !== $">
+        <span class="small text-muted" ng-if="$ctrl.model.Type !== 4">
           {{ $ctrl.model.URL | stripprotocol }}
         </span>
       </div>

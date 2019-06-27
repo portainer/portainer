@@ -18,7 +18,7 @@ angular.module('portainer.app')
         }
 
         checkEndpointStatus(endpoint)
-          .then(function sucess() {
+          .then(function success() {
             return switchToDockerEndpoint(endpoint);
           }).catch(function error(err) {
             Notifications.error('Failure', err, 'Unable to verify endpoint status');
@@ -58,7 +58,7 @@ angular.module('portainer.app')
             }
 
             EndpointService.updateEndpoint(endpoint.Id, { Status: status })
-              .then(function sucess() {
+              .then(function success() {
                 deferred.resolve(endpoint);
               }).catch(function error(err) {
                 deferred.reject({ msg: 'Unable to update endpoint status', err: err });
@@ -82,50 +82,53 @@ angular.module('portainer.app')
       }
 
       // TODO: refactor?
-      // Update status to REQUIRED
-      // start a 10sec timeout loop
-      // send ping request
+      // remove $interval if not needed anymore
       function switchToEdgeEndpoint(endpoint) {
-        // EndpointProvider.setEndpointID(endpoint.Id);
-        // EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
-        // EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
 
-        let connectionAttempts = 0;
-        let maxConnectionAttempts = 5;
+        // let connectionAttempts = 0;
+        // let maxConnectionAttempts = 5;
 
-        EndpointService.updateStatus(endpoint.Id, "REQUIRED")
+        $scope.state.connectingToEdgeEndpoint = true;
+        SystemService.ping(endpoint.Id)
           .then(function success() {
-            $scope.state.connectingToEdgeEndpoint = true;
-            return checkEndpointStatus(endpoint);
+            endpoint.Status = 1;
+            switchToDockerEndpoint(endpoint);
           })
-          .then(function success(data) {
-            if (data.Status === 1) {
-              $scope.state.connectingToEdgeEndpoint = false;
-              switchToDockerEndpoint(endpoint);
-            } else {
-              connectionAttempts++;
-              let repeater = $interval(function() {
-                checkEndpointStatus(endpoint)
-                  .then(function(data2) {
-                    if (data2.Status === 1) {
-                      $interval.cancel(repeater);
-                      $scope.state.connectingToEdgeEndpoint = false;
-                      switchToDockerEndpoint(endpoint);
-                    } else {
-                      connectionAttempts++;
-                      if (connectionAttempts === maxConnectionAttempts) {
-                        $interval.cancel(repeater);
-                        Notifications.error('Failure', {}, 'Unable to connect to Edge endpoint');
-                        $scope.state.connectingToEdgeEndpoint = false;
-                      }
-                    }
-                  });
-              }, 2000, 5, false);
-            }
+          .catch(function error() {
+            Notifications.error('Failure', {}, 'Unable to connect to Edge endpoint');
           })
-          .catch(function error(err) {
-            Notifications.error('Failure', err, 'Unable to access endpoint');
+          .finally(function final() {
+            $scope.state.connectingToEdgeEndpoint = false;
           });
+
+
+        // $scope.state.connectingToEdgeEndpoint = true;
+        // SystemService.shortPing(endpoint.Id)
+        //   .then(function success() {
+        //     $scope.state.connectingToEdgeEndpoint = false;
+        //     endpoint.Status = 1;
+        //     switchToDockerEndpoint(endpoint);
+        //   })
+        //   .catch(function error() {
+        //     connectionAttempts++;
+        //     let repeater = $interval(function() {
+        //       SystemService.shortPing(endpoint.Id)
+        //         .then(function success() {
+        //           $interval.cancel(repeater);
+        //           $scope.state.connectingToEdgeEndpoint = false;
+        //           endpoint.Status = 1;
+        //           switchToDockerEndpoint(endpoint);
+        //         })
+        //         .catch(function error() {
+        //           connectionAttempts++;
+        //           if (connectionAttempts === maxConnectionAttempts) {
+        //             $interval.cancel(repeater);
+        //             Notifications.error('Failure', {}, 'Unable to connect to Edge endpoint');
+        //             $scope.state.connectingToEdgeEndpoint = false;
+        //           }
+        //         })
+        //     }, 3000, 5, false);
+        //   });
       }
 
 

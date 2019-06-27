@@ -1,8 +1,11 @@
 package chisel
 
 import (
+	"fmt"
+	"log"
 	"math/rand"
 	"strconv"
+	"time"
 
 	cmap "github.com/orcaman/concurrent-map"
 
@@ -14,28 +17,36 @@ import (
 const (
 	minAvailablePort = 49152
 	maxAvailablePort = 65535
+	// TODO: configurable? change defaults?
+	inactivityTimerDuration = 1 * time.Minute
+	tunnelCleanupInterval   = 10 * time.Second
 )
 
 type TunnelStatus struct {
-	state string
-	port  int
+	state        string
+	port         int
+	lastActivity time.Time
 }
 
 type Service struct {
 	serverFingerprint string
 	serverPort        string
 	tunnelStatusMap   cmap.ConcurrentMap
+	endpointService   portainer.EndpointService
+	snapshotter       portainer.Snapshotter
 	//allocatedPorts    cmap.ConcurrentMap
 	// endpoint | status | port
 	// ID1: IDLE
 	// ID2 (NOTFOUND) = IDLE
 	// ID3: REQUIRED, PORT: xxxx
-	// ID4: ACTIVE
+	// ID4: ACTIVE, PORT: xxxx
 }
 
-func NewService() *Service {
+func NewService(endpointService portainer.EndpointService, snapshotter portainer.Snapshotter) *Service {
 	return &Service{
 		tunnelStatusMap: cmap.New(),
+		endpointService: endpointService,
+		snapshotter:     snapshotter,
 		//allocatedPorts: cmap.New(),
 	}
 }
@@ -58,6 +69,7 @@ func (service *Service) StartTunnelServer(addr, port string) error {
 
 	service.serverFingerprint = chiselServer.GetFingerprint()
 	service.serverPort = port
+	go service.tunnelCleanup()
 	return chiselServer.Start(addr, port)
 }
 
@@ -69,16 +81,69 @@ func (service *Service) GetServerPort() string {
 	return service.serverPort
 }
 
-//func (service *Service) GetClientPort(endpointID portainer.EndpointID) int {
-//	key := strconv.Itoa(int(endpointID))
-//	if port, ok := service.allocatedPorts.Get(key); ok {
-//		return port.(int)
-//	}
-//
-//	port := service.getUnusedPort(endpointID)
-//	service.allocatedPorts.Set(key, port)
-//	return port
-//}
+// TODO: rename/refactor/add/review logging
+// Manage tunnels every minutes?
+func (service *Service) tunnelCleanup() {
+	ticker := time.NewTicker(tunnelCleanupInterval)
+	quit := make(chan struct{})
+
+	for {
+		select {
+		case <-ticker.C:
+			for item := range service.tunnelStatusMap.IterBuffered() {
+				tunnelStatus := item.Val.(TunnelStatus)
+				if tunnelStatus.lastActivity.IsZero() || tunnelStatus.state != portainer.EdgeAgentActive {
+					continue
+				}
+
+				elapsed := time.Since(tunnelStatus.lastActivity)
+				if elapsed.Seconds() > time.Duration(inactivityTimerDuration).Seconds() {
+
+					endpointID, err := strconv.Atoi(item.Key)
+					if err != nil {
+						log.Printf("[ERROR] [conversion] Unable to snapshot Edge endpoint (id: %s): %s", item.Key, err)
+					}
+
+					if err == nil {
+						endpoint, err := service.endpointService.Endpoint(portainer.EndpointID(endpointID))
+						if err != nil {
+							log.Printf("[ERROR] [db] Unable to retrieve Edge endpoint information (id: %s): %s", item.Key, err)
+						}
+
+						endpointURL := endpoint.URL
+						endpoint.URL = fmt.Sprintf("tcp://localhost:%d", tunnelStatus.port)
+						snapshot, err := service.snapshotter.CreateSnapshot(endpoint)
+						if err != nil {
+							log.Printf("[ERROR] [snapshot] Unable to snapshot Edge endpoint (id: %s): %s", item.Key, err)
+						}
+
+						if snapshot != nil {
+							endpoint.Snapshots = []portainer.Snapshot{*snapshot}
+							endpoint.URL = endpointURL
+							err = service.endpointService.UpdateEndpoint(endpoint.ID, endpoint)
+							if err != nil {
+								log.Printf("[ERROR] [db] Unable to persist snapshot for Edge endpoint (id: %s): %s", item.Key, err)
+							}
+						}
+
+					}
+
+					tunnelStatus.state = portainer.EdgeAgentIdle
+					tunnelStatus.port = 0
+					log.Printf("[DEBUG] #1 TAG ENDPOINT TUNNEL AS: %s | %d", tunnelStatus.state, tunnelStatus.port)
+					service.tunnelStatusMap.Set(item.Key, tunnelStatus)
+				}
+			}
+
+		// do something
+		case <-quit:
+			ticker.Stop()
+			return
+		}
+	}
+	// TODO: required?
+	// close(quit) to exit
+}
 
 // TODO: credentials management
 func (service *Service) GetClientCredentials(endpointID portainer.EndpointID) string {
@@ -121,15 +186,31 @@ func (service *Service) UpdateTunnelState(endpointID portainer.EndpointID, state
 		tunnelStatus = TunnelStatus{state: state}
 	}
 
-	if state == portainer.EdgeAgentManagementRequired {
+	if state == portainer.EdgeAgentManagementRequired && tunnelStatus.port == 0 {
 		tunnelStatus.port = service.getUnusedPort()
 	}
+
+	log.Printf("[DEBUG] #2 TAG ENDPOINT TUNNEL AS: %s | %d", tunnelStatus.state, tunnelStatus.port)
 
 	service.tunnelStatusMap.Set(key, tunnelStatus)
 }
 
+func (service *Service) ResetTunnelActivityTimer(endpointID portainer.EndpointID) {
+	key := strconv.Itoa(int(endpointID))
+
+	var tunnelStatus TunnelStatus
+	item, ok := service.tunnelStatusMap.Get(key)
+	if ok {
+		tunnelStatus = item.(TunnelStatus)
+		tunnelStatus.state = portainer.EdgeAgentActive
+		tunnelStatus.lastActivity = time.Now()
+		service.tunnelStatusMap.Set(key, tunnelStatus)
+		log.Printf("[DEBUG] #3 TAG ENDPOINT TUNNEL AS: %s | %d", tunnelStatus.state, tunnelStatus.port)
+	}
+}
+
 func randomInt(min, max int) int {
-	// should be randomize at service creation time?
+	// TODO: should be randomize at service creation time?
 	// if not seeded, will always get same port order
 	// might not be a problem and maybe not required
 	//rand.Seed(time.Now().UnixNano())

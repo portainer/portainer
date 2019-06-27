@@ -860,6 +860,7 @@ type (
 		GetClientCredentials(endpointID EndpointID) string
 		UpdateTunnelState(endpointID EndpointID, state string)
 		GetTunnelState(endpointID EndpointID) (string, int)
+		ResetTunnelActivityTimer(endpointID EndpointID)
 	}
 )
 

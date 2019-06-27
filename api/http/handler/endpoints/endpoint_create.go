@@ -234,10 +234,9 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 	encodedKey := base64.RawStdEncoding.EncodeToString([]byte(key))
 
 	endpoint := &portainer.Endpoint{
-		ID:   portainer.EndpointID(endpointID),
-		Name: payload.Name,
-		// TODO: URL not set for this endpoint
-		//URL:     "tcp://localhost:" + strconv.Itoa(portnumber),
+		ID:      portainer.EndpointID(endpointID),
+		Name:    payload.Name,
+		URL:     portainerHost,
 		Type:    endpointType,
 		GroupID: portainer.EndpointGroupID(payload.GroupID),
 		TLSConfig: portainer.TLSConfiguration{

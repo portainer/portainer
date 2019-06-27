@@ -24,6 +24,7 @@ type (
 		DockerHubService       portainer.DockerHubService
 		SettingsService        portainer.SettingsService
 		SignatureService       portainer.DigitalSignatureService
+		ReverseTunnelService   portainer.ReverseTunnelService
 		endpointIdentifier     portainer.EndpointID
 	}
 	restrictedDockerOperationContext struct {
@@ -58,7 +59,13 @@ func (p *proxyTransport) RoundTrip(request *http.Request) (*http.Response, error
 }
 
 func (p *proxyTransport) executeDockerRequest(request *http.Request) (*http.Response, error) {
-	return p.dockerTransport.RoundTrip(request)
+	response, err := p.dockerTransport.RoundTrip(request)
+	if err == nil {
+		p.ReverseTunnelService.ResetTunnelActivityTimer(p.endpointIdentifier)
+	}
+
+	return response, err
+	//return p.dockerTransport.RoundTrip(request)
 }
 
 func (p *proxyTransport) proxyDockerRequest(request *http.Request) (*http.Response, error) {

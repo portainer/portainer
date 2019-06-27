@@ -67,6 +67,8 @@ func NewHandler(bouncer *security.RequestBouncer, authorizeEndpointManagement bo
 	// TODO: new API operations. RBAC check?
 	h.Handle("/endpoints/{id}/status",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.endpointStatusInspect))).Methods(http.MethodGet)
+
+	// TODO: unused API endpoint? remove all occurences of rest services in frontend too
 	h.Handle("/endpoints/{id}/status",
 		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointStatusUpdate))).Methods(http.MethodPut)
 
