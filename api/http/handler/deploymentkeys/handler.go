@@ -9,7 +9,7 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// Handler is the HTTP handler used to handle webhook operations.
+// Handler is the HTTP handler used to handle deploymentkey operations.
 type Handler struct {
 	*mux.Router
 	DeploymentKeyService portainer.DeploymentKeyService

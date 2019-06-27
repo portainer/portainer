@@ -33,7 +33,7 @@ func (handler *Handler) deploymentkeyCreate(w http.ResponseWriter, r *http.Reque
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a deployment key with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a deployment key with the specified identifier inside the database", err}
-	}	
+	}
 
 	// Add a function to call and create public key and private key
 

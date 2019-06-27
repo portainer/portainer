@@ -674,6 +674,7 @@ func main() {
 		ResourceControlService: store.ResourceControlService,
 		SettingsService:        store.SettingsService,
 		RegistryService:        store.RegistryService,
+		DeploymentKeyService:   store.DeploymentKeyService,
 		DockerHubService:       store.DockerHubService,
 		StackService:           store.StackService,
 		ScheduleService:        store.ScheduleService,
