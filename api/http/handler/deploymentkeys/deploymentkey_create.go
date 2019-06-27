@@ -29,10 +29,11 @@ func (handler *Handler) deploymentkeyCreate(w http.ResponseWriter, r *http.Reque
 	}
 
 	deploymentkey, err := handler.DeploymentKeyService.DeploymentKeyByName(payload.Name)
-	if err == portainer.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a deployment key with the specified identifier inside the database", err}
-	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a deployment key with the specified identifier inside the database", err}
+	if err != nil && err != portainer.ErrObjectNotFound {
+		return &httperror.HandlerError{http.StatusInternalServerError, "An error occurred retrieving deploymentkey from the database", err}
+	}
+	if deploymentkey != nil {
+		return &httperror.HandlerError{http.StatusConflict, "A deploymentkey for this resource already exists", portainer.ErrDeploymentkeyAlreadyExists}
 	}
 
 	// Add a function to call and create public key and private key
