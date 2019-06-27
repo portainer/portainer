@@ -61,7 +61,7 @@
     "filesize": "~3.3.0",
     "isteven-angular-multiselect": "~4.0.0",
     "jquery": "3.4.0",
-    "js-yaml": "~3.10.0",
+    "js-yaml": "~3.13.1",
     "lodash-es": "^4.17.11",
     "moment": "^2.21.0",
     "ng-file-upload": "~12.2.13",
@@ -74,7 +74,7 @@
   "devDependencies": {
     "@babel/core": "^7.1.2",
     "@babel/preset-env": "^7.1.0",
-    "auto-ngtemplate-loader": "^1.3.0",
+    "auto-ngtemplate-loader": "^2.0.1",
     "autoprefixer": "^7.1.1",
     "babel-loader": "^8.0.4",
     "babel-plugin-lodash": "^3.3.4",

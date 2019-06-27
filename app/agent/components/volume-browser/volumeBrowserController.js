@@ -42,7 +42,7 @@ function (HttpRequestHelper, VolumeBrowserService, FileSaver, Blob, ModalService
     var filePath = this.state.path === '/' ? file : this.state.path + '/' + file;
     VolumeBrowserService.get(this.volumeId, filePath)
     .then(function success(data) {
-      var downloadData = new Blob([data.file], { type: 'text/plain;charset=utf-8' });
+      var downloadData = new Blob([data.file]);
       FileSaver.saveAs(downloadData, file);
     })
     .catch(function error(err) {

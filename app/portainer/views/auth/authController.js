@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('AuthenticationController', ['$q', '$scope', '$state', '$stateParams', '$sanitize', 'Authentication', 'UserService', 'EndpointService', 'ExtensionService', 'StateManager', 'Notifications', 'SettingsService', 'URLHelper',
-function($q, $scope, $state, $stateParams, $sanitize, Authentication, UserService, EndpointService, ExtensionService, StateManager, Notifications, SettingsService, URLHelper) {
+.controller('AuthenticationController', ['$async', '$q', '$scope', '$state', '$stateParams', '$sanitize', 'Authentication', 'UserService', 'EndpointService', 'ExtensionService', 'StateManager', 'Notifications', 'SettingsService', 'URLHelper',
+function($async, $q, $scope, $state, $stateParams, $sanitize, Authentication, UserService, EndpointService, ExtensionService, StateManager, Notifications, SettingsService, URLHelper) {
   $scope.logo = StateManager.getState().application.logo;
 
   $scope.formValues = {
@@ -14,7 +14,11 @@ function($q, $scope, $state, $stateParams, $sanitize, Authentication, UserServic
     OAuthProvider: ''
   };
 
-  async function retrieveAndSaveEnabledExtensions() {
+  function retrieveAndSaveEnabledExtensions() {
+    return $async(retrieveAndSaveEnabledExtensionsAsync);
+  }
+
+  async function retrieveAndSaveEnabledExtensionsAsync() {
     try {
       await ExtensionService.retrieveAndSaveEnabledExtensions();
     } catch (err) {

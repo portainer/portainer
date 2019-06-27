@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('InitAdminController', ['$scope', '$state', 'Notifications', 'Authentication', 'StateManager', 'UserService', 'EndpointService', 'ExtensionService',
-function ($scope, $state, Notifications, Authentication, StateManager, UserService, EndpointService, ExtensionService) {
+.controller('InitAdminController', ['$async', '$scope', '$state', 'Notifications', 'Authentication', 'StateManager', 'UserService', 'EndpointService', 'ExtensionService',
+function ($async, $scope, $state, Notifications, Authentication, StateManager, UserService, EndpointService, ExtensionService) {
 
   $scope.logo = StateManager.getState().application.logo;
 
@@ -14,7 +14,11 @@ function ($scope, $state, Notifications, Authentication, StateManager, UserServi
     actionInProgress: false
   };
 
-  async function retrieveAndSaveEnabledExtensions() {
+  function retrieveAndSaveEnabledExtensions() {
+    return $async(retrieveAndSaveEnabledExtensionsAsync)
+  }
+
+  async function retrieveAndSaveEnabledExtensionsAsync() {
     try {
       await ExtensionService.retrieveAndSaveEnabledExtensions();
     } catch (err) {
