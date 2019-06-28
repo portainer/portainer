@@ -49,5 +49,7 @@ func (handler *Handler) deploymentkeyCreate(w http.ResponseWriter, r *http.Reque
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the deployment key inside the database", err}
 	}
 
+	hideFields(deploymentkey)
+
 	return response.JSON(w, deploymentkey)
 }

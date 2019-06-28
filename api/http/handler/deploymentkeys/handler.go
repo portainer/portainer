@@ -15,6 +15,10 @@ type Handler struct {
 	DeploymentKeyService portainer.DeploymentKeyService
 }
 
+func hideFields(deploymentkey *portainer.DeploymentKey) {
+	deploymentkey.PrivateKey = ""
+}
+
 // NewHandler creates a handler to manage settings operations.
 func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{

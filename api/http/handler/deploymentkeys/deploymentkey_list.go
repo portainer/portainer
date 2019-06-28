@@ -14,5 +14,9 @@ func (handler *Handler) deploymentkeyList(w http.ResponseWriter, r *http.Request
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve deploymentkeys from the database", err}
 	}
 
+	for idx := range deploymentkeys {
+		hideFields(&deploymentkeys[idx])
+	}
+
 	return response.JSON(w, deploymentkeys)
 }

@@ -23,5 +23,7 @@ func (handler *Handler) deploymentkeyInspect(w http.ResponseWriter, r *http.Requ
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a deployment key with the specified identifier inside the database", err}
 	}
 
+	hideFields(deploymentkey)
+
 	return response.JSON(w, deploymentkey)
 }
