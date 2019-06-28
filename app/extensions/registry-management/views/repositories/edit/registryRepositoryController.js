@@ -11,7 +11,7 @@ angular.module('portainer.app')
         tagsRetrieval: {
           auto: true,
           running: false,
-          limit: 500,
+          limit: 100,
           progression: 0,
           elapsedTime: 0,
           asyncGenerator: null
@@ -282,7 +282,7 @@ angular.module('portainer.app')
           const tags = await RegistryV2Service.tags(registryId, repository);
           $scope.tags = [];
           $scope.repository.Tags = [];
-          $scope.repository.Tags = _.sortBy(_.concat($scope.repository.Tags, _.without(tags, null)));
+          $scope.repository.Tags = _.sortBy(_.concat($scope.repository.Tags, _.without(tags.tags, null)));
           _.map($scope.repository.Tags, (item) => $scope.tags.push(new RepositoryTagViewModel(item)));
         } catch (err) {
           Notifications.error('Failure', err, 'Unable to retrieve tags details');

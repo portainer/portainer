@@ -16,15 +16,6 @@ function RegistryV2ServiceFactory($q, $async, RegistryCatalog, RegistryTags, Reg
     return RegistryCatalog.ping({ id: id }).$promise;
   };
 
-  function getCatalog(id) {
-    var deferred = $q.defer();
-    var repositories = [];
-
-    _getCatalogPage({id: id}, deferred, repositories);
-
-    return deferred.promise;
-  }
-
   function _getCatalogPage(params, deferred, repositories) {
     RegistryCatalog.get(params).$promise.then(function(data) {
       repositories = _.concat(repositories, data.repositories);
@@ -36,15 +27,63 @@ function RegistryV2ServiceFactory($q, $async, RegistryCatalog, RegistryTags, Reg
     });
   }
 
+  function getCatalog(id) {
+    var deferred = $q.defer();
+    var repositories = [];
+
+    _getCatalogPage({id: id}, deferred, repositories);
+    return deferred.promise;
+  }
+
+  service.catalog = function (id) {
+    var deferred = $q.defer();
+
+    getCatalog(id).then(function success(data) {
+      var repositories = data.map(function (repositoryName) {
+        return new RegistryRepositoryViewModel(repositoryName);
+      });
+      deferred.resolve(repositories);
+    })
+    .catch(function error(err) {
+      deferred.reject({
+        msg: 'Unable to retrieve repositories',
+        err: err
+      });
+    });
+
+    return deferred.promise;
+  };
+
+  service.tags = function (id, repository) {
+    var deferred = $q.defer();
+
+    _getTagsPage({id: id, repository: repository}, deferred, {tags:[]});
+    return deferred.promise;
+  };
+
+  function _getTagsPage(params, deferred, previousTags) {
+    RegistryTags.get(params).$promise.then(function(data) {
+      previousTags.name = data.name;
+      previousTags.tags = _.concat(previousTags.tags, data.tags);
+      if (data.last && data.n) {
+        _getTagsPage({id: params.id, repository: params.repository, n: data.n, last: data.last}, deferred, previousTags);
+      } else {
+        deferred.resolve(previousTags);
+      }
+    }).catch(function error(err) {
+      deferred.reject({
+        msg: 'Unable to retrieve tags',
+        err: err
+      });
+    });
+  }
+
   service.getRepositoriesDetails = function (id, repositories) {
     var deferred = $q.defer();
     var promises = [];
     for (var i = 0; i < repositories.length; i++) {
       var repository = repositories[i].Name;
-      promises.push(RegistryTags.get({
-        id: id,
-        repository: repository
-      }).$promise);
+      promises.push(service.tags(id, repository));
     }
 
     $q.all(promises)
@@ -67,50 +106,6 @@ function RegistryV2ServiceFactory($q, $async, RegistryCatalog, RegistryTags, Reg
 
     return deferred.promise;
   };
-
-  service.repositories = function (id) {
-    var deferred = $q.defer();
-
-    getCatalog(id).then(function success(data) {
-      var repositories = data.map(function (repositoryName) {
-        return new RegistryRepositoryViewModel(repositoryName);
-      });
-      deferred.resolve(repositories);
-    })
-    .catch(function error(err) {
-      deferred.reject({
-        msg: 'Unable to retrieve repositories',
-        err: err
-      });
-    });
-
-    return deferred.promise;
-  };
-
-  service.tags = function (id, repository) {
-    var deferred = $q.defer();
-    var tags = [];
-
-    _getTagsPage({id: id, repository: repository}, deferred, tags);
-
-    return deferred.promise;
-  };
-
-  function _getTagsPage(params, deferred, tags) {
-    RegistryTags.get(params).$promise.then(function(data) {
-      tags = _.concat(tags, data.tags);
-      if (data.last && data.n) {
-        _getTagsPage({id: params.id, n: data.n, last: data.last}, deferred, tags);
-      } else {
-        deferred.resolve(tags);
-      }
-    }).catch(function error(err) {
-      deferred.reject({
-        msg: 'Unable to retrieve tags',
-        err: err
-      });
-    });
-  }
 
   service.getTagsDetails = function (id, repository, tags) {
     var promises = [];

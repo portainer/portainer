@@ -39,7 +39,7 @@ function ($transition$, $scope, RegistryService, RegistryV2Service, Notification
 
       RegistryV2Service.ping($scope.state.registryId, false)
       .then(function success() {
-        return RegistryV2Service.repositories($scope.state.registryId);
+        return RegistryV2Service.catalog($scope.state.registryId);
       })
       .then(function success(data) {
         $scope.repositories = data;
