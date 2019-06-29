@@ -29,8 +29,8 @@ func (payload *registryCreatePayload) Validate(r *http.Request) error {
 	if payload.Authentication && (govalidator.IsNull(payload.Username) || govalidator.IsNull(payload.Password)) {
 		return portainer.Error("Invalid credentials. Username and password must be specified when authentication is enabled")
 	}
-	if payload.Type != 1 && payload.Type != 2 && payload.Type != 3 {
-		return portainer.Error("Invalid registry type. Valid values are: 1 (Quay.io), 2 (Azure container registry) or 3 (custom registry)")
+	if payload.Type != 1 && payload.Type != 2 && payload.Type != 3 && payload.Type != 4 {
+		return portainer.Error("Invalid registry type. Valid values are: 1 (Quay.io), 2 (Azure container registry), 3 (custom registry) or 4 (Docker Hub)")
 	}
 	return nil
 }

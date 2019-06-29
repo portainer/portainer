@@ -877,7 +877,7 @@ const (
 	// SupportedDockerAPIVersion is the minimum Docker API version supported by Portainer
 	SupportedDockerAPIVersion = "1.24"
 	// ExtensionServer represents the server used by Portainer to communicate with extensions 
-	ExtensionServer = "localhost"
+	ExtensionServer = "192.168.0.15"
 )
 
 const (
@@ -1017,6 +1017,8 @@ const (
 	AzureRegistry
 	// CustomRegistry represents a custom registry
 	CustomRegistry
+	// DockerHubRegistry represents a DockerHub registry
+	DockerHubRegistry
 )
 
 const (
