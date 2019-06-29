@@ -36,7 +36,7 @@ func (handler *Handler) proxyRequestsToDockerAPI(w http.ResponseWriter, r *http.
 	}
 
 	if endpoint.Type == portainer.EdgeAgentEnvironment {
-		state, _ := handler.ReverseTunnelService.GetTunnelState(endpoint.ID)
+		state, _, _ := handler.ReverseTunnelService.GetTunnelState(endpoint.ID)
 		if state == portainer.EdgeAgentIdle {
 			handler.ProxyManager.DeleteProxy(endpoint)
 			handler.ReverseTunnelService.UpdateTunnelState(endpoint.ID, portainer.EdgeAgentManagementRequired)

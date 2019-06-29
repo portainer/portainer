@@ -16,7 +16,7 @@ func (handler *Handler) proxyWebsocketRequest(w http.ResponseWriter, r *http.Req
 	// works now, refactor?
 
 	if params.endpoint.Type == portainer.EdgeAgentEnvironment {
-		_, port := handler.ReverseTunnelService.GetTunnelState(params.endpoint.ID)
+		_, port, _ := handler.ReverseTunnelService.GetTunnelState(params.endpoint.ID)
 		endpointURL, err := url.Parse(fmt.Sprintf("http://localhost:%d", port))
 		if err != nil {
 			return err

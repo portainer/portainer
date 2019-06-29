@@ -26,6 +26,7 @@ type TunnelStatus struct {
 	state        string
 	port         int
 	lastActivity time.Time
+	schedules    []portainer.EdgeSchedule
 }
 
 type Service struct {
@@ -128,6 +129,14 @@ func (service *Service) tunnelCleanup() {
 
 					}
 
+					// TODO: to avoid iteration in a mega map and to keep that map
+					// in a small state, should remove entry from map instead of putting IDLE, 0
+					// NOTE: This cause a potential problem as it remove the schedules as well
+					// Only remove if no schedules? And if not use existing set IDLE,0 ?
+
+					//log.Println("[DEBUG] #1 INACTIVE TUNNEL")
+					//service.tunnelStatusMap.Remove(item.Key)
+
 					tunnelStatus.state = portainer.EdgeAgentIdle
 					tunnelStatus.port = 0
 					log.Printf("[DEBUG] #1 TAG ENDPOINT TUNNEL AS: %s | %d", tunnelStatus.state, tunnelStatus.port)
@@ -163,15 +172,16 @@ func (service *Service) getUnusedPort() int {
 	return port
 }
 
-func (service *Service) GetTunnelState(endpointID portainer.EndpointID) (string, int) {
+func (service *Service) GetTunnelState(endpointID portainer.EndpointID) (string, int, []portainer.EdgeSchedule) {
 	key := strconv.Itoa(int(endpointID))
 
 	if item, ok := service.tunnelStatusMap.Get(key); ok {
 		tunnelStatus := item.(TunnelStatus)
-		return tunnelStatus.state, tunnelStatus.port
+		return tunnelStatus.state, tunnelStatus.port, tunnelStatus.schedules
 	}
 
-	return portainer.EdgeAgentIdle, 0
+	schedules := make([]portainer.EdgeSchedule, 0)
+	return portainer.EdgeAgentIdle, 0, schedules
 }
 
 func (service *Service) UpdateTunnelState(endpointID portainer.EndpointID, state string) {
@@ -183,7 +193,7 @@ func (service *Service) UpdateTunnelState(endpointID portainer.EndpointID, state
 		tunnelStatus = item.(TunnelStatus)
 		tunnelStatus.state = state
 	} else {
-		tunnelStatus = TunnelStatus{state: state}
+		tunnelStatus = TunnelStatus{state: state, schedules: []portainer.EdgeSchedule{}}
 	}
 
 	if state == portainer.EdgeAgentManagementRequired && tunnelStatus.port == 0 {
@@ -206,6 +216,40 @@ func (service *Service) ResetTunnelActivityTimer(endpointID portainer.EndpointID
 		tunnelStatus.lastActivity = time.Now()
 		service.tunnelStatusMap.Set(key, tunnelStatus)
 		log.Printf("[DEBUG] #3 TAG ENDPOINT TUNNEL AS: %s | %d", tunnelStatus.state, tunnelStatus.port)
+	}
+}
+
+func (service *Service) AddSchedule(endpointID portainer.EndpointID, schedule *portainer.EdgeSchedule) {
+	key := strconv.Itoa(int(endpointID))
+
+	var tunnelStatus TunnelStatus
+	item, ok := service.tunnelStatusMap.Get(key)
+	if ok {
+		tunnelStatus = item.(TunnelStatus)
+		tunnelStatus.schedules = append(tunnelStatus.schedules, *schedule)
+	} else {
+		tunnelStatus = TunnelStatus{state: portainer.EdgeAgentIdle, schedules: []portainer.EdgeSchedule{*schedule}}
+	}
+
+	log.Printf("[DEBUG] #4 ADDING SCHEDULE %d | %s", schedule.ID, schedule.CronExpression)
+	service.tunnelStatusMap.Set(key, tunnelStatus)
+}
+
+func (service *Service) RemoveSchedule(scheduleID portainer.ScheduleID) {
+	for item := range service.tunnelStatusMap.IterBuffered() {
+		tunnelStatus := item.Val.(TunnelStatus)
+
+		updatedSchedules := make([]portainer.EdgeSchedule, 0)
+		for _, schedule := range tunnelStatus.schedules {
+			if schedule.ID == scheduleID {
+				log.Printf("[DEBUG] #5 REMOVING SCHEDULE %d", scheduleID)
+				continue
+			}
+			updatedSchedules = append(updatedSchedules, schedule)
+		}
+
+		tunnelStatus.schedules = updatedSchedules
+		service.tunnelStatusMap.Set(item.Key, tunnelStatus)
 	}
 }
 

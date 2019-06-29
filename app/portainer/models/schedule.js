@@ -1,4 +1,5 @@
-import { createStatus } from '../../docker/models/container';
+import _ from 'lodash-es';
+import {createStatus} from '../../docker/models/container';
 
 export function ScheduleDefaultModel() {
   this.Name = '';
@@ -9,13 +10,14 @@ export function ScheduleDefaultModel() {
 }
 
 function ScriptExecutionDefaultJobModel() {
-  this.Image = '';
+  this.Image = 'ubuntu:latest';
   this.Endpoints = [];
   this.FileContent = '';
   this.File = null;
   this.Method = 'editor';
 }
 
+// TODO: endpoint mix for Edge implementation
 export function ScheduleModel(data) {
   this.Id = data.Id;
   this.Name = data.Name;
@@ -23,14 +25,15 @@ export function ScheduleModel(data) {
   this.JobType = data.JobType;
   this.CronExpression = data.CronExpression;
   this.Created = data.Created;
+  this.EdgeSchedule = data.EdgeSchedule;
   if (this.JobType === 1) {
-    this.Job = new ScriptExecutionJobModel(data.ScriptExecutionJob);
+    this.Job = new ScriptExecutionJobModel(data.ScriptExecutionJob, data.EdgeSchedule.Endpoints);
   }
 }
 
-function ScriptExecutionJobModel(data) {
+function ScriptExecutionJobModel(data, edgeEndpoints) {
   this.Image = data.Image;
-  this.Endpoints = data.Endpoints;
+  this.Endpoints = _.concat(data.Endpoints, edgeEndpoints);
   this.FileContent = '';
   this.Method = 'editor';
   this.RetryCount = data.RetryCount;
@@ -42,6 +45,7 @@ export function ScriptExecutionTaskModel(data) {
   this.EndpointId = data.EndpointId;
   this.Status = createStatus(data.Status);
   this.Created = data.Created;
+  this.Edge = data.Edge;
 }
 
 export function ScheduleCreateRequest(model) {

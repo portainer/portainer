@@ -38,7 +38,7 @@ angular.module('portainer.app').component('scheduleForm', {
 
     function datetimeToCron(datetime) {
       var date = moment(datetime);
-      return '0 '.concat(date.minutes(), ' ', date.hours(), ' ', date.date(), ' ', (date.month() + 1));
+      return '0 '.concat(date.minutes(), ' ', date.hours(), ' ', date.date(), ' ', (date.month() + 1), ' *');
     }
 
     this.action = function() {

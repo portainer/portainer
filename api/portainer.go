@@ -335,9 +335,20 @@ type (
 		Recurring          bool
 		Created            int64
 		JobType            JobType
+		EdgeSchedule       *EdgeSchedule
 		ScriptExecutionJob *ScriptExecutionJob
 		SnapshotJob        *SnapshotJob
 		EndpointSyncJob    *EndpointSyncJob
+	}
+
+	// TODO: doc
+	EdgeSchedule struct {
+		ID             ScheduleID `json:"Id"`
+		CronExpression string     `json:"CronExpression"`
+		Script         string     `json:"Script"`
+		ScriptHash     []byte     `json:"ScriptHash"`
+		// TODO: this should not be exposed when retrieved by the agent
+		Endpoints []EndpointID `json:"Endpoints"`
 	}
 
 	// WebhookID represents a webhook identifier.
@@ -859,8 +870,11 @@ type (
 		GetServerPort() string
 		GetClientCredentials(endpointID EndpointID) string
 		UpdateTunnelState(endpointID EndpointID, state string)
-		GetTunnelState(endpointID EndpointID) (string, int)
+		// TODO: refactor return value to struct?
+		GetTunnelState(endpointID EndpointID) (string, int, []EdgeSchedule)
 		ResetTunnelActivityTimer(endpointID EndpointID)
+		AddSchedule(endpointID EndpointID, schedule *EdgeSchedule)
+		RemoveSchedule(scheduleID ScheduleID)
 	}
 )
 
@@ -888,7 +902,7 @@ const (
 	PortainerAgentSignatureMessage = "Portainer-App"
 	// SupportedDockerAPIVersion is the minimum Docker API version supported by Portainer
 	SupportedDockerAPIVersion = "1.24"
-	// ExtensionServer represents the server used by Portainer to communicate with extensions 
+	// ExtensionServer represents the server used by Portainer to communicate with extensions
 	ExtensionServer = "localhost"
 )
 

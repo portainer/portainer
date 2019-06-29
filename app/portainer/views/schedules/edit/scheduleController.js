@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('ScheduleController', ['$q', '$scope', '$transition$', '$state', 'Notifications', 'EndpointService', 'GroupService', 'ScheduleService', 'EndpointProvider',
-function ($q, $scope, $transition$, $state, Notifications, EndpointService, GroupService, ScheduleService, EndpointProvider) {
+.controller('ScheduleController', ['$q', '$scope', '$transition$', '$state', 'Notifications', 'EndpointService', 'GroupService', 'ScheduleService', 'EndpointProvider', 'HostBrowserService', 'FileSaver',
+function ($q, $scope, $transition$, $state, Notifications, EndpointService, GroupService, ScheduleService, EndpointProvider, HostBrowserService, FileSaver) {
 
   $scope.state = {
     actionInProgress: false
@@ -8,6 +8,7 @@ function ($q, $scope, $transition$, $state, Notifications, EndpointService, Grou
 
   $scope.update = update;
   $scope.goToContainerLogs = goToContainerLogs;
+  $scope.getEdgeTaskLogs = getEdgeTaskLogs;
 
   function update() {
     var model = $scope.schedule;
@@ -29,6 +30,26 @@ function ($q, $scope, $transition$, $state, Notifications, EndpointService, Grou
   function goToContainerLogs(endpointId, containerId) {
     EndpointProvider.setEndpointID(endpointId);
     $state.go('docker.containers.container.logs', { id: containerId });
+  }
+
+  function getEdgeTaskLogs(endpointId, scheduleId) {
+    var currentId = EndpointProvider.endpointID();
+    EndpointProvider.setEndpointID(endpointId);
+
+    var filePath = '/host/opt/portainer/scripts/' + scheduleId + '.log';
+    HostBrowserService.get(filePath)
+      .then(function onFileReceived(data) {
+        var downloadData = new Blob([data.file], {
+          type: 'text/plain;charset=utf-8'
+        });
+        FileSaver.saveAs(downloadData, scheduleId + '.log');
+      })
+      .catch(function notifyOnError(err) {
+        Notifications.error('Failure', err, 'Unable to download file');
+      })
+      .finally(function final() {
+        EndpointProvider.setEndpointID(currentId);
+      });
   }
 
   function associateEndpointsToTasks(tasks, endpoints) {

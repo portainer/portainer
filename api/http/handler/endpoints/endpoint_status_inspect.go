@@ -11,8 +11,9 @@ import (
 )
 
 type endpointStatusInspectResponse struct {
-	Status string `json:"status"`
-	Port   int    `json:"port"`
+	Status    string                   `json:"status"`
+	Port      int                      `json:"port"`
+	Schedules []portainer.EdgeSchedule `json:"schedules"`
 }
 
 // GET request on /api/endpoints/:id/status
@@ -33,11 +34,12 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusInternalServerError, "Status unavailable for non Edge agent endpoints", errors.New("Status unavailable")}
 	}
 
-	state, port := handler.ReverseTunnelService.GetTunnelState(endpoint.ID)
+	state, port, schedules := handler.ReverseTunnelService.GetTunnelState(endpoint.ID)
 
 	statusResponse := endpointStatusInspectResponse{
-		Status: state,
-		Port:   port,
+		Status:    state,
+		Port:      port,
+		Schedules: schedules,
 	}
 
 	return response.JSON(w, statusResponse)

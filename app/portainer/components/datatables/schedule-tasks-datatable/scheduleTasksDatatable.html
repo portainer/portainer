@@ -51,15 +51,19 @@
                 <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter: $ctrl.applyFilters | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))">
                   <td>
                     {{ item.Endpoint.Name }}
+                    <a ng-if="item.Edge" ng-click="$ctrl.getEdgeTaskLogs(item.EndpointId, item.Id)"><i class="fa fa-download" aria-hidden="true" style="margin-left: 5px; margin-right: 2px;"></i> Download logs</a>
                   </td>
                   <td>
-                    <a ng-click="$ctrl.goToContainerLogs(item.EndpointId, item.Id)">{{ item.Id | truncate: 32 }}</a>
+                    <a ng-if="!item.Edge" ng-click="$ctrl.goToContainerLogs(item.EndpointId, item.Id)">{{ item.Id | truncate: 32 }}</a>
+                    <span ng-if="item.Edge">-</span>
                   </td>
                   <td>
-                    <span class="label label-{{ item.Status|containerstatusbadge }}">{{ item.Status }}</span>
+                    <span ng-if="!item.Edge" class="label label-{{ item.Status|containerstatusbadge }}">{{ item.Status }}</span>
+                    <span ng-if="item.Edge">-</span>
                   </td>
                   <td>
-                    {{ item.Created | getisodatefromtimestamp}}
+                    <span ng-if="!item.Edge">{{ item.Created | getisodatefromtimestamp}}</span>
+                    <span ng-if="item.Edge">-</span>
                   </td>
                 </tr>
                 <tr ng-if="!$ctrl.dataset">

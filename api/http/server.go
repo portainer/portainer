@@ -172,6 +172,7 @@ func (server *Server) Start() error {
 	schedulesHandler.JobService = server.JobService
 	schedulesHandler.JobScheduler = server.JobScheduler
 	schedulesHandler.SettingsService = server.SettingsService
+	schedulesHandler.ReverseTunnelService = server.ReverseTunnelService
 
 	var settingsHandler = settings.NewHandler(requestBouncer)
 	settingsHandler.SettingsService = server.SettingsService

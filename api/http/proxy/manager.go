@@ -142,7 +142,7 @@ func (manager *Manager) CreateLegacyExtensionProxy(key, extensionAPIURL string) 
 }
 
 func (manager *Manager) createEdgeProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
-	_, port := manager.reverseTunnelService.GetTunnelState(endpoint.ID)
+	_, port, _ := manager.reverseTunnelService.GetTunnelState(endpoint.ID)
 
 	endpointURL, err := url.Parse(fmt.Sprintf("http://localhost:%d", port))
 	if err != nil {
