@@ -23,6 +23,7 @@
               -e EDGE=1 \
               -e CAP_HOST_MANAGEMENT=1 \
               -p 8000:80 \
+              -v portainer_agent_data:/data \
               --name portainer_edge_agent \
               portainer/pagent:edge
            </code>
@@ -46,6 +47,7 @@
               --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock \
               --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volumes \
               --mount type=bind,src=//,dst=/host \
+              --mount type=volume,src=portainer_agent_data,dst=/data \
               portainer/pagent:edge
            </code>
           </uib-tab>
