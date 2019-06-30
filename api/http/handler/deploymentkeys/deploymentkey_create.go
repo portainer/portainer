@@ -38,10 +38,15 @@ func (handler *Handler) deploymentkeyCreate(w http.ResponseWriter, r *http.Reque
 
 	// Add a function to call and create public key and private key
 
+	private, public, err := handler.SignatureService.GenerateDeploymentKeyPair()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create private and public key pairs", err}
+	}
+
 	deploymentkey = &portainer.DeploymentKey{
 		Name:       payload.Name,
-		PublicKey:  "SHA256:hellotherepublic",
-		PrivateKey: "SHA256:hellothereprivate",
+		PublicKey:  public,
+		PrivateKey: private,
 	}
 
 	err = handler.DeploymentKeyService.CreateDeploymentKey(deploymentkey)
@@ -49,7 +54,7 @@ func (handler *Handler) deploymentkeyCreate(w http.ResponseWriter, r *http.Reque
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the deployment key inside the database", err}
 	}
 
-	hideFields(deploymentkey)
+	// hideFields(deploymentkey)
 
 	return response.JSON(w, deploymentkey)
 }

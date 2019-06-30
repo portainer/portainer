@@ -13,10 +13,11 @@ import (
 type Handler struct {
 	*mux.Router
 	DeploymentKeyService portainer.DeploymentKeyService
+	SignatureService     portainer.DigitalSignatureService
 }
 
 func hideFields(deploymentkey *portainer.DeploymentKey) {
-	deploymentkey.PrivateKey = ""
+	deploymentkey.PrivateKey = nil
 }
 
 // NewHandler creates a handler to manage settings operations.

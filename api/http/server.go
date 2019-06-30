@@ -226,6 +226,7 @@ func (server *Server) Start() error {
 
 	var deploymentKeyHandler = deploymentkeys.NewHandler(requestBouncer)
 	deploymentKeyHandler.DeploymentKeyService = server.DeploymentKeyService
+	deploymentKeyHandler.SignatureService = server.SignatureService
 
 	server.Handler = &handler.Handler{
 		RoleHandler:            roleHandler,

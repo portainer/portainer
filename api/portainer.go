@@ -225,7 +225,7 @@ type (
 		ID         DeploymentKeyID `json:"Id`
 		Name       string          `json:"Name"`
 		PublicKey  string          `json:"PublicKey"`
-		PrivateKey string          `json:"PrivateKey"`
+		PrivateKey []byte          `json:"PrivateKey"`
 	}
 
 	// DockerHub represents all the required information to connect and use the
@@ -778,6 +778,7 @@ type (
 	DigitalSignatureService interface {
 		ParseKeyPair(private, public []byte) error
 		GenerateKeyPair() ([]byte, []byte, error)
+		GenerateDeploymentKeyPair() ([]byte, string, error)
 		EncodedPublicKey() string
 		PEMHeaders() (string, string)
 		CreateSignature(message string) (string, error)

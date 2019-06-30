@@ -7,6 +7,8 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/hex"
+	"encoding/pem"
+	"golang.org/x/crypto/ssh"
 	"math/big"
 )
 
@@ -134,4 +136,29 @@ func (service *ECDSAService) CreateSignature(message string) (string, error) {
 	signature := append(rBytesPadded, sBytesPadded...)
 
 	return base64.RawStdEncoding.EncodeToString(signature), nil
+}
+
+// GenerateDeploymentKeyPair will create a new PEM encoded key pairs with ECDSA.
+func (service *ECDSAService) GenerateDeploymentKeyPair() ([]byte, string, error) {
+	pubkeyCurve := elliptic.P256()
+
+	privateKey, err := ecdsa.GenerateKey(pubkeyCurve, rand.Reader)
+	if err != nil {
+		return nil, "", err
+	}
+
+	x509EncodedBytes, _ := x509.MarshalECPrivateKey(privateKey)
+	if err != nil {
+		return nil, "", err
+	}
+
+	pemEncodedPrivate := pem.EncodeToMemory(&pem.Block{Type: "EC PRIVATE KEY", Bytes: x509EncodedBytes})
+
+	publicKey, err := ssh.NewPublicKey(&privateKey.PublicKey)
+	if err != nil {
+		return nil, "", err
+	}
+	publicKeyAutorizedKey := ssh.MarshalAuthorizedKey(publicKey)
+
+	return pemEncodedPrivate, string(publicKeyAutorizedKey), nil
 }
