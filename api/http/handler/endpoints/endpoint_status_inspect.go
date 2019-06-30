@@ -42,5 +42,9 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 		Schedules: schedules,
 	}
 
+	if state == portainer.EdgeAgentManagementRequired {
+		handler.ReverseTunnelService.UpdateTunnelState(endpoint.ID, portainer.EdgeAgentStandby)
+	}
+
 	return response.JSON(w, statusResponse)
 }
