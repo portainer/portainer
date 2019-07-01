@@ -182,6 +182,7 @@ func (server *Server) Start() error {
 	stackHandler.FileService = server.FileService
 	stackHandler.StackService = server.StackService
 	stackHandler.EndpointService = server.EndpointService
+	stackHandler.DeploymentKeyService = server.DeploymentKeyService
 	stackHandler.ResourceControlService = server.ResourceControlService
 	stackHandler.SwarmStackManager = server.SwarmStackManager
 	stackHandler.ComposeStackManager = server.ComposeStackManager

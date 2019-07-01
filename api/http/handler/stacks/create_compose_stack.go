@@ -87,11 +87,13 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 	return response.JSON(w, stack)
 }
 
+// Update struc to cater for deployment key
 type composeStackFromGitRepositoryPayload struct {
 	Name                        string
 	RepositoryURL               string
 	RepositoryReferenceName     string
 	RepositoryAuthentication    bool
+	RepositoryDeploymentKey     string
 	RepositoryUsername          string
 	RepositoryPassword          string
 	ComposeFilePathInRepository string
@@ -145,11 +147,13 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 	projectPath := handler.FileService.GetStackProjectPath(strconv.Itoa(int(stack.ID)))
 	stack.ProjectPath = projectPath
 
+	// Add Deployment Key
 	gitCloneParams := &cloneRepositoryParameters{
 		url:            payload.RepositoryURL,
 		referenceName:  payload.RepositoryReferenceName,
 		path:           projectPath,
 		authentication: payload.RepositoryAuthentication,
+		deploymentKey:  payload.RepositoryDeploymentKey,
 		username:       payload.RepositoryUsername,
 		password:       payload.RepositoryPassword,
 	}

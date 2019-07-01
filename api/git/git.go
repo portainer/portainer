@@ -1,11 +1,12 @@
 package git
 
 import (
-	"net/url"
-	"strings"
-
+	"golang.org/x/crypto/ssh"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
+	gitSsh "gopkg.in/src-d/go-git.v4/plumbing/transport/ssh"
+	"net/url"
+	"strings"
 )
 
 // Service represents a service for managing Git.
@@ -35,6 +36,37 @@ func (service *Service) ClonePrivateRepositoryWithBasicAuth(repositoryURL, refer
 func cloneRepository(repositoryURL, referenceName string, destination string) error {
 	options := &git.CloneOptions{
 		URL: repositoryURL,
+	}
+
+	if referenceName != "" {
+		options.ReferenceName = plumbing.ReferenceName(referenceName)
+	}
+
+	_, err := git.PlainClone(destination, false, options)
+	return err
+}
+
+func (service *Service) ClonePrivateRepositoryWithDeploymentKey(repositoryURL, referenceName string, destination string, privateKeyPem []byte) error {
+	// url := "git@github.com:ssbkang/personal-development.git"
+	// directory := "personal-development"
+	// https://github.com/portainer/portainer-compose
+
+	signer, _ := ssh.ParsePrivateKey(privateKeyPem)
+	auth := &gitSsh.PublicKeys{
+		User:   "git",
+		Signer: signer,
+		HostKeyCallbackHelper: gitSsh.HostKeyCallbackHelper{
+			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		},
+	}
+
+	repositoryURL = strings.Replace(repositoryURL, "https://", "git@", 1)
+	repositoryURL += ".git"
+
+	options := &git.CloneOptions{
+		URL:               repositoryURL,
+		RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
+		Auth:              auth,
 	}
 
 	if referenceName != "" {

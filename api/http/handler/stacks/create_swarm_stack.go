@@ -1,10 +1,6 @@
 package stacks
 
 import (
-	"net/http"
-	"strconv"
-	"strings"
-
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -12,6 +8,9 @@ import (
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/security"
+	"net/http"
+	"strconv"
+	"strings"
 )
 
 type swarmStackFromFileContentPayload struct {
@@ -92,6 +91,7 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 	return response.JSON(w, stack)
 }
 
+// Update struc to cater for deployment key
 type swarmStackFromGitRepositoryPayload struct {
 	Name                        string
 	SwarmID                     string
@@ -99,6 +99,7 @@ type swarmStackFromGitRepositoryPayload struct {
 	RepositoryURL               string
 	RepositoryReferenceName     string
 	RepositoryAuthentication    bool
+	RepositoryDeploymentKey     string
 	RepositoryUsername          string
 	RepositoryPassword          string
 	ComposeFilePathInRepository string
@@ -111,12 +112,18 @@ func (payload *swarmStackFromGitRepositoryPayload) Validate(r *http.Request) err
 	if govalidator.IsNull(payload.SwarmID) {
 		return portainer.Error("Invalid Swarm ID")
 	}
+
+	// Need to improve validators for SSH based URL and deployment key type
+
+	/*
 	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
 		return portainer.Error("Invalid repository URL. Must correspond to a valid URL format")
 	}
-	if payload.RepositoryAuthentication && (govalidator.IsNull(payload.RepositoryUsername) || govalidator.IsNull(payload.RepositoryPassword)) {
-		return portainer.Error("Invalid repository credentials. Username and password must be specified when authentication is enabled")
+
+	if payload.RepositoryAuthentication && (govalidator.IsNull(payload.RepositoryDeploymentKey)) || (govalidator.IsNull(payload.RepositoryUsername) || govalidator.IsNull(payload.RepositoryPassword)) {
+		return portainer.Error("Invalid repository credentials or deploymenet key. Either Username & password or a deployment key must be specified when authentication is enabled")
 	}
+	*/
 	if govalidator.IsNull(payload.ComposeFilePathInRepository) {
 		payload.ComposeFilePathInRepository = filesystem.ComposeFileDefaultName
 	}
@@ -160,6 +167,7 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 		referenceName:  payload.RepositoryReferenceName,
 		path:           projectPath,
 		authentication: payload.RepositoryAuthentication,
+		deploymentKey:  payload.RepositoryDeploymentKey,
 		username:       payload.RepositoryUsername,
 		password:       payload.RepositoryPassword,
 	}

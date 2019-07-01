@@ -16,6 +16,7 @@ type Handler struct {
 	stackDeletionMutex *sync.Mutex
 	requestBouncer     *security.RequestBouncer
 	*mux.Router
+	DeploymentKeyService   portainer.DeploymentKeyService
 	FileService            portainer.FileService
 	GitService             portainer.GitService
 	StackService           portainer.StackService

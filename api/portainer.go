@@ -817,6 +817,7 @@ type (
 	GitService interface {
 		ClonePublicRepository(repositoryURL, referenceName string, destination string) error
 		ClonePrivateRepositoryWithBasicAuth(repositoryURL, referenceName string, destination, username, password string) error
+		ClonePrivateRepositoryWithDeploymentKey(repositoryURL, referenceName string, destination string, privateKeyPem []byte) error
 	}
 
 	// JobScheduler represents a service to run jobs on a periodic basis
