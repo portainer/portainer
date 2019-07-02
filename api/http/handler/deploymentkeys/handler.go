@@ -26,16 +26,12 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		Router: mux.NewRouter(),
 	}
 	h.Handle("/deployment_keys",
-		// bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.deploymentkeyCreate))).Methods(http.MethodPost)
-		bouncer.PublicAccess(httperror.LoggerHandler(h.deploymentkeyCreate))).Methods(http.MethodPost)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.deploymentkeyCreate))).Methods(http.MethodPost)
 	h.Handle("/deployment_keys",
-		// bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.deploymentkeyList))).Methods(http.MethodGet)
-		bouncer.PublicAccess(httperror.LoggerHandler(h.deploymentkeyList))).Methods(http.MethodGet)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.deploymentkeyList))).Methods(http.MethodGet)
 	h.Handle("/deployment_keys/{id}",
-		// bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.deploymentkeyList))).Methods(http.MethodGet)
-		bouncer.PublicAccess(httperror.LoggerHandler(h.deploymentkeyInspect))).Methods(http.MethodGet)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.deploymentkeyInspect))).Methods(http.MethodGet)
 	h.Handle("/deployment_keys/{id}",
-		// bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.deploymentkeyDelete))).Methods(http.MethodDelete)
-		bouncer.PublicAccess(httperror.LoggerHandler(h.deploymentkeyDelete))).Methods(http.MethodDelete)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.deploymentkeyDelete))).Methods(http.MethodDelete)
 	return h
 }

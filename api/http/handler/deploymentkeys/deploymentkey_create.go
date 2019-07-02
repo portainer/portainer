@@ -36,8 +36,6 @@ func (handler *Handler) deploymentkeyCreate(w http.ResponseWriter, r *http.Reque
 		return &httperror.HandlerError{http.StatusConflict, "A deploymentkey for this resource already exists", portainer.ErrDeploymentkeyAlreadyExists}
 	}
 
-	// Add a function to call and create public key and private key
-
 	private, public, err := handler.SignatureService.GenerateDeploymentKeyPair()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create private and public key pairs", err}

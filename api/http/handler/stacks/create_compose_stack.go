@@ -87,17 +87,16 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 	return response.JSON(w, stack)
 }
 
-// Update struc to cater for deployment key
 type composeStackFromGitRepositoryPayload struct {
-	Name                        string
-	RepositoryURL               string
-	RepositoryReferenceName     string
-	RepositoryAuthentication    bool
-	RepositoryDeploymentKey     string
-	RepositoryUsername          string
-	RepositoryPassword          string
-	ComposeFilePathInRepository string
-	Env                         []portainer.Pair
+	Name                         string
+	RepositoryURL                string
+	RepositoryReferenceName      string
+	RepositoryAuthenticationType string
+	RepositoryDeploymentKey      string
+	RepositoryUsername           string
+	RepositoryPassword           string
+	ComposeFilePathInRepository  string
+	Env                          []portainer.Pair
 }
 
 func (payload *composeStackFromGitRepositoryPayload) Validate(r *http.Request) error {
@@ -107,8 +106,11 @@ func (payload *composeStackFromGitRepositoryPayload) Validate(r *http.Request) e
 	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
 		return portainer.Error("Invalid repository URL. Must correspond to a valid URL format")
 	}
-	if payload.RepositoryAuthentication && (govalidator.IsNull(payload.RepositoryUsername) || govalidator.IsNull(payload.RepositoryPassword)) {
-		return portainer.Error("Invalid repository credentials. Username and password must be specified when authentication is enabled")
+	if payload.RepositoryAuthenticationType == "BasicAuth" && (govalidator.IsNull(payload.RepositoryUsername) || govalidator.IsNull(payload.RepositoryPassword)) {
+		return portainer.Error("Invalid repository credentials or deploymenet key. Either username & password must be specified when authentication type is BasicAuth")
+	}
+	if payload.RepositoryAuthenticationType == "DeploymentKey" && govalidator.IsNull(payload.RepositoryDeploymentKey) {
+		return portainer.Error("Invalid repository deploymenet key. A deployment key must be specified when authentication type is DeploymentKey")
 	}
 	if govalidator.IsNull(payload.ComposeFilePathInRepository) {
 		payload.ComposeFilePathInRepository = filesystem.ComposeFileDefaultName
@@ -147,15 +149,22 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 	projectPath := handler.FileService.GetStackProjectPath(strconv.Itoa(int(stack.ID)))
 	stack.ProjectPath = projectPath
 
-	// Add Deployment Key
 	gitCloneParams := &cloneRepositoryParameters{
-		url:            payload.RepositoryURL,
-		referenceName:  payload.RepositoryReferenceName,
-		path:           projectPath,
-		authentication: payload.RepositoryAuthentication,
-		deploymentKey:  payload.RepositoryDeploymentKey,
-		username:       payload.RepositoryUsername,
-		password:       payload.RepositoryPassword,
+		url:                payload.RepositoryURL,
+		referenceName:      payload.RepositoryReferenceName,
+		path:               projectPath,
+		authenticationType: payload.RepositoryAuthenticationType,
+		deploymentKey:      nil,
+		username:           payload.RepositoryUsername,
+		password:           payload.RepositoryPassword,
+	}
+
+	if payload.RepositoryDeploymentKey != "" {
+		deploymentKey, err := handler.DeploymentKeyService.DeploymentKeyByName(payload.Name)
+		if err != nil && err != portainer.ErrObjectNotFound {
+			return &httperror.HandlerError{http.StatusInternalServerError, "An error occurred retrieving deploymentkey from the database", err}
+		}
+		gitCloneParams.deploymentKey = deploymentKey.PrivateKey
 	}
 
 	doCleanUp := true

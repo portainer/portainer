@@ -47,10 +47,6 @@ func cloneRepository(repositoryURL, referenceName string, destination string) er
 }
 
 func (service *Service) ClonePrivateRepositoryWithDeploymentKey(repositoryURL, referenceName string, destination string, privateKeyPem []byte) error {
-	// url := "git@github.com:ssbkang/personal-development.git"
-	// directory := "personal-development"
-	// https://github.com/portainer/portainer-compose
-
 	signer, _ := ssh.ParsePrivateKey(privateKeyPem)
 	auth := &gitSsh.PublicKeys{
 		User:   "git",

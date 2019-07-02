@@ -93,16 +93,16 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 
 // Update struc to cater for deployment key
 type swarmStackFromGitRepositoryPayload struct {
-	Name                        string
-	SwarmID                     string
-	Env                         []portainer.Pair
-	RepositoryURL               string
-	RepositoryReferenceName     string
-	RepositoryAuthentication    bool
-	RepositoryDeploymentKey     string
-	RepositoryUsername          string
-	RepositoryPassword          string
-	ComposeFilePathInRepository string
+	Name                         string
+	SwarmID                      string
+	Env                          []portainer.Pair
+	RepositoryURL                string
+	RepositoryReferenceName      string
+	RepositoryAuthenticationType string
+	RepositoryDeploymentKey      string
+	RepositoryUsername           string
+	RepositoryPassword           string
+	ComposeFilePathInRepository  string
 }
 
 func (payload *swarmStackFromGitRepositoryPayload) Validate(r *http.Request) error {
@@ -112,18 +112,15 @@ func (payload *swarmStackFromGitRepositoryPayload) Validate(r *http.Request) err
 	if govalidator.IsNull(payload.SwarmID) {
 		return portainer.Error("Invalid Swarm ID")
 	}
-
 	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
 		return portainer.Error("Invalid repository URL. Must correspond to a valid URL format")
 	}
-
-	// Need to improve validators for SSH based URL and deployment key type
-	/*
-	if payload.RepositoryAuthentication && (govalidator.IsNull(payload.RepositoryDeploymentKey)) || (govalidator.IsNull(payload.RepositoryUsername) || govalidator.IsNull(payload.RepositoryPassword)) {
-		return portainer.Error("Invalid repository credentials or deploymenet key. Either Username & password or a deployment key must be specified when authentication is enabled")
+	if payload.RepositoryAuthenticationType == "BasicAuth" && (govalidator.IsNull(payload.RepositoryUsername) || govalidator.IsNull(payload.RepositoryPassword)) {
+		return portainer.Error("Invalid repository credentials or deploymenet key. Either username & password must be specified when authentication type is BasicAuth")
 	}
-	*/
-
+	if payload.RepositoryAuthenticationType == "DeploymentKey" && govalidator.IsNull(payload.RepositoryDeploymentKey) {
+		return portainer.Error("Invalid repository deploymenet key. A deployment key must be specified when authentication type is DeploymentKey")
+	}
 	if govalidator.IsNull(payload.ComposeFilePathInRepository) {
 		payload.ComposeFilePathInRepository = filesystem.ComposeFileDefaultName
 	}
@@ -163,13 +160,22 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 	stack.ProjectPath = projectPath
 
 	gitCloneParams := &cloneRepositoryParameters{
-		url:            payload.RepositoryURL,
-		referenceName:  payload.RepositoryReferenceName,
-		path:           projectPath,
-		authentication: payload.RepositoryAuthentication,
-		deploymentKey:  payload.RepositoryDeploymentKey,
-		username:       payload.RepositoryUsername,
-		password:       payload.RepositoryPassword,
+		url:                payload.RepositoryURL,
+		referenceName:      payload.RepositoryReferenceName,
+		path:               projectPath,
+		authenticationType: payload.RepositoryAuthenticationType,
+		deploymentKey:      nil,
+		username:           payload.RepositoryUsername,
+		password:           payload.RepositoryPassword,
+	}
+
+	if payload.RepositoryDeploymentKey != "" {
+		deploymentKey, err := handler.DeploymentKeyService.DeploymentKeyByName(payload.RepositoryDeploymentKey)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "An error occurred retrieving deploymentkey from the database", err}
+		}
+
+		gitCloneParams.deploymentKey = deploymentKey.PrivateKey
 	}
 
 	doCleanUp := true
