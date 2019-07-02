@@ -6,8 +6,8 @@ function isBetween(value, a, b) {
 }
 
 angular.module('portainer.app')
-.controller('GenericDatatableController', ['PaginationService', 'DatatableService', 'PAGINATION_MAX_ITEMS',
-function (PaginationService, DatatableService, PAGINATION_MAX_ITEMS) {
+.controller('GenericDatatableController', ['$interval', 'PaginationService', 'DatatableService', 'PAGINATION_MAX_ITEMS',
+function ($interval, PaginationService, DatatableService, PAGINATION_MAX_ITEMS) {
 
   this.state = {
     selectAll: false,
@@ -20,6 +20,13 @@ function (PaginationService, DatatableService, PAGINATION_MAX_ITEMS) {
     selectedItems: []
   };
 
+  this.settings = {
+    open: false,
+    repeater: {
+      autoRefresh: false,
+      refreshRate: '30'
+    }
+  }
 
   this.onTextFilterChange = function() {
     DatatableService.setDataTableTextFilters(this.tableKey, this.state.textFilter);
@@ -87,7 +94,7 @@ function (PaginationService, DatatableService, PAGINATION_MAX_ITEMS) {
   /**
    * Override this method to execute code after selection changed on datatable
    */
-  this.onSelectionChanged = function () {
+  this.onSelectionChanged = function() {
     return;
   }
 
@@ -131,5 +138,47 @@ function (PaginationService, DatatableService, PAGINATION_MAX_ITEMS) {
     if (this.filters && this.filters.state) {
       this.filters.state.open = false;
     }
+
+    var storedSettings = DatatableService.getDataTableSettings(this.tableKey);
+    if (storedSettings !== null) {
+      this.settings = storedSettings;
+      this.settings.open = false;
+    }
+    this.onSettingsRepeaterChange();
   };
+  
+  /**
+   * REPEATER SECTION
+   */
+  this.repeater = undefined;
+
+  this.$onDestroy = function() {
+    this.stopRepeater();
+  };
+
+  this.stopRepeater = function() {
+    if (angular.isDefined(this.repeater)) {
+      $interval.cancel(this.repeater);
+      this.repeater = undefined;
+    }
+  }
+
+  this.startRepeater = function() {
+    this.repeater = $interval(() => {
+      this.refreshCallback();
+    }, this.settings.repeater.refreshRate * 1000);
+  }
+
+  this.onSettingsRepeaterChange = function() {
+    this.stopRepeater();
+    if (angular.isDefined(this.refreshCallback) && this.settings.repeater.autoRefresh) {
+      this.startRepeater();
+      $('#refreshRateChange').show();
+      $('#refreshRateChange').fadeOut(1500);
+    }
+    DatatableService.setDataTableSettings(this.tableKey, this.settings);
+  }
+  /**
+   * !REPEATER SECTION
+   */
 }]);

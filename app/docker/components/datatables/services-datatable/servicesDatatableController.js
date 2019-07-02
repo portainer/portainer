@@ -92,5 +92,12 @@ function ($scope, $controller, DatatableService, EndpointProvider) {
     if (storedExpandedItems !== null) {
       this.expandItems(storedExpandedItems);
     }
+
+    var storedSettings = DatatableService.getDataTableSettings(this.tableKey);
+    if (storedSettings !== null) {
+      this.settings = storedSettings;
+      this.settings.open = false;
+    }
+    this.onSettingsRepeaterChange();
   };
 }]);

@@ -69,6 +69,27 @@
                     <input id="setting_container_trunc" type="checkbox" ng-model="$ctrl.settings.truncateContainerName" ng-change="$ctrl.onSettingsContainerNameTruncateChange()"/>
                     <label for="setting_container_trunc">Truncate container name</label>
                   </div>
+                  <div>
+                    <div class="md-checkbox">
+                      <input id="setting_auto_refresh" type="checkbox" ng-model="$ctrl.settings.repeater.autoRefresh" ng-change="$ctrl.onSettingsRepeaterChange()"/>
+                      <label for="setting_auto_refresh">Auto refresh</label>
+                    </div>
+                    <div ng-if="$ctrl.settings.repeater.autoRefresh">
+                      <label for="settings_refresh_rate">
+                        Refresh rate
+                      </label>
+                      <select id="settings_refresh_rate" ng-model="$ctrl.settings.repeater.refreshRate" ng-change="$ctrl.onSettingsRepeaterChange()" class="small-select">
+                        <option value="10">10s</option>
+                        <option value="30">30s</option>
+                        <option value="60">1min</option>
+                        <option value="120">2min</option>
+                        <option value="300">5min</option>
+                      </select>
+                      <span>
+                        <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-top: 7px; display: none;"></i>
+                      </span>
+                    </div>
+                  </div>
                 </div>
                 <div authorization="DockerContainerStats, DockerContainerLogs, DockerExecStart, DockerContainerInspect, DockerTaskInspect, DockerTaskLogs, DockerContainerAttach">
                   <div class="menuHeader">
