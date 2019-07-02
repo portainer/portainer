@@ -1,15 +1,34 @@
 angular.module('portainer.docker')
-  .controller('StoridgeDrivesDatatableController', ['$scope', '$controller',
-    function ($scope, $controller) {
+  .controller('StoridgeDrivesDatatableController', ['$scope', '$controller', 'DatatableService',
+    function ($scope, $controller, DatatableService) {
       angular.extend(this, $controller('GenericDatatableController', {$scope: $scope}));
 
-      this.selectAll = function() {
-        for (var i = 0; i < this.state.filteredDataSet.length; i++) {
-          var item = this.state.filteredDataSet[i];
-          if (item.Status !== 'normal' && item.Checked !== this.state.selectAll) {
-            item.Checked = this.state.selectAll;
-            this.selectItem(item);
-          }
+      this.allowSelection = function (item) {
+        return item.Status !== 'normal';
+      };
+
+      this.$onInit = function() {
+        this.setDefaults();
+        this.prepareTableFromDataset();
+
+        var storedOrder = DatatableService.getDataTableOrder(this.tableKey);
+        if (storedOrder !== null) {
+          this.state.reverseOrder = storedOrder.reverse;
+          this.state.orderBy = storedOrder.orderBy;
+        }
+
+        var textFilter = DatatableService.getDataTableTextFilters(this.tableKey);
+        if (textFilter !== null) {
+          this.state.textFilter = textFilter;
+          this.onTextFilterChange();
+        }
+
+        var storedFilters = DatatableService.getDataTableFilters(this.tableKey);
+        if (storedFilters !== null) {
+          this.filters = storedFilters;
+        }
+        if (this.filters && this.filters.state) {
+          this.filters.state.open = false;
         }
       };
   }

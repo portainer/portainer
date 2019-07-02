@@ -70,7 +70,7 @@
               <td>
                 <span class="md-checkbox">
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-disabled="item.Inherited"
-                    ng-change="$ctrl.selectItem(item)" />
+                    ng-click="$ctrl.selectItem(item, $event)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
                 {{ item.Name }}

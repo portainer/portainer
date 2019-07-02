@@ -39,7 +39,7 @@
               ng-class="{active: item.Checked}">
               <td>
                 <span class="md-checkbox">
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-change="$ctrl.selectItem(item)" />
+                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
                 <a ui-sref="portainer.registries.registry.repository({repository: item.Name})" class="monospaced"
