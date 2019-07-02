@@ -61,6 +61,7 @@ func (service *Service) ClonePrivateRepositoryWithDeploymentKey(repositoryURL, r
 	}
 
 	repositoryURL = strings.Replace(repositoryURL, "https://", "git@", 1)
+	repositoryURL = strings.Replace(repositoryURL, "github.com/", "github.com:", 1)
 	repositoryURL += ".git"
 
 	options := &git.CloneOptions{

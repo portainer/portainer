@@ -113,17 +113,17 @@ func (payload *swarmStackFromGitRepositoryPayload) Validate(r *http.Request) err
 		return portainer.Error("Invalid Swarm ID")
 	}
 
-	// Need to improve validators for SSH based URL and deployment key type
-
-	/*
 	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
 		return portainer.Error("Invalid repository URL. Must correspond to a valid URL format")
 	}
 
+	// Need to improve validators for SSH based URL and deployment key type
+	/*
 	if payload.RepositoryAuthentication && (govalidator.IsNull(payload.RepositoryDeploymentKey)) || (govalidator.IsNull(payload.RepositoryUsername) || govalidator.IsNull(payload.RepositoryPassword)) {
 		return portainer.Error("Invalid repository credentials or deploymenet key. Either Username & password or a deployment key must be specified when authentication is enabled")
 	}
 	*/
+
 	if govalidator.IsNull(payload.ComposeFilePathInRepository) {
 		payload.ComposeFilePathInRepository = filesystem.ComposeFileDefaultName
 	}
