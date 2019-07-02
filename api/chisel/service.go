@@ -18,7 +18,7 @@ const (
 	minAvailablePort = 49152
 	maxAvailablePort = 65535
 	// TODO: configurable? change defaults?
-	inactivityTimerDuration = 1 * time.Minute
+	inactivityTimerDuration = 5 * time.Minute
 	tunnelCleanupInterval   = 10 * time.Second
 )
 
