@@ -105,8 +105,8 @@ func initGitService() portainer.GitService {
 	return &git.Service{}
 }
 
-func initClientFactory(signatureService portainer.DigitalSignatureService) *docker.ClientFactory {
-	return docker.NewClientFactory(signatureService)
+func initClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService) *docker.ClientFactory {
+	return docker.NewClientFactory(signatureService, reverseTunnelService)
 }
 
 func initSnapshotter(clientFactory *docker.ClientFactory) portainer.Snapshotter {
@@ -548,11 +548,15 @@ func main() {
 		log.Fatal(err)
 	}
 
-	clientFactory := initClientFactory(digitalSignatureService)
+	var reverseTunnelService portainer.ReverseTunnelService = chisel.NewService(store.EndpointService)
+
+	clientFactory := initClientFactory(digitalSignatureService, reverseTunnelService)
 
 	jobService := initJobService(clientFactory)
 
 	snapshotter := initSnapshotter(clientFactory)
+
+	reverseTunnelService.SetupSnapshotter(snapshotter)
 
 	endpointManagement := true
 	if *flags.ExternalEndpoints != "" {
@@ -572,12 +576,6 @@ func main() {
 	}
 
 	err = initSettings(store.SettingsService, flags)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	var reverseTunnelService portainer.ReverseTunnelService = chisel.NewService(store.EndpointService, snapshotter)
-	err = reverseTunnelService.StartTunnelServer(*flags.TunnelAddr, *flags.TunnelPort)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -670,6 +668,11 @@ func main() {
 
 	if !*flags.NoAuth {
 		go terminateIfNoAdminCreated(store.UserService)
+	}
+
+	err = reverseTunnelService.StartTunnelServer(*flags.TunnelAddr, *flags.TunnelPort)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	var server portainer.Server = &http.Server{

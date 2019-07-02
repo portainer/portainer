@@ -37,12 +37,16 @@ type Service struct {
 	snapshotter       portainer.Snapshotter
 }
 
-func NewService(endpointService portainer.EndpointService, snapshotter portainer.Snapshotter) *Service {
+//TODO: document
+func NewService(endpointService portainer.EndpointService) *Service {
 	return &Service{
 		tunnelStatusMap: cmap.New(),
 		endpointService: endpointService,
-		snapshotter:     snapshotter,
 	}
+}
+
+func (service *Service) SetupSnapshotter(snapshotter portainer.Snapshotter) {
+	service.snapshotter = snapshotter
 }
 
 func (service *Service) StartTunnelServer(addr, port string) error {

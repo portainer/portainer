@@ -262,6 +262,8 @@ func (handler *Handler) addAndPersistSchedule(schedule *portainer.Schedule, file
 
 	schedule.ScriptExecutionJob.Endpoints = nonEdgeEndpointIDs
 
+	// TODO: Edge schedule is both persisted on disk and persisted inside the db (base64 encoded)
+	// Optimisation required
 	scriptPath, err := handler.FileService.StoreScheduledJobFileFromBytes(strconv.Itoa(int(schedule.ID)), file)
 	if err != nil {
 		return err

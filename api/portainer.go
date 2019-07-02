@@ -866,6 +866,7 @@ type (
 
 	ReverseTunnelService interface {
 		StartTunnelServer(addr, port string) error
+		SetupSnapshotter(snapshotter Snapshotter)
 		GetServerFingerprint() string
 		GetServerPort() string
 		GetClientCredentials(endpointID EndpointID) string

@@ -36,7 +36,6 @@ func (service *JobService) ExecuteScript(endpoint *portainer.Endpoint, nodeName,
 		return err
 	}
 
-	// TODO: will fail on Edge agent as using the incorrect URL
 	cli, err := service.dockerClientFactory.CreateClient(endpoint, nodeName)
 	if err != nil {
 		return err
