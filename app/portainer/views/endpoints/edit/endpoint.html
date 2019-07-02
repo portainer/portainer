@@ -1,12 +1,30 @@
 <rd-header>
-  <rd-header-title title-text="Endpoint details"></rd-header-title>
+  <rd-header-title title-text="Endpoint details">
+      <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.endpoints.endpoint({id: endpoint.Id})" ui-sref-opts="{reload: true}">
+          <i class="fa fa-sync" aria-hidden="true"></i>
+      </a>
+  </rd-header-title>
   <rd-header-content>
     <a ui-sref="portainer.endpoints">Endpoints</a> &gt; <a ui-sref="portainer.endpoints.endpoint({id: endpoint.Id})">{{ endpoint.Name }}</a>
   </rd-header-content>
 </rd-header>
 
 <div class="row">
-  <information-panel ng-if="endpoint.Type === 4" title-text="Deploy an agent">
+  <information-panel ng-if="endpoint.Type === 4 && endpoint.EdgeID" title-text="Edge information">
+    <span class="small text-muted">
+      <p>
+        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+        This Edge endpoint is associated to an Edge environment.
+      </p>
+      <p>
+        Edge key: <code>{{ endpoint.EdgeKey }}</code>
+      </p>
+      <p>
+        Edge identifier: <code>{{ endpoint.EdgeID }}</code>
+      </p>
+    </span>
+   </information-panel>
+  <information-panel ng-if="endpoint.Type === 4 && !endpoint.EdgeID" title-text="Deploy an agent">
     <span class="small text-muted">
       <p>
         <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -21,6 +39,7 @@
               -v /:/host \
               --restart always \
               -e EDGE=1 \
+              -e EDGE_ID={{ randomEdgeID }} \
               -e CAP_HOST_MANAGEMENT=1 \
               -p 8000:80 \
               -v portainer_agent_data:/data \
@@ -40,6 +59,7 @@
               --network portainer_agent_network \
               -e AGENT_CLUSTER_ADDR=tasks.portainer_edge_agent \
               -e EDGE=1 \
+              -e EDGE_ID={{ randomEdgeID }} \
               -e CAP_HOST_MANAGEMENT=1 \
               --mode global \
               --publish mode=host,published=8000,target=80 \

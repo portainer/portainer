@@ -34,6 +34,24 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusInternalServerError, "Status unavailable for non Edge agent endpoints", errors.New("Status unavailable")}
 	}
 
+	edgeIdentifier := r.Header.Get(portainer.PortainerAgentEdgeIDHeader)
+	if edgeIdentifier == "" {
+		return &httperror.HandlerError{http.StatusForbidden, "Missing Edge identifier", errors.New("missing Edge identifier")}
+	}
+
+	if endpoint.EdgeID != "" && endpoint.EdgeID != edgeIdentifier {
+		return &httperror.HandlerError{http.StatusForbidden, "Invalid Edge identifier", errors.New("invalid Edge identifier")}
+	}
+
+	if endpoint.EdgeID == "" {
+		endpoint.EdgeID = edgeIdentifier
+
+		err := handler.EndpointService.UpdateEndpoint(endpoint.ID, endpoint)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to Unable to persist endpoint changes inside the database", err}
+		}
+	}
+
 	state, port, schedules := handler.ReverseTunnelService.GetTunnelState(endpoint.ID)
 
 	statusResponse := endpointStatusInspectResponse{

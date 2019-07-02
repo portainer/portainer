@@ -252,6 +252,7 @@ type (
 		Snapshots          []Snapshot          `json:"Snapshots"`
 		UserAccessPolicies UserAccessPolicies  `json:"UserAccessPolicies"`
 		TeamAccessPolicies TeamAccessPolicies  `json:"TeamAccessPolicies"`
+		EdgeID             string              `json:"EdgeID,omitempty"`
 		EdgeKey            string              `json:"EdgeKey"`
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
@@ -891,6 +892,8 @@ const (
 	ExtensionDefinitionsURL = AssetsServerURL + "/extensions-1.21.0.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response
 	PortainerAgentHeader = "Portainer-Agent"
+	// PortainerAgentEdgeIDHeader represent the name of the header containing the Edge ID associated to an agent/agent cluster
+	PortainerAgentEdgeIDHeader = "X-PortainerAgent-EdgeID"
 	// PortainerAgentTargetHeader represent the name of the header containing the target node name
 	PortainerAgentTargetHeader = "X-PortainerAgent-Target"
 	// PortainerAgentSignatureHeader represent the name of the header containing the digital signature
