@@ -347,7 +347,6 @@ type (
 		ID             ScheduleID `json:"Id"`
 		CronExpression string     `json:"CronExpression"`
 		Script         string     `json:"Script"`
-		ScriptHash     []byte     `json:"ScriptHash"`
 		// TODO: this should not be exposed when retrieved by the agent
 		Endpoints []EndpointID `json:"Endpoints"`
 	}

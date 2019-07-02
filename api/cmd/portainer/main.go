@@ -197,7 +197,7 @@ func loadEndpointSyncSystemSchedule(jobScheduler portainer.JobScheduler, schedul
 	return scheduleService.CreateSchedule(endpointSyncSchedule)
 }
 
-func loadSchedulesFromDatabase(jobScheduler portainer.JobScheduler, jobService portainer.JobService, scheduleService portainer.ScheduleService, endpointService portainer.EndpointService, fileService portainer.FileService) error {
+func loadSchedulesFromDatabase(jobScheduler portainer.JobScheduler, jobService portainer.JobService, scheduleService portainer.ScheduleService, endpointService portainer.EndpointService, fileService portainer.FileService, reverseTunnelService portainer.ReverseTunnelService) error {
 	schedules, err := scheduleService.Schedules()
 	if err != nil {
 		return err
@@ -214,6 +214,13 @@ func loadSchedulesFromDatabase(jobScheduler portainer.JobScheduler, jobService p
 				return err
 			}
 		}
+
+		if schedule.EdgeSchedule != nil {
+			for _, endpointID := range schedule.EdgeSchedule.Endpoints {
+				reverseTunnelService.AddSchedule(endpointID, schedule.EdgeSchedule)
+			}
+		}
+
 	}
 
 	return nil
@@ -569,9 +576,15 @@ func main() {
 		log.Fatal(err)
 	}
 
+	var reverseTunnelService portainer.ReverseTunnelService = chisel.NewService(store.EndpointService, snapshotter)
+	err = reverseTunnelService.StartTunnelServer(*flags.TunnelAddr, *flags.TunnelPort)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	jobScheduler := initJobScheduler()
 
-	err = loadSchedulesFromDatabase(jobScheduler, jobService, store.ScheduleService, store.EndpointService, fileService)
+	err = loadSchedulesFromDatabase(jobScheduler, jobService, store.ScheduleService, store.EndpointService, fileService, reverseTunnelService)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -657,12 +670,6 @@ func main() {
 
 	if !*flags.NoAuth {
 		go terminateIfNoAdminCreated(store.UserService)
-	}
-
-	var reverseTunnelService portainer.ReverseTunnelService = chisel.NewService(store.EndpointService, snapshotter)
-	err = reverseTunnelService.StartTunnelServer(*flags.TunnelAddr, *flags.TunnelPort)
-	if err != nil {
-		log.Fatal(err)
 	}
 
 	var server portainer.Server = &http.Server{

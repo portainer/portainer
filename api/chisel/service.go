@@ -35,12 +35,6 @@ type Service struct {
 	tunnelStatusMap   cmap.ConcurrentMap
 	endpointService   portainer.EndpointService
 	snapshotter       portainer.Snapshotter
-	//allocatedPorts    cmap.ConcurrentMap
-	// endpoint | status | port
-	// ID1: IDLE
-	// ID2 (NOTFOUND) = IDLE
-	// ID3: REQUIRED, PORT: xxxx
-	// ID4: ACTIVE, PORT: xxxx
 }
 
 func NewService(endpointService portainer.EndpointService, snapshotter portainer.Snapshotter) *Service {
@@ -48,7 +42,6 @@ func NewService(endpointService portainer.EndpointService, snapshotter portainer
 		tunnelStatusMap: cmap.New(),
 		endpointService: endpointService,
 		snapshotter:     snapshotter,
-		//allocatedPorts: cmap.New(),
 	}
 }
 
@@ -204,6 +197,8 @@ func (service *Service) UpdateTunnelState(endpointID portainer.EndpointID, state
 
 	service.tunnelStatusMap.Set(key, tunnelStatus)
 }
+
+// TODO: remove debug
 
 func (service *Service) ResetTunnelActivityTimer(endpointID portainer.EndpointID) {
 	key := strconv.Itoa(int(endpointID))
