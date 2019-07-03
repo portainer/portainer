@@ -1,6 +1,7 @@
 package schedules
 
 import (
+	"encoding/base64"
 	"errors"
 	"net/http"
 	"strconv"
@@ -58,7 +59,15 @@ func (handler *Handler) scheduleUpdate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a schedule with the specified identifier inside the database", err}
 	}
 
-	updateJobSchedule := updateSchedule(schedule, &payload)
+	updateJobSchedule := false
+	if schedule.EdgeSchedule != nil {
+		err := handler.updateEdgeSchedule(schedule, &payload)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update Edge schedule", err}
+		}
+	} else {
+		updateJobSchedule = updateSchedule(schedule, &payload)
+	}
 
 	if payload.FileContent != nil {
 		_, err := handler.FileService.StoreScheduledJobFileFromBytes(strconv.Itoa(scheduleID), []byte(*payload.FileContent))
@@ -83,6 +92,44 @@ func (handler *Handler) scheduleUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	return response.JSON(w, schedule)
+}
+
+func (handler *Handler) updateEdgeSchedule(schedule *portainer.Schedule, payload *scheduleUpdatePayload) error {
+	if payload.Name != nil {
+		schedule.Name = *payload.Name
+	}
+
+	if payload.Endpoints != nil {
+
+		edgeEndpointIDs := make([]portainer.EndpointID, 0)
+
+		for _, ID := range payload.Endpoints {
+			endpoint, err := handler.EndpointService.Endpoint(ID)
+			if err != nil {
+				return err
+			}
+
+			if endpoint.Type == portainer.EdgeAgentEnvironment {
+				edgeEndpointIDs = append(edgeEndpointIDs, endpoint.ID)
+			}
+		}
+
+		schedule.EdgeSchedule.Endpoints = edgeEndpointIDs
+	}
+
+	if payload.CronExpression != nil {
+		schedule.EdgeSchedule.CronExpression = *payload.CronExpression
+	}
+
+	if payload.FileContent != nil {
+		schedule.EdgeSchedule.Script = base64.RawStdEncoding.EncodeToString([]byte(*payload.FileContent))
+	}
+
+	for _, endpointID := range schedule.EdgeSchedule.Endpoints {
+		handler.ReverseTunnelService.AddSchedule(endpointID, schedule.EdgeSchedule)
+	}
+
+	return nil
 }
 
 func updateSchedule(schedule *portainer.Schedule, payload *scheduleUpdatePayload) bool {

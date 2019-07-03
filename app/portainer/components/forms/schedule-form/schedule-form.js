@@ -25,7 +25,7 @@ angular.module('portainer.app').component('scheduleForm', {
     ctrl.formValues = {
       datetime: ctrl.model.CronExpression ? cronToDatetime(ctrl.model.CronExpression) : moment(),
       scheduleValue: ctrl.scheduleValues[0],
-      cronMethod: 'basic'
+      cronMethod: ctrl.model.Recurring ? 'advanced' : 'basic'
     };
 
     function cronToDatetime(cron) {

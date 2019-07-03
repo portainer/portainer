@@ -225,7 +225,21 @@ func (service *Service) AddSchedule(endpointID portainer.EndpointID, schedule *p
 	item, ok := service.tunnelStatusMap.Get(key)
 	if ok {
 		tunnelStatus = item.(TunnelStatus)
-		tunnelStatus.schedules = append(tunnelStatus.schedules, *schedule)
+
+		existingScheduleIndex := -1
+		for idx, existingSchedule := range tunnelStatus.schedules {
+			if existingSchedule.ID == schedule.ID {
+				existingScheduleIndex = idx
+				break
+			}
+		}
+
+		if existingScheduleIndex == -1 {
+			tunnelStatus.schedules = append(tunnelStatus.schedules, *schedule)
+		} else {
+			tunnelStatus.schedules[existingScheduleIndex] = *schedule
+		}
+
 	} else {
 		tunnelStatus = TunnelStatus{state: portainer.EdgeAgentIdle, schedules: []portainer.EdgeSchedule{*schedule}}
 	}

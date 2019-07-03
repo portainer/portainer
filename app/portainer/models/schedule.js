@@ -27,13 +27,18 @@ export function ScheduleModel(data) {
   this.Created = data.Created;
   this.EdgeSchedule = data.EdgeSchedule;
   if (this.JobType === 1) {
-    this.Job = new ScriptExecutionJobModel(data.ScriptExecutionJob, data.EdgeSchedule.Endpoints);
+    this.Job = new ScriptExecutionJobModel(data.ScriptExecutionJob, data.EdgeSchedule);
   }
 }
 
-function ScriptExecutionJobModel(data, edgeEndpoints) {
+function ScriptExecutionJobModel(data, edgeSchedule) {
   this.Image = data.Image;
-  this.Endpoints = _.concat(data.Endpoints, edgeEndpoints);
+  this.Endpoints = data.Endpoints;
+
+  if (edgeSchedule !== null) {
+    this.Endpoints = _.concat(data.Endpoints, edgeSchedule.Endpoints);
+  }
+
   this.FileContent = '';
   this.Method = 'editor';
   this.RetryCount = data.RetryCount;
