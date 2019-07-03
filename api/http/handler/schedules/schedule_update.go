@@ -119,10 +119,12 @@ func (handler *Handler) updateEdgeSchedule(schedule *portainer.Schedule, payload
 
 	if payload.CronExpression != nil {
 		schedule.EdgeSchedule.CronExpression = *payload.CronExpression
+		schedule.EdgeSchedule.Version++
 	}
 
 	if payload.FileContent != nil {
 		schedule.EdgeSchedule.Script = base64.RawStdEncoding.EncodeToString([]byte(*payload.FileContent))
+		schedule.EdgeSchedule.Version++
 	}
 
 	for _, endpointID := range schedule.EdgeSchedule.Endpoints {

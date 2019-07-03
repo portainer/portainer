@@ -342,13 +342,13 @@ type (
 		EndpointSyncJob    *EndpointSyncJob
 	}
 
-	// TODO: doc
+	// EdgeSchedule represents a scheduled job that can run on Edge environments.
 	EdgeSchedule struct {
-		ID             ScheduleID `json:"Id"`
-		CronExpression string     `json:"CronExpression"`
-		Script         string     `json:"Script"`
-		// TODO: this should not be exposed when retrieved by the agent
-		Endpoints []EndpointID `json:"Endpoints"`
+		ID             ScheduleID   `json:"Id"`
+		CronExpression string       `json:"CronExpression"`
+		Script         string       `json:"Script"`
+		Version        int          `json:"Version"`
+		Endpoints      []EndpointID `json:"Endpoints"`
 	}
 
 	// WebhookID represents a webhook identifier.

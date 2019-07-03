@@ -251,6 +251,7 @@ func (handler *Handler) addAndPersistSchedule(schedule *portainer.Schedule, file
 			CronExpression: strings.Join(edgeCronExpression, " "),
 			Script:         base64.RawStdEncoding.EncodeToString(file),
 			Endpoints:      edgeEndpointIDs,
+			Version:        1,
 		}
 
 		for _, endpointID := range edgeEndpointIDs {
