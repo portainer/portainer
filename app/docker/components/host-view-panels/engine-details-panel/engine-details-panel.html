@@ -29,6 +29,10 @@
               <td>Network Plugins</td>
               <td>{{ $ctrl.engine.networkPlugins | arraytostr: ', ' }}</td>
             </tr>
+            <tr ng-if="$ctrl.engine.engineLabels.length">
+              <td>Engine Labels</td>
+              <td>{{ $ctrl.engine.engineLabels | labelsToStr:', ' }}</td>
+            </tr>
           </tbody>
         </table>
       </rd-widget-body>
