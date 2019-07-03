@@ -60,6 +60,7 @@ func (p *proxyTransport) RoundTrip(request *http.Request) (*http.Response, error
 
 func (p *proxyTransport) executeDockerRequest(request *http.Request) (*http.Response, error) {
 	response, err := p.dockerTransport.RoundTrip(request)
+
 	if err == nil {
 		p.ReverseTunnelService.ResetTunnelActivityTimer(p.endpointIdentifier)
 	} else {
