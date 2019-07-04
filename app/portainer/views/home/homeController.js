@@ -81,56 +81,18 @@ angular.module('portainer.app')
           });
       }
 
-      // TODO: refactor?
-      // remove $interval if not needed anymore
       function switchToEdgeEndpoint(endpoint) {
-
-        // let connectionAttempts = 0;
-        // let maxConnectionAttempts = 5;
-
         $scope.state.connectingToEdgeEndpoint = true;
         SystemService.ping(endpoint.Id)
           .then(function success() {
             endpoint.Status = 1;
-            // switchToDockerEndpoint(endpoint);
           })
           .catch(function error() {
             endpoint.Status = 2;
-            // Notifications.error('Failure', {}, 'Unable to connect to Edge endpoint');
           })
           .finally(function final() {
-            $scope.state.connectingToEdgeEndpoint = false;
             switchToDockerEndpoint(endpoint);
           });
-
-
-        // $scope.state.connectingToEdgeEndpoint = true;
-        // SystemService.shortPing(endpoint.Id)
-        //   .then(function success() {
-        //     $scope.state.connectingToEdgeEndpoint = false;
-        //     endpoint.Status = 1;
-        //     switchToDockerEndpoint(endpoint);
-        //   })
-        //   .catch(function error() {
-        //     connectionAttempts++;
-        //     let repeater = $interval(function() {
-        //       SystemService.shortPing(endpoint.Id)
-        //         .then(function success() {
-        //           $interval.cancel(repeater);
-        //           $scope.state.connectingToEdgeEndpoint = false;
-        //           endpoint.Status = 1;
-        //           switchToDockerEndpoint(endpoint);
-        //         })
-        //         .catch(function error() {
-        //           connectionAttempts++;
-        //           if (connectionAttempts === maxConnectionAttempts) {
-        //             $interval.cancel(repeater);
-        //             Notifications.error('Failure', {}, 'Unable to connect to Edge endpoint');
-        //             $scope.state.connectingToEdgeEndpoint = false;
-        //           }
-        //         })
-        //     }, 3000, 5, false);
-        //   });
       }
 
 
@@ -156,6 +118,9 @@ angular.module('portainer.app')
           })
           .catch(function error(err) {
             Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
+          })
+          .finally(function final() {
+            $scope.state.connectingToEdgeEndpoint = false;
           });
       }
 
