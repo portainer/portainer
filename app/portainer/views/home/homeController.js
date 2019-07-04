@@ -98,9 +98,11 @@ angular.module('portainer.app')
 
       function switchToDockerEndpoint(endpoint) {
         if (endpoint.Status === 2 && endpoint.Snapshots[0] && endpoint.Snapshots[0].Swarm === true) {
+          $scope.state.connectingToEdgeEndpoint = false;
           Notifications.error('Failure', '', 'Endpoint is unreachable. Connect to another swarm manager.');
           return;
         } else if (endpoint.Status === 2 && !endpoint.Snapshots[0]) {
+          $scope.state.connectingToEdgeEndpoint = false;
           Notifications.error('Failure', '', 'Endpoint is unreachable and there is no snapshot available for offline browsing.');
           return;
         }
