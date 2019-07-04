@@ -70,12 +70,12 @@ func initStore(dataStorePath string, fileService portainer.FileService) *bolt.St
 	return store
 }
 
-func initComposeStackManager(dataStorePath string) portainer.ComposeStackManager {
-	return libcompose.NewComposeStackManager(dataStorePath)
+func initComposeStackManager(dataStorePath string, reverseTunnelService portainer.ReverseTunnelService) portainer.ComposeStackManager {
+	return libcompose.NewComposeStackManager(dataStorePath, reverseTunnelService)
 }
 
-func initSwarmStackManager(assetsPath string, dataStorePath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService) (portainer.SwarmStackManager, error) {
-	return exec.NewSwarmStackManager(assetsPath, dataStorePath, signatureService, fileService)
+func initSwarmStackManager(assetsPath string, dataStorePath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService, reverseTunnelService portainer.ReverseTunnelService) (portainer.SwarmStackManager, error) {
+	return exec.NewSwarmStackManager(assetsPath, dataStorePath, signatureService, fileService, reverseTunnelService)
 }
 
 func initJWTService(authenticationEnabled bool) portainer.JWTService {
@@ -563,12 +563,12 @@ func main() {
 		endpointManagement = false
 	}
 
-	swarmStackManager, err := initSwarmStackManager(*flags.Assets, *flags.Data, digitalSignatureService, fileService)
+	swarmStackManager, err := initSwarmStackManager(*flags.Assets, *flags.Data, digitalSignatureService, fileService, reverseTunnelService)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	composeStackManager := initComposeStackManager(*flags.Data)
+	composeStackManager := initComposeStackManager(*flags.Data, reverseTunnelService)
 
 	err = initTemplates(store.TemplateService, fileService, *flags.Templates, *flags.TemplateFile)
 	if err != nil {
