@@ -117,7 +117,8 @@ function ($scope, $state, ImageService, Notifications, ModalService, HttpRequest
 
   $scope.offlineMode = false;
 
-  function initView() {
+  $scope.getImages = getImages;
+  function getImages() {
     ImageService.images(true)
     .then(function success(data) {
       $scope.images = data;
@@ -127,6 +128,10 @@ function ($scope, $state, ImageService, Notifications, ModalService, HttpRequest
       Notifications.error('Failure', err, 'Unable to retrieve images');
       $scope.images = [];
     });
+  }
+
+  function initView() {
+    getImages();
   }
 
   initView();

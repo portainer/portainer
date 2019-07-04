@@ -9,6 +9,7 @@ angular.module('portainer.docker').component('nodesDatatable', {
     orderBy: '@',
     reverseOrder: '<',
     showIpAddressColumn: '<',
-    accessToNodeDetails: '<'
+    accessToNodeDetails: '<',
+    refreshCallback: '<'
   }
 });

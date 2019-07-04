@@ -23,7 +23,9 @@ function ($scope, $state, SecretService, Notifications) {
     });
   };
 
-  function initView() {
+  $scope.getSecrets = getSecrets;
+
+  function getSecrets() {
     SecretService.secrets()
     .then(function success(data) {
       $scope.secrets = data;
@@ -32,6 +34,10 @@ function ($scope, $state, SecretService, Notifications) {
       $scope.secrets = [];
       Notifications.error('Failure', err, 'Unable to retrieve secrets');
     });
+  }
+
+  function initView() {
+    getSecrets();
   }
 
   initView();

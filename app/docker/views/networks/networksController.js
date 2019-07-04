@@ -26,7 +26,9 @@ function ($scope, $state, NetworkService, Notifications, HttpRequestHelper, Endp
 
   $scope.offlineMode = false;
 
-  function initView() {
+  $scope.getNetworks = getNetworks;
+
+  function getNetworks() {
     NetworkService.networks(true, true, true)
     .then(function success(data) {
       $scope.networks = data;
@@ -36,6 +38,10 @@ function ($scope, $state, NetworkService, Notifications, HttpRequestHelper, Endp
       $scope.networks = [];
       Notifications.error('Failure', err, 'Unable to retrieve networks');
     });
+  }
+
+  function initView() {
+    getNetworks();
   }
 
   initView();

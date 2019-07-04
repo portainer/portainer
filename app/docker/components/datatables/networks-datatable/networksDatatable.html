@@ -5,6 +5,44 @@
         <div class="toolBarTitle">
           <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }}
         </div>
+        <div class="settings">
+          <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
+            <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> Settings</span>
+            <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
+              <div class="tableMenu">
+                <div class="menuHeader">
+                  Table settings
+                </div>
+                <div class="menuContent">
+                  <div>
+                    <div class="md-checkbox">
+                      <input id="setting_auto_refresh" type="checkbox" ng-model="$ctrl.settings.repeater.autoRefresh" ng-change="$ctrl.onSettingsRepeaterChange()"/>
+                      <label for="setting_auto_refresh">Auto refresh</label>
+                    </div>
+                    <div ng-if="$ctrl.settings.repeater.autoRefresh">
+                      <label for="settings_refresh_rate">
+                        Refresh rate
+                      </label>
+                      <select id="settings_refresh_rate" ng-model="$ctrl.settings.repeater.refreshRate" ng-change="$ctrl.onSettingsRepeaterChange()" class="small-select">
+                        <option value="10">10s</option>
+                        <option value="30">30s</option>
+                        <option value="60">1min</option>
+                        <option value="120">2min</option>
+                        <option value="300">5min</option>
+                      </select>
+                      <span>
+                        <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-top: 7px; display: none;"></i>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.settings.open = false;">Close</a>
+                </div>
+              </div>
+            </div>
+          </span>
+        </div>
       </div>
       <div class="actionBar" ng-if="!$ctrl.offlineMode" authorization="DockerNetworkDelete, DockerNetworkCreate">
         <button type="button" class="btn btn-sm btn-danger" authorization="DockerNetworkDelete"
