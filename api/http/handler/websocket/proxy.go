@@ -27,6 +27,8 @@ func (handler *Handler) proxyWebsocketRequest(w http.ResponseWriter, r *http.Req
 			out.Set(portainer.PortainerAgentTargetHeader, params.nodeName)
 		}
 
+		handler.ReverseTunnelService.UpdateTunnelState(params.endpoint.ID, portainer.EdgeAgentActive)
+
 		proxy.ServeHTTP(w, r)
 		return nil
 	}

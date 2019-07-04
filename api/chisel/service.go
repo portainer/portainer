@@ -205,7 +205,7 @@ func (service *Service) UpdateTunnelState(endpointID portainer.EndpointID, state
 	item, ok := service.tunnelStatusMap.Get(key)
 	if ok {
 		tunnelStatus = item.(TunnelStatus)
-		if tunnelStatus.state != state {
+		if tunnelStatus.state != state || (tunnelStatus.state == portainer.EdgeAgentActive && state == portainer.EdgeAgentActive) {
 			tunnelStatus.lastActivity = time.Now()
 		}
 		tunnelStatus.state = state
