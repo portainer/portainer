@@ -26,10 +26,6 @@ angular.module('portainer.docker')
     return SystemEndpoint.ping({endpointId: endpointId}).$promise;
   };
 
-  service.shortPing = function(endpointId) {
-    return SystemEndpoint.shortPing({endpointId: endpointId}).$promise;
-  };
-
   service.version = function() {
     return System.version({}).$promise;
   };

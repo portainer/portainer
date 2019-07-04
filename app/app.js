@@ -1,8 +1,8 @@
 import _ from 'lodash-es';
 
 angular.module('portainer')
-.run(['$rootScope', '$state', 'Authentication', 'authManager', 'StateManager', 'EndpointProvider', 'Notifications', 'Analytics', 'cfpLoadingBar', '$transitions', 'HttpRequestHelper',
-function ($rootScope, $state, Authentication, authManager, StateManager, EndpointProvider, Notifications, Analytics, cfpLoadingBar, $transitions, HttpRequestHelper) {
+.run(['$rootScope', '$state', '$interval', 'Authentication', 'authManager', 'StateManager', 'EndpointProvider', 'Notifications', 'Analytics', 'SystemService', 'cfpLoadingBar', '$transitions', 'HttpRequestHelper',
+function ($rootScope, $state, $interval, Authentication, authManager, StateManager, EndpointProvider, Notifications, Analytics, SystemService, cfpLoadingBar, $transitions, HttpRequestHelper) {
   'use strict';
 
   EndpointProvider.initialize();
@@ -34,8 +34,20 @@ function ($rootScope, $state, Authentication, authManager, StateManager, Endpoin
   $transitions.onBefore({}, function() {
     HttpRequestHelper.resetAgentHeaders();
   });
+
+  // Keep-alive Edge endpoints by sending a ping request every minute
+  $interval(function() {
+    ping(EndpointProvider, SystemService);
+  }, 60 * 1000)
+
 }]);
 
+function ping(EndpointProvider, SystemService) {
+  let endpoint = EndpointProvider.currentEndpoint();
+  if (endpoint !== undefined && endpoint.Type === 4) {
+    SystemService.ping(endpoint.Id);
+  }
+}
 
 function initAuthentication(authManager, Authentication, $rootScope, $state) {
   authManager.checkAuthOnRefresh();
