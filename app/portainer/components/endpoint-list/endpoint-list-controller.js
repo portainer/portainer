@@ -1,11 +1,12 @@
 import _ from 'lodash-es';
 
-angular.module('portainer.app').controller('EndpointListController', ['DatatableService',
-  function EndpointListController(DatatableService) {
+angular.module('portainer.app').controller('EndpointListController', ['DatatableService', 'PaginationService',
+  function EndpointListController(DatatableService, PaginationService) {
     var ctrl = this;
     ctrl.state = {
       textFilter: '',
-      filteredEndpoints: []
+      filteredEndpoints: [],
+      paginatedItemLimit: '10'
     };
 
     ctrl.$onChanges = $onChanges;
@@ -58,12 +59,17 @@ angular.module('portainer.app').controller('EndpointListController', ['Datatable
       });
     }
 
+    this.changePaginationLimit = function() {
+      PaginationService.setPaginationLimit(this.tableKey, this.state.paginatedItemLimit);
+    };
+
     function convertStatusToString(status) {
       return status === 1 ? 'up' : 'down';
     }
 
     function $onInit() {
       var textFilter = DatatableService.getDataTableTextFilters(ctrl.tableKey);
+      this.state.paginatedItemLimit = PaginationService.getPaginationLimit(this.tableKey);
       if (textFilter !== null) {
         ctrl.state.textFilter = textFilter;
         onTextFilterChange();
