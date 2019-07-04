@@ -222,7 +222,7 @@ type (
 	// DeploymentKey represents the SSH key details that will be used to
 	// connect to GitHub for deployments based on private key clone
 	DeploymentKey struct {
-		ID         DeploymentKeyID `json:"Id`
+		ID         DeploymentKeyID `json:"Id"`
 		Name       string          `json:"Name"`
 		PublicKey  string          `json:"PublicKey"`
 		PrivateKey []byte          `json:"PrivateKey"`

@@ -46,6 +46,8 @@ func cloneRepository(repositoryURL, referenceName string, destination string) er
 	return err
 }
 
+// ClonePrivateRepositoryWithDeploymentKey clones a private git repository using the specified URL in the specified
+// destination folder. It will use the specified deployment key for SSH based authentication
 func (service *Service) ClonePrivateRepositoryWithDeploymentKey(repositoryURL, referenceName string, destination string, privateKeyPem []byte) error {
 	signer, _ := ssh.ParsePrivateKey(privateKeyPem)
 	auth := &gitSsh.PublicKeys{
