@@ -11,10 +11,8 @@ import (
 	"github.com/portainer/portainer/api"
 )
 
+// TODO: Edge handling (refactor?)
 func (handler *Handler) proxyWebsocketRequest(w http.ResponseWriter, r *http.Request, params *webSocketRequestParams) error {
-	// TODO: retrieve correct host/port combo for Edge agent
-	// works now, refactor?
-
 	if params.endpoint.Type == portainer.EdgeAgentEnvironment {
 		_, port, _ := handler.ReverseTunnelService.GetTunnelState(params.endpoint.ID)
 		endpointURL, err := url.Parse(fmt.Sprintf("http://localhost:%d", port))
@@ -24,6 +22,11 @@ func (handler *Handler) proxyWebsocketRequest(w http.ResponseWriter, r *http.Req
 
 		endpointURL.Scheme = "ws"
 		proxy := websocketproxy.NewProxy(endpointURL)
+
+		proxy.Director = func(incoming *http.Request, out http.Header) {
+			out.Set(portainer.PortainerAgentTargetHeader, params.nodeName)
+		}
+
 		proxy.ServeHTTP(w, r)
 		return nil
 	}
