@@ -1053,8 +1053,8 @@ const (
 const (
 	EdgeAgentIdle               string = "IDLE"
 	EdgeAgentManagementRequired string = "REQUIRED"
-	EdgeAgentStandby            string = "STANDBY"
-	EdgeAgentActive             string = "ACTIVE"
+	//EdgeAgentStandby            string = "STANDBY"
+	EdgeAgentActive string = "ACTIVE"
 )
 
 const (
