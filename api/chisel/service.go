@@ -18,13 +18,17 @@ const (
 	minAvailablePort = 49152
 	maxAvailablePort = 65535
 	// TODO: configurable? change defaults?
-	inactivityTimerDuration = 5 * time.Minute
-	tunnelCleanupInterval   = 10 * time.Second
+	tunnelCleanupInterval = 10 * time.Second
+	standbyTimeout        = 10 * time.Second
+	requiredTimeout       = 10 * time.Second
+	activeTimeout         = 5 * time.Minute
 )
 
 type TunnelStatus struct {
-	state        string
-	port         int
+	// TODO: rename to status
+	state string
+	port  int
+	// TODO: rename to timer or something else
 	lastActivity time.Time
 	schedules    []portainer.EdgeSchedule
 }
@@ -90,12 +94,30 @@ func (service *Service) tunnelCleanup() {
 		case <-ticker.C:
 			for item := range service.tunnelStatusMap.IterBuffered() {
 				tunnelStatus := item.Val.(TunnelStatus)
-				if tunnelStatus.lastActivity.IsZero() || tunnelStatus.state != portainer.EdgeAgentActive {
+
+				if tunnelStatus.lastActivity.IsZero() || tunnelStatus.state == portainer.EdgeAgentIdle {
 					continue
 				}
 
 				elapsed := time.Since(tunnelStatus.lastActivity)
-				if elapsed.Seconds() > time.Duration(inactivityTimerDuration).Seconds() {
+
+				log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [message: endpoint tunnel monitoring]", item.Key, tunnelStatus.state, elapsed.Seconds())
+
+				if tunnelStatus.state == portainer.EdgeAgentStandby && elapsed.Seconds() < standbyTimeout.Seconds() {
+					continue
+				} else if tunnelStatus.state == portainer.EdgeAgentStandby && elapsed.Seconds() > standbyTimeout.Seconds() {
+					log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [timeout_seconds: %f] [message: STANDBY state timeout exceeded]", item.Key, tunnelStatus.state, elapsed.Seconds(), standbyTimeout.Seconds())
+				}
+
+				if tunnelStatus.state == portainer.EdgeAgentManagementRequired && elapsed.Seconds() < requiredTimeout.Seconds() {
+					continue
+				} else if tunnelStatus.state == portainer.EdgeAgentManagementRequired && elapsed.Seconds() > requiredTimeout.Seconds() {
+					log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [timeout_seconds: %f] [message: REQUIRED state timeout exceeded]", item.Key, tunnelStatus.state, elapsed.Seconds(), requiredTimeout.Seconds())
+				}
+
+				if tunnelStatus.state == portainer.EdgeAgentActive && elapsed.Seconds() > activeTimeout.Seconds() {
+
+					log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [timeout_seconds: %f] [message: ACTIVE state timeout exceeded. Triggering snapshot]", item.Key, tunnelStatus.state, elapsed.Seconds(), activeTimeout.Seconds())
 
 					endpointID, err := strconv.Atoi(item.Key)
 					if err != nil {
@@ -123,7 +145,6 @@ func (service *Service) tunnelCleanup() {
 								log.Printf("[ERROR] [db] Unable to persist snapshot for Edge endpoint (id: %s): %s", item.Key, err)
 							}
 						}
-
 					}
 
 					// TODO: to avoid iteration in a mega map and to keep that map
@@ -136,7 +157,8 @@ func (service *Service) tunnelCleanup() {
 
 					tunnelStatus.state = portainer.EdgeAgentIdle
 					tunnelStatus.port = 0
-					log.Printf("[DEBUG] #1 TAG ENDPOINT TUNNEL AS: %s | %d", tunnelStatus.state, tunnelStatus.port)
+					tunnelStatus.lastActivity = time.Now()
+					log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [message: updating tunnel status]", item.Key, tunnelStatus.state)
 					service.tunnelStatusMap.Set(item.Key, tunnelStatus)
 				}
 			}
@@ -188,6 +210,9 @@ func (service *Service) UpdateTunnelState(endpointID portainer.EndpointID, state
 	item, ok := service.tunnelStatusMap.Get(key)
 	if ok {
 		tunnelStatus = item.(TunnelStatus)
+		if tunnelStatus.state != state {
+			tunnelStatus.lastActivity = time.Now()
+		}
 		tunnelStatus.state = state
 	} else {
 		tunnelStatus = TunnelStatus{state: state, schedules: []portainer.EdgeSchedule{}}
@@ -197,12 +222,10 @@ func (service *Service) UpdateTunnelState(endpointID portainer.EndpointID, state
 		tunnelStatus.port = service.getUnusedPort()
 	}
 
-	log.Printf("[DEBUG] #2 TAG ENDPOINT TUNNEL AS: %s | %d", tunnelStatus.state, tunnelStatus.port)
+	log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [message: updating tunnel status]", key, tunnelStatus.state, time.Since(tunnelStatus.lastActivity).Seconds())
 
 	service.tunnelStatusMap.Set(key, tunnelStatus)
 }
-
-// TODO: remove debug
 
 func (service *Service) ResetTunnelActivityTimer(endpointID portainer.EndpointID) {
 	key := strconv.Itoa(int(endpointID))
@@ -211,10 +234,10 @@ func (service *Service) ResetTunnelActivityTimer(endpointID portainer.EndpointID
 	item, ok := service.tunnelStatusMap.Get(key)
 	if ok {
 		tunnelStatus = item.(TunnelStatus)
-		tunnelStatus.state = portainer.EdgeAgentActive
+		//tunnelStatus.state = portainer.EdgeAgentActive
 		tunnelStatus.lastActivity = time.Now()
 		service.tunnelStatusMap.Set(key, tunnelStatus)
-		log.Printf("[DEBUG] #3 TAG ENDPOINT TUNNEL AS: %s | %d", tunnelStatus.state, tunnelStatus.port)
+		log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [message: updating tunnel status timer]", key, tunnelStatus.state, time.Since(tunnelStatus.lastActivity).Seconds())
 	}
 }
 

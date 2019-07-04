@@ -62,7 +62,8 @@ func (p *proxyTransport) executeDockerRequest(request *http.Request) (*http.Resp
 	response, err := p.dockerTransport.RoundTrip(request)
 
 	if err == nil {
-		p.ReverseTunnelService.ResetTunnelActivityTimer(p.endpointIdentifier)
+		p.ReverseTunnelService.UpdateTunnelState(p.endpointIdentifier, portainer.EdgeAgentActive)
+		//p.ReverseTunnelService.ResetTunnelActivityTimer(p.endpointIdentifier)
 	} else {
 		state, _, _ := p.ReverseTunnelService.GetTunnelState(p.endpointIdentifier)
 		if state == portainer.EdgeAgentActive {
