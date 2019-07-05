@@ -18,16 +18,17 @@
         <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
         Portainer needs to retrieve additional information to enable <code>tags modifications (addition, removal, rename)</code> and <code>repository removal</code> features.<br>
         As this repository contains more than <code>{{ state.tagsRetrieval.limit }}</code> tags, the additional retrieval wasn't started automatically.<br>
-        Note: on very huge repositories the process can take a long time. Once started you can still navigate on this view. <br>
-        Leaving this view will cancel the retrieval process.
+        Once started you can still navigate this page, leaving the page will cancel the retrieval process.<br>
+        <br>
+        <span style="font-weight: 700">Note:</span> on very large repositories the retrieval process can take a few minutes.
       </p>
       <button class="btn btn-sm btn-primary" ng-if="!state.tagsRetrieval.running && short.Tags.length === 0"
         ng-click="startStopRetrieval()">Start</button>
       <button class="btn btn-sm btn-danger" ng-if="state.tagsRetrieval.running && state.tagsRetrieval.progression !== repository.Tags.length"
         ng-click="startStopRetrieval()">Cancel</button>
-      <span ng-if="state.tagsRetrieval.running || short.Tags.length !== 0">
-        Retrieval status : {{ state.tagsRetrieval.progression }} / {{ repository.Tags.length }} - {{ state.tagsRetrieval.elapsedTime / 1000 }}s
-      </span>
+    </span>
+    <span ng-if="state.tagsRetrieval.running || short.Tags.length !== 0">
+      Retrieval status : {{ state.tagsRetrieval.progression }} / {{ repository.Tags.length }} - {{ state.tagsRetrieval.elapsedTime / 1000 }}s
     </span>
   </information-panel>
 </div>
@@ -53,7 +54,7 @@
               <td>Tags count</td>
               <td>{{ repository.Tags.length }}</td>
             </tr>
-            <tr>
+            <tr ng-if="short.Images.length">
               <td>Images count</td>
               <td>{{ short.Images.length }}</td>
             </tr>
