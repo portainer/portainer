@@ -1,3 +1,12 @@
+import _ from 'lodash-es';
+
+function handleDockerHubCatalogResponse(response) {
+  if (response.results && !response.repositories) {
+    response.repositories = _.map(response.results, 'name');
+  }
+  return response;
+}
+
 export default function linkGetResponse(data, headers) {
   var response = angular.fromJson(data);
   var link = headers('link');
@@ -9,5 +18,6 @@ export default function linkGetResponse(data, headers) {
       response[kv[0]] = kv[1];
     }
   }
+  response = handleDockerHubCatalogResponse(response);
   return response;
 }
