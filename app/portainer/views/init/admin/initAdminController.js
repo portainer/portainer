@@ -42,7 +42,7 @@ function ($async, $scope, $state, Notifications, Authentication, StateManager, U
       return EndpointService.endpoints();
     })
     .then(function success(data) {
-      if (data.length === 0) {
+      if (data.value.length === 0) {
         $state.go('portainer.init.endpoint');
       } else {
         $state.go('portainer.home');

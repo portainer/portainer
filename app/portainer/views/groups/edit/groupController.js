@@ -42,8 +42,9 @@ function ($q, $scope, $state, $transition$, GroupService, EndpointService, TagSe
 
       var availableEndpoints = [];
       var associatedEndpoints = [];
-      for (var i = 0; i < data.endpoints.length; i++) {
-        var endpoint = data.endpoints[i];
+      var endpoints = data.endpoints.value;
+      for (var i = 0; i < endpoints.length; i++) {
+        var endpoint = endpoints[i];
         if (endpoint.GroupId === +groupId) {
           associatedEndpoints.push(endpoint);
         } else if (endpoint.GroupId === 1) {

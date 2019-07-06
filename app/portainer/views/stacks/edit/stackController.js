@@ -165,7 +165,7 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
     })
     .then(function success(data) {
       var stack = data.stack;
-      $scope.endpoints = data.endpoints;
+      $scope.endpoints = data.endpoints.value;
       $scope.groups = data.groups;
       $scope.stack = stack;
 

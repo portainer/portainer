@@ -39,7 +39,7 @@ function ($q, $scope, $state, GroupService, EndpointService, TagService, Notific
       tags: TagService.tagNames()
     })
     .then(function success(data) {
-      $scope.availableEndpoints = data.endpoints;
+      $scope.availableEndpoints = data.endpoints.value;
       $scope.associatedEndpoints = [];
       $scope.availableTags = data.tags;
     })

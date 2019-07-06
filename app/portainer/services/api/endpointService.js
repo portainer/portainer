@@ -8,8 +8,8 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     return Endpoints.get({id: endpointID}).$promise;
   };
 
-  service.endpoints = function() {
-    return Endpoints.query({}).$promise;
+  service.endpoints = function(start, limit, filter) {
+    return Endpoints.query({start, limit, filter}).$promise;
   };
 
   service.snapshotEndpoints = function() {
