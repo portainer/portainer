@@ -54,6 +54,48 @@ func (service *Service) DeleteEndpoint(ID portainer.EndpointID) error {
 	return internal.DeleteObject(service.db, BucketName, identifier)
 }
 
+func (service *Service) EndpointCount() (int, error) {
+	endpointCount := 0
+
+	err := service.db.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(BucketName))
+		endpointCount = bucket.Stats().KeyN
+		return nil
+	})
+
+	return endpointCount, err
+}
+
+func (service *Service) EndpointsPaginated(pos, limit int) ([]portainer.Endpoint, error) {
+	var endpoints = make([]portainer.Endpoint, 0)
+
+	err := service.db.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(BucketName))
+
+		cursorPos := internal.Itob(pos)
+
+		cursor := bucket.Cursor()
+		idx := 0
+		for k, v := cursor.Seek(cursorPos); k != nil; k, v = cursor.Next() {
+			if idx >= limit {
+				break
+			}
+
+			var endpoint portainer.Endpoint
+			err := internal.UnmarshalObject(v, &endpoint)
+			if err != nil {
+				return err
+			}
+			endpoints = append(endpoints, endpoint)
+			idx++
+		}
+
+		return nil
+	})
+
+	return endpoints, err
+}
+
 // Endpoints return an array containing all the endpoints.
 func (service *Service) Endpoints() ([]portainer.Endpoint, error) {
 	var endpoints = make([]portainer.Endpoint, 0)

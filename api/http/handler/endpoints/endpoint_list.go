@@ -2,6 +2,9 @@ package endpoints
 
 import (
 	"net/http"
+	"strconv"
+
+	"github.com/portainer/libhttp/request"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/response"
@@ -10,7 +13,24 @@ import (
 
 // GET request on /api/endpoints
 func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpoints, err := handler.EndpointService.Endpoints()
+	lastID, _ := request.RetrieveNumericQueryParameter(r, "last_id", false)
+	limit, _ := request.RetrieveNumericQueryParameter(r, "limit", false)
+	//filter, _ := request.RetrieveQueryParameter(r, "filter", false)
+
+	if lastID == 0 {
+		lastID = 1
+	}
+
+	if limit == 0 {
+		limit = 100
+	}
+
+	endpoints, err := handler.EndpointService.EndpointsPaginated(lastID, limit)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
+	}
+
+	endpointCount, err := handler.EndpointService.EndpointCount()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
 	}
@@ -31,5 +51,6 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 		hideFields(&filteredEndpoints[idx])
 	}
 
+	w.Header().Set("X-Total-Count", strconv.Itoa(endpointCount))
 	return response.JSON(w, filteredEndpoints)
 }
