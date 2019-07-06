@@ -13,19 +13,19 @@ import (
 
 // GET request on /api/endpoints
 func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	lastID, _ := request.RetrieveNumericQueryParameter(r, "last_id", false)
+	start, _ := request.RetrieveNumericQueryParameter(r, "start", false)
 	limit, _ := request.RetrieveNumericQueryParameter(r, "limit", false)
 	//filter, _ := request.RetrieveQueryParameter(r, "filter", false)
 
-	if lastID == 0 {
-		lastID = 1
+	if start == 0 {
+		start = 1
 	}
 
 	if limit == 0 {
 		limit = 100
 	}
 
-	endpoints, err := handler.EndpointService.EndpointsPaginated(lastID, limit)
+	endpoints, err := handler.EndpointService.EndpointsPaginated(start, limit)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
 	}
