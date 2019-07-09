@@ -29,7 +29,6 @@ function ($interval, PaginationService, DatatableService, PAGINATION_MAX_ITEMS) 
   }
   this.resetSelectionState = function() {
     this.state.selectAll = false;
-    this.state.selectedItemCount = 0;
     this.state.selectedItems = [];
     _.map(this.state.filteredDataSet, (item) => item.Checked = false);
   };
