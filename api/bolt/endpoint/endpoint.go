@@ -77,7 +77,7 @@ func (service *Service) EndpointsPaginated(pos, limit int) ([]portainer.Endpoint
 		cursor := bucket.Cursor()
 		idx := 0
 		for k, v := cursor.Seek(cursorPos); k != nil; k, v = cursor.Next() {
-			if idx >= limit {
+			if limit != 0 && idx >= limit {
 				break
 			}
 

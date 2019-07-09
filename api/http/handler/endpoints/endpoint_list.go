@@ -24,10 +24,6 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 		start = 1
 	}
 
-	if limit == 0 {
-		limit = 100
-	}
-
 	endpoints, err := handler.EndpointService.EndpointsPaginated(start, limit)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}

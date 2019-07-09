@@ -29,7 +29,7 @@ function ($q, $scope, $state, EndpointService, GroupService, EndpointHelper, Not
       groups: GroupService.groups()
     })
     .then(function success(data) {
-      var endpoints = data.endpoints;
+      var endpoints = data.endpoints.value;
       var groups = data.groups;
       EndpointHelper.mapGroupNameToEndpoint(endpoints, groups);
       $scope.groups = groups;

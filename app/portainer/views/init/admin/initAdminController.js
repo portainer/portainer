@@ -39,10 +39,10 @@ function ($async, $scope, $state, Notifications, Authentication, StateManager, U
       return retrieveAndSaveEnabledExtensions();
     })
     .then(function () {
-      return EndpointService.endpoints();
+      return EndpointService.endpoints(0, 100);
     })
     .then(function success(data) {
-      if (data.length === 0) {
+      if (data.value.length === 0) {
         $state.go('portainer.init.endpoint');
       } else {
         $state.go('portainer.home');
