@@ -54,6 +54,7 @@ func (service *Service) DeleteEndpoint(ID portainer.EndpointID) error {
 	return internal.DeleteObject(service.db, BucketName, identifier)
 }
 
+// EndpointCount returns the total count of endpoints.
 func (service *Service) EndpointCount() (int, error) {
 	endpointCount := 0
 
@@ -66,6 +67,8 @@ func (service *Service) EndpointCount() (int, error) {
 	return endpointCount, err
 }
 
+// EndpointsPaginated return an array containing a specific amount of endpoints
+// based on the specified pagination parameters.
 func (service *Service) EndpointsPaginated(pos, limit int) ([]portainer.Endpoint, error) {
 	var endpoints = make([]portainer.Endpoint, 0)
 
