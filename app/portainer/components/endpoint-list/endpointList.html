@@ -44,7 +44,7 @@
         <div ng-if="!$ctrl.endpoints" class="text-center text-muted">
           Loading...
         </div>
-        <div ng-if="!$ctrl.state.filteredEndpoints.length" class="text-center text-muted">
+        <div ng-if="$ctrl.endpoints && !$ctrl.state.filteredEndpoints.length" class="text-center text-muted">
           No endpoint available.
         </div>
       </div>
