@@ -23,6 +23,13 @@ angular.module('portainer.app')
           totalOps: 0,
           asyncGenerator: null
         },
+        tagsDelete: {
+          running: false,
+          progression: 0,
+          elapsedTime: 0,
+          totalOps: 0,
+          asyncGenerator: null
+        },
       };
       $scope.formValues = {
         Tag: '' // new tag name on add feature
@@ -197,24 +204,43 @@ angular.module('portainer.app')
       /**
        * REMOVE TAGS SECTION
        */
+      $scope.cancelDeleteAction = function() {
+        ModalService.confirmDeletion(
+          'WARNING: stopping this operation will stop all the tags readdition and they will all be lost forever. Are you sure you want to do this?',
+          (confirmed) => {
+            if (!confirmed) {
+              return;
+            }
+            $scope.state.tagsDelete.asyncGenerator.return();
+          });
+      };
+
+      function createDeleteAsyncGenerator(modifiedDigests, impactedTags) {
+        $scope.state.tagsDelete.asyncGenerator =
+          RegistryV2Service.deleteTagsWithProgress($scope.registryId, $scope.repository.Name, modifiedDigests, impactedTags);
+      }
+
       async function removeTagsAsync(selectedTags) {
         try {
+          $scope.state.tagsDelete.running = true;
+          const startTime = Date.now()
           const deletedTagNames = _.map(selectedTags, 'Name');
           const deletedShortTags = _.filter($scope.short.Tags, (item) => _.includes(deletedTagNames, item.Name));
-
           const modifiedDigests = _.uniq(_.map(deletedShortTags, 'ImageDigest'));
           const impactedTags = _.filter($scope.short.Tags, (item) => _.includes(modifiedDigests, item.ImageDigest));
-
-          const deletePromises = [];
-          _.map(modifiedDigests, (item) => deletePromises.push(RegistryV2Service.deleteManifest($scope.registryId, $scope.repository.Name, item)));
-          await Promise.all(deletePromises);
-
           const tagsToKeep = _.without(impactedTags, ...deletedShortTags);
-          const addPromises = [];
-          _.map(tagsToKeep, (item) => {
-            addPromises.push(RegistryV2Service.addTag($scope.registryId, $scope.repository.Name, item.Name, item.ManifestV2))
-          });
-          await Promise.all(addPromises);
+
+          $scope.state.tagsDelete.totalOps = modifiedDigests.length + tagsToKeep.length;
+
+          createDeleteAsyncGenerator(modifiedDigests, tagsToKeep);
+
+          for await (const partialResult of $scope.state.tagsDelete.asyncGenerator) {
+            if (typeof partialResult === 'number') {
+              $scope.state.tagsDelete.progression = partialResult;
+              $scope.state.tagsDelete.elapsedTime = Date.now() - startTime;
+            }
+          }
+          $scope.state.tagsDelete.running = false;
           Notifications.success('Success', 'Tags successfully deleted');
 
           _.map(deletedShortTags, (item) => {
@@ -311,6 +337,9 @@ angular.module('portainer.app')
         }
         if ($scope.state.tagsRetag.asyncGenerator) {
           $scope.state.tagsRetag.asyncGenerator.return();
+        }
+        if ($scope.state.tagsDelete.asyncGenerator) {
+          $scope.state.tagsDelete.asyncGenerator.return();
         }
       });
 

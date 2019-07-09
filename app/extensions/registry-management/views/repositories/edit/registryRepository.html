@@ -45,7 +45,7 @@
               <td>Repository</td>
               <td>
                 {{ repository.Name }}
-                <button class="btn btn-xs btn-danger" ng-if="!state.tagsRetrieval.running && state.tagsRetrieval.progression !== 0 && state.tagsRetrieval.progression === repository.Tags.length" ng-click="removeRepository()">
+                <button class="btn btn-xs btn-danger" ng-if="!state.tagsRetrieval.running && state.tagsRetrieval.progression !== 0" ng-click="removeRepository()">
                   <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this repository
                 </button>
               </td>
@@ -72,6 +72,20 @@
           <button class="btn btn-sm btn-danger" ng-click="cancelRetagAction()">Cancel</button>
           <span>
             Operations status : {{ state.tagsRetag.progression }} / {{ state.tagsRetag.totalOps }} - {{ state.tagsRetag.elapsedTime / 1000 }}s
+          </span>
+        </span>
+      </rd-widget-body>
+    </rd-widget>
+    <rd-widget ng-if="state.tagsDelete.running">
+      <rd-widget-body>
+        <span class="small text-muted">
+          <p>
+            <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+            Delete in progress - don't leave or close this page, or all tags will be lost !
+          </p>
+          <button class="btn btn-sm btn-danger" ng-click="cancelDeleteAction()">Cancel</button>
+          <span>
+            Operations status : {{ state.tagsDelete.progression }} / {{ state.tagsDelete.totalOps }} - {{ state.tagsDelete.elapsedTime / 1000 }}s
           </span>
         </span>
       </rd-widget-body>
