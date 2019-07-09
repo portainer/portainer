@@ -139,7 +139,7 @@ angular.module('portainer.app')
           $scope.motd = data;
         });
 
-        getPaginatedEndpoints()
+        getPaginatedEndpoints(0, 101)
         .then((data) => {
           const totalCount = data.totalCount;
           $scope.totalCount = totalCount;
