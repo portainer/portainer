@@ -81,13 +81,13 @@ function ($q, $scope, $transition$, $state, Notifications, EndpointService, Grou
       var schedule = data.schedule;
       schedule.Job.FileContent = data.file.ScheduleFileContent;
 
-      var endpoints = data.endpoints;
+      var endpoints = data.endpoints.value;
       var tasks = data.tasks;
       associateEndpointsToTasks(tasks, endpoints);
 
       $scope.schedule = schedule;
       $scope.tasks = data.tasks;
-      $scope.endpoints = data.endpoints;
+      $scope.endpoints = data.endpoints.value;
       $scope.groups = data.groups;
     })
     .catch(function error(err) {

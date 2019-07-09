@@ -8,8 +8,8 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     return Endpoints.get({id: endpointID}).$promise;
   };
 
-  service.endpoints = function() {
-    return Endpoints.query({}).$promise;
+  service.endpoints = function(start, limit, filter) {
+    return Endpoints.query({start, limit, filter}).$promise;
   };
 
   service.snapshotEndpoints = function() {
@@ -37,7 +37,7 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
 
     Endpoints.query({}).$promise
     .then(function success(data) {
-      var endpoints = data.filter(function (endpoint) {
+      var endpoints = data.value.filter(function (endpoint) {
         return endpoint.GroupId === groupId;
       });
       deferred.resolve(endpoints);

@@ -2,42 +2,35 @@ import _ from 'lodash-es';
 
 angular.module('portainer.app').controller('EndpointListController', ['DatatableService', 'PaginationService',
   function EndpointListController(DatatableService, PaginationService) {
-    var ctrl = this;
-    ctrl.state = {
+    this.state = {
       textFilter: '',
       filteredEndpoints: [],
-      paginatedItemLimit: '10'
+      paginatedItemLimit: '10',
+      pageNumber: 1
     };
 
-    ctrl.$onChanges = $onChanges;
-    ctrl.onTextFilterChange = onTextFilterChange;
-    ctrl.$onInit = $onInit 
-
-    function $onChanges(changesObj) {
-      handleEndpointsChange(changesObj.endpoints);
+    this.$onChanges = function(changesObj) {
+      this.handleEndpointsChange(changesObj.endpoints);
     }
 
-    function handleEndpointsChange(endpoints) {
-      if (!endpoints) {
+    this.handleEndpointsChange = function(endpoints) {
+      if (!endpoints || !endpoints.currentValue) {
         return;
       }
-      if (!endpoints.currentValue) {
-        return;
+      this.onTextFilterChange();
+    }
+
+    this.onTextFilterChange = function() {
+      var filterValue = this.state.textFilter;
+      DatatableService.setDataTableTextFilters(this.tableKey, filterValue);
+      if (this.hasBackendPagination()) {
+        this.paginationChangedAction();
+      } else {
+        this.state.filteredEndpoints = frontEndpointFilter(this.endpoints, filterValue);
       }
-
-      onTextFilterChange();
     }
 
-    function onTextFilterChange() {
-      var filterValue = ctrl.state.textFilter;
-      ctrl.state.filteredEndpoints = filterEndpoints(
-        ctrl.endpoints,
-        filterValue
-      );
-      DatatableService.setDataTableTextFilters(ctrl.tableKey, filterValue);
-    }
-
-    function filterEndpoints(endpoints, filterValue) {
+    function frontEndpointFilter(endpoints, filterValue) {
       if (!endpoints || !endpoints.length || !filterValue) {
         return endpoints;
       }
@@ -59,20 +52,43 @@ angular.module('portainer.app').controller('EndpointListController', ['Datatable
       });
     }
 
+    this.hasBackendPagination = function() {
+      return this.totalCount && this.totalCount > 100;
+    }
+
+    this.paginationChangedAction = function() {
+      if (this.hasBackendPagination()) {
+        const start = (this.state.pageNumber - 1) * this.state.paginatedItemLimit + 1;
+        this.retrievePage(start, this.state.paginatedItemLimit, this.state.textFilter)
+        .then((data) => {
+          this.state.filteredEndpoints = data.endpoints;
+          this.totalCount = data.totalCount;
+        });
+      }
+    }
+
+    this.pageChangeHandler = function(newPageNumber) {
+      this.state.pageNumber = newPageNumber;
+      this.paginationChangedAction();
+    }
+
     this.changePaginationLimit = function() {
       PaginationService.setPaginationLimit(this.tableKey, this.state.paginatedItemLimit);
+      this.paginationChangedAction();
     };
 
     function convertStatusToString(status) {
       return status === 1 ? 'up' : 'down';
     }
 
-    function $onInit() {
-      var textFilter = DatatableService.getDataTableTextFilters(ctrl.tableKey);
+    this.$onInit = function() {
+      var textFilter = DatatableService.getDataTableTextFilters(this.tableKey);
       this.state.paginatedItemLimit = PaginationService.getPaginationLimit(this.tableKey);
       if (textFilter !== null) {
-        ctrl.state.textFilter = textFilter;
-        onTextFilterChange();
+        this.state.textFilter = textFilter;
+        this.onTextFilterChange();
+      } else {
+        this.paginationChangedAction();
       }
     }
   }

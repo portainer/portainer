@@ -650,7 +650,9 @@ type (
 	// EndpointService represents a service for managing endpoint data
 	EndpointService interface {
 		Endpoint(ID EndpointID) (*Endpoint, error)
+		EndpointsPaginated(pos, limit int) ([]Endpoint, error)
 		Endpoints() ([]Endpoint, error)
+		EndpointCount() (int, error)
 		CreateEndpoint(endpoint *Endpoint) error
 		UpdateEndpoint(ID EndpointID, endpoint *Endpoint) error
 		DeleteEndpoint(ID EndpointID) error

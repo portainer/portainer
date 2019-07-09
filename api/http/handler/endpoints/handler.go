@@ -19,6 +19,9 @@ const (
 
 func hideFields(endpoint *portainer.Endpoint) {
 	endpoint.AzureCredentials = portainer.AzureCredentials{}
+	if len(endpoint.Snapshots) > 0 {
+		endpoint.Snapshots[0].SnapshotRaw = portainer.SnapshotRaw{}
+	}
 }
 
 // Handler is the HTTP handler used to handle endpoint operations.
