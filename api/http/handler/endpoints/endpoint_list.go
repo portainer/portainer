@@ -47,42 +47,7 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	filteredEndpoints := security.FilterEndpoints(endpoints, endpointGroups, securityContext)
 
 	if filter != "" {
-		filter = strings.ToLower(filter)
-
-		nfilteredendpoints := make([]portainer.Endpoint, 0)
-		for _, endpoint := range filteredEndpoints {
-
-			if strings.Contains(strings.ToLower(endpoint.Name), filter) {
-				nfilteredendpoints = append(nfilteredendpoints, endpoint)
-				continue
-			} else if strings.Contains(strings.ToLower(endpoint.URL), filter) {
-				nfilteredendpoints = append(nfilteredendpoints, endpoint)
-				continue
-			}
-
-			if endpoint.Status == portainer.EndpointStatusUp && filter == "up" {
-				nfilteredendpoints = append(nfilteredendpoints, endpoint)
-				continue
-			} else if endpoint.Status == portainer.EndpointStatusDown && filter == "down" {
-				nfilteredendpoints = append(nfilteredendpoints, endpoint)
-				continue
-			}
-
-			for _, tag := range endpoint.Tags {
-				if strings.Contains(strings.ToLower(tag), filter) {
-					nfilteredendpoints = append(nfilteredendpoints, endpoint)
-					continue
-				}
-			}
-
-			endpointGroup := getAssociatedGroup(&endpoint, endpointGroups)
-			if strings.Contains(strings.ToLower(endpointGroup.Name), filter) {
-				nfilteredendpoints = append(nfilteredendpoints, endpoint)
-				continue
-			}
-		}
-
-		filteredEndpoints = nfilteredendpoints
+		filteredEndpoints = filterEndpoints(filteredEndpoints, endpointGroups, filter)
 	}
 
 	for idx := range filteredEndpoints {
@@ -91,6 +56,45 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 
 	w.Header().Set("X-Total-Count", strconv.Itoa(endpointCount))
 	return response.JSON(w, filteredEndpoints)
+}
+
+func filterEndpoints(endpoints []portainer.Endpoint, endpointGroups []portainer.EndpointGroup, filter string) []portainer.Endpoint {
+	filter = strings.ToLower(filter)
+
+	filteredEndpoints := make([]portainer.Endpoint, 0)
+	for _, endpoint := range endpoints {
+
+		if strings.Contains(strings.ToLower(endpoint.Name), filter) {
+			filteredEndpoints = append(filteredEndpoints, endpoint)
+			continue
+		} else if strings.Contains(strings.ToLower(endpoint.URL), filter) {
+			filteredEndpoints = append(filteredEndpoints, endpoint)
+			continue
+		}
+
+		if endpoint.Status == portainer.EndpointStatusUp && filter == "up" {
+			filteredEndpoints = append(filteredEndpoints, endpoint)
+			continue
+		} else if endpoint.Status == portainer.EndpointStatusDown && filter == "down" {
+			filteredEndpoints = append(filteredEndpoints, endpoint)
+			continue
+		}
+
+		for _, tag := range endpoint.Tags {
+			if strings.Contains(strings.ToLower(tag), filter) {
+				filteredEndpoints = append(filteredEndpoints, endpoint)
+				continue
+			}
+		}
+
+		endpointGroup := getAssociatedGroup(&endpoint, endpointGroups)
+		if strings.Contains(strings.ToLower(endpointGroup.Name), filter) {
+			filteredEndpoints = append(filteredEndpoints, endpoint)
+			continue
+		}
+	}
+
+	return filteredEndpoints
 }
 
 func getAssociatedGroup(endpoint *portainer.Endpoint, groups []portainer.EndpointGroup) *portainer.EndpointGroup {
