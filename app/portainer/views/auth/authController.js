@@ -58,7 +58,7 @@ function($async, $q, $scope, $state, $stateParams, $sanitize, Authentication, Us
   };
 
   function unauthenticatedFlow() {
-    EndpointService.endpoints()
+    EndpointService.endpoints(0, 100)
     .then(function success(endpoints) {
       if (endpoints.value.length === 0) {
         $state.go('portainer.init.endpoint');
@@ -84,7 +84,7 @@ function($async, $q, $scope, $state, $stateParams, $sanitize, Authentication, Us
   }
 
   function checkForEndpoints() {
-    EndpointService.endpoints()
+    EndpointService.endpoints(0, 100)
     .then(function success(data) {
       var endpoints = data.value;
 
