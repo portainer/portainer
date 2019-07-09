@@ -117,28 +117,28 @@ func (service *Service) tunnelCleanup() {
 					endpointID, err := strconv.Atoi(item.Key)
 					if err != nil {
 						log.Printf("[ERROR] [conversion] Unable to snapshot Edge endpoint (id: %s): %s", item.Key, err)
+						continue
 					}
 
-					if err == nil {
-						endpoint, err := service.endpointService.Endpoint(portainer.EndpointID(endpointID))
-						if err != nil {
-							log.Printf("[ERROR] [db] Unable to retrieve Edge endpoint information (id: %s): %s", item.Key, err)
-						}
+					endpoint, err := service.endpointService.Endpoint(portainer.EndpointID(endpointID))
+					if err != nil {
+						log.Printf("[ERROR] [db] Unable to retrieve Edge endpoint information (id: %s): %s", item.Key, err)
+						continue
+					}
 
-						endpointURL := endpoint.URL
-						endpoint.URL = fmt.Sprintf("tcp://localhost:%d", tunnelStatus.port)
-						snapshot, err := service.snapshotter.CreateSnapshot(endpoint)
-						if err != nil {
-							log.Printf("[ERROR] [snapshot] Unable to snapshot Edge endpoint (id: %s): %s", item.Key, err)
-						}
+					endpointURL := endpoint.URL
+					endpoint.URL = fmt.Sprintf("tcp://localhost:%d", tunnelStatus.port)
+					snapshot, err := service.snapshotter.CreateSnapshot(endpoint)
+					if err != nil {
+						log.Printf("[ERROR] [snapshot] Unable to snapshot Edge endpoint (id: %s): %s", item.Key, err)
+					}
 
-						if snapshot != nil {
-							endpoint.Snapshots = []portainer.Snapshot{*snapshot}
-							endpoint.URL = endpointURL
-							err = service.endpointService.UpdateEndpoint(endpoint.ID, endpoint)
-							if err != nil {
-								log.Printf("[ERROR] [db] Unable to persist snapshot for Edge endpoint (id: %s): %s", item.Key, err)
-							}
+					if snapshot != nil {
+						endpoint.Snapshots = []portainer.Snapshot{*snapshot}
+						endpoint.URL = endpointURL
+						err = service.endpointService.UpdateEndpoint(endpoint.ID, endpoint)
+						if err != nil {
+							log.Printf("[ERROR] [db] Unable to persist snapshot for Edge endpoint (id: %s): %s", item.Key, err)
 						}
 					}
 				}
