@@ -1,4 +1,4 @@
-import { EndpointGroupDefaultModel } from '../../../models/group';
+import {EndpointGroupDefaultModel} from '../../../models/group';
 
 angular.module('portainer.app')
 .controller('CreateGroupController', ['$q', '$scope', '$state', 'GroupService', 'EndpointService', 'TagService', 'Notifications',
@@ -39,7 +39,7 @@ function ($q, $scope, $state, GroupService, EndpointService, TagService, Notific
       tags: TagService.tagNames()
     })
     .then(function success(data) {
-      $scope.availableEndpoints = data.endpoints.value;
+      $scope.availableEndpoints = data.endpoints;
       $scope.associatedEndpoints = [];
       $scope.availableTags = data.tags;
     })

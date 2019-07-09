@@ -25,7 +25,7 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
 
     Endpoints.query({}).$promise
     .then(function success(data) {
-      var endpoints = data.filter(function (endpoint) {
+      var endpoints = data.value.filter(function (endpoint) {
         return endpoint.GroupId === groupId;
       });
       deferred.resolve(endpoints);
