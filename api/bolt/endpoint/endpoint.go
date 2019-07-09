@@ -75,21 +75,19 @@ func (service *Service) EndpointsPaginated(pos, limit int) ([]portainer.Endpoint
 	err := service.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
-		cursorPos := internal.Itob(pos)
-
 		cursor := bucket.Cursor()
 		idx := 0
-		for k, v := cursor.Seek(cursorPos); k != nil; k, v = cursor.Next() {
-			if limit != 0 && idx >= limit {
-				break
+		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
+
+			if limit == 0 || idx >= pos && idx < pos+limit {
+				var endpoint portainer.Endpoint
+				err := internal.UnmarshalObject(v, &endpoint)
+				if err != nil {
+					return err
+				}
+				endpoints = append(endpoints, endpoint)
 			}
 
-			var endpoint portainer.Endpoint
-			err := internal.UnmarshalObject(v, &endpoint)
-			if err != nil {
-				return err
-			}
-			endpoints = append(endpoints, endpoint)
 			idx++
 		}
 
