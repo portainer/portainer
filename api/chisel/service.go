@@ -284,10 +284,5 @@ func (service *Service) RemoveSchedule(scheduleID portainer.ScheduleID) {
 }
 
 func randomInt(min, max int) int {
-	// TODO: should be randomize at service creation time?
-	// if not seeded, will always get same port order
-	// might not be a problem and maybe not required
-	//rand.Seed(time.Now().UnixNano())
-
 	return min + rand.Intn(max-min)
 }
