@@ -34,8 +34,8 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
 		}
 
-		if start == 1 {
-			start = 0
+		if start != 0 {
+			start--
 		}
 
 		idx := 0
