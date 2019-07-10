@@ -72,6 +72,10 @@ func (service *Service) EndpointCount() (int, error) {
 func (service *Service) EndpointsPaginated(pos, limit int) ([]portainer.Endpoint, error) {
 	var endpoints = make([]portainer.Endpoint, 0)
 
+	if pos == 1 {
+		pos = 0
+	}
+
 	err := service.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 

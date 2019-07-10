@@ -20,9 +20,9 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	limit, _ := request.RetrieveNumericQueryParameter(r, "limit", false)
 	filter, _ := request.RetrieveQueryParameter(r, "filter", false)
 
-	if start == 0 {
-		start = 1
-	}
+	// TODO:
+	// 1. filter pre-pagination // part of pagination
+	// 2. endpoint count must match total filtered entries
 
 	endpoints, err := handler.EndpointService.EndpointsPaginated(start, limit)
 	if err != nil {
