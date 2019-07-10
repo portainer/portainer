@@ -24,14 +24,6 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     return Endpoints.status({ id: endpointID });
   };
 
-  service.updateStatus = function(endpointID, status) {
-    var payload = {
-      Status: status,
-    };
-
-    return Endpoints.updateStatus({ id: endpointID }, payload).$promise;
-  };
-
   service.endpointsByGroup = function(groupId) {
     var deferred = $q.defer();
 

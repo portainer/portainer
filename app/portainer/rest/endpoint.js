@@ -16,7 +16,6 @@ angular.module('portainer.app')
     snapshots: { method: 'POST', params: { action: 'snapshot' } },
     snapshot: { method: 'POST', params: { id: '@id', action: 'snapshot' } },
     executeJob: { method: 'POST', ignoreLoadingBar: true, params: { id: '@id', action: 'job' } },
-    status: { method: 'GET', params: { id: '@id', action: 'status' } },
-    updateStatus: { method: 'PUT', params: { id: '@id', action: 'status' } }
+    status: { method: 'GET', params: { id: '@id', action: 'status' } }
   });
 }]);
