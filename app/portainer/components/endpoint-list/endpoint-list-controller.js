@@ -7,7 +7,8 @@ angular.module('portainer.app').controller('EndpointListController', ['Datatable
       textFilter: '',
       filteredEndpoints: [],
       paginatedItemLimit: '10',
-      pageNumber: 1
+      pageNumber: 1,
+      loading: true
     };
 
     this.$onChanges = function(changesObj) {
@@ -22,12 +23,14 @@ angular.module('portainer.app').controller('EndpointListController', ['Datatable
     }
 
     this.onTextFilterChange = function() {
+      this.state.loading = true;
       var filterValue = this.state.textFilter;
       DatatableService.setDataTableTextFilters(this.tableKey, filterValue);
       if (this.hasBackendPagination()) {
         this.paginationChangedAction();
       } else {
         this.state.filteredEndpoints = frontEndpointFilter(this.endpoints, filterValue);
+        this.state.loading = false;
       }
     }
 
@@ -59,11 +62,14 @@ angular.module('portainer.app').controller('EndpointListController', ['Datatable
 
     this.paginationChangedAction = function() {
       if (this.hasBackendPagination()) {
+        this.state.loading = true;
+        this.state.filteredEndpoints = [];
         const start = (this.state.pageNumber - 1) * this.state.paginatedItemLimit + 1;
         this.retrievePage(start, this.state.paginatedItemLimit, this.state.textFilter)
         .then((data) => {
           this.state.filteredEndpoints = data.endpoints;
           this.state.totalFilteredEndpoints = data.totalCount;
+          this.state.loading = false;
         });
       }
     }
@@ -83,11 +89,11 @@ angular.module('portainer.app').controller('EndpointListController', ['Datatable
     }
 
     this.$onInit = function() {
+      this.state.loading = true;
       var textFilter = DatatableService.getDataTableTextFilters(this.tableKey);
       this.state.paginatedItemLimit = PaginationService.getPaginationLimit(this.tableKey);
       if (textFilter !== null) {
         this.state.textFilter = textFilter;
-        this.onTextFilterChange();
       } else {
         this.paginationChangedAction();
       }
