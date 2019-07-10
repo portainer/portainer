@@ -70,8 +70,6 @@ func (service *Service) EndpointCount() (int, error) {
 }
 
 func matchFilter(endpoint portainer.Endpoint, filter string) bool {
-	filter = strings.ToLower(filter)
-
 	if strings.Contains(strings.ToLower(endpoint.Name), filter) {
 		return true
 	} else if strings.Contains(strings.ToLower(endpoint.URL), filter) {
@@ -94,8 +92,10 @@ func matchFilter(endpoint portainer.Endpoint, filter string) bool {
 }
 
 // EndpointsFiltered return an array containing all the endpoints matching
-// the specified filter.
-func (service *Service) EndpointsFiltered(filter string) ([]portainer.Endpoint, error) {
+// the specified filter. The search is performed on the endpoint name, URL, status
+// and tags. It also aggregates any endpoint that is part of the specified matching endpoint
+// groups.
+func (service *Service) EndpointsFiltered(filter string, matchingGroups []portainer.EndpointGroup) ([]portainer.Endpoint, error) {
 	var endpoints = make([]portainer.Endpoint, 0)
 
 	err := service.db.View(func(tx *bolt.Tx) error {
@@ -111,6 +111,14 @@ func (service *Service) EndpointsFiltered(filter string) ([]portainer.Endpoint, 
 
 			if matchFilter(endpoint, filter) {
 				endpoints = append(endpoints, endpoint)
+				continue
+			}
+
+			for _, group := range matchingGroups {
+				if group.ID == endpoint.GroupID {
+					endpoints = append(endpoints, endpoint)
+					break
+				}
 			}
 		}
 
@@ -124,10 +132,6 @@ func (service *Service) EndpointsFiltered(filter string) ([]portainer.Endpoint, 
 // based on the specified pagination parameters.
 func (service *Service) EndpointsPaginated(pos, limit int) ([]portainer.Endpoint, error) {
 	var endpoints = make([]portainer.Endpoint, 0)
-
-	if pos != 0 {
-		pos--
-	}
 
 	err := service.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
