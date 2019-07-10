@@ -651,6 +651,7 @@ type (
 	EndpointService interface {
 		Endpoint(ID EndpointID) (*Endpoint, error)
 		EndpointsPaginated(pos, limit int) ([]Endpoint, error)
+		EndpointsFiltered(filter string) ([]Endpoint, error)
 		Endpoints() ([]Endpoint, error)
 		EndpointCount() (int, error)
 		CreateEndpoint(endpoint *Endpoint) error
