@@ -20,52 +20,18 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	limit, _ := request.RetrieveNumericQueryParameter(r, "limit", false)
 	filter, _ := request.RetrieveQueryParameter(r, "filter", false)
 
-	// TODO:
-	// 1. filter pre-pagination // part of pagination
-	// 2. endpoint count must match total filtered entries
-
-	//var endpoints []portainer.Endpoint
-	endpoints := make([]portainer.Endpoint, 0)
-	var endpointCount int
-
-	if filter != "" {
-		e, err := handler.EndpointService.EndpointsFiltered(filter)
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
-		}
-
-		if start != 0 {
-			start--
-		}
-
-		idx := 0
-		for _, endpoint := range e {
-			if limit == 0 || idx >= start && idx < start+limit {
-				endpoints = append(endpoints, endpoint)
-			}
-			idx++
-		}
-
-		//endpoints = e
-		endpointCount = len(e)
-	} else {
-		e, err := handler.EndpointService.EndpointsPaginated(start, limit)
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
-		}
-
-		ec, err := handler.EndpointService.EndpointCount()
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
-		}
-
-		endpoints = e
-		endpointCount = ec
+	if start != 0 {
+		start--
 	}
 
 	endpointGroups, err := handler.EndpointGroupService.EndpointGroups()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint groups from the database", err}
+	}
+
+	endpoints, endpointCount, err := handler.getEndpointData(start, limit, filter, endpointGroups)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint data", err}
 	}
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
@@ -75,10 +41,6 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 
 	filteredEndpoints := security.FilterEndpoints(endpoints, endpointGroups, securityContext)
 
-	//if filter != "" {
-	//	filteredEndpoints = filterEndpoints(filteredEndpoints, endpointGroups, filter)
-	//}
-
 	for idx := range filteredEndpoints {
 		hideFields(&filteredEndpoints[idx])
 	}
@@ -87,50 +49,68 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	return response.JSON(w, filteredEndpoints)
 }
 
-func filterEndpoints(endpoints []portainer.Endpoint, endpointGroups []portainer.EndpointGroup, filter string) []portainer.Endpoint {
-	filter = strings.ToLower(filter)
-
-	filteredEndpoints := make([]portainer.Endpoint, 0)
-	for _, endpoint := range endpoints {
-
-		if strings.Contains(strings.ToLower(endpoint.Name), filter) {
-			filteredEndpoints = append(filteredEndpoints, endpoint)
-			continue
-		} else if strings.Contains(strings.ToLower(endpoint.URL), filter) {
-			filteredEndpoints = append(filteredEndpoints, endpoint)
-			continue
-		}
-
-		if endpoint.Status == portainer.EndpointStatusUp && filter == "up" {
-			filteredEndpoints = append(filteredEndpoints, endpoint)
-			continue
-		} else if endpoint.Status == portainer.EndpointStatusDown && filter == "down" {
-			filteredEndpoints = append(filteredEndpoints, endpoint)
-			continue
-		}
-
-		for _, tag := range endpoint.Tags {
-			if strings.Contains(strings.ToLower(tag), filter) {
-				filteredEndpoints = append(filteredEndpoints, endpoint)
-				continue
-			}
-		}
-
-		endpointGroup := getAssociatedGroup(&endpoint, endpointGroups)
-		if strings.Contains(strings.ToLower(endpointGroup.Name), filter) {
-			filteredEndpoints = append(filteredEndpoints, endpoint)
-			continue
-		}
+func (handler *Handler) getEndpointData(start, limit int, filter string, endpointGroups []portainer.EndpointGroup) ([]portainer.Endpoint, int, error) {
+	if filter != "" {
+		filter = strings.ToLower(filter)
+		return handler.getFilteredEndpoints(start, limit, filter, endpointGroups)
 	}
 
-	return filteredEndpoints
+	return handler.getPaginatedEndpoints(start, limit)
 }
 
-func getAssociatedGroup(endpoint *portainer.Endpoint, groups []portainer.EndpointGroup) *portainer.EndpointGroup {
-	for _, group := range groups {
-		if group.ID == endpoint.GroupID {
-			return &group
+func filterGroups(endpointGroups []portainer.EndpointGroup, filter string) []portainer.EndpointGroup {
+	matchingGroups := make([]portainer.EndpointGroup, 0)
+
+	for _, group := range endpointGroups {
+		if strings.Contains(strings.ToLower(group.Name), filter) {
+			matchingGroups = append(matchingGroups, group)
+			continue
+		}
+
+		for _, tag := range group.Tags {
+			if strings.Contains(strings.ToLower(tag), filter) {
+				matchingGroups = append(matchingGroups, group)
+				break
+			}
 		}
 	}
-	return nil
+
+	return matchingGroups
+}
+
+func (handler *Handler) getFilteredEndpoints(start, limit int, filter string, endpointGroups []portainer.EndpointGroup) ([]portainer.Endpoint, int, error) {
+	endpoints := make([]portainer.Endpoint, 0)
+
+	matchingGroups := filterGroups(endpointGroups, filter)
+
+	e, err := handler.EndpointService.EndpointsFiltered(filter, matchingGroups)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	idx := 0
+	for _, endpoint := range e {
+		if limit == 0 || idx >= start && idx < start+limit {
+			endpoints = append(endpoints, endpoint)
+		}
+		idx++
+	}
+
+	endpointCount := len(e)
+
+	return endpoints, endpointCount, nil
+}
+
+func (handler *Handler) getPaginatedEndpoints(start, limit int) ([]portainer.Endpoint, int, error) {
+	e, err := handler.EndpointService.EndpointsPaginated(start, limit)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	ec, err := handler.EndpointService.EndpointCount()
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return e, ec, nil
 }
