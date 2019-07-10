@@ -24,19 +24,48 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	// 1. filter pre-pagination // part of pagination
 	// 2. endpoint count must match total filtered entries
 
-	endpoints, err := handler.EndpointService.EndpointsPaginated(start, limit)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
+	//var endpoints []portainer.Endpoint
+	endpoints := make([]portainer.Endpoint, 0)
+	var endpointCount int
+
+	if filter != "" {
+		e, err := handler.EndpointService.EndpointsFiltered(filter)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
+		}
+
+		if start == 1 {
+			start = 0
+		}
+
+		idx := 0
+		for _, endpoint := range e {
+			if limit == 0 || idx >= start && idx < start+limit {
+				endpoints = append(endpoints, endpoint)
+			}
+			idx++
+		}
+
+		//endpoints = e
+		endpointCount = len(e)
+	} else {
+		e, err := handler.EndpointService.EndpointsPaginated(start, limit)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
+		}
+
+		ec, err := handler.EndpointService.EndpointCount()
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
+		}
+
+		endpoints = e
+		endpointCount = ec
 	}
 
 	endpointGroups, err := handler.EndpointGroupService.EndpointGroups()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint groups from the database", err}
-	}
-
-	endpointCount, err := handler.EndpointService.EndpointCount()
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
 	}
 
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
@@ -46,9 +75,9 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 
 	filteredEndpoints := security.FilterEndpoints(endpoints, endpointGroups, securityContext)
 
-	if filter != "" {
-		filteredEndpoints = filterEndpoints(filteredEndpoints, endpointGroups, filter)
-	}
+	//if filter != "" {
+	//	filteredEndpoints = filterEndpoints(filteredEndpoints, endpointGroups, filter)
+	//}
 
 	for idx := range filteredEndpoints {
 		hideFields(&filteredEndpoints[idx])
