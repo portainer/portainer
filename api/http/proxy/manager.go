@@ -141,34 +141,14 @@ func (manager *Manager) CreateLegacyExtensionProxy(key, extensionAPIURL string) 
 	return proxy, nil
 }
 
-func (manager *Manager) createEdgeProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
-	_, port, _ := manager.reverseTunnelService.GetTunnelState(endpoint.ID)
-
-	endpointURL, err := url.Parse(fmt.Sprintf("http://localhost:%d", port))
-	if err != nil {
-		return nil, err
-	}
-
-	return manager.proxyFactory.newDockerHTTPProxy(endpointURL, false, endpoint.ID), nil
-}
-
-func (manager *Manager) createDockerProxy(endpointURL *url.URL, tlsConfig *portainer.TLSConfiguration, endpointID portainer.EndpointID) (http.Handler, error) {
-	if endpointURL.Scheme == "tcp" {
-		if tlsConfig.TLS || tlsConfig.TLSSkipVerify {
-			return manager.proxyFactory.newDockerHTTPSProxy(endpointURL, tlsConfig, false, endpointID)
-		}
-		return manager.proxyFactory.newDockerHTTPProxy(endpointURL, false, endpointID), nil
-	}
-	return manager.proxyFactory.newLocalProxy(endpointURL.Path, endpointID), nil
-}
-
-func (manager *Manager) createProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
-	// TODO: refactor?
+func (manager *Manager) createDockerProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
+	baseURL := endpoint.URL
 	if endpoint.Type == portainer.EdgeAgentEnvironment {
-		return manager.createEdgeProxy(endpoint)
+		_, port, _ := manager.reverseTunnelService.GetTunnelState(endpoint.ID)
+		baseURL = fmt.Sprintf("http://localhost:%d", port)
 	}
 
-	endpointURL, err := url.Parse(endpoint.URL)
+	endpointURL, err := url.Parse(baseURL)
 	if err != nil {
 		return nil, err
 	}
@@ -176,9 +156,25 @@ func (manager *Manager) createProxy(endpoint *portainer.Endpoint) (http.Handler,
 	switch endpoint.Type {
 	case portainer.AgentOnDockerEnvironment:
 		return manager.proxyFactory.newDockerHTTPSProxy(endpointURL, &endpoint.TLSConfig, true, endpoint.ID)
-	case portainer.AzureEnvironment:
-		return newAzureProxy(&endpoint.AzureCredentials)
-	default:
-		return manager.createDockerProxy(endpointURL, &endpoint.TLSConfig, endpoint.ID)
+	case portainer.EdgeAgentEnvironment:
+		return manager.proxyFactory.newDockerHTTPProxy(endpointURL, false, endpoint.ID), nil
 	}
+
+	if endpointURL.Scheme == "tcp" {
+		if endpoint.TLSConfig.TLS || endpoint.TLSConfig.TLSSkipVerify {
+			return manager.proxyFactory.newDockerHTTPSProxy(endpointURL, &endpoint.TLSConfig, false, endpoint.ID)
+		}
+
+		return manager.proxyFactory.newDockerHTTPProxy(endpointURL, false, endpoint.ID), nil
+	}
+
+	return manager.proxyFactory.newLocalProxy(endpointURL.Path, endpoint.ID), nil
+}
+
+func (manager *Manager) createProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
+	if endpoint.Type == portainer.AzureEnvironment {
+		return newAzureProxy(&endpoint.AzureCredentials)
+	}
+
+	return manager.createDockerProxy(endpoint)
 }
