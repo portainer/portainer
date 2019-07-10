@@ -23,12 +23,14 @@ function($async, $q, $scope, $state, $stateParams, $sanitize, Authentication, Us
       await ExtensionService.retrieveAndSaveEnabledExtensions();
     } catch (err) {
       Notifications.error('Failure', err, 'Unable to retrieve enabled extensions');
+      $scope.state.loginInProgress = false;
     }
   }
 
   $scope.authenticateUser = function() {
     var username = $scope.formValues.Username;
     var password = $scope.formValues.Password;
+    $scope.state.loginInProgress = true;
 
     Authentication.login(username, password)
     .then(function success() {
@@ -53,6 +55,7 @@ function($async, $q, $scope, $state, $stateParams, $sanitize, Authentication, Us
       })
       .catch(function error() {
         $scope.state.AuthenticationError = 'Invalid credentials';
+        $scope.state.loginInProgress = false;
       });
     });
   };
@@ -96,6 +99,7 @@ function($async, $q, $scope, $state, $stateParams, $sanitize, Authentication, Us
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve endpoints');
+      $scope.state.loginInProgress = false;
     });
   }
 
