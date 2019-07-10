@@ -29,7 +29,7 @@
         <endpoint-item ng-if="$ctrl.hasBackendPagination()"
           dir-paginate="endpoint in $ctrl.state.filteredEndpoints | itemsPerPage: $ctrl.state.paginatedItemLimit"
           model="endpoint"
-          total-items="$ctrl.totalCount"
+          total-items="$ctrl.state.totalFilteredEndpoints"
           on-select="$ctrl.dashboardAction"
           on-edit="$ctrl.editAction"
           is-admin="$ctrl.isAdmin"

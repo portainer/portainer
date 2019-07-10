@@ -3,6 +3,7 @@ import _ from 'lodash-es';
 angular.module('portainer.app').controller('EndpointListController', ['DatatableService', 'PaginationService',
   function EndpointListController(DatatableService, PaginationService) {
     this.state = {
+      totalFilteredEndpoints: this.totalCount,
       textFilter: '',
       filteredEndpoints: [],
       paginatedItemLimit: '10',
@@ -62,7 +63,7 @@ angular.module('portainer.app').controller('EndpointListController', ['Datatable
         this.retrievePage(start, this.state.paginatedItemLimit, this.state.textFilter)
         .then((data) => {
           this.state.filteredEndpoints = data.endpoints;
-          this.totalCount = data.totalCount;
+          this.state.totalFilteredEndpoints = data.totalCount;
         });
       }
     }

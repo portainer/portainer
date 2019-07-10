@@ -125,8 +125,8 @@ func (service *Service) EndpointsFiltered(filter string) ([]portainer.Endpoint, 
 func (service *Service) EndpointsPaginated(pos, limit int) ([]portainer.Endpoint, error) {
 	var endpoints = make([]portainer.Endpoint, 0)
 
-	if pos == 1 {
-		pos = 0
+	if pos != 0 {
+		pos--
 	}
 
 	err := service.db.View(func(tx *bolt.Tx) error {
