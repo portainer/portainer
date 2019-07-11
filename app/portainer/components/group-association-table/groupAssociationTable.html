@@ -23,16 +23,16 @@
       <tr ng-if="!$ctrl.hasBackendPagination();"
         ng-click="$ctrl.entryClick(item)"
         class="interactive"
-        dir-paginate="item in $ctrl.dataset | itemsPerPage: $ctrl.paginationState.limit"
+        dir-paginate="item in $ctrl.dataset | filter:$ctrl.paginationState.filter | itemsPerPage: $ctrl.paginationState.limit"
         pagination-id="$ctrl.tableType">
         <td>{{ item.Name }}</td>
       </tr>
       <tr ng-if="$ctrl.hasBackendPagination();"
-      ng-click="$ctrl.entryClick(item)"
-      class="interactive"
-      dir-paginate="item in $ctrl.dataset | itemsPerPage: $ctrl.paginationState.limit"
-      pagination-id="$ctrl.tableType"
-      total-items="$ctrl.paginationState.totalCount">
+        ng-click="$ctrl.entryClick(item)"
+        class="interactive"
+        dir-paginate="item in $ctrl.dataset | itemsPerPage: $ctrl.paginationState.limit"
+        pagination-id="$ctrl.tableType"
+        total-items="$ctrl.paginationState.totalCount">
         <td>{{ item.Name }}</td>
       </tr>
       <tr ng-if="!$ctrl.dataset">
