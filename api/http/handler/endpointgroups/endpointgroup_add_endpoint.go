@@ -9,30 +9,16 @@ import (
 	"github.com/portainer/portainer/api"
 )
 
-type endpointGroupUpdatePayload struct {
-	Name        string
-	Description string
-	//AssociatedEndpoints []portainer.EndpointID
-	Tags               []string
-	UserAccessPolicies portainer.UserAccessPolicies
-	TeamAccessPolicies portainer.TeamAccessPolicies
-}
-
-func (payload *endpointGroupUpdatePayload) Validate(r *http.Request) error {
-	return nil
-}
-
-// PUT request on /api/endpoint_groups/:id
-func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+// PUT request on /api/endpoint_groups/:id/endpoints/:endpointId
+func (handler *Handler) endpointGroupAddEndpoint(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	endpointGroupID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint group identifier route variable", err}
 	}
 
-	var payload endpointGroupUpdatePayload
-	err = request.DecodeAndValidateJSONPayload(r, &payload)
+	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "endpointId")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint identifier route variable", err}
 	}
 
 	endpointGroup, err := handler.EndpointGroupService.EndpointGroup(portainer.EndpointGroupID(endpointGroupID))
@@ -42,30 +28,24 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint group with the specified identifier inside the database", err}
 	}
 
-	if payload.Name != "" {
-		endpointGroup.Name = payload.Name
+	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
+	if err == portainer.ErrObjectNotFound {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
+	} else if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
-	if payload.Description != "" {
-		endpointGroup.Description = payload.Description
-	}
+	endpoint.GroupID = endpointGroup.ID
 
-	if payload.Tags != nil {
-		endpointGroup.Tags = payload.Tags
-	}
-
-	if payload.UserAccessPolicies != nil {
-		endpointGroup.UserAccessPolicies = payload.UserAccessPolicies
-	}
-
-	if payload.TeamAccessPolicies != nil {
-		endpointGroup.TeamAccessPolicies = payload.TeamAccessPolicies
-	}
-
-	err = handler.EndpointGroupService.UpdateEndpointGroup(endpointGroup.ID, endpointGroup)
+	err = handler.EndpointService.UpdateEndpoint(endpoint.ID, endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint group changes inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint changes inside the database", err}
 	}
+
+	//err = handler.EndpointGroupService.UpdateEndpointGroup(endpointGroup.ID, endpointGroup)
+	//if err != nil {
+	//	return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint group changes inside the database", err}
+	//}
 
 	//if payload.AssociatedEndpoints != nil {
 	//	endpoints, err := handler.EndpointService.Endpoints()
@@ -81,5 +61,5 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 	//	}
 	//}
 
-	return response.JSON(w, endpointGroup)
+	return response.Empty(w)
 }

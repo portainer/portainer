@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/utils"
 
 	"github.com/portainer/libhttp/request"
 
@@ -52,38 +53,45 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 func (handler *Handler) getEndpointData(start, limit int, filter string, endpointGroups []portainer.EndpointGroup) ([]portainer.Endpoint, int, error) {
 	if filter != "" {
 		filter = strings.ToLower(filter)
-		return handler.getFilteredEndpoints(start, limit, filter, endpointGroups)
+		slicedFilter := utils.SliceFilter(filter)
+		return handler.getFilteredEndpoints(start, limit, slicedFilter, endpointGroups)
 	}
 
 	return handler.getPaginatedEndpoints(start, limit)
 }
 
-func filterGroups(endpointGroups []portainer.EndpointGroup, filter string) []portainer.EndpointGroup {
+func filterGroups(endpointGroups []portainer.EndpointGroup, filters utils.SlicedFilter) ([]portainer.EndpointGroup, portainer.EndpointGroupID) {
 	matchingGroups := make([]portainer.EndpointGroup, 0)
 
+	id, err := utils.ExtractGroupIdFromFilters(filters)
+	filteredID := portainer.EndpointGroupID(id)
+	if !err {
+		return matchingGroups, filteredID
+	}
+
 	for _, group := range endpointGroups {
-		if strings.Contains(strings.ToLower(group.Name), filter) {
+		if utils.StringContainsOneOf(strings.ToLower(group.Name), filters) {
 			matchingGroups = append(matchingGroups, group)
 			continue
 		}
 
 		for _, tag := range group.Tags {
-			if strings.Contains(strings.ToLower(tag), filter) {
+			if utils.StringContainsOneOf(strings.ToLower(tag), filters) {
 				matchingGroups = append(matchingGroups, group)
 				break
 			}
 		}
 	}
 
-	return matchingGroups
+	return matchingGroups, filteredID
 }
 
-func (handler *Handler) getFilteredEndpoints(start, limit int, filter string, endpointGroups []portainer.EndpointGroup) ([]portainer.Endpoint, int, error) {
+func (handler *Handler) getFilteredEndpoints(start, limit int, filters utils.SlicedFilter, endpointGroups []portainer.EndpointGroup) ([]portainer.Endpoint, int, error) {
 	endpoints := make([]portainer.Endpoint, 0)
 
-	matchingGroups := filterGroups(endpointGroups, filter)
+	matchingGroups, restrictedGroupID := filterGroups(endpointGroups, filters)
 
-	e, err := handler.EndpointService.EndpointsFiltered(filter, matchingGroups)
+	e, err := handler.EndpointService.EndpointsFiltered(filters, matchingGroups, restrictedGroupID)
 	if err != nil {
 		return nil, 0, err
 	}

@@ -1,8 +1,4 @@
-import {
-  EndpointGroupModel,
-  EndpointGroupCreateRequest,
-  EndpointGroupUpdateRequest
-} from '../../models/group';
+import {EndpointGroupCreateRequest, EndpointGroupModel, EndpointGroupUpdateRequest} from '../../models/group';
 
 angular.module('portainer.app')
 .factory('GroupService', ['$q', 'EndpointGroups',
@@ -42,6 +38,14 @@ function GroupService($q, EndpointGroups) {
   service.updateAccess = function(groupId, userAccessPolicies, teamAccessPolicies) {
     return EndpointGroups.updateAccess({ id: groupId }, {UserAccessPolicies: userAccessPolicies, TeamAccessPolicies: teamAccessPolicies}).$promise;
   };
+
+  service.addEndpoint = function(groupId, endpoint) {
+    return EndpointGroups.addEndpoint({id: groupId, action: 'endpoints/' + endpoint.Id}, endpoint).$promise;
+  }
+
+  service.removeEndpoint = function(groupId, endpointId) {
+    return EndpointGroups.removeEndpoint({id: groupId, action: 'endpoints/' + endpointId}).$promise
+  }
 
   service.deleteGroup = function(groupId) {
     return EndpointGroups.remove({ id: groupId }).$promise;

@@ -5,15 +5,48 @@ angular.module('portainer.app').component('groupAssociationTable', {
       orderBy: 'Name',
       reverseOrder: false,
       paginatedItemLimit: '10',
-      textFilter: ''
+      textFilter: '',
+      loading:true,
+      pageNumber: 1
     };
 
     this.changeOrderBy = function(orderField) {
       this.state.reverseOrder = this.state.orderBy === orderField ? !this.state.reverseOrder : false;
       this.state.orderBy = orderField;
     };
+
+    this.hasBackendPagination = function() {
+      return !(this.pageType === 'create' && this.tableType === 'associated');
+    }
+    this.onTextFilterChange = function() {
+      this.paginationChangedAction();
+    }
+
+    this.onPageChanged = function(newPageNumber) {
+      this.paginationState.pageNumber = newPageNumber;
+      this.paginationChangedAction();
+    }
+
+    this.onPaginationLimitChanged = function() {
+      this.paginationChangedAction();
+    };
+
+    this.paginationChangedAction = function() {
+      this.retrievePage(this.pageType, this.tableType);
+    };
+
+    this.$onChanges = function(changes) {
+      if (changes.loaded && changes.loaded.currentValue) {
+        this.paginationChangedAction();
+      }
+    };
   },
   bindings: {
+    paginationState: '=',
+    loaded: '<',
+    pageType: '<',
+    tableType: '@',
+    retrievePage: '<',
     dataset: '<',
     entryClick: '<',
     emptyDatasetMessage: '@'

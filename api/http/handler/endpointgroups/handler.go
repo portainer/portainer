@@ -31,21 +31,24 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointGroupUpdate))).Methods(http.MethodPut)
 	h.Handle("/endpoint_groups/{id}",
 		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointGroupDelete))).Methods(http.MethodDelete)
-
+	h.Handle("/endpoint_groups/{id}/endpoints/{endpointId}",
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointGroupAddEndpoint))).Methods(http.MethodPut)
+	h.Handle("/endpoint_groups/{id}/endpoints/{endpointId}",
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointGroupDeleteEndpoint))).Methods(http.MethodDelete)
 	return h
 }
 
-func (handler *Handler) checkForGroupUnassignment(endpoint portainer.Endpoint, associatedEndpoints []portainer.EndpointID) error {
-	for _, id := range associatedEndpoints {
-		if id == endpoint.ID {
-			return nil
-		}
-	}
-
-	endpoint.GroupID = portainer.EndpointGroupID(1)
-	return handler.EndpointService.UpdateEndpoint(endpoint.ID, &endpoint)
-}
-
+//func (handler *Handler) checkForGroupUnassignment(endpoint portainer.Endpoint, associatedEndpoints []portainer.EndpointID) error {
+//	for _, id := range associatedEndpoints {
+//		if id == endpoint.ID {
+//			return nil
+//		}
+//	}
+//
+//	endpoint.GroupID = portainer.EndpointGroupID(1)
+//	return handler.EndpointService.UpdateEndpoint(endpoint.ID, &endpoint)
+//}
+//
 func (handler *Handler) checkForGroupAssignment(endpoint portainer.Endpoint, groupID portainer.EndpointGroupID, associatedEndpoints []portainer.EndpointID) error {
 	for _, id := range associatedEndpoints {
 
@@ -57,11 +60,12 @@ func (handler *Handler) checkForGroupAssignment(endpoint portainer.Endpoint, gro
 	return nil
 }
 
-func (handler *Handler) updateEndpointGroup(endpoint portainer.Endpoint, groupID portainer.EndpointGroupID, associatedEndpoints []portainer.EndpointID) error {
-	if endpoint.GroupID == groupID {
-		return handler.checkForGroupUnassignment(endpoint, associatedEndpoints)
-	} else if endpoint.GroupID == portainer.EndpointGroupID(1) {
-		return handler.checkForGroupAssignment(endpoint, groupID, associatedEndpoints)
-	}
-	return nil
-}
+//
+//func (handler *Handler) updateEndpointGroup(endpoint portainer.Endpoint, groupID portainer.EndpointGroupID, associatedEndpoints []portainer.EndpointID) error {
+//	if endpoint.GroupID == groupID {
+//		return handler.checkForGroupUnassignment(endpoint, associatedEndpoints)
+//	} else if endpoint.GroupID == portainer.EndpointGroupID(1) {
+//		return handler.checkForGroupAssignment(endpoint, groupID, associatedEndpoints)
+//	}
+//	return nil
+//}
