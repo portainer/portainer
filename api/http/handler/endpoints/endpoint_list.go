@@ -16,9 +16,9 @@ import (
 
 // GET request on /api/endpoints
 func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	start, _ := request.RetrieveNumericQueryParameter(r, "start", false)
-	limit, _ := request.RetrieveNumericQueryParameter(r, "limit", false)
-	filter, _ := request.RetrieveQueryParameter(r, "filter", false)
+	start, _ := request.RetrieveNumericQueryParameter(r, "start", true)
+	limit, _ := request.RetrieveNumericQueryParameter(r, "limit", true)
+	filter, _ := request.RetrieveQueryParameter(r, "filter", true)
 
 	if start != 0 {
 		start--
