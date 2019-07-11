@@ -24,7 +24,12 @@
   </span>
 </information-panel>
 
-<div class="row">
+<div class="row" style="width:100%; height:100%; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;" ng-if="state.connectingToEdgeEndpoint">
+  Connecting to the Edge endpoint...
+  <i class="fa fa-cog fa-spin" style="margin-left: 5px"></i>
+</div>
+
+<div class="row" ng-if="!state.connectingToEdgeEndpoint">
   <div class="col-sm-12">
     <endpoint-list
       title-text="Endpoints" title-icon="fa-plug"
