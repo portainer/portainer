@@ -13,6 +13,7 @@ angular.module('portainer.docker')
         showQuickActionLogs: true,
         showQuickActionConsole: true,
         showQuickActionInspect: true,
+        showQuickActionExec: true,
         showQuickActionAttach: false
       });
 
