@@ -85,18 +85,16 @@
     <div class="col-sm-12 form-section-title">
       Unassociated endpoints
     </div>
-    <div ng-if="$ctrl.associatedEndpoints.length > 0">
-      <div style="margin-top: 10px;">
-        <group-association-table
-          loaded="$ctrl.loaded"
-          page-type="$ctrl.pageType"
-          table-type="associated"
-          retrieve-page="$ctrl.getPaginatedEndpointsByGroup"
-          dataset="$ctrl.associatedEndpoints"
-          pagination-state="$ctrl.state.associated"
-          empty-dataset-message="No endpoint available"
-        ></group-association-table>
-      </div>
+    <div style="margin-top: 10px;">
+      <group-association-table
+        loaded="$ctrl.loaded"
+        page-type="$ctrl.pageType"
+        table-type="associated"
+        retrieve-page="$ctrl.getPaginatedEndpointsByGroup"
+        dataset="$ctrl.associatedEndpoints"
+        pagination-state="$ctrl.state.associated"
+        empty-dataset-message="No endpoint available"
+      ></group-association-table>
     </div>
     <div class="col-sm-12" ng-if="$ctrl.associatedEndpoints.length ===  0">
       <span class="text-muted small">All the endpoints are assigned to a group.</span>
