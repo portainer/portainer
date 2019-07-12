@@ -19,7 +19,6 @@ angular.module('portainer.app').component('groupAssociationTable', {
       return !(this.pageType === 'create' && this.tableType === 'associated');
     }
     this.onTextFilterChange = function() {
-      console.log('changed');
       this.paginationChangedAction();
     }
 
