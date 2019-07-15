@@ -108,7 +108,7 @@ angular.module('portainer.app')
         const startTime = Date.now();
         for await (const partialResult of $scope.state.tagsRetrieval.asyncGenerator) {
           if (typeof partialResult === 'number') {
-            $scope.state.tagsRetrieval.progression = partialResult;
+            $scope.state.tagsRetrieval.progression = (partialResult / $scope.repository.Tags.length * 100).toFixed();
             $scope.state.tagsRetrieval.elapsedTime = Date.now() - startTime;
           } else {
             $scope.short.Tags = _.sortBy(partialResult, 'Name');
@@ -155,12 +155,19 @@ angular.module('portainer.app')
               return;
             }
             $scope.state.tagsRetag.asyncGenerator.return();
+            resetTagsRetagState();
           });
       };
 
       function createRetagAsyncGenerator(modifiedTags, modifiedDigests, impactedTags) {
         $scope.state.tagsRetag.asyncGenerator =
           RegistryV2Service.retagWithProgress($scope.registryId, $scope.repository.Name, modifiedTags, modifiedDigests, impactedTags);
+      }
+
+      function resetTagsRetagState() {
+        $scope.state.tagsRetag.running = false;
+        $scope.state.tagsRetag.progression = 0;
+        $scope.state.tagsRetag.elapsedTime = 0;
       }
 
       async function retagActionAsync() {
@@ -212,8 +219,15 @@ angular.module('portainer.app')
               return;
             }
             $scope.state.tagsDelete.asyncGenerator.return();
+            resetTagsDeleteState();
           });
       };
+
+      function resetTagsDeleteState() {
+        $scope.state.tagsDelete.running = false;
+        $scope.state.tagsDelete.progression = 0;
+        $scope.state.tagsDelete.elapsedTime = 0;
+      }
 
       function createDeleteAsyncGenerator(modifiedDigests, impactedTags) {
         $scope.state.tagsDelete.asyncGenerator =

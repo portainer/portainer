@@ -24,11 +24,11 @@
       </p>
       <button class="btn btn-sm btn-primary" ng-if="!state.tagsRetrieval.running && short.Tags.length === 0"
         ng-click="startStopRetrieval()">Start</button>
-      <button class="btn btn-sm btn-danger" ng-if="state.tagsRetrieval.running && state.tagsRetrieval.progression !== repository.Tags.length"
+      <button class="btn btn-sm btn-danger" ng-if="state.tagsRetrieval.running && state.tagsRetrieval.progression !== 100"
         ng-click="startStopRetrieval()">Cancel</button>
     </span>
     <span ng-if="state.tagsRetrieval.running || short.Tags.length !== 0">
-      Retrieval status : {{ state.tagsRetrieval.progression }} / {{ repository.Tags.length }} - {{ state.tagsRetrieval.elapsedTime / 1000 }}s
+      Retrieval status : {{ state.tagsRetrieval.progression }}% - {{ state.tagsRetrieval.elapsedTime / 1000 }}s
     </span>
   </information-panel>
 </div>
