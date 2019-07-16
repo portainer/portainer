@@ -28,7 +28,7 @@
         ng-click="startStopRetrieval()">Cancel</button>
     </span>
     <span ng-if="state.tagsRetrieval.running && state.tagsRetrieval.progression !== '100'">
-      Retrieval progress : {{ state.tagsRetrieval.progression }}% - {{ state.tagsRetrieval.elapsedTime / 1000 }}s
+      &nbsp; Retrieval progress : {{ state.tagsRetrieval.progression }}% - {{ state.tagsRetrieval.elapsedTime / 1000 }}s
     </span>
     <span ng-if="!state.tagsRetrieval.running && state.tagsRetrieval.progression === '100'">
       <i class="fa fa-check-circle green-icon"></i> Retrieval completed in {{ state.tagsRetrieval.elapsedTime / 1000 }}s
@@ -75,7 +75,7 @@
           <button class="btn btn-sm btn-danger" ng-click="cancelRetagAction()">Cancel</button>
         </span>
         <span>
-          Retag progress : {{ state.tagsRetag.progression }}% - {{ state.tagsRetag.elapsedTime / 1000 }}s
+          &nbsp; Retag progress : {{ state.tagsRetag.progression }}% - {{ state.tagsRetag.elapsedTime / 1000 }}s
         </span>
       </rd-widget-body>
     </rd-widget>
@@ -89,7 +89,7 @@
           <button class="btn btn-sm btn-danger" ng-click="cancelDeleteAction()">Cancel</button>
         </span>
         <span>
-          Deletion progress : {{ state.tagsDelete.progression }}% - {{ state.tagsDelete.elapsedTime / 1000 }}s
+          &nbsp; Deletion progress : {{ state.tagsDelete.progression }}% - {{ state.tagsDelete.elapsedTime / 1000 }}s
         </span>
       </rd-widget-body>
     </rd-widget>
