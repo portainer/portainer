@@ -24,11 +24,14 @@
       </p>
       <button class="btn btn-sm btn-primary" ng-if="!state.tagsRetrieval.running && short.Tags.length === 0"
         ng-click="startStopRetrieval()">Start</button>
-      <button class="btn btn-sm btn-danger" ng-if="state.tagsRetrieval.running && state.tagsRetrieval.progression !== 100"
+      <button class="btn btn-sm btn-danger" ng-if="state.tagsRetrieval.running"
         ng-click="startStopRetrieval()">Cancel</button>
     </span>
-    <span ng-if="state.tagsRetrieval.running || short.Tags.length !== 0">
-      Retrieval status : {{ state.tagsRetrieval.progression }}% - {{ state.tagsRetrieval.elapsedTime / 1000 }}s
+    <span ng-if="state.tagsRetrieval.running && state.tagsRetrieval.progression !== '100'">
+      Retrieval progress : {{ state.tagsRetrieval.progression }}% - {{ state.tagsRetrieval.elapsedTime / 1000 }}s
+    </span>
+    <span ng-if="!state.tagsRetrieval.running && state.tagsRetrieval.progression === '100'">
+      <i class="fa fa-check-circle green-icon"></i> Retrieval completed in {{ state.tagsRetrieval.elapsedTime / 1000 }}s
     </span>
   </information-panel>
 </div>
@@ -67,12 +70,12 @@
         <span class="small text-muted">
           <p>
             <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-            Retag in progress - don't leave or close this page, or all tags will be lost !
+            Retag is in progress! Leaving this page will result in the loss of all tags!
           </p>
           <button class="btn btn-sm btn-danger" ng-click="cancelRetagAction()">Cancel</button>
-          <span>
-            Operations status : {{ state.tagsRetag.progression }} / {{ state.tagsRetag.totalOps }} - {{ state.tagsRetag.elapsedTime / 1000 }}s
-          </span>
+        </span>
+        <span>
+          Retag progress : {{ state.tagsRetag.progression }}% - {{ state.tagsRetag.elapsedTime / 1000 }}s
         </span>
       </rd-widget-body>
     </rd-widget>
@@ -81,12 +84,12 @@
         <span class="small text-muted">
           <p>
             <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-            Delete in progress - don't leave or close this page, or all tags will be lost !
+            Tag delete is in progress! Leaving this page will result in the loss of all tags!
           </p>
           <button class="btn btn-sm btn-danger" ng-click="cancelDeleteAction()">Cancel</button>
-          <span>
-            Operations status : {{ state.tagsDelete.progression }} / {{ state.tagsDelete.totalOps }} - {{ state.tagsDelete.elapsedTime / 1000 }}s
-          </span>
+        </span>
+        <span>
+          Deletion progress : {{ state.tagsDelete.progression }}% - {{ state.tagsDelete.elapsedTime / 1000 }}s
         </span>
       </rd-widget-body>
     </rd-widget>

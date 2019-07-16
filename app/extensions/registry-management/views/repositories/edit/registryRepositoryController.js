@@ -20,14 +20,12 @@ angular.module('portainer.app')
           running: false,
           progression: 0,
           elapsedTime: 0,
-          totalOps: 0,
           asyncGenerator: null
         },
         tagsDelete: {
           running: false,
           progression: 0,
           elapsedTime: 0,
-          totalOps: 0,
           asyncGenerator: null
         },
       };
@@ -43,6 +41,10 @@ angular.module('portainer.app')
         Name: '',
         Tags: [], // string list
       };
+
+      function toPercent(progress, total) {
+        return (progress / total * 100).toFixed();
+      }
 
       $scope.paginationAction = function (tags) {
         $scope.state.loading = true;
@@ -108,13 +110,14 @@ angular.module('portainer.app')
         const startTime = Date.now();
         for await (const partialResult of $scope.state.tagsRetrieval.asyncGenerator) {
           if (typeof partialResult === 'number') {
-            $scope.state.tagsRetrieval.progression = (partialResult / $scope.repository.Tags.length * 100).toFixed();
+            $scope.state.tagsRetrieval.progression = toPercent(partialResult, $scope.repository.Tags.length);
             $scope.state.tagsRetrieval.elapsedTime = Date.now() - startTime;
           } else {
             $scope.short.Tags = _.sortBy(partialResult, 'Name');
           }
         }
         $scope.state.tagsRetrieval.running = false;
+        console.log($scope.state.tagsRetrieval);
       }
       /**
        * !END RETRIEVAL SECTION
@@ -148,8 +151,7 @@ angular.module('portainer.app')
        * RETAG SECTION
        */
       $scope.cancelRetagAction = function() {
-        ModalService.confirmDeletion(
-          'WARNING: stopping this operation will stop all the tags readdition and they will all be lost forever. Are you sure you want to do this?',
+        ModalService.cancelRegistryRepositoryAction(
           (confirmed) => {
             if (!confirmed) {
               return;
@@ -178,13 +180,13 @@ angular.module('portainer.app')
           const modifiedDigests = _.uniq(_.map(modifiedTags, 'ImageDigest'));
           const impactedTags = _.filter($scope.short.Tags, (item) => _.includes(modifiedDigests, item.ImageDigest));
 
-          $scope.state.tagsRetag.totalOps = modifiedDigests.length + impactedTags.length;
+          const totalOps = modifiedDigests.length + impactedTags.length;
 
           createRetagAsyncGenerator(modifiedTags, modifiedDigests, impactedTags);
 
           for await (const partialResult of $scope.state.tagsRetag.asyncGenerator) {
             if (typeof partialResult === 'number') {
-              $scope.state.tagsRetag.progression = partialResult;
+              $scope.state.tagsRetag.progression = toPercent(partialResult, totalOps);
               $scope.state.tagsRetag.elapsedTime = Date.now() - startTime;
             }
           }
@@ -212,8 +214,7 @@ angular.module('portainer.app')
        * REMOVE TAGS SECTION
        */
       $scope.cancelDeleteAction = function() {
-        ModalService.confirmDeletion(
-          'WARNING: stopping this operation will stop all the tags readdition and they will all be lost forever. Are you sure you want to do this?',
+        ModalService.cancelRegistryRepositoryAction(
           (confirmed) => {
             if (!confirmed) {
               return;
@@ -244,13 +245,13 @@ angular.module('portainer.app')
           const impactedTags = _.filter($scope.short.Tags, (item) => _.includes(modifiedDigests, item.ImageDigest));
           const tagsToKeep = _.without(impactedTags, ...deletedShortTags);
 
-          $scope.state.tagsDelete.totalOps = modifiedDigests.length + tagsToKeep.length;
+          const totalOps = modifiedDigests.length + tagsToKeep.length;
 
           createDeleteAsyncGenerator(modifiedDigests, tagsToKeep);
 
           for await (const partialResult of $scope.state.tagsDelete.asyncGenerator) {
             if (typeof partialResult === 'number') {
-              $scope.state.tagsDelete.progression = partialResult;
+              $scope.state.tagsDelete.progression = toPercent(partialResult, totalOps);
               $scope.state.tagsDelete.elapsedTime = Date.now() - startTime;
             }
           }

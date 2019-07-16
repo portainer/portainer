@@ -97,6 +97,20 @@ angular.module('portainer.app')
     });
   };
 
+  service.cancelRegistryRepositoryAction = function(callback) {
+    service.confirm({
+      title: 'Are you sure?',
+      message: 'WARNING: interrupting this operation before it has finished will result in the loss of all tags. Are you sure you want to do this?',
+      buttons: {
+        confirm: {
+          label: 'Stop',
+          className: 'btn-danger'
+        }
+      },
+      callback: callback
+    });
+  };
+
   service.confirmDeletion = function(message, callback) {
     service.confirm({
       title: 'Are you sure ?',
