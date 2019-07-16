@@ -11,28 +11,28 @@ import (
 	"github.com/portainer/portainer/api"
 )
 
-// TODO: Edge handling (refactor?)
-func (handler *Handler) proxyWebsocketRequest(w http.ResponseWriter, r *http.Request, params *webSocketRequestParams) error {
-	if params.endpoint.Type == portainer.EdgeAgentEnvironment {
-		_, port, _ := handler.ReverseTunnelService.GetTunnelState(params.endpoint.ID)
-		endpointURL, err := url.Parse(fmt.Sprintf("http://localhost:%d", port))
-		if err != nil {
-			return err
-		}
+func (handler *Handler) proxyEdgeAgentWebsocketRequest(w http.ResponseWriter, r *http.Request, params *webSocketRequestParams) error {
+	_, port, _ := handler.ReverseTunnelService.GetTunnelState(params.endpoint.ID)
 
-		endpointURL.Scheme = "ws"
-		proxy := websocketproxy.NewProxy(endpointURL)
-
-		proxy.Director = func(incoming *http.Request, out http.Header) {
-			out.Set(portainer.PortainerAgentTargetHeader, params.nodeName)
-		}
-
-		handler.ReverseTunnelService.UpdateTunnelState(params.endpoint.ID, portainer.EdgeAgentActive)
-
-		proxy.ServeHTTP(w, r)
-		return nil
+	endpointURL, err := url.Parse(fmt.Sprintf("http://localhost:%d", port))
+	if err != nil {
+		return err
 	}
 
+	endpointURL.Scheme = "ws"
+	proxy := websocketproxy.NewProxy(endpointURL)
+
+	proxy.Director = func(incoming *http.Request, out http.Header) {
+		out.Set(portainer.PortainerAgentTargetHeader, params.nodeName)
+	}
+
+	handler.ReverseTunnelService.UpdateTunnelState(params.endpoint.ID, portainer.EdgeAgentActive)
+	proxy.ServeHTTP(w, r)
+
+	return nil
+}
+
+func (handler *Handler) proxyAgentWebsocketRequest(w http.ResponseWriter, r *http.Request, params *webSocketRequestParams) error {
 	agentURL, err := url.Parse(params.endpoint.URL)
 	if err != nil {
 		return err
