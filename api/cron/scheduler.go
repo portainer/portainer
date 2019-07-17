@@ -19,8 +19,7 @@ func NewJobScheduler() *JobScheduler {
 
 // ScheduleJob schedules the execution of a job via a runner
 func (scheduler *JobScheduler) ScheduleJob(runner portainer.JobRunner) error {
-	_, err := scheduler.cron.AddJob(runner.GetSchedule().CronExpression, runner)
-	return err
+	return scheduler.cron.AddJob(runner.GetSchedule().CronExpression, runner)
 }
 
 // UpdateSystemJobSchedule updates the first occurence of the specified
@@ -36,7 +35,7 @@ func (scheduler *JobScheduler) UpdateSystemJobSchedule(jobType portainer.JobType
 
 	for _, entry := range cronEntries {
 		if entry.Job.(portainer.JobRunner).GetSchedule().JobType == jobType {
-			_, err := newCron.AddJob(newCronExpression, entry.Job)
+			err := newCron.AddJob(newCronExpression, entry.Job)
 			if err != nil {
 				return err
 			}
@@ -70,7 +69,7 @@ func (scheduler *JobScheduler) UpdateJobSchedule(runner portainer.JobRunner) err
 				jobRunner = entry.Job
 			}
 
-			_, err := newCron.AddJob(runner.GetSchedule().CronExpression, jobRunner)
+			err := newCron.AddJob(runner.GetSchedule().CronExpression, jobRunner)
 			if err != nil {
 				return err
 			}
