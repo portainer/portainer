@@ -117,7 +117,6 @@ angular.module('portainer.app')
           }
         }
         $scope.state.tagsRetrieval.running = false;
-        console.log($scope.state.tagsRetrieval);
       }
       /**
        * !END RETRIEVAL SECTION
@@ -156,8 +155,8 @@ angular.module('portainer.app')
             if (!confirmed) {
               return;
             }
-            $scope.state.tagsRetag.asyncGenerator.return();
             resetTagsRetagState();
+            $scope.state.tagsRetag.asyncGenerator.return();
           });
       };
 
@@ -219,8 +218,8 @@ angular.module('portainer.app')
             if (!confirmed) {
               return;
             }
-            $scope.state.tagsDelete.asyncGenerator.return();
             resetTagsDeleteState();
+            $scope.state.tagsDelete.asyncGenerator.return();
           });
       };
 
