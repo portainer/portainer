@@ -89,7 +89,7 @@ function RegistryV2ServiceFactory($q, $async, RegistryCatalog, RegistryTags, Reg
     $q.all(promises)
     .then(function success(data) {
       var repositories = data.map(function (item) {
-        if (!item.tags) {
+        if (!item.tags || !_.without(item.tags, null).length) {
           return;
         }
         return new RegistryRepositoryViewModel(item);
