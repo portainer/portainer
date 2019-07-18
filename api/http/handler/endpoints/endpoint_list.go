@@ -27,12 +27,12 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: filters", err}
 	}
 
-	start, _ := request.RetrieveNumericQueryParameter(r, "start", false)
+	start, _ := request.RetrieveNumericQueryParameter(r, "start", true)
 	if start != 0 {
 		start--
 	}
 
-	limit, _ := request.RetrieveNumericQueryParameter(r, "limit", false)
+	limit, _ := request.RetrieveNumericQueryParameter(r, "limit", true)
 
 	endpointGroups, err := handler.EndpointGroupService.EndpointGroups()
 	if err != nil {
