@@ -43,6 +43,14 @@ function GroupService($q, EndpointGroups) {
     return EndpointGroups.updateAccess({ id: groupId }, {UserAccessPolicies: userAccessPolicies, TeamAccessPolicies: teamAccessPolicies}).$promise;
   };
 
+  service.addEndpoint = function(groupId, endpoint) {
+    return EndpointGroups.addEndpoint({id: groupId, action: 'endpoints/' + endpoint.Id}, endpoint).$promise;
+  }
+
+  service.removeEndpoint = function(groupId, endpointId) {
+    return EndpointGroups.removeEndpoint({id: groupId, action: 'endpoints/' + endpointId}).$promise
+  }
+
   service.deleteGroup = function(groupId) {
     return EndpointGroups.remove({ id: groupId }).$promise;
   };

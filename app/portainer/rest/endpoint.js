@@ -6,7 +6,7 @@ angular.module('portainer.app')
   return $resource(API_ENDPOINT_ENDPOINTS + '/:id/:action', {}, {
     query: {
       method: 'GET',
-      params: {start: '@start', limit: '@limit', filter: '@filter'},
+      params: {start: '@start', limit: '@limit', filters: '@filters'},
       transformResponse: getEndpointsTotalCount
    },
     get: { method: 'GET', params: { id: '@id' } },

@@ -3,10 +3,9 @@ package endpoint
 import (
 	"strings"
 
+	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
-
-	"github.com/boltdb/bolt"
 )
 
 const (
@@ -109,7 +108,7 @@ func (service *Service) EndpointsFiltered(filter string, matchingGroups []portai
 				return err
 			}
 
-			if matchFilter(endpoint, filter) {
+			if filter != "" && matchFilter(endpoint, filter) {
 				endpoints = append(endpoints, endpoint)
 				continue
 			}

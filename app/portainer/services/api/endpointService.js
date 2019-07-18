@@ -9,7 +9,8 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
   };
 
   service.endpoints = function(start, limit, filter) {
-    return Endpoints.query({start, limit, filter}).$promise;
+    var filters = { search: filter };
+    return Endpoints.query({start, limit, filters}).$promise;
   };
 
   service.snapshotEndpoints = function() {
@@ -20,21 +21,9 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     return Endpoints.snapshot({ id: endpointID }, {}).$promise;
   };
 
-  service.endpointsByGroup = function(groupId) {
-    var deferred = $q.defer();
-
-    Endpoints.query({}).$promise
-    .then(function success(data) {
-      var endpoints = data.value.filter(function (endpoint) {
-        return endpoint.GroupId === groupId;
-      });
-      deferred.resolve(endpoints);
-    })
-    .catch(function error(err) {
-      deferred.reject({msg: 'Unable to retrieve endpoints', err: err});
-    });
-
-    return deferred.promise;
+  service.endpointsByGroup = function(start, limit, filter, groupId) {
+    var filters = { search: filter, groupId: groupId };
+    return Endpoints.query({ start, limit, filters }).$promise;
   };
 
   service.updateAccess = function(id, userAccessPolicies, teamAccessPolicies) {
