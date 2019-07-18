@@ -877,7 +877,7 @@ const (
 	// SupportedDockerAPIVersion is the minimum Docker API version supported by Portainer
 	SupportedDockerAPIVersion = "1.24"
 	// ExtensionServer represents the server used by Portainer to communicate with extensions 
-	ExtensionServer = "192.168.0.15"
+	ExtensionServer = "localhost"
 )
 
 const (
