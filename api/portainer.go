@@ -1,9 +1,5 @@
 package portainer
 
-import (
-	"github.com/portainer/portainer/api/utils"
-)
-
 type (
 	// Pair defines a key/value string pair
 	Pair struct {
@@ -655,7 +651,7 @@ type (
 	EndpointService interface {
 		Endpoint(ID EndpointID) (*Endpoint, error)
 		EndpointsPaginated(pos, limit int) ([]Endpoint, error)
-		EndpointsFiltered(filter utils.SlicedFilter, matchingGroups []EndpointGroup, restrictedGroupID EndpointGroupID) ([]Endpoint, error)
+		EndpointsFiltered(filter string, matchingGroups []EndpointGroup) ([]Endpoint, error)
 		Endpoints() ([]Endpoint, error)
 		EndpointCount() (int, error)
 		CreateEndpoint(endpoint *Endpoint) error
