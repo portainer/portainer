@@ -9,7 +9,8 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
   };
 
   service.endpoints = function(start, limit, filter) {
-    return Endpoints.query({start, limit, filter}).$promise;
+    var filters = { search: filter };
+    return Endpoints.query({start, limit, filters}).$promise;
   };
 
   service.snapshotEndpoints = function() {
@@ -21,12 +22,8 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
   };
 
   service.endpointsByGroup = function(start, limit, filter, groupId) {
-    if (!filter) {
-      filter = "groupid:" + groupId
-    } else {
-      filter += " groupid:" + groupId
-    }
-    return service.endpoints(start, limit, filter);
+    var filters = { search: filter, groupId: groupId };
+    return Endpoints.query({ start, limit, filters }).$promise;
   };
 
   service.updateAccess = function(id, userAccessPolicies, teamAccessPolicies) {
