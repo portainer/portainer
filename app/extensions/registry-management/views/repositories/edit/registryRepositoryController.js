@@ -155,7 +155,7 @@ angular.module('portainer.app')
             if (!confirmed) {
               return;
             }
-            resetTagsRetagState();
+            reload();
             $scope.state.tagsRetag.asyncGenerator.return();
           });
       };
@@ -163,12 +163,6 @@ angular.module('portainer.app')
       function createRetagAsyncGenerator(modifiedTags, modifiedDigests, impactedTags) {
         $scope.state.tagsRetag.asyncGenerator =
           RegistryV2Service.retagWithProgress($scope.registryId, $scope.repository.Name, modifiedTags, modifiedDigests, impactedTags);
-      }
-
-      function resetTagsRetagState() {
-        $scope.state.tagsRetag.running = false;
-        $scope.state.tagsRetag.progression = 0;
-        $scope.state.tagsRetag.elapsedTime = 0;
       }
 
       async function retagActionAsync() {
@@ -218,15 +212,13 @@ angular.module('portainer.app')
             if (!confirmed) {
               return;
             }
-            resetTagsDeleteState();
+            reload();
             $scope.state.tagsDelete.asyncGenerator.return();
           });
       };
 
-      function resetTagsDeleteState() {
-        $scope.state.tagsDelete.running = false;
-        $scope.state.tagsDelete.progression = 0;
-        $scope.state.tagsDelete.elapsedTime = 0;
+      function reload() {
+        $state.reload();
       }
 
       function createDeleteAsyncGenerator(modifiedDigests, impactedTags) {
