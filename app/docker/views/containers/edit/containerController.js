@@ -156,10 +156,10 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
     var imageConfig = ImageHelper.createImageConfigForCommit(image, registry.URL);
     Commit.commitContainer({id: $transition$.params().id, tag: imageConfig.tag, repo: imageConfig.repo}, function () {
       update();
-      Notifications.success('Container commited', $transition$.params().id);
+      Notifications.success('Image created', $transition$.params().id);
     }, function (e) {
       update();
-      Notifications.error('Failure', e, 'Unable to commit container');
+      Notifications.error('Failure', e, 'Unable to create image');
     });
   };
 
