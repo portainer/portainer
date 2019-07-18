@@ -3,11 +3,9 @@ package endpoint
 import (
 	"strings"
 
+	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
-	"github.com/portainer/portainer/api/utils"
-
-	"github.com/boltdb/bolt"
 )
 
 const (
@@ -70,25 +68,21 @@ func (service *Service) EndpointCount() (int, error) {
 	return endpointCount, err
 }
 
-func matchFilter(endpoint portainer.Endpoint, filters utils.SlicedFilter, restrictedGroupID portainer.EndpointGroupID) bool {
-	if restrictedGroupID != -1 && endpoint.GroupID != restrictedGroupID {
-		return false
-	}
-
-	if utils.StringContainsOneOf(strings.ToLower(endpoint.Name), filters) {
+func matchFilter(endpoint portainer.Endpoint, filter string) bool {
+	if strings.Contains(strings.ToLower(endpoint.Name), filter) {
 		return true
-	} else if utils.StringContainsOneOf(strings.ToLower(endpoint.URL), filters) {
+	} else if strings.Contains(strings.ToLower(endpoint.URL), filter) {
 		return true
 	}
 
-	if endpoint.Status == portainer.EndpointStatusUp && utils.StringContainsOneOf("up", filters) {
+	if endpoint.Status == portainer.EndpointStatusUp && filter == "up" {
 		return true
-	} else if endpoint.Status == portainer.EndpointStatusDown && utils.StringContainsOneOf("down", filters) {
+	} else if endpoint.Status == portainer.EndpointStatusDown && filter == "down" {
 		return true
 	}
 
 	for _, tag := range endpoint.Tags {
-		if utils.StringContainsOneOf(strings.ToLower(tag), filters) {
+		if strings.Contains(strings.ToLower(tag), filter) {
 			return true
 		}
 	}
@@ -100,7 +94,7 @@ func matchFilter(endpoint portainer.Endpoint, filters utils.SlicedFilter, restri
 // the specified filter. The search is performed on the endpoint name, URL, status
 // and tags. It also aggregates any endpoint that is part of the specified matching endpoint
 // groups.
-func (service *Service) EndpointsFiltered(filter utils.SlicedFilter, matchingGroups []portainer.EndpointGroup, restrictedGroupID portainer.EndpointGroupID) ([]portainer.Endpoint, error) {
+func (service *Service) EndpointsFiltered(filter string, matchingGroups []portainer.EndpointGroup) ([]portainer.Endpoint, error) {
 	var endpoints = make([]portainer.Endpoint, 0)
 
 	err := service.db.View(func(tx *bolt.Tx) error {
@@ -114,7 +108,7 @@ func (service *Service) EndpointsFiltered(filter utils.SlicedFilter, matchingGro
 				return err
 			}
 
-			if matchFilter(endpoint, filter, restrictedGroupID) {
+			if filter != "" && matchFilter(endpoint, filter) {
 				endpoints = append(endpoints, endpoint)
 				continue
 			}
