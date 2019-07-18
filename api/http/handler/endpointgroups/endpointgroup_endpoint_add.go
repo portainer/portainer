@@ -42,24 +42,5 @@ func (handler *Handler) endpointGroupAddEndpoint(w http.ResponseWriter, r *http.
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint changes inside the database", err}
 	}
 
-	//err = handler.EndpointGroupService.UpdateEndpointGroup(endpointGroup.ID, endpointGroup)
-	//if err != nil {
-	//	return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint group changes inside the database", err}
-	//}
-
-	//if payload.AssociatedEndpoints != nil {
-	//	endpoints, err := handler.EndpointService.Endpoints()
-	//	if err != nil {
-	//		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
-	//	}
-	//
-	//	for _, endpoint := range endpoints {
-	//		err = handler.updateEndpointGroup(endpoint, portainer.EndpointGroupID(endpointGroupID), payload.AssociatedEndpoints)
-	//		if err != nil {
-	//			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint", err}
-	//		}
-	//	}
-	//}
-
 	return response.Empty(w)
 }
