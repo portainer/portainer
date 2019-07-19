@@ -60,7 +60,7 @@ func (service *Service) StartTunnelServer(addr, port string) error {
 	config := &chserver.Config{
 		Reverse: true,
 		KeySeed: "keyseedexample",
-		Auth:    "agent@randomstring",
+		Auth:    "agent:randomstring",
 	}
 
 	chiselServer, err := chserver.NewServer(config)
