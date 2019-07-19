@@ -41,6 +41,7 @@ angular.module('portainer.app')
           this.settings.open = false;
         }
         this.onSettingsRepeaterChange();
+        this.state.orderBy = this.orderBy;
       };
   }
 ]);

@@ -203,5 +203,6 @@ function ($scope, $controller, DatatableService, EndpointProvider) {
       this.columnVisibility = storedColumnVisibility;
       this.columnVisibility.state.open = false;
     }
+    this.state.orderBy = this.orderBy;
   };
 }]);
