@@ -21,24 +21,18 @@ Also, be sure to check our FAQ and documentation first: https://portainer.readth
 -->
 
 **Bug description**
-
 A clear and concise description of what the bug is.
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
-Briefly describe what you were expecting.
-
 **Steps to reproduce the issue:**
-
-Steps to reproduce the behavior:
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'
 4. See error
 
 **Technical details:**
-
 * Portainer version:
 * Docker version (managed by Portainer):
 * Platform (windows/linux):
