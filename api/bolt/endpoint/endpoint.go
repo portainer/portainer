@@ -53,19 +53,6 @@ func (service *Service) DeleteEndpoint(ID portainer.EndpointID) error {
 	return internal.DeleteObject(service.db, BucketName, identifier)
 }
 
-// EndpointCount returns the total count of endpoints.
-func (service *Service) EndpointCount() (int, error) {
-	endpointCount := 0
-
-	err := service.db.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-		endpointCount = bucket.Stats().KeyN
-		return nil
-	})
-
-	return endpointCount, err
-}
-
 // Endpoints return an array containing all the endpoints.
 func (service *Service) Endpoints() ([]portainer.Endpoint, error) {
 	var endpoints = make([]portainer.Endpoint, 0)
