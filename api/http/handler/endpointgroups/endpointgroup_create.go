@@ -55,9 +55,9 @@ func (handler *Handler) endpointGroupCreate(w http.ResponseWriter, r *http.Reque
 
 	for _, id := range payload.AssociatedEndpoints {
 		for _, endpoint := range endpoints {
-
 			if endpoint.ID == id {
 				endpoint.GroupID = endpointGroup.ID
+
 				err := handler.EndpointService.UpdateEndpoint(endpoint.ID, &endpoint)
 				if err != nil {
 					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint", err}
@@ -65,7 +65,6 @@ func (handler *Handler) endpointGroupCreate(w http.ResponseWriter, r *http.Reque
 
 				break
 			}
-
 		}
 	}
 
