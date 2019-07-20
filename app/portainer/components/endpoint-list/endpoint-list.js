@@ -1,5 +1,5 @@
 angular.module('portainer.app').component('endpointList', {
-  templateUrl: 'app/portainer/components/endpoint-list/endpointList.html',
+  templateUrl: './endpointList.html',
   controller: 'EndpointListController',
   bindings: {
     titleText: '@',
@@ -10,6 +10,8 @@ angular.module('portainer.app').component('endpointList', {
     snapshotAction: '<',
     showSnapshotAction: '<',
     editAction: '<',
-    isAdmin:'<'
+    isAdmin:'<',
+    totalCount: '<',
+    retrievePage: '<'
   }
 });

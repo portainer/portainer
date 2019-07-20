@@ -1,4 +1,6 @@
-function NetworkViewModel(data) {
+import { ResourceControlViewModel } from "../../portainer/models/resourceControl";
+
+export function NetworkViewModel(data) {
   this.Id = data.Id;
   this.Name = data.Name;
   this.Scope = data.Scope;

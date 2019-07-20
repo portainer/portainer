@@ -1,3 +1,5 @@
+import { browseGetResponse } from '../response/browse';
+
 angular.module('portainer.agent')
 .factory('BrowseVersion1', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', function BrowseFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
   'use strict';
@@ -10,7 +12,8 @@ angular.module('portainer.agent')
     },
     get: {
       method: 'GET', params: { action: 'get' },
-      transformResponse: browseGetResponse
+      transformResponse: browseGetResponse,
+      responseType: 'arraybuffer'
     },
     delete: {
       method: 'DELETE', params: { action: 'delete' }

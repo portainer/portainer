@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 angular.module('portainer.app')
   .controller('ExtensionsController', ['$scope', '$state', 'ExtensionService', 'Notifications',
     function($scope, $state, ExtensionService, Notifications) {
@@ -28,6 +30,8 @@ angular.module('portainer.app')
         $scope.state.actionInProgress = true;
         ExtensionService.enable(license)
           .then(function onSuccess() {
+            return ExtensionService.retrieveAndSaveEnabledExtensions();
+          }).then(function () {
             Notifications.success('Extension successfully enabled');
             $state.reload();
           })

@@ -1,3 +1,5 @@
+import {EndpointGroupDefaultModel} from '../../../models/group';
+
 angular.module('portainer.app')
 .controller('CreateGroupController', ['$q', '$scope', '$state', 'GroupService', 'EndpointService', 'TagService', 'Notifications',
 function ($q, $scope, $state, GroupService, EndpointService, TagService, Notifications) {
@@ -30,19 +32,15 @@ function ($q, $scope, $state, GroupService, EndpointService, TagService, Notific
   };
 
   function initView() {
-    $scope.model = new EndpointGroupDefaultModel();
-
-    $q.all({
-      endpoints: EndpointService.endpointsByGroup(1),
-      tags: TagService.tagNames()
-    })
-    .then(function success(data) {
-      $scope.availableEndpoints = data.endpoints;
+    TagService.tagNames()
+    .then((tags) => {
+      $scope.availableTags = tags;
       $scope.associatedEndpoints = [];
-      $scope.availableTags = data.tags;
+      $scope.model = new EndpointGroupDefaultModel();
+      $scope.loaded = true;
     })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to retrieve endpoints');
+    .catch((err) => {
+      Notifications.error('Failure', err, 'Unable to retrieve tags');
     });
   }
 

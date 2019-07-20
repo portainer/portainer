@@ -1,50 +1,18 @@
+import _ from 'lodash-es';
+
 angular.module('portainer.docker')
-.controller('ServicesDatatableController', ['PaginationService', 'DatatableService', 'EndpointProvider',
-function (PaginationService, DatatableService, EndpointProvider) {
+.controller('ServicesDatatableController', ['$scope', '$controller', 'DatatableService', 'EndpointProvider',
+function ($scope, $controller, DatatableService, EndpointProvider) {
+
+  angular.extend(this, $controller('GenericDatatableController', {$scope: $scope}));
 
   var ctrl = this;
 
-  this.state = {
-    selectAll: false,
+  this.state = Object.assign(this.state,{
     expandAll: false,
-    orderBy: this.orderBy,
-    paginatedItemLimit: PaginationService.getPaginationLimit(this.tableKey),
-    displayTextFilter: false,
-    selectedItemCount: 0,
-    selectedItems: [],
     expandedItems: [],
     publicURL: EndpointProvider.endpointPublicURL()
-  };
-
-  this.onTextFilterChange = function() {
-    DatatableService.setDataTableTextFilters(this.tableKey, this.state.textFilter);
-  };
-
-  this.changeOrderBy = function(orderField) {
-    this.state.reverseOrder = this.state.orderBy === orderField ? !this.state.reverseOrder : false;
-    this.state.orderBy = orderField;
-    DatatableService.setDataTableOrder(this.tableKey, orderField, this.state.reverseOrder);
-  };
-
-  this.selectItem = function(item) {
-    if (item.Checked) {
-      this.state.selectedItemCount++;
-      this.state.selectedItems.push(item);
-    } else {
-      this.state.selectedItems.splice(this.state.selectedItems.indexOf(item), 1);
-      this.state.selectedItemCount--;
-    }
-  };
-
-  this.selectAll = function() {
-    for (var i = 0; i < this.state.filteredDataSet.length; i++) {
-      var item = this.state.filteredDataSet[i];
-      if (item.Checked !== this.state.selectAll) {
-        item.Checked = this.state.selectAll;
-        this.selectItem(item);
-      }
-    }
-  };
+  });
 
   this.expandAll = function() {
     this.state.expandAll = !this.state.expandAll;
@@ -52,10 +20,6 @@ function (PaginationService, DatatableService, EndpointProvider) {
       var item = this.state.filteredDataSet[i];
       this.expandItem(item, this.state.expandAll);
     }
-  };
-
-  this.changePaginationLimit = function() {
-    PaginationService.setPaginationLimit(this.tableKey, this.state.paginatedItemLimit);
   };
 
   this.expandItem = function(item, expanded) {
@@ -101,7 +65,8 @@ function (PaginationService, DatatableService, EndpointProvider) {
   };
 
   this.$onInit = function() {
-    setDefaults(this);
+    this.setDefaults();
+    this.prepareTableFromDataset();
 
     var storedOrder = DatatableService.getDataTableOrder(this.tableKey);
     if (storedOrder !== null) {
@@ -109,19 +74,23 @@ function (PaginationService, DatatableService, EndpointProvider) {
       this.state.orderBy = storedOrder.orderBy;
     }
 
+    var textFilter = DatatableService.getDataTableTextFilters(this.tableKey);
+    if (textFilter !== null) {
+      this.state.textFilter = textFilter;
+      this.onTextFilterChange();
+    }
+
+    var storedFilters = DatatableService.getDataTableFilters(this.tableKey);
+    if (storedFilters !== null) {
+      this.filters = storedFilters;
+    }
+    if (this.filters && this.filters.state) {
+      this.filters.state.open = false;
+    }
+
     var storedExpandedItems = DatatableService.getDataTableExpandedItems(this.tableKey);
     if (storedExpandedItems !== null) {
       this.expandItems(storedExpandedItems);
     }
-
-    var textFilter = DatatableService.getDataTableTextFilters(this.tableKey);
-    if (textFilter !== null) {
-      this.state.textFilter = textFilter;
-    }
   };
-
-  function setDefaults(ctrl) {
-    ctrl.showTextFilter = ctrl.showTextFilter ? ctrl.showTextFilter : false;
-    ctrl.state.reverseOrder = ctrl.reverseOrder ? ctrl.reverseOrder : false;
-  }
 }]);

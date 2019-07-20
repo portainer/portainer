@@ -5,8 +5,8 @@ import (
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/http/security"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 // Handler is the HTTP handler used to handle endpoint group operations.
@@ -22,48 +22,18 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		Router: mux.NewRouter(),
 	}
 	h.Handle("/endpoint_groups",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.endpointGroupCreate))).Methods(http.MethodPost)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointGroupCreate))).Methods(http.MethodPost)
 	h.Handle("/endpoint_groups",
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointGroupList))).Methods(http.MethodGet)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointGroupList))).Methods(http.MethodGet)
 	h.Handle("/endpoint_groups/{id}",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.endpointGroupInspect))).Methods(http.MethodGet)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointGroupInspect))).Methods(http.MethodGet)
 	h.Handle("/endpoint_groups/{id}",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.endpointGroupUpdate))).Methods(http.MethodPut)
-	h.Handle("/endpoint_groups/{id}/access",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.endpointGroupUpdateAccess))).Methods(http.MethodPut)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointGroupUpdate))).Methods(http.MethodPut)
 	h.Handle("/endpoint_groups/{id}",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.endpointGroupDelete))).Methods(http.MethodDelete)
-
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointGroupDelete))).Methods(http.MethodDelete)
+	h.Handle("/endpoint_groups/{id}/endpoints/{endpointId}",
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointGroupAddEndpoint))).Methods(http.MethodPut)
+	h.Handle("/endpoint_groups/{id}/endpoints/{endpointId}",
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointGroupDeleteEndpoint))).Methods(http.MethodDelete)
 	return h
-}
-
-func (handler *Handler) checkForGroupUnassignment(endpoint portainer.Endpoint, associatedEndpoints []portainer.EndpointID) error {
-	for _, id := range associatedEndpoints {
-		if id == endpoint.ID {
-			return nil
-		}
-	}
-
-	endpoint.GroupID = portainer.EndpointGroupID(1)
-	return handler.EndpointService.UpdateEndpoint(endpoint.ID, &endpoint)
-}
-
-func (handler *Handler) checkForGroupAssignment(endpoint portainer.Endpoint, groupID portainer.EndpointGroupID, associatedEndpoints []portainer.EndpointID) error {
-	for _, id := range associatedEndpoints {
-
-		if id == endpoint.ID {
-			endpoint.GroupID = groupID
-			return handler.EndpointService.UpdateEndpoint(endpoint.ID, &endpoint)
-		}
-	}
-	return nil
-}
-
-func (handler *Handler) updateEndpointGroup(endpoint portainer.Endpoint, groupID portainer.EndpointGroupID, associatedEndpoints []portainer.EndpointID) error {
-	if endpoint.GroupID == groupID {
-		return handler.checkForGroupUnassignment(endpoint, associatedEndpoints)
-	} else if endpoint.GroupID == portainer.EndpointGroupID(1) {
-		return handler.checkForGroupAssignment(endpoint, groupID, associatedEndpoints)
-	}
-	return nil
 }

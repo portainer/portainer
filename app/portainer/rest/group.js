@@ -7,6 +7,8 @@ angular.module('portainer.app')
     get: { method: 'GET', params: { id: '@id' } },
     update: { method: 'PUT', params: { id: '@id' } },
     updateAccess: { method: 'PUT', params: { id: '@id', action: 'access' } },
+    addEndpoint: {method: 'PUT', params: {id: '@id', action: '@action'}},
+    removeEndpoint: {method: 'DELETE', params:{id:'@id', action: '@action'}},
     remove: { method: 'DELETE', params: { id: '@id'} }
   });
 }]);

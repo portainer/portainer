@@ -5,8 +5,8 @@ import (
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/http/security"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 func hideFields(dockerHub *portainer.DockerHub) {
@@ -25,9 +25,9 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		Router: mux.NewRouter(),
 	}
 	h.Handle("/dockerhub",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.dockerhubInspect))).Methods(http.MethodGet)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.dockerhubInspect))).Methods(http.MethodGet)
 	h.Handle("/dockerhub",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.dockerhubUpdate))).Methods(http.MethodPut)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.dockerhubUpdate))).Methods(http.MethodPut)
 
 	return h
 }

@@ -2,6 +2,8 @@ angular.module('portainer.docker')
 .controller('NetworkController', ['$scope', '$state', '$transition$', '$filter', 'NetworkService', 'Container', 'Notifications', 'HttpRequestHelper', 'PREDEFINED_NETWORKS',
 function ($scope, $state, $transition$, $filter, NetworkService, Container, Notifications, HttpRequestHelper, PREDEFINED_NETWORKS) {
 
+  $scope.network = {};
+
   $scope.removeNetwork = function removeNetwork() {
     NetworkService.remove($transition$.params().id, $transition$.params().id)
     .then(function success() {

@@ -1,3 +1,5 @@
+import _ from 'lodash-es';
+
 function includeString(text, values) {
   return values.some(function(val){
     return text.indexOf(val) !== -1;
@@ -90,6 +92,18 @@ angular.module('portainer.docker')
   'use strict';
   return function (text) {
     if (text === 'down' || text === 'Unhealthy') {
+      return 'danger';
+    }
+    return 'success';
+  };
+})
+.filter('dockerNodeAvailabilityBadge', function () {
+  'use strict';
+  return function (text) {
+    if (text === 'pause') {
+      return 'warning';
+    }
+    else if (text === 'drain') {
       return 'danger';
     }
     return 'success';
@@ -258,7 +272,7 @@ angular.module('portainer.docker')
 .filter('imagelayercommand', function () {
   'use strict';
   return function (createdBy) {
-	  return createdBy.replace('/bin/sh -c #(nop) ', '').replace('/bin/sh -c ', 'RUN ');
+    return createdBy.replace('/bin/sh -c #(nop) ', '').replace('/bin/sh -c ', 'RUN ');
   };
 })
 .filter('trimshasum', function () {

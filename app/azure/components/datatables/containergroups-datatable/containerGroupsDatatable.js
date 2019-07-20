@@ -1,5 +1,5 @@
 angular.module('portainer.azure').component('containergroupsDatatable', {
-  templateUrl: 'app/azure/components/datatables/containergroups-datatable/containerGroupsDatatable.html',
+  templateUrl: './containerGroupsDatatable.html',
   controller: 'GenericDatatableController',
   bindings: {
     title: '@',

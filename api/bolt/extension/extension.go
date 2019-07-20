@@ -1,8 +1,8 @@
 package extension
 
 import (
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/bolt/internal"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/bolt/internal"
 
 	"github.com/boltdb/bolt"
 )

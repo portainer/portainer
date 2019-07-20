@@ -1,7 +1,7 @@
 <div>
   <rd-widget>
     <rd-widget-header icon="fa-tasks" title-text="Hosts file entries">
-      <div class="nopadding">
+      <div class="nopadding" authorization="DockerServiceUpdate">
         <a class="btn btn-default btn-sm pull-right" ng-click="isUpdating ||addHostsEntry(service)" ng-disabled="isUpdating">
           <i class="fa fa-plus-circle" aria-hidden="true"></i> add host entry
         </a>
@@ -9,7 +9,7 @@
     </rd-widget-header>
     <rd-widget-body ng-if="!service.Hosts || service.Hosts.length === 0">
       <p>The Hosts file has no extra entries.</p>
-    </rd-widget-body>  
+    </rd-widget-body>
     <rd-widget-body ng-if="service.Hosts.length > 0" classes="no-padding">
       <table class="table" >
         <thead>
@@ -28,7 +28,7 @@
             <td>
               <div class="input-group input-group-sm">
                 <input type="text" class="form-control" ng-model="entry.ip" placeholder="e.g. 10.0.1.1" ng-change="updateHostsEntry(service, entry)" ng-disabled="isUpdating">
-                <span class="input-group-btn">
+                <span class="input-group-btn" authorization="DockerServiceUpdate">
                   <button class="btn btn-sm btn-danger" type="button" ng-click="removeHostsEntry(service, $index)" ng-disabled="isUpdating">
                     <i class="fa fa-trash" aria-hidden="true"></i>
                   </button>
@@ -39,7 +39,7 @@
         </tbody>
       </table>
     </rd-widget-body>
-    <rd-widget-footer>
+    <rd-widget-footer authorization="DockerServiceUpdate">
       <div class="btn-toolbar" role="toolbar">
         <div class="btn-group" role="group">
           <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['Hosts'])" ng-click="updateService(service)">Apply changes</button>

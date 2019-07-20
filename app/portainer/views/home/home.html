@@ -7,14 +7,11 @@
   <rd-header-content>Endpoints</rd-header-content>
 </rd-header>
 
-<information-panel
+<motd-panel
   ng-if="motd && motd.Message !== '' && applicationState.UI.dismissedInfoHash !== motd.Hash"
-  title-text="{{ motd.Title }}"
+  motd="motd"
   dismiss-action="dismissImportantInformation(motd.Hash)">
-  <span class="text-muted">
-    <p ng-bind-html="motd.Message"></p>
-  </span>
-</information-panel>
+</motd-panel>
 
 <information-panel
   ng-if="!isAdmin && endpoints.length === 0"
@@ -27,16 +24,18 @@
   </span>
 </information-panel>
 
-<div class="row" ng-if="endpoints.length > 0">
+<div class="row">
   <div class="col-sm-12">
     <endpoint-list
       title-text="Endpoints" title-icon="fa-plug"
-      endpoints="endpoints" table-key="endpoints"
+      endpoints="endpoints" table-key="home_endpoints"
       dashboard-action="goToDashboard"
       show-snapshot-action="!applicationState.application.authentication || isAdmin"
       snapshot-action="triggerSnapshot"
       edit-action="goToEdit"
       is-admin="isAdmin"
+      total-count="totalCount"
+      retrieve-page="getPaginatedEndpoints"
     ></endpoint-list>
   </div>
 </div>

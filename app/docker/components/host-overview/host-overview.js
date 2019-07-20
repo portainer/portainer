@@ -1,5 +1,5 @@
 angular.module('portainer.docker').component('hostOverview', {
-  templateUrl: 'app/docker/components/host-overview/host-overview.html',
+  templateUrl: './host-overview.html',
   bindings: {
     hostDetails: '<',
     engineDetails: '<',

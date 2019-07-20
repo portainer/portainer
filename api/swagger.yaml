@@ -54,7 +54,7 @@ info:
 
     **NOTE**: You can find more information on how to query the Docker API in the [Docker official documentation](https://docs.docker.com/engine/api/v1.30/) as well as in [this Portainer example](https://gist.github.com/deviantony/77026d402366b4b43fa5918d41bc42f8).
 
-  version: "1.20.2"
+  version: "1.21.0"
   title: "Portainer API"
   contact:
     email: "info@portainer.io"
@@ -69,10 +69,14 @@ tags:
   description: "Manage Docker environments"
 - name: "endpoint_groups"
   description: "Manage endpoint groups"
+- name: "extensions"
+  description: "Manage extensions"
 - name: "registries"
   description: "Manage Docker registries"
 - name: "resource_controls"
   description: "Manage access control on Docker resources"
+- name: "roles"
+  description: "Manage roles"
 - name: "settings"
   description: "Manage Portainer settings"
 - name: "status"
@@ -465,56 +469,6 @@ paths:
           examples:
             application/json:
               err: "Endpoint management is disabled"
-  /endpoints/{id}/access:
-    put:
-      tags:
-      - "endpoints"
-      summary: "Manage accesses to an endpoint"
-      description: |
-        Manage user and team accesses to an endpoint.
-        **Access policy**: administrator
-      operationId: "EndpointAccessUpdate"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      security:
-      - jwt: []
-      parameters:
-      - name: "id"
-        in: "path"
-        description: "Endpoint identifier"
-        required: true
-        type: "integer"
-      - in: "body"
-        name: "body"
-        description: "Authorizations details"
-        required: true
-        schema:
-          $ref: "#/definitions/EndpointAccessUpdateRequest"
-      responses:
-        200:
-          description: "Success"
-          schema:
-            $ref: "#/definitions/Endpoint"
-        400:
-          description: "Invalid request"
-          schema:
-            $ref: "#/definitions/GenericError"
-          examples:
-            application/json:
-              err: "Invalid request data format"
-        404:
-          description: "Endpoint not found"
-          schema:
-            $ref: "#/definitions/GenericError"
-          examples:
-            application/json:
-              err: "Endpoint not found"
-        500:
-          description: "Server error"
-          schema:
-            $ref: "#/definitions/GenericError"
   /endpoints/{id}/job:
     post:
       tags:
@@ -791,15 +745,120 @@ paths:
           examples:
             application/json:
               err: "EndpointGroup management is disabled"
-  /endpoint_groups/{id}/access:
+  /extensions:
+    get:
+      tags:
+      - "extensions"
+      summary: "List extensions"
+      description: |
+        List all extensions registered inside Portainer. If the store parameter is set to true,
+        will retrieve extensions details from the online repository.
+        **Access policy**: administrator
+      operationId: "ExtensionList"
+      produces:
+      - "application/json"
+      security:
+      - jwt: []
+      parameters:
+      - name: "store"
+        in: "query"
+        description: "Retrieve online information about extensions. Possible values: true or false."
+        required: false
+        type: "boolean"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/ExtensionListResponse"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    post:
+      tags:
+      - "extensions"
+      summary: "Enable an extension"
+      description: |
+        Enable an extension.
+        **Access policy**: administrator
+      operationId: "ExtensionCreate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      security:
+      - jwt: []
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Extension details"
+        required: true
+        schema:
+          $ref: "#/definitions/ExtensionCreateRequest"
+      responses:
+        204:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /extensions/{id}:
+    get:
+      tags:
+      - "extensions"
+      summary: "Inspect an extension"
+      description: |
+        Retrieve details abount an extension.
+        **Access policy**: administrator
+      operationId: "ExtensionInspect"
+      produces:
+      - "application/json"
+      security:
+      - jwt: []
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "extension identifier"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Extension"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        404:
+          description: "Extension not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Extension not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
     put:
       tags:
-      - "endpoint_groups"
-      summary: "Manage accesses to an endpoint group"
+      - "extensions"
+      summary: "Update an extension"
       description: |
-        Manage user and team accesses to an endpoint group.
+        Update an extension to a specific version of the extension.
         **Access policy**: administrator
-      operationId: "EndpointGroupAccessUpdate"
+      operationId: "ExtensionUpdate"
       consumes:
       - "application/json"
       produces:
@@ -809,20 +868,18 @@ paths:
       parameters:
       - name: "id"
         in: "path"
-        description: "EndpointGroup identifier"
+        description: "Extension identifier"
         required: true
         type: "integer"
       - in: "body"
         name: "body"
-        description: "Authorizations details"
+        description: "Extension details"
         required: true
         schema:
-          $ref: "#/definitions/EndpointGroupAccessUpdateRequest"
+          $ref: "#/definitions/ExtensionUpdateRequest"
       responses:
-        200:
+        204:
           description: "Success"
-          schema:
-            $ref: "#/definitions/EndpointGroup"
         400:
           description: "Invalid request"
           schema:
@@ -831,12 +888,49 @@ paths:
             application/json:
               err: "Invalid request data format"
         404:
-          description: "EndpointGroup not found"
+          description: "Extension not found"
           schema:
             $ref: "#/definitions/GenericError"
           examples:
             application/json:
-              err: "EndpointGroup not found"
+              err: "Extension not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    delete:
+      tags:
+      - "extensions"
+      summary: "Disable an extension"
+      description: |
+        Disable an extension.
+        **Access policy**: administrator
+      operationId: "ExtensionDelete"
+      security:
+      - jwt: []
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Extension identifier"
+        required: true
+        type: "integer"
+      responses:
+        204:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        404:
+          description: "Extension not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Extension not found"
         500:
           description: "Server error"
           schema:
@@ -1045,56 +1139,6 @@ paths:
           description: "Server error"
           schema:
             $ref: "#/definitions/GenericError"
-  /registries/{id}/access:
-    put:
-      tags:
-      - "registries"
-      summary: "Manage accesses to a registry"
-      description: |
-        Manage user and team accesses to a registry.
-        **Access policy**: administrator
-      operationId: "RegistryAccessUpdate"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      security:
-      - jwt: []
-      parameters:
-      - name: "id"
-        in: "path"
-        description: "Registry identifier"
-        required: true
-        type: "integer"
-      - in: "body"
-        name: "body"
-        description: "Authorizations details"
-        required: true
-        schema:
-          $ref: "#/definitions/RegistryAccessUpdateRequest"
-      responses:
-        200:
-          description: "Success"
-          schema:
-            $ref: "#/definitions/Registry"
-        400:
-          description: "Invalid request"
-          schema:
-            $ref: "#/definitions/GenericError"
-          examples:
-            application/json:
-              err: "Invalid request data format"
-        404:
-          description: "Registry not found"
-          schema:
-            $ref: "#/definitions/GenericError"
-          examples:
-            application/json:
-              err: "Registry not found"
-        500:
-          description: "Server error"
-          schema:
-            $ref: "#/definitions/GenericError"
   /resource_controls:
     post:
       tags:
@@ -1244,6 +1288,29 @@ paths:
           examples:
             application/json:
               err: "Resource control not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+  /roles:
+    get:
+      tags:
+      - "roles"
+      summary: "List roles"
+      description: |
+        List all roles available for use with the RBAC extension.
+        **Access policy**: administrator
+      operationId: "RoleList"
+      produces:
+      - "application/json"
+      security:
+      - jwt: []
+      parameters: []
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/RoleListResponse"
         500:
           description: "Server error"
           schema:
@@ -3018,7 +3085,7 @@ definitions:
         description: "Is analytics enabled"
       Version:
         type: "string"
-        example: "1.20.2"
+        example: "1.21.0"
         description: "Portainer API version"
   PublicSettingsInspectResponse:
     type: "object"
@@ -3114,7 +3181,29 @@ definitions:
         type: "string"
         example: "member"
         description: "LDAP attribute which denotes the group membership."
-
+  UserAccessPolicies:
+    type: "object"
+    description: "User access policies associated to a registry/endpoint/endpoint group. RoleID is not required for registry access policies and can be set to 0."
+    additionalProperties:
+      $ref: "#/definitions/AccessPolicy"
+    example:
+      1: { RoleID: 1 }
+      2: { RoleID: 3 }
+  TeamAccessPolicies:
+    type: "object"
+    description: "Team access policies associated to a registry/endpoint/endpoint group. RoleID is not required for registry access policies and can be set to 0."
+    additionalProperties:
+      $ref: "#/definitions/AccessPolicy"
+    example:
+      1: { RoleID: 1 }
+      2: { RoleID: 3 }
+  AccessPolicy:
+    type: "object"
+    properties:
+      RoleID:
+        type: "integer"
+        example: "1"
+        description: "Role identifier. Reference the role that will be associated to this access policy"
   LDAPSettings:
     type: "object"
     properties:
@@ -3566,40 +3655,10 @@ definitions:
         type: "string"
         example: "cOrXoK/1D35w8YQ8nH1/8ZGwzz45JIYD5jxHKXEQknk="
         description: "Azure authentication key"
-  EndpointAccessUpdateRequest:
-    type: "object"
-    properties:
-      AuthorizedUsers:
-        type: "array"
-        description: "List of user identifiers authorized to connect to this endpoint"
-        items:
-          type: "integer"
-          example: 1
-          description: "User identifier"
-      AuthorizedTeams:
-        type: "array"
-        description: "List of team identifiers authorized to connect to this endpoint"
-        items:
-          type: "integer"
-          example: 1
-          description: "Team identifier"
-  EndpointGroupAccessUpdateRequest:
-    type: "object"
-    properties:
-      AuthorizedUsers:
-        type: "array"
-        description: "List of user identifiers authorized to connect to this endpoint"
-        items:
-          type: "integer"
-          example: 1
-          description: "User identifier"
-      AuthorizedTeams:
-        type: "array"
-        description: "List of team identifiers authorized to connect to this endpoint"
-        items:
-          type: "integer"
-          example: 1
-          description: "Team identifier"
+      UserAccessPolicies:
+        $ref: "#/definitions/UserAccessPolicies"
+      TeamAccessPolicies:
+        $ref: "#/definitions/TeamAccessPolicies"
   RegistryCreateRequest:
     type: "object"
     required:
@@ -3664,23 +3723,10 @@ definitions:
         type: "string"
         example: "registry_password"
         description: "Password used to authenticate against this registry"
-  RegistryAccessUpdateRequest:
-    type: "object"
-    properties:
-      AuthorizedUsers:
-        type: "array"
-        description: "List of user identifiers authorized to use thi registry"
-        items:
-          type: "integer"
-          example: 1
-          description: "User identifier"
-      AuthorizedTeams:
-        type: "array"
-        description: "List of team identifiers authorized to use thi registry"
-        items:
-          type: "integer"
-          example: 1
-          description: "Team identifier"
+      UserAccessPolicies:
+        $ref: "#/definitions/UserAccessPolicies"
+      TeamAccessPolicies:
+        $ref: "#/definitions/TeamAccessPolicies"
   ResourceControlCreateRequest:
     type: "object"
     required:
@@ -3831,6 +3877,10 @@ definitions:
           type: "integer"
           example: 1
           description: "Endpoint identifier"
+      UserAccessPolicies:
+        $ref: "#/definitions/UserAccessPolicies"
+      TeamAccessPolicies:
+        $ref: "#/definitions/TeamAccessPolicies"
   UserCreateRequest:
     type: "object"
     required:
@@ -4502,3 +4552,138 @@ definitions:
         type: "string"
         example: "version: 3\n services:\n web:\n image:nginx"
         description: "Content of the Stack file."
+  LicenseInformation:
+    type: "object"
+    properties:
+      LicenseKey:
+        type: "string"
+        description: "License key"
+        example: "1-uKmVwboSWVIZv5URmE0VRkpbPX0rrCVeDxJl97LZ0piltw2SU28DSrNwPZAHCEAwB2SeKm6BCFcVwzGMBEixKQ"
+      Company:
+        type: "string"
+        description: "Company associated to the license"
+        example: "Portainer.io"
+      Expiration:
+        type: "string"
+        description: "License expiry date"
+        example: "2077-07-07"
+      Valid:
+        type: "boolean"
+        description: "Is the license valid"
+        example: "true"
+  Extension:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        example: 1
+        description: "Extension identifier"
+      Name:
+        type: "string"
+        example: "Registry Manager"
+        description: "Extension name"
+      Enabled:
+        type: "boolean"
+        example: "true"
+        description: "Is the extension enabled"
+      ShortDescription:
+        type: "string"
+        description: "Short description about the extension"
+        example: "Enable in-app registry management"
+      DescriptionURL:
+        type: "string"
+        description: "URL to the file containing the extension description"
+        example: https://portainer-io-assets.sfo2.digitaloceanspaces.com/description_registry_manager.html"
+      Available:
+        type: "boolean"
+        description: "Is the extension available for download and activation"
+        example: "true"
+      Images:
+        type: "array"
+        description: "List of screenshot URLs"
+        items:
+          type: "string"
+          example: "https://portainer-io-assets.sfo2.digitaloceanspaces.com/screenshots/rm01.png"
+          description: "Screenshot URL"
+      Logo:
+        type: "string"
+        description: "Icon associated to the extension"
+        example: "fa-database"
+      Price:
+        type: "string"
+        description: "Extension price"
+        example: "US$9.95"
+      PriceDescription:
+        type: "string"
+        description: "Details about extension pricing"
+        example: "Price per instance per year"
+      ShopURL:
+        type: "string"
+        description: "URL used to buy the extension"
+        example: "https://portainer.io/checkout/?add-to-cart=1164"
+      UpdateAvailable:
+        type: "boolean"
+        description: "Is an update available for this extension"
+        example: "true"
+      Version:
+        type: "string"
+        description: "Extension version"
+        example: "1.0.0"
+      License:
+        $ref: "#/definitions/LicenseInformation"
+  ExtensionListResponse:
+    type: "array"
+    items:
+      $ref: "#/definitions/Extension"
+  ExtensionCreateRequest:
+    type: "object"
+    required:
+    - "License"
+    properties:
+      License:
+        type: "string"
+        example: "1-uKmVwboSWVIZv5URmE0VRkpbPX0rrCVeDxJl97LZ0piltw2SU28DSrNwPZAHCEAwB2SeKm6BCFcVwzGMBEixKQ"
+        description: "License key"
+  ExtensionUpdateRequest:
+    type: "object"
+    required:
+      - "Version"
+    properties:
+      Version:
+        type: "string"
+        example: "1.1.0"
+        description: "New version of the extension"
+  RoleListResponse:
+    type: "array"
+    items:
+      $ref: "#/definitions/Role"
+  Role:
+    type: "object"
+    properties:
+      Id:
+        type: "integer"
+        description: "Role identifier"
+        example: 2
+      Name:
+        type: "string"
+        description: "Role name"
+        example: "HelpDesk"
+      Description:
+        type: "string"
+        description: "Role description"
+        example: "Read-only access of all resources in an endpoint"
+      Authorizations:
+        $ref: "#/definitions/Authorizations"
+  Authorizations:
+    type: "object"
+    description: "Authorizations associated to a role"
+    additionalProperties:
+      type: "object"
+      properties:
+        authorization:
+          type: "string"
+        value:
+          type: "boolean"
+    example:
+      "DockerContainerList": true
+      "DockerVolumeList": true                          

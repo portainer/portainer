@@ -1,13 +1,13 @@
 <div id="service-logging-driver">
     <rd-widget>
-      <rd-widget-header icon="fa-tasks" title-text="Logging driver">        
-      </rd-widget-header>      
+      <rd-widget-header icon="fa-tasks" title-text="Logging driver">
+      </rd-widget-header>
       <rd-widget-body classes="no-padding">
-        <div class="form-inline" style="padding: 10px;">
+        <div class="form-inline" style="padding: 10px;" authorization="DockerServiceUpdate">
           Driver:
           <select class="form-control" ng-model="service.LogDriverName" ng-change="updateLogDriverName(service)" ng-disabled="isUpdating">
-            <option selected value="">Default logging driver</option>  
-            <option ng-repeat="driver in availableLoggingDrivers" ng-value="driver">{{ driver }}</option>                              
+            <option selected value="">Default logging driver</option>
+            <option ng-repeat="driver in availableLoggingDrivers" ng-value="driver">{{ driver }}</option>
             <option value="none">none</option>
           </select>
           <a class="btn btn-default btn-sm" ng-click="!service.LogDriverName || service.LogDriverName === 'none' || addLogDriverOpt(service)">
@@ -33,7 +33,7 @@
                 <div class="input-group input-group-sm">
                   <span class="input-group-addon fit-text-size">value</span>
                   <input type="text" class="form-control" ng-model="option.value" ng-change="updateLogDriverOpt(service, option)" placeholder="e.g. bar" ng-disabled="isUpdating">
-                  <span class="input-group-btn">
+                  <span class="input-group-btn" authorization="DockerServiceUpdate">
                     <button class="btn btn-sm btn-danger" type="button" ng-click="removeLogDriverOpt(service, $index)" ng-disabled="isUpdating">
                       <i class="fa fa-trash" aria-hidden="true"></i>
                     </button>
@@ -47,7 +47,7 @@
           </tbody>
         </table>
       </rd-widget-body>
-      <rd-widget-footer>
+      <rd-widget-footer authorization="DockerServiceUpdate">
         <div class="btn-toolbar" role="toolbar">
           <div class="btn-group" role="group">
             <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['LogDriverName', 'LogDriverOpts'])" ng-click="updateService(service)">Apply changes</button>

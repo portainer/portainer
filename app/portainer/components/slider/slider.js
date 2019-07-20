@@ -1,5 +1,5 @@
 angular.module('portainer.app').component('slider', {
-  templateUrl: 'app/portainer/components/slider/slider.html',
+  templateUrl: './slider.html',
   controller: 'SliderController',
   bindings: {
     model: '=',

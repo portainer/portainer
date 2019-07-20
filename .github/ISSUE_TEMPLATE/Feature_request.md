@@ -8,7 +8,7 @@ about: Suggest a feature/enhancement that should be added in Portainer
 
 Thanks for opening a feature request for Portainer !
 
-Do you need help or have a question? Come chat with us on Slack http://portainer.io/slack/ or gitter https://gitter.im/portainer/Lobby.
+Do you need help or have a question? Come chat with us on Slack http://portainer.io/slack/
 
 Before opening a new issue, make sure that we do not have any duplicates
 already open. You can ensure this by searching the issue list for this

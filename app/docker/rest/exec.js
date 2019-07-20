@@ -1,3 +1,5 @@
+import { genericHandler } from './response/handlers';
+
 angular.module('portainer.docker')
 .factory('Exec', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider',
 function ExecFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {

@@ -1,7 +1,7 @@
 <div ng-if="service.EnvironmentVariables" id="service-env-variables">
   <rd-widget>
     <rd-widget-header icon="fa-tasks" title-text="Environment variables">
-      <div class="nopadding">
+      <div class="nopadding" authorization="DockerServiceUpdate">
         <a class="btn btn-default btn-sm pull-right" ng-click="isUpdating ||addEnvironmentVariable(service)" ng-disabled="isUpdating">
           <i class="fa fa-plus-circle" aria-hidden="true"></i> environment variable
         </a>
@@ -30,7 +30,7 @@
               <div class="input-group input-group-sm">
                 <span class="input-group-addon fit-text-size">value</span>
                 <input type="text" class="form-control" ng-model="var.value" ng-change="updateEnvironmentVariable(service, var)" placeholder="e.g. bar" ng-disabled="isUpdating">
-                <span class="input-group-btn">
+                <span class="input-group-btn" authorization="DockerServiceUpdate">
                   <button class="btn btn-sm btn-danger" type="button" ng-click="removeEnvironmentVariable(service, $index)" ng-disabled="isUpdating">
                     <i class="fa fa-trash" aria-hidden="true"></i>
                   </button>
@@ -41,7 +41,7 @@
         </tbody>
       </table>
     </rd-widget-body>
-    <rd-widget-footer>
+    <rd-widget-footer authorization="DockerServiceUpdate">
       <div class="btn-toolbar" role="toolbar">
         <div class="btn-group" role="group">
           <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['EnvironmentVariables'])" ng-click="updateService(service)">Apply changes</button>

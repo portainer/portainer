@@ -1,3 +1,6 @@
+import { jsonObjectsToArrayHandler, deleteImageHandler } from './response/handlers';
+import { imageGetResponse } from './response/image';
+
 angular.module('portainer.docker')
 .factory('Image', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', 'HttpRequestHelper', 'ImagesInterceptor',
 function ImageFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, HttpRequestHelper, ImagesInterceptor) {

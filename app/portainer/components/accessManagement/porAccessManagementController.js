@@ -1,139 +1,104 @@
-angular.module('portainer.app')
-.controller('porAccessManagementController', ['AccessService', 'Notifications',
-function (AccessService, Notifications) {
-  var ctrl = this;
+import _ from "lodash-es";
 
-  function dispatchUserAndTeamIDs(accesses, users, teams) {
-    angular.forEach(accesses, function (access) {
-      if (access.Type === 'user' && !access.Inherited) {
-        users.push(access.Id);
-      } else if (access.Type === 'team' && !access.Inherited) {
-        teams.push(access.Id);
+import angular from "angular";
+
+class PorAccessManagementController {
+  /* @ngInject */
+  constructor(Notifications, ExtensionService, AccessService, RoleService) {
+    this.Notifications = Notifications;
+    this.ExtensionService = ExtensionService;
+    this.AccessService = AccessService;
+    this.RoleService = RoleService;
+    
+    this.unauthorizeAccess = this.unauthorizeAccess.bind(this);
+    this.updateAction = this.updateAction.bind(this);
+  }
+
+  updateAction() {
+    const entity = this.accessControlledEntity;
+    const oldUserAccessPolicies = entity.UserAccessPolicies;
+    const oldTeamAccessPolicies = entity.TeamAccessPolicies;
+    const updatedUserAccesses = _.filter(this.authorizedUsersAndTeams, {Updated: true, Type: 'user', Inherited: false});
+    const updatedTeamAccesses = _.filter(this.authorizedUsersAndTeams, {Updated: true, Type: 'team', Inherited: false});
+
+    const accessPolicies = this.AccessService.generateAccessPolicies(oldUserAccessPolicies, oldTeamAccessPolicies, updatedUserAccesses, updatedTeamAccesses);
+    this.accessControlledEntity.UserAccessPolicies = accessPolicies.userAccessPolicies;
+    this.accessControlledEntity.TeamAccessPolicies = accessPolicies.teamAccessPolicies;
+    this.updateAccess();
+  }
+
+  authorizeAccess() {
+    const entity = this.accessControlledEntity;
+    const oldUserAccessPolicies = entity.UserAccessPolicies;
+    const oldTeamAccessPolicies = entity.TeamAccessPolicies;
+    const selectedRoleId = this.rbacEnabled ? this.formValues.selectedRole.Id : 0;
+    const selectedUserAccesses = _.filter(this.formValues.multiselectOutput, (access) => access.Type === "user");
+    const selectedTeamAccesses = _.filter(this.formValues.multiselectOutput, (access) => access.Type === "team");
+
+    const accessPolicies = this.AccessService.generateAccessPolicies(oldUserAccessPolicies, oldTeamAccessPolicies, selectedUserAccesses, selectedTeamAccesses, selectedRoleId);
+    this.accessControlledEntity.UserAccessPolicies = accessPolicies.userAccessPolicies;
+    this.accessControlledEntity.TeamAccessPolicies = accessPolicies.teamAccessPolicies;
+    this.updateAccess();
+  }
+
+  unauthorizeAccess(selectedAccesses) {
+    const entity = this.accessControlledEntity;
+    const userAccessPolicies = entity.UserAccessPolicies;
+    const teamAccessPolicies = entity.TeamAccessPolicies;
+    const selectedUserAccesses = _.filter(selectedAccesses, (access) => access.Type === "user");
+    const selectedTeamAccesses = _.filter(selectedAccesses, (access) => access.Type === "team");
+    _.forEach(selectedUserAccesses, (access) => delete userAccessPolicies[access.Id]);
+    _.forEach(selectedTeamAccesses, (access) => delete teamAccessPolicies[access.Id]);
+    this.updateAccess();
+  }
+
+  async $onInit() {
+    const entity = this.accessControlledEntity;
+    if (!entity) {
+      this.Notifications.error("Failure", "Unable to retrieve accesses");
+      return;
+    }
+    if (!entity.UserAccessPolicies) {
+      entity.UserAccessPolicies = {}
+    }
+    if (!entity.TeamAccessPolicies) {
+      entity.TeamAccessPolicies = {};
+    }
+    const parent = this.inheritFrom;
+    if (parent && !parent.UserAccessPolicies) {
+      parent.UserAccessPolicies = {}
+    }
+    if (parent && !parent.TeamAccessPolicies) {
+      parent.TeamAccessPolicies = {};
+    }
+    this.roles = [];
+    this.rbacEnabled = false;
+    try {
+      this.rbacEnabled = await this.ExtensionService.extensionEnabled(this.ExtensionService.EXTENSIONS.RBAC);
+      if (this.rbacEnabled) {
+        this.roles = await this.RoleService.roles();
+        this.formValues = {
+          selectedRole: this.roles[0]
+        };
       }
-    });
-  }
-
-  function processAuthorizedIDs(accesses, authorizedAccesses) {
-    var authorizedUserIDs = [];
-    var authorizedTeamIDs = [];
-    if (accesses) {
-      dispatchUserAndTeamIDs(accesses, authorizedUserIDs, authorizedTeamIDs);
-    }
-    if (authorizedAccesses) {
-      dispatchUserAndTeamIDs(authorizedAccesses, authorizedUserIDs, authorizedTeamIDs);
-    }
-    return {
-      userIDs: authorizedUserIDs,
-      teamIDs: authorizedTeamIDs
-    };
-  }
-
-  function removeFromAccesses(access, accesses) {
-    _.remove(accesses, function(n) {
-      return n.Id === access.Id && n.Type === access.Type;
-    });
-  }
-
-  function removeFromAccessIDs(accessId, accessIDs) {
-    _.remove(accessIDs, function(n) {
-      return n === accessId;
-    });
-  }
-
-  ctrl.authorizeAccess = function(access) {
-    var accessData = processAuthorizedIDs(null, ctrl.authorizedAccesses);
-    var authorizedUserIDs = accessData.userIDs;
-    var authorizedTeamIDs = accessData.teamIDs;
-
-    if (access.Type === 'user') {
-      authorizedUserIDs.push(access.Id);
-    } else if (access.Type === 'team') {
-      authorizedTeamIDs.push(access.Id);
-    }
-
-    ctrl.updateAccess({ userAccesses: authorizedUserIDs, teamAccesses: authorizedTeamIDs })
-    .then(function success() {
-      removeFromAccesses(access, ctrl.accesses);
-      ctrl.authorizedAccesses.push(access);
-      Notifications.success('Accesses successfully updated');
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to update accesses');
-    });
-  };
-
-  ctrl.unauthorizeAccess = function(access) {
-    var accessData = processAuthorizedIDs(null, ctrl.authorizedAccesses);
-    var authorizedUserIDs = accessData.userIDs;
-    var authorizedTeamIDs = accessData.teamIDs;
-
-    if (access.Type === 'user') {
-      removeFromAccessIDs(access.Id, authorizedUserIDs);
-    } else if (access.Type === 'team') {
-      removeFromAccessIDs(access.Id, authorizedTeamIDs);
-    }
-
-    ctrl.updateAccess({ userAccesses: authorizedUserIDs, teamAccesses: authorizedTeamIDs })
-    .then(function success() {
-      removeFromAccesses(access, ctrl.authorizedAccesses);
-      ctrl.accesses.push(access);
-      Notifications.success('Accesses successfully updated');
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to update accesses');
-    });
-  };
-
-  function moveAccesses(source, target) {
-    for (var i = 0; i < source.length; i++) {
-      var access = source[i];
-      if (!access.Inherited) {
-        target.push(access);
-        source.splice(i, 1);
-      }
+      const data = await this.AccessService.accesses(
+        entity.UserAccessPolicies,
+        entity.TeamAccessPolicies,
+        parent ? parent.UserAccessPolicies : {},
+        parent ? parent.TeamAccessPolicies : {},
+        this.roles
+      );
+      this.availableUsersAndTeams = data.availableUsersAndTeams;
+      this.authorizedUsersAndTeams = data.authorizedUsersAndTeams;
+    } catch (err) {
+      this.availableUsersAndTeams = [];
+      this.authorizedUsersAndTeams = [];
+      this.Notifications.error("Failure", err, "Unable to retrieve accesses");
     }
   }
+}
 
-  ctrl.unauthorizeAllAccesses = function() {
-    ctrl.updateAccess({ userAccesses: [], teamAccesses: [] })
-    .then(function success() {
-      moveAccesses(ctrl.authorizedAccesses, ctrl.accesses);
-      Notifications.success('Accesses successfully updated');
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to update accesses');
-    });
-  };
-
-  ctrl.authorizeAllAccesses = function() {
-    var accessData = processAuthorizedIDs(ctrl.accesses, ctrl.authorizedAccesses);
-    var authorizedUserIDs = accessData.userIDs;
-    var authorizedTeamIDs = accessData.teamIDs;
-
-    ctrl.updateAccess({ userAccesses: authorizedUserIDs, teamAccesses: authorizedTeamIDs })
-    .then(function success() {
-      moveAccesses(ctrl.accesses, ctrl.authorizedAccesses);
-      Notifications.success('Accesses successfully updated');
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to update accesses');
-    });
-  };
-
-  function initComponent() {
-    var entity = ctrl.accessControlledEntity;
-    var parent = ctrl.inheritFrom;
-    AccessService.accesses(entity.AuthorizedUsers, entity.AuthorizedTeams, parent ? parent.AuthorizedUsers: [], parent ? parent.AuthorizedTeams : [])
-    .then(function success(data) {
-      ctrl.accesses = data.accesses;
-      ctrl.authorizedAccesses = data.authorizedAccesses;
-    })
-    .catch(function error(err) {
-      ctrl.accesses = [];
-      ctrl.authorizedAccesses = [];
-      Notifications.error('Failure', err, 'Unable to retrieve accesses');
-    });
-  }
-
-  initComponent();
-}]);
+export default PorAccessManagementController;
+angular
+  .module("portainer.app")
+  .controller("porAccessManagementController", PorAccessManagementController);

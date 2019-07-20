@@ -1,5 +1,5 @@
 angular.module('portainer.app').component('templateList', {
-  templateUrl: 'app/portainer/components/template-list/templateList.html',
+  templateUrl: './templateList.html',
   controller: 'TemplateListController',
   bindings: {
     titleText: '@',

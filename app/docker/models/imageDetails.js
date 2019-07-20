@@ -1,4 +1,4 @@
-function ImageDetailsViewModel(data) {
+export function ImageDetailsViewModel(data) {
   this.Id = data.Id;
   this.Tag = data.Tag;
   this.Parent = data.Parent;

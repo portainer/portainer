@@ -7,7 +7,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/api"
 )
 
 type registryCreatePayload struct {
@@ -53,14 +53,14 @@ func (handler *Handler) registryCreate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	registry := &portainer.Registry{
-		Type:            portainer.RegistryType(payload.Type),
-		Name:            payload.Name,
-		URL:             payload.URL,
-		Authentication:  payload.Authentication,
-		Username:        payload.Username,
-		Password:        payload.Password,
-		AuthorizedUsers: []portainer.UserID{},
-		AuthorizedTeams: []portainer.TeamID{},
+		Type:               portainer.RegistryType(payload.Type),
+		Name:               payload.Name,
+		URL:                payload.URL,
+		Authentication:     payload.Authentication,
+		Username:           payload.Username,
+		Password:           payload.Password,
+		UserAccessPolicies: portainer.UserAccessPolicies{},
+		TeamAccessPolicies: portainer.TeamAccessPolicies{},
 	}
 
 	err = handler.RegistryService.CreateRegistry(registry)

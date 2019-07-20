@@ -21,7 +21,7 @@
           <thead>
             <tr>
               <th style="width:55px;">
-                <span class="md-checkbox">
+                <span class="md-checkbox" authorization="DockerServiceUpdate, DockerServiceDelete, DockerServiceCreate">
                   <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                   <label for="select_all"></label>
                 </span>
@@ -83,8 +83,8 @@
           <tbody>
             <tr ng-click="$ctrl.expandItem(item, !item.Expanded)" dir-paginate-start="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))" ng-class="{active: item.Checked}" class="interactive">
               <td>
-                <span class="md-checkbox">
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-change="$ctrl.selectItem(item)"/>
+                <span class="md-checkbox" authorization="DockerServiceUpdate, DockerServiceDelete, DockerServiceCreate">
+                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
                 <a><i ng-class="{ 'fas fa-angle-down': item.Expanded, 'fas fa-angle-right': !item.Expanded }" class="space-right" aria-hidden="true"></i></a>
@@ -97,7 +97,7 @@
               <td ng-controller="ServicesDatatableActionsController as actionCtrl">
                 {{ item.Mode }}
                 <code>{{ item.Tasks | runningtaskscount }}</code> / <code>{{ item.Mode === 'replicated' ? item.Replicas : ($ctrl.nodes | availablenodecount:item) }}</code>
-                <span ng-if="item.Mode === 'replicated' && !item.Scale">
+                <span ng-if="item.Mode === 'replicated' && !item.Scale" authorization="DockerServiceUpdate">
                   <a class="interactive" ng-click="item.Scale = true; item.ReplicaCount = item.Replicas; $event.stopPropagation();">
                     <i class="fa fa-arrows-alt-v" aria-hidden="true"></i> Scale
                   </a>

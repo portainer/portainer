@@ -8,8 +8,8 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     return Endpoints.get({id: endpointID}).$promise;
   };
 
-  service.endpoints = function() {
-    return Endpoints.query({}).$promise;
+  service.endpoints = function(start, limit, search) {
+    return Endpoints.query({start, limit, search}).$promise;
   };
 
   service.snapshotEndpoints = function() {
@@ -20,25 +20,12 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     return Endpoints.snapshot({ id: endpointID }, {}).$promise;
   };
 
-  service.endpointsByGroup = function(groupId) {
-    var deferred = $q.defer();
-
-    Endpoints.query({}).$promise
-    .then(function success(data) {
-      var endpoints = data.filter(function (endpoint) {
-        return endpoint.GroupId === groupId;
-      });
-      deferred.resolve(endpoints);
-    })
-    .catch(function error(err) {
-      deferred.reject({msg: 'Unable to retrieve endpoints', err: err});
-    });
-
-    return deferred.promise;
+  service.endpointsByGroup = function(start, limit, search, groupId) {
+    return Endpoints.query({ start, limit, search, groupId }).$promise;
   };
 
-  service.updateAccess = function(id, authorizedUserIDs, authorizedTeamIDs) {
-    return Endpoints.updateAccess({id: id}, {authorizedUsers: authorizedUserIDs, authorizedTeams: authorizedTeamIDs}).$promise;
+  service.updateAccess = function(id, userAccessPolicies, teamAccessPolicies) {
+    return Endpoints.updateAccess({id: id}, {UserAccessPolicies: userAccessPolicies, TeamAccessPolicies: teamAccessPolicies}).$promise;
   };
 
   service.updateEndpoint = function(id, payload) {

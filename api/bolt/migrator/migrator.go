@@ -2,16 +2,17 @@ package migrator
 
 import (
 	"github.com/boltdb/bolt"
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/bolt/endpoint"
-	"github.com/portainer/portainer/bolt/endpointgroup"
-	"github.com/portainer/portainer/bolt/extension"
-	"github.com/portainer/portainer/bolt/resourcecontrol"
-	"github.com/portainer/portainer/bolt/settings"
-	"github.com/portainer/portainer/bolt/stack"
-	"github.com/portainer/portainer/bolt/template"
-	"github.com/portainer/portainer/bolt/user"
-	"github.com/portainer/portainer/bolt/version"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/bolt/endpoint"
+	"github.com/portainer/portainer/api/bolt/endpointgroup"
+	"github.com/portainer/portainer/api/bolt/extension"
+	"github.com/portainer/portainer/api/bolt/registry"
+	"github.com/portainer/portainer/api/bolt/resourcecontrol"
+	"github.com/portainer/portainer/api/bolt/settings"
+	"github.com/portainer/portainer/api/bolt/stack"
+	"github.com/portainer/portainer/api/bolt/template"
+	"github.com/portainer/portainer/api/bolt/user"
+	"github.com/portainer/portainer/api/bolt/version"
 )
 
 type (
@@ -22,6 +23,7 @@ type (
 		endpointGroupService   *endpointgroup.Service
 		endpointService        *endpoint.Service
 		extensionService       *extension.Service
+		registryService        *registry.Service
 		resourceControlService *resourcecontrol.Service
 		settingsService        *settings.Service
 		stackService           *stack.Service
@@ -38,6 +40,7 @@ type (
 		EndpointGroupService   *endpointgroup.Service
 		EndpointService        *endpoint.Service
 		ExtensionService       *extension.Service
+		RegistryService        *registry.Service
 		ResourceControlService *resourcecontrol.Service
 		SettingsService        *settings.Service
 		StackService           *stack.Service
@@ -56,6 +59,7 @@ func NewMigrator(parameters *Parameters) *Migrator {
 		endpointGroupService:   parameters.EndpointGroupService,
 		endpointService:        parameters.EndpointService,
 		extensionService:       parameters.ExtensionService,
+		registryService:        parameters.RegistryService,
 		resourceControlService: parameters.ResourceControlService,
 		settingsService:        parameters.SettingsService,
 		templateService:        parameters.TemplateService,
@@ -217,6 +221,29 @@ func (m *Migrator) Migrate() error {
 	// Portainer 1.20.1
 	if m.currentDBVersion < 17 {
 		err := m.updateExtensionsToDBVersion17()
+		if err != nil {
+			return err
+		}
+	}
+
+	// Portainer 1.21.0
+	if m.currentDBVersion < 18 {
+		err := m.updateUsersToDBVersion18()
+		if err != nil {
+			return err
+		}
+
+		err = m.updateEndpointsToDBVersion18()
+		if err != nil {
+			return err
+		}
+
+		err = m.updateEndpointGroupsToDBVersion18()
+		if err != nil {
+			return err
+		}
+
+		err = m.updateRegistriesToDBVersion18()
 		if err != nil {
 			return err
 		}

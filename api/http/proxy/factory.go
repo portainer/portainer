@@ -6,8 +6,8 @@ import (
 	"net/http/httputil"
 	"net/url"
 
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/crypto"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/crypto"
 )
 
 // AzureAPIBaseURL is the URL where Azure API requests will be proxied.
@@ -40,10 +40,10 @@ func newAzureProxy(credentials *portainer.AzureCredentials) (http.Handler, error
 	return proxy, nil
 }
 
-func (factory *proxyFactory) newDockerHTTPSProxy(u *url.URL, tlsConfig *portainer.TLSConfiguration, enableSignature bool) (http.Handler, error) {
+func (factory *proxyFactory) newDockerHTTPSProxy(u *url.URL, tlsConfig *portainer.TLSConfiguration, enableSignature bool, endpointID portainer.EndpointID) (http.Handler, error) {
 	u.Scheme = "https"
 
-	proxy := factory.createDockerReverseProxy(u, enableSignature)
+	proxy := factory.createDockerReverseProxy(u, enableSignature, endpointID)
 	config, err := crypto.CreateTLSConfigurationFromDisk(tlsConfig.TLSCACertPath, tlsConfig.TLSCertPath, tlsConfig.TLSKeyPath, tlsConfig.TLSSkipVerify)
 	if err != nil {
 		return nil, err
@@ -53,12 +53,12 @@ func (factory *proxyFactory) newDockerHTTPSProxy(u *url.URL, tlsConfig *portaine
 	return proxy, nil
 }
 
-func (factory *proxyFactory) newDockerHTTPProxy(u *url.URL, enableSignature bool) http.Handler {
+func (factory *proxyFactory) newDockerHTTPProxy(u *url.URL, enableSignature bool, endpointID portainer.EndpointID) http.Handler {
 	u.Scheme = "http"
-	return factory.createDockerReverseProxy(u, enableSignature)
+	return factory.createDockerReverseProxy(u, enableSignature, endpointID)
 }
 
-func (factory *proxyFactory) createDockerReverseProxy(u *url.URL, enableSignature bool) *httputil.ReverseProxy {
+func (factory *proxyFactory) createDockerReverseProxy(u *url.URL, enableSignature bool, endpointID portainer.EndpointID) *httputil.ReverseProxy {
 	proxy := newSingleHostReverseProxyWithHostHeader(u)
 	transport := &proxyTransport{
 		enableSignature:        enableSignature,
@@ -68,6 +68,7 @@ func (factory *proxyFactory) createDockerReverseProxy(u *url.URL, enableSignatur
 		RegistryService:        factory.RegistryService,
 		DockerHubService:       factory.DockerHubService,
 		dockerTransport:        &http.Transport{},
+		endpointIdentifier:     endpointID,
 	}
 
 	if enableSignature {

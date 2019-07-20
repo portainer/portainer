@@ -4,12 +4,13 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/portainer/portainer/api/http/proxy"
+	"github.com/portainer/portainer/api/http/security"
+
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/http/proxy"
-	"github.com/portainer/portainer/http/security"
+	"github.com/portainer/portainer/api"
 )
 
 // DELETE request on /api/stacks/:id?external=<external>&endpointId=<endpointId>
@@ -38,22 +39,6 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a stack with the specified identifier inside the database", err}
 	}
 
-	resourceControl, err := handler.ResourceControlService.ResourceControlByResourceID(stack.Name)
-	if err != nil && err != portainer.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a resource control associated to the stack", err}
-	}
-
-	securityContext, err := security.RetrieveRestrictedRequestContext(r)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
-	}
-
-	if !securityContext.IsAdmin {
-		if !proxy.CanAccessStack(stack, resourceControl, securityContext.UserID, securityContext.UserMemberships) {
-			return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
-		}
-	}
-
 	// TODO: this is a work-around for stacks created with Portainer version >= 1.17.1
 	// The EndpointID property is not available for these stacks, this API endpoint
 	// can use the optional EndpointID query parameter to set a valid endpoint identifier to be
@@ -72,6 +57,27 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the endpoint associated to the stack inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the endpoint associated to the stack inside the database", err}
+	}
+
+	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint, true)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
+	}
+
+	resourceControl, err := handler.ResourceControlService.ResourceControlByResourceID(stack.Name)
+	if err != nil && err != portainer.ErrObjectNotFound {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a resource control associated to the stack", err}
+	}
+
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
+	}
+
+	if !securityContext.IsAdmin {
+		if !proxy.CanAccessStack(stack, resourceControl, securityContext.UserID, securityContext.UserMemberships) {
+			return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
+		}
 	}
 
 	err = handler.deleteStack(stack, endpoint)
@@ -113,9 +119,9 @@ func (handler *Handler) deleteExternalStack(r *http.Request, w http.ResponseWrit
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the endpoint associated to the stack inside the database", err}
 	}
 
-	err = handler.requestBouncer.EndpointAccess(r, endpoint)
+	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint, true)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", portainer.ErrEndpointAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
 	}
 
 	stack = &portainer.Stack{

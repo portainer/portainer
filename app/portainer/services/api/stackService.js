@@ -1,3 +1,7 @@
+
+import _ from 'lodash-es';
+import { StackViewModel, ExternalStackViewModel } from '../../models/stack';
+
 angular.module('portainer.app')
 .factory('StackService', ['$q', 'Stack', 'ResourceControlService', 'FileUploadService', 'StackHelper', 'ServiceService', 'ContainerService', 'SwarmService', 'EndpointProvider',
 function StackServiceFactory($q, Stack, ResourceControlService, FileUploadService, StackHelper, ServiceService, ContainerService, SwarmService, EndpointProvider) {

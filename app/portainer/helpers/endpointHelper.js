@@ -1,3 +1,5 @@
+import _ from 'lodash-es';
+
 angular.module('portainer.app')
 .factory('EndpointHelper', [function EndpointHelperFactory() {
   'use strict';

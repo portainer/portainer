@@ -1,3 +1,5 @@
+import { TaskViewModel } from '../models/task';
+
 angular.module('portainer.docker')
 .factory('TaskService', ['$q', 'Task', 'LogHelper',
 function TaskServiceFactory($q, Task, LogHelper) {

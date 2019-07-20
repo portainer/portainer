@@ -3,13 +3,13 @@ package auth
 import (
 	"encoding/json"
 	"io/ioutil"
-	"net/http"
 	"log"
+	"net/http"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
-	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/api"
 )
 
 type oauthPayload struct {
@@ -113,6 +113,23 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 		user = &portainer.User{
 			Username: username,
 			Role:     portainer.StandardUserRole,
+			PortainerAuthorizations: map[portainer.Authorization]bool{
+				portainer.OperationPortainerDockerHubInspect:        true,
+				portainer.OperationPortainerEndpointGroupList:       true,
+				portainer.OperationPortainerEndpointList:            true,
+				portainer.OperationPortainerEndpointInspect:         true,
+				portainer.OperationPortainerEndpointExtensionAdd:    true,
+				portainer.OperationPortainerEndpointExtensionRemove: true,
+				portainer.OperationPortainerExtensionList:           true,
+				portainer.OperationPortainerMOTD:                    true,
+				portainer.OperationPortainerRegistryList:            true,
+				portainer.OperationPortainerRegistryInspect:         true,
+				portainer.OperationPortainerTeamList:                true,
+				portainer.OperationPortainerTemplateList:            true,
+				portainer.OperationPortainerTemplateInspect:         true,
+				portainer.OperationPortainerUserList:                true,
+				portainer.OperationPortainerUserMemberships:         true,
+			},
 		}
 
 		err = handler.UserService.CreateUser(user)

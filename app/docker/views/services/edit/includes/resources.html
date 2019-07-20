@@ -10,7 +10,7 @@
               Memory reservation (MB)
             </td>
             <td>
-              <input class="input-sm" type="number" step="0.125" min="0" ng-model="service.ReservationMemoryBytes" ng-change="updateServiceAttribute(service, 'ReservationMemoryBytes')" ng-disabled="isUpdating"/>
+              <input class="input-sm" type="number" step="0.125" min="0" ng-model="service.ReservationMemoryBytes" ng-change="updateServiceAttribute(service, 'ReservationMemoryBytes')" disable-authorization="DockerServiceUpdate"/>
             </td>
             <td style="vertical-align : middle;">
               <p class="small text-muted">
@@ -23,7 +23,7 @@
               Memory limit (MB)
             </td>
             <td>
-              <input class="input-sm" type="number" step="0.125" min="0" ng-model="service.LimitMemoryBytes" ng-change="updateServiceAttribute(service, 'LimitMemoryBytes')" ng-disabled="isUpdating"/>
+              <input class="input-sm" type="number" step="0.125" min="0" ng-model="service.LimitMemoryBytes" ng-change="updateServiceAttribute(service, 'LimitMemoryBytes')" disable-authorization="DockerServiceUpdate"/>
             </td>
             <td style="vertical-align : middle;">
               <p class="small text-muted">
@@ -64,7 +64,7 @@
         </tbody>
       </table>
     </rd-widget-body>
-    <rd-widget-footer>
+    <rd-widget-footer authorization="DockerServiceUpdate">
       <div class="btn-toolbar" role="toolbar">
         <div class="btn-group" role="group">
           <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['LimitNanoCPUs', 'LimitMemoryBytes', 'ReservationNanoCPUs', 'ReservationMemoryBytes'])" ng-click="updateService(service)">Apply changes</button>

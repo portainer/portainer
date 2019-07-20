@@ -1,3 +1,7 @@
+import _ from 'lodash-es';
+import { UserViewModel } from '../../models/user';
+import { TeamMembershipModel } from '../../models/teamMembership';
+
 angular.module('portainer.app')
 .factory('UserService', ['$q', 'Users', 'UserHelper', 'TeamService', 'TeamMembershipService', function UserServiceFactory($q, Users, UserHelper, TeamService, TeamMembershipService) {
   'use strict';
@@ -41,7 +45,13 @@ angular.module('portainer.app')
   service.createUser = function(username, password, role, teamIds) {
     var deferred = $q.defer();
 
-    Users.create({}, {username: username, password: password, role: role}).$promise
+    var payload = {
+      username: username,
+      password: password,
+      role: role
+    };
+
+    Users.create({}, payload).$promise
     .then(function success(data) {
       var userId = data.Id;
       var teamMembershipQueries = [];

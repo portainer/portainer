@@ -1,3 +1,5 @@
+import _ from 'lodash-es';
+
 angular.module('portainer')
 .run(['$rootScope', '$state', 'Authentication', 'authManager', 'StateManager', 'EndpointProvider', 'Notifications', 'Analytics', 'cfpLoadingBar', '$transitions', 'HttpRequestHelper',
 function ($rootScope, $state, Authentication, authManager, StateManager, EndpointProvider, Notifications, Analytics, cfpLoadingBar, $transitions, HttpRequestHelper) {
@@ -29,7 +31,7 @@ function ($rootScope, $state, Authentication, authManager, StateManager, Endpoin
     }
   };
 
-  $transitions.onBefore({ to: 'docker.**' }, function() {
+  $transitions.onBefore({}, function() {
     HttpRequestHelper.resetAgentHeaders();
   });
 }]);

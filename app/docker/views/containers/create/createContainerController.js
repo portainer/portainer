@@ -1,3 +1,9 @@
+import _ from 'lodash-es';
+import { ContainerCapabilities, ContainerCapability } from '../../../models/containerCapabilities';
+import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
+import { ContainerDetailsViewModel } from '../../../models/container';
+
+
 angular.module('portainer.docker')
 .controller('CreateContainerController', ['$q', '$scope', '$state', '$timeout', '$transition$', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'NetworkService', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'FormValidator', 'ModalService', 'RegistryService', 'SystemService', 'SettingsService', 'PluginService', 'HttpRequestHelper',
 function ($q, $scope, $state, $timeout, $transition$, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, NetworkService, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, FormValidator, ModalService, RegistryService, SystemService, SettingsService, PluginService, HttpRequestHelper) {
@@ -133,6 +139,9 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
 
   function preparePortBindings(config) {
     var bindings = {};
+    if (config.ExposedPorts === undefined) {
+      config.ExposedPorts = {};
+    }
     config.HostConfig.PortBindings.forEach(function (portBinding) {
       if (portBinding.containerPort) {
         var key = portBinding.containerPort + '/' + portBinding.protocol;
@@ -627,8 +636,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       $scope.availableLoggingDrivers = loggingDrivers;
     });
 
-    var userDetails = Authentication.getUserDetails();
-    $scope.isAdmin = userDetails.role === 1;
+    $scope.isAdmin = Authentication.isAdmin();
   }
 
   function validateForm(accessControlData, isAdmin) {
@@ -839,10 +847,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
 
     function validateAccessControl() {
       var accessControlData = $scope.formValues.AccessControlData;
-      var userDetails = Authentication.getUserDetails();
-      var isAdmin = userDetails.role === 1;
-
-      return validateForm(accessControlData, isAdmin);
+      return validateForm(accessControlData, $scope.isAdmin);
     }
 
     function onSuccess() {

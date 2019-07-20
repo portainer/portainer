@@ -1,3 +1,7 @@
+import toastr from 'toastr';
+import { Terminal } from 'xterm';
+import * as fit from 'xterm/lib/addons/fit/fit';
+
 angular.module('portainer')
   .config(['$urlRouterProvider', '$httpProvider', 'localStorageServiceProvider', 'jwtOptionsProvider', 'AnalyticsProvider', '$uibTooltipProvider', '$compileProvider', 'cfpLoadingBarProvider',
   function ($urlRouterProvider, $httpProvider, localStorageServiceProvider, jwtOptionsProvider, AnalyticsProvider, $uibTooltipProvider, $compileProvider, cfpLoadingBarProvider) {
@@ -36,7 +40,7 @@ angular.module('portainer')
       };
     }]);
 
-    AnalyticsProvider.setAccount('@@CONFIG_GA_ID');
+    AnalyticsProvider.setAccount({ tracker: __CONFIG_GA_ID, set: { anonymizeIp: true } });
     AnalyticsProvider.startOffline(true);
 
     toastr.options.timeOut = 3000;

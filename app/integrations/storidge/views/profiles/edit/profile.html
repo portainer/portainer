@@ -1,0 +1,342 @@
+<rd-header>
+  <rd-header-title title-text="Profile details"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="storidge.cluster">Storidge</a> &gt; <a ui-sref="storidge.profiles">Profiles</a> &gt; {{ profile.Name }}
+  </rd-header-content>
+</rd-header>
+
+<div class="row" ng-if="profile">
+  <div class="col-md-12">
+    <rd-widget>
+      <rd-widget-body>
+        <form class="form-horizontal" name="storidgeUpdateProfileForm">
+          <!-- name-input -->
+          <div class="form-group">
+            <label for="profile_name" class="col-sm-2 col-lg-1 control-label text-left">Name</label>
+            <div class="col-sm-10 col-lg-11">
+              <input type="text" class="form-control" ng-model="profile.Name" name="profile_name" disabled>
+            </div>
+          </div>
+          <!-- !name-input -->
+          <div class="col-sm-12 form-section-title">
+            Profile configuration
+          </div>
+          <!-- directory -->
+          <div class="form-group" ng-class="{ 'has-error': storidgeUpdateProfileForm.profile_directory.$invalid }">
+            <label for="profile_directory" class="col-sm-2 col-lg-1 control-label text-left">Directory</label>
+            <div class="col-sm-10 col-lg-11">
+              <input type="text" class="form-control" ng-model="profile.Directory" name="profile_directory" placeholder="e.g. /cio/myProfile" required>
+            </div>
+          </div>
+          <div class="form-group" ng-show="storidgeUpdateProfileForm.profile_directory.$invalid">
+            <div class="col-sm-12 small text-warning">
+              <div ng-messages="storidgeUpdateProfileForm.profile_directory.$error">
+                <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+              </div>
+            </div>
+          </div>
+          <!-- !directory -->
+          <!-- capacity -->
+          <div class="form-group" ng-class="{ 'has-error': storidgeUpdateProfileForm.profile_capacity.$invalid }">
+            <label for="profile_capacity" class="col-sm-2 col-lg-1 control-label text-left">Capacity</label>
+            <div class="col-sm-10 col-lg-11">
+              <input type="number" class="form-control" ng-model="profile.Capacity" name="profile_capacity" ng-min="1" ng-max="64000" placeholder="2" required>
+            </div>
+          </div>
+          <div class="form-group" ng-show="storidgeUpdateProfileForm.profile_capacity.$invalid">
+            <div class="col-sm-12 small text-warning">
+              <div ng-messages="storidgeUpdateProfileForm.profile_capacity.$error">
+                <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Minimum value for capacity: 1.</p>
+                <p ng-message="max"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Maximum value for capacity: 64000.</p>
+              </div>
+            </div>
+          </div>
+          <!-- !capacity -->
+          <!-- redundancy -->
+          <div class="form-group">
+            <label for="profile_redundancy" class="col-sm-2 col-lg-1 control-label text-left">Redundancy</label>
+            <div class="col-sm-10 col-lg-11">
+              <select name="profile_redundancy" ng-model="profile.Redundancy" ng-options="+(opt.value) as opt.label for opt in RedundancyOptions" class="form-control">
+              </select>
+            </div>
+          </div>
+          <!-- !redudancy -->
+          <!-- provisioning -->
+          <div class="form-group">
+            <label for="profile_provisioning" class="col-sm-2 col-lg-1 control-label text-left">Provisioning</label>
+            <div class="col-sm-10 col-lg-11">
+              <select name="profile_provisioning" ng-model="profile.Provisioning" class="form-control">
+                <option value="thin">Thin</option>
+                <option value="thick">Thick</option>
+              </select>
+            </div>
+          </div>
+          <!-- !provisioning -->
+          <!-- type -->
+          <div class="form-group">
+            <label for="profile_type" class="col-sm-2 col-lg-1 control-label text-left">Type</label>
+            <div class="col-sm-10 col-lg-11">
+              <select name="profile_type" ng-model="profile.Type" class="form-control">
+                <option value="ssd">SSD</option>
+                <option value="hdd">HDD</option>
+              </select>
+            </div>
+          </div>
+          <!-- !type -->
+          <!-- Filesystem -->
+          <div class="form-group">
+              <label for="profile_filesystem" class="col-sm-2 col-lg-1 control-label text-left">Filesystem</label>
+              <div class="col-sm-10 col-lg-11">
+                <select name="profile_filesystem" ng-model="profile.Filesystem" class="form-control">
+                  <option value="btrfs">btrfs</option>
+                  <option value="ext4">ext4</option>
+                  <option value="xfs">xfs</option>
+                </select>
+              </div>
+            </div>
+            <!-- !Filesystem -->
+            <!-- snapshotEnabled -->
+            <div class="form-group">
+              <label for="profile_snapshotEnabled" class="col-sm-2 col-lg-1 control-label text-left">
+                Enable snapshots
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input name="profile_snapshotEnabled" type="checkbox" ng-model="profile.SnapshotEnabled"><i></i>
+              </label>
+            </div>
+            <!-- !snapshotEnabled -->
+            <!-- snapshotMax -->
+            <div class="form-group" ng-if="profile.SnapshotEnabled">
+              <label for="profile_snapshotMax" class="col-sm-2 col-lg-1 control-label text-left" style="margin-top: 20px;">
+                Snapshot max
+              </label>
+              <div class="col-sm-4">
+                <slider model="profile.SnapshotMax" floor="1" ceil="100" step="1"></slider>
+              </div>
+              <div class="col-sm-2">
+                <input type="number" min="1" class="form-control" ng-model="profile.SnapshotMax" id="profile_snapshotMax">
+              </div>
+              <div class="col-sm-4">
+                <p class="small text-muted" style="margin-top: 7px;">
+                  Snapshot max (<b>count</b>)
+                </p>
+              </div>
+            </div>
+            <!-- !snapshotMax -->
+            <!-- snapshotEnabled -->
+            <div class="form-group" ng-if="profile.SnapshotEnabled">
+              <label for="profile_recurringSnapshotEnabled" class="col-sm-2 col-lg-1 control-label text-left">
+                Enable periodic snapshots
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input name="profile_recurringSnapshotEnabled" type="checkbox" ng-model="state.RecurringSnapshotEnabled"><i></i>
+              </label>
+            </div>
+            <!-- !snapshotEnabled -->
+            <!-- snapshotInterval -->
+            <div class="form-group" ng-if="profile.SnapshotEnabled && state.RecurringSnapshotEnabled">
+              <label for="profile_snapshotInterval" class="col-sm-2 col-lg-1 control-label text-left" style="margin-top: 20px;">
+                Snapshot interval
+              </label>
+              <div class="col-sm-4">
+                <slider model="profile.SnapshotInterval" floor="1" ceil="2880" step="1"></slider>
+              </div>
+              <div class="col-sm-2">
+                <input type="number" min="1" class="form-control" ng-model="profile.SnapshotInterval" id="profile_snapshotInterval">
+              </div>
+              <div class="col-sm-4">
+                <p class="small text-muted" style="margin-top: 7px;">
+                  Snapshot interval (<b>minutes</b>)
+                </p>
+              </div>
+            </div>
+            <!-- !snapshotInterval -->
+            <!-- encryptionEnabled -->
+            <div class="form-group">
+              <label for="profile_encryptionEnabled" class="col-sm-2 col-lg-1 control-label text-left">
+                Enable encryption
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input name="profile_encryptionEnabled" type="checkbox" ng-model="profile.EncryptionEnabled"><i></i>
+              </label>
+            </div>
+            <!-- !encryptionEnabled -->
+            <!-- interfaceType -->
+            <div class="form-group">
+              <label for="profile_interfaceType" class="col-sm-2 col-lg-1 control-label text-left">Interface type</label>
+              <div class="col-sm-10 col-lg-11">
+                <select name="profile_interfaceType" ng-model="profile.InterfaceType" class="form-control">
+                  <option value=""></option>
+                  <option value="nfs">nfs</option>
+                </select>
+              </div>
+            </div>
+            <!-- !interfaceType -->
+            <!-- interfaceDriver -->
+            <div class="form-group">
+              <label for="profile_interfaceDriver" class="col-sm-2 col-lg-1 control-label text-left">Network driver</label>
+              <div class="col-sm-10 col-lg-11">
+                <select name="profile_interfaceDriver" ng-model="profile.InterfaceDriver" class="form-control">
+                  <option value=""></option>
+                  <option value="macvlan">macvlan</option>
+                  <option value="overlay">overlay</option>
+                </select>
+              </div>
+            </div>
+            <!-- !interfaceDriver -->
+            <!-- interfaceNetwork -->
+            <div class="form-group">
+              <label for="profile_interfaceNetwork" class="col-sm-2 col-lg-1 control-label text-left">Network name</label>
+              <div class="col-sm-10 col-lg-11">
+                <input type="text" class="form-control" ng-model="profile.InterfaceNetwork" name="profile_interfaceNetwork" pattern="[a-zA-Z0-9]+">
+              </div>
+            </div>
+            <!-- !interfaceNetwork -->
+            <!-- interfaceConf -->
+            <div class="form-group">
+              <label for="profile_interfaceConf" class="col-sm-2 col-lg-1 control-label text-left">Interface conf</label>
+              <div class="col-sm-10 col-lg-11">
+                <input type="text" class="form-control" ng-model="profile.InterfaceConf" name="profile_interfaceConf">
+              </div>
+            </div>
+            <!-- !interfaceConf -->
+            <!-- labels -->
+            <div class="form-group">
+              <div class="col-sm-12" style="margin-top: 5px;">
+                <label class="control-label text-left">Labels</label>
+                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addLabel()">
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i> add label
+                </span>
+              </div>
+              <!-- labels-input-list -->
+              <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                <div ng-repeat="label in formValues.Labels" style="margin-top: 2px;">
+                  <div class="input-group col-sm-5 input-group-sm">
+                    <span class="input-group-addon">name</span>
+                    <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. com.example.foo">
+                  </div>
+                  <div class="input-group col-sm-5 input-group-sm">
+                    <span class="input-group-addon">value</span>
+                    <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar">
+                  </div>
+                  <button class="btn btn-sm btn-danger" type="button" ng-click="removeLabel($index)">
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+              <!-- !labels-input-list -->
+            </div>
+            <!-- !labels -->
+          <!-- iops -->
+          <div ng-if="!state.LimitBandwidth || state.NoLimit">
+            <div class="col-sm-12 form-section-title">
+              IOPS
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label for="permissions" class="control-label text-left">
+                  Limit IOPS
+                </label>
+                <label class="switch" style="margin-left: 20px;">
+                  <input type="checkbox" ng-model="state.LimitIOPS" ng-change="state.NoLimit = (!state.LimitBandwidth && !state.LimitIOPS)"><i></i>
+                </label>
+              </div>
+            </div>
+            <div class="form-group" ng-if="state.LimitIOPS">
+              <label for="min_iops" class="col-sm-1 control-label text-left">Min</label>
+              <div class="col-sm-5" ng-class="{ 'has-error': storidgeUpdateProfileForm.min_iops.$invalid }">
+                <input type="number" class="form-control" ng-model="profile.MinIOPS" name="min_iops" ng-min="30" ng-max="999999" placeholder="100" required>
+              </div>
+              <label for="max_iops" class="col-sm-1 control-label text-left">Max</label>
+              <div class="col-sm-5" ng-class="{ 'has-error': storidgeUpdateProfileForm.max_iops.$invalid }">
+                <input type="number" class="form-control" ng-model="profile.MaxIOPS" name="max_iops" ng-min="30" ng-max="999999" placeholder="2000" required>
+              </div>
+            </div>
+            <div class="form-group" ng-show="storidgeUpdateProfileForm.min_iops.$invalid">
+              <div class="col-sm-12 small text-warning">
+                <div ng-messages="storidgeUpdateProfileForm.min_iops.$error">
+                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A value is required for Min IOPS.</p>
+                  <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Minimum value for Min IOPS: 30.</p>
+                  <p ng-message="max"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Maximum value for Min IOPS: 999999.</p>
+                </div>
+              </div>
+            </div>
+            <div class="form-group" ng-show="storidgeUpdateProfileForm.max_iops.$invalid">
+              <div class="col-sm-12 small text-warning">
+                <div ng-messages="storidgeUpdateProfileForm.max_iops.$error">
+                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A value is required for Max IOPS.</p>
+                  <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Minimum value for Max IOPS: 30.</p>
+                  <p ng-message="max"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Maximum value for Max IOPS: 999999.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- !iops -->
+          <!-- bandwidth -->
+          <div ng-if="!state.LimitIOPS || state.NoLimit">
+            <div class="col-sm-12 form-section-title">
+              Bandwidth
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label for="permissions" class="control-label text-left">
+                  Limit bandwidth
+                </label>
+                <label class="switch" style="margin-left: 20px;">
+                  <input type="checkbox" ng-model="state.LimitBandwidth" ng-change="state.NoLimit = (!state.LimitBandwidth && !state.LimitIOPS)"><i></i>
+                </label>
+              </div>
+            </div>
+            <div class="form-group" ng-if="state.LimitBandwidth">
+              <label for="min_bandwidth" class="col-sm-1 control-label text-left">Min</label>
+              <div class="col-sm-5" ng-class="{ 'has-error': storidgeUpdateProfileForm.min_bandwidth.$invalid }">
+                <input type="number" class="form-control" ng-model="profile.MinBandwidth" name="min_bandwidth" ng-min="1" ng-max="5000" placeholder="1" required>
+              </div>
+              <label for="max_bandwidth" class="col-sm-1 control-label text-left">Max</label>
+              <div class="col-sm-5" ng-class="{ 'has-error': storidgeUpdateProfileForm.max_bandwidth.$invalid }">
+                <input type="number" class="form-control" ng-model="profile.MaxBandwidth" name="max_bandwidth" ng-min="1" ng-max="5000" placeholder="100" required>
+              </div>
+            </div>
+            <div class="form-group" ng-show="storidgeUpdateProfileForm.min_bandwidth.$invalid">
+              <div class="col-sm-12 small text-warning">
+                <div ng-messages="storidgeUpdateProfileForm.min_bandwidth.$error">
+                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A value is required for Min bandwidth.</p>
+                  <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Minimum value for Min bandwidth: 1.</p>
+                  <p ng-message="max"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Maximum value for Min bandwidth: 5000.</p>
+                </div>
+              </div>
+            </div>
+            <div class="form-group" ng-show="storidgeUpdateProfileForm.max_bandwidth.$invalid">
+              <div class="col-sm-12 small text-warning">
+                <div ng-messages="storidgeUpdateProfileForm.max_bandwidth.$error">
+                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A value is required for Max bandwidth.</p>
+                  <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Minimum value for Max bandwidth: 1.</p>
+                  <p ng-message="max"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Maximum value for Max bandwidth: 5000.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- !bandwidth -->
+          <!-- actions -->
+          <div class="col-sm-12 form-section-title">
+            Actions
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-primary btn-sm" ng-click="update()" ng-disabled="state.updateInProgress || !storidgeUpdateProfileForm.$valid" button-spinner="state.updateInProgress">
+                <span ng-hide="state.updateInProgress">Update the profile</span>
+                <span ng-show="state.updateInProgress">Updating profile...</span>
+              </button>
+              <button type="button" class="btn btn-danger btn-sm" ng-click="delete()" ng-disabled="state.deleteInProgress" button-spinner="state.deleteInProgress">
+                <span ng-hide="state.deleteInProgress">Delete the profile</span>
+                <span ng-show="state.deleteInProgress">Deleting profile...</span>
+              </button>
+            </div>
+          </div>
+          <!-- !actions -->
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

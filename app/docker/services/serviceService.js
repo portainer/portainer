@@ -1,3 +1,6 @@
+import { ServiceViewModel } from '../models/service';
+
+
 angular.module('portainer.docker')
 .factory('ServiceService', ['$q', 'Service', 'ServiceHelper', 'TaskService', 'ResourceControlService', 'LogHelper',
 function ServiceServiceFactory($q, Service, ServiceHelper, TaskService, ResourceControlService, LogHelper) {

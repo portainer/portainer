@@ -1,5 +1,5 @@
 angular.module('portainer.docker').component('porImageRegistry', {
-  templateUrl: 'app/docker/components/imageRegistry/porImageRegistry.html',
+  templateUrl: './porImageRegistry.html',
   controller: 'porImageRegistryController',
   bindings: {
     'image': '=',

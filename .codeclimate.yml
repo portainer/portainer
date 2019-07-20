@@ -53,6 +53,7 @@ plugins:
           mass_threshold: 80
   eslint:
     enabled: true
+    channel: "eslint-5"
     config:
       config: .eslintrc.yml
   fixme:

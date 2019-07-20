@@ -5,8 +5,8 @@ import (
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/http/security"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 // Handler is the HTTP handler used to handle schedule operations.
@@ -27,18 +27,18 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	}
 
 	h.Handle("/schedules",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.scheduleList))).Methods(http.MethodGet)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.scheduleList))).Methods(http.MethodGet)
 	h.Handle("/schedules",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.scheduleCreate))).Methods(http.MethodPost)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.scheduleCreate))).Methods(http.MethodPost)
 	h.Handle("/schedules/{id}",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.scheduleInspect))).Methods(http.MethodGet)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.scheduleInspect))).Methods(http.MethodGet)
 	h.Handle("/schedules/{id}",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.scheduleUpdate))).Methods(http.MethodPut)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.scheduleUpdate))).Methods(http.MethodPut)
 	h.Handle("/schedules/{id}",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.scheduleDelete))).Methods(http.MethodDelete)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.scheduleDelete))).Methods(http.MethodDelete)
 	h.Handle("/schedules/{id}/file",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.scheduleFile))).Methods(http.MethodGet)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.scheduleFile))).Methods(http.MethodGet)
 	h.Handle("/schedules/{id}/tasks",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.scheduleTasks))).Methods(http.MethodGet)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.scheduleTasks))).Methods(http.MethodGet)
 	return h
 }

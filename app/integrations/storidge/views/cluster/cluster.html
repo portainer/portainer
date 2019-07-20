@@ -1,0 +1,65 @@
+<rd-header>
+  <rd-header-title title-text="Storidge cluster">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="storidge.cluster" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>
+    <a ui-sref="storidge.cluster">Storidge</a>
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-bolt" title-text="Cluster details"></rd-widget-header>
+      <rd-widget-body>
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Domain</td>
+              <td>{{ clusterInfo.Domain }}</td>
+            </tr>
+            <tr>
+              <td>Condition</td>
+              <td><i class="fa fa-heartbeat space-right {{ clusterInfo.Condition | storidgeClusterConditionBadge }}"></i>
+                {{ clusterInfo.Condition }}
+              </td>
+            </tr>
+            <tr>
+              <td>Version</td>
+              <td>{{ clusterVersion }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <form class="form-horizontal">
+          <div class="col-sm-12 form-section-title">
+            Actions
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-danger btn-sm" ng-click="shutdownCluster()" ng-disabled="state.shutdownInProgress" button-spinner="state.shutdownInProgress">
+                <span ng-hide="state.shutdownInProgress"><i class="fa fa-power-off space-right" aria-hidden="true"></i> Shutdown the cluster</span>
+                <span ng-show="state.shutdownInProgress">Shutting down cluster...</span>
+              </button>
+              <button type="button" class="btn btn-danger btn-sm" ng-click="rebootCluster()" ng-disabled="state.rebootInProgress" button-spinner="state.shutdownInProgress">
+                <span ng-hide="state.rebootInProgress"><i class="fa fa-sync space-right" aria-hidden="true"></i> Reboot the cluster</span>
+                <span ng-show="state.rebootInProgress">Rebooting cluster...</span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <storidge-nodes-datatable
+    title-text="Storage nodes" title-icon="fa-object-group"
+    dataset="clusterNodes" table-key="storidge_nodes"
+    order-by="Name"
+    ></storidge-nodes-datatable>
+  </div>
+</div>

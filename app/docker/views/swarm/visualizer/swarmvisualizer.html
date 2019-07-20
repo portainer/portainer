@@ -80,7 +80,7 @@
       <rd-widget-header icon="fa-object-group" title-text="Cluster visualizer"></rd-widget-header>
       <rd-widget-body>
         <div class="visualizer_container">
-          <div class="node" ng-repeat="node in visualizerData.nodes track by $index">
+          <div class="node" ng-repeat="node in visualizerData.nodes | orderBy : ['Role', 'Hostname'] track by $index">
             <div class="node_info">
               <div>
                 <div>

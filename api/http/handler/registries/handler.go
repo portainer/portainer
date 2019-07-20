@@ -5,9 +5,9 @@ import (
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/http/proxy"
-	"github.com/portainer/portainer/http/security"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/proxy"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 func hideFields(registry *portainer.Registry) {
@@ -33,19 +33,17 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	}
 
 	h.Handle("/registries",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.registryCreate))).Methods(http.MethodPost)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.registryCreate))).Methods(http.MethodPost)
 	h.Handle("/registries",
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.registryList))).Methods(http.MethodGet)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.registryList))).Methods(http.MethodGet)
 	h.Handle("/registries/{id}",
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.registryInspect))).Methods(http.MethodGet)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.registryInspect))).Methods(http.MethodGet)
 	h.Handle("/registries/{id}",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.registryUpdate))).Methods(http.MethodPut)
-	h.Handle("/registries/{id}/access",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.registryUpdateAccess))).Methods(http.MethodPut)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.registryUpdate))).Methods(http.MethodPut)
 	h.Handle("/registries/{id}/configure",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.registryConfigure))).Methods(http.MethodPost)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.registryConfigure))).Methods(http.MethodPost)
 	h.Handle("/registries/{id}",
-		bouncer.AdministratorAccess(httperror.LoggerHandler(h.registryDelete))).Methods(http.MethodDelete)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.registryDelete))).Methods(http.MethodDelete)
 	h.PathPrefix("/registries/{id}/v2").Handler(
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.proxyRequestsToRegistryAPI)))
 

@@ -3,7 +3,7 @@
     <rd-widget-header icon="fa-tasks" title-text="Configs">
     </rd-widget-header>
     <rd-widget-body classes="no-padding">
-      <div class="form-inline" style="padding: 10px;">
+      <div class="form-inline" style="padding: 10px;" authorization="DockerServiceUpdate">
         Add a config:
         <select class="form-control" ng-options="config.Name for config in configs | orderBy: 'Name'" ng-model="newConfig">
           <option selected disabled hidden value="">Select a config</option>
@@ -32,7 +32,7 @@
             <td>{{ config.Uid }}</td>
             <td>{{ config.Gid }}</td>
             <td>{{ config.Mode }}</td>
-            <td>
+            <td authorization="DockerServiceUpdate">
               <button class="btn btn-xs btn-danger pull-right" type="button" ng-click="removeConfig(service, $index)" ng-disabled="isUpdating">
                 <i class="fa fa-trash" aria-hidden="true"></i> Remove config
               </button>
@@ -44,7 +44,7 @@
         </tbody>
       </table>
     </rd-widget-body>
-    <rd-widget-footer>
+    <rd-widget-footer authorization="DockerServiceUpdate">
       <div class="btn-toolbar" role="toolbar">
         <div class="btn-group" role="group">
           <button type="submit" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['ServiceConfigs'])">Apply changes</button>

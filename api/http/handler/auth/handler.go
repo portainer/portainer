@@ -5,9 +5,9 @@ import (
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/http/proxy"
-	"github.com/portainer/portainer/http/security"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/proxy"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 const (
@@ -30,6 +30,9 @@ type Handler struct {
 	TeamService           portainer.TeamService
 	TeamMembershipService portainer.TeamMembershipService
 	ExtensionService      portainer.ExtensionService
+	EndpointService       portainer.EndpointService
+	EndpointGroupService  portainer.EndpointGroupService
+	RoleService           portainer.RoleService
 	ProxyManager          *proxy.Manager
 }
 

@@ -1,0 +1,56 @@
+<rd-header>
+  <rd-header-title title-text="Drive details"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="storidge.cluster">Storidge</a> &gt; <a ui-sref="storidge.drives">Drives</a> &gt; <a ui-sref="storidge.drives.drive({id: drive.Id})">{{ drive.Id }}</a>
+  </rd-header-content>
+</rd-header>
+  
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-hdd" title-text="Drive details "></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>ID</td>
+              <td>
+                {{ drive.Id }}
+                <button class="btn btn-xs btn-danger" ng-click="removeDrive()" ng-if="drive.Status === 'faulty'" button-spinner="actionInProgress" ng-disabled="actionInProgress">
+                  <span ng-hide="actionInProgress"><i class="fa fa-trash space-right" aria-hidden="true"></i>Remove from storage pool</span>
+                  <span ng-show="actionInProgress">Removal in progress...</span>
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>Node</td>
+              <td>{{ drive.Node }}</td>
+            </tr>
+            <tr>
+              <td>Device</td>
+              <td>{{ drive.Device }}</td>
+            </tr>
+            <tr>
+              <td>Size</td>
+              <td>{{ drive.Size }}</td>
+            </tr>
+            <tr>
+              <td>Use</td>
+              <td>{{ drive.Use }}</td>
+            </tr>
+            <tr>
+              <td>Type</td>
+              <td>{{ drive.Type }}</td>
+            </tr>
+            <tr>
+              <td>Status</td>
+              <td>
+                <span class="label label-{{ drive.Status|drivestatusbadge }}">{{ drive.Status|capitalize }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

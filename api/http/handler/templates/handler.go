@@ -5,8 +5,8 @@ import (
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer"
-	"github.com/portainer/portainer/http/security"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 const (
@@ -27,15 +27,15 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	}
 
 	h.Handle("/templates",
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.templateList))).Methods(http.MethodGet)
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.templateList))).Methods(http.MethodGet)
 	h.Handle("/templates",
-		bouncer.AdministratorAccess(h.templateManagementCheck(httperror.LoggerHandler(h.templateCreate)))).Methods(http.MethodPost)
+		bouncer.AuthorizedAccess(h.templateManagementCheck(httperror.LoggerHandler(h.templateCreate)))).Methods(http.MethodPost)
 	h.Handle("/templates/{id}",
-		bouncer.AdministratorAccess(h.templateManagementCheck(httperror.LoggerHandler(h.templateInspect)))).Methods(http.MethodGet)
+		bouncer.AuthorizedAccess(h.templateManagementCheck(httperror.LoggerHandler(h.templateInspect)))).Methods(http.MethodGet)
 	h.Handle("/templates/{id}",
-		bouncer.AdministratorAccess(h.templateManagementCheck(httperror.LoggerHandler(h.templateUpdate)))).Methods(http.MethodPut)
+		bouncer.AuthorizedAccess(h.templateManagementCheck(httperror.LoggerHandler(h.templateUpdate)))).Methods(http.MethodPut)
 	h.Handle("/templates/{id}",
-		bouncer.AdministratorAccess(h.templateManagementCheck(httperror.LoggerHandler(h.templateDelete)))).Methods(http.MethodDelete)
+		bouncer.AuthorizedAccess(h.templateManagementCheck(httperror.LoggerHandler(h.templateDelete)))).Methods(http.MethodDelete)
 	return h
 }
 

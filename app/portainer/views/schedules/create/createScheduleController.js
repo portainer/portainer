@@ -1,3 +1,5 @@
+import { ScheduleDefaultModel } from '../../../models/schedule';
+
 angular.module('portainer.app')
 .controller('CreateScheduleController', ['$q', '$scope', '$state', 'Notifications', 'EndpointService', 'GroupService', 'ScheduleService',
 function ($q, $scope, $state, Notifications, EndpointService, GroupService, ScheduleService) {
@@ -40,7 +42,7 @@ function ($q, $scope, $state, Notifications, EndpointService, GroupService, Sche
       groups: GroupService.groups()
     })
     .then(function success(data) {
-      $scope.endpoints = data.endpoints;
+      $scope.endpoints = data.endpoints.value;
       $scope.groups = data.groups;
     })
     .catch(function error(err) {

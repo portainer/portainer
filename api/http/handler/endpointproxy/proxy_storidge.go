@@ -7,7 +7,7 @@ import (
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
-	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/api"
 
 	"net/http"
 )
@@ -25,9 +25,9 @@ func (handler *Handler) proxyRequestsToStoridgeAPI(w http.ResponseWriter, r *htt
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
-	err = handler.requestBouncer.EndpointAccess(r, endpoint)
+	err = handler.requestBouncer.AuthorizedEndpointOperation(r, endpoint, false)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", portainer.ErrEndpointAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
 	}
 
 	var storidgeExtension *portainer.EndpointExtension
@@ -41,7 +41,7 @@ func (handler *Handler) proxyRequestsToStoridgeAPI(w http.ResponseWriter, r *htt
 		return &httperror.HandlerError{http.StatusServiceUnavailable, "Storidge extension not supported on this endpoint", portainer.ErrEndpointExtensionNotSupported}
 	}
 
-	proxyExtensionKey := string(endpoint.ID) + "_" + string(portainer.StoridgeEndpointExtension)
+	proxyExtensionKey := strconv.Itoa(endpointID) + "_" + strconv.Itoa(int(portainer.StoridgeEndpointExtension)) + "_" + storidgeExtension.URL
 
 	var proxy http.Handler
 	proxy = handler.ProxyManager.GetLegacyExtensionProxy(proxyExtensionKey)
@@ -53,6 +53,6 @@ func (handler *Handler) proxyRequestsToStoridgeAPI(w http.ResponseWriter, r *htt
 	}
 
 	id := strconv.Itoa(endpointID)
-	http.StripPrefix("/"+id+"/extensions/storidge", proxy).ServeHTTP(w, r)
+	http.StripPrefix("/"+id+"/storidge", proxy).ServeHTTP(w, r)
 	return nil
 }

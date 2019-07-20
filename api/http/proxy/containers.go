@@ -3,7 +3,7 @@ package proxy
 import (
 	"net/http"
 
-	"github.com/portainer/portainer"
+	"github.com/portainer/portainer/api"
 )
 
 const (
@@ -26,7 +26,7 @@ func containerListOperation(response *http.Response, executor *operationExecutor
 		return err
 	}
 
-	if executor.operationContext.isAdmin {
+	if executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess {
 		responseArray, err = decorateContainerList(responseArray, executor.operationContext.resourceControls)
 	} else {
 		responseArray, err = filterContainerList(responseArray, executor.operationContext)
@@ -137,7 +137,7 @@ func decorateContainerList(containerData []interface{}, resourceControls []porta
 // Authorized containers are decorated during the process.
 // Resource controls checks are based on: resource identifier, service identifier (from label), stack identifier (from label).
 // Container object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ContainerList
-func filterContainerList(containerData []interface{}, context *restrictedOperationContext) ([]interface{}, error) {
+func filterContainerList(containerData []interface{}, context *restrictedDockerOperationContext) ([]interface{}, error) {
 	filteredContainerData := make([]interface{}, 0)
 
 	for _, container := range containerData {

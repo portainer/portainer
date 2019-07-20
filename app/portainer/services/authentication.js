@@ -1,6 +1,6 @@
 angular.module('portainer.app')
 .factory('Authentication', [
-'Auth', 'OAuth', 'jwtHelper', 'LocalStorage', 'StateManager', 'EndpointProvider', 
+'Auth', 'OAuth', 'jwtHelper', 'LocalStorage', 'StateManager', 'EndpointProvider',
 function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManager, EndpointProvider) {
   'use strict';
 
@@ -13,6 +13,8 @@ function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManage
   service.logout = logout;
   service.isAuthenticated = isAuthenticated;
   service.getUserDetails = getUserDetails;
+  service.isAdmin = isAdmin;
+  service.hasAuthorizations = hasAuthorizations;
 
   function init() {
     var jwt = LocalStorage.getJWT();
@@ -57,6 +59,32 @@ function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManage
     user.username = tokenPayload.username;
     user.ID = tokenPayload.id;
     user.role = tokenPayload.role;
+    user.endpointAuthorizations = tokenPayload.endpointAuthorizations;
+    user.portainerAuthorizations = tokenPayload.portainerAuthorizations;
+  }
+
+  function isAdmin() {
+    if (user.role === 1) {
+      return true;
+    }
+    return false;
+  }
+
+  function hasAuthorizations(authorizations) {
+    const endpointId = EndpointProvider.endpointID();
+    if (isAdmin()) {
+      return true;
+    }
+    if (!user.endpointAuthorizations || (user.endpointAuthorizations && !user.endpointAuthorizations[endpointId])) {
+      return false;
+    }
+    for (var i = 0; i < authorizations.length; i++) {
+      var authorization = authorizations[i];
+      if (user.endpointAuthorizations[endpointId][authorization]) {
+        return true;
+      }
+    }
+    return false;
   }
 
   return service;

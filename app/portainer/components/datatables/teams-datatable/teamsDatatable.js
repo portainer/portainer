@@ -1,5 +1,5 @@
 angular.module('portainer.app').component('teamsDatatable', {
-  templateUrl: 'app/portainer/components/datatables/teams-datatable/teamsDatatable.html',
+  templateUrl: './teamsDatatable.html',
   controller: 'GenericDatatableController',
   bindings: {
     titleText: '@',

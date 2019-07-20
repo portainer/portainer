@@ -1,6 +1,8 @@
 package security
 
-import "github.com/portainer/portainer"
+import (
+	"github.com/portainer/portainer/api"
+)
 
 // FilterUserTeams filters teams based on user role.
 // non-administrator users only have access to team they are member of.
@@ -78,7 +80,7 @@ func FilterRegistries(registries []portainer.Registry, context *RestrictedReques
 }
 
 // FilterTemplates filters templates based on the user role.
-// Non-administrato template do not have access to templates where the AdministratorOnly flag is set to true.
+// Non-administrator template do not have access to templates where the AdministratorOnly flag is set to true.
 func FilterTemplates(templates []portainer.Template, context *RestrictedRequestContext) []portainer.Template {
 	filteredTemplates := templates
 

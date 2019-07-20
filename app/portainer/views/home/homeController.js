@@ -111,28 +111,44 @@ angular.module('portainer.app')
           });
       }
 
-      function initView() {
-        $scope.isAdmin = Authentication.getUserDetails().role === 1;
-
-        MotdService.motd()
-          .then(function success(data) {
-            $scope.motd = data;
-          });
-
+      $scope.getPaginatedEndpoints = getPaginatedEndpoints;
+      function getPaginatedEndpoints(lastId, limit, filter) {
+        const deferred = $q.defer();
         $q.all({
-          endpoints: EndpointService.endpoints(),
+          endpoints: EndpointService.endpoints(lastId, limit, filter),
           groups: GroupService.groups()
         })
-          .then(function success(data) {
-            var endpoints = data.endpoints;
-            var groups = data.groups;
-            EndpointHelper.mapGroupNameToEndpoint(endpoints, groups);
-            $scope.endpoints = endpoints;
-            EndpointProvider.setEndpoints(endpoints);
-          })
-          .catch(function error(err) {
-            Notifications.error('Failure', err, 'Unable to retrieve endpoint information');
-          });
+        .then(function success(data) {
+          var endpoints = data.endpoints.value;
+          var groups = data.groups;
+          EndpointHelper.mapGroupNameToEndpoint(endpoints, groups);
+          EndpointProvider.setEndpoints(endpoints);
+          deferred.resolve({endpoints: endpoints, totalCount: data.endpoints.totalCount});
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to retrieve endpoint information');
+        });
+        return deferred.promise;
+      }
+
+      function initView() {
+        $scope.isAdmin = Authentication.isAdmin();
+
+        MotdService.motd()
+        .then(function success(data) {
+          $scope.motd = data;
+        });
+
+        getPaginatedEndpoints(0, 100)
+        .then((data) => {
+          const totalCount = data.totalCount;
+          $scope.totalCount = totalCount;
+          if (totalCount > 100) {
+            $scope.endpoints = [];
+          } else {
+            $scope.endpoints = data.endpoints;
+          }
+        });
       }
 
       initView();
