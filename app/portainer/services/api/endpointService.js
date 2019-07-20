@@ -8,9 +8,8 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     return Endpoints.get({id: endpointID}).$promise;
   };
 
-  service.endpoints = function(start, limit, filter) {
-    var filters = { search: filter };
-    return Endpoints.query({start, limit, filters}).$promise;
+  service.endpoints = function(start, limit, search) {
+    return Endpoints.query({start, limit, search}).$promise;
   };
 
   service.snapshotEndpoints = function() {
@@ -21,9 +20,8 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     return Endpoints.snapshot({ id: endpointID }, {}).$promise;
   };
 
-  service.endpointsByGroup = function(start, limit, filter, groupId) {
-    var filters = { search: filter, groupId: groupId };
-    return Endpoints.query({ start, limit, filters }).$promise;
+  service.endpointsByGroup = function(start, limit, search, groupId) {
+    return Endpoints.query({ start, limit, search, groupId }).$promise;
   };
 
   service.updateAccess = function(id, userAccessPolicies, teamAccessPolicies) {
