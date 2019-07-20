@@ -8,8 +8,6 @@ function ($q, $scope, $state, EndpointService, GroupService, EndpointHelper, Not
       EndpointService.deleteEndpoint(endpoint.Id)
       .then(function success() {
         Notifications.success('Endpoint successfully removed', endpoint.Name);
-        var index = $scope.endpoints.indexOf(endpoint);
-        $scope.endpoints.splice(index, 1);
       })
       .catch(function error(err) {
         Notifications.error('Failure', err, 'Unable to remove endpoint');
@@ -23,22 +21,22 @@ function ($q, $scope, $state, EndpointService, GroupService, EndpointHelper, Not
     });
   };
 
-  function initView() {
+  $scope.getPaginatedEndpoints = getPaginatedEndpoints;
+  function getPaginatedEndpoints(lastId, limit, filter) {
+    const deferred = $q.defer();
     $q.all({
-      endpoints: EndpointService.endpoints(),
+      endpoints: EndpointService.endpoints(lastId, limit, filter),
       groups: GroupService.groups()
     })
     .then(function success(data) {
-      var endpoints = data.endpoints;
+      var endpoints = data.endpoints.value;
       var groups = data.groups;
       EndpointHelper.mapGroupNameToEndpoint(endpoints, groups);
-      $scope.groups = groups;
-      $scope.endpoints = endpoints;
+      deferred.resolve({endpoints: endpoints, totalCount: data.endpoints.totalCount});
     })
     .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to load view');
+      Notifications.error('Failure', err, 'Unable to retrieve endpoint information');
     });
+    return deferred.promise;
   }
-
-  initView();
 }]);

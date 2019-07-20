@@ -10,12 +10,11 @@ import (
 )
 
 type endpointGroupUpdatePayload struct {
-	Name                string
-	Description         string
-	AssociatedEndpoints []portainer.EndpointID
-	Tags                []string
-	UserAccessPolicies  portainer.UserAccessPolicies
-	TeamAccessPolicies  portainer.TeamAccessPolicies
+	Name               string
+	Description        string
+	Tags               []string
+	UserAccessPolicies portainer.UserAccessPolicies
+	TeamAccessPolicies portainer.TeamAccessPolicies
 }
 
 func (payload *endpointGroupUpdatePayload) Validate(r *http.Request) error {
@@ -65,20 +64,6 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 	err = handler.EndpointGroupService.UpdateEndpointGroup(endpointGroup.ID, endpointGroup)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint group changes inside the database", err}
-	}
-
-	if payload.AssociatedEndpoints != nil {
-		endpoints, err := handler.EndpointService.Endpoints()
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
-		}
-
-		for _, endpoint := range endpoints {
-			err = handler.updateEndpointGroup(endpoint, portainer.EndpointGroupID(endpointGroupID), payload.AssociatedEndpoints)
-			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint", err}
-			}
-		}
 	}
 
 	return response.JSON(w, endpointGroup)

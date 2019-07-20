@@ -61,9 +61,9 @@ function($async, $q, $scope, $state, $stateParams, $sanitize, Authentication, Us
   };
 
   function unauthenticatedFlow() {
-    EndpointService.endpoints()
+    EndpointService.endpoints(0, 100)
     .then(function success(endpoints) {
-      if (endpoints.length === 0) {
+      if (endpoints.value.length === 0) {
         $state.go('portainer.init.endpoint');
       } else {
         $state.go('portainer.home');
@@ -87,9 +87,9 @@ function($async, $q, $scope, $state, $stateParams, $sanitize, Authentication, Us
   }
 
   function checkForEndpoints() {
-    EndpointService.endpoints()
+    EndpointService.endpoints(0, 100)
     .then(function success(data) {
-      var endpoints = data;
+      var endpoints = data.value;
 
       if (endpoints.length === 0 && Authentication.isAdmin()) {
         $state.go('portainer.init.endpoint');
