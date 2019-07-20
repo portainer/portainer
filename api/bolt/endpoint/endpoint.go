@@ -1,8 +1,6 @@
 package endpoint
 
 import (
-	"strings"
-
 	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
@@ -66,95 +64,6 @@ func (service *Service) EndpointCount() (int, error) {
 	})
 
 	return endpointCount, err
-}
-
-func matchFilter(endpoint portainer.Endpoint, filter string) bool {
-	if strings.Contains(strings.ToLower(endpoint.Name), filter) {
-		return true
-	} else if strings.Contains(strings.ToLower(endpoint.URL), filter) {
-		return true
-	}
-
-	if endpoint.Status == portainer.EndpointStatusUp && filter == "up" {
-		return true
-	} else if endpoint.Status == portainer.EndpointStatusDown && filter == "down" {
-		return true
-	}
-
-	for _, tag := range endpoint.Tags {
-		if strings.Contains(strings.ToLower(tag), filter) {
-			return true
-		}
-	}
-
-	return false
-}
-
-// EndpointsFiltered return an array containing all the endpoints matching
-// the specified filter. The search is performed on the endpoint name, URL, status
-// and tags. It also aggregates any endpoint that is part of the specified matching endpoint
-// groups.
-func (service *Service) EndpointsFiltered(filter string, matchingGroups []portainer.EndpointGroup) ([]portainer.Endpoint, error) {
-	var endpoints = make([]portainer.Endpoint, 0)
-
-	err := service.db.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		cursor := bucket.Cursor()
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-			var endpoint portainer.Endpoint
-			err := internal.UnmarshalObject(v, &endpoint)
-			if err != nil {
-				return err
-			}
-
-			if filter != "" && matchFilter(endpoint, filter) {
-				endpoints = append(endpoints, endpoint)
-				continue
-			}
-
-			for _, group := range matchingGroups {
-				if group.ID == endpoint.GroupID {
-					endpoints = append(endpoints, endpoint)
-					break
-				}
-			}
-		}
-
-		return nil
-	})
-
-	return endpoints, err
-}
-
-// EndpointsPaginated return an array containing a specific amount of endpoints
-// based on the specified pagination parameters.
-func (service *Service) EndpointsPaginated(pos, limit int) ([]portainer.Endpoint, error) {
-	var endpoints = make([]portainer.Endpoint, 0)
-
-	err := service.db.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(BucketName))
-
-		cursor := bucket.Cursor()
-		idx := 0
-		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
-
-			if limit == 0 || idx >= pos && idx < pos+limit {
-				var endpoint portainer.Endpoint
-				err := internal.UnmarshalObject(v, &endpoint)
-				if err != nil {
-					return err
-				}
-				endpoints = append(endpoints, endpoint)
-			}
-
-			idx++
-		}
-
-		return nil
-	})
-
-	return endpoints, err
 }
 
 // Endpoints return an array containing all the endpoints.
