@@ -135,6 +135,7 @@ func (server *Server) Start() error {
 	endpointHandler.Snapshotter = server.Snapshotter
 	endpointHandler.JobService = server.JobService
 	endpointHandler.ReverseTunnelService = server.ReverseTunnelService
+	endpointHandler.SettingsService = server.SettingsService
 
 	var endpointGroupHandler = endpointgroups.NewHandler(requestBouncer)
 	endpointGroupHandler.EndpointGroupService = server.EndpointGroupService
@@ -143,6 +144,7 @@ func (server *Server) Start() error {
 	var endpointProxyHandler = endpointproxy.NewHandler(requestBouncer)
 	endpointProxyHandler.EndpointService = server.EndpointService
 	endpointProxyHandler.ProxyManager = proxyManager
+	endpointProxyHandler.SettingsService = server.SettingsService
 	endpointProxyHandler.ReverseTunnelService = server.ReverseTunnelService
 
 	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"))

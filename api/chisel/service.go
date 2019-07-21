@@ -15,9 +15,8 @@ import (
 
 // Dynamic ports (also called private ports) are 49152 to 65535.
 const (
-	minAvailablePort = 49152
-	maxAvailablePort = 65535
-	// TODO: configurable? change defaults?
+	minAvailablePort      = 49152
+	maxAvailablePort      = 65535
 	tunnelCleanupInterval = 10 * time.Second
 	requiredTimeout       = 15 * time.Second
 	activeTimeout         = 5 * time.Minute
@@ -57,6 +56,7 @@ func (service *Service) StartTunnelServer(addr, port string) error {
 	// + auth management
 	// Consider multiple users for auth?
 	// This service could generate/persist credentials for each endpoints
+
 	config := &chserver.Config{
 		Reverse: true,
 		KeySeed: "keyseedexample",
@@ -70,6 +70,7 @@ func (service *Service) StartTunnelServer(addr, port string) error {
 
 	service.serverFingerprint = chiselServer.GetFingerprint()
 	service.serverPort = port
+
 	go service.tunnelCleanup()
 	return chiselServer.Start(addr, port)
 }
@@ -83,8 +84,8 @@ func (service *Service) GetServerPort() string {
 }
 
 // TODO: rename/refactor/add/review logging
-// Manage tunnels every minutes?
 func (service *Service) tunnelCleanup() {
+	log.Printf("[DEBUG] [chisel, monitoring] [checkin_interval_seconds: %f] [message: starting agent checkin loop]", tunnelCleanupInterval.Seconds())
 	ticker := time.NewTicker(tunnelCleanupInterval)
 	quit := make(chan struct{})
 
@@ -158,14 +159,12 @@ func (service *Service) tunnelCleanup() {
 				service.tunnelStatusMap.Set(item.Key, tunnelStatus)
 			}
 
-		// do something
 		case <-quit:
+			log.Println("[DEBUG] [chisel, monitoring] [message: closing agent checkin loop]")
 			ticker.Stop()
 			return
 		}
 	}
-	// TODO: required?
-	// close(quit) to exit
 }
 
 // TODO: credentials management

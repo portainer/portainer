@@ -13,6 +13,7 @@ type Handler struct {
 	*mux.Router
 	requestBouncer       *security.RequestBouncer
 	EndpointService      portainer.EndpointService
+	SettingsService      portainer.SettingsService
 	ProxyManager         *proxy.Manager
 	ReverseTunnelService portainer.ReverseTunnelService
 }

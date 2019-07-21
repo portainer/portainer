@@ -3,7 +3,25 @@ angular.module('portainer.app')
 function ($scope, $state, Notifications, SettingsService, StateManager) {
 
   $scope.state = {
-    actionInProgress: false
+    actionInProgress: false,
+    availableEdgeAgentCheckinOptions: [
+      {
+        key: '5 seconds',
+        value: 5
+      },
+      {
+        key: '10 seconds',
+        value: 10
+      },
+      {
+        key: '30 seconds',
+        value: 30
+      },
+      {
+        key: '60 seconds',
+        value: 60
+      },
+    ]
   };
 
   $scope.formValues = {

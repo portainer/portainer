@@ -40,9 +40,14 @@ func (handler *Handler) proxyRequestsToDockerAPI(w http.ResponseWriter, r *http.
 		if state == portainer.EdgeAgentIdle {
 			handler.ProxyManager.DeleteProxy(endpoint)
 			handler.ReverseTunnelService.UpdateTunnelState(endpoint.ID, portainer.EdgeAgentManagementRequired)
-			// TODO: workaround the management session interruption issue by waiting here? sleep(X) ? maybe not 15secs (as in homecontroller) but a bit less? 5-7secs?
-			// Works fine with 10 secs but hardcoded... might not work well with overrided configuration of activity timeout (wake/sleep)
-			time.Sleep(10 * time.Second)
+
+			settings, err := handler.SettingsService.Settings()
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+			}
+
+			waitForAgentToConnect := time.Duration(settings.EdgeAgentCheckinInterval) * time.Second
+			time.Sleep(waitForAgentToConnect * 2)
 		}
 	}
 

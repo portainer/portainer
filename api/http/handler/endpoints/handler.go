@@ -36,6 +36,7 @@ type Handler struct {
 	Snapshotter                 portainer.Snapshotter
 	JobService                  portainer.JobService
 	ReverseTunnelService        portainer.ReverseTunnelService
+	SettingsService             portainer.SettingsService
 }
 
 // NewHandler creates a handler to manage endpoint operations.

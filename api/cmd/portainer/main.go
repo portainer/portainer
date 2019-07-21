@@ -273,6 +273,7 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 			AllowPrivilegedModeForRegularUsers: true,
 			EnableHostManagementFeatures:       false,
 			SnapshotInterval:                   *flags.SnapshotInterval,
+			EdgeAgentCheckinInterval:           portainer.DefaultEdgeAgentCheckinIntervalInSeconds,
 		}
 
 		if *flags.Templates != "" {

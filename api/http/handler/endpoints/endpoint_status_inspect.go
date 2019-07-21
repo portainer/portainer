@@ -11,9 +11,10 @@ import (
 )
 
 type endpointStatusInspectResponse struct {
-	Status    string                   `json:"status"`
-	Port      int                      `json:"port"`
-	Schedules []portainer.EdgeSchedule `json:"schedules"`
+	Status          string                   `json:"status"`
+	Port            int                      `json:"port"`
+	Schedules       []portainer.EdgeSchedule `json:"schedules"`
+	CheckinInterval int                      `json:"checkin"`
 }
 
 // GET request on /api/endpoints/:id/status
@@ -52,12 +53,18 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 		}
 	}
 
+	settings, err := handler.SettingsService.Settings()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+	}
+
 	state, port, schedules := handler.ReverseTunnelService.GetTunnelState(endpoint.ID)
 
 	statusResponse := endpointStatusInspectResponse{
-		Status:    state,
-		Port:      port,
-		Schedules: schedules,
+		Status:          state,
+		Port:            port,
+		Schedules:       schedules,
+		CheckinInterval: settings.EdgeAgentCheckinInterval,
 	}
 
 	if state == portainer.EdgeAgentManagementRequired {

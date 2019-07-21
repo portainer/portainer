@@ -107,6 +107,8 @@ type (
 		SnapshotInterval                   string               `json:"SnapshotInterval"`
 		TemplatesURL                       string               `json:"TemplatesURL"`
 		EnableHostManagementFeatures       bool                 `json:"EnableHostManagementFeatures"`
+		// TODO: data migration
+		EdgeAgentCheckinInterval int `json:"EdgeAgentCheckinInterval"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
@@ -907,6 +909,8 @@ const (
 	SupportedDockerAPIVersion = "1.24"
 	// ExtensionServer represents the server used by Portainer to communicate with extensions
 	ExtensionServer = "localhost"
+	// DefaultEdgeAgentCheckinIntervalInSeconds represents the default interval (in seconds) used by Edge agents to checkin with the Portainer instance
+	DefaultEdgeAgentCheckinIntervalInSeconds = 5
 )
 
 const (
