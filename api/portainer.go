@@ -1,5 +1,7 @@
 package portainer
 
+import "time"
+
 type (
 	// Pair defines a key/value string pair
 	Pair struct {
@@ -590,6 +592,15 @@ type (
 		Valid      bool   `json:"Valid,omitempty"`
 	}
 
+	// TunnelDetails represents information associated to a tunnel
+	TunnelDetails struct {
+		Status       string
+		Port         int
+		LastActivity time.Time
+		Schedules    []EdgeSchedule
+		Credentials  string
+	}
+
 	// CLIService represents a service for managing CLI
 	CLIService interface {
 		ParseFlags(version string) (*CLIFlags, error)
@@ -873,8 +884,7 @@ type (
 		GetServerPort() string
 		GetClientCredentials(endpointID EndpointID) string
 		UpdateTunnelState(endpointID EndpointID, state string)
-		// TODO: refactor return value to struct?
-		GetTunnelState(endpointID EndpointID) (string, int, []EdgeSchedule)
+		GetTunnelDetails(endpointID EndpointID) *TunnelDetails
 		ResetTunnelActivityTimer(endpointID EndpointID)
 		AddSchedule(endpointID EndpointID, schedule *EdgeSchedule)
 		RemoveSchedule(scheduleID ScheduleID)
@@ -1057,8 +1067,7 @@ const (
 const (
 	EdgeAgentIdle               string = "IDLE"
 	EdgeAgentManagementRequired string = "REQUIRED"
-	//EdgeAgentStandby            string = "STANDBY"
-	EdgeAgentActive string = "ACTIVE"
+	EdgeAgentActive             string = "ACTIVE"
 )
 
 const (

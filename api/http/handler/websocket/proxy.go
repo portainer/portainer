@@ -12,9 +12,9 @@ import (
 )
 
 func (handler *Handler) proxyEdgeAgentWebsocketRequest(w http.ResponseWriter, r *http.Request, params *webSocketRequestParams) error {
-	_, port, _ := handler.ReverseTunnelService.GetTunnelState(params.endpoint.ID)
+	tunnel := handler.ReverseTunnelService.GetTunnelDetails(params.endpoint.ID)
 
-	endpointURL, err := url.Parse(fmt.Sprintf("http://localhost:%d", port))
+	endpointURL, err := url.Parse(fmt.Sprintf("http://localhost:%d", tunnel.Port))
 	if err != nil {
 		return err
 	}

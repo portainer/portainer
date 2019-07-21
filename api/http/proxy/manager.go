@@ -144,8 +144,8 @@ func (manager *Manager) CreateLegacyExtensionProxy(key, extensionAPIURL string) 
 func (manager *Manager) createDockerProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
 	baseURL := endpoint.URL
 	if endpoint.Type == portainer.EdgeAgentEnvironment {
-		_, port, _ := manager.reverseTunnelService.GetTunnelState(endpoint.ID)
-		baseURL = fmt.Sprintf("http://localhost:%d", port)
+		tunnel := manager.reverseTunnelService.GetTunnelDetails(endpoint.ID)
+		baseURL = fmt.Sprintf("http://localhost:%d", tunnel.Port)
 	}
 
 	endpointURL, err := url.Parse(baseURL)

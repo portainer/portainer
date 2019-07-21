@@ -78,8 +78,8 @@ func createEdgeClient(endpoint *portainer.Endpoint, reverseTunnelService portain
 		headers[portainer.PortainerAgentTargetHeader] = nodeName
 	}
 
-	_, port, _ := reverseTunnelService.GetTunnelState(endpoint.ID)
-	endpointURL := fmt.Sprintf("http://localhost:%d", port)
+	tunnel := reverseTunnelService.GetTunnelDetails(endpoint.ID)
+	endpointURL := fmt.Sprintf("http://localhost:%d", tunnel.Port)
 
 	return client.NewClientWithOpts(
 		client.WithHost(endpointURL),

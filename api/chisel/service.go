@@ -5,7 +5,10 @@ import (
 	"log"
 	"math/rand"
 	"strconv"
+	"strings"
 	"time"
+
+	"github.com/dchest/uniuri"
 
 	cmap "github.com/orcaman/concurrent-map"
 
@@ -22,28 +25,30 @@ const (
 	activeTimeout         = 5 * time.Minute
 )
 
-type TunnelStatus struct {
-	// TODO: rename to status
-	state string
-	port  int
-	// TODO: rename to timer or something else
-	lastActivity time.Time
-	schedules    []portainer.EdgeSchedule
-}
+//type portainer.TunnelDetails struct {
+//	// TODO: rename to status
+//	state string
+//	port  int
+//	// TODO: rename to timer or something else
+//	lastActivity time.Time
+//	schedules    []portainer.EdgeSchedule
+//	credentials  string
+//}
 
 type Service struct {
 	serverFingerprint string
 	serverPort        string
-	tunnelStatusMap   cmap.ConcurrentMap
+	tunnelDetailsMap  cmap.ConcurrentMap
 	endpointService   portainer.EndpointService
 	snapshotter       portainer.Snapshotter
+	chiselServer      *chserver.Server
 }
 
 //TODO: document
 func NewService(endpointService portainer.EndpointService) *Service {
 	return &Service{
-		tunnelStatusMap: cmap.New(),
-		endpointService: endpointService,
+		tunnelDetailsMap: cmap.New(),
+		endpointService:  endpointService,
 	}
 }
 
@@ -60,7 +65,7 @@ func (service *Service) StartTunnelServer(addr, port string) error {
 	config := &chserver.Config{
 		Reverse: true,
 		KeySeed: "keyseedexample",
-		Auth:    "agent:randomstring",
+		//Auth:    "agent:randomstring",
 	}
 
 	chiselServer, err := chserver.NewServer(config)
@@ -71,8 +76,15 @@ func (service *Service) StartTunnelServer(addr, port string) error {
 	service.serverFingerprint = chiselServer.GetFingerprint()
 	service.serverPort = port
 
+	err = chiselServer.Start(addr, port)
+	if err != nil {
+		return err
+	}
+
+	service.chiselServer = chiselServer
 	go service.tunnelCleanup()
-	return chiselServer.Start(addr, port)
+
+	return nil
 }
 
 func (service *Service) GetServerFingerprint() string {
@@ -92,28 +104,28 @@ func (service *Service) tunnelCleanup() {
 	for {
 		select {
 		case <-ticker.C:
-			for item := range service.tunnelStatusMap.IterBuffered() {
-				tunnelStatus := item.Val.(TunnelStatus)
+			for item := range service.tunnelDetailsMap.IterBuffered() {
+				tunnel := item.Val.(portainer.TunnelDetails)
 
-				if tunnelStatus.lastActivity.IsZero() || tunnelStatus.state == portainer.EdgeAgentIdle {
+				if tunnel.LastActivity.IsZero() || tunnel.Status == portainer.EdgeAgentIdle {
 					continue
 				}
 
-				elapsed := time.Since(tunnelStatus.lastActivity)
+				elapsed := time.Since(tunnel.LastActivity)
 
-				log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [message: endpoint tunnel monitoring]", item.Key, tunnelStatus.state, elapsed.Seconds())
+				log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [message: endpoint tunnel monitoring]", item.Key, tunnel.Status, elapsed.Seconds())
 
-				if tunnelStatus.state == portainer.EdgeAgentManagementRequired && elapsed.Seconds() < requiredTimeout.Seconds() {
+				if tunnel.Status == portainer.EdgeAgentManagementRequired && elapsed.Seconds() < requiredTimeout.Seconds() {
 					continue
-				} else if tunnelStatus.state == portainer.EdgeAgentManagementRequired && elapsed.Seconds() > requiredTimeout.Seconds() {
-					log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [timeout_seconds: %f] [message: REQUIRED state timeout exceeded]", item.Key, tunnelStatus.state, elapsed.Seconds(), requiredTimeout.Seconds())
+				} else if tunnel.Status == portainer.EdgeAgentManagementRequired && elapsed.Seconds() > requiredTimeout.Seconds() {
+					log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [timeout_seconds: %f] [message: REQUIRED state timeout exceeded]", item.Key, tunnel.Status, elapsed.Seconds(), requiredTimeout.Seconds())
 				}
 
-				if tunnelStatus.state == portainer.EdgeAgentActive && elapsed.Seconds() < activeTimeout.Seconds() {
+				if tunnel.Status == portainer.EdgeAgentActive && elapsed.Seconds() < activeTimeout.Seconds() {
 					continue
-				} else if tunnelStatus.state == portainer.EdgeAgentActive && elapsed.Seconds() > activeTimeout.Seconds() {
+				} else if tunnel.Status == portainer.EdgeAgentActive && elapsed.Seconds() > activeTimeout.Seconds() {
 
-					log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [timeout_seconds: %f] [message: ACTIVE state timeout exceeded. Triggering snapshot]", item.Key, tunnelStatus.state, elapsed.Seconds(), activeTimeout.Seconds())
+					log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [timeout_seconds: %f] [message: ACTIVE state timeout exceeded. Triggering snapshot]", item.Key, tunnel.Status, elapsed.Seconds(), activeTimeout.Seconds())
 
 					endpointID, err := strconv.Atoi(item.Key)
 					if err != nil {
@@ -128,7 +140,7 @@ func (service *Service) tunnelCleanup() {
 					}
 
 					endpointURL := endpoint.URL
-					endpoint.URL = fmt.Sprintf("tcp://localhost:%d", tunnelStatus.port)
+					endpoint.URL = fmt.Sprintf("tcp://localhost:%d", tunnel.Port)
 					snapshot, err := service.snapshotter.CreateSnapshot(endpoint)
 					if err != nil {
 						log.Printf("[ERROR] [snapshot] Unable to snapshot Edge endpoint (id: %s): %s", item.Key, err)
@@ -150,13 +162,18 @@ func (service *Service) tunnelCleanup() {
 				// Only remove if no schedules? And if not use existing set IDLE,0 ?
 
 				//log.Println("[DEBUG] #1 INACTIVE TUNNEL")
-				//service.tunnelStatusMap.Remove(item.Key)
+				//service.tunnelDetailsMap.Remove(item.Key)
 
-				tunnelStatus.state = portainer.EdgeAgentIdle
-				tunnelStatus.port = 0
-				tunnelStatus.lastActivity = time.Now()
-				log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [message: updating tunnel status]", item.Key, tunnelStatus.state)
-				service.tunnelStatusMap.Set(item.Key, tunnelStatus)
+				tunnel.Status = portainer.EdgeAgentIdle
+				tunnel.Port = 0
+				tunnel.LastActivity = time.Now()
+
+				credentials := tunnel.Credentials
+				tunnel.Credentials = ""
+				service.chiselServer.DeleteUser(strings.Split(credentials, ":")[0])
+
+				log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [message: updating tunnel status]", item.Key, tunnel.Status)
+				service.tunnelDetailsMap.Set(item.Key, tunnel)
 			}
 
 		case <-quit:
@@ -175,9 +192,9 @@ func (service *Service) GetClientCredentials(endpointID portainer.EndpointID) st
 func (service *Service) getUnusedPort() int {
 	port := randomInt(minAvailablePort, maxAvailablePort)
 
-	for item := range service.tunnelStatusMap.IterBuffered() {
-		value := item.Val.(TunnelStatus)
-		if value.port == port {
+	for item := range service.tunnelDetailsMap.IterBuffered() {
+		value := item.Val.(portainer.TunnelDetails)
+		if value.Port == port {
 			return service.getUnusedPort()
 		}
 	}
@@ -185,65 +202,78 @@ func (service *Service) getUnusedPort() int {
 	return port
 }
 
-func (service *Service) GetTunnelState(endpointID portainer.EndpointID) (string, int, []portainer.EdgeSchedule) {
+func (service *Service) GetTunnelDetails(endpointID portainer.EndpointID) *portainer.TunnelDetails {
 	key := strconv.Itoa(int(endpointID))
 
-	if item, ok := service.tunnelStatusMap.Get(key); ok {
-		tunnelStatus := item.(TunnelStatus)
-		return tunnelStatus.state, tunnelStatus.port, tunnelStatus.schedules
+	if item, ok := service.tunnelDetailsMap.Get(key); ok {
+		tunnelDetails := item.(portainer.TunnelDetails)
+		return &tunnelDetails
 	}
 
 	schedules := make([]portainer.EdgeSchedule, 0)
-	return portainer.EdgeAgentIdle, 0, schedules
+	return &portainer.TunnelDetails{
+		Status:    portainer.EdgeAgentIdle,
+		Port:      0,
+		Schedules: schedules,
+	}
 }
 
 func (service *Service) UpdateTunnelState(endpointID portainer.EndpointID, state string) {
 	key := strconv.Itoa(int(endpointID))
 
-	var tunnelStatus TunnelStatus
-	item, ok := service.tunnelStatusMap.Get(key)
+	var tunnelDetails portainer.TunnelDetails
+	item, ok := service.tunnelDetailsMap.Get(key)
 	if ok {
-		tunnelStatus = item.(TunnelStatus)
-		if tunnelStatus.state != state || (tunnelStatus.state == portainer.EdgeAgentActive && state == portainer.EdgeAgentActive) {
-			tunnelStatus.lastActivity = time.Now()
+		tunnelDetails = item.(portainer.TunnelDetails)
+		if tunnelDetails.Status != state || (tunnelDetails.Status == portainer.EdgeAgentActive && state == portainer.EdgeAgentActive) {
+			tunnelDetails.LastActivity = time.Now()
 		}
-		tunnelStatus.state = state
+		tunnelDetails.Status = state
 	} else {
-		tunnelStatus = TunnelStatus{state: state, schedules: []portainer.EdgeSchedule{}}
+		tunnelDetails = portainer.TunnelDetails{Status: state, Schedules: []portainer.EdgeSchedule{}}
 	}
 
-	if state == portainer.EdgeAgentManagementRequired && tunnelStatus.port == 0 {
-		tunnelStatus.port = service.getUnusedPort()
+	if state == portainer.EdgeAgentManagementRequired && tunnelDetails.Port == 0 {
+		tunnelDetails.Port = service.getUnusedPort()
+		username, password := generateRandomCredentials()
+		tunnelDetails.Credentials = fmt.Sprintf("%s:%s", username, password)
+		service.chiselServer.AddUser(username, password, "")
 	}
 
-	log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [message: updating tunnel status]", key, tunnelStatus.state, time.Since(tunnelStatus.lastActivity).Seconds())
+	log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [message: updating tunnel status]", key, tunnelDetails.Status, time.Since(tunnelDetails.LastActivity).Seconds())
 
-	service.tunnelStatusMap.Set(key, tunnelStatus)
+	service.tunnelDetailsMap.Set(key, tunnelDetails)
+}
+
+func generateRandomCredentials() (string, string) {
+	username := uniuri.NewLen(8)
+	password := uniuri.NewLen(8)
+	return username, password
 }
 
 func (service *Service) ResetTunnelActivityTimer(endpointID portainer.EndpointID) {
 	key := strconv.Itoa(int(endpointID))
 
-	var tunnelStatus TunnelStatus
-	item, ok := service.tunnelStatusMap.Get(key)
+	var tunnelDetails portainer.TunnelDetails
+	item, ok := service.tunnelDetailsMap.Get(key)
 	if ok {
-		tunnelStatus = item.(TunnelStatus)
-		tunnelStatus.lastActivity = time.Now()
-		service.tunnelStatusMap.Set(key, tunnelStatus)
-		log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [message: updating tunnel status timer]", key, tunnelStatus.state, time.Since(tunnelStatus.lastActivity).Seconds())
+		tunnelDetails = item.(portainer.TunnelDetails)
+		tunnelDetails.LastActivity = time.Now()
+		service.tunnelDetailsMap.Set(key, tunnelDetails)
+		log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [message: updating tunnel status timer]", key, tunnelDetails.Status, time.Since(tunnelDetails.LastActivity).Seconds())
 	}
 }
 
 func (service *Service) AddSchedule(endpointID portainer.EndpointID, schedule *portainer.EdgeSchedule) {
 	key := strconv.Itoa(int(endpointID))
 
-	var tunnelStatus TunnelStatus
-	item, ok := service.tunnelStatusMap.Get(key)
+	var tunnelDetails portainer.TunnelDetails
+	item, ok := service.tunnelDetailsMap.Get(key)
 	if ok {
-		tunnelStatus = item.(TunnelStatus)
+		tunnelDetails = item.(portainer.TunnelDetails)
 
 		existingScheduleIndex := -1
-		for idx, existingSchedule := range tunnelStatus.schedules {
+		for idx, existingSchedule := range tunnelDetails.Schedules {
 			if existingSchedule.ID == schedule.ID {
 				existingScheduleIndex = idx
 				break
@@ -251,25 +281,25 @@ func (service *Service) AddSchedule(endpointID portainer.EndpointID, schedule *p
 		}
 
 		if existingScheduleIndex == -1 {
-			tunnelStatus.schedules = append(tunnelStatus.schedules, *schedule)
+			tunnelDetails.Schedules = append(tunnelDetails.Schedules, *schedule)
 		} else {
-			tunnelStatus.schedules[existingScheduleIndex] = *schedule
+			tunnelDetails.Schedules[existingScheduleIndex] = *schedule
 		}
 
 	} else {
-		tunnelStatus = TunnelStatus{state: portainer.EdgeAgentIdle, schedules: []portainer.EdgeSchedule{*schedule}}
+		tunnelDetails = portainer.TunnelDetails{Status: portainer.EdgeAgentIdle, Schedules: []portainer.EdgeSchedule{*schedule}}
 	}
 
 	log.Printf("[DEBUG] #4 ADDING SCHEDULE %d | %s", schedule.ID, schedule.CronExpression)
-	service.tunnelStatusMap.Set(key, tunnelStatus)
+	service.tunnelDetailsMap.Set(key, tunnelDetails)
 }
 
 func (service *Service) RemoveSchedule(scheduleID portainer.ScheduleID) {
-	for item := range service.tunnelStatusMap.IterBuffered() {
-		tunnelStatus := item.Val.(TunnelStatus)
+	for item := range service.tunnelDetailsMap.IterBuffered() {
+		tunnelDetails := item.Val.(portainer.TunnelDetails)
 
 		updatedSchedules := make([]portainer.EdgeSchedule, 0)
-		for _, schedule := range tunnelStatus.schedules {
+		for _, schedule := range tunnelDetails.Schedules {
 			if schedule.ID == scheduleID {
 				log.Printf("[DEBUG] #5 REMOVING SCHEDULE %d", scheduleID)
 				continue
@@ -277,8 +307,8 @@ func (service *Service) RemoveSchedule(scheduleID portainer.ScheduleID) {
 			updatedSchedules = append(updatedSchedules, schedule)
 		}
 
-		tunnelStatus.schedules = updatedSchedules
-		service.tunnelStatusMap.Set(item.Key, tunnelStatus)
+		tunnelDetails.Schedules = updatedSchedules
+		service.tunnelDetailsMap.Set(item.Key, tunnelDetails)
 	}
 }
 

@@ -34,8 +34,8 @@ func (manager *ComposeStackManager) createClient(endpoint *portainer.Endpoint) (
 
 	endpointURL := endpoint.URL
 	if endpoint.Type == portainer.EdgeAgentEnvironment {
-		_, port, _ := manager.reverseTunnelService.GetTunnelState(endpoint.ID)
-		endpointURL = fmt.Sprintf("tcp://localhost:%d", port)
+		tunnel := manager.reverseTunnelService.GetTunnelDetails(endpoint.ID)
+		endpointURL = fmt.Sprintf("tcp://localhost:%d", tunnel.Port)
 	}
 
 	clientOpts := client.Options{

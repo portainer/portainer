@@ -122,8 +122,8 @@ func (manager *SwarmStackManager) prepareDockerCommandAndArgs(binaryPath, dataPa
 
 	endpointURL := endpoint.URL
 	if endpoint.Type == portainer.EdgeAgentEnvironment {
-		_, port, _ := manager.reverseTunnelService.GetTunnelState(endpoint.ID)
-		endpointURL = fmt.Sprintf("tcp://localhost:%d", port)
+		tunnel := manager.reverseTunnelService.GetTunnelDetails(endpoint.ID)
+		endpointURL = fmt.Sprintf("tcp://localhost:%d", tunnel.Port)
 	}
 
 	args = append(args, "-H", endpointURL)
