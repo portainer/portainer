@@ -44,14 +44,13 @@
               -p 8000:80 \
               -v portainer_agent_data:/data \
               --name portainer_edge_agent \
-              portainer/pagent:edge
+              portainer/agent
            </code>
           </uib-tab>
           <uib-tab index="1" heading="Swarm">
            <code style=display:block;white-space:pre-wrap>
              docker network create \
               --driver overlay \
-              --attachable \
               portainer_agent_network;
 
              docker service create \
@@ -68,7 +67,7 @@
               --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volumes \
               --mount type=bind,src=//,dst=/host \
               --mount type=volume,src=portainer_agent_data,dst=/data \
-              portainer/pagent:edge
+              portainer/agent
            </code>
           </uib-tab>
         </uib-tabset>
