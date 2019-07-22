@@ -226,10 +226,9 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		fmt.Sprintf("%s:%s", portainerHost, handler.ReverseTunnelService.GetServerPort()),
 		handler.ReverseTunnelService.GetServerFingerprint(),
 		strconv.Itoa(endpointID),
-		handler.ReverseTunnelService.GetClientCredentials(portainer.EndpointID(endpointID)),
 	}
 
-	// portainer_instance_url|tunnel_server_addr|tunnel_server_fingerprint|endpoint_ID|client_credentials
+	// portainer_instance_url|tunnel_server_addr|tunnel_server_fingerprint|endpoint_ID
 	key := strings.Join(keyInformation, "|")
 	encodedKey := base64.RawStdEncoding.EncodeToString([]byte(key))
 

@@ -25,16 +25,6 @@ const (
 	activeTimeout         = 5 * time.Minute
 )
 
-//type portainer.TunnelDetails struct {
-//	// TODO: rename to status
-//	state string
-//	port  int
-//	// TODO: rename to timer or something else
-//	lastActivity time.Time
-//	schedules    []portainer.EdgeSchedule
-//	credentials  string
-//}
-
 type Service struct {
 	serverFingerprint string
 	serverPort        string
@@ -58,14 +48,9 @@ func (service *Service) SetupSnapshotter(snapshotter portainer.Snapshotter) {
 
 func (service *Service) StartTunnelServer(addr, port string) error {
 	// TODO: keyseed management (persistence)
-	// + auth management
-	// Consider multiple users for auth?
-	// This service could generate/persist credentials for each endpoints
-
 	config := &chserver.Config{
 		Reverse: true,
 		KeySeed: "keyseedexample",
-		//Auth:    "agent:randomstring",
 	}
 
 	chiselServer, err := chserver.NewServer(config)
@@ -182,11 +167,6 @@ func (service *Service) tunnelCleanup() {
 			return
 		}
 	}
-}
-
-// TODO: credentials management
-func (service *Service) GetClientCredentials(endpointID portainer.EndpointID) string {
-	return "agent:randomstring"
 }
 
 func (service *Service) getUnusedPort() int {

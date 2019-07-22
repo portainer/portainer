@@ -595,8 +595,8 @@ type (
 	// TunnelDetails represents information associated to a tunnel
 	TunnelDetails struct {
 		Status       string
-		Port         int
 		LastActivity time.Time
+		Port         int
 		Schedules    []EdgeSchedule
 		Credentials  string
 	}
@@ -882,7 +882,6 @@ type (
 		SetupSnapshotter(snapshotter Snapshotter)
 		GetServerFingerprint() string
 		GetServerPort() string
-		GetClientCredentials(endpointID EndpointID) string
 		UpdateTunnelState(endpointID EndpointID, state string)
 		GetTunnelDetails(endpointID EndpointID) *TunnelDetails
 		ResetTunnelActivityTimer(endpointID EndpointID)
