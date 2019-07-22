@@ -84,6 +84,11 @@ func (service *Service) GetBinaryFolder() string {
 	return path.Join(service.fileStorePath, BinaryStorePath)
 }
 
+// GetRootFolder returns the full path to the root store on the filesystem
+func (service *Service) GetRootFolder() string {
+	return service.fileStorePath
+}
+
 // ExtractExtensionArchive extracts the content of an extension archive
 // specified as raw data into the binary store on the filesystem
 func (service *Service) ExtractExtensionArchive(data []byte) error {

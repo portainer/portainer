@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/roles"
 
 	"github.com/portainer/portainer/api/http/handler/auth"
+	"github.com/portainer/portainer/api/http/handler/database"
 	"github.com/portainer/portainer/api/http/handler/dockerhub"
 	"github.com/portainer/portainer/api/http/handler/endpointgroups"
 	"github.com/portainer/portainer/api/http/handler/endpointproxy"
@@ -34,6 +35,7 @@ import (
 // Handler is a collection of all the service handlers.
 type Handler struct {
 	AuthHandler            *auth.Handler
+	DatabaseHandler        *database.Handler
 	DockerHubHandler       *dockerhub.Handler
 	EndpointGroupHandler   *endpointgroups.Handler
 	EndpointHandler        *endpoints.Handler
@@ -63,6 +65,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case strings.HasPrefix(r.URL.Path, "/api/auth"):
 		http.StripPrefix("/api", h.AuthHandler).ServeHTTP(w, r)
+	case strings.HasPrefix(r.URL.Path, "/api/database"):
+		http.StripPrefix("/api", h.DatabaseHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/dockerhub"):
 		http.StripPrefix("/api", h.DockerHubHandler).ServeHTTP(w, r)
 	case strings.HasPrefix(r.URL.Path, "/api/endpoint_groups"):

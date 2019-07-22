@@ -11,6 +11,7 @@ import (
 	"github.com/portainer/portainer/api/cli"
 	"github.com/portainer/portainer/api/cron"
 	"github.com/portainer/portainer/api/crypto"
+	"github.com/portainer/portainer/api/database"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/exec"
 	"github.com/portainer/portainer/api/filesystem"
@@ -98,6 +99,10 @@ func initCryptoService() portainer.CryptoService {
 
 func initLDAPService() portainer.LDAPService {
 	return &ldap.Service{}
+}
+
+func initDatabaseService() portainer.DatabaseService {
+	return &database.Service{}
 }
 
 func initGitService() portainer.GitService {
@@ -526,6 +531,8 @@ func main() {
 
 	gitService := initGitService()
 
+	databaseService := initDatabaseService()
+
 	cryptoService := initCryptoService()
 
 	digitalSignatureService := initDigitalSignatureService()
@@ -684,6 +691,7 @@ func main() {
 		ComposeStackManager:    composeStackManager,
 		ExtensionManager:       extensionManager,
 		CryptoService:          cryptoService,
+		DatabaseService:        databaseService,
 		JWTService:             jwtService,
 		FileService:            fileService,
 		LDAPService:            ldapService,

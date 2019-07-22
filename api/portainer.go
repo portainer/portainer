@@ -224,6 +224,11 @@ type (
 		Password       string `json:"Password,omitempty"`
 	}
 
+	// Database represents all the required information to connect and use the database features
+	Database struct {
+		DatabaseExport int64 `json:"DatabaseExport"`
+	}
+
 	// EndpointID represents an endpoint identifier
 	EndpointID int
 
@@ -575,6 +580,11 @@ type (
 		Valid      bool   `json:"Valid,omitempty"`
 	}
 
+	// Server defines the interface to serve the API
+	DatabaseService interface {
+		DatabaseExport(storePath string) (int64, error)
+	}
+
 	// CLIService represents a service for managing CLI
 	CLIService interface {
 		ParseFlags(version string) (*CLIFlags, error)
@@ -789,6 +799,7 @@ type (
 		GetScheduleFolder(identifier string) string
 		ExtractExtensionArchive(data []byte) error
 		GetBinaryFolder() string
+		GetRootFolder() string
 	}
 
 	// GitService represents a service for managing Git

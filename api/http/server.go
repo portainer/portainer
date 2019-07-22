@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/handler"
 	"github.com/portainer/portainer/api/http/handler/auth"
+	"github.com/portainer/portainer/api/http/handler/database"
 	"github.com/portainer/portainer/api/http/handler/dockerhub"
 	"github.com/portainer/portainer/api/http/handler/endpointgroups"
 	"github.com/portainer/portainer/api/http/handler/endpointproxy"
@@ -51,6 +52,7 @@ type Server struct {
 	JobScheduler           portainer.JobScheduler
 	Snapshotter            portainer.Snapshotter
 	RoleService            portainer.RoleService
+	DatabaseService        portainer.DatabaseService
 	DockerHubService       portainer.DockerHubService
 	EndpointService        portainer.EndpointService
 	EndpointGroupService   portainer.EndpointGroupService
@@ -121,6 +123,10 @@ func (server *Server) Start() error {
 
 	var roleHandler = roles.NewHandler(requestBouncer)
 	roleHandler.RoleService = server.RoleService
+
+	var databaseHandler = database.NewHandler(requestBouncer)
+	databaseHandler.DatabaseService = server.DatabaseService
+	databaseHandler.FileService = server.FileService
 
 	var dockerHubHandler = dockerhub.NewHandler(requestBouncer)
 	dockerHubHandler.DockerHubService = server.DockerHubService
@@ -225,6 +231,7 @@ func (server *Server) Start() error {
 	server.Handler = &handler.Handler{
 		RoleHandler:            roleHandler,
 		AuthHandler:            authHandler,
+		DatabaseHandler:        databaseHandler,
 		DockerHubHandler:       dockerHubHandler,
 		EndpointGroupHandler:   endpointGroupHandler,
 		EndpointHandler:        endpointHandler,
