@@ -65,8 +65,13 @@ func (service *Service) StartTunnelServer(addr, port string) error {
 	if err != nil {
 		return err
 	}
-
 	service.chiselServer = chiselServer
+
+	// TODO: work-around Chisel default behavior.
+	// By default, Chisel will allow anyone to connect if no user exists.
+	username, password := generateRandomCredentials()
+	service.chiselServer.AddUser(username, password, "127.0.0.1")
+
 	go service.tunnelCleanup()
 
 	return nil
@@ -217,7 +222,8 @@ func (service *Service) UpdateTunnelState(endpointID portainer.EndpointID, state
 		tunnelDetails.Port = service.getUnusedPort()
 		username, password := generateRandomCredentials()
 		tunnelDetails.Credentials = fmt.Sprintf("%s:%s", username, password)
-		service.chiselServer.AddUser(username, password, "")
+		authorizedRemote := fmt.Sprintf("^R:0.0.0.0:%d$", tunnelDetails.Port)
+		service.chiselServer.AddUser(username, password, authorizedRemote)
 	}
 
 	log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [message: updating tunnel status]", key, tunnelDetails.Status, time.Since(tunnelDetails.LastActivity).Seconds())
