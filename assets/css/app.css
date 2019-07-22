@@ -560,6 +560,17 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   display: none;
 }
 
+.small-select {
+  display: inline-block;
+  padding: 0px 6px;
+  margin-left: 10px;
+  color: #555555;
+  background-color: #fff;
+  background-image: none;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
 .bootbox-form .checkbox i {
   margin-left: 21px;
 }

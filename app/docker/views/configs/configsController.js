@@ -11,15 +11,25 @@ class ConfigsController {
 
     this.removeAction = this.removeAction.bind(this);
     this.removeActionAsync = this.removeActionAsync.bind(this);
+    this.getConfigs = this.getConfigs.bind(this);
+    this.getConfigsAsync = this.getConfigsAsync.bind(this);
   }
 
-  async $onInit() {
-    this.configs = [];
+  getConfigs() {
+    return this.$async(this.getConfigsAsync);
+  }
+
+  async getConfigsAsync() {
     try {
       this.configs = await this.ConfigService.configs();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve configs');
     }
+  }
+
+  async $onInit() {
+    this.configs = [];
+    this.getConfigs();
   }
 
   removeAction(selectedItems) {
