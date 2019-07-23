@@ -63,7 +63,7 @@ func (service *Service) Endpoints() ([]portainer.Endpoint, error) {
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var endpoint portainer.Endpoint
-			err := internal.UnmarshalObject(v, &endpoint)
+			err := internal.UnmarshalObjectWithJsoniter(v, &endpoint)
 			if err != nil {
 				return err
 			}
