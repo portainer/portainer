@@ -72,7 +72,10 @@ func (service *Service) StartTunnelServer(addr, port string) error {
 	// TODO: work-around Chisel default behavior.
 	// By default, Chisel will allow anyone to connect if no user exists.
 	username, password := generateRandomCredentials()
-	service.chiselServer.AddUser(username, password, "127.0.0.1")
+	err = service.chiselServer.AddUser(username, password, "127.0.0.1")
+	if err != nil {
+		return err
+	}
 
 	go service.tunnelCleanup()
 

@@ -75,7 +75,10 @@ func (service *Service) SetRequiredTunnel(endpointID portainer.EndpointID) error
 
 		username, password := generateRandomCredentials()
 		authorizedRemote := fmt.Sprintf("^R:0.0.0.0:%d$", tunnel.Port)
-		service.chiselServer.AddUser(username, password, authorizedRemote)
+		err = service.chiselServer.AddUser(username, password, authorizedRemote)
+		if err != nil {
+			return err
+		}
 
 		credentials, err := encryptCredentials(username, password, endpoint.EdgeID)
 		if err != nil {
