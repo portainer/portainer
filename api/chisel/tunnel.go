@@ -17,8 +17,8 @@ func (service *Service) getUnusedPort() int {
 	port := randomInt(minAvailablePort, maxAvailablePort)
 
 	for item := range service.tunnelDetailsMap.IterBuffered() {
-		value := item.Val.(portainer.TunnelDetails)
-		if value.Port == port {
+		tunnel := item.Val.(*portainer.TunnelDetails)
+		if tunnel.Port == port {
 			return service.getUnusedPort()
 		}
 	}
