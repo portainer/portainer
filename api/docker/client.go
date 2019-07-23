@@ -11,7 +11,8 @@ import (
 )
 
 const (
-	unsupportedEnvironmentType = portainer.Error("Environment not supported")
+	unsupportedEnvironmentType  = portainer.Error("Environment not supported")
+	defaultDockerRequestTimeout = 60
 )
 
 // ClientFactory is used to create Docker clients
@@ -103,6 +104,6 @@ func httpClient(endpoint *portainer.Endpoint) (*http.Client, error) {
 
 	return &http.Client{
 		Transport: transport,
-		Timeout:   30 * time.Second,
+		Timeout:   defaultDockerRequestTimeout * time.Second,
 	}, nil
 }
