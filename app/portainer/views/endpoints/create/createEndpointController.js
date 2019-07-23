@@ -31,6 +31,10 @@ function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService,
     $scope.formValues.URL = window.location.origin;
   };
 
+  $scope.resetEndpointURL = function() {
+    $scope.formValues.URL = '';
+  };
+
   $scope.addDockerEndpoint = function() {
     var name = $scope.formValues.Name;
     var URL = $filter('stripprotocol')($scope.formValues.URL);
