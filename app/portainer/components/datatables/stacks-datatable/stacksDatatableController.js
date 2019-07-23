@@ -41,6 +41,7 @@ function ($scope, $controller, DatatableService) {
       this.settings.open = false;
     }
     this.onSettingsRepeaterChange();
+    this.state.orderBy = this.orderBy;
   };
 
 }]);

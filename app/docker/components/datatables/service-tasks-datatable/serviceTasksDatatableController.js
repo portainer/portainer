@@ -87,6 +87,7 @@ angular.module('portainer.docker')
           this.settings.open = false;
         }
         this.onSettingsRepeaterChange();
+        this.state.orderBy = this.orderBy;
       };
     }
 ]);
