@@ -99,5 +99,6 @@ function ($scope, $controller, DatatableService, EndpointProvider) {
       this.settings.open = false;
     }
     this.onSettingsRepeaterChange();
+    this.state.orderBy = this.orderBy;
   };
 }]);

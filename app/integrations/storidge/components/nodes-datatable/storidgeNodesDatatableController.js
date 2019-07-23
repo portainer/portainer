@@ -51,5 +51,6 @@ function($scope, $controller, clipboard, Notifications, StoridgeNodeService, Dat
       this.settings.open = false;
     }
     this.onSettingsRepeaterChange();
+    this.state.orderBy = this.orderBy;
   };
 }]);

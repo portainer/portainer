@@ -66,5 +66,6 @@ function ($scope, $controller, DatatableService) {
     }
 
     this.onSettingsRepeaterChange();
+    this.state.orderBy = this.orderBy;
   };
 }]);

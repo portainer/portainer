@@ -145,6 +145,7 @@ function ($interval, PaginationService, DatatableService, PAGINATION_MAX_ITEMS) 
       this.settings.open = false;
     }
     this.onSettingsRepeaterChange();
+    this.state.orderBy = this.orderBy;
   };
   
   /**
