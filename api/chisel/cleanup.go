@@ -71,7 +71,7 @@ func (service *Service) tunnelCleanup() {
 					}
 				}
 
-				// TODO: to avoid iteration in a mega map and to keep that map
+				// TODO: to avoid iteration in a huge map and to keep that map
 				// in a small state, should remove entry from map instead of putting IDLE, 0
 				// NOTE: This cause a potential problem as it remove the schedules as well
 				// Only remove if no schedules? And if not use existing set IDLE,0 ?
