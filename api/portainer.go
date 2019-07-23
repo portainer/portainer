@@ -878,13 +878,12 @@ type (
 	}
 
 	ReverseTunnelService interface {
-		StartTunnelServer(addr, port string) error
 		SetupSnapshotter(snapshotter Snapshotter)
-		GetServerFingerprint() string
-		GetServerPort() string
-		UpdateTunnelState(endpointID EndpointID, state string)
+		StartTunnelServer(addr, port string) error
+		GenerateEdgeKey(url, host string, endpointIdentifier int) string
+		SetActiveTunnel(endpointID EndpointID)
+		SetRequiredTunnel(endpointID EndpointID) error
 		GetTunnelDetails(endpointID EndpointID) *TunnelDetails
-		ResetTunnelActivityTimer(endpointID EndpointID)
 		AddSchedule(endpointID EndpointID, schedule *EdgeSchedule)
 		RemoveSchedule(scheduleID ScheduleID)
 	}

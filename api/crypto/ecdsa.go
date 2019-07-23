@@ -8,6 +8,8 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"math/big"
+
+	"github.com/portainer/libcrypto"
 )
 
 const (
@@ -111,7 +113,7 @@ func (service *ECDSAService) CreateSignature(message string) (string, error) {
 		message = service.secret
 	}
 
-	hash := HashFromBytes([]byte(message))
+	hash := libcrypto.HashFromBytes([]byte(message))
 
 	r := big.NewInt(0)
 	s := big.NewInt(0)

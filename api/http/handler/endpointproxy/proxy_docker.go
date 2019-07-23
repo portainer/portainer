@@ -36,10 +36,18 @@ func (handler *Handler) proxyRequestsToDockerAPI(w http.ResponseWriter, r *http.
 	}
 
 	if endpoint.Type == portainer.EdgeAgentEnvironment {
+		if endpoint.EdgeID == "" {
+			return &httperror.HandlerError{http.StatusInternalServerError, "No Edge agent registered with the endpoint", errors.New("No agent available")}
+		}
+
 		tunnel := handler.ReverseTunnelService.GetTunnelDetails(endpoint.ID)
 		if tunnel.Status == portainer.EdgeAgentIdle {
 			handler.ProxyManager.DeleteProxy(endpoint)
-			handler.ReverseTunnelService.UpdateTunnelState(endpoint.ID, portainer.EdgeAgentManagementRequired)
+
+			err := handler.ReverseTunnelService.SetRequiredTunnel(endpoint.ID)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update tunnel status", err}
+			}
 
 			settings, err := handler.SettingsService.Settings()
 			if err != nil {

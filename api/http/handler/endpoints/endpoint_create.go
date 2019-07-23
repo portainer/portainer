@@ -1,16 +1,13 @@
 package endpoints
 
 import (
-	"encoding/base64"
 	"errors"
-	"fmt"
 	"log"
 	"net"
 	"net/http"
 	"net/url"
 	"runtime"
 	"strconv"
-	"strings"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -221,16 +218,7 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		return nil, &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint URL", errors.New("cannot use localhost as endpoint URL")}
 	}
 
-	keyInformation := []string{
-		payload.URL,
-		fmt.Sprintf("%s:%s", portainerHost, handler.ReverseTunnelService.GetServerPort()),
-		handler.ReverseTunnelService.GetServerFingerprint(),
-		strconv.Itoa(endpointID),
-	}
-
-	// portainer_instance_url|tunnel_server_addr|tunnel_server_fingerprint|endpoint_ID
-	key := strings.Join(keyInformation, "|")
-	encodedKey := base64.RawStdEncoding.EncodeToString([]byte(key))
+	edgeKey := handler.ReverseTunnelService.GenerateEdgeKey(payload.URL, portainerHost, endpointID)
 
 	endpoint := &portainer.Endpoint{
 		ID:      portainer.EndpointID(endpointID),
@@ -247,7 +235,7 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		Tags:            payload.Tags,
 		Status:          portainer.EndpointStatusUp,
 		Snapshots:       []portainer.Snapshot{},
-		EdgeKey:         string(encodedKey),
+		EdgeKey:         edgeKey,
 	}
 
 	err = handler.EndpointService.CreateEndpoint(endpoint)
