@@ -52,6 +52,7 @@
     order-by="Hostname" 
     show-ip-address-column="applicationState.endpoint.apiVersion >= 1.25"
     access-to-node-details="!applicationState.application.authentication || isAdmin"
+    refresh-callback="getNodes"
     ></nodes-datatable>
   </div>
 </div>

@@ -15,8 +15,7 @@ function ($scope, $controller, DatatableService, EndpointProvider) {
     publicURL: EndpointProvider.endpointPublicURL()
   });
 
-  this.settings = {
-    open: false,
+  this.settings = Object.assign(this.settings, {
     truncateContainerName: true,
     containerNameTruncateSize: 32,
     showQuickActionStats: true,
@@ -24,7 +23,7 @@ function ($scope, $controller, DatatableService, EndpointProvider) {
     showQuickActionExec: true,
     showQuickActionInspect: true,
     showQuickActionAttach: false
-  };
+  });
 
   this.filters = {
     state: {
@@ -197,6 +196,7 @@ function ($scope, $controller, DatatableService, EndpointProvider) {
       this.settings = storedSettings;
       this.settings.open = false;
     }
+    this.onSettingsRepeaterChange();
 
     var storedColumnVisibility = DatatableService.getColumnVisibilitySettings(this.tableKey);
     if (storedColumnVisibility !== null) {

@@ -5,11 +5,9 @@ angular.module('portainer.extensions.rbac')
       try {
         const rbacEnabled = await ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.RBAC);
         if (!rbacEnabled) {
-          elem.show();
           return;
         }
       } catch (err) {
-        elem.show();
         return;
       }
 

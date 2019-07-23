@@ -44,5 +44,12 @@ function($scope, $controller, clipboard, Notifications, StoridgeNodeService, Dat
     if (this.filters && this.filters.state) {
       this.filters.state.open = false;
     }
+
+    var storedSettings = DatatableService.getDataTableSettings(this.tableKey);
+    if (storedSettings !== null) {
+      this.settings = storedSettings;
+      this.settings.open = false;
+    }
+    this.onSettingsRepeaterChange();
   };
 }]);
