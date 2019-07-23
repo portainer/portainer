@@ -3,6 +3,8 @@ package chisel
 import (
 	"time"
 
+	"github.com/dchest/uniuri"
+
 	cmap "github.com/orcaman/concurrent-map"
 
 	chserver "github.com/jpillora/chisel/server"
@@ -21,18 +23,20 @@ const (
 )
 
 type Service struct {
-	serverFingerprint string
-	serverPort        string
-	tunnelDetailsMap  cmap.ConcurrentMap
-	endpointService   portainer.EndpointService
-	snapshotter       portainer.Snapshotter
-	chiselServer      *chserver.Server
+	serverFingerprint   string
+	serverPort          string
+	tunnelDetailsMap    cmap.ConcurrentMap
+	endpointService     portainer.EndpointService
+	tunnelServerService portainer.TunnelServerService
+	snapshotter         portainer.Snapshotter
+	chiselServer        *chserver.Server
 }
 
-func NewService(endpointService portainer.EndpointService) *Service {
+func NewService(endpointService portainer.EndpointService, tunnelServerService portainer.TunnelServerService) *Service {
 	return &Service{
-		tunnelDetailsMap: cmap.New(),
-		endpointService:  endpointService,
+		tunnelDetailsMap:    cmap.New(),
+		endpointService:     endpointService,
+		tunnelServerService: tunnelServerService,
 	}
 }
 
@@ -41,10 +45,14 @@ func (service *Service) SetupSnapshotter(snapshotter portainer.Snapshotter) {
 }
 
 func (service *Service) StartTunnelServer(addr, port string) error {
-	// TODO: keyseed management (persistence)
+	keySeed, err := service.retrievePrivateKeySeed()
+	if err != nil {
+		return err
+	}
+
 	config := &chserver.Config{
 		Reverse: true,
-		KeySeed: "keyseedexample",
+		KeySeed: keySeed,
 	}
 
 	chiselServer, err := chserver.NewServer(config)
@@ -69,4 +77,26 @@ func (service *Service) StartTunnelServer(addr, port string) error {
 	go service.tunnelCleanup()
 
 	return nil
+}
+
+func (service *Service) retrievePrivateKeySeed() (string, error) {
+	var serverInfo *portainer.TunnelServerInfo
+
+	serverInfo, err := service.tunnelServerService.Info()
+	if err == portainer.ErrObjectNotFound {
+		keySeed := uniuri.NewLen(16)
+
+		serverInfo = &portainer.TunnelServerInfo{
+			PrivateKeySeed: keySeed,
+		}
+
+		err := service.tunnelServerService.UpdateInfo(serverInfo)
+		if err != nil {
+			return "", err
+		}
+	} else if err != nil {
+		return "", err
+	}
+
+	return serverInfo.PrivateKeySeed, nil
 }

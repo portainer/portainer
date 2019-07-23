@@ -9,6 +9,7 @@ import (
 func (service *Service) AddSchedule(endpointID portainer.EndpointID, schedule *portainer.EdgeSchedule) {
 	key := strconv.Itoa(int(endpointID))
 
+	// TODO: use GetTunnelDetails?
 	var tunnelDetails *portainer.TunnelDetails
 	item, ok := service.tunnelDetailsMap.Get(key)
 	if ok {

@@ -601,6 +601,11 @@ type (
 		Credentials  string
 	}
 
+	// TunnelServerInfo represents information associated to the tunnel server
+	TunnelServerInfo struct {
+		PrivateKeySeed string `json:"PrivateKeySeed"`
+	}
+
 	// CLIService represents a service for managing CLI
 	CLIService interface {
 		ParseFlags(version string) (*CLIFlags, error)
@@ -716,6 +721,12 @@ type (
 	VersionService interface {
 		DBVersion() (int, error)
 		StoreDBVersion(version int) error
+	}
+
+	// TunnelServerService represents a service for managing data associated to the tunnel server
+	TunnelServerService interface {
+		Info() (*TunnelServerInfo, error)
+		UpdateInfo(info *TunnelServerInfo) error
 	}
 
 	// WebhookService represents a service for managing webhook data.
@@ -877,6 +888,7 @@ type (
 		UpdateExtension(extension *Extension, version string) error
 	}
 
+	// ReverseTunnelService represensts a service used to manage reverse tunnel connections.
 	ReverseTunnelService interface {
 		SetupSnapshotter(snapshotter Snapshotter)
 		StartTunnelServer(addr, port string) error

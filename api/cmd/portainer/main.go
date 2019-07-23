@@ -549,7 +549,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var reverseTunnelService portainer.ReverseTunnelService = chisel.NewService(store.EndpointService)
+	reverseTunnelService := chisel.NewService(store.EndpointService, store.TunnelServerService)
 
 	clientFactory := initClientFactory(digitalSignatureService, reverseTunnelService)
 
