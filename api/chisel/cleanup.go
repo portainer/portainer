@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"strconv"
-	"strings"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
@@ -78,17 +77,13 @@ func (service *Service) tunnelCleanup() {
 
 				//log.Println("[DEBUG] #1 INACTIVE TUNNEL")
 				//service.tunnelDetailsMap.Remove(item.Key)
+				endpointID, err := strconv.Atoi(item.Key)
+				if err != nil {
+					log.Printf("[ERROR] [conversion] Invalid endpoint identifier (id: %s): %s", item.Key, err)
+					continue
+				}
 
-				tunnel.Status = portainer.EdgeAgentIdle
-				tunnel.Port = 0
-				tunnel.LastActivity = time.Now()
-
-				credentials := tunnel.Credentials
-				tunnel.Credentials = ""
-				service.chiselServer.DeleteUser(strings.Split(credentials, ":")[0])
-
-				log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [message: updating tunnel status]", item.Key, tunnel.Status)
-				service.tunnelDetailsMap.Set(item.Key, tunnel)
+				service.SetIdleTunnel(portainer.EndpointID(endpointID))
 			}
 
 		case <-quit:

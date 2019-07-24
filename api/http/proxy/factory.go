@@ -30,21 +30,21 @@ func (factory *proxyFactory) newHTTPProxy(u *url.URL) http.Handler {
 }
 
 func newAzureProxy(credentials *portainer.AzureCredentials) (http.Handler, error) {
-	url, err := url.Parse(AzureAPIBaseURL)
+	remoteURL, err := url.Parse(AzureAPIBaseURL)
 	if err != nil {
 		return nil, err
 	}
 
-	proxy := newSingleHostReverseProxyWithHostHeader(url)
+	proxy := newSingleHostReverseProxyWithHostHeader(remoteURL)
 	proxy.Transport = NewAzureTransport(credentials)
 
 	return proxy, nil
 }
 
-func (factory *proxyFactory) newDockerHTTPSProxy(u *url.URL, tlsConfig *portainer.TLSConfiguration, enableSignature bool, endpointID portainer.EndpointID) (http.Handler, error) {
+func (factory *proxyFactory) newDockerHTTPSProxy(u *url.URL, tlsConfig *portainer.TLSConfiguration, endpoint *portainer.Endpoint) (http.Handler, error) {
 	u.Scheme = "https"
 
-	proxy := factory.createDockerReverseProxy(u, enableSignature, endpointID)
+	proxy := factory.createDockerReverseProxy(u, endpoint)
 	config, err := crypto.CreateTLSConfigurationFromDisk(tlsConfig.TLSCACertPath, tlsConfig.TLSCertPath, tlsConfig.TLSKeyPath, tlsConfig.TLSSkipVerify)
 	if err != nil {
 		return nil, err
@@ -54,13 +54,19 @@ func (factory *proxyFactory) newDockerHTTPSProxy(u *url.URL, tlsConfig *portaine
 	return proxy, nil
 }
 
-func (factory *proxyFactory) newDockerHTTPProxy(u *url.URL, enableSignature bool, endpointID portainer.EndpointID) http.Handler {
+func (factory *proxyFactory) newDockerHTTPProxy(u *url.URL, endpoint *portainer.Endpoint) http.Handler {
 	u.Scheme = "http"
-	return factory.createDockerReverseProxy(u, enableSignature, endpointID)
+	return factory.createDockerReverseProxy(u, endpoint)
 }
 
-func (factory *proxyFactory) createDockerReverseProxy(u *url.URL, enableSignature bool, endpointID portainer.EndpointID) *httputil.ReverseProxy {
+func (factory *proxyFactory) createDockerReverseProxy(u *url.URL, endpoint *portainer.Endpoint) *httputil.ReverseProxy {
 	proxy := newSingleHostReverseProxyWithHostHeader(u)
+
+	enableSignature := false
+	if endpoint.Type == portainer.AgentOnDockerEnvironment {
+		enableSignature = true
+	}
+
 	transport := &proxyTransport{
 		enableSignature:        enableSignature,
 		ResourceControlService: factory.ResourceControlService,
@@ -70,7 +76,8 @@ func (factory *proxyFactory) createDockerReverseProxy(u *url.URL, enableSignatur
 		DockerHubService:       factory.DockerHubService,
 		ReverseTunnelService:   factory.ReverseTunnelService,
 		dockerTransport:        &http.Transport{},
-		endpointIdentifier:     endpointID,
+		endpointIdentifier:     endpoint.ID,
+		endpointType:           endpoint.Type,
 	}
 
 	if enableSignature {

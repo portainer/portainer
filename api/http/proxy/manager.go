@@ -155,20 +155,20 @@ func (manager *Manager) createDockerProxy(endpoint *portainer.Endpoint) (http.Ha
 
 	switch endpoint.Type {
 	case portainer.AgentOnDockerEnvironment:
-		return manager.proxyFactory.newDockerHTTPSProxy(endpointURL, &endpoint.TLSConfig, true, endpoint.ID)
+		return manager.proxyFactory.newDockerHTTPSProxy(endpointURL, &endpoint.TLSConfig, endpoint)
 	case portainer.EdgeAgentEnvironment:
-		return manager.proxyFactory.newDockerHTTPProxy(endpointURL, false, endpoint.ID), nil
+		return manager.proxyFactory.newDockerHTTPProxy(endpointURL, endpoint), nil
 	}
 
 	if endpointURL.Scheme == "tcp" {
 		if endpoint.TLSConfig.TLS || endpoint.TLSConfig.TLSSkipVerify {
-			return manager.proxyFactory.newDockerHTTPSProxy(endpointURL, &endpoint.TLSConfig, false, endpoint.ID)
+			return manager.proxyFactory.newDockerHTTPSProxy(endpointURL, &endpoint.TLSConfig, endpoint)
 		}
 
-		return manager.proxyFactory.newDockerHTTPProxy(endpointURL, false, endpoint.ID), nil
+		return manager.proxyFactory.newDockerHTTPProxy(endpointURL, endpoint), nil
 	}
 
-	return manager.proxyFactory.newLocalProxy(endpointURL.Path, endpoint.ID), nil
+	return manager.proxyFactory.newLocalProxy(endpointURL.Path, endpoint), nil
 }
 
 func (manager *Manager) createProxy(endpoint *portainer.Endpoint) (http.Handler, error) {

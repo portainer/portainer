@@ -894,6 +894,7 @@ type (
 		GenerateEdgeKey(url, host string, endpointIdentifier int) string
 		SetActiveTunnel(endpointID EndpointID)
 		SetRequiredTunnel(endpointID EndpointID) error
+		SetIdleTunnel(endpointID EndpointID)
 		GetTunnelDetails(endpointID EndpointID) *TunnelDetails
 		AddSchedule(endpointID EndpointID, schedule *EdgeSchedule)
 		RemoveSchedule(scheduleID ScheduleID)

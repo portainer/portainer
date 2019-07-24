@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/portainer/libcrypto"
@@ -57,6 +58,21 @@ func (service *Service) SetActiveTunnel(endpointID portainer.EndpointID) {
 	service.tunnelDetailsMap.Set(key, tunnel)
 }
 
+func (service *Service) SetIdleTunnel(endpointID portainer.EndpointID) {
+	tunnel := service.GetTunnelDetails(endpointID)
+
+	tunnel.Status = portainer.EdgeAgentIdle
+	tunnel.Port = 0
+	tunnel.LastActivity = time.Now()
+
+	credentials := tunnel.Credentials
+	tunnel.Credentials = ""
+	service.chiselServer.DeleteUser(strings.Split(credentials, ":")[0])
+
+	key := strconv.Itoa(int(endpointID))
+	service.tunnelDetailsMap.Set(key, tunnel)
+}
+
 func (service *Service) SetRequiredTunnel(endpointID portainer.EndpointID) error {
 	tunnel := service.GetTunnelDetails(endpointID)
 
@@ -72,6 +88,7 @@ func (service *Service) SetRequiredTunnel(endpointID portainer.EndpointID) error
 
 		tunnel.Status = portainer.EdgeAgentManagementRequired
 		tunnel.Port = service.getUnusedPort()
+		tunnel.LastActivity = time.Now()
 
 		username, password := generateRandomCredentials()
 		authorizedRemote := fmt.Sprintf("^R:0.0.0.0:%d$", tunnel.Port)

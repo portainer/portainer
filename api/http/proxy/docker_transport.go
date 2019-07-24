@@ -26,6 +26,7 @@ type (
 		SignatureService       portainer.DigitalSignatureService
 		ReverseTunnelService   portainer.ReverseTunnelService
 		endpointIdentifier     portainer.EndpointID
+		endpointType           portainer.EndpointType
 	}
 	restrictedDockerOperationContext struct {
 		isAdmin                bool
@@ -61,13 +62,14 @@ func (p *proxyTransport) RoundTrip(request *http.Request) (*http.Response, error
 func (p *proxyTransport) executeDockerRequest(request *http.Request) (*http.Response, error) {
 	response, err := p.dockerTransport.RoundTrip(request)
 
+	if p.endpointType != portainer.EdgeAgentEnvironment {
+		return response, err
+	}
+
 	if err == nil {
 		p.ReverseTunnelService.SetActiveTunnel(p.endpointIdentifier)
 	} else {
-		tunnel := p.ReverseTunnelService.GetTunnelDetails(p.endpointIdentifier)
-		if tunnel.Status == portainer.EdgeAgentActive {
-			_ = p.ReverseTunnelService.SetRequiredTunnel(p.endpointIdentifier)
-		}
+		p.ReverseTunnelService.SetIdleTunnel(p.endpointIdentifier)
 	}
 
 	return response, err
