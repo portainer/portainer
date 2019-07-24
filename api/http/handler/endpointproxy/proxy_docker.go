@@ -25,7 +25,6 @@ func (handler *Handler) proxyRequestsToDockerAPI(w http.ResponseWriter, r *http.
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
-	// TODO: review all code related to Edge cases in that function
 	if endpoint.Type != portainer.EdgeAgentEnvironment && endpoint.Status == portainer.EndpointStatusDown {
 		return &httperror.HandlerError{http.StatusServiceUnavailable, "Unable to query endpoint", errors.New("Endpoint is down")}
 	}
