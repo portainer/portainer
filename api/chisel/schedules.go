@@ -6,6 +6,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
+// AddSchedule register a schedule inside the tunnel details associated to an endpoint.
 func (service *Service) AddSchedule(endpointID portainer.EndpointID, schedule *portainer.EdgeSchedule) {
 	tunnel := service.GetTunnelDetails(endpointID)
 
@@ -27,6 +28,7 @@ func (service *Service) AddSchedule(endpointID portainer.EndpointID, schedule *p
 	service.tunnelDetailsMap.Set(key, tunnel)
 }
 
+// RemoveSchedule will remove the specified schedule from each tunnel it was registered with.
 func (service *Service) RemoveSchedule(scheduleID portainer.ScheduleID) {
 	for item := range service.tunnelDetailsMap.IterBuffered() {
 		tunnelDetails := item.Val.(*portainer.TunnelDetails)

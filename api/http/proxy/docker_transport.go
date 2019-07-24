@@ -67,9 +67,9 @@ func (p *proxyTransport) executeDockerRequest(request *http.Request) (*http.Resp
 	}
 
 	if err == nil {
-		p.ReverseTunnelService.SetActiveTunnel(p.endpointIdentifier)
+		p.ReverseTunnelService.SetTunnelStatusToActive(p.endpointIdentifier)
 	} else {
-		p.ReverseTunnelService.SetIdleTunnel(p.endpointIdentifier)
+		p.ReverseTunnelService.SetTunnelStatusToIdle(p.endpointIdentifier)
 	}
 
 	return response, err

@@ -43,7 +43,7 @@ func (handler *Handler) proxyRequestsToDockerAPI(w http.ResponseWriter, r *http.
 		if tunnel.Status == portainer.EdgeAgentIdle {
 			handler.ProxyManager.DeleteProxy(endpoint)
 
-			err := handler.ReverseTunnelService.SetRequiredTunnel(endpoint.ID)
+			err := handler.ReverseTunnelService.SetTunnelStatusToRequired(endpoint.ID)
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update tunnel status", err}
 			}

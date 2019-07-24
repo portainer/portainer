@@ -1,6 +1,9 @@
 package chisel
 
 import (
+	"fmt"
+	"log"
+	"strconv"
 	"time"
 
 	"github.com/dchest/uniuri"
@@ -11,17 +14,9 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
-//TODO: document the whole package
-
-// Dynamic ports (also called private ports) are 49152 to 65535.
-const (
-	minAvailablePort      = 49152
-	maxAvailablePort      = 65535
-	tunnelCleanupInterval = 10 * time.Second
-	requiredTimeout       = 15 * time.Second
-	activeTimeout         = 5 * time.Minute
-)
-
+// Service represents a service to manage the state of multiple reverse tunnels.
+// It is used to start a reverse tunnel server and to manage the connection status of each tunnel
+// connected to the tunnel server.
 type Service struct {
 	serverFingerprint   string
 	serverPort          string
@@ -32,6 +27,7 @@ type Service struct {
 	chiselServer        *chserver.Server
 }
 
+// NewService returns a pointer to a new instance of Service
 func NewService(endpointService portainer.EndpointService, tunnelServerService portainer.TunnelServerService) *Service {
 	return &Service{
 		tunnelDetailsMap:    cmap.New(),
@@ -44,6 +40,10 @@ func (service *Service) SetupSnapshotter(snapshotter portainer.Snapshotter) {
 	service.snapshotter = snapshotter
 }
 
+// StartTunnelServer starts a tunnel server on the specified addr and port.
+// It uses a seed to generate a new private/public key pair. If the seed cannot
+// be found inside the database, it will generate a new one randomly and persist it.
+// It starts the tunnel status verification process in the background.
 func (service *Service) StartTunnelServer(addr, port string) error {
 	keySeed, err := service.retrievePrivateKeySeed()
 	if err != nil {
@@ -77,7 +77,7 @@ func (service *Service) StartTunnelServer(addr, port string) error {
 		return err
 	}
 
-	go service.tunnelCleanup()
+	go service.startTunnelVerificationLoop()
 
 	return nil
 }
@@ -102,4 +102,97 @@ func (service *Service) retrievePrivateKeySeed() (string, error) {
 	}
 
 	return serverInfo.PrivateKeySeed, nil
+}
+
+const (
+	tunnelCleanupInterval          = 10 * time.Second
+	requiredTimeout                = 15 * time.Second
+	activeTimeout                  = 5 * time.Minute
+	snapshotAfterInactivityTimeout = 4 * time.Minute
+)
+
+func (service *Service) startTunnelVerificationLoop() {
+	log.Printf("[DEBUG] [chisel, monitoring] [check_interval_seconds: %f] [message: starting tunnel management process]", tunnelCleanupInterval.Seconds())
+	ticker := time.NewTicker(tunnelCleanupInterval)
+	stopSignal := make(chan struct{})
+
+	for {
+		select {
+		case <-ticker.C:
+			service.checkTunnels()
+		case <-stopSignal:
+			ticker.Stop()
+			return
+		}
+	}
+}
+
+func (service *Service) checkTunnels() {
+	for item := range service.tunnelDetailsMap.IterBuffered() {
+		tunnel := item.Val.(*portainer.TunnelDetails)
+
+		if tunnel.LastActivity.IsZero() || tunnel.Status == portainer.EdgeAgentIdle {
+			continue
+		}
+
+		elapsed := time.Since(tunnel.LastActivity)
+		log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [message: endpoint tunnel monitoring]", item.Key, tunnel.Status, elapsed.Seconds())
+
+		if tunnel.Status == portainer.EdgeAgentManagementRequired && elapsed.Seconds() < requiredTimeout.Seconds() {
+			continue
+		} else if tunnel.Status == portainer.EdgeAgentManagementRequired && elapsed.Seconds() > requiredTimeout.Seconds() {
+			log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [timeout_seconds: %f] [message: REQUIRED state timeout exceeded]", item.Key, tunnel.Status, elapsed.Seconds(), requiredTimeout.Seconds())
+		}
+
+		if tunnel.Status == portainer.EdgeAgentActive && elapsed.Seconds() < activeTimeout.Seconds() {
+			continue
+		} else if tunnel.Status == portainer.EdgeAgentActive && elapsed.Seconds() > snapshotAfterInactivityTimeout.Seconds() {
+			log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [snapshot_after_seconds: %f] [message: triggering snapshot]", item.Key, tunnel.Status, elapsed.Seconds(), snapshotAfterInactivityTimeout.Seconds())
+			endpointID, err := strconv.Atoi(item.Key)
+			if err != nil {
+				log.Printf("[ERROR] [chisel,snapshot,conversion] Invalid endpoint identifier (id: %s): %s", item.Key, err)
+				continue
+			}
+
+			err = service.snapshotEnvironment(portainer.EndpointID(endpointID), tunnel.Port)
+			if err != nil {
+				log.Printf("[ERROR] [snapshot] Unable to snapshot Edge endpoint (id: %s): %s", item.Key, err)
+			}
+
+			continue
+		} else if tunnel.Status == portainer.EdgeAgentActive && elapsed.Seconds() > activeTimeout.Seconds() {
+			log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [timeout_seconds: %f] [message: ACTIVE state timeout exceeded]", item.Key, tunnel.Status, elapsed.Seconds(), activeTimeout.Seconds())
+		}
+
+		if len(tunnel.Schedules) > 0 {
+			endpointID, err := strconv.Atoi(item.Key)
+			if err != nil {
+				log.Printf("[ERROR] [chisel,conversion] Invalid endpoint identifier (id: %s): %s", item.Key, err)
+				continue
+			}
+
+			service.SetTunnelStatusToIdle(portainer.EndpointID(endpointID))
+		} else {
+			service.tunnelDetailsMap.Remove(item.Key)
+		}
+
+	}
+}
+
+func (service *Service) snapshotEnvironment(endpointID portainer.EndpointID, tunnelPort int) error {
+	endpoint, err := service.endpointService.Endpoint(portainer.EndpointID(endpointID))
+	if err != nil {
+		return err
+	}
+
+	endpointURL := endpoint.URL
+	endpoint.URL = fmt.Sprintf("tcp://localhost:%d", tunnelPort)
+	snapshot, err := service.snapshotter.CreateSnapshot(endpoint)
+	if err != nil {
+		return err
+	}
+
+	endpoint.Snapshots = []portainer.Snapshot{*snapshot}
+	endpoint.URL = endpointURL
+	return service.endpointService.UpdateEndpoint(endpoint.ID, endpoint)
 }

@@ -892,9 +892,9 @@ type (
 		SetupSnapshotter(snapshotter Snapshotter)
 		StartTunnelServer(addr, port string) error
 		GenerateEdgeKey(url, host string, endpointIdentifier int) string
-		SetActiveTunnel(endpointID EndpointID)
-		SetRequiredTunnel(endpointID EndpointID) error
-		SetIdleTunnel(endpointID EndpointID)
+		SetTunnelStatusToActive(endpointID EndpointID)
+		SetTunnelStatusToRequired(endpointID EndpointID) error
+		SetTunnelStatusToIdle(endpointID EndpointID)
 		GetTunnelDetails(endpointID EndpointID) *TunnelDetails
 		AddSchedule(endpointID EndpointID, schedule *EdgeSchedule)
 		RemoveSchedule(scheduleID ScheduleID)

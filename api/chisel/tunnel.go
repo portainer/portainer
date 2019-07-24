@@ -14,6 +14,13 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
+const (
+	minAvailablePort = 49152
+	maxAvailablePort = 65535
+)
+
+// getUnusedPort is used to generate an unused random port in the dynamic port range.
+// Dynamic ports (also called private ports) are 49152 to 65535.
 func (service *Service) getUnusedPort() int {
 	port := randomInt(minAvailablePort, maxAvailablePort)
 
@@ -31,6 +38,7 @@ func randomInt(min, max int) int {
 	return min + rand.Intn(max-min)
 }
 
+// GetTunnelDetails returns information about the tunnel associated to an endpoint.
 func (service *Service) GetTunnelDetails(endpointID portainer.EndpointID) *portainer.TunnelDetails {
 	key := strconv.Itoa(int(endpointID))
 
@@ -48,7 +56,9 @@ func (service *Service) GetTunnelDetails(endpointID portainer.EndpointID) *porta
 	}
 }
 
-func (service *Service) SetActiveTunnel(endpointID portainer.EndpointID) {
+// SetTunnelStatusToActive update the status of the tunnel associated to the specified endpoint.
+// It sets the status to ACTIVE.
+func (service *Service) SetTunnelStatusToActive(endpointID portainer.EndpointID) {
 	tunnel := service.GetTunnelDetails(endpointID)
 	tunnel.Status = portainer.EdgeAgentActive
 	tunnel.Credentials = ""
@@ -58,7 +68,10 @@ func (service *Service) SetActiveTunnel(endpointID portainer.EndpointID) {
 	service.tunnelDetailsMap.Set(key, tunnel)
 }
 
-func (service *Service) SetIdleTunnel(endpointID portainer.EndpointID) {
+// SetTunnelStatusToIdle update the status of the tunnel associated to the specified endpoint.
+// It sets the status to IDLE.
+// It removes any existing credentials associated to the tunnel.
+func (service *Service) SetTunnelStatusToIdle(endpointID portainer.EndpointID) {
 	tunnel := service.GetTunnelDetails(endpointID)
 
 	tunnel.Status = portainer.EdgeAgentIdle
@@ -66,24 +79,27 @@ func (service *Service) SetIdleTunnel(endpointID portainer.EndpointID) {
 	tunnel.LastActivity = time.Now()
 
 	credentials := tunnel.Credentials
-	tunnel.Credentials = ""
-	service.chiselServer.DeleteUser(strings.Split(credentials, ":")[0])
+	if credentials != "" {
+		tunnel.Credentials = ""
+		service.chiselServer.DeleteUser(strings.Split(credentials, ":")[0])
+	}
 
 	key := strconv.Itoa(int(endpointID))
 	service.tunnelDetailsMap.Set(key, tunnel)
 }
 
-func (service *Service) SetRequiredTunnel(endpointID portainer.EndpointID) error {
+// SetTunnelStatusToRequired update the status of the tunnel associated to the specified endpoint.
+// It sets the status to REQUIRED.
+// If no port is currently associated to the tunnel, it will associate a random unused port to the tunnel
+// and generate temporary credentials that can be used to establish a reverse tunnel on that port.
+// Credentials are encrypted using the Edge ID associated to the endpoint.
+func (service *Service) SetTunnelStatusToRequired(endpointID portainer.EndpointID) error {
 	tunnel := service.GetTunnelDetails(endpointID)
 
 	if tunnel.Port == 0 {
 		endpoint, err := service.endpointService.Endpoint(endpointID)
 		if err != nil {
 			return err
-		}
-
-		if endpoint.Type != portainer.EdgeAgentEnvironment {
-			return nil
 		}
 
 		tunnel.Status = portainer.EdgeAgentManagementRequired

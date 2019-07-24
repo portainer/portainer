@@ -70,7 +70,7 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 	}
 
 	if tunnel.Status == portainer.EdgeAgentManagementRequired {
-		handler.ReverseTunnelService.SetActiveTunnel(endpoint.ID)
+		handler.ReverseTunnelService.SetTunnelStatusToActive(endpoint.ID)
 	}
 
 	return response.JSON(w, statusResponse)
