@@ -557,8 +557,6 @@ func main() {
 
 	snapshotter := initSnapshotter(clientFactory)
 
-	reverseTunnelService.SetupSnapshotter(snapshotter)
-
 	endpointManagement := true
 	if *flags.ExternalEndpoints != "" {
 		endpointManagement = false
@@ -671,7 +669,7 @@ func main() {
 		go terminateIfNoAdminCreated(store.UserService)
 	}
 
-	err = reverseTunnelService.StartTunnelServer(*flags.TunnelAddr, *flags.TunnelPort)
+	err = reverseTunnelService.StartTunnelServer(*flags.TunnelAddr, *flags.TunnelPort, snapshotter)
 	if err != nil {
 		log.Fatal(err)
 	}

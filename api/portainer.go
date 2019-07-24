@@ -889,8 +889,7 @@ type (
 
 	// ReverseTunnelService represensts a service used to manage reverse tunnel connections.
 	ReverseTunnelService interface {
-		SetupSnapshotter(snapshotter Snapshotter)
-		StartTunnelServer(addr, port string) error
+		StartTunnelServer(addr, port string, snapshotter Snapshotter) error
 		GenerateEdgeKey(url, host string, endpointIdentifier int) string
 		SetTunnelStatusToActive(endpointID EndpointID)
 		SetTunnelStatusToRequired(endpointID EndpointID) error

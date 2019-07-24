@@ -14,6 +14,13 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
+const (
+	tunnelCleanupInterval          = 10 * time.Second
+	requiredTimeout                = 15 * time.Second
+	activeTimeout                  = 5 * time.Minute
+	snapshotAfterInactivityTimeout = 4 * time.Minute
+)
+
 // Service represents a service to manage the state of multiple reverse tunnels.
 // It is used to start a reverse tunnel server and to manage the connection status of each tunnel
 // connected to the tunnel server.
@@ -36,15 +43,12 @@ func NewService(endpointService portainer.EndpointService, tunnelServerService p
 	}
 }
 
-func (service *Service) SetupSnapshotter(snapshotter portainer.Snapshotter) {
-	service.snapshotter = snapshotter
-}
-
 // StartTunnelServer starts a tunnel server on the specified addr and port.
 // It uses a seed to generate a new private/public key pair. If the seed cannot
 // be found inside the database, it will generate a new one randomly and persist it.
 // It starts the tunnel status verification process in the background.
-func (service *Service) StartTunnelServer(addr, port string) error {
+// The snapshotter is used in the tunnel status verification process.
+func (service *Service) StartTunnelServer(addr, port string, snapshotter portainer.Snapshotter) error {
 	keySeed, err := service.retrievePrivateKeySeed()
 	if err != nil {
 		return err
@@ -77,6 +81,7 @@ func (service *Service) StartTunnelServer(addr, port string) error {
 		return err
 	}
 
+	service.snapshotter = snapshotter
 	go service.startTunnelVerificationLoop()
 
 	return nil
@@ -103,13 +108,6 @@ func (service *Service) retrievePrivateKeySeed() (string, error) {
 
 	return serverInfo.PrivateKeySeed, nil
 }
-
-const (
-	tunnelCleanupInterval          = 10 * time.Second
-	requiredTimeout                = 15 * time.Second
-	activeTimeout                  = 5 * time.Minute
-	snapshotAfterInactivityTimeout = 4 * time.Minute
-)
 
 func (service *Service) startTunnelVerificationLoop() {
 	log.Printf("[DEBUG] [chisel, monitoring] [check_interval_seconds: %f] [message: starting tunnel management process]", tunnelCleanupInterval.Seconds())
