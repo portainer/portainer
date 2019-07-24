@@ -15,10 +15,9 @@ import (
 )
 
 const (
-	tunnelCleanupInterval          = 10 * time.Second
-	requiredTimeout                = 15 * time.Second
-	activeTimeout                  = 5 * time.Minute
-	snapshotAfterInactivityTimeout = 4 * time.Minute
+	tunnelCleanupInterval = 10 * time.Second
+	requiredTimeout       = 15 * time.Second
+	activeTimeout         = 4*time.Minute + 30*time.Second
 )
 
 // Service represents a service to manage the state of multiple reverse tunnels.
@@ -144,22 +143,18 @@ func (service *Service) checkTunnels() {
 
 		if tunnel.Status == portainer.EdgeAgentActive && elapsed.Seconds() < activeTimeout.Seconds() {
 			continue
-		} else if tunnel.Status == portainer.EdgeAgentActive && elapsed.Seconds() > snapshotAfterInactivityTimeout.Seconds() {
-			log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [snapshot_after_seconds: %f] [message: triggering snapshot]", item.Key, tunnel.Status, elapsed.Seconds(), snapshotAfterInactivityTimeout.Seconds())
+		} else if tunnel.Status == portainer.EdgeAgentActive && elapsed.Seconds() > activeTimeout.Seconds() {
+			log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [timeout_seconds: %f] [message: ACTIVE state timeout exceeded]", item.Key, tunnel.Status, elapsed.Seconds(), activeTimeout.Seconds())
+
 			endpointID, err := strconv.Atoi(item.Key)
 			if err != nil {
 				log.Printf("[ERROR] [chisel,snapshot,conversion] Invalid endpoint identifier (id: %s): %s", item.Key, err)
-				continue
 			}
 
 			err = service.snapshotEnvironment(portainer.EndpointID(endpointID), tunnel.Port)
 			if err != nil {
 				log.Printf("[ERROR] [snapshot] Unable to snapshot Edge endpoint (id: %s): %s", item.Key, err)
 			}
-
-			continue
-		} else if tunnel.Status == portainer.EdgeAgentActive && elapsed.Seconds() > activeTimeout.Seconds() {
-			log.Printf("[DEBUG] [chisel,monitoring] [endpoint_id: %s] [status: %s] [status_time_seconds: %f] [timeout_seconds: %f] [message: ACTIVE state timeout exceeded]", item.Key, tunnel.Status, elapsed.Seconds(), activeTimeout.Seconds())
 		}
 
 		if len(tunnel.Schedules) > 0 {
