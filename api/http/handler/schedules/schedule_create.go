@@ -221,8 +221,6 @@ func (handler *Handler) createScheduleObjectFromFileContentPayload(payload *sche
 }
 
 func (handler *Handler) addAndPersistSchedule(schedule *portainer.Schedule, file []byte) error {
-
-	// TODO: temporary implementation for Edge support
 	nonEdgeEndpointIDs := make([]portainer.EndpointID, 0)
 	edgeEndpointIDs := make([]portainer.EndpointID, 0)
 
@@ -263,8 +261,6 @@ func (handler *Handler) addAndPersistSchedule(schedule *portainer.Schedule, file
 
 	schedule.ScriptExecutionJob.Endpoints = nonEdgeEndpointIDs
 
-	// TODO: Edge schedule is both persisted on disk and persisted inside the db (base64 encoded)
-	// Optimisation required
 	scriptPath, err := handler.FileService.StoreScheduledJobFileFromBytes(strconv.Itoa(int(schedule.ID)), file)
 	if err != nil {
 		return err
