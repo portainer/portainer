@@ -7,33 +7,24 @@ import (
 )
 
 func (service *Service) AddSchedule(endpointID portainer.EndpointID, schedule *portainer.EdgeSchedule) {
-	key := strconv.Itoa(int(endpointID))
+	tunnel := service.GetTunnelDetails(endpointID)
 
-	// TODO: use GetTunnelDetails?
-	var tunnelDetails *portainer.TunnelDetails
-	item, ok := service.tunnelDetailsMap.Get(key)
-	if ok {
-		tunnelDetails = item.(*portainer.TunnelDetails)
-
-		existingScheduleIndex := -1
-		for idx, existingSchedule := range tunnelDetails.Schedules {
-			if existingSchedule.ID == schedule.ID {
-				existingScheduleIndex = idx
-				break
-			}
+	existingScheduleIndex := -1
+	for idx, existingSchedule := range tunnel.Schedules {
+		if existingSchedule.ID == schedule.ID {
+			existingScheduleIndex = idx
+			break
 		}
-
-		if existingScheduleIndex == -1 {
-			tunnelDetails.Schedules = append(tunnelDetails.Schedules, *schedule)
-		} else {
-			tunnelDetails.Schedules[existingScheduleIndex] = *schedule
-		}
-
-	} else {
-		tunnelDetails = &portainer.TunnelDetails{Status: portainer.EdgeAgentIdle, Schedules: []portainer.EdgeSchedule{*schedule}}
 	}
 
-	service.tunnelDetailsMap.Set(key, tunnelDetails)
+	if existingScheduleIndex == -1 {
+		tunnel.Schedules = append(tunnel.Schedules, *schedule)
+	} else {
+		tunnel.Schedules[existingScheduleIndex] = *schedule
+	}
+
+	key := strconv.Itoa(int(endpointID))
+	service.tunnelDetailsMap.Set(key, tunnel)
 }
 
 func (service *Service) RemoveSchedule(scheduleID portainer.ScheduleID) {
