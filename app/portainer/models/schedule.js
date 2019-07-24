@@ -17,7 +17,6 @@ function ScriptExecutionDefaultJobModel() {
   this.Method = 'editor';
 }
 
-// TODO: endpoint mix for Edge implementation
 export function ScheduleModel(data) {
   this.Id = data.Id;
   this.Name = data.Name;
