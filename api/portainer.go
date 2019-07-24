@@ -109,8 +109,7 @@ type (
 		SnapshotInterval                   string               `json:"SnapshotInterval"`
 		TemplatesURL                       string               `json:"TemplatesURL"`
 		EnableHostManagementFeatures       bool                 `json:"EnableHostManagementFeatures"`
-		// TODO: data migration
-		EdgeAgentCheckinInterval int `json:"EdgeAgentCheckinInterval"`
+		EdgeAgentCheckinInterval           int                  `json:"EdgeAgentCheckinInterval"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
@@ -905,7 +904,7 @@ const (
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "1.21.0"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 18
+	DBVersion = 19
 	// AssetsServerURL represents the URL of the Portainer asset server
 	AssetsServerURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com"
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
