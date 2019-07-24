@@ -1074,9 +1074,12 @@ const (
 )
 
 const (
-	EdgeAgentIdle               string = "IDLE"
+	// EdgeAgentIdle represents an idle state for a tunnel connected to an Edge endpoint.
+	EdgeAgentIdle string = "IDLE"
+	// EdgeAgentManagementRequired represents a required state for a tunnel connected to an Edge endpoint
 	EdgeAgentManagementRequired string = "REQUIRED"
-	EdgeAgentActive             string = "ACTIVE"
+	// EdgeAgentIdle represents an active state for a tunnel connected to an Edge endpoint
+	EdgeAgentActive string = "ACTIVE"
 )
 
 const (
