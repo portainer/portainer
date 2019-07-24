@@ -12,7 +12,11 @@
           <span class="blocklist-item-title endpoint-item">
             {{ $ctrl.model.Name }}
           </span>
-          <span class="space-left blocklist-item-subtitle" ng-if="$ctrl.model.Type !== 4 || $ctrl.model.Snapshots[0]">
+          <span class="space-left blocklist-item-subtitle">
+            <span ng-if="$ctrl.model.Type === 4" class="small text-muted">
+              <span ng-if="$ctrl.model.EdgeID"><i class="fas fa-link"></i> associated</span>
+              <span ng-if="!$ctrl.model.EdgeID"><i class="fas fa-unlink"></i> <s>associated</s></span>
+            </span>
             <span class="label label-{{ $ctrl.model.Status|endpointstatusbadge }}" ng-if="$ctrl.model.Type !== 4">
               {{ $ctrl.model.Status === 1 ? 'up' : 'down' }}
             </span>
