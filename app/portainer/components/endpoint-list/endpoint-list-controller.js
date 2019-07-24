@@ -89,7 +89,6 @@ angular.module('portainer.app').controller('EndpointListController', ['Datatable
     }
 
     this.$onInit = function() {
-      this.state.loading = true;
       var textFilter = DatatableService.getDataTableTextFilters(this.tableKey);
       this.state.paginatedItemLimit = PaginationService.getPaginationLimit(this.tableKey);
       if (textFilter !== null) {
