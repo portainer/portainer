@@ -124,6 +124,8 @@ angular.module('portainer.app')
       return 'Agent';
     } else if (type === 3) {
       return 'Azure ACI';
+    } else if (type === 4) {
+      return 'Edge Agent';
     }
     return '';
   };
@@ -133,6 +135,8 @@ angular.module('portainer.app')
   return function (type) {
     if (type === 3) {
       return 'fab fa-microsoft';
+    } else if (type === 4) {
+      return 'fa fa-cloud';
     }
     return 'fab fa-docker';
   };

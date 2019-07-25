@@ -1,4 +1,4 @@
-import { logsHandler, genericHandler } from "./response/handlers";
+import {genericHandler, logsHandler} from './response/handlers';
 
 angular.module('portainer.docker')
 .factory('Container', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', 'ContainersInterceptor',
@@ -11,7 +11,7 @@ function ContainerFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, C
   {
     query: {
       method: 'GET', params: { all: 0, action: 'json', filters: '@filters' },
-      isArray: true, interceptor: ContainersInterceptor, timeout: 10000
+      isArray: true, interceptor: ContainersInterceptor, timeout: 15000
     },
     get: {
       method: 'GET', params: { action: 'json' }

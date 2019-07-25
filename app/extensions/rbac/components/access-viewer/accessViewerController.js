@@ -1,7 +1,7 @@
-import _ from "lodash-es";
-import angular from "angular";
+import _ from 'lodash-es';
+import angular from 'angular';
 
-import AccessViewerPolicyModel from '../../models/access'
+import AccessViewerPolicyModel from '../../models/access';
 
 class AccessViewerController {
   /* @ngInject */

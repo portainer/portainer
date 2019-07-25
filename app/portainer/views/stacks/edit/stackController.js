@@ -158,14 +158,20 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
   function loadStack(id) {
     var agentProxy = $scope.applicationState.endpoint.mode.agentProxy;
 
+    EndpointService.endpoints()
+      .then(function success(data) {
+        $scope.endpoints = data.value;
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to retrieve endpoints');
+      });
+
     $q.all({
       stack: StackService.stack(id),
-      endpoints: EndpointService.endpoints(),
       groups: GroupService.groups()
     })
     .then(function success(data) {
       var stack = data.stack;
-      $scope.endpoints = data.endpoints.value;
       $scope.groups = data.groups;
       $scope.stack = stack;
 

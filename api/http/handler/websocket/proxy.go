@@ -2,14 +2,37 @@ package websocket
 
 import (
 	"crypto/tls"
+	"fmt"
+	"net/http"
+	"net/url"
+
 	"github.com/gorilla/websocket"
 	"github.com/koding/websocketproxy"
 	"github.com/portainer/portainer/api"
-	"net/http"
-	"net/url"
 )
 
-func (handler *Handler) proxyWebsocketRequest(w http.ResponseWriter, r *http.Request, params *webSocketRequestParams) error {
+func (handler *Handler) proxyEdgeAgentWebsocketRequest(w http.ResponseWriter, r *http.Request, params *webSocketRequestParams) error {
+	tunnel := handler.ReverseTunnelService.GetTunnelDetails(params.endpoint.ID)
+
+	endpointURL, err := url.Parse(fmt.Sprintf("http://localhost:%d", tunnel.Port))
+	if err != nil {
+		return err
+	}
+
+	endpointURL.Scheme = "ws"
+	proxy := websocketproxy.NewProxy(endpointURL)
+
+	proxy.Director = func(incoming *http.Request, out http.Header) {
+		out.Set(portainer.PortainerAgentTargetHeader, params.nodeName)
+	}
+
+	handler.ReverseTunnelService.SetTunnelStatusToActive(params.endpoint.ID)
+	proxy.ServeHTTP(w, r)
+
+	return nil
+}
+
+func (handler *Handler) proxyAgentWebsocketRequest(w http.ResponseWriter, r *http.Request, params *webSocketRequestParams) error {
 	agentURL, err := url.Parse(params.endpoint.URL)
 	if err != nil {
 		return err

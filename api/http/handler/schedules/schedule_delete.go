@@ -42,6 +42,8 @@ func (handler *Handler) scheduleDelete(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the files associated to the schedule on the filesystem", err}
 	}
 
+	handler.ReverseTunnelService.RemoveSchedule(schedule.ID)
+
 	handler.JobScheduler.UnscheduleJob(schedule.ID)
 
 	err = handler.ScheduleService.DeleteSchedule(portainer.ScheduleID(scheduleID))

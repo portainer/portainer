@@ -1,6 +1,7 @@
 package docker
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -17,13 +18,15 @@ const (
 
 // ClientFactory is used to create Docker clients
 type ClientFactory struct {
-	signatureService portainer.DigitalSignatureService
+	signatureService     portainer.DigitalSignatureService
+	reverseTunnelService portainer.ReverseTunnelService
 }
 
 // NewClientFactory returns a new instance of a ClientFactory
-func NewClientFactory(signatureService portainer.DigitalSignatureService) *ClientFactory {
+func NewClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService) *ClientFactory {
 	return &ClientFactory{
-		signatureService: signatureService,
+		signatureService:     signatureService,
+		reverseTunnelService: reverseTunnelService,
 	}
 }
 
@@ -35,6 +38,8 @@ func (factory *ClientFactory) CreateClient(endpoint *portainer.Endpoint, nodeNam
 		return nil, unsupportedEnvironmentType
 	} else if endpoint.Type == portainer.AgentOnDockerEnvironment {
 		return createAgentClient(endpoint, factory.signatureService, nodeName)
+	} else if endpoint.Type == portainer.EdgeAgentEnvironment {
+		return createEdgeClient(endpoint, factory.reverseTunnelService, nodeName)
 	}
 
 	if strings.HasPrefix(endpoint.URL, "unix://") || strings.HasPrefix(endpoint.URL, "npipe://") {
@@ -60,6 +65,28 @@ func createTCPClient(endpoint *portainer.Endpoint) (*client.Client, error) {
 		client.WithHost(endpoint.URL),
 		client.WithVersion(portainer.SupportedDockerAPIVersion),
 		client.WithHTTPClient(httpCli),
+	)
+}
+
+func createEdgeClient(endpoint *portainer.Endpoint, reverseTunnelService portainer.ReverseTunnelService, nodeName string) (*client.Client, error) {
+	httpCli, err := httpClient(endpoint)
+	if err != nil {
+		return nil, err
+	}
+
+	headers := map[string]string{}
+	if nodeName != "" {
+		headers[portainer.PortainerAgentTargetHeader] = nodeName
+	}
+
+	tunnel := reverseTunnelService.GetTunnelDetails(endpoint.ID)
+	endpointURL := fmt.Sprintf("http://localhost:%d", tunnel.Port)
+
+	return client.NewClientWithOpts(
+		client.WithHost(endpointURL),
+		client.WithVersion(portainer.SupportedDockerAPIVersion),
+		client.WithHTTPClient(httpCli),
+		client.WithHTTPHeaders(headers),
 	)
 }
 

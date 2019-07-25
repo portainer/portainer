@@ -1,4 +1,4 @@
-import { ScheduleDefaultModel } from '../../../models/schedule';
+import {ScheduleDefaultModel} from '../../../models/schedule';
 
 angular.module('portainer.app')
 .controller('CreateScheduleController', ['$q', '$scope', '$state', 'Notifications', 'EndpointService', 'GroupService', 'ScheduleService',

@@ -1,6 +1,7 @@
 package proxy
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -21,6 +22,7 @@ type (
 	// Manager represents a service used to manage Docker proxies.
 	Manager struct {
 		proxyFactory           *proxyFactory
+		reverseTunnelService   portainer.ReverseTunnelService
 		proxies                cmap.ConcurrentMap
 		extensionProxies       cmap.ConcurrentMap
 		legacyExtensionProxies cmap.ConcurrentMap
@@ -34,6 +36,7 @@ type (
 		RegistryService        portainer.RegistryService
 		DockerHubService       portainer.DockerHubService
 		SignatureService       portainer.DigitalSignatureService
+		ReverseTunnelService   portainer.ReverseTunnelService
 	}
 )
 
@@ -50,13 +53,15 @@ func NewManager(parameters *ManagerParams) *Manager {
 			RegistryService:        parameters.RegistryService,
 			DockerHubService:       parameters.DockerHubService,
 			SignatureService:       parameters.SignatureService,
+			ReverseTunnelService:   parameters.ReverseTunnelService,
 		},
+		reverseTunnelService: parameters.ReverseTunnelService,
 	}
 }
 
 // GetProxy returns the proxy associated to a key
-func (manager *Manager) GetProxy(key string) http.Handler {
-	proxy, ok := manager.proxies.Get(key)
+func (manager *Manager) GetProxy(endpoint *portainer.Endpoint) http.Handler {
+	proxy, ok := manager.proxies.Get(string(endpoint.ID))
 	if !ok {
 		return nil
 	}
@@ -76,8 +81,8 @@ func (manager *Manager) CreateAndRegisterProxy(endpoint *portainer.Endpoint) (ht
 }
 
 // DeleteProxy deletes the proxy associated to a key
-func (manager *Manager) DeleteProxy(key string) {
-	manager.proxies.Remove(key)
+func (manager *Manager) DeleteProxy(endpoint *portainer.Endpoint) {
+	manager.proxies.Remove(string(endpoint.ID))
 }
 
 // GetExtensionProxy returns an extension proxy associated to an extension identifier
@@ -136,28 +141,40 @@ func (manager *Manager) CreateLegacyExtensionProxy(key, extensionAPIURL string) 
 	return proxy, nil
 }
 
-func (manager *Manager) createDockerProxy(endpointURL *url.URL, tlsConfig *portainer.TLSConfiguration, endpointID portainer.EndpointID) (http.Handler, error) {
-	if endpointURL.Scheme == "tcp" {
-		if tlsConfig.TLS || tlsConfig.TLSSkipVerify {
-			return manager.proxyFactory.newDockerHTTPSProxy(endpointURL, tlsConfig, false, endpointID)
-		}
-		return manager.proxyFactory.newDockerHTTPProxy(endpointURL, false, endpointID), nil
+func (manager *Manager) createDockerProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
+	baseURL := endpoint.URL
+	if endpoint.Type == portainer.EdgeAgentEnvironment {
+		tunnel := manager.reverseTunnelService.GetTunnelDetails(endpoint.ID)
+		baseURL = fmt.Sprintf("http://localhost:%d", tunnel.Port)
 	}
-	return manager.proxyFactory.newLocalProxy(endpointURL.Path, endpointID), nil
-}
 
-func (manager *Manager) createProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
-	endpointURL, err := url.Parse(endpoint.URL)
+	endpointURL, err := url.Parse(baseURL)
 	if err != nil {
 		return nil, err
 	}
 
 	switch endpoint.Type {
 	case portainer.AgentOnDockerEnvironment:
-		return manager.proxyFactory.newDockerHTTPSProxy(endpointURL, &endpoint.TLSConfig, true, endpoint.ID)
-	case portainer.AzureEnvironment:
-		return newAzureProxy(&endpoint.AzureCredentials)
-	default:
-		return manager.createDockerProxy(endpointURL, &endpoint.TLSConfig, endpoint.ID)
+		return manager.proxyFactory.newDockerHTTPSProxy(endpointURL, &endpoint.TLSConfig, endpoint)
+	case portainer.EdgeAgentEnvironment:
+		return manager.proxyFactory.newDockerHTTPProxy(endpointURL, endpoint), nil
 	}
+
+	if endpointURL.Scheme == "tcp" {
+		if endpoint.TLSConfig.TLS || endpoint.TLSConfig.TLSSkipVerify {
+			return manager.proxyFactory.newDockerHTTPSProxy(endpointURL, &endpoint.TLSConfig, endpoint)
+		}
+
+		return manager.proxyFactory.newDockerHTTPProxy(endpointURL, endpoint), nil
+	}
+
+	return manager.proxyFactory.newLocalProxy(endpointURL.Path, endpoint), nil
+}
+
+func (manager *Manager) createProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
+	if endpoint.Type == portainer.AzureEnvironment {
+		return newAzureProxy(&endpoint.AzureCredentials)
+	}
+
+	return manager.createDockerProxy(endpoint)
 }

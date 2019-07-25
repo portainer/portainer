@@ -171,6 +171,7 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
       var endpointAPIVersion = parseFloat(data.version.ApiVersion);
       state.endpoint.mode = endpointMode;
       state.endpoint.name = endpoint.Name;
+      state.endpoint.type = endpoint.Type;
       state.endpoint.apiVersion = endpointAPIVersion;
       state.endpoint.extensions = assignExtensions(extensions);
 

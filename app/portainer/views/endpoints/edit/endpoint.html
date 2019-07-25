@@ -1,9 +1,107 @@
 <rd-header>
-  <rd-header-title title-text="Endpoint details"></rd-header-title>
+  <rd-header-title title-text="Endpoint details">
+      <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.endpoints.endpoint({id: endpoint.Id})" ui-sref-opts="{reload: true}">
+          <i class="fa fa-sync" aria-hidden="true"></i>
+      </a>
+  </rd-header-title>
   <rd-header-content>
     <a ui-sref="portainer.endpoints">Endpoints</a> &gt; <a ui-sref="portainer.endpoints.endpoint({id: endpoint.Id})">{{ endpoint.Name }}</a>
   </rd-header-content>
 </rd-header>
+
+<div class="row">
+  <information-panel ng-if="endpoint.Type === 4 && endpoint.EdgeID" title-text="Edge information">
+    <span class="small text-muted">
+      <p>
+        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+        This Edge endpoint is associated to an Edge environment.
+      </p>
+      <p>
+        Edge key: <code>{{ endpoint.EdgeKey }}</code>
+      </p>
+      <p>
+        Edge identifier: <code>{{ endpoint.EdgeID }}</code>
+      </p>
+    </span>
+   </information-panel>
+  <information-panel ng-if="endpoint.Type === 4 && !endpoint.EdgeID" title-text="Deploy an agent">
+    <span class="small text-muted">
+      <p>
+        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+        Deploy the Edge agent on your remote Docker environment using the following command
+      </p>
+     <div style="margin-top: 10px;">
+       <uib-tabset active="state.deploymentTab">
+          <uib-tab index="0" heading="Standalone">
+           <code style=display:block;white-space:pre-wrap>
+             docker run -d -v /var/run/docker.sock:/var/run/docker.sock \
+              -v /var/lib/docker/volumes:/var/lib/docker/volumes \
+              -v /:/host \
+              --restart always \
+              -e EDGE=1 \
+              -e EDGE_ID={{ randomEdgeID }} \
+              -e CAP_HOST_MANAGEMENT=1 \
+              -p 8000:80 \
+              -v portainer_agent_data:/data \
+              --name portainer_edge_agent \
+              portainer/agent
+           </code>
+          </uib-tab>
+          <uib-tab index="1" heading="Swarm">
+           <code style=display:block;white-space:pre-wrap>
+             docker network create \
+              --driver overlay \
+              portainer_agent_network;
+
+             docker service create \
+              --name portainer_edge_agent \
+              --network portainer_agent_network \
+              -e AGENT_CLUSTER_ADDR=tasks.portainer_edge_agent \
+              -e EDGE=1 \
+              -e EDGE_ID={{ randomEdgeID }} \
+              -e CAP_HOST_MANAGEMENT=1 \
+              --mode global \
+              --publish mode=host,published=8000,target=80 \
+              --constraint 'node.platform.os == linux' \
+              --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock \
+              --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volumes \
+              --mount type=bind,src=//,dst=/host \
+              --mount type=volume,src=portainer_agent_data,dst=/data \
+              portainer/agent
+           </code>
+          </uib-tab>
+        </uib-tabset>
+       <div style="margin-top: 10px;">
+         <span class="btn btn-primary btn-sm" ng-click="copyEdgeAgentDeploymentCommand()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy command</span>
+         <span id="copyNotificationDeploymentCommand" style="margin-left: 7px; display: none; color: #23ae89;">
+           <i class="fa fa-check" aria-hidden="true" ></i> copied
+         </span>
+       </div>
+     </div>
+      <div class="col-sm-12 form-section-title" style="margin-top: 25px;">
+        Join token
+      </div>
+      <p>
+        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+        Use the following join token to associate the Edge agent with this endpoint
+      </p>
+      <p>
+          The agent will communicate with Portainer via <u>{{ edgeKeyDetails.instanceURL }}</u> and <u>tcp://{{ edgeKeyDetails.tunnelServerAddr }}</u>
+      </p>
+      <div style="margin-top: 10px; overflow-wrap: break-word;">
+       <code>
+        {{ endpoint.EdgeKey }}
+       </code>
+       <div style="margin-top: 10px;">
+         <span class="btn btn-primary btn-sm" ng-click="copyEdgeAgentKey()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy token</span>
+         <span id="copyNotificationEdgeKey" style="margin-left: 7px; display: none; color: #23ae89;">
+           <i class="fa fa-check" aria-hidden="true" ></i> copied
+         </span>
+       </div>
+     </div>
+    </span>
+  </information-panel>
+</div>
 
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
@@ -22,7 +120,7 @@
           </div>
           <!-- !name-input -->
           <!-- endpoint-url-input -->
-          <div class="form-group">
+          <div class="form-group" ng-if="endpoint.Type !== 4">
             <label for="endpoint_url" class="col-sm-3 col-lg-2 control-label text-left">
               Endpoint URL
               <portainer-tooltip position="bottom" message="URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it."></portainer-tooltip>
@@ -70,7 +168,7 @@
           </div>
           <!-- !tags -->
           <!-- endpoint-security -->
-          <div ng-if="endpointType === 'remote' && endpoint.Type !== 3">
+          <div ng-if="endpointType === 'remote' && endpoint.Type !== 3 && endpoint.Type !== 4">
             <div class="col-sm-12 form-section-title">
               Security
             </div>

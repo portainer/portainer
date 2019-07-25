@@ -24,7 +24,9 @@ type (
 		DockerHubService       portainer.DockerHubService
 		SettingsService        portainer.SettingsService
 		SignatureService       portainer.DigitalSignatureService
+		ReverseTunnelService   portainer.ReverseTunnelService
 		endpointIdentifier     portainer.EndpointID
+		endpointType           portainer.EndpointType
 	}
 	restrictedDockerOperationContext struct {
 		isAdmin                bool
@@ -58,7 +60,19 @@ func (p *proxyTransport) RoundTrip(request *http.Request) (*http.Response, error
 }
 
 func (p *proxyTransport) executeDockerRequest(request *http.Request) (*http.Response, error) {
-	return p.dockerTransport.RoundTrip(request)
+	response, err := p.dockerTransport.RoundTrip(request)
+
+	if p.endpointType != portainer.EdgeAgentEnvironment {
+		return response, err
+	}
+
+	if err == nil {
+		p.ReverseTunnelService.SetTunnelStatusToActive(p.endpointIdentifier)
+	} else {
+		p.ReverseTunnelService.SetTunnelStatusToIdle(p.endpointIdentifier)
+	}
+
+	return response, err
 }
 
 func (p *proxyTransport) proxyDockerRequest(request *http.Request) (*http.Response, error) {

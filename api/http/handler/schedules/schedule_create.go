@@ -1,9 +1,11 @@
 package schedules
 
 import (
+	"encoding/base64"
 	"errors"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/asaskevich/govalidator"
@@ -113,7 +115,7 @@ func (payload *scheduleCreateFromFileContentPayload) Validate(r *http.Request) e
 	return nil
 }
 
-// POST /api/schedules?method=file/string
+// POST /api/schedules?method=file|string
 func (handler *Handler) scheduleCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	settings, err := handler.SettingsService.Settings()
 	if err != nil {
@@ -219,6 +221,46 @@ func (handler *Handler) createScheduleObjectFromFileContentPayload(payload *sche
 }
 
 func (handler *Handler) addAndPersistSchedule(schedule *portainer.Schedule, file []byte) error {
+	nonEdgeEndpointIDs := make([]portainer.EndpointID, 0)
+	edgeEndpointIDs := make([]portainer.EndpointID, 0)
+
+	edgeCronExpression := strings.Split(schedule.CronExpression, " ")
+	if len(edgeCronExpression) == 6 {
+		edgeCronExpression = edgeCronExpression[1:]
+	}
+
+	for _, ID := range schedule.ScriptExecutionJob.Endpoints {
+
+		endpoint, err := handler.EndpointService.Endpoint(ID)
+		if err != nil {
+			return err
+		}
+
+		if endpoint.Type != portainer.EdgeAgentEnvironment {
+			nonEdgeEndpointIDs = append(nonEdgeEndpointIDs, endpoint.ID)
+		} else {
+			edgeEndpointIDs = append(edgeEndpointIDs, endpoint.ID)
+		}
+	}
+
+	if len(edgeEndpointIDs) > 0 {
+		edgeSchedule := &portainer.EdgeSchedule{
+			ID:             schedule.ID,
+			CronExpression: strings.Join(edgeCronExpression, " "),
+			Script:         base64.RawStdEncoding.EncodeToString(file),
+			Endpoints:      edgeEndpointIDs,
+			Version:        1,
+		}
+
+		for _, endpointID := range edgeEndpointIDs {
+			handler.ReverseTunnelService.AddSchedule(endpointID, edgeSchedule)
+		}
+
+		schedule.EdgeSchedule = edgeSchedule
+	}
+
+	schedule.ScriptExecutionJob.Endpoints = nonEdgeEndpointIDs
+
 	scriptPath, err := handler.FileService.StoreScheduledJobFileFromBytes(strconv.Itoa(int(schedule.ID)), file)
 	if err != nil {
 		return err

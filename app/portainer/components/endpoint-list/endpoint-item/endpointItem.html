@@ -1,7 +1,8 @@
 <div class="blocklist-item" ng-click="$ctrl.onSelect($ctrl.model)">
   <div class="blocklist-item-box">
     <span ng-class="['blocklist-item-logo', 'endpoint-item', { azure: $ctrl.model.Type === 3 }]">
-      <i ng-class="$ctrl.model.Type | endpointtypeicon" class="fa-4x blue-icon" aria-hidden="true"></i>
+      <i ng-if="$ctrl.model.Type !== 4" ng-class="$ctrl.model.Type | endpointtypeicon" class="fa-4x blue-icon" aria-hidden="true"></i>
+      <img ng-if="$ctrl.model.Type === 4" src="../../../../../assets/images/edge_endpoint.png" />
     </span>
 
     <span class="col-sm-12">
@@ -12,13 +13,16 @@
             {{ $ctrl.model.Name }}
           </span>
           <span class="space-left blocklist-item-subtitle">
-            <span class="label label-{{ $ctrl.model.Status|endpointstatusbadge }}">
+            <span ng-if="$ctrl.model.Type === 4" class="small text-muted">
+              <span ng-if="$ctrl.model.EdgeID"><i class="fas fa-link"></i> associated</span>
+              <span ng-if="!$ctrl.model.EdgeID"><i class="fas fa-unlink"></i> <s>associated</s></span>
+            </span>
+            <span class="label label-{{ $ctrl.model.Status|endpointstatusbadge }}" ng-if="$ctrl.model.Type !== 4">
               {{ $ctrl.model.Status === 1 ? 'up' : 'down' }}
             </span>
             <span class="space-left small text-muted" ng-if="$ctrl.model.Snapshots[0]">
               {{ $ctrl.model.Snapshots[0].Time | getisodatefromtimestamp }}
             </span>
-
           </span>
         </span>
         <span>
@@ -64,6 +68,12 @@
         </span>
       </div>
 
+      <div class="blocklist-item-line endpoint-item" ng-if="!$ctrl.model.Snapshots[0]">
+        <span class="blocklist-item-desc">
+          No snapshot available
+        </span>
+      </div>
+
       <div class="blocklist-item-line endpoint-item">
         <span class="small text-muted">
           <span ng-if="$ctrl.model.Type === 1">
@@ -82,7 +92,7 @@
             </span>
           </span>
         </span>
-        <span class="small text-muted">
+        <span class="small text-muted" ng-if="$ctrl.model.Type !== 4">
           {{ $ctrl.model.URL | stripprotocol }}
         </span>
       </div>

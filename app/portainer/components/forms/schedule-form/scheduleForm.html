@@ -1,5 +1,16 @@
 <form class="form-horizontal" name="scheduleForm">
   <div class="col-sm-12 form-section-title">
+    Information
+  </div>
+  <div class="form-group">
+      <span class="col-sm-12 text-muted small">
+        <p>
+          <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i> Due to how schedules behave differently on Edge endpoints and other endpoints it is recommended to create specific schedules that will only target one
+          type of endpoint.
+        </p>
+      </span>
+  </div>
+  <div class="col-sm-12 form-section-title">
     Schedule configuration
   </div>
   <!-- name-input -->
@@ -114,7 +125,12 @@
     </div>
     <div class="form-group">
       <span class="col-sm-12 text-muted small">
-        You can refer to the <a href="https://godoc.org/github.com/robfig/cron#hdr-CRON_Expression_Format" target="_blank">following documentation</a> to get more information about the supported cron expression format.
+        <p>
+          You can refer to the <a href="https://godoc.org/github.com/robfig/cron#hdr-CRON_Expression_Format" target="_blank">following documentation</a> to get more information about the supported cron expression format.
+        </p>
+        <p>
+          <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i> Edge endpoint schedules are managed by <code>cron</code> on the underlying host. You need to use a valid cron expression that is different from the documentation above.
+        </p>
       </span>
     </div>
   </div>
@@ -122,6 +138,13 @@
   <!-- !cron-input -->
   <div class="col-sm-12 form-section-title">
     Job configuration
+  </div>
+  <div class="form-group">
+      <span class="col-sm-12 text-muted small">
+        <p>
+          <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i> This configuration will be ignored for Edge endpoint schedules.
+        </p>
+      </span>
   </div>
   <!-- image-input -->
   <div class="form-group">
@@ -195,8 +218,13 @@
     </div>
     <div class="form-group">
       <span class="col-sm-12 text-muted small">
-        This schedule will be executed via a privileged container on the target hosts. You can access the host filesystem under the
-        <code>/host</code> folder.
+        <p>
+          This schedule will be executed via a privileged container on the target hosts. You can access the host filesystem under the
+          <code>/host</code> folder.
+        </p>
+        <p>
+          <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i> Edge endpoint schedules are managed by <code>cron</code> on the underlying host. You have full access to the filesystem without having to use the <code>/host</code> folder.
+        </p>
       </span>
     </div>
     <div class="form-group">

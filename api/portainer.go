@@ -1,5 +1,7 @@
 package portainer
 
+import "time"
+
 type (
 	// Pair defines a key/value string pair
 	Pair struct {
@@ -10,6 +12,8 @@ type (
 	// CLIFlags represents the available flags on the CLI
 	CLIFlags struct {
 		Addr              *string
+		TunnelAddr        *string
+		TunnelPort        *string
 		AdminPassword     *string
 		AdminPasswordFile *string
 		Assets            *string
@@ -105,6 +109,7 @@ type (
 		SnapshotInterval                   string               `json:"SnapshotInterval"`
 		TemplatesURL                       string               `json:"TemplatesURL"`
 		EnableHostManagementFeatures       bool                 `json:"EnableHostManagementFeatures"`
+		EdgeAgentCheckinInterval           int                  `json:"EdgeAgentCheckinInterval"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
@@ -250,7 +255,8 @@ type (
 		Snapshots          []Snapshot          `json:"Snapshots"`
 		UserAccessPolicies UserAccessPolicies  `json:"UserAccessPolicies"`
 		TeamAccessPolicies TeamAccessPolicies  `json:"TeamAccessPolicies"`
-
+		EdgeID             string              `json:"EdgeID,omitempty"`
+		EdgeKey            string              `json:"EdgeKey"`
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
 		TLS           bool   `json:"TLS,omitempty"`
@@ -333,9 +339,19 @@ type (
 		Recurring          bool
 		Created            int64
 		JobType            JobType
+		EdgeSchedule       *EdgeSchedule
 		ScriptExecutionJob *ScriptExecutionJob
 		SnapshotJob        *SnapshotJob
 		EndpointSyncJob    *EndpointSyncJob
+	}
+
+	// EdgeSchedule represents a scheduled job that can run on Edge environments.
+	EdgeSchedule struct {
+		ID             ScheduleID   `json:"Id"`
+		CronExpression string       `json:"CronExpression"`
+		Script         string       `json:"Script"`
+		Version        int          `json:"Version"`
+		Endpoints      []EndpointID `json:"Endpoints"`
 	}
 
 	// WebhookID represents a webhook identifier.
@@ -575,6 +591,20 @@ type (
 		Valid      bool   `json:"Valid,omitempty"`
 	}
 
+	// TunnelDetails represents information associated to a tunnel
+	TunnelDetails struct {
+		Status       string
+		LastActivity time.Time
+		Port         int
+		Schedules    []EdgeSchedule
+		Credentials  string
+	}
+
+	// TunnelServerInfo represents information associated to the tunnel server
+	TunnelServerInfo struct {
+		PrivateKeySeed string `json:"PrivateKeySeed"`
+	}
+
 	// CLIService represents a service for managing CLI
 	CLIService interface {
 		ParseFlags(version string) (*CLIFlags, error)
@@ -690,6 +720,12 @@ type (
 	VersionService interface {
 		DBVersion() (int, error)
 		StoreDBVersion(version int) error
+	}
+
+	// TunnelServerService represents a service for managing data associated to the tunnel server
+	TunnelServerService interface {
+		Info() (*TunnelServerInfo, error)
+		UpdateInfo(info *TunnelServerInfo) error
 	}
 
 	// WebhookService represents a service for managing webhook data.
@@ -850,13 +886,25 @@ type (
 		DisableExtension(extension *Extension) error
 		UpdateExtension(extension *Extension, version string) error
 	}
+
+	// ReverseTunnelService represensts a service used to manage reverse tunnel connections.
+	ReverseTunnelService interface {
+		StartTunnelServer(addr, port string, snapshotter Snapshotter) error
+		GenerateEdgeKey(url, host string, endpointIdentifier int) string
+		SetTunnelStatusToActive(endpointID EndpointID)
+		SetTunnelStatusToRequired(endpointID EndpointID) error
+		SetTunnelStatusToIdle(endpointID EndpointID)
+		GetTunnelDetails(endpointID EndpointID) *TunnelDetails
+		AddSchedule(endpointID EndpointID, schedule *EdgeSchedule)
+		RemoveSchedule(scheduleID ScheduleID)
+	}
 )
 
 const (
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "1.21.0"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 18
+	DBVersion = 19
 	// AssetsServerURL represents the URL of the Portainer asset server
 	AssetsServerURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com"
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
@@ -865,6 +913,8 @@ const (
 	ExtensionDefinitionsURL = AssetsServerURL + "/extensions-1.21.0.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response
 	PortainerAgentHeader = "Portainer-Agent"
+	// PortainerAgentEdgeIDHeader represent the name of the header containing the Edge ID associated to an agent/agent cluster
+	PortainerAgentEdgeIDHeader = "X-PortainerAgent-EdgeID"
 	// PortainerAgentTargetHeader represent the name of the header containing the target node name
 	PortainerAgentTargetHeader = "X-PortainerAgent-Target"
 	// PortainerAgentSignatureHeader represent the name of the header containing the digital signature
@@ -878,6 +928,8 @@ const (
 	SupportedDockerAPIVersion = "1.24"
 	// ExtensionServer represents the server used by Portainer to communicate with extensions
 	ExtensionServer = "localhost"
+	// DefaultEdgeAgentCheckinIntervalInSeconds represents the default interval (in seconds) used by Edge agents to checkin with the Portainer instance
+	DefaultEdgeAgentCheckinIntervalInSeconds = 5
 )
 
 const (
@@ -953,6 +1005,8 @@ const (
 	AgentOnDockerEnvironment
 	// AzureEnvironment represents an endpoint connected to an Azure environment
 	AzureEnvironment
+	// EdgeAgentEnvironment represents an endpoint connected to an Edge agent
+	EdgeAgentEnvironment
 )
 
 const (
@@ -1017,6 +1071,15 @@ const (
 	AzureRegistry
 	// CustomRegistry represents a custom registry
 	CustomRegistry
+)
+
+const (
+	// EdgeAgentIdle represents an idle state for a tunnel connected to an Edge endpoint.
+	EdgeAgentIdle string = "IDLE"
+	// EdgeAgentManagementRequired represents a required state for a tunnel connected to an Edge endpoint
+	EdgeAgentManagementRequired string = "REQUIRED"
+	// EdgeAgentActive represents an active state for a tunnel connected to an Edge endpoint
+	EdgeAgentActive string = "ACTIVE"
 )
 
 const (
