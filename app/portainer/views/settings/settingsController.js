@@ -17,10 +17,6 @@ function ($scope, $state, Notifications, SettingsService, StateManager) {
         key: '30 seconds',
         value: 30
       },
-      {
-        key: '60 seconds',
-        value: 60
-      },
     ]
   };
 
