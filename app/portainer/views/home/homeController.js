@@ -82,6 +82,11 @@ angular.module('portainer.app')
       }
 
       function switchToEdgeEndpoint(endpoint) {
+        if (!endpoint.EdgeID) {
+          $state.go('portainer.endpoints.endpoint', { id: endpoint.Id });
+          return;
+        }
+
         $scope.state.connectingToEdgeEndpoint = true;
         SystemService.ping(endpoint.Id)
           .then(function success() {
