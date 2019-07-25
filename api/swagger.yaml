@@ -745,6 +745,95 @@ paths:
           examples:
             application/json:
               err: "EndpointGroup management is disabled"
+  /endpoint_groups/{id}/endpoints/{endpointId}:
+    put:
+      tags:
+      - "endpoint_groups"
+      summary: "Add an endpoint to an endpoint group"
+      description: |
+        Add an endpoint to an endpoint group
+        **Access policy**: administrator
+      operationId: "EndpointGroupAddEndpoint"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      security:
+      - jwt: []
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "EndpointGroup identifier"
+        required: true
+        type: "integer"
+      - name: "endpointId"
+        in: "path"
+        description: "Endpoint identifier"
+        required: true
+        type: "integer"
+      responses:
+        204:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request data format"
+        404:
+          description: "EndpointGroup not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "EndpointGroup not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
+    delete:
+      tags:
+      - "endpoint_groups"
+      summary: "Remove an endpoint group"
+      description: |
+        Remove an endpoint group.
+        **Access policy**: administrator
+      operationId: "EndpointGroupDeleteEndpoint"
+      security:
+      - jwt: []
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "EndpointGroup identifier"
+        required: true
+        type: "integer"
+      - name: "endpointId"
+        in: "path"
+        description: "Endpoint identifier"
+        required: true
+        type: "integer"
+      responses:
+        204:
+          description: "Success"
+        400:
+          description: "Invalid request"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "Invalid request"
+        404:
+          description: "EndpointGroup not found"
+          schema:
+            $ref: "#/definitions/GenericError"
+          examples:
+            application/json:
+              err: "EndpointGroup not found"
+        500:
+          description: "Server error"
+          schema:
+            $ref: "#/definitions/GenericError"
   /extensions:
     get:
       tags:
@@ -3866,17 +3955,13 @@ definitions:
         type: "string"
         example: "Endpoint group description"
         description: "Endpoint group description"
-      Labels:
+      Tags:
         type: "array"
+        description: "List of tags associated to the endpoint group"
         items:
-          $ref: "#/definitions/Pair"
-      AssociatedEndpoints:
-        type: "array"
-        description: "List of endpoint identifiers that will be part of this group"
-        items:
-          type: "integer"
-          example: 1
-          description: "Endpoint identifier"
+          type: "string"
+          example: "zone/east-coast"
+          description: "Tag"
       UserAccessPolicies:
         $ref: "#/definitions/UserAccessPolicies"
       TeamAccessPolicies:
@@ -4686,4 +4771,4 @@ definitions:
           type: "boolean"
     example:
       "DockerContainerList": true
-      "DockerVolumeList": true                          
+      "DockerVolumeList": true
