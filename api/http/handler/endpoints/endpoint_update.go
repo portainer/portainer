@@ -43,10 +43,6 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint identifier route variable", err}
 	}
 
-	if endpointID == 1 {
-		return &httperror.HandlerError{http.StatusForbidden, "This feature is not available in the demo version of Portainer", portainer.ErrNotAvailableInDemo}
-	}
-
 	var payload endpointUpdatePayload
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
