@@ -8,7 +8,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
-func (factory *proxyFactory) newLocalProxy(path string, endpointID portainer.EndpointID) http.Handler {
+func (factory *proxyFactory) newLocalProxy(path string, endpoint *portainer.Endpoint) http.Handler {
 	proxy := &localProxy{}
 	transport := &proxyTransport{
 		enableSignature:        false,
@@ -18,7 +18,9 @@ func (factory *proxyFactory) newLocalProxy(path string, endpointID portainer.End
 		RegistryService:        factory.RegistryService,
 		DockerHubService:       factory.DockerHubService,
 		dockerTransport:        newSocketTransport(path),
-		endpointIdentifier:     endpointID,
+		ReverseTunnelService:   factory.ReverseTunnelService,
+		endpointIdentifier:     endpoint.ID,
+		endpointType:           endpoint.Type,
 	}
 	proxy.Transport = transport
 	return proxy

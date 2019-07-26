@@ -2,9 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/portainer/portainer/api/chisel"
 
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt"
@@ -20,8 +23,6 @@ import (
 	"github.com/portainer/portainer/api/jwt"
 	"github.com/portainer/portainer/api/ldap"
 	"github.com/portainer/portainer/api/libcompose"
-
-	"log"
 )
 
 func initCLI() *portainer.CLIFlags {
@@ -108,12 +109,12 @@ func initDemoData(store *bolt.Store, cryptoService portainer.CryptoService) erro
 	return nil
 }
 
-func initComposeStackManager(dataStorePath string) portainer.ComposeStackManager {
-	return libcompose.NewComposeStackManager(dataStorePath)
+func initComposeStackManager(dataStorePath string, reverseTunnelService portainer.ReverseTunnelService) portainer.ComposeStackManager {
+	return libcompose.NewComposeStackManager(dataStorePath, reverseTunnelService)
 }
 
-func initSwarmStackManager(assetsPath string, dataStorePath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService) (portainer.SwarmStackManager, error) {
-	return exec.NewSwarmStackManager(assetsPath, dataStorePath, signatureService, fileService)
+func initSwarmStackManager(assetsPath string, dataStorePath string, signatureService portainer.DigitalSignatureService, fileService portainer.FileService, reverseTunnelService portainer.ReverseTunnelService) (portainer.SwarmStackManager, error) {
+	return exec.NewSwarmStackManager(assetsPath, dataStorePath, signatureService, fileService, reverseTunnelService)
 }
 
 func initJWTService(authenticationEnabled bool) portainer.JWTService {
@@ -143,8 +144,8 @@ func initGitService() portainer.GitService {
 	return &git.Service{}
 }
 
-func initClientFactory(signatureService portainer.DigitalSignatureService) *docker.ClientFactory {
-	return docker.NewClientFactory(signatureService)
+func initClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService) *docker.ClientFactory {
+	return docker.NewClientFactory(signatureService, reverseTunnelService)
 }
 
 func initSnapshotter(clientFactory *docker.ClientFactory) portainer.Snapshotter {
@@ -189,8 +190,6 @@ func loadSnapshotSystemSchedule(jobScheduler portainer.JobScheduler, snapshotter
 	if err != nil {
 		return err
 	}
-
-	snapshotJobRunner.Run()
 
 	if len(schedules) == 0 {
 		return scheduleService.CreateSchedule(snapshotSchedule)
@@ -237,7 +236,7 @@ func loadEndpointSyncSystemSchedule(jobScheduler portainer.JobScheduler, schedul
 	return scheduleService.CreateSchedule(endpointSyncSchedule)
 }
 
-func loadSchedulesFromDatabase(jobScheduler portainer.JobScheduler, jobService portainer.JobService, scheduleService portainer.ScheduleService, endpointService portainer.EndpointService, fileService portainer.FileService) error {
+func loadSchedulesFromDatabase(jobScheduler portainer.JobScheduler, jobService portainer.JobService, scheduleService portainer.ScheduleService, endpointService portainer.EndpointService, fileService portainer.FileService, reverseTunnelService portainer.ReverseTunnelService) error {
 	schedules, err := scheduleService.Schedules()
 	if err != nil {
 		return err
@@ -254,6 +253,13 @@ func loadSchedulesFromDatabase(jobScheduler portainer.JobScheduler, jobService p
 				return err
 			}
 		}
+
+		if schedule.EdgeSchedule != nil {
+			for _, endpointID := range schedule.EdgeSchedule.Endpoints {
+				reverseTunnelService.AddSchedule(endpointID, schedule.EdgeSchedule)
+			}
+		}
+
 	}
 
 	return nil
@@ -306,6 +312,7 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 			AllowPrivilegedModeForRegularUsers: true,
 			EnableHostManagementFeatures:       false,
 			SnapshotInterval:                   *flags.SnapshotInterval,
+			EdgeAgentCheckinInterval:           portainer.DefaultEdgeAgentCheckinIntervalInSeconds,
 		}
 
 		if *flags.Templates != "" {
@@ -583,7 +590,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	clientFactory := initClientFactory(digitalSignatureService)
+	reverseTunnelService := chisel.NewService(store.EndpointService, store.TunnelServerService)
+
+	clientFactory := initClientFactory(digitalSignatureService, reverseTunnelService)
 
 	jobService := initJobService(clientFactory)
 
@@ -594,12 +603,12 @@ func main() {
 		endpointManagement = false
 	}
 
-	swarmStackManager, err := initSwarmStackManager(*flags.Assets, *flags.Data, digitalSignatureService, fileService)
+	swarmStackManager, err := initSwarmStackManager(*flags.Assets, *flags.Data, digitalSignatureService, fileService, reverseTunnelService)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	composeStackManager := initComposeStackManager(*flags.Data)
+	composeStackManager := initComposeStackManager(*flags.Data, reverseTunnelService)
 
 	err = initTemplates(store.TemplateService, fileService, *flags.Templates, *flags.TemplateFile)
 	if err != nil {
@@ -613,7 +622,7 @@ func main() {
 
 	jobScheduler := initJobScheduler()
 
-	err = loadSchedulesFromDatabase(jobScheduler, jobService, store.ScheduleService, store.EndpointService, fileService)
+	err = loadSchedulesFromDatabase(jobScheduler, jobService, store.ScheduleService, store.EndpointService, fileService, reverseTunnelService)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -701,7 +710,13 @@ func main() {
 		go terminateIfNoAdminCreated(store.UserService)
 	}
 
+	err = reverseTunnelService.StartTunnelServer(*flags.TunnelAddr, *flags.TunnelPort, snapshotter)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	var server portainer.Server = &http.Server{
+		ReverseTunnelService:   reverseTunnelService,
 		Status:                 applicationStatus,
 		BindAddress:            *flags.Addr,
 		AssetsPath:             *flags.Assets,

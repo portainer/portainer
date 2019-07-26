@@ -1,18 +1,32 @@
+import _ from 'lodash-es';
 import './datatable.css';
 
+function isBetween(value, a, b) {
+  return (value >= a && value <= b) || (value >= b && value <= a) ;
+}
+
 angular.module('portainer.app')
-.controller('GenericDatatableController', ['PaginationService', 'DatatableService', 'PAGINATION_MAX_ITEMS',
-function (PaginationService, DatatableService, PAGINATION_MAX_ITEMS) {
+.controller('GenericDatatableController', ['$interval', 'PaginationService', 'DatatableService', 'PAGINATION_MAX_ITEMS',
+function ($interval, PaginationService, DatatableService, PAGINATION_MAX_ITEMS) {
 
   this.state = {
     selectAll: false,
     orderBy: this.orderBy,
     paginatedItemLimit: PAGINATION_MAX_ITEMS,
     displayTextFilter: false,
-    selectedItemCount: 0,
+    get selectedItemCount() {
+      return this.selectedItems.length || 0;
+    },
     selectedItems: []
   };
 
+  this.settings = {
+    open: false,
+    repeater: {
+      autoRefresh: false,
+      refreshRate: '30'
+    }
+  }
 
   this.onTextFilterChange = function() {
     DatatableService.setDataTableTextFilters(this.tableKey, this.state.textFilter);
@@ -24,32 +38,86 @@ function (PaginationService, DatatableService, PAGINATION_MAX_ITEMS) {
     DatatableService.setDataTableOrder(this.tableKey, orderField, this.state.reverseOrder);
   };
 
-  this.selectItem = function(item) {
-    if (item.Checked) {
-      this.state.selectedItemCount++;
-      this.state.selectedItems.push(item);
-    } else {
-      this.state.selectedItems.splice(this.state.selectedItems.indexOf(item), 1);
-      this.state.selectedItemCount--;
+  this.selectItem = function(item, event) {
+    // Handle range select using shift
+    if (event && event.originalEvent.shiftKey && this.state.firstClickedItem) {
+      const firstItemIndex = this.state.filteredDataSet.indexOf(this.state.firstClickedItem);
+      const lastItemIndex = this.state.filteredDataSet.indexOf(item);
+      const itemsInRange = _.filter(this.state.filteredDataSet, (item, index) => {
+        return isBetween(index, firstItemIndex, lastItemIndex);
+      });
+      const value = item.Checked;
+
+      _.forEach(itemsInRange, (i) => {
+        if (!this.allowSelection(i)) {
+          return;
+        }
+        i.Checked = value;
+      });
+      this.state.firstClickedItem = item;
+    } else if (event) {
+      this.state.firstClickedItem = item;
     }
+    this.state.selectedItems = this.state.filteredDataSet.filter(i => i.Checked);
+    if (event && this.state.selectAll && this.state.selectedItems.length !== this.state.filteredDataSet.length) {
+      this.state.selectAll = false;
+    }
+    this.onSelectionChanged();
   };
 
   this.selectAll = function() {
+    this.state.firstClickedItem = null;
     for (var i = 0; i < this.state.filteredDataSet.length; i++) {
       var item = this.state.filteredDataSet[i];
-      if (item.Checked !== this.state.selectAll) {
+      if (this.allowSelection(item) && item.Checked !== this.state.selectAll) {
         item.Checked = this.state.selectAll;
         this.selectItem(item);
       }
     }
+    this.onSelectionChanged();
   };
+
+  /**
+   * Override this method to allow/deny selection
+   */
+  this.allowSelection = function(/*item*/) {
+    return true;
+  }
+
+  /**
+   * Override this method to prepare data table
+   */
+  this.prepareTableFromDataset = function() {
+    return;
+  }
+
+  /**
+   * Override this method to execute code after selection changed on datatable
+   */
+  this.onSelectionChanged = function() {
+    return;
+  }
 
   this.changePaginationLimit = function() {
     PaginationService.setPaginationLimit(this.tableKey, this.state.paginatedItemLimit);
   };
 
+  this.setDefaults = function() {
+    this.showTextFilter = this.showTextFilter ? this.showTextFilter : false;
+    this.state.reverseOrder = this.reverseOrder ? this.reverseOrder : false;
+    this.state.paginatedItemLimit = PaginationService.getPaginationLimit(this.tableKey);
+  }
+
+  /**
+   * Duplicate this function when extending GenericDatatableController
+   * Extending-controller's bindings are not accessible there
+   * For more details see the following comments
+   * https://github.com/portainer/portainer/pull/2877#issuecomment-503333425
+   * https://github.com/portainer/portainer/pull/2877#issuecomment-503537249
+   */
   this.$onInit = function() {
-    setDefaults(this);
+    this.setDefaults();
+    this.prepareTableFromDataset();
 
     var storedOrder = DatatableService.getDataTableOrder(this.tableKey);
     if (storedOrder !== null) {
@@ -62,11 +130,56 @@ function (PaginationService, DatatableService, PAGINATION_MAX_ITEMS) {
       this.state.textFilter = textFilter;
       this.onTextFilterChange();
     }
+
+    var storedFilters = DatatableService.getDataTableFilters(this.tableKey);
+    if (storedFilters !== null) {
+      this.filters = storedFilters;
+    }
+    if (this.filters && this.filters.state) {
+      this.filters.state.open = false;
+    }
+
+    var storedSettings = DatatableService.getDataTableSettings(this.tableKey);
+    if (storedSettings !== null) {
+      this.settings = storedSettings;
+      this.settings.open = false;
+    }
+    this.onSettingsRepeaterChange();
+    this.state.orderBy = this.orderBy;
+  };
+  
+  /**
+   * REPEATER SECTION
+   */
+  this.repeater = undefined;
+
+  this.$onDestroy = function() {
+    this.stopRepeater();
   };
 
-  function setDefaults(ctrl) {
-    ctrl.showTextFilter = ctrl.showTextFilter ? ctrl.showTextFilter : false;
-    ctrl.state.reverseOrder = ctrl.reverseOrder ? ctrl.reverseOrder : false;
-    ctrl.state.paginatedItemLimit = PaginationService.getPaginationLimit(ctrl.tableKey);
+  this.stopRepeater = function() {
+    if (angular.isDefined(this.repeater)) {
+      $interval.cancel(this.repeater);
+      this.repeater = undefined;
+    }
   }
+
+  this.startRepeater = function() {
+    this.repeater = $interval(() => {
+      this.refreshCallback();
+    }, this.settings.repeater.refreshRate * 1000);
+  }
+
+  this.onSettingsRepeaterChange = function() {
+    this.stopRepeater();
+    if (angular.isDefined(this.refreshCallback) && this.settings.repeater.autoRefresh) {
+      this.startRepeater();
+      $('#refreshRateChange').show();
+      $('#refreshRateChange').fadeOut(1500);
+    }
+    DatatableService.setDataTableSettings(this.tableKey, this.settings);
+  }
+  /**
+   * !REPEATER SECTION
+   */
 }]);

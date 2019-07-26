@@ -1,15 +1,15 @@
 angular.module('portainer.app').component('endpointsDatatable', {
   templateUrl: './endpointsDatatable.html',
-  controller: 'GenericDatatableController',
+  controller: 'EndpointsDatatableController',
   bindings: {
     titleText: '@',
     titleIcon: '@',
-    dataset: '<',
     tableKey: '@',
     orderBy: '@',
     reverseOrder: '<',
     endpointManagement: '<',
     accessManagement: '<',
-    removeAction: '<'
+    removeAction: '<',
+    retrievePage: '<'
   }
 });

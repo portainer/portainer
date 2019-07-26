@@ -26,7 +26,8 @@ function ($q, $scope, $state, VolumeService, ServiceService, VolumeHelper, Notif
 
   $scope.offlineMode = false;
 
-  function initView() {
+  $scope.getVolumes = getVolumes;
+  function getVolumes() {
     var endpointProvider = $scope.applicationState.endpoint.mode.provider;
     var endpointRole = $scope.applicationState.endpoint.mode.role;
 
@@ -51,6 +52,10 @@ function ($q, $scope, $state, VolumeService, ServiceService, VolumeHelper, Notif
     }).catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve volumes');
     });
+  }
+
+  function initView() {
+    getVolumes();
   }
 
   initView();

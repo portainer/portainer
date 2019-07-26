@@ -1,4 +1,4 @@
-import { browseGetResponse } from './response/browse';
+import {browseGetResponse} from './response/browse';
 
 angular.module('portainer.agent')
 .factory('Browse', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', 'StateManager',
@@ -14,7 +14,8 @@ angular.module('portainer.agent')
     },
     get: {
       method: 'GET', params: { action: 'get' },
-      transformResponse: browseGetResponse
+      transformResponse: browseGetResponse,
+      responseType: 'arraybuffer'
     },
     delete: {
       method: 'DELETE', params: { action: 'delete' }

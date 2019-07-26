@@ -1,7 +1,7 @@
-import _ from "lodash-es";
-import angular from "angular";
+import _ from 'lodash-es';
+import angular from 'angular';
 
-import AccessViewerPolicyModel from '../../models/access'
+import AccessViewerPolicyModel from '../../models/access';
 
 class AccessViewerController {
   /* @ngInject */
@@ -103,7 +103,7 @@ class AccessViewerController {
       this.rbacEnabled = await this.ExtensionService.extensionEnabled(this.ExtensionService.EXTENSIONS.RBAC);
       if (this.rbacEnabled) {
         this.users = await this.UserService.users();
-        this.endpoints = _.keyBy(await this.EndpointService.endpoints(), 'Id');
+        this.endpoints = _.keyBy((await this.EndpointService.endpoints()).value, 'Id');
         const groups = await this.GroupService.groups();
         this.groupUserAccessPolicies = {};
         this.groupTeamAccessPolicies = {};

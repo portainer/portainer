@@ -2,6 +2,7 @@ package libcompose
 
 import (
 	"context"
+	"fmt"
 	"path"
 	"path/filepath"
 
@@ -17,19 +18,28 @@ import (
 
 // ComposeStackManager represents a service for managing compose stacks.
 type ComposeStackManager struct {
-	dataPath string
+	dataPath             string
+	reverseTunnelService portainer.ReverseTunnelService
 }
 
 // NewComposeStackManager initializes a new ComposeStackManager service.
-func NewComposeStackManager(dataPath string) *ComposeStackManager {
+func NewComposeStackManager(dataPath string, reverseTunnelService portainer.ReverseTunnelService) *ComposeStackManager {
 	return &ComposeStackManager{
-		dataPath: dataPath,
+		dataPath:             dataPath,
+		reverseTunnelService: reverseTunnelService,
 	}
 }
 
-func createClient(endpoint *portainer.Endpoint) (client.Factory, error) {
+func (manager *ComposeStackManager) createClient(endpoint *portainer.Endpoint) (client.Factory, error) {
+
+	endpointURL := endpoint.URL
+	if endpoint.Type == portainer.EdgeAgentEnvironment {
+		tunnel := manager.reverseTunnelService.GetTunnelDetails(endpoint.ID)
+		endpointURL = fmt.Sprintf("tcp://localhost:%d", tunnel.Port)
+	}
+
 	clientOpts := client.Options{
-		Host:       endpoint.URL,
+		Host:       endpointURL,
 		APIVersion: portainer.SupportedDockerAPIVersion,
 	}
 
@@ -47,7 +57,7 @@ func createClient(endpoint *portainer.Endpoint) (client.Factory, error) {
 // Up will deploy a compose stack (equivalent of docker-compose up)
 func (manager *ComposeStackManager) Up(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
 
-	clientFactory, err := createClient(endpoint)
+	clientFactory, err := manager.createClient(endpoint)
 	if err != nil {
 		return err
 	}
@@ -85,7 +95,7 @@ func (manager *ComposeStackManager) Up(stack *portainer.Stack, endpoint *portain
 
 // Down will shutdown a compose stack (equivalent of docker-compose down)
 func (manager *ComposeStackManager) Down(stack *portainer.Stack, endpoint *portainer.Endpoint) error {
-	clientFactory, err := createClient(endpoint)
+	clientFactory, err := manager.createClient(endpoint)
 	if err != nil {
 		return err
 	}

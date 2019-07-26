@@ -3,6 +3,7 @@ package schedules
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -18,6 +19,7 @@ type taskContainer struct {
 	Status     string               `json:"Status"`
 	Created    float64              `json:"Created"`
 	Labels     map[string]string    `json:"Labels"`
+	Edge       bool                 `json:"Edge"`
 }
 
 // GET request on /api/schedules/:id/tasks
@@ -64,6 +66,22 @@ func (handler *Handler) scheduleTasks(w http.ResponseWriter, r *http.Request) *h
 		tasks = append(tasks, endpointTasks...)
 	}
 
+	if schedule.EdgeSchedule != nil {
+		for _, endpointID := range schedule.EdgeSchedule.Endpoints {
+
+			cronTask := taskContainer{
+				ID:         fmt.Sprintf("schedule_%d", schedule.EdgeSchedule.ID),
+				EndpointID: endpointID,
+				Edge:       true,
+				Status:     "",
+				Created:    0,
+				Labels:     map[string]string{},
+			}
+
+			tasks = append(tasks, cronTask)
+		}
+	}
+
 	return response.JSON(w, tasks)
 }
 
@@ -87,6 +105,7 @@ func extractTasksFromContainerSnasphot(endpoint *portainer.Endpoint, scheduleID 
 	for _, container := range containers {
 		if container.Labels["io.portainer.schedule.id"] == strconv.Itoa(int(scheduleID)) {
 			container.EndpointID = endpoint.ID
+			container.Edge = false
 			endpointTasks = append(endpointTasks, container)
 		}
 	}

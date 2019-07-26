@@ -1,8 +1,11 @@
 package endpoints
 
 import (
+	"errors"
 	"log"
+	"net"
 	"net/http"
+	"net/url"
 	"runtime"
 	"strconv"
 
@@ -41,7 +44,7 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 
 	endpointType, err := request.RetrieveNumericMultiPartFormValue(r, "EndpointType", false)
 	if err != nil || endpointType == 0 {
-		return portainer.Error("Invalid endpoint type value. Value must be one of: 1 (Docker environment), 2 (Agent environment) or 3 (Azure environment)")
+		return portainer.Error("Invalid endpoint type value. Value must be one of: 1 (Docker environment), 2 (Agent environment), 3 (Azure environment) or 4 (Edge Agent environment)")
 	}
 	payload.EndpointType = endpointType
 
@@ -149,6 +152,8 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 func (handler *Handler) createEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
 	if portainer.EndpointType(payload.EndpointType) == portainer.AzureEnvironment {
 		return handler.createAzureEndpoint(payload)
+	} else if portainer.EndpointType(payload.EndpointType) == portainer.EdgeAgentEnvironment {
+		return handler.createEdgeAgentEndpoint(payload)
 	}
 
 	if payload.TLS {
@@ -185,6 +190,52 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 		Tags:               payload.Tags,
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.Snapshot{},
+	}
+
+	err = handler.EndpointService.CreateEndpoint(endpoint)
+	if err != nil {
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint inside the database", err}
+	}
+
+	return endpoint, nil
+}
+
+func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
+	endpointType := portainer.EdgeAgentEnvironment
+	endpointID := handler.EndpointService.GetNextIdentifier()
+
+	portainerURL, err := url.Parse(payload.URL)
+	if err != nil {
+		return nil, &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint URL", err}
+	}
+
+	portainerHost, _, err := net.SplitHostPort(portainerURL.Host)
+	if err != nil {
+		portainerHost = portainerURL.Host
+	}
+
+	if portainerHost == "localhost" {
+		return nil, &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint URL", errors.New("cannot use localhost as endpoint URL")}
+	}
+
+	edgeKey := handler.ReverseTunnelService.GenerateEdgeKey(payload.URL, portainerHost, endpointID)
+
+	endpoint := &portainer.Endpoint{
+		ID:      portainer.EndpointID(endpointID),
+		Name:    payload.Name,
+		URL:     portainerHost,
+		Type:    endpointType,
+		GroupID: portainer.EndpointGroupID(payload.GroupID),
+		TLSConfig: portainer.TLSConfiguration{
+			TLS: false,
+		},
+		AuthorizedUsers: []portainer.UserID{},
+		AuthorizedTeams: []portainer.TeamID{},
+		Extensions:      []portainer.EndpointExtension{},
+		Tags:            payload.Tags,
+		Status:          portainer.EndpointStatusUp,
+		Snapshots:       []portainer.Snapshot{},
+		EdgeKey:         edgeKey,
 	}
 
 	err = handler.EndpointService.CreateEndpoint(endpoint)

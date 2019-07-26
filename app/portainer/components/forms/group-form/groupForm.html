@@ -49,8 +49,13 @@
           <div class="text-center small text-muted">Available endpoints</div>
           <div style="margin-top: 10px;">
             <group-association-table
+              loaded="$ctrl.loaded"
+              page-type="$ctrl.pageType"
+              table-type="available"
+              retrieve-page="$ctrl.getPaginatedEndpointsByGroup"
               dataset="$ctrl.availableEndpoints"
               entry-click="$ctrl.associateEndpoint"
+              pagination-state="$ctrl.state.available"
               empty-dataset-message="No endpoint available"
             ></group-association-table>
           </div>
@@ -61,8 +66,13 @@
           <div class="text-center small text-muted">Associated endpoints</div>
           <div style="margin-top: 10px;">
             <group-association-table
+              loaded="$ctrl.loaded"
+              page-type="$ctrl.pageType"
+              table-type="associated"
+              retrieve-page="$ctrl.getPaginatedEndpointsByGroup"
               dataset="$ctrl.associatedEndpoints"
               entry-click="$ctrl.dissociateEndpoint"
+              pagination-state="$ctrl.state.associated"
               empty-dataset-message="No associated endpoint"
             ></group-association-table>
           </div>
@@ -75,16 +85,16 @@
     <div class="col-sm-12 form-section-title">
       Unassociated endpoints
     </div>
-    <div ng-if="$ctrl.associatedEndpoints.length > 0">
-      <div style="margin-top: 10px;">
-        <group-association-table
-          dataset="$ctrl.associatedEndpoints"
-          empty-dataset-message="No endpoint available"
-        ></group-association-table>
-      </div>
-    </div>
-    <div class="col-sm-12" ng-if="$ctrl.associatedEndpoints.length ===  0">
-      <span class="text-muted small">All the endpoints are assigned to a group.</span>
+    <div style="margin-top: 10px;">
+      <group-association-table
+        loaded="$ctrl.loaded"
+        page-type="$ctrl.pageType"
+        table-type="associated"
+        retrieve-page="$ctrl.getPaginatedEndpointsByGroup"
+        dataset="$ctrl.associatedEndpoints"
+        pagination-state="$ctrl.state.associated"
+        empty-dataset-message="No endpoint available"
+      ></group-association-table>
     </div>
   </div>
   <!-- !endpoints -->

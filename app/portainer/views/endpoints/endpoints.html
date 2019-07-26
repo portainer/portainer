@@ -26,11 +26,12 @@
   <div class="col-sm-12">
     <endpoints-datatable
     title-text="Endpoints" title-icon="fa-plug"
-    dataset="endpoints" table-key="endpoints"
+    table-key="endpoints"
     order-by="Name" 
     endpoint-management="applicationState.application.endpointManagement"
     access-management="applicationState.application.authentication"
     remove-action="removeAction"
+    retrieve-page="getPaginatedEndpoints"
     ></endpoints-datatable>
   </div>
 </div>

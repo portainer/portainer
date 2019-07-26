@@ -16,7 +16,7 @@
           <div class="form-group"></div>
           <div class="form-group" style="margin-bottom: 0">
             <div class="boxselector_wrapper">
-              <div>
+              <div ng-click="resetEndpointURL()">
                 <input type="radio" id="docker_endpoint" ng-model="state.EnvironmentType" value="docker">
                 <label for="docker_endpoint">
                   <div class="boxselector_header">
@@ -26,7 +26,7 @@
                   <p>Docker environment</p>
                 </label>
               </div>
-              <div>
+              <div ng-click="resetEndpointURL()">
                 <input type="radio" id="agent_endpoint" ng-model="state.EnvironmentType" value="agent">
                 <label for="agent_endpoint">
                   <div class="boxselector_header">
@@ -34,6 +34,16 @@
                     Agent
                   </div>
                   <p>Portainer agent</p>
+                </label>
+              </div>
+              <div ng-click="setDefaultPortainerInstanceURL()">
+                <input type="radio" id="edge_agent_endpoint" ng-model="state.EnvironmentType" value="edge_agent">
+                <label for="edge_agent_endpoint">
+                  <div class="boxselector_header">
+                    <i class="fa fa-cloud" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Edge Agent
+                  </div>
+                  <p>Portainer Edge agent</p>
                 </label>
               </div>
               <div>
@@ -74,6 +84,16 @@
                     <i id="copyNotification" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none;"></i>
                   </span>
                 </div>
+              </span>
+            </div>
+          </div>
+          <div ng-if="state.EnvironmentType === 'edge_agent'">
+            <div class="col-sm-12 form-section-title" >
+              Information
+            </div>
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                Allows you to create an endpoint that can be registered with an Edge agent. The Edge agent will initiate the communications with the Portainer instance. All the required information on how to connect an Edge agent to this endpoint will be available after endpoint creation.
               </span>
             </div>
           </div>
@@ -138,6 +158,26 @@
             </div>
           </div>
           <!-- !endpoint-url-input -->
+          <!-- portainer-instance-input -->
+          <div ng-if="state.EnvironmentType === 'edge_agent'">
+            <div class="form-group">
+              <label for="endpoint_url" class="col-sm-3 col-lg-2 control-label text-left">
+                Portainer server URL
+                <portainer-tooltip position="bottom" message="URL of the Portainer instance that the agent will use to initiate the communications."></portainer-tooltip>
+              </label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="text" class="form-control" name="endpoint_url" ng-model="formValues.URL" placeholder="e.g. 10.0.0.10:9000 or portainer.mydomain.com" required>
+              </div>
+            </div>
+            <div class="form-group" ng-show="endpointCreationForm.endpoint_url.$invalid">
+              <div class="col-sm-12 small text-warning">
+                <div ng-messages="endpointCreationForm.endpoint_url.$error">
+                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- !portainer-instance-input -->
           <!-- endpoint-public-url-input -->
           <div ng-if="state.EnvironmentType === 'docker' || state.EnvironmentType === 'agent'">
             <div class="form-group">
@@ -235,6 +275,10 @@
                 <span ng-show="state.actionInProgress">Creating endpoint...</span>
               </button>
               <button ng-if="state.EnvironmentType === 'agent'" type="submit" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !endpointCreationForm.$valid" ng-click="addAgentEndpoint()" button-spinner="state.actionInProgress">
+                <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Add endpoint</span>
+                <span ng-show="state.actionInProgress">Creating endpoint...</span>
+              </button>
+              <button ng-if="state.EnvironmentType === 'edge_agent'" type="submit" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !endpointCreationForm.$valid" ng-click="addEdgeAgentEndpoint()" button-spinner="state.actionInProgress">
                 <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Add endpoint</span>
                 <span ng-show="state.actionInProgress">Creating endpoint...</span>
               </button>

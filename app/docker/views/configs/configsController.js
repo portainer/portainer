@@ -3,16 +3,23 @@ import angular from 'angular';
 class ConfigsController {
 
   /* @ngInject */
-  constructor($state, ConfigService, Notifications) {
+  constructor($state, ConfigService, Notifications, $async) {
     this.$state = $state;
     this.ConfigService = ConfigService;
     this.Notifications = Notifications;
+    this.$async = $async;
 
     this.removeAction = this.removeAction.bind(this);
+    this.removeActionAsync = this.removeActionAsync.bind(this);
+    this.getConfigs = this.getConfigs.bind(this);
+    this.getConfigsAsync = this.getConfigsAsync.bind(this);
   }
 
-  async $onInit() {
-    this.configs = [];
+  getConfigs() {
+    return this.$async(this.getConfigsAsync);
+  }
+
+  async getConfigsAsync() {
     try {
       this.configs = await this.ConfigService.configs();
     } catch (err) {
@@ -20,7 +27,16 @@ class ConfigsController {
     }
   }
 
-  async removeAction(selectedItems) {
+  async $onInit() {
+    this.configs = [];
+    this.getConfigs();
+  }
+
+  removeAction(selectedItems) {
+    return this.$async(this.removeActionAsync, selectedItems);
+  }
+
+  async removeActionAsync(selectedItems) {
     let actionCount = selectedItems.length;
     for (const config of selectedItems) {
       try {

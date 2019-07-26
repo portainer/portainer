@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
-import { ContainerCapabilities, ContainerCapability } from '../../../models/containerCapabilities';
-import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
-import { ContainerDetailsViewModel } from '../../../models/container';
+import {ContainerCapabilities, ContainerCapability} from '../../../models/containerCapabilities';
+import {AccessControlFormData} from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
+import {ContainerDetailsViewModel} from '../../../models/container';
 
 
 angular.module('portainer.docker')
@@ -139,6 +139,9 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
 
   function preparePortBindings(config) {
     var bindings = {};
+    if (config.ExposedPorts === undefined) {
+      config.ExposedPorts = {};
+    }
     config.HostConfig.PortBindings.forEach(function (portBinding) {
       if (portBinding.containerPort) {
         var key = portBinding.containerPort + '/' + portBinding.protocol;

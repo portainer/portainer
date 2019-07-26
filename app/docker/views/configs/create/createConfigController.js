@@ -1,11 +1,11 @@
-import _ from "lodash-es";
-import { AccessControlFormData } from "Portainer/components/accessControlForm/porAccessControlFormModel";
+import _ from 'lodash-es';
+import {AccessControlFormData} from 'Portainer/components/accessControlForm/porAccessControlFormModel';
 
-import angular from "angular";
+import angular from 'angular';
 
 class CreateConfigController {
   /* @ngInject */
-  constructor($state, $transition$, Notifications, ConfigService, Authentication, FormValidator, ResourceControlService) {
+  constructor($async, $state, $transition$, Notifications, ConfigService, Authentication, FormValidator, ResourceControlService) {
     this.$state = $state;
     this.$transition$ = $transition$;
     this.Notifications = Notifications;
@@ -13,6 +13,7 @@ class CreateConfigController {
     this.Authentication = Authentication;
     this.FormValidator = FormValidator;
     this.ResourceControlService = ResourceControlService;
+    this.$async = $async;
 
     this.formValues = {
       Name: "",
@@ -26,6 +27,30 @@ class CreateConfigController {
     };
 
     this.editorUpdate = this.editorUpdate.bind(this);
+    this.createAsync = this.createAsync.bind(this);
+  }
+
+  async $onInit() {
+    if (!this.$transition$.params().id) {
+      this.formValues.displayCodeEditor = true;
+      return;
+    }
+
+    try {
+      let data = await this.ConfigService.config(this.$transition$.params().id);
+      this.formValues.Name = data.Name + "_copy";
+      this.formValues.Data = data.Data;
+      let labels = _.keys(data.Labels);
+      for (let i = 0; i < labels.length; i++) {
+        let labelName = labels[i];
+        let labelValue = data.Labels[labelName];
+        this.formValues.Labels.push({ name: labelName, value: labelValue });
+      }
+      this.formValues.displayCodeEditor = true;
+    } catch (err) {
+      this.formValues.displayCodeEditor = true;
+      this.Notifications.error("Failure", err, "Unable to clone config");
+    }
   }
 
   addLabel() {
@@ -74,7 +99,11 @@ class CreateConfigController {
     return true;
   }
 
-  async create() {
+  create() {
+    return this.$async(this.createAsync);
+  }
+
+  async createAsync() {
     let accessControlData = this.formValues.AccessControlData;
     let userDetails = this.Authentication.getUserDetails();
     let isAdmin = this.Authentication.isAdmin();
@@ -110,29 +139,6 @@ class CreateConfigController {
 
   editorUpdate(cm) {
     this.formValues.ConfigContent = cm.getValue();
-  }
-
-  async $onInit() {
-    if (!this.$transition$.params().id) {
-      this.formValues.displayCodeEditor = true;
-      return;
-    }
-
-    try {
-      let data = await this.ConfigService.config(this.$transition$.params().id);
-      this.formValues.Name = data.Name + "_copy";
-      this.formValues.Data = data.Data;
-      let labels = _.keys(data.Labels);
-      for (let i = 0; i < labels.length; i++) {
-        let labelName = labels[i];
-        let labelValue = data.Labels[labelName];
-        this.formValues.Labels.push({ name: labelName, value: labelValue });
-      }
-      this.formValues.displayCodeEditor = true;
-    } catch (err) {
-      this.formValues.displayCodeEditor = true;
-      this.Notifications.error("Failure", err, "Unable to clone config");
-    }
   }
 }
 

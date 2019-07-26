@@ -1,4 +1,4 @@
-import { jsonObjectsToArrayHandler } from './response/handlers';
+import {jsonObjectsToArrayHandler} from './response/handlers';
 
 angular.module('portainer.docker')
 .factory('System', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', 'InfoInterceptor', 'VersionInterceptor',
@@ -10,7 +10,7 @@ angular.module('portainer.docker')
   },
   {
     info: {
-      method: 'GET', params: { action: 'info' }, timeout: 10000, interceptor: InfoInterceptor
+      method: 'GET', params: { action: 'info' }, timeout: 15000, interceptor: InfoInterceptor
     },
     version: { method: 'GET', params: { action: 'version' }, timeout: 4500, interceptor: VersionInterceptor },
     events: {

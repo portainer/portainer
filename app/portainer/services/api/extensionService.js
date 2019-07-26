@@ -1,8 +1,8 @@
 import _ from 'lodash-es';
-import { ExtensionViewModel } from '../../models/extension';
+import {ExtensionViewModel} from '../../models/extension';
 
 angular.module('portainer.app')
-.factory('ExtensionService', ['$q', 'Extension', 'StateManager', function ExtensionServiceFactory($q, Extension, StateManager) {
+.factory('ExtensionService', ['$q', 'Extension', 'StateManager', '$async', function ExtensionServiceFactory($q, Extension, StateManager, $async) {
   'use strict';
   var service = {};
 
@@ -12,19 +12,27 @@ angular.module('portainer.app')
     RBAC: 3
   });
 
-  service.enable = function(license) {
+  service.enable = enable;
+  service.update = update;
+  service.delete = _delete;
+  service.extensions = extensions;
+  service.extension = extension;
+  service.extensionEnabled = extensionEnabled;
+  service.retrieveAndSaveEnabledExtensions = retrieveAndSaveEnabledExtensions;
+
+  function enable(license) {
     return Extension.create({ license: license }).$promise;
-  };
+  }
 
-  service.update = function(id, version) {
+  function update(id, version) {
     return Extension.update({ id: id, version: version }).$promise;
-  };
+  }
 
-  service.delete = function(id) {
+  function _delete(id) {
     return Extension.delete({ id: id }).$promise;
-  };
+  }
 
-  service.extensions = function(store) {
+  function extensions(store) {
     var deferred = $q.defer();
 
     Extension.query({ store: store }).$promise
@@ -39,9 +47,9 @@ angular.module('portainer.app')
     });
 
     return deferred.promise;
-  };
+  }
 
-  service.extension = function(id) {
+  function extension(id) {
     var deferred = $q.defer();
 
     Extension.get({ id: id }).$promise
@@ -54,9 +62,13 @@ angular.module('portainer.app')
     });
 
     return deferred.promise;
-  };
+  }
 
-  service.extensionEnabled = async function(extensionId) {
+  function extensionEnabled(extensionId) {
+    return $async(extensionsEnabledAsync, extensionId)
+  }
+
+  async function extensionsEnabledAsync(extensionId) {
     if (extensionId === service.EXTENSIONS.RBAC) {
       return StateManager.getExtension(extensionId) ? true : false;
     } else {
@@ -64,13 +76,17 @@ angular.module('portainer.app')
       const extension = _.find(extensions, (ext) => ext.Id === extensionId);
       return extension ? extension.Enabled : false;
     }
-  };
+  }
 
-  service.retrieveAndSaveEnabledExtensions = async function() {
+  function retrieveAndSaveEnabledExtensions() {
+    return $async(retrieveAndSaveEnabledExtensionsAsync)
+  }
+
+  async function retrieveAndSaveEnabledExtensionsAsync() {
     const extensions = await service.extensions(false);
     _.forEach(extensions, (ext) => delete ext.License);
     StateManager.saveExtensions(extensions);
-  };
+  }
 
   return service;
 }]);

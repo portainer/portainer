@@ -35,7 +35,8 @@ function ($scope, $state, Notifications, StackService, ModalService, EndpointPro
 
   $scope.offlineMode = false;
 
-  function initView() {
+  $scope.getStacks = getStacks;
+  function getStacks() {
     var endpointMode = $scope.applicationState.endpoint.mode;
     var endpointId = EndpointProvider.endpointID();
 
@@ -53,6 +54,10 @@ function ($scope, $state, Notifications, StackService, ModalService, EndpointPro
       $scope.stacks = [];
       Notifications.error('Failure', err, 'Unable to retrieve stacks');
     });
+  }
+
+  function initView() {
+    getStacks();
   }
 
   initView();

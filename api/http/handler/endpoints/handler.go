@@ -19,6 +19,9 @@ const (
 
 func hideFields(endpoint *portainer.Endpoint) {
 	endpoint.AzureCredentials = portainer.AzureCredentials{}
+	if len(endpoint.Snapshots) > 0 {
+		endpoint.Snapshots[0].SnapshotRaw = portainer.SnapshotRaw{}
+	}
 }
 
 // Handler is the HTTP handler used to handle endpoint operations.
@@ -32,6 +35,8 @@ type Handler struct {
 	ProxyManager                *proxy.Manager
 	Snapshotter                 portainer.Snapshotter
 	JobService                  portainer.JobService
+	ReverseTunnelService        portainer.ReverseTunnelService
+	SettingsService             portainer.SettingsService
 }
 
 // NewHandler creates a handler to manage endpoint operations.
@@ -62,5 +67,8 @@ func NewHandler(bouncer *security.RequestBouncer, authorizeEndpointManagement bo
 		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointJob))).Methods(http.MethodPost)
 	h.Handle("/endpoints/{id}/snapshot",
 		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointSnapshot))).Methods(http.MethodPost)
+	h.Handle("/endpoints/{id}/status",
+		bouncer.PublicAccess(httperror.LoggerHandler(h.endpointStatusInspect))).Methods(http.MethodGet)
+
 	return h
 }

@@ -68,8 +68,10 @@ func (handler *Handler) websocketExec(w http.ResponseWriter, r *http.Request) *h
 func (handler *Handler) handleExecRequest(w http.ResponseWriter, r *http.Request, params *webSocketRequestParams) error {
 	r.Header.Del("Origin")
 
-	if params.nodeName != "" || params.endpoint.Type == portainer.AgentOnDockerEnvironment {
-		return handler.proxyWebsocketRequest(w, r, params)
+	if params.endpoint.Type == portainer.AgentOnDockerEnvironment {
+		return handler.proxyAgentWebsocketRequest(w, r, params)
+	} else if params.endpoint.Type == portainer.EdgeAgentEnvironment {
+		return handler.proxyEdgeAgentWebsocketRequest(w, r, params)
 	}
 
 	websocketConn, err := handler.connectionUpgrader.Upgrade(w, r, nil)

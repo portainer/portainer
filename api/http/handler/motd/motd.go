@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/portainer/libcrypto"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/client"
 )
 
@@ -42,7 +42,7 @@ func (handler *Handler) motd(w http.ResponseWriter, r *http.Request) {
 
 	message := strings.Join(data.Message, "\n")
 
-	hash := crypto.HashFromBytes([]byte(message))
+	hash := libcrypto.HashFromBytes([]byte(message))
 	resp := motdResponse{
 		Title:         data.Title,
 		Message:       message,

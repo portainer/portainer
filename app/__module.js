@@ -4,7 +4,6 @@ import angular from 'angular';
 import './agent/_module';
 import './azure/_module';
 import './docker/__module';
-import './extensions/storidge/__module';
 import './portainer/__module';
 
 angular.module('portainer', [
@@ -31,7 +30,7 @@ angular.module('portainer', [
   'portainer.azure',
   'portainer.docker',
   'portainer.extensions',
-  'extension.storidge',
+  'portainer.integrations',
   'rzModule',
   'moment-picker'
 ]);

@@ -8,6 +8,7 @@ angular.module('portainer.docker').component('scheduleTasksDatatable', {
     tableKey: '@',
     orderBy: '@',
     reverseOrder: '<',
-    goToContainerLogs: '<'
+    goToContainerLogs: '<',
+    getEdgeTaskLogs: '<'
   }
 });

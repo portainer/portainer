@@ -5,6 +5,8 @@ import (
 	"path"
 	"time"
 
+	"github.com/portainer/portainer/api/bolt/tunnelserver"
+
 	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/dockerhub"
@@ -51,6 +53,7 @@ type Store struct {
 	TeamMembershipService  *teammembership.Service
 	TeamService            *team.Service
 	TemplateService        *template.Service
+	TunnelServerService    *tunnelserver.Service
 	UserService            *user.Service
 	VersionService         *version.Service
 	WebhookService         *webhook.Service
@@ -219,6 +222,12 @@ func (store *Store) initServices() error {
 		return err
 	}
 	store.TemplateService = templateService
+
+	tunnelServerService, err := tunnelserver.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.TunnelServerService = tunnelServerService
 
 	userService, err := user.NewService(store.db)
 	if err != nil {

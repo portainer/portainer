@@ -1,14 +1,17 @@
-import angular from "angular";
+import angular from 'angular';
 
 class EndpointAccessController {
   /* @ngInject */
-  constructor($state, $transition$, Notifications, EndpointService, GroupService) {
+  constructor($state, $transition$, Notifications, EndpointService, GroupService, $async) {
     this.$state = $state;
     this.$transition$ = $transition$;
     this.Notifications = Notifications;
     this.EndpointService = EndpointService;
     this.GroupService = GroupService;
+    this.$async = $async;
+
     this.updateAccess = this.updateAccess.bind(this);
+    this.updateAccessAsync = this.updateAccessAsync.bind(this);
   }
 
   async $onInit() {
@@ -23,7 +26,11 @@ class EndpointAccessController {
     }
   }
 
-  async updateAccess() {
+  updateAccess() {
+    return this.$async(this.updateAccessAsync);
+  }
+
+  async updateAccessAsync() {
     try {
       this.state.actionInProgress = true;
       await this.EndpointService.updateEndpoint(this.$transition$.params().id, this.endpoint);
