@@ -119,18 +119,12 @@ function($async, $q, $scope, $state, $stateParams, $sanitize, Authentication, Us
   }
 
   function generateState() {
-    if ($scope.state.OAuthProvider !== 'OAuth') {
-      return '';
-    }
     const uuid = uuidv4();
     LocalStorage.storeLoginStateUUID(uuid);
     return '&state=' + uuid;
   }
 
   function hasValidState(state) {
-    if ($scope.state.OAuthProvider !== 'OAuth') {
-      return true;
-    }
     const savedUUID = LocalStorage.getLoginStateUUID();
     return savedUUID === state;
   }
