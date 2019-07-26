@@ -119,6 +119,7 @@ function ($interval, PaginationService, DatatableService, PAGINATION_MAX_ITEMS) 
     this.setDefaults();
     this.prepareTableFromDataset();
 
+    this.state.orderBy = this.orderBy;
     var storedOrder = DatatableService.getDataTableOrder(this.tableKey);
     if (storedOrder !== null) {
       this.state.reverseOrder = storedOrder.reverse;
@@ -145,7 +146,6 @@ function ($interval, PaginationService, DatatableService, PAGINATION_MAX_ITEMS) 
       this.settings.open = false;
     }
     this.onSettingsRepeaterChange();
-    this.state.orderBy = this.orderBy;
   };
   
   /**
