@@ -1,6 +1,8 @@
+import uuidv4 from 'uuid/v4';
+
 angular.module('portainer.app')
-.controller('AuthenticationController', ['$async', '$q', '$scope', '$state', '$stateParams', '$sanitize', 'Authentication', 'UserService', 'EndpointService', 'ExtensionService', 'StateManager', 'Notifications', 'SettingsService', 'URLHelper',
-function($async, $q, $scope, $state, $stateParams, $sanitize, Authentication, UserService, EndpointService, ExtensionService, StateManager, Notifications, SettingsService, URLHelper) {
+.controller('AuthenticationController', ['$async', '$q', '$scope', '$state', '$stateParams', '$sanitize', 'Authentication', 'UserService', 'EndpointService', 'ExtensionService', 'StateManager', 'Notifications', 'SettingsService', 'URLHelper', 'LocalStorage',
+function($async, $q, $scope, $state, $stateParams, $sanitize, Authentication, UserService, EndpointService, ExtensionService, StateManager, Notifications, SettingsService, URLHelper, LocalStorage) {
   $scope.logo = StateManager.getState().application.logo;
 
   $scope.formValues = {
@@ -116,12 +118,29 @@ function($async, $q, $scope, $state, $stateParams, $sanitize, Authentication, Us
     return 'OAuth';
   }
 
+  function generateState() {
+    if ($scope.state.OAuthProvider !== 'OAuth') {
+      return '';
+    }
+    const uuid = uuidv4();
+    LocalStorage.storeLoginStateUUID(uuid);
+    return '&state=' + uuid;
+  }
+
+  function hasValidState(state) {
+    if ($scope.state.OAuthProvider !== 'OAuth') {
+      return true;
+    }
+    const savedUUID = LocalStorage.getLoginStateUUID();
+    return savedUUID === state;
+  }
+
   function initView() {
     SettingsService.publicSettings()
     .then(function success(settings) {
       $scope.AuthenticationMethod = settings.AuthenticationMethod;
-      $scope.OAuthLoginURI = settings.OAuthLoginURI;
       $scope.state.OAuthProvider = determineOauthProvider(settings.OAuthLoginURI);
+      $scope.OAuthLoginURI = settings.OAuthLoginURI + generateState();
     });
 
     if ($stateParams.logout || $stateParams.error) {
@@ -142,8 +161,9 @@ function($async, $q, $scope, $state, $stateParams, $sanitize, Authentication, Us
       authenticatedFlow();
     }
 
-    var code = URLHelper.getParameter('code');
-    if (code) {
+    const code = URLHelper.getParameter('code');
+    const state = URLHelper.getParameter('state');
+    if (code && hasValidState(state)) {
       oAuthLogin(code);
     } else {
       $scope.state.isInOAuthProcess = false;
