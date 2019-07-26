@@ -902,7 +902,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "1.21.0"
+	APIVersion = "1.22.0"
 	// DBVersion is the version number of the Portainer database
 	DBVersion = 19
 	// AssetsServerURL represents the URL of the Portainer asset server
@@ -910,7 +910,7 @@ const (
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
 	MessageOfTheDayURL = AssetsServerURL + "/motd.json"
 	// ExtensionDefinitionsURL represents the URL where Portainer extension definitions can be retrieved
-	ExtensionDefinitionsURL = AssetsServerURL + "/extensions-1.21.0.json"
+	ExtensionDefinitionsURL = AssetsServerURL + "/extensions-1.22.0.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response
 	PortainerAgentHeader = "Portainer-Agent"
 	// PortainerAgentEdgeIDHeader represent the name of the header containing the Edge ID associated to an agent/agent cluster
