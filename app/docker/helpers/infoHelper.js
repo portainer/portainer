@@ -13,7 +13,7 @@ angular.module('portainer.docker')
       agentProxy: false
     };
 
-    if (type === 2) {
+    if (type === 2 || type === 4) {
       mode.agentProxy = true;
     }
 

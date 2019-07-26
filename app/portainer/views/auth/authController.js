@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.controller('AuthenticationController', ['$q', '$scope', '$state', '$stateParams', '$sanitize', 'Authentication', 'UserService', 'EndpointService', 'ExtensionService', 'StateManager', 'Notifications', 'SettingsService', 'URLHelper',
-function($q, $scope, $state, $stateParams, $sanitize, Authentication, UserService, EndpointService, ExtensionService, StateManager, Notifications, SettingsService, URLHelper) {
+.controller('AuthenticationController', ['$async', '$q', '$scope', '$state', '$stateParams', '$sanitize', 'Authentication', 'UserService', 'EndpointService', 'ExtensionService', 'StateManager', 'Notifications', 'SettingsService', 'URLHelper',
+function($async, $q, $scope, $state, $stateParams, $sanitize, Authentication, UserService, EndpointService, ExtensionService, StateManager, Notifications, SettingsService, URLHelper) {
   $scope.logo = StateManager.getState().application.logo;
 
   $scope.formValues = {
@@ -14,17 +14,23 @@ function($q, $scope, $state, $stateParams, $sanitize, Authentication, UserServic
     OAuthProvider: ''
   };
 
-  async function retrieveAndSaveEnabledExtensions() {
+  function retrieveAndSaveEnabledExtensions() {
+    return $async(retrieveAndSaveEnabledExtensionsAsync);
+  }
+
+  async function retrieveAndSaveEnabledExtensionsAsync() {
     try {
       await ExtensionService.retrieveAndSaveEnabledExtensions();
     } catch (err) {
       Notifications.error('Failure', err, 'Unable to retrieve enabled extensions');
+      $scope.state.loginInProgress = false;
     }
   }
 
   $scope.authenticateUser = function() {
     var username = $scope.formValues.Username;
     var password = $scope.formValues.Password;
+    $scope.state.loginInProgress = true;
 
     Authentication.login(username, password)
     .then(function success() {
@@ -49,14 +55,15 @@ function($q, $scope, $state, $stateParams, $sanitize, Authentication, UserServic
       })
       .catch(function error() {
         $scope.state.AuthenticationError = 'Invalid credentials';
+        $scope.state.loginInProgress = false;
       });
     });
   };
 
   function unauthenticatedFlow() {
-    EndpointService.endpoints()
+    EndpointService.endpoints(0, 100)
     .then(function success(endpoints) {
-      if (endpoints.length === 0) {
+      if (endpoints.value.length === 0) {
         $state.go('portainer.init.endpoint');
       } else {
         $state.go('portainer.home');
@@ -80,9 +87,9 @@ function($q, $scope, $state, $stateParams, $sanitize, Authentication, UserServic
   }
 
   function checkForEndpoints() {
-    EndpointService.endpoints()
+    EndpointService.endpoints(0, 100)
     .then(function success(data) {
-      var endpoints = data;
+      var endpoints = data.value;
 
       if (endpoints.length === 0 && Authentication.isAdmin()) {
         $state.go('portainer.init.endpoint');
@@ -92,6 +99,7 @@ function($q, $scope, $state, $stateParams, $sanitize, Authentication, UserServic
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve endpoints');
+      $scope.state.loginInProgress = false;
     });
   }
 

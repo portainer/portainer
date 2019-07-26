@@ -22,6 +22,7 @@ type settingsUpdatePayload struct {
 	EnableHostManagementFeatures       *bool
 	SnapshotInterval                   *string
 	TemplatesURL                       *string
+	EdgeAgentCheckinInterval           *int
 }
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
@@ -101,6 +102,10 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update snapshot interval", err}
 		}
+	}
+
+	if payload.EdgeAgentCheckinInterval != nil {
+		settings.EdgeAgentCheckinInterval = *payload.EdgeAgentCheckinInterval
 	}
 
 	tlsError := handler.updateTLS(settings)

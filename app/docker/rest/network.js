@@ -1,4 +1,4 @@
-import { genericHandler } from './response/handlers';
+import {genericHandler} from './response/handlers';
 
 angular.module('portainer.docker')
 .factory('Network', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', 'NetworksInterceptor',
@@ -10,7 +10,7 @@ function NetworkFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, Net
   },
   {
     query: {
-      method: 'GET', isArray: true, interceptor: NetworksInterceptor, timeout: 10000
+      method: 'GET', isArray: true, interceptor: NetworksInterceptor, timeout: 15000
     },
     get: {
       method: 'GET'

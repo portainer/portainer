@@ -5,6 +5,44 @@
         <div class="toolBarTitle">
           <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }}
         </div>
+        <div class="settings">
+          <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
+            <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> Settings</span>
+            <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
+              <div class="tableMenu">
+                <div class="menuHeader">
+                  Table settings
+                </div>
+                <div class="menuContent">
+                  <div>
+                    <div class="md-checkbox">
+                      <input id="setting_auto_refresh" type="checkbox" ng-model="$ctrl.settings.repeater.autoRefresh" ng-change="$ctrl.onSettingsRepeaterChange()"/>
+                      <label for="setting_auto_refresh">Auto refresh</label>
+                    </div>
+                    <div ng-if="$ctrl.settings.repeater.autoRefresh">
+                      <label for="settings_refresh_rate">
+                        Refresh rate
+                      </label>
+                      <select id="settings_refresh_rate" ng-model="$ctrl.settings.repeater.refreshRate" ng-change="$ctrl.onSettingsRepeaterChange()" class="small-select">
+                        <option value="10">10s</option>
+                        <option value="30">30s</option>
+                        <option value="60">1min</option>
+                        <option value="120">2min</option>
+                        <option value="300">5min</option>
+                      </select>
+                      <span>
+                        <i id="refreshRateChange" class="fa fa-check green-icon" aria-hidden="true" style="margin-top: 7px; display: none;"></i>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.settings.open = false;">Close</a>
+                </div>
+              </div>
+            </div>
+          </span>
+        </div>
       </div>
       <div class="actionBar" ng-if="!$ctrl.offlineMode" authorization="DockerVolumeDelete, DockerVolumeCreate">
         <button type="button" class="btn btn-sm btn-danger" authorization="DockerVolumeDelete"
@@ -23,7 +61,7 @@
         <table class="table table-hover table-filters nowrap-cells">
           <thead>
             <tr>
-              <th uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.filters.usage.open">
+              <th uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.filters.state.open">
                 <span class="md-checkbox" ng-if="!$ctrl.offlineMode" authorization="DockerVolumeDelete, DockerVolumeCreate">
                   <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                   <label for="select_all"></label>
@@ -34,8 +72,8 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Id' && $ctrl.state.reverseOrder"></i>
                 </a>
                 <div>
-                  <span uib-dropdown-toggle class="table-filter" ng-if="!$ctrl.filters.usage.enabled">Filter <i class="fa fa-filter" aria-hidden="true"></i></span>
-                  <span uib-dropdown-toggle class="table-filter filter-active" ng-if="$ctrl.filters.usage.enabled">Filter <i class="fa fa-check" aria-hidden="true"></i></span>
+                  <span uib-dropdown-toggle class="table-filter" ng-if="!$ctrl.filters.state.enabled">Filter <i class="fa fa-filter" aria-hidden="true"></i></span>
+                  <span uib-dropdown-toggle class="table-filter filter-active" ng-if="$ctrl.filters.state.enabled">Filter <i class="fa fa-check" aria-hidden="true"></i></span>
                 </div>
                 <div class="dropdown-menu" uib-dropdown-menu>
                   <div class="tableMenu">
@@ -44,16 +82,16 @@
                     </div>
                     <div class="menuContent">
                       <div class="md-checkbox">
-                        <input id="filter_usage_usedImages" type="checkbox" ng-model="$ctrl.filters.usage.showUsedVolumes" ng-change="$ctrl.onUsageFilterChange()"/>
+                        <input id="filter_usage_usedImages" type="checkbox" ng-model="$ctrl.filters.state.showUsedVolumes" ng-change="$ctrl.onUsageFilterChange()"/>
                         <label for="filter_usage_usedImages">Used volumes</label>
                       </div>
                       <div class="md-checkbox">
-                        <input id="filter_usage_unusedImages" type="checkbox" ng-model="$ctrl.filters.usage.showUnusedVolumes" ng-change="$ctrl.onUsageFilterChange()"/>
+                        <input id="filter_usage_unusedImages" type="checkbox" ng-model="$ctrl.filters.state.showUnusedVolumes" ng-change="$ctrl.onUsageFilterChange()"/>
                         <label for="filter_usage_unusedImages">Unused volumes</label>
                       </div>
                     </div>
                     <div>
-                      <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.filters.usage.open = false;">Close</a>
+                      <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.filters.state.open = false;">Close</a>
                     </div>
                   </div>
                 </div>
@@ -106,7 +144,7 @@
             <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter: $ctrl.applyFilters | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))" ng-class="{active: item.Checked}">
               <td>
                 <span class="md-checkbox" ng-if="!$ctrl.offlineMode" authorization="DockerVolumeDelete, DockerVolumeCreate">
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-change="$ctrl.selectItem(item)"/>
+                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
                 <a ng-if="!$ctrl.offlineMode" ui-sref="docker.volumes.volume({ id: item.Id, nodeName: item.NodeName })" class="monospaced" title="{{ item.Id }}">{{ item.Id | truncate:40 }}</a>

@@ -50,13 +50,13 @@
             <!-- !always-pull -->
           </div>
           <div class="col-sm-12 form-section-title">
-            Ports configuration
+            Network ports configuration
           </div>
           <!-- publish-exposed-ports -->
           <div class="form-group">
             <div class="col-sm-12">
               <label class="control-label text-left">
-                Publish all exposed ports to random host ports
+                Publish all exposed network ports to random host ports
                 <portainer-tooltip position="bottom" message="When enabled, Portainer will let Docker automatically map a random port on the host to each one defined in the image Dockerfile."></portainer-tooltip>
               </label>
               <label class="switch" style="margin-left: 20px;">
@@ -68,9 +68,9 @@
           <!-- port-mapping -->
           <div class="form-group">
             <div class="col-sm-12">
-              <label class="control-label text-left">Manual port publishing</label>
+              <label class="control-label text-left">Manual network port publishing</label>
               <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addPortBinding()">
-                <i class="fa fa-plus-circle" aria-hidden="true"></i> publish a new port
+                <i class="fa fa-plus-circle" aria-hidden="true"></i> publish a new network port
               </span>
             </div>
             <!-- port-mapping-input-list -->

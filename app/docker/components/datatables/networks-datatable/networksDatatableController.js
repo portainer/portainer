@@ -1,20 +1,51 @@
 angular.module('portainer.docker')
-  .controller('NetworksDatatableController', ['$scope', '$controller', 'PREDEFINED_NETWORKS',
-    function ($scope, $controller, PREDEFINED_NETWORKS) {
+  .controller('NetworksDatatableController', ['$scope', '$controller', 'PREDEFINED_NETWORKS', 'DatatableService',
+    function ($scope, $controller, PREDEFINED_NETWORKS, DatatableService) {
+
       angular.extend(this, $controller('GenericDatatableController', {$scope: $scope}));
 
       this.disableRemove = function(item) {
         return PREDEFINED_NETWORKS.includes(item.Name);
       };
 
-      this.selectAll = function() {
-        for (var i = 0; i < this.state.filteredDataSet.length; i++) {
-          var item = this.state.filteredDataSet[i];
-          if (!this.disableRemove(item) && item.Checked !== this.state.selectAll) {
-            item.Checked = this.state.selectAll;
-            this.selectItem(item);
-          }
+      /**
+       * Do not allow PREDEFINED_NETWORKS to be selected
+       */
+      this.allowSelection = function(item) {
+        return !this.disableRemove(item);
+      }
+
+      this.$onInit = function() {
+        this.setDefaults();
+        this.prepareTableFromDataset();
+
+        var storedOrder = DatatableService.getDataTableOrder(this.tableKey);
+        if (storedOrder !== null) {
+          this.state.reverseOrder = storedOrder.reverse;
+          this.state.orderBy = storedOrder.orderBy;
         }
+
+        var textFilter = DatatableService.getDataTableTextFilters(this.tableKey);
+        if (textFilter !== null) {
+          this.state.textFilter = textFilter;
+          this.onTextFilterChange();
+        }
+
+        var storedFilters = DatatableService.getDataTableFilters(this.tableKey);
+        if (storedFilters !== null) {
+          this.filters = storedFilters;
+        }
+        if (this.filters && this.filters.state) {
+          this.filters.state.open = false;
+        }
+
+        var storedSettings = DatatableService.getDataTableSettings(this.tableKey);
+        if (storedSettings !== null) {
+          this.settings = storedSettings;
+          this.settings.open = false;
+        }
+        this.onSettingsRepeaterChange();
+        this.state.orderBy = this.orderBy;
       };
   }
 ]);

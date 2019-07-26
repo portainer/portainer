@@ -29,7 +29,7 @@ func (handler *Handler) proxyRequestsToAzureAPI(w http.ResponseWriter, r *http.R
 	}
 
 	var proxy http.Handler
-	proxy = handler.ProxyManager.GetProxy(string(endpointID))
+	proxy = handler.ProxyManager.GetProxy(endpoint)
 	if proxy == nil {
 		proxy, err = handler.ProxyManager.CreateAndRegisterProxy(endpoint)
 		if err != nil {

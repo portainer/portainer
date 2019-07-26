@@ -44,6 +44,7 @@ type Server struct {
 	AuthDisabled           bool
 	EndpointManagement     bool
 	Status                 *portainer.Status
+	ReverseTunnelService   portainer.ReverseTunnelService
 	ExtensionManager       portainer.ExtensionManager
 	ComposeStackManager    portainer.ComposeStackManager
 	CryptoService          portainer.CryptoService
@@ -88,6 +89,7 @@ func (server *Server) Start() error {
 		RegistryService:        server.RegistryService,
 		DockerHubService:       server.DockerHubService,
 		SignatureService:       server.SignatureService,
+		ReverseTunnelService:   server.ReverseTunnelService,
 	}
 	proxyManager := proxy.NewManager(proxyManagerParameters)
 
@@ -132,6 +134,8 @@ func (server *Server) Start() error {
 	endpointHandler.ProxyManager = proxyManager
 	endpointHandler.Snapshotter = server.Snapshotter
 	endpointHandler.JobService = server.JobService
+	endpointHandler.ReverseTunnelService = server.ReverseTunnelService
+	endpointHandler.SettingsService = server.SettingsService
 
 	var endpointGroupHandler = endpointgroups.NewHandler(requestBouncer)
 	endpointGroupHandler.EndpointGroupService = server.EndpointGroupService
@@ -140,6 +144,8 @@ func (server *Server) Start() error {
 	var endpointProxyHandler = endpointproxy.NewHandler(requestBouncer)
 	endpointProxyHandler.EndpointService = server.EndpointService
 	endpointProxyHandler.ProxyManager = proxyManager
+	endpointProxyHandler.SettingsService = server.SettingsService
+	endpointProxyHandler.ReverseTunnelService = server.ReverseTunnelService
 
 	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"))
 
@@ -168,6 +174,7 @@ func (server *Server) Start() error {
 	schedulesHandler.JobService = server.JobService
 	schedulesHandler.JobScheduler = server.JobScheduler
 	schedulesHandler.SettingsService = server.SettingsService
+	schedulesHandler.ReverseTunnelService = server.ReverseTunnelService
 
 	var settingsHandler = settings.NewHandler(requestBouncer)
 	settingsHandler.SettingsService = server.SettingsService
@@ -216,6 +223,7 @@ func (server *Server) Start() error {
 	var websocketHandler = websocket.NewHandler(requestBouncer)
 	websocketHandler.EndpointService = server.EndpointService
 	websocketHandler.SignatureService = server.SignatureService
+	websocketHandler.ReverseTunnelService = server.ReverseTunnelService
 
 	var webhookHandler = webhooks.NewHandler(requestBouncer)
 	webhookHandler.WebhookService = server.WebhookService

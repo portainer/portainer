@@ -33,6 +33,8 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 
 	flags := &portainer.CLIFlags{
 		Addr:              kingpin.Flag("bind", "Address and port to serve Portainer").Default(defaultBindAddress).Short('p').String(),
+		TunnelAddr:        kingpin.Flag("tunnel-addr", "Address to serve the tunnel server").Default(defaultTunnelServerAddress).String(),
+		TunnelPort:        kingpin.Flag("tunnel-port", "Port to serve the tunnel server").Default(defaultTunnelServerPort).String(),
 		Assets:            kingpin.Flag("assets", "Path to the assets").Default(defaultAssetsDirectory).Short('a').String(),
 		Data:              kingpin.Flag("data", "Path to the folder where the data is stored").Default(defaultDataDirectory).Short('d').String(),
 		EndpointURL:       kingpin.Flag("host", "Endpoint URL").Short('H').String(),

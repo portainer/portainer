@@ -4,7 +4,9 @@ function ($scope, ContainerService, Notifications, EndpointProvider) {
 
   $scope.offlineMode = false;
 
-  function initView() {
+  $scope.getContainers = getContainers;
+
+  function getContainers() {
     ContainerService.containers(1)
     .then(function success(data) {
       $scope.containers = data;
@@ -14,6 +16,10 @@ function ($scope, ContainerService, Notifications, EndpointProvider) {
       Notifications.error('Failure', err, 'Unable to retrieve containers');
       $scope.containers = [];
     });
+  }
+
+  function initView() {
+    getContainers();
   }
 
   initView();

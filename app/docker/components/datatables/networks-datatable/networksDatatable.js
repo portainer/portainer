@@ -11,6 +11,7 @@ angular.module('portainer.docker').component('networksDatatable', {
     showOwnershipColumn: '<',
     showHostColumn: '<',
     removeAction: '<',
-    offlineMode: '<'
+    offlineMode: '<',
+    refreshCallback: '<'
   }
 });

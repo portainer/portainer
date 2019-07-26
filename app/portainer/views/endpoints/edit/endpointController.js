@@ -1,8 +1,10 @@
-import { EndpointSecurityFormData } from '../../../components/endpointSecurity/porEndpointSecurityModel';
+import _ from 'lodash-es';
+import uuidv4 from 'uuid/v4';
+import {EndpointSecurityFormData} from '../../../components/endpointSecurity/porEndpointSecurityModel';
 
 angular.module('portainer.app')
-.controller('EndpointController', ['$q', '$scope', '$state', '$transition$', '$filter', 'EndpointService', 'GroupService', 'TagService', 'EndpointProvider', 'Notifications',
-function ($q, $scope, $state, $transition$, $filter, EndpointService, GroupService, TagService, EndpointProvider, Notifications) {
+.controller('EndpointController', ['$q', '$scope', '$state', '$transition$', '$filter', 'clipboard', 'EndpointService', 'GroupService', 'TagService', 'EndpointProvider', 'Notifications',
+function ($q, $scope, $state, $transition$, $filter, clipboard, EndpointService, GroupService, TagService, EndpointProvider, Notifications) {
 
   if (!$scope.applicationState.application.endpointManagement) {
     $state.go('portainer.endpoints');
@@ -10,11 +12,26 @@ function ($q, $scope, $state, $transition$, $filter, EndpointService, GroupServi
 
   $scope.state = {
     uploadInProgress: false,
-    actionInProgress: false
+    actionInProgress: false,
+    deploymentTab: 0
   };
 
   $scope.formValues = {
     SecurityFormData: new EndpointSecurityFormData()
+  };
+
+  $scope.copyEdgeAgentDeploymentCommand = function() {
+    if ($scope.state.deploymentTab === 0) {
+      clipboard.copyText('docker run -d -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker/volumes:/var/lib/docker/volumes -v /:/host --restart always -e EDGE=1 -e EDGE_ID=' + $scope.randomEdgeID +' -e CAP_HOST_MANAGEMENT=1 -p 8000:80 -v portainer_agent_data:/data --name portainer_edge_agent portainer/agent');
+    } else {
+      clipboard.copyText('docker network create --driver overlay portainer_agent_network; docker service create --name portainer_edge_agent --network portainer_agent_network -e AGENT_CLUSTER_ADDR=tasks.portainer_edge_agent -e EDGE=1 -e EDGE_ID=' + $scope.randomEdgeID +' -e CAP_HOST_MANAGEMENT=1 --mode global --publish mode=host,published=8000,target=80 --constraint \'node.platform.os == linux\' --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volume --mount type=bind,src=//,dst=/host --mount type=volume,src=portainer_agent_data,dst=/data portainer/agent');
+    }
+    $('#copyNotificationDeploymentCommand').show().fadeOut(2500);
+  };
+
+  $scope.copyEdgeAgentKey = function() {
+    clipboard.copyText($scope.endpoint.EdgeKey);
+    $('#copyNotificationEdgeKey').show().fadeOut(2500);
   };
 
   $scope.updateEndpoint = function() {
@@ -61,6 +78,20 @@ function ($q, $scope, $state, $transition$, $filter, EndpointService, GroupServi
     });
   };
 
+  function decodeEdgeKey(key) {
+    let keyInformation = {};
+
+    if (key === "") {
+      return keyInformation;
+    }
+
+    let decodedKey = _.split(atob(key), "|");
+    keyInformation.instanceURL = decodedKey[0];
+    keyInformation.tunnelServerAddr = decodedKey[1];
+
+    return keyInformation;
+  }
+
   function initView() {
     $q.all({
       endpoint: EndpointService.endpoint($transition$.params().id),
@@ -75,6 +106,10 @@ function ($q, $scope, $state, $transition$, $filter, EndpointService, GroupServi
         $scope.endpointType = 'remote';
       }
       endpoint.URL = $filter('stripprotocol')(endpoint.URL);
+      if (endpoint.Type === 4) {
+        $scope.edgeKeyDetails = decodeEdgeKey(endpoint.EdgeKey);
+        $scope.randomEdgeID = uuidv4();
+      }
       $scope.endpoint = endpoint;
       $scope.groups = data.groups;
       $scope.availableTags = data.tags;

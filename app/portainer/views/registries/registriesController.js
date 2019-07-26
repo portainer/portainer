@@ -1,3 +1,5 @@
+import _ from 'lodash-es';
+
 angular.module('portainer.app')
 .controller('RegistriesController', ['$q', '$scope', '$state', 'RegistryService', 'DockerHubService', 'ModalService', 'Notifications', 'ExtensionService', 'Authentication',
 function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, Notifications, ExtensionService, Authentication) {
@@ -9,6 +11,12 @@ function ($q, $scope, $state, RegistryService, DockerHubService, ModalService, N
   $scope.formValues = {
     dockerHubPassword: ''
   };
+
+  const nonBrowsableUrls = ['quay.io'];
+
+  $scope.canBrowse = function(item) {
+    return ! _.includes(nonBrowsableUrls, item.URL);
+  }
 
   $scope.updateDockerHub = function() {
     var dockerhub = $scope.dockerhub;

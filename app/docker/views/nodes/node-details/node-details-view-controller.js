@@ -62,7 +62,8 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
       return {
         releaseVersion: node.EngineVersion,
         volumePlugins: transformPlugins(node.Plugins, 'Volume'),
-        networkPlugins: transformPlugins(node.Plugins, 'Network')
+        networkPlugins: transformPlugins(node.Plugins, 'Network'),
+        engineLabels: node.EngineLabels,
       };
     }
 
@@ -73,7 +74,6 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
         managerAddress: node.ManagerAddr,
         availability: node.Availability,
         status: node.Status,
-        engineLabels: node.EngineLabels,
         nodeLabels: node.Labels
       };
     }
