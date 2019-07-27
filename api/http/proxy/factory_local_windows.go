@@ -3,6 +3,7 @@
 package proxy
 
 import (
+	"github.com/Microsoft/go-winio"
 	"net"
 	"net/http"
 
