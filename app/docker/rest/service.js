@@ -22,7 +22,7 @@ function ServiceFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, Htt
       ignoreLoadingBar: true
     },
     update: {
-      method: 'POST', params: { id: '@id', action: 'update', version: '@version' },
+      method: 'POST', params: { id: '@id', action: 'update', version: '@version', rollback: '@rollback' },
       headers: {
         // TODO: This is a temporary work-around that allows us to leverage digest pinning on
         // the Docker daemon side. It has been moved client-side since Docker API version > 1.29.

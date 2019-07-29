@@ -22,7 +22,8 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
 
   $scope.state = {
     updateInProgress: false,
-    deletionInProgress: false
+    deletionInProgress: false,
+    rollbackInProgress: false,
   };
 
   $scope.tasks = [];
@@ -281,7 +282,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     return hasChanges;
   };
 
-  $scope.updateService = function updateService(service) {
+  function buildChanges(service) {
     var config = ServiceHelper.serviceToConfig(service.Model);
     config.Name = service.Name;
     config.Labels = LabelHelper.fromKeyValueToLabelHash(service.ServiceLabels);
@@ -361,8 +362,34 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       Mode: (config.EndpointSpec && config.EndpointSpec.Mode) || 'vip',
       Ports: service.Ports
     };
+    return service, config;
+  }
 
-    Service.update({ id: service.Id, version: service.Version }, config, function (data) {
+  $scope.rollbackService = function(service) {
+    $scope.state.rollbackInProgress = true;
+    let config = {};
+    service, config = buildChanges(service);
+    ServiceService.update(service, config, 'previous')
+    .then(function (data) {
+      if (data.message && data.message.match(/^rpc error:/)) {
+        Notifications.error(data.message, 'Error');
+      } else {
+        Notifications.success('Service successfully rollbacked', 'Service rollbacked');
+        $scope.cancelChanges({});
+        initView();
+      }
+    }).catch(function (e) {
+      Notifications.error('Failure', e, 'Unable to rollback service');
+    }).finally(function () {
+      $scope.state.rollbackInProgress = false;
+    });
+  };
+
+  $scope.updateService = function updateService(service) {
+    let config = {};
+    service, config = buildChanges(service);
+    ServiceService.update(service, config)
+    .then(function (data) {
       if (data.message && data.message.match(/^rpc error:/)) {
         Notifications.error(data.message, 'Error');
       } else {
