@@ -51,11 +51,11 @@ func cloneRepository(repositoryURL, referenceName string, destination string) er
 	options := &git.CloneOptions{
 		URL: repositoryURL,
 	}
-	
+
 	if referenceName != "" {
 		options.ReferenceName = plumbing.ReferenceName(referenceName)
 	}
-	
+
 	_, err := git.PlainClone(destination, false, options)
 	return err
 }
