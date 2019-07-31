@@ -46,6 +46,8 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.registryDelete))).Methods(http.MethodDelete)
 	h.PathPrefix("/registries/{id}/v2").Handler(
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.proxyRequestsToRegistryAPI)))
+	h.PathPrefix("/registries/proxies/gitlab").Handler(
+		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.proxyRequestsToGitlabAPI)))
 
 	return h
 }

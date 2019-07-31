@@ -38,6 +38,16 @@
                   <p>Azure container registry</p>
                 </label>
               </div>
+              <div ng-click="selectGitlabRegistry()">
+                <input type="radio" id="registry_gitlab" ng-model="model.Type" ng-value="4">
+                <label for="registry_gitlab">
+                  <div class="boxselector_header">
+                    <i class="fab fa-gitlab" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Gitlab
+                  </div>
+                  <p>Gitlab container registry</p>
+                </label>
+              </div>
               <div ng-click="selectCustomRegistry()">
                 <input type="radio" id="registry_custom" ng-model="model.Type" ng-value="3">
                 <label for="registry_custom">
@@ -72,6 +82,13 @@
             action-in-progress="state.actionInProgress"
           ></registry-form-custom>
 
+          <registry-form-gitlab ng-if="model.Type === 4"
+            model="model"
+            retrieve-registries="retrieveGitlabRegistries"
+            create-registries="createGitlabRegistries"
+            projects="gitlabProjects"
+            action-in-progress="state.actionInProgress"
+          ></registry-form-gitlab>
         </form>
       </rd-widget-body>
     </rd-widget>
