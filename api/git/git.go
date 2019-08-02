@@ -14,11 +14,20 @@ import (
 )
 
 // Service represents a service for managing Git.
-type Service struct{}
+type Service struct {
+	httpsCli *http.Client
+}
 
 // NewService initializes a new service.
 func NewService(dataStorePath string) (*Service, error) {
-	service := &Service{}
+	service := &Service{
+		&http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			},
+			Timeout: 120 * time.Second,
+		},
+	}
 
 	return service, nil
 }
@@ -26,7 +35,7 @@ func NewService(dataStorePath string) (*Service, error) {
 // ClonePublicRepository clones a public git repository using the specified URL in the specified
 // destination folder.
 func (service *Service) ClonePublicRepository(repositoryURL, referenceName string, destination string) error {
-	return cloneRepository(repositoryURL, referenceName, destination)
+	return cloneRepository(repositoryURL, referenceName, destination, service.httpsCli)
 }
 
 // ClonePrivateRepositoryWithBasicAuth clones a private git repository using the specified URL in the specified
@@ -34,19 +43,11 @@ func (service *Service) ClonePublicRepository(repositoryURL, referenceName strin
 func (service *Service) ClonePrivateRepositoryWithBasicAuth(repositoryURL, referenceName string, destination, username, password string) error {
 	credentials := username + ":" + url.PathEscape(password)
 	repositoryURL = strings.Replace(repositoryURL, "://", "://"+credentials+"@", 1)
-	return cloneRepository(repositoryURL, referenceName, destination)
+	return cloneRepository(repositoryURL, referenceName, destination, service.httpsCli)
 }
 
-func cloneRepository(repositoryURL, referenceName string, destination string) error {
-	customClient := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		},
-
-		Timeout: 15 * time.Second,
-	}
-
-	client.InstallProtocol("https", githttp.NewClient(customClient))
+func cloneRepository(repositoryURL string, referenceName string, destination string, httpsCli *http.Client) error {
+	client.InstallProtocol("https", githttp.NewClient(httpsCli))
 
 	options := &git.CloneOptions{
 		URL: repositoryURL,
