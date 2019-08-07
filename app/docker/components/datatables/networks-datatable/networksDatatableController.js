@@ -58,7 +58,7 @@ angular.module('portainer.docker')
       };
 
       this.itemCanExpand = function(item) {
-        return item.Subs.length > 1;
+        return item.Subs.length > 0;
       }
 
       this.hasExpandableItems = function() {
