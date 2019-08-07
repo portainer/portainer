@@ -58,15 +58,17 @@ function ServiceServiceFactory($q, Service, ServiceHelper, TaskService, Resource
     return deferred.promise;
   };
 
-  service.update = function(service, config, rollback) {
-    const params = {
-      id: service.Id,
-      version: service.Version
-    };
-    if (rollback) {
-      params.rollback = rollback
-    }
-    return Service.update(params, config).$promise;
+  service.update = function(serv, config, rollback) {
+    return service.service(serv.Id).then((data) => {
+      const params = {
+        id: serv.Id,
+        version: data.Version
+      };
+      if (rollback) {
+        params.rollback = rollback
+      }
+      return Service.update(params, config).$promise;
+    });
   };
 
   service.logs = function(id, stdout, stderr, timestamps, since, tail) {

@@ -374,7 +374,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       if (data.message && data.message.match(/^rpc error:/)) {
         Notifications.error(data.message, 'Error');
       } else {
-        Notifications.success('Service successfully rolled back', 'Service rolled back');
+        Notifications.success('Success', 'Service successfully rolled back');
         $scope.cancelChanges({});
         initView();
       }
