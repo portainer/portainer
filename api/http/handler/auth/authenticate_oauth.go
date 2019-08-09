@@ -111,25 +111,9 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 
 	if user == nil {
 		user = &portainer.User{
-			Username: username,
-			Role:     portainer.StandardUserRole,
-			PortainerAuthorizations: map[portainer.Authorization]bool{
-				portainer.OperationPortainerDockerHubInspect:        true,
-				portainer.OperationPortainerEndpointGroupList:       true,
-				portainer.OperationPortainerEndpointList:            true,
-				portainer.OperationPortainerEndpointInspect:         true,
-				portainer.OperationPortainerEndpointExtensionAdd:    true,
-				portainer.OperationPortainerEndpointExtensionRemove: true,
-				portainer.OperationPortainerExtensionList:           true,
-				portainer.OperationPortainerMOTD:                    true,
-				portainer.OperationPortainerRegistryList:            true,
-				portainer.OperationPortainerRegistryInspect:         true,
-				portainer.OperationPortainerTeamList:                true,
-				portainer.OperationPortainerTemplateList:            true,
-				portainer.OperationPortainerTemplateInspect:         true,
-				portainer.OperationPortainerUserList:                true,
-				portainer.OperationPortainerUserMemberships:         true,
-			},
+			Username:                username,
+			Role:                    portainer.StandardUserRole,
+			PortainerAuthorizations: portainer.DefaultPortainerAuthorizations(),
 		}
 
 		err = handler.UserService.CreateUser(user)

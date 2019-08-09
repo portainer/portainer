@@ -76,12 +76,15 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		endpoint.Tags = payload.Tags
 	}
 
+	updateAuthorizations := false
 	if payload.UserAccessPolicies != nil {
 		endpoint.UserAccessPolicies = payload.UserAccessPolicies
+		updateAuthorizations = true
 	}
 
 	if payload.TeamAccessPolicies != nil {
 		endpoint.TeamAccessPolicies = payload.TeamAccessPolicies
+		updateAuthorizations = true
 	}
 
 	if payload.Status != nil {
@@ -171,6 +174,13 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 	err = handler.EndpointService.UpdateEndpoint(endpoint.ID, endpoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint changes inside the database", err}
+	}
+
+	if updateAuthorizations {
+		err = handler.AuthorizationService.UpdateUserAuthorizationsFromPolicies(&payload.UserAccessPolicies, &payload.TeamAccessPolicies)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
+		}
 	}
 
 	return response.JSON(w, endpoint)

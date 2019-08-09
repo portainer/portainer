@@ -16,6 +16,7 @@ const AzureAPIBaseURL = "https://management.azure.com"
 // proxyFactory is a factory to create reverse proxies to Docker endpoints
 type proxyFactory struct {
 	ResourceControlService portainer.ResourceControlService
+	UserService            portainer.UserService
 	TeamMembershipService  portainer.TeamMembershipService
 	SettingsService        portainer.SettingsService
 	RegistryService        portainer.RegistryService
@@ -70,6 +71,7 @@ func (factory *proxyFactory) createDockerReverseProxy(u *url.URL, endpoint *port
 	transport := &proxyTransport{
 		enableSignature:        enableSignature,
 		ResourceControlService: factory.ResourceControlService,
+		UserService:            factory.UserService,
 		TeamMembershipService:  factory.TeamMembershipService,
 		SettingsService:        factory.SettingsService,
 		RegistryService:        factory.RegistryService,

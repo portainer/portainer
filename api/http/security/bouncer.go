@@ -142,10 +142,15 @@ func (bouncer *RequestBouncer) checkEndpointOperationAuthorization(r *http.Reque
 		return err
 	}
 
+	user, err := bouncer.userService.User(tokenData.ID)
+	if err != nil {
+		return err
+	}
+
 	apiOperation := &portainer.APIOperationAuthorizationRequest{
 		Path:           r.URL.String(),
 		Method:         r.Method,
-		Authorizations: tokenData.EndpointAuthorizations[endpoint.ID],
+		Authorizations: user.EndpointAuthorizations[endpoint.ID],
 	}
 
 	bouncer.rbacExtensionClient.setLicenseKey(extension.License.LicenseKey)
@@ -208,10 +213,19 @@ func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler)
 			return
 		}
 
+		user, err := bouncer.userService.User(tokenData.ID)
+		if err != nil && err == portainer.ErrObjectNotFound {
+			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", portainer.ErrUnauthorized)
+			return
+		} else if err != nil {
+			httperror.WriteError(w, http.StatusInternalServerError, "Unable to retrieve user details from the database", err)
+			return
+		}
+
 		apiOperation := &portainer.APIOperationAuthorizationRequest{
 			Path:           r.URL.String(),
 			Method:         r.Method,
-			Authorizations: tokenData.PortainerAuthorizations,
+			Authorizations: user.PortainerAuthorizations,
 		}
 
 		bouncer.rbacExtensionClient.setLicenseKey(extension.License.LicenseKey)
@@ -281,7 +295,7 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 				httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", portainer.ErrUnauthorized)
 				return
 			} else if err != nil {
-				httperror.WriteError(w, http.StatusInternalServerError, "Unable to retrieve users from the database", err)
+				httperror.WriteError(w, http.StatusInternalServerError, "Unable to retrieve user details from the database", err)
 				return
 			}
 		} else {

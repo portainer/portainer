@@ -43,25 +43,9 @@ func (handler *Handler) adminInit(w http.ResponseWriter, r *http.Request) *httpe
 	}
 
 	user := &portainer.User{
-		Username: payload.Username,
-		Role:     portainer.AdministratorRole,
-		PortainerAuthorizations: map[portainer.Authorization]bool{
-			portainer.OperationPortainerDockerHubInspect:        true,
-			portainer.OperationPortainerEndpointGroupList:       true,
-			portainer.OperationPortainerEndpointList:            true,
-			portainer.OperationPortainerEndpointInspect:         true,
-			portainer.OperationPortainerEndpointExtensionAdd:    true,
-			portainer.OperationPortainerEndpointExtensionRemove: true,
-			portainer.OperationPortainerExtensionList:           true,
-			portainer.OperationPortainerMOTD:                    true,
-			portainer.OperationPortainerRegistryList:            true,
-			portainer.OperationPortainerRegistryInspect:         true,
-			portainer.OperationPortainerTeamList:                true,
-			portainer.OperationPortainerTemplateList:            true,
-			portainer.OperationPortainerTemplateInspect:         true,
-			portainer.OperationPortainerUserList:                true,
-			portainer.OperationPortainerUserMemberships:         true,
-		},
+		Username:                payload.Username,
+		Role:                    portainer.AdministratorRole,
+		PortainerAuthorizations: portainer.DefaultPortainerAuthorizations(),
 	}
 
 	user.Password, err = handler.CryptoService.Hash(payload.Password)

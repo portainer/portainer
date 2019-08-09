@@ -53,17 +53,27 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 		endpointGroup.Tags = payload.Tags
 	}
 
+	updateAuthorizations := false
 	if payload.UserAccessPolicies != nil {
 		endpointGroup.UserAccessPolicies = payload.UserAccessPolicies
+		updateAuthorizations = true
 	}
 
 	if payload.TeamAccessPolicies != nil {
 		endpointGroup.TeamAccessPolicies = payload.TeamAccessPolicies
+		updateAuthorizations = true
 	}
 
 	err = handler.EndpointGroupService.UpdateEndpointGroup(endpointGroup.ID, endpointGroup)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint group changes inside the database", err}
+	}
+
+	if updateAuthorizations {
+		err = handler.AuthorizationService.UpdateUserAuthorizationsFromPolicies(&payload.UserAccessPolicies, &payload.TeamAccessPolicies)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
+		}
 	}
 
 	return response.JSON(w, endpointGroup)
