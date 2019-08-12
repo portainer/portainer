@@ -365,7 +365,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     return service, config;
   }
 
-  $scope.rollbackService = function(service) {
+  function rollbackService(service) {
     $scope.state.rollbackInProgress = true;
     let config = {};
     service, config = buildChanges(service);
@@ -382,6 +382,23 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       Notifications.error('Failure', e, 'Unable to rollback service');
     }).finally(function () {
       $scope.state.rollbackInProgress = false;
+    });
+  }
+
+  $scope.rollbackService = function(service) {
+    ModalService.confirm({
+      title: 'Rollback service',
+      message: 'Are you sure you want to rollback?',
+      buttons: {
+        confirm: {
+          label: 'Yes',
+          className: 'btn-danger'
+        }
+      },
+      callback: function onConfirm(confirmed) {
+        if(!confirmed) { return; }
+        rollbackService(service);
+      }
     });
   };
 
