@@ -169,6 +169,7 @@ func (server *Server) Start() error {
 	extensionHandler.EndpointGroupService = server.EndpointGroupService
 	extensionHandler.EndpointService = server.EndpointService
 	extensionHandler.RegistryService = server.RegistryService
+	extensionHandler.AuthorizationService = authorizationService
 
 	var registryHandler = registries.NewHandler(requestBouncer)
 	registryHandler.RegistryService = server.RegistryService

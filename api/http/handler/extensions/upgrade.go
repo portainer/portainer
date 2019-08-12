@@ -1,6 +1,8 @@
 package extensions
 
-import portainer "github.com/portainer/portainer/api"
+import (
+	portainer "github.com/portainer/portainer/api"
+)
 
 func updateUserAccessPolicyToReadOnlyRole(policies portainer.UserAccessPolicies, key portainer.UserID) {
 	tmp := policies[key]
@@ -34,6 +36,10 @@ func (handler *Handler) upgradeRBACData() error {
 			return err
 		}
 
+		err = handler.AuthorizationService.UpdateUserAuthorizationsFromPolicies(&endpointGroup.UserAccessPolicies, &endpointGroup.TeamAccessPolicies)
+		if err != nil {
+			return err
+		}
 	}
 
 	endpoints, err := handler.EndpointService.Endpoints()
@@ -51,6 +57,11 @@ func (handler *Handler) upgradeRBACData() error {
 		}
 
 		err := handler.EndpointService.UpdateEndpoint(endpoint.ID, &endpoint)
+		if err != nil {
+			return err
+		}
+
+		err = handler.AuthorizationService.UpdateUserAuthorizationsFromPolicies(&endpoint.UserAccessPolicies, &endpoint.TeamAccessPolicies)
 		if err != nil {
 			return err
 		}

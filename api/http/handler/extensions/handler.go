@@ -17,6 +17,7 @@ type Handler struct {
 	EndpointGroupService portainer.EndpointGroupService
 	EndpointService      portainer.EndpointService
 	RegistryService      portainer.RegistryService
+	AuthorizationService *portainer.AuthorizationService
 }
 
 // NewHandler creates a handler to manage extension operations.
