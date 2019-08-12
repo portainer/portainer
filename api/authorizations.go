@@ -42,6 +42,7 @@ func DefaultPortainerAuthorizations() Authorizations {
 		OperationPortainerTemplateList:            true,
 		OperationPortainerTemplateInspect:         true,
 		OperationPortainerUserList:                true,
+		OperationPortainerUserInspect:             true,
 		OperationPortainerUserMemberships:         true,
 	}
 }
