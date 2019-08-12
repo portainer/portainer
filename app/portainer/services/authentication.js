@@ -1,7 +1,7 @@
 angular.module('portainer.app')
 .factory('Authentication', [
-'Auth', 'OAuth', 'jwtHelper', 'LocalStorage', 'StateManager', 'EndpointProvider',
-function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManager, EndpointProvider) {
+'Auth', 'OAuth', 'jwtHelper', 'LocalStorage', 'StateManager', 'EndpointProvider', 'UserService',
+function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManager, EndpointProvider, UserService) {
   'use strict';
 
   var service = {};
@@ -59,8 +59,11 @@ function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManage
     user.username = tokenPayload.username;
     user.ID = tokenPayload.id;
     user.role = tokenPayload.role;
-    user.endpointAuthorizations = tokenPayload.endpointAuthorizations;
-    user.portainerAuthorizations = tokenPayload.portainerAuthorizations;
+    return UserService.user(user.ID)
+    .then((data) => {
+      user.endpointAuthorizations = data.EndpointAuthorizations;
+      user.portainerAuthorizations = data.PortainerAuthorizations;
+    });
   }
 
   function isAdmin() {
