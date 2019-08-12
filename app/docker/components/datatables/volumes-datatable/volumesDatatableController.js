@@ -39,6 +39,7 @@ function ($scope, $controller, DatatableService) {
     this.setDefaults();
     this.prepareTableFromDataset();
 
+    this.state.orderBy = this.orderBy;
     var storedOrder = DatatableService.getDataTableOrder(this.tableKey);
     if (storedOrder !== null) {
       this.state.reverseOrder = storedOrder.reverse;
@@ -65,6 +66,5 @@ function ($scope, $controller, DatatableService) {
       this.settings.open = false;
     }
     this.onSettingsRepeaterChange();
-    this.state.orderBy = this.orderBy;
   };
 }]);
