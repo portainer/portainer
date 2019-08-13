@@ -15,7 +15,7 @@ angular.module('portainer.docker')
       registry = repository.substr(0, repository.indexOf('/'));
       // assume valid DNS name or IP (contains at least one '.')
       if (_.countBy(registry)['.'] > 0) {
-        image = repository.substr(repository.indexOf('/') + 1);
+        image = repository.substr(repository.lastIndexOf('/') + 1);
       } else {
         registry = null;
       }
