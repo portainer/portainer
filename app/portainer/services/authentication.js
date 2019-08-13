@@ -15,6 +15,7 @@ function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManage
   service.getUserDetails = getUserDetails;
   service.isAdmin = isAdmin;
   service.hasAuthorizations = hasAuthorizations;
+  service.retrievePermissions = retrievePermissions;
 
   function init() {
     var jwt = LocalStorage.getJWT();
@@ -53,17 +54,20 @@ function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManage
     return user;
   }
 
+  function retrievePermissions() {
+    return UserService.user(user.ID)
+    .then((data) => {
+      user.endpointAuthorizations = data.EndpointAuthorizations;
+      user.portainerAuthorizations = data.PortainerAuthorizations;
+    });
+  }
+
   function setUser(jwt) {
     LocalStorage.storeJWT(jwt);
     var tokenPayload = jwtHelper.decodeToken(jwt);
     user.username = tokenPayload.username;
     user.ID = tokenPayload.id;
     user.role = tokenPayload.role;
-    return UserService.user(user.ID)
-    .then((data) => {
-      user.endpointAuthorizations = data.EndpointAuthorizations;
-      user.portainerAuthorizations = data.PortainerAuthorizations;
-    });
   }
 
   function isAdmin() {
