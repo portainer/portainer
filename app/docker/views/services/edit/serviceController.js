@@ -379,7 +379,11 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
         initView();
       }
     }).catch(function (e) {
-      Notifications.error('Failure', e, 'Unable to rollback service');
+      if (e.data.message && e.data.message.includes('does not have a previous spec')) {
+        Notifications.error('Failure', { message: 'No previous config to rollback to.' });
+      } else {
+        Notifications.error('Failure', e, 'Unable to rollback service');
+      }
     }).finally(function () {
       $scope.state.rollbackInProgress = false;
     });
