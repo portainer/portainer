@@ -718,6 +718,17 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   font-size: 16px;
 }
 
+.visualizer_container .node .node_info .node_labels {
+  border-top: 1px solid #777;
+  padding-top: 10px;
+  margin-top: 10px;
+}
+
+.visualizer_container .node .node_info .node_label {
+  font-style: italic;
+  color: #787878;
+}
+
 .visualizer_container .node .tasks {
   display: flex;
   flex-direction: column;
