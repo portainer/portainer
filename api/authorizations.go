@@ -1,5 +1,7 @@
 package portainer
 
+// AuthorizationService represents a service used to
+// update authorizations associated to a user or team.
 type AuthorizationService struct {
 	endpointService       EndpointService
 	endpointGroupService  EndpointGroupService
@@ -8,6 +10,8 @@ type AuthorizationService struct {
 	userService           UserService
 }
 
+// AuthorizationServiceParameters are the required parameters
+// used to create a new AuthorizationService.
 type AuthorizationServiceParameters struct {
 	EndpointService       EndpointService
 	EndpointGroupService  EndpointGroupService
@@ -16,6 +20,7 @@ type AuthorizationServiceParameters struct {
 	UserService           UserService
 }
 
+// NewAuthorizationService returns a point to a new AuthorizationService instance.
 func NewAuthorizationService(parameters *AuthorizationServiceParameters) *AuthorizationService {
 	return &AuthorizationService{
 		endpointService:       parameters.EndpointService,
@@ -26,6 +31,7 @@ func NewAuthorizationService(parameters *AuthorizationServiceParameters) *Author
 	}
 }
 
+// DefaultPortainerAuthorizations returns the default Portainer authorizations used by non-admin users.
 func DefaultPortainerAuthorizations() Authorizations {
 	return map[Authorization]bool{
 		OperationPortainerDockerHubInspect:        true,
@@ -47,6 +53,7 @@ func DefaultPortainerAuthorizations() Authorizations {
 	}
 }
 
+// UpdateUserAuthorizationsFromPolicies will update users authorizations based on the specified access policies.
 func (service *AuthorizationService) UpdateUserAuthorizationsFromPolicies(userPolicies *UserAccessPolicies, teamPolicies *TeamAccessPolicies) error {
 
 	for userID, policy := range *userPolicies {
@@ -91,6 +98,7 @@ func (service *AuthorizationService) updateUserAuthorizationsInTeam(teamID TeamI
 	return nil
 }
 
+// UpdateUserAuthorizations will trigger an update of the authorizations for the specified user.
 func (service *AuthorizationService) UpdateUserAuthorizations(userID UserID) error {
 	user, err := service.userService.User(userID)
 	if err != nil {
