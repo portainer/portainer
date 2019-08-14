@@ -65,34 +65,6 @@
         </table>
       </rd-widget-body>
     </rd-widget>
-    <rd-widget ng-if="state.tagsRetag.running">
-      <rd-widget-body>
-        <span class="small text-muted">
-          <p>
-            <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-            Retag is in progress! Leaving this page will result in the loss of all tags!
-          </p>
-          <button class="btn btn-sm btn-danger" ng-click="cancelRetagAction()">Cancel</button>
-        </span>
-        <span>
-          &nbsp; Retag progress : {{ state.tagsRetag.progression }}% - {{ state.tagsRetag.elapsedTime / 1000 }}s
-        </span>
-      </rd-widget-body>
-    </rd-widget>
-    <rd-widget ng-if="state.tagsDelete.running">
-      <rd-widget-body>
-        <span class="small text-muted">
-          <p>
-            <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-            Tag delete is in progress! Leaving this page will result in the loss of all tags!
-          </p>
-          <button class="btn btn-sm btn-danger" ng-click="cancelDeleteAction()">Cancel</button>
-        </span>
-        <span>
-          &nbsp; Deletion progress : {{ state.tagsDelete.progression }}% - {{ state.tagsDelete.elapsedTime / 1000 }}s
-        </span>
-      </rd-widget-body>
-    </rd-widget>
   </div>
 
   <div class="col-sm-4" ng-if="short.Images.length > 0">

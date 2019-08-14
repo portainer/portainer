@@ -2,8 +2,8 @@ import _ from 'lodash-es';
 import { RepositoryTagViewModel, RepositoryShortTag } from '../../../models/repositoryTag';
 
 angular.module('portainer.app')
-  .controller('RegistryRepositoryController', ['$q', '$async', '$scope', '$transition$', '$state', 'RegistryV2Service', 'RegistryService', 'ModalService', 'Notifications',
-    function ($q, $async, $scope, $transition$, $state, RegistryV2Service, RegistryService, ModalService, Notifications) {
+  .controller('RegistryRepositoryController', ['$q', '$async', '$scope', '$uibModal', '$transition$', '$state', 'RegistryV2Service', 'RegistryService', 'ModalService', 'Notifications',
+    function ($q, $async, $scope, $uibModal, $transition$, $state, RegistryV2Service, RegistryService, ModalService, Notifications) {
 
       $scope.state = {
         actionInProgress: false,
@@ -44,6 +44,15 @@ angular.module('portainer.app')
 
       function toPercent(progress, total) {
         return (progress / total * 100).toFixed();
+      }
+
+      function openModal(resolve) {
+        return $uibModal.open({
+          component: 'progressionModal',
+          backdrop: 'static',
+          keyboard: false,
+          resolve: resolve
+        });
       }
 
       $scope.paginationAction = function (tags) {
@@ -149,16 +158,6 @@ angular.module('portainer.app')
       /**
        * RETAG SECTION
        */
-      $scope.cancelRetagAction = function() {
-        ModalService.cancelRegistryRepositoryAction(
-          (confirmed) => {
-            if (!confirmed) {
-              return;
-            }
-            reload();
-            $scope.state.tagsRetag.asyncGenerator.return();
-          });
-      };
 
       function createRetagAsyncGenerator(modifiedTags, modifiedDigests, impactedTags) {
         $scope.state.tagsRetag.asyncGenerator =
@@ -168,6 +167,12 @@ angular.module('portainer.app')
       async function retagActionAsync() {
         try {
           $scope.state.tagsRetag.running = true;
+          const modal = openModal({
+            message: () => 'Retag is in progress',
+            progressLabel: () => 'Retag progress',
+            context: () => $scope.state.tagsRetag
+          });
+
           const startTime = Date.now();
           const modifiedTags = _.filter($scope.tags, (item) => item.Modified === true);
           const modifiedDigests = _.uniq(_.map(modifiedTags, 'ImageDigest'));
@@ -183,13 +188,16 @@ angular.module('portainer.app')
               $scope.state.tagsRetag.elapsedTime = Date.now() - startTime;
             }
           }
-          $scope.state.tagsRetag.running = false;
-          Notifications.success('Success', 'Tags successfully renamed');
 
           _.map(modifiedTags, (item) => {
             const idx = _.findIndex($scope.short.Tags, (i) => i.Name === item.Name);
             $scope.short.Tags[idx].Name = item.NewName;
           });
+
+          $scope.state.tagsRetag.running = false;
+          Notifications.success('Success', 'Tags successfully renamed');
+          modal.close();
+
           await loadRepositoryDetails();
         } catch (err) {
           Notifications.error('Failure', err, 'Unable to rename tags');
@@ -206,20 +214,6 @@ angular.module('portainer.app')
       /**
        * REMOVE TAGS SECTION
        */
-      $scope.cancelDeleteAction = function() {
-        ModalService.cancelRegistryRepositoryAction(
-          (confirmed) => {
-            if (!confirmed) {
-              return;
-            }
-            reload();
-            $scope.state.tagsDelete.asyncGenerator.return();
-          });
-      };
-
-      function reload() {
-        $state.reload();
-      }
 
       function createDeleteAsyncGenerator(modifiedDigests, impactedTags) {
         $scope.state.tagsDelete.asyncGenerator =
@@ -229,6 +223,12 @@ angular.module('portainer.app')
       async function removeTagsAsync(selectedTags) {
         try {
           $scope.state.tagsDelete.running = true;
+          const modal = openModal({
+            message: () => 'Tag delete is in progress!',
+            progressLabel: () => 'Deletion progress',
+            context: () => $scope.state.tagsDelete
+          });
+
           const startTime = Date.now()
           const deletedTagNames = _.map(selectedTags, 'Name');
           const deletedShortTags = _.filter($scope.short.Tags, (item) => _.includes(deletedTagNames, item.Name));
@@ -246,13 +246,16 @@ angular.module('portainer.app')
               $scope.state.tagsDelete.elapsedTime = Date.now() - startTime;
             }
           }
-          $scope.state.tagsDelete.running = false;
-          Notifications.success('Success', 'Tags successfully deleted');
 
           _.map(deletedShortTags, (item) => {
             const idx = _.findIndex($scope.short.Tags, (i) => i.Name === item.Name);
             $scope.short.Tags.splice(idx, 1);
           });
+
+          $scope.state.tagsDelete.running = false;
+          Notifications.success('Success', 'Tags successfully deleted');
+          modal.close();
+
           await loadRepositoryDetails();
         } catch (err) {
           Notifications.error('Failure', err, 'Unable to delete tags');
