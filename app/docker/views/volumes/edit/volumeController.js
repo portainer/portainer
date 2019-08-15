@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-.controller('VolumeController', ['$scope', '$state', '$transition$', '$q', 'ModalService', 'VolumeService', 'ContainerService', 'Notifications', 'HttpRequestHelper', 'StoridgeVolumeService', 'StoridgeSnapshotService',
-function ($scope, $state, $transition$, $q, ModalService, VolumeService, ContainerService, Notifications, HttpRequestHelper, StoridgeVolumeService, StoridgeSnapshotService) {
+.controller('VolumeController', ['$scope', '$state', '$transition$', '$q', 'ModalService', 'VolumeService', 'ContainerService', 'Notifications', 'HttpRequestHelper', 'StoridgeVolumeService', 'StoridgeSnapshotService', 'StateManager', 'EndpointProvider', 'Authentication', 'ExtensionService',
+function ($scope, $state, $transition$, $q, ModalService, VolumeService, ContainerService, Notifications, HttpRequestHelper, StoridgeVolumeService, StoridgeSnapshotService, StateManager, EndpointProvider, Authentication, ExtensionService) {
 
   $scope.storidgeSnapshots = [];
   $scope.storidgeVolume = {};
@@ -57,7 +57,19 @@ function ($scope, $state, $transition$, $q, ModalService, VolumeService, Contain
   }
 
   function initView() {
-    HttpRequestHelper.setPortainerAgentTargetHeader($transition$.params().nodeName);
+    $scope.nodeName = $transition$.params().nodeName;
+    HttpRequestHelper.setPortainerAgentTargetHeader($scope.nodeName);
+
+    $scope.showBrowseAction = !EndpointProvider.offlineMode() && StateManager.getState().endpoint.mode.agentProxy;
+    ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.RBAC)
+    .then(function success(extensionEnabled) {
+      if (!extensionEnabled) {
+        var isAdmin = Authentication.isAdmin();
+        if (!$scope.applicationState.application.enableVolumeBrowserForNonAdminUsers && !isAdmin) {
+          $scope.showBrowseAction = false;
+        }
+      }
+    });
 
     VolumeService.volume($transition$.params().id)
     .then(function success(data) {
