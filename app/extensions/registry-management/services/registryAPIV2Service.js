@@ -2,8 +2,8 @@ import _ from 'lodash-es';
 import { RegistryRepositoryViewModel } from '../models/registryRepository';
 
 angular.module('portainer.extensions.registrymanagement')
-.factory('RegistryV2Service', ['$q', 'RegistryCatalog', 'RegistryTags', 'RegistryManifests', 'RegistryV2Helper',
-function RegistryV2ServiceFactory($q, RegistryCatalog, RegistryTags, RegistryManifests, RegistryV2Helper) {
+.factory('RegistryAPIV2Service', ['$q', 'RegistryCatalog', 'RegistryTags', 'RegistryManifests', 'RegistryV2Helper',
+function RegistryAPIV2ServiceFactory($q, RegistryCatalog, RegistryTags, RegistryManifests, RegistryV2Helper) {
   'use strict';
   var service = {};
 

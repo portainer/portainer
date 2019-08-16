@@ -2,8 +2,8 @@ import _ from 'lodash-es';
 import { RegistryGitlabProject } from 'Portainer/models/registry';
 
 angular.module('portainer.extensions.registrymanagement')
-.factory('GitlabService', ['$q', 'Gitlab',
-function GitlabServiceFactory($q, Gitlab) {
+.factory('RegistryGitlabService', ['$q', 'Gitlab',
+function RegistryGitlabServiceFactory($q, Gitlab) {
   'use strict';
   var service = {};
 

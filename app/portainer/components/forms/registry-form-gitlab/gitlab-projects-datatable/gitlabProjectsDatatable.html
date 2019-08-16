@@ -19,14 +19,26 @@
                   <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                   <label for="select_all"></label>
                 </span>
+                <a ng-click="$ctrl.changeOrderBy('Namespace')">
+                  Namespace
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Namespace' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Namespace' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
                 <a ng-click="$ctrl.changeOrderBy('Name')">
                   Name
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th>Path</th>
-              <th>Path with namespace</th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('PathWithNamespace')">
+                  Path with namespace
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'PathWithNamespace' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'PathWithNamespace' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
               <th>Description</th>
             </tr>
           </thead>
@@ -34,19 +46,19 @@
             <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))" ng-class="{active: item.Checked}">
               <td>
                 <span class="md-checkbox">
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)"/>
+                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="$ctrl.disableSelection(item)"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
+                {{ item.Namespace }}
+              </td>
+              <td>
                 {{ item.Name }}
               </td>
               <td>
-                {{item.Path}}
+                {{ item.PathWithNamespace }}
               </td>
               <td>
-                {{ item.PathWithNamespace}}
-              </td>
-              <td>
-                {{item.Description}}
+                {{ item.Description }}
               </td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0">

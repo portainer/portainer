@@ -1,6 +1,6 @@
 angular.module('portainer.app').component('gitlabProjectsDatatable', {
   templateUrl: './gitlabProjectsDatatable.html',
-  controller: 'GenericDatatableController',
+  controller: 'GitlabProjectsDatatableController',
   bindings: {
     titleText: '@',
     titleIcon: '@',

@@ -18,9 +18,9 @@
 
           <div class="form-group" style="margin-bottom: 0">
             <div class="boxselector_wrapper">
-              <div ng-click="selectQuayRegistry()">
+              <div>
                 <input type="radio" id="registry_quay" ng-model="model.Type" ng-value="1">
-                <label for="registry_quay">
+                <label for="registry_quay" ng-click="selectQuayRegistry()">
                   <div class="boxselector_header">
                     <i class="fa fa-database" aria-hidden="true" style="margin-right: 2px;"></i>
                     Quay.io
@@ -28,9 +28,9 @@
                   <p>Quay container registry</p>
                 </label>
               </div>
-              <div ng-click="selectAzureRegistry()">
+              <div>
                 <input type="radio" id="registry_azure" ng-model="model.Type" ng-value="2">
-                <label for="registry_azure">
+                <label for="registry_azure" ng-click="selectAzureRegistry()">
                   <div class="boxselector_header">
                     <i class="fab fa-microsoft" aria-hidden="true" style="margin-right: 2px;"></i>
                     Azure
@@ -38,9 +38,9 @@
                   <p>Azure container registry</p>
                 </label>
               </div>
-              <div ng-click="selectGitlabRegistry()">
+              <div>
                 <input type="radio" id="registry_gitlab" ng-model="model.Type" ng-value="4">
-                <label for="registry_gitlab">
+                <label for="registry_gitlab" ng-click="selectGitlabRegistry()">
                   <div class="boxselector_header">
                     <i class="fab fa-gitlab" aria-hidden="true" style="margin-right: 2px;"></i>
                     Gitlab
@@ -48,9 +48,9 @@
                   <p>Gitlab container registry</p>
                 </label>
               </div>
-              <div ng-click="selectCustomRegistry()">
+              <div>
                 <input type="radio" id="registry_custom" ng-model="model.Type" ng-value="3">
-                <label for="registry_custom">
+                <label for="registry_custom" ng-click="selectCustomRegistry()">
                   <div class="boxselector_header">
                     <i class="fa fa-database" aria-hidden="true" style="margin-right: 2px;"></i>
                     Custom registry
@@ -87,6 +87,7 @@
             retrieve-registries="retrieveGitlabRegistries"
             create-registries="createGitlabRegistries"
             projects="gitlabProjects"
+            state="state"
             action-in-progress="state.actionInProgress"
           ></registry-form-gitlab>
         </form>

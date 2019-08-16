@@ -1,8 +1,8 @@
 import _ from 'lodash-es';
 
 angular.module('portainer.app')
-  .controller('RegistryRepositoryController', ['$q', '$scope', '$transition$', '$state', 'RegistryV2Service', 'RegistryService', 'ModalService', 'Notifications',
-    function ($q, $scope, $transition$, $state, RegistryV2Service, RegistryService, ModalService, Notifications) {
+  .controller('RegistryRepositoryController', ['$q', '$scope', '$transition$', '$state', 'RegistryServiceSelector', 'RegistryService', 'ModalService', 'Notifications',
+    function ($q, $scope, $transition$, $state, RegistryServiceSelector, RegistryService, ModalService, Notifications) {
 
       $scope.state = {
         actionInProgress: false
@@ -28,7 +28,7 @@ angular.module('portainer.app')
         var manifest = $scope.tags.find(function (item) {
           return item.ImageId === $scope.formValues.SelectedImage;
         }).ManifestV2;
-        RegistryV2Service.addTag($scope.registryId, $scope.repository.Name, $scope.formValues.Tag, manifest)
+        RegistryServiceSelector.addTag($scope.registry, $scope.repository.Name, $scope.formValues.Tag, manifest)
           .then(function success() {
             Notifications.success('Success', 'Tag successfully added');
             $state.reload();
@@ -39,7 +39,7 @@ angular.module('portainer.app')
       };
 
       $scope.retagAction = function (tag) {
-        RegistryV2Service.deleteManifest($scope.registryId, $scope.repository.Name, tag.Digest)
+        RegistryServiceSelector.deleteManifest($scope.registry, $scope.repository.Name, tag.Digest)
           .then(function success() {
             var promises = [];
             var tagsToAdd = $scope.tags.filter(function (item) {
@@ -47,7 +47,7 @@ angular.module('portainer.app')
             });
             tagsToAdd.map(function (item) {
               var tagValue = item.Modified && item.Name !== item.NewName ? item.NewName : item.Name;
-              promises.push(RegistryV2Service.addTag($scope.registryId, $scope.repository.Name, tagValue, item.ManifestV2));
+              promises.push(RegistryServiceSelector.addTag($scope.registry, $scope.repository.Name, tagValue, item.ManifestV2));
             });
             return $q.all(promises);
           })
@@ -72,14 +72,14 @@ angular.module('portainer.app')
             var promises = [];
             var uniqItems = _.uniqBy(selectedItems, 'Digest');
             uniqItems.map(function (item) {
-              promises.push(RegistryV2Service.deleteManifest($scope.registryId, $scope.repository.Name, item.Digest));
+              promises.push(RegistryServiceSelector.deleteManifest($scope.registry, $scope.repository.Name, item.Digest));
             });
             $q.all(promises)
               .then(function success() {
                 var promises = [];
                 var tagsToReupload = _.differenceBy($scope.tags, selectedItems, 'Name');
                 tagsToReupload.map(function (item) {
-                  promises.push(RegistryV2Service.addTag($scope.registryId, $scope.repository.Name, item.Name, item.ManifestV2));
+                  promises.push(RegistryServiceSelector.addTag($scope.registry, $scope.repository.Name, item.Name, item.ManifestV2));
                 });
                 return $q.all(promises);
               })
@@ -111,7 +111,7 @@ angular.module('portainer.app')
             var promises = [];
             var uniqItems = _.uniqBy($scope.tags, 'Digest');
             uniqItems.map(function (item) {
-              promises.push(RegistryV2Service.deleteManifest($scope.registryId, $scope.repository.Name, item.Digest));
+              promises.push(RegistryServiceSelector.deleteManifest($scope.registry, $scope.repository.Name, item.Digest));
             });
             $q.all(promises)
               .then(function success() {
@@ -131,28 +131,27 @@ angular.module('portainer.app')
       function initView() {
         var registryId = $scope.registryId = $transition$.params().id;
         var repository = $scope.repository.Name = $transition$.params().repository;
-        $q.all({
-            registry: RegistryService.registry(registryId),
-            tags: RegistryV2Service.tags(registryId, repository)
-          })
-          .then(function success(data) {
-            $scope.registry = data.registry;
-            $scope.repository.Tags = [].concat(data.tags || []);
-            $scope.tags = [];
-            for (var i = 0; i < $scope.repository.Tags.length; i++) {
-              var tag = data.tags[i];
-              RegistryV2Service.tag(registryId, repository, tag)
-                .then(function success(data) {
-                  $scope.tags.push(data);
-                })
-                .catch(function error(err) {
-                  Notifications.error('Failure', err, 'Unable to retrieve tag information');
-                });
+
+        RegistryService.registry(registryId)
+        .then((registry) => {
+          $scope.registry = registry;
+          return RegistryServiceSelector.tags($scope.registry, repository);
+        }).then((tags) => {
+          $scope.repository.Tags = [].concat(tags || []);
+          $scope.tags = [];
+          for (var i = 0; i < $scope.repository.Tags.length; i++) {
+            var tag = tags[i];
+            RegistryServiceSelector.tag($scope.registry, repository, tag)
+              .then(function success(data) {
+                $scope.tags.push(data);
+              })
+              .catch(function error(err) {
+                Notifications.error('Failure', err, 'Unable to retrieve tag information');
+              });
             }
-          })
-          .catch(function error(err) {
-            Notifications.error('Failure', err, 'Unable to retrieve repository information');
-          });
+        }).catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to retrieve repository information');
+        });
       }
 
       initView();

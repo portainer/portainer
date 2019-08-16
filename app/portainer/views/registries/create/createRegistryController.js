@@ -1,8 +1,9 @@
+// import _ from 'lodash-es';
 import { RegistryDefaultModel } from '../../../models/registry';
 
 angular.module('portainer.app')
-.controller('CreateRegistryController', ['$scope', '$state', 'RegistryService', 'Notifications', 'GitlabService',
-function ($scope, $state, RegistryService, Notifications, GitlabService) {
+.controller('CreateRegistryController', ['$scope', '$state', 'RegistryService', 'Notifications', 'RegistryGitlabService',
+function ($scope, $state, RegistryService, Notifications, RegistryGitlabService) {
 
   $scope.selectQuayRegistry = selectQuayRegistry;
   $scope.selectAzureRegistry = selectAzureRegistry;
@@ -42,17 +43,20 @@ function ($scope, $state, RegistryService, Notifications, GitlabService) {
   }
 
   function retrieveGitlabRegistries() {
-    // proxy test login + retrieve user registries (https://docs.gitlab.com/ee/api/projects.html#list-user-projects)
-    // filter result with "container_registry_enabled": true
-    GitlabService.projects($scope.model.URL, $scope.model.token)
+    $scope.state.actionInProgress = true;
+    RegistryGitlabService.projects($scope.model.URL, $scope.model.token)
     .then((data) => {
+      // $scope.gitlabProjects = _.filter(data,'RegistryEnabled');
       $scope.gitlabProjects = data;
     }).catch((err) => {
       Notifications.error('Failure', err, 'Unable to retrieve projects');
+    }).finally(() => {
+      $scope.state.actionInProgress = false;
     });
   }
 
   function createGitlabRegistries() {
+    // const selectedItems = $scope.state.gitlab.selectedItems;
     // get selectedItems
     // build all new portainer registries -> build urls
   }
