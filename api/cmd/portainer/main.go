@@ -623,7 +623,8 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		adminPasswordHash, err = cryptoService.Hash(string(content))
+		clearPassword := strings.TrimSuffix(string(content), "\n")
+		adminPasswordHash, err = cryptoService.Hash(clearPassword)
 		if err != nil {
 			log.Fatal(err)
 		}
