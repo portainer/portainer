@@ -16,7 +16,11 @@ function ($transition$, $scope, RegistryService, RegistryV2Service, Notification
       for (var i = 0; i < data.length; i++) {
         var idx = _.findIndex($scope.repositories, {'Name': data[i].Name});
         if (idx !== -1) {
-          $scope.repositories[idx].TagsCount = data[i].TagsCount;
+          if (data[i].TagsCount === 0) {
+            $scope.repositories.splice(idx, 1);
+          } else {
+            $scope.repositories[idx].TagsCount = data[i].TagsCount;
+          }
         }
       }
       $scope.state.loading = false;
