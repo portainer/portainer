@@ -165,13 +165,13 @@ angular.module('portainer.app')
       }
 
       async function retagActionAsync() {
+        const modal = openModal({
+          message: () => 'Retag is in progress! Closing your browser or refreshing the page while this operation is in progress will result in loss of tags.',
+          progressLabel: () => 'Retag progress',
+          context: () => $scope.state.tagsRetag
+        });
         try {
           $scope.state.tagsRetag.running = true;
-          const modal = openModal({
-            message: () => 'Retag is in progress',
-            progressLabel: () => 'Retag progress',
-            context: () => $scope.state.tagsRetag
-          });
 
           const startTime = Date.now();
           const modifiedTags = _.filter($scope.tags, (item) => item.Modified === true);
@@ -196,11 +196,12 @@ angular.module('portainer.app')
 
           $scope.state.tagsRetag.running = false;
           Notifications.success('Success', 'Tags successfully renamed');
-          modal.close();
 
           await loadRepositoryDetails();
         } catch (err) {
           Notifications.error('Failure', err, 'Unable to rename tags');
+        } finally {
+          modal.close();
         }
       }
 
@@ -221,13 +222,13 @@ angular.module('portainer.app')
       }
 
       async function removeTagsAsync(selectedTags) {
+        const modal = openModal({
+          message: () => 'Tag delete is in progress! Closing your browser or refreshing the page while this operation is in progress will result in loss of tags.',
+          progressLabel: () => 'Deletion progress',
+          context: () => $scope.state.tagsDelete
+        });
         try {
           $scope.state.tagsDelete.running = true;
-          const modal = openModal({
-            message: () => 'Tag delete is in progress!',
-            progressLabel: () => 'Deletion progress',
-            context: () => $scope.state.tagsDelete
-          });
 
           const startTime = Date.now()
           const deletedTagNames = _.map(selectedTags, 'Name');
@@ -254,11 +255,12 @@ angular.module('portainer.app')
 
           $scope.state.tagsDelete.running = false;
           Notifications.success('Success', 'Tags successfully deleted');
-          modal.close();
 
           await loadRepositoryDetails();
         } catch (err) {
           Notifications.error('Failure', err, 'Unable to delete tags');
+        } finally {
+          modal.close();
         }
       }
 
