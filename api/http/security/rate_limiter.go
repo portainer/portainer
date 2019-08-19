@@ -1,10 +1,10 @@
 package security
 
 import (
+	"log"
 	"net/http"
 	"strings"
 	"time"
-	"fmt"
 
 	"github.com/g07cha/defender"
 	httperror "github.com/portainer/libhttp/error"
@@ -29,8 +29,7 @@ func NewRateLimiter(maxRequests int, duration time.Duration, banDuration time.Du
 // LimitAccess wraps current request with check if remote address does not goes above the defined limits
 func (limiter *RateLimiter) LimitAccess(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println(r.Host)
-		fmt.Println(r.RemoteAddr)
+		log.Printf("[DEBUG] [host: %s] [remote_addr: %s] [message: rate limiter address check]", r.Host, r.RemoteAddr)
 		ip := StripAddrPort(r.RemoteAddr)
 		if banned := limiter.Inc(ip); banned == true {
 			httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrResourceAccessDenied)
