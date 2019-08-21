@@ -7,7 +7,8 @@ function RegistryAPIV2ServiceFactory($q, RegistryCatalog, RegistryTags, Registry
   'use strict';
   var service = {};
 
-  service.ping = function(id, forceNewConfig) {
+  service.ping = function(registry, forceNewConfig) {
+    const id = registry.Id;
     if (forceNewConfig) {
       return RegistryCatalog.pingWithForceNew({ id: id }).$promise;
     }
@@ -34,8 +35,9 @@ function RegistryAPIV2ServiceFactory($q, RegistryCatalog, RegistryTags, Registry
     });
   }
 
-  service.repositories = function (id) {
-    var deferred = $q.defer();
+  service.repositories = function (registry) {
+    const deferred = $q.defer();
+    const id = registry.Id;
 
     getCatalog(id).then(function success(data) {
       var promises = [];
@@ -68,8 +70,9 @@ function RegistryAPIV2ServiceFactory($q, RegistryCatalog, RegistryTags, Registry
     return deferred.promise;
   };
 
-  service.tags = function (id, repository) {
-    var deferred = $q.defer();
+  service.tags = function (registry, repository) {
+    const deferred = $q.defer();
+    const id = registry.Id;
 
     RegistryTags.get({
       id: id,
@@ -87,8 +90,9 @@ function RegistryAPIV2ServiceFactory($q, RegistryCatalog, RegistryTags, Registry
     return deferred.promise;
   };
 
-  service.tag = function (id, repository, tag) {
-    var deferred = $q.defer();
+  service.tag = function (registry, repository, tag) {
+    const deferred = $q.defer();
+    const id = registry.Id;
 
     var promises = {
       v1: RegistryManifests.get({
@@ -116,7 +120,8 @@ function RegistryAPIV2ServiceFactory($q, RegistryCatalog, RegistryTags, Registry
     return deferred.promise;
   };
 
-  service.addTag = function (id, repository, tag, manifest) {
+  service.addTag = function (registry, repository, tag, manifest) {
+    const id = registry.Id;
     delete manifest.digest;
     return RegistryManifests.put({
       id: id,
@@ -125,7 +130,8 @@ function RegistryAPIV2ServiceFactory($q, RegistryCatalog, RegistryTags, Registry
     }, manifest).$promise;
   };
 
-  service.deleteManifest = function (id, repository, digest) {
+  service.deleteManifest = function (registry, repository, digest) {
+    const id = registry.Id;
     return RegistryManifests.delete({
       id: id,
       repository: repository,

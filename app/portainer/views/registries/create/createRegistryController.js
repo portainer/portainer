@@ -2,8 +2,8 @@
 import { RegistryDefaultModel } from '../../../models/registry';
 
 angular.module('portainer.app')
-.controller('CreateRegistryController', ['$scope', '$state', 'RegistryService', 'Notifications', 'RegistryGitlabService',
-function ($scope, $state, RegistryService, Notifications, RegistryGitlabService) {
+.controller('CreateRegistryController', ['$scope', '$state', 'RegistryService', 'Notifications', 'RegistryGitlabService', 'ExtensionService',
+function ($scope, $state, RegistryService, Notifications, RegistryGitlabService, ExtensionService) {
 
   $scope.selectQuayRegistry = selectQuayRegistry;
   $scope.selectAzureRegistry = selectAzureRegistry;
@@ -44,9 +44,8 @@ function ($scope, $state, RegistryService, Notifications, RegistryGitlabService)
 
   function retrieveGitlabRegistries() {
     $scope.state.actionInProgress = true;
-    RegistryGitlabService.projects($scope.model.URL, $scope.model.token)
+    RegistryGitlabService.projects($scope.model.URL, $scope.model.Token)
     .then((data) => {
-      // $scope.gitlabProjects = _.filter(data,'RegistryEnabled');
       $scope.gitlabProjects = data;
     }).catch((err) => {
       Notifications.error('Failure', err, 'Unable to retrieve projects');
@@ -56,9 +55,16 @@ function ($scope, $state, RegistryService, Notifications, RegistryGitlabService)
   }
 
   function createGitlabRegistries() {
-    // const selectedItems = $scope.state.gitlab.selectedItems;
-    // get selectedItems
-    // build all new portainer registries -> build urls
+    $scope.state.actionInProgress = true;
+    RegistryService.createGitlabRegistries($scope.model, $scope.state.gitlab.selectedItems)
+    .then(() => {
+      Notifications.success('Registries successfully created');
+      $state.go('portainer.registries');
+    }).catch((err) => {
+      Notifications.error('Failure', err, 'Unable to create registries');
+    }).finally(() => {
+      $scope.state.actionInProgress = false;
+    });
   }
 
   function createRegistry() {
@@ -80,6 +86,8 @@ function ($scope, $state, RegistryService, Notifications, RegistryGitlabService)
 
   function initView() {
     $scope.model = new RegistryDefaultModel();
+    ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.REGISTRY_MANAGEMENT)
+    .then((data) => $scope.registryExtensionEnabled = data);
   }
 
   initView();

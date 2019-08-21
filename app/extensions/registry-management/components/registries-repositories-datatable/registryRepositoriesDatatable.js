@@ -8,6 +8,7 @@ angular.module('portainer.extensions.registrymanagement').component('registryRep
     tableKey: '@',
     orderBy: '@',
     reverseOrder: '<',
-    removeAction: '<'
+    removeAction: '<',
+    isGitlab: '<'
   }
 });

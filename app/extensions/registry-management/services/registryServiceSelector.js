@@ -24,7 +24,7 @@ function RegistryServiceSelector($q, RegistryAPIV2Service, RegistryGitlabService
     if (registry.Type === RegistryTypes.GITLAB) {
       service = RegistryGitlabService;
     }
-    return service.ping(registry.Id, forceNewConfig)
+    return service.ping(registry, forceNewConfig)
   }
 
   function repositories(registry) {
@@ -32,7 +32,7 @@ function RegistryServiceSelector($q, RegistryAPIV2Service, RegistryGitlabService
     if (registry.Type === RegistryTypes.GITLAB) {
       service = RegistryGitlabService;
     }
-    return service.repositories(registry.Id);
+    return service.repositories(registry);
   }
 
   function tags(registry, repository) {
@@ -40,7 +40,7 @@ function RegistryServiceSelector($q, RegistryAPIV2Service, RegistryGitlabService
     if (registry.Type === RegistryTypes.GITLAB) {
       service = RegistryGitlabService;
     }
-    return service.tags(registry.Id, repository);
+    return service.tags(registry, repository);
   }
 
   function tag(registry, repository, tag) {
@@ -48,7 +48,7 @@ function RegistryServiceSelector($q, RegistryAPIV2Service, RegistryGitlabService
     if (registry.Type === RegistryTypes.GITLAB) {
       service = RegistryGitlabService;
     }
-    return service.tag(registry.Id, repository, tag);
+    return service.tag(registry, repository, tag);
   }
 
   function addTag(registry, repository, tag, manifest) {
@@ -56,7 +56,7 @@ function RegistryServiceSelector($q, RegistryAPIV2Service, RegistryGitlabService
     if (registry.Type === RegistryTypes.GITLAB) {
       service = RegistryGitlabService;
     }
-    return service.addTag(registry.Id, repository, tag, manifest);
+    return service.addTag(registry, repository, tag, manifest);
   }
 
   function deleteManifest(registry, repository, digest) {
@@ -64,7 +64,7 @@ function RegistryServiceSelector($q, RegistryAPIV2Service, RegistryGitlabService
     if (registry.Type === RegistryTypes.GITLAB) {
       service = RegistryGitlabService;
     }
-    return service.deleteManifest(registry.Id, repository, digest);
+    return service.deleteManifest(registry, repository, digest);
   }
 
   // function deleteTag(registry) {

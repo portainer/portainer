@@ -9,6 +9,7 @@ angular.module('portainer.extensions.registrymanagement').component('registriesR
     orderBy: '@',
     reverseOrder: '<',
     removeAction: '<',
-    retagAction: '<'
+    retagAction: '<',
+    isGitlab: '<'
   }
 });

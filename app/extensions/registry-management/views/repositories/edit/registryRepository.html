@@ -12,7 +12,7 @@
 </rd-header>
 
 <div class="row">
-  <div class="col-sm-8">
+  <div ng-class="registry.Type === 5 ? 'col-sm-12' : 'col-sm-8'">
     <rd-widget>
       <rd-widget-header icon="fa-info" title-text="Repository information">
       </rd-widget-header>
@@ -23,6 +23,8 @@
               <td>Repository</td>
               <td>
                 {{ repository.Name }}
+              </td>
+              <td>
                 <button class="btn btn-xs btn-danger" ng-click="removeRepository()">
                   <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this repository
                 </button>
@@ -31,10 +33,12 @@
             <tr>
               <td>Tags count</td>
               <td>{{ repository.Tags.length }}</td>
+              <td></td>
             </tr>
             <tr>
               <td>Images count</td>
               <td>{{ repository.Images.length }}</td>
+              <td></td>
             </tr>
           </tbody>
         </table>
@@ -42,7 +46,7 @@
     </rd-widget>
   </div>
 
-  <div class="col-sm-4">
+  <div class="col-sm-4" ng-if="registry.Type !== 5">
     <rd-widget>
       <rd-widget-header icon="fa-plus" title-text="Add tag">
       </rd-widget-header>
@@ -83,6 +87,6 @@
 <div class="row">
   <div class="col-sm-12">
     <registries-repository-tags-datatable title-text="Tags" title-icon="fa-tags" dataset="tags" table-key="registryRepositoryTags"
-      order-by="Name" remove-action="removeTags" retag-action="retagAction"></registries-repository-tags-datatable>
+      order-by="Name" remove-action="removeTags" retag-action="retagAction" is-gitlab="registry.Type === 5"></registries-repository-tags-datatable>
   </div>
 </div>
