@@ -45,6 +45,11 @@ function GitlabFactory($resource, API_ENDPOINT_REGISTRIES) {
         transformResponse: gitlabResponseGetLink
       },
       // deleteRepository: DELETE /projects/:id/registry/repositories/:repository_id
+      deleteRepository: {
+        method: 'DELETE',
+        url: baseUrl + '/:projectId/registry/repositories/:repositoryId',
+        headers: headers
+      },
       // tags: GET /projects/:id/registry/repositories/:repository_id/tags
       tags: {
         method: 'GET',
@@ -58,8 +63,13 @@ function GitlabFactory($resource, API_ENDPOINT_REGISTRIES) {
         url: baseUrl + '/:projectId/registry/repositories/:repositoryId/tags/:tagName',
         headers: headers,
         transformResponse: gitlabResponseGetLink
-      }
+      },
       // removeTag: DELETE /projects/:id/registry/repositories/:repository_id/tags/:tag_name
+      deleteTag: {
+        method: 'DELETE',
+        url: baseUrl + '/:projectId/registry/repositories/:repositoryId/tags/:tagName',
+        headers: headers
+      }
     });
   };
 }]);

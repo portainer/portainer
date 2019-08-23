@@ -14,17 +14,13 @@ function RegistryGitlabServiceFactory($async, Gitlab) {
    */
 
   async function _getProjectsPage(env, params, projects) {
-    try {
-      const response = await Gitlab(env).projects(params).$promise;
-      projects = _.concat(projects, response.data);
-      if (response.next) {
-        params.page = response.next;
-        projects = await _getProjectsPage(env, params, projects);
-      }
-      return projects;
-    } catch (err) {
-      Promise.reject(err);
+    const response = await Gitlab(env).projects(params).$promise;
+    projects = _.concat(projects, response.data);
+    if (response.next) {
+      params.page = response.next;
+      projects = await _getProjectsPage(env, params, projects);
     }
+    return projects;
   }
 
   async function projectsAsync(url, token) {
@@ -32,7 +28,7 @@ function RegistryGitlabServiceFactory($async, Gitlab) {
       const data = await _getProjectsPage({url: url, token: token}, {page: 1}, []);
       return _.map(data, (project) => new RegistryGitlabProject(project));
     } catch (error) {
-      Promise.reject({msg: 'Unable to retrieve projects', err: error});
+      throw {msg: 'Unable to retrieve projects', err: error};
     }
   }
 
@@ -45,17 +41,13 @@ function RegistryGitlabServiceFactory($async, Gitlab) {
    */
 
   async function _getRepositoriesPage(params, repositories) {
-    try {
-      const response = await Gitlab().repositories(params).$promise;
-      repositories = _.concat(repositories, response.data);
-      if (response.next) {
-        params.page = response.next;
-        repositories = await _getRepositoriesPage(params, repositories);
-      }
-      return repositories;
-    } catch (err) {
-      Promise.reject(err);
+    const response = await Gitlab().repositories(params).$promise;
+    repositories = _.concat(repositories, response.data);
+    if (response.next) {
+      params.page = response.next;
+      repositories = await _getRepositoriesPage(params, repositories);
     }
+    return repositories;
   }
 
   async function repositoriesAsync(registry) {
@@ -72,7 +64,7 @@ function RegistryGitlabServiceFactory($async, Gitlab) {
       const data = await _getRepositoriesPage(params, []);
       return _.map(data, (r) => new RegistryRepositoryGitlabViewModel(r));
     } catch (error) {
-      Promise.reject({msg: 'Unable to retrieve repositories', err: error});
+      throw {msg: 'Unable to retrieve repositories', err: error};
     }
   }
 
@@ -95,7 +87,7 @@ function RegistryGitlabServiceFactory($async, Gitlab) {
       const res = await Gitlab().tags(params).$promise;
       return _.map(res.data, 'name');
     } catch (error) {
-      Promise.reject({msg: 'Unable to retrieve tags', err: error});
+      throw {msg: 'Unable to retrieve tags', err: error};
     }
   }
 
@@ -115,8 +107,27 @@ function RegistryGitlabServiceFactory($async, Gitlab) {
       const data = res.data;
       return new RepositoryTagViewModel(data.name, data.revision, null, null, data.total_size, data.digest, null, null, null, null);
     } catch (error) {
-      Promise.reject({msg: 'Unable to retrieve ' + tag, err: error});
+      throw {msg: 'Unable to retrieve ' + tag, err: error};
     }
+  }
+
+  async function deleteTagAsync(registry, repository, tag) {
+    const params = {
+      id: registry.Id,
+      projectId: registry.Username,
+      repositoryId: repository,
+      tagName: tag
+    };
+    return await Gitlab().deleteTag(params).$promise;
+  }
+
+  async function deleteRepositoryAsync(registry, repository) {
+    const params = {
+      id: registry.Id,
+      projectId: registry.Username,
+      repositoryId: repository
+    };
+    return await Gitlab().deleteRepository(params).$promise;
   }
 
   /**
@@ -148,12 +159,12 @@ function RegistryGitlabServiceFactory($async, Gitlab) {
     return $async(tagAsync, registry, repository, tag);
   }
 
-  function addTag() {
-
+  function deleteTag(registry, repository, tag) {
+    return $async(deleteTagAsync, registry, repository, tag);
   }
 
-  function deleteTag() {
-
+  function deleteRepository(registry, repository) {
+    return $async(deleteRepositoryAsync, registry, repository);
   }
 
   service.projects = projects;
@@ -161,8 +172,8 @@ function RegistryGitlabServiceFactory($async, Gitlab) {
   service.repositories = repositories;
   service.tags = tags;
   service.tag = tag;
-  service.addTag = addTag;
   service.deleteTag = deleteTag;
+  service.deleteRepository = deleteRepository;
   return service;
 }
 ]);

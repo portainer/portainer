@@ -1,8 +1,9 @@
 import _ from 'lodash-es';
+import { RegistryTypes } from 'Extensions/registry-management/models/registryTypes';
 
 angular.module('portainer.app')
-  .controller('RegistryRepositoryController', ['$q', '$scope', '$transition$', '$state', 'RegistryServiceSelector', 'RegistryService', 'ModalService', 'Notifications',
-    function ($q, $scope, $transition$, $state, RegistryServiceSelector, RegistryService, ModalService, Notifications) {
+  .controller('RegistryRepositoryController', ['$q', '$scope', '$transition$', '$state', '$async', 'RegistryServiceSelector', 'RegistryService', 'ModalService', 'Notifications',
+    function ($q, $scope, $transition$, $state, $async, RegistryServiceSelector, RegistryService, ModalService, Notifications) {
 
       $scope.state = {
         actionInProgress: false
@@ -12,7 +13,7 @@ angular.module('portainer.app')
       };
       $scope.tags = [];
       $scope.repository = {
-        Name: [],
+        Name: '',
         Tags: [],
         Images: []
       };
@@ -62,6 +63,52 @@ angular.module('portainer.app')
           });
       };
 
+      async function removeTagsGitlabAsync(selectedItems) {
+        try {
+          _.forEach(selectedItems, async (item) => await RegistryServiceSelector.deleteTag($scope.registry, $scope.repository.Name, item.Name));
+          Notifications.success('Success', 'Tags successfully deleted');
+          if ($scope.repository.Tags.length === selectedItems.length) {
+            $state.go('portainer.registries.registry.repositories', {id: $scope.registryId}, {reload: true});
+          } else {
+            $state.reload();
+          }
+        } catch (error) {
+          Notifications.error('Failure', error, 'Unable to delete tags');
+        }
+      }
+
+      function removeTags(selectedItems) {
+        var promises = [];
+        var uniqItems = _.uniqBy(selectedItems, 'Digest');
+        uniqItems.map(function (item) {
+          promises.push(RegistryServiceSelector.deleteManifest($scope.registry, $scope.repository.Name, item.Digest));
+        });
+        $q.all(promises)
+          .then(function success() {
+            var promises = [];
+            var tagsToReupload = _.differenceBy($scope.tags, selectedItems, 'Name');
+            tagsToReupload.map(function (item) {
+              promises.push(RegistryServiceSelector.addTag($scope.registry, $scope.repository.Name, item.Name, item.ManifestV2));
+            });
+            return $q.all(promises);
+          })
+          .then(function success(data) {
+            Notifications.success('Success', 'Tags successfully deleted');
+            if (data.length === 0) {
+              $state.go('portainer.registries.registry.repositories', {
+                id: $scope.registryId
+              }, {
+                reload: true
+              });
+            } else {
+              $state.reload();
+            }
+          })
+          .catch(function error(err) {
+            Notifications.error('Failure', err, 'Unable to delete tags');
+          });
+      }
+
       $scope.removeTags = function (selectedItems) {
         ModalService.confirmDeletion(
           'Are you sure you want to remove the selected tags ?',
@@ -69,37 +116,41 @@ angular.module('portainer.app')
             if (!confirmed) {
               return;
             }
-            var promises = [];
-            var uniqItems = _.uniqBy(selectedItems, 'Digest');
-            uniqItems.map(function (item) {
-              promises.push(RegistryServiceSelector.deleteManifest($scope.registry, $scope.repository.Name, item.Digest));
-            });
-            $q.all(promises)
-              .then(function success() {
-                var promises = [];
-                var tagsToReupload = _.differenceBy($scope.tags, selectedItems, 'Name');
-                tagsToReupload.map(function (item) {
-                  promises.push(RegistryServiceSelector.addTag($scope.registry, $scope.repository.Name, item.Name, item.ManifestV2));
-                });
-                return $q.all(promises);
-              })
-              .then(function success(data) {
-                Notifications.success('Success', 'Tags successfully deleted');
-                if (data.length === 0) {
-                  $state.go('portainer.registries.registry.repositories', {
-                    id: $scope.registryId
-                  }, {
-                    reload: true
-                  });
-                } else {
-                  $state.reload();
-                }
-              })
-              .catch(function error(err) {
-                Notifications.error('Failure', err, 'Unable to delete tags');
-              });
+            if ($scope.isGitlab) {
+              return $async(removeTagsGitlabAsync, selectedItems);
+            }
+            return removeTags(selectedItems);
           });
       };
+
+      async function removeRepositoryGitlabAsync() {
+        try {
+          await RegistryServiceSelector.deleteRepository($scope.registry, $scope.repository.Name)
+          Notifications.success('Success', 'Repository sucessfully removed');
+          $state.go('portainer.registries.registry.repositories', {id: $scope.registryId}, {reload: true});
+        } catch (error) {
+          Notifications.error('Failure', error, 'Unable to delete repository');
+        }
+      }
+
+      function removeRepository() {
+        var promises = [];
+        var uniqItems = _.uniqBy($scope.tags, 'Digest');
+        uniqItems.map(function (item) {
+          promises.push(RegistryServiceSelector.deleteManifest($scope.registry, $scope.repository.Name, item.Digest));
+        });
+        $q.all(promises)
+          .then(function success() {
+            Notifications.success('Success', 'Repository sucessfully removed');
+            $state.go('portainer.registries.registry.repositories', {
+              id: $scope.registryId
+            }, {
+              reload: true
+            });
+          }).catch(function error(err) {
+            Notifications.error('Failure', err, 'Unable to delete repository');
+          });
+      }
 
       $scope.removeRepository = function () {
         ModalService.confirmDeletion(
@@ -108,22 +159,10 @@ angular.module('portainer.app')
             if (!confirmed) {
               return;
             }
-            var promises = [];
-            var uniqItems = _.uniqBy($scope.tags, 'Digest');
-            uniqItems.map(function (item) {
-              promises.push(RegistryServiceSelector.deleteManifest($scope.registry, $scope.repository.Name, item.Digest));
-            });
-            $q.all(promises)
-              .then(function success() {
-                Notifications.success('Success', 'Repository sucessfully removed');
-                $state.go('portainer.registries.registry.repositories', {
-                  id: $scope.registryId
-                }, {
-                  reload: true
-                });
-              }).catch(function error(err) {
-                Notifications.error('Failure', err, 'Unable to delete repository');
-              });
+            if ($scope.isGitlab) {
+              return $async(removeRepositoryGitlabAsync);
+            }
+            return removeRepository();
           }
         );
       };
@@ -135,6 +174,7 @@ angular.module('portainer.app')
         RegistryService.registry(registryId)
         .then((registry) => {
           $scope.registry = registry;
+          $scope.isGitlab = registry.Type === RegistryTypes.GITLAB;
           return RegistryServiceSelector.tags($scope.registry, repository);
         }).then((tags) => {
           $scope.repository.Tags = [].concat(tags || []);

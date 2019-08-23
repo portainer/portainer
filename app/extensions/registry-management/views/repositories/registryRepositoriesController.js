@@ -1,3 +1,5 @@
+import { RegistryTypes } from 'Extensions/registry-management/models/registryTypes';
+
 angular.module('portainer.extensions.registrymanagement')
 .controller('RegistryRepositoriesController', ['$transition$', '$scope',  'RegistryService', 'RegistryServiceSelector', 'Notifications', 'Authentication',
 function ($transition$, $scope, RegistryService, RegistryServiceSelector, Notifications, Authentication) {
@@ -17,7 +19,7 @@ function ($transition$, $scope, RegistryService, RegistryServiceSelector, Notifi
     RegistryService.registry(registryId)
     .then(function success(data) {
       $scope.registry = data;
-
+      $scope.isGitlab = data.Type === RegistryTypes.GITLAB;
       RegistryServiceSelector.ping($scope.registry, false)
       .then(function success() {
         return RegistryServiceSelector.repositories($scope.registry);

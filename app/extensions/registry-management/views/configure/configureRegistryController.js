@@ -1,4 +1,5 @@
 import { RegistryManagementConfigurationDefaultModel } from '../../../../portainer/models/registry';
+import { RegistryTypes } from 'Extensions/registry-management/models/registryTypes';
 
 angular.module('portainer.extensions.registrymanagement')
 .controller('ConfigureRegistryController', ['$scope', '$state', '$transition$', 'RegistryService', 'RegistryServiceSelector', 'Notifications',
@@ -50,6 +51,7 @@ function ($scope, $state, $transition$, RegistryService, RegistryServiceSelector
 
   function initView() {
     var registryId = $transition$.params().id;
+    $scope.RegistryTypes = RegistryTypes;
 
     RegistryService.registry(registryId)
     .then(function success(data) {
