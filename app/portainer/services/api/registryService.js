@@ -71,7 +71,7 @@ angular.module('portainer.app')
     _.forEach(projects, (p) => {
       const m = model;
       m.Name = p.PathWithNamespace;
-      m.Username = p.Id.toString();
+      m.Gitlab.ProjectId = p.Id;
       m.Password = m.Token;
       const payload = new RegistryCreateRequest(m);
       promises.push(Registries.create(payload).$promise);

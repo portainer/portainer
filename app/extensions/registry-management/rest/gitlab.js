@@ -16,18 +16,6 @@ function GitlabFactory($resource, API_ENDPOINT_REGISTRIES) {
 
     return $resource(baseUrl, {id:'@id'},
     {
-      ping: {
-        method: 'HEAD',
-        params: { owned: 'true', simple: 'true' },
-        headers: headers
-      },
-      pingWithForceNew: {
-        method: 'HEAD',
-        params: { owned: 'true', simple: 'true' },
-        headers: Object.assign(headers, {
-          'X-RegistryManagement-ForceNew': '1'
-        })
-      },
       projects: {
         method: 'GET',
         params: { membership: 'true', domain: domain },
@@ -36,39 +24,12 @@ function GitlabFactory($resource, API_ENDPOINT_REGISTRIES) {
           'X-RegistryManagement-ForceNew': '1'
         })
       },
-      // repositories : GET /projects/:id/registry/repositories
       repositories :{
         method: 'GET',
         url: baseUrl + '/:projectId/registry/repositories',
         params: { tags: true },
         headers: headers,
         transformResponse: gitlabResponseGetLink
-      },
-      // deleteRepository: DELETE /projects/:id/registry/repositories/:repository_id
-      deleteRepository: {
-        method: 'DELETE',
-        url: baseUrl + '/:projectId/registry/repositories/:repositoryId',
-        headers: headers
-      },
-      // tags: GET /projects/:id/registry/repositories/:repository_id/tags
-      tags: {
-        method: 'GET',
-        url: baseUrl + '/:projectId/registry/repositories/:repositoryId/tags',
-        headers: headers,
-        transformResponse: gitlabResponseGetLink
-      },
-      // tag: GET /projects/:id/registry/repositories/:repository_id/tags/:tag_name
-      tag: {
-        method: 'GET',
-        url: baseUrl + '/:projectId/registry/repositories/:repositoryId/tags/:tagName',
-        headers: headers,
-        transformResponse: gitlabResponseGetLink
-      },
-      // removeTag: DELETE /projects/:id/registry/repositories/:repository_id/tags/:tag_name
-      deleteTag: {
-        method: 'DELETE',
-        url: baseUrl + '/:projectId/registry/repositories/:repositoryId/tags/:tagName',
-        headers: headers
       }
     });
   };

@@ -1,5 +1,4 @@
 import _ from 'lodash-es';
-import { RegistryTypes } from 'Extensions/registry-management/models/registryTypes';
 
 angular.module('portainer.app')
   .controller('RegistryRepositoryController', ['$q', '$scope', '$transition$', '$state', '$async', 'RegistryServiceSelector', 'RegistryService', 'ModalService', 'Notifications',
@@ -63,20 +62,6 @@ angular.module('portainer.app')
           });
       };
 
-      async function removeTagsGitlabAsync(selectedItems) {
-        try {
-          _.forEach(selectedItems, async (item) => await RegistryServiceSelector.deleteTag($scope.registry, $scope.repository.Name, item.Name));
-          Notifications.success('Success', 'Tags successfully deleted');
-          if ($scope.repository.Tags.length === selectedItems.length) {
-            $state.go('portainer.registries.registry.repositories', {id: $scope.registryId}, {reload: true});
-          } else {
-            $state.reload();
-          }
-        } catch (error) {
-          Notifications.error('Failure', error, 'Unable to delete tags');
-        }
-      }
-
       function removeTags(selectedItems) {
         var promises = [];
         var uniqItems = _.uniqBy(selectedItems, 'Digest');
@@ -116,22 +101,9 @@ angular.module('portainer.app')
             if (!confirmed) {
               return;
             }
-            if ($scope.isGitlab) {
-              return $async(removeTagsGitlabAsync, selectedItems);
-            }
             return removeTags(selectedItems);
           });
       };
-
-      async function removeRepositoryGitlabAsync() {
-        try {
-          await RegistryServiceSelector.deleteRepository($scope.registry, $scope.repository.Name)
-          Notifications.success('Success', 'Repository sucessfully removed');
-          $state.go('portainer.registries.registry.repositories', {id: $scope.registryId}, {reload: true});
-        } catch (error) {
-          Notifications.error('Failure', error, 'Unable to delete repository');
-        }
-      }
 
       function removeRepository() {
         var promises = [];
@@ -159,9 +131,6 @@ angular.module('portainer.app')
             if (!confirmed) {
               return;
             }
-            if ($scope.isGitlab) {
-              return $async(removeRepositoryGitlabAsync);
-            }
             return removeRepository();
           }
         );
@@ -174,7 +143,6 @@ angular.module('portainer.app')
         RegistryService.registry(registryId)
         .then((registry) => {
           $scope.registry = registry;
-          $scope.isGitlab = registry.Type === RegistryTypes.GITLAB;
           return RegistryServiceSelector.tags($scope.registry, repository);
         }).then((tags) => {
           $scope.repository.Tags = [].concat(tags || []);

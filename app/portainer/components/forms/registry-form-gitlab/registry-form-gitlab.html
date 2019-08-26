@@ -4,12 +4,30 @@
   </div>
   <!-- url-input -->
   <div class="form-group">
-    <label for="registry_url" class="col-sm-3 col-lg-2 control-label text-left">
-      Registry URL
-      <portainer-tooltip position="bottom" message="URL of a Gitlab instance."></portainer-tooltip>
+    <label for="instance_url" class="col-sm-3 col-lg-2 control-label text-left">
+      Instance URL
+      <portainer-tooltip position="bottom" message="URL of Gitlab instance."></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="registry_url" name="registry_url" ng-model="$ctrl.model.URL" placeholder="https://my.gitlab.com" required>
+      <input type="text" class="form-control" id="instance_url" name="instance_url" ng-model="$ctrl.model.Gitlab.InstanceURL" placeholder="https://gitlab.com" required>
+    </div>
+  </div>
+  <div class="form-group" ng-show="registryFormGitlab.instance_url.$invalid">
+    <div class="col-sm-12 small text-warning">
+      <div ng-messages="registryFormGitlab.instance_url.$error">
+        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+      </div>
+    </div>
+  </div>
+  <!-- !url-input -->
+  <!-- url-input -->
+  <div class="form-group">
+    <label for="registry_url" class="col-sm-3 col-lg-2 control-label text-left">
+      Registry URL
+      <portainer-tooltip position="bottom" message="URL of Gitlab registry instance."></portainer-tooltip>
+    </label>
+    <div class="col-sm-9 col-lg-10">
+      <input type="text" class="form-control" id="registry_url" name="registry_url" ng-model="$ctrl.model.URL" placeholder="https://registry.gitlab.com" required>
     </div>
   </div>
   <div class="form-group" ng-show="registryFormGitlab.registry_url.$invalid">
@@ -20,12 +38,27 @@
     </div>
   </div>
   <!-- !url-input -->
+  <!-- credentials-user -->
+  <div class="form-group">
+    <label for="registry_username" class="col-sm-3 col-lg-2 control-label text-left">Username</label>
+    <div class="col-sm-9 col-lg-10">
+      <input type="text" class="form-control" id="registry_username" name="registry_username" ng-model="$ctrl.model.Username" required>
+    </div>
+  </div>
+  <div class="form-group" ng-show="registryFormGitlab.registry_username.$invalid">
+    <div class="col-sm-12 small text-warning">
+      <div ng-messages="registryFormGitlab.registry_username.$error">
+        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+      </div>
+    </div>
+  </div>
+  <!-- !credentials-user -->
   <!-- credentials-pat -->
   <div class="form-group">
     <label for="registry_perso_acc_token" class="col-sm-3 col-lg-2 control-label text-left">Personal Access Token
     </label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="registry_perso_acc_token" name="registry_perso_acc_token" ng-model="$ctrl.model.Token" required>
+      <input type="password" class="form-control" id="registry_perso_acc_token" name="registry_perso_acc_token" ng-model="$ctrl.model.Token" required>
     </div>
   </div>
   <div class="form-group">

@@ -1,3 +1,4 @@
+import _ from 'lodash-es';
 import { RegistryTypes } from 'Extensions/registry-management/models/registryTypes';
 
 export function RegistryViewModel(data) {
@@ -13,6 +14,7 @@ export function RegistryViewModel(data) {
   this.UserAccessPolicies = data.UserAccessPolicies;
   this.TeamAccessPolicies = data.TeamAccessPolicies;
   this.Checked = false;
+  this.Gitlab = data.Gitlab;
 }
 
 export function RegistryManagementConfigurationDefaultModel(registry) {
@@ -48,10 +50,16 @@ export function RegistryDefaultModel() {
 export function RegistryCreateRequest(model) {
   this.Name = model.Name;
   this.Type = model.Type;
-  this.URL = model.URL;
+  this.URL = _.replace(model.URL, /^https?\:\/\//i, '');
   this.Authentication = model.Authentication;
   if (model.Authentication) {
     this.Username = model.Username;
     this.Password = model.Password;
+  }
+  if (model.Type === RegistryTypes.GITLAB) {
+    this.Gitlab = {
+      ProjectId: model.Gitlab.ProjectId,
+      InstanceURL: model.Gitlab.InstanceURL
+    }
   }
 }

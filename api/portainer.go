@@ -191,6 +191,12 @@ type (
 	// RegistryType represents a type of registry
 	RegistryType int
 
+	// GitlabRegistryData represents data required for gitlab registry to work
+	GitlabRegistryData struct {
+		ProjectID   int    `json:"ProjectId"`
+		InstanceURL string `json:"InstanceURL"`
+	}
+
 	// Registry represents a Docker registry with all the info required
 	// to connect to it
 	Registry struct {
@@ -202,6 +208,7 @@ type (
 		Username                string                           `json:"Username"`
 		Password                string                           `json:"Password,omitempty"`
 		ManagementConfiguration *RegistryManagementConfiguration `json:"ManagementConfiguration"`
+		Gitlab                  GitlabRegistryData               `json:"Gitlab"`
 		UserAccessPolicies      UserAccessPolicies               `json:"UserAccessPolicies"`
 		TeamAccessPolicies      TeamAccessPolicies               `json:"TeamAccessPolicies"`
 

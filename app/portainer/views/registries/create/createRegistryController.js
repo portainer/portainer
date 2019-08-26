@@ -26,8 +26,11 @@ function ($scope, $state, RegistryService, Notifications, RegistryGitlabService,
 
   function selectGitlabRegistry() {
     $scope.model.Name = '';
-    $scope.model.URL = '';
+    $scope.model.URL = 'https://registry.gitlab.com';
     $scope.model.Authentication = true;
+    $scope.model.Gitlab = {
+      InstanceURL: 'https://gitlab.com'
+    };
   }
 
   function selectAzureRegistry() {
@@ -44,7 +47,7 @@ function ($scope, $state, RegistryService, Notifications, RegistryGitlabService,
 
   function retrieveGitlabRegistries() {
     $scope.state.actionInProgress = true;
-    RegistryGitlabService.projects($scope.model.URL, $scope.model.Token)
+    RegistryGitlabService.projects($scope.model.Gitlab.InstanceURL, $scope.model.Token)
     .then((data) => {
       $scope.gitlabProjects = data;
     }).catch((err) => {
@@ -68,8 +71,6 @@ function ($scope, $state, RegistryService, Notifications, RegistryGitlabService,
   }
 
   function createRegistry() {
-    $scope.model.URL = $scope.model.URL.replace(/^https?\:\/\//i, '');
-
     $scope.state.actionInProgress = true;
     RegistryService.createRegistry($scope.model)
     .then(function success() {

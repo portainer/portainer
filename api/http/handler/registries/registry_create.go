@@ -17,6 +17,7 @@ type registryCreatePayload struct {
 	Authentication bool
 	Username       string
 	Password       string
+	Gitlab         portainer.GitlabRegistryData
 }
 
 func (payload *registryCreatePayload) Validate(r *http.Request) error {
@@ -61,6 +62,7 @@ func (handler *Handler) registryCreate(w http.ResponseWriter, r *http.Request) *
 		Password:           payload.Password,
 		UserAccessPolicies: portainer.UserAccessPolicies{},
 		TeamAccessPolicies: portainer.TeamAccessPolicies{},
+		Gitlab:             payload.Gitlab,
 	}
 
 	err = handler.RegistryService.CreateRegistry(registry)

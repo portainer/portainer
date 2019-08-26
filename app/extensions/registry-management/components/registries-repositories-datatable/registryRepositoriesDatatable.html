@@ -42,9 +42,7 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ng-if="!$ctrl.isGitlab" ui-sref="portainer.registries.registry.repository({repository: item.Name})"
-                  title="{{ item.Name }}">{{ item.Name }}</a>
-                <a ng-if="$ctrl.isGitlab" ui-sref="portainer.registries.registry.repository({repository: item.Id})"
+                <a ui-sref="portainer.registries.registry.repository({repository: item.Name})"
                   title="{{ item.Name }}">{{ item.Name }}</a>
               </td>
               <td>{{ item.TagsCount }}</td>

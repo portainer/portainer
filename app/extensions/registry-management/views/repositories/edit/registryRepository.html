@@ -12,7 +12,7 @@
 </rd-header>
 
 <div class="row">
-  <div ng-class="isGitlab ? 'col-sm-12' : 'col-sm-8'">
+  <div class="col-sm-8">
     <rd-widget>
       <rd-widget-header icon="fa-info" title-text="Repository information">
       </rd-widget-header>
@@ -46,7 +46,7 @@
     </rd-widget>
   </div>
 
-  <div class="col-sm-4" ng-if="registry.Type !== 5">
+  <div class="col-sm-4">
     <rd-widget>
       <rd-widget-header icon="fa-plus" title-text="Add tag">
       </rd-widget-header>
@@ -87,6 +87,6 @@
 <div class="row">
   <div class="col-sm-12">
     <registries-repository-tags-datatable title-text="Tags" title-icon="fa-tags" dataset="tags" table-key="registryRepositoryTags"
-      order-by="Name" remove-action="removeTags" retag-action="retagAction" is-gitlab="isGitlab"></registries-repository-tags-datatable>
+      order-by="Name" remove-action="removeTags" retag-action="retagAction"></registries-repository-tags-datatable>
   </div>
 </div>

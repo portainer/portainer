@@ -1,7 +1,6 @@
 import _ from 'lodash-es';
 import { RegistryGitlabProject } from '../models/gitlabRegistry';
 import { RegistryRepositoryGitlabViewModel } from '../models/registryRepository';
-import { RepositoryTagViewModel } from '../models/repositoryTag';
 
 angular.module('portainer.extensions.registrymanagement')
 .factory('RegistryGitlabService', ['$async', 'Gitlab',
@@ -52,13 +51,9 @@ function RegistryGitlabServiceFactory($async, Gitlab) {
 
   async function repositoriesAsync(registry) {
     try {
-      // const env = {
-      //   url: registry.URL,
-      //   token: registry.Password
-      // };
       const params = {
         id: registry.Id,
-        projectId: registry.Username,
+        projectId: registry.Gitlab.ProjectId,
         page: 1
       };
       const data = await _getRepositoriesPage(params, []);
@@ -72,64 +67,6 @@ function RegistryGitlabServiceFactory($async, Gitlab) {
    * END REPOSITORIES
    */
 
-  async function tagsAsync(registry, repository) {
-    try {
-      // const env = {
-      //   url: registry.URL,
-      //   token : registry.Password
-      // };
-      const params = {
-        id: registry.Id,
-        projectId: registry.Username,
-        repositoryId: repository
-      }
-
-      const res = await Gitlab().tags(params).$promise;
-      return _.map(res.data, 'name');
-    } catch (error) {
-      throw {msg: 'Unable to retrieve tags', err: error};
-    }
-  }
-
-  async function tagAsync(registry, repository, tag) {
-    try {
-      // const env = {
-      //   url: registry.URL,
-      //   token : registry.Password
-      // }
-      const params = {
-        id: registry.Id,
-        projectId: registry.Username,
-        repositoryId: repository,
-        tagName: tag
-      };
-      const res = await Gitlab().tag(params).$promise;
-      const data = res.data;
-      return new RepositoryTagViewModel(data.name, data.revision, null, null, data.total_size, data.digest, null, null, null, null);
-    } catch (error) {
-      throw {msg: 'Unable to retrieve ' + tag, err: error};
-    }
-  }
-
-  async function deleteTagAsync(registry, repository, tag) {
-    const params = {
-      id: registry.Id,
-      projectId: registry.Username,
-      repositoryId: repository,
-      tagName: tag
-    };
-    return await Gitlab().deleteTag(params).$promise;
-  }
-
-  async function deleteRepositoryAsync(registry, repository) {
-    const params = {
-      id: registry.Id,
-      projectId: registry.Username,
-      repositoryId: repository
-    };
-    return await Gitlab().deleteRepository(params).$promise;
-  }
-
   /**
    * SERVICE FUNCTIONS DECLARATION
    */
@@ -138,42 +75,12 @@ function RegistryGitlabServiceFactory($async, Gitlab) {
     return $async(projectsAsync, url, token);
   }
 
-  function ping(registry, forceNewConfig) {
-    const env = {url: registry.URL, token: registry.Password};
-    const id = registry.Id;
-    if (forceNewConfig) {
-      return Gitlab(env).pingWithForceNew().$promise;
-    }
-    return Gitlab(env).ping({id:id}).$promise;
-  }
-
   function repositories(registry) {
     return $async(repositoriesAsync, registry);
   }
 
-  function tags(registry, repository) {
-    return $async(tagsAsync, registry, repository);
-  }
-
-  function tag(registry, repository, tag) {
-    return $async(tagAsync, registry, repository, tag);
-  }
-
-  function deleteTag(registry, repository, tag) {
-    return $async(deleteTagAsync, registry, repository, tag);
-  }
-
-  function deleteRepository(registry, repository) {
-    return $async(deleteRepositoryAsync, registry, repository);
-  }
-
   service.projects = projects;
-  service.ping = ping;
   service.repositories = repositories;
-  service.tags = tags;
-  service.tag = tag;
-  service.deleteTag = deleteTag;
-  service.deleteRepository = deleteRepository;
   return service;
 }
 ]);
