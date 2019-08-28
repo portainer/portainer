@@ -315,9 +315,8 @@
                         <!-- volume -->
                         <div class="input-group input-group-sm col-sm-6" ng-if="volume.Type === 'volume'">
                           <span class="input-group-addon">volume</span>
-                          <select class="form-control" ng-model="volume.Source">
+                          <select class="form-control" ng-model="volume.Source" ng-options="vol as ((vol.Id|truncate:30) + ' - ' + (vol.Driver|truncate:30)) for vol in availableVolumes">
                             <option selected disabled hidden value="">Select a volume</option>
-                            <option ng-repeat="vol in availableVolumes" ng-value="vol.Id">{{ vol.Id|truncate:30}} - {{ vol.Driver|truncate:30}}</option>
                           </select>
                         </div>
                         <!-- !volume -->
