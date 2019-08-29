@@ -34,8 +34,20 @@ angular.module('portainer.extensions.registrymanagement', [])
       }
     }
   };
+  var registryRepositoryTag = {
+    name: 'portainer.registries.registry.repository.tag',
+    url: '/:tag',
+    views: {
+      'content@': {
+        templateUrl: './views/repositories/tag/registryRepositoryTag.html',
+        controller: 'RegistryRepositoryTagController',
+        controllerAs: 'ctrl'
+      }
+    }
+  };
 
   $stateRegistryProvider.register(registryConfiguration);
   $stateRegistryProvider.register(registryRepositories);
   $stateRegistryProvider.register(registryRepositoryTags);
+  $stateRegistryProvider.register(registryRepositoryTag);
 }]);
