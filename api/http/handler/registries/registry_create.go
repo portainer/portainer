@@ -43,16 +43,6 @@ func (handler *Handler) registryCreate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	// registries, err := handler.RegistryService.Registries()
-	// if err != nil {
-	// 	return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
-	// }
-	// for _, r := range registries {
-	// 	if r.URL == payload.URL {
-	// 		return &httperror.HandlerError{http.StatusConflict, "A registry with the same URL already exists", portainer.ErrRegistryAlreadyExists}
-	// 	}
-	// }
-
 	registry := &portainer.Registry{
 		Type:               portainer.RegistryType(payload.Type),
 		Name:               payload.Name,

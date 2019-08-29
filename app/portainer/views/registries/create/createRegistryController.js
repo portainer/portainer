@@ -1,4 +1,3 @@
-// import _ from 'lodash-es';
 import { RegistryDefaultModel } from '../../../models/registry';
 
 angular.module('portainer.app')
