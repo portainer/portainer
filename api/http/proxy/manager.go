@@ -178,3 +178,7 @@ func (manager *Manager) createProxy(endpoint *portainer.Endpoint) (http.Handler,
 
 	return manager.createDockerProxy(endpoint)
 }
+
+func (manager *Manager) CreateGitlabProxy(url string) (http.Handler, error) {
+	return newGitlabProxy(url)
+}

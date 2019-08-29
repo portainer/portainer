@@ -38,7 +38,7 @@
                   <p>Azure container registry</p>
                 </label>
               </div>
-              <div ng-if="registryExtensionEnabled">
+              <div>
                 <input type="radio" id="registry_gitlab" ng-model="model.Type" ng-value="5">
                 <label for="registry_gitlab" ng-click="selectGitlabRegistry()">
                   <div class="boxselector_header">
@@ -46,18 +46,6 @@
                     Gitlab
                   </div>
                   <p>Gitlab container registry</p>
-                </label>
-              </div>
-              <div ng-if="!registryExtensionEnabled">
-                <label>
-                  <a ui-sref="portainer.extensions.extension({id: 1})" style="color: #767676" tooltip-append-to-body="true" tooltip-placement="bottom"
-                    tooltip-class="portainer-tooltip" uib-tooltip="Feature available via an extension">
-                    <div class="boxselector_header">
-                      <i class="fab fa-gitlab" aria-hidden="true" style="margin-right: 2px;"></i>
-                      Gitlab
-                    </div>
-                    <p>Gitlab container registry</p>
-                  </a>
                 </label>
               </div>
               <div>

@@ -6,23 +6,20 @@ function GitlabFactory($resource, API_ENDPOINT_REGISTRIES) {
   'use strict';
   return function(env) {
     const headers = {};
-    let domain = '';
     if (env) {
       headers['Private-Token'] = env.token;
-      domain = encodeURIComponent(env.url);
+      headers['X-Gitlab-Domain'] = env.url
     }
 
-    const baseUrl = API_ENDPOINT_REGISTRIES + '/:id/proxies/gitlab/:domain/api/v4/projects';
+    const baseUrl = API_ENDPOINT_REGISTRIES + '/:id/proxies/gitlab/api/v4/projects';
 
     return $resource(baseUrl, {id:'@id'},
     {
       projects: {
         method: 'GET',
-        params: { membership: 'true', domain: domain },
+        params: { membership: 'true' },
         transformResponse: gitlabResponseGetLink,
-        headers: Object.assign(headers, {
-          'X-RegistryManagement-ForceNew': '1'
-        })
+        headers: headers
       },
       repositories :{
         method: 'GET',
