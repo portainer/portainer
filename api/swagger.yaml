@@ -254,7 +254,7 @@ paths:
       - name: "EndpointType"
         in: "formData"
         type: "integer"
-        description: "Environment type. Value must be one of: 1 (Docker environment), 2 (Agent environment) or 3 (Azure environment)"
+        description: "Environment type. Value must be one of: 1 (Docker environment), 2 (Agent environment), 3 (Azure environment) or 4 (Edge agent environment)"
         required: true
       - name: "URL"
         in: "formData"
