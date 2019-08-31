@@ -127,14 +127,14 @@
         <table id="image-layers" class="table">
           <thead>
             <th style="white-space:nowrap;">
-              <a ng-click="order('Order')">
+              <a ng-click="ctrl.order('Order')">
                 Order
                 <span ng-show="ctrl.Sort.Type == 'Order' && !ctrl.Sort.Reverse" class="glyphicon glyphicon-chevron-down"></span>
                 <span ng-show="ctrl.Sort.Type == 'Order' && ctrl.Sort.Reverse" class="glyphicon glyphicon-chevron-up"></span>
               </a>
             </th>
             <th>
-              <a ng-click="order('CreatedBy')">
+              <a ng-click="ctrl.order('CreatedBy')">
                 Layer
                 <span ng-show="ctrl.Sort.Type == 'CreatedBy' && !ctrl.Sort.Reverse" class="glyphicon glyphicon-chevron-down"></span>
                 <span ng-show="ctrl.Sort.Type == 'CreatedBy' && ctrl.Sort.Reverse" class="glyphicon glyphicon-chevron-up"></span>
