@@ -56,6 +56,7 @@
                   </a>
                 </span>
                 <span ng-if="item.Modified">
+                  <portainer-tooltip position="bottom" message="Tag can only contain alphanumeric (a-zA-Z0-9) and special _ . - characters. Tag must not start with . - characters."></portainer-tooltip>
                   <input class="input-sm" type="text" ng-model="item.NewName" on-enter-key="$ctrl.retagAction(item)"
                     auto-focus ng-click="$event.stopPropagation();" />
                   <a class="interactive" ng-click="item.Modified = false; $event.stopPropagation();"><i class="fa fa-times"></i></a>

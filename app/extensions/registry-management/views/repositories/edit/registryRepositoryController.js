@@ -2,8 +2,8 @@ import _ from 'lodash-es';
 import { RepositoryTagViewModel, RepositoryShortTag } from '../../../models/repositoryTag';
 
 angular.module('portainer.app')
-  .controller('RegistryRepositoryController', ['$q', '$async', '$scope', '$uibModal', '$transition$', '$state', 'RegistryV2Service', 'RegistryService', 'ModalService', 'Notifications',
-    function ($q, $async, $scope, $uibModal, $transition$, $state, RegistryV2Service, RegistryService, ModalService, Notifications) {
+  .controller('RegistryRepositoryController', ['$q', '$async', '$scope', '$uibModal', '$transition$', '$state', 'RegistryV2Service', 'RegistryService', 'ModalService', 'Notifications', 'ImageHelper',
+    function ($q, $async, $scope, $uibModal, $transition$, $state, RegistryV2Service, RegistryService, ModalService, Notifications, ImageHelper) {
 
       $scope.state = {
         actionInProgress: false,
@@ -79,11 +79,6 @@ angular.module('portainer.app')
           RegistryV2Service.shortTagsWithProgress($scope.registryId, $scope.repository.Name, $scope.repository.Tags);
       }
 
-      function resetFormValues() {
-        $scope.formValues.Tag = '';
-        delete $scope.formValues.SelectedImage;
-      }
-
       function resetTagsRetrievalState() {
         $scope.state.tagsRetrieval.running = false;
         $scope.state.tagsRetrieval.progression = 0;
@@ -134,22 +129,32 @@ angular.module('portainer.app')
       /**
        * ADD TAG SECTION
        */
+
+      async function addTagAsync() {
+        try {
+          $scope.state.actionInProgress = true;
+          if (!ImageHelper.isValidTag($scope.formValues.Tag)) {
+            throw {msg: 'Invalid tag pattern, see info for more details on format.'}
+          }
+          const tag = $scope.short.Tags.find((item) => item.ImageId === $scope.formValues.SelectedImage);
+          const manifest = tag.ManifestV2;
+          await RegistryV2Service.addTag($scope.registryId, $scope.repository.Name, {tag: $scope.formValues.Tag, manifest: manifest})
+
+          Notifications.success('Success', 'Tag successfully added');
+          $scope.short.Tags.push(new RepositoryShortTag($scope.formValues.Tag, tag.ImageId, tag.ImageDigest, tag.ManifestV2));
+
+          await loadRepositoryDetails();
+          $scope.formValues.Tag = '';
+          delete $scope.formValues.SelectedImage;
+        } catch (err) {
+          Notifications.error('Failure', err, 'Unable to add tag');
+        } finally {
+          $scope.state.actionInProgress = false;
+        }
+      }
+
       $scope.addTag = function () {
-        $scope.state.actionInProgress = true;
-        const tag = $scope.short.Tags.find((item) => item.ImageId === $scope.formValues.SelectedImage);
-        const manifest = tag.ManifestV2;
-        RegistryV2Service.addTag($scope.registryId, $scope.repository.Name, {tag: $scope.formValues.Tag, manifest: manifest})
-          .then(function success() {
-            Notifications.success('Success', 'Tag successfully added');
-            $scope.short.Tags.push(new RepositoryShortTag($scope.formValues.Tag, tag.ImageId, tag.ImageDigest, tag.ManifestV2));
-            return $async(loadRepositoryDetails);
-          })
-          .catch(function error(err) {
-            Notifications.error('Failure', err, 'Unable to add tag');
-          }).finally(() => {
-            $scope.state.actionInProgress = false;
-            resetFormValues();
-          });
+        return $async(addTagAsync);
       };
       /**
        * !END ADD TAG SECTION
@@ -165,16 +170,21 @@ angular.module('portainer.app')
       }
 
       async function retagActionAsync() {
-        const modal = openModal({
-          message: () => 'Retag is in progress! Closing your browser or refreshing the page while this operation is in progress will result in loss of tags.',
-          progressLabel: () => 'Retag progress',
-          context: () => $scope.state.tagsRetag
-        });
+        let modal = null;
         try {
           $scope.state.tagsRetag.running = true;
 
-          const startTime = Date.now();
+          modal = await openModal({
+            message: () => 'Retag is in progress! Closing your browser or refreshing the page while this operation is in progress will result in loss of tags.',
+            progressLabel: () => 'Retag progress',
+            context: () => $scope.state.tagsRetag
+          });
           const modifiedTags = _.filter($scope.tags, (item) => item.Modified === true);
+          for (const tag of modifiedTags) {
+            if (!ImageHelper.isValidTag(tag.NewName)) {
+              throw {msg: 'Invalid tag pattern, see info for more details on format.'}
+            }
+          }
           const modifiedDigests = _.uniq(_.map(modifiedTags, 'ImageDigest'));
           const impactedTags = _.filter($scope.short.Tags, (item) => _.includes(modifiedDigests, item.ImageDigest));
 
@@ -182,6 +192,7 @@ angular.module('portainer.app')
 
           createRetagAsyncGenerator(modifiedTags, modifiedDigests, impactedTags);
 
+          const startTime = Date.now();
           for await (const partialResult of $scope.state.tagsRetag.asyncGenerator) {
             if (typeof partialResult === 'number') {
               $scope.state.tagsRetag.progression = toPercent(partialResult, totalOps);
@@ -194,13 +205,13 @@ angular.module('portainer.app')
             $scope.short.Tags[idx].Name = item.NewName;
           });
 
-          $scope.state.tagsRetag.running = false;
           Notifications.success('Success', 'Tags successfully renamed');
 
           await loadRepositoryDetails();
         } catch (err) {
           Notifications.error('Failure', err, 'Unable to rename tags');
         } finally {
+          $scope.state.tagsRetag.running = false;
           modal.close();
         }
       }
@@ -222,13 +233,14 @@ angular.module('portainer.app')
       }
 
       async function removeTagsAsync(selectedTags) {
-        const modal = openModal({
-          message: () => 'Tag delete is in progress! Closing your browser or refreshing the page while this operation is in progress will result in loss of tags.',
-          progressLabel: () => 'Deletion progress',
-          context: () => $scope.state.tagsDelete
-        });
+        let modal = null;
         try {
           $scope.state.tagsDelete.running = true;
+          modal = await openModal({
+            message: () => 'Tag delete is in progress! Closing your browser or refreshing the page while this operation is in progress will result in loss of tags.',
+            progressLabel: () => 'Deletion progress',
+            context: () => $scope.state.tagsDelete
+          });
 
           const startTime = Date.now()
           const deletedTagNames = _.map(selectedTags, 'Name');
@@ -248,18 +260,19 @@ angular.module('portainer.app')
             }
           }
 
-          _.map(deletedShortTags, (item) => {
-            const idx = _.findIndex($scope.short.Tags, (i) => i.Name === item.Name);
-            $scope.short.Tags.splice(idx, 1);
-          });
+          _.pull($scope.short.Tags, ...deletedShortTags);
+          $scope.short.Images = _.map(_.uniqBy($scope.short.Tags, 'ImageId'), 'ImageId');
 
-          $scope.state.tagsDelete.running = false;
           Notifications.success('Success', 'Tags successfully deleted');
 
+          if ($scope.short.Tags.length === 0) {
+            $state.go('portainer.registries.registry.repositories', {id: $scope.registryId}, {reload: true});
+          }
           await loadRepositoryDetails();
         } catch (err) {
           Notifications.error('Failure', err, 'Unable to delete tags');
         } finally {
+          $scope.state.tagsDelete.running = false;
           modal.close();
         }
       }
