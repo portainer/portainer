@@ -3920,6 +3920,10 @@ definitions:
         type: "boolean"
         example: true
         description: "Whether non-administrator users should be able to use privileged mode when creating containers"
+      EdgeAgentCheckinInterval:
+        type: "integer"
+        example: "30"
+        description: "Polling interval for Edge agent (in seconds)"
   EndpointGroupCreateRequest:
     type: "object"
     required:
