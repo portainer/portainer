@@ -26,8 +26,8 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		requestBouncer:     bouncer,
 	}
 	h.PathPrefix("/websocket/exec").Handler(
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.websocketExec)))
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.websocketExec)))
 	h.PathPrefix("/websocket/attach").Handler(
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.websocketAttach)))
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.websocketAttach)))
 	return h
 }
