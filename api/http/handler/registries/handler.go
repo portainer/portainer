@@ -33,19 +33,19 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	}
 
 	h.Handle("/registries",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.registryCreate))).Methods(http.MethodPost)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.registryCreate))).Methods(http.MethodPost)
 	h.Handle("/registries",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.registryList))).Methods(http.MethodGet)
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.registryList))).Methods(http.MethodGet)
 	h.Handle("/registries/{id}",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.registryInspect))).Methods(http.MethodGet)
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.registryInspect))).Methods(http.MethodGet)
 	h.Handle("/registries/{id}",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.registryUpdate))).Methods(http.MethodPut)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.registryUpdate))).Methods(http.MethodPut)
 	h.Handle("/registries/{id}/configure",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.registryConfigure))).Methods(http.MethodPost)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.registryConfigure))).Methods(http.MethodPost)
 	h.Handle("/registries/{id}",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.registryDelete))).Methods(http.MethodDelete)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.registryDelete))).Methods(http.MethodDelete)
 	h.PathPrefix("/registries/{id}/v2").Handler(
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.proxyRequestsToRegistryAPI)))
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.proxyRequestsToRegistryAPI)))
 
 	return h
 }
