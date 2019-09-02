@@ -7,6 +7,6 @@ angular.module('portainer.kubernetes')
           endpointId: EndpointProvider.endpointID
         },
         {
-          query: { method: 'GET', isArray: true, timeout: 15000},
+          query: { method: 'GET', timeout: 15000},
         });
     }]);
