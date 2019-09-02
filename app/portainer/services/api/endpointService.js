@@ -63,6 +63,20 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     return deferred.promise;
   };
 
+  service.createLocalKubernetesEndpoint = function() {
+    var deferred = $q.defer();
+
+    FileUploadService.createEndpoint('local', 5, '', '', 1, [], true, true, true)
+      .then(function success(response) {
+        deferred.resolve(response.data);
+      })
+      .catch(function error(err) {
+        deferred.reject({msg: 'Unable to create endpoint', err: err});
+      });
+
+    return deferred.promise;
+  };
+
   service.createRemoteEndpoint = function(name, type, URL, PublicURL, groupID, tags, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
     var deferred = $q.defer();
 

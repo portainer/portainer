@@ -154,6 +154,8 @@ func (handler *Handler) createEndpoint(payload *endpointCreatePayload) (*portain
 		return handler.createAzureEndpoint(payload)
 	} else if portainer.EndpointType(payload.EndpointType) == portainer.EdgeAgentEnvironment {
 		return handler.createEdgeAgentEndpoint(payload)
+	} else if portainer.EndpointType(payload.EndpointType) == portainer.KubernetesEnvironment {
+		return handler.createKubernetesEndpoint(payload)
 	}
 
 	if payload.TLS {
@@ -286,6 +288,40 @@ func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) 
 	err := handler.snapshotAndPersistEndpoint(endpoint)
 	if err != nil {
 		return nil, err
+	}
+
+	return endpoint, nil
+}
+
+func (handler *Handler) createKubernetesEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
+	if payload.URL == "" {
+		payload.URL = "https://kubernetes:443"
+	}
+
+	endpointID := handler.EndpointService.GetNextIdentifier()
+
+	endpoint := &portainer.Endpoint{
+		ID:        portainer.EndpointID(endpointID),
+		Name:      payload.Name,
+		URL:       payload.URL,
+		Type:      portainer.KubernetesEnvironment,
+		GroupID:   portainer.EndpointGroupID(payload.GroupID),
+		PublicURL: payload.PublicURL,
+		TLSConfig: portainer.TLSConfiguration{
+			TLS:           payload.TLS,
+			TLSSkipVerify: payload.TLSSkipVerify,
+		},
+		UserAccessPolicies: portainer.UserAccessPolicies{},
+		TeamAccessPolicies: portainer.TeamAccessPolicies{},
+		Extensions:         []portainer.EndpointExtension{},
+		Tags:               payload.Tags,
+		Status:             portainer.EndpointStatusUp,
+		Snapshots:          []portainer.Snapshot{},
+	}
+
+	err := handler.EndpointService.CreateEndpoint(endpoint)
+	if err != nil {
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint inside the database", err}
 	}
 
 	return endpoint, nil

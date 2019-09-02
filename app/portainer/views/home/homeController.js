@@ -15,6 +15,8 @@ angular.module('portainer.app')
           return switchToAzureEndpoint(endpoint);
         } else if (endpoint.Type === 4) {
           return switchToEdgeEndpoint(endpoint);
+        } else if (endpoint.Type === 5) {
+          return switchToKubernetesEndpoint(endpoint);
         }
 
         checkEndpointStatus(endpoint)
@@ -81,6 +83,17 @@ angular.module('portainer.app')
           });
       }
 
+      function switchToKubernetesEndpoint(endpoint) {
+        EndpointProvider.setEndpointID(endpoint.Id);
+        StateManager.updateEndpointState(endpoint, [])
+          .then(function success() {
+            $state.go('kubernetes.dashboard');
+          })
+          .catch(function error(err) {
+            Notifications.error('Failure', err, 'Unable to connect to the Kubernetes endpoint');
+          });
+      }
+
       function switchToEdgeEndpoint(endpoint) {
         if (!endpoint.EdgeID) {
           $state.go('portainer.endpoints.endpoint', { id: endpoint.Id });
@@ -99,7 +112,6 @@ angular.module('portainer.app')
             switchToDockerEndpoint(endpoint);
           });
       }
-
 
       function switchToDockerEndpoint(endpoint) {
         if (endpoint.Status === 2 && endpoint.Snapshots[0] && endpoint.Snapshots[0].Swarm === true) {

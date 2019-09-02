@@ -1007,6 +1007,8 @@ const (
 	AzureEnvironment
 	// EdgeAgentEnvironment represents an endpoint connected to an Edge agent
 	EdgeAgentEnvironment
+	// KubernetesEnvironment represents an endpoint connected to a Kubernetes environment
+	KubernetesEnvironment
 )
 
 const (

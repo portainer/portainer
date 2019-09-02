@@ -16,7 +16,7 @@ function ($scope, $state, EndpointService, StateManager, Notifications) {
   };
 
   $scope.formValues = {
-    EndpointType: 'remote',
+    EndpointType: 'kubernetes',
     Name: '',
     URL: '',
     TLS: false,
@@ -42,6 +42,20 @@ function ($scope, $state, EndpointService, StateManager, Notifications) {
     .finally(function final() {
       $scope.state.actionInProgress = false;
     });
+  };
+
+  $scope.createLocalKubernetesEndpoint = function() {
+    $scope.state.actionInProgress = true;
+    EndpointService.createLocalKubernetesEndpoint()
+      .then(function success() {
+        $state.go('portainer.home');
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to connect to the Kubernetes environment');
+      })
+      .finally(function final() {
+        $scope.state.actionInProgress = false;
+      });
   };
 
   $scope.createAzureEndpoint = function() {

@@ -1,8 +1,9 @@
 <div class="blocklist-item" ng-click="$ctrl.onSelect($ctrl.model)">
   <div class="blocklist-item-box">
     <span ng-class="['blocklist-item-logo', 'endpoint-item', { azure: $ctrl.model.Type === 3 }]">
-      <i ng-if="$ctrl.model.Type !== 4" ng-class="$ctrl.model.Type | endpointtypeicon" class="fa-4x blue-icon" aria-hidden="true"></i>
+      <i ng-if="$ctrl.model.Type !== 4 && $ctrl.model.Type !== 5" ng-class="$ctrl.model.Type | endpointtypeicon" class="fa-4x blue-icon" aria-hidden="true"></i>
       <img ng-if="$ctrl.model.Type === 4" src="../../../../../assets/images/edge_endpoint.png" />
+      <img ng-if="$ctrl.model.Type === 5" src="../../../../../assets/images/kubernetes_endpoint.png" />
     </span>
 
     <span class="col-sm-12">
@@ -68,9 +69,15 @@
         </span>
       </div>
 
-      <div class="blocklist-item-line endpoint-item" ng-if="!$ctrl.model.Snapshots[0]">
+      <div class="blocklist-item-line endpoint-item" ng-if="!$ctrl.model.Snapshots[0] && $ctrl.model.Type !== 5">
         <span class="blocklist-item-desc">
           No snapshot available
+        </span>
+      </div>
+
+      <div class="blocklist-item-line endpoint-item" ng-if="$ctrl.model.Type === 5">
+        <span class="blocklist-item-desc">
+          -
         </span>
       </div>
 

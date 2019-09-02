@@ -1,0 +1,66 @@
+<rd-header>
+  <rd-header-title title-text="Dashboard"></rd-header-title>
+  <rd-header-content>Endpoint summary</rd-header-content>
+</rd-header>
+
+<information-panel title-text="Information">
+  <span class="small">
+    <p class="text-muted">
+      <i class="fa fa-flask orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+      Kubernetes support in Portainer is experimental. Contribute and share your feedback in <a href="https://github.com/portainer/portainer/issues/1637" target="_blank">our official issue</a>.
+    </p>
+  </span>
+</information-panel>
+
+<div class="row" ng-if="endpoint">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-tachometer-alt" title-text="Endpoint info"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Endpoint</td>
+              <td>
+                {{ endpoint.Name }}
+              </td>
+            </tr>
+            <tr>
+              <td>URL</td>
+              <td>{{ endpoint.URL | stripprotocol }}</td>
+            </tr>
+            <tr>
+              <td>Tags</td>
+              <td>
+                <span ng-if="endpoint.Tags.length === 0">
+                  -
+                </span>
+                <span ng-if="endpoint.Tags.length > 0">
+                  <span ng-repeat="tag in endpoint.Tags">
+                    {{ tag }}{{ $last? '' : ', ' }}
+                  </span>
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-xs-12 col-md-6" ng-if="namespaces">
+    <a ui-sref="kubernetes.namespaces">
+      <rd-widget>
+        <rd-widget-body>
+          <div class="widget-icon blue pull-left">
+            <i class="fa fa-layer-group"></i>
+          </div>
+          <div class="title">{{ namespaces.length }}</div>
+          <div class="comment">{{ namespaces.length === 1 ? 'Namespace' : 'Namespaces' }}</div>
+        </rd-widget-body>
+      </rd-widget>
+    </a>
+  </div>
+</div>

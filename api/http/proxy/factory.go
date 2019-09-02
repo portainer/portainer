@@ -29,6 +29,26 @@ func (factory *proxyFactory) newHTTPProxy(u *url.URL) http.Handler {
 	return httputil.NewSingleHostReverseProxy(u)
 }
 
+func newKubernetesProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
+	remoteURL, err := url.Parse(endpoint.URL)
+	if err != nil {
+		return nil, err
+	}
+
+	proxy := newSingleHostReverseProxyWithHostHeader(remoteURL)
+
+	config, err := crypto.CreateTLSConfigurationFromBytes(nil, nil, nil, true, true)
+	if err != nil {
+		return nil, err
+	}
+
+	proxy.Transport = &http.Transport{
+		TLSClientConfig: config,
+	}
+
+	return proxy, nil
+}
+
 func newAzureProxy(credentials *portainer.AzureCredentials) (http.Handler, error) {
 	remoteURL, err := url.Parse(AzureAPIBaseURL)
 	if err != nil {

@@ -174,6 +174,8 @@ func (manager *Manager) createDockerProxy(endpoint *portainer.Endpoint) (http.Ha
 func (manager *Manager) createProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
 	if endpoint.Type == portainer.AzureEnvironment {
 		return newAzureProxy(&endpoint.AzureCredentials)
+	} else if endpoint.Type == portainer.KubernetesEnvironment {
+		return newKubernetesProxy(endpoint)
 	}
 
 	return manager.createDockerProxy(endpoint)
