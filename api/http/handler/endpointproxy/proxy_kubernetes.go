@@ -1,6 +1,8 @@
 package endpointproxy
 
 import (
+	"fmt"
+	"io/ioutil"
 	"strconv"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -36,6 +38,13 @@ func (handler *Handler) proxyRequestsToKubernetesAPI(w http.ResponseWriter, r *h
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create proxy", err}
 		}
 	}
+
+	token, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/sa-portainer/token")
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to read service account token file", err}
+	}
+
+	r.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 
 	id := strconv.Itoa(endpointID)
 	http.StripPrefix("/"+id+"/kubernetes", proxy).ServeHTTP(w, r)
