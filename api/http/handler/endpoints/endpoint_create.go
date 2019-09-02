@@ -295,7 +295,7 @@ func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) 
 
 func (handler *Handler) createKubernetesEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
 	if payload.URL == "" {
-		payload.URL = "https://kubernetes:443"
+		payload.URL = "https://kubernetes.default.svc"
 	}
 
 	endpointID := handler.EndpointService.GetNextIdentifier()
