@@ -19,23 +19,25 @@ type Service struct {
 }
 
 // NewService initializes a new service.
-func NewService(dataStorePath string) (*Service, error) {
-	service := &Service{
-		&http.Client{
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			},
-			Timeout: 120 * time.Second,
+func NewService(dataStorePath string) *Service {
+	httpsCli := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		},
+		Timeout: 300 * time.Second,
 	}
 
-	return service, nil
+	client.InstallProtocol("https", githttp.NewClient(httpsCli))
+
+	return &Service{
+		httpsCli,
+	}
 }
 
 // ClonePublicRepository clones a public git repository using the specified URL in the specified
 // destination folder.
 func (service *Service) ClonePublicRepository(repositoryURL, referenceName string, destination string) error {
-	return cloneRepository(repositoryURL, referenceName, destination, service.httpsCli)
+	return cloneRepository(repositoryURL, referenceName, destination)
 }
 
 // ClonePrivateRepositoryWithBasicAuth clones a private git repository using the specified URL in the specified
@@ -43,12 +45,10 @@ func (service *Service) ClonePublicRepository(repositoryURL, referenceName strin
 func (service *Service) ClonePrivateRepositoryWithBasicAuth(repositoryURL, referenceName string, destination, username, password string) error {
 	credentials := username + ":" + url.PathEscape(password)
 	repositoryURL = strings.Replace(repositoryURL, "://", "://"+credentials+"@", 1)
-	return cloneRepository(repositoryURL, referenceName, destination, service.httpsCli)
+	return cloneRepository(repositoryURL, referenceName, destination)
 }
 
-func cloneRepository(repositoryURL string, referenceName string, destination string, httpsCli *http.Client) error {
-	client.InstallProtocol("https", githttp.NewClient(httpsCli))
-
+func cloneRepository(repositoryURL string, referenceName string, destination string) error {
 	options := &git.CloneOptions{
 		URL: repositoryURL,
 	}
