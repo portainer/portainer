@@ -196,6 +196,7 @@ function shell_downloadDockerBinary(p, a) {
   var ip = ((ps[p] === undefined) ? p : ps[p]);
   var ia = ((as[a] === undefined) ? a : as[a]);
   var binaryVersion = ((p === 'windows' ? '<%= shippedDockerVersionWindows %>' : '<%= shippedDockerVersion %>'));
+  var windowsBinaryBaseVersion = '<%= shippedDockerVersionWindowsBase %>';
   if (p === 'linux' || p === 'mac') {
     return [
       'if [ -f dist/docker ]; then',
@@ -209,7 +210,7 @@ function shell_downloadDockerBinary(p, a) {
       'powershell -Command "& {if (Get-Item -Path dist/docker.exe -ErrorAction:SilentlyContinue) {',
       'Write-Host "Docker binary exists"',
       '} else {',
-      '& ".\\build\\download_docker_binary.ps1" -docker_version ' + binaryVersion + ' ' + '-docker_base_version' + shippedDockerVersionWindowsBase + '',
+      '& ".\\build\\download_docker_binary.ps1" -docker_version ' + binaryVersion + ' ' + '-docker_base_version' + windowsBinaryBaseVersion + '',
       '}}"'
     ].join(' ');
   }
