@@ -195,7 +195,6 @@ function shell_downloadDockerBinary(p, a) {
   var ip = ((ps[p] === undefined) ? p : ps[p]);
   var ia = ((as[a] === undefined) ? a : as[a]);
   var binaryVersion = ((p === 'windows' ? '<%= shippedDockerVersionWindows %>' : '<%= shippedDockerVersion %>'));
-  var windowsBinaryBaseVersion = '<%= shippedDockerVersionWindowsBase %>';
   if (p === 'linux' || p === 'mac') {
     return [
       'if [ -f dist/docker ]; then',
