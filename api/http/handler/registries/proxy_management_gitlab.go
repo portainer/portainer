@@ -41,13 +41,14 @@ func (handler *Handler) proxyRequestsToGitlabAPIWithRegistry(w http.ResponseWrit
 	if proxy == nil {
 		proxy, err = handler.ProxyManager.CreateExtensionProxy(portainer.RegistryManagementExtension)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to register registry proxy", err}
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create extension proxy for registry manager", err}
 		}
 	}
 
 	config := &portainer.RegistryManagementConfiguration{
 		Type: registry.Type,
 		Password: registry.Password,
+		Gitlab: registry.Gitlab,
 	}
 
 	encodedConfiguration, err := json.Marshal(config)

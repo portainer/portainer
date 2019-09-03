@@ -179,7 +179,7 @@ func (manager *Manager) createProxy(endpoint *portainer.Endpoint) (http.Handler,
 	return manager.createDockerProxy(endpoint)
 }
 
-// CreateGitlabProxy creates a new HTTP reverse proxy for gitlab regitries features without registry management extension.
+// CreateGitlabProxy creates a new HTTP reverse proxy that can be used to send requests to the Gitlab API..
 func (manager *Manager) CreateGitlabProxy(url string) (http.Handler, error) {
 	return newGitlabProxy(url)
 }

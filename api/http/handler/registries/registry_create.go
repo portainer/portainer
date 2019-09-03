@@ -12,7 +12,7 @@ import (
 
 type registryCreatePayload struct {
 	Name           string
-	Type           int
+	Type           portainer.RegistryType
 	URL            string
 	Authentication bool
 	Username       string
@@ -30,8 +30,8 @@ func (payload *registryCreatePayload) Validate(r *http.Request) error {
 	if payload.Authentication && (govalidator.IsNull(payload.Username) || govalidator.IsNull(payload.Password)) {
 		return portainer.Error("Invalid credentials. Username and password must be specified when authentication is enabled")
 	}
-	if payload.Type != 1 && payload.Type != 2 && payload.Type != 3 && payload.Type != 5 {
-		return portainer.Error("Invalid registry type. Valid values are: 1 (Quay.io), 2 (Azure container registry), 3 (custom registry) or 5 (Gitlab registry)")
+	if payload.Type != portainer.QuayRegistry && payload.Type != portainer.AzureRegistry && payload.Type != portainer.CustomRegistry && payload.Type != portainer.GitlabRegistry {
+		return portainer.Error("Invalid registry type. Valid values are: 1 (Quay.io), 2 (Azure container registry), 3 (custom registry) or 4 (Gitlab registry)")
 	}
 	return nil
 }

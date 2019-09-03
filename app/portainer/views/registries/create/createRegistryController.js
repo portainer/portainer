@@ -1,4 +1,5 @@
 import { RegistryDefaultModel } from '../../../models/registry';
+import { RegistryTypes } from 'Extensions/registry-management/models/registryTypes';
 
 angular.module('portainer.app')
 .controller('CreateRegistryController', ['$scope', '$state', 'RegistryService', 'Notifications', 'RegistryGitlabService', 'ExtensionService',
@@ -85,6 +86,7 @@ function ($scope, $state, RegistryService, Notifications, RegistryGitlabService,
   }
 
   function initView() {
+    $scope.RegistryTypes = RegistryTypes;
     $scope.model = new RegistryDefaultModel();
     ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.REGISTRY_MANAGEMENT)
     .then((data) => $scope.registryExtensionEnabled = data);
