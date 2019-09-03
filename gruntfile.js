@@ -76,8 +76,9 @@ module.exports = function(grunt) {
   grunt.initConfig({
     root: 'dist',
     distdir: 'dist/public',
-    shippedDockerVersion: '18.09.3',
-    shippedDockerVersionWindows: '17.09.0-ce',
+    shippedDockerVersion: '19.03.1',
+    shippedDockerVersionWindows: '19.03.1',
+    shippedDockerVersionWindowsBase: '19.03',
     config: gruntfile_cfg.config,
     src: gruntfile_cfg.src,
     clean: gruntfile_cfg.clean,
@@ -208,7 +209,7 @@ function shell_downloadDockerBinary(p, a) {
       'powershell -Command "& {if (Get-Item -Path dist/docker.exe -ErrorAction:SilentlyContinue) {',
       'Write-Host "Docker binary exists"',
       '} else {',
-      '& ".\\build\\download_docker_binary.ps1" -docker_version ' + binaryVersion + '',
+      '& ".\\build\\download_docker_binary.ps1" -docker_version ' + binaryVersion + ' ' + '-docker_base_version' + shippedDockerVersionWindowsBase + '',
       '}}"'
     ].join(' ');
   }
