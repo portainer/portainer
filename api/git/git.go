@@ -19,19 +19,10 @@ type Service struct {
 }
 
 // NewService initializes a new service.
-func NewService(dataStorePath string) *Service {
-	httpsCli := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		},
-		Timeout: 300 * time.Second,
-	}
+func NewService() *Service {
+	service := &Service{}
 
-	client.InstallProtocol("https", githttp.NewClient(httpsCli))
-
-	return &Service{
-		httpsCli,
-	}
+	return service
 }
 
 // ClonePublicRepository clones a public git repository using the specified URL in the specified
@@ -49,6 +40,15 @@ func (service *Service) ClonePrivateRepositoryWithBasicAuth(repositoryURL, refer
 }
 
 func cloneRepository(repositoryURL string, referenceName string, destination string) error {
+	httpsCli := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
+		Timeout: 300 * time.Second,
+	}
+
+	client.InstallProtocol("https", githttp.NewClient(httpsCli))
+
 	options := &git.CloneOptions{
 		URL: repositoryURL,
 	}
