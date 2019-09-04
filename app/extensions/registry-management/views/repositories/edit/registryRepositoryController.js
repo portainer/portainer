@@ -2,8 +2,8 @@ import _ from 'lodash-es';
 import { RepositoryTagViewModel, RepositoryShortTag } from '../../../models/repositoryTag';
 
 angular.module('portainer.app')
-  .controller('RegistryRepositoryController', ['$q', '$async', '$scope', '$uibModal', '$transition$', '$state', 'RegistryV2Service', 'RegistryService', 'ModalService', 'Notifications', 'ImageHelper',
-    function ($q, $async, $scope, $uibModal, $transition$, $state, RegistryV2Service, RegistryService, ModalService, Notifications, ImageHelper) {
+  .controller('RegistryRepositoryController', ['$q', '$async', '$scope', '$uibModal', '$interval', '$transition$', '$state', 'RegistryV2Service', 'RegistryService', 'ModalService', 'Notifications', 'ImageHelper',
+    function ($q, $async, $scope, $uibModal, $interval, $transition$, $state, RegistryV2Service, RegistryService, ModalService, Notifications, ImageHelper) {
 
       $scope.state = {
         actionInProgress: false,
@@ -14,19 +14,22 @@ angular.module('portainer.app')
           limit: 100,
           progression: 0,
           elapsedTime: 0,
-          asyncGenerator: null
+          asyncGenerator: null,
+          clock: null
         },
         tagsRetag: {
           running: false,
           progression: 0,
           elapsedTime: 0,
-          asyncGenerator: null
+          asyncGenerator: null,
+          clock: null
         },
         tagsDelete: {
           running: false,
           progression: 0,
           elapsedTime: 0,
-          asyncGenerator: null
+          asyncGenerator: null,
+          clock: null
         },
       };
       $scope.formValues = {
@@ -42,6 +45,9 @@ angular.module('portainer.app')
         Tags: [], // string list
       };
 
+      function toSeconds(time) {
+        return time / 1000;
+      }
       function toPercent(progress, total) {
         return (progress / total * 100).toFixed();
       }
@@ -74,6 +80,10 @@ angular.module('portainer.app')
       /**
        * RETRIEVAL SECTION
        */
+      function updateRetrievalClock(startTime) {
+        $scope.state.tagsRetrieval.elapsedTime = toSeconds(Date.now() - startTime);
+      }
+
       function createRetrieveAsyncGenerator() {
         $scope.state.tagsRetrieval.asyncGenerator =
           RegistryV2Service.shortTagsWithProgress($scope.registryId, $scope.repository.Name, $scope.repository.Tags);
@@ -83,6 +93,7 @@ angular.module('portainer.app')
         $scope.state.tagsRetrieval.running = false;
         $scope.state.tagsRetrieval.progression = 0;
         $scope.state.tagsRetrieval.elapsedTime = 0;
+        $scope.state.tagsRetrieval.clock = null;
       }
 
       function computeImages() {
@@ -93,6 +104,7 @@ angular.module('portainer.app')
       $scope.startStopRetrieval = function () {
         if ($scope.state.tagsRetrieval.running) {
           $scope.state.tagsRetrieval.asyncGenerator.return();
+          $interval.cancel($scope.state.tagsRetrieval.clock);
         } else {
           retrieveTags().then(() => {
             createRetrieveAsyncGenerator();
@@ -112,15 +124,16 @@ angular.module('portainer.app')
       async function retrieveTagsAsync() {
         $scope.state.tagsRetrieval.running = true;
         const startTime = Date.now();
+        $scope.state.tagsRetrieval.clock = $interval(updateRetrievalClock, 1000, 0, true, startTime);
         for await (const partialResult of $scope.state.tagsRetrieval.asyncGenerator) {
           if (typeof partialResult === 'number') {
             $scope.state.tagsRetrieval.progression = toPercent(partialResult, $scope.repository.Tags.length);
-            $scope.state.tagsRetrieval.elapsedTime = Date.now() - startTime;
           } else {
             $scope.short.Tags = _.sortBy(partialResult, 'Name');
           }
         }
         $scope.state.tagsRetrieval.running = false;
+        $interval.cancel($scope.state.tagsRetrieval.clock);
       }
       /**
        * !END RETRIEVAL SECTION
@@ -163,6 +176,9 @@ angular.module('portainer.app')
       /**
        * RETAG SECTION
        */
+      function updateRetagClock(startTime) {
+        $scope.state.tagsRetag.elapsedTime = toSeconds(Date.now() - startTime);
+      }
 
       function createRetagAsyncGenerator(modifiedTags, modifiedDigests, impactedTags) {
         $scope.state.tagsRetag.asyncGenerator =
@@ -174,17 +190,17 @@ angular.module('portainer.app')
         try {
           $scope.state.tagsRetag.running = true;
 
-          modal = await openModal({
-            message: () => 'Retag is in progress! Closing your browser or refreshing the page while this operation is in progress will result in loss of tags.',
-            progressLabel: () => 'Retag progress',
-            context: () => $scope.state.tagsRetag
-          });
           const modifiedTags = _.filter($scope.tags, (item) => item.Modified === true);
           for (const tag of modifiedTags) {
             if (!ImageHelper.isValidTag(tag.NewName)) {
               throw {msg: 'Invalid tag pattern, see info for more details on format.'}
             }
           }
+          modal = await openModal({
+            message: () => 'Retag is in progress! Closing your browser or refreshing the page while this operation is in progress will result in loss of tags.',
+            progressLabel: () => 'Retag progress',
+            context: () => $scope.state.tagsRetag
+          });
           const modifiedDigests = _.uniq(_.map(modifiedTags, 'ImageDigest'));
           const impactedTags = _.filter($scope.short.Tags, (item) => _.includes(modifiedDigests, item.ImageDigest));
 
@@ -193,10 +209,10 @@ angular.module('portainer.app')
           createRetagAsyncGenerator(modifiedTags, modifiedDigests, impactedTags);
 
           const startTime = Date.now();
+          $scope.state.tagsRetag.clock = $interval(updateRetagClock, 1000, 0, true, startTime);
           for await (const partialResult of $scope.state.tagsRetag.asyncGenerator) {
             if (typeof partialResult === 'number') {
               $scope.state.tagsRetag.progression = toPercent(partialResult, totalOps);
-              $scope.state.tagsRetag.elapsedTime = Date.now() - startTime;
             }
           }
 
@@ -211,8 +227,11 @@ angular.module('portainer.app')
         } catch (err) {
           Notifications.error('Failure', err, 'Unable to rename tags');
         } finally {
+          $interval.cancel($scope.state.tagsRetag.clock);
           $scope.state.tagsRetag.running = false;
-          modal.close();
+          if (modal) {
+            modal.close();
+          }
         }
       }
 
@@ -226,6 +245,10 @@ angular.module('portainer.app')
       /**
        * REMOVE TAGS SECTION
        */
+
+      function updateDeleteClock(startTime) {
+        $scope.state.tagsDelete.elapsedTime = toSeconds(Date.now() - startTime);
+      }
 
       function createDeleteAsyncGenerator(modifiedDigests, impactedTags) {
         $scope.state.tagsDelete.asyncGenerator =
@@ -242,7 +265,6 @@ angular.module('portainer.app')
             context: () => $scope.state.tagsDelete
           });
 
-          const startTime = Date.now()
           const deletedTagNames = _.map(selectedTags, 'Name');
           const deletedShortTags = _.filter($scope.short.Tags, (item) => _.includes(deletedTagNames, item.Name));
           const modifiedDigests = _.uniq(_.map(deletedShortTags, 'ImageDigest'));
@@ -253,10 +275,11 @@ angular.module('portainer.app')
 
           createDeleteAsyncGenerator(modifiedDigests, tagsToKeep);
 
+          const startTime = Date.now();
+          $scope.state.tagsDelete.clock = $interval(updateDeleteClock, 1000, 0, true, startTime);
           for await (const partialResult of $scope.state.tagsDelete.asyncGenerator) {
             if (typeof partialResult === 'number') {
               $scope.state.tagsDelete.progression = toPercent(partialResult, totalOps);
-              $scope.state.tagsDelete.elapsedTime = Date.now() - startTime;
             }
           }
 
@@ -272,6 +295,7 @@ angular.module('portainer.app')
         } catch (err) {
           Notifications.error('Failure', err, 'Unable to delete tags');
         } finally {
+          $interval.cancel($scope.state.tagsDelete.clock);
           $scope.state.tagsDelete.running = false;
           modal.close();
         }
@@ -343,6 +367,7 @@ angular.module('portainer.app')
         try {
           const registryId = $scope.registryId = $transition$.params().id;
           $scope.repository.Name = $transition$.params().repository;
+          $scope.state.loading = true;
 
           $scope.registry = await RegistryService.registry(registryId);
           await loadRepositoryDetails();
@@ -352,6 +377,8 @@ angular.module('portainer.app')
           createRetrieveAsyncGenerator();
         } catch (err) {
           Notifications.error('Failure', err, 'Unable to retrieve repository information');
+        } finally {
+          $scope.state.loading = false;
         }
       }
 
@@ -359,16 +386,25 @@ angular.module('portainer.app')
         if ($scope.state.tagsRetrieval.asyncGenerator) {
           $scope.state.tagsRetrieval.asyncGenerator.return();
         }
+        if ($scope.state.tagsRetrieval.clock) {
+          $interval.cancel($scope.state.tagsRetrieval.clock);
+        }
         if ($scope.state.tagsRetag.asyncGenerator) {
           $scope.state.tagsRetag.asyncGenerator.return();
+        }
+        if ($scope.state.tagsRetag.clock) {
+          $interval.cancel($scope.state.tagsRetag.clock);
         }
         if ($scope.state.tagsDelete.asyncGenerator) {
           $scope.state.tagsDelete.asyncGenerator.return();
         }
+        if ($scope.state.tagsDelete.clock) {
+          $interval.cancel($scope.state.tagsDelete.clock);
+        }
       });
 
       this.$onInit = function() {
-        $async(initView)
+        return $async(initView)
         .then(() => {
           if ($scope.state.tagsRetrieval.auto) {
             $scope.startStopRetrieval();

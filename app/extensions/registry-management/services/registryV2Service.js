@@ -169,7 +169,7 @@ function RegistryV2ServiceFactory($q, $async, RegistryCatalog, RegistryTags, Reg
     });
   };
 
-  service.addTagsWithProgress = async function* (id, repository, tagsList, progression = 0) {
+  async function* addTagsWithProgress(id, repository, tagsList, progression = 0) {
     for await (const partialResult of genericAsyncGenerator($q, tagsList, service.addTag, [id, repository])) {
       if (typeof partialResult === 'number') {
         yield progression + partialResult;
@@ -183,14 +183,14 @@ function RegistryV2ServiceFactory($q, $async, RegistryCatalog, RegistryTags, Reg
     yield* genericAsyncGenerator($q, tagsList, service.shortTag, [id, repository]);
   }
 
-  service.deleteManifestsWithProgress = async function* (id, repository, manifests) {
+  async function* deleteManifestsWithProgress(id, repository, manifests) {
     for await (const partialResult of genericAsyncGenerator($q, manifests, service.deleteManifest, [id, repository])) {
       yield partialResult;
     }
   }
 
   service.retagWithProgress = async function* (id, repository, modifiedTags, modifiedDigests, impactedTags){
-    yield* service.deleteManifestsWithProgress(id, repository, modifiedDigests);
+    yield* deleteManifestsWithProgress(id, repository, modifiedDigests);
 
     const newTags = _.map(impactedTags, (item) => {
       const tagFromTable = _.find(modifiedTags, { 'Name': item.Name });
@@ -198,15 +198,15 @@ function RegistryV2ServiceFactory($q, $async, RegistryCatalog, RegistryTags, Reg
       return { tag: name, manifest: item.ManifestV2 };
     });
 
-    yield* service.addTagsWithProgress(id, repository, newTags, modifiedDigests.length);
+    yield* addTagsWithProgress(id, repository, newTags, modifiedDigests.length);
   }
 
   service.deleteTagsWithProgress = async function* (id, repository, modifiedDigests, impactedTags) {
-    yield* service.deleteManifestsWithProgress(id, repository, modifiedDigests);
+    yield* deleteManifestsWithProgress(id, repository, modifiedDigests);
 
     const newTags = _.map(impactedTags, (item) => {return {tag: item.Name, manifest: item.ManifestV2}})
 
-    yield* service.addTagsWithProgress(id, repository, newTags, modifiedDigests.length);
+    yield* addTagsWithProgress(id, repository, newTags, modifiedDigests.length);
   }
 
   return service;

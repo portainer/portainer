@@ -1,7 +1,17 @@
 import _ from 'lodash-es';
 
+function findBestStep(length) {
+  let step = Math.trunc(length / 10);
+  if (step < 10) {
+    step = 10;
+  } else if (step > 100) {
+    step = 100;
+  }
+  return step;
+}
+
 export default async function* genericAsyncGenerator($q, list, func, params) {
-  const step = 100;
+  const step = findBestStep(list.length);
   let start = 0;
   let end = start + step;
   let results = [];
@@ -17,7 +27,7 @@ export default async function* genericAsyncGenerator($q, list, func, params) {
       results.push(res[i]);
     }
     start = end;
-    end = start + step;
+    end += step;
   }
   yield list.length;
   yield results;

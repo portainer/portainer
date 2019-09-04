@@ -20,7 +20,7 @@
         As this repository contains more than <code>{{ state.tagsRetrieval.limit }}</code> tags, the additional retrieval wasn't started automatically.<br>
         Once started you can still navigate this page, leaving the page will cancel the retrieval process.<br>
         <br>
-        <span style="font-weight: 700">Note:</span> on very large repositories the retrieval process can take a few minutes.
+        <span style="font-weight: 700">Note:</span> on very large repositories or high latency environments the retrieval process can take a few minutes.
       </p>
       <button class="btn btn-sm btn-primary" ng-if="!state.tagsRetrieval.running && short.Tags.length === 0"
         ng-click="startStopRetrieval()">Start</button>
@@ -28,10 +28,10 @@
         ng-click="startStopRetrieval()">Cancel</button>
     </span>
     <span ng-if="state.tagsRetrieval.running && state.tagsRetrieval.progression !== '100'">
-      &nbsp; Retrieval progress : {{ state.tagsRetrieval.progression }}% - {{ state.tagsRetrieval.elapsedTime / 1000 }}s
+      &nbsp; Retrieval progress : {{ state.tagsRetrieval.progression }}% - {{ state.tagsRetrieval.elapsedTime | number:0 }}s
     </span>
     <span ng-if="!state.tagsRetrieval.running && state.tagsRetrieval.progression === '100'">
-      <i class="fa fa-check-circle green-icon"></i> Retrieval completed in {{ state.tagsRetrieval.elapsedTime / 1000 }}s
+      <i class="fa fa-check-circle green-icon"></i> Retrieval completed in {{ state.tagsRetrieval.elapsedTime | number:0}}s
     </span>
   </information-panel>
 </div>

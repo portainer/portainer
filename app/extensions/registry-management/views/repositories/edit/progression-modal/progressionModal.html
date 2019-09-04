@@ -7,7 +7,7 @@
       </p>
     </span>
     <span>
-      &nbsp; {{ $ctrl.resolve.progressLabel }} : {{ $ctrl.resolve.context.progression }}% - {{ $ctrl.resolve.context.elapsedTime / 1000 }}s
+      &nbsp; {{ $ctrl.resolve.progressLabel }} : {{ $ctrl.resolve.context.progression }}% - {{ $ctrl.resolve.context.elapsedTime |number:0 }}s
     </span>
   </rd-widget-body>
 </rd-widget>
