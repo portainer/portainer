@@ -48,7 +48,7 @@ func (service *Service) ClonePrivateRepositoryWithBasicAuth(repositoryURL, refer
 	return cloneRepository(repositoryURL, referenceName, destination)
 }
 
-func cloneRepository(repositoryURL string, referenceName string, destination string) error {
+func cloneRepository(repositoryURL, referenceName, destination string) error {
 	options := &git.CloneOptions{
 		URL: repositoryURL,
 	}
