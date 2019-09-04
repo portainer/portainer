@@ -102,7 +102,7 @@ func initLDAPService() portainer.LDAPService {
 }
 
 func initGitService() portainer.GitService {
-	return &git.Service{}
+	return git.NewService()
 }
 
 func initClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService) *docker.ClientFactory {

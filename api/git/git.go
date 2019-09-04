@@ -2,6 +2,7 @@ package git
 
 import (
 	"crypto/tls"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -20,26 +21,6 @@ type Service struct {
 
 // NewService initializes a new service.
 func NewService() *Service {
-	service := &Service{}
-
-	return service
-}
-
-// ClonePublicRepository clones a public git repository using the specified URL in the specified
-// destination folder.
-func (service *Service) ClonePublicRepository(repositoryURL, referenceName string, destination string) error {
-	return cloneRepository(repositoryURL, referenceName, destination)
-}
-
-// ClonePrivateRepositoryWithBasicAuth clones a private git repository using the specified URL in the specified
-// destination folder. It will use the specified username and password for basic HTTP authentication.
-func (service *Service) ClonePrivateRepositoryWithBasicAuth(repositoryURL, referenceName string, destination, username, password string) error {
-	credentials := username + ":" + url.PathEscape(password)
-	repositoryURL = strings.Replace(repositoryURL, "://", "://"+credentials+"@", 1)
-	return cloneRepository(repositoryURL, referenceName, destination)
-}
-
-func cloneRepository(repositoryURL string, referenceName string, destination string) error {
 	httpsCli := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -49,6 +30,26 @@ func cloneRepository(repositoryURL string, referenceName string, destination str
 
 	client.InstallProtocol("https", githttp.NewClient(httpsCli))
 
+	return &Service{
+		httpsCli: httpsCli,
+	}
+}
+
+// ClonePublicRepository clones a public git repository using the specified URL in the specified
+// destination folder.
+func (service *Service) ClonePublicRepository(repositoryURL, referenceName string, destination string) error {
+	return cloneRepository(repositoryURL, referenceName, destination, service.httpsCli)
+}
+
+// ClonePrivateRepositoryWithBasicAuth clones a private git repository using the specified URL in the specified
+// destination folder. It will use the specified username and password for basic HTTP authentication.
+func (service *Service) ClonePrivateRepositoryWithBasicAuth(repositoryURL, referenceName string, destination, username, password string) error {
+	credentials := username + ":" + url.PathEscape(password)
+	repositoryURL = strings.Replace(repositoryURL, "://", "://"+credentials+"@", 1)
+	return cloneRepository(repositoryURL, referenceName, destination, service.httpsCli)
+}
+
+func cloneRepository(repositoryURL string, referenceName string, destination string, httpsCli *http.Client) error {
 	options := &git.CloneOptions{
 		URL: repositoryURL,
 	}
