@@ -2,7 +2,6 @@ package git
 
 import (
 	"crypto/tls"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -38,7 +37,7 @@ func NewService() *Service {
 // ClonePublicRepository clones a public git repository using the specified URL in the specified
 // destination folder.
 func (service *Service) ClonePublicRepository(repositoryURL, referenceName string, destination string) error {
-	return cloneRepository(repositoryURL, referenceName, destination, service.httpsCli)
+	return cloneRepository(repositoryURL, referenceName, destination)
 }
 
 // ClonePrivateRepositoryWithBasicAuth clones a private git repository using the specified URL in the specified
@@ -46,10 +45,10 @@ func (service *Service) ClonePublicRepository(repositoryURL, referenceName strin
 func (service *Service) ClonePrivateRepositoryWithBasicAuth(repositoryURL, referenceName string, destination, username, password string) error {
 	credentials := username + ":" + url.PathEscape(password)
 	repositoryURL = strings.Replace(repositoryURL, "://", "://"+credentials+"@", 1)
-	return cloneRepository(repositoryURL, referenceName, destination, service.httpsCli)
+	return cloneRepository(repositoryURL, referenceName, destination)
 }
 
-func cloneRepository(repositoryURL string, referenceName string, destination string, httpsCli *http.Client) error {
+func cloneRepository(repositoryURL string, referenceName string, destination string) error {
 	options := &git.CloneOptions{
 		URL: repositoryURL,
 	}
