@@ -226,7 +226,6 @@ type (
 		Username       string             `json:"Username"`
 		Password       string             `json:"Password"`
 		TLSConfig      TLSConfiguration   `json:"TLSConfig"`
-		Gitlab         GitlabRegistryData `json:"Gitlab"`
 	}
 
 	// DockerHub represents all the required information to connect and use the

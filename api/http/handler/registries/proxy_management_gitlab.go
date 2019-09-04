@@ -46,9 +46,8 @@ func (handler *Handler) proxyRequestsToGitlabAPIWithRegistry(w http.ResponseWrit
 	}
 
 	config := &portainer.RegistryManagementConfiguration{
-		Type: registry.Type,
+		Type: portainer.GitlabRegistry,
 		Password: registry.Password,
-		Gitlab: registry.Gitlab,
 	}
 
 	encodedConfiguration, err := json.Marshal(config)
