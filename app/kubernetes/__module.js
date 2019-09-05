@@ -4,6 +4,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
 
   var kubernetes = {
     name: 'kubernetes',
+    url: '/kubernetes',
     parent: 'root',
     abstract: true,
     resolve: {
