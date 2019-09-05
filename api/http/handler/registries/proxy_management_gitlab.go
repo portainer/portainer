@@ -46,7 +46,7 @@ func (handler *Handler) proxyRequestsToGitlabAPIWithRegistry(w http.ResponseWrit
 	}
 
 	config := &portainer.RegistryManagementConfiguration{
-		Type: portainer.GitlabRegistry,
+		Type:     portainer.GitlabRegistry,
 		Password: registry.Password,
 	}
 
@@ -56,7 +56,7 @@ func (handler *Handler) proxyRequestsToGitlabAPIWithRegistry(w http.ResponseWrit
 	}
 
 	id := strconv.Itoa(int(registryID))
-	r.Header.Set("X-RegistryManagement-Key", id + "-gitlab")
+	r.Header.Set("X-RegistryManagement-Key", id+"-gitlab")
 	r.Header.Set("X-RegistryManagement-URI", registry.Gitlab.InstanceURL)
 	r.Header.Set("X-RegistryManagement-Config", string(encodedConfiguration))
 	r.Header.Set("X-PortainerExtension-License", extension.License.LicenseKey)

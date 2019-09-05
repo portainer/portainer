@@ -221,11 +221,11 @@ type (
 	// RegistryManagementConfiguration represents a configuration that can be used to query
 	// the registry API via the registry management extension.
 	RegistryManagementConfiguration struct {
-		Type           RegistryType       `json:"Type"`
-		Authentication bool               `json:"Authentication"`
-		Username       string             `json:"Username"`
-		Password       string             `json:"Password"`
-		TLSConfig      TLSConfiguration   `json:"TLSConfig"`
+		Type           RegistryType     `json:"Type"`
+		Authentication bool             `json:"Authentication"`
+		Username       string           `json:"Username"`
+		Password       string           `json:"Password"`
+		TLSConfig      TLSConfiguration `json:"TLSConfig"`
 	}
 
 	// DockerHub represents all the required information to connect and use the
