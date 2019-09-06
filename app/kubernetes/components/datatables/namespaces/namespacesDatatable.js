@@ -1,4 +1,4 @@
-angular.module('portainer.kubernetes').component('namespacesDatatable', {
+angular.module('portainer.kubernetes').component('kubernetesNamespacesDatatable', {
   templateUrl: './namespacesDatatable.html',
   controller: 'GenericDatatableController',
   bindings: {

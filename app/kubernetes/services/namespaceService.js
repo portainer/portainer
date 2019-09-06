@@ -3,7 +3,7 @@ import KubernetesNamespaceViewModel from '../models/namespace';
 
 angular.module('portainer.kubernetes')
   .factory('KubernetesNamespaceService', ['$async', 'KubernetesNamespaces',
-    function EndpointServiceFactory($async, KubernetesNamespaces) {
+    function KubernetesNamespaceServiceFactory($async, KubernetesNamespaces) {
       'use strict';
       var service = {};
 

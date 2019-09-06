@@ -1,0 +1,19 @@
+<rd-header>
+  <rd-header-title title-text="Services list">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="kubernetes.services" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>Services</rd-header-content>
+</rd-header>
+
+<div class="row" ng-if="ctrl.services">
+  <div class="col-sm-12">
+    <kubernetes-services-datatable
+    title-text="Services" title-icon="fa-list-alt"
+    dataset="ctrl.services" table-key="kubernetes.services"
+    order-by="Name" 
+    refresh-callback="ctrl.getAll"
+    ></kubernetes-services-datatable>
+  </div>
+</div>
