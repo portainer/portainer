@@ -1,4 +1,5 @@
 export default function KubernetesServiceViewModel(data) {
+  this.Id = data.metadata.uid;
   this.Namespace = data.metadata.namespace || '';
   this.Name = data.metadata.name || '';
   this.Type = data.spec.type || '';

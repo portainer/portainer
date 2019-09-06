@@ -54,8 +54,21 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     }
   }
 
+  var containers = {
+    name: 'kubernetes.containers',
+    url: '/containers',
+    views: {
+      'content@': {
+        templateUrl: './views/containers/containers.html',
+        controller: 'KubernetesContainersController',
+        controllerAs: 'ctrl'
+      }
+    }
+  }
+
   $stateRegistryProvider.register(kubernetes);
   $stateRegistryProvider.register(dashboard);
   $stateRegistryProvider.register(namespaces);
   $stateRegistryProvider.register(services);
+  $stateRegistryProvider.register(containers);
 }]);

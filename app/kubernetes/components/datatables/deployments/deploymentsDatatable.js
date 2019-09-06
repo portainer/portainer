@@ -1,4 +1,4 @@
-angular.module('portainer.kubernetes').component('deploymentsDatatable', {
+angular.module('portainer.kubernetes').component('kubernetesDeploymentsDatatable', {
   templateUrl: './deploymentsDatatable.html',
   controller: 'GenericDatatableController',
   bindings: {

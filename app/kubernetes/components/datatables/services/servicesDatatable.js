@@ -1,4 +1,4 @@
-angular.module('portainer.docker').component('kubernetesServicesDatatable', {
+angular.module('portainer.kubernetes').component('kubernetesServicesDatatable', {
   templateUrl: './servicesDatatable.html',
   controller: 'KubernetesServicesDatatableController',
   bindings: {
