@@ -1,0 +1,19 @@
+<rd-header>
+  <rd-header-title title-text="Namespaces list">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="docker.kubernetes" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>Namespaces</rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <namespaces-datatable
+    title-text="Namespaces" title-icon="fa-file-code"
+    dataset="ctrl.namespaces" table-key="kubernetes.namespaces"
+    order-by="Name" 
+    refresh-callback="ctrl.getNamespaces"
+    ></namespaces-datatable>
+  </div>
+</div>

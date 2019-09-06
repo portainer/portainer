@@ -30,6 +30,19 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     }
   };
 
+  var namespaces = {
+    name: 'kubernetes.namespaces',
+    url: '/namespaces',
+    views: {
+      'content@': {
+        templateUrl: './views/namespaces/namespaces.html',
+        controller: 'KubernetesNamespacesController',
+        controllerAs: 'ctrl'
+      }
+    }
+  }
+
   $stateRegistryProvider.register(kubernetes);
   $stateRegistryProvider.register(dashboard);
+  $stateRegistryProvider.register(namespaces);
 }]);
