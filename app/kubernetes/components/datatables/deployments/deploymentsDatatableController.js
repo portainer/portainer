@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
 
 angular.module('portainer.kubernetes')
-.controller('KubernetesServicesDatatableController', ['$scope', '$controller', 'DatatableService',
+.controller('KubernetesDeploymentsDatatableController', ['$scope', '$controller', 'DatatableService',
 function ($scope, $controller, DatatableService) {
 
   angular.extend(this, $controller('GenericDatatableController', {$scope: $scope}));

@@ -7,13 +7,13 @@
   <rd-header-content>Services</rd-header-content>
 </rd-header>
 
-<div class="row" ng-if="ctrl.services">
+<div class="row" ng-if="ctrl.deployments">
   <div class="col-sm-12">
-    <kubernetes-services-datatable
-    title-text="Services" title-icon="fa-list-alt"
-    dataset="ctrl.services" table-key="kubernetes.services"
+    <kubernetes-deployments-datatable
+    title-text="Deployments" title-icon="fa-list-alt"
+    dataset="ctrl.deployments" table-key="kubernetes.deployments"
     order-by="Name" 
     refresh-callback="ctrl.getAll"
-    ></kubernetes-services-datatable>
+    ></kubernetes-deployments-datatable>
   </div>
 </div>

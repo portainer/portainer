@@ -2,11 +2,12 @@ import angular from 'angular';
 
 class KubernetesServicesController {
   /* @ngInject */
-  constructor($async, Notifications, KubernetesServiceService, KubernetesDeploymentService) {
+  constructor($async, Notifications, KubernetesServiceService, KubernetesDeploymentService, KubernetesDeploymentHelper) {
     this.$async = $async;
     this.Notifications = Notifications;
     this.KubernetesServiceService = KubernetesServiceService;
     this.KubernetesDeploymentService = KubernetesDeploymentService;
+    this.KubernetesDeploymentHelper = KubernetesDeploymentHelper;
 
     this.getAll = this.getAll.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);
@@ -18,8 +19,9 @@ class KubernetesServicesController {
         this.KubernetesServiceService.services(),
         this.KubernetesDeploymentService.deployments()
       ]);
-      this.services = services;
+      this.KubernetesDeploymentHelper.associateServicesToDeployments(services, deployments);
       this.deployments = deployments;
+      this.services = services;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve services and deployments');
     }

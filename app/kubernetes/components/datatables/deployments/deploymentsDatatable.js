@@ -1,12 +1,13 @@
 angular.module('portainer.kubernetes').component('kubernetesDeploymentsDatatable', {
   templateUrl: './deploymentsDatatable.html',
-  controller: 'GenericDatatableController',
+  controller: 'KubernetesDeploymentsDatatableController',
   bindings: {
+    titleText: '@',
+    titleIcon: '@',
     dataset: '<',
-    serviceId: '<',
     tableKey: '@',
     orderBy: '@',
     reverseOrder: '<',
-    textFilter: '='
+    refreshCallback: '<'
   }
 });

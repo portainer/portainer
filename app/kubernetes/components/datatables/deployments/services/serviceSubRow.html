@@ -1,0 +1,37 @@
+<div style="background-color: #d5e8f3; padding: 2px">
+  <table class="table table-condensed table-hover nowrap-cells">
+    <thead style="background-color: #e7f6ff">
+      <tr>
+        <th>Name</th>
+        <th>Namespace</th>
+        <th>Type</th>
+        <th>Cluster IP</th>
+        <th>External IPs</th>
+        <th>Ports</th>
+        <th>Creation date</th>
+      </tr>
+    </thead>
+    <tbody style="background-color: #f1f9fd;">
+      <tr ng-if="$ctrl.service">
+        <td>{{ $ctrl.service.Name }}</td>
+        <td>{{ $ctrl.service.Namespace }}</td>
+        <td>{{ $ctrl.service.Type }}</td>
+        <td>{{ $ctrl.service.ClusterIP }}</td>
+        <td>
+          <span ng-if="$ctrl.service.ExternalIPs.length" class="label label-primary image-tag" ng-repeat="ip in $ctrl.service.ExternalIPs track by $index">{{ ip }}</span>
+          <span ng-if="!$ctrl.service.ExternalIPs.length">/</span>
+        </td>
+        <td>
+          <a ng-if="$ctrl.service.Ports && $ctrl.service.Ports.length > 0" ng-repeat="p in $ctrl.service.Ports" class="image-tag" ng-href="http://{{ $ctrl.service.ClusterIP }}:{{ p.port }}" target="_blank">
+            <i class="fa fa-external-link-alt" aria-hidden="true"></i> {{ p.port }}:{{ p.targetPort }}
+          </a>
+          <span ng-if="!$ctrl.service.Ports || $ctrl.service.Ports.length === 0">-</span>
+        </td>
+        <td>{{ $ctrl.service.CreatedAt | getisodate }}</td>
+      </tr>
+      <tr ng-if="!$ctrl.service">
+        <td colspan="8" class="text-center text-muted">No service bound to this deployment.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

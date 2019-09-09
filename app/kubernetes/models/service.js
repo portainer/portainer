@@ -7,4 +7,5 @@ export default function KubernetesServiceViewModel(data) {
   this.ExternalIPs = data.spec.externalIPs || [];
   this.Ports = data.spec.ports || [];
   this.CreatedAt = data.metadata.creationTimestamp || '';
+  this.Selector = data.spec.selector;
 }

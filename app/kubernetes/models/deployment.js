@@ -4,4 +4,5 @@ export default function KubernetesDeploymentViewModel(data) {
   this.ReadyReplicaCount = data.status.readyReplicas;
   this.TotalReplicaCount = data.status.replicas;
   this.CreatedAt = data.metadata.creationTimestamp;
+  this.Labels = data.spec.template.metadata.labels;
 }
