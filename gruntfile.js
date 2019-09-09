@@ -1,38 +1,67 @@
 const webpackDevConfig = require('./webpack/webpack.develop');
 const webpackProdConfig = require('./webpack/webpack.production');
-var gruntfile_cfg = {};
 var loadGruntTasks = require('load-grunt-tasks');
+
 var os = require('os');
 var arch = os.arch();
 if (arch === 'x64') arch = 'amd64';
+
+var portainer_data = '/tmp/portainer';
 
 module.exports = function(grunt) {
   loadGruntTasks(grunt, {
     pattern: ['grunt-*', 'gruntify-*']
   });
 
-  grunt.registerTask('default', ['eslint', 'build']);
+  grunt.initConfig({
+    root: 'dist',
+    distdir: 'dist/public',
+    shippedDockerVersion: '18.09.3',
+    shippedDockerVersionWindows: '17.09.0-ce',
+    config: gruntfile_cfg.config,
+    env: gruntfile_cfg.env,
+    src: gruntfile_cfg.src,
+    clean: gruntfile_cfg.clean,
+    eslint: gruntfile_cfg.eslint,
+    shell: gruntfile_cfg.shell,
+    copy: gruntfile_cfg.copy,
+    webpack: gruntfile_cfg.webpack
+  });
 
-  grunt.registerTask('build-webapp', [
-    'config:prod',
-    'env:prod',
-    'clean:all',
-    'copy:templates',
-    'webpack:prod']);
+  grunt.registerTask('lint', ['eslint']);
 
-  grunt.registerTask('build', [
+  grunt.registerTask('build:server', [
+    'shell:build_binary:linux:' + arch,
+    'shell:download_docker_binary:linux:' + arch,
+  ]);
+
+  grunt.registerTask('build:client', [
     'config:dev',
-    'shell:buildBinary:linux:' + arch,
-    'shell:downloadDockerBinary:linux:' + arch,
-    'copy:templates',
+    'env:dev',
     'webpack:dev'
   ]);
 
-  grunt.registerTask('build-server', [
-    'shell:buildBinary:linux:' + arch,
-    'shell:downloadDockerBinary:linux:' + arch,
+  grunt.registerTask('build', [
+    'build:server',
+    'build:client',
+    'copy:templates'
+  ]);
+
+  grunt.registerTask('start:server', [
+    'build:server',
     'copy:templates',
-    'shell:run:' + arch
+    'shell:run_container'
+  ]);
+
+  grunt.registerTask('start:client', [
+    'config:dev',
+    'env:dev',
+    'webpack:devWatch'
+  ]);
+
+  grunt.registerTask('start', [
+    'start:server',
+    'start:client'
   ]);
 
   grunt.task.registerTask('release', 'release:<platform>:<arch>',
@@ -42,8 +71,8 @@ module.exports = function(grunt) {
         'env:prod',
         'clean:all',
         'copy:templates',
-        'shell:buildBinary:' + p + ':' + a,
-        'shell:downloadDockerBinary:' + p + ':' + a,
+        'shell:build_binary:' + p + ':' + a,
+        'shell:download_docker_binary:' + p + ':' + a,
         'webpack:prod'
       ]);
     });
@@ -55,41 +84,15 @@ module.exports = function(grunt) {
         'env:prod',
         'clean:all',
         'copy:templates',
-        'shell:buildBinaryOnDevOps:' + p + ':' + a,
-        'shell:downloadDockerBinary:' + p + ':' + a,
+        'shell:build_binary_azuredevops:' + p + ':' + a,
+        'shell:download_docker_binary:' + p + ':' + a,
         'webpack:prod'
       ]);
     });
-
-  grunt.registerTask('lint', ['eslint']);
-  grunt.registerTask('run-dev', ['build', 'shell:run', 'watch:build']);
-  grunt.registerTask('clear', ['clean:app']);
-
-  grunt.registerTask('run-dev', [
-    'config:dev',
-    'build-server',
-    'webpack:devWatch'
-  ]);
-  grunt.registerTask('clear', ['clean:app']);
-
-  // Project configuration.
-  grunt.initConfig({
-    root: 'dist',
-    distdir: 'dist/public',
-    shippedDockerVersion: '18.09.3',
-    shippedDockerVersionWindows: '17.09.0-ce',
-    config: gruntfile_cfg.config,
-    src: gruntfile_cfg.src,
-    clean: gruntfile_cfg.clean,
-    eslint: gruntfile_cfg.eslint,
-    shell: gruntfile_cfg.shell,
-    copy: gruntfile_cfg.copy,
-    webpack: gruntfile_cfg.webpack,
-    env: gruntfile_cfg.env
-  });
 };
 
 /***/
+var gruntfile_cfg = {};
 
 gruntfile_cfg.env = {
   dev: {
@@ -102,8 +105,8 @@ gruntfile_cfg.env = {
 
 gruntfile_cfg.webpack = {
   dev: webpackDevConfig,
-  prod: webpackProdConfig,
-  devWatch: Object.assign({ watch: true }, webpackDevConfig)
+  devWatch: Object.assign({ watch: true }, webpackDevConfig),
+  prod: webpackProdConfig
 };
 
 gruntfile_cfg.config = {
@@ -120,26 +123,16 @@ gruntfile_cfg.src = {
 };
 
 gruntfile_cfg.clean = {
+  server: ['<%= root %>/portainer'],
+  client: ['<%= distdir %>/*'],
+  docker: ['<%= root %>/docker'],
   all: ['<%= root %>/*'],
-  app: [
-    '<%= distdir %>/*',
-    '!<%= distdir %>/../portainer*',
-    '!<%= distdir %>/../docker*'
-  ],
-  tmpl: ['<%= distdir %>/templates'],
-  tmp: [
-    '<%= distdir %>/js/*',
-    '!<%= distdir %>/js/app.*.js',
-    '<%= distdir %>/css/*',
-    '!<%= distdir %>/css/app.*.css'
-  ]
 };
 
 gruntfile_cfg.eslint = {
   src: ['gruntfile.js', '<%= src.js %>'],
   options: { configFile: '.eslintrc.yml' }
 };
-
 
 gruntfile_cfg.copy = {
   templates: {
@@ -153,7 +146,14 @@ gruntfile_cfg.copy = {
   }
 };
 
-function shell_buildBinary(p, a) {
+gruntfile_cfg.shell = {
+  build_binary: { command: shell_build_binary },
+  build_binary_azuredevops: { command: shell_build_binary_azuredevops },
+  download_docker_binary: { command: shell_download_docker_binary },
+  run_container: { command: shell_run_container }
+};
+
+function shell_build_binary(p, a) {
   var binfile = 'dist/portainer';
   if (p === 'linux') {
     return [
@@ -174,22 +174,22 @@ function shell_buildBinary(p, a) {
   }
 }
 
-function shell_buildBinaryOnDevOps(p, a) {
+function shell_build_binary_azuredevops(p, a) {
   if (p === 'linux') {
-    return 'build/build_binary_devops.sh ' + p + ' ' + a + ';';
+    return 'build/build_binary_azuredevops.sh ' + p + ' ' + a + ';';
   } else {
-    return 'powershell -Command ".\\build\\build_binary_devops.ps1 -platform ' + p + ' -arch ' + a + '"';
+    return 'powershell -Command ".\\build\\build_binary_azuredevops.ps1 -platform ' + p + ' -arch ' + a + '"';
   }
 }
 
-function shell_run() {
+function shell_run_container() {
   return [
     'docker rm -f portainer',
-    'docker run -d -p 8000:8000 -p 9000:9000 -v $(pwd)/dist:/app -v /tmp/portainer:/data -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer portainer/base /app/portainer --no-analytics --template-file /app/templates.json'
+    'docker run -d -p 8000:8000 -p 9000:9000 -v $(pwd)/dist:/app -v ' + portainer_data + ':/data -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer portainer/base /app/portainer --no-analytics --template-file /app/templates.json'
   ].join(';');
 }
 
-function shell_downloadDockerBinary(p, a) {
+function shell_download_docker_binary(p, a) {
   var ps = { 'windows': 'win', 'darwin': 'mac' };
   var as = { 'amd64': 'x86_64', 'arm': 'armhf', 'arm64': 'aarch64' };
   var ip = ((ps[p] === undefined) ? p : ps[p]);
@@ -213,10 +213,3 @@ function shell_downloadDockerBinary(p, a) {
     ].join(' ');
   }
 }
-
-gruntfile_cfg.shell = {
-  buildBinary: { command: shell_buildBinary },
-  buildBinaryOnDevOps: { command: shell_buildBinaryOnDevOps },
-  run: { command: shell_run },
-  downloadDockerBinary: { command: shell_downloadDockerBinary }
-};
