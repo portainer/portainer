@@ -37,6 +37,7 @@ type Handler struct {
 	JobService                  portainer.JobService
 	ReverseTunnelService        portainer.ReverseTunnelService
 	SettingsService             portainer.SettingsService
+	AuthorizationService        *portainer.AuthorizationService
 }
 
 // NewHandler creates a handler to manage endpoint operations.

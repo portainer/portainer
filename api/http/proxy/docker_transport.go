@@ -19,6 +19,7 @@ type (
 		dockerTransport        *http.Transport
 		enableSignature        bool
 		ResourceControlService portainer.ResourceControlService
+		UserService            portainer.UserService
 		TeamMembershipService  portainer.TeamMembershipService
 		RegistryService        portainer.RegistryService
 		DockerHubService       portainer.DockerHubService
@@ -498,7 +499,12 @@ func (p *proxyTransport) createOperationContext(request *http.Request) (*restric
 	if tokenData.Role != portainer.AdministratorRole {
 		operationContext.isAdmin = false
 
-		_, ok := tokenData.EndpointAuthorizations[p.endpointIdentifier][portainer.EndpointResourcesAccess]
+		user, err := p.UserService.User(operationContext.userID)
+		if err != nil {
+			return nil, err
+		}
+
+		_, ok := user.EndpointAuthorizations[p.endpointIdentifier][portainer.EndpointResourcesAccess]
 		if ok {
 			operationContext.endpointResourceAccess = true
 		}

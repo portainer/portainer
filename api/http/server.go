@@ -84,6 +84,7 @@ type Server struct {
 func (server *Server) Start() error {
 	proxyManagerParameters := &proxy.ManagerParams{
 		ResourceControlService: server.ResourceControlService,
+		UserService:            server.UserService,
 		TeamMembershipService:  server.TeamMembershipService,
 		SettingsService:        server.SettingsService,
 		RegistryService:        server.RegistryService,
@@ -92,6 +93,15 @@ func (server *Server) Start() error {
 		ReverseTunnelService:   server.ReverseTunnelService,
 	}
 	proxyManager := proxy.NewManager(proxyManagerParameters)
+
+	authorizationServiceParameters := &portainer.AuthorizationServiceParameters{
+		EndpointService:       server.EndpointService,
+		EndpointGroupService:  server.EndpointGroupService,
+		RoleService:           server.RoleService,
+		TeamMembershipService: server.TeamMembershipService,
+		UserService:           server.UserService,
+	}
+	authorizationService := portainer.NewAuthorizationService(authorizationServiceParameters)
 
 	requestBouncerParameters := &security.RequestBouncerParams{
 		JWTService:            server.JWTService,
@@ -136,10 +146,12 @@ func (server *Server) Start() error {
 	endpointHandler.JobService = server.JobService
 	endpointHandler.ReverseTunnelService = server.ReverseTunnelService
 	endpointHandler.SettingsService = server.SettingsService
+	endpointHandler.AuthorizationService = authorizationService
 
 	var endpointGroupHandler = endpointgroups.NewHandler(requestBouncer)
 	endpointGroupHandler.EndpointGroupService = server.EndpointGroupService
 	endpointGroupHandler.EndpointService = server.EndpointService
+	endpointGroupHandler.AuthorizationService = authorizationService
 
 	var endpointProxyHandler = endpointproxy.NewHandler(requestBouncer)
 	endpointProxyHandler.EndpointService = server.EndpointService
@@ -157,6 +169,7 @@ func (server *Server) Start() error {
 	extensionHandler.EndpointGroupService = server.EndpointGroupService
 	extensionHandler.EndpointService = server.EndpointService
 	extensionHandler.RegistryService = server.RegistryService
+	extensionHandler.AuthorizationService = authorizationService
 
 	var registryHandler = registries.NewHandler(requestBouncer)
 	registryHandler.RegistryService = server.RegistryService

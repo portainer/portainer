@@ -14,6 +14,7 @@ type Handler struct {
 	*mux.Router
 	EndpointService      portainer.EndpointService
 	EndpointGroupService portainer.EndpointGroupService
+	AuthorizationService *portainer.AuthorizationService
 }
 
 // NewHandler creates a handler to manage endpoint group operations.
