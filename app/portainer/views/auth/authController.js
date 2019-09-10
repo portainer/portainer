@@ -29,12 +29,21 @@ function($async, $q, $scope, $state, $stateParams, $sanitize, Authentication, Us
     }
   }
 
+  function permissionsError() {
+    $scope.state.permissionsError = true;
+    Authentication.logout();
+    $scope.state.AuthenticationError = 'Unable to retrieve permissions.'
+    $scope.state.loginInProgress = false;
+    return Promise.reject();
+  }
+
   $scope.authenticateUser = function() {
     var username = $scope.formValues.Username;
     var password = $scope.formValues.Password;
     $scope.state.loginInProgress = true;
 
     Authentication.login(username, password)
+    .then(() => Authentication.retrievePermissions().catch(permissionsError))
     .then(function success() {
       return retrieveAndSaveEnabledExtensions();
     })
@@ -42,6 +51,9 @@ function($async, $q, $scope, $state, $stateParams, $sanitize, Authentication, Us
       checkForEndpoints();
     })
     .catch(function error() {
+      if ($scope.state.permissionsError) {
+        return;
+      }
       SettingsService.publicSettings()
       .then(function success(settings) {
         if (settings.AuthenticationMethod === 1) {
@@ -166,6 +178,7 @@ function($async, $q, $scope, $state, $stateParams, $sanitize, Authentication, Us
 
   function oAuthLogin(code) {
     return Authentication.OAuthLogin(code)
+    .then(() => Authentication.retrievePermissions().catch(permissionsError))
     .then(function success() {
       return retrieveAndSaveEnabledExtensions();
     })
@@ -173,6 +186,9 @@ function($async, $q, $scope, $state, $stateParams, $sanitize, Authentication, Us
       URLHelper.cleanParameters();
     })
     .catch(function error() {
+      if ($scope.state.permissionsError) {
+        return;
+      }
       $scope.state.AuthenticationError = 'Unable to login via OAuth';
       $scope.state.isInOAuthProcess = false;
     });

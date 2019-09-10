@@ -91,10 +91,17 @@
           </tr>
             <tr authorization="DockerServiceLogs, DockerServiceUpdate, DockerServiceDelete">
               <td colspan="2">
+                <p class="small text-muted">
+                  Note: you can only rollback one level of changes. Clicking the rollback button without making a new change will undo your previous rollback
+                <p>
                 <a authorization="DockerServiceLogs" ng-if="applicationState.endpoint.apiVersion >= 1.30" class="btn btn-primary btn-sm" type="button" ui-sref="docker.services.service.logs({id: service.Id})"><i class="fa fa-file-alt space-right" aria-hidden="true"></i>Service logs</a>
                 <button authorization="DockerServiceUpdate" type="button" class="btn btn-primary btn-sm" ng-disabled="state.updateInProgress || isUpdating" ng-click="forceUpdateService(service)" button-spinner="state.updateInProgress" ng-if="applicationState.endpoint.apiVersion >= 1.25">
                   <span ng-hide="state.updateInProgress"><i class="fa fa-sync space-right" aria-hidden="true"></i>Update the service</span>
                   <span ng-show="state.updateInProgress">Update in progress...</span>
+                </button>
+                <button authorization="DockerServiceUpdate" type="button" class="btn btn-primary btn-sm" ng-disabled="state.rollbackInProgress || isUpdating" ng-click="rollbackService(service)" button-spinner="state.rollbackInProgress" ng-if="applicationState.endpoint.apiVersion >= 1.25">
+                  <span ng-hide="state.rollbackInProgress"><i class="fa fa-undo space-right" aria-hidden="true"></i>Rollback the service</span>
+                  <span ng-show="state.rollbackInProgress">Rollback in progress...</span>
                 </button>
                 <button authorization="DockerServiceDelete" type="button" class="btn btn-danger btn-sm" ng-disabled="state.deletionInProgress || isUpdating" ng-click="removeService()" button-spinner="state.deletionInProgress">
                   <span ng-hide="state.deletionInProgress"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete the service</span>

@@ -31,6 +31,7 @@ type (
 	// ManagerParams represents the required parameters to create a new Manager instance.
 	ManagerParams struct {
 		ResourceControlService portainer.ResourceControlService
+		UserService            portainer.UserService
 		TeamMembershipService  portainer.TeamMembershipService
 		SettingsService        portainer.SettingsService
 		RegistryService        portainer.RegistryService
@@ -48,6 +49,7 @@ func NewManager(parameters *ManagerParams) *Manager {
 		legacyExtensionProxies: cmap.New(),
 		proxyFactory: &proxyFactory{
 			ResourceControlService: parameters.ResourceControlService,
+			UserService:            parameters.UserService,
 			TeamMembershipService:  parameters.TeamMembershipService,
 			SettingsService:        parameters.SettingsService,
 			RegistryService:        parameters.RegistryService,

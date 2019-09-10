@@ -118,11 +118,12 @@ type (
 
 	// User represents a user account
 	User struct {
-		ID                      UserID         `json:"Id"`
-		Username                string         `json:"Username"`
-		Password                string         `json:"Password,omitempty"`
-		Role                    UserRole       `json:"Role"`
-		PortainerAuthorizations Authorizations `json:"PortainerAuthorizations"`
+		ID                      UserID                 `json:"Id"`
+		Username                string                 `json:"Username"`
+		Password                string                 `json:"Password,omitempty"`
+		Role                    UserRole               `json:"Role"`
+		PortainerAuthorizations Authorizations         `json:"PortainerAuthorizations"`
+		EndpointAuthorizations  EndpointAuthorizations `json:"EndpointAuthorizations"`
 	}
 
 	// UserID represents a user identifier
@@ -160,11 +161,9 @@ type (
 
 	// TokenData represents the data embedded in a JWT token
 	TokenData struct {
-		ID                      UserID
-		Username                string
-		Role                    UserRole
-		EndpointAuthorizations  EndpointAuthorizations
-		PortainerAuthorizations Authorizations
+		ID       UserID
+		Username string
+		Role     UserRole
 	}
 
 	// StackID represents a stack identifier (it must be composed of Name + "_" + SwarmID to create a unique identifier)
@@ -904,7 +903,7 @@ const (
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "1.22.0"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 19
+	DBVersion = 20
 	// AssetsServerURL represents the URL of the Portainer asset server
 	AssetsServerURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com"
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved

@@ -5,7 +5,7 @@ angular.module('portainer.app')
 function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService, TagService, Notifications) {
 
   $scope.state = {
-    EnvironmentType: 'docker',
+    EnvironmentType: 'agent',
     actionInProgress: false
   };
 
