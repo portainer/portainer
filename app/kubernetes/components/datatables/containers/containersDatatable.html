@@ -107,7 +107,7 @@
             <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))">
               <td>{{ item.Name }}</td>
               <td>{{ item.Namespace }}</td>
-              <td><span ng-repeat="image in item.Images">{{ image }}</span><br/></td>
+              <td><span ng-repeat="image in item.Images track by $index">{{ image }}<br/></span></td>
               <td><span class="label label-{{ item.Status | kubernetesContainerStatusColor }}">{{ item.Status }}</span></td>
               <td>{{ item.Restarts }}</td>
               <td>{{ item.Node }}</td>
