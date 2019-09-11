@@ -25,7 +25,8 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     views: {
       'content@': {
         templateUrl: './views/dashboard/dashboard.html',
-        controller: 'KubernetesDashboardController'
+        controller: 'KubernetesDashboardController',
+        controllerAs: 'ctrl'
       }
     }
   };
