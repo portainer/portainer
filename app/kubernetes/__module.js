@@ -78,10 +78,23 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     }
   };
 
+  const secrets = {
+    name: 'kubernetes.secrets',
+    url: '/secrets',
+    views: {
+      'content@': {
+        templateUrl: './views/secrets/secrets.html',
+        controller: 'KubernetesSecretsController',
+        controllerAs: 'ctrl'
+      }
+    }
+  };
+
   $stateRegistryProvider.register(kubernetes);
   $stateRegistryProvider.register(dashboard);
   $stateRegistryProvider.register(namespaces);
   $stateRegistryProvider.register(services);
   $stateRegistryProvider.register(containers);
   $stateRegistryProvider.register(configs);
+  $stateRegistryProvider.register(secrets);
 }]);
