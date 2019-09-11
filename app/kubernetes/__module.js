@@ -2,7 +2,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
 .config(['$stateRegistryProvider', function ($stateRegistryProvider) {
   'use strict';
 
-  var kubernetes = {
+  const kubernetes = {
     name: 'kubernetes',
     url: '/kubernetes',
     parent: 'root',
@@ -10,7 +10,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     resolve: {
       endpointID: ['EndpointProvider', '$state',
         function (EndpointProvider, $state) {
-          var id = EndpointProvider.endpointID();
+          const id = EndpointProvider.endpointID();
           if (!id) {
             return $state.go('portainer.home');
           }
@@ -19,7 +19,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     }
   };
 
-  var dashboard = {
+  const dashboard = {
     name: 'kubernetes.dashboard',
     url: '/dashboard',
     views: {
@@ -30,7 +30,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     }
   };
 
-  var namespaces = {
+  const namespaces = {
     name: 'kubernetes.namespaces',
     url: '/namespaces',
     views: {
@@ -42,7 +42,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     }
   }
 
-  var services = {
+  const services = {
     name: 'kubernetes.services',
     url: '/services',
     views: {
@@ -52,9 +52,9 @@ angular.module('portainer.kubernetes', ['portainer.app'])
         controllerAs: 'ctrl'
       }
     }
-  }
+  };
 
-  var containers = {
+  const containers = {
     name: 'kubernetes.containers',
     url: '/containers',
     views: {
@@ -64,11 +64,24 @@ angular.module('portainer.kubernetes', ['portainer.app'])
         controllerAs: 'ctrl'
       }
     }
-  }
+  };
+
+  const configs = {
+    name: 'kubernetes.configs',
+    url: '/configs',
+    views: {
+      'content@': {
+        templateUrl: './views/configs/configs.html',
+        controller: 'KubernetesConfigsController',
+        controllerAs: 'ctrl'
+      }
+    }
+  };
 
   $stateRegistryProvider.register(kubernetes);
   $stateRegistryProvider.register(dashboard);
   $stateRegistryProvider.register(namespaces);
   $stateRegistryProvider.register(services);
   $stateRegistryProvider.register(containers);
+  $stateRegistryProvider.register(configs);
 }]);
