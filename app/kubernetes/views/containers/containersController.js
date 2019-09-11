@@ -2,29 +2,29 @@ import angular from 'angular';
 
 class KubernetesContainersController {
   /* @ngInject */
-  constructor($async, Notifications, KubernetesPodService) {
+  constructor($async, Notifications, KubernetesContainerService) {
     this.$async = $async;
     this.Notifications = Notifications;
-    this.KubernetesPodService = KubernetesPodService;
+    this.KubernetesContainerService = KubernetesContainerService;
 
-    this.getPods = this.getPods.bind(this);
-    this.getPodsAsync = this.getPodsAsync.bind(this);
+    this.getContainers = this.getContainers.bind(this);
+    this.getContainersAsync = this.getContainersAsync.bind(this);
   }
 
-  async getPodsAsync() {
+  async getContainersAsync() {
     try {
-      this.pods = await this.KubernetesPodService.pods();
+      this.containers = await this.KubernetesContainerService.containers();
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve pods');
+      this.Notifications.error('Failure', err, 'Unable to retrieve containers');
     }
   }
 
-  getPods() {
-    return this.$async(this.getPodsAsync);
+  getContainers() {
+    return this.$async(this.getContainersAsync);
   }
 
   async $onInit() {
-    this.getPods();
+    this.getContainers();
   }
 }
 

@@ -1,11 +1,12 @@
 angular.module('portainer.kubernetes').component('kubernetesContainersDatatable', {
   templateUrl: './containersDatatable.html',
-  controller: 'KubernetesContainersDatatableController',
+  controller: 'GenericDatatableController',
   bindings: {
+    titleText: '@',
+    titleIcon: '@',
     dataset: '<',
-    podId: '<',
     tableKey: '@',
     orderBy: '@',
-    textFilter: '='
+    refreshCallback: '<'
   }
 });

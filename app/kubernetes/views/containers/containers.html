@@ -7,13 +7,13 @@
   <rd-header-content>Containers</rd-header-content>
 </rd-header>
 
-<div class="row" ng-if="ctrl.pods">
+<div class="row">
   <div class="col-sm-12">
-    <kubernetes-pods-datatable
-    title-text="Pods" title-icon="fa-cubes"
-    dataset="ctrl.pods" table-key="kubernetes.pods"
-    order-by="Name" 
-    refresh-callback="ctrl.getPods"
-    ></kubernetes-pods-datatable>
+    <kubernetes-containers-datatable
+    title-text="Containers" title-icon="fa-server"
+    dataset="ctrl.containers" table-key="kubernetes.containers"
+    order-by="Namespace" 
+    refresh-callback="ctrl.getContainers"
+    ></kubernetes-containers-datatable>
   </div>
 </div>
