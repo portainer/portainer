@@ -32,17 +32,21 @@ class KubernetesConfigController {
 
   async $onInit() {
     this.state = {
-      DisplayedPanel: 'details'
+      DisplayedPanel: 'details',
+      eventsLoading: true
     };
     this.getConfig();
   }
 
   async getEventsAsync() {
     try {
+      this.state.eventsLoading = true;
       const events = await this.KubernetesEventService.events(this.namespace);
       this.events = _.filter(events, (event) => event.Involved.uid === this.config.Id);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve config events');
+    } finally {
+      this.state.eventsLoading = false;
     }
   }
 
