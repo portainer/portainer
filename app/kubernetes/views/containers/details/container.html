@@ -1,0 +1,111 @@
+<rd-header>
+  <rd-header-title title-text="Container details">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="kubernetes.containers.container" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>
+    <a ui-sref="kubernetes.containers">Containers</a> &gt; <a ui-sref="kubernetes.containers.container" ui-sref-opts="{reload: true}">{{ ctrl.container.Name }}</a>
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-server" title-text="Container status">
+        <span class="btn-group btn-group-sm">
+          <label class="btn btn-primary" ng-model="ctrl.state.DisplayedPanel" uib-btn-radio="'details'"><i class="fa fa-heartbeat space-right" aria-hidden="true"></i>Details</label>
+          <label class="btn btn-primary" ng-model="ctrl.state.DisplayedPanel" uib-btn-radio="'events'"><i class="fa fa-history space-right" aria-hidden="true"></i>Events</label>
+          <label class="btn btn-primary" ng-model="ctrl.state.DisplayedPanel" uib-btn-radio="'yaml'"><i class="fa fa-code space-right" aria-hidden="true"></i>Yaml</label>
+        </span>
+      </rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody ng-if="!ctrl.container"><tr><td class="text-center text-muted">Loading...</td></tr></tbody>
+          <tbody ng-if="ctrl.container">
+            <tr>
+              <td>Name</td>
+              <td>{{ ctrl.container.Name }}</td>
+            </tr>
+            <tr>
+              <td>Namespace</td>
+              <td>{{ ctrl.container.Namespace }}</td>
+            </tr>
+            <tr>
+              <td>Status</td>
+              <td><span class="label label-{{ ctrl.container.Status | kubernetesContainerStatusColor }}">{{ ctrl.container.Status }}</span></td>
+            </tr>
+            <tr>
+              <td>Service Account</td>
+              <td>{{ ctrl.container.ServiceAccount }}</td>
+            </tr>
+            <tr>
+              <td>Node</td>
+              <td>{{ ctrl.container.Node }}</td>
+            </tr>
+            <tr>
+              <td>Creation date</td>
+              <td>{{ ctrl.container.CreatedAt | getisodate }}</td>
+            </tr>
+            <tr>
+              <td>Labels</td>
+              <td ng-if="ctrl.container.Labels">
+                <span ng-repeat-start="(key, value) in ctrl.container.Labels" class="tag">
+                  {{ key }}={{ value }}
+                </span>
+                <span ng-repeat-end>&nbsp;</span>
+              </td>
+              <td ng-if="!ctrl.container.Labels">-</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-show="ctrl.state.DisplayedPanel === 'details'">
+  <div class="col-sm-12">
+    <kubernetes-container-conditions-datatable
+    title-text="Container conditions" title-icon="fa-heartbeat"
+    dataset="ctrl.container.Conditions" table-key="kubernetes.container.conditions"
+    order-by="Type"
+    loading="ctrl.state.dataLoading"
+    ></kubernetes-container-conditions-datatable>
+  </div>
+</div>
+
+<div class="row" ng-show="ctrl.state.DisplayedPanel === 'details'">
+  <div class="col-sm-12">
+    <kubernetes-container-instances-datatable
+    title-text="Container image" title-icon="fa-server"
+    dataset="ctrl.container.Containers"
+    order-by="Name"
+    loading="ctrl.state.dataLoading"
+    ></kubernetes-container-instances-datatable>
+  </div>
+</div>
+  
+<div class="row" ng-show="ctrl.state.DisplayedPanel === 'events'">
+  <div class="col-sm-12">
+    <kubernetes-events-datatable
+    title-text="Events" title-icon="fa-history"
+    dataset="ctrl.events" table-key="kubernetes.container.events"
+    order-by="Date"
+    reverse-order="true"
+    loading="ctrl.state.eventsLoading"
+    refresh-callback="ctrl.getEvents"
+    ></kubernetes-events-datatable>
+  </div>
+</div>
+
+<div class="row" ng-show="ctrl.state.DisplayedPanel === 'yaml'">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-code" title-text="Inspect"></rd-widget-header>
+      <rd-widget-body>
+        <pre>{{ ctrl.container.Yaml }}</pre>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

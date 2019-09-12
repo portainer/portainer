@@ -12,7 +12,7 @@ function computeStatus(statuses) {
   return 'Running';
 }
 
-export default function KubernetesContainerViewModel(data) {
+export function KubernetesContainerViewModel(data) {
   this.Id = data.metadata.uid;
   this.Name = data.metadata.name;
   this.Namespace = data.metadata.namespace;
@@ -21,4 +21,22 @@ export default function KubernetesContainerViewModel(data) {
   this.Restarts = _.sumBy(data.status.containerStatuses, 'restartCount');
   this.Node = data.spec.nodeName;
   this.CreatedAt = data.status.startTime;
+}
+
+function KubernetesContainerInstanceViewModel(data) {
+  this.Name = data.name;
+  this.Image = data.image;
+  this.Ready = data.ready;
+  this.RestartCount = data.restartCount;
+  this.CurrentState = data.state;
+  this.LastState = data.lastState;
+}
+
+export function KubernetesContainerDetailsViewModel(data, yaml) {
+  Object.assign(this, new KubernetesContainerViewModel(data));
+  this.ServiceAccount = data.spec.serviceAccountName || '-';
+  this.Labels = data.metadata.labels;
+  this.Conditions = data.status.conditions;
+  this.Containers = _.map(data.status.containerStatuses, (item) => new KubernetesContainerInstanceViewModel(item));
+  this.Yaml = yaml;
 }

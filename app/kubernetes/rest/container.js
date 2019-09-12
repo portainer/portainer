@@ -1,15 +1,15 @@
 import { rawResponse } from './response/transform';
 
 angular.module('portainer.kubernetes')
-.factory('KubernetesConfigs', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider',
-  function KubernetesConfigsFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
+.factory('KubernetesContainers', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider',
+  function KubernetesContainersFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
     'use strict';
     return function(namespace) {
       let url = API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/api/v1';
       if (namespace) {
-        url += '/namespaces/:namespace/configmaps/:id/:action'
+        url += '/namespaces/:namespace/pods/:id/:action'
       } else {
-        url += '/configmaps/:id/:action';
+        url += '/pods/:id/:action';
       }
       return $resource(url,
         {
@@ -18,10 +18,10 @@ angular.module('portainer.kubernetes')
         },
         {
           query: { method: 'GET', timeout: 15000 },
-          config: {
+          container: {
             method: 'GET'
           },
-          yamlConfig: {
+          yamlContainer: {
             method: 'GET',
             headers: {
               'Accept': 'application/yaml'

@@ -36,7 +36,7 @@ class KubernetesNodeController {
       eventsLoading: true,
       dataLoading: true
     };
-    this.getNode();
+    this.getNode().then(() => this.getEvents());
   }
 
   async getEventsAsync() {
@@ -56,7 +56,6 @@ class KubernetesNodeController {
       this.state.dataLoading = true;
       this.nodeName = this.$transition$.params().name;
       this.node = await this.KubernetesNodeService.node(this.nodeName);
-      await this.getEventsAsync();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve node details');
     } finally {

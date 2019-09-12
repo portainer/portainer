@@ -29,11 +29,11 @@ angular.module('portainer.kubernetes')
             return 'fa-exclamation-circle orange-icon'
         }
         break;
-        case 'OutOfDisk':
-        case 'MemoryPressure':
-        case 'PIDPressure':
-        case 'DiskPressure':
-        case 'NetworkUnavailable':
+      case 'OutOfDisk':
+      case 'MemoryPressure':
+      case 'PIDPressure':
+      case 'DiskPressure':
+      case 'NetworkUnavailable':
         switch (status) {
           case 'True':
             return 'fa-exclamation-circle orange-icon'

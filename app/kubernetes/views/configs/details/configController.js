@@ -35,7 +35,7 @@ class KubernetesConfigController {
       DisplayedPanel: 'content',
       eventsLoading: true
     };
-    this.getConfig();
+    this.getConfig().then(() => this.getEvents());
   }
 
   async getEventsAsync() {
@@ -63,7 +63,6 @@ class KubernetesConfigController {
           Value: this.config.Data[keys[0]]
         }
       }
-      await this.getEventsAsync();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve config details');
     }

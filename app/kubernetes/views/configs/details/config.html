@@ -37,9 +37,10 @@
             <tr>
               <td>Labels</td>
               <td ng-if="ctrl.config.Labels">
-                <span ng-repeat="(key, value) in ctrl.config.Labels" class="tag">
+                <span ng-repeat-start="(key, value) in ctrl.config.Labels" class="tag">
                   {{ key }}={{ value }}
                 </span>
+                <span ng-repeat-end>&nbsp;</span>
               </td>
               <td ng-if="!ctrl.config.Labels">-</td>
             </tr>
