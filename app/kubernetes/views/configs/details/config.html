@@ -14,7 +14,7 @@
     <rd-widget>
       <rd-widget-header icon="fa-file-code" title-text="Config status">
         <span class="btn-group btn-group-sm">
-          <label class="btn btn-primary" ng-model="ctrl.state.DisplayedPanel" uib-btn-radio="'details'"><i class="fa fa-info-circle space-right" aria-hidden="true"></i>Details</label>
+          <label class="btn btn-primary" ng-model="ctrl.state.DisplayedPanel" uib-btn-radio="'content'"><i class="fa fa-file-code space-right" aria-hidden="true"></i>Content</label>
           <label class="btn btn-primary" ng-model="ctrl.state.DisplayedPanel" uib-btn-radio="'events'"><i class="fa fa-history space-right" aria-hidden="true"></i>Events</label>
           <label class="btn btn-primary" ng-model="ctrl.state.DisplayedPanel" uib-btn-radio="'yaml'"><i class="fa fa-code space-right" aria-hidden="true"></i>Yaml</label>
         </span>
@@ -50,7 +50,7 @@
   </div>
 </div>
 
-<div class="row" ng-if="ctrl.config.Data" ng-show="ctrl.state.DisplayedPanel === 'details'">
+<div class="row" ng-if="ctrl.config.Data" ng-show="ctrl.state.DisplayedPanel === 'content'">
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-header icon="fa-file-code" title-text="Config content"></rd-widget-header>

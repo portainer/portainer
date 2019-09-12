@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 
-export default function KubernetesSecretViewModel(data) {
+export function KubernetesNodeViewModel(data) {
   this.Id = data.metadata.uid;
   const hostName = _.find(data.status.addresses, {type: 'Hostname'});
   this.Name = hostName ? hostName.address : data.metadata.Name;
@@ -12,4 +12,16 @@ export default function KubernetesSecretViewModel(data) {
   this.Version = data.status.nodeInfo.kubeletVersion;
   const internalIP = _.find(data.status.addresses, {type: 'InternalIP'});
   this.IPAddress = internalIP ? internalIP.address : '-';
+}
+
+export function KubernetesNodeDetailsViewModel(data, yaml) {
+  Object.assign(this, new KubernetesNodeViewModel(data));
+  this.CreatedAt = data.metadata.creationTimestamp;
+  this.OS = {
+    Architecture: data.status.nodeInfo.architecture,
+    Platform: data.status.nodeInfo.operatingSystem,
+    Image: data.status.nodeInfo.osImage
+  };
+  this.Conditions = data.status.conditions;
+  this.Yaml = yaml;
 }

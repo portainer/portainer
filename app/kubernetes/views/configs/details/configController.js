@@ -32,7 +32,7 @@ class KubernetesConfigController {
 
   async $onInit() {
     this.state = {
-      DisplayedPanel: 'details',
+      DisplayedPanel: 'content',
       eventsLoading: true
     };
     this.getConfig();

@@ -32,7 +32,7 @@ class KubernetesSecretController {
 
   async $onInit() {
     this.state = {
-      DisplayedPanel: 'details',
+      DisplayedPanel: 'content',
       eventsLoading: true,
       dataLoading: true
     };

@@ -18,8 +18,10 @@ angular.module('portainer.kubernetes')
 
       async function secretAsync(namespace, name) {
         try {
-          const details = await KubernetesSecrets(namespace).secret({id: name}).$promise;
-          const yaml = await KubernetesSecrets(namespace).yamlSecret({id: name}).$promise;
+          const [details, yaml] = await Promise.all([
+            KubernetesSecrets(namespace).secret({id: name}).$promise,
+            KubernetesSecrets(namespace).yamlSecret({id: name}).$promise
+          ]);
           return new KubernetesSecretDetailsViewModel(details, yaml.data);
         } catch (err) {
           throw {msg: 'Unable to retrieve secret details', err: err};

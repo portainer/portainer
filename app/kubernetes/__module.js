@@ -127,6 +127,18 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     }
   };
 
+  const node = {
+    name: 'kubernetes.nodes.node',
+    url: '/:name',
+    views: {
+      'content@': {
+        templateUrl: './views/nodes/details/node.html',
+        controller: 'KubernetesNodeController',
+        controllerAs: 'ctrl'
+      }
+    }
+  };
+
   $stateRegistryProvider.register(kubernetes);
   $stateRegistryProvider.register(dashboard);
   $stateRegistryProvider.register(namespaces);
@@ -137,4 +149,5 @@ angular.module('portainer.kubernetes', ['portainer.app'])
   $stateRegistryProvider.register(secrets);
   $stateRegistryProvider.register(secret);
   $stateRegistryProvider.register(nodes);
+  $stateRegistryProvider.register(node);
 }]);
