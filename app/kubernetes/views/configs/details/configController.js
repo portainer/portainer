@@ -31,6 +31,9 @@ class KubernetesConfigController {
   }
 
   async $onInit() {
+    this.state = {
+      DisplayedPanel: 'details'
+    };
     this.getConfig();
   }
 

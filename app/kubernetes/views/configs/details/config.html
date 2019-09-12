@@ -12,7 +12,13 @@
 <div class="row">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-file-code" title-text="Config status"></rd-widget-header>
+      <rd-widget-header icon="fa-file-code" title-text="Config status">
+        <span class="btn-group btn-group-sm">
+          <label class="btn btn-primary" ng-model="ctrl.state.DisplayedPanel" uib-btn-radio="'details'"><i class="fa fa-info-circle space-right" aria-hidden="true"></i>Details</label>
+          <label class="btn btn-primary" ng-model="ctrl.state.DisplayedPanel" uib-btn-radio="'events'"><i class="fa fa-history space-right" aria-hidden="true"></i>Events</label>
+          <label class="btn btn-primary" ng-model="ctrl.state.DisplayedPanel" uib-btn-radio="'yaml'"><i class="fa fa-code space-right" aria-hidden="true"></i>Yaml</label>
+        </span>
+      </rd-widget-header>
       <rd-widget-body classes="no-padding">
         <table class="table">
           <tbody>
@@ -44,7 +50,7 @@
   </div>
 </div>
 
-<div class="row" ng-if="ctrl.config.Data">
+<div class="row" ng-if="ctrl.config.Data" ng-show="ctrl.state.DisplayedPanel === 'details'">
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-header icon="fa-file-code" title-text="Config content"></rd-widget-header>
@@ -62,7 +68,7 @@
   </div>
 </div>
 
-<div class="row">
+<div class="row" ng-show="ctrl.state.DisplayedPanel === 'events'">
   <div class="col-sm-12">
     <kubernetes-events-datatable
     title-text="Events" title-icon="fa-history"
@@ -76,10 +82,10 @@
 </div>
   
 
-<div class="row">
+<div class="row" ng-show="ctrl.state.DisplayedPanel === 'yaml'">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
-      <rd-widget-header icon="fa-circle" title-text="Inspect"></rd-widget-header>
+      <rd-widget-header icon="fa-code" title-text="Inspect"></rd-widget-header>
       <rd-widget-body>
         <pre>{{ ctrl.config.Yaml }}</pre>
       </rd-widget-body>
