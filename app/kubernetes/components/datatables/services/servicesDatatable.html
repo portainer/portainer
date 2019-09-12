@@ -104,7 +104,7 @@
               <td>{{ item.RunningPodsCount }} / {{ item.TotalPodsCount }}</td>
               <td>
                 <span ng-if="item.PublishedPorts.length" ng-repeat="port in item.PublishedPorts track by $index">
-                  <a ng-if="port.IPAddress" class="image-tag" ng-href="{{ port.IPAddress }}:{{ port.port }}" target="_blank">
+                  <a ng-if="port.IPAddress" class="image-tag" ng-href="http://{{ port.IPAddress }}:{{ port.port }}" target="_blank">
                     <i class="fa fa-external-link-alt" aria-hidden="true"></i> {{ port.port }}:{{ port.targetPort }}
                   </a>
                   <span ng-if="!port.IPAddress">{{ port.port }}:{{ port.targetPort }} / {{ port.protocol }}</span>
