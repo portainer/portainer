@@ -103,6 +103,18 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     }
   };
 
+  const secret = {
+    name: 'kubernetes.secrets.secret',
+    url: '/:namespace/:name',
+    views: {
+      'content@': {
+        templateUrl: './views/secrets/details/secret.html',
+        controller: 'KubernetesSecretController',
+        controllerAs: 'ctrl'
+      }
+    }
+  };
+
   const nodes = {
     name: 'kubernetes.nodes',
     url: '/nodes',
@@ -110,6 +122,18 @@ angular.module('portainer.kubernetes', ['portainer.app'])
       'content@': {
         templateUrl: './views/nodes/nodes.html',
         controller: 'KubernetesNodesController',
+        controllerAs: 'ctrl'
+      }
+    }
+  };
+
+  const node = {
+    name: 'kubernetes.nodes.node',
+    url: '/:name',
+    views: {
+      'content@': {
+        templateUrl: './views/nodes/details/node.html',
+        controller: 'KubernetesNodeController',
         controllerAs: 'ctrl'
       }
     }
@@ -123,5 +147,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
   $stateRegistryProvider.register(configs);
   $stateRegistryProvider.register(config);
   $stateRegistryProvider.register(secrets);
+  $stateRegistryProvider.register(secret);
   $stateRegistryProvider.register(nodes);
+  $stateRegistryProvider.register(node);
 }]);

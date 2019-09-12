@@ -18,8 +18,10 @@ angular.module('portainer.kubernetes')
 
       async function configAsync(namespace, configName) {
         try {
-          const details = await KubernetesConfigs(namespace).config({id: configName}).$promise;
-          const yaml = await KubernetesConfigs(namespace).yamlConfig({id: configName}).$promise;
+          const [details, yaml] = await Promise.all([
+            KubernetesConfigs(namespace).config({id: configName}).$promise,
+            KubernetesConfigs(namespace).yamlConfig({id: configName}).$promise
+          ]);
           return new KubernetesConfigDetailsViewModel(details, yaml.data);
         } catch (err) {
           throw {msg: 'Unable to retrieve config details', err: err};

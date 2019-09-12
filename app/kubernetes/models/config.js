@@ -9,6 +9,5 @@ export function KubernetesConfigDetailsViewModel(data, yaml) {
   Object.assign(this, new KubernetesConfigViewModel(data));
   this.Labels = data.metadata.labels;
   this.Data = data.data;
-  this.Kind = data.kind;
   this.Yaml = yaml;
 }
