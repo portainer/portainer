@@ -14,7 +14,11 @@ angular.module('portainer.kubernetes')
         _.forEach(deps, (deployment) => deployment.BoundServices.push(service));
       }
     });
-  }
+  };
+
+  helper.associateContainersAndDeployment = function(containers, deployment) {
+    deployment.Containers = _.filter(containers, {metadata:{labels: deployment.spec.selector.matchLabels}});
+  };
 
   return helper;
 }]);

@@ -1,0 +1,105 @@
+<rd-header>
+  <rd-header-title title-text="Service details">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="kubernetes.services.service" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>
+    <a ui-sref="kubernetes.services">Services</a> &gt; <a ui-sref="kubernetes.services.service" ui-sref-opts="{reload: true}">{{ ctrl.service.Name }}</a>
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-list-alt" title-text="Service status">
+        <span class="btn-group btn-group-sm">
+          <label class="btn btn-primary" ng-model="ctrl.state.DisplayedPanel" uib-btn-radio="'containers'"><i class="fa fa-server space-right" aria-hidden="true"></i>Containers</label>
+          <label class="btn btn-primary" ng-model="ctrl.state.DisplayedPanel" uib-btn-radio="'events'"><i class="fa fa-history space-right" aria-hidden="true"></i>Events</label>
+          <label class="btn btn-primary" ng-model="ctrl.state.DisplayedPanel" uib-btn-radio="'yaml'"><i class="fa fa-code space-right" aria-hidden="true"></i>Yaml</label>
+        </span>
+      </rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody ng-if="!ctrl.service"><tr><td class="text-center text-muted">Loading...</td></tr></tbody>
+          <tbody ng-if="ctrl.service">
+            <tr>
+              <td>Name</td>
+              <td>{{ ctrl.service.Name }}</td>
+            </tr>
+            <tr>
+              <td>Namespace</td>
+              <td>{{ ctrl.service.Namespace }}</td>
+            </tr>
+            <tr>
+              <td>Replicas</td>
+              <td>{{ ctrl.service.Replicas }}</td>
+            </tr>
+            <tr>
+              <td>Creation date</td>
+              <td>{{ ctrl.service.CreatedAt | getisodate }}</td>
+            </tr>
+            <tr>
+              <td>Images</td>
+              <td><span ng-repeat="image in ctrl.service.Images track by $index">{{image}}{{!$last ? ', ' : ''}}</span></td>
+            </tr>
+            <tr>
+              <td>Selectors</td>
+              <td ng-if="ctrl.service.Selectors">
+                <span ng-repeat-start="(key, value) in ctrl.service.Selectors" class="tag">
+                  {{ key }}={{ value }}
+                </span>
+                <span ng-repeat-end>&nbsp;</span>
+              </td>
+              <td ng-if="!ctrl.service.Selectors">-</td>
+            </tr>
+            <tr>
+              <td>Labels</td>
+              <td ng-if="ctrl.service.Labels">
+                <span ng-repeat-start="(key, value) in ctrl.service.Labels" class="tag">
+                  {{ key }}={{ value }}
+                </span>
+                <span ng-repeat-end>&nbsp;</span>
+              </td>
+              <td ng-if="!ctrl.service.Labels">-</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-show="ctrl.state.DisplayedPanel === 'containers'">
+  <div class="col-sm-12">
+    <kubernetes-containers-datatable
+    title-text="Service containers" title-icon="fa-server"
+    dataset="ctrl.service.Containers" table-key="kubernetes.service.containers"
+    order-by="Namespace"
+    ></kubernetes-containers-datatable>
+  </div>
+</div>
+  
+<div class="row" ng-show="ctrl.state.DisplayedPanel === 'events'">
+  <div class="col-sm-12">
+    <kubernetes-events-datatable
+    title-text="Events" title-icon="fa-history"
+    dataset="ctrl.events" table-key="kubernetes.service.events"
+    order-by="Date"
+    reverse-order="true"
+    loading="ctrl.state.eventsLoading"
+    refresh-callback="ctrl.getEvents"
+    ></kubernetes-events-datatable>
+  </div>
+</div>
+
+<div class="row" ng-show="ctrl.state.DisplayedPanel === 'yaml'">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-code" title-text="Inspect"></rd-widget-header>
+      <rd-widget-body>
+        <pre>{{ ctrl.service.Yaml }}</pre>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

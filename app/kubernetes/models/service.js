@@ -1,6 +1,7 @@
 import _ from 'lodash-es';
+import { KubernetesContainerViewModel } from './container';
 
-export default function KubernetesServiceViewModel(data) {
+export function KubernetesServiceViewModel(data) {
   this.Id = data.metadata.uid;
   this.Name = data.metadata.name;
   this.Namespace = data.metadata.namespace;
@@ -19,4 +20,17 @@ export default function KubernetesServiceViewModel(data) {
     return service.spec.ports;
   }));
   this.CreatedAt = data.metadata.creationTimestamp;
+}
+
+export function KubernetesServiceDetailsViewModel(data, yaml) {
+  this.Id = data.metadata.uid;
+  this.Name = data.metadata.name;
+  this.Namespace = data.metadata.namespace;
+  this.Images = _.map(data.spec.template.spec.containers, 'image');
+  this.CreatedAt = data.metadata.creationTimestamp;
+  this.Replicas = data.spec.replicas;
+  this.Selectors = data.spec.selector.matchLabels;
+  this.Labels = data.metadata.labels;
+  this.Containers = _.map(data.Containers, (item) => new KubernetesContainerViewModel(item));
+  this.Yaml = yaml;
 }

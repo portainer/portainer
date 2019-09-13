@@ -55,6 +55,18 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     }
   };
 
+  const service = {
+    name: 'kubernetes.services.service',
+    url: '/:namespace/:name',
+    views: {
+      'content@': {
+        templateUrl: './views/services/details/service.html',
+        controller: 'KubernetesServiceController',
+        controllerAs: 'ctrl'
+      }
+    }
+  };
+
   const containers = {
     name: 'kubernetes.containers',
     url: '/containers',
@@ -155,6 +167,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
   $stateRegistryProvider.register(dashboard);
   $stateRegistryProvider.register(namespaces);
   $stateRegistryProvider.register(services);
+  $stateRegistryProvider.register(service);
   $stateRegistryProvider.register(containers);
   $stateRegistryProvider.register(container);
   $stateRegistryProvider.register(configs);
