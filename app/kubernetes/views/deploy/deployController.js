@@ -18,7 +18,7 @@ class KubernetesDeployController {
   }
 
   disableDeploy() {
-    return _.isEmpty(this.formValues.EditorContent) || _.isEmpty(this.formValues.Namespace);
+    return _.isEmpty(this.formValues.EditorContent) || _.isEmpty(this.formValues.Namespace) || this.state.actionInProgress;
   }
 
   getPlaceholder() {
