@@ -39,6 +39,7 @@ func (handler *Handler) proxyRequestsToKubernetesAPI(w http.ResponseWriter, r *h
 		}
 	}
 
+	// TODO: relocate token management into proxy creation
 	token, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/token")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to read service account token file", err}

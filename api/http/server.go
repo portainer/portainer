@@ -47,6 +47,8 @@ type Server struct {
 	ReverseTunnelService   portainer.ReverseTunnelService
 	ExtensionManager       portainer.ExtensionManager
 	ComposeStackManager    portainer.ComposeStackManager
+	SwarmStackManager      portainer.SwarmStackManager
+	KubernetesDeployer     portainer.KubernetesDeployer
 	CryptoService          portainer.CryptoService
 	SignatureService       portainer.DigitalSignatureService
 	JobScheduler           portainer.JobScheduler
@@ -65,7 +67,6 @@ type Server struct {
 	ScheduleService        portainer.ScheduleService
 	SettingsService        portainer.SettingsService
 	StackService           portainer.StackService
-	SwarmStackManager      portainer.SwarmStackManager
 	TagService             portainer.TagService
 	TeamService            portainer.TeamService
 	TeamMembershipService  portainer.TeamMembershipService
@@ -203,6 +204,7 @@ func (server *Server) Start() error {
 	stackHandler.ResourceControlService = server.ResourceControlService
 	stackHandler.SwarmStackManager = server.SwarmStackManager
 	stackHandler.ComposeStackManager = server.ComposeStackManager
+	stackHandler.KubernetesDeployer = server.KubernetesDeployer
 	stackHandler.GitService = server.GitService
 	stackHandler.RegistryService = server.RegistryService
 	stackHandler.DockerHubService = server.DockerHubService

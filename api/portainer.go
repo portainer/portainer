@@ -867,6 +867,10 @@ type (
 		Remove(stack *Stack, endpoint *Endpoint) error
 	}
 
+	KubernetesDeployer interface {
+		Deploy(endpoint *Endpoint, data string, composeFormat bool, namespace string) ([]byte, error)
+	}
+
 	// ComposeStackManager represents a service to manage Compose stacks
 	ComposeStackManager interface {
 		Up(stack *Stack, endpoint *Endpoint) error
@@ -1016,6 +1020,8 @@ const (
 	DockerSwarmStack
 	// DockerComposeStack represents a stack managed via docker-compose
 	DockerComposeStack
+	// KubernetesStack represents a stack managed via kubectl
+	KubernetesStack
 )
 
 const (
