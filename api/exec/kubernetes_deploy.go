@@ -24,8 +24,16 @@ func NewKubernetesDeployer(binaryPath string) *KubernetesDeployer {
 	}
 }
 
-// TODO: add kompose parameter to trigger a convert
-func (deployer *KubernetesDeployer) Deploy(endpoint *portainer.Endpoint, data string) ([]byte, error) {
+// TODO: add a namespace parameter
+func (deployer *KubernetesDeployer) Deploy(endpoint *portainer.Endpoint, data string, composeFormat bool) ([]byte, error) {
+	if composeFormat {
+		convertedData, err := deployer.convertComposeData(data)
+		if err != nil {
+			return nil, err
+		}
+		data = string(convertedData)
+	}
+
 	// TODO: relocate
 	token, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/token")
 	if err != nil {
@@ -33,7 +41,6 @@ func (deployer *KubernetesDeployer) Deploy(endpoint *portainer.Endpoint, data st
 	}
 
 	command := path.Join(deployer.binaryPath, "kubectl")
-
 	if runtime.GOOS == "windows" {
 		command = path.Join(deployer.binaryPath, "kubectl.exe")
 	}
@@ -43,6 +50,28 @@ func (deployer *KubernetesDeployer) Deploy(endpoint *portainer.Endpoint, data st
 	args = append(args, "--insecure-skip-tls-verify")
 	args = append(args, "--token", string(token))
 	args = append(args, "apply", "-f", "-")
+
+	var stderr bytes.Buffer
+	cmd := exec.Command(command, args...)
+	cmd.Stderr = &stderr
+	cmd.Stdin = strings.NewReader(data)
+
+	output, err := cmd.Output()
+	if err != nil {
+		return nil, errors.New(stderr.String())
+	}
+
+	return output, nil
+}
+
+func (deployer *KubernetesDeployer) convertComposeData(data string) ([]byte, error) {
+	command := path.Join(deployer.binaryPath, "kompose")
+	if runtime.GOOS == "windows" {
+		command = path.Join(deployer.binaryPath, "kompose.exe")
+	}
+
+	args := make([]string, 0)
+	args = append(args, "convert", "-f", "-", "--stdout")
 
 	var stderr bytes.Buffer
 	cmd := exec.Command(command, args...)

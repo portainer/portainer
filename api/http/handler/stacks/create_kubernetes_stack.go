@@ -12,6 +12,7 @@ import (
 )
 
 type kubernetesStackPayload struct {
+	ComposeFormat    bool
 	StackFileContent string
 }
 
@@ -33,7 +34,7 @@ func (handler *Handler) createKubernetesStack(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	output, err := handler.deployKubernetesStack(endpoint, payload.StackFileContent)
+	output, err := handler.deployKubernetesStack(endpoint, payload.StackFileContent, payload.ComposeFormat)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
@@ -45,9 +46,9 @@ func (handler *Handler) createKubernetesStack(w http.ResponseWriter, r *http.Req
 	return response.JSON(w, resp)
 }
 
-func (handler *Handler) deployKubernetesStack(endpoint *portainer.Endpoint, data string) ([]byte, error) {
+func (handler *Handler) deployKubernetesStack(endpoint *portainer.Endpoint, data string, composeFormat bool) ([]byte, error) {
 	handler.stackCreationMutex.Lock()
 	defer handler.stackCreationMutex.Unlock()
 
-	return handler.KubernetesDeployer.Deploy(endpoint, data)
+	return handler.KubernetesDeployer.Deploy(endpoint, data, composeFormat)
 }
