@@ -3,8 +3,8 @@ import _ from 'lodash-es';
 import { StackViewModel, ExternalStackViewModel } from '../../models/stack';
 
 angular.module('portainer.app')
-.factory('StackService', ['$q', 'Stack', 'ResourceControlService', 'FileUploadService', 'StackHelper', 'ServiceService', 'ContainerService', 'SwarmService', 'EndpointProvider',
-function StackServiceFactory($q, Stack, ResourceControlService, FileUploadService, StackHelper, ServiceService, ContainerService, SwarmService, EndpointProvider) {
+.factory('StackService', ['$q', '$async', 'Stack', 'ResourceControlService', 'FileUploadService', 'StackHelper', 'ServiceService', 'ContainerService', 'SwarmService', 'EndpointProvider',
+function StackServiceFactory($q, $async, Stack, ResourceControlService, FileUploadService, StackHelper, ServiceService, ContainerService, SwarmService, EndpointProvider) {
   'use strict';
   var service = {};
 
@@ -327,6 +327,23 @@ function StackServiceFactory($q, Stack, ResourceControlService, FileUploadServic
   service.duplicateStack = function duplicateStack(name, stackFileContent, env, endpointId, type) {
     var action = type === 1 ? service.createSwarmStackFromFileContent : service.createComposeStackFromFileContent;
     return action(name, stackFileContent, env, endpointId);
+  };
+
+  async function kubernetesDeployAsync(endpointId, namespace, content, compose) {
+    try {
+      const payload = {
+        StackFileContent: content,
+        ComposeFormat: compose,
+        Namespace: namespace
+      };
+      await Stack.create({method: 'undefined', type: 3, endpointId: endpointId}, payload).$promise;
+    } catch (err) {
+      throw {err: err};
+    }
+  }
+
+  service.kubernetesDeploy = function(endpointId, namespace, content, compose) {
+    return $async(kubernetesDeployAsync, endpointId, namespace, content, compose);
   };
 
   return service;
