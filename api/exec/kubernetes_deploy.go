@@ -24,7 +24,6 @@ func NewKubernetesDeployer(binaryPath string) *KubernetesDeployer {
 	}
 }
 
-// TODO: add a namespace parameter
 func (deployer *KubernetesDeployer) Deploy(endpoint *portainer.Endpoint, data string, composeFormat bool, namespace string) ([]byte, error) {
 	if composeFormat {
 		convertedData, err := deployer.convertComposeData(data)
