@@ -78,6 +78,10 @@ func initSwarmStackManager(assetsPath string, dataStorePath string, signatureSer
 	return exec.NewSwarmStackManager(assetsPath, dataStorePath, signatureService, fileService, reverseTunnelService)
 }
 
+func initKubernetesDeployer(assetsPath string) portainer.KubernetesDeployer {
+	return exec.NewKubernetesDeployer(assetsPath)
+}
+
 func initJWTService(authenticationEnabled bool) portainer.JWTService {
 	if authenticationEnabled {
 		jwtService, err := jwt.NewService()
@@ -569,6 +573,8 @@ func main() {
 
 	composeStackManager := initComposeStackManager(*flags.Data, reverseTunnelService)
 
+	kubernetesDeployer := initKubernetesDeployer(*flags.Assets)
+
 	err = initTemplates(store.TemplateService, fileService, *flags.Templates, *flags.TemplateFile)
 	if err != nil {
 		log.Fatal(err)
@@ -683,6 +689,7 @@ func main() {
 		WebhookService:         store.WebhookService,
 		SwarmStackManager:      swarmStackManager,
 		ComposeStackManager:    composeStackManager,
+		KubernetesDeployer:     kubernetesDeployer,
 		ExtensionManager:       extensionManager,
 		CryptoService:          cryptoService,
 		JWTService:             jwtService,

@@ -25,6 +25,7 @@ type Handler struct {
 	DockerHubService       portainer.DockerHubService
 	SwarmStackManager      portainer.SwarmStackManager
 	ComposeStackManager    portainer.ComposeStackManager
+	KubernetesDeployer     portainer.KubernetesDeployer
 }
 
 // NewHandler creates a handler to manage stack operations.
