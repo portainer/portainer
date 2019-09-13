@@ -36,7 +36,7 @@ class KubernetesSecretController {
       eventsLoading: true,
       dataLoading: true
     };
-    this.getSecret();
+    this.getSecret().then(() => this.getEvents());
   }
 
   async getEventsAsync() {
@@ -65,7 +65,6 @@ class KubernetesSecretController {
           Value: this.secret.Data[keys[0]]
         }
       }
-      await this.getEventsAsync();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve secret details');
     } finally {
