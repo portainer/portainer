@@ -868,7 +868,7 @@ type (
 	}
 
 	KubernetesDeployer interface {
-		Deploy(endpoint *Endpoint, data string, composeFormat bool) ([]byte, error)
+		Deploy(endpoint *Endpoint, data string, composeFormat bool, namespace string) ([]byte, error)
 	}
 
 	// ComposeStackManager represents a service to manage Compose stacks

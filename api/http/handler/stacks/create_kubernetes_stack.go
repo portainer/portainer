@@ -13,12 +13,16 @@ import (
 
 type kubernetesStackPayload struct {
 	ComposeFormat    bool
+	Namespace        string
 	StackFileContent string
 }
 
 func (payload *kubernetesStackPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.StackFileContent) {
 		return portainer.Error("Invalid stack file content")
+	}
+	if govalidator.IsNull(payload.Namespace) {
+		return portainer.Error("Invalid namespace")
 	}
 	return nil
 }
@@ -34,7 +38,7 @@ func (handler *Handler) createKubernetesStack(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	output, err := handler.deployKubernetesStack(endpoint, payload.StackFileContent, payload.ComposeFormat)
+	output, err := handler.deployKubernetesStack(endpoint, payload.StackFileContent, payload.ComposeFormat, payload.Namespace)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
@@ -46,9 +50,9 @@ func (handler *Handler) createKubernetesStack(w http.ResponseWriter, r *http.Req
 	return response.JSON(w, resp)
 }
 
-func (handler *Handler) deployKubernetesStack(endpoint *portainer.Endpoint, data string, composeFormat bool) ([]byte, error) {
+func (handler *Handler) deployKubernetesStack(endpoint *portainer.Endpoint, data string, composeFormat bool, namespace string) ([]byte, error) {
 	handler.stackCreationMutex.Lock()
 	defer handler.stackCreationMutex.Unlock()
 
-	return handler.KubernetesDeployer.Deploy(endpoint, data, composeFormat)
+	return handler.KubernetesDeployer.Deploy(endpoint, data, composeFormat, namespace)
 }

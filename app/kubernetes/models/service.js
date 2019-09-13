@@ -10,7 +10,7 @@ export default function KubernetesServiceViewModel(data) {
   this.PublishedPorts = _.flatMapDeep(_.map(data.BoundServices, (service) => {
     if (service.spec.type === 'LoadBalancer') {
       return _.map(service.spec.ports, (port) => {
-        if (service.status.loadBalancer.ingress.length > 0) {
+        if (service.status.loadBalancer.ingress && service.status.loadBalancer.ingress.length > 0) {
           port.IPAddress = service.status.loadBalancer.ingress[0].ip || service.status.loadBalancer.ingress[0].hostname;
         }
         return port;

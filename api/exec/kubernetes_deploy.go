@@ -25,7 +25,7 @@ func NewKubernetesDeployer(binaryPath string) *KubernetesDeployer {
 }
 
 // TODO: add a namespace parameter
-func (deployer *KubernetesDeployer) Deploy(endpoint *portainer.Endpoint, data string, composeFormat bool) ([]byte, error) {
+func (deployer *KubernetesDeployer) Deploy(endpoint *portainer.Endpoint, data string, composeFormat bool, namespace string) ([]byte, error) {
 	if composeFormat {
 		convertedData, err := deployer.convertComposeData(data)
 		if err != nil {
@@ -49,6 +49,7 @@ func (deployer *KubernetesDeployer) Deploy(endpoint *portainer.Endpoint, data st
 	args = append(args, "--server", endpoint.URL)
 	args = append(args, "--insecure-skip-tls-verify")
 	args = append(args, "--token", string(token))
+	args = append(args, "--namespace", namespace)
 	args = append(args, "apply", "-f", "-")
 
 	var stderr bytes.Buffer
