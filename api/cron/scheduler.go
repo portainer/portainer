@@ -13,13 +13,14 @@ type JobScheduler struct {
 // NewJobScheduler initializes a new service
 func NewJobScheduler() *JobScheduler {
 	return &JobScheduler{
-		cron: cron.New(),
+		cron: cron.New(cron.WithSeconds()),
 	}
 }
 
 // ScheduleJob schedules the execution of a job via a runner
 func (scheduler *JobScheduler) ScheduleJob(runner portainer.JobRunner) error {
-	return scheduler.cron.AddJob(runner.GetSchedule().CronExpression, runner)
+	_, err := scheduler.cron.AddJob(runner.GetSchedule().CronExpression, runner)
+	return err
 }
 
 // UpdateSystemJobSchedule updates the first occurence of the specified
@@ -35,7 +36,7 @@ func (scheduler *JobScheduler) UpdateSystemJobSchedule(jobType portainer.JobType
 
 	for _, entry := range cronEntries {
 		if entry.Job.(portainer.JobRunner).GetSchedule().JobType == jobType {
-			err := newCron.AddJob(newCronExpression, entry.Job)
+			_, err := newCron.AddJob(newCronExpression, entry.Job)
 			if err != nil {
 				return err
 			}
@@ -69,7 +70,7 @@ func (scheduler *JobScheduler) UpdateJobSchedule(runner portainer.JobRunner) err
 				jobRunner = entry.Job
 			}
 
-			err := newCron.AddJob(runner.GetSchedule().CronExpression, jobRunner)
+			_, err := newCron.AddJob(runner.GetSchedule().CronExpression, jobRunner)
 			if err != nil {
 				return err
 			}
