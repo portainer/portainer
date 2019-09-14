@@ -5,8 +5,8 @@ import { ContainerDetailsViewModel } from '../../../models/container';
 
 
 angular.module('portainer.docker')
-.controller('CreateContainerController', ['$q', '$scope', '$state', '$timeout', '$transition$', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'NetworkService', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'FormValidator', 'ModalService', 'RegistryService', 'SystemService', 'SettingsService', 'PluginService', 'HttpRequestHelper',
-function ($q, $scope, $state, $timeout, $transition$, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, NetworkService, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, FormValidator, ModalService, RegistryService, SystemService, SettingsService, PluginService, HttpRequestHelper) {
+.controller('CreateContainerController', ['$q', '$scope', '$async', '$state', '$timeout', '$transition$', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'NetworkService', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'FormValidator', 'ModalService', 'RegistryService', 'SystemService', 'SettingsService', 'PluginService', 'HttpRequestHelper',
+function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, NetworkService, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, FormValidator, ModalService, RegistryService, SystemService, SettingsService, PluginService, HttpRequestHelper) {
 
   $scope.create = create;
 
@@ -138,10 +138,8 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
   }
 
   function preparePortBindings(config) {
-    var bindings = ContainerHelper.preparePortBindings(config.HostConfig.PortBindings);
-    Object.keys(bindings).forEach(function (key) {
-      config.ExposedPorts[key] = {};
-    });
+    const bindings = ContainerHelper.preparePortBindings(config.HostConfig.PortBindings);
+    _.forEach(bindings, (_, key) => config.ExposedPorts[key] = {});
     config.HostConfig.PortBindings = bindings;
   }
 
@@ -315,7 +313,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
   }
 
   function loadFromContainerPortBindings() {
-    var bindings = ContainerHelper.sortAndCombinePorts($scope.config.HostConfig.PortBindings);
+    const bindings = ContainerHelper.sortAndCombinePorts($scope.config.HostConfig.PortBindings);
     $scope.config.HostConfig.PortBindings = bindings;
   }
 
@@ -757,8 +755,10 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     }
 
     function createNewContainer() {
-      var config = prepareConfiguration();
-      return ContainerService.createAndStartContainer(config);
+      return $async(async () => {
+        const config = prepareConfiguration();
+        return await ContainerService.createAndStartContainer(config);
+      });
     }
 
     function applyResourceControl(newContainer) {

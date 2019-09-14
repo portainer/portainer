@@ -1,4 +1,65 @@
+import _ from 'lodash-es';
 import splitargs from 'splitargs/src/splitargs'
+
+const portPattern = /^([1-9]|[1-5]?[0-9]{2,4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/m;
+
+function parsePort(port) {
+  if (portPattern.test(port)) {
+    return parseInt(port);
+  } else {
+    return 0;
+  }
+}
+
+function parsePortRange(portRange) {
+  if (typeof portRange !== 'string') {
+    portRange = portRange.toString();
+  }
+
+  // Split the range and convert to integers
+  const stringPorts = _.split(portRange, '-', 2);
+  const intPorts = _.map(stringPorts, parsePort);
+
+  // If it's not a range, we still make sure that we return two ports (start & end)
+  if (intPorts.length == 1) {
+    intPorts.push(intPorts[0]);
+  }
+
+  return intPorts;
+}
+
+function isValidPortRange(portRange) {
+  if (typeof portRange === 'string') {
+    portRange = parsePortRange();
+  }
+
+  return Array.isArray(portRange) && portRange.length === 2 &&
+    portRange[0] > 0 && portRange[1] >= portRange[0];
+}
+
+function createPortRange(portRangeText, port) {
+  if (typeof portRangeText !== 'string') {
+    portRangeText = portRangeText.toString();
+  }
+
+  let hostIp = null;
+  const colonIndex = portRangeText.indexOf(':');
+  if (colonIndex >= 0) {
+    hostIp = portRangeText.substr(0, colonIndex);
+    portRangeText = portRangeText.substr(colonIndex + 1);
+  }
+
+  port = (typeof port === 'number' ? port : parsePort(port));
+  const portRange = parsePortRange(portRangeText);
+  const startPort = Math.min(portRange[0], port);
+  const endPort = Math.max(portRange[1], port);
+
+  if (hostIp) {
+    return hostIp + ':' + startPort + '-' + endPort;
+  } else {
+    return startPort + '-' + endPort;
+  }
+}
 
 angular.module('portainer.docker')
 .factory('ContainerHelper', [function ContainerHelperFactory() {
@@ -54,76 +115,42 @@ angular.module('portainer.docker')
     return config;
   };
 
-  helper.parsePortRange = function(ports) {
-    if (!ports) {
-      return null;
-    }
-
-    var rangeIndex = ports.indexOf('-');
-    if (rangeIndex === -1) {
-      var port = parseInt(ports);
-      if (isNaN(port) || port <= 0 || port > 0xffff) {
-        return null;
-      }
-
-      return [port, port];
-    }
-
-    var startPort = parseInt(ports.substr(0, rangeIndex));
-    if (isNaN(startPort) || startPort <= 0 || startPort > 0xffff) {
-      return null;
-    }
-
-    var endPort = parseInt(ports.substr(rangeIndex + 1));
-    if (isNaN(endPort) || endPort <= 0 || endPort > 0xffff) {
-      return null;
-    }
-
-    if (endPort < startPort) {
-      return null;
-    }
-
-    return [startPort, endPort];
-  };
-
   helper.preparePortBindings = function(portBindings) {
-    var bindings = {};
+    const bindings = {};
     portBindings.forEach(function (portBinding) {
       if (portBinding.containerPort) {
-        var hostPort = portBinding.hostPort;
-        var containerPortRange = helper.parsePortRange(portBinding.containerPort);
-        if (!containerPortRange || containerPortRange.length !== 2) {
+        let hostPort = portBinding.hostPort;
+        const containerPortRange = parsePortRange(portBinding.containerPort);
+        if (!isValidPortRange(containerPortRange)) {
           throw new Error('Invalid port specification: ' + portBinding.containerPort);
         }
 
-        var startPort = containerPortRange[0];
-        var endPort = containerPortRange[1];
-        var hostIp = undefined;
-        var startHostPort = 0;
-        var endHostPort = 0;
+        const startPort = containerPortRange[0];
+        const endPort = containerPortRange[1];
+        let hostIp = undefined;
+        let startHostPort = 0;
+        let endHostPort = 0;
         if (hostPort) {
           if (hostPort.indexOf(':') > -1) {
-            var hostAndPort = hostPort.split(':');
+            const hostAndPort = _.split(hostPort, ':');
             hostIp = hostAndPort[0];
             hostPort = hostAndPort[1];
           }
 
-          var hostPortRange = helper.parsePortRange(hostPort);
-          if (!hostPortRange || hostPortRange.length !== 2) {
+          const hostPortRange = parsePortRange(hostPort);
+          if (!isValidPortRange(hostPortRange)) {
             throw new Error('Invalid port specification: ' + hostPort);
           }
 
           startHostPort = hostPortRange[0];
           endHostPort = hostPortRange[1];
-          if ((endPort - startPort) !== (endHostPort - startHostPort)) {
-            if (endPort !== startPort) {
-              throw new Error('Invalid port specification: ' + hostPort);
-            }
+          if (endPort !== startPort && (endPort - startPort) !== (endHostPort - startHostPort)) {
+            throw new Error('Invalid port specification: ' + hostPort);
           }
         }
 
-        for (var i = 0; i <= (endPort - startPort); i++) {
-          var containerPort = (startPort + i).toString();
+        for (let i = 0; i <= (endPort - startPort); i++) {
+          const containerPort = (startPort + i).toString();
           if (startHostPort > 0) {
             hostPort = (startHostPort + i).toString();
           }
@@ -131,91 +158,77 @@ angular.module('portainer.docker')
             hostPort += '-' + endHostPort.toString();
           }
 
-          var key = containerPort + '/' + portBinding.protocol;
-          bindings[key] = [{ HostIp: hostIp, HostPort: hostPort }];
+          const bindKey = containerPort + '/' + portBinding.protocol;
+          bindings[bindKey] = [{ HostIp: hostIp, HostPort: hostPort }];
         }
       }
     });
     return bindings;
   };
 
-  helper.createPortRange = function(portRange, port) {
-    var hostIp = null;
-    var colonIndex = portRange.indexOf(':');
-    if (colonIndex >= 0) {
-      hostIp = portRange.substr(0, colonIndex);
-      portRange = portRange.substr(colonIndex + 1);
-    }
-
-    var startPort;
-    var endPort;
-    port = (typeof port === 'number' ? port : parseInt(port));
-    portRange = helper.parsePortRange(portRange);
-    if (!portRange || portRange.length !== 2) {
-      var portSplit = portRange.split('-');
-      startPort = parseInt(portSplit[0]);
-      endPort = startPort;
-    } else {
-      startPort = portRange[0];
-      endPort = portRange[1];
-    }
-
-    if (port < startPort) {
-      startPort = port;
-    }
-    if (port > endPort) {
-      endPort = port;
-    }
-
-    if (hostIp) {
-      return hostIp + ':' + startPort + '-' + endPort;
-    } else {
-      return startPort + '-' + endPort;
-    }
-  };
-
   helper.sortAndCombinePorts = function(portBindings) {
-    var bindings = [];
-    var previousHostPort = null;
-    var previousContainerPort = null;
-    Object.keys(portBindings).sort(function(x, y) {
-      var xSplit = x.split('/');
-      var ySplit = y.split('/');
-      var xPort = parseInt(xSplit[0]);
-      var yPort = parseInt(ySplit[0]);
-      return xPort - yPort;
-    }).forEach(function(portKey) {
-      if (!portBindings.hasOwnProperty(portKey)) {
-        return;
-      }
+    const bindings = [];
+    const portBindingKeys = _.keys(portBindings);
 
-      var portBinding = portBindings[portKey][0];
-      var hostPort = portBinding.HostPort;
-      var containerPort = portKey.split('/')[0];
-      var protocol = portKey.split('/')[1];
-
-      // NOTE: It must be == here, because we are comparing strings with integers
-      if (bindings.length > 0 && previousHostPort == (hostPort - 1) && previousContainerPort == (containerPort - 1)) {
-        bindings[bindings.length-1].hostPort = helper.createPortRange(bindings[bindings.length-1].hostPort, hostPort);
-        bindings[bindings.length-1].containerPort = helper.createPortRange(bindings[bindings.length-1].containerPort, containerPort);
-        previousHostPort = hostPort;
-        previousContainerPort = containerPort;
-        return;
-      }
-
-      if (portBinding.HostIp) {
-        hostPort = portBinding.HostIp + ':' + hostPort;
-      }
-
-      var binding = {
-        'hostPort': hostPort,
-        'containerPort': containerPort,
-        'protocol': protocol
-      };
-      bindings.push(binding);
-      previousHostPort = portBinding.HostPort;
-      previousContainerPort = containerPort;
+    // Group the port bindings by protocol
+    const portBindingKeysByProtocol = _.groupBy(portBindingKeys, (portKey) => {
+      return _.split(portKey, '/')[1];
     });
+
+    _.forEach(portBindingKeysByProtocol, (portBindingKeys, protocol) => {
+      // Group the port bindings by host IP
+      const portBindingKeysByHostIp = _.groupBy(portBindingKeys, (portKey) => {
+        const portBinding = portBindings[portKey][0];
+        return portBinding.HostIp || '';
+      });
+
+      _.forEach(portBindingKeysByHostIp, (portBindingKeys) => {
+        // Sort by host port
+        const sortedPortBindingKeys = _.orderBy(portBindingKeys, (portKey) => {
+          return parseInt(_.split(portKey, '/')[0]);
+        });
+
+        let previousHostPort = -1;
+        let previousContainerPort = -1;
+        _.forEach(sortedPortBindingKeys, (portKey) => {
+          const portKeySplit = _.split(portKey, '/');
+          const containerPort = parseInt(portKeySplit[0]);
+          const portBinding = portBindings[portKey][0];
+          const hostPort = parsePort(portBinding.HostPort);
+
+          // We only combine single ports, and skip the host port ranges on one container port
+          if (hostPort > 0) {
+            // If we detect consecutive ports, we create a range of them
+            if (bindings.length > 0 && previousHostPort === (hostPort - 1) && previousContainerPort === (containerPort - 1)) {
+              bindings[bindings.length-1].hostPort = createPortRange(bindings[bindings.length-1].hostPort, hostPort);
+              bindings[bindings.length-1].containerPort = createPortRange(bindings[bindings.length-1].containerPort, containerPort);
+              previousHostPort = hostPort;
+              previousContainerPort = containerPort;
+              return;
+            }
+
+            previousHostPort = hostPort;
+            previousContainerPort = containerPort;
+          } else {
+            previousHostPort = -1;
+            previousContainerPort = -1;
+          }
+
+          let bindingHostPort = portBinding.HostPort.toString();
+          if (portBinding.HostIp) {
+            bindingHostPort = portBinding.HostIp + ':' + bindingHostPort;
+          }
+
+          const binding = {
+            hostPort: bindingHostPort,
+            containerPort: containerPort,
+            protocol: protocol
+          };
+          bindings.push(binding);
+        });
+      });
+    });
+
     return bindings;
   };
 
