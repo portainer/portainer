@@ -21,13 +21,6 @@ class KubernetesDeployController {
     return _.isEmpty(this.formValues.EditorContent) || _.isEmpty(this.formValues.Namespace) || this.state.actionInProgress;
   }
 
-  getPlaceholder() {
-    if (this.state.Method === this.state.MethodValues.COMPOSE) {
-      return '# Define or paste the content of your docker-compose file here';
-    }
-    return '# Define or paste the content of your docker-compose file here';
-  }
-
   async editorUpdateAsync(cm) {
     this.formValues.EditorContent = cm.getValue();
   }
@@ -72,7 +65,7 @@ class KubernetesDeployController {
         COMPOSE: 'compose',
         KUBERNETES: 'kubernetes'
       },
-      Method: 'compose'
+      Method: 'kubernetes'
     };
     this.formValues = {};
     this.getNamespaces();

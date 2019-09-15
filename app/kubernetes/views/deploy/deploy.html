@@ -26,16 +26,6 @@
           <div class="form-group" style="margin-bottom: 0">
             <div class="boxselector_wrapper">
               <div>
-                <input type="radio" id="method_compose" ng-model="ctrl.state.Method" ng-value="ctrl.state.MethodValues.COMPOSE">
-                <label for="method_compose">
-                  <div class="boxselector_header">
-                    <i class="fab fa-docker" aria-hidden="true" style="margin-right: 2px;"></i>
-                    Compose
-                  </div>
-                  <p>docker-compose format</p>
-                </label>
-              </div>
-              <div>
                 <input type="radio" id="method_kubernetes" ng-model="ctrl.state.Method" ng-value="ctrl.state.MethodValues.KUBERNETES">
                 <label for="method_kubernetes">
                   <div class="boxselector_header">
@@ -43,6 +33,16 @@
                     Kubernetes
                   </div>
                   <p>Kubernetes manifest format</p>
+                </label>
+              </div>
+              <div>
+                <input type="radio" id="method_compose" ng-model="ctrl.state.Method" ng-value="ctrl.state.MethodValues.COMPOSE">
+                <label for="method_compose">
+                  <div class="boxselector_header">
+                    <i class="fab fa-docker" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Compose
+                  </div>
+                  <p>docker-compose format</p>
                 </label>
               </div>
             </div>
@@ -64,7 +64,7 @@
             <div class="col-sm-12">
               <code-editor
                 identifier="kubernetes-deploy-editor"
-                placeholder="{{ctrl.getPlaceholder()}}"
+                placeholder="# Define or paste the content of your manifest file here"
                 yml="true"
                 on-change="ctrl.editorUpdate"
               ></code-editor>
