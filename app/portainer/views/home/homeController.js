@@ -127,6 +127,7 @@ angular.module('portainer.app')
           })
           .catch(function error(err) {
             Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
+            $state.reload();
           })
           .finally(function final() {
             $scope.state.connectingToEdgeEndpoint = false;
