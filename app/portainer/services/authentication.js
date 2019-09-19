@@ -1,7 +1,7 @@
 angular.module('portainer.app')
 .factory('Authentication', [
-'Auth', 'OAuth', 'jwtHelper', 'LocalStorage', 'StateManager', 'EndpointProvider', 'UserService',
-function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManager, EndpointProvider, UserService) {
+'$async', 'Auth', 'OAuth', 'jwtHelper', 'LocalStorage', 'StateManager', 'EndpointProvider', 'UserService',
+function AuthenticationFactory($async, Auth, OAuth, jwtHelper, LocalStorage, StateManager, EndpointProvider, UserService) {
   'use strict';
 
   var service = {};
@@ -25,18 +25,22 @@ function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManage
     }
   }
 
+  async function OAuthLoginAsync(code) {
+    const response = await OAuth.validate({ code: code }).$promise;
+    setUser(response.jwt);
+  }
+
   function OAuthLogin(code) {
-    return OAuth.validate({ code: code }).$promise
-      .then(function onLoginSuccess(response) {
-        return setUser(response.jwt);
-      });
+    return $async(OAuthLoginAsync, code)
+  }
+
+  async function loginAsync(username, password) {
+    const response = await Auth.login({ username: username, password: password }).$promise;
+    setUser(response.jwt);
   }
 
   function login(username, password) {
-    return Auth.login({ username: username, password: password }).$promise
-      .then(function onLoginSuccess(response) {
-        return setUser(response.jwt);
-      });
+    return $async(loginAsync, username, password);
   }
 
   function logout() {
