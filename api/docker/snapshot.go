@@ -2,6 +2,7 @@ package docker
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/docker/docker/api/types"
@@ -10,7 +11,7 @@ import (
 	"github.com/portainer/portainer/api"
 )
 
-func snapshot(cli *client.Client) (*portainer.Snapshot, error) {
+func snapshot(cli *client.Client, endpoint *portainer.Endpoint) (*portainer.Snapshot, error) {
 	_, err := cli.Ping(context.Background())
 	if err != nil {
 		return nil, err
@@ -22,44 +23,44 @@ func snapshot(cli *client.Client) (*portainer.Snapshot, error) {
 
 	err = snapshotInfo(snapshot, cli)
 	if err != nil {
-		return nil, err
+		log.Printf("[WARN] [docker,snapshot] [message: unable to snapshot engine information] [endpoint: %s] [err: %s]", endpoint.Name, err)
 	}
 
 	if snapshot.Swarm {
 		err = snapshotSwarmServices(snapshot, cli)
 		if err != nil {
-			return nil, err
+			log.Printf("[WARN] [docker,snapshot] [message: unable to snapshot Swarm services] [endpoint: %s] [err: %s]", endpoint.Name, err)
 		}
 
 		err = snapshotNodes(snapshot, cli)
 		if err != nil {
-			return nil, err
+			log.Printf("[WARN] [docker,snapshot] [message: unable to snapshot Swarm nodes] [endpoint: %s] [err: %s]", endpoint.Name, err)
 		}
 	}
 
 	err = snapshotContainers(snapshot, cli)
 	if err != nil {
-		return nil, err
+		log.Printf("[WARN] [docker,snapshot] [message: unable to snapshot containers] [endpoint: %s] [err: %s]", endpoint.Name, err)
 	}
 
 	err = snapshotImages(snapshot, cli)
 	if err != nil {
-		return nil, err
+		log.Printf("[WARN] [docker,snapshot] [message: unable to snapshot images] [endpoint: %s] [err: %s]", endpoint.Name, err)
 	}
 
 	err = snapshotVolumes(snapshot, cli)
 	if err != nil {
-		return nil, err
+		log.Printf("[WARN] [docker,snapshot] [message: unable to snapshot volumes] [endpoint: %s] [err: %s]", endpoint.Name, err)
 	}
 
 	err = snapshotNetworks(snapshot, cli)
 	if err != nil {
-		return nil, err
+		log.Printf("[WARN] [docker,snapshot] [message: unable to snapshot networks] [endpoint: %s] [err: %s]", endpoint.Name, err)
 	}
 
 	err = snapshotVersion(snapshot, cli)
 	if err != nil {
-		return nil, err
+		log.Printf("[WARN] [docker,snapshot] [message: unable to snapshot engine version] [endpoint: %s] [err: %s]", endpoint.Name, err)
 	}
 
 	snapshot.Time = time.Now().Unix()
