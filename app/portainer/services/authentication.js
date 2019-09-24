@@ -47,6 +47,7 @@ function AuthenticationFactory($async, Auth, OAuth, jwtHelper, LocalStorage, Sta
     StateManager.clean();
     EndpointProvider.clean();
     LocalStorage.clean();
+    LocalStorage.storeLoginStateUUID('');
   }
 
   function isAuthenticated() {
