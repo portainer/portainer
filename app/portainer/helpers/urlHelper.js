@@ -23,7 +23,7 @@ angular.module('portainer.app')
   }
 
   function cleanParameters() {
-    $window.location.search = '';
+    $window.location.replace($window.location.origin + $window.location.pathname + $window.location.hash);
   }
 
   return helper;
