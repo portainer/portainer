@@ -398,11 +398,10 @@ ul.sidebar .sidebar-list a.active {
 
 .sidebar-footer-content .update-notification {
     font-size: 12px;
-    color: #337ab7;
-    border: #cccccc solid 1px;
+    color: #0074D9;
     padding: 12px;
     border-radius: 2px;
-    background-color: #b3f0fa;
+    background-color: #FF851B;
     margin-bottom: 5px;
 }
 
