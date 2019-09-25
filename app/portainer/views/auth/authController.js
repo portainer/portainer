@@ -3,7 +3,7 @@ import uuidv4 from 'uuid/v4';
 
 class AuthenticationController {
   /* @ngInject */
-  constructor($async, $scope, $state, $stateParams, $sanitize, Authentication, UserService, EndpointService, ExtensionService, StateManager, Notifications, SettingsService, URLHelper, LocalStorage) {
+  constructor($async, $scope, $state, $stateParams, $sanitize, Authentication, UserService, EndpointService, ExtensionService, StateManager, Notifications, SettingsService, URLHelper, LocalStorage, StatusService) {
     this.$async = $async;
     this.$scope = $scope;
     this.$state = $state;
@@ -18,6 +18,7 @@ class AuthenticationController {
     this.SettingsService = SettingsService;
     this.URLHelper = URLHelper;
     this.LocalStorage = LocalStorage;
+    this.StatusService = StatusService;
 
     this.logo = this.StateManager.getState().application.logo;
     this.formValues = {
@@ -33,6 +34,7 @@ class AuthenticationController {
     this.retrieveAndSaveEnabledExtensionsAsync = this.retrieveAndSaveEnabledExtensionsAsync.bind(this);
     this.retrievePermissionsAsync = this.retrievePermissionsAsync.bind(this);
     this.checkForEndpointsAsync = this.checkForEndpointsAsync.bind(this);
+    this.checkForLatestVersionAsync = this.checkForLatestVersionAsync.bind(this);
     this.postLoginSteps = this.postLoginSteps.bind(this);
 
     this.oAuthLoginAsync = this.oAuthLoginAsync.bind(this);
@@ -134,10 +136,28 @@ class AuthenticationController {
     }
   }
 
+  async checkForLatestVersionAsync() {
+    let versionInfo = {
+      UpdateAvailable: false,
+      LatestVersion: ''
+    };
+
+    try {
+      const versionStatus = await this.StatusService.version();
+      if (versionStatus.UpdateAvailable) {
+        versionInfo.UpdateAvailable = true;
+        versionInfo.LatestVersion = versionStatus.LatestVersion;
+      }
+    } finally {
+      this.StateManager.setVersionInfo(versionInfo);
+    }
+  }
+
   async postLoginSteps() {
     await this.retrievePermissionsAsync();
     await this.retrieveAndSaveEnabledExtensionsAsync();
     await this.checkForEndpointsAsync(false);
+    await this.checkForLatestVersionAsync();
   }
   /**
    * END POST LOGIN STEPS SECTION
