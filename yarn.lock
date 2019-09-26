@@ -6492,11 +6492,6 @@ istanbul@~0.1.40:
     which "1.0.x"
     wordwrap "0.0.x"
 
-isteven-angular-multiselect@~4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/isteven-angular-multiselect/-/isteven-angular-multiselect-4.0.0.tgz#70276da5ff3bc4d9a0887dc585ee26a1a26a8ed6"
-  integrity sha1-cCdtpf87xNmgiH3Fhe4moaJqjtY=
-
 isurl@^1.0.0-alpha5:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/isurl/-/isurl-1.0.0.tgz#b27f4f49f3cdaa3ea44a0a5b7f3462e6edc39d67"

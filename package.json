@@ -71,7 +71,6 @@
     "chart.js": "~2.6.0",
     "codemirror": "~5.30.0",
     "filesize": "~3.3.0",
-    "isteven-angular-multiselect": "~4.0.0",
     "jquery": "3.4.0",
     "js-yaml": "~3.13.1",
     "lodash-es": "^4.17.15",
