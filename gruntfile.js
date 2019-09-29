@@ -16,7 +16,7 @@ module.exports = function(grunt) {
   grunt.initConfig({
     root: 'dist',
     distdir: 'dist/public',
-    shippedDockerVersion: '18.09.3',
+    shippedDockerVersion: '19.03.2',
     shippedDockerVersionWindows: '17.09.0-ce',
     config: gruntfile_cfg.config,
     env: gruntfile_cfg.env,
