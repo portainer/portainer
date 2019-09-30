@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/portainer/libhttp/request"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 )
@@ -113,9 +114,27 @@ func (p *proxyTransport) proxyDockerRequest(request *http.Request) (*http.Respon
 		return p.proxyBuildRequest(request)
 	case strings.HasPrefix(path, "/images"):
 		return p.proxyImageRequest(request)
+	case strings.HasPrefix(path, "/v2"):
+		return p.proxyAgentRequest(request)
 	default:
 		return p.executeDockerRequest(request)
 	}
+}
+
+func (p *proxyTransport) proxyAgentRequest(r *http.Request) (*http.Response, error) {
+	requestPath := strings.TrimPrefix(r.URL.Path, "/v2")
+
+	switch {
+	case strings.HasPrefix(requestPath, "/browse"):
+		volumeID, _ := request.RetrieveQueryParameter(r, "volumeID", true)
+		if volumeID == "" {
+			return p.administratorOperation(r)
+		} else {
+			return p.restrictedOperation(r, volumeID)
+		}
+	}
+
+	return p.executeDockerRequest(r)
 }
 
 func (p *proxyTransport) proxyConfigRequest(request *http.Request) (*http.Response, error) {
