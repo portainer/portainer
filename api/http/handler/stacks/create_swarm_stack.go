@@ -1,7 +1,9 @@
 package stacks
 
 import (
+	"errors"
 	"net/http"
+	"path"
 	"strconv"
 	"strings"
 
@@ -290,6 +292,7 @@ type swarmStackDeploymentConfig struct {
 	dockerhub  *portainer.DockerHub
 	registries []portainer.Registry
 	prune      bool
+	isAdmin    bool
 }
 
 func (handler *Handler) createSwarmDeployConfig(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint, prune bool) (*swarmStackDeploymentConfig, *httperror.HandlerError) {
@@ -315,18 +318,41 @@ func (handler *Handler) createSwarmDeployConfig(r *http.Request, stack *portaine
 		dockerhub:  dockerhub,
 		registries: filteredRegistries,
 		prune:      prune,
+		isAdmin:    securityContext.IsAdmin,
 	}
 
 	return config, nil
 }
 
 func (handler *Handler) deploySwarmStack(config *swarmStackDeploymentConfig) error {
+	settings, err := handler.SettingsService.Settings()
+	if err != nil {
+		return err
+	}
+
+	if !settings.AllowBindMountsForRegularUsers && !config.isAdmin {
+		composeFilePath := path.Join(config.stack.ProjectPath, config.stack.EntryPoint)
+
+		stackContent, err := handler.FileService.GetFileContent(composeFilePath)
+		if err != nil {
+			return err
+		}
+
+		valid, err := handler.isValidStackFile(stackContent)
+		if err != nil {
+			return err
+		}
+		if !valid {
+			return errors.New("bind-mount disabled for non administrator users")
+		}
+	}
+
 	handler.stackCreationMutex.Lock()
 	defer handler.stackCreationMutex.Unlock()
 
 	handler.SwarmStackManager.Login(config.dockerhub, config.registries, config.endpoint)
 
-	err := handler.SwarmStackManager.Deploy(config.stack, config.prune, config.endpoint)
+	err = handler.SwarmStackManager.Deploy(config.stack, config.prune, config.endpoint)
 	if err != nil {
 		return err
 	}
