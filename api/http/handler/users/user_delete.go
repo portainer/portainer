@@ -65,12 +65,12 @@ func (handler *Handler) deleteAdminUser(w http.ResponseWriter, user *portainer.U
 }
 
 func (handler *Handler) deleteUser(w http.ResponseWriter, user *portainer.User) *httperror.HandlerError {
-	err := handler.UserService.DeleteUser(portainer.UserID(user.ID))
+	err := handler.UserService.DeleteUser(user.ID)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove user from the database", err}
 	}
 
-	err = handler.TeamMembershipService.DeleteTeamMembershipByUserID(portainer.UserID(user.ID))
+	err = handler.TeamMembershipService.DeleteTeamMembershipByUserID(user.ID)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove user memberships from the database", err}
 	}
