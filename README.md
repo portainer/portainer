@@ -41,10 +41,12 @@ Unlike the public demo, the playground sessions are deleted after 4 hours. Apart
 * Slack (chat): https://portainer.io/slack/
 
 ## Reporting bugs and contributing
+
 * Want to report a bug or request a feature? Please open [an issue](https://github.com/portainer/portainer/issues/new).
 * Want to help us build **_portainer_**? Follow our [contribution guidelines](https://portainer.readthedocs.io/en/latest/contribute.html) to build it  locally and make a pull request. We need all the help we can get!
 
 ## Security
+
 * Here at Portainer, we believe in [responsible disclosure](https://en.wikipedia.org/wiki/Responsible_disclosure) of security issues. If you have found a security issue, please report it to <security@portainer.io>.
 
 ## Limitations
