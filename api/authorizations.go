@@ -5,6 +5,7 @@ package portainer
 type AuthorizationService struct {
 	endpointService       EndpointService
 	endpointGroupService  EndpointGroupService
+	registryService       RegistryService
 	roleService           RoleService
 	teamMembershipService TeamMembershipService
 	userService           UserService
@@ -15,6 +16,7 @@ type AuthorizationService struct {
 type AuthorizationServiceParameters struct {
 	EndpointService       EndpointService
 	EndpointGroupService  EndpointGroupService
+	RegistryService       RegistryService
 	RoleService           RoleService
 	TeamMembershipService TeamMembershipService
 	UserService           UserService
@@ -53,43 +55,145 @@ func DefaultPortainerAuthorizations() Authorizations {
 	}
 }
 
-// UpdateUserAuthorizationsFromPolicies will update users authorizations based on the specified access policies.
-func (service *AuthorizationService) UpdateUserAuthorizationsFromPolicies(userPolicies *UserAccessPolicies, teamPolicies *TeamAccessPolicies) error {
-
-	for userID, policy := range *userPolicies {
-		if policy.RoleID == 0 {
-			continue
-		}
-
-		err := service.UpdateUserAuthorizations(userID)
-		if err != nil {
-			return err
-		}
-	}
-
-	for teamID, policy := range *teamPolicies {
-		if policy.RoleID == 0 {
-			continue
-		}
-
-		err := service.updateUserAuthorizationsInTeam(teamID)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (service *AuthorizationService) updateUserAuthorizationsInTeam(teamID TeamID) error {
-
-	memberships, err := service.teamMembershipService.TeamMembershipsByTeamID(teamID)
+// RemoveTeamAccessPolicies will remove all existing access policies associated to the specified team
+func (service *AuthorizationService) RemoveTeamAccessPolicies(teamID TeamID) error {
+	endpoints, err := service.endpointService.Endpoints()
 	if err != nil {
 		return err
 	}
 
-	for _, membership := range memberships {
-		err := service.UpdateUserAuthorizations(membership.UserID)
+	for _, endpoint := range endpoints {
+		for policyTeamID := range endpoint.TeamAccessPolicies {
+			if policyTeamID == teamID {
+				delete(endpoint.TeamAccessPolicies, policyTeamID)
+
+				err := service.endpointService.UpdateEndpoint(endpoint.ID, &endpoint)
+				if err != nil {
+					return err
+				}
+
+				break
+			}
+		}
+	}
+
+	endpointGroups, err := service.endpointGroupService.EndpointGroups()
+	if err != nil {
+		return err
+	}
+
+	for _, endpointGroup := range endpointGroups {
+		for policyTeamID := range endpointGroup.TeamAccessPolicies {
+			if policyTeamID == teamID {
+				delete(endpointGroup.TeamAccessPolicies, policyTeamID)
+
+				err := service.endpointGroupService.UpdateEndpointGroup(endpointGroup.ID, &endpointGroup)
+				if err != nil {
+					return err
+				}
+
+				break
+			}
+		}
+	}
+
+	registries, err := service.registryService.Registries()
+	if err != nil {
+		return err
+	}
+
+	for _, registry := range registries {
+		for policyTeamID := range registry.TeamAccessPolicies {
+			if policyTeamID == teamID {
+				delete(registry.TeamAccessPolicies, policyTeamID)
+
+				err := service.registryService.UpdateRegistry(registry.ID, &registry)
+				if err != nil {
+					return err
+				}
+
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// RemoveUserAccessPolicies will remove all existing access policies associated to the specified user
+func (service *AuthorizationService) RemoveUserAccessPolicies(userID UserID) error {
+	endpoints, err := service.endpointService.Endpoints()
+	if err != nil {
+		return err
+	}
+
+	for _, endpoint := range endpoints {
+		for policyUserID := range endpoint.UserAccessPolicies {
+			if policyUserID == userID {
+				delete(endpoint.UserAccessPolicies, policyUserID)
+
+				err := service.endpointService.UpdateEndpoint(endpoint.ID, &endpoint)
+				if err != nil {
+					return err
+				}
+
+				break
+			}
+		}
+	}
+
+	endpointGroups, err := service.endpointGroupService.EndpointGroups()
+	if err != nil {
+		return err
+	}
+
+	for _, endpointGroup := range endpointGroups {
+		for policyUserID := range endpointGroup.UserAccessPolicies {
+			if policyUserID == userID {
+				delete(endpointGroup.UserAccessPolicies, policyUserID)
+
+				err := service.endpointGroupService.UpdateEndpointGroup(endpointGroup.ID, &endpointGroup)
+				if err != nil {
+					return err
+				}
+
+				break
+			}
+		}
+	}
+
+	registries, err := service.registryService.Registries()
+	if err != nil {
+		return err
+	}
+
+	for _, registry := range registries {
+		for policyUserID := range registry.UserAccessPolicies {
+			if policyUserID == userID {
+				delete(registry.UserAccessPolicies, policyUserID)
+
+				err := service.registryService.UpdateRegistry(registry.ID, &registry)
+				if err != nil {
+					return err
+				}
+
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// UpdateUsersAuthorizations will trigger an update of the authorizations for all the users.
+func (service *AuthorizationService) UpdateUsersAuthorizations() error {
+	users, err := service.userService.Users()
+	if err != nil {
+		return err
+	}
+
+	for _, user := range users {
+		err := service.updateUserAuthorizations(user.ID)
 		if err != nil {
 			return err
 		}
@@ -98,8 +202,7 @@ func (service *AuthorizationService) updateUserAuthorizationsInTeam(teamID TeamI
 	return nil
 }
 
-// UpdateUserAuthorizations will trigger an update of the authorizations for the specified user.
-func (service *AuthorizationService) UpdateUserAuthorizations(userID UserID) error {
+func (service *AuthorizationService) updateUserAuthorizations(userID UserID) error {
 	user, err := service.userService.User(userID)
 	if err != nil {
 		return err
@@ -175,7 +278,10 @@ func getUserEndpointAuthorizations(user *User, endpoints []Endpoint, endpointGro
 			continue
 		}
 
-		endpointAuthorizations[endpoint.ID] = getAuthorizationsFromTeamEndpointGroupPolicies(userMemberships, &endpoint, roles, groupTeamAccessPolicies)
+		authorizations = getAuthorizationsFromTeamEndpointGroupPolicies(userMemberships, &endpoint, roles, groupTeamAccessPolicies)
+		if len(authorizations) > 0 {
+			endpointAuthorizations[endpoint.ID] = authorizations
+		}
 	}
 
 	return endpointAuthorizations
