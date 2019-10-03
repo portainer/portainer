@@ -8,7 +8,6 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/portainer/libhttp/request"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 )
@@ -126,11 +125,11 @@ func (p *proxyTransport) proxyAgentRequest(r *http.Request) (*http.Response, err
 
 	switch {
 	case strings.HasPrefix(requestPath, "/browse"):
-		volumeID, _ := request.RetrieveQueryParameter(r, "volumeID", true)
-		if volumeID == "" {
+		volumeIDParameter, found := r.URL.Query()["volumeID"]
+		if !found || len(volumeIDParameter) < 1 {
 			return p.administratorOperation(r)
 		} else {
-			return p.restrictedOperation(r, volumeID)
+			return p.restrictedOperation(r, volumeIDParameter[0])
 		}
 	}
 
