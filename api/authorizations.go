@@ -27,6 +27,7 @@ func NewAuthorizationService(parameters *AuthorizationServiceParameters) *Author
 	return &AuthorizationService{
 		endpointService:       parameters.EndpointService,
 		endpointGroupService:  parameters.EndpointGroupService,
+		registryService:       parameters.RegistryService,
 		roleService:           parameters.RoleService,
 		teamMembershipService: parameters.TeamMembershipService,
 		userService:           parameters.UserService,

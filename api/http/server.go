@@ -97,6 +97,7 @@ func (server *Server) Start() error {
 	authorizationServiceParameters := &portainer.AuthorizationServiceParameters{
 		EndpointService:       server.EndpointService,
 		EndpointGroupService:  server.EndpointGroupService,
+		RegistryService:       server.RegistryService,
 		RoleService:           server.RoleService,
 		TeamMembershipService: server.TeamMembershipService,
 		UserService:           server.UserService,
