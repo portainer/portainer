@@ -68,7 +68,10 @@
           <!-- port-mapping -->
           <div class="form-group">
             <div class="col-sm-12">
-              <label class="control-label text-left">Manual network port publishing</label>
+              <label class="control-label text-left">
+                Manual network port publishing
+                <portainer-tooltip position="bottom" message="When a range of ports on the host and a single port on the container is specified, Docker will randomly choose a single available port in the defined range and forward that to the container port."></portainer-tooltip>
+              </label>
               <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addPortBinding()">
                 <i class="fa fa-plus-circle" aria-hidden="true"></i> publish a new network port
               </span>
