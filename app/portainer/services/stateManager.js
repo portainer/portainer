@@ -19,6 +19,11 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
     extensions: []
   };
 
+  manager.setVersionInfo = function(versionInfo) {
+    state.application.versionStatus = versionInfo;
+    LocalStorage.storeApplicationState(state.application);
+  };
+
   manager.dismissInformationPanel = function(id) {
     state.UI.dismissedInfoPanels[id] = true;
     LocalStorage.storeUIState(state.UI);

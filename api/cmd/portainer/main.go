@@ -503,8 +503,13 @@ func initExtensionManager(fileService portainer.FileService, extensionService po
 			log.Printf("Unable to enable extension: %s [extension: %s]", err.Error(), extension.Name)
 			extension.Enabled = false
 			extension.License.Valid = false
-			extensionService.Persist(&extension)
 		}
+
+		err = extensionService.Persist(&extension)
+		if err != nil {
+			return nil, err
+		}
+
 	}
 
 	return extensionManager, nil

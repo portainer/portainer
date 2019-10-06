@@ -396,6 +396,14 @@ ul.sidebar .sidebar-list a.active {
   margin: 2px 0 2px 20px;
 }
 
+.sidebar-footer-content .update-notification {
+    font-size: 14px;
+    padding: 12px;
+    border-radius: 2px;
+    background-color: #FF851B;
+    margin-bottom: 5px;
+}
+
 .sidebar-footer-content .version {
   font-size: 11px;
   margin: 11px 20px 0 7px;

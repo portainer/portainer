@@ -4,53 +4,53 @@
     <div class="col-sm-6 col-sm-offset-3">
       <!-- login box logo -->
       <div class="row">
-        <img ng-if="!logo" src="../../../../assets/images/logo_alt.png" class="simple-box-logo" alt="Portainer">
-        <img ng-if="logo" ng-src="{{ logo }}" class="simple-box-logo">
+        <img ng-if="!ctrl.logo" src="../../../../assets/images/logo_alt.png" class="simple-box-logo" alt="Portainer">
+        <img ng-if="ctrl.logo" ng-src="{{ ctrl.logo }}" class="simple-box-logo">
       </div>
       <!-- !login box logo -->
       <!-- login panel -->
-      <div class="panel panel-default" ng-show="!state.isInOAuthProcess">
+      <div class="panel panel-default" ng-show="!ctrl.state.loginInProgress">
         <div class="panel-body">
           <!-- login form -->
           <form class="simple-box-form form-horizontal">
             <!-- username input -->
             <div class="input-group">
               <span class="input-group-addon"><i class="fa fa-user" aria-hidden="true"></i></span>
-              <input id="username" type="text" class="form-control" name="username" ng-model="formValues.Username" auto-focus>
+              <input id="username" type="text" class="form-control" name="username" ng-model="ctrl.formValues.Username" auto-focus>
             </div>
             <!-- !username input -->
             <!-- password input -->
             <div class="input-group">
               <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
-              <input id="password" type="password" class="form-control" name="password" ng-model="formValues.Password">
+              <input id="password" type="password" class="form-control" name="password" ng-model="ctrl.formValues.Password">
             </div>
             <!-- !password input -->
             <!-- login button -->
             <div class="form-group">
               <div class="col-sm-12" >
-                <a ng-href="{{OAuthLoginURI}}" ng-if="AuthenticationMethod === 3">
-                  <div class="btn btn-primary btn-sm pull-left" style="margin-left:2px" ng-if="state.OAuthProvider === 'Microsoft'">
+                <a ng-href="{{ctrl.OAuthLoginURI}}" ng-if="ctrl.AuthenticationMethod === 3">
+                  <div class="btn btn-primary btn-sm pull-left" style="margin-left:2px" ng-if="ctrl.state.OAuthProvider === 'Microsoft'">
                     <i class="fab fa-microsoft" aria-hidden="true"></i> Login with Microsoft
                   </div>
-                  <div class="btn btn-primary btn-sm pull-left" style="margin-left:2px" ng-if="state.OAuthProvider === 'Google'">
+                  <div class="btn btn-primary btn-sm pull-left" style="margin-left:2px" ng-if="ctrl.state.OAuthProvider === 'Google'">
                     <i class="fab fa-google" aria-hidden="true" ></i> Login with Google
                   </div>
-                  <div class="btn btn-primary btn-sm pull-left" style="margin-left:2px" ng-if="state.OAuthProvider === 'Github'">
+                  <div class="btn btn-primary btn-sm pull-left" style="margin-left:2px" ng-if="ctrl.state.OAuthProvider === 'Github'">
                     <i class="fab fa-github" aria-hidden="true" ></i> Login with Github
                   </div>
-                  <div class="btn btn-primary btn-sm pull-left" style="margin-left:2px" ng-if="state.OAuthProvider === 'OAuth'">
+                  <div class="btn btn-primary btn-sm pull-left" style="margin-left:2px" ng-if="ctrl.state.OAuthProvider === 'OAuth'">
                     <i class="fa fa-sign-in-alt" aria-hidden="true" ></i> Login with OAuth
                   </div>
                 </a>
 
-                <button type="submit" class="btn btn-primary btn-sm pull-right" ng-click="authenticateUser()" button-spinner="state.loginInProgress" ng-disabled="state.loginInProgress">
-                  <span ng-hide="state.loginInProgress"><i class="fa fa-sign-in-alt" aria-hidden="true"></i> Login</span>
-                  <span ng-show="state.loginInProgress">Login in progress...</span>
+                <button type="submit" class="btn btn-primary btn-sm pull-right" ng-click="ctrl.authenticateUser()" button-spinner="ctrl.state.loginInProgress" ng-disabled="ctrl.state.loginInProgress">
+                  <span ng-hide="ctrl.state.loginInProgress"><i class="fa fa-sign-in-alt" aria-hidden="true"></i> Login</span>
+                  <span ng-show="ctrl.state.loginInProgress">Login in progress...</span>
                 </button>
 
-                <span class="pull-right" style="margin: 5px;" ng-if="state.AuthenticationError">
+                <span class="pull-right" style="margin: 5px;" ng-if="ctrl.state.AuthenticationError">
                   <i class="fa fa-exclamation-triangle red-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                  <span class="small text-danger">{{ state.AuthenticationError }}</span>
+                  <span class="small text-danger">{{ ctrl.state.AuthenticationError }}</span>
                 </span>
               </div>
             </div>
@@ -61,10 +61,10 @@
         </div>
       </div>
       <!-- !login panel -->
-      <div class="panel panel-default" ng-show="state.isInOAuthProcess">
+      <div class="panel panel-default" ng-show="ctrl.state.loginInProgress">
         <div class="panel-body">
           <div class="form-group text-center">
-              <span class="small text-muted">OAuth authentication in progress... <span button-spinner="true"></span></span>
+              <span class="small text-muted">Authentication in progress... <span button-spinner="true"></span></span>
           </div>
         </div>
       </div>

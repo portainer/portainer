@@ -2,12 +2,12 @@ package endpoints
 
 import (
 	"errors"
-	"log"
 	"net"
 	"net/http"
 	"net/url"
 	"runtime"
 	"strconv"
+	"strings"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -380,8 +380,10 @@ func (handler *Handler) snapshotAndPersistEndpoint(endpoint *portainer.Endpoint)
 	snapshot, err := handler.Snapshotter.CreateSnapshot(endpoint)
 	endpoint.Status = portainer.EndpointStatusUp
 	if err != nil {
-		log.Printf("http error: endpoint snapshot error (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
-		endpoint.Status = portainer.EndpointStatusDown
+		if strings.Contains(err.Error(), "Invalid request signature") {
+			err = errors.New("agent already paired with another Portainer instance")
+		}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to initiate communications with endpoint", err}
 	}
 
 	if snapshot != nil {
