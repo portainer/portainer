@@ -173,11 +173,32 @@ func (manager *Manager) createDockerProxy(endpoint *portainer.Endpoint) (http.Ha
 	return manager.proxyFactory.newLocalProxy(endpointURL.Path, endpoint), nil
 }
 
+func (manager *Manager) createKubernetesProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
+	baseURL := endpoint.URL
+	if endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
+		tunnel := manager.reverseTunnelService.GetTunnelDetails(endpoint.ID)
+		baseURL = fmt.Sprintf("http://localhost:%d", tunnel.Port)
+	}
+
+	endpointURL, err := url.Parse(baseURL)
+	if err != nil {
+		return nil, err
+	}
+
+	if endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
+		return manager.proxyFactory.newKubernetesEdgeHTTPProxy(endpointURL, endpoint), nil
+	} else if endpoint.Type == portainer.AgentOnKubernetesEnvironment {
+		return manager.proxyFactory.newKubernetesAgentHTTPSProxy(endpointURL, endpoint)
+	}
+
+	return newLocalKubernetesProxy(endpoint)
+}
+
 func (manager *Manager) createProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
 	if endpoint.Type == portainer.AzureEnvironment {
 		return newAzureProxy(&endpoint.AzureCredentials)
-	} else if endpoint.Type == portainer.KubernetesEnvironment {
-		return newKubernetesProxy(endpoint)
+	} else if endpoint.Type == portainer.KubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment || endpoint.Type == portainer.AgentOnKubernetesEnvironment {
+		return manager.createKubernetesProxy(endpoint)
 	}
 
 	return manager.createDockerProxy(endpoint)

@@ -30,26 +30,6 @@ func (factory *proxyFactory) newHTTPProxy(u *url.URL) http.Handler {
 	return httputil.NewSingleHostReverseProxy(u)
 }
 
-func newKubernetesProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
-	remoteURL, err := url.Parse(endpoint.URL)
-	if err != nil {
-		return nil, err
-	}
-
-	proxy := newSingleHostReverseProxyWithHostHeader(remoteURL)
-
-	config, err := crypto.CreateTLSConfigurationFromBytes(nil, nil, nil, true, true)
-	if err != nil {
-		return nil, err
-	}
-
-	proxy.Transport = &http.Transport{
-		TLSClientConfig: config,
-	}
-
-	return proxy, nil
-}
-
 func newAzureProxy(credentials *portainer.AzureCredentials) (http.Handler, error) {
 	remoteURL, err := url.Parse(AzureAPIBaseURL)
 	if err != nil {
@@ -72,6 +52,46 @@ func (factory *proxyFactory) newDockerHTTPSProxy(u *url.URL, tlsConfig *portaine
 	}
 
 	proxy.Transport.(*proxyTransport).dockerTransport.TLSClientConfig = config
+	return proxy, nil
+}
+
+func (factory *proxyFactory) newKubernetesEdgeHTTPProxy(u *url.URL, endpoint *portainer.Endpoint) http.Handler {
+	u.Scheme = "http"
+	proxy := newSingleHostReverseProxyWithHostHeader(u)
+	proxy.Transport = NewEdgeTransport(factory.ReverseTunnelService, endpoint.ID)
+	return proxy
+}
+
+func (factory *proxyFactory) newKubernetesAgentHTTPSProxy(u *url.URL, endpoint *portainer.Endpoint) (http.Handler, error) {
+	u.Scheme = "https"
+	proxy := newSingleHostReverseProxyWithHostHeader(u)
+
+	config, err := crypto.CreateTLSConfigurationFromDisk(endpoint.TLSConfig.TLSCACertPath, endpoint.TLSConfig.TLSCertPath, endpoint.TLSConfig.TLSKeyPath, endpoint.TLSConfig.TLSSkipVerify)
+	if err != nil {
+		return nil, err
+	}
+
+	proxy.Transport = NewAgentTransport(factory.SignatureService, config)
+	return proxy, nil
+}
+
+func newLocalKubernetesProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
+	remoteURL, err := url.Parse(endpoint.URL)
+	if err != nil {
+		return nil, err
+	}
+
+	proxy := newSingleHostReverseProxyWithHostHeader(remoteURL)
+
+	config, err := crypto.CreateTLSConfigurationFromBytes(nil, nil, nil, true, true)
+	if err != nil {
+		return nil, err
+	}
+
+	proxy.Transport = &http.Transport{
+		TLSClientConfig: config,
+	}
+
 	return proxy, nil
 }
 

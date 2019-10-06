@@ -106,7 +106,7 @@ function ($q, $scope, $state, $transition$, $filter, clipboard, EndpointService,
         $scope.endpointType = 'remote';
       }
       endpoint.URL = $filter('stripprotocol')(endpoint.URL);
-      if (endpoint.Type === 4) {
+      if (endpoint.Type === 7) {
         $scope.edgeKeyDetails = decodeEdgeKey(endpoint.EdgeKey);
         $scope.randomEdgeID = uuidv4();
       }

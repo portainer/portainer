@@ -165,7 +165,7 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
       LocalStorage.storeEndpointState(state.endpoint);
       deferred.resolve();
       return deferred.promise;
-    } else if (endpoint.Type === 5) {
+    } else if (endpoint.Type === 5 || endpoint.Type === 6 || endpoint.Type === 7) {
       state.endpoint.name = endpoint.Name;
       state.endpoint.mode = { provider: 'KUBERNETES' };
       LocalStorage.storeEndpointState(state.endpoint);

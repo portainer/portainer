@@ -61,7 +61,8 @@ function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService,
     var groupId = $scope.formValues.GroupId;
     var tags = $scope.formValues.Tags;
 
-    addEndpoint(name, 2, URL, publicURL, groupId, tags, true, true, true, null, null, null);
+    // TODO: temporarily updated to AgentOnKubernetesEnvironment, breaking Docker agent support
+    addEndpoint(name, 6, URL, publicURL, groupId, tags, true, true, true, null, null, null);
   };
 
   $scope.addEdgeAgentEndpoint = function() {
@@ -70,7 +71,8 @@ function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService,
       var tags = $scope.formValues.Tags;
       var URL = $scope.formValues.URL;
 
-      addEndpoint(name, 4, URL, "", groupId, tags, false, false, false, null, null, null);
+    // TODO: temporarily updated to EdgeAgentOnKubernetesEnvironment, breaking Docker Edge agent support
+    addEndpoint(name, 7, URL, "", groupId, tags, false, false, false, null, null, null);
   };
 
   $scope.addAzureEndpoint = function() {
@@ -104,7 +106,7 @@ function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService,
     EndpointService.createRemoteEndpoint(name, type, URL, PublicURL, groupId, tags, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
     .then(function success(data) {
       Notifications.success('Endpoint created', name);
-      if (type === 4) {
+      if (type === 7) {
         $state.go('portainer.endpoints.endpoint', { id: data.Id });
       } else {
         $state.go('portainer.endpoints', {}, {reload: true});

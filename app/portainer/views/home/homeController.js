@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-  .controller('HomeController', ['$q', '$scope', '$state', '$interval', 'Authentication', 'EndpointService', 'EndpointHelper', 'GroupService', 'Notifications', 'EndpointProvider', 'StateManager', 'LegacyExtensionManager', 'ModalService', 'MotdService', 'SystemService',
-    function($q, $scope, $state, $interval, Authentication, EndpointService, EndpointHelper, GroupService, Notifications, EndpointProvider, StateManager, LegacyExtensionManager, ModalService, MotdService, SystemService) {
+  .controller('HomeController', ['$q', '$scope', '$state', '$interval', 'Authentication', 'EndpointService', 'EndpointHelper', 'GroupService', 'Notifications', 'EndpointProvider', 'StateManager', 'LegacyExtensionManager', 'ModalService', 'MotdService', 'SystemService', 'KubernetesNamespaceService',
+    function($q, $scope, $state, $interval, Authentication, EndpointService, EndpointHelper, GroupService, Notifications, EndpointProvider, StateManager, LegacyExtensionManager, ModalService, MotdService, SystemService, KubernetesNamespaceService) {
 
       $scope.state = {
         connectingToEdgeEndpoint: false,
@@ -15,8 +15,10 @@ angular.module('portainer.app')
           return switchToAzureEndpoint(endpoint);
         } else if (endpoint.Type === 4) {
           return switchToEdgeEndpoint(endpoint);
-        } else if (endpoint.Type === 5) {
+        } else if (endpoint.Type === 5 || endpoint.Type === 6) {
           return switchToKubernetesEndpoint(endpoint);
+        } else if (endpoint.Type === 7) {
+          return switchToKubernetesEdgeEndpoint(endpoint);
         }
 
         checkEndpointStatus(endpoint)
@@ -113,6 +115,27 @@ angular.module('portainer.app')
           .finally(function final() {
             switchToDockerEndpoint(endpoint);
           });
+      }
+
+      function switchToKubernetesEdgeEndpoint(endpoint) {
+        if (!endpoint.EdgeID) {
+          $state.go('portainer.endpoints.endpoint', { id: endpoint.Id });
+          return;
+        }
+
+        EndpointProvider.setEndpointID(endpoint.Id);
+        $scope.state.connectingToEdgeEndpoint = true;
+        // TODO: find a better way to ping a Kubernetes environment (no ping in the API)
+        KubernetesNamespaceService.namespaces()
+        .then(function success() {
+          endpoint.Status = 1;
+        })
+        .catch(function error() {
+          endpoint.Status = 2;
+        })
+        .finally(function final() {
+          switchToKubernetesEndpoint(endpoint);
+        });
       }
 
       function switchToDockerEndpoint(endpoint) {

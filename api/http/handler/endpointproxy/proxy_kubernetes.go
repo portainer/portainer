@@ -1,9 +1,11 @@
 package endpointproxy
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"strconv"
+	"time"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -30,6 +32,30 @@ func (handler *Handler) proxyRequestsToKubernetesAPI(w http.ResponseWriter, r *h
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
 	}
 
+	if endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
+		if endpoint.EdgeID == "" {
+			return &httperror.HandlerError{http.StatusInternalServerError, "No Edge agent registered with the endpoint", errors.New("No agent available")}
+		}
+
+		tunnel := handler.ReverseTunnelService.GetTunnelDetails(endpoint.ID)
+		if tunnel.Status == portainer.EdgeAgentIdle {
+			handler.ProxyManager.DeleteProxy(endpoint)
+
+			err := handler.ReverseTunnelService.SetTunnelStatusToRequired(endpoint.ID)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update tunnel status", err}
+			}
+
+			settings, err := handler.SettingsService.Settings()
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+			}
+
+			waitForAgentToConnect := time.Duration(settings.EdgeAgentCheckinInterval) * time.Second
+			time.Sleep(waitForAgentToConnect * 2)
+		}
+	}
+
 	var proxy http.Handler
 	proxy = handler.ProxyManager.GetProxy(endpoint)
 	if proxy == nil {
@@ -40,14 +66,22 @@ func (handler *Handler) proxyRequestsToKubernetesAPI(w http.ResponseWriter, r *h
 	}
 
 	// TODO: relocate token management into proxy creation
-	token, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/token")
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to read service account token file", err}
+	if endpoint.Type == portainer.KubernetesEnvironment {
+		token, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/token")
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to read service account token file", err}
+		}
+
+		r.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 	}
 
-	r.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
-
+	// TODO: find a proper way to proxy a request for the agent
 	id := strconv.Itoa(endpointID)
-	http.StripPrefix("/"+id+"/kubernetes", proxy).ServeHTTP(w, r)
+	if endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
+		http.StripPrefix("/"+id, proxy).ServeHTTP(w, r)
+	} else {
+		http.StripPrefix("/"+id+"/kubernetes", proxy).ServeHTTP(w, r)
+	}
+
 	return nil
 }
