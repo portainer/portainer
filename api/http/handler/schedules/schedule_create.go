@@ -236,7 +236,7 @@ func (handler *Handler) addAndPersistSchedule(schedule *portainer.Schedule, file
 			return err
 		}
 
-		if endpoint.Type != portainer.EdgeAgentEnvironment {
+		if endpoint.Type != portainer.EdgeAgentOnDockerEnvironment {
 			nonEdgeEndpointIDs = append(nonEdgeEndpointIDs, endpoint.ID)
 		} else {
 			edgeEndpointIDs = append(edgeEndpointIDs, endpoint.ID)

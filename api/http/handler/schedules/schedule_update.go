@@ -109,7 +109,7 @@ func (handler *Handler) updateEdgeSchedule(schedule *portainer.Schedule, payload
 				return err
 			}
 
-			if endpoint.Type == portainer.EdgeAgentEnvironment {
+			if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment {
 				edgeEndpointIDs = append(edgeEndpointIDs, endpoint.ID)
 			}
 		}

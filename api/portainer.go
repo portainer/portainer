@@ -1010,10 +1010,14 @@ const (
 	AgentOnDockerEnvironment
 	// AzureEnvironment represents an endpoint connected to an Azure environment
 	AzureEnvironment
-	// EdgeAgentEnvironment represents an endpoint connected to an Edge agent
-	EdgeAgentEnvironment
+	// EdgeAgentOnDockerEnvironment represents an endpoint connected to an Edge agent deployed on a Docker environment
+	EdgeAgentOnDockerEnvironment
 	// KubernetesEnvironment represents an endpoint connected to a Kubernetes environment
 	KubernetesEnvironment
+	// AgentOnKubernetesEnvironment represents an endpoint connected to a Portainer agent deployed on a Kubernetes environment
+	AgentOnKubernetesEnvironment
+	// EdgeAgentOnKubernetesEnvironment represents an endpoint connected to an Edge agent deployed on a Kubernetes environment
+	EdgeAgentOnKubernetesEnvironment
 )
 
 const (

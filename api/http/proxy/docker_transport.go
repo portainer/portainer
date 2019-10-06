@@ -63,7 +63,7 @@ func (p *proxyTransport) RoundTrip(request *http.Request) (*http.Response, error
 func (p *proxyTransport) executeDockerRequest(request *http.Request) (*http.Response, error) {
 	response, err := p.dockerTransport.RoundTrip(request)
 
-	if p.endpointType != portainer.EdgeAgentEnvironment {
+	if p.endpointType != portainer.EdgeAgentOnDockerEnvironment {
 		return response, err
 	}
 

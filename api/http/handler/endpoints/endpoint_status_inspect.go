@@ -32,7 +32,7 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
-	if endpoint.Type != portainer.EdgeAgentEnvironment {
+	if endpoint.Type != portainer.EdgeAgentOnDockerEnvironment {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Status unavailable for non Edge agent endpoints", errors.New("Status unavailable")}
 	}
 

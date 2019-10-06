@@ -152,7 +152,7 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 func (handler *Handler) createEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
 	if portainer.EndpointType(payload.EndpointType) == portainer.AzureEnvironment {
 		return handler.createAzureEndpoint(payload)
-	} else if portainer.EndpointType(payload.EndpointType) == portainer.EdgeAgentEnvironment {
+	} else if portainer.EndpointType(payload.EndpointType) == portainer.EdgeAgentOnDockerEnvironment {
 		return handler.createEdgeAgentEndpoint(payload)
 	} else if portainer.EndpointType(payload.EndpointType) == portainer.KubernetesEnvironment {
 		return handler.createKubernetesEndpoint(payload)
@@ -203,7 +203,7 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 }
 
 func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
-	endpointType := portainer.EdgeAgentEnvironment
+	endpointType := portainer.EdgeAgentOnDockerEnvironment
 	endpointID := handler.EndpointService.GetNextIdentifier()
 
 	portainerURL, err := url.Parse(payload.URL)

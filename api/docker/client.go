@@ -38,7 +38,7 @@ func (factory *ClientFactory) CreateClient(endpoint *portainer.Endpoint, nodeNam
 		return nil, unsupportedEnvironmentType
 	} else if endpoint.Type == portainer.AgentOnDockerEnvironment {
 		return createAgentClient(endpoint, factory.signatureService, nodeName)
-	} else if endpoint.Type == portainer.EdgeAgentEnvironment {
+	} else if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment {
 		return createEdgeClient(endpoint, factory.reverseTunnelService, nodeName)
 	}
 
