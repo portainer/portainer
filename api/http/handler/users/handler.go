@@ -23,6 +23,7 @@ type Handler struct {
 	ResourceControlService portainer.ResourceControlService
 	CryptoService          portainer.CryptoService
 	SettingsService        portainer.SettingsService
+	AuthorizationService   *portainer.AuthorizationService
 }
 
 // NewHandler creates a handler to manage user operations.
