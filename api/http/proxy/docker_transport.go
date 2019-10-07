@@ -128,9 +128,8 @@ func (p *proxyTransport) proxyAgentRequest(r *http.Request) (*http.Response, err
 		volumeIDParameter, found := r.URL.Query()["volumeID"]
 		if !found || len(volumeIDParameter) < 1 {
 			return p.administratorOperation(r)
-		} else {
-			return p.restrictedOperation(r, volumeIDParameter[0])
 		}
+		return p.restrictedOperation(r, volumeIDParameter[0])
 	}
 
 	return p.executeDockerRequest(r)
