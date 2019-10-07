@@ -24,7 +24,7 @@ func NewHandler(bouncer *security.RequestBouncer, status *portainer.Status) *Han
 	h.Handle("/status",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.statusInspect))).Methods(http.MethodGet)
 	h.Handle("/status/version",
-		bouncer.RestrictedAccess(http.HandlerFunc(h.statusInspectVersion))).Methods(http.MethodGet)
+		bouncer.AuthenticatedAccess(http.HandlerFunc(h.statusInspectVersion))).Methods(http.MethodGet)
 
 	return h
 }
