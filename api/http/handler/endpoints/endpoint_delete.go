@@ -43,5 +43,12 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 
 	handler.ProxyManager.DeleteProxy(endpoint)
 
+	if len(endpoint.UserAccessPolicies) > 0 || len(endpoint.TeamAccessPolicies) > 0 {
+		err = handler.AuthorizationService.UpdateUsersAuthorizations()
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
+		}
+	}
+
 	return response.Empty(w)
 }

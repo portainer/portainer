@@ -97,6 +97,7 @@ func (server *Server) Start() error {
 	authorizationServiceParameters := &portainer.AuthorizationServiceParameters{
 		EndpointService:       server.EndpointService,
 		EndpointGroupService:  server.EndpointGroupService,
+		RegistryService:       server.RegistryService,
 		RoleService:           server.RoleService,
 		TeamMembershipService: server.TeamMembershipService,
 		UserService:           server.UserService,
@@ -213,9 +214,12 @@ func (server *Server) Start() error {
 	var teamHandler = teams.NewHandler(requestBouncer)
 	teamHandler.TeamService = server.TeamService
 	teamHandler.TeamMembershipService = server.TeamMembershipService
+	teamHandler.AuthorizationService = authorizationService
 
 	var teamMembershipHandler = teammemberships.NewHandler(requestBouncer)
 	teamMembershipHandler.TeamMembershipService = server.TeamMembershipService
+	teamMembershipHandler.AuthorizationService = authorizationService
+
 	var statusHandler = status.NewHandler(requestBouncer, server.Status)
 
 	var templatesHandler = templates.NewHandler(requestBouncer)
@@ -232,6 +236,7 @@ func (server *Server) Start() error {
 	userHandler.CryptoService = server.CryptoService
 	userHandler.ResourceControlService = server.ResourceControlService
 	userHandler.SettingsService = server.SettingsService
+	userHandler.AuthorizationService = authorizationService
 
 	var websocketHandler = websocket.NewHandler(requestBouncer)
 	websocketHandler.EndpointService = server.EndpointService

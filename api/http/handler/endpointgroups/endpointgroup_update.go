@@ -2,6 +2,7 @@ package endpointgroups
 
 import (
 	"net/http"
+	"reflect"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -54,12 +55,12 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 	}
 
 	updateAuthorizations := false
-	if payload.UserAccessPolicies != nil {
+	if payload.UserAccessPolicies != nil && !reflect.DeepEqual(payload.UserAccessPolicies, endpointGroup.UserAccessPolicies) {
 		endpointGroup.UserAccessPolicies = payload.UserAccessPolicies
 		updateAuthorizations = true
 	}
 
-	if payload.TeamAccessPolicies != nil {
+	if payload.TeamAccessPolicies != nil && !reflect.DeepEqual(payload.TeamAccessPolicies, endpointGroup.TeamAccessPolicies) {
 		endpointGroup.TeamAccessPolicies = payload.TeamAccessPolicies
 		updateAuthorizations = true
 	}
@@ -70,7 +71,7 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 	}
 
 	if updateAuthorizations {
-		err = handler.AuthorizationService.UpdateUserAuthorizationsFromPolicies(&payload.UserAccessPolicies, &payload.TeamAccessPolicies)
+		err = handler.AuthorizationService.UpdateUsersAuthorizations()
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
 		}
