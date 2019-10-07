@@ -113,9 +113,26 @@ func (p *proxyTransport) proxyDockerRequest(request *http.Request) (*http.Respon
 		return p.proxyBuildRequest(request)
 	case strings.HasPrefix(path, "/images"):
 		return p.proxyImageRequest(request)
+	case strings.HasPrefix(path, "/v2"):
+		return p.proxyAgentRequest(request)
 	default:
 		return p.executeDockerRequest(request)
 	}
+}
+
+func (p *proxyTransport) proxyAgentRequest(r *http.Request) (*http.Response, error) {
+	requestPath := strings.TrimPrefix(r.URL.Path, "/v2")
+
+	switch {
+	case strings.HasPrefix(requestPath, "/browse"):
+		volumeIDParameter, found := r.URL.Query()["volumeID"]
+		if !found || len(volumeIDParameter) < 1 {
+			return p.administratorOperation(r)
+		}
+		return p.restrictedOperation(r, volumeIDParameter[0])
+	}
+
+	return p.executeDockerRequest(r)
 }
 
 func (p *proxyTransport) proxyConfigRequest(request *http.Request) (*http.Response, error) {
