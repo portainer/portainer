@@ -28,7 +28,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager) {
     labelName: '',
     labelValue: '',
     enableHostManagementFeatures: false,
-    restrictVolumeBrowser: false,
+    enableVolumeBrowser: false,
   };
 
   $scope.removeFilteredContainerLabel = function(index) {
@@ -62,7 +62,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager) {
 
     settings.AllowBindMountsForRegularUsers = !$scope.formValues.restrictBindMounts;
     settings.AllowPrivilegedModeForRegularUsers = !$scope.formValues.restrictPrivilegedMode;
-    settings.AllowVolumeBrowserForRegularUsers = !$scope.formValues.restrictVolumeBrowser;
+    settings.AllowVolumeBrowserForRegularUsers = $scope.formValues.enableVolumeBrowser;
     settings.EnableHostManagementFeatures = $scope.formValues.enableHostManagementFeatures;
 
     $scope.state.actionInProgress = true;
@@ -100,7 +100,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager) {
       }
       $scope.formValues.restrictBindMounts = !settings.AllowBindMountsForRegularUsers;
       $scope.formValues.restrictPrivilegedMode = !settings.AllowPrivilegedModeForRegularUsers;
-      $scope.formValues.restrictVolumeBrowser = !settings.AllowVolumeBrowserForRegularUsers;
+      $scope.formValues.enableVolumeBrowser = settings.AllowVolumeBrowserForRegularUsers;
       $scope.formValues.enableHostManagementFeatures = settings.EnableHostManagementFeatures;
     })
     .catch(function error(err) {

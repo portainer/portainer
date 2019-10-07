@@ -104,11 +104,11 @@
           <div class="form-group">
             <div class="col-sm-12">
               <label for="toggle_allowvolumebrowser" class="control-label text-left">
-                Disable volume management for non-administrators
-                <portainer-tooltip position="bottom" message="When enabled, regular users aswell as users with helpdesk, standard and read-only roles from the RBAC extension will not be able to use Portainer volume management features."></portainer-tooltip>
+                Enable volume management for non-administrators
+                <portainer-tooltip position="bottom" message="When enabled, allow regular users aswell as users with helpdesk, standard and read-only roles from the RBAC extension to use Portainer volume management features."></portainer-tooltip>
               </label>
               <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="toggle_allowvolumebrowser" ng-model="formValues.restrictVolumeBrowser"><i></i>
+                <input type="checkbox" name="toggle_allowvolumebrowser" ng-model="formValues.enableVolumeBrowser"><i></i>
               </label>
             </div>
           </div>
