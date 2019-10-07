@@ -17,6 +17,7 @@ export function SettingsViewModel(data) {
 export function PublicSettingsViewModel(settings) {
   this.AllowBindMountsForRegularUsers = settings.AllowBindMountsForRegularUsers;
   this.AllowPrivilegedModeForRegularUsers = settings.AllowPrivilegedModeForRegularUsers;
+  this.AllowVolumeBrowserForRegularUsers = settings.AllowVolumeBrowserForRegularUsers;
   this.AuthenticationMethod = settings.AuthenticationMethod;
   this.EnableHostManagementFeatures = settings.EnableHostManagementFeatures;
   this.ExternalTemplates = settings.ExternalTemplates;

@@ -76,6 +76,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager) {
       StateManager.updateLogo(settings.LogoURL);
       StateManager.updateSnapshotInterval(settings.SnapshotInterval);
       StateManager.updateEnableHostManagementFeatures(settings.EnableHostManagementFeatures);
+      StateManager.updateEnableVolumeBrowserForNonAdminUsers(settings.AllowVolumeBrowserForRegularUsers);
       $state.reload();
     })
     .catch(function error(err) {

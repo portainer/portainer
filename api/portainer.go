@@ -638,7 +638,8 @@ type (
 	RoleService interface {
 		Role(ID RoleID) (*Role, error)
 		Roles() ([]Role, error)
-		CreateRole(set *Role) error
+		CreateRole(role *Role) error
+		UpdateRole(ID RoleID, role *Role) error
 	}
 
 	// TeamService represents a service for managing user data
