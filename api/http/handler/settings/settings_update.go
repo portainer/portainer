@@ -19,6 +19,7 @@ type settingsUpdatePayload struct {
 	OAuthSettings                      *portainer.OAuthSettings
 	AllowBindMountsForRegularUsers     *bool
 	AllowPrivilegedModeForRegularUsers *bool
+	AllowVolumeBrowserForRegularUsers  *bool
 	EnableHostManagementFeatures       *bool
 	SnapshotInterval                   *string
 	TemplatesURL                       *string
@@ -91,6 +92,10 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.AllowPrivilegedModeForRegularUsers != nil {
 		settings.AllowPrivilegedModeForRegularUsers = *payload.AllowPrivilegedModeForRegularUsers
+	}
+
+	if payload.AllowVolumeBrowserForRegularUsers != nil {
+		settings.AllowVolumeBrowserForRegularUsers = *payload.AllowVolumeBrowserForRegularUsers
 	}
 
 	if payload.EnableHostManagementFeatures != nil {

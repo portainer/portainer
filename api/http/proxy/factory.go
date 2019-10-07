@@ -23,6 +23,7 @@ type proxyFactory struct {
 	DockerHubService       portainer.DockerHubService
 	SignatureService       portainer.DigitalSignatureService
 	ReverseTunnelService   portainer.ReverseTunnelService
+	ExtensionService       portainer.ExtensionService
 }
 
 func (factory *proxyFactory) newHTTPProxy(u *url.URL) http.Handler {
@@ -77,6 +78,7 @@ func (factory *proxyFactory) createDockerReverseProxy(u *url.URL, endpoint *port
 		RegistryService:        factory.RegistryService,
 		DockerHubService:       factory.DockerHubService,
 		ReverseTunnelService:   factory.ReverseTunnelService,
+		ExtensionService:       factory.ExtensionService,
 		dockerTransport:        &http.Transport{},
 		endpointIdentifier:     endpoint.ID,
 		endpointType:           endpoint.Type,

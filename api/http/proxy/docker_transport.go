@@ -26,6 +26,7 @@ type (
 		SettingsService        portainer.SettingsService
 		SignatureService       portainer.DigitalSignatureService
 		ReverseTunnelService   portainer.ReverseTunnelService
+		ExtensionService       portainer.ExtensionService
 		endpointIdentifier     portainer.EndpointID
 		endpointType           portainer.EndpointType
 	}
@@ -129,6 +130,18 @@ func (p *proxyTransport) proxyAgentRequest(r *http.Request) (*http.Response, err
 		if !found || len(volumeIDParameter) < 1 {
 			return p.administratorOperation(r)
 		}
+
+		settings, err := p.SettingsService.Settings()
+		if err != nil {
+			return nil, err
+		}
+
+		_, err = p.ExtensionService.Extension(portainer.RBACExtension)
+
+		if err == portainer.ErrObjectNotFound && !settings.AllowVolumeBrowserForRegularUsers {
+			return writeAccessDeniedResponse()
+		}
+
 		return p.restrictedOperation(r, volumeIDParameter[0])
 	}
 
