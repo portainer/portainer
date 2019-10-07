@@ -1,6 +1,5 @@
 import 'ui-select/dist/select.css';
 import 'bootstrap/dist/css/bootstrap.css';
-import 'isteven-angular-multiselect/isteven-multi-select.css';
 import '@fortawesome/fontawesome-free-webfonts/css/fa-brands.css';
 import '@fortawesome/fontawesome-free-webfonts/css/fa-solid.css';
 import '@fortawesome/fontawesome-free-webfonts/css/fontawesome.css';
@@ -19,7 +18,6 @@ window.angular = angular;
 import 'moment';
 import '@uirouter/angularjs';
 import 'ui-select';
-import 'isteven-angular-multiselect/isteven-multi-select.js';
 import 'angular-cookies';
 import 'angular-sanitize';
 import 'ng-file-upload';
