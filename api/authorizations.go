@@ -56,7 +56,7 @@ func DefaultPortainerAuthorizations() Authorizations {
 	}
 }
 
-// UpdateRoleVolumeBrowsingAuthorizations will update all the volume browsing authorizations for each role (except endpoint administrator)
+// UpdateVolumeBrowsingAuthorizations will update all the volume browsing authorizations for each role (except endpoint administrator)
 // based on the specified removeAuthorizations parameter. If removeAuthorizations is set to true, all
 // the authorizations will be dropped for the each role. If removeAuthorizations is set to false, the authorizations
 // will be reset based for each role.
