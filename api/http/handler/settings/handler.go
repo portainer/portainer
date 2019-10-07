@@ -30,13 +30,13 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		Router: mux.NewRouter(),
 	}
 	h.Handle("/settings",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.settingsInspect))).Methods(http.MethodGet)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.settingsInspect))).Methods(http.MethodGet)
 	h.Handle("/settings",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.settingsUpdate))).Methods(http.MethodPut)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.settingsUpdate))).Methods(http.MethodPut)
 	h.Handle("/settings/public",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.settingsPublic))).Methods(http.MethodGet)
 	h.Handle("/settings/authentication/checkLDAP",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.settingsLDAPCheck))).Methods(http.MethodPut)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.settingsLDAPCheck))).Methods(http.MethodPut)
 
 	return h
 }
