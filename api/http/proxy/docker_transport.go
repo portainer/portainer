@@ -361,7 +361,7 @@ func (p *proxyTransport) restrictedOperation(request *http.Request, resourceID s
 		}
 
 		resourceControl := getResourceControlByResourceID(resourceID, resourceControls)
-		if resourceControl != nil && !canUserAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
+		if resourceControl == nil || !canUserAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
 			return writeAccessDeniedResponse()
 		}
 	}
