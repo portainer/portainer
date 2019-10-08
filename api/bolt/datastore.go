@@ -125,6 +125,7 @@ func (store *Store) MigrateData() error {
 			RegistryService:        store.RegistryService,
 			ResourceControlService: store.ResourceControlService,
 			RoleService:            store.RoleService,
+			ScheduleService:        store.ScheduleService,
 			SettingsService:        store.SettingsService,
 			StackService:           store.StackService,
 			TeamMembershipService:  store.TeamMembershipService,
