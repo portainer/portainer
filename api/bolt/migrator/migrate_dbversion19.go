@@ -47,10 +47,12 @@ func (m *Migrator) updateSchedulesToDBVersion20() error {
 				schedule.CronExpression = "0 0 * * *"
 			} else {
 				revisedCronExpression := strings.Split(schedule.CronExpression, " ")
-				if len(revisedCronExpression) > 5 {
-					revisedCronExpression = revisedCronExpression[1:]
-					schedule.CronExpression = strings.Join(revisedCronExpression, " ")
+				if len(revisedCronExpression) == 5 {
+					continue
 				}
+
+				revisedCronExpression = revisedCronExpression[1:]
+				schedule.CronExpression = strings.Join(revisedCronExpression, " ")
 			}
 
 			err := m.scheduleService.UpdateSchedule(schedule.ID, &schedule)
