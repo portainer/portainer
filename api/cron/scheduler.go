@@ -13,7 +13,7 @@ type JobScheduler struct {
 // NewJobScheduler initializes a new service
 func NewJobScheduler() *JobScheduler {
 	return &JobScheduler{
-		cron: cron.New(cron.WithSeconds()),
+		cron: cron.New(),
 	}
 }
 
