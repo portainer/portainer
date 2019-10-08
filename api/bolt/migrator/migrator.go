@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/registry"
 	"github.com/portainer/portainer/api/bolt/resourcecontrol"
 	"github.com/portainer/portainer/api/bolt/role"
+	"github.com/portainer/portainer/api/bolt/schedule"
 	"github.com/portainer/portainer/api/bolt/settings"
 	"github.com/portainer/portainer/api/bolt/stack"
 	"github.com/portainer/portainer/api/bolt/teammembership"
@@ -28,6 +29,7 @@ type (
 		registryService        *registry.Service
 		resourceControlService *resourcecontrol.Service
 		roleService            *role.Service
+		scheduleService        *schedule.Service
 		settingsService        *settings.Service
 		stackService           *stack.Service
 		teamMembershipService  *teammembership.Service
@@ -47,6 +49,7 @@ type (
 		RegistryService        *registry.Service
 		ResourceControlService *resourcecontrol.Service
 		RoleService            *role.Service
+		ScheduleService        *schedule.Service
 		SettingsService        *settings.Service
 		StackService           *stack.Service
 		TeamMembershipService  *teammembership.Service
@@ -68,6 +71,7 @@ func NewMigrator(parameters *Parameters) *Migrator {
 		registryService:        parameters.RegistryService,
 		resourceControlService: parameters.ResourceControlService,
 		roleService:            parameters.RoleService,
+		scheduleService:        parameters.ScheduleService,
 		settingsService:        parameters.SettingsService,
 		teamMembershipService:  parameters.TeamMembershipService,
 		templateService:        parameters.TemplateService,
@@ -273,6 +277,11 @@ func (m *Migrator) Migrate() error {
 		}
 
 		err = m.updateSettingsToDBVersion20()
+		if err != nil {
+			return err
+		}
+
+		err = m.updateSchedulesToDBVersion20()
 		if err != nil {
 			return err
 		}
