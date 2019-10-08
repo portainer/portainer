@@ -18,6 +18,7 @@ func (factory *proxyFactory) newLocalProxy(path string, endpoint *portainer.Endp
 		SettingsService:        factory.SettingsService,
 		RegistryService:        factory.RegistryService,
 		DockerHubService:       factory.DockerHubService,
+		ExtensionService:       factory.ExtensionService,
 		dockerTransport:        newSocketTransport(path),
 		ReverseTunnelService:   factory.ReverseTunnelService,
 		endpointIdentifier:     endpoint.ID,

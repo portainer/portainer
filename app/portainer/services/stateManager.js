@@ -58,6 +58,11 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
     LocalStorage.storeApplicationState(state.application);
   };
 
+  manager.updateEnableVolumeBrowserForNonAdminUsers = function(enableVolumeBrowserForNonAdminUsers) {
+    state.application.enableVolumeBrowserForNonAdminUsers = enableVolumeBrowserForNonAdminUsers;
+    LocalStorage.storeApplicationState(state.application);
+  };
+
  function assignStateFromStatusAndSettings(status, settings) {
    state.application.authentication = status.Authentication;
    state.application.analytics = status.Analytics;
@@ -67,6 +72,7 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
    state.application.logo = settings.LogoURL;
    state.application.snapshotInterval = settings.SnapshotInterval;
    state.application.enableHostManagementFeatures = settings.EnableHostManagementFeatures;
+   state.application.enableVolumeBrowserForNonAdminUsers = settings.AllowVolumeBrowserForRegularUsers;
    state.application.validity = moment().unix();
  }
 

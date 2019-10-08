@@ -26,6 +26,7 @@ type (
 		SettingsService        portainer.SettingsService
 		SignatureService       portainer.DigitalSignatureService
 		ReverseTunnelService   portainer.ReverseTunnelService
+		ExtensionService       portainer.ExtensionService
 		endpointIdentifier     portainer.EndpointID
 		endpointType           portainer.EndpointType
 	}
@@ -129,7 +130,8 @@ func (p *proxyTransport) proxyAgentRequest(r *http.Request) (*http.Response, err
 		if !found || len(volumeIDParameter) < 1 {
 			return p.administratorOperation(r)
 		}
-		return p.restrictedOperation(r, volumeIDParameter[0])
+
+		return p.restrictedVolumeBrowserOperation(r, volumeIDParameter[0])
 	}
 
 	return p.executeDockerRequest(r)
@@ -379,6 +381,62 @@ func (p *proxyTransport) restrictedOperation(request *http.Request, resourceID s
 
 		resourceControl := getResourceControlByResourceID(resourceID, resourceControls)
 		if resourceControl == nil || !canUserAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
+			return writeAccessDeniedResponse()
+		}
+	}
+
+	return p.executeDockerRequest(request)
+}
+
+// restrictedVolumeBrowserOperation is similar to restrictedOperation but adds an extra check on a specific setting
+func (p *proxyTransport) restrictedVolumeBrowserOperation(request *http.Request, resourceID string) (*http.Response, error) {
+	var err error
+	tokenData, err := security.RetrieveTokenData(request)
+	if err != nil {
+		return nil, err
+	}
+
+	if tokenData.Role != portainer.AdministratorRole {
+		settings, err := p.SettingsService.Settings()
+		if err != nil {
+			return nil, err
+		}
+
+		_, err = p.ExtensionService.Extension(portainer.RBACExtension)
+		if err == portainer.ErrObjectNotFound && !settings.AllowVolumeBrowserForRegularUsers {
+			return writeAccessDeniedResponse()
+		} else if err != nil && err != portainer.ErrObjectNotFound {
+			return nil, err
+		}
+
+		user, err := p.UserService.User(tokenData.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		endpointResourceAccess := false
+		_, ok := user.EndpointAuthorizations[p.endpointIdentifier][portainer.EndpointResourcesAccess]
+		if ok {
+			endpointResourceAccess = true
+		}
+
+		teamMemberships, err := p.TeamMembershipService.TeamMembershipsByUserID(tokenData.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		userTeamIDs := make([]portainer.TeamID, 0)
+		for _, membership := range teamMemberships {
+			userTeamIDs = append(userTeamIDs, membership.TeamID)
+		}
+
+		resourceControls, err := p.ResourceControlService.ResourceControls()
+		if err != nil {
+			return nil, err
+		}
+
+		resourceControl := getResourceControlByResourceID(resourceID, resourceControls)
+		if !endpointResourceAccess && (resourceControl == nil || !canUserAccessResource(tokenData.ID, userTeamIDs, resourceControl)) {
 			return writeAccessDeniedResponse()
 		}
 	}

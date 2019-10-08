@@ -91,6 +91,7 @@ func (server *Server) Start() error {
 		DockerHubService:       server.DockerHubService,
 		SignatureService:       server.SignatureService,
 		ReverseTunnelService:   server.ReverseTunnelService,
+		ExtensionService:       server.ExtensionService,
 	}
 	proxyManager := proxy.NewManager(proxyManagerParameters)
 
@@ -196,6 +197,9 @@ func (server *Server) Start() error {
 	settingsHandler.FileService = server.FileService
 	settingsHandler.JobScheduler = server.JobScheduler
 	settingsHandler.ScheduleService = server.ScheduleService
+	settingsHandler.RoleService = server.RoleService
+	settingsHandler.ExtensionService = server.ExtensionService
+	settingsHandler.AuthorizationService = authorizationService
 
 	var stackHandler = stacks.NewHandler(requestBouncer)
 	stackHandler.FileService = server.FileService

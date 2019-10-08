@@ -106,6 +106,7 @@ type (
 		OAuthSettings                      OAuthSettings        `json:"OAuthSettings"`
 		AllowBindMountsForRegularUsers     bool                 `json:"AllowBindMountsForRegularUsers"`
 		AllowPrivilegedModeForRegularUsers bool                 `json:"AllowPrivilegedModeForRegularUsers"`
+		AllowVolumeBrowserForRegularUsers  bool                 `json:"AllowVolumeBrowserForRegularUsers"`
 		SnapshotInterval                   string               `json:"SnapshotInterval"`
 		TemplatesURL                       string               `json:"TemplatesURL"`
 		EnableHostManagementFeatures       bool                 `json:"EnableHostManagementFeatures"`
@@ -637,7 +638,8 @@ type (
 	RoleService interface {
 		Role(ID RoleID) (*Role, error)
 		Roles() ([]Role, error)
-		CreateRole(set *Role) error
+		CreateRole(role *Role) error
+		UpdateRole(ID RoleID, role *Role) error
 	}
 
 	// TeamService represents a service for managing user data
@@ -903,7 +905,7 @@ const (
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "1.22.0"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 20
+	DBVersion = 21
 	// AssetsServerURL represents the URL of the Portainer asset server
 	AssetsServerURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com"
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved

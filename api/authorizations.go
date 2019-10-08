@@ -56,6 +56,52 @@ func DefaultPortainerAuthorizations() Authorizations {
 	}
 }
 
+// UpdateVolumeBrowsingAuthorizations will update all the volume browsing authorizations for each role (except endpoint administrator)
+// based on the specified removeAuthorizations parameter. If removeAuthorizations is set to true, all
+// the authorizations will be dropped for the each role. If removeAuthorizations is set to false, the authorizations
+// will be reset based for each role.
+func (service AuthorizationService) UpdateVolumeBrowsingAuthorizations(remove bool) error {
+	roles, err := service.roleService.Roles()
+	if err != nil {
+		return err
+	}
+
+	for _, role := range roles {
+		// all roles except endpoint administrator
+		if role.ID != RoleID(1) {
+			updateRoleVolumeBrowsingAuthorizations(&role, remove)
+
+			err := service.roleService.UpdateRole(role.ID, &role)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func updateRoleVolumeBrowsingAuthorizations(role *Role, removeAuthorizations bool) {
+	if !removeAuthorizations {
+		delete(role.Authorizations, OperationDockerAgentBrowseDelete)
+		delete(role.Authorizations, OperationDockerAgentBrowseGet)
+		delete(role.Authorizations, OperationDockerAgentBrowseList)
+		delete(role.Authorizations, OperationDockerAgentBrowsePut)
+		delete(role.Authorizations, OperationDockerAgentBrowseRename)
+		return
+	}
+
+	role.Authorizations[OperationDockerAgentBrowseGet] = true
+	role.Authorizations[OperationDockerAgentBrowseList] = true
+
+	// Standard-user
+	if role.ID == RoleID(3) {
+		role.Authorizations[OperationDockerAgentBrowseDelete] = true
+		role.Authorizations[OperationDockerAgentBrowsePut] = true
+		role.Authorizations[OperationDockerAgentBrowseRename] = true
+	}
+}
+
 // RemoveTeamAccessPolicies will remove all existing access policies associated to the specified team
 func (service *AuthorizationService) RemoveTeamAccessPolicies(teamID TeamID) error {
 	endpoints, err := service.endpointService.Endpoints()

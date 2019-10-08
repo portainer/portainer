@@ -15,3 +15,14 @@ func (m *Migrator) updateUsersToDBVersion20() error {
 	authorizationService := portainer.NewAuthorizationService(authorizationServiceParameters)
 	return authorizationService.UpdateUsersAuthorizations()
 }
+
+func (m *Migrator) updateSettingsToDBVersion20() error {
+	legacySettings, err := m.settingsService.Settings()
+	if err != nil {
+		return err
+	}
+
+	legacySettings.AllowVolumeBrowserForRegularUsers = false
+
+	return m.settingsService.UpdateSettings(legacySettings)
+}

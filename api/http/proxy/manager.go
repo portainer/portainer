@@ -38,6 +38,7 @@ type (
 		DockerHubService       portainer.DockerHubService
 		SignatureService       portainer.DigitalSignatureService
 		ReverseTunnelService   portainer.ReverseTunnelService
+		ExtensionService       portainer.ExtensionService
 	}
 )
 
@@ -56,6 +57,7 @@ func NewManager(parameters *ManagerParams) *Manager {
 			DockerHubService:       parameters.DockerHubService,
 			SignatureService:       parameters.SignatureService,
 			ReverseTunnelService:   parameters.ReverseTunnelService,
+			ExtensionService:       parameters.ExtensionService,
 		},
 		reverseTunnelService: parameters.ReverseTunnelService,
 	}
