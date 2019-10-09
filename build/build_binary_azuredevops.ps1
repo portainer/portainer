@@ -19,6 +19,6 @@ Set-Location -Path "api\cmd\portainer"
 
 go get -t -d -v ./...
 #go build -v
-CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags '-s'
+go build -a --installsuffix cgo --ldflags '-s'
 
 Copy-Item -Path "portainer.exe" -Destination "$($env:BUILD_SOURCESDIRECTORY)\dist\portainer.exe" -Force -ErrorAction:SilentlyContinue
