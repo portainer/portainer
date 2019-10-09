@@ -259,10 +259,14 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 			LogoURL:              *flags.Logo,
 			AuthenticationMethod: portainer.AuthenticationInternal,
 			LDAPSettings: portainer.LDAPSettings{
-				AutoCreateUsers:     true,
-				TLSConfig:           portainer.TLSConfiguration{},
-				SearchSettings:      []portainer.LDAPSearchSettings{},
-				GroupSearchSettings: []portainer.LDAPGroupSearchSettings{},
+				AutoCreateUsers: true,
+				TLSConfig:       portainer.TLSConfiguration{},
+				SearchSettings: []portainer.LDAPSearchSettings{
+					portainer.LDAPSearchSettings{},
+				},
+				GroupSearchSettings: []portainer.LDAPGroupSearchSettings{
+					portainer.LDAPGroupSearchSettings{},
+				},
 			},
 			OAuthSettings:                      portainer.OAuthSettings{},
 			AllowBindMountsForRegularUsers:     true,
