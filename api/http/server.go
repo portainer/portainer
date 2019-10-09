@@ -3,6 +3,8 @@ package http
 import (
 	"time"
 
+	"github.com/portainer/portainer/api/http/handler/support"
+
 	"github.com/portainer/portainer/api/http/handler/roles"
 
 	"github.com/portainer/portainer/api"
@@ -227,6 +229,8 @@ func (server *Server) Start() error {
 
 	var statusHandler = status.NewHandler(requestBouncer, server.Status)
 
+	var supportHandler = support.NewHandler(requestBouncer)
+
 	var templatesHandler = templates.NewHandler(requestBouncer)
 	templatesHandler.TemplateService = server.TemplateService
 	templatesHandler.SettingsService = server.SettingsService
@@ -268,6 +272,7 @@ func (server *Server) Start() error {
 		SettingsHandler:        settingsHandler,
 		StatusHandler:          statusHandler,
 		StackHandler:           stackHandler,
+		SupportHandler:         supportHandler,
 		TagHandler:             tagHandler,
 		TeamHandler:            teamHandler,
 		TeamMembershipHandler:  teamMembershipHandler,

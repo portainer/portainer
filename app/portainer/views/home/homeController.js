@@ -22,7 +22,7 @@ angular.module('portainer.app')
             endpoint = data;
             return switchToDockerEndpoint(endpoint);
           }).catch(function error(err) {
-            Notifications.error('Failure', err, 'Unable to verify endpoint status');
+          Notifications.error('Failure', err, 'Unable to verify endpoint status');
           });
       };
 
