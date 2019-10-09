@@ -14,13 +14,13 @@ import (
 )
 
 type supportProduct struct {
-	Id               int    `json:"Id"`
+	ID               int    `json:"Id"`
 	Name             string `json:"Name"`
 	ShortDescription string `json:"ShortDescription"`
 	Price            string `json:"Price"`
 	PriceDescription string `json:"PriceDescription"`
 	Description      string `json:"Description"`
-	ProductId        string `json:"ProductId"`
+	ProductID        string `json:"ProductId"`
 }
 
 func (handler *Handler) supportList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
