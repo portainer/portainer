@@ -59,6 +59,7 @@
     "angular-messages": "~1.5.0",
     "angular-mocks": "~1.5.0",
     "angular-moment-picker": "^0.10.2",
+    "angular-multiselect": "github:portainer/angular-multi-select#semver:~v4.0.1",
     "angular-resource": "~1.5.0",
     "angular-sanitize": "~1.5.0",
     "angular-ui-bootstrap": "~2.5.0",
