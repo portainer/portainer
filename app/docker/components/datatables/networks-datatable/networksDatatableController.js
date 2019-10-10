@@ -1,3 +1,5 @@
+import _ from 'lodash-es';
+
 angular.module('portainer.docker')
   .controller('NetworksDatatableController', ['$scope', '$controller', 'PREDEFINED_NETWORKS', 'DatatableService',
     function ($scope, $controller, PREDEFINED_NETWORKS, DatatableService) {
@@ -7,6 +9,10 @@ angular.module('portainer.docker')
       this.disableRemove = function(item) {
         return PREDEFINED_NETWORKS.includes(item.Name);
       };
+
+      this.state = Object.assign(this.state, {
+        expandedItems: []
+      })
 
       /**
        * Do not allow PREDEFINED_NETWORKS to be selected
@@ -19,6 +25,7 @@ angular.module('portainer.docker')
         this.setDefaults();
         this.prepareTableFromDataset();
 
+        this.state.orderBy = this.orderBy;
         var storedOrder = DatatableService.getDataTableOrder(this.tableKey);
         if (storedOrder !== null) {
           this.state.reverseOrder = storedOrder.reverse;
@@ -45,7 +52,27 @@ angular.module('portainer.docker')
           this.settings.open = false;
         }
         this.onSettingsRepeaterChange();
-        this.state.orderBy = this.orderBy;
+      };
+
+      this.expandItem = function(item, expanded) {
+        item.Expanded = expanded;
+      };
+
+      this.itemCanExpand = function(item) {
+        return item.Subs.length > 0;
+      }
+
+      this.hasExpandableItems = function() {
+        return _.filter(this.state.filteredDataSet, (item) => this.itemCanExpand(item)).length;
+      };
+
+      this.expandAll = function() {
+        this.state.expandAll = !this.state.expandAll;
+        _.forEach(this.state.filteredDataSet, (item) => {
+          if (this.itemCanExpand(item)) {
+            this.expandItem(item, this.state.expandAll);
+          }
+        });
       };
   }
 ]);

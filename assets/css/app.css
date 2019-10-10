@@ -396,6 +396,14 @@ ul.sidebar .sidebar-list a.active {
   margin: 2px 0 2px 20px;
 }
 
+.sidebar-footer-content .update-notification {
+    font-size: 14px;
+    padding: 12px;
+    border-radius: 2px;
+    background-color: #FF851B;
+    margin-bottom: 5px;
+}
+
 .sidebar-footer-content .version {
   font-size: 11px;
   margin: 11px 20px 0 7px;
@@ -716,6 +724,17 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
 .visualizer_container .node .node_info .node_platform {
   margin-left: 2px;
   font-size: 16px;
+}
+
+.visualizer_container .node .node_info .node_labels {
+  border-top: 1px solid #777;
+  padding-top: 10px;
+  margin-top: 10px;
+}
+
+.visualizer_container .node .node_info .node_label {
+  font-style: italic;
+  color: #787878;
 }
 
 .visualizer_container .node .tasks {

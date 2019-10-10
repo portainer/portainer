@@ -7,7 +7,7 @@
     <rd-widget-body classes="no-padding">
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter"
+        <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" ng-model-options="{ debounce: 300 }"
           ng-change="$ctrl.onTextFilterChange()" placeholder="Search..." auto-focus>
       </div>
       <div class="table-responsive">

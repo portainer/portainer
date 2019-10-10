@@ -55,7 +55,7 @@
       </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" ng-change="$ctrl.onTextFilterChange()" placeholder="Search..." auto-focus>
+        <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" ng-change="$ctrl.onTextFilterChange()" placeholder="Search..." auto-focus ng-model-options="{ debounce: 300 }">
       </div>
       <div class="table-responsive">
         <table class="table table-hover table-filters nowrap-cells">
@@ -149,9 +149,11 @@
                 </span>
                 <a ng-if="!$ctrl.offlineMode" ui-sref="docker.volumes.volume({ id: item.Id, nodeName: item.NodeName })" class="monospaced" title="{{ item.Id }}">{{ item.Id | truncate:40 }}</a>
                 <span ng-if="$ctrl.offlineMode">{{ item.Id | truncate:40 }}</span>
-                <a authorization="DockerAgentBrowseList" ui-sref="docker.volumes.volume.browse({ id: item.Id, nodeName: item.NodeName })" class="btn btn-xs btn-primary space-left" ng-if="$ctrl.showBrowseAction && !$ctrl.offlineMode">
-                  <i class="fa fa-search"></i> browse</a>
-                </a>
+                <btn authorization="DockerAgentBrowseList" ng-if="$ctrl.showBrowseAction && !$ctrl.offlineMode">
+                  <a ui-sref="docker.volumes.volume.browse({ id: item.Id, nodeName: item.NodeName })" class="btn btn-xs btn-primary space-left">
+                    <i class="fa fa-search"></i> browse
+                  </a>
+                </btn>
                 <span style="margin-left: 10px;" class="label label-warning image-tag space-left" ng-if="item.dangling">Unused</span>
               </td>
               <td>{{ item.StackName ? item.StackName : '-' }}</td>

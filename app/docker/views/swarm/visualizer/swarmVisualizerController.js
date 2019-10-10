@@ -5,6 +5,7 @@ function ($q, $scope, $document, $interval, NodeService, ServiceService, TaskSer
   $scope.state = {
     ShowInformationPanel: true,
     DisplayOnlyRunningTasks: false,
+    DisplayNodeLabels: false,
     refreshRate: '5'
   };
 
@@ -21,6 +22,11 @@ function ($q, $scope, $document, $interval, NodeService, ServiceService, TaskSer
       var value = $scope.state.DisplayOnlyRunningTasks;
       LocalStorage.storeSwarmVisualizerSettings('display_only_running_tasks', value);
   };
+
+  $scope.changeDisplayNodeLabels = function() {
+    var value = $scope.state.DisplayNodeLabels;
+    LocalStorage.storeSwarmVisualizerSettings('display_node_labels', value);
+};
 
   $scope.changeUpdateRepeater = function() {
     stopRepeater();
@@ -109,6 +115,10 @@ function ($q, $scope, $document, $interval, NodeService, ServiceService, TaskSer
     var displayOnlyRunningTasks = LocalStorage.getSwarmVisualizerSettings('display_only_running_tasks');
     if (displayOnlyRunningTasks !== undefined && displayOnlyRunningTasks !== null)
         $scope.state.DisplayOnlyRunningTasks = displayOnlyRunningTasks;
+
+    var displayNodeLabels = LocalStorage.getSwarmVisualizerSettings('display_node_labels');
+    if (displayNodeLabels !== undefined && displayNodeLabels !== null)
+        $scope.state.DisplayNodeLabels = displayNodeLabels;
 
     var refreshRate = LocalStorage.getSwarmVisualizerSettings('refresh_rate');
     if (refreshRate !== undefined && refreshRate !== null)

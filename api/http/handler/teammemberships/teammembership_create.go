@@ -70,5 +70,10 @@ func (handler *Handler) teamMembershipCreate(w http.ResponseWriter, r *http.Requ
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist team memberships inside the database", err}
 	}
 
+	err = handler.AuthorizationService.UpdateUsersAuthorizations()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
+	}
+
 	return response.JSON(w, membership)
 }

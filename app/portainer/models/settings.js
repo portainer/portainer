@@ -6,6 +6,7 @@ export function SettingsViewModel(data) {
   this.OAuthSettings = new OAuthSettingsViewModel(data.OAuthSettings);
   this.AllowBindMountsForRegularUsers = data.AllowBindMountsForRegularUsers;
   this.AllowPrivilegedModeForRegularUsers = data.AllowPrivilegedModeForRegularUsers;
+  this.AllowVolumeBrowserForRegularUsers = data.AllowVolumeBrowserForRegularUsers;
   this.SnapshotInterval = data.SnapshotInterval;
   this.TemplatesURL = data.TemplatesURL;
   this.ExternalTemplates = data.ExternalTemplates;
@@ -16,6 +17,7 @@ export function SettingsViewModel(data) {
 export function PublicSettingsViewModel(settings) {
   this.AllowBindMountsForRegularUsers = settings.AllowBindMountsForRegularUsers;
   this.AllowPrivilegedModeForRegularUsers = settings.AllowPrivilegedModeForRegularUsers;
+  this.AllowVolumeBrowserForRegularUsers = settings.AllowVolumeBrowserForRegularUsers;
   this.AuthenticationMethod = settings.AuthenticationMethod;
   this.EnableHostManagementFeatures = settings.EnableHostManagementFeatures;
   this.ExternalTemplates = settings.ExternalTemplates;

@@ -202,6 +202,10 @@
                 <td><code>{{ container.Config.Cmd|command }}</code></td>
               </tr>
               <tr>
+                <td>ENTRYPOINT</td>
+                <td><code>{{ container.Config.Entrypoint ? (container.Config.Entrypoint|command) : "null" }}</code></td>
+              </tr>
+              <tr>
                 <td>ENV</td>
                 <td>
                   <table class="table table-bordered table-condensed">

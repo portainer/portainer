@@ -102,7 +102,7 @@ func initLDAPService() portainer.LDAPService {
 }
 
 func initGitService() portainer.GitService {
-	return &git.Service{}
+	return git.NewService()
 }
 
 func initClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService) *docker.ClientFactory {
@@ -271,6 +271,7 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 			OAuthSettings:                      portainer.OAuthSettings{},
 			AllowBindMountsForRegularUsers:     true,
 			AllowPrivilegedModeForRegularUsers: true,
+			AllowVolumeBrowserForRegularUsers:  false,
 			EnableHostManagementFeatures:       false,
 			SnapshotInterval:                   *flags.SnapshotInterval,
 			EdgeAgentCheckinInterval:           portainer.DefaultEdgeAgentCheckinIntervalInSeconds,
@@ -499,8 +500,13 @@ func initExtensionManager(fileService portainer.FileService, extensionService po
 			log.Printf("Unable to enable extension: %s [extension: %s]", err.Error(), extension.Name)
 			extension.Enabled = false
 			extension.License.Valid = false
-			extensionService.Persist(&extension)
 		}
+
+		err = extensionService.Persist(&extension)
+		if err != nil {
+			return nil, err
+		}
+
 	}
 
 	return extensionManager, nil
@@ -618,7 +624,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		adminPasswordHash, err = cryptoService.Hash(string(content))
+		adminPasswordHash, err = cryptoService.Hash(strings.TrimSuffix(string(content), "\n"))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -635,26 +641,10 @@ func main() {
 		if len(users) == 0 {
 			log.Printf("Creating admin user with password hash %s", adminPasswordHash)
 			user := &portainer.User{
-				Username: "admin",
-				Role:     portainer.AdministratorRole,
-				Password: adminPasswordHash,
-				PortainerAuthorizations: map[portainer.Authorization]bool{
-					portainer.OperationPortainerDockerHubInspect:        true,
-					portainer.OperationPortainerEndpointGroupList:       true,
-					portainer.OperationPortainerEndpointList:            true,
-					portainer.OperationPortainerEndpointInspect:         true,
-					portainer.OperationPortainerEndpointExtensionAdd:    true,
-					portainer.OperationPortainerEndpointExtensionRemove: true,
-					portainer.OperationPortainerExtensionList:           true,
-					portainer.OperationPortainerMOTD:                    true,
-					portainer.OperationPortainerRegistryList:            true,
-					portainer.OperationPortainerRegistryInspect:         true,
-					portainer.OperationPortainerTeamList:                true,
-					portainer.OperationPortainerTemplateList:            true,
-					portainer.OperationPortainerTemplateInspect:         true,
-					portainer.OperationPortainerUserList:                true,
-					portainer.OperationPortainerUserMemberships:         true,
-				},
+				Username:                "admin",
+				Role:                    portainer.AdministratorRole,
+				Password:                adminPasswordHash,
+				PortainerAuthorizations: portainer.DefaultPortainerAuthorizations(),
 			}
 			err := store.UserService.CreateUser(user)
 			if err != nil {

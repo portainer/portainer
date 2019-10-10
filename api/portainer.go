@@ -106,6 +106,7 @@ type (
 		OAuthSettings                      OAuthSettings        `json:"OAuthSettings"`
 		AllowBindMountsForRegularUsers     bool                 `json:"AllowBindMountsForRegularUsers"`
 		AllowPrivilegedModeForRegularUsers bool                 `json:"AllowPrivilegedModeForRegularUsers"`
+		AllowVolumeBrowserForRegularUsers  bool                 `json:"AllowVolumeBrowserForRegularUsers"`
 		SnapshotInterval                   string               `json:"SnapshotInterval"`
 		TemplatesURL                       string               `json:"TemplatesURL"`
 		EnableHostManagementFeatures       bool                 `json:"EnableHostManagementFeatures"`
@@ -118,11 +119,12 @@ type (
 
 	// User represents a user account
 	User struct {
-		ID                      UserID         `json:"Id"`
-		Username                string         `json:"Username"`
-		Password                string         `json:"Password,omitempty"`
-		Role                    UserRole       `json:"Role"`
-		PortainerAuthorizations Authorizations `json:"PortainerAuthorizations"`
+		ID                      UserID                 `json:"Id"`
+		Username                string                 `json:"Username"`
+		Password                string                 `json:"Password,omitempty"`
+		Role                    UserRole               `json:"Role"`
+		PortainerAuthorizations Authorizations         `json:"PortainerAuthorizations"`
+		EndpointAuthorizations  EndpointAuthorizations `json:"EndpointAuthorizations"`
 	}
 
 	// UserID represents a user identifier
@@ -160,11 +162,9 @@ type (
 
 	// TokenData represents the data embedded in a JWT token
 	TokenData struct {
-		ID                      UserID
-		Username                string
-		Role                    UserRole
-		EndpointAuthorizations  EndpointAuthorizations
-		PortainerAuthorizations Authorizations
+		ID       UserID
+		Username string
+		Role     UserRole
 	}
 
 	// StackID represents a stack identifier (it must be composed of Name + "_" + SwarmID to create a unique identifier)
@@ -638,7 +638,8 @@ type (
 	RoleService interface {
 		Role(ID RoleID) (*Role, error)
 		Roles() ([]Role, error)
-		CreateRole(set *Role) error
+		CreateRole(role *Role) error
+		UpdateRole(ID RoleID, role *Role) error
 	}
 
 	// TeamService represents a service for managing user data
@@ -902,15 +903,19 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "1.22.0"
+	APIVersion = "1.22.1"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 19
+	DBVersion = 20
 	// AssetsServerURL represents the URL of the Portainer asset server
 	AssetsServerURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com"
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
 	MessageOfTheDayURL = AssetsServerURL + "/motd.json"
+	// VersionCheckURL represents the URL used to retrieve the latest version of Portainer
+	VersionCheckURL = "https://api.github.com/repos/portainer/portainer/releases/latest"
 	// ExtensionDefinitionsURL represents the URL where Portainer extension definitions can be retrieved
-	ExtensionDefinitionsURL = AssetsServerURL + "/extensions-1.22.0.json"
+	ExtensionDefinitionsURL = AssetsServerURL + "/extensions-1.22.1.json"
+	// SupportProductsURL represents the URL where Portainer support products can be retrieved
+	SupportProductsURL = AssetsServerURL + "/support.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response
 	PortainerAgentHeader = "Portainer-Agent"
 	// PortainerAgentEdgeIDHeader represent the name of the header containing the Edge ID associated to an agent/agent cluster

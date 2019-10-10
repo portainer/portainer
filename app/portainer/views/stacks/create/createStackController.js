@@ -1,4 +1,4 @@
-import { AccessControlFormData } from '../../../components/accessControlForm/porAccessControlFormModel';
+import {AccessControlFormData} from '../../../components/accessControlForm/porAccessControlFormModel';
 
 angular.module('portainer.app')
 .controller('CreateStackController', ['$scope', '$state', 'StackService', 'Authentication', 'Notifications', 'FormValidator', 'ResourceControlService', 'FormHelper', 'EndpointProvider',
@@ -124,7 +124,7 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
       $state.go('portainer.stacks');
     })
     .catch(function error(err) {
-      Notifications.warning('Deployment error', type === 1 ? err.err.data.err : err.data.err);
+      Notifications.error('Deployment error', err, 'Unable to deploy stack');
     })
     .finally(function final() {
       $scope.state.actionInProgress = false;

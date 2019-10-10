@@ -66,18 +66,24 @@ func (service *Service) Roles() ([]portainer.Role, error) {
 }
 
 // CreateRole creates a new Role.
-func (service *Service) CreateRole(set *portainer.Role) error {
+func (service *Service) CreateRole(role *portainer.Role) error {
 	return service.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
 		id, _ := bucket.NextSequence()
-		set.ID = portainer.RoleID(id)
+		role.ID = portainer.RoleID(id)
 
-		data, err := internal.MarshalObject(set)
+		data, err := internal.MarshalObject(role)
 		if err != nil {
 			return err
 		}
 
-		return bucket.Put(internal.Itob(int(set.ID)), data)
+		return bucket.Put(internal.Itob(int(role.ID)), data)
 	})
+}
+
+// UpdateRole updates a role.
+func (service *Service) UpdateRole(ID portainer.RoleID, role *portainer.Role) error {
+	identifier := internal.Itob(int(ID))
+	return internal.UpdateObject(service.db, BucketName, identifier, role)
 }

@@ -2,6 +2,7 @@ package endpointgroups
 
 import (
 	"net/http"
+	"reflect"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -53,17 +54,27 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 		endpointGroup.Tags = payload.Tags
 	}
 
-	if payload.UserAccessPolicies != nil {
+	updateAuthorizations := false
+	if payload.UserAccessPolicies != nil && !reflect.DeepEqual(payload.UserAccessPolicies, endpointGroup.UserAccessPolicies) {
 		endpointGroup.UserAccessPolicies = payload.UserAccessPolicies
+		updateAuthorizations = true
 	}
 
-	if payload.TeamAccessPolicies != nil {
+	if payload.TeamAccessPolicies != nil && !reflect.DeepEqual(payload.TeamAccessPolicies, endpointGroup.TeamAccessPolicies) {
 		endpointGroup.TeamAccessPolicies = payload.TeamAccessPolicies
+		updateAuthorizations = true
 	}
 
 	err = handler.EndpointGroupService.UpdateEndpointGroup(endpointGroup.ID, endpointGroup)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint group changes inside the database", err}
+	}
+
+	if updateAuthorizations {
+		err = handler.AuthorizationService.UpdateUsersAuthorizations()
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
+		}
 	}
 
 	return response.JSON(w, endpointGroup)
