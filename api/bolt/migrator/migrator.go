@@ -269,7 +269,7 @@ func (m *Migrator) Migrate() error {
 		}
 	}
 
-	// Portainer 1.22.x
+	// Portainer 1.22.1
 	if m.currentDBVersion < 20 {
 		err := m.updateUsersToDBVersion20()
 		if err != nil {

@@ -903,7 +903,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "1.22.0"
+	APIVersion = "1.22.1"
 	// DBVersion is the version number of the Portainer database
 	DBVersion = 20
 	// AssetsServerURL represents the URL of the Portainer asset server
@@ -913,7 +913,7 @@ const (
 	// VersionCheckURL represents the URL used to retrieve the latest version of Portainer
 	VersionCheckURL = "https://api.github.com/repos/portainer/portainer/releases/latest"
 	// ExtensionDefinitionsURL represents the URL where Portainer extension definitions can be retrieved
-	ExtensionDefinitionsURL = AssetsServerURL + "/extensions-1.22.0.json"
+	ExtensionDefinitionsURL = AssetsServerURL + "/extensions-1.22.1.json"
 	// SupportProductsURL represents the URL where Portainer support products can be retrieved
 	SupportProductsURL = AssetsServerURL + "/support.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response
