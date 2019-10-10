@@ -82,13 +82,15 @@ func DeleteObject(db *bolt.DB, bucketName string, key []byte) error {
 func GetNextIdentifier(db *bolt.DB, bucketName string) int {
 	var identifier int
 
-	db.View(func(tx *bolt.Tx) error {
+	db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucketName))
-		id := bucket.Sequence()
+		id, err := bucket.NextSequence()
+		if err != nil {
+			return err
+		}
 		identifier = int(id)
 		return nil
 	})
 
-	identifier++
 	return identifier
 }
