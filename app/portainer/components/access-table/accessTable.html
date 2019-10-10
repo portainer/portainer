@@ -2,7 +2,7 @@
   <table class="table table-hover">
     <div class="col-sm-12">
       <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-      <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" ng-change="$ctrl.onTextFilterChange()" placeholder="Search...">
+      <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" ng-change="$ctrl.onTextFilterChange()" placeholder="Search..." ng-model-options="{ debounce: 300 }">
     </div>
     <thead>
       <tr>

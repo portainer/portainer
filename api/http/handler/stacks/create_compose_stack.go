@@ -1,7 +1,9 @@
 package stacks
 
 import (
+	"errors"
 	"net/http"
+	"path"
 	"strconv"
 	"strings"
 
@@ -238,7 +240,7 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 	}
 
 	stackFolder := strconv.Itoa(int(stack.ID))
-	projectPath, err := handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
+	projectPath, err := handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, payload.StackFileContent)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Compose file on disk", err}
 	}
@@ -271,6 +273,7 @@ type composeStackDeploymentConfig struct {
 	endpoint   *portainer.Endpoint
 	dockerhub  *portainer.DockerHub
 	registries []portainer.Registry
+	isAdmin    bool
 }
 
 func (handler *Handler) createComposeDeployConfig(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) (*composeStackDeploymentConfig, *httperror.HandlerError) {
@@ -295,6 +298,7 @@ func (handler *Handler) createComposeDeployConfig(r *http.Request, stack *portai
 		endpoint:   endpoint,
 		dockerhub:  dockerhub,
 		registries: filteredRegistries,
+		isAdmin:    securityContext.IsAdmin,
 	}
 
 	return config, nil
@@ -306,12 +310,34 @@ func (handler *Handler) createComposeDeployConfig(r *http.Request, stack *portai
 // clean it. Hence the use of the mutex.
 // We should contribute to libcompose to support authentication without using the config.json file.
 func (handler *Handler) deployComposeStack(config *composeStackDeploymentConfig) error {
+	settings, err := handler.SettingsService.Settings()
+	if err != nil {
+		return err
+	}
+
+	if !settings.AllowBindMountsForRegularUsers && !config.isAdmin {
+		composeFilePath := path.Join(config.stack.ProjectPath, config.stack.EntryPoint)
+
+		stackContent, err := handler.FileService.GetFileContent(composeFilePath)
+		if err != nil {
+			return err
+		}
+
+		valid, err := handler.isValidStackFile(stackContent)
+		if err != nil {
+			return err
+		}
+		if !valid {
+			return errors.New("bind-mount disabled for non administrator users")
+		}
+	}
+
 	handler.stackCreationMutex.Lock()
 	defer handler.stackCreationMutex.Unlock()
 
 	handler.SwarmStackManager.Login(config.dockerhub, config.registries, config.endpoint)
 
-	err := handler.ComposeStackManager.Up(config.stack, config.endpoint)
+	err = handler.ComposeStackManager.Up(config.stack, config.endpoint)
 	if err != nil {
 		return err
 	}

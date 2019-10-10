@@ -3,7 +3,6 @@ package registries
 import (
 	"net/http"
 
-	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -11,19 +10,16 @@ import (
 )
 
 type registryUpdatePayload struct {
-	Name               string
-	URL                string
-	Authentication     bool
-	Username           string
-	Password           string
+	Name               *string
+	URL                *string
+	Authentication     *bool
+	Username           *string
+	Password           *string
 	UserAccessPolicies portainer.UserAccessPolicies
 	TeamAccessPolicies portainer.TeamAccessPolicies
 }
 
 func (payload *registryUpdatePayload) Validate(r *http.Request) error {
-	if payload.Authentication && (govalidator.IsNull(payload.Username) || govalidator.IsNull(payload.Password)) {
-		return portainer.Error("Invalid credentials. Username and password must be specified when authentication is enabled")
-	}
 	return nil
 }
 
@@ -47,32 +43,41 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a registry with the specified identifier inside the database", err}
 	}
 
-	registries, err := handler.RegistryService.Registries()
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
+	if payload.Name != nil {
+		registry.Name = *payload.Name
 	}
-	for _, r := range registries {
-		if r.URL == payload.URL && r.ID != registry.ID {
-			return &httperror.HandlerError{http.StatusConflict, "Another registry with the same URL already exists", portainer.ErrRegistryAlreadyExists}
+
+	if payload.URL != nil {
+		registries, err := handler.RegistryService.Registries()
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
 		}
+		for _, r := range registries {
+			if r.URL == *payload.URL && r.ID != registry.ID {
+				return &httperror.HandlerError{http.StatusConflict, "Another registry with the same URL already exists", portainer.ErrRegistryAlreadyExists}
+			}
+		}
+
+		registry.URL = *payload.URL
 	}
 
-	if payload.Name != "" {
-		registry.Name = payload.Name
-	}
+	if payload.Authentication != nil {
+		if *payload.Authentication {
+			registry.Authentication = true
 
-	if payload.URL != "" {
-		registry.URL = payload.URL
-	}
+			if payload.Username != nil {
+				registry.Username = *payload.Username
+			}
 
-	if payload.Authentication {
-		registry.Authentication = true
-		registry.Username = payload.Username
-		registry.Password = payload.Password
-	} else {
-		registry.Authentication = false
-		registry.Username = ""
-		registry.Password = ""
+			if payload.Password != nil {
+				registry.Password = *payload.Password
+			}
+
+		} else {
+			registry.Authentication = false
+			registry.Username = ""
+			registry.Password = ""
+		}
 	}
 
 	if payload.UserAccessPolicies != nil {

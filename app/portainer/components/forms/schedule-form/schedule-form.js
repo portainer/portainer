@@ -10,15 +10,15 @@ angular.module('portainer.app').component('scheduleForm', {
     };
 
     ctrl.scheduleValues = [{
-        displayed: 'Every hour',
-        cron: '0 0 * * *'
-      },
+      displayed: 'Every hour',
+      cron: '0 * * * *'
+    },
       {
         displayed: 'Every 2 hours',
-        cron: '0 0 0/2 * *'
+        cron: '0 */2 * * *'
       }, {
         displayed: 'Every day',
-        cron: '0 0 0 * *'
+        cron: '0 0 * * *'
       }
     ];
 

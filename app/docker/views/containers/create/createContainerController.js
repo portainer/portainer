@@ -402,16 +402,13 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
       }
     }
     $scope.config.NetworkingConfig.EndpointsConfig[$scope.config.HostConfig.NetworkMode] = d.NetworkSettings.Networks[$scope.config.HostConfig.NetworkMode];
-    // Mac Address
-    if(Object.keys(d.NetworkSettings.Networks).length) {
+    if(Object.keys(d.NetworkSettings.Networks).length > 1) {
       var firstNetwork = d.NetworkSettings.Networks[Object.keys(d.NetworkSettings.Networks)[0]];
-      $scope.formValues.MacAddress = firstNetwork.MacAddress;
       $scope.config.NetworkingConfig.EndpointsConfig[$scope.config.HostConfig.NetworkMode] = firstNetwork;
       $scope.extraNetworks = angular.copy(d.NetworkSettings.Networks);
       delete $scope.extraNetworks[Object.keys(d.NetworkSettings.Networks)[0]];
-    } else {
-      $scope.formValues.MacAddress = '';
     }
+    $scope.formValues.MacAddress = d.Config.MacAddress;
 
     // ExtraHosts
     if ($scope.config.HostConfig.ExtraHosts) {

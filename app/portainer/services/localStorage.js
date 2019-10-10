@@ -14,6 +14,12 @@ angular.module('portainer.app')
     getEndpointPublicURL: function() {
       return localStorageService.get('ENDPOINT_PUBLIC_URL');
     },
+    storeLoginStateUUID: function(uuid) {
+      localStorageService.cookie.set('LOGIN_STATE_UUID', uuid);
+    },
+    getLoginStateUUID: function() {
+      return localStorageService.cookie.get('LOGIN_STATE_UUID');
+    },
     storeOfflineMode: function(isOffline) {
       localStorageService.set('ENDPOINT_OFFLINE_MODE', isOffline);
     },

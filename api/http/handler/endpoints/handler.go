@@ -37,6 +37,7 @@ type Handler struct {
 	JobService                  portainer.JobService
 	ReverseTunnelService        portainer.ReverseTunnelService
 	SettingsService             portainer.SettingsService
+	AuthorizationService        *portainer.AuthorizationService
 }
 
 // NewHandler creates a handler to manage endpoint operations.
@@ -48,25 +49,25 @@ func NewHandler(bouncer *security.RequestBouncer, authorizeEndpointManagement bo
 	}
 
 	h.Handle("/endpoints",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointCreate))).Methods(http.MethodPost)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointCreate))).Methods(http.MethodPost)
 	h.Handle("/endpoints/snapshot",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointSnapshots))).Methods(http.MethodPost)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointSnapshots))).Methods(http.MethodPost)
 	h.Handle("/endpoints",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointList))).Methods(http.MethodGet)
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointList))).Methods(http.MethodGet)
 	h.Handle("/endpoints/{id}",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointInspect))).Methods(http.MethodGet)
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointInspect))).Methods(http.MethodGet)
 	h.Handle("/endpoints/{id}",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointUpdate))).Methods(http.MethodPut)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointUpdate))).Methods(http.MethodPut)
 	h.Handle("/endpoints/{id}",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointDelete))).Methods(http.MethodDelete)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointDelete))).Methods(http.MethodDelete)
 	h.Handle("/endpoints/{id}/extensions",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointExtensionAdd))).Methods(http.MethodPost)
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointExtensionAdd))).Methods(http.MethodPost)
 	h.Handle("/endpoints/{id}/extensions/{extensionType}",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointExtensionRemove))).Methods(http.MethodDelete)
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.endpointExtensionRemove))).Methods(http.MethodDelete)
 	h.Handle("/endpoints/{id}/job",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointJob))).Methods(http.MethodPost)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointJob))).Methods(http.MethodPost)
 	h.Handle("/endpoints/{id}/snapshot",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.endpointSnapshot))).Methods(http.MethodPost)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointSnapshot))).Methods(http.MethodPost)
 	h.Handle("/endpoints/{id}/status",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.endpointStatusInspect))).Methods(http.MethodGet)
 
