@@ -117,50 +117,52 @@ angular.module('portainer.docker')
 
   helper.preparePortBindings = function(portBindings) {
     const bindings = {};
-    portBindings.forEach(function (portBinding) {
-      if (portBinding.containerPort) {
-        let hostPort = portBinding.hostPort;
-        const containerPortRange = parsePortRange(portBinding.containerPort);
-        if (!isValidPortRange(containerPortRange)) {
-          throw new Error('Invalid port specification: ' + portBinding.containerPort);
+    _.forEach(portBindings, (portBinding) => {
+      if (!portBinding.containerPort) {
+        return;
+      }
+      
+      let hostPort = portBinding.hostPort;
+      const containerPortRange = parsePortRange(portBinding.containerPort);
+      if (!isValidPortRange(containerPortRange)) {
+        throw new Error('Invalid port specification: ' + portBinding.containerPort);
+      }
+
+      const startPort = containerPortRange[0];
+      const endPort = containerPortRange[1];
+      let hostIp = undefined;
+      let startHostPort = 0;
+      let endHostPort = 0;
+      if (hostPort) {
+        if (hostPort.indexOf(':') > -1) {
+          const hostAndPort = _.split(hostPort, ':');
+          hostIp = hostAndPort[0];
+          hostPort = hostAndPort[1];
         }
 
-        const startPort = containerPortRange[0];
-        const endPort = containerPortRange[1];
-        let hostIp = undefined;
-        let startHostPort = 0;
-        let endHostPort = 0;
-        if (hostPort) {
-          if (hostPort.indexOf(':') > -1) {
-            const hostAndPort = _.split(hostPort, ':');
-            hostIp = hostAndPort[0];
-            hostPort = hostAndPort[1];
-          }
-
-          const hostPortRange = parsePortRange(hostPort);
-          if (!isValidPortRange(hostPortRange)) {
-            throw new Error('Invalid port specification: ' + hostPort);
-          }
-
-          startHostPort = hostPortRange[0];
-          endHostPort = hostPortRange[1];
-          if (endPort !== startPort && (endPort - startPort) !== (endHostPort - startHostPort)) {
-            throw new Error('Invalid port specification: ' + hostPort);
-          }
+        const hostPortRange = parsePortRange(hostPort);
+        if (!isValidPortRange(hostPortRange)) {
+          throw new Error('Invalid port specification: ' + hostPort);
         }
 
-        for (let i = 0; i <= (endPort - startPort); i++) {
-          const containerPort = (startPort + i).toString();
-          if (startHostPort > 0) {
-            hostPort = (startHostPort + i).toString();
-          }
-          if (startPort === endPort && startHostPort !== endHostPort) {
-            hostPort += '-' + endHostPort.toString();
-          }
-
-          const bindKey = containerPort + '/' + portBinding.protocol;
-          bindings[bindKey] = [{ HostIp: hostIp, HostPort: hostPort }];
+        startHostPort = hostPortRange[0];
+        endHostPort = hostPortRange[1];
+        if (endPort !== startPort && (endPort - startPort) !== (endHostPort - startHostPort)) {
+          throw new Error('Invalid port specification: ' + hostPort);
         }
+      }
+
+      for (let i = 0; i <= (endPort - startPort); i++) {
+        const containerPort = (startPort + i).toString();
+        if (startHostPort > 0) {
+          hostPort = (startHostPort + i).toString();
+        }
+        if (startPort === endPort && startHostPort !== endHostPort) {
+          hostPort += '-' + endHostPort.toString();
+        }
+
+        const bindKey = containerPort + '/' + portBinding.protocol;
+        bindings[bindKey] = [{ HostIp: hostIp, HostPort: hostPort }];
       }
     });
     return bindings;
