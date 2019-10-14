@@ -8,7 +8,7 @@
       </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus ng-model-options="{ debounce: 300 }">
+        <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" ng-model-options="{ debounce: 300 }" ng-change="$ctrl.onTextFilterChange()" placeholder="Search..." auto-focus>
       </div>
       <div class="table-responsive">
         <table class="table table-hover table-filters nowrap-cells">
@@ -22,16 +22,12 @@
                 </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('TagsCount')">
                   Tags count
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'TagsCount' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'TagsCount' && $ctrl.state.reverseOrder"></i>
-                </a>
               </th>
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))"
+            <tr ng-hide="$ctrl.loading" dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))"
               ng-class="{active: item.Checked}">
               <td>
                 <a ui-sref="portainer.registries.registry.repository({repository: item.Name})" class="monospaced"
@@ -39,7 +35,7 @@
               </td>
               <td>{{ item.TagsCount }}</td>
             </tr>
-            <tr ng-if="!$ctrl.dataset">
+            <tr ng-if="!$ctrl.dataset || $ctrl.loading">
               <td colspan="5" class="text-center text-muted">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
@@ -59,7 +55,6 @@
                 Items per page
               </span>
               <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
-                <option value="0">All</option>
                 <option value="10">10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>
