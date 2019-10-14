@@ -1,5 +1,4 @@
 import '../assets/css/app.css';
-import './libraries/isteven-angular-multiselect/isteven-multi-select.css';
 import angular from 'angular';
 
 import './agent/_module';

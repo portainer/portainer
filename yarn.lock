@@ -953,6 +953,11 @@ angular-messages@~1.5.0:
   resolved "https://registry.yarnpkg.com/angular-messages/-/angular-messages-1.5.11.tgz#ea99f0163594fcb0a2db701b3038339250decc90"
   integrity sha1-6pnwFjWU/LCi23AbMDgzklDezJA=
 
+angular-mocks@1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/angular-mocks/-/angular-mocks-1.6.1.tgz#2f44a1b3ac608e93751305bce176c274221d8abd"
+  integrity sha1-L0Shs6xgjpN1EwW84XbCdCIdir0=
+
 angular-mocks@~1.5.0:
   version "1.5.11"
   resolved "https://registry.yarnpkg.com/angular-mocks/-/angular-mocks-1.5.11.tgz#a0e1dd0ea55fd77ee7a757d75536c5e964c86f81"
@@ -965,10 +970,22 @@ angular-moment-picker@^0.10.2:
     angular "^1.3"
     moment "^2.16.0"
 
+"angular-multiselect@github:portainer/angular-multi-select#semver:~v4.0.1":
+  version "4.0.0"
+  resolved "https://codeload.github.com/portainer/angular-multi-select/tar.gz/933b066e0aa9e8879967a35a9c5bf7e89c72f86d"
+  dependencies:
+    angular-mocks "1.6.1"
+    angular-sanitize "1.6.1"
+
 angular-resource@~1.5.0:
   version "1.5.11"
   resolved "https://registry.yarnpkg.com/angular-resource/-/angular-resource-1.5.11.tgz#d93ea619184a2e0ee3ae338265758363172929f0"
   integrity sha1-2T6mGRhKLg7jrjOCZXWDYxcpKfA=
+
+angular-sanitize@1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/angular-sanitize/-/angular-sanitize-1.6.1.tgz#cacffec3199ed66297afbb1ef366ec66616b3b3f"
+  integrity sha1-ys/+wxme1mKXr7se82bsZmFrOz8=
 
 angular-sanitize@~1.5.0:
   version "1.5.11"
