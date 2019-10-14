@@ -1,8 +1,8 @@
 import 'ui-select/dist/select.css';
 import 'bootstrap/dist/css/bootstrap.css';
-import '@fortawesome/fontawesome-free-webfonts/css/fa-brands.css';
-import '@fortawesome/fontawesome-free-webfonts/css/fa-solid.css';
-import '@fortawesome/fontawesome-free-webfonts/css/fontawesome.css';
+import '@fortawesome/fontawesome-free/css/brands.css';
+import '@fortawesome/fontawesome-free/css/solid.css';
+import '@fortawesome/fontawesome-free/css/fontawesome.css';
 import 'toastr/build/toastr.css';
 import 'xterm/dist/xterm.css';
 import 'angularjs-slider/dist/rzslider.css';

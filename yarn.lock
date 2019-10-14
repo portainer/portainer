@@ -600,10 +600,10 @@
     lodash "^4.17.10"
     to-fast-properties "^2.0.0"
 
-"@fortawesome/fontawesome-free-webfonts@^1.0.9":
-  version "1.0.9"
-  resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-free-webfonts/-/fontawesome-free-webfonts-1.0.9.tgz#72f2c10453422aba0d338fa6a9cb761b50ba24d5"
-  integrity sha512-nLgl6b6a+tXaoJJnSRw0hjN8cWM/Q5DhxKAwI9Xr0AiC43lQ2F98vQ1KLA6kw5OoYeAyisGGqmlwtBj0WqOI5Q==
+"@fortawesome/fontawesome-free@^5.11.2":
+  version "5.11.2"
+  resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-free/-/fontawesome-free-5.11.2.tgz#8644bc25b19475779a7b7c1fc104bc0a794f4465"
+  integrity sha512-XiUPoS79r1G7PcpnNtq85TJ7inJWe0v+b5oZJZKb0pGHNIV6+UiNeQWiFGmuQ0aj7GEhnD/v9iqxIsjuRKtEnQ==
 
 "@sindresorhus/is@^0.7.0":
   version "0.7.0"
