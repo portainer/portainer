@@ -15,10 +15,6 @@
           <thead>
             <tr>
               <th>
-                <span class="md-checkbox">
-                  <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
-                  <label for="select_all"></label>
-                </span>
                 <a ng-click="$ctrl.changeOrderBy('Name')">
                   Repository
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
@@ -38,10 +34,6 @@
             <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))"
               ng-class="{active: item.Checked}">
               <td>
-                <span class="md-checkbox">
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
-                  <label for="select_{{ $index }}"></label>
-                </span>
                 <a ui-sref="portainer.registries.registry.repository({repository: item.Name})" class="monospaced"
                   title="{{ item.Name }}">{{ item.Name }}</a>
               </td>
