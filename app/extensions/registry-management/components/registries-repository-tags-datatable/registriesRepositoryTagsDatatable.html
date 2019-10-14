@@ -44,7 +44,8 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
-                {{ item.Name }}
+                <a ui-sref="portainer.registries.registry.repository.tag({tag: item.Name})"
+                title="{{ item.Name }}">{{ item.Name }}</a>
               </td>
               <td>{{ item.Os }}/{{ item.Architecture }}</td>
               <td>{{ item.ImageId | trimshasum }}</td>
