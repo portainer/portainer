@@ -5,8 +5,8 @@ import { ContainerDetailsViewModel } from '../../../models/container';
 
 
 angular.module('portainer.docker')
-.controller('CreateContainerController', ['$q', '$scope', '$state', '$timeout', '$transition$', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'NetworkService', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'FormValidator', 'ModalService', 'RegistryService', 'SystemService', 'SettingsService', 'PluginService', 'HttpRequestHelper',
-function ($q, $scope, $state, $timeout, $transition$, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, NetworkService, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, FormValidator, ModalService, RegistryService, SystemService, SettingsService, PluginService, HttpRequestHelper) {
+.controller('CreateContainerController', ['$q', '$scope', '$async', '$state', '$timeout', '$transition$', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'NetworkService', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'FormValidator', 'ModalService', 'RegistryService', 'SystemService', 'SettingsService', 'PluginService', 'HttpRequestHelper',
+function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, NetworkService, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, FormValidator, ModalService, RegistryService, SystemService, SettingsService, PluginService, HttpRequestHelper) {
 
   $scope.create = create;
 
@@ -138,25 +138,8 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
   }
 
   function preparePortBindings(config) {
-    var bindings = {};
-    if (config.ExposedPorts === undefined) {
-      config.ExposedPorts = {};
-    }
-    config.HostConfig.PortBindings.forEach(function (portBinding) {
-      if (portBinding.containerPort) {
-        var key = portBinding.containerPort + '/' + portBinding.protocol;
-        var binding = {};
-        if (portBinding.hostPort && portBinding.hostPort.indexOf(':') > -1) {
-          var hostAndPort = portBinding.hostPort.split(':');
-          binding.HostIp = hostAndPort[0];
-          binding.HostPort = hostAndPort[1];
-        } else {
-          binding.HostPort = portBinding.hostPort;
-        }
-        bindings[key] = [binding];
-        config.ExposedPorts[key] = {};
-      }
-    });
+    const bindings = ContainerHelper.preparePortBindings(config.HostConfig.PortBindings);
+    _.forEach(bindings, (_, key) => config.ExposedPorts[key] = {});
     config.HostConfig.PortBindings = bindings;
   }
 
@@ -330,22 +313,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
   }
 
   function loadFromContainerPortBindings() {
-    var bindings = [];
-    for (var p in $scope.config.HostConfig.PortBindings) {
-      if ({}.hasOwnProperty.call($scope.config.HostConfig.PortBindings, p)) {
-        var hostPort = '';
-        if ($scope.config.HostConfig.PortBindings[p][0].HostIp) {
-          hostPort = $scope.config.HostConfig.PortBindings[p][0].HostIp + ':';
-        }
-        hostPort += $scope.config.HostConfig.PortBindings[p][0].HostPort;
-        var b = {
-          'hostPort': hostPort,
-          'containerPort': p.split('/')[0],
-          'protocol': p.split('/')[1]
-        };
-        bindings.push(b);
-      }
-    }
+    const bindings = ContainerHelper.sortAndCombinePorts($scope.config.HostConfig.PortBindings);
     $scope.config.HostConfig.PortBindings = bindings;
   }
 
@@ -784,8 +752,10 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     }
 
     function createNewContainer() {
-      var config = prepareConfiguration();
-      return ContainerService.createAndStartContainer(config);
+      return $async(async () => {
+        const config = prepareConfiguration();
+        return await ContainerService.createAndStartContainer(config);
+      });
     }
 
     function applyResourceControl(newContainer) {
