@@ -128,10 +128,12 @@ angular.module('portainer.docker')
   }
 
   service.pullImage = function(image, registry, ignoreErrors) {
-    var imageDetails = ImageHelper.extractImageAndRegistryFromRepository(image);
-    var imageConfiguration = ImageHelper.createImageConfigForContainer(imageDetails.image, registry.URL);
+    // var imageDetails = ImageHelper.extractImageAndRegistryFromRepository(image);
+    // var imageConfiguration = ImageHelper.createImageConfigForContainer(imageDetails.image, registry.URL);
     var authenticationDetails = registry.Authentication ? RegistryService.encodedCredentials(registry) : '';
     HttpRequestHelper.setRegistryAuthenticationHeader(authenticationDetails);
+
+    var imageConfiguration = ImageHelper.createImageConfigForContainer(image, registry.URL);
 
     if (ignoreErrors) {
       return pullImageAndIgnoreErrors(imageConfiguration);
@@ -140,8 +142,8 @@ angular.module('portainer.docker')
   };
 
   service.tagImage = function(id, image, registry) {
-    var imageConfig = ImageHelper.createImageConfigForCommit(image, registry);
-    return Image.tag({id: id, tag: imageConfig.tag, repo: imageConfig.repo}).$promise;
+    void registry;
+    return Image.tag({id: id, repo: image}).$promise;
   };
 
   service.downloadImages = function(images) {

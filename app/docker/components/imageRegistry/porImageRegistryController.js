@@ -1,31 +1,40 @@
+import angular from 'angular';
 import _ from 'lodash-es';
 
-angular.module('portainer.docker')
-.controller('porImageRegistryController', ['$q', 'RegistryService', 'DockerHubService', 'ImageService', 'Notifications',
-function ($q, RegistryService, DockerHubService, ImageService, Notifications) {
-  var ctrl = this;
+class porImageRegistryController {
+  /* @ngInject */
+  constructor($async, RegistryService, DockerHubService, ImageService, Notifications) {
+    this.$async = $async;
+    this.RegistryService = RegistryService;
+    this.DockerHubService = DockerHubService;
+    this.ImageService = ImageService;
+    this.Notifications = Notifications;
 
-  function initComponent() {
-    $q.all({
-      registries: RegistryService.registries(),
-      dockerhub: DockerHubService.dockerhub(),
-      availableImages: ctrl.autoComplete ? ImageService.images() : []
-    })
-    .then(function success(data) {
-      var dockerhub = data.dockerhub;
-      var registries = data.registries;
-      ctrl.availableImages = ImageService.getUniqueTagListFromImages(data.availableImages);
-      ctrl.availableRegistries = [dockerhub].concat(registries);
-      if (!ctrl.registry.Id) {
-        ctrl.registry = dockerhub;
-      } else {
-        ctrl.registry = _.find(ctrl.availableRegistries, { 'Id': ctrl.registry.Id });
-      }
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to retrieve registries');
-    });
+    this.onInit = this.onInit.bind(this);
   }
 
-  initComponent();
-}]);
+  async onInit() {
+    try {
+      const [registries, dockerhub, availableImages] = await Promise.all([this.RegistryService.registries(),
+      this.DockerHubService.dockerhub(),
+      this.autoComplete ? this.ImageService.images() : []]);
+      this.availableImages = this.ImageService.getUniqueTagListFromImages(availableImages);
+      this.availableRegistries = [dockerhub].concat(registries);
+      if (!this.registry.Id) {
+        this.registry = dockerhub;
+      } else {
+        this.registry = _.find(this.availableRegistries, { 'Id': this.registry.Id });
+      }
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve registries');
+    }
+  }
+
+  $onInit() {
+    this.useRegistry = true;
+    return this.$async(this.onInit);
+  }
+}
+
+export default porImageRegistryController;
+angular.module('portainer.docker').controller('porImageRegistryController', porImageRegistryController);

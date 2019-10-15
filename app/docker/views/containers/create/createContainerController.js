@@ -133,8 +133,7 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
     var image = config.Image;
     var registry = $scope.formValues.Registry;
     var imageConfig = ImageHelper.createImageConfigForContainer(image, registry.URL);
-    config.Image = imageConfig.fromImage + ':' + imageConfig.tag;
-    $scope.imageConfig = imageConfig;
+    config.Image = imageConfig.fromImage ;//+ ':' + imageConfig.tag;
   }
 
   function preparePortBindings(config) {
@@ -296,6 +295,7 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
     config.Cmd = ContainerHelper.commandStringToArray(config.Cmd);
     prepareNetworkConfig(config);
     prepareImageConfig(config);
+    console.log(config);
     preparePortBindings(config);
     prepareConsole(config);
     prepareEnvironmentVariables(config);

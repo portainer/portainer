@@ -15,7 +15,8 @@ function ImageFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, HttpR
     search: {method: 'GET', params: {action: 'search'}},
     history: {method: 'GET', params: {action: 'history'}, isArray: true},
     insert: {method: 'POST', params: {id: '@id', action: 'insert'}},
-    tag: {method: 'POST', params: {id: '@id', action: 'tag', force: 0, repo: '@repo', tag: '@tag'}, ignoreLoadingBar: true},
+    // tag: {method: 'POST', params: {id: '@id', action: 'tag', force: 0, repo: '@repo', tag: '@tag'}, ignoreLoadingBar: true},
+    tag: {method: 'POST', params: {id: '@id', action: 'tag', force: 0, repo: '@repo'}, ignoreLoadingBar: true},
     inspect: {method: 'GET', params: {id: '@id', action: 'json'}},
     push: {
       method: 'POST', params: {action: 'push', id: '@tag'},
