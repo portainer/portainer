@@ -7,15 +7,15 @@ import (
 )
 
 const (
-	// ErrDockerContainerIdentifierNotFound defines an error raised when Portainer is unable to find a container identifier
-	ErrDockerContainerIdentifierNotFound    = portainer.Error("Docker container identifier not found")
+	errDockerContainerIdentifierNotFound = portainer.Error("Docker container identifier not found")
+	// identifier attribute in inspect/list/create response
 	containerIdentifier                     = "Id"
 	containerLabelForServiceIdentifier      = "com.docker.swarm.service.id"
 	containerLabelForSwarmStackIdentifier   = "com.docker.stack.namespace"
 	containerLabelForComposeStackIdentifier = "com.docker.compose.project"
 )
 
-// containerListOperation extracts the response as a JSON object, loop through the containers array
+// containerListOperation extracts the response as a JSON array, loop through the containers array
 // decorate and/or filter the containers based on resource controls before rewriting the response
 func containerListOperation(response *http.Response, executor *operationExecutor) error {
 	var err error
@@ -57,7 +57,7 @@ func containerInspectOperation(response *http.Response, executor *operationExecu
 	}
 
 	if responseObject[containerIdentifier] == nil {
-		return ErrDockerContainerIdentifierNotFound
+		return errDockerContainerIdentifierNotFound
 	}
 
 	containerID := responseObject[containerIdentifier].(string)
@@ -115,7 +115,7 @@ func decorateContainerList(containerData []interface{}, resourceControls []porta
 
 		containerObject := container.(map[string]interface{})
 		if containerObject[containerIdentifier] == nil {
-			return nil, ErrDockerContainerIdentifierNotFound
+			return nil, errDockerContainerIdentifierNotFound
 		}
 
 		containerID := containerObject[containerIdentifier].(string)
@@ -143,7 +143,7 @@ func filterContainerList(containerData []interface{}, context *restrictedDockerO
 	for _, container := range containerData {
 		containerObject := container.(map[string]interface{})
 		if containerObject[containerIdentifier] == nil {
-			return nil, ErrDockerContainerIdentifierNotFound
+			return nil, errDockerContainerIdentifierNotFound
 		}
 
 		containerID := containerObject[containerIdentifier].(string)

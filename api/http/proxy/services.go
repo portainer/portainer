@@ -7,8 +7,7 @@ import (
 )
 
 const (
-	// ErrDockerServiceIdentifierNotFound defines an error raised when Portainer is unable to find a service identifier
-	ErrDockerServiceIdentifierNotFound = portainer.Error("Docker service identifier not found")
+	errDockerServiceIdentifierNotFound = portainer.Error("Docker service identifier not found")
 	serviceIdentifier                  = "ID"
 	serviceLabelForStackIdentifier     = "com.docker.stack.namespace"
 )
@@ -48,7 +47,7 @@ func serviceInspectOperation(response *http.Response, executor *operationExecuto
 	}
 
 	if responseObject[serviceIdentifier] == nil {
-		return ErrDockerServiceIdentifierNotFound
+		return errDockerServiceIdentifierNotFound
 	}
 
 	serviceID := responseObject[serviceIdentifier].(string)
@@ -98,7 +97,7 @@ func decorateServiceList(serviceData []interface{}, resourceControls []portainer
 
 		serviceObject := service.(map[string]interface{})
 		if serviceObject[serviceIdentifier] == nil {
-			return nil, ErrDockerServiceIdentifierNotFound
+			return nil, errDockerServiceIdentifierNotFound
 		}
 
 		serviceID := serviceObject[serviceIdentifier].(string)
@@ -124,7 +123,7 @@ func filterServiceList(serviceData []interface{}, context *restrictedDockerOpera
 	for _, service := range serviceData {
 		serviceObject := service.(map[string]interface{})
 		if serviceObject[serviceIdentifier] == nil {
-			return nil, ErrDockerServiceIdentifierNotFound
+			return nil, errDockerServiceIdentifierNotFound
 		}
 
 		serviceID := serviceObject[serviceIdentifier].(string)

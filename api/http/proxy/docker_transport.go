@@ -3,6 +3,8 @@ package proxy
 import (
 	"encoding/base64"
 	"encoding/json"
+	"errors"
+	"log"
 	"net/http"
 	"path"
 	"regexp"
@@ -53,8 +55,9 @@ type (
 		operationContext *restrictedDockerOperationContext
 		labelBlackList   []portainer.Pair
 	}
-	restrictedOperationRequest func(*http.Response, *operationExecutor) error
-	operationRequest           func(*http.Request) error
+	restrictedOperationRequest       func(*http.Response, *operationExecutor) error
+	resourceCreationOperationRequest func(*http.Response) error
+	operationRequest                 func(*http.Request) error
 )
 
 func (p *proxyTransport) RoundTrip(request *http.Request) (*http.Response, error) {
@@ -140,7 +143,7 @@ func (p *proxyTransport) proxyAgentRequest(r *http.Request) (*http.Response, err
 func (p *proxyTransport) proxyConfigRequest(request *http.Request) (*http.Response, error) {
 	switch requestPath := request.URL.Path; requestPath {
 	case "/configs/create":
-		return p.executeDockerRequest(request)
+		return p.decorateGenericResourceCreationOperation(request, configCreationIdentifier, portainer.ConfigResourceControl)
 
 	case "/configs":
 		return p.rewriteOperation(request, configListOperation)
@@ -158,7 +161,7 @@ func (p *proxyTransport) proxyConfigRequest(request *http.Request) (*http.Respon
 func (p *proxyTransport) proxyContainerRequest(request *http.Request) (*http.Response, error) {
 	switch requestPath := request.URL.Path; requestPath {
 	case "/containers/create":
-		return p.executeDockerRequest(request)
+		return p.decorateGenericResourceCreationOperation(request, containerIdentifier, portainer.ContainerResourceControl)
 
 	case "/containers/prune":
 		return p.administratorOperation(request)
@@ -216,7 +219,7 @@ func (p *proxyTransport) proxyServiceRequest(request *http.Request) (*http.Respo
 func (p *proxyTransport) proxyVolumeRequest(request *http.Request) (*http.Response, error) {
 	switch requestPath := request.URL.Path; requestPath {
 	case "/volumes/create":
-		return p.executeDockerRequest(request)
+		return p.decorateGenericResourceCreationOperation(request, volumeIdentifier, portainer.VolumeResourceControl)
 
 	case "/volumes/prune":
 		return p.administratorOperation(request)
@@ -237,7 +240,7 @@ func (p *proxyTransport) proxyVolumeRequest(request *http.Request) (*http.Respon
 func (p *proxyTransport) proxyNetworkRequest(request *http.Request) (*http.Response, error) {
 	switch requestPath := request.URL.Path; requestPath {
 	case "/networks/create":
-		return p.executeDockerRequest(request)
+		return p.decorateGenericResourceCreationOperation(request, networkIdentifier, portainer.NetworkResourceControl)
 
 	case "/networks":
 		return p.rewriteOperation(request, networkListOperation)
@@ -255,7 +258,7 @@ func (p *proxyTransport) proxyNetworkRequest(request *http.Request) (*http.Respo
 func (p *proxyTransport) proxySecretRequest(request *http.Request) (*http.Response, error) {
 	switch requestPath := request.URL.Path; requestPath {
 	case "/secrets/create":
-		return p.executeDockerRequest(request)
+		return p.decorateGenericResourceCreationOperation(request, secretIdentifier, portainer.SecretResourceControl)
 
 	case "/secrets":
 		return p.rewriteOperation(request, secretListOperation)
@@ -350,7 +353,7 @@ func (p *proxyTransport) replaceRegistryAuthenticationHeader(request *http.Reque
 		request.Header.Set("X-Registry-Auth", header)
 	}
 
-	return p.executeDockerRequest(request)
+	return p.decorateGenericResourceCreationOperation(request, serviceIdentifier, portainer.ServiceResourceControl)
 }
 
 // restrictedOperation ensures that the current user has the required authorizations
@@ -488,6 +491,49 @@ func (p *proxyTransport) interceptAndRewriteRequest(request *http.Request, opera
 	}
 
 	return p.executeDockerRequest(request)
+}
+
+// decorateGenericResourceCreationResponse extracts the response as a JSON object, extracts the resource identifier from that object based
+// on the resourceIdentifierAttribute parameter then generate a new resource control associated to that resource
+// with a random token and rewrites the response by decorating the original response with a ResourceControl object.
+// The generic Docker API response format is JSON object:
+// https://docs.docker.com/engine/api/v1.40/#operation/ContainerCreate
+// https://docs.docker.com/engine/api/v1.40/#operation/NetworkCreate
+// https://docs.docker.com/engine/api/v1.40/#operation/VolumeCreate
+// https://docs.docker.com/engine/api/v1.40/#operation/ServiceCreate
+// https://docs.docker.com/engine/api/v1.40/#operation/SecretCreate
+// https://docs.docker.com/engine/api/v1.40/#operation/ConfigCreate
+func (p *proxyTransport) decorateGenericResourceCreationResponse(response *http.Response, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) error {
+	responseObject, err := getResponseAsJSONOBject(response)
+	if err != nil {
+		return err
+	}
+
+	if responseObject[resourceIdentifierAttribute] == nil {
+		log.Printf("[ERROR] [proxy,docker]")
+		return errors.New("missing identifier in Docker resource creation response")
+	}
+
+	resourceID := responseObject[resourceIdentifierAttribute].(string)
+
+	resourceControl, err := p.createResourceControlWithRandomToken(resourceID, resourceType)
+	if err != nil {
+		return err
+	}
+
+	responseObject = decorateObject(responseObject, resourceControl)
+
+	return rewriteResponse(response, responseObject, http.StatusOK)
+}
+
+func (p *proxyTransport) decorateGenericResourceCreationOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
+	response, err := p.executeDockerRequest(request)
+	if err != nil {
+		return response, err
+	}
+
+	err = p.decorateGenericResourceCreationResponse(response, resourceIdentifierAttribute, resourceType)
+	return response, err
 }
 
 func (p *proxyTransport) executeRequestAndRewriteResponse(request *http.Request, operation restrictedOperationRequest, executor *operationExecutor) (*http.Response, error) {

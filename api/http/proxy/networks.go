@@ -7,8 +7,7 @@ import (
 )
 
 const (
-	// ErrDockerNetworkIdentifierNotFound defines an error raised when Portainer is unable to find a network identifier
-	ErrDockerNetworkIdentifierNotFound = portainer.Error("Docker network identifier not found")
+	errDockerNetworkIdentifierNotFound = portainer.Error("Docker network identifier not found")
 	networkIdentifier                  = "Id"
 	networkLabelForStackIdentifier     = "com.docker.stack.namespace"
 )
@@ -48,7 +47,7 @@ func networkInspectOperation(response *http.Response, executor *operationExecuto
 	}
 
 	if responseObject[networkIdentifier] == nil {
-		return ErrDockerNetworkIdentifierNotFound
+		return errDockerNetworkIdentifierNotFound
 	}
 
 	networkID := responseObject[networkIdentifier].(string)
@@ -90,7 +89,7 @@ func decorateNetworkList(networkData []interface{}, resourceControls []portainer
 
 		networkObject := network.(map[string]interface{})
 		if networkObject[networkIdentifier] == nil {
-			return nil, ErrDockerNetworkIdentifierNotFound
+			return nil, errDockerNetworkIdentifierNotFound
 		}
 
 		networkID := networkObject[networkIdentifier].(string)
@@ -116,7 +115,7 @@ func filterNetworkList(networkData []interface{}, context *restrictedDockerOpera
 	for _, network := range networkData {
 		networkObject := network.(map[string]interface{})
 		if networkObject[networkIdentifier] == nil {
-			return nil, ErrDockerNetworkIdentifierNotFound
+			return nil, errDockerNetworkIdentifierNotFound
 		}
 
 		networkID := networkObject[networkIdentifier].(string)

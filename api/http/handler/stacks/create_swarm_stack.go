@@ -10,7 +10,6 @@ import (
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/security"
@@ -91,7 +90,7 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 	}
 
 	doCleanUp = false
-	return response.JSON(w, stack)
+	return handler.decorateStackResponse(w, stack)
 }
 
 type swarmStackFromGitRepositoryPayload struct {
@@ -190,7 +189,7 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 	}
 
 	doCleanUp = false
-	return response.JSON(w, stack)
+	return handler.decorateStackResponse(w, stack)
 }
 
 type swarmStackFromFileUploadPayload struct {
@@ -283,7 +282,7 @@ func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r 
 	}
 
 	doCleanUp = false
-	return response.JSON(w, stack)
+	return handler.decorateStackResponse(w, stack)
 }
 
 type swarmStackDeploymentConfig struct {

@@ -10,7 +10,6 @@ import (
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/security"
@@ -86,7 +85,7 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 	}
 
 	doCleanUp = false
-	return response.JSON(w, stack)
+	return handler.decorateStackResponse(w, stack)
 }
 
 type composeStackFromGitRepositoryPayload struct {
@@ -180,7 +179,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 	}
 
 	doCleanUp = false
-	return response.JSON(w, stack)
+	return handler.decorateStackResponse(w, stack)
 }
 
 type composeStackFromFileUploadPayload struct {
@@ -265,7 +264,7 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 	}
 
 	doCleanUp = false
-	return response.JSON(w, stack)
+	return handler.decorateStackResponse(w, stack)
 }
 
 type composeStackDeploymentConfig struct {

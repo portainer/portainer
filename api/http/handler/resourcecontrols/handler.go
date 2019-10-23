@@ -21,11 +21,9 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		Router: mux.NewRouter(),
 	}
 	h.Handle("/resource_controls",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.resourceControlCreate))).Methods(http.MethodPost)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.resourceControlCreate))).Methods(http.MethodPost)
 	h.Handle("/resource_controls/{id}",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.resourceControlUpdate))).Methods(http.MethodPut)
-	h.Handle("/resource_controls/{id}",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.resourceControlDelete))).Methods(http.MethodDelete)
 
 	return h
 }

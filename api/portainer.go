@@ -439,21 +439,20 @@ type (
 
 	// ResourceControl represent a reference to a Docker resource with specific access controls
 	ResourceControl struct {
-		ID             ResourceControlID    `json:"Id"`
-		ResourceID     string               `json:"ResourceId"`
-		SubResourceIDs []string             `json:"SubResourceIds"`
-		Type           ResourceControlType  `json:"Type"`
-		UserAccesses   []UserResourceAccess `json:"UserAccesses"`
-		TeamAccesses   []TeamResourceAccess `json:"TeamAccesses"`
-		Public         bool                 `json:"Public"`
+		ID                 ResourceControlID    `json:"Id"`
+		ResourceID         string               `json:"ResourceId"`
+		SubResourceIDs     []string             `json:"SubResourceIds"`
+		Type               ResourceControlType  `json:"Type"`
+		UserAccesses       []UserResourceAccess `json:"UserAccesses"`
+		TeamAccesses       []TeamResourceAccess `json:"TeamAccesses"`
+		Public             bool                 `json:"Public"`
+		AdministratorsOnly bool                 `json:"AdministratorsOnly"`
+		ResourceToken      string               `json:"ResourceToken"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 2
 		OwnerID     UserID              `json:"OwnerId,omitempty"`
 		AccessLevel ResourceAccessLevel `json:"AccessLevel,omitempty"`
-
-		// Deprecated in DBVersion == 14
-		AdministratorsOnly bool `json:"AdministratorsOnly,omitempty"`
 	}
 
 	// ResourceControlType represents the type of resource associated to the resource control (volume, container, service...)
@@ -905,7 +904,7 @@ const (
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "1.22.1"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 20
+	DBVersion = 21
 	// AssetsServerURL represents the URL of the Portainer asset server
 	AssetsServerURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com"
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved

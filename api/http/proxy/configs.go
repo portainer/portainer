@@ -7,9 +7,11 @@ import (
 )
 
 const (
-	// ErrDockerConfigIdentifierNotFound defines an error raised when Portainer is unable to find a config identifier
-	ErrDockerConfigIdentifierNotFound = portainer.Error("Docker config identifier not found")
-	configIdentifier                  = "ID"
+	errDockerConfigIdentifierNotFound = portainer.Error("Docker config identifier not found")
+	// identifier attribute in inspect/list response
+	configObjectIdentifier = "ID"
+	// identifier attribute in config creation response
+	configCreationIdentifier = "Id"
 )
 
 // configListOperation extracts the response as a JSON object, loop through the configs array
@@ -47,11 +49,11 @@ func configInspectOperation(response *http.Response, executor *operationExecutor
 		return err
 	}
 
-	if responseObject[configIdentifier] == nil {
-		return ErrDockerConfigIdentifierNotFound
+	if responseObject[configObjectIdentifier] == nil {
+		return errDockerConfigIdentifierNotFound
 	}
 
-	configID := responseObject[configIdentifier].(string)
+	configID := responseObject[configObjectIdentifier].(string)
 	responseObject, access := applyResourceAccessControl(responseObject, configID, executor.operationContext)
 	if !access {
 		return rewriteAccessDeniedResponse(response)
@@ -69,11 +71,11 @@ func decorateConfigList(configData []interface{}, resourceControls []portainer.R
 	for _, config := range configData {
 
 		configObject := config.(map[string]interface{})
-		if configObject[configIdentifier] == nil {
-			return nil, ErrDockerConfigIdentifierNotFound
+		if configObject[configObjectIdentifier] == nil {
+			return nil, errDockerConfigIdentifierNotFound
 		}
 
-		configID := configObject[configIdentifier].(string)
+		configID := configObject[configObjectIdentifier].(string)
 		configObject = decorateResourceWithAccessControl(configObject, configID, resourceControls)
 
 		decoratedConfigData = append(decoratedConfigData, configObject)
@@ -92,11 +94,11 @@ func filterConfigList(configData []interface{}, context *restrictedDockerOperati
 
 	for _, config := range configData {
 		configObject := config.(map[string]interface{})
-		if configObject[configIdentifier] == nil {
-			return nil, ErrDockerConfigIdentifierNotFound
+		if configObject[configObjectIdentifier] == nil {
+			return nil, errDockerConfigIdentifierNotFound
 		}
 
-		configID := configObject[configIdentifier].(string)
+		configID := configObject[configObjectIdentifier].(string)
 		configObject, access := applyResourceAccessControl(configObject, configID, context)
 		if access {
 			filteredConfigData = append(filteredConfigData, configObject)

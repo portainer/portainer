@@ -7,8 +7,7 @@ import (
 )
 
 const (
-	// ErrDockerSecretIdentifierNotFound defines an error raised when Portainer is unable to find a secret identifier
-	ErrDockerSecretIdentifierNotFound = portainer.Error("Docker secret identifier not found")
+	errDockerSecretIdentifierNotFound = portainer.Error("Docker secret identifier not found")
 	secretIdentifier                  = "ID"
 )
 
@@ -48,7 +47,7 @@ func secretInspectOperation(response *http.Response, executor *operationExecutor
 	}
 
 	if responseObject[secretIdentifier] == nil {
-		return ErrDockerSecretIdentifierNotFound
+		return errDockerSecretIdentifierNotFound
 	}
 
 	secretID := responseObject[secretIdentifier].(string)
@@ -70,7 +69,7 @@ func decorateSecretList(secretData []interface{}, resourceControls []portainer.R
 
 		secretObject := secret.(map[string]interface{})
 		if secretObject[secretIdentifier] == nil {
-			return nil, ErrDockerSecretIdentifierNotFound
+			return nil, errDockerSecretIdentifierNotFound
 		}
 
 		secretID := secretObject[secretIdentifier].(string)
@@ -93,7 +92,7 @@ func filterSecretList(secretData []interface{}, context *restrictedDockerOperati
 	for _, secret := range secretData {
 		secretObject := secret.(map[string]interface{})
 		if secretObject[secretIdentifier] == nil {
-			return nil, ErrDockerSecretIdentifierNotFound
+			return nil, errDockerSecretIdentifierNotFound
 		}
 
 		secretID := secretObject[secretIdentifier].(string)

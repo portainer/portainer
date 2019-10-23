@@ -5,6 +5,10 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/portainer/portainer/api/http/proxy"
+
+	"github.com/portainer/libhttp/response"
+
 	"github.com/docker/cli/cli/compose/types"
 
 	"github.com/docker/cli/cli/compose/loader"
@@ -124,4 +128,18 @@ func (handler *Handler) isValidStackFile(stackFileContent []byte) (bool, error) 
 	}
 
 	return true, nil
+}
+
+func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *portainer.Stack) *httperror.HandlerError {
+	resourceControl, err := portainer.CreateResourceControlWithRandomToken(stack.Name, portainer.StackResourceControl)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to generate default resource control for the stack", err}
+	}
+
+	decoratedStack := proxy.DecoratedStack{
+		Stack:           *stack,
+		ResourceControl: *resourceControl,
+	}
+
+	return response.JSON(w, decoratedStack)
 }

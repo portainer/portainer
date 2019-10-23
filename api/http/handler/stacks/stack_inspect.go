@@ -47,7 +47,7 @@ func (handler *Handler) stackInspect(w http.ResponseWriter, r *http.Request) *ht
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
 
-	extendedStack := proxy.ExtendedStack{*stack, portainer.ResourceControl{}}
+	extendedStack := proxy.DecoratedStack{*stack, portainer.ResourceControl{}}
 	if !securityContext.IsAdmin && resourceControl == nil {
 		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
 	}

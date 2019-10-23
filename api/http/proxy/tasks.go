@@ -7,8 +7,7 @@ import (
 )
 
 const (
-	// ErrDockerTaskServiceIdentifierNotFound defines an error raised when Portainer is unable to find the service identifier associated to a task
-	ErrDockerTaskServiceIdentifierNotFound = portainer.Error("Docker task service identifier not found")
+	errDockerTaskServiceIdentifierNotFound = portainer.Error("Docker task service identifier not found")
 	taskServiceIdentifier                  = "ServiceID"
 	taskLabelForStackIdentifier            = "com.docker.stack.namespace"
 )
@@ -60,7 +59,7 @@ func filterTaskList(taskData []interface{}, context *restrictedDockerOperationCo
 	for _, task := range taskData {
 		taskObject := task.(map[string]interface{})
 		if taskObject[taskServiceIdentifier] == nil {
-			return nil, ErrDockerTaskServiceIdentifierNotFound
+			return nil, errDockerTaskServiceIdentifierNotFound
 		}
 
 		serviceID := taskObject[taskServiceIdentifier].(string)

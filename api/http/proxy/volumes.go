@@ -7,8 +7,7 @@ import (
 )
 
 const (
-	// ErrDockerVolumeIdentifierNotFound defines an error raised when Portainer is unable to find a volume identifier
-	ErrDockerVolumeIdentifierNotFound = portainer.Error("Docker volume identifier not found")
+	errDockerVolumeIdentifierNotFound = portainer.Error("Docker volume identifier not found")
 	volumeIdentifier                  = "Name"
 	volumeLabelForStackIdentifier     = "com.docker.stack.namespace"
 )
@@ -57,7 +56,7 @@ func volumeInspectOperation(response *http.Response, executor *operationExecutor
 	}
 
 	if responseObject[volumeIdentifier] == nil {
-		return ErrDockerVolumeIdentifierNotFound
+		return errDockerVolumeIdentifierNotFound
 	}
 
 	volumeID := responseObject[volumeIdentifier].(string)
@@ -99,7 +98,7 @@ func decorateVolumeList(volumeData []interface{}, resourceControls []portainer.R
 
 		volumeObject := volume.(map[string]interface{})
 		if volumeObject[volumeIdentifier] == nil {
-			return nil, ErrDockerVolumeIdentifierNotFound
+			return nil, errDockerVolumeIdentifierNotFound
 		}
 
 		volumeID := volumeObject[volumeIdentifier].(string)
@@ -125,7 +124,7 @@ func filterVolumeList(volumeData []interface{}, context *restrictedDockerOperati
 	for _, volume := range volumeData {
 		volumeObject := volume.(map[string]interface{})
 		if volumeObject[volumeIdentifier] == nil {
-			return nil, ErrDockerVolumeIdentifierNotFound
+			return nil, errDockerVolumeIdentifierNotFound
 		}
 
 		volumeID := volumeObject[volumeIdentifier].(string)
