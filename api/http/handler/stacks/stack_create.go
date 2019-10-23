@@ -143,10 +143,6 @@ func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *port
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist resource control inside the database", err}
 	}
 
-	decoratedStack := portainer.DecoratedStack{
-		Stack:           *stack,
-		ResourceControl: *resourceControl,
-	}
-
-	return response.JSON(w, decoratedStack)
+	stack.ResourceControl = resourceControl
+	return response.JSON(w, stack)
 }

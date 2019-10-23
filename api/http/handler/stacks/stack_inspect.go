@@ -55,25 +55,9 @@ func (handler *Handler) stackInspect(w http.ResponseWriter, r *http.Request) *ht
 		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
 	}
 
-	decoratedStack := portainer.DecoratedStack{
-		Stack: *stack,
-	}
-
 	if resourceControl != nil {
-		decoratedStack.ResourceControl = *resourceControl
+		stack.ResourceControl = resourceControl
 	}
 
-	//extendedStack := portainer.DecoratedStack{*stack, portainer.ResourceControl{}}
-	//if !securityContext.IsAdmin && resourceControl == nil {
-	//}
-	//
-	//if resourceControl != nil {
-	//	if securityContext.IsAdmin || portainer.CanAccessStack(stack, resourceControl, securityContext.UserID, securityContext.UserMemberships) {
-	//		extendedStack.ResourceControl = *resourceControl
-	//	} else {
-	//		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
-	//	}
-	//}
-
-	return response.JSON(w, decoratedStack)
+	return response.JSON(w, stack)
 }

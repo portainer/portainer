@@ -175,14 +175,15 @@ type (
 
 	// Stack represents a Docker stack created via docker stack deploy
 	Stack struct {
-		ID          StackID    `json:"Id"`
-		Name        string     `json:"Name"`
-		Type        StackType  `json:"Type"`
-		EndpointID  EndpointID `json:"EndpointId"`
-		SwarmID     string     `json:"SwarmId"`
-		EntryPoint  string     `json:"EntryPoint"`
-		Env         []Pair     `json:"Env"`
-		ProjectPath string
+		ID              StackID          `json:"Id"`
+		Name            string           `json:"Name"`
+		Type            StackType        `json:"Type"`
+		EndpointID      EndpointID       `json:"EndpointId"`
+		SwarmID         string           `json:"SwarmId"`
+		EntryPoint      string           `json:"EntryPoint"`
+		Env             []Pair           `json:"Env"`
+		ResourceControl *ResourceControl `json:"ResourceControl"`
+		ProjectPath     string
 	}
 
 	// RegistryID represents a registry identifier
