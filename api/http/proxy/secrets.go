@@ -51,7 +51,7 @@ func secretInspectOperation(response *http.Response, executor *operationExecutor
 	}
 
 	secretID := responseObject[secretIdentifier].(string)
-	responseObject, access := applyResourceAccessControl(responseObject, secretID, executor.operationContext)
+	responseObject, access := applyResourceAccessControl(responseObject, secretID, executor.operationContext, portainer.SecretResourceControl)
 	if !access {
 		return rewriteAccessDeniedResponse(response)
 	}
@@ -73,7 +73,7 @@ func decorateSecretList(secretData []interface{}, resourceControls []portainer.R
 		}
 
 		secretID := secretObject[secretIdentifier].(string)
-		secretObject = decorateResourceWithAccessControl(secretObject, secretID, resourceControls)
+		secretObject = decorateResourceWithAccessControl(secretObject, secretID, resourceControls, portainer.SecretResourceControl)
 
 		decoratedSecretData = append(decoratedSecretData, secretObject)
 	}
@@ -96,7 +96,7 @@ func filterSecretList(secretData []interface{}, context *restrictedDockerOperati
 		}
 
 		secretID := secretObject[secretIdentifier].(string)
-		secretObject, access := applyResourceAccessControl(secretObject, secretID, context)
+		secretObject, access := applyResourceAccessControl(secretObject, secretID, context, portainer.SecretResourceControl)
 		if access {
 			filteredSecretData = append(filteredSecretData, secretObject)
 		}

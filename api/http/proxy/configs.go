@@ -54,7 +54,7 @@ func configInspectOperation(response *http.Response, executor *operationExecutor
 	}
 
 	configID := responseObject[configObjectIdentifier].(string)
-	responseObject, access := applyResourceAccessControl(responseObject, configID, executor.operationContext)
+	responseObject, access := applyResourceAccessControl(responseObject, configID, executor.operationContext, portainer.ConfigResourceControl)
 	if !access {
 		return rewriteAccessDeniedResponse(response)
 	}
@@ -76,7 +76,7 @@ func decorateConfigList(configData []interface{}, resourceControls []portainer.R
 		}
 
 		configID := configObject[configObjectIdentifier].(string)
-		configObject = decorateResourceWithAccessControl(configObject, configID, resourceControls)
+		configObject = decorateResourceWithAccessControl(configObject, configID, resourceControls, portainer.ConfigResourceControl)
 
 		decoratedConfigData = append(decoratedConfigData, configObject)
 	}
@@ -99,7 +99,7 @@ func filterConfigList(configData []interface{}, context *restrictedDockerOperati
 		}
 
 		configID := configObject[configObjectIdentifier].(string)
-		configObject, access := applyResourceAccessControl(configObject, configID, context)
+		configObject, access := applyResourceAccessControl(configObject, configID, context, portainer.ConfigResourceControl)
 		if access {
 			filteredConfigData = append(filteredConfigData, configObject)
 		}

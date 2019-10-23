@@ -61,23 +61,23 @@ func containerInspectOperation(response *http.Response, executor *operationExecu
 	}
 
 	containerID := responseObject[containerIdentifier].(string)
-	responseObject, access := applyResourceAccessControl(responseObject, containerID, executor.operationContext)
+	responseObject, access := applyResourceAccessControl(responseObject, containerID, executor.operationContext, portainer.ContainerResourceControl)
 	if access {
 		return rewriteResponse(response, responseObject, http.StatusOK)
 	}
 
 	containerLabels := extractContainerLabelsFromContainerInspectObject(responseObject)
-	responseObject, access = applyResourceAccessControlFromLabel(containerLabels, responseObject, containerLabelForServiceIdentifier, executor.operationContext)
+	responseObject, access = applyResourceAccessControlFromLabel(containerLabels, responseObject, containerLabelForServiceIdentifier, executor.operationContext, portainer.ServiceResourceControl)
 	if access {
 		return rewriteResponse(response, responseObject, http.StatusOK)
 	}
 
-	responseObject, access = applyResourceAccessControlFromLabel(containerLabels, responseObject, containerLabelForSwarmStackIdentifier, executor.operationContext)
+	responseObject, access = applyResourceAccessControlFromLabel(containerLabels, responseObject, containerLabelForSwarmStackIdentifier, executor.operationContext, portainer.StackResourceControl)
 	if access {
 		return rewriteResponse(response, responseObject, http.StatusOK)
 	}
 
-	responseObject, access = applyResourceAccessControlFromLabel(containerLabels, responseObject, containerLabelForComposeStackIdentifier, executor.operationContext)
+	responseObject, access = applyResourceAccessControlFromLabel(containerLabels, responseObject, containerLabelForComposeStackIdentifier, executor.operationContext, portainer.StackResourceControl)
 	if access {
 		return rewriteResponse(response, responseObject, http.StatusOK)
 	}
@@ -119,12 +119,12 @@ func decorateContainerList(containerData []interface{}, resourceControls []porta
 		}
 
 		containerID := containerObject[containerIdentifier].(string)
-		containerObject = decorateResourceWithAccessControl(containerObject, containerID, resourceControls)
+		containerObject = decorateResourceWithAccessControl(containerObject, containerID, resourceControls, portainer.ContainerResourceControl)
 
 		containerLabels := extractContainerLabelsFromContainerListObject(containerObject)
-		containerObject = decorateResourceWithAccessControlFromLabel(containerLabels, containerObject, containerLabelForServiceIdentifier, resourceControls)
-		containerObject = decorateResourceWithAccessControlFromLabel(containerLabels, containerObject, containerLabelForSwarmStackIdentifier, resourceControls)
-		containerObject = decorateResourceWithAccessControlFromLabel(containerLabels, containerObject, containerLabelForComposeStackIdentifier, resourceControls)
+		containerObject = decorateResourceWithAccessControlFromLabel(containerLabels, containerObject, containerLabelForServiceIdentifier, resourceControls, portainer.ServiceResourceControl)
+		containerObject = decorateResourceWithAccessControlFromLabel(containerLabels, containerObject, containerLabelForSwarmStackIdentifier, resourceControls, portainer.StackResourceControl)
+		containerObject = decorateResourceWithAccessControlFromLabel(containerLabels, containerObject, containerLabelForComposeStackIdentifier, resourceControls, portainer.StackResourceControl)
 
 		decoratedContainerData = append(decoratedContainerData, containerObject)
 	}
@@ -147,14 +147,14 @@ func filterContainerList(containerData []interface{}, context *restrictedDockerO
 		}
 
 		containerID := containerObject[containerIdentifier].(string)
-		containerObject, access := applyResourceAccessControl(containerObject, containerID, context)
+		containerObject, access := applyResourceAccessControl(containerObject, containerID, context, portainer.ContainerResourceControl)
 		if !access {
 			containerLabels := extractContainerLabelsFromContainerListObject(containerObject)
-			containerObject, access = applyResourceAccessControlFromLabel(containerLabels, containerObject, containerLabelForComposeStackIdentifier, context)
+			containerObject, access = applyResourceAccessControlFromLabel(containerLabels, containerObject, containerLabelForComposeStackIdentifier, context, portainer.StackResourceControl)
 			if !access {
-				containerObject, access = applyResourceAccessControlFromLabel(containerLabels, containerObject, containerLabelForServiceIdentifier, context)
+				containerObject, access = applyResourceAccessControlFromLabel(containerLabels, containerObject, containerLabelForServiceIdentifier, context, portainer.ServiceResourceControl)
 				if !access {
-					containerObject, access = applyResourceAccessControlFromLabel(containerLabels, containerObject, containerLabelForSwarmStackIdentifier, context)
+					containerObject, access = applyResourceAccessControlFromLabel(containerLabels, containerObject, containerLabelForSwarmStackIdentifier, context, portainer.StackResourceControl)
 				}
 			}
 		}

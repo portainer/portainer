@@ -60,13 +60,13 @@ func volumeInspectOperation(response *http.Response, executor *operationExecutor
 	}
 
 	volumeID := responseObject[volumeIdentifier].(string)
-	responseObject, access := applyResourceAccessControl(responseObject, volumeID, executor.operationContext)
+	responseObject, access := applyResourceAccessControl(responseObject, volumeID, executor.operationContext, portainer.VolumeResourceControl)
 	if access {
 		return rewriteResponse(response, responseObject, http.StatusOK)
 	}
 
 	volumeLabels := extractVolumeLabelsFromVolumeInspectObject(responseObject)
-	responseObject, access = applyResourceAccessControlFromLabel(volumeLabels, responseObject, volumeLabelForStackIdentifier, executor.operationContext)
+	responseObject, access = applyResourceAccessControlFromLabel(volumeLabels, responseObject, volumeLabelForStackIdentifier, executor.operationContext, portainer.StackResourceControl)
 	if access {
 		return rewriteResponse(response, responseObject, http.StatusOK)
 	}
@@ -102,10 +102,10 @@ func decorateVolumeList(volumeData []interface{}, resourceControls []portainer.R
 		}
 
 		volumeID := volumeObject[volumeIdentifier].(string)
-		volumeObject = decorateResourceWithAccessControl(volumeObject, volumeID, resourceControls)
+		volumeObject = decorateResourceWithAccessControl(volumeObject, volumeID, resourceControls, portainer.VolumeResourceControl)
 
 		volumeLabels := extractVolumeLabelsFromVolumeListObject(volumeObject)
-		volumeObject = decorateResourceWithAccessControlFromLabel(volumeLabels, volumeObject, volumeLabelForStackIdentifier, resourceControls)
+		volumeObject = decorateResourceWithAccessControlFromLabel(volumeLabels, volumeObject, volumeLabelForStackIdentifier, resourceControls, portainer.StackResourceControl)
 
 		decoratedVolumeData = append(decoratedVolumeData, volumeObject)
 	}
@@ -128,10 +128,10 @@ func filterVolumeList(volumeData []interface{}, context *restrictedDockerOperati
 		}
 
 		volumeID := volumeObject[volumeIdentifier].(string)
-		volumeObject, access := applyResourceAccessControl(volumeObject, volumeID, context)
+		volumeObject, access := applyResourceAccessControl(volumeObject, volumeID, context, portainer.VolumeResourceControl)
 		if !access {
 			volumeLabels := extractVolumeLabelsFromVolumeListObject(volumeObject)
-			volumeObject, access = applyResourceAccessControlFromLabel(volumeLabels, volumeObject, volumeLabelForStackIdentifier, context)
+			volumeObject, access = applyResourceAccessControlFromLabel(volumeLabels, volumeObject, volumeLabelForStackIdentifier, context, portainer.StackResourceControl)
 		}
 
 		if access {

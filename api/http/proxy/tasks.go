@@ -63,10 +63,10 @@ func filterTaskList(taskData []interface{}, context *restrictedDockerOperationCo
 		}
 
 		serviceID := taskObject[taskServiceIdentifier].(string)
-		taskObject, access := applyResourceAccessControl(taskObject, serviceID, context)
+		taskObject, access := applyResourceAccessControl(taskObject, serviceID, context, portainer.ServiceResourceControl)
 		if !access {
 			taskLabels := extractTaskLabelsFromTaskListObject(taskObject)
-			taskObject, access = applyResourceAccessControlFromLabel(taskLabels, taskObject, taskLabelForStackIdentifier, context)
+			taskObject, access = applyResourceAccessControlFromLabel(taskLabels, taskObject, taskLabelForStackIdentifier, context, portainer.StackResourceControl)
 		}
 
 		if access {

@@ -51,13 +51,13 @@ func networkInspectOperation(response *http.Response, executor *operationExecuto
 	}
 
 	networkID := responseObject[networkIdentifier].(string)
-	responseObject, access := applyResourceAccessControl(responseObject, networkID, executor.operationContext)
+	responseObject, access := applyResourceAccessControl(responseObject, networkID, executor.operationContext, portainer.NetworkResourceControl)
 	if access {
 		return rewriteResponse(response, responseObject, http.StatusOK)
 	}
 
 	networkLabels := extractNetworkLabelsFromNetworkInspectObject(responseObject)
-	responseObject, access = applyResourceAccessControlFromLabel(networkLabels, responseObject, networkLabelForStackIdentifier, executor.operationContext)
+	responseObject, access = applyResourceAccessControlFromLabel(networkLabels, responseObject, networkLabelForStackIdentifier, executor.operationContext, portainer.StackResourceControl)
 	if access {
 		return rewriteResponse(response, responseObject, http.StatusOK)
 	}
@@ -93,10 +93,10 @@ func decorateNetworkList(networkData []interface{}, resourceControls []portainer
 		}
 
 		networkID := networkObject[networkIdentifier].(string)
-		networkObject = decorateResourceWithAccessControl(networkObject, networkID, resourceControls)
+		networkObject = decorateResourceWithAccessControl(networkObject, networkID, resourceControls, portainer.NetworkResourceControl)
 
 		networkLabels := extractNetworkLabelsFromNetworkListObject(networkObject)
-		networkObject = decorateResourceWithAccessControlFromLabel(networkLabels, networkObject, networkLabelForStackIdentifier, resourceControls)
+		networkObject = decorateResourceWithAccessControlFromLabel(networkLabels, networkObject, networkLabelForStackIdentifier, resourceControls, portainer.StackResourceControl)
 
 		decoratedNetworkData = append(decoratedNetworkData, networkObject)
 	}
@@ -119,10 +119,10 @@ func filterNetworkList(networkData []interface{}, context *restrictedDockerOpera
 		}
 
 		networkID := networkObject[networkIdentifier].(string)
-		networkObject, access := applyResourceAccessControl(networkObject, networkID, context)
+		networkObject, access := applyResourceAccessControl(networkObject, networkID, context, portainer.NetworkResourceControl)
 		if !access {
 			networkLabels := extractNetworkLabelsFromNetworkListObject(networkObject)
-			networkObject, access = applyResourceAccessControlFromLabel(networkLabels, networkObject, networkLabelForStackIdentifier, context)
+			networkObject, access = applyResourceAccessControlFromLabel(networkLabels, networkObject, networkLabelForStackIdentifier, context, portainer.StackResourceControl)
 		}
 
 		if access {

@@ -51,13 +51,13 @@ func serviceInspectOperation(response *http.Response, executor *operationExecuto
 	}
 
 	serviceID := responseObject[serviceIdentifier].(string)
-	responseObject, access := applyResourceAccessControl(responseObject, serviceID, executor.operationContext)
+	responseObject, access := applyResourceAccessControl(responseObject, serviceID, executor.operationContext, portainer.ServiceResourceControl)
 	if access {
 		return rewriteResponse(response, responseObject, http.StatusOK)
 	}
 
 	serviceLabels := extractServiceLabelsFromServiceInspectObject(responseObject)
-	responseObject, access = applyResourceAccessControlFromLabel(serviceLabels, responseObject, serviceLabelForStackIdentifier, executor.operationContext)
+	responseObject, access = applyResourceAccessControlFromLabel(serviceLabels, responseObject, serviceLabelForStackIdentifier, executor.operationContext, portainer.StackResourceControl)
 	if access {
 		return rewriteResponse(response, responseObject, http.StatusOK)
 	}
@@ -101,10 +101,10 @@ func decorateServiceList(serviceData []interface{}, resourceControls []portainer
 		}
 
 		serviceID := serviceObject[serviceIdentifier].(string)
-		serviceObject = decorateResourceWithAccessControl(serviceObject, serviceID, resourceControls)
+		serviceObject = decorateResourceWithAccessControl(serviceObject, serviceID, resourceControls, portainer.ServiceResourceControl)
 
 		serviceLabels := extractServiceLabelsFromServiceListObject(serviceObject)
-		serviceObject = decorateResourceWithAccessControlFromLabel(serviceLabels, serviceObject, serviceLabelForStackIdentifier, resourceControls)
+		serviceObject = decorateResourceWithAccessControlFromLabel(serviceLabels, serviceObject, serviceLabelForStackIdentifier, resourceControls, portainer.StackResourceControl)
 
 		decoratedServiceData = append(decoratedServiceData, serviceObject)
 	}
@@ -127,10 +127,10 @@ func filterServiceList(serviceData []interface{}, context *restrictedDockerOpera
 		}
 
 		serviceID := serviceObject[serviceIdentifier].(string)
-		serviceObject, access := applyResourceAccessControl(serviceObject, serviceID, context)
+		serviceObject, access := applyResourceAccessControl(serviceObject, serviceID, context, portainer.ServiceResourceControl)
 		if !access {
 			serviceLabels := extractServiceLabelsFromServiceListObject(serviceObject)
-			serviceObject, access = applyResourceAccessControlFromLabel(serviceLabels, serviceObject, serviceLabelForStackIdentifier, context)
+			serviceObject, access = applyResourceAccessControlFromLabel(serviceLabels, serviceObject, serviceLabelForStackIdentifier, context, portainer.StackResourceControl)
 		}
 
 		if access {
