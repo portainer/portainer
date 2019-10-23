@@ -7,7 +7,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -40,7 +39,7 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
 
-	filteredStacks := proxy.FilterStacks(stacks, resourceControls, securityContext.IsAdmin,
+	filteredStacks := portainer.FilterStacks(stacks, resourceControls, securityContext.IsAdmin,
 		securityContext.UserID, securityContext.UserMemberships)
 
 	return response.JSON(w, filteredStacks)
