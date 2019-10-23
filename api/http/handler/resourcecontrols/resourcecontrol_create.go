@@ -69,7 +69,7 @@ func (handler *Handler) resourceControlCreate(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid type value. Value must be one of: container, service, volume, network, secret, stack or config", portainer.ErrInvalidResourceControlType}
 	}
 
-	rc, err := handler.ResourceControlService.ResourceControlByResourceID(payload.ResourceID)
+	rc, err := handler.ResourceControlService.ResourceControlByResourceIDAndType(payload.ResourceID, resourceControlType)
 	if err != nil && err != portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve resource controls from the database", err}
 	}

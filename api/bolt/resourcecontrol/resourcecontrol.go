@@ -42,9 +42,9 @@ func (service *Service) ResourceControl(ID portainer.ResourceControlID) (*portai
 	return &resourceControl, nil
 }
 
-// ResourceControlByResourceID returns a ResourceControl object by checking if the resourceID is equal
+// ResourceControlByResourceIDAndType returns a ResourceControl object by checking if the resourceID is equal
 // to the main ResourceID or in SubResourceIDs
-func (service *Service) ResourceControlByResourceID(resourceID string) (*portainer.ResourceControl, error) {
+func (service *Service) ResourceControlByResourceIDAndType(resourceID string, resourceType portainer.ResourceControlType) (*portainer.ResourceControl, error) {
 	var resourceControl *portainer.ResourceControl
 
 	err := service.db.View(func(tx *bolt.Tx) error {
@@ -58,7 +58,7 @@ func (service *Service) ResourceControlByResourceID(resourceID string) (*portain
 				return err
 			}
 
-			if rc.ResourceID == resourceID {
+			if rc.ResourceID == resourceID && rc.Type == resourceType {
 				resourceControl = &rc
 				break
 			}
