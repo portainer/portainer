@@ -77,6 +77,7 @@ func AuthorizedResourceControlUpdate(resourceControl *portainer.ResourceControl,
 // AuthorizedResourceControlCreation ensure that the user can create a resource control object.
 // A non-administrator user cannot create a resource control where:
 // * the Public flag is set false
+// * the AdministatorsOnly flag is set to true
 // * he wants to create a resource control without any user/team accesses
 // * he wants to add more than one user in the user accesses
 // * he wants to add a user in the user accesses that is not corresponding to its id
@@ -84,6 +85,10 @@ func AuthorizedResourceControlUpdate(resourceControl *portainer.ResourceControl,
 func AuthorizedResourceControlCreation(resourceControl *portainer.ResourceControl, context *RestrictedRequestContext) bool {
 	if context.IsAdmin || resourceControl.Public {
 		return true
+	}
+
+	if resourceControl.AdministratorsOnly {
+		return false
 	}
 
 	userAccessesCount := len(resourceControl.UserAccesses)
