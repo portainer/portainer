@@ -502,7 +502,7 @@ func (p *proxyTransport) interceptAndRewriteRequest(request *http.Request, opera
 // https://docs.docker.com/engine/api/v1.40/#operation/ServiceCreate
 // https://docs.docker.com/engine/api/v1.40/#operation/SecretCreate
 // https://docs.docker.com/engine/api/v1.40/#operation/ConfigCreate
-func (p *proxyTransport) decorateGenericResourceCreationResponse(response *http.Response, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) error {
+func (p *proxyTransport) decorateGenericResourceCreationResponse(response *http.Response, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType, userID portainer.UserID) error {
 	responseObject, err := getResponseAsJSONOBject(response)
 	if err != nil {
 		return err
@@ -515,7 +515,7 @@ func (p *proxyTransport) decorateGenericResourceCreationResponse(response *http.
 
 	resourceID := responseObject[resourceIdentifierAttribute].(string)
 
-	resourceControl, err := p.createResourceControlWithRandomToken(resourceID, resourceType)
+	resourceControl, err := p.createPrivateResourceControl(resourceID, resourceType, userID)
 	if err != nil {
 		return err
 	}
@@ -526,12 +526,17 @@ func (p *proxyTransport) decorateGenericResourceCreationResponse(response *http.
 }
 
 func (p *proxyTransport) decorateGenericResourceCreationOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
+	tokenData, err := security.RetrieveTokenData(request)
+	if err != nil {
+		return nil, err
+	}
+
 	response, err := p.executeDockerRequest(request)
 	if err != nil {
 		return response, err
 	}
 
-	err = p.decorateGenericResourceCreationResponse(response, resourceIdentifierAttribute, resourceType)
+	err = p.decorateGenericResourceCreationResponse(response, resourceIdentifierAttribute, resourceType, tokenData.ID)
 	return response, err
 }
 

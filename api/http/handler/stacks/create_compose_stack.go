@@ -31,7 +31,7 @@ func (payload *composeStackFromFileContentPayload) Validate(r *http.Request) err
 	return nil
 }
 
-func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint) *httperror.HandlerError {
+func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	var payload composeStackFromFileContentPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
@@ -85,7 +85,7 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 	}
 
 	doCleanUp = false
-	return handler.decorateStackResponse(w, stack)
+	return handler.decorateStackResponse(w, stack, userID)
 }
 
 type composeStackFromGitRepositoryPayload struct {
@@ -115,7 +115,7 @@ func (payload *composeStackFromGitRepositoryPayload) Validate(r *http.Request) e
 	return nil
 }
 
-func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint) *httperror.HandlerError {
+func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	var payload composeStackFromGitRepositoryPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
@@ -179,7 +179,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 	}
 
 	doCleanUp = false
-	return handler.decorateStackResponse(w, stack)
+	return handler.decorateStackResponse(w, stack, userID)
 }
 
 type composeStackFromFileUploadPayload struct {
@@ -210,7 +210,7 @@ func (payload *composeStackFromFileUploadPayload) Validate(r *http.Request) erro
 	return nil
 }
 
-func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint) *httperror.HandlerError {
+func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	payload := &composeStackFromFileUploadPayload{}
 	err := payload.Validate(r)
 	if err != nil {
@@ -264,7 +264,7 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 	}
 
 	doCleanUp = false
-	return handler.decorateStackResponse(w, stack)
+	return handler.decorateStackResponse(w, stack, userID)
 }
 
 type composeStackDeploymentConfig struct {

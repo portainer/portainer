@@ -11,7 +11,6 @@ import (
 )
 
 type resourceControlUpdatePayload struct {
-	Token  string
 	Public bool
 	Users  []int
 	Teams  []int
@@ -49,7 +48,7 @@ func (handler *Handler) resourceControlUpdate(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
 
-	if (resourceControl.ResourceToken != payload.Token) && !security.AuthorizedResourceControlAccess(resourceControl, securityContext) {
+	if !security.AuthorizedResourceControlAccess(resourceControl, securityContext) {
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update the resource control", portainer.ErrResourceAccessDenied}
 	}
 
@@ -75,7 +74,7 @@ func (handler *Handler) resourceControlUpdate(w http.ResponseWriter, r *http.Req
 	}
 	resourceControl.TeamAccesses = teamAccesses
 
-	if (resourceControl.ResourceToken != payload.Token) && !security.AuthorizedResourceControlUpdate(resourceControl, securityContext) {
+	if !security.AuthorizedResourceControlUpdate(resourceControl, securityContext) {
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update the resource control", portainer.ErrResourceAccessDenied}
 	}
 

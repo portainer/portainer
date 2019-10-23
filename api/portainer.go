@@ -447,7 +447,6 @@ type (
 		TeamAccesses       []TeamResourceAccess `json:"TeamAccesses"`
 		Public             bool                 `json:"Public"`
 		AdministratorsOnly bool                 `json:"AdministratorsOnly"`
-		ResourceToken      string               `json:"ResourceToken"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 2

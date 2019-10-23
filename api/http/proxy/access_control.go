@@ -14,8 +14,8 @@ type (
 	}
 )
 
-func (p *proxyTransport) createResourceControlWithRandomToken(resourceIdentifier string, resourceType portainer.ResourceControlType) (*portainer.ResourceControl, error) {
-	resourceControl, err := portainer.CreateResourceControlWithRandomToken(resourceIdentifier, resourceType)
+func (p *proxyTransport) createPrivateResourceControl(resourceIdentifier string, resourceType portainer.ResourceControlType, userID portainer.UserID) (*portainer.ResourceControl, error) {
+	resourceControl, err := portainer.NewPrivateResourceControl(resourceIdentifier, resourceType, userID)
 	if err != nil {
 		log.Printf("[ERROR] [http,proxy,docker,transport] [message: unable to generate resource control] [err: %s]", err)
 		return nil, err
