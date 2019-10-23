@@ -2,7 +2,7 @@ package portainer
 
 func NewPrivateResourceControl(resourceIdentifier string, resourceType ResourceControlType, userID UserID) (*ResourceControl, error) {
 	resourceControl := &ResourceControl{
-		AdministratorsOnly: true,
+		AdministratorsOnly: false,
 		Type:               resourceType,
 		ResourceID:         resourceIdentifier,
 		SubResourceIDs:     []string{},
