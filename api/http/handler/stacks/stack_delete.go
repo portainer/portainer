@@ -64,7 +64,7 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 	}
 
 	resourceControl, err := handler.ResourceControlService.ResourceControlByResourceIDAndType(stack.Name, portainer.StackResourceControl)
-	if err != nil && err != portainer.ErrObjectNotFound {
+	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a resource control associated to the stack", err}
 	}
 

@@ -43,7 +43,8 @@ func (service *Service) ResourceControl(ID portainer.ResourceControlID) (*portai
 }
 
 // ResourceControlByResourceIDAndType returns a ResourceControl object by checking if the resourceID is equal
-// to the main ResourceID or in SubResourceIDs
+// to the main ResourceID or in SubResourceIDs. It also performs a check on the resource type. Return nil
+// if no ResourceControl was found.
 func (service *Service) ResourceControlByResourceIDAndType(resourceID string, resourceType portainer.ResourceControlType) (*portainer.ResourceControl, error) {
 	var resourceControl *portainer.ResourceControl
 
@@ -69,10 +70,6 @@ func (service *Service) ResourceControlByResourceIDAndType(resourceID string, re
 					break
 				}
 			}
-		}
-
-		if resourceControl == nil {
-			return portainer.ErrObjectNotFound
 		}
 
 		return nil

@@ -149,10 +149,14 @@ func (p *proxyTransport) proxyConfigRequest(request *http.Request) (*http.Respon
 
 	default:
 		// assume /configs/{id}
+		configID := path.Base(requestPath)
+
 		if request.Method == http.MethodGet {
 			return p.rewriteOperation(request, configInspectOperation)
+		} else if request.Method == http.MethodDelete {
+			return p.executeGenericResourceDeletionOperation(request, configID, portainer.ConfigResourceControl)
 		}
-		configID := path.Base(requestPath)
+
 		return p.restrictedOperation(request, configID, portainer.ConfigResourceControl)
 	}
 }
@@ -182,6 +186,11 @@ func (p *proxyTransport) proxyContainerRequest(request *http.Request) (*http.Res
 		} else if match, _ := path.Match("/containers/*", requestPath); match {
 			// Handle /containers/{id} requests
 			containerID := path.Base(requestPath)
+
+			if request.Method == http.MethodDelete {
+				return p.executeGenericResourceDeletionOperation(request, containerID, portainer.ConfigResourceControl)
+			}
+
 			return p.restrictedOperation(request, containerID, portainer.ContainerResourceControl)
 		}
 		return p.executeDockerRequest(request)
@@ -208,6 +217,8 @@ func (p *proxyTransport) proxyServiceRequest(request *http.Request) (*http.Respo
 
 			if request.Method == http.MethodGet {
 				return p.rewriteOperation(request, serviceInspectOperation)
+			} else if request.Method == http.MethodDelete {
+				return p.executeGenericResourceDeletionOperation(request, serviceID, portainer.ServiceResourceControl)
 			}
 			return p.restrictedOperation(request, serviceID, portainer.ServiceResourceControl)
 		}
@@ -228,10 +239,13 @@ func (p *proxyTransport) proxyVolumeRequest(request *http.Request) (*http.Respon
 
 	default:
 		// assume /volumes/{name}
+		volumeID := path.Base(requestPath)
+
 		if request.Method == http.MethodGet {
 			return p.rewriteOperation(request, volumeInspectOperation)
+		} else if request.Method == http.MethodDelete {
+			return p.executeGenericResourceDeletionOperation(request, volumeID, portainer.VolumeResourceControl)
 		}
-		volumeID := path.Base(requestPath)
 		return p.restrictedOperation(request, volumeID, portainer.VolumeResourceControl)
 	}
 }
@@ -246,10 +260,13 @@ func (p *proxyTransport) proxyNetworkRequest(request *http.Request) (*http.Respo
 
 	default:
 		// assume /networks/{id}
+		networkID := path.Base(requestPath)
+
 		if request.Method == http.MethodGet {
 			return p.rewriteOperation(request, networkInspectOperation)
+		} else if request.Method == http.MethodDelete {
+			return p.executeGenericResourceDeletionOperation(request, networkID, portainer.NetworkResourceControl)
 		}
-		networkID := path.Base(requestPath)
 		return p.restrictedOperation(request, networkID, portainer.NetworkResourceControl)
 	}
 }
@@ -264,10 +281,13 @@ func (p *proxyTransport) proxySecretRequest(request *http.Request) (*http.Respon
 
 	default:
 		// assume /secrets/{id}
+		secretID := path.Base(requestPath)
+
 		if request.Method == http.MethodGet {
 			return p.rewriteOperation(request, secretInspectOperation)
+		} else if request.Method == http.MethodDelete {
+			return p.executeGenericResourceDeletionOperation(request, secretID, portainer.SecretResourceControl)
 		}
-		secretID := path.Base(requestPath)
 		return p.restrictedOperation(request, secretID, portainer.SecretResourceControl)
 	}
 }
@@ -537,6 +557,27 @@ func (p *proxyTransport) decorateGenericResourceCreationOperation(request *http.
 	}
 
 	err = p.decorateGenericResourceCreationResponse(response, resourceIdentifierAttribute, resourceType, tokenData.ID)
+	return response, err
+}
+
+func (p *proxyTransport) executeGenericResourceDeletionOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
+	response, err := p.restrictedOperation(request, resourceIdentifierAttribute, resourceType)
+	if err != nil {
+		return response, err
+	}
+
+	resourceControl, err := p.ResourceControlService.ResourceControlByResourceIDAndType(resourceIdentifierAttribute, resourceType)
+	if err != nil {
+		return response, err
+	}
+
+	if resourceControl != nil {
+		err = p.ResourceControlService.DeleteResourceControl(resourceControl.ID)
+		if err != nil {
+			return response, err
+		}
+	}
+
 	return response, err
 }
 
