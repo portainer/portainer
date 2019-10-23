@@ -132,6 +132,7 @@ func decorateContainerList(containerData []interface{}, resourceControls []porta
 	return decoratedContainerData, nil
 }
 
+// TODO: must be reviewed
 // filterContainerList loops through all containers and filters public containers (no associated resource control)
 // as well as authorized containers (access granted to the user based on existing resource control).
 // Authorized containers are decorated during the process.

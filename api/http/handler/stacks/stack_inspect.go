@@ -36,28 +36,44 @@ func (handler *Handler) stackInspect(w http.ResponseWriter, r *http.Request) *ht
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
 	}
 
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user info from request context", err}
+	}
+
 	resourceControl, err := handler.ResourceControlService.ResourceControlByResourceIDAndType(stack.Name, portainer.StackResourceControl)
 	if err != nil && err != portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a resource control associated to the stack", err}
 	}
 
-	securityContext, err := security.RetrieveRestrictedRequestContext(r)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
+	userTeamIDs := make([]portainer.TeamID, 0)
+	for _, membership := range securityContext.UserMemberships {
+		userTeamIDs = append(userTeamIDs, membership.TeamID)
 	}
 
-	extendedStack := portainer.DecoratedStack{*stack, portainer.ResourceControl{}}
-	if !securityContext.IsAdmin && resourceControl == nil {
+	if (resourceControl == nil && !securityContext.IsAdmin) || !portainer.UserCanAccessResource(securityContext.UserID, userTeamIDs, resourceControl) {
 		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
 	}
 
-	if resourceControl != nil {
-		if securityContext.IsAdmin || portainer.CanAccessStack(stack, resourceControl, securityContext.UserID, securityContext.UserMemberships) {
-			extendedStack.ResourceControl = *resourceControl
-		} else {
-			return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
-		}
+	decoratedStack := portainer.DecoratedStack{
+		Stack: *stack,
 	}
 
-	return response.JSON(w, extendedStack)
+	if resourceControl != nil {
+		decoratedStack.ResourceControl = *resourceControl
+	}
+
+	//extendedStack := portainer.DecoratedStack{*stack, portainer.ResourceControl{}}
+	//if !securityContext.IsAdmin && resourceControl == nil {
+	//}
+	//
+	//if resourceControl != nil {
+	//	if securityContext.IsAdmin || portainer.CanAccessStack(stack, resourceControl, securityContext.UserID, securityContext.UserMemberships) {
+	//		extendedStack.ResourceControl = *resourceControl
+	//	} else {
+	//		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
+	//	}
+	//}
+
+	return response.JSON(w, decoratedStack)
 }

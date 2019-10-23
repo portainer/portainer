@@ -65,10 +65,13 @@ func (handler *Handler) stackMigrate(w http.ResponseWriter, r *http.Request) *ht
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
 
-	if !securityContext.IsAdmin {
-		if !portainer.CanAccessStack(stack, resourceControl, securityContext.UserID, securityContext.UserMemberships) {
-			return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
-		}
+	userTeamIDs := make([]portainer.TeamID, 0)
+	for _, membership := range securityContext.UserMemberships {
+		userTeamIDs = append(userTeamIDs, membership.TeamID)
+	}
+
+	if (resourceControl == nil && !securityContext.IsAdmin) || !portainer.UserCanAccessResource(securityContext.UserID, userTeamIDs, resourceControl) {
+		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
 	}
 
 	// TODO: this is a work-around for stacks created with Portainer version >= 1.17.1

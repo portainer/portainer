@@ -382,7 +382,7 @@ func (p *proxyTransport) restrictedOperation(request *http.Request, resourceID s
 		}
 
 		resourceControl := portainer.GetResourceControlByResourceIDAndType(resourceID, resourceType, resourceControls)
-		if resourceControl == nil || !portainer.CanUserAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
+		if resourceControl == nil || !portainer.UserCanAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
 			return writeAccessDeniedResponse()
 		}
 	}
@@ -438,7 +438,7 @@ func (p *proxyTransport) restrictedVolumeBrowserOperation(request *http.Request,
 		}
 
 		resourceControl := portainer.GetResourceControlByResourceIDAndType(resourceID, portainer.VolumeResourceControl, resourceControls)
-		if !endpointResourceAccess && (resourceControl == nil || !portainer.CanUserAccessResource(tokenData.ID, userTeamIDs, resourceControl)) {
+		if !endpointResourceAccess && (resourceControl == nil || !portainer.UserCanAccessResource(tokenData.ID, userTeamIDs, resourceControl)) {
 			return writeAccessDeniedResponse()
 		}
 	}

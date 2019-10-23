@@ -29,25 +29,28 @@ func NewPrivateResourceControl(resourceIdentifier string, resourceType ResourceC
 	return resourceControl, nil
 }
 
-// CanAccessStack checks if a user can access a stack
-func CanAccessStack(stack *Stack, resourceControl *ResourceControl, userID UserID, memberships []TeamMembership) bool {
-	if resourceControl == nil {
-		return false
+func DecorateStacks(stacks []Stack, resourceControls []ResourceControl) []DecoratedStack {
+	decoratedStacks := make([]DecoratedStack, 0)
+
+	for _, stack := range stacks {
+		decoratedStack := DecoratedStack{
+			Stack: stack,
+		}
+
+		resourceControl := GetResourceControlByResourceIDAndType(stack.Name, StackResourceControl, resourceControls)
+		if resourceControl != nil {
+			decoratedStack.ResourceControl = *resourceControl
+		}
+
+		decoratedStacks = append(decoratedStacks, decoratedStack)
 	}
 
-	userTeamIDs := make([]TeamID, 0)
-	for _, membership := range memberships {
-		userTeamIDs = append(userTeamIDs, membership.TeamID)
-	}
-
-	if CanUserAccessResource(userID, userTeamIDs, resourceControl) {
-		return true
-	}
-
-	return resourceControl.Public
+	return decoratedStacks
 }
 
-func CanUserAccessResource(userID UserID, userTeamIDs []TeamID, resourceControl *ResourceControl) bool {
+// UserCanAccessResource will valide that a user has permissions defined in the specified resource control
+// based on its identifier and the team(s) he is part of.
+func UserCanAccessResource(userID UserID, userTeamIDs []TeamID, resourceControl *ResourceControl) bool {
 	for _, authorizedUserAccess := range resourceControl.UserAccesses {
 		if userID == authorizedUserAccess.UserID {
 			return true
@@ -65,31 +68,23 @@ func CanUserAccessResource(userID UserID, userTeamIDs []TeamID, resourceControl 
 	return resourceControl.Public
 }
 
-// FilterStacks filters stacks based on user role and resource controls.
-func FilterStacks(stacks []Stack, resourceControls []ResourceControl, isAdmin bool,
-	userID UserID, memberships []TeamMembership) []DecoratedStack {
-
-	filteredStacks := make([]DecoratedStack, 0)
-
-	userTeamIDs := make([]TeamID, 0)
-	for _, membership := range memberships {
-		userTeamIDs = append(userTeamIDs, membership.TeamID)
-	}
+// FilterAuthorizedStacks returns a list of decorated stacks filtered through resource control access checks.
+func FilterAuthorizedStacks(stacks []DecoratedStack, userID UserID, userTeamIDs []TeamID) []DecoratedStack {
+	authorizedStacks := make([]DecoratedStack, 0)
 
 	for _, stack := range stacks {
-		extendedStack := DecoratedStack{stack, ResourceControl{}}
-		resourceControl := GetResourceControlByResourceIDAndType(stack.Name, StackResourceControl, resourceControls)
-		if resourceControl == nil && isAdmin {
-			filteredStacks = append(filteredStacks, extendedStack)
-		} else if resourceControl != nil && (isAdmin || resourceControl.Public || CanUserAccessResource(userID, userTeamIDs, resourceControl)) {
-			extendedStack.ResourceControl = *resourceControl
-			filteredStacks = append(filteredStacks, extendedStack)
+
+		if UserCanAccessResource(userID, userTeamIDs, &stack.ResourceControl) {
+			authorizedStacks = append(authorizedStacks, stack)
 		}
+
 	}
 
-	return filteredStacks
+	return authorizedStacks
 }
 
+// GetResourceControlByResourceIDAndType retrieves the first matching resource control in a set of resource controls
+// based on the specified id and resource type parameters.
 func GetResourceControlByResourceIDAndType(resourceID string, resourceType ResourceControlType, resourceControls []ResourceControl) *ResourceControl {
 	for _, resourceControl := range resourceControls {
 		if resourceID == resourceControl.ResourceID && resourceType == resourceControl.Type {

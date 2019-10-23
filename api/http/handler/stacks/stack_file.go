@@ -51,17 +51,13 @@ func (handler *Handler) stackFile(w http.ResponseWriter, r *http.Request) *httpe
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
 
-	extendedStack := portainer.DecoratedStack{*stack, portainer.ResourceControl{}}
-	if !securityContext.IsAdmin && resourceControl == nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
+	userTeamIDs := make([]portainer.TeamID, 0)
+	for _, membership := range securityContext.UserMemberships {
+		userTeamIDs = append(userTeamIDs, membership.TeamID)
 	}
 
-	if resourceControl != nil {
-		if securityContext.IsAdmin || portainer.CanAccessStack(stack, resourceControl, securityContext.UserID, securityContext.UserMemberships) {
-			extendedStack.ResourceControl = *resourceControl
-		} else {
-			return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
-		}
+	if (resourceControl == nil && !securityContext.IsAdmin) || !portainer.UserCanAccessResource(securityContext.UserID, userTeamIDs, resourceControl) {
+		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
 	}
 
 	stackFileContent, err := handler.FileService.GetFileContent(path.Join(stack.ProjectPath, stack.EntryPoint))

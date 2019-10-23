@@ -39,10 +39,18 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
 
-	filteredStacks := portainer.FilterStacks(stacks, resourceControls, securityContext.IsAdmin,
-		securityContext.UserID, securityContext.UserMemberships)
+	decoratedStacks := portainer.DecorateStacks(stacks, resourceControls)
 
-	return response.JSON(w, filteredStacks)
+	if !securityContext.IsAdmin {
+		userTeamIDs := make([]portainer.TeamID, 0)
+		for _, membership := range securityContext.UserMemberships {
+			userTeamIDs = append(userTeamIDs, membership.TeamID)
+		}
+
+		decoratedStacks = portainer.FilterAuthorizedStacks(decoratedStacks, securityContext.UserID, userTeamIDs)
+	}
+
+	return response.JSON(w, decoratedStacks)
 }
 
 func filterStacks(stacks []portainer.Stack, filters *stackListOperationFilters) []portainer.Stack {
