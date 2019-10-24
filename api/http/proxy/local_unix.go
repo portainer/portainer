@@ -1,17 +1,19 @@
-// +build !windows
+// +build aix darwin dragonfly freebsd linux netbsd openbsd solaris
 
 package proxy
 
 import (
 	"net/http"
 
+	"github.com/portainer/portainer/api/http/proxy/provider/docker"
+
 	portainer "github.com/portainer/portainer/api"
 )
 
-func (factory *proxyFactory) newLocalProxy(path string, endpoint *portainer.Endpoint) http.Handler {
+func (factory proxyFactory) newLocalProxy(path string, endpoint *portainer.Endpoint) http.Handler {
 	proxy := &localProxy{}
-	transport := &proxyTransport{
-		enableSignature:        false,
+	transport := &docker.ProxyTransport{
+		EnableSignature:        false,
 		ResourceControlService: factory.ResourceControlService,
 		UserService:            factory.UserService,
 		TeamMembershipService:  factory.TeamMembershipService,
@@ -19,10 +21,10 @@ func (factory *proxyFactory) newLocalProxy(path string, endpoint *portainer.Endp
 		RegistryService:        factory.RegistryService,
 		DockerHubService:       factory.DockerHubService,
 		ExtensionService:       factory.ExtensionService,
-		dockerTransport:        newSocketTransport(path),
+		HTTPTransport:          newSocketTransport(path),
 		ReverseTunnelService:   factory.ReverseTunnelService,
-		endpointIdentifier:     endpoint.ID,
-		endpointType:           endpoint.Type,
+		EndpointIdentifier:     endpoint.ID,
+		EndpointType:           endpoint.Type,
 	}
 	proxy.Transport = transport
 	return proxy

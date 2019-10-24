@@ -5,11 +5,13 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/portainer/portainer/api/http/proxy/provider/docker"
+
 	httperror "github.com/portainer/libhttp/error"
 )
 
 type localProxy struct {
-	Transport *proxyTransport
+	Transport *docker.ProxyTransport
 }
 
 func (proxy *localProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -18,7 +20,7 @@ func (proxy *localProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	r.URL.Scheme = "http"
 	r.URL.Host = "unixsocket"
 
-	res, err := proxy.Transport.proxyDockerRequest(r)
+	res, err := proxy.Transport.ProxyDockerRequest(r)
 	if err != nil {
 		code := http.StatusInternalServerError
 		if res != nil && res.StatusCode != 0 {

@@ -1,9 +1,10 @@
-package proxy
+package docker
 
 import (
 	"net/http"
 
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/proxy/misc"
 )
 
 const (
@@ -18,7 +19,7 @@ func volumeListOperation(response *http.Response, executor *operationExecutor) e
 	var err error
 	// VolumeList response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/VolumeList
-	responseObject, err := getResponseAsJSONOBject(response)
+	responseObject, err := misc.GetResponseAsJSONOBject(response)
 	if err != nil {
 		return err
 	}
@@ -41,7 +42,7 @@ func volumeListOperation(response *http.Response, executor *operationExecutor) e
 		responseObject["Volumes"] = volumeData
 	}
 
-	return rewriteResponse(response, responseObject, http.StatusOK)
+	return misc.RewriteResponse(response, responseObject, http.StatusOK)
 }
 
 // volumeInspectOperation extracts the response as a JSON object, verify that the user
@@ -50,7 +51,7 @@ func volumeListOperation(response *http.Response, executor *operationExecutor) e
 func volumeInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// VolumeInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/VolumeInspect
-	responseObject, err := getResponseAsJSONOBject(response)
+	responseObject, err := misc.GetResponseAsJSONOBject(response)
 	if err != nil {
 		return err
 	}
@@ -62,30 +63,30 @@ func volumeInspectOperation(response *http.Response, executor *operationExecutor
 	volumeID := responseObject[volumeIdentifier].(string)
 	responseObject, access := applyResourceAccessControl(responseObject, volumeID, executor.operationContext, portainer.VolumeResourceControl)
 	if access {
-		return rewriteResponse(response, responseObject, http.StatusOK)
+		return misc.RewriteResponse(response, responseObject, http.StatusOK)
 	}
 
 	volumeLabels := extractVolumeLabelsFromVolumeInspectObject(responseObject)
 	responseObject, access = applyResourceAccessControlFromLabel(volumeLabels, responseObject, volumeLabelForStackIdentifier, executor.operationContext, portainer.StackResourceControl)
 	if access {
-		return rewriteResponse(response, responseObject, http.StatusOK)
+		return misc.RewriteResponse(response, responseObject, http.StatusOK)
 	}
 
-	return rewriteAccessDeniedResponse(response)
+	return misc.RewriteAccessDeniedResponse(response)
 }
 
 // extractVolumeLabelsFromVolumeInspectObject retrieve the Labels of the volume if present.
 // Volume schema reference: https://docs.docker.com/engine/api/v1.28/#operation/VolumeInspect
 func extractVolumeLabelsFromVolumeInspectObject(responseObject map[string]interface{}) map[string]interface{} {
 	// Labels are stored under Labels
-	return extractJSONField(responseObject, "Labels")
+	return misc.ExtractJSONField(responseObject, "Labels")
 }
 
 // extractVolumeLabelsFromVolumeListObject retrieve the Labels of the volume if present.
 // Volume schema reference: https://docs.docker.com/engine/api/v1.28/#operation/VolumeList
 func extractVolumeLabelsFromVolumeListObject(responseObject map[string]interface{}) map[string]interface{} {
 	// Labels are stored under Labels
-	return extractJSONField(responseObject, "Labels")
+	return misc.ExtractJSONField(responseObject, "Labels")
 }
 
 // decorateVolumeList loops through all volumes and decorates any volume with an existing resource control.

@@ -1,4 +1,4 @@
-package proxy
+package docker
 
 import (
 	"bytes"

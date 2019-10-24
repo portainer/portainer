@@ -1,9 +1,10 @@
-package proxy
+package docker
 
 import (
 	"net/http"
 
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/proxy/misc"
 )
 
 const (
@@ -18,7 +19,7 @@ func serviceListOperation(response *http.Response, executor *operationExecutor) 
 	var err error
 	// ServiceList response is a JSON array
 	// https://docs.docker.com/engine/api/v1.28/#operation/ServiceList
-	responseArray, err := getResponseAsJSONArray(response)
+	responseArray, err := misc.GetResponseAsJSONArray(response)
 	if err != nil {
 		return err
 	}
@@ -32,7 +33,7 @@ func serviceListOperation(response *http.Response, executor *operationExecutor) 
 		return err
 	}
 
-	return rewriteResponse(response, responseArray, http.StatusOK)
+	return misc.RewriteResponse(response, responseArray, http.StatusOK)
 }
 
 // serviceInspectOperation extracts the response as a JSON object, verify that the user
@@ -41,7 +42,7 @@ func serviceListOperation(response *http.Response, executor *operationExecutor) 
 func serviceInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// ServiceInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/ServiceInspect
-	responseObject, err := getResponseAsJSONOBject(response)
+	responseObject, err := misc.GetResponseAsJSONOBject(response)
 	if err != nil {
 		return err
 	}
@@ -53,25 +54,25 @@ func serviceInspectOperation(response *http.Response, executor *operationExecuto
 	serviceID := responseObject[serviceIdentifier].(string)
 	responseObject, access := applyResourceAccessControl(responseObject, serviceID, executor.operationContext, portainer.ServiceResourceControl)
 	if access {
-		return rewriteResponse(response, responseObject, http.StatusOK)
+		return misc.RewriteResponse(response, responseObject, http.StatusOK)
 	}
 
 	serviceLabels := extractServiceLabelsFromServiceInspectObject(responseObject)
 	responseObject, access = applyResourceAccessControlFromLabel(serviceLabels, responseObject, serviceLabelForStackIdentifier, executor.operationContext, portainer.StackResourceControl)
 	if access {
-		return rewriteResponse(response, responseObject, http.StatusOK)
+		return misc.RewriteResponse(response, responseObject, http.StatusOK)
 	}
 
-	return rewriteAccessDeniedResponse(response)
+	return misc.RewriteAccessDeniedResponse(response)
 }
 
 // extractServiceLabelsFromServiceInspectObject retrieve the Labels of the service if present.
 // Service schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ServiceInspect
 func extractServiceLabelsFromServiceInspectObject(responseObject map[string]interface{}) map[string]interface{} {
 	// Labels are stored under Spec.Labels
-	serviceSpecObject := extractJSONField(responseObject, "Spec")
+	serviceSpecObject := misc.ExtractJSONField(responseObject, "Spec")
 	if serviceSpecObject != nil {
-		return extractJSONField(serviceSpecObject, "Labels")
+		return misc.ExtractJSONField(serviceSpecObject, "Labels")
 	}
 	return nil
 }
@@ -80,9 +81,9 @@ func extractServiceLabelsFromServiceInspectObject(responseObject map[string]inte
 // Service schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ServiceList
 func extractServiceLabelsFromServiceListObject(responseObject map[string]interface{}) map[string]interface{} {
 	// Labels are stored under Spec.Labels
-	serviceSpecObject := extractJSONField(responseObject, "Spec")
+	serviceSpecObject := misc.ExtractJSONField(responseObject, "Spec")
 	if serviceSpecObject != nil {
-		return extractJSONField(serviceSpecObject, "Labels")
+		return misc.ExtractJSONField(serviceSpecObject, "Labels")
 	}
 	return nil
 }

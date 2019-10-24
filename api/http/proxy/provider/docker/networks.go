@@ -1,9 +1,10 @@
-package proxy
+package docker
 
 import (
 	"net/http"
 
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/proxy/misc"
 )
 
 const (
@@ -18,7 +19,7 @@ func networkListOperation(response *http.Response, executor *operationExecutor) 
 	var err error
 	// NetworkList response is a JSON array
 	// https://docs.docker.com/engine/api/v1.28/#operation/NetworkList
-	responseArray, err := getResponseAsJSONArray(response)
+	responseArray, err := misc.GetResponseAsJSONArray(response)
 	if err != nil {
 		return err
 	}
@@ -32,7 +33,7 @@ func networkListOperation(response *http.Response, executor *operationExecutor) 
 		return err
 	}
 
-	return rewriteResponse(response, responseArray, http.StatusOK)
+	return misc.RewriteResponse(response, responseArray, http.StatusOK)
 }
 
 // networkInspectOperation extracts the response as a JSON object, verify that the user
@@ -41,7 +42,7 @@ func networkListOperation(response *http.Response, executor *operationExecutor) 
 func networkInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// NetworkInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/NetworkInspect
-	responseObject, err := getResponseAsJSONOBject(response)
+	responseObject, err := misc.GetResponseAsJSONOBject(response)
 	if err != nil {
 		return err
 	}
@@ -53,30 +54,30 @@ func networkInspectOperation(response *http.Response, executor *operationExecuto
 	networkID := responseObject[networkIdentifier].(string)
 	responseObject, access := applyResourceAccessControl(responseObject, networkID, executor.operationContext, portainer.NetworkResourceControl)
 	if access {
-		return rewriteResponse(response, responseObject, http.StatusOK)
+		return misc.RewriteResponse(response, responseObject, http.StatusOK)
 	}
 
 	networkLabels := extractNetworkLabelsFromNetworkInspectObject(responseObject)
 	responseObject, access = applyResourceAccessControlFromLabel(networkLabels, responseObject, networkLabelForStackIdentifier, executor.operationContext, portainer.StackResourceControl)
 	if access {
-		return rewriteResponse(response, responseObject, http.StatusOK)
+		return misc.RewriteResponse(response, responseObject, http.StatusOK)
 	}
 
-	return rewriteAccessDeniedResponse(response)
+	return misc.RewriteAccessDeniedResponse(response)
 }
 
 // extractNetworkLabelsFromNetworkInspectObject retrieve the Labels of the network if present.
 // Container schema reference: https://docs.docker.com/engine/api/v1.28/#operation/NetworkInspect
 func extractNetworkLabelsFromNetworkInspectObject(responseObject map[string]interface{}) map[string]interface{} {
 	// Labels are stored under Labels
-	return extractJSONField(responseObject, "Labels")
+	return misc.ExtractJSONField(responseObject, "Labels")
 }
 
 // extractNetworkLabelsFromNetworkListObject retrieve the Labels of the network if present.
 // Network schema reference: https://docs.docker.com/engine/api/v1.28/#operation/NetworkList
 func extractNetworkLabelsFromNetworkListObject(responseObject map[string]interface{}) map[string]interface{} {
 	// Labels are stored under Labels
-	return extractJSONField(responseObject, "Labels")
+	return misc.ExtractJSONField(responseObject, "Labels")
 }
 
 // decorateNetworkList loops through all networks and decorates any network with an existing resource control.

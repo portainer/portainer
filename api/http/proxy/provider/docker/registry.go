@@ -1,18 +1,33 @@
-package proxy
+package docker
 
 import (
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 )
 
-func createRegistryAuthenticationHeader(serverAddress string, accessContext *registryAccessContext) *registryAuthenticationHeader {
+type (
+	registryAccessContext struct {
+		isAdmin         bool
+		userID          portainer.UserID
+		teamMemberships []portainer.TeamMembership
+		registries      []portainer.Registry
+		dockerHub       *portainer.DockerHub
+	}
+	registryAuthenticationHeader struct {
+		Username      string `json:"username"`
+		Password      string `json:"password"`
+		Serveraddress string `json:"serveraddress"`
+	}
+)
+
+func CreateRegistryAuthenticationHeader(serverAddress string, accessContext *registryAccessContext) *registryAuthenticationHeader {
 	var authenticationHeader *registryAuthenticationHeader
 
 	if serverAddress == "" {
 		authenticationHeader = &registryAuthenticationHeader{
 			Username:      accessContext.dockerHub.Username,
 			Password:      accessContext.dockerHub.Password,
-			Serveraddress: "docker.io",
+			Serveraddress: "io",
 		}
 	} else {
 		var matchingRegistry *portainer.Registry

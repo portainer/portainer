@@ -6,12 +6,15 @@ import (
 	"net/http/httputil"
 	"net/url"
 
+	"github.com/portainer/portainer/api/http/proxy/provider/docker"
+
+	"github.com/portainer/portainer/api/http/proxy/provider/azure"
+
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
 )
 
-// AzureAPIBaseURL is the URL where Azure API requests will be proxied.
-const AzureAPIBaseURL = "https://management.azure.com"
+const azureAPIBaseURL = "https://management.azure.com"
 
 // proxyFactory is a factory to create reverse proxies to Docker endpoints
 type proxyFactory struct {
@@ -32,13 +35,13 @@ func (factory *proxyFactory) newHTTPProxy(u *url.URL) http.Handler {
 }
 
 func newAzureProxy(credentials *portainer.AzureCredentials) (http.Handler, error) {
-	remoteURL, err := url.Parse(AzureAPIBaseURL)
+	remoteURL, err := url.Parse(azureAPIBaseURL)
 	if err != nil {
 		return nil, err
 	}
 
 	proxy := newSingleHostReverseProxyWithHostHeader(remoteURL)
-	proxy.Transport = NewAzureTransport(credentials)
+	proxy.Transport = azure.NewTransport(credentials)
 
 	return proxy, nil
 }
@@ -52,7 +55,7 @@ func (factory *proxyFactory) newDockerHTTPSProxy(u *url.URL, tlsConfig *portaine
 		return nil, err
 	}
 
-	proxy.Transport.(*proxyTransport).dockerTransport.TLSClientConfig = config
+	proxy.Transport.(*docker.ProxyTransport).HTTPTransport.TLSClientConfig = config
 	return proxy, nil
 }
 
@@ -69,8 +72,8 @@ func (factory *proxyFactory) createDockerReverseProxy(u *url.URL, endpoint *port
 		enableSignature = true
 	}
 
-	transport := &proxyTransport{
-		enableSignature:        enableSignature,
+	transport := &docker.ProxyTransport{
+		EnableSignature:        enableSignature,
 		ResourceControlService: factory.ResourceControlService,
 		UserService:            factory.UserService,
 		TeamMembershipService:  factory.TeamMembershipService,
@@ -79,9 +82,9 @@ func (factory *proxyFactory) createDockerReverseProxy(u *url.URL, endpoint *port
 		DockerHubService:       factory.DockerHubService,
 		ReverseTunnelService:   factory.ReverseTunnelService,
 		ExtensionService:       factory.ExtensionService,
-		dockerTransport:        &http.Transport{},
-		endpointIdentifier:     endpoint.ID,
-		endpointType:           endpoint.Type,
+		HTTPTransport:          &http.Transport{},
+		EndpointIdentifier:     endpoint.ID,
+		EndpointType:           endpoint.Type,
 	}
 
 	if enableSignature {

@@ -1,9 +1,10 @@
-package proxy
+package docker
 
 import (
 	"net/http"
 
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/proxy/misc"
 )
 
 const (
@@ -21,7 +22,7 @@ func configListOperation(response *http.Response, executor *operationExecutor) e
 
 	// ConfigList response is a JSON array
 	// https://docs.docker.com/engine/api/v1.30/#operation/ConfigList
-	responseArray, err := getResponseAsJSONArray(response)
+	responseArray, err := misc.GetResponseAsJSONArray(response)
 	if err != nil {
 		return err
 	}
@@ -35,7 +36,7 @@ func configListOperation(response *http.Response, executor *operationExecutor) e
 		return err
 	}
 
-	return rewriteResponse(response, responseArray, http.StatusOK)
+	return misc.RewriteResponse(response, responseArray, http.StatusOK)
 }
 
 // configInspectOperation extracts the response as a JSON object, verify that the user
@@ -44,7 +45,7 @@ func configListOperation(response *http.Response, executor *operationExecutor) e
 func configInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// ConfigInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.30/#operation/ConfigInspect
-	responseObject, err := getResponseAsJSONOBject(response)
+	responseObject, err := misc.GetResponseAsJSONOBject(response)
 	if err != nil {
 		return err
 	}
@@ -56,10 +57,10 @@ func configInspectOperation(response *http.Response, executor *operationExecutor
 	configID := responseObject[configObjectIdentifier].(string)
 	responseObject, access := applyResourceAccessControl(responseObject, configID, executor.operationContext, portainer.ConfigResourceControl)
 	if !access {
-		return rewriteAccessDeniedResponse(response)
+		return misc.RewriteAccessDeniedResponse(response)
 	}
 
-	return rewriteResponse(response, responseObject, http.StatusOK)
+	return misc.RewriteResponse(response, responseObject, http.StatusOK)
 }
 
 // decorateConfigList loops through all configs and decorates any config with an existing resource control.
