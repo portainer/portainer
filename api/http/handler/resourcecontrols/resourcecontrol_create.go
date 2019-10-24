@@ -9,7 +9,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/security"
 )
 
 type resourceControlCreatePayload struct {
@@ -36,7 +35,7 @@ func (payload *resourceControlCreatePayload) Validate(r *http.Request) error {
 	}
 
 	if payload.Public && payload.AdministratorsOnly {
-		return errors.New("invalid payload: cannot set public and administrators only")
+		return errors.New("invalid payload: cannot set both public and administrators only flags to true")
 	}
 	return nil
 }
@@ -103,15 +102,6 @@ func (handler *Handler) resourceControlCreate(w http.ResponseWriter, r *http.Req
 		AdministratorsOnly: payload.AdministratorsOnly,
 		UserAccesses:       userAccesses,
 		TeamAccesses:       teamAccesses,
-	}
-
-	securityContext, err := security.RetrieveRestrictedRequestContext(r)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
-	}
-
-	if !security.AuthorizedResourceControlCreation(&resourceControl, securityContext) {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to create a resource control for the specified resource", portainer.ErrResourceAccessDenied}
 	}
 
 	err = handler.ResourceControlService.CreateResourceControl(&resourceControl)
