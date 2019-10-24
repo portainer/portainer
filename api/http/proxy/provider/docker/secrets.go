@@ -3,7 +3,7 @@ package docker
 import (
 	"net/http"
 
-	"github.com/portainer/portainer/api/http/proxy/misc"
+	"github.com/portainer/portainer/api/http/proxy/responseutils"
 
 	"github.com/portainer/portainer/api"
 )
@@ -20,7 +20,7 @@ func secretListOperation(response *http.Response, executor *operationExecutor) e
 
 	// SecretList response is a JSON array
 	// https://docs.docker.com/engine/api/v1.28/#operation/SecretList
-	responseArray, err := misc.GetResponseAsJSONArray(response)
+	responseArray, err := responseutils.GetResponseAsJSONArray(response)
 	if err != nil {
 		return err
 	}
@@ -34,7 +34,7 @@ func secretListOperation(response *http.Response, executor *operationExecutor) e
 		return err
 	}
 
-	return misc.RewriteResponse(response, responseArray, http.StatusOK)
+	return responseutils.RewriteResponse(response, responseArray, http.StatusOK)
 }
 
 // secretInspectOperation extracts the response as a JSON object, verify that the user
@@ -43,7 +43,7 @@ func secretListOperation(response *http.Response, executor *operationExecutor) e
 func secretInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// SecretInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/SecretInspect
-	responseObject, err := misc.GetResponseAsJSONOBject(response)
+	responseObject, err := responseutils.GetResponseAsJSONOBject(response)
 	if err != nil {
 		return err
 	}
@@ -55,10 +55,10 @@ func secretInspectOperation(response *http.Response, executor *operationExecutor
 	secretID := responseObject[secretIdentifier].(string)
 	responseObject, access := applyResourceAccessControl(responseObject, secretID, executor.operationContext, portainer.SecretResourceControl)
 	if !access {
-		return misc.RewriteAccessDeniedResponse(response)
+		return responseutils.RewriteAccessDeniedResponse(response)
 	}
 
-	return misc.RewriteResponse(response, responseObject, http.StatusOK)
+	return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
 }
 
 // decorateSecretList loops through all secrets and decorates any secret with an existing resource control.

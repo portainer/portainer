@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/proxy/misc"
+	"github.com/portainer/portainer/api/http/proxy/responseutils"
 )
 
 const (
@@ -20,7 +20,7 @@ func taskListOperation(response *http.Response, executor *operationExecutor) err
 
 	// TaskList response is a JSON array
 	// https://docs.docker.com/engine/api/v1.28/#operation/TaskList
-	responseArray, err := misc.GetResponseAsJSONArray(response)
+	responseArray, err := responseutils.GetResponseAsJSONArray(response)
 	if err != nil {
 		return err
 	}
@@ -32,18 +32,18 @@ func taskListOperation(response *http.Response, executor *operationExecutor) err
 		}
 	}
 
-	return misc.RewriteResponse(response, responseArray, http.StatusOK)
+	return responseutils.RewriteResponse(response, responseArray, http.StatusOK)
 }
 
 // extractTaskLabelsFromTaskListObject retrieve the Labels of the task if present.
 // Task schema reference: https://docs.docker.com/engine/api/v1.28/#operation/TaskList
 func extractTaskLabelsFromTaskListObject(responseObject map[string]interface{}) map[string]interface{} {
 	// Labels are stored under Spec.ContainerSpec.Labels
-	taskSpecObject := misc.ExtractJSONField(responseObject, "Spec")
+	taskSpecObject := responseutils.GetJSONObject(responseObject, "Spec")
 	if taskSpecObject != nil {
-		containerSpecObject := misc.ExtractJSONField(taskSpecObject, "ContainerSpec")
+		containerSpecObject := responseutils.GetJSONObject(taskSpecObject, "ContainerSpec")
 		if containerSpecObject != nil {
-			return misc.ExtractJSONField(containerSpecObject, "Labels")
+			return responseutils.GetJSONObject(containerSpecObject, "Labels")
 		}
 	}
 	return nil

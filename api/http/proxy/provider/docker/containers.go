@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/proxy/misc"
+	"github.com/portainer/portainer/api/http/proxy/responseutils"
 )
 
 const (
@@ -22,7 +22,7 @@ func containerListOperation(response *http.Response, executor *operationExecutor
 	var err error
 	// ContainerList response is a JSON array
 	// https://docs.docker.com/engine/api/v1.28/#operation/ContainerList
-	responseArray, err := misc.GetResponseAsJSONArray(response)
+	responseArray, err := responseutils.GetResponseAsJSONArray(response)
 	if err != nil {
 		return err
 	}
@@ -43,7 +43,7 @@ func containerListOperation(response *http.Response, executor *operationExecutor
 		}
 	}
 
-	return misc.RewriteResponse(response, responseArray, http.StatusOK)
+	return responseutils.RewriteResponse(response, responseArray, http.StatusOK)
 }
 
 // containerInspectOperation extracts the response as a JSON object, verify that the user
@@ -52,7 +52,7 @@ func containerListOperation(response *http.Response, executor *operationExecutor
 func containerInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// ContainerInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/ContainerInspect
-	responseObject, err := misc.GetResponseAsJSONOBject(response)
+	responseObject, err := responseutils.GetResponseAsJSONOBject(response)
 	if err != nil {
 		return err
 	}
@@ -64,35 +64,35 @@ func containerInspectOperation(response *http.Response, executor *operationExecu
 	containerID := responseObject[containerIdentifier].(string)
 	responseObject, access := applyResourceAccessControl(responseObject, containerID, executor.operationContext, portainer.ContainerResourceControl)
 	if access {
-		return misc.RewriteResponse(response, responseObject, http.StatusOK)
+		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
 	}
 
 	containerLabels := extractContainerLabelsFromContainerInspectObject(responseObject)
 	responseObject, access = applyResourceAccessControlFromLabel(containerLabels, responseObject, containerLabelForServiceIdentifier, executor.operationContext, portainer.ServiceResourceControl)
 	if access {
-		return misc.RewriteResponse(response, responseObject, http.StatusOK)
+		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
 	}
 
 	responseObject, access = applyResourceAccessControlFromLabel(containerLabels, responseObject, containerLabelForSwarmStackIdentifier, executor.operationContext, portainer.StackResourceControl)
 	if access {
-		return misc.RewriteResponse(response, responseObject, http.StatusOK)
+		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
 	}
 
 	responseObject, access = applyResourceAccessControlFromLabel(containerLabels, responseObject, containerLabelForComposeStackIdentifier, executor.operationContext, portainer.StackResourceControl)
 	if access {
-		return misc.RewriteResponse(response, responseObject, http.StatusOK)
+		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
 	}
 
-	return misc.RewriteAccessDeniedResponse(response)
+	return responseutils.RewriteAccessDeniedResponse(response)
 }
 
 // extractContainerLabelsFromContainerInspectObject retrieve the Labels of the container if present.
 // Container schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ContainerInspect
 func extractContainerLabelsFromContainerInspectObject(responseObject map[string]interface{}) map[string]interface{} {
 	// Labels are stored under Config.Labels
-	containerConfigObject := misc.ExtractJSONField(responseObject, "Config")
+	containerConfigObject := responseutils.GetJSONObject(responseObject, "Config")
 	if containerConfigObject != nil {
-		containerLabelsObject := misc.ExtractJSONField(containerConfigObject, "Labels")
+		containerLabelsObject := responseutils.GetJSONObject(containerConfigObject, "Labels")
 		return containerLabelsObject
 	}
 	return nil
@@ -102,7 +102,7 @@ func extractContainerLabelsFromContainerInspectObject(responseObject map[string]
 // Container schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ContainerList
 func extractContainerLabelsFromContainerListObject(responseObject map[string]interface{}) map[string]interface{} {
 	// Labels are stored under Labels
-	containerLabelsObject := misc.ExtractJSONField(responseObject, "Labels")
+	containerLabelsObject := responseutils.GetJSONObject(responseObject, "Labels")
 	return containerLabelsObject
 }
 

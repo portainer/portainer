@@ -3,7 +3,7 @@ package docker
 import (
 	"net/http"
 
-	"github.com/portainer/portainer/api/http/proxy/misc"
+	"github.com/portainer/portainer/api/http/proxy/responseutils"
 )
 
 // swarmInspectOperation extracts the response as a JSON object and rewrites the response based
@@ -11,7 +11,7 @@ import (
 func swarmInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// SwarmInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.30/#operation/SwarmInspect
-	responseObject, err := misc.GetResponseAsJSONOBject(response)
+	responseObject, err := responseutils.GetResponseAsJSONOBject(response)
 	if err != nil {
 		return err
 	}
@@ -21,5 +21,5 @@ func swarmInspectOperation(response *http.Response, executor *operationExecutor)
 		delete(responseObject, "TLSInfo")
 	}
 
-	return misc.RewriteResponse(response, responseObject, http.StatusOK)
+	return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
 }

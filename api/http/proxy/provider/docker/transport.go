@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/proxy/misc"
+	"github.com/portainer/portainer/api/http/proxy/responseutils"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -396,7 +396,7 @@ func (p *ProxyTransport) restrictedOperation(request *http.Request, resourceID s
 
 		resourceControl := portainer.GetResourceControlByResourceIDAndType(resourceID, resourceType, resourceControls)
 		if resourceControl == nil || !portainer.UserCanAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
-			return misc.WriteAccessDeniedResponse()
+			return responseutils.WriteAccessDeniedResponse()
 		}
 	}
 
@@ -419,7 +419,7 @@ func (p *ProxyTransport) restrictedVolumeBrowserOperation(request *http.Request,
 
 		_, err = p.ExtensionService.Extension(portainer.RBACExtension)
 		if err == portainer.ErrObjectNotFound && !settings.AllowVolumeBrowserForRegularUsers {
-			return misc.WriteAccessDeniedResponse()
+			return responseutils.WriteAccessDeniedResponse()
 		} else if err != nil && err != portainer.ErrObjectNotFound {
 			return nil, err
 		}
@@ -452,7 +452,7 @@ func (p *ProxyTransport) restrictedVolumeBrowserOperation(request *http.Request,
 
 		resourceControl := portainer.GetResourceControlByResourceIDAndType(resourceID, portainer.VolumeResourceControl, resourceControls)
 		if !endpointResourceAccess && (resourceControl == nil || !portainer.UserCanAccessResource(tokenData.ID, userTeamIDs, resourceControl)) {
-			return misc.WriteAccessDeniedResponse()
+			return responseutils.WriteAccessDeniedResponse()
 		}
 	}
 
@@ -516,7 +516,7 @@ func (p *ProxyTransport) interceptAndRewriteRequest(request *http.Request, opera
 // https://docs.docker.com/engine/api/v1.40/#operation/SecretCreate
 // https://docs.docker.com/engine/api/v1.40/#operation/ConfigCreate
 func (p *ProxyTransport) decorateGenericResourceCreationResponse(response *http.Response, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType, userID portainer.UserID) error {
-	responseObject, err := misc.GetResponseAsJSONOBject(response)
+	responseObject, err := responseutils.GetResponseAsJSONOBject(response)
 	if err != nil {
 		return err
 	}
@@ -535,7 +535,7 @@ func (p *ProxyTransport) decorateGenericResourceCreationResponse(response *http.
 
 	responseObject = decorateObject(responseObject, resourceControl)
 
-	return misc.RewriteResponse(response, responseObject, http.StatusOK)
+	return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
 }
 
 func (p *ProxyTransport) decorateGenericResourceCreationOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
@@ -593,7 +593,7 @@ func (p *ProxyTransport) administratorOperation(request *http.Request) (*http.Re
 	}
 
 	if tokenData.Role != portainer.AdministratorRole {
-		return misc.WriteAccessDeniedResponse()
+		return responseutils.WriteAccessDeniedResponse()
 	}
 
 	return p.executeDockerRequest(request)

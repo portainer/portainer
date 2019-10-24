@@ -1,4 +1,4 @@
-package misc
+package responseutils
 
 import (
 	"bytes"
@@ -12,14 +12,7 @@ import (
 	"github.com/portainer/portainer/api"
 )
 
-func ExtractJSONField(jsonObject map[string]interface{}, key string) map[string]interface{} {
-	object := jsonObject[key]
-	if object != nil {
-		return object.(map[string]interface{})
-	}
-	return nil
-}
-
+// GetResponseAsJSONOBject returns the response content as a generic JSON object
 func GetResponseAsJSONOBject(response *http.Response) (map[string]interface{}, error) {
 	responseData, err := getResponseBodyAsGenericJSON(response)
 	if err != nil {
@@ -30,6 +23,7 @@ func GetResponseAsJSONOBject(response *http.Response) (map[string]interface{}, e
 	return responseObject, nil
 }
 
+// GetResponseAsJSONArray returns the response content as an array of generic JSON object
 func GetResponseAsJSONArray(response *http.Response) ([]interface{}, error) {
 	responseData, err := getResponseBodyAsGenericJSON(response)
 	if err != nil {
@@ -75,22 +69,28 @@ func getResponseBodyAsGenericJSON(response *http.Response) (interface{}, error) 
 	return data, nil
 }
 
+// WriteAccessDeniedResponse will create a new access denied response
 func WriteAccessDeniedResponse() (*http.Response, error) {
 	response := &http.Response{}
 	err := RewriteResponse(response, portainer.ErrResourceAccessDenied, http.StatusForbidden)
 	return response, err
 }
 
+// WriteAccessDeniedResponse will overwrite the existing response with an access denied response
 func RewriteAccessDeniedResponse(response *http.Response) error {
 	return RewriteResponse(response, portainer.ErrResourceAccessDenied, http.StatusForbidden)
 }
 
+// RewriteReponse will replace the existing response body and status code with the one specified
+// in parameters
 func RewriteResponse(response *http.Response, newResponseData interface{}, statusCode int) error {
 	jsonData, err := json.Marshal(newResponseData)
 	if err != nil {
 		return err
 	}
+
 	body := ioutil.NopCloser(bytes.NewReader(jsonData))
+
 	response.StatusCode = statusCode
 	response.Body = body
 	response.ContentLength = int64(len(jsonData))
