@@ -112,8 +112,7 @@ func decorateServiceList(serviceData []interface{}, resourceControls []portainer
 	return decoratedServiceData, nil
 }
 
-// filterServiceList loops through all services and filters public services (no associated resource control)
-// as well as authorized services (access granted to the user based on existing resource control).
+// filterServiceList loops through all services and filters authorized services (access granted to the user based on existing resource control).
 // Authorized services are decorated during the process.
 // Resource controls checks are based on: resource identifier, stack identifier (from label).
 // Service object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ServiceList

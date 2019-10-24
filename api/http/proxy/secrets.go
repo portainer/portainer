@@ -81,8 +81,7 @@ func decorateSecretList(secretData []interface{}, resourceControls []portainer.R
 	return decoratedSecretData, nil
 }
 
-// filterSecretList loops through all secrets and filters public secrets (no associated resource control)
-// as well as authorized secrets (access granted to the user based on existing resource control).
+// filterSecretList loops through all secrets and filters authorized secrets (access granted to the user based on existing resource control).
 // Authorized secrets are decorated during the process.
 // Resource controls checks are based on: resource identifier.
 // Secret object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/SecretList

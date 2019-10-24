@@ -113,8 +113,7 @@ func decorateVolumeList(volumeData []interface{}, resourceControls []portainer.R
 	return decoratedVolumeData, nil
 }
 
-// filterVolumeList loops through all volumes and filters public volumes (no associated resource control)
-// as well as authorized volumes (access granted to the user based on existing resource control).
+// filterVolumeList loops through all volumes and filters authorized volumes (access granted to the user based on existing resource control).
 // Authorized volumes are decorated during the process.
 // Resource controls checks are based on: resource identifier, stack identifier (from label).
 // Volume object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/VolumeList

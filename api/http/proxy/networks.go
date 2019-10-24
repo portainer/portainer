@@ -104,8 +104,7 @@ func decorateNetworkList(networkData []interface{}, resourceControls []portainer
 	return decoratedNetworkData, nil
 }
 
-// filterNetworkList loops through all networks and filters public networks (no associated resource control)
-// as well as authorized networks (access granted to the user based on existing resource control).
+// filterNetworkList loops through all networks and filters authorized networks (access granted to the user based on existing resource control).
 // Authorized networks are decorated during the process.
 // Resource controls checks are based on: resource identifier, stack identifier (from label).
 // Network object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/NetworkList

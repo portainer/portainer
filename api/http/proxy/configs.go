@@ -84,8 +84,7 @@ func decorateConfigList(configData []interface{}, resourceControls []portainer.R
 	return decoratedConfigData, nil
 }
 
-// filterConfigList loops through all configs and filters public configs (no associated resource control)
-// as well as authorized configs (access granted to the user based on existing resource control).
+// filterConfigList loops through all configs and filters authorized configs (access granted to the user based on existing resource control).
 // Authorized configs are decorated during the process.
 // Resource controls checks are based on: resource identifier.
 // Config object schema reference: https://docs.docker.com/engine/api/v1.30/#operation/ConfigList
