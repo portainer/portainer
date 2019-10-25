@@ -30,8 +30,8 @@ func (payload *resourceControlCreatePayload) Validate(r *http.Request) error {
 		return errors.New("invalid payload: invalid type")
 	}
 
-	if len(payload.Users) == 0 && len(payload.Teams) == 0 && !payload.Public {
-		return errors.New("invalid payload: must specify Users, Teams or Public")
+	if len(payload.Users) == 0 && len(payload.Teams) == 0 && !payload.Public && !payload.AdministratorsOnly {
+		return errors.New("invalid payload: must specify Users, Teams, Public or AdministratorsOnly")
 	}
 
 	if payload.Public && payload.AdministratorsOnly {

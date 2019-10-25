@@ -759,16 +759,14 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
     }
 
     function applyResourceControl(newContainer) {
-      var containerIdentifier = newContainer.Id;
-      var userId = Authentication.getUserDetails().ID;
+      const userId = Authentication.getUserDetails().ID;
+      const resourceControl = newContainer.Portainer.ResourceControl;
+      const containerId = newContainer.Id;
+      const accessControlData = $scope.formValues.AccessControlData;
 
-      return $q.when(ResourceControlService.applyResourceControl(
-        'container',
-        containerIdentifier,
-        userId,
-        $scope.formValues.AccessControlData, []
-      )).then(function onApplyResourceControlSuccess() {
-        return containerIdentifier;
+      return ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl)
+      .then(function onApplyResourceControlSuccess() {
+        return containerId;
       });
     }
 

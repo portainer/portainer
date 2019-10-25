@@ -205,7 +205,7 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
       .then(setMainNetworkAndCreateContainer)
       .then(connectContainerToOtherNetworks)
       .then(startContainerIfNeeded)
-      .then(createResourceControlIfNeeded)
+      .then(createResourceControl)
       .then(deleteOldContainer)
       .then(notifyAndChangeView)
       .catch(notifyOnError);
@@ -276,19 +276,10 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
       );
     }
 
-    function createResourceControlIfNeeded(newContainer) {
-      if (!container.ResourceControl) {
-        return $q.when();
-      }
-      var containerIdentifier = newContainer.Id;
-      var resourceControl = container.ResourceControl;
-      var users = resourceControl.UserAccesses.map(function(u) {
-        return u.UserId;
-      });
-      var teams = resourceControl.TeamAccesses.map(function(t) {
-        return t.TeamId;
-      });
-      return ResourceControlService.createResourceControl(resourceControl.Public, users, teams, containerIdentifier, 'container', []);
+    function createResourceControl(newContainer) {
+      const oldResourceControl = container.ResourceControl;
+      const newResourceControl = newContainer.Portainer.ResourceControl;
+      return ResourceControlService.duplicateResourceControl(oldResourceControl, newResourceControl);
     }
 
     function notifyAndChangeView() {

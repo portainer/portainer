@@ -1,80 +1,106 @@
 import _ from 'lodash-es';
 
 angular.module('portainer.app')
-.factory('ResourceControlService', ['$q', 'ResourceControl', 'UserService', 'TeamService', 'ResourceControlHelper', function ResourceControlServiceFactory($q, ResourceControl, UserService, TeamService, ResourceControlHelper) {
+.factory('ResourceControlService', ['$q', 'ResourceControl', 'UserService', 'TeamService', 'ResourceControlHelper',
+  function ResourceControlServiceFactory($q, ResourceControl, UserService, TeamService, ResourceControlHelper) {
   'use strict';
-  var service = {};
+  const service = {};
 
-  service.createResourceControl = function(publicOnly, userIDs, teamIDs, resourceID, type, subResourceIDs) {
+  service.duplicateResourceControl = duplicateResourceControl;
+  service.applyResourceControlChange = applyResourceControlChange;
+  service.applyResourceControl = applyResourceControl;
+  service.retrieveOwnershipDetails = retrieveOwnershipDetails;
+  service.retrieveUserPermissionsOnResource =retrieveUserPermissionsOnResource;
+
+  /**
+   * PRIVATE SECTION
+   */
+
+  /**
+   * Create a ResourceControl
+   * @param {ResourceControlTypeString} rcType Type of ResourceControl
+   * @param {string} rcID ID of involved resource
+   * @param {ResourceControlOwnershipParameters} ownershipParameters Transcient type from view data to payload
+   */
+   function createResourceControl(rcType, resourceID, ownershipParameters) {
     var payload = {
-      Type: type,
-      Public: publicOnly,
+      Type: rcType,
+      Public: ownershipParameters.Public,
+      AdministratorsOnly: ownershipParameters.AdministratorsOnly,
       ResourceID: resourceID,
-      Users: userIDs,
-      Teams: teamIDs,
-      SubResourceIDs: subResourceIDs
+      Users: ownershipParameters.Users,
+      Teams: ownershipParameters.Teams,
+      SubResourceIds: ownershipParameters.SubResourceIDs
     };
     return ResourceControl.create({}, payload).$promise;
-  };
+  }
 
-  service.deleteResourceControl = function(rcID) {
-    return ResourceControl.remove({id: rcID}).$promise;
-  };
-
-  service.updateResourceControl = function(publicOnly, userIDs, teamIDs, resourceControlId) {
-    var payload = {
-      Public: publicOnly,
-      Users: userIDs,
-      Teams: teamIDs
+  /**
+   * Update a ResourceControl
+   * @param {String} rcID ID of involved resource
+   * @param {ResourceControlOwnershipParameters} ownershipParameters Transcient type from view data to payload
+   */
+  function updateResourceControl(rcID, ownershipParameters) {
+    const payload = {
+      AdministratorsOnly: ownershipParameters.AdministratorsOnly,
+      Public: ownershipParameters.Public,
+      Users: ownershipParameters.Users,
+      Teams: ownershipParameters.Teams
     };
-    return ResourceControl.update({id: resourceControlId}, payload).$promise;
-  };
 
-  service.applyResourceControl = function(resourceControlType, resourceIdentifier, userId, accessControlData, subResources) {
-    if (!accessControlData.AccessControlEnabled) {
-      accessControlData.Ownership = 'public';
-    }
+    return ResourceControl.update({id: rcID}, payload).$promise;
+  }
 
-    var authorizedUserIds = [];
-    var authorizedTeamIds = [];
-    var publicOnly = false;
-    switch (accessControlData.Ownership) {
-      case 'public':
-        publicOnly = true;
-        break;
-      case 'private':
-        authorizedUserIds.push(userId);
-        break;
-      case 'restricted':
-        angular.forEach(accessControlData.AuthorizedUsers, function(user) {
-          authorizedUserIds.push(user.Id);
-        });
-        angular.forEach(accessControlData.AuthorizedTeams, function(team) {
-          authorizedTeamIds.push(team.Id);
-        });
-        break;
-      default:
-        return;  
-      }
-    return service.createResourceControl(publicOnly, authorizedUserIds,
-      authorizedTeamIds, resourceIdentifier, resourceControlType, subResources);
-  };
+  /**
+   * END PRIVATE SECTION
+   */
 
-  service.applyResourceControlChange = function(resourceControlType, resourceId, resourceControl, ownershipParameters) {    
+  /**
+   * PUBLIC SECTION
+   */
+
+   /**
+    * Apply a ResourceControl after Resource creation
+    * @param {int} userId ID of User performing the action
+    * @param {AccessControlFormData} accessControlData ResourceControl to apply
+    * @param {ResourceControlViewModel} resourceControl ResourceControl to update
+    * @param {[]int} subResources SubResources managed by the ResourceControl
+    */
+  function applyResourceControl(userId, accessControlData, resourceControl, subResources=[]) {
+    const ownershipParameters = ResourceControlHelper.RCFormDataToOwnershipParameters(userId, accessControlData, subResources);
+    return updateResourceControl(resourceControl.Id, ownershipParameters);
+  }
+
+  /**
+   * Duplicate an existing ResourceControl (default to AdministratorsOnly if undefined)
+   * @param {ResourceControlViewModel} resourceControl ResourceControl to duplicate
+   */
+  function duplicateResourceControl(oldResourceControl, newResourceControl) {
+    const ownershipParameters = ResourceControlHelper.RCViewModelToOwnershipParameters(oldResourceControl);
+    return updateResourceControl(newResourceControl.Id, ownershipParameters);
+  }
+
+  /**
+   * Update an existing ResourceControl or create a new one on existing resource without RC
+   * @param {ResourceControlTypeString} rcType Type of ResourceControl
+   * @param {String} resourceId ID of involved Resource
+   * @param {ResourceControlViewModel} resourceControl Previous ResourceControl (can be undefined)
+   * @param {AccessControlPanelData} formValues View data generated by AccessControlPanel
+   */
+  function applyResourceControlChange(rcType, resourceId, resourceControl, formValues) {
+    const ownershipParameters = ResourceControlHelper.RCPanelDataToOwnershipParameters(formValues);
     if (resourceControl) {
-      if (ownershipParameters.ownership === 'administrators') {
-        return service.deleteResourceControl(resourceControl.Id);
-      } else {
-        return service.updateResourceControl(ownershipParameters.publicOnly, ownershipParameters.authorizedUserIds,
-          ownershipParameters.authorizedTeamIds, resourceControl.Id);
-      }
+      return updateResourceControl(resourceControl.Id, ownershipParameters);
     } else {
-        return service.createResourceControl(ownershipParameters.publicOnly, ownershipParameters.authorizedUserIds,
-          ownershipParameters.authorizedTeamIds, resourceId, resourceControlType);
+      return createResourceControl(rcType, resourceId, ownershipParameters);
     }
-  };
+  }
 
-  service.retrieveOwnershipDetails = function(resourceControl) {
+  /**
+   * Retrive users and team details for ResourceControlViewModel
+   * @param {ResourceControlViewModel} resourceControl ResourceControl view model
+   */
+  function retrieveOwnershipDetails(resourceControl) {
     var deferred = $q.defer();
 
     if (!resourceControl) {
@@ -96,9 +122,9 @@ angular.module('portainer.app')
     });
 
     return deferred.promise;
-  };
+  }
 
-  service.retrieveUserPermissionsOnResource = function(userID, isAdministrator, resourceControl) {
+  function retrieveUserPermissionsOnResource(userID, isAdministrator, resourceControl) {
     var deferred = $q.defer();
 
     if (!resourceControl || isAdministrator) {
@@ -123,7 +149,11 @@ angular.module('portainer.app')
     }
 
     return deferred.promise;
-  };
+  }
+
+  /**
+   * END PUBLIC SECTION
+   */
 
   return service;
 }]);

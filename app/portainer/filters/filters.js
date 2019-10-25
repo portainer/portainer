@@ -2,6 +2,8 @@ import moment from 'moment';
 import _ from 'lodash-es';
 import filesize from 'filesize';
 
+import { ResourceControlOwnership as RCO } from 'Portainer/models/resourceControl/resourceControlOwnership';
+
 angular.module('portainer.app')
 .filter('truncate', function () {
   'use strict';
@@ -145,11 +147,11 @@ angular.module('portainer.app')
   'use strict';
   return function (ownership) {
     switch (ownership) {
-      case 'private':
+      case RCO.PRIVATE:
         return 'fa fa-eye-slash';
-      case 'administrators':
+      case RCO.ADMINISTRATORS:
         return 'fa fa-eye-slash';
-      case 'restricted':
+      case RCO.RESTRICTED:
         return 'fa fa-users';
       default:
         return 'fa fa-eye';
