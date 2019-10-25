@@ -13,5 +13,6 @@ services:
     environment:
       - CYPRESS_baseUrl=http://e2e-portainer:9000
     volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
       - ./cypress:/app/cypress
       - ./cypress.json:/app/cypress.json

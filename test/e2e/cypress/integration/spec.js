@@ -4,10 +4,18 @@ context('Tests to run', () => {
   beforeEach(() => {
     cy.visit('/')
   })
-  describe('Describes the test', function() {
-    it('Test action', function() {
+  describe('Init admin', function() {
+    it('Create user and verify success', function() {
       cy.get('#username')
       .should('have.value', 'admin')
+      cy.get('#password')
+      .type('portaineriscool')
+      .should('have.value', 'portaineriscool')
+      cy.get('#confirm_password')
+      .type('portaineriscool')
+      .should('have.value', 'portaineriscool')
+      cy.get('[type=submit]').click()
+      cy.url().should('include', '/init/endpoint')
     })
   })
 })
