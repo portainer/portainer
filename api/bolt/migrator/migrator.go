@@ -287,8 +287,14 @@ func (m *Migrator) Migrate() error {
 		}
 	}
 
+	// Portainer next
 	if m.currentDBVersion < 21 {
 		err := m.updateResourceControlsToDBVersion21()
+		if err != nil {
+			return err
+		}
+
+		err = m.updateUsersAndRolesToDBVersion21()
 		if err != nil {
 			return err
 		}
