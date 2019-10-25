@@ -1,0 +1,20 @@
+version: '3'
+services:
+  portainer:
+    image: portainerci/portainer:$PORTAINER_TAG
+    container_name: portainer
+    restart: always
+    environment:
+      - PORT=9000
+
+  cypress:
+    image: cypress/included:3.4.1
+    container_name: cypress
+    depends_on:
+      - portainer
+    working_dir: /app
+    environment:
+      - CYPRESS_baseUrl=http://portainer:9000
+    volumes:
+      - ./config:/app/cypress
+      - ./cypress.json:/app/cypress.json
