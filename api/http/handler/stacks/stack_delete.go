@@ -78,7 +78,7 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 		userTeamIDs = append(userTeamIDs, membership.TeamID)
 	}
 
-	if (resourceControl == nil && !securityContext.IsAdmin) || !portainer.UserCanAccessResource(securityContext.UserID, userTeamIDs, resourceControl) {
+	if (resourceControl == nil && !securityContext.IsAdmin) && !portainer.UserCanAccessResource(securityContext.UserID, userTeamIDs, resourceControl) {
 		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
 	}
 
@@ -90,6 +90,13 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 	err = handler.StackService.DeleteStack(portainer.StackID(id))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the stack from the database", err}
+	}
+
+	if resourceControl != nil {
+		err = handler.ResourceControlService.DeleteResourceControl(resourceControl.ID)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the associated resource control from the database", err}
+		}
 	}
 
 	err = handler.FileService.RemoveDirectory(stack.ProjectPath)
