@@ -39,7 +39,7 @@ func FilterAuthorizedStacks(stacks []Stack, userID UserID, userTeamIDs []TeamID)
 
 	for _, stack := range stacks {
 
-		if UserCanAccessResource(userID, userTeamIDs, stack.ResourceControl) {
+		if stack.ResourceControl != nil && UserCanAccessResource(userID, userTeamIDs, stack.ResourceControl) {
 			authorizedStacks = append(authorizedStacks, stack)
 		}
 	}
