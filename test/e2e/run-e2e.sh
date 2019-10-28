@@ -19,5 +19,11 @@ exec_in worker1 docker swarm join --token $TOKEN_WORKER manager1:2377
 # Worker2 join
 exec_in worker2 docker swarm join --token $TOKEN_WORKER manager1:2377
 
-# Up portainer
-docker-compose up --exit-code-from cypress
+# Run portainer + cypress
+# Use export CI=1 to run in CI mode
+if [ -z "${CI}" ];
+then
+  docker-compose up --exit-code-from cypress
+else
+  docker-compose -f docker-compose.yml -f docker-compose.ci.yml up --exit-code-from cypress
+fi
