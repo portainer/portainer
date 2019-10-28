@@ -1,0 +1,17 @@
+version: '3'
+services:
+  cypress:
+    image: cypress/included:3.5.0
+    container_name: e2e-cypress
+    command: --record --browser chrome
+    depends_on:
+      - portainer
+    working_dir: /e2e
+    environment:
+      CYPRESS_baseUrl: http://e2e-portainer:9000
+      CYPRESS_RECORD_KEY: ${CYPRESS_RECORD_KEY}
+    volumes:
+      - ./cypress:/e2e/cypress
+      - ./cypress.json:/e2e/cypress.json
+    networks:
+      - e2e-ci
