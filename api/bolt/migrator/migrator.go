@@ -287,5 +287,13 @@ func (m *Migrator) Migrate() error {
 		}
 	}
 
+	// Portainer next
+	if m.currentDBVersion < 21 {
+		err := m.updateUsersToDBVersion21()
+		if err != nil {
+			return err
+		}
+	}
+
 	return m.versionService.StoreDBVersion(portainer.DBVersion)
 }
