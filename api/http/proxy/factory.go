@@ -66,9 +66,7 @@ func (factory *proxyFactory) newDockerHTTPProxy(u *url.URL, endpoint *portainer.
 
 func (factory *proxyFactory) createDockerReverseProxy(u *url.URL, endpoint *portainer.Endpoint) *httputil.ReverseProxy {
 	transportParameters := &docker.TransportParameters{
-		EnableSignature:        false,
-		EndpointIdentifier:     endpoint.ID,
-		EndpointType:           endpoint.Type,
+		Endpoint:               endpoint,
 		ResourceControlService: factory.ResourceControlService,
 		UserService:            factory.UserService,
 		TeamMembershipService:  factory.TeamMembershipService,
@@ -77,12 +75,7 @@ func (factory *proxyFactory) createDockerReverseProxy(u *url.URL, endpoint *port
 		SettingsService:        factory.SettingsService,
 		ReverseTunnelService:   factory.ReverseTunnelService,
 		ExtensionService:       factory.ExtensionService,
-		SignatureService:       nil,
-	}
-
-	if endpoint.Type == portainer.AgentOnDockerEnvironment {
-		transportParameters.EnableSignature = true
-		transportParameters.SignatureService = factory.SignatureService
+		SignatureService:       factory.SignatureService,
 	}
 
 	proxy := newSingleHostReverseProxyWithHostHeader(u)

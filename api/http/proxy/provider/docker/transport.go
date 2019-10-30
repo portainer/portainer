@@ -22,25 +22,21 @@ type (
 	// interception of requests and rewriting of responses.
 	Transport struct {
 		HTTPTransport          *http.Transport
-		EnableSignature        bool
-		EndpointIdentifier     portainer.EndpointID
-		EndpointType           portainer.EndpointType
-		ResourceControlService portainer.ResourceControlService
-		UserService            portainer.UserService
-		TeamMembershipService  portainer.TeamMembershipService
-		RegistryService        portainer.RegistryService
-		DockerHubService       portainer.DockerHubService
-		SettingsService        portainer.SettingsService
-		SignatureService       portainer.DigitalSignatureService
-		ReverseTunnelService   portainer.ReverseTunnelService
-		ExtensionService       portainer.ExtensionService
+		endpoint               *portainer.Endpoint
+		resourceControlService portainer.ResourceControlService
+		userService            portainer.UserService
+		teamMembershipService  portainer.TeamMembershipService
+		registryService        portainer.RegistryService
+		dockerHubService       portainer.DockerHubService
+		settingsService        portainer.SettingsService
+		signatureService       portainer.DigitalSignatureService
+		reverseTunnelService   portainer.ReverseTunnelService
+		extensionService       portainer.ExtensionService
 	}
 
 	// TransportParameters is used to create a new Transport
 	TransportParameters struct {
-		EnableSignature        bool
-		EndpointIdentifier     portainer.EndpointID
-		EndpointType           portainer.EndpointType
+		Endpoint               *portainer.Endpoint
 		ResourceControlService portainer.ResourceControlService
 		UserService            portainer.UserService
 		TeamMembershipService  portainer.TeamMembershipService
@@ -71,18 +67,16 @@ type (
 // NewTransport returns a pointer to a new Transport instance.
 func NewTransport(parameters *TransportParameters, httpTransport *http.Transport) *Transport {
 	return &Transport{
-		EnableSignature:        parameters.EnableSignature,
-		EndpointIdentifier:     parameters.EndpointIdentifier,
-		EndpointType:           parameters.EndpointType,
-		ResourceControlService: parameters.ResourceControlService,
-		UserService:            parameters.UserService,
-		TeamMembershipService:  parameters.TeamMembershipService,
-		RegistryService:        parameters.RegistryService,
-		DockerHubService:       parameters.DockerHubService,
-		SettingsService:        parameters.SettingsService,
-		SignatureService:       parameters.SignatureService,
-		ReverseTunnelService:   parameters.ReverseTunnelService,
-		ExtensionService:       parameters.ExtensionService,
+		endpoint:               parameters.Endpoint,
+		resourceControlService: parameters.ResourceControlService,
+		userService:            parameters.UserService,
+		teamMembershipService:  parameters.TeamMembershipService,
+		registryService:        parameters.RegistryService,
+		dockerHubService:       parameters.DockerHubService,
+		settingsService:        parameters.SettingsService,
+		signatureService:       parameters.SignatureService,
+		reverseTunnelService:   parameters.ReverseTunnelService,
+		extensionService:       parameters.ExtensionService,
 		HTTPTransport:          httpTransport,
 	}
 }
@@ -98,13 +92,13 @@ func (p *Transport) ProxyDockerRequest(request *http.Request) (*http.Response, e
 	requestPath := apiVersionRe.ReplaceAllString(request.URL.Path, "")
 	request.URL.Path = requestPath
 
-	if p.EnableSignature {
-		signature, err := p.SignatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
+	if p.endpoint.Type == portainer.AgentOnDockerEnvironment {
+		signature, err := p.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
 		if err != nil {
 			return nil, err
 		}
 
-		request.Header.Set(portainer.PortainerAgentPublicKeyHeader, p.SignatureService.EncodedPublicKey())
+		request.Header.Set(portainer.PortainerAgentPublicKeyHeader, p.signatureService.EncodedPublicKey())
 		request.Header.Set(portainer.PortainerAgentSignatureHeader, signature)
 	}
 
@@ -141,14 +135,14 @@ func (p *Transport) ProxyDockerRequest(request *http.Request) (*http.Response, e
 func (p *Transport) executeDockerRequest(request *http.Request) (*http.Response, error) {
 	response, err := p.HTTPTransport.RoundTrip(request)
 
-	if p.EndpointType != portainer.EdgeAgentEnvironment {
+	if p.endpoint.Type != portainer.EdgeAgentEnvironment {
 		return response, err
 	}
 
 	if err == nil {
-		p.ReverseTunnelService.SetTunnelStatusToActive(p.EndpointIdentifier)
+		p.reverseTunnelService.SetTunnelStatusToActive(p.endpoint.ID)
 	} else {
-		p.ReverseTunnelService.SetTunnelStatusToIdle(p.EndpointIdentifier)
+		p.reverseTunnelService.SetTunnelStatusToIdle(p.endpoint.ID)
 	}
 
 	return response, err
@@ -417,7 +411,7 @@ func (p *Transport) restrictedOperation(request *http.Request, resourceID string
 
 	if tokenData.Role != portainer.AdministratorRole {
 
-		teamMemberships, err := p.TeamMembershipService.TeamMembershipsByUserID(tokenData.ID)
+		teamMemberships, err := p.teamMembershipService.TeamMembershipsByUserID(tokenData.ID)
 		if err != nil {
 			return nil, err
 		}
@@ -427,12 +421,27 @@ func (p *Transport) restrictedOperation(request *http.Request, resourceID string
 			userTeamIDs = append(userTeamIDs, membership.TeamID)
 		}
 
-		resourceControls, err := p.ResourceControlService.ResourceControls()
+		resourceControls, err := p.resourceControlService.ResourceControls()
 		if err != nil {
 			return nil, err
 		}
 
+		// if resource is part of a stack, RC will have resourceID == stackName. Here resourceID == resource identifier
+		// and do not match stack name.
+		// => always resourceControl == nil
+
+		// if part of a stack, must search into labels to see if a resource control with stack type exists
+		// labels are not available here though.
+		// not fixed: https://github.com/portainer/portainer/issues/3259
+
 		resourceControl := portainer.GetResourceControlByResourceIDAndType(resourceID, resourceType, resourceControls)
+		// must add an extra check to validate that resource is not part of a stack (if it can be, e.g. not an image)
+		// send resourceInspect request
+		// inspect labels and try a GetResourceControlByResourceIDAndType(stackName, portainer.Stack, resourceControls)
+
+		// TODO: must be tested against agent endpoint when trying to access a resource that is on another node.
+		// TODO: must be tested with Edge endpoint.
+
 		if resourceControl == nil || !portainer.UserCanAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
 			return responseutils.WriteAccessDeniedResponse()
 		}
@@ -450,30 +459,30 @@ func (p *Transport) restrictedVolumeBrowserOperation(request *http.Request, reso
 	}
 
 	if tokenData.Role != portainer.AdministratorRole {
-		settings, err := p.SettingsService.Settings()
+		settings, err := p.settingsService.Settings()
 		if err != nil {
 			return nil, err
 		}
 
-		_, err = p.ExtensionService.Extension(portainer.RBACExtension)
+		_, err = p.extensionService.Extension(portainer.RBACExtension)
 		if err == portainer.ErrObjectNotFound && !settings.AllowVolumeBrowserForRegularUsers {
 			return responseutils.WriteAccessDeniedResponse()
 		} else if err != nil && err != portainer.ErrObjectNotFound {
 			return nil, err
 		}
 
-		user, err := p.UserService.User(tokenData.ID)
+		user, err := p.userService.User(tokenData.ID)
 		if err != nil {
 			return nil, err
 		}
 
 		endpointResourceAccess := false
-		_, ok := user.EndpointAuthorizations[p.EndpointIdentifier][portainer.EndpointResourcesAccess]
+		_, ok := user.EndpointAuthorizations[p.endpoint.ID][portainer.EndpointResourcesAccess]
 		if ok {
 			endpointResourceAccess = true
 		}
 
-		teamMemberships, err := p.TeamMembershipService.TeamMembershipsByUserID(tokenData.ID)
+		teamMemberships, err := p.teamMembershipService.TeamMembershipsByUserID(tokenData.ID)
 		if err != nil {
 			return nil, err
 		}
@@ -483,7 +492,7 @@ func (p *Transport) restrictedVolumeBrowserOperation(request *http.Request, reso
 			userTeamIDs = append(userTeamIDs, membership.TeamID)
 		}
 
-		resourceControls, err := p.ResourceControlService.ResourceControls()
+		resourceControls, err := p.resourceControlService.ResourceControls()
 		if err != nil {
 			return nil, err
 		}
@@ -506,7 +515,7 @@ func (p *Transport) rewriteOperationWithLabelFiltering(request *http.Request, op
 		return nil, err
 	}
 
-	settings, err := p.SettingsService.Settings()
+	settings, err := p.settingsService.Settings()
 	if err != nil {
 		return nil, err
 	}
@@ -597,13 +606,13 @@ func (p *Transport) executeGenericResourceDeletionOperation(request *http.Reques
 		return response, err
 	}
 
-	resourceControl, err := p.ResourceControlService.ResourceControlByResourceIDAndType(resourceIdentifierAttribute, resourceType)
+	resourceControl, err := p.resourceControlService.ResourceControlByResourceIDAndType(resourceIdentifierAttribute, resourceType)
 	if err != nil {
 		return response, err
 	}
 
 	if resourceControl != nil {
-		err = p.ResourceControlService.DeleteResourceControl(resourceControl.ID)
+		err = p.resourceControlService.DeleteResourceControl(resourceControl.ID)
 		if err != nil {
 			return response, err
 		}
@@ -648,13 +657,13 @@ func (p *Transport) createRegistryAccessContext(request *http.Request) (*registr
 		userID:  tokenData.ID,
 	}
 
-	hub, err := p.DockerHubService.DockerHub()
+	hub, err := p.dockerHubService.DockerHub()
 	if err != nil {
 		return nil, err
 	}
 	accessContext.dockerHub = hub
 
-	registries, err := p.RegistryService.Registries()
+	registries, err := p.registryService.Registries()
 	if err != nil {
 		return nil, err
 	}
@@ -663,7 +672,7 @@ func (p *Transport) createRegistryAccessContext(request *http.Request) (*registr
 	if tokenData.Role != portainer.AdministratorRole {
 		accessContext.isAdmin = false
 
-		teamMemberships, err := p.TeamMembershipService.TeamMembershipsByUserID(tokenData.ID)
+		teamMemberships, err := p.teamMembershipService.TeamMembershipsByUserID(tokenData.ID)
 		if err != nil {
 			return nil, err
 		}
@@ -681,7 +690,7 @@ func (p *Transport) createOperationContext(request *http.Request) (*restrictedDo
 		return nil, err
 	}
 
-	resourceControls, err := p.ResourceControlService.ResourceControls()
+	resourceControls, err := p.resourceControlService.ResourceControls()
 	if err != nil {
 		return nil, err
 	}
@@ -696,17 +705,17 @@ func (p *Transport) createOperationContext(request *http.Request) (*restrictedDo
 	if tokenData.Role != portainer.AdministratorRole {
 		operationContext.isAdmin = false
 
-		user, err := p.UserService.User(operationContext.userID)
+		user, err := p.userService.User(operationContext.userID)
 		if err != nil {
 			return nil, err
 		}
 
-		_, ok := user.EndpointAuthorizations[p.EndpointIdentifier][portainer.EndpointResourcesAccess]
+		_, ok := user.EndpointAuthorizations[p.endpoint.ID][portainer.EndpointResourcesAccess]
 		if ok {
 			operationContext.endpointResourceAccess = true
 		}
 
-		teamMemberships, err := p.TeamMembershipService.TeamMembershipsByUserID(tokenData.ID)
+		teamMemberships, err := p.teamMembershipService.TeamMembershipsByUserID(tokenData.ID)
 		if err != nil {
 			return nil, err
 		}

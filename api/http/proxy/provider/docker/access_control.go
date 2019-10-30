@@ -13,7 +13,7 @@ func (p *Transport) createPrivateResourceControl(resourceIdentifier string, reso
 		return nil, err
 	}
 
-	err = p.ResourceControlService.CreateResourceControl(resourceControl)
+	err = p.resourceControlService.CreateResourceControl(resourceControl)
 	if err != nil {
 		log.Printf("[ERROR] [http,proxy,docker,transport] [message: unable to persist resource control] [err: %s]", err)
 		return nil, err

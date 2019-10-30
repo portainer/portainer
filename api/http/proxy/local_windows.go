@@ -15,9 +15,7 @@ import (
 
 func (factory proxyFactory) newLocalProxy(path string, endpoint *portainer.Endpoint) http.Handler {
 	transportParameters := &docker.TransportParameters{
-		EnableSignature:        false,
-		EndpointIdentifier:     endpoint.ID,
-		EndpointType:           endpoint.Type,
+		Endpoint:               endpoint,
 		ResourceControlService: factory.ResourceControlService,
 		UserService:            factory.UserService,
 		TeamMembershipService:  factory.TeamMembershipService,
@@ -26,7 +24,7 @@ func (factory proxyFactory) newLocalProxy(path string, endpoint *portainer.Endpo
 		SettingsService:        factory.SettingsService,
 		ReverseTunnelService:   factory.ReverseTunnelService,
 		ExtensionService:       factory.ExtensionService,
-		SignatureService:       nil,
+		SignatureService:       factory.SignatureService,
 	}
 
 	proxy := &localProxy{}
