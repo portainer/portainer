@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/docker/docker/client"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/responseutils"
 	"github.com/portainer/portainer/api/http/security"
@@ -32,6 +33,7 @@ type (
 		signatureService       portainer.DigitalSignatureService
 		reverseTunnelService   portainer.ReverseTunnelService
 		extensionService       portainer.ExtensionService
+		dockerClient           *client.Client
 	}
 
 	// TransportParameters is used to create a new Transport
@@ -65,7 +67,7 @@ type (
 )
 
 // NewTransport returns a pointer to a new Transport instance.
-func NewTransport(parameters *TransportParameters, httpTransport *http.Transport) *Transport {
+func NewTransport(parameters *TransportParameters, httpTransport *http.Transport, dockerClient *client.Client) *Transport {
 	return &Transport{
 		endpoint:               parameters.Endpoint,
 		resourceControlService: parameters.ResourceControlService,
@@ -78,6 +80,7 @@ func NewTransport(parameters *TransportParameters, httpTransport *http.Transport
 		reverseTunnelService:   parameters.ReverseTunnelService,
 		extensionService:       parameters.ExtensionService,
 		HTTPTransport:          httpTransport,
+		dockerClient:           dockerClient,
 	}
 }
 

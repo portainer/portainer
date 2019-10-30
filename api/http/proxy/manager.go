@@ -6,6 +6,8 @@ import (
 	"net/url"
 	"strconv"
 
+	"github.com/portainer/portainer/api/docker"
+
 	"github.com/orcaman/concurrent-map"
 	"github.com/portainer/portainer/api"
 )
@@ -39,6 +41,7 @@ type (
 		SignatureService       portainer.DigitalSignatureService
 		ReverseTunnelService   portainer.ReverseTunnelService
 		ExtensionService       portainer.ExtensionService
+		DockerClientFactory    *docker.ClientFactory
 	}
 )
 
@@ -161,7 +164,7 @@ func (manager *Manager) createDockerProxy(endpoint *portainer.Endpoint) (http.Ha
 	case portainer.AgentOnDockerEnvironment:
 		return manager.proxyFactory.newDockerHTTPSProxy(endpointURL, &endpoint.TLSConfig, endpoint)
 	case portainer.EdgeAgentEnvironment:
-		return manager.proxyFactory.newDockerHTTPProxy(endpointURL, endpoint), nil
+		return manager.proxyFactory.newDockerHTTPProxy(endpointURL, endpoint)
 	}
 
 	if endpointURL.Scheme == "tcp" {
@@ -169,10 +172,10 @@ func (manager *Manager) createDockerProxy(endpoint *portainer.Endpoint) (http.Ha
 			return manager.proxyFactory.newDockerHTTPSProxy(endpointURL, &endpoint.TLSConfig, endpoint)
 		}
 
-		return manager.proxyFactory.newDockerHTTPProxy(endpointURL, endpoint), nil
+		return manager.proxyFactory.newDockerHTTPProxy(endpointURL, endpoint)
 	}
 
-	return manager.proxyFactory.newLocalProxy(endpointURL.Path, endpoint), nil
+	return manager.proxyFactory.newLocalProxy(endpointURL.Path, endpoint)
 }
 
 func (manager *Manager) createProxy(endpoint *portainer.Endpoint) (http.Handler, error) {

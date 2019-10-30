@@ -6,12 +6,11 @@ import (
 	"net/http/httputil"
 	"net/url"
 
-	"github.com/portainer/portainer/api/http/proxy/provider/docker"
-
-	"github.com/portainer/portainer/api/http/proxy/provider/azure"
-
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
+	"github.com/portainer/portainer/api/docker"
+	"github.com/portainer/portainer/api/http/proxy/provider/azure"
+	dockerprovider "github.com/portainer/portainer/api/http/proxy/provider/docker"
 )
 
 const azureAPIBaseURL = "https://management.azure.com"
@@ -27,6 +26,7 @@ type proxyFactory struct {
 	SignatureService       portainer.DigitalSignatureService
 	ReverseTunnelService   portainer.ReverseTunnelService
 	ExtensionService       portainer.ExtensionService
+	DockerClientFactory    *docker.ClientFactory
 }
 
 func (factory *proxyFactory) newHTTPProxy(u *url.URL) http.Handler {
@@ -49,23 +49,27 @@ func newAzureProxy(credentials *portainer.AzureCredentials) (http.Handler, error
 func (factory *proxyFactory) newDockerHTTPSProxy(u *url.URL, tlsConfig *portainer.TLSConfiguration, endpoint *portainer.Endpoint) (http.Handler, error) {
 	u.Scheme = "https"
 
-	proxy := factory.createDockerReverseProxy(u, endpoint)
+	proxy, err := factory.createDockerReverseProxy(u, endpoint)
+	if err != nil {
+		return nil, err
+	}
+
 	config, err := crypto.CreateTLSConfigurationFromDisk(tlsConfig.TLSCACertPath, tlsConfig.TLSCertPath, tlsConfig.TLSKeyPath, tlsConfig.TLSSkipVerify)
 	if err != nil {
 		return nil, err
 	}
 
-	proxy.Transport.(*docker.Transport).HTTPTransport.TLSClientConfig = config
+	proxy.Transport.(*dockerprovider.Transport).HTTPTransport.TLSClientConfig = config
 	return proxy, nil
 }
 
-func (factory *proxyFactory) newDockerHTTPProxy(u *url.URL, endpoint *portainer.Endpoint) http.Handler {
+func (factory *proxyFactory) newDockerHTTPProxy(u *url.URL, endpoint *portainer.Endpoint) (http.Handler, error) {
 	u.Scheme = "http"
 	return factory.createDockerReverseProxy(u, endpoint)
 }
 
-func (factory *proxyFactory) createDockerReverseProxy(u *url.URL, endpoint *portainer.Endpoint) *httputil.ReverseProxy {
-	transportParameters := &docker.TransportParameters{
+func (factory *proxyFactory) createDockerReverseProxy(u *url.URL, endpoint *portainer.Endpoint) (*httputil.ReverseProxy, error) {
+	transportParameters := &dockerprovider.TransportParameters{
 		Endpoint:               endpoint,
 		ResourceControlService: factory.ResourceControlService,
 		UserService:            factory.UserService,
@@ -78,9 +82,14 @@ func (factory *proxyFactory) createDockerReverseProxy(u *url.URL, endpoint *port
 		SignatureService:       factory.SignatureService,
 	}
 
+	dockerClient, err := factory.DockerClientFactory.CreateClient(endpoint, "")
+	if err != nil {
+		return nil, err
+	}
+
 	proxy := newSingleHostReverseProxyWithHostHeader(u)
-	proxy.Transport = docker.NewTransport(transportParameters, &http.Transport{})
-	return proxy
+	proxy.Transport = dockerprovider.NewTransport(transportParameters, &http.Transport{}, dockerClient)
+	return proxy, nil
 }
 
 func newSocketTransport(socketPath string) *http.Transport {

@@ -13,7 +13,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
-func (factory proxyFactory) newLocalProxy(path string, endpoint *portainer.Endpoint) http.Handler {
+func (factory proxyFactory) newLocalProxy(path string, endpoint *portainer.Endpoint) (http.Handler, error) {
 	transportParameters := &docker.TransportParameters{
 		Endpoint:               endpoint,
 		ResourceControlService: factory.ResourceControlService,
@@ -25,11 +25,17 @@ func (factory proxyFactory) newLocalProxy(path string, endpoint *portainer.Endpo
 		ReverseTunnelService:   factory.ReverseTunnelService,
 		ExtensionService:       factory.ExtensionService,
 		SignatureService:       factory.SignatureService,
+		DockerClientFactory:    factory.DockerClientFactory,
+	}
+
+	dockerClient, err := factory.DockerClientFactory.CreateClient(endpoint, "")
+	if err != nil {
+		return nil, err
 	}
 
 	proxy := &localProxy{}
-	proxy.transport = docker.NewTransport(transportParameters, newNamedPipeTransport(path))
-	return proxy
+	proxy.transport = docker.NewTransport(transportParameters, newNamedPipeTransport(path), dockerClient)
+	return proxy, nil
 }
 
 func newNamedPipeTransport(namedPipePath string) *http.Transport {

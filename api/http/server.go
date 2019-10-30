@@ -94,6 +94,7 @@ func (server *Server) Start() error {
 		SignatureService:       server.SignatureService,
 		ReverseTunnelService:   server.ReverseTunnelService,
 		ExtensionService:       server.ExtensionService,
+		DockerClientFactory:    server.DockerClientFactory,
 	}
 	proxyManager := proxy.NewManager(proxyManagerParameters)
 
