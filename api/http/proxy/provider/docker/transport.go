@@ -18,11 +18,13 @@ import (
 var apiVersionRe = regexp.MustCompile(`(/v[0-9]\.[0-9]*)?`)
 
 type (
-	// TODO: doco + rename to transport
-	// + refactor to parameter + NewTransport functions
-	ProxyTransport struct {
+	// Transport is a custom transport for Docker API reverse proxy. It allows
+	// interception of requests and rewriting of responses.
+	Transport struct {
 		HTTPTransport          *http.Transport
 		EnableSignature        bool
+		EndpointIdentifier     portainer.EndpointID
+		EndpointType           portainer.EndpointType
 		ResourceControlService portainer.ResourceControlService
 		UserService            portainer.UserService
 		TeamMembershipService  portainer.TeamMembershipService
@@ -32,9 +34,24 @@ type (
 		SignatureService       portainer.DigitalSignatureService
 		ReverseTunnelService   portainer.ReverseTunnelService
 		ExtensionService       portainer.ExtensionService
+	}
+
+	// TransportParameters is used to create a new Transport
+	TransportParameters struct {
+		EnableSignature        bool
 		EndpointIdentifier     portainer.EndpointID
 		EndpointType           portainer.EndpointType
+		ResourceControlService portainer.ResourceControlService
+		UserService            portainer.UserService
+		TeamMembershipService  portainer.TeamMembershipService
+		RegistryService        portainer.RegistryService
+		DockerHubService       portainer.DockerHubService
+		SettingsService        portainer.SettingsService
+		SignatureService       portainer.DigitalSignatureService
+		ReverseTunnelService   portainer.ReverseTunnelService
+		ExtensionService       portainer.ExtensionService
 	}
+
 	restrictedDockerOperationContext struct {
 		isAdmin                bool
 		endpointResourceAccess bool
@@ -51,28 +68,33 @@ type (
 	operationRequest           func(*http.Request) error
 )
 
-func (p *ProxyTransport) RoundTrip(request *http.Request) (*http.Response, error) {
+// NewTransport returns a pointer to a new Transport instance.
+func NewTransport(parameters *TransportParameters, httpTransport *http.Transport) *Transport {
+	return &Transport{
+		EnableSignature:        parameters.EnableSignature,
+		EndpointIdentifier:     parameters.EndpointIdentifier,
+		EndpointType:           parameters.EndpointType,
+		ResourceControlService: parameters.ResourceControlService,
+		UserService:            parameters.UserService,
+		TeamMembershipService:  parameters.TeamMembershipService,
+		RegistryService:        parameters.RegistryService,
+		DockerHubService:       parameters.DockerHubService,
+		SettingsService:        parameters.SettingsService,
+		SignatureService:       parameters.SignatureService,
+		ReverseTunnelService:   parameters.ReverseTunnelService,
+		ExtensionService:       parameters.ExtensionService,
+		HTTPTransport:          httpTransport,
+	}
+}
+
+// RoundTrip is the implementation of the the http.RoundTripper interface
+func (p *Transport) RoundTrip(request *http.Request) (*http.Response, error) {
 	return p.ProxyDockerRequest(request)
 }
 
-func (p *ProxyTransport) executeDockerRequest(request *http.Request) (*http.Response, error) {
-	response, err := p.HTTPTransport.RoundTrip(request)
-
-	if p.EndpointType != portainer.EdgeAgentEnvironment {
-		return response, err
-	}
-
-	if err == nil {
-		p.ReverseTunnelService.SetTunnelStatusToActive(p.EndpointIdentifier)
-	} else {
-		p.ReverseTunnelService.SetTunnelStatusToIdle(p.EndpointIdentifier)
-	}
-
-	return response, err
-}
-
-// TODO: doco
-func (p *ProxyTransport) ProxyDockerRequest(request *http.Request) (*http.Response, error) {
+// ProxyDockerRequest intercepts a Docker API request and apply logic based
+// on the requested operation.
+func (p *Transport) ProxyDockerRequest(request *http.Request) (*http.Response, error) {
 	requestPath := apiVersionRe.ReplaceAllString(request.URL.Path, "")
 	request.URL.Path = requestPath
 
@@ -116,7 +138,23 @@ func (p *ProxyTransport) ProxyDockerRequest(request *http.Request) (*http.Respon
 	}
 }
 
-func (p *ProxyTransport) proxyAgentRequest(r *http.Request) (*http.Response, error) {
+func (p *Transport) executeDockerRequest(request *http.Request) (*http.Response, error) {
+	response, err := p.HTTPTransport.RoundTrip(request)
+
+	if p.EndpointType != portainer.EdgeAgentEnvironment {
+		return response, err
+	}
+
+	if err == nil {
+		p.ReverseTunnelService.SetTunnelStatusToActive(p.EndpointIdentifier)
+	} else {
+		p.ReverseTunnelService.SetTunnelStatusToIdle(p.EndpointIdentifier)
+	}
+
+	return response, err
+}
+
+func (p *Transport) proxyAgentRequest(r *http.Request) (*http.Response, error) {
 	requestPath := strings.TrimPrefix(r.URL.Path, "/v2")
 
 	switch {
@@ -132,7 +170,7 @@ func (p *ProxyTransport) proxyAgentRequest(r *http.Request) (*http.Response, err
 	return p.executeDockerRequest(r)
 }
 
-func (p *ProxyTransport) proxyConfigRequest(request *http.Request) (*http.Response, error) {
+func (p *Transport) proxyConfigRequest(request *http.Request) (*http.Response, error) {
 	switch requestPath := request.URL.Path; requestPath {
 	case "/configs/create":
 		return p.decorateGenericResourceCreationOperation(request, configCreationIdentifier, portainer.ConfigResourceControl)
@@ -154,7 +192,7 @@ func (p *ProxyTransport) proxyConfigRequest(request *http.Request) (*http.Respon
 	}
 }
 
-func (p *ProxyTransport) proxyContainerRequest(request *http.Request) (*http.Response, error) {
+func (p *Transport) proxyContainerRequest(request *http.Request) (*http.Response, error) {
 	switch requestPath := request.URL.Path; requestPath {
 	case "/containers/create":
 		return p.decorateGenericResourceCreationOperation(request, containerIdentifier, portainer.ContainerResourceControl)
@@ -190,7 +228,7 @@ func (p *ProxyTransport) proxyContainerRequest(request *http.Request) (*http.Res
 	}
 }
 
-func (p *ProxyTransport) proxyServiceRequest(request *http.Request) (*http.Response, error) {
+func (p *Transport) proxyServiceRequest(request *http.Request) (*http.Response, error) {
 	switch requestPath := request.URL.Path; requestPath {
 	case "/services/create":
 		return p.replaceRegistryAuthenticationHeader(request)
@@ -219,7 +257,7 @@ func (p *ProxyTransport) proxyServiceRequest(request *http.Request) (*http.Respo
 	}
 }
 
-func (p *ProxyTransport) proxyVolumeRequest(request *http.Request) (*http.Response, error) {
+func (p *Transport) proxyVolumeRequest(request *http.Request) (*http.Response, error) {
 	switch requestPath := request.URL.Path; requestPath {
 	case "/volumes/create":
 		return p.decorateGenericResourceCreationOperation(request, volumeIdentifier, portainer.VolumeResourceControl)
@@ -243,7 +281,7 @@ func (p *ProxyTransport) proxyVolumeRequest(request *http.Request) (*http.Respon
 	}
 }
 
-func (p *ProxyTransport) proxyNetworkRequest(request *http.Request) (*http.Response, error) {
+func (p *Transport) proxyNetworkRequest(request *http.Request) (*http.Response, error) {
 	switch requestPath := request.URL.Path; requestPath {
 	case "/networks/create":
 		return p.decorateGenericResourceCreationOperation(request, networkIdentifier, portainer.NetworkResourceControl)
@@ -264,7 +302,7 @@ func (p *ProxyTransport) proxyNetworkRequest(request *http.Request) (*http.Respo
 	}
 }
 
-func (p *ProxyTransport) proxySecretRequest(request *http.Request) (*http.Response, error) {
+func (p *Transport) proxySecretRequest(request *http.Request) (*http.Response, error) {
 	switch requestPath := request.URL.Path; requestPath {
 	case "/secrets/create":
 		return p.decorateGenericResourceCreationOperation(request, secretIdentifier, portainer.SecretResourceControl)
@@ -285,7 +323,7 @@ func (p *ProxyTransport) proxySecretRequest(request *http.Request) (*http.Respon
 	}
 }
 
-func (p *ProxyTransport) proxyNodeRequest(request *http.Request) (*http.Response, error) {
+func (p *Transport) proxyNodeRequest(request *http.Request) (*http.Response, error) {
 	requestPath := request.URL.Path
 
 	// assume /nodes/{id}
@@ -296,7 +334,7 @@ func (p *ProxyTransport) proxyNodeRequest(request *http.Request) (*http.Response
 	return p.executeDockerRequest(request)
 }
 
-func (p *ProxyTransport) proxySwarmRequest(request *http.Request) (*http.Response, error) {
+func (p *Transport) proxySwarmRequest(request *http.Request) (*http.Response, error) {
 	switch requestPath := request.URL.Path; requestPath {
 	case "/swarm":
 		return p.rewriteOperation(request, swarmInspectOperation)
@@ -306,7 +344,7 @@ func (p *ProxyTransport) proxySwarmRequest(request *http.Request) (*http.Respons
 	}
 }
 
-func (p *ProxyTransport) proxyTaskRequest(request *http.Request) (*http.Response, error) {
+func (p *Transport) proxyTaskRequest(request *http.Request) (*http.Response, error) {
 	switch requestPath := request.URL.Path; requestPath {
 	case "/tasks":
 		return p.rewriteOperation(request, taskListOperation)
@@ -316,11 +354,11 @@ func (p *ProxyTransport) proxyTaskRequest(request *http.Request) (*http.Response
 	}
 }
 
-func (p *ProxyTransport) proxyBuildRequest(request *http.Request) (*http.Response, error) {
+func (p *Transport) proxyBuildRequest(request *http.Request) (*http.Response, error) {
 	return p.interceptAndRewriteRequest(request, buildOperation)
 }
 
-func (p *ProxyTransport) proxyImageRequest(request *http.Request) (*http.Response, error) {
+func (p *Transport) proxyImageRequest(request *http.Request) (*http.Response, error) {
 	switch requestPath := request.URL.Path; requestPath {
 	case "/images/create":
 		return p.replaceRegistryAuthenticationHeader(request)
@@ -332,7 +370,7 @@ func (p *ProxyTransport) proxyImageRequest(request *http.Request) (*http.Respons
 	}
 }
 
-func (p *ProxyTransport) replaceRegistryAuthenticationHeader(request *http.Request) (*http.Response, error) {
+func (p *Transport) replaceRegistryAuthenticationHeader(request *http.Request) (*http.Response, error) {
 	accessContext, err := p.createRegistryAccessContext(request)
 	if err != nil {
 		return nil, err
@@ -370,7 +408,7 @@ func (p *ProxyTransport) replaceRegistryAuthenticationHeader(request *http.Reque
 
 // restrictedOperation ensures that the current user has the required authorizations
 // before executing the original request.
-func (p *ProxyTransport) restrictedOperation(request *http.Request, resourceID string, resourceType portainer.ResourceControlType) (*http.Response, error) {
+func (p *Transport) restrictedOperation(request *http.Request, resourceID string, resourceType portainer.ResourceControlType) (*http.Response, error) {
 	var err error
 	tokenData, err := security.RetrieveTokenData(request)
 	if err != nil {
@@ -404,7 +442,7 @@ func (p *ProxyTransport) restrictedOperation(request *http.Request, resourceID s
 }
 
 // restrictedVolumeBrowserOperation is similar to restrictedOperation but adds an extra check on a specific setting
-func (p *ProxyTransport) restrictedVolumeBrowserOperation(request *http.Request, resourceID string) (*http.Response, error) {
+func (p *Transport) restrictedVolumeBrowserOperation(request *http.Request, resourceID string) (*http.Response, error) {
 	var err error
 	tokenData, err := security.RetrieveTokenData(request)
 	if err != nil {
@@ -462,7 +500,7 @@ func (p *ProxyTransport) restrictedVolumeBrowserOperation(request *http.Request,
 // rewriteOperationWithLabelFiltering will create a new operation context with data that will be used
 // to decorate the original request's response as well as retrieve all the black listed labels
 // to filter the resources.
-func (p *ProxyTransport) rewriteOperationWithLabelFiltering(request *http.Request, operation restrictedOperationRequest) (*http.Response, error) {
+func (p *Transport) rewriteOperationWithLabelFiltering(request *http.Request, operation restrictedOperationRequest) (*http.Response, error) {
 	operationContext, err := p.createOperationContext(request)
 	if err != nil {
 		return nil, err
@@ -483,7 +521,7 @@ func (p *ProxyTransport) rewriteOperationWithLabelFiltering(request *http.Reques
 
 // rewriteOperation will create a new operation context with data that will be used
 // to decorate the original request's response.
-func (p *ProxyTransport) rewriteOperation(request *http.Request, operation restrictedOperationRequest) (*http.Response, error) {
+func (p *Transport) rewriteOperation(request *http.Request, operation restrictedOperationRequest) (*http.Response, error) {
 	operationContext, err := p.createOperationContext(request)
 	if err != nil {
 		return nil, err
@@ -496,7 +534,7 @@ func (p *ProxyTransport) rewriteOperation(request *http.Request, operation restr
 	return p.executeRequestAndRewriteResponse(request, operation, executor)
 }
 
-func (p *ProxyTransport) interceptAndRewriteRequest(request *http.Request, operation operationRequest) (*http.Response, error) {
+func (p *Transport) interceptAndRewriteRequest(request *http.Request, operation operationRequest) (*http.Response, error) {
 	err := operation(request)
 	if err != nil {
 		return nil, err
@@ -515,7 +553,7 @@ func (p *ProxyTransport) interceptAndRewriteRequest(request *http.Request, opera
 // https://docs.docker.com/engine/api/v1.40/#operation/ServiceCreate
 // https://docs.docker.com/engine/api/v1.40/#operation/SecretCreate
 // https://docs.docker.com/engine/api/v1.40/#operation/ConfigCreate
-func (p *ProxyTransport) decorateGenericResourceCreationResponse(response *http.Response, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType, userID portainer.UserID) error {
+func (p *Transport) decorateGenericResourceCreationResponse(response *http.Response, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType, userID portainer.UserID) error {
 	responseObject, err := responseutils.GetResponseAsJSONOBject(response)
 	if err != nil {
 		return err
@@ -538,7 +576,7 @@ func (p *ProxyTransport) decorateGenericResourceCreationResponse(response *http.
 	return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
 }
 
-func (p *ProxyTransport) decorateGenericResourceCreationOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
+func (p *Transport) decorateGenericResourceCreationOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
 	tokenData, err := security.RetrieveTokenData(request)
 	if err != nil {
 		return nil, err
@@ -553,7 +591,7 @@ func (p *ProxyTransport) decorateGenericResourceCreationOperation(request *http.
 	return response, err
 }
 
-func (p *ProxyTransport) executeGenericResourceDeletionOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
+func (p *Transport) executeGenericResourceDeletionOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
 	response, err := p.restrictedOperation(request, resourceIdentifierAttribute, resourceType)
 	if err != nil {
 		return response, err
@@ -574,7 +612,7 @@ func (p *ProxyTransport) executeGenericResourceDeletionOperation(request *http.R
 	return response, err
 }
 
-func (p *ProxyTransport) executeRequestAndRewriteResponse(request *http.Request, operation restrictedOperationRequest, executor *operationExecutor) (*http.Response, error) {
+func (p *Transport) executeRequestAndRewriteResponse(request *http.Request, operation restrictedOperationRequest, executor *operationExecutor) (*http.Response, error) {
 	response, err := p.executeDockerRequest(request)
 	if err != nil {
 		return response, err
@@ -586,7 +624,7 @@ func (p *ProxyTransport) executeRequestAndRewriteResponse(request *http.Request,
 
 // administratorOperation ensures that the user has administrator privileges
 // before executing the original request.
-func (p *ProxyTransport) administratorOperation(request *http.Request) (*http.Response, error) {
+func (p *Transport) administratorOperation(request *http.Request) (*http.Response, error) {
 	tokenData, err := security.RetrieveTokenData(request)
 	if err != nil {
 		return nil, err
@@ -599,7 +637,7 @@ func (p *ProxyTransport) administratorOperation(request *http.Request) (*http.Re
 	return p.executeDockerRequest(request)
 }
 
-func (p *ProxyTransport) createRegistryAccessContext(request *http.Request) (*registryAccessContext, error) {
+func (p *Transport) createRegistryAccessContext(request *http.Request) (*registryAccessContext, error) {
 	tokenData, err := security.RetrieveTokenData(request)
 	if err != nil {
 		return nil, err
@@ -636,7 +674,7 @@ func (p *ProxyTransport) createRegistryAccessContext(request *http.Request) (*re
 	return accessContext, nil
 }
 
-func (p *ProxyTransport) createOperationContext(request *http.Request) (*restrictedDockerOperationContext, error) {
+func (p *Transport) createOperationContext(request *http.Request) (*restrictedDockerOperationContext, error) {
 	var err error
 	tokenData, err := security.RetrieveTokenData(request)
 	if err != nil {

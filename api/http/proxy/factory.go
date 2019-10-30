@@ -55,7 +55,7 @@ func (factory *proxyFactory) newDockerHTTPSProxy(u *url.URL, tlsConfig *portaine
 		return nil, err
 	}
 
-	proxy.Transport.(*docker.ProxyTransport).HTTPTransport.TLSClientConfig = config
+	proxy.Transport.(*docker.Transport).HTTPTransport.TLSClientConfig = config
 	return proxy, nil
 }
 
@@ -65,33 +65,28 @@ func (factory *proxyFactory) newDockerHTTPProxy(u *url.URL, endpoint *portainer.
 }
 
 func (factory *proxyFactory) createDockerReverseProxy(u *url.URL, endpoint *portainer.Endpoint) *httputil.ReverseProxy {
-	proxy := newSingleHostReverseProxyWithHostHeader(u)
-
-	enableSignature := false
-	if endpoint.Type == portainer.AgentOnDockerEnvironment {
-		enableSignature = true
-	}
-
-	transport := &docker.ProxyTransport{
-		EnableSignature:        enableSignature,
+	transportParameters := &docker.TransportParameters{
+		EnableSignature:        false,
+		EndpointIdentifier:     endpoint.ID,
+		EndpointType:           endpoint.Type,
 		ResourceControlService: factory.ResourceControlService,
 		UserService:            factory.UserService,
 		TeamMembershipService:  factory.TeamMembershipService,
-		SettingsService:        factory.SettingsService,
 		RegistryService:        factory.RegistryService,
 		DockerHubService:       factory.DockerHubService,
+		SettingsService:        factory.SettingsService,
 		ReverseTunnelService:   factory.ReverseTunnelService,
 		ExtensionService:       factory.ExtensionService,
-		HTTPTransport:          &http.Transport{},
-		EndpointIdentifier:     endpoint.ID,
-		EndpointType:           endpoint.Type,
+		SignatureService:       nil,
 	}
 
-	if enableSignature {
-		transport.SignatureService = factory.SignatureService
+	if endpoint.Type == portainer.AgentOnDockerEnvironment {
+		transportParameters.EnableSignature = true
+		transportParameters.SignatureService = factory.SignatureService
 	}
 
-	proxy.Transport = transport
+	proxy := newSingleHostReverseProxyWithHostHeader(u)
+	proxy.Transport = docker.NewTransport(transportParameters, &http.Transport{})
 	return proxy
 }
 

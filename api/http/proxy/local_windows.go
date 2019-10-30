@@ -14,22 +14,23 @@ import (
 )
 
 func (factory proxyFactory) newLocalProxy(path string, endpoint *portainer.Endpoint) http.Handler {
-	proxy := &localProxy{}
-	transport := &docker.ProxyTransport{
+	transportParameters := &docker.TransportParameters{
 		EnableSignature:        false,
+		EndpointIdentifier:     endpoint.ID,
+		EndpointType:           endpoint.Type,
 		ResourceControlService: factory.ResourceControlService,
 		UserService:            factory.UserService,
 		TeamMembershipService:  factory.TeamMembershipService,
-		SettingsService:        factory.SettingsService,
 		RegistryService:        factory.RegistryService,
 		DockerHubService:       factory.DockerHubService,
+		SettingsService:        factory.SettingsService,
 		ReverseTunnelService:   factory.ReverseTunnelService,
 		ExtensionService:       factory.ExtensionService,
-		HTTPTransport:          newNamedPipeTransport(path),
-		EndpointIdentifier:     endpoint.ID,
-		EndpointType:           endpoint.Type,
+		SignatureService:       nil,
 	}
-	proxy.Transport = transport
+
+	proxy := &localProxy{}
+	proxy.transport = docker.NewTransport(transportParameters, newNamedPipeTransport(path))
 	return proxy
 }
 

@@ -11,16 +11,16 @@ import (
 )
 
 type localProxy struct {
-	Transport *docker.ProxyTransport
+	transport *docker.Transport
 }
 
 func (proxy *localProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Force URL/domain to http/unixsocket to be able to
-	// use http.Transport RoundTrip to do the requests via the socket
+	// use http.transport RoundTrip to do the requests via the socket
 	r.URL.Scheme = "http"
 	r.URL.Host = "unixsocket"
 
-	res, err := proxy.Transport.ProxyDockerRequest(r)
+	res, err := proxy.transport.ProxyDockerRequest(r)
 	if err != nil {
 		code := http.StatusInternalServerError
 		if res != nil && res.StatusCode != 0 {
