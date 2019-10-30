@@ -164,7 +164,7 @@ func (service *AuthorizationService) RemoveTeamAccessPolicies(teamID TeamID) err
 		}
 	}
 
-	return nil
+	return service.UpdateUsersAuthorizations()
 }
 
 // RemoveUserAccessPolicies will remove all existing access policies associated to the specified user
