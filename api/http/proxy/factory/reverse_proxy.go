@@ -1,4 +1,4 @@
-package proxy
+package factory
 
 import (
 	"net/http"

@@ -12,7 +12,7 @@ import (
 
 	"github.com/docker/docker/client"
 	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/proxy/responseutils"
+	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
 	"github.com/portainer/portainer/api/http/security"
 )
 

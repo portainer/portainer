@@ -8,8 +8,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-
-	"github.com/portainer/portainer/api"
 )
 
 // GetResponseAsJSONOBject returns the response content as a generic JSON object
@@ -72,13 +70,13 @@ func getResponseBodyAsGenericJSON(response *http.Response) (interface{}, error) 
 // WriteAccessDeniedResponse will create a new access denied response
 func WriteAccessDeniedResponse() (*http.Response, error) {
 	response := &http.Response{}
-	err := RewriteResponse(response, portainer.ErrResourceAccessDenied, http.StatusForbidden)
+	err := RewriteResponse(response, errors.New("access denied to resource"), http.StatusForbidden)
 	return response, err
 }
 
 // WriteAccessDeniedResponse will overwrite the existing response with an access denied response
 func RewriteAccessDeniedResponse(response *http.Response) error {
-	return RewriteResponse(response, portainer.ErrResourceAccessDenied, http.StatusForbidden)
+	return RewriteResponse(response, errors.New("access denied to resource"), http.StatusForbidden)
 }
 
 // RewriteReponse will replace the existing response body and status code with the one specified
