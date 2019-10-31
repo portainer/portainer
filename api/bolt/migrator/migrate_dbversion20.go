@@ -21,6 +21,19 @@ func (m *Migrator) updateResourceControlsToDBVersion21() error {
 }
 
 func (m *Migrator) updateUsersAndRolesToDBVersion21() error {
+	legacyUsers, err := m.userService.Users()
+	if err != nil {
+		return err
+	}
+
+	for _, user := range legacyUsers {
+		user.PortainerAuthorizations = portainer.DefaultPortainerAuthorizations()
+		err = m.userService.UpdateUser(user.ID, &user)
+		if err != nil {
+			return err
+		}
+	}
+
 	endpointAdministratorRole, err := m.roleService.Role(portainer.RoleID(1))
 	if err != nil {
 		return err
