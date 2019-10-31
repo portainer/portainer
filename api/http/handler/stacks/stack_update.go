@@ -90,7 +90,7 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 		userTeamIDs = append(userTeamIDs, membership.TeamID)
 	}
 
-	if (resourceControl == nil && !securityContext.IsAdmin) || !portainer.UserCanAccessResource(securityContext.UserID, userTeamIDs, resourceControl) {
+	if !securityContext.IsAdmin && (resourceControl == nil || !portainer.UserCanAccessResource(securityContext.UserID, userTeamIDs, resourceControl)) {
 		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
 	}
 
