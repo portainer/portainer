@@ -1,7 +1,12 @@
 package docker
 
 import (
+	"context"
 	"net/http"
+
+	"github.com/docker/docker/api/types"
+
+	"github.com/docker/docker/client"
 
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
@@ -12,6 +17,20 @@ const (
 	networkIdentifier                  = "Id"
 	networkLabelForStackIdentifier     = "com.docker.stack.namespace"
 )
+
+func getInheritedResourceControlFromNetworkLabels(dockerClient *client.Client, networkID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
+	network, err := dockerClient.NetworkInspect(context.Background(), networkID, types.NetworkInspectOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	swarmStackName := network.Labels[networkLabelForStackIdentifier]
+	if swarmStackName != "" {
+		return portainer.GetResourceControlByResourceIDAndType(swarmStackName, portainer.StackResourceControl, resourceControls), nil
+	}
+
+	return nil, nil
+}
 
 // networkListOperation extracts the response as a JSON object, loop through the networks array
 // decorate and/or filter the networks based on resource controls before rewriting the response

@@ -1,7 +1,10 @@
 package docker
 
 import (
+	"context"
 	"net/http"
+
+	"github.com/docker/docker/client"
 
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
@@ -12,6 +15,20 @@ const (
 	volumeIdentifier                  = "Name"
 	volumeLabelForStackIdentifier     = "com.docker.stack.namespace"
 )
+
+func getInheritedResourceControlFromVolumeLabels(dockerClient *client.Client, volumeID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
+	network, err := dockerClient.VolumeInspect(context.Background(), volumeID)
+	if err != nil {
+		return nil, err
+	}
+
+	swarmStackName := network.Labels[volumeLabelForStackIdentifier]
+	if swarmStackName != "" {
+		return portainer.GetResourceControlByResourceIDAndType(swarmStackName, portainer.StackResourceControl, resourceControls), nil
+	}
+
+	return nil, nil
+}
 
 // volumeListOperation extracts the response as a JSON object, loop through the volume array
 // decorate and/or filter the volumes based on resource controls before rewriting the response

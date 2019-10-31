@@ -1,7 +1,11 @@
 package docker
 
 import (
+	"context"
 	"net/http"
+
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/client"
 
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
@@ -12,6 +16,20 @@ const (
 	serviceIdentifier                  = "ID"
 	serviceLabelForStackIdentifier     = "com.docker.stack.namespace"
 )
+
+func getInheritedResourceControlFromServiceLabels(dockerClient *client.Client, serviceID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
+	service, _, err := dockerClient.ServiceInspectWithRaw(context.Background(), serviceID, types.ServiceInspectOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	swarmStackName := service.Spec.Labels[serviceLabelForStackIdentifier]
+	if swarmStackName != "" {
+		return portainer.GetResourceControlByResourceIDAndType(swarmStackName, portainer.StackResourceControl, resourceControls), nil
+	}
+
+	return nil, nil
+}
 
 // serviceListOperation extracts the response as a JSON array, loop through the service array
 // decorate and/or filter the services based on resource controls before rewriting the response

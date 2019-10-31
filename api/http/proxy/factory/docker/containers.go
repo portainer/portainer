@@ -1,8 +1,10 @@
 package docker
 
 import (
+	"context"
 	"net/http"
 
+	"github.com/docker/docker/client"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
 )
@@ -15,6 +17,30 @@ const (
 	containerLabelForSwarmStackIdentifier   = "com.docker.stack.namespace"
 	containerLabelForComposeStackIdentifier = "com.docker.compose.project"
 )
+
+func getInheritedResourceControlFromContainerLabels(dockerClient *client.Client, containerID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
+	container, err := dockerClient.ContainerInspect(context.Background(), containerID)
+	if err != nil {
+		return nil, err
+	}
+
+	serviceName := container.Config.Labels[containerLabelForServiceIdentifier]
+	if serviceName != "" {
+		return portainer.GetResourceControlByResourceIDAndType(serviceName, portainer.ServiceResourceControl, resourceControls), nil
+	}
+
+	swarmStackName := container.Config.Labels[containerLabelForSwarmStackIdentifier]
+	if swarmStackName != "" {
+		return portainer.GetResourceControlByResourceIDAndType(swarmStackName, portainer.StackResourceControl, resourceControls), nil
+	}
+
+	composeStackName := container.Config.Labels[containerLabelForComposeStackIdentifier]
+	if composeStackName != "" {
+		return portainer.GetResourceControlByResourceIDAndType(composeStackName, portainer.StackResourceControl, resourceControls), nil
+	}
+
+	return nil, nil
+}
 
 // containerListOperation extracts the response as a JSON array, loop through the containers array
 // decorate and/or filter the containers based on resource controls before rewriting the response

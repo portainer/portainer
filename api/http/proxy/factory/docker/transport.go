@@ -429,23 +429,22 @@ func (p *Transport) restrictedOperation(request *http.Request, resourceID string
 			return nil, err
 		}
 
-		// if resource is part of a stack, RC will have resourceID == stackName. Here resourceID == resource identifier
-		// and do not match stack name.
-		// => always resourceControl == nil
-
-		// if part of a stack, must search into labels to see if a resource control with stack type exists
-		// labels are not available here though.
-		// not fixed: https://github.com/portainer/portainer/issues/3259
-
 		resourceControl := portainer.GetResourceControlByResourceIDAndType(resourceID, resourceType, resourceControls)
-		// must add an extra check to validate that resource is not part of a stack (if it can be, e.g. not an image)
-		// send resourceInspect request
-		// inspect labels and try a GetResourceControlByResourceIDAndType(stackName, portainer.Stack, resourceControls)
+		if resourceControl == nil {
+			// This resource was created outside of portainer,
+			// is part of a Docker service or part of a Docker Swarm/Compose stack
 
-		// TODO: must be tested against agent endpoint when trying to access a resource that is on another node.
-		// TODO: must be tested with Edge endpoint.
+			inheritedResourceControl, err := p.getInheritedResourceControlFromServiceOrStack(resourceID, resourceType, resourceControls)
+			if err != nil {
+				return nil, err
+			}
 
-		if resourceControl == nil || !portainer.UserCanAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
+			if inheritedResourceControl == nil || !portainer.UserCanAccessResource(tokenData.ID, userTeamIDs, inheritedResourceControl) {
+				return responseutils.WriteAccessDeniedResponse()
+			}
+		}
+
+		if resourceControl != nil && !portainer.UserCanAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
 			return responseutils.WriteAccessDeniedResponse()
 		}
 	}

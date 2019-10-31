@@ -22,6 +22,22 @@ func (p *Transport) createPrivateResourceControl(resourceIdentifier string, reso
 	return resourceControl, nil
 }
 
+func (p *Transport) getInheritedResourceControlFromServiceOrStack(resourceIdentifier string, resourceType portainer.ResourceControlType, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
+
+	switch resourceType {
+	case portainer.ContainerResourceControl:
+		return getInheritedResourceControlFromContainerLabels(p.dockerClient, resourceIdentifier, resourceControls)
+	case portainer.NetworkResourceControl:
+		return getInheritedResourceControlFromNetworkLabels(p.dockerClient, resourceIdentifier, resourceControls)
+	case portainer.VolumeResourceControl:
+		return getInheritedResourceControlFromVolumeLabels(p.dockerClient, resourceIdentifier, resourceControls)
+	case portainer.ServiceResourceControl:
+		return getInheritedResourceControlFromServiceLabels(p.dockerClient, resourceIdentifier, resourceControls)
+	}
+
+	return nil, nil
+}
+
 // applyResourceAccessControlFromLabel returns an optionally decorated object as the first return value and the
 // access level for the user (granted or denied) as the second return value.
 // It will retrieve an identifier from the labels object. If an identifier exists, it will check for
