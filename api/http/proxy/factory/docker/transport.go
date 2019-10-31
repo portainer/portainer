@@ -598,7 +598,7 @@ func (p *Transport) decorateGenericResourceCreationOperation(request *http.Reque
 		return response, err
 	}
 
-	if response.StatusCode == http.StatusOK {
+	if response.StatusCode == http.StatusCreated {
 		err = p.decorateGenericResourceCreationResponse(response, resourceIdentifierAttribute, resourceType, tokenData.ID)
 	}
 
