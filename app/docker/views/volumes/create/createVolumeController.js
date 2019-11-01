@@ -82,7 +82,7 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
     VolumeService.createVolume(volumeConfiguration)
     .then(function success(data) {
       const userId = userDetails.ID;
-      const resourceControl = data.Portainer.ResourceControl;
+      const resourceControl = data.ResourceControl;
       return ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
     })
     .then(function success() {

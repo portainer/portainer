@@ -116,6 +116,9 @@ function ($scope, $state, StackService, Authentication, Notifications, FormValid
     $scope.state.actionInProgress = true;
     action(name, method)
     .then(function success(data) {
+      if (data.data) {
+        data = data.data;
+      }
       const userId = userDetails.ID;
       const resourceControl = data.ResourceControl;
       return ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);

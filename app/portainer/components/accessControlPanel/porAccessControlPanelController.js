@@ -27,7 +27,7 @@ function ($q, $state, UserService, TeamService, ResourceControlHelper, ResourceC
   ctrl.availableTeams = [];
 
   ctrl.canEditOwnership = function() {
-    const hasRC = ctrl.ResourceControl;
+    const hasRC = ctrl.resourceControl;
     const inheritedVolume = hasRC && ctrl.resourceControl.Type === RCTI.CONTAINER && ctrl.resourceType === RCTS.VOLUME;
     const inheritedContainer = hasRC && ctrl.resourceControl.Type === RCTI.SERVICE && ctrl.resourceType === RCTS.CONTAINER;
     const inheritedFromStack = hasRC && ctrl.resourceControl.Type === RCTI.STACK && ctrl.resourceType !== RCTS.STACK;
