@@ -393,7 +393,7 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
     var envArr = [];
     for (var e in $scope.config.Env) {
       if ({}.hasOwnProperty.call($scope.config.Env, e)) {
-        var arr = $scope.config.Env[e].split(/\=(.+)/);
+        var arr = $scope.config.Env[e].split(/\=(.*)/);
         envArr.push({'name': arr[0], 'value': arr[1]});
       }
     }
