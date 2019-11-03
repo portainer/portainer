@@ -216,7 +216,7 @@ func (p *Transport) proxyContainerRequest(request *http.Request) (*http.Response
 			containerID := path.Base(requestPath)
 
 			if request.Method == http.MethodDelete {
-				return p.executeGenericResourceDeletionOperation(request, containerID, portainer.ConfigResourceControl)
+				return p.executeGenericResourceDeletionOperation(request, containerID, portainer.ContainerResourceControl)
 			}
 
 			return p.restrictedOperation(request, containerID, portainer.ContainerResourceControl)
