@@ -20,6 +20,8 @@ func NewPrivateResourceControl(resourceIdentifier string, resourceType ResourceC
 	return resourceControl
 }
 
+// DecorateStacks will iterate through a list of stacks, check for an associated resource control for each
+// stack and decorate the stack element if a resource control is found.
 func DecorateStacks(stacks []Stack, resourceControls []ResourceControl) []Stack {
 	for idx, stack := range stacks {
 
