@@ -70,19 +70,42 @@ func networkInspectOperation(response *http.Response, executor *operationExecuto
 		return errDockerNetworkIdentifierNotFound
 	}
 
-	networkID := responseObject[networkIdentifier].(string)
-	responseObject, access := applyResourceAccessControl(responseObject, networkID, executor.operationContext, portainer.NetworkResourceControl)
-	if access {
+	resourceControl := findInheritedNetworkResourceControl(responseObject, executor.operationContext.resourceControls)
+	if resourceControl == nil && (executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess) {
 		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
 	}
 
-	networkLabels := extractNetworkLabelsFromNetworkInspectObject(responseObject)
-	responseObject, access = applyResourceAccessControlFromLabel(networkLabels, responseObject, networkLabelForStackIdentifier, executor.operationContext, portainer.StackResourceControl)
-	if access {
+	if executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess || portainer.UserCanAccessResource(executor.operationContext.userID, executor.operationContext.userTeamIDs, resourceControl) {
+		responseObject = decorateObject(responseObject, resourceControl)
 		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
 	}
 
 	return responseutils.RewriteAccessDeniedResponse(response)
+}
+
+// findInheritedNetworkResourceControl will search for a resource control object associated to the network or
+// inherited from a Swarm stack (based on labels).
+func findInheritedNetworkResourceControl(responseObject map[string]interface{}, resourceControls []portainer.ResourceControl) *portainer.ResourceControl {
+	networkID := responseObject[networkIdentifier].(string)
+
+	resourceControl := portainer.GetResourceControlByResourceIDAndType(networkID, portainer.NetworkResourceControl, resourceControls)
+	if resourceControl != nil {
+		return resourceControl
+	}
+
+	networkLabels := extractNetworkLabelsFromNetworkInspectObject(responseObject)
+	if networkLabels != nil {
+		if networkLabels[networkLabelForStackIdentifier] != nil {
+			inheritedSwarmStackIdentifier := networkLabels[networkLabelForStackIdentifier].(string)
+			resourceControl = portainer.GetResourceControlByResourceIDAndType(inheritedSwarmStackIdentifier, portainer.StackResourceControl, resourceControls)
+
+			if resourceControl != nil {
+				return resourceControl
+			}
+		}
+	}
+
+	return nil
 }
 
 // extractNetworkLabelsFromNetworkInspectObject retrieve the Labels of the network if present.

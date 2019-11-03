@@ -87,29 +87,60 @@ func containerInspectOperation(response *http.Response, executor *operationExecu
 		return errDockerContainerIdentifierNotFound
 	}
 
-	containerID := responseObject[containerIdentifier].(string)
-	responseObject, access := applyResourceAccessControl(responseObject, containerID, executor.operationContext, portainer.ContainerResourceControl)
-	if access {
+	resourceControl := findInheritedContainerResourceControl(responseObject, executor.operationContext.resourceControls)
+	if resourceControl == nil && (executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess) {
 		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
 	}
 
-	containerLabels := extractContainerLabelsFromContainerInspectObject(responseObject)
-	responseObject, access = applyResourceAccessControlFromLabel(containerLabels, responseObject, containerLabelForServiceIdentifier, executor.operationContext, portainer.ServiceResourceControl)
-	if access {
-		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
-	}
-
-	responseObject, access = applyResourceAccessControlFromLabel(containerLabels, responseObject, containerLabelForSwarmStackIdentifier, executor.operationContext, portainer.StackResourceControl)
-	if access {
-		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
-	}
-
-	responseObject, access = applyResourceAccessControlFromLabel(containerLabels, responseObject, containerLabelForComposeStackIdentifier, executor.operationContext, portainer.StackResourceControl)
-	if access {
+	if executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess || portainer.UserCanAccessResource(executor.operationContext.userID, executor.operationContext.userTeamIDs, resourceControl) {
+		responseObject = decorateObject(responseObject, resourceControl)
 		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
 	}
 
 	return responseutils.RewriteAccessDeniedResponse(response)
+}
+
+// findInheritedContainerResourceControl will search for a resource control object associated to the container or
+// inherited from another resource (based on labels) in the following order: a Swarm service, a Swarm stack or a Compose stack.
+func findInheritedContainerResourceControl(responseObject map[string]interface{}, resourceControls []portainer.ResourceControl) *portainer.ResourceControl {
+	containerID := responseObject[containerIdentifier].(string)
+
+	resourceControl := portainer.GetResourceControlByResourceIDAndType(containerID, portainer.ContainerResourceControl, resourceControls)
+	if resourceControl != nil {
+		return resourceControl
+	}
+
+	containerLabels := extractContainerLabelsFromContainerInspectObject(responseObject)
+	if containerLabels != nil {
+		if containerLabels[containerLabelForServiceIdentifier] != nil {
+			inheritedServiceIdentifier := containerLabels[containerLabelForServiceIdentifier].(string)
+			resourceControl = portainer.GetResourceControlByResourceIDAndType(inheritedServiceIdentifier, portainer.ServiceResourceControl, resourceControls)
+
+			if resourceControl != nil {
+				return resourceControl
+			}
+		}
+
+		if containerLabels[containerLabelForSwarmStackIdentifier] != nil {
+			inheritedSwarmStackIdentifier := containerLabels[containerLabelForSwarmStackIdentifier].(string)
+			resourceControl = portainer.GetResourceControlByResourceIDAndType(inheritedSwarmStackIdentifier, portainer.StackResourceControl, resourceControls)
+
+			if resourceControl != nil {
+				return resourceControl
+			}
+		}
+
+		if containerLabels[containerLabelForComposeStackIdentifier] != nil {
+			inheritedComposeStackIdentifier := containerLabels[containerLabelForComposeStackIdentifier].(string)
+			resourceControl = portainer.GetResourceControlByResourceIDAndType(inheritedComposeStackIdentifier, portainer.StackResourceControl, resourceControls)
+
+			if resourceControl != nil {
+				return resourceControl
+			}
+		}
+	}
+
+	return nil
 }
 
 // extractContainerLabelsFromContainerInspectObject retrieve the Labels of the container if present.

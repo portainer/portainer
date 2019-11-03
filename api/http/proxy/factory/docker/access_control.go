@@ -71,7 +71,7 @@ func applyResourceAccessControl(resourceObject map[string]interface{}, resourceI
 		return resourceObject, context.isAdmin || context.endpointResourceAccess
 	}
 
-	if context.isAdmin || context.endpointResourceAccess || resourceControl.Public || portainer.UserCanAccessResource(context.userID, context.userTeamIDs, resourceControl) {
+	if context.isAdmin || context.endpointResourceAccess || portainer.UserCanAccessResource(context.userID, context.userTeamIDs, resourceControl) {
 		resourceObject = decorateObject(resourceObject, resourceControl)
 		return resourceObject, true
 	}

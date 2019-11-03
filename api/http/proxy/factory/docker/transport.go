@@ -432,8 +432,7 @@ func (p *Transport) restrictedOperation(request *http.Request, resourceID string
 		resourceControl := portainer.GetResourceControlByResourceIDAndType(resourceID, resourceType, resourceControls)
 		if resourceControl == nil {
 			// This resource was created outside of portainer,
-			// is part of a Docker service or part of a Docker Swarm/Compose stack
-
+			// is part of a Docker service or part of a Docker Swarm/Compose stack.
 			inheritedResourceControl, err := p.getInheritedResourceControlFromServiceOrStack(resourceID, resourceType, resourceControls)
 			if err != nil {
 				return nil, err

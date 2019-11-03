@@ -69,19 +69,42 @@ func serviceInspectOperation(response *http.Response, executor *operationExecuto
 		return errDockerServiceIdentifierNotFound
 	}
 
-	serviceID := responseObject[serviceIdentifier].(string)
-	responseObject, access := applyResourceAccessControl(responseObject, serviceID, executor.operationContext, portainer.ServiceResourceControl)
-	if access {
+	resourceControl := findInheritedServiceResourceControl(responseObject, executor.operationContext.resourceControls)
+	if resourceControl == nil && (executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess) {
 		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
 	}
 
-	serviceLabels := extractServiceLabelsFromServiceInspectObject(responseObject)
-	responseObject, access = applyResourceAccessControlFromLabel(serviceLabels, responseObject, serviceLabelForStackIdentifier, executor.operationContext, portainer.StackResourceControl)
-	if access {
+	if executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess || portainer.UserCanAccessResource(executor.operationContext.userID, executor.operationContext.userTeamIDs, resourceControl) {
+		responseObject = decorateObject(responseObject, resourceControl)
 		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
 	}
 
 	return responseutils.RewriteAccessDeniedResponse(response)
+}
+
+// findInheritedServiceResourceControl will search for a resource control object associated to the service or
+// inherited from a Swarm stack (based on labels).
+func findInheritedServiceResourceControl(responseObject map[string]interface{}, resourceControls []portainer.ResourceControl) *portainer.ResourceControl {
+	serviceID := responseObject[serviceIdentifier].(string)
+
+	resourceControl := portainer.GetResourceControlByResourceIDAndType(serviceID, portainer.ServiceResourceControl, resourceControls)
+	if resourceControl != nil {
+		return resourceControl
+	}
+
+	serviceLabels := extractServiceLabelsFromServiceInspectObject(responseObject)
+	if serviceLabels != nil {
+		if serviceLabels[serviceLabelForStackIdentifier] != nil {
+			inheritedSwarmStackIdentifier := serviceLabels[serviceLabelForStackIdentifier].(string)
+			resourceControl = portainer.GetResourceControlByResourceIDAndType(inheritedSwarmStackIdentifier, portainer.StackResourceControl, resourceControls)
+
+			if resourceControl != nil {
+				return resourceControl
+			}
+		}
+	}
+
+	return nil
 }
 
 // extractServiceLabelsFromServiceInspectObject retrieve the Labels of the service if present.

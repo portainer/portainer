@@ -77,19 +77,42 @@ func volumeInspectOperation(response *http.Response, executor *operationExecutor
 		return errDockerVolumeIdentifierNotFound
 	}
 
-	volumeID := responseObject[volumeIdentifier].(string)
-	responseObject, access := applyResourceAccessControl(responseObject, volumeID, executor.operationContext, portainer.VolumeResourceControl)
-	if access {
+	resourceControl := findInheritedVolumeResourceControl(responseObject, executor.operationContext.resourceControls)
+	if resourceControl == nil && (executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess) {
 		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
 	}
 
-	volumeLabels := extractVolumeLabelsFromVolumeInspectObject(responseObject)
-	responseObject, access = applyResourceAccessControlFromLabel(volumeLabels, responseObject, volumeLabelForStackIdentifier, executor.operationContext, portainer.StackResourceControl)
-	if access {
+	if executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess || portainer.UserCanAccessResource(executor.operationContext.userID, executor.operationContext.userTeamIDs, resourceControl) {
+		responseObject = decorateObject(responseObject, resourceControl)
 		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
 	}
 
 	return responseutils.RewriteAccessDeniedResponse(response)
+}
+
+// findInheritedVolumeResourceControl will search for a resource control object associated to the service or
+// inherited from a Swarm stack (based on labels).
+func findInheritedVolumeResourceControl(responseObject map[string]interface{}, resourceControls []portainer.ResourceControl) *portainer.ResourceControl {
+	volumeID := responseObject[volumeIdentifier].(string)
+
+	resourceControl := portainer.GetResourceControlByResourceIDAndType(volumeID, portainer.VolumeResourceControl, resourceControls)
+	if resourceControl != nil {
+		return resourceControl
+	}
+
+	volumeLabels := extractVolumeLabelsFromVolumeInspectObject(responseObject)
+	if volumeLabels != nil {
+		if volumeLabels[volumeLabelForStackIdentifier] != nil {
+			inheritedSwarmStackIdentifier := volumeLabels[volumeLabelForStackIdentifier].(string)
+			resourceControl = portainer.GetResourceControlByResourceIDAndType(inheritedSwarmStackIdentifier, portainer.StackResourceControl, resourceControls)
+
+			if resourceControl != nil {
+				return resourceControl
+			}
+		}
+	}
+
+	return nil
 }
 
 // extractVolumeLabelsFromVolumeInspectObject retrieve the Labels of the volume if present.
