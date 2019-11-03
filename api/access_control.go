@@ -2,8 +2,7 @@ package portainer
 
 // NewPrivateResourceControl will create a new private resource control associated to the resource specified by the
 // identifier and type parameters. It automatically assigns it to the user specified by the userID parameter.
-func NewPrivateResourceControl(resourceIdentifier string, resourceType ResourceControlType, userID UserID) (*ResourceControl, error) {
-
+func NewPrivateResourceControl(resourceIdentifier string, resourceType ResourceControlType, userID UserID) *ResourceControl {
 	resourceControl := &ResourceControl{
 		AdministratorsOnly: false,
 		Type:               resourceType,
@@ -18,7 +17,7 @@ func NewPrivateResourceControl(resourceIdentifier string, resourceType ResourceC
 		TeamAccesses: []TeamResourceAccess{},
 	}
 
-	return resourceControl, nil
+	return resourceControl
 }
 
 func DecorateStacks(stacks []Stack, resourceControls []ResourceControl) []Stack {

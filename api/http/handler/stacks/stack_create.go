@@ -133,12 +133,9 @@ func (handler *Handler) isValidStackFile(stackFileContent []byte) (bool, error) 
 }
 
 func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *portainer.Stack, userID portainer.UserID) *httperror.HandlerError {
-	resourceControl, err := portainer.NewPrivateResourceControl(stack.Name, portainer.StackResourceControl, userID)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to generate default resource control for the stack", err}
-	}
+	resourceControl := portainer.NewPrivateResourceControl(stack.Name, portainer.StackResourceControl, userID)
 
-	err = handler.ResourceControlService.CreateResourceControl(resourceControl)
+	err := handler.ResourceControlService.CreateResourceControl(resourceControl)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist resource control inside the database", err}
 	}
