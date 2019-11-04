@@ -64,6 +64,7 @@ func (factory *ProxyFactory) newDockerHTTPProxy(endpoint *portainer.Endpoint) (h
 		Endpoint:               endpoint,
 		ResourceControlService: factory.resourceControlService,
 		UserService:            factory.userService,
+		TeamService:            factory.teamService,
 		TeamMembershipService:  factory.teamMembershipService,
 		RegistryService:        factory.registryService,
 		DockerHubService:       factory.dockerHubService,

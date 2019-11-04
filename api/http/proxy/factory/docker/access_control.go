@@ -2,9 +2,82 @@ package docker
 
 import (
 	"log"
+	"strings"
 
 	"github.com/portainer/portainer/api"
 )
+
+const (
+	resourceLabelForPortainerTeamResourceControl   = "io.portainer.accesscontrol.teams"
+	resourceLabelForPortainerUserResourceControl   = "io.portainer.accesscontrol.users"
+	resourceLabelForPortainerPublicResourceControl = "io.portainer.accesscontrol.public"
+	resourceLabelForDockerSwarmStackName           = "com.docker.stack.namespace"
+	resourceLabelForDockerServiceID                = "com.docker.swarm.service.id"
+	resourceLabelForDockerComposeStackName         = "com.docker.compose.project"
+)
+
+type resourceLabelSelector func(map[string]interface{}) map[string]interface{}
+
+func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject map[string]interface{}, resourceID string, resourceType portainer.ResourceControlType) (*portainer.ResourceControl, error) {
+	if labelsObject[resourceLabelForPortainerPublicResourceControl] != nil {
+		resourceControl := portainer.NewPublicResourceControl(resourceID, resourceType)
+
+		err := transport.resourceControlService.CreateResourceControl(resourceControl)
+		if err != nil {
+			return nil, err
+		}
+
+		return resourceControl, nil
+	}
+
+	teamNames := make([]string, 0)
+	userNames := make([]string, 0)
+	if labelsObject[resourceLabelForPortainerTeamResourceControl] != nil {
+		concatenatedTeamNames := labelsObject[resourceLabelForPortainerTeamResourceControl].(string)
+		teamNames = strings.Split(concatenatedTeamNames, ",")
+	}
+
+	if labelsObject[resourceLabelForPortainerUserResourceControl] != nil {
+		concatenatedUserNames := labelsObject[resourceLabelForPortainerUserResourceControl].(string)
+		userNames = strings.Split(concatenatedUserNames, ",")
+	}
+
+	if len(teamNames) > 0 || len(userNames) > 0 {
+		teamIDs := make([]portainer.TeamID, 0)
+		userIDs := make([]portainer.UserID, 0)
+
+		for _, name := range teamNames {
+			team, err := transport.teamService.TeamByName(name)
+			if err != nil {
+				log.Printf("[WARN] [http,proxy,docker] [message: unknown team name in access control label, ignoring access control rule for this team] [name: %s] [resource_id: %s]", name, resourceID)
+				continue
+			}
+
+			teamIDs = append(teamIDs, team.ID)
+		}
+
+		for _, name := range userNames {
+			user, err := transport.userService.UserByUsername(name)
+			if err != nil {
+				log.Printf("[WARN] [http,proxy,docker] [message: unknown user name in access control label, ignoring access control rule for this user] [name: %s] [resource_id: %s]", name, resourceID)
+				continue
+			}
+
+			userIDs = append(userIDs, user.ID)
+		}
+
+		resourceControl := portainer.NewRestrictedResourceControl(resourceID, resourceType, userIDs, teamIDs)
+
+		err := transport.resourceControlService.CreateResourceControl(resourceControl)
+		if err != nil {
+			return nil, err
+		}
+
+		return resourceControl, nil
+	}
+
+	return nil, nil
+}
 
 func (transport *Transport) createPrivateResourceControl(resourceIdentifier string, resourceType portainer.ResourceControlType, userID portainer.UserID) (*portainer.ResourceControl, error) {
 	resourceControl := portainer.NewPrivateResourceControl(resourceIdentifier, resourceType, userID)
@@ -29,77 +102,13 @@ func (transport *Transport) getInheritedResourceControlFromServiceOrStack(resour
 		return getInheritedResourceControlFromVolumeLabels(transport.dockerClient, resourceIdentifier, resourceControls)
 	case portainer.ServiceResourceControl:
 		return getInheritedResourceControlFromServiceLabels(transport.dockerClient, resourceIdentifier, resourceControls)
+	case portainer.ConfigResourceControl:
+		return getInheritedResourceControlFromConfigLabels(transport.dockerClient, resourceIdentifier, resourceControls)
+	case portainer.SecretResourceControl:
+		return getInheritedResourceControlFromSecretLabels(transport.dockerClient, resourceIdentifier, resourceControls)
 	}
 
 	return nil, nil
-}
-
-// applyResourceAccessControlFromLabel returns an optionally decorated object as the first return value and the
-// access level for the user (granted or denied) as the second return value.
-// It will retrieve an identifier from the labels object. If an identifier exists, it will check for
-// an existing resource control associated to it.
-// Returns a decorated object and authorized access (true) when a resource control is found and the user can access the resource.
-// Returns the original object and denied access (false) when no resource control is found.
-// Returns the original object and denied access (false) when a resource control is found and the user cannot access the resource.
-func applyResourceAccessControlFromLabel(labelsObject, resourceObject map[string]interface{}, labelIdentifier string,
-	context *restrictedDockerOperationContext, resourceType portainer.ResourceControlType) (map[string]interface{}, bool) {
-
-	if labelsObject != nil && labelsObject[labelIdentifier] != nil {
-		resourceIdentifier := labelsObject[labelIdentifier].(string)
-		return applyResourceAccessControl(resourceObject, resourceIdentifier, context, resourceType)
-	}
-	return resourceObject, false
-}
-
-// applyResourceAccessControl returns an optionally decorated object as the first return value and the
-// access level for the user (granted or denied) as the second return value.
-// Returns a decorated object and authorized access (true) when a resource control is found to the specified resource
-// identifier and the user can access the resource.
-// Returns the original object and authorized access (false) when no resource control is found for the specified
-// resource identifier.
-// Returns the original object and denied access (false) when a resource control is associated to the resource
-// and the user cannot access the resource.
-func applyResourceAccessControl(resourceObject map[string]interface{}, resourceIdentifier string,
-	context *restrictedDockerOperationContext, resourceType portainer.ResourceControlType) (map[string]interface{}, bool) {
-
-	resourceControl := portainer.GetResourceControlByResourceIDAndType(resourceIdentifier, resourceType, context.resourceControls)
-	if resourceControl == nil {
-		return resourceObject, context.isAdmin || context.endpointResourceAccess
-	}
-
-	if context.isAdmin || context.endpointResourceAccess || portainer.UserCanAccessResource(context.userID, context.userTeamIDs, resourceControl) {
-		resourceObject = decorateObject(resourceObject, resourceControl)
-		return resourceObject, true
-	}
-
-	return resourceObject, false
-}
-
-// decorateResourceWithAccessControlFromLabel will retrieve an identifier from the labels object. If an identifier exists,
-// it will check for an existing resource control associated to it. If a resource control is found, the resource object will be
-// decorated. If no identifier can be found in the labels or no resource control is associated to the identifier, the resource
-// object will not be changed.
-func decorateResourceWithAccessControlFromLabel(labelsObject, resourceObject map[string]interface{}, labelIdentifier string,
-	resourceControls []portainer.ResourceControl, resourceType portainer.ResourceControlType) map[string]interface{} {
-
-	if labelsObject != nil && labelsObject[labelIdentifier] != nil {
-		resourceIdentifier := labelsObject[labelIdentifier].(string)
-		resourceObject = decorateResourceWithAccessControl(resourceObject, resourceIdentifier, resourceControls, resourceType)
-	}
-
-	return resourceObject
-}
-
-// decorateResourceWithAccessControl will check if a resource control is associated to the specified resource identifier and type.
-// If a resource control is found, the resource object will be decorated, otherwise it will not be changed.
-func decorateResourceWithAccessControl(resourceObject map[string]interface{}, resourceIdentifier string,
-	resourceControls []portainer.ResourceControl, resourceType portainer.ResourceControlType) map[string]interface{} {
-
-	resourceControl := portainer.GetResourceControlByResourceIDAndType(resourceIdentifier, resourceType, resourceControls)
-	if resourceControl != nil {
-		return decorateObject(resourceObject, resourceControl)
-	}
-	return resourceObject
 }
 
 func decorateObject(object map[string]interface{}, resourceControl *portainer.ResourceControl) map[string]interface{} {

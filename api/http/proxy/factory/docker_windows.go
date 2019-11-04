@@ -16,6 +16,7 @@ func (factory ProxyFactory) newOSBasedLocalProxy(path string, endpoint *portaine
 		Endpoint:               endpoint,
 		ResourceControlService: factory.resourceControlService,
 		UserService:            factory.userService,
+		TeamService:            factory.teamService,
 		TeamMembershipService:  factory.teamMembershipService,
 		RegistryService:        factory.registryService,
 		DockerHubService:       factory.dockerHubService,

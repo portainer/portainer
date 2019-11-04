@@ -2,6 +2,7 @@ package docker
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"github.com/docker/docker/client"
@@ -11,18 +12,16 @@ import (
 )
 
 const (
-	errDockerVolumeIdentifierNotFound = portainer.Error("Docker volume identifier not found")
-	volumeIdentifier                  = "Name"
-	volumeLabelForStackIdentifier     = "com.docker.stack.namespace"
+	volumeObjectIdentifier = "Name"
 )
 
 func getInheritedResourceControlFromVolumeLabels(dockerClient *client.Client, volumeID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
-	network, err := dockerClient.VolumeInspect(context.Background(), volumeID)
+	volume, err := dockerClient.VolumeInspect(context.Background(), volumeID)
 	if err != nil {
 		return nil, err
 	}
 
-	swarmStackName := network.Labels[volumeLabelForStackIdentifier]
+	swarmStackName := volume.Labels[resourceLabelForDockerSwarmStackName]
 	if swarmStackName != "" {
 		return portainer.GetResourceControlByResourceIDAndType(swarmStackName, portainer.StackResourceControl, resourceControls), nil
 	}
@@ -32,7 +31,7 @@ func getInheritedResourceControlFromVolumeLabels(dockerClient *client.Client, vo
 
 // volumeListOperation extracts the response as a JSON object, loop through the volume array
 // decorate and/or filter the volumes based on resource controls before rewriting the response
-func volumeListOperation(response *http.Response, executor *operationExecutor) error {
+func (transport *Transport) volumeListOperation(response *http.Response, executor *operationExecutor) error {
 	var err error
 	// VolumeList response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/VolumeList
@@ -47,9 +46,9 @@ func volumeListOperation(response *http.Response, executor *operationExecutor) e
 		volumeData := responseObject["Volumes"].([]interface{})
 
 		if executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess {
-			volumeData, err = decorateVolumeList(volumeData, executor.operationContext.resourceControls)
+			volumeData, err = transport.decorateVolumeList(volumeData, executor.operationContext.resourceControls)
 		} else {
-			volumeData, err = filterVolumeList(volumeData, executor.operationContext)
+			volumeData, err = transport.filterVolumeList(volumeData, executor.operationContext)
 		}
 		if err != nil {
 			return err
@@ -65,7 +64,7 @@ func volumeListOperation(response *http.Response, executor *operationExecutor) e
 // volumeInspectOperation extracts the response as a JSON object, verify that the user
 // has access to the volume based on any existing resource control and either rewrite an access denied response
 // or a decorated volume.
-func volumeInspectOperation(response *http.Response, executor *operationExecutor) error {
+func (transport *Transport) volumeInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// VolumeInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/VolumeInspect
 	responseObject, err := responseutils.GetResponseAsJSONOBject(response)
@@ -73,11 +72,15 @@ func volumeInspectOperation(response *http.Response, executor *operationExecutor
 		return err
 	}
 
-	if responseObject[volumeIdentifier] == nil {
-		return errDockerVolumeIdentifierNotFound
+	if responseObject[volumeObjectIdentifier] == nil {
+		return errors.New("docker volume identifier not found")
 	}
 
-	resourceControl := findInheritedVolumeResourceControl(responseObject, executor.operationContext.resourceControls)
+	resourceControl, err := transport.findVolumeResourceControl(responseObject, executor.operationContext.resourceControls)
+	if err != nil {
+		return err
+	}
+
 	if resourceControl == nil && (executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess) {
 		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
 	}
@@ -90,41 +93,38 @@ func volumeInspectOperation(response *http.Response, executor *operationExecutor
 	return responseutils.RewriteAccessDeniedResponse(response)
 }
 
-// findInheritedVolumeResourceControl will search for a resource control object associated to the service or
+// findVolumeResourceControl will search for a resource control object associated to the service or
 // inherited from a Swarm stack (based on labels).
-func findInheritedVolumeResourceControl(responseObject map[string]interface{}, resourceControls []portainer.ResourceControl) *portainer.ResourceControl {
-	volumeID := responseObject[volumeIdentifier].(string)
+func (transport *Transport) findVolumeResourceControl(responseObject map[string]interface{}, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
+	volumeID := responseObject[volumeObjectIdentifier].(string)
 
 	resourceControl := portainer.GetResourceControlByResourceIDAndType(volumeID, portainer.VolumeResourceControl, resourceControls)
 	if resourceControl != nil {
-		return resourceControl
+		return resourceControl, nil
 	}
 
-	volumeLabels := extractVolumeLabelsFromVolumeInspectObject(responseObject)
+	volumeLabels := selectorVolumeLabels(responseObject)
 	if volumeLabels != nil {
-		if volumeLabels[volumeLabelForStackIdentifier] != nil {
-			inheritedSwarmStackIdentifier := volumeLabels[volumeLabelForStackIdentifier].(string)
+		if volumeLabels[resourceLabelForDockerSwarmStackName] != nil {
+			inheritedSwarmStackIdentifier := volumeLabels[resourceLabelForDockerSwarmStackName].(string)
 			resourceControl = portainer.GetResourceControlByResourceIDAndType(inheritedSwarmStackIdentifier, portainer.StackResourceControl, resourceControls)
 
 			if resourceControl != nil {
-				return resourceControl
+				return resourceControl, nil
 			}
 		}
+
+		return transport.newResourceControlFromPortainerLabels(volumeLabels, volumeID, portainer.VolumeResourceControl)
 	}
 
-	return nil
+	return nil, nil
 }
 
-// extractVolumeLabelsFromVolumeInspectObject retrieve the Labels of the volume if present.
-// Volume schema reference: https://docs.docker.com/engine/api/v1.28/#operation/VolumeInspect
-func extractVolumeLabelsFromVolumeInspectObject(responseObject map[string]interface{}) map[string]interface{} {
-	// Labels are stored under Labels
-	return responseutils.GetJSONObject(responseObject, "Labels")
-}
-
-// extractVolumeLabelsFromVolumeListObject retrieve the Labels of the volume if present.
-// Volume schema reference: https://docs.docker.com/engine/api/v1.28/#operation/VolumeList
-func extractVolumeLabelsFromVolumeListObject(responseObject map[string]interface{}) map[string]interface{} {
+// selectorVolumeLabels retrieve the Labels of the volume if present.
+// Volume schema references:
+// https://docs.docker.com/engine/api/v1.28/#operation/VolumeInspect
+// https://docs.docker.com/engine/api/v1.28/#operation/VolumeList
+func selectorVolumeLabels(responseObject map[string]interface{}) map[string]interface{} {
 	// Labels are stored under Labels
 	return responseutils.GetJSONObject(responseObject, "Labels")
 }
@@ -132,21 +132,24 @@ func extractVolumeLabelsFromVolumeListObject(responseObject map[string]interface
 // decorateVolumeList loops through all volumes and decorates any volume with an existing resource control.
 // Resource controls checks are based on: resource identifier, stack identifier (from label).
 // Volume object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/VolumeList
-func decorateVolumeList(volumeData []interface{}, resourceControls []portainer.ResourceControl) ([]interface{}, error) {
+func (transport *Transport) decorateVolumeList(volumeData []interface{}, resourceControls []portainer.ResourceControl) ([]interface{}, error) {
 	decoratedVolumeData := make([]interface{}, 0)
 
 	for _, volume := range volumeData {
 
 		volumeObject := volume.(map[string]interface{})
-		if volumeObject[volumeIdentifier] == nil {
-			return nil, errDockerVolumeIdentifierNotFound
+		if volumeObject[volumeObjectIdentifier] == nil {
+			return nil, errors.New("docker volume identifier not found")
 		}
 
-		volumeID := volumeObject[volumeIdentifier].(string)
-		volumeObject = decorateResourceWithAccessControl(volumeObject, volumeID, resourceControls, portainer.VolumeResourceControl)
+		resourceControl, err := transport.findVolumeResourceControl(volumeObject, resourceControls)
+		if err != nil {
+			return nil, err
+		}
 
-		volumeLabels := extractVolumeLabelsFromVolumeListObject(volumeObject)
-		volumeObject = decorateResourceWithAccessControlFromLabel(volumeLabels, volumeObject, volumeLabelForStackIdentifier, resourceControls, portainer.StackResourceControl)
+		if resourceControl != nil {
+			volumeObject = decorateObject(volumeObject, resourceControl)
+		}
 
 		decoratedVolumeData = append(decoratedVolumeData, volumeObject)
 	}
@@ -158,23 +161,29 @@ func decorateVolumeList(volumeData []interface{}, resourceControls []portainer.R
 // Authorized volumes are decorated during the process.
 // Resource controls checks are based on: resource identifier, stack identifier (from label).
 // Volume object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/VolumeList
-func filterVolumeList(volumeData []interface{}, context *restrictedDockerOperationContext) ([]interface{}, error) {
+func (transport *Transport) filterVolumeList(volumeData []interface{}, context *restrictedDockerOperationContext) ([]interface{}, error) {
 	filteredVolumeData := make([]interface{}, 0)
 
 	for _, volume := range volumeData {
 		volumeObject := volume.(map[string]interface{})
-		if volumeObject[volumeIdentifier] == nil {
-			return nil, errDockerVolumeIdentifierNotFound
+		if volumeObject[volumeObjectIdentifier] == nil {
+			return nil, errors.New("docker volume identifier not found")
 		}
 
-		volumeID := volumeObject[volumeIdentifier].(string)
-		volumeObject, access := applyResourceAccessControl(volumeObject, volumeID, context, portainer.VolumeResourceControl)
-		if !access {
-			volumeLabels := extractVolumeLabelsFromVolumeListObject(volumeObject)
-			volumeObject, access = applyResourceAccessControlFromLabel(volumeLabels, volumeObject, volumeLabelForStackIdentifier, context, portainer.StackResourceControl)
+		resourceControl, err := transport.findVolumeResourceControl(volumeObject, context.resourceControls)
+		if err != nil {
+			return nil, err
 		}
 
-		if access {
+		if resourceControl == nil {
+			if context.isAdmin || context.endpointResourceAccess {
+				filteredVolumeData = append(filteredVolumeData, volumeObject)
+			}
+			continue
+		}
+
+		if context.isAdmin || context.endpointResourceAccess || portainer.UserCanAccessResource(context.userID, context.userTeamIDs, resourceControl) {
+			volumeObject = decorateObject(volumeObject, resourceControl)
 			filteredVolumeData = append(filteredVolumeData, volumeObject)
 		}
 	}

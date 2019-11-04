@@ -2,6 +2,7 @@ package docker
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"github.com/docker/docker/client"
@@ -10,12 +11,7 @@ import (
 )
 
 const (
-	errDockerContainerIdentifierNotFound = portainer.Error("Docker container identifier not found")
-	// identifier attribute in inspect/list/create response
-	containerIdentifier                     = "Id"
-	containerLabelForServiceIdentifier      = "com.docker.swarm.service.id"
-	containerLabelForSwarmStackIdentifier   = "com.docker.stack.namespace"
-	containerLabelForComposeStackIdentifier = "com.docker.compose.project"
+	containerObjectIdentifier = "Id"
 )
 
 func getInheritedResourceControlFromContainerLabels(dockerClient *client.Client, containerID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
@@ -24,17 +20,17 @@ func getInheritedResourceControlFromContainerLabels(dockerClient *client.Client,
 		return nil, err
 	}
 
-	serviceName := container.Config.Labels[containerLabelForServiceIdentifier]
-	if serviceName != "" {
-		return portainer.GetResourceControlByResourceIDAndType(serviceName, portainer.ServiceResourceControl, resourceControls), nil
-	}
-
-	swarmStackName := container.Config.Labels[containerLabelForSwarmStackIdentifier]
+	swarmStackName := container.Config.Labels[resourceLabelForDockerSwarmStackName]
 	if swarmStackName != "" {
 		return portainer.GetResourceControlByResourceIDAndType(swarmStackName, portainer.StackResourceControl, resourceControls), nil
 	}
 
-	composeStackName := container.Config.Labels[containerLabelForComposeStackIdentifier]
+	serviceName := container.Config.Labels[resourceLabelForDockerServiceID]
+	if serviceName != "" {
+		return portainer.GetResourceControlByResourceIDAndType(serviceName, portainer.ServiceResourceControl, resourceControls), nil
+	}
+
+	composeStackName := container.Config.Labels[resourceLabelForDockerComposeStackName]
 	if composeStackName != "" {
 		return portainer.GetResourceControlByResourceIDAndType(composeStackName, portainer.StackResourceControl, resourceControls), nil
 	}
@@ -44,7 +40,7 @@ func getInheritedResourceControlFromContainerLabels(dockerClient *client.Client,
 
 // containerListOperation extracts the response as a JSON array, loop through the containers array
 // decorate and/or filter the containers based on resource controls before rewriting the response
-func containerListOperation(response *http.Response, executor *operationExecutor) error {
+func (transport *Transport) containerListOperation(response *http.Response, executor *operationExecutor) error {
 	var err error
 	// ContainerList response is a JSON array
 	// https://docs.docker.com/engine/api/v1.28/#operation/ContainerList
@@ -54,9 +50,9 @@ func containerListOperation(response *http.Response, executor *operationExecutor
 	}
 
 	if executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess {
-		responseArray, err = decorateContainerList(responseArray, executor.operationContext.resourceControls)
+		responseArray, err = transport.decorateContainerList(responseArray, executor.operationContext.resourceControls)
 	} else {
-		responseArray, err = filterContainerList(responseArray, executor.operationContext)
+		responseArray, err = transport.filterContainerList(responseArray, executor.operationContext)
 	}
 	if err != nil {
 		return err
@@ -75,7 +71,7 @@ func containerListOperation(response *http.Response, executor *operationExecutor
 // containerInspectOperation extracts the response as a JSON object, verify that the user
 // has access to the container based on resource control (check are done based on the containerID and optional Swarm service ID)
 // and either rewrite an access denied response or a decorated container.
-func containerInspectOperation(response *http.Response, executor *operationExecutor) error {
+func (transport *Transport) containerInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// ContainerInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/ContainerInspect
 	responseObject, err := responseutils.GetResponseAsJSONOBject(response)
@@ -83,11 +79,15 @@ func containerInspectOperation(response *http.Response, executor *operationExecu
 		return err
 	}
 
-	if responseObject[containerIdentifier] == nil {
-		return errDockerContainerIdentifierNotFound
+	if responseObject[containerObjectIdentifier] == nil {
+		return errors.New("docker container identifier not found")
 	}
 
-	resourceControl := findInheritedContainerResourceControl(responseObject, executor.operationContext.resourceControls)
+	resourceControl, err := transport.findContainerResourceControl(responseObject, executor.operationContext.resourceControls, selectorContainerLabelsFromContainerInspectObject)
+	if err != nil {
+		return err
+	}
+
 	if resourceControl == nil && (executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess) {
 		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
 	}
@@ -100,52 +100,56 @@ func containerInspectOperation(response *http.Response, executor *operationExecu
 	return responseutils.RewriteAccessDeniedResponse(response)
 }
 
-// findInheritedContainerResourceControl will search for a resource control object associated to the container or
+// findContainerResourceControl will search for a resource control object associated to the container or
 // inherited from another resource (based on labels) in the following order: a Swarm service, a Swarm stack or a Compose stack.
-func findInheritedContainerResourceControl(responseObject map[string]interface{}, resourceControls []portainer.ResourceControl) *portainer.ResourceControl {
-	containerID := responseObject[containerIdentifier].(string)
+// If no resource control is found, it will search for Portainer specific resource control labels and will generate
+// a resource control based on these if they exist. Public access control label take precedence over user/team access control labels.
+func (transport *Transport) findContainerResourceControl(responseObject map[string]interface{}, resourceControls []portainer.ResourceControl, labelSelector resourceLabelSelector) (*portainer.ResourceControl, error) {
+	containerID := responseObject[containerObjectIdentifier].(string)
 
 	resourceControl := portainer.GetResourceControlByResourceIDAndType(containerID, portainer.ContainerResourceControl, resourceControls)
 	if resourceControl != nil {
-		return resourceControl
+		return resourceControl, nil
 	}
 
-	containerLabels := extractContainerLabelsFromContainerInspectObject(responseObject)
+	containerLabels := labelSelector(responseObject)
 	if containerLabels != nil {
-		if containerLabels[containerLabelForServiceIdentifier] != nil {
-			inheritedServiceIdentifier := containerLabels[containerLabelForServiceIdentifier].(string)
+		if containerLabels[resourceLabelForDockerServiceID] != nil {
+			inheritedServiceIdentifier := containerLabels[resourceLabelForDockerServiceID].(string)
 			resourceControl = portainer.GetResourceControlByResourceIDAndType(inheritedServiceIdentifier, portainer.ServiceResourceControl, resourceControls)
 
 			if resourceControl != nil {
-				return resourceControl
+				return resourceControl, nil
 			}
 		}
 
-		if containerLabels[containerLabelForSwarmStackIdentifier] != nil {
-			inheritedSwarmStackIdentifier := containerLabels[containerLabelForSwarmStackIdentifier].(string)
+		if containerLabels[resourceLabelForDockerSwarmStackName] != nil {
+			inheritedSwarmStackIdentifier := containerLabels[resourceLabelForDockerSwarmStackName].(string)
 			resourceControl = portainer.GetResourceControlByResourceIDAndType(inheritedSwarmStackIdentifier, portainer.StackResourceControl, resourceControls)
 
 			if resourceControl != nil {
-				return resourceControl
+				return resourceControl, nil
 			}
 		}
 
-		if containerLabels[containerLabelForComposeStackIdentifier] != nil {
-			inheritedComposeStackIdentifier := containerLabels[containerLabelForComposeStackIdentifier].(string)
+		if containerLabels[resourceLabelForDockerComposeStackName] != nil {
+			inheritedComposeStackIdentifier := containerLabels[resourceLabelForDockerComposeStackName].(string)
 			resourceControl = portainer.GetResourceControlByResourceIDAndType(inheritedComposeStackIdentifier, portainer.StackResourceControl, resourceControls)
 
 			if resourceControl != nil {
-				return resourceControl
+				return resourceControl, nil
 			}
 		}
+
+		return transport.newResourceControlFromPortainerLabels(containerLabels, containerID, portainer.ContainerResourceControl)
 	}
 
-	return nil
+	return nil, nil
 }
 
-// extractContainerLabelsFromContainerInspectObject retrieve the Labels of the container if present.
+// selectorContainerLabelsFromContainerInspectObject retrieve the Labels of the container if present.
 // Container schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ContainerInspect
-func extractContainerLabelsFromContainerInspectObject(responseObject map[string]interface{}) map[string]interface{} {
+func selectorContainerLabelsFromContainerInspectObject(responseObject map[string]interface{}) map[string]interface{} {
 	// Labels are stored under Config.Labels
 	containerConfigObject := responseutils.GetJSONObject(responseObject, "Config")
 	if containerConfigObject != nil {
@@ -155,9 +159,9 @@ func extractContainerLabelsFromContainerInspectObject(responseObject map[string]
 	return nil
 }
 
-// extractContainerLabelsFromContainerListObject retrieve the Labels of the container if present.
+// selectorContainerLabelsFromContainerListObject retrieve the Labels of the container if present.
 // Container schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ContainerList
-func extractContainerLabelsFromContainerListObject(responseObject map[string]interface{}) map[string]interface{} {
+func selectorContainerLabelsFromContainerListObject(responseObject map[string]interface{}) map[string]interface{} {
 	// Labels are stored under Labels
 	containerLabelsObject := responseutils.GetJSONObject(responseObject, "Labels")
 	return containerLabelsObject
@@ -165,24 +169,25 @@ func extractContainerLabelsFromContainerListObject(responseObject map[string]int
 
 // decorateContainerList loops through all containers and decorates any container with an existing resource control.
 // Resource controls checks are based on: resource identifier, service identifier (from label), stack identifier (from label).
+// Resources controls can also be generated on the fly via specific Portainer labels.
 // Container object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ContainerList
-func decorateContainerList(containerData []interface{}, resourceControls []portainer.ResourceControl) ([]interface{}, error) {
+func (transport *Transport) decorateContainerList(containerData []interface{}, resourceControls []portainer.ResourceControl) ([]interface{}, error) {
 	decoratedContainerData := make([]interface{}, 0)
 
 	for _, container := range containerData {
-
 		containerObject := container.(map[string]interface{})
-		if containerObject[containerIdentifier] == nil {
-			return nil, errDockerContainerIdentifierNotFound
+		if containerObject[containerObjectIdentifier] == nil {
+			return nil, errors.New("docker container identifier not found")
 		}
 
-		containerID := containerObject[containerIdentifier].(string)
-		containerObject = decorateResourceWithAccessControl(containerObject, containerID, resourceControls, portainer.ContainerResourceControl)
+		resourceControl, err := transport.findContainerResourceControl(containerObject, resourceControls, selectorContainerLabelsFromContainerListObject)
+		if err != nil {
+			return nil, err
+		}
 
-		containerLabels := extractContainerLabelsFromContainerListObject(containerObject)
-		containerObject = decorateResourceWithAccessControlFromLabel(containerLabels, containerObject, containerLabelForServiceIdentifier, resourceControls, portainer.ServiceResourceControl)
-		containerObject = decorateResourceWithAccessControlFromLabel(containerLabels, containerObject, containerLabelForSwarmStackIdentifier, resourceControls, portainer.StackResourceControl)
-		containerObject = decorateResourceWithAccessControlFromLabel(containerLabels, containerObject, containerLabelForComposeStackIdentifier, resourceControls, portainer.StackResourceControl)
+		if resourceControl != nil {
+			containerObject = decorateObject(containerObject, resourceControl)
+		}
 
 		decoratedContainerData = append(decoratedContainerData, containerObject)
 	}
@@ -193,30 +198,31 @@ func decorateContainerList(containerData []interface{}, resourceControls []porta
 // filterContainerList loops through all containers and filters authorized containers (access granted to the user based on existing resource control).
 // Authorized containers are decorated during the process.
 // Resource controls checks are based on: resource identifier, service identifier (from label), stack identifier (from label).
+// Resources controls can also be generated on the fly via specific Portainer labels.
 // Container object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ContainerList
-func filterContainerList(containerData []interface{}, context *restrictedDockerOperationContext) ([]interface{}, error) {
+func (transport *Transport) filterContainerList(containerData []interface{}, context *restrictedDockerOperationContext) ([]interface{}, error) {
 	filteredContainerData := make([]interface{}, 0)
 
 	for _, container := range containerData {
 		containerObject := container.(map[string]interface{})
-		if containerObject[containerIdentifier] == nil {
-			return nil, errDockerContainerIdentifierNotFound
+		if containerObject[containerObjectIdentifier] == nil {
+			return nil, errors.New("docker container identifier not found")
 		}
 
-		containerID := containerObject[containerIdentifier].(string)
-		containerObject, access := applyResourceAccessControl(containerObject, containerID, context, portainer.ContainerResourceControl)
-		if !access {
-			containerLabels := extractContainerLabelsFromContainerListObject(containerObject)
-			containerObject, access = applyResourceAccessControlFromLabel(containerLabels, containerObject, containerLabelForComposeStackIdentifier, context, portainer.StackResourceControl)
-			if !access {
-				containerObject, access = applyResourceAccessControlFromLabel(containerLabels, containerObject, containerLabelForServiceIdentifier, context, portainer.ServiceResourceControl)
-				if !access {
-					containerObject, access = applyResourceAccessControlFromLabel(containerLabels, containerObject, containerLabelForSwarmStackIdentifier, context, portainer.StackResourceControl)
-				}
+		resourceControl, err := transport.findContainerResourceControl(containerObject, context.resourceControls, selectorContainerLabelsFromContainerListObject)
+		if err != nil {
+			return nil, err
+		}
+
+		if resourceControl == nil {
+			if context.isAdmin || context.endpointResourceAccess {
+				filteredContainerData = append(filteredContainerData, containerObject)
 			}
+			continue
 		}
 
-		if access {
+		if context.isAdmin || context.endpointResourceAccess || portainer.UserCanAccessResource(context.userID, context.userTeamIDs, resourceControl) {
+			containerObject = decorateObject(containerObject, resourceControl)
 			filteredContainerData = append(filteredContainerData, containerObject)
 		}
 	}
@@ -232,7 +238,7 @@ func filterContainersWithBlackListedLabels(containerData []interface{}, labelBla
 	for _, container := range containerData {
 		containerObject := container.(map[string]interface{})
 
-		containerLabels := extractContainerLabelsFromContainerListObject(containerObject)
+		containerLabels := selectorContainerLabelsFromContainerListObject(containerObject)
 		if containerLabels != nil {
 			if !containerHasBlackListedLabel(containerLabels, labelBlackList) {
 				filteredContainerData = append(filteredContainerData, containerObject)

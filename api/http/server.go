@@ -87,6 +87,7 @@ func (server *Server) Start() error {
 	proxyManagerParameters := &proxy.ManagerParams{
 		ResourceControlService: server.ResourceControlService,
 		UserService:            server.UserService,
+		TeamService:            server.TeamService,
 		TeamMembershipService:  server.TeamMembershipService,
 		SettingsService:        server.SettingsService,
 		RegistryService:        server.RegistryService,

@@ -26,6 +26,7 @@ type (
 		endpoint               *portainer.Endpoint
 		resourceControlService portainer.ResourceControlService
 		userService            portainer.UserService
+		teamService            portainer.TeamService
 		teamMembershipService  portainer.TeamMembershipService
 		registryService        portainer.RegistryService
 		dockerHubService       portainer.DockerHubService
@@ -41,6 +42,7 @@ type (
 		Endpoint               *portainer.Endpoint
 		ResourceControlService portainer.ResourceControlService
 		UserService            portainer.UserService
+		TeamService            portainer.TeamService
 		TeamMembershipService  portainer.TeamMembershipService
 		RegistryService        portainer.RegistryService
 		DockerHubService       portainer.DockerHubService
@@ -72,6 +74,7 @@ func NewTransport(parameters *TransportParameters, httpTransport *http.Transport
 		endpoint:               parameters.Endpoint,
 		resourceControlService: parameters.ResourceControlService,
 		userService:            parameters.UserService,
+		teamService:            parameters.TeamService,
 		teamMembershipService:  parameters.TeamMembershipService,
 		registryService:        parameters.RegistryService,
 		dockerHubService:       parameters.DockerHubService,
@@ -170,17 +173,17 @@ func (transport *Transport) proxyAgentRequest(r *http.Request) (*http.Response, 
 func (transport *Transport) proxyConfigRequest(request *http.Request) (*http.Response, error) {
 	switch requestPath := request.URL.Path; requestPath {
 	case "/configs/create":
-		return transport.decorateGenericResourceCreationOperation(request, configCreationIdentifier, portainer.ConfigResourceControl)
+		return transport.decorateGenericResourceCreationOperation(request, configObjectIdentifier, portainer.ConfigResourceControl)
 
 	case "/configs":
-		return transport.rewriteOperation(request, configListOperation)
+		return transport.rewriteOperation(request, transport.configListOperation)
 
 	default:
 		// assume /configs/{id}
 		configID := path.Base(requestPath)
 
 		if request.Method == http.MethodGet {
-			return transport.rewriteOperation(request, configInspectOperation)
+			return transport.rewriteOperation(request, transport.configInspectOperation)
 		} else if request.Method == http.MethodDelete {
 			return transport.executeGenericResourceDeletionOperation(request, configID, portainer.ConfigResourceControl)
 		}
@@ -192,13 +195,13 @@ func (transport *Transport) proxyConfigRequest(request *http.Request) (*http.Res
 func (transport *Transport) proxyContainerRequest(request *http.Request) (*http.Response, error) {
 	switch requestPath := request.URL.Path; requestPath {
 	case "/containers/create":
-		return transport.decorateGenericResourceCreationOperation(request, containerIdentifier, portainer.ContainerResourceControl)
+		return transport.decorateGenericResourceCreationOperation(request, containerObjectIdentifier, portainer.ContainerResourceControl)
 
 	case "/containers/prune":
 		return transport.administratorOperation(request)
 
 	case "/containers/json":
-		return transport.rewriteOperationWithLabelFiltering(request, containerListOperation)
+		return transport.rewriteOperationWithLabelFiltering(request, transport.containerListOperation)
 
 	default:
 		// This section assumes /containers/**
@@ -208,7 +211,7 @@ func (transport *Transport) proxyContainerRequest(request *http.Request) (*http.
 			action := path.Base(requestPath)
 
 			if action == "json" {
-				return transport.rewriteOperation(request, containerInspectOperation)
+				return transport.rewriteOperation(request, transport.containerInspectOperation)
 			}
 			return transport.restrictedOperation(request, containerID, portainer.ContainerResourceControl)
 		} else if match, _ := path.Match("/containers/*", requestPath); match {
@@ -231,7 +234,7 @@ func (transport *Transport) proxyServiceRequest(request *http.Request) (*http.Re
 		return transport.replaceRegistryAuthenticationHeader(request)
 
 	case "/services":
-		return transport.rewriteOperation(request, serviceListOperation)
+		return transport.rewriteOperation(request, transport.serviceListOperation)
 
 	default:
 		// This section assumes /services/**
@@ -244,7 +247,7 @@ func (transport *Transport) proxyServiceRequest(request *http.Request) (*http.Re
 			serviceID := path.Base(requestPath)
 
 			if request.Method == http.MethodGet {
-				return transport.rewriteOperation(request, serviceInspectOperation)
+				return transport.rewriteOperation(request, transport.serviceInspectOperation)
 			} else if request.Method == http.MethodDelete {
 				return transport.executeGenericResourceDeletionOperation(request, serviceID, portainer.ServiceResourceControl)
 			}
@@ -257,20 +260,20 @@ func (transport *Transport) proxyServiceRequest(request *http.Request) (*http.Re
 func (transport *Transport) proxyVolumeRequest(request *http.Request) (*http.Response, error) {
 	switch requestPath := request.URL.Path; requestPath {
 	case "/volumes/create":
-		return transport.decorateGenericResourceCreationOperation(request, volumeIdentifier, portainer.VolumeResourceControl)
+		return transport.decorateGenericResourceCreationOperation(request, volumeObjectIdentifier, portainer.VolumeResourceControl)
 
 	case "/volumes/prune":
 		return transport.administratorOperation(request)
 
 	case "/volumes":
-		return transport.rewriteOperation(request, volumeListOperation)
+		return transport.rewriteOperation(request, transport.volumeListOperation)
 
 	default:
 		// assume /volumes/{name}
 		volumeID := path.Base(requestPath)
 
 		if request.Method == http.MethodGet {
-			return transport.rewriteOperation(request, volumeInspectOperation)
+			return transport.rewriteOperation(request, transport.volumeInspectOperation)
 		} else if request.Method == http.MethodDelete {
 			return transport.executeGenericResourceDeletionOperation(request, volumeID, portainer.VolumeResourceControl)
 		}
@@ -281,17 +284,17 @@ func (transport *Transport) proxyVolumeRequest(request *http.Request) (*http.Res
 func (transport *Transport) proxyNetworkRequest(request *http.Request) (*http.Response, error) {
 	switch requestPath := request.URL.Path; requestPath {
 	case "/networks/create":
-		return transport.decorateGenericResourceCreationOperation(request, networkIdentifier, portainer.NetworkResourceControl)
+		return transport.decorateGenericResourceCreationOperation(request, networkObjectIdentifier, portainer.NetworkResourceControl)
 
 	case "/networks":
-		return transport.rewriteOperation(request, networkListOperation)
+		return transport.rewriteOperation(request, transport.networkListOperation)
 
 	default:
 		// assume /networks/{id}
 		networkID := path.Base(requestPath)
 
 		if request.Method == http.MethodGet {
-			return transport.rewriteOperation(request, networkInspectOperation)
+			return transport.rewriteOperation(request, transport.networkInspectOperation)
 		} else if request.Method == http.MethodDelete {
 			return transport.executeGenericResourceDeletionOperation(request, networkID, portainer.NetworkResourceControl)
 		}
@@ -302,17 +305,17 @@ func (transport *Transport) proxyNetworkRequest(request *http.Request) (*http.Re
 func (transport *Transport) proxySecretRequest(request *http.Request) (*http.Response, error) {
 	switch requestPath := request.URL.Path; requestPath {
 	case "/secrets/create":
-		return transport.decorateGenericResourceCreationOperation(request, secretIdentifier, portainer.SecretResourceControl)
+		return transport.decorateGenericResourceCreationOperation(request, secretObjectIdentifier, portainer.SecretResourceControl)
 
 	case "/secrets":
-		return transport.rewriteOperation(request, secretListOperation)
+		return transport.rewriteOperation(request, transport.secretListOperation)
 
 	default:
 		// assume /secrets/{id}
 		secretID := path.Base(requestPath)
 
 		if request.Method == http.MethodGet {
-			return transport.rewriteOperation(request, secretInspectOperation)
+			return transport.rewriteOperation(request, transport.secretInspectOperation)
 		} else if request.Method == http.MethodDelete {
 			return transport.executeGenericResourceDeletionOperation(request, secretID, portainer.SecretResourceControl)
 		}
@@ -400,7 +403,7 @@ func (transport *Transport) replaceRegistryAuthenticationHeader(request *http.Re
 		request.Header.Set("X-Registry-Auth", header)
 	}
 
-	return transport.decorateGenericResourceCreationOperation(request, serviceIdentifier, portainer.ServiceResourceControl)
+	return transport.decorateGenericResourceCreationOperation(request, serviceObjectIdentifier, portainer.ServiceResourceControl)
 }
 
 // restrictedOperation ensures that the current user has the required authorizations

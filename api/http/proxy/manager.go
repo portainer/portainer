@@ -25,6 +25,7 @@ type (
 	ManagerParams struct {
 		ResourceControlService portainer.ResourceControlService
 		UserService            portainer.UserService
+		TeamService            portainer.TeamService
 		TeamMembershipService  portainer.TeamMembershipService
 		SettingsService        portainer.SettingsService
 		RegistryService        portainer.RegistryService
@@ -41,6 +42,7 @@ func NewManager(parameters *ManagerParams) *Manager {
 	proxyFactoryParameters := &factory.ProxyFactoryParameters{
 		ResourceControlService: parameters.ResourceControlService,
 		UserService:            parameters.UserService,
+		TeamService:            parameters.TeamService,
 		TeamMembershipService:  parameters.TeamMembershipService,
 		SettingsService:        parameters.SettingsService,
 		RegistryService:        parameters.RegistryService,

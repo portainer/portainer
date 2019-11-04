@@ -23,6 +23,7 @@ type (
 	ProxyFactory struct {
 		resourceControlService portainer.ResourceControlService
 		userService            portainer.UserService
+		teamService            portainer.TeamService
 		teamMembershipService  portainer.TeamMembershipService
 		settingsService        portainer.SettingsService
 		registryService        portainer.RegistryService
@@ -37,6 +38,7 @@ type (
 	ProxyFactoryParameters struct {
 		ResourceControlService portainer.ResourceControlService
 		UserService            portainer.UserService
+		TeamService            portainer.TeamService
 		TeamMembershipService  portainer.TeamMembershipService
 		SettingsService        portainer.SettingsService
 		RegistryService        portainer.RegistryService
@@ -53,6 +55,7 @@ func NewProxyFactory(parameters *ProxyFactoryParameters) *ProxyFactory {
 	return &ProxyFactory{
 		resourceControlService: parameters.ResourceControlService,
 		userService:            parameters.UserService,
+		teamService:            parameters.TeamService,
 		teamMembershipService:  parameters.TeamMembershipService,
 		settingsService:        parameters.SettingsService,
 		registryService:        parameters.RegistryService,

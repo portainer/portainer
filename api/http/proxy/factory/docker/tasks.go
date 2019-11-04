@@ -1,6 +1,7 @@
 package docker
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/portainer/portainer/api"
@@ -8,9 +9,7 @@ import (
 )
 
 const (
-	errDockerTaskServiceIdentifierNotFound = portainer.Error("Docker task service identifier not found")
-	taskServiceIdentifier                  = "ServiceID"
-	taskLabelForStackIdentifier            = "com.docker.stack.namespace"
+	taskObjectServiceIdentifier = "ServiceID"
 )
 
 // taskListOperation extracts the response as a JSON object, loop through the tasks array
@@ -35,9 +34,36 @@ func taskListOperation(response *http.Response, executor *operationExecutor) err
 	return responseutils.RewriteResponse(response, responseArray, http.StatusOK)
 }
 
-// extractTaskLabelsFromTaskListObject retrieve the Labels of the task if present.
+// findContainerResourceControl will search for a resource control object associated to the container or
+// inherited from another resource (based on labels) in the following order: a Swarm service, a Swarm stack or a Compose stack.
+// If no resource control is found, it will search for Portainer specific resource control labels and will generate
+// a resource control based on these if they exist. Public access control label take precedence over user/team access control labels.
+func findTaskServiceResourceControl(responseObject map[string]interface{}, resourceControls []portainer.ResourceControl) *portainer.ResourceControl {
+	serviceID := responseObject[taskObjectServiceIdentifier].(string)
+
+	resourceControl := portainer.GetResourceControlByResourceIDAndType(serviceID, portainer.ServiceResourceControl, resourceControls)
+	if resourceControl != nil {
+		return resourceControl
+	}
+
+	taskLabels := selectorTaskLabels(responseObject)
+	if taskLabels != nil {
+		if taskLabels[resourceLabelForDockerSwarmStackName] != nil {
+			inheritedSwarmStackIdentifier := taskLabels[resourceLabelForDockerSwarmStackName].(string)
+			resourceControl = portainer.GetResourceControlByResourceIDAndType(inheritedSwarmStackIdentifier, portainer.StackResourceControl, resourceControls)
+
+			if resourceControl != nil {
+				return resourceControl
+			}
+		}
+	}
+
+	return nil
+}
+
+// selectorTaskLabels retrieve the Labels of the task if present.
 // Task schema reference: https://docs.docker.com/engine/api/v1.28/#operation/TaskList
-func extractTaskLabelsFromTaskListObject(responseObject map[string]interface{}) map[string]interface{} {
+func selectorTaskLabels(responseObject map[string]interface{}) map[string]interface{} {
 	// Labels are stored under Spec.ContainerSpec.Labels
 	taskSpecObject := responseutils.GetJSONObject(responseObject, "Spec")
 	if taskSpecObject != nil {
@@ -59,18 +85,21 @@ func filterTaskList(taskData []interface{}, context *restrictedDockerOperationCo
 
 	for _, task := range taskData {
 		taskObject := task.(map[string]interface{})
-		if taskObject[taskServiceIdentifier] == nil {
-			return nil, errDockerTaskServiceIdentifierNotFound
+		if taskObject[taskObjectServiceIdentifier] == nil {
+			return nil, errors.New("docker service task identifier not found")
 		}
 
-		serviceID := taskObject[taskServiceIdentifier].(string)
-		taskObject, access := applyResourceAccessControl(taskObject, serviceID, context, portainer.ServiceResourceControl)
-		if !access {
-			taskLabels := extractTaskLabelsFromTaskListObject(taskObject)
-			taskObject, access = applyResourceAccessControlFromLabel(taskLabels, taskObject, taskLabelForStackIdentifier, context, portainer.StackResourceControl)
+		resourceControl := findTaskServiceResourceControl(taskObject, context.resourceControls)
+
+		if resourceControl == nil {
+			if context.isAdmin || context.endpointResourceAccess {
+				filteredTaskData = append(filteredTaskData, taskObject)
+			}
+			continue
 		}
 
-		if access {
+		if context.isAdmin || context.endpointResourceAccess || portainer.UserCanAccessResource(context.userID, context.userTeamIDs, resourceControl) {
+			taskObject = decorateObject(taskObject, resourceControl)
 			filteredTaskData = append(filteredTaskData, taskObject)
 		}
 	}

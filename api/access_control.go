@@ -35,6 +35,55 @@ func NewSystemResourceControl(resourceIdentifier string, resourceType ResourceCo
 	}
 }
 
+// NewPublicResourceControl will create a new public resource control.
+func NewPublicResourceControl(resourceIdentifier string, resourceType ResourceControlType) *ResourceControl {
+	return &ResourceControl{
+		Type:               resourceType,
+		ResourceID:         resourceIdentifier,
+		SubResourceIDs:     []string{},
+		UserAccesses:       []UserResourceAccess{},
+		TeamAccesses:       []TeamResourceAccess{},
+		AdministratorsOnly: false,
+		Public:             true,
+		System:             false,
+	}
+}
+
+// NewRestrictedResourceControl will create a new resource control with user and team accesses restrictions.
+func NewRestrictedResourceControl(resourceIdentifier string, resourceType ResourceControlType, userIDs []UserID, teamIDs []TeamID) *ResourceControl {
+	userAccesses := make([]UserResourceAccess, 0)
+	teamAccesses := make([]TeamResourceAccess, 0)
+
+	for _, id := range userIDs {
+		access := UserResourceAccess{
+			UserID:      id,
+			AccessLevel: ReadWriteAccessLevel,
+		}
+
+		userAccesses = append(userAccesses, access)
+	}
+
+	for _, id := range teamIDs {
+		access := TeamResourceAccess{
+			TeamID:      id,
+			AccessLevel: ReadWriteAccessLevel,
+		}
+
+		teamAccesses = append(teamAccesses, access)
+	}
+
+	return &ResourceControl{
+		Type:               resourceType,
+		ResourceID:         resourceIdentifier,
+		SubResourceIDs:     []string{},
+		UserAccesses:       userAccesses,
+		TeamAccesses:       teamAccesses,
+		AdministratorsOnly: false,
+		Public:             false,
+		System:             false,
+	}
+}
+
 // DecorateStacks will iterate through a list of stacks, check for an associated resource control for each
 // stack and decorate the stack element if a resource control is found.
 func DecorateStacks(stacks []Stack, resourceControls []ResourceControl) []Stack {

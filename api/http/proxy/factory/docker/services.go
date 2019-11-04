@@ -2,6 +2,7 @@ package docker
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"github.com/docker/docker/api/types"
@@ -12,9 +13,7 @@ import (
 )
 
 const (
-	errDockerServiceIdentifierNotFound = portainer.Error("Docker service identifier not found")
-	serviceIdentifier                  = "ID"
-	serviceLabelForStackIdentifier     = "com.docker.stack.namespace"
+	serviceObjectIdentifier = "ID"
 )
 
 func getInheritedResourceControlFromServiceLabels(dockerClient *client.Client, serviceID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
@@ -23,7 +22,7 @@ func getInheritedResourceControlFromServiceLabels(dockerClient *client.Client, s
 		return nil, err
 	}
 
-	swarmStackName := service.Spec.Labels[serviceLabelForStackIdentifier]
+	swarmStackName := service.Spec.Labels[resourceLabelForDockerSwarmStackName]
 	if swarmStackName != "" {
 		return portainer.GetResourceControlByResourceIDAndType(swarmStackName, portainer.StackResourceControl, resourceControls), nil
 	}
@@ -33,7 +32,7 @@ func getInheritedResourceControlFromServiceLabels(dockerClient *client.Client, s
 
 // serviceListOperation extracts the response as a JSON array, loop through the service array
 // decorate and/or filter the services based on resource controls before rewriting the response
-func serviceListOperation(response *http.Response, executor *operationExecutor) error {
+func (transport *Transport) serviceListOperation(response *http.Response, executor *operationExecutor) error {
 	var err error
 	// ServiceList response is a JSON array
 	// https://docs.docker.com/engine/api/v1.28/#operation/ServiceList
@@ -43,9 +42,9 @@ func serviceListOperation(response *http.Response, executor *operationExecutor) 
 	}
 
 	if executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess {
-		responseArray, err = decorateServiceList(responseArray, executor.operationContext.resourceControls)
+		responseArray, err = transport.decorateServiceList(responseArray, executor.operationContext.resourceControls)
 	} else {
-		responseArray, err = filterServiceList(responseArray, executor.operationContext)
+		responseArray, err = transport.filterServiceList(responseArray, executor.operationContext)
 	}
 	if err != nil {
 		return err
@@ -57,7 +56,7 @@ func serviceListOperation(response *http.Response, executor *operationExecutor) 
 // serviceInspectOperation extracts the response as a JSON object, verify that the user
 // has access to the service based on resource control and either rewrite an access denied response
 // or a decorated service.
-func serviceInspectOperation(response *http.Response, executor *operationExecutor) error {
+func (transport *Transport) serviceInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// ServiceInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/ServiceInspect
 	responseObject, err := responseutils.GetResponseAsJSONOBject(response)
@@ -65,11 +64,15 @@ func serviceInspectOperation(response *http.Response, executor *operationExecuto
 		return err
 	}
 
-	if responseObject[serviceIdentifier] == nil {
-		return errDockerServiceIdentifierNotFound
+	if responseObject[serviceObjectIdentifier] == nil {
+		return errors.New("docker service identifier not found")
 	}
 
-	resourceControl := findInheritedServiceResourceControl(responseObject, executor.operationContext.resourceControls)
+	resourceControl, err := transport.findServiceResourceControl(responseObject, executor.operationContext.resourceControls)
+	if err != nil {
+		return err
+	}
+
 	if resourceControl == nil && (executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess) {
 		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
 	}
@@ -82,45 +85,40 @@ func serviceInspectOperation(response *http.Response, executor *operationExecuto
 	return responseutils.RewriteAccessDeniedResponse(response)
 }
 
-// findInheritedServiceResourceControl will search for a resource control object associated to the service or
+// findServiceResourceControl will search for a resource control object associated to the service or
 // inherited from a Swarm stack (based on labels).
-func findInheritedServiceResourceControl(responseObject map[string]interface{}, resourceControls []portainer.ResourceControl) *portainer.ResourceControl {
-	serviceID := responseObject[serviceIdentifier].(string)
+// If no resource control is found, it will search for Portainer specific resource control labels and will generate
+// a resource control based on these if they exist. Public access control label take precedence over user/team access control labels.
+func (transport *Transport) findServiceResourceControl(responseObject map[string]interface{}, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
+	serviceID := responseObject[serviceObjectIdentifier].(string)
 
 	resourceControl := portainer.GetResourceControlByResourceIDAndType(serviceID, portainer.ServiceResourceControl, resourceControls)
 	if resourceControl != nil {
-		return resourceControl
+		return resourceControl, nil
 	}
 
-	serviceLabels := extractServiceLabelsFromServiceInspectObject(responseObject)
+	serviceLabels := selectorServiceLabels(responseObject)
 	if serviceLabels != nil {
-		if serviceLabels[serviceLabelForStackIdentifier] != nil {
-			inheritedSwarmStackIdentifier := serviceLabels[serviceLabelForStackIdentifier].(string)
+		if serviceLabels[resourceLabelForDockerSwarmStackName] != nil {
+			inheritedSwarmStackIdentifier := serviceLabels[resourceLabelForDockerSwarmStackName].(string)
 			resourceControl = portainer.GetResourceControlByResourceIDAndType(inheritedSwarmStackIdentifier, portainer.StackResourceControl, resourceControls)
 
 			if resourceControl != nil {
-				return resourceControl
+				return resourceControl, nil
 			}
 		}
+
+		return transport.newResourceControlFromPortainerLabels(serviceLabels, serviceID, portainer.ServiceResourceControl)
 	}
 
-	return nil
+	return nil, nil
 }
 
-// extractServiceLabelsFromServiceInspectObject retrieve the Labels of the service if present.
-// Service schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ServiceInspect
-func extractServiceLabelsFromServiceInspectObject(responseObject map[string]interface{}) map[string]interface{} {
-	// Labels are stored under Spec.Labels
-	serviceSpecObject := responseutils.GetJSONObject(responseObject, "Spec")
-	if serviceSpecObject != nil {
-		return responseutils.GetJSONObject(serviceSpecObject, "Labels")
-	}
-	return nil
-}
-
-// extractServiceLabelsFromServiceListObject retrieve the Labels of the service if present.
-// Service schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ServiceList
-func extractServiceLabelsFromServiceListObject(responseObject map[string]interface{}) map[string]interface{} {
+// selectorServiceLabels retrieve the Labels of the service if present.
+// Service schema references:
+// https://docs.docker.com/engine/api/v1.28/#operation/ServiceInspect
+// https://docs.docker.com/engine/api/v1.28/#operation/ServiceList
+func selectorServiceLabels(responseObject map[string]interface{}) map[string]interface{} {
 	// Labels are stored under Spec.Labels
 	serviceSpecObject := responseutils.GetJSONObject(responseObject, "Spec")
 	if serviceSpecObject != nil {
@@ -132,21 +130,24 @@ func extractServiceLabelsFromServiceListObject(responseObject map[string]interfa
 // decorateServiceList loops through all services and decorates any service with an existing resource control.
 // Resource controls checks are based on: resource identifier, stack identifier (from label).
 // Service object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ServiceList
-func decorateServiceList(serviceData []interface{}, resourceControls []portainer.ResourceControl) ([]interface{}, error) {
+func (transport *Transport) decorateServiceList(serviceData []interface{}, resourceControls []portainer.ResourceControl) ([]interface{}, error) {
 	decoratedServiceData := make([]interface{}, 0)
 
 	for _, service := range serviceData {
 
 		serviceObject := service.(map[string]interface{})
-		if serviceObject[serviceIdentifier] == nil {
-			return nil, errDockerServiceIdentifierNotFound
+		if serviceObject[serviceObjectIdentifier] == nil {
+			return nil, errors.New("docker service identifier not found")
 		}
 
-		serviceID := serviceObject[serviceIdentifier].(string)
-		serviceObject = decorateResourceWithAccessControl(serviceObject, serviceID, resourceControls, portainer.ServiceResourceControl)
+		resourceControl, err := transport.findServiceResourceControl(serviceObject, resourceControls)
+		if err != nil {
+			return nil, err
+		}
 
-		serviceLabels := extractServiceLabelsFromServiceListObject(serviceObject)
-		serviceObject = decorateResourceWithAccessControlFromLabel(serviceLabels, serviceObject, serviceLabelForStackIdentifier, resourceControls, portainer.StackResourceControl)
+		if resourceControl != nil {
+			serviceObject = decorateObject(serviceObject, resourceControl)
+		}
 
 		decoratedServiceData = append(decoratedServiceData, serviceObject)
 	}
@@ -158,23 +159,29 @@ func decorateServiceList(serviceData []interface{}, resourceControls []portainer
 // Authorized services are decorated during the process.
 // Resource controls checks are based on: resource identifier, stack identifier (from label).
 // Service object schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ServiceList
-func filterServiceList(serviceData []interface{}, context *restrictedDockerOperationContext) ([]interface{}, error) {
+func (transport *Transport) filterServiceList(serviceData []interface{}, context *restrictedDockerOperationContext) ([]interface{}, error) {
 	filteredServiceData := make([]interface{}, 0)
 
 	for _, service := range serviceData {
 		serviceObject := service.(map[string]interface{})
-		if serviceObject[serviceIdentifier] == nil {
-			return nil, errDockerServiceIdentifierNotFound
+		if serviceObject[serviceObjectIdentifier] == nil {
+			return nil, errors.New("docker service identifier not found")
 		}
 
-		serviceID := serviceObject[serviceIdentifier].(string)
-		serviceObject, access := applyResourceAccessControl(serviceObject, serviceID, context, portainer.ServiceResourceControl)
-		if !access {
-			serviceLabels := extractServiceLabelsFromServiceListObject(serviceObject)
-			serviceObject, access = applyResourceAccessControlFromLabel(serviceLabels, serviceObject, serviceLabelForStackIdentifier, context, portainer.StackResourceControl)
+		resourceControl, err := transport.findServiceResourceControl(serviceObject, context.resourceControls)
+		if err != nil {
+			return nil, err
 		}
 
-		if access {
+		if resourceControl == nil {
+			if context.isAdmin || context.endpointResourceAccess {
+				filteredServiceData = append(filteredServiceData, serviceObject)
+			}
+			continue
+		}
+
+		if context.isAdmin || context.endpointResourceAccess || portainer.UserCanAccessResource(context.userID, context.userTeamIDs, resourceControl) {
+			serviceObject = decorateObject(serviceObject, resourceControl)
 			filteredServiceData = append(filteredServiceData, serviceObject)
 		}
 	}
