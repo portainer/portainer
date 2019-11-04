@@ -1235,7 +1235,7 @@ paths:
       summary: "Create a new resource control"
       description: |
         Create a new resource control to restrict access to a Docker resource.
-        **Access policy**: restricted
+        **Access policy**: administrator
       operationId: "ResourceControlCreate"
       consumes:
       - "application/json"
@@ -1343,7 +1343,7 @@ paths:
       summary: "Remove a resource control"
       description: |
         Remove a resource control.
-        **Access policy**: restricted
+        **Access policy**: administrator
       operationId: "ResourceControlDelete"
       security:
       - jwt: []
