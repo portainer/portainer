@@ -31,8 +31,9 @@ function ($q, $state, UserService, TeamService, ResourceControlHelper, ResourceC
     const inheritedVolume = hasRC && ctrl.resourceControl.Type === RCTI.CONTAINER && ctrl.resourceType === RCTS.VOLUME;
     const inheritedContainer = hasRC && ctrl.resourceControl.Type === RCTI.SERVICE && ctrl.resourceType === RCTS.CONTAINER;
     const inheritedFromStack = hasRC && ctrl.resourceControl.Type === RCTI.STACK && ctrl.resourceType !== RCTS.STACK;
+    const hasSpecialDisable = ctrl.disableOwnershipChange;
 
-    return !inheritedVolume && !inheritedContainer && !inheritedFromStack
+    return !inheritedVolume && !inheritedContainer && !inheritedFromStack && !hasSpecialDisable
       && !ctrl.state.editOwnership && (ctrl.isAdmin || ctrl.state.canEditOwnership);
   }
 

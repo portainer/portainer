@@ -20,7 +20,7 @@
               <td>ID</td>
               <td>
                 {{ network.Id }}
-                <button authorization="DockerNetworkDelete" ng-if="allowRemove(network)" class="btn btn-xs btn-danger" ng-click="removeNetwork(network.Id)"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this network</button>
+                <button authorization="DockerNetworkDelete" ng-if="allowRemove()" class="btn btn-xs btn-danger" ng-click="removeNetwork(network.Id)"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this network</button>
               </td>
             </tr>
             <tr>
@@ -55,7 +55,8 @@
   ng-if="network && applicationState.application.authentication"
   resource-id="network.Id"
   resource-control="network.ResourceControl"
-  resource-type="'network'">
+  resource-type="'network'"
+  disable-ownership-change="isSystemNetwork()">
 </por-access-control-panel>
 <!-- !access-control-panel -->
 

@@ -7,6 +7,7 @@ export function ResourceControlViewModel(data) {
   this.UserAccesses = data.UserAccesses;
   this.TeamAccesses = data.TeamAccesses;
   this.Public = data.Public;
+  this.System = data.System;
   this.Ownership = determineOwnership(this);
 }
 
