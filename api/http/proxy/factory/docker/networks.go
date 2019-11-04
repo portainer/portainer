@@ -2,6 +2,7 @@ package docker
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"github.com/docker/docker/api/types"
@@ -13,9 +14,9 @@ import (
 )
 
 const (
-	errDockerNetworkIdentifierNotFound = portainer.Error("Docker network identifier not found")
-	networkIdentifier                  = "Id"
-	networkLabelForStackIdentifier     = "com.docker.stack.namespace"
+	networkIdentifier              = "Id"
+	networkName                    = "Name"
+	networkLabelForStackIdentifier = "com.docker.stack.namespace"
 )
 
 func getInheritedResourceControlFromNetworkLabels(dockerClient *client.Client, networkID string, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
@@ -67,7 +68,13 @@ func networkInspectOperation(response *http.Response, executor *operationExecuto
 	}
 
 	if responseObject[networkIdentifier] == nil {
-		return errDockerNetworkIdentifierNotFound
+		return errors.New("docker network identifier not found in response")
+	}
+
+	systemResourceControl := findSystemNetworkResourceControl(responseObject)
+	if systemResourceControl != nil {
+		responseObject = decorateObject(responseObject, systemResourceControl)
+		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
 	}
 
 	resourceControl := findInheritedNetworkResourceControl(responseObject, executor.operationContext.resourceControls)
@@ -81,6 +88,23 @@ func networkInspectOperation(response *http.Response, executor *operationExecuto
 	}
 
 	return responseutils.RewriteAccessDeniedResponse(response)
+}
+
+// findSystemNetworkResourceControl will check if the network object is a system network
+// and will return a system resource control if that's the case.
+func findSystemNetworkResourceControl(networkObject map[string]interface{}) *portainer.ResourceControl {
+	if networkObject[networkName] == nil {
+		return nil
+	}
+
+	networkID := networkObject[networkIdentifier].(string)
+	networkName := networkObject[networkName].(string)
+
+	if networkName == "bridge" || networkName == "host" || networkName == "none" {
+		return portainer.NewSystemResourceControl(networkID, portainer.NetworkResourceControl)
+	}
+
+	return nil
 }
 
 // findInheritedNetworkResourceControl will search for a resource control object associated to the network or
@@ -132,10 +156,18 @@ func decorateNetworkList(networkData []interface{}, resourceControls []portainer
 
 		networkObject := network.(map[string]interface{})
 		if networkObject[networkIdentifier] == nil {
-			return nil, errDockerNetworkIdentifierNotFound
+			return nil, errors.New("docker network identifier not found in response")
+		}
+
+		systemResourceControl := findSystemNetworkResourceControl(networkObject)
+		if systemResourceControl != nil {
+			networkObject = decorateObject(networkObject, systemResourceControl)
+			decoratedNetworkData = append(decoratedNetworkData, networkObject)
+			continue
 		}
 
 		networkID := networkObject[networkIdentifier].(string)
+
 		networkObject = decorateResourceWithAccessControl(networkObject, networkID, resourceControls, portainer.NetworkResourceControl)
 
 		networkLabels := extractNetworkLabelsFromNetworkListObject(networkObject)
@@ -157,10 +189,18 @@ func filterNetworkList(networkData []interface{}, context *restrictedDockerOpera
 	for _, network := range networkData {
 		networkObject := network.(map[string]interface{})
 		if networkObject[networkIdentifier] == nil {
-			return nil, errDockerNetworkIdentifierNotFound
+			return nil, errors.New("docker network identifier not found in response")
+		}
+
+		systemResourceControl := findSystemNetworkResourceControl(networkObject)
+		if systemResourceControl != nil {
+			networkObject = decorateObject(networkObject, systemResourceControl)
+			filteredNetworkData = append(filteredNetworkData, networkObject)
+			continue
 		}
 
 		networkID := networkObject[networkIdentifier].(string)
+
 		networkObject, access := applyResourceAccessControl(networkObject, networkID, context, portainer.NetworkResourceControl)
 		if !access {
 			networkLabels := extractNetworkLabelsFromNetworkListObject(networkObject)

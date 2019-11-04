@@ -3,21 +3,36 @@ package portainer
 // NewPrivateResourceControl will create a new private resource control associated to the resource specified by the
 // identifier and type parameters. It automatically assigns it to the user specified by the userID parameter.
 func NewPrivateResourceControl(resourceIdentifier string, resourceType ResourceControlType, userID UserID) *ResourceControl {
-	resourceControl := &ResourceControl{
-		AdministratorsOnly: false,
-		Type:               resourceType,
-		ResourceID:         resourceIdentifier,
-		SubResourceIDs:     []string{},
+	return &ResourceControl{
+		Type:           resourceType,
+		ResourceID:     resourceIdentifier,
+		SubResourceIDs: []string{},
 		UserAccesses: []UserResourceAccess{
 			{
 				UserID:      userID,
 				AccessLevel: ReadWriteAccessLevel,
 			},
 		},
-		TeamAccesses: []TeamResourceAccess{},
+		TeamAccesses:       []TeamResourceAccess{},
+		AdministratorsOnly: false,
+		Public:             false,
+		System:             false,
 	}
+}
 
-	return resourceControl
+// NewSystemResourceControl will create a new public resource control with the System flag set to true.
+// These kind of resource control are not persisted and are created on the fly by the Portainer API.
+func NewSystemResourceControl(resourceIdentifier string, resourceType ResourceControlType) *ResourceControl {
+	return &ResourceControl{
+		Type:               resourceType,
+		ResourceID:         resourceIdentifier,
+		SubResourceIDs:     []string{},
+		UserAccesses:       []UserResourceAccess{},
+		TeamAccesses:       []TeamResourceAccess{},
+		AdministratorsOnly: false,
+		Public:             true,
+		System:             true,
+	}
 }
 
 // DecorateStacks will iterate through a list of stacks, check for an associated resource control for each

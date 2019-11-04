@@ -448,6 +448,7 @@ type (
 		TeamAccesses       []TeamResourceAccess `json:"TeamAccesses"`
 		Public             bool                 `json:"Public"`
 		AdministratorsOnly bool                 `json:"AdministratorsOnly"`
+		System             bool                 `json:"System"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 2
