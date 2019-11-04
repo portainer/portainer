@@ -6,10 +6,10 @@ import (
 	"github.com/portainer/portainer/api"
 )
 
-func (p *Transport) createPrivateResourceControl(resourceIdentifier string, resourceType portainer.ResourceControlType, userID portainer.UserID) (*portainer.ResourceControl, error) {
+func (transport *Transport) createPrivateResourceControl(resourceIdentifier string, resourceType portainer.ResourceControlType, userID portainer.UserID) (*portainer.ResourceControl, error) {
 	resourceControl := portainer.NewPrivateResourceControl(resourceIdentifier, resourceType, userID)
 
-	err := p.resourceControlService.CreateResourceControl(resourceControl)
+	err := transport.resourceControlService.CreateResourceControl(resourceControl)
 	if err != nil {
 		log.Printf("[ERROR] [http,proxy,docker,transport] [message: unable to persist resource control] [err: %s]", err)
 		return nil, err
@@ -18,17 +18,17 @@ func (p *Transport) createPrivateResourceControl(resourceIdentifier string, reso
 	return resourceControl, nil
 }
 
-func (p *Transport) getInheritedResourceControlFromServiceOrStack(resourceIdentifier string, resourceType portainer.ResourceControlType, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
+func (transport *Transport) getInheritedResourceControlFromServiceOrStack(resourceIdentifier string, resourceType portainer.ResourceControlType, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
 
 	switch resourceType {
 	case portainer.ContainerResourceControl:
-		return getInheritedResourceControlFromContainerLabels(p.dockerClient, resourceIdentifier, resourceControls)
+		return getInheritedResourceControlFromContainerLabels(transport.dockerClient, resourceIdentifier, resourceControls)
 	case portainer.NetworkResourceControl:
-		return getInheritedResourceControlFromNetworkLabels(p.dockerClient, resourceIdentifier, resourceControls)
+		return getInheritedResourceControlFromNetworkLabels(transport.dockerClient, resourceIdentifier, resourceControls)
 	case portainer.VolumeResourceControl:
-		return getInheritedResourceControlFromVolumeLabels(p.dockerClient, resourceIdentifier, resourceControls)
+		return getInheritedResourceControlFromVolumeLabels(transport.dockerClient, resourceIdentifier, resourceControls)
 	case portainer.ServiceResourceControl:
-		return getInheritedResourceControlFromServiceLabels(p.dockerClient, resourceIdentifier, resourceControls)
+		return getInheritedResourceControlFromServiceLabels(transport.dockerClient, resourceIdentifier, resourceControls)
 	}
 
 	return nil, nil
