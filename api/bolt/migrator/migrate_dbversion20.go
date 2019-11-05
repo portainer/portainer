@@ -2,7 +2,7 @@ package migrator
 
 import portainer "github.com/portainer/portainer/api"
 
-func (m *Migrator) updateResourceControlsToDBVersion21() error {
+func (m *Migrator) updateResourceControlsToDBVersion22() error {
 	legacyResourceControls, err := m.resourceControlService.ResourceControls()
 	if err != nil {
 		return err
@@ -20,7 +20,7 @@ func (m *Migrator) updateResourceControlsToDBVersion21() error {
 	return nil
 }
 
-func (m *Migrator) updateUsersAndRolesToDBVersion21() error {
+func (m *Migrator) updateUsersAndRolesToDBVersion22() error {
 	legacyUsers, err := m.userService.Users()
 	if err != nil {
 		return err
