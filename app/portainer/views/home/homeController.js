@@ -18,10 +18,11 @@ angular.module('portainer.app')
         }
 
         checkEndpointStatus(endpoint)
-          .then(function success() {
+          .then(function success(data) {
+            endpoint = data;
             return switchToDockerEndpoint(endpoint);
           }).catch(function error(err) {
-            Notifications.error('Failure', err, 'Unable to verify endpoint status');
+          Notifications.error('Failure', err, 'Unable to verify endpoint status');
           });
       };
 
@@ -59,6 +60,7 @@ angular.module('portainer.app')
 
             EndpointService.updateEndpoint(endpoint.Id, { Status: status })
               .then(function success() {
+                endpoint.Status = status;
                 deferred.resolve(endpoint);
               }).catch(function error(err) {
                 deferred.reject({ msg: 'Unable to update endpoint status', err: err });
@@ -125,6 +127,7 @@ angular.module('portainer.app')
           })
           .catch(function error(err) {
             Notifications.error('Failure', err, 'Unable to connect to the Docker endpoint');
+            $state.reload();
           })
           .finally(function final() {
             $scope.state.connectingToEdgeEndpoint = false;

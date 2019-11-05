@@ -23,6 +23,7 @@ type Handler struct {
 	ResourceControlService portainer.ResourceControlService
 	CryptoService          portainer.CryptoService
 	SettingsService        portainer.SettingsService
+	AuthorizationService   *portainer.AuthorizationService
 }
 
 // NewHandler creates a handler to manage user operations.
@@ -31,19 +32,19 @@ func NewHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimi
 		Router: mux.NewRouter(),
 	}
 	h.Handle("/users",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.userCreate))).Methods(http.MethodPost)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.userCreate))).Methods(http.MethodPost)
 	h.Handle("/users",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.userList))).Methods(http.MethodGet)
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.userList))).Methods(http.MethodGet)
 	h.Handle("/users/{id}",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.userInspect))).Methods(http.MethodGet)
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.userInspect))).Methods(http.MethodGet)
 	h.Handle("/users/{id}",
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.userUpdate))).Methods(http.MethodPut)
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.userUpdate))).Methods(http.MethodPut)
 	h.Handle("/users/{id}",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.userDelete))).Methods(http.MethodDelete)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.userDelete))).Methods(http.MethodDelete)
 	h.Handle("/users/{id}/memberships",
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.userMemberships))).Methods(http.MethodGet)
 	h.Handle("/users/{id}/passwd",
-		rateLimiter.LimitAccess(bouncer.RestrictedAccess(httperror.LoggerHandler(h.userUpdatePassword)))).Methods(http.MethodPut)
+		rateLimiter.LimitAccess(bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.userUpdatePassword)))).Methods(http.MethodPut)
 	h.Handle("/users/admin/check",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.adminCheck))).Methods(http.MethodGet)
 	h.Handle("/users/admin/init",

@@ -27,6 +27,11 @@ function ($interval, PaginationService, DatatableService, PAGINATION_MAX_ITEMS) 
       refreshRate: '30'
     }
   }
+  this.resetSelectionState = function() {
+    this.state.selectAll = false;
+    this.state.selectedItems = [];
+    _.map(this.state.filteredDataSet, (item) => item.Checked = false);
+  };
 
   this.onTextFilterChange = function() {
     DatatableService.setDataTableTextFilters(this.tableKey, this.state.textFilter);

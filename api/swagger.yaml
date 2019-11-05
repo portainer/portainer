@@ -54,7 +54,7 @@ info:
 
     **NOTE**: You can find more information on how to query the Docker API in the [Docker official documentation](https://docs.docker.com/engine/api/v1.30/) as well as in [this Portainer example](https://gist.github.com/deviantony/77026d402366b4b43fa5918d41bc42f8).
 
-  version: "1.22.0"
+  version: "1.22.1"
   title: "Portainer API"
   contact:
     email: "info@portainer.io"
@@ -254,7 +254,7 @@ paths:
       - name: "EndpointType"
         in: "formData"
         type: "integer"
-        description: "Environment type. Value must be one of: 1 (Docker environment), 2 (Agent environment) or 3 (Azure environment)"
+        description: "Environment type. Value must be one of: 1 (Docker environment), 2 (Agent environment), 3 (Azure environment) or 4 (Edge agent environment)"
         required: true
       - name: "URL"
         in: "formData"
@@ -3174,7 +3174,7 @@ definitions:
         description: "Is analytics enabled"
       Version:
         type: "string"
-        example: "1.22.0"
+        example: "1.22.1"
         description: "Portainer API version"
   PublicSettingsInspectResponse:
     type: "object"
@@ -3920,6 +3920,10 @@ definitions:
         type: "boolean"
         example: true
         description: "Whether non-administrator users should be able to use privileged mode when creating containers"
+      EdgeAgentCheckinInterval:
+        type: "integer"
+        example: "30"
+        description: "Polling interval for Edge agent (in seconds)"
   EndpointGroupCreateRequest:
     type: "object"
     required:

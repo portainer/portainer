@@ -396,6 +396,14 @@ ul.sidebar .sidebar-list a.active {
   margin: 2px 0 2px 20px;
 }
 
+.sidebar-footer-content .update-notification {
+    font-size: 14px;
+    padding: 12px;
+    border-radius: 2px;
+    background-color: #FF851B;
+    margin-bottom: 5px;
+}
+
 .sidebar-footer-content .version {
   font-size: 11px;
   margin: 11px 20px 0 7px;
@@ -825,6 +833,26 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   width: 50%;
   margin: 20px auto 10px auto;
 }
+
+.modal {
+  text-align: center;
+  padding: 0!important;
+}
+
+.modal::before {
+  content: '';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+  margin-right: -4px;
+}
+
+.modal-dialog {
+  display: inline-block;
+  text-align: left;
+  vertical-align: middle;
+}
+
 
 /*bootbox override*/
 .modal-open {

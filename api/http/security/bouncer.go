@@ -34,7 +34,7 @@ type (
 	}
 
 	// RestrictedRequestContext is a data structure containing information
-	// used in RestrictedAccess
+	// used in AuthenticatedAccess
 	RestrictedRequestContext struct {
 		IsAdmin         bool
 		IsTeamLeader    bool
@@ -64,22 +64,40 @@ func (bouncer *RequestBouncer) PublicAccess(h http.Handler) http.Handler {
 	return h
 }
 
-// AuthorizedAccess defines a security check for API endpoints that require an authorization check.
+// AdminAccess defines a security check for API endpoints that require an authorization check.
 // Authentication is required to access these endpoints.
 // If the RBAC extension is enabled, authorizations are required to use these endpoints.
 // If the RBAC extension is not enabled, the administrator role is required to use these endpoints.
-func (bouncer *RequestBouncer) AuthorizedAccess(h http.Handler) http.Handler {
+// The request context will be enhanced with a RestrictedRequestContext object
+// that might be used later to inside the API operation for extra authorization validation
+// and resource filtering.
+func (bouncer *RequestBouncer) AdminAccess(h http.Handler) http.Handler {
 	h = bouncer.mwUpgradeToRestrictedRequest(h)
-	h = bouncer.mwCheckPortainerAuthorizations(h)
+	h = bouncer.mwCheckPortainerAuthorizations(h, true)
 	h = bouncer.mwAuthenticatedUser(h)
 	return h
 }
 
 // RestrictedAccess defines a security check for restricted API endpoints.
 // Authentication is required to access these endpoints.
+// If the RBAC extension is enabled, authorizations are required to use these endpoints.
+// If the RBAC extension is not enabled, access is granted to any authenticated user.
 // The request context will be enhanced with a RestrictedRequestContext object
-// that might be used later to authorize/filter access to resources inside an endpoint.
+// that might be used later to inside the API operation for extra authorization validation
+// and resource filtering.
 func (bouncer *RequestBouncer) RestrictedAccess(h http.Handler) http.Handler {
+	h = bouncer.mwUpgradeToRestrictedRequest(h)
+	h = bouncer.mwCheckPortainerAuthorizations(h, false)
+	h = bouncer.mwAuthenticatedUser(h)
+	return h
+}
+
+// AuthenticatedAccess defines a security check for restricted API endpoints.
+// Authentication is required to access these endpoints.
+// The request context will be enhanced with a RestrictedRequestContext object
+// that might be used later to inside the API operation for extra authorization validation
+// and resource filtering.
+func (bouncer *RequestBouncer) AuthenticatedAccess(h http.Handler) http.Handler {
 	h = bouncer.mwUpgradeToRestrictedRequest(h)
 	h = bouncer.mwAuthenticatedUser(h)
 	return h
@@ -142,10 +160,15 @@ func (bouncer *RequestBouncer) checkEndpointOperationAuthorization(r *http.Reque
 		return err
 	}
 
+	user, err := bouncer.userService.User(tokenData.ID)
+	if err != nil {
+		return err
+	}
+
 	apiOperation := &portainer.APIOperationAuthorizationRequest{
 		Path:           r.URL.String(),
 		Method:         r.Method,
-		Authorizations: tokenData.EndpointAuthorizations[endpoint.ID],
+		Authorizations: user.EndpointAuthorizations[endpoint.ID],
 	}
 
 	bouncer.rbacExtensionClient.setLicenseKey(extension.License.LicenseKey)
@@ -186,11 +209,13 @@ func (bouncer *RequestBouncer) mwAuthenticatedUser(h http.Handler) http.Handler 
 // mwCheckPortainerAuthorizations will verify that the user has the required authorization to access
 // a specific API endpoint. It will leverage the RBAC extension authorization validation if the extension
 // is enabled.
-func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler) http.Handler {
+// If the administratorOnly flag is specified and the RBAC extension is not enabled, this will prevent non-admin
+// users from accessing the endpoint.
+func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler, administratorOnly bool) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tokenData, err := RetrieveTokenData(r)
 		if err != nil {
-			httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrResourceAccessDenied)
+			httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrUnauthorized)
 			return
 		}
 
@@ -201,6 +226,11 @@ func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler)
 
 		extension, err := bouncer.extensionService.Extension(portainer.RBACExtension)
 		if err == portainer.ErrObjectNotFound {
+			if administratorOnly {
+				httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrUnauthorized)
+				return
+			}
+
 			next.ServeHTTP(w, r)
 			return
 		} else if err != nil {
@@ -208,10 +238,19 @@ func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler)
 			return
 		}
 
+		user, err := bouncer.userService.User(tokenData.ID)
+		if err != nil && err == portainer.ErrObjectNotFound {
+			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", portainer.ErrUnauthorized)
+			return
+		} else if err != nil {
+			httperror.WriteError(w, http.StatusInternalServerError, "Unable to retrieve user details from the database", err)
+			return
+		}
+
 		apiOperation := &portainer.APIOperationAuthorizationRequest{
 			Path:           r.URL.String(),
 			Method:         r.Method,
-			Authorizations: tokenData.PortainerAuthorizations,
+			Authorizations: user.PortainerAuthorizations,
 		}
 
 		bouncer.rbacExtensionClient.setLicenseKey(extension.License.LicenseKey)
@@ -281,7 +320,7 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 				httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", portainer.ErrUnauthorized)
 				return
 			} else if err != nil {
-				httperror.WriteError(w, http.StatusInternalServerError, "Unable to retrieve users from the database", err)
+				httperror.WriteError(w, http.StatusInternalServerError, "Unable to retrieve user details from the database", err)
 				return
 			}
 		} else {

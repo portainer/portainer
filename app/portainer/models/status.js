@@ -5,3 +5,8 @@ export function StatusViewModel(data) {
   this.Analytics = data.Analytics;
   this.Version = data.Version;
 }
+
+export function StatusVersionViewModel(data) {
+  this.UpdateAvailable = data.UpdateAvailable;
+  this.LatestVersion = data.LatestVersion;
+}

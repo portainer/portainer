@@ -1,7 +1,7 @@
 angular.module('portainer.app')
 .factory('Authentication', [
-'Auth', 'OAuth', 'jwtHelper', 'LocalStorage', 'StateManager', 'EndpointProvider',
-function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManager, EndpointProvider) {
+'$async', 'Auth', 'OAuth', 'jwtHelper', 'LocalStorage', 'StateManager', 'EndpointProvider', 'UserService',
+function AuthenticationFactory($async, Auth, OAuth, jwtHelper, LocalStorage, StateManager, EndpointProvider, UserService) {
   'use strict';
 
   var service = {};
@@ -15,6 +15,7 @@ function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManage
   service.getUserDetails = getUserDetails;
   service.isAdmin = isAdmin;
   service.hasAuthorizations = hasAuthorizations;
+  service.retrievePermissions = retrievePermissions;
 
   function init() {
     var jwt = LocalStorage.getJWT();
@@ -24,24 +25,29 @@ function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManage
     }
   }
 
+  async function OAuthLoginAsync(code) {
+    const response = await OAuth.validate({ code: code }).$promise;
+    setUser(response.jwt);
+  }
+
   function OAuthLogin(code) {
-    return OAuth.validate({ code: code }).$promise
-      .then(function onLoginSuccess(response) {
-        return setUser(response.jwt);
-      });
+    return $async(OAuthLoginAsync, code)
+  }
+
+  async function loginAsync(username, password) {
+    const response = await Auth.login({ username: username, password: password }).$promise;
+    setUser(response.jwt);
   }
 
   function login(username, password) {
-    return Auth.login({ username: username, password: password }).$promise
-      .then(function onLoginSuccess(response) {
-        return setUser(response.jwt);
-      });
+    return $async(loginAsync, username, password);
   }
 
   function logout() {
     StateManager.clean();
     EndpointProvider.clean();
     LocalStorage.clean();
+    LocalStorage.storeLoginStateUUID('');
   }
 
   function isAuthenticated() {
@@ -53,14 +59,20 @@ function AuthenticationFactory(Auth, OAuth, jwtHelper, LocalStorage, StateManage
     return user;
   }
 
+  function retrievePermissions() {
+    return UserService.user(user.ID)
+    .then((data) => {
+      user.endpointAuthorizations = data.EndpointAuthorizations;
+      user.portainerAuthorizations = data.PortainerAuthorizations;
+    });
+  }
+
   function setUser(jwt) {
     LocalStorage.storeJWT(jwt);
     var tokenPayload = jwtHelper.decodeToken(jwt);
     user.username = tokenPayload.username;
     user.ID = tokenPayload.id;
     user.role = tokenPayload.role;
-    user.endpointAuthorizations = tokenPayload.endpointAuthorizations;
-    user.portainerAuthorizations = tokenPayload.portainerAuthorizations;
   }
 
   function isAdmin() {

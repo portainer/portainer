@@ -52,7 +52,7 @@ func (handler *Handler) authenticate(w http.ResponseWriter, r *http.Request) *ht
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a user with the specified username from the database", err}
 	}
 
-	if err == portainer.ErrObjectNotFound && settings.AuthenticationMethod == portainer.AuthenticationInternal {
+	if err == portainer.ErrObjectNotFound && (settings.AuthenticationMethod == portainer.AuthenticationInternal || settings.AuthenticationMethod == portainer.AuthenticationOAuth) {
 		return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid credentials", portainer.ErrUnauthorized}
 	}
 
@@ -98,25 +98,9 @@ func (handler *Handler) authenticateLDAPAndCreateUser(w http.ResponseWriter, use
 	}
 
 	user := &portainer.User{
-		Username: username,
-		Role:     portainer.StandardUserRole,
-		PortainerAuthorizations: map[portainer.Authorization]bool{
-			portainer.OperationPortainerDockerHubInspect:        true,
-			portainer.OperationPortainerEndpointGroupList:       true,
-			portainer.OperationPortainerEndpointList:            true,
-			portainer.OperationPortainerEndpointInspect:         true,
-			portainer.OperationPortainerEndpointExtensionAdd:    true,
-			portainer.OperationPortainerEndpointExtensionRemove: true,
-			portainer.OperationPortainerExtensionList:           true,
-			portainer.OperationPortainerMOTD:                    true,
-			portainer.OperationPortainerRegistryList:            true,
-			portainer.OperationPortainerRegistryInspect:         true,
-			portainer.OperationPortainerTeamList:                true,
-			portainer.OperationPortainerTemplateList:            true,
-			portainer.OperationPortainerTemplateInspect:         true,
-			portainer.OperationPortainerUserList:                true,
-			portainer.OperationPortainerUserMemberships:         true,
-		},
+		Username:                username,
+		Role:                    portainer.StandardUserRole,
+		PortainerAuthorizations: portainer.DefaultPortainerAuthorizations(),
 	}
 
 	err = handler.UserService.CreateUser(user)
@@ -134,57 +118,12 @@ func (handler *Handler) authenticateLDAPAndCreateUser(w http.ResponseWriter, use
 
 func (handler *Handler) writeToken(w http.ResponseWriter, user *portainer.User) *httperror.HandlerError {
 	tokenData := &portainer.TokenData{
-		ID:                      user.ID,
-		Username:                user.Username,
-		Role:                    user.Role,
-		PortainerAuthorizations: user.PortainerAuthorizations,
+		ID:       user.ID,
+		Username: user.Username,
+		Role:     user.Role,
 	}
-
-	_, err := handler.ExtensionService.Extension(portainer.RBACExtension)
-	if err == portainer.ErrObjectNotFound {
-		return handler.persistAndWriteToken(w, tokenData)
-	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a extension with the specified identifier inside the database", err}
-	}
-
-	endpointAuthorizations, err := handler.getAuthorizations(user)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve authorizations associated to the user", err}
-	}
-	tokenData.EndpointAuthorizations = endpointAuthorizations
 
 	return handler.persistAndWriteToken(w, tokenData)
-}
-
-func (handler *Handler) getAuthorizations(user *portainer.User) (portainer.EndpointAuthorizations, error) {
-	endpointAuthorizations := portainer.EndpointAuthorizations{}
-	if user.Role == portainer.AdministratorRole {
-		return endpointAuthorizations, nil
-	}
-
-	userMemberships, err := handler.TeamMembershipService.TeamMembershipsByUserID(user.ID)
-	if err != nil {
-		return endpointAuthorizations, err
-	}
-
-	endpoints, err := handler.EndpointService.Endpoints()
-	if err != nil {
-		return endpointAuthorizations, err
-	}
-
-	endpointGroups, err := handler.EndpointGroupService.EndpointGroups()
-	if err != nil {
-		return endpointAuthorizations, err
-	}
-
-	roles, err := handler.RoleService.Roles()
-	if err != nil {
-		return endpointAuthorizations, err
-	}
-
-	endpointAuthorizations = getUserEndpointAuthorizations(user, endpoints, endpointGroups, roles, userMemberships)
-
-	return endpointAuthorizations, nil
 }
 
 func (handler *Handler) persistAndWriteToken(w http.ResponseWriter, tokenData *portainer.TokenData) *httperror.HandlerError {

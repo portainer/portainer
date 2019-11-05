@@ -2,7 +2,7 @@
   "author": "Portainer.io",
   "name": "portainer",
   "homepage": "http://portainer.io",
-  "version": "1.22.0",
+  "version": "1.22.1",
   "repository": {
     "type": "git",
     "url": "git@github.com:portainer/portainer.git"
@@ -20,20 +20,32 @@
     }
   ],
   "scripts": {
-    "start": "grunt run-dev",
-    "start:client": "webpack-dev-server",
-    "start:server": "yarn build:server:offline && grunt shell:run:amd64",
-    "clean:all": "grunt clean:all",
-    "build": "NODE_ENV=production grunt build",
+    "build": "grunt clean:all && grunt build",
+    "build:server": "grunt clean:server && grunt build:server",
+    "build:client": "grunt clean:client && grunt build:client",
+    "clean": "grunt clean:all",
+    "start": "grunt clean:all && grunt start",
+    "start:server": "grunt clean:server && grunt start:server",
+    "start:client": "grunt clean:client && grunt start:client",
     "build:server:offline": "cd ./api/cmd/portainer && CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags '-s' && mv -f portainer ../../../dist/portainer",
-    "build:client": "NODE_ENV=production grunt build-webapp"
+    "clean:all": "grunt clean:all"
+  },
+  "scriptsComments": {
+    "build": "Build the entire app (backend/frontend) in development mode",
+    "build:server": "Build the backend",
+    "build:client": "Build the frontend (development mode)",
+    "clean": "Clean the entire dist folder",
+    "start": "Build the entire app (backend/frontend) in development mode, run it inside a container locally and start a watch process for the frontend files",
+    "start:server": "Build the backend and run it inside a container",
+    "clean:all": "Deprecated. Use the clean script instead",
+    "build:server:offline": "Deprecated. Use the build:server script instead"
   },
   "engines": {
     "node": ">= 0.8.4"
   },
   "dependencies": {
     "@babel/polyfill": "^7.2.5",
-    "@fortawesome/fontawesome-free-webfonts": "^1.0.9",
+    "@fortawesome/fontawesome-free": "^5.11.2",
     "@uirouter/angularjs": "~1.0.6",
     "angular": "~1.5.0",
     "angular-clipboard": "^1.6.2",
@@ -47,6 +59,7 @@
     "angular-messages": "~1.5.0",
     "angular-mocks": "~1.5.0",
     "angular-moment-picker": "^0.10.2",
+    "angular-multiselect": "github:portainer/angular-multi-select#semver:~v4.0.1",
     "angular-resource": "~1.5.0",
     "angular-sanitize": "~1.5.0",
     "angular-ui-bootstrap": "~2.5.0",
@@ -59,7 +72,6 @@
     "chart.js": "~2.6.0",
     "codemirror": "~5.30.0",
     "filesize": "~3.3.0",
-    "isteven-angular-multiselect": "~4.0.0",
     "jquery": "3.4.0",
     "js-yaml": "~3.13.1",
     "lodash-es": "^4.17.15",
@@ -83,8 +95,8 @@
     "clean-webpack-plugin": "^0.1.19",
     "css-loader": "^1.0.0",
     "cssnano": "^3.10.0",
-    "eslint": "^3.19.0",
-    "eslint-loader": "^2.1.1",
+    "eslint": "5.16.0",
+    "eslint-loader": "^2.1.2",
     "file-loader": "^1.1.11",
     "grunt": "~0.4.0",
     "grunt-cli": "^1.2.0",

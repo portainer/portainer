@@ -1,0 +1,175 @@
+<rd-header>
+  <rd-header-title title-text="Tag">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.registries.registry.repository.tag" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>
+    <a ui-sref="portainer.registries">Registries</a> &gt;
+    <a ui-sref="portainer.registries.registry.repositories()">{{ ctrl.registry.Name }}</a> &gt;
+    <a ui-sref="portainer.registries.registry.repository()">{{ ctrl.context.repository }} </a> &gt;
+    {{ ctrl.context.tag }}
+  </rd-header-content>
+</rd-header>
+
+<div class="row" ng-if="ctrl.details.RepoTags.length > 0">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa fa-tags" title-text="Image tags"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <div class="form-group">
+            <div class="row">
+              <div class="pull-left" ng-repeat="tag in ctrl.details.RepoTags" style="display:table">
+                <div class="input-group col-md-1" style="padding:0 15px">
+                  <span class="input-group-addon">{{ tag }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-if="ctrl.details">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-clone" title-text="Image details"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>ID</td>
+              <td>
+                {{ ctrl.details.Id }}
+              </td>
+            </tr>
+            <tr ng-if="ctrl.details.Parent">
+              <td>Parent</td>
+              <td>{{ ctrl.details.Parent }}</td>
+            </tr>
+            <tr>
+              <td>Created</td>
+              <td>{{ ctrl.details.Created|getisodate }}</td>
+            </tr>
+            <tr>
+              <td>Build</td>
+              <td>Docker {{ ctrl.details.DockerVersion }} on {{ ctrl.details.Os}}, {{ ctrl.details.Architecture }}</td>
+            </tr>
+            <tr ng-if="ctrl.details.Author">
+              <td>Author</td>
+              <td>{{ ctrl.details.Author }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-if="ctrl.details">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-clone" title-text="Dockerfile details"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>CMD</td>
+              <td><code>{{ ctrl.details.Command|command }}</code></td>
+            </tr>
+            <tr ng-if="ctrl.details.Entrypoint">
+              <td>ENTRYPOINT</td>
+              <td><code>{{ ctrl.details.Entrypoint|command }}</code></td>
+            </tr>
+            <tr ng-if="ctrl.details.ExposedPorts.length > 0">
+              <td>EXPOSE</td>
+              <td>
+                <span class="label label-default space-right" ng-repeat="port in ctrl.details.ExposedPorts">
+                  {{ port }}
+                </span>
+              </td>
+            </tr>
+            <tr ng-if="ctrl.details.Volumes.length > 0">
+              <td>VOLUME</td>
+              <td>
+                <span class="label label-default space-right" ng-repeat="volume in ctrl.details.Volumes">
+                  {{ volume }}
+                </span>
+              </td>
+            </tr>
+            <tr ng-if="ctrl.details.Env.length > 0">
+              <td>ENV</td>
+              <td>
+                <table class="table table-bordered table-condensed">
+                  <tr ng-repeat="var in ctrl.details.Env">
+                    <td>{{ var|key: '=' }}</td>
+                    <td>{{ var|value: '=' }}</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+
+</div>
+
+<div class="row" ng-if="ctrl.tag">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-clone" title-text="Image layers"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table id="image-layers" class="table">
+          <thead>
+            <th style="white-space:nowrap;">
+              <a ng-click="ctrl.order('Order')">
+                Order
+                <span ng-show="ctrl.Sort.Type == 'Order' && !ctrl.Sort.Reverse" class="glyphicon glyphicon-chevron-down"></span>
+                <span ng-show="ctrl.Sort.Type == 'Order' && ctrl.Sort.Reverse" class="glyphicon glyphicon-chevron-up"></span>
+              </a>
+            </th>
+            <th>
+              <a ng-click="ctrl.order('CreatedBy')">
+                Layer
+                <span ng-show="ctrl.Sort.Type == 'CreatedBy' && !ctrl.Sort.Reverse" class="glyphicon glyphicon-chevron-down"></span>
+                <span ng-show="ctrl.Sort.Type == 'CreatedBy' && ctrl.Sort.Reverse" class="glyphicon glyphicon-chevron-up"></span>
+              </a>
+            </th>
+          </thead>
+          <tbody>
+            <tr ng-repeat="layer in ctrl.history | orderBy:ctrl.Sort.Type:ctrl.Sort.Reverse">
+              <td style="white-space:nowrap;">
+                {{ layer.Order }}
+              </td>
+              <td class="expand">
+                <div ng-if="layer.CreatedBy.length > 130">
+                  <span id="layer-command-{{$index}}-full" style="display: none">
+                    {{ layer.CreatedBy }}
+                  </span>
+                  <span id="layer-command-{{$index}}-short">
+                    {{ layer.CreatedBy | truncate:130 }}
+                    <span ng-if="layer.CreatedBy.length > 130" style="margin-left: 5px;">
+                      <a id="layer-command-expander{{$index}}" class="btn" ng-click='ctrl.toggleLayerCommand($index)'>
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                      </a>
+                    </span>
+                  </span>
+                </div>
+                <div ng-if="layer.CreatedBy.length <= 130">
+                  <span id="layer-command-{{$index}}-full">
+                    {{ layer.CreatedBy }}
+                  </span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

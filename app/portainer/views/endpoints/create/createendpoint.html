@@ -17,16 +17,6 @@
           <div class="form-group" style="margin-bottom: 0">
             <div class="boxselector_wrapper">
               <div ng-click="resetEndpointURL()">
-                <input type="radio" id="docker_endpoint" ng-model="state.EnvironmentType" value="docker">
-                <label for="docker_endpoint">
-                  <div class="boxselector_header">
-                    <i class="fab fa-docker" aria-hidden="true" style="margin-right: 2px;"></i>
-                    Docker
-                  </div>
-                  <p>Docker environment</p>
-                </label>
-              </div>
-              <div ng-click="resetEndpointURL()">
                 <input type="radio" id="agent_endpoint" ng-model="state.EnvironmentType" value="agent">
                 <label for="agent_endpoint">
                   <div class="boxselector_header">
@@ -44,6 +34,16 @@
                     Edge Agent
                   </div>
                   <p>Portainer Edge agent</p>
+                </label>
+              </div>
+              <div ng-click="resetEndpointURL()">
+                <input type="radio" id="docker_endpoint" ng-model="state.EnvironmentType" value="docker">
+                <label for="docker_endpoint">
+                  <div class="boxselector_header">
+                    <i class="fab fa-docker" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Docker
+                  </div>
+                  <p>Directly connect to the Docker API</p>
                 </label>
               </div>
               <div>

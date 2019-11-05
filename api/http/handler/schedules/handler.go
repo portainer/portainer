@@ -28,18 +28,18 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	}
 
 	h.Handle("/schedules",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.scheduleList))).Methods(http.MethodGet)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.scheduleList))).Methods(http.MethodGet)
 	h.Handle("/schedules",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.scheduleCreate))).Methods(http.MethodPost)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.scheduleCreate))).Methods(http.MethodPost)
 	h.Handle("/schedules/{id}",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.scheduleInspect))).Methods(http.MethodGet)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.scheduleInspect))).Methods(http.MethodGet)
 	h.Handle("/schedules/{id}",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.scheduleUpdate))).Methods(http.MethodPut)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.scheduleUpdate))).Methods(http.MethodPut)
 	h.Handle("/schedules/{id}",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.scheduleDelete))).Methods(http.MethodDelete)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.scheduleDelete))).Methods(http.MethodDelete)
 	h.Handle("/schedules/{id}/file",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.scheduleFile))).Methods(http.MethodGet)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.scheduleFile))).Methods(http.MethodGet)
 	h.Handle("/schedules/{id}/tasks",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.scheduleTasks))).Methods(http.MethodGet)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.scheduleTasks))).Methods(http.MethodGet)
 	return h
 }

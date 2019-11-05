@@ -21,7 +21,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		Router: mux.NewRouter(),
 	}
 	h.Handle("/roles",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.roleList))).Methods(http.MethodGet)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.roleList))).Methods(http.MethodGet)
 
 	return h
 }

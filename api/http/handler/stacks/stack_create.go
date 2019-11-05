@@ -5,6 +5,9 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/docker/cli/cli/compose/types"
+
+	"github.com/docker/cli/cli/compose/loader"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/portainer/api"
@@ -86,4 +89,39 @@ func (handler *Handler) createSwarmStack(w http.ResponseWriter, r *http.Request,
 	}
 
 	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: method. Value must be one of: string, repository or file", errors.New(request.ErrInvalidQueryParameter)}
+}
+
+func (handler *Handler) isValidStackFile(stackFileContent []byte) (bool, error) {
+	composeConfigYAML, err := loader.ParseYAML(stackFileContent)
+	if err != nil {
+		return false, err
+	}
+
+	composeConfigFile := types.ConfigFile{
+		Config: composeConfigYAML,
+	}
+
+	composeConfigDetails := types.ConfigDetails{
+		ConfigFiles: []types.ConfigFile{composeConfigFile},
+		Environment: map[string]string{},
+	}
+
+	composeConfig, err := loader.Load(composeConfigDetails, func(options *loader.Options) {
+		options.SkipValidation = true
+		options.SkipInterpolation = true
+	})
+	if err != nil {
+		return false, err
+	}
+
+	for key := range composeConfig.Services {
+		service := composeConfig.Services[key]
+		for _, volume := range service.Volumes {
+			if volume.Type == "bind" {
+				return false, nil
+			}
+		}
+	}
+
+	return true, nil
 }
