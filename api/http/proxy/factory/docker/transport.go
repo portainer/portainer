@@ -246,9 +246,10 @@ func (transport *Transport) proxyServiceRequest(request *http.Request) (*http.Re
 			// Handle /services/{id} requests
 			serviceID := path.Base(requestPath)
 
-			if request.Method == http.MethodGet {
+			switch request.Method {
+			case http.MethodGet:
 				return transport.rewriteOperation(request, transport.serviceInspectOperation)
-			} else if request.Method == http.MethodDelete {
+			case http.MethodDelete:
 				return transport.executeGenericResourceDeletionOperation(request, serviceID, portainer.ServiceResourceControl)
 			}
 			return transport.restrictedOperation(request, serviceID, portainer.ServiceResourceControl)
