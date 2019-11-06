@@ -79,7 +79,6 @@ func (transport *Transport) volumeInspectOperation(response *http.Response, exec
 	}
 
 	return transport.applyAccessControlOnResource(resourceOperationParameters, responseObject, response, executor)
-
 }
 
 // selectorVolumeLabels retrieve the Labels of the volume if present.
