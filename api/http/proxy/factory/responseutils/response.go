@@ -74,12 +74,12 @@ func WriteAccessDeniedResponse() (*http.Response, error) {
 	return response, err
 }
 
-// WriteAccessDeniedResponse will overwrite the existing response with an access denied response
+// RewriteAccessDeniedResponse will overwrite the existing response with an access denied response
 func RewriteAccessDeniedResponse(response *http.Response) error {
 	return RewriteResponse(response, errors.New("access denied to resource"), http.StatusForbidden)
 }
 
-// RewriteReponse will replace the existing response body and status code with the one specified
+// RewriteResponse will replace the existing response body and status code with the one specified
 // in parameters
 func RewriteResponse(response *http.Response, newResponseData interface{}, statusCode int) error {
 	jsonData, err := json.Marshal(newResponseData)
