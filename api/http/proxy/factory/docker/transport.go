@@ -416,7 +416,6 @@ func (transport *Transport) restrictedOperation(request *http.Request, resourceI
 	}
 
 	if tokenData.Role != portainer.AdministratorRole {
-
 		teamMemberships, err := transport.teamMembershipService.TeamMembershipsByUserID(tokenData.ID)
 		if err != nil {
 			return nil, err
@@ -486,6 +485,10 @@ func (transport *Transport) restrictedVolumeBrowserOperation(request *http.Reque
 			endpointResourceAccess = true
 		}
 
+		if endpointResourceAccess {
+			return transport.executeDockerRequest(request)
+		}
+
 		teamMemberships, err := transport.teamMembershipService.TeamMembershipsByUserID(tokenData.ID)
 		if err != nil {
 			return nil, err
@@ -502,7 +505,20 @@ func (transport *Transport) restrictedVolumeBrowserOperation(request *http.Reque
 		}
 
 		resourceControl := portainer.GetResourceControlByResourceIDAndType(resourceID, portainer.VolumeResourceControl, resourceControls)
-		if !endpointResourceAccess && (resourceControl == nil || !portainer.UserCanAccessResource(tokenData.ID, userTeamIDs, resourceControl)) {
+		if resourceControl == nil {
+			// This resource was created outside of portainer,
+			// is part of a Docker service or part of a Docker Swarm/Compose stack.
+			inheritedResourceControl, err := transport.getInheritedResourceControlFromServiceOrStack(resourceID, portainer.VolumeResourceControl, resourceControls)
+			if err != nil {
+				return nil, err
+			}
+
+			if inheritedResourceControl == nil || !portainer.UserCanAccessResource(tokenData.ID, userTeamIDs, inheritedResourceControl) {
+				return responseutils.WriteAccessDeniedResponse()
+			}
+		}
+
+		if resourceControl != nil && !portainer.UserCanAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
 			return responseutils.WriteAccessDeniedResponse()
 		}
 	}
