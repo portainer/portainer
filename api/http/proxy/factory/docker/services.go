@@ -40,9 +40,9 @@ func (transport *Transport) serviceListOperation(response *http.Response, execut
 	}
 
 	resourceOperationParameters := &resourceOperationParameters{
-		serviceObjectIdentifier,
-		portainer.ServiceResourceControl,
-		selectorServiceLabels,
+		resourceIdentifierAttribute: serviceObjectIdentifier,
+		resourceType:                portainer.ServiceResourceControl,
+		labelsObjectSelector:        selectorServiceLabels,
 	}
 
 	responseArray, err = transport.applyAccessControlOnResourceList(resourceOperationParameters, responseArray, executor)
@@ -65,20 +65,20 @@ func (transport *Transport) serviceInspectOperation(response *http.Response, exe
 	}
 
 	resourceOperationParameters := &resourceOperationParameters{
-		serviceObjectIdentifier,
-		portainer.ServiceResourceControl,
-		selectorServiceLabels,
+		resourceIdentifierAttribute: serviceObjectIdentifier,
+		resourceType:                portainer.ServiceResourceControl,
+		labelsObjectSelector:        selectorServiceLabels,
 	}
 
 	return transport.applyAccessControlOnResource(resourceOperationParameters, responseObject, response, executor)
 }
 
 // selectorServiceLabels retrieve the Labels of the service if present.
+// Labels are stored under Spec.Labels
 // Service schema references:
 // https://docs.docker.com/engine/api/v1.28/#operation/ServiceInspect
 // https://docs.docker.com/engine/api/v1.28/#operation/ServiceList
 func selectorServiceLabels(responseObject map[string]interface{}) map[string]interface{} {
-	// Labels are stored under Spec.Labels
 	serviceSpecObject := responseutils.GetJSONObject(responseObject, "Spec")
 	if serviceSpecObject != nil {
 		return responseutils.GetJSONObject(serviceSpecObject, "Labels")

@@ -44,9 +44,9 @@ func (transport *Transport) volumeListOperation(response *http.Response, executo
 		volumeData := responseObject["Volumes"].([]interface{})
 
 		resourceOperationParameters := &resourceOperationParameters{
-			volumeObjectIdentifier,
-			portainer.VolumeResourceControl,
-			selectorVolumeLabels,
+			resourceIdentifierAttribute: volumeObjectIdentifier,
+			resourceType:                portainer.VolumeResourceControl,
+			labelsObjectSelector:        selectorVolumeLabels,
 		}
 
 		volumeData, err = transport.applyAccessControlOnResourceList(resourceOperationParameters, volumeData, executor)
@@ -73,9 +73,9 @@ func (transport *Transport) volumeInspectOperation(response *http.Response, exec
 	}
 
 	resourceOperationParameters := &resourceOperationParameters{
-		volumeObjectIdentifier,
-		portainer.VolumeResourceControl,
-		selectorVolumeLabels,
+		resourceIdentifierAttribute: volumeObjectIdentifier,
+		resourceType:                portainer.VolumeResourceControl,
+		labelsObjectSelector:        selectorVolumeLabels,
 	}
 
 	return transport.applyAccessControlOnResource(resourceOperationParameters, responseObject, response, executor)
@@ -83,10 +83,10 @@ func (transport *Transport) volumeInspectOperation(response *http.Response, exec
 }
 
 // selectorVolumeLabels retrieve the Labels of the volume if present.
+// Labels are stored under Labels
 // Volume schema references:
 // https://docs.docker.com/engine/api/v1.28/#operation/VolumeInspect
 // https://docs.docker.com/engine/api/v1.28/#operation/VolumeList
 func selectorVolumeLabels(responseObject map[string]interface{}) map[string]interface{} {
-	// Labels are stored under Labels
 	return responseutils.GetJSONObject(responseObject, "Labels")
 }

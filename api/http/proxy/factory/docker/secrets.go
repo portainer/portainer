@@ -40,9 +40,9 @@ func (transport *Transport) secretListOperation(response *http.Response, executo
 	}
 
 	resourceOperationParameters := &resourceOperationParameters{
-		secretObjectIdentifier,
-		portainer.SecretResourceControl,
-		selectorSecretLabels,
+		resourceIdentifierAttribute: secretObjectIdentifier,
+		resourceType:                portainer.SecretResourceControl,
+		labelsObjectSelector:        selectorSecretLabels,
 	}
 
 	responseArray, err = transport.applyAccessControlOnResourceList(resourceOperationParameters, responseArray, executor)
@@ -65,20 +65,20 @@ func (transport *Transport) secretInspectOperation(response *http.Response, exec
 	}
 
 	resourceOperationParameters := &resourceOperationParameters{
-		secretObjectIdentifier,
-		portainer.SecretResourceControl,
-		selectorSecretLabels,
+		resourceIdentifierAttribute: secretObjectIdentifier,
+		resourceType:                portainer.SecretResourceControl,
+		labelsObjectSelector:        selectorSecretLabels,
 	}
 
 	return transport.applyAccessControlOnResource(resourceOperationParameters, responseObject, response, executor)
 }
 
 // selectorSecretLabels retrieve the Labels of the secret if present.
+// Labels are stored under Spec.Labels
 // Secret schema references:
 // https://docs.docker.com/engine/api/v1.40/#operation/SecretList
 // https://docs.docker.com/engine/api/v1.40/#operation/SecretInspect
 func selectorSecretLabels(responseObject map[string]interface{}) map[string]interface{} {
-	// Labels are stored under Spec.Labels
 	secretSpec := responseutils.GetJSONObject(responseObject, "Spec")
 	if secretSpec != nil {
 		secretLabelsObject := responseutils.GetJSONObject(secretSpec, "Labels")

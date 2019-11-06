@@ -39,9 +39,9 @@ func (transport *Transport) configListOperation(response *http.Response, executo
 	}
 
 	resourceOperationParameters := &resourceOperationParameters{
-		configObjectIdentifier,
-		portainer.ConfigResourceControl,
-		selectorConfigLabels,
+		resourceIdentifierAttribute: configObjectIdentifier,
+		resourceType:                portainer.ConfigResourceControl,
+		labelsObjectSelector:        selectorConfigLabels,
 	}
 
 	responseArray, err = transport.applyAccessControlOnResourceList(resourceOperationParameters, responseArray, executor)
@@ -64,20 +64,20 @@ func (transport *Transport) configInspectOperation(response *http.Response, exec
 	}
 
 	resourceOperationParameters := &resourceOperationParameters{
-		configObjectIdentifier,
-		portainer.ConfigResourceControl,
-		selectorConfigLabels,
+		resourceIdentifierAttribute: configObjectIdentifier,
+		resourceType:                portainer.ConfigResourceControl,
+		labelsObjectSelector:        selectorConfigLabels,
 	}
 
 	return transport.applyAccessControlOnResource(resourceOperationParameters, responseObject, response, executor)
 }
 
 // selectorConfigLabels retrieve the Labels of the config if present.
+// Labels are stored under Spec.Labels
 // Secret schema references:
 // https://docs.docker.com/engine/api/v1.40/#operation/ConfigList
 // https://docs.docker.com/engine/api/v1.40/#operation/ConfigInspect
 func selectorConfigLabels(responseObject map[string]interface{}) map[string]interface{} {
-	// Labels are stored under Spec.Labels
 	secretSpec := responseutils.GetJSONObject(responseObject, "Spec")
 	if secretSpec != nil {
 		secretLabelsObject := responseutils.GetJSONObject(secretSpec, "Labels")

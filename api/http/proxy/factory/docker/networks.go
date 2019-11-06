@@ -42,9 +42,9 @@ func (transport *Transport) networkListOperation(response *http.Response, execut
 	}
 
 	resourceOperationParameters := &resourceOperationParameters{
-		networkObjectIdentifier,
-		portainer.NetworkResourceControl,
-		selectorContainerLabelsFromContainerListObject,
+		resourceIdentifierAttribute: networkObjectIdentifier,
+		resourceType:                portainer.NetworkResourceControl,
+		labelsObjectSelector:        selectorNetworkLabels,
 	}
 
 	responseArray, err = transport.applyAccessControlOnResourceList(resourceOperationParameters, responseArray, executor)
@@ -67,9 +67,9 @@ func (transport *Transport) networkInspectOperation(response *http.Response, exe
 	}
 
 	resourceOperationParameters := &resourceOperationParameters{
-		networkObjectIdentifier,
-		portainer.NetworkResourceControl,
-		selectorNetworkLabels,
+		resourceIdentifierAttribute: networkObjectIdentifier,
+		resourceType:                portainer.NetworkResourceControl,
+		labelsObjectSelector:        selectorNetworkLabels,
 	}
 
 	return transport.applyAccessControlOnResource(resourceOperationParameters, responseObject, response, executor)
@@ -93,10 +93,10 @@ func findSystemNetworkResourceControl(networkObject map[string]interface{}) *por
 }
 
 // selectorNetworkLabels retrieve the Labels of the network if present.
+// Labels are stored under Labels
 // Network schema references:
 // https://docs.docker.com/engine/api/v1.28/#operation/NetworkInspect
 // https://docs.docker.com/engine/api/v1.28/#operation/NetworkList
 func selectorNetworkLabels(responseObject map[string]interface{}) map[string]interface{} {
-	// Labels are stored under Labels
 	return responseutils.GetJSONObject(responseObject, "Labels")
 }

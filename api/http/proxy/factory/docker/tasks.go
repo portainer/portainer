@@ -22,9 +22,9 @@ func (transport *Transport) taskListOperation(response *http.Response, executor 
 	}
 
 	resourceOperationParameters := &resourceOperationParameters{
-		taskServiceObjectIdentifier,
-		portainer.ServiceResourceControl,
-		selectorTaskLabels,
+		resourceIdentifierAttribute: taskServiceObjectIdentifier,
+		resourceType:                portainer.ServiceResourceControl,
+		labelsObjectSelector:        selectorTaskLabels,
 	}
 
 	responseArray, err = transport.applyAccessControlOnResourceList(resourceOperationParameters, responseArray, executor)
@@ -36,9 +36,9 @@ func (transport *Transport) taskListOperation(response *http.Response, executor 
 }
 
 // selectorTaskLabels retrieve the Labels of the task if present.
+// Labels are stored under Spec.ContainerSpec.Labels
 // Task schema reference: https://docs.docker.com/engine/api/v1.28/#operation/TaskList
 func selectorTaskLabels(responseObject map[string]interface{}) map[string]interface{} {
-	// Labels are stored under Spec.ContainerSpec.Labels
 	taskSpecObject := responseutils.GetJSONObject(responseObject, "Spec")
 	if taskSpecObject != nil {
 		containerSpecObject := responseutils.GetJSONObject(taskSpecObject, "ContainerSpec")

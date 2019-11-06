@@ -48,9 +48,9 @@ func (transport *Transport) containerListOperation(response *http.Response, exec
 	}
 
 	resourceOperationParameters := &resourceOperationParameters{
-		containerObjectIdentifier,
-		portainer.ContainerResourceControl,
-		selectorContainerLabelsFromContainerListObject,
+		resourceIdentifierAttribute: containerObjectIdentifier,
+		resourceType:                portainer.ContainerResourceControl,
+		labelsObjectSelector:        selectorContainerLabelsFromContainerListOperation,
 	}
 
 	responseArray, err = transport.applyAccessControlOnResourceList(resourceOperationParameters, responseArray, executor)
@@ -80,18 +80,18 @@ func (transport *Transport) containerInspectOperation(response *http.Response, e
 	}
 
 	resourceOperationParameters := &resourceOperationParameters{
-		containerObjectIdentifier,
-		portainer.ContainerResourceControl,
-		selectorContainerLabelsFromContainerInspectObject,
+		resourceIdentifierAttribute: containerObjectIdentifier,
+		resourceType:                portainer.ContainerResourceControl,
+		labelsObjectSelector:        selectorContainerLabelsFromContainerInspectOperation,
 	}
 
 	return transport.applyAccessControlOnResource(resourceOperationParameters, responseObject, response, executor)
 }
 
-// selectorContainerLabelsFromContainerInspectObject retrieve the Labels of the container if present.
+// selectorContainerLabelsFromContainerInspectOperation retrieve the Labels of the container if present.
+// Labels are stored under Config.Labels
 // Container schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ContainerInspect
-func selectorContainerLabelsFromContainerInspectObject(responseObject map[string]interface{}) map[string]interface{} {
-	// Labels are stored under Config.Labels
+func selectorContainerLabelsFromContainerInspectOperation(responseObject map[string]interface{}) map[string]interface{} {
 	containerConfigObject := responseutils.GetJSONObject(responseObject, "Config")
 	if containerConfigObject != nil {
 		containerLabelsObject := responseutils.GetJSONObject(containerConfigObject, "Labels")
@@ -100,10 +100,10 @@ func selectorContainerLabelsFromContainerInspectObject(responseObject map[string
 	return nil
 }
 
-// selectorContainerLabelsFromContainerListObject retrieve the Labels of the container if present.
+// selectorContainerLabelsFromContainerListOperation retrieve the Labels of the container if present.
+// Labels are stored under Labels
 // Container schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ContainerList
-func selectorContainerLabelsFromContainerListObject(responseObject map[string]interface{}) map[string]interface{} {
-	// Labels are stored under Labels
+func selectorContainerLabelsFromContainerListOperation(responseObject map[string]interface{}) map[string]interface{} {
 	containerLabelsObject := responseutils.GetJSONObject(responseObject, "Labels")
 	return containerLabelsObject
 }
@@ -116,7 +116,7 @@ func filterContainersWithBlackListedLabels(containerData []interface{}, labelBla
 	for _, container := range containerData {
 		containerObject := container.(map[string]interface{})
 
-		containerLabels := selectorContainerLabelsFromContainerListObject(containerObject)
+		containerLabels := selectorContainerLabelsFromContainerListOperation(containerObject)
 		if containerLabels != nil {
 			if !containerHasBlackListedLabel(containerLabels, labelBlackList) {
 				filteredContainerData = append(filteredContainerData, containerObject)
