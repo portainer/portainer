@@ -345,7 +345,13 @@ func (transport *Transport) proxySwarmRequest(request *http.Request) (*http.Resp
 }
 
 func (transport *Transport) proxyTaskRequest(request *http.Request) (*http.Response, error) {
-	return transport.executeDockerRequest(request)
+	switch requestPath := request.URL.Path; requestPath {
+	case "/tasks":
+		return transport.rewriteOperation(request, transport.taskListOperation)
+	default:
+		// assume /tasks/{id}
+		return transport.executeDockerRequest(request)
+	}
 }
 
 func (transport *Transport) proxyBuildRequest(request *http.Request) (*http.Response, error) {
