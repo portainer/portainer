@@ -157,24 +157,24 @@ func (transport *Transport) applyAccessControlOnResource(parameters *resourceOpe
 
 func (transport *Transport) applyAccessControlOnResourceList(parameters *resourceOperationParameters, resourceData []interface{}, executor *operationExecutor) ([]interface{}, error) {
 	if executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess {
-		return transport.decorateResourceList(resourceData, parameters.resourceIdentifierAttribute, parameters.resourceType, parameters.labelsObjectSelector, executor.operationContext.resourceControls)
+		return transport.decorateResourceList(parameters, resourceData, executor.operationContext.resourceControls)
 	}
 
-	return transport.filterResourceList(resourceData, parameters.resourceIdentifierAttribute, parameters.resourceType, parameters.labelsObjectSelector, executor.operationContext)
+	return transport.filterResourceList(parameters, resourceData, executor.operationContext)
 }
 
-func (transport *Transport) decorateResourceList(resourceData []interface{}, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType, selector resourceLabelsObjectSelector, resourceControls []portainer.ResourceControl) ([]interface{}, error) {
+func (transport *Transport) decorateResourceList(parameters *resourceOperationParameters, resourceData []interface{}, resourceControls []portainer.ResourceControl) ([]interface{}, error) {
 	decoratedResourceData := make([]interface{}, 0)
 
 	for _, resource := range resourceData {
 		resourceObject := resource.(map[string]interface{})
 
-		if resourceObject[resourceIdentifierAttribute] == nil {
-			log.Printf("[WARN] [http,proxy,docker,decorate] [message: unable to find resource identifier property in resource list element] [identifier_attribute: %s]", resourceIdentifierAttribute)
+		if resourceObject[parameters.resourceIdentifierAttribute] == nil {
+			log.Printf("[WARN] [http,proxy,docker,decorate] [message: unable to find resource identifier property in resource list element] [identifier_attribute: %s]", parameters.resourceIdentifierAttribute)
 			continue
 		}
 
-		if resourceType == portainer.NetworkResourceControl {
+		if parameters.resourceType == portainer.NetworkResourceControl {
 			systemResourceControl := findSystemNetworkResourceControl(resourceObject)
 			if systemResourceControl != nil {
 				resourceObject = decorateObject(resourceObject, systemResourceControl)
@@ -183,10 +183,10 @@ func (transport *Transport) decorateResourceList(resourceData []interface{}, res
 			}
 		}
 
-		resourceIdentifier := resourceObject[resourceIdentifierAttribute].(string)
-		resourceLabelsObject := selector(resourceObject)
+		resourceIdentifier := resourceObject[parameters.resourceIdentifierAttribute].(string)
+		resourceLabelsObject := parameters.labelsObjectSelector(resourceObject)
 
-		resourceControl, err := transport.findResourceControl(resourceIdentifier, resourceType, resourceLabelsObject, resourceControls)
+		resourceControl, err := transport.findResourceControl(resourceIdentifier, parameters.resourceType, resourceLabelsObject, resourceControls)
 		if err != nil {
 			return nil, err
 		}
@@ -201,20 +201,20 @@ func (transport *Transport) decorateResourceList(resourceData []interface{}, res
 	return decoratedResourceData, nil
 }
 
-func (transport *Transport) filterResourceList(resourceData []interface{}, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType, selector resourceLabelsObjectSelector, context *restrictedDockerOperationContext) ([]interface{}, error) {
+func (transport *Transport) filterResourceList(parameters *resourceOperationParameters, resourceData []interface{}, context *restrictedDockerOperationContext) ([]interface{}, error) {
 	filteredResourceData := make([]interface{}, 0)
 
 	for _, resource := range resourceData {
 		resourceObject := resource.(map[string]interface{})
-		if resourceObject[resourceIdentifierAttribute] == nil {
-			log.Printf("[WARN] [http,proxy,docker,filter] [message: unable to find resource identifier property in resource list element] [identifier_attribute: %s]", resourceIdentifierAttribute)
+		if resourceObject[parameters.resourceIdentifierAttribute] == nil {
+			log.Printf("[WARN] [http,proxy,docker,filter] [message: unable to find resource identifier property in resource list element] [identifier_attribute: %s]", parameters.resourceIdentifierAttribute)
 			continue
 		}
 
-		resourceIdentifier := resourceObject[resourceIdentifierAttribute].(string)
-		resourceLabelsObject := selector(resourceObject)
+		resourceIdentifier := resourceObject[parameters.resourceIdentifierAttribute].(string)
+		resourceLabelsObject := parameters.labelsObjectSelector(resourceObject)
 
-		if resourceType == portainer.NetworkResourceControl {
+		if parameters.resourceType == portainer.NetworkResourceControl {
 			systemResourceControl := findSystemNetworkResourceControl(resourceObject)
 			if systemResourceControl != nil {
 				resourceObject = decorateObject(resourceObject, systemResourceControl)
@@ -223,7 +223,7 @@ func (transport *Transport) filterResourceList(resourceData []interface{}, resou
 			}
 		}
 
-		resourceControl, err := transport.findResourceControl(resourceIdentifier, resourceType, resourceLabelsObject, context.resourceControls)
+		resourceControl, err := transport.findResourceControl(resourceIdentifier, parameters.resourceType, resourceLabelsObject, context.resourceControls)
 		if err != nil {
 			return nil, err
 		}
