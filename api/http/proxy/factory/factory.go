@@ -34,7 +34,7 @@ type (
 		dockerClientFactory    *docker.ClientFactory
 	}
 
-	// ProxyFactory is used to create a new ProxyFactory
+	// ProxyFactoryParameters is used to create a new ProxyFactory
 	ProxyFactoryParameters struct {
 		ResourceControlService portainer.ResourceControlService
 		UserService            portainer.UserService
