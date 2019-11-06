@@ -30,7 +30,7 @@ func getInheritedResourceControlFromSecretLabels(dockerClient *client.Client, se
 }
 
 // secretListOperation extracts the response as a JSON object, loop through the secrets array
-// decorate and/or filter the secrets based on resource controls before rewriting the response
+// decorate and/or filter the secrets based on resource controls before rewriting the response.
 func (transport *Transport) secretListOperation(response *http.Response, executor *operationExecutor) error {
 	// SecretList response is a JSON array
 	// https://docs.docker.com/engine/api/v1.28/#operation/SecretList
@@ -54,8 +54,7 @@ func (transport *Transport) secretListOperation(response *http.Response, executo
 }
 
 // secretInspectOperation extracts the response as a JSON object, verify that the user
-// has access to the secret based on resource control (check are done based on the secretID and optional Swarm service ID)
-// and either rewrite an access denied response or a decorated secret.
+// has access to the secret based on resource control and either rewrite an access denied response or a decorated secret.
 func (transport *Transport) secretInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// SecretInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/SecretInspect
@@ -73,9 +72,9 @@ func (transport *Transport) secretInspectOperation(response *http.Response, exec
 	return transport.applyAccessControlOnResource(resourceOperationParameters, responseObject, response, executor)
 }
 
-// selectorSecretLabels retrieve the Labels of the secret if present.
-// Labels are stored under Spec.Labels
-// Secret schema references:
+// selectorSecretLabels retrieve the labels object associated to the secret object.
+// Labels are available under the "Spec.Labels" property.
+// API schema references:
 // https://docs.docker.com/engine/api/v1.40/#operation/SecretList
 // https://docs.docker.com/engine/api/v1.40/#operation/SecretInspect
 func selectorSecretLabels(responseObject map[string]interface{}) map[string]interface{} {

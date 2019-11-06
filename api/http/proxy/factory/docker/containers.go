@@ -38,7 +38,7 @@ func getInheritedResourceControlFromContainerLabels(dockerClient *client.Client,
 }
 
 // containerListOperation extracts the response as a JSON array, loop through the containers array
-// decorate and/or filter the containers based on resource controls before rewriting the response
+// decorate and/or filter the containers based on resource controls before rewriting the response.
 func (transport *Transport) containerListOperation(response *http.Response, executor *operationExecutor) error {
 	// ContainerList response is a JSON array
 	// https://docs.docker.com/engine/api/v1.28/#operation/ContainerList
@@ -69,8 +69,7 @@ func (transport *Transport) containerListOperation(response *http.Response, exec
 }
 
 // containerInspectOperation extracts the response as a JSON object, verify that the user
-// has access to the container based on resource control (check are done based on the containerID and optional Swarm service ID)
-// and either rewrite an access denied response or a decorated container.
+// has access to the container based on resource control and either rewrite an access denied response or a decorated container.
 func (transport *Transport) containerInspectOperation(response *http.Response, executor *operationExecutor) error {
 	//ContainerInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/ContainerInspect
@@ -88,9 +87,10 @@ func (transport *Transport) containerInspectOperation(response *http.Response, e
 	return transport.applyAccessControlOnResource(resourceOperationParameters, responseObject, response, executor)
 }
 
-// selectorContainerLabelsFromContainerInspectOperation retrieve the Labels of the container if present.
-// Labels are stored under Config.Labels
-// Container schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ContainerInspect
+// selectorContainerLabelsFromContainerInspectOperation retrieve the labels object associated to the container object.
+// This selector is specific to the containerInspect Docker operation.
+// Labels are available under the "Config.Labels" property.
+// API schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ContainerInspect
 func selectorContainerLabelsFromContainerInspectOperation(responseObject map[string]interface{}) map[string]interface{} {
 	containerConfigObject := responseutils.GetJSONObject(responseObject, "Config")
 	if containerConfigObject != nil {
@@ -100,9 +100,10 @@ func selectorContainerLabelsFromContainerInspectOperation(responseObject map[str
 	return nil
 }
 
-// selectorContainerLabelsFromContainerListOperation retrieve the Labels of the container if present.
-// Labels are stored under Labels
-// Container schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ContainerList
+// selectorContainerLabelsFromContainerListOperation retrieve the labels object associated to the container object.
+// This selector is specific to the containerList Docker operation.
+// Labels are available under the "Labels" property.
+// API schema reference: https://docs.docker.com/engine/api/v1.28/#operation/ContainerList
 func selectorContainerLabelsFromContainerListOperation(responseObject map[string]interface{}) map[string]interface{} {
 	containerLabelsObject := responseutils.GetJSONObject(responseObject, "Labels")
 	return containerLabelsObject

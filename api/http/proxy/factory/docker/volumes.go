@@ -29,7 +29,7 @@ func getInheritedResourceControlFromVolumeLabels(dockerClient *client.Client, vo
 }
 
 // volumeListOperation extracts the response as a JSON object, loop through the volume array
-// decorate and/or filter the volumes based on resource controls before rewriting the response
+// decorate and/or filter the volumes based on resource controls before rewriting the response.
 func (transport *Transport) volumeListOperation(response *http.Response, executor *operationExecutor) error {
 	// VolumeList response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/VolumeList
@@ -39,7 +39,6 @@ func (transport *Transport) volumeListOperation(response *http.Response, executo
 	}
 
 	// The "Volumes" field contains the list of volumes as an array of JSON objects
-	// Response schema reference: https://docs.docker.com/engine/api/v1.28/#operation/VolumeList
 	if responseObject["Volumes"] != nil {
 		volumeData := responseObject["Volumes"].([]interface{})
 
@@ -62,8 +61,7 @@ func (transport *Transport) volumeListOperation(response *http.Response, executo
 }
 
 // volumeInspectOperation extracts the response as a JSON object, verify that the user
-// has access to the volume based on any existing resource control and either rewrite an access denied response
-// or a decorated volume.
+// has access to the volume based on any existing resource control and either rewrite an access denied response or a decorated volume.
 func (transport *Transport) volumeInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// VolumeInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/VolumeInspect
@@ -81,9 +79,9 @@ func (transport *Transport) volumeInspectOperation(response *http.Response, exec
 	return transport.applyAccessControlOnResource(resourceOperationParameters, responseObject, response, executor)
 }
 
-// selectorVolumeLabels retrieve the Labels of the volume if present.
-// Labels are stored under Labels
-// Volume schema references:
+// selectorVolumeLabels retrieve the labels object associated to the volume object.
+// Labels are available under the "Labels" property.
+// API schema references:
 // https://docs.docker.com/engine/api/v1.28/#operation/VolumeInspect
 // https://docs.docker.com/engine/api/v1.28/#operation/VolumeList
 func selectorVolumeLabels(responseObject map[string]interface{}) map[string]interface{} {

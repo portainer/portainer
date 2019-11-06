@@ -32,7 +32,7 @@ func getInheritedResourceControlFromNetworkLabels(dockerClient *client.Client, n
 }
 
 // networkListOperation extracts the response as a JSON object, loop through the networks array
-// decorate and/or filter the networks based on resource controls before rewriting the response
+// decorate and/or filter the networks based on resource controls before rewriting the response.
 func (transport *Transport) networkListOperation(response *http.Response, executor *operationExecutor) error {
 	// NetworkList response is a JSON array
 	// https://docs.docker.com/engine/api/v1.28/#operation/NetworkList
@@ -56,8 +56,7 @@ func (transport *Transport) networkListOperation(response *http.Response, execut
 }
 
 // networkInspectOperation extracts the response as a JSON object, verify that the user
-// has access to the network based on resource control and either rewrite an access denied response
-// or a decorated network.
+// has access to the network based on resource control and either rewrite an access denied response or a decorated network.
 func (transport *Transport) networkInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// NetworkInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.28/#operation/NetworkInspect
@@ -92,9 +91,9 @@ func findSystemNetworkResourceControl(networkObject map[string]interface{}) *por
 	return nil
 }
 
-// selectorNetworkLabels retrieve the Labels of the network if present.
-// Labels are stored under Labels
-// Network schema references:
+// selectorNetworkLabels retrieve the labels object associated to the network object.
+// Labels are available under the "Labels" property.
+// API schema references:
 // https://docs.docker.com/engine/api/v1.28/#operation/NetworkInspect
 // https://docs.docker.com/engine/api/v1.28/#operation/NetworkList
 func selectorNetworkLabels(responseObject map[string]interface{}) map[string]interface{} {

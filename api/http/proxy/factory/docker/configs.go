@@ -29,7 +29,7 @@ func getInheritedResourceControlFromConfigLabels(dockerClient *client.Client, co
 }
 
 // configListOperation extracts the response as a JSON object, loop through the configs array
-// decorate and/or filter the configs based on resource controls before rewriting the response
+// decorate and/or filter the configs based on resource controls before rewriting the response.
 func (transport *Transport) configListOperation(response *http.Response, executor *operationExecutor) error {
 	// ConfigList response is a JSON array
 	// https://docs.docker.com/engine/api/v1.30/#operation/ConfigList
@@ -53,8 +53,7 @@ func (transport *Transport) configListOperation(response *http.Response, executo
 }
 
 // configInspectOperation extracts the response as a JSON object, verify that the user
-// has access to the config based on resource control (check are done based on the configID and optional Swarm service ID)
-// and either rewrite an access denied response or a decorated config.
+// has access to the config based on resource control and either rewrite an access denied response or a decorated config.
 func (transport *Transport) configInspectOperation(response *http.Response, executor *operationExecutor) error {
 	// ConfigInspect response is a JSON object
 	// https://docs.docker.com/engine/api/v1.30/#operation/ConfigInspect
@@ -72,9 +71,9 @@ func (transport *Transport) configInspectOperation(response *http.Response, exec
 	return transport.applyAccessControlOnResource(resourceOperationParameters, responseObject, response, executor)
 }
 
-// selectorConfigLabels retrieve the Labels of the config if present.
-// Labels are stored under Spec.Labels
-// Secret schema references:
+// selectorConfigLabels retrieve the labels object associated to the config object.
+// Labels are available under the "Spec.Labels" property.
+// API schema references:
 // https://docs.docker.com/engine/api/v1.40/#operation/ConfigList
 // https://docs.docker.com/engine/api/v1.40/#operation/ConfigInspect
 func selectorConfigLabels(responseObject map[string]interface{}) map[string]interface{} {
