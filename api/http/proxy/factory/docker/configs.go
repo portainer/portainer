@@ -2,7 +2,6 @@ package docker
 
 import (
 	"context"
-	"errors"
 	"net/http"
 
 	"github.com/docker/docker/client"
@@ -32,8 +31,6 @@ func getInheritedResourceControlFromConfigLabels(dockerClient *client.Client, co
 // configListOperation extracts the response as a JSON object, loop through the configs array
 // decorate and/or filter the configs based on resource controls before rewriting the response
 func (transport *Transport) configListOperation(response *http.Response, executor *operationExecutor) error {
-	var err error
-
 	// ConfigList response is a JSON array
 	// https://docs.docker.com/engine/api/v1.30/#operation/ConfigList
 	responseArray, err := responseutils.GetResponseAsJSONArray(response)
@@ -41,11 +38,13 @@ func (transport *Transport) configListOperation(response *http.Response, executo
 		return err
 	}
 
-	if executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess {
-		responseArray, err = transport.decorateConfigList(responseArray, executor.operationContext.resourceControls)
-	} else {
-		responseArray, err = transport.filterConfigList(responseArray, executor.operationContext)
+	resourceOperationParameters := &resourceOperationParameters{
+		configObjectIdentifier,
+		portainer.ConfigResourceControl,
+		selectorConfigLabels,
 	}
+
+	responseArray, err = transport.applyAccessControlOnResourceList(resourceOperationParameters, responseArray, executor)
 	if err != nil {
 		return err
 	}
@@ -64,50 +63,13 @@ func (transport *Transport) configInspectOperation(response *http.Response, exec
 		return err
 	}
 
-	if responseObject[configObjectIdentifier] == nil {
-		return errors.New("docker secret identifier not found")
+	resourceOperationParameters := &resourceOperationParameters{
+		configObjectIdentifier,
+		portainer.ConfigResourceControl,
+		selectorConfigLabels,
 	}
 
-	resourceControl, err := transport.findConfigResourceControl(responseObject, executor.operationContext.resourceControls)
-	if err != nil {
-		return err
-	}
-
-	if resourceControl == nil && (executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess) {
-		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
-	}
-
-	if executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess || portainer.UserCanAccessResource(executor.operationContext.userID, executor.operationContext.userTeamIDs, resourceControl) {
-		responseObject = decorateObject(responseObject, resourceControl)
-		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
-	}
-
-	return responseutils.RewriteAccessDeniedResponse(response)
-}
-
-func (transport *Transport) findConfigResourceControl(responseObject map[string]interface{}, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
-	configID := responseObject[configObjectIdentifier].(string)
-
-	resourceControl := portainer.GetResourceControlByResourceIDAndType(configID, portainer.ConfigResourceControl, resourceControls)
-	if resourceControl != nil {
-		return resourceControl, nil
-	}
-
-	secretLabels := selectorConfigLabels(responseObject)
-	if secretLabels != nil {
-		if secretLabels[resourceLabelForDockerSwarmStackName] != nil {
-			inheritedSwarmStackIdentifier := secretLabels[resourceLabelForDockerSwarmStackName].(string)
-			resourceControl = portainer.GetResourceControlByResourceIDAndType(inheritedSwarmStackIdentifier, portainer.StackResourceControl, resourceControls)
-
-			if resourceControl != nil {
-				return resourceControl, nil
-			}
-		}
-
-		return transport.newResourceControlFromPortainerLabels(secretLabels, configID, portainer.ConfigResourceControl)
-	}
-
-	return nil, nil
+	return transport.applyAccessControlOnResource(resourceOperationParameters, responseObject, response, executor)
 }
 
 // selectorConfigLabels retrieve the Labels of the config if present.
@@ -122,66 +84,4 @@ func selectorConfigLabels(responseObject map[string]interface{}) map[string]inte
 		return secretLabelsObject
 	}
 	return nil
-}
-
-// decorateConfigList loops through all configs and decorates any config with an existing resource control.
-// Resource controls checks are based on: resource identifier.
-// Config object schema reference: https://docs.docker.com/engine/api/v1.30/#operation/ConfigList
-func (transport *Transport) decorateConfigList(configData []interface{}, resourceControls []portainer.ResourceControl) ([]interface{}, error) {
-	decoratedConfigData := make([]interface{}, 0)
-
-	for _, config := range configData {
-
-		configObject := config.(map[string]interface{})
-		if configObject[configObjectIdentifier] == nil {
-			return nil, errors.New("docker config identifier not found")
-		}
-
-		resourceControl, err := transport.findSecretResourceControl(configObject, resourceControls)
-		if err != nil {
-			return nil, err
-		}
-
-		if resourceControl != nil {
-			configObject = decorateObject(configObject, resourceControl)
-		}
-
-		decoratedConfigData = append(decoratedConfigData, configObject)
-	}
-
-	return decoratedConfigData, nil
-}
-
-// filterConfigList loops through all configs and filters authorized configs (access granted to the user based on existing resource control).
-// Authorized configs are decorated during the process.
-// Resource controls checks are based on: resource identifier.
-// Config object schema reference: https://docs.docker.com/engine/api/v1.30/#operation/ConfigList
-func (transport *Transport) filterConfigList(configData []interface{}, context *restrictedDockerOperationContext) ([]interface{}, error) {
-	filteredConfigData := make([]interface{}, 0)
-
-	for _, config := range configData {
-		configObject := config.(map[string]interface{})
-		if configObject[configObjectIdentifier] == nil {
-			return nil, errors.New("docker config identifier not found")
-		}
-
-		resourceControl, err := transport.findSecretResourceControl(configObject, context.resourceControls)
-		if err != nil {
-			return nil, err
-		}
-
-		if resourceControl == nil {
-			if context.isAdmin || context.endpointResourceAccess {
-				filteredConfigData = append(filteredConfigData, configObject)
-			}
-			continue
-		}
-
-		if context.isAdmin || context.endpointResourceAccess || portainer.UserCanAccessResource(context.userID, context.userTeamIDs, resourceControl) {
-			configObject = decorateObject(configObject, resourceControl)
-			filteredConfigData = append(filteredConfigData, configObject)
-		}
-	}
-
-	return filteredConfigData, nil
 }

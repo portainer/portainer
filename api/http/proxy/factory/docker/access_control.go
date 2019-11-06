@@ -2,7 +2,10 @@ package docker
 
 import (
 	"log"
+	"net/http"
 	"strings"
+
+	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
 
 	"github.com/portainer/portainer/api"
 )
@@ -16,7 +19,14 @@ const (
 	resourceLabelForDockerComposeStackName         = "com.docker.compose.project"
 )
 
-type resourceLabelSelector func(map[string]interface{}) map[string]interface{}
+type (
+	resourceLabelsObjectSelector func(map[string]interface{}) map[string]interface{}
+	resourceOperationParameters  struct {
+		resourceIdentifierAttribute string
+		resourceType                portainer.ResourceControlType
+		labelsObjectSelector        resourceLabelsObjectSelector
+	}
+)
 
 func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject map[string]interface{}, resourceID string, resourceType portainer.ResourceControlType) (*portainer.ResourceControl, error) {
 	if labelsObject[resourceLabelForPortainerPublicResourceControl] != nil {
@@ -106,6 +116,169 @@ func (transport *Transport) getInheritedResourceControlFromServiceOrStack(resour
 		return getInheritedResourceControlFromConfigLabels(transport.dockerClient, resourceIdentifier, resourceControls)
 	case portainer.SecretResourceControl:
 		return getInheritedResourceControlFromSecretLabels(transport.dockerClient, resourceIdentifier, resourceControls)
+	}
+
+	return nil, nil
+}
+
+func (transport *Transport) applyAccessControlOnResource(parameters *resourceOperationParameters, responseObject map[string]interface{}, response *http.Response, executor *operationExecutor) error {
+	if responseObject[parameters.resourceIdentifierAttribute] == nil {
+		log.Printf("[WARN] [message: unable to find resource identifier property in resource object] [identifier_attribute: %s]", parameters.resourceIdentifierAttribute)
+		return nil
+	}
+
+	if parameters.resourceType == portainer.NetworkResourceControl {
+		systemResourceControl := findSystemNetworkResourceControl(responseObject)
+		if systemResourceControl != nil {
+			responseObject = decorateObject(responseObject, systemResourceControl)
+			return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
+		}
+	}
+
+	resourceIdentifier := responseObject[parameters.resourceIdentifierAttribute].(string)
+	resourceLabelsObject := parameters.labelsObjectSelector(responseObject)
+
+	resourceControl, err := transport.findResourceControl(resourceIdentifier, parameters.resourceType, resourceLabelsObject, executor.operationContext.resourceControls)
+	if err != nil {
+		return err
+	}
+
+	if resourceControl == nil && (executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess) {
+		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
+	}
+
+	if executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess || portainer.UserCanAccessResource(executor.operationContext.userID, executor.operationContext.userTeamIDs, resourceControl) {
+		responseObject = decorateObject(responseObject, resourceControl)
+		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
+	}
+
+	return responseutils.RewriteAccessDeniedResponse(response)
+}
+
+func (transport *Transport) applyAccessControlOnResourceList(parameters *resourceOperationParameters, resourceData []interface{}, executor *operationExecutor) ([]interface{}, error) {
+	if executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess {
+		return transport.decorateResourceList(resourceData, parameters.resourceIdentifierAttribute, parameters.resourceType, parameters.labelsObjectSelector, executor.operationContext.resourceControls)
+	}
+
+	return transport.filterResourceList(resourceData, parameters.resourceIdentifierAttribute, parameters.resourceType, parameters.labelsObjectSelector, executor.operationContext)
+}
+
+func (transport *Transport) decorateResourceList(resourceData []interface{}, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType, selector resourceLabelsObjectSelector, resourceControls []portainer.ResourceControl) ([]interface{}, error) {
+	decoratedResourceData := make([]interface{}, 0)
+
+	for _, resource := range resourceData {
+		resourceObject := resource.(map[string]interface{})
+
+		if resourceObject[resourceIdentifierAttribute] == nil {
+			log.Printf("[WARN] [http,proxy,docker,decorate] [message: unable to find resource identifier property in resource list element] [identifier_attribute: %s]", resourceIdentifierAttribute)
+			continue
+		}
+
+		if resourceType == portainer.NetworkResourceControl {
+			systemResourceControl := findSystemNetworkResourceControl(resourceObject)
+			if systemResourceControl != nil {
+				resourceObject = decorateObject(resourceObject, systemResourceControl)
+				decoratedResourceData = append(decoratedResourceData, resourceObject)
+				continue
+			}
+		}
+
+		resourceIdentifier := resourceObject[resourceIdentifierAttribute].(string)
+		resourceLabelsObject := selector(resourceObject)
+
+		resourceControl, err := transport.findResourceControl(resourceIdentifier, resourceType, resourceLabelsObject, resourceControls)
+		if err != nil {
+			return nil, err
+		}
+
+		if resourceControl != nil {
+			resourceObject = decorateObject(resourceObject, resourceControl)
+		}
+
+		decoratedResourceData = append(decoratedResourceData, resourceObject)
+	}
+
+	return decoratedResourceData, nil
+}
+
+func (transport *Transport) filterResourceList(resourceData []interface{}, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType, selector resourceLabelsObjectSelector, context *restrictedDockerOperationContext) ([]interface{}, error) {
+	filteredResourceData := make([]interface{}, 0)
+
+	for _, resource := range resourceData {
+		resourceObject := resource.(map[string]interface{})
+		if resourceObject[resourceIdentifierAttribute] == nil {
+			log.Printf("[WARN] [http,proxy,docker,filter] [message: unable to find resource identifier property in resource list element] [identifier_attribute: %s]", resourceIdentifierAttribute)
+			continue
+		}
+
+		resourceIdentifier := resourceObject[resourceIdentifierAttribute].(string)
+		resourceLabelsObject := selector(resourceObject)
+
+		if resourceType == portainer.NetworkResourceControl {
+			systemResourceControl := findSystemNetworkResourceControl(resourceObject)
+			if systemResourceControl != nil {
+				resourceObject = decorateObject(resourceObject, systemResourceControl)
+				filteredResourceData = append(filteredResourceData, resourceObject)
+				continue
+			}
+		}
+
+		resourceControl, err := transport.findResourceControl(resourceIdentifier, resourceType, resourceLabelsObject, context.resourceControls)
+		if err != nil {
+			return nil, err
+		}
+
+		if resourceControl == nil {
+			if context.isAdmin || context.endpointResourceAccess {
+				filteredResourceData = append(filteredResourceData, resourceObject)
+			}
+			continue
+		}
+
+		if context.isAdmin || context.endpointResourceAccess || portainer.UserCanAccessResource(context.userID, context.userTeamIDs, resourceControl) {
+			resourceObject = decorateObject(resourceObject, resourceControl)
+			filteredResourceData = append(filteredResourceData, resourceObject)
+		}
+	}
+
+	return filteredResourceData, nil
+}
+
+func (transport *Transport) findResourceControl(resourceIdentifier string, resourceType portainer.ResourceControlType, resourceLabelsObject map[string]interface{}, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
+	resourceControl := portainer.GetResourceControlByResourceIDAndType(resourceIdentifier, resourceType, resourceControls)
+	if resourceControl != nil {
+		return resourceControl, nil
+	}
+
+	if resourceLabelsObject != nil {
+		if resourceLabelsObject[resourceLabelForDockerServiceID] != nil {
+			inheritedServiceIdentifier := resourceLabelsObject[resourceLabelForDockerServiceID].(string)
+			resourceControl = portainer.GetResourceControlByResourceIDAndType(inheritedServiceIdentifier, portainer.ServiceResourceControl, resourceControls)
+
+			if resourceControl != nil {
+				return resourceControl, nil
+			}
+		}
+
+		if resourceLabelsObject[resourceLabelForDockerSwarmStackName] != nil {
+			inheritedSwarmStackIdentifier := resourceLabelsObject[resourceLabelForDockerSwarmStackName].(string)
+			resourceControl = portainer.GetResourceControlByResourceIDAndType(inheritedSwarmStackIdentifier, portainer.StackResourceControl, resourceControls)
+
+			if resourceControl != nil {
+				return resourceControl, nil
+			}
+		}
+
+		if resourceLabelsObject[resourceLabelForDockerComposeStackName] != nil {
+			inheritedComposeStackIdentifier := resourceLabelsObject[resourceLabelForDockerComposeStackName].(string)
+			resourceControl = portainer.GetResourceControlByResourceIDAndType(inheritedComposeStackIdentifier, portainer.StackResourceControl, resourceControls)
+
+			if resourceControl != nil {
+				return resourceControl, nil
+			}
+		}
+
+		return transport.newResourceControlFromPortainerLabels(resourceLabelsObject, resourceIdentifier, resourceType)
 	}
 
 	return nil, nil
