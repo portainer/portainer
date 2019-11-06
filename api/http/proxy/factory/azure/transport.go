@@ -16,7 +16,7 @@ type (
 		expirationTime time.Time
 	}
 
-	transport struct {
+	Transport struct {
 		credentials *portainer.AzureCredentials
 		client      *client.HTTPClient
 		token       *azureAPIToken
@@ -24,17 +24,17 @@ type (
 	}
 )
 
-// NewTransport returns a pointer to a new instance of transport that implements the HTTP transport
+// NewTransport returns a pointer to a new instance of Transport that implements the HTTP Transport
 // interface for proxying requests to the Azure API.
-func NewTransport(credentials *portainer.AzureCredentials) *transport {
-	return &transport{
+func NewTransport(credentials *portainer.AzureCredentials) *Transport {
+	return &Transport{
 		credentials: credentials,
 		client:      client.NewHTTPClient(),
 	}
 }
 
-// RoundTrip is the implementation of the transport interface.
-func (transport *transport) RoundTrip(request *http.Request) (*http.Response, error) {
+// RoundTrip is the implementation of the Transport interface.
+func (transport *Transport) RoundTrip(request *http.Request) (*http.Response, error) {
 	err := transport.retrieveAuthenticationToken()
 	if err != nil {
 		return nil, err
@@ -44,7 +44,7 @@ func (transport *transport) RoundTrip(request *http.Request) (*http.Response, er
 	return http.DefaultTransport.RoundTrip(request)
 }
 
-func (transport *transport) authenticate() error {
+func (transport *Transport) authenticate() error {
 	token, err := transport.client.ExecuteAzureAuthenticationRequest(transport.credentials)
 	if err != nil {
 		return err
@@ -63,7 +63,7 @@ func (transport *transport) authenticate() error {
 	return nil
 }
 
-func (transport *transport) retrieveAuthenticationToken() error {
+func (transport *Transport) retrieveAuthenticationToken() error {
 	transport.mutex.Lock()
 	defer transport.mutex.Unlock()
 
