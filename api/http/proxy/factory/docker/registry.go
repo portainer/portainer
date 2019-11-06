@@ -20,14 +20,14 @@ type (
 	}
 )
 
-func CreateRegistryAuthenticationHeader(serverAddress string, accessContext *registryAccessContext) *registryAuthenticationHeader {
+func createRegistryAuthenticationHeader(serverAddress string, accessContext *registryAccessContext) *registryAuthenticationHeader {
 	var authenticationHeader *registryAuthenticationHeader
 
 	if serverAddress == "" {
 		authenticationHeader = &registryAuthenticationHeader{
 			Username:      accessContext.dockerHub.Username,
 			Password:      accessContext.dockerHub.Password,
-			Serveraddress: "io",
+			Serveraddress: "docker.io",
 		}
 	} else {
 		var matchingRegistry *portainer.Registry
