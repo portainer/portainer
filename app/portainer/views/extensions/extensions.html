@@ -42,18 +42,18 @@
 
           <div class="form-group">
             <div class="col-sm-12">
-              <p class="small text-muted" ng-if="!state.offlineMode">
+              <p class="small text-muted" ng-if="!state.offlineActivation">
                 Portainer will download the latest version of the extension. Ensure that you have a valid license.
               </p>
-              <p class="small text-muted" ng-if="state.offlineMode">
+              <p class="small text-muted" ng-if="state.offlineActivation">
                 You will need to upload the extension archive manually. Ensure that you have a valid license.
               </p>
               <p>
-                <a class="small interactive" ng-if="!state.offlineMode" ng-click="state.offlineMode = true;">
-                  <i class="fa fa-toggle-off space-right" aria-hidden="true"></i> Switch to offline mode
+                <a class="small interactive" ng-if="!state.offlineActivation" ng-click="state.offlineActivation = true;">
+                  <i class="fa fa-toggle-off space-right" aria-hidden="true"></i> Switch to offline activation
                 </a>
-                <a class="small interactive" ng-if="state.offlineMode" ng-click="state.offlineMode = false;">
-                  <i class="fa fa-wifi space-right" aria-hidden="true"></i> Switch to online mode
+                <a class="small interactive" ng-if="state.offlineActivation" ng-click="state.offlineActivation = false;">
+                  <i class="fa fa-wifi space-right" aria-hidden="true"></i> Switch to online activation
                 </a>
               </p>
             </div>
@@ -75,7 +75,7 @@
             </div>
           </div>
 
-          <div class="form-group" ng-if="state.offlineMode">
+          <div class="form-group" ng-if="state.offlineActivation">
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm" ngf-select ng-model="formValues.ExtensionFile" style="margin-left: 0px;">Select file</button>
               <span style="margin-left: 5px;">
