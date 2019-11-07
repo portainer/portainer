@@ -164,7 +164,7 @@ func (transport *Transport) proxyAgentRequest(r *http.Request) (*http.Response, 
 			return transport.administratorOperation(r)
 		}
 
-		return transport.restrictedVolumeBrowserOperation(r, volumeIDParameter[0])
+		return transport.restrictedResourceOperation(r, volumeIDParameter[0], portainer.VolumeResourceControl, true)
 	}
 
 	return transport.executeDockerRequest(r)
@@ -188,7 +188,7 @@ func (transport *Transport) proxyConfigRequest(request *http.Request) (*http.Res
 			return transport.executeGenericResourceDeletionOperation(request, configID, portainer.ConfigResourceControl)
 		}
 
-		return transport.restrictedOperation(request, configID, portainer.ConfigResourceControl)
+		return transport.restrictedResourceOperation(request, configID, portainer.ConfigResourceControl, false)
 	}
 }
 
@@ -213,7 +213,7 @@ func (transport *Transport) proxyContainerRequest(request *http.Request) (*http.
 			if action == "json" {
 				return transport.rewriteOperation(request, transport.containerInspectOperation)
 			}
-			return transport.restrictedOperation(request, containerID, portainer.ContainerResourceControl)
+			return transport.restrictedResourceOperation(request, containerID, portainer.ContainerResourceControl, false)
 		} else if match, _ := path.Match("/containers/*", requestPath); match {
 			// Handle /containers/{id} requests
 			containerID := path.Base(requestPath)
@@ -222,7 +222,7 @@ func (transport *Transport) proxyContainerRequest(request *http.Request) (*http.
 				return transport.executeGenericResourceDeletionOperation(request, containerID, portainer.ContainerResourceControl)
 			}
 
-			return transport.restrictedOperation(request, containerID, portainer.ContainerResourceControl)
+			return transport.restrictedResourceOperation(request, containerID, portainer.ContainerResourceControl, false)
 		}
 		return transport.executeDockerRequest(request)
 	}
@@ -241,7 +241,7 @@ func (transport *Transport) proxyServiceRequest(request *http.Request) (*http.Re
 		if match, _ := path.Match("/services/*/*", requestPath); match {
 			// Handle /services/{id}/{action} requests
 			serviceID := path.Base(path.Dir(requestPath))
-			return transport.restrictedOperation(request, serviceID, portainer.ServiceResourceControl)
+			return transport.restrictedResourceOperation(request, serviceID, portainer.ServiceResourceControl, false)
 		} else if match, _ := path.Match("/services/*", requestPath); match {
 			// Handle /services/{id} requests
 			serviceID := path.Base(requestPath)
@@ -252,7 +252,7 @@ func (transport *Transport) proxyServiceRequest(request *http.Request) (*http.Re
 			case http.MethodDelete:
 				return transport.executeGenericResourceDeletionOperation(request, serviceID, portainer.ServiceResourceControl)
 			}
-			return transport.restrictedOperation(request, serviceID, portainer.ServiceResourceControl)
+			return transport.restrictedResourceOperation(request, serviceID, portainer.ServiceResourceControl, false)
 		}
 		return transport.executeDockerRequest(request)
 	}
@@ -278,7 +278,7 @@ func (transport *Transport) proxyVolumeRequest(request *http.Request) (*http.Res
 		} else if request.Method == http.MethodDelete {
 			return transport.executeGenericResourceDeletionOperation(request, volumeID, portainer.VolumeResourceControl)
 		}
-		return transport.restrictedOperation(request, volumeID, portainer.VolumeResourceControl)
+		return transport.restrictedResourceOperation(request, volumeID, portainer.VolumeResourceControl, false)
 	}
 }
 
@@ -299,7 +299,7 @@ func (transport *Transport) proxyNetworkRequest(request *http.Request) (*http.Re
 		} else if request.Method == http.MethodDelete {
 			return transport.executeGenericResourceDeletionOperation(request, networkID, portainer.NetworkResourceControl)
 		}
-		return transport.restrictedOperation(request, networkID, portainer.NetworkResourceControl)
+		return transport.restrictedResourceOperation(request, networkID, portainer.NetworkResourceControl, false)
 	}
 }
 
@@ -320,7 +320,7 @@ func (transport *Transport) proxySecretRequest(request *http.Request) (*http.Res
 		} else if request.Method == http.MethodDelete {
 			return transport.executeGenericResourceDeletionOperation(request, secretID, portainer.SecretResourceControl)
 		}
-		return transport.restrictedOperation(request, secretID, portainer.SecretResourceControl)
+		return transport.restrictedResourceOperation(request, secretID, portainer.SecretResourceControl, false)
 	}
 }
 
@@ -407,9 +407,7 @@ func (transport *Transport) replaceRegistryAuthenticationHeader(request *http.Re
 	return transport.decorateGenericResourceCreationOperation(request, serviceObjectIdentifier, portainer.ServiceResourceControl)
 }
 
-// restrictedOperation ensures that the current user has the required authorizations
-// before executing the original request.
-func (transport *Transport) restrictedOperation(request *http.Request, resourceID string, resourceType portainer.ResourceControlType) (*http.Response, error) {
+func (transport *Transport) restrictedResourceOperation(request *http.Request, resourceID string, resourceType portainer.ResourceControlType, volumeBrowseRestrictionCheck bool) (*http.Response, error) {
 	var err error
 	tokenData, err := security.RetrieveTokenData(request)
 	if err != nil {
@@ -417,6 +415,37 @@ func (transport *Transport) restrictedOperation(request *http.Request, resourceI
 	}
 
 	if tokenData.Role != portainer.AdministratorRole {
+		rbacExtension, err := transport.extensionService.Extension(portainer.RBACExtension)
+		if err != nil && err != portainer.ErrObjectNotFound {
+			return nil, err
+		}
+
+		if volumeBrowseRestrictionCheck {
+			settings, err := transport.settingsService.Settings()
+			if err != nil {
+				return nil, err
+			}
+
+			if rbacExtension != nil && !settings.AllowVolumeBrowserForRegularUsers {
+				return responseutils.WriteAccessDeniedResponse()
+			}
+		}
+
+		user, err := transport.userService.User(tokenData.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		endpointResourceAccess := false
+		_, ok := user.EndpointAuthorizations[transport.endpoint.ID][portainer.EndpointResourcesAccess]
+		if ok {
+			endpointResourceAccess = true
+		}
+
+		if rbacExtension != nil && endpointResourceAccess {
+			return transport.executeDockerRequest(request)
+		}
+
 		teamMemberships, err := transport.teamMembershipService.TeamMembershipsByUserID(tokenData.ID)
 		if err != nil {
 			return nil, err
@@ -437,79 +466,6 @@ func (transport *Transport) restrictedOperation(request *http.Request, resourceI
 			// This resource was created outside of portainer,
 			// is part of a Docker service or part of a Docker Swarm/Compose stack.
 			inheritedResourceControl, err := transport.getInheritedResourceControlFromServiceOrStack(resourceID, resourceType, resourceControls)
-			if err != nil {
-				return nil, err
-			}
-
-			if inheritedResourceControl == nil || !portainer.UserCanAccessResource(tokenData.ID, userTeamIDs, inheritedResourceControl) {
-				return responseutils.WriteAccessDeniedResponse()
-			}
-		}
-
-		if resourceControl != nil && !portainer.UserCanAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
-			return responseutils.WriteAccessDeniedResponse()
-		}
-	}
-
-	return transport.executeDockerRequest(request)
-}
-
-// restrictedVolumeBrowserOperation is similar to restrictedOperation but adds an extra check on a specific setting
-func (transport *Transport) restrictedVolumeBrowserOperation(request *http.Request, resourceID string) (*http.Response, error) {
-	var err error
-	tokenData, err := security.RetrieveTokenData(request)
-	if err != nil {
-		return nil, err
-	}
-
-	if tokenData.Role != portainer.AdministratorRole {
-		settings, err := transport.settingsService.Settings()
-		if err != nil {
-			return nil, err
-		}
-
-		_, err = transport.extensionService.Extension(portainer.RBACExtension)
-		if err == portainer.ErrObjectNotFound && !settings.AllowVolumeBrowserForRegularUsers {
-			return responseutils.WriteAccessDeniedResponse()
-		} else if err != nil && err != portainer.ErrObjectNotFound {
-			return nil, err
-		}
-
-		user, err := transport.userService.User(tokenData.ID)
-		if err != nil {
-			return nil, err
-		}
-
-		endpointResourceAccess := false
-		_, ok := user.EndpointAuthorizations[transport.endpoint.ID][portainer.EndpointResourcesAccess]
-		if ok {
-			endpointResourceAccess = true
-		}
-
-		if endpointResourceAccess {
-			return transport.executeDockerRequest(request)
-		}
-
-		teamMemberships, err := transport.teamMembershipService.TeamMembershipsByUserID(tokenData.ID)
-		if err != nil {
-			return nil, err
-		}
-
-		userTeamIDs := make([]portainer.TeamID, 0)
-		for _, membership := range teamMemberships {
-			userTeamIDs = append(userTeamIDs, membership.TeamID)
-		}
-
-		resourceControls, err := transport.resourceControlService.ResourceControls()
-		if err != nil {
-			return nil, err
-		}
-
-		resourceControl := portainer.GetResourceControlByResourceIDAndType(resourceID, portainer.VolumeResourceControl, resourceControls)
-		if resourceControl == nil {
-			// This resource was created outside of portainer,
-			// is part of a Docker service or part of a Docker Swarm/Compose stack.
-			inheritedResourceControl, err := transport.getInheritedResourceControlFromServiceOrStack(resourceID, portainer.VolumeResourceControl, resourceControls)
 			if err != nil {
 				return nil, err
 			}
@@ -625,7 +581,7 @@ func (transport *Transport) decorateGenericResourceCreationOperation(request *ht
 }
 
 func (transport *Transport) executeGenericResourceDeletionOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
-	response, err := transport.restrictedOperation(request, resourceIdentifierAttribute, resourceType)
+	response, err := transport.restrictedResourceOperation(request, resourceIdentifierAttribute, resourceType, false)
 	if err != nil {
 		return response, err
 	}
