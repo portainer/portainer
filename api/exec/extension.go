@@ -20,7 +20,7 @@ import (
 var extensionDownloadBaseURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com/extensions/"
 
 var extensionBinaryMap = map[portainer.ExtensionID]string{
-	portainer.RegistryManagementExtension:  "extension-registry-management-dev",
+	portainer.RegistryManagementExtension:  "extension-registry-management",
 	portainer.OAuthAuthenticationExtension: "extension-oauth-authentication",
 	portainer.RBACExtension:                "extension-rbac",
 }
