@@ -169,5 +169,18 @@ angular.module('portainer.app')
     return $q.all(queue);
   };
 
+  service.uploadExtension = function(license, extensionFile) {
+    const payload = {
+      License: license,
+      ExtensionArchive: extensionFile,
+      ArchiveFileName: extensionFile.name
+    };
+    return Upload.http({
+      url: 'api/extensions/upload',
+      data: payload,
+      ignoreLoadingBar: true
+    });
+  };
+
   return service;
 }]);
