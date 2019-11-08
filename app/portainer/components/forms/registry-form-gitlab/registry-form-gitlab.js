@@ -6,6 +6,7 @@ angular.module('portainer.app').component('registryFormGitlab', {
     createRegistries: '<',
     actionInProgress: '<',
     projects: '=',
-    state: '='
+    state: '=',
+    resetDefaults: '<'
   }
 });

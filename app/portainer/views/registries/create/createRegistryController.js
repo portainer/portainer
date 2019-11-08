@@ -10,11 +10,13 @@ function ($scope, $state, RegistryService, Notifications, RegistryGitlabService,
   $scope.selectCustomRegistry = selectCustomRegistry;
   $scope.selectGitlabRegistry = selectGitlabRegistry;
   $scope.create = createRegistry;
+  $scope.useDefaultGitlabConfiguration = useDefaultGitlabConfiguration;
   $scope.retrieveGitlabRegistries = retrieveGitlabRegistries;
   $scope.createGitlabRegistries = createGitlabRegistries;
 
   $scope.state = {
     actionInProgress: false,
+    overrideConfiguration: false,
     gitlab: {}
   };
 
@@ -24,13 +26,16 @@ function ($scope, $state, RegistryService, Notifications, RegistryGitlabService,
     $scope.model.Authentication = true;
   }
 
+  function useDefaultGitlabConfiguration() {
+    $scope.model.URL = 'https://registry.gitlab.com';
+    $scope.model.Gitlab.InstanceURL = 'https://gitlab.com';
+  }
+
   function selectGitlabRegistry() {
     $scope.model.Name = '';
-    $scope.model.URL = 'https://registry.gitlab.com';
     $scope.model.Authentication = true;
-    $scope.model.Gitlab = {
-      InstanceURL: 'https://gitlab.com'
-    };
+    $scope.model.Gitlab = {};
+    useDefaultGitlabConfiguration();
   }
 
   function selectAzureRegistry() {

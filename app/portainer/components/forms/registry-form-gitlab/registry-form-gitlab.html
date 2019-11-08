@@ -2,42 +2,6 @@
   <div class="col-sm-12 form-section-title">
     Gitlab registry connexion details
   </div>
-  <!-- url-input -->
-  <div class="form-group">
-    <label for="instance_url" class="col-sm-3 col-lg-2 control-label text-left">
-      Instance URL
-      <portainer-tooltip position="bottom" message="URL of Gitlab instance."></portainer-tooltip>
-    </label>
-    <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="instance_url" name="instance_url" ng-model="$ctrl.model.Gitlab.InstanceURL" placeholder="https://gitlab.com" required>
-    </div>
-  </div>
-  <div class="form-group" ng-show="registryFormGitlab.instance_url.$invalid">
-    <div class="col-sm-12 small text-warning">
-      <div ng-messages="registryFormGitlab.instance_url.$error">
-        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
-      </div>
-    </div>
-  </div>
-  <!-- !url-input -->
-  <!-- url-input -->
-  <div class="form-group">
-    <label for="registry_url" class="col-sm-3 col-lg-2 control-label text-left">
-      Registry URL
-      <portainer-tooltip position="bottom" message="URL of Gitlab registry instance."></portainer-tooltip>
-    </label>
-    <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="registry_url" name="registry_url" ng-model="$ctrl.model.URL" placeholder="https://registry.gitlab.com" required>
-    </div>
-  </div>
-  <div class="form-group" ng-show="registryFormGitlab.registry_url.$invalid">
-    <div class="col-sm-12 small text-warning">
-      <div ng-messages="registryFormGitlab.registry_url.$error">
-        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
-      </div>
-    </div>
-  </div>
-  <!-- !url-input -->
   <!-- credentials-user -->
   <div class="form-group">
     <label for="registry_username" class="col-sm-3 col-lg-2 control-label text-left">Username</label>
@@ -75,6 +39,55 @@
     </div>
   </div>
   <!-- !credentials-pat -->
+
+  <div class="form-group">
+    <div class="col-sm-12">
+      <a class="small interactive" ng-if="!$ctrl.state.overrideConfiguration" ng-click="$ctrl.state.overrideConfiguration = true;">
+        <i class="fa fa-wrench space-right" aria-hidden="true"></i> Override default configuration
+      </a>
+      <a class="small interactive" ng-if="$ctrl.state.overrideConfiguration" ng-click="$ctrl.state.overrideConfiguration = false; $ctrl.resetDefaults()">
+        <i class="fa fa-cogs space-right" aria-hidden="true"></i> Use default configuration
+      </a>
+    </div>
+  </div>
+
+  <!-- url-input -->
+  <div class="form-group" ng-if="$ctrl.state.overrideConfiguration">
+    <label for="instance_url" class="col-sm-3 col-lg-2 control-label text-left">
+      Instance URL
+      <portainer-tooltip position="bottom" message="URL of Gitlab instance."></portainer-tooltip>
+    </label>
+    <div class="col-sm-9 col-lg-10">
+      <input type="text" class="form-control" id="instance_url" name="instance_url" ng-model="$ctrl.model.Gitlab.InstanceURL" placeholder="https://gitlab.com" required>
+    </div>
+  </div>
+  <div class="form-group" ng-show="registryFormGitlab.instance_url.$invalid">
+    <div class="col-sm-12 small text-warning">
+      <div ng-messages="registryFormGitlab.instance_url.$error">
+        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+      </div>
+    </div>
+  </div>
+  <!-- !url-input -->
+  <!-- url-input -->
+  <div class="form-group" ng-if="$ctrl.state.overrideConfiguration">
+    <label for="registry_url" class="col-sm-3 col-lg-2 control-label text-left">
+      Registry URL
+      <portainer-tooltip position="bottom" message="URL of Gitlab registry instance."></portainer-tooltip>
+    </label>
+    <div class="col-sm-9 col-lg-10">
+      <input type="text" class="form-control" id="registry_url" name="registry_url" ng-model="$ctrl.model.URL" placeholder="https://registry.gitlab.com" required>
+    </div>
+  </div>
+  <div class="form-group" ng-show="registryFormGitlab.registry_url.$invalid">
+    <div class="col-sm-12 small text-warning">
+      <div ng-messages="registryFormGitlab.registry_url.$error">
+        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+      </div>
+    </div>
+  </div>
+  <!-- !url-input -->
+
   <div class="form-group">
     <div class="col-sm-12">
       <button type="submit" class="btn btn-primary btn-sm" ng-disabled="$ctrl.actionInProgress || !registryFormGitlab.$valid" button-spinner="$ctrl.actionInProgress">
