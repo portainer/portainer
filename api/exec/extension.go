@@ -12,6 +12,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/coreos/go-semver/semver"
+
 	"github.com/orcaman/concurrent-map"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/client"
@@ -143,6 +145,61 @@ func (manager *ExtensionManager) DisableExtension(extension *portainer.Extension
 
 	extensionBinaryPath := buildExtensionPath(manager.fileService.GetBinaryFolder(), extension)
 	return manager.fileService.RemoveDirectory(extensionBinaryPath)
+}
+
+// StartExtensions will retrieve the extensions definitions from the Internet and check if a new version of each
+// extension is available. If so, it will automatically install the new version of the extension. If no update is
+// available it will simply start the extension.
+// The purpose of this function is to be ran at startup, as such most of the error handling won't block the program execution
+// and will log warning messages instead.
+func (manager *ExtensionManager) StartExtensions() error {
+	extensions, err := manager.extensionService.Extensions()
+	if err != nil {
+		return err
+	}
+
+	definitions, err := manager.FetchExtensionDefinitions()
+	if err != nil {
+		log.Printf("[WARN] [exec,extensions] [message: unable to retrieve extension information from Internet. Skipping extensions update check.] [err: %s]", err)
+		return nil
+	}
+
+	return manager.updateAndStartExtensions(extensions, definitions)
+}
+
+func (manager *ExtensionManager) updateAndStartExtensions(extensions []portainer.Extension, definitions []portainer.Extension) error {
+	for _, definition := range definitions {
+		for _, extension := range extensions {
+			if extension.ID == definition.ID {
+				definitionVersion := semver.New(definition.Version)
+				extensionVersion := semver.New(extension.Version)
+
+				var err error
+				if extensionVersion.LessThan(*definitionVersion) {
+					err = manager.UpdateExtension(&extension, definition.Version)
+					if err != nil {
+						log.Printf("[WARN] [exec,extensions] [message: unable to update extension automatically] [extension: %s] [current_version: %s] [available_version: %s] [err: %s]", extension.Name, extension.Version, definition.Version, err)
+					}
+				} else {
+					err = manager.EnableExtension(&extension, extension.License.LicenseKey)
+					if err != nil {
+						log.Printf("[WARN] [exec,extensions] [message: unable to start extension] [extension: %s] [err: %s]", extension.Name, err)
+						extension.Enabled = false
+						extension.License.Valid = false
+					}
+
+					err = manager.extensionService.Persist(&extension)
+					if err != nil {
+						return err
+					}
+				}
+
+				break
+			}
+		}
+	}
+
+	return nil
 }
 
 // UpdateExtension will download the new extension binary from the official Portainer assets

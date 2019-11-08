@@ -886,6 +886,7 @@ type (
 		EnableExtension(extension *Extension, licenseKey string) error
 		DisableExtension(extension *Extension) error
 		UpdateExtension(extension *Extension, version string) error
+		StartExtensions() error
 	}
 
 	// ReverseTunnelService represensts a service used to manage reverse tunnel connections.
