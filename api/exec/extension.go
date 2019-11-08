@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"os/exec"
 	"path"
+	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
@@ -18,6 +20,7 @@ import (
 )
 
 var extensionDownloadBaseURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com/extensions/"
+var extensionVersionRegexp = regexp.MustCompile(`\d+(\.\d+)+`)
 
 var extensionBinaryMap = map[portainer.ExtensionID]string{
 	portainer.RegistryManagementExtension:  "extension-registry-management",
@@ -47,20 +50,26 @@ func processKey(ID portainer.ExtensionID) string {
 }
 
 func buildExtensionURL(extension *portainer.Extension) string {
-	extensionURL := extensionDownloadBaseURL
-	extensionURL += extensionBinaryMap[extension.ID]
-	extensionURL += "-" + runtime.GOOS + "-" + runtime.GOARCH
-	extensionURL += "-" + extension.Version
-	extensionURL += ".zip"
-	return extensionURL
+	return fmt.Sprintf("%s%s-%s-%s-%s-.zip", extensionDownloadBaseURL, extensionBinaryMap[extension.ID], runtime.GOOS, runtime.GOARCH, extension.Version)
 }
 
+// extension-oauth-authentication-linux-amd64-1.0.0.zip
+// extension-rbac-darwin-amd64-1.0.0.zip
+// extension-rbac-windows-amd64-1.0.0.zip
+// extension-registry-management-darwin-amd64-1.0.0.zip
+
+// extension-${EXTENSION_NAME}-${GOOS}-${GOARCH}-${VERSION}.zip
+
+//fmt.Println("Hello, playground")
+//arr := []string{"extension-oauth-authentication-linux-amd64-1.0.0.zip", "extension-rbac-darwin-amd64-1.0.0.zip", "extension-rbac-windows-amd64-1.0.0.zip", "extension-registry-management-darwin-amd64-1.0.0.zip"}
+//
+//
+//for _, item := range arr {
+//fmt.Printf("Result for %s: %s\n", item, )
+//}
+
 func buildExtensionPath(binaryPath string, extension *portainer.Extension) string {
-
-	extensionFilename := extensionBinaryMap[extension.ID]
-	extensionFilename += "-" + runtime.GOOS + "-" + runtime.GOARCH
-	extensionFilename += "-" + extension.Version
-
+	extensionFilename := fmt.Sprintf("%s-%s-%s-%s", extensionBinaryMap[extension.ID], runtime.GOOS, runtime.GOARCH, extension.Version)
 	if runtime.GOOS == "windows" {
 		extensionFilename += ".exe"
 	}
@@ -87,6 +96,24 @@ func (manager *ExtensionManager) FetchExtensionDefinitions() ([]portainer.Extens
 	}
 
 	return extensions, nil
+}
+
+// InstallExtension will install the extension from an archive. It will extract the extension version number from
+// the archive file name first and return an error if the file name is not valid (cannot find extension version).
+// It will then extract the archive and execute the EnableExtension function to enable the extension.
+func (manager *ExtensionManager) InstallExtension(extension *portainer.Extension, licenseKey string, archiveFileName string, extensionArchive []byte) error {
+	extensionVersion := extensionVersionRegexp.FindString(archiveFileName)
+	if extensionVersion == "" {
+		return errors.New("invalid extension archive filename: unable to retrieve extension version")
+	}
+
+	err := manager.fileService.ExtractExtensionArchive(extensionArchive)
+	if err != nil {
+		return err
+	}
+
+	extension.Version = extensionVersion
+	return manager.EnableExtension(extension, licenseKey)
 }
 
 // EnableExtension will check for the existence of the extension binary on the filesystem
@@ -195,7 +222,7 @@ func validateLicense(binaryPath, licenseKey string) ([]string, error) {
 	err := licenseCheckProcess.Run()
 	if err != nil {
 		log.Printf("[DEBUG] [exec,extension] [message: unable to run extension process] [err: %s]", err)
-		return nil, errors.New("Invalid extension license key")
+		return nil, errors.New("invalid extension license key")
 	}
 
 	output := string(cmdOutput.Bytes())
@@ -207,6 +234,7 @@ func (manager *ExtensionManager) startExtensionProcess(extension *portainer.Exte
 	extensionProcess := exec.Command(binaryPath, "-license", extension.License.LicenseKey)
 	err := extensionProcess.Start()
 	if err != nil {
+		log.Printf("[DEBUG] [exec,extension] [message: unable to start extension process] [err: %s]", err)
 		return err
 	}
 

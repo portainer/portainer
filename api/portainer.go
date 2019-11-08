@@ -883,6 +883,7 @@ type (
 	// ExtensionManager represents a service used to manage extensions
 	ExtensionManager interface {
 		FetchExtensionDefinitions() ([]Extension, error)
+		InstallExtension(extension *Extension, licenseKey string, archiveFileName string, extensionArchive []byte) error
 		EnableExtension(extension *Extension, licenseKey string) error
 		DisableExtension(extension *Extension) error
 		UpdateExtension(extension *Extension, version string) error

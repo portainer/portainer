@@ -30,6 +30,8 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.RestrictedAccess(httperror.LoggerHandler(h.extensionList))).Methods(http.MethodGet)
 	h.Handle("/extensions",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.extensionCreate))).Methods(http.MethodPost)
+	h.Handle("/extensions/upload",
+		bouncer.AdminAccess(httperror.LoggerHandler(h.extensionUpload))).Methods(http.MethodPost)
 	h.Handle("/extensions/{id}",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.extensionInspect))).Methods(http.MethodGet)
 	h.Handle("/extensions/{id}",
