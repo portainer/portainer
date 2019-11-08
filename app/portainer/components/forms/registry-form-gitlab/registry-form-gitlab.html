@@ -64,6 +64,7 @@
   <div class="form-group">
     <span class="col-sm-12 text-muted small">
       To know how to generate a Personal Access Token, follow the <a href="https://gitlab.com/help/user/profile/personal_access_tokens.md" target="_blank">gitlab guide</a>.
+      <br/>Portainer needs a token with <code>api</code> scope to provide all its features. Providing a token without <code>api</code> scope and with more restrictive ones will lead to non working features.
     </span>
   </div>
   <div class="form-group" ng-show="registryFormGitlab.registry_perso_acc_token.$invalid">
