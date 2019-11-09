@@ -1076,6 +1076,8 @@ const (
 	AzureRegistry
 	// CustomRegistry represents a custom registry
 	CustomRegistry
+	// DockerHubRegistry represents a DockerHub registry
+	DockerHubRegistry
 )
 
 const (

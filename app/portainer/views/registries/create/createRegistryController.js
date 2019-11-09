@@ -5,6 +5,7 @@ angular.module('portainer.app')
 function ($scope, $state, RegistryService, Notifications) {
 
   $scope.selectQuayRegistry = selectQuayRegistry;
+  $scope.selectDockerHubRegistry = selectDockerHubRegistry;
   $scope.selectAzureRegistry = selectAzureRegistry;
   $scope.selectCustomRegistry = selectCustomRegistry;
   $scope.create = createRegistry;
@@ -16,6 +17,12 @@ function ($scope, $state, RegistryService, Notifications) {
   function selectQuayRegistry() {
     $scope.model.Name = 'Quay';
     $scope.model.URL = 'quay.io';
+    $scope.model.Authentication = true;
+  }
+
+  function selectDockerHubRegistry() {
+    $scope.model.Name = 'Docker Hub';
+    $scope.model.URL = 'registry-1.docker.io';
     $scope.model.Authentication = true;
   }
 
