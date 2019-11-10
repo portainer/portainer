@@ -1,6 +1,7 @@
 package extensions
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/coreos/go-semver/semver"
@@ -22,7 +23,8 @@ func (handler *Handler) extensionList(w http.ResponseWriter, r *http.Request) *h
 	if storeDetails {
 		definitions, err := handler.ExtensionManager.FetchExtensionDefinitions()
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve extensions", err}
+			log.Printf("[WARN] [http,extensions] [message: unable to retrieve extension manifest via Internet. Extensions information might not be up to date] [err: %s]", err)
+			return response.JSON(w, extensions)
 		}
 
 		for idx := range definitions {

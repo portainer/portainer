@@ -24,7 +24,7 @@ function ($q, $scope, $transition$, $state, ExtensionService, Notifications, Mod
     ExtensionService.delete(extension.Id)
     .then(function onSuccess() {
       Notifications.success('Extension successfully deleted');
-      $state.reload();
+      $state.go('portainer.extensions');
     })
     .catch(function onError(err) {
       Notifications.error('Failure', err, 'Unable to delete extension');

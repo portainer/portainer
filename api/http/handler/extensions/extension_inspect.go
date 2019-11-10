@@ -2,6 +2,7 @@ package extensions
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/coreos/go-semver/semver"
@@ -20,15 +21,22 @@ func (handler *Handler) extensionInspect(w http.ResponseWriter, r *http.Request)
 	}
 	extensionID := portainer.ExtensionID(extensionIdentifier)
 
-	extensionData, err := client.Get(portainer.ExtensionDefinitionsURL, 30)
+	storedExtension, err := handler.ExtensionService.Extension(extensionID)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve extension definitions", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a extension with the specified identifier inside the database", err}
+	}
+
+	extensionData, err := client.Get(portainer.ExtensionDefinitionsURL, 10)
+	if err != nil {
+		log.Printf("[WARN] [http,extensions] [message: unable to retrieve extension manifest via Internet] [err: %s]", err)
+		return response.JSON(w, storedExtension)
 	}
 
 	var extensions []portainer.Extension
 	err = json.Unmarshal(extensionData, &extensions)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to parse external extension definitions", err}
+		log.Printf("[WARN] [http,extensions] [message: unable to retrieve extension information via Internet] [err: %s]", err)
+		return response.JSON(w, storedExtension)
 	}
 
 	var extension portainer.Extension
@@ -41,13 +49,6 @@ func (handler *Handler) extensionInspect(w http.ResponseWriter, r *http.Request)
 			}
 			break
 		}
-	}
-
-	storedExtension, err := handler.ExtensionService.Extension(extensionID)
-	if err == portainer.ErrObjectNotFound {
-		return response.JSON(w, extension)
-	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a extension with the specified identifier inside the database", err}
 	}
 
 	extension.Enabled = storedExtension.Enabled

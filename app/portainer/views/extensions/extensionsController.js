@@ -10,7 +10,8 @@ angular.module('portainer.app')
       };
 
       $scope.formValues = {
-        License: ''
+        License: '',
+        ExtensionFile: null,
       };
 
       function initView() {

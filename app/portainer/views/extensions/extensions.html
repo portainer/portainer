@@ -87,7 +87,7 @@
 
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-click="enableExtension()" ng-disabled="state.actionInProgress || !extensionEnableForm.$valid" button-spinner="state.actionInProgress" style="margin-left: 0px;">
+              <button type="button" class="btn btn-primary btn-sm" ng-click="enableExtension()" ng-disabled="state.actionInProgress || !extensionEnableForm.$valid || (state.offlineActivation && !formValues.ExtensionFile)" button-spinner="state.actionInProgress" style="margin-left: 0px;">
                 <span ng-hide="state.actionInProgress">Enable extension</span>
                 <span ng-show="state.actionInProgress">Enabling extension...</span>
               </button>

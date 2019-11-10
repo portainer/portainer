@@ -19,7 +19,7 @@ import (
 	"github.com/portainer/portainer/api/http/client"
 )
 
-var extensionDownloadBaseURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com/extensions/"
+var extensionDownloadBaseURL = portainer.AssetsServerURL + "/extensions/"
 var extensionVersionRegexp = regexp.MustCompile(`\d+(\.\d+)+`)
 
 var extensionBinaryMap = map[portainer.ExtensionID]string{
@@ -50,23 +50,8 @@ func processKey(ID portainer.ExtensionID) string {
 }
 
 func buildExtensionURL(extension *portainer.Extension) string {
-	return fmt.Sprintf("%s%s-%s-%s-%s-.zip", extensionDownloadBaseURL, extensionBinaryMap[extension.ID], runtime.GOOS, runtime.GOARCH, extension.Version)
+	return fmt.Sprintf("%s%s-%s-%s-%s.zip", extensionDownloadBaseURL, extensionBinaryMap[extension.ID], runtime.GOOS, runtime.GOARCH, extension.Version)
 }
-
-// extension-oauth-authentication-linux-amd64-1.0.0.zip
-// extension-rbac-darwin-amd64-1.0.0.zip
-// extension-rbac-windows-amd64-1.0.0.zip
-// extension-registry-management-darwin-amd64-1.0.0.zip
-
-// extension-${EXTENSION_NAME}-${GOOS}-${GOARCH}-${VERSION}.zip
-
-//fmt.Println("Hello, playground")
-//arr := []string{"extension-oauth-authentication-linux-amd64-1.0.0.zip", "extension-rbac-darwin-amd64-1.0.0.zip", "extension-rbac-windows-amd64-1.0.0.zip", "extension-registry-management-darwin-amd64-1.0.0.zip"}
-//
-//
-//for _, item := range arr {
-//fmt.Printf("Result for %s: %s\n", item, )
-//}
 
 func buildExtensionPath(binaryPath string, extension *portainer.Extension) string {
 	extensionFilename := fmt.Sprintf("%s-%s-%s-%s", extensionBinaryMap[extension.ID], runtime.GOOS, runtime.GOARCH, extension.Version)
@@ -84,7 +69,7 @@ func buildExtensionPath(binaryPath string, extension *portainer.Extension) strin
 // FetchExtensionDefinitions will fetch the list of available
 // extension definitions from the official Portainer assets server
 func (manager *ExtensionManager) FetchExtensionDefinitions() ([]portainer.Extension, error) {
-	extensionData, err := client.Get(portainer.ExtensionDefinitionsURL, 30)
+	extensionData, err := client.Get(portainer.ExtensionDefinitionsURL, 10)
 	if err != nil {
 		return nil, err
 	}
@@ -101,6 +86,8 @@ func (manager *ExtensionManager) FetchExtensionDefinitions() ([]portainer.Extens
 // InstallExtension will install the extension from an archive. It will extract the extension version number from
 // the archive file name first and return an error if the file name is not valid (cannot find extension version).
 // It will then extract the archive and execute the EnableExtension function to enable the extension.
+// Since we're missing information about this extension (stored on Portainer.io server) we need to assume
+// default information based on the extension ID.
 func (manager *ExtensionManager) InstallExtension(extension *portainer.Extension, licenseKey string, archiveFileName string, extensionArchive []byte) error {
 	extensionVersion := extensionVersionRegexp.FindString(archiveFileName)
 	if extensionVersion == "" {
@@ -112,7 +99,18 @@ func (manager *ExtensionManager) InstallExtension(extension *portainer.Extension
 		return err
 	}
 
+	switch extension.ID {
+	case portainer.RegistryManagementExtension:
+		extension.Name = "Registry Manager"
+	case portainer.OAuthAuthenticationExtension:
+		extension.Name = "External Authentication"
+	case portainer.RBACExtension:
+		extension.Name = "Role-Based Access Control"
+	}
+	extension.ShortDescription = "Extension enabled offline"
 	extension.Version = extensionVersion
+	extension.Available = true
+
 	return manager.EnableExtension(extension, licenseKey)
 }
 
