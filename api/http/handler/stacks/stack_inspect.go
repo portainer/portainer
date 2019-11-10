@@ -46,12 +46,11 @@ func (handler *Handler) stackInspect(w http.ResponseWriter, r *http.Request) *ht
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a resource control associated to the stack", err}
 	}
 
-	userTeamIDs := make([]portainer.TeamID, 0)
-	for _, membership := range securityContext.UserMemberships {
-		userTeamIDs = append(userTeamIDs, membership.TeamID)
+	access, err := handler.userCanAccessStack(securityContext, endpoint.ID, resourceControl)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify user authorizations to validate stack access", err}
 	}
-
-	if !securityContext.IsAdmin && (resourceControl == nil || !portainer.UserCanAccessResource(securityContext.UserID, userTeamIDs, resourceControl)) {
+	if !access {
 		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
 	}
 

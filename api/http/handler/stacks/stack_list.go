@@ -42,12 +42,25 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 	stacks = portainer.DecorateStacks(stacks, resourceControls)
 
 	if !securityContext.IsAdmin {
+		rbacExtensionEnabled := true
+		_, err := handler.ExtensionService.Extension(portainer.RBACExtension)
+		if err == portainer.ErrObjectNotFound {
+			rbacExtensionEnabled = false
+		} else if err != nil && err != portainer.ErrObjectNotFound {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check if RBAC extension is enabled", err}
+		}
+
+		user, err := handler.UserService.User(securityContext.UserID)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user information from the database", err}
+		}
+
 		userTeamIDs := make([]portainer.TeamID, 0)
 		for _, membership := range securityContext.UserMemberships {
 			userTeamIDs = append(userTeamIDs, membership.TeamID)
 		}
 
-		stacks = portainer.FilterAuthorizedStacks(stacks, securityContext.UserID, userTeamIDs)
+		stacks = portainer.FilterAuthorizedStacks(stacks, user, userTeamIDs, rbacExtensionEnabled)
 	}
 
 	return response.JSON(w, stacks)

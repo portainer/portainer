@@ -99,12 +99,17 @@ func DecorateStacks(stacks []Stack, resourceControls []ResourceControl) []Stack 
 }
 
 // FilterAuthorizedStacks returns a list of decorated stacks filtered through resource control access checks.
-func FilterAuthorizedStacks(stacks []Stack, userID UserID, userTeamIDs []TeamID) []Stack {
+func FilterAuthorizedStacks(stacks []Stack, user *User, userTeamIDs []TeamID, rbacEnabled bool) []Stack {
 	authorizedStacks := make([]Stack, 0)
 
 	for _, stack := range stacks {
+		_, ok := user.EndpointAuthorizations[stack.EndpointID][EndpointResourcesAccess]
+		if rbacEnabled && ok {
+			authorizedStacks = append(authorizedStacks, stack)
+			continue
+		}
 
-		if stack.ResourceControl != nil && UserCanAccessResource(userID, userTeamIDs, stack.ResourceControl) {
+		if stack.ResourceControl != nil && UserCanAccessResource(user.ID, userTeamIDs, stack.ResourceControl) {
 			authorizedStacks = append(authorizedStacks, stack)
 		}
 	}

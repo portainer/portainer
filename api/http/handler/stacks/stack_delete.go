@@ -73,12 +73,11 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
 
-	userTeamIDs := make([]portainer.TeamID, 0)
-	for _, membership := range securityContext.UserMemberships {
-		userTeamIDs = append(userTeamIDs, membership.TeamID)
+	access, err := handler.userCanAccessStack(securityContext, endpoint.ID, resourceControl)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify user authorizations to validate stack access", err}
 	}
-
-	if !securityContext.IsAdmin && (resourceControl == nil || !portainer.UserCanAccessResource(securityContext.UserID, userTeamIDs, resourceControl)) {
+	if !access {
 		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
 	}
 

@@ -216,6 +216,8 @@ func (server *Server) Start() error {
 	stackHandler.RegistryService = server.RegistryService
 	stackHandler.DockerHubService = server.DockerHubService
 	stackHandler.SettingsService = server.SettingsService
+	stackHandler.UserService = server.UserService
+	stackHandler.ExtensionService = server.ExtensionService
 
 	var tagHandler = tags.NewHandler(requestBouncer)
 	tagHandler.TagService = server.TagService
