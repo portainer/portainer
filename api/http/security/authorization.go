@@ -4,40 +4,6 @@ import (
 	"github.com/portainer/portainer/api"
 )
 
-// AuthorizedResourceControlDeletion ensure that the user can delete a resource control object.
-// A non-administrator user cannot delete a resource control where:
-// * the Public flag is false
-// * he is not one of the users in the user accesses
-// * he is not a member of any team within the team accesses
-func AuthorizedResourceControlDeletion(resourceControl *portainer.ResourceControl, context *RestrictedRequestContext) bool {
-	if context.IsAdmin || resourceControl.Public {
-		return true
-	}
-
-	userAccessesCount := len(resourceControl.UserAccesses)
-	teamAccessesCount := len(resourceControl.TeamAccesses)
-
-	if teamAccessesCount > 0 {
-		for _, access := range resourceControl.TeamAccesses {
-			for _, membership := range context.UserMemberships {
-				if membership.TeamID == access.TeamID {
-					return true
-				}
-			}
-		}
-	}
-
-	if userAccessesCount > 0 {
-		for _, access := range resourceControl.UserAccesses {
-			if access.UserID == context.UserID {
-				return true
-			}
-		}
-	}
-
-	return false
-}
-
 // AuthorizedResourceControlAccess checks whether the user can alter an existing resource control.
 func AuthorizedResourceControlAccess(resourceControl *portainer.ResourceControl, context *RestrictedRequestContext) bool {
 	if context.IsAdmin || resourceControl.Public {
@@ -122,15 +88,6 @@ func AuthorizedTeamManagement(teamID portainer.TeamID, context *RestrictedReques
 		}
 	}
 
-	return false
-}
-
-// AuthorizedUserManagement ensure that access to the management of the specified user is granted.
-// It will check if the user is either administrator or the owner of the user account.
-func AuthorizedUserManagement(userID portainer.UserID, context *RestrictedRequestContext) bool {
-	if context.IsAdmin || context.UserID == userID {
-		return true
-	}
 	return false
 }
 
