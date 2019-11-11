@@ -2,8 +2,8 @@ import _ from 'lodash-es';
 import moment from 'moment';
 
 angular.module('portainer.app')
-.factory('StateManager', ['$q', 'SystemService', 'InfoHelper', 'LocalStorage', 'SettingsService', 'StatusService', 'APPLICATION_CACHE_VALIDITY', 'AgentPingService',
-function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, SettingsService, StatusService, APPLICATION_CACHE_VALIDITY, AgentPingService) {
+.factory('StateManager', ['$q', 'SystemService', 'InfoHelper', 'Authentication', 'EndpointProvider', 'LocalStorage', 'SettingsService', 'StatusService', 'APPLICATION_CACHE_VALIDITY', 'AgentPingService',
+function StateManagerFactory($q, SystemService, InfoHelper, Authentication, EndpointProvider, LocalStorage, SettingsService, StatusService, APPLICATION_CACHE_VALIDITY, AgentPingService) {
   'use strict';
 
   var manager = {};
@@ -18,6 +18,13 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
     },
     extensions: []
   };
+
+  manager.logout =  function() {
+    manager.clean();
+    EndpointProvider.clean();
+    LocalStorage.clean();
+    LocalStorage.storeLoginStateUUID('');
+  }
 
   manager.setVersionInfo = function(versionInfo) {
     state.application.versionStatus = versionInfo;
@@ -124,25 +131,21 @@ function StateManagerFactory($q, SystemService, InfoHelper, LocalStorage, Settin
       var cacheValidity = now - applicationState.validity;
       if (cacheValidity > APPLICATION_CACHE_VALIDITY) {
         loadApplicationState()
-        .then(function success() {
-          deferred.resolve(state);
-        })
-        .catch(function error(err) {
-          deferred.reject(err);
-        });
+        .then(() => $q.when(state.application.authentication && Authentication.init()))
+        .then(() => deferred.resolve(state))
+        .catch((err) => deferred.reject(err));
       } else {
         state.application = applicationState;
         state.loading = false;
-        deferred.resolve(state);
+        $q.when(state.application.authentication && Authentication.init())
+        .then(() => deferred.resolve(state))
+        .catch((err) => deferred.reject(err));
       }
     } else {
       loadApplicationState()
-      .then(function success() {
-        deferred.resolve(state);
-      })
-      .catch(function error(err) {
-        deferred.reject(err);
-      });
+      .then(() => $q.when(state.application.authentication && Authentication.init()))
+      .then(() => deferred.resolve(state))
+      .catch((err) => deferred.reject(err));
     }
 
     return deferred.promise;

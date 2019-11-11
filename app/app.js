@@ -3,8 +3,8 @@ import $ from 'jquery';
 import '@babel/polyfill'
 
 angular.module('portainer')
-.run(['$rootScope', '$state', '$interval', 'LocalStorage', 'Authentication', 'authManager', 'StateManager', 'EndpointProvider', 'Notifications', 'Analytics', 'SystemService', 'cfpLoadingBar', '$transitions', 'HttpRequestHelper',
-function ($rootScope, $state, $interval, LocalStorage, Authentication, authManager, StateManager, EndpointProvider, Notifications, Analytics, SystemService, cfpLoadingBar, $transitions, HttpRequestHelper) {
+.run(['$rootScope', '$state', '$interval', 'LocalStorage', 'authManager', 'StateManager', 'EndpointProvider', 'Notifications', 'Analytics', 'SystemService', 'cfpLoadingBar', '$transitions', 'HttpRequestHelper',
+function ($rootScope, $state, $interval, LocalStorage, authManager, StateManager, EndpointProvider, Notifications, Analytics, SystemService, cfpLoadingBar, $transitions, HttpRequestHelper) {
   'use strict';
 
   EndpointProvider.initialize();
@@ -12,7 +12,7 @@ function ($rootScope, $state, $interval, LocalStorage, Authentication, authManag
   StateManager.initialize()
   .then(function success(state) {
     if (state.application.authentication) {
-      initAuthentication(authManager, Authentication, $rootScope, $state);
+      initAuthentication(authManager, $rootScope, $state);
     }
     if (state.application.analytics) {
       initAnalytics(Analytics, $rootScope);
@@ -59,10 +59,8 @@ function ping(EndpointProvider, SystemService) {
   }
 }
 
-function initAuthentication(authManager, Authentication, $rootScope, $state) {
+function initAuthentication(authManager, $rootScope, $state) {
   authManager.checkAuthOnRefresh();
-  Authentication.init();
-
   // The unauthenticated event is broadcasted by the jwtInterceptor when
   // hitting a 401. We're using this instead of the usual combination of
   // authManager.redirectWhenUnauthenticated() + unauthenticatedRedirector
