@@ -73,10 +73,12 @@ angular.module('portainer.app')
 
   /**
    * Duplicate an existing ResourceControl (default to AdministratorsOnly if undefined)
-   * @param {ResourceControlViewModel} resourceControl ResourceControl to duplicate
+   * @param {int} userId ID of User performing the action
+   * @param {ResourceControlViewModel} oldResourceControl ResourceControl to duplicate
+   * @param {ResourceControlViewModel} newResourceControl ResourceControl to apply duplication to
    */
-  function duplicateResourceControl(oldResourceControl, newResourceControl) {
-    const ownershipParameters = ResourceControlHelper.RCViewModelToOwnershipParameters(oldResourceControl);
+  function duplicateResourceControl(userId, oldResourceControl, newResourceControl) {
+    const ownershipParameters = ResourceControlHelper.RCViewModelToOwnershipParameters(userId, oldResourceControl);
     return updateResourceControl(newResourceControl.Id, ownershipParameters);
   }
 

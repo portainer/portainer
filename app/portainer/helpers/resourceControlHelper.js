@@ -7,9 +7,10 @@ class ResourceControlHelper {
 
   /**
    * Transform ResourceControlViewModel to ResourceControlOwnershipParameters
+   * @param {int} userId ID of User performing the action
    * @param {ResourceControlViewModel} resourceControl ResourceControl view model
    */
-  RCViewModelToOwnershipParameters(resourceControl) {
+  RCViewModelToOwnershipParameters(userId, resourceControl) {
     if (!resourceControl) {
       return new ResourceControlOwnershipParameters(true);
     }
@@ -22,7 +23,7 @@ class ResourceControlHelper {
         publicOnly = true;
         break;
       case RCO.PRIVATE:
-        users = _.map(resourceControl.UserAccesses, (user) => user.UserId);
+        users = [userId];
         break;
       case RCO.RESTRICTED:
         users = _.map(resourceControl.UserAccesses, (user) => user.UserId);
