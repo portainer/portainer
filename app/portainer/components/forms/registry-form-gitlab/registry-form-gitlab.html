@@ -1,6 +1,19 @@
 <form class="form-horizontal" name="registryFormGitlab" ng-submit="$ctrl.retrieveRegistries()">
   <div class="col-sm-12 form-section-title">
-    Gitlab registry connexion details
+    Important notice
+  </div>
+  <div class="form-group">
+    <span class="col-sm-12 text-muted small">
+      <p>
+        For information on how to generate a Gitlab Personal Access Token, follow the <a href="https://gitlab.com/help/user/profile/personal_access_tokens.md" target="_blank">gitlab guide</a>.
+      </p>
+      <p>
+        <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i> If you fail to provide a token with <code>api</code> scope or you set a more restrictive scope you will be able to push/pull from your registry, however <a ui-sref="portainer.extensions.extension({id: 1})">registry management (extension)</a> will not work.
+      </p>
+    </span>
+  </div>
+  <div class="col-sm-12 form-section-title">
+    Gitlab registry connection details
   </div>
   <!-- credentials-user -->
   <div class="form-group">
@@ -24,12 +37,6 @@
     <div class="col-sm-9 col-lg-10">
       <input type="password" class="form-control" id="registry_perso_acc_token" name="registry_perso_acc_token" ng-model="$ctrl.model.Token" required>
     </div>
-  </div>
-  <div class="form-group">
-    <span class="col-sm-12 text-muted small">
-      To know how to generate a Personal Access Token, follow the <a href="https://gitlab.com/help/user/profile/personal_access_tokens.md" target="_blank">gitlab guide</a>.
-      <br/>Portainer needs a token with <code>api</code> scope to provide all its features. Providing a token without <code>api</code> scope and with more restrictive ones will lead to non working features.
-    </span>
   </div>
   <div class="form-group" ng-show="registryFormGitlab.registry_perso_acc_token.$invalid">
     <div class="col-sm-12 small text-warning">
@@ -103,11 +110,11 @@
   </div>
   <div class="form-group">
     <span class="col-sm-12 text-muted small">
-      Select the projects registries you want to manage. Portainer will create one registry for each selected project.
+      Select the project's registries you want to manage. Portainer will create one registry for each selected project.
     </span>
     <span class="col-sm-12 text-muted small">
       <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-      If you can't select a project make sure that registry feature is activated on it.
+      If you can't select a project, make sure that registry feature is activated on it.
     </span>
   </div>
   <div class="form-group">
