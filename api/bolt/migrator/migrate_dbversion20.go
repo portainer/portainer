@@ -42,7 +42,7 @@ func (m *Migrator) updateUsersAndRolesToDBVersion22() error {
 
 	err = m.roleService.UpdateRole(endpointAdministratorRole.ID, endpointAdministratorRole)
 
-	helpDeskRole, err := m.roleService.Role(portainer.RoleID(1))
+	helpDeskRole, err := m.roleService.Role(portainer.RoleID(2))
 	if err != nil {
 		return err
 	}
@@ -50,7 +50,7 @@ func (m *Migrator) updateUsersAndRolesToDBVersion22() error {
 
 	err = m.roleService.UpdateRole(helpDeskRole.ID, helpDeskRole)
 
-	standardUserRole, err := m.roleService.Role(portainer.RoleID(1))
+	standardUserRole, err := m.roleService.Role(portainer.RoleID(3))
 	if err != nil {
 		return err
 	}
@@ -58,7 +58,7 @@ func (m *Migrator) updateUsersAndRolesToDBVersion22() error {
 
 	err = m.roleService.UpdateRole(standardUserRole.ID, standardUserRole)
 
-	readOnlyUserRole, err := m.roleService.Role(portainer.RoleID(1))
+	readOnlyUserRole, err := m.roleService.Role(portainer.RoleID(4))
 	if err != nil {
 		return err
 	}
