@@ -10,8 +10,8 @@ import (
 	"github.com/portainer/portainer/api"
 )
 
-// request on /api/registries/:id/v2
-func (handler *Handler) proxyRequestsToRegistryAPI(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+// request on /api/registries/{id}/proxies/gitlab
+func (handler *Handler) proxyRequestsToGitlabAPIWithRegistry(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	registryID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid registry identifier route variable", err}
@@ -45,39 +45,22 @@ func (handler *Handler) proxyRequestsToRegistryAPI(w http.ResponseWriter, r *htt
 		}
 	}
 
-	managementConfiguration := registry.ManagementConfiguration
-	if managementConfiguration == nil {
-		managementConfiguration = createDefaultManagementConfiguration(registry)
+	config := &portainer.RegistryManagementConfiguration{
+		Type:     portainer.GitlabRegistry,
+		Password: registry.Password,
 	}
 
-	encodedConfiguration, err := json.Marshal(managementConfiguration)
+	encodedConfiguration, err := json.Marshal(config)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to encode management configuration", err}
 	}
 
 	id := strconv.Itoa(int(registryID))
-	r.Header.Set("X-RegistryManagement-Key", id)
-	r.Header.Set("X-RegistryManagement-URI", registry.URL)
+	r.Header.Set("X-RegistryManagement-Key", id+"-gitlab")
+	r.Header.Set("X-RegistryManagement-URI", registry.Gitlab.InstanceURL)
 	r.Header.Set("X-RegistryManagement-Config", string(encodedConfiguration))
 	r.Header.Set("X-PortainerExtension-License", extension.License.LicenseKey)
 
-	http.StripPrefix("/registries/"+id, proxy).ServeHTTP(w, r)
+	http.StripPrefix("/registries/"+id+"/proxies/gitlab", proxy).ServeHTTP(w, r)
 	return nil
-}
-
-func createDefaultManagementConfiguration(registry *portainer.Registry) *portainer.RegistryManagementConfiguration {
-	config := &portainer.RegistryManagementConfiguration{
-		Type: registry.Type,
-		TLSConfig: portainer.TLSConfiguration{
-			TLS: false,
-		},
-	}
-
-	if registry.Authentication {
-		config.Authentication = true
-		config.Username = registry.Username
-		config.Password = registry.Password
-	}
-
-	return config
 }

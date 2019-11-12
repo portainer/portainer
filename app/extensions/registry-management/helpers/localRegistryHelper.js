@@ -1,3 +1,4 @@
+import _ from 'lodash-es';
 import { RepositoryTagViewModel } from '../models/repositoryTag';
 
 angular.module('portainer.extensions.registrymanagement')
@@ -7,7 +8,7 @@ angular.module('portainer.extensions.registrymanagement')
     var helper = {};
 
     function historyRawToParsed(rawHistory) {
-      return angular.fromJson(rawHistory[0].v1Compatibility);
+      return _.map(rawHistory, (item) => angular.fromJson(item.v1Compatibility));
     }
 
     helper.manifestsToTag = function (manifests) {
@@ -16,7 +17,7 @@ angular.module('portainer.extensions.registrymanagement')
 
       var history = historyRawToParsed(v1.history);
       var name = v1.tag;
-      var os = history.os;
+      var os = history[0].os;
       var arch = v1.architecture;
       var size = v2.layers.reduce(function (a, b) {
         return {
@@ -26,7 +27,7 @@ angular.module('portainer.extensions.registrymanagement')
       var imageId = v2.config.digest;
       var imageDigest = v2.digest;
 
-      return new RepositoryTagViewModel(name, os, arch, size, imageDigest, imageId, v2);
+      return new RepositoryTagViewModel(name, os, arch, size, imageDigest, imageId, v2, history);
     };
 
     return helper;

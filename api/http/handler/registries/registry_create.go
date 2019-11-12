@@ -12,11 +12,12 @@ import (
 
 type registryCreatePayload struct {
 	Name           string
-	Type           int
+	Type           portainer.RegistryType
 	URL            string
 	Authentication bool
 	Username       string
 	Password       string
+	Gitlab         portainer.GitlabRegistryData
 }
 
 func (payload *registryCreatePayload) Validate(r *http.Request) error {
@@ -29,8 +30,8 @@ func (payload *registryCreatePayload) Validate(r *http.Request) error {
 	if payload.Authentication && (govalidator.IsNull(payload.Username) || govalidator.IsNull(payload.Password)) {
 		return portainer.Error("Invalid credentials. Username and password must be specified when authentication is enabled")
 	}
-	if payload.Type != 1 && payload.Type != 2 && payload.Type != 3 {
-		return portainer.Error("Invalid registry type. Valid values are: 1 (Quay.io), 2 (Azure container registry) or 3 (custom registry)")
+	if payload.Type != portainer.QuayRegistry && payload.Type != portainer.AzureRegistry && payload.Type != portainer.CustomRegistry && payload.Type != portainer.GitlabRegistry {
+		return portainer.Error("Invalid registry type. Valid values are: 1 (Quay.io), 2 (Azure container registry), 3 (custom registry) or 4 (Gitlab registry)")
 	}
 	return nil
 }
@@ -42,16 +43,6 @@ func (handler *Handler) registryCreate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	registries, err := handler.RegistryService.Registries()
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
-	}
-	for _, r := range registries {
-		if r.URL == payload.URL {
-			return &httperror.HandlerError{http.StatusConflict, "A registry with the same URL already exists", portainer.ErrRegistryAlreadyExists}
-		}
-	}
-
 	registry := &portainer.Registry{
 		Type:               portainer.RegistryType(payload.Type),
 		Name:               payload.Name,
@@ -61,6 +52,7 @@ func (handler *Handler) registryCreate(w http.ResponseWriter, r *http.Request) *
 		Password:           payload.Password,
 		UserAccessPolicies: portainer.UserAccessPolicies{},
 		TeamAccessPolicies: portainer.TeamAccessPolicies{},
+		Gitlab:             payload.Gitlab,
 	}
 
 	err = handler.RegistryService.CreateRegistry(registry)

@@ -121,7 +121,7 @@ angular.module('portainer.docker')
       if (!portBinding.containerPort) {
         return;
       }
-      
+
       let hostPort = portBinding.hostPort;
       const containerPortRange = parsePortRange(portBinding.containerPort);
       if (!isValidPortRange(containerPortRange)) {
