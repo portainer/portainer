@@ -929,8 +929,6 @@ const (
 	// PortainerAgentSignatureMessage represents the message used to create a digital signature
 	// to be used when communicating with an agent
 	PortainerAgentSignatureMessage = "Portainer-App"
-	// SupportedDockerAPIVersion is the minimum Docker API version supported by Portainer
-	SupportedDockerAPIVersion = "1.24"
 	// ExtensionServer represents the server used by Portainer to communicate with extensions
 	ExtensionServer = "localhost"
 	// DefaultEdgeAgentCheckinIntervalInSeconds represents the default interval (in seconds) used by Edge agents to checkin with the Portainer instance
