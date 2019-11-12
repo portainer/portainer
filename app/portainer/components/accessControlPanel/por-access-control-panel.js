@@ -9,6 +9,8 @@ angular.module('portainer.app').component('porAccessControlPanel', {
     // This component is usually displayed inside a resource-details view.
     // This variable specifies the type of the associated resource.
     // Accepted values: 'container', 'service' or 'volume'.
-    resourceType: '<'
+    resourceType: '<',
+    // Allow to disable the Ownership edition based on non resource control data
+    disableOwnershipChange: '<'
   }
 });

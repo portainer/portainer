@@ -1,4 +1,4 @@
-package proxy
+package azure
 
 import (
 	"net/http"
@@ -16,9 +16,7 @@ type (
 		expirationTime time.Time
 	}
 
-	// AzureTransport represents a transport used when executing HTTP requests
-	// against the Azure API.
-	AzureTransport struct {
+	Transport struct {
 		credentials *portainer.AzureCredentials
 		client      *client.HTTPClient
 		token       *azureAPIToken
@@ -26,15 +24,27 @@ type (
 	}
 )
 
-// NewAzureTransport returns a pointer to an AzureTransport instance.
-func NewAzureTransport(credentials *portainer.AzureCredentials) *AzureTransport {
-	return &AzureTransport{
+// NewTransport returns a pointer to a new instance of Transport that implements the HTTP Transport
+// interface for proxying requests to the Azure API.
+func NewTransport(credentials *portainer.AzureCredentials) *Transport {
+	return &Transport{
 		credentials: credentials,
 		client:      client.NewHTTPClient(),
 	}
 }
 
-func (transport *AzureTransport) authenticate() error {
+// RoundTrip is the implementation of the Transport interface.
+func (transport *Transport) RoundTrip(request *http.Request) (*http.Response, error) {
+	err := transport.retrieveAuthenticationToken()
+	if err != nil {
+		return nil, err
+	}
+
+	request.Header.Set("Authorization", "Bearer "+transport.token.value)
+	return http.DefaultTransport.RoundTrip(request)
+}
+
+func (transport *Transport) authenticate() error {
 	token, err := transport.client.ExecuteAzureAuthenticationRequest(transport.credentials)
 	if err != nil {
 		return err
@@ -53,7 +63,7 @@ func (transport *AzureTransport) authenticate() error {
 	return nil
 }
 
-func (transport *AzureTransport) retrieveAuthenticationToken() error {
+func (transport *Transport) retrieveAuthenticationToken() error {
 	transport.mutex.Lock()
 	defer transport.mutex.Unlock()
 
@@ -67,15 +77,4 @@ func (transport *AzureTransport) retrieveAuthenticationToken() error {
 	}
 
 	return nil
-}
-
-// RoundTrip is the implementation of the Transport interface.
-func (transport *AzureTransport) RoundTrip(request *http.Request) (*http.Response, error) {
-	err := transport.retrieveAuthenticationToken()
-	if err != nil {
-		return nil, err
-	}
-
-	request.Header.Set("Authorization", "Bearer "+transport.token.value)
-	return http.DefaultTransport.RoundTrip(request)
 }

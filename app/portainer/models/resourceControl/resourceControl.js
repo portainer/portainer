@@ -1,3 +1,5 @@
+import { ResourceControlOwnership as RCO } from 'Portainer/models/resourceControl/resourceControlOwnership';
+
 export function ResourceControlViewModel(data) {
   this.Id = data.Id;
   this.Type = data.Type;
@@ -5,17 +7,18 @@ export function ResourceControlViewModel(data) {
   this.UserAccesses = data.UserAccesses;
   this.TeamAccesses = data.TeamAccesses;
   this.Public = data.Public;
+  this.System = data.System;
   this.Ownership = determineOwnership(this);
 }
 
 function determineOwnership(resourceControl) {
   if (resourceControl.Public) {
-    return 'public';
+    return RCO.PUBLIC;
   } else if (resourceControl.UserAccesses.length === 1 && resourceControl.TeamAccesses.length === 0) {
-    return 'private';
+    return RCO.PRIVATE;
   } else if (resourceControl.UserAccesses.length > 1 || resourceControl.TeamAccesses.length > 0) {
-    return 'restricted';
+    return RCO.RESTRICTED;
   } else {
-    return 'administrators';
+    return RCO.ADMINISTRATORS;
   }
 }

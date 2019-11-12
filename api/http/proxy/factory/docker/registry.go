@@ -1,8 +1,23 @@
-package proxy
+package docker
 
 import (
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
+)
+
+type (
+	registryAccessContext struct {
+		isAdmin         bool
+		userID          portainer.UserID
+		teamMemberships []portainer.TeamMembership
+		registries      []portainer.Registry
+		dockerHub       *portainer.DockerHub
+	}
+	registryAuthenticationHeader struct {
+		Username      string `json:"username"`
+		Password      string `json:"password"`
+		Serveraddress string `json:"serveraddress"`
+	}
 )
 
 func createRegistryAuthenticationHeader(serverAddress string, accessContext *registryAccessContext) *registryAuthenticationHeader {

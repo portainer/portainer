@@ -288,8 +288,14 @@ func (m *Migrator) Migrate() error {
 	}
 
 	// Portainer next
-	if m.currentDBVersion < 21 {
-		err := m.updateUsersToDBVersion21()
+	// DBVersion 21 is missing as it was shipped as via hotfix 1.22.2
+	if m.currentDBVersion < 22 {
+		err := m.updateResourceControlsToDBVersion22()
+		if err != nil {
+			return err
+		}
+
+		err = m.updateUsersAndRolesToDBVersion22()
 		if err != nil {
 			return err
 		}
