@@ -23,15 +23,17 @@ func (factory ProxyFactory) newOSBasedLocalProxy(path string, endpoint *portaine
 		ReverseTunnelService:   factory.reverseTunnelService,
 		ExtensionService:       factory.extensionService,
 		SignatureService:       factory.signatureService,
+		DockerClientFactory:    factory.dockerClientFactory,
 	}
 
-	dockerClient, err := factory.dockerClientFactory.CreateClient(endpoint, "")
+	proxy := &dockerLocalProxy{}
+
+	dockerTransport, err := docker.NewTransport(transportParameters, newSocketTransport(path))
 	if err != nil {
 		return nil, err
 	}
 
-	proxy := &dockerLocalProxy{}
-	proxy.transport = docker.NewTransport(transportParameters, newSocketTransport(path), dockerClient)
+	proxy.transport = dockerTransport
 	return proxy, nil
 }
 

@@ -10,6 +10,8 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/portainer/portainer/api/docker"
+
 	"github.com/docker/docker/client"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
@@ -35,6 +37,7 @@ type (
 		reverseTunnelService   portainer.ReverseTunnelService
 		extensionService       portainer.ExtensionService
 		dockerClient           *client.Client
+		dockerClientFactory    *docker.ClientFactory
 	}
 
 	// TransportParameters is used to create a new Transport
@@ -50,6 +53,7 @@ type (
 		SignatureService       portainer.DigitalSignatureService
 		ReverseTunnelService   portainer.ReverseTunnelService
 		ExtensionService       portainer.ExtensionService
+		DockerClientFactory    *docker.ClientFactory
 	}
 
 	restrictedDockerOperationContext struct {
@@ -69,8 +73,13 @@ type (
 )
 
 // NewTransport returns a pointer to a new Transport instance.
-func NewTransport(parameters *TransportParameters, httpTransport *http.Transport, dockerClient *client.Client) *Transport {
-	return &Transport{
+func NewTransport(parameters *TransportParameters, httpTransport *http.Transport) (*Transport, error) {
+	dockerClient, err := parameters.DockerClientFactory.CreateClient(parameters.Endpoint, "")
+	if err != nil {
+		return nil, err
+	}
+
+	transport := &Transport{
 		endpoint:               parameters.Endpoint,
 		resourceControlService: parameters.ResourceControlService,
 		userService:            parameters.UserService,
@@ -82,9 +91,12 @@ func NewTransport(parameters *TransportParameters, httpTransport *http.Transport
 		signatureService:       parameters.SignatureService,
 		reverseTunnelService:   parameters.ReverseTunnelService,
 		extensionService:       parameters.ExtensionService,
+		dockerClientFactory:    parameters.DockerClientFactory,
 		HTTPTransport:          httpTransport,
 		dockerClient:           dockerClient,
 	}
+
+	return transport, nil
 }
 
 // RoundTrip is the implementation of the the http.RoundTripper interface
@@ -463,9 +475,11 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 
 		resourceControl := portainer.GetResourceControlByResourceIDAndType(resourceID, resourceType, resourceControls)
 		if resourceControl == nil {
+			agentTargetHeader := request.Header.Get(portainer.PortainerAgentTargetHeader)
+
 			// This resource was created outside of portainer,
 			// is part of a Docker service or part of a Docker Swarm/Compose stack.
-			inheritedResourceControl, err := transport.getInheritedResourceControlFromServiceOrStack(resourceID, resourceType, resourceControls)
+			inheritedResourceControl, err := transport.getInheritedResourceControlFromServiceOrStack(resourceID, agentTargetHeader, resourceType, resourceControls)
 			if err != nil {
 				return nil, err
 			}

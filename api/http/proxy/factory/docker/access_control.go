@@ -101,21 +101,32 @@ func (transport *Transport) createPrivateResourceControl(resourceIdentifier stri
 	return resourceControl, nil
 }
 
-func (transport *Transport) getInheritedResourceControlFromServiceOrStack(resourceIdentifier string, resourceType portainer.ResourceControlType, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
+func (transport *Transport) getInheritedResourceControlFromServiceOrStack(resourceIdentifier, nodeName string, resourceType portainer.ResourceControlType, resourceControls []portainer.ResourceControl) (*portainer.ResourceControl, error) {
+	client := transport.dockerClient
+
+	if nodeName != "" {
+		dockerClient, err := transport.dockerClientFactory.CreateClient(transport.endpoint, nodeName)
+		if err != nil {
+			return nil, err
+		}
+		defer dockerClient.Close()
+
+		client = dockerClient
+	}
 
 	switch resourceType {
 	case portainer.ContainerResourceControl:
-		return getInheritedResourceControlFromContainerLabels(transport.dockerClient, resourceIdentifier, resourceControls)
+		return getInheritedResourceControlFromContainerLabels(client, resourceIdentifier, resourceControls)
 	case portainer.NetworkResourceControl:
-		return getInheritedResourceControlFromNetworkLabels(transport.dockerClient, resourceIdentifier, resourceControls)
+		return getInheritedResourceControlFromNetworkLabels(client, resourceIdentifier, resourceControls)
 	case portainer.VolumeResourceControl:
-		return getInheritedResourceControlFromVolumeLabels(transport.dockerClient, resourceIdentifier, resourceControls)
+		return getInheritedResourceControlFromVolumeLabels(client, resourceIdentifier, resourceControls)
 	case portainer.ServiceResourceControl:
-		return getInheritedResourceControlFromServiceLabels(transport.dockerClient, resourceIdentifier, resourceControls)
+		return getInheritedResourceControlFromServiceLabels(client, resourceIdentifier, resourceControls)
 	case portainer.ConfigResourceControl:
-		return getInheritedResourceControlFromConfigLabels(transport.dockerClient, resourceIdentifier, resourceControls)
+		return getInheritedResourceControlFromConfigLabels(client, resourceIdentifier, resourceControls)
 	case portainer.SecretResourceControl:
-		return getInheritedResourceControlFromSecretLabels(transport.dockerClient, resourceIdentifier, resourceControls)
+		return getInheritedResourceControlFromSecretLabels(client, resourceIdentifier, resourceControls)
 	}
 
 	return nil, nil
