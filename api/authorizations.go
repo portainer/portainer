@@ -173,8 +173,8 @@ func DefaultEndpointAuthorizationsForEndpointAdministratorRole() Authorizations 
 
 // DefaultEndpointAuthorizationsForHelpDeskRole returns the default endpoint authorizations
 // associated to the helpdesk role.
-func DefaultEndpointAuthorizationsForHelpDeskRole() Authorizations {
-	return map[Authorization]bool{
+func DefaultEndpointAuthorizationsForHelpDeskRole(volumeBrowsingAuthorizations bool) Authorizations {
+	authorizations := map[Authorization]bool{
 		OperationDockerContainerArchiveInfo: true,
 		OperationDockerContainerList:        true,
 		OperationDockerContainerChanges:     true,
@@ -221,12 +221,19 @@ func DefaultEndpointAuthorizationsForHelpDeskRole() Authorizations {
 		OperationPortainerWebhookList:       true,
 		EndpointResourcesAccess:             true,
 	}
+
+	if volumeBrowsingAuthorizations {
+		authorizations[OperationDockerAgentBrowseGet] = true
+		authorizations[OperationDockerAgentBrowseList] = true
+	}
+
+	return authorizations
 }
 
 // DefaultEndpointAuthorizationsForStandardUserRole returns the default endpoint authorizations
 // associated to the standard user role.
-func DefaultEndpointAuthorizationsForStandardUserRole() Authorizations {
-	return map[Authorization]bool{
+func DefaultEndpointAuthorizationsForStandardUserRole(volumeBrowsingAuthorizations bool) Authorizations {
+	authorizations := map[Authorization]bool{
 		OperationDockerContainerArchiveInfo:         true,
 		OperationDockerContainerList:                true,
 		OperationDockerContainerExport:              true,
@@ -345,12 +352,22 @@ func DefaultEndpointAuthorizationsForStandardUserRole() Authorizations {
 		OperationPortainerWebhookList:               true,
 		OperationPortainerWebhookCreate:             true,
 	}
+
+	if volumeBrowsingAuthorizations {
+		authorizations[OperationDockerAgentBrowseGet] = true
+		authorizations[OperationDockerAgentBrowseList] = true
+		authorizations[OperationDockerAgentBrowseDelete] = true
+		authorizations[OperationDockerAgentBrowsePut] = true
+		authorizations[OperationDockerAgentBrowseRename] = true
+	}
+
+	return authorizations
 }
 
 // DefaultEndpointAuthorizationsForReadOnlyUserRole returns the default endpoint authorizations
 // associated to the readonly user role.
-func DefaultEndpointAuthorizationsForReadOnlyUserRole() Authorizations {
-	return map[Authorization]bool{
+func DefaultEndpointAuthorizationsForReadOnlyUserRole(volumeBrowsingAuthorizations bool) Authorizations {
+	authorizations := map[Authorization]bool{
 		OperationDockerContainerArchiveInfo: true,
 		OperationDockerContainerList:        true,
 		OperationDockerContainerChanges:     true,
@@ -396,6 +413,13 @@ func DefaultEndpointAuthorizationsForReadOnlyUserRole() Authorizations {
 		OperationPortainerStackFile:         true,
 		OperationPortainerWebhookList:       true,
 	}
+
+	if volumeBrowsingAuthorizations {
+		authorizations[OperationDockerAgentBrowseGet] = true
+		authorizations[OperationDockerAgentBrowseList] = true
+	}
+
+	return authorizations
 }
 
 // DefaultPortainerAuthorizations returns the default Portainer authorizations used by non-admin users.

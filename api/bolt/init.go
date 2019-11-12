@@ -45,7 +45,7 @@ func (store *Store) Init() error {
 		environmentReadOnlyUserRole := &portainer.Role{
 			Name:           "Helpdesk",
 			Description:    "Read-only access of all resources in an endpoint",
-			Authorizations: portainer.DefaultEndpointAuthorizationsForHelpDeskRole(),
+			Authorizations: portainer.DefaultEndpointAuthorizationsForHelpDeskRole(false),
 		}
 
 		err = store.RoleService.CreateRole(environmentReadOnlyUserRole)
@@ -56,7 +56,7 @@ func (store *Store) Init() error {
 		standardUserRole := &portainer.Role{
 			Name:           "Standard user",
 			Description:    "Full control of assigned resources in an endpoint",
-			Authorizations: portainer.DefaultEndpointAuthorizationsForStandardUserRole(),
+			Authorizations: portainer.DefaultEndpointAuthorizationsForStandardUserRole(false),
 		}
 
 		err = store.RoleService.CreateRole(standardUserRole)
@@ -67,7 +67,7 @@ func (store *Store) Init() error {
 		readOnlyUserRole := &portainer.Role{
 			Name:           "Read-only user",
 			Description:    "Read-only access of assigned resources in an endpoint",
-			Authorizations: portainer.DefaultEndpointAuthorizationsForReadOnlyUserRole(),
+			Authorizations: portainer.DefaultEndpointAuthorizationsForReadOnlyUserRole(false),
 		}
 
 		err = store.RoleService.CreateRole(readOnlyUserRole)
