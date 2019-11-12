@@ -67,16 +67,20 @@ func getResponseBodyAsGenericJSON(response *http.Response) (interface{}, error) 
 	return data, nil
 }
 
+type dockerErrorResponse struct {
+	Message string `json:"message,omitempty"`
+}
+
 // WriteAccessDeniedResponse will create a new access denied response
 func WriteAccessDeniedResponse() (*http.Response, error) {
 	response := &http.Response{}
-	err := RewriteResponse(response, errors.New("access denied to resource"), http.StatusForbidden)
+	err := RewriteResponse(response, dockerErrorResponse{Message: "access denied to resource"}, http.StatusForbidden)
 	return response, err
 }
 
 // RewriteAccessDeniedResponse will overwrite the existing response with an access denied response
 func RewriteAccessDeniedResponse(response *http.Response) error {
-	return RewriteResponse(response, errors.New("access denied to resource"), http.StatusForbidden)
+	return RewriteResponse(response, dockerErrorResponse{Message: "access denied to resource"}, http.StatusForbidden)
 }
 
 // RewriteResponse will replace the existing response body and status code with the one specified
