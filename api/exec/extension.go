@@ -73,7 +73,7 @@ func buildExtensionPath(binaryPath string, extension *portainer.Extension) strin
 func (manager *ExtensionManager) FetchExtensionDefinitions() ([]portainer.Extension, error) {
 	var extensionData []byte
 
-	extensionData, err := client.Get(portainer.ExtensionDefinitionsURL, 10)
+	extensionData, err := client.Get(portainer.ExtensionDefinitionsURL, 5)
 	if err != nil {
 		log.Printf("[WARN] [exec,extensions] [message: unable to retrieve extensions manifest via Internet. Extensions will be retrieved from local cache and might not be up to date] [err: %s]", err)
 

@@ -48,7 +48,7 @@ func (handler *Handler) extensionInspect(w http.ResponseWriter, r *http.Request)
 
 	mergeExtensionAndDefinition(&extension, &extensionDefinition)
 
-	description, _ := client.Get(extension.DescriptionURL, 10)
+	description, _ := client.Get(extension.DescriptionURL, 5)
 	extension.Description = string(description)
 
 	return response.JSON(w, extension)
