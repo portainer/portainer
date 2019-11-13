@@ -67,11 +67,20 @@ func buildExtensionPath(binaryPath string, extension *portainer.Extension) strin
 }
 
 // FetchExtensionDefinitions will fetch the list of available
-// extension definitions from the official Portainer assets server
+// extension definitions from the official Portainer assets server.
+// If it cannot retrieve the data from the Internet it will fallback to the locally cached
+// manifest file.
 func (manager *ExtensionManager) FetchExtensionDefinitions() ([]portainer.Extension, error) {
+	var extensionData []byte
+
 	extensionData, err := client.Get(portainer.ExtensionDefinitionsURL, 10)
 	if err != nil {
-		return nil, err
+		log.Printf("[WARN] [exec,extensions] [message: unable to retrieve extensions manifest via Internet. Extensions will be retrieved from local cache and might not be up to date] [err: %s]", err)
+
+		extensionData, err = manager.fileService.GetFileContent(portainer.LocalExtensionManifestFile)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	var extensions []portainer.Extension

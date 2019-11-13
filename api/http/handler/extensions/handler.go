@@ -3,6 +3,8 @@ package extensions
 import (
 	"net/http"
 
+	"github.com/coreos/go-semver/semver"
+
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer/api"
@@ -40,4 +42,43 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AdminAccess(httperror.LoggerHandler(h.extensionUpdate))).Methods(http.MethodPost)
 
 	return h
+}
+
+func mergeExtensionsAndDefinitions(extensions, definitions []portainer.Extension) []portainer.Extension {
+	for _, definition := range definitions {
+		foundInDB := false
+
+		for idx, extension := range extensions {
+			if extension.ID == definition.ID {
+				foundInDB = true
+				mergeExtensionAndDefinition(&extensions[idx], &definition)
+				break
+			}
+		}
+
+		if !foundInDB {
+			extensions = append(extensions, definition)
+		}
+	}
+
+	return extensions
+}
+
+func mergeExtensionAndDefinition(extension, definition *portainer.Extension) {
+	extension.Name = definition.Name
+	extension.ShortDescription = definition.ShortDescription
+	extension.Deal = definition.Deal
+	extension.Available = definition.Available
+	extension.DescriptionURL = definition.DescriptionURL
+	extension.Images = definition.Images
+	extension.Logo = definition.Logo
+	extension.Price = definition.Price
+	extension.PriceDescription = definition.PriceDescription
+	extension.ShopURL = definition.ShopURL
+
+	definitionVersion := semver.New(definition.Version)
+	extensionVersion := semver.New(extension.Version)
+	if extensionVersion.LessThan(*definitionVersion) {
+		extension.UpdateAvailable = true
+	}
 }

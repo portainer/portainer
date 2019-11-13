@@ -941,6 +941,8 @@ const (
 	ExtensionServer = "localhost"
 	// DefaultEdgeAgentCheckinIntervalInSeconds represents the default interval (in seconds) used by Edge agents to checkin with the Portainer instance
 	DefaultEdgeAgentCheckinIntervalInSeconds = 5
+	// LocalExtensionManifestFile represents the name of the local manifest file for extensions
+	LocalExtensionManifestFile = "/app/extensions.json"
 )
 
 const (
