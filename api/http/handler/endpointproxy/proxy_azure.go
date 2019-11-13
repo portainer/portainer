@@ -29,9 +29,9 @@ func (handler *Handler) proxyRequestsToAzureAPI(w http.ResponseWriter, r *http.R
 	}
 
 	var proxy http.Handler
-	proxy = handler.ProxyManager.GetProxy(endpoint)
+	proxy = handler.ProxyManager.GetEndpointProxy(endpoint)
 	if proxy == nil {
-		proxy, err = handler.ProxyManager.CreateAndRegisterProxy(endpoint)
+		proxy, err = handler.ProxyManager.CreateAndRegisterEndpointProxy(endpoint)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create proxy", err}
 		}

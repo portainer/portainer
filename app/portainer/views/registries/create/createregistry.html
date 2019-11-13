@@ -18,9 +18,9 @@
 
           <div class="form-group" style="margin-bottom: 0">
             <div class="boxselector_wrapper">
-              <div ng-click="selectQuayRegistry()">
-                <input type="radio" id="registry_quay" ng-model="model.Type" ng-value="1">
-                <label for="registry_quay">
+              <div>
+                <input type="radio" id="registry_quay" ng-model="model.Type" ng-value="RegistryTypes.QUAY">
+                <label for="registry_quay" ng-click="selectQuayRegistry()">
                   <div class="boxselector_header">
                     <i class="fa fa-database" aria-hidden="true" style="margin-right: 2px;"></i>
                     Quay.io
@@ -28,9 +28,9 @@
                   <p>Quay container registry</p>
                 </label>
               </div>
-              <div ng-click="selectAzureRegistry()">
-                <input type="radio" id="registry_azure" ng-model="model.Type" ng-value="2">
-                <label for="registry_azure">
+              <div>
+                <input type="radio" id="registry_azure" ng-model="model.Type" ng-value="RegistryTypes.AZURE">
+                <label for="registry_azure" ng-click="selectAzureRegistry()">
                   <div class="boxselector_header">
                     <i class="fab fa-microsoft" aria-hidden="true" style="margin-right: 2px;"></i>
                     Azure
@@ -38,9 +38,19 @@
                   <p>Azure container registry</p>
                 </label>
               </div>
-              <div ng-click="selectCustomRegistry()">
-                <input type="radio" id="registry_custom" ng-model="model.Type" ng-value="3">
-                <label for="registry_custom">
+              <div>
+                <input type="radio" id="registry_gitlab" ng-model="model.Type" ng-value="RegistryTypes.GITLAB">
+                <label for="registry_gitlab" ng-click="selectGitlabRegistry()">
+                  <div class="boxselector_header">
+                    <i class="fab fa-gitlab" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Gitlab
+                  </div>
+                  <p>Gitlab container registry</p>
+                </label>
+              </div>
+              <div>
+                <input type="radio" id="registry_custom" ng-model="model.Type" ng-value="RegistryTypes.CUSTOM">
+                <label for="registry_custom" ng-click="selectCustomRegistry()">
                   <div class="boxselector_header">
                     <i class="fa fa-database" aria-hidden="true" style="margin-right: 2px;"></i>
                     Custom registry
@@ -51,27 +61,36 @@
             </div>
           </div>
 
-          <registry-form-quay ng-if="model.Type === 1"
+          <registry-form-quay ng-if="model.Type === RegistryTypes.QUAY"
             model="model"
             form-action="create"
             form-action-label="Add registry"
             action-in-progress="state.actionInProgress"
           ></registry-form-quay>
 
-          <registry-form-azure ng-if="model.Type === 2"
+          <registry-form-azure ng-if="model.Type === RegistryTypes.AZURE"
             model="model"
             form-action="create"
             form-action-label="Add registry"
             action-in-progress="state.actionInProgress"
           ></registry-form-azure>
 
-          <registry-form-custom ng-if="model.Type === 3"
+          <registry-form-custom ng-if="model.Type === RegistryTypes.CUSTOM"
             model="model"
             form-action="create"
             form-action-label="Add registry"
             action-in-progress="state.actionInProgress"
           ></registry-form-custom>
 
+          <registry-form-gitlab ng-if="model.Type === RegistryTypes.GITLAB"
+            model="model"
+            retrieve-registries="retrieveGitlabRegistries"
+            create-registries="createGitlabRegistries"
+            projects="gitlabProjects"
+            state="state"
+            action-in-progress="state.actionInProgress"
+            reset-defaults="useDefaultGitlabConfiguration"
+          ></registry-form-gitlab>
         </form>
       </rd-widget-body>
     </rd-widget>

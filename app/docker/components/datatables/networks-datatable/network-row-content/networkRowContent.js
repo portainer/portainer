@@ -1,3 +1,5 @@
+import { ResourceControlOwnership as RCO } from 'Portainer/models/resourceControl/resourceControlOwnership';
+
 angular.module('portainer.docker')
 .directive('networkRowContent', [function networkRowContent() {
   var directive = {
@@ -9,6 +11,9 @@ angular.module('portainer.docker')
       parentCtrl: '<',
       allowCheckbox: '<',
       allowExpand: '<'
+    },
+    controller: ($scope) => {
+      $scope.RCO = RCO;
     }
   };
   return directive;

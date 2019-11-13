@@ -7,7 +7,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -40,10 +39,31 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
 
-	filteredStacks := proxy.FilterStacks(stacks, resourceControls, securityContext.IsAdmin,
-		securityContext.UserID, securityContext.UserMemberships)
+	stacks = portainer.DecorateStacks(stacks, resourceControls)
 
-	return response.JSON(w, filteredStacks)
+	if !securityContext.IsAdmin {
+		rbacExtensionEnabled := true
+		_, err := handler.ExtensionService.Extension(portainer.RBACExtension)
+		if err == portainer.ErrObjectNotFound {
+			rbacExtensionEnabled = false
+		} else if err != nil && err != portainer.ErrObjectNotFound {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check if RBAC extension is enabled", err}
+		}
+
+		user, err := handler.UserService.User(securityContext.UserID)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user information from the database", err}
+		}
+
+		userTeamIDs := make([]portainer.TeamID, 0)
+		for _, membership := range securityContext.UserMemberships {
+			userTeamIDs = append(userTeamIDs, membership.TeamID)
+		}
+
+		stacks = portainer.FilterAuthorizedStacks(stacks, user, userTeamIDs, rbacExtensionEnabled)
+	}
+
+	return response.JSON(w, stacks)
 }
 
 func filterStacks(stacks []portainer.Stack, filters *stackListOperationFilters) []portainer.Stack {

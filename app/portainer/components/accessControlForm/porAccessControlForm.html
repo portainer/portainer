@@ -71,7 +71,7 @@
   </div>
   <!-- restricted-access -->
   <!-- authorized-teams -->
-  <div class="form-group" ng-if="$ctrl.formData.AccessControlEnabled && $ctrl.formData.Ownership === 'restricted' && ($ctrl.isAdmin || (!$ctrl.isAdmin && $ctrl.availableTeams.length > 1))" >
+  <div class="form-group" ng-if="$ctrl.formData.AccessControlEnabled && $ctrl.formData.Ownership === $ctrl.RCO.RESTRICTED && ($ctrl.isAdmin || (!$ctrl.isAdmin && $ctrl.availableTeams.length > 1))" >
     <div class="col-sm-12">
       <label for="group-access" class="control-label text-left">
         Authorized teams
@@ -97,7 +97,7 @@
   </div>
   <!-- !authorized-teams -->
   <!-- authorized-users -->
-  <div class="form-group" ng-if="$ctrl.formData.AccessControlEnabled && $ctrl.formData.Ownership === 'restricted' && $ctrl.isAdmin">
+  <div class="form-group" ng-if="$ctrl.formData.AccessControlEnabled && $ctrl.formData.Ownership === $ctrl.RCO.RESTRICTED && $ctrl.isAdmin">
     <div class="col-sm-12">
       <label for="group-access" class="control-label text-left">
         Authorized users
