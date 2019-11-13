@@ -16,28 +16,28 @@
                 </span>
                 <span ng-if="$ctrl.resourceControl">
                   {{ $ctrl.resourceControl.Ownership }}
-                  <portainer-tooltip ng-if="$ctrl.resourceControl.Ownership === 'public'" message="This resource can be managed by any user with access to this endpoint." position="bottom" style="margin-left: -3px;"></portainer-tooltip>
-                  <portainer-tooltip ng-if="$ctrl.resourceControl.Ownership === 'private'" message="Management of this resource is restricted to a single user." position="bottom" style="margin-left: -3px;"></portainer-tooltip>
-                  <portainer-tooltip ng-if="$ctrl.resourceControl.Ownership === 'restricted'" message="This resource can be managed by a restricted set of users and/or teams." position="bottom" style="margin-left: -3px;"></portainer-tooltip>
+                  <portainer-tooltip ng-if="$ctrl.resourceControl.Ownership === $ctrl.RCO.PUBLIC" message="This resource can be managed by any user with access to this endpoint." position="bottom" style="margin-left: -3px;"></portainer-tooltip>
+                  <portainer-tooltip ng-if="$ctrl.resourceControl.Ownership === $ctrl.RCO.PRIVATE" message="Management of this resource is restricted to a single user." position="bottom" style="margin-left: -3px;"></portainer-tooltip>
+                  <portainer-tooltip ng-if="$ctrl.resourceControl.Ownership === $ctrl.RCO.RESTRICTED" message="This resource can be managed by a restricted set of users and/or teams." position="bottom" style="margin-left: -3px;"></portainer-tooltip>
                 </span>
               </td>
             </tr>
             <!-- !ownership -->
-            <tr ng-if="$ctrl.resourceControl.Type === 2 && $ctrl.resourceType === 'container'">
+            <tr ng-if="$ctrl.resourceControl.Type === $ctrl.RCTI.SERVICE && $ctrl.resourceType === $ctrl.RCTS.CONTAINER">
               <td colspan="2">
                 <i class="fa fa-info-circle" aria-hidden="true" style="margin-right: 2px;"></i>
                 Access control on this resource is inherited from the following service: <a ui-sref="docker.services.service({ id: $ctrl.resourceControl.ResourceId })">{{ $ctrl.resourceControl.ResourceId | truncate }}</a>
                 <portainer-tooltip message="Access control applied on a service is also applied on each container of that service." position="bottom" style="margin-left: 2px;"></portainer-tooltip>
               </td>
             </tr>
-            <tr ng-if="$ctrl.resourceControl.Type === 1 && $ctrl.resourceType === 'volume'">
+            <tr ng-if="$ctrl.resourceControl.Type === $ctrl.RCTI.CONTAINER && $ctrl.resourceType === $ctrl.RCTS.VOLUME">
               <td colspan="2">
                 <i class="fa fa-info-circle" aria-hidden="true" style="margin-right: 2px;"></i>
                 Access control on this resource is inherited from the following container: <a ui-sref="docker.containers.container({ id: $ctrl.resourceControl.ResourceId })">{{ $ctrl.resourceControl.ResourceId | truncate }}</a>
                 <portainer-tooltip message="Access control applied on a container created using a template is also applied on each volume associated to the container." position="bottom" style="margin-left: 2px;"></portainer-tooltip>
               </td>
             </tr>
-            <tr ng-if="$ctrl.resourceControl.Type === 6 && $ctrl.resourceType !== 'stack'">
+            <tr ng-if="$ctrl.resourceControl.Type === $ctrl.RCTI.STACK && $ctrl.resourceType !== $ctrl.RCTS.STACK">
               <td colspan="2">
                 <i class="fa fa-info-circle" aria-hidden="true" style="margin-right: 2px;"></i>
                 Access control on this resource is inherited from the following stack: {{ $ctrl.resourceControl.ResourceId }}
@@ -61,11 +61,7 @@
             </tr>
             <!-- !authorized-teams -->
             <!-- edit-ownership -->
-            <tr ng-if="!($ctrl.resourceControl.Type === 1 && $ctrl.resourceType === 'volume')
-            && !($ctrl.resourceControl.Type === 2 && $ctrl.resourceType === 'container')
-            && !($ctrl.resourceControl.Type === 6 && $ctrl.resourceType !== 'stack')
-            && !$ctrl.state.editOwnership
-            && ($ctrl.isAdmin || $ctrl.state.canEditOwnership)">
+            <tr ng-if="$ctrl.canEditOwnership();">
               <td colspan="2">
                 <a ng-click="$ctrl.state.editOwnership = true"><i class="fa fa-edit space-right" aria-hidden="true"></i>Change ownership</a>
               </td>
@@ -76,7 +72,7 @@
               <td colspan="2" style="white-space: inherit;">
                 <div class="boxselector_wrapper">
                   <div ng-if="$ctrl.isAdmin">
-                    <input type="radio" id="access_administrators" ng-model="$ctrl.formValues.Ownership" value="administrators">
+                    <input type="radio" id="access_administrators" ng-model="$ctrl.formValues.Ownership" ng-value="$ctrl.RCO.ADMINISTRATORS">
                     <label for="access_administrators">
                       <div class="boxselector_header">
                         <i ng-class="'administrators' | ownershipicon" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -86,7 +82,7 @@
                     </label>
                   </div>
                   <div ng-if="$ctrl.isAdmin">
-                    <input type="radio" id="access_restricted" ng-model="$ctrl.formValues.Ownership" value="restricted">
+                    <input type="radio" id="access_restricted" ng-model="$ctrl.formValues.Ownership" ng-value="$ctrl.RCO.RESTRICTED">
                     <label for="access_restricted">
                       <div class="boxselector_header">
                         <i ng-class="'restricted' | ownershipicon" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -98,7 +94,7 @@
                     </label>
                   </div>
                   <div ng-if="!$ctrl.isAdmin && $ctrl.state.canChangeOwnershipToTeam && $ctrl.availableTeams.length > 0">
-                    <input type="radio" id="access_restricted" ng-model="$ctrl.formValues.Ownership" value="restricted">
+                    <input type="radio" id="access_restricted" ng-model="$ctrl.formValues.Ownership" ng-value="$ctrl.RCO.RESTRICTED">
                     <label for="access_restricted">
                       <div class="boxselector_header">
                         <i ng-class="'restricted' | ownershipicon" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -113,7 +109,7 @@
                     </label>
                   </div>
                   <div>
-                    <input type="radio" id="access_public" ng-model="$ctrl.formValues.Ownership" value="public">
+                    <input type="radio" id="access_public" ng-model="$ctrl.formValues.Ownership" ng-value="$ctrl.RCO.PUBLIC">
                     <label for="access_public">
                       <div class="boxselector_header">
                         <i ng-class="'public' | ownershipicon" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -127,7 +123,7 @@
             </tr>
             <!-- edit-ownership-choices -->
             <!-- select-teams -->
-            <tr ng-if="$ctrl.state.editOwnership && $ctrl.formValues.Ownership === 'restricted' && ($ctrl.isAdmin || !$ctrl.isAdmin && $ctrl.availableTeams.length > 1)">
+            <tr ng-if="$ctrl.state.editOwnership && $ctrl.formValues.Ownership === $ctrl.RCO.RESTRICTED && ($ctrl.isAdmin || !$ctrl.isAdmin && $ctrl.availableTeams.length > 1)">
               <td colspan="2">
                 <span>Teams</span>
                 <span ng-if="$ctrl.isAdmin && $ctrl.availableTeams.length === 0" class="small text-muted" style="margin-left: 10px;">
@@ -149,7 +145,7 @@
             </tr>
             <!-- !select-teams -->
             <!-- select-users -->
-            <tr ng-if="$ctrl.isAdmin && $ctrl.state.editOwnership && $ctrl.formValues.Ownership === 'restricted'">
+            <tr ng-if="$ctrl.isAdmin && $ctrl.state.editOwnership && $ctrl.formValues.Ownership === $ctrl.RCO.RESTRICTED">
               <td colspan="2">
                 <span>Users</span>
                 <span ng-if="$ctrl.availableUsers.length === 0" class="small text-muted" style="margin-left: 10px;">

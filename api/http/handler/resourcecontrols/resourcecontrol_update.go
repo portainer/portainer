@@ -1,6 +1,7 @@
 package resourcecontrols
 
 import (
+	"errors"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -11,14 +12,19 @@ import (
 )
 
 type resourceControlUpdatePayload struct {
-	Public bool
-	Users  []int
-	Teams  []int
+	Public             bool
+	Users              []int
+	Teams              []int
+	AdministratorsOnly bool
 }
 
 func (payload *resourceControlUpdatePayload) Validate(r *http.Request) error {
-	if len(payload.Users) == 0 && len(payload.Teams) == 0 && !payload.Public {
-		return portainer.Error("Invalid resource control declaration. Must specify Users, Teams or Public")
+	if len(payload.Users) == 0 && len(payload.Teams) == 0 && !payload.Public && !payload.AdministratorsOnly {
+		return errors.New("invalid payload: must specify Users, Teams, Public or AdministratorsOnly")
+	}
+
+	if payload.Public && payload.AdministratorsOnly {
+		return errors.New("invalid payload: cannot set public and administrators only")
 	}
 	return nil
 }
@@ -49,10 +55,11 @@ func (handler *Handler) resourceControlUpdate(w http.ResponseWriter, r *http.Req
 	}
 
 	if !security.AuthorizedResourceControlAccess(resourceControl, securityContext) {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update the resource control", portainer.ErrResourceAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access the resource control", portainer.ErrResourceAccessDenied}
 	}
 
 	resourceControl.Public = payload.Public
+	resourceControl.AdministratorsOnly = payload.AdministratorsOnly
 
 	var userAccesses = make([]portainer.UserResourceAccess, 0)
 	for _, v := range payload.Users {

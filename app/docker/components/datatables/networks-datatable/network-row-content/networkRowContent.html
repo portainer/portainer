@@ -9,6 +9,7 @@
 <td>
   <a ng-if="!parentCtrl.offlineMode" ui-sref="docker.networks.network({ id: item.Id, nodeName: item.NodeName })" title="{{ item.Name }}">{{ item.Name | truncate:40 }}</a>
   <span ng-if="parentCtrl.offlineMode">{{ item.Name | truncate:40 }}</span>
+  <span style="margin-left: 10px;" class="label label-info image-tag space-left" ng-if="item.ResourceControl.System">System</span>
 </td>
 <td>{{ item.StackName ? item.StackName : '-' }}</td>
 <td>{{ item.Scope }}</td>
@@ -22,6 +23,6 @@
 <td ng-if="parentCtrl.showOwnershipColumn">
   <span>
     <i ng-class="item.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
-    {{ item.ResourceControl.Ownership ? item.ResourceControl.Ownership : item.ResourceControl.Ownership = 'administrators' }}
+    {{ item.ResourceControl.Ownership ? item.ResourceControl.Ownership : item.ResourceControl.Ownership = RCO.ADMINISTRATORS }}
   </span>
 </td>

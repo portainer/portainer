@@ -432,15 +432,14 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     var authenticationDetails = registry.Authentication ? RegistryService.encodedCredentials(registry) : '';
     HttpRequestHelper.setRegistryAuthenticationHeader(authenticationDetails);
 
-    var serviceIdentifier;
     Service.create(config).$promise
     .then(function success(data) {
-      serviceIdentifier = data.ID;
-      return $q.when($scope.formValues.Webhook && WebhookService.createServiceWebhook(serviceIdentifier, EndpointProvider.endpointID()));
-    })
-    .then(function success() {
-      var userId = Authentication.getUserDetails().ID;
-      return ResourceControlService.applyResourceControl('service', serviceIdentifier, userId, accessControlData, []);
+      const serviceId = data.ID;
+      const resourceControl = data.Portainer.ResourceControl;
+      const userId = Authentication.getUserDetails().ID;
+      const rcPromise = ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
+      const webhookPromise = $q.when($scope.formValues.Webhook && WebhookService.createServiceWebhook(serviceId, EndpointProvider.endpointID()));
+      return $q.all([rcPromise, webhookPromise]);
     })
     .then(function success() {
       Notifications.success('Service successfully created');
