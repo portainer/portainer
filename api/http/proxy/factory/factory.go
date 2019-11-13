@@ -107,3 +107,8 @@ func (factory *ProxyFactory) NewEndpointProxy(endpoint *portainer.Endpoint) (htt
 
 	return factory.newDockerProxy(endpoint)
 }
+
+// NewGitlabProxy returns a new HTTP proxy to a Gitlab API server
+func (factory *ProxyFactory) NewGitlabProxy(gitlabAPIUri string) (http.Handler, error) {
+	return newGitlabProxy(gitlabAPIUri)
+}

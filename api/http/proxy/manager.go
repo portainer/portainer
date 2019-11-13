@@ -120,7 +120,7 @@ func (manager *Manager) DeleteExtensionProxy(extensionID portainer.ExtensionID) 
 	manager.extensionProxies.Remove(strconv.Itoa(int(extensionID)))
 }
 
-// CreateLegacyExtensionProxy creates a new HTTP reverse proxy for a legacy extension and adds it to the registered proxies.
+// CreateLegacyExtensionProxy creates a new HTTP reverse proxy for a legacy extension and adds it to the registered proxies
 func (manager *Manager) CreateLegacyExtensionProxy(key, extensionAPIURL string) (http.Handler, error) {
 	proxy, err := manager.proxyFactory.NewLegacyExtensionProxy(extensionAPIURL)
 	if err != nil {
@@ -140,7 +140,7 @@ func (manager *Manager) GetLegacyExtensionProxy(key string) http.Handler {
 	return proxy.(http.Handler)
 }
 
-// CreateGitlabProxy creates a new HTTP reverse proxy that can be used to send requests to the Gitlab API..
+// CreateGitlabProxy creates a new HTTP reverse proxy that can be used to send requests to the Gitlab API
 func (manager *Manager) CreateGitlabProxy(url string) (http.Handler, error) {
-	return newGitlabProxy(url)
+	return manager.proxyFactory.NewGitlabProxy(url)
 }

@@ -33,7 +33,7 @@ func NewTransport(credentials *portainer.AzureCredentials) *Transport {
 	}
 }
 
-// RoundTrip is the implementation of the Transport interface.
+// RoundTrip is the implementation of the the http.RoundTripper interface
 func (transport *Transport) RoundTrip(request *http.Request) (*http.Response, error) {
 	err := transport.retrieveAuthenticationToken()
 	if err != nil {
