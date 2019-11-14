@@ -34,6 +34,7 @@ func (store *Store) Init() error {
 		environmentAdministratorRole := &portainer.Role{
 			Name:           "Endpoint administrator",
 			Description:    "Full control of all resources in an endpoint",
+			Priority:       1,
 			Authorizations: portainer.DefaultEndpointAuthorizationsForEndpointAdministratorRole(),
 		}
 
@@ -45,6 +46,7 @@ func (store *Store) Init() error {
 		environmentReadOnlyUserRole := &portainer.Role{
 			Name:           "Helpdesk",
 			Description:    "Read-only access of all resources in an endpoint",
+			Priority:       2,
 			Authorizations: portainer.DefaultEndpointAuthorizationsForHelpDeskRole(false),
 		}
 
@@ -56,6 +58,7 @@ func (store *Store) Init() error {
 		standardUserRole := &portainer.Role{
 			Name:           "Standard user",
 			Description:    "Full control of assigned resources in an endpoint",
+			Priority:       3,
 			Authorizations: portainer.DefaultEndpointAuthorizationsForStandardUserRole(false),
 		}
 
@@ -67,6 +70,7 @@ func (store *Store) Init() error {
 		readOnlyUserRole := &portainer.Role{
 			Name:           "Read-only user",
 			Description:    "Read-only access of assigned resources in an endpoint",
+			Priority:       4,
 			Authorizations: portainer.DefaultEndpointAuthorizationsForReadOnlyUserRole(false),
 		}
 

@@ -730,7 +730,7 @@ func getAuthorizationsFromUserEndpointPolicy(user *User, endpoint *Endpoint, rol
 		policyRoles = append(policyRoles, policy.RoleID)
 	}
 
-	return getAuthorizationsFromRoles(policyRoles, roles)
+	return getAuthorizationsFromRoles2(policyRoles, roles)
 }
 
 func getAuthorizationsFromUserEndpointGroupPolicy(user *User, endpoint *Endpoint, roles []Role, groupAccessPolicies map[EndpointGroupID]UserAccessPolicies) Authorizations {
@@ -741,7 +741,7 @@ func getAuthorizationsFromUserEndpointGroupPolicy(user *User, endpoint *Endpoint
 		policyRoles = append(policyRoles, policy.RoleID)
 	}
 
-	return getAuthorizationsFromRoles(policyRoles, roles)
+	return getAuthorizationsFromRoles2(policyRoles, roles)
 }
 
 func getAuthorizationsFromTeamEndpointPolicies(memberships []TeamMembership, endpoint *Endpoint, roles []Role) Authorizations {
@@ -754,7 +754,7 @@ func getAuthorizationsFromTeamEndpointPolicies(memberships []TeamMembership, end
 		}
 	}
 
-	return getAuthorizationsFromRoles(policyRoles, roles)
+	return getAuthorizationsFromRoles2(policyRoles, roles)
 }
 
 func getAuthorizationsFromTeamEndpointGroupPolicies(memberships []TeamMembership, endpoint *Endpoint, roles []Role, groupAccessPolicies map[EndpointGroupID]TeamAccessPolicies) Authorizations {
@@ -767,41 +767,29 @@ func getAuthorizationsFromTeamEndpointGroupPolicies(memberships []TeamMembership
 		}
 	}
 
-	return getAuthorizationsFromRoles(policyRoles, roles)
+	return getAuthorizationsFromRoles2(policyRoles, roles)
 }
 
-func getAuthorizationsFromRoles(roleIdentifiers []RoleID, roles []Role) Authorizations {
-	var roleAuthorizations []Authorizations
+func getAuthorizationsFromRoles2(roleIdentifiers []RoleID, roles []Role) Authorizations {
+	var associatedRoles []Role
+
 	for _, id := range roleIdentifiers {
 		for _, role := range roles {
 			if role.ID == id {
-				roleAuthorizations = append(roleAuthorizations, role.Authorizations)
+				associatedRoles = append(associatedRoles, role)
 				break
 			}
 		}
 	}
 
-	processedAuthorizations := make(Authorizations)
-	if len(roleAuthorizations) > 0 {
-		processedAuthorizations = roleAuthorizations[0]
-		for idx, authorizations := range roleAuthorizations {
-			if idx == 0 {
-				continue
-			}
-			processedAuthorizations = mergeAuthorizations(processedAuthorizations, authorizations)
+	var authorizations Authorizations
+	highestPriority := 0
+	for _, role := range associatedRoles {
+		if role.Priority > highestPriority {
+			highestPriority = role.Priority
+			authorizations = role.Authorizations
 		}
 	}
 
-	return processedAuthorizations
-}
-
-func mergeAuthorizations(a, b Authorizations) Authorizations {
-	c := make(map[Authorization]bool)
-
-	for k := range b {
-		if _, ok := a[k]; ok {
-			c[k] = true
-		}
-	}
-	return c
+	return authorizations
 }

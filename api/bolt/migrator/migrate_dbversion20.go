@@ -43,6 +43,7 @@ func (m *Migrator) updateUsersAndRolesToDBVersion22() error {
 	if err != nil {
 		return err
 	}
+	endpointAdministratorRole.Priority = 1
 	endpointAdministratorRole.Authorizations = portainer.DefaultEndpointAuthorizationsForEndpointAdministratorRole()
 
 	err = m.roleService.UpdateRole(endpointAdministratorRole.ID, endpointAdministratorRole)
@@ -51,6 +52,7 @@ func (m *Migrator) updateUsersAndRolesToDBVersion22() error {
 	if err != nil {
 		return err
 	}
+	helpDeskRole.Priority = 2
 	helpDeskRole.Authorizations = portainer.DefaultEndpointAuthorizationsForHelpDeskRole(settings.AllowVolumeBrowserForRegularUsers)
 
 	err = m.roleService.UpdateRole(helpDeskRole.ID, helpDeskRole)
@@ -59,6 +61,7 @@ func (m *Migrator) updateUsersAndRolesToDBVersion22() error {
 	if err != nil {
 		return err
 	}
+	standardUserRole.Priority = 3
 	standardUserRole.Authorizations = portainer.DefaultEndpointAuthorizationsForStandardUserRole(settings.AllowVolumeBrowserForRegularUsers)
 
 	err = m.roleService.UpdateRole(standardUserRole.ID, standardUserRole)
@@ -67,6 +70,7 @@ func (m *Migrator) updateUsersAndRolesToDBVersion22() error {
 	if err != nil {
 		return err
 	}
+	readOnlyUserRole.Priority = 4
 	readOnlyUserRole.Authorizations = portainer.DefaultEndpointAuthorizationsForReadOnlyUserRole(settings.AllowVolumeBrowserForRegularUsers)
 
 	err = m.roleService.UpdateRole(readOnlyUserRole.ID, readOnlyUserRole)
