@@ -174,24 +174,24 @@ func (manager *ExtensionManager) updateAndStartExtensions(extensions []portainer
 				definitionVersion := semver.New(definition.Version)
 				extensionVersion := semver.New(extension.Version)
 
-				var err error
 				if extensionVersion.LessThan(*definitionVersion) {
-					err = manager.UpdateExtension(&extension, definition.Version)
+					log.Printf("[INFO] [exec,extensions] [message: new version detected, updating extension] [extension: %s] [current_version: %s] [available_version: %s]", extension.Name, extension.Version, definition.Version)
+					err := manager.UpdateExtension(&extension, definition.Version)
 					if err != nil {
 						log.Printf("[WARN] [exec,extensions] [message: unable to update extension automatically] [extension: %s] [current_version: %s] [available_version: %s] [err: %s]", extension.Name, extension.Version, definition.Version, err)
 					}
 				} else {
-					err = manager.EnableExtension(&extension, extension.License.LicenseKey)
+					err := manager.EnableExtension(&extension, extension.License.LicenseKey)
 					if err != nil {
 						log.Printf("[WARN] [exec,extensions] [message: unable to start extension] [extension: %s] [err: %s]", extension.Name, err)
 						extension.Enabled = false
 						extension.License.Valid = false
 					}
+				}
 
-					err = manager.extensionService.Persist(&extension)
-					if err != nil {
-						return err
-					}
+				err := manager.extensionService.Persist(&extension)
+				if err != nil {
+					return err
 				}
 
 				break
