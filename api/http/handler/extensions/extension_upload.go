@@ -46,20 +46,11 @@ func (handler *Handler) extensionUpload(w http.ResponseWriter, r *http.Request) 
 	}
 	extensionID := portainer.ExtensionID(extensionIdentifier)
 
-	extensions, err := handler.ExtensionService.Extensions()
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve extensions status from the database", err}
-	}
-
-	for _, existingExtension := range extensions {
-		if existingExtension.ID == extensionID && existingExtension.Enabled {
-			return &httperror.HandlerError{http.StatusConflict, "Unable to enable extension", portainer.ErrExtensionAlreadyEnabled}
-		}
-	}
-
 	extension := &portainer.Extension{
 		ID: extensionID,
 	}
+
+	_ = handler.ExtensionManager.DisableExtension(extension)
 
 	err = handler.ExtensionManager.InstallExtension(extension, payload.License, payload.ArchiveFileName, payload.ExtensionArchive)
 	if err != nil {
