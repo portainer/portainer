@@ -48,6 +48,9 @@
               <p class="small text-muted" ng-if="state.offlineActivation">
                 You will need to upload the extension archive manually. Ensure that you have a valid license.
               </p>
+              <p class="small text-muted" ng-if="state.offlineActivation">
+                You can download the latest version of our extensions <a target="_blank" href="https://download.portainer.io/extensions.zip">here</a>.
+              </p>
               <p>
                 <a class="small interactive" ng-if="!state.offlineActivation" ng-click="state.offlineActivation = true;">
                   <i class="fa fa-toggle-off space-right" aria-hidden="true"></i> Switch to offline activation
