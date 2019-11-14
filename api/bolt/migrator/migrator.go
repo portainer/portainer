@@ -287,7 +287,7 @@ func (m *Migrator) Migrate() error {
 		}
 	}
 
-	// Portainer next
+	// Portainer 1.23.0-dev
 	// DBVersion 21 is missing as it was shipped as via hotfix 1.22.2
 	if m.currentDBVersion < 22 {
 		err := m.updateResourceControlsToDBVersion22()
