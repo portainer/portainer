@@ -81,4 +81,6 @@ func mergeExtensionAndDefinition(extension, definition *portainer.Extension) {
 	if extensionVersion.LessThan(*definitionVersion) {
 		extension.UpdateAvailable = true
 	}
+
+	extension.Version = definition.Version
 }
