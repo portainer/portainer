@@ -730,7 +730,7 @@ func getAuthorizationsFromUserEndpointPolicy(user *User, endpoint *Endpoint, rol
 		policyRoles = append(policyRoles, policy.RoleID)
 	}
 
-	return getAuthorizationsFromRoles2(policyRoles, roles)
+	return getAuthorizationsFromRoles(policyRoles, roles)
 }
 
 func getAuthorizationsFromUserEndpointGroupPolicy(user *User, endpoint *Endpoint, roles []Role, groupAccessPolicies map[EndpointGroupID]UserAccessPolicies) Authorizations {
@@ -741,7 +741,7 @@ func getAuthorizationsFromUserEndpointGroupPolicy(user *User, endpoint *Endpoint
 		policyRoles = append(policyRoles, policy.RoleID)
 	}
 
-	return getAuthorizationsFromRoles2(policyRoles, roles)
+	return getAuthorizationsFromRoles(policyRoles, roles)
 }
 
 func getAuthorizationsFromTeamEndpointPolicies(memberships []TeamMembership, endpoint *Endpoint, roles []Role) Authorizations {
@@ -754,7 +754,7 @@ func getAuthorizationsFromTeamEndpointPolicies(memberships []TeamMembership, end
 		}
 	}
 
-	return getAuthorizationsFromRoles2(policyRoles, roles)
+	return getAuthorizationsFromRoles(policyRoles, roles)
 }
 
 func getAuthorizationsFromTeamEndpointGroupPolicies(memberships []TeamMembership, endpoint *Endpoint, roles []Role, groupAccessPolicies map[EndpointGroupID]TeamAccessPolicies) Authorizations {
@@ -767,10 +767,10 @@ func getAuthorizationsFromTeamEndpointGroupPolicies(memberships []TeamMembership
 		}
 	}
 
-	return getAuthorizationsFromRoles2(policyRoles, roles)
+	return getAuthorizationsFromRoles(policyRoles, roles)
 }
 
-func getAuthorizationsFromRoles2(roleIdentifiers []RoleID, roles []Role) Authorizations {
+func getAuthorizationsFromRoles(roleIdentifiers []RoleID, roles []Role) Authorizations {
 	var associatedRoles []Role
 
 	for _, id := range roleIdentifiers {
