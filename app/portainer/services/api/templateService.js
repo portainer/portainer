@@ -58,7 +58,7 @@ function TemplateServiceFactory($q, Templates, TemplateHelper, ImageHelper, Cont
   };
 
   service.createTemplateConfiguration = function(template, containerName, network) {
-    var imageConfiguration = ImageHelper.createImageConfigForContainer(template.Image, template.Registry);
+    var imageConfiguration = ImageHelper.createImageConfigForContainer(template.Image, template.Registry.URL);
     var containerConfiguration = service.createContainerConfiguration(template, containerName, network);
     containerConfiguration.Image = imageConfiguration.fromImage + ':' + imageConfiguration.tag;
     return containerConfiguration;
