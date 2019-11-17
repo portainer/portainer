@@ -5,6 +5,22 @@ angular.module('portainer.docker')
 function ($q, RegistryService, DockerHubService, ImageService, Notifications) {
   var ctrl = this;
 
+  ctrl.imageChanged = function($value) {
+    if ($value === '') {
+      return;
+    }
+
+    ctrl.availableRegistries.filter(function(registry) {
+      var regex = new RegExp('^' + registry.URL + '\/(.*)$');
+      return (registry.URL !== '' && $value.match(regex));
+    }).map(function(registry) {
+      var regex = new RegExp('^' + registry.URL + '\/(.*)$');
+
+      ctrl.registry = registry;
+      ctrl.image = $value.replace(regex, '$1');
+    });
+  };
+
   function initComponent() {
     $q.all({
       registries: RegistryService.registries(),
