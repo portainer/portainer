@@ -1,6 +1,5 @@
 import 'ui-select/dist/select.css';
 import 'bootstrap/dist/css/bootstrap.css';
-import 'isteven-angular-multiselect/isteven-multi-select.css';
 import '@fortawesome/fontawesome-free/css/brands.css';
 import '@fortawesome/fontawesome-free/css/solid.css';
 import '@fortawesome/fontawesome-free/css/fontawesome.css';
@@ -13,12 +12,12 @@ import 'angular-json-tree/dist/angular-json-tree.css';
 import 'angular-loading-bar/build/loading-bar.css';
 import 'rdash-ui/dist/css/rdash.css';
 import 'angular-moment-picker/dist/angular-moment-picker.min.css';
+import 'angular-multiselect/isteven-multi-select.css';
 
 import angular from 'angular';
 import 'moment';
 import '@uirouter/angularjs';
 import 'ui-select';
-import 'isteven-angular-multiselect/isteven-multi-select.js';
 import 'angular-cookies';
 import 'angular-sanitize';
 import 'ng-file-upload';
@@ -38,5 +37,6 @@ import 'bootstrap/dist/js/bootstrap.js';
 import 'js-yaml/dist/js-yaml.js';
 import 'angular-ui-bootstrap';
 import 'angular-moment-picker';
+import 'angular-multiselect/isteven-multi-select.js';
 
 window.angular = angular;

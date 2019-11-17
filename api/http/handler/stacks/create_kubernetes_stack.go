@@ -40,7 +40,7 @@ func (handler *Handler) createKubernetesStack(w http.ResponseWriter, r *http.Req
 
 	output, err := handler.deployKubernetesStack(endpoint, payload.StackFileContent, payload.ComposeFormat, payload.Namespace)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to deploy Kubernetes stack", err}
 	}
 
 	resp := &createKubernetesStackResponse{

@@ -194,9 +194,9 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 		Snapshots:          []portainer.Snapshot{},
 	}
 
-	err = handler.EndpointService.CreateEndpoint(endpoint)
+	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
 	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint inside the database", err}
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "An error occured while trying to create the endpoint", err}
 	}
 
 	return endpoint, nil
@@ -240,9 +240,9 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		EdgeKey:         edgeKey,
 	}
 
-	err = handler.EndpointService.CreateEndpoint(endpoint)
+	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
 	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint inside the database", err}
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "An error occured while trying to create the endpoint", err}
 	}
 
 	return endpoint, nil
@@ -390,9 +390,27 @@ func (handler *Handler) snapshotAndPersistEndpoint(endpoint *portainer.Endpoint)
 		endpoint.Snapshots = []portainer.Snapshot{*snapshot}
 	}
 
-	err = handler.EndpointService.CreateEndpoint(endpoint)
+	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "An error occured while trying to create the endpoint", err}
+	}
+
+	return nil
+}
+
+func (handler *Handler) saveEndpointAndUpdateAuthorizations(endpoint *portainer.Endpoint) error {
+	err := handler.EndpointService.CreateEndpoint(endpoint)
+	if err != nil {
+		return err
+	}
+
+	group, err := handler.EndpointGroupService.EndpointGroup(endpoint.GroupID)
+	if err != nil {
+		return err
+	}
+
+	if len(group.UserAccessPolicies) > 0 || len(group.TeamAccessPolicies) > 0 {
+		return handler.AuthorizationService.UpdateUsersAuthorizations()
 	}
 
 	return nil

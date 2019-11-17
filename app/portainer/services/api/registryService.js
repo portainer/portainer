@@ -1,4 +1,5 @@
-import { RegistryViewModel, RegistryCreateRequest } from '../../models/registry';
+import _ from 'lodash-es';
+import {RegistryCreateRequest, RegistryViewModel} from '../../models/registry';
 
 angular.module('portainer.app')
 .factory('RegistryService', ['$q', 'Registries', 'DockerHubService', 'RegistryHelper', 'ImageHelper', 'FileUploadService', function RegistryServiceFactory($q, Registries, DockerHubService, RegistryHelper, ImageHelper, FileUploadService) {
@@ -63,6 +64,19 @@ angular.module('portainer.app')
   service.createRegistry = function(model) {
     var payload = new RegistryCreateRequest(model);
     return Registries.create(payload).$promise;
+  };
+
+  service.createGitlabRegistries = function(model, projects) {
+    const promises = [];
+    _.forEach(projects, (p) => {
+      const m = model;
+      m.Name = p.PathWithNamespace;
+      m.Gitlab.ProjectId = p.Id;
+      m.Password = m.Token;
+      const payload = new RegistryCreateRequest(m);
+      promises.push(Registries.create(payload).$promise);
+    });
+    return $q.all(promises);
   };
 
   service.retrieveRegistryFromRepository = function(repository) {

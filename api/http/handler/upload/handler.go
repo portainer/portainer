@@ -22,6 +22,6 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		Router: mux.NewRouter(),
 	}
 	h.Handle("/upload/tls/{certificate:(?:ca|cert|key)}",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.uploadTLS))).Methods(http.MethodPost)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.uploadTLS))).Methods(http.MethodPost)
 	return h
 }

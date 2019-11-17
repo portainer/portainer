@@ -21,11 +21,11 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		Router: mux.NewRouter(),
 	}
 	h.Handle("/tags",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.tagCreate))).Methods(http.MethodPost)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.tagCreate))).Methods(http.MethodPost)
 	h.Handle("/tags",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.tagList))).Methods(http.MethodGet)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.tagList))).Methods(http.MethodGet)
 	h.Handle("/tags/{id}",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.tagDelete))).Methods(http.MethodDelete)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.tagDelete))).Methods(http.MethodDelete)
 
 	return h
 }

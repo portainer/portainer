@@ -1,7 +1,7 @@
 import bootbox from 'bootbox';
 
 angular.module('portainer.app')
-.factory('ModalService', [function ModalServiceFactory() {
+.factory('ModalService', [ '$sanitize', function ModalServiceFactory($sanitize) {
   'use strict';
   var service = {};
 
@@ -17,17 +17,18 @@ angular.module('portainer.app')
   var confirmButtons = function(options) {
     var buttons = {
       confirm: {
-        label: options.buttons.confirm.label,
-        className: options.buttons.confirm.className
+        label: $sanitize(options.buttons.confirm.label),
+        className: $sanitize(options.buttons.confirm.className)
       },
       cancel: {
-        label: options.buttons.cancel && options.buttons.cancel.label ? options.buttons.cancel.label : 'Cancel'
+        label: options.buttons.cancel && options.buttons.cancel.label ? $sanitize(options.buttons.cancel.label) : 'Cancel'
       }
     };
     return buttons;
   };
 
   service.enlargeImage = function(image) {
+    image = $sanitize(image);
     bootbox.dialog({
       message: '<img src="' + image + '" style="width:100%" />',
       className: 'image-zoom-modal',
@@ -45,7 +46,7 @@ angular.module('portainer.app')
     applyBoxCSS(box);
   };
 
-  service.prompt = function(options){
+  function prompt(options){
     var box = bootbox.prompt({
       title: options.title,
       inputType: options.inputType,
@@ -54,9 +55,9 @@ angular.module('portainer.app')
       callback: options.callback
     });
     applyBoxCSS(box);
-  };
+  }
 
-  service.customPrompt = function(options, optionToggled) {
+  function customPrompt(options, optionToggled) {
     var box = bootbox.prompt({
       title: options.title,
       inputType: options.inputType,
@@ -67,7 +68,7 @@ angular.module('portainer.app')
     applyBoxCSS(box);
     box.find('.bootbox-body').prepend('<p>' + options.message + '</p>');
     box.find('.bootbox-input-checkbox').prop('checked', optionToggled);
-  };
+  }
 
   service.confirmAccessControlUpdate = function(callback) {
     service.confirm({
@@ -97,7 +98,22 @@ angular.module('portainer.app')
     });
   };
 
+  service.cancelRegistryRepositoryAction = function(callback) {
+    service.confirm({
+      title: 'Are you sure?',
+      message: 'WARNING: interrupting this operation before it has finished will result in the loss of all tags. Are you sure you want to do this?',
+      buttons: {
+        confirm: {
+          label: 'Stop',
+          className: 'btn-danger'
+        }
+      },
+      callback: callback
+    });
+  };
+
   service.confirmDeletion = function(message, callback) {
+    message = $sanitize(message);
     service.confirm({
       title: 'Are you sure ?',
       message: message,
@@ -112,7 +128,7 @@ angular.module('portainer.app')
   };
 
   service.confirmContainerDeletion = function(title, callback) {
-    service.prompt({
+    prompt({
       title: title,
       inputType: 'checkbox',
       inputOptions: [
@@ -132,7 +148,7 @@ angular.module('portainer.app')
   };
 
   service.confirmContainerRecreation = function(callback) {
-    service.customPrompt({
+    customPrompt({
       title: 'Are you sure?',
       message: 'You\'re about to re-create this container, any non-persisted data will be lost. This container will be removed and another one will be created using the same configuration.',
       inputType: 'checkbox',
@@ -181,7 +197,7 @@ angular.module('portainer.app')
   };
 
   service.confirmServiceForceUpdate = function(message, callback) {
-    service.customPrompt({
+    customPrompt({
       title: 'Are you sure ?',
       message: message,
       inputType: 'checkbox',

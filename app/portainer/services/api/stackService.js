@@ -1,6 +1,5 @@
-
 import _ from 'lodash-es';
-import { StackViewModel, ExternalStackViewModel } from '../../models/stack';
+import {ExternalStackViewModel, StackViewModel} from '../../models/stack';
 
 angular.module('portainer.app')
 .factory('StackService', ['$q', '$async', 'Stack', 'ResourceControlService', 'FileUploadService', 'StackHelper', 'ServiceService', 'ContainerService', 'SwarmService', 'EndpointProvider',
@@ -208,11 +207,6 @@ function StackServiceFactory($q, $async, Stack, ResourceControlService, FileUplo
     var deferred = $q.defer();
 
     Stack.remove({ id: stack.Id ? stack.Id : stack.Name, external: external, endpointId: endpointId }).$promise
-    .then(function success() {
-      if (stack.ResourceControl && stack.ResourceControl.Id) {
-        return ResourceControlService.deleteResourceControl(stack.ResourceControl.Id);
-      }
-    })
     .then(function success() {
       deferred.resolve();
     })

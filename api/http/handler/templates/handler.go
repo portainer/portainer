@@ -27,15 +27,15 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	}
 
 	h.Handle("/templates",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.templateList))).Methods(http.MethodGet)
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.templateList))).Methods(http.MethodGet)
 	h.Handle("/templates",
-		bouncer.AuthorizedAccess(h.templateManagementCheck(httperror.LoggerHandler(h.templateCreate)))).Methods(http.MethodPost)
+		bouncer.AdminAccess(h.templateManagementCheck(httperror.LoggerHandler(h.templateCreate)))).Methods(http.MethodPost)
 	h.Handle("/templates/{id}",
-		bouncer.AuthorizedAccess(h.templateManagementCheck(httperror.LoggerHandler(h.templateInspect)))).Methods(http.MethodGet)
+		bouncer.RestrictedAccess(h.templateManagementCheck(httperror.LoggerHandler(h.templateInspect)))).Methods(http.MethodGet)
 	h.Handle("/templates/{id}",
-		bouncer.AuthorizedAccess(h.templateManagementCheck(httperror.LoggerHandler(h.templateUpdate)))).Methods(http.MethodPut)
+		bouncer.AdminAccess(h.templateManagementCheck(httperror.LoggerHandler(h.templateUpdate)))).Methods(http.MethodPut)
 	h.Handle("/templates/{id}",
-		bouncer.AuthorizedAccess(h.templateManagementCheck(httperror.LoggerHandler(h.templateDelete)))).Methods(http.MethodDelete)
+		bouncer.AdminAccess(h.templateManagementCheck(httperror.LoggerHandler(h.templateDelete)))).Methods(http.MethodDelete)
 	return h
 }
 

@@ -31,9 +31,9 @@ func (handler *Handler) proxyRequestsToKubernetesAPI(w http.ResponseWriter, r *h
 	}
 
 	var proxy http.Handler
-	proxy = handler.ProxyManager.GetProxy(endpoint)
+	proxy = handler.ProxyManager.GetEndpointProxy(endpoint)
 	if proxy == nil {
-		proxy, err = handler.ProxyManager.CreateAndRegisterProxy(endpoint)
+		proxy, err = handler.ProxyManager.CreateAndRegisterEndpointProxy(endpoint)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create proxy", err}
 		}

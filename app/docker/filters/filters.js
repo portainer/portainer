@@ -278,6 +278,9 @@ angular.module('portainer.docker')
 .filter('trimshasum', function () {
   'use strict';
   return function (imageName) {
+    if (!imageName) {
+      return;
+    }
     if (imageName.indexOf('sha256:') === 0) {
       return imageName.substring(7, 19);
     }

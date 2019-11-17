@@ -1,7 +1,7 @@
-import _ from "lodash-es";
-import { AccessControlFormData } from "Portainer/components/accessControlForm/porAccessControlFormModel";
+import _ from 'lodash-es';
+import {AccessControlFormData} from 'Portainer/components/accessControlForm/porAccessControlFormModel';
 
-import angular from "angular";
+import angular from 'angular';
 
 class CreateConfigController {
   /* @ngInject */
@@ -104,9 +104,9 @@ class CreateConfigController {
   }
 
   async createAsync() {
-    let accessControlData = this.formValues.AccessControlData;
-    let userDetails = this.Authentication.getUserDetails();
-    let isAdmin = this.Authentication.isAdmin();
+    const accessControlData = this.formValues.AccessControlData;
+    const userDetails = this.Authentication.getUserDetails();
+    const isAdmin = this.Authentication.isAdmin();
 
     if (this.formValues.ConfigContent === "") {
       this.state.formValidationError = "Config content must not be empty";
@@ -117,19 +117,13 @@ class CreateConfigController {
       return;
     }
 
-    let config = this.prepareConfiguration();
+    const config = this.prepareConfiguration();
 
     try {
-      let data = await this.ConfigService.create(config);
-      let configIdentifier = data.ID;
-      let userId = userDetails.ID;
-      await this.ResourceControlService.applyResourceControl(
-        "config",
-        configIdentifier,
-        userId,
-        accessControlData,
-        []
-      );
+      const data = await this.ConfigService.create(config);
+      const resourceControl = data.Portainer.ResourceControl;
+      const userId = userDetails.ID;
+      await this.ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
       this.Notifications.success("Config successfully created");
       this.$state.go("docker.configs", {}, { reload: true });
     } catch (err) {

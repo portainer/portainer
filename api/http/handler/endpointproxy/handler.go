@@ -25,12 +25,12 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		requestBouncer: bouncer,
 	}
 	h.PathPrefix("/{id}/azure").Handler(
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.proxyRequestsToAzureAPI)))
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.proxyRequestsToAzureAPI)))
 	h.PathPrefix("/{id}/docker").Handler(
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.proxyRequestsToDockerAPI)))
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.proxyRequestsToDockerAPI)))
 	h.PathPrefix("/{id}/kubernetes").Handler(
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.proxyRequestsToKubernetesAPI)))
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.proxyRequestsToKubernetesAPI)))
 	h.PathPrefix("/{id}/storidge").Handler(
-		bouncer.RestrictedAccess(httperror.LoggerHandler(h.proxyRequestsToStoridgeAPI)))
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.proxyRequestsToStoridgeAPI)))
 	return h
 }

@@ -1,5 +1,5 @@
-import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
-import { VolumesNFSFormData } from '../../../components/volumesNFSForm/volumesNFSFormModel';
+import {AccessControlFormData} from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
+import {VolumesNFSFormData} from '../../../components/volumesNFSForm/volumesNFSFormModel';
 
 angular.module('portainer.docker')
 .controller('CreateVolumeController', ['$q', '$scope', '$state', 'VolumeService', 'PluginService', 'ResourceControlService', 'Authentication', 'Notifications', 'FormValidator', 'HttpRequestHelper',
@@ -81,9 +81,9 @@ function ($q, $scope, $state, VolumeService, PluginService, ResourceControlServi
     $scope.state.actionInProgress = true;
     VolumeService.createVolume(volumeConfiguration)
     .then(function success(data) {
-      var volumeIdentifier = data.Id;
-      var userId = userDetails.ID;
-      return ResourceControlService.applyResourceControl('volume', volumeIdentifier, userId, accessControlData, []);
+      const userId = userDetails.ID;
+      const resourceControl = data.ResourceControl;
+      return ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
     })
     .then(function success() {
       Notifications.success('Volume successfully created');

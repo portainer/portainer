@@ -1,7 +1,7 @@
-import { VolumeViewModel } from '../models/volume';
+import {VolumeViewModel} from '../models/volume';
 
 angular.module('portainer.docker')
-.factory('VolumeService', ['$q', 'Volume', 'VolumeHelper', 'ResourceControlService', function VolumeServiceFactory($q, Volume, VolumeHelper, ResourceControlService) {
+.factory('VolumeService', ['$q', 'Volume', 'VolumeHelper', function VolumeServiceFactory($q, Volume, VolumeHelper) {
   'use strict';
   var service = {};
 
@@ -45,13 +45,9 @@ angular.module('portainer.docker')
     .then(function success(data) {
       if (data.message) {
         deferred.reject({ msg: data.message, err: data.message });
+      } else {
+        deferred.resolve();
       }
-      if (volume.ResourceControl && volume.ResourceControl.Type === 3) {
-        return ResourceControlService.deleteResourceControl(volume.ResourceControl.Id);
-      }
-    })
-    .then(function success() {
-      deferred.resolve();
     })
     .catch(function error(err) {
       deferred.reject({ msg: 'Unable to remove volume', err: err });

@@ -12,6 +12,31 @@
 </rd-header>
 
 <div class="row">
+  <information-panel ng-if="!state.tagsRetrieval.auto" title-text="Information regarding repository size">
+    <span class="small text-muted">
+      <p>
+        <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+        Portainer needs to retrieve additional information to enable <code>tags modifications (addition, removal, rename)</code> and <code>repository removal</code> features.<br>
+        As this repository contains more than <code>{{ state.tagsRetrieval.limit }}</code> tags, the additional retrieval wasn't started automatically.<br>
+        Once started you can still navigate this page, leaving the page will cancel the retrieval process.<br>
+        <br>
+        <span style="font-weight: 700">Note:</span> on very large repositories or high latency environments the retrieval process can take a few minutes.
+      </p>
+      <button class="btn btn-sm btn-primary" ng-if="!state.tagsRetrieval.running && short.Tags.length === 0"
+        ng-click="startStopRetrieval()">Start</button>
+      <button class="btn btn-sm btn-danger" ng-if="state.tagsRetrieval.running"
+        ng-click="startStopRetrieval()">Cancel</button>
+    </span>
+    <span ng-if="state.tagsRetrieval.running && state.tagsRetrieval.progression !== '100'">
+      &nbsp; Retrieval progress : {{ state.tagsRetrieval.progression }}% - {{ state.tagsRetrieval.elapsedTime | number:0 }}s
+    </span>
+    <span ng-if="!state.tagsRetrieval.running && state.tagsRetrieval.progression === '100'">
+      <i class="fa fa-check-circle green-icon"></i> Retrieval completed in {{ state.tagsRetrieval.elapsedTime | number:0}}s
+    </span>
+  </information-panel>
+</div>
+
+<div class="row">
   <div class="col-sm-8">
     <rd-widget>
       <rd-widget-header icon="fa-info" title-text="Repository information">
@@ -23,7 +48,9 @@
               <td>Repository</td>
               <td>
                 {{ repository.Name }}
-                <button class="btn btn-xs btn-danger" ng-click="removeRepository()">
+              </td>
+              <td>
+                <button class="btn btn-xs btn-danger" ng-if="!state.tagsRetrieval.running && state.tagsRetrieval.progression !== 0" ng-click="removeRepository()">
                   <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this repository
                 </button>
               </td>
@@ -31,10 +58,12 @@
             <tr>
               <td>Tags count</td>
               <td>{{ repository.Tags.length }}</td>
+              <td></td>
             </tr>
-            <tr>
+            <tr ng-if="short.Images.length">
               <td>Images count</td>
-              <td>{{ repository.Images.length }}</td>
+              <td>{{ short.Images.length }}</td>
+              <td></td>
             </tr>
           </tbody>
         </table>
@@ -42,14 +71,16 @@
     </rd-widget>
   </div>
 
-  <div class="col-sm-4">
+  <div class="col-sm-4" ng-if="short.Images.length > 0">
     <rd-widget>
       <rd-widget-header icon="fa-plus" title-text="Add tag">
       </rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <div class="form-group">
-            <label for="tag" class="col-sm-3 col-lg-2 control-label text-left">Tag</label>
+            <label for="tag" class="col-sm-3 col-lg-2 control-label text-left">Tag
+              <portainer-tooltip position="bottom" message="Tag can only contain alphanumeric (a-zA-Z0-9) and special _ . - characters. Tag must not start with . - characters."></portainer-tooltip>
+            </label>
             <div class="col-sm-9 col-lg-10">
               <input type="text" class="form-control" id="tag" ng-model="formValues.Tag">
             </div>
@@ -58,10 +89,10 @@
             <label for="image" class="col-sm-3 col-lg-2 control-label text-left">Image</label>
             <ui-select class="col-sm-9 col-lg-10" ng-model="formValues.SelectedImage" id="image">
               <ui-select-match placeholder="Select an image" allow-clear="true">
-                <span>{{ $select.selected }}</span>
+                <span>{{ $select.selected | trimshasum }}</span>
               </ui-select-match>
-              <ui-select-choices repeat="image in (repository.Images | filter: $select.search)">
-                <span>{{ image }}</span>
+              <ui-select-choices repeat="image in (short.Images | filter: $select.search)">
+                <span>{{ image | trimshasum }}</span>
               </ui-select-choices>
             </ui-select>
           </div>
@@ -83,6 +114,10 @@
 <div class="row">
   <div class="col-sm-12">
     <registries-repository-tags-datatable title-text="Tags" title-icon="fa-tags" dataset="tags" table-key="registryRepositoryTags"
-      order-by="Name" remove-action="removeTags" retag-action="retagAction"></registries-repository-tags-datatable>
+      order-by="Name" remove-action="removeTags" retag-action="retagAction"
+      advanced-features-available="short.Images.length > 0"
+      pagination-action="paginationAction"
+      loading="state.loading">
+    </registries-repository-tags-datatable>
   </div>
 </div>

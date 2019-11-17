@@ -5,9 +5,13 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/docker/cli/cli/compose/loader"
+	"github.com/docker/cli/cli/compose/types"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
+	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 func (handler *Handler) cleanUp(stack *portainer.Stack, doCleanUp *bool) error {
@@ -51,11 +55,16 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
 	}
 
+	tokenData, err := security.RetrieveTokenData(r)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user details from authentication token", err}
+	}
+
 	switch portainer.StackType(stackType) {
 	case portainer.DockerSwarmStack:
-		return handler.createSwarmStack(w, r, method, endpoint)
+		return handler.createSwarmStack(w, r, method, endpoint, tokenData.ID)
 	case portainer.DockerComposeStack:
-		return handler.createComposeStack(w, r, method, endpoint)
+		return handler.createComposeStack(w, r, method, endpoint, tokenData.ID)
 	case portainer.KubernetesStack:
 		return handler.createKubernetesStack(w, r, endpoint)
 	}
@@ -63,29 +72,76 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: type. Value must be one of: 1 (Swarm stack) or 2 (Compose stack)", errors.New(request.ErrInvalidQueryParameter)}
 }
 
-func (handler *Handler) createComposeStack(w http.ResponseWriter, r *http.Request, method string, endpoint *portainer.Endpoint) *httperror.HandlerError {
+func (handler *Handler) createComposeStack(w http.ResponseWriter, r *http.Request, method string, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 
 	switch method {
 	case "string":
-		return handler.createComposeStackFromFileContent(w, r, endpoint)
+		return handler.createComposeStackFromFileContent(w, r, endpoint, userID)
 	case "repository":
-		return handler.createComposeStackFromGitRepository(w, r, endpoint)
+		return handler.createComposeStackFromGitRepository(w, r, endpoint, userID)
 	case "file":
-		return handler.createComposeStackFromFileUpload(w, r, endpoint)
+		return handler.createComposeStackFromFileUpload(w, r, endpoint, userID)
 	}
 
 	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: method. Value must be one of: string, repository or file", errors.New(request.ErrInvalidQueryParameter)}
 }
 
-func (handler *Handler) createSwarmStack(w http.ResponseWriter, r *http.Request, method string, endpoint *portainer.Endpoint) *httperror.HandlerError {
+func (handler *Handler) createSwarmStack(w http.ResponseWriter, r *http.Request, method string, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	switch method {
 	case "string":
-		return handler.createSwarmStackFromFileContent(w, r, endpoint)
+		return handler.createSwarmStackFromFileContent(w, r, endpoint, userID)
 	case "repository":
-		return handler.createSwarmStackFromGitRepository(w, r, endpoint)
+		return handler.createSwarmStackFromGitRepository(w, r, endpoint, userID)
 	case "file":
-		return handler.createSwarmStackFromFileUpload(w, r, endpoint)
+		return handler.createSwarmStackFromFileUpload(w, r, endpoint, userID)
 	}
 
 	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: method. Value must be one of: string, repository or file", errors.New(request.ErrInvalidQueryParameter)}
+}
+
+func (handler *Handler) isValidStackFile(stackFileContent []byte) (bool, error) {
+	composeConfigYAML, err := loader.ParseYAML(stackFileContent)
+	if err != nil {
+		return false, err
+	}
+
+	composeConfigFile := types.ConfigFile{
+		Config: composeConfigYAML,
+	}
+
+	composeConfigDetails := types.ConfigDetails{
+		ConfigFiles: []types.ConfigFile{composeConfigFile},
+		Environment: map[string]string{},
+	}
+
+	composeConfig, err := loader.Load(composeConfigDetails, func(options *loader.Options) {
+		options.SkipValidation = true
+		options.SkipInterpolation = true
+	})
+	if err != nil {
+		return false, err
+	}
+
+	for key := range composeConfig.Services {
+		service := composeConfig.Services[key]
+		for _, volume := range service.Volumes {
+			if volume.Type == "bind" {
+				return false, nil
+			}
+		}
+	}
+
+	return true, nil
+}
+
+func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *portainer.Stack, userID portainer.UserID) *httperror.HandlerError {
+	resourceControl := portainer.NewPrivateResourceControl(stack.Name, portainer.StackResourceControl, userID)
+
+	err := handler.ResourceControlService.CreateResourceControl(resourceControl)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist resource control inside the database", err}
+	}
+
+	stack.ResourceControl = resourceControl
+	return response.JSON(w, stack)
 }

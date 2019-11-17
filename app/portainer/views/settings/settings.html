@@ -103,6 +103,17 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
+              <label for="toggle_allowvolumebrowser" class="control-label text-left">
+                Enable volume management for non-administrators
+                <portainer-tooltip position="bottom" message="When enabled, non-admin users & users with helpdesk, standard and read-only roles from the RBAC extension will be able to use Portainer volume management features."></portainer-tooltip>
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" name="toggle_allowvolumebrowser" ng-model="formValues.enableVolumeBrowser"><i></i>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
               <label for="toggle_enableHostManagementFeatures" class="control-label text-left">
                 Enable host management features
                 <portainer-tooltip position="bottom" message="Enables host management features: host scheduler, host browsing and command execution. You'll need to set the CAP_HOST_MANAGEMENT variable when deploying the Portainer agent to use some of these features."></portainer-tooltip>
