@@ -303,6 +303,7 @@ type (
 		Name           string         `json:"Name"`
 		Description    string         `json:"Description"`
 		Authorizations Authorizations `json:"Authorizations"`
+		Priority       int            `json:"Priority"`
 	}
 
 	// AccessPolicy represent a policy that can be associated to a user or team

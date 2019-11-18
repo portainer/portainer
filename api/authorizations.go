@@ -771,37 +771,25 @@ func getAuthorizationsFromTeamEndpointGroupPolicies(memberships []TeamMembership
 }
 
 func getAuthorizationsFromRoles(roleIdentifiers []RoleID, roles []Role) Authorizations {
-	var roleAuthorizations []Authorizations
+	var associatedRoles []Role
+
 	for _, id := range roleIdentifiers {
 		for _, role := range roles {
 			if role.ID == id {
-				roleAuthorizations = append(roleAuthorizations, role.Authorizations)
+				associatedRoles = append(associatedRoles, role)
 				break
 			}
 		}
 	}
 
-	processedAuthorizations := make(Authorizations)
-	if len(roleAuthorizations) > 0 {
-		processedAuthorizations = roleAuthorizations[0]
-		for idx, authorizations := range roleAuthorizations {
-			if idx == 0 {
-				continue
-			}
-			processedAuthorizations = mergeAuthorizations(processedAuthorizations, authorizations)
+	var authorizations Authorizations
+	highestPriority := 0
+	for _, role := range associatedRoles {
+		if role.Priority > highestPriority {
+			highestPriority = role.Priority
+			authorizations = role.Authorizations
 		}
 	}
 
-	return processedAuthorizations
-}
-
-func mergeAuthorizations(a, b Authorizations) Authorizations {
-	c := make(map[Authorization]bool)
-
-	for k := range b {
-		if _, ok := a[k]; ok {
-			c[k] = true
-		}
-	}
-	return c
+	return authorizations
 }
