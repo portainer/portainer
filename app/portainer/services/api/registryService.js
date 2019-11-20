@@ -81,6 +81,7 @@ angular.module('portainer.app')
 
   service.retrieveRegistryFromRepository = function(repository) {
     var deferred = $q.defer();
+    console.log('registry', repository);
 
     var imageDetails = ImageHelper.extractImageAndRegistryFromRepository(repository);
     $q.when(imageDetails.registry ? service.registries() : DockerHubService.dockerhub())

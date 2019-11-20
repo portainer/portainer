@@ -10,6 +10,7 @@ function TemplateServiceFactory($q, Templates, TemplateHelper, ImageHelper, Cont
   'use strict';
   var service = {};
 
+  // TODO CHANGE
   service.templates = function() {
     var deferred = $q.defer();
 
@@ -27,6 +28,7 @@ function TemplateServiceFactory($q, Templates, TemplateHelper, ImageHelper, Cont
     return deferred.promise;
   };
 
+  // TODO CHANGE
   service.template = function(id) {
     var deferred = $q.defer();
 
@@ -47,18 +49,20 @@ function TemplateServiceFactory($q, Templates, TemplateHelper, ImageHelper, Cont
     return Templates.remove({ id: id }).$promise;
   };
 
+  // TODO CHANGE
   service.create = function(model) {
     var payload = new TemplateCreateRequest(model);
     return Templates.create(payload).$promise;
   };
 
+  // TODO CHANGE
   service.update = function(model) {
     var payload = new TemplateUpdateRequest(model);
     return Templates.update(payload).$promise;
   };
 
   service.createTemplateConfiguration = function(template, containerName, network) {
-    var imageConfiguration = ImageHelper.createImageConfigForContainer(template.Image, template.Registry);
+    var imageConfiguration = ImageHelper.createImageConfigForContainer(template.RegistryModel);
     var containerConfiguration = service.createContainerConfiguration(template, containerName, network);
     containerConfiguration.Image = imageConfiguration.fromImage + ':' + imageConfiguration.tag;
     return containerConfiguration;

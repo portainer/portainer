@@ -20,10 +20,12 @@ class porImageRegistryController {
       this.autoComplete ? this.ImageService.images() : []]);
       this.availableImages = this.ImageService.getUniqueTagListFromImages(availableImages);
       this.availableRegistries = [dockerhub].concat(registries);
-      if (!this.registry.Id) {
-        this.registry = dockerhub;
+
+      const id = this.model.Registry.Id;
+      if (!id) {
+        this.model.Registry = dockerhub;
       } else {
-        this.registry = _.find(this.availableRegistries, { 'Id': this.registry.Id });
+        this.model.Registry = _.find(this.availableRegistries, { 'Id': id });
       }
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve registries');
@@ -31,7 +33,6 @@ class porImageRegistryController {
   }
 
   $onInit() {
-    this.useRegistry = true;
     return this.$async(this.onInit);
   }
 }

@@ -1,4 +1,4 @@
-// import _ from 'lodash-es';
+import _ from 'lodash-es';
 
 angular.module('portainer.docker')
 .factory('ImageHelper', [function ImageHelperFactory() {
@@ -7,6 +7,7 @@ angular.module('portainer.docker')
   var helper = {};
 
   helper.isValidTag = isValidTag;
+  helper.createImageConfigForContainer = createImageConfigForContainer;
 
   function isValidTag(tag) {
     return tag.match(/^(?![\.\-])([a-zA-Z0-9\_\.\-])+$/g);
@@ -42,13 +43,30 @@ angular.module('portainer.docker')
     };
   };
 
-  helper.createImageConfigForContainer = function (imageName, registry) {
-    void registry;
-    console.log(imageName);
-    return {
-      fromImage: imageName
+  /**
+   * 
+   * @param {PorImageRegistryModel} registry
+   */
+  function createImageConfigForContainer(registry) {
+    console.log('registry', registry);
+    const data = {
+      fromImage: ''
+    };
+    let fullImageName = '';
+
+    if (registry.UseRegistry) {
+      fullImageName = registry.Registry.URL + '/' + registry.Image;
+      if (!_.includes(registry.Image, ':')) {
+        fullImageName += ':latest';
+      }
+    } else {
+      fullImageName = registry.Image;
     }
-  };
+
+    data.fromImage = fullImageName;
+    console.log('FULL IMAGE NAME', fullImageName);
+    return data;
+  }
 
   helper.removeDigestFromRepository = function(repository) {
     return repository.split('@sha')[0];

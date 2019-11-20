@@ -108,7 +108,6 @@ function ContainerServiceFactory($q, Container, ResourceControlService, LogHelpe
   service.createAndStartContainer = function(configuration) {
     var deferred = $q.defer();
     var container;
-    console.log(configuration);
     service.createContainer(configuration)
     .then(function success(data) {
       container = data;

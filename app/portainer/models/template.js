@@ -1,19 +1,20 @@
 import _ from 'lodash-es';
+import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
 export function TemplateDefaultModel() {
   this.Type = 1;
   this.AdministratorOnly = false;
   this.Title = '';
-  this.Image = '';
   this.Description = '';
   this.Volumes = [];
   this.Ports = [];
   this.Env = [];
   this.Labels = [];
   this.RestartPolicy = 'always';
-  this.Registry = {};
+  this.RegistryModel = new PorImageRegistryModel();
 }
 
+// TODO CHANGE
 export function TemplateCreateRequest(model) {
   this.Type = model.Type;
   this.Name = model.Name;
@@ -24,8 +25,8 @@ export function TemplateCreateRequest(model) {
   this.Categories = model.Categories;
   this.Platform = model.Platform;
   this.Logo = model.Logo;
-  this.Image = model.Image;
-  this.Registry = model.Registry.URL;
+  this.Image = model.RegistryModel.Image;
+  this.Registry = model.RegistryModel.Registry.URL;
   this.Command = model.Command;
   this.Network = model.Network && model.Network.Name;
   this.Privileged = model.Privileged;
@@ -53,6 +54,7 @@ export function TemplateUpdateRequest(model) {
   this.id = model.Id;
 }
 
+// TODO CHANGE
 export function TemplateViewModel(data) {
   this.Id = data.Id;
   this.Title = data.title;
@@ -66,9 +68,9 @@ export function TemplateViewModel(data) {
   this.Logo = data.logo;
   this.Repository = data.repository;
   this.Hostname = data.hostname;
-  this.Registry = data.registry ? { URL: data.registry } : {};
-  this.Image = data.image;
-  this.Registry = data.registry ? data.registry : '';
+  this.Registry = data.registry ? { URL: data.registry } : {}; // CHANGE
+  this.Image = data.image; // CHANGE
+  this.Registry = data.registry ? data.registry : ''; // CHANGE
   this.Command = data.command ? data.command : '';
   this.Network = data.network ? data.network : '';
   this.Privileged = data.privileged ? data.privileged : false;

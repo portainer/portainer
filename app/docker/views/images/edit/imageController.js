@@ -1,11 +1,11 @@
 import _ from 'lodash-es';
+import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
 angular.module('portainer.docker')
 .controller('ImageController', ['$q', '$scope', '$transition$', '$state', '$timeout', 'ImageService', 'RegistryService', 'Notifications', 'HttpRequestHelper', 'ModalService', 'FileSaver', 'Blob',
 function ($q, $scope, $transition$, $state, $timeout, ImageService, RegistryService, Notifications, HttpRequestHelper, ModalService, FileSaver, Blob) {
 	$scope.formValues = {
-		Image: '',
-		Registry: ''
+		RegistryModel: new PorImageRegistryModel()
 	};
 
 	$scope.state = {
@@ -26,6 +26,7 @@ function ($q, $scope, $transition$, $state, $timeout, ImageService, RegistryServ
 		$('#layer-command-'+layerId+'-full').toggle();
 	};
 
+	// TODO CHANGE
 	$scope.tagImage = function() {
 		var image = $scope.formValues.Image;
 		var registry = $scope.formValues.Registry;
@@ -40,6 +41,7 @@ function ($q, $scope, $transition$, $state, $timeout, ImageService, RegistryServ
 		});
 	};
 
+	// TODO CHANGE
 	$scope.pushTag = function(repository) {
 		$('#uploadResourceHint').show();
 		RegistryService.retrieveRegistryFromRepository(repository)
@@ -58,12 +60,13 @@ function ($q, $scope, $transition$, $state, $timeout, ImageService, RegistryServ
 		});
 	};
 
+	// TODO CHANGE
 	$scope.pullTag = function(repository) {
 		$('#downloadResourceHint').show();
 		RegistryService.retrieveRegistryFromRepository(repository)
 		.then(function success(data) {
 			var registry = data;
-			return ImageService.pullImage(repository, registry, false);
+			return ImageService.pullImage(registry, false);
 		})
 		.then(function success() {
 			Notifications.success('Image successfully pulled', repository);

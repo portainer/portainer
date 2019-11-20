@@ -127,19 +127,26 @@ angular.module('portainer.docker')
     return deferred.promise;
   }
 
-  service.pullImage = function(image, registry, ignoreErrors) {
+  service.pullImage = pullImage;
+
+  /**
+   * 
+   * @param {PorImageRegistryModel} registry 
+   * @param {bool} ignoreErrors 
+   */
+  function pullImage(registry, ignoreErrors) {
     // var imageDetails = ImageHelper.extractImageAndRegistryFromRepository(image);
     // var imageConfiguration = ImageHelper.createImageConfigForContainer(imageDetails.image, registry.URL);
-    var authenticationDetails = registry.Authentication ? RegistryService.encodedCredentials(registry) : '';
+    var authenticationDetails = registry.Registry.Authentication ? RegistryService.encodedCredentials(registry.Registry) : '';
     HttpRequestHelper.setRegistryAuthenticationHeader(authenticationDetails);
 
-    var imageConfiguration = ImageHelper.createImageConfigForContainer(image, registry.URL);
+    var imageConfiguration = ImageHelper.createImageConfigForContainer(registry);
 
     if (ignoreErrors) {
       return pullImageAndIgnoreErrors(imageConfiguration);
     }
     return pullImageAndAcknowledgeErrors(imageConfiguration);
-  };
+  }
 
   service.tagImage = function(id, image, registry) {
     void registry;

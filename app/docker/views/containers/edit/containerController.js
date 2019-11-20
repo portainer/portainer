@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
 angular.module('portainer.docker')
 .controller('ContainerController', ['$q', '$scope', '$state','$transition$', '$filter', 'Commit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'NetworkService', 'Notifications', 'ModalService', 'ResourceControlService', 'RegistryService', 'ImageService', 'HttpRequestHelper', 'Authentication',
@@ -7,8 +8,7 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
   $scope.portBindings = [];
 
   $scope.config = {
-    Image: '',
-    Registry: ''
+    RegistryModel: new PorImageRegistryModel()
   };
 
   $scope.state = {
@@ -149,6 +149,7 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
     });
   };
 
+  // TODO CHANGE
   $scope.commit = function () {
     const image = $scope.config.Image;
     $scope.config.Image = '';
@@ -223,13 +224,10 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
       if (!pullImage) {
         return $q.when();
       }
-      return getRegistry().then(function pullImage(containerRegistery) {
-        return ImageService.pullImage(container.Config.Image, containerRegistery, true);
+      return RegistryService.retrieveRegistryFromRepository(container.Config.Image)
+      .then(function pullImage(containerRegistry) {
+        return ImageService.pullImage(containerRegistry, true);
       });
-    }
-
-    function getRegistry() {
-      return RegistryService.retrieveRegistryFromRepository(container.Config.Image);
     }
 
     function setMainNetworkAndCreateContainer() {

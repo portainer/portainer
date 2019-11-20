@@ -25,7 +25,8 @@ function ImageFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, HttpR
       ignoreLoadingBar: true
     },
     create: {
-      method: 'POST', params: {action: 'create', fromImage: '@fromImage', tag: '@tag'},
+      // method: 'POST', params: {action: 'create', fromImage: '@fromImage', tag: '@tag'},
+      method: 'POST', params: {action: 'create', fromImage: '@fromImage'},
       isArray: true, transformResponse: jsonObjectsToArrayHandler,
       headers: { 'X-Registry-Auth': HttpRequestHelper.registryAuthenticationHeader },
       ignoreLoadingBar: true
