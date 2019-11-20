@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"log"
+	"os"
 	"os/exec"
 	"path"
 	"runtime"
@@ -195,7 +196,7 @@ func validateLicense(binaryPath, licenseKey string) ([]string, error) {
 	err := licenseCheckProcess.Run()
 	if err != nil {
 		log.Printf("[DEBUG] [exec,extension] [message: unable to run extension process] [err: %s]", err)
-		return nil, errors.New("Invalid extension license key")
+		return nil, errors.New("invalid extension license key")
 	}
 
 	output := string(cmdOutput.Bytes())
@@ -205,6 +206,9 @@ func validateLicense(binaryPath, licenseKey string) ([]string, error) {
 
 func (manager *ExtensionManager) startExtensionProcess(extension *portainer.Extension, binaryPath string) error {
 	extensionProcess := exec.Command(binaryPath, "-license", extension.License.LicenseKey)
+	extensionProcess.Stdout = os.Stdout
+	extensionProcess.Stderr = os.Stderr
+
 	err := extensionProcess.Start()
 	if err != nil {
 		return err
