@@ -47,7 +47,7 @@
     "@babel/polyfill": "^7.2.5",
     "@fortawesome/fontawesome-free": "^5.11.2",
     "@uirouter/angularjs": "~1.0.6",
-    "angular": "~1.5.0",
+    "angular": "~1.7.9",
     "angular-clipboard": "^1.6.2",
     "angular-cookies": "~1.5.0",
     "angular-file-saver": "^1.1.3",
