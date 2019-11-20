@@ -891,6 +891,7 @@ type (
 	// ExtensionManager represents a service used to manage extensions
 	ExtensionManager interface {
 		FetchExtensionDefinitions() ([]Extension, error)
+		InstallExtension(extension *Extension, licenseKey string, archiveFileName string, extensionArchive []byte) error
 		EnableExtension(extension *Extension, licenseKey string) error
 		DisableExtension(extension *Extension) error
 		UpdateExtension(extension *Extension, version string) error
@@ -942,6 +943,8 @@ const (
 	ExtensionServer = "localhost"
 	// DefaultEdgeAgentCheckinIntervalInSeconds represents the default interval (in seconds) used by Edge agents to checkin with the Portainer instance
 	DefaultEdgeAgentCheckinIntervalInSeconds = 5
+	// LocalExtensionManifestFile represents the name of the local manifest file for extensions
+	LocalExtensionManifestFile = "/app/extensions.json"
 )
 
 const (

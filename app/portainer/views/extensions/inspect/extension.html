@@ -68,10 +68,10 @@
                 <btn class="btn btn-primary btn-sm" style="width: 100%; margin-left: 0;" disabled>Coming soon</btn>
               </div>
 
-              <div style="margin-top: 15px;" ng-if="extension.Enabled && extension.UpdateAvailable">
-                <button type="button" class="btn btn-primary btn-sm" ng-click="updateExtension(extension)" ng-disabled="state.updateInProgress" button-spinner="state.updateInProgress" style="width: 100%; margin-left: 0;">
-                  <span ng-hide="state.updateInProgress">Update</span>
-                  <span ng-show="state.updateInProgress">Updating extension...</span>
+              <div style="margin-top: 15px;" ng-if="extension.Enabled && extension.UpdateAvailable && !state.offlineUpdate">
+                <button type="button" class="btn btn-primary btn-sm" ng-click="updateExtensionOnline(extension)" ng-disabled="state.onlineUpdateInProgress" button-spinner="state.onlineUpdateInProgress" style="width: 100%; margin-left: 0;">
+                  <span ng-hide="state.onlineUpdateInProgress">Update via Internet</span>
+                  <span ng-show="state.onlineUpdateInProgress">Updating extension...</span>
                 </button>
               </div>
 
@@ -82,10 +82,60 @@
                 </button>
               </div>
 
-            </div>
+              <div style="margin-top: 15px;" ng-if="extension.Enabled && extension.UpdateAvailable">
+                <p>
+                  <a class="small interactive" ng-if="!state.offlineUpdate" ng-click="state.offlineUpdate = true;">
+                    <i class="fa fa-toggle-off space-right" aria-hidden="true"></i> Switch to offline update
+                  </a>
+                  <a class="small interactive" ng-if="state.offlineUpdate" ng-click="state.offlineUpdate = false;">
+                    <i class="fa fa-wifi space-right" aria-hidden="true"></i> Switch to online update
+                  </a>
+                </p>
+              </div>
 
+            </div>
           </div>
         </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-if="extension && state.offlineUpdate">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+        <form class="form-horizontal">
+        <div class="col-sm-12 form-section-title">
+          <span>
+            Offline update
+          </span>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-12">
+            <p class="small text-muted" ng-if="state.offlineUpdate">
+              You will need to upload the extension archive manually. You can download the latest version of our extensions <a target="_blank" href="https://download.portainer.io/extensions.zip">here</a>.
+            </p>
+          </div>
+        </div>
+        <div class="form-group" ng-if="state.offlineUpdate">
+          <div class="col-sm-12">
+            <button type="button" class="btn btn-primary btn-sm" ngf-select ng-model="formValues.ExtensionFile" style="margin-left: 0px;">Select file</button>
+            <span style="margin-left: 5px;">
+                {{ formValues.ExtensionFile.name }}
+                <i class="fa fa-times red-icon" ng-if="!formValues.ExtensionFile" aria-hidden="true"></i>
+              </span>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-12">
+            <button type="button" class="btn btn-primary btn-sm" ng-click="updateExtensionOffline(extension)" ng-disabled="state.offlineUpdateInProgress || !formValues.ExtensionFile" button-spinner="state.offlineUpdateInProgress" style="margin-left: 0px;">
+              <span ng-hide="state.offlineUpdateInProgress">Update extension</span>
+              <span ng-show="state.offlineUpdateInProgress">Updating extension...</span>
+            </button>
+          </div>
+        </div>
+        </form>
       </rd-widget-body>
     </rd-widget>
   </div>
@@ -107,7 +157,7 @@
           <div class="small text-muted">
             <p>
               <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true"></i>
-              Description for this extension unavailable at the moment.
+              Unable to provide a description in an offline environment.
             </p>
           </div>
         </div>
@@ -116,7 +166,7 @@
   </div>
 </div>
 
-<div class="row" ng-if="extension">
+<div class="row" ng-if="extension.Description && extension.Images">
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-body>
