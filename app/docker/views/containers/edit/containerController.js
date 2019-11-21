@@ -2,13 +2,14 @@ import moment from 'moment';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
 angular.module('portainer.docker')
-.controller('ContainerController', ['$q', '$scope', '$state','$transition$', '$filter', 'Commit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'NetworkService', 'Notifications', 'ModalService', 'ResourceControlService', 'RegistryService', 'ImageService', 'HttpRequestHelper', 'Authentication',
-function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, ContainerService, ImageHelper, NetworkService, Notifications, ModalService, ResourceControlService, RegistryService, ImageService, HttpRequestHelper, Authentication) {
+.controller('ContainerController', ['$q', '$scope', '$state','$transition$', '$filter', '$async', 'Commit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'NetworkService', 'Notifications', 'ModalService', 'ResourceControlService', 'RegistryService', 'ImageService', 'HttpRequestHelper', 'Authentication',
+function ($q, $scope, $state, $transition$, $filter, $async, Commit, ContainerHelper, ContainerService, ImageHelper, NetworkService, Notifications, ModalService, ResourceControlService, RegistryService, ImageService, HttpRequestHelper, Authentication) {
   $scope.activityTime = 0;
   $scope.portBindings = [];
 
   $scope.config = {
-    RegistryModel: new PorImageRegistryModel()
+    RegistryModel: new PorImageRegistryModel(),
+    commitInProgress: false
   };
 
   $scope.state = {
@@ -149,19 +150,23 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
     });
   };
 
-  // TODO CHANGE
-  $scope.commit = function () {
-    const image = $scope.config.Image;
-    $scope.config.Image = '';
-    Commit.commitContainer({id: $transition$.params().id, repo: image}, function () {
-      update();
+  async function commitContainerAsync() {
+    $scope.config.commitInProgress = true;
+    const registryModel = $scope.config.RegistryModel;
+    const imageConfig = ImageHelper.createImageConfigForContainer(registryModel);
+    try {
+      await Commit.commitContainer({id: $transition$.params().id, repo: imageConfig.fromImage}).$promise;
       Notifications.success('Image created', $transition$.params().id);
-    }, function (e) {
-      update();
-      Notifications.error('Failure', e, 'Unable to create image');
-    });
-  };
+      $state.reload();
+    } catch (err) {
+      Notifications.error('Failure', err, 'Unable to create image');
+      $scope.config.commitInProgress = false;
+    }
+  }
 
+  $scope.commit = function () {
+    return $async(commitContainerAsync);
+  };
 
   $scope.confirmRemove = function () {
     var title = 'You are about to remove a container.';
