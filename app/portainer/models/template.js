@@ -14,7 +14,6 @@ export function TemplateDefaultModel() {
   this.RegistryModel = new PorImageRegistryModel();
 }
 
-// TODO CHANGE
 export function TemplateCreateRequest(model) {
   this.Type = model.Type;
   this.Name = model.Name;
@@ -54,7 +53,6 @@ export function TemplateUpdateRequest(model) {
   this.id = model.Id;
 }
 
-// TODO CHANGE
 export function TemplateViewModel(data) {
   this.Id = data.Id;
   this.Title = data.title;
@@ -68,9 +66,9 @@ export function TemplateViewModel(data) {
   this.Logo = data.logo;
   this.Repository = data.repository;
   this.Hostname = data.hostname;
-  this.Registry = data.registry ? { URL: data.registry } : {}; // CHANGE
-  this.Image = data.image; // CHANGE
-  this.Registry = data.registry ? data.registry : ''; // CHANGE
+  this.RegistryModel = new PorImageRegistryModel();
+  this.RegistryModel.Image = data.image;
+  this.RegistryModel.Registry = data.registry || {};
   this.Command = data.command ? data.command : '';
   this.Network = data.network ? data.network : '';
   this.Privileged = data.privileged ? data.privileged : false;

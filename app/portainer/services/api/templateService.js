@@ -10,7 +10,6 @@ function TemplateServiceFactory($q, Templates, TemplateHelper, ImageHelper, Cont
   'use strict';
   var service = {};
 
-  // TODO CHANGE
   service.templates = function() {
     var deferred = $q.defer();
 
@@ -28,7 +27,6 @@ function TemplateServiceFactory($q, Templates, TemplateHelper, ImageHelper, Cont
     return deferred.promise;
   };
 
-  // TODO CHANGE
   service.template = function(id) {
     var deferred = $q.defer();
 
@@ -49,7 +47,6 @@ function TemplateServiceFactory($q, Templates, TemplateHelper, ImageHelper, Cont
     return Templates.remove({ id: id }).$promise;
   };
 
-  // TODO CHANGE
   service.create = function(model) {
     var payload = new TemplateCreateRequest(model);
     return Templates.create(payload).$promise;
@@ -63,12 +60,12 @@ function TemplateServiceFactory($q, Templates, TemplateHelper, ImageHelper, Cont
 
   service.createTemplateConfiguration = function(template, containerName, network) {
     var imageConfiguration = ImageHelper.createImageConfigForContainer(template.RegistryModel);
-    var containerConfiguration = service.createContainerConfiguration(template, containerName, network);
-    containerConfiguration.Image = imageConfiguration.fromImage + ':' + imageConfiguration.tag;
+    var containerConfiguration = createContainerConfiguration(template, containerName, network);
+    containerConfiguration.Image = imageConfiguration.fromImage;
     return containerConfiguration;
   };
 
-  service.createContainerConfiguration = function(template, containerName, network) {
+  function createContainerConfiguration(template, containerName, network) {
     var configuration = TemplateHelper.getDefaultContainerConfiguration();
     configuration.HostConfig.NetworkMode = network.Name;
     configuration.HostConfig.Privileged = template.Privileged;
@@ -76,7 +73,6 @@ function TemplateServiceFactory($q, Templates, TemplateHelper, ImageHelper, Cont
     configuration.HostConfig.ExtraHosts = template.Hosts ? template.Hosts : [];
     configuration.name = containerName;
     configuration.Hostname = template.Hostname;
-    configuration.Image = template.Image;
     configuration.Env = TemplateHelper.EnvToStringArray(template.Env);
     configuration.Cmd = ContainerHelper.commandStringToArray(template.Command);
     var portConfiguration = TemplateHelper.portArrayToPortConfiguration(template.Ports);
@@ -87,7 +83,7 @@ function TemplateServiceFactory($q, Templates, TemplateHelper, ImageHelper, Cont
     configuration.Tty = consoleConfiguration.tty;
     configuration.Labels = TemplateHelper.updateContainerConfigurationWithLabels(template.Labels);
     return configuration;
-  };
+  }
 
   service.updateContainerConfigurationWithVolumes = function(configuration, template, generatedVolumesPile) {
     var volumes = template.Volumes;

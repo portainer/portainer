@@ -34,7 +34,7 @@ angular.module('portainer.docker')
     };
     let fullImageName = '';
 
-    if (registry.UseRegistry) {
+    if (registry.UseRegistry && registry.Registry.URL) {
       fullImageName = registry.Registry.URL + '/' + registry.Image;
       if (!_.includes(registry.Image, ':')) {
         fullImageName += ':latest';

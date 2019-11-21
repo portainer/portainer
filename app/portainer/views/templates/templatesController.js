@@ -73,7 +73,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
         generatedVolumeIds.push(volumeId);
       });
       TemplateService.updateContainerConfigurationWithVolumes(templateConfiguration, template, data);
-      return ImageService.pullImage(template.Image, { URL: template.Registry }, true);
+      return ImageService.pullImage(template.RegistryModel, true);
     })
     .then(function success() {
       return ContainerService.createAndStartContainer(templateConfiguration);
@@ -94,6 +94,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
     });
   }
 
+  // TODO CHANGE
   function createComposeStackFromTemplate(template, userId, accessControlData) {
     var stackName = $scope.formValues.name;
 
@@ -127,6 +128,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
     });
   }
 
+  // TODO CHANGE
   function createStackFromTemplate(template, userId, accessControlData) {
     var stackName = $scope.formValues.name;
     var env =_.filter(
