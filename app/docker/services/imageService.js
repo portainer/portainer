@@ -77,12 +77,20 @@ angular.module('portainer.docker')
     return deferred.promise;
   };
 
-  service.pushImage = function(tag, registry) {
+  service.pushImage = pushImage;
+  /**
+   * 
+   * @param {PorImageRegistryModel} registryModel
+   */
+  function pushImage(registryModel) {
     var deferred = $q.defer();
 
-    var authenticationDetails = registry.Authentication ? RegistryService.encodedCredentials(registry) : '';
+    var authenticationDetails = registryModel.Registry.Authentication ? RegistryService.encodedCredentials(registryModel.Registry) : '';
     HttpRequestHelper.setRegistryAuthenticationHeader(authenticationDetails);
-    Image.push({tag: tag}).$promise
+
+    const imageConfiguration = ImageHelper.createImageConfigForContainer(registryModel);
+
+    Image.push({imageName: imageConfiguration.fromImage}).$promise
     .then(function success(data) {
       if (data[data.length - 1].error) {
         deferred.reject({ msg: data[data.length - 1].error });
@@ -94,7 +102,7 @@ angular.module('portainer.docker')
       deferred.reject({ msg: 'Unable to push image tag', err: err });
     });
     return deferred.promise;
-  };
+  }
 
   /**
    * PULL IMAGE

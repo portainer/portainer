@@ -41,13 +41,11 @@ function ($q, $scope, $transition$, $state, $timeout, ImageService, ImageHelper,
 		});
 	};
 
-	// TODO CHANGE
 	$scope.pushTag = function(repository) {
 		$('#uploadResourceHint').show();
-		RegistryService.retrieveRegistryFromRepository(repository)
-		.then(function success(data) {
-			var registry = data;
-			return ImageService.pushImage(repository, registry);
+		RegistryService.retrievePorRegistryModelFromRepository(repository)
+		.then(function success(registryModel) {
+			return ImageService.pushImage(registryModel);
 		})
 		.then(function success() {
 			Notifications.success('Image successfully pushed', repository);
