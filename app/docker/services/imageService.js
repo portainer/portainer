@@ -154,8 +154,7 @@ angular.module('portainer.docker')
    * ! PULL IMAGE
    */
 
-  service.tagImage = function(id, image, registry) {
-    void registry;
+  service.tagImage = function(id, image) {
     return Image.tag({id: id, repo: image}).$promise;
   };
 

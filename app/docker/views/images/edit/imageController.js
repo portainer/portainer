@@ -2,8 +2,8 @@ import _ from 'lodash-es';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
 angular.module('portainer.docker')
-.controller('ImageController', ['$q', '$scope', '$transition$', '$state', '$timeout', 'ImageService', 'RegistryService', 'Notifications', 'HttpRequestHelper', 'ModalService', 'FileSaver', 'Blob',
-function ($q, $scope, $transition$, $state, $timeout, ImageService, RegistryService, Notifications, HttpRequestHelper, ModalService, FileSaver, Blob) {
+.controller('ImageController', ['$q', '$scope', '$transition$', '$state', '$timeout', 'ImageService', 'ImageHelper', 'RegistryService', 'Notifications', 'HttpRequestHelper', 'ModalService', 'FileSaver', 'Blob',
+function ($q, $scope, $transition$, $state, $timeout, ImageService, ImageHelper, RegistryService, Notifications, HttpRequestHelper, ModalService, FileSaver, Blob) {
 	$scope.formValues = {
 		RegistryModel: new PorImageRegistryModel()
 	};
@@ -26,12 +26,12 @@ function ($q, $scope, $transition$, $state, $timeout, ImageService, RegistryServ
 		$('#layer-command-'+layerId+'-full').toggle();
 	};
 
-	// TODO CHANGE
 	$scope.tagImage = function() {
-		var image = $scope.formValues.Image;
-		var registry = $scope.formValues.Registry;
+		const registryModel = $scope.formValues.RegistryModel;
 
-		ImageService.tagImage($transition$.params().id, image, registry.URL)
+		const image = ImageHelper.createImageConfigForContainer(registryModel);
+
+		ImageService.tagImage($transition$.params().id, image.fromImage)
 		.then(function success() {
 			Notifications.success('Image successfully tagged');
 			$state.go('docker.images.image', {id: $transition$.params().id}, {reload: true});
