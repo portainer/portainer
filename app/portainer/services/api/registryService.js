@@ -111,5 +111,3 @@ function RegistryServiceFactory($q, $async, Registries, DockerHubService, ImageH
 
   return service;
 }]);
-
-// retrieveRegistryFromRepository

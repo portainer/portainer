@@ -159,7 +159,6 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     $scope.formValues.LogDriverOpts.splice(index, 1);
   };
 
-  // TODO CHANGE
   function prepareImageConfig(config, input) {
     var imageConfig = ImageHelper.createImageConfigForContainer(input.RegistryModel);
     config.TaskTemplate.ContainerSpec.Image = imageConfig.fromImage;
@@ -427,11 +426,9 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
     return config;
   }
 
-  // TODO CHANGE
   function createNewService(config, accessControlData) {
-
-    var registry = $scope.formValues.Registry;
-    var authenticationDetails = registry.Authentication ? RegistryService.encodedCredentials(registry) : '';
+    const registryModel = $scope.formValues.RegistryModel;
+    var authenticationDetails = registryModel.Registry.Authentication ? RegistryService.encodedCredentials(registryModel.Registry) : '';
     HttpRequestHelper.setRegistryAuthenticationHeader(authenticationDetails);
 
     Service.create(config).$promise
