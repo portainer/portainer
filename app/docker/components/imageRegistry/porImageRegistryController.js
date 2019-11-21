@@ -15,9 +15,11 @@ class porImageRegistryController {
 
   async onInit() {
     try {
-      const [registries, dockerhub, availableImages] = await Promise.all([this.RegistryService.registries(),
-      this.DockerHubService.dockerhub(),
-      this.autoComplete ? this.ImageService.images() : []]);
+      const [registries, dockerhub, availableImages] = await Promise.all([
+        this.RegistryService.registries(),
+        this.DockerHubService.dockerhub(),
+        this.autoComplete ? this.ImageService.images() : []
+      ]);
       this.availableImages = this.ImageService.getUniqueTagListFromImages(availableImages);
       this.availableRegistries = [dockerhub].concat(registries);
 

@@ -135,8 +135,6 @@ angular.module('portainer.docker')
    * @param {bool} ignoreErrors 
    */
   function pullImage(registry, ignoreErrors) {
-    // var imageDetails = ImageHelper.extractImageAndRegistryFromRepository(image);
-    // var imageConfiguration = ImageHelper.createImageConfigForContainer(imageDetails.image, registry.URL);
     var authenticationDetails = registry.Registry.Authentication ? RegistryService.encodedCredentials(registry.Registry) : '';
     HttpRequestHelper.setRegistryAuthenticationHeader(authenticationDetails);
 

@@ -33,6 +33,16 @@
               auto-complete="true"
               label-class="col-sm-1" input-class="col-sm-11 col-md-5"
             ></por-image-registry>
+            <div class="form-group" ng-if="formValues.RegistryModel.UseRegistry">
+              <div class="col-sm-12">
+                <span class="small text-muted">Note: if you don't specify the tag in the image name, <span class="label label-default">latest</span> will be used.</span>
+              </div>
+            </div>
+            <div class="form-group" ng-if="formValues.alwaysPull && !formValues.RegistryModel.UseRegistry">
+              <div class="col-sm-12">
+                <span class="small text-muted"><i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i> WARNING: if you don't specify the tag in the image name, all tags will be pulled for the image unless you don't ask Portainer to pull the image.</span>
+              </div>
+            </div>
             <!-- !image-and-registry -->
             <!-- always-pull -->
             <div class="form-group">

@@ -1,8 +1,10 @@
 import _ from 'lodash-es';
 import { RegistryViewModel, RegistryCreateRequest } from '../../models/registry';
+import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
 angular.module('portainer.app')
-.factory('RegistryService', ['$q', 'Registries', 'DockerHubService', 'RegistryHelper', 'ImageHelper', 'FileUploadService', function RegistryServiceFactory($q, Registries, DockerHubService, RegistryHelper, ImageHelper, FileUploadService) {
+.factory('RegistryService', ['$q', '$async', 'Registries', 'DockerHubService', 'ImageHelper', 'FileUploadService',
+function RegistryServiceFactory($q, $async, Registries, DockerHubService, ImageHelper, FileUploadService) {
   'use strict';
   var service = {};
 
@@ -79,25 +81,35 @@ angular.module('portainer.app')
     return $q.all(promises);
   };
 
-  service.retrieveRegistryFromRepository = function(repository) {
-    var deferred = $q.defer();
-    console.log('registry', repository);
-
-    var imageDetails = ImageHelper.extractImageAndRegistryFromRepository(repository);
-    $q.when(imageDetails.registry ? service.registries() : DockerHubService.dockerhub())
-    .then(function success(data) {
-      var registry = data;
-      if (imageDetails.registry) {
-        registry = RegistryHelper.getRegistryByURL(data, imageDetails.registry);
+  async function retrievePorRegistryModelFromRepositoryAsync(repository) {
+    try {
+      const model = new PorImageRegistryModel();
+      const [registries, dockerhub] = await Promise.all([
+        service.registries(),
+        DockerHubService.dockerhub()
+      ]);
+      registries.concat([dockerhub]);
+      const registry = _.find(registries, (reg) => _.includes(repository, reg.URL));
+      if (registry) {
+        const lastIndex = repository.lastIndexOf(registry.URL) + registry.URL.length;
+        const image = repository.substring(lastIndex + 1);
+        model.Registry = registry;
+        model.Image = image;
+      } else {
+        model.UseRegistry = false;
+        model.Image = repository;
       }
-      deferred.resolve(registry);
-    })
-    .catch(function error(err) {
-      deferred.reject({ msg: 'Unable to retrieve the registry associated to the repository', err: err });
-    });
+      return model;
+    } catch (err) {
+      throw { msg: 'Unable to retrieve the registry associated to the repository', err: err }
+    }
+  }
 
-    return deferred.promise;
+  service.retrievePorRegistryModelFromRepository = function(repository) {
+    return $async(retrievePorRegistryModelFromRepositoryAsync, repository)
   };
 
   return service;
 }]);
+
+// retrieveRegistryFromRepository

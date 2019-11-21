@@ -131,7 +131,6 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
 
   $scope.fromContainerMultipleNetworks = false;
 
-  // TODO
   function prepareImageConfig(config) {
     const imageConfig = ImageHelper.createImageConfigForContainer($scope.formValues.RegistryModel);
     config.Image = imageConfig.fromImage;
@@ -436,15 +435,10 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
     $scope.config.HostConfig.Devices = path;
   }
 
-  // TODO
   function loadFromContainerImageConfig() {
-    var imageInfo = ImageHelper.extractImageAndRegistryFromRepository($scope.config.Image);
-    RegistryService.retrieveRegistryFromRepository($scope.config.Image)
-    .then(function success(data) {
-      if (data) {
-        $scope.config.Image = imageInfo.image;
-        $scope.formValues.RegistryModel = data;
-      }
+    RegistryService.retrievePorRegistryModelFromRepository($scope.config.Image)
+    .then((model) => {
+      $scope.formValues.RegistryModel = model;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrive registry');
