@@ -14,7 +14,6 @@ function ($scope, $state, ImageService, Notifications, ModalService, HttpRequest
     NodeName: null
   };
 
-  // TODO CHANGE
   $scope.pullImage = function() {
     const registryModel = $scope.formValues.RegistryModel;
 
