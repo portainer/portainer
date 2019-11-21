@@ -96,6 +96,10 @@ angular.module('portainer.docker')
     return deferred.promise;
   };
 
+  /**
+   * PULL IMAGE
+   */
+
   function pullImageAndIgnoreErrors(imageConfiguration) {
     var deferred = $q.defer();
 
@@ -145,6 +149,10 @@ angular.module('portainer.docker')
     }
     return pullImageAndAcknowledgeErrors(imageConfiguration);
   }
+
+  /**
+   * ! PULL IMAGE
+   */
 
   service.tagImage = function(id, image, registry) {
     void registry;

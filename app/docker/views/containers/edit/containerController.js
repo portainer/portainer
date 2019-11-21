@@ -224,9 +224,9 @@ function ($q, $scope, $state, $transition$, $filter, Commit, ContainerHelper, Co
       if (!pullImage) {
         return $q.when();
       }
-      return RegistryService.retrieveRegistryFromRepository(container.Config.Image)
-      .then(function pullImage(containerRegistry) {
-        return ImageService.pullImage(containerRegistry, true);
+      return RegistryService.retrievePorRegistryModelFromRepository(container.Config.Image)
+      .then(function pullImage(registryModel) {
+        return ImageService.pullImage(registryModel, true);
       });
     }
 

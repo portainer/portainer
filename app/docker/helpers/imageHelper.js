@@ -8,47 +8,27 @@ angular.module('portainer.docker')
 
   helper.isValidTag = isValidTag;
   helper.createImageConfigForContainer = createImageConfigForContainer;
+  helper.getImagesNamesForDownload = getImagesNamesForDownload;
+  helper.removeDigestFromRepository = removeDigestFromRepository;
 
   function isValidTag(tag) {
     return tag.match(/^(?![\.\-])([a-zA-Z0-9\_\.\-])+$/g);
   }
 
-  // helper.extractImageAndRegistryFromRepository = function(repository) {
-  //   var slashCount = _.countBy(repository)['/'];
-  //   var registry = null;
-  //   var image = repository;
-  //   if (slashCount >= 1) {
-  //     // assume something/something[/...]
-  //     registry = repository.substr(0, repository.indexOf('/'));
-  //     // assume valid DNS name or IP (contains at least one '.')
-  //     if (_.countBy(registry)['.'] > 0) {
-  //       image = repository.substr(repository.indexOf('/') + 1);
-  //     } else {
-  //       registry = null;
-  //     }
-  //   }
-
-  //   return {
-  //     registry: registry,
-  //     image: image
-  //   };
-  // };
-
-  helper.getImagesNamesForDownload = function(images) {
+  function getImagesNamesForDownload(images) {
     var names = images.map(function(image) {
       return image.RepoTags[0] !== '<none>:<none>' ? image.RepoTags[0] : image.Id;
     });
     return {
       names: names
     };
-  };
+  }
 
   /**
    * 
    * @param {PorImageRegistryModel} registry
    */
   function createImageConfigForContainer(registry) {
-    console.log('registry', registry);
     const data = {
       fromImage: ''
     };
@@ -64,13 +44,12 @@ angular.module('portainer.docker')
     }
 
     data.fromImage = fullImageName;
-    console.log('FULL IMAGE NAME', fullImageName);
     return data;
   }
 
-  helper.removeDigestFromRepository = function(repository) {
+  function removeDigestFromRepository(repository) {
     return repository.split('@sha')[0];
-  };
+  }
 
   return helper;
 }]);
