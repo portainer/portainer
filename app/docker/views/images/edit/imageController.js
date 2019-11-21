@@ -58,13 +58,11 @@ function ($q, $scope, $transition$, $state, $timeout, ImageService, ImageHelper,
 		});
 	};
 
-	// TODO CHANGE
 	$scope.pullTag = function(repository) {
 		$('#downloadResourceHint').show();
-		RegistryService.retrieveRegistryFromRepository(repository)
-		.then(function success(data) {
-			var registry = data;
-			return ImageService.pullImage(registry, false);
+		RegistryService.retrievePorRegistryModelFromRepository(repository)
+		.then(function success(registryModel) {
+			return ImageService.pullImage(registryModel, false);
 		})
 		.then(function success() {
 			Notifications.success('Image successfully pulled', repository);
