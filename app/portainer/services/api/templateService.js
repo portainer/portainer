@@ -5,18 +5,27 @@ import {
 } from '../../models/template';
 
 angular.module('portainer.app')
-.factory('TemplateService', ['$q', 'Templates', 'TemplateHelper', 'ImageHelper', 'ContainerHelper',
-function TemplateServiceFactory($q, Templates, TemplateHelper, ImageHelper, ContainerHelper) {
+.factory('TemplateService', ['$q', 'Templates', 'TemplateHelper', 'RegistryService', 'DockerHubService', 'ImageHelper', 'ContainerHelper',
+function TemplateServiceFactory($q, Templates, TemplateHelper, RegistryService, DockerHubService, ImageHelper, ContainerHelper) {
   'use strict';
   var service = {};
 
   service.templates = function() {
     var deferred = $q.defer();
 
-    Templates.query().$promise
+    $q.all({
+      templates: Templates.query().$promise,
+      registries: RegistryService.registries(),
+      dockerhub: DockerHubService.dockerhub()
+    })
     .then(function success(data) {
-      var templates = data.map(function (item) {
-        return new TemplateViewModel(item);
+      data.registries.concat([data.dockerhub]);
+      const templates = data.templates.map(function (item) {
+        const res = new TemplateViewModel(item);
+        const registry = RegistryService.retrievePorRegistryModelFromRepositoryWithRegistries(res.RegistryModel.Registry, data.registries);
+        registry.Image = res.RegistryModel.Image;
+        res.RegistryModel = registry;
+        return res;
       });
       deferred.resolve(templates);
     })
@@ -29,10 +38,15 @@ function TemplateServiceFactory($q, Templates, TemplateHelper, ImageHelper, Cont
 
   service.template = function(id) {
     var deferred = $q.defer();
-
+    let template;
     Templates.get({ id: id }).$promise
     .then(function success(data) {
-      var template = new TemplateViewModel(data);
+      template = new TemplateViewModel(data);
+      return RegistryService.retrievePorRegistryModelFromRepository(template.RegistryModel.Registry);
+    })
+    .then((registry) => {
+      registry.Image = template.RegistryModel.Image;
+      template.RegistryModel = registry;
       deferred.resolve(template);
     })
     .catch(function error(err) {
@@ -52,7 +66,6 @@ function TemplateServiceFactory($q, Templates, TemplateHelper, ImageHelper, Cont
     return Templates.create(payload).$promise;
   };
 
-  // TODO CHANGE
   service.update = function(model) {
     var payload = new TemplateUpdateRequest(model);
     return Templates.update(payload).$promise;

@@ -8,7 +8,6 @@ function ($q, $scope, $state, $transition$, TemplateService, TemplateHelper, Net
     actionInProgress: false
   };
 
-  // TODO CHANGE
   $scope.update = function() {
     var model = $scope.template;
 
