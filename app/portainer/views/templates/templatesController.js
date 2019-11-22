@@ -94,7 +94,6 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
     });
   }
 
-  // TODO CHANGE
   function createComposeStackFromTemplate(template, userId, accessControlData) {
     var stackName = $scope.formValues.name;
 
@@ -113,7 +112,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
     var endpointId = EndpointProvider.endpointID();
     StackService.createComposeStackFromGitRepository(stackName, repositoryOptions, template.Env, endpointId)
     .then(function success(data) {
-      const resourceControl = data.Portainer.ResourceControl;
+      const resourceControl = data.ResourceControl;
       return ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
     })
     .then(function success() {
@@ -128,7 +127,6 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
     });
   }
 
-  // TODO CHANGE
   function createStackFromTemplate(template, userId, accessControlData) {
     var stackName = $scope.formValues.name;
     var env =_.filter(
@@ -152,7 +150,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
     var endpointId = EndpointProvider.endpointID();
     StackService.createSwarmStackFromGitRepository(stackName, repositoryOptions, env, endpointId)
     .then(function success(data) {
-      const resourceControl = data.Portainer.ResourceControl;
+      const resourceControl = data.ResourceControl;
       return ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
     })
     .then(function success() {
@@ -160,7 +158,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
       $state.go('portainer.stacks');
     })
     .catch(function error(err) {
-      Notifications.warning('Deployment error', err.err.data.err);
+      Notifications.warning('Deployment error', err.data.err);
     })
     .finally(function final() {
       $scope.state.actionInProgress = false;
