@@ -3,11 +3,10 @@ import _ from 'lodash-es';
 
 class porImageRegistryController {
   /* @ngInject */
-  constructor($async, RegistryService, DockerHubService, ImageService, Notifications) {
+  constructor($async, RegistryService, DockerHubService, Notifications) {
     this.$async = $async;
     this.RegistryService = RegistryService;
     this.DockerHubService = DockerHubService;
-    this.ImageService = ImageService;
     this.Notifications = Notifications;
 
     this.onInit = this.onInit.bind(this);
@@ -15,12 +14,10 @@ class porImageRegistryController {
 
   async onInit() {
     try {
-      const [registries, dockerhub, availableImages] = await Promise.all([
+      const [registries, dockerhub] = await Promise.all([
         this.RegistryService.registries(),
         this.DockerHubService.dockerhub(),
-        this.autoComplete ? this.ImageService.images() : []
       ]);
-      this.availableImages = this.ImageService.getUniqueTagListFromImages(availableImages);
       this.availableRegistries = _.concat(dockerhub, registries);
 
       const id = this.model.Registry.Id;
