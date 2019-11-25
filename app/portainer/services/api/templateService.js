@@ -19,10 +19,9 @@ function TemplateServiceFactory($q, Templates, TemplateHelper, RegistryService, 
       dockerhub: DockerHubService.dockerhub()
     })
     .then(function success(data) {
-      data.registries.concat([data.dockerhub]);
       const templates = data.templates.map(function (item) {
         const res = new TemplateViewModel(item);
-        const registry = RegistryService.retrievePorRegistryModelFromRepositoryWithRegistries(res.RegistryModel.Registry, data.registries);
+        const registry = RegistryService.retrievePorRegistryModelFromRepositoryWithRegistries(res.RegistryModel.Registry, data.registries, data.dockerhub);
         registry.Image = res.RegistryModel.Image;
         res.RegistryModel = registry;
         return res;

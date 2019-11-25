@@ -83,7 +83,7 @@ function RegistryServiceFactory($q, $async, Registries, DockerHubService, ImageH
 
   service.retrievePorRegistryModelFromRepositoryWithRegistries = retrievePorRegistryModelFromRepositoryWithRegistries;
 
-  function retrievePorRegistryModelFromRepositoryWithRegistries(repository, registries) {
+  function retrievePorRegistryModelFromRepositoryWithRegistries(repository, registries, dockerhub) {
     const model = new PorImageRegistryModel();
     const registry = _.find(registries, (reg) => _.includes(repository, reg.URL));
     if (registry) {
@@ -93,6 +93,7 @@ function RegistryServiceFactory($q, $async, Registries, DockerHubService, ImageH
       model.Image = image;
     } else {
       model.UseRegistry = false;
+      model.Registry = dockerhub;
       model.Image = repository;
     }
     return model;
@@ -100,12 +101,11 @@ function RegistryServiceFactory($q, $async, Registries, DockerHubService, ImageH
 
   async function retrievePorRegistryModelFromRepositoryAsync(repository) {
     try {
-      const [registries, dockerhub] = await Promise.all([
+      let [registries, dockerhub] = await Promise.all([
         service.registries(),
         DockerHubService.dockerhub()
       ]);
-      registries.concat([dockerhub]);
-      return retrievePorRegistryModelFromRepositoryWithRegistries(repository, registries);
+      return retrievePorRegistryModelFromRepositoryWithRegistries(repository, registries, dockerhub);
     } catch (err) {
       throw { msg: 'Unable to retrieve the registry associated to the repository', err: err }
     }

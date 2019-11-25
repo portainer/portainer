@@ -1,20 +1,10 @@
-<div class="form-group">
-  <div class="col-sm-12">
-    <label for="use_registry" class="control-label text-left">
-      Use registry
-    </label>
-    <label class="switch" style="margin-left: 20px;">
-      <input type="checkbox" ng-model="$ctrl.model.UseRegistry"><i></i>
-    </label>
-  </div>
-</div>
 <!-- use registry -->
 <div ng-if="$ctrl.model.UseRegistry">
   <div class="form-group">
     <label for="image_name" ng-class="$ctrl.labelClass" class="control-label text-left">Image</label>
     <div ng-class="$ctrl.inputClass">
       <div class="input-group">
-        <span class="input-group-addon" id="registry-name">{{$ctrl.model.Registry.URL}}</span>
+        <span class="input-group-addon" id="registry-name">{{$ctrl.model.Registry.URL || 'docker.io'}}</span>
         <input type="text" class="form-control" aria-describedby="registry-name" uib-typeahead="image for image in $ctrl.availableImages | filter:$viewValue | limitTo:5"
         ng-model="$ctrl.model.Image" name="image_name" placeholder="e.g. myImage:myTag" required>
       </div>
@@ -23,8 +13,8 @@
       Registry
     </label>
     <div ng-class="$ctrl.inputClass" class="margin-sm-top">
-      <select ng-options="registry as registry.Name for registry in $ctrl.availableRegistries" ng-model="$ctrl.model.Registry" id="image_registry"
-        class="form-control"></select>
+      <select ng-options="registry as registry.Name for registry in $ctrl.availableRegistries track by registry.Name" ng-model="$ctrl.model.Registry" id="image_registry"
+        selected-item-id="ctrl.selectedItemId" class="form-control"></select>
     </div>
   </div>
 </div>
@@ -45,8 +35,20 @@
 <div class="form-group" ng-show="$ctrl.form.image_name.$invalid">
   <div class="col-sm-12 small text-warning">
     <div ng-messages="$ctrl.form.image_name.$error">
-      <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Image name is required.</p>
+      <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Image name is required. <span ng-if="$ctrl.canPull">Tag must be specified otherwise Portainer will pull all tags associated to the image.</span></p>
     </div>
   </div>
 </div>
 <!-- ! info message -->
+<div class="form-group">
+  <div class="col-sm-12">
+    <p>
+      <a class="small interactive" ng-if="!$ctrl.model.UseRegistry" ng-click="$ctrl.model.UseRegistry = true;">
+        <i class="fa fa-database space-right" aria-hidden="true"></i> Use specific registry
+      </a>
+      <a class="small interactive" ng-if="$ctrl.model.UseRegistry" ng-click="$ctrl.model.UseRegistry = false;">
+        <i class="fa fa-globe space-right" aria-hidden="true"></i> Use public registry
+      </a>
+    </p>
+  </div>
+</div>

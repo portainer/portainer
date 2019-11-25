@@ -21,7 +21,7 @@ class porImageRegistryController {
         this.autoComplete ? this.ImageService.images() : []
       ]);
       this.availableImages = this.ImageService.getUniqueTagListFromImages(availableImages);
-      this.availableRegistries = [dockerhub].concat(registries);
+      this.availableRegistries = _.concat(dockerhub, registries);
 
       const id = this.model.Registry.Id;
       if (!id) {
