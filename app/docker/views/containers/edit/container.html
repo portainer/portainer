@@ -20,7 +20,7 @@
             <button authorization="DockerContainerUnpause" class="btn btn-primary btn-sm" ng-click="unpause()" ng-disabled="!container.State.Paused"><i class="fa fa-play space-right" aria-hidden="true"></i>Resume</button>
             <button authorization="DockerContainerDelete" class="btn btn-danger btn-sm" ng-click="confirmRemove()"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove</button>
           </div>
-          <div class="btn-group" role="group" aria-label="..." ng-if="!container.Config.Labels['com.docker.swarm.service.id']" authorization="DockerContainerCreate">
+          <div class="btn-group" role="group" aria-label="..." ng-if="!container.Config.Labels['com.docker.swarm.service.id'] && !container.HostConfig.AutoRemove" authorization="DockerContainerCreate">
             <button type="button" class="btn btn-danger btn-sm" ng-disabled="state.recreateContainerInProgress" ng-click="recreate()" button-spinner="state.recreateContainerInProgress">
               <span ng-hide="state.recreateContainerInProgress"><i class="fa fa-sync space-right" aria-hidden="true"></i>Recreate</span>
               <span ng-show="state.recreateContainerInProgress">Recreation in progress...</span>
