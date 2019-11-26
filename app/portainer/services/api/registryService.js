@@ -73,6 +73,7 @@ function RegistryServiceFactory($q, $async, Registries, DockerHubService, ImageH
     _.forEach(projects, (p) => {
       const m = model;
       m.Name = p.PathWithNamespace;
+      m.Gitlab.ProjectPath = _.toLower(p.PathWithNamespace);
       m.Gitlab.ProjectId = p.Id;
       m.Password = m.Token;
       const payload = new RegistryCreateRequest(m);

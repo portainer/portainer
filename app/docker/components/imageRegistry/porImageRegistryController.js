@@ -52,7 +52,7 @@ class porImageRegistryController {
 
   changeRegistryURL() {
     if (this.model.Registry.Type === RegistryTypes.GITLAB) {
-      this.model.Registry.URL = this.model.Registry.URL + '/' + _.toLower(this.model.Registry.Name);
+      this.model.Registry.URL = this.model.Registry.URL + '/' + _.toLower(this.model.Registry.Gitlab.ProjectPath);
     }
   }
 
