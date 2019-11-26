@@ -27,8 +27,12 @@ class porImageRegistryController {
     let images = [];
     const registry = this.model.Registry;
     if (this.isKnownRegistry(registry)) {
-      const registryImages = _.filter(this.images, (image) => _.includes(image, this.model.Registry.URL));
-      images = _.map(registryImages, (image) => _.replace(image, registry.URL + '/', ''));
+      let url = registry.URL;
+      if (registry.Type === RegistryTypes.GITLAB) {
+        url = registry.URL + '/' + registry.Gitlab.ProjectPath;
+      }
+      const registryImages = _.filter(this.images, (image) => _.includes(image, url));
+      images = _.map(registryImages, (image) => _.replace(image, new RegExp(url + '\/?'), ''));
     } else {
       const registries = _.filter(this.availableRegistries, (reg) => this.isKnownRegistry(reg));
       const registryImages = _.flatMap(registries, (registry) => _.filter(this.images, (image) => _.includes(image, registry.URL)));
