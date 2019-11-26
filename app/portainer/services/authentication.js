@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-.factory('Authentication', ['$async', '$state', 'Auth', 'OAuth', 'jwtHelper', 'LocalStorage', 'EndpointProvider', 'UserService',
-function AuthenticationFactory($async, $state, Auth, OAuth, jwtHelper, LocalStorage, EndpointProvider, UserService) {
+.factory('Authentication', ['$async', '$state', 'Auth', 'OAuth', 'jwtHelper', 'LocalStorage', 'StateManager', 'EndpointProvider', 'UserService',
+function AuthenticationFactory($async, $state, Auth, OAuth, jwtHelper, LocalStorage, StateManager, EndpointProvider, UserService) {
   'use strict';
 
   var service = {};
@@ -9,6 +9,7 @@ function AuthenticationFactory($async, $state, Auth, OAuth, jwtHelper, LocalStor
   service.init = init;
   service.OAuthLogin = OAuthLogin;
   service.login = login;
+  service.logout = logout;
   service.isAuthenticated = isAuthenticated;
   service.getUserDetails = getUserDetails;
   service.isAdmin = isAdmin;
@@ -23,6 +24,13 @@ function AuthenticationFactory($async, $state, Auth, OAuth, jwtHelper, LocalStor
     } catch (error) {
       throw error;
     }
+  }
+
+  function logout() {
+    StateManager.clean();
+    EndpointProvider.clean();
+    LocalStorage.clean();
+    LocalStorage.storeLoginStateUUID('');
   }
 
   function init() {
@@ -57,13 +65,9 @@ function AuthenticationFactory($async, $state, Auth, OAuth, jwtHelper, LocalStor
   }
 
   async function retrievePermissions() {
-    try {
-      const data = await UserService.user(user.ID);
-      user.endpointAuthorizations = data.EndpointAuthorizations;
-      user.portainerAuthorizations = data.PortainerAuthorizations;
-    } catch (error) {
-      $state.go('portainer.auth', { error: error });
-    }
+    const data = await UserService.user(user.ID);
+    user.endpointAuthorizations = data.EndpointAuthorizations;
+    user.portainerAuthorizations = data.PortainerAuthorizations;
   }
 
   async function setUser(jwt) {

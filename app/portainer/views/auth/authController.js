@@ -52,7 +52,7 @@ class AuthenticationController {
    */
 
   logout() {
-    this.StateManager.logout();
+    this.Authentication.logout();
     this.state.loginInProgress = false;
     this.generateOAuthLoginURI();
   }
@@ -252,7 +252,6 @@ class AuthenticationController {
       if (this.$stateParams.logout || this.$stateParams.error) {
         this.logout();
         this.state.AuthenticationError = this.$stateParams.error;
-        return;
       }
 
       if (this.Authentication.isAuthenticated()) {

@@ -1,3 +1,30 @@
+import _ from 'lodash-es';
+
+async function initAuthentication(authManager, Authentication, $rootScope, $state) {
+  authManager.checkAuthOnRefresh();
+  // The unauthenticated event is broadcasted by the jwtInterceptor when
+  // hitting a 401. We're using this instead of the usual combination of
+  // authManager.redirectWhenUnauthenticated() + unauthenticatedRedirector
+  // to have more controls on which URL should trigger the unauthenticated state.
+  $rootScope.$on('unauthenticated', function (event, data) {
+    if (!_.includes(data.config.url, '/v2/') && !_.includes(data.config.url, '/api/v4/')) {
+      $state.go('portainer.auth', { error: 'Your session has expired' });
+    }
+  });
+
+ await Authentication.init();
+}
+
+function initAnalytics(Analytics, $rootScope) {
+  Analytics.offline(false);
+  Analytics.registerScriptTags();
+  Analytics.registerTrackers();
+  $rootScope.$on('$stateChangeSuccess', function (event, toState) {
+    Analytics.trackPage(toState.url);
+    Analytics.pageView();
+  });
+}
+
 angular.module('portainer.app', [])
 .config(['$stateRegistryProvider', function ($stateRegistryProvider) {
   'use strict';
@@ -6,10 +33,30 @@ angular.module('portainer.app', [])
     name: 'root',
     abstract: true,
     resolve: {
-      requiresLogin: ['StateManager', function (StateManager) {
-        var applicationState = StateManager.getState();
-        return applicationState.application.authentication;
-      }]
+      initStateManager: ['StateManager', 'Authentication', 'Notifications', 'Analytics', 'authManager', '$rootScope', '$state', '$async', '$q',
+        (StateManager, Authentication, Notifications, Analytics, authManager, $rootScope, $state, $async, $q) => {
+          const deferred = $q.defer();
+          const appState = StateManager.getState();
+          if (!appState.loading) {
+            deferred.resolve();
+          } else {
+            StateManager.initialize()
+            .then(function success(state) {
+              if (state.application.analytics) {
+                initAnalytics(Analytics, $rootScope);
+              }
+              if (state.application.authentication) {
+                return $async(initAuthentication, authManager, Authentication, $rootScope, $state);
+              }
+            })
+            .then(() => deferred.resolve())
+            .catch(function error(err) {
+              Notifications.error('Failure', err, 'Unable to retrieve application settings');
+              deferred.reject(err);
+            });
+          }
+          return deferred.promise;
+        }]
     },
     views: {
       'sidebar@': {
@@ -60,9 +107,6 @@ angular.module('portainer.app', [])
         controllerAs: 'ctrl'
       },
       'sidebar@': {}
-    },
-    data: {
-      requiresLogin: false
     }
   };
 
@@ -170,9 +214,6 @@ angular.module('portainer.app', [])
     name: 'portainer.init',
     abstract: true,
     url: '/init',
-    data: {
-      requiresLogin: false
-    },
     views: {
       'sidebar@': {}
     }
