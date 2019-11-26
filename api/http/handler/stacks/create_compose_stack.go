@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"path"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -15,6 +16,13 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
+// this is coming from libcompose
+// https://github.com/portainer/libcompose/blob/master/project/context.go#L117-L120
+func normalizeStackName(name string) string {
+	r := regexp.MustCompile("[^a-z0-9]+")
+	return r.ReplaceAllString(strings.ToLower(name), "")
+}
+
 type composeStackFromFileContentPayload struct {
 	Name             string
 	StackFileContent string
@@ -25,6 +33,7 @@ func (payload *composeStackFromFileContentPayload) Validate(r *http.Request) err
 	if govalidator.IsNull(payload.Name) {
 		return portainer.Error("Invalid stack name")
 	}
+	payload.Name = normalizeStackName(payload.Name)
 	if govalidator.IsNull(payload.StackFileContent) {
 		return portainer.Error("Invalid stack file content")
 	}
@@ -103,6 +112,7 @@ func (payload *composeStackFromGitRepositoryPayload) Validate(r *http.Request) e
 	if govalidator.IsNull(payload.Name) {
 		return portainer.Error("Invalid stack name")
 	}
+	payload.Name = normalizeStackName(payload.Name)
 	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
 		return portainer.Error("Invalid repository URL. Must correspond to a valid URL format")
 	}
@@ -193,7 +203,7 @@ func (payload *composeStackFromFileUploadPayload) Validate(r *http.Request) erro
 	if err != nil {
 		return portainer.Error("Invalid stack name")
 	}
-	payload.Name = name
+	payload.Name = normalizeStackName(name)
 
 	composeFileContent, _, err := request.RetrieveMultiPartFormFile(r, "file")
 	if err != nil {
