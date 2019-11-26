@@ -51,6 +51,7 @@ class porImageRegistryController {
 
   displayedRegistryURL() {
     if (this.model.Registry.Type === RegistryTypes.GITLAB) {
+      this.model.Image = _.replace(this.model.Image, this.model.Registry.Gitlab.ProjectPath, '')
       return this.model.Registry.URL + '/' + this.model.Registry.Gitlab.ProjectPath;
     }
     return this.model.Registry.URL || 'docker.io';
