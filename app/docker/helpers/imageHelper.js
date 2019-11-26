@@ -1,4 +1,5 @@
 import _ from 'lodash-es';
+import { RegistryTypes } from 'Extensions/registry-management/models/registryTypes';
 
 angular.module('portainer.docker')
 .factory('ImageHelper', [function ImageHelperFactory() {
@@ -35,8 +36,9 @@ angular.module('portainer.docker')
     let fullImageName = '';
 
     if (registry.UseRegistry && registry.Registry.URL) {
-      if (_.startsWith(registry.Image, ':')) {
-        fullImageName = registry.Registry.URL + registry.Image;
+      if (registry.Registry.Type === RegistryTypes.GITLAB) {
+        const slash = _.startsWith(registry.Image, ':') ? '' : '/';
+        fullImageName = registry.Registry.URL + '/' + registry.Registry.Gitlab.ProjectPath + slash + registry.Image;
       } else {
         fullImageName = registry.Registry.URL + '/' + registry.Image;
         if (!_.includes(registry.Image, ':')) {

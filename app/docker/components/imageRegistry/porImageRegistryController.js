@@ -46,14 +46,14 @@ class porImageRegistryController {
   }
 
   onRegistryChange() {
-    this.changeRegistryURL();
     this.prepareAutocomplete();
   }
 
-  changeRegistryURL() {
+  displayedRegistryURL() {
     if (this.model.Registry.Type === RegistryTypes.GITLAB) {
-      this.model.Registry.URL = this.model.Registry.URL + '/' + _.toLower(this.model.Registry.Gitlab.ProjectPath);
+      return this.model.Registry.URL + '/' + this.model.Registry.Gitlab.ProjectPath;
     }
+    return this.model.Registry.URL || 'docker.io';
   }
 
   async onInit() {

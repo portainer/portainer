@@ -11,7 +11,7 @@
     <label for="image_name" ng-class="$ctrl.labelClass" class="margin-sm-top control-label text-left">Image</label>
     <div ng-class="$ctrl.inputClass" class="margin-sm-top">
       <div class="input-group">
-        <span class="input-group-addon" id="registry-name">{{$ctrl.model.Registry.URL || 'docker.io'}}</span>
+        <span class="input-group-addon" id="registry-name">{{$ctrl.displayedRegistryURL()}}</span>
         <input type="text" class="form-control" aria-describedby="registry-name" uib-typeahead="image for image in $ctrl.availableImages | filter:$viewValue | limitTo:5"
         ng-model="$ctrl.model.Image" name="image_name" placeholder="e.g. myImage:myTag" required>
       </div>
