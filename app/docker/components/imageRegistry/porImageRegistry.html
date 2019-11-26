@@ -5,8 +5,8 @@
     <div ng-class="$ctrl.inputClass">
       <div class="input-group">
         <span class="input-group-addon" id="registry-name">{{$ctrl.model.Registry.URL || 'docker.io'}}</span>
-        <input type="text" class="form-control" aria-describedby="registry-name"
-          ng-model="$ctrl.model.Image" name="image_name" placeholder="e.g. myImage:myTag" required>
+        <input type="text" class="form-control" aria-describedby="registry-name" uib-typeahead="image for image in $ctrl.availableImages | filter:$viewValue | limitTo:5"
+        ng-model="$ctrl.model.Image" name="image_name" placeholder="e.g. myImage:myTag" required>
       </div>
     </div>
     <label for="image_registry" class="margin-sm-top control-label text-right" ng-class="$ctrl.labelClass">
