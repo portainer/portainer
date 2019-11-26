@@ -1,20 +1,20 @@
 <!-- use registry -->
 <div ng-if="$ctrl.model.UseRegistry">
   <div class="form-group">
-    <label for="image_name" ng-class="$ctrl.labelClass" class="control-label text-left">Image</label>
+    <label for="image_registry" class="control-label text-left" ng-class="$ctrl.labelClass">
+      Registry
+    </label>
     <div ng-class="$ctrl.inputClass">
+      <select ng-options="registry as registry.Name for registry in $ctrl.availableRegistries track by registry.Name" ng-model="$ctrl.model.Registry" id="image_registry"
+        selected-item-id="ctrl.selectedItemId" class="form-control"></select>
+    </div>
+    <label for="image_name" ng-class="$ctrl.labelClass" class="margin-sm-top control-label text-left">Image</label>
+    <div ng-class="$ctrl.inputClass" class="margin-sm-top">
       <div class="input-group">
         <span class="input-group-addon" id="registry-name">{{$ctrl.model.Registry.URL || 'docker.io'}}</span>
         <input type="text" class="form-control" aria-describedby="registry-name" uib-typeahead="image for image in $ctrl.availableImages | filter:$viewValue | limitTo:5"
         ng-model="$ctrl.model.Image" name="image_name" placeholder="e.g. myImage:myTag" required>
       </div>
-    </div>
-    <label for="image_registry" class="margin-sm-top control-label text-right" ng-class="$ctrl.labelClass">
-      Registry
-    </label>
-    <div ng-class="$ctrl.inputClass" class="margin-sm-top">
-      <select ng-options="registry as registry.Name for registry in $ctrl.availableRegistries track by registry.Name" ng-model="$ctrl.model.Registry" id="image_registry"
-        selected-item-id="ctrl.selectedItemId" class="form-control"></select>
     </div>
   </div>
 </div>

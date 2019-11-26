@@ -514,7 +514,7 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   }
 }
 
-@media(min-width: 768px) and (max-width: 992px) {
+@media(min-width: 768px){
   .margin-sm-top {
     margin-top: 5px;
   }
