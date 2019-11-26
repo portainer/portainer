@@ -32,7 +32,15 @@ class porImageRegistryController {
     } else {
       const registries = _.filter(this.availableRegistries, (reg) => this.isKnownRegistry(reg));
       const registryImages = _.flatMap(registries, (registry) => _.filter(this.images, (image) => _.includes(image, registry.URL)));
-      images = _.difference(this.images, registryImages);
+      const imagesWithoutKnown = _.difference(this.images, registryImages);
+      images = _.filter(imagesWithoutKnown, (image) => {
+        const split = _.split(image, '/');
+        const url = split[0];
+        if (split.length > 1) {
+          return !_.includes(url, '.') && !_.includes(url, ':');
+        }
+        return true;
+      });
     }
     this.availableImages = images;
   }
