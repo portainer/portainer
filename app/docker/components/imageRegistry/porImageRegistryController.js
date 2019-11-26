@@ -1,6 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import { DockerHubViewModel } from 'Portainer/models/dockerhub';
+import { RegistryTypes } from 'Extensions/registry-management/models/registryTypes';
 
 class porImageRegistryController {
   /* @ngInject */
@@ -18,22 +19,33 @@ class porImageRegistryController {
     this.$scope.$watch(() => this.model.Registry, this.onRegistryChange);
   }
 
-  isKnownRepository(registry) {
+  isKnownRegistry(registry) {
     return !(registry instanceof DockerHubViewModel) && registry.URL;
   }
 
-  onRegistryChange() {
+  prepareAutocomplete() {
     let images = [];
     const registry = this.model.Registry;
-    if (this.isKnownRepository(registry)) {
+    if (this.isKnownRegistry(registry)) {
       const registryImages = _.filter(this.images, (image) => _.includes(image, this.model.Registry.URL));
       images = _.map(registryImages, (image) => _.replace(image, registry.URL + '/', ''));
     } else {
-      const registries = _.filter(this.availableRegistries, (reg) => this.isKnownRepository(reg));
+      const registries = _.filter(this.availableRegistries, (reg) => this.isKnownRegistry(reg));
       const registryImages = _.flatMap(registries, (registry) => _.filter(this.images, (image) => _.includes(image, registry.URL)));
       images = _.difference(this.images, registryImages);
     }
     this.availableImages = images;
+  }
+
+  onRegistryChange() {
+    this.changeRegistryURL();
+    this.prepareAutocomplete();
+  }
+
+  changeRegistryURL() {
+    if (this.model.Registry.Type === RegistryTypes.GITLAB) {
+      this.model.Registry.URL = this.model.Registry.URL + '/' + _.toLower(this.model.Registry.Name);
+    }
   }
 
   async onInit() {
