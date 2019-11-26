@@ -1,15 +1,14 @@
 package extensions
 
 import (
-	"encoding/json"
 	"net/http"
 
-	"github.com/coreos/go-semver/semver"
+	"github.com/portainer/portainer/api/http/client"
+
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/client"
 )
 
 // GET request on /api/extensions/:id
@@ -18,46 +17,39 @@ func (handler *Handler) extensionInspect(w http.ResponseWriter, r *http.Request)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid extension identifier route variable", err}
 	}
+
 	extensionID := portainer.ExtensionID(extensionIdentifier)
 
-	extensionData, err := client.Get(portainer.ExtensionDefinitionsURL, 30)
+	definitions, err := handler.ExtensionManager.FetchExtensionDefinitions()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve extension definitions", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve extensions informations", err}
 	}
 
-	var extensions []portainer.Extension
-	err = json.Unmarshal(extensionData, &extensions)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to parse external extension definitions", err}
+	localExtension, err := handler.ExtensionService.Extension(extensionID)
+	if err != nil && err != portainer.ErrObjectNotFound {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve extension information from the database", err}
 	}
 
 	var extension portainer.Extension
-	for _, p := range extensions {
-		if p.ID == extensionID {
-			extension = p
-			if extension.DescriptionURL != "" {
-				description, _ := client.Get(extension.DescriptionURL, 10)
-				extension.Description = string(description)
-			}
+	var extensionDefinition portainer.Extension
+
+	for _, definition := range definitions {
+		if definition.ID == extensionID {
+			extensionDefinition = definition
 			break
 		}
 	}
 
-	storedExtension, err := handler.ExtensionService.Extension(extensionID)
-	if err == portainer.ErrObjectNotFound {
-		return response.JSON(w, extension)
-	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a extension with the specified identifier inside the database", err}
+	if localExtension == nil {
+		extension = extensionDefinition
+	} else {
+		extension = *localExtension
 	}
 
-	extension.Enabled = storedExtension.Enabled
+	mergeExtensionAndDefinition(&extension, &extensionDefinition)
 
-	extensionVer := semver.New(extension.Version)
-	pVer := semver.New(storedExtension.Version)
-
-	if pVer.LessThan(*extensionVer) {
-		extension.UpdateAvailable = true
-	}
+	description, _ := client.Get(extension.DescriptionURL, 5)
+	extension.Description = string(description)
 
 	return response.JSON(w, extension)
 }

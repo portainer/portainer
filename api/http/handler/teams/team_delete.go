@@ -33,5 +33,10 @@ func (handler *Handler) teamDelete(w http.ResponseWriter, r *http.Request) *http
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to delete associated team memberships from the database", err}
 	}
 
+	err = handler.AuthorizationService.RemoveTeamAccessPolicies(portainer.TeamID(teamID))
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to clean-up team access policies", err}
+	}
+
 	return response.Empty(w)
 }

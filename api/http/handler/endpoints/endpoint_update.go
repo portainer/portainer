@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"net/http"
+	"reflect"
 	"strconv"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -77,12 +78,12 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	updateAuthorizations := false
-	if payload.UserAccessPolicies != nil {
+	if payload.UserAccessPolicies != nil && !reflect.DeepEqual(payload.UserAccessPolicies, endpoint.UserAccessPolicies) {
 		endpoint.UserAccessPolicies = payload.UserAccessPolicies
 		updateAuthorizations = true
 	}
 
-	if payload.TeamAccessPolicies != nil {
+	if payload.TeamAccessPolicies != nil && !reflect.DeepEqual(payload.TeamAccessPolicies, endpoint.TeamAccessPolicies) {
 		endpoint.TeamAccessPolicies = payload.TeamAccessPolicies
 		updateAuthorizations = true
 	}
@@ -165,7 +166,7 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if payload.URL != nil || payload.TLS != nil || endpoint.Type == portainer.AzureEnvironment {
-		_, err = handler.ProxyManager.CreateAndRegisterProxy(endpoint)
+		_, err = handler.ProxyManager.CreateAndRegisterEndpointProxy(endpoint)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to register HTTP proxy for the endpoint", err}
 		}
@@ -177,7 +178,7 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if updateAuthorizations {
-		err = handler.AuthorizationService.UpdateUserAuthorizationsFromPolicies(&payload.UserAccessPolicies, &payload.TeamAccessPolicies)
+		err = handler.AuthorizationService.UpdateUsersAuthorizations()
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
 		}

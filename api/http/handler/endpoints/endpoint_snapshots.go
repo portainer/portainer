@@ -17,7 +17,7 @@ func (handler *Handler) endpointSnapshots(w http.ResponseWriter, r *http.Request
 	}
 
 	for _, endpoint := range endpoints {
-		if endpoint.Type == portainer.AzureEnvironment {
+		if !portainer.EndpointSupportsSnapshot(&endpoint) {
 			continue
 		}
 

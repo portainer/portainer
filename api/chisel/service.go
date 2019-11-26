@@ -173,9 +173,13 @@ func (service *Service) checkTunnels() {
 }
 
 func (service *Service) snapshotEnvironment(endpointID portainer.EndpointID, tunnelPort int) error {
-	endpoint, err := service.endpointService.Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := service.endpointService.Endpoint(endpointID)
 	if err != nil {
 		return err
+	}
+
+	if !portainer.EndpointSupportsSnapshot(endpoint) {
+		return nil
 	}
 
 	endpointURL := endpoint.URL

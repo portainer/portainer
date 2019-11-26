@@ -16,6 +16,10 @@ import (
 	"github.com/portainer/portainer/api"
 )
 
+const (
+	dockerClientVersion = "1.24"
+)
+
 // ComposeStackManager represents a service for managing compose stacks.
 type ComposeStackManager struct {
 	dataPath             string
@@ -40,7 +44,7 @@ func (manager *ComposeStackManager) createClient(endpoint *portainer.Endpoint) (
 
 	clientOpts := client.Options{
 		Host:       endpointURL,
-		APIVersion: portainer.SupportedDockerAPIVersion,
+		APIVersion: dockerClientVersion,
 	}
 
 	if endpoint.TLSConfig.TLS {

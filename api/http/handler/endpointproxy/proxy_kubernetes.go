@@ -39,7 +39,7 @@ func (handler *Handler) proxyRequestsToKubernetesAPI(w http.ResponseWriter, r *h
 
 		tunnel := handler.ReverseTunnelService.GetTunnelDetails(endpoint.ID)
 		if tunnel.Status == portainer.EdgeAgentIdle {
-			handler.ProxyManager.DeleteProxy(endpoint)
+			handler.ProxyManager.DeleteEndpointProxy(endpoint)
 
 			err := handler.ReverseTunnelService.SetTunnelStatusToRequired(endpoint.ID)
 			if err != nil {
@@ -57,16 +57,16 @@ func (handler *Handler) proxyRequestsToKubernetesAPI(w http.ResponseWriter, r *h
 	}
 
 	var proxy http.Handler
-	proxy = handler.ProxyManager.GetProxy(endpoint)
+	proxy = handler.ProxyManager.GetEndpointProxy(endpoint)
 	if proxy == nil {
-		proxy, err = handler.ProxyManager.CreateAndRegisterProxy(endpoint)
+		proxy, err = handler.ProxyManager.CreateAndRegisterEndpointProxy(endpoint)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create proxy", err}
 		}
 	}
 
 	// TODO: relocate token management into proxy creation
-	if endpoint.Type == portainer.KubernetesEnvironment {
+	if endpoint.Type == portainer.KubernetesLocalEnvironment {
 		token, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/token")
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to read service account token file", err}

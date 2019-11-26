@@ -19,8 +19,8 @@ module.exports = function(grunt) {
     binaries: {
       dockerLinuxVersion: '18.09.3',
       dockerWindowsVersion: '17.09.0-ce',
-      komposeVersion: 'v1.18.0',
-      kubectlVersion: 'v1.15.3'
+      komposeVersion: 'v1.19.0',
+      kubectlVersion: 'v1.16.3'
     },
     config: gruntfile_cfg.config,
     env: gruntfile_cfg.env,
@@ -50,12 +50,12 @@ module.exports = function(grunt) {
   grunt.registerTask('build', [
     'build:server',
     'build:client',
-    'copy:templates'
+    'copy:assets'
   ]);
 
   grunt.registerTask('start:server', [
     'build:server',
-    'copy:templates',
+    'copy:assets',
     'shell:run_container'
   ]);
 
@@ -76,7 +76,7 @@ module.exports = function(grunt) {
         'config:prod',
         'env:prod',
         'clean:all',
-        'copy:templates',
+        'copy:assets',
         'shell:build_binary:' + p + ':' + a,
         'shell:download_docker_binary:' + p + ':' + a,
         'shell:download_kompose_binary:' + p + ':' + a,
@@ -91,7 +91,7 @@ module.exports = function(grunt) {
         'config:prod',
         'env:prod',
         'clean:all',
-        'copy:templates',
+        'copy:assets',
         'shell:build_binary_azuredevops:' + p + ':' + a,
         'shell:download_docker_binary:' + p + ':' + a,
         'shell:download_kompose_binary:' + p + ':' + a,
@@ -144,11 +144,16 @@ gruntfile_cfg.eslint = {
 };
 
 gruntfile_cfg.copy = {
-  templates: {
+  assets: {
     files: [
       {
         dest: '<%= root %>/',
         src: 'templates.json',
+        cwd: ''
+      },
+      {
+        dest: '<%= root %>/',
+        src: 'extensions.json',
         cwd: ''
       }
     ]

@@ -115,11 +115,11 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 		}
 		payload.AzureAuthenticationKey = azureAuthenticationKey
 	default:
-		url, err := request.RetrieveMultiPartFormValue(r, "URL", true)
+		endpointURL, err := request.RetrieveMultiPartFormValue(r, "URL", true)
 		if err != nil {
 			return portainer.Error("Invalid endpoint URL")
 		}
-		payload.URL = url
+		payload.URL = endpointURL
 
 		publicURL, _ := request.RetrieveMultiPartFormValue(r, "PublicURL", true)
 		payload.PublicURL = publicURL
@@ -156,7 +156,7 @@ func (handler *Handler) createEndpoint(payload *endpointCreatePayload) (*portain
 	case portainer.EdgeAgentOnDockerEnvironment:
 		return handler.createEdgeAgentEndpoint(payload, portainer.EdgeAgentOnDockerEnvironment)
 
-	case portainer.KubernetesEnvironment:
+	case portainer.KubernetesLocalEnvironment:
 		return handler.createKubernetesEndpoint(payload)
 
 	case portainer.EdgeAgentOnKubernetesEnvironment:
@@ -166,7 +166,7 @@ func (handler *Handler) createEndpoint(payload *endpointCreatePayload) (*portain
 	if payload.TLS {
 		return handler.createTLSSecuredEndpoint(payload, portainer.EndpointType(payload.EndpointType))
 	}
-	return handler.createUnsecuredDockerEndpoint(payload)
+	return handler.createUnsecuredEndpoint(payload)
 }
 
 func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
@@ -199,9 +199,9 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 		Snapshots:          []portainer.Snapshot{},
 	}
 
-	err = handler.EndpointService.CreateEndpoint(endpoint)
+	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
 	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint inside the database", err}
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "An error occured while trying to create the endpoint", err}
 	}
 
 	return endpoint, nil
@@ -244,15 +244,15 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload, 
 		EdgeKey:         edgeKey,
 	}
 
-	err = handler.EndpointService.CreateEndpoint(endpoint)
+	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
 	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint inside the database", err}
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "An error occured while trying to create the endpoint", err}
 	}
 
 	return endpoint, nil
 }
 
-func (handler *Handler) createUnsecuredDockerEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
+func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
 	endpointType := portainer.DockerEnvironment
 
 	if payload.URL == "" {
@@ -300,7 +300,7 @@ func (handler *Handler) createKubernetesEndpoint(payload *endpointCreatePayload)
 		ID:        portainer.EndpointID(endpointID),
 		Name:      payload.Name,
 		URL:       payload.URL,
-		Type:      portainer.KubernetesEnvironment,
+		Type:      portainer.KubernetesLocalEnvironment,
 		GroupID:   portainer.EndpointGroupID(payload.GroupID),
 		PublicURL: payload.PublicURL,
 		TLSConfig: portainer.TLSConfiguration{
@@ -374,9 +374,27 @@ func (handler *Handler) snapshotAndPersistEndpoint(endpoint *portainer.Endpoint)
 		}
 	}
 
+	err := handler.saveEndpointAndUpdateAuthorizations(endpoint)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "An error occured while trying to create the endpoint", err}
+	}
+
+	return nil
+}
+
+func (handler *Handler) saveEndpointAndUpdateAuthorizations(endpoint *portainer.Endpoint) error {
 	err := handler.EndpointService.CreateEndpoint(endpoint)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint inside the database", err}
+		return err
+	}
+
+	group, err := handler.EndpointGroupService.EndpointGroup(endpoint.GroupID)
+	if err != nil {
+		return err
+	}
+
+	if len(group.UserAccessPolicies) > 0 || len(group.TeamAccessPolicies) > 0 {
+		return handler.AuthorizationService.UpdateUsersAuthorizations()
 	}
 
 	return nil

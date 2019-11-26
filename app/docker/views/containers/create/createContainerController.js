@@ -1,12 +1,12 @@
 import _ from 'lodash-es';
-import { ContainerCapabilities, ContainerCapability } from '../../../models/containerCapabilities';
-import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
-import { ContainerDetailsViewModel } from '../../../models/container';
+import {ContainerCapabilities, ContainerCapability} from '../../../models/containerCapabilities';
+import {AccessControlFormData} from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
+import {ContainerDetailsViewModel} from '../../../models/container';
 
 
 angular.module('portainer.docker')
-.controller('CreateContainerController', ['$q', '$scope', '$state', '$timeout', '$transition$', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'NetworkService', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'FormValidator', 'ModalService', 'RegistryService', 'SystemService', 'SettingsService', 'PluginService', 'HttpRequestHelper',
-function ($q, $scope, $state, $timeout, $transition$, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, NetworkService, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, FormValidator, ModalService, RegistryService, SystemService, SettingsService, PluginService, HttpRequestHelper) {
+.controller('CreateContainerController', ['$q', '$scope', '$async', '$state', '$timeout', '$transition$', '$filter', 'Container', 'ContainerHelper', 'Image', 'ImageHelper', 'Volume', 'NetworkService', 'ResourceControlService', 'Authentication', 'Notifications', 'ContainerService', 'ImageService', 'FormValidator', 'ModalService', 'RegistryService', 'SystemService', 'SettingsService', 'PluginService', 'HttpRequestHelper',
+function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container, ContainerHelper, Image, ImageHelper, Volume, NetworkService, ResourceControlService, Authentication, Notifications, ContainerService, ImageService, FormValidator, ModalService, RegistryService, SystemService, SettingsService, PluginService, HttpRequestHelper) {
 
   $scope.create = create;
 
@@ -138,25 +138,8 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
   }
 
   function preparePortBindings(config) {
-    var bindings = {};
-    if (config.ExposedPorts === undefined) {
-      config.ExposedPorts = {};
-    }
-    config.HostConfig.PortBindings.forEach(function (portBinding) {
-      if (portBinding.containerPort) {
-        var key = portBinding.containerPort + '/' + portBinding.protocol;
-        var binding = {};
-        if (portBinding.hostPort && portBinding.hostPort.indexOf(':') > -1) {
-          var hostAndPort = portBinding.hostPort.split(':');
-          binding.HostIp = hostAndPort[0];
-          binding.HostPort = hostAndPort[1];
-        } else {
-          binding.HostPort = portBinding.hostPort;
-        }
-        bindings[key] = [binding];
-        config.ExposedPorts[key] = {};
-      }
-    });
+    const bindings = ContainerHelper.preparePortBindings(config.HostConfig.PortBindings);
+    _.forEach(bindings, (_, key) => config.ExposedPorts[key] = {});
     config.HostConfig.PortBindings = bindings;
   }
 
@@ -238,8 +221,13 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
   function prepareLabels(config) {
     var labels = {};
     $scope.formValues.Labels.forEach(function (label) {
-      if (label.name && label.value) {
-        labels[label.name] = label.value;
+      if (label.name) {
+        if (label.value) {
+            labels[label.name] = label.value;
+        }
+        else {
+            labels[label.name] = '';
+        }
       }
     });
     config.Labels = labels;
@@ -330,22 +318,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
   }
 
   function loadFromContainerPortBindings() {
-    var bindings = [];
-    for (var p in $scope.config.HostConfig.PortBindings) {
-      if ({}.hasOwnProperty.call($scope.config.HostConfig.PortBindings, p)) {
-        var hostPort = '';
-        if ($scope.config.HostConfig.PortBindings[p][0].HostIp) {
-          hostPort = $scope.config.HostConfig.PortBindings[p][0].HostIp + ':';
-        }
-        hostPort += $scope.config.HostConfig.PortBindings[p][0].HostPort;
-        var b = {
-          'hostPort': hostPort,
-          'containerPort': p.split('/')[0],
-          'protocol': p.split('/')[1]
-        };
-        bindings.push(b);
-      }
-    }
+    const bindings = ContainerHelper.sortAndCombinePorts($scope.config.HostConfig.PortBindings);
     $scope.config.HostConfig.PortBindings = bindings;
   }
 
@@ -425,7 +398,7 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     var envArr = [];
     for (var e in $scope.config.Env) {
       if ({}.hasOwnProperty.call($scope.config.Env, e)) {
-        var arr = $scope.config.Env[e].split(/\=(.+)/);
+        var arr = $scope.config.Env[e].split(/\=(.*)/);
         envArr.push({'name': arr[0], 'value': arr[1]});
       }
     }
@@ -784,21 +757,21 @@ function ($q, $scope, $state, $timeout, $transition$, $filter, Container, Contai
     }
 
     function createNewContainer() {
-      var config = prepareConfiguration();
-      return ContainerService.createAndStartContainer(config);
+      return $async(async () => {
+        const config = prepareConfiguration();
+        return await ContainerService.createAndStartContainer(config);
+      });
     }
 
     function applyResourceControl(newContainer) {
-      var containerIdentifier = newContainer.Id;
-      var userId = Authentication.getUserDetails().ID;
+      const userId = Authentication.getUserDetails().ID;
+      const resourceControl = newContainer.Portainer.ResourceControl;
+      const containerId = newContainer.Id;
+      const accessControlData = $scope.formValues.AccessControlData;
 
-      return $q.when(ResourceControlService.applyResourceControl(
-        'container',
-        containerIdentifier,
-        userId,
-        $scope.formValues.AccessControlData, []
-      )).then(function onApplyResourceControlSuccess() {
-        return containerIdentifier;
+      return ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl)
+      .then(function onApplyResourceControlSuccess() {
+        return containerId;
       });
     }
 

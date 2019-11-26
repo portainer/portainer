@@ -2,6 +2,8 @@ import moment from 'moment';
 import _ from 'lodash-es';
 import filesize from 'filesize';
 
+import {ResourceControlOwnership as RCO} from 'Portainer/models/resourceControl/resourceControlOwnership';
+
 angular.module('portainer.app')
 .filter('truncate', function () {
   'use strict';
@@ -120,11 +122,13 @@ angular.module('portainer.app')
   return function (type) {
     if (type === 1) {
       return 'Docker';
-    } else if (type === 2) {
+    } else if (type === 2 || type === 6) {
       return 'Agent';
     } else if (type === 3) {
       return 'Azure ACI';
-    } else if (type === 4) {
+    } else if (type === 5) {
+      return 'Kubernetes';
+    } else if (type === 4 || type === 7) {
       return 'Edge Agent';
     }
     return '';
@@ -137,6 +141,8 @@ angular.module('portainer.app')
       return 'fab fa-microsoft';
     } else if (type === 4) {
       return 'fa fa-cloud';
+    } else if (type === 5 || type === 6 || type === 7) {
+      return 'fas fa-dharmachakra';
     }
     return 'fab fa-docker';
   };
@@ -145,11 +151,11 @@ angular.module('portainer.app')
   'use strict';
   return function (ownership) {
     switch (ownership) {
-      case 'private':
+      case RCO.PRIVATE:
         return 'fa fa-eye-slash';
-      case 'administrators':
+      case RCO.ADMINISTRATORS:
         return 'fa fa-eye-slash';
-      case 'restricted':
+      case RCO.RESTRICTED:
         return 'fa fa-users';
       default:
         return 'fa fa-eye';

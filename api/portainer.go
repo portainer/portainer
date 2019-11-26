@@ -106,6 +106,7 @@ type (
 		OAuthSettings                      OAuthSettings        `json:"OAuthSettings"`
 		AllowBindMountsForRegularUsers     bool                 `json:"AllowBindMountsForRegularUsers"`
 		AllowPrivilegedModeForRegularUsers bool                 `json:"AllowPrivilegedModeForRegularUsers"`
+		AllowVolumeBrowserForRegularUsers  bool                 `json:"AllowVolumeBrowserForRegularUsers"`
 		SnapshotInterval                   string               `json:"SnapshotInterval"`
 		TemplatesURL                       string               `json:"TemplatesURL"`
 		EnableHostManagementFeatures       bool                 `json:"EnableHostManagementFeatures"`
@@ -174,14 +175,15 @@ type (
 
 	// Stack represents a Docker stack created via docker stack deploy
 	Stack struct {
-		ID          StackID    `json:"Id"`
-		Name        string     `json:"Name"`
-		Type        StackType  `json:"Type"`
-		EndpointID  EndpointID `json:"EndpointId"`
-		SwarmID     string     `json:"SwarmId"`
-		EntryPoint  string     `json:"EntryPoint"`
-		Env         []Pair     `json:"Env"`
-		ProjectPath string
+		ID              StackID          `json:"Id"`
+		Name            string           `json:"Name"`
+		Type            StackType        `json:"Type"`
+		EndpointID      EndpointID       `json:"EndpointId"`
+		SwarmID         string           `json:"SwarmId"`
+		EntryPoint      string           `json:"EntryPoint"`
+		Env             []Pair           `json:"Env"`
+		ResourceControl *ResourceControl `json:"ResourceControl"`
+		ProjectPath     string
 	}
 
 	// RegistryID represents a registry identifier
@@ -189,6 +191,12 @@ type (
 
 	// RegistryType represents a type of registry
 	RegistryType int
+
+	// GitlabRegistryData represents data required for gitlab registry to work
+	GitlabRegistryData struct {
+		ProjectID   int    `json:"ProjectId"`
+		InstanceURL string `json:"InstanceURL"`
+	}
 
 	// Registry represents a Docker registry with all the info required
 	// to connect to it
@@ -201,6 +209,7 @@ type (
 		Username                string                           `json:"Username"`
 		Password                string                           `json:"Password,omitempty"`
 		ManagementConfiguration *RegistryManagementConfiguration `json:"ManagementConfiguration"`
+		Gitlab                  GitlabRegistryData               `json:"Gitlab"`
 		UserAccessPolicies      UserAccessPolicies               `json:"UserAccessPolicies"`
 		TeamAccessPolicies      TeamAccessPolicies               `json:"TeamAccessPolicies"`
 
@@ -294,6 +303,7 @@ type (
 		Name           string         `json:"Name"`
 		Description    string         `json:"Description"`
 		Authorizations Authorizations `json:"Authorizations"`
+		Priority       int            `json:"Priority"`
 	}
 
 	// AccessPolicy represent a policy that can be associated to a user or team
@@ -438,21 +448,20 @@ type (
 
 	// ResourceControl represent a reference to a Docker resource with specific access controls
 	ResourceControl struct {
-		ID             ResourceControlID    `json:"Id"`
-		ResourceID     string               `json:"ResourceId"`
-		SubResourceIDs []string             `json:"SubResourceIds"`
-		Type           ResourceControlType  `json:"Type"`
-		UserAccesses   []UserResourceAccess `json:"UserAccesses"`
-		TeamAccesses   []TeamResourceAccess `json:"TeamAccesses"`
-		Public         bool                 `json:"Public"`
+		ID                 ResourceControlID    `json:"Id"`
+		ResourceID         string               `json:"ResourceId"`
+		SubResourceIDs     []string             `json:"SubResourceIds"`
+		Type               ResourceControlType  `json:"Type"`
+		UserAccesses       []UserResourceAccess `json:"UserAccesses"`
+		TeamAccesses       []TeamResourceAccess `json:"TeamAccesses"`
+		Public             bool                 `json:"Public"`
+		AdministratorsOnly bool                 `json:"AdministratorsOnly"`
+		System             bool                 `json:"System"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 2
 		OwnerID     UserID              `json:"OwnerId,omitempty"`
 		AccessLevel ResourceAccessLevel `json:"AccessLevel,omitempty"`
-
-		// Deprecated in DBVersion == 14
-		AdministratorsOnly bool `json:"AdministratorsOnly,omitempty"`
 	}
 
 	// ResourceControlType represents the type of resource associated to the resource control (volume, container, service...)
@@ -637,7 +646,8 @@ type (
 	RoleService interface {
 		Role(ID RoleID) (*Role, error)
 		Roles() ([]Role, error)
-		CreateRole(set *Role) error
+		CreateRole(role *Role) error
+		UpdateRole(ID RoleID, role *Role) error
 	}
 
 	// TeamService represents a service for managing user data
@@ -740,7 +750,7 @@ type (
 	// ResourceControlService represents a service for managing resource control data
 	ResourceControlService interface {
 		ResourceControl(ID ResourceControlID) (*ResourceControl, error)
-		ResourceControlByResourceID(resourceID string) (*ResourceControl, error)
+		ResourceControlByResourceIDAndType(resourceID string, resourceType ResourceControlType) (*ResourceControl, error)
 		ResourceControls() ([]ResourceControl, error)
 		CreateResourceControl(rc *ResourceControl) error
 		UpdateResourceControl(ID ResourceControlID, resourceControl *ResourceControl) error
@@ -885,9 +895,11 @@ type (
 	// ExtensionManager represents a service used to manage extensions
 	ExtensionManager interface {
 		FetchExtensionDefinitions() ([]Extension, error)
+		InstallExtension(extension *Extension, licenseKey string, archiveFileName string, extensionArchive []byte) error
 		EnableExtension(extension *Extension, licenseKey string) error
 		DisableExtension(extension *Extension) error
 		UpdateExtension(extension *Extension, version string) error
+		StartExtensions() error
 	}
 
 	// ReverseTunnelService represensts a service used to manage reverse tunnel connections.
@@ -905,9 +917,9 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "1.22.0"
+	APIVersion = "1.23.0-dev"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 20
+	DBVersion = 22
 	// AssetsServerURL represents the URL of the Portainer asset server
 	AssetsServerURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com"
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
@@ -915,7 +927,9 @@ const (
 	// VersionCheckURL represents the URL used to retrieve the latest version of Portainer
 	VersionCheckURL = "https://api.github.com/repos/portainer/portainer/releases/latest"
 	// ExtensionDefinitionsURL represents the URL where Portainer extension definitions can be retrieved
-	ExtensionDefinitionsURL = AssetsServerURL + "/extensions-1.22.0.json"
+	ExtensionDefinitionsURL = AssetsServerURL + "/extensions-" + APIVersion + ".json"
+	// SupportProductsURL represents the URL where Portainer support products can be retrieved
+	SupportProductsURL = AssetsServerURL + "/support.json"
 	// PortainerAgentHeader represents the name of the header available in any agent response
 	PortainerAgentHeader = "Portainer-Agent"
 	// PortainerAgentEdgeIDHeader represent the name of the header containing the Edge ID associated to an agent/agent cluster
@@ -929,12 +943,12 @@ const (
 	// PortainerAgentSignatureMessage represents the message used to create a digital signature
 	// to be used when communicating with an agent
 	PortainerAgentSignatureMessage = "Portainer-App"
-	// SupportedDockerAPIVersion is the minimum Docker API version supported by Portainer
-	SupportedDockerAPIVersion = "1.24"
 	// ExtensionServer represents the server used by Portainer to communicate with extensions
 	ExtensionServer = "localhost"
 	// DefaultEdgeAgentCheckinIntervalInSeconds represents the default interval (in seconds) used by Edge agents to checkin with the Portainer instance
 	DefaultEdgeAgentCheckinIntervalInSeconds = 5
+	// LocalExtensionManifestFile represents the name of the local manifest file for extensions
+	LocalExtensionManifestFile = "/app/extensions.json"
 )
 
 const (
@@ -1012,8 +1026,8 @@ const (
 	AzureEnvironment
 	// EdgeAgentOnDockerEnvironment represents an endpoint connected to an Edge agent deployed on a Docker environment
 	EdgeAgentOnDockerEnvironment
-	// KubernetesEnvironment represents an endpoint connected to a Kubernetes environment
-	KubernetesEnvironment
+	// KubernetesLocalEnvironment represents an endpoint connected to a local Kubernetes environment
+	KubernetesLocalEnvironment
 	// AgentOnKubernetesEnvironment represents an endpoint connected to a Portainer agent deployed on a Kubernetes environment
 	AgentOnKubernetesEnvironment
 	// EdgeAgentOnKubernetesEnvironment represents an endpoint connected to an Edge agent deployed on a Kubernetes environment
@@ -1084,6 +1098,8 @@ const (
 	AzureRegistry
 	// CustomRegistry represents a custom registry
 	CustomRegistry
+	// GitlabRegistry represents a gitlab registry
+	GitlabRegistry
 )
 
 const (

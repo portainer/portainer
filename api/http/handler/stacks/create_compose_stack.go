@@ -1,18 +1,27 @@
 package stacks
 
 import (
+	"errors"
 	"net/http"
+	"path"
+	"regexp"
 	"strconv"
 	"strings"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/security"
 )
+
+// this is coming from libcompose
+// https://github.com/portainer/libcompose/blob/master/project/context.go#L117-L120
+func normalizeStackName(name string) string {
+	r := regexp.MustCompile("[^a-z0-9]+")
+	return r.ReplaceAllString(strings.ToLower(name), "")
+}
 
 type composeStackFromFileContentPayload struct {
 	Name             string
@@ -24,13 +33,14 @@ func (payload *composeStackFromFileContentPayload) Validate(r *http.Request) err
 	if govalidator.IsNull(payload.Name) {
 		return portainer.Error("Invalid stack name")
 	}
+	payload.Name = normalizeStackName(payload.Name)
 	if govalidator.IsNull(payload.StackFileContent) {
 		return portainer.Error("Invalid stack file content")
 	}
 	return nil
 }
 
-func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint) *httperror.HandlerError {
+func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	var payload composeStackFromFileContentPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
@@ -84,7 +94,7 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 	}
 
 	doCleanUp = false
-	return response.JSON(w, stack)
+	return handler.decorateStackResponse(w, stack, userID)
 }
 
 type composeStackFromGitRepositoryPayload struct {
@@ -102,6 +112,7 @@ func (payload *composeStackFromGitRepositoryPayload) Validate(r *http.Request) e
 	if govalidator.IsNull(payload.Name) {
 		return portainer.Error("Invalid stack name")
 	}
+	payload.Name = normalizeStackName(payload.Name)
 	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
 		return portainer.Error("Invalid repository URL. Must correspond to a valid URL format")
 	}
@@ -114,7 +125,7 @@ func (payload *composeStackFromGitRepositoryPayload) Validate(r *http.Request) e
 	return nil
 }
 
-func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint) *httperror.HandlerError {
+func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	var payload composeStackFromGitRepositoryPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
@@ -178,7 +189,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 	}
 
 	doCleanUp = false
-	return response.JSON(w, stack)
+	return handler.decorateStackResponse(w, stack, userID)
 }
 
 type composeStackFromFileUploadPayload struct {
@@ -192,7 +203,7 @@ func (payload *composeStackFromFileUploadPayload) Validate(r *http.Request) erro
 	if err != nil {
 		return portainer.Error("Invalid stack name")
 	}
-	payload.Name = name
+	payload.Name = normalizeStackName(name)
 
 	composeFileContent, _, err := request.RetrieveMultiPartFormFile(r, "file")
 	if err != nil {
@@ -209,7 +220,7 @@ func (payload *composeStackFromFileUploadPayload) Validate(r *http.Request) erro
 	return nil
 }
 
-func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint) *httperror.HandlerError {
+func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	payload := &composeStackFromFileUploadPayload{}
 	err := payload.Validate(r)
 	if err != nil {
@@ -238,7 +249,7 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 	}
 
 	stackFolder := strconv.Itoa(int(stack.ID))
-	projectPath, err := handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
+	projectPath, err := handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, payload.StackFileContent)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Compose file on disk", err}
 	}
@@ -263,7 +274,7 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 	}
 
 	doCleanUp = false
-	return response.JSON(w, stack)
+	return handler.decorateStackResponse(w, stack, userID)
 }
 
 type composeStackDeploymentConfig struct {
@@ -271,6 +282,7 @@ type composeStackDeploymentConfig struct {
 	endpoint   *portainer.Endpoint
 	dockerhub  *portainer.DockerHub
 	registries []portainer.Registry
+	isAdmin    bool
 }
 
 func (handler *Handler) createComposeDeployConfig(r *http.Request, stack *portainer.Stack, endpoint *portainer.Endpoint) (*composeStackDeploymentConfig, *httperror.HandlerError) {
@@ -295,6 +307,7 @@ func (handler *Handler) createComposeDeployConfig(r *http.Request, stack *portai
 		endpoint:   endpoint,
 		dockerhub:  dockerhub,
 		registries: filteredRegistries,
+		isAdmin:    securityContext.IsAdmin,
 	}
 
 	return config, nil
@@ -306,12 +319,34 @@ func (handler *Handler) createComposeDeployConfig(r *http.Request, stack *portai
 // clean it. Hence the use of the mutex.
 // We should contribute to libcompose to support authentication without using the config.json file.
 func (handler *Handler) deployComposeStack(config *composeStackDeploymentConfig) error {
+	settings, err := handler.SettingsService.Settings()
+	if err != nil {
+		return err
+	}
+
+	if !settings.AllowBindMountsForRegularUsers && !config.isAdmin {
+		composeFilePath := path.Join(config.stack.ProjectPath, config.stack.EntryPoint)
+
+		stackContent, err := handler.FileService.GetFileContent(composeFilePath)
+		if err != nil {
+			return err
+		}
+
+		valid, err := handler.isValidStackFile(stackContent)
+		if err != nil {
+			return err
+		}
+		if !valid {
+			return errors.New("bind-mount disabled for non administrator users")
+		}
+	}
+
 	handler.stackCreationMutex.Lock()
 	defer handler.stackCreationMutex.Unlock()
 
 	handler.SwarmStackManager.Login(config.dockerhub, config.registries, config.endpoint)
 
-	err := handler.ComposeStackManager.Up(config.stack, config.endpoint)
+	err = handler.ComposeStackManager.Up(config.stack, config.endpoint)
 	if err != nil {
 		return err
 	}

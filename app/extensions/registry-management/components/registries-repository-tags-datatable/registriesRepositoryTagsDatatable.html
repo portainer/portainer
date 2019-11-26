@@ -3,18 +3,17 @@
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
         <div class="toolBarTitle">
-          <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{
-          $ctrl.titleText }}
+          <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }}
         </div>
       </div>
-      <div class="actionBar">
+      <div class="actionBar" ng-if="$ctrl.advancedFeaturesAvailable">
         <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
       </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" placeholder="Search..." auto-focus ng-model-options="{ debounce: 300 }">
+        <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" ng-model-options="{ debounce: 300 }" ng-change="$ctrl.onTextFilterChange()" placeholder="Search..." auto-focus>
       </div>
       <div class="table-responsive">
         <table class="table table-hover nowrap-cells">
@@ -32,43 +31,33 @@
                 </a>
               </th>
               <th>Os/Architecture</th>
-              <th>
-                <a ng-click="$ctrl.changeOrderBy('ImageId')">
-                  Image ID
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ImageId' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ImageId' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
-              <th>
-                <a ng-click="$ctrl.changeOrderBy('Size')">
-                  Size
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Size' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Size' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
-              <th>Actions</th>
+              <th>Image ID</th>
+              <th>Compressed size</th>
+              <th ng-if="$ctrl.advancedFeaturesAvailable">Actions</th>
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))"
+            <tr ng-hide="$ctrl.loading" dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))"
               ng-class="{active: item.Checked}">
               <td>
                 <span class="md-checkbox">
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
-                {{ item.Name }}
+                <a ui-sref="portainer.registries.registry.repository.tag({tag: item.Name})"
+                title="{{ item.Name }}">{{ item.Name }}</a>
               </td>
               <td>{{ item.Os }}/{{ item.Architecture }}</td>
-              <td>{{ item.ImageId | truncate:40 }}</td>
+              <td>{{ item.ImageId | trimshasum }}</td>
               <td>{{ item.Size | humansize }}</td>
-              <td>
+              <td ng-if="$ctrl.advancedFeaturesAvailable">
                 <span ng-if="!item.Modified">
                   <a class="interactive" ng-click="item.Modified = true; item.NewName = item.Name; $event.stopPropagation();">
                     <i class="fa fa-tag" aria-hidden="true"></i> Retag
                   </a>
                 </span>
                 <span ng-if="item.Modified">
+                  <portainer-tooltip position="bottom" message="Tag can only contain alphanumeric (a-zA-Z0-9) and special _ . - characters. Tag must not start with . - characters."></portainer-tooltip>
                   <input class="input-sm" type="text" ng-model="item.NewName" on-enter-key="$ctrl.retagAction(item)"
                     auto-focus ng-click="$event.stopPropagation();" />
                   <a class="interactive" ng-click="item.Modified = false; $event.stopPropagation();"><i class="fa fa-times"></i></a>
@@ -76,11 +65,11 @@
                 </span>
               </td>
             </tr>
-            <tr ng-if="!$ctrl.dataset">
-              <td colspan="3" class="text-center text-muted">Loading...</td>
+            <tr ng-if="$ctrl.loading">
+              <td colspan="5" class="text-center text-muted">Loading...</td>
             </tr>
-            <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-              <td colspan="3" class="text-center text-muted">No tag available.</td>
+            <tr ng-if="!$ctrl.loading && $ctrl.state.filteredDataSet.length === 0">
+              <td colspan="5" class="text-center text-muted">No tag available.</td>
             </tr>
           </tbody>
         </table>
@@ -96,7 +85,6 @@
                 Items per page
               </span>
               <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
-                <option value="0">All</option>
                 <option value="10">10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>

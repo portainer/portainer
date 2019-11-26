@@ -10,7 +10,8 @@ angular.module('portainer.app')
       };
 
       $scope.formValues = {
-        License: ''
+        License: '',
+        ExtensionFile: null,
       };
 
       function initView() {
@@ -25,10 +26,11 @@ angular.module('portainer.app')
       }
 
       $scope.enableExtension = function() {
-        var license = $scope.formValues.License;
+        const license = $scope.formValues.License;
+        const extensionFile = $scope.formValues.ExtensionFile;
 
         $scope.state.actionInProgress = true;
-        ExtensionService.enable(license)
+        ExtensionService.enable(license, extensionFile)
           .then(function onSuccess() {
             return ExtensionService.retrieveAndSaveEnabledExtensions();
           }).then(function () {

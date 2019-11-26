@@ -53,7 +53,7 @@ func (runner *SnapshotJobRunner) Run() {
 		}
 
 		for _, endpoint := range endpoints {
-			if endpoint.Type == portainer.AzureEnvironment || endpoint.Type == portainer.EdgeAgentOnDockerEnvironment || endpoint.Type == portainer.KubernetesEnvironment || endpoint.Type == portainer.AgentOnKubernetesEnvironment {
+			if !portainer.EndpointSupportsSnapshot(&endpoint) {
 				continue
 			}
 

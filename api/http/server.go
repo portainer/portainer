@@ -3,6 +3,8 @@ package http
 import (
 	"time"
 
+	"github.com/portainer/portainer/api/http/handler/support"
+
 	"github.com/portainer/portainer/api/http/handler/roles"
 
 	"github.com/portainer/portainer/api"
@@ -86,18 +88,22 @@ func (server *Server) Start() error {
 	proxyManagerParameters := &proxy.ManagerParams{
 		ResourceControlService: server.ResourceControlService,
 		UserService:            server.UserService,
+		TeamService:            server.TeamService,
 		TeamMembershipService:  server.TeamMembershipService,
 		SettingsService:        server.SettingsService,
 		RegistryService:        server.RegistryService,
 		DockerHubService:       server.DockerHubService,
 		SignatureService:       server.SignatureService,
 		ReverseTunnelService:   server.ReverseTunnelService,
+		ExtensionService:       server.ExtensionService,
+		DockerClientFactory:    server.DockerClientFactory,
 	}
 	proxyManager := proxy.NewManager(proxyManagerParameters)
 
 	authorizationServiceParameters := &portainer.AuthorizationServiceParameters{
 		EndpointService:       server.EndpointService,
 		EndpointGroupService:  server.EndpointGroupService,
+		RegistryService:       server.RegistryService,
 		RoleService:           server.RoleService,
 		TeamMembershipService: server.TeamMembershipService,
 		UserService:           server.UserService,
@@ -196,6 +202,9 @@ func (server *Server) Start() error {
 	settingsHandler.FileService = server.FileService
 	settingsHandler.JobScheduler = server.JobScheduler
 	settingsHandler.ScheduleService = server.ScheduleService
+	settingsHandler.RoleService = server.RoleService
+	settingsHandler.ExtensionService = server.ExtensionService
+	settingsHandler.AuthorizationService = authorizationService
 
 	var stackHandler = stacks.NewHandler(requestBouncer)
 	stackHandler.FileService = server.FileService
@@ -208,6 +217,9 @@ func (server *Server) Start() error {
 	stackHandler.GitService = server.GitService
 	stackHandler.RegistryService = server.RegistryService
 	stackHandler.DockerHubService = server.DockerHubService
+	stackHandler.SettingsService = server.SettingsService
+	stackHandler.UserService = server.UserService
+	stackHandler.ExtensionService = server.ExtensionService
 
 	var tagHandler = tags.NewHandler(requestBouncer)
 	tagHandler.TagService = server.TagService
@@ -215,10 +227,15 @@ func (server *Server) Start() error {
 	var teamHandler = teams.NewHandler(requestBouncer)
 	teamHandler.TeamService = server.TeamService
 	teamHandler.TeamMembershipService = server.TeamMembershipService
+	teamHandler.AuthorizationService = authorizationService
 
 	var teamMembershipHandler = teammemberships.NewHandler(requestBouncer)
 	teamMembershipHandler.TeamMembershipService = server.TeamMembershipService
+	teamMembershipHandler.AuthorizationService = authorizationService
+
 	var statusHandler = status.NewHandler(requestBouncer, server.Status)
+
+	var supportHandler = support.NewHandler(requestBouncer)
 
 	var templatesHandler = templates.NewHandler(requestBouncer)
 	templatesHandler.TemplateService = server.TemplateService
@@ -234,6 +251,7 @@ func (server *Server) Start() error {
 	userHandler.CryptoService = server.CryptoService
 	userHandler.ResourceControlService = server.ResourceControlService
 	userHandler.SettingsService = server.SettingsService
+	userHandler.AuthorizationService = authorizationService
 
 	var websocketHandler = websocket.NewHandler(requestBouncer)
 	websocketHandler.EndpointService = server.EndpointService
@@ -260,6 +278,7 @@ func (server *Server) Start() error {
 		SettingsHandler:        settingsHandler,
 		StatusHandler:          statusHandler,
 		StackHandler:           stackHandler,
+		SupportHandler:         supportHandler,
 		TagHandler:             tagHandler,
 		TeamHandler:            teamHandler,
 		TeamMembershipHandler:  teamMembershipHandler,

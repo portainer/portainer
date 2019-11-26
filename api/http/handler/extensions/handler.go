@@ -3,6 +3,8 @@ package extensions
 import (
 	"net/http"
 
+	"github.com/coreos/go-semver/semver"
+
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer/api"
@@ -27,15 +29,58 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	}
 
 	h.Handle("/extensions",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.extensionList))).Methods(http.MethodGet)
+		bouncer.RestrictedAccess(httperror.LoggerHandler(h.extensionList))).Methods(http.MethodGet)
 	h.Handle("/extensions",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.extensionCreate))).Methods(http.MethodPost)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.extensionCreate))).Methods(http.MethodPost)
+	h.Handle("/extensions/upload",
+		bouncer.AdminAccess(httperror.LoggerHandler(h.extensionUpload))).Methods(http.MethodPost)
 	h.Handle("/extensions/{id}",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.extensionInspect))).Methods(http.MethodGet)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.extensionInspect))).Methods(http.MethodGet)
 	h.Handle("/extensions/{id}",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.extensionDelete))).Methods(http.MethodDelete)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.extensionDelete))).Methods(http.MethodDelete)
 	h.Handle("/extensions/{id}/update",
-		bouncer.AuthorizedAccess(httperror.LoggerHandler(h.extensionUpdate))).Methods(http.MethodPost)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.extensionUpdate))).Methods(http.MethodPost)
 
 	return h
+}
+
+func mergeExtensionsAndDefinitions(extensions, definitions []portainer.Extension) []portainer.Extension {
+	for _, definition := range definitions {
+		foundInDB := false
+
+		for idx, extension := range extensions {
+			if extension.ID == definition.ID {
+				foundInDB = true
+				mergeExtensionAndDefinition(&extensions[idx], &definition)
+				break
+			}
+		}
+
+		if !foundInDB {
+			extensions = append(extensions, definition)
+		}
+	}
+
+	return extensions
+}
+
+func mergeExtensionAndDefinition(extension, definition *portainer.Extension) {
+	extension.Name = definition.Name
+	extension.ShortDescription = definition.ShortDescription
+	extension.Deal = definition.Deal
+	extension.Available = definition.Available
+	extension.DescriptionURL = definition.DescriptionURL
+	extension.Images = definition.Images
+	extension.Logo = definition.Logo
+	extension.Price = definition.Price
+	extension.PriceDescription = definition.PriceDescription
+	extension.ShopURL = definition.ShopURL
+
+	definitionVersion := semver.New(definition.Version)
+	extensionVersion := semver.New(extension.Version)
+	if extensionVersion.LessThan(*definitionVersion) {
+		extension.UpdateAvailable = true
+	}
+
+	extension.Version = definition.Version
 }

@@ -14,6 +14,7 @@ type publicSettingsResponse struct {
 	AuthenticationMethod               portainer.AuthenticationMethod `json:"AuthenticationMethod"`
 	AllowBindMountsForRegularUsers     bool                           `json:"AllowBindMountsForRegularUsers"`
 	AllowPrivilegedModeForRegularUsers bool                           `json:"AllowPrivilegedModeForRegularUsers"`
+	AllowVolumeBrowserForRegularUsers  bool                           `json:"AllowVolumeBrowserForRegularUsers"`
 	EnableHostManagementFeatures       bool                           `json:"EnableHostManagementFeatures"`
 	ExternalTemplates                  bool                           `json:"ExternalTemplates"`
 	OAuthLoginURI                      string                         `json:"OAuthLoginURI"`
@@ -31,6 +32,7 @@ func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *
 		AuthenticationMethod:               settings.AuthenticationMethod,
 		AllowBindMountsForRegularUsers:     settings.AllowBindMountsForRegularUsers,
 		AllowPrivilegedModeForRegularUsers: settings.AllowPrivilegedModeForRegularUsers,
+		AllowVolumeBrowserForRegularUsers:  settings.AllowVolumeBrowserForRegularUsers,
 		EnableHostManagementFeatures:       settings.EnableHostManagementFeatures,
 		ExternalTemplates:                  false,
 		OAuthLoginURI: fmt.Sprintf("%s?response_type=code&client_id=%s&redirect_uri=%s&scope=%s&prompt=login",
