@@ -32,7 +32,6 @@ class AuthenticationController {
     };
 
     this.retrieveAndSaveEnabledExtensionsAsync = this.retrieveAndSaveEnabledExtensionsAsync.bind(this);
-    this.retrievePermissionsAsync = this.retrievePermissionsAsync.bind(this);
     this.checkForEndpointsAsync = this.checkForEndpointsAsync.bind(this);
     this.checkForLatestVersionAsync = this.checkForLatestVersionAsync.bind(this);
     this.postLoginSteps = this.postLoginSteps.bind(this);
@@ -103,16 +102,6 @@ class AuthenticationController {
    * POST LOGIN STEPS SECTION
    */
 
-  async retrievePermissionsAsync() {
-    try {
-      await this.Authentication.retrievePermissions();
-    } catch (err) {
-      this.state.permissionsError = true;
-      this.logout();
-      this.error(err, 'Unable to retrieve permissions.');
-    }
-  }
-
   async retrieveAndSaveEnabledExtensionsAsync() {
     try {
       await this.ExtensionService.retrieveAndSaveEnabledExtensions();
@@ -154,7 +143,6 @@ class AuthenticationController {
   }
 
   async postLoginSteps() {
-    await this.retrievePermissionsAsync();
     await this.retrieveAndSaveEnabledExtensionsAsync();
     await this.checkForEndpointsAsync(false);
     await this.checkForLatestVersionAsync();
@@ -264,7 +252,6 @@ class AuthenticationController {
       if (this.$stateParams.logout || this.$stateParams.error) {
         this.logout();
         this.state.AuthenticationError = this.$stateParams.error;
-        return;
       }
 
       if (this.Authentication.isAuthenticated()) {

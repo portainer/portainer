@@ -358,7 +358,7 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
       var netContainer = $scope.config.HostConfig.NetworkMode.split(/^container:/)[1];
       $scope.config.HostConfig.NetworkMode = 'container';
       for (var c in $scope.runningContainers) {
-        if ($scope.runningContainers[c].Names && $scope.runningContainers[c].Names[0] === '/' + netContainer) {
+        if ($scope.runningContainers[c].Id == netContainer) {
           $scope.formValues.NetworkContainer = $scope.runningContainers[c];
         }
       }
