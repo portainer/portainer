@@ -64,9 +64,8 @@
         <form class="form-horizontal">
           <!-- image-and-registry -->
           <por-image-registry
-            image="formValues.Image"
-            registry="formValues.Registry"
-            label-class="col-sm-1" input-class="col-sm-11 col-md-5"
+            model="formValues.RegistryModel"
+            label-class="col-sm-1" input-class="col-sm-11"
           ></por-image-registry>
           <!-- !image-and-registry -->
           <!-- tag-note -->
@@ -78,7 +77,7 @@
           <!-- !tag-note -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.Image" ng-click="tagImage()">Tag</button>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.RegistryModel.Image" ng-click="tagImage()">Tag</button>
             </div>
           </div>
         </form>

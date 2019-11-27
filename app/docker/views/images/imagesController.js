@@ -1,4 +1,5 @@
 import _ from 'lodash-es';
+import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
 angular.module('portainer.docker')
 .controller('ImagesController', ['$scope', '$state', 'ImageService', 'Notifications', 'ModalService', 'HttpRequestHelper', 'FileSaver', 'Blob', 'EndpointProvider',
@@ -9,22 +10,20 @@ function ($scope, $state, ImageService, Notifications, ModalService, HttpRequest
   };
 
   $scope.formValues = {
-    Image: '',
-    Registry: '',
+    RegistryModel: new PorImageRegistryModel(),
     NodeName: null
   };
 
   $scope.pullImage = function() {
-    var image = $scope.formValues.Image;
-    var registry = $scope.formValues.Registry;
+    const registryModel = $scope.formValues.RegistryModel;
 
     var nodeName = $scope.formValues.NodeName;
     HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
 
     $scope.state.actionInProgress = true;
-    ImageService.pullImage(image, registry, false)
+    ImageService.pullImage(registryModel, false)
     .then(function success() {
-      Notifications.success('Image successfully pulled', image);
+      Notifications.success('Image successfully pulled', registryModel.Image);
       $state.reload();
     })
     .catch(function error(err) {
