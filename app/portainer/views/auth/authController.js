@@ -3,11 +3,12 @@ import uuidv4 from 'uuid/v4';
 
 class AuthenticationController {
   /* @ngInject */
-  constructor($async, $scope, $state, $stateParams, $sanitize, Authentication, UserService, EndpointService, ExtensionService, StateManager, Notifications, SettingsService, URLHelper, LocalStorage, StatusService) {
+  constructor($async, $scope, $state, $stateParams, $sanitize, $window, Authentication, UserService, EndpointService, ExtensionService, StateManager, Notifications, SettingsService, URLHelper, LocalStorage, StatusService) {
     this.$async = $async;
     this.$scope = $scope;
     this.$state = $state;
     this.$stateParams = $stateParams;
+    this.$window = $window;
     this.$sanitize = $sanitize;
     this.Authentication = Authentication;
     this.UserService = UserService;
@@ -51,10 +52,12 @@ class AuthenticationController {
    * UTILS FUNCTIONS SECTION
    */
 
-  logout() {
+  logout(error) {
     this.Authentication.logout();
     this.state.loginInProgress = false;
     this.generateOAuthLoginURI();
+    this.LocalStorage.storeLogoutReason(error);
+    this.$window.location.reload();
   }
 
   error(err, message) {
@@ -250,8 +253,13 @@ class AuthenticationController {
       this.generateOAuthLoginURI();
 
       if (this.$stateParams.logout || this.$stateParams.error) {
-        this.logout();
-        this.state.AuthenticationError = this.$stateParams.error;
+        this.logout(this.$stateParams.error);
+        return;
+      }
+      const error = this.LocalStorage.getLogoutReason();
+      if (error) {
+        this.state.AuthenticationError = error;
+        this.LocalStorage.cleanLogoutReason();
       }
 
       if (this.Authentication.isAuthenticated()) {
