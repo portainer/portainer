@@ -208,7 +208,8 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
       IPAMConfig: {
         IPv4Address: $scope.formValues.IPv4,
         IPv6Address: $scope.formValues.IPv6
-      }
+      },
+      Aliases: _.without($scope.config.NetworkingConfig.EndpointsConfig[networkMode].Aliases, $scope.config.Hostname)
     };
 
     $scope.formValues.ExtraHosts.forEach(function (v) {
@@ -775,9 +776,9 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
         return $q.when();
       }
 
-      var connectionPromises = Object.keys($scope.extraNetworks).map(function (networkName) {
-        return NetworkService.connectContainer(networkName, newContainerId);
-      });
+      var connectionPromises = _.forOwn($scope.extraNetworks, function (network, networkName) {
+        return NetworkService.connectContainer(networkName, newContainerId, _.without(network.Aliases, $scope.config.Hostname));
+        });
 
       return $q.all(connectionPromises);
     }
