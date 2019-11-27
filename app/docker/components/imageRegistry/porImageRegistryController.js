@@ -23,14 +23,19 @@ class porImageRegistryController {
     return !(registry instanceof DockerHubViewModel) && registry.URL;
   }
 
+  getRegistryURL(registry) {
+    let url = registry.URL;
+    if (registry.Type === RegistryTypes.GITLAB) {
+      url = registry.URL + '/' + registry.Gitlab.ProjectPath;
+    }
+    return url;
+  }
+
   prepareAutocomplete() {
     let images = [];
     const registry = this.model.Registry;
     if (this.isKnownRegistry(registry)) {
-      let url = registry.URL;
-      if (registry.Type === RegistryTypes.GITLAB) {
-        url = registry.URL + '/' + registry.Gitlab.ProjectPath;
-      }
+      const url = this.getRegistryURL(registry);
       const registryImages = _.filter(this.images, (image) => _.includes(image, url));
       images = _.map(registryImages, (image) => _.replace(image, new RegExp(url + '\/?'), ''));
     } else {
@@ -51,14 +56,13 @@ class porImageRegistryController {
 
   onRegistryChange() {
     this.prepareAutocomplete();
+    if (this.model.Registry.Type === RegistryTypes.GITLAB && this.model.Image) {
+      this.model.Image = _.replace(this.model.Image, this.model.Registry.Gitlab.ProjectPath, '');
+    }
   }
 
   displayedRegistryURL() {
-    if (this.model.Registry.Type === RegistryTypes.GITLAB) {
-      this.model.Image = _.replace(this.model.Image, this.model.Registry.Gitlab.ProjectPath, '')
-      return this.model.Registry.URL + '/' + this.model.Registry.Gitlab.ProjectPath;
-    }
-    return this.model.Registry.URL || 'docker.io';
+    return this.getRegistryURL(this.model.Registry) || 'docker.io';
   }
 
   async onInit() {

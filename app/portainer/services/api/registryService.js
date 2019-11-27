@@ -1,6 +1,7 @@
 import _ from 'lodash-es';
 import { RegistryViewModel, RegistryCreateRequest } from '../../models/registry';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
+import { RegistryTypes } from 'Extensions/registry-management/models/registryTypes';
 
 angular.module('portainer.app')
 .factory('RegistryService', ['$q', '$async', 'Registries', 'DockerHubService', 'ImageHelper', 'FileUploadService',
@@ -84,12 +85,24 @@ function RegistryServiceFactory($q, $async, Registries, DockerHubService, ImageH
 
   service.retrievePorRegistryModelFromRepositoryWithRegistries = retrievePorRegistryModelFromRepositoryWithRegistries;
 
+  function getURL(reg) {
+    let url = reg.URL;
+    if (reg.Type === RegistryTypes.GITLAB) {
+      url = reg.URL + '/' + reg.Gitlab.ProjectPath;
+    }
+    return url;
+  }
+
   function retrievePorRegistryModelFromRepositoryWithRegistries(repository, registries, dockerhub) {
     const model = new PorImageRegistryModel();
-    const registry = _.find(registries, (reg) => _.includes(repository, reg.URL));
+    const registry = _.find(registries, (reg) => _.includes(repository, getURL(reg)));
     if (registry) {
-      const lastIndex = repository.lastIndexOf(registry.URL) + registry.URL.length;
-      const image = repository.substring(lastIndex + 1);
+      const url = getURL(registry);
+      const lastIndex = repository.lastIndexOf(url) + url.length;
+      let image = repository.substring(lastIndex);
+      if (!_.startsWith(image, ':')) {
+        image = image.substring(1);
+      }
       model.Registry = registry;
       model.Image = image;
     } else {
