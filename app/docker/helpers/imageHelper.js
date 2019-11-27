@@ -36,12 +36,13 @@ angular.module('portainer.docker')
     };
     let fullImageName = '';
 
-    if (registry.UseRegistry && registry.Registry.URL) {
+    if (registry.UseRegistry) {
       if (registry.Registry.Type === RegistryTypes.GITLAB) {
         const slash = _.startsWith(registry.Image, ':') ? '' : '/';
         fullImageName = registry.Registry.URL + '/' + registry.Registry.Gitlab.ProjectPath + slash + registry.Image;
       } else {
-        fullImageName = registry.Registry.URL + '/' + registry.Image;
+        const url = registry.Registry.URL ? registry.Registry.URL + '/' : '';
+        fullImageName = url + registry.Image;
       }
       if (!_.includes(registry.Image, ':')) {
         fullImageName += ':latest';
