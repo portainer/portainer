@@ -11,6 +11,7 @@ angular.module('portainer.docker')
   helper.createImageConfigForContainer = createImageConfigForContainer;
   helper.getImagesNamesForDownload = getImagesNamesForDownload;
   helper.removeDigestFromRepository = removeDigestFromRepository;
+  helper.imageContainsURL = imageContainsURL;
 
   function isValidTag(tag) {
     return tag.match(/^(?![\.\-])([a-zA-Z0-9\_\.\-])+$/g);
@@ -51,6 +52,15 @@ angular.module('portainer.docker')
 
     data.fromImage = fullImageName;
     return data;
+  }
+
+  function imageContainsURL(image) {
+    const split = _.split(image, '/');
+    const url = split[0];
+    if (split.length > 1) {
+      return _.includes(url, '.') || _.includes(url, ':');
+    }
+    return false;
   }
 
   function removeDigestFromRepository(repository) {

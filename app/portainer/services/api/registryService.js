@@ -106,7 +106,9 @@ function RegistryServiceFactory($q, $async, Registries, DockerHubService, ImageH
       model.Registry = registry;
       model.Image = image;
     } else {
-      model.UseRegistry = false;
+      if (ImageHelper.imageContainsURL(repository)) {
+        model.UseRegistry = false;
+      }
       model.Registry = dockerhub;
       model.Image = repository;
     }

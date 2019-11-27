@@ -5,9 +5,10 @@ import { RegistryTypes } from 'Extensions/registry-management/models/registryTyp
 
 class porImageRegistryController {
   /* @ngInject */
-  constructor($async, $scope, RegistryService, DockerHubService, ImageService, Notifications) {
+  constructor($async, $scope, ImageHelper, RegistryService, DockerHubService, ImageService, Notifications) {
     this.$async = $async;
     this.$scope = $scope;
+    this.ImageHelper = ImageHelper;
     this.RegistryService = RegistryService;
     this.DockerHubService = DockerHubService;
     this.ImageService = ImageService;
@@ -42,14 +43,7 @@ class porImageRegistryController {
       const registries = _.filter(this.availableRegistries, (reg) => this.isKnownRegistry(reg));
       const registryImages = _.flatMap(registries, (registry) => _.filter(this.images, (image) => _.includes(image, registry.URL)));
       const imagesWithoutKnown = _.difference(this.images, registryImages);
-      images = _.filter(imagesWithoutKnown, (image) => {
-        const split = _.split(image, '/');
-        const url = split[0];
-        if (split.length > 1) {
-          return !_.includes(url, '.') && !_.includes(url, ':');
-        }
-        return true;
-      });
+      images = _.filter(imagesWithoutKnown, (image) => !this.ImageHelper.imageContainsURL(image));
     }
     this.availableImages = images;
   }
