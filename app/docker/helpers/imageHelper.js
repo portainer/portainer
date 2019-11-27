@@ -42,9 +42,9 @@ angular.module('portainer.docker')
         fullImageName = registry.Registry.URL + '/' + registry.Registry.Gitlab.ProjectPath + slash + registry.Image;
       } else {
         fullImageName = registry.Registry.URL + '/' + registry.Image;
-        if (!_.includes(registry.Image, ':')) {
-          fullImageName += ':latest';
-        }
+      }
+      if (!_.includes(registry.Image, ':')) {
+        fullImageName += ':latest';
       }
     } else {
       fullImageName = registry.Image;
