@@ -21,7 +21,7 @@ function TemplateServiceFactory($q, Templates, TemplateHelper, RegistryService, 
     .then(function success(data) {
       const templates = data.templates.map(function (item) {
         const res = new TemplateViewModel(item);
-        const registry = RegistryService.retrievePorRegistryModelFromRepositoryWithRegistries(res.RegistryModel.Registry, data.registries, data.dockerhub);
+        const registry = RegistryService.retrievePorRegistryModelFromRepositoryWithRegistries(res.RegistryModel.Registry.URL, data.registries, data.dockerhub);
         registry.Image = res.RegistryModel.Image;
         res.RegistryModel = registry;
         return res;
@@ -41,7 +41,7 @@ function TemplateServiceFactory($q, Templates, TemplateHelper, RegistryService, 
     Templates.get({ id: id }).$promise
     .then(function success(data) {
       template = new TemplateViewModel(data);
-      return RegistryService.retrievePorRegistryModelFromRepository(template.RegistryModel.Registry);
+      return RegistryService.retrievePorRegistryModelFromRepository(template.RegistryModel.Registry.URL);
     })
     .then((registry) => {
       registry.Image = template.RegistryModel.Image;

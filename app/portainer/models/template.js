@@ -68,7 +68,7 @@ export function TemplateViewModel(data) {
   this.Hostname = data.hostname;
   this.RegistryModel = new PorImageRegistryModel();
   this.RegistryModel.Image = data.image;
-  this.RegistryModel.Registry = data.registry || {};
+  this.RegistryModel.Registry.URL = data.registry || '';
   this.Command = data.command ? data.command : '';
   this.Network = data.network ? data.network : '';
   this.Privileged = data.privileged ? data.privileged : false;
