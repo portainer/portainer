@@ -624,7 +624,7 @@ func main() {
 		}
 
 		if len(users) == 0 {
-			log.Printf("Creating admin user with password hash %s", adminPasswordHash)
+			log.Println("Created admin user with the given password.")
 			user := &portainer.User{
 				Username:                "admin",
 				Role:                    portainer.AdministratorRole,
