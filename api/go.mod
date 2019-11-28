@@ -1,4 +1,4 @@
-module portainer/api
+module portainer/portainer/api
 
 go 1.13
 
@@ -28,6 +28,7 @@ require (
 	github.com/portainer/libcompose v0.5.1
 	github.com/portainer/libcrypto v0.0.0-20190723020515-23ebe86ab2c2
 	github.com/portainer/libhttp v0.0.0-20190806161843-ba068f58be33
+	github.com/portainer/portainer v0.6.1-0.20191128051432-550c7a739b27 // indirect
 	github.com/robfig/cron v1.2.0
 	github.com/satori/go.uuid v1.2.0
 	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4
