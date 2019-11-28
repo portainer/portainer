@@ -203,7 +203,7 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
     config.HostConfig.NetworkMode = networkMode;
     config.MacAddress = $scope.formValues.MacAddress;
 
-    let aliases= []
+    let aliases = [];
     if (networkMode && _.has($scope.config.NetworkingConfig.EndpointsConfig[networkMode], 'Aliases')){
       aliases = _.without($scope.config.NetworkingConfig.EndpointsConfig[networkMode].Aliases, $scope.config.Hostname);
     }
