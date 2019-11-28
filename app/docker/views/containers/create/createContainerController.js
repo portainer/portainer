@@ -202,19 +202,18 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
     }
     config.HostConfig.NetworkMode = networkMode;
     config.MacAddress = $scope.formValues.MacAddress;
-
-    let aliases = [];
-    if (networkMode && _.has($scope.config.NetworkingConfig.EndpointsConfig[networkMode], 'Aliases')){
-      aliases = _.without($scope.config.NetworkingConfig.EndpointsConfig[networkMode].Aliases, $scope.config.Hostname);
-    }
-    
+ 
     config.NetworkingConfig.EndpointsConfig[networkMode] = {
       IPAMConfig: {
         IPv4Address: $scope.formValues.IPv4,
         IPv6Address: $scope.formValues.IPv6
-      },
-      Aliases: aliases
+      }
     };
+    
+    if (networkMode && _.get($scope.config.NetworkingConfig.EndpointsConfig[networkMode], 'Aliases')){
+      var aliases = $scope.config.NetworkingConfig.EndpointsConfig[networkMode].Aliases;
+      config.NetworkingConfig.EndpointsConfig[networkMode].Aliases = _.filter(aliases, (o) => { return !_.startsWith($scope.fromContainer.Id,o)});
+    }
 
     $scope.formValues.ExtraHosts.forEach(function (v) {
     if (v.value) {
@@ -781,7 +780,10 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
       }
 
       var connectionPromises = _.forOwn($scope.extraNetworks, function (network, networkName) {
-        return NetworkService.connectContainer(networkName, newContainerId, _.without(network.Aliases, $scope.config.Hostname));
+        if (_.has(network, 'Aliases')) {
+          var aliases = _.filter(network.Aliases, (o) => { return !_.startsWith($scope.fromContainer.Id,o)})
+        }
+        return NetworkService.connectContainer(networkName, newContainerId, aliases);
         });
 
       return $q.all(connectionPromises);
