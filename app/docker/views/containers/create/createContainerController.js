@@ -203,12 +203,17 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
     config.HostConfig.NetworkMode = networkMode;
     config.MacAddress = $scope.formValues.MacAddress;
 
+    let aliases = [];
+    if (networkMode && _.has($scope.config.NetworkingConfig.EndpointsConfig[networkMode], 'Aliases')){
+      aliases = _.without($scope.config.NetworkingConfig.EndpointsConfig[networkMode].Aliases, $scope.config.Hostname);
+    }
+    
     config.NetworkingConfig.EndpointsConfig[networkMode] = {
       IPAMConfig: {
         IPv4Address: $scope.formValues.IPv4,
         IPv6Address: $scope.formValues.IPv6
       },
-      Aliases: _.without($scope.config.NetworkingConfig.EndpointsConfig[networkMode].Aliases, $scope.config.Hostname)
+      Aliases: aliases
     };
 
     $scope.formValues.ExtraHosts.forEach(function (v) {
