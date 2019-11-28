@@ -210,7 +210,7 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
       }
     };
     
-    if (networkMode && _.get($scope.config.NetworkingConfig.EndpointsConfig[networkMode], 'Aliases') != null){
+    if (networkMode && _.get($scope.config.NetworkingConfig.EndpointsConfig[networkMode], 'Aliases')){
       var aliases = $scope.config.NetworkingConfig.EndpointsConfig[networkMode].Aliases;
       config.NetworkingConfig.EndpointsConfig[networkMode].Aliases = _.filter(aliases, (o) => { return !_.startsWith($scope.fromContainer.Id,o)});
     }
