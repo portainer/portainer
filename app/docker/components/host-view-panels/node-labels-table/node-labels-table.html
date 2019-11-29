@@ -12,14 +12,14 @@
   <tbody>
     <tr ng-repeat="label in $ctrl.labels">
       <td>
-        <div class="input-group input-group-sm">
+        <div class="input-group input-group-sm label_name">
           <span class="input-group-addon fit-text-size">Name</span>
           <input type="text" class="form-control" ng-model="label.key" placeholder="e.g. com.example.foo"
             ng-change="$ctrl.updateLabel(label)">
         </div>
       </td>
       <td>
-        <div class="input-group input-group-sm">
+        <div class="input-group input-group-sm label_value">
           <span class="input-group-addon fit-text-size">Value</span>
           <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar"
             ng-change="$ctrl.updateLabel(label)">

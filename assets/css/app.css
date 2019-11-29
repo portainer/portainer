@@ -695,6 +695,14 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   }
 }
 
+.swarm_node_details .label_name {
+  width: 100%;
+}
+
+.swarm_node_details .label_value {
+  width: 100%;
+}
+
 .visualizer_container {
   display: flex;
   flex-direction: row;
