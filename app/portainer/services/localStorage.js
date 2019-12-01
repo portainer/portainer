@@ -125,6 +125,9 @@ angular.module('portainer.app')
     getJobImage: function() {
       return localStorageService.get('job_image');
     },
+    storeLogoutReason: (reason) => localStorageService.set('logout_reason', reason),
+    getLogoutReason: () => localStorageService.get('logout_reason'),
+    cleanLogoutReason: () => localStorageService.remove('logout_reason'),
     clean: function() {
       localStorageService.clearAll();
     }

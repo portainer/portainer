@@ -2,6 +2,7 @@ import _ from 'lodash-es';
 import {ContainerCapabilities, ContainerCapability} from '../../../models/containerCapabilities';
 import {AccessControlFormData} from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
 import {ContainerDetailsViewModel} from '../../../models/container';
+import {PorImageRegistryModel} from 'Docker/models/porImageRegistry';
 
 
 angular.module('portainer.docker')
@@ -27,7 +28,8 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
     NodeName: null,
     capabilities: [],
     LogDriverName: '',
-    LogDriverOpts: []
+    LogDriverOpts: [],
+    RegistryModel: new PorImageRegistryModel()
   };
 
   $scope.extraNetworks = {};
@@ -130,11 +132,8 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
   $scope.fromContainerMultipleNetworks = false;
 
   function prepareImageConfig(config) {
-    var image = config.Image;
-    var registry = $scope.formValues.Registry;
-    var imageConfig = ImageHelper.createImageConfigForContainer(image, registry.URL);
-    config.Image = imageConfig.fromImage + ':' + imageConfig.tag;
-    $scope.imageConfig = imageConfig;
+    const imageConfig = ImageHelper.createImageConfigForContainer($scope.formValues.RegistryModel);
+    config.Image = imageConfig.fromImage;
   }
 
   function preparePortBindings(config) {
@@ -203,13 +202,18 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
     }
     config.HostConfig.NetworkMode = networkMode;
     config.MacAddress = $scope.formValues.MacAddress;
-
+ 
     config.NetworkingConfig.EndpointsConfig[networkMode] = {
       IPAMConfig: {
         IPv4Address: $scope.formValues.IPv4,
         IPv6Address: $scope.formValues.IPv6
       }
     };
+    
+    if (networkMode && _.get($scope.config.NetworkingConfig.EndpointsConfig[networkMode], 'Aliases')){
+      var aliases = $scope.config.NetworkingConfig.EndpointsConfig[networkMode].Aliases;
+      config.NetworkingConfig.EndpointsConfig[networkMode].Aliases = _.filter(aliases, (o) => { return !_.startsWith($scope.fromContainer.Id,o)});
+    }
 
     $scope.formValues.ExtraHosts.forEach(function (v) {
     if (v.value) {
@@ -437,13 +441,9 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
   }
 
   function loadFromContainerImageConfig() {
-    var imageInfo = ImageHelper.extractImageAndRegistryFromRepository($scope.config.Image);
-    RegistryService.retrieveRegistryFromRepository($scope.config.Image)
-    .then(function success(data) {
-      if (data) {
-        $scope.config.Image = imageInfo.image;
-        $scope.formValues.Registry = data;
-      }
+    RegistryService.retrievePorRegistryModelFromRepository($scope.config.Image)
+    .then((model) => {
+      $scope.formValues.RegistryModel = model;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrive registry');
@@ -568,7 +568,6 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
         loadFromContainerSpec();
       } else {
         $scope.fromContainer = {};
-        $scope.formValues.Registry = {};
         $scope.formValues.capabilities = new ContainerCapabilities();
       }
     }, function(e) {
@@ -753,7 +752,7 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
 
     function pullImageIfNeeded() {
       return $q.when($scope.formValues.alwaysPull &&
-        ImageService.pullImage($scope.config.Image, $scope.formValues.Registry, true));
+        ImageService.pullImage($scope.formValues.RegistryModel, true));
     }
 
     function createNewContainer() {
@@ -780,9 +779,12 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
         return $q.when();
       }
 
-      var connectionPromises = Object.keys($scope.extraNetworks).map(function (networkName) {
-        return NetworkService.connectContainer(networkName, newContainerId);
-      });
+      var connectionPromises = _.forOwn($scope.extraNetworks, function (network, networkName) {
+        if (_.has(network, 'Aliases')) {
+          var aliases = _.filter(network.Aliases, (o) => { return !_.startsWith($scope.fromContainer.Id,o)})
+        }
+        return NetworkService.connectContainer(networkName, newContainerId, aliases);
+        });
 
       return $q.all(connectionPromises);
     }

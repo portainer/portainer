@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
-import { ImageViewModel } from '../models/image';
-import { ImageDetailsViewModel } from "../models/imageDetails";
-import { ImageLayerViewModel } from "../models/imageLayer";
+import {ImageViewModel} from '../models/image';
+import {ImageDetailsViewModel} from '../models/imageDetails';
+import {ImageLayerViewModel} from '../models/imageLayer';
 
 angular.module('portainer.docker')
 .factory('ImageService', ['$q', 'Image', 'ImageHelper', 'RegistryService', 'HttpRequestHelper', 'ContainerService', 'FileUploadService',
@@ -77,12 +77,20 @@ angular.module('portainer.docker')
     return deferred.promise;
   };
 
-  service.pushImage = function(tag, registry) {
+  service.pushImage = pushImage;
+  /**
+   * 
+   * @param {PorImageRegistryModel} registryModel
+   */
+  function pushImage(registryModel) {
     var deferred = $q.defer();
 
-    var authenticationDetails = registry.Authentication ? RegistryService.encodedCredentials(registry) : '';
+    var authenticationDetails = registryModel.Registry.Authentication ? RegistryService.encodedCredentials(registryModel.Registry) : '';
     HttpRequestHelper.setRegistryAuthenticationHeader(authenticationDetails);
-    Image.push({tag: tag}).$promise
+
+    const imageConfiguration = ImageHelper.createImageConfigForContainer(registryModel);
+
+    Image.push({imageName: imageConfiguration.fromImage}).$promise
     .then(function success(data) {
       if (data[data.length - 1].error) {
         deferred.reject({ msg: data[data.length - 1].error });
@@ -94,7 +102,11 @@ angular.module('portainer.docker')
       deferred.reject({ msg: 'Unable to push image tag', err: err });
     });
     return deferred.promise;
-  };
+  }
+
+  /**
+   * PULL IMAGE
+   */
 
   function pullImageAndIgnoreErrors(imageConfiguration) {
     var deferred = $q.defer();
@@ -127,21 +139,31 @@ angular.module('portainer.docker')
     return deferred.promise;
   }
 
-  service.pullImage = function(image, registry, ignoreErrors) {
-    var imageDetails = ImageHelper.extractImageAndRegistryFromRepository(image);
-    var imageConfiguration = ImageHelper.createImageConfigForContainer(imageDetails.image, registry.URL);
-    var authenticationDetails = registry.Authentication ? RegistryService.encodedCredentials(registry) : '';
+  service.pullImage = pullImage;
+
+  /**
+   * 
+   * @param {PorImageRegistryModel} registry 
+   * @param {bool} ignoreErrors 
+   */
+  function pullImage(registry, ignoreErrors) {
+    var authenticationDetails = registry.Registry.Authentication ? RegistryService.encodedCredentials(registry.Registry) : '';
     HttpRequestHelper.setRegistryAuthenticationHeader(authenticationDetails);
+
+    var imageConfiguration = ImageHelper.createImageConfigForContainer(registry);
 
     if (ignoreErrors) {
       return pullImageAndIgnoreErrors(imageConfiguration);
     }
     return pullImageAndAcknowledgeErrors(imageConfiguration);
-  };
+  }
 
-  service.tagImage = function(id, image, registry) {
-    var imageConfig = ImageHelper.createImageConfigForCommit(image, registry);
-    return Image.tag({id: id, tag: imageConfig.tag, repo: imageConfig.repo}).$promise;
+  /**
+   * ! PULL IMAGE
+   */
+
+  service.tagImage = function(id, image) {
+    return Image.tag({id: id, repo: image}).$promise;
   };
 
   service.downloadImages = function(images) {

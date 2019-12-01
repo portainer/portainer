@@ -59,7 +59,8 @@ export function RegistryCreateRequest(model) {
   if (model.Type === RegistryTypes.GITLAB) {
     this.Gitlab = {
       ProjectId: model.Gitlab.ProjectId,
-      InstanceURL: model.Gitlab.InstanceURL
+      InstanceURL: model.Gitlab.InstanceURL,
+      ProjectPath: model.Gitlab.ProjectPath
     }
   }
 }

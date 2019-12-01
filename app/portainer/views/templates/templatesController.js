@@ -73,7 +73,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
         generatedVolumeIds.push(volumeId);
       });
       TemplateService.updateContainerConfigurationWithVolumes(templateConfiguration, template, data);
-      return ImageService.pullImage(template.Image, { URL: template.Registry }, true);
+      return ImageService.pullImage(template.RegistryModel, true);
     })
     .then(function success() {
       return ContainerService.createAndStartContainer(templateConfiguration);
@@ -112,7 +112,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
     var endpointId = EndpointProvider.endpointID();
     StackService.createComposeStackFromGitRepository(stackName, repositoryOptions, template.Env, endpointId)
     .then(function success(data) {
-      const resourceControl = data.Portainer.ResourceControl;
+      const resourceControl = data.ResourceControl;
       return ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
     })
     .then(function success() {
@@ -150,7 +150,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
     var endpointId = EndpointProvider.endpointID();
     StackService.createSwarmStackFromGitRepository(stackName, repositoryOptions, env, endpointId)
     .then(function success(data) {
-      const resourceControl = data.Portainer.ResourceControl;
+      const resourceControl = data.ResourceControl;
       return ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
     })
     .then(function success() {
@@ -158,7 +158,7 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
       $state.go('portainer.stacks');
     })
     .catch(function error(err) {
-      Notifications.warning('Deployment error', err.err.data.err);
+      Notifications.warning('Deployment error', err.data.err);
     })
     .finally(function final() {
       $scope.state.actionInProgress = false;

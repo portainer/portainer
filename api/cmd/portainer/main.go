@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/chisel"
 
-	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt"
 	"github.com/portainer/portainer/api/cli"
 	"github.com/portainer/portainer/api/cron"
@@ -630,7 +630,7 @@ func main() {
 		}
 
 		if len(users) == 0 {
-			log.Printf("Creating admin user with password hash %s", adminPasswordHash)
+			log.Println("Created admin user with the given password.")
 			user := &portainer.User{
 				Username:                "admin",
 				Role:                    portainer.AdministratorRole,

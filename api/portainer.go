@@ -196,6 +196,7 @@ type (
 	GitlabRegistryData struct {
 		ProjectID   int    `json:"ProjectId"`
 		InstanceURL string `json:"InstanceURL"`
+		ProjectPath string `json:"ProjectPath"`
 	}
 
 	// Registry represents a Docker registry with all the info required

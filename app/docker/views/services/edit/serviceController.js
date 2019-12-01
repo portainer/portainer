@@ -4,6 +4,7 @@ require('./includes/container-specs.html')
 require('./includes/containerlabels.html')
 require('./includes/environmentvariables.html')
 require('./includes/hosts.html')
+require('./includes/image.html')
 require('./includes/logging.html')
 require('./includes/mounts.html')
 require('./includes/networks.html')
@@ -16,6 +17,8 @@ require('./includes/servicelabels.html')
 require('./includes/tasks.html')
 require('./includes/updateconfig.html')
 
+import {PorImageRegistryModel} from 'Docker/models/porImageRegistry';
+
 angular.module('portainer.docker')
 .controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'ContainerService', 'TaskHelper', 'Notifications', 'ModalService', 'PluginService', 'Authentication', 'SettingsService', 'VolumeService', 'ImageHelper', 'WebhookService', 'EndpointProvider', 'clipboard','WebhookHelper',
 function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, ContainerService, TaskHelper, Notifications, ModalService, PluginService, Authentication, SettingsService, VolumeService, ImageHelper, WebhookService, EndpointProvider, clipboard, WebhookHelper) {
@@ -26,6 +29,10 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     rollbackInProgress: false,
   };
 
+  $scope.formValues = {
+    RegistryModel: new PorImageRegistryModel()
+  };
+
   $scope.tasks = [];
   $scope.availableImages = [];
 
@@ -33,20 +40,6 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
 
   var originalService = {};
   var previousServiceValues = [];
-
-  $scope.renameService = function renameService(service) {
-    updateServiceAttribute(service, 'Name', service.newServiceName || service.name);
-    service.EditName = false;
-  };
-  $scope.changeServiceImage = function changeServiceImage(service) {
-    updateServiceAttribute(service, 'Image', service.newServiceImage || service.image);
-    service.EditImage = false;
-  };
-  $scope.scaleService = function scaleService(service) {
-    var replicas = service.newServiceReplicas === null || isNaN(service.newServiceReplicas) ? service.Replicas : service.newServiceReplicas;
-    updateServiceAttribute(service, 'Replicas', replicas);
-    service.EditReplicas = false;
-  };
 
   $scope.goToItem = function(hash) {
       if ($location.hash() !== hash) {
@@ -259,12 +252,17 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   $scope.cancelChanges = function cancelChanges(service, keys) {
     if (keys) { // clean out the keys only from the list of modified keys
       keys.forEach(function(key) {
-        var index = previousServiceValues.indexOf(key);
-        if (index >= 0) {
-          previousServiceValues.splice(index, 1);
+        if (key === 'Image') {
+          $scope.formValues.RegistryModel.Image = '';
+        } else {
+          var index = previousServiceValues.indexOf(key);
+          if (index >= 0) {
+            previousServiceValues.splice(index, 1);
+          }
         }
       });
     } else { // clean out all changes
+      $scope.formValues.RegistryModel.Image = '';
       keys = Object.keys(service);
       previousServiceValues = [];
     }
@@ -277,7 +275,11 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   $scope.hasChanges = function(service, elements) {
     var hasChanges = false;
     elements.forEach(function(key) {
-      hasChanges = hasChanges || (previousServiceValues.indexOf(key) >= 0);
+      if (key === 'Image') {
+        hasChanges = hasChanges || $scope.formValues.RegistryModel.Image ? true : false;
+      } else {
+        hasChanges = hasChanges || (previousServiceValues.indexOf(key) >= 0);
+      }
     });
     return hasChanges;
   };
@@ -288,7 +290,14 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     config.Labels = LabelHelper.fromKeyValueToLabelHash(service.ServiceLabels);
     config.TaskTemplate.ContainerSpec.Env = ServiceHelper.translateEnvironmentVariablesToEnv(service.EnvironmentVariables);
     config.TaskTemplate.ContainerSpec.Labels = LabelHelper.fromKeyValueToLabelHash(service.ServiceContainerLabels);
-    config.TaskTemplate.ContainerSpec.Image = service.Image;
+
+    if ($scope.hasChanges(service, ["Image"])) {
+      const image = ImageHelper.createImageConfigForContainer($scope.formValues.RegistryModel);
+      config.TaskTemplate.ContainerSpec.Image = image.fromImage;
+    } else {
+      config.TaskTemplate.ContainerSpec.Image = service.Image;
+    }
+
     config.TaskTemplate.ContainerSpec.Secrets = service.ServiceSecrets ? service.ServiceSecrets.map(SecretHelper.secretConfig) : [];
     config.TaskTemplate.ContainerSpec.Configs = service.ServiceConfigs ? service.ServiceConfigs.map(ConfigHelper.configConfig) : [];
     config.TaskTemplate.ContainerSpec.Hosts = service.Hosts ? ServiceHelper.translateHostnameIPToHostsEntries(service.Hosts) : [];
@@ -468,7 +477,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   function forceUpdateService(service, pullImage) {
     var config = ServiceHelper.serviceToConfig(service.Model);
     if (pullImage) {
-      config.TaskTemplate.ContainerSpec.Image = config.TaskTemplate.ContainerSpec.Image = ImageHelper.removeDigestFromRepository(config.TaskTemplate.ContainerSpec.Image);
+      config.TaskTemplate.ContainerSpec.Image = ImageHelper.removeDigestFromRepository(config.TaskTemplate.ContainerSpec.Image);
     }
 
     // As explained in https://github.com/docker/swarmkit/issues/2364 ForceUpdate can accept a random

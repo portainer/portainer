@@ -1,4 +1,4 @@
-import { NetworkViewModel } from '../models/network';
+import {NetworkViewModel} from '../models/network';
 
 angular.module('portainer.docker')
 .factory('NetworkService', ['$q', 'Network', function NetworkServiceFactory($q, Network) {
@@ -71,8 +71,16 @@ angular.module('portainer.docker')
     return Network.disconnect({ id: networkId }, { Container: containerId, Force: force }).$promise;
   };
 
-  service.connectContainer = function(networkId, containerId) {
-    return Network.connect({ id: networkId }, { Container: containerId }).$promise;
+  service.connectContainer = function(networkId, containerId, aliases) {
+    var payload = {
+      Container: containerId,
+    };
+    if (aliases) {
+      payload.EndpointConfig = {
+        Aliases: aliases,
+      }
+    }
+    return Network.connect({ id: networkId }, payload).$promise;
   };
 
   return service;

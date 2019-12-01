@@ -155,10 +155,9 @@
             <!-- !tag-description -->
             <!-- image-and-registry -->
             <por-image-registry
-              image="config.Image"
-              registry="config.Registry"
+              model="config.RegistryModel"
               auto-complete="true"
-              label-class="col-sm-1" input-class="col-sm-11 col-md-5"
+              label-class="col-sm-1" input-class="col-sm-11"
             ></por-image-registry>
             <!-- !image-and-registry -->
             <!-- tag-note -->
@@ -170,7 +169,7 @@
             <!-- !tag-note -->
             <div class="form-group">
               <div class="col-sm-12">
-                <button type="button" class="btn btn-primary btn-sm" ng-disabled="!config.Image" ng-click="commit()">Create</button>
+                <button type="button" class="btn btn-primary btn-sm" ng-disabled="!config.RegistryModel.Image || config.commitInProgress" ng-click="commit()">Create</button>
               </div>
             </div>
           </form>
