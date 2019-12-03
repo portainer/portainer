@@ -279,8 +279,16 @@ type (
 		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
 	}
 
+	// KubernetesData contains all the Kubernetes related endpoint information
 	KubernetesData struct {
-		Snapshots []KubernetesSnapshot `json:"Snapshots"`
+		Snapshots     []KubernetesSnapshot    `json:"Snapshots"`
+		Configuration KubernetesConfiguration `json:"Configuration"`
+	}
+
+	// KubernetesConfiguration represents the configuration of a Kubernetes endpoint
+	KubernetesConfiguration struct {
+		UseLoadBalancer bool     `json:"UseLoadBalancer"`
+		StorageClasses  []string `json:"StorageClasses"`
 	}
 
 	// KubernetesSnapshot represents a snapshot of a specific Kubernetes endpoint at a specific time
