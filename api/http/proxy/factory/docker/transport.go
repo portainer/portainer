@@ -432,20 +432,22 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 			return nil, err
 		}
 
+		user, err := transport.userService.User(tokenData.ID)
+		if err != nil {
+			return nil, err
+		}
+
 		if volumeBrowseRestrictionCheck {
 			settings, err := transport.settingsService.Settings()
 			if err != nil {
 				return nil, err
 			}
 
-			if rbacExtension != nil && !settings.AllowVolumeBrowserForRegularUsers {
+			// Return access denied for all roles except endpoint-administrator
+			_, userCanBrowse := user.EndpointAuthorizations[transport.endpoint.ID][portainer.OperationDockerAgentBrowseList]
+			if rbacExtension != nil && !settings.AllowVolumeBrowserForRegularUsers && !userCanBrowse {
 				return responseutils.WriteAccessDeniedResponse()
 			}
-		}
-
-		user, err := transport.userService.User(tokenData.ID)
-		if err != nil {
-			return nil, err
 		}
 
 		endpointResourceAccess := false
