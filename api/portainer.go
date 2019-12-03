@@ -285,8 +285,11 @@ type (
 
 	// KubernetesSnapshot represents a snapshot of a specific Kubernetes endpoint at a specific time
 	KubernetesSnapshot struct {
-		Time           int64  `json:"Time"`
-		KubeletVersion string `json:"KubeletVersion"`
+		Time              int64  `json:"Time"`
+		KubernetesVersion string `json:"KubernetesVersion"`
+		NodeCount         int    `json:"NodeCount"`
+		TotalCPU          int64  `json:"TotalCPU"`
+		TotalMemory       int64  `json:"TotalMemory"`
 	}
 
 	// Authorization represents an authorization associated to an operation

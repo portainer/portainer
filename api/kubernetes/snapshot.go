@@ -40,7 +40,12 @@ func snapshot(cli *kubernetes.Clientset, endpoint *portainer.Endpoint) (*portain
 
 	err := snapshotVersion(snapshot, cli)
 	if err != nil {
-		log.Printf("[WARN] [kubernetes,snapshot] [message: unable to snapshot Kubelet version] [endpoint: %s] [err: %s]", endpoint.Name, err)
+		log.Printf("[WARN] [kubernetes,snapshot] [message: unable to snapshot cluster version] [endpoint: %s] [err: %s]", endpoint.Name, err)
+	}
+
+	err = snapshotNodes(snapshot, cli)
+	if err != nil {
+		log.Printf("[WARN] [kubernetes,snapshot] [message: unable to snapshot cluster nodes] [endpoint: %s] [err: %s]", endpoint.Name, err)
 	}
 
 	snapshot.Time = time.Now().Unix()
@@ -48,15 +53,29 @@ func snapshot(cli *kubernetes.Clientset, endpoint *portainer.Endpoint) (*portain
 }
 
 func snapshotVersion(snapshot *portainer.KubernetesSnapshot, cli *kubernetes.Clientset) error {
+	versionInfo, err := cli.ServerVersion()
+	if err != nil {
+		return err
+	}
+
+	snapshot.KubernetesVersion = versionInfo.GitVersion
+	return nil
+}
+
+func snapshotNodes(snapshot *portainer.KubernetesSnapshot, cli *kubernetes.Clientset) error {
 	nodeList, err := cli.CoreV1().Nodes().List(metav1.ListOptions{})
 	if err != nil {
 		return err
 	}
 
+	var totalCPUs, totalMemory int64
 	for _, node := range nodeList.Items {
-		snapshot.KubeletVersion = node.Status.NodeInfo.KubeletVersion
-		break
+		totalCPUs += node.Status.Capacity.Cpu().Value()
+		totalMemory += node.Status.Capacity.Memory().Value()
 	}
 
+	snapshot.TotalCPU = totalCPUs
+	snapshot.TotalMemory = totalMemory
+	snapshot.NodeCount = len(nodeList.Items)
 	return nil
 }
