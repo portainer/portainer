@@ -20,7 +20,7 @@ const (
 func hideFields(endpoint *portainer.Endpoint) {
 	endpoint.AzureCredentials = portainer.AzureCredentials{}
 	if len(endpoint.Snapshots) > 0 {
-		endpoint.Snapshots[0].SnapshotRaw = portainer.SnapshotRaw{}
+		endpoint.Snapshots[0].SnapshotRaw = portainer.DockerSnapshotRaw{}
 	}
 }
 
@@ -33,7 +33,7 @@ type Handler struct {
 	EndpointGroupService        portainer.EndpointGroupService
 	FileService                 portainer.FileService
 	ProxyManager                *proxy.Manager
-	Snapshotter                 portainer.Snapshotter
+	SnapshotManager             *portainer.SnapshotManager
 	JobService                  portainer.JobService
 	ReverseTunnelService        portainer.ReverseTunnelService
 	SettingsService             portainer.SettingsService

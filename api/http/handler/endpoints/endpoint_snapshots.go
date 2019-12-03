@@ -17,11 +17,11 @@ func (handler *Handler) endpointSnapshots(w http.ResponseWriter, r *http.Request
 	}
 
 	for _, endpoint := range endpoints {
-		if !portainer.EndpointSupportsSnapshot(&endpoint) {
+		if !portainer.SupportDirectSnapshot(&endpoint) {
 			continue
 		}
 
-		snapshot, snapshotError := handler.Snapshotter.CreateSnapshot(&endpoint)
+		snapshotError := handler.SnapshotManager.SnapshotEndpoint(&endpoint)
 
 		latestEndpointReference, err := handler.EndpointService.Endpoint(endpoint.ID)
 		if latestEndpointReference == nil {
@@ -29,15 +29,14 @@ func (handler *Handler) endpointSnapshots(w http.ResponseWriter, r *http.Request
 			continue
 		}
 
-		latestEndpointReference.Status = portainer.EndpointStatusUp
+		endpoint.Status = portainer.EndpointStatusUp
 		if snapshotError != nil {
 			log.Printf("background schedule error (endpoint snapshot). Unable to create snapshot (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, snapshotError)
-			latestEndpointReference.Status = portainer.EndpointStatusDown
+			endpoint.Status = portainer.EndpointStatusDown
 		}
 
-		if snapshot != nil {
-			latestEndpointReference.Snapshots = []portainer.Snapshot{*snapshot}
-		}
+		latestEndpointReference.Snapshots = endpoint.Snapshots
+		latestEndpointReference.Kubernetes.Snapshots = endpoint.Kubernetes.Snapshots
 
 		err = handler.EndpointService.UpdateEndpoint(latestEndpointReference.ID, latestEndpointReference)
 		if err != nil {

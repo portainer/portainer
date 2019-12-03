@@ -27,7 +27,7 @@ func (handler *Handler) endpointSnapshot(w http.ResponseWriter, r *http.Request)
 		return &httperror.HandlerError{http.StatusBadRequest, "Snapshots not supported for Azure endpoints", err}
 	}
 
-	snapshot, snapshotError := handler.Snapshotter.CreateSnapshot(endpoint)
+	snapshotError := handler.SnapshotManager.SnapshotEndpoint(endpoint)
 
 	latestEndpointReference, err := handler.EndpointService.Endpoint(endpoint.ID)
 	if latestEndpointReference == nil {
@@ -39,9 +39,8 @@ func (handler *Handler) endpointSnapshot(w http.ResponseWriter, r *http.Request)
 		latestEndpointReference.Status = portainer.EndpointStatusDown
 	}
 
-	if snapshot != nil {
-		latestEndpointReference.Snapshots = []portainer.Snapshot{*snapshot}
-	}
+	latestEndpointReference.Snapshots = endpoint.Snapshots
+	latestEndpointReference.Kubernetes.Snapshots = endpoint.Kubernetes.Snapshots
 
 	err = handler.EndpointService.UpdateEndpoint(latestEndpointReference.ID, latestEndpointReference)
 	if err != nil {

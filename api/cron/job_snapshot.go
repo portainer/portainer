@@ -15,14 +15,14 @@ type SnapshotJobRunner struct {
 // SnapshotJobContext represents the context of execution of a SnapshotJob
 type SnapshotJobContext struct {
 	endpointService portainer.EndpointService
-	snapshotter     portainer.Snapshotter
+	snapshotManager *portainer.SnapshotManager
 }
 
 // NewSnapshotJobContext returns a new context that can be used to execute a SnapshotJob
-func NewSnapshotJobContext(endpointService portainer.EndpointService, snapshotter portainer.Snapshotter) *SnapshotJobContext {
+func NewSnapshotJobContext(endpointService portainer.EndpointService, snapshotManager *portainer.SnapshotManager) *SnapshotJobContext {
 	return &SnapshotJobContext{
 		endpointService: endpointService,
-		snapshotter:     snapshotter,
+		snapshotManager: snapshotManager,
 	}
 }
 
@@ -53,11 +53,11 @@ func (runner *SnapshotJobRunner) Run() {
 		}
 
 		for _, endpoint := range endpoints {
-			if !portainer.EndpointSupportsSnapshot(&endpoint) {
+			if !portainer.SupportDirectSnapshot(&endpoint) {
 				continue
 			}
 
-			snapshot, snapshotError := runner.context.snapshotter.CreateSnapshot(&endpoint)
+			snapshotError := runner.context.snapshotManager.SnapshotEndpoint(&endpoint)
 
 			latestEndpointReference, err := runner.context.endpointService.Endpoint(endpoint.ID)
 			if latestEndpointReference == nil {
@@ -71,9 +71,8 @@ func (runner *SnapshotJobRunner) Run() {
 				latestEndpointReference.Status = portainer.EndpointStatusDown
 			}
 
-			if snapshot != nil {
-				latestEndpointReference.Snapshots = []portainer.Snapshot{*snapshot}
-			}
+			latestEndpointReference.Snapshots = endpoint.Snapshots
+			latestEndpointReference.Kubernetes.Snapshots = endpoint.Kubernetes.Snapshots
 
 			err = runner.context.endpointService.UpdateEndpoint(latestEndpointReference.ID, latestEndpointReference)
 			if err != nil {

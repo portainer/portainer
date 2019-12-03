@@ -28,16 +28,13 @@ func (factory *ProxyFactory) newKubernetesLocalProxy(endpoint *portainer.Endpoin
 		return nil, err
 	}
 
-	proxy := newSingleHostReverseProxyWithHostHeader(remoteURL)
-
-	config, err := crypto.CreateTLSConfigurationFromBytes(nil, nil, nil, true, true)
+	transport, err := kubernetes.NewLocalTransport()
 	if err != nil {
 		return nil, err
 	}
 
-	proxy.Transport = &http.Transport{
-		TLSClientConfig: config,
-	}
+	proxy := newSingleHostReverseProxyWithHostHeader(remoteURL)
+	proxy.Transport = transport
 
 	return proxy, nil
 }
@@ -59,7 +56,8 @@ func (factory *ProxyFactory) newKubernetesEdgeHTTPProxy(endpoint *portainer.Endp
 }
 
 func (factory *ProxyFactory) newKubernetesAgentHTTPSProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
-	remoteURL, err := url.Parse(endpoint.URL)
+	endpointURL := fmt.Sprintf("https://%s", endpoint.URL)
+	remoteURL, err := url.Parse(endpointURL)
 	if err != nil {
 		return nil, err
 	}

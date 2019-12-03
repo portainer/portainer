@@ -28,10 +28,13 @@ require (
 	github.com/portainer/libhttp v0.0.0-20190806161843-ba068f58be33
 	github.com/robfig/cron/v3 v3.0.0
 	golang.org/x/crypto v0.0.0-20191128160524-b544559bb6d1
+	golang.org/x/net v0.0.0-20191126235420-ef20fe5d7933 // indirect
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	gopkg.in/asn1-ber.v1 v1.0.0-00010101000000-000000000000 // indirect
 	gopkg.in/ldap.v2 v2.5.1
 	gopkg.in/src-d/go-git.v4 v4.13.1
+	k8s.io/apimachinery v0.0.0-20191028221656-72ed19daf4bb
+	k8s.io/client-go v0.0.0-20191114101535-6c5935290e33
 )
 
 replace github.com/docker/docker => github.com/docker/engine v1.4.2-0.20191127222017-3152f9436292

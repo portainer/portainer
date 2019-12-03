@@ -3,8 +3,6 @@ package endpointproxy
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
-	"strconv"
 	"time"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -65,23 +63,11 @@ func (handler *Handler) proxyRequestsToKubernetesAPI(w http.ResponseWriter, r *h
 		}
 	}
 
-	// TODO: relocate token management into proxy creation
-	if endpoint.Type == portainer.KubernetesLocalEnvironment {
-		token, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/token")
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to read service account token file", err}
-		}
-
-		r.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
-	}
-
-	// TODO: find a proper way to proxy a request for the agent
-	id := strconv.Itoa(endpointID)
+	requestPrefix := fmt.Sprintf("/%d/kubernetes", endpointID)
 	if endpoint.Type == portainer.AgentOnKubernetesEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
-		http.StripPrefix("/"+id, proxy).ServeHTTP(w, r)
-	} else {
-		http.StripPrefix("/"+id+"/kubernetes", proxy).ServeHTTP(w, r)
+		requestPrefix = fmt.Sprintf("/%d", endpointID)
 	}
 
+	http.StripPrefix(requestPrefix, proxy).ServeHTTP(w, r)
 	return nil
 }

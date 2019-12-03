@@ -54,7 +54,6 @@ type Server struct {
 	CryptoService          portainer.CryptoService
 	SignatureService       portainer.DigitalSignatureService
 	JobScheduler           portainer.JobScheduler
-	Snapshotter            portainer.Snapshotter
 	RoleService            portainer.RoleService
 	DockerHubService       portainer.DockerHubService
 	EndpointService        portainer.EndpointService
@@ -80,6 +79,7 @@ type Server struct {
 	SSLCert                string
 	SSLKey                 string
 	DockerClientFactory    *docker.ClientFactory
+	SnapshotManager        *portainer.SnapshotManager
 	JobService             portainer.JobService
 }
 
@@ -149,7 +149,7 @@ func (server *Server) Start() error {
 	endpointHandler.EndpointGroupService = server.EndpointGroupService
 	endpointHandler.FileService = server.FileService
 	endpointHandler.ProxyManager = proxyManager
-	endpointHandler.Snapshotter = server.Snapshotter
+	endpointHandler.SnapshotManager = server.SnapshotManager
 	endpointHandler.JobService = server.JobService
 	endpointHandler.ReverseTunnelService = server.ReverseTunnelService
 	endpointHandler.SettingsService = server.SettingsService

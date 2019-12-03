@@ -196,7 +196,8 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 		AzureCredentials:   credentials,
 		Tags:               payload.Tags,
 		Status:             portainer.EndpointStatusUp,
-		Snapshots:          []portainer.Snapshot{},
+		Snapshots:          []portainer.DockerSnapshot{},
+		Kubernetes:         portainer.KubernetesDefault(),
 	}
 
 	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
@@ -240,8 +241,9 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload, 
 		Extensions:      []portainer.EndpointExtension{},
 		Tags:            payload.Tags,
 		Status:          portainer.EndpointStatusUp,
-		Snapshots:       []portainer.Snapshot{},
+		Snapshots:       []portainer.DockerSnapshot{},
 		EdgeKey:         edgeKey,
+		Kubernetes:      portainer.KubernetesDefault(),
 	}
 
 	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
@@ -278,7 +280,8 @@ func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) 
 		Extensions:         []portainer.EndpointExtension{},
 		Tags:               payload.Tags,
 		Status:             portainer.EndpointStatusUp,
-		Snapshots:          []portainer.Snapshot{},
+		Snapshots:          []portainer.DockerSnapshot{},
+		Kubernetes:         portainer.KubernetesDefault(),
 	}
 
 	err := handler.snapshotAndPersistEndpoint(endpoint)
@@ -312,12 +315,13 @@ func (handler *Handler) createKubernetesEndpoint(payload *endpointCreatePayload)
 		Extensions:         []portainer.EndpointExtension{},
 		Tags:               payload.Tags,
 		Status:             portainer.EndpointStatusUp,
-		Snapshots:          []portainer.Snapshot{},
+		Snapshots:          []portainer.DockerSnapshot{},
+		Kubernetes:         portainer.KubernetesDefault(),
 	}
 
-	err := handler.EndpointService.CreateEndpoint(endpoint)
+	err := handler.snapshotAndPersistEndpoint(endpoint)
 	if err != nil {
-		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint inside the database", err}
+		return nil, err
 	}
 
 	return endpoint, nil
@@ -341,7 +345,8 @@ func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload,
 		Extensions:         []portainer.EndpointExtension{},
 		Tags:               payload.Tags,
 		Status:             portainer.EndpointStatusUp,
-		Snapshots:          []portainer.Snapshot{},
+		Snapshots:          []portainer.DockerSnapshot{},
+		Kubernetes:         portainer.KubernetesDefault(),
 	}
 
 	err := handler.storeTLSFiles(endpoint, payload)
@@ -358,23 +363,15 @@ func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload,
 }
 
 func (handler *Handler) snapshotAndPersistEndpoint(endpoint *portainer.Endpoint) *httperror.HandlerError {
-
-	// TODO: entire endpoint creation should probably be rewritten
-	if endpoint.Type != portainer.AgentOnKubernetesEnvironment {
-		snapshot, err := handler.Snapshotter.CreateSnapshot(endpoint)
-		if err != nil {
-			if strings.Contains(err.Error(), "Invalid request signature") {
-				err = errors.New("agent already paired with another Portainer instance")
-			}
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to initiate communications with endpoint", err}
+	err := handler.SnapshotManager.SnapshotEndpoint(endpoint)
+	if err != nil {
+		if strings.Contains(err.Error(), "Invalid request signature") {
+			err = errors.New("agent already paired with another Portainer instance")
 		}
-
-		if snapshot != nil {
-			endpoint.Snapshots = []portainer.Snapshot{*snapshot}
-		}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to initiate communications with endpoint", err}
 	}
 
-	err := handler.saveEndpointAndUpdateAuthorizations(endpoint)
+	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "An error occured while trying to create the endpoint", err}
 	}

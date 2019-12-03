@@ -43,7 +43,7 @@ type (
 	Status struct {
 		Authentication     bool   `json:"Authentication"`
 		EndpointManagement bool   `json:"EndpointManagement"`
-		Snapshot           bool   `json:"Snapshot"`
+		Snapshot           bool   `json:"DockerSnapshot"`
 		Analytics          bool   `json:"Analytics"`
 		Version            string `json:"Version"`
 	}
@@ -261,11 +261,12 @@ type (
 		AzureCredentials   AzureCredentials    `json:"AzureCredentials,omitempty"`
 		Tags               []string            `json:"Tags"`
 		Status             EndpointStatus      `json:"Status"`
-		Snapshots          []Snapshot          `json:"Snapshots"`
+		Snapshots          []DockerSnapshot    `json:"Snapshots"`
 		UserAccessPolicies UserAccessPolicies  `json:"UserAccessPolicies"`
 		TeamAccessPolicies TeamAccessPolicies  `json:"TeamAccessPolicies"`
 		EdgeID             string              `json:"EdgeID,omitempty"`
 		EdgeKey            string              `json:"EdgeKey"`
+		Kubernetes         KubernetesData      `json:"Kubernetes"`
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
 		TLS           bool   `json:"TLS,omitempty"`
@@ -276,6 +277,16 @@ type (
 		// Deprecated in DBVersion == 18
 		AuthorizedUsers []UserID `json:"AuthorizedUsers"`
 		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
+	}
+
+	KubernetesData struct {
+		Snapshots []KubernetesSnapshot `json:"Snapshots"`
+	}
+
+	// KubernetesSnapshot represents a snapshot of a specific Kubernetes endpoint at a specific time
+	KubernetesSnapshot struct {
+		Time           int64  `json:"Time"`
+		KubeletVersion string `json:"KubeletVersion"`
 	}
 
 	// Authorization represents an authorization associated to an operation
@@ -387,24 +398,24 @@ type (
 		AuthenticationKey string `json:"AuthenticationKey"`
 	}
 
-	// Snapshot represents a snapshot of a specific endpoint at a specific time
-	Snapshot struct {
-		Time                  int64       `json:"Time"`
-		DockerVersion         string      `json:"DockerVersion"`
-		Swarm                 bool        `json:"Swarm"`
-		TotalCPU              int         `json:"TotalCPU"`
-		TotalMemory           int64       `json:"TotalMemory"`
-		RunningContainerCount int         `json:"RunningContainerCount"`
-		StoppedContainerCount int         `json:"StoppedContainerCount"`
-		VolumeCount           int         `json:"VolumeCount"`
-		ImageCount            int         `json:"ImageCount"`
-		ServiceCount          int         `json:"ServiceCount"`
-		StackCount            int         `json:"StackCount"`
-		SnapshotRaw           SnapshotRaw `json:"SnapshotRaw"`
+	// DockerSnapshot represents a snapshot of a specific Docker endpoint at a specific time
+	DockerSnapshot struct {
+		Time                  int64             `json:"Time"`
+		DockerVersion         string            `json:"DockerVersion"`
+		Swarm                 bool              `json:"Swarm"`
+		TotalCPU              int               `json:"TotalCPU"`
+		TotalMemory           int64             `json:"TotalMemory"`
+		RunningContainerCount int               `json:"RunningContainerCount"`
+		StoppedContainerCount int               `json:"StoppedContainerCount"`
+		VolumeCount           int               `json:"VolumeCount"`
+		ImageCount            int               `json:"ImageCount"`
+		ServiceCount          int               `json:"ServiceCount"`
+		StackCount            int               `json:"StackCount"`
+		SnapshotRaw           DockerSnapshotRaw `json:"DockerSnapshotRaw"`
 	}
 
-	// SnapshotRaw represents all the information related to a snapshot as returned by the Docker API
-	SnapshotRaw struct {
+	// DockerSnapshotRaw represents all the information related to a snapshot as returned by the Docker API
+	DockerSnapshotRaw struct {
 		Containers interface{} `json:"Containers"`
 		Volumes    interface{} `json:"Volumes"`
 		Networks   interface{} `json:"Networks"`
@@ -858,9 +869,14 @@ type (
 		GetSchedule() *Schedule
 	}
 
-	// Snapshotter represents a service used to create endpoint snapshots
-	Snapshotter interface {
-		CreateSnapshot(endpoint *Endpoint) (*Snapshot, error)
+	// DockerSnapshotter represents a service used to create Docker endpoint snapshots
+	DockerSnapshotter interface {
+		CreateSnapshot(endpoint *Endpoint) (*DockerSnapshot, error)
+	}
+
+	// KubernetesSnapshotter represents a service used to create Kubernetes endpoint snapshots
+	KubernetesSnapshotter interface {
+		CreateSnapshot(endpoint *Endpoint) (*KubernetesSnapshot, error)
 	}
 
 	// LDAPService represents a service used to authenticate users against a LDAP/AD
@@ -905,7 +921,7 @@ type (
 
 	// ReverseTunnelService represensts a service used to manage reverse tunnel connections.
 	ReverseTunnelService interface {
-		StartTunnelServer(addr, port string, snapshotter Snapshotter) error
+		StartTunnelServer(addr, port string, snapshotManager *SnapshotManager) error
 		GenerateEdgeKey(url, host string, endpointIdentifier int) string
 		SetTunnelStatusToActive(endpointID EndpointID)
 		SetTunnelStatusToRequired(endpointID EndpointID) error

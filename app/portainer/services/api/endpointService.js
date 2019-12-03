@@ -81,7 +81,7 @@ function EndpointServiceFactory($q, Endpoints, FileUploadService) {
     var deferred = $q.defer();
 
     var endpointURL = URL;
-    if (type !== 7) {
+    if (type !== 6 && type !== 7) {
       endpointURL = 'tcp://' + URL;
     }
 

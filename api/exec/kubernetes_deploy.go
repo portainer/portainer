@@ -33,7 +33,6 @@ func (deployer *KubernetesDeployer) Deploy(endpoint *portainer.Endpoint, data st
 		data = string(convertedData)
 	}
 
-	// TODO: relocate
 	token, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/token")
 	if err != nil {
 		return nil, err
