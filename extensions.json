@@ -1,0 +1,60 @@
+[
+  {
+    "Id": 3,
+    "Name": "Role-Based Access Control",
+    "ShortDescription": "Fine grained access control against Portainer and deployed resources",
+    "Price": "See website for pricing",
+    "PriceDescription": "Price per instance per year",
+    "Deal": false,
+    "Available": true,
+    "Version": "1.0.1",
+    "DescriptionURL": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/description_rbac.html",
+    "ShopURL": "https://portainer.io/checkout/?add-to-cart=2890",
+    "Logo": "fa-user-lock",
+    "Images": [
+      "https://portainer-io-assets.sfo2.digitaloceanspaces.com/screenshots/rbac01.png",
+      "https://portainer-io-assets.sfo2.digitaloceanspaces.com/screenshots/rbac02.png",
+      "https://portainer-io-assets.sfo2.digitaloceanspaces.com/screenshots/rbac03.png"
+    ]
+  },
+  {
+    "Id": 2,
+    "Name": "External Authentication",
+    "ShortDescription": "Enable single sign-on authentication via OAuth",
+    "Price": "See website for pricing",
+    "PriceDescription": "Price per instance per year",
+    "Deal": false,
+    "Available": true,
+    "Version": "1.0.0",
+    "DescriptionURL": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/description_external_authentication.html",
+    "ShopURL": "https://portainer.io/checkout/?add-to-cart=992",
+    "Logo": "fa-users",
+    "Images": [
+      "https://portainer-io-assets.sfo2.digitaloceanspaces.com/screenshots/extauth01.png",
+      "https://portainer-io-assets.sfo2.digitaloceanspaces.com/screenshots/extauth02.png",
+      "https://portainer-io-assets.sfo2.digitaloceanspaces.com/screenshots/extauth03.png",
+      "https://portainer-io-assets.sfo2.digitaloceanspaces.com/screenshots/extauth04.png",
+      "https://portainer-io-assets.sfo2.digitaloceanspaces.com/screenshots/extauth05.png"
+    ]
+  },
+  {
+    "Id": 1,
+    "Name": "Registry Manager",
+    "ShortDescription": "Enable in-app registry management",
+    "Price": "See website for pricing",
+    "PriceDescription": "Price per instance per year",
+    "Deal": false,
+    "Available": true,
+    "Version": "1.1.0",
+    "DescriptionURL": "https://portainer-io-assets.sfo2.digitaloceanspaces.com/description_registry_manager.html",
+    "ShopURL": "https://portainer.io/checkout/?add-to-cart=1164",
+    "Logo": "fa-database",
+    "Images": [
+      "https://portainer-io-assets.sfo2.digitaloceanspaces.com/screenshots/rm01.png",
+      "https://portainer-io-assets.sfo2.digitaloceanspaces.com/screenshots/rm02.png",
+      "https://portainer-io-assets.sfo2.digitaloceanspaces.com/screenshots/rm03.png",
+      "https://portainer-io-assets.sfo2.digitaloceanspaces.com/screenshots/rm04.png",
+      "https://portainer-io-assets.sfo2.digitaloceanspaces.com/screenshots/rm05.png"
+    ]
+  }
+]

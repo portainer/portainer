@@ -14,7 +14,7 @@
           <div class="form-group">
             <label for="stack_name" class="col-sm-1 control-label text-left">Name</label>
             <div class="col-sm-11">
-              <input type="text" class="form-control" ng-model="formValues.Name" id="stack_name" placeholder="e.g. myStack" auto-focus>
+              <input type="text" class="form-control" ng-model="formValues.Name" id="stack_name" placeholder="e.g. mystack" auto-focus>
             </div>
           </div>
           <!-- !name-input -->
@@ -24,6 +24,9 @@
             </span>
             <span class="col-sm-12 text-muted small" ng-if="state.StackType === 2">
               This stack will be deployed using the equivalent of <code>docker-compose</code>. Only Compose file format version <b>2</b> is supported at the moment.
+              <br/><br/>
+              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+              Note: Due to a limitation of libcompose, the name of the stack will be standardized to remove all special characters and uppercase letters.
             </span>
           </div>
           <!-- build-method -->

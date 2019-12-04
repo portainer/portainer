@@ -1,5 +1,6 @@
 import _ from 'lodash-es';
 import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
+import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
 require('./includes/update-restart.html')
 require('./includes/secret.html')
@@ -12,8 +13,7 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
 
   $scope.formValues = {
     Name: '',
-    Image: '',
-    Registry: {},
+    RegistryModel: new PorImageRegistryModel(),
     Mode: 'replicated',
     Replicas: 1,
     Command: '',
@@ -160,8 +160,8 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
   };
 
   function prepareImageConfig(config, input) {
-    var imageConfig = ImageHelper.createImageConfigForContainer(input.Image, input.Registry.URL);
-    config.TaskTemplate.ContainerSpec.Image = imageConfig.fromImage + ':' + imageConfig.tag;
+    var imageConfig = ImageHelper.createImageConfigForContainer(input.RegistryModel);
+    config.TaskTemplate.ContainerSpec.Image = imageConfig.fromImage;
   }
 
   function preparePortsConfig(config, input) {
@@ -427,20 +427,18 @@ function ($q, $scope, $state, $timeout, Service, ServiceHelper, ConfigService, C
   }
 
   function createNewService(config, accessControlData) {
-
-    var registry = $scope.formValues.Registry;
-    var authenticationDetails = registry.Authentication ? RegistryService.encodedCredentials(registry) : '';
+    const registryModel = $scope.formValues.RegistryModel;
+    var authenticationDetails = registryModel.Registry.Authentication ? RegistryService.encodedCredentials(registryModel.Registry) : '';
     HttpRequestHelper.setRegistryAuthenticationHeader(authenticationDetails);
 
-    var serviceIdentifier;
     Service.create(config).$promise
     .then(function success(data) {
-      serviceIdentifier = data.ID;
-      return $q.when($scope.formValues.Webhook && WebhookService.createServiceWebhook(serviceIdentifier, EndpointProvider.endpointID()));
-    })
-    .then(function success() {
-      var userId = Authentication.getUserDetails().ID;
-      return ResourceControlService.applyResourceControl('service', serviceIdentifier, userId, accessControlData, []);
+      const serviceId = data.ID;
+      const resourceControl = data.Portainer.ResourceControl;
+      const userId = Authentication.getUserDetails().ID;
+      const rcPromise = ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
+      const webhookPromise = $q.when($scope.formValues.Webhook && WebhookService.createServiceWebhook(serviceId, EndpointProvider.endpointID()));
+      return $q.all([rcPromise, webhookPromise]);
     })
     .then(function success() {
       Notifications.success('Service successfully created');

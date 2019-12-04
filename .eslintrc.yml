@@ -24,7 +24,7 @@ rules:
 #   no-cond-assign: error
 #   no-console: off
 #   no-constant-condition: error
-#   no-control-regex: error
+  no-control-regex: off
 #   no-debugger: error
 #   no-dupe-args: error
 #   no-dupe-keys: error

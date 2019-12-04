@@ -54,7 +54,7 @@ info:
 
     **NOTE**: You can find more information on how to query the Docker API in the [Docker official documentation](https://docs.docker.com/engine/api/v1.30/) as well as in [this Portainer example](https://gist.github.com/deviantony/77026d402366b4b43fa5918d41bc42f8).
 
-  version: "1.22.1"
+  version: "1.23.0"
   title: "Portainer API"
   contact:
     email: "info@portainer.io"
@@ -1235,7 +1235,7 @@ paths:
       summary: "Create a new resource control"
       description: |
         Create a new resource control to restrict access to a Docker resource.
-        **Access policy**: restricted
+        **Access policy**: administrator
       operationId: "ResourceControlCreate"
       consumes:
       - "application/json"
@@ -1343,7 +1343,7 @@ paths:
       summary: "Remove a resource control"
       description: |
         Remove a resource control.
-        **Access policy**: restricted
+        **Access policy**: administrator
       operationId: "ResourceControlDelete"
       security:
       - jwt: []
@@ -3174,7 +3174,7 @@ definitions:
         description: "Is analytics enabled"
       Version:
         type: "string"
-        example: "1.22.1"
+        example: "1.23.0"
         description: "Portainer API version"
   PublicSettingsInspectResponse:
     type: "object"

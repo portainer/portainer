@@ -1,8 +1,8 @@
 import 'ui-select/dist/select.css';
 import 'bootstrap/dist/css/bootstrap.css';
-import '@fortawesome/fontawesome-free-webfonts/css/fa-brands.css';
-import '@fortawesome/fontawesome-free-webfonts/css/fa-solid.css';
-import '@fortawesome/fontawesome-free-webfonts/css/fontawesome.css';
+import '@fortawesome/fontawesome-free/css/brands.css';
+import '@fortawesome/fontawesome-free/css/solid.css';
+import '@fortawesome/fontawesome-free/css/fontawesome.css';
 import 'toastr/build/toastr.css';
 import 'xterm/dist/xterm.css';
 import 'angularjs-slider/dist/rzslider.css';
@@ -12,6 +12,7 @@ import 'angular-json-tree/dist/angular-json-tree.css';
 import 'angular-loading-bar/build/loading-bar.css';
 import 'rdash-ui/dist/css/rdash.css';
 import 'angular-moment-picker/dist/angular-moment-picker.min.css';
+import 'angular-multiselect/isteven-multi-select.css';
 
 import angular from 'angular';
 window.angular = angular;
@@ -37,3 +38,4 @@ import 'bootstrap/dist/js/bootstrap.js';
 import 'js-yaml/dist/js-yaml.js'
 import 'angular-ui-bootstrap';
 import 'angular-moment-picker';
+import 'angular-multiselect/isteven-multi-select.js';

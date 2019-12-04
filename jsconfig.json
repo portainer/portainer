@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "es2017",
+    "allowSyntheticDefaultImports": false,
+    "baseUrl": "app",
+    "paths": {
+      "Agent/*": ["agent/*"],
+      "Azure/*": ["azure/*"],
+      "Docker/*": ["docker/*"],
+      "Extensions/*": ["extensions/*"],
+      "Portainer/*": ["portainer/*"]
+    }
+  },
+  "exclude": ["api", "build", "dist", "distribution", "node_modules", "test", "webpack"]
+}

@@ -5,6 +5,6 @@ angular.module('portainer.docker')
     endpointId: EndpointProvider.endpointID
   },
   {
-    commitContainer: {method: 'POST', params: {container: '@id', repo: '@repo', tag: '@tag'}, ignoreLoadingBar: true}
+    commitContainer: {method: 'POST', params: {container: '@id', repo: '@repo'}, ignoreLoadingBar: true}
   });
 }]);

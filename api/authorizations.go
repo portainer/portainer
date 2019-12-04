@@ -34,6 +34,394 @@ func NewAuthorizationService(parameters *AuthorizationServiceParameters) *Author
 	}
 }
 
+// DefaultEndpointAuthorizationsForEndpointAdministratorRole returns the default endpoint authorizations
+// associated to the endpoint administrator role.
+func DefaultEndpointAuthorizationsForEndpointAdministratorRole() Authorizations {
+	return map[Authorization]bool{
+		OperationDockerContainerArchiveInfo:         true,
+		OperationDockerContainerList:                true,
+		OperationDockerContainerExport:              true,
+		OperationDockerContainerChanges:             true,
+		OperationDockerContainerInspect:             true,
+		OperationDockerContainerTop:                 true,
+		OperationDockerContainerLogs:                true,
+		OperationDockerContainerStats:               true,
+		OperationDockerContainerAttachWebsocket:     true,
+		OperationDockerContainerArchive:             true,
+		OperationDockerContainerCreate:              true,
+		OperationDockerContainerPrune:               true,
+		OperationDockerContainerKill:                true,
+		OperationDockerContainerPause:               true,
+		OperationDockerContainerUnpause:             true,
+		OperationDockerContainerRestart:             true,
+		OperationDockerContainerStart:               true,
+		OperationDockerContainerStop:                true,
+		OperationDockerContainerWait:                true,
+		OperationDockerContainerResize:              true,
+		OperationDockerContainerAttach:              true,
+		OperationDockerContainerExec:                true,
+		OperationDockerContainerRename:              true,
+		OperationDockerContainerUpdate:              true,
+		OperationDockerContainerPutContainerArchive: true,
+		OperationDockerContainerDelete:              true,
+		OperationDockerImageList:                    true,
+		OperationDockerImageSearch:                  true,
+		OperationDockerImageGetAll:                  true,
+		OperationDockerImageGet:                     true,
+		OperationDockerImageHistory:                 true,
+		OperationDockerImageInspect:                 true,
+		OperationDockerImageLoad:                    true,
+		OperationDockerImageCreate:                  true,
+		OperationDockerImagePrune:                   true,
+		OperationDockerImagePush:                    true,
+		OperationDockerImageTag:                     true,
+		OperationDockerImageDelete:                  true,
+		OperationDockerImageCommit:                  true,
+		OperationDockerImageBuild:                   true,
+		OperationDockerNetworkList:                  true,
+		OperationDockerNetworkInspect:               true,
+		OperationDockerNetworkCreate:                true,
+		OperationDockerNetworkConnect:               true,
+		OperationDockerNetworkDisconnect:            true,
+		OperationDockerNetworkPrune:                 true,
+		OperationDockerNetworkDelete:                true,
+		OperationDockerVolumeList:                   true,
+		OperationDockerVolumeInspect:                true,
+		OperationDockerVolumeCreate:                 true,
+		OperationDockerVolumePrune:                  true,
+		OperationDockerVolumeDelete:                 true,
+		OperationDockerExecInspect:                  true,
+		OperationDockerExecStart:                    true,
+		OperationDockerExecResize:                   true,
+		OperationDockerSwarmInspect:                 true,
+		OperationDockerSwarmUnlockKey:               true,
+		OperationDockerSwarmInit:                    true,
+		OperationDockerSwarmJoin:                    true,
+		OperationDockerSwarmLeave:                   true,
+		OperationDockerSwarmUpdate:                  true,
+		OperationDockerSwarmUnlock:                  true,
+		OperationDockerNodeList:                     true,
+		OperationDockerNodeInspect:                  true,
+		OperationDockerNodeUpdate:                   true,
+		OperationDockerNodeDelete:                   true,
+		OperationDockerServiceList:                  true,
+		OperationDockerServiceInspect:               true,
+		OperationDockerServiceLogs:                  true,
+		OperationDockerServiceCreate:                true,
+		OperationDockerServiceUpdate:                true,
+		OperationDockerServiceDelete:                true,
+		OperationDockerSecretList:                   true,
+		OperationDockerSecretInspect:                true,
+		OperationDockerSecretCreate:                 true,
+		OperationDockerSecretUpdate:                 true,
+		OperationDockerSecretDelete:                 true,
+		OperationDockerConfigList:                   true,
+		OperationDockerConfigInspect:                true,
+		OperationDockerConfigCreate:                 true,
+		OperationDockerConfigUpdate:                 true,
+		OperationDockerConfigDelete:                 true,
+		OperationDockerTaskList:                     true,
+		OperationDockerTaskInspect:                  true,
+		OperationDockerTaskLogs:                     true,
+		OperationDockerPluginList:                   true,
+		OperationDockerPluginPrivileges:             true,
+		OperationDockerPluginInspect:                true,
+		OperationDockerPluginPull:                   true,
+		OperationDockerPluginCreate:                 true,
+		OperationDockerPluginEnable:                 true,
+		OperationDockerPluginDisable:                true,
+		OperationDockerPluginPush:                   true,
+		OperationDockerPluginUpgrade:                true,
+		OperationDockerPluginSet:                    true,
+		OperationDockerPluginDelete:                 true,
+		OperationDockerSessionStart:                 true,
+		OperationDockerDistributionInspect:          true,
+		OperationDockerBuildPrune:                   true,
+		OperationDockerBuildCancel:                  true,
+		OperationDockerPing:                         true,
+		OperationDockerInfo:                         true,
+		OperationDockerVersion:                      true,
+		OperationDockerEvents:                       true,
+		OperationDockerSystem:                       true,
+		OperationDockerUndefined:                    true,
+		OperationDockerAgentPing:                    true,
+		OperationDockerAgentList:                    true,
+		OperationDockerAgentHostInfo:                true,
+		OperationDockerAgentBrowseDelete:            true,
+		OperationDockerAgentBrowseGet:               true,
+		OperationDockerAgentBrowseList:              true,
+		OperationDockerAgentBrowsePut:               true,
+		OperationDockerAgentBrowseRename:            true,
+		OperationDockerAgentUndefined:               true,
+		OperationPortainerResourceControlCreate:     true,
+		OperationPortainerResourceControlUpdate:     true,
+		OperationPortainerStackList:                 true,
+		OperationPortainerStackInspect:              true,
+		OperationPortainerStackFile:                 true,
+		OperationPortainerStackCreate:               true,
+		OperationPortainerStackMigrate:              true,
+		OperationPortainerStackUpdate:               true,
+		OperationPortainerStackDelete:               true,
+		OperationPortainerWebsocketExec:             true,
+		OperationPortainerWebhookList:               true,
+		OperationPortainerWebhookCreate:             true,
+		OperationPortainerWebhookDelete:             true,
+		OperationIntegrationStoridgeAdmin:           true,
+		EndpointResourcesAccess:                     true,
+	}
+}
+
+// DefaultEndpointAuthorizationsForHelpDeskRole returns the default endpoint authorizations
+// associated to the helpdesk role.
+func DefaultEndpointAuthorizationsForHelpDeskRole(volumeBrowsingAuthorizations bool) Authorizations {
+	authorizations := map[Authorization]bool{
+		OperationDockerContainerArchiveInfo: true,
+		OperationDockerContainerList:        true,
+		OperationDockerContainerChanges:     true,
+		OperationDockerContainerInspect:     true,
+		OperationDockerContainerTop:         true,
+		OperationDockerContainerLogs:        true,
+		OperationDockerContainerStats:       true,
+		OperationDockerImageList:            true,
+		OperationDockerImageSearch:          true,
+		OperationDockerImageGetAll:          true,
+		OperationDockerImageGet:             true,
+		OperationDockerImageHistory:         true,
+		OperationDockerImageInspect:         true,
+		OperationDockerNetworkList:          true,
+		OperationDockerNetworkInspect:       true,
+		OperationDockerVolumeList:           true,
+		OperationDockerVolumeInspect:        true,
+		OperationDockerSwarmInspect:         true,
+		OperationDockerNodeList:             true,
+		OperationDockerNodeInspect:          true,
+		OperationDockerServiceList:          true,
+		OperationDockerServiceInspect:       true,
+		OperationDockerServiceLogs:          true,
+		OperationDockerSecretList:           true,
+		OperationDockerSecretInspect:        true,
+		OperationDockerConfigList:           true,
+		OperationDockerConfigInspect:        true,
+		OperationDockerTaskList:             true,
+		OperationDockerTaskInspect:          true,
+		OperationDockerTaskLogs:             true,
+		OperationDockerPluginList:           true,
+		OperationDockerDistributionInspect:  true,
+		OperationDockerPing:                 true,
+		OperationDockerInfo:                 true,
+		OperationDockerVersion:              true,
+		OperationDockerEvents:               true,
+		OperationDockerSystem:               true,
+		OperationDockerAgentPing:            true,
+		OperationDockerAgentList:            true,
+		OperationDockerAgentHostInfo:        true,
+		OperationPortainerStackList:         true,
+		OperationPortainerStackInspect:      true,
+		OperationPortainerStackFile:         true,
+		OperationPortainerWebhookList:       true,
+		EndpointResourcesAccess:             true,
+	}
+
+	if volumeBrowsingAuthorizations {
+		authorizations[OperationDockerAgentBrowseGet] = true
+		authorizations[OperationDockerAgentBrowseList] = true
+	}
+
+	return authorizations
+}
+
+// DefaultEndpointAuthorizationsForStandardUserRole returns the default endpoint authorizations
+// associated to the standard user role.
+func DefaultEndpointAuthorizationsForStandardUserRole(volumeBrowsingAuthorizations bool) Authorizations {
+	authorizations := map[Authorization]bool{
+		OperationDockerContainerArchiveInfo:         true,
+		OperationDockerContainerList:                true,
+		OperationDockerContainerExport:              true,
+		OperationDockerContainerChanges:             true,
+		OperationDockerContainerInspect:             true,
+		OperationDockerContainerTop:                 true,
+		OperationDockerContainerLogs:                true,
+		OperationDockerContainerStats:               true,
+		OperationDockerContainerAttachWebsocket:     true,
+		OperationDockerContainerArchive:             true,
+		OperationDockerContainerCreate:              true,
+		OperationDockerContainerKill:                true,
+		OperationDockerContainerPause:               true,
+		OperationDockerContainerUnpause:             true,
+		OperationDockerContainerRestart:             true,
+		OperationDockerContainerStart:               true,
+		OperationDockerContainerStop:                true,
+		OperationDockerContainerWait:                true,
+		OperationDockerContainerResize:              true,
+		OperationDockerContainerAttach:              true,
+		OperationDockerContainerExec:                true,
+		OperationDockerContainerRename:              true,
+		OperationDockerContainerUpdate:              true,
+		OperationDockerContainerPutContainerArchive: true,
+		OperationDockerContainerDelete:              true,
+		OperationDockerImageList:                    true,
+		OperationDockerImageSearch:                  true,
+		OperationDockerImageGetAll:                  true,
+		OperationDockerImageGet:                     true,
+		OperationDockerImageHistory:                 true,
+		OperationDockerImageInspect:                 true,
+		OperationDockerImageLoad:                    true,
+		OperationDockerImageCreate:                  true,
+		OperationDockerImagePush:                    true,
+		OperationDockerImageTag:                     true,
+		OperationDockerImageDelete:                  true,
+		OperationDockerImageCommit:                  true,
+		OperationDockerImageBuild:                   true,
+		OperationDockerNetworkList:                  true,
+		OperationDockerNetworkInspect:               true,
+		OperationDockerNetworkCreate:                true,
+		OperationDockerNetworkConnect:               true,
+		OperationDockerNetworkDisconnect:            true,
+		OperationDockerNetworkDelete:                true,
+		OperationDockerVolumeList:                   true,
+		OperationDockerVolumeInspect:                true,
+		OperationDockerVolumeCreate:                 true,
+		OperationDockerVolumeDelete:                 true,
+		OperationDockerExecInspect:                  true,
+		OperationDockerExecStart:                    true,
+		OperationDockerExecResize:                   true,
+		OperationDockerSwarmInspect:                 true,
+		OperationDockerSwarmUnlockKey:               true,
+		OperationDockerSwarmInit:                    true,
+		OperationDockerSwarmJoin:                    true,
+		OperationDockerSwarmLeave:                   true,
+		OperationDockerSwarmUpdate:                  true,
+		OperationDockerSwarmUnlock:                  true,
+		OperationDockerNodeList:                     true,
+		OperationDockerNodeInspect:                  true,
+		OperationDockerNodeUpdate:                   true,
+		OperationDockerNodeDelete:                   true,
+		OperationDockerServiceList:                  true,
+		OperationDockerServiceInspect:               true,
+		OperationDockerServiceLogs:                  true,
+		OperationDockerServiceCreate:                true,
+		OperationDockerServiceUpdate:                true,
+		OperationDockerServiceDelete:                true,
+		OperationDockerSecretList:                   true,
+		OperationDockerSecretInspect:                true,
+		OperationDockerSecretCreate:                 true,
+		OperationDockerSecretUpdate:                 true,
+		OperationDockerSecretDelete:                 true,
+		OperationDockerConfigList:                   true,
+		OperationDockerConfigInspect:                true,
+		OperationDockerConfigCreate:                 true,
+		OperationDockerConfigUpdate:                 true,
+		OperationDockerConfigDelete:                 true,
+		OperationDockerTaskList:                     true,
+		OperationDockerTaskInspect:                  true,
+		OperationDockerTaskLogs:                     true,
+		OperationDockerPluginList:                   true,
+		OperationDockerPluginPrivileges:             true,
+		OperationDockerPluginInspect:                true,
+		OperationDockerPluginPull:                   true,
+		OperationDockerPluginCreate:                 true,
+		OperationDockerPluginEnable:                 true,
+		OperationDockerPluginDisable:                true,
+		OperationDockerPluginPush:                   true,
+		OperationDockerPluginUpgrade:                true,
+		OperationDockerPluginSet:                    true,
+		OperationDockerPluginDelete:                 true,
+		OperationDockerSessionStart:                 true,
+		OperationDockerDistributionInspect:          true,
+		OperationDockerBuildPrune:                   true,
+		OperationDockerBuildCancel:                  true,
+		OperationDockerPing:                         true,
+		OperationDockerInfo:                         true,
+		OperationDockerVersion:                      true,
+		OperationDockerEvents:                       true,
+		OperationDockerSystem:                       true,
+		OperationDockerUndefined:                    true,
+		OperationDockerAgentPing:                    true,
+		OperationDockerAgentList:                    true,
+		OperationDockerAgentHostInfo:                true,
+		OperationDockerAgentUndefined:               true,
+		OperationPortainerResourceControlUpdate:     true,
+		OperationPortainerStackList:                 true,
+		OperationPortainerStackInspect:              true,
+		OperationPortainerStackFile:                 true,
+		OperationPortainerStackCreate:               true,
+		OperationPortainerStackMigrate:              true,
+		OperationPortainerStackUpdate:               true,
+		OperationPortainerStackDelete:               true,
+		OperationPortainerWebsocketExec:             true,
+		OperationPortainerWebhookList:               true,
+		OperationPortainerWebhookCreate:             true,
+	}
+
+	if volumeBrowsingAuthorizations {
+		authorizations[OperationDockerAgentBrowseGet] = true
+		authorizations[OperationDockerAgentBrowseList] = true
+		authorizations[OperationDockerAgentBrowseDelete] = true
+		authorizations[OperationDockerAgentBrowsePut] = true
+		authorizations[OperationDockerAgentBrowseRename] = true
+	}
+
+	return authorizations
+}
+
+// DefaultEndpointAuthorizationsForReadOnlyUserRole returns the default endpoint authorizations
+// associated to the readonly user role.
+func DefaultEndpointAuthorizationsForReadOnlyUserRole(volumeBrowsingAuthorizations bool) Authorizations {
+	authorizations := map[Authorization]bool{
+		OperationDockerContainerArchiveInfo: true,
+		OperationDockerContainerList:        true,
+		OperationDockerContainerChanges:     true,
+		OperationDockerContainerInspect:     true,
+		OperationDockerContainerTop:         true,
+		OperationDockerContainerLogs:        true,
+		OperationDockerContainerStats:       true,
+		OperationDockerImageList:            true,
+		OperationDockerImageSearch:          true,
+		OperationDockerImageGetAll:          true,
+		OperationDockerImageGet:             true,
+		OperationDockerImageHistory:         true,
+		OperationDockerImageInspect:         true,
+		OperationDockerNetworkList:          true,
+		OperationDockerNetworkInspect:       true,
+		OperationDockerVolumeList:           true,
+		OperationDockerVolumeInspect:        true,
+		OperationDockerSwarmInspect:         true,
+		OperationDockerNodeList:             true,
+		OperationDockerNodeInspect:          true,
+		OperationDockerServiceList:          true,
+		OperationDockerServiceInspect:       true,
+		OperationDockerServiceLogs:          true,
+		OperationDockerSecretList:           true,
+		OperationDockerSecretInspect:        true,
+		OperationDockerConfigList:           true,
+		OperationDockerConfigInspect:        true,
+		OperationDockerTaskList:             true,
+		OperationDockerTaskInspect:          true,
+		OperationDockerTaskLogs:             true,
+		OperationDockerPluginList:           true,
+		OperationDockerDistributionInspect:  true,
+		OperationDockerPing:                 true,
+		OperationDockerInfo:                 true,
+		OperationDockerVersion:              true,
+		OperationDockerEvents:               true,
+		OperationDockerSystem:               true,
+		OperationDockerAgentPing:            true,
+		OperationDockerAgentList:            true,
+		OperationDockerAgentHostInfo:        true,
+		OperationPortainerStackList:         true,
+		OperationPortainerStackInspect:      true,
+		OperationPortainerStackFile:         true,
+		OperationPortainerWebhookList:       true,
+	}
+
+	if volumeBrowsingAuthorizations {
+		authorizations[OperationDockerAgentBrowseGet] = true
+		authorizations[OperationDockerAgentBrowseList] = true
+	}
+
+	return authorizations
+}
+
 // DefaultPortainerAuthorizations returns the default Portainer authorizations used by non-admin users.
 func DefaultPortainerAuthorizations() Authorizations {
 	return map[Authorization]bool{
@@ -164,7 +552,7 @@ func (service *AuthorizationService) RemoveTeamAccessPolicies(teamID TeamID) err
 		}
 	}
 
-	return nil
+	return service.UpdateUsersAuthorizations()
 }
 
 // RemoveUserAccessPolicies will remove all existing access policies associated to the specified user
@@ -383,37 +771,25 @@ func getAuthorizationsFromTeamEndpointGroupPolicies(memberships []TeamMembership
 }
 
 func getAuthorizationsFromRoles(roleIdentifiers []RoleID, roles []Role) Authorizations {
-	var roleAuthorizations []Authorizations
+	var associatedRoles []Role
+
 	for _, id := range roleIdentifiers {
 		for _, role := range roles {
 			if role.ID == id {
-				roleAuthorizations = append(roleAuthorizations, role.Authorizations)
+				associatedRoles = append(associatedRoles, role)
 				break
 			}
 		}
 	}
 
-	processedAuthorizations := make(Authorizations)
-	if len(roleAuthorizations) > 0 {
-		processedAuthorizations = roleAuthorizations[0]
-		for idx, authorizations := range roleAuthorizations {
-			if idx == 0 {
-				continue
-			}
-			processedAuthorizations = mergeAuthorizations(processedAuthorizations, authorizations)
+	var authorizations Authorizations
+	highestPriority := 0
+	for _, role := range associatedRoles {
+		if role.Priority > highestPriority {
+			highestPriority = role.Priority
+			authorizations = role.Authorizations
 		}
 	}
 
-	return processedAuthorizations
-}
-
-func mergeAuthorizations(a, b Authorizations) Authorizations {
-	c := make(map[Authorization]bool)
-
-	for k := range b {
-		if _, ok := a[k]; ok {
-			c[k] = true
-		}
-	}
-	return c
+	return authorizations
 }

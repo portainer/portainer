@@ -41,7 +41,7 @@ func (handler *Handler) proxyRequestsToRegistryAPI(w http.ResponseWriter, r *htt
 	if proxy == nil {
 		proxy, err = handler.ProxyManager.CreateExtensionProxy(portainer.RegistryManagementExtension)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to register registry proxy", err}
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create extension proxy for registry manager", err}
 		}
 	}
 

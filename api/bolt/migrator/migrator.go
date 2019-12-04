@@ -287,5 +287,19 @@ func (m *Migrator) Migrate() error {
 		}
 	}
 
+	// Portainer 1.23.0
+	// DBVersion 21 is missing as it was shipped as via hotfix 1.22.2
+	if m.currentDBVersion < 22 {
+		err := m.updateResourceControlsToDBVersion22()
+		if err != nil {
+			return err
+		}
+
+		err = m.updateUsersAndRolesToDBVersion22()
+		if err != nil {
+			return err
+		}
+	}
+
 	return m.versionService.StoreDBVersion(portainer.DBVersion)
 }

@@ -8,7 +8,6 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -42,8 +41,8 @@ func (handler *Handler) stackFile(w http.ResponseWriter, r *http.Request) *httpe
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
 	}
 
-	resourceControl, err := handler.ResourceControlService.ResourceControlByResourceID(stack.Name)
-	if err != nil && err != portainer.ErrObjectNotFound {
+	resourceControl, err := handler.ResourceControlService.ResourceControlByResourceIDAndType(stack.Name, portainer.StackResourceControl)
+	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a resource control associated to the stack", err}
 	}
 
@@ -52,17 +51,12 @@ func (handler *Handler) stackFile(w http.ResponseWriter, r *http.Request) *httpe
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
 
-	extendedStack := proxy.ExtendedStack{*stack, portainer.ResourceControl{}}
-	if !securityContext.IsAdmin && resourceControl == nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
+	access, err := handler.userCanAccessStack(securityContext, endpoint.ID, resourceControl)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify user authorizations to validate stack access", err}
 	}
-
-	if resourceControl != nil {
-		if securityContext.IsAdmin || proxy.CanAccessStack(stack, resourceControl, securityContext.UserID, securityContext.UserMemberships) {
-			extendedStack.ResourceControl = *resourceControl
-		} else {
-			return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
-		}
+	if !access {
+		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
 	}
 
 	stackFileContent, err := handler.FileService.GetFileContent(path.Join(stack.ProjectPath, stack.EntryPoint))

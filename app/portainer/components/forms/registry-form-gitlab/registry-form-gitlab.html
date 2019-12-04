@@ -1,0 +1,139 @@
+<form class="form-horizontal" name="registryFormGitlab" ng-submit="$ctrl.retrieveRegistries()">
+  <div class="col-sm-12 form-section-title">
+    Important notice
+  </div>
+  <div class="form-group">
+    <span class="col-sm-12 text-muted small">
+      <p>
+        For information on how to generate a Gitlab Personal Access Token, follow the <a href="https://gitlab.com/help/user/profile/personal_access_tokens.md" target="_blank">gitlab guide</a>.
+      </p>
+      <p>
+        <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i> You must provide a token with <code>api</code> scope. Failure to do so will mean you can only push/pull from your registry but not manage it using the <a ui-sref="portainer.extensions.extension({id: 1})">registry management (extension)</a>.
+      </p>
+    </span>
+  </div>
+  <div class="col-sm-12 form-section-title">
+    Gitlab registry connection details
+  </div>
+  <!-- credentials-user -->
+  <div class="form-group">
+    <label for="registry_username" class="col-sm-3 col-lg-2 control-label text-left">Username</label>
+    <div class="col-sm-9 col-lg-10">
+      <input type="text" class="form-control" id="registry_username" name="registry_username" ng-model="$ctrl.model.Username" required>
+    </div>
+  </div>
+  <div class="form-group" ng-show="registryFormGitlab.registry_username.$invalid">
+    <div class="col-sm-12 small text-warning">
+      <div ng-messages="registryFormGitlab.registry_username.$error">
+        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+      </div>
+    </div>
+  </div>
+  <!-- !credentials-user -->
+  <!-- credentials-pat -->
+  <div class="form-group">
+    <label for="registry_perso_acc_token" class="col-sm-3 col-lg-2 control-label text-left">Personal Access Token
+    </label>
+    <div class="col-sm-9 col-lg-10">
+      <input type="password" class="form-control" id="registry_perso_acc_token" name="registry_perso_acc_token" ng-model="$ctrl.model.Token" required>
+    </div>
+  </div>
+  <div class="form-group" ng-show="registryFormGitlab.registry_perso_acc_token.$invalid">
+    <div class="col-sm-12 small text-warning">
+      <div ng-messages="registryFormGitlab.registry_perso_acc_token.$error">
+        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+      </div>
+    </div>
+  </div>
+  <!-- !credentials-pat -->
+
+  <div class="form-group">
+    <div class="col-sm-12">
+      <a class="small interactive" ng-if="!$ctrl.state.overrideConfiguration" ng-click="$ctrl.state.overrideConfiguration = true;">
+        <i class="fa fa-wrench space-right" aria-hidden="true"></i> Override default configuration
+      </a>
+      <a class="small interactive" ng-if="$ctrl.state.overrideConfiguration" ng-click="$ctrl.state.overrideConfiguration = false; $ctrl.resetDefaults()">
+        <i class="fa fa-cogs space-right" aria-hidden="true"></i> Use default configuration
+      </a>
+    </div>
+  </div>
+
+  <!-- url-input -->
+  <div class="form-group" ng-if="$ctrl.state.overrideConfiguration">
+    <label for="instance_url" class="col-sm-3 col-lg-2 control-label text-left">
+      Instance URL
+      <portainer-tooltip position="bottom" message="URL of Gitlab instance."></portainer-tooltip>
+    </label>
+    <div class="col-sm-9 col-lg-10">
+      <input type="text" class="form-control" id="instance_url" name="instance_url" ng-model="$ctrl.model.Gitlab.InstanceURL" placeholder="https://gitlab.com" required>
+    </div>
+  </div>
+  <div class="form-group" ng-show="registryFormGitlab.instance_url.$invalid">
+    <div class="col-sm-12 small text-warning">
+      <div ng-messages="registryFormGitlab.instance_url.$error">
+        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+      </div>
+    </div>
+  </div>
+  <!-- !url-input -->
+  <!-- url-input -->
+  <div class="form-group" ng-if="$ctrl.state.overrideConfiguration">
+    <label for="registry_url" class="col-sm-3 col-lg-2 control-label text-left">
+      Registry URL
+      <portainer-tooltip position="bottom" message="URL of Gitlab registry instance."></portainer-tooltip>
+    </label>
+    <div class="col-sm-9 col-lg-10">
+      <input type="text" class="form-control" id="registry_url" name="registry_url" ng-model="$ctrl.model.URL" placeholder="https://registry.gitlab.com" required>
+    </div>
+  </div>
+  <div class="form-group" ng-show="registryFormGitlab.registry_url.$invalid">
+    <div class="col-sm-12 small text-warning">
+      <div ng-messages="registryFormGitlab.registry_url.$error">
+        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+      </div>
+    </div>
+  </div>
+  <!-- !url-input -->
+
+  <div class="form-group">
+    <div class="col-sm-12">
+      <button type="submit" class="btn btn-primary btn-sm" ng-disabled="$ctrl.actionInProgress || !registryFormGitlab.$valid" button-spinner="$ctrl.actionInProgress">
+        <span ng-hide="$ctrl.actionInProgress">Retrieve projects</span>
+        <span ng-show="$ctrl.actionInProgress">In progress...</span>
+      </button>
+    </div>
+  </div>
+</form>
+<div class="form-horizontal" ng-if="$ctrl.projects">
+  <div class="col-sm-12 form-section-title">
+    Gitlab projects
+  </div>
+  <div class="form-group">
+    <span class="col-sm-12 text-muted small">
+      Select the project's registries you want to manage. Portainer will create one registry for each selected project.
+    </span>
+    <span class="col-sm-12 text-muted small">
+      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+      If you can't select a project, make sure that registry feature is activated on it.
+    </span>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-12">
+        <gitlab-projects-datatable
+        title-text="Gitlab projects" title-icon="fa-project-diagram"
+        dataset="$ctrl.projects" table-key="gitlab_projects"
+        state="$ctrl.state.gitlab"
+        order-by="Name"
+        ></gitlab-projects-datatable>
+      </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-12">
+      <button ng-click="$ctrl.createRegistries()" class="btn btn-primary btn-sm" ng-disabled="$ctrl.actionInProgress || !$ctrl.state.gitlab.selectedItemCount" button-spinner="$ctrl.actionInProgress">
+        <span ng-hide="$ctrl.actionInProgress">Create registries</span>
+        <span ng-show="$ctrl.actionInProgress">In progress...</span>
+      </button>
+    </div>
+  </div>
+  <!-- !actions -->
+</div>
