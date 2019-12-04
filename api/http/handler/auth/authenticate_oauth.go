@@ -133,6 +133,11 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist team membership inside the database", err}
 			}
 		}
+
+		err = handler.AuthorizationService.UpdateUsersAuthorizations()
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
+		}
 	}
 
 	return handler.writeToken(w, user)

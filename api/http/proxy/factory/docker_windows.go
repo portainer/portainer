@@ -29,7 +29,7 @@ func (factory ProxyFactory) newOSBasedLocalProxy(path string, endpoint *portaine
 
 	proxy := &dockerLocalProxy{}
 
-	dockerTransport, err := docker.NewTransport(transportParameters, newSocketTransport(path))
+	dockerTransport, err := docker.NewTransport(transportParameters, newNamedPipeTransport(path))
 	if err != nil {
 		return nil, err
 	}

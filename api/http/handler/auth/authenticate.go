@@ -113,6 +113,11 @@ func (handler *Handler) authenticateLDAPAndCreateUser(w http.ResponseWriter, use
 		log.Printf("Warning: unable to automatically add user into teams: %s\n", err.Error())
 	}
 
+	err = handler.AuthorizationService.UpdateUsersAuthorizations()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
+	}
+
 	return handler.writeToken(w, user)
 }
 

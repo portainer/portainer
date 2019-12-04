@@ -192,7 +192,8 @@ angular.module('portainer.docker')
   };
 
   service.getUniqueTagListFromImages = function (availableImages) {
-    return _.flatten(_.map(availableImages, function (image) {
+
+    return _.uniq(_.flatMap(availableImages, function (image) {
       _.remove(image.RepoTags, function (item) {
         return item.indexOf('<none>') !== -1;
       });

@@ -945,7 +945,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "1.23.0-dev"
+	APIVersion = "1.24.0-dev"
 	// DBVersion is the version number of the Portainer database
 	DBVersion = 22
 	// AssetsServerURL represents the URL of the Portainer asset server
@@ -976,7 +976,7 @@ const (
 	// DefaultEdgeAgentCheckinIntervalInSeconds represents the default interval (in seconds) used by Edge agents to checkin with the Portainer instance
 	DefaultEdgeAgentCheckinIntervalInSeconds = 5
 	// LocalExtensionManifestFile represents the name of the local manifest file for extensions
-	LocalExtensionManifestFile = "/app/extensions.json"
+	LocalExtensionManifestFile = "/extensions.json"
 )
 
 const (

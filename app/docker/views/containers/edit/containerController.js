@@ -2,10 +2,11 @@ import moment from 'moment';
 import {PorImageRegistryModel} from 'Docker/models/porImageRegistry';
 
 angular.module('portainer.docker')
-.controller('ContainerController', ['$q', '$scope', '$state','$transition$', '$filter', '$async', 'Commit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'NetworkService', 'Notifications', 'ModalService', 'ResourceControlService', 'RegistryService', 'ImageService', 'HttpRequestHelper', 'Authentication',
-function ($q, $scope, $state, $transition$, $filter, $async, Commit, ContainerHelper, ContainerService, ImageHelper, NetworkService, Notifications, ModalService, ResourceControlService, RegistryService, ImageService, HttpRequestHelper, Authentication) {
+.controller('ContainerController', ['$q', '$scope', '$state','$transition$', '$filter', '$async', 'ExtensionService', 'Commit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'NetworkService', 'Notifications', 'ModalService', 'ResourceControlService', 'RegistryService', 'ImageService', 'HttpRequestHelper', 'Authentication',
+function ($q, $scope, $state, $transition$, $filter, $async, ExtensionService, Commit, ContainerHelper, ContainerService, ImageHelper, NetworkService, Notifications, ModalService, ResourceControlService, RegistryService, ImageService, HttpRequestHelper, Authentication) {
   $scope.activityTime = 0;
   $scope.portBindings = [];
+  $scope.displayRecreateButton = false;
 
   $scope.config = {
     RegistryModel: new PorImageRegistryModel(),
@@ -51,6 +52,14 @@ function ($q, $scope, $state, $transition$, $filter, $async, Commit, ContainerHe
           }
         });
       }
+
+      const inSwarm = $scope.container.Config.Labels['com.docker.swarm.service.id'];
+      const autoRemove = $scope.container.HostConfig.AutoRemove;
+      const admin = Authentication.isAdmin();
+
+      ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.RBAC).then((rbacEnabled) => {
+        $scope.displayRecreateButton = !inSwarm && !autoRemove && (rbacEnabled ? admin : true)
+      });
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve container info');
