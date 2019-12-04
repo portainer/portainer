@@ -136,6 +136,7 @@ func (server *Server) Start() error {
 	authHandler.EndpointGroupService = server.EndpointGroupService
 	authHandler.RoleService = server.RoleService
 	authHandler.ProxyManager = proxyManager
+	authHandler.AuthorizationService = authorizationService
 
 	var roleHandler = roles.NewHandler(requestBouncer)
 	roleHandler.RoleService = server.RoleService
