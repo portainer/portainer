@@ -32,7 +32,7 @@
           </div>
           <!-- !registry-url-input -->
           <!-- authentication-checkbox -->
-          <div class="form-group" ng-if="registry.Type === 3">
+          <div class="form-group" ng-if="registry.Type === RegistryTypes.CUSTOM || registry.Type === RegistryTypes.GITLAB">
             <div class="col-sm-12">
               <label for="registry_auth" class="control-label text-left">
                 Authentication
@@ -65,7 +65,7 @@
           </div>
           <!-- !authentication-credentials -->
           <!-- tls -->
-          <div ng-if="registry.Type === 3">
+          <div ng-if="registry.Type === RegistryTypes.CUSTOM || registry.Type === RegistryTypes.GITLAB">
             <!-- tls-checkbox -->
             <div class="form-group">
               <div class="col-sm-12">

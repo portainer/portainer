@@ -2,7 +2,7 @@
   "author": "Portainer.io",
   "name": "portainer",
   "homepage": "http://portainer.io",
-  "version": "1.22.1",
+  "version": "1.23.0",
   "repository": {
     "type": "git",
     "url": "git@github.com:portainer/portainer.git"
@@ -45,7 +45,7 @@
   },
   "dependencies": {
     "@babel/polyfill": "^7.2.5",
-    "@fortawesome/fontawesome-free-webfonts": "^1.0.9",
+    "@fortawesome/fontawesome-free": "^5.11.2",
     "@uirouter/angularjs": "~1.0.6",
     "angular": "~1.5.0",
     "angular-clipboard": "^1.6.2",
@@ -59,6 +59,7 @@
     "angular-messages": "~1.5.0",
     "angular-mocks": "~1.5.0",
     "angular-moment-picker": "^0.10.2",
+    "angular-multiselect": "github:portainer/angular-multi-select#semver:~v4.0.1",
     "angular-resource": "~1.5.0",
     "angular-sanitize": "~1.5.0",
     "angular-ui-bootstrap": "~2.5.0",
@@ -94,8 +95,8 @@
     "clean-webpack-plugin": "^0.1.19",
     "css-loader": "^1.0.0",
     "cssnano": "^3.10.0",
-    "eslint": "^3.19.0",
-    "eslint-loader": "^2.1.1",
+    "eslint": "5.16.0",
+    "eslint-loader": "^2.1.2",
     "file-loader": "^1.1.11",
     "grunt": "~0.4.0",
     "grunt-cli": "^1.2.0",

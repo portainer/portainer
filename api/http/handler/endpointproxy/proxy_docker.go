@@ -37,7 +37,7 @@ func (handler *Handler) proxyRequestsToDockerAPI(w http.ResponseWriter, r *http.
 
 		tunnel := handler.ReverseTunnelService.GetTunnelDetails(endpoint.ID)
 		if tunnel.Status == portainer.EdgeAgentIdle {
-			handler.ProxyManager.DeleteProxy(endpoint)
+			handler.ProxyManager.DeleteEndpointProxy(endpoint)
 
 			err := handler.ReverseTunnelService.SetTunnelStatusToRequired(endpoint.ID)
 			if err != nil {
@@ -55,9 +55,9 @@ func (handler *Handler) proxyRequestsToDockerAPI(w http.ResponseWriter, r *http.
 	}
 
 	var proxy http.Handler
-	proxy = handler.ProxyManager.GetProxy(endpoint)
+	proxy = handler.ProxyManager.GetEndpointProxy(endpoint)
 	if proxy == nil {
-		proxy, err = handler.ProxyManager.CreateAndRegisterProxy(endpoint)
+		proxy, err = handler.ProxyManager.CreateAndRegisterEndpointProxy(endpoint)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create proxy", err}
 		}

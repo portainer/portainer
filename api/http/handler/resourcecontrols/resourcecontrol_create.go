@@ -1,6 +1,7 @@
 package resourcecontrols
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -8,29 +9,33 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/security"
 )
 
 type resourceControlCreatePayload struct {
-	ResourceID     string
-	Type           string
-	Public         bool
-	Users          []int
-	Teams          []int
-	SubResourceIDs []string
+	ResourceID         string
+	Type               string
+	Public             bool
+	AdministratorsOnly bool
+	Users              []int
+	Teams              []int
+	SubResourceIDs     []string
 }
 
 func (payload *resourceControlCreatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.ResourceID) {
-		return portainer.Error("Invalid resource identifier")
+		return errors.New("invalid payload: invalid resource identifier")
 	}
 
 	if govalidator.IsNull(payload.Type) {
-		return portainer.Error("Invalid type")
+		return errors.New("invalid payload: invalid type")
 	}
 
-	if len(payload.Users) == 0 && len(payload.Teams) == 0 && !payload.Public {
-		return portainer.Error("Invalid resource control declaration. Must specify Users, Teams or Public")
+	if len(payload.Users) == 0 && len(payload.Teams) == 0 && !payload.Public && !payload.AdministratorsOnly {
+		return errors.New("invalid payload: must specify Users, Teams, Public or AdministratorsOnly")
+	}
+
+	if payload.Public && payload.AdministratorsOnly {
+		return errors.New("invalid payload: cannot set both public and administrators only flags to true")
 	}
 	return nil
 }
@@ -63,8 +68,8 @@ func (handler *Handler) resourceControlCreate(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid type value. Value must be one of: container, service, volume, network, secret, stack or config", portainer.ErrInvalidResourceControlType}
 	}
 
-	rc, err := handler.ResourceControlService.ResourceControlByResourceID(payload.ResourceID)
-	if err != nil && err != portainer.ErrObjectNotFound {
+	rc, err := handler.ResourceControlService.ResourceControlByResourceIDAndType(payload.ResourceID, resourceControlType)
+	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve resource controls from the database", err}
 	}
 	if rc != nil {
@@ -90,21 +95,13 @@ func (handler *Handler) resourceControlCreate(w http.ResponseWriter, r *http.Req
 	}
 
 	resourceControl := portainer.ResourceControl{
-		ResourceID:     payload.ResourceID,
-		SubResourceIDs: payload.SubResourceIDs,
-		Type:           resourceControlType,
-		Public:         payload.Public,
-		UserAccesses:   userAccesses,
-		TeamAccesses:   teamAccesses,
-	}
-
-	securityContext, err := security.RetrieveRestrictedRequestContext(r)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
-	}
-
-	if !security.AuthorizedResourceControlCreation(&resourceControl, securityContext) {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to create a resource control for the specified resource", portainer.ErrResourceAccessDenied}
+		ResourceID:         payload.ResourceID,
+		SubResourceIDs:     payload.SubResourceIDs,
+		Type:               resourceControlType,
+		Public:             payload.Public,
+		AdministratorsOnly: payload.AdministratorsOnly,
+		UserAccesses:       userAccesses,
+		TeamAccesses:       teamAccesses,
 	}
 
 	err = handler.ResourceControlService.CreateResourceControl(&resourceControl)

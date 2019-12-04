@@ -4,20 +4,26 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
+	"os"
 	"os/exec"
 	"path"
+	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/coreos/go-semver/semver"
 
 	"github.com/orcaman/concurrent-map"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/client"
 )
 
-var extensionDownloadBaseURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com/extensions/"
+var extensionDownloadBaseURL = portainer.AssetsServerURL + "/extensions/"
+var extensionVersionRegexp = regexp.MustCompile(`\d+(\.\d+)+`)
 
 var extensionBinaryMap = map[portainer.ExtensionID]string{
 	portainer.RegistryManagementExtension:  "extension-registry-management",
@@ -47,20 +53,11 @@ func processKey(ID portainer.ExtensionID) string {
 }
 
 func buildExtensionURL(extension *portainer.Extension) string {
-	extensionURL := extensionDownloadBaseURL
-	extensionURL += extensionBinaryMap[extension.ID]
-	extensionURL += "-" + runtime.GOOS + "-" + runtime.GOARCH
-	extensionURL += "-" + extension.Version
-	extensionURL += ".zip"
-	return extensionURL
+	return fmt.Sprintf("%s%s-%s-%s-%s.zip", extensionDownloadBaseURL, extensionBinaryMap[extension.ID], runtime.GOOS, runtime.GOARCH, extension.Version)
 }
 
 func buildExtensionPath(binaryPath string, extension *portainer.Extension) string {
-
-	extensionFilename := extensionBinaryMap[extension.ID]
-	extensionFilename += "-" + runtime.GOOS + "-" + runtime.GOARCH
-	extensionFilename += "-" + extension.Version
-
+	extensionFilename := fmt.Sprintf("%s-%s-%s-%s", extensionBinaryMap[extension.ID], runtime.GOOS, runtime.GOARCH, extension.Version)
 	if runtime.GOOS == "windows" {
 		extensionFilename += ".exe"
 	}
@@ -73,11 +70,20 @@ func buildExtensionPath(binaryPath string, extension *portainer.Extension) strin
 }
 
 // FetchExtensionDefinitions will fetch the list of available
-// extension definitions from the official Portainer assets server
+// extension definitions from the official Portainer assets server.
+// If it cannot retrieve the data from the Internet it will fallback to the locally cached
+// manifest file.
 func (manager *ExtensionManager) FetchExtensionDefinitions() ([]portainer.Extension, error) {
-	extensionData, err := client.Get(portainer.ExtensionDefinitionsURL, 30)
+	var extensionData []byte
+
+	extensionData, err := client.Get(portainer.ExtensionDefinitionsURL, 5)
 	if err != nil {
-		return nil, err
+		log.Printf("[WARN] [exec,extensions] [message: unable to retrieve extensions manifest via Internet. Extensions will be retrieved from local cache and might not be up to date] [err: %s]", err)
+
+		extensionData, err = manager.fileService.GetFileContent(portainer.LocalExtensionManifestFile)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	var extensions []portainer.Extension
@@ -87,6 +93,37 @@ func (manager *ExtensionManager) FetchExtensionDefinitions() ([]portainer.Extens
 	}
 
 	return extensions, nil
+}
+
+// InstallExtension will install the extension from an archive. It will extract the extension version number from
+// the archive file name first and return an error if the file name is not valid (cannot find extension version).
+// It will then extract the archive and execute the EnableExtension function to enable the extension.
+// Since we're missing information about this extension (stored on Portainer.io server) we need to assume
+// default information based on the extension ID.
+func (manager *ExtensionManager) InstallExtension(extension *portainer.Extension, licenseKey string, archiveFileName string, extensionArchive []byte) error {
+	extensionVersion := extensionVersionRegexp.FindString(archiveFileName)
+	if extensionVersion == "" {
+		return errors.New("invalid extension archive filename: unable to retrieve extension version")
+	}
+
+	err := manager.fileService.ExtractExtensionArchive(extensionArchive)
+	if err != nil {
+		return err
+	}
+
+	switch extension.ID {
+	case portainer.RegistryManagementExtension:
+		extension.Name = "Registry Manager"
+	case portainer.OAuthAuthenticationExtension:
+		extension.Name = "External Authentication"
+	case portainer.RBACExtension:
+		extension.Name = "Role-Based Access Control"
+	}
+	extension.ShortDescription = "Extension enabled offline"
+	extension.Version = extensionVersion
+	extension.Available = true
+
+	return manager.EnableExtension(extension, licenseKey)
 }
 
 // EnableExtension will check for the existence of the extension binary on the filesystem
@@ -145,6 +182,61 @@ func (manager *ExtensionManager) DisableExtension(extension *portainer.Extension
 	return manager.fileService.RemoveDirectory(extensionBinaryPath)
 }
 
+// StartExtensions will retrieve the extensions definitions from the Internet and check if a new version of each
+// extension is available. If so, it will automatically install the new version of the extension. If no update is
+// available it will simply start the extension.
+// The purpose of this function is to be ran at startup, as such most of the error handling won't block the program execution
+// and will log warning messages instead.
+func (manager *ExtensionManager) StartExtensions() error {
+	extensions, err := manager.extensionService.Extensions()
+	if err != nil {
+		return err
+	}
+
+	definitions, err := manager.FetchExtensionDefinitions()
+	if err != nil {
+		log.Printf("[WARN] [exec,extensions] [message: unable to retrieve extension information from Internet. Skipping extensions update check.] [err: %s]", err)
+		return nil
+	}
+
+	return manager.updateAndStartExtensions(extensions, definitions)
+}
+
+func (manager *ExtensionManager) updateAndStartExtensions(extensions []portainer.Extension, definitions []portainer.Extension) error {
+	for _, definition := range definitions {
+		for _, extension := range extensions {
+			if extension.ID == definition.ID {
+				definitionVersion := semver.New(definition.Version)
+				extensionVersion := semver.New(extension.Version)
+
+				if extensionVersion.LessThan(*definitionVersion) {
+					log.Printf("[INFO] [exec,extensions] [message: new version detected, updating extension] [extension: %s] [current_version: %s] [available_version: %s]", extension.Name, extension.Version, definition.Version)
+					err := manager.UpdateExtension(&extension, definition.Version)
+					if err != nil {
+						log.Printf("[WARN] [exec,extensions] [message: unable to update extension automatically] [extension: %s] [current_version: %s] [available_version: %s] [err: %s]", extension.Name, extension.Version, definition.Version, err)
+					}
+				} else {
+					err := manager.EnableExtension(&extension, extension.License.LicenseKey)
+					if err != nil {
+						log.Printf("[WARN] [exec,extensions] [message: unable to start extension] [extension: %s] [err: %s]", extension.Name, err)
+						extension.Enabled = false
+						extension.License.Valid = false
+					}
+				}
+
+				err := manager.extensionService.Persist(&extension)
+				if err != nil {
+					return err
+				}
+
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
 // UpdateExtension will download the new extension binary from the official Portainer assets
 // server, disable the previous extension via DisableExtension, trigger a license check
 // and then start the extension process and add it to the processes map
@@ -195,7 +287,7 @@ func validateLicense(binaryPath, licenseKey string) ([]string, error) {
 	err := licenseCheckProcess.Run()
 	if err != nil {
 		log.Printf("[DEBUG] [exec,extension] [message: unable to run extension process] [err: %s]", err)
-		return nil, errors.New("Invalid extension license key")
+		return nil, errors.New("invalid extension license key")
 	}
 
 	output := string(cmdOutput.Bytes())
@@ -205,8 +297,12 @@ func validateLicense(binaryPath, licenseKey string) ([]string, error) {
 
 func (manager *ExtensionManager) startExtensionProcess(extension *portainer.Extension, binaryPath string) error {
 	extensionProcess := exec.Command(binaryPath, "-license", extension.License.LicenseKey)
+	extensionProcess.Stdout = os.Stdout
+	extensionProcess.Stderr = os.Stderr
+
 	err := extensionProcess.Start()
 	if err != nil {
+		log.Printf("[DEBUG] [exec,extension] [message: unable to start extension process] [err: %s]", err)
 		return err
 	}
 

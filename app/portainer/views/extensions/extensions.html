@@ -42,9 +42,23 @@
 
           <div class="form-group">
             <div class="col-sm-12">
-              <span class="small text-muted">
-                Ensure that you have a valid license.
-              </span>
+              <p class="small text-muted" ng-if="!state.offlineActivation">
+                Portainer will download the latest version of the extension. Ensure that you have a valid license.
+              </p>
+              <p class="small text-muted" ng-if="state.offlineActivation">
+                You will need to upload the extension archive manually. Ensure that you have a valid license.
+              </p>
+              <p class="small text-muted" ng-if="state.offlineActivation">
+                You can download the latest version of our extensions <a target="_blank" href="https://downloads.portainer.io/extensions.zip">here</a>.
+              </p>
+              <p>
+                <a class="small interactive" ng-if="!state.offlineActivation" ng-click="state.offlineActivation = true;">
+                  <i class="fa fa-toggle-off space-right" aria-hidden="true"></i> Switch to offline activation
+                </a>
+                <a class="small interactive" ng-if="state.offlineActivation" ng-click="state.offlineActivation = false;">
+                  <i class="fa fa-wifi space-right" aria-hidden="true"></i> Switch to online activation
+                </a>
+              </p>
             </div>
           </div>
 
@@ -58,14 +72,25 @@
           <div class="form-group" ng-show="extensionEnableForm.extension_license.$invalid">
             <div class="col-sm-12 small text-warning">
               <div ng-messages="extensionEnableForm.extension_license.$error">
+                <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
                 <p ng-message="invalidLicense"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Invalid license format.</p>
               </div>
             </div>
           </div>
 
+          <div class="form-group" ng-if="state.offlineActivation">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-primary btn-sm" ngf-select ng-model="formValues.ExtensionFile" style="margin-left: 0px;">Select file</button>
+              <span style="margin-left: 5px;">
+                {{ formValues.ExtensionFile.name }}
+                <i class="fa fa-times red-icon" ng-if="!formValues.ExtensionFile" aria-hidden="true"></i>
+              </span>
+            </div>
+          </div>
+
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-click="enableExtension()" ng-disabled="state.actionInProgress || !extensionEnableForm.$valid" button-spinner="state.actionInProgress" style="margin-left: 0px;">
+              <button type="button" class="btn btn-primary btn-sm" ng-click="enableExtension()" ng-disabled="state.actionInProgress || !extensionEnableForm.$valid || (state.offlineActivation && !formValues.ExtensionFile)" button-spinner="state.actionInProgress" style="margin-left: 0px;">
                 <span ng-hide="state.actionInProgress">Enable extension</span>
                 <span ng-show="state.actionInProgress">Enabling extension...</span>
               </button>

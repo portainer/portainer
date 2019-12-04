@@ -43,13 +43,12 @@ function ServiceServiceFactory($q, Service, ServiceHelper, TaskService, Resource
     var deferred = $q.defer();
 
     Service.remove({id: service.Id}).$promise
-    .then(function success() {
-      if (service.ResourceControl && service.ResourceControl.Type === 2) {
-        return ResourceControlService.deleteResourceControl(service.ResourceControl.Id);
+    .then(function success(data) {
+      if (data.message) {
+        deferred.reject({ msg: data.message, err: data.message });
+      } else {
+        deferred.resolve();
       }
-    })
-    .then(function success() {
-      deferred.resolve();
     })
     .catch(function error(err) {
       deferred.reject({ msg: 'Unable to remove service', err: err });

@@ -1,4 +1,4 @@
-import { jsonObjectsToArrayHandler, genericHandler } from '../../docker/rest/response/handlers';
+import {genericHandler, jsonObjectsToArrayHandler} from '../../docker/rest/response/handlers';
 
 angular.module('portainer.app')
 .factory('FileUploadService', ['$q', 'Upload', 'EndpointProvider', function FileUploadFactory($q, Upload, EndpointProvider) {
@@ -167,6 +167,19 @@ angular.module('portainer.app')
     }
 
     return $q.all(queue);
+  };
+
+  service.uploadExtension = function(license, extensionFile) {
+    const payload = {
+      License: license,
+      file: extensionFile,
+      ArchiveFileName: extensionFile.name
+    };
+    return Upload.upload({
+      url: 'api/extensions/upload',
+      data: payload,
+      ignoreLoadingBar: true
+    });
   };
 
   return service;

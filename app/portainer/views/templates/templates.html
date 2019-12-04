@@ -234,10 +234,13 @@
                     <!-- volume -->
                     <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'volume'">
                       <span class="input-group-addon">volume</span>
-                      <select class="form-control" ng-model="volume.bind">
-                        <option selected disabled hidden value="">Select a volume</option>
-                        <option ng-repeat="vol in availableVolumes" ng-value="vol.Name">{{ vol.Name|truncate:30}}</option>
-                      </select>
+                      <input
+                              type="text" ng-model="volume.bind"
+                              id="container_volumes" class="form-control"
+                              placeholder="Select a volume"
+                              typeahead-min-length="0"
+                              uib-typeahead="vol as vol.Name for vol in availableVolumes | filter:$viewValue"
+                      />
                     </div>
                     <!-- !volume -->
                     <!-- bind -->

@@ -1,0 +1,65 @@
+version: '3'
+services:
+  portainer:
+    image: portainerci/portainer:$PORTAINER_TAG
+    container_name: e2e-portainer
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - e2e-ci
+
+  cypress:
+    image: cypress/included:3.5.0
+    container_name: e2e-cypress
+    command: --browser chrome
+    depends_on:
+      - portainer
+    working_dir: /e2e
+    environment:
+      CYPRESS_baseUrl: http://e2e-portainer:9000
+    volumes:
+      - ./cypress:/e2e/cypress
+      - ./cypress.json:/e2e/cypress.json
+    networks:
+      - e2e-ci
+
+  manager1:
+    image: docker:dind
+    privileged: true
+    environment:
+      DOCKER_TLS_CERTDIR:
+    hostname: manager1
+    networks:
+      - e2e-ci
+    depends_on:
+      - manager2
+      - worker1
+      - worker2
+  manager2:
+    image: docker:dind
+    privileged: true
+    environment:
+      DOCKER_TLS_CERTDIR:
+    hostname: manager2
+    networks:
+      - e2e-ci
+  worker1:
+    image: docker:dind
+    privileged: true
+    environment:
+      DOCKER_TLS_CERTDIR:
+    hostname: worker1
+    networks:
+      - e2e-ci
+  worker2:
+    image: docker:dind
+    privileged: true
+    environment:
+      DOCKER_TLS_CERTDIR:
+    hostname: worker2
+    networks:
+      - e2e-ci
+
+networks:
+  e2e-ci:
+    driver: bridge

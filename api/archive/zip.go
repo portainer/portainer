@@ -17,32 +17,38 @@ func UnzipArchive(archiveData []byte, dest string) error {
 	}
 
 	for _, zipFile := range zipReader.File {
-
-		f, err := zipFile.Open()
+		err := extractFileFromArchive(zipFile, dest)
 		if err != nil {
 			return err
 		}
-		defer f.Close()
-
-		data, err := ioutil.ReadAll(f)
-		if err != nil {
-			return err
-		}
-
-		fpath := filepath.Join(dest, zipFile.Name)
-
-		outFile, err := os.OpenFile(fpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, zipFile.Mode())
-		if err != nil {
-			return err
-		}
-
-		_, err = io.Copy(outFile, bytes.NewReader(data))
-		if err != nil {
-			return err
-		}
-
-		outFile.Close()
 	}
 
 	return nil
+}
+
+func extractFileFromArchive(file *zip.File, dest string) error {
+	f, err := file.Open()
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	data, err := ioutil.ReadAll(f)
+	if err != nil {
+		return err
+	}
+
+	fpath := filepath.Join(dest, file.Name)
+
+	outFile, err := os.OpenFile(fpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, file.Mode())
+	if err != nil {
+		return err
+	}
+
+	_, err = io.Copy(outFile, bytes.NewReader(data))
+	if err != nil {
+		return err
+	}
+
+	return outFile.Close()
 }
