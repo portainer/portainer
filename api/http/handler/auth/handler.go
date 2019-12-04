@@ -34,6 +34,7 @@ type Handler struct {
 	EndpointGroupService  portainer.EndpointGroupService
 	RoleService           portainer.RoleService
 	ProxyManager          *proxy.Manager
+	AuthorizationService  *portainer.AuthorizationService
 }
 
 // NewHandler creates a handler to manage authentication operations.
