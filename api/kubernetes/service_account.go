@@ -35,7 +35,7 @@ func (kcl *KubeClient) GetServiceAccountBearerToken(userID int, username string)
 		return "", err
 	}
 
-	err = kcl.ensureServiceAccountForUserExists(portainerNamespace, serviceAccountName)
+	err = kcl.ensureServiceAccountForUserExists(serviceAccountName)
 	if err != nil {
 		return "", err
 	}
@@ -47,8 +47,8 @@ func (kcl *KubeClient) ensureRequiredResourcesExist() error {
 	return kcl.createClusterNamespaceListRole()
 }
 
-func (kcl *KubeClient) ensureServiceAccountForUserExists(namespace, serviceAccountName string) error {
-	err := kcl.ensureServiceAccountForUserExists(namespace, serviceAccountName)
+func (kcl *KubeClient) ensureServiceAccountForUserExists(serviceAccountName string) error {
+	err := kcl.createUserServiceAccount(portainerNamespace, serviceAccountName)
 	if err != nil && !k8serrors.IsAlreadyExists(err) {
 		return err
 	}
