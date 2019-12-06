@@ -31,7 +31,7 @@ func NewClientFactory(signatureService portainer.DigitalSignatureService, revers
 	}
 }
 
-// CreateClient is a generic function to create a Docker client based on
+// createClient is a generic function to create a Docker client based on
 // a specific endpoint configuration. The nodeName parameter can be used
 // with an agent enabled endpoint to target a specific node in an agent cluster.
 func (factory *ClientFactory) CreateClient(endpoint *portainer.Endpoint, nodeName string) (*client.Client, error) {

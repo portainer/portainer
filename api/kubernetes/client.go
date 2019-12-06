@@ -25,8 +25,21 @@ func NewClientFactory(signatureService portainer.DigitalSignatureService, revers
 	}
 }
 
-// CreateClient creates a kubernetes client based on the endpoint type
-func (factory *ClientFactory) CreateClient(endpoint *portainer.Endpoint) (*kubernetes.Clientset, error) {
+// CreateKubeClient returns a pointer to a new KubeClient instance
+func (factory *ClientFactory) CreateKubeClient(endpoint *portainer.Endpoint) (portainer.KubeClient, error) {
+	cli, err := factory.createClient(endpoint)
+	if err != nil {
+		return nil, err
+	}
+
+	kubecli := &KubeClient{
+		cli: cli,
+	}
+
+	return kubecli, nil
+}
+
+func (factory *ClientFactory) createClient(endpoint *portainer.Endpoint) (*kubernetes.Clientset, error) {
 	switch endpoint.Type {
 	case portainer.KubernetesLocalEnvironment:
 		return buildLocalClient()

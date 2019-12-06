@@ -6,6 +6,8 @@ import (
 	"net/http/httputil"
 	"net/url"
 
+	"github.com/portainer/portainer/api/kubernetes"
+
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker"
 )
@@ -21,49 +23,52 @@ var extensionPorts = map[portainer.ExtensionID]string{
 type (
 	// ProxyFactory is a factory to create reverse proxies to Docker endpoints and extensions
 	ProxyFactory struct {
-		resourceControlService portainer.ResourceControlService
-		userService            portainer.UserService
-		teamService            portainer.TeamService
-		teamMembershipService  portainer.TeamMembershipService
-		settingsService        portainer.SettingsService
-		registryService        portainer.RegistryService
-		dockerHubService       portainer.DockerHubService
-		signatureService       portainer.DigitalSignatureService
-		reverseTunnelService   portainer.ReverseTunnelService
-		extensionService       portainer.ExtensionService
-		dockerClientFactory    *docker.ClientFactory
+		resourceControlService  portainer.ResourceControlService
+		userService             portainer.UserService
+		teamService             portainer.TeamService
+		teamMembershipService   portainer.TeamMembershipService
+		settingsService         portainer.SettingsService
+		registryService         portainer.RegistryService
+		dockerHubService        portainer.DockerHubService
+		signatureService        portainer.DigitalSignatureService
+		reverseTunnelService    portainer.ReverseTunnelService
+		extensionService        portainer.ExtensionService
+		dockerClientFactory     *docker.ClientFactory
+		kubernetesClientFactory *kubernetes.ClientFactory
 	}
 
 	// ProxyFactoryParameters is used to create a new ProxyFactory
 	ProxyFactoryParameters struct {
-		ResourceControlService portainer.ResourceControlService
-		UserService            portainer.UserService
-		TeamService            portainer.TeamService
-		TeamMembershipService  portainer.TeamMembershipService
-		SettingsService        portainer.SettingsService
-		RegistryService        portainer.RegistryService
-		DockerHubService       portainer.DockerHubService
-		SignatureService       portainer.DigitalSignatureService
-		ReverseTunnelService   portainer.ReverseTunnelService
-		ExtensionService       portainer.ExtensionService
-		DockerClientFactory    *docker.ClientFactory
+		ResourceControlService  portainer.ResourceControlService
+		UserService             portainer.UserService
+		TeamService             portainer.TeamService
+		TeamMembershipService   portainer.TeamMembershipService
+		SettingsService         portainer.SettingsService
+		RegistryService         portainer.RegistryService
+		DockerHubService        portainer.DockerHubService
+		SignatureService        portainer.DigitalSignatureService
+		ReverseTunnelService    portainer.ReverseTunnelService
+		ExtensionService        portainer.ExtensionService
+		DockerClientFactory     *docker.ClientFactory
+		KubernetesClientFactory *kubernetes.ClientFactory
 	}
 )
 
 // NewProxyFactory returns a pointer to a new instance of a ProxyFactory
 func NewProxyFactory(parameters *ProxyFactoryParameters) *ProxyFactory {
 	return &ProxyFactory{
-		resourceControlService: parameters.ResourceControlService,
-		userService:            parameters.UserService,
-		teamService:            parameters.TeamService,
-		teamMembershipService:  parameters.TeamMembershipService,
-		settingsService:        parameters.SettingsService,
-		registryService:        parameters.RegistryService,
-		dockerHubService:       parameters.DockerHubService,
-		signatureService:       parameters.SignatureService,
-		reverseTunnelService:   parameters.ReverseTunnelService,
-		extensionService:       parameters.ExtensionService,
-		dockerClientFactory:    parameters.DockerClientFactory,
+		resourceControlService:  parameters.ResourceControlService,
+		userService:             parameters.UserService,
+		teamService:             parameters.TeamService,
+		teamMembershipService:   parameters.TeamMembershipService,
+		settingsService:         parameters.SettingsService,
+		registryService:         parameters.RegistryService,
+		dockerHubService:        parameters.DockerHubService,
+		signatureService:        parameters.SignatureService,
+		reverseTunnelService:    parameters.ReverseTunnelService,
+		extensionService:        parameters.ExtensionService,
+		dockerClientFactory:     parameters.DockerClientFactory,
+		kubernetesClientFactory: parameters.KubernetesClientFactory,
 	}
 }
 

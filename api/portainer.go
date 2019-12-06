@@ -930,7 +930,7 @@ type (
 		StartExtensions() error
 	}
 
-	// ReverseTunnelService represensts a service used to manage reverse tunnel connections.
+	// ReverseTunnelService represents a service used to manage reverse tunnel connections
 	ReverseTunnelService interface {
 		StartTunnelServer(addr, port string, snapshotManager *SnapshotManager) error
 		GenerateEdgeKey(url, host string, endpointIdentifier int) string
@@ -940,6 +940,11 @@ type (
 		GetTunnelDetails(endpointID EndpointID) *TunnelDetails
 		AddSchedule(endpointID EndpointID, schedule *EdgeSchedule)
 		RemoveSchedule(scheduleID ScheduleID)
+	}
+
+	// KubeClient represents a service used to query a Kubernetes environment
+	KubeClient interface {
+		GetServiceAccountBearerToken(userID int, username string) (string, error)
 	}
 )
 

@@ -6,9 +6,9 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/portainer/portainer/api/crypto"
-
 	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/crypto"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 const defaultServiceAccountTokenFile = "/var/run/secrets/kubernetes.io/serviceaccount/token"
@@ -27,10 +27,11 @@ type edgeTransport struct {
 type localTransport struct {
 	httpTransport *http.Transport
 	bearerToken   string
+	kubecli       portainer.KubeClient
 }
 
 // NewAgentTransport returns a new transport that can be used to send signed requests to a Portainer agent
-func NewLocalTransport() (*localTransport, error) {
+func NewLocalTransport(kubecli portainer.KubeClient) (*localTransport, error) {
 	token, err := ioutil.ReadFile(defaultServiceAccountTokenFile)
 	if err != nil {
 		return nil, err
@@ -48,6 +49,7 @@ func NewLocalTransport() (*localTransport, error) {
 	transport := &localTransport{
 		httpTransport: httpTransport,
 		bearerToken:   string(token),
+		kubecli:       kubecli,
 	}
 
 	return transport, nil
@@ -55,7 +57,23 @@ func NewLocalTransport() (*localTransport, error) {
 
 // RoundTrip is the implementation of the the http.RoundTripper interface
 func (p *localTransport) RoundTrip(request *http.Request) (*http.Response, error) {
-	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", p.bearerToken))
+	tokenData, err := security.RetrieveTokenData(request)
+	if err != nil {
+		return nil, err
+	}
+
+	if tokenData.Role != portainer.AdministratorRole {
+		token, err := p.kubecli.GetServiceAccountBearerToken(int(tokenData.ID), tokenData.Username)
+		if err != nil {
+			return nil, err
+		}
+
+		request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	} else {
+		request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", p.bearerToken))
+
+	}
+
 	return p.httpTransport.RoundTrip(request)
 }
 

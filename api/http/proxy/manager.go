@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/proxy/factory"
+	"github.com/portainer/portainer/api/kubernetes"
 )
 
 // TODO: contain code related to legacy extension management
@@ -23,34 +24,36 @@ type (
 
 	// ManagerParams represents the required parameters to create a new Manager instance.
 	ManagerParams struct {
-		ResourceControlService portainer.ResourceControlService
-		UserService            portainer.UserService
-		TeamService            portainer.TeamService
-		TeamMembershipService  portainer.TeamMembershipService
-		SettingsService        portainer.SettingsService
-		RegistryService        portainer.RegistryService
-		DockerHubService       portainer.DockerHubService
-		SignatureService       portainer.DigitalSignatureService
-		ReverseTunnelService   portainer.ReverseTunnelService
-		ExtensionService       portainer.ExtensionService
-		DockerClientFactory    *docker.ClientFactory
+		ResourceControlService  portainer.ResourceControlService
+		UserService             portainer.UserService
+		TeamService             portainer.TeamService
+		TeamMembershipService   portainer.TeamMembershipService
+		SettingsService         portainer.SettingsService
+		RegistryService         portainer.RegistryService
+		DockerHubService        portainer.DockerHubService
+		SignatureService        portainer.DigitalSignatureService
+		ReverseTunnelService    portainer.ReverseTunnelService
+		ExtensionService        portainer.ExtensionService
+		DockerClientFactory     *docker.ClientFactory
+		KubernetesClientFactory *kubernetes.ClientFactory
 	}
 )
 
 // NewManager initializes a new proxy Service
 func NewManager(parameters *ManagerParams) *Manager {
 	proxyFactoryParameters := &factory.ProxyFactoryParameters{
-		ResourceControlService: parameters.ResourceControlService,
-		UserService:            parameters.UserService,
-		TeamService:            parameters.TeamService,
-		TeamMembershipService:  parameters.TeamMembershipService,
-		SettingsService:        parameters.SettingsService,
-		RegistryService:        parameters.RegistryService,
-		DockerHubService:       parameters.DockerHubService,
-		SignatureService:       parameters.SignatureService,
-		ReverseTunnelService:   parameters.ReverseTunnelService,
-		ExtensionService:       parameters.ExtensionService,
-		DockerClientFactory:    parameters.DockerClientFactory,
+		ResourceControlService:  parameters.ResourceControlService,
+		UserService:             parameters.UserService,
+		TeamService:             parameters.TeamService,
+		TeamMembershipService:   parameters.TeamMembershipService,
+		SettingsService:         parameters.SettingsService,
+		RegistryService:         parameters.RegistryService,
+		DockerHubService:        parameters.DockerHubService,
+		SignatureService:        parameters.SignatureService,
+		ReverseTunnelService:    parameters.ReverseTunnelService,
+		ExtensionService:        parameters.ExtensionService,
+		DockerClientFactory:     parameters.DockerClientFactory,
+		KubernetesClientFactory: parameters.KubernetesClientFactory,
 	}
 
 	return &Manager{

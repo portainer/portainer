@@ -28,7 +28,12 @@ func (factory *ProxyFactory) newKubernetesLocalProxy(endpoint *portainer.Endpoin
 		return nil, err
 	}
 
-	transport, err := kubernetes.NewLocalTransport()
+	kubecli, err := factory.kubernetesClientFactory.CreateKubeClient(endpoint)
+	if err != nil {
+		return nil, err
+	}
+
+	transport, err := kubernetes.NewLocalTransport(kubecli)
 	if err != nil {
 		return nil, err
 	}
