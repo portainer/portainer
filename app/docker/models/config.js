@@ -7,7 +7,7 @@ export function ConfigViewModel(data) {
   this.Version = data.Version.Index;
   this.Name = data.Spec.Name;
   this.Labels = data.Spec.Labels;
-  this.Data = atob(data.Spec.Data);
+  this.Data = decodeURIComponent(escape(atob(data.Spec.Data)));
 
   if (data.Portainer && data.Portainer.ResourceControl) {
     this.ResourceControl = new ResourceControlViewModel(data.Portainer.ResourceControl);
