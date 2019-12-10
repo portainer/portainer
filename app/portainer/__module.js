@@ -225,7 +225,8 @@ angular.module('portainer.app', [])
     views: {
       'content@': {
         templateUrl: './views/init/endpoint/initEndpoint.html',
-        controller: 'InitEndpointController'
+        controller: 'InitEndpointController',
+        controllerAs: 'ctrl'
       }
     }
   };
