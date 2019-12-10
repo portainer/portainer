@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-  .controller('HomeController', ['$q', '$scope', '$state', '$interval', 'Authentication', 'EndpointService', 'EndpointHelper', 'GroupService', 'Notifications', 'EndpointProvider', 'StateManager', 'LegacyExtensionManager', 'ModalService', 'MotdService', 'SystemService', 'KubernetesNamespaceService',
-    function($q, $scope, $state, $interval, Authentication, EndpointService, EndpointHelper, GroupService, Notifications, EndpointProvider, StateManager, LegacyExtensionManager, ModalService, MotdService, SystemService, KubernetesNamespaceService) {
+  .controller('HomeController', ['$q', '$scope', '$state', '$interval', 'Authentication', 'EndpointService', 'EndpointHelper', 'GroupService', 'Notifications', 'EndpointProvider', 'StateManager', 'LegacyExtensionManager', 'ModalService', 'MotdService', 'SystemService',
+    function($q, $scope, $state, $interval, Authentication, EndpointService, EndpointHelper, GroupService, Notifications, EndpointProvider, StateManager, LegacyExtensionManager, ModalService, MotdService, SystemService) {
 
       $scope.state = {
         connectingToEdgeEndpoint: false,
@@ -123,19 +123,19 @@ angular.module('portainer.app')
           return;
         }
 
-        EndpointProvider.setEndpointID(endpoint.Id);
-        $scope.state.connectingToEdgeEndpoint = true;
-        // TODO: find a better way to ping a Kubernetes environment (no ping in the API)
-        KubernetesNamespaceService.namespaces()
-        .then(function success() {
-          endpoint.Status = 1;
-        })
-        .catch(function error() {
-          endpoint.Status = 2;
-        })
-        .finally(function final() {
-          switchToKubernetesEndpoint(endpoint);
-        });
+        // EndpointProvider.setEndpointID(endpoint.Id);
+        // $scope.state.connectingToEdgeEndpoint = true;
+        // // TODO: find a better way to ping a Kubernetes environment (no ping in the API)
+        // KubernetesNamespaceService.namespaces()
+        // .then(function success() {
+        //   endpoint.Status = 1;
+        // })
+        // .catch(function error() {
+        //   endpoint.Status = 2;
+        // })
+        // .finally(function final() {
+        //   switchToKubernetesEndpoint(endpoint);
+        // });
       }
 
       function switchToDockerEndpoint(endpoint) {

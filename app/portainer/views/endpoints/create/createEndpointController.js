@@ -61,8 +61,7 @@ function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService,
     var groupId = $scope.formValues.GroupId;
     var tags = $scope.formValues.Tags;
 
-    // TODO: temporarily updated to AgentOnKubernetesEnvironment, breaking Docker agent support
-    addEndpoint(name, 6, URL, publicURL, groupId, tags, true, true, true, null, null, null);
+    addEndpoint(name, 2, URL, publicURL, groupId, tags, true, true, true, null, null, null);
   };
 
   $scope.addEdgeAgentEndpoint = function() {
@@ -71,8 +70,7 @@ function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService,
       var tags = $scope.formValues.Tags;
       var URL = $scope.formValues.URL;
 
-    // TODO: temporarily updated to EdgeAgentOnKubernetesEnvironment, breaking Docker Edge agent support
-    addEndpoint(name, 7, URL, "", groupId, tags, false, false, false, null, null, null);
+    addEndpoint(name, 4, URL, "", groupId, tags, false, false, false, null, null, null);
   };
 
   $scope.addAzureEndpoint = function() {

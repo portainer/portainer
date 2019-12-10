@@ -323,22 +323,5 @@ function StackServiceFactory($q, $async, Stack, ResourceControlService, FileUplo
     return action(name, stackFileContent, env, endpointId);
   };
 
-  async function kubernetesDeployAsync(endpointId, namespace, content, compose) {
-    try {
-      const payload = {
-        StackFileContent: content,
-        ComposeFormat: compose,
-        Namespace: namespace
-      };
-      await Stack.create({method: 'undefined', type: 3, endpointId: endpointId}, payload).$promise;
-    } catch (err) {
-      throw {err: err};
-    }
-  }
-
-  service.kubernetesDeploy = function(endpointId, namespace, content, compose) {
-    return $async(kubernetesDeployAsync, endpointId, namespace, content, compose);
-  };
-
   return service;
 }]);
