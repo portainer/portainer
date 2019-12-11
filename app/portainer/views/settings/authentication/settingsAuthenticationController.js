@@ -11,7 +11,8 @@ function($q, $scope, $state, Notifications, SettingsService, FileUploadService, 
   };
 
   $scope.formValues = {
-    TLSCACert: ''
+    TLSCACert: '',
+    Anonymous: false
   };
 
   $scope.goToOAuthExtensionView = function() {
@@ -40,6 +41,13 @@ function($q, $scope, $state, Notifications, SettingsService, FileUploadService, 
 
   $scope.LDAPConnectivityCheck = function() {
     var settings = $scope.settings;
+
+    // Delete credentials if in Anonymous Mode
+    if ($scope.formValues.Anonymous){
+      delete settings.LDAPSettings['Password'];
+      delete settings.LDAPSettings['ReaderDN'];
+    }
+
     var TLSCAFile = $scope.formValues.TLSCACert !== settings.LDAPSettings.TLSConfig.TLSCACert ? $scope.formValues.TLSCACert : null;
 
     var uploadRequired = ($scope.LDAPSettings.TLSConfig.TLS || $scope.LDAPSettings.StartTLS) && !$scope.LDAPSettings.TLSConfig.TLSSkipVerify;
@@ -69,6 +77,13 @@ function($q, $scope, $state, Notifications, SettingsService, FileUploadService, 
 
   $scope.saveSettings = function() {
     var settings = $scope.settings;
+
+    // Delete credentials if in Anonymous Mode
+    if ($scope.formValues.Anonymous){
+      delete settings.LDAPSettings['Password'];
+      delete settings.LDAPSettings['ReaderDN'];
+    }
+
     var TLSCAFile = $scope.formValues.TLSCACert !== settings.LDAPSettings.TLSConfig.TLSCACert ? $scope.formValues.TLSCACert : null;
 
     var uploadRequired = ($scope.LDAPSettings.TLSConfig.TLS || $scope.LDAPSettings.StartTLS) && !$scope.LDAPSettings.TLSConfig.TLSSkipVerify;
