@@ -1,6 +1,7 @@
 import _ from "lodash-es";
 import angular from "angular";
 import { InitEndpointFormValues } from "Portainer/models/formValues/initEndpointFormValues";
+import { InitEndpointEndpointTypes } from "Portainer/models/formValues/initEndpointEndpointTypes";
 
 class InitEndpointController {
   /* @ngInject */
@@ -12,10 +13,12 @@ class InitEndpointController {
     this.StateManager = StateManager;
     this.Notifications = Notifications;
 
-    this.onInit = this.onInit.bind(this);
+    this.createLocalEndpointAsync = this.createLocalEndpointAsync.bind(this);
+    this.createLocalKubernetesEndpointAsync = this.createLocalKubernetesEndpointAsync.bind(this);
+    this.createAgentEndpointAsync = this.createAgentEndpointAsync.bind(this);
   }
 
-  async onInit() {
+  $onInit() {
     if (!_.isEmpty(this.$scope.applicationState.endpoint)) {
       this.$state.go("portainer.home");
     }
@@ -27,97 +30,58 @@ class InitEndpointController {
     };
 
     this.formValues = new InitEndpointFormValues();
+    this.endpointTypes = InitEndpointEndpointTypes;
   }
 
-  $onInit() {
-    return this.$async(this.onInit);
+  async createLocalEndpointAsync() {
+    try {
+      this.state.actionInProgress = true;
+      await this.EndpointService.createLocalEndpoint();
+      this.$state.go("portainer.home");
+    } catch (err) {
+      this.Notifications.error("Failure", err, "Unable to connect to the Docker environment");
+    } finally {
+      this.state.actionInProgress = false;
+    }
   }
 
   createLocalEndpoint() {
-    this.state.actionInProgress = true;
-    this.EndpointService.createLocalEndpoint()
-      .then(function success() {
-        this.$state.go("portainer.home");
-      })
-      .catch(function error(err) {
-        this.Notifications.error("Failure", err, "Unable to connect to the Docker environment");
-      })
-      .finally(function final() {
-        this.state.actionInProgress = false;
-      });
+    return this.$async(this.createLocalEndpointAsync);
+  }
+
+  async createLocalKubernetesEndpointAsync() {
+    try {
+      this.state.actionInProgress = true;
+      await this.EndpointService.createLocalKubernetesEndpoint();
+      this.$state.go("portainer.home");
+    } catch (err) {
+      this.Notifications.error("Failure", err, "Unable to connect to the Kubernetes environment");
+    } finally {
+      this.state.actionInProgress = false;
+    }
   }
 
   createLocalKubernetesEndpoint() {
-    this.state.actionInProgress = true;
-    this.EndpointService.createLocalKubernetesEndpoint()
-      .then(function success() {
-        this.$state.go("portainer.home");
-      })
-      .catch(function error(err) {
-        this.Notifications.error("Failure", err, "Unable to connect to the Kubernetes environment");
-      })
-      .finally(function final() {
-        this.state.actionInProgress = false;
-      });
+    return this.$async(this.createLocalKubernetesEndpointAsync);
   }
 
-  createAzureEndpoint() {
-    var name = this.formValues.Name;
-    var applicationId = this.formValues.AzureApplicationId;
-    var tenantId = this.formValues.AzureTenantId;
-    var authenticationKey = this.formValues.AzureAuthenticationKey;
-
-    this.createAzureEndpointAction(name, applicationId, tenantId, authenticationKey);
+  async createAgentEndpointAsync() {
+    try {
+      this.state.actionInProgress = true;
+      const name = this.formValues.Name;
+      const URL = this.formValues.URL;
+      const PublicURL = URL.split(":")[0];
+      await this.EndpointService.createRemoteEndpoint(name, 2, URL, PublicURL, 1, [], true, true, true, null, null, null);
+      this.$state.go("portainer.home");
+    } catch (err) {
+      this.Notifications.error("Failure", err, "Unable to connect to the Docker environment");
+    } finally {
+      this.state.actionInProgress = false;
+    }
   }
 
   createAgentEndpoint() {
-    var name = this.formValues.Name;
-    var URL = this.formValues.URL;
-    var PublicURL = URL.split(":")[0];
-
-    this.createRemoteEndpoint(name, 2, URL, PublicURL, true, true, true, null, null, null);
-  }
-
-  createRemoteEndpoint() {
-    var name = this.formValues.Name;
-    var URL = this.formValues.URL;
-    var PublicURL = URL.split(":")[0];
-    var TLS = this.formValues.TLS;
-    var TLSSkipVerify = TLS && this.formValues.TLSSkipVerify;
-    var TLSSKipClientVerify = TLS && this.formValues.TLSSKipClientVerify;
-    var TLSCAFile = TLSSkipVerify ? null : this.formValues.TLSCACert;
-    var TLSCertFile = TLSSKipClientVerify ? null : this.formValues.TLSCert;
-    var TLSKeyFile = TLSSKipClientVerify ? null : this.formValues.TLSKey;
-
-    this.createRemoteEndpointAction(name, 1, URL, PublicURL, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile);
-  }
-
-  createAzureEndpointAction(name, applicationId, tenantId, authenticationKey) {
-    this.state.actionInProgress = true;
-    this.EndpointService.createAzureEndpoint(name, applicationId, tenantId, authenticationKey, 1, [])
-      .then(function success() {
-        this.$state.go("portainer.home");
-      })
-      .catch(function error(err) {
-        this.Notifications.error("Failure", err, "Unable to connect to the Azure environment");
-      })
-      .finally(function final() {
-        this.state.actionInProgress = false;
-      });
-  }
-
-  createRemoteEndpointAction(name, type, URL, PublicURL, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
-    this.state.actionInProgress = true;
-    this.EndpointService.createRemoteEndpoint(name, type, URL, PublicURL, 1, [], TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
-      .then(function success() {
-        this.$state.go("portainer.home");
-      })
-      .catch(function error(err) {
-        this.Notifications.error("Failure", err, "Unable to connect to the Docker environment");
-      })
-      .finally(function final() {
-        this.state.actionInProgress = false;
-      });
+    return this.$async(this.createAgentEndpointAsync);
   }
 }
 
