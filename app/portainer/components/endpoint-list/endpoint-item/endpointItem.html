@@ -24,6 +24,9 @@
             <span class="space-left small text-muted" ng-if="$ctrl.model.Snapshots[0]">
               {{ $ctrl.model.Snapshots[0].Time | getisodatefromtimestamp }}
             </span>
+            <span class="space-left small text-muted" ng-if="$ctrl.model.Kubernetes.Snapshots[0]">
+              {{ $ctrl.model.Kubernetes.Snapshots[0].Time | getisodatefromtimestamp }}
+            </span>
           </span>
         </span>
         <span>
@@ -75,7 +78,27 @@
         </span>
       </div>
 
-      <div class="blocklist-item-line endpoint-item" ng-if="$ctrl.model.Type === 5 || $ctrl.model.Type === 6 || $ctrl.model.Type === 7">
+      <div class="blocklist-item-line endpoint-item" ng-if="$ctrl.model.Kubernetes.Snapshots[0] && ($ctrl.model.Type === 5 || $ctrl.model.Type === 6 || $ctrl.model.Type === 7)">
+        <span class="blocklist-item-desc">
+          <span>
+            <span style="padding: 0 7px 0 0;">
+              <i class="fa fa-microchip space-right" aria-hidden="true"></i>{{ $ctrl.model.Kubernetes.Snapshots[0].TotalCPU }} CPU
+            </span>
+            <span style="padding: 0 7px 0 7px;">
+              <i class="fa fa-memory space-right" aria-hidden="true"></i>{{ $ctrl.model.Kubernetes.Snapshots[0].TotalMemory | humansize }} RAM
+            </span>
+          </span>
+        </span>
+        <span class="small text-muted">
+          Kubernetes {{ $ctrl.model.Kubernetes.Snapshots[0].KubernetesVersion }}
+          <span style="padding: 0 0 0 7px;">
+            <i class="fa fa-hdd space-left space-right" aria-hidden="true"></i>
+            {{ $ctrl.model.Kubernetes.Snapshots[0].NodeCount }} {{ $ctrl.model.Kubernetes.Snapshots[0].NodeCount === 1 ? 'node' : 'nodes'}}
+          </span>
+        </span>
+      </div>
+
+      <div class="blocklist-item-line endpoint-item" ng-if="!$ctrl.model.Kubernetes.Snapshots[0] && ($ctrl.model.Type === 5 || $ctrl.model.Type === 6 || $ctrl.model.Type === 7)">
         <span class="blocklist-item-desc">
           -
         </span>

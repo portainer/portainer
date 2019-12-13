@@ -71,7 +71,8 @@ class InitEndpointController {
       const name = this.formValues.Name;
       const URL = this.formValues.URL;
       const PublicURL = URL.split(":")[0];
-      await this.EndpointService.createRemoteEndpoint(name, 2, URL, PublicURL, 1, [], true, true, true, null, null, null);
+      // TODO: change type ID for agent on kube (6) or agent on swarm (2)
+      await this.EndpointService.createRemoteEndpoint(name, 6, URL, PublicURL, 1, [], true, true, true, null, null, null);
       this.$state.go("portainer.home");
     } catch (err) {
       this.Notifications.error("Failure", err, "Unable to connect to the Docker environment");
