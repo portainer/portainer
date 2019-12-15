@@ -42,10 +42,10 @@ function($q, $scope, $state, Notifications, SettingsService, FileUploadService, 
   $scope.LDAPConnectivityCheck = function() {
     var settings = $scope.settings;
 
-    // Delete credentials if in Anonymous Mode
+    // Set empty credentials if in Anonymous Mode
     if ($scope.formValues.Anonymous){
-      delete settings.LDAPSettings['Password'];
-      delete settings.LDAPSettings['ReaderDN'];
+      settings.LDAPSettings['Password'] = "";
+      settings.LDAPSettings['ReaderDN'] = "";
     }
 
     var TLSCAFile = $scope.formValues.TLSCACert !== settings.LDAPSettings.TLSConfig.TLSCACert ? $scope.formValues.TLSCACert : null;
@@ -78,10 +78,10 @@ function($q, $scope, $state, Notifications, SettingsService, FileUploadService, 
   $scope.saveSettings = function() {
     var settings = $scope.settings;
 
-    // Delete credentials if in Anonymous Mode
+    // Set empty credentials if in Anonymous Mode
     if ($scope.formValues.Anonymous){
-      delete settings.LDAPSettings['Password'];
-      delete settings.LDAPSettings['ReaderDN'];
+      settings.LDAPSettings['Password'] = "";
+      settings.LDAPSettings['ReaderDN'] = "";
     }
 
     var TLSCAFile = $scope.formValues.TLSCACert !== settings.LDAPSettings.TLSConfig.TLSCACert ? $scope.formValues.TLSCACert : null;

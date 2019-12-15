@@ -99,7 +99,7 @@
               <div class="col-sm-12">
                 <label for="anonymous" class="control-label text-left">
                   Anonymous mode
-                  <portainer-tooltip position="bottom" message="Only enable this option if the server is configured for Anonymous access"></portainer-tooltip>
+                  <portainer-tooltip position="bottom" message="Enable this option if the server is configured for Anonymous access."></portainer-tooltip>
                 </label>
                 <label class="switch" style="margin-left: 20px;">
                   <input type="checkbox" id="anonymous" ng-model="formValues.Anonymous"><i></i>
@@ -122,6 +122,7 @@
               <div class="form-group">
                 <label for="ldap_password" class="col-sm-3 col-lg-2 control-label text-left">
                   Password
+                  <portainer-tooltip position="bottom" message="If you do not enter a password, Portainer will leave the current password unchanged."></portainer-tooltip>
                 </label>
                 <div class="col-sm-9 col-lg-10">
                   <input type="password" class="form-control" id="ldap_password" ng-model="LDAPSettings.Password" placeholder="password">
