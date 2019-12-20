@@ -45,7 +45,6 @@
               -e EDGE_ID={{ randomEdgeID }} \
               -e EDGE_KEY={{ endpoint.EdgeKey }} \
               -e CAP_HOST_MANAGEMENT=1 \
-              -p 8000:80 \
               -v portainer_agent_data:/data \
               --name portainer_edge_agent \
               portainer/agent
@@ -66,7 +65,6 @@
               -e EDGE_KEY={{ endpoint.EdgeKey }} \
               -e CAP_HOST_MANAGEMENT=1 \
               --mode global \
-              --publish mode=host,published=8000,target=80 \
               --constraint 'node.platform.os == linux' \
               --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock \
               --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volumes \
