@@ -97,18 +97,18 @@
             <!-- Anonymous mode-->
             <div class="form-group">
               <div class="col-sm-12">
-                <label for="anonymous" class="control-label text-left">
+                <label for="anonymous_mode" class="control-label text-left">
                   Anonymous mode
                   <portainer-tooltip position="bottom" message="Enable this option if the server is configured for Anonymous access."></portainer-tooltip>
                 </label>
                 <label class="switch" style="margin-left: 20px;">
-                  <input type="checkbox" id="anonymous" ng-model="formValues.Anonymous"><i></i>
+                  <input type="checkbox" id="anonymous_mode" ng-model="LDAPSettings.AnonymousMode"><i></i>
                 </label>
               </div>
             </div>
             <!-- !Anonymous mode-->
 
-            <div ng-if="!formValues.Anonymous">
+            <div ng-if="!LDAPSettings.AnonymousMode">
               <div class="form-group">
                 <label for="ldap_username" class="col-sm-3 col-lg-2 control-label text-left">
                   Reader DN
@@ -137,7 +137,7 @@
                 <i class="fa fa-times red-icon" style="margin-left: 5px;" ng-if="state.failedConnectivityCheck"></i>
               </label>
               <div class="col-sm-9 col-lg-10">
-                <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.connectivityCheckInProgress || !LDAPSettings.URL || (!LDAPSettings.ReaderDN || !LDAPSettings.Password) && !formValues.Anonymous" ng-click="LDAPConnectivityCheck()" button-spinner="state.connectivityCheckInProgress">
+                <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.connectivityCheckInProgress || !LDAPSettings.URL || (!LDAPSettings.ReaderDN || !LDAPSettings.Password) && !LDAPSettings.AnonymousMode" ng-click="LDAPConnectivityCheck()" button-spinner="state.connectivityCheckInProgress">
                   <span ng-hide="state.connectivityCheckInProgress">Test connectivity</span>
                   <span ng-show="state.connectivityCheckInProgress">Testing connectivity...</span>
                 </button>
