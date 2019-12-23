@@ -4,7 +4,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
 
   const kubernetes = {
     name: 'kubernetes',
-    url: '/kubernetes',
+    // url: '/kubernetes',
     parent: 'root',
     abstract: true,
     resolve: {
@@ -19,5 +19,18 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     }
   };
 
+  const configure = {
+    name: 'kubernetes.configure',
+    url: '/:id/configure',
+    views: {
+      'content@': {
+        templateUrl: './views/configure/configure.html',
+        controller: 'KubernetesConfigureController',
+        controllerAs: 'ctrl'
+      }
+    }
+  };
+
   $stateRegistryProvider.register(kubernetes);
+  $stateRegistryProvider.register(configure);
 }]);

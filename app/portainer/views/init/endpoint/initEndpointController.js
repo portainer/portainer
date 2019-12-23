@@ -5,11 +5,12 @@ import { InitEndpointEndpointTypes } from "Portainer/models/formValues/initEndpo
 
 class InitEndpointController {
   /* @ngInject */
-  constructor($async, $scope, $state, EndpointService, StateManager, Notifications) {
+  constructor($async, $scope, $state, EndpointService, EndpointProvider, StateManager, Notifications) {
     this.$async = $async;
     this.$scope = $scope;
     this.$state = $state;
     this.EndpointService = EndpointService;
+    this.EndpointProvider = EndpointProvider
     this.StateManager = StateManager;
     this.Notifications = Notifications;
 
@@ -52,8 +53,9 @@ class InitEndpointController {
   async createLocalKubernetesEndpointAsync() {
     try {
       this.state.actionInProgress = true;
-      await this.EndpointService.createLocalKubernetesEndpoint();
-      this.$state.go("portainer.home");
+      const endpoint = await this.EndpointService.createLocalKubernetesEndpoint();
+      this.EndpointProvider.setEndpointID(endpoint.Id);
+      this.$state.go("kubernetes.configure", {id: endpoint.Id});
     } catch (err) {
       this.Notifications.error("Failure", err, "Unable to connect to the Kubernetes environment");
     } finally {
@@ -72,8 +74,10 @@ class InitEndpointController {
       const URL = this.formValues.URL;
       const PublicURL = URL.split(":")[0];
       // TODO: change type ID for agent on kube (6) or agent on swarm (2)
-      await this.EndpointService.createRemoteEndpoint(name, 6, URL, PublicURL, 1, [], true, true, true, null, null, null);
-      this.$state.go("portainer.home");
+      const endpoint = await this.EndpointService.createRemoteEndpoint(name, 6, URL, PublicURL, 1, [], true, true, true, null, null, null);
+      this.EndpointProvider.setEndpointID(endpoint.Id);
+      // TODO: go on home whith agent on swarm (2)
+      this.$state.go("kubernetes.configure", {id: endpoint.Id});
     } catch (err) {
       this.Notifications.error("Failure", err, "Unable to connect to the Docker environment");
     } finally {
