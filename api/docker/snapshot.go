@@ -126,12 +126,21 @@ func snapshotContainers(snapshot *portainer.Snapshot, cli *client.Client) error 
 
 	runningContainers := 0
 	stoppedContainers := 0
+	healthyContainers := 0
+	unhealthyContainers := 0
 	stacks := make(map[string]struct{})
 	for _, container := range containers {
 		if container.State == "exited" {
 			stoppedContainers++
 		} else if container.State == "running" {
 			runningContainers++
+		}
+
+		statusLen := len(container.Status)
+		if statusLen >= 9 && container.Status[statusLen - 9:] == "(healthy)" {
+			healthyContainers++
+		} else if statusLen >= 11 && container.Status[statusLen - 11:] == "(unhealthy)" {
+			unhealthyContainers++
 		}
 
 		for k, v := range container.Labels {
@@ -143,6 +152,8 @@ func snapshotContainers(snapshot *portainer.Snapshot, cli *client.Client) error 
 
 	snapshot.RunningContainerCount = runningContainers
 	snapshot.StoppedContainerCount = stoppedContainers
+	snapshot.HealthyContainerCount = healthyContainers
+	snapshot.UnhealthyContainerCount = unhealthyContainers
 	snapshot.StackCount += len(stacks)
 	snapshot.SnapshotRaw.Containers = containers
 	return nil

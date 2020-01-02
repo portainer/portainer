@@ -109,9 +109,13 @@
           <div class="widget-icon blue pull-left">
             <i class="fa fa-server"></i>
           </div>
-          <div class="pull-right">
-            <div><i class="fa fa-heartbeat space-right green-icon"></i>{{ containers | runningcontainers }} running</div>
-            <div><i class="fa fa-heartbeat space-right red-icon"></i>{{ containers | stoppedcontainers }} stopped</div>
+          <div class="pull-right"style="padding-left: 5px;">
+            <div><i class="fa fa-power-off space-right green-icon"></i>{{ containers | runningcontainers }} running</div>
+            <div><i class="fa fa-power-off space-right red-icon"></i>{{ containers | stoppedcontainers }} stopped</div>
+          </div>
+          <div class="pull-right" style="padding-right: 5px;">
+            <div><i class="fa fa-heartbeat space-right green-icon"></i>{{ containers | healthycontainers }} healthy</div>
+            <div><i class="fa fa-heartbeat space-right orange-icon"></i>{{ containers | unhealthycontainers }} unhealthy</div>
           </div>
           <div class="title">{{ containers.length }}</div>
           <div class="comment">{{ containers.length === 1 ? 'Container' : 'Containers' }}</div>

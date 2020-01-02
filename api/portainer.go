@@ -389,18 +389,20 @@ type (
 
 	// Snapshot represents a snapshot of a specific endpoint at a specific time
 	Snapshot struct {
-		Time                  int64       `json:"Time"`
-		DockerVersion         string      `json:"DockerVersion"`
-		Swarm                 bool        `json:"Swarm"`
-		TotalCPU              int         `json:"TotalCPU"`
-		TotalMemory           int64       `json:"TotalMemory"`
-		RunningContainerCount int         `json:"RunningContainerCount"`
-		StoppedContainerCount int         `json:"StoppedContainerCount"`
-		VolumeCount           int         `json:"VolumeCount"`
-		ImageCount            int         `json:"ImageCount"`
-		ServiceCount          int         `json:"ServiceCount"`
-		StackCount            int         `json:"StackCount"`
-		SnapshotRaw           SnapshotRaw `json:"SnapshotRaw"`
+		Time                    int64       `json:"Time"`
+		DockerVersion           string      `json:"DockerVersion"`
+		Swarm                   bool        `json:"Swarm"`
+		TotalCPU                int         `json:"TotalCPU"`
+		TotalMemory             int64       `json:"TotalMemory"`
+		RunningContainerCount   int         `json:"RunningContainerCount"`
+		StoppedContainerCount   int         `json:"StoppedContainerCount"`
+		HealthyContainerCount   int         `json:"HealthyContainerCount"`
+		UnhealthyContainerCount int         `json:"UnhealthyContainerCount"`
+		VolumeCount             int         `json:"VolumeCount"`
+		ImageCount              int         `json:"ImageCount"`
+		ServiceCount            int         `json:"ServiceCount"`
+		StackCount              int         `json:"StackCount"`
+		SnapshotRaw             SnapshotRaw `json:"SnapshotRaw"`
 	}
 
 	// SnapshotRaw represents all the information related to a snapshot as returned by the Docker API
