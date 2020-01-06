@@ -13,7 +13,11 @@ function ($q, $scope, $state, $transition$, $filter, clipboard, EndpointService,
   $scope.state = {
     uploadInProgress: false,
     actionInProgress: false,
-    deploymentTab: 0
+    deploymentTab: 0,
+    azureEndpoint: false,
+    kubernetesEndpoint: false,
+    agentEndpoint: false,
+    edgeEndpoint: false
   };
 
   $scope.formValues = {
@@ -92,6 +96,21 @@ function ($q, $scope, $state, $transition$, $filter, clipboard, EndpointService,
     return keyInformation;
   }
 
+  function configureState() {
+    if ($scope.endpoint.Type === 5 || $scope.endpoint.Type === 6 || $scope.endpoint.Type === 7) {
+      $scope.state.kubernetesEndpoint = true;
+    }
+    if ($scope.endpoint.Type === 4 || $scope.endpoint.Type === 7) {
+      $scope.state.edgeEndpoint = true;
+    }
+    if ($scope.endpoint.Type === 3) {
+      $scope.state.azureEndpoint = true;
+    }
+    if ($scope.endpoint.Type === 2 || $scope.endpoint.Type === 4 || $scope.endpoint.Type === 6 || $scope.endpoint.Type === 7) {
+      $scope.state.agentEndpoint = true;
+    }
+  }
+
   function initView() {
     $q.all({
       endpoint: EndpointService.endpoint($transition$.params().id),
@@ -113,6 +132,7 @@ function ($q, $scope, $state, $transition$, $filter, clipboard, EndpointService,
       $scope.endpoint = endpoint;
       $scope.groups = data.groups;
       $scope.availableTags = data.tags;
+      configureState();
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve endpoint details');

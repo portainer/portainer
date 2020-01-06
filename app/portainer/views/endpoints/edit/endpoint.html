@@ -10,11 +10,11 @@
 </rd-header>
 
 <div class="row">
-  <information-panel ng-if="endpoint.Type === 7 && endpoint.EdgeID" title-text="Edge information">
+  <information-panel ng-if="state.edgeEndpoint && endpoint.EdgeID" title-text="Edge information">
     <span class="small text-muted">
       <p>
         <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-        This Edge endpoint is associated to an Edge environment.
+        This Edge endpoint is associated to an Edge environment {{ state.kubernetesEndpoint ? '(Kubernetes)' : '(Docker)' }}.
       </p>
       <p>
         Edge key: <code>{{ endpoint.EdgeKey }}</code>
@@ -24,7 +24,7 @@
       </p>
     </span>
    </information-panel>
-  <information-panel ng-if="endpoint.Type === 7 && !endpoint.EdgeID" title-text="Deploy an agent">
+  <information-panel ng-if="state.edgeEndpoint && !endpoint.EdgeID" title-text="Deploy an agent">
     <span class="small text-muted">
       <p>
         <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -75,6 +75,11 @@
               portainer/agent
            </code>
           </uib-tab>
+          <uib-tab index="2" heading="Kubernetes">
+            <code style=display:block;white-space:pre-wrap>
+              TODO: write the setup here
+            </code>
+          </uib-tab>
         </uib-tabset>
        <div style="margin-top: 10px;">
          <span class="btn btn-primary btn-sm" ng-click="copyEdgeAgentDeploymentCommand()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy command</span>
@@ -106,6 +111,11 @@
      </div>
     </span>
   </information-panel>
+  <information-panel ng-if="state.kubernetesEndpoint" title-text="Kubernetes information">
+    <span class="small text-muted">
+      Access Portainer <a ui-sref="portainer.endpoints.endpoint.kubernetesConfig({id: endpoint.Id})">configuration</a> for Kubernetes endpoints
+    </span>
+  </information-panel>
 </div>
 
 <div class="row">
@@ -125,18 +135,18 @@
           </div>
           <!-- !name-input -->
           <!-- endpoint-url-input -->
-          <div class="form-group" ng-if="endpoint.Type !== 4">
+          <div class="form-group" ng-if="!state.edgeEndpoint">
             <label for="endpoint_url" class="col-sm-3 col-lg-2 control-label text-left">
               Endpoint URL
               <portainer-tooltip position="bottom" message="URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it."></portainer-tooltip>
             </label>
             <div class="col-sm-9 col-lg-10">
-              <input ng-disabled="endpointType === 'local' || endpoint.Type === 3" type="text" class="form-control" id="endpoint_url" ng-model="endpoint.URL" placeholder="e.g. 10.0.0.10:2375 or mydocker.mydomain.com:2375">
+              <input ng-disabled="endpointType === 'local' || state.azureEndpoint" type="text" class="form-control" id="endpoint_url" ng-model="endpoint.URL" placeholder="e.g. 10.0.0.10:2375 or mydocker.mydomain.com:2375">
             </div>
           </div>
           <!-- !endpoint-url-input -->
           <!-- endpoint-public-url-input -->
-          <div class="form-group" ng-if="endpoint.Type !== 3">
+          <div class="form-group" ng-if="!state.azureEndpoint">
             <label for="endpoint_public_url" class="col-sm-3 col-lg-2 control-label text-left">
               Public IP
               <portainer-tooltip position="bottom" message="URL or IP address where exposed containers will be reachable. This field is optional and will default to the endpoint URL."></portainer-tooltip>
@@ -145,7 +155,7 @@
               <input type="text" class="form-control" id="endpoint_public_url" ng-model="endpoint.PublicURL" placeholder="e.g. 10.0.0.10 or mydocker.mydomain.com">
             </div>
           </div>
-          <azure-endpoint-config ng-if="endpoint.Type === 3"
+          <azure-endpoint-config ng-if="state.azureEndpoint"
             application-id="endpoint.AzureCredentials.ApplicationID"
             tenant-id="endpoint.AzureCredentials.TenantID"
             authentication-key="endpoint.AzureCredentials.AuthenticationKey"
@@ -173,7 +183,7 @@
           </div>
           <!-- !tags -->
           <!-- endpoint-security -->
-          <div ng-if="endpointType === 'remote' && endpoint.Type !== 3 && endpoint.Type !== 4 && endpoint.Type !== 6 && endpoint.Type !== 7">
+          <div ng-if="endpointType === 'remote' && !state.azureEndpoint && !state.edgeEndpoint && endpoint.Type !== 6">
             <div class="col-sm-12 form-section-title">
               Security
             </div>
