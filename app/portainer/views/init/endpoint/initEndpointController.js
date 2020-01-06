@@ -54,8 +54,7 @@ class InitEndpointController {
     try {
       this.state.actionInProgress = true;
       const endpoint = await this.EndpointService.createLocalKubernetesEndpoint();
-      this.EndpointProvider.setEndpointID(endpoint.Id);
-      this.$state.go("kubernetes.configure", {id: endpoint.Id});
+      this.$state.go("portainer.endpoints.endpoint.kubernetesConfig", {id: endpoint.Id});
     } catch (err) {
       this.Notifications.error("Failure", err, "Unable to connect to the Kubernetes environment");
     } finally {
@@ -75,9 +74,8 @@ class InitEndpointController {
       const PublicURL = URL.split(":")[0];
       // TODO: change type ID for agent on kube (6) or agent on swarm (2)
       const endpoint = await this.EndpointService.createRemoteEndpoint(name, 6, URL, PublicURL, 1, [], true, true, true, null, null, null);
-      this.EndpointProvider.setEndpointID(endpoint.Id);
       // TODO: go on home whith agent on swarm (2)
-      this.$state.go("kubernetes.configure", {id: endpoint.Id});
+      this.$state.go("portainer.endpoints.endpoint.kubernetesConfig", {id: endpoint.Id});
     } catch (err) {
       this.Notifications.error("Failure", err, "Unable to connect to the Docker environment");
     } finally {

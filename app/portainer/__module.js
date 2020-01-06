@@ -132,6 +132,18 @@ angular.module('portainer.app', [])
     }
   };
 
+  const endpointKubernetesConfiguration = {
+    name: 'portainer.endpoints.endpoint.kubernetesConfig',
+    url: '/configure',
+    views: {
+      'content@': {
+        templateUrl: '../kubernetes/views/configure/configure.html',
+        controller: 'KubernetesConfigureController',
+        controllerAs: 'ctrl'
+      }
+    }
+  };
+
   var endpointCreation = {
     name: 'portainer.endpoints.new',
     url: '/new',
@@ -550,6 +562,7 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(endpoint);
   $stateRegistryProvider.register(endpointAccess);
   $stateRegistryProvider.register(endpointCreation);
+  $stateRegistryProvider.register(endpointKubernetesConfiguration);
   $stateRegistryProvider.register(groups);
   $stateRegistryProvider.register(group);
   $stateRegistryProvider.register(groupAccess);

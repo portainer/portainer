@@ -39,7 +39,7 @@ class KubernetesConfigureController {
   async onInit() {
     try {
       const endpointId = this.$stateParams.id;
-      [this.availableClasses, this.endpoint] = await Promise.all([this.KubernetesStorageService.storageClasses(), this.EndpointService.endpoint(endpointId)]);
+      [this.availableClasses, this.endpoint] = await Promise.all([this.KubernetesStorageService.storageClasses(endpointId), this.EndpointService.endpoint(endpointId)]);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve storage classes');
     }

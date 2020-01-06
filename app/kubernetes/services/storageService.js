@@ -7,17 +7,17 @@ angular.module('portainer.kubernetes')
 
   service.storageClasses = storageClasses;
 
-  async function storageClassesAsync() {
+  async function storageClassesAsync(endpointId) {
     try {
-      const classes = await KubernetesStorage.query().$promise;
+      const classes = await KubernetesStorage.query({id: endpointId}).$promise;
       return _.map(classes.items, (item) => item.metadata.name);
     } catch (err) {
       Promise.reject({ msg: 'Unable to retrieve storage classes', err: err });
     }
   }
 
-  function storageClasses() {
-    return $async(storageClassesAsync);
+  function storageClasses(endpointId) {
+    return $async(storageClassesAsync, endpointId);
   }
 
   return service;
