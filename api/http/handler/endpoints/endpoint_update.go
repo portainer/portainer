@@ -27,6 +27,7 @@ type endpointUpdatePayload struct {
 	Tags                   []string
 	UserAccessPolicies     portainer.UserAccessPolicies
 	TeamAccessPolicies     portainer.TeamAccessPolicies
+	Kubernetes             *portainer.KubernetesData
 }
 
 func (payload *endpointUpdatePayload) Validate(r *http.Request) error {
@@ -75,6 +76,10 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.Tags != nil {
 		endpoint.Tags = payload.Tags
+	}
+
+	if payload.Kubernetes != nil {
+		endpoint.Kubernetes = *payload.Kubernetes
 	}
 
 	updateAuthorizations := false
