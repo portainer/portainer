@@ -28,7 +28,7 @@
     <span class="small text-muted">
       <p>
         <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-        Deploy the Edge agent on your remote Docker environment using the following command(s)
+        Deploy the Edge agent on your remote Docker or Kubernetes environment using the following command(s)
       </p>
       <p>
         The agent will communicate with Portainer via <u>{{ edgeKeyDetails.instanceURL }}</u> and <u>tcp://{{ edgeKeyDetails.tunnelServerAddr }}</u>
@@ -77,7 +77,8 @@
           </uib-tab>
           <uib-tab index="2" heading="Kubernetes">
             <code style=display:block;white-space:pre-wrap>
-              TODO: write the setup here
+              curl -L https://downloads.portainer.io/portainer-agent-edge-k8s.yaml -o portainer-agent-edge-k8s.yaml;
+              kubectl apply -f portainer-agent-edge-k8s.yaml
             </code>
           </uib-tab>
         </uib-tabset>
