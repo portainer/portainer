@@ -61,16 +61,18 @@ function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService,
     var groupId = $scope.formValues.GroupId;
     var tags = $scope.formValues.Tags;
 
-    addEndpoint(name, 2, URL, publicURL, groupId, tags, true, true, true, null, null, null);
+    // TODO: temporarily updated to AgentOnKubernetesEnvironment, breaking Docker agent support
+    addEndpoint(name, 6, URL, publicURL, groupId, tags, true, true, true, null, null, null);
   };
 
   $scope.addEdgeAgentEndpoint = function() {
-      var name = $scope.formValues.Name;
-      var groupId = $scope.formValues.GroupId;
-      var tags = $scope.formValues.Tags;
-      var URL = $scope.formValues.URL;
+    var name = $scope.formValues.Name;
+    var groupId = $scope.formValues.GroupId;
+    var tags = $scope.formValues.Tags;
+    var URL = $scope.formValues.URL;
 
-    addEndpoint(name, 4, URL, "", groupId, tags, false, false, false, null, null, null);
+    // TODO: temporarily updated to EdgeAgentOnKubernetesEnvironment, breaking Docker Edge agent support
+    addEndpoint(name, 7, URL, "", groupId, tags, false, false, false, null, null, null);
   };
 
   $scope.addAzureEndpoint = function() {
@@ -106,6 +108,8 @@ function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService,
       Notifications.success('Endpoint created', name);
       if (type === 7) {
         $state.go('portainer.endpoints.endpoint', { id: data.Id });
+      } else if (type === 6) {
+        $state.go('portainer.endpoints.endpoint.kubernetesConfig', { id: data.Id });
       } else {
         $state.go('portainer.endpoints', {}, {reload: true});
       }
