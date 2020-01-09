@@ -81,6 +81,8 @@ func (kcl *KubeClient) createClusterNamespaceListRole() error {
 		if err != nil {
 			return err
 		}
+
+		return nil
 	}
 
 	return err
@@ -99,7 +101,10 @@ func (kcl *KubeClient) createUserServiceAccount(namespace, serviceAccountName st
 		if err != nil {
 			return err
 		}
+
+		return nil
 	}
+
 	return err
 }
 
