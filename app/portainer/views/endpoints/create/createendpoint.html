@@ -23,7 +23,7 @@
                     <i class="fa fa-bolt" aria-hidden="true" style="margin-right: 2px;"></i>
                     Agent
                   </div>
-                  <p>Portainer agent</p>
+                  <p>Portainer agent for Docker/Kubernetes</p>
                 </label>
               </div>
               <div ng-click="setDefaultPortainerInstanceURL()">
@@ -33,7 +33,7 @@
                     <i class="fa fa-cloud" aria-hidden="true" style="margin-right: 2px;"></i>
                     Edge Agent
                   </div>
-                  <p>Portainer Edge agent</p>
+                  <p>Portainer Edge agent for Docker/Kubernetes</p>
                 </label>
               </div>
               <div ng-click="resetEndpointURL()">
@@ -74,15 +74,27 @@
             </div>
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
-                Ensure that you have deployed the Portainer agent in your cluster first. You can use execute the following command on any manager node to deploy it.
+                Ensure that you have deployed the Portainer agent in your cluster first. You can use execute the following command to deploy it.
                 <div style="margin-top: 10px;">
-                  <code>
-                    curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent
-                  </code>
-                  <span class="btn btn-primary btn-sm space-left" ng-click="copyAgentCommand()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy</span>
-                  <span>
-                    <i id="copyNotification" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none;"></i>
-                  </span>
+                 <uib-tabset active="state.deploymentTab">
+                    <uib-tab index="0" heading="Swarm">
+                     <code style=display:block;white-space:pre-wrap>
+                       curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent
+                     </code>
+                    </uib-tab>
+                    <uib-tab index="1" heading="Kubernetes">
+                      <code style=display:block;white-space:pre-wrap>
+                        curl -L https://downloads.portainer.io/portainer-agent-k8s.yaml -o portainer-agent-k8s.yaml;
+                        kubectl apply -f portainer-agent-k8s.yaml
+                      </code>
+                    </uib-tab>
+                  </uib-tabset>
+                 <div style="margin-top: 10px;">
+                   <span class="btn btn-primary btn-sm space-left" ng-click="copyAgentCommand()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy command</span>
+                   <span>
+                     <i id="copyNotification" class="fa fa-check green-icon" aria-hidden="true" style="margin-left: 7px; display: none;"></i>
+                   </span>
+                 </div>
                 </div>
               </span>
             </div>
@@ -93,7 +105,12 @@
             </div>
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
+                <p>
                 Allows you to create an endpoint that can be registered with an Edge agent. The Edge agent will initiate the communications with the Portainer instance. All the required information on how to connect an Edge agent to this endpoint will be available after endpoint creation.
+                </p>
+                <p>
+                You can read more about the Edge agent in the userguide available <a href="https://downloads.portainer.io/edge_agent_guide.pdf">here.</a>
+                </p>
               </span>
             </div>
           </div>

@@ -6,7 +6,8 @@ function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService,
 
   $scope.state = {
     EnvironmentType: 'agent',
-    actionInProgress: false
+    actionInProgress: false,
+    deploymentTab: 0,
   };
 
   $scope.formValues = {
@@ -22,9 +23,12 @@ function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService,
   };
 
   $scope.copyAgentCommand = function() {
-    clipboard.copyText('curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent');
-    $('#copyNotification').show();
-    $('#copyNotification').fadeOut(2000);
+    if ($scope.state.deploymentTab === 0) {
+      clipboard.copyText('curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent');
+    } else {
+      clipboard.copyText('curl -L https://downloads.portainer.io/portainer-agent-k8s.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml');
+    }
+    $('#copyNotification').show().fadeOut(2500);
   };
 
   $scope.setDefaultPortainerInstanceURL = function() {
