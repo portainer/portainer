@@ -50,41 +50,15 @@
 </div>
 
 <div class="row">
-  <div class="col-xs-12 col-md-6" ng-if="ctrl.namespaces">
-    <a ui-sref="kubernetes.namespaces">
+  <div class="col-xs-12 col-md-6" ng-if="ctrl.pools">
+    <a ui-sref="kubernetes.resourcePools">
       <rd-widget>
         <rd-widget-body>
           <div class="widget-icon blue pull-left">
             <i class="fa fa-layer-group"></i>
           </div>
-          <div class="title">{{ ctrl.namespaces.length }}</div>
-          <div class="comment">{{ ctrl.namespaces.length === 1 ? 'Namespace' : 'Namespaces' }}</div>
-        </rd-widget-body>
-      </rd-widget>
-    </a>
-  </div>
-  <div class="col-xs-12 col-md-6" ng-if="ctrl.services">
-    <a ui-sref="kubernetes.services">
-      <rd-widget>
-        <rd-widget-body>
-          <div class="widget-icon blue pull-left">
-            <i class="fa fa-list-alt"></i>
-          </div>
-          <div class="title">{{ ctrl.services.length }}</div>
-          <div class="comment">{{ ctrl.services.length === 1 ? 'Service' : 'Services' }}</div>
-        </rd-widget-body>
-      </rd-widget>
-    </a>
-  </div>
-  <div class="col-xs-12 col-md-6" ng-if="ctrl.containers">
-    <a ui-sref="kubernetes.containers">
-      <rd-widget>
-        <rd-widget-body>
-          <div class="widget-icon blue pull-left">
-            <i class="fa fa-server"></i>
-          </div>
-          <div class="title">{{ ctrl.containers.length }}</div>
-          <div class="comment">{{ ctrl.containers.length === 1 ? 'Container' : 'Containers' }}</div>
+          <div class="title">{{ ctrl.pools.length }}</div>
+          <div class="comment">{{ ctrl.pools.length === 1 ? 'Resource pool' : 'Resource pools' }}</div>
         </rd-widget-body>
       </rd-widget>
     </a>
