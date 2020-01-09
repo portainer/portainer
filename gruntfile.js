@@ -19,8 +19,8 @@ module.exports = function(grunt) {
     binaries: {
       dockerLinuxVersion: '18.09.3',
       dockerWindowsVersion: '17.09.0-ce',
-      komposeVersion: 'v1.19.0',
-      kubectlVersion: 'v1.16.3'
+      komposeVersion: 'v1.20.0',
+      kubectlVersion: 'v1.17.0'
     },
     config: gruntfile_cfg.config,
     env: gruntfile_cfg.env,
