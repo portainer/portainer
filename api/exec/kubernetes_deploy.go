@@ -24,6 +24,9 @@ func NewKubernetesDeployer(binaryPath string) *KubernetesDeployer {
 	}
 }
 
+// Deploy will deploy a Kubernetes manifest inside a specific namespace in a Kubernetes endpoint.
+// If composeFormat is set to true, it will leverage the kompose binary to deploy a compose compliant manifest.
+// Otherwise it will use kubectl to deploy the manifest.
 func (deployer *KubernetesDeployer) Deploy(endpoint *portainer.Endpoint, data string, composeFormat bool, namespace string) ([]byte, error) {
 	if composeFormat {
 		convertedData, err := deployer.convertComposeData(data)
