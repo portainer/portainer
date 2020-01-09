@@ -1,0 +1,19 @@
+<rd-header>
+  <rd-header-title title-text="Resource pools list">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="docker.resourcePools" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>Resource pools</rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <kubernetes-resource-pools-datatable
+    title-text="Resource pools" title-icon="fa-question"
+    dataset="ctrl.namespaces" table-key="kubernetes.resourcePools"
+    order-by="Name"
+    refresh-callback="ctrl.getNamespaces"
+    ></kubernetes-resource-pools-datatable>
+  </div>
+</div>

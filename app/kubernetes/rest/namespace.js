@@ -8,5 +8,6 @@ angular.module('portainer.kubernetes')
         },
         {
           query: { method: 'GET', timeout: 15000},
+          status: { method: 'GET', params: {action: 'status'}}
         });
     }]);
