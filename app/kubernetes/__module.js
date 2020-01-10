@@ -51,8 +51,8 @@ angular.module('portainer.kubernetes', ['portainer.app'])
         templateUrl: './views/nodes/nodes.html',
         controller: 'KubernetesNodesController',
         controllerAs: 'ctrl'
-      }	
-    }	
+      }
+    }
   };
 
   $stateRegistryProvider.register(kubernetes);

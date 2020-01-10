@@ -1,38 +1,55 @@
 import _ from "lodash-es";
-import KubernetesNamespaceViewModel from "Kubernetes/models/namespace";
+import KubernetesResourcePoolViewModel from "Kubernetes/models/resourcePool";
 
 angular.module("portainer.kubernetes").factory("KubernetesResourcePoolService", [
-  "$async", "KubernetesNamespaces", "KubernetesResourceQuotas",
-  function KubernetesResourcePoolServiceFactory($async, KubernetesNamespaces, KubernetesResourceQuotas) {
+  "$async", 'KubernetesNamespaceService', 'KubernetesResourceQuotaService',
+  function KubernetesResourcePoolServiceFactory($async, KubernetesNamespaceService, KubernetesResourceQuotaService) {
     "use strict";
     const service = {
-      pools: pools  
+      resourcePools: resourcePools,
+      shortResourcePools: shortResourcePools
     };
 
-    async function visibleNamespaces() {
+    /**
+     * Resource pools
+     */
+    async function resourcePoolsAsync() {
       try {
-        const data = await KubernetesNamespaces.query().$promise;
-        const namespaces = _.map(data.items, (item) => new KubernetesNamespaceViewModel(item));
-        const promises = _.map(namespaces, (item) => KubernetesNamespaces.status({id: item.Name}).$promise);
-        const statuses = await Promise.allSettled(promises);
-        return statuses;
-      } catch (err) {
-        throw err;
-      }
-    }
-
-    async function poolsAsync() {
-      void KubernetesResourceQuotas;
-      try {
-        const namespaces = await visibleNamespaces();
-        console.log(namespaces);
+        const namespaces = await KubernetesNamespaceService.namespaces();
+        const quotas = await KubernetesResourceQuotaService.quotas();
+        const pools = [];
+        _.forEach(namespaces, (namespace) => {
+          const pool = new KubernetesResourcePoolViewModel(namespace);
+          _.forEach(quotas, (quota) => {
+            if (quota.Namespace === namespace.Name) {
+              pool.Quotas.push(quota);
+            }
+          });
+          pools.push(pool);
+        })
+        return pools;
       } catch (err) {
         throw { msg: 'Unable to retrieve resource pools', err: err };
       }
     }
 
-    function pools() {
-      return $async(poolsAsync);
+    function resourcePools() {
+      return $async(resourcePoolsAsync);
+    }
+
+    /**
+     * Short resource pools
+     */
+    async function shortResourcePoolsAsync() {
+      try {
+        return await KubernetesNamespaceService.namespaces();
+      } catch (err) {
+        throw { msg: 'Unable to retrieve resource pools', err: err };
+      }
+    }
+
+    function shortResourcePools() {
+      return $async(shortResourcePoolsAsync);
     }
 
     return service;

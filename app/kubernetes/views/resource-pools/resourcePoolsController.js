@@ -13,7 +13,7 @@ class KubernetesResourcePoolsController {
 
   async getResourcePoolsAsync() {
     try {
-      this.resourcePools = await this.KubernetesResourcePoolService.pools();
+      this.resourcePools = await this.KubernetesResourcePoolService.resourcePools();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retreive resource pools');
     }
