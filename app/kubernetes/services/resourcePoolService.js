@@ -7,7 +7,8 @@ angular.module("portainer.kubernetes").factory("KubernetesResourcePoolService", 
     "use strict";
     const service = {
       resourcePools: resourcePools,
-      shortResourcePools: shortResourcePools
+      shortResourcePools: shortResourcePools,
+      create: create
     };
 
     /**
@@ -50,6 +51,21 @@ angular.module("portainer.kubernetes").factory("KubernetesResourcePoolService", 
 
     function shortResourcePools() {
       return $async(shortResourcePoolsAsync);
+    }
+
+    /**
+     * Create resource pool
+     */
+    async function createResourcePoolAsync(data) {
+      try {
+        const namespace = KubernetesNamespaceService.create(data.Name)
+      } catch (err) {
+        throw { msg: 'Unable to create resource pool' };
+      }
+    }
+
+    function create(data) {
+      return $async(createResourcePoolAsync, data);
     }
 
     return service;

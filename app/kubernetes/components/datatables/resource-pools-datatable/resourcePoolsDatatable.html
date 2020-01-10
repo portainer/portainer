@@ -44,6 +44,11 @@
           </span>
         </div>
       </div>
+      <div class="actionBar">
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.resourcePools.new">
+          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add resource pool
+        </button>
+      </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
         <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" ng-change="$ctrl.onTextFilterChange()" placeholder="Search..." auto-focus ng-model-options="{ debounce: 300 }">

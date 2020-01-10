@@ -6,7 +6,8 @@ angular.module("portainer.kubernetes").factory("KubernetesNamespaceService", [
   function KubernetesNamespaceServiceFactory($async, KubernetesNamespaces) {
     "use strict";
     const service = {
-      namespaces: namespaces
+      namespaces: namespaces,
+      create: create
     };
 
     async function namespacesAsync() {
@@ -29,6 +30,22 @@ angular.module("portainer.kubernetes").factory("KubernetesNamespaceService", [
 
     function namespaces() {
       return $async(namespacesAsync);
+    }
+
+    async function createAsync(name) {
+      try {
+        const payload = {
+          name: name
+        };
+        const data = await KubernetesNamespaces.create(payload).$promise
+        return data;
+      } catch (err) {
+        throw { msg: 'Unable to create namespace', err: err };
+      }
+    }
+
+    function create(name) {
+      return $async(createAsync, name);
     }
 
     return service;
