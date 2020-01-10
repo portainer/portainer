@@ -1,0 +1,100 @@
+<rd-header>
+  <rd-header-title title-text="Create resource pool"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="kubernetes.resourcePools">Resource pools</a> &gt; Add resource pool
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-xs-12">
+    <rd-widget>
+      <rd-widget-body>
+        <form class="form-horizontal" autocomplete="off" name="resourcePoolCreationForm">
+           <!-- name-input -->
+           <div class="form-group">
+            <label for="pool_name" class="col-sm-1 control-label text-left">Name</label>
+            <div class="col-sm-11">
+              <input type="text" class="form-control" name="pool_name" ng-model="formValues.Name" placeholder="e.g. docker-prod01" required auto-focus>
+            </div>
+          </div>
+          <div class="form-group" ng-show="resourcePoolCreationForm.pool_name.$invalid">
+            <div class="col-sm-12 small text-warning">
+              <div ng-messages="resourcePoolCreationForm.pool_name.$error">
+                <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+              </div>
+            </div>
+          </div>
+          <!-- !name-input -->
+          <div class="col-sm-12 form-section-title">
+            Quotas
+          </div>
+          <!-- quotas-switch -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <label class="control-label text-left">
+                Add quota to resource pool
+              </label>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" ng-model="ctrl.formValues.hasQuotas"><i></i>
+              </label>
+            </div>
+          </div>
+          <!-- !quotas-switch -->
+          <div ng-if="ctrl.formValues.hasQuotas">
+              <div class="col-sm-12 form-section-title">
+                Resources
+              </div>
+              <!-- memory-limit-input -->
+              <div class="form-group">
+                <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
+                  Memory limit
+                </label>
+                <div class="col-sm-3">
+                  <slider model="ctrl.formValues.MemoryLimit" floor="0" ceil="ctrl.state.sliderMaxMemory" step="256" ng-if="ctrl.state.sliderMaxMemory"></slider>
+                </div>
+                <div class="col-sm-2">
+                  <input type="number" min="0" class="form-control" ng-model="ctrl.formValues.MemoryLimit" id="memory-limit">
+                </div>
+                <div class="col-sm-4">
+                  <p class="small text-muted" style="margin-top: 7px;">
+                    Memory limit (<b>MB</b>)
+                  </p>
+                </div>
+              </div>
+              <!-- !memory-limit-input -->
+              <!-- cpu-limit-input -->
+              <div class="form-group">
+                <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
+                  CPU limit
+                </label>
+                <div class="col-sm-5">
+                  <slider model="ctrl.formValues.CpuLimit" floor="0" ceil="ctrl.state.sliderMaxCpu" step="0.25" precision="2" ng-if="ctrl.state.sliderMaxCpu"></slider>
+                </div>
+                <div class="col-sm-4" style="margin-top: 20px;">
+                  <p class="small text-muted">
+                    Maximum CPU usage
+                  </p>
+                </div>
+              </div>
+              <!-- !cpu-limit-input -->
+          </div>
+          <!-- actions -->
+          <div class="col-sm-12 form-section-title">
+            Actions
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-primary btn-sm"
+                ng-disabled="!resourcePoolCreationForm.$valid"
+                ng-click="ctrl.createResourcePool()" button-spinner="ctrl.state.actionInProgress">
+                <span ng-hide="ctrl.state.actionInProgress">Create resource pool</span>
+                <span ng-show="ctrl.state.actionInProgress">Creation in progress...</span>
+              </button>
+            </div>
+          </div>
+          <!-- !actions -->
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

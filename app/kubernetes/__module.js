@@ -31,6 +31,18 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     }
   };
 
+  const nodes = {
+    name: 'kubernetes.nodes',
+    url: '/nodes',
+    views: {
+      'content@': {
+        templateUrl: './views/nodes/nodes.html',
+        controller: 'KubernetesNodesController',
+        controllerAs: 'ctrl'
+      }
+    }
+  };
+
   const resourcePools = {
     name: 'kubernetes.resourcePools',
     url: '/pools',
@@ -43,13 +55,13 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     }	
   };
 
-  const nodes = {
-    name: 'kubernetes.nodes',
-    url: '/nodes',
+  const resourcePoolCreation = {
+    name: 'kubernetes.resourcePools.new',
+    url: '/new',
     views: {
       'content@': {
-        templateUrl: './views/nodes/nodes.html',
-        controller: 'KubernetesNodesController',
+        templateUrl: './views/resource-pools/create/createResourcePool.html',
+        controller: 'KubernetesCreateResourcePoolController',
         controllerAs: 'ctrl'
       }	
     }	
@@ -57,6 +69,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
 
   $stateRegistryProvider.register(kubernetes);
   $stateRegistryProvider.register(dashboard);
-  $stateRegistryProvider.register(resourcePools);
   $stateRegistryProvider.register(nodes);
+  $stateRegistryProvider.register(resourcePools);
+  $stateRegistryProvider.register(resourcePoolCreation);
 }]);

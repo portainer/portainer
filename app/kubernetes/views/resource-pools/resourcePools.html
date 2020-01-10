@@ -11,9 +11,9 @@
   <div class="col-sm-12">
     <kubernetes-resource-pools-datatable
     title-text="Resource pools" title-icon="fa-question"
-    dataset="ctrl.namespaces" table-key="kubernetes.resourcePools"
-    order-by="Name"
-    refresh-callback="ctrl.getNamespaces"
+    dataset="ctrl.resourcePools" table-key="kubernetes.resourcePools"
+    order-by="Namespace.Name"
+    refresh-callback="ctrl.getResourcePools"
     ></kubernetes-resource-pools-datatable>
   </div>
 </div>

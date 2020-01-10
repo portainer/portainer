@@ -2,9 +2,10 @@ import angular from 'angular';
 
 class KubernetesDashboardController {
   /* @ngInject */
-  constructor($async, Notifications, EndpointService, EndpointProvider, KubernetesResourcePoolService) {
+  constructor($async, Notifications, Authentication, EndpointService, EndpointProvider, KubernetesResourcePoolService) {
     this.$async = $async;
     this.Notifications = Notifications;
+    this.Authentication = Authentication;
     this.EndpointService = EndpointService;
     this.EndpointProvider = EndpointProvider;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
@@ -18,7 +19,7 @@ class KubernetesDashboardController {
       const endpointId = this.EndpointProvider.endpointID();
       const [endpoint, pools] = await Promise.all([
         this.EndpointService.endpoint(endpointId),
-        this.KubernetesResourcePoolService.pools()
+        this.KubernetesResourcePoolService.shortResourcePools()
       ]);
       this.endpoint = endpoint;
       this.pools = pools;
@@ -32,6 +33,7 @@ class KubernetesDashboardController {
   }
 
   async $onInit() {
+    this.isAdmin = this.Authentication.isAdmin();
     this.getAll();
   }
 }
