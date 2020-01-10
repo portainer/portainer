@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-class KubernetesNodesController {
+class KubernetesClusterController {
   /* @ngInject */
   constructor($async, Notifications, KubernetesNodeService) {
     this.$async = $async;
@@ -28,5 +28,5 @@ class KubernetesNodesController {
   }
 }
 
-export default KubernetesNodesController;
-angular.module('portainer.kubernetes').controller('KubernetesNodesController', KubernetesNodesController);
+export default KubernetesClusterController;
+angular.module('portainer.kubernetes').controller('KubernetesClusterController', KubernetesClusterController);

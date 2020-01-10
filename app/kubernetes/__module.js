@@ -32,12 +32,12 @@ angular.module('portainer.kubernetes', ['portainer.app'])
   };
 
   const nodes = {
-    name: 'kubernetes.nodes',
-    url: '/nodes',
+    name: 'kubernetes.cluster',
+    url: '/cluster',
     views: {
       'content@': {
-        templateUrl: './views/nodes/nodes.html',
-        controller: 'KubernetesNodesController',
+        templateUrl: './views/cluster/cluster.html',
+        controller: 'KubernetesClusterController',
         controllerAs: 'ctrl'
       }
     }
