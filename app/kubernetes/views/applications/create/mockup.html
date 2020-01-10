@@ -1,0 +1,224 @@
+<rd-header>
+  <rd-header-title title-text="Create application"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="kubernetes.applications">Application</a> &gt; Deploy application
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-xs-12">
+
+    <rd-widget>
+      <rd-widget-body>
+        <form class="form-horizontal" name="kubernetesApplicationCreationForm" autocomplete="off">
+
+          <div class="col-sm-12 form-section-title">
+            Application
+          </div>
+
+          <!-- resource-pool -->
+          <div class="form-group">
+            <label for="application_name" class="col-sm-1 control-label text-left">Resource pool</label>
+            <div class="col-sm-11">
+              <select class="form-control" id="resource-pool-selector">
+                <option selected value="project-A">project-A</option>
+                <option value="project-B">project-B</option>
+                <option value="project-C">project-C</option>
+              </select>
+            </div>
+          </div>
+          <!-- !resource-pool -->
+
+          <!-- name -->
+          <div class="form-group">
+            <label for="application_name" class="col-sm-1 control-label text-left">Name</label>
+            <div class="col-sm-11">
+              <input type="text" class="form-control" name="application_name" placeholder="myApp" auto-focus>
+            </div>
+          </div>
+          <!-- !name -->
+
+          <div class="col-sm-12 form-section-title">
+            Stack
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-12 small text-muted">
+              <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+              Portainer can automatically bundle multiple applications inside a stack. Enter a name of a new stack or select an existing stack in the list. Leave empty to use the application name.
+            </div>
+          </div>
+
+          <!-- stack -->
+          <div class="form-group">
+            <label for="stack_name" class="col-sm-1 control-label text-left">Stack</label>
+            <div class="col-sm-11">
+              <input
+                      type="text"
+                      class="form-control"
+                      placeholder="myStack"
+                      ng-model=""
+                      name="stack_name"
+                      uib-typeahead="stack for stack in ['stackA', 'stackB'] | filter:$viewValue | limitTo:7"
+                      typeahead-show-hint="true" typeahead-min-length="0" />
+            </div>
+          </div>
+          <!-- !stack -->
+
+          <div class="col-sm-12 form-section-title">
+            Container configuration
+          </div>
+
+          <!-- image -->
+          <div class="form-group">
+            <label for="container_image" class="col-sm-1 control-label text-left">Image</label>
+            <div class="col-sm-11">
+              <input type="text" class="form-control" name="container_image" placeholder="nginx:latest">
+            </div>
+          </div>
+          <!-- !image -->
+
+          <!-- environment-variables -->
+          <div class="form-group">
+
+            <div class="col-sm-12" style="margin-top: 5px;">
+              <label class="control-label text-left">Environment variables</label>
+              <span class="label label-default interactive" style="margin-left: 10px;">
+                <i class="fa fa-plus-circle" aria-hidden="true"></i> add environment variable
+              </span>
+            </div>
+
+          </div>
+
+          <div class="col-sm-12 form-section-title">
+            Persisting data
+          </div>
+
+          <!-- persisted folders -->
+          <div class="form-group">
+
+            <div class="col-sm-12" style="margin-top: 5px;">
+              <label class="control-label text-left">Persisted folders</label>
+              <span class="label label-default interactive" style="margin-left: 10px;">
+                <i class="fa fa-plus-circle" aria-hidden="true"></i> add persisted folder
+              </span>
+            </div>
+
+          </div>
+          <!-- !persisted folders -->
+
+          <div class="col-sm-12 form-section-title">
+            Deployment
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-12 small text-muted">
+              Select how you want to deploy your application inside the cluster.
+            </div>
+          </div>
+
+          <!-- deployment options -->
+          <div class="form-group" style="margin-bottom: 0">
+            <div class="boxselector_wrapper">
+              <div>
+                <input type="radio" id="deployment_optionA" value="deployment_optionA" checked="checked">
+                <label for="deployment_optionA">
+                  <div class="boxselector_header">
+                    <i class="fa fa-cube" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Replicated
+                  </div>
+                  <p>Run multiple replicas for this container</p>
+                </label>
+              </div>
+              <div>
+                <input type="radio" id="deployment_optionB" value="deployment_optionB">
+                <label for="deployment_optionB">
+                  <div class="boxselector_header">
+                    <i class="fa fa-cubes" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Global
+                  </div>
+                  <p>Deploy an instance of this container on each node of the cluster</p>
+                </label>
+              </div>
+            </div>
+          </div>
+          <!-- !deployment options -->
+
+          <!-- replica count -->
+          <div class="form-group form-inline">
+            <div class="col-sm-12">
+              <label class="control-label text-left">
+                Replica count
+              </label>
+              <input type="number" class="form-control" placeholder="1" style="margin-left: 20px;" value="1">
+            </div>
+          </div>
+          <!-- !replica count -->
+
+          <div class="col-sm-12 form-section-title">
+            Publishing the application
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-12 small text-muted">
+              Select how you want to publish your application.
+            </div>
+          </div>
+
+          <!-- publishing options -->
+          <div class="form-group" style="margin-bottom: 0">
+            <div class="boxselector_wrapper">
+              <div>
+                <input type="radio" id="publishing_optionA" value="publishing_optionA" checked="checked">
+                <label for="publishing_optionA">
+                  <div class="boxselector_header">
+                    <i class="fa fa-list-alt" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Internal
+                  </div>
+                  <p>Internal communications inside the cluster only</p>
+                </label>
+              </div>
+              <div>
+                <input type="radio" id="publishing_optionB" value="publishing_optionB">
+                <label for="publishing_optionB">
+                  <div class="boxselector_header">
+                    <i class="fa fa-list" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Node ports
+                  </div>
+                  <p>Publish this application via a port on all nodes of the cluster</p>
+                </label>
+              </div>
+            </div>
+          </div>
+          <!-- !publishing options -->
+
+          <!-- published ports -->
+          <div class="form-group">
+
+            <div class="col-sm-12" style="margin-top: 5px;">
+              <label class="control-label text-left">Published ports</label>
+              <span class="label label-default interactive" style="margin-left: 10px;">
+                <i class="fa fa-plus-circle" aria-hidden="true"></i> publish a new port
+              </span>
+            </div>
+
+          </div>
+          <!-- !published ports -->
+
+          <div class="col-sm-12 form-section-title">
+            Actions
+          </div>
+
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-primary btn-sm">Deploy application</button>
+            </div>
+          </div>
+
+        </form>
+        
+      </rd-widget-body>
+    </rd-widget>
+
+  </div>
+</div>

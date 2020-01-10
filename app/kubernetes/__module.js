@@ -19,6 +19,42 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     }
   };
 
+  var applications = {
+    name: 'kubernetes.applications',
+    url: '/applications',
+    // views: {
+    //   'content@': {
+    //     templateUrl: './views/applications/applications.html',
+    //     controller: 'KubernetesApplicationsController',
+    //     controllerAs: 'ctrl'
+    //   }
+    // }
+  };
+
+  const applicationCreateMockup = {
+    name: 'kubernetes.applications.mockup1',
+    url: '/mockup1',
+    views: {
+      'content@': {
+        templateUrl: './views/applications/create/mockup.html',
+        // controller: 'KubernetesCreateApplicationController',
+        // controllerAs: 'ctrl'
+      }
+    }
+  };
+
+  const applicationCreateMockupExpanded = {
+    name: 'kubernetes.applications.mockup2',
+    url: '/mockup2',
+    views: {
+      'content@': {
+        templateUrl: './views/applications/create/mockup-expanded.html',
+        // controller: 'KubernetesCreateApplicationController',
+        // controllerAs: 'ctrl'
+      }
+    }
+  };
+
   const dashboard = {
     name: 'kubernetes.dashboard',
     url: '/dashboard',
@@ -68,6 +104,9 @@ angular.module('portainer.kubernetes', ['portainer.app'])
   };
 
   $stateRegistryProvider.register(kubernetes);
+  $stateRegistryProvider.register(applications);
+  $stateRegistryProvider.register(applicationCreateMockup);
+  $stateRegistryProvider.register(applicationCreateMockupExpanded);
   $stateRegistryProvider.register(dashboard);
   $stateRegistryProvider.register(nodes);
   $stateRegistryProvider.register(resourcePools);
