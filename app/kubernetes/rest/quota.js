@@ -7,6 +7,11 @@ angular.module('portainer.kubernetes')
           endpointId: EndpointProvider.endpointID
         },
         {
-          query: { method: 'GET', timeout: 15000}
+          query: { method: 'GET', timeout: 15000 },
+          create: {
+            method: 'POST',
+            url: API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/api/v1/namespaces/:namespace/resourcequotas',
+            params: { namespace: '@metadata.name' }
+          }
         });
     }]);

@@ -14,7 +14,7 @@
            <div class="form-group">
             <label for="pool_name" class="col-sm-1 control-label text-left">Name</label>
             <div class="col-sm-11">
-              <input type="text" class="form-control" name="pool_name" ng-model="formValues.Name" placeholder="e.g. docker-prod01" required auto-focus>
+              <input type="text" class="form-control" name="pool_name" ng-model="ctrl.formValues.Name" placeholder="placeholder" required auto-focus>
             </div>
           </div>
           <div class="form-group" ng-show="resourcePoolCreationForm.pool_name.$invalid">
@@ -35,30 +35,38 @@
                 Add quota to resource pool
               </label>
               <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" ng-model="ctrl.formValues.hasQuotas"><i></i>
+                <input type="checkbox" ng-model="ctrl.formValues.hasQuota"><i></i>
               </label>
             </div>
           </div>
           <!-- !quotas-switch -->
-          <div ng-if="ctrl.formValues.hasQuotas">
-              <div class="col-sm-12 form-section-title">
-                Resources
-              </div>
+          <div ng-if="ctrl.formValues.hasQuota">
+            <div class="col-sm-12 form-section-title">
+              Resources
+            </div>
+            <div ng-if="ctrl.hasEnoughResources()">
               <!-- memory-limit-input -->
               <div class="form-group">
                 <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
                   Memory limit
                 </label>
                 <div class="col-sm-3">
-                  <slider model="ctrl.formValues.MemoryLimit" floor="0" ceil="ctrl.state.sliderMaxMemory" step="256" ng-if="ctrl.state.sliderMaxMemory"></slider>
+                  <slider model="ctrl.formValues.MemoryLimit" floor="ctrl.defaults.MemoryLimit" ceil="ctrl.state.sliderMaxMemory" step="256" ng-if="ctrl.state.sliderMaxMemory"></slider>
                 </div>
                 <div class="col-sm-2">
-                  <input type="number" min="0" class="form-control" ng-model="ctrl.formValues.MemoryLimit" id="memory-limit">
+                  <input name="memory_limit" type="number" min="{{ctrl.defaults.MemoryLimit}}" max="{{ctrl.state.sliderMaxMemory}}" class="form-control" ng-model="ctrl.formValues.MemoryLimit" id="memory-limit" required>
                 </div>
                 <div class="col-sm-4">
                   <p class="small text-muted" style="margin-top: 7px;">
-                    Memory limit (<b>MB</b>)
+                    Memory limit (<b>bytes</b>)
                   </p>
+                </div>
+              </div>
+              <div class="form-group" ng-show="resourcePoolCreationForm.memory_limit.$invalid">
+                <div class="col-sm-12 small text-warning">
+                  <div ng-messages="resourcePoolCreationForm.pool_name.$error">
+                    <p><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Value must be between {{ ctrl.defaults.MemoryLimit }} and {{ ctrl.state.sliderMaxMemory }}</p>
+                  </div>
                 </div>
               </div>
               <!-- !memory-limit-input -->
@@ -68,7 +76,7 @@
                   CPU limit
                 </label>
                 <div class="col-sm-5">
-                  <slider model="ctrl.formValues.CpuLimit" floor="0" ceil="ctrl.state.sliderMaxCpu" step="0.25" precision="2" ng-if="ctrl.state.sliderMaxCpu"></slider>
+                  <slider model="ctrl.formValues.CpuLimit" floor="ctrl.defaults.CpuLimit" ceil="ctrl.state.sliderMaxCpu" step="0.25" precision="2" ng-if="ctrl.state.sliderMaxCpu"></slider>
                 </div>
                 <div class="col-sm-4" style="margin-top: 20px;">
                   <p class="small text-muted">
@@ -77,6 +85,18 @@
                 </div>
               </div>
               <!-- !cpu-limit-input -->
+            </div>
+            <div ng-if="!ctrl.hasEnoughResources()">
+              <div class="form-group">
+                <span class="col-sm-12">
+                  Not enough resources.
+                  <br/>
+                  Min CPU for quota : <code>{{ ctrl.defaults.CpuLimit }}</code> / Available CPU : <code>{{ ctrl.state.sliderMaxCpu }}</code>
+                  <br/>
+                  Min Memory for quota : <code>{{ ctrl.defaults.MemoryLimit }}</code> / Available memory : <code>{{ ctrl.state.sliderMaxMemory }}</code>
+                </span>
+              </div>
+            </div>
           </div>
           <!-- actions -->
           <div class="col-sm-12 form-section-title">
@@ -85,7 +105,7 @@
           <div class="form-group">
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm"
-                ng-disabled="!resourcePoolCreationForm.$valid"
+                ng-disabled="!resourcePoolCreationForm.$valid || ctrl.state.actionInProgress || (ctrl.formValues.hasQuota && !ctrl.hasEnoughResources())"
                 ng-click="ctrl.createResourcePool()" button-spinner="ctrl.state.actionInProgress">
                 <span ng-hide="ctrl.state.actionInProgress">Create resource pool</span>
                 <span ng-show="ctrl.state.actionInProgress">Creation in progress...</span>

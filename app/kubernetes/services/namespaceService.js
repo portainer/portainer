@@ -35,7 +35,9 @@ angular.module("portainer.kubernetes").factory("KubernetesNamespaceService", [
     async function createAsync(name) {
       try {
         const payload = {
-          name: name
+          metadata: {
+            name: name
+          }
         };
         const data = await KubernetesNamespaces.create(payload).$promise
         return data;

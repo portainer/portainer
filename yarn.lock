@@ -4521,6 +4521,11 @@ fileset@0.1.x, fileset@~0.1.5:
     glob "3.x"
     minimatch "0.x"
 
+filesize-parser@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/filesize-parser/-/filesize-parser-1.5.0.tgz#97ad66d5b0d7154b2e8b1b4e83f526aed33c62f3"
+  integrity sha512-UTDpJB22VvozK7t31slU9WCAPSdcUWuwD7P7S6LBXswdgzUz+YhoziLOohknFcx0Kq5LWCAj4MEKY9q3zGq47Q==
+
 filesize@~3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/filesize/-/filesize-3.3.0.tgz#53149ea3460e3b2e024962a51648aa572cf98122"

@@ -56,16 +56,19 @@ angular.module("portainer.kubernetes").factory("KubernetesResourcePoolService", 
     /**
      * Create resource pool
      */
-    async function createResourcePoolAsync(data) {
+    async function createAsync(name, hasQuota, cpuLimit, memoryLimit) {
       try {
-        const namespace = KubernetesNamespaceService.create(data.Name)
+        await KubernetesNamespaceService.create(name);
+        if (hasQuota) {
+          await KubernetesResourceQuotaService.create(name, cpuLimit, memoryLimit);
+        }
       } catch (err) {
         throw { msg: 'Unable to create resource pool' };
       }
     }
 
-    function create(data) {
-      return $async(createResourcePoolAsync, data);
+    function create(name, hasQuota, cpuLimit, memoryLimit) {
+      return $async(createAsync, name, hasQuota, cpuLimit, memoryLimit);
     }
 
     return service;
