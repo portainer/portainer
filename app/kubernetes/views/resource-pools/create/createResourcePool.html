@@ -88,12 +88,17 @@
             </div>
             <div ng-if="!ctrl.hasEnoughResources()">
               <div class="form-group">
-                <span class="col-sm-12">
-                  Not enough resources.
-                  <br/>
-                  Min CPU for quota : <code>{{ ctrl.defaults.CpuLimit }}</code> / Available CPU : <code>{{ ctrl.state.sliderMaxCpu }}</code>
-                  <br/>
-                  Min Memory for quota : <code>{{ ctrl.defaults.MemoryLimit }}</code> / Available memory : <code>{{ ctrl.state.sliderMaxMemory }}</code>
+                <span class="col-sm-12 text-muted small">
+                  <p>
+                    <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Not enough resources available in the cluster to create a quota.
+                  </p>
+                  <p>
+                    Available CPU : <code>{{ ctrl.state.sliderMaxCpu }}</code>
+                  </p>
+                  <p>
+                    Available memory : <code>{{ ctrl.state.sliderMaxMemory }}</code>
+                  </p>
                 </span>
               </div>
             </div>
