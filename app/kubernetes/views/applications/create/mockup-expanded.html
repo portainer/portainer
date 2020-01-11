@@ -570,7 +570,7 @@
 
             <div class="col-sm-12 small text-muted" style="margin-top: 10px;">
               <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-              The node port is optional, if left empty Kubernetes will use a random port number.
+              The node port is optional, if left empty Kubernetes will use a random port number. If you wish to specify a port, use a port number inside the default range <code>30000-32767</code>.
             </div>
 
             <div class="col-sm-12 form-inline" style="margin-top: 10px;">
@@ -583,7 +583,7 @@
 
                 <div class="input-group col-sm-5 input-group-sm">
                   <span class="input-group-addon">node port</span>
-                  <input type="number" class="form-control" placeholder="80" value="8080">
+                  <input type="number" class="form-control" placeholder="80" value="30888">
                 </div>
 
                 <div class="input-group col-sm-1 input-group-sm">
@@ -706,11 +706,6 @@
               <span class="label label-default interactive" style="margin-left: 10px;">
                 <i class="fa fa-plus-circle" aria-hidden="true"></i> publish a new port
               </span>
-            </div>
-
-            <div class="col-sm-12 small text-muted" style="margin-top: 10px;">
-              <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-              A load balancer will be created for each published port.
             </div>
 
             <div class="col-sm-12 form-inline" style="margin-top: 10px;">
