@@ -44,7 +44,8 @@
             <div class="col-sm-12 form-section-title">
               Resources
             </div>
-            <div ng-if="ctrl.hasEnoughResources()">
+            <!-- <div ng-if="ctrl.hasEnoughResources()"> -->
+            <div>
               <!-- memory-limit-input -->
               <div class="form-group">
                 <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
@@ -58,7 +59,7 @@
                 </div>
                 <div class="col-sm-4">
                   <p class="small text-muted" style="margin-top: 7px;">
-                    Memory limit (<b>bytes</b>)
+                    Memory limit (<b>MB</b>)
                   </p>
                 </div>
               </div>
@@ -86,7 +87,7 @@
               </div>
               <!-- !cpu-limit-input -->
             </div>
-            <div ng-if="!ctrl.hasEnoughResources()">
+            <!-- <div ng-if="!ctrl.hasEnoughResources()">
               <div class="form-group">
                 <span class="col-sm-12 text-muted small">
                   <p>
@@ -102,7 +103,7 @@
                 </span>
               </div>
             </div>
-          </div>
+          </div> -->
           <!-- actions -->
           <div class="col-sm-12 form-section-title">
             Actions

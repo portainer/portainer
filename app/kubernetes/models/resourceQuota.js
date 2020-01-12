@@ -9,5 +9,5 @@ export default function KubernetesResourceQuotaViewModel(data) {
 
 export const KubernetesResourceQuotaDefaults = {
   CpuLimit: 1,
-  MemoryLimit: 64000
+  MemoryLimit: 64 // MB
 };

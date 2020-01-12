@@ -11,6 +11,14 @@ import { KubernetesResourceQuotaDefaults } from 'Kubernetes/models/resourceQuota
  * TODO: this view needs a refactor to allow users working with multiple quotas inside the same namespace
  */
 
+function megaBytesValue(mem) {
+  return Math.floor(mem / 1000 / 1000);
+}
+
+function bytesValue(mem) {
+  return mem * 1000 * 1000;
+}
+
 class KubernetesEditResourcePoolController {
   /* @ngInject */
   constructor($async, $state, $stateParams, Notifications, KubernetesNodeService, KubernetesResourceQuotaService, KubernetesResourcePoolService) {
@@ -39,20 +47,21 @@ class KubernetesEditResourcePoolController {
     if (this.formValues.CpuLimit < this.defaults.CpuLimit) {
       this.formValues.CpuLimit = this.defaults.CpuLimit;
     }
-    if (this.formValues.MemoryLimit < this.defaults.MemoryLimit) {
-        this.formValues.MemoryLimit = this.defaults.MemoryLimit;
+    if (this.formValues.MemoryLimit < megaBytesValue(this.defaults.MemoryLimit)) {
+        this.formValues.MemoryLimit = megaBytesValue(this.defaults.MemoryLimit);
     }
   }
 
   async updateResourcePoolAsync() {
     this.state.actionInProgress = true;
+    const memoryLimit = bytesValue(this.formValues.MemoryLimit);
     try {
       this.checkDefaults(); 
       if (this.formValues.hasQuota) {
         if (this.pool.Quotas.length) {
-          await this.KubernetesResourceQuotaService.update(this.pool.Quotas[0].Raw, this.formValues.CpuLimit, this.formValues.MemoryLimit);
+          await this.KubernetesResourceQuotaService.update(this.pool.Quotas[0].Raw, this.formValues.CpuLimit, memoryLimit);
         } else {
-          await this.KubernetesResourceQuotaService.create(this.pool.Namespace.Name, this.formValues.CpuLimit, this.formValues.MemoryLimit);
+          await this.KubernetesResourceQuotaService.create(this.pool.Namespace.Name, this.formValues.CpuLimit, memoryLimit);
         }
       } else if (this.pool.Quotas.length) {
         await this.KubernetesResourceQuotaService.remove(this.pool.Namespace.Name);
@@ -100,7 +109,6 @@ class KubernetesEditResourcePoolController {
         this.state.sliderMaxMemory += filesizeParser(item.Memory);
         this.state.sliderMaxCpu += item.CPU;
       });
-      // this.state.sliderMaxMemory = Math.floor(this.state.sliderMaxMemory / 1000 / 1000);
       _.forEach(quotas, (item) => {
         this.state.sliderMaxCpu -= item.CpuLimit;
         this.state.sliderMaxMemory -= item.MemoryLimit;
@@ -118,7 +126,9 @@ class KubernetesEditResourcePoolController {
         });
         this.formValues.CpuLimit = cpuLimit;
         this.formValues.MemoryLimit = memoryLimit;
+        this.formValues.MemoryLimit = megaBytesValue(this.formValues.MemoryLimit);
       }
+      this.state.sliderMaxMemory = megaBytesValue(this.state.sliderMaxMemory);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
     }

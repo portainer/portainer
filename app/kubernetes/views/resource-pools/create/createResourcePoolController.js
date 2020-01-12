@@ -11,6 +11,14 @@ import { KubernetesResourceQuotaDefaults } from 'Kubernetes/models/resourceQuota
  * TODO: this view needs a refactor to allow users working with multiple quotas inside the same namespace
  */
 
+function megaBytesValue(mem) {
+  return Math.floor(mem / 1000 / 1000);
+}
+
+function bytesValue(mem) {
+  return mem * 1000 * 1000;
+}
+
 class KubernetesCreateResourcePoolController {
   /* @ngInject */
   constructor($async, $state, Notifications, KubernetesNodeService, KubernetesResourceQuotaService, KubernetesResourcePoolService) {
@@ -34,16 +42,20 @@ class KubernetesCreateResourcePoolController {
     return true;
   }
 
+  checkDefaults() {
+    if (this.formValues.CpuLimit < this.defaults.CpuLimit) {
+      this.formValues.CpuLimit = this.defaults.CpuLimit;
+    }
+    if (this.formValues.MemoryLimit < megaBytesValue(this.defaults.MemoryLimit)) {
+        this.formValues.MemoryLimit = megaBytesValue(this.defaults.MemoryLimit);
+    }
+  }
+
   async createResourcePoolAsync() {
     this.state.actionInProgress = true;
     try {
-      if (this.formValues.CpuLimit < this.defaults.CpuLimit) {
-        this.formValues.CpuLimit = this.defaults.CpuLimit;
-      }
-      if (this.formValues.MemoryLimit < this.defaults.MemoryLimit) {
-          this.formValues.MemoryLimit = this.defaults.MemoryLimit;
-      }
-      await this.KubernetesResourcePoolService.create(this.formValues.Name, this.formValues.hasQuota, this.formValues.CpuLimit, this.formValues.MemoryLimit);
+      this.checkDefaults();
+      await this.KubernetesResourcePoolService.create(this.formValues.Name, this.formValues.hasQuota, this.formValues.CpuLimit, bytesValue(this.formValues.MemoryLimit));
       this.$state.go('kubernetes.resourcePools');
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to create resource pool');
@@ -81,12 +93,11 @@ class KubernetesCreateResourcePoolController {
         this.state.sliderMaxMemory += filesizeParser(item.Memory);
         this.state.sliderMaxCpu += item.CPU;
       });
-      // this.state.sliderMaxMemory = Math.floor(this.state.sliderMaxMemory / 1000 / 1000);
       _.forEach(quotas, (item) => {
         this.state.sliderMaxCpu -= item.CpuLimit;
         this.state.sliderMaxMemory -= item.MemoryLimit;
       });
-
+      this.state.sliderMaxMemory = megaBytesValue(this.state.sliderMaxMemory);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
     }
