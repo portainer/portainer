@@ -8,24 +8,35 @@ angular.module("portainer.kubernetes").factory("KubernetesResourcePoolService", 
     const service = {
       resourcePools: resourcePools,
       shortResourcePools: shortResourcePools,
+      resourcePool: resourcePool,
       create: create
     };
+
+    /**
+     * Utility functions
+     */
+
+    function bindQuotasToNamespace(pool, namespace, quotas) {
+      _.forEach(quotas, (quota) => {
+        if (quota.Namespace === namespace.Name) {
+          pool.Quotas.push(quota);
+        }
+      });
+    }
 
     /**
      * Resource pools
      */
     async function resourcePoolsAsync() {
       try {
-        const namespaces = await KubernetesNamespaceService.namespaces();
-        const quotas = await KubernetesResourceQuotaService.quotas();
+        const [namespaces, quotas] = await Promise.all([
+          KubernetesNamespaceService.namespaces(),
+          KubernetesResourceQuotaService.quotas()
+        ]);
         const pools = [];
         _.forEach(namespaces, (namespace) => {
           const pool = new KubernetesResourcePoolViewModel(namespace);
-          _.forEach(quotas, (quota) => {
-            if (quota.Namespace === namespace.Name) {
-              pool.Quotas.push(quota);
-            }
-          });
+          bindQuotasToNamespace(pool, namespace, quotas);
           pools.push(pool);
         })
         return pools;
@@ -51,6 +62,24 @@ angular.module("portainer.kubernetes").factory("KubernetesResourcePoolService", 
 
     function shortResourcePools() {
       return $async(shortResourcePoolsAsync);
+    }
+
+    async function resourcePoolAsync(name) {
+      try {
+        const [namespace, quotas] = await Promise.all([
+          KubernetesNamespaceService.namespace(name),
+          KubernetesResourceQuotaService.quotas()
+        ]);
+        const pool = new KubernetesResourcePoolViewModel(namespace);
+        bindQuotasToNamespace(pool, namespace, quotas);
+        return pool;
+      } catch (err) {
+        throw { msg: 'Unable to retrieve resource pool', err: err };
+      }
+    }
+
+    function resourcePool(name) {
+      return $async(resourcePoolAsync, name);
     }
 
     /**

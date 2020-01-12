@@ -7,9 +7,13 @@ angular.module("portainer.kubernetes").factory("KubernetesNamespaceService", [
     "use strict";
     const service = {
       namespaces: namespaces,
+      namespace: namespace,
       create: create
     };
 
+    /**
+     * Namespaces
+     */
     async function namespacesAsync() {
       try {
         const data = await KubernetesNamespaces.query().$promise;
@@ -32,6 +36,26 @@ angular.module("portainer.kubernetes").factory("KubernetesNamespaceService", [
       return $async(namespacesAsync);
     }
 
+    /**
+     * Namespace
+     */
+    async function namespaceAsync(name) {
+      try {
+        const data = await KubernetesNamespaces.query({id: name}).$promise;
+        return new KubernetesNamespaceViewModel(data);
+      } catch (err) {
+        throw { msg: 'Unable to retrieve namespace', err: err };
+      }
+    }
+
+    function namespace(name) {
+      return $async(namespaceAsync, name);
+    }
+
+
+    /**
+     * Create
+     */
     async function createAsync(name) {
       try {
         const payload = {
