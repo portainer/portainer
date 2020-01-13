@@ -375,7 +375,12 @@
 
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm">Deploy application</button>
+              <button type="button" class="btn btn-primary btn-sm"
+                      ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.state.actionInProgress"
+                      button-spinner="ctrl.state.actionInProgress">
+                <span ng-hide="ctrl.state.actionInProgress">Deploy application</span>
+                <span ng-show="ctrl.state.actionInProgress">Deployment in progress...</span>
+              </button>
             </div>
           </div>
 

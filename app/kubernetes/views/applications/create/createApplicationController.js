@@ -86,6 +86,7 @@ class KubernetesCreateApplicationController {
       this.state = {
         DeploymentType: ApplicationDeploymentTypes.REPLICATED,
         PublishingType: ApplicationPublishingTypes.INTERNAL,
+        actionInProgress: false,
       };
 
       this.ApplicationDeploymentTypes = ApplicationDeploymentTypes;
