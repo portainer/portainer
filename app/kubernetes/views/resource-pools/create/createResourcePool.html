@@ -52,7 +52,7 @@
                   Memory limit
                 </label>
                 <div class="col-sm-3">
-                  <slider model="ctrl.formValues.MemoryLimit" floor="ctrl.defaults.MemoryLimit" ceil="ctrl.state.sliderMaxMemory" step="256" ng-if="ctrl.state.sliderMaxMemory"></slider>
+                  <slider model="ctrl.formValues.MemoryLimit" floor="ctrl.defaults.MemoryLimit" ceil="ctrl.state.sliderMaxMemory" step="128" ng-if="ctrl.state.sliderMaxMemory"></slider>
                 </div>
                 <div class="col-sm-2">
                   <input name="memory_limit" type="number" min="{{ctrl.defaults.MemoryLimit}}" max="{{ctrl.state.sliderMaxMemory}}" class="form-control" ng-model="ctrl.formValues.MemoryLimit" id="memory-limit" required>
