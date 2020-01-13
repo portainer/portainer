@@ -95,8 +95,6 @@ class KubernetesCreateApplicationController {
       this.ApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
       this.ApplicationPublishingTypes = KubernetesApplicationPublishingTypes;
 
-      // TODO: LP validation required
-      // Wasn't sure if that should have been part of some other object so I put all these directly in the scope.
       this.resourcePools = await this.KubernetesResourcePoolService.resourcePools();
       this.formValues.ResourcePool = this.resourcePools[0];
 
