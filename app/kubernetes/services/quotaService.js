@@ -36,7 +36,8 @@ angular.module("portainer.kubernetes").factory("KubernetesResourceQuotaService",
       try {
         const payload = {
           metadata: {
-            name: namespace
+            name: 'portainer-rq-' + namespace,
+            namespace: namespace
           },
           spec: {
             hard: {
@@ -77,11 +78,11 @@ angular.module("portainer.kubernetes").factory("KubernetesResourceQuotaService",
     /**
      * Delete
      */
-    async function removeAsync(name) {
+    async function removeAsync(quota) {
       try {
         const payload = {
-          namespace: name,
-          id: name
+          namespace: quota.Namespace,
+          id: quota.Name
         };
         await KubernetesResourceQuotas.delete(payload).$promise;
       } catch (err) {
@@ -89,8 +90,8 @@ angular.module("portainer.kubernetes").factory("KubernetesResourceQuotaService",
       }
     }
 
-    function remove(name) {
-      return $async(removeAsync, name);
+    function remove(quota) {
+      return $async(removeAsync, quota);
     }
 
     return service;

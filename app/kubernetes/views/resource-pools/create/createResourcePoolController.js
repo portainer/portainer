@@ -3,14 +3,6 @@ import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import { KubernetesResourceQuotaDefaults } from 'Kubernetes/models/resourceQuota';
 
-/**
- * IMPORTANT NOTICE
- * This view assumes that only 1 quota can exist at a time in the resource pool (1 quota per namespace)
- * The created quota here will have the same name as the underlying namespace
- *
- * TODO: this view needs a refactor to allow users working with multiple quotas inside the same namespace
- */
-
 function megaBytesValue(mem) {
   return Math.floor(mem / 1000 / 1000);
 }

@@ -1,15 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
-import { KubernetesResourceQuotaDefaults } from 'Kubernetes/models/resourceQuota';
-
-/**
- * IMPORTANT NOTICE
- * This view assumes that only 1 quota can exist at a time in the resource pool (1 quota per namespace)
- * Modifying the quota here will only modify the first quota of the list returned by Kubernetes API, regarding of its name or list order
- * 
- * TODO: this view needs a refactor to allow users working with multiple quotas inside the same namespace
- */
+import { KubernetesResourceQuotaDefaults, KubernetesPortainerQuotaSuffix } from 'Kubernetes/models/resourceQuota';
 
 function megaBytesValue(mem) {
   return Math.floor(mem / 1000 / 1000);
@@ -54,17 +46,18 @@ class KubernetesEditResourcePoolController {
 
   async updateResourcePoolAsync() {
     this.state.actionInProgress = true;
-    const memoryLimit = bytesValue(this.formValues.MemoryLimit);
     try {
       this.checkDefaults(); 
+      const memoryLimit = bytesValue(this.formValues.MemoryLimit);
+      const quota = _.find(this.pool.Quotas, (item) => item.Name === KubernetesPortainerQuotaSuffix + item.Namespace);
       if (this.formValues.hasQuota) {
-        if (this.pool.Quotas.length) {
-          await this.KubernetesResourceQuotaService.update(this.pool.Quotas[0].Raw, this.formValues.CpuLimit, memoryLimit);
+        if (quota) {
+          await this.KubernetesResourceQuotaService.update(quota.Raw, this.formValues.CpuLimit, memoryLimit);
         } else {
           await this.KubernetesResourceQuotaService.create(this.pool.Namespace.Name, this.formValues.CpuLimit, memoryLimit);
         }
-      } else if (this.pool.Quotas.length) {
-        await this.KubernetesResourceQuotaService.remove(this.pool.Namespace.Name);
+      } else if (quota) {
+        await this.KubernetesResourceQuotaService.remove(quota);
       }
       this.Notifications.success('Resource pool successfully updated', this.pool.Namespace.Name);
       this.$state.reload();

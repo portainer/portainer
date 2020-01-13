@@ -12,8 +12,8 @@ angular.module('portainer.kubernetes')
             timeout: 15000,
             url: API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/api/v1/resourcequotas',
           },
-          create: { method: 'POST', params: { namespace: '@metadata.name' } },
-          update: { method: 'PUT', params: { namespace: '@metadata.name', id: '@metadata.name' } },
+          create: { method: 'POST', params: { namespace: '@metadata.namespace' } },
+          update: { method: 'PUT', params: { namespace: '@metadata.namespace', id: '@metadata.name' } },
           delete: { method: 'DELETE'},
         });
     }]);
