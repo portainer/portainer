@@ -1,4 +1,5 @@
 import angular from 'angular';
+import {ApplicationDeploymentTypes, ApplicationPublishingTypes} from 'Kubernetes/models/application';
 
 class KubernetesCreateApplicationController {
   /* @ngInject */
@@ -23,20 +24,8 @@ class KubernetesCreateApplicationController {
     this.formValues.EnvironmentVariables.splice(index, 1);
   }
 
-  // TODO: LP validation required
-  // Wasn't sure if check on length should have been done in the html directly so I created this function.
   hasEnvironmentVariables() {
     return this.formValues.EnvironmentVariables.length > 0;
-  }
-
-  // TODO: temporary mock, should be updated based on endpoint kubernetes configuration
-  storageClassAvailable() {
-    return true;
-  }
-
-  // TODO: temporary mock, should be updated based on endpoint kubernetes configuration
-  hasMultipleStorageClassesAvailable() {
-    return true;
   }
 
   addPersistedFolder() {
@@ -51,27 +40,6 @@ class KubernetesCreateApplicationController {
 
   removePersistedFolder(index) {
     this.formValues.PersistedFolders.splice(index, 1);
-  }
-
-  // TODO: LP validation required
-  // Wasn't sure if we were going full functions or if check on variables in ng-if still ok in HTML so created a func
-  isDeploymentReplicated() {
-    return this.state.DeploymentType === 'replicated';
-  }
-
-  // Same as above
-  isPublishingCluster() {
-    return this.state.PublishingType === 'cluster';
-  }
-
-  // Same as above
-  isPublishingLoadBalancer() {
-    return this.state.PublishingType === 'loadbalancer';
-  }
-
-  // TODO: temporary mock, should be updated based on endpoint kubernetes configuration
-  publishViaLoadBalancerEnabled() {
-    return true;
   }
 
   addPublishedPort() {
@@ -89,6 +57,21 @@ class KubernetesCreateApplicationController {
     this.formValues.PublishedPorts.splice(index, 1);
   }
 
+  // TODO: temporary mock, should be updated based on endpoint kubernetes configuration
+  storageClassAvailable() {
+    return true;
+  }
+
+  // TODO: temporary mock, should be updated based on endpoint kubernetes configuration
+  hasMultipleStorageClassesAvailable() {
+    return true;
+  }
+
+  // TODO: temporary mock, should be updated based on endpoint kubernetes configuration
+  publishViaLoadBalancerEnabled() {
+    return true;
+  }
+
   async onInit() {
     try {
       this.formValues = {
@@ -100,13 +83,17 @@ class KubernetesCreateApplicationController {
       };
 
       this.state = {
-        DeploymentType: 'replicated',
-        PublishingType: 'internal',
+        DeploymentType: ApplicationDeploymentTypes.REPLICATED,
+        PublishingType: ApplicationPublishingTypes.INTERNAL,
       };
+
+      this.ApplicationDeploymentTypes = ApplicationDeploymentTypes;
+      this.ApplicationPublishingTypes = ApplicationPublishingTypes;
 
       // TODO: LP validation required
       // Wasn't sure if that should have been part of some other object so I put all these directly in the scope.
       this.resourcePools = [];
+
       // Part of the endpoint Kubernetes configuration
       this.storageClasses = [];
       this.stacks = [];

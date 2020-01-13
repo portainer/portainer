@@ -201,7 +201,7 @@
           <div class="form-group" style="margin-bottom: 0">
             <div class="boxselector_wrapper">
               <div>
-                <input type="radio" id="deployment_replicated" value="replicated" ng-model="ctrl.state.DeploymentType">
+                <input type="radio" id="deployment_replicated" ng-value="ctrl.ApplicationDeploymentTypes.REPLICATED" ng-model="ctrl.state.DeploymentType">
                 <label for="deployment_replicated">
                   <div class="boxselector_header">
                     <i class="fa fa-cube" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -211,7 +211,7 @@
                 </label>
               </div>
               <div>
-                <input type="radio" id="deployment_global" value="global" ng-model="ctrl.state.DeploymentType">
+                <input type="radio" id="deployment_global" ng-value="ctrl.ApplicationDeploymentTypes.GLOBAL" ng-model="ctrl.state.DeploymentType">
                 <label for="deployment_global">
                   <div class="boxselector_header">
                     <i class="fa fa-cubes" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -225,7 +225,7 @@
           <!-- !deployment options -->
 
           <!-- replica count -->
-          <div class="form-group form-inline" ng-if="ctrl.isDeploymentReplicated()">
+          <div class="form-group form-inline" ng-if="ctrl.state.DeploymentType === ctrl.ApplicationDeploymentTypes.REPLICATED">
             <div class="col-sm-12">
               <label class="control-label text-left">
                 Replica count
@@ -287,7 +287,7 @@
           <div class="form-group" style="margin-bottom: 0">
             <div class="boxselector_wrapper">
               <div>
-                <input type="radio" id="publishing_internal" value="internal" ng-model="ctrl.state.PublishingType">
+                <input type="radio" id="publishing_internal" ng-value="ctrl.ApplicationPublishingTypes.INTERNAL" ng-model="ctrl.state.PublishingType">
                 <label for="publishing_internal">
                   <div class="boxselector_header">
                     <i class="fa fa-list-alt" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -297,7 +297,7 @@
                 </label>
               </div>
               <div>
-                <input type="radio" id="publishing_cluster" value="cluster" ng-model="ctrl.state.PublishingType">
+                <input type="radio" id="publishing_cluster" ng-value="ctrl.ApplicationPublishingTypes.CLUSTER" ng-model="ctrl.state.PublishingType">
                 <label for="publishing_cluster">
                   <div class="boxselector_header">
                     <i class="fa fa-list" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -307,7 +307,7 @@
                 </label>
               </div>
               <div ng-if="ctrl.publishViaLoadBalancerEnabled()">
-                <input type="radio" id="publishing_loadbalancer" value="loadbalancer" ng-model="ctrl.state.PublishingType">
+                <input type="radio" id="publishing_loadbalancer" ng-value="ctrl.ApplicationPublishingTypes.LOADBALANCER" ng-model="ctrl.state.PublishingType">
                 <label for="publishing_loadbalancer">
                   <div class="boxselector_header">
                     <i class="fa fa-project-diagram" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -323,16 +323,16 @@
           <!-- published ports -->
           <div class="form-group">
 
+            <div class="col-sm-12 small text-muted" style="margin-top: 10px;" ng-if="ctrl.state.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER">
+              <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+              When publishing a port in cluster mode, the node port is optional. If left empty Kubernetes will use a random port number. If you wish to specify a port, use a port number inside the default range <code>30000-32767</code>.
+            </div>
+
             <div class="col-sm-12" style="margin-top: 5px;">
               <label class="control-label text-left">Published ports</label>
               <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addPublishedPort()">
                 <i class="fa fa-plus-circle" aria-hidden="true"></i> publish a new port
               </span>
-            </div>
-
-            <div class="col-sm-12 small text-muted" style="margin-top: 10px;" ng-if="ctrl.isPublishingCluster()">
-              <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-              The node port is optional, if left empty Kubernetes will use a random port number. If you wish to specify a port, use a port number inside the default range <code>30000-32767</code>.
             </div>
 
             <div class="col-sm-12 form-inline" style="margin-top: 10px;">
@@ -343,12 +343,12 @@
                   <input type="number" class="form-control" ng-model="publishedPort.ContainerPort" placeholder="80">
                 </div>
 
-                <div class="input-group col-sm-5 input-group-sm" ng-if="ctrl.isPublishingCluster()">
+                <div class="input-group col-sm-5 input-group-sm" ng-if="ctrl.state.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER">
                   <span class="input-group-addon">node port</span>
                   <input type="number" class="form-control" ng-model="publishedPort.NodePort" placeholder="80">
                 </div>
 
-                <div class="input-group col-sm-5 input-group-sm" ng-if="ctrl.isPublishingLoadBalancer()">
+                <div class="input-group col-sm-5 input-group-sm" ng-if="ctrl.state.PublishingType === ctrl.ApplicationPublishingTypes.LOADBALANCER">
                   <span class="input-group-addon">load balancer port</span>
                   <input type="number" class="form-control" ng-model="publishedPort.LoadBalancerPort" placeholder="80" value="8080">
                 </div>
