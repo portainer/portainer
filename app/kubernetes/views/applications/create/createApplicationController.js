@@ -1,5 +1,8 @@
 import angular from 'angular';
-import {ApplicationDeploymentTypes, ApplicationPublishingTypes} from 'Kubernetes/models/application';
+import {
+  KubernetesApplicationDeploymentTypes,
+  KubernetesApplicationPublishingTypes
+} from 'Kubernetes/models/application';
 
 class KubernetesCreateApplicationController {
   /* @ngInject */
@@ -84,13 +87,13 @@ class KubernetesCreateApplicationController {
       };
 
       this.state = {
-        DeploymentType: ApplicationDeploymentTypes.REPLICATED,
-        PublishingType: ApplicationPublishingTypes.INTERNAL,
+        DeploymentType: KubernetesApplicationDeploymentTypes.REPLICATED,
+        PublishingType: KubernetesApplicationPublishingTypes.INTERNAL,
         actionInProgress: false,
       };
 
-      this.ApplicationDeploymentTypes = ApplicationDeploymentTypes;
-      this.ApplicationPublishingTypes = ApplicationPublishingTypes;
+      this.ApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
+      this.ApplicationPublishingTypes = KubernetesApplicationPublishingTypes;
 
       // TODO: LP validation required
       // Wasn't sure if that should have been part of some other object so I put all these directly in the scope.
