@@ -3,9 +3,10 @@ import {ApplicationDeploymentTypes, ApplicationPublishingTypes} from 'Kubernetes
 
 class KubernetesCreateApplicationController {
   /* @ngInject */
-  constructor($async, $state) {
+  constructor($async, $state, KubernetesResourcePoolService) {
     this.$async = $async;
     this.$state = $state;
+    this.KubernetesResourcePoolService = KubernetesResourcePoolService;
 
     this.onInit = this.onInit.bind(this);
   }
@@ -92,10 +93,12 @@ class KubernetesCreateApplicationController {
 
       // TODO: LP validation required
       // Wasn't sure if that should have been part of some other object so I put all these directly in the scope.
-      this.resourcePools = [];
+      this.resourcePools = await this.KubernetesResourcePoolService.resourcePools();
+      this.formValues.ResourcePool = this.resourcePools[0];
 
       // Part of the endpoint Kubernetes configuration
       this.storageClasses = [];
+
       this.stacks = [];
 
     } catch (err) {

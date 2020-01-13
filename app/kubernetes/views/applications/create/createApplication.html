@@ -21,7 +21,7 @@
             <label for="resource-pool-selector" class="col-sm-1 control-label text-left">Resource pool</label>
             <div class="col-sm-11">
               <select class="form-control" id="resource-pool-selector"
-                      ng-model="$ctrl.resourcePools" ng-options="resourcePool.Name as resourcePool.Name for resourcePool in $ctrl.resourcePools"
+                      ng-model="ctrl.formValues.ResourcePool" ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools"
               ></select>
             </div>
           </div>
@@ -64,7 +64,7 @@
                       placeholder="myStack"
                       ng-model="ctrl.formValues.StackName"
                       name="stack_name"
-                      uib-typeahead="stack.Name for stack in $ctrl.stacks | filter:$viewValue | limitTo:7"
+                      uib-typeahead="stack.Name for stack in ctrl.stacks | filter:$viewValue | limitTo:7"
                       typeahead-show-hint="true" typeahead-min-length="0" />
             </div>
           </div>
@@ -171,7 +171,7 @@
                 <div class="input-group col-sm-3 input-group-sm" ng-if="ctrl.hasMultipleStorageClassesAvailable()">
                   <span class="input-group-addon">storage</span>
                   <select class="form-control"
-                          ng-model="persistedFolder.StorageClass" ng-options="storageClass as storageClass for storageClass in $ctrl.storageClasses"
+                          ng-model="persistedFolder.StorageClass" ng-options="storageClass for storageClass in ctrl.storageClasses"
                   ></select>
                 </div>
 
