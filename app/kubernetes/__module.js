@@ -123,6 +123,18 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     }
   };
 
+  const stacks = {
+    name: 'kubernetes.stacks',
+    url: '/stacks',
+    views: {
+      'content@': {
+        templateUrl: './views/stacks/stacks.html',
+        controller: 'KubernetesStacksController',
+        controllerAs: 'ctrl'
+      }
+    }
+  };
+
   $stateRegistryProvider.register(kubernetes);
   $stateRegistryProvider.register(applications);
   $stateRegistryProvider.register(applicationCreation);
@@ -133,4 +145,5 @@ angular.module('portainer.kubernetes', ['portainer.app'])
   $stateRegistryProvider.register(resourcePools);
   $stateRegistryProvider.register(resourcePoolCreation);
   $stateRegistryProvider.register(resourcePool);
+  $stateRegistryProvider.register(stacks);
 }]);
