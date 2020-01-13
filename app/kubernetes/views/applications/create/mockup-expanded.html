@@ -431,6 +431,44 @@
           <!-- !deployment options -->
 
           <div class="col-sm-12 form-section-title">
+            Resources
+          </div>
+
+          <!-- memory-limit-input -->
+          <div class="form-group">
+            <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
+              Memory limit
+            </label>
+            <div class="col-sm-3">
+              <slider model="" floor="0" ceil="2048" step="128"></slider>
+            </div>
+            <div class="col-sm-2">
+              <input name="memory_limit" type="number" min="0" max="2048" class="form-control" id="memory-limit" required>
+            </div>
+            <div class="col-sm-4">
+              <p class="small text-muted" style="margin-top: 7px;">
+                Memory limit (<b>MB</b>)
+              </p>
+            </div>
+          </div>
+          <!-- !memory-limit-input -->
+          <!-- cpu-limit-input -->
+          <div class="form-group">
+            <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
+              CPU limit
+            </label>
+            <div class="col-sm-5">
+              <slider floor="0" ceil="4" step="0.25" precision="2"></slider>
+            </div>
+            <div class="col-sm-4" style="margin-top: 20px;">
+              <p class="small text-muted">
+                Maximum CPU usage
+              </p>
+            </div>
+          </div>
+          <!-- !cpu-limit-input -->
+
+          <div class="col-sm-12 form-section-title">
             Publishing the application (internal option selected)
           </div>
 
