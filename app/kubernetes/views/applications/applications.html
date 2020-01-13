@@ -1,0 +1,19 @@
+<rd-header>
+  <rd-header-title title-text="Applications list">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="kubernetes.applications" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>Applications</rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <kubernetes-applications-datatable
+            title-text="Applications" title-icon="fa-laptop-code"
+            dataset="ctrl.applications" table-key="kubernetes.applications"
+            order-by=""
+            refresh-callback=""
+    ></kubernetes-applications-datatable>
+  </div>
+</div>

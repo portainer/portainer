@@ -22,13 +22,13 @@ angular.module('portainer.kubernetes', ['portainer.app'])
   var applications = {
     name: 'kubernetes.applications',
     url: '/applications',
-    // views: {
-    //   'content@': {
-    //     templateUrl: './views/applications/applications.html',
-    //     controller: 'KubernetesApplicationsController',
-    //     controllerAs: 'ctrl'
-    //   }
-    // }
+    views: {
+      'content@': {
+        templateUrl: './views/applications/applications.html',
+        controller: 'KubernetesApplicationsController',
+        controllerAs: 'ctrl'
+      }
+    }
   };
 
   const applicationCreateMockup = {
@@ -36,9 +36,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     url: '/mockup1',
     views: {
       'content@': {
-        templateUrl: './views/applications/create/mockup.html',
-        // controller: 'KubernetesCreateApplicationController',
-        // controllerAs: 'ctrl'
+        templateUrl: './views/applications/create/mockup.html'
       }
     }
   };
@@ -48,9 +46,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     url: '/mockup2',
     views: {
       'content@': {
-        templateUrl: './views/applications/create/mockup-expanded.html',
-        // controller: 'KubernetesCreateApplicationController',
-        // controllerAs: 'ctrl'
+        templateUrl: './views/applications/create/mockup-expanded.html'
       }
     }
   };
