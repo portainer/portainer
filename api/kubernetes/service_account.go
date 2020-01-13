@@ -13,6 +13,7 @@ import (
 )
 
 const (
+	defaultNamespace     = "default"
 	portainerNamespace   = "ns-portainer"
 	namespaceListCRName  = "portainer-cr-list-namespaces"
 	namespaceListCRBName = "portainer-crb-list-namespaces"
@@ -151,7 +152,7 @@ func (kcl *KubeClient) ensureServiceAccountHasClusterNamespaceListRole(serviceAc
 }
 
 func (kcl *KubeClient) ensureServiceAccountHasEditRoleInDefaultNamespace(serviceAccountName string) error {
-	roleBinding, err := kcl.cli.RbacV1().RoleBindings("default").Get(defaultRBName, metav1.GetOptions{})
+	roleBinding, err := kcl.cli.RbacV1().RoleBindings(defaultNamespace).Get(defaultRBName, metav1.GetOptions{})
 	if k8serrors.IsNotFound(err) {
 		roleBinding = &rbacv1.RoleBinding{
 			ObjectMeta: metav1.ObjectMeta{
@@ -170,7 +171,7 @@ func (kcl *KubeClient) ensureServiceAccountHasEditRoleInDefaultNamespace(service
 			},
 		}
 
-		_, err = kcl.cli.RbacV1().RoleBindings("default").Create(roleBinding)
+		_, err = kcl.cli.RbacV1().RoleBindings(defaultNamespace).Create(roleBinding)
 		return err
 	} else if err != nil {
 		return err
@@ -188,7 +189,7 @@ func (kcl *KubeClient) ensureServiceAccountHasEditRoleInDefaultNamespace(service
 		Namespace: portainerNamespace,
 	})
 
-	_, err = kcl.cli.RbacV1().RoleBindings("default").Update(roleBinding)
+	_, err = kcl.cli.RbacV1().RoleBindings(defaultNamespace).Update(roleBinding)
 	return err
 }
 
