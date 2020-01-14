@@ -46,7 +46,8 @@ angular.module("portainer.kubernetes").factory("KubernetesDaemonSetService", [
                 containers: [
                   {
                     name: daemonSet.Name,
-                    image: daemonSet.Image
+                    image: daemonSet.Image,
+                    env: daemonSet.Env
                   }
                 ]
               }

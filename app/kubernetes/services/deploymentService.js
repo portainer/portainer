@@ -38,7 +38,8 @@ angular.module("portainer.kubernetes").factory("KubernetesDeploymentService", [
                 containers: [
                   {
                     name: deployment.Name,
-                    image: deployment.Image
+                    image: deployment.Image,
+                    env: deployment.Env
                   }
                 ]
               }
