@@ -10,10 +10,11 @@ import {
 
 class KubernetesCreateApplicationController {
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesResourcePoolService, KubernetesApplicationService) {
+  constructor($async, $state, Notifications, EndpointProvider, KubernetesResourcePoolService, KubernetesApplicationService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
+    this.EndpointProvider = EndpointProvider;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesApplicationService = KubernetesApplicationService;
 
@@ -62,10 +63,8 @@ class KubernetesCreateApplicationController {
     return this.storageClasses && this.storageClasses.length > 1;
   }
 
-  // TODO: temporary mock
-  // Should be retrieved from endpoint Kubernetes configuration
   publishViaLoadBalancerEnabled() {
-    return true;
+    return this.state.useLoadBalancer;
   }
 
   async deployApplicationAsync() {
@@ -98,18 +97,17 @@ class KubernetesCreateApplicationController {
 
       this.state = {
         actionInProgress: false,
+        useLoadBalancer: false
       };
 
       this.ApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
       this.ApplicationPublishingTypes = KubernetesApplicationPublishingTypes;
-
       this.resourcePools = await this.KubernetesResourcePoolService.resourcePools();
       this.formValues.ResourcePool = this.resourcePools[0];
 
-      // TODO: temporary mock
-      // Assumes a single StorageClass available called 'standard' (minikube environment)
-      // Should be retrieved from endpoint Kubernetes configuration
-      this.storageClasses = ['standard'];
+      const endpoint = this.EndpointProvider.currentEndpoint();
+      this.storageClasses = endpoint.Kubernetes.Configuration.StorageClasses;
+      this.state.useLoadBalancer = endpoint.Kubernetes.Configuration.UseLoadBalancer;
 
       this.stacks = [];
 
