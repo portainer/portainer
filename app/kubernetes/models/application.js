@@ -13,6 +13,37 @@ export function KubernetesApplicationFormValues() {
   this.PublishingType = KubernetesApplicationPublishingTypes.INTERNAL;
 }
 
+export function KubernetesApplicationEnvironmentVariableFormValue() {
+  const envVar = {
+    Name: '',
+    Value: '',
+    IsSecret: false
+  };
+
+  return envVar;
+}
+
+export function KubernetesApplicationPersistedFolderFormValue() {
+  const persistedFolder = {
+    ContainerPath: '',
+    Size: '',
+    StorageClass: ''
+  };
+
+  return persistedFolder;
+}
+
+export function KubernetesApplicationPublishedPortFormValue() {
+  const publishedPort = {
+    ContainerPort: '',
+    NodePort: '',
+    LoadBalancerPort: '',
+    Protocol: 'TCP'
+  };
+
+  return publishedPort;
+}
+
 export const KubernetesApplicationDeploymentTypes = Object.freeze({
   'REPLICATED': 1,
   'GLOBAL': 2

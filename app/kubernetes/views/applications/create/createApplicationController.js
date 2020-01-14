@@ -1,7 +1,10 @@
 import angular from 'angular';
 import {
   KubernetesApplicationDeploymentTypes,
+  KubernetesApplicationEnvironmentVariableFormValue,
   KubernetesApplicationFormValues,
+  KubernetesApplicationPersistedFolderFormValue,
+  KubernetesApplicationPublishedPortFormValue,
   KubernetesApplicationPublishingTypes
 } from 'Kubernetes/models/application';
 
@@ -19,13 +22,7 @@ class KubernetesCreateApplicationController {
   }
 
   addEnvironmentVariable() {
-    const envVar = {
-      Name: '',
-      Value: '',
-      IsSecret: false
-    };
-
-    this.formValues.EnvironmentVariables.push(envVar);
+    this.formValues.EnvironmentVariables.push(new KubernetesApplicationEnvironmentVariableFormValue());
   }
 
   removeEnvironmentVariable(index) {
@@ -37,13 +34,7 @@ class KubernetesCreateApplicationController {
   }
 
   addPersistedFolder() {
-    const persistedFolder = {
-      ContainerPath: '',
-      Size: '',
-      StorageClass: ''
-    };
-
-    this.formValues.PersistedFolders.push(persistedFolder);
+    this.formValues.PersistedFolders.push(new KubernetesApplicationPersistedFolderFormValue());
   }
 
   removePersistedFolder(index) {
@@ -51,14 +42,7 @@ class KubernetesCreateApplicationController {
   }
 
   addPublishedPort() {
-    const publishedPort = {
-      ContainerPort: '',
-      NodePort: '',
-      LoadBalancerPort: '',
-      Protocol: 'tcp'
-    };
-
-    this.formValues.PublishedPorts.push(publishedPort);
+    this.formValues.PublishedPorts.push(new KubernetesApplicationPublishedPortFormValue());
   }
 
   removePublishedPort(index) {
