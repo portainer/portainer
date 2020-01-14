@@ -22,22 +22,23 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
       try {
         if (applicationFormValues.DeploymentType === KubernetesApplicationDeploymentTypes.REPLICATED) {
           const deployment = new KubernetesDeploymentModelFromApplication(applicationFormValues);
-          await KubernetesDeploymentService.create(deployment).$promise;
+          await KubernetesDeploymentService.create(deployment);
         } else {
           const daemonSet = new KubernetesDaemonSetModelFromApplication(applicationFormValues);
-          await KubernetesDaemonSetService.create(daemonSet).$promise;
+          await KubernetesDaemonSetService.create(daemonSet);
         }
 
         const service = new KubernetesServiceModelFromApplication(applicationFormValues);
         if (service.Ports.length === 0) {
+          return;
           // TODO: review @LP
           // Basically if a service has no ports defined, we should not create a Service object.
           // I didn't know how to return an empty promise or something else here so asking for your help :-)
         }
 
-        return await KubernetesServiceService.create(service).$promise;
+        return await KubernetesServiceService.create(service);
       } catch (err) {
-        throw { msg: 'Unable to create application', err:err };
+        throw err;
       }
     }
 

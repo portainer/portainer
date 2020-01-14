@@ -55,11 +55,11 @@ class KubernetesCreateApplicationController {
   }
 
   storageClassAvailable() {
-    return this.storageClasses.length > 0;
+    return this.storageClasses && this.storageClasses.length > 0;
   }
 
   hasMultipleStorageClassesAvailable() {
-    return this.storageClasses.length > 1;
+    return this.storageClasses && this.storageClasses.length > 1;
   }
 
   // TODO: temporary mock
