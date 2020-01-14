@@ -26,11 +26,11 @@ export function KubernetesApplicationEnvironmentVariableFormValue() {
   return envVar;
 }
 
-export function KubernetesApplicationPersistedFolderFormValue() {
+export function KubernetesApplicationPersistedFolderFormValue(storageClass) {
   const persistedFolder = {
     ContainerPath: '',
     Size: '',
-    StorageClass: ''
+    StorageClass: storageClass
   };
 
   return persistedFolder;

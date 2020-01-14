@@ -34,7 +34,12 @@ class KubernetesCreateApplicationController {
   }
 
   addPersistedFolder() {
-    this.formValues.PersistedFolders.push(new KubernetesApplicationPersistedFolderFormValue());
+    let storageClass = '';
+    if (this.storageClasses.length === 1) {
+      storageClass = this.storageClasses[0];
+    }
+
+    this.formValues.PersistedFolders.push(new KubernetesApplicationPersistedFolderFormValue(storageClass));
   }
 
   removePersistedFolder(index) {
@@ -49,17 +54,16 @@ class KubernetesCreateApplicationController {
     this.formValues.PublishedPorts.splice(index, 1);
   }
 
-  // TODO: temporary mock, should be updated based on endpoint kubernetes configuration
   storageClassAvailable() {
-    return true;
+    return this.storageClasses.length > 0;
   }
 
-  // TODO: temporary mock, should be updated based on endpoint kubernetes configuration
   hasMultipleStorageClassesAvailable() {
-    return true;
+    return this.storageClasses.length > 1;
   }
 
-  // TODO: temporary mock, should be updated based on endpoint kubernetes configuration
+  // TODO: temporary mock
+  // Should be retrieved from endpoint Kubernetes configuration
   publishViaLoadBalancerEnabled() {
     return true;
   }
@@ -68,13 +72,13 @@ class KubernetesCreateApplicationController {
     this.state.actionInProgress = true;
     try {
       // TODO: review @LP
-      // Ultimately using the approach I proposed, it make the controller code quite clear and most of the function
-      // are only associated to model/view manipulation.
+      // Ultimately using the approach I proposed, it make the controller code quite clear and most of the functions
+      // in the controller are only associated to model/view manipulation.
       await this.KubernetesApplicationService.create(this.formValues);
 
       // TODO: review @LP
       // even if the create above fails (deployment/daemonset create request fails and/or service create request fails)
-      // it stills show a success notification
+      // it still shows a success notification
       this.Notifications.success('Application successfully deployed', this.formValues.Name);
       this.$state.go('kubernetes.applications');
     } catch (err) {
@@ -102,8 +106,10 @@ class KubernetesCreateApplicationController {
       this.resourcePools = await this.KubernetesResourcePoolService.resourcePools();
       this.formValues.ResourcePool = this.resourcePools[0];
 
-      // Part of the endpoint Kubernetes configuration
-      this.storageClasses = [];
+      // TODO: temporary mock
+      // Assumes a single StorageClass available called 'standard' (minikube environment)
+      // Should be retrieved from endpoint Kubernetes configuration
+      this.storageClasses = ['standard'];
 
       this.stacks = [];
 
