@@ -20,15 +20,20 @@ export function KubernetesApplicationViewModel(type, data, service) {
   this.Image = data.spec.template.spec.containers[0].image;
   this.CreatedAt = data.metadata.creationTimestamp;
 
-  if (service && service.spec.type === 'LoadBalancer') {
-    this.PublishedPorts = _.map(service.spec.ports, (port) => {
-      if (service.status.loadBalancer.ingress && service.status.loadBalancer.ingress.length > 0) {
-        port.IPAddress = service.status.loadBalancer.ingress[0].ip || service.status.loadBalancer.ingress[0].hostname;
-      }
-      return port;
-    });
-  } else if (service) {
-    this.PublishedPorts = service.spec.ports;
+  if (service) {
+    const serviceType = service.spec.type;
+    this.ServiceType = serviceType;
+
+    if (serviceType === 'LoadBalancer') {
+      this.PublishedPorts = _.map(service.spec.ports, (port) => {
+        if (service.status.loadBalancer.ingress && service.status.loadBalancer.ingress.length > 0) {
+          port.IPAddress = service.status.loadBalancer.ingress[0].ip || service.status.loadBalancer.ingress[0].hostname;
+        }
+        return port;
+      });
+    } else {
+      this.PublishedPorts = service.spec.ports;
+    }
   } else {
     this.PublishedPorts = [];
   }
