@@ -58,13 +58,78 @@
           <thead>
             <tr>
               <th>
-                Name
+                <a ng-click="$ctrl.changeOrderBy('Name')">
+                  Name
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('stack')">
+                  Stack
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'stack' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'stack' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('ResourcePool')">
+                  Resource pool
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourcePool' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourcePool' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('Image')">
+                  Image
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Image' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Image' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('RunningPodsCount')">
+                  Deployment
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'RunningPodsCount' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'RunningPodsCount' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('PublishedPorts')">
+                  Published ports
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'PublishedPorts' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'PublishedPorts' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('CreatedAt')">
+                  Creation date
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreatedAt' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreatedAt' && $ctrl.state.reverseOrder"></i>
+                </a>
               </th>
             </tr>
           </thead>
           <tbody>
             <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))" ng-class="{active: item.Checked}">
               <td><a ui-sref="kubernetes.applications.application({ id: item.Name })">{{ item.Name }}</a></td>
+              <td>{{ item.Stack }}</td>
+              <td>{{ item.ResourcePool }}</td>
+              <td>{{ item.Image }}</td>
+              <td>
+                <span ng-if="item.DeploymentType === $ctrl.deploymentTypes.REPLICATED">Replicated</span>
+                <span ng-if="item.DeploymentType === $ctrl.deploymentTypes.GLOBAL">Global</span>
+                - {{ item.RunningPodsCount }} / {{ item.TotalPodsCount }}</td>
+              <td>
+                <span ng-if="item.PublishedPorts.length" ng-repeat="port in item.PublishedPorts track by $index">
+                  <a ng-if="port.IPAddress" class="image-tag" ng-href="http://{{ port.IPAddress }}:{{ port.port }}" target="_blank">
+                    <i class="fa fa-external-link-alt" aria-hidden="true"></i> {{ port.port }}:{{ port.targetPort }}
+                  </a>
+                  <span ng-if="!port.IPAddress">{{ port.port }}:{{ port.targetPort }} / {{ port.protocol }}</span>
+                  <br/>
+                </span>
+                <span ng-if="!item.PublishedPorts">-</span>
+              </td>
+              <td>{{ item.CreatedAt | getisodate }}</td>
+            </tr>
             </tr>
             <tr ng-if="!$ctrl.dataset">
               <td colspan="1" class="text-center text-muted">Loading...</td>

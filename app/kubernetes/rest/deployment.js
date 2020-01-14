@@ -7,6 +7,10 @@ angular.module('portainer.kubernetes')
         endpointId: EndpointProvider.endpointID
       },
       {
+        query: {
+          method: 'GET',
+          url: API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/apis/apps/v1/deployments'
+        },
         create: { method: 'POST', params: { namespace: '@metadata.namespace' } }
       });
   }]);

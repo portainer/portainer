@@ -5,8 +5,25 @@ angular.module("portainer.kubernetes").factory("KubernetesDeploymentService", [
   function KubernetesDeploymentServiceFactory($async, KubernetesDeployments) {
     "use strict";
     const service = {
+      deployments: deployments,
       create: create,
     };
+
+    /**
+     * Deployments
+     */
+    async function deploymentsAsync() {
+      try {
+        const data = await KubernetesDeployments.query().$promise;
+        return data.items;
+      } catch (err) {
+        throw { msg: 'Unable to retrieve deployments', err: err };
+      }
+    }
+
+    function deployments() {
+      return $async(deploymentsAsync);
+    }
 
     /**
      * Creation

@@ -1,5 +1,6 @@
+import _ from 'lodash-es';
 import KubernetesDeploymentModelFromApplication from 'Kubernetes/models/deployment';
-import {KubernetesApplicationDeploymentTypes} from 'Kubernetes/models/application';
+import {KubernetesApplicationDeploymentTypes, KubernetesApplicationViewModel} from 'Kubernetes/models/application';
 import KubernetesDaemonSetModelFromApplication from 'Kubernetes/models/daemonset';
 import KubernetesServiceModelFromApplication from 'Kubernetes/models/service';
 
@@ -8,8 +9,38 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
   function KubernetesApplicationServiceFactory($async, KubernetesDeploymentService, KubernetesDaemonSetService, KubernetesServiceService) {
     "use strict";
     const service = {
+      applications: applications,
       create: create,
     };
+
+    /**
+     * Applications
+     */
+    async function applicationsAsync() {
+      try {
+        const [deployments, daemonSets, services] = await Promise.all([
+          KubernetesDeploymentService.deployments(),
+          KubernetesDaemonSetService.daemonSets(),
+          KubernetesServiceService.services()
+        ]);
+        const deploymentApplications = _.map(deployments, (item) => {
+          const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
+          return new KubernetesApplicationViewModel(KubernetesApplicationDeploymentTypes.REPLICATED, item, service);
+        });
+        const daemonSetApplications = _.map(daemonSets, (item) => {
+          const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
+          return new KubernetesApplicationViewModel(KubernetesApplicationDeploymentTypes.GLOBAL, item, service);
+        });
+        const applications = _.concat(deploymentApplications, daemonSetApplications);
+        return applications;
+      } catch (err) {
+        throw err;
+      }
+    }
+
+    function applications() {
+      return $async(applicationsAsync);
+    }
 
     /**
      * Creation

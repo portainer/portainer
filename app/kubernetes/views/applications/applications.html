@@ -10,10 +10,11 @@
 <div class="row">
   <div class="col-sm-12">
     <kubernetes-applications-datatable
-            title-text="Applications" title-icon="fa-laptop-code"
-            dataset="ctrl.applications" table-key="kubernetes.applications"
-            order-by=""
-            refresh-callback=""
+      title-text="Applications" title-icon="fa-laptop-code"
+      dataset="ctrl.applications" table-key="kubernetes.applications"
+      order-by="Name"
+      deployment-types="ctrl.KubernetesApplicationDeploymentTypes"
+      refresh-callback="ctrl.getApplications"
     ></kubernetes-applications-datatable>
   </div>
 </div>

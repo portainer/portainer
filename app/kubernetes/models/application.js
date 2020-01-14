@@ -1,3 +1,39 @@
+import _ from 'lodash-es';
+
+export function KubernetesApplicationViewModel(type, data, service) {
+  if (type === KubernetesApplicationDeploymentTypes.REPLICATED) {
+    this.DeploymentType = KubernetesApplicationDeploymentTypes.REPLICATED;
+    this.RunningPodsCount = data.status.availableReplicas || data.status.replicas - data.status.unavailableReplicas;
+    this.TotalPodsCount = data.status.replicas;
+  } else if (type === KubernetesApplicationDeploymentTypes.GLOBAL) {
+    this.DeploymentType = KubernetesApplicationDeploymentTypes.GLOBAL;
+    this.RunningPodsCount = data.status.numberAvailable || data.status.desiredNumberScheduled - data.status.numberUnavailable;
+    this.TotalPodsCount = data.status.desiredNumberScheduled;
+  } else {
+    this.DeploymentType = 'Unknown';
+    this.RunningPodsCount = 0;
+    this.TotalPodsCount = 0;
+  }
+  this.Name = data.metadata.name;
+  this.Stack = data.metadata.annotations[KubernetesApplicationStackAnnotationKey] || '-';
+  this.ResourcePool = data.metadata.namespace;
+  this.Image = data.spec.template.spec.containers[0].image;
+  this.CreatedAt = data.metadata.creationTimestamp;
+
+  if (service && service.spec.type === 'LoadBalancer') {
+    this.PublishedPorts = _.map(service.spec.ports, (port) => {
+      if (service.status.loadBalancer.ingress && service.status.loadBalancer.ingress.length > 0) {
+        port.IPAddress = service.status.loadBalancer.ingress[0].ip || service.status.loadBalancer.ingress[0].hostname;
+      }
+      return port;
+    });
+  } else if (service) {
+    this.PublishedPorts = service.spec.ports;
+  } else {
+    this.PublishedPorts = [];
+  }
+}
+
 export function KubernetesApplicationFormValues() {
   this.ResourcePool = '';
   this.Name = '';

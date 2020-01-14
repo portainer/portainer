@@ -5,8 +5,25 @@ angular.module("portainer.kubernetes").factory("KubernetesDaemonSetService", [
   function KubernetesDaemonSetServiceFactory($async, KubernetesDaemonSets) {
     "use strict";
     const service = {
+      daemonSets: daemonSets,
       create: create,
     };
+
+    /**
+     * DaemonSets
+     */
+    async function daemonSetsAsync() {
+      try {
+        const data = await KubernetesDaemonSets.query().$promise;
+        return data.items;
+      } catch (err) {
+        throw { msg: 'Unable to retrieve DaemonSets', err: err };
+      }
+    }
+
+    function daemonSets() {
+      return $async(daemonSetsAsync);
+    }
 
     /**
      * Creation

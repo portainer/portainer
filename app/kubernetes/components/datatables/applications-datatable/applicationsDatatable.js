@@ -5,6 +5,7 @@ angular.module('portainer.kubernetes').component('kubernetesApplicationsDatatabl
     titleText: '@',
     titleIcon: '@',
     dataset: '<',
+    deploymentTypes: '<',
     tableKey: '@',
     orderBy: '@',
     reverseOrder: '<',
