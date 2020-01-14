@@ -42,13 +42,21 @@
           <div class="col-sm-12 form-section-title">
             Available storage options
           </div>
-          <div class="form-group">
+
+          <div class="form-group" ng-if="!ctrl.storageClassAvailable()">
+            <div class="col-sm-12 small text-muted">
+              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+              Unable to detect any storage class available to persist data. Users won't be able to persist application data inside this cluster.
+            </div>
+          </div>
+
+          <div class="form-group" ng-if="ctrl.storageClassAvailable()">
             <span class="col-sm-12 text-muted small">
               Select which storage options will be available for use when deploying applications.
             </span>
           </div>
 
-          <div class="form-group">
+          <div class="form-group" ng-if="ctrl.storageClassAvailable()">
             <div ng-repeat="class in ctrl.availableClasses">
               <div class="col-sm-6">
                 <label class="control-label text-left">

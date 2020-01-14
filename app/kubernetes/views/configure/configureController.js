@@ -15,6 +15,10 @@ class KubernetesConfigureController {
     this.configureAsync = this.configureAsync.bind(this);
   }
 
+  storageClassAvailable() {
+    return this.availableClasses && this.availableClasses.length > 0;
+  }
+
   async configureAsync() {
     try {
       this.state.actionInProgress = true;
@@ -34,7 +38,6 @@ class KubernetesConfigureController {
   configure() {
     return this.$async(this.configureAsync)
   }
-
 
   async onInit() {
     try {
