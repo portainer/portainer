@@ -14,10 +14,6 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
     /**
      * Creation
      */
-    // TODO: review @LP
-    // An application is a composite object that requires the creation of multiple Kubernetes resources
-    // depending on the application configuration. The creation takes the form values and creates the associated resources
-    // using the model conversion functions defined in models/<resource>.js
     async function createAsync(applicationFormValues) {
       try {
         if (applicationFormValues.DeploymentType === KubernetesApplicationDeploymentTypes.REPLICATED) {
@@ -31,9 +27,6 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
         const service = new KubernetesServiceModelFromApplication(applicationFormValues);
         if (service.Ports.length === 0) {
           return;
-          // TODO: review @LP
-          // Basically if a service has no ports defined, we should not create a Service object.
-          // I didn't know how to return an empty promise or something else here so asking for your help :-)
         }
 
         return await KubernetesServiceService.create(service);

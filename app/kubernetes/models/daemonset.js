@@ -1,6 +1,10 @@
-// TODO: review @LP
+// TODO: review on architecture/refactor meeting
 // As for deployments, I've created a function that creates a model for DaemonSet object from the ApplicationFormValues
 // model defined in model/application.js
+// This is basically a "converter" function from the form values to a temporary model that can be used to create a payload
+// Maybe convert directly to payload? As this model is only used to create payloads at the moment.
+// If it is used elsewhere later then maybe rename it to clarify its purpose (not really a view model at the moment hence
+// why it was not named KubernetesDaemonSetViewModelFromApplication).
 import _ from 'lodash-es';
 
 export default function KubernetesDaemonSetModelFromApplication(applicationFormValues) {

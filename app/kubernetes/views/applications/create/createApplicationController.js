@@ -70,14 +70,7 @@ class KubernetesCreateApplicationController {
   async deployApplicationAsync() {
     this.state.actionInProgress = true;
     try {
-      // TODO: review @LP
-      // Ultimately using the approach I proposed, it make the controller code quite clear and most of the functions
-      // in the controller are only associated to model/view manipulation.
       await this.KubernetesApplicationService.create(this.formValues);
-
-      // TODO: review @LP
-      // even if the create above fails (deployment/daemonset create request fails and/or service create request fails)
-      // it still shows a success notification
       this.Notifications.success('Application successfully deployed', this.formValues.Name);
       this.$state.go('kubernetes.applications');
     } catch (err) {
