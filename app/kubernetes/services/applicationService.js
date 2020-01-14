@@ -14,9 +14,12 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
     /**
      * Creation
      */
+    // TODO: review @LP
+    // An application is a composite object that requires the creation of multiple Kubernetes resources
+    // depending on the application configuration. The creation takes the form values and creates the associated resources
+    // using the model conversion functions defined in models/<resource>.js
     async function createAsync(applicationFormValues) {
       try {
-
         if (applicationFormValues.DeploymentType === KubernetesApplicationDeploymentTypes.REPLICATED) {
           const deployment = new KubernetesDeploymentModelFromApplication(applicationFormValues);
           await KubernetesDeploymentService.create(deployment).$promise;

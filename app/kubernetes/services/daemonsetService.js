@@ -11,6 +11,11 @@ angular.module("portainer.kubernetes").factory("KubernetesDaemonSetService", [
     /**
      * Creation
      */
+    // TODO: review @LP
+    // The payload is created in each <Resource>Service
+    // We convert the daemonSet model from models/daemonset.js to the payload in here.
+    // Wasn't sure if the payload should have been added as a new object in the models/daemonset.js too, with
+    // a function to convert a model to a payload. But it kinda make sense to keep this here in the rest/ folder.
     async function createAsync(daemonSet) {
       try {
         const payload = {

@@ -1,3 +1,6 @@
+// TODO: @LP review
+// I've decided to put all the Form models inside this as I thought it was easier to centralize each object struct
+// Not sure about the export default vs export logic here so I did not export any default.
 export function KubernetesApplicationFormValues() {
   this.ResourcePool = '';
   this.Name = '';
