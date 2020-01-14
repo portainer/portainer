@@ -3,11 +3,11 @@ import _ from 'lodash-es';
 export function KubernetesApplicationViewModel(type, data, service) {
   if (type === KubernetesApplicationDeploymentTypes.REPLICATED) {
     this.DeploymentType = KubernetesApplicationDeploymentTypes.REPLICATED;
-    this.RunningPodsCount = data.status.availableReplicas || data.status.replicas - data.status.unavailableReplicas;
-    this.TotalPodsCount = data.status.replicas;
+    this.RunningPodsCount = data.status.availableReplicas || data.status.replicas - data.status.unavailableReplicas || 0;
+    this.TotalPodsCount = data.status.replicas || data.spec.replicas;
   } else if (type === KubernetesApplicationDeploymentTypes.GLOBAL) {
     this.DeploymentType = KubernetesApplicationDeploymentTypes.GLOBAL;
-    this.RunningPodsCount = data.status.numberAvailable || data.status.desiredNumberScheduled - data.status.numberUnavailable;
+    this.RunningPodsCount = data.status.numberAvailable || data.status.desiredNumberScheduled - data.status.numberUnavailable || 0;
     this.TotalPodsCount = data.status.desiredNumberScheduled;
   } else {
     this.DeploymentType = 'Unknown';
