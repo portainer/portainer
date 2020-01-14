@@ -4,7 +4,7 @@ import _ from 'lodash-es';
 export default function KubernetesServiceModelFromApplication(applicationFormValues) {
   this.Namespace = applicationFormValues.ResourcePool.Namespace.Name;
   this.Name = applicationFormValues.Name;
-  this.StackName = applicationFormValues.StackName;
+  this.StackName = applicationFormValues.StackName ? applicationFormValues.StackName : applicationFormValues.Name;
   this.Ports = [];
 
   switch (applicationFormValues.PublishingType) {

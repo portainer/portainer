@@ -4,6 +4,6 @@
 export default function KubernetesDaemonSetModelFromApplication(applicationFormValues) {
   this.Namespace = applicationFormValues.ResourcePool.Namespace.Name;
   this.Name = applicationFormValues.Name;
-  this.StackName = applicationFormValues.StackName;
+  this.StackName = applicationFormValues.StackName ? applicationFormValues.StackName : applicationFormValues.Name;
   this.Image = applicationFormValues.Image;
 }
