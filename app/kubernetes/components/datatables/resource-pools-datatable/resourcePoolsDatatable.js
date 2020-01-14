@@ -1,6 +1,6 @@
 angular.module('portainer.kubernetes').component('kubernetesResourcePoolsDatatable', {
   templateUrl: './resourcePoolsDatatable.html',
-  controller: 'GenericDatatableController',
+  controller: 'KubernetesResourcePoolsDatatableController',
   bindings: {
     titleText: '@',
     titleIcon: '@',
@@ -8,6 +8,7 @@ angular.module('portainer.kubernetes').component('kubernetesResourcePoolsDatatab
     tableKey: '@',
     orderBy: '@',
     reverseOrder: '<',
+    removeAction: '<',
     refreshCallback: '<'
   }
 });

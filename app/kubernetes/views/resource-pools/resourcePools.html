@@ -13,6 +13,7 @@
     title-text="Resource pools" title-icon="fa-layer-group"
     dataset="ctrl.resourcePools" table-key="kubernetes.resourcePools"
     order-by="Namespace.Name"
+    remove-action="ctrl.removeAction"
     refresh-callback="ctrl.getResourcePools"
     ></kubernetes-resource-pools-datatable>
   </div>

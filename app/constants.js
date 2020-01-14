@@ -22,4 +22,5 @@ angular.module('portainer')
 .constant('PAGINATION_MAX_ITEMS', 10)
 .constant('APPLICATION_CACHE_VALIDITY', 3600)
 .constant('CONSOLE_COMMANDS_LABEL_PREFIX', 'io.portainer.commands.')
-.constant('PREDEFINED_NETWORKS', ['host', 'bridge', 'none']);
+.constant('PREDEFINED_NETWORKS', ['host', 'bridge', 'none'])
+.constant('KUBERNETES_SYSTEM_NAMESPACES', ['default', 'kube-system', 'kube-public']);

@@ -9,7 +9,8 @@ angular.module("portainer.kubernetes").factory("KubernetesResourceQuotaService",
       quotas: quotas,
       create: create,
       update: update,
-      remove: remove
+      remove: remove,
+      removeCollection: removeCollection
     };
 
     /**
@@ -92,6 +93,24 @@ angular.module("portainer.kubernetes").factory("KubernetesResourceQuotaService",
 
     function remove(quota) {
       return $async(removeAsync, quota);
+    }
+
+    /**
+     * Delete collection
+     */
+    async function removeCollectionAsync(quota) {
+      try {
+        const payload = {
+          namespace: quota.Namespace
+        };
+        await KubernetesResourceQuotas.delete(payload).$promise;
+      } catch (err) {
+        throw { msg: 'Unable to delete quotas', err: err };
+      }
+    }
+
+    function removeCollection(quota) {
+      return $async(removeCollectionAsync, quota);
     }
 
     return service;

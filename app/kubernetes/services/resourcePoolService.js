@@ -9,7 +9,8 @@ angular.module("portainer.kubernetes").factory("KubernetesResourcePoolService", 
       resourcePools: resourcePools,
       shortResourcePools: shortResourcePools,
       resourcePool: resourcePool,
-      create: create
+      create: create,
+      remove: remove
     };
 
     /**
@@ -92,12 +93,32 @@ angular.module("portainer.kubernetes").factory("KubernetesResourcePoolService", 
           await KubernetesResourceQuotaService.create(name, cpuLimit, memoryLimit);
         }
       } catch (err) {
-        throw { msg: 'Unable to create resource pool' };
+        throw err;
       }
     }
 
     function create(name, hasQuota, cpuLimit, memoryLimit) {
       return $async(createAsync, name, hasQuota, cpuLimit, memoryLimit);
+    }
+
+    /**
+     * Remove
+     */
+
+    async function removeAsync(pool) {
+      try {
+        const promises = [KubernetesNamespaceService.remove(pool.Namespace)];
+        if (pool.Quotas.length) {
+          promises.push(KubernetesResourceQuotaService.removeCollection(pool.Quotas[0]));
+        }
+        await Promise.all(promises);
+      } catch (err) {
+        throw { msg: 'Unable to remove resource pool', err: err };
+      }
+    }
+
+    function remove(pool) {
+      return $async(removeAsync, pool);
     }
 
     return service;

@@ -8,7 +8,8 @@ angular.module("portainer.kubernetes").factory("KubernetesNamespaceService", [
     const service = {
       namespaces: namespaces,
       namespace: namespace,
-      create: create
+      create: create,
+      remove: remove
     };
 
     /**
@@ -21,7 +22,7 @@ angular.module("portainer.kubernetes").factory("KubernetesNamespaceService", [
         const promises = _.map(namespaces, (item) => KubernetesNamespaces.status({id: item}).$promise);
         const statuses = await Promise.allSettled(promises);
         const visibleNamespaces = _.reduce(statuses, (result, item) => {
-          if (item.status === 'fulfilled') {
+          if (item.status === 'fulfilled' && item.value.status.phase !== 'Terminating') {
             result.push(new KubernetesNamespaceViewModel(item.value));
           }
           return result
@@ -72,6 +73,24 @@ angular.module("portainer.kubernetes").factory("KubernetesNamespaceService", [
 
     function create(name) {
       return $async(createAsync, name);
+    }
+
+    /**
+     * Delete
+     */
+    async function removeAsync(namespace) {
+      try {
+        const payload = {
+          id: namespace.Name
+        };
+        await KubernetesNamespaces.delete(payload).$promise
+      } catch (err) {
+        throw { msg: 'Unable to delete namespace', err: err };
+      }
+    }
+
+    function remove(namespace) {
+      return $async(removeAsync, namespace);
     }
 
     return service;
