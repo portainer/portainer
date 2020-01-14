@@ -120,13 +120,31 @@
                 <code>{{ item.RunningPodsCount }}</code> / <code>{{ item.TotalPodsCount }}</code></td>
               <td>
                 <span ng-if="item.PublishedPorts.length" ng-repeat="port in item.PublishedPorts track by $index">
-                  <a ng-if="port.IPAddress" class="image-tag" ng-href="http://{{ port.IPAddress }}:{{ port.port }}" target="_blank">
-                    <i class="fa fa-external-link-alt" aria-hidden="true"></i> {{ port.port }}:{{ port.targetPort }}
+                  <span ng-if="port.IPAddress">
+                    <span class="interactive" tooltip-append-to-body="true" tooltip-placement="bottom" tooltip-class="portainer-tooltip" uib-tooltip="Port published via an external load balancer">
+                      <i class="fa fa-question-circle tooltip-icon" aria-hidden="true"></i>
+                    </span>
+                    <a class="image-tag" ng-href="http://{{ port.IPAddress }}:{{ port.port }}" target="_blank">
+                    <i class="fa fa-project-diagram" aria-hidden="true" style="margin-right: 2px;"></i> {{ port.targetPort }}:{{ port.port }}
                   </a>
-                  <span ng-if="!port.IPAddress">{{ port.port }}:{{ port.targetPort }} / {{ port.protocol }}</span>
+                  </span>
+                  <span ng-if="!port.IPAddress && !port.nodePort">
+                    <span class="interactive" tooltip-append-to-body="true" tooltip-placement="bottom" tooltip-class="portainer-tooltip" uib-tooltip="Internal port, only exposed inside the cluster">
+                      <i class="fa fa-question-circle tooltip-icon" aria-hidden="true"></i>
+                    </span>
+                    <i class="fa fa-list-alt" aria-hidden="true"></i>
+                      {{ port.port }}
+                  </span>
+                  <span ng-if="!port.IPAddress && port.nodePort">
+                    <span class="interactive" tooltip-append-to-body="true" tooltip-placement="bottom" tooltip-class="portainer-tooltip" uib-tooltip="Port published via node port, use the IP of a node in the cluster to access it">
+                      <i class="fa fa-question-circle tooltip-icon" aria-hidden="true"></i>
+                    </span>
+                    <i class="fa fa-list" aria-hidden="true"></i>
+                      {{ port.targetPort }}:{{ port.nodePort }}
+                  </span>
                   <br/>
                 </span>
-                <span ng-if="!item.PublishedPorts">-</span>
+                <span ng-if="item.PublishedPorts.length === 0">-</span>
               </td>
               <td>{{ item.CreatedAt | getisodate }}</td>
             </tr>
