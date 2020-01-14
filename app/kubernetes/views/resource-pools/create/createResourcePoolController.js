@@ -1,7 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
-import { KubernetesResourceQuotaDefaults } from 'Kubernetes/models/resourceQuota';
+import {KubernetesResourceQuotaDefaults} from 'Kubernetes/models/resourceQuota';
 
 function megaBytesValue(mem) {
   return Math.floor(mem / 1000 / 1000);
@@ -48,6 +48,7 @@ class KubernetesCreateResourcePoolController {
     try {
       this.checkDefaults();
       await this.KubernetesResourcePoolService.create(this.formValues.Name, this.formValues.hasQuota, this.formValues.CpuLimit, bytesValue(this.formValues.MemoryLimit));
+      this.Notifications.success('Resource pool successfully created', this.formValues.Name);
       this.$state.go('kubernetes.resourcePools');
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to create resource pool');
