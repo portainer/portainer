@@ -1,17 +1,21 @@
 import angular from 'angular';
 import {
   KubernetesApplicationDeploymentTypes,
+  KubernetesApplicationFormValues,
   KubernetesApplicationPublishingTypes
 } from 'Kubernetes/models/application';
 
 class KubernetesCreateApplicationController {
   /* @ngInject */
-  constructor($async, $state, KubernetesResourcePoolService) {
+  constructor($async, $state, Notifications, KubernetesResourcePoolService, KubernetesApplicationService) {
     this.$async = $async;
     this.$state = $state;
+    this.Notifications = Notifications;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
+    this.KubernetesApplicationService = KubernetesApplicationService;
 
     this.onInit = this.onInit.bind(this);
+    this.deployApplicationAsync = this.deployApplicationAsync.bind(this);
   }
 
   addEnvironmentVariable() {
@@ -76,19 +80,28 @@ class KubernetesCreateApplicationController {
     return true;
   }
 
+  async deployApplicationAsync() {
+    this.state.actionInProgress = true;
+    try {
+      await this.KubernetesApplicationService.create(this.formValues);
+      this.Notifications.success('Application successfully deployed', this.formValues.Name);
+      this.$state.go('kubernetes.applications');
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to create application');
+    } finally {
+      this.state.actionInProgress = false;
+    }
+  }
+
+  deployApplication() {
+    return this.$async(this.deployApplicationAsync);
+  }
+
   async onInit() {
     try {
-      this.formValues = {
-        EnvironmentVariables: [],
-        PersistedFolders: [],
-        PublishedPorts: [],
-        MemoryLimit: 0,
-        CpuLimit: 0,
-      };
+      this.formValues = new KubernetesApplicationFormValues();
 
       this.state = {
-        DeploymentType: KubernetesApplicationDeploymentTypes.REPLICATED,
-        PublishingType: KubernetesApplicationPublishingTypes.INTERNAL,
         actionInProgress: false,
       };
 
