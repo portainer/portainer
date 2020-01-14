@@ -59,13 +59,13 @@
             <label for="stack_name" class="col-sm-1 control-label text-left">Stack</label>
             <div class="col-sm-11">
               <input
-                      type="text"
-                      class="form-control"
-                      placeholder="myStack"
-                      ng-model="ctrl.formValues.StackName"
-                      name="stack_name"
-                      uib-typeahead="stack.Name for stack in ctrl.stacks | filter:$viewValue | limitTo:7"
-                      typeahead-show-hint="true" typeahead-min-length="0" />
+                type="text"
+                class="form-control"
+                placeholder="myStack"
+                ng-model="ctrl.formValues.StackName"
+                name="stack_name"
+                uib-typeahead="stack for stack in ctrl.stacks | filter:$viewValue | limitTo:7"
+                typeahead-show-hint="true" typeahead-min-length="0" />
             </div>
           </div>
           <!-- !stack -->
@@ -376,8 +376,8 @@
           <div class="form-group">
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm"
-                      ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.state.actionInProgress"
-                      ng-click="ctrl.deployApplication()" button-spinner="ctrl.state.actionInProgress">
+                ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.state.actionInProgress"
+                ng-click="ctrl.deployApplication()" button-spinner="ctrl.state.actionInProgress">
                 <span ng-hide="ctrl.state.actionInProgress">Deploy application</span>
                 <span ng-show="ctrl.state.actionInProgress">Deployment in progress...</span>
               </button>

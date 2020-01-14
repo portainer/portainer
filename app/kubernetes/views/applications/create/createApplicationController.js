@@ -10,13 +10,14 @@ import {
 
 class KubernetesCreateApplicationController {
   /* @ngInject */
-  constructor($async, $state, Notifications, EndpointProvider, KubernetesResourcePoolService, KubernetesApplicationService) {
+  constructor($async, $state, Notifications, EndpointProvider, KubernetesResourcePoolService, KubernetesApplicationService, KubernetesStackService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
     this.EndpointProvider = EndpointProvider;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesApplicationService = KubernetesApplicationService;
+    this.KubernetesStackService = KubernetesStackService;
 
     this.onInit = this.onInit.bind(this);
     this.deployApplicationAsync = this.deployApplicationAsync.bind(this);
@@ -95,15 +96,19 @@ class KubernetesCreateApplicationController {
 
       this.ApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
       this.ApplicationPublishingTypes = KubernetesApplicationPublishingTypes;
-      this.resourcePools = await this.KubernetesResourcePoolService.resourcePools();
+
+      const [resourcePools, stacks] = await Promise.all([
+        this.KubernetesResourcePoolService.resourcePools(),
+        this.KubernetesStackService.stacks()
+      ])
+      this.resourcePools = resourcePools;
       this.formValues.ResourcePool = this.resourcePools[0];
+
+      this.stacks = stacks;
 
       const endpoint = this.EndpointProvider.currentEndpoint();
       this.storageClasses = endpoint.Kubernetes.Configuration.StorageClasses;
       this.state.useLoadBalancer = endpoint.Kubernetes.Configuration.UseLoadBalancer;
-
-      this.stacks = [];
-
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
     }
