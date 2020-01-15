@@ -123,7 +123,7 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="$ctrl.disableRemove(item)"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="kubernetes.applications.application({ id: item.Name })">{{ item.Name }}</a>
+                <a ui-sref="kubernetes.applications.application({ name: item.Name })">{{ item.Name }}</a>
               </td>
               <td>{{ item.Stack }}</td>
               <td>{{ item.ResourcePool }}</td>
@@ -138,10 +138,10 @@
                     <span class="interactive" tooltip-append-to-body="true" tooltip-placement="bottom" tooltip-class="portainer-tooltip" uib-tooltip="Port published via an external load balancer">
                       <i class="fa fa-question-circle tooltip-icon" aria-hidden="true"></i>
                     </span>
-                    <a ng-if="port.IPAddress" class="image-tag" ng-href="http://{{ port.IPAddress }}:{{ port.port }}" target="_blank">
+                    <a ng-if="item.LoadBalancerIPAddress" class="image-tag" ng-href="http://{{ item.LoadBalancerIPAddress }}:{{ port.port }}" target="_blank">
                       <i class="fa fa-project-diagram" aria-hidden="true" style="margin-right: 2px;"></i> {{ port.targetPort }}:{{ port.port }}
                     </a>
-                    <span ng-if="!port.IPAddress">
+                    <span ng-if="!item.LoadBalancerIPAddress">
                       <i class="fa fa-project-diagram" aria-hidden="true" style="margin-right: 2px;"></i> pending
                     </span>
                   </span>

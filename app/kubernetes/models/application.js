@@ -1,5 +1,3 @@
-import _ from 'lodash-es';
-
 export function KubernetesApplicationViewModel(type, data, service) {
   if (type === KubernetesApplicationDeploymentTypes.REPLICATED) {
     this.DeploymentType = KubernetesApplicationDeploymentTypes.REPLICATED;
@@ -25,15 +23,12 @@ export function KubernetesApplicationViewModel(type, data, service) {
     this.ServiceType = serviceType;
 
     if (serviceType === 'LoadBalancer') {
-      this.PublishedPorts = _.map(service.spec.ports, (port) => {
-        if (service.status.loadBalancer.ingress && service.status.loadBalancer.ingress.length > 0) {
-          port.IPAddress = service.status.loadBalancer.ingress[0].ip || service.status.loadBalancer.ingress[0].hostname;
-        }
-        return port;
-      });
-    } else {
-      this.PublishedPorts = service.spec.ports;
+      if (service.status.loadBalancer.ingress && service.status.loadBalancer.ingress.length > 0) {
+        this.LoadBalancerIPAddress = service.status.loadBalancer.ingress[0].ip || service.status.loadBalancer.ingress[0].hostname;
+      }
     }
+
+    this.PublishedPorts = service.spec.ports;
   } else {
     this.PublishedPorts = [];
   }

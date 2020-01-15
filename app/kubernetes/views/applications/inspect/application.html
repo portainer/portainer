@@ -1,0 +1,160 @@
+<rd-header>
+  <rd-header-title title-text="Application details">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="kubernetes.applications.application" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>
+    <a ui-sref="kubernetes.services">Applications</a> &gt; <a ui-sref="kubernetes.applications.application" ui-sref-opts="{reload: true}">{{ ctrl.application.Name }}</a>
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-laptop-code" title-text="Application status"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody ng-if="!ctrl.application"><tr><td class="text-center text-muted">Loading...</td></tr></tbody>
+          <tbody ng-if="ctrl.application">
+          <tr>
+            <td>Name</td>
+            <td>{{ ctrl.application.Name }}</td>
+          </tr>
+          <tr>
+            <td>Stack</td>
+            <td>{{ ctrl.application.Stack }}</td>
+          </tr>
+          <tr>
+            <td>Resource pool</td>
+            <td>{{ ctrl.application.ResourcePool }}</td>
+          </tr>
+          <tr>
+            <td>Deployment</td>
+            <td>
+              <span ng-if="ctrl.application.DeploymentType === ctrl.KubernetesApplicationDeploymentTypes.REPLICATED">Replicated</span>
+              <span ng-if="ctrl.application.DeploymentType === ctrl.KubernetesApplicationDeploymentTypes.GLOBAL">Global</span>
+              <code>{{ ctrl.application.RunningPodsCount }}</code> / <code>{{ ctrl.application.TotalPodsCount }}</code></td>
+            </td>
+          </tr>
+          <tr>
+            <td>Creation date</td>
+            <td>{{ ctrl.application.CreatedAt | getisodate }}</td>
+          </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row" ng-if="ctrl.application && ctrl.application.PublishedPorts.length > 0">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-laptop" title-text="Accessing the application"></rd-widget-header>
+      <rd-widget-body>
+        <div ng-if="ctrl.application.ServiceType === 'LoadBalancer'">
+          <div class="small text-muted" >
+            <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+            This application is exposed through an external load balancer. Use the links below to access the different ports exposed.
+          </div>
+          <div style="margin-top: 10px;" class="small text-muted">
+            <span ng-if="!ctrl.application.LoadBalancerIPAddress">
+              <p>
+                Load balancer status: <i class="fa fa-cog fa-spin" style="margin-left: 2px"></i> pending
+              </p>
+              <p>
+                <u>what does the "pending" status means?</u>
+                <portainer-tooltip position="bottom" message="A pending status means that Portainer delegated the request to the provider responsible for creating the external load balancer. If it stays in pending state for long, this means that this capability might not be supported or you might have an issue with your cluster provider. Contact your cluster administrator for more information."></portainer-tooltip>
+              </p>
+            </span>
+            <span ng-if="ctrl.application.LoadBalancerIPAddress" class="small text-muted">
+              <p>
+              Load balancer status: <i class="fa fa-check green-icon" style="margin-left: 2px"></i> available
+              </p>
+              <p>
+              Load balancer IP address: {{ ctrl.application.LoadBalancerIPAddress }}
+              </p>
+            </span>
+          </div>
+          <div style="margin-top: 20px;">
+            <table class="table">
+              <tbody>
+                <tr class="text-muted">
+                  <td>Container port</td>
+                  <td>Load balancer port</td>
+                </tr>
+                <tr ng-repeat="port in ctrl.application.PublishedPorts track by $index">
+                  <td>{{ port.targetPort }}</td>
+                  <td>
+                      {{ port.port }}
+                    <a ng-if="ctrl.application.LoadBalancerIPAddress" ng-href="http://{{ ctrl.application.LoadBalancerIPAddress }}:{{port.port}}" target="_blank" style="margin-left: 5px">
+                      <i class="fa fa-external-link-alt" aria-hidden="true"></i> access
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div ng-if="ctrl.application.ServiceType === 'NodePort'">
+          <div class="small text-muted">
+            <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+            This application is exposed globally on all nodes of your cluster. It can be reached using the IP address of any node in your cluster using the port configuration below.
+          </div>
+          <div style="margin-top: 20px;">
+            <table class="table">
+              <tbody>
+                <tr class="text-muted">
+                  <td>Container port</td>
+                  <td>Cluster node port</td>
+                </tr>
+                <tr ng-repeat="port in ctrl.application.PublishedPorts track by $index">
+                  <td>{{ port.targetPort }}</td>
+                  <td>{{ port.nodePort }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div ng-if="ctrl.application.ServiceType === 'ClusterIP'">
+          <div class="small text-muted">
+            <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+            This application is only available for internal usage inside the cluster. It can be reached through the application name <code>{{ ctrl.application.Name }}</code> using the port configuration below.
+          </div>
+          <div style="margin-top: 20px;">
+            <table class="table">
+              <tbody>
+                <tr class="text-muted">
+                  <td>Container port</td>
+                  <td>Application port</td>
+                </tr>
+                <tr ng-repeat="port in ctrl.application.PublishedPorts track by $index">
+                  <td>{{ port.targetPort }}</td>
+                  <td>{{ port.port }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-laptop-medical" title-text="Application details"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+
+        <uib-tabset active="ctrl.state.activeTab" justified="true">
+          <uib-tab index="0" heading="Pods"></uib-tab>
+          <uib-tab index="1" heading="Events"></uib-tab>
+          <uib-tab index="2" heading="YAML"></uib-tab>
+        </uib-tabset>
+
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

@@ -10,6 +10,7 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
     "use strict";
     const service = {
       applications: applications,
+      application: application,
       create: create,
       remove: remove
     };
@@ -41,6 +42,35 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
 
     function applications() {
       return $async(applicationsAsync);
+    }
+
+    /**
+     * Application
+     */
+    async function applicationAsync(name) {
+      try {
+        const [deployments, daemonSets, services] = await Promise.all([
+          KubernetesDeploymentService.deployments(),
+          KubernetesDaemonSetService.daemonSets(),
+          KubernetesServiceService.services()
+        ]);
+
+        const service = _.find(services, (serv) => serv.metadata.name === name);
+        const deployment = _.find(deployments, (depl) => depl.metadata.name === name);
+        const daemonSet = _.find(daemonSets, (daemon) => daemon.metadata.name === name);
+
+        if (deployment) {
+          return new KubernetesApplicationViewModel(KubernetesApplicationDeploymentTypes.REPLICATED, deployment, service);
+        }
+
+        return new KubernetesApplicationViewModel(KubernetesApplicationDeploymentTypes.GLOBAL, daemonSet, service);
+      } catch (err) {
+        throw err;
+      }
+    }
+
+    function application(name) {
+      return $async(applicationAsync, name);
     }
 
     /**
