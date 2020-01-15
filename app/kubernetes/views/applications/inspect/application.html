@@ -172,15 +172,24 @@
               refresh-callback="ctrl.getEvents"
             ></kubernetes-events-datatable>
           </uib-tab>
-          <uib-tab index="2">
+          <uib-tab index="2" ng-if="ctrl.application.Yaml" select="ctrl.showEditor()">
             <uib-tab-heading>
               <i class="fa fa-code space-right" aria-hidden="true"></i> YAML
             </uib-tab-heading>
-            <rd-widget>
-              <rd-widget-body>
-                <pre>{{ ctrl.application.Yaml }}</pre>
-              </rd-widget-body>
-            </rd-widget>
+            <div style="padding-right: 25px;" ng-if="ctrl.state.showEditorTab">
+              <code-editor
+                      identifier="application-details-yaml"
+                      yml="false"
+                      read-only="true"
+                      value="ctrl.application.Yaml"
+              ></code-editor>
+              <div style="margin: 15px;">
+                <span class="btn btn-primary btn-sm" ng-click="ctrl.copyYAML()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy to clipboard</span>
+                <span id="copyNotificationYAML" style="margin-left: 7px; display: none; color: #23ae89;" class="small">
+                    <i class="fa fa-check" aria-hidden="true" ></i> copied
+                  </span>
+              </div>
+            </div>
           </uib-tab>
         </uib-tabset>
 
