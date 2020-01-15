@@ -11,6 +11,7 @@ angular.module('portainer.kubernetes')
           method: 'GET',
           url: API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/apis/apps/v1/deployments'
         },
-        create: { method: 'POST', params: { namespace: '@metadata.namespace' } }
+        create: { method: 'POST', params: { namespace: '@metadata.namespace' } },
+        delete: { method: 'DELETE' }
       });
   }]);

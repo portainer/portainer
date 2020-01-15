@@ -7,6 +7,7 @@ angular.module("portainer.kubernetes").factory("KubernetesDaemonSetService", [
     const service = {
       daemonSets: daemonSets,
       create: create,
+      remove: remove
     };
 
     /**
@@ -92,6 +93,25 @@ angular.module("portainer.kubernetes").factory("KubernetesDaemonSetService", [
 
     function create(daemonSet) {
       return $async(createAsync, daemonSet);
+    }
+
+    /**
+     * Delete
+     */
+    async function removeAsync(daemonSet) {
+      try {
+        const payload = {
+          namespace: daemonSet.Namespace,
+          name: daemonSet.Name
+        };
+        await KubernetesDaemonSets.delete(payload).$promise
+      } catch (err) {
+        throw { msg: 'Unable to remove daemonset', err: err };
+      }
+    }
+
+    function remove(daemonSet) {
+      return $async(removeAsync, daemonSet);
     }
 
     return service;

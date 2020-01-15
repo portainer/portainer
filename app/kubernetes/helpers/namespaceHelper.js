@@ -2,12 +2,17 @@ import _ from 'lodash-es';
 import angular from 'angular';
 
 class KubernetesNamespaceHelper {
-  constructor(KUBERNETES_SYSTEM_NAMESPACES) {
+  constructor(KUBERNETES_SYSTEM_NAMESPACES, KUBERNETES_APP_SYSTEM_NAMESPACES) {
     this.KUBERNETES_SYSTEM_NAMESPACES = KUBERNETES_SYSTEM_NAMESPACES;
+    this.KUBERNETES_APP_SYSTEM_NAMESPACES = KUBERNETES_APP_SYSTEM_NAMESPACES;
   }
 
-  isSystemNamespace(item) {
-    return _.includes(this.KUBERNETES_SYSTEM_NAMESPACES, item.Name);
+  isSystemNamespace(namespace) {
+    return _.includes(this.KUBERNETES_SYSTEM_NAMESPACES, namespace);
+  }
+
+  isAppSystemNamespace(namespace) {
+    return _.includes(this.KUBERNETES_APP_SYSTEM_NAMESPACES, namespace);
   }
 }
 

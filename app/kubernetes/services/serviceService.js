@@ -7,6 +7,7 @@ angular.module("portainer.kubernetes").factory("KubernetesServiceService", [
     const service = {
       services: services,
       create: create,
+      remove: remove
     };
 
     /**
@@ -59,6 +60,25 @@ angular.module("portainer.kubernetes").factory("KubernetesServiceService", [
 
     function create(service) {
       return $async(createAsync, service);
+    }
+
+    /**
+     * Delete
+     */
+    async function removeAsync(service) {
+      try {
+        const payload = {
+          namespace: service.Namespace,
+          name: service.Name
+        };
+        await KubernetesServices.delete(payload).$promise
+      } catch (err) {
+        throw { msg: 'Unable to remove service', err: err };
+      }
+    }
+
+    function remove(service) {
+      return $async(removeAsync, service);
     }
 
     return service;

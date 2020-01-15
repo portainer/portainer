@@ -1,21 +1,24 @@
+import { KubernetesApplicationDeploymentTypes } from 'Kubernetes/models/application';
+
 angular.module('portainer.docker')
-  .controller('KubernetesResourcePoolsDatatableController', ['$scope', '$controller', 'KubernetesNamespaceHelper', 'DatatableService',
+  .controller('KubernetesApplicationsDatatableController', ['$scope', '$controller', 'KubernetesNamespaceHelper', 'DatatableService',
     function ($scope, $controller, KubernetesNamespaceHelper, DatatableService) {
 
       angular.extend(this, $controller('GenericDatatableController', {$scope: $scope}));
 
       this.disableRemove = function(item) {
-        return KubernetesNamespaceHelper.isSystemNamespace(item.Namespace.Name);
+        return KubernetesNamespaceHelper.isAppSystemNamespace(item.ResourcePool);
       };
 
       /**
-       * Do not allow system namespaces to be selected
+       * Do not allow applications in system namespaces to be selected
        */
       this.allowSelection = function(item) {
         return !this.disableRemove(item);
       }
 
       this.$onInit = function() {
+        this.KubernetesApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
         this.setDefaults();
         this.prepareTableFromDataset();
     

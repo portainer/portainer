@@ -11,6 +11,7 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
     const service = {
       applications: applications,
       create: create,
+      remove: remove
     };
 
     /**
@@ -68,6 +69,37 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
 
     function create(applicationFormValues) {
       return $async(createAsync, applicationFormValues);
+    }
+
+    /**
+     * Delete
+     */
+
+     /**
+      *
+      * @param {KubernetesApplicationViewModel} application
+      */
+    async function removeAsync(application) {
+      const payload = {
+        Namespace: application.ResourcePool,
+        Name: application.Name
+      };
+      try {
+        if (application.DeploymentType === KubernetesApplicationDeploymentTypes.REPLICATED) {
+          await KubernetesDeploymentService.remove(payload);
+        } else {
+          await KubernetesDaemonSetService.remove(payload);
+        }
+        if (application.ServiceType && application.ServiceType === 'LoadBalancer') {
+          await KubernetesServiceService.remove(payload);
+        }
+      } catch (err) {
+        throw err;
+      }
+    }
+
+    function remove(application) {
+      return $async(removeAsync, application);
     }
 
     return service;
