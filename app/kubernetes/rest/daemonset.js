@@ -1,9 +1,13 @@
-import { rawResponse } from './response/transform';
+import {rawResponse} from './response/transform';
 
 angular.module('portainer.kubernetes')
 .factory('KubernetesDaemonSets', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider',
   function KubernetesDaemonSetsFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
     'use strict';
+    // TODO: review on architecture/refactor meeting
+    // I'm not sure we need to keep that optional namespace support for most of our rest services
+    // It is a legacy from early kubernetes support if i'm correct.
+    // I do prefer a clean rest service such as rest/resourceQuota.js
     return function(namespace) {
       let url = API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/apis/apps/v1';
       if (namespace) {
