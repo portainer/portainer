@@ -1,7 +1,7 @@
 <rd-header>
   <rd-header-title title-text="Create application"></rd-header-title>
   <rd-header-content>
-    <a ui-sref="kubernetes.applications">Application</a> &gt; Deploy application
+    <a ui-sref="kubernetes.applications">Applications</a> &gt; Deploy application
   </rd-header-content>
 </rd-header>
 
@@ -245,10 +245,10 @@
               Memory limit
             </label>
             <div class="col-sm-3">
-              <slider model="ctrl.formValues.MemoryLimit" floor="0" ceil="2048" step="128"></slider>
+              <slider model="ctrl.formValues.MemoryLimit" floor="0" ceil="ctrl.state.maxMemory" step="128" ng-if="ctrl.state.maxMemory"></slider>
             </div>
             <div class="col-sm-2">
-              <input name="memory_limit" ng-model="ctrl.formValues.MemoryLimit" type="number" min="0" max="2048" class="form-control" id="memory-limit" required>
+              <input name="memory_limit" ng-model="ctrl.formValues.MemoryLimit" type="number" min="0" max="{{ctrl.state.maxMemory}}" class="form-control" id="memory-limit" required>
             </div>
             <div class="col-sm-4">
               <p class="small text-muted" style="margin-top: 7px;">
@@ -263,7 +263,7 @@
               CPU limit
             </label>
             <div class="col-sm-5">
-              <slider model="ctrl.formValues.CpuLimit" floor="0" ceil="4" step="0.25" precision="2"></slider>
+              <slider model="ctrl.formValues.CpuLimit" floor="0" ceil="ctrl.state.maxCpu" step="0.25" precision="2" ng-if="ctrl.state.maxCpu"></slider>
             </div>
             <div class="col-sm-4" style="margin-top: 20px;">
               <p class="small text-muted">

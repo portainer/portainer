@@ -7,12 +7,18 @@
 // why it was not named KubernetesDaemonSetViewModelFromApplication).
 import _ from 'lodash-es';
 
+function bytesValue(mem) {
+  return mem * 1000 * 1000;
+}
+
 export default function KubernetesDaemonSetModelFromApplication(applicationFormValues) {
   this.Namespace = applicationFormValues.ResourcePool.Namespace.Name;
   this.Name = applicationFormValues.Name;
   this.StackName = applicationFormValues.StackName ? applicationFormValues.StackName : applicationFormValues.Name;
   this.Image = applicationFormValues.Image;
   this.Env = [];
+  this.CpuLimit = applicationFormValues.CpuLimit;
+  this.MemoryLimit = bytesValue(applicationFormValues.MemoryLimit);
 
   // TODO: Secret environment variables are not supported yet
   _.forEach(applicationFormValues.EnvironmentVariables, (item) => {

@@ -56,13 +56,23 @@ angular.module("portainer.kubernetes").factory("KubernetesDeploymentService", [
                   {
                     name: deployment.Name,
                     image: deployment.Image,
-                    env: deployment.Env
+                    env: deployment.Env,
+                    resources: {
+                      limits: { }
+                    }
                   }
                 ]
               }
             }
           }
         };
+
+        if (deployment.MemoryLimit) {
+          payload.spec.template.spec.containers[0].resources.limits.memory = deployment.MemoryLimit;
+        }
+        if (deployment.CpuLimit) {
+          payload.spec.template.spec.containers[0].resources.limits.cpu = deployment.CpuLimit;
+        }
 
         const data = await KubernetesDeployments.create(payload).$promise;
         return data;

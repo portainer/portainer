@@ -1,5 +1,9 @@
 import _ from 'lodash-es';
 
+function bytesValue(mem) {
+  return mem * 1000 * 1000;
+}
+
 export default function KubernetesDeploymentModelFromApplication(applicationFormValues) {
   this.Namespace = applicationFormValues.ResourcePool.Namespace.Name;
   this.Name = applicationFormValues.Name;
@@ -7,6 +11,8 @@ export default function KubernetesDeploymentModelFromApplication(applicationForm
   this.ReplicaCount = applicationFormValues.ReplicaCount;
   this.Image = applicationFormValues.Image;
   this.Env = [];
+  this.CpuLimit = applicationFormValues.CpuLimit;
+  this.MemoryLimit = bytesValue(applicationFormValues.MemoryLimit);
 
   // TODO: Secret environment variables are not supported yet
   _.forEach(applicationFormValues.EnvironmentVariables, (item) => {

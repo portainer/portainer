@@ -1,4 +1,6 @@
 import angular from 'angular';
+import _ from 'lodash-es';
+import filesizeParser from 'filesize-parser';
 import {
   KubernetesApplicationDeploymentTypes,
   KubernetesApplicationEnvironmentVariableFormValue,
@@ -8,9 +10,13 @@ import {
   KubernetesApplicationPublishingTypes
 } from 'Kubernetes/models/application';
 
+
+function megaBytesValue(mem) {
+  return Math.floor(mem / 1000 / 1000);
+}
 class KubernetesCreateApplicationController {
   /* @ngInject */
-  constructor($async, $state, Notifications, EndpointProvider, KubernetesResourcePoolService, KubernetesApplicationService, KubernetesStackService) {
+  constructor($async, $state, Notifications, EndpointProvider, KubernetesResourcePoolService, KubernetesApplicationService, KubernetesStackService, KubernetesNodeService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
@@ -18,6 +24,7 @@ class KubernetesCreateApplicationController {
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesStackService = KubernetesStackService;
+    this.KubernetesNodeService = KubernetesNodeService;
 
     this.onInit = this.onInit.bind(this);
     this.deployApplicationAsync = this.deployApplicationAsync.bind(this);
@@ -91,20 +98,29 @@ class KubernetesCreateApplicationController {
 
       this.state = {
         actionInProgress: false,
-        useLoadBalancer: false
+        useLoadBalancer: false,
+        maxCpu: 0,
+        maxMemory: 0
       };
 
       this.ApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
       this.ApplicationPublishingTypes = KubernetesApplicationPublishingTypes;
 
-      const [resourcePools, stacks] = await Promise.all([
+      const [resourcePools, stacks, nodes] = await Promise.all([
         this.KubernetesResourcePoolService.resourcePools(),
-        this.KubernetesStackService.stacks()
-      ])
+        this.KubernetesStackService.stacks(),
+        this.KubernetesNodeService.nodes()
+      ]);
       this.resourcePools = resourcePools;
       this.formValues.ResourcePool = this.resourcePools[0];
 
       this.stacks = stacks;
+
+      _.forEach(nodes, (item) => {
+        this.state.maxMemory += filesizeParser(item.Memory);
+        this.state.maxCpu += item.CPU;
+      });
+      this.state.maxMemory = megaBytesValue(this.state.maxMemory);
 
       const endpoint = this.EndpointProvider.currentEndpoint();
       this.storageClasses = endpoint.Kubernetes.Configuration.StorageClasses;
