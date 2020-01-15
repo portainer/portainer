@@ -4,8 +4,9 @@ angular.module("portainer.kubernetes").factory("KubernetesServiceService", [
   "$async", "KubernetesServices",
   function KubernetesServiceServiceFactory($async, KubernetesServices) {
     "use strict";
-    const service = {
+    const factory = {
       services: services,
+      service: service,
       create: create,
       remove: remove
     };
@@ -15,7 +16,7 @@ angular.module("portainer.kubernetes").factory("KubernetesServiceService", [
      */
     async function servicesAsync() {
       try {
-        const data = await KubernetesServices.query().$promise;
+        const data = await KubernetesServices().query().$promise;
         return data.items;
       } catch (err) {
         throw { msg: 'Unable to retrieve services', err: err };
@@ -24,6 +25,24 @@ angular.module("portainer.kubernetes").factory("KubernetesServiceService", [
 
     function services() {
       return $async(servicesAsync);
+    }
+
+    /**
+     * Service
+     */
+    async function serviceAsync(namespace, name) {
+      try {
+        const payload = {
+          id: name
+        };
+        return await KubernetesServices(namespace).get(payload).$promise;  
+      } catch (err) {
+        throw { msg: 'Unable to retrieve service', err: err };
+      }
+    }
+
+    function service(namespace, name) {
+      return $async(serviceAsync, namespace, name);
     }
 
     /**
@@ -51,7 +70,7 @@ angular.module("portainer.kubernetes").factory("KubernetesServiceService", [
           payload.spec.type = service.Type;
         }
 
-        const data = await KubernetesServices.create(payload).$promise;
+        const data = await KubernetesServices(payload.metadata.namespace).create(payload).$promise;
         return data;
       } catch (err) {
         throw { msg: 'Unable to create service', err:err };
@@ -68,10 +87,9 @@ angular.module("portainer.kubernetes").factory("KubernetesServiceService", [
     async function removeAsync(service) {
       try {
         const payload = {
-          namespace: service.Namespace,
           name: service.Name
         };
-        await KubernetesServices.delete(payload).$promise
+        await KubernetesServices(service.Namespace).delete(payload).$promise
       } catch (err) {
         throw { msg: 'Unable to remove service', err: err };
       }
@@ -81,6 +99,6 @@ angular.module("portainer.kubernetes").factory("KubernetesServiceService", [
       return $async(removeAsync, service);
     }
 
-    return service;
+    return factory;
   }
 ]);

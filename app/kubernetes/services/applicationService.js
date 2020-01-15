@@ -1,12 +1,13 @@
 import _ from 'lodash-es';
 import KubernetesDeploymentModelFromApplication from 'Kubernetes/models/deployment';
-import {KubernetesApplicationDeploymentTypes, KubernetesApplicationViewModel} from 'Kubernetes/models/application';
+import { KubernetesApplicationDeploymentTypes, KubernetesApplicationViewModel } from 'Kubernetes/models/application';
 import KubernetesDaemonSetModelFromApplication from 'Kubernetes/models/daemonset';
 import KubernetesServiceModelFromApplication from 'Kubernetes/models/service';
+import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 
 angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
-  "$async", "KubernetesDeploymentService", "KubernetesDaemonSetService", "KubernetesServiceService",
-  function KubernetesApplicationServiceFactory($async, KubernetesDeploymentService, KubernetesDaemonSetService, KubernetesServiceService) {
+  '$async', 'KubernetesDeploymentService', 'KubernetesDaemonSetService', 'KubernetesServiceService', 'KubernetesPods',
+  function KubernetesApplicationServiceFactory($async, KubernetesDeploymentService, KubernetesDaemonSetService, KubernetesServiceService, KubernetesPods) {
     "use strict";
     const service = {
       applications: applications,
@@ -47,30 +48,32 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
     /**
      * Application
      */
-    async function applicationAsync(name) {
+    async function applicationAsync(namespace, name) {
       try {
-        const [deployments, daemonSets, services] = await Promise.all([
-          KubernetesDeploymentService.deployments(),
-          KubernetesDaemonSetService.daemonSets(),
-          KubernetesServiceService.services()
+        const [deployment, daemonSet, service, pods] = await Promise.allSettled([
+          KubernetesDeploymentService.deployment(namespace, name),
+          KubernetesDaemonSetService.daemonSet(namespace, name),
+          KubernetesServiceService.service(namespace, name),
+          KubernetesPods(namespace).query().$promise
         ]);
 
-        const service = _.find(services, (serv) => serv.metadata.name === name);
-        const deployment = _.find(deployments, (depl) => depl.metadata.name === name);
-        const daemonSet = _.find(daemonSets, (daemon) => daemon.metadata.name === name);
-
-        if (deployment) {
-          return new KubernetesApplicationViewModel(KubernetesApplicationDeploymentTypes.REPLICATED, deployment, service);
+        if (deployment.status === 'fulfilled') {
+          KubernetesApplicationHelper.associatePodsAndApplication(pods.value.items, deployment.value.Raw);
+          const application = new KubernetesApplicationViewModel(KubernetesApplicationDeploymentTypes.REPLICATED, deployment.value.Raw, service.value);
+          application.Yaml = deployment.value.Yaml.data;
+          return application;
         }
-
-        return new KubernetesApplicationViewModel(KubernetesApplicationDeploymentTypes.GLOBAL, daemonSet, service);
+        KubernetesApplicationHelper.associatePodsAndApplication(pods.value.items, daemonSet.value.Raw);
+        const application = new KubernetesApplicationViewModel(KubernetesApplicationDeploymentTypes.GLOBAL, daemonSet.value.Raw, service.value);
+        application.Yaml = daemonSet.value.Yaml;
+        return application;
       } catch (err) {
         throw err;
       }
     }
 
-    function application(name) {
-      return $async(applicationAsync, name);
+    function application(namespace, name) {
+      return $async(applicationAsync, namespace, name);
     }
 
     /**
@@ -105,10 +108,10 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
      * Delete
      */
 
-     /**
-      *
-      * @param {KubernetesApplicationViewModel} application
-      */
+    /**
+     *
+     * @param {KubernetesApplicationViewModel} application
+     */
     async function removeAsync(application) {
       const payload = {
         Namespace: application.ResourcePool,

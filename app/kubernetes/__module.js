@@ -45,7 +45,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
 
   const applicationInspect = {
     name: 'kubernetes.applications.application',
-    url: '/:name',
+    url: '/:namespace/:name',
     views: {
       'content@': {
         templateUrl: './views/applications/inspect/application.html',

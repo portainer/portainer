@@ -12,11 +12,13 @@ export function KubernetesApplicationViewModel(type, data, service) {
     this.RunningPodsCount = 0;
     this.TotalPodsCount = 0;
   }
+  this.Id = data.metadata.uid;
   this.Name = data.metadata.name;
   this.Stack = data.metadata.annotations[KubernetesApplicationStackAnnotationKey] || '-';
   this.ResourcePool = data.metadata.namespace;
   this.Image = data.spec.template.spec.containers[0].image;
   this.CreatedAt = data.metadata.creationTimestamp;
+  this.Pods = data.Pods;
 
   if (service) {
     const serviceType = service.spec.type;

@@ -5,7 +5,7 @@
     </a>
   </rd-header-title>
   <rd-header-content>
-    <a ui-sref="kubernetes.services">Applications</a> &gt; <a ui-sref="kubernetes.applications.application" ui-sref-opts="{reload: true}">{{ ctrl.application.Name }}</a>
+    <a ui-sref="kubernetes.applications">Applications</a> &gt; <a ui-sref="kubernetes.applications.application" ui-sref-opts="{reload: true}">{{ ctrl.application.Name }}</a>
   </rd-header-content>
 </rd-header>
 
@@ -149,9 +149,39 @@
       <rd-widget-body classes="no-padding">
 
         <uib-tabset active="ctrl.state.activeTab" justified="true">
-          <uib-tab index="0" heading="Pods"></uib-tab>
-          <uib-tab index="1" heading="Events"></uib-tab>
-          <uib-tab index="2" heading="YAML"></uib-tab>
+          <uib-tab index="0">
+            <uib-tab-heading>
+              <i class="fa fa-server space-right" aria-hidden="true"></i> Pods
+            </uib-tab-heading>
+            <kubernetes-pods-datatable
+              title-text="Application pods" title-icon="fa-server"
+              dataset="ctrl.application.Pods" table-key="kubernetes.application.pods"
+              order-by="Name"
+            ></kubernetes-pods-datatable>
+          </uib-tab>
+          <uib-tab index="1">
+            <uib-tab-heading>
+              <i class="fa fa-history space-right" aria-hidden="true"></i> Events
+            </uib-tab-heading>
+            <kubernetes-events-datatable
+              title-text="Events" title-icon="fa-history"
+              dataset="ctrl.events" table-key="kubernetes.application.events"
+              order-by="Date"
+              reverse-order="true"
+              loading="ctrl.state.eventsLoading"
+              refresh-callback="ctrl.getEvents"
+            ></kubernetes-events-datatable>
+          </uib-tab>
+          <uib-tab index="2">
+            <uib-tab-heading>
+              <i class="fa fa-code space-right" aria-hidden="true"></i> YAML
+            </uib-tab-heading>
+            <rd-widget>
+              <rd-widget-body>
+                <pre>{{ ctrl.application.Yaml }}</pre>
+              </rd-widget-body>
+            </rd-widget>
+          </uib-tab>
         </uib-tabset>
 
       </rd-widget-body>

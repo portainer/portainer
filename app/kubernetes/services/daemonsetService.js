@@ -4,8 +4,9 @@ angular.module("portainer.kubernetes").factory("KubernetesDaemonSetService", [
   "$async", "KubernetesDaemonSets",
   function KubernetesDaemonSetServiceFactory($async, KubernetesDaemonSets) {
     "use strict";
-    const service = {
+    const factory = {
       daemonSets: daemonSets,
+      daemonSet: daemonSet,
       create: create,
       remove: remove
     };
@@ -15,7 +16,7 @@ angular.module("portainer.kubernetes").factory("KubernetesDaemonSetService", [
      */
     async function daemonSetsAsync() {
       try {
-        const data = await KubernetesDaemonSets.query().$promise;
+        const data = await KubernetesDaemonSets().query().$promise;
         return data.items;
       } catch (err) {
         throw { msg: 'Unable to retrieve DaemonSets', err: err };
@@ -27,6 +28,32 @@ angular.module("portainer.kubernetes").factory("KubernetesDaemonSetService", [
     }
 
     /**
+     * daemonSet
+     */
+    async function daemonSetAsync(namespace, name) {
+      try {
+        const payload = {
+          id: name
+        };
+        const [raw, yaml] = await Promise.all([
+          KubernetesDaemonSets(namespace).get(payload).$promise,
+          KubernetesDaemonSets(namespace).getYaml(payload).$promise
+        ]);
+        const res = {
+          Raw: raw,
+          Yaml: yaml
+        };
+        return res;
+      } catch (err) {
+        throw { msg: 'Unable to retrieve daemonSet', err: err };
+      }
+    }
+
+    function daemonSet(namespace, name) {
+      return $async(daemonSetAsync, namespace, name);
+    }
+
+    /**
      * Creation
      */
     // TODO: review on architecture/refactor meeting
@@ -34,7 +61,7 @@ angular.module("portainer.kubernetes").factory("KubernetesDaemonSetService", [
     // We convert the daemonSet model from models/daemonset.js to the payload in here.
     // Wasn't sure if the payload should have been added as a new object in the models/daemonset.js too, with
     // a function to convert a model to a payload.
-    // Most of the Kubernetes models are re-used in other objects (container definition is also defined in the deployment
+    // Most of the Kubernetes models are re-used in other objects (container definition is also defined in the daemonSet
     // model, metadata is the same for all models...) so maybe it should be centralized/defined somewhere.
     // Last discussion on this was to use models for payload and converters (converters location to be determined either
     // in helpers or models).
@@ -84,7 +111,7 @@ angular.module("portainer.kubernetes").factory("KubernetesDaemonSetService", [
           payload.spec.template.spec.containers[0].resources.limits.cpu = daemonSet.CpuLimit;
         }
 
-        const data = await KubernetesDaemonSets.create(payload).$promise;
+        const data = await KubernetesDaemonSets(payload.metadata.namespace).create(payload).$promise;
         return data;
       } catch (err) {
         throw { msg: 'Unable to create daemon set', err:err };
@@ -101,10 +128,9 @@ angular.module("portainer.kubernetes").factory("KubernetesDaemonSetService", [
     async function removeAsync(daemonSet) {
       try {
         const payload = {
-          namespace: daemonSet.Namespace,
           name: daemonSet.Name
         };
-        await KubernetesDaemonSets.delete(payload).$promise
+        await KubernetesDaemonSets(daemonSet.Namespace).delete(payload).$promise
       } catch (err) {
         throw { msg: 'Unable to remove daemonset', err: err };
       }
@@ -114,6 +140,6 @@ angular.module("portainer.kubernetes").factory("KubernetesDaemonSetService", [
       return $async(removeAsync, daemonSet);
     }
 
-    return service;
+    return factory;
   }
 ]);

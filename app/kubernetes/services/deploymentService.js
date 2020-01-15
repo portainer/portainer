@@ -4,8 +4,9 @@ angular.module("portainer.kubernetes").factory("KubernetesDeploymentService", [
   "$async", "KubernetesDeployments",
   function KubernetesDeploymentServiceFactory($async, KubernetesDeployments) {
     "use strict";
-    const service = {
+    const factory = {
       deployments: deployments,
+      deployment: deployment,
       create: create,
       remove: remove
     };
@@ -15,7 +16,7 @@ angular.module("portainer.kubernetes").factory("KubernetesDeploymentService", [
      */
     async function deploymentsAsync() {
       try {
-        const data = await KubernetesDeployments.query().$promise;
+        const data = await KubernetesDeployments().query().$promise;
         return data.items;
       } catch (err) {
         throw { msg: 'Unable to retrieve deployments', err: err };
@@ -24,6 +25,32 @@ angular.module("portainer.kubernetes").factory("KubernetesDeploymentService", [
 
     function deployments() {
       return $async(deploymentsAsync);
+    }
+
+    /**
+     * Deployment
+     */
+    async function deploymentAsync(namespace, name) {
+      try {
+        const payload = {
+          id: name
+        };
+        const [raw, yaml] = await Promise.all([
+          KubernetesDeployments(namespace).get(payload).$promise,
+          KubernetesDeployments(namespace).getYaml(payload).$promise
+        ]);
+        const res = {
+          Raw: raw,
+          Yaml: yaml
+        }
+        return res;
+      } catch (err) {
+        throw { msg: 'Unable to retrieve deployment', err: err };
+      }
+    }
+
+    function deployment(namespace, name) {
+      return $async(deploymentAsync, namespace, name);
     }
 
     /**
@@ -75,7 +102,7 @@ angular.module("portainer.kubernetes").factory("KubernetesDeploymentService", [
           payload.spec.template.spec.containers[0].resources.limits.cpu = deployment.CpuLimit;
         }
 
-        const data = await KubernetesDeployments.create(payload).$promise;
+        const data = await KubernetesDeployments(payload.metadata.namespace).create(payload).$promise;
         return data;
       } catch (err) {
         throw { msg: 'Unable to create deployment', err:err };
@@ -92,10 +119,9 @@ angular.module("portainer.kubernetes").factory("KubernetesDeploymentService", [
     async function removeAsync(deployment) {
       try {
         const payload = {
-          namespace: deployment.Namespace,
           name: deployment.Name
         };
-        await KubernetesDeployments.delete(payload).$promise
+        await KubernetesDeployments(deployment.Namespace).delete(payload).$promise
       } catch (err) {
         throw { msg: 'Unable to remove deployment', err: err };
       }
@@ -105,6 +131,6 @@ angular.module("portainer.kubernetes").factory("KubernetesDeploymentService", [
       return $async(removeAsync, deployment);
     }
 
-    return service;
+    return factory;
   }
 ]);

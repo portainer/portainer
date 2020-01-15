@@ -123,7 +123,7 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="$ctrl.disableRemove(item)"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="kubernetes.applications.application({ name: item.Name })">{{ item.Name }}</a>
+                <a ui-sref="kubernetes.applications.application({ name: item.Name, namespace: item.ResourcePool })">{{ item.Name }}</a>
               </td>
               <td>{{ item.Stack }}</td>
               <td>{{ item.ResourcePool }}</td>
