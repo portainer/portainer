@@ -87,6 +87,18 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     }
   };
 
+  const deploy = {
+    name: 'kubernetes.deploy',
+    url: '/deploy',
+    views: {
+      'content@': {
+        templateUrl: './views/deploy/deploy.html',
+        controller: 'KubernetesDeployController',
+        controllerAs: 'ctrl'
+      }
+    }
+  };
+
   const nodes = {
     name: 'kubernetes.cluster',
     url: '/cluster',
@@ -154,6 +166,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
   $stateRegistryProvider.register(applicationCreateMockup);
   $stateRegistryProvider.register(applicationCreateMockupExpanded);
   $stateRegistryProvider.register(dashboard);
+  $stateRegistryProvider.register(deploy);
   $stateRegistryProvider.register(nodes);
   $stateRegistryProvider.register(resourcePools);
   $stateRegistryProvider.register(resourcePoolCreation);
