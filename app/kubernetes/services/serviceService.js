@@ -35,7 +35,15 @@ angular.module("portainer.kubernetes").factory("KubernetesServiceService", [
         const payload = {
           id: name
         };
-        return await KubernetesServices(namespace).get(payload).$promise;  
+        const [raw, yaml] = await Promise.all([
+          KubernetesServices(namespace).get(payload).$promise,
+          KubernetesServices(namespace).getYaml(payload).$promise
+        ]);
+        const res = {
+          Raw: raw,
+          Yaml: yaml
+        }
+        return res;
       } catch (err) {
         throw { msg: 'Unable to retrieve service', err: err };
       }

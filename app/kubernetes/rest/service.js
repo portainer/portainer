@@ -1,4 +1,4 @@
-// import { rawResponse } from './response/transform';
+import { rawResponse } from './response/transform';
 
 angular.module('portainer.kubernetes')
 .factory('KubernetesServices', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider',
@@ -19,6 +19,13 @@ angular.module('portainer.kubernetes')
         {
           query: { method: 'GET', timeout: 15000 },
           get: { method: 'GET' },
+          getYaml: {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/yaml'
+            },
+            transformResponse: rawResponse
+          },
           create: { method: 'POST' },
           delete: { method: 'DELETE' }
         }

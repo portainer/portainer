@@ -50,22 +50,33 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
      */
     async function applicationAsync(namespace, name) {
       try {
-        const [deployment, daemonSet, service, pods] = await Promise.allSettled([
+        const [deployment, daemonSet, serviceAttempt, pods] = await Promise.allSettled([
           KubernetesDeploymentService.deployment(namespace, name),
           KubernetesDaemonSetService.daemonSet(namespace, name),
           KubernetesServiceService.service(namespace, name),
           KubernetesPods(namespace).query().$promise
         ]);
+        const service = {};
+        if (serviceAttempt.status === 'fulfilled') {
+          service.Raw = serviceAttempt.value.Raw;
+          service.Yaml = serviceAttempt.value.Yaml;
+        }
 
         if (deployment.status === 'fulfilled') {
           KubernetesApplicationHelper.associatePodsAndApplication(pods.value.items, deployment.value.Raw);
-          const application = new KubernetesApplicationViewModel(KubernetesApplicationDeploymentTypes.REPLICATED, deployment.value.Raw, service.value);
+          const application = new KubernetesApplicationViewModel(KubernetesApplicationDeploymentTypes.REPLICATED, deployment.value.Raw, service.Raw);
           application.Yaml = deployment.value.Yaml.data;
+          if (service.Yaml) {
+            application.Yaml += '\n---\n' + service.Yaml.data;
+          }
           return application;
         }
         KubernetesApplicationHelper.associatePodsAndApplication(pods.value.items, daemonSet.value.Raw);
-        const application = new KubernetesApplicationViewModel(KubernetesApplicationDeploymentTypes.GLOBAL, daemonSet.value.Raw, service.value);
+        const application = new KubernetesApplicationViewModel(KubernetesApplicationDeploymentTypes.GLOBAL, daemonSet.value.Raw, service.Raw);
         application.Yaml = daemonSet.value.Yaml;
+        if (service.Yaml) {
+          application.Yaml += '\n---\n' + service.Yaml.data;
+        }
         return application;
       } catch (err) {
         throw err;
