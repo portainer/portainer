@@ -6,6 +6,7 @@
 // If it is used elsewhere later then maybe rename it to clarify its purpose (not really a view model at the moment hence
 // why it was not named KubernetesDaemonSetViewModelFromApplication).
 import _ from 'lodash-es';
+import KubernetesSecretModel from 'Kubernetes/models/secret';
 
 function bytesValue(mem) {
   return mem * 1000 * 1000;
@@ -19,13 +20,25 @@ export default function KubernetesDaemonSetModelFromApplication(applicationFormV
   this.Env = [];
   this.CpuLimit = applicationFormValues.CpuLimit;
   this.MemoryLimit = bytesValue(applicationFormValues.MemoryLimit);
+  this.Secret = new KubernetesSecretModel(this.Name, this.Namespace, this.StackName);
 
-  // TODO: Secret environment variables are not supported yet
   _.forEach(applicationFormValues.EnvironmentVariables, (item) => {
-    const envVar = {
-      name: item.Name,
-      value: item.Value
+    let envVar = {
+      name: item.Name
     };
+
+    if (item.IsSecret) {
+      envVar.valueFrom = {
+        secretKeyRef: {
+          name: this.Name,
+          key: item.Name
+        }
+      };
+
+      this.Secret.Data[item.Name] = btoa(unescape(encodeURIComponent(item.Value)));
+    } else {
+      envVar.value = item.Value
+    }
 
     this.Env.push(envVar);
   });

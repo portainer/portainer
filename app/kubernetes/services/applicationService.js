@@ -1,13 +1,13 @@
 import _ from 'lodash-es';
 import KubernetesDeploymentModelFromApplication from 'Kubernetes/models/deployment';
-import { KubernetesApplicationDeploymentTypes, KubernetesApplicationViewModel } from 'Kubernetes/models/application';
+import {KubernetesApplicationDeploymentTypes, KubernetesApplicationViewModel} from 'Kubernetes/models/application';
 import KubernetesDaemonSetModelFromApplication from 'Kubernetes/models/daemonset';
 import KubernetesServiceModelFromApplication from 'Kubernetes/models/service';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 
 angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
-  '$async', 'KubernetesDeploymentService', 'KubernetesDaemonSetService', 'KubernetesServiceService', 'KubernetesPods',
-  function KubernetesApplicationServiceFactory($async, KubernetesDeploymentService, KubernetesDaemonSetService, KubernetesServiceService, KubernetesPods) {
+  '$async', 'KubernetesDeploymentService', 'KubernetesDaemonSetService', 'KubernetesServiceService', 'KubernetesPods', 'KubernetesSecretService',
+  function KubernetesApplicationServiceFactory($async, KubernetesDeploymentService, KubernetesDaemonSetService, KubernetesServiceService, KubernetesPods, KubernetesSecretService) {
     "use strict";
     const service = {
       applications: applications,
@@ -94,9 +94,19 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
       try {
         if (applicationFormValues.DeploymentType === KubernetesApplicationDeploymentTypes.REPLICATED) {
           const deployment = new KubernetesDeploymentModelFromApplication(applicationFormValues);
+
+          if (!_.isEmpty(deployment.Secret.Data)) {
+            await KubernetesSecretService.create(deployment.Secret);
+          }
+
           await KubernetesDeploymentService.create(deployment);
         } else {
           const daemonSet = new KubernetesDaemonSetModelFromApplication(applicationFormValues);
+
+          if (!_.isEmpty(daemonSet.Secret.Data)) {
+            await KubernetesSecretService.create(daemonSet.Secret);
+          }
+
           await KubernetesDaemonSetService.create(daemonSet);
         }
 
