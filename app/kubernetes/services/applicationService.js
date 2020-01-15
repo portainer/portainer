@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
 import KubernetesDeploymentModelFromApplication from 'Kubernetes/models/deployment';
 import {KubernetesApplicationDeploymentTypes, KubernetesApplicationViewModel} from 'Kubernetes/models/application';
-import KubernetesDaemonSetModelFromApplication from 'Kubernetes/models/daemonset';
+import KubernetesDaemonSetModelFromApplication from 'Kubernetes/models/daemonSet';
 import KubernetesServiceModelFromApplication from 'Kubernetes/models/service';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 
