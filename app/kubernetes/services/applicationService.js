@@ -67,7 +67,7 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
           const application = new KubernetesApplicationViewModel(KubernetesApplicationDeploymentTypes.REPLICATED, deployment.value.Raw, service.Raw);
           application.Yaml = deployment.value.Yaml.data;
           if (service.Yaml) {
-            application.Yaml += '\n---\n' + service.Yaml.data;
+            application.Yaml += '---\n' + service.Yaml.data;
           }
           return application;
         }
@@ -75,7 +75,7 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
         const application = new KubernetesApplicationViewModel(KubernetesApplicationDeploymentTypes.GLOBAL, daemonSet.value.Raw, service.Raw);
         application.Yaml = daemonSet.value.Yaml;
         if (service.Yaml) {
-          application.Yaml += '\n---\n' + service.Yaml.data;
+          application.Yaml += '---\n' + service.Yaml.data;
         }
         return application;
       } catch (err) {
