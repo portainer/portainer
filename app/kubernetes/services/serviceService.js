@@ -95,7 +95,7 @@ angular.module("portainer.kubernetes").factory("KubernetesServiceService", [
     async function removeAsync(service) {
       try {
         const payload = {
-          name: service.Name
+          id: service.Name
         };
         await KubernetesServices(service.Namespace).delete(payload).$promise
       } catch (err) {
