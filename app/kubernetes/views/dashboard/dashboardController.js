@@ -2,13 +2,14 @@ import angular from 'angular';
 
 class KubernetesDashboardController {
   /* @ngInject */
-  constructor($async, Notifications, Authentication, EndpointService, EndpointProvider, KubernetesResourcePoolService) {
+  constructor($async, Notifications, Authentication, EndpointService, EndpointProvider, KubernetesResourcePoolService, KubernetesApplicationService) {
     this.$async = $async;
     this.Notifications = Notifications;
     this.Authentication = Authentication;
     this.EndpointService = EndpointService;
     this.EndpointProvider = EndpointProvider;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
+    this.KubernetesApplicationService = KubernetesApplicationService;
 
     this.getAll = this.getAll.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);
@@ -17,12 +18,14 @@ class KubernetesDashboardController {
   async getAllAsync() {
     try {
       const endpointId = this.EndpointProvider.endpointID();
-      const [endpoint, pools] = await Promise.all([
+      const [endpoint, pools, applications] = await Promise.all([
         this.EndpointService.endpoint(endpointId),
-        this.KubernetesResourcePoolService.shortResourcePools()
+        this.KubernetesResourcePoolService.shortResourcePools(),
+        this.KubernetesApplicationService.applications(),
       ]);
       this.endpoint = endpoint;
       this.pools = pools;
+      this.applications = applications;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load dashboard data');
     }

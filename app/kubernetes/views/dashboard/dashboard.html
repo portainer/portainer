@@ -74,4 +74,17 @@
       </rd-widget>
     </div>
   </div>
+  <div class="col-xs-12 col-md-6" ng-if="ctrl.applications">
+    <a ui-sref="kubernetes.applications">
+      <rd-widget>
+        <rd-widget-body>
+          <div class="widget-icon blue pull-left">
+            <i class="fa fa-laptop-code"></i>
+          </div>
+          <div class="title">{{ ctrl.applications.length }}</div>
+          <div class="comment">{{ ctrl.applications.length === 1 ? 'Application' : 'Applications' }}</div>
+        </rd-widget-body>
+      </rd-widget>
+    </a>
+  </div>
 </div>
