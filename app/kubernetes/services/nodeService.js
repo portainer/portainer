@@ -1,10 +1,12 @@
 import _ from 'lodash-es';
-import { KubernetesNodeViewModel, KubernetesNodeDetailsViewModel } from '../models/node';
+import {KubernetesNodeDetailsViewModel, KubernetesNodeViewModel} from '../models/node';
 
 angular.module('portainer.kubernetes')
   .factory('KubernetesNodeService', ['$async', 'KubernetesNodes',
     function KubernetesNodeServiceFactory($async, KubernetesNodes) {
       'use strict';
+      // TODO: review on architecture/refactor meeting
+      // Ensure that all services are using the same structure for code consistency
       var service = {};
 
       async function nodesAsync() {
