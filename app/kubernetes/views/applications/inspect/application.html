@@ -68,7 +68,7 @@
                 <portainer-tooltip position="bottom" message="A pending status means that Portainer delegated the request to the provider responsible for creating the external load balancer. If it stays in pending state for long, this means that this capability might not be supported or you might have an issue with your cluster provider. Contact your cluster administrator for more information."></portainer-tooltip>
               </p>
             </span>
-            <span ng-if="ctrl.application.LoadBalancerIPAddress" class="small text-muted">
+            <span ng-if="ctrl.application.LoadBalancerIPAddress">
               <p>
               Load balancer status: <i class="fa fa-check green-icon" style="margin-left: 2px"></i> available
               </p>
