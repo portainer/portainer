@@ -23,20 +23,20 @@ export function KubernetesPodViewModel(data) {
   this.CreatedAt = data.status.startTime;
 }
 
-function KubernetesContainerViewModel(data) {
-  this.Name = data.name;
-  this.Image = data.image;
-  this.Ready = data.ready;
-  this.RestartCount = data.restartCount;
-  this.CurrentState = data.state;
-  this.LastState = data.lastState;
-}
+// function KubernetesContainerViewModel(data) {
+//   this.Name = data.name;
+//   this.Image = data.image;
+//   this.Ready = data.ready;
+//   this.RestartCount = data.restartCount;
+//   this.CurrentState = data.state;
+//   this.LastState = data.lastState;
+// }
 
-export function KubernetesContainerDetailsViewModel(data, yaml) {
-  Object.assign(this, new KubernetesPodViewModel(data));
-  this.ServiceAccount = data.spec.serviceAccountName || '-';
-  this.Labels = data.metadata.labels;
-  this.Conditions = data.status.conditions;
-  this.Containers = _.map(data.status.containerStatuses, (item) => new KubernetesContainerViewModel(item));
-  this.Yaml = yaml;
-}
+// export function KubernetesPodDetailsViewModel(data, yaml) {
+//   Object.assign(this, new KubernetesPodViewModel(data));
+//   this.ServiceAccount = data.spec.serviceAccountName || '-';
+//   this.Labels = data.metadata.labels;
+//   this.Conditions = data.status.conditions;
+//   this.Containers = _.map(data.status.containerStatuses, (item) => new KubernetesContainerViewModel(item));
+//   this.Yaml = yaml;
+// }

@@ -23,6 +23,7 @@ export function KubernetesApplicationViewModel(type, data, service) {
   if (service) {
     const serviceType = service.spec.type;
     this.ServiceType = serviceType;
+    this.ServiceId = service.metadata.uid;
 
     if (serviceType === 'LoadBalancer') {
       if (service.status.loadBalancer.ingress && service.status.loadBalancer.ingress.length > 0) {

@@ -23,7 +23,9 @@ class KubernetesApplicationController {
     try {
       this.state.eventsLoading = true;
       const events = await this.KubernetesEventService.events();
-      this.events = _.filter(events, (event) => event.Involved.uid === this.application.Id);
+      this.events = _.filter(events, (event) => event.Involved.uid === this.application.Id
+        || event.Involved.uid === this.application.ServiceId
+        || _.find(this.application.Pods, (pod) => pod.Id === event.Involved.uid) !== undefined);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve application events');
     } finally {
