@@ -109,7 +109,7 @@
               <td>{{ item.Role }}</td>
               <td><span class="label label-{{item.Status | kubernetesNodeStatusColor}}">{{ item.Status }}</span></td>
               <td>{{ item.CPU }}</td>
-              <td>{{ item.Memory }}</td>
+              <td>{{ item.Memory | humansize }}</td>
               <td>{{ item.Version }}</td>
               <td>{{ item.IPAddress }}</td>
             </tr>

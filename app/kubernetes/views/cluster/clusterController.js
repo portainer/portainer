@@ -1,4 +1,6 @@
 import angular from 'angular';
+import _ from 'lodash-es';
+import filesizeParser from 'filesize-parser';
 
 class KubernetesClusterController {
   /* @ngInject */
@@ -13,7 +15,9 @@ class KubernetesClusterController {
 
   async getNodesAsync() {
     try {
-      this.nodes = await this.KubernetesNodeService.nodes();
+      const nodes = await this.KubernetesNodeService.nodes();
+      _.forEach(nodes, (node) => node.Memory = filesizeParser(node.Memory));
+      this.nodes = nodes;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve nodes');
     }
