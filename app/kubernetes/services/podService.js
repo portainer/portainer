@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { KubernetesPodViewModel, KubernetesPodDetailsViewModel } from '../models/pod';
+import { KubernetesPodViewModel } from '../models/pod';
 
 angular.module('portainer.kubernetes')
   .factory('KubernetesPodService', ['$async', 'KubernetesPods',
@@ -7,7 +7,7 @@ angular.module('portainer.kubernetes')
       'use strict';
       var factory = {
         pods: pods,
-        pod: pod
+        // pod: pod
       };
 
       /**
@@ -29,21 +29,21 @@ angular.module('portainer.kubernetes')
       /**
        * Pod
        */
-      async function podAsync(namespace, name) {
-        try {
-          const [details, yaml] = await Promise.all([
-            KubernetesPods(namespace).pod({ id: name }).$promise,
-            KubernetesPods(namespace).yamlPod({ id: name }).$promise
-          ]);
-          return new KubernetesPodDetailsViewModel(details, yaml.data);
-        } catch (err) {
-          throw { msg: 'Unable to retrieve pod details', err: err };
-        }
-      }
+      // async function podAsync(namespace, name) {
+      //   try {
+      //     const [details, yaml] = await Promise.all([
+      //       KubernetesPods(namespace).pod({ id: name }).$promise,
+      //       KubernetesPods(namespace).yamlPod({ id: name }).$promise
+      //     ]);
+      //     return new KubernetesPodDetailsViewModel(details, yaml.data);
+      //   } catch (err) {
+      //     throw { msg: 'Unable to retrieve pod details', err: err };
+      //   }
+      // }
 
-      function pod(namespace, name) {
-        return $async(podAsync, namespace, name);
-      }
+      // function pod(namespace, name) {
+      //   return $async(podAsync, namespace, name);
+      // }
 
       return factory;
     }]);
