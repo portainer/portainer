@@ -14,17 +14,17 @@ angular.module("portainer.kubernetes").factory("KubernetesServiceService", [
     /**
      * Services
      */
-    async function servicesAsync() {
+    async function servicesAsync(namespace) {
       try {
-        const data = await KubernetesServices().query().$promise;
+        const data = await KubernetesServices(namespace).query().$promise;
         return data.items;
       } catch (err) {
         throw { msg: 'Unable to retrieve services', err: err };
       }
     }
 
-    function services() {
-      return $async(servicesAsync);
+    function services(namespace) {
+      return $async(servicesAsync, namespace);
     }
 
     /**

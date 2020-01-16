@@ -1,3 +1,6 @@
+import _ from 'lodash-es';
+import filesizeParser from 'filesize-parser';
+
 export function KubernetesApplicationViewModel(type, data, service) {
   if (type === KubernetesApplicationDeploymentTypes.REPLICATED) {
     this.DeploymentType = KubernetesApplicationDeploymentTypes.REPLICATED;
@@ -19,6 +22,15 @@ export function KubernetesApplicationViewModel(type, data, service) {
   this.Image = data.spec.template.spec.containers[0].image;
   this.CreatedAt = data.metadata.creationTimestamp;
   this.Pods = data.Pods;
+  const limits = {
+    Cpu: 0,
+    Memory: 0
+  }
+  this.Limits = _.reduce(data.spec.template.spec.containers, (acc, item) => {
+    acc.Cpu += item.resources.limits ? parseInt(item.resources.limits.cpu)/1000 : 0;
+    acc.Memory += item.resources.limits ? filesizeParser(item.resources.limits.memory) : 0;
+    return acc;
+  }, limits);
 
   if (service) {
     const serviceType = service.spec.type;

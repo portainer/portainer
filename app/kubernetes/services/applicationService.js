@@ -19,12 +19,12 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
     /**
      * Applications
      */
-    async function applicationsAsync() {
+    async function applicationsAsync(namespace) {
       try {
         const [deployments, daemonSets, services] = await Promise.all([
-          KubernetesDeploymentService.deployments(),
-          KubernetesDaemonSetService.daemonSets(),
-          KubernetesServiceService.services()
+          KubernetesDeploymentService.deployments(namespace),
+          KubernetesDaemonSetService.daemonSets(namespace),
+          KubernetesServiceService.services(namespace)
         ]);
         const deploymentApplications = _.map(deployments, (item) => {
           const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
@@ -41,8 +41,8 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
       }
     }
 
-    function applications() {
-      return $async(applicationsAsync);
+    function applications(namespace) {
+      return $async(applicationsAsync, namespace);
     }
 
     /**

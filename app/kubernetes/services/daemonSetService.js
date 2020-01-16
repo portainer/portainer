@@ -14,17 +14,17 @@ angular.module("portainer.kubernetes").factory("KubernetesDaemonSetService", [
     /**
      * DaemonSets
      */
-    async function daemonSetsAsync() {
+    async function daemonSetsAsync(namespace) {
       try {
-        const data = await KubernetesDaemonSets().query().$promise;
+        const data = await KubernetesDaemonSets(namespace).query().$promise;
         return data.items;
       } catch (err) {
         throw { msg: 'Unable to retrieve DaemonSets', err: err };
       }
     }
 
-    function daemonSets() {
-      return $async(daemonSetsAsync);
+    function daemonSets(namespace) {
+      return $async(daemonSetsAsync, namespace);
     }
 
     /**
