@@ -9,6 +9,8 @@ import {
   KubernetesApplicationPublishedPortFormValue,
   KubernetesApplicationPublishingTypes
 } from 'Kubernetes/models/application';
+import {KubernetesPortainerQuotaSuffix} from 'Kubernetes/models/resourceQuota';
+import {KubernetesLimitRangeDefaults} from 'Kubernetes/models/limitRange';
 
 
 function megaBytesValue(mem) {
@@ -92,6 +94,28 @@ class KubernetesCreateApplicationController {
     return this.$async(this.deployApplicationAsync);
   }
 
+  onSelectResourcePool() {
+    // TODO: review @LP
+    // slider UI (max memory/CPU) not updated after the execution of this function
+
+    // const quota = _.find(this.formValues.ResourcePool.Quotas, (item) => item.Name === KubernetesPortainerQuotaSuffix + this.formValues.ResourcePool.Namespace.Name);
+    // if (quota) {
+    //   this.state.maxMemory = megaBytesValue(quota.MemoryLimit);
+    //   this.state.maxCpu = quota.CpuLimit;
+    //
+    //   this.formValues.MemoryLimit = this.KubernetesLimitRangeDefaults.MemoryLimit;
+    //   this.formValues.CpuLimit = this.KubernetesLimitRangeDefaults.CpuLimit;
+    // } else {
+    //   this.formValues.CpuLimit = 0;
+    //   this.formValues.MemoryLimit = 0;
+    //   _.forEach(this.nodes, (item) => {
+    //     this.state.maxMemory += filesizeParser(item.Memory);
+    //     this.state.maxCpu += item.CPU;
+    //   });
+    //   this.state.maxMemory = megaBytesValue(this.state.maxMemory);
+    // }
+  }
+
   async onInit() {
     try {
       this.formValues = new KubernetesApplicationFormValues();
@@ -105,22 +129,29 @@ class KubernetesCreateApplicationController {
 
       this.ApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
       this.ApplicationPublishingTypes = KubernetesApplicationPublishingTypes;
+      this.KubernetesLimitRangeDefaults = KubernetesLimitRangeDefaults;
 
       const [resourcePools, stacks, nodes] = await Promise.all([
         this.KubernetesResourcePoolService.resourcePools(),
         this.KubernetesStackService.stacks(),
         this.KubernetesNodeService.nodes()
       ]);
-      this.resourcePools = resourcePools;
-      this.formValues.ResourcePool = this.resourcePools[0];
 
       this.stacks = stacks;
-
-      _.forEach(nodes, (item) => {
-        this.state.maxMemory += filesizeParser(item.Memory);
-        this.state.maxCpu += item.CPU;
-      });
-      this.state.maxMemory = megaBytesValue(this.state.maxMemory);
+      this.nodes = nodes;
+      this.resourcePools = resourcePools;
+      this.formValues.ResourcePool = this.resourcePools[0];
+      const quota = _.find(this.formValues.ResourcePool.Quotas, (item) => item.Name === KubernetesPortainerQuotaSuffix + this.formValues.ResourcePool.Namespace.Name);
+      if (quota) {
+        this.state.maxMemory = quota.MemoryLimit;
+        this.state.maxCpu = quota.CpuLimit;
+      } else {
+        _.forEach(nodes, (item) => {
+          this.state.maxMemory += filesizeParser(item.Memory);
+          this.state.maxCpu += item.CPU;
+        });
+        this.state.maxMemory = megaBytesValue(this.state.maxMemory);
+      }
 
       const endpoint = this.EndpointProvider.currentEndpoint();
       this.storageClasses = endpoint.Kubernetes.Configuration.StorageClasses;

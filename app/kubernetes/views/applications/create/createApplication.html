@@ -22,6 +22,7 @@
             <div class="col-sm-11">
               <select class="form-control" id="resource-pool-selector"
                       ng-model="ctrl.formValues.ResourcePool" ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools"
+                      ng-change="ctrl.onSelectResourcePool()"
               ></select>
             </div>
           </div>

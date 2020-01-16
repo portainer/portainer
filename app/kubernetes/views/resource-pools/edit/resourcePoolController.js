@@ -1,7 +1,8 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
-import { KubernetesResourceQuotaDefaults, KubernetesPortainerQuotaSuffix } from 'Kubernetes/models/resourceQuota';
+import {KubernetesPortainerQuotaSuffix, KubernetesResourceQuotaDefaults} from 'Kubernetes/models/resourceQuota';
+import KubernetesDefaultLimitRangeModel from 'Kubernetes/models/limitRange';
 
 function megaBytesValue(mem) {
   return Math.floor(mem / 1000 / 1000);
@@ -13,7 +14,7 @@ function bytesValue(mem) {
 
 class KubernetesEditResourcePoolController {
   /* @ngInject */
-  constructor($async, $state, $stateParams, Notifications, KubernetesNodeService, KubernetesResourceQuotaService, KubernetesResourcePoolService) {
+  constructor($async, $state, $stateParams, Notifications, KubernetesNodeService, KubernetesResourceQuotaService, KubernetesResourcePoolService, KubernetesLimitRangeService) {
     this.$async = $async;
     this.$state = $state;
     this.$stateParams = $stateParams;
@@ -21,6 +22,7 @@ class KubernetesEditResourcePoolController {
 
     this.KubernetesNodeService = KubernetesNodeService;
     this.KubernetesResourceQuotaService = KubernetesResourceQuotaService;
+    this.KubernetesLimitRangeService = KubernetesLimitRangeService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
 
     this.onInit = this.onInit.bind(this);
@@ -50,15 +52,26 @@ class KubernetesEditResourcePoolController {
       this.checkDefaults(); 
       const memoryLimit = bytesValue(this.formValues.MemoryLimit);
       const quota = _.find(this.pool.Quotas, (item) => item.Name === KubernetesPortainerQuotaSuffix + item.Namespace);
+
       if (this.formValues.hasQuota) {
         if (quota) {
           await this.KubernetesResourceQuotaService.update(quota.Raw, this.formValues.CpuLimit, memoryLimit);
+          if (!this.pool.LimitRange) {
+            const limitRange = new KubernetesDefaultLimitRangeModel(this.pool.Namespace.Name);
+            await this.KubernetesLimitRangeService.create(limitRange);
+          }
         } else {
           await this.KubernetesResourceQuotaService.create(this.pool.Namespace.Name, this.formValues.CpuLimit, memoryLimit);
+          const limitRange = new KubernetesDefaultLimitRangeModel(this.pool.Namespace.Name);
+          await this.KubernetesLimitRangeService.create(limitRange);
         }
       } else if (quota) {
         await this.KubernetesResourceQuotaService.remove(quota);
+        if (this.pool.LimitRange) {
+          await this.KubernetesLimitRangeService.remove(this.pool.LimitRange);
+        }
       }
+
       this.Notifications.success('Resource pool successfully updated', this.pool.Namespace.Name);
       this.$state.reload();
     } catch (err) {

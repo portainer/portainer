@@ -1,9 +1,10 @@
-import _ from "lodash-es";
-import KubernetesResourcePoolViewModel from "Kubernetes/models/resourcePool";
+import _ from 'lodash-es';
+import KubernetesResourcePoolViewModel from 'Kubernetes/models/resourcePool';
+import KubernetesDefaultLimitRangeModel, {KubernetesPortainerLimitRangeSuffix} from 'Kubernetes/models/limitRange';
 
 angular.module("portainer.kubernetes").factory("KubernetesResourcePoolService", [
-  "$async", 'KubernetesNamespaceService', 'KubernetesResourceQuotaService',
-  function KubernetesResourcePoolServiceFactory($async, KubernetesNamespaceService, KubernetesResourceQuotaService) {
+  "$async", "KubernetesNamespaceService", "KubernetesResourceQuotaService", "KubernetesLimitRangeService",
+  function KubernetesResourcePoolServiceFactory($async, KubernetesNamespaceService, KubernetesResourceQuotaService, KubernetesLimitRangeService) {
     "use strict";
     const service = {
       resourcePools: resourcePools,
@@ -39,7 +40,7 @@ angular.module("portainer.kubernetes").factory("KubernetesResourcePoolService", 
           const pool = new KubernetesResourcePoolViewModel(namespace);
           bindQuotasToNamespace(pool, namespace, quotas);
           pools.push(pool);
-        })
+        });
         return pools;
       } catch (err) {
         throw { msg: 'Unable to retrieve resource pools', err: err };
@@ -67,12 +68,14 @@ angular.module("portainer.kubernetes").factory("KubernetesResourcePoolService", 
 
     async function resourcePoolAsync(name) {
       try {
-        const [namespace, quotas] = await Promise.all([
+        const [namespace, quotas, limitRanges] = await Promise.all([
           KubernetesNamespaceService.namespace(name),
-          KubernetesResourceQuotaService.quotas()
+          KubernetesResourceQuotaService.quotas(),
+          KubernetesLimitRangeService.limitRanges(name)
         ]);
         const pool = new KubernetesResourcePoolViewModel(namespace);
         bindQuotasToNamespace(pool, namespace, quotas);
+        pool.LimitRange = _.find(limitRanges, (item) => item.Name === KubernetesPortainerLimitRangeSuffix + name);
         return pool;
       } catch (err) {
         throw { msg: 'Unable to retrieve resource pool', err: err };
@@ -91,6 +94,8 @@ angular.module("portainer.kubernetes").factory("KubernetesResourcePoolService", 
         await KubernetesNamespaceService.create(name);
         if (hasQuota) {
           await KubernetesResourceQuotaService.create(name, cpuLimit, memoryLimit);
+          const limitRange = new KubernetesDefaultLimitRangeModel(name);
+          await KubernetesLimitRangeService.create(limitRange);
         }
       } catch (err) {
         throw err;
