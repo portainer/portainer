@@ -109,18 +109,18 @@
             <div class="col-sm-12 form-inline" style="margin-top: 10px;">
               <div ng-repeat="envVar in ctrl.formValues.EnvironmentVariables" style="margin-top: 2px;">
 
-                <div class="input-group col-sm-5 input-group-sm">
+                <div class="input-group col-sm-4 input-group-sm">
                   <span class="input-group-addon">name</span>
                   <input type="text" class="form-control" ng-model="envVar.Name" placeholder="foo">
                 </div>
 
-                <div class="input-group col-sm-5 input-group-sm">
+                <div class="input-group col-sm-4 input-group-sm">
                   <span class="input-group-addon">value</span>
                   <input type="text" class="form-control" ng-model="envVar.Value" placeholder="bar" ng-if="!envVar.IsSecret">
                   <input type="password" class="form-control" ng-model="envVar.Value" placeholder="bar" ng-if="envVar.IsSecret">
                 </div>
 
-                <div class="input-group col-sm-1 input-group-sm">
+                <div class="input-group col-sm-2 input-group-sm">
                   <div class="btn-group btn-group-sm">
                     <label class="btn btn-primary" ng-model="envVar.IsSecret" uib-btn-radio="false"><i class="fas fa-eye"></i> Clear</label>
                     <label class="btn btn-primary" ng-model="envVar.IsSecret" uib-btn-radio="true"><i class="fas fa-eye-slash"></i> Secret</label>
