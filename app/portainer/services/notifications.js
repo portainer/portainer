@@ -15,10 +15,10 @@ angular.module('portainer.app')
 
   service.error = function(title, e, fallbackText) {
     var msg = fallbackText;
-    if (e.err && e.err.data && e.err.data.message) {
-      msg = e.err.data.message;
-    } else if (e.err && e.err.data && e.err.data.details) {
+    if (e.err && e.err.data && e.err.data.details) {
       msg = e.err.data.details;
+    } else if (e.err && e.err.data && e.err.data.message) {
+      msg = e.err.data.message;
     } else if (e.data && e.data.details) {
       msg = e.data.details;
     } else if (e.data && e.data.message) {
