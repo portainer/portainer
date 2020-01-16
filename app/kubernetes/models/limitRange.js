@@ -18,7 +18,7 @@ export function KubernetesLimitRangeViewModel(data) {
 }
 
 export const KubernetesLimitRangeDefaults = {
-  CpuLimit: 0.25,
+  CpuLimit: 0.10,
   MemoryLimit: 64 // MB
 };
 

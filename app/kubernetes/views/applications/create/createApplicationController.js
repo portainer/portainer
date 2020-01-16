@@ -99,11 +99,13 @@ class KubernetesCreateApplicationController {
       (item) => item.Name === KubernetesPortainerQuotaSuffix + this.formValues.ResourcePool.Namespace.Name);
     let minCpu, maxCpu, minMemory, maxMemory = 0;
     if (quota) {
+      this.state.resourcePoolHasQuota = true;
       minCpu = this.KubernetesLimitRangeDefaults.CpuLimit;
       maxCpu = quota.CpuLimit;
       minMemory = this.KubernetesLimitRangeDefaults.MemoryLimit;
       maxMemory = quota.MemoryLimit;
     } else {
+      this.state.resourcePoolHasQuota = false;
       minCpu = 0;
       maxCpu = this.state.nodes.cpu;
       minMemory = 0;
@@ -137,7 +139,8 @@ class KubernetesCreateApplicationController {
         nodes: {
           memory: 0,
           cpu: 0
-        }
+        },
+        resourcePoolHasQuota: false,
       };
 
       this.ApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
