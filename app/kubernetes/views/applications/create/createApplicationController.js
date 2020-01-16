@@ -94,26 +94,27 @@ class KubernetesCreateApplicationController {
     return this.$async(this.deployApplicationAsync);
   }
 
-  onSelectResourcePool() {
-    // TODO: review @LP
-    // slider UI (max memory/CPU) not updated after the execution of this function
-
-    // const quota = _.find(this.formValues.ResourcePool.Quotas, (item) => item.Name === KubernetesPortainerQuotaSuffix + this.formValues.ResourcePool.Namespace.Name);
-    // if (quota) {
-    //   this.state.maxMemory = megaBytesValue(quota.MemoryLimit);
-    //   this.state.maxCpu = quota.CpuLimit;
-    //
-    //   this.formValues.MemoryLimit = this.KubernetesLimitRangeDefaults.MemoryLimit;
-    //   this.formValues.CpuLimit = this.KubernetesLimitRangeDefaults.CpuLimit;
-    // } else {
-    //   this.formValues.CpuLimit = 0;
-    //   this.formValues.MemoryLimit = 0;
-    //   _.forEach(this.nodes, (item) => {
-    //     this.state.maxMemory += filesizeParser(item.Memory);
-    //     this.state.maxCpu += item.CPU;
-    //   });
-    //   this.state.maxMemory = megaBytesValue(this.state.maxMemory);
-    // }
+  updateSliders() {
+    const quota = _.find(this.formValues.ResourcePool.Quotas,
+      (item) => item.Name === KubernetesPortainerQuotaSuffix + this.formValues.ResourcePool.Namespace.Name);
+    let minCpu, maxCpu, minMemory, maxMemory = 0;
+    if (quota) {
+      minCpu = this.KubernetesLimitRangeDefaults.CpuLimit;
+      maxCpu = quota.CpuLimit;
+      minMemory = this.KubernetesLimitRangeDefaults.MemoryLimit;
+      maxMemory = quota.MemoryLimit;
+    } else {
+      minCpu = 0;
+      maxCpu = this.state.nodes.cpu;
+      minMemory = 0;
+      maxMemory = this.state.nodes.memory;
+    }
+    this.state.sliders.memory.min = minMemory;
+    this.state.sliders.memory.max = megaBytesValue(maxMemory);
+    this.state.sliders.cpu.min = minCpu;
+    this.state.sliders.cpu.max = maxCpu;
+    this.formValues.CpuLimit = minCpu;
+    this.formValues.MemoryLimit = minMemory;
   }
 
   async onInit() {
@@ -123,8 +124,20 @@ class KubernetesCreateApplicationController {
       this.state = {
         actionInProgress: false,
         useLoadBalancer: false,
-        maxCpu: 0,
-        maxMemory: 0
+        sliders: {
+          cpu: {
+            min: 0,
+            max: 0
+          },
+          memory: {
+            min: 0,
+            max: 0,
+          },
+        },
+        nodes: {
+          memory: 0,
+          cpu: 0
+        }
       };
 
       this.ApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
@@ -138,20 +151,13 @@ class KubernetesCreateApplicationController {
       ]);
 
       this.stacks = stacks;
-      this.nodes = nodes;
+      _.forEach(nodes, (item) => {
+        this.state.nodes.memory += filesizeParser(item.Memory);
+        this.state.nodes.cpu += item.CPU;
+      });
       this.resourcePools = resourcePools;
       this.formValues.ResourcePool = this.resourcePools[0];
-      const quota = _.find(this.formValues.ResourcePool.Quotas, (item) => item.Name === KubernetesPortainerQuotaSuffix + this.formValues.ResourcePool.Namespace.Name);
-      if (quota) {
-        this.state.maxMemory = quota.MemoryLimit;
-        this.state.maxCpu = quota.CpuLimit;
-      } else {
-        _.forEach(nodes, (item) => {
-          this.state.maxMemory += filesizeParser(item.Memory);
-          this.state.maxCpu += item.CPU;
-        });
-        this.state.maxMemory = megaBytesValue(this.state.maxMemory);
-      }
+      this.updateSliders();
 
       const endpoint = this.EndpointProvider.currentEndpoint();
       this.storageClasses = endpoint.Kubernetes.Configuration.StorageClasses;

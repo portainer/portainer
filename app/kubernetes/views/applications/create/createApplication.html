@@ -21,8 +21,8 @@
             <label for="resource-pool-selector" class="col-sm-1 control-label text-left">Resource pool</label>
             <div class="col-sm-11">
               <select class="form-control" id="resource-pool-selector"
-                      ng-model="ctrl.formValues.ResourcePool" ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools"
-                      ng-change="ctrl.onSelectResourcePool()"
+                ng-model="ctrl.formValues.ResourcePool" ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools"
+                ng-change="ctrl.updateSliders()"
               ></select>
             </div>
           </div>
@@ -246,10 +246,11 @@
               Memory limit
             </label>
             <div class="col-sm-3">
-              <slider model="ctrl.formValues.MemoryLimit" floor="0" ceil="ctrl.state.maxMemory" step="128" ng-if="ctrl.state.maxMemory"></slider>
+              <slider model="ctrl.formValues.MemoryLimit" floor="ctrl.state.sliders.memory.min" ceil="ctrl.state.sliders.memory.max" step="128"></slider>
             </div>
             <div class="col-sm-2">
-              <input name="memory_limit" ng-model="ctrl.formValues.MemoryLimit" type="number" min="0" max="{{ctrl.state.maxMemory}}" class="form-control" id="memory-limit" required>
+              <input name="memory_limit" ng-model="ctrl.formValues.MemoryLimit" type="number"
+                min="{{ctrl.state.sliders.memory.min}}" max="{{ctrl.state.sliders.memory.max}}" class="form-control" id="memory-limit" required>
             </div>
             <div class="col-sm-4">
               <p class="small text-muted" style="margin-top: 7px;">
@@ -264,7 +265,7 @@
               CPU limit
             </label>
             <div class="col-sm-5">
-              <slider model="ctrl.formValues.CpuLimit" floor="0" ceil="ctrl.state.maxCpu" step="0.25" precision="2" ng-if="ctrl.state.maxCpu"></slider>
+              <slider model="ctrl.formValues.CpuLimit" floor="ctrl.state.sliders.cpu.min" ceil="ctrl.state.sliders.cpu.max" step="0.25" precision="2"></slider>
             </div>
             <div class="col-sm-4" style="margin-top: 20px;">
               <p class="small text-muted">
