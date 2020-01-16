@@ -128,7 +128,7 @@ angular.module("portainer.kubernetes").factory("KubernetesDaemonSetService", [
     async function removeAsync(daemonSet) {
       try {
         const payload = {
-          name: daemonSet.Name
+          id: daemonSet.Name
         };
         await KubernetesDaemonSets(daemonSet.Namespace).delete(payload).$promise
       } catch (err) {

@@ -119,7 +119,7 @@ angular.module("portainer.kubernetes").factory("KubernetesDeploymentService", [
     async function removeAsync(deployment) {
       try {
         const payload = {
-          name: deployment.Name
+          id: deployment.Name
         };
         await KubernetesDeployments(deployment.Namespace).delete(payload).$promise
       } catch (err) {
