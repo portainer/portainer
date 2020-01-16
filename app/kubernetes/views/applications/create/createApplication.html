@@ -324,17 +324,16 @@
 
           <!-- published ports -->
           <div class="form-group">
-
-            <div class="col-sm-12 small text-muted" style="margin-top: 10px;" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER">
-              <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-              When publishing a port in cluster mode, the node port is optional. If left empty Kubernetes will use a random port number. If you wish to specify a port, use a port number inside the default range <code>30000-32767</code>.
-            </div>
-
             <div class="col-sm-12" style="margin-top: 5px;">
               <label class="control-label text-left">Published ports</label>
               <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addPublishedPort()">
                 <i class="fa fa-plus-circle" aria-hidden="true"></i> publish a new port
               </span>
+            </div>
+
+            <div class="col-sm-12 small text-muted" style="margin-top: 15px;" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER && ctrl.formValues.PublishedPorts.length > 0">
+              <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+              When publishing a port in cluster mode, the node port is optional. If left empty Kubernetes will use a random port number. If you wish to specify a port, use a port number inside the default range <code>30000-32767</code>.
             </div>
 
             <div class="col-sm-12 form-inline" style="margin-top: 10px;">
