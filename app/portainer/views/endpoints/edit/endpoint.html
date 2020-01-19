@@ -77,8 +77,7 @@
           </uib-tab>
           <uib-tab index="2" heading="Kubernetes">
             <code style=display:block;white-space:pre-wrap>
-              curl -L https://downloads.portainer.io/portainer-agent-edge-k8s.yaml -o portainer-agent-edge-k8s.yaml;
-              kubectl apply -f portainer-agent-edge-k8s.yaml
+              curl https://downloads.portainer.io/portainer-edge-agent-setup.sh | sudo bash -s -- {{ randomEdgeID }} {{ endpoint.EdgeKey }}
             </code>
           </uib-tab>
         </uib-tabset>

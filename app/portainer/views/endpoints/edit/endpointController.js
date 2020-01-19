@@ -30,7 +30,7 @@ function ($q, $scope, $state, $transition$, $filter, clipboard, EndpointService,
     } else if ($scope.state.deploymentTab === 1) {
       clipboard.copyText('docker network create --driver overlay portainer_agent_network; docker service create --name portainer_edge_agent --network portainer_agent_network -e AGENT_CLUSTER_ADDR=tasks.portainer_edge_agent -e EDGE=1 -e EDGE_ID=' + $scope.randomEdgeID + ' -e EDGE_KEY=' + $scope.endpoint.EdgeKey +' -e CAP_HOST_MANAGEMENT=1 --mode global --publish mode=host,published=8000,target=80 --constraint \'node.platform.os == linux\' --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volume --mount type=bind,src=//,dst=/host --mount type=volume,src=portainer_agent_data,dst=/data portainer/agent');
     } else {
-      clipboard.copyText('curl -L https://downloads.portainer.io/portainer-agent-edge-k8s.yaml -o portainer-agent-edge-k8s.yaml; kubectl apply -f portainer-agent-edge-k8s.yaml');
+      clipboard.copyText('curl https://downloads.portainer.io/portainer-edge-agent-setup.sh | bash -s -- ' + $scope.randomEdgeID + ' ' + $scope.endpoint.EdgeKey);
     }
     $('#copyNotificationDeploymentCommand').show().fadeOut(2500);
   };
