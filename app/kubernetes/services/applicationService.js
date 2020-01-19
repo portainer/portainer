@@ -73,7 +73,7 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
         }
         KubernetesApplicationHelper.associatePodsAndApplication(pods.value.items, daemonSet.value.Raw);
         const application = new KubernetesApplicationViewModel(KubernetesApplicationDeploymentTypes.GLOBAL, daemonSet.value.Raw, service.Raw);
-        application.Yaml = daemonSet.value.Yaml;
+        application.Yaml = daemonSet.value.Yaml.data;
         if (service.Yaml) {
           application.Yaml += '---\n' + service.Yaml.data;
         }
