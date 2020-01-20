@@ -56,15 +56,8 @@ angular.module("portainer.kubernetes").factory("KubernetesDaemonSetService", [
     /**
      * Creation
      */
-    // TODO: review on architecture/refactor meeting
-    // The payload is created in each <Resource>Service
-    // We convert the daemonSet model from models/daemonset.js to the payload in here.
-    // Wasn't sure if the payload should have been added as a new object in the models/daemonset.js too, with
-    // a function to convert a model to a payload.
-    // Most of the Kubernetes models are re-used in other objects (container definition is also defined in the daemonSet
-    // model, metadata is the same for all models...) so maybe it should be centralized/defined somewhere.
-    // Last discussion on this was to use models for payload and converters (converters location to be determined either
-    // in helpers or models).
+    // TODO: refactor try an approach on a small service/model for resource pools
+    // Find a way to create view/payload models with converters
     async function createAsync(daemonSet) {
       try {
         const payload = {

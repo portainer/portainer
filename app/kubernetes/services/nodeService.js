@@ -5,8 +5,7 @@ angular.module('portainer.kubernetes')
   .factory('KubernetesNodeService', ['$async', 'KubernetesNodes',
     function KubernetesNodeServiceFactory($async, KubernetesNodes) {
       'use strict';
-      // TODO: review on architecture/refactor meeting
-      // Ensure that all services are using the same structure for code consistency
+      // TODO: refactor all services
       var service = {};
 
       async function nodesAsync() {

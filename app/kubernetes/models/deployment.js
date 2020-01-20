@@ -15,7 +15,7 @@ export default function KubernetesDeploymentModelFromApplication(applicationForm
   this.CpuLimit = applicationFormValues.CpuLimit;
   this.MemoryLimit = bytesValue(applicationFormValues.MemoryLimit);
 
-  // TODO: review on architecture/refactor meeting
+  // TODO: refactor to find a better/clearer way to handle secrets with deployments/daemonsets
   // Secret management is the same in here and daemonset.js
   // It implies the creation of another model object and set the model.Data directly in
   // the loop below. Not sure if an helper function or a function related to the model should be used
