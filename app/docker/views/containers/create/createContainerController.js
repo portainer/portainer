@@ -21,6 +21,8 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
     MacAddress: '',
     IPv4: '',
     IPv6: '',
+    Dns1: '',
+    Dns2: '',
     AccessControlData: new AccessControlFormData(),
     CpuLimit: 0,
     MemoryLimit: 0,
@@ -202,18 +204,27 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
     }
     config.HostConfig.NetworkMode = networkMode;
     config.MacAddress = $scope.formValues.MacAddress;
- 
+
     config.NetworkingConfig.EndpointsConfig[networkMode] = {
       IPAMConfig: {
         IPv4Address: $scope.formValues.IPv4,
         IPv6Address: $scope.formValues.IPv6
       }
     };
-    
+
     if (networkMode && _.get($scope.config.NetworkingConfig.EndpointsConfig[networkMode], 'Aliases')){
       var aliases = $scope.config.NetworkingConfig.EndpointsConfig[networkMode].Aliases;
       config.NetworkingConfig.EndpointsConfig[networkMode].Aliases = _.filter(aliases, (o) => { return !_.startsWith($scope.fromContainer.Id,o)});
     }
+
+    var dnsServers = [];
+    if ($scope.formValues.Dns1) {
+      dnsServers.push($scope.formValues.Dns1);
+    }
+    if ($scope.formValues.Dns2) {
+      dnsServers.push($scope.formValues.Dns2);
+    }
+    config.HostConfig.Dns = dnsServers;
 
     $scope.formValues.ExtraHosts.forEach(function (v) {
     if (v.value) {
@@ -312,7 +323,7 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
     return config;
   }
 
-  
+
   function loadFromContainerCmd() {
     if ($scope.config.Cmd) {
       $scope.config.Cmd = ContainerHelper.commandArrayToString($scope.config.Cmd);
@@ -386,6 +397,13 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
       delete $scope.extraNetworks[Object.keys(d.NetworkSettings.Networks)[0]];
     }
     $scope.formValues.MacAddress = d.Config.MacAddress;
+
+    if (d.HostConfig.Dns[0]) {
+      $scope.formValues.Dns1 = d.HostConfig.Dns[0];
+    }
+    if (d.HostConfig.Dns[1]) {
+      $scope.formValues.Dns2 = d.HostConfig.Dns[1];
+    }
 
     // ExtraHosts
     if ($scope.config.HostConfig.ExtraHosts) {
