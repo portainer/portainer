@@ -7,6 +7,7 @@ angular.module('portainer.kubernetes').component('kubernetesEventsDatatable', {
     dataset: '<',
     tableKey: '@',
     orderBy: '@',
+    reverseOrder: '<',
     loading: '<',
     refreshCallback: '<'
   }
