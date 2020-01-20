@@ -94,24 +94,16 @@
                 </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('RunningPodsCount')">
                   Deployment
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'RunningPodsCount' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'RunningPodsCount' && $ctrl.state.reverseOrder"></i>
-                </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('PublishedPorts')">
                   Published ports
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'PublishedPorts' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'PublishedPorts' && $ctrl.state.reverseOrder"></i>
-                </a>
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('CreatedAt')">
                   Creation date
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreatedAt' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreatedAt' && $ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-numeric-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreatedAt' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-numeric-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreatedAt' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
             </tr>
