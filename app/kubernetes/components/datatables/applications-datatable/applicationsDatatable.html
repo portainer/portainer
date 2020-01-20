@@ -124,6 +124,7 @@
                   <label for="select_{{ $index }}"></label>
                 </span>
                 <a ui-sref="kubernetes.applications.application({ name: item.Name, namespace: item.ResourcePool })">{{ item.Name }}</a>
+                <span style="margin-left: 5px;" class="label label-warning image-tag" ng-if="$ctrl.isPartOfSystemNamespace(item)">system</span>
               </td>
               <td>{{ item.Stack }}</td>
               <td>{{ item.ResourcePool }}</td>

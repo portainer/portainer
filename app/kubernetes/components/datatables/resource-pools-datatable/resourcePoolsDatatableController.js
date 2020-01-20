@@ -8,12 +8,16 @@ angular.module('portainer.docker')
         return KubernetesNamespaceHelper.isSystemNamespace(item.Namespace.Name);
       };
 
+      this.isSystemNamespace = function(item) {
+        return KubernetesNamespaceHelper.isSystemNamespace(item.Namespace.Name);
+      };
+
       /**
        * Do not allow system namespaces to be selected
        */
       this.allowSelection = function(item) {
         return !this.disableRemove(item);
-      }
+      };
 
       this.$onInit = function() {
         this.setDefaults();

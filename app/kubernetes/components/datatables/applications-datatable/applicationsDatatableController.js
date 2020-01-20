@@ -1,4 +1,4 @@
-import { KubernetesApplicationDeploymentTypes } from 'Kubernetes/models/application';
+import {KubernetesApplicationDeploymentTypes} from 'Kubernetes/models/application';
 
 angular.module('portainer.docker')
   .controller('KubernetesApplicationsDatatableController', ['$scope', '$controller', 'KubernetesNamespaceHelper', 'DatatableService',
@@ -8,6 +8,10 @@ angular.module('portainer.docker')
 
       this.disableRemove = function(item) {
         return KubernetesNamespaceHelper.isAppSystemNamespace(item.ResourcePool);
+      };
+
+      this.isPartOfSystemNamespace = function(item) {
+        return KubernetesNamespaceHelper.isSystemNamespace(item.ResourcePool);
       };
 
       /**

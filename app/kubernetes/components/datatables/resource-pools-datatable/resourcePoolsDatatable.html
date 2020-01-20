@@ -99,6 +99,7 @@
                   <label for="select_{{ $index }}"></label>
                 </span>
                 <a ui-sref="kubernetes.resourcePools.resourcePool({ id: item.Namespace.Name })">{{ item.Namespace.Name }}</a>
+                <span style="margin-left: 5px;" class="label label-warning image-tag" ng-if="$ctrl.isSystemNamespace(item)">system</span>
               </td>
               <td>
                 <i class="fa {{item.Quotas.length ? 'fa-toggle-on' : 'fa-toggle-off'}}" aria-hidden="true" style="margin-right: 2px;"></i> {{ item.Quotas.length ? 'Yes' : 'No' }}
