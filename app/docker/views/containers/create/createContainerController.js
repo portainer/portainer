@@ -398,12 +398,8 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
     }
     $scope.formValues.MacAddress = d.Config.MacAddress;
 
-    if (d.HostConfig.Dns[0]) {
-      $scope.formValues.Dns1 = d.HostConfig.Dns[0];
-    }
-    if (d.HostConfig.Dns[1]) {
-      $scope.formValues.Dns2 = d.HostConfig.Dns[1];
-    }
+    $scope.formValues.Dns1 = d.HostConfig.Dns[0];
+    $scope.formValues.Dns2 = d.HostConfig.Dns[1];
 
     // ExtraHosts
     if ($scope.config.HostConfig.ExtraHosts) {
