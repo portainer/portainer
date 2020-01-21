@@ -21,8 +21,8 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
     MacAddress: '',
     IPv4: '',
     IPv6: '',
-    Dns1: '',
-    Dns2: '',
+    DnsPrimary: '',
+    DnsSecondary: '',
     AccessControlData: new AccessControlFormData(),
     CpuLimit: 0,
     MemoryLimit: 0,
@@ -218,11 +218,11 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
     }
 
     var dnsServers = [];
-    if ($scope.formValues.Dns1) {
-      dnsServers.push($scope.formValues.Dns1);
+    if ($scope.formValues.DnsPrimary) {
+      dnsServers.push($scope.formValues.DnsPrimary);
     }
-    if ($scope.formValues.Dns2) {
-      dnsServers.push($scope.formValues.Dns2);
+    if ($scope.formValues.DnsSecondary) {
+      dnsServers.push($scope.formValues.DnsSecondary);
     }
     config.HostConfig.Dns = dnsServers;
 
@@ -398,8 +398,8 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
     }
     $scope.formValues.MacAddress = d.Config.MacAddress;
 
-    $scope.formValues.Dns1 = d.HostConfig.Dns[0];
-    $scope.formValues.Dns2 = d.HostConfig.Dns[1];
+    $scope.formValues.DnsPrimary = d.HostConfig.Dns[0];
+    $scope.formValues.DnsSecondary = d.HostConfig.Dns[1];
 
     // ExtraHosts
     if ($scope.config.HostConfig.ExtraHosts) {
