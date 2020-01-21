@@ -50,6 +50,7 @@ type (
 
 	// LDAPSettings represents the settings used to connect to a LDAP server
 	LDAPSettings struct {
+		AnonymousMode       bool                      `json:"AnonymousMode"`
 		ReaderDN            string                    `json:"ReaderDN"`
 		Password            string                    `json:"Password,omitempty"`
 		URL                 string                    `json:"URL"`
