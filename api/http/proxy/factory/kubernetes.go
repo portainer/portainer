@@ -68,13 +68,23 @@ func (factory *ProxyFactory) newKubernetesAgentHTTPSProxy(endpoint *portainer.En
 	}
 
 	remoteURL.Scheme = "https"
-	proxy := newSingleHostReverseProxyWithHostHeader(remoteURL)
 
-	config, err := crypto.CreateTLSConfigurationFromDisk(endpoint.TLSConfig.TLSCACertPath, endpoint.TLSConfig.TLSCertPath, endpoint.TLSConfig.TLSKeyPath, endpoint.TLSConfig.TLSSkipVerify)
+	kubecli, err := factory.kubernetesClientFactory.CreateKubeClient(endpoint)
 	if err != nil {
 		return nil, err
 	}
 
-	proxy.Transport = kubernetes.NewAgentTransport(factory.signatureService, config)
+	tlsConfig, err := crypto.CreateTLSConfigurationFromDisk(endpoint.TLSConfig.TLSCACertPath, endpoint.TLSConfig.TLSCertPath, endpoint.TLSConfig.TLSKeyPath, endpoint.TLSConfig.TLSSkipVerify)
+	if err != nil {
+		return nil, err
+	}
+
+	transport, err := kubernetes.NewAgentTransport(factory.signatureService, tlsConfig, kubecli)
+	if err != nil {
+		return nil, err
+	}
+
+	proxy := newSingleHostReverseProxyWithHostHeader(remoteURL)
+	proxy.Transport = transport
 	return proxy, nil
 }

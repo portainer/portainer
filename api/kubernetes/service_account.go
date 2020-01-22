@@ -13,34 +13,41 @@ import (
 )
 
 const (
-	defaultNamespace     = "default"
-	portainerNamespace   = "ns-portainer"
-	namespaceListCRName  = "portainer-cr-list-namespaces"
-	namespaceListCRBName = "portainer-crb-list-namespaces"
-	defaultRBName        = "portainer-rb-default"
+	defaultNamespace            = "default"
+	portainerNamespace          = "ns-portainer"
+	namespaceListCRName         = "portainer-cr-list-namespaces"
+	namespaceListCRBName        = "portainer-crb-list-namespaces"
+	defaultRBName               = "portainer-rb-default"
+	portainerServiceAccountName = "portainer-sa-clusteradmin"
 )
 
 type KubeClient struct {
 	cli *kubernetes.Clientset
 }
 
-// GetServiceAccountBearerToken will make sure that all the required resources are created inside the Kubernetes
-// cluster before creating a ServiceAccount for the specified Portainer user. It will also create required
-// default RoleBinding and ClusterRoleBinding rules.
-// Finally, it will retrieve the Bearer token associated to the ServiceAccount.
-func (kcl *KubeClient) GetServiceAccountBearerToken(userID int, username string) (string, error) {
+// GetPortainerServiceAccountBearerToken returns the Bearer token associated to the Portainer service account
+// with cluster administration privileges. This service account is created as part of the Portainer/Agent deployment.
+func (kcl *KubeClient) GetPortainerServiceAccountBearerToken() (string, error) {
+	return kcl.getSecretTokenFromServiceAccount(portainerServiceAccountName)
+}
+
+// SetupUserServiceAccount will make sure that all the required resources are created inside the Kubernetes
+// cluster before creating a ServiceAccount and a ServiceAccountToken for the specified Portainer user.
+//It will also create required default RoleBinding and ClusterRoleBinding rules.
+func (kcl *KubeClient) SetupUserServiceAccount(userID int, username string) error {
 	serviceAccountName := fmt.Sprintf("portainer-sa-%d-%s", userID, username)
 
 	err := kcl.ensureRequiredResourcesExist()
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	err = kcl.ensureServiceAccountForUserExists(serviceAccountName)
-	if err != nil {
-		return "", err
-	}
+	return kcl.ensureServiceAccountForUserExists(serviceAccountName)
+}
 
+// GetServiceAccountBearerToken returns the ServiceAccountToken associated to the specified user.
+func (kcl *KubeClient) GetServiceAccountBearerToken(userID int, username string) (string, error) {
+	serviceAccountName := fmt.Sprintf("portainer-sa-%d-%s", userID, username)
 	return kcl.getSecretTokenFromServiceAccount(serviceAccountName)
 }
 
@@ -50,6 +57,11 @@ func (kcl *KubeClient) ensureRequiredResourcesExist() error {
 
 func (kcl *KubeClient) ensureServiceAccountForUserExists(serviceAccountName string) error {
 	err := kcl.createUserServiceAccount(portainerNamespace, serviceAccountName)
+	if err != nil && !k8serrors.IsAlreadyExists(err) {
+		return err
+	}
+
+	err = kcl.createServiceAccountToken(serviceAccountName)
 	if err != nil && !k8serrors.IsAlreadyExists(err) {
 		return err
 	}
@@ -193,33 +205,40 @@ func (kcl *KubeClient) ensureServiceAccountHasEditRoleInDefaultNamespace(service
 	return err
 }
 
+func (kcl *KubeClient) createServiceAccountToken(serviceAccountName string) error {
+	serviceAccountSecretName := fmt.Sprintf("%s-secret", serviceAccountName)
+
+	serviceAccountSecret := &v1.Secret{
+		TypeMeta: metav1.TypeMeta{},
+		ObjectMeta: metav1.ObjectMeta{
+			Name: serviceAccountSecretName,
+			Annotations: map[string]string{
+				"kubernetes.io/service-account.name": serviceAccountName,
+			},
+		},
+		Type: "kubernetes.io/service-account-token",
+	}
+
+	_, err := kcl.cli.CoreV1().Secrets(portainerNamespace).Create(serviceAccountSecret)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (kcl *KubeClient) getSecretTokenFromServiceAccount(serviceAccountName string) (string, error) {
 	serviceAccountSecretName := fmt.Sprintf("%s-secret", serviceAccountName)
 
 	secret, err := kcl.cli.CoreV1().Secrets(portainerNamespace).Get(serviceAccountSecretName, metav1.GetOptions{})
-	if k8serrors.IsNotFound(err) {
-		serviceAccountSecret := &v1.Secret{
-			TypeMeta: metav1.TypeMeta{},
-			ObjectMeta: metav1.ObjectMeta{
-				Name: serviceAccountSecretName,
-				Annotations: map[string]string{
-					"kubernetes.io/service-account.name": serviceAccountName,
-				},
-			},
-			Type: "kubernetes.io/service-account-token",
-		}
-
-		secret, err = kcl.cli.CoreV1().Secrets(portainerNamespace).Create(serviceAccountSecret)
-		if err != nil {
-			return "", err
-		}
-	} else if err != nil {
+	if err != nil {
 		return "", err
 	}
 
 	// API token secret is populated asynchronously.
 	// Is it created by the controller and will depend on the environment/secret-store:
 	// https://github.com/kubernetes/kubernetes/issues/67882#issuecomment-422026204
+	// as a work-around, we wait for up to 5 seconds for the secret to be populated.
 	timeout := time.After(5 * time.Second)
 	searchingForSecret := true
 	for searchingForSecret {

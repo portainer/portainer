@@ -944,6 +944,8 @@ type (
 
 	// KubeClient represents a service used to query a Kubernetes environment
 	KubeClient interface {
+		SetupUserServiceAccount(userID int, username string) error
+		GetPortainerServiceAccountBearerToken() (string, error)
 		GetServiceAccountBearerToken(userID int, username string) (string, error)
 	}
 )
@@ -973,6 +975,8 @@ const (
 	PortainerAgentSignatureHeader = "X-PortainerAgent-Signature"
 	// PortainerAgentPublicKeyHeader represent the name of the header containing the public key
 	PortainerAgentPublicKeyHeader = "X-PortainerAgent-PublicKey"
+	// PortainerAgentKubernetesSATokenHeader represent the name of the header containing a Kubernetes SA token
+	PortainerAgentKubernetesSATokenHeader = "X-PortainerAgent-SA-Token"
 	// PortainerAgentSignatureMessage represents the message used to create a digital signature
 	// to be used when communicating with an agent
 	PortainerAgentSignatureMessage = "Portainer-App"

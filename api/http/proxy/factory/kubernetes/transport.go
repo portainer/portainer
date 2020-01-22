@@ -5,7 +5,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
+	"sync"
 
+	"github.com/orcaman/concurrent-map"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/security"
@@ -16,6 +19,9 @@ const defaultServiceAccountTokenFile = "/var/run/secrets/kubernetes.io/serviceac
 type agentTransport struct {
 	httpTransport    *http.Transport
 	signatureService portainer.DigitalSignatureService
+	kubecli          portainer.KubeClient
+	mutex            sync.Mutex
+	userTokens       cmap.ConcurrentMap
 }
 
 type edgeTransport struct {
@@ -26,8 +32,10 @@ type edgeTransport struct {
 
 type localTransport struct {
 	httpTransport *http.Transport
-	bearerToken   string
 	kubecli       portainer.KubeClient
+	mutex         sync.Mutex
+	adminToken    string
+	userTokens    cmap.ConcurrentMap
 }
 
 // NewAgentTransport returns a new transport that can be used to send signed requests to a Portainer agent
@@ -48,56 +56,104 @@ func NewLocalTransport(kubecli portainer.KubeClient) (*localTransport, error) {
 
 	transport := &localTransport{
 		httpTransport: httpTransport,
-		bearerToken:   string(token),
 		kubecli:       kubecli,
+		adminToken:    string(token),
+		userTokens:    cmap.New(),
 	}
 
 	return transport, nil
 }
 
 // RoundTrip is the implementation of the the http.RoundTripper interface
-func (p *localTransport) RoundTrip(request *http.Request) (*http.Response, error) {
+func (transport *localTransport) RoundTrip(request *http.Request) (*http.Response, error) {
 	tokenData, err := security.RetrieveTokenData(request)
 	if err != nil {
 		return nil, err
 	}
 
 	if tokenData.Role != portainer.AdministratorRole {
-		token, err := p.kubecli.GetServiceAccountBearerToken(int(tokenData.ID), tokenData.Username)
-		if err != nil {
-			return nil, err
+		key := strconv.Itoa(int(tokenData.ID))
+		token, ok := transport.userTokens.Get(key)
+		if !ok {
+			transport.mutex.Lock()
+			defer transport.mutex.Unlock()
+
+			err := transport.kubecli.SetupUserServiceAccount(int(tokenData.ID), tokenData.Username)
+			if err != nil {
+				return nil, err
+			}
+
+			serviceAccountToken, err := transport.kubecli.GetServiceAccountBearerToken(int(tokenData.ID), tokenData.Username)
+			if err != nil {
+				return nil, err
+			}
+
+			transport.userTokens.Set(key, serviceAccountToken)
+			token = serviceAccountToken
 		}
 
-		request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+		request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token.(string)))
 	} else {
-		request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", p.bearerToken))
-
+		request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", transport.adminToken))
 	}
 
-	return p.httpTransport.RoundTrip(request)
+	return transport.httpTransport.RoundTrip(request)
 }
 
 // NewAgentTransport returns a new transport that can be used to send signed requests to a Portainer agent
-func NewAgentTransport(signatureService portainer.DigitalSignatureService, tlsConfig *tls.Config) *agentTransport {
-	return &agentTransport{
+func NewAgentTransport(signatureService portainer.DigitalSignatureService, tlsConfig *tls.Config, kubecli portainer.KubeClient) (*agentTransport, error) {
+	transport := &agentTransport{
 		httpTransport: &http.Transport{
 			TLSClientConfig: tlsConfig,
 		},
 		signatureService: signatureService,
+		kubecli:          kubecli,
+		userTokens:       cmap.New(),
 	}
+
+	return transport, nil
 }
 
 // RoundTrip is the implementation of the the http.RoundTripper interface
-func (p *agentTransport) RoundTrip(request *http.Request) (*http.Response, error) {
-	signature, err := p.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
+func (transport *agentTransport) RoundTrip(request *http.Request) (*http.Response, error) {
+	tokenData, err := security.RetrieveTokenData(request)
 	if err != nil {
 		return nil, err
 	}
 
-	request.Header.Set(portainer.PortainerAgentPublicKeyHeader, p.signatureService.EncodedPublicKey())
+	if tokenData.Role != portainer.AdministratorRole {
+		key := strconv.Itoa(int(tokenData.ID))
+		token, ok := transport.userTokens.Get(key)
+		if !ok {
+			transport.mutex.Lock()
+			defer transport.mutex.Unlock()
+
+			err := transport.kubecli.SetupUserServiceAccount(int(tokenData.ID), tokenData.Username)
+			if err != nil {
+				return nil, err
+			}
+
+			serviceAccountToken, err := transport.kubecli.GetServiceAccountBearerToken(int(tokenData.ID), tokenData.Username)
+			if err != nil {
+				return nil, err
+			}
+
+			transport.userTokens.Set(key, serviceAccountToken)
+			token = serviceAccountToken
+		}
+
+		request.Header.Set(portainer.PortainerAgentKubernetesSATokenHeader, token.(string))
+	}
+
+	signature, err := transport.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
+	if err != nil {
+		return nil, err
+	}
+
+	request.Header.Set(portainer.PortainerAgentPublicKeyHeader, transport.signatureService.EncodedPublicKey())
 	request.Header.Set(portainer.PortainerAgentSignatureHeader, signature)
 
-	return p.httpTransport.RoundTrip(request)
+	return transport.httpTransport.RoundTrip(request)
 }
 
 func NewEdgeTransport(reverseTunnelService portainer.ReverseTunnelService, endpointIdentifier portainer.EndpointID) *edgeTransport {
@@ -109,13 +165,13 @@ func NewEdgeTransport(reverseTunnelService portainer.ReverseTunnelService, endpo
 }
 
 // RoundTrip is the implementation of the the http.RoundTripper interface
-func (p *edgeTransport) RoundTrip(request *http.Request) (*http.Response, error) {
-	response, err := p.httpTransport.RoundTrip(request)
+func (transport *edgeTransport) RoundTrip(request *http.Request) (*http.Response, error) {
+	response, err := transport.httpTransport.RoundTrip(request)
 
 	if err == nil {
-		p.reverseTunnelService.SetTunnelStatusToActive(p.endpointIdentifier)
+		transport.reverseTunnelService.SetTunnelStatusToActive(transport.endpointIdentifier)
 	} else {
-		p.reverseTunnelService.SetTunnelStatusToIdle(p.endpointIdentifier)
+		transport.reverseTunnelService.SetTunnelStatusToIdle(transport.endpointIdentifier)
 	}
 
 	return response, err
