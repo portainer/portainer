@@ -406,7 +406,8 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
         envArr.push({'name': arr[0], 'value': arr[1]});
       }
     }
-    $scope.config.Env = envArr;
+    // Sort ENV VARs to improve readability.
+    $scope.config.Env = _.sortBy(envArr, ['name']);
   }
 
   function loadFromContainerLabels() {

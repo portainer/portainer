@@ -1,3 +1,4 @@
+import _ from 'lodash-es';
 import moment from 'moment';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
@@ -32,6 +33,8 @@ function ($q, $scope, $state, $transition$, $filter, $async, ExtensionService, C
       $scope.container = container;
       $scope.container.edit = false;
       $scope.container.newContainerName = $filter('trimcontainername')(container.Name);
+      // Sort ENV VARs (here, "key=value") to improve readability.
+      $scope.container.Config.Env = _.sortBy(container.Config.Env);
 
       if (container.State.Running) {
         $scope.activityTime = moment.duration(moment(container.State.StartedAt).utc().diff(moment().utc())).humanize();
