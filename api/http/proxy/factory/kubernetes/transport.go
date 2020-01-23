@@ -3,48 +3,34 @@ package kubernetes
 import (
 	"crypto/tls"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"strconv"
 	"sync"
 
 	"github.com/orcaman/concurrent-map"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
-	"github.com/portainer/portainer/api/http/security"
 )
-
-const defaultServiceAccountTokenFile = "/var/run/secrets/kubernetes.io/serviceaccount/token"
 
 type agentTransport struct {
 	httpTransport    *http.Transport
 	signatureService portainer.DigitalSignatureService
-	kubecli          portainer.KubeClient
-	mutex            sync.Mutex
-	userTokens       cmap.ConcurrentMap
+	tokenManager     *tokenManager
 }
 
 type edgeTransport struct {
 	httpTransport        *http.Transport
 	reverseTunnelService portainer.ReverseTunnelService
 	endpointIdentifier   portainer.EndpointID
+	tokenManager         *tokenManager
 }
 
 type localTransport struct {
 	httpTransport *http.Transport
-	kubecli       portainer.KubeClient
-	mutex         sync.Mutex
-	adminToken    string
-	userTokens    cmap.ConcurrentMap
+	tokenManager  *tokenManager
 }
 
 // NewAgentTransport returns a new transport that can be used to send signed requests to a Portainer agent
 func NewLocalTransport(kubecli portainer.KubeClient) (*localTransport, error) {
-	token, err := ioutil.ReadFile(defaultServiceAccountTokenFile)
-	if err != nil {
-		return nil, err
-	}
-
 	config, err := crypto.CreateTLSConfigurationFromBytes(nil, nil, nil, true, true)
 	if err != nil {
 		return nil, err
@@ -54,11 +40,15 @@ func NewLocalTransport(kubecli portainer.KubeClient) (*localTransport, error) {
 		TLSClientConfig: config,
 	}
 
+	tokenManager := &tokenManager{
+		kubecli:    kubecli,
+		mutex:      sync.Mutex{},
+		userTokens: cmap.New(),
+	}
+
 	transport := &localTransport{
 		httpTransport: httpTransport,
-		kubecli:       kubecli,
-		adminToken:    string(token),
-		userTokens:    cmap.New(),
+		tokenManager:  tokenManager,
 	}
 
 	return transport, nil
@@ -66,84 +56,43 @@ func NewLocalTransport(kubecli portainer.KubeClient) (*localTransport, error) {
 
 // RoundTrip is the implementation of the the http.RoundTripper interface
 func (transport *localTransport) RoundTrip(request *http.Request) (*http.Response, error) {
-	tokenData, err := security.RetrieveTokenData(request)
+	token, err := transport.tokenManager.getTokenFromRequest(request, true)
 	if err != nil {
 		return nil, err
 	}
 
-	if tokenData.Role != portainer.AdministratorRole {
-		key := strconv.Itoa(int(tokenData.ID))
-		token, ok := transport.userTokens.Get(key)
-		if !ok {
-			transport.mutex.Lock()
-			defer transport.mutex.Unlock()
-
-			err := transport.kubecli.SetupUserServiceAccount(int(tokenData.ID), tokenData.Username)
-			if err != nil {
-				return nil, err
-			}
-
-			serviceAccountToken, err := transport.kubecli.GetServiceAccountBearerToken(int(tokenData.ID), tokenData.Username)
-			if err != nil {
-				return nil, err
-			}
-
-			transport.userTokens.Set(key, serviceAccountToken)
-			token = serviceAccountToken
-		}
-
-		request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token.(string)))
-	} else {
-		request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", transport.adminToken))
-	}
+	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 
 	return transport.httpTransport.RoundTrip(request)
 }
 
 // NewAgentTransport returns a new transport that can be used to send signed requests to a Portainer agent
-func NewAgentTransport(signatureService portainer.DigitalSignatureService, tlsConfig *tls.Config, kubecli portainer.KubeClient) (*agentTransport, error) {
+func NewAgentTransport(signatureService portainer.DigitalSignatureService, tlsConfig *tls.Config, kubecli portainer.KubeClient) *agentTransport {
+	tokenManager := &tokenManager{
+		kubecli:    kubecli,
+		mutex:      sync.Mutex{},
+		userTokens: cmap.New(),
+	}
+
 	transport := &agentTransport{
 		httpTransport: &http.Transport{
 			TLSClientConfig: tlsConfig,
 		},
 		signatureService: signatureService,
-		kubecli:          kubecli,
-		userTokens:       cmap.New(),
+		tokenManager:     tokenManager,
 	}
 
-	return transport, nil
+	return transport
 }
 
 // RoundTrip is the implementation of the the http.RoundTripper interface
 func (transport *agentTransport) RoundTrip(request *http.Request) (*http.Response, error) {
-	tokenData, err := security.RetrieveTokenData(request)
+	token, err := transport.tokenManager.getTokenFromRequest(request, false)
 	if err != nil {
 		return nil, err
 	}
 
-	if tokenData.Role != portainer.AdministratorRole {
-		key := strconv.Itoa(int(tokenData.ID))
-		token, ok := transport.userTokens.Get(key)
-		if !ok {
-			transport.mutex.Lock()
-			defer transport.mutex.Unlock()
-
-			err := transport.kubecli.SetupUserServiceAccount(int(tokenData.ID), tokenData.Username)
-			if err != nil {
-				return nil, err
-			}
-
-			serviceAccountToken, err := transport.kubecli.GetServiceAccountBearerToken(int(tokenData.ID), tokenData.Username)
-			if err != nil {
-				return nil, err
-			}
-
-			transport.userTokens.Set(key, serviceAccountToken)
-			token = serviceAccountToken
-		}
-
-		request.Header.Set(portainer.PortainerAgentKubernetesSATokenHeader, token.(string))
-	}
+	request.Header.Set(portainer.PortainerAgentKubernetesSATokenHeader, token)
 
 	signature, err := transport.signatureService.CreateSignature(portainer.PortainerAgentSignatureMessage)
 	if err != nil {
@@ -156,16 +105,32 @@ func (transport *agentTransport) RoundTrip(request *http.Request) (*http.Respons
 	return transport.httpTransport.RoundTrip(request)
 }
 
-func NewEdgeTransport(reverseTunnelService portainer.ReverseTunnelService, endpointIdentifier portainer.EndpointID) *edgeTransport {
-	return &edgeTransport{
+func NewEdgeTransport(reverseTunnelService portainer.ReverseTunnelService, endpointIdentifier portainer.EndpointID, kubecli portainer.KubeClient) *edgeTransport {
+	tokenManager := &tokenManager{
+		kubecli:    kubecli,
+		mutex:      sync.Mutex{},
+		userTokens: cmap.New(),
+	}
+
+	transport := &edgeTransport{
 		httpTransport:        &http.Transport{},
 		reverseTunnelService: reverseTunnelService,
 		endpointIdentifier:   endpointIdentifier,
+		tokenManager:         tokenManager,
 	}
+
+	return transport
 }
 
 // RoundTrip is the implementation of the the http.RoundTripper interface
 func (transport *edgeTransport) RoundTrip(request *http.Request) (*http.Response, error) {
+	token, err := transport.tokenManager.getTokenFromRequest(request, false)
+	if err != nil {
+		return nil, err
+	}
+
+	request.Header.Set(portainer.PortainerAgentKubernetesSATokenHeader, token)
+
 	response, err := transport.httpTransport.RoundTrip(request)
 
 	if err == nil {

@@ -53,9 +53,14 @@ func (factory *ProxyFactory) newKubernetesEdgeHTTPProxy(endpoint *portainer.Endp
 		return nil, err
 	}
 
+	kubecli, err := factory.kubernetesClientFactory.CreateKubeClient(endpoint)
+	if err != nil {
+		return nil, err
+	}
+
 	endpointURL.Scheme = "http"
 	proxy := newSingleHostReverseProxyWithHostHeader(endpointURL)
-	proxy.Transport = kubernetes.NewEdgeTransport(factory.reverseTunnelService, endpoint.ID)
+	proxy.Transport = kubernetes.NewEdgeTransport(factory.reverseTunnelService, endpoint.ID, kubecli)
 
 	return proxy, nil
 }
@@ -79,12 +84,8 @@ func (factory *ProxyFactory) newKubernetesAgentHTTPSProxy(endpoint *portainer.En
 		return nil, err
 	}
 
-	transport, err := kubernetes.NewAgentTransport(factory.signatureService, tlsConfig, kubecli)
-	if err != nil {
-		return nil, err
-	}
-
 	proxy := newSingleHostReverseProxyWithHostHeader(remoteURL)
-	proxy.Transport = transport
+	proxy.Transport = kubernetes.NewAgentTransport(factory.signatureService, tlsConfig, kubecli)
+
 	return proxy, nil
 }
