@@ -15,8 +15,8 @@ import (
 const (
 	defaultNamespace            = "default"
 	portainerNamespace          = "ns-portainer"
-	namespaceListCRName         = "portainer-cr-list-namespaces"
-	namespaceListCRBName        = "portainer-crb-list-namespaces"
+	portainerUserCRName         = "portainer-cr-user"
+	portainerUserCRBName        = "portainer-crb-user"
 	defaultRBName               = "portainer-rb-default"
 	portainerServiceAccountName = "portainer-sa-clusteradmin"
 )
@@ -52,7 +52,7 @@ func (kcl *KubeClient) GetServiceAccountBearerToken(userID int, username string)
 }
 
 func (kcl *KubeClient) ensureRequiredResourcesExist() error {
-	return kcl.createClusterNamespaceListRole()
+	return kcl.createPortainerUserClusterRole()
 }
 
 func (kcl *KubeClient) ensureServiceAccountForUserExists(serviceAccountName string) error {
@@ -66,39 +66,12 @@ func (kcl *KubeClient) ensureServiceAccountForUserExists(serviceAccountName stri
 		return err
 	}
 
-	err = kcl.ensureServiceAccountHasClusterNamespaceListRole(serviceAccountName)
+	err = kcl.ensureServiceAccountHasUserClusterRole(serviceAccountName)
 	if err != nil {
 		return err
 	}
 
 	return kcl.ensureServiceAccountHasEditRoleInDefaultNamespace(serviceAccountName)
-}
-
-func (kcl *KubeClient) createClusterNamespaceListRole() error {
-	_, err := kcl.cli.RbacV1().ClusterRoles().Get(namespaceListCRName, metav1.GetOptions{})
-	if k8serrors.IsNotFound(err) {
-		clusterRole := &rbacv1.ClusterRole{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: namespaceListCRName,
-			},
-			Rules: []rbacv1.PolicyRule{
-				{
-					Verbs:     []string{"list"},
-					Resources: []string{"namespaces"},
-					APIGroups: []string{""},
-				},
-			},
-		}
-
-		_, err := kcl.cli.RbacV1().ClusterRoles().Create(clusterRole)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	}
-
-	return err
 }
 
 func (kcl *KubeClient) createUserServiceAccount(namespace, serviceAccountName string) error {
@@ -121,12 +94,48 @@ func (kcl *KubeClient) createUserServiceAccount(namespace, serviceAccountName st
 	return err
 }
 
-func (kcl *KubeClient) ensureServiceAccountHasClusterNamespaceListRole(serviceAccountName string) error {
-	clusterRoleBinding, err := kcl.cli.RbacV1().ClusterRoleBindings().Get(namespaceListCRBName, metav1.GetOptions{})
+func getPortainerUserDefaultPolicies() []rbacv1.PolicyRule {
+	return []rbacv1.PolicyRule{
+		{
+			Verbs:     []string{"list"},
+			Resources: []string{"namespaces", "resourcequotas", "nodes", "services"},
+			APIGroups: []string{""},
+		},
+		{
+			Verbs:     []string{"list"},
+			Resources: []string{"deployments", "daemonsets"},
+			APIGroups: []string{"apps"},
+		},
+	}
+}
+
+func (kcl *KubeClient) createPortainerUserClusterRole() error {
+	_, err := kcl.cli.RbacV1().ClusterRoles().Get(portainerUserCRName, metav1.GetOptions{})
+	if k8serrors.IsNotFound(err) {
+		clusterRole := &rbacv1.ClusterRole{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: portainerUserCRName,
+			},
+			Rules: getPortainerUserDefaultPolicies(),
+		}
+
+		_, err := kcl.cli.RbacV1().ClusterRoles().Create(clusterRole)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	return err
+}
+
+func (kcl *KubeClient) ensureServiceAccountHasUserClusterRole(serviceAccountName string) error {
+	clusterRoleBinding, err := kcl.cli.RbacV1().ClusterRoleBindings().Get(portainerUserCRBName, metav1.GetOptions{})
 	if k8serrors.IsNotFound(err) {
 		clusterRoleBinding = &rbacv1.ClusterRoleBinding{
 			ObjectMeta: metav1.ObjectMeta{
-				Name: namespaceListCRBName,
+				Name: portainerUserCRBName,
 			},
 			Subjects: []rbacv1.Subject{
 				{
@@ -137,7 +146,7 @@ func (kcl *KubeClient) ensureServiceAccountHasClusterNamespaceListRole(serviceAc
 			},
 			RoleRef: rbacv1.RoleRef{
 				Kind: "ClusterRole",
-				Name: namespaceListCRName,
+				Name: portainerUserCRName,
 			},
 		}
 
