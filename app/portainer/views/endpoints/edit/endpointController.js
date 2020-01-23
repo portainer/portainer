@@ -22,9 +22,9 @@ function ($q, $scope, $state, $transition$, $filter, clipboard, EndpointService,
 
   $scope.copyEdgeAgentDeploymentCommand = function() {
     if ($scope.state.deploymentTab === 0) {
-      clipboard.copyText('docker run -d -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker/volumes:/var/lib/docker/volumes -v /:/host --restart always -e EDGE=1 -e EDGE_ID=' + $scope.randomEdgeID + ' -e EDGE_KEY=' + $scope.endpoint.EdgeKey +' -e CAP_HOST_MANAGEMENT=1 -p 8000:80 -v portainer_agent_data:/data --name portainer_edge_agent portainer/agent');
+      clipboard.copyText('docker run -d -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker/volumes:/var/lib/docker/volumes -v /:/host --restart always -e EDGE=1 -e EDGE_ID=' + $scope.randomEdgeID + ' -e EDGE_KEY=' + $scope.endpoint.EdgeKey +' -e CAP_HOST_MANAGEMENT=1 -v portainer_agent_data:/data --name portainer_edge_agent portainer/agent');
     } else {
-      clipboard.copyText('docker network create --driver overlay portainer_agent_network; docker service create --name portainer_edge_agent --network portainer_agent_network -e AGENT_CLUSTER_ADDR=tasks.portainer_edge_agent -e EDGE=1 -e EDGE_ID=' + $scope.randomEdgeID + ' -e EDGE_KEY=' + $scope.endpoint.EdgeKey +' -e CAP_HOST_MANAGEMENT=1 --mode global --publish mode=host,published=8000,target=80 --constraint \'node.platform.os == linux\' --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volume --mount type=bind,src=//,dst=/host --mount type=volume,src=portainer_agent_data,dst=/data portainer/agent');
+      clipboard.copyText('docker network create --driver overlay portainer_agent_network; docker service create --name portainer_edge_agent --network portainer_agent_network -e AGENT_CLUSTER_ADDR=tasks.portainer_edge_agent -e EDGE=1 -e EDGE_ID=' + $scope.randomEdgeID + ' -e EDGE_KEY=' + $scope.endpoint.EdgeKey +' -e CAP_HOST_MANAGEMENT=1 --mode global --constraint \'node.platform.os == linux\' --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volume --mount type=bind,src=//,dst=/host --mount type=volume,src=portainer_agent_data,dst=/data portainer/agent');
     }
     $('#copyNotificationDeploymentCommand').show().fadeOut(2500);
   };

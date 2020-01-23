@@ -3296,6 +3296,10 @@ definitions:
   LDAPSettings:
     type: "object"
     properties:
+      AnonymousMode:
+        type: "boolean"
+        example: true
+        description: "Enable this option if the server is configured for Anonymous access. When enabled, ReaderDN and Password will not be used."
       ReaderDN:
         type: "string"
         example: "cn=readonly-account,dc=ldap,dc=domain,dc=tld"
