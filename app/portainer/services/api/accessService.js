@@ -3,7 +3,7 @@ import { UserAccessViewModel } from '../../models/access';
 import { TeamAccessViewModel } from '../../models/access';
 
 angular.module('portainer.app')
-.factory('AccessService', ['$q', 'UserService', 'TeamService', function AccessServiceFactory($q, UserService, TeamService) {
+.factory('AccessService', ['$q', '$async', 'UserService', 'TeamService', function AccessServiceFactory($q, $async, UserService, TeamService) {
   'use strict';
   var service = {};
 
@@ -47,7 +47,7 @@ angular.module('portainer.app')
     };
   }
 
-  service.accesses = function(authorizedUserPolicies, authorizedTeamPolicies, inheritedUserPolicies, inheritedTeamPolicies, roles) {
+  function getAccesses(authorizedUserPolicies, authorizedTeamPolicies, inheritedUserPolicies, inheritedTeamPolicies, roles) {
     var deferred = $q.defer();
 
     $q.all({
@@ -77,8 +77,42 @@ angular.module('portainer.app')
     });
 
     return deferred.promise;
-  };
+  }
 
+  async function accessesAsync(entity, parent, roles) {
+    try {
+      if (!entity) {
+        throw { msg: 'Unable to retrieve accesses' };
+      }
+      if (!entity.UserAccessPolicies) {
+        entity.UserAccessPolicies = {}
+      }
+      if (!entity.TeamAccessPolicies) {
+        entity.TeamAccessPolicies = {};
+      }
+      if (parent && !parent.UserAccessPolicies) {
+        parent.UserAccessPolicies = {}
+      }
+      if (parent && !parent.TeamAccessPolicies) {
+        parent.TeamAccessPolicies = {};
+      }
+      return await getAccesses(
+        entity.UserAccessPolicies,
+        entity.TeamAccessPolicies,
+        parent ? parent.UserAccessPolicies : {},
+        parent ? parent.TeamAccessPolicies : {},
+        roles
+      );
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  function accesses(entity, parent, roles) {
+    return $async(accessesAsync, entity, parent, roles);
+  }
+
+  service.accesses = accesses;
 
   service.generateAccessPolicies = function(userAccessPolicies, teamAccessPolicies, selectedUserAccesses, selectedTeamAccesses, selectedRoleId) {
 

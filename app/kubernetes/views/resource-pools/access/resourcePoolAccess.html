@@ -1,0 +1,98 @@
+<rd-header>
+  <rd-header-title title-text="Resource pool access"></rd-header-title>
+  <rd-header-content>
+    <a ui-sref="kubernetes.resourcePools">Resource pools</a> &gt; <a
+      ui-sref="kubernetes.resourcePools.resourcePool({id: ctrl.pool.Namespace.Name})">{{ ctrl.pool.Namespace.Name }}</a> &gt; Access management
+  </rd-header-content>
+</rd-header>
+
+<div class="row" ng-if="ctrl.pool">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-plug" title-text="Resource pool"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Name</td>
+              <td>
+                {{ ctrl.pool.Namespace.Name }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget ng-if="ctrl.availableUsersAndTeams">
+      <rd-widget-header icon="fa-user-lock" title-text="Create access"></rd-widget-header>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <div class="form-group">
+            <label class="col-sm-3 col-lg-2 control-label text-left">
+              Select user(s) and/or team(s)
+            </label>
+            <div class="col-sm-9 col-lg-4">
+              <span class="small text-muted" ng-if="ctrl.availableUsersAndTeams.length === 0">
+                No user nor team available.
+              </span>
+              <span isteven-multi-select ng-if="ctrl.availableUsersAndTeams.length > 0" input-model="ctrl.availableUsersAndTeams"
+                output-model="ctrl.formValues.multiselectOutput" button-label="icon '-' Name" item-label="icon '-' Name"
+                tick-property="ticked" helper-elements="filter" search-property="Name"
+                translation="{nothingSelected: 'Select one or more users and/or teams', search: 'Search...'}">
+              </span>
+            </div>
+          </div>
+
+          <!-- KEEP FOR FUTURE RBAC EVOL -->
+          <!-- <div class="form-group" ng-if="ctrl.entityType !== 'registry'">
+            <label class="col-sm-3 col-lg-2 control-label text-left">
+              Role
+            </label>
+            <div class="col-sm-9 col-lg-4">
+              <select ng-if="ctrl.rbacEnabled" class="form-control" ng-model="ctrl.formValues.selectedRole"
+                ng-options="role.Name for role in ctrl.roles">
+              </select>
+              <span class="small text-muted" ng-if="!ctrl.rbacEnabled">
+                  The <a ui-sref="portainer.extensions.extension({id: 3})">Role-Based Access Control extension</a> is required to select a specific role.
+              </span>
+            </div>
+          </div> -->
+
+          <!-- actions -->
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button type="submit" class="btn btn-primary btn-sm" ng-disabled="(ctrl.availableUsersAndTeams | filter:{ticked:true}).length === 0 || ctrl.actionInProgress"
+                ng-click="ctrl.authorizeAccess()" button-spinner="ctrl.actionInProgress">
+                <span ng-hide="ctrl.state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Create
+                  access</span>
+                <span ng-show="ctrl.state.actionInProgress">Creating access...</span>
+              </button>
+            </div>
+          </div>
+          <!-- !actions -->
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-12">
+    <!--
+      rbac-enabled="ctrl.rbacEnabled && ctrl.entityType !== 'registry'"
+      roles="ctrl.roles"
+      update-action="ctrl.updateAction"
+    -->
+    <access-datatable ng-if="ctrl.authorizedUsersAndTeams"
+      title-text="Access" title-icon="fa-user-lock"
+      table-key="kubernetes_resourcepool_access" order-by="Name"
+      dataset="ctrl.authorizedUsersAndTeams"
+      remove-action="ctrl.unauthorizeAccess"
+    >
+    </access-datatable>
+  </div>
+</div>
