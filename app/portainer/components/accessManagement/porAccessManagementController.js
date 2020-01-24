@@ -88,7 +88,7 @@ class PorAccessManagementController {
         parent ? parent.TeamAccessPolicies : {},
         this.roles
       );
-      this.availableUsersAndTeams = data.availableUsersAndTeams;
+      this.availableUsersAndTeams = _.orderBy(data.availableUsersAndTeams, 'Name', 'asc');
       this.authorizedUsersAndTeams = data.authorizedUsersAndTeams;
     } catch (err) {
       this.availableUsersAndTeams = [];

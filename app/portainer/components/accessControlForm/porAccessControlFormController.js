@@ -48,9 +48,9 @@ function ($q, UserService, TeamService, Notifications, Authentication, ResourceC
       availableUsers: isAdmin ? UserService.users(false) : []
     })
     .then(function success(data) {
-      ctrl.availableUsers = data.availableUsers;
+      ctrl.availableUsers = _.orderBy(data.availableUsers, 'Username', 'asc');
 
-      var availableTeams = data.availableTeams;
+      var availableTeams = _.orderBy(data.availableTeams, 'Name', 'asc');
       ctrl.availableTeams = availableTeams;
       if (!isAdmin && availableTeams.length === 1) {
         ctrl.formData.AuthorizedTeams = availableTeams;
