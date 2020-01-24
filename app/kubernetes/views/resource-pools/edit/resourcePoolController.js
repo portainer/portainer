@@ -14,10 +14,10 @@ function bytesValue(mem) {
 
 class KubernetesEditResourcePoolController {
   /* @ngInject */
-  constructor($async, $state, $stateParams, Notifications, KubernetesNodeService, KubernetesResourceQuotaService, KubernetesResourcePoolService, KubernetesLimitRangeService) {
+  constructor($async, $state, $transition$, Notifications, KubernetesNodeService, KubernetesResourceQuotaService, KubernetesResourcePoolService, KubernetesLimitRangeService) {
     this.$async = $async;
     this.$state = $state;
-    this.$stateParams = $stateParams;
+    this.$transition$ = $transition$;
     this.Notifications = Notifications;
 
     this.KubernetesNodeService = KubernetesNodeService;
@@ -101,7 +101,7 @@ class KubernetesEditResourcePoolController {
         sliderMaxCpu: 0
       };
 
-      const name = this.$stateParams.id;
+      const name = this.$transition$.params().id;
 
       const [nodes, quotas, pool] = await Promise.all([
         this.KubernetesNodeService.nodes(),
