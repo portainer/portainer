@@ -139,6 +139,8 @@ function ($q, $scope, $transition$, $state, $timeout, ImageService, ImageHelper,
 			history: endpointProvider !== 'VMWARE_VIC' ? ImageService.history($transition$.params().id) : []
 		})
 		.then(function success(data) {
+			// Sort ENV VARs (here, "key=value") to improve readability.
+			data.image.Env = _.sortBy(data.image.Env);
 			$scope.image = data.image;
 			$scope.history = data.history;
 		})
