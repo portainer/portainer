@@ -1,3 +1,5 @@
+import _ from 'lodash-es';
+
 angular.module('portainer.app')
 .controller('StackController', ['$q', '$scope', '$state', '$transition$', 'StackService', 'NodeService', 'ServiceService', 'TaskService', 'ContainerService', 'ServiceHelper', 'TaskHelper', 'Notifications', 'FormHelper', 'EndpointProvider', 'EndpointService', 'GroupService', 'ModalService',
 function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceService, TaskService, ContainerService, ServiceHelper, TaskHelper, Notifications, FormHelper, EndpointProvider, EndpointService, GroupService, ModalService) {
@@ -172,6 +174,8 @@ function ($q, $scope, $state, $transition$, StackService, NodeService, ServiceSe
     })
     .then(function success(data) {
       var stack = data.stack;
+      // Sort ENV VARs to improve readability.
+      stack.Env = _.sortBy(stack.Env, ['name']);
       $scope.groups = data.groups;
       $scope.stack = stack;
 
