@@ -44,6 +44,8 @@ class RegistryRepositoryTagController {
       this.history = _.map(this.tag.History, (layer, idx) => new RegistryImageLayerViewModel(length - idx, layer));
       _.forEach(this.history, (item) => item.CreatedBy = this.imagelayercommandFilter(item.CreatedBy))
       this.details = new RegistryImageDetailsViewModel(this.tag.History[0]);
+      // Sort ENV VARs (here, "key=value") to improve readability.
+      this.details.Env = _.sortBy(this.details.Env);
     } catch (error) {
       this.Notifications.error('Failure', error, 'Unable to retrieve tag')
     }
