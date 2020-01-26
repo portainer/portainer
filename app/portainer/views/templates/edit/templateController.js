@@ -41,6 +41,8 @@ function ($q, $scope, $state, $transition$, TemplateService, TemplateHelper, Net
     })
     .then(function success(data) {
       var template = data.template;
+      // Sort ENV VARs to improve readability.
+      template.Env = _.sortBy(template.Env, ['name']);
       if (template.Network) {
         template.Network = _.find(data.networks, function(o) { return o.Name === template.Network; });
       } else {
