@@ -122,7 +122,7 @@
             <tr ng-click="$ctrl.expandItem(item, !item.Expanded)" dir-paginate-start="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))" ng-class="{active: item.Checked}" class="interactive">
               <td>
                 <span class="md-checkbox" authorization="DockerServiceUpdate, DockerServiceDelete, DockerServiceCreate">
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)"/>
+                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event); $event.stopPropagation()"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
                 <a><i ng-class="{ 'fas fa-angle-down': item.Expanded, 'fas fa-angle-right': !item.Expanded }" class="space-right" aria-hidden="true"></i></a>
