@@ -22,12 +22,12 @@
           <tr ng-repeat="entry in service.Hosts">
             <td>
               <div class="input-group input-group-sm">
-                <input type="text" class="form-control" ng-model="entry.hostname" placeholder="e.g. example.com" ng-change="updateHostsEntry(service, entry)" ng-disabled="isUpdating">
+                <input type="text" class="form-control" ng-model="entry.hostname" placeholder="e.g. example.com" ng-change="updateHostsEntry(service, entry)" ng-disabled="isUpdating" disable-authorization="DockerServiceUpdate">
               </div>
             </td>
             <td>
               <div class="input-group input-group-sm">
-                <input type="text" class="form-control" ng-model="entry.ip" placeholder="e.g. 10.0.1.1" ng-change="updateHostsEntry(service, entry)" ng-disabled="isUpdating">
+                <input type="text" class="form-control" ng-model="entry.ip" placeholder="e.g. 10.0.1.1" ng-change="updateHostsEntry(service, entry)" ng-disabled="isUpdating" disable-authorization="DockerServiceUpdate">
                 <span class="input-group-btn" authorization="DockerServiceUpdate">
                   <button class="btn btn-sm btn-danger" type="button" ng-click="removeHostsEntry(service, $index)" ng-disabled="isUpdating">
                     <i class="fa fa-trash" aria-hidden="true"></i>
