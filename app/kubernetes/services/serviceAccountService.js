@@ -1,9 +1,9 @@
 import angular from 'angular';
 import _ from 'lodash-es';
-import PortainerError from "Portainer/error";
+import PortainerError from 'Portainer/error';
 
-import { KubernetesPortainerServiceAccountNamespace, KubernetesServiceAccount } from "Kubernetes/models/service-account/models";
-import KubernetesServiceAccountConvertor from "Kubernetes/convertors/serviceAccount";
+import {KubernetesPortainerServiceAccountNamespace} from 'Kubernetes/models/service-account/models';
+import KubernetesServiceAccountConverter from 'Kubernetes/converters/serviceAccount';
 
 class KubernetesServiceAccountService {
   /* @ngInject */
@@ -21,7 +21,7 @@ class KubernetesServiceAccountService {
   async listAsync() {
     try {
       const data = await this.KubernetesServiceAccounts(KubernetesPortainerServiceAccountNamespace).get().$promise;
-      return _.map(data.items, (item) => KubernetesServiceAccountConvertor.apiToServiceAccount(item));
+      return _.map(data.items, (item) => KubernetesServiceAccountConverter.apiToServiceAccount(item));
     } catch (err) {
       throw new PortainerError('Unable to retrieve service accounts', err);
     }
@@ -37,23 +37,37 @@ class KubernetesServiceAccountService {
   async getAsync(payload) {
     try {
       const data = await this.KubernetesServiceAccounts(KubernetesPortainerServiceAccountNamespace).get(payload).$promise;
-      return KubernetesServiceAccountConvertor.apiToServiceAccount(data);
+      return KubernetesServiceAccountConverter.apiToServiceAccount(data);
     } catch (err) {
-      if (err.status === 404) {
-        return new KubernetesServiceAccount();
-      }
       throw new PortainerError('Unable to retrieve service account', err);
     }
   }
 
   get(name) {
-    const payload = KubernetesServiceAccountConvertor.getPayload(name);
+    const payload = KubernetesServiceAccountConverter.getPayload(name);
     return this.$async(this.getAsync, payload);
   }
 
-  getFromUser(user) {
-    const payload = KubernetesServiceAccountConvertor.getPayloadFromUser(user);
+  getForUser(user) {
+    const payload = KubernetesServiceAccountConverter.getForUserPayload(user);
     return this.$async(this.getAsync, payload);
+  }
+
+  /**
+   * CREATE
+   */
+  async createAsync(user) {
+    try {
+      const payload = KubernetesServiceAccountConverter.createPayload(user);
+      const data = await this.KubernetesServiceAccounts(KubernetesPortainerServiceAccountNamespace).create(payload).$promise;
+      return KubernetesServiceAccountConverter.apiToServiceAccount(data);
+    } catch (err) {
+      throw new PortainerError('Unable to create service account', err);
+    }
+  }
+
+  create(user) {
+    return this.$async(this.createAsync, user)
   }
 }
 

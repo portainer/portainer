@@ -1,4 +1,4 @@
-import { KubernetesCommonMetadataPayload } from "../common/payloads";
+import {KubernetesCommonMetadataPayload} from '../common/payloads';
 
 /**
  * Payload for GET
@@ -16,7 +16,7 @@ export class KubernetesServiceAccountGetPayload {
  * Payload for CREATE
  */
 const _KubernetesServiceAccountCreatePayload = Object.freeze({
-  metadata: new KubernetesCommonMetadataPayload(),
+  metadata: new KubernetesCommonMetadataPayload()
 });
 export class KubernetesServiceAccountCreatePayload {
   constructor() {
@@ -27,12 +27,12 @@ export class KubernetesServiceAccountCreatePayload {
 /**
  * Payload for UPDATE
  */
-
-const _KubernetesServiceAccountUpdatePayload = Object.freeze({
-  metadata: new KubernetesCommonMetadataPayload(),
-});
-export class KubernetesServiceAccountUpdatePayload {
-  constructor() {
-    Object.assign(this, _KubernetesServiceAccountUpdatePayload);
-  }
-}
+// const _KubernetesServiceAccountUpdatePayload = Object.freeze({
+//   metadata: new KubernetesCommonMetadataPayload(),
+//   subjects: []
+// });
+// export class KubernetesServiceAccountUpdatePayload {
+//   constructor() {
+//     Object.assign(this, _KubernetesServiceAccountUpdatePayload);
+//   }
+// }

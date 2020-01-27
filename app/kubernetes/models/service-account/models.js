@@ -1,12 +1,16 @@
 export const KubernetesPortainerServiceAccountSuffix = 'portainer-sa-';
-export const KubernetesPortainerServiceAccountNamespace = 'portainer-ns'
+export const KubernetesPortainerServiceAccountNamespace = 'ns-portainer'
 
 /**
- * Role Binding Model
+ * ServiceAccount Model
  */
 const _KubernetesServiceAccount = Object.freeze({
+  Id: 0,
+  Name: '',
+  UserId: '',
+  UserName: '',
+  Secrets: []
 });
-
 export class KubernetesServiceAccount {
   constructor() {
     Object.assign(this, _KubernetesServiceAccount);

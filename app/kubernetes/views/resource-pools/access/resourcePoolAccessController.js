@@ -1,20 +1,25 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 
+// import { TeamAccessViewModel, UserAccessViewModel } from 'Portainer/models/access';
+
 class KubernetesResourcePoolAccessController {
   /* @ngInject */
-  constructor($async, $state, $transition$, Notifications, KubernetesResourcePoolService, EndpointProvider, EndpointService, GroupService, AccessService, KubernetesRoleBindingService) {
+  constructor($async, $state, $transition$, Notifications, KubernetesResourcePoolService, KubernetesServiceAccountService, EndpointProvider, EndpointService, GroupService, AccessService,
+    TeamService, KubernetesRoleBindingService) {
     this.$async = $async;
     this.$state = $state;
     this.$transition$ = $transition$;
     this.Notifications = Notifications;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesRoleBindingService = KubernetesRoleBindingService;
+    this.KubernetesServiceAccountService = KubernetesServiceAccountService;
 
     this.EndpointProvider = EndpointProvider;
     this.EndpointService = EndpointService;
     this.GroupService = GroupService;
     this.AccessService = AccessService;
+    this.TeamService = TeamService;
 
     this.onInit = this.onInit.bind(this);
     this.authorizeAccessAsync = this.authorizeAccessAsync.bind(this);
@@ -44,6 +49,13 @@ class KubernetesResourcePoolAccessController {
       const accesses = await this.AccessService.accesses(endpoint, group, roles);
 
       this.pool = pool;
+      // const availableUsers = _.filter(accesses.authorizedUsersAndTeams, (item) => item instanceof UserAccessViewModel);
+      // const availableTeams = _.filter(accesses.authorizedUsersAndTeams, (item) => item instanceof TeamAccessViewModel);
+      // const promises = [];
+      // _.forEach(availableTeams, (item) => promises.push(this.TeamService.userMemberships(item.Id)))
+      // const memberships = await Promise.all(promises);
+      // console.log(memberships);
+
       this.authorizedUsersAndTeams = _.filter(accesses.authorizedUsersAndTeams,
         (item) => _.find(roleBinding.AuthorizedUsersAndTeams, (user) => item.Id === user.Id));
       this.availableUsersAndTeams = _.without(accesses.authorizedUsersAndTeams, ...this.authorizedUsersAndTeams);

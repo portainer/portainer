@@ -1,14 +1,17 @@
 import angular from 'angular';
+import _ from 'lodash-es';
 import PortainerError from 'Portainer/error';
 
-import { KubernetesRoleBinding } from 'Kubernetes/models/role-binding/models';
-import KubernetesRoleBindingConvertor from 'Kubernetes/convertors/roleBinding';
+import {KubernetesRoleBinding} from 'Kubernetes/models/role-binding/models';
+import KubernetesRoleBindingConverter from 'Kubernetes/converters/roleBinding';
+import $allSettled from 'Portainer/services/allSettled';
 
 class KubernetesRoleBindingService {
   /* @ngInject */
-  constructor($async, KubernetesRoleBindings) {
+  constructor($async, KubernetesServiceAccountService, KubernetesRoleBindings) {
     this.$async = $async;
     this.KubernetesRoleBindings = KubernetesRoleBindings;
+    this.KubernetesServiceAccountService = KubernetesServiceAccountService;
 
     this.getAsync = this.getAsync.bind(this);
     this.createAsync = this.createAsync.bind(this);
@@ -20,9 +23,9 @@ class KubernetesRoleBindingService {
    */
   async getAsync(namespace) {
     try {
-      const payload = KubernetesRoleBindingConvertor.getPayload(namespace);
+      const payload = KubernetesRoleBindingConverter.getPayload(namespace);
       const data = await this.KubernetesRoleBindings(namespace).get(payload).$promise;
-      return KubernetesRoleBindingConvertor.apiToRoleBinding(data);
+      return KubernetesRoleBindingConverter.apiToRoleBinding(data);
     } catch (err) {
       if (err.status === 404) {
         return new KubernetesRoleBinding();
@@ -41,9 +44,9 @@ class KubernetesRoleBindingService {
    */
   async createAsync(namespace) {
     try {
-      const payload = KubernetesRoleBindingConvertor.createPayload(namespace);
+      const payload = KubernetesRoleBindingConverter.createPayload(namespace);
       const data = await this.KubernetesRoleBindings(namespace).create(payload).$promise;
-      return KubernetesRoleBindingConvertor.apiToRoleBinding(data);
+      return KubernetesRoleBindingConverter.apiToRoleBinding(data);
     } catch (err) {
       throw new PortainerError('Unable to create role binding', err);
     }
@@ -60,13 +63,17 @@ class KubernetesRoleBindingService {
    */
   async updateAsync(namespace, newAccesses) {
     try {
-      // get SA and co
       let rb = await this.get(namespace)
-      // if (rb.Id === 0) {
-      //   rb = await this.create(namespace)
-      // }
-      const payload = KubernetesRoleBindingConvertor.updatePayload(rb, newAccesses);
-      console.log(payload);
+      if (rb.Id === 0) {
+        rb = await this.create(namespace)
+      }
+      const queryServAccounts = await $allSettled(_.map(newAccesses, (item) => this.KubernetesServiceAccountService.getForUser(item)));
+      console.log(queryServAccounts);
+
+      // const saToCreate = _.filter(newAccesses, 
+      // const createdServiceAccounts = await Promise.all(_.map(serviceAccounts.rejected, (item) => this.KubernetesServiceAccountService.create(item)))
+      const payload = KubernetesRoleBindingConverter.updatePayload(rb, newAccesses);
+      console.log('payload', payload);
       // const res = await this.KubernetesRoleBindings(namespace).update(payload).$promise;
       // return res;
     } catch (err) {
