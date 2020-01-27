@@ -97,8 +97,8 @@
                     <i class="fa fa-project-diagram" aria-hidden="true" style="margin-right: 2px;"></i> Load balancer
                   </span>
                   <span class="text-muted small" style="margin-left: 5px;">
-                    <span ng-if="item.LoadBalancerIPAddress"><i class="fa fa-check green-icon"></i> {{ item.LoadBalancerIPAddress }}</span>
-                    <span ng-if="!item.LoadBalancerIPAddress"><i class="fa fa-cog"></i> pending</span>
+                    <span ng-if="item.LoadBalancerIPAddress">{{ item.LoadBalancerIPAddress }}</span>
+                    <span ng-if="!item.LoadBalancerIPAddress">pending</span>
                   </span>
                 </span>
                 <span ng-if="item.ServiceType === 'ClusterIP'">

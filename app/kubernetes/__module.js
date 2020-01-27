@@ -19,21 +19,21 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     }
   };
 
-  var applications = {
-    name: 'kubernetes.applications',
-    url: '/applications',
-    views: {
-      'content@': {
-        templateUrl: './views/applications/applications.html',
-        controller: 'KubernetesApplicationsController',
-        controllerAs: 'ctrl'
-      }
-    }
-  };
+  // var applications = {
+  //   name: 'kubernetes.applications',
+  //   url: '/applications',
+  //   views: {
+  //     'content@': {
+  //       templateUrl: './views/applications/applications.html',
+  //       controller: 'KubernetesApplicationsController',
+  //       controllerAs: 'ctrl'
+  //     }
+  //   }
+  // };
 
   var applications2 = {
-    name: 'kubernetes.applications2',
-    url: '/applications2',
+    name: 'kubernetes.applications',
+    url: '/applications',
     views: {
       'content@': {
         templateUrl: './views/applications/applications2.html',
@@ -184,7 +184,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
   };
 
   $stateRegistryProvider.register(kubernetes);
-  $stateRegistryProvider.register(applications);
+  // $stateRegistryProvider.register(applications);
   $stateRegistryProvider.register(applications2);
   $stateRegistryProvider.register(applicationCreation);
   $stateRegistryProvider.register(applicationInspect);
