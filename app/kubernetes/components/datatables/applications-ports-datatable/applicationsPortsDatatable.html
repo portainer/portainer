@@ -109,12 +109,12 @@
                 </span>
               </td>
               <td>
-                  {{ item.TargetPort }}
-                <a ng-if="item.LoadBalancerIPAddress" ng-href="http://{{ item.LoadBalancerIPAddress }}:{{port.port}}" target="_blank" style="margin-left: 5px">
+                  {{ item.Port }}
+                <a ng-if="item.LoadBalancerIPAddress" ng-href="http://{{ item.LoadBalancerIPAddress }}:{{item.Port}}" target="_blank" style="margin-left: 5px">
                   <i class="fa fa-external-link-alt" aria-hidden="true"></i> access
                 </a>
               </td>
-              <td>{{ item.Port }}</td>
+              <td>{{ item.TargetPort }}</td>
               <td>{{ item.Protocol }}</td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
