@@ -126,7 +126,7 @@
                 <span ng-if="item.DeploymentType === $ctrl.KubernetesApplicationDeploymentTypes.GLOBAL">Global</span>
                 <code>{{ item.RunningPodsCount }}</code> / <code>{{ item.TotalPodsCount }}</code></td>
               <td>
-                <span ng-if="item.PublishedPorts.length" ng-repeat="port in item.PublishedPorts track by $index">
+                <span ng-if="item.PublishedPorts.length">
                   <span ng-if="item.ServiceType === 'LoadBalancer'">
                     <i class="fa fa-project-diagram" aria-hidden="true" style="margin-right: 2px;"></i> Load balancer
                   </span>
