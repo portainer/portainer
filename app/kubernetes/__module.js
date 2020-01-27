@@ -31,6 +31,18 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     }
   };
 
+  var applications2 = {
+    name: 'kubernetes.applications2',
+    url: '/applications2',
+    views: {
+      'content@': {
+        templateUrl: './views/applications/applications2.html',
+        controller: 'KubernetesApplicationsController2',
+        controllerAs: 'ctrl'
+      }
+    }
+  };
+
   const applicationCreation = {
     name: 'kubernetes.applications.new',
     url: '/new',
@@ -173,6 +185,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
 
   $stateRegistryProvider.register(kubernetes);
   $stateRegistryProvider.register(applications);
+  $stateRegistryProvider.register(applications2);
   $stateRegistryProvider.register(applicationCreation);
   $stateRegistryProvider.register(applicationInspect);
   $stateRegistryProvider.register(applicationCreateMockup);
