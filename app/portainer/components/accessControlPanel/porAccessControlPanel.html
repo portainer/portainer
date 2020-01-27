@@ -127,7 +127,7 @@
               <td colspan="2">
                 <span>Teams</span>
                 <span ng-if="$ctrl.isAdmin && $ctrl.availableTeams.length === 0" class="small text-muted" style="margin-left: 10px;">
-                  You have not yet created any team. Head over the <a ui-sref="portainer.teams">teams view</a> to manage user teams.
+                  You have not yet created any teams. Head over to the <a ui-sref="portainer.teams">Teams view</a> to manage teams.
                 </span>
                 <span isteven-multi-select
                   ng-if="($ctrl.isAdmin && $ctrl.availableTeams.length > 0) || (!$ctrl.isAdmin && $ctrl.availableTeams.length > 1)"
@@ -149,7 +149,7 @@
               <td colspan="2">
                 <span>Users</span>
                 <span ng-if="$ctrl.availableUsers.length === 0" class="small text-muted" style="margin-left: 10px;">
-                  You have not yet created any user. Head over the <a ui-sref="portainer.users">users view</a> to manage users.
+                  You have not yet created any users. Head over to the <a ui-sref="portainer.users">Users view</a> to manage users.
                 </span>
                 <span isteven-multi-select
                   ng-if="$ctrl.availableUsers.length > 0"
