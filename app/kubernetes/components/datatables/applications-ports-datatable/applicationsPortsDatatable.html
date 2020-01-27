@@ -124,6 +124,9 @@
             </td>
             <td ng-if="item.Ports.length === 1">{{ item.Ports[0].TargetPort }}</td>
             <td ng-if="item.Ports.length === 1">{{ item.Ports[0].Protocol }}</td>
+            <td ng-if="item.Ports.length > 1"></td>
+            <td ng-if="item.Ports.length > 1"></td>
+            <td ng-if="item.Ports.length > 1"></td>
           </tr>
           <tr dir-paginate-end ng-show="item.Expanded" ng-repeat="port in item.Ports" style="background: #d5e8f3;" ng-if="item.Ports.length > 1">
             <td></td>
