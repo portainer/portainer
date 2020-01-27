@@ -60,19 +60,27 @@ class KubernetesApplicationsController2 {
           stackInfo.push(stack);
         }
 
-
-        for (const port of application.PublishedPorts) {
-          const portMapping = {
+        if (application.PublishedPorts.length > 0) {
+          const mapping = {
+            Expanded: true,
             ApplicationName: application.Name,
             ResourcePool: application.ResourcePool,
             ServiceType: application.ServiceType,
             LoadBalancerIPAddress: application.LoadBalancerIPAddress,
-            Port: port.port,
-            TargetPort: port.targetPort,
-            Protocol: port.protocol
+            Ports: []
           };
 
-          this.ports.push(portMapping);
+          for (const port of application.PublishedPorts) {
+            const portDetails = {
+              Port: port.port,
+              TargetPort: port.targetPort,
+              Protocol: port.protocol
+            };
+
+            mapping.Ports.push(portDetails);
+          }
+
+          this.ports.push(mapping);
         }
 
       }

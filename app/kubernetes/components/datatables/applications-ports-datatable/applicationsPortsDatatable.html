@@ -52,6 +52,11 @@
         <table class="table table-hover nowrap-cells">
           <thead>
             <tr>
+              <th style="width:55px;">
+                <a ng-click="$ctrl.expandAll()">
+                  <i ng-class="{ 'fas fa-angle-down': $ctrl.state.expandAll, 'fas fa-angle-right': !$ctrl.state.expandAll }" aria-hidden="true"></i>
+                </a>
+              </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('Name')">
                   Application
@@ -86,43 +91,59 @@
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))" ng-class="{active: item.Checked}">
-              <td>
-                <a ui-sref="kubernetes.applications.application({ name: item.Name, namespace: item.ResourcePool })">{{ item.ApplicationName }}</a>
-                <span style="margin-left: 5px;" class="label label-warning image-tag" ng-if="$ctrl.isPartOfSystemNamespace(item)">system</span>
-              </td>
-              <td>
-                <span ng-if="item.ServiceType === 'LoadBalancer'">
-                  <span>
-                    <i class="fa fa-project-diagram" aria-hidden="true" style="margin-right: 2px;"></i> Load balancer
-                  </span>
-                  <span class="text-muted small" style="margin-left: 5px;">
-                    <span ng-if="item.LoadBalancerIPAddress">{{ item.LoadBalancerIPAddress }}</span>
-                    <span ng-if="!item.LoadBalancerIPAddress">pending</span>
-                  </span>
+          <tr dir-paginate-start="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))" ng-class="{active: item.Checked}">
+            <td>
+              <a ng-if="item.Ports.length > 1"><i ng-class="{ 'fas fa-angle-down': item.Expanded, 'fas fa-angle-right': !item.Expanded }" class="space-right" aria-hidden="true"></i></a>
+            </td>
+            <td>
+              <a ui-sref="kubernetes.applications.application({ name: item.Name, namespace: item.ResourcePool })">{{ item.ApplicationName }}</a>
+              <span style="margin-left: 5px;" class="label label-warning image-tag" ng-if="$ctrl.isPartOfSystemNamespace(item)">system</span>
+            </td>
+            <td>
+              <span ng-if="item.ServiceType === 'LoadBalancer'">
+                <span>
+                  <i class="fa fa-project-diagram" aria-hidden="true" style="margin-right: 2px;"></i> Load balancer
                 </span>
-                <span ng-if="item.ServiceType === 'ClusterIP'">
-                  <i class="fa fa-list-alt" aria-hidden="true" style="margin-right: 2px;"></i> Internal
+                <span class="text-muted small" style="margin-left: 5px;">
+                  <span ng-if="item.LoadBalancerIPAddress">{{ item.LoadBalancerIPAddress }}</span>
+                  <span ng-if="!item.LoadBalancerIPAddress">pending</span>
                 </span>
-                <span ng-if="item.ServiceType === 'NodePort'">
-                  <i class="fa fa-list" aria-hidden="true" style="margin-right: 2px;"></i> Cluster
-                </span>
-              </td>
-              <td>
-                  {{ item.Port }}
-                <a ng-if="item.LoadBalancerIPAddress" ng-href="http://{{ item.LoadBalancerIPAddress }}:{{item.Port}}" target="_blank" style="margin-left: 5px">
-                  <i class="fa fa-external-link-alt" aria-hidden="true"></i> access
-                </a>
-              </td>
-              <td>{{ item.TargetPort }}</td>
-              <td>{{ item.Protocol }}</td>
-            </tr>
-            <tr ng-if="!$ctrl.dataset">
-              <td colspan="4" class="text-center text-muted">Loading...</td>
-            </tr>
-            <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-              <td colspan="4" class="text-center text-muted">No application port mapping available.</td>
-            </tr>
+              </span>
+                      <span ng-if="item.ServiceType === 'ClusterIP'">
+                <i class="fa fa-list-alt" aria-hidden="true" style="margin-right: 2px;"></i> Internal
+              </span>
+                      <span ng-if="item.ServiceType === 'NodePort'">
+                <i class="fa fa-list" aria-hidden="true" style="margin-right: 2px;"></i> Cluster
+              </span>
+            </td>
+            <td ng-if="item.Ports.length === 1">
+                {{ item.Ports[0].Port }}
+              <a ng-if="item.LoadBalancerIPAddress" ng-href="http://{{ item.LoadBalancerIPAddress }}:{{item.Ports[0].Port}}" target="_blank" style="margin-left: 5px">
+                <i class="fa fa-external-link-alt" aria-hidden="true"></i> access
+              </a>
+            </td>
+            <td ng-if="item.Ports.length === 1">{{ item.Ports[0].TargetPort }}</td>
+            <td ng-if="item.Ports.length === 1">{{ item.Ports[0].Protocol }}</td>
+          </tr>
+          <tr dir-paginate-end ng-show="item.Expanded" ng-repeat="port in item.Ports" style="background: #d5e8f3;" ng-if="item.Ports.length > 1">
+            <td></td>
+            <td>-</td>
+            <td>-</td>
+            <td>
+                {{ port.Port }}
+              <a ng-if="item.LoadBalancerIPAddress" ng-href="http://{{ item.LoadBalancerIPAddress }}:{{item.Port}}" target="_blank" style="margin-left: 5px">
+                <i class="fa fa-external-link-alt" aria-hidden="true"></i> access
+              </a>
+            </td>
+            <td>{{ port.TargetPort }}</td>
+            <td>{{ port.Protocol }}</td>
+          </tr>
+          <tr ng-if="!$ctrl.dataset">
+            <td colspan="6" class="text-center text-muted">Loading...</td>
+          </tr>
+          <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
+            <td colspan="6" class="text-center text-muted">No application port mapping available.</td>
+          </tr>
           </tbody>
         </table>
       </div>

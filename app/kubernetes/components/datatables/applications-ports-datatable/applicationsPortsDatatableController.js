@@ -14,6 +14,11 @@ angular.module('portainer.docker')
         return KubernetesNamespaceHelper.isSystemNamespace(item.ResourcePool);
       };
 
+      this.state = Object.assign(this.state, {
+        expandedItems: [],
+        expandAll: true
+      })
+
       /**
        * Do not allow applications in system namespaces to be selected
        */
