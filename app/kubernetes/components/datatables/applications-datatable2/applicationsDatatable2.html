@@ -128,13 +128,13 @@
               <td>
                 <span ng-if="item.PublishedPorts.length">
                   <span ng-if="item.ServiceType === 'LoadBalancer'">
-                    <i class="fa fa-project-diagram" aria-hidden="true" style="margin-right: 2px;"></i> Load balancer
+                    <a href="#"><i class="fa fa-project-diagram" aria-hidden="true" style="margin-right: 2px;"></i> Load balancer</a>
                   </span>
                   <span ng-if="item.ServiceType === 'ClusterIP'">
-                    <i class="fa fa-list-alt" aria-hidden="true" style="margin-right: 2px;"></i> Internal
+                    <a href="#"><i class="fa fa-list-alt" aria-hidden="true" style="margin-right: 2px;"></i> Internal</a>
                   </span>
                   <span ng-if="item.ServiceType === 'NodePort'">
-                    <i class="fa fa-list" aria-hidden="true" style="margin-right: 2px;"></i> Cluster
+                    <a href="#"><i class="fa fa-list" aria-hidden="true" style="margin-right: 2px;"></i> Cluster</a>
                   </span>
                 </span>
                 <span ng-if="item.PublishedPorts.length === 0">-</span>
