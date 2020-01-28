@@ -35,7 +35,7 @@ func (kcl *KubeClient) GetPortainerServiceAccountBearerToken() (string, error) {
 // cluster before creating a ServiceAccount and a ServiceAccountToken for the specified Portainer user.
 //It will also create required default RoleBinding and ClusterRoleBinding rules.
 func (kcl *KubeClient) SetupUserServiceAccount(userID int, username string) error {
-	serviceAccountName := fmt.Sprintf("portainer-sa-%d-%s", userID, username)
+	serviceAccountName := fmt.Sprintf("portainer-sa-user-%d", userID)
 
 	err := kcl.ensureRequiredResourcesExist()
 	if err != nil {
@@ -47,7 +47,7 @@ func (kcl *KubeClient) SetupUserServiceAccount(userID int, username string) erro
 
 // GetServiceAccountBearerToken returns the ServiceAccountToken associated to the specified user.
 func (kcl *KubeClient) GetServiceAccountBearerToken(userID int, username string) (string, error) {
-	serviceAccountName := fmt.Sprintf("portainer-sa-%d-%s", userID, username)
+	serviceAccountName := fmt.Sprintf("portainer-sa-user-%d", userID)
 	return kcl.getSecretTokenFromServiceAccount(serviceAccountName)
 }
 

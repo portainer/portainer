@@ -13,6 +13,7 @@ class KubernetesServiceAccountService {
 
     this.listAsync = this.listAsync.bind(this);
     this.getAsync = this.getAsync.bind(this);
+    this.createAsync = this.createAsync.bind(this);
   }
 
   /**
@@ -48,17 +49,17 @@ class KubernetesServiceAccountService {
     return this.$async(this.getAsync, payload);
   }
 
-  getForUser(user) {
-    const payload = KubernetesServiceAccountConverter.getForUserPayload(user);
+  getForUserOrTeam(userOrTeam) {
+    const payload = KubernetesServiceAccountConverter.getForUserOrTeamPayload(userOrTeam);
     return this.$async(this.getAsync, payload);
   }
 
   /**
    * CREATE
    */
-  async createAsync(user) {
+  async createAsync(userOrTeam) {
     try {
-      const payload = KubernetesServiceAccountConverter.createPayload(user);
+      const payload = KubernetesServiceAccountConverter.createPayload(userOrTeam);
       const data = await this.KubernetesServiceAccounts(KubernetesPortainerServiceAccountNamespace).create(payload).$promise;
       return KubernetesServiceAccountConverter.apiToServiceAccount(data);
     } catch (err) {
@@ -66,8 +67,8 @@ class KubernetesServiceAccountService {
     }
   }
 
-  create(user) {
-    return this.$async(this.createAsync, user)
+  create(userOrTeam) {
+    return this.$async(this.createAsync, userOrTeam)
   }
 }
 

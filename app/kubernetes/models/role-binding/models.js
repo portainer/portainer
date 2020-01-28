@@ -7,24 +7,11 @@ const _KubernetesRoleBinding = Object.freeze({
   Id: 0,
   Name: '',
   Namespace: '',
-  AuthorizedUsersAndTeams: []
+  AuthorizedUsersAndTeams: [] // KubernetesServiceAccount list
 });
 
 export class KubernetesRoleBinding {
   constructor() {
     Object.assign(this, _KubernetesRoleBinding);
-  }
-}
-
-/**
- * Role Binding authorized users and teams
- */
-const _KubernetesRoleBindingUserOrTeam = Object.freeze({
-  Id: 0,
-  Name: ''
-});
-export class KubernetesRoleBindingUserOrTeam {
-  constructor() {
-    Object.assign(this, _KubernetesRoleBindingUserOrTeam);
   }
 }

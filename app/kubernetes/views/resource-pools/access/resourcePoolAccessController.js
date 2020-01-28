@@ -47,17 +47,10 @@ class KubernetesResourcePoolAccessController {
       const group = await this.GroupService.group(endpoint.GroupId);
       const roles = [];
       const accesses = await this.AccessService.accesses(endpoint, group, roles);
-
       this.pool = pool;
-      // const availableUsers = _.filter(accesses.authorizedUsersAndTeams, (item) => item instanceof UserAccessViewModel);
-      // const availableTeams = _.filter(accesses.authorizedUsersAndTeams, (item) => item instanceof TeamAccessViewModel);
-      // const promises = [];
-      // _.forEach(availableTeams, (item) => promises.push(this.TeamService.userMemberships(item.Id)))
-      // const memberships = await Promise.all(promises);
-      // console.log(memberships);
 
       this.authorizedUsersAndTeams = _.filter(accesses.authorizedUsersAndTeams,
-        (item) => _.find(roleBinding.AuthorizedUsersAndTeams, (user) => item.Id === user.Id));
+        (item) => _.find(roleBinding.AuthorizedUsersAndTeams, (user) => item.Id === user.UID));
       this.availableUsersAndTeams = _.without(accesses.authorizedUsersAndTeams, ...this.authorizedUsersAndTeams);
     } catch (err) {
       this.Notifications.error("Failure", err, "Unable to retrieve resource pool information");
@@ -75,10 +68,9 @@ class KubernetesResourcePoolAccessController {
     try {
       this.state.actionInProgress = true;
       const newAccesses = _.concat(this.authorizedUsersAndTeams, this.formValues.multiselectOutput);
-      console.log(newAccesses);
       await this.KubernetesRoleBindingService.update(this.pool.Namespace.Name, newAccesses)
       this.Notifications.success("Access successfully created");
-      // this.$state.reload();
+      this.$state.reload();
     } catch (err) {
       this.Notifications.error("Failure", err, "Unable to create accesses");
     }
@@ -96,7 +88,6 @@ class KubernetesResourcePoolAccessController {
       this.state.actionInProgress = true;
       const newAccesses = _.without(this.authorizedUsersAndTeams, ...selectedItems);
       await this.KubernetesRoleBindingService.update(this.pool.Namespace.Name, newAccesses)
-      console.log(newAccesses);
       this.Notifications.success("Access successfully removed");
       this.$state.reload();
     } catch (err) {

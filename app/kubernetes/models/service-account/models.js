@@ -1,5 +1,14 @@
-export const KubernetesPortainerServiceAccountSuffix = 'portainer-sa-';
+export const KubernetesPortainerServiceAccountUserSuffix = 'portainer-sa-user-';
+export const KubernetesPortainerServiceAccountTeamSuffix = 'portainer-sa-team-';
 export const KubernetesPortainerServiceAccountNamespace = 'ns-portainer'
+
+/**
+ * ServiceAccount types
+ */
+export const KubernetesServiceAccountTypes = Object.freeze({
+  USER: 'user',
+  TEAM: 'team'
+});
 
 /**
  * ServiceAccount Model
@@ -7,8 +16,8 @@ export const KubernetesPortainerServiceAccountNamespace = 'ns-portainer'
 const _KubernetesServiceAccount = Object.freeze({
   Id: 0,
   Name: '',
-  UserId: '',
-  UserName: '',
+  UID: '',
+  Type: '',
   Secrets: []
 });
 export class KubernetesServiceAccount {

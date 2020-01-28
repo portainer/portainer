@@ -67,17 +67,18 @@ class KubernetesRoleBindingService {
       if (rb.Id === 0) {
         rb = await this.create(namespace)
       }
-      const queryServAccounts = await $allSettled(_.map(newAccesses, (item) => this.KubernetesServiceAccountService.getForUser(item)));
-      console.log(queryServAccounts);
-
-      // const saToCreate = _.filter(newAccesses, 
-      // const createdServiceAccounts = await Promise.all(_.map(serviceAccounts.rejected, (item) => this.KubernetesServiceAccountService.create(item)))
-      const payload = KubernetesRoleBindingConverter.updatePayload(rb, newAccesses);
-      console.log('payload', payload);
-      // const res = await this.KubernetesRoleBindings(namespace).update(payload).$promise;
-      // return res;
+      const queriedSA = await $allSettled(_.map(newAccesses, (item) => this.KubernetesServiceAccountService.getForUserOrTeam(item)));
+      const saToCreate = _.reduce(newAccesses, (acc, item) => {
+        if (!_.find(queriedSA.fulfilled, (query) => query.UID === item.Id)){
+          acc.push(item);
+        }
+        return acc;
+      }, []);
+      const createdSA = await Promise.all(_.map(saToCreate, (item) => this.KubernetesServiceAccountService.create(item)))
+      const serviceAccounts = _.concat(queriedSA.fulfilled, createdSA);
+      const payload = KubernetesRoleBindingConverter.updatePayload(rb, serviceAccounts);
+      return await this.KubernetesRoleBindings(namespace).update(payload).$promise;
     } catch (err) {
-      console.log(err);
       throw new PortainerError('Unable to update role binding', err);
     }
   }
