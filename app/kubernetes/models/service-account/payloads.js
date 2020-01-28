@@ -8,7 +8,7 @@ const _KubernetesServiceAccountGetPayload = Object.freeze({
 });
 export class KubernetesServiceAccountGetPayload {
   constructor() {
-    Object.assign(this, _KubernetesServiceAccountGetPayload);
+    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesServiceAccountGetPayload)));
   }
 }
 
@@ -20,7 +20,7 @@ const _KubernetesServiceAccountCreatePayload = Object.freeze({
 });
 export class KubernetesServiceAccountCreatePayload {
   constructor() {
-    Object.assign(this, _KubernetesServiceAccountCreatePayload);
+    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesServiceAccountCreatePayload)));
   }
 }
 
@@ -33,6 +33,6 @@ export class KubernetesServiceAccountCreatePayload {
 // });
 // export class KubernetesServiceAccountUpdatePayload {
 //   constructor() {
-//     Object.assign(this, _KubernetesServiceAccountUpdatePayload);
+//     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesServiceAccountUpdatePayload)));
 //   }
 // }

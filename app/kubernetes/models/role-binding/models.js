@@ -12,6 +12,6 @@ const _KubernetesRoleBinding = Object.freeze({
 
 export class KubernetesRoleBinding {
   constructor() {
-    Object.assign(this, _KubernetesRoleBinding);
+    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesRoleBinding)));
   }
 }

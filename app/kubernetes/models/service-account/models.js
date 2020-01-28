@@ -22,6 +22,6 @@ const _KubernetesServiceAccount = Object.freeze({
 });
 export class KubernetesServiceAccount {
   constructor() {
-    Object.assign(this, _KubernetesServiceAccount);
+    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesServiceAccount)));
   }
 }

@@ -9,7 +9,7 @@ const _KubernetesRoleBindingGetPayload = Object.freeze({
 });
 export class KubernetesRoleBindingGetPayload {
   constructor() {
-    Object.assign(this, _KubernetesRoleBindingGetPayload);
+    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesRoleBindingGetPayload)));
   }
 }
 
@@ -27,7 +27,7 @@ const _KubernetesRoleBindingCreatePayload = Object.freeze({
 });
 export class KubernetesRoleBindingCreatePayload {
   constructor() {
-    Object.assign(this, _KubernetesRoleBindingCreatePayload);
+    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesRoleBindingCreatePayload)));
   }
 }
 
@@ -41,7 +41,7 @@ const _KubernetesRoleBindingSubjectPayload = Object.freeze({
 })
 export class KubernetesRoleBindingSubjectPayload {
   constructor() {
-    Object.assign(this, _KubernetesRoleBindingSubjectPayload);
+    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesRoleBindingSubjectPayload)));
   }
 }
 
@@ -56,6 +56,6 @@ const _KubernetesRoleBindingUpdatePayload = Object.freeze({
 });
 export class KubernetesRoleBindingUpdatePayload {
   constructor() {
-    Object.assign(this, _KubernetesRoleBindingUpdatePayload);
+    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesRoleBindingUpdatePayload)));
   }
 }
