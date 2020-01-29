@@ -1,3 +1,6 @@
 angular.module('portainer.kubernetes').component('kubernetesSidebarContent', {
-  templateUrl: './kubernetesSidebarContent.html'
+  templateUrl: './kubernetesSidebarContent.html',
+  bindings: {
+    adminAccess: '<'
+  }
 });

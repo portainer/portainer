@@ -15,7 +15,7 @@
     <li class="sidebar-title endpoint-name" ng-if="applicationState.endpoint.name">
       <span class="fa fa-plug space-right"></span>{{ applicationState.endpoint.name }}
     </li>
-    <kubernetes-sidebar-content ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider === 'KUBERNETES'">
+    <kubernetes-sidebar-content ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider === 'KUBERNETES'" admin-access="!applicationState.application.authentication || isAdmin">
     </kubernetes-sidebar-content>
     <azure-sidebar-content ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider === 'AZURE'">
     </azure-sidebar-content>
