@@ -6,10 +6,6 @@ angular.module('portainer.docker')
 
       angular.extend(this, $controller('GenericDatatableController', {$scope: $scope}));
 
-      this.disableRemove = function(item) {
-        return KubernetesNamespaceHelper.isAppSystemNamespace(item.ResourcePool);
-      };
-
       this.isPartOfSystemNamespace = function(item) {
         return KubernetesNamespaceHelper.isSystemNamespace(item.ResourcePool);
       };
@@ -18,7 +14,7 @@ angular.module('portainer.docker')
        * Do not allow applications in system namespaces to be selected
        */
       this.allowSelection = function(item) {
-        return !this.disableRemove(item);
+        return !this.isPartOfSystemNamespace(item);
       }
 
       this.$onInit = function() {
