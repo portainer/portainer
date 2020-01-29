@@ -7,14 +7,14 @@ import (
 	"time"
 
 	"github.com/docker/docker/client"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
 )
 
 const (
 	unsupportedEnvironmentType  = portainer.Error("Environment not supported")
 	defaultDockerRequestTimeout = 60
-	dockerClientVersion         = "1.40"
+	dockerClientVersion         = "1.37"
 )
 
 // ClientFactory is used to create Docker clients
