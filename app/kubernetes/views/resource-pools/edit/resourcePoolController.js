@@ -58,12 +58,12 @@ class KubernetesEditResourcePoolController {
           await this.KubernetesResourceQuotaService.update(quota.Raw, this.formValues.CpuLimit, memoryLimit);
           if (!this.pool.LimitRange) {
             const limitRange = new KubernetesDefaultLimitRangeModel(this.pool.Namespace.Name);
-            await this.KubernetesLimitRangeService.create(limitRange);
+            await this.KubernetesLimitRangeService.create(limitRange, this.formValues.CpuLimit, memoryLimit);
           }
         } else {
           await this.KubernetesResourceQuotaService.create(this.pool.Namespace.Name, this.formValues.CpuLimit, memoryLimit);
           const limitRange = new KubernetesDefaultLimitRangeModel(this.pool.Namespace.Name);
-          await this.KubernetesLimitRangeService.create(limitRange);
+          await this.KubernetesLimitRangeService.create(limitRange, this.formValues.CpuLimit, memoryLimit);
         }
       } else if (quota) {
         await this.KubernetesResourceQuotaService.remove(quota);
@@ -103,9 +103,8 @@ class KubernetesEditResourcePoolController {
 
       const name = this.$transition$.params().id;
 
-      const [nodes, quotas, pool] = await Promise.all([
+      const [nodes, pool] = await Promise.all([
         this.KubernetesNodeService.nodes(),
-        this.KubernetesResourceQuotaService.quotas(),
         this.KubernetesResourcePoolService.resourcePool(name)
       ]);
 
@@ -115,26 +114,19 @@ class KubernetesEditResourcePoolController {
         this.state.sliderMaxMemory += filesizeParser(item.Memory);
         this.state.sliderMaxCpu += item.CPU;
       });
-      _.forEach(quotas, (item) => {
-        this.state.sliderMaxCpu -= item.CpuLimit;
-        this.state.sliderMaxMemory -= item.MemoryLimit;
-      });
+      this.state.sliderMaxMemory = megaBytesValue(this.state.sliderMaxMemory);
 
       if (pool.Quotas.length) {
         let cpuLimit = 0;
         let memoryLimit = 0;
         this.formValues.hasQuota = true;
         _.forEach(pool.Quotas, (item) => {
-          this.state.sliderMaxCpu += item.CpuLimit;
-          this.state.sliderMaxMemory += item.MemoryLimit;
           cpuLimit += item.CpuLimit;
-          memoryLimit += item.MemoryLimit;
+          memoryLimit += megaBytesValue(item.MemoryLimit);
         });
         this.formValues.CpuLimit = cpuLimit;
         this.formValues.MemoryLimit = memoryLimit;
-        this.formValues.MemoryLimit = megaBytesValue(this.formValues.MemoryLimit);
       }
-      this.state.sliderMaxMemory = megaBytesValue(this.state.sliderMaxMemory);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
     }

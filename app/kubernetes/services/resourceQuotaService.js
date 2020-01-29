@@ -47,6 +47,12 @@ angular.module("portainer.kubernetes").factory("KubernetesResourceQuotaService",
             }
           }
         };
+        if (cpuLimit === 0) {
+          delete payload.spec.hard['limits.cpu'];
+        }
+        if (memoryLimit ===0) {
+          delete payload.spec.hard['limits.memory'];
+        }
         const data = await KubernetesResourceQuotas.create(payload).$promise;
         return data;
       } catch (err) {
@@ -65,6 +71,12 @@ angular.module("portainer.kubernetes").factory("KubernetesResourceQuotaService",
       try {
         quota.spec.hard['limits.cpu'] = cpuLimit;
         quota.spec.hard['limits.memory'] = memoryLimit;
+        if (cpuLimit === 0) {
+          delete quota.spec.hard['limits.cpu'];
+        }
+        if (memoryLimit === 0) {
+          delete quota.spec.hard['limits.memory'];
+        }
         const data = await KubernetesResourceQuotas.update({}, quota).$promise;
         return new KubernetesResourceQuotaViewModel(data);
       } catch (err) {

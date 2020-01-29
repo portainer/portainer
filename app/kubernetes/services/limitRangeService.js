@@ -30,7 +30,7 @@ angular.module("portainer.kubernetes").factory("KubernetesLimitRangeService", [
     /**
      * Creation
      */
-    async function createAsync(limitRange) {
+    async function createAsync(limitRange, cpu, memory) {
       try {
         const payload = {
           metadata: {
@@ -41,7 +41,12 @@ angular.module("portainer.kubernetes").factory("KubernetesLimitRangeService", [
             limits: limitRange.Limits
           }
         };
-
+        if (cpu === 0) {
+          delete payload.spec.limits[0].default.cpu;
+        }
+        if (memory === 0) {
+          delete payload.spec.limits[0].default.memory;
+        }
         const data = await KubernetesLimitRanges.create(payload).$promise;
         return data;
       } catch (err) {
@@ -49,8 +54,8 @@ angular.module("portainer.kubernetes").factory("KubernetesLimitRangeService", [
       }
     }
 
-    function create(limitRange) {
-      return $async(createAsync, limitRange);
+    function create(limitRange, cpu, memory) {
+      return $async(createAsync, limitRange, cpu, memory);
     }
 
     /**

@@ -99,18 +99,13 @@ class KubernetesCreateApplicationController {
     try {
       const quota = _.find(this.formValues.ResourcePool.Quotas,
         (item) => item.Name === KubernetesPortainerQuotaSuffix + this.formValues.ResourcePool.Namespace.Name);
-      const apps = await this.KubernetesApplicationService.applications(this.formValues.ResourcePool.Namespace.Name)
       let minCpu, maxCpu, minMemory, maxMemory = 0;
       if (quota) {
         this.state.resourcePoolHasQuota = true;
         minCpu = this.KubernetesLimitRangeDefaults.CpuLimit;
-        maxCpu = quota.CpuLimit;
+        maxCpu = quota.CpuLimit || this.state.nodes.cpu;
         minMemory = this.KubernetesLimitRangeDefaults.MemoryLimit;
-        maxMemory = quota.MemoryLimit;
-        _.forEach(apps, (app) => {
-          maxCpu -= app.Limits.Cpu;
-          maxMemory -= app.Limits.Memory;
-        })
+        maxMemory = quota.MemoryLimit || this.state.nodes.memory;
       } else {
         this.state.resourcePoolHasQuota = false;
         minCpu = 0;

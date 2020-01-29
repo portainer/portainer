@@ -7,8 +7,8 @@ export function KubernetesNodeViewModel(data) {
   this.Role = _.has(data.metadata.labels, 'node-role.kubernetes.io/master') ? 'Manager' : 'Worker';
   const readyStatus = _.find(data.status.conditions, {type: 'Ready'});
   this.Status = readyStatus && readyStatus.status === "True" ? 'Ready' : 'Warning';
-  this.CPU = parseInt(data.status.capacity.cpu);
-  this.Memory = data.status.capacity.memory;
+  this.CPU = parseInt(data.status.allocatable.cpu);
+  this.Memory = data.status.allocatable.memory;
   this.Version = data.status.nodeInfo.kubeletVersion;
   const internalIP = _.find(data.status.addresses, {type: 'InternalIP'});
   this.IPAddress = internalIP ? internalIP.address : '-';

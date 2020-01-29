@@ -95,7 +95,7 @@ angular.module("portainer.kubernetes").factory("KubernetesResourcePoolService", 
         if (hasQuota) {
           await KubernetesResourceQuotaService.create(name, cpuLimit, memoryLimit);
           const limitRange = new KubernetesDefaultLimitRangeModel(name);
-          await KubernetesLimitRangeService.create(limitRange);
+          await KubernetesLimitRangeService.create(limitRange, cpuLimit, memoryLimit);
         }
       } catch (err) {
         throw err;

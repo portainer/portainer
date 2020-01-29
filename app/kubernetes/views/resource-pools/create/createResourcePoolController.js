@@ -13,13 +13,12 @@ function bytesValue(mem) {
 
 class KubernetesCreateResourcePoolController {
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesNodeService, KubernetesResourceQuotaService, KubernetesResourcePoolService) {
+  constructor($async, $state, Notifications, KubernetesNodeService, KubernetesResourcePoolService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
 
     this.KubernetesNodeService = KubernetesNodeService;
-    this.KubernetesResourceQuotaService = KubernetesResourceQuotaService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
 
     this.onInit = this.onInit.bind(this);
@@ -77,18 +76,11 @@ class KubernetesCreateResourcePoolController {
         sliderMaxCpu: 0
       };
 
-      const [nodes, quotas] = await Promise.all([
-        this.KubernetesNodeService.nodes(),
-        this.KubernetesResourceQuotaService.quotas()
-      ]);
+      const nodes = await this.KubernetesNodeService.nodes();
 
       _.forEach(nodes, (item) => {
         this.state.sliderMaxMemory += filesizeParser(item.Memory);
         this.state.sliderMaxCpu += item.CPU;
-      });
-      _.forEach(quotas, (item) => {
-        this.state.sliderMaxCpu -= item.CpuLimit;
-        this.state.sliderMaxMemory -= item.MemoryLimit;
       });
       this.state.sliderMaxMemory = megaBytesValue(this.state.sliderMaxMemory);
     } catch (err) {
