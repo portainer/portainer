@@ -944,7 +944,7 @@ type (
 
 	// KubeClient represents a service used to query a Kubernetes environment
 	KubeClient interface {
-		SetupUserServiceAccount(userID int, username string) error
+		SetupUserServiceAccount(userID int, username string, teamIDs []int) error
 		GetPortainerServiceAccountBearerToken() (string, error)
 		GetServiceAccountBearerToken(userID int, username string) (string, error)
 	}

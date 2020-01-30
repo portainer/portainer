@@ -3,6 +3,11 @@ package http
 import (
 	"time"
 
+	"github.com/portainer/portainer/api/kubernetes/cli"
+
+	"net/http"
+	"path/filepath"
+
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/handler"
@@ -32,10 +37,6 @@ import (
 	"github.com/portainer/portainer/api/http/handler/websocket"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/kubernetes"
-
-	"net/http"
-	"path/filepath"
 )
 
 // Server implements the portainer.Server interface
@@ -78,7 +79,7 @@ type Server struct {
 	SSLCert                 string
 	SSLKey                  string
 	DockerClientFactory     *docker.ClientFactory
-	KubernetesClientFactory *kubernetes.ClientFactory
+	KubernetesClientFactory *cli.ClientFactory
 	SnapshotManager         *portainer.SnapshotManager
 	JobService              portainer.JobService
 }

@@ -14,29 +14,41 @@ import (
 const defaultServiceAccountTokenFile = "/var/run/secrets/kubernetes.io/serviceaccount/token"
 
 type tokenManager struct {
-	kubecli    portainer.KubeClient
-	mutex      sync.Mutex
-	adminToken string
-	userTokens cmap.ConcurrentMap
+	kubecli               portainer.KubeClient
+	teamMemberShipService portainer.TeamMembershipService
+	mutex                 sync.Mutex
+	adminToken            string
+	userTokens            cmap.ConcurrentMap
 }
 
-func (manager *tokenManager) getTokenFromRequest(request *http.Request, localAdminLookup bool) (string, error) {
+func newTokenManager(kubecli portainer.KubeClient, teamMembershipService portainer.TeamMembershipService, useLocalAdminToken bool) (*tokenManager, error) {
+	tokenManager := &tokenManager{
+		kubecli:               kubecli,
+		teamMemberShipService: teamMembershipService,
+		mutex:                 sync.Mutex{},
+		userTokens:            cmap.New(),
+	}
+
+	if useLocalAdminToken {
+		token, err := ioutil.ReadFile(defaultServiceAccountTokenFile)
+		if err != nil {
+			return nil, err
+		}
+
+		tokenManager.adminToken = string(token)
+	}
+
+	return tokenManager, nil
+}
+
+func (manager *tokenManager) getTokenFromRequest(request *http.Request, useLocalAdminToken bool) (string, error) {
 	tokenData, err := security.RetrieveTokenData(request)
 	if err != nil {
 		return "", err
 	}
 
 	if tokenData.Role == portainer.AdministratorRole {
-		if localAdminLookup {
-			if manager.adminToken == "" {
-				token, err := ioutil.ReadFile(defaultServiceAccountTokenFile)
-				if err != nil {
-					return "", err
-				}
-
-				manager.adminToken = string(token)
-			}
-
+		if useLocalAdminToken {
 			return manager.adminToken, nil
 		}
 
@@ -49,7 +61,17 @@ func (manager *tokenManager) getTokenFromRequest(request *http.Request, localAdm
 		manager.mutex.Lock()
 		defer manager.mutex.Unlock()
 
-		err := manager.kubecli.SetupUserServiceAccount(int(tokenData.ID), tokenData.Username)
+		memberships, err := manager.teamMemberShipService.TeamMembershipsByUserID(tokenData.ID)
+		if err != nil {
+			return "", err
+		}
+
+		teamIds := make([]int, 0)
+		for _, membership := range memberships {
+			teamIds = append(teamIds, int(membership.TeamID))
+		}
+
+		err = manager.kubecli.SetupUserServiceAccount(int(tokenData.ID), tokenData.Username, teamIds)
 		if err != nil {
 			return "", err
 		}

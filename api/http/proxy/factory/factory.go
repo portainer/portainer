@@ -6,7 +6,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 
-	"github.com/portainer/portainer/api/kubernetes"
+	"github.com/portainer/portainer/api/kubernetes/cli"
 
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker"
@@ -34,7 +34,7 @@ type (
 		reverseTunnelService    portainer.ReverseTunnelService
 		extensionService        portainer.ExtensionService
 		dockerClientFactory     *docker.ClientFactory
-		kubernetesClientFactory *kubernetes.ClientFactory
+		kubernetesClientFactory *cli.ClientFactory
 	}
 
 	// ProxyFactoryParameters is used to create a new ProxyFactory
@@ -50,7 +50,7 @@ type (
 		ReverseTunnelService    portainer.ReverseTunnelService
 		ExtensionService        portainer.ExtensionService
 		DockerClientFactory     *docker.ClientFactory
-		KubernetesClientFactory *kubernetes.ClientFactory
+		KubernetesClientFactory *cli.ClientFactory
 	}
 )
 

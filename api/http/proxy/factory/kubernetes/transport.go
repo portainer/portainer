@@ -30,7 +30,7 @@ type localTransport struct {
 }
 
 // NewAgentTransport returns a new transport that can be used to send signed requests to a Portainer agent
-func NewLocalTransport(kubecli portainer.KubeClient) (*localTransport, error) {
+func NewLocalTransport(kubecli portainer.KubeClient, teamMembershipService portainer.TeamMembershipService) (*localTransport, error) {
 	config, err := crypto.CreateTLSConfigurationFromBytes(nil, nil, nil, true, true)
 	if err != nil {
 		return nil, err
@@ -40,10 +40,9 @@ func NewLocalTransport(kubecli portainer.KubeClient) (*localTransport, error) {
 		TLSClientConfig: config,
 	}
 
-	tokenManager := &tokenManager{
-		kubecli:    kubecli,
-		mutex:      sync.Mutex{},
-		userTokens: cmap.New(),
+	tokenManager, err := newTokenManager(kubecli, teamMembershipService, true)
+	if err != nil {
+		return nil, err
 	}
 
 	transport := &localTransport{

@@ -4,11 +4,12 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/portainer/portainer/api/kubernetes/cli"
+
 	"github.com/orcaman/concurrent-map"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/proxy/factory"
-	"github.com/portainer/portainer/api/kubernetes"
 )
 
 // TODO: contain code related to legacy extension management
@@ -35,7 +36,7 @@ type (
 		ReverseTunnelService    portainer.ReverseTunnelService
 		ExtensionService        portainer.ExtensionService
 		DockerClientFactory     *docker.ClientFactory
-		KubernetesClientFactory *kubernetes.ClientFactory
+		KubernetesClientFactory *cli.ClientFactory
 	}
 )
 

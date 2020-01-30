@@ -33,7 +33,7 @@ func (factory *ProxyFactory) newKubernetesLocalProxy(endpoint *portainer.Endpoin
 		return nil, err
 	}
 
-	transport, err := kubernetes.NewLocalTransport(kubecli)
+	transport, err := kubernetes.NewLocalTransport(kubecli, factory.teamMembershipService)
 	if err != nil {
 		return nil, err
 	}

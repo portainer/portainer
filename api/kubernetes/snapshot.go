@@ -4,17 +4,19 @@ import (
 	"log"
 	"time"
 
+	"github.com/portainer/portainer/api/kubernetes/cli"
+
 	portainer "github.com/portainer/portainer/api"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 )
 
 type Snapshotter struct {
-	clientFactory *ClientFactory
+	clientFactory *cli.ClientFactory
 }
 
 // NewSnapshotter returns a new Snapshotter instance
-func NewSnapshotter(clientFactory *ClientFactory) *Snapshotter {
+func NewSnapshotter(clientFactory *cli.ClientFactory) *Snapshotter {
 	return &Snapshotter{
 		clientFactory: clientFactory,
 	}
@@ -22,12 +24,12 @@ func NewSnapshotter(clientFactory *ClientFactory) *Snapshotter {
 
 // CreateSnapshot creates a snapshot of a specific Kubernetes endpoint
 func (snapshotter *Snapshotter) CreateSnapshot(endpoint *portainer.Endpoint) (*portainer.KubernetesSnapshot, error) {
-	cli, err := snapshotter.clientFactory.createClient(endpoint)
+	client, err := snapshotter.clientFactory.CreateClient(endpoint)
 	if err != nil {
 		return nil, err
 	}
 
-	return snapshot(cli, endpoint)
+	return snapshot(client, endpoint)
 }
 
 func snapshot(cli *kubernetes.Clientset, endpoint *portainer.Endpoint) (*portainer.KubernetesSnapshot, error) {

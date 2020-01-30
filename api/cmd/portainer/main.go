@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	cli2 "github.com/portainer/portainer/api/kubernetes/cli"
+
 	"github.com/portainer/portainer/api/kubernetes"
 
 	portainer "github.com/portainer/portainer/api"
@@ -115,11 +117,11 @@ func initDockerClientFactory(signatureService portainer.DigitalSignatureService,
 	return docker.NewClientFactory(signatureService, reverseTunnelService)
 }
 
-func initKubernetesClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService) *kubernetes.ClientFactory {
-	return kubernetes.NewClientFactory(signatureService, reverseTunnelService)
+func initKubernetesClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService) *cli2.ClientFactory {
+	return cli2.NewClientFactory(signatureService, reverseTunnelService)
 }
 
-func initSnapshotManager(dockerClientFactory *docker.ClientFactory, kubernetesClientFactory *kubernetes.ClientFactory) *portainer.SnapshotManager {
+func initSnapshotManager(dockerClientFactory *docker.ClientFactory, kubernetesClientFactory *cli2.ClientFactory) *portainer.SnapshotManager {
 	dockerSnapshotter := docker.NewSnapshotter(dockerClientFactory)
 	kubernetesSnapshotter := kubernetes.NewSnapshotter(kubernetesClientFactory)
 

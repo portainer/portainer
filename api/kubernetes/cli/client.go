@@ -1,4 +1,4 @@
-package kubernetes
+package cli
 
 import (
 	"errors"
@@ -11,11 +11,18 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-// ClientFactory is used to create Kubernetes clients
-type ClientFactory struct {
-	reverseTunnelService portainer.ReverseTunnelService
-	signatureService     portainer.DigitalSignatureService
-}
+type (
+	// ClientFactory is used to create Kubernetes clients
+	ClientFactory struct {
+		reverseTunnelService portainer.ReverseTunnelService
+		signatureService     portainer.DigitalSignatureService
+	}
+
+	// KubeClient represent a service used to execute Kubernetes operations
+	KubeClient struct {
+		cli *kubernetes.Clientset
+	}
+)
 
 // NewClientFactory returns a new instance of a ClientFactory
 func NewClientFactory(signatureService portainer.DigitalSignatureService, reverseTunnelService portainer.ReverseTunnelService) *ClientFactory {
@@ -27,7 +34,7 @@ func NewClientFactory(signatureService portainer.DigitalSignatureService, revers
 
 // CreateKubeClient returns a pointer to a new KubeClient instance
 func (factory *ClientFactory) CreateKubeClient(endpoint *portainer.Endpoint) (portainer.KubeClient, error) {
-	cli, err := factory.createClient(endpoint)
+	cli, err := factory.CreateClient(endpoint)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +46,8 @@ func (factory *ClientFactory) CreateKubeClient(endpoint *portainer.Endpoint) (po
 	return kubecli, nil
 }
 
-func (factory *ClientFactory) createClient(endpoint *portainer.Endpoint) (*kubernetes.Clientset, error) {
+// CreateClient returns a pointer to a new Clientset instance
+func (factory *ClientFactory) CreateClient(endpoint *portainer.Endpoint) (*kubernetes.Clientset, error) {
 	switch endpoint.Type {
 	case portainer.KubernetesLocalEnvironment:
 		return buildLocalClient()
