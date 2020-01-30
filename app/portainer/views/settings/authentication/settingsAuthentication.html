@@ -215,8 +215,8 @@
                 <i class="fa fa-check green-icon" style="margin-left: 5px;" ng-if="state.successfulConnectivityCheck"></i>
                 <i class="fa fa-times red-icon" style="margin-left: 5px;" ng-if="state.failedConnectivityCheck"></i>
               </label>
-              <div class="col-sm-9 col-lg-10">
-                <button type="button" class="btn btn-primary btn-sm" ng-click="LDAPConnectivityCheck()" ng-disabled="!formValues.LDAPSettings.URL || !formValues.LDAPSettings.ReaderDN || !formValues.LDAPSettings.Password || (!formValues.TLSCACert && !formValues.LDAPSettings.TLSConfig.TLSSkipVerify)">Test connectivity</button>
+              <div class="col-sm-9 col-lg-10">                                                          
+                <button type="button" class="btn btn-primary btn-sm" ng-click="LDAPConnectivityCheck()" ng-disabled="!formValues.LDAPSettings.URL || (!formValues.TLSCACert && !formValues.LDAPSettings.TLSConfig.TLSSkipVerify) || (!formValues.LDAPSettings.ReaderDN || !formValues.LDAPSettings.Password) && !formValues.LDAPSettings.AnonymousMode">Test connectivity</button>
                 <i id="connectivityCheckSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
               </div>
             </div>
