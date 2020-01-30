@@ -5,7 +5,7 @@ export default function KubernetesDefaultLimitRangeModel(namespace) {
     {
       default: {
         memory: '64Mi',
-        cpu: '250m'
+        cpu: '100m'
       },
       type: 'Container'
     }
