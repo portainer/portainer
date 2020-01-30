@@ -25,9 +25,10 @@ class KubernetesCreateResourcePoolController {
     this.createResourcePoolAsync = this.createResourcePoolAsync.bind(this);
   }
 
-  hasEnoughResources() {
-    if (this.state.sliderMaxCpu < this.formValues.CpuLimit || this.state.sliderMaxMemory < this.formValues.MemoryLimit) {
-      this.state.displayLowResourceMessage = true;
+  isQuotaValid() {
+    if (this.state.sliderMaxCpu < this.formValues.CpuLimit
+      || this.state.sliderMaxMemory < this.formValues.MemoryLimit
+      || (this.formValues.CpuLimit === 0 && this.formValues.MemoryLimit === 0)) {
       return false;
     }
     return true;
