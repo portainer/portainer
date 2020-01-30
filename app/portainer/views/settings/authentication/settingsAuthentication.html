@@ -90,7 +90,7 @@
                 <portainer-tooltip position="bottom" message="URL or IP address of the LDAP server."></portainer-tooltip>
               </label>
               <div class="col-sm-9 col-lg-10">
-                <input type="text" class="form-control" id="ldap_url" ng-model="LDAPSettings.URL" placeholder="e.g. 10.0.0.10:389 or myldap.domain.tld:389">
+                <input type="text" class="form-control" id="ldap_url" ng-model="formValues.LDAPSettings.URL" placeholder="e.g. 10.0.0.10:389 or myldap.domain.tld:389">
               </div>
             </div>
 
@@ -102,20 +102,20 @@
                   <portainer-tooltip position="bottom" message="Enable this option if the server is configured for Anonymous access."></portainer-tooltip>
                 </label>
                 <label class="switch" style="margin-left: 20px;">
-                  <input type="checkbox" id="anonymous_mode" ng-model="LDAPSettings.AnonymousMode"><i></i>
+                  <input type="checkbox" id="anonymous_mode" ng-model="formValues.LDAPSettings.AnonymousMode"><i></i>
                 </label>
               </div>
             </div>
             <!-- !Anonymous mode-->
 
-            <div ng-if="!LDAPSettings.AnonymousMode">
+            <div ng-if="!formValues.LDAPSettings.AnonymousMode">
               <div class="form-group">
                 <label for="ldap_username" class="col-sm-3 col-lg-2 control-label text-left">
                   Reader DN
                   <portainer-tooltip position="bottom" message="Account that will be used to search for users."></portainer-tooltip>
                 </label>
                 <div class="col-sm-9 col-lg-10">
-                  <input type="text" class="form-control" id="ldap_username" ng-model="LDAPSettings.ReaderDN" placeholder="cn=readonly-account,dc=ldap,dc=domain,dc=tld">
+                  <input type="text" class="form-control" id="ldap_username" ng-model="formValues.LDAPSettings.ReaderDN" placeholder="cn=readonly-account,dc=ldap,dc=domain,dc=tld">
                 </div>
               </div>
 
@@ -125,19 +125,19 @@
                   <portainer-tooltip position="bottom" message="If you do not enter a password, Portainer will leave the current password unchanged."></portainer-tooltip>
                 </label>
                 <div class="col-sm-9 col-lg-10">
-                  <input type="password" class="form-control" id="ldap_password" ng-model="LDAPSettings.Password" placeholder="password">
+                  <input type="password" class="form-control" id="ldap_password" ng-model="formValues.LDAPSettings.Password" placeholder="password">
                 </div>
               </div>
             </div>
             
-            <div class="form-group" ng-if="!LDAPSettings.TLSConfig.TLS && !LDAPSettings.StartTLS">
+            <div class="form-group" ng-if="!formValues.LDAPSettings.TLSConfig.TLS && !formValues.LDAPSettings.StartTLS">
               <label for="ldap_password" class="col-sm-3 col-lg-2 control-label text-left">
                 Connectivity check
                 <i class="fa fa-check green-icon" style="margin-left: 5px;" ng-if="state.successfulConnectivityCheck"></i>
                 <i class="fa fa-times red-icon" style="margin-left: 5px;" ng-if="state.failedConnectivityCheck"></i>
               </label>
               <div class="col-sm-9 col-lg-10">
-                <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.connectivityCheckInProgress || !LDAPSettings.URL || (!LDAPSettings.ReaderDN || !LDAPSettings.Password) && !LDAPSettings.AnonymousMode" ng-click="LDAPConnectivityCheck()" button-spinner="state.connectivityCheckInProgress">
+                <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.connectivityCheckInProgress || !formValues.LDAPSettings.URL || (!formValues.LDAPSettings.ReaderDN || !formValues.LDAPSettings.Password) && !formValues.LDAPSettings.AnonymousMode" ng-click="LDAPConnectivityCheck()" button-spinner="state.connectivityCheckInProgress">
                   <span ng-hide="state.connectivityCheckInProgress">Test connectivity</span>
                   <span ng-show="state.connectivityCheckInProgress">Testing connectivity...</span>
                 </button>
@@ -149,28 +149,28 @@
             </div>
 
             <!-- starttls -->
-            <div class="form-group" ng-if="!LDAPSettings.TLSConfig.TLS">
+            <div class="form-group" ng-if="!formValues.LDAPSettings.TLSConfig.TLS">
               <div class="col-sm-12">
                 <label for="tls" class="control-label text-left">
                   Use StartTLS
                   <portainer-tooltip position="bottom" message="Enable this option if want to use StartTLS to secure the connection to the server. Ignored if Use TLS is selected."></portainer-tooltip>
                 </label>
                 <label class="switch" style="margin-left: 20px;">
-                  <input type="checkbox" ng-model="LDAPSettings.StartTLS"><i></i>
+                  <input type="checkbox" ng-model="formValues.LDAPSettings.StartTLS"><i></i>
                 </label>
               </div>
             </div>
             <!-- !starttls -->
 
             <!-- tls-checkbox -->
-            <div class="form-group" ng-if="!LDAPSettings.StartTLS">
+            <div class="form-group" ng-if="!formValues.LDAPSettings.StartTLS">
               <div class="col-sm-12">
                 <label for="tls" class="control-label text-left">
                   Use TLS
                   <portainer-tooltip position="bottom" message="Enable this option if you need to specify TLS certificates to connect to the LDAP server."></portainer-tooltip>
                 </label>
                 <label class="switch" style="margin-left: 20px;">
-                  <input type="checkbox" ng-model="LDAPSettings.TLSConfig.TLS"><i></i>
+                  <input type="checkbox" ng-model="formValues.LDAPSettings.TLSConfig.TLS"><i></i>
                 </label>
               </div>
             </div>
@@ -184,22 +184,22 @@
                   <portainer-tooltip position="bottom" message="Skip the verification of the server TLS certificate. Not recommended on unsecured networks."></portainer-tooltip>
                 </label>
                 <label class="switch" style="margin-left: 20px;">
-                  <input type="checkbox" ng-model="LDAPSettings.TLSConfig.TLSSkipVerify"><i></i>
+                  <input type="checkbox" ng-model="formValues.LDAPSettings.TLSConfig.TLSSkipVerify"><i></i>
                 </label>
               </div>
             </div>
             <!-- !tls-skip-verify -->
 
             <!-- tls-certs -->
-            <div ng-if="LDAPSettings.TLSConfig.TLS || LDAPSettings.StartTLS">
+            <div ng-if="formValues.LDAPSettings.TLSConfig.TLS || formValues.LDAPSettings.StartTLS">
               <!-- ca-input -->
-              <div class="form-group" ng-if="!LDAPSettings.TLSConfig.TLSSkipVerify">
+              <div class="form-group" ng-if="!formValues.LDAPSettings.TLSConfig.TLSSkipVerify">
                 <label class="col-sm-2 control-label text-left">TLS CA certificate</label>
                 <div class="col-sm-10">
                   <button class="btn btn-sm btn-primary" ngf-select ng-model="formValues.TLSCACert">Select file</button>
                   <span style="margin-left: 5px;">
                     {{ formValues.TLSCACert.name }}
-                    <i class="fa fa-check green-icon" ng-if="formValues.TLSCACert && formValues.TLSCACert === LDAPSettings.TLSConfig.TLSCACert" aria-hidden="true"></i>
+                    <i class="fa fa-check green-icon" ng-if="formValues.TLSCACert && formValues.TLSCACert === formValues.LDAPSettings.TLSConfig.TLSCACert" aria-hidden="true"></i>
                     <i class="fa fa-times red-icon" ng-if="!formValues.TLSCACert" aria-hidden="true"></i>
                     <i class="fa fa-circle-notch fa-spin" ng-if="state.uploadInProgress"></i>
                   </span>
@@ -209,14 +209,14 @@
             </div>
             <!-- !tls-certs -->
 
-            <div class="form-group" ng-if="LDAPSettings.TLSConfig.TLS || LDAPSettings.StartTLS">
+            <div class="form-group" ng-if="formValues.LDAPSettings.TLSConfig.TLS || formValues.LDAPSettings.StartTLS">
               <label for="ldap_password" class="col-sm-3 col-lg-2 control-label text-left">
                 Connectivity check
                 <i class="fa fa-check green-icon" style="margin-left: 5px;" ng-if="state.successfulConnectivityCheck"></i>
                 <i class="fa fa-times red-icon" style="margin-left: 5px;" ng-if="state.failedConnectivityCheck"></i>
               </label>
               <div class="col-sm-9 col-lg-10">
-                <button type="button" class="btn btn-primary btn-sm" ng-click="LDAPConnectivityCheck()" ng-disabled="!LDAPSettings.URL || !LDAPSettings.ReaderDN || !LDAPSettings.Password || (!formValues.TLSCACert && !LDAPSettings.TLSConfig.TLSSkipVerify)">Test connectivity</button>
+                <button type="button" class="btn btn-primary btn-sm" ng-click="LDAPConnectivityCheck()" ng-disabled="!formValues.LDAPSettings.URL || !formValues.LDAPSettings.ReaderDN || !formValues.LDAPSettings.Password || (!formValues.TLSCACert && !formValues.LDAPSettings.TLSConfig.TLSSkipVerify)">Test connectivity</button>
                 <i id="connectivityCheckSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
               </div>
             </div>
@@ -235,7 +235,7 @@
                   Automatic user provisioning
                 </label>
                 <label class="switch" style="margin-left: 20px;">
-                  <input type="checkbox" ng-model="LDAPSettings.AutoCreateUsers"><i></i>
+                  <input type="checkbox" ng-model="formValues.LDAPSettings.AutoCreateUsers"><i></i>
                 </label>
               </div>
             </div>
@@ -245,7 +245,7 @@
             </div>
 
             <!-- search-settings -->
-            <div ng-repeat="config in LDAPSettings.SearchSettings | limitTo: (1 - LDAPSettings.SearchSettings)" style="margin-top: 5px;">
+            <div ng-repeat="config in formValues.LDAPSettings.SearchSettings | limitTo: (1 - formValues.LDAPSettings.SearchSettings)" style="margin-top: 5px;">
 
               <div class="form-group" ng-if="$index > 0">
                 <span class="col-sm-12 text-muted small">
@@ -299,7 +299,7 @@
             </div>
 
             <!-- group-search-settings -->
-            <div ng-repeat="groupConfig in LDAPSettings.GroupSearchSettings | limitTo: (1 - LDAPSettings.GroupSearchSettings)" style="margin-top: 5px;">
+            <div ng-repeat="groupConfig in formValues.LDAPSettings.GroupSearchSettings | limitTo: (1 - formValues.LDAPSettings.GroupSearchSettings)" style="margin-top: 5px;">
 
               <div class="form-group" ng-if="$index > 0">
                 <span class="col-sm-12 text-muted small">
