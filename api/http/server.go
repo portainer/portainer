@@ -3,6 +3,8 @@ package http
 import (
 	"time"
 
+	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
+
 	"github.com/portainer/portainer/api/kubernetes/cli"
 
 	"net/http"
@@ -86,19 +88,22 @@ type Server struct {
 
 // Start starts the HTTP server
 func (server *Server) Start() error {
+	kubernetesTokenCacheManager := kubernetes.NewTokenCacheManager()
+
 	proxyManagerParameters := &proxy.ManagerParams{
-		ResourceControlService:  server.ResourceControlService,
-		UserService:             server.UserService,
-		TeamService:             server.TeamService,
-		TeamMembershipService:   server.TeamMembershipService,
-		SettingsService:         server.SettingsService,
-		RegistryService:         server.RegistryService,
-		DockerHubService:        server.DockerHubService,
-		SignatureService:        server.SignatureService,
-		ReverseTunnelService:    server.ReverseTunnelService,
-		ExtensionService:        server.ExtensionService,
-		DockerClientFactory:     server.DockerClientFactory,
-		KubernetesClientFactory: server.KubernetesClientFactory,
+		ResourceControlService:      server.ResourceControlService,
+		UserService:                 server.UserService,
+		TeamService:                 server.TeamService,
+		TeamMembershipService:       server.TeamMembershipService,
+		SettingsService:             server.SettingsService,
+		RegistryService:             server.RegistryService,
+		DockerHubService:            server.DockerHubService,
+		SignatureService:            server.SignatureService,
+		ReverseTunnelService:        server.ReverseTunnelService,
+		ExtensionService:            server.ExtensionService,
+		DockerClientFactory:         server.DockerClientFactory,
+		KubernetesClientFactory:     server.KubernetesClientFactory,
+		KubernetesTokenCacheManager: kubernetesTokenCacheManager,
 	}
 	proxyManager := proxy.NewManager(proxyManagerParameters)
 
@@ -140,6 +145,7 @@ func (server *Server) Start() error {
 	authHandler.RoleService = server.RoleService
 	authHandler.ProxyManager = proxyManager
 	authHandler.AuthorizationService = authorizationService
+	authHandler.KubernetesTokenCacheManager = kubernetesTokenCacheManager
 
 	var roleHandler = roles.NewHandler(requestBouncer)
 	roleHandler.RoleService = server.RoleService

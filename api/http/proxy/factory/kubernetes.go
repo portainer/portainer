@@ -33,7 +33,13 @@ func (factory *ProxyFactory) newKubernetesLocalProxy(endpoint *portainer.Endpoin
 		return nil, err
 	}
 
-	transport, err := kubernetes.NewLocalTransport(kubecli, factory.teamMembershipService)
+	tokenCache := factory.kubernetesTokenCacheManager.CreateTokenCache(int(endpoint.ID))
+	tokenManager, err := kubernetes.NewTokenManager(kubecli, factory.teamMembershipService, tokenCache, true)
+	if err != nil {
+		return nil, err
+	}
+
+	transport, err := kubernetes.NewLocalTransport(tokenManager)
 	if err != nil {
 		return nil, err
 	}
@@ -58,9 +64,15 @@ func (factory *ProxyFactory) newKubernetesEdgeHTTPProxy(endpoint *portainer.Endp
 		return nil, err
 	}
 
+	tokenCache := factory.kubernetesTokenCacheManager.CreateTokenCache(int(endpoint.ID))
+	tokenManager, err := kubernetes.NewTokenManager(kubecli, factory.teamMembershipService, tokenCache, false)
+	if err != nil {
+		return nil, err
+	}
+
 	endpointURL.Scheme = "http"
 	proxy := newSingleHostReverseProxyWithHostHeader(endpointURL)
-	proxy.Transport = kubernetes.NewEdgeTransport(factory.reverseTunnelService, endpoint.ID, kubecli)
+	proxy.Transport = kubernetes.NewEdgeTransport(factory.reverseTunnelService, endpoint.ID, tokenManager)
 
 	return proxy, nil
 }
@@ -84,8 +96,14 @@ func (factory *ProxyFactory) newKubernetesAgentHTTPSProxy(endpoint *portainer.En
 		return nil, err
 	}
 
+	tokenCache := factory.kubernetesTokenCacheManager.CreateTokenCache(int(endpoint.ID))
+	tokenManager, err := kubernetes.NewTokenManager(kubecli, factory.teamMembershipService, tokenCache, false)
+	if err != nil {
+		return nil, err
+	}
+
 	proxy := newSingleHostReverseProxyWithHostHeader(remoteURL)
-	proxy.Transport = kubernetes.NewAgentTransport(factory.signatureService, tlsConfig, kubecli)
+	proxy.Transport = kubernetes.NewAgentTransport(factory.signatureService, tlsConfig, tokenManager)
 
 	return proxy, nil
 }

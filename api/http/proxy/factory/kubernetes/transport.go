@@ -4,50 +4,45 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
-	"sync"
 
-	"github.com/orcaman/concurrent-map"
+	"github.com/portainer/portainer/api/http/security"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
 )
 
-type agentTransport struct {
-	httpTransport    *http.Transport
-	signatureService portainer.DigitalSignatureService
-	tokenManager     *tokenManager
-}
+type (
+	localTransport struct {
+		httpTransport *http.Transport
+		tokenManager  *tokenManager
+	}
 
-type edgeTransport struct {
-	httpTransport        *http.Transport
-	reverseTunnelService portainer.ReverseTunnelService
-	endpointIdentifier   portainer.EndpointID
-	tokenManager         *tokenManager
-}
+	agentTransport struct {
+		httpTransport    *http.Transport
+		tokenManager     *tokenManager
+		signatureService portainer.DigitalSignatureService
+	}
 
-type localTransport struct {
-	httpTransport *http.Transport
-	tokenManager  *tokenManager
-}
+	edgeTransport struct {
+		httpTransport        *http.Transport
+		tokenManager         *tokenManager
+		reverseTunnelService portainer.ReverseTunnelService
+		endpointIdentifier   portainer.EndpointID
+	}
+)
 
-// NewAgentTransport returns a new transport that can be used to send signed requests to a Portainer agent
-func NewLocalTransport(kubecli portainer.KubeClient, teamMembershipService portainer.TeamMembershipService) (*localTransport, error) {
+// NewLocalTransport returns a new transport that can be used to send requests to the local Kubernetes API
+func NewLocalTransport(tokenManager *tokenManager) (*localTransport, error) {
 	config, err := crypto.CreateTLSConfigurationFromBytes(nil, nil, nil, true, true)
 	if err != nil {
 		return nil, err
 	}
 
-	httpTransport := &http.Transport{
-		TLSClientConfig: config,
-	}
-
-	tokenManager, err := newTokenManager(kubecli, teamMembershipService, true)
-	if err != nil {
-		return nil, err
-	}
-
 	transport := &localTransport{
-		httpTransport: httpTransport,
-		tokenManager:  tokenManager,
+		httpTransport: &http.Transport{
+			TLSClientConfig: config,
+		},
+		tokenManager: tokenManager,
 	}
 
 	return transport, nil
@@ -55,9 +50,19 @@ func NewLocalTransport(kubecli portainer.KubeClient, teamMembershipService porta
 
 // RoundTrip is the implementation of the the http.RoundTripper interface
 func (transport *localTransport) RoundTrip(request *http.Request) (*http.Response, error) {
-	token, err := transport.tokenManager.getTokenFromRequest(request, true)
+	tokenData, err := security.RetrieveTokenData(request)
 	if err != nil {
 		return nil, err
+	}
+
+	var token string
+	if tokenData.Role == portainer.AdministratorRole {
+		token = transport.tokenManager.getAdminServiceAccountToken()
+	} else {
+		token, err = transport.tokenManager.getUserServiceAccountToken(int(tokenData.ID), tokenData.Username)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
@@ -66,19 +71,13 @@ func (transport *localTransport) RoundTrip(request *http.Request) (*http.Respons
 }
 
 // NewAgentTransport returns a new transport that can be used to send signed requests to a Portainer agent
-func NewAgentTransport(signatureService portainer.DigitalSignatureService, tlsConfig *tls.Config, kubecli portainer.KubeClient) *agentTransport {
-	tokenManager := &tokenManager{
-		kubecli:    kubecli,
-		mutex:      sync.Mutex{},
-		userTokens: cmap.New(),
-	}
-
+func NewAgentTransport(signatureService portainer.DigitalSignatureService, tlsConfig *tls.Config, tokenManager *tokenManager) *agentTransport {
 	transport := &agentTransport{
 		httpTransport: &http.Transport{
 			TLSClientConfig: tlsConfig,
 		},
-		signatureService: signatureService,
 		tokenManager:     tokenManager,
+		signatureService: signatureService,
 	}
 
 	return transport
@@ -86,9 +85,19 @@ func NewAgentTransport(signatureService portainer.DigitalSignatureService, tlsCo
 
 // RoundTrip is the implementation of the the http.RoundTripper interface
 func (transport *agentTransport) RoundTrip(request *http.Request) (*http.Response, error) {
-	token, err := transport.tokenManager.getTokenFromRequest(request, false)
+	tokenData, err := security.RetrieveTokenData(request)
 	if err != nil {
 		return nil, err
+	}
+
+	var token string
+	if tokenData.Role == portainer.AdministratorRole {
+		token = transport.tokenManager.getAdminServiceAccountToken()
+	} else {
+		token, err = transport.tokenManager.getUserServiceAccountToken(int(tokenData.ID), tokenData.Username)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	request.Header.Set(portainer.PortainerAgentKubernetesSATokenHeader, token)
@@ -104,18 +113,13 @@ func (transport *agentTransport) RoundTrip(request *http.Request) (*http.Respons
 	return transport.httpTransport.RoundTrip(request)
 }
 
-func NewEdgeTransport(reverseTunnelService portainer.ReverseTunnelService, endpointIdentifier portainer.EndpointID, kubecli portainer.KubeClient) *edgeTransport {
-	tokenManager := &tokenManager{
-		kubecli:    kubecli,
-		mutex:      sync.Mutex{},
-		userTokens: cmap.New(),
-	}
-
+// NewAgentTransport returns a new transport that can be used to send signed requests to a Portainer Edge agent
+func NewEdgeTransport(reverseTunnelService portainer.ReverseTunnelService, endpointIdentifier portainer.EndpointID, tokenManager *tokenManager) *edgeTransport {
 	transport := &edgeTransport{
 		httpTransport:        &http.Transport{},
+		tokenManager:         tokenManager,
 		reverseTunnelService: reverseTunnelService,
 		endpointIdentifier:   endpointIdentifier,
-		tokenManager:         tokenManager,
 	}
 
 	return transport
@@ -123,9 +127,19 @@ func NewEdgeTransport(reverseTunnelService portainer.ReverseTunnelService, endpo
 
 // RoundTrip is the implementation of the the http.RoundTripper interface
 func (transport *edgeTransport) RoundTrip(request *http.Request) (*http.Response, error) {
-	token, err := transport.tokenManager.getTokenFromRequest(request, false)
+	tokenData, err := security.RetrieveTokenData(request)
 	if err != nil {
 		return nil, err
+	}
+
+	var token string
+	if tokenData.Role == portainer.AdministratorRole {
+		token = transport.tokenManager.getAdminServiceAccountToken()
+	} else {
+		token, err = transport.tokenManager.getUserServiceAccountToken(int(tokenData.ID), tokenData.Username)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	request.Header.Set(portainer.PortainerAgentKubernetesSATokenHeader, token)

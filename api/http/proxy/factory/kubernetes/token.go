@@ -2,34 +2,34 @@ package kubernetes
 
 import (
 	"io/ioutil"
-	"net/http"
-	"strconv"
 	"sync"
 
-	"github.com/orcaman/concurrent-map"
 	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/security"
 )
 
 const defaultServiceAccountTokenFile = "/var/run/secrets/kubernetes.io/serviceaccount/token"
 
 type tokenManager struct {
+	tokenCache            *tokenCache
 	kubecli               portainer.KubeClient
 	teamMemberShipService portainer.TeamMembershipService
 	mutex                 sync.Mutex
 	adminToken            string
-	userTokens            cmap.ConcurrentMap
 }
 
-func newTokenManager(kubecli portainer.KubeClient, teamMembershipService portainer.TeamMembershipService, useLocalAdminToken bool) (*tokenManager, error) {
+// NewTokenManager returns a pointer to a new instance of tokenManager.
+// If the useLocalAdminToken parameter is set to true, it will search for the local admin service account
+// and associate it to the manager.
+func NewTokenManager(kubecli portainer.KubeClient, teamMembershipService portainer.TeamMembershipService, cache *tokenCache, setLocalAdminToken bool) (*tokenManager, error) {
 	tokenManager := &tokenManager{
+		tokenCache:            cache,
 		kubecli:               kubecli,
 		teamMemberShipService: teamMembershipService,
 		mutex:                 sync.Mutex{},
-		userTokens:            cmap.New(),
+		adminToken:            "",
 	}
 
-	if useLocalAdminToken {
+	if setLocalAdminToken {
 		token, err := ioutil.ReadFile(defaultServiceAccountTokenFile)
 		if err != nil {
 			return nil, err
@@ -41,27 +41,17 @@ func newTokenManager(kubecli portainer.KubeClient, teamMembershipService portain
 	return tokenManager, nil
 }
 
-func (manager *tokenManager) getTokenFromRequest(request *http.Request, useLocalAdminToken bool) (string, error) {
-	tokenData, err := security.RetrieveTokenData(request)
-	if err != nil {
-		return "", err
-	}
+func (manager *tokenManager) getAdminServiceAccountToken() string {
+	return manager.adminToken
+}
 
-	if tokenData.Role == portainer.AdministratorRole {
-		if useLocalAdminToken {
-			return manager.adminToken, nil
-		}
-
-		return "", nil
-	}
-
-	key := strconv.Itoa(int(tokenData.ID))
-	token, ok := manager.userTokens.Get(key)
+func (manager *tokenManager) getUserServiceAccountToken(userID int, username string) (string, error) {
+	token, ok := manager.tokenCache.getToken(userID)
 	if !ok {
 		manager.mutex.Lock()
 		defer manager.mutex.Unlock()
 
-		memberships, err := manager.teamMemberShipService.TeamMembershipsByUserID(tokenData.ID)
+		memberships, err := manager.teamMemberShipService.TeamMembershipsByUserID(portainer.UserID(userID))
 		if err != nil {
 			return "", err
 		}
@@ -71,19 +61,19 @@ func (manager *tokenManager) getTokenFromRequest(request *http.Request, useLocal
 			teamIds = append(teamIds, int(membership.TeamID))
 		}
 
-		err = manager.kubecli.SetupUserServiceAccount(int(tokenData.ID), tokenData.Username, teamIds)
+		err = manager.kubecli.SetupUserServiceAccount(userID, username, teamIds)
 		if err != nil {
 			return "", err
 		}
 
-		serviceAccountToken, err := manager.kubecli.GetServiceAccountBearerToken(int(tokenData.ID), tokenData.Username)
+		serviceAccountToken, err := manager.kubecli.GetServiceAccountBearerToken(userID, username)
 		if err != nil {
 			return "", err
 		}
 
-		manager.userTokens.Set(key, serviceAccountToken)
+		manager.tokenCache.addToken(userID, serviceAccountToken)
 		token = serviceAccountToken
 	}
 
-	return token.(string), nil
+	return token, nil
 }

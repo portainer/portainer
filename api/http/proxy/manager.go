@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
+
 	"github.com/portainer/portainer/api/kubernetes/cli"
 
 	"github.com/orcaman/concurrent-map"
@@ -25,36 +27,38 @@ type (
 
 	// ManagerParams represents the required parameters to create a new Manager instance.
 	ManagerParams struct {
-		ResourceControlService  portainer.ResourceControlService
-		UserService             portainer.UserService
-		TeamService             portainer.TeamService
-		TeamMembershipService   portainer.TeamMembershipService
-		SettingsService         portainer.SettingsService
-		RegistryService         portainer.RegistryService
-		DockerHubService        portainer.DockerHubService
-		SignatureService        portainer.DigitalSignatureService
-		ReverseTunnelService    portainer.ReverseTunnelService
-		ExtensionService        portainer.ExtensionService
-		DockerClientFactory     *docker.ClientFactory
-		KubernetesClientFactory *cli.ClientFactory
+		ResourceControlService      portainer.ResourceControlService
+		UserService                 portainer.UserService
+		TeamService                 portainer.TeamService
+		TeamMembershipService       portainer.TeamMembershipService
+		SettingsService             portainer.SettingsService
+		RegistryService             portainer.RegistryService
+		DockerHubService            portainer.DockerHubService
+		SignatureService            portainer.DigitalSignatureService
+		ReverseTunnelService        portainer.ReverseTunnelService
+		ExtensionService            portainer.ExtensionService
+		DockerClientFactory         *docker.ClientFactory
+		KubernetesClientFactory     *cli.ClientFactory
+		KubernetesTokenCacheManager *kubernetes.TokenCacheManager
 	}
 )
 
 // NewManager initializes a new proxy Service
 func NewManager(parameters *ManagerParams) *Manager {
 	proxyFactoryParameters := &factory.ProxyFactoryParameters{
-		ResourceControlService:  parameters.ResourceControlService,
-		UserService:             parameters.UserService,
-		TeamService:             parameters.TeamService,
-		TeamMembershipService:   parameters.TeamMembershipService,
-		SettingsService:         parameters.SettingsService,
-		RegistryService:         parameters.RegistryService,
-		DockerHubService:        parameters.DockerHubService,
-		SignatureService:        parameters.SignatureService,
-		ReverseTunnelService:    parameters.ReverseTunnelService,
-		ExtensionService:        parameters.ExtensionService,
-		DockerClientFactory:     parameters.DockerClientFactory,
-		KubernetesClientFactory: parameters.KubernetesClientFactory,
+		ResourceControlService:      parameters.ResourceControlService,
+		UserService:                 parameters.UserService,
+		TeamService:                 parameters.TeamService,
+		TeamMembershipService:       parameters.TeamMembershipService,
+		SettingsService:             parameters.SettingsService,
+		RegistryService:             parameters.RegistryService,
+		DockerHubService:            parameters.DockerHubService,
+		SignatureService:            parameters.SignatureService,
+		ReverseTunnelService:        parameters.ReverseTunnelService,
+		ExtensionService:            parameters.ExtensionService,
+		DockerClientFactory:         parameters.DockerClientFactory,
+		KubernetesClientFactory:     parameters.KubernetesClientFactory,
+		KubernetesTokenCacheManager: parameters.KubernetesTokenCacheManager,
 	}
 
 	return &Manager{
