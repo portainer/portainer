@@ -27,8 +27,15 @@ export function KubernetesApplicationViewModel(type, data, service) {
     Memory: 0
   }
   this.Limits = _.reduce(data.spec.template.spec.containers, (acc, item) => {
-    acc.Cpu += item.resources.limits ? parseInt(item.resources.limits.cpu)/1000 : 0;
-    acc.Memory += item.resources.limits ? filesizeParser(item.resources.limits.memory) : 0;
+    if (item.resources.limits && item.resources.limits.cpu) {
+      acc.Cpu += parseInt(item.resources.limits.cpu);
+      if (_.endsWith(item.resources.limits.cpu, 'm')) {
+        acc.Cpu /= 1000;
+      }
+    }
+    if (item.resources.limits && item.resources.limits.memory) {
+      acc.Memory += filesizeParser(item.resources.limits.memory, {base: 10});
+    }
     return acc;
   }, limits);
 
