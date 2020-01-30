@@ -19,7 +19,7 @@
           </div>
           <!-- !name-input -->
           <div class="col-sm-12 form-section-title">
-            Quotas
+            Quota
           </div>
           <!-- quotas-switch -->
           <div class="form-group">
@@ -32,20 +32,19 @@
               </label>
             </div>
           </div>
+          <div class="form-group" ng-if="ctrl.formValues.hasQuota && !ctrl.isQuotaValid()">
+            <span class="col-sm-12 text-warning small">
+              <p>
+                <i class="fa fa-exclamation-triangle" aria-hidden="true" style="margin-right: 2px;"></i> At least a single limit must be set for the quota to be valid.
+              </p>
+            </span>
+          </div>
           <!-- !quotas-switch -->
           <div ng-if="ctrl.formValues.hasQuota">
             <div class="col-sm-12 form-section-title">
               Resources
             </div>
             <div>
-              <div class="form-group" ng-if="ctrl.formValues.hasQuota && !ctrl.isQuotaValid()">
-                <span class="col-sm-12 text-muted small">
-                  <p>
-                    <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                    You need to set at least one limit on the quota.
-                  </p>
-                </span>
-              </div>
               <!-- memory-limit-input -->
               <div class="form-group">
                 <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">

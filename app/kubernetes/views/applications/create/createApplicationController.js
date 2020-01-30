@@ -107,7 +107,7 @@ class KubernetesCreateApplicationController {
           maxCpu = quota.CpuLimit;
         } else {
           minCpu = 0 ;
-          maxCpu = this.state.nodes.cpu;;
+          maxCpu = this.state.nodes.cpu;
         }
         if (quota.MemoryLimit) {
           minMemory = this.KubernetesLimitRangeDefaults.MemoryLimit;
