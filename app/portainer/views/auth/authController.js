@@ -55,12 +55,11 @@ class AuthenticationController {
   async logoutAsync(error) {
     try {
       await this.Authentication.logout();
+    } finally {
       this.state.loginInProgress = false;
       this.generateOAuthLoginURI();
       this.LocalStorage.storeLogoutReason(error);
       this.$window.location.reload();
-    } catch (err) {
-      this.error(err, 'Error occured while performing logout');
     }
   }
 
