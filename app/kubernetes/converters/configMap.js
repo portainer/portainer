@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { KubernetesConfigMap } from 'Kubernetes/models/config-map/models';
+import { KubernetesConfigMap, KubernetesPortainerConfigMapAccessKey } from 'Kubernetes/models/config-map/models';
 import { KubernetesConfigMapGetPayload,
   KubernetesConfigMapCreatePayload,
   KubernetesConfigMapUpdatePayload
@@ -25,15 +25,15 @@ class KubernetesConfigMapConverter {
    * 
    */
   static modifiyNamespaceAccesses(configMap, namespace, accesses) {
-    configMap.Data[namespace] = {
+    configMap.Data[KubernetesPortainerConfigMapAccessKey][namespace] = {
       UserAccessPolicies: {},
       TeamAccessPolicies: {}
     };
     _.forEach(accesses, (item) => {
       if (item instanceof UserAccessViewModel) {
-        configMap.Data[namespace].UserAccessPolicies[item.Id] = {RoleId: 0};
+        configMap.Data[KubernetesPortainerConfigMapAccessKey][namespace].UserAccessPolicies[item.Id] = {RoleId: 0};
       } else if (item instanceof TeamAccessViewModel) {
-        configMap.Data[namespace].TeamAccessPolicies[item.Id] = {RoleId: 0};
+        configMap.Data[KubernetesPortainerConfigMapAccessKey][namespace].TeamAccessPolicies[item.Id] = {RoleId: 0};
       }
     });
     return configMap;

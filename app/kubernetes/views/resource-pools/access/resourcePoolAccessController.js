@@ -1,6 +1,6 @@
 import angular from 'angular';
 import _ from 'lodash-es';
-import { KubernetesPortainerConfigMapConfigName, KubernetesPortainerConfigMapNamespace } from 'Kubernetes/models/config-map/models';
+import { KubernetesPortainerConfigMapConfigName, KubernetesPortainerConfigMapNamespace, KubernetesPortainerConfigMapAccessKey } from 'Kubernetes/models/config-map/models';
 import { UserAccessViewModel, TeamAccessViewModel } from 'Portainer/models/access';
 import KubernetesConfigMapConverter from 'Kubernetes/converters/configMap';
 
@@ -29,6 +29,7 @@ class KubernetesResourcePoolAccessController {
   initAccessConfigMap(configMap) {
     configMap.Name = KubernetesPortainerConfigMapConfigName;
     configMap.Namespace = KubernetesPortainerConfigMapNamespace;
+    configMap.Data[KubernetesPortainerConfigMapAccessKey] = {};
     return configMap;
   }
 
@@ -58,7 +59,7 @@ class KubernetesResourcePoolAccessController {
 
       this.authorizedUsersAndTeams = [];
       this.accessConfigMap = configMap;
-      const poolAccesses = configMap.Data[name];
+      const poolAccesses = configMap.Data[KubernetesPortainerConfigMapAccessKey][name];
       if (poolAccesses) {
         this.authorizedUsersAndTeams = _.filter(endpointAccesses.authorizedUsersAndTeams,
           (item) => {
