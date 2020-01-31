@@ -12,6 +12,7 @@ angular.module('portainer.app')
       const role = _.find(roles, (role) => role.Id === roleId);
       return role ? role : { Id: 0, Name: "-" };
     }
+    return { Id: 0, Name: '-'};
   }
 
   function _mapAccessData(accesses, authorizedPolicies, inheritedPolicies, roles) {
