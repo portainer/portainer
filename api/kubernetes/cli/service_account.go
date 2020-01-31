@@ -142,7 +142,7 @@ func (kcl *KubeClient) ensureServiceAccountHasClusterEditRoleInNamespace(service
 			},
 		}
 
-		_, err = kcl.cli.RbacV1().RoleBindings(portainerNamespace).Create(roleBinding)
+		_, err = kcl.cli.RbacV1().RoleBindings(namespace).Create(roleBinding)
 		return err
 	} else if err != nil {
 		return err
@@ -160,6 +160,6 @@ func (kcl *KubeClient) ensureServiceAccountHasClusterEditRoleInNamespace(service
 		Namespace: portainerNamespace,
 	})
 
-	_, err = kcl.cli.RbacV1().RoleBindings(portainerNamespace).Update(roleBinding)
+	_, err = kcl.cli.RbacV1().RoleBindings(namespace).Update(roleBinding)
 	return err
 }
