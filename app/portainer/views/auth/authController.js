@@ -40,6 +40,7 @@ class AuthenticationController {
     this.oAuthLoginAsync = this.oAuthLoginAsync.bind(this);
     this.retryLoginSanitizeAsync = this.retryLoginSanitizeAsync.bind(this);
     this.internalLoginAsync = this.internalLoginAsync.bind(this);
+    this.logoutAsync = this.logoutAsync.bind(this);
 
     this.authenticateUserAsync = this.authenticateUserAsync.bind(this);
 
@@ -51,13 +52,20 @@ class AuthenticationController {
   /**
    * UTILS FUNCTIONS SECTION
    */
+  async logoutAsync(error) {
+    try {
+      await this.Authentication.logout();
+      this.state.loginInProgress = false;
+      this.generateOAuthLoginURI();
+      this.LocalStorage.storeLogoutReason(error);
+      this.$window.location.reload();
+    } catch (err) {
+      this.error(err, 'Error occured while performing logout');
+    }
+  }
 
   logout(error) {
-    this.Authentication.logout();
-    this.state.loginInProgress = false;
-    this.generateOAuthLoginURI();
-    this.LocalStorage.storeLogoutReason(error);
-    this.$window.location.reload();
+    return this.$async(this.logoutAsync, error);
   }
 
   error(err, message) {
@@ -253,7 +261,7 @@ class AuthenticationController {
       this.generateOAuthLoginURI();
 
       if (this.$stateParams.logout || this.$stateParams.error) {
-        this.logout(this.$stateParams.error);
+        await this.logout(this.$stateParams.error);
         return;
       }
       const error = this.LocalStorage.getLogoutReason();

@@ -26,11 +26,16 @@ function AuthenticationFactory($async, $state, Auth, OAuth, jwtHelper, LocalStor
     }
   }
 
-  function logout() {
+  async function logoutAsync() {
+    await Auth.logout().$promise;
     StateManager.clean();
     EndpointProvider.clean();
     LocalStorage.clean();
     LocalStorage.storeLoginStateUUID('');
+  }
+
+  function logout() {
+    return $async(logoutAsync);
   }
 
   function init() {
