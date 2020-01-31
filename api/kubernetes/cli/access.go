@@ -36,7 +36,7 @@ func (kcl *KubeClient) ensureNamespaceAccessesAreSet(userID int, teamIDs []int, 
 	for namespace, policies := range accessPolicies {
 		if hasUserAccessToNamespace(userID, teamIDs, policies) {
 			err = kcl.ensureServiceAccountHasClusterEditRoleInNamespace(serviceAccountName, namespace)
-			if err != nil {
+			if err != nil && !k8serrors.IsAlreadyExists(err) {
 				return err
 			}
 		}

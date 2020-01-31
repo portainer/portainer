@@ -143,11 +143,7 @@ func (kcl *KubeClient) ensureServiceAccountHasClusterEditRoleInNamespace(service
 		}
 
 		_, err = kcl.cli.RbacV1().RoleBindings(portainerNamespace).Create(roleBinding)
-		if err != nil {
-			return err
-		}
-
-		return nil
+		return err
 	} else if err != nil {
 		return err
 	}

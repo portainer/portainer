@@ -46,11 +46,11 @@ func (manager *tokenManager) getAdminServiceAccountToken() string {
 }
 
 func (manager *tokenManager) getUserServiceAccountToken(userID int, username string) (string, error) {
+	manager.mutex.Lock()
+	defer manager.mutex.Unlock()
+
 	token, ok := manager.tokenCache.getToken(userID)
 	if !ok {
-		manager.mutex.Lock()
-		defer manager.mutex.Unlock()
-
 		memberships, err := manager.teamMemberShipService.TeamMembershipsByUserID(portainer.UserID(userID))
 		if err != nil {
 			return "", err
