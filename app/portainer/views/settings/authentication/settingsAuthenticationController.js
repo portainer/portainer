@@ -42,7 +42,6 @@ function($q, $scope, $state, Notifications, SettingsService, FileUploadService, 
   $scope.LDAPConnectivityCheck = function() {
     var settings = angular.copy($scope.settings);
     var TLSCAFile = $scope.formValues.TLSCACert !== settings.LDAPSettings.TLSConfig.TLSCACert ? $scope.formValues.TLSCACert : null;
-    
 
     if ($scope.formValues.LDAPSettings.AnonymousMode){
       settings.LDAPSettings['ReaderDN'] = '';
