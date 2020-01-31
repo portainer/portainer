@@ -1,3 +1,5 @@
+import _ from 'lodash-es';
+
 angular.module('portainer.app')
 .controller('UsersController', ['$q', '$scope', '$state', 'UserService', 'TeamService', 'TeamMembershipService', 'ModalService', 'Notifications', 'Authentication', 'SettingsService',
 function ($q, $scope, $state, UserService, TeamService, TeamMembershipService, ModalService, Notifications, Authentication, SettingsService) {
@@ -110,7 +112,7 @@ function ($q, $scope, $state, UserService, TeamService, TeamMembershipService, M
       var users = data.users;
       assignTeamLeaders(users, data.memberships);
       $scope.users = users;
-      $scope.teams = data.teams;
+      $scope.teams = _.orderBy(data.teams, 'Name', 'asc');
       $scope.AuthenticationMethod = data.settings.AuthenticationMethod;
     })
     .catch(function error(err) {

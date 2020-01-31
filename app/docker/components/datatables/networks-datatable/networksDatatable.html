@@ -151,7 +151,7 @@
           </thead>
           <tbody>
             <tr dir-paginate-start="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))"
-              ng-class="{active: item.Checked}" network-row-content item="item" parent-ctrl="$ctrl" allow-checkbox="true">
+              ng-class="{active: item.Checked}" network-row-content item="item" parent-ctrl="$ctrl" ng-click="$ctrl.expandItem(item, !item.Expanded)" allow-checkbox="true">
             </tr>
             <tr dir-paginate-end ng-show="item.Expanded" ng-repeat="it in item.Subs" style="background: #d5e8f3;"
               network-row-content item="it" parent-ctrl="$ctrl">

@@ -6,7 +6,7 @@ import (
 
 	"github.com/docker/docker/client"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
 )
 
@@ -74,8 +74,8 @@ func (transport *Transport) configInspectOperation(response *http.Response, exec
 // selectorConfigLabels retrieve the labels object associated to the config object.
 // Labels are available under the "Spec.Labels" property.
 // API schema references:
-// https://docs.docker.com/engine/api/v1.40/#operation/ConfigList
-// https://docs.docker.com/engine/api/v1.40/#operation/ConfigInspect
+// https://docs.docker.com/engine/api/v1.37/#operation/ConfigList
+// https://docs.docker.com/engine/api/v1.37/#operation/ConfigInspect
 func selectorConfigLabels(responseObject map[string]interface{}) map[string]interface{} {
 	secretSpec := responseutils.GetJSONObject(responseObject, "Spec")
 	if secretSpec != nil {
