@@ -1,11 +1,10 @@
-<td ng-if="allowCheckbox">
+<td ng-if="allowCheckbox" authorization="DockerNetworkDelete, DockerNetworkCreate">
   <span class="md-checkbox" ng-if="!parentCtrl.offlineMode">
     <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="parentCtrl.selectItem(item, $event); $event.stopPropagation()" ng-disabled="parentCtrl.disableRemove(item)"/>
     <label for="select_{{ $index }}"></label>
   </span>
   <a ng-if="parentCtrl.itemCanExpand(item)"><i ng-class="{ 'fas fa-angle-down': item.Expanded, 'fas fa-angle-right': !item.Expanded }" class="space-right" aria-hidden="true"></i></a>
 </td>
-<td ng-if="!allowCheckbox"></td>
 <td>
   <a ng-if="!parentCtrl.offlineMode" ui-sref="docker.networks.network({ id: item.Id, nodeName: item.NodeName })" title="{{ item.Name }}">{{ item.Name | truncate:40 }}</a>
   <span ng-if="parentCtrl.offlineMode">{{ item.Name | truncate:40 }}</span>
