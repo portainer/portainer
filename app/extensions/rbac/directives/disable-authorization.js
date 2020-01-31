@@ -18,7 +18,7 @@ angular.module('portainer.extensions.rbac')
 
       if (!Authentication.hasAuthorizations(authorizations)) {
         elem.attr('disabled', true);
-        if(elem.is('Slider')) {
+        if (elem.is('Slider')) {
           elem.css('pointer-events', 'none');
         }
       }
