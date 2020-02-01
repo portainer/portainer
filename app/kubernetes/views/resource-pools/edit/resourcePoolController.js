@@ -47,6 +47,16 @@ class KubernetesEditResourcePoolController {
     }
   }
 
+  usageLevelInfo(usage) {
+    if (usage >= 80) {
+      return 'danger';
+    } else if (usage > 50 && usage < 80) {
+      return 'warning';
+    } else {
+      return 'success';
+    }
+  }
+
   async updateResourcePoolAsync() {
     this.state.actionInProgress = true;
     try {
@@ -99,7 +109,9 @@ class KubernetesEditResourcePoolController {
       this.state = {
         actionInProgress: false,
         sliderMaxMemory: 0,
-        sliderMaxCpu: 0
+        sliderMaxCpu: 0,
+        cpuUsage: 0,
+        memoryUsage: 0
       };
 
       const name = this.$transition$.params().id;
@@ -119,14 +131,26 @@ class KubernetesEditResourcePoolController {
 
       if (pool.Quotas.length) {
         let cpuLimit = 0;
+        let cpuUsage = 0;
         let memoryLimit = 0;
+        let memoryUsage = 0;
         this.formValues.hasQuota = true;
         _.forEach(pool.Quotas, (item) => {
           cpuLimit += item.CpuLimit;
+          cpuUsage += item.CpuLimitUsage;
           memoryLimit += megaBytesValue(item.MemoryLimit);
+          memoryUsage += megaBytesValue(item.MemoryLimitUsage);
         });
         this.formValues.CpuLimit = cpuLimit;
         this.formValues.MemoryLimit = memoryLimit;
+
+        if (cpuUsage !== 0) {
+          this.state.cpuUsage = cpuUsage * 100 / cpuUsage;
+        }
+
+        if (memoryUsage !== 0) {
+          this.state.memoryUsage = memoryUsage * 100 / memoryLimit;
+        }
       }
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');

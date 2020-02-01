@@ -15,6 +15,20 @@ export default function KubernetesResourceQuotaViewModel(data) {
   if (data.spec.hard && data.spec.hard['limits.memory']) {
     this.MemoryLimit = filesizeParser(data.spec.hard['limits.memory'], {base: 10});
   }
+
+  this.MemoryLimitUsage = 0;
+  if (data.status.used && data.status.used['limits.memory']) {
+    this.MemoryLimitUsage = filesizeParser(data.status.used['limits.memory'], {base: 10});
+  }
+
+  this.CpuLimitUsage = 0;
+  if (data.status.used && data.status.used['limits.cpu']) {
+    this.CpuLimitUsage = parseInt(data.status.used['limits.cpu']);
+    if (_.endsWith(data.status.used['limits.cpu'], 'm')) {
+      this.CpuLimitUsage /= 1000;
+    }
+  }
+
   this.Raw = data;
 }
 

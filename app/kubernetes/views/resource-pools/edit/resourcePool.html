@@ -42,7 +42,7 @@
           <!-- !quotas-switch -->
           <div ng-if="ctrl.formValues.hasQuota">
             <div class="col-sm-12 form-section-title">
-              Resources
+              Resource limits
             </div>
             <div>
               <!-- memory-limit-input -->
@@ -85,6 +85,34 @@
                 </div>
               </div>
               <!-- !cpu-limit-input -->
+            </div>
+            <div ng-if="ctrl.pool.Quotas.length">
+              <div class="col-sm-12 form-section-title">
+                Resource reservation
+              </div>
+              <div class="form-group">
+                <span class="col-sm-12 text-muted small" >
+                  <p>
+                    Resource reservation represents the total amount of resource limits applied to all of the applications deployed inside this resource pool.
+                  </p>
+                </span>
+              </div>
+              <div class="form-group">
+                <label for="memory-limit-usage" class="col-sm-3 col-lg-2 control-label text-left" >
+                  Memory reservation
+                </label>
+                <div class="col-sm-9" style="margin-top: 4px;">
+                  <uib-progressbar animate="false" value="ctrl.state.memoryUsage" type="{{ ctrl.usageLevelInfo(ctrl.state.memoryUsage) }}"><b>{{ ctrl.state.memoryUsage }}%</b></uib-progressbar>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="cpu-limit-usage" class="col-sm-3 col-lg-2 control-label text-left">
+                  CPU reservation
+                </label>
+                <div class="col-sm-9" style="margin-top: 4px;">
+                  <uib-progressbar animate="false" value="ctrl.state.cpuUsage" type="{{ ctrl.usageLevelInfo(ctrl.state.cpuUsage) }}"><b>{{ ctrl.state.cpuUsage }}%</b></uib-progressbar>
+                </div>
+              </div>
             </div>
           </div>
           <!-- actions -->
