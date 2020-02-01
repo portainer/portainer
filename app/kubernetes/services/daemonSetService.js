@@ -88,7 +88,8 @@ angular.module("portainer.kubernetes").factory("KubernetesDaemonSetService", [
                     image: daemonSet.Image,
                     env: daemonSet.Env,
                     resources: {
-                      limits: { }
+                      limits: {},
+                      requests: {}
                     }
                   }
                 ]
@@ -99,9 +100,11 @@ angular.module("portainer.kubernetes").factory("KubernetesDaemonSetService", [
 
         if (daemonSet.MemoryLimit) {
           payload.spec.template.spec.containers[0].resources.limits.memory = daemonSet.MemoryLimit;
+          payload.spec.template.spec.containers[0].resources.requests.memory = 0;
         }
         if (daemonSet.CpuLimit) {
           payload.spec.template.spec.containers[0].resources.limits.cpu = daemonSet.CpuLimit;
+          payload.spec.template.spec.containers[0].resources.requests.cpu = 0;
         }
 
         const data = await KubernetesDaemonSets(payload.metadata.namespace).create(payload).$promise;
