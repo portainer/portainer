@@ -1,6 +1,7 @@
 import _ from 'lodash-es';
 import KubernetesResourcePoolViewModel from 'Kubernetes/models/resourcePool';
 import KubernetesDefaultLimitRangeModel, {KubernetesPortainerLimitRangeSuffix} from 'Kubernetes/models/limitRange';
+import {KubernetesPortainerQuotaSuffix} from 'Kubernetes/models/resourceQuota';
 
 angular.module("portainer.kubernetes").factory("KubernetesResourcePoolService", [
   "$async", "KubernetesNamespaceService", "KubernetesResourceQuotaService", "KubernetesLimitRangeService",
@@ -68,14 +69,28 @@ angular.module("portainer.kubernetes").factory("KubernetesResourcePoolService", 
 
     async function resourcePoolAsync(name) {
       try {
-        const [namespace, quotas, limitRanges] = await Promise.all([
+        const [namespace, quotaAttempt, limitRangeAttempt] = await Promise.allSettled([
           KubernetesNamespaceService.namespace(name),
-          KubernetesResourceQuotaService.quotas(),
-          KubernetesLimitRangeService.limitRanges(name)
+          KubernetesResourceQuotaService.quota(name, KubernetesPortainerQuotaSuffix + name),
+          KubernetesLimitRangeService.limitRange(name, KubernetesPortainerLimitRangeSuffix + name)
         ]);
-        const pool = new KubernetesResourcePoolViewModel(namespace);
-        bindQuotasToNamespace(pool, namespace, quotas);
-        pool.LimitRange = _.find(limitRanges, (item) => item.Name === KubernetesPortainerLimitRangeSuffix + name);
+
+        let pool = {};
+        if (namespace.status === 'fulfilled') {
+          pool = new KubernetesResourcePoolViewModel(namespace.value);
+          pool.Yaml = namespace.value.Yaml.data;
+        }
+
+        if (quotaAttempt.status === 'fulfilled') {
+          pool.Quotas.push(quotaAttempt.value);
+          pool.Yaml += '---\n' + quotaAttempt.value.Yaml.data;
+        }
+
+        if (limitRangeAttempt.status === 'fulfilled') {
+          pool.LimitRange = limitRangeAttempt.value;
+          pool.Yaml += '---\n' + limitRangeAttempt.value.Yaml.data;
+        }
+
         return pool;
       } catch (err) {
         throw { msg: 'Unable to retrieve resource pool', err: err };

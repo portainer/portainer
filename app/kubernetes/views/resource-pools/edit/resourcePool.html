@@ -135,3 +135,28 @@
     </rd-widget>
   </div>
 </div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-header icon="fa-layer-group" title-text="Resource pool details"></rd-widget-header>
+      <rd-widget-body classes="no-padding">
+
+        <uib-tabset active="ctrl.state.activeTab" justified="true">
+          <uib-tab index="0" ng-if="ctrl.pool.Yaml" select="ctrl.showEditor()">
+            <uib-tab-heading>
+              <i class="fa fa-code space-right" aria-hidden="true"></i> YAML
+            </uib-tab-heading>
+            <div style="padding-right: 25px;" ng-if="ctrl.state.showEditorTab">
+              <kubernetes-yaml-inspector
+                      key="resource-pool-yaml"
+                      data="ctrl.pool.Yaml"
+              ></kubernetes-yaml-inspector>
+            </div>
+          </uib-tab>
+        </uib-tabset>
+
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

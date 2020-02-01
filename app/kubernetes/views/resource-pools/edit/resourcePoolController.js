@@ -47,6 +47,10 @@ class KubernetesEditResourcePoolController {
     }
   }
 
+  showEditor() {
+    this.state.showEditorTab = true;
+  }
+
   usageLevelInfo(usage) {
     if (usage >= 80) {
       return 'danger';
@@ -113,7 +117,9 @@ class KubernetesEditResourcePoolController {
         cpuUsage: 0,
         cpuUsed: 0,
         memoryUsage: 0,
-        memoryUsed: 0
+        memoryUsed: 0,
+        activeTab: 0,
+        showEditorTab: true,
       };
 
       const name = this.$transition$.params().id;

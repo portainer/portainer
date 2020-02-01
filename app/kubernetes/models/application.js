@@ -25,7 +25,7 @@ export function KubernetesApplicationViewModel(type, data, service) {
   const limits = {
     Cpu: 0,
     Memory: 0
-  }
+  };
   this.Limits = _.reduce(data.spec.template.spec.containers, (acc, item) => {
     if (item.resources.limits && item.resources.limits.cpu) {
       acc.Cpu += parseInt(item.resources.limits.cpu);

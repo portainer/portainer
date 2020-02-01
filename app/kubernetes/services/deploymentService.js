@@ -42,7 +42,7 @@ angular.module("portainer.kubernetes").factory("KubernetesDeploymentService", [
         const res = {
           Raw: raw,
           Yaml: yaml
-        }
+        };
         return res;
       } catch (err) {
         throw { msg: 'Unable to retrieve deployment', err: err };

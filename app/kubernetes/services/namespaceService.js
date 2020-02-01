@@ -1,5 +1,5 @@
-import _ from "lodash-es";
-import KubernetesNamespaceViewModel from "Kubernetes/models/namespace";
+import _ from 'lodash-es';
+import KubernetesNamespaceViewModel from 'Kubernetes/models/namespace';
 
 angular.module("portainer.kubernetes").factory("KubernetesNamespaceService", [
   "$async", "KubernetesNamespaces",
@@ -42,8 +42,16 @@ angular.module("portainer.kubernetes").factory("KubernetesNamespaceService", [
      */
     async function namespaceAsync(name) {
       try {
-        const data = await KubernetesNamespaces.query({id: name}).$promise;
-        return new KubernetesNamespaceViewModel(data);
+        const payload = {
+          id: name
+        };
+        const [raw, yaml] = await Promise.all([
+          KubernetesNamespaces.query(payload).$promise,
+          KubernetesNamespaces.getYaml(payload).$promise
+        ]);
+        const namespace = new KubernetesNamespaceViewModel(raw);
+        namespace.Yaml = yaml;
+        return namespace;
       } catch (err) {
         throw { msg: 'Unable to retrieve namespace', err: err };
       }

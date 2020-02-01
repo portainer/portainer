@@ -1,4 +1,3 @@
-import _ from 'lodash-es';
 import {KubernetesLimitRangeViewModel} from 'Kubernetes/models/limitRange';
 
 angular.module("portainer.kubernetes").factory("KubernetesLimitRangeService", [
@@ -7,24 +6,33 @@ angular.module("portainer.kubernetes").factory("KubernetesLimitRangeService", [
     "use strict";
     const service = {
       create: create,
-      limitRanges: limitRanges,
+      limitRange: limitRange,
       remove: remove
     };
 
     /**
-     * LimitRanges
+     * LimitRange
      */
-    async function limitRangesAsync(namespace) {
+    async function limitRangeAsync(namespace, name) {
       try {
-        const data = await KubernetesLimitRanges.query({namespace: namespace}).$promise;
-        return _.map(data.items, (item) => new KubernetesLimitRangeViewModel(item));
+        const payload = {
+          id: name,
+          namespace: namespace
+        };
+        const [raw, yaml] = await Promise.all([
+          KubernetesLimitRanges.get(payload).$promise,
+          KubernetesLimitRanges.getYaml(payload).$promise
+        ]);
+        const limitRange = new KubernetesLimitRangeViewModel(raw);
+        limitRange.Yaml = yaml;
+        return limitRange;
       } catch (err) {
-        throw { msg: 'Unable to retrieve limit ranges', err: err};
+        throw { msg: 'Unable to retrieve limit range', err: err };
       }
     }
 
-    function limitRanges(namespace) {
-      return $async(limitRangesAsync, namespace);
+    function limitRange(namespace, name) {
+      return $async(limitRangeAsync, namespace, name);
     }
 
     /**

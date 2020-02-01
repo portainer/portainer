@@ -42,7 +42,7 @@ angular.module("portainer.kubernetes").factory("KubernetesServiceService", [
         const res = {
           Raw: raw,
           Yaml: yaml
-        }
+        };
         return res;
       } catch (err) {
         throw { msg: 'Unable to retrieve service', err: err };

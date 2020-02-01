@@ -1,3 +1,5 @@
+import {rawResponse} from 'Kubernetes/rest/response/transform';
+
 angular.module('portainer.kubernetes')
 .factory('KubernetesLimitRanges', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider',
   function KubernetesLimitRangesFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
@@ -7,7 +9,14 @@ angular.module('portainer.kubernetes')
         endpointId: EndpointProvider.endpointID
       },
       {
-        query: { method: 'GET', timeout: 15000 },
+        get: { method: 'GET' },
+        getYaml: {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/yaml'
+          },
+          transformResponse: rawResponse
+        },
         create: { method: 'POST', params: { namespace: '@metadata.namespace' } },
         delete: { method: 'DELETE'}
       });

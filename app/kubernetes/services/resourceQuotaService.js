@@ -1,4 +1,4 @@
-import _ from "lodash-es";
+import _ from 'lodash-es';
 import KubernetesResourceQuotaViewModel from 'Kubernetes/models/resourceQuota';
 
 angular.module("portainer.kubernetes").factory("KubernetesResourceQuotaService", [
@@ -6,12 +6,38 @@ angular.module("portainer.kubernetes").factory("KubernetesResourceQuotaService",
   function KubernetesResourceQuotaServiceFactory($async, KubernetesResourceQuotas) {
     "use strict";
     const service = {
+      quota: quota,
       quotas: quotas,
       create: create,
       update: update,
       remove: remove,
       removeCollection: removeCollection
     };
+
+    /**
+     * Quota
+     */
+    async function quotaAsync(namespace, name) {
+      try {
+        const payload = {
+          id: name,
+          namespace: namespace
+        };
+        const [raw, yaml] = await Promise.all([
+          KubernetesResourceQuotas.get(payload).$promise,
+          KubernetesResourceQuotas.getYaml(payload).$promise
+        ]);
+        const quota = new KubernetesResourceQuotaViewModel(raw);
+        quota.Yaml = yaml;
+        return quota;
+      } catch (err) {
+        throw { msg: 'Unable to retrieve resource quota', err: err };
+      }
+    }
+
+    function quota(namespace, name) {
+      return $async(quotaAsync, namespace, name);
+    }
 
     /**
      * Quotas
