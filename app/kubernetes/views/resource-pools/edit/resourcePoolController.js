@@ -129,30 +129,21 @@ class KubernetesEditResourcePoolController {
       });
       this.state.sliderMaxMemory = megaBytesValue(this.state.sliderMaxMemory);
 
-      // TODO: refactor
-      // even if a resource pool can have multiple quotas, we store all the required information in portainer-rq-<namespace>
-      // see the resource pool retrieval process in createApplicationController.js updateSlidersAsync() function
-      if (pool.Quotas.length) {
-        let cpuLimit = 0;
-        let cpuUsage = 0;
-        let memoryLimit = 0;
-        let memoryUsage = 0;
+      const quota = _.find(pool.Quotas,
+        (item) => item.Name === KubernetesPortainerQuotaSuffix + pool.Namespace.Name);
+      if (quota) {
         this.formValues.hasQuota = true;
-        _.forEach(pool.Quotas, (item) => {
-          cpuLimit += item.CpuLimit;
-          cpuUsage += item.CpuLimitUsed;
-          memoryLimit += megaBytesValue(item.MemoryLimit);
-          memoryUsage += megaBytesValue(item.MemoryLimitUsed);
-        });
-        this.formValues.CpuLimit = cpuLimit;
-        this.formValues.MemoryLimit = memoryLimit;
+        this.formValues.CpuLimit = quota.CpuLimit;
+        this.formValues.MemoryLimit = megaBytesValue(quota.MemoryLimit);
 
-        if (cpuUsage !== 0) {
-          this.state.cpuUsage = cpuUsage * 100 / cpuUsage;
+        let usedCPU = quota.CpuLimitUsed;
+        if (usedCPU !== 0) {
+          this.state.cpuUsage = usedCPU * 100 / quota.CpuLimit;
         }
 
-        if (memoryUsage !== 0) {
-          this.state.memoryUsage = memoryUsage * 100 / memoryLimit;
+        let usedMemory = quota.MemoryLimitUsed;
+        if (usedMemory !== 0) {
+          this.state.memoryUsage = usedMemory * 100 / quota.MemoryLimit;
         }
       }
     } catch (err) {
