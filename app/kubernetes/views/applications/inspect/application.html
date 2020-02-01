@@ -177,18 +177,10 @@
               <i class="fa fa-code space-right" aria-hidden="true"></i> YAML
             </uib-tab-heading>
             <div style="padding-right: 25px;" ng-if="ctrl.state.showEditorTab">
-              <code-editor
-                      identifier="application-details-yaml"
-                      yml="false"
-                      read-only="true"
-                      value="ctrl.application.Yaml"
-              ></code-editor>
-              <div style="margin: 15px;">
-                <span class="btn btn-primary btn-sm" ng-click="ctrl.copyYAML()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy to clipboard</span>
-                <span id="copyNotificationYAML" style="margin-left: 7px; display: none; color: #23ae89;" class="small">
-                    <i class="fa fa-check" aria-hidden="true" ></i> copied
-                  </span>
-              </div>
+              <kubernetes-yaml-inspector
+                      key="application-yaml"
+                      data="ctrl.application.Yaml"
+              ></kubernetes-yaml-inspector>
             </div>
           </uib-tab>
         </uib-tabset>

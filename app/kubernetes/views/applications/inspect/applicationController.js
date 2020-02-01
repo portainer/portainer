@@ -4,11 +4,10 @@ import {KubernetesApplicationDeploymentTypes} from 'Kubernetes/models/applicatio
 
 class KubernetesApplicationController {
   /* @ngInject */
-  constructor($async, $state, $transition$, clipboard, Notifications, KubernetesApplicationService, KubernetesEventService) {
+  constructor($async, $state, $transition$, Notifications, KubernetesApplicationService, KubernetesEventService) {
     this.$async = $async;
     this.$state = $state;
     this.$transition$ = $transition$;
-    this.clipboard = clipboard;
     this.Notifications = Notifications;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesEventService = KubernetesEventService;
@@ -18,11 +17,6 @@ class KubernetesApplicationController {
     this.getApplicationAsync = this.getApplicationAsync.bind(this);
     this.getEvents = this.getEvents.bind(this);
     this.getEventsAsync = this.getEventsAsync.bind(this);
-  }
-
-  copyYAML() {
-    this.clipboard.copyText(this.application.Yaml);
-    $('#copyNotificationYAML').show().fadeOut(2500);
   }
 
   async getEventsAsync() {
