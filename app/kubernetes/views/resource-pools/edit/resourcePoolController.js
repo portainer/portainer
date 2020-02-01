@@ -129,6 +129,9 @@ class KubernetesEditResourcePoolController {
       });
       this.state.sliderMaxMemory = megaBytesValue(this.state.sliderMaxMemory);
 
+      // TODO: refactor
+      // even if a resource pool can have multiple quotas, we store all the required information in portainer-rq-<namespace>
+      // see the resource pool retrieval process in createApplicationController.js updateSlidersAsync() function
       if (pool.Quotas.length) {
         let cpuLimit = 0;
         let cpuUsage = 0;
