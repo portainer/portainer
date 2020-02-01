@@ -148,8 +148,8 @@
       <rd-widget-header icon="fa-laptop-medical" title-text="Application details"></rd-widget-header>
       <rd-widget-body classes="no-padding">
 
-        <uib-tabset active="ctrl.state.activeTab" justified="true">
-          <uib-tab index="0">
+        <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
+          <uib-tab index="0" classes="btn-sm">
             <uib-tab-heading>
               <i class="fa fa-server space-right" aria-hidden="true"></i> Pods
             </uib-tab-heading>
@@ -159,7 +159,7 @@
               order-by="Name"
             ></kubernetes-pods-datatable>
           </uib-tab>
-          <uib-tab index="1">
+          <uib-tab index="1" classes="btn-sm">
             <uib-tab-heading>
               <i class="fa fa-history space-right" aria-hidden="true"></i> Events
             </uib-tab-heading>
@@ -172,7 +172,7 @@
               refresh-callback="ctrl.getEvents"
             ></kubernetes-events-datatable>
           </uib-tab>
-          <uib-tab index="2" ng-if="ctrl.application.Yaml" select="ctrl.showEditor()">
+          <uib-tab index="2" ng-if="ctrl.application.Yaml" select="ctrl.showEditor()" classes="btn-sm">
             <uib-tab-heading>
               <i class="fa fa-code space-right" aria-hidden="true"></i> YAML
             </uib-tab-heading>

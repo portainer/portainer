@@ -14,7 +14,7 @@ function bytesValue(mem) {
 
 class KubernetesEditResourcePoolController {
   /* @ngInject */
-  constructor($async, $state, $transition$, Notifications, KubernetesNodeService, KubernetesResourceQuotaService, KubernetesResourcePoolService, KubernetesLimitRangeService) {
+  constructor($async, $state, $transition$, Notifications, KubernetesNodeService, KubernetesResourceQuotaService, KubernetesResourcePoolService, KubernetesLimitRangeService, KubernetesEventService) {
     this.$async = $async;
     this.$state = $state;
     this.$transition$ = $transition$;
@@ -24,9 +24,12 @@ class KubernetesEditResourcePoolController {
     this.KubernetesResourceQuotaService = KubernetesResourceQuotaService;
     this.KubernetesLimitRangeService = KubernetesLimitRangeService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
+    this.KubernetesEventService = KubernetesEventService;
 
     this.onInit = this.onInit.bind(this);
     this.updateResourcePoolAsync = this.updateResourcePoolAsync.bind(this);
+    this.getEvents = this.getEvents.bind(this);
+    this.getEventsAsync = this.getEventsAsync.bind(this);
   }
 
   isQuotaValid() {
@@ -100,6 +103,31 @@ class KubernetesEditResourcePoolController {
     return this.$async(this.updateResourcePoolAsync);
   }
 
+  async getEventsAsync() {
+    try {
+      this.state.eventsLoading = true;
+      // TODO: review
+      // Should this be relocated inside the KubernetesEventService as KubernetesEventService.resourcePoolEvents() ?
+      const events = await this.KubernetesEventService.events(this.pool.Namespace.Name);
+
+      // TODO: refactor
+      // quota related events should be part of this
+      // Due to the model supporting multiple quotas at the moment, this would complexify the logic to retrieve
+      // quota related events here. Should be added in here when the resource pool model support for a single quota
+      // has been implemented.
+      this.events = _.filter(events, (event) => event.Involved.uid === this.pool.Namespace.Id
+        || event.Involved.uid === this.pool.LimitRange.Id);
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve resource pool related events');
+    } finally {
+      this.state.eventsLoading = false;
+    }
+  }
+
+  getEvents() {
+    return this.$async(this.getEventsAsync);
+  }
+
   async onInit() {
     try {
       this.defaults = KubernetesResourceQuotaDefaults;
@@ -119,7 +147,8 @@ class KubernetesEditResourcePoolController {
         memoryUsage: 0,
         memoryUsed: 0,
         activeTab: 0,
-        showEditorTab: true,
+        showEditorTab: false,
+        eventsLoading: true
       };
 
       const name = this.$transition$.params().id;
@@ -156,6 +185,8 @@ class KubernetesEditResourcePoolController {
           this.state.memoryUsage = Math.floor(usedMemory * 100 / quota.MemoryLimit);
         }
       }
+
+      this.getEvents();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
     }

@@ -13,6 +13,7 @@ export default function KubernetesDefaultLimitRangeModel(namespace) {
 }
 
 export function KubernetesLimitRangeViewModel(data) {
+  this.Id = data.metadata.uid;
   this.Namespace = data.metadata.namespace;
   this.Name = data.metadata.name;
 }

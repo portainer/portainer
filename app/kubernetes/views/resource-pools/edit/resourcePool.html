@@ -6,144 +6,153 @@
 </rd-header>
 
 <div class="row">
-  <div class="col-lg-12 col-md-12 col-xs-12">
+  <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-body>
-        <form class="form-horizontal" autocomplete="off" name="resourcePoolEditForm">
-           <!-- name-input -->
-           <div class="form-group">
-            <label for="pool_name" class="col-sm-1 control-label text-left">Name</label>
-            <div class="col-sm-11">
-              <input type="text" class="form-control" name="pool_name" ng-model="ctrl.pool.Namespace.Name" disabled>
-            </div>
-          </div>
-          <!-- !name-input -->
-          <div class="col-sm-12 form-section-title">
-            Quota
-          </div>
-          <!-- quotas-switch -->
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label class="control-label text-left">
-                Add quota to resource pool
-              </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" ng-model="ctrl.formValues.hasQuota"><i></i>
-              </label>
-            </div>
-          </div>
-          <div class="form-group" ng-if="ctrl.formValues.hasQuota && !ctrl.isQuotaValid()">
+      <rd-widget-body classes="no-padding">
+
+        <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
+          <uib-tab index="0" classes="btn-sm">
+            <uib-tab-heading>
+              <i class="fa fa-layer-group space-right" aria-hidden="true"></i> Resource pool
+            </uib-tab-heading>
+
+            <form class="form-horizontal" autocomplete="off" name="resourcePoolEditForm" style="padding: 20px; margin-top: 10px;">
+              <!-- name-input -->
+              <div class="form-group">
+                <label for="pool_name" class="col-sm-1 control-label text-left">Name</label>
+                <div class="col-sm-11">
+                  <input type="text" class="form-control" name="pool_name" ng-model="ctrl.pool.Namespace.Name" disabled>
+                </div>
+              </div>
+              <!-- !name-input -->
+              <div class="col-sm-12 form-section-title">
+                Quota
+              </div>
+              <!-- quotas-switch -->
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <label class="control-label text-left">
+                    Add quota to resource pool
+                  </label>
+                  <label class="switch" style="margin-left: 20px;">
+                    <input type="checkbox" ng-model="ctrl.formValues.hasQuota"><i></i>
+                  </label>
+                </div>
+              </div>
+              <div class="form-group" ng-if="ctrl.formValues.hasQuota && !ctrl.isQuotaValid()">
             <span class="col-sm-12 text-warning small">
               <p>
                 <i class="fa fa-exclamation-triangle" aria-hidden="true" style="margin-right: 2px;"></i> At least a single limit must be set for the quota to be valid.
               </p>
             </span>
-          </div>
-          <!-- !quotas-switch -->
-          <div ng-if="ctrl.formValues.hasQuota">
-            <div class="col-sm-12 form-section-title">
-              Resource limits
-            </div>
-            <div>
-              <!-- memory-limit-input -->
-              <div class="form-group">
-                <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
-                  Memory limit
-                </label>
-                <div class="col-sm-3">
-                  <slider model="ctrl.formValues.MemoryLimit" floor="ctrl.defaults.MemoryLimit" ceil="ctrl.state.sliderMaxMemory" step="128" ng-if="ctrl.state.sliderMaxMemory"></slider>
-                </div>
-                <div class="col-sm-2">
-                  <input name="memory_limit" type="number" min="{{ctrl.defaults.MemoryLimit}}" max="{{ctrl.state.sliderMaxMemory}}" class="form-control" ng-model="ctrl.formValues.MemoryLimit" id="memory-limit" required>
-                </div>
-                <div class="col-sm-4">
-                  <p class="small text-muted" style="margin-top: 7px;">
-                    Memory limit (<b>MB</b>)
-                  </p>
-                </div>
               </div>
-              <div class="form-group" ng-show="resourcePoolEditForm.memory_limit.$invalid">
-                <div class="col-sm-12 small text-warning">
-                  <div ng-messages="resourcePoolEditForm.pool_name.$error">
-                    <p><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Value must be between {{ ctrl.defaults.MemoryLimit }} and {{ ctrl.state.sliderMaxMemory }}</p>
+              <!-- !quotas-switch -->
+              <div ng-if="ctrl.formValues.hasQuota">
+                <div class="col-sm-12 form-section-title">
+                  Resource limits
+                </div>
+                <div>
+                  <!-- memory-limit-input -->
+                  <div class="form-group">
+                    <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
+                      Memory limit
+                    </label>
+                    <div class="col-sm-3">
+                      <slider model="ctrl.formValues.MemoryLimit" floor="ctrl.defaults.MemoryLimit" ceil="ctrl.state.sliderMaxMemory" step="128" ng-if="ctrl.state.sliderMaxMemory"></slider>
+                    </div>
+                    <div class="col-sm-2">
+                      <input name="memory_limit" type="number" min="{{ctrl.defaults.MemoryLimit}}" max="{{ctrl.state.sliderMaxMemory}}" class="form-control" ng-model="ctrl.formValues.MemoryLimit" id="memory-limit" required>
+                    </div>
+                    <div class="col-sm-4">
+                      <p class="small text-muted" style="margin-top: 7px;">
+                        Memory limit (<b>MB</b>)
+                      </p>
+                    </div>
                   </div>
+                  <div class="form-group" ng-show="resourcePoolEditForm.memory_limit.$invalid">
+                    <div class="col-sm-12 small text-warning">
+                      <div ng-messages="resourcePoolEditForm.pool_name.$error">
+                        <p><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Value must be between {{ ctrl.defaults.MemoryLimit }} and {{ ctrl.state.sliderMaxMemory }}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- !memory-limit-input -->
+                  <!-- cpu-limit-input -->
+                  <div class="form-group">
+                    <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
+                      CPU limit
+                    </label>
+                    <div class="col-sm-5">
+                      <slider model="ctrl.formValues.CpuLimit" floor="ctrl.defaults.CpuLimit" ceil="ctrl.state.sliderMaxCpu" step="0.25" precision="2" ng-if="ctrl.state.sliderMaxCpu"></slider>
+                    </div>
+                    <div class="col-sm-4" style="margin-top: 20px;">
+                      <p class="small text-muted">
+                        Maximum CPU usage
+                      </p>
+                    </div>
+                  </div>
+                  <!-- !cpu-limit-input -->
                 </div>
-              </div>
-              <!-- !memory-limit-input -->
-              <!-- cpu-limit-input -->
-              <div class="form-group">
-                <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
-                  CPU limit
-                </label>
-                <div class="col-sm-5">
-                  <slider model="ctrl.formValues.CpuLimit" floor="ctrl.defaults.CpuLimit" ceil="ctrl.state.sliderMaxCpu" step="0.25" precision="2" ng-if="ctrl.state.sliderMaxCpu"></slider>
-                </div>
-                <div class="col-sm-4" style="margin-top: 20px;">
-                  <p class="small text-muted">
-                    Maximum CPU usage
-                  </p>
-                </div>
-              </div>
-              <!-- !cpu-limit-input -->
-            </div>
-            <div ng-if="ctrl.pool.Quotas.length">
-              <div class="col-sm-12 form-section-title">
-                Resource reservation
-              </div>
-              <div class="form-group">
+                <div ng-if="ctrl.pool.Quotas.length">
+                  <div class="col-sm-12 form-section-title">
+                    Resource reservation
+                  </div>
+                  <div class="form-group">
                 <span class="col-sm-12 text-muted small" >
                   <p>
                     Resource reservation represents the total amount of resource limits applied to all of the applications deployed inside this resource pool.
                   </p>
                 </span>
-              </div>
-              <div class="form-group">
-                <label for="memory-limit-usage" class="col-sm-3 col-lg-2 control-label text-left" >
-                  Memory reservation
-                </label>
-                <div class="col-sm-9" style="margin-top: 4px;">
-                  <uib-progressbar animate="false" value="ctrl.state.memoryUsage" type="{{ ctrl.usageLevelInfo(ctrl.state.memoryUsage) }}"><b>{{ ctrl.state.memoryUsed }} MB - {{ ctrl.state.memoryUsage }}%</b></uib-progressbar>
+                  </div>
+                  <div class="form-group">
+                    <label for="memory-limit-usage" class="col-sm-3 col-lg-2 control-label text-left" >
+                      Memory reservation
+                    </label>
+                    <div class="col-sm-9" style="margin-top: 4px;">
+                      <uib-progressbar animate="false" value="ctrl.state.memoryUsage" type="{{ ctrl.usageLevelInfo(ctrl.state.memoryUsage) }}"><b>{{ ctrl.state.memoryUsed }} MB - {{ ctrl.state.memoryUsage }}%</b></uib-progressbar>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="cpu-limit-usage" class="col-sm-3 col-lg-2 control-label text-left">
+                      CPU reservation
+                    </label>
+                    <div class="col-sm-9" style="margin-top: 4px;">
+                      <uib-progressbar animate="false" value="ctrl.state.cpuUsage" type="{{ ctrl.usageLevelInfo(ctrl.state.cpuUsage) }}"><b>{{ ctrl.state.cpuUsed }} - {{ ctrl.state.cpuUsage }}%</b></uib-progressbar>
+                    </div>
+                  </div>
                 </div>
               </div>
+              <!-- actions -->
+              <div class="col-sm-12 form-section-title">
+                Actions
+              </div>
               <div class="form-group">
-                <label for="cpu-limit-usage" class="col-sm-3 col-lg-2 control-label text-left">
-                  CPU reservation
-                </label>
-                <div class="col-sm-9" style="margin-top: 4px;">
-                  <uib-progressbar animate="false" value="ctrl.state.cpuUsage" type="{{ ctrl.usageLevelInfo(ctrl.state.cpuUsage) }}"><b>{{ ctrl.state.cpuUsed }} - {{ ctrl.state.cpuUsage }}%</b></uib-progressbar>
+                <div class="col-sm-12">
+                  <button type="button" class="btn btn-primary btn-sm"
+                          ng-disabled="!resourcePoolEditForm.$valid || ctrl.state.actionInProgress || (ctrl.formValues.hasQuota && !ctrl.isQuotaValid())"
+                          ng-click="ctrl.updateResourcePool()" button-spinner="ctrl.state.actionInProgress">
+                    <span ng-hide="ctrl.state.actionInProgress">Update resource pool</span>
+                    <span ng-show="ctrl.state.actionInProgress">Update in progress...</span>
+                  </button>
                 </div>
               </div>
-            </div>
-          </div>
-          <!-- actions -->
-          <div class="col-sm-12 form-section-title">
-            Actions
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm"
-                ng-disabled="!resourcePoolEditForm.$valid || ctrl.state.actionInProgress || (ctrl.formValues.hasQuota && !ctrl.isQuotaValid())"
-                ng-click="ctrl.updateResourcePool()" button-spinner="ctrl.state.actionInProgress">
-                <span ng-hide="ctrl.state.actionInProgress">Update resource pool</span>
-                <span ng-show="ctrl.state.actionInProgress">Update in progress...</span>
-              </button>
-            </div>
-          </div>
-          <!-- !actions -->
-        </form>
-      </rd-widget-body>
-    </rd-widget>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-sm-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-layer-group" title-text="Resource pool details"></rd-widget-header>
-      <rd-widget-body classes="no-padding">
-
-        <uib-tabset active="ctrl.state.activeTab" justified="true">
-          <uib-tab index="0" ng-if="ctrl.pool.Yaml" select="ctrl.showEditor()">
+              <!-- !actions -->
+            </form>
+          </uib-tab>
+          <uib-tab index="1" classes="btn-sm">
+            <uib-tab-heading>
+              <i class="fa fa-history space-right" aria-hidden="true"></i> Events
+            </uib-tab-heading>
+            <kubernetes-events-datatable
+                    title-text="Events" title-icon="fa-history"
+                    dataset="ctrl.events" table-key="kubernetes.resourcepool.events"
+                    order-by="Date"
+                    reverse-order="true"
+                    loading="ctrl.state.eventsLoading"
+                    refresh-callback="ctrl.getEvents"
+            ></kubernetes-events-datatable>
+          </uib-tab>
+          <uib-tab index="2" ng-if="ctrl.pool.Yaml" select="ctrl.showEditor()" classes="btn-sm">
             <uib-tab-heading>
               <i class="fa fa-code space-right" aria-hidden="true"></i> YAML
             </uib-tab-heading>
