@@ -137,9 +137,9 @@ class KubernetesEditResourcePoolController {
         this.formValues.hasQuota = true;
         _.forEach(pool.Quotas, (item) => {
           cpuLimit += item.CpuLimit;
-          cpuUsage += item.CpuLimitUsage;
+          cpuUsage += item.CpuLimitUsed;
           memoryLimit += megaBytesValue(item.MemoryLimit);
-          memoryUsage += megaBytesValue(item.MemoryLimitUsage);
+          memoryUsage += megaBytesValue(item.MemoryLimitUsed);
         });
         this.formValues.CpuLimit = cpuLimit;
         this.formValues.MemoryLimit = memoryLimit;
