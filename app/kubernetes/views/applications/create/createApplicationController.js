@@ -104,14 +104,14 @@ class KubernetesCreateApplicationController {
         this.state.resourcePoolHasQuota = true;
         if (quota.CpuLimit) {
           minCpu = this.KubernetesLimitRangeDefaults.CpuLimit;
-          maxCpu = quota.CpuLimit;
+          maxCpu = quota.CpuLimit - quota.CpuLimitUsed;
         } else {
           minCpu = 0 ;
           maxCpu = this.state.nodes.cpu;
         }
         if (quota.MemoryLimit) {
           minMemory = this.KubernetesLimitRangeDefaults.MemoryLimit;
-          maxMemory = quota.MemoryLimit;
+          maxMemory = quota.MemoryLimit - quota.MemoryLimitUsed;
         } else {
           minMemory = 0;
           maxMemory = this.state.nodes.memory;
