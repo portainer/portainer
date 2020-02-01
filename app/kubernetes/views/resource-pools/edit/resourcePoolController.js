@@ -111,7 +111,9 @@ class KubernetesEditResourcePoolController {
         sliderMaxMemory: 0,
         sliderMaxCpu: 0,
         cpuUsage: 0,
-        memoryUsage: 0
+        cpuUsed: 0,
+        memoryUsage: 0,
+        memoryUsed: 0
       };
 
       const name = this.$transition$.params().id;
@@ -137,13 +139,15 @@ class KubernetesEditResourcePoolController {
         this.formValues.MemoryLimit = megaBytesValue(quota.MemoryLimit);
 
         let usedCPU = quota.CpuLimitUsed;
+        this.state.cpuUsed = usedCPU;
         if (usedCPU !== 0) {
-          this.state.cpuUsage = usedCPU * 100 / quota.CpuLimit;
+          this.state.cpuUsage = Math.floor(usedCPU * 100 / quota.CpuLimit);
         }
 
         let usedMemory = quota.MemoryLimitUsed;
+        this.state.memoryUsed = megaBytesValue(usedMemory);
         if (usedMemory !== 0) {
-          this.state.memoryUsage = usedMemory * 100 / quota.MemoryLimit;
+          this.state.memoryUsage = Math.floor(usedMemory * 100 / quota.MemoryLimit);
         }
       }
     } catch (err) {

@@ -102,7 +102,7 @@
                   Memory reservation
                 </label>
                 <div class="col-sm-9" style="margin-top: 4px;">
-                  <uib-progressbar animate="false" value="ctrl.state.memoryUsage" type="{{ ctrl.usageLevelInfo(ctrl.state.memoryUsage) }}"><b>{{ ctrl.state.memoryUsage }}%</b></uib-progressbar>
+                  <uib-progressbar animate="false" value="ctrl.state.memoryUsage" type="{{ ctrl.usageLevelInfo(ctrl.state.memoryUsage) }}"><b>{{ ctrl.state.memoryUsed }} MB - {{ ctrl.state.memoryUsage }}%</b></uib-progressbar>
                 </div>
               </div>
               <div class="form-group">
@@ -110,7 +110,7 @@
                   CPU reservation
                 </label>
                 <div class="col-sm-9" style="margin-top: 4px;">
-                  <uib-progressbar animate="false" value="ctrl.state.cpuUsage" type="{{ ctrl.usageLevelInfo(ctrl.state.cpuUsage) }}"><b>{{ ctrl.state.cpuUsage }}%</b></uib-progressbar>
+                  <uib-progressbar animate="false" value="ctrl.state.cpuUsage" type="{{ ctrl.usageLevelInfo(ctrl.state.cpuUsage) }}"><b>{{ ctrl.state.cpuUsed }} - {{ ctrl.state.cpuUsage }}%</b></uib-progressbar>
                 </div>
               </div>
             </div>
