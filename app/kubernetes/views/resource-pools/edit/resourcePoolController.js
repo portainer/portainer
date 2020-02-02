@@ -108,15 +108,7 @@ class KubernetesEditResourcePoolController {
       this.state.eventsLoading = true;
       // TODO: review
       // Should this be relocated inside the KubernetesEventService as KubernetesEventService.resourcePoolEvents() ?
-      const events = await this.KubernetesEventService.events(this.pool.Namespace.Name);
-
-      // TODO: refactor
-      // quota related events should be part of this
-      // Due to the model supporting multiple quotas at the moment, this would complexify the logic to retrieve
-      // quota related events here. Should be added in here when the resource pool model support for a single quota
-      // has been implemented.
-      this.events = _.filter(events, (event) => event.Involved.uid === this.pool.Namespace.Id
-        || event.Involved.uid === this.pool.LimitRange.Id);
+      this.events = await this.KubernetesEventService.events(this.pool.Namespace.Name);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve resource pool related events');
     } finally {
