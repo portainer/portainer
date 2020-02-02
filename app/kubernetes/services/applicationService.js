@@ -3,11 +3,12 @@ import KubernetesDeploymentModelFromApplication from 'Kubernetes/models/deployme
 import {KubernetesApplicationDeploymentTypes, KubernetesApplicationViewModel} from 'Kubernetes/models/application';
 import KubernetesDaemonSetModelFromApplication from 'Kubernetes/models/daemonSet';
 import KubernetesServiceModelFromApplication from 'Kubernetes/models/service';
+import KubernetesPersistentVolumeClaimsFromApplication from 'Kubernetes/models/persistentVolumeClaim';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 
 angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
-  '$async', 'KubernetesDeploymentService', 'KubernetesDaemonSetService', 'KubernetesServiceService', 'KubernetesPods', 'KubernetesSecretService',
-  function KubernetesApplicationServiceFactory($async, KubernetesDeploymentService, KubernetesDaemonSetService, KubernetesServiceService, KubernetesPods, KubernetesSecretService) {
+  '$async', 'KubernetesDeploymentService', 'KubernetesDaemonSetService', 'KubernetesServiceService', 'KubernetesPods', 'KubernetesSecretService', 'KubernetesPersistentVolumeClaimService',
+  function KubernetesApplicationServiceFactory($async, KubernetesDeploymentService, KubernetesDaemonSetService, KubernetesServiceService, KubernetesPods, KubernetesSecretService, KubernetesPersistentVolumeClaimService) {
     "use strict";
     const service = {
       applications: applications,
@@ -92,6 +93,14 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
      */
     async function createAsync(applicationFormValues) {
       try {
+
+        const claims = new KubernetesPersistentVolumeClaimsFromApplication(applicationFormValues);
+        // TODO: review @LP
+        // Not sure if that forEach async form is ok here.
+        _.forEach(claims.Claims, async (claim) => {
+          await KubernetesPersistentVolumeClaimService.create(claim);
+        });
+
         if (applicationFormValues.DeploymentType === KubernetesApplicationDeploymentTypes.REPLICATED) {
           const deployment = new KubernetesDeploymentModelFromApplication(applicationFormValues);
 

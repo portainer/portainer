@@ -88,9 +88,11 @@ angular.module("portainer.kubernetes").factory("KubernetesDeploymentService", [
                     resources: {
                       limits: {},
                       requests: {}
-                    }
+                    },
+                    volumeMounts: deployment.VolumeMounts
                   }
-                ]
+                ],
+                volumes: deployment.Volumes
               }
             }
           }

@@ -1,5 +1,6 @@
 import _ from 'lodash-es';
 import KubernetesSecretModel from 'Kubernetes/models/secret';
+import {KubernetesApplicationVolumeName} from 'Kubernetes/models/application';
 
 function bytesValue(mem) {
   return mem * 1000 * 1000;
@@ -34,5 +35,25 @@ export default function KubernetesDaemonSetModelFromApplication(applicationFormV
     }
 
     this.Env.push(envVar);
+  });
+
+  this.VolumeMounts = [];
+  this.Volumes = [];
+  _.forEach(applicationFormValues.PersistedFolders, (item) => {
+    const volumeMount = {
+      mountPath: item.ContainerPath,
+      name: KubernetesApplicationVolumeName(applicationFormValues.Name, item.ContainerPath)
+    };
+
+    this.VolumeMounts.push(volumeMount);
+
+    const volume = {
+      name: KubernetesApplicationVolumeName(applicationFormValues.Name, item.ContainerPath),
+      persistentVolumeClaim: {
+        claimName: KubernetesApplicationVolumeName(applicationFormValues.Name, item.ContainerPath)
+      }
+    };
+
+    this.Volumes.push(volume);
   });
 }

@@ -90,9 +90,11 @@ angular.module("portainer.kubernetes").factory("KubernetesDaemonSetService", [
                     resources: {
                       limits: {},
                       requests: {}
-                    }
+                    },
+                    volumeMounts: daemonSet.VolumeMounts
                   }
-                ]
+                ],
+                volumes: daemonSet.Volumes
               }
             }
           }

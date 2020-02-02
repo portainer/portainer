@@ -102,6 +102,12 @@ export function KubernetesApplicationPublishedPortFormValue() {
   return publishedPort;
 }
 
+// TODO: review LP
+// Not sure if this should be located here. It is a convenience function to generate application volume names.
+export function KubernetesApplicationVolumeName(applicationName, volumePath) {
+  return applicationName + volumePath.replace(/[^a-z0-9\-]/gi, '-').toLowerCase();
+}
+
 export const KubernetesApplicationDeploymentTypes = Object.freeze({
   'REPLICATED': 1,
   'GLOBAL': 2
