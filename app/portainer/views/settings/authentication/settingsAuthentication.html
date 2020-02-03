@@ -137,7 +137,7 @@
                 <i class="fa fa-times red-icon" style="margin-left: 5px;" ng-if="state.failedConnectivityCheck"></i>
               </label>
               <div class="col-sm-9 col-lg-10">
-                <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.connectivityCheckInProgress || !formValues.LDAPSettings.URL || (!formValues.LDAPSettings.ReaderDN || !formValues.LDAPSettings.Password) && !formValues.LDAPSettings.AnonymousMode" ng-click="LDAPConnectivityCheck()" button-spinner="state.connectivityCheckInProgress">
+                <button type="button" class="btn btn-primary btn-sm" ng-disabled="(state.connectivityCheckInProgress) || (!formValues.LDAPSettings.URL) || ((!formValues.LDAPSettings.ReaderDN || !formValues.LDAPSettings.Password) && !formValues.LDAPSettings.AnonymousMode)" ng-click="LDAPConnectivityCheck()" button-spinner="state.connectivityCheckInProgress">
                   <span ng-hide="state.connectivityCheckInProgress">Test connectivity</span>
                   <span ng-show="state.connectivityCheckInProgress">Testing connectivity...</span>
                 </button>
@@ -216,7 +216,7 @@
                 <i class="fa fa-times red-icon" style="margin-left: 5px;" ng-if="state.failedConnectivityCheck"></i>
               </label>
               <div class="col-sm-9 col-lg-10">
-                <button type="button" class="btn btn-primary btn-sm" ng-click="LDAPConnectivityCheck()" ng-disabled="!formValues.LDAPSettings.URL || (!formValues.TLSCACert && !formValues.LDAPSettings.TLSConfig.TLSSkipVerify) || (!formValues.LDAPSettings.ReaderDN || !formValues.LDAPSettings.Password) && !formValues.LDAPSettings.AnonymousMode">Test connectivity</button>
+                <button type="button" class="btn btn-primary btn-sm" ng-click="LDAPConnectivityCheck()" ng-disabled="(!formValues.LDAPSettings.URL) || (!formValues.TLSCACert && !formValues.LDAPSettings.TLSConfig.TLSSkipVerify) || ((!formValues.LDAPSettings.ReaderDN || !formValues.LDAPSettings.Password) && !formValues.LDAPSettings.AnonymousMode)">Test connectivity</button>
                 <i id="connectivityCheckSpinner" class="fa fa-cog fa-spin" style="margin-left: 5px; display: none;"></i>
               </div>
             </div>

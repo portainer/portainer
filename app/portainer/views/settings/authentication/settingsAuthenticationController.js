@@ -12,7 +12,31 @@ function($q, $scope, $state, Notifications, SettingsService, FileUploadService, 
 
   $scope.formValues = {
     TLSCACert: '',
-    LDAPSettings: ''
+    LDAPSettings: {
+      AnonymousMode: true,
+      ReaderDN: '',
+      URL: '',
+      TLSConfig: {
+        TLS: false,
+        TLSSkipVerify: false
+      },
+      StartTLS: false,
+      SearchSettings: [
+        {
+          BaseDN: '',
+          Filter: '',
+          UserNameAttribute: ''  
+        }
+      ],
+      GroupSearchSettings: [
+         {
+            GroupBaseDN: '',
+            GroupFilter: '',
+            GroupAttribute: ''
+         }
+      ],
+      AutoCreateUsers: true
+    }
   };
 
   $scope.goToOAuthExtensionView = function() {
