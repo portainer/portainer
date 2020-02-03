@@ -54,6 +54,7 @@ export function KubernetesApplicationViewModel(type, data, service) {
   } else {
     this.PublishedPorts = [];
   }
+  this.Volumes = data.spec.template.spec.volumes ? data.spec.template.spec.volumes : [];
 }
 
 export function KubernetesApplicationFormValues() {

@@ -8,5 +8,6 @@ angular.module('portainer.kubernetes')
       },
       {
         create: { method: 'POST', params: { namespace: '@metadata.namespace' } },
+        delete: { method: 'DELETE' }
       });
   }]);

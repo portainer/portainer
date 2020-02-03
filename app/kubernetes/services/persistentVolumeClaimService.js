@@ -6,19 +6,8 @@ angular.module("portainer.kubernetes").factory("KubernetesPersistentVolumeClaimS
     "use strict";
     const service = {
       create: create,
+      remove: remove
     };
-
-    // apiVersion: v1
-// kind: PersistentVolumeClaim
-// metadata:
-//   name: csi-pvc
-// spec:
-//   accessModes:
-//     - ReadWriteOnce
-// resources:
-//   requests:
-//     storage: 5Gi
-// storageClassName: do-block-storage
 
     /**
      * Creation
@@ -53,6 +42,29 @@ angular.module("portainer.kubernetes").factory("KubernetesPersistentVolumeClaimS
 
     function create(persistentVolumeClaim) {
       return $async(createAsync, persistentVolumeClaim);
+    }
+
+    /**
+     * Delete
+     */
+    async function removeAsync(name, namespace) {
+      try {
+        // TODO: review with LP
+        // This is a very strange pattern since only POST requests have a payload
+        // I understand this is used to pass the correct parameters to the REST service but it can be confusing
+        // Should be taken into account during REST service uniformization
+        const payload = {
+          namespace: namespace,
+          id: name
+        };
+        await KubernetesPersistentVolumeClaims.delete(payload).$promise;
+      } catch (err) {
+        throw { msg: 'Unable to delete persistent volume claim', err: err };
+      }
+    }
+
+    function remove(name, namespace) {
+      return $async(removeAsync, name, namespace);
     }
 
     return service;

@@ -156,6 +156,11 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
         if (application.ServiceType) {
           await KubernetesServiceService.remove(payload);
         }
+        // TODO: review LP
+        // Same as above
+        _.forEach(application.Volumes, async (claim) => {
+          await KubernetesPersistentVolumeClaimService.remove(claim.persistentVolumeClaim.claimName, application.ResourcePool);
+        });
       } catch (err) {
         throw err;
       }

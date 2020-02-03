@@ -18,6 +18,6 @@ angular.module('portainer.kubernetes')
           transformResponse: rawResponse
         },
         create: { method: 'POST', params: { namespace: '@metadata.namespace' } },
-        delete: { method: 'DELETE'}
+        delete: { method: 'DELETE' }
       });
   }]);
