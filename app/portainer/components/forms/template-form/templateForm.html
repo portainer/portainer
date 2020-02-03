@@ -229,6 +229,37 @@
         </div>
       </div>
       <!-- !hostname -->
+      <div class="form-group">
+        <label for="template_memorylimit" class="col-sm-3 col-lg-2 control-label text-left">
+          Memory Limit (mb)
+          <portainer-tooltip position="bottom" message="Set the amount of memory to allocate to the container. Will use Docker default if not specified or set to 0."></portainer-tooltip>
+        </label>
+        <div class="col-sm-9 col-lg-10">
+          <input type="number" class="form-control" name="template_memorylimit" ng-model="$ctrl.model.MemoryLimit" placeholder="Leave blank or 0 for default value">
+        </div>
+      </div>
+      <!-- !MemoryLimit -->
+      <!-- MemoryReservation -->
+      <div class="form-group">
+        <label for="template_memoryreservation" class="col-sm-3 col-lg-2 control-label text-left">
+          Memory Reservation (mb)
+          <portainer-tooltip position="bottom" message="Set amount of memory to reserve for this container. Will use Docker default if not specified or set to 0."></portainer-tooltip>
+        </label>
+        <div class="col-sm-9 col-lg-10">
+          <input type="number" class="form-control" name="template_memoryreservation" ng-model="$ctrl.model.MemoryReservation" placeholder="Leave blank or 0 for default value">
+        </div>
+      </div>
+      <!-- !MemoryReservation -->
+      <!-- CpuLimit -->
+      <div class="form-group">
+        <label for="template_cpulimit" class="col-sm-3 col-lg-2 control-label text-left">
+          CPU Limit
+          <portainer-tooltip position="bottom" message="Set the share of the CPUs (in 1/1000000000 of a CPU share) to allocate to this container. Will use Docker default if not specified or set to 0."></portainer-tooltip>
+        </label>
+        <div class="col-sm-9 col-lg-10">
+          <input type="number" class="form-control" name="template_cpulimit" ng-model="$ctrl.model.CpuLimit" placeholder="Leave blank or 0 for default value">
+        </div>
+      </div>
       <!-- network -->
       <div class="form-group">
         <label for="template_network" class="col-sm-3 col-lg-2 control-label text-left">

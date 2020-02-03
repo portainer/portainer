@@ -31,6 +31,10 @@ type templateUpdatePayload struct {
 	Interactive       *bool
 	RestartPolicy     *string
 	Hostname          *string
+	MemoryLimit   	  *int
+	MemoryReservation *int
+	CpuLimit      	  *int
+	ImageTags     	  []string
 }
 
 func (payload *templateUpdatePayload) Validate(r *http.Request) error {
@@ -111,6 +115,23 @@ func updateContainerProperties(template *portainer.Template, payload *templateUp
 	if payload.Hostname != nil {
 		template.Hostname = *payload.Hostname
 	}
+
+	if payload.MemoryLimit != nil {
+		template.MemoryLimit = *payload.MemoryLimit
+	}
+
+	if payload.MemoryReservation != nil {
+		template.MemoryReservation = *payload.MemoryReservation
+	}
+
+	if payload.CpuLimit != nil {
+		template.CpuLimit = *payload.CpuLimit
+	}
+
+	if payload.ImageTags != nil {
+		template.ImageTags = payload.ImageTags
+	}
+
 }
 
 func updateStackProperties(template *portainer.Template, payload *templateUpdatePayload) {

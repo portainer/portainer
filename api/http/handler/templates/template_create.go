@@ -33,16 +33,20 @@ type templateCreatePayload struct {
 	Repository portainer.TemplateRepository
 
 	// Opt container
-	Registry      string
-	Command       string
-	Network       string
-	Volumes       []portainer.TemplateVolume
-	Ports         []string
-	Labels        []portainer.Pair
-	Privileged    bool
-	Interactive   bool
-	RestartPolicy string
-	Hostname      string
+	Registry      		string
+	Command       		string
+	Network       		string
+	Volumes       		[]portainer.TemplateVolume
+	Ports         		[]string
+	Labels        		[]portainer.Pair
+	Privileged    		bool
+	Interactive   		bool
+	RestartPolicy 		string
+	Hostname      		string
+	MemoryLimit   		int
+	MemoryReservation 	int
+	CpuLimit      		int
+	ImageTags     		[]string
 }
 
 func (payload *templateCreatePayload) Validate(r *http.Request) error {
@@ -107,6 +111,10 @@ func (handler *Handler) templateCreate(w http.ResponseWriter, r *http.Request) *
 		template.Interactive = payload.Interactive
 		template.RestartPolicy = payload.RestartPolicy
 		template.Hostname = payload.Hostname
+		template.MemoryLimit = payload.MemoryLimit
+		template.MemoryReservation 	= payload.MemoryReservation
+		template.CpuLimit = payload.CpuLimit
+		template.ImageTags = payload.ImageTags
 	}
 
 	if template.Type == portainer.SwarmStackTemplate || template.Type == portainer.ComposeStackTemplate {

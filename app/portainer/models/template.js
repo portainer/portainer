@@ -12,6 +12,12 @@ export function TemplateDefaultModel() {
   this.Labels = [];
   this.RestartPolicy = 'always';
   this.RegistryModel = new PorImageRegistryModel();
+  this.Registry = {};
+  this.MemoryReservation = 0;
+  this.MemoryLimit = 0;
+  this.CpuLimit = 0;
+  this.ImageTags = [];
+
 }
 
 export function TemplateCreateRequest(model) {
@@ -35,6 +41,11 @@ export function TemplateCreateRequest(model) {
   this.Repository = model.Repository;
   this.Env = model.Env;
   this.AdministratorOnly = model.AdministratorOnly;
+
+  this.MemoryReservation = model.MemoryReservation;
+  this.MemoryLimit = model.MemoryLimit;
+  this.CpuLimit = model.CpuLimit;
+  this.ImageTags = model.ImageTags;
 
   this.Ports = [];
   for (var i = 0; i < model.Ports.length; i++) {
@@ -79,7 +90,12 @@ export function TemplateViewModel(data) {
   this.Env = templateEnv(data);
   this.Volumes = templateVolumes(data);
   this.Ports = templatePorts(data);
-}
+
+  this.MemoryReservation = data.memory_reservation > 0 ? data.memory_reservation : 0;
+  this.MemoryLimit = data.memory_limit > 0 ? data.memory_limit : 0;
+  this.CpuLimit = data.cpu_limit > 0 ? data.cpu_limit : 0;
+  this.ImageTags = data.image_tags ? data.image_tags : [];
+  }
 
 function templatePorts(data) {
   var ports = [];

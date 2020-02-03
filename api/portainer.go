@@ -520,17 +520,21 @@ type (
 		Categories []string      `json:"categories,omitempty"`
 
 		// Optional container fields
-		Registry      string           `json:"registry,omitempty"`
-		Command       string           `json:"command,omitempty"`
-		Network       string           `json:"network,omitempty"`
-		Volumes       []TemplateVolume `json:"volumes,omitempty"`
-		Ports         []string         `json:"ports,omitempty"`
-		Labels        []Pair           `json:"labels,omitempty"`
-		Privileged    bool             `json:"privileged,omitempty"`
-		Interactive   bool             `json:"interactive,omitempty"`
-		RestartPolicy string           `json:"restart_policy,omitempty"`
-		Hostname      string           `json:"hostname,omitempty"`
-	}
+		Registry      		string           `json:"registry,omitempty"`
+		Command       		string           `json:"command,omitempty"`
+		Network       		string           `json:"network,omitempty"`
+		Volumes       		[]TemplateVolume `json:"volumes,omitempty"`
+		Ports         		[]string         `json:"ports,omitempty"`
+		Labels        		[]Pair           `json:"labels,omitempty"`
+		Privileged    		bool             `json:"privileged,omitempty"`
+		Interactive   		bool             `json:"interactive,omitempty"`
+		RestartPolicy 		string           `json:"restart_policy,omitempty"`
+		Hostname      		string           `json:"hostname,omitempty"`
+		MemoryLimit   		int           	 `json:"memory_limit,omitempty"`
+		MemoryReservation 	int			 	 `json:"memory_reservation,omitempty"`
+		CpuLimit      		int           	 `json:"cpu_limit,omitempty"`
+		ImageTags     		[]string         `json:"image_tags,omitempty"`
+		}
 
 	// TemplateEnv represents a template environment variable configuration
 	TemplateEnv struct {

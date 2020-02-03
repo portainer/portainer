@@ -324,6 +324,32 @@
               </div>
             </div>
             <!-- !hostname -->
+            <div class="form-group">
+                <div class="col-sm-12" style="margin-top: 5px;">
+                    <label class="control-label text-left">Resources</label>
+                </div>
+              <div class="col-sm-12" style="margin-top: 5px;">
+              <label for="container_memorylimit" class="col-sm-2 control-label text-left">Memory Limit (mb)</label>
+              <div class="col-sm-10">
+                <input type="number" name="container_memorylimit" class="form-control" ng-model="state.selectedTemplate.MemoryLimit" placeholder="leave empty to use docker default">
+              </div>
+            </div>
+              <div class="col-sm-12" style="margin-top: 5px;">
+              <label for="container_memoryreservation" class="col-sm-2 control-label text-left">Memory Reservation (mb)</label>
+              <div class="col-sm-10">
+                <input type="number" name="container_memoryreservation" class="form-control" ng-model="state.selectedTemplate.MemoryReservation" placeholder="leave empty to use docker default">
+              </div>
+            </div>
+            <div class="col-sm-12" style="margin-top: 5px;">
+            <label for="container_cpulimit" class="col-sm-2 control-label text-left">CPU Limit</label>
+              <div class="col-sm-10">
+                <input type="number" name="container_cpulimit" class="form-control" ng-model="state.selectedTemplate.CpuLimit" placeholder="leave empty to use docker default">
+              </div>
+            </div>
+          </div>
+
+
+
           </div>
           <!-- !advanced-options -->
           <!-- actions -->
