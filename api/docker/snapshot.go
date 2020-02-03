@@ -3,6 +3,7 @@ package docker
 import (
 	"context"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/docker/docker/api/types"
@@ -136,10 +137,9 @@ func snapshotContainers(snapshot *portainer.Snapshot, cli *client.Client) error 
 			runningContainers++
 		}
 
-		statusLen := len(container.Status)
-		if statusLen >= 9 && container.Status[statusLen - 9:] == "(healthy)" {
+		if strings.Contains(container.Status, "(healthy)") {
 			healthyContainers++
-		} else if statusLen >= 11 && container.Status[statusLen - 11:] == "(unhealthy)" {
+		} else if strings.Contains(container.Status, "(unhealthy)") {
 			unhealthyContainers++
 		}
 
