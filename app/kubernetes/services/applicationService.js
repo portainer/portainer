@@ -153,7 +153,7 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
         } else {
           await KubernetesDaemonSetService.remove(payload);
         }
-        if (application.ServiceType && application.ServiceType === 'LoadBalancer') {
+        if (application.ServiceType) {
           await KubernetesServiceService.remove(payload);
         }
       } catch (err) {
