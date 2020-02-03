@@ -532,7 +532,7 @@ type (
 		Hostname      		string           `json:"hostname,omitempty"`
 		MemoryLimit   		int           	 `json:"memory_limit,omitempty"`
 		MemoryReservation 	int			 	 `json:"memory_reservation,omitempty"`
-		CpuLimit      		int           	 `json:"cpu_limit,omitempty"`
+		CPULimit      		int           	 `json:"cpu_limit,omitempty"`
 		ImageTags     		[]string         `json:"image_tags,omitempty"`
 		}
 

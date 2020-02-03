@@ -45,7 +45,7 @@ type templateCreatePayload struct {
 	Hostname      		string
 	MemoryLimit   		int
 	MemoryReservation 	int
-	CpuLimit      		int
+	CPULimit      		int
 	ImageTags     		[]string
 }
 
@@ -113,7 +113,7 @@ func (handler *Handler) templateCreate(w http.ResponseWriter, r *http.Request) *
 		template.Hostname = payload.Hostname
 		template.MemoryLimit = payload.MemoryLimit
 		template.MemoryReservation 	= payload.MemoryReservation
-		template.CpuLimit = payload.CpuLimit
+		template.CPULimit = payload.CPULimit
 		template.ImageTags = payload.ImageTags
 	}
 

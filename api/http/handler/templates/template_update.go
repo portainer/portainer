@@ -33,7 +33,7 @@ type templateUpdatePayload struct {
 	Hostname          *string
 	MemoryLimit   	  *int
 	MemoryReservation *int
-	CpuLimit      	  *int
+	CPULimit      	  *int
 	ImageTags     	  []string
 }
 
@@ -124,8 +124,8 @@ func updateContainerProperties(template *portainer.Template, payload *templateUp
 		template.MemoryReservation = *payload.MemoryReservation
 	}
 
-	if payload.CpuLimit != nil {
-		template.CpuLimit = *payload.CpuLimit
+	if payload.CPULimit != nil {
+		template.CPULimit = *payload.CPULimit
 	}
 
 	if payload.ImageTags != nil {
