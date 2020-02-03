@@ -33,20 +33,20 @@ type templateCreatePayload struct {
 	Repository portainer.TemplateRepository
 
 	// Opt container
-	Registry      		string
-	Command       		string
-	Network       		string
-	Volumes       		[]portainer.TemplateVolume
-	Ports         		[]string
-	Labels        		[]portainer.Pair
-	Privileged    		bool
-	Interactive   		bool
-	RestartPolicy 		string
-	Hostname      		string
-	MemoryLimit   		int
-	MemoryReservation 	int
-	CPULimit      		int
-	ImageTags     		[]string
+	Registry          string
+	Command           string
+	Network           string
+	Volumes           []portainer.TemplateVolume
+	Ports             []string
+	Labels            []portainer.Pair
+	Privileged        bool
+	Interactive       bool
+	RestartPolicy     string
+	Hostname          string
+	MemoryLimit       int
+	MemoryReservation int
+	CPULimit          int
+	ImageTags         []string
 }
 
 func (payload *templateCreatePayload) Validate(r *http.Request) error {
@@ -112,7 +112,7 @@ func (handler *Handler) templateCreate(w http.ResponseWriter, r *http.Request) *
 		template.RestartPolicy = payload.RestartPolicy
 		template.Hostname = payload.Hostname
 		template.MemoryLimit = payload.MemoryLimit
-		template.MemoryReservation 	= payload.MemoryReservation
+		template.MemoryReservation = payload.MemoryReservation
 		template.CPULimit = payload.CPULimit
 		template.ImageTags = payload.ImageTags
 	}

@@ -31,10 +31,10 @@ type templateUpdatePayload struct {
 	Interactive       *bool
 	RestartPolicy     *string
 	Hostname          *string
-	MemoryLimit   	  *int
+	MemoryLimit       *int
 	MemoryReservation *int
-	CPULimit      	  *int
-	ImageTags     	  []string
+	CPULimit          *int
+	ImageTags         []string
 }
 
 func (payload *templateUpdatePayload) Validate(r *http.Request) error {
