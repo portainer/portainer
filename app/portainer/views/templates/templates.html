@@ -239,7 +239,7 @@
                               id="container_volumes" class="form-control"
                               placeholder="Select a volume"
                               typeahead-min-length="0"
-                              uib-typeahead="vol as vol.Name for vol in availableVolumes | filter:$viewValue"
+                              uib-typeahead="vol.Name as vol.Name for vol in availableVolumes | filter:$viewValue"
                       />
                     </div>
                     <!-- !volume -->
