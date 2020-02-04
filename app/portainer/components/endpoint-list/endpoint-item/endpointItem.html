@@ -51,8 +51,11 @@
               <i class="fa fa-server space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].RunningContainerCount + $ctrl.model.Snapshots[0].StoppedContainerCount }} {{ $ctrl.model.Snapshots[0].RunningContainerCount + $ctrl.model.Snapshots[0].StoppedContainerCount === 1 ? 'container' : 'containers' }}
               <span ng-if="$ctrl.model.Snapshots[0].RunningContainerCount > 0 || $ctrl.model.Snapshots[0].StoppedContainerCount > 0">
                 -
-                <i class="fa fa-heartbeat green-icon" aria-hidden="true"></i> {{ $ctrl.model.Snapshots[0].RunningContainerCount }}
-                <i class="fa fa-heartbeat red-icon" aria-hidden="true"></i> {{ $ctrl.model.Snapshots[0].StoppedContainerCount }}
+                <i class="fa fa-power-off green-icon" aria-hidden="true"></i> {{ $ctrl.model.Snapshots[0].RunningContainerCount }}
+                <i class="fa fa-power-off red-icon" aria-hidden="true"></i> {{ $ctrl.model.Snapshots[0].StoppedContainerCount }}
+                /
+                <i class="fa fa-heartbeat green-icon" aria-hidden="true"></i> {{ $ctrl.model.Snapshots[0].HealthyContainerCount }}
+                <i class="fa fa-heartbeat orange-icon" aria-hidden="true"></i> {{ $ctrl.model.Snapshots[0].UnhealthyContainerCount }}
               </span>
             </span>
             <span style="padding: 0 7px 0 7px;">
