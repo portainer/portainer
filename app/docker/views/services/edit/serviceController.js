@@ -18,10 +18,11 @@ require('./includes/tasks.html')
 require('./includes/updateconfig.html')
 
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
+import _ from 'lodash-es';
 
 angular.module('portainer.docker')
-.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'ContainerService', 'TaskHelper', 'Notifications', 'ModalService', 'PluginService', 'Authentication', 'SettingsService', 'VolumeService', 'ImageHelper', 'WebhookService', 'EndpointProvider', 'clipboard','WebhookHelper',
-function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, ContainerService, TaskHelper, Notifications, ModalService, PluginService, Authentication, SettingsService, VolumeService, ImageHelper, WebhookService, EndpointProvider, clipboard, WebhookHelper) {
+.controller('ServiceController', ['$q', '$scope', '$transition$', '$state', '$location', '$timeout', '$anchorScroll', 'ServiceService', 'ConfigService', 'ConfigHelper', 'SecretService', 'ImageService', 'SecretHelper', 'Service', 'ServiceHelper', 'LabelHelper', 'TaskService', 'NodeService', 'NetworkService', 'ContainerService', 'TaskHelper', 'Notifications', 'ModalService', 'PluginService', 'Authentication', 'SettingsService', 'VolumeService', 'ImageHelper', 'WebhookService', 'EndpointProvider', 'clipboard','WebhookHelper',
+function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, ServiceService, ConfigService, ConfigHelper, SecretService, ImageService, SecretHelper, Service, ServiceHelper, LabelHelper, TaskService, NodeService, NetworkService, ContainerService, TaskHelper, Notifications, ModalService, PluginService, Authentication, SettingsService, VolumeService, ImageHelper, WebhookService, EndpointProvider, clipboard, WebhookHelper) {
 
   $scope.state = {
     updateInProgress: false,
@@ -167,7 +168,19 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
   $scope.updatePlacementPreference = function(service) {
     updateServiceArray(service, 'ServicePreferences', service.ServicePreferences);
   };
-
+  $scope.addNetwork = function addNetwork(service, network) {
+    if (network && !_.find(service.ServiceNetworks, {'NetworkID': network.Id})) {
+      service.ServiceNetworks.push({NetworkID: network.Id})
+      updateServiceArray(service, 'ServiceNetworks', service.ServiceNetworks);
+      ServiceHelper.mapNetworkNameToServiceNetwork(service, $scope.networks);
+    }
+  };
+  $scope.removeNetwork = function removeNetwork(service, index) {
+    var removedElement = service.ServiceNetworks.splice(index, 1);
+    if (removedElement !== null) {
+      updateServiceArray(service, 'ServiceNetworks', service.ServiceNetworks);
+    }
+  };
   $scope.addPublishedPort = function addPublishedPort(service) {
     if (!service.Ports) {
       service.Ports = [];
@@ -297,7 +310,9 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     } else {
       config.TaskTemplate.ContainerSpec.Image = service.Image;
     }
-
+    if ($scope.hasChanges(service, ["ServiceNetworks"])) {
+    config.TaskTemplate.Networks = _.map(service.ServiceNetworks, ({NetworkID}) => ({ Target: NetworkID}));
+    }
     config.TaskTemplate.ContainerSpec.Secrets = service.ServiceSecrets ? service.ServiceSecrets.map(SecretHelper.secretConfig) : [];
     config.TaskTemplate.ContainerSpec.Configs = service.ServiceConfigs ? service.ServiceConfigs.map(ConfigHelper.configConfig) : [];
     config.TaskTemplate.ContainerSpec.Hosts = service.Hosts ? ServiceHelper.translateHostnameIPToHostsEntries(service.Hosts) : [];
@@ -508,6 +523,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     service.ServiceMounts = angular.copy(service.Mounts);
     service.ServiceConstraints = ServiceHelper.translateConstraintsToKeyValue(service.Constraints);
     service.ServicePreferences = ServiceHelper.translatePreferencesToKeyValue(service.Preferences);
+    service.ServiceNetworks = service.VirtualIPs ? angular.copy(service.VirtualIPs) : [];
     service.Hosts = ServiceHelper.translateHostsEntriesToHostnameIP(service.Hosts);
   }
 
@@ -549,6 +565,8 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
         tasks: TaskService.tasks({ service: [service.Name] }),
         containers: agentProxy ? ContainerService.containers() : [],
         nodes: NodeService.nodes(),
+        networks: NetworkService.networks(true, true, true),
+        availableNetworks: NetworkService.networks(true, true, true),
         secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
         configs: apiVersion >= 1.30 ? ConfigService.configs() : [],
         availableImages: ImageService.images(),
@@ -566,7 +584,8 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       $scope.availableVolumes = data.volumes;
       $scope.allowBindMounts = data.settings.AllowBindMountsForRegularUsers;
       $scope.isAdmin = Authentication.isAdmin();
-
+      $scope.networks = data.networks;
+      $scope.availableNetworks = data.availableNetworks;
       if (data.webhooks.length > 0) {
         var webhook = data.webhooks[0];
         $scope.WebhookExists = true;
@@ -588,7 +607,8 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
 
       $scope.tasks = data.tasks;
 
-
+      ServiceHelper.mapNetworkNameToServiceNetwork(service, data.networks);
+      
       // Set max cpu value
       var maxCpus = 0;
       for (var n in data.nodes) {

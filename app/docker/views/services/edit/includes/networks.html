@@ -1,26 +1,52 @@
 <div id="service-network-specs">
   <rd-widget>
     <rd-widget-header icon="fa-tasks" title-text="Networks"></rd-widget-header>
-    <rd-widget-body ng-if="!service.VirtualIPs || service.VirtualIPs.length === 0">
-      <p>This service is not connected to any networks.</p>
-    </rd-widget-body>
-    <rd-widget-body ng-if="service.VirtualIPs && service.VirtualIPs.length > 0" classes="no-padding">
-      <table class="table" >
+      <div class="form-inline" style="padding: 10px;" authorization="DockerServiceUpdate">
+        Add a network:
+        <select class="form-control" ng-options="network.Name for network in availableNetworks | orderBy: 'Id'" ng-model="newNetwork">
+          <option selected disabled hidden value="">Select a network</option>
+        </select>
+        <a class="btn btn-default btn-sm" ng-click="addNetwork(service, newNetwork)">
+          <i class="fa fa-plus-circle" aria-hidden="true"></i> add network
+        </a>
+      </div>
+      <p style="padding: 10px;" ng-if="!service.ServiceNetworks || service.ServiceNetworks.length === 0">This service is not connected to any networks.</p>
+      <table class="table" style="margin-top: 5px;" ng-if="service.ServiceNetworks && service.ServiceNetworks.length > 0">
         <thead>
           <tr>
-            <th>ID</th>
+            <th>Network</th>
             <th>IP address</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr ng-repeat="network in service.VirtualIPs">
+          <tr ng-repeat="network in service.ServiceNetworks">
             <td>
-              <a ui-sref="docker.networks.network({id: network.NetworkID})">{{ network.NetworkID }}</a>
+              <a ui-sref="docker.networks.network({id: network.NetworkID})">{{ network.Name }}</a>
             </td>
             <td>{{ network.Addr }}</td>
+            <td authorization="DockerServiceUpdate">
+              <button type="button" class="btn btn-xs btn-danger" ng-click="removeNetwork(service, $index)" ng-disabled="isUpdating">
+                <i class="fa fa-trash" aria-hidden="true"></i> Remove network
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
     </rd-widget-body>
+    <rd-widget-footer>
+      <div class="btn-toolbar" role="toolbar">
+        <div class="btn-group" role="group">
+          <button type="submit" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['ServiceNetworks'])"  ng-click="updateService(service)">Apply changes</button>
+          <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a ng-click="cancelChanges(service, ['ServiceNetworks'])"">Reset changes</a></li>
+            <li><a ng-click="cancelChanges(service)">Reset all changes</a></li>
+          </ul>
+        </div>
+      </div>
+    </rd-widget-footer>
   </rd-widget>
 </div>
