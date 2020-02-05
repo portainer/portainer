@@ -95,8 +95,7 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
       try {
 
         const claims = new KubernetesPersistentVolumeClaimsFromApplication(applicationFormValues);
-        // TODO: review @LP
-        // Not sure if that forEach async form is ok here.
+        // TODO: refactor that for parallelization
         _.forEach(claims.Claims, async (claim) => {
           await KubernetesPersistentVolumeClaimService.create(claim);
         });
@@ -156,8 +155,7 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
         if (application.ServiceType) {
           await KubernetesServiceService.remove(payload);
         }
-        // TODO: review LP
-        // Same as above
+        // TODO: refactor that for parallelization
         _.forEach(application.Volumes, async (claim) => {
           await KubernetesPersistentVolumeClaimService.remove(claim.persistentVolumeClaim.claimName, application.ResourcePool);
         });

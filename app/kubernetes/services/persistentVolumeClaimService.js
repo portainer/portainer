@@ -33,7 +33,11 @@ angular.module("portainer.kubernetes").factory("KubernetesPersistentVolumeClaimS
           }
         };
 
-        const data = await KubernetesPersistentVolumeClaims.create(payload).$promise;
+        const params = {
+          id: claim.Name,
+        };
+
+        const data = await KubernetesPersistentVolumeClaims(namespace).create(params, payload).$promise;
         return data;
       } catch (err) {
         throw { msg: 'Unable to create persistent volume claim', err: err };
@@ -49,15 +53,16 @@ angular.module("portainer.kubernetes").factory("KubernetesPersistentVolumeClaimS
      */
     async function removeAsync(name, namespace) {
       try {
-        // TODO: review with LP
+        // TODO: refactor
         // This is a very strange pattern since only POST requests have a payload
         // I understand this is used to pass the correct parameters to the REST service but it can be confusing
-        // Should be taken into account during REST service uniformization
-        const payload = {
+        // Should be taken into account during REST service uniformization/refactor
+        // Split into params and payload objects
+        const params = {
           namespace: namespace,
           id: name
         };
-        await KubernetesPersistentVolumeClaims.delete(payload).$promise;
+        await KubernetesPersistentVolumeClaims.delete(params).$promise;
       } catch (err) {
         throw { msg: 'Unable to delete persistent volume claim', err: err };
       }

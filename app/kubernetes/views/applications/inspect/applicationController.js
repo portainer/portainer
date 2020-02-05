@@ -22,8 +22,6 @@ class KubernetesApplicationController {
   async getEventsAsync() {
     try {
       this.state.eventsLoading = true;
-      // TODO: review
-      // Should this be relocated inside the KubernetesEventService as KubernetesEventService.applicationEvents() ?
       const events = await this.KubernetesEventService.events(this.application.ResourcePool);
       this.events = _.filter(events, (event) => event.Involved.uid === this.application.Id
         || event.Involved.uid === this.application.ServiceId

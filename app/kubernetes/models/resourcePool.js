@@ -6,8 +6,7 @@
  */
 export default function KubernetesResourcePoolViewModel(namespace) {
   this.Namespace = namespace;
-  // TODO: review
-  // @alapenna: In my opinion we should only support a single quota (see Portainer naming convention, portainer-rq-<namespace>)
+  // TODO: refactor to use a single quota object instead of an array
   this.Quotas = [];
   this.LimitRange = {};
 }

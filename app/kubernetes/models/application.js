@@ -103,8 +103,8 @@ export function KubernetesApplicationPublishedPortFormValue() {
   return publishedPort;
 }
 
-// TODO: review LP
-// Not sure if this should be located here. It is a convenience function to generate application volume names.
+// TODO: It is a convenience function to generate application volume names.
+// Relocate inside a helper.
 export function KubernetesApplicationVolumeName(applicationName, volumePath) {
   return applicationName + volumePath.replace(/[^a-z0-9\-]/gi, '-').toLowerCase();
 }

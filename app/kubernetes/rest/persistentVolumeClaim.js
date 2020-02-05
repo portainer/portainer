@@ -7,7 +7,7 @@ angular.module('portainer.kubernetes')
         endpointId: EndpointProvider.endpointID
       },
       {
-        create: { method: 'POST', params: { namespace: '@metadata.namespace' } },
+        create: { method: 'POST' },
         delete: { method: 'DELETE' }
       });
   }]);

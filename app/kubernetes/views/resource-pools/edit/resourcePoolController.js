@@ -106,8 +106,6 @@ class KubernetesEditResourcePoolController {
   async getEventsAsync() {
     try {
       this.state.eventsLoading = true;
-      // TODO: review
-      // Should this be relocated inside the KubernetesEventService as KubernetesEventService.resourcePoolEvents() ?
       this.events = await this.KubernetesEventService.events(this.pool.Namespace.Name);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve resource pool related events');
