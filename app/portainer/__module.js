@@ -8,7 +8,7 @@ async function initAuthentication(authManager, Authentication, $rootScope, $stat
   // to have more controls on which URL should trigger the unauthenticated state.
   $rootScope.$on('unauthenticated', function (event, data) {
     if (!_.includes(data.config.url, '/v2/') && !_.includes(data.config.url, '/api/v4/')) {
-      $state.go('portainer.auth', { error: 'Your session has expired' });
+      $state.go('portainer.logout', { error: 'Your session has expired' });
     }
   });
 
@@ -97,13 +97,28 @@ angular.module('portainer.app', [])
     name: 'portainer.auth',
     url: '/auth',
     params: {
-      logout: false,
-      error: ''
+      reload: false
     },
     views: {
       'content@': {
         templateUrl: './views/auth/auth.html',
         controller: 'AuthenticationController',
+        controllerAs: 'ctrl'
+      },
+      'sidebar@': {}
+    }
+  };
+  const logout = {
+    name: 'portainer.logout',
+    url: '/logout',
+    params: {
+      error: '',
+      performApiLogout: false
+    },
+    views: {
+      'content@': {
+        templateUrl: './views/logout/logout.html',
+        controller: 'LogoutController',
         controllerAs: 'ctrl'
       },
       'sidebar@': {}
@@ -558,6 +573,7 @@ angular.module('portainer.app', [])
   $stateRegistryProvider.register(about);
   $stateRegistryProvider.register(account);
   $stateRegistryProvider.register(authentication);
+  $stateRegistryProvider.register(logout);
   $stateRegistryProvider.register(endpoints);
   $stateRegistryProvider.register(endpoint);
   $stateRegistryProvider.register(endpointAccess);

@@ -3,11 +3,11 @@ import uuidv4 from 'uuid/v4';
 
 class AuthenticationController {
   /* @ngInject */
-  constructor($async, $scope, $state, $stateParams, $sanitize, $window, Authentication, UserService, EndpointService, ExtensionService, StateManager, Notifications, SettingsService, URLHelper, LocalStorage, StatusService) {
+  constructor($async, $scope, $state, $transition$, $sanitize, $window, Authentication, UserService, EndpointService, ExtensionService, StateManager, Notifications, SettingsService, URLHelper, LocalStorage, StatusService) {
     this.$async = $async;
     this.$scope = $scope;
     this.$state = $state;
-    this.$stateParams = $stateParams;
+    this.$transition$ = $transition$;
     this.$window = $window;
     this.$sanitize = $sanitize;
     this.Authentication = Authentication;
@@ -40,7 +40,6 @@ class AuthenticationController {
     this.oAuthLoginAsync = this.oAuthLoginAsync.bind(this);
     this.retryLoginSanitizeAsync = this.retryLoginSanitizeAsync.bind(this);
     this.internalLoginAsync = this.internalLoginAsync.bind(this);
-    this.logoutAsync = this.logoutAsync.bind(this);
 
     this.authenticateUserAsync = this.authenticateUserAsync.bind(this);
 
@@ -52,20 +51,6 @@ class AuthenticationController {
   /**
    * UTILS FUNCTIONS SECTION
    */
-  async logoutAsync(error) {
-    try {
-      await this.Authentication.logout();
-    } finally {
-      this.state.loginInProgress = false;
-      this.generateOAuthLoginURI();
-      this.LocalStorage.storeLogoutReason(error);
-      this.$window.location.reload();
-    }
-  }
-
-  logout(error) {
-    return this.$async(this.logoutAsync, error);
-  }
 
   error(err, message) {
     this.state.AuthenticationError = message;
@@ -259,8 +244,8 @@ class AuthenticationController {
       }
       this.generateOAuthLoginURI();
 
-      if (this.$stateParams.logout || this.$stateParams.error) {
-        await this.logout(this.$stateParams.error);
+      if (this.$transition$.params().reload) {
+        this.$window.location.reload();
         return;
       }
       const error = this.LocalStorage.getLogoutReason();
