@@ -1,4 +1,5 @@
 import moment from 'moment';
+import _ from 'lodash-es';
 
 angular.module('portainer.docker')
 .factory('ServiceHelper', [function ServiceHelperFactory() {
@@ -19,6 +20,22 @@ angular.module('portainer.docker')
       }
     }
     tasks = otherServicesTasks;
+  };
+
+  function findAssociatedNetwork(serviceNetwork, networks) {
+    return _.find(networks, function(network) {
+      return network.Id === serviceNetwork.NetworkID;
+    });
+  }
+
+  helper.mapNetworkNameToServiceNetwork = function(service, networks) {
+    for (var i = 0; i < service.ServiceNetworks.length; i++) {
+      var serviceNetwork = service.ServiceNetworks[i];
+      var network = findAssociatedNetwork(serviceNetwork, networks);
+      if (network) {
+        serviceNetwork.Name = network.Name;
+      }
+    }
   };
 
   helper.serviceToConfig = function(service) {
