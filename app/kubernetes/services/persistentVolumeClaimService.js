@@ -33,11 +33,7 @@ angular.module("portainer.kubernetes").factory("KubernetesPersistentVolumeClaimS
           }
         };
 
-        const params = {
-          id: claim.Name,
-        };
-
-        const data = await KubernetesPersistentVolumeClaims(namespace).create(params, payload).$promise;
+        const data = await KubernetesPersistentVolumeClaims().create(payload).$promise;
         return data;
       } catch (err) {
         throw { msg: 'Unable to create persistent volume claim', err: err };
