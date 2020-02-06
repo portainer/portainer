@@ -45,6 +45,7 @@ angular.module("portainer.kubernetes").factory("KubernetesNamespaceService", [
         const payload = {
           id: name
         };
+        await KubernetesNamespaces.status({id: name}).$promise;
         const [raw, yaml] = await Promise.all([
           KubernetesNamespaces.query(payload).$promise,
           KubernetesNamespaces.getYaml(payload).$promise
@@ -60,7 +61,6 @@ angular.module("portainer.kubernetes").factory("KubernetesNamespaceService", [
     function namespace(name) {
       return $async(namespaceAsync, name);
     }
-
 
     /**
      * Create
