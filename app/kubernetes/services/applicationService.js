@@ -7,8 +7,12 @@ import KubernetesPersistentVolumeClaimsFromApplication from 'Kubernetes/models/p
 import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 
 angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
-  '$async', 'KubernetesDeploymentService', 'KubernetesDaemonSetService', 'KubernetesServiceService', 'KubernetesPods', 'KubernetesSecretService', 'KubernetesPersistentVolumeClaimService',
-  function KubernetesApplicationServiceFactory($async, KubernetesDeploymentService, KubernetesDaemonSetService, KubernetesServiceService, KubernetesPods, KubernetesSecretService, KubernetesPersistentVolumeClaimService) {
+  '$async', 'KubernetesDeploymentService', 'KubernetesDaemonSetService', 'KubernetesServiceService', 'KubernetesPods',
+  'KubernetesSecretService', 'KubernetesPersistentVolumeClaimService', 'Authentication', 'KubernetesNamespaceService',
+  function KubernetesApplicationServiceFactory($async, KubernetesDeploymentService, KubernetesDaemonSetService,
+    KubernetesServiceService, KubernetesPods, KubernetesSecretService,
+    KubernetesPersistentVolumeClaimService, Authentication,
+    KubernetesNamespaceService) {
     "use strict";
     const service = {
       applications: applications,
@@ -20,6 +24,23 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
     /**
      * Applications
      */
+    async function applicationsFilteredAsync(namespace) {
+      try {
+        let namespaces;
+        if (namespace) {
+          const ns = await KubernetesNamespaceService.namespace(namespace);
+          namespaces = [ns];
+        } else {
+          namespaces = await KubernetesNamespaceService.namespaces();
+        }
+        const promises = _.map(namespaces, (item) => applicationsAsync(item.Name));
+        const res = await Promise.all(promises);
+        return _.flatten(res);
+      } catch (err) {
+        throw err;
+      }
+    }
+
     async function applicationsAsync(namespace) {
       try {
         const [deployments, daemonSets, services] = await Promise.all([
@@ -43,6 +64,10 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
     }
 
     function applications(namespace) {
+      const isAdmin = Authentication.isAdmin();
+      if (!isAdmin) {
+        return $async(applicationsFilteredAsync, namespace);
+      }
       return $async(applicationsAsync, namespace);
     }
 
