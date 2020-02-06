@@ -28,15 +28,24 @@ angular.module('portainer.docker')
     });
   }
 
-  helper.mapNetworkNameToServiceNetwork = function(service, networks) {
+  helper.filterServiceNetworks = function(service, networks) {
     for (var i = 0; i < service.ServiceNetworks.length; i++) {
       var serviceNetwork = service.ServiceNetworks[i];
       var network = findAssociatedNetwork(serviceNetwork, networks);
-      if (network) {
+      if (network && network.Name) {
         serviceNetwork.Name = network.Name;
       }
     }
+    _.remove(service.ServiceNetworks, network => (!network.Name));
+    if (!_.some(service.ServiceNetworks, network => (network.Name === 'bridge'))){
+      service.ServiceNetworks.push(_.find(networks, network => network.Name === 'bridge'));
+    }
   };
+
+  helper.translateNetworkNameToTargets = function(networks) {
+    _.remove(networks, network => (network.Name === 'ingress' || network.Name === 'bridge'));
+    return _.map(networks, ({NetworkID}) => ({ Target: NetworkID}));
+  }
 
   helper.serviceToConfig = function(service) {
     return {

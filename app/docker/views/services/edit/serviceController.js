@@ -172,7 +172,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
     if (network && !_.find(service.ServiceNetworks, {'NetworkID': network.Id})) {
       service.ServiceNetworks.push({NetworkID: network.Id})
       updateServiceArray(service, 'ServiceNetworks', service.ServiceNetworks);
-      ServiceHelper.mapNetworkNameToServiceNetwork(service, $scope.networks);
+      ServiceHelper.filterServiceNetworks(service, $scope.networks);
     }
   };
   $scope.removeNetwork = function removeNetwork(service, index) {
@@ -311,7 +311,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
       config.TaskTemplate.ContainerSpec.Image = service.Image;
     }
     if ($scope.hasChanges(service, ["ServiceNetworks"])) {
-    config.TaskTemplate.Networks = _.map(service.ServiceNetworks, ({NetworkID}) => ({ Target: NetworkID}));
+      config.TaskTemplate.Networks = ServiceHelper.translateNetworkNameToTargets(service.ServiceNetworks);
     }
     config.TaskTemplate.ContainerSpec.Secrets = service.ServiceSecrets ? service.ServiceSecrets.map(SecretHelper.secretConfig) : [];
     config.TaskTemplate.ContainerSpec.Configs = service.ServiceConfigs ? service.ServiceConfigs.map(ConfigHelper.configConfig) : [];
@@ -566,7 +566,8 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
         containers: agentProxy ? ContainerService.containers() : [],
         nodes: NodeService.nodes(),
         networks: NetworkService.networks(true, true, true),
-        availableNetworks: NetworkService.networks(true, true, true),
+        availableNetworks: NetworkService.networks(false, true, true),
+        test: NetworkService.networks(false, true, true),
         secrets: apiVersion >= 1.25 ? SecretService.secrets() : [],
         configs: apiVersion >= 1.30 ? ConfigService.configs() : [],
         availableImages: ImageService.images(),
@@ -607,7 +608,7 @@ function ($q, $scope, $transition$, $state, $location, $timeout, $anchorScroll, 
 
       $scope.tasks = data.tasks;
 
-      ServiceHelper.mapNetworkNameToServiceNetwork(service, data.networks);
+      ServiceHelper.filterServiceNetworks(service, data.networks);
       
       // Set max cpu value
       var maxCpus = 0;

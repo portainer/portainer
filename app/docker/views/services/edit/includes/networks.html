@@ -26,7 +26,7 @@
             </td>
             <td>{{ network.Addr }}</td>
             <td authorization="DockerServiceUpdate">
-              <button type="button" class="btn btn-xs btn-danger" ng-click="removeNetwork(service, $index)" ng-disabled="isUpdating">
+              <button type="button" class="btn btn-xs btn-danger" ng-click="removeNetwork(service, $index)" ng-disabled="isUpdating" ng-if="network.Name && !(network.Name == 'ingress' || network.Name == 'bridge')" >
                 <i class="fa fa-trash" aria-hidden="true"></i> Remove network
               </button>
             </td>
