@@ -4,7 +4,7 @@ angular.module('portainer.app')
       angular.extend(this, $controller('GenericDatatableController', {$scope: $scope}));
 
       this.disableRemove = function(item) {
-        return item.Inherited;
+        return item.Inherited && this.inheritFrom;
       };
 
       this.allowSelection = function(item) {
