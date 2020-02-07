@@ -20,12 +20,11 @@ angular.module("portainer.kubernetes").factory("KubernetesResourceQuotaService",
     async function quotaAsync(namespace, name) {
       try {
         const payload = {
-          id: name,
-          namespace: namespace
+          id: name
         };
         const [raw, yaml] = await Promise.all([
-          KubernetesResourceQuotas.get(payload).$promise,
-          KubernetesResourceQuotas.getYaml(payload).$promise
+          KubernetesResourceQuotas(namespace).get(payload).$promise,
+          KubernetesResourceQuotas(namespace).getYaml(payload).$promise
         ]);
         const quota = new KubernetesResourceQuotaViewModel(raw);
         quota.Yaml = yaml;
@@ -42,9 +41,9 @@ angular.module("portainer.kubernetes").factory("KubernetesResourceQuotaService",
     /**
      * Quotas
      */
-    async function quotasAsync() {
+    async function quotasAsync(namespace) {
       try {
-        const data = await KubernetesResourceQuotas.query().$promise;
+        const data = await KubernetesResourceQuotas(namespace).get().$promise;
         const quotas = _.map(data.items, (item) => new KubernetesResourceQuotaViewModel(item));
         return quotas;
       } catch (err) {
@@ -52,8 +51,8 @@ angular.module("portainer.kubernetes").factory("KubernetesResourceQuotaService",
       }
     }
 
-    function quotas() {
-      return $async(quotasAsync);
+    function quotas(namespace) {
+      return $async(quotasAsync, namespace);
     }
 
     /**
@@ -79,7 +78,7 @@ angular.module("portainer.kubernetes").factory("KubernetesResourceQuotaService",
         if (memoryLimit ===0) {
           delete payload.spec.hard['limits.memory'];
         }
-        const data = await KubernetesResourceQuotas.create(payload).$promise;
+        const data = await KubernetesResourceQuotas(namespace).create(payload).$promise;
         return data;
       } catch (err) {
         throw { msg: 'Unable to create quota', err:err };
@@ -103,7 +102,7 @@ angular.module("portainer.kubernetes").factory("KubernetesResourceQuotaService",
         if (memoryLimit === 0) {
           delete quota.spec.hard['limits.memory'];
         }
-        const data = await KubernetesResourceQuotas.update({}, quota).$promise;
+        const data = await KubernetesResourceQuotas(quota.metadata.namespace).update({}, quota).$promise;
         return new KubernetesResourceQuotaViewModel(data);
       } catch (err) {
         throw { msg: 'Unable to update resource quota', err: err };
@@ -120,10 +119,9 @@ angular.module("portainer.kubernetes").factory("KubernetesResourceQuotaService",
     async function removeAsync(quota) {
       try {
         const payload = {
-          namespace: quota.Namespace,
           id: quota.Name
         };
-        await KubernetesResourceQuotas.delete(payload).$promise;
+        await KubernetesResourceQuotas(quota.Namespace).delete(payload).$promise;
       } catch (err) {
         throw { msg: 'Unable to delete quota', err: err };
       }
@@ -138,10 +136,7 @@ angular.module("portainer.kubernetes").factory("KubernetesResourceQuotaService",
      */
     async function removeCollectionAsync(quota) {
       try {
-        const payload = {
-          namespace: quota.Namespace
-        };
-        await KubernetesResourceQuotas.delete(payload).$promise;
+        await KubernetesResourceQuotas(quota.Namespace).delete().$promise;
       } catch (err) {
         throw { msg: 'Unable to delete quotas', err: err };
       }

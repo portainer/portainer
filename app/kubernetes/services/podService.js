@@ -15,7 +15,7 @@ angular.module('portainer.kubernetes')
        */
       async function podsAsync(namespace) {
         try {
-          const data = await KubernetesPods(namespace).query().$promise;
+          const data = await KubernetesPods(namespace).get().$promise;
           return _.map(data.items, (item) => new KubernetesPodViewModel(item));
         } catch (err) {
           throw { msg: 'Unable to retrieve pods', err: err };

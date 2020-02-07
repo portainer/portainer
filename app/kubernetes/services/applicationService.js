@@ -80,7 +80,7 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
           KubernetesDeploymentService.deployment(namespace, name),
           KubernetesDaemonSetService.daemonSet(namespace, name),
           KubernetesServiceService.service(namespace, name),
-          KubernetesPods(namespace).query().$promise
+          KubernetesPods(namespace).get().$promise
         ]);
         const service = {};
         if (serviceAttempt.status === 'fulfilled') {

@@ -16,7 +16,7 @@ angular.module("portainer.kubernetes").factory("KubernetesDeploymentService", [
      */
     async function deploymentsAsync(namespace) {
       try {
-        const data = await KubernetesDeployments(namespace).query().$promise;
+        const data = await KubernetesDeployments(namespace).get().$promise;
         return data.items;
       } catch (err) {
         throw { msg: 'Unable to retrieve deployments', err: err };

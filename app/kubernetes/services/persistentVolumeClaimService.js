@@ -33,7 +33,7 @@ angular.module("portainer.kubernetes").factory("KubernetesPersistentVolumeClaimS
           }
         };
 
-        const data = await KubernetesPersistentVolumeClaims().create(payload).$promise;
+        const data = await KubernetesPersistentVolumeClaims(payload.metadata.namespace).create(payload).$promise;
         return data;
       } catch (err) {
         throw { msg: 'Unable to create persistent volume claim', err: err };
@@ -55,10 +55,9 @@ angular.module("portainer.kubernetes").factory("KubernetesPersistentVolumeClaimS
         // Should be taken into account during REST service uniformization/refactor
         // Split into params and payload objects
         const params = {
-          namespace: namespace,
           id: name
         };
-        await KubernetesPersistentVolumeClaims.delete(params).$promise;
+        await KubernetesPersistentVolumeClaims(namespace).delete(params).$promise;
       } catch (err) {
         throw { msg: 'Unable to delete persistent volume claim', err: err };
       }

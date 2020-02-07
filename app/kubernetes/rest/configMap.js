@@ -1,4 +1,4 @@
-import { rawResponse } from './response/transform';
+import { rawResponse } from 'Kubernetes/rest/response/transform';
 
 angular.module('portainer.kubernetes')
   .factory('KubernetesConfigMaps', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider',

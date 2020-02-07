@@ -1,24 +1,19 @@
-import { rawResponse } from './response/transform';
+import { rawResponse } from 'Kubernetes/rest/response/transform';
 
 angular.module('portainer.kubernetes')
 .factory('KubernetesDeployments', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider',
   function KubernetesDeploymentsFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
     'use strict';
-    return function(namespace) {
-      let url = API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/apis/apps/v1';
-      if (namespace) {
-        url += '/namespaces/:namespace/deployments/:id/:action'
-      } else {
-        url += '/deployments/:id/:action';
-      }
+    return function (namespace) {
+      const url = API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/apis/apps/v1'
+        + (namespace ? '/namespaces/:namespace' : '') + '/deployments/:id/:action';
       return $resource(url,
         {
           endpointId: EndpointProvider.endpointID,
           namespace: namespace
         },
         {
-          query: { method: 'GET', timeout: 15000 },
-          get: { method: 'GET' },
+          get: { method: 'GET', timeout: 15000 },
           getYaml: {
             method: 'GET',
             headers: {
@@ -27,6 +22,7 @@ angular.module('portainer.kubernetes')
             transformResponse: rawResponse
           },
           create: { method: 'POST' },
+          update: { method: 'PUT', params: { id: '@metadata.name' } },
           delete: { method: 'DELETE' }
         }
       );

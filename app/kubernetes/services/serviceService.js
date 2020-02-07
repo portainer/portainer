@@ -16,7 +16,7 @@ angular.module("portainer.kubernetes").factory("KubernetesServiceService", [
      */
     async function servicesAsync(namespace) {
       try {
-        const data = await KubernetesServices(namespace).query().$promise;
+        const data = await KubernetesServices(namespace).get().$promise;
         return data.items;
       } catch (err) {
         throw { msg: 'Unable to retrieve services', err: err };

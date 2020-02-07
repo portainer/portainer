@@ -17,9 +17,9 @@ angular.module("portainer.kubernetes").factory("KubernetesNamespaceService", [
      */
     async function namespacesAsync() {
       try {
-        const data = await KubernetesNamespaces.query().$promise;
+        const data = await KubernetesNamespaces().get().$promise;
         const namespaces = _.map(data.items, (item) => item.metadata.name);
-        const promises = _.map(namespaces, (item) => KubernetesNamespaces.status({id: item}).$promise);
+        const promises = _.map(namespaces, (item) => KubernetesNamespaces().status({id: item}).$promise);
         const statuses = await Promise.allSettled(promises);
         const visibleNamespaces = _.reduce(statuses, (result, item) => {
           if (item.status === 'fulfilled' && item.value.status.phase !== 'Terminating') {
@@ -45,10 +45,10 @@ angular.module("portainer.kubernetes").factory("KubernetesNamespaceService", [
         const payload = {
           id: name
         };
-        await KubernetesNamespaces.status({id: name}).$promise;
+        await KubernetesNamespaces().status({id: name}).$promise;
         const [raw, yaml] = await Promise.all([
-          KubernetesNamespaces.query(payload).$promise,
-          KubernetesNamespaces.getYaml(payload).$promise
+          KubernetesNamespaces().get(payload).$promise,
+          KubernetesNamespaces().getYaml(payload).$promise
         ]);
         const namespace = new KubernetesNamespaceViewModel(raw);
         namespace.Yaml = yaml;
@@ -72,7 +72,7 @@ angular.module("portainer.kubernetes").factory("KubernetesNamespaceService", [
             name: name
           }
         };
-        const data = await KubernetesNamespaces.create(payload).$promise
+        const data = await KubernetesNamespaces().create(payload).$promise
         return data;
       } catch (err) {
         throw { msg: 'Unable to create namespace', err: err };
@@ -91,7 +91,7 @@ angular.module("portainer.kubernetes").factory("KubernetesNamespaceService", [
         const payload = {
           id: namespace.Name
         };
-        await KubernetesNamespaces.delete(payload).$promise
+        await KubernetesNamespaces().delete(payload).$promise
       } catch (err) {
         throw { msg: 'Unable to delete namespace', err: err };
       }

@@ -25,7 +25,7 @@ angular.module("portainer.kubernetes").factory("KubernetesSecretService", [
           data: secret.Data
         };
 
-        const data = await KubernetesSecrets.create(payload).$promise;
+        const data = await KubernetesSecrets(payload.metadata.namespace).create(payload).$promise;
         return data;
       } catch (err) {
         throw { msg: 'Unable to create secret', err: err };

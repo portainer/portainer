@@ -10,7 +10,7 @@ angular.module('portainer.kubernetes')
 
       async function nodesAsync() {
         try {
-          const data = await KubernetesNodes.query({}).$promise;
+          const data = await KubernetesNodes().get().$promise;
           return _.map(data.items, (item) => new KubernetesNodeViewModel(item));
         } catch (err) {
           throw {msg: 'Unable to retrieve nodes', err:err};
@@ -20,8 +20,8 @@ angular.module('portainer.kubernetes')
       async function nodeAsync(name) {
         try {
           const [details, yaml] = await Promise.all([
-            KubernetesNodes.node({id: name}).$promise,
-            KubernetesNodes.yamlNode({id: name}).$promise
+            KubernetesNodes().get({id: name}).$promise,
+            KubernetesNodes().getYaml({id: name}).$promise
           ]);
           return new KubernetesNodeDetailsViewModel(details, yaml.data);
         } catch (err) {

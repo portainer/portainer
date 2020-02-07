@@ -17,11 +17,10 @@ angular.module("portainer.kubernetes").factory("KubernetesLimitRangeService", [
       try {
         const payload = {
           id: name,
-          namespace: namespace
         };
         const [raw, yaml] = await Promise.all([
-          KubernetesLimitRanges.get(payload).$promise,
-          KubernetesLimitRanges.getYaml(payload).$promise
+          KubernetesLimitRanges(namespace).get(payload).$promise,
+          KubernetesLimitRanges(namespace).getYaml(payload).$promise
         ]);
         const limitRange = new KubernetesLimitRangeViewModel(raw);
         limitRange.Yaml = yaml;
@@ -55,7 +54,7 @@ angular.module("portainer.kubernetes").factory("KubernetesLimitRangeService", [
         if (memory === 0) {
           delete payload.spec.limits[0].default.memory;
         }
-        const data = await KubernetesLimitRanges.create(payload).$promise;
+        const data = await KubernetesLimitRanges(payload.metadata.namespace).create(payload).$promise;
         return data;
       } catch (err) {
         throw { msg: 'Unable to create limit range', err: err };
@@ -72,10 +71,9 @@ angular.module("portainer.kubernetes").factory("KubernetesLimitRangeService", [
     async function removeAsync(limitRange) {
       try {
         const payload = {
-          namespace: limitRange.Namespace,
           id: limitRange.Name
         };
-        await KubernetesLimitRanges.delete(payload).$promise;
+        await KubernetesLimitRanges(limitRange.Namespace).delete(payload).$promise;
       } catch (err) {
         throw { msg: 'Unable to delete limit range', err: err };
       }

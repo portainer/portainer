@@ -11,7 +11,7 @@ angular.module("portainer.kubernetes").factory("KubernetesEventService", [
 
     async function eventsAsync(namespace) {
       try {
-        const data = await KubernetesEvents(namespace).query({}).$promise;
+        const data = await KubernetesEvents(namespace).get().$promise;
         return _.map(data.items, (item) => new KubernetesEventViewModel(item));
       } catch (err) {
         throw {msg: 'Unable to retrieve events', err:err};

@@ -1,12 +1,31 @@
+import { rawResponse } from 'Kubernetes/rest/response/transform';
+
 angular.module('portainer.kubernetes')
 .factory('KubernetesSecrets', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider',
   function KubernetesSecretsFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider) {
     'use strict';
-    return $resource(API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/api/v1/namespaces/:namespace/secrets/:id/:action',
-      {
-        endpointId: EndpointProvider.endpointID
-      },
-      {
-        create: { method: 'POST', params: { namespace: '@metadata.namespace' } },
-      });
-  }]);
+    return function (namespace) {
+      const url = API_ENDPOINT_ENDPOINTS + '/:endpointId/kubernetes/api/v1'
+        + (namespace ? '/namespaces/:namespace' : '') + '/secrets/:id/:action';
+      return $resource(url,
+        {
+          endpointId: EndpointProvider.endpointID,
+          namespace: namespace
+        },
+        {
+          get: { method: 'GET', timeout: 15000 },
+          getYaml: {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/yaml'
+            },
+            transformResponse: rawResponse
+          },
+          create: { method: 'POST' },
+          update: { method: 'PUT', params: { id: '@metadata.name' } },
+          delete: { method: 'DELETE' }
+        }
+      );
+    };
+  }
+]);
