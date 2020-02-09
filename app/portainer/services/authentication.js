@@ -27,17 +27,18 @@ function AuthenticationFactory($async, $state, Auth, OAuth, jwtHelper, LocalStor
   }
 
   async function logoutAsync(performApiLogout) {
+    if (performApiLogout) {
+      await Auth.logout().$promise;
+    }
+
     StateManager.clean();
     EndpointProvider.clean();
     LocalStorage.clean();
     LocalStorage.storeLoginStateUUID('');
-    if (performApiLogout) {
-      await Auth.logout().$promise;
-    }
   }
 
   function logout(performApiLogout) {
-    return $async(logoutAsync), performApiLogout;
+    return $async(logoutAsync, performApiLogout);
   }
 
   function init() {
