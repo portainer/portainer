@@ -4,6 +4,8 @@ import (
 	"errors"
 	"time"
 
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
+
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -23,7 +25,11 @@ func (kcl *KubeClient) createServiceAccountToken(serviceAccountName string) erro
 	}
 
 	_, err := kcl.cli.CoreV1().Secrets(portainerNamespace).Create(serviceAccountSecret)
-	return err
+	if err != nil && !k8serrors.IsAlreadyExists(err) {
+		return err
+	}
+
+	return nil
 }
 
 func (kcl *KubeClient) getServiceAccountToken(serviceAccountName string) (string, error) {

@@ -7,7 +7,6 @@ const (
 	portainerNamespace                  = "ns-portainer"
 	portainerUserCRName                 = "portainer-cr-user"
 	portainerUserCRBName                = "portainer-crb-user"
-	portainerServiceAccountName         = "portainer-sa-clusteradmin"
 	portainerUserServiceAccountPrefix   = "portainer-sa-user"
 	portainerRBPrefix                   = "portainer-rb"
 	portainerConfigMapName              = "portainer-config"

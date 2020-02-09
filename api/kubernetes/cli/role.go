@@ -7,37 +7,29 @@ import (
 )
 
 func getPortainerUserDefaultPolicies() []rbacv1.PolicyRule {
+	// TODO: this policy should not allow to list resourcequotas in the cluster
+	// To be removed once the front-end has been refactored to list resourcesquotas inside namespaces
 	return []rbacv1.PolicyRule{
 		{
 			Verbs:     []string{"list"},
-			Resources: []string{"namespaces", "resourcequotas", "nodes", "services"},
+			Resources: []string{"namespaces", "resourcequotas", "nodes"},
 			APIGroups: []string{""},
-		},
-		{
-			Verbs:     []string{"list"},
-			Resources: []string{"deployments", "daemonsets"},
-			APIGroups: []string{"apps"},
 		},
 	}
 }
 
 func (kcl *KubeClient) createPortainerUserClusterRole() error {
-	_, err := kcl.cli.RbacV1().ClusterRoles().Get(portainerUserCRName, metav1.GetOptions{})
-	if k8serrors.IsNotFound(err) {
-		clusterRole := &rbacv1.ClusterRole{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: portainerUserCRName,
-			},
-			Rules: getPortainerUserDefaultPolicies(),
-		}
-
-		_, err := kcl.cli.RbacV1().ClusterRoles().Create(clusterRole)
-		if err != nil {
-			return err
-		}
-
-		return nil
+	clusterRole := &rbacv1.ClusterRole{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: portainerUserCRName,
+		},
+		Rules: getPortainerUserDefaultPolicies(),
 	}
 
-	return err
+	_, err := kcl.cli.RbacV1().ClusterRoles().Create(clusterRole)
+	if err != nil && !k8serrors.IsAlreadyExists(err) {
+		return err
+	}
+
+	return nil
 }

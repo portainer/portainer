@@ -17,7 +17,7 @@ type (
 	namespaceAccessPolicies map[string]accessPolicies
 )
 
-func (kcl *KubeClient) ensureNamespaceAccessesAreSet(userID int, teamIDs []int, serviceAccountName string) error {
+func (kcl *KubeClient) setupNamespaceAccesses(userID int, teamIDs []int, serviceAccountName string) error {
 	configMap, err := kcl.cli.CoreV1().ConfigMaps(portainerNamespace).Get(portainerConfigMapName, metav1.GetOptions{})
 	if k8serrors.IsNotFound(err) {
 		return nil
@@ -33,12 +33,36 @@ func (kcl *KubeClient) ensureNamespaceAccessesAreSet(userID int, teamIDs []int, 
 		return err
 	}
 
-	for namespace, policies := range accessPolicies {
-		if hasUserAccessToNamespace(userID, teamIDs, policies) {
-			err = kcl.ensureServiceAccountHasClusterEditRoleInNamespace(serviceAccountName, namespace)
-			if err != nil && !k8serrors.IsAlreadyExists(err) {
+	namespaces, err := kcl.cli.CoreV1().Namespaces().List(metav1.ListOptions{})
+	if err != nil {
+		return err
+	}
+
+	for _, namespace := range namespaces.Items {
+		if namespace.Name == defaultNamespace {
+			continue
+		}
+
+		policies, ok := accessPolicies[namespace.Name]
+		if !ok {
+			err = kcl.removeNamespaceAccessForServiceAccount(serviceAccountName, namespace.Name)
+			if err != nil {
 				return err
 			}
+			continue
+		}
+
+		if !hasUserAccessToNamespace(userID, teamIDs, policies) {
+			err = kcl.removeNamespaceAccessForServiceAccount(serviceAccountName, namespace.Name)
+			if err != nil {
+				return err
+			}
+			continue
+		}
+
+		err = kcl.ensureNamespaceAccessForServiceAccount(serviceAccountName, namespace.Name)
+		if err != nil && !k8serrors.IsAlreadyExists(err) {
+			return err
 		}
 	}
 

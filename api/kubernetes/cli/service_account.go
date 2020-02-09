@@ -7,12 +7,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// GetPortainerServiceAccountBearerToken returns the Bearer token associated to the Portainer service account
-// with cluster administration privileges. This service account is created as part of the Portainer/Agent deployment.
-func (kcl *KubeClient) GetPortainerServiceAccountBearerToken() (string, error) {
-	return kcl.getServiceAccountToken(portainerServiceAccountName)
-}
-
 // GetServiceAccountBearerToken returns the ServiceAccountToken associated to the specified user.
 func (kcl *KubeClient) GetServiceAccountBearerToken(userID int, username string) (string, error) {
 	serviceAccountName := userServiceAccountName(userID, username)
@@ -36,7 +30,7 @@ func (kcl *KubeClient) SetupUserServiceAccount(userID int, username string, team
 		return err
 	}
 
-	return kcl.ensureNamespaceAccessesAreSet(userID, teamIDs, serviceAccountName)
+	return kcl.setupNamespaceAccesses(userID, teamIDs, serviceAccountName)
 }
 
 func (kcl *KubeClient) ensureRequiredResourcesExist() error {
@@ -45,12 +39,12 @@ func (kcl *KubeClient) ensureRequiredResourcesExist() error {
 
 func (kcl *KubeClient) ensureServiceAccountForUserExists(serviceAccountName string) error {
 	err := kcl.createUserServiceAccount(portainerNamespace, serviceAccountName)
-	if err != nil && !k8serrors.IsAlreadyExists(err) {
+	if err != nil {
 		return err
 	}
 
 	err = kcl.createServiceAccountToken(serviceAccountName)
-	if err != nil && !k8serrors.IsAlreadyExists(err) {
+	if err != nil {
 		return err
 	}
 
@@ -59,23 +53,22 @@ func (kcl *KubeClient) ensureServiceAccountForUserExists(serviceAccountName stri
 		return err
 	}
 
-	return kcl.ensureServiceAccountHasClusterEditRoleInNamespace(serviceAccountName, defaultNamespace)
+	return kcl.ensureNamespaceAccessForServiceAccount(serviceAccountName, defaultNamespace)
 }
 
 func (kcl *KubeClient) createUserServiceAccount(namespace, serviceAccountName string) error {
-	_, err := kcl.cli.CoreV1().ServiceAccounts(namespace).Get(serviceAccountName, metav1.GetOptions{})
-	if k8serrors.IsNotFound(err) {
-		serviceAccount := &v1.ServiceAccount{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: serviceAccountName,
-			},
-		}
+	serviceAccount := &v1.ServiceAccount{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: serviceAccountName,
+		},
+	}
 
-		_, err = kcl.cli.CoreV1().ServiceAccounts(namespace).Create(serviceAccount)
+	_, err := kcl.cli.CoreV1().ServiceAccounts(namespace).Create(serviceAccount)
+	if err != nil && !k8serrors.IsAlreadyExists(err) {
 		return err
 	}
 
-	return err
+	return nil
 }
 
 func (kcl *KubeClient) ensureServiceAccountHasPortainerUserClusterRole(serviceAccountName string) error {
@@ -120,7 +113,31 @@ func (kcl *KubeClient) ensureServiceAccountHasPortainerUserClusterRole(serviceAc
 	return err
 }
 
-func (kcl *KubeClient) ensureServiceAccountHasClusterEditRoleInNamespace(serviceAccountName, namespace string) error {
+func (kcl *KubeClient) removeNamespaceAccessForServiceAccount(serviceAccountName, namespace string) error {
+	roleBindingName := namespaceClusterRoleBindingName(namespace)
+
+	roleBinding, err := kcl.cli.RbacV1().RoleBindings(namespace).Get(roleBindingName, metav1.GetOptions{})
+	if k8serrors.IsNotFound(err) {
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	updatedSubjects := roleBinding.Subjects[:0]
+
+	for _, subject := range roleBinding.Subjects {
+		if subject.Name != serviceAccountName {
+			updatedSubjects = append(updatedSubjects, subject)
+		}
+	}
+
+	roleBinding.Subjects = updatedSubjects
+
+	_, err = kcl.cli.RbacV1().RoleBindings(namespace).Update(roleBinding)
+	return err
+}
+
+func (kcl *KubeClient) ensureNamespaceAccessForServiceAccount(serviceAccountName, namespace string) error {
 	roleBindingName := namespaceClusterRoleBindingName(namespace)
 
 	roleBinding, err := kcl.cli.RbacV1().RoleBindings(namespace).Get(roleBindingName, metav1.GetOptions{})
