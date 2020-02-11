@@ -97,7 +97,7 @@
                   Deployment
               </th>
               <th>
-                  Published ports
+                  Publishing mode
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('CreatedAt')">
@@ -126,33 +126,13 @@
                 <span ng-if="item.DeploymentType === $ctrl.KubernetesApplicationDeploymentTypes.GLOBAL">Global</span>
                 <code>{{ item.RunningPodsCount }}</code> / <code>{{ item.TotalPodsCount }}</code></td>
               <td>
-                <span ng-if="item.PublishedPorts.length" ng-repeat="port in item.PublishedPorts track by $index">
-                  <span ng-if="item.ServiceType === 'LoadBalancer'">
-                    <span class="interactive" tooltip-append-to-body="true" tooltip-placement="bottom" tooltip-class="portainer-tooltip" uib-tooltip="Port published via an external load balancer">
-                      <i class="fa fa-question-circle tooltip-icon" aria-hidden="true"></i>
-                    </span>
-                    <a ng-if="item.LoadBalancerIPAddress" class="image-tag" ng-href="http://{{ item.LoadBalancerIPAddress }}:{{ port.port }}" target="_blank">
-                      <i class="fa fa-project-diagram" aria-hidden="true" style="margin-right: 2px;"></i> {{ port.targetPort }}:{{ port.port }}
+                <span ng-if="item.PublishedPorts.length">
+                  <span>
+                    <a ng-click="$ctrl.onPublishingModeClick(item)">
+                      <i class="fa {{item.ServiceType | kubernetesApplicationServiceTypeIcon}}" aria-hidden="true" style="margin-right: 2px;">
+                      </i> {{item.ServiceType | kubernetesApplicationServiceTypeText}}
                     </a>
-                    <span ng-if="!item.LoadBalancerIPAddress">
-                      <i class="fa fa-project-diagram" aria-hidden="true" style="margin-right: 2px;"></i> pending
-                    </span>
                   </span>
-                  <span ng-if="item.ServiceType === 'ClusterIP'">
-                    <span class="interactive" tooltip-append-to-body="true" tooltip-placement="bottom" tooltip-class="portainer-tooltip" uib-tooltip="Internal port, only exposed inside the cluster and available through the application name">
-                      <i class="fa fa-question-circle tooltip-icon" aria-hidden="true"></i>
-                    </span>
-                    <i class="fa fa-list-alt" aria-hidden="true"></i>
-                      {{ port.port }}
-                  </span>
-                  <span ng-if="item.ServiceType === 'NodePort'">
-                    <span class="interactive" tooltip-append-to-body="true" tooltip-placement="bottom" tooltip-class="portainer-tooltip" uib-tooltip="Port published via node port, use the IP of a node in the cluster to access it">
-                      <i class="fa fa-question-circle tooltip-icon" aria-hidden="true"></i>
-                    </span>
-                    <i class="fa fa-list" aria-hidden="true"></i>
-                      {{ port.targetPort }}:{{ port.nodePort }}
-                  </span>
-                  <br/>
                 </span>
                 <span ng-if="item.PublishedPorts.length === 0">-</span>
               </td>
