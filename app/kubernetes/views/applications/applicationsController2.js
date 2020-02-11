@@ -1,4 +1,7 @@
 import angular from 'angular';
+import _ from 'lodash-es';
+import KubernetesStackHelper from 'Kubernetes/helpers/stackHelper';
+import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 
 class KubernetesApplicationsController2 {
   /* @ngInject */
@@ -13,6 +16,7 @@ class KubernetesApplicationsController2 {
     this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
     this.removeAction = this.removeAction.bind(this);
     this.removeActionAsync = this.removeActionAsync.bind(this);
+    this.onPublishingModeClick = this.onPublishingModeClick.bind(this);
   }
 
   async removeActionAsync(selectedItems) {
@@ -34,6 +38,20 @@ class KubernetesApplicationsController2 {
     }
   }
 
+  onPublishingModeClick(application) {
+    this.state.activeTab = 1;
+    _.forEach(this.ports, (item) => {
+      item.Expanded = false;
+      item.Highlighted = false;
+      if (item.ApplicationName === application.Name) {
+        if (item.Ports.length > 1) {
+          item.Expanded = true;
+        }
+        item.Highlighted = true;
+      }
+    });
+  }
+
   removeAction(selectedItems) {
     return this.$async(this.removeActionAsync, selectedItems);
   }
@@ -41,71 +59,8 @@ class KubernetesApplicationsController2 {
   async getApplicationsAsync() {
     try {
       this.applications = await this.KubernetesApplicationService.applications();
-
-      // TODO: mockup purpose
-
-      this.ports = [];
-      this.stacks = [];
-      let stackInfo = [];
-
-      for (const application of this.applications) {
-
-        if (application.Stack !== "-") {
-          const stack = {
-            Name: application.Stack,
-            ResourcePool: application.ResourcePool,
-            ApplicationCount: 1
-          };
-
-          stackInfo.push(stack);
-        }
-
-        if (application.PublishedPorts.length > 0) {
-          const mapping = {
-            Expanded: true,
-            ApplicationName: application.Name,
-            ResourcePool: application.ResourcePool,
-            ServiceType: application.ServiceType,
-            LoadBalancerIPAddress: application.LoadBalancerIPAddress,
-            Ports: []
-          };
-
-          for (const port of application.PublishedPorts) {
-            const portDetails = {
-              Port: port.port,
-              TargetPort: port.targetPort,
-              Protocol: port.protocol
-            };
-
-            mapping.Ports.push(portDetails);
-          }
-
-          this.ports.push(mapping);
-        }
-
-      }
-
-      for (const stackDetails of stackInfo) {
-
-        let found = false;
-        let idxFound = 0;
-
-        this.stacks.forEach(function (stack, idx) {
-          if (stack.Name === stackDetails.Name) {
-            found = true;
-            idxFound = idx;
-          }
-        });
-
-        if (found) {
-          this.stacks[idxFound].ApplicationCount++;
-        } else {
-          this.stacks.push(stackDetails);
-        }
-      }
-
-
-
+      this.stacks = KubernetesStackHelper.stacksFromApplications(this.applications);
+      this.ports = KubernetesApplicationHelper.portMappingsFromApplications(this.applications);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve applications');
     }

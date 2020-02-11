@@ -1,3 +1,4 @@
+import _ from 'lodash-es';
 import {KubernetesApplicationDeploymentTypes} from 'Kubernetes/models/application';
 
 angular.module('portainer.docker')
@@ -5,26 +6,34 @@ angular.module('portainer.docker')
     function ($scope, $controller, KubernetesNamespaceHelper, DatatableService) {
 
       angular.extend(this, $controller('GenericDatatableController', {$scope: $scope}));
-
-      this.disableRemove = function(item) {
-        return KubernetesNamespaceHelper.isAppSystemNamespace(item.ResourcePool);
-      };
-
-      this.isPartOfSystemNamespace = function(item) {
-        return KubernetesNamespaceHelper.isSystemNamespace(item.ResourcePool);
-      };
-
       this.state = Object.assign(this.state, {
         expandedItems: [],
-        expandAll: true
-      })
+        expandAll: false
+      });
 
-      /**
-       * Do not allow applications in system namespaces to be selected
-       */
-      this.allowSelection = function(item) {
-        return !this.disableRemove(item);
+      this.expandItem = function(item, expanded) {
+        item.Expanded = expanded;
+        if (!expanded) {
+          item.Highlighted = false;
+        }
+      };
+
+      this.itemCanExpand = function(item) {
+        return item.Ports.length > 1;
       }
+
+      this.hasExpandableItems = function() {
+        return _.filter(this.state.filteredDataSet, (item) => this.itemCanExpand(item)).length;
+      };
+
+      this.expandAll = function() {
+        this.state.expandAll = !this.state.expandAll;
+        _.forEach(this.state.filteredDataSet, (item) => {
+          if (this.itemCanExpand(item)) {
+            this.expandItem(item, this.state.expandAll);
+          }
+        });
+      };
 
       this.$onInit = function() {
         this.KubernetesApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;

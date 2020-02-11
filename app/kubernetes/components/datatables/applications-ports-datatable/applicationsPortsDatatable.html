@@ -52,8 +52,8 @@
         <table class="table table-hover nowrap-cells">
           <thead>
             <tr>
-              <th style="width:55px;">
-                <a ng-click="$ctrl.expandAll()">
+              <th>
+                <a ng-click="$ctrl.expandAll()" ng-if="$ctrl.hasExpandableItems()">
                   <i ng-class="{ 'fas fa-angle-down': $ctrl.state.expandAll, 'fas fa-angle-right': !$ctrl.state.expandAll }" aria-hidden="true"></i>
                 </a>
               </th>
@@ -91,9 +91,12 @@
             </tr>
           </thead>
           <tbody>
-          <tr dir-paginate-start="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))" ng-class="{active: item.Checked}">
+          <tr dir-paginate-start="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))"
+            ng-class="{active: item.Checked}" ng-style="{background: (item.Highlighted ? '#d5e8f3' : '')}">
             <td>
-              <a ng-if="item.Ports.length > 1"><i ng-class="{ 'fas fa-angle-down': item.Expanded, 'fas fa-angle-right': !item.Expanded }" class="space-right" aria-hidden="true"></i></a>
+              <a ng-if="$ctrl.itemCanExpand(item)" ng-click="$ctrl.expandItem(item, !item.Expanded)">
+                <i ng-class="{ 'fas fa-angle-down': item.Expanded, 'fas fa-angle-right': !item.Expanded }" class="space-right" aria-hidden="true"></i>
+              </a>
             </td>
             <td>
               <a ui-sref="kubernetes.applications.application({ name: item.Name, namespace: item.ResourcePool })">{{ item.ApplicationName }}</a>
@@ -109,26 +112,26 @@
                   <span ng-if="!item.LoadBalancerIPAddress">pending</span>
                 </span>
               </span>
-                      <span ng-if="item.ServiceType === 'ClusterIP'">
+              <span ng-if="item.ServiceType === 'ClusterIP'">
                 <i class="fa fa-list-alt" aria-hidden="true" style="margin-right: 2px;"></i> Internal
               </span>
-                      <span ng-if="item.ServiceType === 'NodePort'">
+              <span ng-if="item.ServiceType === 'NodePort'">
                 <i class="fa fa-list" aria-hidden="true" style="margin-right: 2px;"></i> Cluster
               </span>
             </td>
-            <td ng-if="item.Ports.length === 1">
+            <td ng-if="!$ctrl.itemCanExpand(item)">
                 {{ item.Ports[0].Port }}
               <a ng-if="item.LoadBalancerIPAddress" ng-href="http://{{ item.LoadBalancerIPAddress }}:{{item.Ports[0].Port}}" target="_blank" style="margin-left: 5px">
                 <i class="fa fa-external-link-alt" aria-hidden="true"></i> access
               </a>
             </td>
-            <td ng-if="item.Ports.length === 1">{{ item.Ports[0].TargetPort }}</td>
-            <td ng-if="item.Ports.length === 1">{{ item.Ports[0].Protocol }}</td>
-            <td ng-if="item.Ports.length > 1"></td>
-            <td ng-if="item.Ports.length > 1"></td>
-            <td ng-if="item.Ports.length > 1"></td>
+            <td ng-if="!$ctrl.itemCanExpand(item)">{{ item.Ports[0].TargetPort }}</td>
+            <td ng-if="!$ctrl.itemCanExpand(item)">{{ item.Ports[0].Protocol }}</td>
+            <td ng-if="$ctrl.itemCanExpand(item)"></td>
+            <td ng-if="$ctrl.itemCanExpand(item)"></td>
+            <td ng-if="$ctrl.itemCanExpand(item)"></td>
           </tr>
-          <tr dir-paginate-end ng-show="item.Expanded" ng-repeat="port in item.Ports" style="background: #d5e8f3;" ng-if="item.Ports.length > 1">
+          <tr dir-paginate-end ng-show="item.Expanded" ng-repeat="port in item.Ports" ng-style="{background: (item.Highlighted ? '#d5e8f3' : '#f5f5f5')}">
             <td></td>
             <td>-</td>
             <td>-</td>

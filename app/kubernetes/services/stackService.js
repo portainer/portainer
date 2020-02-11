@@ -1,9 +1,8 @@
 import _ from 'lodash-es';
-import { KubernetesApplicationStackAnnotationKey } from 'Kubernetes/models/application';
 
 angular.module("portainer.kubernetes").factory('KubernetesStackService', [
-  '$async', 'KubernetesDeploymentService', 'KubernetesDaemonSetService',
-  function KubernetesStackServiceFactory($async, KubernetesDeploymentService, KubernetesDaemonSetService) {
+  '$async', 'KubernetesApplicationService',
+  function KubernetesStackServiceFactory($async, KubernetesApplicationService) {
     const service = {
       stacks: stacks
     };
@@ -13,14 +12,14 @@ angular.module("portainer.kubernetes").factory('KubernetesStackService', [
      */
     async function stacksAsync() {
       try {
-        const [deployments, daemonSets] = await Promise.all([
-          KubernetesDeploymentService.deployments(),
-          KubernetesDaemonSetService.daemonSets()
-        ]);
-        const deploymentStacks = _.map(deployments, (item) => item.metadata.annotations[KubernetesApplicationStackAnnotationKey]);
-        const daemonSetStacks = _.map(daemonSets, (item) => item.metadata.annotations[KubernetesApplicationStackAnnotationKey]);
-        const stacks = _.concat(deploymentStacks, daemonSetStacks);
-        return _.uniq(_.without(stacks, undefined));
+        const applications = await KubernetesApplicationService.applications();
+        const stacks = _.reduce(applications, (acc, app) => {
+          if (app.Stack !== '-' && !_.find(acc, (stack) => stack === app.Stack)) {
+            acc.push(app.Stack);
+          }
+          return acc;
+        }, []);
+        return stacks;
       } catch (err) {
         throw err;
       }

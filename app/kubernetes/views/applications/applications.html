@@ -11,7 +11,8 @@
   <span class="small">
     <p class="text-muted">
       <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-      As an administrator user, you have access to the advanced deployment feature allowing you to deploy any Kubernetes manifest inside your cluster.
+      As an administrator user, you have access to the advanced deployment feature allowing you to deploy any Kubernetes
+      manifest inside your cluster.
     </p>
     <p>
       <button type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.deploy">
@@ -23,13 +24,9 @@
 
 <div class="row">
   <div class="col-sm-12">
-    <kubernetes-applications-datatable
-      title-text="Applications" title-icon="fa-laptop-code"
-      dataset="ctrl.applications" table-key="kubernetes.applications"
-      order-by="Name"
-      deployment-types="ctrl.KubernetesApplicationDeploymentTypes"
-      remove-action="ctrl.removeAction"
-      refresh-callback="ctrl.getApplications"
-    ></kubernetes-applications-datatable>
+    <kubernetes-applications-datatable title-text="Applications" title-icon="fa-laptop-code" dataset="ctrl.applications"
+      table-key="kubernetes.applications" order-by="Name"
+      remove-action="ctrl.removeAction" refresh-callback="ctrl.getApplications">
+    </kubernetes-applications-datatable>
   </div>
 </div>

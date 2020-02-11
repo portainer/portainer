@@ -1,11 +1,36 @@
 import _ from 'lodash-es';
 import { KubernetesPodViewModel } from 'Kubernetes/models/pod';
+import { KubernetesPortMappingPort, KubernetesPortMapping } from 'Kubernetes/models/port/models';
 
 class KubernetesApplicationHelper {
   static associatePodsAndApplication(pods, app) {
     const filteredPods = _.filter(pods, {metadata:{labels: app.spec.selector.matchLabels}});
     app.Pods = _.map(filteredPods, (item) => new KubernetesPodViewModel(item));
   }
+
+  static portMappingsFromApplications(applications) {
+    const res = _.reduce(applications, (acc, app) => {
+      if (app.PublishedPorts.length > 0) {
+        const mapping = new KubernetesPortMapping();
+        mapping.ApplicationName = app.Name;
+        mapping.ResourcePool = app.ResourcePool;
+        mapping.ServiceType = app.ServiceType;
+        mapping.LoadBalancerIPAddress = app.LoadBalancerIPAddress;
+
+        mapping.Ports = _.map(app.PublishedPorts, (item) => {
+          const port = new KubernetesPortMappingPort();
+          port.Port = item.port;
+          port.TargetPort = item.targetPort;
+          port.Protocol = item.protocol;
+          return port;
+        });
+        acc.push(mapping);
+      }
+      return acc;
+    }, []);
+    return res;
+  }
+
 }
 export default KubernetesApplicationHelper;
 
