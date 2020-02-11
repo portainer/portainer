@@ -10,9 +10,9 @@ angular.module("portainer.kubernetes").factory('KubernetesStackService', [
     /**
      * Stacks
      */
-    async function stacksAsync() {
+    async function stacksAsync(namespace) {
       try {
-        const applications = await KubernetesApplicationService.applications();
+        const applications = await KubernetesApplicationService.applications(namespace);
         const stacks = _.reduce(applications, (acc, app) => {
           if (app.Stack !== '-' && !_.find(acc, (stack) => stack === app.Stack)) {
             acc.push(app.Stack);
@@ -25,8 +25,8 @@ angular.module("portainer.kubernetes").factory('KubernetesStackService', [
       }
     }
 
-    function stacks() {
-      return $async(stacksAsync);
+    function stacks(namespace) {
+      return $async(stacksAsync, namespace);
     }
 
     return service;

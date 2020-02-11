@@ -31,6 +31,7 @@ class KubernetesCreateApplicationController {
     this.onInit = this.onInit.bind(this);
     this.deployApplicationAsync = this.deployApplicationAsync.bind(this);
     this.updateSlidersAsync = this.updateSlidersAsync.bind(this);
+    this.updateStacksAsync = this.updateStacksAsync.bind(this);
   }
 
   addEnvironmentVariable() {
@@ -138,6 +139,23 @@ class KubernetesCreateApplicationController {
     return this.$async(this.updateSlidersAsync);
   }
 
+  async updateStacksAsync() {
+    try {
+      this.stacks = await this.KubernetesStackService.stacks(this.formValues.ResourcePool.Namespace.Name);
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve stacks');
+    }
+  }
+
+  updateStacks() {
+    return this.$async(this.updateStacksAsync);
+  }
+
+  onResourcePoolSelectionChange() {
+    this.updateSliders();
+    this.updateStacks();
+  }
+
   async onInit() {
     try {
       this.formValues = new KubernetesApplicationFormValues();
@@ -166,13 +184,11 @@ class KubernetesCreateApplicationController {
       this.ApplicationPublishingTypes = KubernetesApplicationPublishingTypes;
       this.KubernetesLimitRangeDefaults = KubernetesLimitRangeDefaults;
 
-      const [resourcePools, stacks, nodes] = await Promise.all([
+      const [resourcePools, nodes] = await Promise.all([
         this.KubernetesResourcePoolService.resourcePools(),
-        this.KubernetesStackService.stacks(),
         this.KubernetesNodeService.nodes()
       ]);
 
-      this.stacks = stacks;
       _.forEach(nodes, (item) => {
         this.state.nodes.memory += filesizeParser(item.Memory);
         this.state.nodes.cpu += item.CPU;
@@ -184,6 +200,7 @@ class KubernetesCreateApplicationController {
       const endpoint = this.EndpointProvider.currentEndpoint();
       this.storageClasses = endpoint.Kubernetes.Configuration.StorageClasses;
       this.state.useLoadBalancer = endpoint.Kubernetes.Configuration.UseLoadBalancer;
+      await this.updateStacks();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
     }
