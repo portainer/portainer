@@ -92,9 +92,9 @@
           </thead>
           <tbody>
           <tr dir-paginate-start="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))"
-            ng-class="{active: item.Checked}" ng-style="{background: (item.Highlighted ? '#d5e8f3' : '')}">
+            ng-class="{active: item.Checked}" ng-style="{background: (item.Highlighted ? '#d5e8f3' : '')}" ng-click="$ctrl.expandItem(item, !item.Expanded)">
             <td>
-              <a ng-if="$ctrl.itemCanExpand(item)" ng-click="$ctrl.expandItem(item, !item.Expanded)">
+              <a ng-if="$ctrl.itemCanExpand(item)">
                 <i ng-class="{ 'fas fa-angle-down': item.Expanded, 'fas fa-angle-right': !item.Expanded }" class="space-right" aria-hidden="true"></i>
               </a>
             </td>
