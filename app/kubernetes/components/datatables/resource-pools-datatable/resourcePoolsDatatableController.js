@@ -4,6 +4,10 @@ angular.module('portainer.docker')
 
       angular.extend(this, $controller('GenericDatatableController', {$scope: $scope}));
 
+      this.canManageAccess = function(item) {
+        return item.Namespace.Name !== 'default';
+      }
+
       this.disableRemove = function(item) {
         return KubernetesNamespaceHelper.isSystemNamespace(item.Namespace.Name);
       };

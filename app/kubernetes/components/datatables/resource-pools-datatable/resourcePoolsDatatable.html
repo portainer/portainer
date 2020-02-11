@@ -106,9 +106,10 @@
               </td>
               <td>{{ item.CreatedAt | getisodate }}</td>
               <td>
-                <a ui-sref="kubernetes.resourcePools.resourcePool.access({id: item.Namespace.Name})">
+                <a ng-if="$ctrl.canManageAccess(item)" ui-sref="kubernetes.resourcePools.resourcePool.access({id: item.Namespace.Name})">
                   <i class="fa fa-users" aria-hidden="true"></i> Manage access
                 </a>
+                <span ng-if="!$ctrl.canManageAccess(item)">-</span>
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
