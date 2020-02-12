@@ -15,7 +15,7 @@ class KubernetesClusterController {
 
   async getNodesAsync() {
     try {
-      const nodes = await this.KubernetesNodeService.nodes();
+      const nodes = await this.KubernetesNodeService.get();
       _.forEach(nodes, (node) => node.Memory = filesizeParser(node.Memory));
       this.nodes = nodes;
     } catch (err) {

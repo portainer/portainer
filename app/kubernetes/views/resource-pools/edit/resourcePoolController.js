@@ -144,7 +144,7 @@ class KubernetesEditResourcePoolController {
       const name = this.$transition$.params().id;
 
       const [nodes, pool] = await Promise.all([
-        this.KubernetesNodeService.nodes(),
+        this.KubernetesNodeService.get(),
         this.KubernetesResourcePoolService.resourcePool(name)
       ]);
 

@@ -186,7 +186,7 @@ class KubernetesCreateApplicationController {
 
       const [resourcePools, nodes] = await Promise.all([
         this.KubernetesResourcePoolService.resourcePools(),
-        this.KubernetesNodeService.nodes()
+        this.KubernetesNodeService.get()
       ]);
 
       _.forEach(nodes, (item) => {

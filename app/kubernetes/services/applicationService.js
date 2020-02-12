@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
 import KubernetesDeploymentModelFromApplication from 'Kubernetes/models/deployment';
-import {KubernetesApplicationDeploymentTypes, KubernetesApplicationViewModel} from 'Kubernetes/models/application';
-import KubernetesDaemonSetModelFromApplication from 'Kubernetes/models/daemonSet';
+import { KubernetesApplicationDeploymentTypes, KubernetesApplicationViewModel } from 'Kubernetes/models/application';
+import KubernetesDaemonSetModelFromApplication from 'Kubernetes/models/daemon-set/daemonSet';
 import KubernetesServiceModelFromApplication from 'Kubernetes/models/service';
 import KubernetesPersistentVolumeClaimsFromApplication from 'Kubernetes/models/persistentVolumeClaim';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
@@ -44,8 +44,8 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
     async function applicationsAsync(namespace) {
       try {
         const [deployments, daemonSets, services] = await Promise.all([
-          KubernetesDeploymentService.deployments(namespace),
-          KubernetesDaemonSetService.daemonSets(namespace),
+          KubernetesDeploymentService.get(namespace),
+          KubernetesDaemonSetService.get(namespace),
           KubernetesServiceService.services(namespace)
         ]);
         const deploymentApplications = _.map(deployments, (item) => {
@@ -77,8 +77,8 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
     async function applicationAsync(namespace, name) {
       try {
         const [deployment, daemonSet, serviceAttempt, pods] = await Promise.allSettled([
-          KubernetesDeploymentService.deployment(namespace, name),
-          KubernetesDaemonSetService.daemonSet(namespace, name),
+          KubernetesDeploymentService.gets(namespace, name),
+          KubernetesDaemonSetService.get(namespace, name),
           KubernetesServiceService.service(namespace, name),
           KubernetesPods(namespace).get().$promise
         ]);
@@ -173,9 +173,9 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
       };
       try {
         if (application.DeploymentType === KubernetesApplicationDeploymentTypes.REPLICATED) {
-          await KubernetesDeploymentService.remove(payload);
+          await KubernetesDeploymentService.delete(payload);
         } else {
-          await KubernetesDaemonSetService.remove(payload);
+          await KubernetesDaemonSetService.delete(payload);
         }
         if (application.ServiceType) {
           await KubernetesServiceService.remove(payload);

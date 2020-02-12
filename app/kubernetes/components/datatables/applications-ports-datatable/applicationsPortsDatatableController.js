@@ -11,6 +11,10 @@ angular.module('portainer.docker')
         expandAll: false
       });
 
+      this.isSystemNamespace = function(item) {
+        return KubernetesNamespaceHelper.isSystemNamespace(item.ResourcePool);
+      };
+
       this.expandItem = function(item, expanded) {
         item.Expanded = expanded;
         if (!expanded) {

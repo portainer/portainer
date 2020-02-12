@@ -77,7 +77,7 @@ class KubernetesCreateResourcePoolController {
         sliderMaxCpu: 0
       };
 
-      const nodes = await this.KubernetesNodeService.nodes();
+      const nodes = await this.KubernetesNodeService.get();
 
       _.forEach(nodes, (item) => {
         this.state.sliderMaxMemory += filesizeParser(item.Memory);

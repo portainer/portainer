@@ -1,143 +1,94 @@
-import {KubernetesApplicationStackAnnotationKey} from 'Kubernetes/models/application';
+import angular from 'angular';
+import PortainerError from 'Portainer/error';
+import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
+import KubernetesDaemonSetConverter from 'Kubernetes/converters/daemonSet';
 
-angular.module("portainer.kubernetes").factory("KubernetesDaemonSetService", [
-  "$async", "KubernetesDaemonSets",
-  function KubernetesDaemonSetServiceFactory($async, KubernetesDaemonSets) {
-    "use strict";
-    const factory = {
-      daemonSets: daemonSets,
-      daemonSet: daemonSet,
-      create: create,
-      remove: remove
-    };
+class KubernetesDaemonSetService {
+  /* @ngInject */
+  constructor($async, KubernetesDaemonSets) {
+    this.$async = $async;
+    this.KubernetesDaemonSets = KubernetesDaemonSets;
 
-    /**
-     * DaemonSets
-     */
-    async function daemonSetsAsync(namespace) {
-      try {
-        const data = await KubernetesDaemonSets(namespace).get().$promise;
-        return data.items;
-      } catch (err) {
-        throw { msg: 'Unable to retrieve DaemonSets', err: err };
-      }
-    }
-
-    function daemonSets(namespace) {
-      return $async(daemonSetsAsync, namespace);
-    }
-
-    /**
-     * daemonSet
-     */
-    async function daemonSetAsync(namespace, name) {
-      try {
-        const payload = {
-          id: name
-        };
-        const [raw, yaml] = await Promise.all([
-          KubernetesDaemonSets(namespace).get(payload).$promise,
-          KubernetesDaemonSets(namespace).getYaml(payload).$promise
-        ]);
-        const res = {
-          Raw: raw,
-          Yaml: yaml
-        };
-        return res;
-      } catch (err) {
-        throw { msg: 'Unable to retrieve daemonSet', err: err };
-      }
-    }
-
-    function daemonSet(namespace, name) {
-      return $async(daemonSetAsync, namespace, name);
-    }
-
-    /**
-     * Creation
-     */
-    // TODO: refactor try an approach on a small service/model for resource pools
-    // Find a way to create view/payload models with converters
-    async function createAsync(daemonSet) {
-      try {
-        const payload = {
-          metadata: {
-            name: daemonSet.Name,
-            namespace: daemonSet.Namespace,
-            annotations: {
-              [KubernetesApplicationStackAnnotationKey]: daemonSet.StackName
-            }
-          },
-          spec: {
-            replicas: daemonSet.ReplicaCount,
-            selector: {
-              matchLabels: {
-                app: daemonSet.Name
-              }
-            },
-            template: {
-              metadata: {
-                labels: {
-                  app: daemonSet.Name
-                }
-              },
-              spec: {
-                containers: [
-                  {
-                    name: daemonSet.Name,
-                    image: daemonSet.Image,
-                    env: daemonSet.Env,
-                    resources: {
-                      limits: {},
-                      requests: {}
-                    },
-                    volumeMounts: daemonSet.VolumeMounts
-                  }
-                ],
-                volumes: daemonSet.Volumes
-              }
-            }
-          }
-        };
-
-        if (daemonSet.MemoryLimit) {
-          payload.spec.template.spec.containers[0].resources.limits.memory = daemonSet.MemoryLimit;
-          payload.spec.template.spec.containers[0].resources.requests.memory = 0;
-        }
-        if (daemonSet.CpuLimit) {
-          payload.spec.template.spec.containers[0].resources.limits.cpu = daemonSet.CpuLimit;
-          payload.spec.template.spec.containers[0].resources.requests.cpu = 0;
-        }
-
-        const data = await KubernetesDaemonSets(payload.metadata.namespace).create(payload).$promise;
-        return data;
-      } catch (err) {
-        throw { msg: 'Unable to create daemon set', err:err };
-      }
-    }
-
-    function create(daemonSet) {
-      return $async(createAsync, daemonSet);
-    }
-
-    /**
-     * Delete
-     */
-    async function removeAsync(daemonSet) {
-      try {
-        const payload = {
-          id: daemonSet.Name
-        };
-        await KubernetesDaemonSets(daemonSet.Namespace).delete(payload).$promise
-      } catch (err) {
-        throw { msg: 'Unable to remove daemonset', err: err };
-      }
-    }
-
-    function remove(daemonSet) {
-      return $async(removeAsync, daemonSet);
-    }
-
-    return factory;
+    this.getAsync = this.getAsync.bind(this);
+    this.getAllAsync = this.getAllAsync.bind(this);
+    this.createAsync = this.createAsync.bind(this);
+    this.deleteAsync = this.deleteAsync.bind(this);
   }
-]);
+
+  /**
+   * GET
+   */
+  async getAsync(namespace, name) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = name;
+      const [raw, yaml] = await Promise.all([
+        this.KubernetesDaemonSets(namespace).get(params).$promise,
+        this.KubernetesDaemonSets(namespace).getYaml(params).$promise
+      ]);
+      const res = {
+        Raw: raw,
+        Yaml: yaml
+      };
+      return res;
+    } catch (err) {
+      throw new PortainerError('Unable to retrieve DaemonSet', err);
+    }
+  }
+
+  async getAllAsync(namespace) {
+    try {
+      const data = await this.KubernetesDaemonSets(namespace).get().$promise;
+      return data.items;
+    } catch (err) {
+      throw new PortainerError('Unable to retrieve DaemonSets', err);
+    }
+  }
+
+  get(namespace, name) {
+    if (name) {
+      return this.$async(this.getAsync, namespace, name);
+    }
+    return this.$async(this.getAllAsync, namespace);
+  }
+
+  /**
+   * CREATE
+   */
+  async createAsync(daemonSet) {
+    try {
+      const params = {};
+      const payload = KubernetesDaemonSetConverter.createPayload(daemonSet);
+      const namespace = payload.metadata.namespace;
+      const data = await this.KubernetesDaemonSets(namespace).create(params, payload).$promise;
+      return data;
+    } catch (err) {
+      throw new PortainerError('Unable to create daemonset', err);
+    }
+  }
+
+  create(daemonSet) {
+    return this.$async(this.createAsync, daemonSet);
+  }
+
+  /**
+   * DELETE
+   */
+  async deleteAsync(daemonSet) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = daemonSet.Name;
+      const namespace = daemonSet.Namespace;
+      await this.KubernetesDaemonSets(namespace).delete(params).$promise
+    } catch (err) {
+      throw new PortainerError('Unable to remove daemonset', err);
+    }
+  }
+
+  delete(daemonSet) {
+    return this.$async(this.deleteAsync, daemonSet);
+  }
+}
+
+export default KubernetesDaemonSetService;
+angular.module('portainer.kubernetes').service('KubernetesDaemonSetService', KubernetesDaemonSetService);

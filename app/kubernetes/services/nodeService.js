@@ -1,41 +1,53 @@
+import angular from 'angular';
 import _ from 'lodash-es';
-import {KubernetesNodeDetailsViewModel, KubernetesNodeViewModel} from '../models/node';
 
-angular.module('portainer.kubernetes')
-  .factory('KubernetesNodeService', ['$async', 'KubernetesNodes',
-    function KubernetesNodeServiceFactory($async, KubernetesNodes) {
-      'use strict';
-      // TODO: refactor all services
-      var service = {};
+import PortainerError from 'Portainer/error';
+import KubernetesNodeConverter from 'Kubernetes/converters/node';
+import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
 
-      async function nodesAsync() {
-        try {
-          const data = await KubernetesNodes().get().$promise;
-          return _.map(data.items, (item) => new KubernetesNodeViewModel(item));
-        } catch (err) {
-          throw {msg: 'Unable to retrieve nodes', err:err};
-        }
-      }
+class KubernetesNodeService {
+  /* @ngInject */
+  constructor($async, KubernetesNodes) {
+    this.$async = $async;
+    this.KubernetesNodes = KubernetesNodes;
 
-      async function nodeAsync(name) {
-        try {
-          const [details, yaml] = await Promise.all([
-            KubernetesNodes().get({id: name}).$promise,
-            KubernetesNodes().getYaml({id: name}).$promise
-          ]);
-          return new KubernetesNodeDetailsViewModel(details, yaml.data);
-        } catch (err) {
-          throw {msg: 'Unable to retrieve node details', err: err};
-        }
-      }
+    this.getAsync = this.getAsync.bind(this);
+    this.getAllAsync = this.getAllAsync.bind(this);
+  }
 
-      service.nodes = function() {
-        return $async(nodesAsync);
-      };
+  /**
+   * GET
+   */
+  async getAsync(name) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = name;
+      const [details, yaml] = await Promise.all([
+        this.KubernetesNodes().get(params).$promise,
+        this.KubernetesNodes().getYaml(params).$promise
+      ]);
+      return KubernetesNodeConverter.apiToNodeDetails(details, yaml.data);
+    } catch (err) {
+      throw new PortainerError('Unable to retrieve node details', err);
+    }
+  }
 
-      service.node = function(name) {
-        return $async(nodeAsync, name);
-      };
+  async getAllAsync() {
+    try {
+      const data = await this.KubernetesNodes().get().$promise;
+      return _.map(data.items, (item) => KubernetesNodeConverter.apiToNode(item));
+    } catch (err) {
+      throw {msg: 'Unable to retrieve nodes', err:err};
+    }
+  }
 
-      return service;
-    }]);
+  get(name) {
+    if (name) {
+      return this.$async(this.getAsync, name);
+    }
+    return this.$async(this.getAllAsync);
+  }
+}
+
+export default KubernetesNodeService;
+angular.module('portainer.kubernetes').service('KubernetesNodeService', KubernetesNodeService);
