@@ -5,7 +5,7 @@ angular.module('portainer.docker')
       angular.extend(this, $controller('GenericDatatableController', {$scope: $scope}));
 
       this.canManageAccess = function(item) {
-        return item.Namespace.Name !== 'default';
+        return item.Namespace.Name !== 'default' && !this.isSystemNamespace(item);
       }
 
       this.disableRemove = function(item) {
