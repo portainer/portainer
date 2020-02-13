@@ -38,7 +38,7 @@
                             <i
                                 class="fa fa-heartbeat space-right"
                                 aria-hidden="true"
-                            ></i> Conditions
+                            ></i> Node
                         </uib-tab-heading>
                         <table class="table">
                             <tbody ng-if="ctrl.node">
@@ -60,7 +60,16 @@
                                 </tr>
                                 <tr>
                                     <td>Status</td>
-                                    <td>{{ ctrl.node.Status }}</td>
+                                    <td>
+                                        <span
+                                            class="label"
+                                            ng-class="{
+                                                'label-success': ctrl.NodeStatus == 'Ready',
+                                                'label-warning': ctrl.NodeStatus == 'Warning',
+                                                'label-error': ctrl.NodeStatus == 'Unhealthy'
+                                            }"
+                                        >{{ ctrl.NodeStatus }}</span> {{ ctrl.NodeStatusMessage }}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td>Resource Reservation</td>

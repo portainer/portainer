@@ -1,5 +1,5 @@
 import angular from 'angular';
-// import _ from 'lodash-es';
+import _ from 'lodash-es';
 
 class KubernetesClusterNodeController {
     /* @ngInject */
@@ -16,6 +16,8 @@ class KubernetesClusterNodeController {
         this.getNodeAsync = this.getNodeAsync.bind(this);
         this.getEvents = this.getEvents.bind(this);
         this.getEventsAsync = this.getEventsAsync.bind(this);
+
+        this.computeNodeStatus = this.computeNodeStatus.bind(this);
     }
 
     async getNodeAsync() {
@@ -23,19 +25,47 @@ class KubernetesClusterNodeController {
             this.state.dataLoading = true;
             const nodeName = this.$transition$.params().name;
             this.node = await this.KubernetesNodeService.get(nodeName);
+            this.computeNodeStatus();
         } catch (err) {
             this.Notifications.error(
                 'Failure',
                 err,
                 'Unable to retrieve node'
-            )
+            );
         } finally {
-            this.state.dataLoading = false
+            this.state.dataLoading = false;
         }
     }
 
     getNode() {
         return this.$async(this.getNodeAsync);
+    }
+
+    computeNodeStatus() {
+        this.NodeStatus = this.node.Status;
+        if (this.NodeStatus !== 'Unhealthy') {
+            _.forEach(this.node.Conditions, (condition) => {
+                if (condition.type === 'MemoryPressure' && condition.status === true) {
+                    this.NodeStatus = 'Warning';
+                    this.NodeStatusMessage = 'Node memory is running low';
+                }
+
+                if (condition.type === 'PIDPressure' && condition.status === true) {
+                    this.NodeStatus = 'Warning';
+                    this.NodeStatusMessage = 'Too many processes running on the node';
+                }
+
+                if (condition.type === 'DiskPressure' && condition.status === true) {
+                    this.NodeStatus = 'Warning';
+                    this.NodeStatusMessage = 'Node disk capacity is running low';
+                }
+
+                if (condition.type === 'NetworkUnavailable' && condition.status === true) {
+                    this.NodeStatus = 'Warning';
+                    this.NodeStatusMessage = 'Incorrect node network configuration';
+                }
+            });
+        }
     }
 
     async getEventsAsync() {
