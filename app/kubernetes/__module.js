@@ -111,6 +111,18 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     }
   };
 
+  const nodeInspect = {
+    name: 'kubernetes.cluster.node',
+    url: '/:name',
+    views: {
+      'content@': {
+        templateUrl: './views/cluster/inspect/node.html',
+        controller: 'KubernetesClusterNodeController',
+        controllerAs: 'ctrl'
+      }
+    }
+  };
+
   const resourcePools = {
     name: 'kubernetes.resourcePools',
     url: '/pools',
@@ -180,6 +192,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
   $stateRegistryProvider.register(dashboard);
   $stateRegistryProvider.register(deploy);
   $stateRegistryProvider.register(nodes);
+  $stateRegistryProvider.register(nodeInspect);
   $stateRegistryProvider.register(resourcePools);
   $stateRegistryProvider.register(resourcePoolCreation);
   $stateRegistryProvider.register(resourcePool);
