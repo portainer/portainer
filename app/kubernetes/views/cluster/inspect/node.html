@@ -44,7 +44,7 @@
                             <tbody ng-if="ctrl.node">
                                 <tr>
                                     <td>Hostname</td>
-                                    <td>{{ ctrl.node.Hostname }}</td>
+                                    <td>{{ ctrl.node.Name }}</td>
                                 </tr>
                                 <tr>
                                     <td>Role</td>
@@ -73,7 +73,7 @@
                                 </tr>
                                 <tr>
                                     <td>Resource Reservation</td>
-                                    <td>{{ ctrl.node.Memory }} / {{ ctrl.node.Memory }}</td>
+                                    <td>{{ ctrl.Usage.Memory | humansize }} , {{ ctrl.Usage.CPU }}</td>
                                 </tr>
                             </tbody>
                         </table>
