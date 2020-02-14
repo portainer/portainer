@@ -54,6 +54,66 @@ class KubernetesClusterNodeController {
         return this.$async(this.getNodeAsync);
     }
 
+    async getEventsAsync() {
+        try {
+            this.state.eventsLoading = true;
+            this.events = await this.KubernetesEventService.events(this.node.Name);
+        } catch (err) {
+            this.Notifications.error(
+                'Failure',
+                err,
+                'Unable to retrieve node events'
+            );
+        } finally {
+            this.state.eventsLoading = false;
+        }
+    }
+
+    getEvents() {
+        return this.$async(this.getEventsAsync);
+    }
+
+    async getPodsAsync() {
+        try {
+            this.state.podsLoading = true;
+            const pods = await this.KubernetesPodService.pods();
+            this.pods = _.filter(pods, pod => pod.Node === this.node.Name);
+            this.computeMemoryUsage();
+        } catch (err) {
+            this.Notifications.error(
+                'Failure',
+                err,
+                'Unable to retrieve pods'
+            );
+        } finally {
+            this.state.podsLoading = false;
+        }
+    }
+
+    getPods() {
+        return this.$async(this.getPodsAsync);
+    }
+
+    async onInit() {
+        this.state = {
+            activeTab: 0,
+            dataLoading: true,
+            eventsLoading: true,
+            podsLoading: true,
+            memoryUsage: 0,
+            cpuUsage: 0
+        };
+
+        this.getNode().then(() => {
+            this.getEvents();
+            this.getPods();
+        });
+    }
+
+    $onInit() {
+        return this.$async(this.onInit);
+    }
+
     computeNodeStatus() {
         this.NodeStatus = this.node.Status;
         if (this.NodeStatus !== 'Unhealthy') {
@@ -82,16 +142,10 @@ class KubernetesClusterNodeController {
     }
 
     computeMemoryUsage() {
+        const usage = { Memory: 0, CPU: 0 };
 
-        const usage = {
-            Memory: 0,
-            CPU: 0
-        };
         this.Usage = _.reduce(this.pods, (acc, pod) => {
-            const usage = {
-                Memory: 0,
-                CPU: 0
-            };
+            const usage = { Memory: 0, CPU: 0 };
             let podUsage = _.reduce(pod.Containers, (acc, container) => {
                 if (container.resources && container.resources.requests) {
                     if (container.resources.requests.memory) {
@@ -112,66 +166,11 @@ class KubernetesClusterNodeController {
             acc.CPU += podUsage.CPU;
             return acc;
         }, usage);
-        if (this.Usage.CPU < 1) {
-            this.Usage.CPU = this.Usage.CPU * 1000 + 'm';
+
+        this.UsageMax = {
+            Memory: filesizeParser(this.node.Memory),
+            CPU: this.node.CPU
         }
-    }
-
-    async getEventsAsync() {
-        try {
-            this.state.eventsLoading = true;
-            this.events = await this.KubernetesEventService.events(this.node.Name);
-        } catch (err) {
-            this.Notifications.error(
-                'Failure',
-                err,
-                'Unable to retrieve node events'
-            );
-        } finally {
-            this.state.eventsLoading = false;
-        }
-    }
-
-    getEvents() {
-        return this.$async(this.getEventsAsync);
-    }
-
-    async getPodsAsync() {
-        try {
-            this.state.podsLoading = true;
-            this.pods = await this.KubernetesPodService.pods();
-            this.computeMemoryUsage();
-        } catch (err) {
-            this.Notifications.error(
-                'Failure',
-                err,
-                'Unable to retrieve pods'
-            );
-        } finally {
-            this.state.podsLoading = false;
-        }
-    }
-
-    getPods() {
-        return this.$async(this.getPodsAsync);
-    }
-
-    async onInit() {
-        this.state = {
-            activeTab: 0,
-            dataLoading: true,
-            eventsLoading: true,
-            podsLoading: true
-        };
-
-        this.getNode().then(() => {
-            this.getEvents();
-            this.getPods();
-        });
-    }
-
-    $onInit() {
-        return this.$async(this.onInit);
     }
 }
 
