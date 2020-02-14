@@ -6,6 +6,7 @@ require (
 	github.com/Microsoft/go-winio v0.3.8
 	github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a
 	github.com/boltdb/bolt v1.3.1
+	github.com/containerd/containerd v1.3.1 // indirect
 	github.com/coreos/go-semver v0.3.0
 	github.com/dchest/uniuri v0.0.0-20160212164326-8902c56451e9
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -23,7 +24,7 @@ require (
 	github.com/mattn/go-shellwords v1.0.6 // indirect
 	github.com/mitchellh/mapstructure v1.1.2 // indirect
 	github.com/orcaman/concurrent-map v0.0.0-20190826125027-8c72a8bb44f6
-	github.com/portainer/libcompose v0.5.1-0.20191128210235-7e42ca632b24
+	github.com/portainer/libcompose v0.5.3
 	github.com/portainer/libcrypto v0.0.0-20190723020515-23ebe86ab2c2
 	github.com/portainer/libhttp v0.0.0-20190806161843-ba068f58be33
 	github.com/robfig/cron/v3 v3.0.0
