@@ -11,7 +11,8 @@ class KubernetesClusterNodeController {
         Notifications,
         KubernetesNodeService,
         KubernetesEventService,
-        KubernetesPodService
+        KubernetesPodService,
+        KubernetesApplicationService
     ) {
         this.$async = $async;
         this.$state = $state;
@@ -20,6 +21,7 @@ class KubernetesClusterNodeController {
         this.KubernetesNodeService = KubernetesNodeService;
         this.KubernetesEventService = KubernetesEventService;
         this.KubernetesPodService = KubernetesPodService;
+        this.KubernetesApplicationService = KubernetesApplicationService;
 
         this.onInit = this.onInit.bind(this);
         this.getNode = this.getNode.bind(this);
@@ -28,6 +30,8 @@ class KubernetesClusterNodeController {
         this.getEventsAsync = this.getEventsAsync.bind(this);
         this.getPods = this.getPods.bind(this);
         this.getPodsAsync = this.getPodsAsync.bind(this);
+        this.getApplications = this.getApplications.bind(this);
+        this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
 
         this.computeNodeStatus = this.computeNodeStatus.bind(this);
         this.computeMemoryUsage = this.computeMemoryUsage.bind(this);
@@ -94,19 +98,69 @@ class KubernetesClusterNodeController {
         return this.$async(this.getPodsAsync);
     }
 
+    async getApplicationsAsync() {
+        try {
+            this.state.applicationsLoading = true;
+            const applications = await this.KubernetesApplicationService.applications();
+            this.applications = _.filter(applications, (app) => {
+                app.MemoryReservation = 0;
+                app.CPUReservation = 0;
+                return _.filter(this.pods, (pod) => {
+                    if (_.startsWith(pod.Metadata.name, app.Name)) {
+                        const usage = { Memory: 0, CPU: 0 };
+                        let podUsage = _.reduce(pod.Containers, (acc, container) => {
+                            if (container.resources && container.resources.requests) {
+                                if (container.resources.requests.memory) {
+                                    acc.Memory += filesizeParser(container.resources.requests.memory, { base: 10 });
+                                }
+                                if (container.resources.requests.cpu) {
+                                    let cpu = parseInt(container.resources.requests.cpu);
+                                    if (_.endsWith(container.resources.requests.cpu, 'm')) {
+                                        cpu /= 1000;
+                                    }
+                                    acc.CPU += cpu;
+                                }
+                            }
+                            return acc;
+                        }, usage);
+
+                        app.MemoryReservation += podUsage.Memory;
+                        app.CPUReservation += podUsage.CPU;
+                        return app;
+                    }
+                });
+            })
+        } catch (err) {
+            this.Notifications.error(
+                'Failure',
+                err,
+                'Unable to retrieve applications'
+            );
+        } finally {
+            this.state.applicationsLoading = false;
+        }
+    }
+
+    getApplications() {
+        return this.$async(this.getApplicationsAsync);
+    }
+
     async onInit() {
         this.state = {
             activeTab: 0,
             dataLoading: true,
             eventsLoading: true,
             podsLoading: true,
+            applicationsLoading: true,
             memoryUsage: 0,
             cpuUsage: 0
         };
 
         this.getNode().then(() => {
             this.getEvents();
-            this.getPods();
+            this.getPods().then(() => {
+                this.getApplications();
+            });
         });
     }
 

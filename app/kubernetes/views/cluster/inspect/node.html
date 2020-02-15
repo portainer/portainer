@@ -158,5 +158,16 @@
                 </uib-tabset>
             </rd-widget-body>
         </rd-widget>
+
+        <rd-widget>
+            <rd-widget-body>
+                <kubernetes-applications-node-datatable
+                    dataset="ctrl.applications"
+                    table-key="kubernetes.applications"
+                    order-by="Name"
+                    title-text="Running applications panel"
+                ></kubernetes-applications-node-datatable>
+            </rd-widget-body>
+        </rd-widget>
     </div>
 </div>
