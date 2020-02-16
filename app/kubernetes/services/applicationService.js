@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 import KubernetesDeploymentModelFromApplication from 'Kubernetes/models/deployment';
-import { KubernetesApplicationDeploymentTypes, KubernetesApplicationViewModel } from 'Kubernetes/models/application';
+import {KubernetesApplicationDeploymentTypes, KubernetesApplicationViewModel} from 'Kubernetes/models/application';
 import KubernetesDaemonSetModelFromApplication from 'Kubernetes/models/daemon-set/daemonSet';
 import KubernetesServiceModelFromApplication from 'Kubernetes/models/service';
 import KubernetesPersistentVolumeClaimsFromApplication from 'Kubernetes/models/persistentVolumeClaim';
@@ -77,7 +77,7 @@ angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
     async function applicationAsync(namespace, name) {
       try {
         const [deployment, daemonSet, serviceAttempt, pods] = await Promise.allSettled([
-          KubernetesDeploymentService.gets(namespace, name),
+          KubernetesDeploymentService.get(namespace, name),
           KubernetesDaemonSetService.get(namespace, name),
           KubernetesServiceService.service(namespace, name),
           KubernetesPods(namespace).get().$promise
