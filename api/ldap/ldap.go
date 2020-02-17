@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
 
 	"gopkg.in/ldap.v2"
@@ -178,11 +178,9 @@ func (*Service) TestConnectivity(settings *portainer.LDAPSettings) error {
 	}
 	defer connection.Close()
 
-	if !settings.AnonymousMode {
-		err = connection.Bind(settings.ReaderDN, settings.Password)
-		if err != nil {
-			return err
-		}
+	err = connection.Bind(settings.ReaderDN, settings.Password)
+	if err != nil {
+		return err
 	}
 	return nil
 }
