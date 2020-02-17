@@ -82,7 +82,7 @@
                                     <div class="form-group">
                                         <span class="col-sm-12 text-muted small" >
                                             <p>
-                                                Resource reservation represents the total amount of resource limits applied to the node.
+                                                Resource reservation represents the total amount of resource applied to the node.
                                             </p>
                                         </span>
                                     </div>
@@ -94,10 +94,10 @@
                                             <uib-progressbar
                                                 animate="false"
                                                 value="ctrl.Usage.Memory"
-                                                max="ctrl.UsageMax.Memory"
+                                                type="ctrl.usageLevelInfo(ctrl.Usage.Memory)"
                                             >
                                                 <b>
-                                                    {{ ctrl.Usage.Memory | humansize }} - {{ ctrl.UsageMax.Memory | humansize }}
+                                                    {{ ctrl.Reservation.Memory | humansize }} - {{ ctrl.Usage.Memory }}%
                                                 </b>
                                             </uib-progressbar>
                                         </div>
@@ -110,10 +110,10 @@
                                             <uib-progressbar
                                                 animate="false"
                                                 value="ctrl.Usage.CPU"
-                                                max="ctrl.UsageMax.CPU"
+                                                type="ctrl.usageLevelInfo(ctrl.Usage.CPU)"
                                             >
                                                 <b>
-                                                    {{ ctrl.Usage.CPU }} - {{ ctrl.UsageMax.CPU }}
+                                                    {{ ctrl.Reservation.CPU }} - {{ ctrl.Usage.CPU }}%
                                                 </b>
                                             </uib-progressbar>
                                         </div>

@@ -35,6 +35,7 @@ class KubernetesClusterNodeController {
 
         this.computeNodeStatus = this.computeNodeStatus.bind(this);
         this.computeMemoryUsage = this.computeMemoryUsage.bind(this);
+        this.usageLevelInfo = this.usageLevelInfo.bind(this);
     }
 
     async getNodeAsync() {
@@ -151,9 +152,7 @@ class KubernetesClusterNodeController {
             dataLoading: true,
             eventsLoading: true,
             podsLoading: true,
-            applicationsLoading: true,
-            memoryUsage: 0,
-            cpuUsage: 0
+            applicationsLoading: true
         };
 
         this.getNode().then(() => {
@@ -196,11 +195,11 @@ class KubernetesClusterNodeController {
     }
 
     computeMemoryUsage() {
-        const usage = { Memory: 0, CPU: 0 };
+        const reservation = { Memory: 0, CPU: 0 };
 
-        this.Usage = _.reduce(this.pods, (acc, pod) => {
-            const usage = { Memory: 0, CPU: 0 };
-            let podUsage = _.reduce(pod.Containers, (acc, container) => {
+        this.Reservation = _.reduce(this.pods, (acc, pod) => {
+            const reservation = { Memory: 0, CPU: 0 };
+            let podReservation = _.reduce(pod.Containers, (acc, container) => {
                 if (container.resources && container.resources.requests) {
                     if (container.resources.requests.memory) {
                         acc.Memory += filesizeParser(container.resources.requests.memory, { base: 10 });
@@ -214,16 +213,36 @@ class KubernetesClusterNodeController {
                     }
                 }
                 return acc;
-            }, usage);
+            }, reservation);
 
-            acc.Memory += podUsage.Memory;
-            acc.CPU += podUsage.CPU;
+            acc.Memory += podReservation.Memory;
+            acc.CPU += podReservation.CPU;
             return acc;
-        }, usage);
+        }, reservation);
 
-        this.UsageMax = {
+        this.Limits = {
             Memory: filesizeParser(this.node.Memory),
             CPU: this.node.CPU
+        };
+
+        this.Usage = {
+            Memory: 0,
+            CPU: 0
+        };
+
+        if (this.Limits.CPU && this.Limits.Memory) {
+            this.Usage.Memory = this.Reservation.Memory / this.Limits.Memory * 100;
+            this.Usage.CPU = this.Reservation.CPU / this.Limits.CPU * 100;
+        }
+    }
+
+    usageLevelInfo(usage) {
+        if (usage >= 80) {
+            return 'danger';
+        } else if (usage > 50 && usage < 80) {
+            return 'warning';
+        } else {
+            return 'success';
         }
     }
 }
