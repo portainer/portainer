@@ -16,6 +16,10 @@ angular.module('portainer.docker')
       };
 
       this.expandItem = function(item, expanded) {
+        if (!this.itemCanExpand(item)) {
+          return;
+        }
+
         item.Expanded = expanded;
         if (!expanded) {
           item.Highlighted = false;
