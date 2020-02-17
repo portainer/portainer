@@ -109,7 +109,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))" ng-class="{active: item.Checked}">
+            <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit: $ctrl.tableKey))"
+            ng-class="{active: item.Checked}" pagination-id="$ctrl.tableKey">
               <td>
                 <span class="md-checkbox">
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="$ctrl.isSystemNamespace(item)"/>
@@ -166,7 +167,7 @@
                 <option value="100">100</option>
               </select>
             </span>
-            <dir-pagination-controls max-size="5"></dir-pagination-controls>
+            <dir-pagination-controls max-size="5" pagination-id="$ctrl.tableKey"></dir-pagination-controls>
           </form>
         </div>
       </div>
