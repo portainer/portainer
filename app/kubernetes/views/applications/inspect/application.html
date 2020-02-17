@@ -110,6 +110,12 @@
               </p>
               <p>
               Load balancer IP address: {{ ctrl.application.LoadBalancerIPAddress }}
+                <span class="btn btn-primary btn-xs" ng-click="ctrl.copyLoadBalancerIP()" style="margin-left: 5px;">
+                  <i class="fa fa-copy space-right" aria-hidden="true"></i>Copy
+                </span>
+                <span id="copyNotificationLB" style="margin-left: 7px; display: none; color: #23ae89;" class="small">
+                  <i class="fa fa-check" aria-hidden="true" ></i> copied
+                </span>
               </p>
             </span>
           </div>
