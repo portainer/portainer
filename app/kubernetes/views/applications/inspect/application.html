@@ -5,44 +5,82 @@
     </a>
   </rd-header-title>
   <rd-header-content>
-    <a ui-sref="kubernetes.applications">Applications</a> &gt; <a ui-sref="kubernetes.applications.application" ui-sref-opts="{reload: true}">{{ ctrl.application.Name }}</a>
+    <a ui-sref="kubernetes.applications">Applications</a> &gt; {{ ctrl.application.Name }}
   </rd-header-content>
 </rd-header>
 
-<div class="row">
+<div class="row" ng-if="ctrl.application">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-laptop-code" title-text="Application status"></rd-widget-header>
       <rd-widget-body classes="no-padding">
-        <table class="table">
-          <tbody ng-if="!ctrl.application"><tr><td class="text-center text-muted">Loading...</td></tr></tbody>
-          <tbody ng-if="ctrl.application">
-          <tr>
-            <td>Name</td>
-            <td>{{ ctrl.application.Name }}</td>
-          </tr>
-          <tr>
-            <td>Stack</td>
-            <td>{{ ctrl.application.Stack }}</td>
-          </tr>
-          <tr>
-            <td>Resource pool</td>
-            <td>{{ ctrl.application.ResourcePool }}</td>
-          </tr>
-          <tr>
-            <td>Deployment</td>
-            <td>
-              <span ng-if="ctrl.application.DeploymentType === ctrl.KubernetesApplicationDeploymentTypes.REPLICATED">Replicated</span>
-              <span ng-if="ctrl.application.DeploymentType === ctrl.KubernetesApplicationDeploymentTypes.GLOBAL">Global</span>
-              <code>{{ ctrl.application.RunningPodsCount }}</code> / <code>{{ ctrl.application.TotalPodsCount }}</code></td>
-            </td>
-          </tr>
-          <tr>
-            <td>Creation date</td>
-            <td>{{ ctrl.application.CreatedAt | getisodate }}</td>
-          </tr>
-          </tbody>
-        </table>
+
+        <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
+          <uib-tab index="0" classes="btn-sm">
+            <uib-tab-heading>
+              <i class="fa fa-laptop-code space-right" aria-hidden="true"></i> Application
+            </uib-tab-heading>
+
+            <div style="padding: 20px;">
+              <table class="table">
+                <tbody>
+                <tr>
+                  <td>Name</td>
+                  <td>{{ ctrl.application.Name }}</td>
+                </tr>
+                <tr>
+                  <td>Stack</td>
+                  <td>{{ ctrl.application.Stack }}</td>
+                </tr>
+                <tr>
+                  <td>Resource pool</td>
+                  <td>{{ ctrl.application.ResourcePool }}</td>
+                </tr>
+                <tr>
+                  <td>Deployment</td>
+                  <td>
+                    <span ng-if="ctrl.application.DeploymentType === ctrl.KubernetesApplicationDeploymentTypes.REPLICATED">Replicated</span>
+                    <span ng-if="ctrl.application.DeploymentType === ctrl.KubernetesApplicationDeploymentTypes.GLOBAL">Global</span>
+                    <code>{{ ctrl.application.RunningPodsCount }}</code> / <code>{{ ctrl.application.TotalPodsCount }}</code>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Creation date</td>
+                  <td>{{ ctrl.application.CreatedAt | getisodate }}</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </uib-tab>
+
+          <uib-tab index="1" classes="btn-sm">
+            <uib-tab-heading>
+              <i class="fa fa-history space-right" aria-hidden="true"></i> Events
+            </uib-tab-heading>
+            <kubernetes-events-datatable
+                    title-text="Events" title-icon="fa-history"
+                    dataset="ctrl.events" table-key="kubernetes.application.events"
+                    order-by="Date"
+                    reverse-order="true"
+                    loading="ctrl.state.eventsLoading"
+                    refresh-callback="ctrl.getEvents"
+            ></kubernetes-events-datatable>
+          </uib-tab>
+
+          <uib-tab index="2" ng-if="ctrl.application.Yaml" select="ctrl.showEditor()" classes="btn-sm">
+            <uib-tab-heading>
+              <i class="fa fa-code space-right" aria-hidden="true"></i> YAML
+            </uib-tab-heading>
+            <div style="padding-right: 25px;" ng-if="ctrl.state.showEditorTab">
+              <kubernetes-yaml-inspector
+                      key="application-yaml"
+                      data="ctrl.application.Yaml"
+              ></kubernetes-yaml-inspector>
+            </div>
+          </uib-tab>
+
+        </uib-tabset>
+
       </rd-widget-body>
     </rd-widget>
   </div>
@@ -74,6 +112,12 @@
               </p>
               <p>
               Load balancer IP address: {{ ctrl.application.LoadBalancerIPAddress }}
+                <span class="btn btn-primary btn-xs" ng-click="ctrl.copyLoadBalancerIP()" style="margin-left: 5px;">
+                  <i class="fa fa-copy space-right" aria-hidden="true"></i>Copy
+                </span>
+                <span id="copyNotificationLB" style="margin-left: 7px; display: none; color: #23ae89;" class="small">
+                  <i class="fa fa-check" aria-hidden="true" ></i> copied
+                </span>
               </p>
             </span>
           </div>
@@ -142,50 +186,12 @@
   </div>
 </div>
 
-<div class="row">
+<div class="row" ng-if="ctrl.application">
   <div class="col-sm-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-laptop-medical" title-text="Application details"></rd-widget-header>
-      <rd-widget-body classes="no-padding">
-
-        <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
-          <uib-tab index="0" classes="btn-sm">
-            <uib-tab-heading>
-              <i class="fa fa-server space-right" aria-hidden="true"></i> Pods
-            </uib-tab-heading>
-            <kubernetes-pods-datatable
-              title-text="Application pods" title-icon="fa-server"
-              dataset="ctrl.application.Pods" table-key="kubernetes.application.pods"
-              order-by="Name"
-            ></kubernetes-pods-datatable>
-          </uib-tab>
-          <uib-tab index="1" classes="btn-sm">
-            <uib-tab-heading>
-              <i class="fa fa-history space-right" aria-hidden="true"></i> Events
-            </uib-tab-heading>
-            <kubernetes-events-datatable
-              title-text="Events" title-icon="fa-history"
-              dataset="ctrl.events" table-key="kubernetes.application.events"
-              order-by="Date"
-              reverse-order="true"
-              loading="ctrl.state.eventsLoading"
-              refresh-callback="ctrl.getEvents"
-            ></kubernetes-events-datatable>
-          </uib-tab>
-          <uib-tab index="2" ng-if="ctrl.application.Yaml" select="ctrl.showEditor()" classes="btn-sm">
-            <uib-tab-heading>
-              <i class="fa fa-code space-right" aria-hidden="true"></i> YAML
-            </uib-tab-heading>
-            <div style="padding-right: 25px;" ng-if="ctrl.state.showEditorTab">
-              <kubernetes-yaml-inspector
-                      key="application-yaml"
-                      data="ctrl.application.Yaml"
-              ></kubernetes-yaml-inspector>
-            </div>
-          </uib-tab>
-        </uib-tabset>
-
-      </rd-widget-body>
-    </rd-widget>
+    <kubernetes-pods-datatable
+            title-text="Application pods" title-icon="fa-server"
+            dataset="ctrl.application.Pods" table-key="kubernetes.application.pods"
+            order-by="Name"
+    ></kubernetes-pods-datatable>
   </div>
 </div>

@@ -4,10 +4,11 @@ import {KubernetesApplicationDeploymentTypes} from 'Kubernetes/models/applicatio
 
 class KubernetesApplicationController {
   /* @ngInject */
-  constructor($async, $state, $transition$, Notifications, KubernetesApplicationService, KubernetesEventService) {
+  constructor($async, $state, $transition$, clipboard, Notifications, KubernetesApplicationService, KubernetesEventService) {
     this.$async = $async;
     this.$state = $state;
     this.$transition$ = $transition$;
+    this.clipboard = clipboard;
     this.Notifications = Notifications;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesEventService = KubernetesEventService;
@@ -17,6 +18,7 @@ class KubernetesApplicationController {
     this.getApplicationAsync = this.getApplicationAsync.bind(this);
     this.getEvents = this.getEvents.bind(this);
     this.getEventsAsync = this.getEventsAsync.bind(this);
+    this.copyLoadBalancerIP = this.copyLoadBalancerIP.bind(this);
   }
 
   async getEventsAsync() {
@@ -35,6 +37,11 @@ class KubernetesApplicationController {
 
   getEvents() {
     return this.$async(this.getEventsAsync);
+  }
+
+  copyLoadBalancerIP() {
+    this.clipboard.copyText(this.application.LoadBalancerIPAddress);
+    $('#copyNotificationLB').show().fadeOut(2500);
   }
 
   async getApplicationAsync() {

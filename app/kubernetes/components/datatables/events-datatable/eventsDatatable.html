@@ -83,7 +83,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))">
+            <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit: $ctrl.tableKey))" pagination-id="$ctrl.tableKey">
               <td>{{ item.Date | getisodate }}</td>
               <td>{{ item.Involved.kind }}</td>
               <td><span class="label label-{{ item.Type | kubernetesEventTypeColor }}">{{ item.Type }}</span></td>
@@ -116,7 +116,7 @@
                 <option value="100">100</option>
               </select>
             </span>
-            <dir-pagination-controls max-size="5"></dir-pagination-controls>
+            <dir-pagination-controls max-size="5" pagination-id="$ctrl.tableKey"></dir-pagination-controls>
           </form>
         </div>
       </div>
