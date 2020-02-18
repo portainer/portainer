@@ -88,7 +88,7 @@
           </tr>
             <tr authorization="DockerServiceLogs, DockerServiceUpdate, DockerServiceDelete">
               <td colspan="2">
-                <p class="small text-muted">
+                <p class="small text-muted" authorization="DockerServiceUpdate">
                   Note: you can only rollback one level of changes. Clicking the rollback button without making a new change will undo your previous rollback
                 <p>
                 <a authorization="DockerServiceLogs" ng-if="applicationState.endpoint.apiVersion >= 1.30" class="btn btn-primary btn-sm" type="button" ui-sref="docker.services.service.logs({id: service.Id})"><i class="fa fa-file-alt space-right" aria-hidden="true"></i>Service logs</a>

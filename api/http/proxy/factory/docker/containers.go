@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/docker/docker/client"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
 )
 
@@ -19,14 +19,17 @@ func getInheritedResourceControlFromContainerLabels(dockerClient *client.Client,
 		return nil, err
 	}
 
+	serviceName := container.Config.Labels[resourceLabelForDockerServiceID]
+	if serviceName != "" {
+		serviceResourceControl := portainer.GetResourceControlByResourceIDAndType(serviceName, portainer.ServiceResourceControl, resourceControls)
+		if serviceResourceControl != nil {
+			return serviceResourceControl, nil
+		}
+	}
+
 	swarmStackName := container.Config.Labels[resourceLabelForDockerSwarmStackName]
 	if swarmStackName != "" {
 		return portainer.GetResourceControlByResourceIDAndType(swarmStackName, portainer.StackResourceControl, resourceControls), nil
-	}
-
-	serviceName := container.Config.Labels[resourceLabelForDockerServiceID]
-	if serviceName != "" {
-		return portainer.GetResourceControlByResourceIDAndType(serviceName, portainer.ServiceResourceControl, resourceControls), nil
 	}
 
 	composeStackName := container.Config.Labels[resourceLabelForDockerComposeStackName]

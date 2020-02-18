@@ -50,6 +50,7 @@ type (
 
 	// LDAPSettings represents the settings used to connect to a LDAP server
 	LDAPSettings struct {
+		AnonymousMode       bool                      `json:"AnonymousMode"`
 		ReaderDN            string                    `json:"ReaderDN"`
 		Password            string                    `json:"Password,omitempty"`
 		URL                 string                    `json:"URL"`
@@ -389,18 +390,20 @@ type (
 
 	// Snapshot represents a snapshot of a specific endpoint at a specific time
 	Snapshot struct {
-		Time                  int64       `json:"Time"`
-		DockerVersion         string      `json:"DockerVersion"`
-		Swarm                 bool        `json:"Swarm"`
-		TotalCPU              int         `json:"TotalCPU"`
-		TotalMemory           int64       `json:"TotalMemory"`
-		RunningContainerCount int         `json:"RunningContainerCount"`
-		StoppedContainerCount int         `json:"StoppedContainerCount"`
-		VolumeCount           int         `json:"VolumeCount"`
-		ImageCount            int         `json:"ImageCount"`
-		ServiceCount          int         `json:"ServiceCount"`
-		StackCount            int         `json:"StackCount"`
-		SnapshotRaw           SnapshotRaw `json:"SnapshotRaw"`
+		Time                    int64       `json:"Time"`
+		DockerVersion           string      `json:"DockerVersion"`
+		Swarm                   bool        `json:"Swarm"`
+		TotalCPU                int         `json:"TotalCPU"`
+		TotalMemory             int64       `json:"TotalMemory"`
+		RunningContainerCount   int         `json:"RunningContainerCount"`
+		StoppedContainerCount   int         `json:"StoppedContainerCount"`
+		HealthyContainerCount   int         `json:"HealthyContainerCount"`
+		UnhealthyContainerCount int         `json:"UnhealthyContainerCount"`
+		VolumeCount             int         `json:"VolumeCount"`
+		ImageCount              int         `json:"ImageCount"`
+		ServiceCount            int         `json:"ServiceCount"`
+		StackCount              int         `json:"StackCount"`
+		SnapshotRaw             SnapshotRaw `json:"SnapshotRaw"`
 	}
 
 	// SnapshotRaw represents all the information related to a snapshot as returned by the Docker API
@@ -914,7 +917,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "1.23.0"
+	APIVersion = "1.23.1"
 	// DBVersion is the version number of the Portainer database
 	DBVersion = 22
 	// AssetsServerURL represents the URL of the Portainer asset server

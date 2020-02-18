@@ -6,9 +6,8 @@ import (
 
 	"github.com/docker/docker/client"
 
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
-
-	"github.com/portainer/portainer/api"
 )
 
 const (
@@ -75,8 +74,8 @@ func (transport *Transport) secretInspectOperation(response *http.Response, exec
 // selectorSecretLabels retrieve the labels object associated to the secret object.
 // Labels are available under the "Spec.Labels" property.
 // API schema references:
-// https://docs.docker.com/engine/api/v1.40/#operation/SecretList
-// https://docs.docker.com/engine/api/v1.40/#operation/SecretInspect
+// https://docs.docker.com/engine/api/v1.37/#operation/SecretList
+// https://docs.docker.com/engine/api/v1.37/#operation/SecretInspect
 func selectorSecretLabels(responseObject map[string]interface{}) map[string]interface{} {
 	secretSpec := responseutils.GetJSONObject(responseObject, "Spec")
 	if secretSpec != nil {

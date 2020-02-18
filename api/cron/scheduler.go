@@ -2,7 +2,7 @@ package cron
 
 import (
 	"github.com/portainer/portainer/api"
-	"github.com/robfig/cron"
+	"github.com/robfig/cron/v3"
 )
 
 // JobScheduler represents a service for managing crons
