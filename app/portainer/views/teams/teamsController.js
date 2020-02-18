@@ -1,3 +1,5 @@
+import _ from 'lodash-es';
+
 angular.module('portainer.app')
 .controller('TeamsController', ['$q', '$scope', '$state', 'TeamService', 'UserService', 'ModalService', 'Notifications', 'Authentication',
 function ($q, $scope, $state, TeamService, UserService, ModalService, Notifications, Authentication) {
@@ -84,7 +86,7 @@ function ($q, $scope, $state, TeamService, UserService, ModalService, Notificati
     .then(function success(data) {
       var teams = data.teams;
       $scope.teams = teams;
-      $scope.users = data.users;
+      $scope.users = _.orderBy(data.users, 'Username', 'asc');
     })
     .catch(function error(err) {
       $scope.teams = [];

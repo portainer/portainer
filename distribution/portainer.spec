@@ -1,5 +1,5 @@
 Name:           portainer
-Version:        1.23.0
+Version:        1.23.1
 Release:        0
 License:        Zlib
 Summary:        A lightweight docker management UI

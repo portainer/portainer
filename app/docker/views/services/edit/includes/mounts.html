@@ -17,28 +17,28 @@
             <th ng-if="isAdmin || allowBindMounts">Type</th>
             <th>Source</th>
             <th>Target</th>
-            <th>Read only</th>
-            <th>Actions</th>
+            <th authorization="DockerServiceUpdate">Read only</th>
+            <th authorization="DockerServiceUpdate">Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr ng-repeat="mount in service.ServiceMounts">
             <td ng-if="isAdmin || allowBindMounts">
-              <select name="mountType" class="form-control" ng-model="mount.Type" ng-disabled="isUpdating">
+              <select name="mountType" class="form-control" ng-model="mount.Type" ng-disabled="isUpdating" disable-authorization="DockerServiceUpdate">
                 <option value="volume">Volume</option>
                 <option value="bind">Bind</option>
               </select>
             </td>
             <td>
-              <select class="form-control" ng-model="mount.Source" ng-options="vol.Id as ((vol.Id|truncate:30) + ' - ' + (vol.Driver|truncate:30))  for vol in availableVolumes" ng-if="mount.Type === 'volume'">
+              <select class="form-control" ng-model="mount.Source" ng-options="vol.Id as ((vol.Id|truncate:30) + ' - ' + (vol.Driver|truncate:30))  for vol in availableVolumes" ng-if="mount.Type === 'volume'" disable-authorization="DockerServiceUpdate">
                 <option selected disabled hidden value="">Select a volume</option>
               </select>
               <input type="text" class="form-control" ng-model="mount.Source" placeholder="e.g. /tmp/portainer/data" ng-change="updateMount(service, mount)" ng-disabled="isUpdating || (!isAdmin && !allowBindMounts && mount.Type === 'bind')" ng-if="mount.Type === 'bind'">
             </td>
             <td>
-              <input type="text" class="form-control" ng-model="mount.Target" placeholder="e.g. /tmp/portainer/data" ng-change="updateMount(service, mount)" ng-disabled="isUpdating">
+              <input type="text" class="form-control" ng-model="mount.Target" placeholder="e.g. /tmp/portainer/data" ng-change="updateMount(service, mount)" ng-disabled="isUpdating" disable-authorization="DockerServiceUpdate">
             </td>
-            <td>
+            <td authorization="DockerServiceUpdate">
               <input type="checkbox" class="form-control" ng-model="mount.ReadOnly" ng-change="updateMount(service, mount)" ng-disabled="isUpdating">
             </td>
             <td authorization="DockerServiceUpdate">
