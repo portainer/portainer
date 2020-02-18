@@ -11,8 +11,36 @@ class KubernetesNodeConverter {
     const hostName = _.find(data.status.addresses, { type: 'Hostname' });
     res.Name = hostName ? hostName.address : data.metadata.Name;
     res.Role = _.has(data.metadata.labels, 'node-role.kubernetes.io/master') ? 'Manager' : 'Worker';
-    const readyStatus = _.find(data.status.conditions, { type: 'Ready' });
-    res.Status = readyStatus && readyStatus.status === "True" ? 'Ready' : 'Warning';
+
+    const ready = _.find(data.status.conditions, { type: 'Ready' });
+    const memoryPressure = _.find(data.status.conditions, { type: 'MemoryPressure' });
+    const PIDPressure = _.find(data.status.conditions, { type: 'PIDPressure' });
+    const diskPressure = _.find(data.status.conditions, { type: 'DiskPressure' });
+    const networkUnavailable = _.find(data.status.conditions, { type: 'NetworkUnavailable' });
+
+    res.Conditions = {
+      MemoryPressure: memoryPressure && memoryPressure.status === 'True' ? true : false,
+      PIDPressure: PIDPressure && PIDPressure.status === 'True' ? true : false,
+      DiskPressure: diskPressure && diskPressure.status === 'True' ? true : false,
+      NetworkUnavailable: networkUnavailable && networkUnavailable.status === 'True' ? true : false
+    };
+
+    if (ready.status === 'False') {
+      res.Status = 'Unhealthy';
+    } else {
+      if (
+        ready.status === 'Unknown' ||
+        res.Conditions.MemoryPressure === 'True' ||
+        res.Conditions.PIDPressure === 'True' ||
+        res.Conditions.DiskPressure === 'True' ||
+        res.Conditions.NetworkUnavailable === 'True'
+      ) {
+        res.Status = 'Warning';
+      } else {
+        res.Status = 'Ready';
+      }
+    }
+
     res.CPU = parseInt(data.status.allocatable.cpu);
     res.Memory = data.status.allocatable.memory;
     res.Version = data.status.nodeInfo.kubeletVersion;
@@ -28,7 +56,6 @@ class KubernetesNodeConverter {
     res.OS.Architecture = data.status.nodeInfo.architecture;
     res.OS.Platform = data.status.nodeInfo.operatingSystem;
     res.OS.Image = data.status.nodeInfo.osImage;
-    res.Conditions = data.status.conditions;
     res.Yaml = yaml;
     return res;
   }

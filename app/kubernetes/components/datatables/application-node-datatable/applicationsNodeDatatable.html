@@ -53,10 +53,10 @@
                                 {{ item.Image }}
                             </td>
                             <td>
-                                {{ item.CPUReservation }}
+                                {{ item.ResourceReservation.CPU }}
                             </td>
                             <td>
-                                {{ item.MemoryReservation | humansize }}
+                                {{ item.ResourceReservation.Memory | humansize }}
                             </td>
                         </tr>
                         <tr ng-if="!$ctrl.dataset">

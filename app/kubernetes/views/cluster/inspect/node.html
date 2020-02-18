@@ -62,18 +62,17 @@
                                     <td>Status</td>
                                     <td>
                                         <span
-                                            class="label"
-                                            ng-class="{
-                                                'label-success': ctrl.NodeStatus == 'Ready',
-                                                'label-warning': ctrl.NodeStatus == 'Warning',
-                                                'label-error': ctrl.NodeStatus == 'Unhealthy'
-                                            }"
-                                        >{{ ctrl.NodeStatus }}</span> {{ ctrl.NodeStatusMessage }}
+                                            class="label label-{{ctrl.node.Status | kubernetesNodeStatusColor}}"
+                                        >{{ ctrl.node.Status }}</span>
+                                        <span
+                                            ng-if="ctrl.node.Status == 'Warning'"
+                                            class="text text-warning"
+                                        >{{ ctrl.node.Conditions | kubernetesNodeConditionsMessage }}</span>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
-                        <rd-widget ng-if="ctrl.Usage">
+                        <rd-widget>
                             <rd-widget-body>
                                 <div class="row">
                                     <div class="col-sm-12 form-section-title">
@@ -93,11 +92,11 @@
                                         <div class="col-sm-9" style="margin-top: 4px;">
                                             <uib-progressbar
                                                 animate="false"
-                                                value="ctrl.Usage.Memory"
-                                                type="ctrl.usageLevelInfo(ctrl.Usage.Memory)"
+                                                value="ctrl.ResourceUsage.Memory"
+                                                type="ctrl.usageLevelInfo(ctrl.ResourceUsage.Memory)"
                                             >
                                                 <b>
-                                                    {{ ctrl.Reservation.Memory | humansize }} - {{ ctrl.Usage.Memory }}%
+                                                    {{ ctrl.ResourceReservation.Memory | humansize }} - {{ ctrl.ResourceUsage.Memory }}%
                                                 </b>
                                             </uib-progressbar>
                                         </div>
@@ -109,11 +108,11 @@
                                         <div class="col-sm-9" style="margin-top: 4px;">
                                             <uib-progressbar
                                                 animate="false"
-                                                value="ctrl.Usage.CPU"
-                                                type="ctrl.usageLevelInfo(ctrl.Usage.CPU)"
+                                                value="ctrl.ResourceUsage.CPU"
+                                                type="ctrl.usageLevelInfo(ctrl.ResourceUsage.CPU)"
                                             >
                                                 <b>
-                                                    {{ ctrl.Reservation.CPU }} - {{ ctrl.Usage.CPU }}%
+                                                    {{ ctrl.ResourceReservation.CPU }} - {{ ctrl.ResourceUsage.CPU }}%
                                                 </b>
                                             </uib-progressbar>
                                         </div>
