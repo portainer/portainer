@@ -20,8 +20,9 @@
               <i class="fa fa-laptop-code space-right" aria-hidden="true"></i> Application
             </uib-tab-heading>
 
-            <table class="table">
-              <tbody>
+            <div style="padding: 20px;">
+              <table class="table">
+                <tbody>
                 <tr>
                   <td>Name</td>
                   <td>{{ ctrl.application.Name }}</td>
@@ -39,15 +40,16 @@
                   <td>
                     <span ng-if="ctrl.application.DeploymentType === ctrl.KubernetesApplicationDeploymentTypes.REPLICATED">Replicated</span>
                     <span ng-if="ctrl.application.DeploymentType === ctrl.KubernetesApplicationDeploymentTypes.GLOBAL">Global</span>
-                    <code>{{ ctrl.application.RunningPodsCount }}</code> / <code>{{ ctrl.application.TotalPodsCount }}</code></td>
+                    <code>{{ ctrl.application.RunningPodsCount }}</code> / <code>{{ ctrl.application.TotalPodsCount }}</code>
                   </td>
                 </tr>
                 <tr>
                   <td>Creation date</td>
                   <td>{{ ctrl.application.CreatedAt | getisodate }}</td>
                 </tr>
-              </tbody>
-            </table>
+                </tbody>
+              </table>
+            </div>
 
           </uib-tab>
 
