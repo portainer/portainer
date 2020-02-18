@@ -17,7 +17,7 @@
     <rd-header-content>
         <a
             ui-sref="kubernetes.cluster"
-        >Cluster</a> &gt; Node
+        >Cluster</a> &gt; {{ ctrl.node.Name }}
     </rd-header-content>
 </rd-header>
 
@@ -164,6 +164,7 @@
                     dataset="ctrl.applications"
                     table-key="kubernetes.applications"
                     order-by="Name"
+                    loading="ctrl.state.applicationsLoading"
                     title-text="Running applications panel"
                 ></kubernetes-applications-node-datatable>
             </rd-widget-body>

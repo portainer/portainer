@@ -86,8 +86,8 @@ class KubernetesClusterNodeController {
             const memory = filesizeParser(this.node.Memory, { base: 10 });
             if (this.node.CPU && memory) {
                 this.ResourceUsage = {
-                    Memory: this.ResourceReservation.Memory / memory * 100,
-                    CPU: this.ResourceReservation.CPU / this.node.CPU * 100
+                    Memory: Math.round(this.ResourceReservation.Memory / memory * 100),
+                    CPU: Math.round(this.ResourceReservation.CPU / this.node.CPU * 100)
                 };
             }
         } catch (err) {
