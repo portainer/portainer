@@ -33,7 +33,6 @@ class KubernetesClusterNodeController {
         this.getApplications = this.getApplications.bind(this);
         this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
 
-        this.computeResourceReservation = this.computeResourceReservation.bind(this);
         this.computePodsResourceReservation = this.computePodsResourceReservation.bind(this);
         this.usageLevelInfo = this.usageLevelInfo.bind(this);
     }
