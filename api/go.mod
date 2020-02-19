@@ -35,6 +35,6 @@ require (
 	gopkg.in/src-d/go-git.v4 v4.13.1
 )
 
-replace github.com/docker/docker => github.com/docker/engine v1.4.2-0.20191127222017-3152f9436292
+replace github.com/docker/docker => github.com/docker/engine v1.4.2-0.20200204220554-5f6d6f3f2203
 
 replace gopkg.in/asn1-ber.v1 => github.com/go-asn1-ber/asn1-ber v1.3.1
