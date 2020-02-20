@@ -49,7 +49,7 @@
             </table>
             <rd-widget>
               <rd-widget-body>
-                <kubernetes-resource-reservation ng-if="ctrl.ResourceReservation" description="Resource reservation represents the total amount of resource applied to the node." cpu="ctrl.ResourceReservation.CPU" cpu-limit="ctrl.node.CPU" memory="ctrl.ResourceReservation.Memory" memory-limit="ctrl.node.Memory"></kubernetes-resource-reservation>
+                <kubernetes-resource-reservation ng-if="ctrl.ResourceReservation" description="Resource reservation represents the total amount of resource applied to the node." cpu="ctrl.ResourceReservation.CPU" cpu-limit="ctrl.node.CPU" memory="ctrl.ResourceReservation.Memory" memory-limit="ctrl.memoryLimit"></kubernetes-resource-reservation>
               </rd-widget-body>
             </rd-widget>
           </uib-tab>

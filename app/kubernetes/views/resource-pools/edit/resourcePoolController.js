@@ -54,16 +54,6 @@ class KubernetesEditResourcePoolController {
     this.state.showEditorTab = true;
   }
 
-  usageLevelInfo(usage) {
-    if (usage >= 80) {
-      return 'danger';
-    } else if (usage > 50 && usage < 80) {
-      return 'warning';
-    } else {
-      return 'success';
-    }
-  }
-
   async updateResourcePoolAsync() {
     this.state.actionInProgress = true;
     try {

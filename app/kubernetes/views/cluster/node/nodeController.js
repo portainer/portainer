@@ -25,7 +25,6 @@ class KubernetesNodeController {
     this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
 
     this.computePodsResourceReservation = this.computePodsResourceReservation.bind(this);
-    this.usageLevelInfo = this.usageLevelInfo.bind(this);
   }
 
   async getNodeAsync() {
@@ -65,8 +64,8 @@ class KubernetesNodeController {
       const pods = await this.KubernetesPodService.pods();
       this.pods = _.filter(pods, pod => pod.Node === this.node.Name);
       this.ResourceReservation = this.computePodsResourceReservation(this.pods);
-      this.ResourceReservation.Memory = Math.floor(this.ResourceReservation / 1000 / 1000);
-      this.memoryLimit = Math.floor(filesizeParser(this.node.memory) / 1000 / 1000);
+      this.ResourceReservation.Memory = Math.floor(this.ResourceReservation.Memory / 1000 / 1000);
+      this.memoryLimit = Math.floor(filesizeParser(this.node.Memory) / 1000 / 1000);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve pods');
     } finally {
@@ -145,16 +144,6 @@ class KubernetesNodeController {
       }
       return acc;
     }, { Memory: 0, CPU: 0 });
-  }
-
-  usageLevelInfo(usage) {
-    if (usage >= 80) {
-      return 'danger';
-    } else if (usage > 50 && usage < 80) {
-      return 'warning';
-    } else {
-      return 'success';
-    }
   }
 }
 
