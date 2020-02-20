@@ -1,0 +1,85 @@
+<rd-header>
+  <rd-header-title title-text="Node detail">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="kubernetes.cluster.node" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>
+    <a ui-sref="kubernetes.cluster">Cluster</a> &gt; {{ ctrl.node.Name }}
+  </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body classes="no-padding">
+        <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
+          <uib-tab index="0" classes="btn-sm">
+            <uib-tab-heading>
+              <i class="fa fa-heartbeat space-right" aria-hidden="true"></i> Node
+            </uib-tab-heading>
+            <table class="table">
+              <tbody ng-if="ctrl.node">
+                <tr>
+                  <td>Hostname</td>
+                  <td>{{ ctrl.node.Name }}</td>
+                </tr>
+                <tr>
+                  <td>Role</td>
+                  <td>{{ ctrl.node.Role }}</td>
+                </tr>
+                <tr>
+                  <td>Kubelet version</td>
+                  <td>{{ ctrl.node.Version }}</td>
+                </tr>
+                <tr>
+                  <td>Creation date</td>
+                  <td>{{ ctrl.node.CreatedAt | getisodate }}</td>
+                </tr>
+                <tr>
+                  <td>Status</td>
+                  <td>
+                    <span
+                      class="label label-{{ctrl.node.Status | kubernetesNodeStatusColor}}">{{ ctrl.node.Status }}</span>
+                    <span ng-if="ctrl.node.Status == 'Warning'"
+                      class="text text-warning">{{ ctrl.node.Conditions | kubernetesNodeConditionsMessage }}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <rd-widget>
+              <rd-widget-body>
+                <kubernetes-resource-reservation ng-if="ctrl.ResourceReservation" description="Resource reservation represents the total amount of resource applied to the node." cpu="ctrl.ResourceReservation.CPU" cpu-limit="ctrl.node.CPU" memory="ctrl.ResourceReservation.Memory" memory-limit="ctrl.node.Memory"></kubernetes-resource-reservation>
+              </rd-widget-body>
+            </rd-widget>
+          </uib-tab>
+          <uib-tab index="1" classes="btn-sm">
+            <uib-tab-heading>
+              <i class="fa fa-history space-right" aria-hidden="true"></i> Events
+            </uib-tab-heading>
+            <kubernetes-events-datatable title-text="Events" title-icon="fa-history" dataset="ctrl.events"
+              table-key="kubernetes.node.events" order-by="Date" reverse-order="true"
+              loading="ctrl.state.eventsLoading" refresh-callback="ctrl.getEvents">
+            </kubernetes-events-datatable>
+          </uib-tab>
+          <uib-tab index="2" classes="btn-sm">
+            <uib-tab-heading>
+              <i class="fa fa-code space-right" aria-hidden="true"></i> Yaml
+            </uib-tab-heading>
+            <pre>
+        {{ctrl.node.Yaml}}
+      </pre>
+          </uib-tab>
+        </uib-tabset>
+      </rd-widget-body>
+    </rd-widget>
+
+    <rd-widget>
+      <rd-widget-body>
+        <kubernetes-node-applications-datatable dataset="ctrl.applications" table-key="kubernetes.applications"
+          order-by="Name" loading="ctrl.state.applicationsLoading" title-text="Running applications panel" refresh-callback="ctrl.getApplications">
+        </kubernetes-node-applications-datatable>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

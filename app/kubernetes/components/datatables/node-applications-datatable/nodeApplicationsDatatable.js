@@ -1,9 +1,9 @@
 angular.module(
     'portainer.kubernetes'
 ).component(
-    'kubernetesApplicationsNodeDatatable',
+    'kubernetesNodeApplicationsDatatable',
     {
-        templateUrl: './applicationsNodeDatatable.html',
+        templateUrl: './nodeApplicationsDatatable.html',
         controller: 'GenericDatatableController',
         bindings: {
             titleText: '@',

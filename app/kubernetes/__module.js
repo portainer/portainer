@@ -116,8 +116,8 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     url: '/:name',
     views: {
       'content@': {
-        templateUrl: './views/cluster/inspect/node.html',
-        controller: 'KubernetesClusterNodeController',
+        templateUrl: './views/cluster/node/node.html',
+        controller: 'KubernetesNodeController',
         controllerAs: 'ctrl'
       }
     }
