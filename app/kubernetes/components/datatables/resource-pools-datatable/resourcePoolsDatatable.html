@@ -86,7 +86,7 @@
                   <i class="fa fa-sort-numeric-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreatedAt' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th>
+              <th ng-if="$ctrl.isAdmin">
                 Actions
               </th>
             </tr>
@@ -105,7 +105,7 @@
                 <i class="fa {{item.Quotas.length ? 'fa-toggle-on' : 'fa-toggle-off'}}" aria-hidden="true" style="margin-right: 2px;"></i> {{ item.Quotas.length ? 'Yes' : 'No' }}
               </td>
               <td>{{ item.CreatedAt | getisodate }}</td>
-              <td>
+              <td ng-if="$ctrl.isAdmin">
                 <a ng-if="$ctrl.canManageAccess(item)" ui-sref="kubernetes.resourcePools.resourcePool.access({id: item.Namespace.Name})">
                   <i class="fa fa-users" aria-hidden="true"></i> Manage access
                 </a>

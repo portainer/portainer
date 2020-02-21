@@ -1,6 +1,6 @@
 angular.module('portainer.docker')
-  .controller('KubernetesResourcePoolsDatatableController', ['$scope', '$controller', 'KubernetesNamespaceHelper', 'DatatableService',
-    function ($scope, $controller, KubernetesNamespaceHelper, DatatableService) {
+  .controller('KubernetesResourcePoolsDatatableController', ['$scope', '$controller', 'Authentication', 'KubernetesNamespaceHelper', 'DatatableService',
+    function ($scope, $controller, Authentication, KubernetesNamespaceHelper, DatatableService) {
 
       angular.extend(this, $controller('GenericDatatableController', {$scope: $scope}));
 
@@ -24,6 +24,7 @@ angular.module('portainer.docker')
       };
 
       this.$onInit = function() {
+        this.isAdmin = Authentication.isAdmin();
         this.setDefaults();
         this.prepareTableFromDataset();
     

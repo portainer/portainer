@@ -14,11 +14,12 @@ function bytesValue(mem) {
 
 class KubernetesEditResourcePoolController {
   /* @ngInject */
-  constructor($async, $state, $transition$, Notifications, KubernetesNodeService, KubernetesResourceQuotaService, KubernetesResourcePoolService, KubernetesLimitRangeService, KubernetesEventService) {
+  constructor($async, $state, $transition$, Authentication, Notifications, KubernetesNodeService, KubernetesResourceQuotaService, KubernetesResourcePoolService, KubernetesLimitRangeService, KubernetesEventService) {
     this.$async = $async;
     this.$state = $state;
     this.$transition$ = $transition$;
     this.Notifications = Notifications;
+    this.Authentication = Authentication;
 
     this.KubernetesNodeService = KubernetesNodeService;
     this.KubernetesResourceQuotaService = KubernetesResourceQuotaService;
@@ -120,6 +121,7 @@ class KubernetesEditResourcePoolController {
 
   async onInit() {
     try {
+      this.isAdmin = this.Authentication.isAdmin();
       this.defaults = KubernetesResourceQuotaDefaults;
 
       this.formValues = {
