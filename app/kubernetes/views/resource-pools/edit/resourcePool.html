@@ -94,7 +94,8 @@
                   <!-- !cpu-limit-input -->
                 </div>
                 <kubernetes-resource-reservation
-                  ng-if="ctrl.state.cpuUsed && ctrl.state.memoryUsed" description="Resource reservation represents the total amount of resource limits applied to all of the applications deployed inside this resource pool." cpu="ctrl.state.cpuUsed" memory="ctrl.state.memoryUsed" cpu-limit="ctrl.formValues.CpuLimit" memory-limit="ctrl.formValues.MemoryLimit"></kubernetes-resource-reservation>
+                  ng-if="ctrl.pool.Quotas.length"
+                  description="Resource reservation represents the total amount of resource limits applied to all of the applications deployed inside this resource pool." cpu="ctrl.state.cpuUsed" memory="ctrl.state.memoryUsed" cpu-limit="ctrl.formValues.CpuLimit" memory-limit="ctrl.formValues.MemoryLimit"></kubernetes-resource-reservation>
               </div>
               <!-- actions -->
               <div class="col-sm-12 form-section-title">
