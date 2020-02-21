@@ -84,14 +84,14 @@
                 </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('CPUReservation')">
+                <a ng-click="$ctrl.changeOrderBy('CPU')">
                   CPU reservation
                   <i class="fa fa-sort-numeric-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CPUReservation' && !$ctrl.state.reverseOrder"></i>
                     <i class="fa fa-sort-numeric-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CPUReservation' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('MemoryReservation')">
+                <a ng-click="$ctrl.changeOrderBy('Memory')">
                   Memory reservation
                   <i class="fa fa-sort-numeric-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'MemoryReservation' && !$ctrl.state.reverseOrder"></i>
                     <i class="fa fa-sort-numeric-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'MemoryReservation' && $ctrl.state.reverseOrder"></i>
@@ -114,10 +114,10 @@
                 {{ item.Image }}
               </td>
               <td>
-                {{ item.ResourceReservation.CPU }}
+                {{ item.CPU }}
               </td>
               <td>
-                {{ item.ResourceReservation.Memory | humansize }}
+                {{ item.Memory | humansize }}
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">

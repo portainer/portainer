@@ -90,7 +90,9 @@ class KubernetesNodeController {
       this.applications = _.map(this.applications, app => {
         app.pods = _.filter(this.pods, pod => Object.values(pod.Metadata.labels).includes(app.Name));
 
-        app.ResourceReservation = this.computePodsResourceReservation(app.pods);
+        const resourceReservation = this.computePodsResourceReservation(app.pods);
+        app.CPU = resourceReservation.CPU;
+        app.Memory = resourceReservation.Memory;
         return app;
       });
     } catch (err) {

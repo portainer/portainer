@@ -1,18 +1,18 @@
 angular.module(
-    'portainer.kubernetes'
+  'portainer.kubernetes'
 ).component(
-    'kubernetesNodeApplicationsDatatable',
-    {
-        templateUrl: './nodeApplicationsDatatable.html',
-        controller: 'GenericDatatableController',
-        bindings: {
-            titleText: '@',
-            titleIcon: '@',
-            dataset: '<',
-            tableKey: '@',
-            orderBy: '@',
-            reverseOrder: '<',
-            refreshCallback: '<'
-        }
+  'kubernetesNodeApplicationsDatatable',
+  {
+    templateUrl: './nodeApplicationsDatatable.html',
+    controller: 'GenericDatatableController',
+    bindings: {
+      titleText: '@',
+      titleIcon: '@',
+      dataset: '<',
+      tableKey: '@',
+      orderBy: '@',
+      reverseOrder: '<',
+      refreshCallback: '<'
     }
+  }
 );
