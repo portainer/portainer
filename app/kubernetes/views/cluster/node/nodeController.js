@@ -88,7 +88,7 @@ class KubernetesNodeController {
       this.applications = await this.KubernetesApplicationService.applications();
 
       this.applications = _.map(this.applications, app => {
-        app.pods = _.filter(this.pods, pod => _.startsWith(pod.Metadata.name, app.Name));
+        app.pods = _.filter(this.pods, pod => Object.values(pod.Metadata.labels).includes(app.Name));
 
         app.ResourceReservation = this.computePodsResourceReservation(app.pods);
         return app;
