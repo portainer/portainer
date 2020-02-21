@@ -86,15 +86,15 @@
               <th>
                 <a ng-click="$ctrl.changeOrderBy('CPU')">
                   CPU reservation
-                  <i class="fa fa-sort-numeric-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CPUReservation' && !$ctrl.state.reverseOrder"></i>
-                    <i class="fa fa-sort-numeric-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CPUReservation' && $ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-numeric-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CPU' && !$ctrl.state.reverseOrder"></i>
+                    <i class="fa fa-sort-numeric-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CPU' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('Memory')">
                   Memory reservation
-                  <i class="fa fa-sort-numeric-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'MemoryReservation' && !$ctrl.state.reverseOrder"></i>
-                    <i class="fa fa-sort-numeric-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'MemoryReservation' && $ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-numeric-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Memory' && !$ctrl.state.reverseOrder"></i>
+                    <i class="fa fa-sort-numeric-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Memory' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
             </tr>
