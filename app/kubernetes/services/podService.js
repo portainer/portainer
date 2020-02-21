@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { KubernetesPodViewModel } from '../models/pod';
+import {KubernetesPodViewModel} from '../models/pod';
 
 angular.module('portainer.kubernetes')
   .factory('KubernetesPodService', ['$async', 'KubernetesPods',
@@ -8,6 +8,7 @@ angular.module('portainer.kubernetes')
       var factory = {
         pods: pods,
         // pod: pod
+        logs: logs
       };
 
       /**
@@ -44,6 +45,28 @@ angular.module('portainer.kubernetes')
       // function pod(namespace, name) {
       //   return $async(podAsync, namespace, name);
       // }
+
+      /**
+       * Logs
+       *
+       * @param {string} namespace
+       * @param {string} podName
+       */
+      async function logsAsync(namespace, podName) {
+        const params = {
+          id: podName,
+        };
+        try {
+          const data = await KubernetesPods(namespace).logs(params).$promise;
+          return data.logs.length === 0 ? [] : data.logs.split("\n");
+        } catch (err) {
+          throw { msg: 'Unable to retrieve pod logs', err: err };
+        }
+      }
+
+      function logs(namespace, podName) {
+        return $async(logsAsync, namespace, podName);
+      }
 
       return factory;
     }]);

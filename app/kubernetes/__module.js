@@ -55,6 +55,18 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     }
   };
 
+  const applicationLogs = {
+    name: 'kubernetes.applications.application.logs',
+    url: '/:pod/logs',
+    views: {
+      'content@': {
+        templateUrl: './views/applications/logs/logs.html',
+        controller: 'KubernetesApplicationLogsController',
+        controllerAs: 'ctrl'
+      }
+    }
+  };
+
   const applicationCreateMockup = {
     name: 'kubernetes.applications.mockup1',
     url: '/mockup1',
@@ -175,6 +187,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
   $stateRegistryProvider.register(applications);
   $stateRegistryProvider.register(applicationCreation);
   $stateRegistryProvider.register(applicationInspect);
+  $stateRegistryProvider.register(applicationLogs);
   $stateRegistryProvider.register(applicationCreateMockup);
   $stateRegistryProvider.register(applicationCreateMockupExpanded);
   $stateRegistryProvider.register(dashboard);

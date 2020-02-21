@@ -1,4 +1,5 @@
-import { rawResponse } from 'Kubernetes/rest/response/transform';
+import {rawResponse} from 'Kubernetes/rest/response/transform';
+import {logsHandler} from 'Docker/rest/response/handlers';
 
 angular.module('portainer.kubernetes')
   .factory('KubernetesPods', ['$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider',
@@ -23,7 +24,12 @@ angular.module('portainer.kubernetes')
             },
             create: { method: 'POST' },
             update: { method: 'PUT', params: { id: '@metadata.name' } },
-            delete: { method: 'DELETE' }
+            delete: { method: 'DELETE' },
+            logs: {
+              method: 'GET',
+              params: { action: 'log' },
+              transformResponse: logsHandler
+            }
           }
         );
       };
