@@ -59,6 +59,10 @@ class KubernetesNodeController {
     return this.$async(this.getEventsAsync);
   }
 
+  showEditor() {
+    this.state.showEditorTab = true;
+  }
+
   async getPodsAsync() {
     try {
       this.state.podsLoading = true;
@@ -106,7 +110,8 @@ class KubernetesNodeController {
       dataLoading: true,
       eventsLoading: true,
       podsLoading: true,
-      applicationsLoading: true
+      applicationsLoading: true,
+      showEditorTab: false
     };
 
     this.getNode().then(() => {
