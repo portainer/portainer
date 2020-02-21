@@ -1,5 +1,7 @@
 import _ from 'lodash-es';
 import {KubernetesPodViewModel} from '../models/pod';
+import {KubernetesCommonParams} from 'Kubernetes/models/common/params';
+import PortainerError from 'Portainer/error';
 
 angular.module('portainer.kubernetes')
   .factory('KubernetesPodService', ['$async', 'KubernetesPods',
@@ -7,19 +9,20 @@ angular.module('portainer.kubernetes')
       'use strict';
       var factory = {
         pods: pods,
-        // pod: pod
         logs: logs
       };
 
       /**
        * Pods
+       *
+       * @param {string} namespace
        */
       async function podsAsync(namespace) {
         try {
           const data = await KubernetesPods(namespace).get().$promise;
           return _.map(data.items, (item) => new KubernetesPodViewModel(item));
         } catch (err) {
-          throw { msg: 'Unable to retrieve pods', err: err };
+          throw new PortainerError('Unable to retrieve pods', err);
         }
       }
 
@@ -28,39 +31,19 @@ angular.module('portainer.kubernetes')
       }
 
       /**
-       * Pod
-       */
-      // async function podAsync(namespace, name) {
-      //   try {
-      //     const [details, yaml] = await Promise.all([
-      //       KubernetesPods(namespace).pod({ id: name }).$promise,
-      //       KubernetesPods(namespace).yamlPod({ id: name }).$promise
-      //     ]);
-      //     return new KubernetesPodDetailsViewModel(details, yaml.data);
-      //   } catch (err) {
-      //     throw { msg: 'Unable to retrieve pod details', err: err };
-      //   }
-      // }
-
-      // function pod(namespace, name) {
-      //   return $async(podAsync, namespace, name);
-      // }
-
-      /**
        * Logs
        *
        * @param {string} namespace
        * @param {string} podName
        */
       async function logsAsync(namespace, podName) {
-        const params = {
-          id: podName,
-        };
+        const params = new KubernetesCommonParams();
+        params.id = podName;
         try {
           const data = await KubernetesPods(namespace).logs(params).$promise;
           return data.logs.length === 0 ? [] : data.logs.split("\n");
         } catch (err) {
-          throw { msg: 'Unable to retrieve pod logs', err: err };
+          throw new PortainerError('Unable to retrieve pod logs', err);
         }
       }
 
