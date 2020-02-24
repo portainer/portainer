@@ -4,9 +4,6 @@ class KubernetesResourceReservationController {
   /* @ngInject */
   constructor($scope) {
     this.$scope = $scope;
-
-    this.usageLevelInfo = this.usageLevelInfo.bind(this);
-    this.usageValues = this.usageValues.bind(this);
   }
 
   usageLevelInfo(usage) {
