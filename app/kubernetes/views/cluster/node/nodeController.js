@@ -116,12 +116,10 @@ class KubernetesNodeController {
       showEditorTab: false
     };
 
-    this.getNode().then(() => {
-      this.getEvents();
-      this.getPods().then(() => {
-        this.getApplications();
-      });
-    });
+    await this.getNode();
+    this.getEvents();
+    await this.getPods();
+    this.getApplications();
   }
 
   $onInit() {
