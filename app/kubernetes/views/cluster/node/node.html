@@ -86,7 +86,7 @@
 <div class="row" ng-if="ctrl.applications">
   <div class="col-sm-12">
     <kubernetes-node-applications-datatable
-      dataset="ctrl.applications" table-key="kubernetes.node.applications" order-by="Name"
+      dataset="ctrl.applications" table-key="kubernetes.node.applications" order-by="Name" refresh-callback="ctrl.getPodsApplications"
       loading="ctrl.state.applicationsLoading" title-text="Applications running on this node">
     </kubernetes-node-applications-datatable>
   </div>

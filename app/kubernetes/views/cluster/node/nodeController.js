@@ -15,16 +15,11 @@ class KubernetesNodeController {
     this.KubernetesApplicationService = KubernetesApplicationService;
 
     this.onInit = this.onInit.bind(this);
-    this.getNode = this.getNode.bind(this);
     this.getNodeAsync = this.getNodeAsync.bind(this);
-    this.getEvents = this.getEvents.bind(this);
     this.getEventsAsync = this.getEventsAsync.bind(this);
-    this.getPods = this.getPods.bind(this);
     this.getPodsAsync = this.getPodsAsync.bind(this);
-    this.getApplications = this.getApplications.bind(this);
     this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
-
-    this.computePodsResourceReservation = this.computePodsResourceReservation.bind(this);
+    this.getPodsApplicationsAsync = this.getPodsApplicationsAsync.bind(this);
   }
 
   async getNodeAsync() {
@@ -118,12 +113,20 @@ class KubernetesNodeController {
 
     await this.getNode();
     this.getEvents();
-    await this.getPods();
-    this.getApplications();
+    this.getPodsApplications();
   }
 
   $onInit() {
     return this.$async(this.onInit);
+  }
+
+  async getPodsApplicationsAsync() {
+    await this.getPods();
+    this.getApplications();
+  }
+
+  getPodsApplications() {
+    return this.$async(this.getPodsApplicationsAsync);
   }
 
   computePodsResourceReservation(pods) {
