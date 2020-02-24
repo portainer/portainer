@@ -15,7 +15,7 @@
     </label>
     <div class="col-sm-9" style="margin-top: 4px;">
       <uib-progressbar animate="false" value="$ctrl.memoryUsage"
-        type="{{$ctrl.usageLevelInfo($ctrl.memoryUsage)}}">
+        type="{{ $ctrl.memoryUsage | kubernetesUsageLevelInfo }}">
         <b>
           {{ $ctrl.memory }} MB -
           {{ $ctrl.memoryUsage }}%
@@ -29,7 +29,7 @@
     </label>
     <div class="col-sm-9" style="margin-top: 4px;">
       <uib-progressbar animate="false" value="$ctrl.cpuUsage"
-        type="{{$ctrl.usageLevelInfo($ctrl.cpuUsage)}}">
+        type="{{ $ctrl.cpuUsage | kubernetesUsageLevelInfo }}">
         <b>
           {{ $ctrl.cpu }} - {{ $ctrl.cpuUsage }}%
         </b>

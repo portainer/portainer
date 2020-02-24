@@ -6,16 +6,6 @@ class KubernetesResourceReservationController {
     this.$scope = $scope;
   }
 
-  usageLevelInfo(usage) {
-    if (usage >= 80) {
-      return 'danger';
-    } else if (usage > 50 && usage < 80) {
-      return 'warning';
-    } else {
-      return 'success';
-    }
-  }
-
   usageValues() {
     if (this.cpuLimit) {
       this.cpuUsage = Math.round(this.cpu / this.cpuLimit * 100);
