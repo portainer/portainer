@@ -27,12 +27,10 @@ class KubernetesNodeConverter {
 
     if (ready.status === 'False') {
       res.Status = 'Unhealthy';
-    } else {
-      if (ready.status === 'Unknown' || res.Conditions.MemoryPressure || res.Conditions.PIDPressure || res.Conditions.DiskPressure || res.Conditions.NetworkUnavailable) {
+    } else if (ready.status === 'Unknown' || res.Conditions.MemoryPressure || res.Conditions.PIDPressure || res.Conditions.DiskPressure || res.Conditions.NetworkUnavailable) {
         res.Status = 'Warning';
-      } else {
-        res.Status = 'Ready';
-      }
+    } else {
+      res.Status = 'Ready';
     }
 
     res.CPU = parseInt(data.status.allocatable.cpu);
