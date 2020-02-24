@@ -111,7 +111,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     }
   };
 
-  const nodeInspect = {
+  const node = {
     name: 'kubernetes.cluster.node',
     url: '/:name',
     views: {
@@ -192,7 +192,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
   $stateRegistryProvider.register(dashboard);
   $stateRegistryProvider.register(deploy);
   $stateRegistryProvider.register(nodes);
-  $stateRegistryProvider.register(nodeInspect);
+  $stateRegistryProvider.register(node);
   $stateRegistryProvider.register(resourcePools);
   $stateRegistryProvider.register(resourcePoolCreation);
   $stateRegistryProvider.register(resourcePool);
