@@ -12,29 +12,23 @@ class KubernetesNodeConverter {
     res.Name = hostName ? hostName.address : data.metadata.Name;
     res.Role = _.has(data.metadata.labels, 'node-role.kubernetes.io/master') ? 'Manager' : 'Worker';
 
-    const ready = _.find(data.status.conditions, { type: 'Ready' });
-    const memoryPressure = _.find(data.status.conditions, { type: 'MemoryPressure' });
-    const PIDPressure = _.find(data.status.conditions, { type: 'PIDPressure' });
-    const diskPressure = _.find(data.status.conditions, { type: 'DiskPressure' });
-    const networkUnavailable = _.find(data.status.conditions, { type: 'NetworkUnavailable' });
+    const ready = _.find(data.status.conditions, { type: KubernetesNodeConditionTypes.READY });
+    const memoryPressure = _.find(data.status.conditions, { type: KubernetesNodeConditionTypes.MEMORY_PRESSURE });
+    const PIDPressure = _.find(data.status.conditions, { type: KubernetesNodeConditionTypes.PID_PRESSURE });
+    const diskPressure = _.find(data.status.conditions, { type: KubernetesNodeConditionTypes.DISK_PRESSURE });
+    const networkUnavailable = _.find(data.status.conditions, { type: KubernetesNodeConditionTypes.NETWORK_UNAVAILABLE });
 
     res.Conditions = {
-      MemoryPressure: memoryPressure && memoryPressure.status === 'True' ? true : false,
-      PIDPressure: PIDPressure && PIDPressure.status === 'True' ? true : false,
-      DiskPressure: diskPressure && diskPressure.status === 'True' ? true : false,
-      NetworkUnavailable: networkUnavailable && networkUnavailable.status === 'True' ? true : false
+      MemoryPressure: memoryPressure && memoryPressure.status === 'True',
+      PIDPressure: PIDPressure && PIDPressure.status === 'True',
+      DiskPressure: diskPressure && diskPressure.status === 'True',
+      NetworkUnavailable: networkUnavailable && networkUnavailable.status === 'True'
     };
 
     if (ready.status === 'False') {
       res.Status = 'Unhealthy';
     } else {
-      if (
-        ready.status === 'Unknown' ||
-        res.Conditions.MemoryPressure === 'True' ||
-        res.Conditions.PIDPressure === 'True' ||
-        res.Conditions.DiskPressure === 'True' ||
-        res.Conditions.NetworkUnavailable === 'True'
-      ) {
+      if (ready.status === 'Unknown' || res.Conditions.MemoryPressure || res.Conditions.PIDPressure || res.Conditions.DiskPressure || res.Conditions.NetworkUnavailable) {
         res.Status = 'Warning';
       } else {
         res.Status = 'Ready';
@@ -60,5 +54,13 @@ class KubernetesNodeConverter {
     return res;
   }
 }
+
+export const KubernetesNodeConditionTypes = Object.freeze({
+  READY: 'Ready',
+  MEMORY_PRESSURE: 'MemoryPressure',
+  PID_PRESSURE: 'PIDPressure',
+  DISK_PRESSURE: 'DiskPressure',
+  NETWORK_UNAVAILABLE: 'NetworkUnavailable'
+});
 
 export default KubernetesNodeConverter;
