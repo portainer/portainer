@@ -1,4 +1,7 @@
-FROM microsoft/nanoserver:sac2016
+ARG BASE_IMAGE
+ARG BASE_TAG
+
+FROM ${BASE_IMAGE}:${BASE_TAG}
 
 COPY dist /
 
