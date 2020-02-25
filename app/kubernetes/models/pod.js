@@ -21,4 +21,6 @@ export function KubernetesPodViewModel(data) {
   this.Restarts = _.sumBy(data.status.containerStatuses, 'restartCount');
   this.Node = data.spec.nodeName;
   this.CreatedAt = data.status.startTime;
+  this.Containers = data.spec.containers;
+  this.Metadata = data.metadata;
 }

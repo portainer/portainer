@@ -3,11 +3,14 @@
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
         <div class="toolBarTitle">
-          <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }}
+          <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i>
+          {{ $ctrl.titleText }}
         </div>
-        <div class="settings">
+        <div ng-if="$ctrl.refreshCallback" class="settings">
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
-            <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> Settings</span>
+            <span uib-dropdown-toggle>
+              <i class="fa fa-cog" aria-hidden="true"></i> Settings
+            </span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
               <div class="tableMenu">
                 <div class="menuHeader">
@@ -16,7 +19,7 @@
                 <div class="menuContent">
                   <div>
                     <div class="md-checkbox">
-                      <input id="setting_auto_refresh" type="checkbox" ng-model="$ctrl.settings.repeater.autoRefresh" ng-change="$ctrl.onSettingsRepeaterChange()"/>
+                      <input id="setting_auto_refresh" type="checkbox" ng-model="$ctrl.settings.repeater.autoRefresh" ng-change="$ctrl.onSettingsRepeaterChange()" />
                       <label for="setting_auto_refresh">Auto refresh</label>
                     </div>
                     <div ng-if="$ctrl.settings.repeater.autoRefresh">
@@ -60,64 +63,68 @@
                 </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Role')">
-                  Role
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Role' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Role' && $ctrl.state.reverseOrder"></i>
+                <a ng-click="$ctrl.changeOrderBy('Stack')">
+                  Stack
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Stack' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Stack' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Status')">
-                  Status
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status' && $ctrl.state.reverseOrder"></i>
+                <a ng-click="$ctrl.changeOrderBy('ResourcePool')">
+                  Resource pool
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourcePool' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourcePool' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('Image')">
+                  Image
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Image' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Image' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('CPU')">
-                  CPU
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CPU' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CPU' && $ctrl.state.reverseOrder"></i>
+                  CPU reservation
+                  <i class="fa fa-sort-numeric-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CPU' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-numeric-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CPU' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('Memory')">
-                  Memory
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Memory' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Memory' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
-              <th>
-                <a ng-click="$ctrl.changeOrderBy('Version')">
-                  Version
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Version' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Version' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
-              <th>
-                <a ng-click="$ctrl.changeOrderBy('IPAddress')">
-                  IP Address
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAddress' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAddress' && $ctrl.state.reverseOrder"></i>
+                  Memory reservation
+                  <i class="fa fa-sort-numeric-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Memory' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-numeric-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Memory' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
             </tr>
           </thead>
           <tbody>
             <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))">
-              <td>{{ item.Name }}</td>
-              <td>{{ item.Role }}</td>
-              <td><span class="label label-{{item.Status | kubernetesNodeStatusColor}}">{{ item.Status }}</span></td>
-              <td>{{ item.CPU }}</td>
-              <td>{{ item.Memory | humansize }}</td>
-              <td>{{ item.Version }}</td>
-              <td>{{ item.IPAddress }}</td>
+              <td>
+                {{ item.Name }}
+              </td>
+              <td>
+                {{ item.Stack }}
+              </td>
+              <td>
+                {{ item.ResourcePool }}
+              </td>
+              <td>
+                {{ item.Image }}
+              </td>
+              <td>
+                {{ item.CPU }}
+              </td>
+              <td>
+                {{ item.Memory | humansize }}
+              </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
-              <td colspan="7" class="text-center text-muted">Loading...</td>
+              <td colspan="6" class="text-center text-muted">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-              <td colspan="7" class="text-center text-muted">No node available.</td>
+              <td colspan="6" class="text-center text-muted">No stack available.</td>
             </tr>
           </tbody>
         </table>
@@ -132,7 +139,8 @@
               <span style="margin-right: 5px;">
                 Items per page
               </span>
-              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit" ng-change="$ctrl.changePaginationLimit()">
+              <select class="form-control" ng-model="$ctrl.state.paginatedItemLimit"
+                ng-change="$ctrl.changePaginationLimit()">
                 <option value="0">All</option>
                 <option value="10">10</option>
                 <option value="25">25</option>
