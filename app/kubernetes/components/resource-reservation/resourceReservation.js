@@ -1,5 +1,5 @@
 angular.module('portainer.kubernetes').component('kubernetesResourceReservation', {
-  templateUrl: './kubernetesResourceReservation.html',
+  templateUrl: './resourceReservation.html',
   controller: 'KubernetesResourceReservationController',
   bindings: {
     description: '@',
