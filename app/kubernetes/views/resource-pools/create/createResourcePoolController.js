@@ -68,7 +68,7 @@ class KubernetesCreateResourcePoolController {
       this.formValues = {
         MemoryLimit: this.defaults.MemoryLimit,
         CpuLimit: this.defaults.CpuLimit,
-        hasQuota: false
+        hasQuota: true
       };
 
       this.state = {
