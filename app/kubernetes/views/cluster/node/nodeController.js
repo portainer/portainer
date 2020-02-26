@@ -16,6 +16,7 @@ class KubernetesNodeController {
 
     this.onInit = this.onInit.bind(this);
     this.getNodeAsync = this.getNodeAsync.bind(this);
+    this.getEvents = this.getEvents.bind(this);
     this.getEventsAsync = this.getEventsAsync.bind(this);
     this.getPodsAsync = this.getPodsAsync.bind(this);
     this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
