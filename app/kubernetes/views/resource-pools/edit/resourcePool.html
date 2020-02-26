@@ -9,13 +9,11 @@
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-body classes="no-padding">
-
         <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
           <uib-tab index="0" classes="btn-sm">
             <uib-tab-heading>
               <i class="fa fa-layer-group space-right" aria-hidden="true"></i> Resource pool
             </uib-tab-heading>
-
             <form class="form-horizontal" autocomplete="off" name="resourcePoolEditForm" style="padding: 20px; margin-top: 10px;">
               <!-- name-input -->
               <div class="form-group">
@@ -25,11 +23,9 @@
                 </div>
               </div>
               <!-- !name-input -->
-              <div class="col-sm-12 form-section-title">
-                Quota
-              </div>
+              <div ng-if="ctrl.isAdmin" class="col-sm-12 form-section-title">Quota</div>
               <!-- quotas-switch -->
-              <div class="form-group">
+              <div ng-if="ctrl.isAdmin" class="form-group">
                 <div class="col-sm-12">
                   <label class="control-label text-left">
                     Add quota to resource pool
@@ -40,18 +36,18 @@
                 </div>
               </div>
               <div class="form-group" ng-if="ctrl.formValues.hasQuota && !ctrl.isQuotaValid()">
-            <span class="col-sm-12 text-warning small">
-              <p>
-                <i class="fa fa-exclamation-triangle" aria-hidden="true" style="margin-right: 2px;"></i> At least a single limit must be set for the quota to be valid.
-              </p>
-            </span>
+                <span class="col-sm-12 text-warning small">
+                  <p>
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true" style="margin-right: 2px;"></i> At least a single limit must be set for the quota to be valid.
+                  </p>
+                </span>
               </div>
               <!-- !quotas-switch -->
               <div ng-if="ctrl.formValues.hasQuota">
                 <div class="col-sm-12 form-section-title">
                   Resource limits
                 </div>
-                <div>
+                <div ng-if="ctrl.isAdmin">
                   <!-- memory-limit-input -->
                   <div class="form-group">
                     <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
@@ -93,20 +89,22 @@
                   </div>
                   <!-- !cpu-limit-input -->
                 </div>
-                <kubernetes-resource-reservation
-                  ng-if="ctrl.pool.Quotas.length"
-                  description="Resource reservation represents the total amount of resource limits applied to all of the applications deployed inside this resource pool." cpu="ctrl.state.cpuUsed" memory="ctrl.state.memoryUsed" cpu-limit="ctrl.formValues.CpuLimit" memory-limit="ctrl.formValues.MemoryLimit">
+                <div class="form-group" ng-if="!ctrl.isAdmin">
+                  <div class="col-sm-12">Memory limit: {{ ctrl.formValues.MemoryLimit }} MB</div>
+                  <div class="col-sm-12">CPU limit: {{ ctrl.formValues.CpuLimit }}</div>
+                </div>
+                <kubernetes-resource-reservation ng-if="ctrl.pool.Quotas.length" description="Resource reservation represents the total amount of resource limits applied to all of the applications deployed inside this resource pool."
+                  cpu="ctrl.state.cpuUsed" memory="ctrl.state.memoryUsed" cpu-limit="ctrl.formValues.CpuLimit" memory-limit="ctrl.formValues.MemoryLimit">
                 </kubernetes-resource-reservation>
               </div>
               <!-- actions -->
-              <div class="col-sm-12 form-section-title">
+              <div ng-if="ctrl.isAdmin" class="col-sm-12 form-section-title">
                 Actions
               </div>
-              <div class="form-group">
+              <div ng-if="ctrl.isAdmin" class="form-group">
                 <div class="col-sm-12">
-                  <button type="button" class="btn btn-primary btn-sm"
-                          ng-disabled="!resourcePoolEditForm.$valid || ctrl.state.actionInProgress || (ctrl.formValues.hasQuota && !ctrl.isQuotaValid())"
-                          ng-click="ctrl.updateResourcePool()" button-spinner="ctrl.state.actionInProgress">
+                  <button type="button" class="btn btn-primary btn-sm" ng-disabled="!resourcePoolEditForm.$valid || ctrl.state.actionInProgress || (ctrl.formValues.hasQuota && !ctrl.isQuotaValid())"
+                    ng-click="ctrl.updateResourcePool()" button-spinner="ctrl.state.actionInProgress">
                     <span ng-hide="ctrl.state.actionInProgress">Update resource pool</span>
                     <span ng-show="ctrl.state.actionInProgress">Update in progress...</span>
                   </button>
@@ -119,28 +117,18 @@
             <uib-tab-heading>
               <i class="fa fa-history space-right" aria-hidden="true"></i> Events
             </uib-tab-heading>
-            <kubernetes-events-datatable
-                    title-text="Events" title-icon="fa-history"
-                    dataset="ctrl.events" table-key="kubernetes.resourcepool.events"
-                    order-by="Date"
-                    reverse-order="true"
-                    loading="ctrl.state.eventsLoading"
-                    refresh-callback="ctrl.getEvents"
-            ></kubernetes-events-datatable>
+            <kubernetes-events-datatable title-text="Events" title-icon="fa-history" dataset="ctrl.events" table-key="kubernetes.resourcepool.events" order-by="Date"
+              reverse-order="true" loading="ctrl.state.eventsLoading" refresh-callback="ctrl.getEvents"></kubernetes-events-datatable>
           </uib-tab>
           <uib-tab index="2" ng-if="ctrl.pool.Yaml" select="ctrl.showEditor()" classes="btn-sm">
             <uib-tab-heading>
               <i class="fa fa-code space-right" aria-hidden="true"></i> YAML
             </uib-tab-heading>
             <div style="padding-right: 25px;" ng-if="ctrl.state.showEditorTab">
-              <kubernetes-yaml-inspector
-                      key="resource-pool-yaml"
-                      data="ctrl.pool.Yaml"
-              ></kubernetes-yaml-inspector>
+              <kubernetes-yaml-inspector key="resource-pool-yaml" data="ctrl.pool.Yaml"></kubernetes-yaml-inspector>
             </div>
           </uib-tab>
         </uib-tabset>
-
       </rd-widget-body>
     </rd-widget>
   </div>
