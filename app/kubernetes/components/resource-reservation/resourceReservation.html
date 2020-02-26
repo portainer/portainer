@@ -17,8 +17,7 @@
       <uib-progressbar animate="false" value="$ctrl.memoryUsage"
         type="{{ $ctrl.memoryUsage | kubernetesUsageLevelInfo }}">
         <b>
-          {{ $ctrl.memory }} MB -
-          {{ $ctrl.memoryUsage }}%
+          {{ $ctrl.memory }} / {{ $ctrl.memoryLimit }} MB - {{ $ctrl.memoryUsage }}%
         </b>
       </uib-progressbar>
     </div>
@@ -31,7 +30,7 @@
       <uib-progressbar animate="false" value="$ctrl.cpuUsage"
         type="{{ $ctrl.cpuUsage | kubernetesUsageLevelInfo }}">
         <b>
-          {{ $ctrl.cpu }} - {{ $ctrl.cpuUsage }}%
+          {{ $ctrl.cpu }} / {{ $ctrl.cpuLimit }} - {{ $ctrl.cpuUsage }}%
         </b>
       </uib-progressbar>
     </div>

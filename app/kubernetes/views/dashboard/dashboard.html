@@ -51,7 +51,7 @@
 
 <div class="row">
   <div class="col-xs-12 col-md-6" ng-if="ctrl.pools">
-    <a ng-if="ctrl.isAdmin" ui-sref="kubernetes.resourcePools">
+    <a ui-sref="kubernetes.resourcePools">
       <rd-widget>
         <rd-widget-body>
           <div class="widget-icon blue pull-left">
@@ -62,17 +62,6 @@
         </rd-widget-body>
       </rd-widget>
     </a>
-    <div ng-if="!ctrl.isAdmin">
-      <rd-widget>
-        <rd-widget-body>
-          <div class="widget-icon blue pull-left">
-            <i class="fa fa-layer-group"></i>
-          </div>
-          <div class="title">{{ ctrl.pools.length }}</div>
-          <div class="comment">{{ ctrl.pools.length === 1 ? 'Resource pool' : 'Resource pools' }}</div>
-        </rd-widget-body>
-      </rd-widget>
-    </div>
   </div>
   <div class="col-xs-12 col-md-6" ng-if="ctrl.applications">
     <a ui-sref="kubernetes.applications">

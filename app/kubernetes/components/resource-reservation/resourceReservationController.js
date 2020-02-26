@@ -1,11 +1,6 @@
 import angular from 'angular';
 
 class KubernetesResourceReservationController {
-  /* @ngInject */
-  constructor($scope) {
-    this.$scope = $scope;
-  }
-
   usageValues() {
     if (this.cpuLimit) {
       this.cpuUsage = Math.round(this.cpu / this.cpuLimit * 100);
@@ -16,6 +11,10 @@ class KubernetesResourceReservationController {
   }
 
   $onInit() {
+    this.usageValues();
+  }
+
+  $onChanges() {
     this.usageValues();
   }
 }
