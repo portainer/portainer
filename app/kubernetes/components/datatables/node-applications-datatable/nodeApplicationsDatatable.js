@@ -1,5 +1,5 @@
-angular.module('portainer.kubernetes').component('kubernetesNodesDatatable', {
-  templateUrl: './nodesDatatable.html',
+angular.module('portainer.kubernetes').component('kubernetesNodeApplicationsDatatable', {
+  templateUrl: './nodeApplicationsDatatable.html',
   controller: 'GenericDatatableController',
   bindings: {
     titleText: '@',
@@ -7,6 +7,7 @@ angular.module('portainer.kubernetes').component('kubernetesNodesDatatable', {
     dataset: '<',
     tableKey: '@',
     orderBy: '@',
+    reverseOrder: '<',
     refreshCallback: '<'
   }
 });
