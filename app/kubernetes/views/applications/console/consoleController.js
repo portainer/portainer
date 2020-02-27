@@ -73,10 +73,12 @@ class KubernetesApplicationConsoleController {
   }
 
   async onInit() {
+    const availableCommands = ['/bin/bash', '/bin/sh'];
+
     this.state = {
       actionInProgress: false,
-      availableCommands: ['/bin/bash', '/bin/sh'],
-      command: '/bin/sh',
+      availableCommands: availableCommands,
+      command: availableCommands[1],
       connected: false,
       socket: null,
       term: null
