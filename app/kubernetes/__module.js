@@ -218,7 +218,6 @@ angular.module('portainer.kubernetes', ['portainer.app'])
   $stateRegistryProvider.register(cluster);
   $stateRegistryProvider.register(dashboard);
   $stateRegistryProvider.register(deploy);
-  $stateRegistryProvider.register(nodes);
   $stateRegistryProvider.register(node);
   $stateRegistryProvider.register(resourcePools);
   $stateRegistryProvider.register(resourcePoolCreation);
