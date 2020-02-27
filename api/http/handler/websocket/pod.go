@@ -60,9 +60,25 @@ func (handler *Handler) websocketPodExec(w http.ResponseWriter, r *http.Request)
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
 	}
 
-	// TODO:
-	// if endpoint.Type === kubernetes local, proceed
-	// else if Edge/Agent, proxy
+	params := &webSocketRequestParams{
+		endpoint: endpoint,
+	}
+
+	r.Header.Del("Origin")
+
+	if endpoint.Type == portainer.AgentOnDockerEnvironment {
+		err := handler.proxyAgentWebsocketRequest(w, r, params)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to proxy websocket request to agent", err}
+		}
+		return nil
+	} else if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment {
+		err := handler.proxyEdgeAgentWebsocketRequest(w, r, params)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to proxy websocket request to Edge agent", err}
+		}
+		return nil
+	}
 
 	commandArray := strings.Split(command, " ")
 
