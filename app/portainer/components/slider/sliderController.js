@@ -1,4 +1,4 @@
-// TODO: TEST WITH EXISTING SLIDERS !
+// TODO: k8s merge - TEST WITH EXISTING SLIDERS !
 // Not sure if this is not breaking existing sliders on docker views
 // Or sliders with onChange call (docker service update view)
 import angular from 'angular';

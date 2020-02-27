@@ -1,7 +1,7 @@
-import _ from "lodash-es";
-import angular from "angular";
-import { InitEndpointFormValues } from "Portainer/models/formValues/initEndpointFormValues";
-import { InitEndpointEndpointTypes } from "Portainer/models/formValues/initEndpointEndpointTypes";
+import _ from 'lodash-es';
+import angular from 'angular';
+import {InitEndpointFormValues} from 'Portainer/models/formValues/initEndpointFormValues';
+import {InitEndpointEndpointTypes} from 'Portainer/models/formValues/initEndpointEndpointTypes';
 
 class InitEndpointController {
   /* @ngInject */
@@ -72,9 +72,9 @@ class InitEndpointController {
       const name = this.formValues.Name;
       const URL = this.formValues.URL;
       const PublicURL = URL.split(":")[0];
-      // TODO: change type ID for agent on kube (6) or agent on swarm (2)
+      // TODO: k8s merge - change type ID for agent on kube (6) or agent on swarm (2)
       const endpoint = await this.EndpointService.createRemoteEndpoint(name, 6, URL, PublicURL, 1, [], true, true, true, null, null, null);
-      // TODO: go on home whith agent on swarm (2)
+      // TODO: k8s merge - go on home whith agent on swarm (2)
       this.$state.go("portainer.endpoints.endpoint.kubernetesConfig", {id: endpoint.Id});
     } catch (err) {
       this.Notifications.error("Failure", err, "Unable to connect to the Docker environment");
