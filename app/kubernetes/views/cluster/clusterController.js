@@ -4,8 +4,9 @@ import filesizeParser from 'filesize-parser';
 
 class KubernetesClusterController {
   /* @ngInject */
-  constructor($async, Notifications, KubernetesNodeService) {
+  constructor($async, Authentication, Notifications, KubernetesNodeService) {
     this.$async = $async;
+    this.Authentication = Authentication;
     this.Notifications = Notifications;
     this.KubernetesNodeService = KubernetesNodeService;
 
@@ -28,6 +29,7 @@ class KubernetesClusterController {
   }
 
   async $onInit() {
+    this.isAdmin = this.Authentication.isAdmin();
     this.getNodes();
   }
 }

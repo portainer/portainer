@@ -14,11 +14,12 @@ function bytesValue(mem) {
 
 class KubernetesEditResourcePoolController {
   /* @ngInject */
-  constructor($async, $state, $transition$, Notifications, KubernetesNodeService, KubernetesResourceQuotaService, KubernetesResourcePoolService, KubernetesLimitRangeService, KubernetesEventService) {
+  constructor($async, $state, $transition$, Authentication, Notifications, KubernetesNodeService, KubernetesResourceQuotaService, KubernetesResourcePoolService, KubernetesLimitRangeService, KubernetesEventService) {
     this.$async = $async;
     this.$state = $state;
     this.$transition$ = $transition$;
     this.Notifications = Notifications;
+    this.Authentication = Authentication;
 
     this.KubernetesNodeService = KubernetesNodeService;
     this.KubernetesResourceQuotaService = KubernetesResourceQuotaService;
@@ -54,16 +55,6 @@ class KubernetesEditResourcePoolController {
     this.state.showEditorTab = true;
   }
 
-  usageLevelInfo(usage) {
-    if (usage >= 80) {
-      return 'danger';
-    } else if (usage > 50 && usage < 80) {
-      return 'warning';
-    } else {
-      return 'success';
-    }
-  }
-
   async updateResourcePoolAsync() {
     this.state.actionInProgress = true;
     try {
@@ -74,6 +65,8 @@ class KubernetesEditResourcePoolController {
       if (this.formValues.hasQuota) {
         if (quota) {
           await this.KubernetesResourceQuotaService.update(quota.Raw, this.formValues.CpuLimit, memoryLimit);
+          this.state.cpuUsed = quota.CpuLimitUsed;
+          this.state.memoryUsed = megaBytesValue(quota.MemoryLimitUse);
           if (!this.pool.LimitRange) {
             const limitRange = new KubernetesDefaultLimitRangeModel(this.pool.Namespace.Name);
             await this.KubernetesLimitRangeService.create(limitRange, this.formValues.CpuLimit, memoryLimit);
@@ -120,6 +113,7 @@ class KubernetesEditResourcePoolController {
 
   async onInit() {
     try {
+      this.isAdmin = this.Authentication.isAdmin();
       this.defaults = KubernetesResourceQuotaDefaults;
 
       this.formValues = {
@@ -163,17 +157,8 @@ class KubernetesEditResourcePoolController {
         this.formValues.CpuLimit = quota.CpuLimit;
         this.formValues.MemoryLimit = megaBytesValue(quota.MemoryLimit);
 
-        let usedCPU = quota.CpuLimitUsed;
-        this.state.cpuUsed = usedCPU;
-        if (usedCPU !== 0) {
-          this.state.cpuUsage = Math.floor(usedCPU * 100 / quota.CpuLimit);
-        }
-
-        let usedMemory = quota.MemoryLimitUsed;
-        this.state.memoryUsed = megaBytesValue(usedMemory);
-        if (usedMemory !== 0) {
-          this.state.memoryUsage = Math.floor(usedMemory * 100 / quota.MemoryLimit);
-        }
+        this.state.cpuUsed = quota.CpuLimitUsed;
+        this.state.memoryUsed = megaBytesValue(quota.MemoryLimitUsed);
       }
 
       this.getEvents();
