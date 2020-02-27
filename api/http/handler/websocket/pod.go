@@ -66,13 +66,13 @@ func (handler *Handler) websocketPodExec(w http.ResponseWriter, r *http.Request)
 
 	r.Header.Del("Origin")
 
-	if endpoint.Type == portainer.AgentOnDockerEnvironment {
+	if endpoint.Type == portainer.AgentOnKubernetesEnvironment {
 		err := handler.proxyAgentWebsocketRequest(w, r, params)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to proxy websocket request to agent", err}
 		}
 		return nil
-	} else if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment {
+	} else if endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
 		err := handler.proxyEdgeAgentWebsocketRequest(w, r, params)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to proxy websocket request to Edge agent", err}
