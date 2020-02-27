@@ -3,17 +3,50 @@ import {Terminal} from 'xterm';
 
 class KubernetesApplicationConsoleController {
   /* @ngInject */
-  constructor($async, $state, $transition$, Notifications, KubernetesApplicationService, KubernetesPodService, EndpointProvider, LocalStorage) {
+  constructor($async, $state, $transition$, Notifications, KubernetesApplicationService, EndpointProvider, LocalStorage) {
     this.$async = $async;
     this.$state = $state;
     this.$transition$ = $transition$;
     this.Notifications = Notifications;
     this.KubernetesApplicationService = KubernetesApplicationService;
-    this.KubernetesPodService = KubernetesPodService;
     this.EndpointProvider = EndpointProvider;
     this.LocalStorage = LocalStorage;
 
     this.onInit = this.onInit.bind(this);
+  }
+
+  disconnect() {
+    this.state.socket.close();
+    this.state.term.dispose();
+    this.state.connected = false;
+  }
+
+  configureSocketAndTerminal(socket, term) {
+    socket.onopen = function() {
+      const terminal_container = document.getElementById('terminal-container');
+      term.open(terminal_container);
+      term.setOption('cursorBlink', true);
+      term.focus();
+    };
+
+    term.on('data', function (data) {
+      socket.send(data);
+    });
+
+    socket.onmessage = function (msg) {
+      term.write(msg.data);
+    };
+
+    socket.onerror = function (err) {
+      this.disconnect();
+      this.Notifications.error("Failure", err, "Websocket connection error");
+    }.bind(this);
+
+    this.state.socket.onclose = function () {
+      this.disconnect();
+    }.bind(this);
+
+    this.state.connected = true;
   }
 
   connectConsole() {
@@ -26,56 +59,17 @@ class KubernetesApplicationConsoleController {
       command: this.state.command
     };
 
-    // url builder
-    var url = window.location.href.split('#')[0] + 'api/websocket/pod?' + (Object.keys(params).map((k) => k + "=" + params[k]).join("&"));
+    let url = window.location.href.split('#')[0] + 'api/websocket/pod?' + (Object.keys(params).map((k) => k + "=" + params[k]).join("&"));
     if (url.indexOf('https') > -1) {
       url = url.replace('https://', 'wss://');
     } else {
       url = url.replace('http://', 'ws://');
     }
 
-    const socket = new WebSocket(url);
+    this.state.socket = new WebSocket(url);
+    this.state.term = new Terminal();
 
-    socket.onopen = function () {
-      const term = new Terminal();
-
-
-      term.on('data', function (data) {
-        socket.send(data);
-      });
-
-      var terminal_container = document.getElementById('terminal-container');
-      term.open(terminal_container);
-      term.focus();
-      term.setOption('cursorBlink', true);
-
-      // window.onresize = function () {
-      //   resizefun();
-      //   $scope.$apply();
-      // };
-
-      // $scope.$watch('toggle', function () {
-      //   setTimeout(resizefun, 400);
-      // });
-
-      socket.onmessage = function (e) {
-        term.write(e.data);
-      };
-
-      socket.onerror = function (err) {
-        // $scope.disconnect();
-        // $scope.$apply();
-        this.Notifications.error("Failure", err, "Connection error");
-      };
-
-      socket.onclose = function () {
-        // $scope.disconnect();
-        // $scope.$apply();
-      };
-
-      // resizefun(1);
-      // $scope.$apply();
-    };
+    this.configureSocketAndTerminal(this.state.socket, this.state.term);
   }
 
   async onInit() {
@@ -83,7 +77,9 @@ class KubernetesApplicationConsoleController {
       actionInProgress: false,
       availableCommands: ['/bin/bash', '/bin/sh'],
       command: '/bin/sh',
-      connected: false
+      connected: false,
+      socket: null,
+      term: null
     };
 
     const podName = this.$transition$.params().pod;
