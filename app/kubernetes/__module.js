@@ -43,13 +43,25 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     }
   };
 
-  const applicationInspect = {
+  const application = {
     name: 'kubernetes.applications.application',
     url: '/:namespace/:name',
     views: {
       'content@': {
         templateUrl: './views/applications/inspect/application.html',
         controller: 'KubernetesApplicationController',
+        controllerAs: 'ctrl'
+      }
+    }
+  };
+
+  const applicationConsole = {
+    name: 'kubernetes.applications.application.console',
+    url: '/:pod/console',
+    views: {
+      'content@': {
+        templateUrl: './views/applications/console/console.html',
+        controller: 'KubernetesApplicationConsoleController',
         controllerAs: 'ctrl'
       }
     }
@@ -111,7 +123,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     }
   };
 
-  const nodes = {
+  const cluster = {
     name: 'kubernetes.cluster',
     url: '/cluster',
     views: {
@@ -186,13 +198,14 @@ angular.module('portainer.kubernetes', ['portainer.app'])
   $stateRegistryProvider.register(kubernetes);
   $stateRegistryProvider.register(applications);
   $stateRegistryProvider.register(applicationCreation);
-  $stateRegistryProvider.register(applicationInspect);
+  $stateRegistryProvider.register(application);
+  $stateRegistryProvider.register(applicationConsole);
   $stateRegistryProvider.register(applicationLogs);
   $stateRegistryProvider.register(applicationCreateMockup);
   $stateRegistryProvider.register(applicationCreateMockupExpanded);
+  $stateRegistryProvider.register(cluster);
   $stateRegistryProvider.register(dashboard);
   $stateRegistryProvider.register(deploy);
-  $stateRegistryProvider.register(nodes);
   $stateRegistryProvider.register(resourcePools);
   $stateRegistryProvider.register(resourcePoolCreation);
   $stateRegistryProvider.register(resourcePool);

@@ -101,7 +101,7 @@
                 <a ui-sref="kubernetes.applications.application.logs({ pod: item.Name })">
                   <i class="fa fa-file-alt" aria-hidden="true"></i> Logs
                 </a>
-                <a ui-sref="kubernetes.applications.application.console({ application: item.Name, namespace: item.ResourcePool, pod: item.Name })" style="margin-left: 10px;">
+                <a ui-sref="kubernetes.applications.application.console({ pod: item.Name })" style="margin-left: 10px;">
                   <i class="fa fa-terminal" aria-hidden="true"></i> Console
                 </a>
               </td>

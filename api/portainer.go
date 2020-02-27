@@ -1,6 +1,9 @@
 package portainer
 
-import "time"
+import (
+	"io"
+	"time"
+)
 
 type (
 	// Pair defines a key/value string pair
@@ -946,6 +949,7 @@ type (
 	KubeClient interface {
 		SetupUserServiceAccount(userID int, username string, teamIDs []int) error
 		GetServiceAccountBearerToken(userID int, username string) (string, error)
+		StartExecProcess(namespace, podName, containerName string, command []string, stdin io.Reader, stdout io.Writer) error
 	}
 )
 
