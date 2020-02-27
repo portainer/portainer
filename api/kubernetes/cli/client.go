@@ -4,6 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
+
+	cmap "github.com/orcaman/concurrent-map"
 
 	portainer "github.com/portainer/portainer/api"
 	"k8s.io/client-go/kubernetes"
@@ -16,6 +19,7 @@ type (
 	ClientFactory struct {
 		reverseTunnelService portainer.ReverseTunnelService
 		signatureService     portainer.DigitalSignatureService
+		endpointClients      cmap.ConcurrentMap
 	}
 
 	// KubeClient represent a service used to execute Kubernetes operations
@@ -29,11 +33,29 @@ func NewClientFactory(signatureService portainer.DigitalSignatureService, revers
 	return &ClientFactory{
 		signatureService:     signatureService,
 		reverseTunnelService: reverseTunnelService,
+		endpointClients:      cmap.New(),
 	}
 }
 
-// CreateKubeClient returns a pointer to a new KubeClient instance
-func (factory *ClientFactory) CreateKubeClient(endpoint *portainer.Endpoint) (portainer.KubeClient, error) {
+// GetKubeClient checks if an existing client is already registered for the endpoint and returns it if one is found.
+// If no client is registered, it will create a new client, register it, and returns it.
+func (factory *ClientFactory) GetKubeClient(endpoint *portainer.Endpoint) (portainer.KubeClient, error) {
+	key := strconv.Itoa(int(endpoint.ID))
+	client, ok := factory.endpointClients.Get(key)
+	if !ok {
+		client, err := factory.createKubeClient(endpoint)
+		if err != nil {
+			return nil, err
+		}
+
+		factory.endpointClients.Set(key, client)
+		return client, nil
+	}
+
+	return client.(portainer.KubeClient), nil
+}
+
+func (factory *ClientFactory) createKubeClient(endpoint *portainer.Endpoint) (portainer.KubeClient, error) {
 	cli, err := factory.CreateClient(endpoint)
 	if err != nil {
 		return nil, err

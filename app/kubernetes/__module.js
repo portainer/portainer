@@ -43,13 +43,25 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     }
   };
 
-  const applicationInspect = {
+  const application = {
     name: 'kubernetes.applications.application',
     url: '/:namespace/:name',
     views: {
       'content@': {
         templateUrl: './views/applications/inspect/application.html',
         controller: 'KubernetesApplicationController',
+        controllerAs: 'ctrl'
+      }
+    }
+  };
+
+  const applicationConsole = {
+    name: 'kubernetes.applications.application.console',
+    url: '/:pod/console',
+    views: {
+      'content@': {
+        templateUrl: './views/applications/console/console.html',
+        controller: 'KubernetesApplicationConsoleController',
         controllerAs: 'ctrl'
       }
     }
@@ -87,6 +99,30 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     }
   };
 
+  const cluster = {
+    name: 'kubernetes.cluster',
+    url: '/cluster',
+    views: {
+      'content@': {
+        templateUrl: './views/cluster/cluster.html',
+        controller: 'KubernetesClusterController',
+        controllerAs: 'ctrl'
+      }
+    }
+  };
+
+  const node = {
+    name: 'kubernetes.cluster.node',
+    url: '/:name',
+    views: {
+      'content@': {
+        templateUrl: './views/cluster/node/node.html',
+        controller: 'KubernetesNodeController',
+        controllerAs: 'ctrl'
+      }
+    }
+  };
+
   const dashboard = {
     name: 'kubernetes.dashboard',
     url: '/dashboard',
@@ -106,30 +142,6 @@ angular.module('portainer.kubernetes', ['portainer.app'])
       'content@': {
         templateUrl: './views/deploy/deploy.html',
         controller: 'KubernetesDeployController',
-        controllerAs: 'ctrl'
-      }
-    }
-  };
-
-  const nodes = {
-    name: 'kubernetes.cluster',
-    url: '/cluster',
-    views: {
-      'content@': {
-        templateUrl: './views/cluster/cluster.html',
-        controller: 'KubernetesClusterController',
-        controllerAs: 'ctrl'
-      }
-    }
-  };
-
-  const node = {
-    name: 'kubernetes.cluster.node',
-    url: '/:name',
-    views: {
-      'content@': {
-        templateUrl: './views/cluster/node/node.html',
-        controller: 'KubernetesNodeController',
         controllerAs: 'ctrl'
       }
     }
@@ -198,13 +210,14 @@ angular.module('portainer.kubernetes', ['portainer.app'])
   $stateRegistryProvider.register(kubernetes);
   $stateRegistryProvider.register(applications);
   $stateRegistryProvider.register(applicationCreation);
-  $stateRegistryProvider.register(applicationInspect);
+  $stateRegistryProvider.register(application);
+  $stateRegistryProvider.register(applicationConsole);
   $stateRegistryProvider.register(applicationLogs);
   $stateRegistryProvider.register(applicationCreateMockup);
   $stateRegistryProvider.register(applicationCreateMockupExpanded);
+  $stateRegistryProvider.register(cluster);
   $stateRegistryProvider.register(dashboard);
   $stateRegistryProvider.register(deploy);
-  $stateRegistryProvider.register(nodes);
   $stateRegistryProvider.register(node);
   $stateRegistryProvider.register(resourcePools);
   $stateRegistryProvider.register(resourcePoolCreation);

@@ -28,7 +28,7 @@ func (factory *ProxyFactory) newKubernetesLocalProxy(endpoint *portainer.Endpoin
 		return nil, err
 	}
 
-	kubecli, err := factory.kubernetesClientFactory.CreateKubeClient(endpoint)
+	kubecli, err := factory.kubernetesClientFactory.GetKubeClient(endpoint)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (factory *ProxyFactory) newKubernetesEdgeHTTPProxy(endpoint *portainer.Endp
 		return nil, err
 	}
 
-	kubecli, err := factory.kubernetesClientFactory.CreateKubeClient(endpoint)
+	kubecli, err := factory.kubernetesClientFactory.GetKubeClient(endpoint)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +86,7 @@ func (factory *ProxyFactory) newKubernetesAgentHTTPSProxy(endpoint *portainer.En
 
 	remoteURL.Scheme = "https"
 
-	kubecli, err := factory.kubernetesClientFactory.CreateKubeClient(endpoint)
+	kubecli, err := factory.kubernetesClientFactory.GetKubeClient(endpoint)
 	if err != nil {
 		return nil, err
 	}

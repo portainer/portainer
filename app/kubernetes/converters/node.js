@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 
-import { KubernetesNode, KubernetesNodeDetails } from "Kubernetes/models/node/models";
+import {KubernetesNode, KubernetesNodeDetails} from 'Kubernetes/models/node/models';
 
 class KubernetesNodeConverter {
   static apiToNode(data, res) {
