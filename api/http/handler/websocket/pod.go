@@ -14,7 +14,7 @@ import (
 
 // websocketPodExec handles GET requests on /websocket/pod?token=<token>&endpointId=<endpointID>&namespace=<namespace>&podName=<podName>&containerName=<containerName>&command=<command>
 // The request will be upgraded to the websocket protocol.
-// Authentication and access is controled via the mandatory token query parameter.
+// Authentication and access is controlled via the mandatory token query parameter.
 // The following parameters query parameters are mandatory:
 // * token: JWT token used for authentication against this endpoint
 // * endpointId: endpoint ID of the endpoint where the resource is located
