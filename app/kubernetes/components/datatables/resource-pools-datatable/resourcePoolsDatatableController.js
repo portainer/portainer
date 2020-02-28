@@ -9,7 +9,7 @@ angular.module('portainer.docker')
       }
 
       this.disableRemove = function(item) {
-        return KubernetesNamespaceHelper.isSystemNamespace(item.Namespace.Name);
+        return KubernetesNamespaceHelper.isSystemNamespace(item.Namespace.Name) || item.Namespace.Name === 'default';
       };
 
       this.isSystemNamespace = function(item) {
