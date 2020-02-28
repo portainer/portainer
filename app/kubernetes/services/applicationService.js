@@ -1,198 +1,237 @@
 import _ from 'lodash-es';
-import KubernetesDeploymentModelFromApplication from 'Kubernetes/models/deployment';
-import {KubernetesApplicationDeploymentTypes, KubernetesApplicationViewModel} from 'Kubernetes/models/application';
-import KubernetesDaemonSetModelFromApplication from 'Kubernetes/models/daemon-set/daemonSet';
-import KubernetesServiceModelFromApplication from 'Kubernetes/models/service';
-import KubernetesPersistentVolumeClaimsFromApplication from 'Kubernetes/models/persistentVolumeClaim';
+import angular from 'angular';
+import PortainerError from 'Portainer/error';
+
+import { KubernetesApplicationDeploymentTypes, KubernetesApplicationDataAccessPolicies, KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
+
 import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 
-angular.module("portainer.kubernetes").factory("KubernetesApplicationService", [
-  '$async', 'KubernetesDeploymentService', 'KubernetesDaemonSetService', 'KubernetesServiceService', 'KubernetesPods',
-  'KubernetesSecretService', 'KubernetesPersistentVolumeClaimService', 'Authentication', 'KubernetesNamespaceService',
-  function KubernetesApplicationServiceFactory($async, KubernetesDeploymentService, KubernetesDaemonSetService,
-    KubernetesServiceService, KubernetesPods, KubernetesSecretService,
-    KubernetesPersistentVolumeClaimService, Authentication,
-    KubernetesNamespaceService) {
-    "use strict";
-    const service = {
-      applications: applications,
-      application: application,
-      create: create,
-      remove: remove
-    };
+import KubernetesDeploymentConverter from 'Kubernetes/converters/deployment';
+import KubernetesDaemonSetConverter from 'Kubernetes/converters/daemonSet';
+import KubernetesStatefulSetConverter from 'Kubernetes/converters/statefulSet';
+import KubernetesServiceConverter from 'Kubernetes/converters/service';
+import KubernetesApplicationConverter from 'Kubernetes/converters/application';
+import KubernetesPersistentVolumeClaimConverter from 'Kubernetes/converters/persistentVolumeClaim';
+import KubernetesServiceHelper from 'Kubernetes/helpers/serviceHelper';
 
-    /**
-     * Applications
-     */
-    async function applicationsFilteredAsync(namespace) {
-      try {
-        let namespaces;
-        if (namespace) {
-          const ns = await KubernetesNamespaceService.namespace(namespace);
-          namespaces = [ns];
-        } else {
-          namespaces = await KubernetesNamespaceService.namespaces();
-        }
-        const promises = _.map(namespaces, (item) => applicationsAsync(item.Name));
-        const res = await Promise.all(promises);
-        return _.flatten(res);
-      } catch (err) {
-        throw err;
+class KubernetesApplicationService {
+  /* @ngInject */
+  constructor($async, Authentication, KubernetesDeploymentService, KubernetesDaemonSetService, KubernetesStatefulSetService, KubernetesServiceService,
+    KubernetesSecretService, KubernetesPersistentVolumeClaimService, KubernetesNamespaceService, KubernetesPods) {
+    this.$async = $async;
+    this.Authentication = Authentication;
+    this.KubernetesDeploymentService = KubernetesDeploymentService;
+    this.KubernetesDaemonSetService = KubernetesDaemonSetService;
+    this.KubernetesStatefulSetService = KubernetesStatefulSetService;
+    this.KubernetesServiceService = KubernetesServiceService;
+    this.KubernetesSecretService = KubernetesSecretService;
+    this.KubernetesPersistentVolumeClaimService = KubernetesPersistentVolumeClaimService;
+    this.KubernetesNamespaceService = KubernetesNamespaceService;
+    this.KubernetesPods = KubernetesPods;
+
+    this.getAsync = this.getAsync.bind(this);
+    this.getAllAsync = this.getAllAsync.bind(this);
+    this.getAllFilteredAsync = this.getAllFilteredAsync.bind(this);
+    this.createAsync = this.createAsync.bind(this);
+    this.deleteAsync = this.deleteAsync.bind(this);
+  }
+
+  /**
+   * GET
+   */
+  async getAsync(namespace, name) {
+    try {
+      const [deployment, daemonSet, statefulSet, serviceAttempt, pods] = await Promise.allSettled([
+        this.KubernetesDeploymentService.get(namespace, name),
+        this.KubernetesDaemonSetService.get(namespace, name),
+        this.KubernetesStatefulSetService.get(namespace, name),
+        this.KubernetesServiceService.get(namespace, name),
+        this.KubernetesPods(namespace).get().$promise
+      ]);
+      const service = {};
+      if (serviceAttempt.status === 'fulfilled') {
+        service.Raw = serviceAttempt.value.Raw;
+        service.Yaml = serviceAttempt.value.Yaml;
       }
-    }
-
-    async function applicationsAsync(namespace) {
-      try {
-        const [deployments, daemonSets, services] = await Promise.all([
-          KubernetesDeploymentService.get(namespace),
-          KubernetesDaemonSetService.get(namespace),
-          KubernetesServiceService.services(namespace)
-        ]);
-        const deploymentApplications = _.map(deployments, (item) => {
-          const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
-          return new KubernetesApplicationViewModel(KubernetesApplicationDeploymentTypes.REPLICATED, item, service);
-        });
-        const daemonSetApplications = _.map(daemonSets, (item) => {
-          const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
-          return new KubernetesApplicationViewModel(KubernetesApplicationDeploymentTypes.GLOBAL, item, service);
-        });
-        const applications = _.concat(deploymentApplications, daemonSetApplications);
-        return applications;
-      } catch (err) {
-        throw err;
+      let item;
+      let application;
+      if (deployment.status === 'fulfilled') {
+        item = deployment;
+        application = KubernetesApplicationConverter.apiDeploymentToApplication(deployment.value.Raw, service.Raw);
+      } else if (daemonSet.status === 'fulfilled') {
+        item = daemonSet;
+        application = KubernetesApplicationConverter.apiDaemonSetToApplication(daemonSet.value.Raw, service.Raw);
+      } else if (statefulSet.status === 'fulfilled') {
+        item = statefulSet;
+        application = KubernetesApplicationConverter.apiStatefulSetToapplication(statefulSet.value.Raw, service.Raw);
+      } else {
+        throw new PortainerError('Unable to determine which association to use');
       }
-    }
-
-    function applications(namespace) {
-      const isAdmin = Authentication.isAdmin();
-      if (!isAdmin) {
-        return $async(applicationsFilteredAsync, namespace);
+      application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods.value.items, item.value.Raw);
+      application.Yaml = item.value.Yaml.data;
+      if (service.Yaml) {
+        application.Yaml += '---\n' + service.Yaml.data;
       }
-      return $async(applicationsAsync, namespace);
+      return application;
+    } catch (err) {
+      throw err;
     }
+  }
 
-    /**
-     * Application
-     */
-    async function applicationAsync(namespace, name) {
-      try {
-        const [deployment, daemonSet, serviceAttempt, pods] = await Promise.allSettled([
-          KubernetesDeploymentService.get(namespace, name),
-          KubernetesDaemonSetService.get(namespace, name),
-          KubernetesServiceService.service(namespace, name),
-          KubernetesPods(namespace).get().$promise
-        ]);
-        const service = {};
-        if (serviceAttempt.status === 'fulfilled') {
-          service.Raw = serviceAttempt.value.Raw;
-          service.Yaml = serviceAttempt.value.Yaml;
-        }
-
-        if (deployment.status === 'fulfilled') {
-          KubernetesApplicationHelper.associatePodsAndApplication(pods.value.items, deployment.value.Raw);
-          const application = new KubernetesApplicationViewModel(KubernetesApplicationDeploymentTypes.REPLICATED, deployment.value.Raw, service.Raw);
-          application.Yaml = deployment.value.Yaml.data;
-          if (service.Yaml) {
-            application.Yaml += '---\n' + service.Yaml.data;
-          }
-          return application;
-        }
-        KubernetesApplicationHelper.associatePodsAndApplication(pods.value.items, daemonSet.value.Raw);
-        const application = new KubernetesApplicationViewModel(KubernetesApplicationDeploymentTypes.GLOBAL, daemonSet.value.Raw, service.Raw);
-        application.Yaml = daemonSet.value.Yaml.data;
-        if (service.Yaml) {
-          application.Yaml += '---\n' + service.Yaml.data;
-        }
-        return application;
-      } catch (err) {
-        throw err;
+  async getAllFilteredAsync(namespace) {
+    try {
+      let namespaces;
+      if (namespace) {
+        const ns = await this.KubernetesNamespaceService.namespace(namespace);
+        namespaces = [ns];
+      } else {
+        namespaces = await this.KubernetesNamespaceService.namespaces();
       }
+      const promises = _.map(namespaces, (item) => this.getAllAsync(item.Name));
+      const res = await Promise.all(promises);
+      return _.flatten(res);
+    } catch (err) {
+      throw err;
     }
+  }
 
-    function application(namespace, name) {
-      return $async(applicationAsync, namespace, name);
+
+  async getAllAsync(namespace) {
+    try {
+      const [deployments, daemonSets, statefulSets, services] = await Promise.all([
+        this.KubernetesDeploymentService.get(namespace),
+        this.KubernetesDaemonSetService.get(namespace),
+        this.KubernetesStatefulSetService.get(namespace),
+        this.KubernetesServiceService.get(namespace)
+      ]);
+      const deploymentApplications = _.map(deployments, (item) => {
+        const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
+        return KubernetesApplicationConverter.apiDeploymentToApplication(item, service);
+      });
+      const daemonSetApplications = _.map(daemonSets, (item) => {
+        const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
+        return KubernetesApplicationConverter.apiDaemonSetToApplication(item, service);
+      });
+      const statefulSetApplications = _.map(statefulSets, (item) => {
+        const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
+        return KubernetesApplicationConverter.apiStatefulSetToapplication(item, service);
+      });
+      const applications = _.concat(deploymentApplications, daemonSetApplications, statefulSetApplications);
+      return applications;
+    } catch (err) {
+      throw err;
     }
+  }
 
-    /**
-     * Creation
-     */
-    async function createAsync(applicationFormValues) {
-      try {
+  get(namespace, name) {
+    if (name) {
+      return this.$async(this.getAsync, namespace, name);
+    }
+    const isAdmin = this.Authentication.isAdmin();
+    if (!isAdmin) {
+      return this.$async(this.getAllFilteredAsync, namespace);
+    }
+    return this.$async(this.getAllAsync, namespace);
+  }
 
-        const claims = new KubernetesPersistentVolumeClaimsFromApplication(applicationFormValues);
-        // TODO: refactor that for parallelization
-        _.forEach(claims.Claims, async (claim) => {
-          await KubernetesPersistentVolumeClaimService.create(claim);
-        });
+  /**
+   * CREATE
+   */
+  async createAsync(formValues) {
+    try {
+      const claims = KubernetesPersistentVolumeClaimConverter.applicationFormValuesToVolumeClaims(formValues);
+      const roxrwx = _.find(claims, (item) => _.includes(item.StorageClass.AccessModes, "ROX") || _.includes(item.StorageClass.AccessModes, "RWX"));
+      let apiService;
+      let app;
 
-        if (applicationFormValues.DeploymentType === KubernetesApplicationDeploymentTypes.REPLICATED) {
-          const deployment = new KubernetesDeploymentModelFromApplication(applicationFormValues);
+      const deployment = formValues.DeploymentType === KubernetesApplicationDeploymentTypes.REPLICATED &&
+        (claims.length === 0 || (claims.length > 0 && formValues.DataAccessPolicy === KubernetesApplicationDataAccessPolicies.SHARED));
+      const statefulSet = claims.length > 0 && formValues.DataAccessPolicy === KubernetesApplicationDataAccessPolicies.ISOLATED &&
+        formValues.DeploymentType === KubernetesApplicationDeploymentTypes.REPLICATED;
+      const daemonSet = formValues.DeploymentType === KubernetesApplicationDeploymentTypes.GLOBAL &&
+        (claims.length === 0 || (claims.length > 0 && formValues.DataAccessPolicy === KubernetesApplicationDataAccessPolicies.SHARED && roxrwx));
 
-          if (!_.isEmpty(deployment.Secret.Data)) {
-            await KubernetesSecretService.create(deployment.Secret);
-          }
-
-          await KubernetesDeploymentService.create(deployment);
-        } else {
-          const daemonSet = new KubernetesDaemonSetModelFromApplication(applicationFormValues);
-
-          if (!_.isEmpty(daemonSet.Secret.Data)) {
-            await KubernetesSecretService.create(daemonSet.Secret);
-          }
-
-          await KubernetesDaemonSetService.create(daemonSet);
-        }
-
-        const service = new KubernetesServiceModelFromApplication(applicationFormValues);
-        if (service.Ports.length === 0) {
-          return;
-        }
-
-        return await KubernetesServiceService.create(service);
-      } catch (err) {
-        throw err;
+      if (deployment) {
+        app = KubernetesDeploymentConverter.applicationFormValuesToDeployment(formValues);
+        apiService = this.KubernetesDeploymentService;
+      } else if (statefulSet) {
+        app = KubernetesStatefulSetConverter.applicationFormValuesToStatefulSet(formValues);
+        apiService = this.KubernetesStatefulSetService;
+      } else if (daemonSet) {
+        app = KubernetesDaemonSetConverter.applicationFormValuesToDaemonSet(formValues);
+        apiService = this.KubernetesDaemonSetService;
+      } else {
+        throw new PortainerError('Unable to determine which association to use');
       }
+
+      if (statefulSet) {
+        app.VolumeClaims = claims;
+        let headlessService = KubernetesServiceConverter.applicationFormValuesToService(formValues);
+        headlessService.Headless = true;
+        headlessService = await this.KubernetesServiceService.create(headlessService);
+        app.ServiceName = headlessService.metadata.name;
+      } else {
+        const claimPromises = _.map(claims, (item) => this.KubernetesPersistentVolumeClaimService.create(item));
+        await Promise.all(claimPromises);
+      }
+
+      if (app.Secret) {
+        await this.KubernetesSecretService.create(app.Secret);
+      }
+      await apiService.create(app);
+
+      const service = KubernetesServiceConverter.applicationFormValuesToService(formValues);
+      if (service.Ports.length === 0) {
+        return;
+      }
+      await this.KubernetesServiceService.create(service);
+    } catch (err) {
+      throw err;
     }
+  }
 
-    function create(applicationFormValues) {
-      return $async(createAsync, applicationFormValues);
-    }
+  create(formValues) {
+    return this.$async(this.createAsync, formValues);
+  }
 
-    /**
-     * Delete
-     */
-
-    /**
-     *
-     * @param {KubernetesApplicationViewModel} application
-     */
-    async function removeAsync(application) {
+  /**
+   * DELETE
+   */
+  async deleteAsync(application) {
+    try {
       const payload = {
         Namespace: application.ResourcePool,
         Name: application.Name
       };
-      try {
-        if (application.DeploymentType === KubernetesApplicationDeploymentTypes.REPLICATED) {
-          await KubernetesDeploymentService.delete(payload);
-        } else {
-          await KubernetesDaemonSetService.delete(payload);
-        }
-        if (application.ServiceType) {
-          await KubernetesServiceService.remove(payload);
-        }
-        // TODO: refactor that for parallelization
-        _.forEach(application.Volumes, async (claim) => {
-          await KubernetesPersistentVolumeClaimService.remove(claim.persistentVolumeClaim.claimName, application.ResourcePool);
-        });
-      } catch (err) {
-        throw err;
+      const headlessServicePayload = angular.copy(payload);
+      headlessServicePayload.Name = KubernetesServiceHelper.generateHeadlessServiceName(application.Name);
+
+      switch (application.ApplicationType) {
+        case KubernetesApplicationTypes.DEPLOYMENT:
+          await this.KubernetesDeploymentService.delete(payload);
+          break;
+        case KubernetesApplicationTypes.DAEMONSET:
+          await this.KubernetesDaemonSetService.delete(payload);
+          break;
+        case KubernetesApplicationTypes.STATEFULSET:
+          await this.KubernetesStatefulSetService.delete(payload);
+          await this.KubernetesServiceService.delete(headlessServicePayload);
+          break;
+        default:
+          throw new PortainerError('Unable to determine which association to remove');
       }
+      if (application.ServiceType) {
+        await this.KubernetesServiceService.delete(payload);
+      }
+    } catch (err) {
+      throw err;
     }
-
-    function remove(application) {
-      return $async(removeAsync, application);
-    }
-
-    return service;
   }
-]);
+
+  delete(application) {
+    return this.$async(this.deleteAsync, application);
+  }
+}
+
+export default KubernetesApplicationService;
+angular.module('portainer.kubernetes').service('KubernetesApplicationService', KubernetesApplicationService);

@@ -5,11 +5,12 @@ import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 
 class KubernetesApplicationsController {
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesApplicationService) {
+  constructor($async, $state, Notifications, KubernetesApplicationService, Authentication) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
     this.KubernetesApplicationService = KubernetesApplicationService;
+    this.Authentication = Authentication;
 
     this.onInit = this.onInit.bind(this);
     this.getApplications = this.getApplications.bind(this);
@@ -23,7 +24,7 @@ class KubernetesApplicationsController {
     let actionCount = selectedItems.length;
     for (const application of selectedItems) {
       try {
-        await this.KubernetesApplicationService.remove(application);
+        await this.KubernetesApplicationService.delete(application);
         this.Notifications.success('Application successfully removed', application.Name);
         const index = this.applications.indexOf(application);
         this.applications.splice(index, 1);
@@ -58,7 +59,7 @@ class KubernetesApplicationsController {
 
   async getApplicationsAsync() {
     try {
-      this.applications = await this.KubernetesApplicationService.applications();
+      this.applications = await this.KubernetesApplicationService.get();
       this.stacks = KubernetesStackHelper.stacksFromApplications(this.applications);
       this.ports = KubernetesApplicationHelper.portMappingsFromApplications(this.applications);
     } catch (err) {
@@ -76,7 +77,8 @@ class KubernetesApplicationsController {
 
   $onInit() {
     this.state = {
-      activeTab: 0
+      activeTab: 0,
+      isAdmin: this.Authentication.isAdmin()
     };
 
     return this.$async(this.onInit);

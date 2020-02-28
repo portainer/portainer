@@ -1,10 +1,28 @@
 import { KubernetesDaemonSet } from "Kubernetes/models/daemon-set/models";
 import { KubernetesDaemonSetCreatePayload } from "Kubernetes/models/daemon-set/payloads";
-import { KubernetesApplicationStackAnnotationKey } from "Kubernetes/models/application";
+import { KubernetesApplicationStackAnnotationKey } from "Kubernetes/models/application/models";
+import KubernetesApplicationHelper from "Kubernetes/helpers/applicationHelper";
+
+function bytesValue(mem) {
+  return mem * 1000 * 1000;
+}
 
 class KubernetesDaemonSetConverter {
-  static apiToDaemonSet() {
+  /**
+   * Generate KubernetesDaemonSet from KubenetesApplicationFormValues
+   * @param {KubernetesApplicationFormValues} formValues
+   */
+  static applicationFormValuesToDaemonSet(formValues) {
     const res = new KubernetesDaemonSet();
+    res.Namespace = formValues.ResourcePool.Namespace.Name;
+    res.Name = formValues.Name;
+    res.StackName = formValues.StackName ? formValues.StackName : formValues.Name;
+    res.Image = formValues.Image;
+    res.Env = [];
+    res.CpuLimit = formValues.CpuLimit;
+    res.MemoryLimit = bytesValue(formValues.MemoryLimit);
+    KubernetesApplicationHelper.generateEnvAndSecretFromEnvVariables(res, formValues.EnvironmentVariables);
+    KubernetesApplicationHelper.generateVolumesFromPersistedFolders(res, formValues.PersistedFolders);
     return res;
   }
 

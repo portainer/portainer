@@ -52,21 +52,55 @@
 
           <div class="form-group" ng-if="ctrl.storageClassAvailable()">
             <span class="col-sm-12 text-muted small">
-              Select which storage options will be available for use when deploying applications.
+              <p>
+                Select which storage options will be available for use when deploying applications. Have a look at your storage driver documentation to figure out
+              which access policy to configure.
+              </p>
+              <p>
+                You can find more information about access modes <a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes" target="_blank">in the official Kubernetes documentation</a>.
+              </p>
             </span>
           </div>
 
           <div class="form-group" ng-if="ctrl.storageClassAvailable()">
-            <div ng-repeat="class in ctrl.availableClasses">
-              <div class="col-sm-6">
-                <label class="control-label text-left">
-                  {{ class }}
-                </label>
-                <label class="switch" style="margin-left: 20px;">
-                  <input type="checkbox" ng-model="ctrl.formValues.selectedClasses[class]"><i></i>
-                </label>
-              </div>
+            <div style="margin-top: 10px;" class="col-sm-12">
+              <table class="table" style="table-layout:fixed;">
+                <tbody>
+                <tr class="text-muted">
+                  <td>Storage</td>
+                  <td>Shared access policy</td>
+                </tr>
+                <tr ng-repeat="class in ctrl.StorageClasses">
+                  <td>
+                    <div style="margin: 5px;">
+                      <label class="switch" style="margin-right: 10px;">
+                        <input type="checkbox" ng-model="class.selected"><i></i>
+                      </label>
+                      <span>{{ class.Name }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span isteven-multi-select
+                      input-model="class.availableAccessModes"
+                      output-model="class.AccessModes"
+                      button-label="Name"
+                      item-label="Description"
+                      tick-property="selected"
+                      directive-id="{{class.Name}}"
+                      helper-elements=""
+                      translation="{nothingSelected: 'Not configured'}">
+                    </span>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
             </div>
+              <div class="col-sm-12">
+                <span ng-if="!ctrl.hasValidStorageConfiguration()" style="margin-left: 5px" class="text-muted small">
+                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                  Shared access policy configuration required
+                </span>
+              </div>
           </div>
 
           <div class="col-sm-12 form-section-title">
@@ -76,7 +110,7 @@
           <div class="form-group">
             <div class="col-sm-12">
               <button type="submit" class="btn btn-primary btn-sm"
-                ng-click="ctrl.configure()" ng-disabled="ctrl.state.actionInProgress" button-spinner="ctrl.state.actionInProgress">
+                ng-click="ctrl.configure()" ng-disabled="ctrl.state.actionInProgress || !ctrl.hasValidStorageConfiguration()" button-spinner="ctrl.state.actionInProgress">
                 <span ng-hide="ctrl.state.actionInProgress">Save configuration</span>
                 <span ng-show="ctrl.state.actionInProgress">Saving configuration...</span>
               </button>

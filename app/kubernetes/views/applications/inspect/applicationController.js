@@ -1,6 +1,6 @@
 import angular from 'angular';
 import _ from 'lodash-es';
-import {KubernetesApplicationDeploymentTypes} from 'Kubernetes/models/application';
+import {KubernetesApplicationDeploymentTypes} from 'Kubernetes/models/application/models';
 
 class KubernetesApplicationController {
   /* @ngInject */
@@ -49,7 +49,7 @@ class KubernetesApplicationController {
         this.state.dataLoading = true;
         const applicationName = this.$transition$.params().name;
         const namespace = this.$transition$.params().namespace;
-        this.application = await this.KubernetesApplicationService.application(namespace, applicationName);
+        this.application = await this.KubernetesApplicationService.get(namespace, applicationName);
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to retrieve application details');
       } finally {

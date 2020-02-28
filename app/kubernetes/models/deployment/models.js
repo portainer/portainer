@@ -1,8 +1,18 @@
 /**
  * KubernetesDeployment Model
  */
- const _KubernetesDeployment = Object.freeze({
-  
+const _KubernetesDeployment = Object.freeze({
+  Namespace: '',
+  Name: '',
+  StackName: '',
+  ReplicaCount: 0,
+  Image: '',
+  Env: [],
+  CpuLimit: 0,
+  MemoryLimit: 0,
+  VolumeMounts: [],
+  Volumes: [],
+  Secret: undefined
 });
 
 export class KubernetesDeployment {

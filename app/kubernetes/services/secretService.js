@@ -1,4 +1,4 @@
-import {KubernetesApplicationStackAnnotationKey} from 'Kubernetes/models/application';
+import {KubernetesApplicationStackAnnotationKey} from 'Kubernetes/models/application/models';
 
 angular.module("portainer.kubernetes").factory("KubernetesSecretService", [
   "$async", "KubernetesSecrets",

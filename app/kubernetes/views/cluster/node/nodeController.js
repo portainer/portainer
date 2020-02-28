@@ -83,7 +83,7 @@ class KubernetesNodeController {
   async getApplicationsAsync() {
     try {
       this.state.applicationsLoading = true;
-      this.applications = await this.KubernetesApplicationService.applications();
+      this.applications = await this.KubernetesApplicationService.get();
 
       this.applications = _.map(this.applications, app => {
         const pods = _.filter(this.pods, pod => Object.values(pod.Metadata.labels).includes(app.Name));

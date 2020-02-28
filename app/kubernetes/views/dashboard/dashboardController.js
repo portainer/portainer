@@ -21,7 +21,7 @@ class KubernetesDashboardController {
       const [endpoint, pools, applications] = await Promise.all([
         this.EndpointService.endpoint(endpointId),
         this.KubernetesResourcePoolService.shortResourcePools(),
-        this.KubernetesApplicationService.applications(),
+        this.KubernetesApplicationService.get(),
       ]);
       this.endpoint = endpoint;
       this.pools = pools;

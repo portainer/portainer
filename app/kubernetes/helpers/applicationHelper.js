@@ -1,11 +1,18 @@
 import _ from 'lodash-es';
 import { KubernetesPodViewModel } from 'Kubernetes/models/pod';
 import { KubernetesPortMappingPort, KubernetesPortMapping } from 'Kubernetes/models/port/models';
+import { KubernetesApplicationSecret } from 'Kubernetes/models/secret/models';
+import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 
 class KubernetesApplicationHelper {
+
+  static generateApplicationVolumeName(applicationName, volumePath) {
+    return applicationName + volumePath.replace(/[^a-z0-9\-]/gi, '-').toLowerCase();
+  }
+
   static associatePodsAndApplication(pods, app) {
-    const filteredPods = _.filter(pods, {metadata:{labels: app.spec.selector.matchLabels}});
-    app.Pods = _.map(filteredPods, (item) => new KubernetesPodViewModel(item));
+    const filteredPods = _.filter(pods, { metadata: { labels: app.spec.selector.matchLabels } });
+    return _.map(filteredPods, (item) => new KubernetesPodViewModel(item));
   }
 
   static portMappingsFromApplications(applications) {
@@ -19,7 +26,7 @@ class KubernetesApplicationHelper {
 
         mapping.Ports = _.map(app.PublishedPorts, (item) => {
           const port = new KubernetesPortMappingPort();
-          port.Port = item.port;
+          port.Port = mapping.ServiceType === KubernetesServiceTypes.NODE_PORT ? item.nodePort : item.port;
           port.TargetPort = item.targetPort;
           port.Protocol = item.protocol;
           return port;
@@ -29,6 +36,61 @@ class KubernetesApplicationHelper {
       return acc;
     }, []);
     return res;
+  }
+
+  static generateEnvAndSecretFromEnvVariables(app, envVariables) {
+    const secret = new KubernetesApplicationSecret();
+    secret.Name = app.Name;
+    secret.Namespace = app.Namespace;
+    secret.StackName = app.StackName;
+    _.forEach(envVariables, (item) => {
+      let envVar = {
+        name: item.Name
+      };
+
+      if (item.IsSecret) {
+        envVar.valueFrom = {
+          secretKeyRef: {
+            name: app.Name,
+            key: item.Name
+          }
+        };
+
+        secret.Data[item.Name] = btoa(unescape(encodeURIComponent(item.Value)));
+      } else {
+        envVar.value = item.Value
+      }
+
+      app.Env.push(envVar);
+    });
+    if (!_.isEmpty(secret.Data)) {
+      app.Secret = secret;
+    }
+    return app;
+  }
+
+  static generateVolumesFromPersistedFolders(app, persistedFolders) {
+    app.VolumeMounts = [];
+    app.Volumes = [];
+    _.forEach(persistedFolders, (item) => {
+      const name = KubernetesApplicationHelper.generateApplicationVolumeName(app.Name, item.ContainerPath);
+      const volumeMount = {
+        mountPath: item.ContainerPath,
+        name: name
+      };
+
+      app.VolumeMounts.push(volumeMount);
+
+      const volume = {
+        name: name,
+        persistentVolumeClaim: {
+          claimName: name
+        }
+      };
+
+      app.Volumes.push(volume);
+    });
+    return app;
   }
 
 }

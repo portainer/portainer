@@ -1,4 +1,4 @@
-import {KubernetesApplicationDeploymentTypes} from 'Kubernetes/models/application';
+import {KubernetesApplicationDeploymentTypes} from 'Kubernetes/models/application/models';
 
 angular.module('portainer.docker')
   .controller('KubernetesApplicationsDatatableController', ['$scope', '$controller', 'KubernetesNamespaceHelper', 'DatatableService',

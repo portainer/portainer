@@ -148,7 +148,6 @@
 
           <!-- persisted folders -->
           <div class="form-group" ng-if="ctrl.storageClassAvailable()">
-
             <div class="col-sm-12" style="margin-top: 5px;">
               <label class="control-label text-left">Persisted folders</label>
               <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addPersistedFolder()">
@@ -172,8 +171,13 @@
                 <div class="input-group col-sm-3 input-group-sm" ng-if="ctrl.hasMultipleStorageClassesAvailable()">
                   <span class="input-group-addon">storage</span>
                   <select class="form-control"
-                          ng-model="persistedFolder.StorageClass" ng-options="storageClass for storageClass in ctrl.storageClasses"
+                          ng-model="persistedFolder.StorageClass" ng-options="storageClass as storageClass.Name for storageClass in ctrl.storageClasses"
                   ></select>
+                </div>
+
+                <div class="input-group col-sm-3 input-group-sm" ng-if="!ctrl.hasMultipleStorageClassesAvailable()">
+                  <span class="input-group-addon">storage</span>
+                  <input type="text" class="form-control" disabled ng-model="persistedFolder.StorageClass.Name"/>
                 </div>
 
                 <div class="input-group col-sm-1 input-group-sm">
@@ -187,6 +191,49 @@
 
           </div>
           <!-- !persisted folders -->
+
+          <div ng-if="ctrl.showDataAccessPolicySection()">
+
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label class="control-label text-left">Data access policy</label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="col-sm-12 small text-muted">
+                Specify how the data will be used across instances.
+              </div>
+            </div>
+
+            <!-- access policy options -->
+            <div class="form-group" style="margin-bottom: 0">
+              <div class="boxselector_wrapper">
+                <div>
+                  <input type="radio" id="data_access_shared" ng-value="ctrl.ApplicationDataAccessPolicies.SHARED" ng-model="ctrl.formValues.DataAccessPolicy" ng-change="ctrl.resetDeploymentType()">
+                  <label for="data_access_shared">
+                    <div class="boxselector_header">
+                      <i class="fa fa-cube" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Shared
+                    </div>
+                    <p>All the instances of this application will use the same data</p>
+                  </label>
+                </div>
+                <div>
+                  <input type="radio" id="data_access_isolated" ng-value="ctrl.ApplicationDataAccessPolicies.ISOLATED" ng-model="ctrl.formValues.DataAccessPolicy" ng-change="ctrl.resetDeploymentType()">
+                  <label for="data_access_isolated">
+                    <div class="boxselector_header">
+                      <i class="fa fa-cubes" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Isolated
+                    </div>
+                    <p>Every instance of this application will use their own data</p>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <!-- !access policy options -->
+
+          </div>
 
           <div class="col-sm-12 form-section-title">
             Deployment
@@ -208,10 +255,20 @@
                     <i class="fa fa-cube" aria-hidden="true" style="margin-right: 2px;"></i>
                     Replicated
                   </div>
-                  <p>Run multiple replicas for this container</p>
+                  <p>Run one or multiple instances of this container</p>
                 </label>
               </div>
-              <div>
+              <div style="color: #767676;" ng-if="!ctrl.supportGlobalDeployment()">
+                <input type="radio" id="deployment_global" disabled>
+                <label for="deployment_global" tooltip-append-to-body="true" tooltip-placement="bottom" tooltip-class="portainer-tooltip" uib-tooltip="The storage used for persisted folders cannot be used with this option" style="cursor:pointer; border-color: #767676">
+                  <div class="boxselector_header">
+                    <i class="fa fa-cubes" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Global
+                  </div>
+                  <p>Deploy an instance of this container on each node of the cluster</p>
+                </label>
+              </div>
+              <div ng-if="ctrl.supportGlobalDeployment()">
                 <input type="radio" id="deployment_global" ng-value="ctrl.ApplicationDeploymentTypes.GLOBAL" ng-model="ctrl.formValues.DeploymentType">
                 <label for="deployment_global">
                   <div class="boxselector_header">
@@ -229,12 +286,19 @@
           <div class="form-group form-inline" ng-if="ctrl.formValues.DeploymentType === ctrl.ApplicationDeploymentTypes.REPLICATED">
             <div class="col-sm-12">
               <label class="control-label text-left">
-                Replica count
+                Instance count
               </label>
-              <input type="number" class="form-control" placeholder="1" style="margin-left: 20px;" ng-model="ctrl.formValues.ReplicaCount">
+              <input type="number" class="form-control" placeholder="1" style="margin-left: 20px;" ng-model="ctrl.formValues.ReplicaCount" ng-disabled="!ctrl.supportScalableReplicaDeployment()">
             </div>
           </div>
           <!-- !replica count -->
+
+          <div class="form-group" ng-if="!ctrl.supportScalableReplicaDeployment()">
+            <div class="col-sm-12 small text-muted">
+              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+              The following storage option(s) do not support concurrent access from multiples instances: <code>{{ ctrl.getNonScalableStorage() }}</code>. You will not be able to scale that application.
+            </div>
+          </div>
 
           <div class="col-sm-12 form-section-title">
             Resources
@@ -257,7 +321,7 @@
             </div>
             <div class="col-sm-2">
               <input name="memory_limit" ng-model="ctrl.formValues.MemoryLimit" type="number"
-                min="{{ctrl.state.sliders.memory.min}}" max="{{ctrl.state.sliders.memory.max}}" class="form-control" id="memory-limit" required>
+                     min="{{ctrl.state.sliders.memory.min}}" max="{{ctrl.state.sliders.memory.max}}" class="form-control" id="memory-limit" required>
             </div>
             <div class="col-sm-4">
               <p class="small text-muted" style="margin-top: 7px;">
@@ -384,8 +448,8 @@
           <div class="form-group">
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm"
-                ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.state.actionInProgress"
-                ng-click="ctrl.deployApplication()" button-spinner="ctrl.state.actionInProgress">
+                      ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.state.actionInProgress"
+                      ng-click="ctrl.deployApplication()" button-spinner="ctrl.state.actionInProgress">
                 <span ng-hide="ctrl.state.actionInProgress">Deploy application</span>
                 <span ng-show="ctrl.state.actionInProgress">Deployment in progress...</span>
               </button>
@@ -393,7 +457,7 @@
           </div>
 
         </form>
-        
+
       </rd-widget-body>
     </rd-widget>
 

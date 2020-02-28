@@ -1,72 +1,55 @@
-import {KubernetesApplicationStackAnnotationKey} from 'Kubernetes/models/application';
 
-angular.module("portainer.kubernetes").factory("KubernetesPersistentVolumeClaimService", [
-  "$async", "KubernetesPersistentVolumeClaims",
-  function KubernetesPersistentVolumeClaimServiceFactory($async, KubernetesPersistentVolumeClaims) {
-    "use strict";
-    const service = {
-      create: create,
-      remove: remove
-    };
+import angular from 'angular';
+import PortainerError from 'Portainer/error';
+import KubernetesPersistentVolumeClaimConverter from 'Kubernetes/converters/persistentVolumeClaim';
+import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
 
-    /**
-     * Creation
-     */
-    async function createAsync(claim) {
-      try {
-        const payload = {
-          metadata: {
-            name: claim.Name,
-            namespace: claim.Namespace,
-            annotations: {
-              [KubernetesApplicationStackAnnotationKey]: claim.StackName
-            }
-          },
-          spec: {
-            accessModes: ['ReadWriteOnce'],
-            resources: {
-              requests: {
-                storage: claim.Storage
-              }
-            },
-            storageClassName: claim.StorageClass
-          }
-        };
+class KubernetesPersistentVolumeClaimService {
+  /* @ngInject */
+  constructor($async, KubernetesPersistentVolumeClaims) {
+    this.$async = $async;
+    this.KubernetesPersistentVolumeClaims = KubernetesPersistentVolumeClaims;
 
-        const data = await KubernetesPersistentVolumeClaims(payload.metadata.namespace).create(payload).$promise;
-        return data;
-      } catch (err) {
-        throw { msg: 'Unable to create persistent volume claim', err: err };
-      }
-    }
-
-    function create(persistentVolumeClaim) {
-      return $async(createAsync, persistentVolumeClaim);
-    }
-
-    /**
-     * Delete
-     */
-    async function removeAsync(name, namespace) {
-      try {
-        // TODO: refactor
-        // This is a very strange pattern since only POST requests have a payload
-        // I understand this is used to pass the correct parameters to the REST service but it can be confusing
-        // Should be taken into account during REST service uniformization/refactor
-        // Split into params and payload objects
-        const params = {
-          id: name
-        };
-        await KubernetesPersistentVolumeClaims(namespace).delete(params).$promise;
-      } catch (err) {
-        throw { msg: 'Unable to delete persistent volume claim', err: err };
-      }
-    }
-
-    function remove(name, namespace) {
-      return $async(removeAsync, name, namespace);
-    }
-
-    return service;
+    this.createAsync = this.createAsync.bind(this);
+    this.deleteAsync = this.deleteAsync.bind(this);
   }
-]);
+
+  /**
+   * CREATE
+   */
+  async createAsync(claim) {
+    try {
+      const params = {};
+      const payload = KubernetesPersistentVolumeClaimConverter.createPayload(claim);
+      const namespace = payload.metadata.namespace;
+      const data = await this.KubernetesPersistentVolumeClaims(namespace).create(params, payload).$promise;
+      return data;
+    } catch (err) {
+      throw new PortainerError('Unable to create persistent volume claim', err);
+    }
+  }
+
+  create(claim) {
+    return this.$async(this.createAsync, claim);
+  }
+
+  /**
+   * DELETE
+   */
+  async deleteAsync(namespace, name) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = name;
+      await this.KubernetesPersistentVolumeClaims(namespace).delete(params).$promise;
+    } catch (err) {
+      throw new PortainerError('Unable to delete persistent volume claim', err);
+    }
+  }
+
+  delete(namespace, name) {
+    return this.$async(this.deleteAsync, namespace, name);
+  }
+}
+
+export default KubernetesPersistentVolumeClaimService;
+angular.module('portainer.kubernetes').service('KubernetesPersistentVolumeClaimService', KubernetesPersistentVolumeClaimService);

@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import {KubernetesApplicationDeploymentTypes} from 'Kubernetes/models/application';
+import {KubernetesApplicationDeploymentTypes} from 'Kubernetes/models/application/models';
 
 angular.module('portainer.docker')
   .controller('KubernetesApplicationsPortsDatatableController', ['$scope', '$controller', 'KubernetesNamespaceHelper', 'DatatableService',

@@ -1,112 +1,94 @@
-import {KubernetesApplicationStackAnnotationKey} from 'Kubernetes/models/application';
+import angular from 'angular';
+import PortainerError from 'Portainer/error';
+import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
+import KubernetesServiceConverter from 'Kubernetes/converters/service';
 
-angular.module("portainer.kubernetes").factory("KubernetesServiceService", [
-  "$async", "KubernetesServices",
-  function KubernetesServiceServiceFactory($async, KubernetesServices) {
-    "use strict";
-    const factory = {
-      services: services,
-      service: service,
-      create: create,
-      remove: remove
-    };
+class KubernetesServiceService {
+  /* @ngInject */
+  constructor($async, KubernetesServices) {
+    this.$async = $async;
+    this.KubernetesServices = KubernetesServices;
 
-    /**
-     * Services
-     */
-    async function servicesAsync(namespace) {
-      try {
-        const data = await KubernetesServices(namespace).get().$promise;
-        return data.items;
-      } catch (err) {
-        throw { msg: 'Unable to retrieve services', err: err };
-      }
-    }
-
-    function services(namespace) {
-      return $async(servicesAsync, namespace);
-    }
-
-    /**
-     * Service
-     */
-    async function serviceAsync(namespace, name) {
-      try {
-        const payload = {
-          id: name
-        };
-        const [raw, yaml] = await Promise.all([
-          KubernetesServices(namespace).get(payload).$promise,
-          KubernetesServices(namespace).getYaml(payload).$promise
-        ]);
-        const res = {
-          Raw: raw,
-          Yaml: yaml
-        };
-        return res;
-      } catch (err) {
-        throw { msg: 'Unable to retrieve service', err: err };
-      }
-    }
-
-    function service(namespace, name) {
-      return $async(serviceAsync, namespace, name);
-    }
-
-    /**
-     * Creation
-     */
-    async function createAsync(service) {
-      try {
-        const payload = {
-          metadata: {
-            name: service.Name,
-            namespace: service.Namespace,
-            annotations: {
-              [KubernetesApplicationStackAnnotationKey]: service.StackName
-            }
-          },
-          spec: {
-            ports: service.Ports,
-            selector: {
-              app: service.Name,
-            },
-          }
-        };
-
-        if (service.Type) {
-          payload.spec.type = service.Type;
-        }
-
-        const data = await KubernetesServices(payload.metadata.namespace).create(payload).$promise;
-        return data;
-      } catch (err) {
-        throw { msg: 'Unable to create service', err:err };
-      }
-    }
-
-    function create(service) {
-      return $async(createAsync, service);
-    }
-
-    /**
-     * Delete
-     */
-    async function removeAsync(service) {
-      try {
-        const payload = {
-          id: service.Name
-        };
-        await KubernetesServices(service.Namespace).delete(payload).$promise
-      } catch (err) {
-        throw { msg: 'Unable to remove service', err: err };
-      }
-    }
-
-    function remove(service) {
-      return $async(removeAsync, service);
-    }
-
-    return factory;
+    this.getAsync = this.getAsync.bind(this);
+    this.getAllAsync = this.getAllAsync.bind(this);
+    this.createAsync = this.createAsync.bind(this);
+    this.deleteAsync = this.deleteAsync.bind(this);
   }
-]);
+
+  /**
+   * GET
+   */
+  async getAsync(namespace, name) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = name;
+      const [raw, yaml] = await Promise.all([
+        this.KubernetesServices(namespace).get(params).$promise,
+        this.KubernetesServices(namespace).getYaml(params).$promise
+      ]);
+      const res = {
+        Raw: raw,
+        Yaml: yaml
+      };
+      return res;
+    } catch (err) {
+      throw new PortainerError('Unable to retrieve service', err);
+    }
+  }
+
+  async getAllAsync(namespace) {
+    try {
+      const data = await this.KubernetesServices(namespace).get().$promise;
+      return data.items;
+    } catch (err) {
+      throw new PortainerError('Unable to retrieve services', err);
+    }
+  }
+
+  get(namespace, name) {
+    if (name) {
+      return this.$async(this.getAsync, namespace, name);
+    }
+    return this.$async(this.getAllAsync, namespace);
+  }
+
+  /**
+   * CREATE
+   */
+  async createAsync(service) {
+    try {
+      const params = {};
+      const payload = KubernetesServiceConverter.createPayload(service);
+      const namespace = payload.metadata.namespace;
+      const data = await this.KubernetesServices(namespace).create(params, payload).$promise;
+      return data;
+    } catch (err) {
+      throw new PortainerError('Unable to create service', err);
+    }
+  }
+
+  create(service) {
+    return this.$async(this.createAsync, service);
+  }
+
+  /**
+   * DELETE
+   */
+  async deleteAsync(service) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = service.Name;
+      const namespace = service.Namespace;
+      await this.KubernetesServices(namespace).delete(params).$promise
+    } catch (err) {
+      throw new PortainerError('Unable to remove service', err);
+    }
+  }
+
+  delete(service) {
+    return this.$async(this.deleteAsync, service);
+  }
+}
+
+export default KubernetesServiceService;
+angular.module('portainer.kubernetes').service('KubernetesServiceService', KubernetesServiceService);

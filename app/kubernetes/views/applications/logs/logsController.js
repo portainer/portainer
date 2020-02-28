@@ -64,7 +64,7 @@ class KubernetesApplicationLogsController {
 
     try {
       const [application, applicationLogs] = await Promise.all([
-        this.KubernetesApplicationService.application(namespace, applicationName),
+        this.KubernetesApplicationService.get(namespace, applicationName),
         this.KubernetesPodService.logs(namespace, podName)
       ]);
 

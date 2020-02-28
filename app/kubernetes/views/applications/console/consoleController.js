@@ -91,7 +91,7 @@ class KubernetesApplicationConsoleController {
     this.podName = podName;
 
     try {
-      this.application = await this.KubernetesApplicationService.application(namespace, applicationName);
+      this.application = await this.KubernetesApplicationService.get(namespace, applicationName);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve application logs');
     }

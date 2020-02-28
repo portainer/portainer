@@ -3,12 +3,13 @@ import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import {
   KubernetesApplicationDeploymentTypes,
+  KubernetesApplicationDataAccessPolicies,
   KubernetesApplicationEnvironmentVariableFormValue,
   KubernetesApplicationFormValues,
   KubernetesApplicationPersistedFolderFormValue,
   KubernetesApplicationPublishedPortFormValue,
   KubernetesApplicationPublishingTypes
-} from 'Kubernetes/models/application';
+} from 'Kubernetes/models/application/models';
 import {KubernetesPortainerQuotaSuffix} from 'Kubernetes/models/resourceQuota';
 import {KubernetesLimitRangeDefaults} from 'Kubernetes/models/limitRange';
 
@@ -27,6 +28,11 @@ class KubernetesCreateApplicationController {
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesStackService = KubernetesStackService;
     this.KubernetesNodeService = KubernetesNodeService;
+
+    this.ApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
+    this.ApplicationDataAccessPolicies = KubernetesApplicationDataAccessPolicies;
+    this.ApplicationPublishingTypes = KubernetesApplicationPublishingTypes;
+    this.KubernetesLimitRangeDefaults = KubernetesLimitRangeDefaults;
 
     this.onInit = this.onInit.bind(this);
     this.deployApplicationAsync = this.deployApplicationAsync.bind(this);
@@ -47,12 +53,13 @@ class KubernetesCreateApplicationController {
   }
 
   addPersistedFolder() {
-    let storageClass = '';
-    if (this.storageClasses.length === 1) {
+    let storageClass = {};
+    if (this.storageClasses.length > 0) {
       storageClass = this.storageClasses[0];
     }
 
     this.formValues.PersistedFolders.push(new KubernetesApplicationPersistedFolderFormValue(storageClass));
+    this.resetDeploymentType();
   }
 
   removePersistedFolder(index) {
@@ -73,6 +80,69 @@ class KubernetesCreateApplicationController {
 
   hasMultipleStorageClassesAvailable() {
     return this.storageClasses && this.storageClasses.length > 1;
+  }
+
+  resetDeploymentType() {
+    this.formValues.DeploymentType = this.ApplicationDeploymentTypes.REPLICATED;
+  }
+
+  // The data access policy panel is not shown when:
+  // * There is not persisted folder specified
+  showDataAccessPolicySection() {
+    return this.formValues.PersistedFolders.length !== 0;
+  }
+
+  // A global deployment is not available when either:
+  // * For each persisted folder specified, if one of the storage object only supports the RWO access mode
+  // * The data access policy is set to ISOLATED
+  supportGlobalDeployment() {
+    if (this.formValues.PersistedFolders.length === 0) {
+      return true;
+    }
+
+    const hasRWOOnly = _.find(this.formValues.PersistedFolders, (item) => _.isEqual(item.StorageClass.AccessModes, ["RWO"]));
+    if (hasRWOOnly) {
+      return false;
+    }
+
+    return this.formValues.DataAccessPolicy !== this.ApplicationDataAccessPolicies.ISOLATED;
+  }
+
+  // A scalable deployment is available when either:
+  // * No persisted folders are specified
+  // * The access policy is set to shared and for each persisted folders specified, all the associated storage objects support at least the ROX or RWX access mode
+  // * The access policy is set to isolated
+  supportScalableReplicaDeployment() {
+    if (this.formValues.PersistedFolders.length === 0) {
+      return true;
+    }
+
+    if (this.formValues.DataAccessPolicy === this.ApplicationDataAccessPolicies.ISOLATED) {
+      return true;
+    }
+
+    const hasRWOOnly = _.find(this.formValues.PersistedFolders, (item) => _.isEqual(item.StorageClass.AccessModes, ["RWO"]));
+    if (hasRWOOnly) {
+      return false;
+    }
+
+    return true;
+  }
+
+  // For each persisted folders, returns the non scalable deployments options (storage class that only supports RWO)
+  getNonScalableStorage() {
+    let storageOptions = [];
+
+    for (let i = 0; i < this.formValues.PersistedFolders.length; i++) {
+      const folder = this.formValues.PersistedFolders[i];
+
+      if (_.isEqual(folder.StorageClass.AccessModes, ["RWO"])) {
+        storageOptions.push(folder.StorageClass.Name);
+      }
+
+    }
+
+    return _.uniq(storageOptions).join(", ");
   }
 
   publishViaLoadBalancerEnabled() {
@@ -159,6 +229,7 @@ class KubernetesCreateApplicationController {
   async onInit() {
     try {
       this.formValues = new KubernetesApplicationFormValues();
+      this.formValues.DataAccessPolicy = this.ApplicationDataAccessPolicies.SHARED;
 
       this.state = {
         actionInProgress: false,
@@ -179,10 +250,6 @@ class KubernetesCreateApplicationController {
         },
         resourcePoolHasQuota: false,
       };
-
-      this.ApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
-      this.ApplicationPublishingTypes = KubernetesApplicationPublishingTypes;
-      this.KubernetesLimitRangeDefaults = KubernetesLimitRangeDefaults;
 
       const [resourcePools, nodes] = await Promise.all([
         this.KubernetesResourcePoolService.resourcePools(),

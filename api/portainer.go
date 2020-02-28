@@ -288,12 +288,6 @@ type (
 		Configuration KubernetesConfiguration `json:"Configuration"`
 	}
 
-	// KubernetesConfiguration represents the configuration of a Kubernetes endpoint
-	KubernetesConfiguration struct {
-		UseLoadBalancer bool     `json:"UseLoadBalancer"`
-		StorageClasses  []string `json:"StorageClasses"`
-	}
-
 	// KubernetesSnapshot represents a snapshot of a specific Kubernetes endpoint at a specific time
 	KubernetesSnapshot struct {
 		Time              int64  `json:"Time"`
@@ -301,6 +295,18 @@ type (
 		NodeCount         int    `json:"NodeCount"`
 		TotalCPU          int64  `json:"TotalCPU"`
 		TotalMemory       int64  `json:"TotalMemory"`
+	}
+
+	// KubernetesConfiguration represents the configuration of a Kubernetes endpoint
+	KubernetesConfiguration struct {
+		UseLoadBalancer bool                           `json:"UseLoadBalancer"`
+		StorageClasses  []KubernetesStorageClassConfig `json:"StorageClasses"`
+	}
+
+	// KubernetesStorageClassConfig represents a Kubernetes Storage Class configuration
+	KubernetesStorageClassConfig struct {
+		Name        string   `json:"Name"`
+		AccessModes []string `json:"AccessModes"`
 	}
 
 	// Authorization represents an authorization associated to an operation
