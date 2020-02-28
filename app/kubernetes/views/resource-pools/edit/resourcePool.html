@@ -131,3 +131,12 @@
     </rd-widget>
   </div>
 </div>
+
+<div class="row" ng-if="ctrl.applications">
+  <div class="col-sm-12">
+    <kubernetes-resource-pool-applications-datatable dataset="ctrl.applications" table-key="kubernetes.resourcepool.applications"
+      order-by="Name" refresh-callback="ctrl.getPodsApplications" loading="ctrl.state.applicationsLoading"
+      title-text="Applications running in this resource pool" title-icon="fa-laptop-code">
+    </kubernetes-resource-pool-applications-datatable>
+  </div>
+</div>

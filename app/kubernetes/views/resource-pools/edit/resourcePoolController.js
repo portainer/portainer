@@ -3,6 +3,7 @@ import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import {KubernetesPortainerQuotaSuffix, KubernetesResourceQuotaDefaults} from 'Kubernetes/models/resourceQuota';
 import KubernetesDefaultLimitRangeModel from 'Kubernetes/models/limitRange';
+import KubernetesResourceReservationHelper from 'Kubernetes/helpers/kubernetesResourceReservationHelper';
 
 function megaBytesValue(mem) {
   return Math.floor(mem / 1000 / 1000);
@@ -14,7 +15,7 @@ function bytesValue(mem) {
 
 class KubernetesEditResourcePoolController {
   /* @ngInject */
-  constructor($async, $state, $transition$, Authentication, Notifications, KubernetesNodeService, KubernetesResourceQuotaService, KubernetesResourcePoolService, KubernetesLimitRangeService, KubernetesEventService) {
+  constructor($async, $state, $transition$, Authentication, Notifications, KubernetesNodeService, KubernetesResourceQuotaService, KubernetesResourcePoolService, KubernetesLimitRangeService, KubernetesEventService, KubernetesPodService, KubernetesApplicationService) {
     this.$async = $async;
     this.$state = $state;
     this.$transition$ = $transition$;
@@ -26,11 +27,17 @@ class KubernetesEditResourcePoolController {
     this.KubernetesLimitRangeService = KubernetesLimitRangeService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesEventService = KubernetesEventService;
+    this.KubernetesPodService = KubernetesPodService;
+    this.KubernetesApplicationService = KubernetesApplicationService;
 
     this.onInit = this.onInit.bind(this);
     this.updateResourcePoolAsync = this.updateResourcePoolAsync.bind(this);
     this.getEvents = this.getEvents.bind(this);
     this.getEventsAsync = this.getEventsAsync.bind(this);
+    this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
+    this.getPodsAsync = this.getPodsAsync.bind(this);
+    this.getPodsApplications = this.getPodsApplications.bind(this);
+    this.getPodsApplicationsAsync = this.getPodsApplicationsAsync.bind(this);
   }
 
   isQuotaValid() {
@@ -111,6 +118,52 @@ class KubernetesEditResourcePoolController {
     return this.$async(this.getEventsAsync);
   }
 
+  async getPodsAsync() {
+    try {
+      this.state.podsLoading = true;
+      this.pods = await this.KubernetesPodService.pods(this.pool.Namespace.Name);
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve pods.');
+    } finally {
+      this.state.podsLoading = false;
+    }
+  }
+
+  getPods() {
+    return this.$async(this.getPodsAsync);
+  }
+
+  async getApplicationsAsync() {
+    try {
+      this.state.applicationsLoading = true;
+      this.applications = await this.KubernetesApplicationService.applications(this.pool.Namespace.Name);
+      this.applications = _.map(this.applications, app => {
+        const pods = _.filter(this.pods, pod => Object.values(pod.Metadata.labels).includes(app.Name));
+        const resourceReservation = KubernetesResourceReservationHelper.computeResourceReservation(pods);
+        app.CPU = resourceReservation.CPU;
+        app.Memory = resourceReservation.Memory;
+        return app;
+      });
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve applications.');
+    } finally {
+      this.state.applicationsLoading = false;
+    }
+  }
+
+  getApplications() {
+    return this.$async(this.getApplicationsAsync);
+  }
+
+  async getPodsApplicationsAsync() {
+    await this.getPods();
+    await this.getApplications();
+  }
+
+  getPodsApplications() {
+    return this.$async(this.getPodsApplicationsAsync);
+  }
+
   async onInit() {
     try {
       this.isAdmin = this.Authentication.isAdmin();
@@ -132,7 +185,9 @@ class KubernetesEditResourcePoolController {
         memoryUsed: 0,
         activeTab: 0,
         showEditorTab: false,
-        eventsLoading: true
+        eventsLoading: true,
+        podsLoading: true,
+        applicationsLoading: true
       };
 
       const name = this.$transition$.params().id;
@@ -161,7 +216,8 @@ class KubernetesEditResourcePoolController {
         this.state.memoryUsed = megaBytesValue(quota.MemoryLimitUsed);
       }
 
-      this.getEvents();
+      await this.getEvents();
+      await this.getPodsApplications();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
     }

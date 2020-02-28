@@ -1,6 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
+import KubernetesResourceReservationHelper from 'Kubernetes/helpers/kubernetesResourceReservationHelper';
 
 class KubernetesNodeController {
   /* @ngInject */
@@ -65,7 +66,7 @@ class KubernetesNodeController {
       this.state.podsLoading = true;
       const pods = await this.KubernetesPodService.pods();
       this.pods = _.filter(pods, pod => pod.Node === this.node.Name);
-      this.ResourceReservation = this.computePodsResourceReservation(this.pods);
+      this.ResourceReservation = KubernetesResourceReservationHelper.computeResourceReservation(this.pods);
       this.ResourceReservation.Memory = Math.floor(this.ResourceReservation.Memory / 1000 / 1000);
       this.memoryLimit = Math.floor(filesizeParser(this.node.Memory) / 1000 / 1000);
     } catch (err) {
@@ -85,9 +86,8 @@ class KubernetesNodeController {
       this.applications = await this.KubernetesApplicationService.applications();
 
       this.applications = _.map(this.applications, app => {
-        app.pods = _.filter(this.pods, pod => Object.values(pod.Metadata.labels).includes(app.Name));
-
-        const resourceReservation = this.computePodsResourceReservation(app.pods);
+        const pods = _.filter(this.pods, pod => Object.values(pod.Metadata.labels).includes(app.Name));
+        const resourceReservation = KubernetesResourceReservationHelper.computeResourceReservation(pods);
         app.CPU = resourceReservation.CPU;
         app.Memory = resourceReservation.Memory;
         return app;
@@ -114,8 +114,8 @@ class KubernetesNodeController {
     };
 
     await this.getNode();
-    this.getEvents();
-    this.getPodsApplications();
+    await this.getEvents();
+    await this.getPodsApplications();
   }
 
   $onInit() {
@@ -124,37 +124,11 @@ class KubernetesNodeController {
 
   async getPodsApplicationsAsync() {
     await this.getPods();
-    this.getApplications();
+    await this.getApplications();
   }
 
   getPodsApplications() {
     return this.$async(this.getPodsApplicationsAsync);
-  }
-
-  computePodsResourceReservation(pods) {
-    const containers = _.reduce(pods, (acc, pod) => _.concat(acc, pod.Containers), []);
-
-    return _.reduce(containers, (acc, container) => {
-      if (container.resources && container.resources.limits) {
-        
-        if (container.resources.limits.memory) {
-          acc.Memory += filesizeParser(
-            container.resources.limits.memory,
-            { base: 10 }
-          );
-        }
-        
-        if (container.resources.limits.cpu) {
-          const cpu = parseInt(container.resources.limits.cpu);
-          if (_.endsWith(container.resources.limits.cpu, 'm')) {
-            acc.CPU += cpu / 1000;
-          } else {
-            acc.CPU += cpu;
-          }
-        }
-      }
-      return acc;
-    }, { Memory: 0, CPU: 0 });
   }
 }
 
