@@ -79,26 +79,6 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     }
   };
 
-  const applicationCreateMockup = {
-    name: 'kubernetes.applications.mockup1',
-    url: '/mockup1',
-    views: {
-      'content@': {
-        templateUrl: './views/applications/create/mockup.html'
-      }
-    }
-  };
-
-  const applicationCreateMockupExpanded = {
-    name: 'kubernetes.applications.mockup2',
-    url: '/mockup2',
-    views: {
-      'content@': {
-        templateUrl: './views/applications/create/mockup-expanded.html'
-      }
-    }
-  };
-
   const cluster = {
     name: 'kubernetes.cluster',
     url: '/cluster',
@@ -213,8 +193,6 @@ angular.module('portainer.kubernetes', ['portainer.app'])
   $stateRegistryProvider.register(application);
   $stateRegistryProvider.register(applicationConsole);
   $stateRegistryProvider.register(applicationLogs);
-  $stateRegistryProvider.register(applicationCreateMockup);
-  $stateRegistryProvider.register(applicationCreateMockupExpanded);
   $stateRegistryProvider.register(cluster);
   $stateRegistryProvider.register(dashboard);
   $stateRegistryProvider.register(deploy);
