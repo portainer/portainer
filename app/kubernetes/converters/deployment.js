@@ -1,7 +1,7 @@
-import { KubernetesDeployment } from "Kubernetes/models/deployment/models";
-import { KubernetesDeploymentCreatePayload } from "Kubernetes/models/deployment/payloads";
-import { KubernetesApplicationStackAnnotationKey } from "Kubernetes/models/application/models";
-import KubernetesApplicationHelper from "Kubernetes/helpers/applicationHelper";
+import {KubernetesDeployment} from 'Kubernetes/models/deployment/models';
+import {KubernetesDeploymentCreatePayload} from 'Kubernetes/models/deployment/payloads';
+import {KubernetesApplicationStackAnnotationKey} from 'Kubernetes/models/application/models';
+import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 
 function bytesValue(mem) {
   return mem * 1000 * 1000;
@@ -46,11 +46,11 @@ class KubernetesDeploymentConverter {
     payload.spec.template.spec.volumes = deployment.Volumes;
     if (deployment.MemoryLimit) {
       payload.spec.template.spec.containers[0].resources.limits.memory = deployment.MemoryLimit;
-      payload.spec.template.spec.containers[0].resources.requests.memory = 0;
+      payload.spec.template.spec.containers[0].resources.requests.memory = deployment.MemoryLimit;
     }
     if (deployment.CpuLimit) {
       payload.spec.template.spec.containers[0].resources.limits.cpu = deployment.CpuLimit;
-      payload.spec.template.spec.containers[0].resources.requests.cpu = 0;
+      payload.spec.template.spec.containers[0].resources.requests.cpu = deployment.CpuLimit;
     }
     return payload;
   }

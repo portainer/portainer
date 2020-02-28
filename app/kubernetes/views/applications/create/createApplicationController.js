@@ -2,8 +2,8 @@ import angular from 'angular';
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import {
-  KubernetesApplicationDeploymentTypes,
   KubernetesApplicationDataAccessPolicies,
+  KubernetesApplicationDeploymentTypes,
   KubernetesApplicationEnvironmentVariableFormValue,
   KubernetesApplicationFormValues,
   KubernetesApplicationPersistedFolderFormValue,
@@ -164,6 +164,10 @@ class KubernetesCreateApplicationController {
 
   deployApplication() {
     return this.$async(this.deployApplicationAsync);
+  }
+
+  resourceQuotaCapacityExceeded() {
+    return !this.state.sliders.memory.max || !this.state.sliders.cpu.max;
   }
 
   async updateSlidersAsync() {

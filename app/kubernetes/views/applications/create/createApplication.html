@@ -26,6 +26,12 @@
               ></select>
             </div>
           </div>
+          <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
+            <div class="col-sm-12 small text-warning">
+              <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+              This resource pool has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of the resource pool.
+            </div>
+          </div>
           <!-- !resource-pool -->
 
           <!-- name -->
@@ -301,20 +307,28 @@
           </div>
 
           <div class="col-sm-12 form-section-title">
-            Resources
+            Resource reservations
           </div>
 
-          <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota">
+          <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded()">
             <div class="col-sm-12 small text-muted">
               <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-              A resource quota is set on this resource pool, you must specify maximum resource usage limits for your application. Maximums are inherited from the resource pool quota.
+              A resource quota is set on this resource pool, you must specify resource reservations for your application. Maximums are inherited from the resource pool quota.
+            </div>
+          </div>
+
+          <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
+            <div class="col-sm-12 small text-muted">
+              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+              This resource pool has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of the resource pool.
             </div>
           </div>
 
           <!-- memory-limit-input -->
-          <div class="form-group">
+          <div class="form-group" ng-if="!ctrl.state.resourcePoolHasQuota || (ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded())">
             <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
-              Memory limit
+              Memory
+              <portainer-tooltip position="bottom" message="This application will reserve this amount of memory. If the application memory usage exceeds the reservation, it might be subject to OOM."></portainer-tooltip>
             </label>
             <div class="col-sm-3">
               <slider model="ctrl.formValues.MemoryLimit" floor="ctrl.state.sliders.memory.min" ceil="ctrl.state.sliders.memory.max" step="128"></slider>
@@ -325,15 +339,16 @@
             </div>
             <div class="col-sm-4">
               <p class="small text-muted" style="margin-top: 7px;">
-                Memory limit (<b>MB</b>)
+                Maximum memory usage (<b>MB</b>)
               </p>
             </div>
           </div>
           <!-- !memory-limit-input -->
           <!-- cpu-limit-input -->
-          <div class="form-group">
+          <div class="form-group" ng-if="!ctrl.state.resourcePoolHasQuota || (ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded())">
             <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
-              CPU limit
+              CPU
+              <portainer-tooltip position="bottom" message="This application will reserve this amount of CPU. If the application memory usage exceeds the reservation, it might be subject to CPU throttling."></portainer-tooltip>
             </label>
             <div class="col-sm-5">
               <slider model="ctrl.formValues.CpuLimit" floor="ctrl.state.sliders.cpu.min" ceil="ctrl.state.sliders.cpu.max" step="0.10" precision="2"></slider>

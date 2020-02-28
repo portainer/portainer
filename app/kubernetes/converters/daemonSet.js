@@ -1,7 +1,7 @@
-import { KubernetesDaemonSet } from "Kubernetes/models/daemon-set/models";
-import { KubernetesDaemonSetCreatePayload } from "Kubernetes/models/daemon-set/payloads";
-import { KubernetesApplicationStackAnnotationKey } from "Kubernetes/models/application/models";
-import KubernetesApplicationHelper from "Kubernetes/helpers/applicationHelper";
+import {KubernetesDaemonSet} from 'Kubernetes/models/daemon-set/models';
+import {KubernetesDaemonSetCreatePayload} from 'Kubernetes/models/daemon-set/payloads';
+import {KubernetesApplicationStackAnnotationKey} from 'Kubernetes/models/application/models';
+import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 
 function bytesValue(mem) {
   return mem * 1000 * 1000;
@@ -45,11 +45,11 @@ class KubernetesDaemonSetConverter {
     payload.spec.template.spec.volumes = daemonSet.Volumes;
     if (daemonSet.MemoryLimit) {
       payload.spec.template.spec.containers[0].resources.limits.memory = daemonSet.MemoryLimit;
-      payload.spec.template.spec.containers[0].resources.requests.memory = 0;
+      payload.spec.template.spec.containers[0].resources.requests.memory = daemonSet.MemoryLimit;
     }
     if (daemonSet.CpuLimit) {
       payload.spec.template.spec.containers[0].resources.limits.cpu = daemonSet.CpuLimit;
-      payload.spec.template.spec.containers[0].resources.requests.cpu = 0;
+      payload.spec.template.spec.containers[0].resources.requests.cpu = daemonSet.CpuLimit;
     }
     return payload;
   }

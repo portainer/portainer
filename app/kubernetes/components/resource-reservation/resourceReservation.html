@@ -9,7 +9,7 @@
       </p>
     </span>
   </div>
-  <div class="form-group">
+  <div class="form-group" ng-if="$ctrl.memoryLimit !== 0">
     <label for="memory-usage" class="col-sm-3 col-lg-2 control-label text-left">
       Memory reservation
     </label>
@@ -22,7 +22,7 @@
       </uib-progressbar>
     </div>
   </div>
-  <div class="form-group">
+  <div class="form-group" ng-if="$ctrl.cpuLimit !== 0">
     <label for="cpu-usage" class="col-sm-3 col-lg-2 control-label text-left">
       CPU reservation
     </label>

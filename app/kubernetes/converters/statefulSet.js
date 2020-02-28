@@ -1,9 +1,9 @@
 import _ from 'lodash-es';
-import { KubernetesStatefulSet } from "Kubernetes/models/stateful-set/models";
-import { KubernetesStatefulSetCreatePayload } from "Kubernetes/models/stateful-set/payloads";
-import { KubernetesApplicationStackAnnotationKey } from "Kubernetes/models/application/models";
+import {KubernetesStatefulSet} from 'Kubernetes/models/stateful-set/models';
+import {KubernetesStatefulSetCreatePayload} from 'Kubernetes/models/stateful-set/payloads';
+import {KubernetesApplicationStackAnnotationKey} from 'Kubernetes/models/application/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
-import KubernetesPersistentVolumeClaimConverter from "./persistentVolumeClaim";
+import KubernetesPersistentVolumeClaimConverter from './persistentVolumeClaim';
 
 function bytesValue(mem) {
   return mem * 1000 * 1000;
@@ -49,11 +49,11 @@ class KubernetesStatefulSetConverter {
     payload.spec.template.spec.volumes = statefulSet.Volumes;
     if (statefulSet.MemoryLimit) {
       payload.spec.template.spec.containers[0].resources.limits.memory = statefulSet.MemoryLimit;
-      payload.spec.template.spec.containers[0].resources.requests.memory = 0;
+      payload.spec.template.spec.containers[0].resources.requests.memory = statefulSet.MemoryLimit;
     }
     if (statefulSet.CpuLimit) {
       payload.spec.template.spec.containers[0].resources.limits.cpu = statefulSet.CpuLimit;
-      payload.spec.template.spec.containers[0].resources.requests.cpu = 0;
+      payload.spec.template.spec.containers[0].resources.requests.cpu = statefulSet.CpuLimit;
     }
     return payload;
   }

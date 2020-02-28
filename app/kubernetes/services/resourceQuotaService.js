@@ -67,15 +67,19 @@ angular.module("portainer.kubernetes").factory("KubernetesResourceQuotaService",
           },
           spec: {
             hard: {
+              'requests.cpu': cpuLimit,
+              'requests.memory': memoryLimit,
               'limits.cpu': cpuLimit,
-              'limits.memory': memoryLimit
+              'limits.memory': memoryLimit,
             }
           }
         };
         if (cpuLimit === 0) {
+          delete payload.spec.hard['requests.cpu'];
           delete payload.spec.hard['limits.cpu'];
         }
         if (memoryLimit ===0) {
+          delete payload.spec.hard['requests.memory'];
           delete payload.spec.hard['limits.memory'];
         }
         const data = await KubernetesResourceQuotas(namespace).create(payload).$promise;
@@ -94,12 +98,16 @@ angular.module("portainer.kubernetes").factory("KubernetesResourceQuotaService",
      */
     async function updateAsync(quota, cpuLimit, memoryLimit) {
       try {
+        quota.spec.hard['requests.cpu'] = cpuLimit;
+        quota.spec.hard['requests.memory'] = memoryLimit;
         quota.spec.hard['limits.cpu'] = cpuLimit;
         quota.spec.hard['limits.memory'] = memoryLimit;
         if (cpuLimit === 0) {
+          delete quota.spec.hard['requests.cpu'];
           delete quota.spec.hard['limits.cpu'];
         }
         if (memoryLimit === 0) {
+          delete quota.spec.hard['requests.memory'];
           delete quota.spec.hard['limits.memory'];
         }
         const data = await KubernetesResourceQuotas(quota.metadata.namespace).update({}, quota).$promise;

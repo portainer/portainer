@@ -85,6 +85,8 @@ class KubernetesNodeController {
       this.state.applicationsLoading = true;
       this.applications = await this.KubernetesApplicationService.get();
 
+      // TODO: review
+      // This code block is duplicated in resourcePoolController. Should it be relocated?
       this.applications = _.map(this.applications, app => {
         const pods = _.filter(this.pods, pod => Object.values(pod.Metadata.labels).includes(app.Name));
         const resourceReservation = KubernetesResourceReservationHelper.computeResourceReservation(pods);
