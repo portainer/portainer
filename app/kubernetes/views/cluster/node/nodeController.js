@@ -66,9 +66,6 @@ class KubernetesNodeController {
       this.state.podsLoading = true;
       const pods = await this.KubernetesPodService.pods();
       this.pods = _.filter(pods, pod => pod.Node === this.node.Name);
-      this.ResourceReservation = KubernetesResourceReservationHelper.computeResourceReservation(this.pods);
-      this.ResourceReservation.Memory = Math.floor(this.ResourceReservation.Memory / 1000 / 1000);
-      this.memoryLimit = Math.floor(filesizeParser(this.node.Memory) / 1000 / 1000);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve pods');
     } finally {
@@ -85,15 +82,20 @@ class KubernetesNodeController {
       this.state.applicationsLoading = true;
       this.applications = await this.KubernetesApplicationService.get();
 
-      // TODO: review
+      // TODO: review (outdated)
       // This code block is duplicated in resourcePoolController. Should it be relocated?
+      this.ResourceReservation = { CPU: 0, Memory: 0 };
       this.applications = _.map(this.applications, app => {
         const pods = _.filter(this.pods, pod => Object.values(pod.Metadata.labels).includes(app.Name));
         const resourceReservation = KubernetesResourceReservationHelper.computeResourceReservation(pods);
         app.CPU = resourceReservation.CPU;
         app.Memory = resourceReservation.Memory;
+        this.ResourceReservation.CPU += resourceReservation.CPU;
+        this.ResourceReservation.Memory += resourceReservation.Memory;
         return app;
       });
+      this.ResourceReservation.Memory = Math.floor(this.ResourceReservation.Memory / 1000 / 1000);
+      this.memoryLimit = Math.floor(filesizeParser(this.node.Memory) / 1000 / 1000);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve applications');
     } finally {
