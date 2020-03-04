@@ -26,7 +26,7 @@
     "clean": "grunt clean:all",
     "start": "grunt clean:all && grunt start",
     "start:server": "grunt clean:server && grunt start:server",
-    "start:client": "grunt clean:client && grunt start:client",
+    "start:client": "grunt clean:client && webpack-dev-server --config=./webpack/webpack.develop.js",
     "build:server:offline": "cd ./api/cmd/portainer && CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags '-s' && mv -f portainer ../../../dist/portainer",
     "clean:all": "grunt clean:all"
   },
