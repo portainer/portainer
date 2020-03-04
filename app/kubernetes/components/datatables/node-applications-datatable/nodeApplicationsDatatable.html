@@ -105,7 +105,7 @@
               <td>{{ item.Stack }}</td>
               <td>{{ item.ResourcePool }}</td>
               <td>{{ item.Image }}</td>
-              <td>{{ item.CPU }}</td>
+              <td>{{ item.CPU | kubernetesApplicationCPUValue }}</td>
               <td>{{ item.Memory | humansize }}</td>
             </tr>
             <tr ng-if="!$ctrl.dataset">

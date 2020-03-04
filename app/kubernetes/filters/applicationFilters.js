@@ -28,4 +28,10 @@ angular.module('portainer.kubernetes')
         return 'Cluster';
     }
   };
+})
+.filter('kubernetesApplicationCPUValue', function () {
+  'use strict';
+  return function (value) {
+    return _.round(value, 2);
+  };
 });
