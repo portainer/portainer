@@ -43,6 +43,13 @@
                     <code>{{ ctrl.application.RunningPodsCount }}</code> / <code>{{ ctrl.application.TotalPodsCount }}</code>
                   </td>
                 </tr>
+                <tr ng-if="ctrl.application.Limits.Cpu || ctrl.application.Limits.Memory">
+                  <td>Resource reservations</td>
+                  <td>
+                    <div ng-if="ctrl.application.Limits.Cpu">CPU {{ ctrl.application.Limits.Cpu | kubernetesApplicationCPUValue }}</div>
+                    <div ng-if="ctrl.application.Limits.Memory">Memory {{ ctrl.application.Limits.Memory | humansize }}</div>
+                  </td>
+                </tr>
                 <tr>
                   <td>Creation date</td>
                   <td>{{ ctrl.application.CreatedAt | getisodate }}</td>
