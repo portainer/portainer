@@ -1,17 +1,14 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
+import { KubernetesApplicationDataAccessPolicies, KubernetesApplicationDeploymentTypes, KubernetesApplicationPublishingTypes } from 'Kubernetes/models/application/models';
+import { KubernetesLimitRangeDefaults } from 'Kubernetes/models/limit-range/models';
 import {
-  KubernetesApplicationDataAccessPolicies,
-  KubernetesApplicationDeploymentTypes,
+  KubernetesApplicationPublishedPortFormValue,
   KubernetesApplicationEnvironmentVariableFormValue,
   KubernetesApplicationFormValues,
-  KubernetesApplicationPersistedFolderFormValue,
-  KubernetesApplicationPublishedPortFormValue,
-  KubernetesApplicationPublishingTypes
-} from 'Kubernetes/models/application/models';
-import {KubernetesPortainerQuotaSuffix} from 'Kubernetes/models/resourceQuota';
-import {KubernetesLimitRangeDefaults} from 'Kubernetes/models/limitRange';
+  KubernetesApplicationPersistedFolderFormValue
+} from 'Kubernetes/models/application/formValues';
 
 
 function megaBytesValue(mem) {
@@ -32,7 +29,6 @@ class KubernetesCreateApplicationController {
     this.ApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
     this.ApplicationDataAccessPolicies = KubernetesApplicationDataAccessPolicies;
     this.ApplicationPublishingTypes = KubernetesApplicationPublishingTypes;
-    this.KubernetesLimitRangeDefaults = KubernetesLimitRangeDefaults;
 
     this.onInit = this.onInit.bind(this);
     this.deployApplicationAsync = this.deployApplicationAsync.bind(this);
@@ -172,20 +168,19 @@ class KubernetesCreateApplicationController {
 
   async updateSlidersAsync() {
     try {
-      const quota = _.find(this.formValues.ResourcePool.Quotas,
-        (item) => item.Name === KubernetesPortainerQuotaSuffix + this.formValues.ResourcePool.Namespace.Name);
+      const quota = this.formValues.ResourcePool.Quota;
       let minCpu, maxCpu, minMemory, maxMemory = 0;
       if (quota) {
         this.state.resourcePoolHasQuota = true;
         if (quota.CpuLimit) {
-          minCpu = this.KubernetesLimitRangeDefaults.CpuLimit;
+          minCpu = KubernetesLimitRangeDefaults.CpuLimit;
           maxCpu = quota.CpuLimit - quota.CpuLimitUsed;
         } else {
-          minCpu = 0 ;
+          minCpu = 0;
           maxCpu = this.state.nodes.cpu;
         }
         if (quota.MemoryLimit) {
-          minMemory = this.KubernetesLimitRangeDefaults.MemoryLimit;
+          minMemory = KubernetesLimitRangeDefaults.MemoryLimit;
           maxMemory = quota.MemoryLimit - quota.MemoryLimitUsed;
         } else {
           minMemory = 0;
@@ -215,7 +210,7 @@ class KubernetesCreateApplicationController {
 
   async updateStacksAsync() {
     try {
-      this.stacks = await this.KubernetesStackService.stacks(this.formValues.ResourcePool.Namespace.Name);
+      this.stacks = await this.KubernetesStackService.get(this.formValues.ResourcePool.Namespace.Name);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve stacks');
     }
@@ -256,7 +251,7 @@ class KubernetesCreateApplicationController {
       };
 
       const [resourcePools, nodes] = await Promise.all([
-        this.KubernetesResourcePoolService.resourcePools(),
+        this.KubernetesResourcePoolService.get(),
         this.KubernetesNodeService.get()
       ]);
 

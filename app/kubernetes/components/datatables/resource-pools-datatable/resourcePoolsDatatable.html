@@ -73,10 +73,10 @@
                 </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Quotas')">
-                  Quotas
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Quotas' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Quotas' && $ctrl.state.reverseOrder"></i>
+                <a ng-click="$ctrl.changeOrderBy('Quota')">
+                  Quota
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Quota' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Quota' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
@@ -102,7 +102,7 @@
                 <span style="margin-left: 5px;" class="label label-warning image-tag" ng-if="$ctrl.isSystemNamespace(item)">system</span>
               </td>
               <td>
-                <i class="fa {{item.Quotas.length ? 'fa-toggle-on' : 'fa-toggle-off'}}" aria-hidden="true" style="margin-right: 2px;"></i> {{ item.Quotas.length ? 'Yes' : 'No' }}
+                <i class="fa {{item.Quota ? 'fa-toggle-on' : 'fa-toggle-off'}}" aria-hidden="true" style="margin-right: 2px;"></i> {{ item.Quota ? 'Yes' : 'No' }}
               </td>
               <td>{{ item.CreatedAt | getisodate }}</td>
               <td ng-if="$ctrl.isAdmin">

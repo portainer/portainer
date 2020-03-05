@@ -1,55 +1,56 @@
 import _ from 'lodash-es';
-import {KubernetesPodViewModel} from '../models/pod';
-import {KubernetesCommonParams} from 'Kubernetes/models/common/params';
+import angular from 'angular';
 import PortainerError from 'Portainer/error';
 
-angular.module('portainer.kubernetes')
-  .factory('KubernetesPodService', ['$async', 'KubernetesPods',
-    function KubernetesPodServiceFactory($async, KubernetesPods) {
-      'use strict';
-      var factory = {
-        pods: pods,
-        logs: logs
-      };
+import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
+import KubernetesPodConverter from 'Kubernetes/converters/pod';
 
-      /**
-       * Pods
-       *
-       * @param {string} namespace
-       */
-      async function podsAsync(namespace) {
-        try {
-          const data = await KubernetesPods(namespace).get().$promise;
-          return _.map(data.items, (item) => new KubernetesPodViewModel(item));
-        } catch (err) {
-          throw new PortainerError('Unable to retrieve pods', err);
-        }
-      }
+class KubernetesPodService {
+  /* @ngInject */
+  constructor($async, KubernetesPods) {
+    this.$async = $async;
+    this.KubernetesPods = KubernetesPods;
 
-      function pods(namespace) {
-        return $async(podsAsync, namespace);
-      }
+    this.getAllAsync = this.getAllAsync.bind(this);
+    this.logsAsync = this.logsAsync.bind(this);
+  }
+  /**
+   * GET ALL
+   */
+  async getAllAsync(namespace) {
+    try {
+      const data = await this.KubernetesPods(namespace).get().$promise;
+      return _.map(data.items, (item) => KubernetesPodConverter.apiToPod(item));
+    } catch (err) {
+      throw new PortainerError('Unable to retrieve pods', err);
+    }
+  }
 
-      /**
-       * Logs
-       *
-       * @param {string} namespace
-       * @param {string} podName
-       */
-      async function logsAsync(namespace, podName) {
-        const params = new KubernetesCommonParams();
-        params.id = podName;
-        try {
-          const data = await KubernetesPods(namespace).logs(params).$promise;
-          return data.logs.length === 0 ? [] : data.logs.split("\n");
-        } catch (err) {
-          throw new PortainerError('Unable to retrieve pod logs', err);
-        }
-      }
+  get(namespace) {
+    return this.$async(this.getAllAsync, namespace);
+  }
 
-      function logs(namespace, podName) {
-        return $async(logsAsync, namespace, podName);
-      }
+  /**
+   * Logs
+   *
+   * @param {string} namespace
+   * @param {string} podName
+   */
+  async logsAsync(namespace, podName) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = podName;
+      const data = await this.KubernetesPods(namespace).logs(params).$promise;
+      return data.logs.length === 0 ? [] : data.logs.split('\n');
+    } catch (err) {
+      throw new PortainerError('Unable to retrieve pod logs', err);
+    }
+  }
 
-      return factory;
-    }]);
+  logs(namespace, podName) {
+    return this.$async(this.logsAsync, namespace, podName);
+  }
+}
+
+export default KubernetesPodService;
+angular.module('portainer.kubernetes').service('KubernetesPodService', KubernetesPodService);

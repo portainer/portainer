@@ -1,18 +1,6 @@
 import { KubernetesCommonMetadataPayload } from 'Kubernetes/models/common/payloads';
 
 /**
- * Payload for GET
- */
-const _KubernetesConfigMapGetPayload = Object.freeze({
-  id: ''
-});
-export class KubernetesConfigMapGetPayload {
-  constructor() {
-    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesConfigMapGetPayload)));
-  }
-}
-
-/**
  * Payload for CREATE
  */
 const _KubernetesConfigMapCreatePayload = Object.freeze({

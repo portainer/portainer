@@ -1,8 +1,8 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
-import {KubernetesPortainerQuotaSuffix, KubernetesResourceQuotaDefaults} from 'Kubernetes/models/resourceQuota';
-import KubernetesDefaultLimitRangeModel from 'Kubernetes/models/limitRange';
+import { KubernetesResourceQuotaDefaults, KubernetesResourceQuota } from 'Kubernetes/models/resource-quota/models';
+import { KubernetesLimitRange } from 'Kubernetes/models/limit-range/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/kubernetesResourceReservationHelper';
 
 function megaBytesValue(mem) {
@@ -31,6 +31,8 @@ class KubernetesEditResourcePoolController {
     this.KubernetesApplicationService = KubernetesApplicationService;
 
     this.onInit = this.onInit.bind(this);
+    this.createResourceQuotaAsync = this.createResourceQuotaAsync.bind(this);
+    this.createLimitRangeAsync = this.createLimitRangeAsync.bind(this);
     this.updateResourcePoolAsync = this.updateResourcePoolAsync.bind(this);
     this.getEvents = this.getEvents.bind(this);
     this.getEventsAsync = this.getEventsAsync.bind(this);
@@ -54,7 +56,7 @@ class KubernetesEditResourcePoolController {
       this.formValues.CpuLimit = this.defaults.CpuLimit;
     }
     if (this.formValues.MemoryLimit < megaBytesValue(this.defaults.MemoryLimit)) {
-        this.formValues.MemoryLimit = megaBytesValue(this.defaults.MemoryLimit);
+      this.formValues.MemoryLimit = megaBytesValue(this.defaults.MemoryLimit);
     }
   }
 
@@ -62,34 +64,47 @@ class KubernetesEditResourcePoolController {
     this.state.showEditorTab = true;
   }
 
+  async createLimitRangeAsync(namespace, cpuLimit, memoryLimit) {
+    const limitRange = new KubernetesLimitRange(namespace);
+    limitRange.CPU = cpuLimit
+    limitRange.Memory = memoryLimit;
+    return await this.KubernetesLimitRangeService.create(limitRange);
+  }
+
+  async createResourceQuotaAsync(namespace, cpuLimit, memoryLimit) {
+    const quota = new KubernetesResourceQuota(namespace);
+    quota.CpuLimit = cpuLimit;
+    quota.MemoryLimit = memoryLimit;
+    await this.KubernetesResourceQuotaService.create(quota);
+  }
+
   async updateResourcePoolAsync() {
     this.state.actionInProgress = true;
     try {
-      this.checkDefaults(); 
+      this.checkDefaults();
+      const namespace = this.pool.Namespace.Name;
+      const cpuLimit = this.formValues.CpuLimit;
       const memoryLimit = bytesValue(this.formValues.MemoryLimit);
-      const quota = _.find(this.pool.Quotas, (item) => item.Name === KubernetesPortainerQuotaSuffix + item.Namespace);
+      const quota = this.pool.Quota;
 
       if (this.formValues.hasQuota) {
         if (quota) {
-          await this.KubernetesResourceQuotaService.update(quota.Raw, this.formValues.CpuLimit, memoryLimit);
-          this.state.cpuUsed = quota.CpuLimitUsed;
-          this.state.memoryUsed = megaBytesValue(quota.MemoryLimitUse);
+          quota.CpuLimit = cpuLimit;
+          quota.MemoryLimit = memoryLimit;
+          await this.KubernetesResourceQuotaService.update(quota);
           if (!this.pool.LimitRange) {
-            const limitRange = new KubernetesDefaultLimitRangeModel(this.pool.Namespace.Name);
-            await this.KubernetesLimitRangeService.create(limitRange, this.formValues.CpuLimit, memoryLimit);
+            await this.createLimitRangeAsync(namespace, cpuLimit, memoryLimit);
           }
         } else {
-          await this.KubernetesResourceQuotaService.create(this.pool.Namespace.Name, this.formValues.CpuLimit, memoryLimit);
-          const limitRange = new KubernetesDefaultLimitRangeModel(this.pool.Namespace.Name);
-          await this.KubernetesLimitRangeService.create(limitRange, this.formValues.CpuLimit, memoryLimit);
+          await this.createResourceQuotaAsync(namespace, cpuLimit, memoryLimit);
+          await this.createLimitRangeAsync(namespace, cpuLimit, memoryLimit);
         }
       } else if (quota) {
-        await this.KubernetesResourceQuotaService.remove(quota);
+        await this.KubernetesResourceQuotaService.delete(quota);
         if (this.pool.LimitRange) {
-          await this.KubernetesLimitRangeService.remove(this.pool.LimitRange);
+          await this.KubernetesLimitRangeService.delete(this.pool.LimitRange);
         }
       }
-
       this.Notifications.success('Resource pool successfully updated', this.pool.Namespace.Name);
       this.$state.reload();
     } catch (err) {
@@ -106,7 +121,7 @@ class KubernetesEditResourcePoolController {
   async getEventsAsync() {
     try {
       this.state.eventsLoading = true;
-      this.events = await this.KubernetesEventService.events(this.pool.Namespace.Name);
+      this.events = await this.KubernetesEventService.get(this.pool.Namespace.Name);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve resource pool related events');
     } finally {
@@ -121,7 +136,7 @@ class KubernetesEditResourcePoolController {
   async getPodsAsync() {
     try {
       this.state.podsLoading = true;
-      this.pods = await this.KubernetesPodService.pods(this.pool.Namespace.Name);
+      this.pods = await this.KubernetesPodService.get(this.pool.Namespace.Name);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve pods.');
     } finally {
@@ -194,7 +209,7 @@ class KubernetesEditResourcePoolController {
 
       const [nodes, pool] = await Promise.all([
         this.KubernetesNodeService.get(),
-        this.KubernetesResourcePoolService.resourcePool(name)
+        this.KubernetesResourcePoolService.get(name)
       ]);
 
       this.pool = pool;
@@ -205,8 +220,7 @@ class KubernetesEditResourcePoolController {
       });
       this.state.sliderMaxMemory = megaBytesValue(this.state.sliderMaxMemory);
 
-      const quota = _.find(pool.Quotas,
-        (item) => item.Name === KubernetesPortainerQuotaSuffix + pool.Namespace.Name);
+      const quota = pool.Quota;
       if (quota) {
         this.formValues.hasQuota = true;
         this.formValues.CpuLimit = quota.CpuLimit;

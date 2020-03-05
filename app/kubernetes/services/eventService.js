@@ -1,27 +1,34 @@
 import _ from 'lodash-es';
-import KubernetesEventViewModel from '../models/event';
+import angular from 'angular';
+import PortainerError from 'Portainer/error';
+import KubernetesEventConverter from 'Kubernetes/converters/event';
 
-angular.module("portainer.kubernetes").factory("KubernetesEventService", [
-  "$async", "KubernetesEvents",
-  function KubernetesServiceServiceFactory($async, KubernetesEvents) {
-    "use strict";
-    const service = {
-      events: events,
-    };
+class KubernetesEventService {
+  /* @ngInject */
+  constructor($async, KubernetesEvents) {
+    this.$async = $async;
+    this.KubernetesEvents = KubernetesEvents;
 
-    async function eventsAsync(namespace) {
-      try {
-        const data = await KubernetesEvents(namespace).get().$promise;
-        return _.map(data.items, (item) => new KubernetesEventViewModel(item));
-      } catch (err) {
-        throw {msg: 'Unable to retrieve events', err:err};
-      }
-    }
-
-    function events(namespace) {
-      return $async(eventsAsync, namespace);
-    }
-
-    return service;
+    this.getAllAsync = this.getAllAsync.bind(this);
   }
-]);
+
+  /**
+   * GET
+   */
+  async getAllAsync(namespace) {
+    try {
+      const data = await this.KubernetesEvents(namespace).get().$promise;
+      const res = _.map(data.items, (item) => KubernetesEventConverter.apiToEvent(item));
+      return res;
+    } catch (err) {
+      throw new PortainerError('Unable to retrieve events', err);
+    }
+  }
+
+  get(namespace) {
+    return this.$async(this.getAllAsync, namespace);
+  }
+}
+
+export default KubernetesEventService;
+angular.module('portainer.kubernetes').service('KubernetesEventService', KubernetesEventService);

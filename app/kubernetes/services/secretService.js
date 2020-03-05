@@ -1,41 +1,36 @@
-import {KubernetesApplicationStackAnnotationKey} from 'Kubernetes/models/application/models';
+import angular from 'angular';
+import PortainerError from 'Portainer/error';
+import KubernetesSecretConverter from 'Kubernetes/converters/secret';
 
-angular.module("portainer.kubernetes").factory("KubernetesSecretService", [
-  "$async", "KubernetesSecrets",
-  function KubernetesSecretServiceFactory($async, KubernetesSecrets) {
-    "use strict";
-    const service = {
-      create: create,
-    };
+class KubernetesSecretService {
+  /* @ngInject */
+  constructor($async, KubernetesSecrets) {
+    this.$async = $async;
+    this.KubernetesSecrets = KubernetesSecrets;
 
-    /**
-     * Creation
-     */
-    async function createAsync(secret) {
-      try {
-        const payload = {
-          metadata: {
-            name: secret.Name,
-            namespace: secret.Namespace,
-            annotations: {
-              [KubernetesApplicationStackAnnotationKey]: secret.StackName
-            }
-          },
-          type: secret.Type,
-          data: secret.Data
-        };
-
-        const data = await KubernetesSecrets(payload.metadata.namespace).create(payload).$promise;
-        return data;
-      } catch (err) {
-        throw { msg: 'Unable to create secret', err: err };
-      }
-    }
-
-    function create(secret) {
-      return $async(createAsync, secret);
-    }
-
-    return service;
+    this.createAsync = this.createAsync.bind(this);
   }
-]);
+
+  /**
+   * CREATE
+   */
+  async createAsync(secret) {
+    try {
+      const payload = KubernetesSecretConverter.createPayload(secret);
+      const namespace = payload.metadata.namespace;
+      const params = {};
+      const data = await this.KubernetesSecrets(namespace).create(params, payload).$promise;
+      return data;
+    } catch (err) {
+      throw new PortainerError('Unable to create secret', err);
+    }
+  }
+
+  create(secret) {
+    return this.$async(this.createAsync, secret);
+  }
+}
+
+export default KubernetesSecretService;
+angular.module('portainer.kubernetes').service('KubernetesSecretService', KubernetesSecretService);
+

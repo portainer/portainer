@@ -24,7 +24,7 @@ class KubernetesApplicationController {
   async getEventsAsync() {
     try {
       this.state.eventsLoading = true;
-      const events = await this.KubernetesEventService.events(this.application.ResourcePool);
+      const events = await this.KubernetesEventService.get(this.application.ResourcePool);
       this.events = _.filter(events, (event) => event.Involved.uid === this.application.Id
         || event.Involved.uid === this.application.ServiceId
         || _.find(this.application.Pods, (pod) => pod.Id === event.Involved.uid) !== undefined);

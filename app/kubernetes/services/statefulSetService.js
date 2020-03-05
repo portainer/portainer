@@ -2,12 +2,14 @@ import angular from 'angular';
 import PortainerError from 'Portainer/error';
 import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
 import KubernetesStatefulSetConverter from 'Kubernetes/converters/statefulSet';
+import KubernetesServiceHelper from 'Kubernetes/helpers/serviceHelper';
 
 class KubernetesStatefulSetService {
   /* @ngInject */
-  constructor($async, KubernetesStatefulSets) {
+  constructor($async, KubernetesStatefulSets, KubernetesServiceService) {
     this.$async = $async;
     this.KubernetesStatefulSets = KubernetesStatefulSets;
+    this.KubernetesServiceService = KubernetesServiceService;
 
     this.getAsync = this.getAsync.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);
@@ -22,14 +24,19 @@ class KubernetesStatefulSetService {
     try {
       const params = new KubernetesCommonParams();
       params.id = name;
-      const [raw, yaml] = await Promise.all([
+      const serviceName = KubernetesServiceHelper.generateHeadlessServiceName(name);
+      const [raw, yaml, service] = await Promise.all([
         this.KubernetesStatefulSets(namespace).get(params).$promise,
-        this.KubernetesStatefulSets(namespace).getYaml(params).$promise
+        this.KubernetesStatefulSets(namespace).getYaml(params).$promise,
+        this.KubernetesServiceService.get(namespace, serviceName)
       ]);
       const res = {
         Raw: raw,
-        Yaml: yaml
+        Yaml: yaml.data
       };
+      if (service.Yaml) {
+        res.Yaml += '---\n' + service.Yaml;
+      }
       return res;
     } catch (err) {
       throw new PortainerError('Unable to retrieve StatefulSet', err);

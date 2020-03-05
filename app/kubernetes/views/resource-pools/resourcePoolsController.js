@@ -18,7 +18,7 @@ class KubernetesResourcePoolsController {
     let actionCount = selectedItems.length;
     for (const pool of selectedItems) {
       try {
-        await this.KubernetesResourcePoolService.remove(pool);
+        await this.KubernetesResourcePoolService.delete(pool);
         this.Notifications.success('Resource pool successfully removed', pool.Namespace.Name);
         const index = this.resourcePools.indexOf(pool);
         this.resourcePools.splice(index, 1);
@@ -39,7 +39,7 @@ class KubernetesResourcePoolsController {
 
   async getResourcePoolsAsync() {
     try {
-      this.resourcePools = await this.KubernetesResourcePoolService.resourcePools();
+      this.resourcePools = await this.KubernetesResourcePoolService.get();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retreive resource pools');
     }

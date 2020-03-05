@@ -1,21 +1,30 @@
-angular.module('portainer.kubernetes')
-.factory('KubernetesHealthService', ['$async', 'KubernetesHealth', function KubernetesHealthServiceFactory($async, KubernetesHealth) {
-  'use strict';
-  const service = {};
+import angular from 'angular';
+import PortainerError from 'Portainer/error';
 
-  service.ping = ping;
+class KubernetesHealthService {
+  /* @ngInject */
+  constructor($async, KubernetesHealth) {
+    this.$async = $async;
+    this.KubernetesHealth = KubernetesHealth;
 
-  async function pingAsync() {
+    this.pingAsync = this.pingAsync.bind(this);
+  }
+
+  /**
+   * PING
+   */
+  async pingAsync() {
     try {
-      return await KubernetesHealth.ping().$promise;
+      return await this.KubernetesHealth.ping().$promise;
     } catch (err) {
-      throw { msg: 'Unable to retrieve environment health', err: err };
+      throw new PortainerError('Unable to retrieve environment health', err);
     }
   }
 
-  function ping() {
-    return $async(pingAsync);
+  ping() {
+    return this.$async(this.pingAsync);
   }
+}
 
-  return service;
-}]);
+export default KubernetesHealthService;
+angular.module('portainer.kubernetes').service('KubernetesHealthService', KubernetesHealthService);

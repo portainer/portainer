@@ -44,7 +44,7 @@ class KubernetesNodeController {
   async getEventsAsync() {
     try {
       this.state.eventsLoading = true;
-      this.events = await this.KubernetesEventService.events();
+      this.events = await this.KubernetesEventService.get();
       this.events = _.filter(this.events.items, (item) => item.involvedObject.kind === 'Node');
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve node events');
@@ -64,7 +64,7 @@ class KubernetesNodeController {
   async getPodsAsync() {
     try {
       this.state.podsLoading = true;
-      const pods = await this.KubernetesPodService.pods();
+      const pods = await this.KubernetesPodService.get();
       this.pods = _.filter(pods, pod => pod.Node === this.node.Name);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve pods');

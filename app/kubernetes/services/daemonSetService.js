@@ -28,7 +28,7 @@ class KubernetesDaemonSetService {
       ]);
       const res = {
         Raw: raw,
-        Yaml: yaml
+        Yaml: yaml.data
       };
       return res;
     } catch (err) {

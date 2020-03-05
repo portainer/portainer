@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
-import { KubernetesServiceCreatePayload } from "Kubernetes/models/service/payloads";
-import { KubernetesApplicationStackAnnotationKey } from "Kubernetes/models/application/models";
-import { KubernetesServiceHeadlessClusterIP, KubernetesService, KubernetesServicePort, KubernetesServiceTypes } from "Kubernetes/models/service/models";
+import { KubernetesServiceCreatePayload } from 'Kubernetes/models/service/payloads';
+import { KubernetesApplicationStackAnnotationKey } from 'Kubernetes/models/application/models';
+import { KubernetesServiceHeadlessClusterIP, KubernetesService, KubernetesServicePort, KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import { KubernetesApplicationPublishingTypes } from 'Kubernetes/models/application/models';
 import KubernetesServiceHelper from 'Kubernetes/helpers/serviceHelper';
 

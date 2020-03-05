@@ -10,9 +10,9 @@ const _KubernetesStatefulSet = Object.freeze({
   Env: [],
   CpuLimit: '',
   MemoryLimit: '',
-  Secret: '',
   VolumeMounts: [],
   Volumes: [],
+  Secret: undefined,
   VolumeClaims: [],
   ServiceName: ''
 });

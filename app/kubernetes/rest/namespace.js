@@ -19,10 +19,10 @@ angular.module('portainer.kubernetes')
               },
               transformResponse: rawResponse
             },
-            status: { method: 'GET', params: { action: 'status' } },
             create: { method: 'POST' },
-            update: { method: 'PUT', params: { id: '@metadata.name' } },
-            delete: { method: 'DELETE' }
+            update: { method: 'PUT' },
+            delete: { method: 'DELETE' },
+            status: { method: 'GET', params: { action: 'status' } }
           }
         );
       };

@@ -1,7 +1,8 @@
 import angular from 'angular';
-
+import _ from 'lodash-es';
 import PortainerError from 'Portainer/error';
 import KubernetesConfigMapConverter from 'Kubernetes/converters/configMap';
+import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
 
 class KubernetesConfigMapService {
   /* @ngInject */
@@ -10,6 +11,7 @@ class KubernetesConfigMapService {
     this.KubernetesConfigMaps = KubernetesConfigMaps;
 
     this.getAsync = this.getAsync.bind(this);
+    this.getAllAsync = this.getAllAsync.bind(this);
     this.createAsync = this.createAsync.bind(this);
     this.updateAsync = this.updateAsync.bind(this);
   }
@@ -19,8 +21,9 @@ class KubernetesConfigMapService {
    */
   async getAsync(namespace, name) {
     try {
-      const payload = KubernetesConfigMapConverter.getPayload(name);
-      const data = await this.KubernetesConfigMaps(namespace).get(payload).$promise;
+      const params = new KubernetesCommonParams();
+      params.id = name;
+      const data = await this.KubernetesConfigMaps(namespace).get(params).$promise;
       return KubernetesConfigMapConverter.apiToConfigMap(data);
     } catch (err) {
       if (err.status === 404) {
@@ -30,10 +33,21 @@ class KubernetesConfigMapService {
     }
   }
 
-  get(namespace, name) {
-    return this.$async(this.getAsync, namespace, name);
+  async getAllAsync(namespace) {
+    try {
+      const data = await this.KubernetesConfigMaps(namespace).get().$promise;
+      return _.map(data.items, (item) => KubernetesConfigMapConverter.apiToConfigMap(item));
+    } catch (err) {
+      throw new PortainerError('Unable to retrieve config maps', err);
+    }
   }
 
+  get(namespace, name) {
+    if (name) {
+      return this.$async(this.getAsync, namespace, name);
+    }
+    return this.$async(this.getAllAsync, namespace);
+  }
 
   /**
    * CREATE
@@ -41,7 +55,9 @@ class KubernetesConfigMapService {
   async createAsync(config) {
     try {
       const payload = KubernetesConfigMapConverter.createPayload(config);
-      const data = await this.KubernetesConfigMaps(config.Namespace).create(payload).$promise;
+      const params = {};
+      const namespace = payload.metadata.namespace;
+      const data = await this.KubernetesConfigMaps(namespace).create(params, payload).$promise;
       return KubernetesConfigMapConverter.apiToConfigMap(data);
     } catch (err) {
       throw new PortainerError('Unable to create config map', err);
@@ -61,7 +77,10 @@ class KubernetesConfigMapService {
         return await this.create(config);
       }
       const payload = KubernetesConfigMapConverter.updatePayload(config);
-      const data = await this.KubernetesConfigMaps(config.Namespace).update(payload).$promise;
+      const params = new KubernetesCommonParams();
+      params.id = payload.metadata.name;
+      const namespace = payload.metadata.namespace;
+      const data = await this.KubernetesConfigMaps(namespace).update(params, payload).$promise;
       return KubernetesConfigMapConverter.apiToConfigMap(data);
     } catch (err) {
       throw new PortainerError('Unable to update config map', err);

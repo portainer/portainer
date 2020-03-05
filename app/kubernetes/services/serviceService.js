@@ -28,7 +28,7 @@ class KubernetesServiceService {
       ]);
       const res = {
         Raw: raw,
-        Yaml: yaml
+        Yaml: yaml.data
       };
       return res;
     } catch (err) {

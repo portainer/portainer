@@ -1,9 +1,6 @@
 import _ from 'lodash-es';
 import { KubernetesConfigMap, KubernetesPortainerConfigMapAccessKey } from 'Kubernetes/models/config-map/models';
-import { KubernetesConfigMapGetPayload,
-  KubernetesConfigMapCreatePayload,
-  KubernetesConfigMapUpdatePayload
-} from 'Kubernetes/models/config-map/payloads';
+import { KubernetesConfigMapCreatePayload, KubernetesConfigMapUpdatePayload } from 'Kubernetes/models/config-map/payloads';
 import { UserAccessViewModel, TeamAccessViewModel } from 'Portainer/models/access';
 
 class KubernetesConfigMapConverter {
@@ -31,9 +28,9 @@ class KubernetesConfigMapConverter {
     };
     _.forEach(accesses, (item) => {
       if (item instanceof UserAccessViewModel) {
-        configMap.Data[KubernetesPortainerConfigMapAccessKey][namespace].UserAccessPolicies[item.Id] = {RoleId: 0};
+        configMap.Data[KubernetesPortainerConfigMapAccessKey][namespace].UserAccessPolicies[item.Id] = { RoleId: 0 };
       } else if (item instanceof TeamAccessViewModel) {
-        configMap.Data[KubernetesPortainerConfigMapAccessKey][namespace].TeamAccessPolicies[item.Id] = {RoleId: 0};
+        configMap.Data[KubernetesPortainerConfigMapAccessKey][namespace].TeamAccessPolicies[item.Id] = { RoleId: 0 };
       }
     });
     return configMap;
@@ -48,15 +45,6 @@ class KubernetesConfigMapConverter {
     const res = new KubernetesConfigMap();
     res.Name = name
     res.Namespace = namespace;
-    return res;
-  }
-
-  /**
-   * GET payload
-   */
-  static getPayload(name) {
-    const res = new KubernetesConfigMapGetPayload();
-    res.id = name;
     return res;
   }
 

@@ -68,9 +68,10 @@ class KubernetesApplicationService {
         throw new PortainerError('Unable to determine which association to use');
       }
       application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods.value.items, item.value.Raw);
-      application.Yaml = item.value.Yaml.data;
+      application.Yaml = item.value.Yaml;
+
       if (service.Yaml) {
-        application.Yaml += '---\n' + service.Yaml.data;
+        application.Yaml += '---\n' + service.Yaml;
       }
       return application;
     } catch (err) {
@@ -82,10 +83,10 @@ class KubernetesApplicationService {
     try {
       let namespaces;
       if (namespace) {
-        const ns = await this.KubernetesNamespaceService.namespace(namespace);
+        const ns = await this.KubernetesNamespaceService.get(namespace);
         namespaces = [ns];
       } else {
-        namespaces = await this.KubernetesNamespaceService.namespaces();
+        namespaces = await this.KubernetesNamespaceService.get();
       }
       const promises = _.map(namespaces, (item) => this.getAllAsync(item.Name));
       const res = await Promise.all(promises);
@@ -140,7 +141,7 @@ class KubernetesApplicationService {
   async createAsync(formValues) {
     try {
       const claims = KubernetesPersistentVolumeClaimConverter.applicationFormValuesToVolumeClaims(formValues);
-      const roxrwx = _.find(claims, (item) => _.includes(item.StorageClass.AccessModes, "ROX") || _.includes(item.StorageClass.AccessModes, "RWX"));
+      const roxrwx = _.find(claims, (item) => _.includes(item.StorageClass.AccessModes, 'ROX') || _.includes(item.StorageClass.AccessModes, 'RWX'));
       let apiService;
       let app;
 

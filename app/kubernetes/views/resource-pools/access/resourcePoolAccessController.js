@@ -46,7 +46,7 @@ class KubernetesResourcePoolAccessController {
       const name = this.$transition$.params().id;
       let [endpoint, pool, configMap] = await Promise.all([
         this.EndpointService.endpoint(this.EndpointProvider.endpointID()),
-        this.KubernetesResourcePoolService.resourcePool(name),
+        this.KubernetesResourcePoolService.get(name),
         this.KubernetesConfigMapService.get(KubernetesPortainerConfigMapNamespace, KubernetesPortainerConfigMapConfigName)
       ]);
       const group = await this.GroupService.group(endpoint.GroupId);

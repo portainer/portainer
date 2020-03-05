@@ -1,34 +1,32 @@
 import _ from 'lodash-es';
+import angular from 'angular';
 
-angular.module("portainer.kubernetes").factory('KubernetesStackService', [
-  '$async', 'KubernetesApplicationService',
-  function KubernetesStackServiceFactory($async, KubernetesApplicationService) {
-    const service = {
-      stacks: stacks
-    };
+class KubernetesStackService {
+  /* @ngInject */
+  constructor($async, KubernetesApplicationService) {
+    this.$async = $async;
+    this.KubernetesApplicationService = KubernetesApplicationService;
 
-    /**
-     * Stacks
-     */
-    async function stacksAsync(namespace) {
-      try {
-        const applications = await KubernetesApplicationService.get(namespace);
-        const stacks = _.reduce(applications, (acc, app) => {
-          if (app.Stack !== '-' && !_.find(acc, (stack) => stack === app.Stack)) {
-            acc.push(app.Stack);
-          }
-          return acc;
-        }, []);
-        return stacks;
-      } catch (err) {
-        throw err;
-      }
-    }
-
-    function stacks(namespace) {
-      return $async(stacksAsync, namespace);
-    }
-
-    return service;
+    this.getAllAsync = this.getAllAsync.bind(this);
   }
-]);
+
+  /**
+   * GET
+   */
+  async getAllAsync(namespace) {
+    try {
+      const applications = await this.KubernetesApplicationService.get(namespace);
+      const stacks = _.map(applications, (item) => item.Stack);
+      return _.uniq(_.without(stacks, '-'));
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  get(namespace) {
+    return this.$async(this.getAllAsync, namespace);
+  }
+}
+
+export default KubernetesStackService;
+angular.module('portainer.kubernetes').service('KubernetesStackService', KubernetesStackService);

@@ -1,106 +1,99 @@
 import _ from 'lodash-es';
-import KubernetesNamespaceViewModel from 'Kubernetes/models/namespace';
 
-angular.module("portainer.kubernetes").factory("KubernetesNamespaceService", [
-  "$async", "KubernetesNamespaces",
-  function KubernetesNamespaceServiceFactory($async, KubernetesNamespaces) {
-    "use strict";
-    const service = {
-      namespaces: namespaces,
-      namespace: namespace,
-      create: create,
-      remove: remove
-    };
+import angular from 'angular';
+import PortainerError from 'Portainer/error';
+import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
+import KubernetesNamespaceConverter from 'Kubernetes/converters/namespace';
+import $allSettled from 'Portainer/services/allSettled';
 
-    /**
-     * Namespaces
-     */
-    async function namespacesAsync() {
-      try {
-        const data = await KubernetesNamespaces().get().$promise;
-        const namespaces = _.map(data.items, (item) => item.metadata.name);
-        const promises = _.map(namespaces, (item) => KubernetesNamespaces().status({id: item}).$promise);
-        const statuses = await Promise.allSettled(promises);
-        const visibleNamespaces = _.reduce(statuses, (result, item) => {
-          if (item.status === 'fulfilled' && item.value.status.phase !== 'Terminating') {
-            result.push(new KubernetesNamespaceViewModel(item.value));
-          }
-          return result
-        }, []);
-        return visibleNamespaces;
-      } catch (err) {
-        throw { msg: 'Unable to retrieve namespaces', err: err };
-      }
-    }
+class KubernetesNamespaceService {
+  /* @ngInject */
+  constructor($async, KubernetesNamespaces) {
+    this.$async = $async;
+    this.KubernetesNamespaces = KubernetesNamespaces;
 
-    function namespaces() {
-      return $async(namespacesAsync);
-    }
-
-    /**
-     * Namespace
-     */
-    async function namespaceAsync(name) {
-      try {
-        const payload = {
-          id: name
-        };
-        await KubernetesNamespaces().status({id: name}).$promise;
-        const [raw, yaml] = await Promise.all([
-          KubernetesNamespaces().get(payload).$promise,
-          KubernetesNamespaces().getYaml(payload).$promise
-        ]);
-        const namespace = new KubernetesNamespaceViewModel(raw);
-        namespace.Yaml = yaml;
-        return namespace;
-      } catch (err) {
-        throw { msg: 'Unable to retrieve namespace', err: err };
-      }
-    }
-
-    function namespace(name) {
-      return $async(namespaceAsync, name);
-    }
-
-    /**
-     * Create
-     */
-    async function createAsync(name) {
-      try {
-        const payload = {
-          metadata: {
-            name: name
-          }
-        };
-        const data = await KubernetesNamespaces().create(payload).$promise
-        return data;
-      } catch (err) {
-        throw { msg: 'Unable to create namespace', err: err };
-      }
-    }
-
-    function create(name) {
-      return $async(createAsync, name);
-    }
-
-    /**
-     * Delete
-     */
-    async function removeAsync(namespace) {
-      try {
-        const payload = {
-          id: namespace.Name
-        };
-        await KubernetesNamespaces().delete(payload).$promise
-      } catch (err) {
-        throw { msg: 'Unable to delete namespace', err: err };
-      }
-    }
-
-    function remove(namespace) {
-      return $async(removeAsync, namespace);
-    }
-
-    return service;
+    this.getAsync = this.getAsync.bind(this);
+    this.getAllAsync = this.getAllAsync.bind(this);
+    this.createAsync = this.createAsync.bind(this);
+    this.deleteAsync = this.deleteAsync.bind(this);
   }
-]);
+
+  /**
+   * GET
+   */
+  async getAsync(name) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = name;
+      await this.KubernetesNamespaces().status(params).$promise;
+      const [raw, yaml] = await Promise.all([
+        this.KubernetesNamespaces().get(params).$promise,
+        this.KubernetesNamespaces().getYaml(params).$promise
+      ]);
+      return KubernetesNamespaceConverter.apiToNamespace(raw, yaml);
+    } catch (err) {
+      throw new PortainerError('Unable to retrieve namespace', err);
+    }
+  }
+
+  async getAllAsync() {
+    try {
+      const data = await this.KubernetesNamespaces().get().$promise;
+      const promises = _.map(data.items, (item) => this.KubernetesNamespaces().status({id: item.metadata.name}).$promise);
+      const namespaces = await $allSettled(promises);
+      const visibleNamespaces = _.map(namespaces.fulfilled, (item) => {
+        if (item.status.phase !== 'Terminating') {
+          return KubernetesNamespaceConverter.apiToNamespace(item);
+        }
+      });
+      return _.without(visibleNamespaces, undefined);
+    } catch (err) {
+      throw new PortainerError('Unable to retrieve namespaces', err);
+    }
+  }
+
+  get(name) {
+    if (name) {
+      return this.$async(this.getAsync, name);
+    }
+    return this.$async(this.getAllAsync);
+  }
+
+  /**
+   * CREATE
+   */
+  async createAsync(name) {
+    try {
+      const payload = KubernetesNamespaceConverter.createPayload(name);
+      const params = {};
+      const data = await this.KubernetesNamespaces().create(params, payload).$promise
+      return data;
+    } catch (err) {
+      throw new PortainerError('Unable to create namespace', err);
+    }
+  }
+
+  create(name) {
+    return this.$async(this.createAsync, name);
+  }
+
+  /**
+   * DELETE
+   */
+  async deleteAsync(namespace) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = namespace.Name;
+      await this.KubernetesNamespaces().delete(params).$promise
+    } catch (err) {
+      throw new PortainerError('Unable to delete namespace', err);
+    }
+  }
+
+  delete(namespace) {
+    return this.$async(this.deleteAsync, namespace);
+  }
+}
+
+export default KubernetesNamespaceService;
+angular.module('portainer.kubernetes').service('KubernetesNamespaceService', KubernetesNamespaceService);

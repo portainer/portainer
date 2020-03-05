@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
-import { KubernetesApplication, KubernetesApplicationStackAnnotationKey, KubernetesApplicationDeploymentTypes, KubernetesApplicationDataAccessPolicies, KubernetesApplicationTypes } from "Kubernetes/models/application/models";
+import { KubernetesApplication, KubernetesApplicationStackAnnotationKey, KubernetesApplicationDeploymentTypes, KubernetesApplicationDataAccessPolicies, KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 
 class KubernetesApplicationConverter {

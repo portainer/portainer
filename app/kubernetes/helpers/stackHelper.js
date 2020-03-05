@@ -4,7 +4,7 @@ import { KubernetesStack } from 'Kubernetes/models/stack/models';
 class KubernetesStackHelper {
   static stacksFromApplications(applications) {
     const res = _.reduce(applications, (acc, app) => {
-      if (app.Stack !== "-") {
+      if (app.Stack !== '-') {
         const stack = _.find(acc, {Name: app.Stack});
         if (stack) {
           stack.ApplicationCount += 1;

@@ -48,7 +48,7 @@ class KubernetesNodeConverter {
     res.OS.Architecture = data.status.nodeInfo.architecture;
     res.OS.Platform = data.status.nodeInfo.operatingSystem;
     res.OS.Image = data.status.nodeInfo.osImage;
-    res.Yaml = yaml;
+    res.Yaml = yaml ? yaml.data : '';
     return res;
   }
 }

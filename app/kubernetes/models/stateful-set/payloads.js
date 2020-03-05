@@ -7,6 +7,7 @@ import { KubernetesCommonMetadataPayload } from "Kubernetes/models/common/payloa
     metadata: new KubernetesCommonMetadataPayload(),
     spec: {
       replicas: 0,
+      serviceName: '',
       selector: {
         matchLabels: {
           app: ''

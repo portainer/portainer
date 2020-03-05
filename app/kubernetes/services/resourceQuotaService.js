@@ -1,159 +1,125 @@
 import _ from 'lodash-es';
-import KubernetesResourceQuotaViewModel from 'Kubernetes/models/resourceQuota';
 
-angular.module("portainer.kubernetes").factory("KubernetesResourceQuotaService", [
-  "$async", "KubernetesResourceQuotas",
-  function KubernetesResourceQuotaServiceFactory($async, KubernetesResourceQuotas) {
-    "use strict";
-    const service = {
-      quota: quota,
-      quotas: quotas,
-      create: create,
-      update: update,
-      remove: remove,
-      removeCollection: removeCollection
-    };
+import angular from 'angular';
+import PortainerError from 'Portainer/error';
+import { KubernetesCommonParams } from 'Kubernetes/models/common/params';
+import KubernetesResourceQuotaConverter from 'Kubernetes/converters/resourceQuota';
 
-    /**
-     * Quota
-     */
-    async function quotaAsync(namespace, name) {
-      try {
-        const payload = {
-          id: name
-        };
-        const [raw, yaml] = await Promise.all([
-          KubernetesResourceQuotas(namespace).get(payload).$promise,
-          KubernetesResourceQuotas(namespace).getYaml(payload).$promise
-        ]);
-        const quota = new KubernetesResourceQuotaViewModel(raw);
-        quota.Yaml = yaml;
-        return quota;
-      } catch (err) {
-        throw { msg: 'Unable to retrieve resource quota', err: err };
-      }
-    }
+class KubernetesResourceQuotaService {
+  /* @ngInject */
+  constructor($async, KubernetesResourceQuotas) {
+    this.$async = $async;
+    this.KubernetesResourceQuotas = KubernetesResourceQuotas;
 
-    function quota(namespace, name) {
-      return $async(quotaAsync, namespace, name);
-    }
-
-    /**
-     * Quotas
-     */
-    async function quotasAsync(namespace) {
-      try {
-        const data = await KubernetesResourceQuotas(namespace).get().$promise;
-        const quotas = _.map(data.items, (item) => new KubernetesResourceQuotaViewModel(item));
-        return quotas;
-      } catch (err) {
-        throw { msg: 'Unable to retrieve resource quotas', err: err};
-      }
-    }
-
-    function quotas(namespace) {
-      return $async(quotasAsync, namespace);
-    }
-
-    /**
-     * Creation
-     */
-    async function createAsync(namespace, cpuLimit, memoryLimit) {
-      try {
-        const payload = {
-          metadata: {
-            name: 'portainer-rq-' + namespace,
-            namespace: namespace
-          },
-          spec: {
-            hard: {
-              'requests.cpu': cpuLimit,
-              'requests.memory': memoryLimit,
-              'limits.cpu': cpuLimit,
-              'limits.memory': memoryLimit,
-            }
-          }
-        };
-        if (cpuLimit === 0) {
-          delete payload.spec.hard['requests.cpu'];
-          delete payload.spec.hard['limits.cpu'];
-        }
-        if (memoryLimit ===0) {
-          delete payload.spec.hard['requests.memory'];
-          delete payload.spec.hard['limits.memory'];
-        }
-        const data = await KubernetesResourceQuotas(namespace).create(payload).$promise;
-        return data;
-      } catch (err) {
-        throw { msg: 'Unable to create quota', err:err };
-      }
-    }
-
-    function create(namespace, cpuLimit, memoryLimit) {
-      return $async(createAsync, namespace, cpuLimit, memoryLimit);
-    }
-
-    /**
-     * Update
-     */
-    async function updateAsync(quota, cpuLimit, memoryLimit) {
-      try {
-        quota.spec.hard['requests.cpu'] = cpuLimit;
-        quota.spec.hard['requests.memory'] = memoryLimit;
-        quota.spec.hard['limits.cpu'] = cpuLimit;
-        quota.spec.hard['limits.memory'] = memoryLimit;
-        if (cpuLimit === 0) {
-          delete quota.spec.hard['requests.cpu'];
-          delete quota.spec.hard['limits.cpu'];
-        }
-        if (memoryLimit === 0) {
-          delete quota.spec.hard['requests.memory'];
-          delete quota.spec.hard['limits.memory'];
-        }
-        const data = await KubernetesResourceQuotas(quota.metadata.namespace).update({}, quota).$promise;
-        return new KubernetesResourceQuotaViewModel(data);
-      } catch (err) {
-        throw { msg: 'Unable to update resource quota', err: err };
-      }
-    }
-
-    function update(quota, cpuLimit, memoryLimit) {
-      return $async(updateAsync, quota, cpuLimit, memoryLimit)
-    }
-
-    /**
-     * Delete
-     */
-    async function removeAsync(quota) {
-      try {
-        const payload = {
-          id: quota.Name
-        };
-        await KubernetesResourceQuotas(quota.Namespace).delete(payload).$promise;
-      } catch (err) {
-        throw { msg: 'Unable to delete quota', err: err };
-      }
-    }
-
-    function remove(quota) {
-      return $async(removeAsync, quota);
-    }
-
-    /**
-     * Delete collection
-     */
-    async function removeCollectionAsync(quota) {
-      try {
-        await KubernetesResourceQuotas(quota.Namespace).delete().$promise;
-      } catch (err) {
-        throw { msg: 'Unable to delete quotas', err: err };
-      }
-    }
-
-    function removeCollection(quota) {
-      return $async(removeCollectionAsync, quota);
-    }
-
-    return service;
+    this.getAsync = this.getAsync.bind(this);
+    this.getAllAsync = this.getAllAsync.bind(this);
+    this.createAsync = this.createAsync.bind(this);
+    this.updateAsync = this.updateAsync.bind(this);
+    this.deleteAsync = this.deleteAsync.bind(this);
+    this.removeCollectionAsync = this.removeCollectionAsync.bind(this);
   }
-]);
+
+  /**
+   * GET
+   */
+  async getAsync(namespace, name) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = name;
+      const [raw, yaml] = await Promise.all([
+        this.KubernetesResourceQuotas(namespace).get(params).$promise,
+        this.KubernetesResourceQuotas(namespace).getYaml(params).$promise
+      ]);
+      return KubernetesResourceQuotaConverter.apiToResourceQuota(raw, yaml);
+    } catch (err) {
+      throw new PortainerError('Unable to retrieve resource quota', err);
+    }
+  }
+
+  async getAllAsync(namespace) {
+    try {
+      const data = await this.KubernetesResourceQuotas(namespace).get().$promise;
+      return _.map(data.items, (item) => KubernetesResourceQuotaConverter.apiToResourceQuota(item));
+    } catch (err) {
+      throw new PortainerError('Unable to retrieve resource quotas', err);
+    }
+  }
+
+  get(namespace, name) {
+    if (name) {
+      return this.$async(this.getAsync, namespace, name);
+    }
+    return this.$async(this.getAllAsync, namespace);
+  }
+
+  /**
+   * CREATE
+   */
+  async createAsync(quota) {
+    try {
+      const payload = KubernetesResourceQuotaConverter.createPayload(quota);
+      const namespace = payload.metadata.namespace;
+      const params = {};
+      const data = await this.KubernetesResourceQuotas(namespace).create(params, payload).$promise;
+      return KubernetesResourceQuotaConverter.apiToResourceQuota(data);
+    } catch (err) {
+      throw new PortainerError('Unable to create quota', err);
+    }
+  }
+
+  create(quota) {
+    return this.$async(this.createAsync, quota);
+  }
+
+  /**
+   * UPDATE
+   */
+  async updateAsync(quota) {
+    try {
+      const payload = KubernetesResourceQuotaConverter.updatePayload(quota);
+      const params = new KubernetesCommonParams();
+      params.id = payload.metadata.name;
+      const namespace = payload.metadata.namespace;
+      const data = await this.KubernetesResourceQuotas(namespace).update(params, payload).$promise;
+      return data;
+    } catch (err) {
+      throw new PortainerError('Unable to update resource quota', err);
+    }
+  }
+
+  update(quota) {
+    return this.$async(this.updateAsync, quota);
+  }
+
+  /**
+   * DELETE
+   */
+  async deleteAsync(quota) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = quota.Name;
+      await this.KubernetesResourceQuotas(quota.Namespace).delete(params).$promise;
+    } catch (err) {
+      throw new PortainerError('Unable to delete quota', err);
+    }
+  }
+
+  delete(quota) {
+    return this.$async(this.deleteAsync, quota);
+  }
+
+  async removeCollectionAsync(quota) {
+    try {
+      await this.KubernetesResourceQuotas(quota.Namespace).delete().$promise;
+    } catch (err) {
+      throw new PortainerError('Unable to delete quotas', err);
+    }
+  }
+
+  removeCollection(quota) {
+    return this.$async(this.removeCollectionAsync, quota);
+  }
+}
+
+export default KubernetesResourceQuotaService;
+angular.module('portainer.kubernetes').service('KubernetesResourceQuotaService', KubernetesResourceQuotaService);

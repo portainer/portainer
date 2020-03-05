@@ -39,6 +39,7 @@ class KubernetesStatefulSetConverter {
     payload.metadata.namespace = statefulSet.Namespace;
     payload.metadata.annotations[KubernetesApplicationStackAnnotationKey] = statefulSet.StackName;
     payload.spec.replicas = statefulSet.ReplicaCount;
+    payload.spec.serviceName = statefulSet.ServiceName;
     payload.spec.selector.matchLabels.app = statefulSet.Name;
     payload.spec.volumeClaimTemplates = _.map(statefulSet.VolumeClaims, (item) => KubernetesPersistentVolumeClaimConverter.createPayload(item));
     payload.spec.template.metadata.labels.app = statefulSet.Name;
