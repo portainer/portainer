@@ -84,14 +84,15 @@ class KubernetesNodeController {
 
       this.ResourceReservation = { CPU: 0, Memory: 0 };
       this.applications = _.map(this.applications, app => {
-        const pods = _.filter(this.pods, pod => Object.values(pod.Metadata.labels).includes(app.Name));
-        const resourceReservation = KubernetesResourceReservationHelper.computeResourceReservation(pods);
+        app.pods = _.filter(this.pods, pod => Object.values(pod.Metadata.labels).includes(app.Name));
+        const resourceReservation = KubernetesResourceReservationHelper.computeResourceReservation(app.pods);
         app.CPU = resourceReservation.CPU;
         app.Memory = resourceReservation.Memory;
         this.ResourceReservation.CPU += resourceReservation.CPU;
         this.ResourceReservation.Memory += resourceReservation.Memory;
         return app;
       });
+      this.applications = _.filter(this.applications, app => app.pods.length !== 0);
       this.ResourceReservation.Memory = Math.floor(this.ResourceReservation.Memory / 1000 / 1000);
       this.memoryLimit = Math.floor(filesizeParser(this.node.Memory) / 1000 / 1000);
     } catch (err) {
