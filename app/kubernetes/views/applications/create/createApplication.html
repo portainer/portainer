@@ -242,6 +242,68 @@
           </div>
 
           <div class="col-sm-12 form-section-title">
+            Resource reservations
+          </div>
+
+          <div class="form-group" ng-if="!ctrl.state.resourcePoolHasQuota">
+            <div class="col-sm-12 small text-muted">
+              <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+              Resource reservations are applied per instance of the application.
+            </div>
+          </div>
+
+          <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded()">
+            <div class="col-sm-12 small text-muted">
+              <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+              A resource quota is set on this resource pool, you must specify resource reservations. Resource reservations are applied per instance of the application. Maximums are inherited from the resource pool quota.
+            </div>
+          </div>
+
+          <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
+            <div class="col-sm-12 small text-muted">
+              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+              This resource pool has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of the resource pool.
+            </div>
+          </div>
+
+          <!-- memory-limit-input -->
+          <div class="form-group" ng-if="!ctrl.state.resourcePoolHasQuota || (ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded())">
+            <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
+              Memory
+              <portainer-tooltip position="bottom" message="An instance of this application will reserve this amount of memory. If the instance memory usage exceeds the reservation, it might be subject to OOM."></portainer-tooltip>
+            </label>
+            <div class="col-sm-3">
+              <slider model="ctrl.formValues.MemoryLimit" floor="ctrl.state.sliders.memory.min" ceil="ctrl.state.sliders.memory.max" step="128"></slider>
+            </div>
+            <div class="col-sm-2">
+              <input name="memory_limit" ng-model="ctrl.formValues.MemoryLimit" type="number"
+                     min="{{ctrl.state.sliders.memory.min}}" max="{{ctrl.state.sliders.memory.max}}" class="form-control" id="memory-limit" required>
+            </div>
+            <div class="col-sm-4">
+              <p class="small text-muted" style="margin-top: 7px;">
+                Maximum memory usage (<b>MB</b>)
+              </p>
+            </div>
+          </div>
+          <!-- !memory-limit-input -->
+          <!-- cpu-limit-input -->
+          <div class="form-group" ng-if="!ctrl.state.resourcePoolHasQuota || (ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded())">
+            <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
+              CPU
+              <portainer-tooltip position="bottom" message="An instance of this application will reserve this amount of CPU. If the instance CPU usage exceeds the reservation, it might be subject to CPU throttling."></portainer-tooltip>
+            </label>
+            <div class="col-sm-5">
+              <slider model="ctrl.formValues.CpuLimit" floor="ctrl.state.sliders.cpu.min" ceil="ctrl.state.sliders.cpu.max" step="0.10" precision="2"></slider>
+            </div>
+            <div class="col-sm-4" style="margin-top: 20px;">
+              <p class="small text-muted">
+                Maximum CPU usage
+              </p>
+            </div>
+          </div>
+          <!-- !cpu-limit-input -->
+
+          <div class="col-sm-12 form-section-title">
             Deployment
           </div>
 
@@ -294,10 +356,17 @@
               <label class="control-label text-left">
                 Instance count
               </label>
-              <input type="number" class="form-control" placeholder="1" style="margin-left: 20px;" ng-model="ctrl.formValues.ReplicaCount" ng-disabled="!ctrl.supportScalableReplicaDeployment()">
+              <input type="number" class="form-control" min="1" max="9999" placeholder="1" style="margin-left: 20px;" ng-model="ctrl.formValues.ReplicaCount" ng-disabled="!ctrl.supportScalableReplicaDeployment()" ng-change="ctrl.enforceReplicaCountMinimum()">
             </div>
           </div>
           <!-- !replica count -->
+
+          <div class="form-group" ng-if="ctrl.resourceReservationsOverflow()">
+            <div class="col-sm-12 small text-muted">
+              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+              This application would exceed available resources. Please review resource reservations or the instance count.
+            </div>
+          </div>
 
           <div class="form-group" ng-if="!ctrl.supportScalableReplicaDeployment()">
             <div class="col-sm-12 small text-muted">
@@ -305,61 +374,6 @@
               The following storage option(s) do not support concurrent access from multiples instances: <code>{{ ctrl.getNonScalableStorage() }}</code>. You will not be able to scale that application.
             </div>
           </div>
-
-          <div class="col-sm-12 form-section-title">
-            Resource reservations
-          </div>
-
-          <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded()">
-            <div class="col-sm-12 small text-muted">
-              <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-              A resource quota is set on this resource pool, you must specify resource reservations for your application. Maximums are inherited from the resource pool quota.
-            </div>
-          </div>
-
-          <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
-            <div class="col-sm-12 small text-muted">
-              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-              This resource pool has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of the resource pool.
-            </div>
-          </div>
-
-          <!-- memory-limit-input -->
-          <div class="form-group" ng-if="!ctrl.state.resourcePoolHasQuota || (ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded())">
-            <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
-              Memory
-              <portainer-tooltip position="bottom" message="This application will reserve this amount of memory. If the application memory usage exceeds the reservation, it might be subject to OOM."></portainer-tooltip>
-            </label>
-            <div class="col-sm-3">
-              <slider model="ctrl.formValues.MemoryLimit" floor="ctrl.state.sliders.memory.min" ceil="ctrl.state.sliders.memory.max" step="128"></slider>
-            </div>
-            <div class="col-sm-2">
-              <input name="memory_limit" ng-model="ctrl.formValues.MemoryLimit" type="number"
-                     min="{{ctrl.state.sliders.memory.min}}" max="{{ctrl.state.sliders.memory.max}}" class="form-control" id="memory-limit" required>
-            </div>
-            <div class="col-sm-4">
-              <p class="small text-muted" style="margin-top: 7px;">
-                Maximum memory usage (<b>MB</b>)
-              </p>
-            </div>
-          </div>
-          <!-- !memory-limit-input -->
-          <!-- cpu-limit-input -->
-          <div class="form-group" ng-if="!ctrl.state.resourcePoolHasQuota || (ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded())">
-            <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
-              CPU
-              <portainer-tooltip position="bottom" message="This application will reserve this amount of CPU. If the application memory usage exceeds the reservation, it might be subject to CPU throttling."></portainer-tooltip>
-            </label>
-            <div class="col-sm-5">
-              <slider model="ctrl.formValues.CpuLimit" floor="ctrl.state.sliders.cpu.min" ceil="ctrl.state.sliders.cpu.max" step="0.10" precision="2"></slider>
-            </div>
-            <div class="col-sm-4" style="margin-top: 20px;">
-              <p class="small text-muted">
-                Maximum CPU usage
-              </p>
-            </div>
-          </div>
-          <!-- !cpu-limit-input -->
 
           <div class="col-sm-12 form-section-title">
             Publishing the application
@@ -463,7 +477,7 @@
           <div class="form-group">
             <div class="col-sm-12">
               <button type="button" class="btn btn-primary btn-sm"
-                      ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.state.actionInProgress"
+                      ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.resourceReservationsOverflow() || ctrl.state.actionInProgress"
                       ng-click="ctrl.deployApplication()" button-spinner="ctrl.state.actionInProgress">
                 <span ng-hide="ctrl.state.actionInProgress">Deploy application</span>
                 <span ng-show="ctrl.state.actionInProgress">Deployment in progress...</span>

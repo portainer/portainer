@@ -44,7 +44,9 @@
                   </td>
                 </tr>
                 <tr ng-if="ctrl.application.Limits.Cpu || ctrl.application.Limits.Memory">
-                  <td>Resource reservations</td>
+                  <td>
+                    <div>Resource reservations</div>
+                    <div class="text-muted small">per instance</div></td>
                   <td>
                     <div ng-if="ctrl.application.Limits.Cpu">CPU {{ ctrl.application.Limits.Cpu | kubernetesApplicationCPUValue }}</div>
                     <div ng-if="ctrl.application.Limits.Memory">Memory {{ ctrl.application.Limits.Memory | humansize }}</div>

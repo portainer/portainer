@@ -141,6 +141,30 @@ class KubernetesCreateApplicationController {
     return _.uniq(storageOptions).join(", ");
   }
 
+  enforceReplicaCountMinimum() {
+    if (this.formValues.ReplicaCount === null) {
+      this.formValues.ReplicaCount = 1;
+    }
+  }
+
+  resourceReservationsOverflow() {
+    const instances = this.formValues.ReplicaCount;
+    const cpu = this.formValues.CpuLimit;
+    const maxCpu = this.state.sliders.cpu.max;
+    const memory = this.formValues.MemoryLimit;
+    const maxMemory = this.state.sliders.memory.max;
+
+    if (cpu * instances > maxCpu) {
+      return true;
+    }
+
+    if (memory * instances > maxMemory) {
+      return true;
+    }
+
+    return false;
+  }
+
   publishViaLoadBalancerEnabled() {
     return this.state.useLoadBalancer;
   }
