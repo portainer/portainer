@@ -16,7 +16,6 @@ class KubernetesResourceQuotaService {
     this.createAsync = this.createAsync.bind(this);
     this.updateAsync = this.updateAsync.bind(this);
     this.deleteAsync = this.deleteAsync.bind(this);
-    this.removeCollectionAsync = this.removeCollectionAsync.bind(this);
   }
 
   /**
@@ -106,18 +105,6 @@ class KubernetesResourceQuotaService {
 
   delete(quota) {
     return this.$async(this.deleteAsync, quota);
-  }
-
-  async removeCollectionAsync(quota) {
-    try {
-      await this.KubernetesResourceQuotas(quota.Namespace).delete().$promise;
-    } catch (err) {
-      throw new PortainerError('Unable to delete quotas', err);
-    }
-  }
-
-  removeCollection(quota) {
-    return this.$async(this.removeCollectionAsync, quota);
   }
 }
 

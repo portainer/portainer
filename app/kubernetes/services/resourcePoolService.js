@@ -103,11 +103,7 @@ class KubernetesResourcePoolService {
    */
   async deleteAsync(pool) {
     try {
-      const promises = [this.KubernetesNamespaceService.delete(pool.Namespace)];
-      if (pool.Quota) {
-        promises.push(this.KubernetesResourceQuotaService.removeCollection(pool.Quota));
-      }
-      await Promise.all(promises);
+      await this.KubernetesNamespaceService.delete(pool.Namespace);
     } catch (err) {
       throw err;
     }
