@@ -1,3 +1,7 @@
+export const KubernetesPortainerResourcePoolNameLabel = "io.portainer.kubernetes.resourcepool.name";
+
+export const KubernetesPortainerResourcePoolOwnerLabel = "io.portainer.kubernetes.resourcepool.owner";
+
 /**
  * KubernetesResourcePool Model
  * ResourcePool is a composite model that includes

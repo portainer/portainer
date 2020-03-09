@@ -13,10 +13,11 @@ function bytesValue(mem) {
 
 class KubernetesCreateResourcePoolController {
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesNodeService, KubernetesResourcePoolService) {
+  constructor($async, $state, Notifications, KubernetesNodeService, KubernetesResourcePoolService, Authentication) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
+    this.Authentication = Authentication;
 
     this.KubernetesNodeService = KubernetesNodeService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
@@ -47,7 +48,8 @@ class KubernetesCreateResourcePoolController {
     this.state.actionInProgress = true;
     try {
       this.checkDefaults();
-      await this.KubernetesResourcePoolService.create(this.formValues.Name, this.formValues.hasQuota, this.formValues.CpuLimit, bytesValue(this.formValues.MemoryLimit));
+      const owner = this.Authentication.getUserDetails().username;
+      await this.KubernetesResourcePoolService.create(this.formValues.Name, owner, this.formValues.hasQuota, this.formValues.CpuLimit, bytesValue(this.formValues.MemoryLimit));
       this.Notifications.success('Resource pool successfully created', this.formValues.Name);
       this.$state.go('kubernetes.resourcePools');
     } catch (err) {

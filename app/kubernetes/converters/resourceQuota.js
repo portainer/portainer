@@ -4,6 +4,7 @@ import filesizeParser from 'filesize-parser';
 import { KubernetesResourceQuota } from 'Kubernetes/models/resource-quota/models';
 import { KubernetesResourceQuotaCreatePayload, KubernetesResourceQuotaUpdatePayload } from 'Kubernetes/models/resource-quota/payloads';
 import KubernetesResourceQuotaHelper from 'Kubernetes/helpers/resourceQuotaHelper';
+import { KubernetesPortainerResourcePoolNameLabel, KubernetesPortainerResourcePoolOwnerLabel } from 'Kubernetes/models/resource-pool/models';
 
 class KubernetesResourceQuotaConverter {
   static apiToResourceQuota(data, yaml) {
@@ -36,6 +37,8 @@ class KubernetesResourceQuotaConverter {
       }
     }
     res.Yaml = yaml ? yaml.data : '';
+    res.ResourcePoolName = data.metadata.labels ? data.metadata.labels[KubernetesPortainerResourcePoolNameLabel] : '';
+    res.ResourcePoolOwner = data.metadata.labels ? data.metadata.labels[KubernetesPortainerResourcePoolOwnerLabel] : '';
     return res;
   }
 
@@ -47,6 +50,10 @@ class KubernetesResourceQuotaConverter {
     res.spec.hard['requests.memory'] = quota.MemoryLimit;
     res.spec.hard['limits.cpu'] = quota.CpuLimit;
     res.spec.hard['limits.memory'] = quota.MemoryLimit;
+    res.metadata.labels[KubernetesPortainerResourcePoolNameLabel] = quota.ResourcePoolName;
+    if (quota.ResourcePoolOwner) {
+      res.metadata.labels[KubernetesPortainerResourcePoolOwnerLabel] = quota.ResourcePoolOwner;
+    }
     if (!quota.CpuLimit || quota.CpuLimit === 0) {
       delete res.spec.hard['requests.cpu'];
       delete res.spec.hard['limits.cpu'];
@@ -67,6 +74,10 @@ class KubernetesResourceQuotaConverter {
     res.spec.hard['requests.memory'] = quota.MemoryLimit;
     res.spec.hard['limits.cpu'] = quota.CpuLimit;
     res.spec.hard['limits.memory'] = quota.MemoryLimit;
+    res.metadata.labels[KubernetesPortainerResourcePoolNameLabel] = quota.ResourcePoolName;
+    if (quota.ResourcePoolOwner) {
+      res.metadata.labels[KubernetesPortainerResourcePoolOwnerLabel] = quota.ResourcePoolOwner;
+    }
     if (!quota.CpuLimit || quota.CpuLimit === 0) {
       delete res.spec.hard['requests.cpu'];
       delete res.spec.hard['limits.cpu'];

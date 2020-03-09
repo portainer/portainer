@@ -6,7 +6,9 @@ const _KubernetesNamespace = Object.freeze({
   Name: '',
   CreatedAt: '',
   Status: '',
-  Yaml: ''
+  Yaml: '',
+  ResourcePoolName: '',
+  ResourcePoolOwner: '',
 });
 
 export class KubernetesNamespace {

@@ -64,17 +64,21 @@ class KubernetesEditResourcePoolController {
     this.state.showEditorTab = true;
   }
 
-  async createLimitRangeAsync(namespace, cpuLimit, memoryLimit) {
+  async createLimitRangeAsync(namespace, owner, cpuLimit, memoryLimit) {
     const limitRange = new KubernetesLimitRange(namespace);
     limitRange.CPU = cpuLimit
     limitRange.Memory = memoryLimit;
+    limitRange.ResourcePoolName = namespace;
+    limitRange.ResourcePoolOwner = owner;
     return await this.KubernetesLimitRangeService.create(limitRange);
   }
 
-  async createResourceQuotaAsync(namespace, cpuLimit, memoryLimit) {
+  async createResourceQuotaAsync(namespace, owner, cpuLimit, memoryLimit) {
     const quota = new KubernetesResourceQuota(namespace);
     quota.CpuLimit = cpuLimit;
     quota.MemoryLimit = memoryLimit;
+    quota.ResourcePoolName = namespace;
+    quota.ResourcePoolOwner = owner;
     await this.KubernetesResourceQuotaService.create(quota);
   }
 
@@ -85,6 +89,7 @@ class KubernetesEditResourcePoolController {
       const namespace = this.pool.Namespace.Name;
       const cpuLimit = this.formValues.CpuLimit;
       const memoryLimit = bytesValue(this.formValues.MemoryLimit);
+      const owner = this.pool.Namespace.ResourcePoolOwner;
       const quota = this.pool.Quota;
 
       if (this.formValues.hasQuota) {
@@ -93,11 +98,11 @@ class KubernetesEditResourcePoolController {
           quota.MemoryLimit = memoryLimit;
           await this.KubernetesResourceQuotaService.update(quota);
           if (!this.pool.LimitRange) {
-            await this.createLimitRangeAsync(namespace, cpuLimit, memoryLimit);
+            await this.createLimitRangeAsync(namespace, owner, cpuLimit, memoryLimit);
           }
         } else {
-          await this.createResourceQuotaAsync(namespace, cpuLimit, memoryLimit);
-          await this.createLimitRangeAsync(namespace, cpuLimit, memoryLimit);
+          await this.createResourceQuotaAsync(namespace, owner, cpuLimit, memoryLimit);
+          await this.createLimitRangeAsync(namespace, owner, cpuLimit, memoryLimit);
         }
       } else if (quota) {
         await this.KubernetesResourceQuotaService.delete(quota);

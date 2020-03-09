@@ -7,6 +7,7 @@ import KubernetesResourcePoolConverter from 'Kubernetes/converters/resourcePool'
 import KubernetesResourcePoolHelper from 'Kubernetes/helpers/resourcePoolHelper';
 import KubernetesLimitRangeHelper from 'Kubernetes/helpers/limitRangeHelper';
 import KubernetesResourceQuotaHelper from 'Kubernetes/helpers/resourceQuotaHelper';
+import { KubernetesNamespace } from 'Kubernetes/models/namespace/models';
 
 class KubernetesResourcePoolService {
   /* @ngInject */
@@ -76,17 +77,25 @@ class KubernetesResourcePoolService {
    * CREATE
    */
   // TODO: review LR future
-  async createAsync(name, hasQuota, cpuLimit, memoryLimit) {
+  async createAsync(name, owner, hasQuota, cpuLimit, memoryLimit) {
     try {
-      await this.KubernetesNamespaceService.create(name);
+      const namespace = new KubernetesNamespace();
+      namespace.Name = name;
+      namespace.ResourcePoolName = name;
+      namespace.ResourcePoolOwner = owner;
+      await this.KubernetesNamespaceService.create(namespace);
       if (hasQuota) {
         const quota = new KubernetesResourceQuota(name);
         quota.CpuLimit = cpuLimit;
         quota.MemoryLimit = memoryLimit;
+        quota.ResourcePoolName = name;
+        quota.ResourcePoolOwner = owner;
         await this.KubernetesResourceQuotaService.create(quota);
         const limitRange = new KubernetesLimitRange(name);
         limitRange.CPU = cpuLimit;
         limitRange.Memory = memoryLimit;
+        limitRange.ResourcePoolName = name;
+        limitRange.ResourcePoolOwner = owner;
         await this.KubernetesLimitRangeService.create(limitRange);
       }
     } catch (err) {
@@ -94,8 +103,8 @@ class KubernetesResourcePoolService {
     }
   }
 
-  create(name, hasQuota, cpuLimit, memoryLimit) {
-    return this.$async(this.createAsync, name, hasQuota, cpuLimit, memoryLimit);
+  create(name, owner, hasQuota, cpuLimit, memoryLimit) {
+    return this.$async(this.createAsync, name, owner, hasQuota, cpuLimit, memoryLimit);
   }
 
   /**

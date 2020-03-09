@@ -18,7 +18,9 @@ const _KubernetesResourceQuota = Object.freeze({
   MemoryLimit: KubernetesResourceQuotaDefaults.MemoryLimit,
   CpuLimitUsed: KubernetesResourceQuotaDefaults.CpuLimit,
   MemoryLimitUsed: KubernetesResourceQuotaDefaults.MemoryLimit,
-  Yaml: ''
+  Yaml: '',
+  ResourcePoolName: '',
+  ResourcePoolOwner: '',
 });
 
 export class KubernetesResourceQuota {

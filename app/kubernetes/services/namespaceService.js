@@ -62,9 +62,9 @@ class KubernetesNamespaceService {
   /**
    * CREATE
    */
-  async createAsync(name) {
+  async createAsync(namespace) {
     try {
-      const payload = KubernetesNamespaceConverter.createPayload(name);
+      const payload = KubernetesNamespaceConverter.createPayload(namespace);
       const params = {};
       const data = await this.KubernetesNamespaces().create(params, payload).$promise
       return data;
@@ -73,8 +73,8 @@ class KubernetesNamespaceService {
     }
   }
 
-  create(name) {
-    return this.$async(this.createAsync, name);
+  create(namespace) {
+    return this.$async(this.createAsync, namespace);
   }
 
   /**

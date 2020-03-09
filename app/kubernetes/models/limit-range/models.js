@@ -16,7 +16,9 @@ const _KubernetesLimitRange = Object.freeze({
   Name: '',
   Yaml: '',
   CPU: KubernetesLimitRangeDefaults.CpuLimit,
-  Memory: KubernetesLimitRangeDefaults.MemoryLimit
+  Memory: KubernetesLimitRangeDefaults.MemoryLimit,
+  ResourcePoolName: '',
+  ResourcePoolOwner: '',
 });
 
 export class KubernetesLimitRange {
