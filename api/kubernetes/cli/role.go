@@ -7,12 +7,10 @@ import (
 )
 
 func getPortainerUserDefaultPolicies() []rbacv1.PolicyRule {
-	// TODO: this policy should not allow to list resourcequotas in the cluster
-	// To be removed once the front-end has been refactored to list resourcesquotas inside namespaces
 	return []rbacv1.PolicyRule{
 		{
 			Verbs:     []string{"list"},
-			Resources: []string{"namespaces", "resourcequotas", "nodes"},
+			Resources: []string{"namespaces", "nodes"},
 			APIGroups: []string{""},
 		},
 	}
