@@ -2,10 +2,11 @@ import angular from 'angular';
 
 class KubernetesResourcePoolsController {
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesResourcePoolService) {
+  constructor($async, $state, Notifications, ModalService, KubernetesResourcePoolService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
+    this.ModalService = ModalService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
 
     this.getResourcePools = this.getResourcePools.bind(this);
@@ -34,7 +35,13 @@ class KubernetesResourcePoolsController {
   }
 
   removeAction(selectedItems) {
-    return this.$async(this.removeActionAsync, selectedItems);
+    this.ModalService.confirmDeletion(
+      'Do you want to remove the selected resource pool(s)? All the resources associated to the selected resource pool(s) will be removed too.',
+      (confirmed) => {
+        if (confirmed) {
+          return this.$async(this.removeActionAsync, selectedItems);
+        }
+      });
   }
 
   async getResourcePoolsAsync() {
