@@ -3,10 +3,9 @@ import {Terminal} from 'xterm';
 
 class KubernetesApplicationConsoleController {
   /* @ngInject */
-  constructor($async, $state, $transition$, Notifications, KubernetesApplicationService, EndpointProvider, LocalStorage) {
+  constructor($async, $state, Notifications, KubernetesApplicationService, EndpointProvider, LocalStorage) {
     this.$async = $async;
     this.$state = $state;
-    this.$transition$ = $transition$;
     this.Notifications = Notifications;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.EndpointProvider = EndpointProvider;

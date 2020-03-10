@@ -13,12 +13,11 @@ function bytesValue(mem) {
   return mem * 1000 * 1000;
 }
 
-class KubernetesEditResourcePoolController {
+class KubernetesResourcePoolController {
   /* @ngInject */
-  constructor($async, $state, $transition$, Authentication, Notifications, KubernetesNodeService, KubernetesResourceQuotaService, KubernetesResourcePoolService, KubernetesLimitRangeService, KubernetesEventService, KubernetesPodService, KubernetesApplicationService) {
+  constructor($async, $state, Authentication, Notifications, KubernetesNodeService, KubernetesResourceQuotaService, KubernetesResourcePoolService, KubernetesLimitRangeService, KubernetesEventService, KubernetesPodService, KubernetesApplicationService) {
     this.$async = $async;
     this.$state = $state;
-    this.$transition$ = $transition$;
     this.Notifications = Notifications;
     this.Authentication = Authentication;
 
@@ -247,5 +246,5 @@ class KubernetesEditResourcePoolController {
   }
 }
 
-export default KubernetesEditResourcePoolController;
-angular.module('portainer.kubernetes').controller('KubernetesEditResourcePoolController', KubernetesEditResourcePoolController);
+export default KubernetesResourcePoolController;
+angular.module('portainer.kubernetes').controller('KubernetesResourcePoolController', KubernetesResourcePoolController);

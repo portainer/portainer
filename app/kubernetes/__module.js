@@ -24,9 +24,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     url: '/applications',
     views: {
       'content@': {
-        templateUrl: './views/applications/applications.html',
-        controller: 'KubernetesApplicationsController',
-        controllerAs: 'ctrl'
+        component: 'kubernetesApplicationsView'
       }
     }
   };
@@ -36,9 +34,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     url: '/new',
     views: {
       'content@': {
-        templateUrl: './views/applications/create/createApplication.html',
-        controller: 'KubernetesCreateApplicationController',
-        controllerAs: 'ctrl'
+        component: 'kubernetesCreateApplicationView'
       }
     }
   };
@@ -48,9 +44,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     url: '/:namespace/:name',
     views: {
       'content@': {
-        templateUrl: './views/applications/inspect/application.html',
-        controller: 'KubernetesApplicationController',
-        controllerAs: 'ctrl'
+        component: 'kubernetesApplicationView'
       }
     }
   };
@@ -60,9 +54,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     url: '/:pod/console',
     views: {
       'content@': {
-        templateUrl: './views/applications/console/console.html',
-        controller: 'KubernetesApplicationConsoleController',
-        controllerAs: 'ctrl'
+        component: 'kubernetesApplicationConsoleView'
       }
     }
   };
@@ -72,9 +64,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     url: '/:pod/logs',
     views: {
       'content@': {
-        templateUrl: './views/applications/logs/logs.html',
-        controller: 'KubernetesApplicationLogsController',
-        controllerAs: 'ctrl'
+        component: 'kubernetesApplicationLogsView'
       }
     }
   };
@@ -84,9 +74,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     url: '/cluster',
     views: {
       'content@': {
-        templateUrl: './views/cluster/cluster.html',
-        controller: 'KubernetesClusterController',
-        controllerAs: 'ctrl'
+        component: 'kubernetesClusterView'
       }
     }
   };
@@ -96,9 +84,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     url: '/:name',
     views: {
       'content@': {
-        templateUrl: './views/cluster/node/node.html',
-        controller: 'KubernetesNodeController',
-        controllerAs: 'ctrl'
+        component: 'kubernetesNodeView'
       }
     }
   };
@@ -108,9 +94,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     url: '/dashboard',
     views: {
       'content@': {
-        templateUrl: './views/dashboard/dashboard.html',
-        controller: 'KubernetesDashboardController',
-        controllerAs: 'ctrl'
+        component: 'kubernetesDashboardView'
       }
     }
   };
@@ -120,9 +104,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     url: '/deploy',
     views: {
       'content@': {
-        templateUrl: './views/deploy/deploy.html',
-        controller: 'KubernetesDeployController',
-        controllerAs: 'ctrl'
+        component: 'kubernetesDeployView'
       }
     }
   };
@@ -132,9 +114,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     url: '/pools',
     views: {
       'content@': {
-        templateUrl: './views/resource-pools/resourcePools.html',
-        controller: 'KubernetesResourcePoolsController',
-        controllerAs: 'ctrl'
+        component: 'kubernetesResourcePoolsView'
       }
     }
   };
@@ -144,9 +124,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     url: '/new',
     views: {
       'content@': {
-        templateUrl: './views/resource-pools/create/createResourcePool.html',
-        controller: 'KubernetesCreateResourcePoolController',
-        controllerAs: 'ctrl'
+        component: 'kubernetesCreateResourcePoolView'
       }
     }
   };
@@ -156,9 +134,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     url: '/:id',
     views: {
       'content@': {
-        templateUrl: './views/resource-pools/edit/resourcePool.html',
-        controller: 'KubernetesEditResourcePoolController',
-        controllerAs: 'ctrl'
+        component: 'kubernetesResourcePoolView'
       }
     }
   };
@@ -168,9 +144,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     url: '/access',
     views: {
       'content@': {
-        templateUrl: './views/resource-pools/access/resourcePoolAccess.html',
-        controller: 'KubernetesResourcePoolAccessController',
-        controllerAs: 'ctrl'
+        component: 'kubernetesResourcePoolAccessView'
       }
     }
   };

@@ -4,10 +4,9 @@ import {KubernetesApplicationDeploymentTypes} from 'Kubernetes/models/applicatio
 
 class KubernetesApplicationController {
   /* @ngInject */
-  constructor($async, $state, $transition$, clipboard, Notifications, KubernetesApplicationService, KubernetesEventService) {
+  constructor($async, $state, clipboard, Notifications, KubernetesApplicationService, KubernetesEventService) {
     this.$async = $async;
     this.$state = $state;
-    this.$transition$ = $transition$;
     this.clipboard = clipboard;
     this.Notifications = Notifications;
     this.KubernetesApplicationService = KubernetesApplicationService;

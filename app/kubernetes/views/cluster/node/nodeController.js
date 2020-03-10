@@ -5,10 +5,9 @@ import KubernetesResourceReservationHelper from 'Kubernetes/helpers/kubernetesRe
 
 class KubernetesNodeController {
   /* @ngInject */
-  constructor($async, $state, $transition$, Notifications, KubernetesNodeService, KubernetesEventService, KubernetesPodService, KubernetesApplicationService) {
+  constructor($async, $state, Notifications, KubernetesNodeService, KubernetesEventService, KubernetesPodService, KubernetesApplicationService) {
     this.$async = $async;
     this.$state = $state;
-    this.$transition$ = $transition$;
     this.Notifications = Notifications;
     this.KubernetesNodeService = KubernetesNodeService;
     this.KubernetesEventService = KubernetesEventService;

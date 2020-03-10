@@ -6,10 +6,9 @@ import KubernetesConfigMapConverter from 'Kubernetes/converters/configMap';
 
 class KubernetesResourcePoolAccessController {
   /* @ngInject */
-  constructor($async, $state, $transition$, Notifications, KubernetesResourcePoolService, KubernetesConfigMapService, EndpointProvider, EndpointService, GroupService, AccessService) {
+  constructor($async, $state, Notifications, KubernetesResourcePoolService, KubernetesConfigMapService, EndpointProvider, EndpointService, GroupService, AccessService) {
     this.$async = $async;
     this.$state = $state;
-    this.$transition$ = $transition$;
     this.Notifications = Notifications;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesConfigMapService = KubernetesConfigMapService;

@@ -2,11 +2,9 @@ import angular from 'angular';
 
 class KubernetesApplicationLogsController {
   /* @ngInject */
-  constructor($async, $scope, $state, $transition$, $interval, Notifications, KubernetesApplicationService, KubernetesPodService) {
+  constructor($async, $state, $interval, Notifications, KubernetesApplicationService, KubernetesPodService) {
     this.$async = $async;
     this.$state = $state;
-    this.$scope = $scope;
-    this.$transition$ = $transition$;
     this.$interval = $interval;
     this.Notifications = Notifications;
     this.KubernetesApplicationService = KubernetesApplicationService;
@@ -53,8 +51,6 @@ class KubernetesApplicationLogsController {
       search: ''
     };
 
-    this.$scope.$on('$destroy', this.stopRepeater);
-
     const podName = this.$transition$.params().pod;
     const applicationName = this.$transition$.params().name;
     const namespace = this.$transition$.params().namespace;
@@ -73,6 +69,10 @@ class KubernetesApplicationLogsController {
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve application logs');
     }
+  }
+
+  $onDestroy() {
+    this.stopRepeater();
   }
 
   $onInit() {
