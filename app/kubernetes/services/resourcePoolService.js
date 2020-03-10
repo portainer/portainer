@@ -4,7 +4,6 @@ import { KubernetesResourceQuota } from 'Kubernetes/models/resource-quota/models
 
 import angular from 'angular';
 import KubernetesResourcePoolConverter from 'Kubernetes/converters/resourcePool';
-import KubernetesResourcePoolHelper from 'Kubernetes/helpers/resourcePoolHelper';
 import KubernetesLimitRangeHelper from 'Kubernetes/helpers/limitRangeHelper';
 import KubernetesResourceQuotaHelper from 'Kubernetes/helpers/resourceQuotaHelper';
 import { KubernetesNamespace } from 'Kubernetes/models/namespace/models';
