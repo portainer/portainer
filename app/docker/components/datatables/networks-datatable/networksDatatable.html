@@ -140,6 +140,13 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeName' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('Created')">
+                  Created
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Created' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Created' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
               <th ng-if="$ctrl.showOwnershipColumn">
                 <a ng-click="$ctrl.changeOrderBy('ResourceControl.Ownership')">
                   Ownership
