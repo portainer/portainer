@@ -51,15 +51,9 @@ class KubernetesResourcePoolService {
 
   async getAllAsync() {
     try {
-      const [namespaces, quotas] = await Promise.all([
-        this.KubernetesNamespaceService.get(),
-        this.KubernetesResourceQuotaService.get()
-      ]);
-      const pools = _.map(namespaces, (item) => {
-        const pool = KubernetesResourcePoolConverter.apiToResourcePool(item);
-        KubernetesResourcePoolHelper.bindQuotaToResourcePool(pool, quotas);
-        return pool;
-      });
+      const namespaces = await this.KubernetesNamespaceService.get();
+      const promises = _.map(namespaces, (item) => this.getAsync(item.Name));
+      const pools = await Promise.all(promises);
       return pools;
     } catch (err) {
       throw err;
