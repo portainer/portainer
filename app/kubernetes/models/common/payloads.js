@@ -5,7 +5,6 @@ const _KubernetesCommonMetadataPayload = Object.freeze({
   uid: '',
   name: '',
   namespace: '',
-  annotations: {},
   labels: {}
 })
 export class KubernetesCommonMetadataPayload {

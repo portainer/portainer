@@ -25,7 +25,7 @@ class KubernetesPodConverter {
     res.Node = data.spec.nodeName;
     res.CreatedAt = data.status.startTime;
     res.Containers = data.spec.containers;
-    res.Metadata = data.metadata;
+    res.Labels = data.metadata.labels;
     return res;
   }
 }

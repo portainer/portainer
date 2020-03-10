@@ -11,7 +11,7 @@ const _KubernetesPod = Object.freeze({
   Node: '',
   CreatedAt: '',
   Containers: [],
-  Metadata: {}
+  Labels: []
 });
 
 export class KubernetesPod {

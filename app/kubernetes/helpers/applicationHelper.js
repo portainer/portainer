@@ -42,7 +42,6 @@ class KubernetesApplicationHelper {
     const secret = new KubernetesApplicationSecret();
     secret.Name = app.Name;
     secret.Namespace = app.Namespace;
-    secret.StackName = app.StackName;
     _.forEach(envVariables, (item) => {
       let envVar = {
         name: item.Name

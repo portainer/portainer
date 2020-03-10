@@ -20,7 +20,11 @@ export const KubernetesApplicationPublishingTypes = Object.freeze({
   'LOADBALANCER': 3
 });
 
-export const KubernetesApplicationStackAnnotationKey = 'io.portainer.kubernetes.stack';
+export const KubernetesPortainerApplicationStackNameLabel = 'io.portainer.kubernetes.application.stack';
+
+export const KubernetesPortainerApplicationNameLabel = 'io.portainer.kubernetes.application.name';
+
+export const KubernetesPortainerApplicationOwnerLabel = 'io.portainer.kubernetes.application.owner';
 
 /**
  * KubernetesApplication Model
@@ -28,7 +32,8 @@ export const KubernetesApplicationStackAnnotationKey = 'io.portainer.kubernetes.
 const _KubernetesApplication = Object.freeze({
   Id: '',
   Name: '',
-  Stack: '',
+  StackName: '',
+  ApplicationOwner: '',
   ResourcePool: '',
   Image: '',
   CreatedAt: 0,

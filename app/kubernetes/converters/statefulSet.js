@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
 import {KubernetesStatefulSet} from 'Kubernetes/models/stateful-set/models';
 import {KubernetesStatefulSetCreatePayload} from 'Kubernetes/models/stateful-set/payloads';
-import {KubernetesApplicationStackAnnotationKey} from 'Kubernetes/models/application/models';
+import {KubernetesPortainerApplicationStackNameLabel, KubernetesPortainerApplicationNameLabel, KubernetesPortainerApplicationOwnerLabel} from 'Kubernetes/models/application/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 import KubernetesPersistentVolumeClaimConverter from './persistentVolumeClaim';
 
@@ -19,6 +19,7 @@ class KubernetesStatefulSetConverter {
     res.Namespace = formValues.ResourcePool.Namespace.Name;
     res.Name = formValues.Name;
     res.StackName = formValues.StackName ? formValues.StackName : formValues.Name;
+    res.ApplicationOwner = formValues.ApplicationOwner;
     res.ReplicaCount = formValues.ReplicaCount;
     res.Image = formValues.Image;
     res.Env = [];
@@ -37,7 +38,9 @@ class KubernetesStatefulSetConverter {
     const payload = new KubernetesStatefulSetCreatePayload();
     payload.metadata.name = statefulSet.Name;
     payload.metadata.namespace = statefulSet.Namespace;
-    payload.metadata.annotations[KubernetesApplicationStackAnnotationKey] = statefulSet.StackName;
+    payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = statefulSet.StackName;
+    payload.metadata.labels[KubernetesPortainerApplicationNameLabel] = statefulSet.Name;
+    payload.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = statefulSet.ApplicationOwner;
     payload.spec.replicas = statefulSet.ReplicaCount;
     payload.spec.serviceName = statefulSet.ServiceName;
     payload.spec.selector.matchLabels.app = statefulSet.Name;

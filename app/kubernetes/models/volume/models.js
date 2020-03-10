@@ -4,7 +4,6 @@
 const _KubernetesPersistentVolumeClaim = Object.freeze({
   Name: '',
   Namespace: '',
-  StackName: '',
   Storage: 0,
   StorageClass: ''
 });

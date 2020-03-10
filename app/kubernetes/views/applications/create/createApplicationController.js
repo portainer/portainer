@@ -16,11 +16,12 @@ function megaBytesValue(mem) {
 }
 class KubernetesCreateApplicationController {
   /* @ngInject */
-  constructor($async, $state, Notifications, EndpointProvider, KubernetesResourcePoolService, KubernetesApplicationService, KubernetesStackService, KubernetesNodeService) {
+  constructor($async, $state, Notifications, EndpointProvider, Authentication, KubernetesResourcePoolService, KubernetesApplicationService, KubernetesStackService, KubernetesNodeService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
     this.EndpointProvider = EndpointProvider;
+    this.Authentication = Authentication;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesStackService = KubernetesStackService;
@@ -172,6 +173,7 @@ class KubernetesCreateApplicationController {
   async deployApplicationAsync() {
     this.state.actionInProgress = true;
     try {
+      this.formValues.ApplicationOwner = this.Authentication.getUserDetails().username;
       await this.KubernetesApplicationService.create(this.formValues);
       this.Notifications.success('Application successfully deployed', this.formValues.Name);
       this.$state.go('kubernetes.applications');

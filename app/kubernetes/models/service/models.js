@@ -15,7 +15,9 @@ const _KubernetesService = Object.freeze({
   StackName: '',
   Ports: [],
   Type: '',
-  ClusterIP: ''
+  ClusterIP: '',
+  ApplicationName: '',
+  ApplicationOwner: '',
 });
 
 export class KubernetesService {

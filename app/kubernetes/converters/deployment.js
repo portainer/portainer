@@ -1,6 +1,6 @@
 import {KubernetesDeployment} from 'Kubernetes/models/deployment/models';
 import {KubernetesDeploymentCreatePayload} from 'Kubernetes/models/deployment/payloads';
-import {KubernetesApplicationStackAnnotationKey} from 'Kubernetes/models/application/models';
+import {KubernetesPortainerApplicationStackNameLabel, KubernetesPortainerApplicationNameLabel, KubernetesPortainerApplicationOwnerLabel} from 'Kubernetes/models/application/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 
 function bytesValue(mem) {
@@ -17,6 +17,7 @@ class KubernetesDeploymentConverter {
     res.Namespace = formValues.ResourcePool.Namespace.Name;
     res.Name = formValues.Name;
     res.StackName = formValues.StackName ? formValues.StackName : formValues.Name;
+    res.ApplicationOwner = formValues.ApplicationOwner;
     res.ReplicaCount = formValues.ReplicaCount;
     res.Image = formValues.Image;
     res.Env = [];
@@ -35,7 +36,9 @@ class KubernetesDeploymentConverter {
     const payload = new KubernetesDeploymentCreatePayload();
     payload.metadata.name = deployment.Name;
     payload.metadata.namespace = deployment.Namespace;
-    payload.metadata.annotations[KubernetesApplicationStackAnnotationKey] = deployment.StackName;
+    payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = deployment.StackName;
+    payload.metadata.labels[KubernetesPortainerApplicationNameLabel] = deployment.Name;
+    payload.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = deployment.ApplicationOwner;
     payload.spec.replicas = deployment.ReplicaCount;
     payload.spec.selector.matchLabels.app = deployment.Name;
     payload.spec.template.metadata.labels.app = deployment.Name;

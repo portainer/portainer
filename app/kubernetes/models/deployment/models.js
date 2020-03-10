@@ -12,7 +12,9 @@ const _KubernetesDeployment = Object.freeze({
   MemoryLimit: 0,
   VolumeMounts: [],
   Volumes: [],
-  Secret: undefined
+  Secret: undefined,
+  ApplicationName: '',
+  ApplicationOwner: '',
 });
 
 export class KubernetesDeployment {

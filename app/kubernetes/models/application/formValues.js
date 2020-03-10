@@ -7,6 +7,7 @@ const _KubernetesApplicationFormValues = Object.freeze({
   ResourcePool: '',
   Name: '',
   StackName: '',
+  ApplicationOwner: '',
   Image: '',
   ReplicaCount: 1,
   EnvironmentVariables: [],

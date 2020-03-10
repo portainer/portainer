@@ -14,7 +14,9 @@ const _KubernetesStatefulSet = Object.freeze({
   Volumes: [],
   Secret: undefined,
   VolumeClaims: [],
-  ServiceName: ''
+  ServiceName: '',
+  ApplicationName: '',
+  ApplicationOwner: '',
 });
 
 export class KubernetesStatefulSet {

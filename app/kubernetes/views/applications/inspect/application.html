@@ -29,7 +29,7 @@
                 </tr>
                 <tr>
                   <td>Stack</td>
-                  <td>{{ ctrl.application.Stack }}</td>
+                  <td>{{ ctrl.application.StackName }}</td>
                 </tr>
                 <tr>
                   <td>Resource pool</td>
@@ -53,8 +53,8 @@
                   </td>
                 </tr>
                 <tr>
-                  <td>Creation date</td>
-                  <td>{{ ctrl.application.CreatedAt | getisodate }}</td>
+                  <td>Creation</td>
+                  <td>{{ ctrl.application.CreatedAt | getisodate }}{{ ctrl.application.ApplicationOwner ? ' by ' + ctrl.application.ApplicationOwner : ''}}</td>
                 </tr>
                 </tbody>
               </table>

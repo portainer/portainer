@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 import { KubernetesServiceCreatePayload } from 'Kubernetes/models/service/payloads';
-import { KubernetesApplicationStackAnnotationKey } from 'Kubernetes/models/application/models';
+import { KubernetesPortainerApplicationStackNameLabel, KubernetesPortainerApplicationNameLabel, KubernetesPortainerApplicationOwnerLabel } from 'Kubernetes/models/application/models';
 import { KubernetesServiceHeadlessClusterIP, KubernetesService, KubernetesServicePort, KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import { KubernetesApplicationPublishingTypes } from 'Kubernetes/models/application/models';
 import KubernetesServiceHelper from 'Kubernetes/helpers/serviceHelper';
@@ -29,6 +29,7 @@ class KubernetesServiceConverter {
     res.Namespace = formValues.ResourcePool.Namespace.Name;
     res.Name = formValues.Name;
     res.StackName = formValues.StackName ? formValues.StackName : formValues.Name;
+    res.ApplicationOwner = formValues.ApplicationOwner;
     if (formValues.PublishingType === KubernetesApplicationPublishingTypes.CLUSTER) {
       res.Type = KubernetesServiceTypes.NODE_PORT;
     } else if (formValues.PublishingType === KubernetesApplicationPublishingTypes.LOADBALANCER) {
@@ -46,7 +47,9 @@ class KubernetesServiceConverter {
     const payload = new KubernetesServiceCreatePayload();
     payload.metadata.name = service.Name;
     payload.metadata.namespace = service.Namespace;
-    payload.metadata.annotations[KubernetesApplicationStackAnnotationKey] = service.StackName;
+    payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = service.StackName;
+    payload.metadata.labels[KubernetesPortainerApplicationNameLabel] = service.Name;
+    payload.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = service.ApplicationOwner;
     payload.spec.ports = service.Ports;
     payload.spec.selector.app = service.Name;
     if (service.Headless) {

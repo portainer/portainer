@@ -73,10 +73,10 @@
                 </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Stack')">
+                <a ng-click="$ctrl.changeOrderBy('StackName')">
                   Stack
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Stack' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Stack' && $ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'StackName' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'StackName' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
@@ -119,7 +119,7 @@
                 <a ui-sref="kubernetes.applications.application({ name: item.Name, namespace: item.ResourcePool })">{{ item.Name }}</a>
                 <span style="margin-left: 5px;" class="label label-warning image-tag" ng-if="$ctrl.isSystemNamespace(item)">system</span>
               </td>
-              <td>{{ item.Stack }}</td>
+              <td>{{ item.StackName }}</td>
               <td>{{ item.ResourcePool }}</td>
               <td>{{ item.Image }}</td>
               <td>

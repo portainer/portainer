@@ -1,6 +1,6 @@
 import {KubernetesDaemonSet} from 'Kubernetes/models/daemon-set/models';
 import {KubernetesDaemonSetCreatePayload} from 'Kubernetes/models/daemon-set/payloads';
-import {KubernetesApplicationStackAnnotationKey} from 'Kubernetes/models/application/models';
+import {KubernetesPortainerApplicationStackNameLabel, KubernetesPortainerApplicationNameLabel, KubernetesPortainerApplicationOwnerLabel} from 'Kubernetes/models/application/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 
 function bytesValue(mem) {
@@ -17,6 +17,7 @@ class KubernetesDaemonSetConverter {
     res.Namespace = formValues.ResourcePool.Namespace.Name;
     res.Name = formValues.Name;
     res.StackName = formValues.StackName ? formValues.StackName : formValues.Name;
+    res.ApplicationOwner = formValues.ApplicationOwner;
     res.Image = formValues.Image;
     res.Env = [];
     res.CpuLimit = formValues.CpuLimit;
@@ -34,7 +35,9 @@ class KubernetesDaemonSetConverter {
     const payload = new KubernetesDaemonSetCreatePayload();
     payload.metadata.name = daemonSet.Name;
     payload.metadata.namespace = daemonSet.Namespace;
-    payload.metadata.annotations[KubernetesApplicationStackAnnotationKey] = daemonSet.StackName;
+    payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = daemonSet.StackName;
+    payload.metadata.labels[KubernetesPortainerApplicationNameLabel] = daemonSet.Name;
+    payload.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = daemonSet.ApplicationOwner;
     payload.spec.replicas = daemonSet.ReplicaCount;
     payload.spec.selector.matchLabels.app = daemonSet.Name;
     payload.spec.template.metadata.labels.app = daemonSet.Name;

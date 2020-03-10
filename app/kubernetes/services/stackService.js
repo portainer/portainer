@@ -16,7 +16,7 @@ class KubernetesStackService {
   async getAllAsync(namespace) {
     try {
       const applications = await this.KubernetesApplicationService.get(namespace);
-      const stacks = _.map(applications, (item) => item.Stack);
+      const stacks = _.map(applications, (item) => item.StackName);
       return _.uniq(_.without(stacks, '-'));
     } catch (err) {
       throw err;

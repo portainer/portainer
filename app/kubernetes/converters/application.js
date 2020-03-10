@@ -1,13 +1,14 @@
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
-import { KubernetesApplication, KubernetesApplicationStackAnnotationKey, KubernetesApplicationDeploymentTypes, KubernetesApplicationDataAccessPolicies, KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
+import { KubernetesApplication, KubernetesPortainerApplicationStackNameLabel, KubernetesApplicationDeploymentTypes, KubernetesApplicationDataAccessPolicies, KubernetesApplicationTypes, KubernetesPortainerApplicationOwnerLabel } from 'Kubernetes/models/application/models';
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 
 class KubernetesApplicationConverter {
   static applicationCommon(res, data, service) {
     res.Id = data.metadata.uid;
     res.Name = data.metadata.name;
-    res.Stack = data.metadata.annotations[KubernetesApplicationStackAnnotationKey] || '-';
+    res.StackName = data.metadata.labels ? data.metadata.labels[KubernetesPortainerApplicationStackNameLabel] || '-' : '-';
+    res.ApplicationOwner = data.metadata.labels ? data.metadata.labels[KubernetesPortainerApplicationOwnerLabel] : '';
     res.ResourcePool = data.metadata.namespace;
     res.Image = data.spec.template.spec.containers[0].image;
     res.CreatedAt = data.metadata.creationTimestamp;

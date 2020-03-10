@@ -158,7 +158,7 @@ class KubernetesEditResourcePoolController {
       this.state.applicationsLoading = true;
       this.applications = await this.KubernetesApplicationService.get(this.pool.Namespace.Name);
       this.applications = _.map(this.applications, app => {
-        const pods = _.filter(this.pods, pod => Object.values(pod.Metadata.labels).includes(app.Name));
+        const pods = _.filter(this.pods, pod => Object.values(pod.Labels).includes(app.Name));
         const resourceReservation = KubernetesResourceReservationHelper.computeResourceReservation(pods);
         app.CPU = resourceReservation.CPU;
         app.Memory = resourceReservation.Memory;

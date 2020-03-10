@@ -4,7 +4,6 @@
 const _KubernetesApplicationSecret = Object.freeze({
   Name: '',
   Namespace: '',
-  StackName: '',
   Data: {}
 });
 

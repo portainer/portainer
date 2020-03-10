@@ -84,7 +84,7 @@ class KubernetesNodeController {
 
       this.ResourceReservation = { CPU: 0, Memory: 0 };
       this.applications = _.map(this.applications, app => {
-        app.pods = _.filter(this.pods, pod => Object.values(pod.Metadata.labels).includes(app.Name));
+        app.pods = _.filter(this.pods, pod => Object.values(pod.Labels).includes(app.Name));
         const resourceReservation = KubernetesResourceReservationHelper.computeResourceReservation(app.pods);
         app.CPU = resourceReservation.CPU;
         app.Memory = resourceReservation.Memory;
