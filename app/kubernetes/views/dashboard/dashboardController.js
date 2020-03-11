@@ -20,7 +20,7 @@ class KubernetesDashboardController {
       const endpointId = this.EndpointProvider.endpointID();
       const [endpoint, pools, applications] = await Promise.all([
         this.EndpointService.endpoint(endpointId),
-        this.KubernetesNamespaceService.get(),
+        this.KubernetesNamespaceService.get(), // TODO: review, use ResourcePools instead of namespaces
         this.KubernetesApplicationService.get(),
       ]);
       this.endpoint = endpoint;

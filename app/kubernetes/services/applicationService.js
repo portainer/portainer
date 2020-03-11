@@ -46,7 +46,7 @@ class KubernetesApplicationService {
         this.KubernetesDaemonSetService.get(namespace, name),
         this.KubernetesStatefulSetService.get(namespace, name),
         this.KubernetesServiceService.get(namespace, name),
-        this.KubernetesPods(namespace).get().$promise
+        this.KubernetesPods(namespace).get().$promise // TODO: review, use service
       ]);
       const service = {};
       if (serviceAttempt.status === 'fulfilled') {
@@ -79,6 +79,7 @@ class KubernetesApplicationService {
     }
   }
 
+  // TODO: review, remove function
   async getAllFilteredAsync(namespace) {
     try {
       let namespaces;

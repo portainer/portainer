@@ -47,6 +47,7 @@ class KubernetesResourcePoolService {
     }
   }
 
+  // TODO: review, unconsistent getAll pattern
   async getAllAsync() {
     try {
       const namespaces = await this.KubernetesNamespaceService.get();

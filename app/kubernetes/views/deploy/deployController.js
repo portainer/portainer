@@ -50,6 +50,7 @@ class KubernetesDeployController {
     return this.$async(this.deployAsync);
   }
 
+  // TODO: review, use ResourcePools instead of Namespaces
   async getNamespacesAsync() {
     try {
       this.namespaces = await this.KubernetesNamespaceService.get();
