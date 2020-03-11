@@ -36,9 +36,6 @@ class KubernetesResourcePoolController {
     this.getEvents = this.getEvents.bind(this);
     this.getEventsAsync = this.getEventsAsync.bind(this);
     this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
-    this.getPodsAsync = this.getPodsAsync.bind(this);
-    this.getPodsApplications = this.getPodsApplications.bind(this);
-    this.getPodsApplicationsAsync = this.getPodsApplicationsAsync.bind(this);
   }
 
   isQuotaValid() {
@@ -137,28 +134,12 @@ class KubernetesResourcePoolController {
     return this.$async(this.getEventsAsync);
   }
 
-  async getPodsAsync() {
-    try {
-      this.state.podsLoading = true;
-      this.pods = await this.KubernetesPodService.get(this.pool.Namespace.Name);
-    } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve pods.');
-    } finally {
-      this.state.podsLoading = false;
-    }
-  }
-
-  getPods() {
-    return this.$async(this.getPodsAsync);
-  }
-
   async getApplicationsAsync() {
     try {
       this.state.applicationsLoading = true;
       this.applications = await this.KubernetesApplicationService.get(this.pool.Namespace.Name);
-      this.applications = _.map(this.applications, app => {
-        const pods = _.filter(this.pods, pod => Object.values(pod.Labels).includes(app.Name));
-        const resourceReservation = KubernetesResourceReservationHelper.computeResourceReservation(pods);
+      this.applications = _.map(this.applications, (app) => {
+        const resourceReservation = KubernetesResourceReservationHelper.computeResourceReservation(app.Pods);
         app.CPU = resourceReservation.CPU;
         app.Memory = resourceReservation.Memory;
         return app;
@@ -172,15 +153,6 @@ class KubernetesResourcePoolController {
 
   getApplications() {
     return this.$async(this.getApplicationsAsync);
-  }
-
-  async getPodsApplicationsAsync() {
-    await this.getPods();
-    await this.getApplications();
-  }
-
-  getPodsApplications() {
-    return this.$async(this.getPodsApplicationsAsync);
   }
 
   async onInit() {
@@ -205,7 +177,6 @@ class KubernetesResourcePoolController {
         activeTab: 0,
         showEditorTab: false,
         eventsLoading: true,
-        podsLoading: true,
         applicationsLoading: true
       };
 
@@ -235,7 +206,7 @@ class KubernetesResourcePoolController {
       }
 
       await this.getEvents();
-      await this.getPodsApplications();
+      await this.getApplications();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
     }

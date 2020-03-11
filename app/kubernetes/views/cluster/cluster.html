@@ -12,4 +12,14 @@
     <kubernetes-nodes-datatable title-text="Nodes" title-icon="fa-hdd" dataset="ctrl.nodes" table-key="kubernetes.nodes"
       order-by="Name" refresh-callback="ctrl.getNodes" is-admin="ctrl.isAdmin"></kubernetes-nodes-datatable>
   </div>
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+        <kubernetes-resource-reservation ng-if="ctrl.resourceReservation && ctrl.isAdmin" cpu="ctrl.resourceReservation.CPU" cpu-limit="ctrl.CPULimit"
+          memory="ctrl.resourceReservation.Memory" memory-limit="ctrl.MemoryLimit"
+          description="Resource reservation represents the total amount of resource requested by all of the nodes.">
+        </kubernetes-resource-reservation>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
 </div>

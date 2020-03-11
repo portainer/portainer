@@ -135,7 +135,7 @@
 <div class="row" ng-if="ctrl.applications && ctrl.applications.length > 0">
   <div class="col-sm-12">
     <kubernetes-resource-pool-applications-datatable dataset="ctrl.applications" table-key="kubernetes.resourcepool.applications"
-      order-by="Name" refresh-callback="ctrl.getPodsApplications" loading="ctrl.state.applicationsLoading"
+      order-by="Name" refresh-callback="ctrl.getApplications" loading="ctrl.state.applicationsLoading"
       title-text="Applications running in this resource pool" title-icon="fa-laptop-code">
     </kubernetes-resource-pool-applications-datatable>
   </div>

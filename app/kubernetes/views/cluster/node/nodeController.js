@@ -1,7 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
-import filesizeParser from 'filesize-parser';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/kubernetesResourceReservationHelper';
+import {KubernetesResourceReservation} from 'Kubernetes/models/resource-reservation/models';
 
 class KubernetesNodeController {
   /* @ngInject */
@@ -18,10 +18,7 @@ class KubernetesNodeController {
     this.getNodeAsync = this.getNodeAsync.bind(this);
     this.getEvents = this.getEvents.bind(this);
     this.getEventsAsync = this.getEventsAsync.bind(this);
-    this.getPodsAsync = this.getPodsAsync.bind(this);
     this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
-    this.getPodsApplications = this.getPodsApplications.bind(this);
-    this.getPodsApplicationsAsync = this.getPodsApplicationsAsync.bind(this);
   }
 
   async getNodeAsync() {
@@ -60,40 +57,23 @@ class KubernetesNodeController {
     this.state.showEditorTab = true;
   }
 
-  async getPodsAsync() {
-    try {
-      this.state.podsLoading = true;
-      const pods = await this.KubernetesPodService.get();
-      this.pods = _.filter(pods, pod => pod.Node === this.node.Name);
-    } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve pods');
-    } finally {
-      this.state.podsLoading = false;
-    }
-  }
-
-  getPods() {
-    return this.$async(this.getPodsAsync);
-  }
-
   async getApplicationsAsync() {
     try {
       this.state.applicationsLoading = true;
       this.applications = await this.KubernetesApplicationService.get();
 
-      this.ResourceReservation = { CPU: 0, Memory: 0 };
-      this.applications = _.map(this.applications, app => {
-        app.pods = _.filter(this.pods, pod => Object.values(pod.Labels).includes(app.Name));
-        const resourceReservation = KubernetesResourceReservationHelper.computeResourceReservation(app.pods);
+      this.resourceReservation = new KubernetesResourceReservation();
+      this.applications = _.map(this.applications, (app) => {
+        const resourceReservation = KubernetesResourceReservationHelper.computeResourceReservation(app.Pods);
         app.CPU = resourceReservation.CPU;
         app.Memory = resourceReservation.Memory;
-        this.ResourceReservation.CPU += resourceReservation.CPU;
-        this.ResourceReservation.Memory += resourceReservation.Memory;
+        this.resourceReservation.CPU += resourceReservation.CPU;
+        this.resourceReservation.Memory += resourceReservation.Memory;
         return app;
       });
-      this.applications = _.filter(this.applications, app => app.pods.length !== 0);
-      this.ResourceReservation.Memory = Math.floor(this.ResourceReservation.Memory / 1000 / 1000);
-      this.memoryLimit = Math.floor(filesizeParser(this.node.Memory) / 1000 / 1000);
+      this.applications = _.filter(this.applications, (app) => _.map(app.Pods, (pod) => pod.Node).includes(this.node.Name).length !== 0);
+      this.resourceReservation.Memory = KubernetesResourceReservationHelper.megaBytesValue(this.resourceReservation.Memory);
+      this.memoryLimit = KubernetesResourceReservationHelper.megaBytesValue(this.node.Memory);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve applications');
     } finally {
@@ -110,27 +90,17 @@ class KubernetesNodeController {
       activeTab: 0,
       dataLoading: true,
       eventsLoading: true,
-      podsLoading: true,
       applicationsLoading: true,
       showEditorTab: false
     };
 
     await this.getNode();
     await this.getEvents();
-    await this.getPodsApplications();
+    await this.getApplications();
   }
 
   $onInit() {
     return this.$async(this.onInit);
-  }
-
-  async getPodsApplicationsAsync() {
-    await this.getPods();
-    await this.getApplications();
-  }
-
-  getPodsApplications() {
-    return this.$async(this.getPodsApplicationsAsync);
   }
 }
 

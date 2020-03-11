@@ -99,23 +99,30 @@ class KubernetesApplicationService {
 
   async getAllAsync(namespace) {
     try {
-      const [deployments, daemonSets, statefulSets, services] = await Promise.all([
+      const [deployments, daemonSets, statefulSets, services, pods] = await Promise.all([
         this.KubernetesDeploymentService.get(namespace),
         this.KubernetesDaemonSetService.get(namespace),
         this.KubernetesStatefulSetService.get(namespace),
-        this.KubernetesServiceService.get(namespace)
+        this.KubernetesServiceService.get(namespace),
+        this.KubernetesPods(namespace).get().$promise
       ]);
       const deploymentApplications = _.map(deployments, (item) => {
         const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
-        return KubernetesApplicationConverter.apiDeploymentToApplication(item, service);
+        const application = KubernetesApplicationConverter.apiDeploymentToApplication(item, service);
+        application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods.items, item);
+        return application;
       });
       const daemonSetApplications = _.map(daemonSets, (item) => {
         const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
-        return KubernetesApplicationConverter.apiDaemonSetToApplication(item, service);
+        const application = KubernetesApplicationConverter.apiDaemonSetToApplication(item, service);
+        application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods.items, item);
+        return application;
       });
       const statefulSetApplications = _.map(statefulSets, (item) => {
         const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
-        return KubernetesApplicationConverter.apiStatefulSetToapplication(item, service);
+        const application = KubernetesApplicationConverter.apiStatefulSetToapplication(item, service);
+        application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods.items, item);
+        return application;
       });
       const applications = _.concat(deploymentApplications, daemonSetApplications, statefulSetApplications);
       return applications;

@@ -1,5 +1,6 @@
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
+import {KubernetesResourceReservation} from 'Kubernetes/models/resource-reservation/models';
 
 class KubernetesResourceReservationHelper {
   static computeResourceReservation(pods) {
@@ -26,7 +27,11 @@ class KubernetesResourceReservationHelper {
       }
 
       return acc;
-    }, { Memory: 0, CPU: 0 });
+    }, new KubernetesResourceReservation());
+  }
+
+  static megaBytesValue(value) {
+    return Math.floor(filesizeParser(value) / 1000 / 1000);
   }
 }
 export default KubernetesResourceReservationHelper;
