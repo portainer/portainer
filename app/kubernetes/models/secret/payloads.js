@@ -14,3 +14,18 @@ export class KubernetesSecretCreatePayload {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesSecretCreatePayload)));
   }
 }
+
+/**
+ * KubernetesSecretUpdatePayload Model
+ */
+const _KubernetesSecretUpdatePayload = Object.freeze({
+  metadata: new KubernetesCommonMetadataPayload(),
+  type: 'Opaque',
+  data: {}
+});
+
+export class KubernetesSecretUpdatePayload {
+  constructor() {
+    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesSecretUpdatePayload)));
+  }
+}

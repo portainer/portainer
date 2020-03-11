@@ -32,7 +32,6 @@ class KubernetesResourcePoolService {
         this.KubernetesResourceQuotaService.get(name, KubernetesResourceQuotaHelper.generateResourceQuotaName(name)),
         this.KubernetesLimitRangeService.get(name, KubernetesLimitRangeHelper.generateLimitRangeName(name))
       ]);
-
       const pool = KubernetesResourcePoolConverter.apiToResourcePool(namespace);
       if (quotaAttempt.status === 'fulfilled') {
         pool.Quota = quotaAttempt.value;

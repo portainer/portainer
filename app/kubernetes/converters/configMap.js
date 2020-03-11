@@ -12,9 +12,26 @@ class KubernetesConfigMapConverter {
     res.Id = data.metadata.uid;
     res.Name = data.metadata.name;
     res.Namespace = data.metadata.namespace;
+    res.CreationDate = data.metadata.creationTimestamp;
     res.Data = {};
     const resData = data.data || {};
-    _.forIn(resData, (value, key) => res.Data[key] = JSON.parse(value));
+    _.forIn(resData, (value, key) => {
+      try {
+        res.Data[key] = JSON.parse(value)
+      } catch (err) {
+        res.Data[key] = value;
+      }
+    });
+    return res;
+  }
+
+  static configurationToConfigMap(configuration) {
+    const res = new KubernetesConfigMap();
+    res.Id = configuration.Id;
+    res.Name = configuration.Name;
+    res.Namespace = configuration.Namespace;
+    res.CreationDate = configuration.CreationDate;
+    res.Data = configuration.Data;
     return res;
   }
 

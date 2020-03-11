@@ -14,6 +14,7 @@ class KubernetesConfigMapService {
     this.getAllAsync = this.getAllAsync.bind(this);
     this.createAsync = this.createAsync.bind(this);
     this.updateAsync = this.updateAsync.bind(this);
+    this.deleteAsync = this.deleteAsync.bind(this);
   }
 
   /**
@@ -88,6 +89,24 @@ class KubernetesConfigMapService {
   }
   update(config) {
     return this.$async(this.updateAsync, config);
+  }
+
+  /**
+   * DELETE
+   */
+  async deleteAsync(config) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = config.Name;
+      const namespace = config.Namespace;
+      await this.KubernetesConfigMaps(namespace).delete(params).$promise;
+    } catch(err) {
+      throw new PortainerError('Unable to delete config map', err);
+    }
+  }
+
+  delete(config) {
+    return this.$async(this.deleteAsync, config);
   }
 }
 
