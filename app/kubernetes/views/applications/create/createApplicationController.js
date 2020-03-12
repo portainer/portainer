@@ -222,7 +222,7 @@ class KubernetesCreateApplicationController {
       this.state.sliders.memory.min = minMemory;
       this.state.sliders.memory.max = megaBytesValue(maxMemory);
       this.state.sliders.cpu.min = minCpu;
-      this.state.sliders.cpu.max = maxCpu;
+      this.state.sliders.cpu.max = _.round(maxCpu, 2);
       this.formValues.CpuLimit = minCpu;
       this.formValues.MemoryLimit = minMemory;
     } catch (err) {
