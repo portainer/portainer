@@ -146,6 +146,10 @@ class KubernetesApplicationService {
   /**
    * CREATE
    */
+  // TODO: review
+  // resource creation flow
+  // should we keep formValues > Resource_1 || Resource_2
+  // or should we switch to formValues > Composite > Resource_1 || Resource_2
   async createAsync(formValues) {
     try {
       const claims = KubernetesPersistentVolumeClaimConverter.applicationFormValuesToVolumeClaims(formValues);
