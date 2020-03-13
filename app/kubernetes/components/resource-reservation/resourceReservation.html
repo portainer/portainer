@@ -16,7 +16,7 @@
     <div class="col-sm-9" style="margin-top: 4px;">
       <uib-progressbar animate="false" value="$ctrl.memoryUsage"
         type="{{ $ctrl.memoryUsage | kubernetesUsageLevelInfo }}">
-        <b>
+        <b style="white-space:nowrap;">
           {{ $ctrl.memory }} / {{ $ctrl.memoryLimit }} MB - {{ $ctrl.memoryUsage }}%
         </b>
       </uib-progressbar>
