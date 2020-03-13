@@ -48,24 +48,15 @@
                 <label for="endpoint_count" class="col-sm-7 control-label text-left" style="margin-top: 7px;">Hosts</label>
                 <div class="col-sm-5">
                   <input type="number" class="form-control" ng-model="formValues.hostCount" id="endpoint_count"
-                    placeholder="1" min="1" ng-if="product.Id == 1">
-                  <input type="number" class="form-control" ng-model="formValues.hostCount" id="endpoint_count"
-                    placeholder="4" min="4" ng-if="product.Id == 2 || product.Id == 3">
-                  <input type="number" class="form-control" ng-model="formValues.hostCount" id="endpoint_count"
-                    placeholder="10" min="10" ng-if="product.Id == 4 || product.Id == 5">
+                    placeholder="{{ state.placeholder }}" min="{{ state.minHosts }}">
                 </div>
               </div>
 
               <div style="margin-top: 15px;">
                 <a href="https://portainer.io/checkout/?add-to-cart={{ product.ProductId }}&quantity={{ formValues.hostCount }}"
                   target="_blank">
-                  <button ng-disabled="!formValues.hostCount || formValues.hostCount < 1" class="btn btn-primary btn-sm"
-                    style="width: 100%; margin-left: 0;" ng-if="product.Id == 1">Buy</button>
-                  <button ng-disabled="!formValues.hostCount || formValues.hostCount < 4" class="btn btn-primary btn-sm"
-                    style="width: 100%; margin-left: 0;" ng-if="product.Id == 2 || product.Id == 3">Buy</button>
-                  <button ng-disabled="!formValues.hostCount || formValues.hostCount < 10"
-                    class="btn btn-primary btn-sm" style="width: 100%; margin-left: 0;"
-                    ng-if="product.Id == 4 || product.Id == 5">Buy</button>
+                  <button ng-disabled="buttonChecker()" class="btn btn-primary btn-sm"
+                    style="width: 100%; margin-left: 0;">Buy</button>
                 </a>
               </div>
 
