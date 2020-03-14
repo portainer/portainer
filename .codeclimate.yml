@@ -35,8 +35,11 @@ exclude_patterns:
 - build/
 - dist/
 - distribution/
+- node_modules
 - test/
 - webpack/
 - gruntfile.js
 - webpack.config.js
 - !app/kubernetes/**
+- .github/
+- .tmp
