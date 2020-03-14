@@ -40,6 +40,6 @@ exclude_patterns:
 - webpack/
 - gruntfile.js
 - webpack.config.js
-- !app/kubernetes/**
+- "!app/kubernetes/**"
 - .github/
-- .tmp
+- .tmp/
