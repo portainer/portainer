@@ -28,8 +28,6 @@ plugins:
     channel: "eslint-5"
     config:
       config: .eslintrc.yml
-  fixme:
-    enabled: true
 exclude_patterns:
 - assets/
 - build/
