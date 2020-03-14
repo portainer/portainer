@@ -39,3 +39,4 @@ exclude_patterns:
 - webpack/
 - gruntfile.js
 - webpack.config.js
+- !app/kubernetes/**
