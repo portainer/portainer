@@ -2,6 +2,7 @@ import _ from 'lodash-es';
 import { KubernetesConfigMap, KubernetesPortainerConfigMapAccessKey } from 'Kubernetes/models/config-map/models';
 import { KubernetesConfigMapCreatePayload, KubernetesConfigMapUpdatePayload } from 'Kubernetes/models/config-map/payloads';
 import { UserAccessViewModel, TeamAccessViewModel } from 'Portainer/models/access';
+import YAML from 'yaml';
 
 class KubernetesConfigMapConverter {
   /**
@@ -22,16 +23,6 @@ class KubernetesConfigMapConverter {
         res.Data[key] = value;
       }
     });
-    return res;
-  }
-
-  static configurationToConfigMap(configuration) {
-    const res = new KubernetesConfigMap();
-    res.Id = configuration.Id;
-    res.Name = configuration.Name;
-    res.Namespace = configuration.Namespace;
-    res.CreationDate = configuration.CreationDate;
-    res.Data = configuration.Data;
     return res;
   }
 
@@ -87,6 +78,21 @@ class KubernetesConfigMapConverter {
     res.metadata.namespace = data.Namespace;
     res.data = {};
     _.forIn(data.Data, (value, key) => res.data[key] = JSON.stringify(value));
+    return res;
+  }
+
+  static configurationFormValuesToConfigMap(formValues) {
+    const res = new KubernetesConfigMap();
+    res.Name = formValues.Name;
+    res.Namespace = formValues.ResourcePool.Namespace.Name;
+    if (formValues.IsSimple) {
+      res.Data = _.reduce(formValues.Data, (acc, entry) => {
+        acc[entry.Key] = entry.Value;
+        return acc;
+      }, {});
+    } else {
+      res.Data = YAML.parse(formValues.DataYaml);
+    }
     return res;
   }
 }

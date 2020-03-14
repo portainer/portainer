@@ -86,22 +86,22 @@ class KubernetesConfigurationService {
   /**
    * CREATE
    */
-  async createAsync(config) {
+  async createAsync(formValues) {
     try {
-      if (config.Type === KubernetesConfigurationTypes.BASIC) {
-        const configMap = KubernetesConfigMapConverter.configurationToConfigMap(config);
+      if (formValues.Type === KubernetesConfigurationTypes.BASIC) {
+        const configMap = KubernetesConfigMapConverter.configurationFormValuesToConfigMap(formValues);
         await this.KubernetesConfigMapService.create(configMap);
       } else {
-        const secret = KubernetesSecretConverter.configurationToSecret(config);
+        const secret = KubernetesSecretConverter.configurationFormValuesToSecret(formValues);
         await this.KubernetesSecretService.create(secret);
       }
     } catch (err) {
-      throw new PortainerError('Unable to create config map', err);
+      throw err;
     }
   }
 
-  create(config) {
-    return this.$async(this.createAsync, config);
+  create(formValues) {
+    return this.$async(this.createAsync, formValues);
   }
 
   /**

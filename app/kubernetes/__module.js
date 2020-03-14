@@ -79,6 +79,16 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     }
   };
 
+  const configurationCreation = {
+    name: 'kubernetes.configurations.new',
+    url: '/new',
+    views: {
+      'content@': {
+        component: 'kubernetesCreateConfigurationView'
+      }
+    }
+  };
+
   const cluster = {
     name: 'kubernetes.cluster',
     url: '/cluster',
@@ -166,6 +176,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
   $stateRegistryProvider.register(applicationConsole);
   $stateRegistryProvider.register(applicationLogs);
   $stateRegistryProvider.register(configurations);
+  $stateRegistryProvider.register(configurationCreation);
   $stateRegistryProvider.register(cluster);
   $stateRegistryProvider.register(dashboard);
   $stateRegistryProvider.register(deploy);
