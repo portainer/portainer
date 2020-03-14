@@ -7,7 +7,7 @@ class KubernetesConfigurationHelper {
       const configMapFind = _.find(app.Volumes, (vol) => vol.configMap && vol.configMap.name === config.Name);
       if ((config.Type === KubernetesConfigurationTypes.SECRET && app.Name === config.Name) || configMapFind !== undefined) {
         config.Used = true;
-        return false;
+        config.Apps.push(app);
       }
     })
     return config;

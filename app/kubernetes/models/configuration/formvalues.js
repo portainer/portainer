@@ -4,6 +4,7 @@ import {KubernetesConfigurationTypes} from './models';
  * KubernetesConfigurationFormValues Model
  */
 const _KubernetesConfigurationFormValues = Object.freeze({
+  Id: '',
   ResourcePool: '',
   Name: '',
   Type: KubernetesConfigurationTypes.BASIC,

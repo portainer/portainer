@@ -1,6 +1,5 @@
 import angular from 'angular';
 import _ from 'lodash-es';
-import PortainerError from 'Portainer/error';
 import KubernetesConfigurationConverter from 'Kubernetes/converters/configuration';
 import KubernetesConfigMapConverter from 'Kubernetes/converters/configMap';
 import KubernetesSecretConverter from 'Kubernetes/converters/secret';
@@ -32,12 +31,12 @@ class KubernetesConfigurationService {
         this.KubernetesConfigMapService.get(namespace, name),
         this.KubernetesSecretService.get(namespace, name)
       ]);
-      if (configMap.status === 'fulfilled') {
-        return KubernetesConfigurationConverter.configMapToConfiguration(configMap.value);
+      if (secret.status === 'fulfilled') {
+        return KubernetesConfigurationConverter.secretToConfiguration(secret.value);
       }
-      return KubernetesConfigurationConverter.secretToConfiguration(secret.value);
+      return KubernetesConfigurationConverter.configMapToConfiguration(configMap.value);
     } catch (err) {
-      throw new PortainerError('Unable to retrieve configuration', err);
+      throw err;
     }
   }
 
@@ -68,7 +67,7 @@ class KubernetesConfigurationService {
       const configMapsConfigurations = _.map(configMaps, configMap => KubernetesConfigurationConverter.configMapToConfiguration(configMap));
       return _.concat(configMapsConfigurations, secretsConfigurations);
     } catch (err) {
-      throw new PortainerError('Unable to retrieve configurations', err);
+      throw err;
     }
   }
 
@@ -107,17 +106,17 @@ class KubernetesConfigurationService {
   /**
    * UPDATE
    */
-  async updateAsync(config) {
+  async updateAsync(formValues) {
     try {
-      if (config.Type === KubernetesConfigurationTypes.BASIC) {
-        const configMap = KubernetesConfigMapConverter.configurationToConfigMap(config);
+      if (formValues.Type === KubernetesConfigurationTypes.BASIC) {
+        const configMap = KubernetesConfigMapConverter.configurationFormValuesToConfigMap(formValues);
         await this.KubernetesConfigMapService.update(configMap);
       } else {
-        const secret = KubernetesSecretConverter.configurationToSecret(config);
+        const secret = KubernetesSecretConverter.configurationFormValuesToSecret(formValues);
         await this.KubernetesSecretService.update(secret);
       }
     } catch (err) {
-      throw new PortainerError('Unable to update configuration', err);
+      throw err;
     }
   }
   update(config) {
@@ -130,14 +129,12 @@ class KubernetesConfigurationService {
   async deleteAsync(config) {
     try {
       if (config.Type === KubernetesConfigurationTypes.BASIC) {
-        const configMap = KubernetesConfigMapConverter.configurationToConfigMap(config);
-        await this.KubernetesConfigMapService.delete(configMap);
+        await this.KubernetesConfigMapService.delete(config);
       } else {
-        const secret = KubernetesSecretConverter.configurationToSecret(config);
-        await this.KubernetesSecretService.delete(secret);
+        await this.KubernetesSecretService.delete(config);
       }
     } catch(err) {
-      throw new PortainerError('Unable to delete configuration', err)
+      throw err;
     }
   }
 

@@ -102,7 +102,7 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="item.Used"/>
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a>{{ item.Name }}</a>
+                <a ui-sref="kubernetes.configurations.configuration({ name: item.Name, namespace: item.Namespace })">{{ item.Name }}</a>
                 <span style="margin-left: 5px;" class="label label-warning image-tag" ng-if="!item.Used">unused</span>
               </td>
               <td>{{ item.Namespace }}</td>

@@ -83,6 +83,7 @@ class KubernetesConfigMapConverter {
 
   static configurationFormValuesToConfigMap(formValues) {
     const res = new KubernetesConfigMap();
+    res.Id = formValues.Id;
     res.Name = formValues.Name;
     res.Namespace = formValues.ResourcePool.Namespace.Name;
     if (formValues.IsSimple) {

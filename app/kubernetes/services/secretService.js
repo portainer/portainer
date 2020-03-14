@@ -75,7 +75,7 @@ class KubernetesSecretService {
       const params = new KubernetesCommonParams();
       params.id = payload.metadata.name;
       const namespace = payload.metadata.namespace;
-      const data = await this.KubernetesSecret(namespace).update(params, payload).$promise;
+      const data = await this.KubernetesSecrets(namespace).update(params, payload).$promise;
       return KubernetesSecretConverter.apiToSecret(data);
     } catch (err) {
       throw new PortainerError('Unable to update secret', err);
@@ -94,7 +94,7 @@ class KubernetesSecretService {
       const params = new KubernetesCommonParams();
       params.id = secret.Name;
       const namespace = secret.Namespace;
-      await this.KubernetesSecret(namespace).delete(params).$promise;
+      await this.KubernetesSecrets(namespace).delete(params).$promise;
     } catch(err) {
       throw new PortainerError('Unable to delete secret', err);
     }

@@ -127,6 +127,21 @@ angular.module('portainer.app')
     });
   };
 
+  service.confirmUpdate = function(message, callback) {
+    message = $sanitize(message);
+    service.confirm({
+      title: 'Are you sure ?',
+      message: message,
+      buttons: {
+        confirm: {
+          label: 'Update',
+          className: 'btn-warning'
+        }
+      },
+      callback: callback
+    });
+  };
+
   service.confirmContainerDeletion = function(title, callback) {
     prompt({
       title: title,
