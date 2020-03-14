@@ -54,7 +54,14 @@
                 </tr>
                 <tr>
                   <td>Creation</td>
-                  <td>{{ ctrl.application.CreatedAt | getisodate }}{{ ctrl.application.ApplicationOwner ? ' by ' + ctrl.application.ApplicationOwner : ''}}</td>
+                  <td>
+                    <span ng-if="ctrl.application.ApplicationOwner" style="margin-right: 5px;">
+                      <i class="fas fa-user"></i> {{ ctrl.application.ApplicationOwner }}
+                    </span>
+                    <span>
+                      <i class="fas fa-clock"></i> {{ ctrl.application.CreatedAt | getisodate }}
+                    </span>
+                  </td>
                 </tr>
                 </tbody>
               </table>
