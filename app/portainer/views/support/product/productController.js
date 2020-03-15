@@ -1,6 +1,6 @@
 angular.module('portainer.app')
   .controller('SupportProductController', ['$scope', '$transition$',
-    function($scope, $transition$) {
+    function ($scope, $transition$) {
 
       $scope.formValues = {
         hostCount: 0
@@ -11,13 +11,13 @@ angular.module('portainer.app')
         placeholder: 0
       };
 
-      $scope.buttonChecker = function () {
+      $scope.isBuyButtonEnabled = function () {
         return !$scope.formValues.hostCount || ($scope.formValues.hostCount < $scope.state.minHosts);
       };
 
       function initView() {
         $scope.product = $transition$.params().product;
-        
+
         if ($scope.product.Id == 1) {
           $scope.formValues.hostCount = 1;
           $scope.state.minHosts = 1;
@@ -36,4 +36,5 @@ angular.module('portainer.app')
       }
 
       initView();
-    }]);
+    }
+  ]);

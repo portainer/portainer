@@ -45,7 +45,8 @@
               </div>
 
               <div style="margin-top: 10px; margin-bottom: 95px;">
-                <label for="endpoint_count" class="col-sm-7 control-label text-left" style="margin-top: 7px;">Hosts</label>
+                <label for="endpoint_count" class="col-sm-7 control-label text-left"
+                  style="margin-top: 7px;">Hosts</label>
                 <div class="col-sm-5">
                   <input type="number" class="form-control" ng-model="formValues.hostCount" id="endpoint_count"
                     placeholder="{{ state.placeholder }}" min="{{ state.minHosts }}">
@@ -55,7 +56,7 @@
               <div style="margin-top: 15px;">
                 <a href="https://portainer.io/checkout/?add-to-cart={{ product.ProductId }}&quantity={{ formValues.hostCount }}"
                   target="_blank">
-                  <button ng-disabled="buttonChecker()" class="btn btn-primary btn-sm"
+                  <button ng-disabled="isBuyButtonEnabled()" class="btn btn-primary btn-sm"
                     style="width: 100%; margin-left: 0;">Buy</button>
                 </a>
               </div>
