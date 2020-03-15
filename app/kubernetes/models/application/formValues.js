@@ -1,4 +1,4 @@
-import { KubernetesApplicationDeploymentTypes, KubernetesApplicationPublishingTypes } from "./models";
+import { KubernetesApplicationDeploymentTypes, KubernetesApplicationPublishingTypes, KubernetesApplicationDataAccessPolicies } from "./models";
 
 /**
  * KubernetesApplicationFormValues Model
@@ -16,12 +16,49 @@ const _KubernetesApplicationFormValues = Object.freeze({
   MemoryLimit: 0,
   CpuLimit: 0,
   DeploymentType: KubernetesApplicationDeploymentTypes.REPLICATED,
-  PublishingType: KubernetesApplicationPublishingTypes.INTERNAL
+  PublishingType: KubernetesApplicationPublishingTypes.INTERNAL,
+  DataAccessPolicy: KubernetesApplicationDataAccessPolicies.SHARED,
+  Configurations: [], // KubernetesApplicationConfigurationFormValue list
 });
 
 export class KubernetesApplicationFormValues {
   constructor() {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesApplicationFormValues)));
+  }
+}
+
+export const KubernetesApplicationConfigurationFormValueOverridenKeyTypes = Object.freeze({
+  'ENVIRONMENT': 1,
+  'FILESYSTEM': 2,
+});
+
+/**
+ * KubernetesApplicationConfigurationFormValueOverridenKey Model
+ */
+const _KubernetesApplicationConfigurationFormValueOverridenKey = Object.freeze({
+  Key: '',
+  Path: '',
+  Type: KubernetesApplicationConfigurationFormValueOverridenKeyTypes.ENVIRONMENT
+});
+
+export class KubernetesApplicationConfigurationFormValueOverridenKey {
+  constructor() {
+    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesApplicationConfigurationFormValueOverridenKey)));
+  }
+}
+
+/**
+ * KubernetesApplicationConfigurationFormValue Model
+ */
+const _KubernetesApplicationConfigurationFormValue = Object.freeze({
+  SelectedConfiguration: undefined,
+  Overriden: false,
+  OverridenKeys: [] // KubernetesApplicationConfigurationFormValueOverridenKey list
+});
+
+export class KubernetesApplicationConfigurationFormValue {
+  constructor() {
+    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesApplicationConfigurationFormValue)));
   }
 }
 

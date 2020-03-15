@@ -188,9 +188,6 @@ class KubernetesApplicationService {
         await Promise.all(claimPromises);
       }
 
-      if (app.Secret) {
-        await this.KubernetesSecretService.create(app.Secret);
-      }
       await apiService.create(app);
 
       const service = KubernetesServiceConverter.applicationFormValuesToService(formValues);

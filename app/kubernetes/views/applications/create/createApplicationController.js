@@ -7,7 +7,10 @@ import {
   KubernetesApplicationPublishedPortFormValue,
   KubernetesApplicationEnvironmentVariableFormValue,
   KubernetesApplicationFormValues,
-  KubernetesApplicationPersistedFolderFormValue
+  KubernetesApplicationPersistedFolderFormValue,
+  KubernetesApplicationConfigurationFormValue,
+  KubernetesApplicationConfigurationFormValueOverridenKey,
+  KubernetesApplicationConfigurationFormValueOverridenKeyTypes
 } from 'Kubernetes/models/application/formValues';
 
 
@@ -16,7 +19,8 @@ function megaBytesValue(mem) {
 }
 class KubernetesCreateApplicationController {
   /* @ngInject */
-  constructor($async, $state, Notifications, EndpointProvider, Authentication, KubernetesResourcePoolService, KubernetesApplicationService, KubernetesStackService, KubernetesNodeService) {
+  constructor($async, $state, Notifications, EndpointProvider, Authentication, KubernetesResourcePoolService, KubernetesApplicationService,
+    KubernetesStackService, KubernetesConfigurationService, KubernetesNodeService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
@@ -25,16 +29,44 @@ class KubernetesCreateApplicationController {
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesStackService = KubernetesStackService;
+    this.KubernetesConfigurationService = KubernetesConfigurationService;
     this.KubernetesNodeService = KubernetesNodeService;
 
     this.ApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
     this.ApplicationDataAccessPolicies = KubernetesApplicationDataAccessPolicies;
     this.ApplicationPublishingTypes = KubernetesApplicationPublishingTypes;
+    this.ApplicationConfigurationFormValueOverridenKeyTypes = KubernetesApplicationConfigurationFormValueOverridenKeyTypes;
 
     this.onInit = this.onInit.bind(this);
     this.deployApplicationAsync = this.deployApplicationAsync.bind(this);
     this.updateSlidersAsync = this.updateSlidersAsync.bind(this);
     this.updateStacksAsync = this.updateStacksAsync.bind(this);
+    this.updateConfigurationsAsync = this.updateConfigurationsAsync.bind(this);
+    this.updateStacksAndConfigurationsAsync = this.updateStacksAndConfigurationsAsync.bind(this);
+  }
+
+  addConfiguration() {
+    this.formValues.Configurations.push(new KubernetesApplicationConfigurationFormValue());
+  }
+
+  removeConfiguration(index) {
+    this.formValues.Configurations.splice(index, 1);
+  }
+
+  overrideConfiguration(index) {
+    const config = this.formValues.Configurations[index];
+    config.Overriden = true;
+    config.OverridenKeys = _.map(_.keys(config.SelectedConfiguration.Data), (key) => {
+      const res = new KubernetesApplicationConfigurationFormValueOverridenKey()
+      res.Key = key;
+      return res;
+    });
+  }
+
+  resetConfiguration(index) {
+    const config = this.formValues.Configurations[index];
+    config.Overriden = false;
+    config.OverridenKeys = [];
   }
 
   addEnvironmentVariable() {
@@ -174,6 +206,7 @@ class KubernetesCreateApplicationController {
     this.state.actionInProgress = true;
     try {
       this.formValues.ApplicationOwner = this.Authentication.getUserDetails().username;
+      _.remove(this.formValues.Configurations, (item) => item.SelectedConfiguration === undefined);
       await this.KubernetesApplicationService.create(this.formValues);
       this.Notifications.success('Application successfully deployed', this.formValues.Name);
       this.$state.go('kubernetes.applications');
@@ -236,7 +269,8 @@ class KubernetesCreateApplicationController {
 
   async updateStacksAsync() {
     try {
-      this.stacks = await this.KubernetesStackService.get(this.formValues.ResourcePool.Namespace.Name);
+      const namespace = this.formValues.ResourcePool.Namespace.Name;
+      this.stacks = await this.KubernetesStackService.get(namespace);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve stacks');
     }
@@ -246,15 +280,39 @@ class KubernetesCreateApplicationController {
     return this.$async(this.updateStacksAsync);
   }
 
+  async updateConfigurationsAsync() {
+    try {
+      const namespace = this.formValues.ResourcePool.Namespace.Name;
+      this.configurations = await this.KubernetesConfigurationService.get(namespace);
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve configurations');
+    }
+  }
+
+  updateConfigurations() {
+    return this.$async(this.updateConfigurationsAsync);
+  }
+
+  async updateStacksAndConfigurationsAsync() {
+    await Promise.all([
+      this.updateStacks(),
+      this.updateConfigurations()
+    ]);
+  }
+
+  updateStacksAndConfigurations() {
+    return this.$async(this.updateStacksAndConfigurationsAsync);
+  }
+
   onResourcePoolSelectionChange() {
     this.updateSliders();
-    this.updateStacks();
+    this.updateStacksAndConfigurations();
+    this.formValues.Configurations = [];
   }
 
   async onInit() {
     try {
       this.formValues = new KubernetesApplicationFormValues();
-      this.formValues.DataAccessPolicy = this.ApplicationDataAccessPolicies.SHARED;
 
       this.state = {
         actionInProgress: false,
@@ -292,7 +350,7 @@ class KubernetesCreateApplicationController {
       const endpoint = this.EndpointProvider.currentEndpoint();
       this.storageClasses = endpoint.Kubernetes.Configuration.StorageClasses;
       this.state.useLoadBalancer = endpoint.Kubernetes.Configuration.UseLoadBalancer;
-      await this.updateStacks();
+      await this.updateStacksAndConfigurations();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
     }

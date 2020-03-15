@@ -1,13 +1,28 @@
 import _ from 'lodash-es';
 import { KubernetesPortMappingPort, KubernetesPortMapping } from 'Kubernetes/models/port/models';
-import { KubernetesApplicationSecret } from 'Kubernetes/models/secret/models';
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import KubernetesPodConverter from 'Kubernetes/converters/pod';
+import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
+import { KubernetesApplicationConfigurationFormValueOverridenKeyTypes } from 'Kubernetes/models/application/formValues';
+import {
+  KubernetesApplicationEnvPayload,
+  KubernetesApplicationVolumeMountPayload,
+  KubernetesApplicationVolumePersistentPayload,
+  KubernetesApplicationVolumeConfigMapPayload,
+  KubernetesApplicationVolumeSecretPayload,
+  KubernetesApplicationEnvSecretPayload,
+  KubernetesApplicationEnvConfigMapPayload,
+  KubernetesApplicationVolumeEntryPayload
+} from 'Kubernetes/models/application/payloads';
 
 class KubernetesApplicationHelper {
 
+  static dnsCompliantString(s) {
+    return s.replace(/[^a-z0-9\-]/gi, '-').toLowerCase();
+  }
+
   static generateApplicationVolumeName(applicationName, volumePath) {
-    return applicationName + volumePath.replace(/[^a-z0-9\-]/gi, '-').toLowerCase();
+    return applicationName + KubernetesApplicationHelper.dnsCompliantString(volumePath);
   }
 
   static associatePodsAndApplication(pods, app) {
@@ -38,33 +53,90 @@ class KubernetesApplicationHelper {
     return res;
   }
 
-  static generateEnvAndSecretFromEnvVariables(app, envVariables) {
-    const secret = new KubernetesApplicationSecret();
-    secret.Name = app.Name;
-    secret.Namespace = app.Namespace;
-    _.forEach(envVariables, (item) => {
-      let envVar = {
-        name: item.Name
-      };
-
-      if (item.IsSecret) {
-        envVar.valueFrom = {
-          secretKeyRef: {
-            name: app.Name,
-            key: item.Name
-          }
-        };
-
-        secret.Data[item.Name] = btoa(unescape(encodeURIComponent(item.Value)));
-      } else {
-        envVar.value = item.Value
-      }
-
-      app.Env.push(envVar);
+  static generateEnvFromEnvVariables(app, envVariables) {
+    const env = _.map(envVariables, (item) => {
+      const res = new KubernetesApplicationEnvPayload();
+      res.name = item.Name;
+      res.value = item.Value;
+      return res;
     });
-    if (!_.isEmpty(secret.Data)) {
-      app.Secret = secret;
-    }
+    app.Env = _.concat(app.Env, env);
+    return app;
+  }
+
+  static generateEnvOrVolumesFromConfigurations(app, configurations) {
+    let finalEnv = [];
+    let finalVolumes = [];
+    let finalMounts = [];
+
+    _.forEach(configurations, (config) => {
+      const isBasic = config.SelectedConfiguration.Type === KubernetesConfigurationTypes.BASIC;
+
+      if (!config.Overriden) {
+        const envKeys = _.keys(config.SelectedConfiguration.Data);
+        _.forEach(envKeys, (item) => {
+          const res = isBasic ? new KubernetesApplicationEnvConfigMapPayload() : new KubernetesApplicationEnvSecretPayload();
+          res.name = item;
+          if (isBasic) {
+            res.valueFrom.configMapKeyRef.name = config.SelectedConfiguration.Name;
+            res.valueFrom.configMapKeyRef.key = item;
+          } else {
+            res.valueFrom.secretKeyRef.name = config.SelectedConfiguration.Name;
+            res.valueFrom.secretKeyRef.key = item;
+          }
+          finalEnv.push(res);
+        });
+
+      } else {
+
+        const envKeys = _.filter(config.OverridenKeys, (item) => item.Type === KubernetesApplicationConfigurationFormValueOverridenKeyTypes.ENVIRONMENT);
+        _.forEach(envKeys, (item) => {
+          const res = isBasic ? new KubernetesApplicationEnvConfigMapPayload() : new KubernetesApplicationEnvSecretPayload();
+          res.name = item.Key;
+          if (isBasic) {
+            res.valueFrom.configMapKeyRef.name = config.SelectedConfiguration.Name;
+            res.valueFrom.configMapKeyRef.key = item.Key;
+          } else {
+            res.valueFrom.secretKeyRef.name = config.SelectedConfiguration.Name;
+            res.valueFrom.secretKeyRef.key = item.Key;
+          }
+          finalEnv.push(res);
+        });
+
+        const volKeys = _.filter(config.OverridenKeys, (item) => item.Type === KubernetesApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM);
+        const groupedVolKeys = _.groupBy(volKeys, 'Path');
+        _.forEach(groupedVolKeys, (items, path) => {
+          const volumeName = KubernetesApplicationHelper.dnsCompliantString('volume-' + path);
+          const configurationName = config.SelectedConfiguration.Name;
+          const itemsMap = _.map(items, (item) => {
+            const entry = new KubernetesApplicationVolumeEntryPayload();
+            entry.key = item.Key;
+            entry.path = item.Key;
+            return entry;
+          });
+
+          const mount = isBasic ? new KubernetesApplicationVolumeMountPayload() : new KubernetesApplicationVolumeMountPayload(true);
+          const volume = isBasic ? new KubernetesApplicationVolumeConfigMapPayload() : new KubernetesApplicationVolumeSecretPayload();
+
+          mount.name = volumeName;
+          mount.mountPath = path;
+          volume.name = volumeName;
+          if (isBasic) {
+            volume.configMap.name = configurationName;
+            volume.configMap.items = itemsMap;
+          } else {
+            volume.secret.secretName = configurationName;
+            volume.secret.items = itemsMap;
+          }
+
+          finalMounts.push(mount);
+          finalVolumes.push(volume);
+        });
+      }
+    });
+    app.Env = _.concat(app.Env, finalEnv);
+    app.Volumes = _.concat(app.Volumes, finalVolumes);
+    app.VolumeMounts = _.concat(app.VolumeMounts, finalMounts);
     return app;
   }
 
@@ -73,20 +145,14 @@ class KubernetesApplicationHelper {
     app.Volumes = [];
     _.forEach(persistedFolders, (item) => {
       const name = KubernetesApplicationHelper.generateApplicationVolumeName(app.Name, item.ContainerPath);
-      const volumeMount = {
-        mountPath: item.ContainerPath,
-        name: name
-      };
-
+      const volumeMount = new KubernetesApplicationVolumeMountPayload();
+      volumeMount.name = name;
+      volumeMount.mountPath = item.ContainerPath;
       app.VolumeMounts.push(volumeMount);
 
-      const volume = {
-        name: name,
-        persistentVolumeClaim: {
-          claimName: name
-        }
-      };
-
+      const volume = new KubernetesApplicationVolumePersistentPayload();
+      volume.name = name;
+      volume.persistentVolumeClaim.claimName = name;
       app.Volumes.push(volume);
     });
     return app;

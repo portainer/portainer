@@ -25,8 +25,9 @@ class KubernetesStatefulSetConverter {
     res.Env = [];
     res.CpuLimit = formValues.CpuLimit;
     res.MemoryLimit = bytesValue(formValues.MemoryLimit);
-    KubernetesApplicationHelper.generateEnvAndSecretFromEnvVariables(res, formValues.EnvironmentVariables);
+    KubernetesApplicationHelper.generateEnvFromEnvVariables(res, formValues.EnvironmentVariables);
     KubernetesApplicationHelper.generateVolumesFromPersistedFolders(res, formValues.PersistedFolders);
+    KubernetesApplicationHelper.generateEnvOrVolumesFromConfigurations(res, formValues.Configurations);
     return res;
   }
 
