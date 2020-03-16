@@ -88,6 +88,7 @@ class KubernetesCreateConfigurationController {
   async onInit() {
     try {
       this.formValues = new KubernetesConfigurationFormValues();
+      this.formValues.Data.push(new KubernetesConfigurationFormValuesDataEntry());
 
       this.state = {
         actionInProgress: false

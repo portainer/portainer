@@ -32,4 +32,3 @@ export class KubernetesConfigurationFormValuesDataEntry {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesConfigurationFormValuesDataEntry)));
   }
 }
-
