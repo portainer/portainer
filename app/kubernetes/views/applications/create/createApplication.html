@@ -151,7 +151,7 @@
               <select class="form-control" ng-model="config.SelectedConfiguration" ng-options="c as c.Name for c in ctrl.configurations"
                 ng-change="ctrl.resetConfiguration($index)"></select>
             </div>
-            <div class="col-sm-4" style="margin-top: 2px;">
+            <div class="col-sm-6" style="margin-top: 2px;">
               <button class="btn btn-sm btn-primary" type="button" ng-if="!config.Overriden" ng-click="ctrl.overrideConfiguration($index)"
                 ng-disabled="!config.SelectedConfiguration">
                 <i class="fa fa-list" aria-hidden="true"></i> Override
@@ -164,26 +164,30 @@
               </button>
             </div>
             <!-- no-override -->
-            <div class="col-sm-12 small text-muted" style="margin-top: 10px;" ng-if="config.SelectedConfiguration && !config.Overriden">
-              The following keys will be loaded from the <code>{{ config.SelectedConfiguration.Name }}</code> configuration as environment variables:
-              <span ng-repeat="(key, _) in config.SelectedConfiguration.Data">
-                <code>{{ key }}</code>{{ $last ? '' : ', '}}
-              </span>
+            <div class="col-sm-12" style="margin-top: 10px;" ng-if="config.SelectedConfiguration && !config.Overriden">
+              <div class="col-md-1 col-sm-2"></div>
+              <div class="col-md-11 col-sm-10 small text-muted" style="padding-left: 5px;">
+                The following keys will be loaded from the <code>{{ config.SelectedConfiguration.Name }}</code> configuration as environment variables:
+                <span ng-repeat="(key, _) in config.SelectedConfiguration.Data">
+                  <code>{{ key }}</code>{{ $last ? '' : ', '}}
+                </span>
+              </div>
             </div>
             <!-- !no-override -->
 
             <!-- has-override -->
             <div class="col-sm-12 form-inline" style="margin-top: 10px;" ng-if="config.Overriden">
               <div ng-repeat="overridenKey in config.OverridenKeys" style="margin-top: 2px;">
+                <div class="col-md-1 col-sm-2" style="margin-left: 3px;"></div>
                 <div class="input-group col-sm-3 input-group-sm">
                   <span class="input-group-addon">configuration key</span>
                   <input type="text" class="form-control" ng-value="overridenKey.Key" disabled>
                 </div>
-                <div class="input-group col-sm-4 input-group-sm" ng-if="overridenKey.Type === ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM">
+                <div class="input-group col-sm-3 input-group-sm" ng-if="overridenKey.Type === ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM">
                   <span class="input-group-addon">path on disk</span>
                   <input type="text" class="form-control" ng-model="overridenKey.Path" placeholder="/etc/myapp/conf.d">
                 </div>
-                <div class="input-group col-sm-4 btn-group btn-group-sm">
+                <div class="input-group col-sm-3 btn-group btn-group-sm">
                   <label class="btn btn-primary" ng-model="overridenKey.Type" uib-btn-radio="ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.ENVIRONMENT">
                     <i class="fa fa-list" aria-hidden="true"></i> Environment
                   </label>
