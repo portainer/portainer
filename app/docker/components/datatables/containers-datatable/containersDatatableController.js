@@ -130,7 +130,6 @@ function ($scope, $controller, DatatableService, EndpointProvider) {
       }
     }
     this.filters.state.enabled = filtered;
-    DatatableService.setDataTableFilters(this.tableKey, this.filters);
   };
 
   this.onSettingsContainerNameTruncateChange = function() {
