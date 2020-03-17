@@ -45,8 +45,8 @@
               </div>
 
               <div style="margin-top: 10px; margin-bottom: 95px;">
-                <label for="endpoint_count" class="col-sm-7 control-label text-left"
-                  style="margin-top: 7px;">Hosts</label>
+                <label for="endpoint_count" class="col-sm-7 control-label text-left" style="margin-top: 7px;">No. of
+                  {{ state.supportType }}(s)</label>
                 <div class="col-sm-5">
                   <input type="number" class="form-control" ng-model="formValues.hostCount" id="endpoint_count"
                     placeholder="{{ state.placeholder }}" min="{{ state.minHosts }}">
