@@ -12,7 +12,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/client"
 )
@@ -32,7 +32,7 @@ type endpointCreatePayload struct {
 	AzureApplicationID     string
 	AzureTenantID          string
 	AzureAuthenticationKey string
-	Tags                   []string
+	Tags                   []portainer.TagID
 }
 
 func (payload *endpointCreatePayload) Validate(r *http.Request) error {
@@ -54,14 +54,14 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 	}
 	payload.GroupID = groupID
 
-	var tags []string
+	var tags []portainer.TagID
 	err = request.RetrieveMultiPartFormJSONValue(r, "Tags", &tags, true)
 	if err != nil {
 		return portainer.Error("Invalid Tags parameter")
 	}
 	payload.Tags = tags
 	if payload.Tags == nil {
-		payload.Tags = make([]string, 0)
+		payload.Tags = make([]portainer.TagID, 0)
 	}
 
 	useTLS, _ := request.RetrieveBooleanMultiPartFormValue(r, "TLS", true)

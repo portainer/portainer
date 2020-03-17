@@ -7,14 +7,14 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 type endpointGroupCreatePayload struct {
 	Name                string
 	Description         string
 	AssociatedEndpoints []portainer.EndpointID
-	Tags                []string
+	Tags                []portainer.TagID
 }
 
 func (payload *endpointGroupCreatePayload) Validate(r *http.Request) error {
@@ -22,7 +22,7 @@ func (payload *endpointGroupCreatePayload) Validate(r *http.Request) error {
 		return portainer.Error("Invalid endpoint group name")
 	}
 	if payload.Tags == nil {
-		payload.Tags = []string{}
+		payload.Tags = []portainer.TagID{}
 	}
 	return nil
 }

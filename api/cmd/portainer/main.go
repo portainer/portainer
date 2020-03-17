@@ -9,7 +9,7 @@ import (
 
 	"github.com/portainer/portainer/api/chisel"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt"
 	"github.com/portainer/portainer/api/cli"
 	"github.com/portainer/portainer/api/cron"
@@ -259,7 +259,7 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 			LogoURL:              *flags.Logo,
 			AuthenticationMethod: portainer.AuthenticationInternal,
 			LDAPSettings: portainer.LDAPSettings{
-				AnonymousMode: true,
+				AnonymousMode:   true,
 				AutoCreateUsers: true,
 				TLSConfig:       portainer.TLSConfiguration{},
 				SearchSettings: []portainer.LDAPSearchSettings{
@@ -397,7 +397,7 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, endpointService portain
 		UserAccessPolicies: portainer.UserAccessPolicies{},
 		TeamAccessPolicies: portainer.TeamAccessPolicies{},
 		Extensions:         []portainer.EndpointExtension{},
-		Tags:               []string{},
+		Tags:               []portainer.TagID{},
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.Snapshot{},
 	}
@@ -440,7 +440,7 @@ func createUnsecuredEndpoint(endpointURL string, endpointService portainer.Endpo
 		UserAccessPolicies: portainer.UserAccessPolicies{},
 		TeamAccessPolicies: portainer.TeamAccessPolicies{},
 		Extensions:         []portainer.EndpointExtension{},
-		Tags:               []string{},
+		Tags:               []portainer.TagID{},
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.Snapshot{},
 	}

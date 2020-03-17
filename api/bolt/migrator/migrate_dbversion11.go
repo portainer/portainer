@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/boltdb/bolt"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
 	"github.com/portainer/portainer/api/bolt/stack"
 )
@@ -17,7 +17,7 @@ func (m *Migrator) updateEndpointsToVersion12() error {
 	}
 
 	for _, endpoint := range legacyEndpoints {
-		endpoint.Tags = []string{}
+		endpoint.Tags = []portainer.TagID{}
 
 		err = m.endpointService.UpdateEndpoint(endpoint.ID, &endpoint)
 		if err != nil {
@@ -35,7 +35,7 @@ func (m *Migrator) updateEndpointGroupsToVersion12() error {
 	}
 
 	for _, group := range legacyEndpointGroups {
-		group.Tags = []string{}
+		group.Tags = []portainer.TagID{}
 
 		err = m.endpointGroupService.UpdateEndpointGroup(group.ID, &group)
 		if err != nil {

@@ -8,7 +8,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/client"
 )
 
@@ -24,7 +24,7 @@ type endpointUpdatePayload struct {
 	AzureApplicationID     *string
 	AzureTenantID          *string
 	AzureAuthenticationKey *string
-	Tags                   []string
+	Tags                   []portainer.TagID
 	UserAccessPolicies     portainer.UserAccessPolicies
 	TeamAccessPolicies     portainer.TeamAccessPolicies
 }

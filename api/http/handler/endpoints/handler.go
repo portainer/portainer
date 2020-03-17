@@ -2,7 +2,7 @@ package endpoints
 
 import (
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/security"
 
@@ -37,6 +37,7 @@ type Handler struct {
 	JobService                  portainer.JobService
 	ReverseTunnelService        portainer.ReverseTunnelService
 	SettingsService             portainer.SettingsService
+	TagsService                 portainer.TagService
 	AuthorizationService        *portainer.AuthorizationService
 }
 

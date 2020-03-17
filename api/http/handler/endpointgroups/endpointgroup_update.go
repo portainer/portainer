@@ -7,13 +7,13 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 type endpointGroupUpdatePayload struct {
 	Name               string
 	Description        string
-	Tags               []string
+	Tags               []portainer.TagID
 	UserAccessPolicies portainer.UserAccessPolicies
 	TeamAccessPolicies portainer.TeamAccessPolicies
 }

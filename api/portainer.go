@@ -260,7 +260,7 @@ type (
 		TLSConfig          TLSConfiguration    `json:"TLSConfig"`
 		Extensions         []EndpointExtension `json:"Extensions"`
 		AzureCredentials   AzureCredentials    `json:"AzureCredentials,omitempty"`
-		Tags               []string            `json:"Tags"`
+		Tags               []TagID             `json:"Tags"`
 		Status             EndpointStatus      `json:"Status"`
 		Snapshots          []Snapshot          `json:"Snapshots"`
 		UserAccessPolicies UserAccessPolicies  `json:"UserAccessPolicies"`
@@ -426,7 +426,7 @@ type (
 		Description        string             `json:"Description"`
 		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
 		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
-		Tags               []string           `json:"Tags"`
+		Tags               []TagID            `json:"Tags"`
 
 		// Deprecated fields
 		Labels []Pair `json:"Labels"`

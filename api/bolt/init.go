@@ -16,7 +16,7 @@ func (store *Store) Init() error {
 			Labels:             []portainer.Pair{},
 			UserAccessPolicies: portainer.UserAccessPolicies{},
 			TeamAccessPolicies: portainer.TeamAccessPolicies{},
-			Tags:               []string{},
+			Tags:               []portainer.TagID{},
 		}
 
 		err = store.EndpointGroupService.CreateEndpointGroup(unassignedGroup)
