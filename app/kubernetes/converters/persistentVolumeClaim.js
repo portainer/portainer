@@ -5,6 +5,17 @@ import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 import { KubernetesPersistentVolumClaimCreatePayload } from 'Kubernetes/models/volume/payloads';
 
 class KubernetesPersistentVolumeClaimConverter {
+
+  static apiToPersistentVolumeClaim(data, storageClasses) {
+    const res = new KubernetesPersistentVolumeClaim();
+    res.Name = data.metadata.name;
+    res.Namespace = data.metadata.namespace;
+    res.CreationDate = data.metadata.creationTimestamp;
+    res.Storage = data.spec.resources.requests.storage;
+    res.StorageClass = _.find(storageClasses, {Name: data.spec.storageClassName});
+    return res;
+  }
+
   /**
    * Generate KubernetesPersistentVolumeClaim list from KubernetesApplicationFormValues
    * @param {KubernetesApplicationFormValues} formValues 

@@ -101,7 +101,7 @@
             </td>
             <td>
               <a ui-sref="kubernetes.applications.application({ name: item.ApplicationName, namespace: item.ResourcePool })">{{ item.ApplicationName }}</a>
-              <span style="margin-left: 5px;" class="label label-warning image-tag" ng-if="$ctrl.isSystemNamespace(item)">system</span>
+              <span style="margin-left: 5px;" class="label label-info image-tag" ng-if="$ctrl.isSystemNamespace(item)">system</span>
             </td>
             <td>
               <span ng-if="item.ServiceType === 'LoadBalancer'">
