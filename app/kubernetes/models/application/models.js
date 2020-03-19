@@ -20,6 +20,11 @@ export const KubernetesApplicationPublishingTypes = Object.freeze({
   'LOADBALANCER': 3
 });
 
+export const KubernetesApplicationQuotaDefaults = {
+  CpuLimit: 0.10,
+  MemoryLimit: 64 // MB
+};
+
 export const KubernetesPortainerApplicationStackNameLabel = 'io.portainer.kubernetes.application.stack';
 
 export const KubernetesPortainerApplicationNameLabel = 'io.portainer.kubernetes.application.name';

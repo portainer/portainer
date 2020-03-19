@@ -5,12 +5,11 @@ export const KubernetesPortainerResourcePoolOwnerLabel = "io.portainer.kubernete
 /**
  * KubernetesResourcePool Model
  * ResourcePool is a composite model that includes
- * A Namespace, a Quota and a LimitRange if it contains a resource quota
+ * A Namespace and a Quota
  */
 const _KubernetesResourcePool = Object.freeze({
   Namespace: {}, // KubernetesNamespace
   Quota: undefined, // KubernetesResourceQuota
-  LimitRange: undefined, // KubernetesLimitRange
   Yaml: ''
 });
 

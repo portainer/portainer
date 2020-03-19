@@ -1,8 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
-import { KubernetesApplicationDataAccessPolicies, KubernetesApplicationDeploymentTypes, KubernetesApplicationPublishingTypes } from 'Kubernetes/models/application/models';
-import { KubernetesLimitRangeDefaults } from 'Kubernetes/models/limit-range/models';
+import { KubernetesApplicationDataAccessPolicies, KubernetesApplicationDeploymentTypes, KubernetesApplicationPublishingTypes, KubernetesApplicationQuotaDefaults } from 'Kubernetes/models/application/models';
 import {
   KubernetesApplicationPublishedPortFormValue,
   KubernetesApplicationEnvironmentVariableFormValue,
@@ -232,14 +231,14 @@ class KubernetesCreateApplicationController {
       if (quota) {
         this.state.resourcePoolHasQuota = true;
         if (quota.CpuLimit) {
-          minCpu = KubernetesLimitRangeDefaults.CpuLimit;
+          minCpu = KubernetesApplicationQuotaDefaults.CpuLimit;
           maxCpu = quota.CpuLimit - quota.CpuLimitUsed;
         } else {
           minCpu = 0;
           maxCpu = this.state.nodes.cpu;
         }
         if (quota.MemoryLimit) {
-          minMemory = KubernetesLimitRangeDefaults.MemoryLimit;
+          minMemory = KubernetesApplicationQuotaDefaults.MemoryLimit;
           maxMemory = quota.MemoryLimit - quota.MemoryLimitUsed;
         } else {
           minMemory = 0;

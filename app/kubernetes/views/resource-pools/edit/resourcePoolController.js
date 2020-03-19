@@ -2,7 +2,6 @@ import angular from 'angular';
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import { KubernetesResourceQuotaDefaults, KubernetesResourceQuota } from 'Kubernetes/models/resource-quota/models';
-import { KubernetesLimitRange } from 'Kubernetes/models/limit-range/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/kubernetesResourceReservationHelper';
 
 function megaBytesValue(mem) {
@@ -15,7 +14,7 @@ function bytesValue(mem) {
 
 class KubernetesResourcePoolController {
   /* @ngInject */
-  constructor($async, $state, Authentication, Notifications, KubernetesNodeService, KubernetesResourceQuotaService, KubernetesResourcePoolService, KubernetesLimitRangeService, KubernetesEventService, KubernetesPodService, KubernetesApplicationService) {
+  constructor($async, $state, Authentication, Notifications, KubernetesNodeService, KubernetesResourceQuotaService, KubernetesResourcePoolService, KubernetesEventService, KubernetesPodService, KubernetesApplicationService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
@@ -23,7 +22,6 @@ class KubernetesResourcePoolController {
 
     this.KubernetesNodeService = KubernetesNodeService;
     this.KubernetesResourceQuotaService = KubernetesResourceQuotaService;
-    this.KubernetesLimitRangeService = KubernetesLimitRangeService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesEventService = KubernetesEventService;
     this.KubernetesPodService = KubernetesPodService;
@@ -31,7 +29,6 @@ class KubernetesResourcePoolController {
 
     this.onInit = this.onInit.bind(this);
     this.createResourceQuotaAsync = this.createResourceQuotaAsync.bind(this);
-    this.createLimitRangeAsync = this.createLimitRangeAsync.bind(this);
     this.updateResourcePoolAsync = this.updateResourcePoolAsync.bind(this);
     this.getEvents = this.getEvents.bind(this);
     this.getEventsAsync = this.getEventsAsync.bind(this);
@@ -60,15 +57,6 @@ class KubernetesResourcePoolController {
     this.state.showEditorTab = true;
   }
 
-  async createLimitRangeAsync(namespace, owner, cpuLimit, memoryLimit) {
-    const limitRange = new KubernetesLimitRange(namespace);
-    limitRange.CPU = cpuLimit
-    limitRange.Memory = memoryLimit;
-    limitRange.ResourcePoolName = namespace;
-    limitRange.ResourcePoolOwner = owner;
-    return await this.KubernetesLimitRangeService.create(limitRange);
-  }
-
   async createResourceQuotaAsync(namespace, owner, cpuLimit, memoryLimit) {
     const quota = new KubernetesResourceQuota(namespace);
     quota.CpuLimit = cpuLimit;
@@ -93,18 +81,11 @@ class KubernetesResourcePoolController {
           quota.CpuLimit = cpuLimit;
           quota.MemoryLimit = memoryLimit;
           await this.KubernetesResourceQuotaService.update(quota);
-          if (!this.pool.LimitRange) {
-            await this.createLimitRangeAsync(namespace, owner, cpuLimit, memoryLimit);
-          }
         } else {
           await this.createResourceQuotaAsync(namespace, owner, cpuLimit, memoryLimit);
-          await this.createLimitRangeAsync(namespace, owner, cpuLimit, memoryLimit);
         }
       } else if (quota) {
         await this.KubernetesResourceQuotaService.delete(quota);
-        if (this.pool.LimitRange) {
-          await this.KubernetesLimitRangeService.delete(this.pool.LimitRange);
-        }
       }
       this.Notifications.success('Resource pool successfully updated', this.pool.Namespace.Name);
       this.$state.reload();

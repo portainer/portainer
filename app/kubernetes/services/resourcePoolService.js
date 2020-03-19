@@ -1,20 +1,17 @@
 import _ from 'lodash-es';
-import { KubernetesLimitRange } from 'Kubernetes/models/limit-range/models';
 import { KubernetesResourceQuota } from 'Kubernetes/models/resource-quota/models';
 
 import angular from 'angular';
 import KubernetesResourcePoolConverter from 'Kubernetes/converters/resourcePool';
-import KubernetesLimitRangeHelper from 'Kubernetes/helpers/limitRangeHelper';
 import KubernetesResourceQuotaHelper from 'Kubernetes/helpers/resourceQuotaHelper';
 import { KubernetesNamespace } from 'Kubernetes/models/namespace/models';
 
 class KubernetesResourcePoolService {
   /* @ngInject */
-  constructor($async, KubernetesNamespaceService, KubernetesResourceQuotaService, KubernetesLimitRangeService) {
+  constructor($async, KubernetesNamespaceService, KubernetesResourceQuotaService) {
     this.$async = $async;
     this.KubernetesNamespaceService = KubernetesNamespaceService;
     this.KubernetesResourceQuotaService = KubernetesResourceQuotaService;
-    this.KubernetesLimitRangeService = KubernetesLimitRangeService;
 
     this.getAsync = this.getAsync.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);
@@ -28,18 +25,13 @@ class KubernetesResourcePoolService {
   async getAsync(name) {
     try {
       const namespace = await this.KubernetesNamespaceService.get(name);
-      const [quotaAttempt, limitRangeAttempt] = await Promise.allSettled([
+      const [quotaAttempt] = await Promise.allSettled([
         this.KubernetesResourceQuotaService.get(name, KubernetesResourceQuotaHelper.generateResourceQuotaName(name)),
-        this.KubernetesLimitRangeService.get(name, KubernetesLimitRangeHelper.generateLimitRangeName(name))
       ]);
       const pool = KubernetesResourcePoolConverter.apiToResourcePool(namespace);
       if (quotaAttempt.status === 'fulfilled') {
         pool.Quota = quotaAttempt.value;
         pool.Yaml += '---\n' + quotaAttempt.value.Yaml;
-      }
-      if (limitRangeAttempt.status === 'fulfilled') {
-        pool.LimitRange = limitRangeAttempt.value;
-        pool.Yaml += '---\n' + limitRangeAttempt.value.Yaml;
       }
       return pool;
     } catch (err) {
@@ -84,12 +76,6 @@ class KubernetesResourcePoolService {
         quota.ResourcePoolName = name;
         quota.ResourcePoolOwner = owner;
         await this.KubernetesResourceQuotaService.create(quota);
-        const limitRange = new KubernetesLimitRange(name);
-        limitRange.CPU = cpuLimit;
-        limitRange.Memory = memoryLimit;
-        limitRange.ResourcePoolName = name;
-        limitRange.ResourcePoolOwner = owner;
-        await this.KubernetesLimitRangeService.create(limitRange);
       }
     } catch (err) {
       throw err;
