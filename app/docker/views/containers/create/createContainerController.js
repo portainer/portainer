@@ -594,7 +594,7 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
 
     SystemService.info()
     .then(function success(data) {
-      $scope.availableRuntimes = Object.keys(data.Runtimes);
+      $scope.availableRuntimes = data.Runtimes ? Object.keys(data.Runtimes) : [];
       $scope.config.HostConfig.Runtime = '';
       $scope.state.sliderMaxCpu = 32;
       if (data.NCPU) {

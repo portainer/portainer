@@ -3,7 +3,7 @@ module github.com/portainer/portainer/api
 go 1.13
 
 require (
-	github.com/Microsoft/go-winio v0.3.8
+	github.com/Microsoft/go-winio v0.4.14
 	github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a
 	github.com/boltdb/bolt v1.3.1
 	github.com/containerd/containerd v1.3.1 // indirect
@@ -35,6 +35,6 @@ require (
 	gopkg.in/src-d/go-git.v4 v4.13.1
 )
 
-replace github.com/docker/docker => github.com/docker/engine v1.4.2-0.20191127222017-3152f9436292
+replace github.com/docker/docker => github.com/docker/engine v1.4.2-0.20200204220554-5f6d6f3f2203
 
 replace gopkg.in/asn1-ber.v1 => github.com/go-asn1-ber/asn1-ber v1.3.1
