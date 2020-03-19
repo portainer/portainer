@@ -945,7 +945,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-	APIVersion = "1.23.2"
+	APIVersion = "1.24.0-dev"
 	// DBVersion is the version number of the Portainer database
 	DBVersion = 23
 	// AssetsServerURL represents the URL of the Portainer asset server
