@@ -85,14 +85,12 @@
             </span>
             <span class="space-left space-right">-</span>
           </span>
-          <span ng-if="$ctrl.model.Tags.length === 0">
+          <span ng-if="$ctrl.endpointTags.length === 0">
             <i class="fa fa-tags" aria-hidden="true"></i> No tags
           </span>
-          <span ng-if="$ctrl.model.Tags.length > 0">
+          <span ng-if="$ctrl.endpointTags.length > 0">
             <i class="fa fa-tags" aria-hidden="true"></i>
-            <span ng-repeat="tag in $ctrl.model.Tags">
-              {{ tag }}{{ $last? '' : ', ' }}
-            </span>
+            {{ $ctrl.endpointTags }}
           </span>
         </span>
         <span class="small text-muted" ng-if="$ctrl.model.Type !== 4">
