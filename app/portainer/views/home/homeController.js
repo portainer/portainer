@@ -1,6 +1,6 @@
 angular.module('portainer.app')
-  .controller('HomeController', ['$q', '$scope', '$state', '$interval', 'Authentication', 'EndpointService', 'EndpointHelper', 'GroupService', 'Notifications', 'EndpointProvider', 'StateManager', 'LegacyExtensionManager', 'ModalService', 'MotdService', 'SystemService',
-    function($q, $scope, $state, $interval, Authentication, EndpointService, EndpointHelper, GroupService, Notifications, EndpointProvider, StateManager, LegacyExtensionManager, ModalService, MotdService, SystemService) {
+  .controller('HomeController', 
+    function($q, $scope, $state, TagService, Authentication, EndpointService, EndpointHelper, GroupService, Notifications, EndpointProvider, StateManager, LegacyExtensionManager, ModalService, MotdService, SystemService) {
 
       $scope.state = {
         connectingToEdgeEndpoint: false,
@@ -165,9 +165,10 @@ angular.module('portainer.app')
         return deferred.promise;
       }
 
-      function initView() {
+      async function initView() {
         $scope.isAdmin = Authentication.isAdmin();
-
+        $scope.tags = [];
+        
         MotdService.motd()
         .then(function success(data) {
           $scope.motd = data;
@@ -183,7 +184,13 @@ angular.module('portainer.app')
             $scope.endpoints = data.endpoints;
           }
         });
+
+        try {
+          $scope.tags = await TagService.tags();
+        } catch(e) {
+          Notifications.error("Failed loading tags", e)
+        }
       }
 
       initView();
-    }]);
+    });
