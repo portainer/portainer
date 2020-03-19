@@ -51,7 +51,7 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 	}
 
 	if payload.Tags != nil {
-		endpointGroup.Tags = payload.Tags
+		endpointGroup.TagIDs = payload.Tags
 	}
 
 	updateAuthorizations := false

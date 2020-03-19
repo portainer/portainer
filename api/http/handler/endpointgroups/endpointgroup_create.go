@@ -40,7 +40,7 @@ func (handler *Handler) endpointGroupCreate(w http.ResponseWriter, r *http.Reque
 		Description:        payload.Description,
 		UserAccessPolicies: portainer.UserAccessPolicies{},
 		TeamAccessPolicies: portainer.TeamAccessPolicies{},
-		Tags:               payload.Tags,
+		TagIDs:             payload.Tags,
 	}
 
 	err = handler.EndpointGroupService.CreateEndpointGroup(endpointGroup)

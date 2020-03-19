@@ -260,7 +260,7 @@ type (
 		TLSConfig          TLSConfiguration    `json:"TLSConfig"`
 		Extensions         []EndpointExtension `json:"Extensions"`
 		AzureCredentials   AzureCredentials    `json:"AzureCredentials,omitempty"`
-		Tags               []TagID             `json:"Tags"`
+		TagIDs             []TagID             `json:"TagIds"`
 		Status             EndpointStatus      `json:"Status"`
 		Snapshots          []Snapshot          `json:"Snapshots"`
 		UserAccessPolicies UserAccessPolicies  `json:"UserAccessPolicies"`
@@ -277,6 +277,9 @@ type (
 		// Deprecated in DBVersion == 18
 		AuthorizedUsers []UserID `json:"AuthorizedUsers"`
 		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
+
+		// Deprecated in DBVersion == 22
+		Tags []string `json:"Tags"`
 	}
 
 	// Authorization represents an authorization associated to an operation
@@ -426,7 +429,7 @@ type (
 		Description        string             `json:"Description"`
 		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
 		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
-		Tags               []TagID            `json:"Tags"`
+		TagIDs             []TagID            `json:"TagIDs"`
 
 		// Deprecated fields
 		Labels []Pair `json:"Labels"`
@@ -434,6 +437,9 @@ type (
 		// Deprecated in DBVersion == 18
 		AuthorizedUsers []UserID `json:"AuthorizedUsers"`
 		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
+
+		// Deprecated in DBVersion == 22
+		Tags []string `json:"Tags"`
 	}
 
 	// EndpointExtension represents a deprecated form of Portainer extension
@@ -919,7 +925,7 @@ const (
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "1.24.0-dev"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 22
+	DBVersion = 23
 	// AssetsServerURL represents the URL of the Portainer asset server
 	AssetsServerURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com"
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved

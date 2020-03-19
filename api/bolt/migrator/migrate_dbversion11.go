@@ -17,7 +17,7 @@ func (m *Migrator) updateEndpointsToVersion12() error {
 	}
 
 	for _, endpoint := range legacyEndpoints {
-		endpoint.Tags = []portainer.TagID{}
+		endpoint.Tags = []string{}
 
 		err = m.endpointService.UpdateEndpoint(endpoint.ID, &endpoint)
 		if err != nil {
@@ -35,7 +35,7 @@ func (m *Migrator) updateEndpointGroupsToVersion12() error {
 	}
 
 	for _, group := range legacyEndpointGroups {
-		group.Tags = []portainer.TagID{}
+		group.Tags = []string{}
 
 		err = m.endpointGroupService.UpdateEndpointGroup(group.ID, &group)
 		if err != nil {

@@ -2,7 +2,7 @@ package migrator
 
 import (
 	"github.com/boltdb/bolt"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/endpoint"
 	"github.com/portainer/portainer/api/bolt/endpointgroup"
 	"github.com/portainer/portainer/api/bolt/extension"
@@ -12,6 +12,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/schedule"
 	"github.com/portainer/portainer/api/bolt/settings"
 	"github.com/portainer/portainer/api/bolt/stack"
+	"github.com/portainer/portainer/api/bolt/tag"
 	"github.com/portainer/portainer/api/bolt/teammembership"
 	"github.com/portainer/portainer/api/bolt/template"
 	"github.com/portainer/portainer/api/bolt/user"
@@ -37,6 +38,7 @@ type (
 		userService            *user.Service
 		versionService         *version.Service
 		fileService            portainer.FileService
+		tagService             *tag.Service
 	}
 
 	// Parameters represents the required parameters to create a new Migrator instance.
@@ -57,6 +59,7 @@ type (
 		UserService            *user.Service
 		VersionService         *version.Service
 		FileService            portainer.FileService
+		TagService             *tag.Service
 	}
 )
 
@@ -79,6 +82,7 @@ func NewMigrator(parameters *Parameters) *Migrator {
 		userService:            parameters.UserService,
 		versionService:         parameters.VersionService,
 		fileService:            parameters.FileService,
+		tagService:             parameters.TagService,
 	}
 }
 
@@ -296,6 +300,13 @@ func (m *Migrator) Migrate() error {
 		}
 
 		err = m.updateUsersAndRolesToDBVersion22()
+		if err != nil {
+			return err
+		}
+	}
+
+	if m.currentDBVersion < 23 {
+		err := m.updateEndointsAndEndpointsGroupsToDBVersion23()
 		if err != nil {
 			return err
 		}

@@ -74,7 +74,7 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if payload.Tags != nil {
-		endpoint.Tags = payload.Tags
+		endpoint.TagIDs = payload.Tags
 	}
 
 	updateAuthorizations := false

@@ -187,7 +187,7 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 		TeamAccessPolicies: portainer.TeamAccessPolicies{},
 		Extensions:         []portainer.EndpointExtension{},
 		AzureCredentials:   credentials,
-		Tags:               payload.Tags,
+		TagIDs:             payload.Tags,
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.Snapshot{},
 	}
@@ -232,7 +232,7 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		AuthorizedUsers: []portainer.UserID{},
 		AuthorizedTeams: []portainer.TeamID{},
 		Extensions:      []portainer.EndpointExtension{},
-		Tags:            payload.Tags,
+		TagIDs:          payload.Tags,
 		Status:          portainer.EndpointStatusUp,
 		Snapshots:       []portainer.Snapshot{},
 		EdgeKey:         edgeKey,
@@ -278,7 +278,7 @@ func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) 
 		UserAccessPolicies: portainer.UserAccessPolicies{},
 		TeamAccessPolicies: portainer.TeamAccessPolicies{},
 		Extensions:         []portainer.EndpointExtension{},
-		Tags:               payload.Tags,
+		TagIDs:             payload.Tags,
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.Snapshot{},
 	}
@@ -322,7 +322,7 @@ func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload)
 		UserAccessPolicies: portainer.UserAccessPolicies{},
 		TeamAccessPolicies: portainer.TeamAccessPolicies{},
 		Extensions:         []portainer.EndpointExtension{},
-		Tags:               payload.Tags,
+		TagIDs:             payload.Tags,
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.Snapshot{},
 	}
