@@ -6,13 +6,15 @@ import { KubernetesPersistentVolumClaimCreatePayload } from 'Kubernetes/models/v
 
 class KubernetesPersistentVolumeClaimConverter {
 
-  static apiToPersistentVolumeClaim(data, storageClasses) {
+  static apiToPersistentVolumeClaim(data, storageClasses, yaml) {
     const res = new KubernetesPersistentVolumeClaim();
+    res.Id = data.metadata.uid;
     res.Name = data.metadata.name;
     res.Namespace = data.metadata.namespace;
     res.CreationDate = data.metadata.creationTimestamp;
     res.Storage = data.spec.resources.requests.storage;
     res.StorageClass = _.find(storageClasses, {Name: data.spec.storageClassName});
+    res.Yaml = yaml ? yaml.data : '';
     return res;
   }
 

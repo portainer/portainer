@@ -23,8 +23,11 @@ class KubernetesPersistentVolumeClaimService {
     try {
       const params = new KubernetesCommonParams();
       params.id = name;
-      const data = this.KubernetesPersistentVolumeClaims(namespace).get(params).$promise;
-      return KubernetesPersistentVolumeClaimConverter.apiToPersistentVolumeClaim(data, this.storageClasses);
+      const [raw, yaml] = await Promise.all([
+        this.KubernetesPersistentVolumeClaims(namespace).get(params).$promise,
+        this.KubernetesPersistentVolumeClaims(namespace).getYaml(params).$promise
+      ]);
+      return KubernetesPersistentVolumeClaimConverter.apiToPersistentVolumeClaim(raw, this.storageClasses, yaml);
     } catch (err) {
       throw new PortainerError('Unable to retrieve persistent volume claim', err);
     }

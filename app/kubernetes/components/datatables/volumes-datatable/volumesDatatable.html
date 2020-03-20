@@ -108,9 +108,9 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="$ctrl.disableRemove(item)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="kubernetes.volumes.volume({ id: item.PersistentVolumeClaim.Name })">{{ item.PersistentVolumeClaim.Name }}</a>
+                <a ui-sref="kubernetes.volumes.volume({ namespace: item.ResourcePool.Namespace.Name, name: item.PersistentVolumeClaim.Name })">{{ item.PersistentVolumeClaim.Name }}</a>
                 <span style="margin-left: 5px;" class="label label-info image-tag" ng-if="$ctrl.isSystemNamespace(item)">system</span>
-                <span style="margin-left: 5px;" class="label label-warning image-tag" ng-if="$ctrl.isUnused(item)">unused</span>
+                <span style="margin-left: 5px;" class="label label-warning image-tag" ng-if="!$ctrl.isUsed(item)">unused</span>
               </td>
               <td>
                 <a ui-sref="kubernetes.resourcePools.resourcePool({ id: item.ResourcePool.Namespace.Name })">{{ item.ResourcePool.Namespace.Name }}</a>

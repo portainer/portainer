@@ -23,7 +23,7 @@ class KubernetesVolumeService {
     try {
       const ns = await this.KubernetesResourcePoolService.get(namespace);
       const pools = [ns];
-      const [data, applications] = Promise.all([
+      const [data, applications] = await Promise.all([
         this.KubernetesPersistentVolumeClaimService.get(namespace, name),
         this.KubernetesApplicationService.get(namespace)
       ]);

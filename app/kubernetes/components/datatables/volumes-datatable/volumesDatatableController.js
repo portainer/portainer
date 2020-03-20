@@ -1,4 +1,5 @@
 import angular from 'angular';
+import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
 
 // TODO: review - refactor to use `extends GenericDatatableController`
 class KubernetesVolumesDatatableController {
@@ -15,11 +16,11 @@ class KubernetesVolumesDatatableController {
   }
 
   disableRemove(item) {
-    return !this.isUnused(item);
+    return this.isSystemNamespace(item) || this.isUsed(item);
   }
 
-  isUnused(item) {
-    return !this.isSystemNamespace(item) && item.Applications.length === 0;
+  isUsed(item) {
+    return KubernetesVolumeHelper.isUsed(item);
   }
 
   isSystemNamespace(item) {

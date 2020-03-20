@@ -8,6 +8,10 @@ class KubernetesVolumeHelper {
       return volume.ResourcePool.Namespace.Name === app.ResourcePool && matchingNames.length;
     });
   }
+
+  static isUsed(item) {
+    return item.Applications.length !== 0;
+  }
 }
 
 export default KubernetesVolumeHelper;

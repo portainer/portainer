@@ -189,6 +189,16 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     }
   };
 
+  const volume = {
+    name: 'kubernetes.volumes.volume',
+    url: '/:namespace/:name',
+    views: {
+      'content@': {
+        component: 'kubernetesVolumeView'
+      }
+    }
+  };
+
   $stateRegistryProvider.register(kubernetes);
   $stateRegistryProvider.register(applications);
   $stateRegistryProvider.register(applicationCreation);
@@ -207,4 +217,5 @@ angular.module('portainer.kubernetes', ['portainer.app'])
   $stateRegistryProvider.register(resourcePool);
   $stateRegistryProvider.register(resourcePoolAccess);
   $stateRegistryProvider.register(volumes);
+  $stateRegistryProvider.register(volume);
 }]);

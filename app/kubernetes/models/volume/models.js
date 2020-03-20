@@ -2,11 +2,13 @@
  * KubernetesPersistentVolumeClaim Model
  */
 const _KubernetesPersistentVolumeClaim = Object.freeze({
+  Id: '',
   Name: '',
   Namespace: '',
   Storage: 0,
   StorageClass: {}, // KubernetesStorageClass
-  CreationDate: ''
+  CreationDate: '',
+  Yaml: ''
 });
 
 export class KubernetesPersistentVolumeClaim {
