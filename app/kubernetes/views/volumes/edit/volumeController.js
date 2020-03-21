@@ -55,10 +55,6 @@ class KubernetesVolumeController {
       this.state.eventsLoading = true;
       const events = await this.KubernetesEventService.get(this.state.namespace);
       this.events = _.filter(events, (event) => event.Involved.uid === this.volume.PersistentVolumeClaim.Id);
-
-      // this.events = _.filter(events, (event) => event.Involved.uid === this.application.Id
-      //   || event.Involved.uid === this.application.ServiceId
-      //   || _.find(this.application.Pods, (pod) => pod.Id === event.Involved.uid) !== undefined);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve application related events');
     } finally {
