@@ -5,16 +5,14 @@ class KubernetesStackHelper {
   static stacksFromApplications(applications) {
     const res = _.reduce(applications, (acc, app) => {
       if (app.StackName !== '-') {
-        const stack = _.find(acc, {Name: app.StackName});
-        if (stack) {
-          stack.ApplicationCount += 1;
-        } else {
-          const item = new KubernetesStack();
-          item.Name = app.StackName;
-          item.ResourcePool = app.ResourcePool;
-          item.ApplicationCount = 1;
-          acc.push(item);
+        let stack = _.find(acc, {Name: app.StackName, ResourcePool: app.ResourcePool});
+        if (!stack) {
+          stack = new KubernetesStack();
+          stack.Name = app.StackName;
+          stack.ResourcePool = app.ResourcePool;
+          acc.push(stack);
         }
+        stack.Applications.push(app);
       }
       return acc;
     }, []);

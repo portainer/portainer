@@ -1,6 +1,6 @@
 angular.module('portainer.kubernetes').component('kubernetesApplicationsStacksDatatable', {
   templateUrl: './applicationsStacksDatatable.html',
-  controller: 'GenericDatatableController',
+  controller: 'KubernetesApplicationsStacksDatatableController',
   bindings: {
     titleText: '@',
     titleIcon: '@',
