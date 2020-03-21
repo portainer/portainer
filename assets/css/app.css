@@ -933,3 +933,9 @@ json-tree .branch-preview {
   opacity: .5;
 }
 /* !json-tree override */
+
+/* uib-progressbar override */
+.progress-bar {
+  color: #4e4e4e;
+}
+/* !uib-progressbar override */
