@@ -29,7 +29,7 @@
     <div class="col-sm-9" style="margin-top: 4px;">
       <uib-progressbar animate="false" value="$ctrl.cpuUsage"
         type="{{ $ctrl.cpuUsage | kubernetesUsageLevelInfo }}">
-        <b>
+        <b style="white-space:nowrap;">
           {{ $ctrl.cpu | kubernetesApplicationCPUValue }} / {{ $ctrl.cpuLimit }} - {{ $ctrl.cpuUsage }}%
         </b>
       </uib-progressbar>
