@@ -45,7 +45,9 @@ class KubernetesCreateApplicationController {
   }
 
   addConfiguration() {
-    this.formValues.Configurations.push(new KubernetesApplicationConfigurationFormValue());
+    let config = new KubernetesApplicationConfigurationFormValue();
+    config.SelectedConfiguration = this.configurations[0];
+    this.formValues.Configurations.push(config);
   }
 
   removeConfiguration(index) {
