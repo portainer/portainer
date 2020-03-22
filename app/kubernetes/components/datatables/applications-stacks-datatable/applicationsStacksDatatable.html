@@ -102,7 +102,7 @@
             </tr>
             <tr dir-paginate-end ng-show="item.Expanded" ng-repeat="app in item.Applications" ng-style="{background: (item.Highlighted ? '#d5e8f3' : '#f5f5f5')}">
               <td colspan="4">
-                <a ui-sref="kubernetes.applications.application({ name: app.Name, namespace: app.ResourcePool })">{{ app.Name }}</a>
+                <a ui-sref="kubernetes.applications.application({ name: app.Name, namespace: app.ResourcePool })" style="margin-left: 25px;">{{ app.Name }}</a>
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
