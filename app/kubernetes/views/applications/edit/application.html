@@ -5,7 +5,7 @@
     </a>
   </rd-header-title>
   <rd-header-content>
-    <a ui-sref="kubernetes.applications">Applications</a> &gt; {{ ctrl.application.Name }}
+    <a ui-sref="kubernetes.resourcePools">Resource pools</a> &gt; <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.application.ResourcePool })">{{ ctrl.application.ResourcePool }}</a> &gt; <a ui-sref="kubernetes.applications">Applications</a> &gt; {{ ctrl.application.Name }}
   </rd-header-content>
 </rd-header>
 
@@ -33,7 +33,9 @@
                 </tr>
                 <tr>
                   <td>Resource pool</td>
-                  <td>{{ ctrl.application.ResourcePool }}</td>
+                  <td>
+                    <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.application.ResourcePool })">{{ ctrl.application.ResourcePool }}</a>
+                  </td>
                 </tr>
                 <tr>
                   <td>Deployment</td>

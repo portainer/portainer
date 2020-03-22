@@ -105,7 +105,9 @@
                 <a ui-sref="kubernetes.configurations.configuration({ name: item.Name, namespace: item.Namespace })">{{ item.Name }}</a>
                 <span style="margin-left: 5px;" class="label label-warning image-tag" ng-if="!item.Used">unused</span>
               </td>
-              <td>{{ item.Namespace }}</td>
+              <td>
+                <a ui-sref="kubernetes.resourcePools.resourcePool({ id: item.Namespace })">{{ item.Namespace }}</a>
+              </td>
               <td>{{ item.Type }}</td>
               <td>{{ item.CreationDate | getisodate }}</td>
             </tr>

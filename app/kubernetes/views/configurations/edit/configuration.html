@@ -1,7 +1,11 @@
 <rd-header>
-  <rd-header-title title-text="Configuration detail"></rd-header-title>
+  <rd-header-title title-text="Configuration details">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="kubernetes.configurations.configuration" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
   <rd-header-content>
-    <a ui-sref="kubernetes.configurations">Configurations</a> &gt; {{ ctrl.configuration.Name }}
+    <a ui-sref="kubernetes.resourcePools">Resource pools</a> &gt; <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.configuration.Namespace })">{{ ctrl.configuration.Namespace }}</a> &gt; <a ui-sref="kubernetes.configurations">Configurations</a> &gt; {{ ctrl.configuration.Name }}
   </rd-header-content>
 </rd-header>
 

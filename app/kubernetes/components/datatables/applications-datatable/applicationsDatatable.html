@@ -120,7 +120,9 @@
                 <span style="margin-left: 5px;" class="label label-info image-tag" ng-if="$ctrl.isSystemNamespace(item)">system</span>
               </td>
               <td>{{ item.StackName }}</td>
-              <td>{{ item.ResourcePool }}</td>
+              <td>
+                <a ui-sref="kubernetes.resourcePools.resourcePool({ id: item.ResourcePool })">{{ item.ResourcePool }}</a>
+              </td>
               <td>{{ item.Image }}</td>
               <td>
                 <span ng-if="item.DeploymentType === $ctrl.KubernetesApplicationDeploymentTypes.REPLICATED">Replicated</span>

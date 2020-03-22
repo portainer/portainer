@@ -1,7 +1,11 @@
 <rd-header>
-  <rd-header-title title-text="Edit resource pool"></rd-header-title>
+  <rd-header-title title-text="Resource pool details">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="kubernetes.resourcePools.resourcePool" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
   <rd-header-content>
-    <a ui-sref="kubernetes.resourcePools">Resource pools</a> &gt; {{ctrl.pool.Namespace.Name}}
+    <a ui-sref="kubernetes.resourcePools">Resource pools</a> &gt; {{ ctrl.pool.Namespace.Name }}
   </rd-header-content>
 </rd-header>
 
