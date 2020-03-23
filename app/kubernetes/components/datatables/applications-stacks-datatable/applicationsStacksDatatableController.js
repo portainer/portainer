@@ -11,6 +11,13 @@ angular.module('portainer.docker')
         expandAll: false
       });
 
+      /**
+       * Do not allow applications in system namespaces to be selected
+       */
+      this.allowSelection = function(item) {
+        return !this.isSystemNamespace(item);
+      }
+
       this.isSystemNamespace = function (item) {
         return KubernetesNamespaceHelper.isSystemNamespace(item.ResourcePool);
       };

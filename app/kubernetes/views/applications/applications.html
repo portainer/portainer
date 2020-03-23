@@ -51,7 +51,7 @@
               <i class="fa fa-th-list space-right" aria-hidden="true"></i> Stacks
             </uib-tab-heading>
             <kubernetes-applications-stacks-datatable dataset="ctrl.stacks" table-key="kubernetes.applications.stacks"
-              order-by="Name" refresh-callback="ctrl.getApplications">
+              order-by="Name" refresh-callback="ctrl.getApplications" remove-action="ctrl.removeStacksAction">
             </kubernetes-applications-stacks-datatable>
           </uib-tab>
         </uib-tabset>

@@ -44,6 +44,11 @@
           </span>
         </div>
       </div>
+      <div class="actionBar">
+        <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
+          <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
+        </button>
+      </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
         <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" ng-change="$ctrl.onTextFilterChange()" placeholder="Search..." auto-focus
@@ -54,6 +59,10 @@
           <thead>
             <tr>
               <th>
+                <span class="md-checkbox">
+                  <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
+                  <label for="select_all"></label>
+                </span>
                 <a ng-click="$ctrl.expandAll()" ng-if="$ctrl.hasExpandableItems()">
                   <i ng-class="{ 'fas fa-angle-down': $ctrl.state.expandAll, 'fas fa-angle-right': !$ctrl.state.expandAll }" aria-hidden="true"></i>
                 </a>
@@ -87,6 +96,11 @@
               ng-class="{active: item.Checked}" ng-style="{background: (item.Highlighted ? '#d5e8f3' : '')}" ng-click="$ctrl.expandItem(item, !item.Expanded)"
               pagination-id="$ctrl.tableKey">
               <td>
+                <span class="md-checkbox">
+                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event); $event.stopPropagation();"
+                    ng-disabled="!$ctrl.allowSelection(item)" />
+                  <label for="select_{{ $index }}"></label>
+                </span>
                 <a ng-if="$ctrl.itemCanExpand(item)">
                   <i ng-class="{ 'fas fa-angle-down': item.Expanded, 'fas fa-angle-right': !item.Expanded }" class="space-right" aria-hidden="true"></i>
                 </a>
