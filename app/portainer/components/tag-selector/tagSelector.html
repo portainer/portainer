@@ -15,7 +15,7 @@
   <label for="tags" class="col-sm-3 col-lg-2 control-label text-left">
     Tags
   </label>
-  <div class="col-sm-9 col-lg-10" ng-if="$ctrl.tags.length > 0">
+  <div class="col-sm-9 col-lg-10" ng-if="$ctrl.allowCreate || $ctrl.tags.length > 0">
     <input
       type="text" ng-model="$ctrl.state.selectedValue"
       id="tags" class="form-control"
@@ -26,13 +26,13 @@
       typeahead-show-hint="true" typeahead-min-length="0"
     />
   </div>
-  <div class="col-sm-9 col-lg-10" ng-if="$ctrl.tags.length === 0">
+  <div class="col-sm-9 col-lg-10" ng-if="!$ctrl.allowCreate && $ctrl.tags.length === 0">
     <span class="small text-muted">
       No tags available.
     </span>
   </div>
 </div>
-<div class="col-sm-offset-3 col-lg-offset-2 col-sm-12" ng-if="$ctrl.state.noResult" style="margin-top: 2px;">
+<div class="col-sm-offset-3 col-lg-offset-2 col-sm-12" ng-if="!$ctrl.allowCreate && $ctrl.state.noResult" style="margin-top: 2px;">
   <span class="small text-muted">
     No tags matching your filter. 
   </span>
