@@ -781,6 +781,7 @@ type (
 	// TagService represents a service for managing tag data
 	TagService interface {
 		Tags() ([]Tag, error)
+		Tag(ID TagID) (*Tag, error)
 		CreateTag(tag *Tag) error
 		DeleteTag(ID TagID) error
 	}

@@ -1,7 +1,7 @@
 package tag
 
 import (
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
 
 	"github.com/boltdb/bolt"
@@ -50,6 +50,19 @@ func (service *Service) Tags() ([]portainer.Tag, error) {
 	})
 
 	return tags, err
+}
+
+// Tag returns an tag by ID.
+func (service *Service) Tag(ID portainer.TagID) (*portainer.Tag, error) {
+	var tag portainer.Tag
+	identifier := internal.Itob(int(ID))
+
+	err := internal.GetObject(service.db, BucketName, identifier, &tag)
+	if err != nil {
+		return nil, err
+	}
+
+	return &tag, nil
 }
 
 // CreateTag creates a new tag.

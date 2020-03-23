@@ -5,14 +5,16 @@ import (
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 )
 
 // Handler is the HTTP handler used to handle tag operations.
 type Handler struct {
 	*mux.Router
-	TagService portainer.TagService
+	TagService           portainer.TagService
+	EndpointService      portainer.EndpointService
+	EndpointGroupService portainer.EndpointGroupService
 }
 
 // NewHandler creates a handler to manage tag operations.
