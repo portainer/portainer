@@ -930,9 +930,9 @@ type (
 	EdgeGroupService interface {
 		EdgeGroups() ([]EdgeGroup, error)
 		EdgeGroup(ID EdgeGroupID) (*EdgeGroup, error)
-		CreateGroup(group *EdgeGroup) error
-		UpdateGroup(ID EdgeGroupID, group *EdgeGroup) error
-		DeleteGroup(ID EdgeGroupID) error
+		CreateEdgeGroup(group *EdgeGroup) error
+		UpdateEdgeGroup(ID EdgeGroupID, group *EdgeGroup) error
+		DeleteEdgeGroup(ID EdgeGroupID) error
 	}
 )
 
