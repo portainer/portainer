@@ -19,8 +19,11 @@ angular.module('portainer.app').controller('TagSelectorController', function() {
 
   this.selectTag = function($item) {
     this.state.selectedValue = '';
-    this.model.push($item.Id);
-    this.state.selectedTags.push($item);
+    if ($item.create && this.allowCreate) {
+      this.onCreate($item.value)
+      return;
+    }
+    this.onChange(this.model.concat($item.Id));
   };
 
   this.removeTag = function removeTag(tag) {
@@ -28,21 +31,12 @@ angular.module('portainer.app').controller('TagSelectorController', function() {
     _.remove(this.model, (id) => id === tag.Id);
   };
 
-  this.addNew = function addNew() {
-    if (this.allowCreate) {
-      this.onCreate(this.state.selectedValue);
-      this.state.selectedValue = '';
-      angular.element('#tags').focus();
+  this.getCurrentTags = function getCurrentTags(searchValue) {
+    const exactTag = this.tags.find(tag => tag.Name === searchValue);
+    const tags = this.tags.filter(tag => !this.model.includes(tag.Id) && tag.Name.toLowerCase().includes(searchValue));
+    if (exactTag || !searchValue) {
+      return tags.slice(0,7);
     }
+    return tags.slice(0,6).concat({ Name: `Add "${searchValue}"` , create: true, value: searchValue});
   };
-
-  this.filterSelected = filterSelected.bind(this);
-
-  function filterSelected($item) {
-    if (!this.model) {
-      return true;
-    }
-    return !_.includes(this.model, $item.Id);
-  }
-  window._remove = _.remove;
 });

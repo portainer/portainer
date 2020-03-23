@@ -20,7 +20,7 @@
       type="text" ng-model="$ctrl.state.selectedValue"
       id="tags" class="form-control"
       placeholder="Select tags..."
-      uib-typeahead="tag.Id as tag.Name for tag in $ctrl.tags | filter: $ctrl.filterSelected | filter:$viewValue | limitTo:7"
+      uib-typeahead="tag.Id as tag.Name for tag in $ctrl.getCurrentTags($viewValue)"
       typeahead-on-select="$ctrl.selectTag($item, $model, $label)"
       typeahead-no-results="$ctrl.state.noResult"
       typeahead-show-hint="true" typeahead-min-length="0"
@@ -35,6 +35,5 @@
 <div class="col-sm-offset-3 col-lg-offset-2 col-sm-12" ng-if="$ctrl.state.noResult" style="margin-top: 2px;">
   <span class="small text-muted">
     No tags matching your filter. 
-    <button type="button" class="btn btn-primary btn-sm" ng-if="$ctrl.allowCreate" ng-click="$ctrl.addNew()">Add new</button>
   </span>
 </div>
