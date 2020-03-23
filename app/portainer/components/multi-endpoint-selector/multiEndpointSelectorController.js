@@ -17,8 +17,7 @@ angular.module('portainer.app').controller('MultiEndpointSelectorController', fu
     }
   };
 
-  this.tagIdsToTagNames = tagIdsToTagNames.bind(this);
-  function tagIdsToTagNames(tagsId) {
+  this.tagIdsToTagNames = function tagIdsToTagNames(tagsId) {
     return tagsId.map(tagId => {
       const tag = this.tags.find(t => t.Id === tagId);
       if (!tag) {
