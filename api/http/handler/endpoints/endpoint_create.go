@@ -32,7 +32,7 @@ type endpointCreatePayload struct {
 	AzureApplicationID     string
 	AzureTenantID          string
 	AzureAuthenticationKey string
-	Tags                   []portainer.TagID
+	TagIds                 []portainer.TagID
 }
 
 func (payload *endpointCreatePayload) Validate(r *http.Request) error {
@@ -59,9 +59,9 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 	if err != nil {
 		return portainer.Error("Invalid Tags parameter")
 	}
-	payload.Tags = tags
-	if payload.Tags == nil {
-		payload.Tags = make([]portainer.TagID, 0)
+	payload.TagIds = tags
+	if payload.TagIds == nil {
+		payload.TagIds = make([]portainer.TagID, 0)
 	}
 
 	useTLS, _ := request.RetrieveBooleanMultiPartFormValue(r, "TLS", true)
@@ -187,7 +187,7 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 		TeamAccessPolicies: portainer.TeamAccessPolicies{},
 		Extensions:         []portainer.EndpointExtension{},
 		AzureCredentials:   credentials,
-		TagIDs:             payload.Tags,
+		TagIDs:             payload.TagIds,
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.Snapshot{},
 	}
@@ -232,7 +232,7 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		AuthorizedUsers: []portainer.UserID{},
 		AuthorizedTeams: []portainer.TeamID{},
 		Extensions:      []portainer.EndpointExtension{},
-		TagIDs:          payload.Tags,
+		TagIDs:          payload.TagIds,
 		Status:          portainer.EndpointStatusUp,
 		Snapshots:       []portainer.Snapshot{},
 		EdgeKey:         edgeKey,
@@ -278,7 +278,7 @@ func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) 
 		UserAccessPolicies: portainer.UserAccessPolicies{},
 		TeamAccessPolicies: portainer.TeamAccessPolicies{},
 		Extensions:         []portainer.EndpointExtension{},
-		TagIDs:             payload.Tags,
+		TagIDs:             payload.TagIds,
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.Snapshot{},
 	}
@@ -322,7 +322,7 @@ func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload)
 		UserAccessPolicies: portainer.UserAccessPolicies{},
 		TeamAccessPolicies: portainer.TeamAccessPolicies{},
 		Extensions:         []portainer.EndpointExtension{},
-		TagIDs:             payload.Tags,
+		TagIDs:             payload.TagIds,
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.Snapshot{},
 	}
