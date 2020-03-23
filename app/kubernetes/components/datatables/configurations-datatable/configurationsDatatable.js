@@ -1,6 +1,6 @@
 angular.module('portainer.kubernetes').component('kubernetesConfigurationsDatatable', {
   templateUrl: './configurationsDatatable.html',
-  controller: 'GenericDatatableController',
+  controller: 'KubernetesConfigurationsDatatableController',
   bindings: {
     titleText: '@',
     titleIcon: '@',
