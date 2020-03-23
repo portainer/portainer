@@ -18,7 +18,7 @@ function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService,
     AzureApplicationId: '',
     AzureTenantId: '',
     AzureAuthenticationKey: '',
-    Tags: []
+    TagIds: []
   };
 
   $scope.copyAgentCommand = function() {
@@ -40,7 +40,7 @@ function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService,
     var URL = $filter('stripprotocol')($scope.formValues.URL);
     var publicURL = $scope.formValues.PublicURL === '' ? URL.split(':')[0] : $scope.formValues.PublicURL;
     var groupId = $scope.formValues.GroupId;
-    var tags = $scope.formValues.Tags;
+    var tagIds = $scope.formValues.TagIds;
 
     var securityData = $scope.formValues.SecurityFormData;
     var TLS = securityData.TLS;
@@ -51,7 +51,7 @@ function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService,
     var TLSCertFile = TLSSkipClientVerify ? null : securityData.TLSCert;
     var TLSKeyFile = TLSSkipClientVerify ? null : securityData.TLSKey;
 
-    addEndpoint(name, 1, URL, publicURL, groupId, tags, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile);
+    addEndpoint(name, 1, URL, publicURL, groupId, tagIds, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile);
   };
 
   $scope.addAgentEndpoint = function() {
@@ -59,18 +59,18 @@ function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService,
     var URL = $filter('stripprotocol')($scope.formValues.URL);
     var publicURL = $scope.formValues.PublicURL === '' ? URL.split(':')[0] : $scope.formValues.PublicURL;
     var groupId = $scope.formValues.GroupId;
-    var tags = $scope.formValues.Tags;
+    var tagIds = $scope.formValues.TagIds;
 
-    addEndpoint(name, 2, URL, publicURL, groupId, tags, true, true, true, null, null, null);
+    addEndpoint(name, 2, URL, publicURL, groupId, tagIds, true, true, true, null, null, null);
   };
 
   $scope.addEdgeAgentEndpoint = function() {
       var name = $scope.formValues.Name;
       var groupId = $scope.formValues.GroupId;
-      var tags = $scope.formValues.Tags;
+      var tagIds = $scope.formValues.TagIds;
       var URL = $scope.formValues.URL;
 
-      addEndpoint(name, 4, URL, "", groupId, tags, false, false, false, null, null, null);
+      addEndpoint(name, 4, URL, "", groupId, tagIds, false, false, false, null, null, null);
   };
 
   $scope.addAzureEndpoint = function() {
@@ -79,14 +79,18 @@ function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService,
     var tenantId = $scope.formValues.AzureTenantId;
     var authenticationKey = $scope.formValues.AzureAuthenticationKey;
     var groupId = $scope.formValues.GroupId;
-    var tags = $scope.formValues.Tags;
+    var tagIds = $scope.formValues.TagIds;
 
-    createAzureEndpoint(name, applicationId, tenantId, authenticationKey, groupId, tags);
+    createAzureEndpoint(name, applicationId, tenantId, authenticationKey, groupId, tagIds);
   };
 
-  function createAzureEndpoint(name, applicationId, tenantId, authenticationKey, groupId, tags) {
+  $scope.onChangeTags = function onChangeTags(tagIds) {
+    $scope.formValues.TagIds = tagIds;
+  }
+
+  function createAzureEndpoint(name, applicationId, tenantId, authenticationKey, groupId, tagIds) {
     $scope.state.actionInProgress = true;
-    EndpointService.createAzureEndpoint(name, applicationId, tenantId, authenticationKey, groupId, tags)
+    EndpointService.createAzureEndpoint(name, applicationId, tenantId, authenticationKey, groupId, tagIds)
     .then(function success() {
       Notifications.success('Endpoint created', name);
       $state.go('portainer.endpoints', {}, {reload: true});
@@ -99,9 +103,9 @@ function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService,
     });
   }
 
-  function addEndpoint(name, type, URL, PublicURL, groupId, tags, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
+  function addEndpoint(name, type, URL, PublicURL, groupId, tagIds, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
     $scope.state.actionInProgress = true;
-    EndpointService.createRemoteEndpoint(name, type, URL, PublicURL, groupId, tags, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
+    EndpointService.createRemoteEndpoint(name, type, URL, PublicURL, groupId, tagIds, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
     .then(function success(data) {
       Notifications.success('Endpoint created', name);
       if (type === 4) {
@@ -121,7 +125,7 @@ function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService,
   function initView() {
     $q.all({
       groups: GroupService.groups(),
-      tags: TagService.tagNames()
+      tags: TagService.tags()
     })
     .then(function success(data) {
       $scope.groups = data.groups;

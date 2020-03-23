@@ -34,6 +34,11 @@ function ($q, $scope, $state, $transition$, $filter, clipboard, EndpointService,
     $('#copyNotificationEdgeKey').show().fadeOut(2500);
   };
 
+  $scope.onChangeTags = function onChangeTags(tagIds) {
+    console.log('on change, endpoint')
+    $scope.endpoint.TagIds = tagIds;
+  }
+
   $scope.updateEndpoint = function() {
     var endpoint = $scope.endpoint;
     var securityData = $scope.formValues.SecurityFormData;
@@ -41,12 +46,12 @@ function ($q, $scope, $state, $transition$, $filter, clipboard, EndpointService,
     var TLSMode = securityData.TLSMode;
     var TLSSkipVerify = TLS && (TLSMode === 'tls_client_noca' || TLSMode === 'tls_only');
     var TLSSkipClientVerify = TLS && (TLSMode === 'tls_ca' || TLSMode === 'tls_only');
-
+    
     var payload = {
       Name: endpoint.Name,
       PublicURL: endpoint.PublicURL,
       GroupID: endpoint.GroupId,
-      Tags: endpoint.Tags,
+      TagIds: endpoint.TagIds,
       TLS: TLS,
       TLSSkipVerify: TLSSkipVerify,
       TLSSkipClientVerify: TLSSkipClientVerify,
@@ -96,7 +101,7 @@ function ($q, $scope, $state, $transition$, $filter, clipboard, EndpointService,
     $q.all({
       endpoint: EndpointService.endpoint($transition$.params().id),
       groups: GroupService.groups(),
-      tags: TagService.tagNames()
+      tags: TagService.tags()
     })
     .then(function success(data) {
       var endpoint = data.endpoint;

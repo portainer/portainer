@@ -29,7 +29,8 @@
   <div class="form-group">
     <tag-selector
       tags="$ctrl.availableTags"
-      model="$ctrl.model.Tags"
+      model="$ctrl.model.TagIds"
+      on-change="$ctrl.onChangeTags"
     ></tag-selector>
   </div>
   <!-- !tags -->

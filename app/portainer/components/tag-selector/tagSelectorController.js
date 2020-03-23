@@ -1,32 +1,28 @@
-import _ from 'lodash-es';
-
-angular.module('portainer.app')
-.controller('TagSelectorController', function () {
-
+angular.module('portainer.app').controller('TagSelectorController', function() {
   this.$onChanges = function(changes) {
-    if(angular.isDefined(changes.tags.currentValue)) {
-      this.tags = _.difference(changes.tags.currentValue, this.model);
+    if (changes.model && changes.model.currentValue) {
+      this.state.selectedTags = changes.model.currentValue.map(id => this.tags.find(t => t.Id === id))
     }
   };
 
   this.state = {
     selectedValue: '',
-    noResult: false
+    selectedTags: [],
+    noResult: false,
   };
 
   this.selectTag = function($item) {
     this.state.selectedValue = '';
-    this.model.push($item);
-    this.tags = _.remove(this.tags, function(item) {
-      return item !== $item;
-    });
+    this.onChange(this.model.concat($item.Id));
   };
 
-  this.removeTag = function(tag) {
-    var idx = this.model.indexOf(tag);
-    if (idx > -1) {
-      this.model.splice(idx, 1);
-      this.tags.push(tag);
-    }
+  this.removeTag = function removeTag(tag) {
+    this.onChange(this.model.filter(id => tag.Id !== id));
   };
+
+  this.filterSelected = filterSelected.bind(this);
+
+  function filterSelected($item) {
+    return !this.model.includes($item.Id);
+  }
 });

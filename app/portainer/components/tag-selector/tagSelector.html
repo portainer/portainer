@@ -3,8 +3,12 @@
     Selected tags
   </label>
   <div class="col-sm-9 col-lg-10" style="padding-top: 4px;">
-    <span class="tag space-right interactive" ng-repeat="tag in $ctrl.model" ng-click="$ctrl.removeTag(tag)">
-      {{ tag }}
+    <span
+      class="tag space-right interactive"
+      ng-repeat="tag in $ctrl.state.selectedTags"
+      ng-click="$ctrl.removeTag(tag)"
+    >
+      {{ tag.Name }}
       <a title="Remove tag" ng-click="$ctrl.removeTag(tag)" style="margin-left: 2px;">
         <span class="fa fa-trash-alt white-icon" aria-hidden="true"></span>
       </a>
@@ -17,13 +21,17 @@
   </label>
   <div class="col-sm-9 col-lg-10" ng-if="$ctrl.tags.length > 0">
     <input
-      type="text" ng-model="$ctrl.state.selectedValue"
-      id="tags" class="form-control"
+      type="text"
+      ng-model="$ctrl.state.selectedValue"
+      id="tags"
+      class="form-control"
       placeholder="Select tags..."
-      uib-typeahead="tag for tag in $ctrl.tags | filter:$viewValue | limitTo:7"
+      uib-typeahead="tag.Id as tag.Name for tag in $ctrl.tags | filter: $ctrl.filterSelected | filter:$viewValue | limitTo:7"
       typeahead-on-select="$ctrl.selectTag($item, $model, $label)"
       typeahead-no-results="$ctrl.state.noResult"
-      typeahead-show-hint="true" typeahead-min-length="0" />
+      typeahead-show-hint="true"
+      typeahead-min-length="0"
+    />
   </div>
   <div class="col-sm-9 col-lg-10" ng-if="$ctrl.tags.length === 0">
     <span class="small text-muted">

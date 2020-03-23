@@ -100,7 +100,7 @@ angular.module('portainer.app')
     });
   };
 
-  service.createEndpoint = function(name, type, URL, PublicURL, groupID, tags, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
+  service.createEndpoint = function(name, type, URL, PublicURL, groupID, tagIds, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
     return Upload.upload({
       url: 'api/endpoints',
       data: {
@@ -109,7 +109,7 @@ angular.module('portainer.app')
         URL: URL,
         PublicURL: PublicURL,
         GroupID: groupID,
-        Tags: Upload.json(tags),
+        Tags: Upload.json(tagIds),
         TLS: TLS,
         TLSSkipVerify: TLSSkipVerify,
         TLSSkipClientVerify: TLSSkipClientVerify,
@@ -121,14 +121,14 @@ angular.module('portainer.app')
     });
   };
 
-  service.createAzureEndpoint = function(name, applicationId, tenantId, authenticationKey, groupId, tags) {
+  service.createAzureEndpoint = function(name, applicationId, tenantId, authenticationKey, groupId, tagIds) {
     return Upload.upload({
       url: 'api/endpoints',
       data: {
         Name: name,
         EndpointType: 3,
         GroupID: groupId,
-        Tags: Upload.json(tags),
+        TagIds: Upload.json(tagIds),
         AzureApplicationID: applicationId,
         AzureTenantID: tenantId,
         AzureAuthenticationKey: authenticationKey
