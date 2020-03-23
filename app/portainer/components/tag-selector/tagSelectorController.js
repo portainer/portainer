@@ -37,6 +37,6 @@ angular.module('portainer.app').controller('TagSelectorController', function() {
     if (exactTag || !searchValue) {
       return tags.slice(0,7);
     }
-    return tags.slice(0,6).concat({ Name: `Add "${searchValue}"` , create: true, value: searchValue});
+    return tags.slice(0,6).concat({ Name: `Create "${searchValue}"` , create: true, value: searchValue});
   };
 });
