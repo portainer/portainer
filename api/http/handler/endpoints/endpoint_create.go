@@ -54,12 +54,12 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 	}
 	payload.GroupID = groupID
 
-	var tags []portainer.TagID
-	err = request.RetrieveMultiPartFormJSONValue(r, "Tags", &tags, true)
+	var tagIDs []portainer.TagID
+	err = request.RetrieveMultiPartFormJSONValue(r, "TagIds", &tagIDs, true)
 	if err != nil {
-		return portainer.Error("Invalid Tags parameter")
+		return portainer.Error("Invalid TagIds parameter")
 	}
-	payload.TagIDs = tags
+	payload.TagIDs = tagIDs
 	if payload.TagIDs == nil {
 		payload.TagIDs = make([]portainer.TagID, 0)
 	}

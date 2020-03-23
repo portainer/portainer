@@ -109,7 +109,7 @@ angular.module('portainer.app')
         URL: URL,
         PublicURL: PublicURL,
         GroupID: groupID,
-        Tags: Upload.json(tagIds),
+        TagIds: Upload.json(tagIds),
         TLS: TLS,
         TLSSkipVerify: TLSSkipVerify,
         TLSSkipClientVerify: TLSSkipClientVerify,
