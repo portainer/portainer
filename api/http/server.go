@@ -74,6 +74,7 @@ type Server struct {
 	TemplateService        portainer.TemplateService
 	UserService            portainer.UserService
 	WebhookService         portainer.WebhookService
+	EdgeGroupService       portainer.EdgeGroupService
 	Handler                *handler.Handler
 	SSL                    bool
 	SSLCert                string

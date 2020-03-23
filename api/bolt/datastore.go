@@ -5,6 +5,7 @@ import (
 	"path"
 	"time"
 
+	"github.com/portainer/portainer/api/bolt/edgegroup"
 	"github.com/portainer/portainer/api/bolt/tunnelserver"
 
 	"github.com/boltdb/bolt"
@@ -58,6 +59,7 @@ type Store struct {
 	VersionService         *version.Service
 	WebhookService         *webhook.Service
 	ScheduleService        *schedule.Service
+	EdgeGroupService       *edgegroup.Service
 }
 
 // NewStore initializes a new Store and the associated services
@@ -255,6 +257,12 @@ func (store *Store) initServices() error {
 		return err
 	}
 	store.ScheduleService = scheduleService
+
+	edgeGroupService, err := edgegroup.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.EdgeGroupService = edgeGroupService
 
 	return nil
 }

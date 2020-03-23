@@ -259,7 +259,7 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 			LogoURL:              *flags.Logo,
 			AuthenticationMethod: portainer.AuthenticationInternal,
 			LDAPSettings: portainer.LDAPSettings{
-				AnonymousMode: true,
+				AnonymousMode:   true,
 				AutoCreateUsers: true,
 				TLSConfig:       portainer.TLSConfiguration{},
 				SearchSettings: []portainer.LDAPSearchSettings{
@@ -673,6 +673,7 @@ func main() {
 		TagService:             store.TagService,
 		TemplateService:        store.TemplateService,
 		WebhookService:         store.WebhookService,
+		EdgeGroupService:       store.EdgeGroupService,
 		SwarmStackManager:      swarmStackManager,
 		ComposeStackManager:    composeStackManager,
 		ExtensionManager:       extensionManager,
