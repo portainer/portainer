@@ -13,6 +13,7 @@ class KubernetesApplicationConverter {
     res.Image = data.spec.template.spec.containers[0].image;
     res.CreatedAt = data.metadata.creationTimestamp;
     res.Pods = data.Pods;
+    res.Env = data.spec.template.spec.containers[0].env;
     const limits = {
       Cpu: 0,
       Memory: 0
