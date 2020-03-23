@@ -3,6 +3,7 @@ package http
 import (
 	"time"
 
+	"github.com/portainer/portainer/api/http/handler/edgegroups"
 	"github.com/portainer/portainer/api/http/handler/support"
 
 	"github.com/portainer/portainer/api/http/handler/roles"
@@ -263,6 +264,9 @@ func (server *Server) Start() error {
 	webhookHandler.EndpointService = server.EndpointService
 	webhookHandler.DockerClientFactory = server.DockerClientFactory
 
+	var edgeGroupsHandler = edgegroups.NewHandler(requestBouncer)
+	edgeGroupsHandler.EdgeGroupService = server.EdgeGroupService
+
 	server.Handler = &handler.Handler{
 		RoleHandler:            roleHandler,
 		AuthHandler:            authHandler,
@@ -288,6 +292,7 @@ func (server *Server) Start() error {
 		WebSocketHandler:       websocketHandler,
 		WebhookHandler:         webhookHandler,
 		SchedulesHanlder:       schedulesHandler,
+		EdgeGroupsHandler:      edgeGroupsHandler,
 	}
 
 	if server.SSL {
