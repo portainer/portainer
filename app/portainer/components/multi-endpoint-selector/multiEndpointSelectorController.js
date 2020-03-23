@@ -1,7 +1,6 @@
 import _ from 'lodash-es';
 
-angular.module('portainer.app')
-.controller('MultiEndpointSelectorController', function () {
+angular.module('portainer.app').controller('MultiEndpointSelectorController', function() {
   var ctrl = this;
 
   this.sortGroups = function(groups) {
@@ -18,6 +17,17 @@ angular.module('portainer.app')
     }
   };
 
+  this.tagIdsToTagNames = tagIdsToTagNames.bind(this);
+  function tagIdsToTagNames(tagsId) {
+    return tagsId.map(tagId => {
+      const tag = this.tags.find(t => t.Id === tagId);
+      if (!tag) {
+        return '';
+      }
+      return tag.Name;
+    });
+  }
+
   this.$onInit = function() {
     this.availableGroups = filterEmptyGroups(this.groups, this.endpoints);
   };
@@ -25,7 +35,6 @@ angular.module('portainer.app')
   function filterEmptyGroups(groups, endpoints) {
     return groups.filter(function f(group) {
       for (var i = 0; i < endpoints.length; i++) {
-
         var endpoint = endpoints[i];
         if (endpoint.GroupId === group.Id) {
           return true;

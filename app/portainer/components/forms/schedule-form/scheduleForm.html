@@ -265,9 +265,9 @@
   </div>
   <!-- node-selection -->
   <multi-endpoint-selector
-    ng-if="$ctrl.endpoints && $ctrl.groups"
+    ng-if="$ctrl.endpoints && $ctrl.groups && $ctrl.tags"
     model="$ctrl.model.Job.Endpoints"
-    endpoints="$ctrl.endpoints" groups="$ctrl.groups"
+    endpoints="$ctrl.endpoints" groups="$ctrl.groups" tags="$ctrl.tags"
   ></multi-endpoint-selector>
   <!-- !node-selection -->
   <!-- actions -->
