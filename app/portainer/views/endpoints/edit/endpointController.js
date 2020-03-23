@@ -35,7 +35,6 @@ function ($q, $scope, $state, $transition$, $filter, clipboard, EndpointService,
   };
 
   $scope.onChangeTags = function onChangeTags(tagIds) {
-    console.log('on change, endpoint')
     $scope.endpoint.TagIds = tagIds;
   }
 
