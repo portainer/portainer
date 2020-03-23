@@ -26,8 +26,8 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeGroupList))).Methods(http.MethodGet)
 	h.Handle("/edge_groups/{id}",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeGroupInspect))).Methods(http.MethodGet)
-	// h.Handle("/edge_groups/{id}",
-	// 	bouncer.AdminAccess(httperror.LoggerHandler(h.edgeGroupUpdate))).Methods(http.MethodPut)
+	h.Handle("/edge_groups/{id}",
+		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeGroupUpdate))).Methods(http.MethodPut)
 	h.Handle("/edge_groups/{id}",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeGroupDelete))).Methods(http.MethodDelete)
 	return h
