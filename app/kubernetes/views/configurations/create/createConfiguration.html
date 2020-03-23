@@ -64,13 +64,13 @@
           <div class="form-group" style="margin-bottom: 0">
             <div class="boxselector_wrapper">
               <div>
-                <input type="radio" id="type_basic" ng-value="ctrl.KubernetesConfigurationTypes.BASIC" ng-model="ctrl.formValues.Type">
+                <input type="radio" id="type_basic" ng-value="ctrl.KubernetesConfigurationTypes.CONFIGMAP" ng-model="ctrl.formValues.Type">
                 <label for="type_basic">
                   <div class="boxselector_header">
                     <i class="fa fa-file-code" aria-hidden="true" style="margin-right: 2px;"></i>
-                    Basic
+                    Non-sensitive
                   </div>
-                  <p>This configuration holds basic information</p>
+                  <p>This configuration holds non-sensitive information</p>
                 </label>
               </div>
               <div>
@@ -78,7 +78,7 @@
                 <label for="type_secret">
                   <div class="boxselector_header">
                     <i class="fa fa-user-secret" aria-hidden="true" style="margin-right: 2px;"></i>
-                    Secret
+                    Sensitive
                   </div>
                   <p>This configuration holds sensitive information</p>
                 </label>

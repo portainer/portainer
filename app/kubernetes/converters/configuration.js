@@ -14,7 +14,7 @@ class KubernetesConfigurationConverter {
 
   static configMapToConfiguration(configMap) {
     const res = new KubernetesConfiguration();
-    res.Type = KubernetesConfigurationTypes.BASIC;
+    res.Type = KubernetesConfigurationTypes.CONFIGMAP;
     res.Id = configMap.Id;
     res.Name = configMap.Name;
     res.Namespace = configMap.Namespace;

@@ -109,7 +109,7 @@
               <td>
                 <a ui-sref="kubernetes.resourcePools.resourcePool({ id: item.Namespace })">{{ item.Namespace }}</a>
               </td>
-              <td>{{ item.Type }}</td>
+              <td>{{ item.Type | kubernetesConfigurationTypeText }}</td>
               <td>{{ item.CreationDate | getisodate }}</td>
             </tr>
             <tr ng-if="!$ctrl.dataset">

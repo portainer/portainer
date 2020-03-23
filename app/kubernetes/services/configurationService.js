@@ -87,7 +87,7 @@ class KubernetesConfigurationService {
    */
   async createAsync(formValues) {
     try {
-      if (formValues.Type === KubernetesConfigurationTypes.BASIC) {
+      if (formValues.Type === KubernetesConfigurationTypes.CONFIGMAP) {
         const configMap = KubernetesConfigMapConverter.configurationFormValuesToConfigMap(formValues);
         await this.KubernetesConfigMapService.create(configMap);
       } else {
@@ -108,7 +108,7 @@ class KubernetesConfigurationService {
    */
   async updateAsync(formValues) {
     try {
-      if (formValues.Type === KubernetesConfigurationTypes.BASIC) {
+      if (formValues.Type === KubernetesConfigurationTypes.CONFIGMAP) {
         const configMap = KubernetesConfigMapConverter.configurationFormValuesToConfigMap(formValues);
         await this.KubernetesConfigMapService.update(configMap);
       } else {
@@ -128,7 +128,7 @@ class KubernetesConfigurationService {
    */
   async deleteAsync(config) {
     try {
-      if (config.Type === KubernetesConfigurationTypes.BASIC) {
+      if (config.Type === KubernetesConfigurationTypes.CONFIGMAP) {
         await this.KubernetesConfigMapService.delete(config);
       } else {
         await this.KubernetesSecretService.delete(config);

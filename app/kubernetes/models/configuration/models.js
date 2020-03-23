@@ -19,6 +19,6 @@ export class KubernetesConfiguration {
 }
 
 export const KubernetesConfigurationTypes = Object.freeze({
-  BASIC: 'Basic',
-  SECRET: 'Secret'
+  CONFIGMAP: 1,
+  SECRET: 2
 });

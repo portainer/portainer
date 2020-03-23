@@ -70,7 +70,7 @@ class KubernetesApplicationHelper {
     let finalMounts = [];
 
     _.forEach(configurations, (config) => {
-      const isBasic = config.SelectedConfiguration.Type === KubernetesConfigurationTypes.BASIC;
+      const isBasic = config.SelectedConfiguration.Type === KubernetesConfigurationTypes.CONFIGMAP;
 
       if (!config.Overriden) {
         const envKeys = _.keys(config.SelectedConfiguration.Data);
