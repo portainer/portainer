@@ -429,7 +429,7 @@ type (
 		Description        string             `json:"Description"`
 		UserAccessPolicies UserAccessPolicies `json:"UserAccessPolicies"`
 		TeamAccessPolicies TeamAccessPolicies `json:"TeamAccessPolicies"`
-		TagIDs             []TagID            `json:"TagIDs"`
+		TagIDs             []TagID            `json:"TagIds"`
 
 		// Deprecated fields
 		Labels []Pair `json:"Labels"`

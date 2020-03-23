@@ -114,7 +114,7 @@ func filterEndpointsBySearchCriteria(endpoints []portainer.Endpoint, endpointGro
 	filteredEndpoints := make([]portainer.Endpoint, 0)
 
 	for _, endpoint := range endpoints {
-		endpointTags := convertTagIdsToTags(tagsMap, endpoint.TagIDs)
+		endpointTags := convertTagIDsToTags(tagsMap, endpoint.TagIDs)
 		if endpointMatchSearchCriteria(&endpoint, endpointTags, searchCriteria) {
 			filteredEndpoints = append(filteredEndpoints, endpoint)
 			continue
@@ -157,7 +157,7 @@ func endpointGroupMatchSearchCriteria(endpoint *portainer.Endpoint, endpointGrou
 			if strings.Contains(strings.ToLower(group.Name), searchCriteria) {
 				return true
 			}
-			tags := convertTagIdsToTags(tagsMap, group.TagIDs)
+			tags := convertTagIDsToTags(tagsMap, group.TagIDs)
 			for _, tag := range tags {
 				if strings.Contains(strings.ToLower(tag.Name), searchCriteria) {
 					return true
