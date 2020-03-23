@@ -1,5 +1,6 @@
 import angular from 'angular';
 import _ from 'lodash-es';
+import stripAnsi from 'strip-ansi';
 import {KubernetesDeployManifestTypes} from 'Kubernetes/models/deploy';
 
 class KubernetesDeployController {
@@ -31,7 +32,14 @@ class KubernetesDeployController {
     return this.$async(this.editorUpdateAsync, cm);
   }
 
+  displayErrorLog(log) {
+    this.errorLog = stripAnsi(log);
+    this.state.tabLogsDisabled = false;
+    this.state.activeTab = 1;
+  }
+
   async deployAsync() {
+    this.errorLog = '';
     this.state.actionInProgress = true;
 
     try {
@@ -41,6 +49,7 @@ class KubernetesDeployController {
       this.$state.go('kubernetes.applications');
     } catch (err) {
       this.Notifications.error('Unable to deploy manifest', err, 'Unable to deploy resources');
+      this.displayErrorLog(err.err.data.details);
     } finally {
       this.state.actionInProgress = false;
     }
@@ -70,7 +79,9 @@ class KubernetesDeployController {
       return;
     }
     this.state = {
-      DeployType: KubernetesDeployManifestTypes.KUBERNETES
+      DeployType: KubernetesDeployManifestTypes.KUBERNETES,
+      tabLogsDisabled: true,
+      activeTab: 0
     };
 
     this.formValues = {};
