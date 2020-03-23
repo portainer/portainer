@@ -262,7 +262,10 @@
               ng-if="availableTags"
               tags="availableTags"
               model="formValues.TagIds"
-            ></tag-selector>
+              on-change="onChangeTags"
+              on-create="onCreateTag"
+              allow-create="state.allowCreateTag"
+          ></tag-selector>
           </div>
           <!-- !tags -->
           <div class="col-sm-12 form-section-title">
