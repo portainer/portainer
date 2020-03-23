@@ -31,6 +31,12 @@ function ($q, $scope, $state, GroupService, EndpointService, TagService, Notific
     });
   };
 
+  $scope.onCreateTag = async function onCreateTag(tagName) {
+    const tag = await TagService.createTag(tagName);
+    $scope.availableTags = $scope.availableTags.concat(tag);
+    $scope.model.TagIds = $scope.model.TagIds.concat(tag.Id);
+  }
+
   function initView() {
     TagService.tags()
     .then((tags) => {

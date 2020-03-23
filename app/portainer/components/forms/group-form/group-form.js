@@ -3,11 +3,12 @@ import angular from 'angular';
 
 class GroupFormController {
   /* @ngInject */
-  constructor($q, EndpointService, GroupService, Notifications) {
+  constructor($q, EndpointService, GroupService, Notifications, Authentication) {
     this.$q = $q;
     this.EndpointService = EndpointService;
     this.GroupService = GroupService;
     this.Notifications = Notifications;
+    this.Authentication = Authentication;
 
     this.associateEndpoint = this.associateEndpoint.bind(this);
     this.dissociateEndpoint = this.dissociateEndpoint.bind(this);
@@ -27,7 +28,8 @@ class GroupFormController {
         filter: '',
         pageNumber: 1,
         totalCount: 0
-      }
+      },
+      allowCreateTag: this.Authentication.isAdmin()
     };
   }
   associateEndpoint(endpoint) {
@@ -102,6 +104,7 @@ angular.module('portainer.app').component('groupForm', {
     removeLabelAction: '<',
     formAction: '<',
     formActionLabel: '@',
-    actionInProgress: '<'
+    actionInProgress: '<',
+    onCreateTag: '<'
   }
 });
