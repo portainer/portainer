@@ -2,7 +2,7 @@ package endpoints
 
 import (
 	httperror "github.com/portainer/libhttp/error"
-	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/security"
 

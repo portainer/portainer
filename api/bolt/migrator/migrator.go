@@ -2,7 +2,7 @@ package migrator
 
 import (
 	"github.com/boltdb/bolt"
-	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/endpoint"
 	"github.com/portainer/portainer/api/bolt/endpointgroup"
 	"github.com/portainer/portainer/api/bolt/extension"

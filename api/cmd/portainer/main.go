@@ -9,7 +9,7 @@ import (
 
 	"github.com/portainer/portainer/api/chisel"
 
-	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt"
 	"github.com/portainer/portainer/api/cli"
 	"github.com/portainer/portainer/api/cron"

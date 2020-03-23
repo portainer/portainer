@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api"
 
 	"github.com/portainer/libhttp/request"
 
