@@ -3,6 +3,9 @@ angular.module('portainer.app').component('tagSelector', {
   controller: 'TagSelectorController',
   bindings: {
     tags: '<',
-    model: '=',
+    model: '<',
+    onChange: '<',
+    onCreate: '<',
+    allowCreate: '<'
   },
 });

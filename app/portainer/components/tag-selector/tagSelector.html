@@ -34,6 +34,7 @@
 </div>
 <div class="col-sm-offset-3 col-lg-offset-2 col-sm-12" ng-if="$ctrl.state.noResult" style="margin-top: 2px;">
   <span class="small text-muted">
-    No tags matching your filter.
+    No tags matching your filter. 
+    <button type="button" class="btn btn-primary btn-sm" ng-if="$ctrl.allowCreate" ng-click="$ctrl.addNew()">Add new</button>
   </span>
 </div>

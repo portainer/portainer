@@ -35,12 +35,13 @@ angular.module('portainer.app')
     return deferred.promise;
   };
 
-  service.createTag = function(name) {
+  service.createTag = async function(name) {
     var payload = {
       Name: name
     };
 
-    return Tags.create({}, payload).$promise;
+    const tag = await Tags.create({}, payload).$promise;
+    return new TagViewModel(tag);
   };
 
   service.deleteTag = function(id) {
