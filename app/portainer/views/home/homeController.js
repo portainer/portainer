@@ -167,7 +167,6 @@ angular.module('portainer.app')
 
       async function initView() {
         $scope.isAdmin = Authentication.isAdmin();
-        $scope.tags = [];
         
         MotdService.motd()
         .then(function success(data) {

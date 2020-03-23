@@ -23,6 +23,9 @@ angular.module('portainer.app').controller('EndpointItemController', function En
   }
 
   this.joinTags = function joinTags() {
+    if (!this.tags) {
+      return 'Loading tags...'
+    }
     return this.model.TagIds.map(tagId => {
       const tag = this.tags.find(tag => tag.Id === tagId);
       if (!tag) {
