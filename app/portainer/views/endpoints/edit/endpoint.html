@@ -168,6 +168,9 @@
               ng-if="availableTags && endpoint.TagIds"
               tags="availableTags"
               model="endpoint.TagIds"
+              on-change="onChangeTags"
+              on-create="onCreateTag"
+              allow-create="state.allowCreate"
             ></tag-selector>
           </div>
           <!-- !tags -->

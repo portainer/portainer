@@ -3,8 +3,8 @@ import uuidv4 from 'uuid/v4';
 import {EndpointSecurityFormData} from '../../../components/endpointSecurity/porEndpointSecurityModel';
 
 angular.module('portainer.app')
-.controller('EndpointController', ['$q', '$scope', '$state', '$transition$', '$filter', 'clipboard', 'EndpointService', 'GroupService', 'TagService', 'EndpointProvider', 'Notifications',
-function ($q, $scope, $state, $transition$, $filter, clipboard, EndpointService, GroupService, TagService, EndpointProvider, Notifications) {
+.controller('EndpointController', 
+function EndpointController($q, $scope, $state, $transition$, $filter, clipboard, EndpointService, GroupService, TagService, EndpointProvider, Notifications, Authentication) {
 
   if (!$scope.applicationState.application.endpointManagement) {
     $state.go('portainer.endpoints');
@@ -13,12 +13,15 @@ function ($q, $scope, $state, $transition$, $filter, clipboard, EndpointService,
   $scope.state = {
     uploadInProgress: false,
     actionInProgress: false,
-    deploymentTab: 0
+    deploymentTab: 0,
+    allowCreate: Authentication.isAdmin()
   };
 
   $scope.formValues = {
     SecurityFormData: new EndpointSecurityFormData()
   };
+
+  
 
   $scope.copyEdgeAgentDeploymentCommand = function() {
     if ($scope.state.deploymentTab === 0) {
@@ -33,6 +36,16 @@ function ($q, $scope, $state, $transition$, $filter, clipboard, EndpointService,
     clipboard.copyText($scope.endpoint.EdgeKey);
     $('#copyNotificationEdgeKey').show().fadeOut(2500);
   };
+
+  $scope.onChangeTags = function onChangeTags(tagIds) {
+    $scope.endpoint.TagIds = tagIds;
+  };
+
+  $scope.onCreateTag = async function onCreateTag(tagName) {
+    const tag = await TagService.createTag(tagName);
+    $scope.availableTags = $scope.availableTags.concat(tag);
+    $scope.endpoint.TagIds = $scope.endpoint.TagIds.concat(tag.Id);
+  }
 
   $scope.updateEndpoint = function() {
     var endpoint = $scope.endpoint;
@@ -120,4 +133,4 @@ function ($q, $scope, $state, $transition$, $filter, clipboard, EndpointService,
   }
 
   initView();
-}]);
+});
