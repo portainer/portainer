@@ -23,6 +23,12 @@ function ($q, $scope, $state, $transition$, GroupService, TagService, Notificati
     });
   };
 
+  $scope.onCreateTag = async function onCreateTag(tagName) {
+    const tag = await TagService.createTag(tagName);
+    $scope.availableTags = $scope.availableTags.concat(tag);
+    $scope.group.TagIds = $scope.group.TagIds.concat(tag.Id);
+  }
+
   function initView() {
     var groupId = $transition$.params().id;
 
