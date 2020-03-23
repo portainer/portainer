@@ -13,7 +13,7 @@ import (
 type endpointGroupUpdatePayload struct {
 	Name               string
 	Description        string
-	Tags               []portainer.TagID
+	TagIDs             []portainer.TagID
 	UserAccessPolicies portainer.UserAccessPolicies
 	TeamAccessPolicies portainer.TeamAccessPolicies
 }
@@ -50,8 +50,8 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 		endpointGroup.Description = payload.Description
 	}
 
-	if payload.Tags != nil {
-		endpointGroup.TagIDs = payload.Tags
+	if payload.TagIDs != nil {
+		endpointGroup.TagIDs = payload.TagIDs
 	}
 
 	updateAuthorizations := false

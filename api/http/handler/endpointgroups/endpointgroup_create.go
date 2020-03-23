@@ -14,15 +14,15 @@ type endpointGroupCreatePayload struct {
 	Name                string
 	Description         string
 	AssociatedEndpoints []portainer.EndpointID
-	Tags                []portainer.TagID
+	TagIDs              []portainer.TagID
 }
 
 func (payload *endpointGroupCreatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
 		return portainer.Error("Invalid endpoint group name")
 	}
-	if payload.Tags == nil {
-		payload.Tags = []portainer.TagID{}
+	if payload.TagIDs == nil {
+		payload.TagIDs = []portainer.TagID{}
 	}
 	return nil
 }
@@ -40,7 +40,7 @@ func (handler *Handler) endpointGroupCreate(w http.ResponseWriter, r *http.Reque
 		Description:        payload.Description,
 		UserAccessPolicies: portainer.UserAccessPolicies{},
 		TeamAccessPolicies: portainer.TeamAccessPolicies{},
-		TagIDs:             payload.Tags,
+		TagIDs:             payload.TagIDs,
 	}
 
 	err = handler.EndpointGroupService.CreateEndpointGroup(endpointGroup)
