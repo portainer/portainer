@@ -305,6 +305,7 @@ func (m *Migrator) Migrate() error {
 		}
 	}
 
+	// Portainer 1.24.0-dev
 	if m.currentDBVersion < 23 {
 		err := m.updateEndointsAndEndpointsGroupsToDBVersion23()
 		if err != nil {
