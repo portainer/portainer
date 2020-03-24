@@ -33,12 +33,12 @@ type (
 		scheduleService        *schedule.Service
 		settingsService        *settings.Service
 		stackService           *stack.Service
+		tagService             *tag.Service
 		teamMembershipService  *teammembership.Service
 		templateService        *template.Service
 		userService            *user.Service
 		versionService         *version.Service
 		fileService            portainer.FileService
-		tagService             *tag.Service
 	}
 
 	// Parameters represents the required parameters to create a new Migrator instance.
@@ -54,12 +54,12 @@ type (
 		ScheduleService        *schedule.Service
 		SettingsService        *settings.Service
 		StackService           *stack.Service
+		TagService             *tag.Service
 		TeamMembershipService  *teammembership.Service
 		TemplateService        *template.Service
 		UserService            *user.Service
 		VersionService         *version.Service
 		FileService            portainer.FileService
-		TagService             *tag.Service
 	}
 )
 
@@ -76,13 +76,13 @@ func NewMigrator(parameters *Parameters) *Migrator {
 		roleService:            parameters.RoleService,
 		scheduleService:        parameters.ScheduleService,
 		settingsService:        parameters.SettingsService,
+		tagService:             parameters.TagService,
 		teamMembershipService:  parameters.TeamMembershipService,
 		templateService:        parameters.TemplateService,
 		stackService:           parameters.StackService,
 		userService:            parameters.UserService,
 		versionService:         parameters.VersionService,
 		fileService:            parameters.FileService,
-		tagService:             parameters.TagService,
 	}
 }
 
