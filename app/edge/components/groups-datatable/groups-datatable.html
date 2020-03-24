@@ -108,8 +108,8 @@
                 </span>
                 <a ui-sref="edge.groups.edit({groupId: item.Id})">{{ item.Name }}</a>
               </td>
-              <td>{{ item.EndpointsCount }}</td>
-              <td>{{ item.Type }}</td>
+              <td>{{ item.Endpoints.length }}</td>
+              <td>{{ item.Dynamic ? 'Dynamic' : 'Static' }}</td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
               <td colspan="4" class="text-center text-muted">Loading...</td>
