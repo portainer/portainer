@@ -43,6 +43,7 @@ type Store struct {
 	fileService            portainer.FileService
 	RoleService            *role.Service
 	DockerHubService       *dockerhub.Service
+	EdgeGroupService       *edgegroup.Service
 	EndpointGroupService   *endpointgroup.Service
 	EndpointService        *endpoint.Service
 	ExtensionService       *extension.Service
@@ -59,7 +60,6 @@ type Store struct {
 	VersionService         *version.Service
 	WebhookService         *webhook.Service
 	ScheduleService        *schedule.Service
-	EdgeGroupService       *edgegroup.Service
 }
 
 // NewStore initializes a new Store and the associated services
@@ -162,6 +162,12 @@ func (store *Store) initServices() error {
 	}
 	store.DockerHubService = dockerhubService
 
+	edgeGroupService, err := edgegroup.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.EdgeGroupService = edgeGroupService
+
 	endpointgroupService, err := endpointgroup.NewService(store.db)
 	if err != nil {
 		return err
@@ -257,12 +263,6 @@ func (store *Store) initServices() error {
 		return err
 	}
 	store.ScheduleService = scheduleService
-
-	edgeGroupService, err := edgegroup.NewService(store.db)
-	if err != nil {
-		return err
-	}
-	store.EdgeGroupService = edgeGroupService
 
 	return nil
 }
