@@ -52,7 +52,7 @@ func (service *Service) Tags() ([]portainer.Tag, error) {
 	return tags, err
 }
 
-// Tag returns an tag by ID.
+// Tag returns a tag by ID.
 func (service *Service) Tag(ID portainer.TagID) (*portainer.Tag, error) {
 	var tag portainer.Tag
 	identifier := internal.Itob(int(ID))
