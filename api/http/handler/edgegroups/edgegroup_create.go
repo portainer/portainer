@@ -22,10 +22,10 @@ func (payload *edgeGroupCreatePayload) Validate(r *http.Request) error {
 		return portainer.Error("Invalid edge group name")
 	}
 	if payload.Dynamic && (payload.TagIDs == nil || len(payload.TagIDs) == 0) {
-		return portainer.Error("Dynamic edge group should have tags")
+		return portainer.Error("TagIDs is mandatory for a dynamic edge group")
 	}
 	if !payload.Dynamic && (payload.Endpoints == nil || len(payload.Endpoints) == 0) {
-		return portainer.Error("Static edge group should have endpoints")
+		return portainer.Error("Endpoints is mandatory for a static edge group")
 	}
 	return nil
 }
