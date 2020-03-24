@@ -64,13 +64,12 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 	}
 
 	edgeGroup.Dynamic = payload.Dynamic
-
-	if payload.Endpoints != nil {
-		edgeGroup.Endpoints = payload.Endpoints
-	}
-
-	if payload.TagIDs != nil {
+	if edgeGroup.Dynamic {
+		edgeGroup.Endpoints = nil
 		edgeGroup.TagIDs = payload.TagIDs
+	} else {
+		edgeGroup.Endpoints = payload.Endpoints
+		edgeGroup.TagIDs = nil
 	}
 
 	err = handler.EdgeGroupService.UpdateEdgeGroup(edgeGroup.ID, edgeGroup)
