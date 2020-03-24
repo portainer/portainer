@@ -23,17 +23,9 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 	}
 
 	for _, endpoint := range endpoints {
-		endpointTags := []portainer.TagID{}
-		needToSave := false
-		for _, etid := range endpoint.TagIDs {
-			if tagID == etid {
-				needToSave = true
-			} else {
-				endpointTags = append(endpointTags, etid)
-			}
-		}
-		if needToSave {
-			endpoint.TagIDs = endpointTags
+		tagIdx := findTagIndex(endpoint.TagIDs, tagID)
+		if tagIdx != -1 {
+			endpoint.TagIDs = removeElement(endpoint.TagIDs, tagIdx)
 			err = handler.EndpointService.UpdateEndpoint(endpoint.ID, &endpoint)
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint", err}
@@ -47,17 +39,9 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 	}
 
 	for _, endpointGroup := range endpointGroups {
-		tags := []portainer.TagID{}
-		needToSave := false
-		for _, etid := range endpointGroup.TagIDs {
-			if tagID == etid {
-				needToSave = true
-			} else {
-				tags = append(tags, etid)
-			}
-		}
-		if needToSave {
-			endpointGroup.TagIDs = tags
+		tagIdx := findTagIndex(endpointGroup.TagIDs, tagID)
+		if tagIdx != -1 {
+			endpointGroup.TagIDs = removeElement(endpointGroup.TagIDs, tagIdx)
 			err = handler.EndpointGroupService.UpdateEndpointGroup(endpointGroup.ID, &endpointGroup)
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint group", err}
@@ -71,4 +55,22 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 	}
 
 	return response.Empty(w)
+}
+
+func findTagIndex(tags []portainer.TagID, tagID portainer.TagID) int {
+	for idx, etid := range tags {
+		if tagID == etid {
+			return idx
+		}
+	}
+	return -1
+}
+
+func removeElement(arr []portainer.TagID, index int) []portainer.TagID {
+	if index < 0 {
+		return arr
+	}
+	lastTagIdx := len(arr) - 1
+	arr[index] = arr[lastTagIdx]
+	return arr[:lastTagIdx]
 }
