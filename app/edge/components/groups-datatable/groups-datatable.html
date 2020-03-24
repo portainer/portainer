@@ -1,0 +1,153 @@
+<div class="datatable">
+  <rd-widget>
+    <rd-widget-header
+      icon="fa-plane-departure"
+      title-text="Edge Groups"
+    >
+    </rd-widget-header>
+    <rd-widget-body classes="no-padding">
+      <div class="actionBar">
+        <button
+          type="button"
+          class="btn btn-sm btn-danger"
+          ng-disabled="$ctrl.state.selectedItemCount === 0"
+          ng-click="$ctrl.removeAction($ctrl.state.selectedItems)"
+        >
+          <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
+        </button>
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="edge.groups.new">
+          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add edge group
+        </button>
+      </div>
+      <div class="searchBar">
+        <i class="fa fa-search searchIcon" aria-hidden="true"></i>
+        <input
+          type="text"
+          class="searchInput"
+          ng-model="$ctrl.state.textFilter"
+          ng-change="$ctrl.onTextFilterChange()"
+          placeholder="Search..."
+          ng-model-options="{ debounce: 300 }"
+        />
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover nowrap-cells">
+          <thead>
+            <tr>
+              <th>
+                <span class="md-checkbox">
+                  <input
+                    id="select_all"
+                    type="checkbox"
+                    ng-model="$ctrl.state.selectAll"
+                    ng-change="$ctrl.selectAll()"
+                  />
+                  <label for="select_all"></label>
+                </span>
+                <a ng-click="$ctrl.changeOrderBy('Name')">
+                  Name
+                  <i
+                    class="fa fa-sort-alpha-down"
+                    aria-hidden="true"
+                    ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"
+                  ></i>
+                  <i
+                    class="fa fa-sort-alpha-up"
+                    aria-hidden="true"
+                    ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"
+                  ></i>
+                </a>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('EndpointsCount')">
+                  Endpoints Count
+                  <i
+                    class="fa fa-sort-alpha-down"
+                    aria-hidden="true"
+                    ng-if="$ctrl.state.orderBy === 'EndpointsCount' && !$ctrl.state.reverseOrder"
+                  ></i>
+                  <i
+                    class="fa fa-sort-alpha-up"
+                    aria-hidden="true"
+                    ng-if="$ctrl.state.orderBy === 'EndpointsCount' && $ctrl.state.reverseOrder"
+                  ></i>
+                </a>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('Type')">
+                  Group Type
+                  <i
+                    class="fa fa-sort-alpha-down"
+                    aria-hidden="true"
+                    ng-if="$ctrl.state.orderBy === 'Type' && !$ctrl.state.reverseOrder"
+                  ></i>
+                  <i
+                    class="fa fa-sort-alpha-up"
+                    aria-hidden="true"
+                    ng-if="$ctrl.state.orderBy === 'Type' && $ctrl.state.reverseOrder"
+                  ></i>
+                </a>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit)) track by $index"
+              ng-class="{active: item.Checked}"
+            >
+              <td>
+                <span class="md-checkbox">
+                  <input
+                    id="select_{{ $index }}"
+                    type="checkbox"
+                    ng-model="item.Checked"
+                    ng-disabled="item.Inherited"
+                    ng-click="$ctrl.selectItem(item, $event)"
+                  />
+                  <label for="select_{{ $index }}"></label>
+                </span>
+                <a ui-sref="edge.groups.edit({groupId: item.Id})">{{ item.Name }}</a>
+              </td>
+              <td>{{ item.EndpointsCount }}</td>
+              <td>{{ item.Type }}</td>
+            </tr>
+            <tr ng-if="!$ctrl.dataset">
+              <td colspan="4" class="text-center text-muted">Loading...</td>
+            </tr>
+            <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
+              <td colspan="4" class="text-center text-muted">
+                No edge groups
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="footer" ng-if="$ctrl.dataset">
+        <div class="infoBar" ng-if="$ctrl.state.selectedItemCount !== 0">
+          {{ $ctrl.state.selectedItemCount }} item(s) selected
+        </div>
+        <div class="paginationControls">
+          <form class="form-inline">
+            <span class="limitSelector">
+              <span style="margin-right: 5px;">
+                Items per page
+              </span>
+              <select
+                class="form-control"
+                ng-model="$ctrl.state.paginatedItemLimit"
+                ng-change="$ctrl.changePaginationLimit()"
+              >
+                <option value="0">All</option>
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </span>
+            <dir-pagination-controls max-size="5"></dir-pagination-controls>
+          </form>
+        </div>
+      </div>
+    </rd-widget-body>
+  </rd-widget>
+</div>
