@@ -57,9 +57,9 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 	return response.Empty(w)
 }
 
-func findTagIndex(tags []portainer.TagID, tagID portainer.TagID) int {
-	for idx, etid := range tags {
-		if tagID == etid {
+func findTagIndex(tags []portainer.TagID, searchTagID portainer.TagID) int {
+	for idx, tagID := range tags {
+		if searchTagID == tagID {
 			return idx
 		}
 	}
