@@ -128,6 +128,7 @@ func (store *Store) MigrateData() error {
 			ScheduleService:        store.ScheduleService,
 			SettingsService:        store.SettingsService,
 			StackService:           store.StackService,
+			TagService:             store.TagService,
 			TeamMembershipService:  store.TeamMembershipService,
 			TemplateService:        store.TemplateService,
 			UserService:            store.UserService,
