@@ -56,6 +56,7 @@ type Server struct {
 	Snapshotter            portainer.Snapshotter
 	RoleService            portainer.RoleService
 	DockerHubService       portainer.DockerHubService
+	EdgeGroupService       portainer.EdgeGroupService
 	EndpointService        portainer.EndpointService
 	EndpointGroupService   portainer.EndpointGroupService
 	FileService            portainer.FileService
@@ -75,7 +76,6 @@ type Server struct {
 	TemplateService        portainer.TemplateService
 	UserService            portainer.UserService
 	WebhookService         portainer.WebhookService
-	EdgeGroupService       portainer.EdgeGroupService
 	Handler                *handler.Handler
 	SSL                    bool
 	SSLCert                string
@@ -145,6 +145,9 @@ func (server *Server) Start() error {
 
 	var dockerHubHandler = dockerhub.NewHandler(requestBouncer)
 	dockerHubHandler.DockerHubService = server.DockerHubService
+
+	var edgeGroupsHandler = edgegroups.NewHandler(requestBouncer)
+	edgeGroupsHandler.EdgeGroupService = server.EdgeGroupService
 
 	var endpointHandler = endpoints.NewHandler(requestBouncer, server.EndpointManagement)
 	endpointHandler.EndpointService = server.EndpointService
@@ -264,13 +267,11 @@ func (server *Server) Start() error {
 	webhookHandler.EndpointService = server.EndpointService
 	webhookHandler.DockerClientFactory = server.DockerClientFactory
 
-	var edgeGroupsHandler = edgegroups.NewHandler(requestBouncer)
-	edgeGroupsHandler.EdgeGroupService = server.EdgeGroupService
-
 	server.Handler = &handler.Handler{
 		RoleHandler:            roleHandler,
 		AuthHandler:            authHandler,
 		DockerHubHandler:       dockerHubHandler,
+		EdgeGroupsHandler:      edgeGroupsHandler,
 		EndpointGroupHandler:   endpointGroupHandler,
 		EndpointHandler:        endpointHandler,
 		EndpointProxyHandler:   endpointProxyHandler,
@@ -292,7 +293,6 @@ func (server *Server) Start() error {
 		WebSocketHandler:       websocketHandler,
 		WebhookHandler:         webhookHandler,
 		SchedulesHanlder:       schedulesHandler,
-		EdgeGroupsHandler:      edgeGroupsHandler,
 	}
 
 	if server.SSL {
