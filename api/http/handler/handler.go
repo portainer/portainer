@@ -38,6 +38,7 @@ import (
 type Handler struct {
 	AuthHandler            *auth.Handler
 	DockerHubHandler       *dockerhub.Handler
+	EdgeGroupsHandler      *edgegroups.Handler
 	EndpointGroupHandler   *endpointgroups.Handler
 	EndpointHandler        *endpoints.Handler
 	EndpointProxyHandler   *endpointproxy.Handler
@@ -60,7 +61,6 @@ type Handler struct {
 	UserHandler            *users.Handler
 	WebSocketHandler       *websocket.Handler
 	WebhookHandler         *webhooks.Handler
-	EdgeGroupsHandler      *edgegroups.Handler
 }
 
 // ServeHTTP delegates a request to the appropriate subhandler.

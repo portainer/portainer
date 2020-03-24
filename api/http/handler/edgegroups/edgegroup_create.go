@@ -64,5 +64,4 @@ func (handler *Handler) edgeGroupCreate(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the edge group inside the database", err}
 	}
 	return response.JSON(w, edgeGroup)
-
 }
