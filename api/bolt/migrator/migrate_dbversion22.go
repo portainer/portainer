@@ -3,9 +3,7 @@ package migrator
 import "github.com/portainer/portainer/api"
 
 func (m *Migrator) updateEndointsAndEndpointsGroupsToDBVersion23() error {
-
 	tags, err := m.tagService.Tags()
-
 	if err != nil {
 		return err
 	}
@@ -23,11 +21,16 @@ func (m *Migrator) updateEndointsAndEndpointsGroupsToDBVersion23() error {
 	for _, endpoint := range endpoints {
 		endpointTags := make([]portainer.TagID, 0)
 		for _, tagName := range endpoint.Tags {
-			tagID := tagsNameMap[tagName]
-			endpointTags = append(endpointTags, tagID)
+			tagID, ok := tagsNameMap[tagName]
+			if ok {
+				endpointTags = append(endpointTags, tagID)
+			}
 		}
 		endpoint.TagIDs = endpointTags
-		m.endpointService.UpdateEndpoint(endpoint.ID, &endpoint)
+		err = m.endpointService.UpdateEndpoint(endpoint.ID, &endpoint)
+		if err != nil {
+			return err
+		}
 	}
 
 	endpointGroups, err := m.endpointGroupService.EndpointGroups()
@@ -38,11 +41,16 @@ func (m *Migrator) updateEndointsAndEndpointsGroupsToDBVersion23() error {
 	for _, endpointGroup := range endpointGroups {
 		endpointGroupTags := make([]portainer.TagID, 0)
 		for _, tagName := range endpointGroup.Tags {
-			tagID := tagsNameMap[tagName]
-			endpointGroupTags = append(endpointGroupTags, tagID)
+			tagID, ok := tagsNameMap[tagName]
+			if ok {
+				endpointGroupTags = append(endpointGroupTags, tagID)
+			}
 		}
 		endpointGroup.TagIDs = endpointGroupTags
-		m.endpointGroupService.UpdateEndpointGroup(endpointGroup.ID, &endpointGroup)
+		err = m.endpointGroupService.UpdateEndpointGroup(endpointGroup.ID, &endpointGroup)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
