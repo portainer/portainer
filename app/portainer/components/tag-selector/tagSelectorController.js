@@ -13,16 +13,21 @@ angular.module('portainer.app').controller('TagSelectorController', function() {
 
   this.selectTag = function($item) {
     this.state.selectedValue = '';
-    this.onChange(this.model.concat($item.Id));
+    const model = this.model || [];
+    this.onChange(model.concat($item.Id));
   };
 
   this.removeTag = function removeTag(tag) {
-    this.onChange(this.model.filter(id => tag.Id !== id));
+    const model = this.model || [];
+    this.onChange(model.filter(id => tag.Id !== id));
   };
 
   this.filterSelected = filterSelected.bind(this);
 
   function filterSelected($item) {
+    if (!this.model) {
+      return true
+    }
     return !this.model.includes($item.Id);
   }
 });
