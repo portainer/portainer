@@ -38,7 +38,9 @@ class KubernetesClusterController {
     try {
       this.state.applicationsLoading = true;
       this.applications = await this.KubernetesApplicationService.get();
+      const nodeNames = _.map(this.nodes, (node) => node.Name);
       this.resourceReservation = _.reduce(this.applications, (acc, app) => {
+        app.Pods = _.filter(app.Pods, (pod) => nodeNames.includes(pod.Node));
         const resourceReservation = KubernetesResourceReservationHelper.computeResourceReservation(app.Pods);
         acc.CPU += resourceReservation.CPU;
         acc.Memory += resourceReservation.Memory;
