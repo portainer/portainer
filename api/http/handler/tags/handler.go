@@ -25,7 +25,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h.Handle("/tags",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.tagCreate))).Methods(http.MethodPost)
 	h.Handle("/tags",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.tagList))).Methods(http.MethodGet)
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.tagList))).Methods(http.MethodGet)
 	h.Handle("/tags/{id}",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.tagDelete))).Methods(http.MethodDelete)
 
