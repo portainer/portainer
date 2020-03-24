@@ -6,7 +6,7 @@ import _ from 'lodash-es';
 
 class KubernetesConfigurationController {
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesConfigurationService, KubernetesResourcePoolService, ModalService, KubernetesApplicationService) {
+  constructor($async, $state, Notifications, KubernetesConfigurationService, KubernetesResourcePoolService, ModalService, KubernetesApplicationService, KubernetesEventService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
@@ -14,10 +14,13 @@ class KubernetesConfigurationController {
     this.KubernetesConfigurationService = KubernetesConfigurationService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesApplicationService = KubernetesApplicationService;
+    this.KubernetesEventService = KubernetesEventService;
     this.KubernetesConfigurationTypes = KubernetesConfigurationTypes;
 
     this.onInit = this.onInit.bind(this);
     this.getConfigurationAsync = this.getConfigurationAsync.bind(this);
+    this.getEvents = this.getEvents.bind(this);
+    this.getEventsAsync = this.getEventsAsync.bind(this);
     this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
     this.updateConfiguration = this.updateConfiguration.bind(this);
     this.updateConfigurationAsync = this.updateConfigurationAsync.bind(this);
@@ -32,6 +35,10 @@ class KubernetesConfigurationController {
 
   removeEntry(index) {
     this.formValues.Data.splice(index, 1);
+  }
+
+  showEditor() {
+    this.state.showEditorTab = true;
   }
 
   // TODO: review - don't use async function (cf docker/createConfigController for working 'cm' use)
@@ -146,6 +153,22 @@ class KubernetesConfigurationController {
     return this.$async(this.getApplicationsAsync, namespace);
   }
 
+  async getEventsAsync(namespace) {
+    try {
+      this.state.eventsLoading = true;
+      this.events = await this.KubernetesEventService.get(namespace);
+      this.events = _.filter(this.events, (event) => event.Involved.uid === this.configuration.Id);
+    } catch(err) {
+      this.Notifications('Failure', err, 'Unable to retrieve events');
+    } finally {
+      this.state.eventsLoading = false;
+    }
+  }
+
+  getEvents(namespace) {
+    return this.$async(this.getEventsAsync, namespace);
+  }
+
   async onInit() {
     try {
       this.formValues = new KubernetesConfigurationFormValues();
@@ -153,12 +176,15 @@ class KubernetesConfigurationController {
       this.state = {
         actionInProgress: false,
         configurationLoading: true,
-        applicationsLoading: true
+        applicationsLoading: true,
+        eventsLoading: true,
+        showEditorTab: false
       };
 
       this.resourcePools = await this.KubernetesResourcePoolService.get();
       await this.getConfiguration();
       await this.getApplications(this.configuration.Namespace);
+      await this.getEvents(this.configuration.Namespace);
       this.configuration = KubernetesConfigurationHelper.setConfigurationUsed(this.configuration, this.applications);
       this.formValues.ResourcePool = _.find(this.resourcePools, (resourcePool) => resourcePool.Namespace.Name === this.configuration.Namespace);
       this.formValues.Id = this.configuration.Id;

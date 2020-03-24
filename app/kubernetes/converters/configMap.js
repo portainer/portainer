@@ -8,12 +8,13 @@ class KubernetesConfigMapConverter {
   /**
    * API ConfigMap to front ConfigMap
    */
-  static apiToConfigMap(data) {
+  static apiToConfigMap(data, yaml) {
     const res = new KubernetesConfigMap();
     res.Id = data.metadata.uid;
     res.Name = data.metadata.name;
     res.Namespace = data.metadata.namespace;
     res.CreationDate = data.metadata.creationTimestamp;
+    res.Yaml = yaml ? yaml.data : '';
     res.Data = {};
     const resData = data.data || {};
     _.forIn(resData, (value, key) => {

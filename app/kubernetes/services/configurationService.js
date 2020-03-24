@@ -31,10 +31,13 @@ class KubernetesConfigurationService {
         this.KubernetesConfigMapService.get(namespace, name),
         this.KubernetesSecretService.get(namespace, name)
       ]);
+      let configuration;
       if (secret.status === 'fulfilled') {
-        return KubernetesConfigurationConverter.secretToConfiguration(secret.value);
+        configuration = KubernetesConfigurationConverter.secretToConfiguration(secret.value);
+        return configuration;
       }
-      return KubernetesConfigurationConverter.configMapToConfiguration(configMap.value);
+      configuration = KubernetesConfigurationConverter.configMapToConfiguration(configMap.value);
+      return configuration;
     } catch (err) {
       throw err;
     }

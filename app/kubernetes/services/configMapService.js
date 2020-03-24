@@ -24,8 +24,12 @@ class KubernetesConfigMapService {
     try {
       const params = new KubernetesCommonParams();
       params.id = name;
-      const data = await this.KubernetesConfigMaps(namespace).get(params).$promise;
-      return KubernetesConfigMapConverter.apiToConfigMap(data);
+      const [raw, yaml] = await Promise.all([
+        this.KubernetesConfigMaps(namespace).get(params).$promise,
+        this.KubernetesConfigMaps(namespace).getYaml(params).$promise
+      ]);
+      const configMap = KubernetesConfigMapConverter.apiToConfigMap(raw, yaml);
+      return configMap;
     } catch (err) {
       if (err.status === 404) {
         return KubernetesConfigMapConverter.defaultConfigMap(namespace, name);

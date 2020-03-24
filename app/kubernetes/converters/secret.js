@@ -20,11 +20,13 @@ class KubernetesSecretConverter {
     return res;
   }
 
-  static apiToSecret(payload) {
+  static apiToSecret(payload, yaml) {
     const res = new KubernetesApplicationSecret();
+    res.Id = payload.metadata.uid;
     res.Name = payload.metadata.name;
     res.Namespace = payload.metadata.namespace;
     res.CreationDate = payload.metadata.creationTimestamp;
+    res.Yaml = yaml ? yaml.data : '';
     res.Data = payload.data;
     return res;
   }

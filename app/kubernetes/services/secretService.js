@@ -24,8 +24,12 @@ class KubernetesSecretService {
     try {
       const params = new KubernetesCommonParams();
       params.id = name;
-      const data = await this.KubernetesSecrets(namespace).get(params).$promise;
-      return KubernetesSecretConverter.apiToSecret(data);
+      const [raw, yaml] = await Promise.all([
+        this.KubernetesSecrets(namespace).get(params).$promise,
+        this.KubernetesSecrets(namespace).getYaml(params).$promise
+      ]);
+      const secret = KubernetesSecretConverter.apiToSecret(raw, yaml);
+      return secret;
     } catch(err) {
       throw new PortainerError('Unable to retrieve secret', err);
     }

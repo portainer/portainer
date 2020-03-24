@@ -5,9 +5,11 @@ class KubernetesConfigurationConverter {
   static secretToConfiguration(secret) {
     const res = new KubernetesConfiguration();
     res.Type = KubernetesConfigurationTypes.SECRET;
+    res.Id = secret.Id;
     res.Name = secret.Name;
     res.Namespace = secret.Namespace;
     res.CreationDate = secret.CreationDate;
+    res.Yaml = secret.Yaml;
     res.Data = secret.Data;
     return res;
   }
@@ -19,6 +21,7 @@ class KubernetesConfigurationConverter {
     res.Name = configMap.Name;
     res.Namespace = configMap.Namespace;
     res.CreationDate = configMap.CreationDate;
+    res.Yaml = configMap.Yaml;
     res.Data = configMap.Data;
     return res;
   }

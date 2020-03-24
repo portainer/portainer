@@ -9,6 +9,7 @@ const _KubernetesConfigMap = Object.freeze({
   Id: 0,
   Name: '',
   Namespace: '',
+  Yaml: '',
   Data: {}
 });
 

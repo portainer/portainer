@@ -2,9 +2,11 @@
  * KubernetesApplicationSecret Model
  */
 const _KubernetesApplicationSecret = Object.freeze({
+  Id: 0,
   Name: '',
   Namespace: '',
   CreationDate: '',
+  Yaml: '',
   Data: {}
 });
 
