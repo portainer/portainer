@@ -40,7 +40,8 @@
     "start": "Build the entire app (backend/frontend) in development mode, run it inside a container locally and start a watch process for the frontend files",
     "start:server": "Build the backend and run it inside a container",
     "clean:all": "Deprecated. Use the clean script instead",
-    "build:server:offline": "Deprecated. Use the build:server script instead"
+    "build:server:offline": "Deprecated. Use the build:server script instead",
+    "format": "Should be removed before pr is merged"
   },
   "engines": {
     "node": ">= 0.8.4"
