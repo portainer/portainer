@@ -14,6 +14,7 @@ class KubernetesDeployController {
     this.StackService = StackService;
     this.Authentication = Authentication;
 
+    this.onInit = this.onInit.bind(this);
     this.deployAsync = this.deployAsync.bind(this);
     this.editorUpdate = this.editorUpdate.bind(this);
     this.editorUpdateAsync = this.editorUpdateAsync.bind(this);
@@ -73,23 +74,30 @@ class KubernetesDeployController {
     return this.$async(this.getNamespacesAsync);
   }
 
-  async $onInit() {
+  async onInit() {
     if (!this.Authentication.isAdmin()) {
       this.$state.go('portainer.home');
       return;
     }
+
     this.state = {
       DeployType: KubernetesDeployManifestTypes.KUBERNETES,
       tabLogsDisabled: true,
-      activeTab: 0
+      activeTab: 0,
+      viewReady: false
     };
 
     this.formValues = {};
-
     this.ManifestDeployTypes = KubernetesDeployManifestTypes;
-
     this.endpointId = this.EndpointProvider.endpointID();
-    this.getNamespaces();
+
+    await this.getNamespaces();
+
+    this.state.viewReady = true;
+  }
+
+  $onInit() {
+    return this.$async(this.onInit);
   }
 }
 

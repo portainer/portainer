@@ -2,15 +2,15 @@ import angular from 'angular';
 
 class KubernetesDashboardController {
   /* @ngInject */
-  constructor($async, Notifications, Authentication, EndpointService, EndpointProvider, KubernetesNamespaceService, KubernetesApplicationService) {
+  constructor($async, Notifications, EndpointService, EndpointProvider, KubernetesNamespaceService, KubernetesApplicationService) {
     this.$async = $async;
     this.Notifications = Notifications;
-    this.Authentication = Authentication;
     this.EndpointService = EndpointService;
     this.EndpointProvider = EndpointProvider;
     this.KubernetesNamespaceService = KubernetesNamespaceService;
     this.KubernetesApplicationService = KubernetesApplicationService;
 
+    this.onInit = this.onInit.bind(this);
     this.getAll = this.getAll.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);
   }
@@ -35,9 +35,18 @@ class KubernetesDashboardController {
     return this.$async(this.getAllAsync);
   }
 
-  async $onInit() {
-    this.isAdmin = this.Authentication.isAdmin();
-    this.getAll();
+  async onInit() {
+    this.state = {
+      viewReady: false
+    };
+
+    await this.getAll();
+
+    this.state.viewReady = true;
+  }
+
+  $onInit() {
+    return this.$async(this.onInit);
   }
 }
 

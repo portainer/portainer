@@ -313,8 +313,6 @@ class KubernetesCreateApplicationController {
 
   async onInit() {
     try {
-      this.formValues = new KubernetesApplicationFormValues();
-
       this.state = {
         actionInProgress: false,
         useLoadBalancer: false,
@@ -333,7 +331,10 @@ class KubernetesCreateApplicationController {
           cpu: 0
         },
         resourcePoolHasQuota: false,
+        viewReady: false
       };
+
+      this.formValues = new KubernetesApplicationFormValues();
 
       const [resourcePools, nodes] = await Promise.all([
         this.KubernetesResourcePoolService.get(),
@@ -354,6 +355,8 @@ class KubernetesCreateApplicationController {
       await this.updateStacksAndConfigurations();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
+    } finally {
+      this.state.viewReady = true;
     }
   }
 

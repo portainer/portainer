@@ -9,6 +9,7 @@ class KubernetesResourcePoolsController {
     this.ModalService = ModalService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
 
+    this.onInit = this.onInit.bind(this);
     this.getResourcePools = this.getResourcePools.bind(this);
     this.getResourcePoolsAsync = this.getResourcePoolsAsync.bind(this);
     this.removeAction = this.removeAction.bind(this);
@@ -56,8 +57,18 @@ class KubernetesResourcePoolsController {
     return this.$async(this.getResourcePoolsAsync)
   }
 
+  async onInit() {
+    this.state = {
+      viewReady: false
+    };
+
+    await this.getResourcePools();
+
+    this.state.viewReady = true;
+  }
+
   $onInit() {
-    this.getResourcePools();
+    return this.$async(this.onInit);
   }
 }
 

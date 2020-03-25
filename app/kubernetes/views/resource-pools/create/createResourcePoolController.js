@@ -76,7 +76,8 @@ class KubernetesCreateResourcePoolController {
       this.state = {
         actionInProgress: false,
         sliderMaxMemory: 0,
-        sliderMaxCpu: 0
+        sliderMaxCpu: 0,
+        viewReady: false
       };
 
       const nodes = await this.KubernetesNodeService.get();
@@ -88,6 +89,8 @@ class KubernetesCreateResourcePoolController {
       this.state.sliderMaxMemory = megaBytesValue(this.state.sliderMaxMemory);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
+    } finally {
+      this.state.viewReady = true;
     }
   }
 

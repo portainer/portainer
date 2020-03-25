@@ -104,15 +104,18 @@ class KubernetesApplicationsController {
   }
 
   async onInit() {
-    this.getApplications();
+    this.state = {
+      activeTab: 0,
+      isAdmin: this.Authentication.isAdmin(),
+      viewReady: false
+    };
+
+    await this.getApplications();
+
+    this.state.viewReady = true;
   }
 
   $onInit() {
-    this.state = {
-      activeTab: 0,
-      isAdmin: this.Authentication.isAdmin()
-    };
-
     return this.$async(this.onInit);
   }
 }

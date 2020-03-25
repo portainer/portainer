@@ -48,7 +48,8 @@ class KubernetesApplicationLogsController {
     this.state = {
       autoRefresh: false,
       refreshRate: 5000, // 5 seconds
-      search: ''
+      search: '',
+      viewReady: false
     };
 
     const podName = this.$transition$.params().pod;
@@ -68,15 +69,17 @@ class KubernetesApplicationLogsController {
       this.applicationLogs = applicationLogs;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve application logs');
+    } finally {
+      this.state.viewReady = true;
     }
-  }
-
-  $onDestroy() {
-    this.stopRepeater();
   }
 
   $onInit() {
     return this.$async(this.onInit);
+  }
+
+  $onDestroy() {
+    this.stopRepeater();
   }
 }
 

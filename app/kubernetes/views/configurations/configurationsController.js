@@ -86,11 +86,14 @@ class KubernetesConfigurationsController {
   async onInit() {
     this.state = {
       configurationsLoading: true,
-      applicationsLoading: true
+      applicationsLoading: true,
+      viewReady: false
     };
 
     await this.getApplications();
     await this.getConfigurations();
+
+    this.state.viewReady = true;
   }
 
   $onInit() {

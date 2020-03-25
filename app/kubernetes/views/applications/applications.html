@@ -1,61 +1,60 @@
-<rd-header>
-  <rd-header-title title-text="Applications list">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="kubernetes.applications" ui-sref-opts="{reload: true}">
-      <i class="fa fa-sync" aria-hidden="true"></i>
-    </a>
-  </rd-header-title>
-  <rd-header-content>Applications</rd-header-content>
-</rd-header>
+<kubernetes-view-header title="Application list" state="kubernetes.applications" view-ready="ctrl.state.viewReady">
+  Applications
+</kubernetes-view-header>
 
-<kubernetes-feedback-panel></kubernetes-feedback-panel>
+<kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
-<information-panel title-text="Advanced deployment" ng-if="ctrl.state.isAdmin">
-  <span class="small">
-    <p class="text-muted">
-      <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-      As an administrator user, you have access to the advanced deployment feature allowing you to deploy any Kubernetes
-      manifest inside your cluster.
-    </p>
-    <p>
-      <button type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.deploy">
-        <i class="fa fa-file-code space-right" aria-hidden="true"></i>Advanced deployment
-      </button>
-    </p>
-  </span>
-</information-panel>
+<div ng-if="ctrl.state.viewReady">
+  <kubernetes-feedback-panel></kubernetes-feedback-panel>
 
-<div class="row">
-  <div class="col-sm-12">
-    <rd-widget>
-      <rd-widget-body classes="no-padding">
-        <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
-          <uib-tab index="0" classes="btn-sm">
-            <uib-tab-heading>
-              <i class="fa fa-laptop-code space-right" aria-hidden="true"></i> Applications
-            </uib-tab-heading>
-            <kubernetes-applications-datatable dataset="ctrl.applications" table-key="kubernetes.applications"
-              order-by="Name" remove-action="ctrl.removeAction" refresh-callback="ctrl.getApplications"
-              on-publishing-mode-click="ctrl.onPublishingModeClick">
-            </kubernetes-applications-datatable>
-          </uib-tab>
-          <uib-tab index="1" classes="btn-sm">
-            <uib-tab-heading>
-              <i class="fa fa-exchange-alt space-right" aria-hidden="true"></i> Ports mapping
-            </uib-tab-heading>
-            <kubernetes-applications-ports-datatable dataset="ctrl.ports" table-key="kubernetes.applications.ports"
-              order-by="Name" refresh-callback="ctrl.getApplications">
-            </kubernetes-applications-ports-datatable>
-          </uib-tab>
-          <uib-tab index="2" classes="btn-sm">
-            <uib-tab-heading>
-              <i class="fa fa-th-list space-right" aria-hidden="true"></i> Stacks
-            </uib-tab-heading>
-            <kubernetes-applications-stacks-datatable dataset="ctrl.stacks" table-key="kubernetes.applications.stacks"
-              order-by="Name" refresh-callback="ctrl.getApplications" remove-action="ctrl.removeStacksAction">
-            </kubernetes-applications-stacks-datatable>
-          </uib-tab>
-        </uib-tabset>
-      </rd-widget-body>
-    </rd-widget>
+  <information-panel title-text="Advanced deployment" ng-if="ctrl.state.isAdmin">
+    <span class="small">
+      <p class="text-muted">
+        <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+        As an administrator user, you have access to the advanced deployment feature allowing you to deploy any Kubernetes
+        manifest inside your cluster.
+      </p>
+      <p>
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.deploy">
+          <i class="fa fa-file-code space-right" aria-hidden="true"></i>Advanced deployment
+        </button>
+      </p>
+    </span>
+  </information-panel>
+
+  <div class="row">
+    <div class="col-sm-12">
+      <rd-widget>
+        <rd-widget-body classes="no-padding">
+          <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
+            <uib-tab index="0" classes="btn-sm">
+              <uib-tab-heading>
+                <i class="fa fa-laptop-code space-right" aria-hidden="true"></i> Applications
+              </uib-tab-heading>
+              <kubernetes-applications-datatable dataset="ctrl.applications" table-key="kubernetes.applications"
+                order-by="Name" remove-action="ctrl.removeAction" refresh-callback="ctrl.getApplications"
+                on-publishing-mode-click="ctrl.onPublishingModeClick">
+              </kubernetes-applications-datatable>
+            </uib-tab>
+            <uib-tab index="1" classes="btn-sm">
+              <uib-tab-heading>
+                <i class="fa fa-exchange-alt space-right" aria-hidden="true"></i> Ports mapping
+              </uib-tab-heading>
+              <kubernetes-applications-ports-datatable dataset="ctrl.ports" table-key="kubernetes.applications.ports"
+                order-by="Name" refresh-callback="ctrl.getApplications">
+              </kubernetes-applications-ports-datatable>
+            </uib-tab>
+            <uib-tab index="2" classes="btn-sm">
+              <uib-tab-heading>
+                <i class="fa fa-th-list space-right" aria-hidden="true"></i> Stacks
+              </uib-tab-heading>
+              <kubernetes-applications-stacks-datatable dataset="ctrl.stacks" table-key="kubernetes.applications.stacks"
+                order-by="Name" refresh-callback="ctrl.getApplications" remove-action="ctrl.removeStacksAction">
+              </kubernetes-applications-stacks-datatable>
+            </uib-tab>
+          </uib-tabset>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
   </div>
 </div>

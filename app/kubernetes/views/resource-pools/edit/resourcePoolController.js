@@ -158,7 +158,8 @@ class KubernetesResourcePoolController {
         activeTab: 0,
         showEditorTab: false,
         eventsLoading: true,
-        applicationsLoading: true
+        applicationsLoading: true,
+        viewReady: false,
       };
 
       const name = this.$transition$.params().id;
@@ -190,6 +191,8 @@ class KubernetesResourcePoolController {
       await this.getApplications();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
+    } finally {
+      this.state.viewReady = true;
     }
   }
 

@@ -1,17 +1,16 @@
-<rd-header>
-  <rd-header-title title-text="Configurations list">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="kubernetes.configurations" ui-sref-opts="{reload: true}">
-      <i class="fa fa-sync" aria-hidden="true"></i>
-    </a>
-  </rd-header-title>
-  <rd-header-content>Configurations</rd-header-content>
-</rd-header>
+<kubernetes-view-header title="Configuration list" state="kubernetes.configurations" view-ready="ctrl.state.viewReady">
+  Configurations
+</kubernetes-view-header>
 
-<kubernetes-feedback-panel></kubernetes-feedback-panel>
+<kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
-<div class="row">
-  <div class="col-sm-12">
-    <kubernetes-configurations-datatable title-text="Configurations" title-icon="fa-file-code" dataset="ctrl.configurations" table-key="kubernetes.configurations"
-      order-by="Name" refresh-callback="ctrl.refreshCallback" remove-action="ctrl.removeAction"></kubernetes-configurations-datatable>
+<div ng-if="ctrl.state.viewReady">
+  <kubernetes-feedback-panel></kubernetes-feedback-panel>
+
+  <div class="row">
+    <div class="col-sm-12">
+      <kubernetes-configurations-datatable title-text="Configurations" title-icon="fa-file-code" dataset="ctrl.configurations" table-key="kubernetes.configurations"
+        order-by="Name" refresh-callback="ctrl.refreshCallback" remove-action="ctrl.removeAction"></kubernetes-configurations-datatable>
+    </div>
   </div>
 </div>

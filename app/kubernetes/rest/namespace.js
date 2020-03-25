@@ -11,18 +11,27 @@ angular.module('portainer.kubernetes')
             endpointId: EndpointProvider.endpointID,
           },
           {
-            get: { method: 'GET', timeout: 15000 },
+            get: {
+              method: 'GET',
+              timeout: 15000,
+              ignoreLoadingBar: true
+            },
             getYaml: {
               method: 'GET',
               headers: {
                 'Accept': 'application/yaml'
               },
-              transformResponse: rawResponse
+              transformResponse: rawResponse,
+              ignoreLoadingBar: true
             },
             create: { method: 'POST' },
             update: { method: 'PUT' },
             delete: { method: 'DELETE' },
-            status: { method: 'GET', params: { action: 'status' } }
+            status: {
+              method: 'GET',
+              params: { action: 'status' },
+              ignoreLoadingBar: true
+            }
           }
         );
       };

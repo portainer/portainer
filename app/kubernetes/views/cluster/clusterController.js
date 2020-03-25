@@ -13,6 +13,7 @@ class KubernetesClusterController {
     this.KubernetesNodeService = KubernetesNodeService;
     this.KubernetesApplicationService = KubernetesApplicationService;
 
+    this.onInit = this.onInit.bind(this);
     this.getNodes = this.getNodes.bind(this);
     this.getNodesAsync = this.getNodesAsync.bind(this);
     this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
@@ -58,16 +59,24 @@ class KubernetesClusterController {
     return this.$async(this.getApplicationsAsync);
   }
 
-  async $onInit() {
+  async onInit() {
     this.state = {
-      applicationsLoading: true
+      applicationsLoading: true,
+      viewReady: false
     };
 
     this.isAdmin = this.Authentication.isAdmin();
+
     await this.getNodes();
     if (this.isAdmin) {
       await this.getApplications();
     }
+
+    this.state.viewReady = true;
+  }
+
+  $onInit() {
+    return this.$async(this.onInit);
   }
 }
 

@@ -1,567 +1,568 @@
-<rd-header>
-  <rd-header-title title-text="Create application"></rd-header-title>
-  <rd-header-content>
-    <a ui-sref="kubernetes.applications">Applications</a> &gt; Create an application
-  </rd-header-content>
-</rd-header>
+<kubernetes-view-header title="Create application" state="kubernetes.applications.new" view-ready="ctrl.state.viewReady">
+  <a ui-sref="kubernetes.applications">Applications</a> &gt; Create an application
+</kubernetes-view-header>
 
-<div class="row">
-  <div class="col-xs-12">
+<kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
-    <rd-widget>
-      <rd-widget-body>
-        <form class="form-horizontal" name="kubernetesApplicationCreationForm" autocomplete="off">
+<div ng-if="ctrl.state.viewReady">
+  <div class="row">
+    <div class="col-xs-12">
 
-          <div class="col-sm-12 form-section-title">
-            Application
-          </div>
+      <rd-widget>
+        <rd-widget-body>
+          <form class="form-horizontal" name="kubernetesApplicationCreationForm" autocomplete="off">
 
-          <!-- resource-pool -->
-          <div class="form-group">
-            <label for="resource-pool-selector" class="col-sm-1 control-label text-left">Resource pool</label>
-            <div class="col-sm-11">
-              <select class="form-control" id="resource-pool-selector" ng-model="ctrl.formValues.ResourcePool"
-                ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools" ng-change="ctrl.onResourcePoolSelectionChange()"></select>
-            </div>
-          </div>
-          <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
-            <div class="col-sm-12 small text-warning">
-              <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-              This resource pool has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of the
-              resource pool.
-            </div>
-          </div>
-          <!-- !resource-pool -->
-
-          <!-- name -->
-          <div class="form-group">
-            <label for="application_name" class="col-sm-1 control-label text-left">Name</label>
-            <div class="col-sm-11">
-              <input type="text" class="form-control" name="application_name" ng-model="ctrl.formValues.Name" placeholder="myApp" auto-focus required>
-            </div>
-          </div>
-          <div class="form-group" ng-show="kubernetesApplicationCreationForm.application_name.$invalid">
-            <div class="col-sm-12 small text-warning">
-              <div ng-messages="kubernetesApplicationCreationForm.application_name.$error">
-                <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
-              </div>
-            </div>
-          </div>
-          <!-- !name -->
-
-          <!-- image -->
-          <div class="form-group">
-            <label for="container_image" class="col-sm-1 control-label text-left">Image</label>
-            <div class="col-sm-11">
-              <input type="text" class="form-control" name="container_image" ng-model="ctrl.formValues.Image" placeholder="nginx:latest" required>
-            </div>
-          </div>
-          <div class="form-group" ng-show="kubernetesApplicationCreationForm.container_image.$invalid">
-            <div class="col-sm-12 small text-warning">
-              <div ng-messages="kubernetesApplicationCreationForm.container_image.$error">
-                <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
-              </div>
-            </div>
-          </div>
-          <!-- !image -->
-
-          <div class="col-sm-12 form-section-title">
-            Stack
-          </div>
-
-          <div class="form-group">
-            <div class="col-sm-12 small text-muted">
-              <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-              Portainer can automatically bundle multiple applications inside a stack. Enter a name of a new stack or select an existing stack in the list. Leave empty to use the
-              application name.
-            </div>
-          </div>
-
-          <!-- stack -->
-          <div class="form-group">
-            <label for="stack_name" class="col-sm-1 control-label text-left">Stack</label>
-            <div class="col-sm-11">
-              <input type="text" class="form-control" placeholder="myStack" ng-model="ctrl.formValues.StackName" name="stack_name"
-                uib-typeahead="stack for stack in ctrl.stacks | filter:$viewValue | limitTo:7" typeahead-show-hint="true" typeahead-min-length="0" />
-            </div>
-          </div>
-          <!-- !stack -->
-
-          <div class="col-sm-12 form-section-title">
-            Environment
-          </div>
-
-          <!-- environment-variables -->
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label class="control-label text-left">Environment variables</label>
-              <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addEnvironmentVariable()">
-                <i class="fa fa-plus-circle" aria-hidden="true"></i> add environment variable
-              </span>
+            <div class="col-sm-12 form-section-title">
+              Application
             </div>
 
-            <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-              <div ng-repeat="envVar in ctrl.formValues.EnvironmentVariables" style="margin-top: 2px;">
-
-                <div class="input-group col-sm-4 input-group-sm">
-                  <span class="input-group-addon">name</span>
-                  <input type="text" class="form-control" ng-model="envVar.Name" placeholder="foo">
-                </div>
-
-                <div class="input-group col-sm-4 input-group-sm">
-                  <span class="input-group-addon">value</span>
-                  <input type="text" class="form-control" ng-model="envVar.Value" placeholder="bar">
-                </div>
-
-                <div class="input-group col-sm-2 input-group-sm">
-                  <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeEnvironmentVariable($index)">
-                    <i class="fa fa-times" aria-hidden="true"></i>
-                  </button>
-                </div>
-
-              </div>
-            </div>
-
-          </div>
-          <!-- !environment-variables -->
-
-          <div class="col-sm-12 form-section-title">
-            Configurations
-          </div>
-
-          <!-- configurations -->
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label class="control-label text-left">Configurations</label>
-              <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addConfiguration()">
-                <i class="fa fa-plus-circle" aria-hidden="true"></i> add configuration
-              </span>
-            </div>
-            <div class="col-sm-12 small text-muted" style="margin-top: 15px;" ng-if="ctrl.formValues.Configurations.length">
-              <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-              Portainer will automatically expose all the keys of a configuration as environment variables. This behavior can be overriden to filesystem mounts for each key via
-              the override button.
-            </div>
-          </div>
-
-          <!-- config-element -->
-          <div class="form-group" ng-repeat="config in ctrl.formValues.Configurations">
-            <label for="stack_name" class="col-md-1 col-sm-2 control-label text-left">Configuration</label>
-            <div class="col-sm-5">
-              <select class="form-control" ng-model="config.SelectedConfiguration" ng-options="c as c.Name for c in ctrl.configurations"
-                ng-change="ctrl.resetConfiguration($index)"></select>
-            </div>
-            <div class="col-sm-6" style="margin-top: 2px;">
-              <button class="btn btn-sm btn-primary" type="button" ng-if="!config.Overriden" ng-click="ctrl.overrideConfiguration($index)"
-                ng-disabled="!config.SelectedConfiguration">
-                <i class="fa fa-list" aria-hidden="true"></i> Override
-              </button>
-              <button class="btn btn-sm btn-primary" type="button" ng-if="config.Overriden" ng-click="ctrl.resetConfiguration($index)">
-                <i class="fa fa-undo" aria-hidden="true"></i> Auto
-              </button>
-              <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeConfiguration($index)">
-                <i class="fa fa-trash" aria-hidden="true"></i> Remove
-              </button>
-            </div>
-            <!-- no-override -->
-            <div class="col-sm-12" style="margin-top: 10px;" ng-if="config.SelectedConfiguration && !config.Overriden">
-              <div class="col-md-1 col-sm-2"></div>
-              <div class="col-md-11 col-sm-10 small text-muted" style="padding-left: 5px;">
-                The following keys will be loaded from the <code>{{ config.SelectedConfiguration.Name }}</code> configuration as environment variables:
-                <span ng-repeat="(key, _) in config.SelectedConfiguration.Data">
-                  <code>{{ key }}</code>{{ $last ? '' : ', '}}
-                </span>
-              </div>
-            </div>
-            <!-- !no-override -->
-
-            <!-- has-override -->
-            <div class="col-sm-12 form-inline" style="margin-top: 10px;" ng-if="config.Overriden">
-              <div ng-repeat="overridenKey in config.OverridenKeys" style="margin-top: 2px;">
-                <div class="col-md-1 col-sm-2" style="margin-left: 3px;"></div>
-                <div class="input-group col-sm-3 input-group-sm">
-                  <span class="input-group-addon">configuration key</span>
-                  <input type="text" class="form-control" ng-value="overridenKey.Key" disabled>
-                </div>
-                <div class="input-group col-sm-3 input-group-sm" ng-if="overridenKey.Type === ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM">
-                  <span class="input-group-addon">path on disk</span>
-                  <input type="text" class="form-control" ng-model="overridenKey.Path" placeholder="/etc/myapp/conf.d">
-                </div>
-                <div class="input-group col-sm-3 btn-group btn-group-sm">
-                  <label class="btn btn-primary" ng-model="overridenKey.Type" uib-btn-radio="ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.ENVIRONMENT">
-                    <i class="fa fa-list" aria-hidden="true"></i> Environment
-                  </label>
-                  <label class="btn btn-primary" ng-model="overridenKey.Type" uib-btn-radio="ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM">
-                    <i class="fa fa-file" aria-hidden="true"></i> Filesystem
-                  </label>
-                </div>
-              </div>
-            </div>
-            <!-- !has-override -->
-          </div>
-          <!-- !config-element -->
-          <!-- !configurations -->
-
-          <div class="col-sm-12 form-section-title">
-            Persisting data
-          </div>
-
-          <div class="form-group" ng-if="!ctrl.storageClassAvailable()">
-            <div class="col-sm-12 small text-muted">
-              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-              No storage option is available to persist data, contact your administrator to enable a storage option.
-            </div>
-          </div>
-
-          <!-- persisted folders -->
-          <div class="form-group" ng-if="ctrl.storageClassAvailable()">
-            <div class="col-sm-12" style="margin-top: 5px;">
-              <label class="control-label text-left">Persisted folders</label>
-              <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addPersistedFolder()">
-                <i class="fa fa-plus-circle" aria-hidden="true"></i> add persisted folder
-              </span>
-            </div>
-
-            <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-              <div ng-repeat="persistedFolder in ctrl.formValues.PersistedFolders" style="margin-top: 2px;">
-
-                <div class="input-group col-sm-3 input-group-sm">
-                  <span class="input-group-addon">path in container</span>
-                  <input type="text" class="form-control" ng-model="persistedFolder.ContainerPath" placeholder="/data">
-                </div>
-
-                <div class="input-group col-sm-3 input-group-sm">
-                  <span class="input-group-addon">requested size</span>
-                  <input type="text" class="form-control" ng-model="persistedFolder.Size" placeholder="20G">
-                </div>
-
-                <div class="input-group col-sm-3 input-group-sm" ng-if="ctrl.hasMultipleStorageClassesAvailable()">
-                  <span class="input-group-addon">storage</span>
-                  <select class="form-control" ng-model="persistedFolder.StorageClass"
-                    ng-options="storageClass as storageClass.Name for storageClass in ctrl.storageClasses"></select>
-                </div>
-
-                <div class="input-group col-sm-3 input-group-sm" ng-if="!ctrl.hasMultipleStorageClassesAvailable()">
-                  <span class="input-group-addon">storage</span>
-                  <input type="text" class="form-control" disabled ng-model="persistedFolder.StorageClass.Name" />
-                </div>
-
-                <div class="input-group col-sm-1 input-group-sm">
-                  <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removePersistedFolder($index)">
-                    <i class="fa fa-times" aria-hidden="true"></i>
-                  </button>
-                </div>
-
-              </div>
-            </div>
-
-          </div>
-          <!-- !persisted folders -->
-
-          <div ng-if="ctrl.showDataAccessPolicySection()">
-
+            <!-- resource-pool -->
             <div class="form-group">
-              <div class="col-sm-12">
-                <label class="control-label text-left">Data access policy</label>
+              <label for="resource-pool-selector" class="col-sm-1 control-label text-left">Resource pool</label>
+              <div class="col-sm-11">
+                <select class="form-control" id="resource-pool-selector" ng-model="ctrl.formValues.ResourcePool"
+                  ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools" ng-change="ctrl.onResourcePoolSelectionChange()"></select>
               </div>
+            </div>
+            <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
+              <div class="col-sm-12 small text-warning">
+                <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                This resource pool has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of the
+                resource pool.
+              </div>
+            </div>
+            <!-- !resource-pool -->
+
+            <!-- name -->
+            <div class="form-group">
+              <label for="application_name" class="col-sm-1 control-label text-left">Name</label>
+              <div class="col-sm-11">
+                <input type="text" class="form-control" name="application_name" ng-model="ctrl.formValues.Name" placeholder="myApp" auto-focus required>
+              </div>
+            </div>
+            <div class="form-group" ng-show="kubernetesApplicationCreationForm.application_name.$invalid">
+              <div class="col-sm-12 small text-warning">
+                <div ng-messages="kubernetesApplicationCreationForm.application_name.$error">
+                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                </div>
+              </div>
+            </div>
+            <!-- !name -->
+
+            <!-- image -->
+            <div class="form-group">
+              <label for="container_image" class="col-sm-1 control-label text-left">Image</label>
+              <div class="col-sm-11">
+                <input type="text" class="form-control" name="container_image" ng-model="ctrl.formValues.Image" placeholder="nginx:latest" required>
+              </div>
+            </div>
+            <div class="form-group" ng-show="kubernetesApplicationCreationForm.container_image.$invalid">
+              <div class="col-sm-12 small text-warning">
+                <div ng-messages="kubernetesApplicationCreationForm.container_image.$error">
+                  <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                </div>
+              </div>
+            </div>
+            <!-- !image -->
+
+            <div class="col-sm-12 form-section-title">
+              Stack
             </div>
 
             <div class="form-group">
               <div class="col-sm-12 small text-muted">
-                Specify how the data will be used across instances.
+                <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                Portainer can automatically bundle multiple applications inside a stack. Enter a name of a new stack or select an existing stack in the list. Leave empty to use the
+                application name.
               </div>
             </div>
 
-            <!-- access policy options -->
+            <!-- stack -->
+            <div class="form-group">
+              <label for="stack_name" class="col-sm-1 control-label text-left">Stack</label>
+              <div class="col-sm-11">
+                <input type="text" class="form-control" placeholder="myStack" ng-model="ctrl.formValues.StackName" name="stack_name"
+                  uib-typeahead="stack for stack in ctrl.stacks | filter:$viewValue | limitTo:7" typeahead-show-hint="true" typeahead-min-length="0" />
+              </div>
+            </div>
+            <!-- !stack -->
+
+            <div class="col-sm-12 form-section-title">
+              Environment
+            </div>
+
+            <!-- environment-variables -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label class="control-label text-left">Environment variables</label>
+                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addEnvironmentVariable()">
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i> add environment variable
+                </span>
+              </div>
+
+              <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                <div ng-repeat="envVar in ctrl.formValues.EnvironmentVariables" style="margin-top: 2px;">
+
+                  <div class="input-group col-sm-4 input-group-sm">
+                    <span class="input-group-addon">name</span>
+                    <input type="text" class="form-control" ng-model="envVar.Name" placeholder="foo">
+                  </div>
+
+                  <div class="input-group col-sm-4 input-group-sm">
+                    <span class="input-group-addon">value</span>
+                    <input type="text" class="form-control" ng-model="envVar.Value" placeholder="bar">
+                  </div>
+
+                  <div class="input-group col-sm-2 input-group-sm">
+                    <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeEnvironmentVariable($index)">
+                      <i class="fa fa-times" aria-hidden="true"></i>
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+            <!-- !environment-variables -->
+
+            <div class="col-sm-12 form-section-title">
+              Configurations
+            </div>
+
+            <!-- configurations -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label class="control-label text-left">Configurations</label>
+                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addConfiguration()">
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i> add configuration
+                </span>
+              </div>
+              <div class="col-sm-12 small text-muted" style="margin-top: 15px;" ng-if="ctrl.formValues.Configurations.length">
+                <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                Portainer will automatically expose all the keys of a configuration as environment variables. This behavior can be overriden to filesystem mounts for each key via
+                the override button.
+              </div>
+            </div>
+
+            <!-- config-element -->
+            <div class="form-group" ng-repeat="config in ctrl.formValues.Configurations">
+              <label for="stack_name" class="col-md-1 col-sm-2 control-label text-left">Configuration</label>
+              <div class="col-sm-5">
+                <select class="form-control" ng-model="config.SelectedConfiguration" ng-options="c as c.Name for c in ctrl.configurations"
+                  ng-change="ctrl.resetConfiguration($index)"></select>
+              </div>
+              <div class="col-sm-6" style="margin-top: 2px;">
+                <button class="btn btn-sm btn-primary" type="button" ng-if="!config.Overriden" ng-click="ctrl.overrideConfiguration($index)"
+                  ng-disabled="!config.SelectedConfiguration">
+                  <i class="fa fa-list" aria-hidden="true"></i> Override
+                </button>
+                <button class="btn btn-sm btn-primary" type="button" ng-if="config.Overriden" ng-click="ctrl.resetConfiguration($index)">
+                  <i class="fa fa-undo" aria-hidden="true"></i> Auto
+                </button>
+                <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeConfiguration($index)">
+                  <i class="fa fa-trash" aria-hidden="true"></i> Remove
+                </button>
+              </div>
+              <!-- no-override -->
+              <div class="col-sm-12" style="margin-top: 10px;" ng-if="config.SelectedConfiguration && !config.Overriden">
+                <div class="col-md-1 col-sm-2"></div>
+                <div class="col-md-11 col-sm-10 small text-muted" style="padding-left: 5px;">
+                  The following keys will be loaded from the <code>{{ config.SelectedConfiguration.Name }}</code> configuration as environment variables:
+                  <span ng-repeat="(key, _) in config.SelectedConfiguration.Data">
+                    <code>{{ key }}</code>{{ $last ? '' : ', '}}
+                  </span>
+                </div>
+              </div>
+              <!-- !no-override -->
+
+              <!-- has-override -->
+              <div class="col-sm-12 form-inline" style="margin-top: 10px;" ng-if="config.Overriden">
+                <div ng-repeat="overridenKey in config.OverridenKeys" style="margin-top: 2px;">
+                  <div class="col-md-1 col-sm-2" style="margin-left: 3px;"></div>
+                  <div class="input-group col-sm-3 input-group-sm">
+                    <span class="input-group-addon">configuration key</span>
+                    <input type="text" class="form-control" ng-value="overridenKey.Key" disabled>
+                  </div>
+                  <div class="input-group col-sm-3 input-group-sm" ng-if="overridenKey.Type === ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM">
+                    <span class="input-group-addon">path on disk</span>
+                    <input type="text" class="form-control" ng-model="overridenKey.Path" placeholder="/etc/myapp/conf.d">
+                  </div>
+                  <div class="input-group col-sm-3 btn-group btn-group-sm">
+                    <label class="btn btn-primary" ng-model="overridenKey.Type" uib-btn-radio="ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.ENVIRONMENT">
+                      <i class="fa fa-list" aria-hidden="true"></i> Environment
+                    </label>
+                    <label class="btn btn-primary" ng-model="overridenKey.Type" uib-btn-radio="ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM">
+                      <i class="fa fa-file" aria-hidden="true"></i> Filesystem
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <!-- !has-override -->
+            </div>
+            <!-- !config-element -->
+            <!-- !configurations -->
+
+            <div class="col-sm-12 form-section-title">
+              Persisting data
+            </div>
+
+            <div class="form-group" ng-if="!ctrl.storageClassAvailable()">
+              <div class="col-sm-12 small text-muted">
+                <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                No storage option is available to persist data, contact your administrator to enable a storage option.
+              </div>
+            </div>
+
+            <!-- persisted folders -->
+            <div class="form-group" ng-if="ctrl.storageClassAvailable()">
+              <div class="col-sm-12" style="margin-top: 5px;">
+                <label class="control-label text-left">Persisted folders</label>
+                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addPersistedFolder()">
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i> add persisted folder
+                </span>
+              </div>
+
+              <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                <div ng-repeat="persistedFolder in ctrl.formValues.PersistedFolders" style="margin-top: 2px;">
+
+                  <div class="input-group col-sm-3 input-group-sm">
+                    <span class="input-group-addon">path in container</span>
+                    <input type="text" class="form-control" ng-model="persistedFolder.ContainerPath" placeholder="/data">
+                  </div>
+
+                  <div class="input-group col-sm-3 input-group-sm">
+                    <span class="input-group-addon">requested size</span>
+                    <input type="text" class="form-control" ng-model="persistedFolder.Size" placeholder="20G">
+                  </div>
+
+                  <div class="input-group col-sm-3 input-group-sm" ng-if="ctrl.hasMultipleStorageClassesAvailable()">
+                    <span class="input-group-addon">storage</span>
+                    <select class="form-control" ng-model="persistedFolder.StorageClass"
+                      ng-options="storageClass as storageClass.Name for storageClass in ctrl.storageClasses"></select>
+                  </div>
+
+                  <div class="input-group col-sm-3 input-group-sm" ng-if="!ctrl.hasMultipleStorageClassesAvailable()">
+                    <span class="input-group-addon">storage</span>
+                    <input type="text" class="form-control" disabled ng-model="persistedFolder.StorageClass.Name" />
+                  </div>
+
+                  <div class="input-group col-sm-1 input-group-sm">
+                    <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removePersistedFolder($index)">
+                      <i class="fa fa-times" aria-hidden="true"></i>
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+            <!-- !persisted folders -->
+
+            <div ng-if="ctrl.showDataAccessPolicySection()">
+
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <label class="control-label text-left">Data access policy</label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="col-sm-12 small text-muted">
+                  Specify how the data will be used across instances.
+                </div>
+              </div>
+
+              <!-- access policy options -->
+              <div class="form-group" style="margin-bottom: 0">
+                <div class="boxselector_wrapper">
+                  <div>
+                    <input type="radio" id="data_access_shared" ng-value="ctrl.ApplicationDataAccessPolicies.SHARED" ng-model="ctrl.formValues.DataAccessPolicy"
+                      ng-change="ctrl.resetDeploymentType()">
+                    <label for="data_access_shared">
+                      <div class="boxselector_header">
+                        <i class="fa fa-cube" aria-hidden="true" style="margin-right: 2px;"></i>
+                        Shared
+                      </div>
+                      <p>All the instances of this application will use the same data</p>
+                    </label>
+                  </div>
+                  <div>
+                    <input type="radio" id="data_access_isolated" ng-value="ctrl.ApplicationDataAccessPolicies.ISOLATED" ng-model="ctrl.formValues.DataAccessPolicy"
+                      ng-change="ctrl.resetDeploymentType()">
+                    <label for="data_access_isolated">
+                      <div class="boxselector_header">
+                        <i class="fa fa-cubes" aria-hidden="true" style="margin-right: 2px;"></i>
+                        Isolated
+                      </div>
+                      <p>Every instance of this application will use their own data</p>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <!-- !access policy options -->
+
+            </div>
+
+            <div class="col-sm-12 form-section-title">
+              Resource reservations
+            </div>
+
+            <div class="form-group" ng-if="!ctrl.state.resourcePoolHasQuota">
+              <div class="col-sm-12 small text-muted">
+                <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                Resource reservations are applied per instance of the application.
+              </div>
+            </div>
+
+            <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded()">
+              <div class="col-sm-12 small text-muted">
+                <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                A resource quota is set on this resource pool, you must specify resource reservations. Resource reservations are applied per instance of the application. Maximums are
+                inherited from the resource pool quota.
+              </div>
+            </div>
+
+            <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
+              <div class="col-sm-12 small text-muted">
+                <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                This resource pool has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of the
+                resource pool.
+              </div>
+            </div>
+
+            <!-- memory-limit-input -->
+            <div class="form-group" ng-if="!ctrl.state.resourcePoolHasQuota || (ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded())">
+              <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
+                Memory
+                <portainer-tooltip position="bottom"
+                  message="An instance of this application will reserve this amount of memory. If the instance memory usage exceeds the reservation, it might be subject to OOM.">
+                </portainer-tooltip>
+              </label>
+              <div class="col-sm-3">
+                <slider model="ctrl.formValues.MemoryLimit" floor="ctrl.state.sliders.memory.min" ceil="ctrl.state.sliders.memory.max" step="128"></slider>
+              </div>
+              <div class="col-sm-2">
+                <input name="memory_limit" ng-model="ctrl.formValues.MemoryLimit" type="number" min="{{ctrl.state.sliders.memory.min}}" max="{{ctrl.state.sliders.memory.max}}"
+                  class="form-control" id="memory-limit" required>
+              </div>
+              <div class="col-sm-4">
+                <p class="small text-muted" style="margin-top: 7px;">
+                  Maximum memory usage (<b>MB</b>)
+                </p>
+              </div>
+            </div>
+            <!-- !memory-limit-input -->
+            <!-- cpu-limit-input -->
+            <div class="form-group" ng-if="!ctrl.state.resourcePoolHasQuota || (ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded())">
+              <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
+                CPU
+                <portainer-tooltip position="bottom"
+                  message="An instance of this application will reserve this amount of CPU. If the instance CPU usage exceeds the reservation, it might be subject to CPU throttling.">
+                </portainer-tooltip>
+              </label>
+              <div class="col-sm-5">
+                <slider model="ctrl.formValues.CpuLimit" floor="ctrl.state.sliders.cpu.min" ceil="ctrl.state.sliders.cpu.max" step="0.10" precision="2"></slider>
+              </div>
+              <div class="col-sm-4" style="margin-top: 20px;">
+                <p class="small text-muted">
+                  Maximum CPU usage
+                </p>
+              </div>
+            </div>
+            <!-- !cpu-limit-input -->
+
+            <div class="col-sm-12 form-section-title">
+              Deployment
+            </div>
+
+            <div class="form-group">
+              <div class="col-sm-12 small text-muted">
+                Select how you want to deploy your application inside the cluster.
+              </div>
+            </div>
+
+            <!-- deployment options -->
             <div class="form-group" style="margin-bottom: 0">
               <div class="boxselector_wrapper">
                 <div>
-                  <input type="radio" id="data_access_shared" ng-value="ctrl.ApplicationDataAccessPolicies.SHARED" ng-model="ctrl.formValues.DataAccessPolicy"
-                    ng-change="ctrl.resetDeploymentType()">
-                  <label for="data_access_shared">
+                  <input type="radio" id="deployment_replicated" ng-value="ctrl.ApplicationDeploymentTypes.REPLICATED" ng-model="ctrl.formValues.DeploymentType">
+                  <label for="deployment_replicated">
                     <div class="boxselector_header">
                       <i class="fa fa-cube" aria-hidden="true" style="margin-right: 2px;"></i>
-                      Shared
+                      Replicated
                     </div>
-                    <p>All the instances of this application will use the same data</p>
+                    <p>Run one or multiple instances of this container</p>
+                  </label>
+                </div>
+                <div style="color: #767676;" ng-if="!ctrl.supportGlobalDeployment()">
+                  <input type="radio" id="deployment_global" disabled>
+                  <label for="deployment_global" tooltip-append-to-body="true" tooltip-placement="bottom" tooltip-class="portainer-tooltip"
+                    uib-tooltip="The storage used for persisted folders cannot be used with this option" style="cursor:pointer; border-color: #767676">
+                    <div class="boxselector_header">
+                      <i class="fa fa-cubes" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Global
+                    </div>
+                    <p>Deploy an instance of this container on each node of the cluster</p>
+                  </label>
+                </div>
+                <div ng-if="ctrl.supportGlobalDeployment()">
+                  <input type="radio" id="deployment_global" ng-value="ctrl.ApplicationDeploymentTypes.GLOBAL" ng-model="ctrl.formValues.DeploymentType">
+                  <label for="deployment_global">
+                    <div class="boxselector_header">
+                      <i class="fa fa-cubes" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Global
+                    </div>
+                    <p>Deploy an instance of this container on each node of the cluster</p>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <!-- !deployment options -->
+
+            <!-- replica count -->
+            <div class="form-group form-inline" ng-if="ctrl.formValues.DeploymentType === ctrl.ApplicationDeploymentTypes.REPLICATED">
+              <div class="col-sm-12">
+                <label class="control-label text-left">
+                  Instance count
+                </label>
+                <input type="number" class="form-control" min="1" max="9999" placeholder="1" style="margin-left: 20px;" ng-model="ctrl.formValues.ReplicaCount"
+                  ng-disabled="!ctrl.supportScalableReplicaDeployment()" ng-change="ctrl.enforceReplicaCountMinimum()">
+              </div>
+            </div>
+            <!-- !replica count -->
+
+            <div class="form-group" ng-if="ctrl.resourceReservationsOverflow()">
+              <div class="col-sm-12 small text-muted">
+                <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                This application would exceed available resources. Please review resource reservations or the instance count.
+              </div>
+            </div>
+
+            <div class="form-group" ng-if="!ctrl.supportScalableReplicaDeployment()">
+              <div class="col-sm-12 small text-muted">
+                <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                The following storage option(s) do not support concurrent access from multiples instances: <code>{{ ctrl.getNonScalableStorage() }}</code>. You will not be able to
+                scale that application.
+              </div>
+            </div>
+
+            <div class="col-sm-12 form-section-title">
+              Publishing the application
+            </div>
+
+            <div class="form-group">
+              <div class="col-sm-12 small text-muted">
+                Select how you want to publish your application.
+              </div>
+            </div>
+
+            <!-- publishing options -->
+            <div class="form-group" style="margin-bottom: 0">
+              <div class="boxselector_wrapper">
+                <div>
+                  <input type="radio" id="publishing_internal" ng-value="ctrl.ApplicationPublishingTypes.INTERNAL" ng-model="ctrl.formValues.PublishingType">
+                  <label for="publishing_internal">
+                    <div class="boxselector_header">
+                      <i class="fa fa-list-alt" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Internal
+                    </div>
+                    <p>Internal communications inside the cluster only</p>
                   </label>
                 </div>
                 <div>
-                  <input type="radio" id="data_access_isolated" ng-value="ctrl.ApplicationDataAccessPolicies.ISOLATED" ng-model="ctrl.formValues.DataAccessPolicy"
-                    ng-change="ctrl.resetDeploymentType()">
-                  <label for="data_access_isolated">
+                  <input type="radio" id="publishing_cluster" ng-value="ctrl.ApplicationPublishingTypes.CLUSTER" ng-model="ctrl.formValues.PublishingType">
+                  <label for="publishing_cluster">
                     <div class="boxselector_header">
-                      <i class="fa fa-cubes" aria-hidden="true" style="margin-right: 2px;"></i>
-                      Isolated
+                      <i class="fa fa-list" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Cluster
                     </div>
-                    <p>Every instance of this application will use their own data</p>
+                    <p>Publish this application via a port on all nodes of the cluster</p>
+                  </label>
+                </div>
+                <div ng-if="ctrl.publishViaLoadBalancerEnabled()">
+                  <input type="radio" id="publishing_loadbalancer" ng-value="ctrl.ApplicationPublishingTypes.LOADBALANCER" ng-model="ctrl.formValues.PublishingType">
+                  <label for="publishing_loadbalancer">
+                    <div class="boxselector_header">
+                      <i class="fa fa-project-diagram" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Load balancer
+                    </div>
+                    <p>Publish this application via a load balancer</p>
                   </label>
                 </div>
               </div>
             </div>
-            <!-- !access policy options -->
+            <!-- !publishing options -->
 
-          </div>
-
-          <div class="col-sm-12 form-section-title">
-            Resource reservations
-          </div>
-
-          <div class="form-group" ng-if="!ctrl.state.resourcePoolHasQuota">
-            <div class="col-sm-12 small text-muted">
-              <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-              Resource reservations are applied per instance of the application.
-            </div>
-          </div>
-
-          <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded()">
-            <div class="col-sm-12 small text-muted">
-              <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-              A resource quota is set on this resource pool, you must specify resource reservations. Resource reservations are applied per instance of the application. Maximums are
-              inherited from the resource pool quota.
-            </div>
-          </div>
-
-          <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
-            <div class="col-sm-12 small text-muted">
-              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-              This resource pool has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of the
-              resource pool.
-            </div>
-          </div>
-
-          <!-- memory-limit-input -->
-          <div class="form-group" ng-if="!ctrl.state.resourcePoolHasQuota || (ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded())">
-            <label for="memory-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
-              Memory
-              <portainer-tooltip position="bottom"
-                message="An instance of this application will reserve this amount of memory. If the instance memory usage exceeds the reservation, it might be subject to OOM.">
-              </portainer-tooltip>
-            </label>
-            <div class="col-sm-3">
-              <slider model="ctrl.formValues.MemoryLimit" floor="ctrl.state.sliders.memory.min" ceil="ctrl.state.sliders.memory.max" step="128"></slider>
-            </div>
-            <div class="col-sm-2">
-              <input name="memory_limit" ng-model="ctrl.formValues.MemoryLimit" type="number" min="{{ctrl.state.sliders.memory.min}}" max="{{ctrl.state.sliders.memory.max}}"
-                class="form-control" id="memory-limit" required>
-            </div>
-            <div class="col-sm-4">
-              <p class="small text-muted" style="margin-top: 7px;">
-                Maximum memory usage (<b>MB</b>)
-              </p>
-            </div>
-          </div>
-          <!-- !memory-limit-input -->
-          <!-- cpu-limit-input -->
-          <div class="form-group" ng-if="!ctrl.state.resourcePoolHasQuota || (ctrl.state.resourcePoolHasQuota && !ctrl.resourceQuotaCapacityExceeded())">
-            <label for="cpu-limit" class="col-sm-3 col-lg-2 control-label text-left" style="margin-top: 20px;">
-              CPU
-              <portainer-tooltip position="bottom"
-                message="An instance of this application will reserve this amount of CPU. If the instance CPU usage exceeds the reservation, it might be subject to CPU throttling.">
-              </portainer-tooltip>
-            </label>
-            <div class="col-sm-5">
-              <slider model="ctrl.formValues.CpuLimit" floor="ctrl.state.sliders.cpu.min" ceil="ctrl.state.sliders.cpu.max" step="0.10" precision="2"></slider>
-            </div>
-            <div class="col-sm-4" style="margin-top: 20px;">
-              <p class="small text-muted">
-                Maximum CPU usage
-              </p>
-            </div>
-          </div>
-          <!-- !cpu-limit-input -->
-
-          <div class="col-sm-12 form-section-title">
-            Deployment
-          </div>
-
-          <div class="form-group">
-            <div class="col-sm-12 small text-muted">
-              Select how you want to deploy your application inside the cluster.
-            </div>
-          </div>
-
-          <!-- deployment options -->
-          <div class="form-group" style="margin-bottom: 0">
-            <div class="boxselector_wrapper">
-              <div>
-                <input type="radio" id="deployment_replicated" ng-value="ctrl.ApplicationDeploymentTypes.REPLICATED" ng-model="ctrl.formValues.DeploymentType">
-                <label for="deployment_replicated">
-                  <div class="boxselector_header">
-                    <i class="fa fa-cube" aria-hidden="true" style="margin-right: 2px;"></i>
-                    Replicated
-                  </div>
-                  <p>Run one or multiple instances of this container</p>
-                </label>
+            <!-- published ports -->
+            <div class="form-group">
+              <div class="col-sm-12" style="margin-top: 5px;">
+                <label class="control-label text-left">Published ports</label>
+                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addPublishedPort()">
+                  <i class="fa fa-plus-circle" aria-hidden="true"></i> publish a new port
+                </span>
               </div>
-              <div style="color: #767676;" ng-if="!ctrl.supportGlobalDeployment()">
-                <input type="radio" id="deployment_global" disabled>
-                <label for="deployment_global" tooltip-append-to-body="true" tooltip-placement="bottom" tooltip-class="portainer-tooltip"
-                  uib-tooltip="The storage used for persisted folders cannot be used with this option" style="cursor:pointer; border-color: #767676">
-                  <div class="boxselector_header">
-                    <i class="fa fa-cubes" aria-hidden="true" style="margin-right: 2px;"></i>
-                    Global
-                  </div>
-                  <p>Deploy an instance of this container on each node of the cluster</p>
-                </label>
+
+              <div class="col-sm-12 small text-muted" style="margin-top: 15px;"
+                ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER && ctrl.formValues.PublishedPorts.length > 0">
+                <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                When publishing a port in cluster mode, the node port is optional. If left empty Kubernetes will use a random port number. If you wish to specify a port, use a port
+                number inside the default range <code>30000-32767</code>.
               </div>
-              <div ng-if="ctrl.supportGlobalDeployment()">
-                <input type="radio" id="deployment_global" ng-value="ctrl.ApplicationDeploymentTypes.GLOBAL" ng-model="ctrl.formValues.DeploymentType">
-                <label for="deployment_global">
-                  <div class="boxselector_header">
-                    <i class="fa fa-cubes" aria-hidden="true" style="margin-right: 2px;"></i>
-                    Global
+
+              <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+                <div ng-repeat="publishedPort in ctrl.formValues.PublishedPorts" style="margin-top: 2px;">
+
+                  <div class="input-group col-sm-5 input-group-sm">
+                    <span class="input-group-addon">container port</span>
+                    <input type="number" class="form-control" ng-model="publishedPort.ContainerPort" placeholder="80">
                   </div>
-                  <p>Deploy an instance of this container on each node of the cluster</p>
-                </label>
-              </div>
-            </div>
-          </div>
-          <!-- !deployment options -->
 
-          <!-- replica count -->
-          <div class="form-group form-inline" ng-if="ctrl.formValues.DeploymentType === ctrl.ApplicationDeploymentTypes.REPLICATED">
-            <div class="col-sm-12">
-              <label class="control-label text-left">
-                Instance count
-              </label>
-              <input type="number" class="form-control" min="1" max="9999" placeholder="1" style="margin-left: 20px;" ng-model="ctrl.formValues.ReplicaCount"
-                ng-disabled="!ctrl.supportScalableReplicaDeployment()" ng-change="ctrl.enforceReplicaCountMinimum()">
-            </div>
-          </div>
-          <!-- !replica count -->
-
-          <div class="form-group" ng-if="ctrl.resourceReservationsOverflow()">
-            <div class="col-sm-12 small text-muted">
-              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-              This application would exceed available resources. Please review resource reservations or the instance count.
-            </div>
-          </div>
-
-          <div class="form-group" ng-if="!ctrl.supportScalableReplicaDeployment()">
-            <div class="col-sm-12 small text-muted">
-              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-              The following storage option(s) do not support concurrent access from multiples instances: <code>{{ ctrl.getNonScalableStorage() }}</code>. You will not be able to
-              scale that application.
-            </div>
-          </div>
-
-          <div class="col-sm-12 form-section-title">
-            Publishing the application
-          </div>
-
-          <div class="form-group">
-            <div class="col-sm-12 small text-muted">
-              Select how you want to publish your application.
-            </div>
-          </div>
-
-          <!-- publishing options -->
-          <div class="form-group" style="margin-bottom: 0">
-            <div class="boxselector_wrapper">
-              <div>
-                <input type="radio" id="publishing_internal" ng-value="ctrl.ApplicationPublishingTypes.INTERNAL" ng-model="ctrl.formValues.PublishingType">
-                <label for="publishing_internal">
-                  <div class="boxselector_header">
-                    <i class="fa fa-list-alt" aria-hidden="true" style="margin-right: 2px;"></i>
-                    Internal
+                  <div class="input-group col-sm-5 input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER">
+                    <span class="input-group-addon">node port</span>
+                    <input type="number" class="form-control" ng-model="publishedPort.NodePort" placeholder="30080">
                   </div>
-                  <p>Internal communications inside the cluster only</p>
-                </label>
-              </div>
-              <div>
-                <input type="radio" id="publishing_cluster" ng-value="ctrl.ApplicationPublishingTypes.CLUSTER" ng-model="ctrl.formValues.PublishingType">
-                <label for="publishing_cluster">
-                  <div class="boxselector_header">
-                    <i class="fa fa-list" aria-hidden="true" style="margin-right: 2px;"></i>
-                    Cluster
+
+                  <div class="input-group col-sm-5 input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.LOADBALANCER">
+                    <span class="input-group-addon">load balancer port</span>
+                    <input type="number" class="form-control" ng-model="publishedPort.LoadBalancerPort" placeholder="80" value="8080">
                   </div>
-                  <p>Publish this application via a port on all nodes of the cluster</p>
-                </label>
-              </div>
-              <div ng-if="ctrl.publishViaLoadBalancerEnabled()">
-                <input type="radio" id="publishing_loadbalancer" ng-value="ctrl.ApplicationPublishingTypes.LOADBALANCER" ng-model="ctrl.formValues.PublishingType">
-                <label for="publishing_loadbalancer">
-                  <div class="boxselector_header">
-                    <i class="fa fa-project-diagram" aria-hidden="true" style="margin-right: 2px;"></i>
-                    Load balancer
+
+                  <div class="input-group col-sm-1 input-group-sm">
+                    <div class="btn-group btn-group-sm">
+                      <label class="btn btn-primary" ng-model="publishedPort.Protocol" uib-btn-radio="'TCP'">TCP</label>
+                      <label class="btn btn-primary" ng-model="publishedPort.Protocol" uib-btn-radio="'UDP'">UDP</label>
+                    </div>
+                    <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removePublishedPort($index)">
+                      <i class="fa fa-times" aria-hidden="true"></i>
+                    </button>
                   </div>
-                  <p>Publish this application via a load balancer</p>
-                </label>
-              </div>
-            </div>
-          </div>
-          <!-- !publishing options -->
 
-          <!-- published ports -->
-          <div class="form-group">
-            <div class="col-sm-12" style="margin-top: 5px;">
-              <label class="control-label text-left">Published ports</label>
-              <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addPublishedPort()">
-                <i class="fa fa-plus-circle" aria-hidden="true"></i> publish a new port
-              </span>
-            </div>
-
-            <div class="col-sm-12 small text-muted" style="margin-top: 15px;"
-              ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER && ctrl.formValues.PublishedPorts.length > 0">
-              <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-              When publishing a port in cluster mode, the node port is optional. If left empty Kubernetes will use a random port number. If you wish to specify a port, use a port
-              number inside the default range <code>30000-32767</code>.
-            </div>
-
-            <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-              <div ng-repeat="publishedPort in ctrl.formValues.PublishedPorts" style="margin-top: 2px;">
-
-                <div class="input-group col-sm-5 input-group-sm">
-                  <span class="input-group-addon">container port</span>
-                  <input type="number" class="form-control" ng-model="publishedPort.ContainerPort" placeholder="80">
                 </div>
+              </div>
 
-                <div class="input-group col-sm-5 input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER">
-                  <span class="input-group-addon">node port</span>
-                  <input type="number" class="form-control" ng-model="publishedPort.NodePort" placeholder="30080">
-                </div>
+            </div>
+            <!-- !published ports -->
 
-                <div class="input-group col-sm-5 input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.LOADBALANCER">
-                  <span class="input-group-addon">load balancer port</span>
-                  <input type="number" class="form-control" ng-model="publishedPort.LoadBalancerPort" placeholder="80" value="8080">
-                </div>
+            <div class="col-sm-12 form-section-title">
+              Actions
+            </div>
 
-                <div class="input-group col-sm-1 input-group-sm">
-                  <div class="btn-group btn-group-sm">
-                    <label class="btn btn-primary" ng-model="publishedPort.Protocol" uib-btn-radio="'TCP'">TCP</label>
-                    <label class="btn btn-primary" ng-model="publishedPort.Protocol" uib-btn-radio="'UDP'">UDP</label>
-                  </div>
-                  <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removePublishedPort($index)">
-                    <i class="fa fa-times" aria-hidden="true"></i>
-                  </button>
-                </div>
-
+            <div class="form-group">
+              <div class="col-sm-12">
+                <button type="button" class="btn btn-primary btn-sm"
+                  ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.resourceReservationsOverflow() || ctrl.state.actionInProgress" ng-click="ctrl.deployApplication()"
+                  button-spinner="ctrl.state.actionInProgress">
+                  <span ng-hide="ctrl.state.actionInProgress">Deploy application</span>
+                  <span ng-show="ctrl.state.actionInProgress">Deployment in progress...</span>
+                </button>
               </div>
             </div>
 
-          </div>
-          <!-- !published ports -->
+          </form>
 
-          <div class="col-sm-12 form-section-title">
-            Actions
-          </div>
+        </rd-widget-body>
+      </rd-widget>
 
-          <div class="form-group">
-            <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm"
-                ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.resourceReservationsOverflow() || ctrl.state.actionInProgress" ng-click="ctrl.deployApplication()"
-                button-spinner="ctrl.state.actionInProgress">
-                <span ng-hide="ctrl.state.actionInProgress">Deploy application</span>
-                <span ng-show="ctrl.state.actionInProgress">Deployment in progress...</span>
-              </button>
-            </div>
-          </div>
-
-        </form>
-
-      </rd-widget-body>
-    </rd-widget>
-
-  </div>
+    </div>
+  </div>  
 </div>

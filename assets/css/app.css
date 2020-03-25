@@ -939,3 +939,24 @@ json-tree .branch-preview {
   color: #4e4e4e;
 }
 /* !uib-progressbar override */
+
+.loading-view-area {
+  height: 85%;
+  display: flex;
+  align-items: center;
+}
+
+/* spinkit override */
+.sk-fold {
+  width: 57px;
+  height: 57px;
+}
+
+.sk-fold-cube {
+  background-color: white;
+}
+
+.sk-fold-cube:before {
+  background-color: #337ab7;
+}
+/* !spinkit override */

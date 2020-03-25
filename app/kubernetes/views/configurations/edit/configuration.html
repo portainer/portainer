@@ -1,201 +1,198 @@
-<rd-header>
-  <rd-header-title title-text="Configuration details">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="kubernetes.configurations.configuration" ui-sref-opts="{reload: true}">
-      <i class="fa fa-sync" aria-hidden="true"></i>
-    </a>
-  </rd-header-title>
-  <rd-header-content>
-    <a ui-sref="kubernetes.resourcePools">Resource pools</a> &gt; <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.configuration.Namespace })">{{ ctrl.configuration.Namespace }}</a> &gt; <a ui-sref="kubernetes.configurations">Configurations</a> &gt; {{ ctrl.configuration.Name }}
-  </rd-header-content>
-</rd-header>
+<kubernetes-view-header title="Configuration details" state="kubernetes.configurations.configuration" view-ready="ctrl.state.viewReady">
+  <a ui-sref="kubernetes.resourcePools">Resource pools</a> &gt; <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.configuration.Namespace })">{{ ctrl.configuration.Namespace }}</a> &gt; <a ui-sref="kubernetes.configurations">Configurations</a> &gt; {{ ctrl.configuration.Name }}
+</kubernetes-view-header>
 
-<div class="row">
-  <div class="col-xs-12">
-    <rd-widget>
-      <rd-widget-body>
-        <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
-          <uib-tab index="0" classes="btn-sm">
-            <uib-tab-heading>
-              <i class="fa fa-filecode space-right" aria-hidden="true"></i> Node
-            </uib-tab-heading>
+<kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
-            <form class="form-horizontal" name="kubernetesConfigurationCreationForm" autocomplete="off">
+<div ng-if="ctrl.state.viewReady">
+  <div class="row">
+    <div class="col-xs-12">
+      <rd-widget>
+        <rd-widget-body>
+          <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
+            <uib-tab index="0" classes="btn-sm">
+              <uib-tab-heading>
+                <i class="fa fa-filecode space-right" aria-hidden="true"></i> Node
+              </uib-tab-heading>
 
-              <div class="col-sm-12 form-section-title">
-                Configurations
-              </div>
+              <form class="form-horizontal" name="kubernetesConfigurationCreationForm" autocomplete="off">
 
-              <!-- resource-pool -->
-              <div class="form-group">
-                <label for="resource-pool-selector" class="col-sm-1 control-label text-left">Resource pool</label>
-                <div class="col-sm-11">
-                  <select class="form-control" id="resource-pool-selector" ng-model="ctrl.formValues.ResourcePool" ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools"
-                    ng-change="ctrl.onResourcePoolSelectionChange()"></select>
+                <div class="col-sm-12 form-section-title">
+                  Configurations
                 </div>
-              </div>
-              <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
-                <div class="col-sm-12 small text-warning">
-                  <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                  This resource pool has exhausted its resource capacity and you will not be able to deploy the configuration. Contact your administrator to expand the capacity of the resource pool.
-                </div>
-              </div>
-              <!-- !resource-pool -->
 
-              <!-- name -->
-              <div class="form-group">
-                <label for="configuration_name" class="col-sm-1 control-label text-left">Name</label>
-                <div class="col-sm-11">
-                  <input type="text" class="form-control" name="configuration_name" ng-model="ctrl.formValues.Name" placeholder="myConfiguration" auto-focus required>
-                </div>
-              </div>
-              <div class="form-group" ng-show="kubernetesConfigurationCreationForm.configuration_name.$invalid">
-                <div class="col-sm-12 small text-warning">
-                  <div ng-messages="kubernetesConfigurationCreationForm.configuration_name.$error">
-                    <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
-                  </div>
-                </div>
-              </div>
-              <!-- !name -->
-
-              <div class="col-sm-12 form-section-title">
-                Configuration type
-              </div>
-
-              <!-- type options -->
-              <div class="form-group">
-                <div class="col-sm-12 small text-muted">
-                  Select the type of data that you want to save in the configuration.
-                </div>
-              </div>
-    
-              <!-- type options -->
-              <div class="form-group" style="margin-bottom: 0">
-                <div class="boxselector_wrapper">
-                  <div>
-                    <input type="radio" id="type_basic" ng-value="ctrl.KubernetesConfigurationTypes.CONFIGMAP" ng-model="ctrl.formValues.Type">
-                    <label for="type_basic">
-                      <div class="boxselector_header">
-                        <i class="fa fa-file-code" aria-hidden="true" style="margin-right: 2px;"></i>
-                        Non-sensitive
-                      </div>
-                      <p>This configuration holds non-sensitive information</p>
-                    </label>
-                  </div>
-                  <div>
-                    <input type="radio" id="type_secret" ng-value="ctrl.KubernetesConfigurationTypes.SECRET" ng-model="ctrl.formValues.Type">
-                    <label for="type_secret">
-                      <div class="boxselector_header">
-                        <i class="fa fa-user-secret" aria-hidden="true" style="margin-right: 2px;"></i>
-                        Sensitive
-                      </div>
-                      <p>This configuration holds sensitive information</p>
-                    </label>
-                  </div>
-                </div>
-              </div>
-              <!-- !type options -->
-
-              <div class="col-sm-12 form-section-title" style="margin-top: 10px;">
-                Data
-              </div>
-
-              <div class="form-group">
-                <div class="col-sm-12">
-                  <p>
-                    <a class="small interactive" ng-if="ctrl.formValues.IsSimple" ng-click="ctrl.formValues.IsSimple = false">
-                      <i class="fa fa-list-ol space-right" aria-hidden="true"></i> Advanced mode
-                    </a>
-                    <a class="small interactive" ng-if="!ctrl.formValues.IsSimple" ng-click="ctrl.formValues.IsSimple = true">
-                      <i class="fa fa-edit space-right" aria-hidden="true"></i>
-                      Simple mode
-                    </a>
-                  </p>
-                </div>
-                <div class="col-sm-12 small text-muted" ng-if="ctrl.formValues.IsSimple">
-                  <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                  Switch to advanced mode to copy and paste multiple key/values
-                </div>
-                <div class="col-sm-12 small text-muted" ng-if="!ctrl.formValues.IsSimple">
-                  <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                  Generate a configuration entry per line, use YAML format
-                </div>
-              </div>
-
-              <div class="form-group" ng-if="ctrl.formValues.IsSimple">
-                <div class="col-sm-12">
-                  <button type="button" class="btn btn-sm btn-default" style="margin-left: 0;" ng-click="ctrl.addEntry()">
-                    <i class="fa fa-plus-circle" aria-hidden="true"></i> Create entry
-                  </button>
-                  <button type="button" class="btn btn-sm btn-default" ngf-select="ctrl.addEntryFromFile($file)" style="margin-left: 0;">
-                    <i class="fa fa-file-upload" aria-hidden="true"></i> Create entry from file
-                  </button>
-                </div>
-              </div>
-
-              <div ng-repeat="(index, entry) in ctrl.formValues.Data" ng-if="ctrl.formValues.IsSimple">
+                <!-- resource-pool -->
                 <div class="form-group">
-                  <label for="configuration_data_key_{{index}}" class="col-sm-1 control-label text-left">Key</label>
+                  <label for="resource-pool-selector" class="col-sm-1 control-label text-left">Resource pool</label>
                   <div class="col-sm-11">
-                    <input type="text" class="form-control" id="configuration_data_key_{{index}}" ng-model="ctrl.formValues.Data[index].Key" required>
+                    <select class="form-control" id="resource-pool-selector" ng-model="ctrl.formValues.ResourcePool" ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools"
+                      ng-change="ctrl.onResourcePoolSelectionChange()"></select>
+                  </div>
+                </div>
+                <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
+                  <div class="col-sm-12 small text-warning">
+                    <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                    This resource pool has exhausted its resource capacity and you will not be able to deploy the configuration. Contact your administrator to expand the capacity of the resource pool.
+                  </div>
+                </div>
+                <!-- !resource-pool -->
+
+                <!-- name -->
+                <div class="form-group">
+                  <label for="configuration_name" class="col-sm-1 control-label text-left">Name</label>
+                  <div class="col-sm-11">
+                    <input type="text" class="form-control" name="configuration_name" ng-model="ctrl.formValues.Name" placeholder="myConfiguration" auto-focus required>
+                  </div>
+                </div>
+                <div class="form-group" ng-show="kubernetesConfigurationCreationForm.configuration_name.$invalid">
+                  <div class="col-sm-12 small text-warning">
+                    <div ng-messages="kubernetesConfigurationCreationForm.configuration_name.$error">
+                      <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                    </div>
+                  </div>
+                </div>
+                <!-- !name -->
+
+                <div class="col-sm-12 form-section-title">
+                  Configuration type
+                </div>
+
+                <!-- type options -->
+                <div class="form-group">
+                  <div class="col-sm-12 small text-muted">
+                    Select the type of data that you want to save in the configuration.
+                  </div>
+                </div>
+
+                <!-- type options -->
+                <div class="form-group" style="margin-bottom: 0">
+                  <div class="boxselector_wrapper">
+                    <div>
+                      <input type="radio" id="type_basic" ng-value="ctrl.KubernetesConfigurationTypes.CONFIGMAP" ng-model="ctrl.formValues.Type">
+                      <label for="type_basic">
+                        <div class="boxselector_header">
+                          <i class="fa fa-file-code" aria-hidden="true" style="margin-right: 2px;"></i>
+                          Non-sensitive
+                        </div>
+                        <p>This configuration holds non-sensitive information</p>
+                      </label>
+                    </div>
+                    <div>
+                      <input type="radio" id="type_secret" ng-value="ctrl.KubernetesConfigurationTypes.SECRET" ng-model="ctrl.formValues.Type">
+                      <label for="type_secret">
+                        <div class="boxselector_header">
+                          <i class="fa fa-user-secret" aria-hidden="true" style="margin-right: 2px;"></i>
+                          Sensitive
+                        </div>
+                        <p>This configuration holds sensitive information</p>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <!-- !type options -->
+
+                <div class="col-sm-12 form-section-title" style="margin-top: 10px;">
+                  Data
+                </div>
+
+                <div class="form-group">
+                  <div class="col-sm-12">
+                    <p>
+                      <a class="small interactive" ng-if="ctrl.formValues.IsSimple" ng-click="ctrl.formValues.IsSimple = false">
+                        <i class="fa fa-list-ol space-right" aria-hidden="true"></i> Advanced mode
+                      </a>
+                      <a class="small interactive" ng-if="!ctrl.formValues.IsSimple" ng-click="ctrl.formValues.IsSimple = true">
+                        <i class="fa fa-edit space-right" aria-hidden="true"></i>
+                        Simple mode
+                      </a>
+                    </p>
+                  </div>
+                  <div class="col-sm-12 small text-muted" ng-if="ctrl.formValues.IsSimple">
+                    <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Switch to advanced mode to copy and paste multiple key/values
+                  </div>
+                  <div class="col-sm-12 small text-muted" ng-if="!ctrl.formValues.IsSimple">
+                    <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Generate a configuration entry per line, use YAML format
                   </div>
                 </div>
 
                 <div class="form-group" ng-if="ctrl.formValues.IsSimple">
-                  <label for="configuration_data_value_{{index}}" class="col-sm-1 control-label text-left">Value</label>
-                  <div class="col-sm-11">
-                    <textarea class="form-control" rows="5" id="configuration_data_value_{{index}}" ng-model="ctrl.formValues.Data[index].Value" required></textarea>
-                  </div>
-                </div>
-
-                <div class="form-group" ng-if="ctrl.formValues.IsSimple">
-                  <div class="col-sm-1"></div>
-                  <div class="col-sm-11">
-                    <button type="button" class="btn btn-sm btn-danger" style="margin-left: 0;" ng-click="ctrl.removeEntry(index)">
-                      <i class="fa fa-trash" aria-hidden="true"></i> Remove entry
+                  <div class="col-sm-12">
+                    <button type="button" class="btn btn-sm btn-default" style="margin-left: 0;" ng-click="ctrl.addEntry()">
+                      <i class="fa fa-plus-circle" aria-hidden="true"></i> Create entry
+                    </button>
+                    <button type="button" class="btn btn-sm btn-default" ngf-select="ctrl.addEntryFromFile($file)" style="margin-left: 0;">
+                      <i class="fa fa-file-upload" aria-hidden="true"></i> Create entry from file
                     </button>
                   </div>
                 </div>
-              </div>
 
-              <div class="form-group" ng-if="!ctrl.formValues.IsSimple">
-                <input type="text" ng-model="ctrl.formValues.DataYaml" required style="display:none;">
-                <code-editor identifier="kubernetes-configuration-editor" read-only="false" yml="true" on-change="ctrl.editorUpdate" value="ctrl.formValues.DataYaml"></code-editor>
-              </div>
+                <div ng-repeat="(index, entry) in ctrl.formValues.Data" ng-if="ctrl.formValues.IsSimple">
+                  <div class="form-group">
+                    <label for="configuration_data_key_{{index}}" class="col-sm-1 control-label text-left">Key</label>
+                    <div class="col-sm-11">
+                      <input type="text" class="form-control" id="configuration_data_key_{{index}}" ng-model="ctrl.formValues.Data[index].Key" required>
+                    </div>
+                  </div>
 
-              <!-- actions -->
-              <div class="col-sm-12 form-section-title" style="margin-top: 10px;">
-                Actions
-              </div>
-              <div class="form-group">
-                <div class="col-sm-12">
-                  <button type="button" class="btn btn-primary btn-sm" ng-disabled="!ctrl.isFormValid(kubernetesConfigurationCreationForm.$valid)" ng-click="ctrl.updateConfiguration()" button-spinner="ctrl.state.actionInProgress">
-                    <span ng-hide="ctrl.state.actionInProgress">Update configuration</span>
-                    <span ng-show="ctrl.state.actionInProgress">Update in progress...</span>
-                  </button>
+                  <div class="form-group" ng-if="ctrl.formValues.IsSimple">
+                    <label for="configuration_data_value_{{index}}" class="col-sm-1 control-label text-left">Value</label>
+                    <div class="col-sm-11">
+                      <textarea class="form-control" rows="5" id="configuration_data_value_{{index}}" ng-model="ctrl.formValues.Data[index].Value" required></textarea>
+                    </div>
+                  </div>
+
+                  <div class="form-group" ng-if="ctrl.formValues.IsSimple">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-11">
+                      <button type="button" class="btn btn-sm btn-danger" style="margin-left: 0;" ng-click="ctrl.removeEntry(index)">
+                        <i class="fa fa-trash" aria-hidden="true"></i> Remove entry
+                      </button>
+                    </div>
+                  </div>
                 </div>
+
+                <div class="form-group" ng-if="!ctrl.formValues.IsSimple">
+                  <input type="text" ng-model="ctrl.formValues.DataYaml" required style="display:none;">
+                  <code-editor identifier="kubernetes-configuration-editor" read-only="false" yml="true" on-change="ctrl.editorUpdate" value="ctrl.formValues.DataYaml"></code-editor>
+                </div>
+
+                <!-- actions -->
+                <div class="col-sm-12 form-section-title" style="margin-top: 10px;">
+                  Actions
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-12">
+                    <button type="button" class="btn btn-primary btn-sm" ng-disabled="!ctrl.isFormValid(kubernetesConfigurationCreationForm.$valid)" ng-click="ctrl.updateConfiguration()" button-spinner="ctrl.state.actionInProgress">
+                      <span ng-hide="ctrl.state.actionInProgress">Update configuration</span>
+                      <span ng-show="ctrl.state.actionInProgress">Update in progress...</span>
+                    </button>
+                  </div>
+                </div>
+                <!-- !actions -->
+              </form>
+            </uib-tab>
+            <uib-tab index="1" classes="btn-sm">
+              <uib-tab-heading>
+                <i class="fa fa-history space-right" aria-hidden="true"></i> Events
+              </uib-tab-heading>
+              <kubernetes-events-datatable title-text="Events" title-icon="fa-history" dataset="ctrl.events" table-key="kubernetes.configuration.events" order-by="Date"
+                reverse-order="true" loading="ctrl.state.eventsLoading" refresh-callback="ctrl.getEvents">
+              </kubernetes-events-datatable>
+            </uib-tab>
+            <uib-tab index="2" ng-if="ctrl.configuration.Yaml" classes="btn-sm" select="ctrl.showEditor()">
+              <uib-tab-heading>
+                <i class="fa fa-code space-right" aria-hidden="true"></i> YAML
+              </uib-tab-heading>
+              <div style="padding-right: 25px;" ng-if="ctrl.state.showEditorTab">
+                <kubernetes-yaml-inspector key="configuration-yaml" data="ctrl.configuration.Yaml">
+                </kubernetes-yaml-inspector>
               </div>
-              <!-- !actions -->
-            </form>
-          </uib-tab>
-          <uib-tab index="1" classes="btn-sm">
-            <uib-tab-heading>
-              <i class="fa fa-history space-right" aria-hidden="true"></i> Events
-            </uib-tab-heading>
-            <kubernetes-events-datatable title-text="Events" title-icon="fa-history" dataset="ctrl.events" table-key="kubernetes.configuration.events" order-by="Date"
-              reverse-order="true" loading="ctrl.state.eventsLoading" refresh-callback="ctrl.getEvents">
-            </kubernetes-events-datatable>
-          </uib-tab>
-          <uib-tab index="2" ng-if="ctrl.configuration.Yaml" classes="btn-sm" select="ctrl.showEditor()">
-            <uib-tab-heading>
-              <i class="fa fa-code space-right" aria-hidden="true"></i> YAML
-            </uib-tab-heading>
-            <div style="padding-right: 25px;" ng-if="ctrl.state.showEditorTab">
-              <kubernetes-yaml-inspector key="configuration-yaml" data="ctrl.configuration.Yaml">
-              </kubernetes-yaml-inspector>
-            </div>
-          </uib-tab>
-        </uib-tabset>
-      </rd-widget-body>
-    </rd-widget>
+            </uib-tab>
+          </uib-tabset>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
   </div>
 </div>

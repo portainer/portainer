@@ -1,20 +1,19 @@
-<rd-header>
-  <rd-header-title title-text="Resource pools list">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="kubernetes.resourcePools" ui-sref-opts="{reload: true}">
-      <i class="fa fa-sync" aria-hidden="true"></i>
-    </a>
-  </rd-header-title>
-  <rd-header-content>Resource pools</rd-header-content>
-</rd-header>
+<kubernetes-view-header title="Resource pool list" state="kubernetes.resourcePools" view-ready="ctrl.state.viewReady">
+  Resource pools
+</kubernetes-view-header>
 
-<kubernetes-feedback-panel></kubernetes-feedback-panel>
+<kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
-<div class="row">
-  <div class="col-sm-12">
-    <kubernetes-resource-pools-datatable
-    title-text="Resource pools" title-icon="fa-layer-group" dataset="ctrl.resourcePools"
-    table-key="kubernetes.resourcePools" order-by="Namespace.Name" remove-action="ctrl.removeAction"
-    refresh-callback="ctrl.getResourcePools"
-    ></kubernetes-resource-pools-datatable>
+<div ng-if="ctrl.state.viewReady">
+  <kubernetes-feedback-panel></kubernetes-feedback-panel>
+
+  <div class="row">
+    <div class="col-sm-12">
+      <kubernetes-resource-pools-datatable
+      title-text="Resource pools" title-icon="fa-layer-group" dataset="ctrl.resourcePools"
+      table-key="kubernetes.resourcePools" order-by="Namespace.Name" remove-action="ctrl.removeAction"
+      refresh-callback="ctrl.getResourcePools"
+      ></kubernetes-resource-pools-datatable>
+    </div>
   </div>
 </div>

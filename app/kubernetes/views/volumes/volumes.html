@@ -1,17 +1,18 @@
-<rd-header>
-  <rd-header-title title-text="Volumes list">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="kubernetes.volumes" ui-sref-opts="{reload: true}">
-      <i class="fa fa-sync" aria-hidden="true"></i>
-    </a>
-  </rd-header-title>
-  <rd-header-content>Volumes</rd-header-content>
-</rd-header>
+<kubernetes-view-header title="Volume list" state="kubernetes.volumes" view-ready="ctrl.state.viewReady">
+  Volumes
+</kubernetes-view-header>
 
-<kubernetes-feedback-panel></kubernetes-feedback-panel>
+<kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
-<div class="row">
-  <div class="col-sm-12">
-    <kubernetes-volumes-datatable title-text="Volumes" title-icon="fa-database" dataset="ctrl.volumes" table-key="kubernetes.volumes"
-      order-by="PersistentVolumeClaim.Name" remove-action="ctrl.removeAction" refresh-callback="ctrl.getVolumes"></kubernetes-resource-pools-datatable>
+<div ng-if="ctrl.state.viewReady">
+  <kubernetes-feedback-panel></kubernetes-feedback-panel>
+
+  <div class="row">
+    <div class="col-sm-12">
+      <kubernetes-volumes-datatable title-text="Volumes" title-icon="fa-database" dataset="ctrl.volumes" table-key="kubernetes.volumes"
+        order-by="PersistentVolumeClaim.Name" remove-action="ctrl.removeAction" refresh-callback="ctrl.getVolumes">
+      </kubernetes-volumes-datatable>
+    </div>
   </div>
+
 </div>

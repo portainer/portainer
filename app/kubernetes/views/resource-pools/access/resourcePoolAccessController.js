@@ -39,8 +39,15 @@ class KubernetesResourcePoolAccessController {
   // see porAccessManagementController for more details
   // Extract the fetching code and merge it in AccessService.accesses() function
   async onInit() {
-    this.state = {actionInProgress: false};
-    this.formValues = {multiselectOutput: []};
+    this.state = {
+      actionInProgress: false,
+      viewReady: false
+    };
+
+    this.formValues = {
+      multiselectOutput: []
+    };
+
     try {
       const name = this.$transition$.params().id;
       let [endpoint, pool, configMap] = await Promise.all([
@@ -73,6 +80,8 @@ class KubernetesResourcePoolAccessController {
       this.availableUsersAndTeams = _.without(endpointAccesses.authorizedUsersAndTeams, ...this.authorizedUsersAndTeams);
     } catch (err) {
       this.Notifications.error("Failure", err, "Unable to retrieve resource pool information");
+    } finally {
+      this.state.viewReady = true;
     }
   }
 
@@ -101,7 +110,7 @@ class KubernetesResourcePoolAccessController {
   }
 
   /**
-   * 
+   *
    */
   async unauthorizeAccessAsync(selectedItems) {
     try {

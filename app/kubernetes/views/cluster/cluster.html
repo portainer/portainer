@@ -1,32 +1,31 @@
-<rd-header>
-  <rd-header-title title-text="Cluster">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="kubernetes.cluster" ui-sref-opts="{reload: true}">
-      <i class="fa fa-sync" aria-hidden="true"></i>
-    </a>
-  </rd-header-title>
-  <rd-header-content>Cluster information</rd-header-content>
-</rd-header>
+<kubernetes-view-header title="Cluster" state="kubernetes.cluster" view-ready="ctrl.state.viewReady">
+  Cluster information
+</kubernetes-view-header>
 
-<kubernetes-feedback-panel></kubernetes-feedback-panel>
+<kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
-<div class="row">
-  <div class="col-sm-12">
-    <rd-widget>
-      <rd-widget-body>
-        <form class="form-horizontal">
-          <kubernetes-resource-reservation ng-if="ctrl.resourceReservation && ctrl.isAdmin" cpu="ctrl.resourceReservation.CPU" cpu-limit="ctrl.CPULimit"
-            memory="ctrl.resourceReservation.Memory" memory-limit="ctrl.MemoryLimit"
-            description="Resource reservation represents the total amount of resource requested by all the applications inside the cluster.">
-          </kubernetes-resource-reservation>
-        </form>
-      </rd-widget-body>
-    </rd-widget>
+<div ng-if="ctrl.state.viewReady">
+  <kubernetes-feedback-panel></kubernetes-feedback-panel>
+
+  <div class="row">
+    <div class="col-sm-12">
+      <rd-widget>
+        <rd-widget-body>
+          <form class="form-horizontal">
+            <kubernetes-resource-reservation ng-if="ctrl.resourceReservation && ctrl.isAdmin" cpu="ctrl.resourceReservation.CPU" cpu-limit="ctrl.CPULimit"
+              memory="ctrl.resourceReservation.Memory" memory-limit="ctrl.MemoryLimit"
+              description="Resource reservation represents the total amount of resource requested by all the applications inside the cluster.">
+            </kubernetes-resource-reservation>
+          </form>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
   </div>
-</div>
 
-<div class="row">
-  <div class="col-sm-12">
-    <kubernetes-nodes-datatable title-text="Nodes" title-icon="fa-hdd" dataset="ctrl.nodes" table-key="kubernetes.nodes"
-      order-by="Name" refresh-callback="ctrl.getNodes" is-admin="ctrl.isAdmin"></kubernetes-nodes-datatable>
+  <div class="row">
+    <div class="col-sm-12">
+      <kubernetes-nodes-datatable title-text="Nodes" title-icon="fa-hdd" dataset="ctrl.nodes" table-key="kubernetes.nodes"
+        order-by="Name" refresh-callback="ctrl.getNodes" is-admin="ctrl.isAdmin"></kubernetes-nodes-datatable>
+    </div>
   </div>
 </div>

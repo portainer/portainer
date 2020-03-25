@@ -80,7 +80,8 @@ class KubernetesApplicationConsoleController {
       command: availableCommands[1],
       connected: false,
       socket: null,
-      term: null
+      term: null,
+      viewReady: false
     };
 
     const podName = this.$transition$.params().pod;
@@ -93,6 +94,8 @@ class KubernetesApplicationConsoleController {
       this.application = await this.KubernetesApplicationService.get(namespace, applicationName);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve application logs');
+    } finally {
+      this.state.viewReady = true;
     }
   }
 

@@ -70,7 +70,13 @@ class KubernetesVolumesController {
   }
 
   async onInit() {
+    this.state = {
+      viewReady: false
+    };
+
     await this.getVolumes();
+
+    this.state.viewReady = true;
   }
 
   $onInit() {

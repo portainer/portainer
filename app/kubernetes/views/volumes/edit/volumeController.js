@@ -76,19 +76,22 @@ class KubernetesVolumeController {
    * ON INIT
    */
   async onInit() {
-    try {
-      this.state = {
-        activeTab: 0,
-        showEditorTab: false,
-        eventsLoading: true,
-        namespace: this.$transition$.params().namespace,
-        name: this.$transition$.params().name
-      };
+    this.state = {
+      activeTab: 0,
+      showEditorTab: false,
+      eventsLoading: true,
+      viewReady: false,
+      namespace: this.$transition$.params().namespace,
+      name: this.$transition$.params().name
+    };
 
+    try {
       await this.getVolume();
       await this.getEvents();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
+    } finally {
+      this.state.viewReady = true;
     }
   }
 

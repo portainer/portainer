@@ -171,15 +171,16 @@ class KubernetesConfigurationController {
 
   async onInit() {
     try {
-      this.formValues = new KubernetesConfigurationFormValues();
-
       this.state = {
         actionInProgress: false,
         configurationLoading: true,
         applicationsLoading: true,
         eventsLoading: true,
-        showEditorTab: false
+        showEditorTab: false,
+        viewReady: false
       };
+
+      this.formValues = new KubernetesConfigurationFormValues();
 
       this.resourcePools = await this.KubernetesResourcePoolService.get();
       await this.getConfiguration();
@@ -202,6 +203,8 @@ class KubernetesConfigurationController {
       });
     } catch(err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
+    } finally {
+      this.state.viewReady = true;
     }
   }
 

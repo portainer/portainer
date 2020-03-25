@@ -60,6 +60,16 @@ class KubernetesConfigureController {
   }
 
   async onInit() {
+    this.state = {
+      actionInProgress: false,
+      displayConfigureClassPanel: {},
+      viewReady: false
+    };
+
+    this.formValues = {
+      UseLoadBalancer: false
+    };
+
     try {
       const endpointId = this.$stateParams.id;
       [this.StorageClasses, this.endpoint] = await Promise.all([this.KubernetesStorageService.get(endpointId), this.EndpointService.endpoint(endpointId)]);
@@ -80,17 +90,12 @@ class KubernetesConfigureController {
       this.formValues.UseLoadBalancer = this.endpoint.Kubernetes.Configuration.UseLoadBalancer;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve storage classes');
+    } finally {
+      this.state.viewReady = true;
     }
   }
 
   $onInit() {
-    this.formValues = {
-      UseLoadBalancer: false
-    };
-    this.state = {
-      actionInProgress: false,
-      displayConfigureClassPanel: {}
-    };
     return this.$async(this.onInit);
   }
 }

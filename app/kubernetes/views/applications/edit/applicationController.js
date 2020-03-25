@@ -115,6 +115,7 @@ class KubernetesApplicationController {
       DisplayedPanel: 'pods',
       eventsLoading: true,
       dataLoading: true,
+      viewReady: false,
       params: {
         namespace: this.$transition$.params().namespace,
         name: this.$transition$.params().name,
@@ -128,6 +129,8 @@ class KubernetesApplicationController {
       this.getVolumes(),
       this.getConfigurations()
     ]);
+
+    this.state.viewReady = true;
   }
 
   $onInit() {

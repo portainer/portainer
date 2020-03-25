@@ -95,12 +95,15 @@ class KubernetesNodeController {
       dataLoading: true,
       eventsLoading: true,
       applicationsLoading: true,
-      showEditorTab: false
+      showEditorTab: false,
+      viewReady: false
     };
 
     await this.getNode();
     await this.getEvents();
     await this.getApplications();
+
+    this.state.viewReady = true;
   }
 
   $onInit() {

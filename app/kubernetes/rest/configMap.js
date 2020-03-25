@@ -13,13 +13,18 @@ angular.module('portainer.kubernetes')
             namespace: namespace
           },
           {
-            get: { method: 'GET', timeout: 15000 },
+            get: {
+              method: 'GET',
+              timeout: 15000,
+              ignoreLoadingBar: true
+            },
             getYaml: {
               method: 'GET',
               headers: {
                 'Accept': 'application/yaml'
               },
-              transformResponse: rawResponse
+              transformResponse: rawResponse,
+              ignoreLoadingBar: true
             },
             create: { method: 'POST' },
             update: { method: 'PUT' },

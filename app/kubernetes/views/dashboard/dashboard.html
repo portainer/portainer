@@ -1,72 +1,76 @@
-<rd-header>
-  <rd-header-title title-text="Dashboard"></rd-header-title>
-  <rd-header-content>Endpoint summary</rd-header-content>
-</rd-header>
+<kubernetes-view-header title="Dashboard" state="kubernetes.dashboard" view-ready="ctrl.state.viewReady">
+  Endpoint summary
+</kubernetes-view-header>
 
-<kubernetes-feedback-panel></kubernetes-feedback-panel>
+<kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
-<div class="row" ng-if="ctrl.endpoint">
-  <div class="col-sm-12">
-    <rd-widget>
-      <rd-widget-header icon="fa-tachometer-alt" title-text="Endpoint info"></rd-widget-header>
-      <rd-widget-body classes="no-padding">
-        <table class="table">
-          <tbody>
-            <tr>
-              <td>Endpoint</td>
-              <td>
-                {{ ctrl.endpoint.Name }}
-              </td>
-            </tr>
-            <tr>
-              <td>URL</td>
-              <td>{{ ctrl.endpoint.URL | stripprotocol }}</td>
-            </tr>
-            <tr>
-              <td>Tags</td>
-              <td>
-                <span ng-if="ctrl.endpoint.Tags.length === 0">
-                  -
-                </span>
-                <span ng-if="ctrl.endpoint.Tags.length > 0">
-                  <span ng-repeat="tag in ctrl.endpoint.Tags">
-                    {{ tag }}{{ $last? '' : ', ' }}
+<div ng-if="ctrl.state.viewReady">
+  <kubernetes-feedback-panel></kubernetes-feedback-panel>
+
+  <div class="row" ng-if="ctrl.endpoint">
+    <div class="col-sm-12">
+      <rd-widget>
+        <rd-widget-header icon="fa-tachometer-alt" title-text="Endpoint info"></rd-widget-header>
+        <rd-widget-body classes="no-padding">
+          <table class="table">
+            <tbody>
+              <tr>
+                <td>Endpoint</td>
+                <td>
+                  {{ ctrl.endpoint.Name }}
+                </td>
+              </tr>
+              <tr>
+                <td>URL</td>
+                <td>{{ ctrl.endpoint.URL | stripprotocol }}</td>
+              </tr>
+              <tr>
+                <td>Tags</td>
+                <td>
+                  <span ng-if="ctrl.endpoint.Tags.length === 0">
+                    -
                   </span>
-                </span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </rd-widget-body>
-    </rd-widget>
+                  <span ng-if="ctrl.endpoint.Tags.length > 0">
+                    <span ng-repeat="tag in ctrl.endpoint.Tags">
+                      {{ tag }}{{ $last? '' : ', ' }}
+                    </span>
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </rd-widget-body>
+      </rd-widget>
+    </div>
   </div>
-</div>
 
-<div class="row">
-  <div class="col-xs-12 col-md-6" ng-if="ctrl.pools">
-    <a ui-sref="kubernetes.resourcePools">
-      <rd-widget>
-        <rd-widget-body>
-          <div class="widget-icon blue pull-left">
-            <i class="fa fa-layer-group"></i>
-          </div>
-          <div class="title">{{ ctrl.pools.length }}</div>
-          <div class="comment">{{ ctrl.pools.length === 1 ? 'Resource pool' : 'Resource pools' }}</div>
-        </rd-widget-body>
-      </rd-widget>
-    </a>
+  <div class="row">
+    <div class="col-xs-12 col-md-6" ng-if="ctrl.pools">
+      <a ui-sref="kubernetes.resourcePools">
+        <rd-widget>
+          <rd-widget-body>
+            <div class="widget-icon blue pull-left">
+              <i class="fa fa-layer-group"></i>
+            </div>
+            <div class="title">{{ ctrl.pools.length }}</div>
+            <div class="comment">{{ ctrl.pools.length === 1 ? 'Resource pool' : 'Resource pools' }}</div>
+          </rd-widget-body>
+        </rd-widget>
+      </a>
+    </div>
+    <div class="col-xs-12 col-md-6" ng-if="ctrl.applications">
+      <a ui-sref="kubernetes.applications">
+        <rd-widget>
+          <rd-widget-body>
+            <div class="widget-icon blue pull-left">
+              <i class="fa fa-laptop-code"></i>
+            </div>
+            <div class="title">{{ ctrl.applications.length }}</div>
+            <div class="comment">{{ ctrl.applications.length === 1 ? 'Application' : 'Applications' }}</div>
+          </rd-widget-body>
+        </rd-widget>
+      </a>
+    </div>
   </div>
-  <div class="col-xs-12 col-md-6" ng-if="ctrl.applications">
-    <a ui-sref="kubernetes.applications">
-      <rd-widget>
-        <rd-widget-body>
-          <div class="widget-icon blue pull-left">
-            <i class="fa fa-laptop-code"></i>
-          </div>
-          <div class="title">{{ ctrl.applications.length }}</div>
-          <div class="comment">{{ ctrl.applications.length === 1 ? 'Application' : 'Applications' }}</div>
-        </rd-widget-body>
-      </rd-widget>
-    </a>
-  </div>
+
 </div>
