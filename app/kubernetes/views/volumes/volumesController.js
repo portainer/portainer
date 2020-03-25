@@ -1,13 +1,16 @@
+import _ from 'lodash-es';
 import angular from 'angular';
+import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
 
 class KubernetesVolumesController {
   /* @ngInject */
-  constructor($async, $state, Notifications, ModalService, KubernetesVolumeService) {
+  constructor($async, $state, Notifications, ModalService, KubernetesVolumeService, KubernetesApplicationService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
     this.ModalService = ModalService;
     this.KubernetesVolumeService = KubernetesVolumeService;
+    this.KubernetesApplicationService = KubernetesApplicationService;
 
     this.onInit = this.onInit.bind(this);
     this.getVolumes = this.getVolumes.bind(this);
@@ -47,7 +50,16 @@ class KubernetesVolumesController {
 
   async getVolumesAsync() {
     try {
-      this.volumes = await this.KubernetesVolumeService.get();
+      const [volumes, applications] = await Promise.all([
+        this.KubernetesVolumeService.get(),
+        this.KubernetesApplicationService.get()
+      ]);
+
+      this.volumes = _.map(volumes, (volume) => {
+        volume.Applications = KubernetesVolumeHelper.getUsingApplications(volume, applications);
+        return volume;
+      });
+
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retreive resource pools');
     }

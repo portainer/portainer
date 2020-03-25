@@ -8,7 +8,7 @@ const _KubernetesConfiguration = Object.freeze({
   Namespace: '',
   CreationDate: '',
   Used: false,
-  Apps: [],
+  Applications: [],
   Data: {}
 });
 

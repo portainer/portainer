@@ -2,7 +2,7 @@ import angular from 'angular';
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import { KubernetesResourceQuotaDefaults, KubernetesResourceQuota } from 'Kubernetes/models/resource-quota/models';
-import KubernetesResourceReservationHelper from 'Kubernetes/helpers/kubernetesResourceReservationHelper';
+import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 
 function megaBytesValue(mem) {
   return Math.floor(mem / 1000 / 1000);

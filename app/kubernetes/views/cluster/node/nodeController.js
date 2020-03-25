@@ -1,6 +1,6 @@
 import angular from 'angular';
 import _ from 'lodash-es';
-import KubernetesResourceReservationHelper from 'Kubernetes/helpers/kubernetesResourceReservationHelper';
+import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import {KubernetesResourceReservation} from 'Kubernetes/models/resource-reservation/models';
 
 class KubernetesNodeController {

@@ -23,11 +23,8 @@ class KubernetesVolumeService {
     try {
       const ns = await this.KubernetesResourcePoolService.get(namespace);
       const pools = [ns];
-      const [data, applications] = await Promise.all([
-        this.KubernetesPersistentVolumeClaimService.get(namespace, name),
-        this.KubernetesApplicationService.get(namespace)
-      ]);
-      return KubernetesVolumeConverter.pvcToVolume(data, pools, applications);
+      const data = await this.KubernetesPersistentVolumeClaimService.get(namespace, name);
+      return KubernetesVolumeConverter.pvcToVolume(data, pools);
     } catch (err) {
       throw err;
     }
@@ -43,13 +40,9 @@ class KubernetesVolumeService {
         pools = await this.KubernetesResourcePoolService.get();
       }
       const pvcPromises = _.map(pools, (item) => this.KubernetesPersistentVolumeClaimService.get(item.Namespace.Name));
-      const appPromises = _.map(pools, (item) => this.KubernetesApplicationService.get(item.Namespace.Name));
-      const [pvcData, appData] = await Promise.all([
-        Promise.all(pvcPromises), Promise.all(appPromises)
-      ]);
-      const applications = _.flatten(appData);
+      const pvcData = await Promise.all(pvcPromises);
       const pvc = _.flatten(pvcData);
-      const res = _.map(pvc, (item) => KubernetesVolumeConverter.pvcToVolume(item, pools, applications));
+      const res = _.map(pvc, (item) => KubernetesVolumeConverter.pvcToVolume(item, pools));
       return res;
     } catch (err) {
       throw err;

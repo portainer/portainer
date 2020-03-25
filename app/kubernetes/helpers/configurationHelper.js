@@ -6,7 +6,7 @@ class KubernetesConfigurationHelper {
     _.forEach(apps, (app) => {
       let envFind = false;
       let volumeFind = false;
-      if (config.Type === KubernetesConfigurationTypes.BASIC) {
+      if (config.Type === KubernetesConfigurationTypes.CONFIGMAP) {
         envFind = _.find(app.Env, { valueFrom: { configMapKeyRef: { name: config.Name }}});
         volumeFind = _.find(app.Volumes, { configMap: { name: config.Name }});
       } else {
@@ -15,7 +15,7 @@ class KubernetesConfigurationHelper {
       }
       if (envFind || volumeFind) {
         config.Used = true;
-        config.Apps.push(app);
+        config.Applications.push(app);
       }
     })
     return config;

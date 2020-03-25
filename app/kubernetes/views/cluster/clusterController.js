@@ -1,7 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
-import KubernetesResourceReservationHelper from 'Kubernetes/helpers/kubernetesResourceReservationHelper';
+import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import {KubernetesResourceReservation} from 'Kubernetes/models/resource-reservation/models';
 
 class KubernetesClusterController {

@@ -5,7 +5,10 @@
     </a>
   </rd-header-title>
   <rd-header-content>
-    <a ui-sref="kubernetes.resourcePools">Resource pools</a> &gt; <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.application.ResourcePool })">{{ ctrl.application.ResourcePool }}</a> &gt; <a ui-sref="kubernetes.applications">Applications</a> &gt; {{ ctrl.application.Name }}
+    <a ui-sref="kubernetes.resourcePools">Resource pools</a>
+    &gt; <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.application.ResourcePool })">{{ ctrl.application.ResourcePool }}</a>
+    &gt; <a ui-sref="kubernetes.applications">Applications</a>
+    &gt; {{ ctrl.application.Name }}
   </rd-header-content>
 </rd-header>
 
@@ -23,48 +26,49 @@
             <div style="padding: 20px;">
               <table class="table">
                 <tbody>
-                <tr>
-                  <td>Name</td>
-                  <td>{{ ctrl.application.Name }}</td>
-                </tr>
-                <tr>
-                  <td>Stack</td>
-                  <td>{{ ctrl.application.StackName }}</td>
-                </tr>
-                <tr>
-                  <td>Resource pool</td>
-                  <td>
-                    <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.application.ResourcePool })">{{ ctrl.application.ResourcePool }}</a>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Deployment</td>
-                  <td>
-                    <span ng-if="ctrl.application.DeploymentType === ctrl.KubernetesApplicationDeploymentTypes.REPLICATED">Replicated</span>
-                    <span ng-if="ctrl.application.DeploymentType === ctrl.KubernetesApplicationDeploymentTypes.GLOBAL">Global</span>
-                    <code>{{ ctrl.application.RunningPodsCount }}</code> / <code>{{ ctrl.application.TotalPodsCount }}</code>
-                  </td>
-                </tr>
-                <tr ng-if="ctrl.application.Limits.Cpu || ctrl.application.Limits.Memory">
-                  <td>
-                    <div>Resource reservations</div>
-                    <div class="text-muted small">per instance</div></td>
-                  <td>
-                    <div ng-if="ctrl.application.Limits.Cpu">CPU {{ ctrl.application.Limits.Cpu | kubernetesApplicationCPUValue }}</div>
-                    <div ng-if="ctrl.application.Limits.Memory">Memory {{ ctrl.application.Limits.Memory | humansize }}</div>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Creation</td>
-                  <td>
-                    <span ng-if="ctrl.application.ApplicationOwner" style="margin-right: 5px;">
-                      <i class="fas fa-user"></i> {{ ctrl.application.ApplicationOwner }}
-                    </span>
-                    <span>
-                      <i class="fas fa-clock"></i> {{ ctrl.application.CreatedAt | getisodate }}
-                    </span>
-                  </td>
-                </tr>
+                  <tr>
+                    <td>Name</td>
+                    <td>{{ ctrl.application.Name }}</td>
+                  </tr>
+                  <tr>
+                    <td>Stack</td>
+                    <td>{{ ctrl.application.StackName }}</td>
+                  </tr>
+                  <tr>
+                    <td>Resource pool</td>
+                    <td>
+                      <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.application.ResourcePool })">{{ ctrl.application.ResourcePool }}</a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Deployment</td>
+                    <td>
+                      <span ng-if="ctrl.application.DeploymentType === ctrl.KubernetesApplicationDeploymentTypes.REPLICATED">Replicated</span>
+                      <span ng-if="ctrl.application.DeploymentType === ctrl.KubernetesApplicationDeploymentTypes.GLOBAL">Global</span>
+                      <code>{{ ctrl.application.RunningPodsCount }}</code> / <code>{{ ctrl.application.TotalPodsCount }}</code>
+                    </td>
+                  </tr>
+                  <tr ng-if="ctrl.application.Limits.Cpu || ctrl.application.Limits.Memory">
+                    <td>
+                      <div>Resource reservations</div>
+                      <div class="text-muted small">per instance</div>
+                    </td>
+                    <td>
+                      <div ng-if="ctrl.application.Limits.Cpu">CPU {{ ctrl.application.Limits.Cpu | kubernetesApplicationCPUValue }}</div>
+                      <div ng-if="ctrl.application.Limits.Memory">Memory {{ ctrl.application.Limits.Memory | humansize }}</div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Creation</td>
+                    <td>
+                      <span ng-if="ctrl.application.ApplicationOwner" style="margin-right: 5px;">
+                        <i class="fas fa-user"></i> {{ ctrl.application.ApplicationOwner }}
+                      </span>
+                      <span>
+                        <i class="fas fa-clock"></i> {{ ctrl.application.CreatedAt | getisodate }}
+                      </span>
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -75,14 +79,8 @@
             <uib-tab-heading>
               <i class="fa fa-history space-right" aria-hidden="true"></i> Events
             </uib-tab-heading>
-            <kubernetes-events-datatable
-                    title-text="Events" title-icon="fa-history"
-                    dataset="ctrl.events" table-key="kubernetes.application.events"
-                    order-by="Date"
-                    reverse-order="true"
-                    loading="ctrl.state.eventsLoading"
-                    refresh-callback="ctrl.getEvents"
-            ></kubernetes-events-datatable>
+            <kubernetes-events-datatable title-text="Events" title-icon="fa-history" dataset="ctrl.events" table-key="kubernetes.application.events" order-by="Date"
+              reverse-order="true" loading="ctrl.state.eventsLoading" refresh-callback="ctrl.getEvents"></kubernetes-events-datatable>
           </uib-tab>
 
           <uib-tab index="2" ng-if="ctrl.application.Yaml" select="ctrl.showEditor()" classes="btn-sm">
@@ -90,10 +88,7 @@
               <i class="fa fa-code space-right" aria-hidden="true"></i> YAML
             </uib-tab-heading>
             <div style="padding-right: 25px;" ng-if="ctrl.state.showEditorTab">
-              <kubernetes-yaml-inspector
-                      key="application-yaml"
-                      data="ctrl.application.Yaml"
-              ></kubernetes-yaml-inspector>
+              <kubernetes-yaml-inspector key="application-yaml" data="ctrl.application.Yaml"></kubernetes-yaml-inspector>
             </div>
           </uib-tab>
 
@@ -110,7 +105,7 @@
       <rd-widget-header icon="fa-laptop" title-text="Accessing the application"></rd-widget-header>
       <rd-widget-body>
         <div ng-if="ctrl.application.ServiceType === 'LoadBalancer'">
-          <div class="small text-muted" >
+          <div class="small text-muted">
             <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
             This application is exposed through an external load balancer. Use the links below to access the different ports exposed.
           </div>
@@ -121,20 +116,22 @@
               </p>
               <p>
                 <u>what does the "pending" status means?</u>
-                <portainer-tooltip position="bottom" message="A pending status means that Portainer delegated the request to the provider responsible for creating the external load balancer. If it stays in pending state for long, this means that this capability might not be supported or you might have an issue with your cluster provider. Contact your cluster administrator for more information."></portainer-tooltip>
+                <portainer-tooltip position="bottom"
+                  message="A pending status means that Portainer delegated the request to the provider responsible for creating the external load balancer. If it stays in pending state for long, this means that this capability might not be supported or you might have an issue with your cluster provider. Contact your cluster administrator for more information.">
+                </portainer-tooltip>
               </p>
             </span>
             <span ng-if="ctrl.application.LoadBalancerIPAddress">
               <p>
-              Load balancer status: <i class="fa fa-check green-icon" style="margin-left: 2px"></i> available
+                Load balancer status: <i class="fa fa-check green-icon" style="margin-left: 2px"></i> available
               </p>
               <p>
-              Load balancer IP address: {{ ctrl.application.LoadBalancerIPAddress }}
+                Load balancer IP address: {{ ctrl.application.LoadBalancerIPAddress }}
                 <span class="btn btn-primary btn-xs" ng-click="ctrl.copyLoadBalancerIP()" style="margin-left: 5px;">
                   <i class="fa fa-copy space-right" aria-hidden="true"></i>Copy
                 </span>
                 <span id="copyNotificationLB" style="margin-left: 7px; display: none; color: #23ae89;" class="small">
-                  <i class="fa fa-check" aria-hidden="true" ></i> copied
+                  <i class="fa fa-check" aria-hidden="true"></i> copied
                 </span>
               </p>
             </span>
@@ -149,8 +146,9 @@
                 <tr ng-repeat="port in ctrl.application.PublishedPorts track by $index">
                   <td>{{ port.targetPort }}</td>
                   <td>
-                      {{ port.port }}
-                    <a ng-if="ctrl.application.LoadBalancerIPAddress" ng-href="http://{{ ctrl.application.LoadBalancerIPAddress }}:{{port.port}}" target="_blank" style="margin-left: 5px">
+                    {{ port.port }}
+                    <a ng-if="ctrl.application.LoadBalancerIPAddress" ng-href="http://{{ ctrl.application.LoadBalancerIPAddress }}:{{port.port}}" target="_blank"
+                      style="margin-left: 5px">
                       <i class="fa fa-external-link-alt" aria-hidden="true"></i> access
                     </a>
                   </td>
@@ -162,7 +160,8 @@
         <div ng-if="ctrl.application.ServiceType === 'NodePort'">
           <div class="small text-muted">
             <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-            This application is exposed globally on all nodes of your cluster. It can be reached using the IP address of any node in your cluster using the port configuration below.
+            This application is exposed globally on all nodes of your cluster. It can be reached using the IP address of any node in your cluster using the port configuration
+            below.
           </div>
           <div style="margin-top: 20px;">
             <table class="table">
@@ -182,7 +181,8 @@
         <div ng-if="ctrl.application.ServiceType === 'ClusterIP'">
           <div class="small text-muted">
             <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-            This application is only available for internal usage inside the cluster. It can be reached through the application name <code>{{ ctrl.application.Name }}</code> using the port configuration below.
+            This application is only available for internal usage inside the cluster. It can be reached through the application name <code>{{ ctrl.application.Name }}</code> using
+            the port configuration below.
           </div>
           <div style="margin-top: 20px;">
             <table class="table">
@@ -206,10 +206,23 @@
 
 <div class="row" ng-if="ctrl.application">
   <div class="col-sm-12">
-    <kubernetes-pods-datatable
-            title-text="Application pods" title-icon="fa-server"
-            dataset="ctrl.application.Pods" table-key="kubernetes.application.pods"
-            order-by="Name"
-    ></kubernetes-pods-datatable>
+    <kubernetes-pods-datatable title-text="Application pods" title-icon="fa-server" dataset="ctrl.application.Pods" table-key="kubernetes.application.pods" order-by="Name">
+    </kubernetes-pods-datatable>
+  </div>
+</div>
+
+<div class="row" ng-if="ctrl.volumes && ctrl.volumes.length > 0">
+  <div class="col-sm-12">
+    <kubernetes-application-volumes-datatable title-text="Application volumes" title-icon="fa-database" dataset="ctrl.volumes" table-key="kubernetes.application.volumes"
+      order-by="Name">
+    </kubernetes-application-volumes-datatable>
+  </div>
+</div>
+
+<div class="row" ng-if="ctrl.configurations && ctrl.configurations.length > 0">
+  <div class="col-sm-12">
+    <kubernetes-application-configurations-datatable title-text="Application configurations" title-icon="fa-file-code" dataset="ctrl.configurations"
+      table-key="kubernetes.application.configurations" order-by="Name">
+    </kubernetes-application-configurations-datatable>
   </div>
 </div>

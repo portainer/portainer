@@ -1,7 +1,7 @@
 import angular from 'angular';
 import {KubernetesConfigurationFormValues, KubernetesConfigurationFormValuesDataEntry} from 'Kubernetes/models/configuration/formvalues';
 import {KubernetesConfigurationTypes} from 'Kubernetes/models/configuration/models';
-import KubernetesConfigurationHelper from 'Kubernetes/helpers/kubernetesConfigurationHelper';
+import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 import _ from 'lodash-es';
 
 class KubernetesConfigurationController {
@@ -107,9 +107,9 @@ class KubernetesConfigurationController {
 
   updateConfiguration() {
     if (this.configuration.Used) {
-      const plural = this.configuration.Apps.length > 1 ? 's' : '';
+      const plural = this.configuration.Applications.length > 1 ? 's' : '';
       this.ModalService.confirmUpdate(
-        `The changes will be propagated to ${this.configuration.Apps.length} running application${plural}. Are you sure you want to update this configuration?`,
+        `The changes will be propagated to ${this.configuration.Applications.length} running application${plural}. Are you sure you want to update this configuration?`,
         (confirmed) => {
           if (confirmed) {
             return this.$async(this.updateConfigurationAsync);

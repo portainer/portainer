@@ -17,6 +17,31 @@ import {
 
 class KubernetesApplicationHelper {
 
+  static getUsedVolumes(application, volumes) {
+    const names = _.without(_.map(application.Volumes, 'persistentVolumeClaim.claimName'), undefined);
+    return _.filter(volumes, (volume) => {
+      const matchingNames = _.filter(names, (name) => _.startsWith(volume.PersistentVolumeClaim.Name, name));
+      return volume.ResourcePool.Namespace.Name === application.ResourcePool && matchingNames.length;
+    });
+  }
+
+  static getUsedConfigurations(application, configurations) {
+    return _.filter(configurations, (config) => {
+      let envFind;
+      let volumeFind;
+      if (config.Type === KubernetesConfigurationTypes.CONFIGMAP) {
+        envFind = _.find(application.Env, { valueFrom: { configMapKeyRef: { name: config.Name }}});
+        volumeFind = _.find(application.Volumes, { configMap: { name: config.Name }});
+      } else {
+        envFind = _.find(application.Env, { valueFrom: { secretKeyRef: { name: config.Name }}});
+        volumeFind = _.find(application.Volumes, { secret: { secretName: config.Name }});
+      }
+      if (envFind || volumeFind) {
+        return true;
+      }
+    });
+  }
+
   static dnsCompliantString(s) {
     return s.replace(/[^a-z0-9\-]/gi, '-').toLowerCase();
   }

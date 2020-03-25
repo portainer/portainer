@@ -1,5 +1,5 @@
 import angular from 'angular';
-import KubernetesConfigurationHelper from 'Kubernetes/helpers/kubernetesConfigurationHelper';
+import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 
 class KubernetesConfigurationsController {
   /* @ngInject */

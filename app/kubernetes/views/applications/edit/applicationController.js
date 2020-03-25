@@ -1,29 +1,81 @@
 import angular from 'angular';
 import _ from 'lodash-es';
-import {KubernetesApplicationDeploymentTypes} from 'Kubernetes/models/application/models';
+import { KubernetesApplicationDeploymentTypes } from 'Kubernetes/models/application/models';
+import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 
 class KubernetesApplicationController {
   /* @ngInject */
-  constructor($async, $state, clipboard, Notifications, KubernetesApplicationService, KubernetesEventService) {
+  constructor($async, $state, clipboard, Notifications, KubernetesApplicationService, KubernetesEventService,
+    KubernetesVolumeService, KubernetesConfigurationService) {
     this.$async = $async;
     this.$state = $state;
     this.clipboard = clipboard;
     this.Notifications = Notifications;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesEventService = KubernetesEventService;
+    this.KubernetesVolumeService = KubernetesVolumeService;
+    this.KubernetesConfigurationService = KubernetesConfigurationService;
 
     this.onInit = this.onInit.bind(this);
     this.getApplication = this.getApplication.bind(this);
     this.getApplicationAsync = this.getApplicationAsync.bind(this);
     this.getEvents = this.getEvents.bind(this);
     this.getEventsAsync = this.getEventsAsync.bind(this);
+    this.getVolumes = this.getVolumes.bind(this);
+    this.getVolumesAsync = this.getVolumesAsync.bind(this);
+    this.getConfigurations = this.getConfigurations.bind(this);
+    this.getConfigurationsAsync = this.getConfigurationsAsync.bind(this);
     this.copyLoadBalancerIP = this.copyLoadBalancerIP.bind(this);
   }
 
+  showEditor() {
+    this.state.showEditorTab = true;
+  }
+
+  copyLoadBalancerIP() {
+    this.clipboard.copyText(this.application.LoadBalancerIPAddress);
+    $('#copyNotificationLB').show().fadeOut(2500);
+  }
+
+  /**
+   * VOLUMES
+   */
+
+  async getVolumesAsync() {
+    try {
+      const volumes = await this.KubernetesVolumeService.get(this.state.params.namespace);
+      this.volumes = KubernetesApplicationHelper.getUsedVolumes(this.application, volumes);
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve application related volumes');
+    }
+  }
+
+  getVolumes() {
+    return this.$async(this.getVolumesAsync);
+  }
+  /**
+   * CONFIGURATIONS
+   */
+  async getConfigurationsAsync() {
+    try {
+      const configurations = await this.KubernetesConfigurationService.get(this.state.params.namespace);
+      this.configurations = KubernetesApplicationHelper.getUsedConfigurations(this.application, configurations);
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve application related configurations');
+    }
+  }
+
+  getConfigurations() {
+    return this.$async(this.getConfigurationsAsync);
+  }
+
+  /**
+   * EVENTS
+   */
   async getEventsAsync() {
     try {
       this.state.eventsLoading = true;
-      const events = await this.KubernetesEventService.get(this.application.ResourcePool);
+      const events = await this.KubernetesEventService.get(this.state.params.namespace);
       this.events = _.filter(events, (event) => event.Involved.uid === this.application.Id
         || event.Involved.uid === this.application.ServiceId
         || _.find(this.application.Pods, (pod) => pod.Id === event.Involved.uid) !== undefined);
@@ -38,30 +90,22 @@ class KubernetesApplicationController {
     return this.$async(this.getEventsAsync);
   }
 
-  copyLoadBalancerIP() {
-    this.clipboard.copyText(this.application.LoadBalancerIPAddress);
-    $('#copyNotificationLB').show().fadeOut(2500);
-  }
-
+  /**
+   * APPLICATION
+   */
   async getApplicationAsync() {
-      try {
-        this.state.dataLoading = true;
-        const applicationName = this.$transition$.params().name;
-        const namespace = this.$transition$.params().namespace;
-        this.application = await this.KubernetesApplicationService.get(namespace, applicationName);
-      } catch (err) {
-        this.Notifications.error('Failure', err, 'Unable to retrieve application details');
-      } finally {
-        this.state.dataLoading = false;
-      }
+    try {
+      this.state.dataLoading = true;
+      this.application = await this.KubernetesApplicationService.get(this.state.params.namespace, this.state.params.name);
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve application details');
+    } finally {
+      this.state.dataLoading = false;
+    }
   }
 
   getApplication() {
     return this.$async(this.getApplicationAsync);
-  }
-
-  showEditor() {
-    this.state.showEditorTab = true;
   }
 
   async onInit() {
@@ -70,11 +114,20 @@ class KubernetesApplicationController {
       showEditorTab: false,
       DisplayedPanel: 'pods',
       eventsLoading: true,
-      dataLoading: true
+      dataLoading: true,
+      params: {
+        namespace: this.$transition$.params().namespace,
+        name: this.$transition$.params().name,
+      }
     };
 
     this.KubernetesApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
-    this.getApplication().then(() => this.getEvents());
+    await this.getApplication();
+    await Promise.all([
+      this.getEvents(),
+      this.getVolumes(),
+      this.getConfigurations()
+    ]);
   }
 
   $onInit() {

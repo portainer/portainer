@@ -4,7 +4,7 @@ import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
 
 class KubernetesVolumeController {
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesVolumeService, KubernetesEventService, KubernetesNamespaceHelper) {
+  constructor($async, $state, Notifications, KubernetesVolumeService, KubernetesEventService, KubernetesNamespaceHelper, KubernetesApplicationService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
@@ -12,6 +12,7 @@ class KubernetesVolumeController {
     this.KubernetesVolumeService = KubernetesVolumeService;
     this.KubernetesEventService = KubernetesEventService;
     this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
+    this.KubernetesApplicationService = KubernetesApplicationService;
 
     this.onInit = this.onInit.bind(this);
     this.getVolume = this.getVolume.bind(this);
@@ -37,7 +38,12 @@ class KubernetesVolumeController {
    */
   async getVolumeAsync() {
     try {
-      this.volume = await this.KubernetesVolumeService.get(this.state.namespace, this.state.name);
+      const [volume, applications] = await Promise.all([
+        this.KubernetesVolumeService.get(this.state.namespace, this.state.name),
+        this.KubernetesApplicationService.get(this.state.namespace)
+      ]);
+      volume.Applications = KubernetesVolumeHelper.getUsingApplications(volume, applications);
+      this.volume = volume;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve volume');
     }
