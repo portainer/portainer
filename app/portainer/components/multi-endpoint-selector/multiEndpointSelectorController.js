@@ -1,4 +1,5 @@
 import _ from 'lodash-es';
+import PortainerEndpointTagHelper from 'Portainer/helpers/tagHelper';
 
 angular.module('portainer.app').controller('MultiEndpointSelectorController', function() {
   var ctrl = this;
@@ -17,14 +18,8 @@ angular.module('portainer.app').controller('MultiEndpointSelectorController', fu
     }
   };
 
-  this.tagIdsToTagNames = function tagIdsToTagNames(tagsId) {
-    return tagsId.map(tagId => {
-      const tag = this.tags.find(t => t.Id === tagId);
-      if (!tag) {
-        return '';
-      }
-      return tag.Name;
-    });
+  this.tagIdsToTagNames = function tagIdsToTagNames(tagIds) {
+    return PortainerEndpointTagHelper.tagIdsToTagNames(this.tags, tagIds)
   }
 
   this.$onInit = function() {
