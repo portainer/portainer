@@ -572,6 +572,18 @@ type (
 	// It can be either a TLS CA file, a TLS certificate file or a TLS key file
 	TLSFileType int
 
+	// EdgeGroupID represents an edge group identifier
+	EdgeGroupID int
+
+	// EdgeGroup represents an edge group
+	EdgeGroup struct {
+		ID        EdgeGroupID  `json:"Id"`
+		Name      string       `json:"Name"`
+		Dynamic   bool         `json:"Dynamic"`
+		TagIDs    []TagID      `json:"TagIds"`
+		Endpoints []EndpointID `json:"Endpoints"`
+	}
+
 	// ExtensionID represents a extension identifier
 	ExtensionID int
 
@@ -912,6 +924,15 @@ type (
 		GetTunnelDetails(endpointID EndpointID) *TunnelDetails
 		AddSchedule(endpointID EndpointID, schedule *EdgeSchedule)
 		RemoveSchedule(scheduleID ScheduleID)
+	}
+
+	// EdgeGroupService represents a service to manage edge groups
+	EdgeGroupService interface {
+		EdgeGroups() ([]EdgeGroup, error)
+		EdgeGroup(ID EdgeGroupID) (*EdgeGroup, error)
+		CreateEdgeGroup(group *EdgeGroup) error
+		UpdateEdgeGroup(ID EdgeGroupID, group *EdgeGroup) error
+		DeleteEdgeGroup(ID EdgeGroupID) error
 	}
 )
 

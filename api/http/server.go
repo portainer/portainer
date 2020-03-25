@@ -3,6 +3,7 @@ package http
 import (
 	"time"
 
+	"github.com/portainer/portainer/api/http/handler/edgegroups"
 	"github.com/portainer/portainer/api/http/handler/support"
 
 	"github.com/portainer/portainer/api/http/handler/roles"
@@ -55,6 +56,7 @@ type Server struct {
 	Snapshotter            portainer.Snapshotter
 	RoleService            portainer.RoleService
 	DockerHubService       portainer.DockerHubService
+	EdgeGroupService       portainer.EdgeGroupService
 	EndpointService        portainer.EndpointService
 	EndpointGroupService   portainer.EndpointGroupService
 	FileService            portainer.FileService
@@ -143,6 +145,9 @@ func (server *Server) Start() error {
 
 	var dockerHubHandler = dockerhub.NewHandler(requestBouncer)
 	dockerHubHandler.DockerHubService = server.DockerHubService
+
+	var edgeGroupsHandler = edgegroups.NewHandler(requestBouncer)
+	edgeGroupsHandler.EdgeGroupService = server.EdgeGroupService
 
 	var endpointHandler = endpoints.NewHandler(requestBouncer, server.EndpointManagement)
 	endpointHandler.EndpointService = server.EndpointService
@@ -266,6 +271,7 @@ func (server *Server) Start() error {
 		RoleHandler:            roleHandler,
 		AuthHandler:            authHandler,
 		DockerHubHandler:       dockerHubHandler,
+		EdgeGroupsHandler:      edgeGroupsHandler,
 		EndpointGroupHandler:   endpointGroupHandler,
 		EndpointHandler:        endpointHandler,
 		EndpointProxyHandler:   endpointProxyHandler,
