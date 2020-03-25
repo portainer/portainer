@@ -1,40 +1,42 @@
 import _ from 'lodash-es';
 import PortainerEndpointTagHelper from 'Portainer/helpers/tagHelper';
 
-angular.module('portainer.app').controller('MultiEndpointSelectorController', function() {
-  var ctrl = this;
+import angular from 'angular';
 
-  this.sortGroups = function(groups) {
+class MultiEndpointSelectorController {
+  /* @ngInject */
+  constructor() {
+    this.sortGroups = this.sortGroups.bind(this);
+    this.groupEndpoints = this.groupEndpoints.bind(this);
+    this.tagIdsToTagNames = this.tagIdsToTagNames.bind(this);
+  }
+
+  sortGroups(groups) {
     return _.sortBy(groups, ['name']);
-  };
+  }
 
-  this.groupEndpoints = function(endpoint) {
-    for (var i = 0; i < ctrl.availableGroups.length; i++) {
-      var group = ctrl.availableGroups[i];
+  groupEndpoints(endpoint) {
+    for (var i = 0; i < this.availableGroups.length; i++) {
+      var group = this.availableGroups[i];
 
       if (endpoint.GroupId === group.Id) {
         return group.Name;
       }
     }
-  };
-
-  this.tagIdsToTagNames = function tagIdsToTagNames(tagIds) {
-    return PortainerEndpointTagHelper.tagIdsToTagNames(this.tags, tagIds)
   }
 
-  this.$onInit = function() {
+  tagIdsToTagNames(tagIds) {
+    return PortainerEndpointTagHelper.idsToTagNames(this.tags, tagIds);
+  }
+
+  $onInit() {
     this.availableGroups = filterEmptyGroups(this.groups, this.endpoints);
-  };
-
-  function filterEmptyGroups(groups, endpoints) {
-    return groups.filter(function f(group) {
-      for (var i = 0; i < endpoints.length; i++) {
-        var endpoint = endpoints[i];
-        if (endpoint.GroupId === group.Id) {
-          return true;
-        }
-      }
-      return false;
-    });
   }
-});
+}
+
+export default MultiEndpointSelectorController;
+angular.module('portainer.app').controller('MultiEndpointSelectorController', MultiEndpointSelectorController);
+
+function filterEmptyGroups(groups, endpoints) {
+  return _.filter(groups, group => _.some(endpoints, endpoint => endpoint.GroupId == group.Id));
+}
