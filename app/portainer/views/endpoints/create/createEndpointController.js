@@ -84,10 +84,6 @@ function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService,
     createAzureEndpoint(name, applicationId, tenantId, authenticationKey, groupId, tagIds);
   };
 
-  $scope.onChangeTags = function onChangeTags(tagIds) {
-    $scope.formValues.TagIds = tagIds;
-  }
-
   function createAzureEndpoint(name, applicationId, tenantId, authenticationKey, groupId, tagIds) {
     $scope.state.actionInProgress = true;
     EndpointService.createAzureEndpoint(name, applicationId, tenantId, authenticationKey, groupId, tagIds)

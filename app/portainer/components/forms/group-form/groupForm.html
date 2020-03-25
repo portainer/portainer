@@ -28,9 +28,9 @@
   <!-- tags -->
   <div class="form-group">
     <tag-selector
+      ng-if="$ctrl.availableTags && $ctrl.model.TagIds"
       tags="$ctrl.availableTags"
       model="$ctrl.model.TagIds"
-      on-change="$ctrl.onChangeTags"
     ></tag-selector>
   </div>
   <!-- !tags -->

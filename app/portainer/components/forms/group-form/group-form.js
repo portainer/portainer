@@ -12,7 +12,6 @@ class GroupFormController {
     this.associateEndpoint = this.associateEndpoint.bind(this);
     this.dissociateEndpoint = this.dissociateEndpoint.bind(this);
     this.getPaginatedEndpointsByGroup = this.getPaginatedEndpointsByGroup.bind(this);
-    this.onChangeTags = this.onChangeTags.bind(this);
   }
 
   $onInit() {
@@ -42,10 +41,6 @@ class GroupFormController {
       })
       .catch((err) => this.Notifications.error('Error', err, 'Unable to add endpoint to group'));
     }
-  }
-
-  onChangeTags(tagIds) {
-    this.model.TagIds = tagIds;
   }
 
   dissociateEndpoint(endpoint) {

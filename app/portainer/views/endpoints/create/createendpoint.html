@@ -259,9 +259,9 @@
           <!-- tags -->
           <div class="form-group">
             <tag-selector
+              ng-if="availableTags"
               tags="availableTags"
               model="formValues.TagIds"
-              on-change="onChangeTags"
             ></tag-selector>
           </div>
           <!-- !tags -->

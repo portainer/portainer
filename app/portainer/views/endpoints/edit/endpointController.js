@@ -34,10 +34,6 @@ function ($q, $scope, $state, $transition$, $filter, clipboard, EndpointService,
     $('#copyNotificationEdgeKey').show().fadeOut(2500);
   };
 
-  $scope.onChangeTags = function onChangeTags(tagIds) {
-    $scope.endpoint.TagIds = tagIds;
-  }
-
   $scope.updateEndpoint = function() {
     var endpoint = $scope.endpoint;
     var securityData = $scope.formValues.SecurityFormData;
