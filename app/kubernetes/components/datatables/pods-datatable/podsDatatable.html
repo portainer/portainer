@@ -96,9 +96,12 @@
               <td><span ng-repeat="image in item.Images track by $index">{{ image }}<br/></span></td>
               <td><span class="label label-{{ item.Status | kubernetesPodStatusColor }}">{{ item.Status }}</span></td>
               <td>
-                <a ui-sref="kubernetes.cluster.node({ name: item.Node })">
-                  {{ item.Node }}
-                </a>
+                <span ng-if="item.Node">
+                  <a ui-sref="kubernetes.cluster.node({ name: item.Node })">
+                    {{ item.Node }}
+                  </a>
+                </span>
+                <span ng-if="!item.Node">-</span>
               </td>
               <td>{{ item.CreatedAt | getisodate }}</td>
               <td>
