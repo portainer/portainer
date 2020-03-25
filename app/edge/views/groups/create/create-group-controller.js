@@ -26,7 +26,7 @@ angular
         GroupService.groups(),
       ]);
       this.tags = tags;
-      this.endpoints = endpoints.value;
+      this.endpoints = endpoints.value.filter(endpoint => endpoint.Type === 4);
       this.endpointGroups = endpointGroups;
     };
 
