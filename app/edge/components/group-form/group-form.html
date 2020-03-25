@@ -1,8 +1,4 @@
-<form
-  class="form-horizontal"
-  name="EdgeGroupForm"
-  ng-submit="$ctrl.formAction()"
->
+<form class="form-horizontal" name="EdgeGroupForm" ng-submit="$ctrl.formAction()">
   <div class="form-group">
     <label for="group_name" class="col-sm-3 col-lg-2 control-label text-left">
       Name
@@ -40,16 +36,13 @@
         <input
           type="radio"
           id="static-group"
-          ng-model="$ctrl.model.Type"
-          value="static"
+          ng-model="$ctrl.model.Dynamic"
+          ng-value="false"
+          ng-checked="!$ctrl.model.Dynamic"
         />
         <label for="static-group">
           <div class="boxselector_header">
-            <i
-              class="fa fa-bolt"
-              aria-hidden="true"
-              style="margin-right: 2px;"
-            ></i>
+            <i class="fa fa-bolt" aria-hidden="true" style="margin-right: 2px;"></i>
             Static
           </div>
         </label>
@@ -58,16 +51,13 @@
         <input
           type="radio"
           id="dynamic-group"
-          ng-model="$ctrl.model.Type"
-          value="dynamic"
+          ng-model="$ctrl.model.Dynamic"
+          ng-value="true"
+          ng-checked="$ctrl.model.Dynamic"
         />
         <label for="dynamic-group">
           <div class="boxselector_header">
-            <i
-              class="fa fa-bolt"
-              aria-hidden="true"
-              style="margin-right: 2px;"
-            ></i>
+            <i class="fa fa-bolt" aria-hidden="true" style="margin-right: 2px;"></i>
             Dynamic
           </div>
         </label>
@@ -75,40 +65,30 @@
     </div>
   </div>
 
-  <div
-    class="col-sm-12 form-section-title"
-    ng-if="$ctrl.model.Type === 'static'"
-  >
+  <div class="col-sm-12 form-section-title" ng-if="!$ctrl.model.Dynamic">
     Endpoints
   </div>
   <multi-endpoint-selector
-    ng-if="$ctrl.model.Type === 'static' && $ctrl.endpoints && $ctrl.groups"
+    ng-if="!$ctrl.model.Dynamic && $ctrl.endpoints && $ctrl.groups"
     model="$ctrl.model.Endpoints"
     endpoints="$ctrl.endpoints"
     groups="$ctrl.groups"
     tags="$ctrl.tags"
   ></multi-endpoint-selector>
-  <div
-    class="form-group"
-    ng-show="$ctrl.model.Type === 'static' && !$ctrl.model.Endpoints.length"
-  >
+  <div class="form-group" ng-show="!$ctrl.model.Dynamic && !$ctrl.model.Endpoints.length">
     <div class="col-sm-12 small text-warning">
       <div ng-messages="EdgeGroupForm.group_name.$error">
         <p ng-message="required">
-          <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-          This field is required.
+          <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.
         </p>
       </div>
     </div>
   </div>
 
-  <div
-    class="col-sm-12 form-section-title"
-    ng-if="$ctrl.model.Type === 'dynamic'"
-  >
+  <div class="col-sm-12 form-section-title" ng-if="$ctrl.model.Dynamic">
     Tags
   </div>
-  <div class="form-group" ng-if="$ctrl.model.Type === 'dynamic'">
+  <div class="form-group" ng-if="$ctrl.model.Dynamic">
     <tag-selector tags="$ctrl.tags" model="$ctrl.model.TagIds" on-change="$ctrl.onChangeTags"></tag-selector>
   </div>
 
@@ -121,12 +101,10 @@
       <button
         type="submit"
         class="btn btn-primary btn-sm"
-        ng-disabled="$ctrl.actionInProgress || !EdgeGroupForm.$valid || ($ctrl.model.Type === 'static' && !$ctrl.model.Endpoints.length) || ($ctrl.model.Type === 'dynamic' && !$ctrl.model.Tags.length)"
+        ng-disabled="$ctrl.actionInProgress || !EdgeGroupForm.$valid || (!$ctrl.model.Dynamic && !$ctrl.model.Endpoints.length) || ($ctrl.model.Dynamic && !$ctrl.model.TagIds.length)"
         button-spinner="$ctrl.actionInProgress"
       >
-        <span ng-hide="$ctrl.actionInProgress"
-          >{{ $ctrl.formActionLabel }}</span
-        >
+        <span ng-hide="$ctrl.actionInProgress">{{ $ctrl.formActionLabel }}</span>
         <span ng-show="$ctrl.actionInProgress">In progress...</span>
       </button>
     </div>
