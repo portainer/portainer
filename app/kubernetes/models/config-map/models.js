@@ -1,4 +1,4 @@
-export const KubernetesPortainerConfigMapNamespace = 'ns-portainer';
+export const KubernetesPortainerConfigMapNamespace = 'portainer';
 export const KubernetesPortainerConfigMapConfigName = 'portainer-config';
 export const KubernetesPortainerConfigMapAccessKey = 'NamespaceAccessPolicies';
 

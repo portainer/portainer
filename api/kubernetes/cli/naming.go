@@ -4,7 +4,7 @@ import "fmt"
 
 const (
 	defaultNamespace                    = "default"
-	portainerNamespace                  = "ns-portainer"
+	portainerNamespace                  = "portainer"
 	portainerUserCRName                 = "portainer-cr-user"
 	portainerUserCRBName                = "portainer-crb-user"
 	portainerUserServiceAccountPrefix   = "portainer-sa-user"
