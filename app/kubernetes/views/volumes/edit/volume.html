@@ -76,7 +76,7 @@
     </div>
   </div>
 
-  <div class="row">
+  <div class="row" ng-if="ctrl.isUsed(item)">
     <div class="col-sm-12">
       <kubernetes-volume-applications-datatable dataset="ctrl.volume.Applications" table-key="kubernetes.volume.applications" order-by="Name" refresh-callback="ctrl.getVolume"
         title-text="Applications using this volume" title-icon="fa-laptop-code">
