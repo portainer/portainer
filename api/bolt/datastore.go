@@ -5,6 +5,7 @@ import (
 	"path"
 	"time"
 
+	"github.com/portainer/portainer/api/bolt/edgegroup"
 	"github.com/portainer/portainer/api/bolt/tunnelserver"
 
 	"github.com/boltdb/bolt"
@@ -42,6 +43,7 @@ type Store struct {
 	fileService            portainer.FileService
 	RoleService            *role.Service
 	DockerHubService       *dockerhub.Service
+	EdgeGroupService       *edgegroup.Service
 	EndpointGroupService   *endpointgroup.Service
 	EndpointService        *endpoint.Service
 	ExtensionService       *extension.Service
@@ -160,6 +162,12 @@ func (store *Store) initServices() error {
 		return err
 	}
 	store.DockerHubService = dockerhubService
+
+	edgeGroupService, err := edgegroup.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.EdgeGroupService = edgeGroupService
 
 	endpointgroupService, err := endpointgroup.NewService(store.db)
 	if err != nil {
