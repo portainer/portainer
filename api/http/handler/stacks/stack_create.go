@@ -66,6 +66,10 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 	case portainer.DockerComposeStack:
 		return handler.createComposeStack(w, r, method, endpoint, tokenData.ID)
 	case portainer.KubernetesStack:
+		if tokenData.Role != portainer.AdministratorRole {
+			return &httperror.HandlerError{http.StatusForbidden, "Access denied", portainer.ErrUnauthorized}
+		}
+
 		return handler.createKubernetesStack(w, r, endpoint)
 	}
 

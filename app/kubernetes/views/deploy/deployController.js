@@ -5,14 +5,13 @@ import {KubernetesDeployManifestTypes} from 'Kubernetes/models/deploy';
 
 class KubernetesDeployController {
   /* @ngInject */
-  constructor($async, $state, Notifications, EndpointProvider, KubernetesNamespaceService, StackService, Authentication) {
+  constructor($async, $state, Notifications, EndpointProvider, KubernetesNamespaceService, StackService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
     this.EndpointProvider = EndpointProvider;
     this.KubernetesNamespaceService = KubernetesNamespaceService;
     this.StackService = StackService;
-    this.Authentication = Authentication;
 
     this.onInit = this.onInit.bind(this);
     this.deployAsync = this.deployAsync.bind(this);
@@ -75,11 +74,6 @@ class KubernetesDeployController {
   }
 
   async onInit() {
-    if (!this.Authentication.isAdmin()) {
-      this.$state.go('portainer.home');
-      return;
-    }
-
     this.state = {
       DeployType: KubernetesDeployManifestTypes.KUBERNETES,
       tabLogsDisabled: true,
