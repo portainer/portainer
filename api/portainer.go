@@ -84,6 +84,18 @@ type (
 		Password       string `json:"Password,omitempty"`
 	}
 
+	// EdgeGroup represents an edge group
+	EdgeGroup struct {
+		ID        EdgeGroupID  `json:"Id"`
+		Name      string       `json:"Name"`
+		Dynamic   bool         `json:"Dynamic"`
+		TagIDs    []TagID      `json:"TagIds"`
+		Endpoints []EndpointID `json:"Endpoints"`
+	}
+
+	// EdgeGroupID represents an edge group identifier
+	EdgeGroupID int
+
 	// EdgeSchedule represents a scheduled job that can run on Edge environments.
 	EdgeSchedule struct {
 		ID             ScheduleID   `json:"Id"`
@@ -921,6 +933,15 @@ type (
 		WebhookByResourceID(resourceID string) (*Webhook, error)
 		WebhookByToken(token string) (*Webhook, error)
 		DeleteWebhook(serviceID WebhookID) error
+	}
+
+	// EdgeGroupService represents a service to manage edge groups
+	EdgeGroupService interface {
+		EdgeGroups() ([]EdgeGroup, error)
+		EdgeGroup(ID EdgeGroupID) (*EdgeGroup, error)
+		CreateEdgeGroup(group *EdgeGroup) error
+		UpdateEdgeGroup(ID EdgeGroupID, group *EdgeGroup) error
+		DeleteEdgeGroup(ID EdgeGroupID) error
 	}
 )
 
