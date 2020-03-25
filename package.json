@@ -29,7 +29,8 @@
     "start:client": "grunt clean:client && grunt start:client",
     "dev:client": "grunt clean:client && webpack-dev-server --config=./webpack/webpack.develop.js",
     "build:server:offline": "cd ./api/cmd/portainer && CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags '-s' && mv -f portainer ../../../dist/portainer",
-    "clean:all": "grunt clean:all"
+    "clean:all": "grunt clean:all",
+    "format": "prettier --loglevel warn --write \"**/*.{js,css,md}\""
   },
   "scriptsComments": {
     "build": "Build the entire app (backend/frontend) in development mode",
@@ -120,12 +121,15 @@
     "gruntify-eslint": "^3.1.0",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
+    "husky": ">=4",
     "image-webpack-loader": "^4.5.0",
+    "lint-staged": ">=10",
     "load-grunt-tasks": "^3.5.2",
     "lodash-webpack-plugin": "^0.11.5",
     "mini-css-extract-plugin": "^0.4.4",
     "ngtemplate-loader": "^2.0.1",
     "postcss-loader": "^3.0.0",
+    "prettier": "^2.0.2",
     "speed-measure-webpack-plugin": "^1.2.3",
     "style-loader": "^0.23.1",
     "url-loader": "^1.1.1",
@@ -137,5 +141,14 @@
   },
   "resolutions": {
     "jquery": "^3.3.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.js": "eslint --cache --fix",
+    "*.{js,css,md}": "prettier --write"
   }
 }
