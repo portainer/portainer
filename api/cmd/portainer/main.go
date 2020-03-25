@@ -661,6 +661,7 @@ func main() {
 		UserService:            store.UserService,
 		TeamService:            store.TeamService,
 		TeamMembershipService:  store.TeamMembershipService,
+		EdgeGroupService:       store.EdgeGroupService,
 		EndpointService:        store.EndpointService,
 		EndpointGroupService:   store.EndpointGroupService,
 		ExtensionService:       store.ExtensionService,
