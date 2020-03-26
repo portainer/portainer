@@ -151,15 +151,16 @@ func (server *Server) Start() error {
 	edgeGroupsHandler.EdgeGroupService = server.EdgeGroupService
 
 	var endpointHandler = endpoints.NewHandler(requestBouncer, server.EndpointManagement)
+	endpointHandler.AuthorizationService = authorizationService
+	endpointHandler.ProxyManager = proxyManager
 	endpointHandler.EndpointService = server.EndpointService
 	endpointHandler.EndpointGroupService = server.EndpointGroupService
 	endpointHandler.FileService = server.FileService
-	endpointHandler.ProxyManager = proxyManager
-	endpointHandler.Snapshotter = server.Snapshotter
 	endpointHandler.JobService = server.JobService
 	endpointHandler.ReverseTunnelService = server.ReverseTunnelService
 	endpointHandler.SettingsService = server.SettingsService
-	endpointHandler.AuthorizationService = authorizationService
+	endpointHandler.Snapshotter = server.Snapshotter
+	endpointHandler.TagAssociationService = server.TagAssociationService
 
 	var endpointGroupHandler = endpointgroups.NewHandler(requestBouncer)
 	endpointGroupHandler.AuthorizationService = authorizationService

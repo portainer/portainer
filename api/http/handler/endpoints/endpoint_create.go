@@ -377,6 +377,20 @@ func (handler *Handler) saveEndpointAndUpdateAuthorizations(endpoint *portainer.
 		return handler.AuthorizationService.UpdateUsersAuthorizations()
 	}
 
+	for _, tagID := range endpoint.TagIDs {
+		tagAssociation, err := handler.TagAssociationService.TagAssociationByTagID(tagID)
+		if err != nil {
+			return err
+		}
+
+		tagAssociation.Endpoints[endpoint.ID] = true
+
+		err = handler.TagAssociationService.UpdateTagAssociation(tagID, tagAssociation)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 

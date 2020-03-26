@@ -29,16 +29,17 @@ type Handler struct {
 	*mux.Router
 	authorizeEndpointManagement bool
 	requestBouncer              *security.RequestBouncer
+	ProxyManager                *proxy.Manager
+	AuthorizationService        *portainer.AuthorizationService
 	EndpointService             portainer.EndpointService
 	EndpointGroupService        portainer.EndpointGroupService
 	FileService                 portainer.FileService
-	ProxyManager                *proxy.Manager
-	Snapshotter                 portainer.Snapshotter
 	JobService                  portainer.JobService
 	ReverseTunnelService        portainer.ReverseTunnelService
 	SettingsService             portainer.SettingsService
+	Snapshotter                 portainer.Snapshotter
 	TagsService                 portainer.TagService
-	AuthorizationService        *portainer.AuthorizationService
+	TagAssociationService       portainer.TagAssociationService
 }
 
 // NewHandler creates a handler to manage endpoint operations.
