@@ -28,6 +28,7 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 
 	groupID, _ := request.RetrieveNumericQueryParameter(r, "groupId", true)
 	limit, _ := request.RetrieveNumericQueryParameter(r, "limit", true)
+	endpointType, _ := request.RetrieveNumericQueryParameter(r, "type", true)
 
 	endpointGroups, err := handler.EndpointGroupService.EndpointGroups()
 	if err != nil {
@@ -52,6 +53,10 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 
 	if search != "" {
 		filteredEndpoints = filterEndpointsBySearchCriteria(filteredEndpoints, endpointGroups, search)
+	}
+
+	if endpointType != 0 {
+		filteredEndpoints = filterEndpointsByType(filteredEndpoints, portainer.EndpointType(endpointType))
 	}
 
 	filteredEndpointCount := len(filteredEndpoints)
@@ -155,4 +160,15 @@ func endpointGroupMatchSearchCriteria(endpoint *portainer.Endpoint, endpointGrou
 	}
 
 	return false
+}
+
+func filterEndpointsByType(endpoints []portainer.Endpoint, endpointType portainer.EndpointType) []portainer.Endpoint {
+	filteredEndpoints := make([]portainer.Endpoint, 0)
+
+	for _, endpoint := range endpoints {
+		if endpoint.Type == endpointType {
+			filteredEndpoints = append(filteredEndpoints, endpoint)
+		}
+	}
+	return filteredEndpoints
 }
