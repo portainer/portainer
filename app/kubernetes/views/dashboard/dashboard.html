@@ -71,6 +71,32 @@
         </rd-widget>
       </a>
     </div>
+    <div class="col-xs-12 col-md-6" ng-if="ctrl.configurations">
+      <a ui-sref="kubernetes.configurations">
+        <rd-widget>
+          <rd-widget-body>
+            <div class="widget-icon blue pull-left">
+              <i class="fa fa-file-code"></i>
+            </div>
+            <div class="title">{{ ctrl.configurations.length }}</div>
+            <div class="comment">{{ ctrl.configurations.length === 1 ? 'Configuration' : 'Configurations' }}</div>
+          </rd-widget-body>
+        </rd-widget>
+      </a>
+    </div>
+    <div class="col-xs-12 col-md-6" ng-if="ctrl.volumes">
+      <a ui-sref="kubernetes.volumes">
+        <rd-widget>
+          <rd-widget-body>
+            <div class="widget-icon blue pull-left">
+              <i class="fa fa-database"></i>
+            </div>
+            <div class="title">{{ ctrl.volumes.length }}</div>
+            <div class="comment">{{ ctrl.volumes.length === 1 ? 'Volume' : 'Volumes' }}</div>
+          </rd-widget-body>
+        </rd-widget>
+      </a>
+    </div>
   </div>
 
 </div>
