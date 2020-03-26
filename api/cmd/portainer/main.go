@@ -672,6 +672,7 @@ func main() {
 		StackService:           store.StackService,
 		ScheduleService:        store.ScheduleService,
 		TagService:             store.TagService,
+		TagAssociationService:  store.TagAssociationService,
 		TemplateService:        store.TemplateService,
 		WebhookService:         store.WebhookService,
 		SwarmStackManager:      swarmStackManager,

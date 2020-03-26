@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/portainer/portainer/api/bolt/edgegroup"
+	"github.com/portainer/portainer/api/bolt/tagassociation"
 	"github.com/portainer/portainer/api/bolt/tunnelserver"
 
 	"github.com/boltdb/bolt"
@@ -52,6 +53,7 @@ type Store struct {
 	SettingsService        *settings.Service
 	StackService           *stack.Service
 	TagService             *tag.Service
+	TagAssociationService  *tagassociation.Service
 	TeamMembershipService  *teammembership.Service
 	TeamService            *team.Service
 	TemplateService        *template.Service
@@ -131,6 +133,7 @@ func (store *Store) MigrateData() error {
 			SettingsService:        store.SettingsService,
 			StackService:           store.StackService,
 			TagService:             store.TagService,
+			TagAssociationService:  store.TagAssociationService,
 			TeamMembershipService:  store.TeamMembershipService,
 			TemplateService:        store.TemplateService,
 			UserService:            store.UserService,
@@ -216,6 +219,12 @@ func (store *Store) initServices() error {
 		return err
 	}
 	store.TagService = tagService
+
+	tagAssociationService, err := tagassociation.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.TagAssociationService = tagAssociationService
 
 	teammembershipService, err := teammembership.NewService(store.db)
 	if err != nil {

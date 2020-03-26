@@ -498,6 +498,13 @@ type (
 		Name string `json:"Name"`
 	}
 
+	// TagAssociation represent an association between tag to endpoints and endpoint groups
+	TagAssociation struct {
+		TagID          TagID                    `json:"TagID"`
+		Endpoints      map[EndpointID]bool      `json:"Endpoints"`
+		EndpointGroups map[EndpointGroupID]bool `json:"EndpointGroups"`
+	}
+
 	// TemplateID represents a template identifier
 	TemplateID int
 
@@ -796,6 +803,15 @@ type (
 		Tag(ID TagID) (*Tag, error)
 		CreateTag(tag *Tag) error
 		DeleteTag(ID TagID) error
+	}
+
+	// TagAssociationService represents a service for managing tag association data
+	TagAssociationService interface {
+		TagAssociations() ([]TagAssociation, error)
+		TagAssociationByTagID(tagID TagID) (*TagAssociation, error)
+		CreateTagAssociation(tagAssociation *TagAssociation) error
+		UpdateTagAssociation(tagID TagID, tagAssociation *TagAssociation) error
+		DeleteTagAssociation(tagID TagID) error
 	}
 
 	// TemplateService represents a service for managing template data

@@ -71,6 +71,7 @@ type Server struct {
 	StackService           portainer.StackService
 	SwarmStackManager      portainer.SwarmStackManager
 	TagService             portainer.TagService
+	TagAssociationService  portainer.TagAssociationService
 	TeamService            portainer.TeamService
 	TeamMembershipService  portainer.TeamMembershipService
 	TemplateService        portainer.TemplateService
