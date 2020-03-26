@@ -23,5 +23,9 @@ func (handler *Handler) endpointGroupInspect(w http.ResponseWriter, r *http.Requ
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint group with the specified identifier inside the database", err}
 	}
 
+	if endpointGroup.TagIDs == nil {
+		endpointGroup.TagIDs = []portainer.TagID{}
+	}
+
 	return response.JSON(w, endpointGroup)
 }
