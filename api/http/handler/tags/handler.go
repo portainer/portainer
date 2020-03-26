@@ -16,6 +16,8 @@ type Handler struct {
 	EndpointService       portainer.EndpointService
 	EndpointGroupService  portainer.EndpointGroupService
 	TagAssociationService portainer.TagAssociationService
+	EndpointService       portainer.EndpointService
+	EndpointGroupService  portainer.EndpointGroupService
 }
 
 // NewHandler creates a handler to manage tag operations.
