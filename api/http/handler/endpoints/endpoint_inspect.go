@@ -30,9 +30,5 @@ func (handler *Handler) endpointInspect(w http.ResponseWriter, r *http.Request) 
 
 	hideFields(endpoint)
 
-	if endpoint.TagIDs == nil {
-		endpoint.TagIDs = []portainer.TagID{}
-	}
-
 	return response.JSON(w, endpoint)
 }
