@@ -5,8 +5,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/portainer/portainer/api"
-
 	"github.com/portainer/libhttp/request"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -61,6 +59,10 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 			tagsMap[tag.ID] = tag.Name
 		}
 		filteredEndpoints = filterEndpointsBySearchCriteria(filteredEndpoints, endpointGroups, tagsMap, search)
+	}
+
+	if endpointType != 0 {
+		filteredEndpoints = filterEndpointsByType(filteredEndpoints, portainer.EndpointType(endpointType))
 	}
 
 	if endpointType != 0 {
