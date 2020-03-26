@@ -2,6 +2,7 @@ import angular from 'angular';
 import _ from 'lodash-es';
 import { KubernetesApplicationDeploymentTypes } from 'Kubernetes/models/application/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
+import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 
 class KubernetesApplicationController {
   /* @ngInject */
@@ -72,6 +73,10 @@ class KubernetesApplicationController {
   /**
    * EVENTS
    */
+  hasEventWarnings() {
+    return this.state.eventWarningCount;
+  }
+
   async getEventsAsync() {
     try {
       this.state.eventsLoading = true;
@@ -79,6 +84,7 @@ class KubernetesApplicationController {
       this.events = _.filter(events, (event) => event.Involved.uid === this.application.Id
         || event.Involved.uid === this.application.ServiceId
         || _.find(this.application.Pods, (pod) => pod.Id === event.Involved.uid) !== undefined);
+        this.state.eventWarningCount = KubernetesEventHelper.warningCount(this.events);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve application related events');
     } finally {
@@ -119,7 +125,8 @@ class KubernetesApplicationController {
       params: {
         namespace: this.$transition$.params().namespace,
         name: this.$transition$.params().name,
-      }
+      },
+      eventWarningCount: 0
     };
 
     this.KubernetesApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;

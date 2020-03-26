@@ -58,6 +58,10 @@
             <uib-tab index="1" classes="btn-sm">
               <uib-tab-heading>
                 <i class="fa fa-history space-right" aria-hidden="true"></i> Events
+                <div ng-if="ctrl.hasEventWarnings()">
+                  <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                  {{ ctrl.state.eventWarningCount }} warning(s)
+                </div>
               </uib-tab-heading>
               <kubernetes-events-datatable title-text="Events" title-icon="fa-history" dataset="ctrl.events"
                 table-key="kubernetes.node.events" order-by="Date" reverse-order="true" loading="ctrl.state.eventsLoading"

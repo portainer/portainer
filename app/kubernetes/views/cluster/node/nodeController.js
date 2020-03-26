@@ -2,6 +2,7 @@ import angular from 'angular';
 import _ from 'lodash-es';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import {KubernetesResourceReservation} from 'Kubernetes/models/resource-reservation/models';
+import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 
 class KubernetesNodeController {
   /* @ngInject */
@@ -37,11 +38,16 @@ class KubernetesNodeController {
     return this.$async(this.getNodeAsync);
   }
 
+  hasEventWarnings() {
+    return this.state.eventWarningCount;
+  }
+
   async getEventsAsync() {
     try {
       this.state.eventsLoading = true;
       this.events = await this.KubernetesEventService.get();
       this.events = _.filter(this.events.items, (item) => item.involvedObject.kind === 'Node');
+      this.state.eventWarningCount = KubernetesEventHelper.warningCount(this.events);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve node events');
     } finally {
@@ -96,7 +102,8 @@ class KubernetesNodeController {
       eventsLoading: true,
       applicationsLoading: true,
       showEditorTab: false,
-      viewReady: false
+      viewReady: false,
+      eventWarningCount: 0
     };
 
     await this.getNode();

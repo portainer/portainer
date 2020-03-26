@@ -3,6 +3,7 @@ import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import { KubernetesResourceQuotaDefaults, KubernetesResourceQuota } from 'Kubernetes/models/resource-quota/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
+import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 
 function megaBytesValue(mem) {
   return Math.floor(mem / 1000 / 1000);
@@ -100,10 +101,15 @@ class KubernetesResourcePoolController {
     return this.$async(this.updateResourcePoolAsync);
   }
 
+  hasEventWarnings() {
+    return this.state.eventWarningCount;
+  }
+
   async getEventsAsync() {
     try {
       this.state.eventsLoading = true;
       this.events = await this.KubernetesEventService.get(this.pool.Namespace.Name);
+      this.state.eventWarningCount = KubernetesEventHelper.warningCount(this.events);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve resource pool related events');
     } finally {
@@ -160,6 +166,7 @@ class KubernetesResourcePoolController {
         eventsLoading: true,
         applicationsLoading: true,
         viewReady: false,
+        eventWarningCount: 0
       };
 
       const name = this.$transition$.params().id;

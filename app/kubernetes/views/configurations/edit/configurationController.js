@@ -2,6 +2,7 @@ import angular from 'angular';
 import {KubernetesConfigurationFormValues, KubernetesConfigurationFormValuesDataEntry} from 'Kubernetes/models/configuration/formvalues';
 import {KubernetesConfigurationTypes} from 'Kubernetes/models/configuration/models';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
+import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 import _ from 'lodash-es';
 
 class KubernetesConfigurationController {
@@ -156,11 +157,16 @@ class KubernetesConfigurationController {
     return this.$async(this.getApplicationsAsync, namespace);
   }
 
+  hasEventWarnings() {
+    return this.state.eventWarningCount;
+  }
+
   async getEventsAsync(namespace) {
     try {
       this.state.eventsLoading = true;
       this.events = await this.KubernetesEventService.get(namespace);
       this.events = _.filter(this.events, (event) => event.Involved.uid === this.configuration.Id);
+      this.state.eventWarningCount = KubernetesEventHelper.warningCount(this.events);
     } catch(err) {
       this.Notifications('Failure', err, 'Unable to retrieve events');
     } finally {
@@ -180,7 +186,8 @@ class KubernetesConfigurationController {
         applicationsLoading: true,
         eventsLoading: true,
         showEditorTab: false,
-        viewReady: false
+        viewReady: false,
+        eventWarningCount: 0
       };
 
       this.formValues = new KubernetesConfigurationFormValues();

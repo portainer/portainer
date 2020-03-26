@@ -1,6 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
+import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 
 class KubernetesVolumeController {
   /* @ngInject */
@@ -56,11 +57,16 @@ class KubernetesVolumeController {
   /**
    * EVENTS
    */
+  hasEventWarnings() {
+    return this.state.eventWarningCount;
+  }
+
   async getEventsAsync() {
     try {
       this.state.eventsLoading = true;
       const events = await this.KubernetesEventService.get(this.state.namespace);
       this.events = _.filter(events, (event) => event.Involved.uid === this.volume.PersistentVolumeClaim.Id);
+      this.state.eventWarningCount = KubernetesEventHelper.warningCount(this.events);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve application related events');
     } finally {
@@ -82,7 +88,8 @@ class KubernetesVolumeController {
       eventsLoading: true,
       viewReady: false,
       namespace: this.$transition$.params().namespace,
-      name: this.$transition$.params().name
+      name: this.$transition$.params().name,
+      eventWarningCount: 0
     };
 
     try {
