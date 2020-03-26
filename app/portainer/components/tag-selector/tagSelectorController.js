@@ -27,24 +27,22 @@ class TagSelectorController {
   }
 
   filterTags(searchValue) {
-    let filteredTags = this.tags.filter(tag => !this.model.includes(tag.Id));
+    let filteredTags = _.filter(this.tags, tag => !_.includes(this.model, tag.Id));
     if (!searchValue) {
       return filteredTags.slice(0, 7);
     }
 
-    const exactTag = this.tags.find(tag => tag.Name === searchValue);
-    filteredTags = filteredTags.filter(
-      tag => tag.Name.toLowerCase().includes(searchValue.toLowerCase())
-    );
+    const exactTag = _.find(this.tags, tag => tag.Name === searchValue);
+    filteredTags = _.filter(filteredTags, tag => _.includes(tag.Name.toLowerCase(), searchValue.toLowerCase()));
     if (exactTag || !this.allowCreate) {
       return filteredTags.slice(0, 7);
     }
-    
+
     return filteredTags.slice(0, 6).concat({ Name: `Create "${searchValue}"`, create: true, value: searchValue });
   }
 
   generateSelectedTags(model, tags) {
-    this.state.selectedTags = model.map(id => tags.find(t => t.Id === id));
+    this.state.selectedTags = _.map(model, id => _.find(tags, t => t.Id === id));
   }
 
   $onInit() {
