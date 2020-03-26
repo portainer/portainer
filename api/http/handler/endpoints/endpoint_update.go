@@ -74,7 +74,36 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if payload.TagIDs != nil {
+		tagsMap := make(map[portainer.TagID]bool)
+		for _, tagID := range payload.TagIDs {
+			tagsMap[tagID] = true
+		}
+		for _, tagID := range endpoint.TagIDs {
+			_, alreadyExist := tagsMap[tagID]
+			if alreadyExist {
+				delete(tagsMap, tagID)
+			} else {
+				tagsMap[tagID] = false
+			}
+		}
 		endpoint.TagIDs = payload.TagIDs
+		for tagID, value := range tagsMap {
+			tagAssociation, err := handler.TagAssociationService.TagAssociationByTagID(tagID)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a tag association inside the database", err}
+			}
+
+			if value {
+				tagAssociation.Endpoints[endpoint.ID] = true
+			} else {
+				delete(tagAssociation.Endpoints, endpoint.ID)
+			}
+
+			err = handler.TagAssociationService.UpdateTagAssociation(tagID, tagAssociation)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist tag association changes inside the database", err}
+			}
+		}
 	}
 
 	updateAuthorizations := false
