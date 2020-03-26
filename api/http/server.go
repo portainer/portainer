@@ -162,9 +162,10 @@ func (server *Server) Start() error {
 	endpointHandler.AuthorizationService = authorizationService
 
 	var endpointGroupHandler = endpointgroups.NewHandler(requestBouncer)
+	endpointGroupHandler.AuthorizationService = authorizationService
 	endpointGroupHandler.EndpointGroupService = server.EndpointGroupService
 	endpointGroupHandler.EndpointService = server.EndpointService
-	endpointGroupHandler.AuthorizationService = authorizationService
+	endpointGroupHandler.TagAssociationService = server.TagAssociationService
 
 	var endpointProxyHandler = endpointproxy.NewHandler(requestBouncer)
 	endpointProxyHandler.EndpointService = server.EndpointService
