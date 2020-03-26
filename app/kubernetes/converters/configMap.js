@@ -1,8 +1,7 @@
 import _ from 'lodash-es';
-import { KubernetesConfigMap, KubernetesPortainerConfigMapAccessKey } from 'Kubernetes/models/config-map/models';
-import { KubernetesConfigMapCreatePayload, KubernetesConfigMapUpdatePayload } from 'Kubernetes/models/config-map/payloads';
-import { UserAccessViewModel, TeamAccessViewModel } from 'Portainer/models/access';
 import YAML from 'yaml';
+import { KubernetesConfigMap } from 'Kubernetes/models/config-map/models';
+import { KubernetesConfigMapCreatePayload, KubernetesConfigMapUpdatePayload } from 'Kubernetes/models/config-map/payloads';
 
 class KubernetesConfigMapConverter {
   /**
@@ -15,34 +14,8 @@ class KubernetesConfigMapConverter {
     res.Namespace = data.metadata.namespace;
     res.CreationDate = data.metadata.creationTimestamp;
     res.Yaml = yaml ? yaml.data : '';
-    res.Data = {};
-    const resData = data.data || {};
-    _.forIn(resData, (value, key) => {
-      try {
-        res.Data[key] = JSON.parse(value)
-      } catch (err) {
-        res.Data[key] = value;
-      }
-    });
+    res.Data = data.data;
     return res;
-  }
-
-  /**
-   * 
-   */
-  static modifiyNamespaceAccesses(configMap, namespace, accesses) {
-    configMap.Data[KubernetesPortainerConfigMapAccessKey][namespace] = {
-      UserAccessPolicies: {},
-      TeamAccessPolicies: {}
-    };
-    _.forEach(accesses, (item) => {
-      if (item instanceof UserAccessViewModel) {
-        configMap.Data[KubernetesPortainerConfigMapAccessKey][namespace].UserAccessPolicies[item.Id] = { RoleId: 0 };
-      } else if (item instanceof TeamAccessViewModel) {
-        configMap.Data[KubernetesPortainerConfigMapAccessKey][namespace].TeamAccessPolicies[item.Id] = { RoleId: 0 };
-      }
-    });
-    return configMap;
   }
 
   /**
@@ -64,8 +37,7 @@ class KubernetesConfigMapConverter {
     const res = new KubernetesConfigMapCreatePayload();
     res.metadata.name = data.Name;
     res.metadata.namespace = data.Namespace;
-    res.data = {};
-    _.forIn(data.Data, (value, key) => res.data[key] = JSON.stringify(value));
+    res.data = data.Data;
     return res;
   }
 
@@ -77,8 +49,7 @@ class KubernetesConfigMapConverter {
     res.metadata.uid = data.Id;
     res.metadata.name = data.Name;
     res.metadata.namespace = data.Namespace;
-    res.data = {};
-    _.forIn(data.Data, (value, key) => res.data[key] = JSON.stringify(value));
+    res.data = data.Data;
     return res;
   }
 

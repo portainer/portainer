@@ -2,7 +2,7 @@ import angular from 'angular';
 import _ from 'lodash-es';
 import { KubernetesPortainerConfigMapConfigName, KubernetesPortainerConfigMapNamespace, KubernetesPortainerConfigMapAccessKey } from 'Kubernetes/models/config-map/models';
 import { UserAccessViewModel, TeamAccessViewModel } from 'Portainer/models/access';
-import KubernetesConfigMapConverter from 'Kubernetes/converters/configMap';
+import KubernetesConfigMapHelper from 'Kubernetes/helpers/configMapHelper';
 
 class KubernetesResourcePoolAccessController {
   /* @ngInject */
@@ -62,6 +62,7 @@ class KubernetesResourcePoolAccessController {
       if (configMap.Id === 0) {
         configMap = this.initAccessConfigMap(configMap);
       }
+      configMap = KubernetesConfigMapHelper.parseJSONData(configMap);
 
       this.authorizedUsersAndTeams = [];
       this.accessConfigMap = configMap;
@@ -96,7 +97,7 @@ class KubernetesResourcePoolAccessController {
     try {
       this.state.actionInProgress = true;
       const newAccesses = _.concat(this.authorizedUsersAndTeams, this.formValues.multiselectOutput);
-      const accessConfigMap = KubernetesConfigMapConverter.modifiyNamespaceAccesses(angular.copy(this.accessConfigMap), this.pool.Namespace.Name, newAccesses);
+      const accessConfigMap = KubernetesConfigMapHelper.modifiyNamespaceAccesses(angular.copy(this.accessConfigMap), this.pool.Namespace.Name, newAccesses);
       await this.KubernetesConfigMapService.update(accessConfigMap);
       this.Notifications.success("Access successfully created");
       this.$state.reload();
@@ -116,7 +117,7 @@ class KubernetesResourcePoolAccessController {
     try {
       this.state.actionInProgress = true;
       const newAccesses = _.without(this.authorizedUsersAndTeams, ...selectedItems);
-      const accessConfigMap = KubernetesConfigMapConverter.modifiyNamespaceAccesses(angular.copy(this.accessConfigMap), this.pool.Namespace.Name, newAccesses);
+      const accessConfigMap = KubernetesConfigMapHelper.modifiyNamespaceAccesses(angular.copy(this.accessConfigMap), this.pool.Namespace.Name, newAccesses);
       await this.KubernetesConfigMapService.update(accessConfigMap);
       this.Notifications.success("Access successfully removed");
       this.$state.reload();
