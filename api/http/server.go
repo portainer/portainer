@@ -230,6 +230,7 @@ func (server *Server) Start() error {
 	tagHandler.TagService = server.TagService
 	tagHandler.EndpointService = server.EndpointService
 	tagHandler.EndpointGroupService = server.EndpointGroupService
+	tagHandler.TagAssociationService = server.TagAssociationService
 
 	var teamHandler = teams.NewHandler(requestBouncer)
 	teamHandler.TeamService = server.TeamService

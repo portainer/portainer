@@ -49,5 +49,14 @@ func (handler *Handler) tagCreate(w http.ResponseWriter, r *http.Request) *httpe
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the tag inside the database", err}
 	}
 
+	tagAssociation := &portainer.TagAssociation{
+		TagID: tag.ID,
+	}
+
+	err = handler.TagAssociationService.CreateTagAssociation(tagAssociation)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the tag association object inside the database", err}
+	}
+
 	return response.JSON(w, tag)
 }
