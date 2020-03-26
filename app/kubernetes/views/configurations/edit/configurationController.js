@@ -21,6 +21,7 @@ class KubernetesConfigurationController {
     this.getConfigurationAsync = this.getConfigurationAsync.bind(this);
     this.getEvents = this.getEvents.bind(this);
     this.getEventsAsync = this.getEventsAsync.bind(this);
+    this.getApplications = this.getApplications.bind(this);
     this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
     this.updateConfiguration = this.updateConfiguration.bind(this);
     this.updateConfigurationAsync = this.updateConfigurationAsync.bind(this);
@@ -141,7 +142,9 @@ class KubernetesConfigurationController {
   async getApplicationsAsync(namespace) {
     try {
       this.state.applicationsLoading = true;
-      this.applications = await this.KubernetesApplicationService.get(namespace);
+      const applications  = await this.KubernetesApplicationService.get(namespace);
+      this.configuration.Applications = KubernetesConfigurationHelper.getUsingApplications(this.configuration, applications);
+      KubernetesConfigurationHelper.setConfigurationUsed(this.configuration);
     } catch(err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve applications');
     } finally {
@@ -186,7 +189,6 @@ class KubernetesConfigurationController {
       await this.getConfiguration();
       await this.getApplications(this.configuration.Namespace);
       await this.getEvents(this.configuration.Namespace);
-      this.configuration = KubernetesConfigurationHelper.setConfigurationUsed(this.configuration, this.applications);
       this.formValues.ResourcePool = _.find(this.resourcePools, (resourcePool) => resourcePool.Namespace.Name === this.configuration.Namespace);
       this.formValues.Id = this.configuration.Id;
       this.formValues.Name = this.configuration.Name;

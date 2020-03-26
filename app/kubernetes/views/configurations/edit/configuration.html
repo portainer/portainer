@@ -190,4 +190,12 @@
       </rd-widget>
     </div>
   </div>
+
+  <div class="row" ng-if="ctrl.configuration.Used">
+    <div class="col-sm-12">
+      <kubernetes-integrated-applications-datatable dataset="ctrl.configuration.Applications" table-key="kubernetes.configurations.applications" order-by="Name"
+        refresh-callback="ctrl.getApplications" title-text="Applications using this configuration" title-icon="fa-laptop-code">
+      </kubernetes-integrated-applications-datatable>
+    </div>
+  </div>
 </div>

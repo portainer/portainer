@@ -1,5 +1,5 @@
-angular.module('portainer.kubernetes').component('kubernetesVolumeApplicationsDatatable', {
-  templateUrl: './volumeApplicationsDatatable.html',
+angular.module('portainer.kubernetes').component('kubernetesIntegratedApplicationsDatatable', {
+  templateUrl: './integratedApplicationsDatatable.html',
   controller: 'GenericDatatableController',
   bindings: {
     titleText: '@',

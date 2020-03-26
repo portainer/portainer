@@ -2,28 +2,29 @@ import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/mo
 import _ from 'lodash-es';
 
 class KubernetesConfigurationHelper {
-  static setConfigurationUsed(config, apps) {
-    _.forEach(apps, (app) => {
-      let envFind = false;
-      let volumeFind = false;
+  static getUsingApplications(config, applications) {
+    return _.filter(applications, (app) => {
+      let envFind;
+      let volumeFind;
       if (config.Type === KubernetesConfigurationTypes.CONFIGMAP) {
-        envFind = _.find(app.Env, { valueFrom: { configMapKeyRef: { name: config.Name }}});
-        volumeFind = _.find(app.Volumes, { configMap: { name: config.Name }});
+        envFind = _.find(app.Env, { valueFrom: { configMapKeyRef: { name: config.Name } } });
+        volumeFind = _.find(app.Volumes, { configMap: { name: config.Name } });
       } else {
-        envFind = _.find(app.Env, { valueFrom: { secretKeyRef: { name: config.Name }}});
-        volumeFind = _.find(app.Volumes, { secret: { secretName: config.Name }});
+        envFind = _.find(app.Env, { valueFrom: { secretKeyRef: { name: config.Name } } });
+        volumeFind = _.find(app.Volumes, { secret: { secretName: config.Name } });
       }
-      if (envFind || volumeFind) {
-        config.Used = true;
-        config.Applications.push(app);
-      }
-    })
-    return config;
+      return envFind || volumeFind;
+    });
   }
-  
-  static setConfigurationsUsed(configs, apps) {
-    _.forEach(configs, (config) => {
-      return KubernetesConfigurationHelper.setConfigurationUsed(config, apps);
+
+  static setConfigurationUsed(config) {
+    config.Used = config.Applications && config.Applications.length !== 0;
+  }
+
+  static setConfigurationsUsed(configurations, applications) {
+    _.forEach(configurations, (config) => {
+      config.Applications = KubernetesConfigurationHelper.getUsingApplications(config, applications);
+      KubernetesConfigurationHelper.setConfigurationUsed(config);
     });
   }
 }
