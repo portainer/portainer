@@ -15,6 +15,10 @@
                 </div>
                 <div class="menuContent">
                   <div>
+                    <div class="md-checkbox" ng-if="$ctrl.isAdmin">
+                      <input id="applications_setting_show_system" type="checkbox" ng-model="$ctrl.settings.showSystem" ng-change="$ctrl.onSettingsShowSystemChange()"/>
+                      <label for="applications_setting_show_system">Show system resources</label>
+                    </div>
                     <div class="md-checkbox">
                       <input id="setting_auto_refresh" type="checkbox" ng-model="$ctrl.settings.repeater.autoRefresh" ng-change="$ctrl.onSettingsRepeaterChange()"/>
                       <label for="setting_auto_refresh">Auto refresh</label>
@@ -109,7 +113,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit: $ctrl.tableKey))"
+            <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | filter:$ctrl.isDisplayed | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit: $ctrl.tableKey))"
             ng-class="{active: item.Checked}" pagination-id="$ctrl.tableKey">
               <td>
                 <span class="md-checkbox">

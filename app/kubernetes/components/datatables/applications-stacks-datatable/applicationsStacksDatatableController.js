@@ -2,14 +2,24 @@ import _ from 'lodash-es';
 import { KubernetesApplicationDeploymentTypes } from 'Kubernetes/models/application/models';
 
 angular.module('portainer.docker')
-  .controller('KubernetesApplicationsStacksDatatableController', ['$scope', '$controller', 'KubernetesNamespaceHelper', 'DatatableService',
-    function ($scope, $controller, KubernetesNamespaceHelper, DatatableService) {
+  .controller('KubernetesApplicationsStacksDatatableController', ['$scope', '$controller', 'KubernetesNamespaceHelper', 'DatatableService', 'Authentication',
+    function ($scope, $controller, KubernetesNamespaceHelper, DatatableService, Authentication) {
 
       angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
       this.state = Object.assign(this.state, {
         expandedItems: [],
         expandAll: false
       });
+
+      var ctrl = this;
+
+      this.settings = Object.assign(this.settings, {
+        showSystem: false,
+      });
+
+      this.onSettingsRepeaterChange = function() {
+        DatatableService.setDataTableSettings(this.tableKey, this.settings);
+      };
 
       /**
        * Do not allow applications in system namespaces to be selected
@@ -21,6 +31,10 @@ angular.module('portainer.docker')
       this.isSystemNamespace = function (item) {
         return KubernetesNamespaceHelper.isSystemNamespace(item.ResourcePool);
       };
+
+      this.isDisplayed = function(item) {
+        return !ctrl.isSystemNamespace(item) || ctrl.settings.showSystem;
+      }
 
       this.expandItem = function (item, expanded) {
         if (!this.itemCanExpand(item)) {
@@ -51,6 +65,7 @@ angular.module('portainer.docker')
       };
 
       this.$onInit = function () {
+        this.isAdmin = Authentication.isAdmin();
         this.KubernetesApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
         this.setDefaults();
         this.prepareTableFromDataset();

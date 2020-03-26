@@ -4,6 +4,16 @@ angular.module('portainer.docker')
 
       angular.extend(this, $controller('GenericDatatableController', {$scope: $scope}));
 
+      var ctrl = this;
+
+      this.settings = Object.assign(this.settings, {
+        showSystem: false,
+      });
+
+      this.onSettingsShowSystemChange = function() {
+        DatatableService.setDataTableSettings(this.tableKey, this.settings);
+      };
+
       this.canManageAccess = function(item) {
         return item.Namespace.Name !== 'default' && !this.isSystemNamespace(item);
       }
@@ -14,6 +24,10 @@ angular.module('portainer.docker')
 
       this.isSystemNamespace = function(item) {
         return KubernetesNamespaceHelper.isSystemNamespace(item.Namespace.Name);
+      };
+
+      this.isDisplayed = function(item) {
+        return !ctrl.isSystemNamespace(item) || ctrl.settings.showSystem;
       };
 
       /**

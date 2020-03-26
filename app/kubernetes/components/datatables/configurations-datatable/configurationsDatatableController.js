@@ -1,11 +1,25 @@
 angular.module('portainer.docker')
-  .controller('KubernetesConfigurationsDatatableController', ['$scope', '$controller', 'KubernetesNamespaceHelper', 'DatatableService',
-    function ($scope, $controller, KubernetesNamespaceHelper, DatatableService) {
+  .controller('KubernetesConfigurationsDatatableController', ['$scope', '$controller', 'KubernetesNamespaceHelper', 'DatatableService', 'Authentication',
+    function ($scope, $controller, KubernetesNamespaceHelper, DatatableService, Authentication) {
 
       angular.extend(this, $controller('GenericDatatableController', {$scope: $scope}));
 
+      var ctrl = this;
+
+      this.settings = Object.assign(this.settings, {
+        showSystem: false,
+      });
+
+      this.onSettingsShowSystemChange = function() {
+        DatatableService.setDataTableSettings(this.tableKey, this.settings);
+      };
+
       this.isSystemNamespace = function(item) {
         return KubernetesNamespaceHelper.isSystemNamespace(item.Namespace);
+      };
+
+      this.isDisplayed = function(item) {
+        return !ctrl.isSystemNamespace(item) || ctrl.settings.showSystem;
       };
 
       /**
@@ -16,6 +30,7 @@ angular.module('portainer.docker')
       }
 
       this.$onInit = function() {
+        this.isAdmin = Authentication.isAdmin();
         this.setDefaults();
         this.prepareTableFromDataset();
     

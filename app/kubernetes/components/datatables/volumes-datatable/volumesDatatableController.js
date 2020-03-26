@@ -13,6 +13,11 @@ class KubernetesVolumesDatatableController {
 
     this.onInit = this.onInit.bind(this);
     this.allowSelection = this.allowSelection.bind(this);
+    this.isDisplayed = this.isDisplayed.bind(this);
+  }
+
+  onSettingsShowSystemChange() {
+    this.DatatableService.setDataTableSettings(this.tableKey, this.settings);
   }
 
   disableRemove(item) {
@@ -27,6 +32,10 @@ class KubernetesVolumesDatatableController {
     return this.KubernetesNamespaceHelper.isSystemNamespace(item.ResourcePool.Namespace.Name);
   }
 
+  isDisplayed(item) {
+    return !this.isSystemNamespace(item) || this.showSystem;
+  }
+
   allowSelection(item) {
     return !this.disableRemove(item);
   }
@@ -34,6 +43,7 @@ class KubernetesVolumesDatatableController {
   async onInit() {
     this.setDefaults();
     this.prepareTableFromDataset();
+    this.isAdmin = this.Authentication.isAdmin();
 
     this.state.orderBy = this.orderBy;
     var storedOrder = this.DatatableService.getDataTableOrder(this.tableKey);
@@ -62,6 +72,8 @@ class KubernetesVolumesDatatableController {
       this.settings.open = false;
     }
     this.onSettingsRepeaterChange();
+
+    this.settings.showSystem = false;
   }
 
   $onInit() {
