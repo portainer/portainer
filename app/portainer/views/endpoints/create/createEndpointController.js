@@ -85,10 +85,6 @@ function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService,
     createAzureEndpoint(name, applicationId, tenantId, authenticationKey, groupId, tagIds);
   };
 
-  $scope.onChangeTags = function onChangeTags(tagIds) {
-    $scope.formValues.TagIds = tagIds;
-  }
-
   $scope.onCreateTag = async function onCreateTag(tagName) {
     const tag = await TagService.createTag(tagName);
     $scope.availableTags = $scope.availableTags.concat(tag);

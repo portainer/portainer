@@ -37,10 +37,6 @@ function EndpointController($q, $scope, $state, $transition$, $filter, clipboard
     $('#copyNotificationEdgeKey').show().fadeOut(2500);
   };
 
-  $scope.onChangeTags = function onChangeTags(tagIds) {
-    $scope.endpoint.TagIds = tagIds;
-  };
-
   $scope.onCreateTag = async function onCreateTag(tagName) {
     const tag = await TagService.createTag(tagName);
     $scope.availableTags = $scope.availableTags.concat(tag);
