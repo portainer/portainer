@@ -13,7 +13,10 @@ func (m *Migrator) updateTagsToDBVersion23() error {
 		tagAssociation := &portainer.TagAssociation{
 			TagID: tag.ID,
 		}
-		m.tagAssociationService.CreateTagAssociation(tagAssociation)
+		err = m.tagAssociationService.CreateTagAssociation(tagAssociation)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
