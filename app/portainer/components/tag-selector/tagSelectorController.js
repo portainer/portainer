@@ -1,47 +1,64 @@
+import angular from 'angular';
 import _ from 'lodash-es';
 
-angular.module('portainer.app').controller('TagSelectorController', function() {
-  this.$onInit = function() {
-    this.state.selectedTags = _.map(this.model, (id) => _.find(this.tags, (t) => t.Id === id));
-  };
+class TagSelectorController {
+  /* @ngInject */
+  constructor() {
+    this.state = {
+      selectedValue: '',
+      selectedTags: [],
+      noResult: false,
+    };
+  }
 
-  this.$onChanges = function({ model }) {
-    if (model && model.currentValue) {
-      this.state.selectedTags = model.currentValue.map(id => this.tags.find(t => t.Id === id)).filter(Boolean);
-    }
-  };
+  removeTag(tag) {
+    _.remove(this.model, id => tag.Id === id);
+    _.remove(this.state.selectedTags, {Id: tag.Id});
+  }
 
-  this.state = {
-    selectedValue: '',
-    selectedTags: [],
-    noResult: false,
-  };
-
-  this.selectTag = function($item) {
+  selectTag($item) {
     this.state.selectedValue = '';
     if ($item.create && this.allowCreate) {
       this.onCreate($item.value);
       return;
     }
-    this.onChange(this.model.concat($item.Id));
-  };
+    this.state.selectedTags.push($item);
+    this.model.push($item.Id);
+  }
 
-  this.removeTag = function removeTag(tag) {
-    _.remove(this.state.selectedTags, { Id: tag.Id });
-    _.remove(this.model, (id) => id === tag.Id);
-  };
-
-  this.getCurrentTags = function getCurrentTags(searchValue) {
+  filterTags(searchValue) {
+    let filteredTags = this.tags.filter(tag => !this.model.includes(tag.Id));
     if (!searchValue) {
-      return this.tags.filter(tag => !this.model.includes(tag.Id)).slice(0, 7);
+      return filteredTags.slice(0, 7);
     }
+
     const exactTag = this.tags.find(tag => tag.Name === searchValue);
-    const tags = this.tags.filter(
-      tag => !this.model.includes(tag.Id) && tag.Name.toLowerCase().includes(searchValue.toLowerCase())
+    filteredTags = filteredTags.filter(
+      tag => tag.Name.toLowerCase().includes(searchValue.toLowerCase())
     );
     if (exactTag || !this.allowCreate) {
-      return tags.slice(0, 7);
+      return filteredTags.slice(0, 7);
     }
-    return tags.slice(0, 6).concat({ Name: `Create "${searchValue}"`, create: true, value: searchValue });
-  };
-});
+    
+    return filteredTags.slice(0, 6).concat({ Name: `Create "${searchValue}"`, create: true, value: searchValue });
+  }
+
+  generateSelectedTags(model, tags) {
+    this.state.selectedTags = model.map(id => tags.find(t => t.Id === id));
+  }
+
+  $onInit() {
+    this.generateSelectedTags(this.model, this.tags);
+  }
+
+  $onChanges({ tags, model }) {
+    const tagsValue = tags && tags.currentValue ? tags.currentValue : this.tags;
+    const modelValue = model && model.currentValue ? model.currentValue : this.model;
+    if (modelValue && tagsValue) {
+      this.generateSelectedTags(modelValue, tagsValue);
+    }
+  }
+}
+
+export default TagSelectorController;
+angular.module('portainer.app').controller('TagSelectorController', TagSelectorController);

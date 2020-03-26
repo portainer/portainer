@@ -20,7 +20,7 @@
       type="text" ng-model="$ctrl.state.selectedValue"
       id="tags" class="form-control"
       placeholder="Select tags..."
-      uib-typeahead="tag.Id as tag.Name for tag in $ctrl.getCurrentTags($viewValue)"
+      uib-typeahead="tag.Id as tag.Name for tag in $ctrl.filterTags($viewValue)"
       typeahead-on-select="$ctrl.selectTag($item, $model, $label)"
       typeahead-no-results="$ctrl.state.noResult"
       typeahead-show-hint="true" typeahead-min-length="0"
