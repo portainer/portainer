@@ -1,31 +1,23 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import { KubernetesApplicationDeploymentTypes } from 'Kubernetes/models/application/models';
-import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 
 class KubernetesApplicationController {
   /* @ngInject */
-  constructor($async, $state, clipboard, Notifications, KubernetesApplicationService, KubernetesEventService,
-    KubernetesVolumeService, KubernetesConfigurationService) {
+  constructor($async, $state, clipboard, Notifications, KubernetesApplicationService, KubernetesEventService) {
     this.$async = $async;
     this.$state = $state;
     this.clipboard = clipboard;
     this.Notifications = Notifications;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesEventService = KubernetesEventService;
-    this.KubernetesVolumeService = KubernetesVolumeService;
-    this.KubernetesConfigurationService = KubernetesConfigurationService;
 
     this.onInit = this.onInit.bind(this);
     this.getApplication = this.getApplication.bind(this);
     this.getApplicationAsync = this.getApplicationAsync.bind(this);
     this.getEvents = this.getEvents.bind(this);
     this.getEventsAsync = this.getEventsAsync.bind(this);
-    this.getVolumes = this.getVolumes.bind(this);
-    this.getVolumesAsync = this.getVolumesAsync.bind(this);
-    this.getConfigurations = this.getConfigurations.bind(this);
-    this.getConfigurationsAsync = this.getConfigurationsAsync.bind(this);
     this.copyLoadBalancerIP = this.copyLoadBalancerIP.bind(this);
   }
 
@@ -38,36 +30,12 @@ class KubernetesApplicationController {
     $('#copyNotificationLB').show().fadeOut(2500);
   }
 
-  /**
-   * VOLUMES
-   */
-
-  async getVolumesAsync() {
-    try {
-      const volumes = await this.KubernetesVolumeService.get(this.state.params.namespace);
-      this.volumes = KubernetesApplicationHelper.getUsedVolumes(this.application, volumes);
-    } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve application related volumes');
-    }
+  hasPersistedFolders() {
+    return this.application.PersistedFolders.length;
   }
 
-  getVolumes() {
-    return this.$async(this.getVolumesAsync);
-  }
-  /**
-   * CONFIGURATIONS
-   */
-  async getConfigurationsAsync() {
-    try {
-      const configurations = await this.KubernetesConfigurationService.get(this.state.params.namespace);
-      this.configurations = KubernetesApplicationHelper.getUsedConfigurations(this.application, configurations);
-    } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve application related configurations');
-    }
-  }
-
-  getConfigurations() {
-    return this.$async(this.getConfigurationsAsync);
+  hasVolumeConfiguration() {
+    return this.application.ConfigurationVolumes.length;
   }
 
   /**
@@ -131,11 +99,7 @@ class KubernetesApplicationController {
 
     this.KubernetesApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
     await this.getApplication();
-    await Promise.all([
-      this.getEvents(),
-      this.getVolumes(),
-      this.getConfigurations()
-    ]);
+    await this.getEvents();
 
     this.state.viewReady = true;
   }

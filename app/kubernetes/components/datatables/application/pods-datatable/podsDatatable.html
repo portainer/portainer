@@ -5,7 +5,7 @@
         <div class="toolBarTitle">
           <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }}
         </div>
-        <div class="settings">
+        <div ng-if="$ctrl.refreshCallback" class="settings">
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
             <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> Settings</span>
             <div class="dropdown-menu dropdown-menu-right" uib-dropdown-menu>
@@ -16,7 +16,7 @@
                 <div class="menuContent">
                   <div>
                     <div class="md-checkbox">
-                      <input id="setting_auto_refresh" type="checkbox" ng-model="$ctrl.settings.repeater.autoRefresh" ng-change="$ctrl.onSettingsRepeaterChange()" />
+                      <input id="setting_auto_refresh" type="checkbox" ng-model="$ctrl.settings.repeater.autoRefresh" ng-change="$ctrl.onSettingsRepeaterChange()"/>
                       <label for="setting_auto_refresh">Auto refresh</label>
                     </div>
                     <div ng-if="$ctrl.settings.repeater.autoRefresh">
@@ -46,76 +46,78 @@
       </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" ng-change="$ctrl.onTextFilterChange()" placeholder="Search..." auto-focus
-          ng-model-options="{ debounce: 300 }">
+        <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" ng-change="$ctrl.onTextFilterChange()" placeholder="Search..." ng-model-options="{ debounce: 300 }">
       </div>
       <div class="table-responsive">
         <table class="table table-hover nowrap-cells">
           <thead>
             <tr>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('PersistentVolumeClaim.Name')">
+                <a ng-click="$ctrl.changeOrderBy('Name')">
                   Name
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'PersistentVolumeClaim.Name' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'PersistentVolumeClaim.Name' && $ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('ResourcePool.Namespace.Name')">
-                  Resource pool
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourcePool.Namespace.Name' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourcePool.Namespace.Name' && $ctrl.state.reverseOrder"></i>
+                <a ng-click="$ctrl.changeOrderBy('Images')">
+                  Image
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Images' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Images' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('PersistentVolumeClaim.StorageClass.Name')">
-                  Storage
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'PersistentVolumeClaim.StorageClass.Name' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'PersistentVolumeClaim.StorageClass.Name' && $ctrl.state.reverseOrder"></i>
+                <a ng-click="$ctrl.changeOrderBy('Status')">
+                  Status
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('PersistentVolumeClaim.Storage')">
-                  Size
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'PersistentVolumeClaim.Storage' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'PersistentVolumeClaim.Storage' && $ctrl.state.reverseOrder"></i>
+                <a ng-click="$ctrl.changeOrderBy('Node')">
+                  Node
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Node' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Node' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('PersistentVolumeClaim.CreationDate')">
-                  Creation Date
-                  <i class="fa fa-sort-numeric-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'PersistentVolumeClaim.CreationDate' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-numeric-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'PersistentVolumeClaim.CreationDate' && $ctrl.state.reverseOrder"></i>
+                <a ng-click="$ctrl.changeOrderBy('CreatedAt')">
+                  Creation date
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreatedAt' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreatedAt' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            <tr
-              dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))"
-              ng-class="{active: item.Checked}">
+            <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit: $ctrl.tableKey))" pagination-id="$ctrl.tableKey" >
+              <td>{{ item.Name }}</td>
+              <td><span ng-repeat="image in item.Images track by $index">{{ image }}<br/></span></td>
+              <td><span class="label label-{{ item.Status | kubernetesPodStatusColor }}">{{ item.Status }}</span></td>
               <td>
-                <a ui-sref="kubernetes.volumes.volume({ namespace: item.ResourcePool.Namespace.Name, name: item.PersistentVolumeClaim.Name })">{{ item.PersistentVolumeClaim.Name }}</a>
-                <span style="margin-left: 5px;" class="label label-info image-tag" ng-if="$ctrl.isSystemNamespace(item)">system</span>
+                <span ng-if="item.Node">
+                  <a ui-sref="kubernetes.cluster.node({ name: item.Node })">
+                    {{ item.Node }}
+                  </a>
+                </span>
+                <span ng-if="!item.Node">-</span>
               </td>
+              <td>{{ item.CreatedAt | getisodate }}</td>
               <td>
-                <a ui-sref="kubernetes.resourcePools.resourcePool({ id: item.ResourcePool.Namespace.Name })">{{ item.ResourcePool.Namespace.Name }}</a>
-              </td>
-              <td>
-                {{ item.PersistentVolumeClaim.StorageClass.Name }}
-              </td>
-              <td>
-                {{ item.PersistentVolumeClaim.Storage }}
-              </td>
-              <td>
-                {{ item.PersistentVolumeClaim.CreationDate | getisodate }}
+                <a ui-sref="kubernetes.applications.application.logs({ pod: item.Name })">
+                  <i class="fa fa-file-alt" aria-hidden="true"></i> Logs
+                </a>
+                <a ng-if="item.Status === 'Running'" ui-sref="kubernetes.applications.application.console({ pod: item.Name })" style="margin-left: 10px;">
+                  <i class="fa fa-terminal" aria-hidden="true"></i> Console
+                </a>
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
-              <td colspan="5" class="text-center text-muted">Loading...</td>
+              <td colspan="6" class="text-center text-muted">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-              <td colspan="5" class="text-center text-muted">No volume available.</td>
+              <td colspan="6" class="text-center text-muted">No pod available.</td>
             </tr>
           </tbody>
         </table>
@@ -138,7 +140,7 @@
                 <option value="100">100</option>
               </select>
             </span>
-            <dir-pagination-controls max-size="5"></dir-pagination-controls>
+            <dir-pagination-controls max-size="5" pagination-id="$ctrl.tableKey"></dir-pagination-controls>
           </form>
         </div>
       </div>

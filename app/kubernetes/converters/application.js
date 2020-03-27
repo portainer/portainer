@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
-import { KubernetesApplication, KubernetesPortainerApplicationStackNameLabel, KubernetesApplicationDeploymentTypes, KubernetesApplicationDataAccessPolicies, KubernetesApplicationTypes, KubernetesPortainerApplicationOwnerLabel } from 'Kubernetes/models/application/models';
+import { KubernetesApplication, KubernetesApplicationPersistedFolder, KubernetesApplicationConfigurationVolume, KubernetesPortainerApplicationStackNameLabel, KubernetesApplicationDeploymentTypes, KubernetesApplicationDataAccessPolicies, KubernetesApplicationTypes, KubernetesPortainerApplicationOwnerLabel } from 'Kubernetes/models/application/models';
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 
 class KubernetesApplicationConverter {
@@ -30,23 +30,68 @@ class KubernetesApplicationConverter {
       }
       return acc;
     }, limits);
-  
+
     if (service) {
       const serviceType = service.spec.type;
       res.ServiceType = serviceType;
       res.ServiceId = service.metadata.uid;
-  
+
       if (serviceType === KubernetesServiceTypes.LOAD_BALANCER) {
         if (service.status.loadBalancer.ingress && service.status.loadBalancer.ingress.length > 0) {
           res.LoadBalancerIPAddress = service.status.loadBalancer.ingress[0].ip || service.status.loadBalancer.ingress[0].hostname;
         }
       }
-  
+
       res.PublishedPorts = service.spec.ports;
     } else {
       res.PublishedPorts = [];
     }
+
     res.Volumes = data.spec.template.spec.volumes ? data.spec.template.spec.volumes : [];
+
+    res.PersistedFolders = _.map(res.Volumes, (volume) => {
+      if (volume.persistentVolumeClaim) {
+        const matchingVolumeMount = _.find(data.spec.template.spec.containers[0].volumeMounts, { name: volume.name });
+
+        if (matchingVolumeMount) {
+          const persistedFolder = new KubernetesApplicationPersistedFolder();
+          persistedFolder.persistentVolumeClaimName = volume.persistentVolumeClaim.claimName;
+          persistedFolder.mountPath = matchingVolumeMount.mountPath;
+
+          return persistedFolder;
+        }
+      }
+    });
+
+    res.ConfigurationVolumes = _.reduce(data.spec.template.spec.volumes, (acc, volume) => {
+      if (volume.configMap || volume.secret) {
+        const matchingVolumeMount = _.find(data.spec.template.spec.containers[0].volumeMounts, { name: volume.name });
+
+        if (matchingVolumeMount) {
+          let items = [];
+          let configurationName = '';
+
+          if (volume.configMap) {
+            items = volume.configMap.items;
+            configurationName = volume.configMap.name;
+          } else {
+            items = volume.secret.items;
+            configurationName = volume.secret.secretName;
+          }
+
+          _.forEach(items, (item) => {
+            const configurationVolume = new KubernetesApplicationConfigurationVolume();
+            configurationVolume.mountPath = matchingVolumeMount.mountPath + '/' + item.path;
+            configurationVolume.configurationKey = item.key;
+            configurationVolume.configurationName = configurationName;
+
+            acc.push(configurationVolume);
+          });
+        }
+      }
+
+      return acc;
+    }, []);
   }
 
   static apiDeploymentToApplication(data, service) {

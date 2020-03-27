@@ -5,7 +5,7 @@
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
 <div ng-if="ctrl.state.viewReady">
-  <div class="row" ng-if="ctrl.application">
+  <div class="row">
     <div class="col-sm-12">
       <rd-widget>
         <rd-widget-body classes="no-padding">
@@ -105,126 +105,210 @@
     </div>
   </div>
 
-  <div class="row" ng-if="ctrl.application && ctrl.application.PublishedPorts.length > 0">
+  <div class="row">
     <div class="col-sm-12">
       <rd-widget>
-        <rd-widget-header icon="fa-laptop" title-text="Accessing the application"></rd-widget-header>
         <rd-widget-body>
-          <div ng-if="ctrl.application.ServiceType === 'LoadBalancer'">
-            <div class="small text-muted" >
-              <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-              This application is exposed through an external load balancer. Use the links below to access the different ports exposed.
+
+          <div class="text-muted" style="margin-bottom: 15px;">
+            <i class="fa fa-external-link-alt" aria-hidden="true" style="margin-right: 2px;"></i> Accessing the application
+          </div>
+
+          <div class="small text-muted" ng-if="ctrl.application.PublishedPorts.length === 0" style="margin-bottom: 15px;">
+            <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+            This application is not exposing any port.
+          </div>
+
+          <div ng-if="ctrl.application.PublishedPorts.length > 0">
+
+            <div ng-if="ctrl.application.ServiceType === 'LoadBalancer'">
+              <div class="small text-muted" >
+                <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                This application is exposed through an external load balancer. Use the links below to access the different ports exposed.
+              </div>
+              <div style="margin-top: 10px;" class="small text-muted">
+                <span ng-if="!ctrl.application.LoadBalancerIPAddress">
+                  <p>
+                    Load balancer status: <i class="fa fa-cog fa-spin" style="margin-left: 2px"></i> pending
+                  </p>
+                  <p>
+                    <u>what does the "pending" status means?</u>
+                    <portainer-tooltip position="bottom" message="A pending status means that Portainer delegated the request to the provider responsible for creating the external load balancer. If it stays in pending state for long, this means that this capability might not be supported or you might have an issue with your cluster provider. Contact your cluster administrator for more information."></portainer-tooltip>
+                  </p>
+                </span>
+                <span ng-if="ctrl.application.LoadBalancerIPAddress">
+                  <p>
+                  Load balancer status: <i class="fa fa-check green-icon" style="margin-left: 2px"></i> available
+                  </p>
+                  <p>
+                  Load balancer IP address: {{ ctrl.application.LoadBalancerIPAddress }}
+                    <span class="btn btn-primary btn-xs" ng-click="ctrl.copyLoadBalancerIP()" style="margin-left: 5px;">
+                      <i class="fa fa-copy space-right" aria-hidden="true"></i>Copy
+                    </span>
+                    <span id="copyNotificationLB" style="margin-left: 7px; display: none; color: #23ae89;" class="small">
+                      <i class="fa fa-check" aria-hidden="true" ></i> copied
+                    </span>
+                  </p>
+                </span>
+              </div>
+              <div style="margin-top: 15px;">
+                <table class="table">
+                  <tbody>
+                    <tr class="text-muted">
+                      <td style="width: 50%;">Container port</td>
+                      <td style="width: 50%;">Load balancer port</td>
+                    </tr>
+                    <tr ng-repeat="port in ctrl.application.PublishedPorts track by $index">
+                      <td>{{ port.targetPort }}</td>
+                      <td>
+                          {{ port.port }}
+                        <a ng-if="ctrl.application.LoadBalancerIPAddress" ng-href="http://{{ ctrl.application.LoadBalancerIPAddress }}:{{port.port}}" target="_blank" style="margin-left: 5px">
+                          <i class="fa fa-external-link-alt" aria-hidden="true"></i> access
+                        </a>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-            <div style="margin-top: 10px;" class="small text-muted">
-              <span ng-if="!ctrl.application.LoadBalancerIPAddress">
-                <p>
-                  Load balancer status: <i class="fa fa-cog fa-spin" style="margin-left: 2px"></i> pending
-                </p>
-                <p>
-                  <u>what does the "pending" status means?</u>
-                  <portainer-tooltip position="bottom" message="A pending status means that Portainer delegated the request to the provider responsible for creating the external load balancer. If it stays in pending state for long, this means that this capability might not be supported or you might have an issue with your cluster provider. Contact your cluster administrator for more information."></portainer-tooltip>
-                </p>
-              </span>
-              <span ng-if="ctrl.application.LoadBalancerIPAddress">
-                <p>
-                Load balancer status: <i class="fa fa-check green-icon" style="margin-left: 2px"></i> available
-                </p>
-                <p>
-                Load balancer IP address: {{ ctrl.application.LoadBalancerIPAddress }}
-                  <span class="btn btn-primary btn-xs" ng-click="ctrl.copyLoadBalancerIP()" style="margin-left: 5px;">
-                    <i class="fa fa-copy space-right" aria-hidden="true"></i>Copy
-                  </span>
-                  <span id="copyNotificationLB" style="margin-left: 7px; display: none; color: #23ae89;" class="small">
-                    <i class="fa fa-check" aria-hidden="true" ></i> copied
-                  </span>
-                </p>
-              </span>
+
+            <div ng-if="ctrl.application.ServiceType === 'NodePort'">
+              <div class="small text-muted">
+                <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                This application is exposed globally on all nodes of your cluster. It can be reached using the IP address of any node in your cluster using the port configuration below.
+              </div>
+              <div style="margin-top: 15px;">
+                <table class="table">
+                  <tbody>
+                    <tr class="text-muted">
+                      <td style="width: 50%;">Container port</td>
+                      <td style="width: 50%;">Cluster node port</td>
+                    </tr>
+                    <tr ng-repeat="port in ctrl.application.PublishedPorts track by $index">
+                      <td>{{ port.targetPort }}</td>
+                      <td>{{ port.nodePort }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-            <div style="margin-top: 20px;">
+
+            <div ng-if="ctrl.application.ServiceType === 'ClusterIP'">
+              <div class="small text-muted">
+                <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                This application is only available for internal usage inside the cluster. It can be reached through the application name <code>{{ ctrl.application.Name }}</code> using the port configuration below.
+              </div>
+              <div style="margin-top: 15px;">
+                <table class="table">
+                  <tbody>
+                    <tr class="text-muted">
+                      <td style="width: 50%;">Container port</td>
+                      <td style="width: 50%;">Application port</td>
+                    </tr>
+                    <tr ng-repeat="port in ctrl.application.PublishedPorts track by $index">
+                      <td>{{ port.targetPort }}</td>
+                      <td>{{ port.port }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="text-muted" style="margin-bottom: 15px; margin-top: 35px;">
+            <i class="fa fa-file-code" aria-hidden="true" style="margin-right: 2px;"></i> Configuration
+          </div>
+
+          <div class="small text-muted" ng-if="!ctrl.application.Env && !ctrl.hasVolumeConfiguration()" style="margin-bottom: 15px;">
+            <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+            This application is not using any environment variable or configuration.
+          </div>
+
+          <div ng-if="ctrl.application.Env.length > 0">
+            <div>
               <table class="table">
                 <tbody>
                   <tr class="text-muted">
-                    <td>Container port</td>
-                    <td>Load balancer port</td>
+                    <td style="width: 50%;">Environment variable</td>
+                    <td style="width: 50%;">Value</td>
                   </tr>
-                  <tr ng-repeat="port in ctrl.application.PublishedPorts track by $index">
-                    <td>{{ port.targetPort }}</td>
+                  <tr ng-repeat="envvar in ctrl.application.Env track by $index">
                     <td>
-                        {{ port.port }}
-                      <a ng-if="ctrl.application.LoadBalancerIPAddress" ng-href="http://{{ ctrl.application.LoadBalancerIPAddress }}:{{port.port}}" target="_blank" style="margin-left: 5px">
-                        <i class="fa fa-external-link-alt" aria-hidden="true"></i> access
-                      </a>
+                      {{ envvar.name }}
+                      <span ng-if="envvar.valueFrom.configMapKeyRef || envvar.valueFrom.secretKeyRef"><i class="fa fa-file-code" aria-hidden="true"></i></span>
+                    </td>
+                    <td>
+                      <span ng-if="envvar.value">{{ envvar.value }}</span>
+                      <span ng-if="envvar.valueFrom.configMapKeyRef"><code>{{ envvar.valueFrom.configMapKeyRef.key }}</code> from <a ui-sref="kubernetes.configurations.configuration({ name: envvar.valueFrom.configMapKeyRef.name, namespace: ctrl.application.ResourcePool })"><i class="fa fa-file-code" aria-hidden="true"></i> {{ envvar.valueFrom.configMapKeyRef.name }}</a></span>
+                      <span ng-if="envvar.valueFrom.secretKeyRef"><code>{{ envvar.valueFrom.secretKeyRef.key }}</code> from <a ui-sref="kubernetes.configurations.configuration({ name: envvar.valueFrom.secretKeyRef.name, namespace: ctrl.application.ResourcePool })"><i class="fa fa-file-code" aria-hidden="true"></i> {{ envvar.valueFrom.secretKeyRef.name }}</a></span>
                     </td>
                   </tr>
                 </tbody>
               </table>
             </div>
           </div>
-          <div ng-if="ctrl.application.ServiceType === 'NodePort'">
-            <div class="small text-muted">
-              <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-              This application is exposed globally on all nodes of your cluster. It can be reached using the IP address of any node in your cluster using the port configuration below.
-            </div>
-            <div style="margin-top: 20px;">
+
+          <div ng-if="ctrl.hasVolumeConfiguration()">
+            <table class="table">
+              <tbody>
+                <tr class="text-muted">
+                  <td style="width: 50%;">Configuration path</td>
+                  <td style="width: 50%;">Value</td>
+                </tr>
+
+                <tr ng-repeat="volume in ctrl.application.ConfigurationVolumes track by $index" style="border-top: 0">
+                  <td>
+                    {{ volume.mountPath }}
+                  </td>
+                  <td>
+                    <code>{{ volume.configurationKey }}</code> from <a ui-sref="kubernetes.configurations.configuration({ name: volume.configurationName, namespace: ctrl.application.ResourcePool })"><i class="fa fa-file-code" aria-hidden="true"></i> {{ volume.configurationName }}</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="text-muted" style="margin-bottom: 15px; margin-top: 35px;">
+            <i class="fa fa-database" aria-hidden="true" style="margin-right: 2px;"></i> Data persistence
+          </div>
+
+          <div class="small text-muted" ng-if="!ctrl.hasPersistedFolders()">
+            <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+            This application has no persisted folders.
+          </div>
+
+          <div ng-if="ctrl.hasPersistedFolders()">
+            <div ng-if="ctrl.hasPersistedFolders()">
               <table class="table">
                 <tbody>
                   <tr class="text-muted">
-                    <td>Container port</td>
-                    <td>Cluster node port</td>
+                    <td style="width: 50%;">Persisted folder</td>
+                    <td style="width: 50%;">Volume</td>
                   </tr>
-                  <tr ng-repeat="port in ctrl.application.PublishedPorts track by $index">
-                    <td>{{ port.targetPort }}</td>
-                    <td>{{ port.nodePort }}</td>
+                  <tr ng-repeat="volume in ctrl.application.PersistedFolders track by $index">
+                    <td>
+                      {{ volume.mountPath }}
+                    </td>
+                    <td>
+                      <a ui-sref="kubernetes.volumes.volume({ name: volume.persistentVolumeClaimName, namespace: ctrl.application.ResourcePool })">{{ volume.persistentVolumeClaimName }}</a>
+                    </td>
                   </tr>
                 </tbody>
               </table>
             </div>
           </div>
-          <div ng-if="ctrl.application.ServiceType === 'ClusterIP'">
-            <div class="small text-muted">
-              <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-              This application is only available for internal usage inside the cluster. It can be reached through the application name <code>{{ ctrl.application.Name }}</code> using the port configuration below.
-            </div>
-            <div style="margin-top: 20px;">
-              <table class="table">
-                <tbody>
-                  <tr class="text-muted">
-                    <td>Container port</td>
-                    <td>Application port</td>
-                  </tr>
-                  <tr ng-repeat="port in ctrl.application.PublishedPorts track by $index">
-                    <td>{{ port.targetPort }}</td>
-                    <td>{{ port.port }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+
         </rd-widget-body>
       </rd-widget>
     </div>
   </div>
 
-  <div class="row" ng-if="ctrl.application">
+  <div class="row">
     <div class="col-sm-12">
       <kubernetes-pods-datatable title-text="Application pods" title-icon="fa-server" dataset="ctrl.application.Pods" table-key="kubernetes.application.pods" order-by="Name">
       </kubernetes-pods-datatable>
     </div>
   </div>
 
-  <div class="row" ng-if="ctrl.volumes && ctrl.volumes.length > 0">
-    <div class="col-sm-12">
-      <kubernetes-application-volumes-datatable title-text="Application volumes" title-icon="fa-database" dataset="ctrl.volumes" table-key="kubernetes.application.volumes"
-        order-by="Name">
-      </kubernetes-application-volumes-datatable>
-    </div>
-  </div>
-
-  <div class="row" ng-if="ctrl.configurations && ctrl.configurations.length > 0">
-    <div class="col-sm-12">
-      <kubernetes-application-configurations-datatable title-text="Application configurations" title-icon="fa-file-code" dataset="ctrl.configurations"
-        table-key="kubernetes.application.configurations" order-by="Name">
-      </kubernetes-application-configurations-datatable>
-    </div>
-  </div>
 </div>

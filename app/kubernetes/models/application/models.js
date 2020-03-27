@@ -48,6 +48,9 @@ const _KubernetesApplication = Object.freeze({
   ServiceId: '',
   PublishedPorts: [],
   Volumes: [],
+  Env: [],
+  PersistedFolders: [], // KubernetesApplicationPersistedFolder list
+  ConfigurationVolumes: [], // KubernetesApplicationConfigurationVolume list
   DeploymentType: 'Unknown',
   DataAccessPolicy: 'Unknown',
   ApplicationType: 'Unknown',
@@ -59,5 +62,34 @@ const _KubernetesApplication = Object.freeze({
 export class KubernetesApplication {
   constructor() {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesApplication)));
+  }
+}
+
+/**
+ * _KubernetesApplicationPersistedFolder Model
+ */
+const _KubernetesApplicationPersistedFolder = Object.freeze({
+  persistentVolumeClaimName: '',
+  mountPath: ''
+});
+
+export class KubernetesApplicationPersistedFolder {
+  constructor() {
+    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesApplicationPersistedFolder)));
+  }
+}
+
+/**
+ * KubernetesApplicationConfigurationVolume Model
+ */
+const _KubernetesApplicationConfigurationVolume = Object.freeze({
+  mountPath: '',
+  configurationKey: '',
+  configurationName: ''
+});
+
+export class KubernetesApplicationConfigurationVolume {
+  constructor() {
+    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesApplicationConfigurationVolume)));
   }
 }
