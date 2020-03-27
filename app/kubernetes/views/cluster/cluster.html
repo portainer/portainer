@@ -5,12 +5,12 @@
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
 
 <div ng-if="ctrl.state.viewReady">
-  <div class="row">
+  <div class="row" ng-if="ctrl.resourceReservation && ctrl.isAdmin">
     <div class="col-sm-12">
       <rd-widget>
         <rd-widget-body>
           <form class="form-horizontal">
-            <kubernetes-resource-reservation ng-if="ctrl.resourceReservation && ctrl.isAdmin" cpu="ctrl.resourceReservation.CPU" cpu-limit="ctrl.CPULimit"
+            <kubernetes-resource-reservation cpu="ctrl.resourceReservation.CPU" cpu-limit="ctrl.CPULimit"
               memory="ctrl.resourceReservation.Memory" memory-limit="ctrl.MemoryLimit"
               description="Resource reservation represents the total amount of resource requested by all the applications inside the cluster.">
             </kubernetes-resource-reservation>
