@@ -30,13 +30,11 @@ class MultiEndpointSelectorController {
   }
 
   $onInit() {
-    this.availableGroups = filterEmptyGroups(this.groups, this.endpoints);
+    this.availableGroups = _.filter(this.groups, group =>
+      _.some(this.endpoints, endpoint => endpoint.GroupId == group.Id)
+    );
   }
 }
 
 export default MultiEndpointSelectorController;
 angular.module('portainer.app').controller('MultiEndpointSelectorController', MultiEndpointSelectorController);
-
-function filterEmptyGroups(groups, endpoints) {
-  return _.filter(groups, group => _.some(endpoints, endpoint => endpoint.GroupId == group.Id));
-}
