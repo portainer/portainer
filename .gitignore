@@ -6,3 +6,4 @@ api/cmd/portainer/portainer*
 .tmp
 .vscode
 .eslintcache
+!.vscode/portainer.code-snippets
