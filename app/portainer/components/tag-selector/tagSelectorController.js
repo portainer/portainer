@@ -2,7 +2,7 @@ import _ from 'lodash-es';
 
 angular.module('portainer.app').controller('TagSelectorController', function() {
   this.$onInit = function() {
-    this.state.selectedTags = _.map(this.model, id => _.find(this.tags, t => t.Id === id));
+    this.state.selectedTags = _.map(this.model, (id) => _.find(this.tags, (t) => t.Id === id));
   };
 
   this.state = {
