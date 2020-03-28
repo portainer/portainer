@@ -83,6 +83,7 @@ export class KubernetesApplicationEnvironmentVariableFormValue {
 const _KubernetesApplicationPersistedFolderFormValue = Object.freeze({
   ContainerPath: '',
   Size: '',
+  SizeUnit: '',
   StorageClass: {}
 });
 
@@ -90,6 +91,7 @@ export class KubernetesApplicationPersistedFolderFormValue {
   constructor(storageClass) {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesApplicationPersistedFolderFormValue)));
     this.StorageClass = storageClass;
+    this.SizeUnit = 'GB';
   }
 }
 

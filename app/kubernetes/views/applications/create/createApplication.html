@@ -232,7 +232,10 @@
 
                   <div class="input-group col-sm-3 input-group-sm">
                     <span class="input-group-addon">requested size</span>
-                    <input type="text" class="form-control" ng-model="persistedFolder.Size" placeholder="20G">
+                    <input type="number" class="form-control" ng-model="persistedFolder.Size" placeholder="20" min="0">
+                    <span class="input-group-addon">
+                      <select ng-model="persistedFolder.SizeUnit" style="width: 100%;" ng-options="unit for unit in ctrl.state.availableSizeUnits"></select>
+                    </span>
                   </div>
 
                   <div class="input-group col-sm-3 input-group-sm" ng-if="ctrl.hasMultipleStorageClassesAvailable()">
@@ -564,5 +567,5 @@
       </rd-widget>
 
     </div>
-  </div>  
+  </div>
 </div>

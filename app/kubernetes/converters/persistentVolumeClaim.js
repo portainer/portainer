@@ -12,7 +12,7 @@ class KubernetesPersistentVolumeClaimConverter {
     res.Name = data.metadata.name;
     res.Namespace = data.metadata.namespace;
     res.CreationDate = data.metadata.creationTimestamp;
-    res.Storage = data.spec.resources.requests.storage;
+    res.Storage = data.spec.resources.requests.storage + 'B';
     res.StorageClass = _.find(storageClasses, {Name: data.spec.storageClassName});
     res.Yaml = yaml ? yaml.data : '';
     return res;
@@ -20,14 +20,14 @@ class KubernetesPersistentVolumeClaimConverter {
 
   /**
    * Generate KubernetesPersistentVolumeClaim list from KubernetesApplicationFormValues
-   * @param {KubernetesApplicationFormValues} formValues 
+   * @param {KubernetesApplicationFormValues} formValues
    */
   static applicationFormValuesToVolumeClaims(formValues) {
     const res = _.map(formValues.PersistedFolders, (item) => {
       const pvc = new KubernetesPersistentVolumeClaim();
       pvc.Name = KubernetesApplicationHelper.generateApplicationVolumeName(formValues.Name, item.ContainerPath);
       pvc.Namespace = formValues.ResourcePool.Namespace.Name;
-      pvc.Storage = item.Size;
+      pvc.Storage = '' + item.Size + item.SizeUnit.charAt(0);
       pvc.StorageClass = item.StorageClass;
       return pvc;
     });

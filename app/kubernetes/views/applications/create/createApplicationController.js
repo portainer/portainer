@@ -331,7 +331,8 @@ class KubernetesCreateApplicationController {
           cpu: 0
         },
         resourcePoolHasQuota: false,
-        viewReady: false
+        viewReady: false,
+        availableSizeUnits: ['MB', 'GB', 'TB']
       };
 
       this.formValues = new KubernetesApplicationFormValues();
