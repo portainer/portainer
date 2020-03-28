@@ -141,7 +141,7 @@
                   </a>
                 </span>
                 <span ng-if="item.Mode === 'replicated' && item.Scale">
-                  <input class="input-sm" type="number" min="0" ng-model="item.Replicas" on-enter-key="actionCtrl.scaleAction(item)" auto-focus ng-click="$event.stopPropagation();"/>
+                  <input class="input-sm" type="number" min="0" step="1" ng-model="item.Replicas" on-enter-key="actionCtrl.scaleAction(item)" auto-focus ng-click="$event.stopPropagation();"/>
                   <a class="interactive" ng-click="item.Scale = false; $event.stopPropagation();"><i class="fa fa-times"></i></a>
                   <a class="interactive" ng-click="actionCtrl.scaleAction(item); $event.stopPropagation();"><i class="fa fa-check-square"></i></a>
                 </span>
