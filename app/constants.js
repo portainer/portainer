@@ -23,4 +23,4 @@ angular.module('portainer')
 .constant('APPLICATION_CACHE_VALIDITY', 3600)
 .constant('CONSOLE_COMMANDS_LABEL_PREFIX', 'io.portainer.commands.')
 .constant('PREDEFINED_NETWORKS', ['host', 'bridge', 'none'])
-.constant('KUBERNETES_SYSTEM_NAMESPACES', ['kube-system', 'kube-public', 'portainer']);
+.constant('KUBERNETES_SYSTEM_NAMESPACES', ['kube-system', 'kube-public', 'kube-node-lease', 'portainer']);
