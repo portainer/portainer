@@ -2,6 +2,7 @@ import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import { KubernetesApplication, KubernetesApplicationPersistedFolder, KubernetesApplicationConfigurationVolume, KubernetesPortainerApplicationStackNameLabel, KubernetesApplicationDeploymentTypes, KubernetesApplicationDataAccessPolicies, KubernetesApplicationTypes, KubernetesPortainerApplicationOwnerLabel } from 'Kubernetes/models/application/models';
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
+import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 
 class KubernetesApplicationConverter {
   static applicationCommon(res, data, service) {
@@ -20,10 +21,7 @@ class KubernetesApplicationConverter {
     };
     res.Limits = _.reduce(data.spec.template.spec.containers, (acc, item) => {
       if (item.resources.limits && item.resources.limits.cpu) {
-        acc.Cpu += parseInt(item.resources.limits.cpu);
-        if (_.endsWith(item.resources.limits.cpu, 'm')) {
-          acc.Cpu /= 1000;
-        }
+        acc.Cpu += KubernetesResourceReservationHelper.parseCPU(item.resources.limits.cpu);
       }
       if (item.resources.limits && item.resources.limits.memory) {
         acc.Memory += filesizeParser(item.resources.limits.memory, {base: 10});

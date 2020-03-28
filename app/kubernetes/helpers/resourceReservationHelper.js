@@ -17,17 +17,20 @@ class KubernetesResourceReservationHelper {
         }
         
         if (container.resources.limits.cpu) {
-          const cpu = parseInt(container.resources.limits.cpu);
-          if (_.endsWith(container.resources.limits.cpu, 'm')) {
-            acc.CPU += cpu / 1000;
-          } else {
-            acc.CPU += cpu;
-          }
+          acc.CPU += KubernetesResourceReservationHelper.parseCPU(container.resources.limits.cpu);
         }
       }
 
       return acc;
     }, new KubernetesResourceReservation());
+  }
+
+  static parseCPU(cpu) {
+    let res = parseInt(cpu);
+    if (_.endsWith(cpu, 'm')) {
+      res /= 1000;
+    }
+    return res;
   }
 
   static megaBytesValue(value) {

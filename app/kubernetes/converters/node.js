@@ -1,6 +1,7 @@
 import _ from 'lodash-es';
 
 import {KubernetesNode, KubernetesNodeDetails} from 'Kubernetes/models/node/models';
+import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 
 class KubernetesNodeConverter {
   static apiToNode(data, res) {
@@ -33,7 +34,7 @@ class KubernetesNodeConverter {
       res.Status = 'Ready';
     }
 
-    res.CPU = parseInt(data.status.allocatable.cpu);
+    res.CPU = KubernetesResourceReservationHelper.parseCPU(data.status.allocatable.cpu);
     res.Memory = data.status.allocatable.memory;
     res.Version = data.status.nodeInfo.kubeletVersion;
     const internalIP = _.find(data.status.addresses, { type: 'InternalIP' });

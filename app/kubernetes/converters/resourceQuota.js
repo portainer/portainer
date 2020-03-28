@@ -1,10 +1,10 @@
-import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 
 import { KubernetesResourceQuota } from 'Kubernetes/models/resource-quota/models';
 import { KubernetesResourceQuotaCreatePayload, KubernetesResourceQuotaUpdatePayload } from 'Kubernetes/models/resource-quota/payloads';
 import KubernetesResourceQuotaHelper from 'Kubernetes/helpers/resourceQuotaHelper';
 import { KubernetesPortainerResourcePoolNameLabel, KubernetesPortainerResourcePoolOwnerLabel } from 'Kubernetes/models/resource-pool/models';
+import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 
 class KubernetesResourceQuotaConverter {
   static apiToResourceQuota(data, yaml) {
@@ -15,10 +15,7 @@ class KubernetesResourceQuotaConverter {
     res.CpuLimit = 0;
     res.MemoryLimit = 0;
     if (data.spec.hard && data.spec.hard['limits.cpu']) {
-      res.CpuLimit = parseInt(data.spec.hard['limits.cpu']);
-      if (_.endsWith(data.spec.hard['limits.cpu'], 'm')) {
-        res.CpuLimit /= 1000;
-      }
+      res.CpuLimit = KubernetesResourceReservationHelper.parseCPU(data.spec.hard['limits.cpu']);
     }
     if (data.spec.hard && data.spec.hard['limits.memory']) {
       res.MemoryLimit = filesizeParser(data.spec.hard['limits.memory'], { base: 10 });
@@ -31,10 +28,7 @@ class KubernetesResourceQuotaConverter {
 
     res.CpuLimitUsed = 0;
     if (data.status.used && data.status.used['limits.cpu']) {
-      res.CpuLimitUsed = parseInt(data.status.used['limits.cpu']);
-      if (_.endsWith(data.status.used['limits.cpu'], 'm')) {
-        res.CpuLimitUsed /= 1000;
-      }
+      res.CpuLimitUsed = KubernetesResourceReservationHelper.parseCPU(data.status.used['limits.cpu']);
     }
     res.Yaml = yaml ? yaml.data : '';
     res.ResourcePoolName = data.metadata.labels ? data.metadata.labels[KubernetesPortainerResourcePoolNameLabel] : '';
