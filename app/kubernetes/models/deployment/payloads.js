@@ -42,3 +42,16 @@ export class KubernetesDeploymentCreatePayload {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesDeploymentCreatePayload)));
   }
 }
+
+/**
+ * KubernetesDeploymentPatchPayload Model
+ */
+const _KubernetesDeploymentPatchPayload = Object.freeze({
+  metadata: new KubernetesCommonMetadataPayload(),
+});
+
+export class KubernetesDeploymentPatchPayload {
+  constructor() {
+    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesDeploymentPatchPayload)));
+  }
+}

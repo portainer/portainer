@@ -946,6 +946,16 @@ json-tree .branch-preview {
   align-items: center;
 }
 
+/* bootstrap extend */
+.input-xs {
+  height: 22px;
+  padding: 2px 5px;
+  font-size: 12px;
+  line-height: 1.5; /* If Placeholder of the input is moved up, rem/modify this. */
+  border-radius: 3px;
+}
+/* !bootstrap extend */
+
 /* spinkit override */
 .sk-fold {
   width: 57px;

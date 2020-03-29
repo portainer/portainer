@@ -1,5 +1,5 @@
 import {KubernetesDeployment} from 'Kubernetes/models/deployment/models';
-import {KubernetesDeploymentCreatePayload} from 'Kubernetes/models/deployment/payloads';
+import {KubernetesDeploymentCreatePayload, KubernetesDeploymentPatchPayload} from 'Kubernetes/models/deployment/payloads';
 import {KubernetesPortainerApplicationStackNameLabel, KubernetesPortainerApplicationNameLabel, KubernetesPortainerApplicationOwnerLabel} from 'Kubernetes/models/application/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 
@@ -56,6 +56,15 @@ class KubernetesDeploymentConverter {
       payload.spec.template.spec.containers[0].resources.limits.cpu = deployment.CpuLimit;
       payload.spec.template.spec.containers[0].resources.requests.cpu = deployment.CpuLimit;
     }
+    return payload;
+  }
+
+  static patchPayload(deployment) {
+    const payload = new KubernetesDeploymentPatchPayload();
+    delete payload.metadata.uid;
+    delete payload.metadata.name;
+    delete payload.metadata.namespace;
+    payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = deployment.StackName;
     return payload;
   }
 }

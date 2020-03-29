@@ -5,24 +5,32 @@ import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 
 class KubernetesApplicationController {
   /* @ngInject */
-  constructor($async, $state, clipboard, Notifications, KubernetesApplicationService, KubernetesEventService) {
+  constructor($async, $state, clipboard, Notifications, KubernetesApplicationService, KubernetesEventService, KubernetesStackService) {
     this.$async = $async;
     this.$state = $state;
     this.clipboard = clipboard;
     this.Notifications = Notifications;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesEventService = KubernetesEventService;
+    this.KubernetesStackService = KubernetesStackService;
 
     this.onInit = this.onInit.bind(this);
     this.getApplication = this.getApplication.bind(this);
     this.getApplicationAsync = this.getApplicationAsync.bind(this);
     this.getEvents = this.getEvents.bind(this);
     this.getEventsAsync = this.getEventsAsync.bind(this);
+    this.getStacksAsync = this.getStacksAsync.bind(this);
+    this.updateApplicationAsync = this.updateApplicationAsync.bind(this);
     this.copyLoadBalancerIP = this.copyLoadBalancerIP.bind(this);
   }
 
   showEditor() {
     this.state.showEditorTab = true;
+  }
+
+  resetApplicationStackName() {
+    this.formValues.StackName = '';
+    this.state.updateStackName = false;
   }
 
   copyLoadBalancerIP() {
@@ -38,13 +46,44 @@ class KubernetesApplicationController {
     return this.application.ConfigurationVolumes.length;
   }
 
-  /**
-   * EVENTS
-   */
   hasEventWarnings() {
     return this.state.eventWarningCount;
   }
 
+  async updateApplicationAsync() {
+    try {
+      const application = angular.copy(this.application);
+      application.StackName = this.formValues.StackName;
+      await this.KubernetesApplicationService.patch(application);
+      this.Notifications.success('Application successfully updated');
+      this.$state.reload();
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve application related events');
+    }
+  }
+
+  updateApplication() {
+    return this.$async(this.updateApplicationAsync);
+  }
+
+  /**
+   * STACKS
+   */
+  async getStacksAsync() {
+    try {
+      this.stacks = await this.KubernetesStackService.get(this.state.params.namespace);
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve stacks');
+    }
+  }
+
+  getStacks() {
+    return this.$async(this.getStacksAsync);
+  }
+
+  /**
+   * EVENTS
+   */
   async getEventsAsync() {
     try {
       this.state.eventsLoading = true;
@@ -52,7 +91,7 @@ class KubernetesApplicationController {
       this.events = _.filter(events, (event) => event.Involved.uid === this.application.Id
         || event.Involved.uid === this.application.ServiceId
         || _.find(this.application.Pods, (pod) => pod.Id === event.Involved.uid) !== undefined);
-        this.state.eventWarningCount = KubernetesEventHelper.warningCount(this.events);
+      this.state.eventWarningCount = KubernetesEventHelper.warningCount(this.events);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve application related events');
     } finally {
@@ -94,13 +133,18 @@ class KubernetesApplicationController {
         namespace: this.$transition$.params().namespace,
         name: this.$transition$.params().name,
       },
-      eventWarningCount: 0
+      eventWarningCount: 0,
+      updateStackName: false
+    };
+
+    this.formValues = {
+      StackName: ''
     };
 
     this.KubernetesApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
     await this.getApplication();
     await this.getEvents();
-
+    await this.getStacks();
     this.state.viewReady = true;
   }
 

@@ -12,6 +12,7 @@ class KubernetesServiceService {
     this.getAsync = this.getAsync.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);
     this.createAsync = this.createAsync.bind(this);
+    this.patchAsync = this.patchAsync.bind(this);
     this.deleteAsync = this.deleteAsync.bind(this);
   }
 
@@ -69,6 +70,26 @@ class KubernetesServiceService {
 
   create(service) {
     return this.$async(this.createAsync, service);
+  }
+
+  /**
+   * PATCH
+   */
+  async patchAsync(deployment) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = deployment.Name;
+      const namespace = deployment.Namespace;
+      const payload = KubernetesServiceConverter.patchPayload(deployment);
+      const data = await this.KubernetesServices(namespace).patch(params, payload).$promise;
+      return data;
+    } catch (err) {
+      throw new PortainerError('Unable to patch deployment', err);
+    }
+  }
+
+  patch(deployment) {
+    return this.$async(this.patchAsync, deployment);
   }
 
   /**

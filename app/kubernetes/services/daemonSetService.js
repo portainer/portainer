@@ -12,6 +12,7 @@ class KubernetesDaemonSetService {
     this.getAsync = this.getAsync.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);
     this.createAsync = this.createAsync.bind(this);
+    this.patchAsync = this.patchAsync.bind(this);
     this.deleteAsync = this.deleteAsync.bind(this);
   }
 
@@ -69,6 +70,26 @@ class KubernetesDaemonSetService {
 
   create(daemonSet) {
     return this.$async(this.createAsync, daemonSet);
+  }
+
+  /**
+   * PATCH
+   */
+  async patchAsync(daemonSet) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = daemonSet.Name;
+      const namespace = daemonSet.Namespace;
+      const payload = KubernetesDaemonSetConverter.patchPayload(daemonSet);
+      const data = await this.KubernetesDaemonSets(namespace).patch(params, payload).$promise;
+      return data;
+    } catch (err) {
+      throw new PortainerError('Unable to patch daemonset', err);
+    }
+  }
+
+  patch(daemonSet) {
+    return this.$async(this.patchAsync, daemonSet);
   }
 
   /**

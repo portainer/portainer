@@ -28,6 +28,12 @@ angular.module('portainer.kubernetes')
             },
             create: { method: 'POST' },
             update: { method: 'PUT' },
+            patch: {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/merge-patch+json'
+              }
+            },
             delete: { method: 'DELETE' }
           }
         );

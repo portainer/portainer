@@ -33,6 +33,7 @@ class KubernetesApplicationService {
     this.getAllAsync = this.getAllAsync.bind(this);
     this.getAllFilteredAsync = this.getAllFilteredAsync.bind(this);
     this.createAsync = this.createAsync.bind(this);
+    this.patchAsync = this.patchAsync.bind(this);
     this.deleteAsync = this.deleteAsync.bind(this);
   }
 
@@ -202,6 +203,46 @@ class KubernetesApplicationService {
 
   create(formValues) {
     return this.$async(this.createAsync, formValues);
+  }
+
+  /**
+   * PATCH
+   */
+
+  async patchAsync(application) {
+    try {
+      const payload = {
+        Namespace: application.ResourcePool,
+        Name: application.Name,
+        StackName: application.StackName
+      };
+
+      const headlessServicePayload = angular.copy(payload);
+      headlessServicePayload.Name = KubernetesServiceHelper.generateHeadlessServiceName(application.Name);
+      switch (application.ApplicationType) {
+        case KubernetesApplicationTypes.DEPLOYMENT:
+          await this.KubernetesDeploymentService.patch(payload);
+          break;
+        case KubernetesApplicationTypes.DAEMONSET:
+          await this.KubernetesDaemonSetService.patch(payload);
+          break;
+        case KubernetesApplicationTypes.STATEFULSET:
+          await this.KubernetesStatefulSetService.patch(payload);
+          await this.KubernetesServiceService.patch(headlessServicePayload);
+          break;
+        default:
+          throw new PortainerError('Unable to determine which association to patch');
+      }
+      if (application.ServiceType) {
+        await this.KubernetesServiceService.patch(payload);
+      }
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  patch(application) {
+    return this.$async(this.patchAsync, application);
   }
 
   /**

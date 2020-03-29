@@ -14,6 +14,7 @@ class KubernetesStatefulSetService {
     this.getAsync = this.getAsync.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);
     this.createAsync = this.createAsync.bind(this);
+    this.patchAsync = this.patchAsync.bind(this);
     this.deleteAsync = this.deleteAsync.bind(this);
   }
 
@@ -76,6 +77,26 @@ class KubernetesStatefulSetService {
 
   create(statefulSet) {
     return this.$async(this.createAsync, statefulSet);
+  }
+
+  /**
+   * PATCH
+   */
+  async patchAsync(statefulSet) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = statefulSet.Name;
+      const namespace = statefulSet.Namespace;
+      const payload = KubernetesStatefulSetConverter.patchPayload(statefulSet);
+      const data = await this.KubernetesStatefulSets(namespace).patch(params, payload).$promise;
+      return data;
+    } catch (err) {
+      throw new PortainerError('Unable to patch statefulSet', err);
+    }
+  }
+
+  patch(statefulSet) {
+    return this.$async(this.patchAsync, statefulSet);
   }
 
   /**

@@ -1,5 +1,5 @@
 import {KubernetesDaemonSet} from 'Kubernetes/models/daemon-set/models';
-import {KubernetesDaemonSetCreatePayload} from 'Kubernetes/models/daemon-set/payloads';
+import {KubernetesDaemonSetCreatePayload, KubernetesDaemonSetPatchPayload} from 'Kubernetes/models/daemon-set/payloads';
 import {KubernetesPortainerApplicationStackNameLabel, KubernetesPortainerApplicationNameLabel, KubernetesPortainerApplicationOwnerLabel} from 'Kubernetes/models/application/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 
@@ -55,6 +55,15 @@ class KubernetesDaemonSetConverter {
       payload.spec.template.spec.containers[0].resources.limits.cpu = daemonSet.CpuLimit;
       payload.spec.template.spec.containers[0].resources.requests.cpu = daemonSet.CpuLimit;
     }
+    return payload;
+  }
+
+  static patchPayload(daemonSet) {
+    const payload = new KubernetesDaemonSetPatchPayload();
+    delete payload.metadata.uid;
+    delete payload.metadata.name;
+    delete payload.metadata.namespace;
+    payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = daemonSet.StackName;
     return payload;
   }
 }
