@@ -33,6 +33,7 @@
           on-select="$ctrl.dashboardAction"
           on-edit="$ctrl.editAction"
           is-admin="$ctrl.isAdmin"
+          tags="$ctrl.tags"
         ></endpoint-item>
         <endpoint-item ng-if="!$ctrl.hasBackendPagination()"
           dir-paginate="endpoint in $ctrl.state.filteredEndpoints | itemsPerPage: $ctrl.state.paginatedItemLimit"
@@ -40,6 +41,7 @@
           on-select="$ctrl.dashboardAction"
           on-edit="$ctrl.editAction"
           is-admin="$ctrl.isAdmin"
+          tags="$ctrl.tags"
         ></endpoint-item>
         <div ng-if="$ctrl.state.loading" class="text-center text-muted">
           Loading...

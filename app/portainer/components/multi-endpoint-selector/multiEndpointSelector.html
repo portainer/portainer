@@ -2,13 +2,13 @@
   <ui-select-match placeholder="Select one or multiple endpoint(s)">
     <span>
       {{ $item.Name }}
-      <span ng-if="$item.Tags.length">({{ $item.Tags | arraytostr }})</span>
-     </span>
+      <span ng-if="$item.TagIds.length">({{ $ctrl.tagIdsToTagNames($item.TagIds) | arraytostr }})</span>
+    </span>
   </ui-select-match>
   <ui-select-choices group-by="$ctrl.groupEndpoints" group-filter="$ctrl.sortGroups" repeat="endpoint.Id as endpoint in $ctrl.endpoints | filter: { Name: $select.search }">
     <span>
       {{ endpoint.Name }}
-      <span ng-if="endpoint.Tags.length">({{ endpoint.Tags | arraytostr }})</span>
-     </span>
+      <span ng-if="endpoint.TagIds.length">({{ $ctrl.tagIdsToTagNames(endpoint.TagIds) | arraytostr }})</span>
+    </span>
   </ui-select-choices>
 </ui-select>

@@ -165,8 +165,9 @@
           <!-- tags -->
           <div class="form-group">
             <tag-selector
+              ng-if="availableTags && endpoint.TagIds"
               tags="availableTags"
-              model="endpoint.Tags"
+              model="endpoint.TagIds"
             ></tag-selector>
           </div>
           <!-- !tags -->

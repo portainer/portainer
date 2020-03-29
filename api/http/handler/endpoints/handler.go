@@ -37,6 +37,7 @@ type Handler struct {
 	JobService                  portainer.JobService
 	ReverseTunnelService        portainer.ReverseTunnelService
 	SettingsService             portainer.SettingsService
+	TagsService                 portainer.TagService
 	AuthorizationService        *portainer.AuthorizationService
 }
 
