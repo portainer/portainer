@@ -47,17 +47,24 @@ class KubernetesApplicationConverter {
 
     res.Volumes = data.spec.template.spec.volumes ? data.spec.template.spec.volumes : [];
 
-    res.PersistedFolders = _.map(res.Volumes, (volume) => {
-      if (volume.persistentVolumeClaim) {
-        const matchingVolumeMount = _.find(data.spec.template.spec.containers[0].volumeMounts, { name: volume.name });
+    const persistedFolders = _.filter(res.Volumes, (volume) => {
+      return volume.persistentVolumeClaim || volume.hostPath;
+    });
 
-        if (matchingVolumeMount) {
-          const persistedFolder = new KubernetesApplicationPersistedFolder();
+    res.PersistedFolders = _.map(persistedFolders, (volume) => {
+      const matchingVolumeMount = _.find(data.spec.template.spec.containers[0].volumeMounts, { name: volume.name });
+
+      if (matchingVolumeMount) {
+        const persistedFolder = new KubernetesApplicationPersistedFolder();
+        persistedFolder.mountPath = matchingVolumeMount.mountPath;
+
+        if (volume.persistentVolumeClaim) {
           persistedFolder.persistentVolumeClaimName = volume.persistentVolumeClaim.claimName;
-          persistedFolder.mountPath = matchingVolumeMount.mountPath;
-
-          return persistedFolder;
+        } else {
+          persistedFolder.hostPath = volume.hostPath.path;
         }
+
+        return persistedFolder;
       }
     });
 

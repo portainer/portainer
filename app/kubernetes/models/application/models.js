@@ -69,8 +69,9 @@ export class KubernetesApplication {
  * _KubernetesApplicationPersistedFolder Model
  */
 const _KubernetesApplicationPersistedFolder = Object.freeze({
+  mountPath: '',
   persistentVolumeClaimName: '',
-  mountPath: ''
+  hostPath: ''
 });
 
 export class KubernetesApplicationPersistedFolder {

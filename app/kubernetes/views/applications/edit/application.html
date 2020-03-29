@@ -235,7 +235,7 @@
 
           </div>
 
-          <div class="text-muted" style="margin-bottom: 15px; margin-top: 35px;">
+          <div class="text-muted" style="margin-bottom: 15px; margin-top: 25px;">
             <i class="fa fa-file-code" aria-hidden="true" style="margin-right: 2px;"></i> Configuration
           </div>
 
@@ -249,22 +249,23 @@
               <table class="table">
                 <tbody>
                   <tr class="text-muted">
-                    <td style="width: 50%;">Environment variable</td>
-                    <td style="width: 50%;">Value</td>
+                    <td style="width: 33%;">Environment variable</td>
+                    <td style="width: 33%;">Value</td>
+                    <td style="width: 33%;">Configuration</td>
                   </tr>
                   <tr ng-repeat="envvar in ctrl.application.Env track by $index">
+                    <td>{{ envvar.name }}</td>
                     <td>
-                      {{ envvar.name }}
-                      <span ng-if="envvar.valueFrom.configMapKeyRef || envvar.valueFrom.secretKeyRef"><i class="fa fa-file-code" aria-hidden="true"></i></span>
+                      <span ng-if="envvar.value">{{ envvar.value }}</span>
+                      <span ng-if="envvar.valueFrom.configMapKeyRef"><i class="fa fa-key" aria-hidden="true"></i> {{ envvar.valueFrom.configMapKeyRef.key }}</span>
+                      <span ng-if="envvar.valueFrom.secretKeyRef"><i class="fa fa-key" aria-hidden="true"></i> {{ envvar.valueFrom.secretKeyRef.key }}</span>
+                      <span ng-if="!envvar.value && !envvar.valueFrom.secretKeyRef && !envvar.valueFrom.configMapKeyRef">-</span>
                     </td>
                     <td>
                       <span ng-if="envvar.value">{{ envvar.value }}</span>
-                      <span ng-if="envvar.valueFrom.configMapKeyRef"><code>{{ envvar.valueFrom.configMapKeyRef.key }}</code> from <a
-                          ui-sref="kubernetes.configurations.configuration({ name: envvar.valueFrom.configMapKeyRef.name, namespace: ctrl.application.ResourcePool })"><i
-                            class="fa fa-file-code" aria-hidden="true"></i> {{ envvar.valueFrom.configMapKeyRef.name }}</a></span>
-                      <span ng-if="envvar.valueFrom.secretKeyRef"><code>{{ envvar.valueFrom.secretKeyRef.key }}</code> from <a
-                          ui-sref="kubernetes.configurations.configuration({ name: envvar.valueFrom.secretKeyRef.name, namespace: ctrl.application.ResourcePool })"><i
-                            class="fa fa-file-code" aria-hidden="true"></i> {{ envvar.valueFrom.secretKeyRef.name }}</a></span>
+                      <span ng-if="envvar.value || (!envvar.value && !envvar.valueFrom.secretKeyRef && !envvar.valueFrom.configMapKeyRef)">-</span>
+                      <span ng-if="envvar.valueFrom.configMapKeyRef"><a ui-sref="kubernetes.configurations.configuration({ name: envvar.valueFrom.configMapKeyRef.name, namespace: ctrl.application.ResourcePool })"><i class="fa fa-file-code" aria-hidden="true"></i> {{ envvar.valueFrom.configMapKeyRef.name }}</a></span>
+                      <span ng-if="envvar.valueFrom.secretKeyRef"><a ui-sref="kubernetes.configurations.configuration({ name: envvar.valueFrom.secretKeyRef.name, namespace: ctrl.application.ResourcePool })"><i class="fa fa-file-code" aria-hidden="true"></i> {{ envvar.valueFrom.secretKeyRef.name }}</a></span>
                     </td>
                   </tr>
                 </tbody>
@@ -276,8 +277,9 @@
             <table class="table">
               <tbody>
                 <tr class="text-muted">
-                  <td style="width: 50%;">Configuration path</td>
-                  <td style="width: 50%;">Value</td>
+                  <td style="width: 33%;">Configuration path</td>
+                  <td style="width: 33%;">Value</td>
+                  <td style="width: 33%;">Configuration</td>
                 </tr>
 
                 <tr ng-repeat="volume in ctrl.application.ConfigurationVolumes track by $index" style="border-top: 0">
@@ -285,16 +287,17 @@
                     {{ volume.mountPath }}
                   </td>
                   <td>
-                    <code>{{ volume.configurationKey }}</code> from <a
-                      ui-sref="kubernetes.configurations.configuration({ name: volume.configurationName, namespace: ctrl.application.ResourcePool })"><i class="fa fa-file-code"
-                        aria-hidden="true"></i> {{ volume.configurationName }}</a>
+                    <i class="fa fa-key" aria-hidden="true"></i> {{ volume.configurationKey }}
+                  </td>
+                  <td>
+                    <a ui-sref="kubernetes.configurations.configuration({ name: volume.configurationName, namespace: ctrl.application.ResourcePool })"><i class="fa fa-file-code" aria-hidden="true"></i> {{ volume.configurationName }}</a>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          <div class="text-muted" style="margin-bottom: 15px; margin-top: 35px;">
+          <div class="text-muted" style="margin-bottom: 15px; margin-top: 25px;">
             <i class="fa fa-database" aria-hidden="true" style="margin-right: 2px;"></i> Data persistence
           </div>
 
@@ -304,25 +307,25 @@
           </div>
 
           <div ng-if="ctrl.hasPersistedFolders()">
-            <div ng-if="ctrl.hasPersistedFolders()">
-              <table class="table">
-                <tbody>
-                  <tr class="text-muted">
-                    <td style="width: 50%;">Persisted folder</td>
-                    <td style="width: 50%;">Volume</td>
-                  </tr>
-                  <tr ng-repeat="volume in ctrl.application.PersistedFolders track by $index">
-                    <td>
-                      {{ volume.mountPath }}
-                    </td>
-                    <td>
-                      <a
-                        ui-sref="kubernetes.volumes.volume({ name: volume.persistentVolumeClaimName, namespace: ctrl.application.ResourcePool })">{{ volume.persistentVolumeClaimName }}</a>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <table class="table">
+              <tbody>
+                <tr class="text-muted">
+                  <td style="width: 50%;">Persisted folder</td>
+                  <td style="width: 50%;">Persistence</td>
+                </tr>
+                <tr ng-repeat="volume in ctrl.application.PersistedFolders track by $index">
+                  <td>
+                    {{ volume.mountPath }}
+                  </td>
+                  <td ng-if="volume.persistentVolumeClaimName">
+                    <a ui-sref="kubernetes.volumes.volume({ name: volume.persistentVolumeClaimName, namespace: ctrl.application.ResourcePool })"><i class="fa fa-database" aria-hidden="true"></i> {{ volume.persistentVolumeClaimName }}</a>
+                  </td>
+                  <td ng-if="volume.hostPath">
+                    {{ volume.hostPath }} on host filesystem
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
         </rd-widget-body>
