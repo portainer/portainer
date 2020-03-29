@@ -19,7 +19,7 @@ angular.module('portainer.app').controller('TagSelectorController', function() {
 
   this.removeTag = function removeTag(tag) {
     _.remove(this.state.selectedTags, { Id: tag.Id });
-    _.remove(this.model, tag.Id);
+    _.remove(this.model, (id) => id === tag.Id);
   };
 
   this.filterSelected = filterSelected.bind(this);
@@ -30,4 +30,6 @@ angular.module('portainer.app').controller('TagSelectorController', function() {
     }
     return !_.includes(this.model, $item.Id);
   }
+  window._remove = _.remove;
 });
+
