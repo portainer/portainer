@@ -65,10 +65,6 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 		filteredEndpoints = filterEndpointsByType(filteredEndpoints, portainer.EndpointType(endpointType))
 	}
 
-	if endpointType != 0 {
-		filteredEndpoints = filterEndpointsByType(filteredEndpoints, portainer.EndpointType(endpointType))
-	}
-
 	filteredEndpointCount := len(filteredEndpoints)
 
 	paginatedEndpoints := paginateEndpoints(filteredEndpoints, start, limit)
