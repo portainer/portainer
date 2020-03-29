@@ -167,7 +167,7 @@
                   </p>
                 </span>
               </div>
-              <div style="margin-top: 15px;">
+              <div style="margin-top: 15px; width: 33%;">
                 <table class="table">
                   <tbody>
                     <tr class="text-muted">
@@ -217,7 +217,7 @@
                 This application is only available for internal usage inside the cluster. It can be reached through the application name <code>{{ ctrl.application.Name }}</code>
                 using the port configuration below.
               </div>
-              <div style="margin-top: 15px;">
+              <div style="margin-top: 15px; width: 33%;">
                 <table class="table">
                   <tbody>
                     <tr class="text-muted">
@@ -259,11 +259,11 @@
                       <span ng-if="envvar.value">{{ envvar.value }}</span>
                       <span ng-if="envvar.valueFrom.configMapKeyRef"><i class="fa fa-key" aria-hidden="true"></i> {{ envvar.valueFrom.configMapKeyRef.key }}</span>
                       <span ng-if="envvar.valueFrom.secretKeyRef"><i class="fa fa-key" aria-hidden="true"></i> {{ envvar.valueFrom.secretKeyRef.key }}</span>
-                      <span ng-if="!envvar.value && !envvar.valueFrom.secretKeyRef && !envvar.valueFrom.configMapKeyRef">-</span>
+                      <span ng-if="envvar.valueFrom.fieldRef"><i class="fa fa-asterisk" aria-hidden="true"></i> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a href="https://kubernetes.io/docs/tasks/inject-data-application/downward-api-volume-expose-pod-information/#capabilities-of-the-downward-api" target="_blank">downward API</a>)</span>
+                      <span ng-if="!envvar.value && !envvar.valueFrom.secretKeyRef && !envvar.valueFrom.configMapKeyRef && !envvar.valueFrom.fieldRef">-</span>
                     </td>
                     <td>
-                      <span ng-if="envvar.value">{{ envvar.value }}</span>
-                      <span ng-if="envvar.value || (!envvar.value && !envvar.valueFrom.secretKeyRef && !envvar.valueFrom.configMapKeyRef)">-</span>
+                      <span ng-if="envvar.value || envvar.valueFrom.fieldRef || (!envvar.valueFrom.secretKeyRef && !envvar.valueFrom.configMapKeyRef)">-</span>
                       <span ng-if="envvar.valueFrom.configMapKeyRef"><a ui-sref="kubernetes.configurations.configuration({ name: envvar.valueFrom.configMapKeyRef.name, namespace: ctrl.application.ResourcePool })"><i class="fa fa-file-code" aria-hidden="true"></i> {{ envvar.valueFrom.configMapKeyRef.name }}</a></span>
                       <span ng-if="envvar.valueFrom.secretKeyRef"><a ui-sref="kubernetes.configurations.configuration({ name: envvar.valueFrom.secretKeyRef.name, namespace: ctrl.application.ResourcePool })"><i class="fa fa-file-code" aria-hidden="true"></i> {{ envvar.valueFrom.secretKeyRef.name }}</a></span>
                     </td>
