@@ -112,6 +112,7 @@ type (
 		TemplatesURL                       string               `json:"TemplatesURL"`
 		EnableHostManagementFeatures       bool                 `json:"EnableHostManagementFeatures"`
 		EdgeAgentCheckinInterval           int                  `json:"EdgeAgentCheckinInterval"`
+		EnableEdgeComputeFeatures          bool                 `json:"EnableEdgeComputeFeatures"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool

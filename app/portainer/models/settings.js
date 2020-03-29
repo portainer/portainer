@@ -12,6 +12,7 @@ export function SettingsViewModel(data) {
   this.ExternalTemplates = data.ExternalTemplates;
   this.EnableHostManagementFeatures = data.EnableHostManagementFeatures;
   this.EdgeAgentCheckinInterval = data.EdgeAgentCheckinInterval;
+  this.EnableEdgeComputeFeatures = data.EnableEdgeComputeFeatures;
 }
 
 export function PublicSettingsViewModel(settings) {

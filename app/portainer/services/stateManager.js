@@ -63,6 +63,11 @@ function StateManagerFactory($q, SystemService, InfoHelper, EndpointProvider, Lo
     LocalStorage.storeApplicationState(state.application);
   };
 
+  manager.updateEnableEdgeComputeFeatures = function updateEnableEdgeComputeFeatures(enableEdgeComputeFeatures) {
+    state.application.enableEdgeComputeFeatures = enableEdgeComputeFeatures;
+    LocalStorage.storeApplicationState(state.application);
+  }
+
  function assignStateFromStatusAndSettings(status, settings) {
    state.application.authentication = status.Authentication;
    state.application.analytics = status.Analytics;
@@ -73,6 +78,7 @@ function StateManagerFactory($q, SystemService, InfoHelper, EndpointProvider, Lo
    state.application.snapshotInterval = settings.SnapshotInterval;
    state.application.enableHostManagementFeatures = settings.EnableHostManagementFeatures;
    state.application.enableVolumeBrowserForNonAdminUsers = settings.AllowVolumeBrowserForRegularUsers;
+   state.application.enableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
    state.application.validity = moment().unix();
  }
 
