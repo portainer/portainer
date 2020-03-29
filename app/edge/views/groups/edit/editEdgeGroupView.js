@@ -1,4 +1,4 @@
 angular.module('portainer.edge').component('editEdgeGroupView', {
-  templateUrl: './edit-group.html',
+  templateUrl: './editEdgeGroupView.html',
   controller: 'EditEdgeGroupController'
 });
