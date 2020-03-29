@@ -50,7 +50,7 @@
                 <div style="padding: 8px;">
                   <kubernetes-resource-reservation ng-if="ctrl.resourceReservation" cpu="ctrl.resourceReservation.CPU" cpu-limit="ctrl.node.CPU"
                     memory="ctrl.resourceReservation.Memory" memory-limit="ctrl.memoryLimit"
-                    description="Resource reservation represents the total amount of resource requested by all of the applications deployed on this node.">
+                    description="Resource reservation represents the total amount of resource assigned to all the applications running on this node.">
                   </kubernetes-resource-reservation>
                 </div>
               </form>

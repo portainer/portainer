@@ -33,12 +33,12 @@
               <div class="col-sm-12 small text-muted">
                 <p>
                   <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                  Adding a resource quota will limit the amount of resources that can be used by applications deployed inside this resource pool.
+                   A resource pool segments the underyling physical Kubernetes cluster into smaller virtual clusters. You should assign a capped limit of resources to this pool or disable for the safe operation of your platform.
                 </p>
               </div>
               <div class="col-sm-12">
                 <label class="control-label text-left">
-                  Add quota to resource pool
+                  Resource assignment
                 </label>
                 <label class="switch" style="margin-left: 20px;">
                   <input type="checkbox" ng-model="ctrl.formValues.hasQuota"><i></i>

@@ -28,7 +28,7 @@
                 <div ng-if="ctrl.isAdmin" class="form-group">
                   <div class="col-sm-12">
                     <label class="control-label text-left">
-                      Add quota to resource pool
+                      Resource assignment
                     </label>
                     <label class="switch" style="margin-left: 20px;">
                       <input type="checkbox" ng-model="ctrl.formValues.hasQuota"><i></i>
@@ -91,7 +91,7 @@
                   </div>
                 </div>
                 <div ng-if="ctrl.formValues.hasQuota">
-                  <kubernetes-resource-reservation ng-if="ctrl.pool.Quota" description="Resource reservation represents the total amount of resource requested by all of the applications deployed inside this resource pool."
+                  <kubernetes-resource-reservation ng-if="ctrl.pool.Quota" description="Resource reservation represents the total amount of resource assigned to all the applications deployed inside this resource pool."
                     cpu="ctrl.state.cpuUsed" memory="ctrl.state.memoryUsed" cpu-limit="ctrl.formValues.CpuLimit" memory-limit="ctrl.formValues.MemoryLimit">
                   </kubernetes-resource-reservation>
                 </div>
