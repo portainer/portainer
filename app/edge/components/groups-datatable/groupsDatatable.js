@@ -1,5 +1,7 @@
+import angular from 'angular';
+
 angular.module('portainer.edge').component('edgeGroupsDatatable', {
-  templateUrl: './groups-datatable.html',
+  templateUrl: './groupsDatatable.html',
   controller: 'EdgeGroupsDatatableController',
   bindings: {
     dataset: '<',
