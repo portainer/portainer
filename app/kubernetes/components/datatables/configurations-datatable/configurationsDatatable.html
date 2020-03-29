@@ -111,8 +111,8 @@
                   <label for="select_{{ $index }}"></label>
                 </span>
                 <a ui-sref="kubernetes.configurations.configuration({ name: item.Name, namespace: item.Namespace })">{{ item.Name }}</a>
-                <span style="margin-left: 5px;" class="label label-warning image-tag" ng-if="!item.Used && !$ctrl.isSystemNamespace(item)">unused</span>
-                <span style="margin-left: 5px;" class="label label-info image-tag" ng-if="$ctrl.isSystemNamespace(item)">system</span>
+                <span style="margin-left: 5px;" class="label label-warning image-tag" ng-if="!item.Used && !$ctrl.isSystemNamespace(item) && !$ctrl.isSystemConfig(item)">unused</span>
+                <span style="margin-left: 5px;" class="label label-info image-tag" ng-if="$ctrl.isSystemConfig(item)">system</span>
               </td>
               <td>
                 <a ui-sref="kubernetes.resourcePools.resourcePool({ id: item.Namespace })">{{ item.Namespace }}</a>
