@@ -1,4 +1,4 @@
 angular.module('portainer.edge').component('edgeGroupsView', {
-  templateUrl: './groups.html',
+  templateUrl: './edgeGroupsView.html',
   controller: 'EdgeGroupsController'
 });
