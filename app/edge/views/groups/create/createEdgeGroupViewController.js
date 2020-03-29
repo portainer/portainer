@@ -1,6 +1,8 @@
-angular
-  .module('portainer.edge')
-  .controller('CreateEdgeGroupController', function CreateEdgeGroupController(
+import angular from 'angular';
+
+class CreateEdgeGroupController {
+  /* @ngInject */
+  constructor(
     EdgeGroupService,
     EndpointService,
     GroupService,
@@ -8,44 +10,57 @@ angular
     Notifications,
     $state
   ) {
+    this.EdgeGroupService = EdgeGroupService;
+    this.EndpointService = EndpointService;
+    this.GroupService = GroupService;
+    this.TagService = TagService;
+    this.Notifications = Notifications;
+    this.$state = $state;
+
     this.state = {
-      actionInProgress: false,
+      actionInProgress: false
     };
 
     this.model = {
       Name: '',
       Endpoints: [],
       Dynamic: false,
-      TagIds: [],
+      TagIds: []
     };
 
-    this.$onInit = async function $onInit() {
-      const [tags, endpoints, endpointGroups] = await Promise.all([
-        TagService.tags(),
-        EndpointService.endpoints(),
-        GroupService.groups(),
-      ]);
-      this.tags = tags;
-      this.endpoints = endpoints.value.filter(endpoint => endpoint.Type === 4);
-      this.endpointGroups = endpointGroups;
-    };
+    this.onChangeTags = this.onChangeTags.bind(this);
+    this.createGroup = this.createGroup.bind(this);
+  }
 
-    this.onChangeTags = onChangeTags.bind(this);
-    function onChangeTags(tags) {
-      this.model.TagIds = tags;
+  async $onInit() {
+    const [tags, endpoints, endpointGroups] = await Promise.all([
+      this.TagService.tags(),
+      this.EndpointService.endpoints(),
+      this.GroupService.groups()
+    ]);
+    this.tags = tags;
+    this.endpoints = endpoints.value.filter(endpoint => endpoint.Type === 4);
+    this.endpointGroups = endpointGroups;
+  }
+
+  onChangeTags(tags) {
+    this.model.TagIds = tags;
+  }
+
+  async createGroup() {
+    this.state.actionInProgress = true;
+    try {
+      await this.EdgeGroupService.create(this.model);
+      this.Notifications.success('Edge group successfully created');
+      this.$state.go('edge.groups');
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to create edge group');
     }
+    this.state.actionInProgress = false;
+  }
+}
 
-    this.createGroup = createGroup.bind(this);
-
-    async function createGroup() {
-      this.state.actionInProgress = true;
-      try {
-        await EdgeGroupService.create(this.model);
-        Notifications.success('Edge group successfully created');
-        $state.go('edge.groups');
-      } catch (err) {
-        Notifications.error('Failure', err, 'Unable to create edge group');
-      }
-      this.state.actionInProgress = false;
-    }
-  });
+angular
+  .module('portainer.edge')
+  .controller('CreateEdgeGroupController', CreateEdgeGroupController);
+export default CreateEdgeGroupController;
