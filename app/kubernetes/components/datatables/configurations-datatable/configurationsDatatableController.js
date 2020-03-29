@@ -1,4 +1,4 @@
-import _ from 'lodash-es';
+import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 
 angular.module('portainer.docker')
   .controller('KubernetesConfigurationsDatatableController', ['$scope', '$controller', 'KubernetesNamespaceHelper', 'DatatableService', 'Authentication',
@@ -21,7 +21,7 @@ angular.module('portainer.docker')
       };
 
       this.isSystemToken = function(item) {
-        return _.startsWith(item.Name, 'default-token-');
+        return KubernetesConfigurationHelper.isSystemToken(item);
       }
 
       this.isSystemConfig = function(item) {

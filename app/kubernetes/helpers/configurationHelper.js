@@ -17,6 +17,10 @@ class KubernetesConfigurationHelper {
     });
   }
 
+  static isSystemToken(config) {
+    return _.startsWith(config.Name, 'default-token-');
+  }
+
   static setConfigurationUsed(config) {
     config.Used = config.Applications && config.Applications.length !== 0;
   }
