@@ -37,7 +37,7 @@
               </label>
               <div class="col-sm-9 col-lg-4">
                 <span class="small text-muted" ng-if="ctrl.availableUsersAndTeams.length === 0">
-                  No user nor team available.
+                  No user nor team access have been set on the endpoint. Head over to the <a ui-sref="portainer.endpoints.endpoint.access({id: ctrl.endpointId})">endpoint access view</a> to manage them.
                 </span>
                 <span isteven-multi-select ng-if="ctrl.availableUsersAndTeams.length > 0" input-model="ctrl.availableUsersAndTeams"
                   output-model="ctrl.formValues.multiselectOutput" button-label="icon '-' Name" item-label="icon '-' Name"

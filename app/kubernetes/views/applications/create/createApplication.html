@@ -12,27 +12,6 @@
         <rd-widget-body>
           <form class="form-horizontal" name="kubernetesApplicationCreationForm" autocomplete="off">
 
-            <div class="col-sm-12 form-section-title">
-              Application
-            </div>
-
-            <!-- resource-pool -->
-            <div class="form-group">
-              <label for="resource-pool-selector" class="col-sm-1 control-label text-left">Resource pool</label>
-              <div class="col-sm-11">
-                <select class="form-control" id="resource-pool-selector" ng-model="ctrl.formValues.ResourcePool"
-                  ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools" ng-change="ctrl.onResourcePoolSelectionChange()"></select>
-              </div>
-            </div>
-            <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
-              <div class="col-sm-12 small text-warning">
-                <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                This resource pool has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of the
-                resource pool.
-              </div>
-            </div>
-            <!-- !resource-pool -->
-
             <!-- name -->
             <div class="form-group">
               <label for="application_name" class="col-sm-1 control-label text-left">Name</label>
@@ -64,6 +43,27 @@
               </div>
             </div>
             <!-- !image -->
+
+            <div class="col-sm-12 form-section-title">
+              Resource pool
+            </div>
+
+            <!-- resource-pool -->
+            <div class="form-group">
+              <label for="resource-pool-selector" class="col-sm-1 control-label text-left">Resource pool</label>
+              <div class="col-sm-11">
+                <select class="form-control" id="resource-pool-selector" ng-model="ctrl.formValues.ResourcePool"
+                  ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools" ng-change="ctrl.onResourcePoolSelectionChange()"></select>
+              </div>
+            </div>
+            <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
+              <div class="col-sm-12 small text-warning">
+                <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                This resource pool has exhausted its resource capacity and you will not be able to deploy the application. Contact your administrator to expand the capacity of the
+                resource pool.
+              </div>
+            </div>
+            <!-- !resource-pool -->
 
             <div class="col-sm-12 form-section-title">
               Stack
@@ -434,6 +434,13 @@
             </div>
             <!-- !replica count -->
 
+            <div class="form-group" ng-if="!ctrl.resourceReservationsOverflow() && ctrl.formValues.ReplicaCount > 1">
+              <div class="col-sm-12 small text-muted">
+                <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                This application will reserve the following resources: <b>{{ ctrl.formValues.CpuLimit * ctrl.formValues.ReplicaCount }} CPU</b> and <b>{{ ctrl.formValues.MemoryLimit * ctrl.formValues.ReplicaCount }} MB</b> of memory.
+              </div>
+            </div>
+
             <div class="form-group" ng-if="ctrl.resourceReservationsOverflow()">
               <div class="col-sm-12 small text-muted">
                 <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -515,17 +522,17 @@
               <div class="col-sm-12 form-inline" style="margin-top: 10px;">
                 <div ng-repeat="publishedPort in ctrl.formValues.PublishedPorts" style="margin-top: 2px;">
 
-                  <div class="input-group col-sm-5 input-group-sm">
+                  <div class="input-group col-sm-4 input-group-sm">
                     <span class="input-group-addon">container port</span>
                     <input type="number" class="form-control" ng-model="publishedPort.ContainerPort" placeholder="80">
                   </div>
 
-                  <div class="input-group col-sm-5 input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER">
+                  <div class="input-group col-sm-4 input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER">
                     <span class="input-group-addon">node port</span>
                     <input type="number" class="form-control" ng-model="publishedPort.NodePort" placeholder="30080">
                   </div>
 
-                  <div class="input-group col-sm-5 input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.LOADBALANCER">
+                  <div class="input-group col-sm-4 input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.LOADBALANCER">
                     <span class="input-group-addon">load balancer port</span>
                     <input type="number" class="form-control" ng-model="publishedPort.LoadBalancerPort" placeholder="80" value="8080">
                   </div>

@@ -48,10 +48,12 @@ class KubernetesResourcePoolAccessController {
       multiselectOutput: []
     };
 
+    this.endpointId = this.EndpointProvider.endpointID();
+
     try {
       const name = this.$transition$.params().id;
       let [endpoint, pool, configMap] = await Promise.all([
-        this.EndpointService.endpoint(this.EndpointProvider.endpointID()),
+        this.EndpointService.endpoint(this.endpointId),
         this.KubernetesResourcePoolService.get(name),
         this.KubernetesConfigMapService.get(KubernetesPortainerConfigMapNamespace, KubernetesPortainerConfigMapConfigName)
       ]);

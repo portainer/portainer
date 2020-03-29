@@ -16,21 +16,6 @@
               </uib-tab-heading>
 
               <form class="form-horizontal" name="kubernetesConfigurationCreationForm" autocomplete="off" style="padding: 20px; margin-top: 10px;">
-                <!-- resource-pool -->
-                <div class="form-group">
-                  <label for="resource-pool-selector" class="col-sm-1 control-label text-left">Resource pool</label>
-                  <div class="col-sm-11">
-                    <select class="form-control" id="resource-pool-selector" ng-model="ctrl.formValues.ResourcePool" ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools"
-                      ng-change="ctrl.onResourcePoolSelectionChange()"></select>
-                  </div>
-                </div>
-                <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
-                  <div class="col-sm-12 small text-warning">
-                    <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                    This resource pool has exhausted its resource capacity and you will not be able to deploy the configuration. Contact your administrator to expand the capacity of the resource pool.
-                  </div>
-                </div>
-                <!-- !resource-pool -->
 
                 <!-- name -->
                 <div class="form-group">
@@ -47,6 +32,26 @@
                   </div>
                 </div>
                 <!-- !name -->
+
+                <div class="col-sm-12 form-section-title">
+                  Resource pool
+                </div>
+
+                <!-- resource-pool -->
+                <div class="form-group">
+                  <label for="resource-pool-selector" class="col-sm-1 control-label text-left">Resource pool</label>
+                  <div class="col-sm-11">
+                    <select class="form-control" id="resource-pool-selector" ng-model="ctrl.formValues.ResourcePool" ng-options="resourcePool.Namespace.Name for resourcePool in ctrl.resourcePools"
+                      ng-change="ctrl.onResourcePoolSelectionChange()"></select>
+                  </div>
+                </div>
+                <div class="form-group" ng-if="ctrl.state.resourcePoolHasQuota && ctrl.resourceQuotaCapacityExceeded()">
+                  <div class="col-sm-12 small text-warning">
+                    <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+                    This resource pool has exhausted its resource capacity and you will not be able to deploy the configuration. Contact your administrator to expand the capacity of the resource pool.
+                  </div>
+                </div>
+                <!-- !resource-pool -->
 
                 <div class="col-sm-12 form-section-title">
                   Configuration type
