@@ -4,7 +4,6 @@ angular.module('portainer.app').component('tagSelector', {
   bindings: {
     tags: '<',
     model: '=',
-    onChange: '<',
     onCreate: '<',
     allowCreate: '<'
   },
