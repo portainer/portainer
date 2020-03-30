@@ -71,7 +71,6 @@ type Server struct {
 	StackService           portainer.StackService
 	SwarmStackManager      portainer.SwarmStackManager
 	TagService             portainer.TagService
-	TagAssociationService  portainer.TagAssociationService
 	TeamService            portainer.TeamService
 	TeamMembershipService  portainer.TeamMembershipService
 	TemplateService        portainer.TemplateService
@@ -160,13 +159,11 @@ func (server *Server) Start() error {
 	endpointHandler.ReverseTunnelService = server.ReverseTunnelService
 	endpointHandler.SettingsService = server.SettingsService
 	endpointHandler.Snapshotter = server.Snapshotter
-	endpointHandler.TagAssociationService = server.TagAssociationService
 
 	var endpointGroupHandler = endpointgroups.NewHandler(requestBouncer)
 	endpointGroupHandler.AuthorizationService = authorizationService
 	endpointGroupHandler.EndpointGroupService = server.EndpointGroupService
 	endpointGroupHandler.EndpointService = server.EndpointService
-	endpointGroupHandler.TagAssociationService = server.TagAssociationService
 
 	var endpointProxyHandler = endpointproxy.NewHandler(requestBouncer)
 	endpointProxyHandler.EndpointService = server.EndpointService
@@ -232,7 +229,6 @@ func (server *Server) Start() error {
 	tagHandler.TagService = server.TagService
 	tagHandler.EndpointService = server.EndpointService
 	tagHandler.EndpointGroupService = server.EndpointGroupService
-	tagHandler.TagAssociationService = server.TagAssociationService
 	tagHandler.EndpointService = server.EndpointService
 	tagHandler.EndpointGroupService = server.EndpointGroupService
 

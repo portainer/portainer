@@ -66,18 +66,18 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 		}
 		endpointGroup.TagIDs = payload.TagIDs
 		for tagID, value := range tagsMap {
-			tagAssociation, err := handler.TagAssociationService.TagAssociationByTagID(tagID)
+			tag, err := handler.TagService.Tag(tagID)
 			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a tag association inside the database", err}
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a tag inside the database", err}
 			}
 
 			if value {
-				tagAssociation.EndpointGroups[endpointGroup.ID] = true
+				tag.EndpointGroups[endpointGroup.ID] = true
 			} else {
-				delete(tagAssociation.EndpointGroups, endpointGroup.ID)
+				delete(tag.EndpointGroups, endpointGroup.ID)
 			}
 
-			err = handler.TagAssociationService.UpdateTagAssociation(tagID, tagAssociation)
+			err = handler.TagService.UpdateTag(tagID, tag)
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist tag association changes inside the database", err}
 			}

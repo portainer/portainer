@@ -52,7 +52,7 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	if search != "" {
-		tags, err := handler.TagsService.Tags()
+		tags, err := handler.TagService.Tags()
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve tags from the database", err}
 		}

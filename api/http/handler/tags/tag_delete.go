@@ -17,19 +17,14 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 	}
 	tagID := portainer.TagID(id)
 
-	err = handler.TagService.DeleteTag(tagID)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the tag from the database", err}
-	}
-
-	tagAssociation, err := handler.TagAssociationService.TagAssociationByTagID(tagID)
+	tag, err := handler.TagService.Tag(tagID)
 	if err == portainer.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a tag association with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a tag with the specified identifier inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a tag association with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a tag with the specified identifier inside the database", err}
 	}
 
-	for endpointID := range tagAssociation.Endpoints {
+	for endpointID := range tag.Endpoints {
 		endpoint, err := handler.EndpointService.Endpoint(endpointID)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint from the database", err}
@@ -45,7 +40,7 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 		}
 	}
 
-	for endpointGroupID := range tagAssociation.EndpointGroups {
+	for endpointGroupID := range tag.EndpointGroups {
 		endpointGroup, err := handler.EndpointGroupService.EndpointGroup(endpointGroupID)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint group from the database", err}
@@ -61,9 +56,9 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 		}
 	}
 
-	err = handler.TagAssociationService.DeleteTagAssociation(tagID)
+	err = handler.TagService.DeleteTag(tagID)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the tag association from the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the tag from the database", err}
 	}
 
 	return response.Empty(w)

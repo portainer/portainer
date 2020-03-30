@@ -38,8 +38,7 @@ type Handler struct {
 	ReverseTunnelService        portainer.ReverseTunnelService
 	SettingsService             portainer.SettingsService
 	Snapshotter                 portainer.Snapshotter
-	TagsService                 portainer.TagService
-	TagAssociationService       portainer.TagAssociationService
+	TagService                  portainer.TagService
 }
 
 // NewHandler creates a handler to manage endpoint operations.
