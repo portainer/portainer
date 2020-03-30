@@ -30,7 +30,7 @@
                       <td>
                         <span ng-if="!ctrl.state.updateStackName">
                           <span>{{ ctrl.application.StackName }}</span>
-                          <button class="btn btn-xs btn-primary" ng-click="ctrl.state.updateStackName = true;">Change</button>
+                          <button class="btn btn-xs btn-primary" ng-click="ctrl.state.updateStackName = true;">change stack</button>
                         </span>
                         <span ng-if="ctrl.state.updateStackName">
                           <div class="form-inline">
@@ -40,10 +40,10 @@
                             </div>
                             <div class="input-group input-group-xs">
                               <button class="btn btn-xs btn-danger" type="button" ng-click="ctrl.resetApplicationStackName();">
-                                <i class="fa fa-times" aria-hidden="true"></i>
+                                <i class="fa fa-times" aria-hidden="true"></i> reset
                               </button>
                               <button class="btn btn-xs btn-success" type="button" ng-click="ctrl.updateApplication();">
-                                <i class="fa fa-check" aria-hidden="true"></i>
+                                <i class="fa fa-check" aria-hidden="true"></i> apply
                               </button>
                             </div>
                           </div>
