@@ -32,7 +32,7 @@ function ($q, $scope, $state, GroupService, EndpointService, TagService, Notific
   };
 
   function initView() {
-    TagService.tagNames()
+    TagService.tags()
     .then((tags) => {
       $scope.availableTags = tags;
       $scope.associatedEndpoints = [];

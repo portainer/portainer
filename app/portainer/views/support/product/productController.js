@@ -8,7 +8,8 @@ angular.module('portainer.app')
 
       $scope.state = {
         minHosts: 0,
-        placeholder: 0
+        placeholder: 0,
+        supportType: ''
       };
 
       $scope.isBuyButtonEnabled = function () {
@@ -22,16 +23,19 @@ angular.module('portainer.app')
           $scope.formValues.hostCount = 1;
           $scope.state.minHosts = 1;
           $scope.state.placeholder = 1;
+          $scope.state.supportType = 'Person';
         }
         if ($scope.product.Id == 2 || $scope.product.Id == 3) {
           $scope.formValues.hostCount = 4;
           $scope.state.minHosts = 4;
           $scope.state.placeholder = 4;
+          $scope.state.supportType = 'Host';
         }
         if ($scope.product.Id == 4 || $scope.product.Id == 5) {
           $scope.formValues.hostCount = 10;
           $scope.state.minHosts = 10;
           $scope.state.placeholder = 10;
+          $scope.state.supportType = 'Host'
         }
       }
 

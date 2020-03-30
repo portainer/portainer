@@ -28,8 +28,9 @@
   <!-- tags -->
   <div class="form-group">
     <tag-selector
+      ng-if="$ctrl.availableTags && $ctrl.model.TagIds"
       tags="$ctrl.availableTags"
-      model="$ctrl.model.Tags"
+      model="$ctrl.model.TagIds"
     ></tag-selector>
   </div>
   <!-- !tags -->

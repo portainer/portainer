@@ -69,6 +69,7 @@ angular.module('portainer.app').component('scheduleForm', {
     model: '=',
     endpoints: '<',
     groups: '<',
+    tags: '<',
     addLabelAction: '<',
     removeLabelAction: '<',
     formAction: '<',
