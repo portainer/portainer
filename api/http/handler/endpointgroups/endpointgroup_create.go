@@ -71,14 +71,14 @@ func (handler *Handler) endpointGroupCreate(w http.ResponseWriter, r *http.Reque
 	for _, tagID := range endpointGroup.TagIDs {
 		tag, err := handler.TagService.Tag(tagID)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve tag association from the database", err}
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve tag from the database", err}
 		}
 
 		tag.EndpointGroups[endpointGroup.ID] = true
 
 		err = handler.TagService.UpdateTag(tagID, tag)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the tag association inside the database", err}
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist tag changes inside the database", err}
 		}
 	}
 

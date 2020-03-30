@@ -57,16 +57,16 @@ func (handler *Handler) endpointGroupDelete(w http.ResponseWriter, r *http.Reque
 	}
 
 	for _, tagID := range endpointGroup.TagIDs {
-		tagAssociation, err := handler.TagService.Tag(tagID)
+		tag, err := handler.TagService.Tag(tagID)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a tag inside the database", err}
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve tag from the database", err}
 		}
 
-		delete(tagAssociation.EndpointGroups, endpointGroup.ID)
+		delete(tag.EndpointGroups, endpointGroup.ID)
 
-		err = handler.TagService.UpdateTag(tagID, tagAssociation)
+		err = handler.TagService.UpdateTag(tagID, tag)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update tag", err}
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist tag changes inside the database", err}
 		}
 	}
 
