@@ -26,9 +26,9 @@ func (m *Migrator) updateEndpointsAndEndpointGroupsToDBVersion23() error {
 		return err
 	}
 
-	tagsNameMap := make(map[string]*portainer.Tag)
+	tagsNameMap := make(map[string]portainer.Tag)
 	for _, tag := range tags {
-		tagsNameMap[tag.Name] = &tag
+		tagsNameMap[tag.Name] = tag
 	}
 
 	endpoints, err := m.endpointService.Endpoints()
@@ -74,7 +74,7 @@ func (m *Migrator) updateEndpointsAndEndpointGroupsToDBVersion23() error {
 	}
 
 	for _, tag := range tagsNameMap {
-		err = m.tagService.UpdateTag(tag.ID, tag)
+		err = m.tagService.UpdateTag(tag.ID, &tag)
 		if err != nil {
 			return err
 		}
