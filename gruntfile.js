@@ -36,7 +36,6 @@ module.exports = function(grunt) {
 
   grunt.registerTask('build:server', [
     'shell:build_binary:linux:' + arch,
-    'shell:download_docker_binary:linux:' + arch,
     'shell:download_kompose_binary:linux:' + arch,
     'shell:download_kubectl_binary:linux:' + arch,
   ]);
@@ -78,7 +77,6 @@ module.exports = function(grunt) {
         'clean:all',
         'copy:assets',
         'shell:build_binary:' + p + ':' + a,
-        'shell:download_docker_binary:' + p + ':' + a,
         'shell:download_kompose_binary:' + p + ':' + a,
         'shell:download_kubectl_binary:' + p + ':' + a,
         'webpack:prod'
@@ -93,7 +91,6 @@ module.exports = function(grunt) {
         'clean:all',
         'copy:assets',
         'shell:build_binary_azuredevops:' + p + ':' + a,
-        'shell:download_docker_binary:' + p + ':' + a,
         'shell:download_kompose_binary:' + p + ':' + a,
         'shell:download_kubectl_binary:' + p + ':' + a,
         'webpack:prod'
