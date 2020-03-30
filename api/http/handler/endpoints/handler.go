@@ -29,12 +29,12 @@ type Handler struct {
 	*mux.Router
 	authorizeEndpointManagement bool
 	requestBouncer              *security.RequestBouncer
-	ProxyManager                *proxy.Manager
 	AuthorizationService        *portainer.AuthorizationService
 	EndpointService             portainer.EndpointService
 	EndpointGroupService        portainer.EndpointGroupService
 	FileService                 portainer.FileService
 	JobService                  portainer.JobService
+	ProxyManager                *proxy.Manager
 	ReverseTunnelService        portainer.ReverseTunnelService
 	SettingsService             portainer.SettingsService
 	Snapshotter                 portainer.Snapshotter

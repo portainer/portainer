@@ -3,7 +3,6 @@ package migrator
 import "github.com/portainer/portainer/api"
 
 func (m *Migrator) updateTagsToDBVersion23() error {
-	// create association objects to each tag
 	tags, err := m.tagService.Tags()
 	if err != nil {
 		return err

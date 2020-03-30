@@ -151,11 +151,11 @@ func (server *Server) Start() error {
 
 	var endpointHandler = endpoints.NewHandler(requestBouncer, server.EndpointManagement)
 	endpointHandler.AuthorizationService = authorizationService
-	endpointHandler.ProxyManager = proxyManager
 	endpointHandler.EndpointService = server.EndpointService
 	endpointHandler.EndpointGroupService = server.EndpointGroupService
 	endpointHandler.FileService = server.FileService
 	endpointHandler.JobService = server.JobService
+	endpointHandler.ProxyManager = proxyManager
 	endpointHandler.ReverseTunnelService = server.ReverseTunnelService
 	endpointHandler.SettingsService = server.SettingsService
 	endpointHandler.Snapshotter = server.Snapshotter
@@ -226,11 +226,9 @@ func (server *Server) Start() error {
 	stackHandler.ExtensionService = server.ExtensionService
 
 	var tagHandler = tags.NewHandler(requestBouncer)
+	tagHandler.EndpointService = server.EndpointService
+	tagHandler.EndpointGroupService = server.EndpointGroupService
 	tagHandler.TagService = server.TagService
-	tagHandler.EndpointService = server.EndpointService
-	tagHandler.EndpointGroupService = server.EndpointGroupService
-	tagHandler.EndpointService = server.EndpointService
-	tagHandler.EndpointGroupService = server.EndpointGroupService
 
 	var teamHandler = teams.NewHandler(requestBouncer)
 	teamHandler.TeamService = server.TeamService
