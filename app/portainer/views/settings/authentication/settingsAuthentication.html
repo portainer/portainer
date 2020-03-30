@@ -37,26 +37,6 @@
                   <p>LDAP authentication</p>
                 </label>
               </div>
-              <div ng-if="oauthAuthenticationAvailable">
-                <input type="radio" id="registry_auth" ng-model="settings.AuthenticationMethod" ng-value="3">
-                <label for="registry_auth">
-                  <div class="boxselector_header">
-                    <i class="fa fa-users" aria-hidden="true" style="margin-right: 2px;"></i>
-                    OAuth
-                  </div>
-                  <p>OAuth authentication</p>
-                </label>
-              </div>
-              <div style="color: #767676;" ng-click="goToOAuthExtensionView()" ng-if="!oauthAuthenticationAvailable">
-                <input type="radio" id="registry_auth" ng-model="settings.AuthenticationMethod" ng-value="3" disabled>
-                <label for="registry_auth" tooltip-append-to-body="true" tooltip-placement="bottom" tooltip-class="portainer-tooltip" uib-tooltip="Feature available via an extension" style="cursor:pointer; border-color: #767676">
-                  <div class="boxselector_header">
-                    <i class="fa fa-users" aria-hidden="true" style="margin-right: 2px;"></i>
-                    OAuth (extension)
-                  </div>
-                  <p>OAuth authentication</p>
-                </label>
-              </div>
             </div>
           </div>
 

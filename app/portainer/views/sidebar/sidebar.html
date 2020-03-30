@@ -51,18 +51,6 @@
       <span>Settings</span>
     </li>
     <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
-      <a ui-sref="portainer.extensions" ui-sref-active="active">Extensions <span class="menu-icon fa fa-bolt fa-fw"></span></a>
-    </li>
-    <li class="sidebar-list" ng-if="applicationState.application.authentication && (isAdmin || isTeamLeader)">
-      <a ui-sref="portainer.users" ui-sref-active="active">Users <span class="menu-icon fa fa-users fa-fw"></span></a>
-      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'portainer.users' || $state.current.name === 'portainer.users.user' || $state.current.name === 'portainer.teams' || $state.current.name === 'portainer.teams.team' || $state.current.name === 'portainer.roles' || $state.current.name === 'portainer.roles.role' || $state.current.name === 'portainer.roles.new')">
-        <a ui-sref="portainer.teams" ui-sref-active="active">Teams</a>
-      </div>
-      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'portainer.users' || $state.current.name === 'portainer.users.user' || $state.current.name === 'portainer.teams' || $state.current.name === 'portainer.teams.team' || $state.current.name === 'portainer.roles' || $state.current.name === 'portainer.roles.role' || $state.current.name === 'portainer.roles.new')">
-        <a ui-sref="portainer.roles" ui-sref-active="active">Roles</a>
-      </div>
-    </li>
-    <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
       <a ui-sref="portainer.endpoints" ui-sref-active="active">Endpoints <span class="menu-icon fa fa-plug fa-fw"></span></a>
       <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'portainer.endpoints' || $state.current.name === 'portainer.endpoints.endpoint' || $state.current.name === 'portainer.endpoints.new' || $state.current.name === 'portainer.endpoints.endpoint.access' || $state.current.name === 'portainer.groups' || $state.current.name === 'portainer.groups.group' || $state.current.name === 'portainer.groups.group.access' || $state.current.name === 'portainer.groups.new' || $state.current.name === 'portainer.tags')">
         <a ui-sref="portainer.groups" ui-sref-active="active">Groups</a>
@@ -70,9 +58,6 @@
       <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'portainer.endpoints' || $state.current.name === 'portainer.endpoints.endpoint' || $state.current.name === 'portainer.endpoints.new' || $state.current.name === 'portainer.endpoints.endpoint.access' || $state.current.name === 'portainer.groups' || $state.current.name === 'portainer.groups.group' || $state.current.name === 'portainer.groups.group.access' || $state.current.name === 'portainer.groups.new' || $state.current.name === 'portainer.tags')">
         <a ui-sref="portainer.tags" ui-sref-active="active">Tags</a>
       </div>
-    </li>
-    <li class="sidebar-list">
-      <a ui-sref="portainer.registries" ui-sref-active="active">Registries <span class="menu-icon fa fa-database fa-fw"></span></a>
     </li>
     <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
       <a ui-sref="portainer.settings" ui-sref-active="active">Settings <span class="menu-icon fa fa-cogs fa-fw"></span></a>
