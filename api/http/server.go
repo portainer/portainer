@@ -148,6 +148,8 @@ func (server *Server) Start() error {
 
 	var edgeGroupsHandler = edgegroups.NewHandler(requestBouncer)
 	edgeGroupsHandler.EdgeGroupService = server.EdgeGroupService
+	edgeGroupsHandler.EndpointService = server.EndpointService
+	edgeGroupsHandler.TagService = server.TagService
 
 	var endpointHandler = endpoints.NewHandler(requestBouncer, server.EndpointManagement)
 	endpointHandler.AuthorizationService = authorizationService
@@ -159,11 +161,13 @@ func (server *Server) Start() error {
 	endpointHandler.ReverseTunnelService = server.ReverseTunnelService
 	endpointHandler.SettingsService = server.SettingsService
 	endpointHandler.Snapshotter = server.Snapshotter
+	endpointHandler.TagService = server.TagService
 
 	var endpointGroupHandler = endpointgroups.NewHandler(requestBouncer)
 	endpointGroupHandler.AuthorizationService = authorizationService
 	endpointGroupHandler.EndpointGroupService = server.EndpointGroupService
 	endpointGroupHandler.EndpointService = server.EndpointService
+	endpointGroupHandler.TagService = server.TagService
 
 	var endpointProxyHandler = endpointproxy.NewHandler(requestBouncer)
 	endpointProxyHandler.EndpointService = server.EndpointService
