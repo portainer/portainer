@@ -3,6 +3,7 @@ import {KubernetesConfigurationFormValues, KubernetesConfigurationFormValuesData
 import {KubernetesConfigurationTypes} from 'Kubernetes/models/configuration/models';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
+import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import _ from 'lodash-es';
 
 class KubernetesConfigurationController {
@@ -24,11 +25,33 @@ class KubernetesConfigurationController {
     this.getEventsAsync = this.getEventsAsync.bind(this);
     this.getApplications = this.getApplications.bind(this);
     this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
+    this.getConfigurationsAsync = this.getConfigurationsAsync.bind(this);
     this.updateConfiguration = this.updateConfiguration.bind(this);
     this.updateConfigurationAsync = this.updateConfigurationAsync.bind(this);
     this.editorUpdate = this.editorUpdate.bind(this);
     this.editorUpdateAsync = this.editorUpdateAsync.bind(this);
     this.addEntryFromFileAsync = this.addEntryFromFileAsync.bind(this);
+  }
+
+  // TODO: review
+  // change this.state.isAlreadyExist to this.state.alreadyExists
+  // and use
+  // onChangeName() {
+  //   this.state.isAlreadyExist = _.fin(this.configurations, (app) => config.Namespace === this.formValues.ResourcePool.Namespace.Name && config.Name === this.formValues.Name) !== undefined;
+  // }
+  onChangeName() {
+    if (this.formValues.Name === this.configuration.Name) {
+      this.state.isAlreadyExist = false;
+      return;
+    }
+
+    const filteredConfigurations = _.filter(this.configurations, (config) => config.Namespace === this.formValues.ResourcePool.Namespace.Name);
+    this.state.isAlreadyExist = _.find(filteredConfigurations, (config) => config.Name === this.formValues.Name) !== undefined;
+  }
+
+  onChangeKey() {
+    this.state.duplicateKeys = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.Data, (data) => data.Key));
+    this.state.isDuplicateKeys = Object.keys(this.state.duplicateKeys).length > 0;
   }
 
   addEntry() {
@@ -37,6 +60,8 @@ class KubernetesConfigurationController {
 
   removeEntry(index) {
     this.formValues.Data.splice(index, 1);
+    this.state.duplicateKeys = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.Data, (data) => data.Key));
+    this.state.isDuplicateKeys = Object.keys(this.state.duplicateKeys).length > 0;
   }
 
   showEditor() {
@@ -52,12 +77,12 @@ class KubernetesConfigurationController {
     return this.$async(this.editorUpdateAsync, cm);
   }
 
-  // TODO: review - refactor form validation (html should not pass form.$valid as param)
-  isFormValid(isValid) {
-    if (this.formValues.IsSimple && isValid) {
-      return this.formValues.Data.length > 0;
+  isFormValid() {
+    const uniqueCheck = !this.state.isAlreadyExist && !this.state.isDuplicateKeys;
+    if (this.formValues.IsSimple) {
+      return this.formValues.Data.length > 0 && uniqueCheck;
     }
-    return isValid;
+    return uniqueCheck;
   }
 
   // TODO: review - refactor fileReader usage
@@ -178,6 +203,18 @@ class KubernetesConfigurationController {
     return this.$async(this.getEventsAsync, namespace);
   }
 
+  async getConfigurationsAsync() {
+    try {
+      this.configurations = await this.KubernetesConfigurationService.get();
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve configurations');
+    }
+  }
+
+  getConfigurations() {
+    return this.$async(this.getConfigurationsAsync)
+  }
+
   async onInit() {
     try {
       this.state = {
@@ -187,7 +224,10 @@ class KubernetesConfigurationController {
         eventsLoading: true,
         showEditorTab: false,
         viewReady: false,
-        eventWarningCount: 0
+        eventWarningCount: 0,
+        isAlreadyExist: false,
+        duplicateKeys: {},
+        isDuplicateKeys: false
       };
 
       this.formValues = new KubernetesConfigurationFormValues();
@@ -210,6 +250,7 @@ class KubernetesConfigurationController {
         entry.Value = value;
         return entry;
       });
+      await this.getConfigurations();
     } catch(err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
     } finally {

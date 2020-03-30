@@ -11,6 +11,7 @@ import {
   KubernetesApplicationConfigurationFormValueOverridenKey,
   KubernetesApplicationConfigurationFormValueOverridenKeyTypes
 } from 'Kubernetes/models/application/formValues';
+import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 
 
 function megaBytesValue(mem) {
@@ -42,6 +43,21 @@ class KubernetesCreateApplicationController {
     this.updateStacksAsync = this.updateStacksAsync.bind(this);
     this.updateConfigurationsAsync = this.updateConfigurationsAsync.bind(this);
     this.updateStacksAndConfigurationsAsync = this.updateStacksAndConfigurationsAsync.bind(this);
+    this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
+  }
+
+  isValid() {
+    return !this.state.isAlreadyExist && !this.state.isDuplicateEnvironmentVariables && !this.state.isDuplicatePersistedFolderPaths;
+  }
+
+  // TODO: review : use
+  // and change this.state.isAlreadyExist to this.state.alreadyExists
+  // onChangeName() {
+  //   this.state.isAlreadyExist = _.fin(this.applications, (app) => app.ResourcePool === this.formValues.ResourcePool.Namespace.Name && app.Name === this.formValues.Name) !== undefined;
+  // }
+  onChangeName() {
+    const filteredApplications = _.filter(this.applications, (app) => this.formValues.ResourcePool.Namespace.Name === app.ResourcePool);
+    this.state.isAlreadyExist = _.find(filteredApplications, (app) => app.Name === this.formValues.Name) !== undefined;
   }
 
   addConfiguration() {
@@ -74,12 +90,22 @@ class KubernetesCreateApplicationController {
     this.formValues.EnvironmentVariables.push(new KubernetesApplicationEnvironmentVariableFormValue());
   }
 
+  // TODO: review
+  // change isDuplicateEnvironmentVariables to hasDuplicateEnvironmentVariables
+  // and all occurences like that
   removeEnvironmentVariable(index) {
     this.formValues.EnvironmentVariables.splice(index, 1);
+    this.state.duplicateEnvironmentVariables = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.EnvironmentVariables, (env) => env.Name));
+    this.state.isDuplicateEnvironmentVariables = Object.keys(this.state.duplicateEnvironmentVariables).length > 0;
   }
 
   hasEnvironmentVariables() {
     return this.formValues.EnvironmentVariables.length > 0;
+  }
+
+  onChangeEnvironmentName() {
+    this.state.duplicateEnvironmentVariables = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.EnvironmentVariables, (env) => env.Name));
+    this.state.isDuplicateEnvironmentVariables = Object.keys(this.state.duplicateEnvironmentVariables).length > 0;
   }
 
   addPersistedFolder() {
@@ -92,8 +118,15 @@ class KubernetesCreateApplicationController {
     this.resetDeploymentType();
   }
 
+  onChangePersistedFolderPath() {
+    this.state.duplicatePersistedFolderPaths = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.PersistedFolders, (item) => item.ContainerPath));
+    this.state.isDuplicatePersistedFolderPaths = Object.keys(this.state.duplicatePersistedFolderPaths).length > 0;
+  }
+
   removePersistedFolder(index) {
     this.formValues.PersistedFolders.splice(index, 1);
+    this.state.duplicatePersistedFolderPaths = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.PersistedFolders, (item) => item.ContainerPath));
+    this.state.isDuplicatePersistedFolderPaths = Object.keys(this.state.duplicatePersistedFolderPaths).length > 0;
   }
 
   addPublishedPort() {
@@ -311,6 +344,18 @@ class KubernetesCreateApplicationController {
     this.formValues.Configurations = [];
   }
 
+  async getApplicationsAsync() {
+    try {
+      this.applications = await this.KubernetesApplicationService.get();
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve applications');
+    }
+  }
+
+  getApplications() {
+    return this.$async(this.getApplicationsAsync);
+  }
+
   async onInit() {
     try {
       this.state = {
@@ -332,7 +377,12 @@ class KubernetesCreateApplicationController {
         },
         resourcePoolHasQuota: false,
         viewReady: false,
-        availableSizeUnits: ['MB', 'GB', 'TB']
+        availableSizeUnits: ['MB', 'GB', 'TB'],
+        isAlreadyExist: false,
+        duplicateEnvironmentVariables: {},
+        isDuplicateEnvironmentVariables: false,
+        duplicatePersistedFolderPaths: {},
+        isDuplicatePersistedFolderPaths: false
       };
 
       this.formValues = new KubernetesApplicationFormValues();
@@ -354,6 +404,7 @@ class KubernetesCreateApplicationController {
       this.storageClasses = endpoint.Kubernetes.Configuration.StorageClasses;
       this.state.useLoadBalancer = endpoint.Kubernetes.Configuration.UseLoadBalancer;
       await this.updateStacksAndConfigurations();
+      await this.getApplications();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
     } finally {

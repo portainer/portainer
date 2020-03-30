@@ -24,6 +24,15 @@ class KubernetesCreateResourcePoolController {
 
     this.onInit = this.onInit.bind(this);
     this.createResourcePoolAsync = this.createResourcePoolAsync.bind(this);
+    this.getResourcePoolsAsync = this.getResourcePoolsAsync.bind(this);
+  }
+
+  isValid() {
+    return !this.state.isAlreadyExist;
+  }
+
+  onChangeName() {
+    this.state.isAlreadyExist = _.find(this.resourcePools, (resourcePool) => resourcePool.Namespace.Name === this.formValues.Name) !== undefined;
   }
 
   isQuotaValid() {
@@ -63,6 +72,18 @@ class KubernetesCreateResourcePoolController {
     return this.$async(this.createResourcePoolAsync);
   }
 
+  async getResourcePoolsAsync() {
+    try {
+      this.resourcePools = await this.KubernetesResourcePoolService.get();
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve resource pools');
+    }
+  }
+
+  getResourcePools() {
+    return this.$async(this.getResourcePoolsAsync);
+  }
+
   async onInit() {
     try {
       this.defaults = KubernetesResourceQuotaDefaults;
@@ -77,7 +98,8 @@ class KubernetesCreateResourcePoolController {
         actionInProgress: false,
         sliderMaxMemory: 0,
         sliderMaxCpu: 0,
-        viewReady: false
+        viewReady: false,
+        isAlreadyExist: false
       };
 
       const nodes = await this.KubernetesNodeService.get();
@@ -87,6 +109,7 @@ class KubernetesCreateResourcePoolController {
         this.state.sliderMaxCpu += item.CPU;
       });
       this.state.sliderMaxMemory = megaBytesValue(this.state.sliderMaxMemory);
+      await this.getResourcePools();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
     } finally {

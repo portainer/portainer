@@ -21,14 +21,16 @@
                 <div class="form-group">
                   <label for="configuration_name" class="col-sm-1 control-label text-left">Name</label>
                   <div class="col-sm-11">
-                    <input type="text" class="form-control" name="configuration_name" ng-model="ctrl.formValues.Name" placeholder="myConfiguration" auto-focus required>
+                    <input type="text" class="form-control" name="configuration_name" ng-model="ctrl.formValues.Name" ng-change="ctrl.onChangeName()" ng-pattern="/^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/" placeholder="my-configuration" auto-focus required>
                   </div>
                 </div>
-                <div class="form-group" ng-show="kubernetesConfigurationCreationForm.configuration_name.$invalid">
+                <div class="form-group" ng-show="kubernetesConfigurationCreationForm.configuration_name.$invalid || ctrl.state.isAlreadyExist">
                   <div class="col-sm-12 small text-warning">
                     <div ng-messages="kubernetesConfigurationCreationForm.configuration_name.$error">
                       <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                      <p ng-message="pattern"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character.</p>
                     </div>
+                    <p ng-if="ctrl.state.isAlreadyExist"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A configuration with the same name already exists inside the selected resource pool.</p>
                   </div>
                 </div>
                 <!-- !name -->
@@ -132,14 +134,25 @@
                   <div class="form-group">
                     <label for="configuration_data_key_{{index}}" class="col-sm-1 control-label text-left">Key</label>
                     <div class="col-sm-11">
-                      <input type="text" class="form-control" id="configuration_data_key_{{index}}" ng-model="ctrl.formValues.Data[index].Key" required>
+                      <input type="text" class="form-control" id="configuration_data_key_{{index}}" name="configuration_data_key_{{index}}" ng-model="ctrl.formValues.Data[index].Key" required ng-change="ctrl.onChangeKey()">
+                    </div>
+                    <div class="col-sm-11 small text-warning" style="margin-top: 5px" ng-show="kubernetesConfigurationCreationForm['configuration_data_key_' + index].$invalid || ctrl.state.duplicateKeys[index] !== undefined">
+                      <ng-messages for="kubernetesConfigurationCreationForm['configuration_data_key_' + index].$error">
+                        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                      </ng-messages>
+                      <p ng-if="ctrl.state.duplicateKeys[index] !== undefined"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This key already exists.</p>
                     </div>
                   </div>
 
                   <div class="form-group" ng-if="ctrl.formValues.IsSimple">
                     <label for="configuration_data_value_{{index}}" class="col-sm-1 control-label text-left">Value</label>
                     <div class="col-sm-11">
-                      <textarea class="form-control" rows="5" id="configuration_data_value_{{index}}" ng-model="ctrl.formValues.Data[index].Value" required></textarea>
+                      <textarea class="form-control" rows="5" id="configuration_data_value_{{index}}" name="configuration_data_value_{{index}}" ng-model="ctrl.formValues.Data[index].Value" required ></textarea>
+                    </div>
+                    <div class="col-sm-11 small text-warning" style="margin-top: 5px" ng-show="kubernetesConfigurationCreationForm['configuration_data_value_' + index].$invalid">
+                      <ng-messages for="kubernetesConfigurationCreationForm['configuration_data_value_' + index].$error">
+                        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                      </ng-messages>
                     </div>
                   </div>
 
@@ -164,7 +177,7 @@
                 </div>
                 <div class="form-group">
                   <div class="col-sm-12">
-                    <button type="button" class="btn btn-primary btn-sm" ng-disabled="!ctrl.isFormValid(kubernetesConfigurationCreationForm.$valid) || ctrl.state.actionInProgress" ng-click="ctrl.updateConfiguration()" button-spinner="ctrl.state.actionInProgress">
+                    <button type="button" class="btn btn-primary btn-sm" ng-disabled="!ctrl.isFormValid() || !kubernetesConfigurationCreationForm.$valid || ctrl.state.actionInProgress" ng-click="ctrl.updateConfiguration()" button-spinner="ctrl.state.actionInProgress">
                       <span ng-hide="ctrl.state.actionInProgress">Update configuration</span>
                       <span ng-show="ctrl.state.actionInProgress">Update in progress...</span>
                     </button>

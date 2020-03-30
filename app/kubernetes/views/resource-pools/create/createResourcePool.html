@@ -10,18 +10,20 @@
       <rd-widget>
         <rd-widget-body>
           <form class="form-horizontal" autocomplete="off" name="resourcePoolCreationForm">
-             <!-- name-input -->
-             <div class="form-group">
+            <!-- name-input -->
+            <div class="form-group">
               <label for="pool_name" class="col-sm-1 control-label text-left">Name</label>
               <div class="col-sm-11">
-                <input type="text" class="form-control" name="pool_name" ng-model="ctrl.formValues.Name" placeholder="my-project" required auto-focus>
+                <input type="text" class="form-control" name="pool_name" ng-model="ctrl.formValues.Name" ng-pattern="/^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/" ng-change="ctrl.onChangeName()" placeholder="my-project" required auto-focus>
               </div>
             </div>
-            <div class="form-group" ng-show="resourcePoolCreationForm.pool_name.$invalid">
+            <div class="form-group" ng-show="resourcePoolCreationForm.pool_name.$invalid || ctrl.state.isAlreadyExist">
               <div class="col-sm-12 small text-warning">
                 <div ng-messages="resourcePoolCreationForm.pool_name.$error">
                   <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                  <p ng-message="pattern"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character.</p>
                 </div>
+                <p ng-if="ctrl.state.isAlreadyExist"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A resource pool with the same name already exists.</p>
               </div>
             </div>
             <!-- !name-input -->
@@ -33,7 +35,7 @@
               <div class="col-sm-12 small text-muted">
                 <p>
                   <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                   A resource pool segments the underyling physical Kubernetes cluster into smaller virtual clusters. You should assign a capped limit of resources to this pool or disable for the safe operation of your platform.
+                    A resource pool segments the underyling physical Kubernetes cluster into smaller virtual clusters. You should assign a capped limit of resources to this pool or disable for the safe operation of your platform.
                 </p>
               </div>
               <div class="col-sm-12">
@@ -107,7 +109,7 @@
             <div class="form-group">
               <div class="col-sm-12">
                 <button type="button" class="btn btn-primary btn-sm"
-                  ng-disabled="!resourcePoolCreationForm.$valid || ctrl.state.actionInProgress || (ctrl.formValues.hasQuota && !ctrl.isQuotaValid())"
+                  ng-disabled="!resourcePoolCreationForm.$valid || ctrl.state.actionInProgress || (ctrl.formValues.hasQuota && !ctrl.isQuotaValid()) || !ctrl.isValid()"
                   ng-click="ctrl.createResourcePool()" button-spinner="ctrl.state.actionInProgress">
                   <span ng-hide="ctrl.state.actionInProgress">Create resource pool</span>
                   <span ng-show="ctrl.state.actionInProgress">Creation in progress...</span>

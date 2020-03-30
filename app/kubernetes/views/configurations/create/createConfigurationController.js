@@ -1,6 +1,8 @@
 import angular from 'angular';
+import _ from 'lodash-es';
 import {KubernetesConfigurationFormValues, KubernetesConfigurationFormValuesDataEntry} from 'Kubernetes/models/configuration/formvalues';
 import {KubernetesConfigurationTypes} from 'Kubernetes/models/configuration/models';
+import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 
 class KubernetesCreateConfigurationController {
   /* @ngInject */
@@ -17,6 +19,24 @@ class KubernetesCreateConfigurationController {
     this.editorUpdate = this.editorUpdate.bind(this);
     this.editorUpdateAsync = this.editorUpdateAsync.bind(this);
     this.addEntryFromFileAsync = this.addEntryFromFileAsync.bind(this);
+    this.getConfigurationsAsync = this.getConfigurationsAsync.bind(this);
+  }
+
+  // TODO: review : use
+  // and change this.state.isAlreadyExist to this.state.alreadyExists
+  // onChangeName() {
+  //   this.state.isAlreadyExist = _.fin(this.configurations, (config) => config.Namespace === this.formValues.ResourcePool.Namespace.Name && config.Name === this.formValues.Name) !== undefined;
+  // }
+  onChangeName() {
+    const filteredConfigurations = _.filter(this.configurations, (config) => config.Namespace === this.formValues.ResourcePool.Namespace.Name);
+    this.state.isAlreadyExist = _.find(filteredConfigurations, (config) => config.Name === this.formValues.Name) !== undefined;
+  }
+
+  // TODO: review
+  // change isDuplicateKeys to hasDuplicateKeys
+  onChangeKey() {
+    this.state.duplicateKeys = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.Data, (data) => data.Key));
+    this.state.isDuplicateKeys = Object.keys(this.state.duplicateKeys).length > 0;
   }
 
   addEntry() {
@@ -25,6 +45,8 @@ class KubernetesCreateConfigurationController {
 
   removeEntry(index) {
     this.formValues.Data.splice(index, 1);
+    this.state.duplicateKeys = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.Data, (data) => data.Key));
+    this.state.isDuplicateKeys = Object.keys(this.state.duplicateKeys).length > 0;
   }
 
   // TODO: review - don't use async function (cf docker/createConfigController for working 'cm' use)
@@ -36,12 +58,12 @@ class KubernetesCreateConfigurationController {
     return this.$async(this.editorUpdateAsync, cm);
   }
 
-  // TODO: review - refactor form validation (html should not pass form.$valid as param)
-  isFormValid(isValid) {
-    if (this.formValues.IsSimple && isValid) {
-      return this.formValues.Data.length > 0;
+  isFormValid() {
+    const uniqueCheck = !this.state.isAlreadyExist && !this.state.isDuplicateKeys;
+    if (this.formValues.IsSimple) {
+      return this.formValues.Data.length > 0 && uniqueCheck;
     }
-    return isValid;
+    return uniqueCheck;
   }
 
   // TODO: review - refactor fileReader usage
@@ -85,10 +107,25 @@ class KubernetesCreateConfigurationController {
     return this.$async(this.createConfigurationAsync);
   }
 
+  async getConfigurationsAsync() {
+    try {
+      this.configurations = await this.KubernetesConfigurationService.get();
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve configurations');
+    }
+  }
+
+  getConfigurations() {
+    return this.$async(this.getConfigurationsAsync)
+  }
+
   async onInit() {
     this.state = {
       actionInProgress: false,
-      viewReady: false
+      viewReady: false,
+      isAlreadyExist: false,
+      duplicateKeys: {},
+      isDuplicateKeys: false
     };
 
     this.formValues = new KubernetesConfigurationFormValues();
@@ -97,6 +134,7 @@ class KubernetesCreateConfigurationController {
     try {
       this.resourcePools = await this.KubernetesResourcePoolService.get();
       this.formValues.ResourcePool = this.resourcePools[0];
+      await this.getConfigurations();
     } catch(err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
     } finally {

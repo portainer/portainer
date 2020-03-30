@@ -16,14 +16,16 @@
             <div class="form-group">
               <label for="application_name" class="col-sm-1 control-label text-left">Name</label>
               <div class="col-sm-11">
-                <input type="text" class="form-control" name="application_name" ng-model="ctrl.formValues.Name" placeholder="myApp" auto-focus required>
+                <input type="text" class="form-control" name="application_name" ng-model="ctrl.formValues.Name" ng-pattern="/^[a-z]([-a-z0-9]*[a-z0-9])?$/" ng-change="ctrl.onChangeName()" placeholder="my-app" auto-focus required>
               </div>
             </div>
-            <div class="form-group" ng-show="kubernetesApplicationCreationForm.application_name.$invalid">
+            <div class="form-group" ng-show="kubernetesApplicationCreationForm.application_name.$invalid || ctrl.state.isAlreadyExist">
               <div class="col-sm-12 small text-warning">
                 <div ng-messages="kubernetesApplicationCreationForm.application_name.$error">
                   <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+                  <p ng-message="pattern"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist of lower case alphanumeric characters or '-', start with an alphabetic character, and end with an alphanumeric character (e.g. 'my-name',  or 'abc-123').</p>
                 </div>
+                <p ng-if="ctrl.state.isAlreadyExist"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> An application with the same name already exists inside the selected resource pool.</p>
               </div>
             </div>
             <!-- !name -->
@@ -103,14 +105,23 @@
               <div class="col-sm-12 form-inline" style="margin-top: 10px;">
                 <div ng-repeat="envVar in ctrl.formValues.EnvironmentVariables" style="margin-top: 2px;">
 
-                  <div class="input-group col-sm-4 input-group-sm">
-                    <span class="input-group-addon">name</span>
-                    <input type="text" class="form-control" ng-model="envVar.Name" placeholder="foo">
+                  <div class="col-sm-4 input-group input-group-sm" style="vertical-align: top;">
+                    <div class="input-group col-sm-12 input-group-sm">
+                      <span class="input-group-addon">name</span>
+                      <input type="text" name="environment_variable_name_{{$index}}" class="form-control" ng-model="envVar.Name" ng-change="ctrl.onChangeEnvironmentName($index)" placeholder="foo" required>
+                    </div>
+                    <div class="small text-warning" style="margin-top: 5px;"
+                      ng-show="kubernetesApplicationCreationForm['environment_variable_name_' + $index].$invalid || ctrl.state.duplicateEnvironmentVariables[$index] !== undefined">
+                      <ng-messages for="kubernetesApplicationCreationForm['environment_variable_name_' + $index].$error">
+                        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Environment variable name is required.</p>
+                      </ng-messages>
+                      <p ng-if="ctrl.state.duplicateEnvironmentVariables[$index] !== undefined"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This environment variable is already defined.</p>
+                    </div>
                   </div>
 
                   <div class="input-group col-sm-4 input-group-sm">
                     <span class="input-group-addon">value</span>
-                    <input type="text" class="form-control" ng-model="envVar.Value" placeholder="bar">
+                    <input type="text" name="environment_variable_value_{{$index}}" class="form-control" ng-model="envVar.Value" placeholder="bar">
                   </div>
 
                   <div class="input-group col-sm-2 input-group-sm">
@@ -178,16 +189,25 @@
               <!-- has-override -->
               <div class="col-sm-12 form-inline" style="margin-top: 10px;" ng-if="config.Overriden">
                 <div ng-repeat="overridenKey in config.OverridenKeys" style="margin-top: 2px;">
-                  <div class="col-md-1 col-sm-2" style="margin-left: 3px;"></div>
-                  <div class="input-group col-sm-3 input-group-sm">
+                  <div class="col-md-1 col-sm-2" style="margin-left: 3px;" style="vertical-align: top;"></div>
+                  <div class="input-group col-sm-3 input-group-sm" style="vertical-align: top;">
                     <span class="input-group-addon">configuration key</span>
                     <input type="text" class="form-control" ng-value="overridenKey.Key" disabled>
                   </div>
-                  <div class="input-group col-sm-3 input-group-sm" ng-if="overridenKey.Type === ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM">
-                    <span class="input-group-addon">path on disk</span>
-                    <input type="text" class="form-control" ng-model="overridenKey.Path" placeholder="/etc/myapp/conf.d">
+
+                  <div class="col-sm-3 input-group input-group-sm" style="vertical-align: top;" ng-if="overridenKey.Type === ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM">
+                    <div class="input-group col-sm-12 input-group-sm">
+                      <span class="input-group-addon">path on disk</span>
+                      <input type="text" class="form-control" ng-model="overridenKey.Path" placeholder="/etc/myapp/conf.d" name="overriden_key_path_{{$index}}" required>
+                    </div>
+                    <div class="small text-warning" style="margin-top:5px" ng-show="kubernetesApplicationCreationForm['overriden_key_path_' + $index].$invalid">
+                      <ng-messages for="kubernetesApplicationCreationForm['overriden_key_path_' + $index].$error">
+                        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Path is required.</p>
+                      </ng-messages>
+                    </div>
                   </div>
-                  <div class="input-group col-sm-3 btn-group btn-group-sm">
+
+                  <div class="input-group col-sm-3 btn-group btn-group-sm" style="vertical-align: top;">
                     <label class="btn btn-primary" ng-model="overridenKey.Type" uib-btn-radio="ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.ENVIRONMENT">
                       <i class="fa fa-list" aria-hidden="true"></i> Environment
                     </label>
@@ -223,39 +243,70 @@
               </div>
 
               <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-                <div ng-repeat="persistedFolder in ctrl.formValues.PersistedFolders" style="margin-top: 2px;">
+
+                <div ng-repeat-start="persistedFolder in ctrl.formValues.PersistedFolders" style="margin-top: 2px;">
 
                   <div class="input-group col-sm-3 input-group-sm">
                     <span class="input-group-addon">path in container</span>
-                    <input type="text" class="form-control" ng-model="persistedFolder.ContainerPath" placeholder="/data">
+                    <input type="text" class="form-control" name="persisted_folder_path_{{$index}}" ng-model="persistedFolder.ContainerPath" ng-change="ctrl.onChangePersistedFolderPath($index)" placeholder="/data" required>
                   </div>
 
                   <div class="input-group col-sm-3 input-group-sm">
                     <span class="input-group-addon">requested size</span>
-                    <input type="number" class="form-control" ng-model="persistedFolder.Size" placeholder="20" min="0">
+                    <input type="number" class="form-control" name="persisted_folder_size_{{$index}}" ng-model="persistedFolder.Size" placeholder="20" ng-min="0" required>
                     <span class="input-group-addon">
                       <select ng-model="persistedFolder.SizeUnit" style="width: 100%;" ng-options="unit for unit in ctrl.state.availableSizeUnits"></select>
                     </span>
                   </div>
 
-                  <div class="input-group col-sm-3 input-group-sm" ng-if="ctrl.hasMultipleStorageClassesAvailable()">
+                  <div class="input-group col-sm-3 input-group-sm" style="vertical-align: top;" ng-if="ctrl.hasMultipleStorageClassesAvailable()">
                     <span class="input-group-addon">storage</span>
                     <select class="form-control" ng-model="persistedFolder.StorageClass"
                       ng-options="storageClass as storageClass.Name for storageClass in ctrl.storageClasses"></select>
                   </div>
 
-                  <div class="input-group col-sm-3 input-group-sm" ng-if="!ctrl.hasMultipleStorageClassesAvailable()">
+                  <div class="input-group col-sm-3 input-group-sm" style="vertical-align: top;" ng-if="!ctrl.hasMultipleStorageClassesAvailable()">
                     <span class="input-group-addon">storage</span>
                     <input type="text" class="form-control" disabled ng-model="persistedFolder.StorageClass.Name" />
                   </div>
 
-                  <div class="input-group col-sm-1 input-group-sm">
+                  <div class="input-group col-sm-1 input-group-sm" style="vertical-align: top;">
                     <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removePersistedFolder($index)">
                       <i class="fa fa-times" aria-hidden="true"></i>
                     </button>
                   </div>
 
                 </div>
+
+                <div ng-repeat-end ng-show="kubernetesApplicationCreationForm['persisted_folder_path_' + $index].$invalid || ctrl.state.duplicatePersistedFolderPaths[$index] !== undefined || kubernetesApplicationCreationForm['persisted_folder_size_' + $index].$invalid">
+
+                  <div class="input-group col-sm-3 input-group-sm">
+                    <div class="small text-warning" style="margin-top: 5px;"
+                      ng-show="kubernetesApplicationCreationForm['persisted_folder_path_' + $index].$invalid || ctrl.state.duplicatePersistedFolderPaths[$index] !== undefined">
+                      <ng-messages for="kubernetesApplicationCreationForm['persisted_folder_path_' + $index].$error">
+                        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Path is required.</p>
+                      </ng-messages>
+                      <p ng-if="ctrl.state.duplicatePersistedFolderPaths[$index] !== undefined"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This path is already defined.</p>
+                    </div>
+                  </div>
+
+                  <div class="input-group col-sm-3 input-group-sm">
+                    <div class="small text-warning" style="margin-top: 5px;" ng-show="kubernetesApplicationCreationForm['persisted_folder_size_' + $index].$invalid">
+                      <ng-messages for="kubernetesApplicationCreationForm['persisted_folder_size_' + $index].$error">
+                        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Size is required.</p>
+                        <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This value must be greater than zero.</p>
+                      </ng-messages>
+                    </div>
+                  </div>
+
+                  <div class="input-group col-sm-3 input-group-sm">
+                  </div>
+
+                  <div class="input-group col-sm-1 input-group-sm">
+                  </div>
+
+                </div>
+
               </div>
 
             </div>
@@ -352,6 +403,13 @@
                 <p class="small text-muted" style="margin-top: 7px;">
                   Maximum memory usage (<b>MB</b>)
                 </p>
+              </div>
+            </div>
+            <div class="form-group" ng-show="kubernetesApplicationCreationForm.memory_limit.$invalid">
+              <div class="col-sm-12 small text-warning">
+                <div ng-messages="kubernetesApplicationCreationForm.memory_limit.$error">
+                  <p><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Value must be between {{ ctrl.state.sliders.memory.min }} and {{ ctrl.state.sliders.memory.max }}</p>
+                </div>
               </div>
             </div>
             <!-- !memory-limit-input -->
@@ -520,24 +578,24 @@
               </div>
 
               <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-                <div ng-repeat="publishedPort in ctrl.formValues.PublishedPorts" style="margin-top: 2px;">
+                <div ng-repeat-start="publishedPort in ctrl.formValues.PublishedPorts" style="margin-top: 2px;">
 
-                  <div class="input-group col-sm-4 input-group-sm">
+                  <div class="col-sm-4 input-group input-group-sm">
                     <span class="input-group-addon">container port</span>
-                    <input type="number" class="form-control" ng-model="publishedPort.ContainerPort" placeholder="80">
+                    <input type="number" class="form-control" name="container_port_{{$index}}" ng-model="publishedPort.ContainerPort" placeholder="80" ng-min="1" ng-max="65535" required>
                   </div>
 
-                  <div class="input-group col-sm-4 input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER">
+                  <div class="input-group input-group-sm col-sm-4" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER">
                     <span class="input-group-addon">node port</span>
-                    <input type="number" class="form-control" ng-model="publishedPort.NodePort" placeholder="30080">
+                    <input name="published_node_port_{{$index}}" type="number" class="form-control" ng-model="publishedPort.NodePort" placeholder="30080" ng-min="30000" ng-max="32767">
                   </div>
 
-                  <div class="input-group col-sm-4 input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.LOADBALANCER">
+                  <div class="col-sm-4 input-group input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.LOADBALANCER">
                     <span class="input-group-addon">load balancer port</span>
-                    <input type="number" class="form-control" ng-model="publishedPort.LoadBalancerPort" placeholder="80" value="8080">
+                    <input type="number" class="form-control" name="load_balancer_port_{{$index}}" ng-model="publishedPort.LoadBalancerPort" placeholder="80" value="8080" ng-min="1" ng-max="65535" required>
                   </div>
 
-                  <div class="input-group col-sm-1 input-group-sm">
+                  <div class="input-group col-sm-3 input-group-sm">
                     <div class="btn-group btn-group-sm">
                       <label class="btn btn-primary" ng-model="publishedPort.Protocol" uib-btn-radio="'TCP'">TCP</label>
                       <label class="btn btn-primary" ng-model="publishedPort.Protocol" uib-btn-radio="'UDP'">UDP</label>
@@ -548,6 +606,43 @@
                   </div>
 
                 </div>
+
+                <div ng-repeat-end ng-if="kubernetesApplicationCreationForm['container_port_'+$index].$invalid || kubernetesApplicationCreationForm['published_node_port_'+$index].$invalid || kubernetesApplicationCreationForm['load_balancer_port_'+$index].$invalid">
+
+                  <div class="col-sm-4 input-group input-group-sm">
+                    <div class="small text-warning" style="margin-top: 5px;" ng-if="kubernetesApplicationCreationForm['container_port_'+$index].$invalid">
+                      <div ng-messages="kubernetesApplicationCreationForm['container_port_'+$index].$error">
+                        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Container port number is required.</p>
+                        <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Container port number must be inside the range 1-65535.</p>
+                        <p ng-message="max"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Container port number must be inside the range 1-65535.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="input-group input-group-sm col-sm-4" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER">
+                    <div class="small text-warning" style="margin-top: 5px;" ng-if="kubernetesApplicationCreationForm['published_node_port_'+$index].$invalid">
+                      <div ng-messages="kubernetesApplicationCreationForm['published_node_port_'+$index].$error">
+                        <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Node port number must be inside the range 30000-32767.</p>
+                        <p ng-message="max"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Node port number must be inside the range 30000-32767.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-sm-4 input-group input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.LOADBALANCER">
+                    <div class="small text-warning" style="margin-top: 5px;" ng-if="kubernetesApplicationCreationForm['load_balancer_port_'+$index].$invalid">
+                      <div ng-messages="kubernetesApplicationCreationForm['load_balancer_port_'+$index].$error">
+                        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Load balancer port number is required.</p>
+                        <p ng-message="min"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Load balancer port number must be inside the range 1-65535.</p>
+                        <p ng-message="max"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Load balancer port number must be inside the range 1-65535.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="input-group col-sm-1 input-group-sm">
+                  </div>
+
+                </div>
+
               </div>
 
             </div>
@@ -560,7 +655,7 @@
             <div class="form-group">
               <div class="col-sm-12">
                 <button type="button" class="btn btn-primary btn-sm"
-                  ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.resourceReservationsOverflow() || ctrl.state.actionInProgress" ng-click="ctrl.deployApplication()"
+                  ng-disabled="!kubernetesApplicationCreationForm.$valid || ctrl.resourceReservationsOverflow() || ctrl.state.actionInProgress || !ctrl.isValid()" ng-click="ctrl.deployApplication()"
                   button-spinner="ctrl.state.actionInProgress">
                   <span ng-hide="ctrl.state.actionInProgress">Deploy application</span>
                   <span ng-show="ctrl.state.actionInProgress">Deployment in progress...</span>
