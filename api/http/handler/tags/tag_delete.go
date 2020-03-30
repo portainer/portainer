@@ -56,7 +56,7 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 			endpointGroup.TagIDs = removeElement(endpointGroup.TagIDs, tagIdx)
 			err = handler.EndpointGroupService.UpdateEndpointGroup(endpointGroup.ID, endpointGroup)
 			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint", err}
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint group", err}
 			}
 		}
 	}

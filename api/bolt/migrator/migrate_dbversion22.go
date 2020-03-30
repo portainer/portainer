@@ -1,6 +1,6 @@
 package migrator
 
-import portainer "github.com/portainer/portainer/api"
+import "github.com/portainer/portainer/api"
 
 func (m *Migrator) updateTagsToDBVersion23() error {
 	// create association objects to each tag

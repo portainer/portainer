@@ -3,9 +3,10 @@ package tags
 import (
 	"net/http"
 
+	"github.com/portainer/portainer/api"
+
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -13,8 +14,6 @@ import (
 type Handler struct {
 	*mux.Router
 	TagService            portainer.TagService
-	EndpointService       portainer.EndpointService
-	EndpointGroupService  portainer.EndpointGroupService
 	TagAssociationService portainer.TagAssociationService
 	EndpointService       portainer.EndpointService
 	EndpointGroupService  portainer.EndpointGroupService
