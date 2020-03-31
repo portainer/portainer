@@ -74,23 +74,8 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if payload.TagIDs != nil {
-		removeTags := []portainer.TagID{}
+		removeTags := portainer.TagDifference(endpoint.TagIDs, payload.TagIDs)
 
-		// list tags to remove
-		for _, endpointTagID := range endpoint.TagIDs {
-			shouldRemoveTag := true
-			for _, tagID := range payload.TagIDs {
-				if tagID == endpointTagID {
-					shouldRemoveTag = false
-					break
-				}
-			}
-			if shouldRemoveTag {
-				removeTags = append(removeTags, endpointTagID)
-			}
-		}
-
-		// remove tag associations
 		for _, tagID := range removeTags {
 			tag, err := handler.TagService.Tag(tagID)
 			if err != nil {
@@ -103,7 +88,6 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 			}
 		}
 
-		// associate tags with group
 		endpoint.TagIDs = payload.TagIDs
 		for _, tagID := range payload.TagIDs {
 			tag, err := handler.TagService.Tag(tagID)
