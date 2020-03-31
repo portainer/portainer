@@ -495,8 +495,10 @@ type (
 
 	// Tag represents a tag that can be associated to a resource
 	Tag struct {
-		ID   TagID
-		Name string `json:"Name"`
+		ID             TagID
+		Name           string                   `json:"Name"`
+		Endpoints      map[EndpointID]bool      `json:"Endpoints"`
+		EndpointGroups map[EndpointGroupID]bool `json:"EndpointGroups"`
 	}
 
 	// TemplateID represents a template identifier
@@ -796,6 +798,7 @@ type (
 		Tags() ([]Tag, error)
 		Tag(ID TagID) (*Tag, error)
 		CreateTag(tag *Tag) error
+		UpdateTag(ID TagID, tag *Tag) error
 		DeleteTag(ID TagID) error
 	}
 
