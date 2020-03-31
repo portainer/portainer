@@ -12,8 +12,8 @@ class TagSelectorController {
   }
 
   removeTag(tag) {
-    _.remove(this.model, id => tag.Id === id);
-    _.remove(this.state.selectedTags, {Id: tag.Id});
+    _.remove(this.model, (id) => tag.Id === id);
+    _.remove(this.state.selectedTags, { Id: tag.Id });
   }
 
   selectTag($item) {
@@ -27,13 +27,13 @@ class TagSelectorController {
   }
 
   filterTags(searchValue) {
-    let filteredTags = _.filter(this.tags, tag => !_.includes(this.model, tag.Id));
+    let filteredTags = _.filter(this.tags, (tag) => !_.includes(this.model, tag.Id));
     if (!searchValue) {
       return filteredTags.slice(0, 7);
     }
 
-    const exactTag = _.find(this.tags, tag => tag.Name === searchValue);
-    filteredTags = _.filter(filteredTags, tag => _.includes(tag.Name.toLowerCase(), searchValue.toLowerCase()));
+    const exactTag = _.find(this.tags, (tag) => tag.Name === searchValue);
+    filteredTags = _.filter(filteredTags, (tag) => _.includes(tag.Name.toLowerCase(), searchValue.toLowerCase()));
     if (exactTag || !this.allowCreate) {
       return filteredTags.slice(0, 7);
     }
@@ -42,7 +42,7 @@ class TagSelectorController {
   }
 
   generateSelectedTags(model, tags) {
-    this.state.selectedTags = _.map(model, id => _.find(tags, t => t.Id === id));
+    this.state.selectedTags = _.map(model, (id) => _.find(tags, (t) => t.Id === id));
   }
 
   $onInit() {
