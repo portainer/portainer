@@ -31,7 +31,7 @@ angular.module('portainer.app')
   };
 
   $scope.onCreateTag = function onCreateTag(tagName) {
-    $async(onCreateTagAsync, tagName);
+    return $async(onCreateTagAsync, tagName);
   }
   
   async function onCreateTagAsync(tagName) {

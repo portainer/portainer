@@ -38,7 +38,7 @@ function EndpointController($async, $q, $scope, $state, $transition$, $filter, c
   };
 
   $scope.onCreateTag = function onCreateTag(tagName) {
-    $async(onCreateTagAsync, tagName);
+    return $async(onCreateTagAsync, tagName);
   }
   
   async function onCreateTagAsync(tagName) {

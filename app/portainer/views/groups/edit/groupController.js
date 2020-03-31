@@ -23,7 +23,7 @@ function GroupController($q, $async, $scope, $state, $transition$, GroupService,
   };
 
   $scope.onCreateTag = function onCreateTag(tagName) {
-    $async(onCreateTagAsync, tagName);
+    return $async(onCreateTagAsync, tagName);
   }
   
   async function onCreateTagAsync(tagName) {
