@@ -148,22 +148,26 @@ func (server *Server) Start() error {
 
 	var edgeGroupsHandler = edgegroups.NewHandler(requestBouncer)
 	edgeGroupsHandler.EdgeGroupService = server.EdgeGroupService
+	edgeGroupsHandler.EndpointService = server.EndpointService
+	edgeGroupsHandler.TagService = server.TagService
 
 	var endpointHandler = endpoints.NewHandler(requestBouncer, server.EndpointManagement)
+	endpointHandler.AuthorizationService = authorizationService
 	endpointHandler.EndpointService = server.EndpointService
 	endpointHandler.EndpointGroupService = server.EndpointGroupService
 	endpointHandler.FileService = server.FileService
-	endpointHandler.ProxyManager = proxyManager
-	endpointHandler.Snapshotter = server.Snapshotter
 	endpointHandler.JobService = server.JobService
+	endpointHandler.ProxyManager = proxyManager
 	endpointHandler.ReverseTunnelService = server.ReverseTunnelService
 	endpointHandler.SettingsService = server.SettingsService
-	endpointHandler.AuthorizationService = authorizationService
+	endpointHandler.Snapshotter = server.Snapshotter
+	endpointHandler.TagService = server.TagService
 
 	var endpointGroupHandler = endpointgroups.NewHandler(requestBouncer)
+	endpointGroupHandler.AuthorizationService = authorizationService
 	endpointGroupHandler.EndpointGroupService = server.EndpointGroupService
 	endpointGroupHandler.EndpointService = server.EndpointService
-	endpointGroupHandler.AuthorizationService = authorizationService
+	endpointGroupHandler.TagService = server.TagService
 
 	var endpointProxyHandler = endpointproxy.NewHandler(requestBouncer)
 	endpointProxyHandler.EndpointService = server.EndpointService
@@ -226,9 +230,9 @@ func (server *Server) Start() error {
 	stackHandler.ExtensionService = server.ExtensionService
 
 	var tagHandler = tags.NewHandler(requestBouncer)
-	tagHandler.TagService = server.TagService
 	tagHandler.EndpointService = server.EndpointService
 	tagHandler.EndpointGroupService = server.EndpointGroupService
+	tagHandler.TagService = server.TagService
 
 	var teamHandler = teams.NewHandler(requestBouncer)
 	teamHandler.TeamService = server.TeamService
