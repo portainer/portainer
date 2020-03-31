@@ -35,11 +35,11 @@ class CreateEdgeGroupController {
   async $onInit() {
     const [tags, endpoints, endpointGroups] = await Promise.all([
       this.TagService.tags(),
-      this.EndpointService.endpoints(),
+      this.EndpointService.endpoints(undefined, undefined, undefined, 4),
       this.GroupService.groups()
     ]);
     this.tags = tags;
-    this.endpoints = endpoints.value.filter(endpoint => endpoint.Type === 4);
+    this.endpoints = endpoints.value;
     this.endpointGroups = endpointGroups;
   }
 
