@@ -13,7 +13,7 @@ func (handler *Handler) edgeGroupList(w http.ResponseWriter, r *http.Request) *h
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge groups from the database", err}
 	}
-	edgeGroupsViewModel := []portainer.EdgeGroup{}
+	decoratedEdgeGroups := []portainer.EdgeGroup{}
 	for _, edgeGroup := range edgeGroups {
 		if edgeGroup.Dynamic {
 			endpoints, err := handler.getEndpointsByTags(edgeGroup.TagIDs)
@@ -23,8 +23,8 @@ func (handler *Handler) edgeGroupList(w http.ResponseWriter, r *http.Request) *h
 
 			edgeGroup.Endpoints = endpoints
 		}
-		edgeGroupsViewModel = append(edgeGroupsViewModel, edgeGroup)
+		decoratedEdgeGroups = append(decoratedEdgeGroups, edgeGroup)
 	}
 
-	return response.JSON(w, edgeGroupsViewModel)
+	return response.JSON(w, decoratedEdgeGroups)
 }
