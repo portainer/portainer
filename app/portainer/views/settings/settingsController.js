@@ -30,6 +30,7 @@ angular.module('portainer.app').controller('SettingsController', [
       restrictPrivilegedMode: false,
       labelName: '',
       labelValue: '',
+      enableEdgeComputeFeatures: false,
       enableHostManagementFeatures: false,
       enableVolumeBrowser: false,
     };
@@ -67,6 +68,7 @@ angular.module('portainer.app').controller('SettingsController', [
       settings.AllowPrivilegedModeForRegularUsers = !$scope.formValues.restrictPrivilegedMode;
       settings.AllowVolumeBrowserForRegularUsers = $scope.formValues.enableVolumeBrowser;
       settings.EnableHostManagementFeatures = $scope.formValues.enableHostManagementFeatures;
+      settings.EnableEdgeComputeFeatures = $scope.formValues.enableEdgeComputeFeatures;
 
       $scope.state.actionInProgress = true;
       updateSettings(settings);
@@ -80,6 +82,7 @@ angular.module('portainer.app').controller('SettingsController', [
           StateManager.updateSnapshotInterval(settings.SnapshotInterval);
           StateManager.updateEnableHostManagementFeatures(settings.EnableHostManagementFeatures);
           StateManager.updateEnableVolumeBrowserForNonAdminUsers(settings.AllowVolumeBrowserForRegularUsers);
+          StateManager.updateEnableEdgeComputeFeatures(settings.EnableEdgeComputeFeatures);
           $state.reload();
         })
         .catch(function error(err) {
@@ -105,6 +108,7 @@ angular.module('portainer.app').controller('SettingsController', [
           $scope.formValues.restrictPrivilegedMode = !settings.AllowPrivilegedModeForRegularUsers;
           $scope.formValues.enableVolumeBrowser = settings.AllowVolumeBrowserForRegularUsers;
           $scope.formValues.enableHostManagementFeatures = settings.EnableHostManagementFeatures;
+          $scope.formValues.enableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve application settings');
