@@ -4,7 +4,7 @@ import {EndpointSecurityFormData} from '../../../components/endpointSecurity/por
 
 angular.module('portainer.app')
 .controller('EndpointController', 
-function EndpointController($q, $scope, $state, $transition$, $filter, clipboard, EndpointService, GroupService, TagService, EndpointProvider, Notifications, Authentication) {
+function EndpointController($async, $q, $scope, $state, $transition$, $filter, clipboard, EndpointService, GroupService, TagService, EndpointProvider, Notifications, Authentication) {
 
   if (!$scope.applicationState.application.endpointManagement) {
     $state.go('portainer.endpoints');
@@ -37,12 +37,20 @@ function EndpointController($q, $scope, $state, $transition$, $filter, clipboard
     $('#copyNotificationEdgeKey').show().fadeOut(2500);
   };
 
-  $scope.onCreateTag = async function onCreateTag(tagName) {
-    const tag = await TagService.createTag(tagName);
-    $scope.availableTags = $scope.availableTags.concat(tag);
-    $scope.endpoint.TagIds = $scope.endpoint.TagIds.concat(tag.Id);
+  $scope.onCreateTag = function onCreateTag(tagName) {
+    $async(onCreateTagAsync, tagName);
   }
-
+  
+  async function onCreateTagAsync(tagName) {
+    try {
+      const tag = await TagService.createTag(tagName);
+      $scope.availableTags = $scope.availableTags.concat(tag);
+      $scope.endpoint.TagIds = $scope.endpoint.TagIds.concat(tag.Id);
+    } catch(err) {
+      Notifications.error('Failue', err, 'Unable to create tag');
+    }
+  }
+  
   $scope.updateEndpoint = function() {
     var endpoint = $scope.endpoint;
     var securityData = $scope.formValues.SecurityFormData;

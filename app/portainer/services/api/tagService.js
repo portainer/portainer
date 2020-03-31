@@ -39,9 +39,12 @@ angular.module('portainer.app')
     var payload = {
       Name: name
     };
-
-    const tag = await Tags.create({}, payload).$promise;
-    return new TagViewModel(tag);
+    try {
+      const tag = await Tags.create({}, payload).$promise;
+      return new TagViewModel(tag);
+    } catch(error) {
+      throw { message: "Unable to create tag", error };
+    }
   };
 
   service.deleteTag = function(id) {
