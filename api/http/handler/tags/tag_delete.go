@@ -17,39 +17,46 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 	}
 	tagID := portainer.TagID(id)
 
-	endpoints, err := handler.EndpointService.Endpoints()
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
+	tag, err := handler.TagService.Tag(tagID)
+	if err == portainer.ErrObjectNotFound {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a tag with the specified identifier inside the database", err}
+	} else if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a tag with the specified identifier inside the database", err}
 	}
 
-	for _, endpoint := range endpoints {
+	for endpointID := range tag.Endpoints {
+		endpoint, err := handler.EndpointService.Endpoint(endpointID)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint from the database", err}
+		}
+
 		tagIdx := findTagIndex(endpoint.TagIDs, tagID)
 		if tagIdx != -1 {
 			endpoint.TagIDs = removeElement(endpoint.TagIDs, tagIdx)
-			err = handler.EndpointService.UpdateEndpoint(endpoint.ID, &endpoint)
+			err = handler.EndpointService.UpdateEndpoint(endpoint.ID, endpoint)
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint", err}
 			}
 		}
 	}
 
-	endpointGroups, err := handler.EndpointGroupService.EndpointGroups()
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
-	}
+	for endpointGroupID := range tag.EndpointGroups {
+		endpointGroup, err := handler.EndpointGroupService.EndpointGroup(endpointGroupID)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint group from the database", err}
+		}
 
-	for _, endpointGroup := range endpointGroups {
 		tagIdx := findTagIndex(endpointGroup.TagIDs, tagID)
 		if tagIdx != -1 {
 			endpointGroup.TagIDs = removeElement(endpointGroup.TagIDs, tagIdx)
-			err = handler.EndpointGroupService.UpdateEndpointGroup(endpointGroup.ID, &endpointGroup)
+			err = handler.EndpointGroupService.UpdateEndpointGroup(endpointGroup.ID, endpointGroup)
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint group", err}
 			}
 		}
 	}
 
-	err = handler.TagService.DeleteTag(portainer.TagID(id))
+	err = handler.TagService.DeleteTag(tagID)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the tag from the database", err}
 	}
