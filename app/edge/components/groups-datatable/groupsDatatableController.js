@@ -3,10 +3,7 @@ import angular from 'angular';
 class EdgeGroupsDatatableController {
   /* @ngInject */
   constructor($scope, $controller, DatatableService) {
-    angular.extend(
-      this,
-      $controller('GenericDatatableController', { $scope: $scope })
-    );
+    angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
     this.DatatableService = DatatableService;
   }
 
@@ -52,8 +49,6 @@ class EdgeGroupsDatatableController {
   }
 }
 
-angular
-  .module('portainer.edge')
-  .controller('EdgeGroupsDatatableController', EdgeGroupsDatatableController);
+angular.module('portainer.edge').controller('EdgeGroupsDatatableController', EdgeGroupsDatatableController);
 
 export default EdgeGroupsDatatableController;

@@ -39,12 +39,13 @@ function ($interval, PaginationService, DatatableService, PAGINATION_MAX_ITEMS) 
   this.onTextFilterChange = function() {
     DatatableService.setDataTableTextFilters(this.tableKey, this.state.textFilter);
   };
-
-  this.changeOrderBy = function(orderField) {
+  
+  this.changeOrderBy = changeOrderBy.bind(this);
+  function changeOrderBy(orderField) {
     this.state.reverseOrder = this.state.orderBy === orderField ? !this.state.reverseOrder : false;
     this.state.orderBy = orderField;
     DatatableService.setDataTableOrder(this.tableKey, orderField, this.state.reverseOrder);
-  };
+  }
 
   this.selectItem = function(item, event) {
     // Handle range select using shift

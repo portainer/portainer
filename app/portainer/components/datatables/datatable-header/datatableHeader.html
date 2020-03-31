@@ -1,0 +1,5 @@
+<a ng-click="$ctrl.changeOrderBy($ctrl.sortKey)">
+  {{$ctrl.label}}
+  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.orderBy === $ctrl.sortKey && !$ctrl.reverseOrder" />
+  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.orderBy === $ctrl.sortKey && $ctrl.reverseOrder" />
+</a>

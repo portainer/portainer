@@ -1,10 +1,6 @@
 <div class="datatable">
   <rd-widget>
-    <rd-widget-header
-      icon="fa-plane-departure"
-      title-text="Edge Groups"
-    >
-    </rd-widget-header>
+    <rd-widget-header icon="fa-plane-departure" title-text="Edge Groups"> </rd-widget-header>
     <rd-widget-body classes="no-padding">
       <div class="actionBar">
         <button
@@ -44,49 +40,31 @@
                   />
                   <label for="select_all"></label>
                 </span>
-                <a ng-click="$ctrl.changeOrderBy('Name')">
-                  Name
-                  <i
-                    class="fa fa-sort-alpha-down"
-                    aria-hidden="true"
-                    ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"
-                  ></i>
-                  <i
-                    class="fa fa-sort-alpha-up"
-                    aria-hidden="true"
-                    ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"
-                  ></i>
-                </a>
+                <datatable-header
+                  label="Name"
+                  sort-key="Name"
+                  change-order-by="$ctrl.changeOrderBy"
+                  order-by="$ctrl.state.orderBy"
+                  reverse-order="$ctrl.state.reverseOrder"
+                ></datatable-header>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Endpoints.length')">
-                  Endpoints Count
-                  <i
-                    class="fa fa-sort-alpha-down"
-                    aria-hidden="true"
-                    ng-if="$ctrl.state.orderBy === 'Endpoints.length' && !$ctrl.state.reverseOrder"
-                  ></i>
-                  <i
-                    class="fa fa-sort-alpha-up"
-                    aria-hidden="true"
-                    ng-if="$ctrl.state.orderBy === 'Endpoints.length' && $ctrl.state.reverseOrder"
-                  ></i>
-                </a>
+                <datatable-header
+                  label="Endpoints Count"
+                  sort-key="Endpoints.length"
+                  change-order-by="$ctrl.changeOrderBy"
+                  order-by="$ctrl.state.orderBy"
+                  reverse-order="$ctrl.state.reverseOrder"
+                ></datatable-header>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Dynamic')">
-                  Group Type
-                  <i
-                    class="fa fa-sort-alpha-down"
-                    aria-hidden="true"
-                    ng-if="$ctrl.state.orderBy === 'Dynamic' && !$ctrl.state.reverseOrder"
-                  ></i>
-                  <i
-                    class="fa fa-sort-alpha-up"
-                    aria-hidden="true"
-                    ng-if="$ctrl.state.orderBy === 'Dynamic' && $ctrl.state.reverseOrder"
-                  ></i>
-                </a>
+                <datatable-header
+                  label="Group Type"
+                  sort-key="Dynamic"
+                  change-order-by="$ctrl.changeOrderBy"
+                  order-by="$ctrl.state.orderBy"
+                  reverse-order="$ctrl.state.reverseOrder"
+                ></datatable-header>
               </th>
             </tr>
           </thead>
