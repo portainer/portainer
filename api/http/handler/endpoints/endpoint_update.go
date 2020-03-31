@@ -96,6 +96,11 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 			}
 
 			tag.Endpoints[endpoint.ID] = true
+
+			err = handler.TagService.UpdateTag(tag.ID, tag)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist tag changes inside the database", err}
+			}
 		}
 	}
 
