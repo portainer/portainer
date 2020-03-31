@@ -51,36 +51,44 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 	}
 
 	if payload.TagIDs != nil {
-		// tagsMap[tagID] is true if needs to add, and false if needs to remove
-		tagsMap := make(map[portainer.TagID]bool)
-		for _, tagID := range payload.TagIDs {
-			tagsMap[tagID] = true
-		}
-		for _, tagID := range endpointGroup.TagIDs {
-			_, alreadyExist := tagsMap[tagID]
-			if alreadyExist {
-				delete(tagsMap, tagID)
-			} else {
-				tagsMap[tagID] = false
+		removeTags := []portainer.TagID{}
+
+		// list tags to remove
+		for _, endpointGroupTagID := range endpointGroup.TagIDs {
+			shouldRemoveTag := true
+			for _, tagID := range payload.TagIDs {
+				if tagID == endpointGroupTagID {
+					shouldRemoveTag = false
+					break
+				}
+			}
+			if shouldRemoveTag {
+				removeTags = append(removeTags, endpointGroupTagID)
 			}
 		}
+
+		// remove tag associations
+		for _, tagID := range removeTags {
+			tag, err := handler.TagService.Tag(tagID)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a tag inside the database", err}
+			}
+			delete(tag.EndpointGroups, endpointGroup.ID)
+			err = handler.TagService.UpdateTag(tag.ID, tag)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist tag changes inside the database", err}
+			}
+		}
+
+		// associate tags with group
 		endpointGroup.TagIDs = payload.TagIDs
-		for tagID, value := range tagsMap {
+		for _, tagID := range payload.TagIDs {
 			tag, err := handler.TagService.Tag(tagID)
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a tag inside the database", err}
 			}
 
-			if value {
-				tag.EndpointGroups[endpointGroup.ID] = true
-			} else {
-				delete(tag.EndpointGroups, endpointGroup.ID)
-			}
-
-			err = handler.TagService.UpdateTag(tagID, tag)
-			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist tag changes inside the database", err}
-			}
+			tag.EndpointGroups[endpointGroup.ID] = true
 		}
 	}
 
