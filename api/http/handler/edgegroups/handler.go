@@ -13,6 +13,8 @@ import (
 type Handler struct {
 	*mux.Router
 	EdgeGroupService portainer.EdgeGroupService
+	EndpointService  portainer.EndpointService
+	TagService       portainer.TagService
 }
 
 // NewHandler creates a handler to manage endpoint group operations.
@@ -31,4 +33,41 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h.Handle("/edge_groups/{id}",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeGroupDelete))).Methods(http.MethodDelete)
 	return h
+}
+
+func (handler *Handler) getEndpointsByTags(tagIDs []portainer.TagID) ([]portainer.EndpointID, error) {
+	endpointsSet := make(map[portainer.EndpointID]bool)
+	endpointGroupsSet := make(map[portainer.EndpointGroupID]bool)
+	for _, tagID := range tagIDs {
+		tag, err := handler.TagService.Tag(tagID)
+		if err != nil {
+			return nil, err
+		}
+
+		for endpointID := range tag.Endpoints {
+			endpointsSet[endpointID] = true
+		}
+
+		for endpointGroupID := range tag.EndpointGroups {
+			endpointGroupsSet[endpointGroupID] = true
+		}
+	}
+
+	endpoints, err := handler.EndpointService.Endpoints()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, endpoint := range endpoints {
+		if _, ok := endpointGroupsSet[endpoint.GroupID]; ok {
+			endpointsSet[endpoint.ID] = true
+		}
+	}
+
+	results := []portainer.EndpointID{}
+	for endpointID := range endpointsSet {
+		results = append(results, endpointID)
+	}
+
+	return results, nil
 }
