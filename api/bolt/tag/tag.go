@@ -82,6 +82,12 @@ func (service *Service) CreateTag(tag *portainer.Tag) error {
 	})
 }
 
+// UpdateTag updates a tag.
+func (service *Service) UpdateTag(ID portainer.TagID, tag *portainer.Tag) error {
+	identifier := internal.Itob(int(ID))
+	return internal.UpdateObject(service.db, BucketName, identifier, tag)
+}
+
 // DeleteTag deletes a tag.
 func (service *Service) DeleteTag(ID portainer.TagID) error {
 	identifier := internal.Itob(int(ID))
