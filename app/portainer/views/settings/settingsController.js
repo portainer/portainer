@@ -29,6 +29,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager) {
     labelValue: '',
     enableHostManagementFeatures: false,
     enableVolumeBrowser: false,
+    enableEdgeComputeFeatures: false
   };
 
   $scope.removeFilteredContainerLabel = function(index) {
@@ -64,6 +65,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager) {
     settings.AllowPrivilegedModeForRegularUsers = !$scope.formValues.restrictPrivilegedMode;
     settings.AllowVolumeBrowserForRegularUsers = $scope.formValues.enableVolumeBrowser;
     settings.EnableHostManagementFeatures = $scope.formValues.enableHostManagementFeatures;
+    settings.EnableEdgeComputeFeatures = $scope.formValues.enableEdgeComputeFeatures;
 
     $scope.state.actionInProgress = true;
     updateSettings(settings);
@@ -77,6 +79,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager) {
       StateManager.updateSnapshotInterval(settings.SnapshotInterval);
       StateManager.updateEnableHostManagementFeatures(settings.EnableHostManagementFeatures);
       StateManager.updateEnableVolumeBrowserForNonAdminUsers(settings.AllowVolumeBrowserForRegularUsers);
+      StateManager.updateEnableEdgeComputeFeatures(settings.EnableEdgeComputeFeatures)
       $state.reload();
     })
     .catch(function error(err) {
@@ -102,6 +105,7 @@ function ($scope, $state, Notifications, SettingsService, StateManager) {
       $scope.formValues.restrictPrivilegedMode = !settings.AllowPrivilegedModeForRegularUsers;
       $scope.formValues.enableVolumeBrowser = settings.AllowVolumeBrowserForRegularUsers;
       $scope.formValues.enableHostManagementFeatures = settings.EnableHostManagementFeatures;
+      $scope.formValues.enableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve application settings');
