@@ -24,6 +24,7 @@ type settingsUpdatePayload struct {
 	SnapshotInterval                   *string
 	TemplatesURL                       *string
 	EdgeAgentCheckinInterval           *int
+	EnableEdgeComputeFeatures          *bool
 }
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
@@ -107,6 +108,10 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.EnableHostManagementFeatures != nil {
 		settings.EnableHostManagementFeatures = *payload.EnableHostManagementFeatures
+	}
+
+	if payload.EnableEdgeComputeFeatures != nil {
+		settings.EnableEdgeComputeFeatures = *payload.EnableEdgeComputeFeatures
 	}
 
 	if payload.SnapshotInterval != nil && *payload.SnapshotInterval != settings.SnapshotInterval {
