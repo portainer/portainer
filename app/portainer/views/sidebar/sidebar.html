@@ -47,8 +47,14 @@
     <li class="sidebar-list" ng-if="(!applicationState.application.authentication || isAdmin) && applicationState.application.enableHostManagementFeatures">
       <a ui-sref="portainer.schedules" ui-sref-active="active">Host jobs <span class="menu-icon fa fa-clock fa-fw"></span></a>
     </li>
-    <li class="sidebar-title">
+    <li class="sidebar-title" ng-if="!applicationState.application.authentication || isAdmin">
       <span>Settings</span>
+    </li>
+    <li class="sidebar-list" ng-if="applicationState.application.authentication && (isAdmin || isTeamLeader)">
+      <a ui-sref="portainer.users" ui-sref-active="active">Users <span class="menu-icon fa fa-users fa-fw"></span></a>
+      <div class="sidebar-sublist" ng-if="toggle && ($state.current.name === 'portainer.users' || $state.current.name === 'portainer.users.user' || $state.current.name === 'portainer.teams' || $state.current.name === 'portainer.teams.team' || $state.current.name === 'portainer.roles' || $state.current.name === 'portainer.roles.role' || $state.current.name === 'portainer.roles.new')">
+        <a ui-sref="portainer.teams" ui-sref-active="active">Teams</a>
+      </div>
     </li>
     <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
       <a ui-sref="portainer.endpoints" ui-sref-active="active">Endpoints <span class="menu-icon fa fa-plug fa-fw"></span></a>
