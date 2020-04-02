@@ -6,7 +6,6 @@ angular.module('portainer.edge', []).config(function config($stateRegistryProvid
     url: '/edge',
     parent: 'root',
     abstract: true,
-    
     onEnter: /* @ngInject */ function onEnter($state, Notifications, Authentication) {
       if (!Authentication.isAdmin()) {
         Notifications.warning('User is not authorized');
