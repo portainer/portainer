@@ -2,10 +2,7 @@ import $ from 'jquery';
 import '@babel/polyfill'
 
 angular.module('portainer')
-.run(['$rootScope', '$state', '$interval', 'LocalStorage', 'EndpointProvider', 'SystemService', 'cfpLoadingBar', '$transitions', 'HttpRequestHelper',
-function ($rootScope, $state, $interval, LocalStorage, EndpointProvider, SystemService, cfpLoadingBar, $transitions, HttpRequestHelper) {
-  'use strict';
-
+.run(function ($trace, $rootScope, $state, $interval, LocalStorage, EndpointProvider, SystemService, cfpLoadingBar, $transitions, HttpRequestHelper) {
   EndpointProvider.initialize();
 
   $rootScope.$state = $state;
@@ -40,7 +37,9 @@ function ($rootScope, $state, $interval, LocalStorage, EndpointProvider, SystemS
     }
     jqXhr.setRequestHeader('Authorization', 'Bearer ' + LocalStorage.getJWT());
   });
-}]);
+
+   $trace.enable('TRANSITION');
+});
 
 function ping(EndpointProvider, SystemService) {
   let endpoint = EndpointProvider.currentEndpoint();
