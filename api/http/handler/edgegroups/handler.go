@@ -58,15 +58,14 @@ func (handler *Handler) getEndpointsByTags(tagIDs []portainer.TagID) ([]portaine
 		return nil, err
 	}
 
+	results := []portainer.EndpointID{}
 	for _, endpoint := range endpoints {
 		if _, ok := endpointGroupsSet[endpoint.GroupID]; ok {
 			endpointsSet[endpoint.ID] = true
 		}
-	}
-
-	results := []portainer.EndpointID{}
-	for endpointID := range endpointsSet {
-		results = append(results, endpointID)
+		if _, ok := endpointsSet[endpoint.ID]; ok && endpoint.Type == portainer.EdgeAgentEnvironment {
+			results = append(results, endpoint.ID)
+		}
 	}
 
 	return results, nil
