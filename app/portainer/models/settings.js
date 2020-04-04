@@ -22,6 +22,7 @@ export function PublicSettingsViewModel(settings) {
   this.AuthenticationMethod = settings.AuthenticationMethod;
   this.EnableHostManagementFeatures = settings.EnableHostManagementFeatures;
   this.ExternalTemplates = settings.ExternalTemplates;
+  this.EnableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
   this.LogoURL = settings.LogoURL;
   this.OAuthLoginURI = settings.OAuthLoginURI;
 }
