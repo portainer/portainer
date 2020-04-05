@@ -19,13 +19,13 @@ type edgeGroupCreatePayload struct {
 
 func (payload *edgeGroupCreatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
-		return portainer.Error("Invalid edge group name")
+		return portainer.Error("Invalid Edge group name")
 	}
 	if payload.Dynamic && (payload.TagIDs == nil || len(payload.TagIDs) == 0) {
-		return portainer.Error("TagIDs is mandatory for a dynamic edge group")
+		return portainer.Error("TagIDs is mandatory for a dynamic Edge group")
 	}
 	if !payload.Dynamic && (payload.Endpoints == nil || len(payload.Endpoints) == 0) {
-		return portainer.Error("Endpoints is mandatory for a static edge group")
+		return portainer.Error("Endpoints is mandatory for a static Edge group")
 	}
 	return nil
 }
@@ -39,7 +39,7 @@ func (handler *Handler) edgeGroupCreate(w http.ResponseWriter, r *http.Request) 
 
 	edgeGroups, err := handler.EdgeGroupService.EdgeGroups()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge groups from the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve Edge groups from the database", err}
 	}
 
 	for _, edgeGroup := range edgeGroups {
@@ -71,7 +71,7 @@ func (handler *Handler) edgeGroupCreate(w http.ResponseWriter, r *http.Request) 
 
 	err = handler.EdgeGroupService.CreateEdgeGroup(edgeGroup)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the edge group inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the Edge group inside the database", err}
 	}
 	return response.JSON(w, edgeGroup)
 }

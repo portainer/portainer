@@ -939,7 +939,7 @@ type (
 		DeleteWebhook(serviceID WebhookID) error
 	}
 
-	// EdgeGroupService represents a service to manage edge groups
+	// EdgeGroupService represents a service to manage Edge groups
 	EdgeGroupService interface {
 		EdgeGroups() ([]EdgeGroup, error)
 		EdgeGroup(ID EdgeGroupID) (*EdgeGroup, error)
