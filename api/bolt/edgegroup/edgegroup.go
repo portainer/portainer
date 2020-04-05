@@ -11,7 +11,7 @@ const (
 	BucketName = "edgegroups"
 )
 
-// Service represents a service for managing edge group data.
+// Service represents a service for managing Edge group data.
 type Service struct {
 	db *bolt.DB
 }
@@ -28,7 +28,7 @@ func NewService(db *bolt.DB) (*Service, error) {
 	}, nil
 }
 
-// EdgeGroups return an array containing all the edge groups.
+// EdgeGroups return an array containing all the Edge groups.
 func (service *Service) EdgeGroups() ([]portainer.EdgeGroup, error) {
 	var groups = make([]portainer.EdgeGroup, 0)
 
@@ -51,7 +51,7 @@ func (service *Service) EdgeGroups() ([]portainer.EdgeGroup, error) {
 	return groups, err
 }
 
-// EdgeGroup returns an edge group by ID.
+// EdgeGroup returns an Edge group by ID.
 func (service *Service) EdgeGroup(ID portainer.EdgeGroupID) (*portainer.EdgeGroup, error) {
 	var group portainer.EdgeGroup
 	identifier := internal.Itob(int(ID))
@@ -64,19 +64,19 @@ func (service *Service) EdgeGroup(ID portainer.EdgeGroupID) (*portainer.EdgeGrou
 	return &group, nil
 }
 
-// UpdateEdgeGroup updates an edge group.
+// UpdateEdgeGroup updates an Edge group.
 func (service *Service) UpdateEdgeGroup(ID portainer.EdgeGroupID, group *portainer.EdgeGroup) error {
 	identifier := internal.Itob(int(ID))
 	return internal.UpdateObject(service.db, BucketName, identifier, group)
 }
 
-// DeleteEdgeGroup deletes an edge group.
+// DeleteEdgeGroup deletes an Edge group.
 func (service *Service) DeleteEdgeGroup(ID portainer.EdgeGroupID) error {
 	identifier := internal.Itob(int(ID))
 	return internal.DeleteObject(service.db, BucketName, identifier)
 }
 
-// CreateEdgeGroup assign an ID to a new edge group and saves it.
+// CreateEdgeGroup assign an ID to a new Edge group and saves it.
 func (service *Service) CreateEdgeGroup(group *portainer.EdgeGroup) error {
 	return service.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))

@@ -581,10 +581,10 @@ type (
 	// It can be either a TLS CA file, a TLS certificate file or a TLS key file
 	TLSFileType int
 
-	// EdgeGroupID represents an edge group identifier
+	// EdgeGroupID represents an Edge group identifier
 	EdgeGroupID int
 
-	// EdgeGroup represents an edge group
+	// EdgeGroup represents an Edge group
 	EdgeGroup struct {
 		ID        EdgeGroupID  `json:"Id"`
 		Name      string       `json:"Name"`
@@ -937,7 +937,7 @@ type (
 		RemoveSchedule(scheduleID ScheduleID)
 	}
 
-	// EdgeGroupService represents a service to manage edge groups
+	// EdgeGroupService represents a service to manage Edge groups
 	EdgeGroupService interface {
 		EdgeGroups() ([]EdgeGroup, error)
 		EdgeGroup(ID EdgeGroupID) (*EdgeGroup, error)
