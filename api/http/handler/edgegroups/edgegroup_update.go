@@ -19,13 +19,13 @@ type edgeGroupUpdatePayload struct {
 
 func (payload *edgeGroupUpdatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
-		return portainer.Error("Invalid edge group name")
+		return portainer.Error("Invalid Edge group name")
 	}
 	if payload.Dynamic && (payload.TagIDs == nil || len(payload.TagIDs) == 0) {
-		return portainer.Error("TagIDs is mandatory for a dynamic edge group")
+		return portainer.Error("TagIDs is mandatory for a dynamic Edge group")
 	}
 	if !payload.Dynamic && (payload.Endpoints == nil || len(payload.Endpoints) == 0) {
-		return portainer.Error("Endpoints is mandatory for a static edge group")
+		return portainer.Error("Endpoints is mandatory for a static Edge group")
 	}
 	return nil
 }
@@ -33,7 +33,7 @@ func (payload *edgeGroupUpdatePayload) Validate(r *http.Request) error {
 func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	edgeGroupID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid edge group identifier route variable", err}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid Edge group identifier route variable", err}
 	}
 
 	var payload edgeGroupCreatePayload
@@ -44,15 +44,15 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 
 	edgeGroup, err := handler.EdgeGroupService.EdgeGroup(portainer.EdgeGroupID(edgeGroupID))
 	if err == portainer.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an edge group with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an Edge group with the specified identifier inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an edge group with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an Edge group with the specified identifier inside the database", err}
 	}
 
 	if payload.Name != "" {
 		edgeGroups, err := handler.EdgeGroupService.EdgeGroups()
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge groups from the database", err}
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve Edge groups from the database", err}
 		}
 		for _, edgeGroup := range edgeGroups {
 			if edgeGroup.Name == payload.Name && edgeGroup.ID != portainer.EdgeGroupID(edgeGroupID) {
@@ -84,7 +84,7 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 
 	err = handler.EdgeGroupService.UpdateEdgeGroup(edgeGroup.ID, edgeGroup)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist edge group changes inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Edge group changes inside the database", err}
 	}
 
 	return response.JSON(w, edgeGroup)

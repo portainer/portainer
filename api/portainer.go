@@ -84,7 +84,7 @@ type (
 		Password       string `json:"Password,omitempty"`
 	}
 
-	// EdgeGroup represents an edge group
+	// EdgeGroup represents an Edge group
 	EdgeGroup struct {
 		ID        EdgeGroupID  `json:"Id"`
 		Name      string       `json:"Name"`
@@ -93,7 +93,7 @@ type (
 		Endpoints []EndpointID `json:"Endpoints"`
 	}
 
-	// EdgeGroupID represents an edge group identifier
+	// EdgeGroupID represents an Edge group identifier
 	EdgeGroupID int
 
 	// EdgeSchedule represents a scheduled job that can run on Edge environments.
@@ -939,7 +939,7 @@ type (
 		DeleteWebhook(serviceID WebhookID) error
 	}
 
-	// EdgeGroupService represents a service to manage edge groups
+	// EdgeGroupService represents a service to manage Edge groups
 	EdgeGroupService interface {
 		EdgeGroups() ([]EdgeGroup, error)
 		EdgeGroup(ID EdgeGroupID) (*EdgeGroup, error)
