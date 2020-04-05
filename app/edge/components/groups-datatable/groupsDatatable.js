@@ -5,6 +5,7 @@ angular.module('portainer.edge').component('edgeGroupsDatatable', {
   controller: 'GenericDatatableController',
   bindings: {
     dataset: '<',
+    titleIcon: '@',
     tableKey: '@',
     orderBy: '@',
     removeAction: '<',
