@@ -1,8 +1,8 @@
 angular.module('portainer.edge').component('edgeGroupForm', {
   templateUrl: './groupForm.html',
+  controller: 'EdgeGroupFormController',
   bindings: {
     model: '<',
-    endpoints: '<',
     groups: '<',
     tags: '<',
     formActionLabel: '@',
