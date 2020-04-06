@@ -602,7 +602,7 @@ type (
 		Name         string                         `json:"Name"`
 		Status       map[EndpointID]EdgeStackStatus `json:"Status"`
 		CreationDate int64                          `json:"CreationDate"`
-		Groups       []EdgeGroupID                  `json:"Groups"`
+		EdgeGroups   []EdgeGroupID                  `json:"EdgeGroups"`
 		ProjectPath  string                         `json:"ProjectPath"`
 		EntryPoint   string                         `json:"EntryPoint"`
 		Version      int                            `json:"Version"`
