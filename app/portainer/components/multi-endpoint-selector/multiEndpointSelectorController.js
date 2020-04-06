@@ -29,8 +29,18 @@ class MultiEndpointSelectorController {
     return PortainerEndpointTagHelper.idsToTagNames(this.tags, tagIds);
   }
 
-  $onInit() {
+  filterEmptyGroups() {
     this.availableGroups = _.filter(this.groups, (group) => _.some(this.endpoints, (endpoint) => endpoint.GroupId == group.Id));
+  }
+
+  $onInit() {
+    this.filterEmptyGroups();
+  }
+
+  $onChanges({ endpoints, groups }) {
+    if (endpoints || groups) {
+      this.filterEmptyGroups();
+    }
   }
 }
 
