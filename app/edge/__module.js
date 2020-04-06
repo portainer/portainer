@@ -28,8 +28,19 @@ angular.module('portainer.edge', []).config(function config($stateRegistryProvid
       }
     };
 
+    const groupsEdit = {
+      name: 'edge.groups.edit',
+      url: '/:groupId',
+      views: {
+        'content@': {
+          component: 'editEdgeGroupView'
+        }
+      }
+    };
+
     $stateRegistryProvider.register(edge);
     $stateRegistryProvider.register(groups);
     $stateRegistryProvider.register(groupsNew);
+    $stateRegistryProvider.register(groupsEdit);
   }
 );
