@@ -970,6 +970,15 @@ type (
 		UpdateEdgeGroup(ID EdgeGroupID, group *EdgeGroup) error
 		DeleteEdgeGroup(ID EdgeGroupID) error
 	}
+
+	// EdgeStackService represents a service to manage Edge stacks
+	EdgeStackService interface {
+		EdgeStacks() ([]EdgeStack, error)
+		EdgeStack(ID EdgeStackID) (*EdgeStack, error)
+		CreateEdgeStack(edgeStack *EdgeStack) error
+		UpdateEdgeStack(ID EdgeStackID, edgeStack *EdgeStack) error
+		DeleteEdgeStack(ID EdgeStackID) error
+	}
 )
 
 const (
