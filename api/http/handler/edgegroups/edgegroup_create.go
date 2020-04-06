@@ -49,8 +49,10 @@ func (handler *Handler) edgeGroupCreate(w http.ResponseWriter, r *http.Request) 
 	}
 
 	edgeGroup := &portainer.EdgeGroup{
-		Name:    payload.Name,
-		Dynamic: payload.Dynamic,
+		Name:      payload.Name,
+		Dynamic:   payload.Dynamic,
+		TagIDs:    []portainer.TagID{},
+		Endpoints: []portainer.EndpointID{},
 	}
 
 	if edgeGroup.Dynamic {
