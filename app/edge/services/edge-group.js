@@ -1,10 +1,11 @@
 import angular from 'angular';
 
-angular.module('portainer.app').factory('EdgeGroupService', function EdgeGroupServiceFactory(EdgeGroups) {
+angular.module('portainer.edge').factory('EdgeGroupService', function EdgeGroupServiceFactory(EdgeGroups) {
   var service = {};
 
-  // service.group = async function group(groupId) {
-  // };
+  service.group = function group(groupId) {
+    return EdgeGroups.get({ id: groupId }).$promise;
+  };
 
   service.groups = function groups() {
     return EdgeGroups.query({}).$promise;
@@ -18,8 +19,9 @@ angular.module('portainer.app').factory('EdgeGroupService', function EdgeGroupSe
     return EdgeGroups.create(group).$promise;
   };
 
-  // service.update = async function update(groupId, group) {
-  // };
+  service.update = function update(group) {
+    return EdgeGroups.update(group).$promise;
+  };
 
   return service;
 });
