@@ -6,5 +6,6 @@ angular.module('portainer.app').component('multiEndpointSelector', {
     endpoints: '<',
     groups: '<',
     tags: '<',
+    onSearch: '<',
   },
 });
