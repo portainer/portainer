@@ -8,16 +8,28 @@ angular.module('portainer.edge', []).config(function config($stateRegistryProvid
     abstract: true,
   };
 
-  const groups = {
-    name: 'edge.groups',
-    url: '/groups',
-    views: {
-      'content@': {
-        component: 'edgeGroupsView',
-      },
-    },
-  };
+    const groups = {
+      name: 'edge.groups',
+      url: '/groups',
+      views: {
+        'content@': {
+          component: 'edgeGroupsView'
+        }
+      }
+    };
 
-  $stateRegistryProvider.register(edge);
-  $stateRegistryProvider.register(groups);
-});
+    const groupsNew = {
+      name: 'edge.groups.new',
+      url: '/new',
+      views: {
+        'content@': {
+          component: 'createEdgeGroupView'
+        }
+      }
+    };
+
+    $stateRegistryProvider.register(edge);
+    $stateRegistryProvider.register(groups);
+    $stateRegistryProvider.register(groupsNew);
+  }
+);

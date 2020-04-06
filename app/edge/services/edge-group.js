@@ -10,12 +10,13 @@ angular.module('portainer.app').factory('EdgeGroupService', function EdgeGroupSe
     return EdgeGroups.query({}).$promise;
   };
 
-  service.remove = async function remove(groupId) {
+  service.remove = function remove(groupId) {
     return EdgeGroups.remove({ id: groupId }).$promise;
   };
 
-  // service.create = async function create(group) {
-  // };
+  service.create = function create(group) {
+    return EdgeGroups.create(group).$promise;
+  };
 
   // service.update = async function update(groupId, group) {
   // };
