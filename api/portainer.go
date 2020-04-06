@@ -593,6 +593,31 @@ type (
 		Endpoints []EndpointID `json:"Endpoints"`
 	}
 
+	//EdgeStackID represents an edge stack id
+	EdgeStackID int
+
+	//EdgeStack represents an edge stack
+	EdgeStack struct {
+		ID           EdgeStackID                    `json:"Id"`
+		Name         string                         `json:"Name"`
+		Status       map[EndpointID]EdgeStackStatus `json:"Status"`
+		CreationDate int64                          `json:"CreationDate"`
+		Groups       []EdgeGroupID                  `json:"Groups"`
+		ProjectPath  string                         `json:"ProjectPath"`
+		EntryPoint   string                         `json:"EntryPoint"`
+		Version      int                            `json:"Version"`
+	}
+
+	//EdgeStackStatusType represents an edge stack status type
+	EdgeStackStatusType int
+
+	//EdgeStackStatus represents an edge stack status
+	EdgeStackStatus struct {
+		Type       EdgeStackStatusType `json:"Type"`
+		Error      string              `json:"Error"`
+		EndpointID EndpointID          `json:"EndpointID"`
+	}
+
 	// ExtensionID represents a extension identifier
 	ExtensionID int
 
@@ -1058,6 +1083,16 @@ const (
 	AzureEnvironment
 	// EdgeAgentEnvironment represents an endpoint connected to an Edge agent
 	EdgeAgentEnvironment
+)
+
+const (
+	_ EdgeStackStatusType = iota
+	//StatusOk represents a successfully deployed edge stack
+	StatusOk
+	//StatusError represents an edge endpoint which failed to deploy its edge stack
+	StatusError
+	//StatusAcknowledged represents an acknowledged edge stack
+	StatusAcknowledged
 )
 
 const (
