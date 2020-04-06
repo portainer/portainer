@@ -57,6 +57,7 @@ type Server struct {
 	RoleService            portainer.RoleService
 	DockerHubService       portainer.DockerHubService
 	EdgeGroupService       portainer.EdgeGroupService
+	EdgeStackService       portainer.EdgeStackService
 	EndpointService        portainer.EndpointService
 	EndpointGroupService   portainer.EndpointGroupService
 	FileService            portainer.FileService
