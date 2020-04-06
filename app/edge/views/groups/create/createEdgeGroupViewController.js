@@ -22,7 +22,6 @@ class CreateEdgeGroupController {
       TagIds: [],
     };
 
-    this.onChangeTags = this.onChangeTags.bind(this);
     this.createGroup = this.createGroup.bind(this);
     this.createGroupAsync = this.createGroupAsync.bind(this);
   }
@@ -36,10 +35,6 @@ class CreateEdgeGroupController {
     this.tags = tags;
     this.endpoints = endpoints.value;
     this.endpointGroups = endpointGroups;
-  }
-
-  onChangeTags(tags) {
-    this.model.TagIds = tags;
   }
 
   createGroup() {
