@@ -49,8 +49,9 @@ class CreateEdgeGroupController {
       this.$state.go('edge.groups');
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to create edge group');
+    } finally {
+      this.state.actionInProgress = false;
     }
-    this.state.actionInProgress = false;
   }
 }
 
