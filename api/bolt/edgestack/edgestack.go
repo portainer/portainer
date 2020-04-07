@@ -38,7 +38,7 @@ func (service *Service) EdgeStacks() ([]portainer.EdgeStack, error) {
 		cursor := bucket.Cursor()
 		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
 			var stack portainer.EdgeStack
-			err := internal.UnmarshalObjectWithJsoniter(v, &stack)
+			err := internal.UnmarshalObject(v, &stack)
 			if err != nil {
 				return err
 			}
