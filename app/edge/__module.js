@@ -53,8 +53,7 @@ angular.module('portainer.edge', []).config(function config($stateRegistryProvid
     url: '/new',
     views: {
       'content@': {
-        // component: 'createEdgeStackView',
-        template: 'edge stack new',
+        component: 'createEdgeStackView',
       },
     },
   };
