@@ -1,6 +1,9 @@
 import angular from 'angular';
 
-angular.module('portainer.{{module}}')
-  .controller('{{properCase name}}Controller', function {{properCase name}}Controller(){
+class {{properCase name}}Controller {
+  constructor() {}
+}
 
-  });
+angular.module('portainer.{{module}}')
+  .controller('{{properCase name}}Controller', {{properCase name}}Controller);
+export default {{properCase name}}Controller;
