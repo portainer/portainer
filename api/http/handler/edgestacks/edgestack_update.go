@@ -27,7 +27,6 @@ func (payload *updateEdgeStackPayload) Validate(r *http.Request) error {
 	return nil
 }
 
-// PUT request on /api/stacks/:id?endpointId=<endpointId>
 func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

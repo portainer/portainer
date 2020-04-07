@@ -7,7 +7,6 @@ import (
 	"github.com/portainer/libhttp/response"
 )
 
-// GET request on /api/endpoint_groups
 func (handler *Handler) edgeStackList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	edgeStacks, err := handler.EdgeStackService.EdgeStacks()
 	if err != nil {

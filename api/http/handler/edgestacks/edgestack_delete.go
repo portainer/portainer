@@ -9,7 +9,6 @@ import (
 	"github.com/portainer/portainer/api"
 )
 
-// DELETE request on /api/endpoint_groups/:id
 func (handler *Handler) edgeStackDelete(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	edgeStackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {

@@ -9,7 +9,6 @@ import (
 	"github.com/portainer/portainer/api"
 )
 
-// GET request on /api/endpoint_groups/:id
 func (handler *Handler) edgeStackInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	edgeStackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
