@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { ResourceControlViewModel } from '../../portainer/models/resourceControl';
+import { ResourceControlViewModel } from 'Portainer/models/resourceControl/resourceControl';
 
 export function createStatus(statusText) {
   var status = _.toLower(statusText);
@@ -103,9 +103,7 @@ export function ContainerDetailsViewModel(data) {
   this.Config = data.Config;
   this.HostConfig = data.HostConfig;
   this.Mounts = data.Mounts;
-  if (data.Portainer) {
-    if (data.Portainer.ResourceControl) {
-      this.ResourceControl = new ResourceControlViewModel(data.Portainer.ResourceControl);
-    }
+  if (data.Portainer && data.Portainer.ResourceControl) {
+    this.ResourceControl = new ResourceControlViewModel(data.Portainer.ResourceControl);
   }
 }

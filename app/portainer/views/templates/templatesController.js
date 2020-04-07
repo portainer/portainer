@@ -73,14 +73,14 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
         generatedVolumeIds.push(volumeId);
       });
       TemplateService.updateContainerConfigurationWithVolumes(templateConfiguration, template, data);
-      return ImageService.pullImage(template.Image, { URL: template.Registry }, true);
+      return ImageService.pullImage(template.RegistryModel, true);
     })
     .then(function success() {
       return ContainerService.createAndStartContainer(templateConfiguration);
     })
     .then(function success(data) {
-      var containerIdentifier = data.Id;
-      return ResourceControlService.applyResourceControl('container', containerIdentifier, userId, accessControlData, generatedVolumeIds);
+      const resourceControl = data.Portainer.ResourceControl;
+      return ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl, generatedVolumeIds);
     })
     .then(function success() {
       Notifications.success('Container successfully created');
@@ -111,8 +111,9 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
 
     var endpointId = EndpointProvider.endpointID();
     StackService.createComposeStackFromGitRepository(stackName, repositoryOptions, template.Env, endpointId)
-    .then(function success() {
-      return ResourceControlService.applyResourceControl('stack', stackName, userId, accessControlData, []);
+    .then(function success(data) {
+      const resourceControl = data.ResourceControl;
+      return ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
     })
     .then(function success() {
       Notifications.success('Stack successfully deployed');
@@ -148,15 +149,16 @@ function ($scope, $q, $state, $transition$, $anchorScroll, ContainerService, Ima
 
     var endpointId = EndpointProvider.endpointID();
     StackService.createSwarmStackFromGitRepository(stackName, repositoryOptions, env, endpointId)
-    .then(function success() {
-      return ResourceControlService.applyResourceControl('stack', stackName, userId, accessControlData, []);
+    .then(function success(data) {
+      const resourceControl = data.ResourceControl;
+      return ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
     })
     .then(function success() {
       Notifications.success('Stack successfully deployed');
       $state.go('portainer.stacks');
     })
     .catch(function error(err) {
-      Notifications.warning('Deployment error', err.err.data.err);
+      Notifications.warning('Deployment error', err.data.err);
     })
     .finally(function final() {
       $scope.state.actionInProgress = false;

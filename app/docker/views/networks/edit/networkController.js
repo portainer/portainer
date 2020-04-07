@@ -1,8 +1,6 @@
 angular.module('portainer.docker')
-.controller('NetworkController', ['$scope', '$state', '$transition$', '$filter', 'NetworkService', 'Container', 'Notifications', 'HttpRequestHelper', 'PREDEFINED_NETWORKS',
-function ($scope, $state, $transition$, $filter, NetworkService, Container, Notifications, HttpRequestHelper, PREDEFINED_NETWORKS) {
-
-  $scope.network = {};
+.controller('NetworkController', ['$scope', '$state', '$transition$', '$filter', 'NetworkService', 'Container', 'Notifications', 'HttpRequestHelper', 'NetworkHelper',
+function ($scope, $state, $transition$, $filter, NetworkService, Container, Notifications, HttpRequestHelper, NetworkHelper) {
 
   $scope.removeNetwork = function removeNetwork() {
     NetworkService.remove($transition$.params().id, $transition$.params().id)
@@ -27,8 +25,12 @@ function ($scope, $state, $transition$, $filter, NetworkService, Container, Noti
     });
   };
 
-  $scope.allowRemove = function allowRemove(item) {
-    return !PREDEFINED_NETWORKS.includes(item.Name);
+  $scope.isSystemNetwork = function() {
+    return $scope.network && NetworkHelper.isSystemNetwork($scope.network);
+  }
+
+  $scope.allowRemove = function() {
+    return !$scope.isSystemNetwork();
   };
 
   function filterContainersInNetwork(network, containers) {

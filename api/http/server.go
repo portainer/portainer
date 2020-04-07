@@ -7,7 +7,7 @@ import (
 
 	"github.com/portainer/portainer/api/http/handler/roles"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/handler"
 	"github.com/portainer/portainer/api/http/handler/auth"
@@ -87,6 +87,7 @@ func (server *Server) Start() error {
 	proxyManagerParameters := &proxy.ManagerParams{
 		ResourceControlService: server.ResourceControlService,
 		UserService:            server.UserService,
+		TeamService:            server.TeamService,
 		TeamMembershipService:  server.TeamMembershipService,
 		SettingsService:        server.SettingsService,
 		RegistryService:        server.RegistryService,
@@ -94,6 +95,7 @@ func (server *Server) Start() error {
 		SignatureService:       server.SignatureService,
 		ReverseTunnelService:   server.ReverseTunnelService,
 		ExtensionService:       server.ExtensionService,
+		DockerClientFactory:    server.DockerClientFactory,
 	}
 	proxyManager := proxy.NewManager(proxyManagerParameters)
 
@@ -134,6 +136,7 @@ func (server *Server) Start() error {
 	authHandler.EndpointGroupService = server.EndpointGroupService
 	authHandler.RoleService = server.RoleService
 	authHandler.ProxyManager = proxyManager
+	authHandler.AuthorizationService = authorizationService
 
 	var roleHandler = roles.NewHandler(requestBouncer)
 	roleHandler.RoleService = server.RoleService
@@ -214,9 +217,13 @@ func (server *Server) Start() error {
 	stackHandler.RegistryService = server.RegistryService
 	stackHandler.DockerHubService = server.DockerHubService
 	stackHandler.SettingsService = server.SettingsService
+	stackHandler.UserService = server.UserService
+	stackHandler.ExtensionService = server.ExtensionService
 
 	var tagHandler = tags.NewHandler(requestBouncer)
 	tagHandler.TagService = server.TagService
+	tagHandler.EndpointService = server.EndpointService
+	tagHandler.EndpointGroupService = server.EndpointGroupService
 
 	var teamHandler = teams.NewHandler(requestBouncer)
 	teamHandler.TeamService = server.TeamService

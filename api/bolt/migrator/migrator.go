@@ -12,6 +12,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/schedule"
 	"github.com/portainer/portainer/api/bolt/settings"
 	"github.com/portainer/portainer/api/bolt/stack"
+	"github.com/portainer/portainer/api/bolt/tag"
 	"github.com/portainer/portainer/api/bolt/teammembership"
 	"github.com/portainer/portainer/api/bolt/template"
 	"github.com/portainer/portainer/api/bolt/user"
@@ -32,6 +33,7 @@ type (
 		scheduleService        *schedule.Service
 		settingsService        *settings.Service
 		stackService           *stack.Service
+		tagService             *tag.Service
 		teamMembershipService  *teammembership.Service
 		templateService        *template.Service
 		userService            *user.Service
@@ -52,6 +54,7 @@ type (
 		ScheduleService        *schedule.Service
 		SettingsService        *settings.Service
 		StackService           *stack.Service
+		TagService             *tag.Service
 		TeamMembershipService  *teammembership.Service
 		TemplateService        *template.Service
 		UserService            *user.Service
@@ -73,6 +76,7 @@ func NewMigrator(parameters *Parameters) *Migrator {
 		roleService:            parameters.RoleService,
 		scheduleService:        parameters.ScheduleService,
 		settingsService:        parameters.SettingsService,
+		tagService:             parameters.TagService,
 		teamMembershipService:  parameters.TeamMembershipService,
 		templateService:        parameters.TemplateService,
 		stackService:           parameters.StackService,
@@ -282,6 +286,28 @@ func (m *Migrator) Migrate() error {
 		}
 
 		err = m.updateSchedulesToDBVersion20()
+		if err != nil {
+			return err
+		}
+	}
+
+	// Portainer 1.23.0
+	// DBVersion 21 is missing as it was shipped as via hotfix 1.22.2
+	if m.currentDBVersion < 22 {
+		err := m.updateResourceControlsToDBVersion22()
+		if err != nil {
+			return err
+		}
+
+		err = m.updateUsersAndRolesToDBVersion22()
+		if err != nil {
+			return err
+		}
+	}
+
+	// Portainer 1.24.0-dev
+	if m.currentDBVersion < 23 {
+		err := m.updateEndointsAndEndpointsGroupsToDBVersion23()
 		if err != nil {
 			return err
 		}

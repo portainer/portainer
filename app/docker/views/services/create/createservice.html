@@ -23,10 +23,9 @@
           </div>
           <!-- image-and-registry -->
           <por-image-registry
-            image="formValues.Image"
-            registry="formValues.Registry"
+            model="formValues.RegistryModel"
             auto-complete="true"
-            label-class="col-sm-1" input-class="col-sm-11 col-md-5"
+            label-class="col-sm-1" input-class="col-sm-11"
           ></por-image-registry>
           <!-- !image-and-registry -->
           <div class="col-sm-12 form-section-title">
@@ -126,7 +125,7 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !formValues.Image" ng-click="create()" button-spinner="state.actionInProgress">
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !formValues.RegistryModel.Image" ng-click="create()" button-spinner="state.actionInProgress">
                 <span ng-hide="state.actionInProgress">Create the service</span>
                 <span ng-show="state.actionInProgress">Creating service...</span>
               </button>

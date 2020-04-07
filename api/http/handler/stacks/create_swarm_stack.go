@@ -10,7 +10,6 @@ import (
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
-	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/security"
@@ -36,7 +35,7 @@ func (payload *swarmStackFromFileContentPayload) Validate(r *http.Request) error
 	return nil
 }
 
-func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint) *httperror.HandlerError {
+func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	var payload swarmStackFromFileContentPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
@@ -91,7 +90,7 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 	}
 
 	doCleanUp = false
-	return response.JSON(w, stack)
+	return handler.decorateStackResponse(w, stack, userID)
 }
 
 type swarmStackFromGitRepositoryPayload struct {
@@ -125,7 +124,7 @@ func (payload *swarmStackFromGitRepositoryPayload) Validate(r *http.Request) err
 	return nil
 }
 
-func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint) *httperror.HandlerError {
+func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	var payload swarmStackFromGitRepositoryPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
@@ -190,7 +189,7 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 	}
 
 	doCleanUp = false
-	return response.JSON(w, stack)
+	return handler.decorateStackResponse(w, stack, userID)
 }
 
 type swarmStackFromFileUploadPayload struct {
@@ -228,7 +227,7 @@ func (payload *swarmStackFromFileUploadPayload) Validate(r *http.Request) error 
 	return nil
 }
 
-func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint) *httperror.HandlerError {
+func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r *http.Request, endpoint *portainer.Endpoint, userID portainer.UserID) *httperror.HandlerError {
 	payload := &swarmStackFromFileUploadPayload{}
 	err := payload.Validate(r)
 	if err != nil {
@@ -283,7 +282,7 @@ func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r 
 	}
 
 	doCleanUp = false
-	return response.JSON(w, stack)
+	return handler.decorateStackResponse(w, stack, userID)
 }
 
 type swarmStackDeploymentConfig struct {

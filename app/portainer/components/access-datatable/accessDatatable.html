@@ -5,10 +5,10 @@
     <rd-widget-body classes="no-padding">
       <div class="toolBar small" ng-if="$ctrl.inheritFrom">
           Access tagged as <code>inherited</code> are inherited from the group access. They cannot be
-          removed nor modified at the endpoint level but they can be overriden.
+          removed or modified at the endpoint level but they can be overriden.
       </div>
       <div class="toolBar small" ng-if="$ctrl.inheritFrom">
-        Access tagged as <code>override</code> are overriding the group access for the related users / teams.
+        Access tagged as <code>override</code> are overriding the group access for the related users/teams.
       </div>
       <div class="actionBar">
         <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0"
@@ -99,7 +99,7 @@
               <td colspan="4" class="text-center text-muted">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-              <td colspan="4" class="text-center text-muted">No authorized user or team.</td>
+              <td colspan="4" class="text-center text-muted">No authorized users or teams.</td>
             </tr>
           </tbody>
         </table>

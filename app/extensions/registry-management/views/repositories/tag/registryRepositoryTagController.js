@@ -6,12 +6,12 @@ import { RegistryImageDetailsViewModel } from 'Extensions/registry-management/mo
 class RegistryRepositoryTagController {
 
   /* @ngInject */
-  constructor($transition$, $async, Notifications, RegistryService, RegistryV2Service, imagelayercommandFilter) {
+  constructor($transition$, $async, Notifications, RegistryService, RegistryServiceSelector, imagelayercommandFilter) {
     this.$transition$ = $transition$;
     this.$async = $async;
     this.Notifications = Notifications;
     this.RegistryService = RegistryService;
-    this.RegistryV2Service = RegistryV2Service;
+    this.RegistryServiceSelector = RegistryServiceSelector;
     this.imagelayercommandFilter = imagelayercommandFilter;
 
     this.context = {};
@@ -39,7 +39,7 @@ class RegistryRepositoryTagController {
     }
     try {
       this.registry = await this.RegistryService.registry(this.context.registryId);
-      this.tag = await this.RegistryV2Service.tag(this.context.registryId, this.context.repository, this.context.tag);
+      this.tag = await this.RegistryServiceSelector.tag(this.registry, this.context.repository, this.context.tag);
       const length = this.tag.History.length;
       this.history = _.map(this.tag.History, (layer, idx) => new RegistryImageLayerViewModel(length - idx, layer));
       _.forEach(this.history, (item) => item.CreatedBy = this.imagelayercommandFilter(item.CreatedBy))

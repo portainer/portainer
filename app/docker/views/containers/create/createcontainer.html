@@ -21,18 +21,18 @@
           <div class="col-sm-12 form-section-title">
             Image configuration
           </div>
-          <div ng-if="!formValues.Registry && fromContainer">
+          <div ng-if="!formValues.RegistryModel.Registry && fromContainer">
             <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true"></i>
             <span class="small text-danger" style="margin-left: 5px;">The Docker registry for the <code>{{ config.Image }}</code> image is not registered inside Portainer, you will not be able to create a container. Please register that registry first.</span>
           </div>
-          <div ng-if="formValues.Registry || !fromContainer">
+          <div ng-if="formValues.RegistryModel.Registry || !fromContainer">
             <!-- image-and-registry -->
             <por-image-registry
-              image="config.Image"
-              registry="formValues.Registry"
-              ng-if="formValues.Registry"
+              model="formValues.RegistryModel"
+              pull-warning="formValues.alwaysPull"
+              ng-if="formValues.RegistryModel.Registry"
               auto-complete="true"
-              label-class="col-sm-1" input-class="col-sm-11 col-md-5"
+              label-class="col-sm-1" input-class="col-sm-11"
             ></por-image-registry>
             <!-- !image-and-registry -->
             <!-- always-pull -->
@@ -142,7 +142,9 @@
           <!-- !autoremove -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !config.Image || (!formValues.Registry && fromContainer)" ng-click="create()" button-spinner="state.actionInProgress">
+              <button type="button" class="btn btn-primary btn-sm"
+                ng-disabled="state.actionInProgress || !formValues.RegistryModel.Image || (!formValues.RegistryModel.Registry && fromContainer)"
+                ng-click="create()" button-spinner="state.actionInProgress">
                 <span ng-hide="state.actionInProgress">Deploy the container</span>
                 <span ng-show="state.actionInProgress">Deployment in progress...</span>
               </button>
@@ -433,6 +435,22 @@
                 </div>
               </div>
               <!-- !ipv6-input -->
+              <!-- dns-primary-input -->
+              <div class="form-group">
+                <label for="container_dns_primary" class="col-sm-2 col-lg-1 control-label text-left">Primary DNS Server</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" ng-model="formValues.DnsPrimary" id="container_dns_primary" placeholder="e.g. 1.1.1.1">
+                </div>
+              </div>
+              <!-- !dns-primary-input -->
+              <!-- dns-secondary-input -->
+              <div class="form-group">
+                <label for="container_dns_secondary" class="col-sm-2 col-lg-1 control-label text-left">Secondary DNS Server</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" ng-model="formValues.DnsSecondary" id="container_dns_secondary" placeholder="e.g. 1.0.0.1">
+                </div>
+              </div>
+              <!-- !dns-secondary-input -->
               <!-- extra-hosts-variables -->
               <div class="form-group">
                 <div class="col-sm-12" style="margin-top: 5px;">

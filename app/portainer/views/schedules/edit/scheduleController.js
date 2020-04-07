@@ -1,6 +1,5 @@
 angular.module('portainer.app')
-.controller('ScheduleController', ['$q', '$scope', '$transition$', '$state', 'Notifications', 'EndpointService', 'GroupService', 'ScheduleService', 'EndpointProvider', 'HostBrowserService', 'FileSaver',
-function ($q, $scope, $transition$, $state, Notifications, EndpointService, GroupService, ScheduleService, EndpointProvider, HostBrowserService, FileSaver) {
+.controller('ScheduleController', function ScheduleController($q, $scope, $transition$, $state, Notifications, EndpointService, GroupService, ScheduleService, EndpointProvider, HostBrowserService, FileSaver, TagService) {
 
   $scope.state = {
     actionInProgress: false
@@ -75,7 +74,8 @@ function ($q, $scope, $transition$, $state, Notifications, EndpointService, Grou
       file: ScheduleService.getScriptFile(id),
       tasks: ScheduleService.scriptExecutionTasks(id),
       endpoints: EndpointService.endpoints(),
-      groups: GroupService.groups()
+      groups: GroupService.groups(),
+      tags: TagService.tags()
     })
     .then(function success(data) {
       var schedule = data.schedule;
@@ -89,6 +89,7 @@ function ($q, $scope, $transition$, $state, Notifications, EndpointService, Grou
       $scope.tasks = data.tasks;
       $scope.endpoints = data.endpoints.value;
       $scope.groups = data.groups;
+      $scope.tags = data.tags;
     })
     .catch(function error(err) {
       Notifications.error('Failure', err, 'Unable to retrieve endpoint list');
@@ -96,4 +97,4 @@ function ($q, $scope, $transition$, $state, Notifications, EndpointService, Grou
   }
 
   initView();
-}]);
+});

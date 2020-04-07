@@ -24,7 +24,7 @@ type endpointUpdatePayload struct {
 	AzureApplicationID     *string
 	AzureTenantID          *string
 	AzureAuthenticationKey *string
-	Tags                   []string
+	TagIDs                 []portainer.TagID
 	UserAccessPolicies     portainer.UserAccessPolicies
 	TeamAccessPolicies     portainer.TeamAccessPolicies
 }
@@ -73,8 +73,8 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		endpoint.GroupID = portainer.EndpointGroupID(*payload.GroupID)
 	}
 
-	if payload.Tags != nil {
-		endpoint.Tags = payload.Tags
+	if payload.TagIDs != nil {
+		endpoint.TagIDs = payload.TagIDs
 	}
 
 	updateAuthorizations := false
@@ -166,7 +166,7 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if payload.URL != nil || payload.TLS != nil || endpoint.Type == portainer.AzureEnvironment {
-		_, err = handler.ProxyManager.CreateAndRegisterProxy(endpoint)
+		_, err = handler.ProxyManager.CreateAndRegisterEndpointProxy(endpoint)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to register HTTP proxy for the endpoint", err}
 		}

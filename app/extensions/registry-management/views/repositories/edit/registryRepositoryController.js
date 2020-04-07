@@ -2,8 +2,8 @@ import _ from 'lodash-es';
 import { RepositoryTagViewModel, RepositoryShortTag } from '../../../models/repositoryTag';
 
 angular.module('portainer.app')
-  .controller('RegistryRepositoryController', ['$q', '$async', '$scope', '$uibModal', '$interval', '$transition$', '$state', 'RegistryV2Service', 'RegistryService', 'ModalService', 'Notifications', 'ImageHelper',
-    function ($q, $async, $scope, $uibModal, $interval, $transition$, $state, RegistryV2Service, RegistryService, ModalService, Notifications, ImageHelper) {
+  .controller('RegistryRepositoryController', ['$q', '$async', '$scope', '$uibModal', '$interval', '$transition$', '$state', 'RegistryServiceSelector', 'RegistryService', 'ModalService', 'Notifications', 'ImageHelper',
+    function ($q, $async, $scope, $uibModal, $interval, $transition$, $state, RegistryServiceSelector, RegistryService, ModalService, Notifications, ImageHelper) {
 
       $scope.state = {
         actionInProgress: false,
@@ -63,7 +63,7 @@ angular.module('portainer.app')
 
       $scope.paginationAction = function (tags) {
         $scope.state.loading = true;
-        RegistryV2Service.getTagsDetails($scope.registryId, $scope.repository.Name, tags)
+        RegistryServiceSelector.getTagsDetails($scope.registry, $scope.repository.Name, tags)
         .then(function success(data) {
           for (var i = 0; i < data.length; i++) {
             var idx = _.findIndex($scope.tags, {'Name': data[i].Name});
@@ -86,7 +86,7 @@ angular.module('portainer.app')
 
       function createRetrieveAsyncGenerator() {
         $scope.state.tagsRetrieval.asyncGenerator =
-          RegistryV2Service.shortTagsWithProgress($scope.registryId, $scope.repository.Name, $scope.repository.Tags);
+          RegistryServiceSelector.shortTagsWithProgress($scope.registry, $scope.repository.Name, $scope.repository.Tags);
       }
 
       function resetTagsRetrievalState() {
@@ -151,7 +151,7 @@ angular.module('portainer.app')
           }
           const tag = $scope.short.Tags.find((item) => item.ImageId === $scope.formValues.SelectedImage);
           const manifest = tag.ManifestV2;
-          await RegistryV2Service.addTag($scope.registryId, $scope.repository.Name, {tag: $scope.formValues.Tag, manifest: manifest})
+          await RegistryServiceSelector.addTag($scope.registry, $scope.repository.Name, $scope.formValues.Tag, manifest)
 
           Notifications.success('Success', 'Tag successfully added');
           $scope.short.Tags.push(new RepositoryShortTag($scope.formValues.Tag, tag.ImageId, tag.ImageDigest, tag.ManifestV2));
@@ -182,7 +182,7 @@ angular.module('portainer.app')
 
       function createRetagAsyncGenerator(modifiedTags, modifiedDigests, impactedTags) {
         $scope.state.tagsRetag.asyncGenerator =
-          RegistryV2Service.retagWithProgress($scope.registryId, $scope.repository.Name, modifiedTags, modifiedDigests, impactedTags);
+          RegistryServiceSelector.retagWithProgress($scope.registry, $scope.repository.Name, modifiedTags, modifiedDigests, impactedTags);
       }
 
       async function retagActionAsync() {
@@ -252,7 +252,7 @@ angular.module('portainer.app')
 
       function createDeleteAsyncGenerator(modifiedDigests, impactedTags) {
         $scope.state.tagsDelete.asyncGenerator =
-          RegistryV2Service.deleteTagsWithProgress($scope.registryId, $scope.repository.Name, modifiedDigests, impactedTags);
+          RegistryServiceSelector.deleteTagsWithProgress($scope.registry, $scope.repository.Name, modifiedDigests, impactedTags);
       }
 
       async function removeTagsAsync(selectedTags) {
@@ -289,7 +289,7 @@ angular.module('portainer.app')
           Notifications.success('Success', 'Tags successfully deleted');
 
           if ($scope.short.Tags.length === 0) {
-            $state.go('portainer.registries.registry.repositories', {id: $scope.registryId}, {reload: true});
+            $state.go('portainer.registries.registry.repositories', {id: $scope.registry.Id}, {reload: true});
           }
           await loadRepositoryDetails();
         } catch (err) {
@@ -322,10 +322,10 @@ angular.module('portainer.app')
         try {
           const digests = _.uniqBy($scope.short.Tags, 'ImageDigest');
           const promises = [];
-          _.map(digests, (item) => promises.push(RegistryV2Service.deleteManifest($scope.registryId, $scope.repository.Name, item.ImageDigest)));
+          _.map(digests, (item) => promises.push(RegistryServiceSelector.deleteManifest($scope.registry, $scope.repository.Name, item.ImageDigest)));
           await Promise.all(promises);
           Notifications.success('Success', 'Repository sucessfully removed');
-          $state.go('portainer.registries.registry.repositories', {id: $scope.registryId}, {reload: true});
+          $state.go('portainer.registries.registry.repositories', {id: $scope.registry.Id}, {reload: true});
         } catch (err) {
           Notifications.error('Failure', err, 'Unable to delete repository');
         }
@@ -351,9 +351,9 @@ angular.module('portainer.app')
        */
       async function loadRepositoryDetails() {
         try {
-          const registryId = $scope.registryId;
+          const registry = $scope.registry;
           const repository = $scope.repository.Name;
-          const tags = await RegistryV2Service.tags(registryId, repository);
+          const tags = await RegistryServiceSelector.tags(registry, repository);
           $scope.tags = [];
           $scope.repository.Tags = [];
           $scope.repository.Tags = _.sortBy(_.concat($scope.repository.Tags, _.without(tags.tags, null)));
@@ -365,7 +365,7 @@ angular.module('portainer.app')
 
       async function initView() {
         try {
-          const registryId = $scope.registryId = $transition$.params().id;
+          const registryId = $transition$.params().id;
           $scope.repository.Name = $transition$.params().repository;
           $scope.state.loading = true;
 

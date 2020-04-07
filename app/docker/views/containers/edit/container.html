@@ -14,13 +14,13 @@
           <div class="btn-group" role="group" aria-label="...">
             <button authorization="DockerContainerStart" class="btn btn-success btn-sm" ng-click="start()" ng-disabled="container.State.Running"><i class="fa fa-play space-right" aria-hidden="true"></i>Start</button>
             <button authorization="DockerContainerStop" class="btn btn-danger btn-sm" ng-click="stop()" ng-disabled="!container.State.Running"><i class="fa fa-stop space-right" aria-hidden="true"></i>Stop</button>
-            <button authorization=DockerContainerKill" class="btn btn-danger btn-sm" ng-click="kill()" ng-disabled="!container.State.Running"><i class="fa fa-bomb space-right" aria-hidden="true"></i>Kill</button>
+            <button authorization="DockerContainerKill" class="btn btn-danger btn-sm" ng-click="kill()" ng-disabled="!container.State.Running"><i class="fa fa-bomb space-right" aria-hidden="true"></i>Kill</button>
             <button authorization="DockerContainerRestart" class="btn btn-primary btn-sm" ng-click="restart()" ng-disabled="!container.State.Running"><i class="fa fa-sync space-right" aria-hidden="true"></i>Restart</button>
             <button authorization="DockerContainerPause" class="btn btn-primary btn-sm" ng-click="pause()" ng-disabled="!container.State.Running || container.State.Paused"><i class="fa fa-pause space-right" aria-hidden="true"></i>Pause</button>
             <button authorization="DockerContainerUnpause" class="btn btn-primary btn-sm" ng-click="unpause()" ng-disabled="!container.State.Paused"><i class="fa fa-play space-right" aria-hidden="true"></i>Resume</button>
             <button authorization="DockerContainerDelete" class="btn btn-danger btn-sm" ng-click="confirmRemove()"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove</button>
           </div>
-          <div class="btn-group" role="group" aria-label="..." ng-if="!container.Config.Labels['com.docker.swarm.service.id']" authorization="DockerContainerCreate">
+          <div class="btn-group" role="group" aria-label="..." ng-if="displayRecreateButton" authorization="DockerContainerCreate">
             <button type="button" class="btn btn-danger btn-sm" ng-disabled="state.recreateContainerInProgress" ng-click="recreate()" button-spinner="state.recreateContainerInProgress">
               <span ng-hide="state.recreateContainerInProgress"><i class="fa fa-sync space-right" aria-hidden="true"></i>Recreate</span>
               <span ng-show="state.recreateContainerInProgress">Recreation in progress...</span>
@@ -155,10 +155,9 @@
             <!-- !tag-description -->
             <!-- image-and-registry -->
             <por-image-registry
-              image="config.Image"
-              registry="config.Registry"
+              model="config.RegistryModel"
               auto-complete="true"
-              label-class="col-sm-1" input-class="col-sm-11 col-md-5"
+              label-class="col-sm-1" input-class="col-sm-11"
             ></por-image-registry>
             <!-- !image-and-registry -->
             <!-- tag-note -->
@@ -170,7 +169,7 @@
             <!-- !tag-note -->
             <div class="form-group">
               <div class="col-sm-12">
-                <button type="button" class="btn btn-primary btn-sm" ng-disabled="!config.Image" ng-click="commit()">Create</button>
+                <button type="button" class="btn btn-primary btn-sm" ng-disabled="!config.RegistryModel.Image || config.commitInProgress" ng-click="commit()">Create</button>
               </div>
             </div>
           </form>

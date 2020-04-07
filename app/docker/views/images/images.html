@@ -16,18 +16,12 @@
         <form class="form-horizontal">
           <!-- image-and-registry -->
           <por-image-registry
-            image="formValues.Image"
-            registry="formValues.Registry"
-            label-class="col-sm-1" input-class="col-sm-11 col-md-5"
+            model="formValues.RegistryModel"
+            auto-complete="true"
+            pull-warning="true"
+            label-class="col-sm-1" input-class="col-sm-11"
           ></por-image-registry>
           <!-- !image-and-registry -->
-          <!-- tag-note -->
-          <div class="form-group">
-            <div class="col-sm-12">
-              <span class="small text-muted">Note: if you don't specify the tag in the image name, <span class="label label-default">latest</span> will be used.</span>
-            </div>
-          </div>
-          <!-- !tag-note -->
           <div ng-if="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'">
             <div class="col-sm-12 form-section-title">
               Deployment
@@ -40,7 +34,7 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !formValues.Image" ng-click="pullImage()" button-spinner="state.actionInProgress">
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !formValues.RegistryModel.Image" ng-click="pullImage()" button-spinner="state.actionInProgress">
                 <span ng-hide="state.actionInProgress">Pull the image</span>
                 <span ng-show="state.actionInProgress">Download in progress...</span>
               </button>

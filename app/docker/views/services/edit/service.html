@@ -66,10 +66,7 @@
             </tr>
             <tr>
               <td>Image</td>
-              <td>
-                  <input type="text" class="form-control" uib-typeahead="image for image in availableImages | filter:$viewValue | limitTo:5"
-                    ng-model="service.Image" ng-change="updateServiceAttribute(service, 'Image')" id="image_name" disable-authorization="DockerServiceUpdate">
-              </td>
+              <td>{{ service.Image }}</td>
             </tr>
             <tr ng-if="applicationState.endpoint.type !== 4">
               <td colspan="{{webhookURL ? '1' : '2'}}">
@@ -91,7 +88,7 @@
           </tr>
             <tr authorization="DockerServiceLogs, DockerServiceUpdate, DockerServiceDelete">
               <td colspan="2">
-                <p class="small text-muted">
+                <p class="small text-muted" authorization="DockerServiceUpdate">
                   Note: you can only rollback one level of changes. Clicking the rollback button without making a new change will undo your previous rollback
                 <p>
                 <a authorization="DockerServiceLogs" ng-if="applicationState.endpoint.apiVersion >= 1.30" class="btn btn-primary btn-sm" type="button" ui-sref="docker.services.service.logs({id: service.Id})"><i class="fa fa-file-alt space-right" aria-hidden="true"></i>Service logs</a>
@@ -118,12 +115,12 @@
         </p>
         <div class="btn-toolbar" role="toolbar">
           <div class="btn-group" role="group">
-            <button type="button" class="btn btn-primary" ng-disabled="!hasChanges(service, ['Mode', 'Replicas', 'Image', 'Name', 'Webhooks'])" ng-click="updateService(service)">Apply changes</button>
+            <button type="button" class="btn btn-primary" ng-disabled="!hasChanges(service, ['Mode', 'Replicas', 'Name', 'Webhooks'])" ng-click="updateService(service)">Apply changes</button>
             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <span class="caret"></span>
             </button>
             <ul class="dropdown-menu">
-              <li><a ng-click="cancelChanges(service, ['Mode', 'Replicas', 'Image', 'Name'])">Reset changes</a></li>
+              <li><a ng-click="cancelChanges(service, ['Mode', 'Replicas', 'Name'])">Reset changes</a></li>
               <li><a ng-click="cancelChanges(service)">Reset all changes</a></li>
             </ul>
           </div>
@@ -138,6 +135,7 @@
       <rd-widget-body classes="no-padding">
         <ul class="nav nav-pills nav-stacked">
           <li><a href ng-click="goToItem('service-env-variables')">Environment variables</a></li>
+          <li><a href ng-click="goToItem('service-container-image')">Container image</a></li>
           <li><a href ng-click="goToItem('service-container-labels')">Container labels</a></li>
           <li><a href ng-click="goToItem('service-mounts')">Mounts</a></li>
           <li><a href ng-click="goToItem('service-network-specs')">Network &amp; published ports</a></li>
@@ -171,6 +169,7 @@
   <div class="col-lg-12 col-md-12 col-xs-12">
     <h3 id="container-specs">Container specification</h3>
     <div id="service-container-spec" class="padding-top" ng-include="'app/docker/views/services/edit/includes/container-specs.html'"></div>
+    <div id="service-container-image" class="padding-top" ng-include="'app/docker/views/services/edit/includes/image.html'"></div>
     <div id="service-env-variables" class="padding-top" ng-include="'app/docker/views/services/edit/includes/environmentvariables.html'"></div>
     <div id="service-container-labels" class="padding-top" ng-include="'app/docker/views/services/edit/includes/containerlabels.html'"></div>
     <div id="service-mounts" class="padding-top" ng-include="'app/docker/views/services/edit/includes/mounts.html'"></div>

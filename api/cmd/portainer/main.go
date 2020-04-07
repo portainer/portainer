@@ -259,6 +259,7 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 			LogoURL:              *flags.Logo,
 			AuthenticationMethod: portainer.AuthenticationInternal,
 			LDAPSettings: portainer.LDAPSettings{
+				AnonymousMode:   true,
 				AutoCreateUsers: true,
 				TLSConfig:       portainer.TLSConfiguration{},
 				SearchSettings: []portainer.LDAPSearchSettings{
@@ -396,7 +397,7 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, endpointService portain
 		UserAccessPolicies: portainer.UserAccessPolicies{},
 		TeamAccessPolicies: portainer.TeamAccessPolicies{},
 		Extensions:         []portainer.EndpointExtension{},
-		Tags:               []string{},
+		TagIDs:             []portainer.TagID{},
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.Snapshot{},
 	}
@@ -439,7 +440,7 @@ func createUnsecuredEndpoint(endpointURL string, endpointService portainer.Endpo
 		UserAccessPolicies: portainer.UserAccessPolicies{},
 		TeamAccessPolicies: portainer.TeamAccessPolicies{},
 		Extensions:         []portainer.EndpointExtension{},
-		Tags:               []string{},
+		TagIDs:             []portainer.TagID{},
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.Snapshot{},
 	}
@@ -489,24 +490,9 @@ func initJobService(dockerClientFactory *docker.ClientFactory) portainer.JobServ
 func initExtensionManager(fileService portainer.FileService, extensionService portainer.ExtensionService) (portainer.ExtensionManager, error) {
 	extensionManager := exec.NewExtensionManager(fileService, extensionService)
 
-	extensions, err := extensionService.Extensions()
+	err := extensionManager.StartExtensions()
 	if err != nil {
 		return nil, err
-	}
-
-	for _, extension := range extensions {
-		err := extensionManager.EnableExtension(&extension, extension.License.LicenseKey)
-		if err != nil {
-			log.Printf("Unable to enable extension: %s [extension: %s]", err.Error(), extension.Name)
-			extension.Enabled = false
-			extension.License.Valid = false
-		}
-
-		err = extensionService.Persist(&extension)
-		if err != nil {
-			return nil, err
-		}
-
 	}
 
 	return extensionManager, nil
@@ -639,7 +625,7 @@ func main() {
 		}
 
 		if len(users) == 0 {
-			log.Printf("Creating admin user with password hash %s", adminPasswordHash)
+			log.Println("Created admin user with the given password.")
 			user := &portainer.User{
 				Username:                "admin",
 				Role:                    portainer.AdministratorRole,

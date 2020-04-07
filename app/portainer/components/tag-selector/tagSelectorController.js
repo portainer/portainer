@@ -1,32 +1,35 @@
 import _ from 'lodash-es';
 
-angular.module('portainer.app')
-.controller('TagSelectorController', function () {
-
-  this.$onChanges = function(changes) {
-    if(angular.isDefined(changes.tags.currentValue)) {
-      this.tags = _.difference(changes.tags.currentValue, this.model);
-    }
+angular.module('portainer.app').controller('TagSelectorController', function() {
+  this.$onInit = function() {
+    this.state.selectedTags = _.map(this.model, (id) => _.find(this.tags, (t) => t.Id === id));
   };
 
   this.state = {
     selectedValue: '',
-    noResult: false
+    selectedTags: [],
+    noResult: false,
   };
 
   this.selectTag = function($item) {
     this.state.selectedValue = '';
-    this.model.push($item);
-    this.tags = _.remove(this.tags, function(item) {
-      return item !== $item;
-    });
+    this.model.push($item.Id);
+    this.state.selectedTags.push($item);
   };
 
-  this.removeTag = function(tag) {
-    var idx = this.model.indexOf(tag);
-    if (idx > -1) {
-      this.model.splice(idx, 1);
-      this.tags.push(tag);
-    }
+  this.removeTag = function removeTag(tag) {
+    _.remove(this.state.selectedTags, { Id: tag.Id });
+    _.remove(this.model, (id) => id === tag.Id);
   };
+
+  this.filterSelected = filterSelected.bind(this);
+
+  function filterSelected($item) {
+    if (!this.model) {
+      return true;
+    }
+    return !_.includes(this.model, $item.Id);
+  }
+  window._remove = _.remove;
 });
+

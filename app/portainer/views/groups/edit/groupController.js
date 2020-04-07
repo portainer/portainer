@@ -28,7 +28,7 @@ function ($q, $scope, $state, $transition$, GroupService, TagService, Notificati
 
     $q.all({
       group: GroupService.group(groupId),
-      tags: TagService.tagNames()
+      tags: TagService.tags()
     })
     .then(function success(data) {
       $scope.group = data.group;

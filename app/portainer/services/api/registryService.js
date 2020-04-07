@@ -1,7 +1,11 @@
+import _ from 'lodash-es';
 import { RegistryViewModel, RegistryCreateRequest } from '../../models/registry';
+import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
+import { RegistryTypes } from 'Extensions/registry-management/models/registryTypes';
 
 angular.module('portainer.app')
-.factory('RegistryService', ['$q', 'Registries', 'DockerHubService', 'RegistryHelper', 'ImageHelper', 'FileUploadService', function RegistryServiceFactory($q, Registries, DockerHubService, RegistryHelper, ImageHelper, FileUploadService) {
+.factory('RegistryService', ['$q', '$async', 'Registries', 'DockerHubService', 'ImageHelper', 'FileUploadService',
+function RegistryServiceFactory($q, $async, Registries, DockerHubService, ImageHelper, FileUploadService) {
   'use strict';
   var service = {};
 
@@ -65,23 +69,66 @@ angular.module('portainer.app')
     return Registries.create(payload).$promise;
   };
 
-  service.retrieveRegistryFromRepository = function(repository) {
-    var deferred = $q.defer();
-
-    var imageDetails = ImageHelper.extractImageAndRegistryFromRepository(repository);
-    $q.when(imageDetails.registry ? service.registries() : DockerHubService.dockerhub())
-    .then(function success(data) {
-      var registry = data;
-      if (imageDetails.registry) {
-        registry = RegistryHelper.getRegistryByURL(data, imageDetails.registry);
-      }
-      deferred.resolve(registry);
-    })
-    .catch(function error(err) {
-      deferred.reject({ msg: 'Unable to retrieve the registry associated to the repository', err: err });
+  service.createGitlabRegistries = function(model, projects) {
+    const promises = [];
+    _.forEach(projects, (p) => {
+      const m = model;
+      m.Name = p.PathWithNamespace;
+      m.Gitlab.ProjectPath = _.toLower(p.PathWithNamespace);
+      m.Gitlab.ProjectId = p.Id;
+      m.Password = m.Token;
+      const payload = new RegistryCreateRequest(m);
+      promises.push(Registries.create(payload).$promise);
     });
+    return $q.all(promises);
+  };
 
-    return deferred.promise;
+  service.retrievePorRegistryModelFromRepositoryWithRegistries = retrievePorRegistryModelFromRepositoryWithRegistries;
+
+  function getURL(reg) {
+    let url = reg.URL;
+    if (reg.Type === RegistryTypes.GITLAB) {
+      url = reg.URL + '/' + reg.Gitlab.ProjectPath;
+    }
+    return url;
+  }
+
+  function retrievePorRegistryModelFromRepositoryWithRegistries(repository, registries, dockerhub) {
+    const model = new PorImageRegistryModel();
+    const registry = _.find(registries, (reg) => _.includes(repository, getURL(reg)));
+    if (registry) {
+      const url = getURL(registry);
+      const lastIndex = repository.lastIndexOf(url) + url.length;
+      let image = repository.substring(lastIndex);
+      if (!_.startsWith(image, ':')) {
+        image = image.substring(1);
+      }
+      model.Registry = registry;
+      model.Image = image;
+    } else {
+      if (ImageHelper.imageContainsURL(repository)) {
+        model.UseRegistry = false;
+      }
+      model.Registry = dockerhub;
+      model.Image = repository;
+    }
+    return model;
+  }
+
+  async function retrievePorRegistryModelFromRepositoryAsync(repository) {
+    try {
+      let [registries, dockerhub] = await Promise.all([
+        service.registries(),
+        DockerHubService.dockerhub()
+      ]);
+      return retrievePorRegistryModelFromRepositoryWithRegistries(repository, registries, dockerhub);
+    } catch (err) {
+      throw { msg: 'Unable to retrieve the registry associated to the repository', err: err }
+    }
+  }
+
+  service.retrievePorRegistryModelFromRepository = function(repository) {
+    return $async(retrievePorRegistryModelFromRepositoryAsync, repository)
   };
 
   return service;

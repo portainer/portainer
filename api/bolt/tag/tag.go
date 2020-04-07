@@ -52,6 +52,19 @@ func (service *Service) Tags() ([]portainer.Tag, error) {
 	return tags, err
 }
 
+// Tag returns a tag by ID.
+func (service *Service) Tag(ID portainer.TagID) (*portainer.Tag, error) {
+	var tag portainer.Tag
+	identifier := internal.Itob(int(ID))
+
+	err := internal.GetObject(service.db, BucketName, identifier, &tag)
+	if err != nil {
+		return nil, err
+	}
+
+	return &tag, nil
+}
+
 // CreateTag creates a new tag.
 func (service *Service) CreateTag(tag *portainer.Tag) error {
 	return service.db.Update(func(tx *bolt.Tx) error {
