@@ -8,7 +8,7 @@ import (
 
 const (
 	// BucketName represents the name of the bucket where this service stores data.
-	BucketName = "edgestacks"
+	BucketName = "edge_stack"
 )
 
 // Service represents a service for managing Edge stack data.
