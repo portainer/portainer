@@ -77,7 +77,7 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 	}
 
 	stackFolder := strconv.Itoa(int(stack.ID))
-	projectPath, err := handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
+	projectPath, err := handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Stack file on disk", err}
 	}
@@ -144,7 +144,7 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 		Version:      1,
 	}
 
-	projectPath := handler.FileService.GetStackProjectPath(strconv.Itoa(int(stack.ID)))
+	projectPath := handler.FileService.GetEdgeStackProjectPath(strconv.Itoa(int(stack.ID)))
 	stack.ProjectPath = projectPath
 
 	gitCloneParams := &cloneRepositoryParameters{
@@ -220,7 +220,7 @@ func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r 
 	}
 
 	stackFolder := strconv.Itoa(int(stack.ID))
-	projectPath, err := handler.FileService.StoreStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
+	projectPath, err := handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Stack file on disk", err}
 	}

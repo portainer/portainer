@@ -29,6 +29,8 @@ const (
 	ComposeStorePath = "compose"
 	// ComposeFileDefaultName represents the default name of a compose file.
 	ComposeFileDefaultName = "docker-compose.yml"
+	// EdgeStackStorePath represents the subfolder where edge stack files are stored in the file store folder.
+	EdgeStackStorePath = "edgestacks"
 	// PrivateKeyFile represents the name on disk of the file containing the private key.
 	PrivateKeyFile = "portainer.key"
 	// PublicKeyFile represents the name on disk of the file containing the public key.
@@ -105,6 +107,32 @@ func (service *Service) GetStackProjectPath(stackIdentifier string) string {
 // It returns the path to the folder where the file is stored.
 func (service *Service) StoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error) {
 	stackStorePath := path.Join(ComposeStorePath, stackIdentifier)
+	err := service.createDirectoryInStore(stackStorePath)
+	if err != nil {
+		return "", err
+	}
+
+	composeFilePath := path.Join(stackStorePath, fileName)
+	r := bytes.NewReader(data)
+
+	err = service.createFileInStore(composeFilePath, r)
+	if err != nil {
+		return "", err
+	}
+
+	return path.Join(service.fileStorePath, stackStorePath), nil
+}
+
+// GetEdgeStackProjectPath returns the absolute path on the FS for a edge stack based
+// on its identifier.
+func (service *Service) GetEdgeStackProjectPath(edgeStackIdentifier string) string {
+	return path.Join(service.fileStorePath, EdgeStackStorePath, edgeStackIdentifier)
+}
+
+// StoreEdgeStackFileFromBytes creates a subfolder in the EdgeStackStorePath and stores a new file from bytes.
+// It returns the path to the folder where the file is stored.
+func (service *Service) StoreEdgeStackFileFromBytes(edgeStackIdentifier, fileName string, data []byte) (string, error) {
+	stackStorePath := path.Join(EdgeStackStorePath, edgeStackIdentifier)
 	err := service.createDirectoryInStore(stackStorePath)
 	if err != nil {
 		return "", err
