@@ -978,6 +978,7 @@ type (
 		CreateEdgeStack(edgeStack *EdgeStack) error
 		UpdateEdgeStack(ID EdgeStackID, edgeStack *EdgeStack) error
 		DeleteEdgeStack(ID EdgeStackID) error
+		GetNextIdentifier() int
 	}
 )
 

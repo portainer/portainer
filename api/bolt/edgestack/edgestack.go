@@ -69,8 +69,10 @@ func (service *Service) CreateEdgeStack(edgeStack *portainer.EdgeStack) error {
 	return service.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
-		id, _ := bucket.NextSequence()
-		edgeStack.ID = portainer.EdgeStackID(id)
+		if edgeStack.ID == 0 {
+			id, _ := bucket.NextSequence()
+			edgeStack.ID = portainer.EdgeStackID(id)
+		}
 
 		data, err := internal.MarshalObject(edgeStack)
 		if err != nil {
@@ -91,4 +93,9 @@ func (service *Service) UpdateEdgeStack(ID portainer.EdgeStackID, edgeStack *por
 func (service *Service) DeleteEdgeStack(ID portainer.EdgeStackID) error {
 	identifier := internal.Itob(int(ID))
 	return internal.DeleteObject(service.db, BucketName, identifier)
+}
+
+// GetNextIdentifier returns the next identifier for an endpoint.
+func (service *Service) GetNextIdentifier() int {
+	return internal.GetNextIdentifier(service.db, BucketName)
 }
