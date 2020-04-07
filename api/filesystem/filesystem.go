@@ -30,7 +30,7 @@ const (
 	// ComposeFileDefaultName represents the default name of a compose file.
 	ComposeFileDefaultName = "docker-compose.yml"
 	// EdgeStackStorePath represents the subfolder where edge stack files are stored in the file store folder.
-	EdgeStackStorePath = "edgestacks"
+	EdgeStackStorePath = "edge_stacks"
 	// PrivateKeyFile represents the name on disk of the file containing the private key.
 	PrivateKeyFile = "portainer.key"
 	// PublicKeyFile represents the name on disk of the file containing the public key.
