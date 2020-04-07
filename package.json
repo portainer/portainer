@@ -30,7 +30,7 @@
     "dev:client": "grunt clean:client && webpack-dev-server --config=./webpack/webpack.develop.js",
     "build:server:offline": "cd ./api/cmd/portainer && CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags '-s' && mv -f portainer ../../../dist/portainer",
     "clean:all": "grunt clean:all",
-    "format": "prettier --loglevel warn --write \"**/*.{js,css,md}\""
+    "format": "prettier --loglevel warn --write \"**/*.{js,css,html}\""
   },
   "scriptsComments": {
     "build": "Build the entire app (backend/frontend) in development mode",
