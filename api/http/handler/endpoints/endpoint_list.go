@@ -29,8 +29,12 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	groupID, _ := request.RetrieveNumericQueryParameter(r, "groupId", true)
 	limit, _ := request.RetrieveNumericQueryParameter(r, "limit", true)
 	endpointType, _ := request.RetrieveNumericQueryParameter(r, "type", true)
-	var tagIds []portainer.TagID
-	request.RetrieveJSONQueryParameter(r, "tagIds", &tagIds, true)
+
+	var tagIDs []portainer.TagID
+	request.RetrieveJSONQueryParameter(r, "tagIds", &tagIDs, true)
+
+	var endpointIDs []portainer.EndpointID
+	request.RetrieveJSONQueryParameter(r, "endpointIds", &endpointIDs, true)
 
 	endpointGroups, err := handler.EndpointGroupService.EndpointGroups()
 	if err != nil {
@@ -48,6 +52,10 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	filteredEndpoints := security.FilterEndpoints(endpoints, endpointGroups, securityContext)
+
+	if endpointIDs != nil {
+		filteredEndpoints = filteredEndpointsByIds(filteredEndpoints, endpointIDs)
+	}
 
 	if groupID != 0 {
 		filteredEndpoints = filterEndpointsByGroupID(filteredEndpoints, portainer.EndpointGroupID(groupID))
@@ -69,8 +77,8 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 		filteredEndpoints = filterEndpointsByType(filteredEndpoints, portainer.EndpointType(endpointType))
 	}
 
-	if tagIds != nil {
-		filteredEndpoints = filteredEndpointsByTags(filteredEndpoints, tagIds, endpointGroups)
+	if tagIDs != nil {
+		filteredEndpoints = filteredEndpointsByTags(filteredEndpoints, tagIDs, endpointGroups)
 	}
 
 	filteredEndpointCount := len(filteredEndpoints)
@@ -229,4 +237,22 @@ func endpointGroupHasTags(groupID portainer.EndpointGroupID, groups []portainer.
 		}
 	}
 	return missingTags
+}
+
+func filteredEndpointsByIds(endpoints []portainer.Endpoint, ids []portainer.EndpointID) []portainer.Endpoint {
+	filteredEndpoints := make([]portainer.Endpoint, 0)
+
+	idsSet := make(map[portainer.EndpointID]bool)
+	for _, id := range ids {
+		idsSet[id] = true
+	}
+
+	for _, endpoint := range endpoints {
+		if idsSet[endpoint.ID] {
+			filteredEndpoints = append(filteredEndpoints, endpoint)
+		}
+	}
+
+	return filteredEndpoints
+
 }
