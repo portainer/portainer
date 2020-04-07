@@ -29,8 +29,8 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeStackList))).Methods(http.MethodGet)
 	h.Handle("/edge_stacks/{id}",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeStackInspect))).Methods(http.MethodGet)
-	// h.Handle("/edge_stacks/{id}",
-	// 	bouncer.AdminAccess(httperror.LoggerHandler(h.edgeStackUpdate))).Methods(http.MethodPut)
+	h.Handle("/edge_stacks/{id}",
+		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeStackUpdate))).Methods(http.MethodPut)
 	h.Handle("/edge_stacks/{id}",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeStackDelete))).Methods(http.MethodDelete)
 	// h.Handle("/edge_stacks/{id}/status",

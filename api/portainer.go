@@ -606,6 +606,7 @@ type (
 		ProjectPath  string                         `json:"ProjectPath"`
 		EntryPoint   string                         `json:"EntryPoint"`
 		Version      int                            `json:"Version"`
+		Prune        bool                           `json:"Prune"`
 	}
 
 	//EdgeStackStatusType represents an edge stack status type
