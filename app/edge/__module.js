@@ -8,39 +8,76 @@ angular.module('portainer.edge', []).config(function config($stateRegistryProvid
     abstract: true,
   };
 
-    const groups = {
-      name: 'edge.groups',
-      url: '/groups',
-      views: {
-        'content@': {
-          component: 'edgeGroupsView'
-        }
-      }
-    };
+  const groups = {
+    name: 'edge.groups',
+    url: '/groups',
+    views: {
+      'content@': {
+        component: 'edgeGroupsView',
+      },
+    },
+  };
 
-    const groupsNew = {
-      name: 'edge.groups.new',
-      url: '/new',
-      views: {
-        'content@': {
-          component: 'createEdgeGroupView'
-        }
-      }
-    };
+  const groupsNew = {
+    name: 'edge.groups.new',
+    url: '/new',
+    views: {
+      'content@': {
+        component: 'createEdgeGroupView',
+      },
+    },
+  };
 
-    const groupsEdit = {
-      name: 'edge.groups.edit',
-      url: '/:groupId',
-      views: {
-        'content@': {
-          component: 'editEdgeGroupView'
-        }
-      }
-    };
+  const groupsEdit = {
+    name: 'edge.groups.edit',
+    url: '/:groupId',
+    views: {
+      'content@': {
+        component: 'editEdgeGroupView',
+      },
+    },
+  };
 
-    $stateRegistryProvider.register(edge);
-    $stateRegistryProvider.register(groups);
-    $stateRegistryProvider.register(groupsNew);
-    $stateRegistryProvider.register(groupsEdit);
-  }
-);
+  const stacks = {
+    name: 'edge.stacks',
+    url: '/stacks',
+    views: {
+      'content@': {
+        // component: 'edgeStacksView',
+        template: 'edge stacks',
+      },
+    },
+  };
+
+  const stacksNew = {
+    name: 'edge.stacks.new',
+    url: '/new',
+    views: {
+      'content@': {
+        // component: 'createEdgeStackView',
+        template: 'edge stack new',
+      },
+    },
+  };
+
+  const stacksEdit = {
+    name: 'edge.stacks.edit',
+    url: '/:stackId',
+    views: {
+      'content@': {
+        // component: 'editEdgeStackView',
+        template: 'edge stack edit',
+      },
+    },
+  };
+
+  $stateRegistryProvider.register(edge);
+
+  $stateRegistryProvider.register(groups);
+  $stateRegistryProvider.register(groupsNew);
+  $stateRegistryProvider.register(groupsEdit);
+
+  $stateRegistryProvider.register(stacks);
+  $stateRegistryProvider.register(stacksNew);
+  $stateRegistryProvider.register(stacksEdit);
+});
