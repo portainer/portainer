@@ -29,6 +29,8 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	groupID, _ := request.RetrieveNumericQueryParameter(r, "groupId", true)
 	limit, _ := request.RetrieveNumericQueryParameter(r, "limit", true)
 	endpointType, _ := request.RetrieveNumericQueryParameter(r, "type", true)
+	var tagIds []portainer.TagID
+	request.RetrieveJSONQueryParameter(r, "tagIds", &tagIds, true)
 
 	endpointGroups, err := handler.EndpointGroupService.EndpointGroups()
 	if err != nil {
@@ -65,6 +67,10 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 
 	if endpointType != 0 {
 		filteredEndpoints = filterEndpointsByType(filteredEndpoints, portainer.EndpointType(endpointType))
+	}
+
+	if tagIds != nil {
+		filteredEndpoints = filteredEndpointsByTags(filteredEndpoints, tagIds)
 	}
 
 	filteredEndpointCount := len(filteredEndpoints)
@@ -186,4 +192,26 @@ func convertTagIDsToTags(tagsMap map[portainer.TagID]string, tagIDs []portainer.
 		tags = append(tags, tagsMap[tagID])
 	}
 	return tags
+}
+
+func filteredEndpointsByTags(endpoints []portainer.Endpoint, tagIDs []portainer.TagID) []portainer.Endpoint {
+	filteredEndpoints := make([]portainer.Endpoint, 0)
+	tagSet := make(map[portainer.TagID]bool)
+	for _, tagID := range tagIDs {
+		tagSet[tagID] = true
+	}
+
+	for _, endpoint := range endpoints {
+		hasAllTags := true
+		for _, tagID := range endpoint.TagIDs {
+			if !tagSet[tagID] {
+				hasAllTags = false
+				break
+			}
+		}
+		if hasAllTags {
+			filteredEndpoints = append(filteredEndpoints, endpoint)
+		}
+	}
+	return filteredEndpoints
 }
