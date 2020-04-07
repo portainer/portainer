@@ -593,6 +593,32 @@ type (
 		Endpoints []EndpointID `json:"Endpoints"`
 	}
 
+	//EdgeStackID represents an edge stack id
+	EdgeStackID int
+
+	//EdgeStack represents an edge stack
+	EdgeStack struct {
+		ID           EdgeStackID                    `json:"Id"`
+		Name         string                         `json:"Name"`
+		Status       map[EndpointID]EdgeStackStatus `json:"Status"`
+		CreationDate int64                          `json:"CreationDate"`
+		EdgeGroups   []EdgeGroupID                  `json:"EdgeGroups"`
+		ProjectPath  string                         `json:"ProjectPath"`
+		EntryPoint   string                         `json:"EntryPoint"`
+		Version      int                            `json:"Version"`
+		Prune        bool                           `json:"Prune"`
+	}
+
+	//EdgeStackStatusType represents an edge stack status type
+	EdgeStackStatusType int
+
+	//EdgeStackStatus represents an edge stack status
+	EdgeStackStatus struct {
+		Type       EdgeStackStatusType `json:"Type"`
+		Error      string              `json:"Error"`
+		EndpointID EndpointID          `json:"EndpointID"`
+	}
+
 	// ExtensionID represents a extension identifier
 	ExtensionID int
 
@@ -851,6 +877,8 @@ type (
 		DeleteTLSFiles(folder string) error
 		GetStackProjectPath(stackIdentifier string) string
 		StoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error)
+		GetEdgeStackProjectPath(edgeStackIdentifier string) string
+		StoreEdgeStackFileFromBytes(edgeStackIdentifier, fileName string, data []byte) (string, error)
 		StoreRegistryManagementFileFromBytes(folder, fileName string, data []byte) (string, error)
 		KeyPairFilesExist() (bool, error)
 		StoreKeyPair(private, public []byte, privatePEMHeader, publicPEMHeader string) error
@@ -944,6 +972,16 @@ type (
 		CreateEdgeGroup(group *EdgeGroup) error
 		UpdateEdgeGroup(ID EdgeGroupID, group *EdgeGroup) error
 		DeleteEdgeGroup(ID EdgeGroupID) error
+	}
+
+	// EdgeStackService represents a service to manage Edge stacks
+	EdgeStackService interface {
+		EdgeStacks() ([]EdgeStack, error)
+		EdgeStack(ID EdgeStackID) (*EdgeStack, error)
+		CreateEdgeStack(edgeStack *EdgeStack) error
+		UpdateEdgeStack(ID EdgeStackID, edgeStack *EdgeStack) error
+		DeleteEdgeStack(ID EdgeStackID) error
+		GetNextIdentifier() int
 	}
 )
 
@@ -1058,6 +1096,16 @@ const (
 	AzureEnvironment
 	// EdgeAgentEnvironment represents an endpoint connected to an Edge agent
 	EdgeAgentEnvironment
+)
+
+const (
+	_ EdgeStackStatusType = iota
+	//StatusOk represents a successfully deployed edge stack
+	StatusOk
+	//StatusError represents an edge endpoint which failed to deploy its edge stack
+	StatusError
+	//StatusAcknowledged represents an acknowledged edge stack
+	StatusAcknowledged
 )
 
 const (
