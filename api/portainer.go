@@ -3,11 +3,8 @@ package portainer
 import "time"
 
 type (
-	// Pair defines a key/value string pair
-	Pair struct {
-		Name  string `json:"name"`
-		Value string `json:"value"`
-	}
+	// AuthenticationMethod represents the authentication method used to authenticate a user
+	AuthenticationMethod int
 
 	// CLIFlags represents the available flags on the CLI
 	CLIFlags struct {
@@ -39,13 +36,25 @@ type (
 		SnapshotInterval  *string
 	}
 
-	// Status represents the application status
-	Status struct {
-		Authentication     bool   `json:"Authentication"`
-		EndpointManagement bool   `json:"EndpointManagement"`
-		Snapshot           bool   `json:"Snapshot"`
-		Analytics          bool   `json:"Analytics"`
-		Version            string `json:"Version"`
+	// GitlabRegistryData represents data required for gitlab registry to work
+	GitlabRegistryData struct {
+		ProjectID   int    `json:"ProjectId"`
+		InstanceURL string `json:"InstanceURL"`
+		ProjectPath string `json:"ProjectPath"`
+	}
+
+	// LDAPGroupSearchSettings represents settings used to search for groups in a LDAP server
+	LDAPGroupSearchSettings struct {
+		GroupBaseDN    string `json:"GroupBaseDN"`
+		GroupFilter    string `json:"GroupFilter"`
+		GroupAttribute string `json:"GroupAttribute"`
+	}
+
+	// LDAPSearchSettings represents settings used to search for users in a LDAP server
+	LDAPSearchSettings struct {
+		BaseDN            string `json:"BaseDN"`
+		Filter            string `json:"Filter"`
+		UserNameAttribute string `json:"UserNameAttribute"`
 	}
 
 	// LDAPSettings represents the settings used to connect to a LDAP server
@@ -61,6 +70,9 @@ type (
 		AutoCreateUsers     bool                      `json:"AutoCreateUsers"`
 	}
 
+	// MembershipRole represents the role of a user within a team
+	MembershipRole int
+
 	// OAuthSettings represents the settings used to authorize with an authorization server
 	OAuthSettings struct {
 		ClientID             string `json:"ClientID"`
@@ -75,28 +87,17 @@ type (
 		DefaultTeamID        TeamID `json:"DefaultTeamID"`
 	}
 
-	// TLSConfiguration represents a TLS configuration
-	TLSConfiguration struct {
-		TLS           bool   `json:"TLS"`
-		TLSSkipVerify bool   `json:"TLSSkipVerify"`
-		TLSCACertPath string `json:"TLSCACert,omitempty"`
-		TLSCertPath   string `json:"TLSCert,omitempty"`
-		TLSKeyPath    string `json:"TLSKey,omitempty"`
+	// Pair defines a key/value string pair
+	Pair struct {
+		Name  string `json:"name"`
+		Value string `json:"value"`
 	}
 
-	// LDAPSearchSettings represents settings used to search for users in a LDAP server
-	LDAPSearchSettings struct {
-		BaseDN            string `json:"BaseDN"`
-		Filter            string `json:"Filter"`
-		UserNameAttribute string `json:"UserNameAttribute"`
-	}
+	// RegistryID represents a registry identifier
+	RegistryID int
 
-	// LDAPGroupSearchSettings represents settings used to search for groups in a LDAP server
-	LDAPGroupSearchSettings struct {
-		GroupBaseDN    string `json:"GroupBaseDN"`
-		GroupFilter    string `json:"GroupFilter"`
-		GroupAttribute string `json:"GroupAttribute"`
-	}
+	// RegistryType represents a type of registry
+	RegistryType int
 
 	// Settings represents the application settings
 	Settings struct {
@@ -118,25 +119,33 @@ type (
 		DisplayExternalContributors bool
 	}
 
-	// User represents a user account
-	User struct {
-		ID                      UserID                 `json:"Id"`
-		Username                string                 `json:"Username"`
-		Password                string                 `json:"Password,omitempty"`
-		Role                    UserRole               `json:"Role"`
-		PortainerAuthorizations Authorizations         `json:"PortainerAuthorizations"`
-		EndpointAuthorizations  EndpointAuthorizations `json:"EndpointAuthorizations"`
+	// Stack represents a Docker stack created via docker stack deploy
+	Stack struct {
+		ID              StackID          `json:"Id"`
+		Name            string           `json:"Name"`
+		Type            StackType        `json:"Type"`
+		EndpointID      EndpointID       `json:"EndpointId"`
+		SwarmID         string           `json:"SwarmId"`
+		EntryPoint      string           `json:"EntryPoint"`
+		Env             []Pair           `json:"Env"`
+		ResourceControl *ResourceControl `json:"ResourceControl"`
+		ProjectPath     string
 	}
 
-	// UserID represents a user identifier
-	UserID int
+	// StackID represents a stack identifier (it must be composed of Name + "_" + SwarmID to create a unique identifier)
+	StackID int
 
-	// UserRole represents the role of a user. It can be either an administrator
-	// or a regular user
-	UserRole int
+	// StackType represents the type of the stack (compose v2, stack deploy v3)
+	StackType int
 
-	// AuthenticationMethod represents the authentication method used to authenticate a user
-	AuthenticationMethod int
+	// Status represents the application status
+	Status struct {
+		Authentication     bool   `json:"Authentication"`
+		EndpointManagement bool   `json:"EndpointManagement"`
+		Snapshot           bool   `json:"Snapshot"`
+		Analytics          bool   `json:"Analytics"`
+		Version            string `json:"Version"`
+	}
 
 	// Team represents a list of user accounts
 	Team struct {
@@ -158,8 +167,14 @@ type (
 	// TeamMembershipID represents a team membership identifier
 	TeamMembershipID int
 
-	// MembershipRole represents the role of a user within a team
-	MembershipRole int
+	// TLSConfiguration represents a TLS configuration
+	TLSConfiguration struct {
+		TLS           bool   `json:"TLS"`
+		TLSSkipVerify bool   `json:"TLSSkipVerify"`
+		TLSCACertPath string `json:"TLSCACert,omitempty"`
+		TLSCertPath   string `json:"TLSCert,omitempty"`
+		TLSKeyPath    string `json:"TLSKey,omitempty"`
+	}
 
 	// TokenData represents the data embedded in a JWT token
 	TokenData struct {
@@ -168,37 +183,24 @@ type (
 		Role     UserRole
 	}
 
-	// StackID represents a stack identifier (it must be composed of Name + "_" + SwarmID to create a unique identifier)
-	StackID int
-
-	// StackType represents the type of the stack (compose v2, stack deploy v3)
-	StackType int
-
-	// Stack represents a Docker stack created via docker stack deploy
-	Stack struct {
-		ID              StackID          `json:"Id"`
-		Name            string           `json:"Name"`
-		Type            StackType        `json:"Type"`
-		EndpointID      EndpointID       `json:"EndpointId"`
-		SwarmID         string           `json:"SwarmId"`
-		EntryPoint      string           `json:"EntryPoint"`
-		Env             []Pair           `json:"Env"`
-		ResourceControl *ResourceControl `json:"ResourceControl"`
-		ProjectPath     string
+	// User represents a user account
+	User struct {
+		ID                      UserID                 `json:"Id"`
+		Username                string                 `json:"Username"`
+		Password                string                 `json:"Password,omitempty"`
+		Role                    UserRole               `json:"Role"`
+		PortainerAuthorizations Authorizations         `json:"PortainerAuthorizations"`
+		EndpointAuthorizations  EndpointAuthorizations `json:"EndpointAuthorizations"`
 	}
 
-	// RegistryID represents a registry identifier
-	RegistryID int
+	// UserID represents a user identifier
+	UserID int
 
-	// RegistryType represents a type of registry
-	RegistryType int
+	// UserRole represents the role of a user. It can be either an administrator
+	// or a regular user
+	UserRole int
 
-	// GitlabRegistryData represents data required for gitlab registry to work
-	GitlabRegistryData struct {
-		ProjectID   int    `json:"ProjectId"`
-		InstanceURL string `json:"InstanceURL"`
-		ProjectPath string `json:"ProjectPath"`
-	}
+	// TODO sort
 
 	// Registry represents a Docker registry with all the info required
 	// to connect to it
