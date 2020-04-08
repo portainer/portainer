@@ -50,6 +50,7 @@
   <div class="col-sm-12 form-section-title" ng-if="!$ctrl.model.Dynamic">
     Endpoints
   </div>
+  <!-- StaticGroup -->
   <div ng-if="!$ctrl.model.Dynamic">
     <div ng-if="!$ctrl.noEndpoints">
       <multi-endpoint-selector
@@ -75,6 +76,9 @@
       <div class="col-sm-12 small text-muted"> No Edge endpoints available. Head over the <a ui-sref="portainer.endpoints">Endpoints view</a> to add endpoints. </div>
     </div>
   </div>
+  <!-- !StaticGroup -->
+
+  <!-- DynamicGroup -->
   <div ng-if="$ctrl.model.Dynamic">
     <div class="col-sm-12 form-section-title">
       Tags
@@ -85,7 +89,26 @@
         No tags available. Head over to the <a ui-sref="portainer.tags">Tags view</a> to add tags
       </div>
     </div>
+
+    <div class="col-sm-12 form-section-title">
+      <div class="form-group">
+        <div class="col-sm-12">
+          <label for="toggle_mustHaveAllTags" class="control-label text-left">
+            Associated Endpoints must include all tags
+          </label>
+          <label class="switch" style="margin-left: 20px;">
+            <input
+              type="checkbox"
+              name="toggle_mustHaveAllTags"
+              ng-model="$ctrl.model.MustHaveAllTags"
+            /><i></i>
+          </label>
+        </div>
+      </div>
+    </div>
   </div>
+  <!-- !DynamicGroup -->
+
   <!-- actions -->
   <div class="col-sm-12 form-section-title">
     Actions
