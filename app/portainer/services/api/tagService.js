@@ -42,8 +42,8 @@ angular.module('portainer.app')
     try {
       const tag = await Tags.create({}, payload).$promise;
       return new TagViewModel(tag);
-    } catch(error) {
-      throw { message: "Unable to create tag", error };
+    } catch(err) {
+      throw { msg: 'Unable to create tag', err };
     }
   };
 
