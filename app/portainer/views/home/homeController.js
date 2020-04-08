@@ -146,10 +146,10 @@ angular.module('portainer.app')
       }
 
       $scope.getPaginatedEndpoints = getPaginatedEndpoints;
-      function getPaginatedEndpoints(lastId, limit, filter) {
+      function getPaginatedEndpoints(lastId, limit, search) {
         const deferred = $q.defer();
         $q.all({
-          endpoints: EndpointService.endpoints(lastId, limit, filter),
+          endpoints: EndpointService.endpoints(lastId, limit, {search}),
           groups: GroupService.groups()
         })
         .then(function success(data) {
