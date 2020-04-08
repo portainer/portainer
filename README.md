@@ -54,9 +54,7 @@ For community support: You can find more information about Portainer's community
 
 ## Limitations
 
-**_Portainer_** has full support for the following Docker versions:
-
-Portainer supports N-2 Docker Versions.
+Portainer supports "Current - 2 docker versions only. Prior versions may operate, however these are not supported.
 
 ## Licensing
 
