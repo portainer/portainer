@@ -981,6 +981,8 @@ const (
 	AdministratorRole
 	// StandardUserRole represents a regular user role
 	StandardUserRole
+	// ApplicationAPIRole represent a machine API with a long living token
+	ApplicationAPIRole
 )
 
 const (
