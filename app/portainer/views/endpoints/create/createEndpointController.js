@@ -1,12 +1,12 @@
 import {EndpointSecurityFormData} from '../../../components/endpointSecurity/porEndpointSecurityModel';
 
-angular.module('portainer.app')
-.controller('CreateEndpointController', ['$q', '$scope', '$state', '$filter', 'clipboard', 'EndpointService', 'GroupService', 'TagService', 'Notifications',
-function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService, TagService, Notifications) {
+angular.module('portainer.app').controller('CreateEndpointController', 
+function CreateEndpointController($async, $q, $scope, $state, $filter, clipboard, EndpointService, GroupService, TagService, Notifications, Authentication) {
 
   $scope.state = {
     EnvironmentType: 'agent',
-    actionInProgress: false
+    actionInProgress: false,
+    allowCreateTag: Authentication.isAdmin()
   };
 
   $scope.formValues = {
@@ -84,6 +84,20 @@ function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService,
     createAzureEndpoint(name, applicationId, tenantId, authenticationKey, groupId, tagIds);
   };
 
+  $scope.onCreateTag = function onCreateTag(tagName) {
+    return $async(onCreateTagAsync, tagName);
+  }
+  
+  async function onCreateTagAsync(tagName) {
+    try {
+      const tag = await TagService.createTag(tagName);
+      $scope.availableTags = $scope.availableTags.concat(tag);
+      $scope.formValues.TagIds = $scope.formValues.TagIds.concat(tag.Id);
+    } catch(err) {
+      Notifications.error('Failue', err, 'Unable to create tag');
+    }
+  }
+
   function createAzureEndpoint(name, applicationId, tenantId, authenticationKey, groupId, tagIds) {
     $scope.state.actionInProgress = true;
     EndpointService.createAzureEndpoint(name, applicationId, tenantId, authenticationKey, groupId, tagIds)
@@ -133,4 +147,4 @@ function ($q, $scope, $state, $filter, clipboard, EndpointService, GroupService,
   }
 
   initView();
-}]);
+});

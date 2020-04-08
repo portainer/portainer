@@ -165,9 +165,11 @@
           <!-- tags -->
           <div class="form-group">
             <tag-selector
-              ng-if="availableTags && endpoint.TagIds"
+              ng-if="endpoint && availableTags"
               tags="availableTags"
               model="endpoint.TagIds"
+              on-create="onCreateTag"
+              allow-create="state.allowCreate"
             ></tag-selector>
           </div>
           <!-- !tags -->

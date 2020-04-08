@@ -28,9 +28,11 @@
   <!-- tags -->
   <div class="form-group">
     <tag-selector
-      ng-if="$ctrl.availableTags && $ctrl.model.TagIds"
+      ng-if="$ctrl.model && $ctrl.availableTags"
       tags="$ctrl.availableTags"
       model="$ctrl.model.TagIds"
+      allow-create="$ctrl.state.allowCreateTag"
+      on-create="$ctrl.onCreateTag"
     ></tag-selector>
   </div>
   <!-- !tags -->

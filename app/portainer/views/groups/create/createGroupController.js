@@ -1,8 +1,7 @@
 import {EndpointGroupDefaultModel} from '../../../models/group';
 
 angular.module('portainer.app')
-.controller('CreateGroupController', ['$q', '$scope', '$state', 'GroupService', 'EndpointService', 'TagService', 'Notifications',
-function ($q, $scope, $state, GroupService, EndpointService, TagService, Notifications) {
+.controller('CreateGroupController', function CreateGroupController($async, $scope, $state, GroupService, TagService, Notifications) {
 
   $scope.state = {
     actionInProgress: false
@@ -31,6 +30,20 @@ function ($q, $scope, $state, GroupService, EndpointService, TagService, Notific
     });
   };
 
+  $scope.onCreateTag = function onCreateTag(tagName) {
+    return $async(onCreateTagAsync, tagName);
+  }
+  
+  async function onCreateTagAsync(tagName) {
+    try {
+      const tag = await TagService.createTag(tagName);
+      $scope.availableTags = $scope.availableTags.concat(tag);
+      $scope.model.TagIds = $scope.model.TagIds.concat(tag.Id);
+    } catch(err) {
+      Notifications.error('Failue', err, 'Unable to create tag');
+    }
+  }
+
   function initView() {
     TagService.tags()
     .then((tags) => {
@@ -45,4 +58,4 @@ function ($q, $scope, $state, GroupService, EndpointService, TagService, Notific
   }
 
   initView();
-}]);
+});
