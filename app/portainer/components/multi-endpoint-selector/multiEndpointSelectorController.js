@@ -30,9 +30,7 @@ class MultiEndpointSelectorController {
   }
 
   $onInit() {
-    this.availableGroups = _.filter(this.groups, group =>
-      _.some(this.endpoints, endpoint => endpoint.GroupId == group.Id)
-    );
+    this.availableGroups = _.filter(this.groups, (group) => _.some(this.endpoints, (endpoint) => endpoint.GroupId == group.Id));
   }
 }
 

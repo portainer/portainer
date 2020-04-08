@@ -32,12 +32,12 @@ angular.module('portainer', [
   'portainer.extensions',
   'portainer.integrations',
   'rzModule',
-  'moment-picker'
+  'moment-picker',
 ]);
 
 if (require) {
   var req = require.context('./', true, /^(.*\.(js$))[^.]*$/im);
-  req.keys().forEach(function(key) {
+  req.keys().forEach(function (key) {
     req(key);
   });
 }

@@ -1,8 +1,6 @@
 <rd-header>
   <rd-header-title title-text="Endpoint group details"></rd-header-title>
-  <rd-header-content>
-    <a ui-sref="portainer.groups">Groups</a> &gt; {{ ::group.Name }}
-  </rd-header-content>
+  <rd-header-content> <a ui-sref="portainer.groups">Groups</a> &gt; {{ ::group.Name }} </rd-header-content>
 </rd-header>
 
 <div class="row">
@@ -21,7 +19,7 @@
           form-action="update"
           form-action-label="Update the group"
           action-in-progress="state.actionInProgress"
-          on-create-tag="onCreateTag"
+          on-create-tag="(onCreateTag)"
         ></group-form>
       </rd-widget-body>
     </rd-widget>

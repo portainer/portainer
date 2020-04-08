@@ -12,12 +12,9 @@ angular.module('portainer.docker').controller('NodeLabelsTableController', [
     }
 
     function updateLabel(label) {
-      if (
-        label.value !== label.originalValue ||
-        label.key !== label.originalKey
-      ) {
+      if (label.value !== label.originalValue || label.key !== label.originalKey) {
         ctrl.onChangedLabels({ labels: ctrl.labels });
       }
     }
-  }
+  },
 ]);

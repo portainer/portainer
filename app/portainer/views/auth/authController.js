@@ -3,7 +3,24 @@ import uuidv4 from 'uuid/v4';
 
 class AuthenticationController {
   /* @ngInject */
-  constructor($async, $scope, $state, $stateParams, $sanitize, $window, Authentication, UserService, EndpointService, ExtensionService, StateManager, Notifications, SettingsService, URLHelper, LocalStorage, StatusService) {
+  constructor(
+    $async,
+    $scope,
+    $state,
+    $stateParams,
+    $sanitize,
+    $window,
+    Authentication,
+    UserService,
+    EndpointService,
+    ExtensionService,
+    StateManager,
+    Notifications,
+    SettingsService,
+    URLHelper,
+    LocalStorage,
+    StatusService
+  ) {
     this.$async = $async;
     this.$scope = $scope;
     this.$state = $state;
@@ -24,12 +41,12 @@ class AuthenticationController {
     this.logo = this.StateManager.getState().application.logo;
     this.formValues = {
       Username: '',
-      Password: ''
+      Password: '',
     };
     this.state = {
       AuthenticationError: '',
       loginInProgress: true,
-      OAuthProvider: ''
+      OAuthProvider: '',
     };
 
     this.retrieveAndSaveEnabledExtensionsAsync = this.retrieveAndSaveEnabledExtensionsAsync.bind(this);
@@ -72,11 +89,9 @@ class AuthenticationController {
   determineOauthProvider(LoginURI) {
     if (LoginURI.indexOf('login.microsoftonline.com') !== -1) {
       return 'Microsoft';
-    }
-    else if (LoginURI.indexOf('accounts.google.com') !== -1) {
+    } else if (LoginURI.indexOf('accounts.google.com') !== -1) {
       return 'Google';
-    }
-    else if (LoginURI.indexOf('github.com') !== -1) {
+    } else if (LoginURI.indexOf('github.com') !== -1) {
       return 'Github';
     }
     return 'OAuth';
@@ -131,7 +146,7 @@ class AuthenticationController {
   async checkForLatestVersionAsync() {
     let versionInfo = {
       UpdateAvailable: false,
-      LatestVersion: ''
+      LatestVersion: '',
     };
 
     try {
@@ -207,7 +222,7 @@ class AuthenticationController {
   }
 
   authenticateUser() {
-    return this.$async(this.authenticateUserAsync)
+    return this.$async(this.authenticateUserAsync);
   }
 
   /**
@@ -232,7 +247,7 @@ class AuthenticationController {
         this.$state.go('portainer.init.admin');
       }
     } catch (err) {
-      this.error(err, 'Unable to verify administrator account existence')
+      this.error(err, 'Unable to verify administrator account existence');
     }
   }
 

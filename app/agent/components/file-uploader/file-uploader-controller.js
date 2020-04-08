@@ -4,7 +4,7 @@ angular.module('portainer.agent').controller('FileUploaderController', [
     var ctrl = this;
 
     ctrl.state = {
-      uploadInProgress: false
+      uploadInProgress: false,
     };
 
     ctrl.onFileSelected = onFileSelected;
@@ -19,5 +19,5 @@ angular.module('portainer.agent').controller('FileUploaderController', [
         ctrl.state.uploadInProgress = false;
       });
     }
-  }
+  },
 ]);

@@ -1,6 +1,8 @@
 <files-datatable
-  title-text="Volume browser" title-icon="fa-file"
-  dataset="$ctrl.files" table-key="volume_browser"
+  title-text="Volume browser"
+  title-icon="fa-file"
+  dataset="$ctrl.files"
+  table-key="volume_browser"
   order-by="Dir"
   is-root="$ctrl.state.path === '/'"
   go-to-parent="$ctrl.up()"
@@ -8,7 +10,6 @@
   rename="$ctrl.rename(name, newName)"
   download="$ctrl.download(name)"
   delete="$ctrl.delete(name)"
-
   is-upload-allowed="$ctrl.isUploadEnabled"
-  on-file-selected-for-upload="$ctrl.onFileSelectedForUpload"
+  on-file-selected-for-upload="($ctrl.onFileSelectedForUpload)"
 ></files-datatable>

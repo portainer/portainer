@@ -12,6 +12,6 @@ angular.module('portainer.extensions.registrymanagement').component('registriesR
     retagAction: '<',
     advancedFeaturesAvailable: '<',
     paginationAction: '<',
-    loading: '<'
-  }
+    loading: '<',
+  },
 });

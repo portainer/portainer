@@ -9,6 +9,6 @@ angular.module('portainer.app').component('groupsDatatable', {
     orderBy: '@',
     reverseOrder: '<',
     accessManagement: '<',
-    removeAction: '<'
-  }
+    removeAction: '<',
+  },
 });

@@ -1,7 +1,6 @@
 import angular from 'angular';
 
 class ConfigsController {
-
   /* @ngInject */
   constructor($state, ConfigService, Notifications, $async) {
     this.$state = $state;

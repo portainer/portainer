@@ -11,6 +11,6 @@ angular.module('portainer.app').component('porAccessControlPanel', {
     // Accepted values: 'container', 'service' or 'volume'.
     resourceType: '<',
     // Allow to disable the Ownership edition based on non resource control data
-    disableOwnershipChange: '<'
-  }
+    disableOwnershipChange: '<',
+  },
 });

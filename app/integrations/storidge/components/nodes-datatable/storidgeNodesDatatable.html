@@ -2,16 +2,12 @@
   <rd-widget>
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
-        <div class="toolBarTitle">
-          <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }}
-        </div>
+        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
       </div>
       <div class="actionBar">
         <div class="row">
-          <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.addNodeAction()">
-            <i class="fa fa-plus space-right" aria-hidden="true"></i>Add node
-          </button>
-          <div  style="margin-bottom: 0px;">
+          <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.addNodeAction()"> <i class="fa fa-plus space-right" aria-hidden="true"></i>Add node </button>
+          <div style="margin-bottom: 0px;">
             <span ng-if="$ctrl.addInfo" class="text-muted small">
               To add a node to this cluster, run the following command on your new node
               <code>
@@ -27,7 +23,15 @@
       </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" ng-change="$ctrl.onTextFilterChange()" placeholder="Search..." auto-focus ng-model-options="{ debounce: 300 }">
+        <input
+          type="text"
+          class="searchInput"
+          ng-model="$ctrl.state.textFilter"
+          ng-change="$ctrl.onTextFilterChange()"
+          placeholder="Search..."
+          auto-focus
+          ng-model-options="{ debounce: 300 }"
+        />
       </div>
       <div class="table-responsive">
         <table class="table table-hover">
@@ -64,7 +68,10 @@
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))" ng-class="{active: item.Checked}">
+            <tr
+              dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))"
+              ng-class="{ active: item.Checked }"
+            >
               <td>
                 <a ui-sref="storidge.cluster.node({name: item.Name})"> {{ item.Name }}</a>
               </td>

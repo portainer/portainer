@@ -2,30 +2,32 @@ import moment from 'moment';
 
 angular.module('portainer.app').component('scheduleForm', {
   templateUrl: './scheduleForm.html',
-  controller: function() {
+  controller: function () {
     var ctrl = this;
 
     ctrl.state = {
-      formValidationError: ''
+      formValidationError: '',
     };
 
-    ctrl.scheduleValues = [{
-      displayed: 'Every hour',
-      cron: '0 * * * *'
-    },
+    ctrl.scheduleValues = [
+      {
+        displayed: 'Every hour',
+        cron: '0 * * * *',
+      },
       {
         displayed: 'Every 2 hours',
-        cron: '0 */2 * * *'
-      }, {
+        cron: '0 */2 * * *',
+      },
+      {
         displayed: 'Every day',
-        cron: '0 0 * * *'
-      }
+        cron: '0 0 * * *',
+      },
     ];
 
     ctrl.formValues = {
       datetime: ctrl.model.CronExpression ? cronToDatetime(ctrl.model.CronExpression) : moment(),
       scheduleValue: ctrl.scheduleValues[0],
-      cronMethod: ctrl.model.Recurring ? 'advanced' : 'basic'
+      cronMethod: ctrl.model.Recurring ? 'advanced' : 'basic',
     };
 
     function cronToDatetime(cron) {
@@ -38,10 +40,10 @@ angular.module('portainer.app').component('scheduleForm', {
 
     function datetimeToCron(datetime) {
       var date = moment(datetime);
-      return '0 '.concat(date.minutes(), ' ', date.hours(), ' ', date.date(), ' ', (date.month() + 1), ' *');
+      return '0 '.concat(date.minutes(), ' ', date.hours(), ' ', date.date(), ' ', date.month() + 1, ' *');
     }
 
-    this.action = function() {
+    this.action = function () {
       ctrl.state.formValidationError = '';
 
       if (ctrl.model.Job.Method === 'editor' && ctrl.model.Job.FileContent === '') {
@@ -61,7 +63,7 @@ angular.module('portainer.app').component('scheduleForm', {
       ctrl.formAction();
     };
 
-    this.editorUpdate = function(cm) {
+    this.editorUpdate = function (cm) {
       ctrl.model.Job.FileContent = cm.getValue();
     };
   },
@@ -74,6 +76,6 @@ angular.module('portainer.app').component('scheduleForm', {
     removeLabelAction: '<',
     formAction: '<',
     formActionLabel: '@',
-    actionInProgress: '<'
-  }
+    actionInProgress: '<',
+  },
 });

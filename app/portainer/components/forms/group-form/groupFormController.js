@@ -21,15 +21,15 @@ class GroupFormController {
         limit: '10',
         filter: '',
         pageNumber: 1,
-        totalCount: 0
+        totalCount: 0,
       },
       associated: {
         limit: '10',
         filter: '',
         pageNumber: 1,
-        totalCount: 0
+        totalCount: 0,
       },
-      allowCreateTag: this.Authentication.isAdmin()
+      allowCreateTag: this.Authentication.isAdmin(),
     };
   }
   associateEndpoint(endpoint) {
@@ -37,11 +37,11 @@ class GroupFormController {
       this.associatedEndpoints.push(endpoint);
     } else if (this.pageType === 'edit') {
       this.GroupService.addEndpoint(this.model.Id, endpoint)
-      .then(() => {
-        this.Notifications.success('Success', 'Endpoint successfully added to group');
-        this.reloadTablesContent();
-      })
-      .catch((err) => this.Notifications.error('Error', err, 'Unable to add endpoint to group'));
+        .then(() => {
+          this.Notifications.success('Success', 'Endpoint successfully added to group');
+          this.reloadTablesContent();
+        })
+        .catch((err) => this.Notifications.error('Error', err, 'Unable to add endpoint to group'));
     }
   }
 
@@ -50,29 +50,27 @@ class GroupFormController {
       _.remove(this.associatedEndpoints, (item) => item.Id === endpoint.Id);
     } else if (this.pageType === 'edit') {
       this.GroupService.removeEndpoint(this.model.Id, endpoint.Id)
-      .then(() => {
-        this.Notifications.success('Success', 'Endpoint successfully removed from group');
-        this.reloadTablesContent();
-      })
-      .catch((err) => this.Notifications.error('Error', err, 'Unable to remove endpoint from group'));
+        .then(() => {
+          this.Notifications.success('Success', 'Endpoint successfully removed from group');
+          this.reloadTablesContent();
+        })
+        .catch((err) => this.Notifications.error('Error', err, 'Unable to remove endpoint from group'));
     }
   }
 
   reloadTablesContent() {
     this.getPaginatedEndpointsByGroup(this.pageType, 'available');
     this.getPaginatedEndpointsByGroup(this.pageType, 'associated');
-    this.GroupService.group(this.model.Id)
-    .then((data) => {
+    this.GroupService.group(this.model.Id).then((data) => {
       this.model = data;
-    })
+    });
   }
 
   getPaginatedEndpointsByGroup(pageType, tableType) {
     if (tableType === 'available') {
       const context = this.state.available;
       const start = (context.pageNumber - 1) * context.limit + 1;
-      this.EndpointService.endpointsByGroup(start, context.limit, context.filter, 1)
-      .then((data) => {
+      this.EndpointService.endpointsByGroup(start, context.limit, context.filter, 1).then((data) => {
         this.availableEndpoints = data.value;
         this.state.available.totalCount = data.totalCount;
       });
@@ -80,8 +78,7 @@ class GroupFormController {
       const groupId = this.model.Id ? this.model.Id : 1;
       const context = this.state.associated;
       const start = (context.pageNumber - 1) * context.limit + 1;
-      this.EndpointService.endpointsByGroup(start, context.limit, context.filter, groupId)
-      .then((data) => {
+      this.EndpointService.endpointsByGroup(start, context.limit, context.filter, groupId).then((data) => {
         this.associatedEndpoints = data.value;
         this.state.associated.totalCount = data.totalCount;
       });

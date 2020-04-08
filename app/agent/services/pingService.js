@@ -10,5 +10,5 @@ angular.module('portainer.agent').service('AgentPingService', [
     }
 
     return service;
-  }
+  },
 ]);
