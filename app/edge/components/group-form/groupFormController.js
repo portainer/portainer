@@ -22,7 +22,7 @@ class EdgeGroupFormController {
   }
 
   async searchEndpointsAsync(search) {
-    const response = await this.EndpointService.endpoints(0, 10, search, 4);
+    const response = await this.EndpointService.endpoints(0, 10, { search, type: 4 });
     this.endpoints = response.value;
     return this.endpoints;
   }

@@ -259,10 +259,12 @@
           <!-- tags -->
           <div class="form-group">
             <tag-selector
-              ng-if="availableTags"
+              ng-if="formValues && availableTags"
               tags="availableTags"
               model="formValues.TagIds"
-            ></tag-selector>
+              allow-create="state.allowCreateTag"
+              on-create="onCreateTag"
+          ></tag-selector>
           </div>
           <!-- !tags -->
           <div class="col-sm-12 form-section-title">

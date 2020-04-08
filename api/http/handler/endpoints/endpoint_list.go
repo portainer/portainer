@@ -30,6 +30,12 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	limit, _ := request.RetrieveNumericQueryParameter(r, "limit", true)
 	endpointType, _ := request.RetrieveNumericQueryParameter(r, "type", true)
 
+	var tagIDs []portainer.TagID
+	request.RetrieveJSONQueryParameter(r, "tagIds", &tagIDs, true)
+
+	var endpointIDs []portainer.EndpointID
+	request.RetrieveJSONQueryParameter(r, "endpointIds", &endpointIDs, true)
+
 	endpointGroups, err := handler.EndpointGroupService.EndpointGroups()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint groups from the database", err}
@@ -46,6 +52,10 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	filteredEndpoints := security.FilterEndpoints(endpoints, endpointGroups, securityContext)
+
+	if endpointIDs != nil {
+		filteredEndpoints = filteredEndpointsByIds(filteredEndpoints, endpointIDs)
+	}
 
 	if groupID != 0 {
 		filteredEndpoints = filterEndpointsByGroupID(filteredEndpoints, portainer.EndpointGroupID(groupID))
@@ -65,6 +75,10 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 
 	if endpointType != 0 {
 		filteredEndpoints = filterEndpointsByType(filteredEndpoints, portainer.EndpointType(endpointType))
+	}
+
+	if tagIDs != nil {
+		filteredEndpoints = filteredEndpointsByTags(filteredEndpoints, tagIDs, endpointGroups)
 	}
 
 	filteredEndpointCount := len(filteredEndpoints)
@@ -186,4 +200,59 @@ func convertTagIDsToTags(tagsMap map[portainer.TagID]string, tagIDs []portainer.
 		tags = append(tags, tagsMap[tagID])
 	}
 	return tags
+}
+
+func filteredEndpointsByTags(endpoints []portainer.Endpoint, tagIDs []portainer.TagID, endpointGroups []portainer.EndpointGroup) []portainer.Endpoint {
+	filteredEndpoints := make([]portainer.Endpoint, 0)
+
+	for _, endpoint := range endpoints {
+		missingTags := make(map[portainer.TagID]bool)
+		for _, tagID := range tagIDs {
+			missingTags[tagID] = true
+		}
+		for _, tagID := range endpoint.TagIDs {
+			if missingTags[tagID] {
+				delete(missingTags, tagID)
+			}
+		}
+		missingTags = endpointGroupHasTags(endpoint.GroupID, endpointGroups, missingTags)
+		if len(missingTags) == 0 {
+			filteredEndpoints = append(filteredEndpoints, endpoint)
+		}
+	}
+	return filteredEndpoints
+}
+
+func endpointGroupHasTags(groupID portainer.EndpointGroupID, groups []portainer.EndpointGroup, missingTags map[portainer.TagID]bool) map[portainer.TagID]bool {
+	var endpointGroup portainer.EndpointGroup
+	for _, group := range groups {
+		if group.ID == groupID {
+			endpointGroup = group
+			break
+		}
+	}
+	for _, tagID := range endpointGroup.TagIDs {
+		if missingTags[tagID] {
+			delete(missingTags, tagID)
+		}
+	}
+	return missingTags
+}
+
+func filteredEndpointsByIds(endpoints []portainer.Endpoint, ids []portainer.EndpointID) []portainer.Endpoint {
+	filteredEndpoints := make([]portainer.Endpoint, 0)
+
+	idsSet := make(map[portainer.EndpointID]bool)
+	for _, id := range ids {
+		idsSet[id] = true
+	}
+
+	for _, endpoint := range endpoints {
+		if idsSet[endpoint.ID] {
+			filteredEndpoints = append(filteredEndpoints, endpoint)
+		}
+	}
+
+	return filteredEndpoints
+
 }
