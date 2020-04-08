@@ -925,7 +925,6 @@ type (
 )
 
 const (
-	// TODO sort
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "1.24.0-dev"
 	// DBVersion is the version number of the Portainer database
@@ -962,12 +961,61 @@ const (
 )
 
 const (
-	// TLSFileCA represents a TLS CA certificate file
-	TLSFileCA TLSFileType = iota
-	// TLSFileCert represents a TLS certificate file
-	TLSFileCert
-	// TLSFileKey represents a TLS key file
-	TLSFileKey
+	_ AuthenticationMethod = iota
+	// AuthenticationInternal represents the internal authentication method (authentication against Portainer API)
+	AuthenticationInternal
+	// AuthenticationLDAP represents the LDAP authentication method (authentication against a LDAP server)
+	AuthenticationLDAP
+	//AuthenticationOAuth represents the OAuth authentication method (authentication against a authorization server)
+	AuthenticationOAuth
+)
+
+const (
+	_ EndpointExtensionType = iota
+	// StoridgeEndpointExtension represents the Storidge extension
+	StoridgeEndpointExtension
+)
+
+const (
+	_ EndpointStatus = iota
+	// EndpointStatusUp is used to represent an available endpoint
+	EndpointStatusUp
+	// EndpointStatusDown is used to represent an unavailable endpoint
+	EndpointStatusDown
+)
+
+const (
+	_ EndpointType = iota
+	// DockerEnvironment represents an endpoint connected to a Docker environment
+	DockerEnvironment
+	// AgentOnDockerEnvironment represents an endpoint connected to a Portainer agent deployed on a Docker environment
+	AgentOnDockerEnvironment
+	// AzureEnvironment represents an endpoint connected to an Azure environment
+	AzureEnvironment
+	// EdgeAgentEnvironment represents an endpoint connected to an Edge agent
+	EdgeAgentEnvironment
+)
+
+const (
+	_ ExtensionID = iota
+	// RegistryManagementExtension represents the registry management extension
+	RegistryManagementExtension
+	// OAuthAuthenticationExtension represents the OAuth authentication extension
+	OAuthAuthenticationExtension
+	// RBACExtension represents the RBAC extension
+	RBACExtension
+)
+
+const (
+	_ JobType = iota
+	// ScriptExecutionJobType is a non-system job used to execute a script against a list of
+	// endpoints via privileged containers
+	ScriptExecutionJobType
+	// SnapshotJobType is a system job used to create endpoint snapshots
+	SnapshotJobType
+	// EndpointSyncJobType is a system job used to synchronize endpoints from
+	// an external definition store
+	EndpointSyncJobType
 )
 
 const (
@@ -979,21 +1027,15 @@ const (
 )
 
 const (
-	_ UserRole = iota
-	// AdministratorRole represents an administrator user role
-	AdministratorRole
-	// StandardUserRole represents a regular user role
-	StandardUserRole
-)
-
-const (
-	_ AuthenticationMethod = iota
-	// AuthenticationInternal represents the internal authentication method (authentication against Portainer API)
-	AuthenticationInternal
-	// AuthenticationLDAP represents the LDAP authentication method (authentication against a LDAP server)
-	AuthenticationLDAP
-	//AuthenticationOAuth represents the OAuth authentication method (authentication against a authorization server)
-	AuthenticationOAuth
+	_ RegistryType = iota
+	// QuayRegistry represents a Quay.io registry
+	QuayRegistry
+	// AzureRegistry represents an ACR registry
+	AzureRegistry
+	// CustomRegistry represents a custom registry
+	CustomRegistry
+	// GitlabRegistry represents a gitlab registry
+	GitlabRegistry
 )
 
 const (
@@ -1021,24 +1063,6 @@ const (
 )
 
 const (
-	_ EndpointExtensionType = iota
-	// StoridgeEndpointExtension represents the Storidge extension
-	StoridgeEndpointExtension
-)
-
-const (
-	_ EndpointType = iota
-	// DockerEnvironment represents an endpoint connected to a Docker environment
-	DockerEnvironment
-	// AgentOnDockerEnvironment represents an endpoint connected to a Portainer agent deployed on a Docker environment
-	AgentOnDockerEnvironment
-	// AzureEnvironment represents an endpoint connected to an Azure environment
-	AzureEnvironment
-	// EdgeAgentEnvironment represents an endpoint connected to an Edge agent
-	EdgeAgentEnvironment
-)
-
-const (
 	_ StackType = iota
 	// DockerSwarmStack represents a stack managed via docker stack
 	DockerSwarmStack
@@ -1057,51 +1081,26 @@ const (
 )
 
 const (
-	_ EndpointStatus = iota
-	// EndpointStatusUp is used to represent an available endpoint
-	EndpointStatusUp
-	// EndpointStatusDown is used to represent an unavailable endpoint
-	EndpointStatusDown
+	// TLSFileCA represents a TLS CA certificate file
+	TLSFileCA TLSFileType = iota
+	// TLSFileCert represents a TLS certificate file
+	TLSFileCert
+	// TLSFileKey represents a TLS key file
+	TLSFileKey
+)
+
+const (
+	_ UserRole = iota
+	// AdministratorRole represents an administrator user role
+	AdministratorRole
+	// StandardUserRole represents a regular user role
+	StandardUserRole
 )
 
 const (
 	_ WebhookType = iota
 	// ServiceWebhook is a webhook for restarting a docker service
 	ServiceWebhook
-)
-
-const (
-	_ ExtensionID = iota
-	// RegistryManagementExtension represents the registry management extension
-	RegistryManagementExtension
-	// OAuthAuthenticationExtension represents the OAuth authentication extension
-	OAuthAuthenticationExtension
-	// RBACExtension represents the RBAC extension
-	RBACExtension
-)
-
-const (
-	_ JobType = iota
-	// ScriptExecutionJobType is a non-system job used to execute a script against a list of
-	// endpoints via privileged containers
-	ScriptExecutionJobType
-	// SnapshotJobType is a system job used to create endpoint snapshots
-	SnapshotJobType
-	// EndpointSyncJobType is a system job used to synchronize endpoints from
-	// an external definition store
-	EndpointSyncJobType
-)
-
-const (
-	_ RegistryType = iota
-	// QuayRegistry represents a Quay.io registry
-	QuayRegistry
-	// AzureRegistry represents an ACR registry
-	AzureRegistry
-	// CustomRegistry represents a custom registry
-	CustomRegistry
-	// GitlabRegistry represents a gitlab registry
-	GitlabRegistry
 )
 
 const (
