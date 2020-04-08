@@ -11,10 +11,11 @@ import (
 )
 
 type edgeGroupUpdatePayload struct {
-	Name      string
-	Dynamic   bool
-	TagIDs    []portainer.TagID
-	Endpoints []portainer.EndpointID
+	Name            string
+	Dynamic         bool
+	TagIDs          []portainer.TagID
+	Endpoints       []portainer.EndpointID
+	MustHaveAllTags *bool
 }
 
 func (payload *edgeGroupUpdatePayload) Validate(r *http.Request) error {
@@ -36,7 +37,7 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid Edge group identifier route variable", err}
 	}
 
-	var payload edgeGroupCreatePayload
+	var payload edgeGroupUpdatePayload
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
@@ -80,6 +81,10 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 			}
 		}
 		edgeGroup.Endpoints = endpointIDs
+	}
+
+	if payload.MustHaveAllTags != nil {
+		edgeGroup.MustHaveAllTags = *payload.MustHaveAllTags
 	}
 
 	err = handler.EdgeGroupService.UpdateEdgeGroup(edgeGroup.ID, edgeGroup)
