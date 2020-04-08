@@ -638,53 +638,31 @@ type (
 	// WebhookType represents the type of resource a webhook is related to
 	WebhookType int
 
-	// TODO sort
-
-	// Server defines the interface to serve the API
-	Server interface {
-		Start() error
+	// ComposeStackManager represents a service to manage Compose stacks
+	ComposeStackManager interface {
+		Up(stack *Stack, endpoint *Endpoint) error
+		Down(stack *Stack, endpoint *Endpoint) error
 	}
 
-	// UserService represents a service for managing user data
-	UserService interface {
-		User(ID UserID) (*User, error)
-		UserByUsername(username string) (*User, error)
-		Users() ([]User, error)
-		UsersByRole(role UserRole) ([]User, error)
-		CreateUser(user *User) error
-		UpdateUser(ID UserID, user *User) error
-		DeleteUser(ID UserID) error
+	// CryptoService represents a service for encrypting/hashing data
+	CryptoService interface {
+		Hash(data string) (string, error)
+		CompareHashAndData(hash string, data string) error
 	}
 
-	// RoleService represents a service for managing user roles
-	RoleService interface {
-		Role(ID RoleID) (*Role, error)
-		Roles() ([]Role, error)
-		CreateRole(role *Role) error
-		UpdateRole(ID RoleID, role *Role) error
+	// DigitalSignatureService represents a service to manage digital signatures
+	DigitalSignatureService interface {
+		ParseKeyPair(private, public []byte) error
+		GenerateKeyPair() ([]byte, []byte, error)
+		EncodedPublicKey() string
+		PEMHeaders() (string, string)
+		CreateSignature(message string) (string, error)
 	}
 
-	// TeamService represents a service for managing user data
-	TeamService interface {
-		Team(ID TeamID) (*Team, error)
-		TeamByName(name string) (*Team, error)
-		Teams() ([]Team, error)
-		CreateTeam(team *Team) error
-		UpdateTeam(ID TeamID, team *Team) error
-		DeleteTeam(ID TeamID) error
-	}
-
-	// TeamMembershipService represents a service for managing team membership data
-	TeamMembershipService interface {
-		TeamMembership(ID TeamMembershipID) (*TeamMembership, error)
-		TeamMemberships() ([]TeamMembership, error)
-		TeamMembershipsByUserID(userID UserID) ([]TeamMembership, error)
-		TeamMembershipsByTeamID(teamID TeamID) ([]TeamMembership, error)
-		CreateTeamMembership(membership *TeamMembership) error
-		UpdateTeamMembership(ID TeamMembershipID, membership *TeamMembership) error
-		DeleteTeamMembership(ID TeamMembershipID) error
-		DeleteTeamMembershipByUserID(userID UserID) error
-		DeleteTeamMembershipByTeamID(teamID TeamID) error
+	// DockerHubService represents a service for managing the DockerHub object
+	DockerHubService interface {
+		DockerHub() (*DockerHub, error)
+		UpdateDockerHub(registry *DockerHub) error
 	}
 
 	// EndpointService represents a service for managing endpoint data
@@ -707,96 +685,14 @@ type (
 		DeleteEndpointGroup(ID EndpointGroupID) error
 	}
 
-	// RegistryService represents a service for managing registry data
-	RegistryService interface {
-		Registry(ID RegistryID) (*Registry, error)
-		Registries() ([]Registry, error)
-		CreateRegistry(registry *Registry) error
-		UpdateRegistry(ID RegistryID, registry *Registry) error
-		DeleteRegistry(ID RegistryID) error
-	}
-
-	// StackService represents a service for managing stack data
-	StackService interface {
-		Stack(ID StackID) (*Stack, error)
-		StackByName(name string) (*Stack, error)
-		Stacks() ([]Stack, error)
-		CreateStack(stack *Stack) error
-		UpdateStack(ID StackID, stack *Stack) error
-		DeleteStack(ID StackID) error
-		GetNextIdentifier() int
-	}
-
-	// DockerHubService represents a service for managing the DockerHub object
-	DockerHubService interface {
-		DockerHub() (*DockerHub, error)
-		UpdateDockerHub(registry *DockerHub) error
-	}
-
-	// SettingsService represents a service for managing application settings
-	SettingsService interface {
-		Settings() (*Settings, error)
-		UpdateSettings(settings *Settings) error
-	}
-
-	// VersionService represents a service for managing version data
-	VersionService interface {
-		DBVersion() (int, error)
-		StoreDBVersion(version int) error
-	}
-
-	// TunnelServerService represents a service for managing data associated to the tunnel server
-	TunnelServerService interface {
-		Info() (*TunnelServerInfo, error)
-		UpdateInfo(info *TunnelServerInfo) error
-	}
-
-	// WebhookService represents a service for managing webhook data.
-	WebhookService interface {
-		Webhooks() ([]Webhook, error)
-		Webhook(ID WebhookID) (*Webhook, error)
-		CreateWebhook(portainer *Webhook) error
-		WebhookByResourceID(resourceID string) (*Webhook, error)
-		WebhookByToken(token string) (*Webhook, error)
-		DeleteWebhook(serviceID WebhookID) error
-	}
-
-	// ResourceControlService represents a service for managing resource control data
-	ResourceControlService interface {
-		ResourceControl(ID ResourceControlID) (*ResourceControl, error)
-		ResourceControlByResourceIDAndType(resourceID string, resourceType ResourceControlType) (*ResourceControl, error)
-		ResourceControls() ([]ResourceControl, error)
-		CreateResourceControl(rc *ResourceControl) error
-		UpdateResourceControl(ID ResourceControlID, resourceControl *ResourceControl) error
-		DeleteResourceControl(ID ResourceControlID) error
-	}
-
-	// ScheduleService represents a service for managing schedule data
-	ScheduleService interface {
-		Schedule(ID ScheduleID) (*Schedule, error)
-		Schedules() ([]Schedule, error)
-		SchedulesByJobType(jobType JobType) ([]Schedule, error)
-		CreateSchedule(schedule *Schedule) error
-		UpdateSchedule(ID ScheduleID, schedule *Schedule) error
-		DeleteSchedule(ID ScheduleID) error
-		GetNextIdentifier() int
-	}
-
-	// TagService represents a service for managing tag data
-	TagService interface {
-		Tags() ([]Tag, error)
-		Tag(ID TagID) (*Tag, error)
-		CreateTag(tag *Tag) error
-		DeleteTag(ID TagID) error
-	}
-
-	// TemplateService represents a service for managing template data
-	TemplateService interface {
-		Templates() ([]Template, error)
-		Template(ID TemplateID) (*Template, error)
-		CreateTemplate(template *Template) error
-		UpdateTemplate(ID TemplateID, template *Template) error
-		DeleteTemplate(ID TemplateID) error
+	// ExtensionManager represents a service used to manage extensions
+	ExtensionManager interface {
+		FetchExtensionDefinitions() ([]Extension, error)
+		InstallExtension(extension *Extension, licenseKey string, archiveFileName string, extensionArchive []byte) error
+		EnableExtension(extension *Extension, licenseKey string) error
+		DisableExtension(extension *Extension) error
+		UpdateExtension(extension *Extension, version string) error
+		StartExtensions() error
 	}
 
 	// ExtensionService represents a service for managing extension data
@@ -805,27 +701,6 @@ type (
 		Extensions() ([]Extension, error)
 		Persist(extension *Extension) error
 		DeleteExtension(ID ExtensionID) error
-	}
-
-	// CryptoService represents a service for encrypting/hashing data
-	CryptoService interface {
-		Hash(data string) (string, error)
-		CompareHashAndData(hash string, data string) error
-	}
-
-	// DigitalSignatureService represents a service to manage digital signatures
-	DigitalSignatureService interface {
-		ParseKeyPair(private, public []byte) error
-		GenerateKeyPair() ([]byte, []byte, error)
-		EncodedPublicKey() string
-		PEMHeaders() (string, string)
-		CreateSignature(message string) (string, error)
-	}
-
-	// JWTService represents a service for managing JWT tokens
-	JWTService interface {
-		GenerateToken(data *TokenData) (string, error)
-		ParseAndVerifyToken(token string) (*TokenData, error)
 	}
 
 	// FileService represents a service for managing files
@@ -857,6 +732,12 @@ type (
 		ClonePrivateRepositoryWithBasicAuth(repositoryURL, referenceName string, destination, username, password string) error
 	}
 
+	// JobRunner represents a service that can be used to run a job
+	JobRunner interface {
+		Run()
+		GetSchedule() *Schedule
+	}
+
 	// JobScheduler represents a service to run jobs on a periodic basis
 	JobScheduler interface {
 		ScheduleJob(runner JobRunner) error
@@ -866,15 +747,15 @@ type (
 		Start()
 	}
 
-	// JobRunner represents a service that can be used to run a job
-	JobRunner interface {
-		Run()
-		GetSchedule() *Schedule
+	// JobService represents a service to manage job execution on hosts
+	JobService interface {
+		ExecuteScript(endpoint *Endpoint, nodeName, image string, script []byte, schedule *Schedule) error
 	}
 
-	// Snapshotter represents a service used to create endpoint snapshots
-	Snapshotter interface {
-		CreateSnapshot(endpoint *Endpoint) (*Snapshot, error)
+	// JWTService represents a service for managing JWT tokens
+	JWTService interface {
+		GenerateToken(data *TokenData) (string, error)
+		ParseAndVerifyToken(token string) (*TokenData, error)
 	}
 
 	// LDAPService represents a service used to authenticate users against a LDAP/AD
@@ -884,33 +765,23 @@ type (
 		GetUserGroups(username string, settings *LDAPSettings) ([]string, error)
 	}
 
-	// SwarmStackManager represents a service to manage Swarm stacks
-	SwarmStackManager interface {
-		Login(dockerhub *DockerHub, registries []Registry, endpoint *Endpoint)
-		Logout(endpoint *Endpoint) error
-		Deploy(stack *Stack, prune bool, endpoint *Endpoint) error
-		Remove(stack *Stack, endpoint *Endpoint) error
+	// RegistryService represents a service for managing registry data
+	RegistryService interface {
+		Registry(ID RegistryID) (*Registry, error)
+		Registries() ([]Registry, error)
+		CreateRegistry(registry *Registry) error
+		UpdateRegistry(ID RegistryID, registry *Registry) error
+		DeleteRegistry(ID RegistryID) error
 	}
 
-	// ComposeStackManager represents a service to manage Compose stacks
-	ComposeStackManager interface {
-		Up(stack *Stack, endpoint *Endpoint) error
-		Down(stack *Stack, endpoint *Endpoint) error
-	}
-
-	// JobService represents a service to manage job execution on hosts
-	JobService interface {
-		ExecuteScript(endpoint *Endpoint, nodeName, image string, script []byte, schedule *Schedule) error
-	}
-
-	// ExtensionManager represents a service used to manage extensions
-	ExtensionManager interface {
-		FetchExtensionDefinitions() ([]Extension, error)
-		InstallExtension(extension *Extension, licenseKey string, archiveFileName string, extensionArchive []byte) error
-		EnableExtension(extension *Extension, licenseKey string) error
-		DisableExtension(extension *Extension) error
-		UpdateExtension(extension *Extension, version string) error
-		StartExtensions() error
+	// ResourceControlService represents a service for managing resource control data
+	ResourceControlService interface {
+		ResourceControl(ID ResourceControlID) (*ResourceControl, error)
+		ResourceControlByResourceIDAndType(resourceID string, resourceType ResourceControlType) (*ResourceControl, error)
+		ResourceControls() ([]ResourceControl, error)
+		CreateResourceControl(rc *ResourceControl) error
+		UpdateResourceControl(ID ResourceControlID, resourceControl *ResourceControl) error
+		DeleteResourceControl(ID ResourceControlID) error
 	}
 
 	// ReverseTunnelService represensts a service used to manage reverse tunnel connections.
@@ -924,9 +795,137 @@ type (
 		AddSchedule(endpointID EndpointID, schedule *EdgeSchedule)
 		RemoveSchedule(scheduleID ScheduleID)
 	}
+
+	// RoleService represents a service for managing user roles
+	RoleService interface {
+		Role(ID RoleID) (*Role, error)
+		Roles() ([]Role, error)
+		CreateRole(role *Role) error
+		UpdateRole(ID RoleID, role *Role) error
+	}
+
+	// ScheduleService represents a service for managing schedule data
+	ScheduleService interface {
+		Schedule(ID ScheduleID) (*Schedule, error)
+		Schedules() ([]Schedule, error)
+		SchedulesByJobType(jobType JobType) ([]Schedule, error)
+		CreateSchedule(schedule *Schedule) error
+		UpdateSchedule(ID ScheduleID, schedule *Schedule) error
+		DeleteSchedule(ID ScheduleID) error
+		GetNextIdentifier() int
+	}
+
+	// SettingsService represents a service for managing application settings
+	SettingsService interface {
+		Settings() (*Settings, error)
+		UpdateSettings(settings *Settings) error
+	}
+
+	// Server defines the interface to serve the API
+	Server interface {
+		Start() error
+	}
+
+	// Snapshotter represents a service used to create endpoint snapshots
+	Snapshotter interface {
+		CreateSnapshot(endpoint *Endpoint) (*Snapshot, error)
+	}
+
+	// StackService represents a service for managing stack data
+	StackService interface {
+		Stack(ID StackID) (*Stack, error)
+		StackByName(name string) (*Stack, error)
+		Stacks() ([]Stack, error)
+		CreateStack(stack *Stack) error
+		UpdateStack(ID StackID, stack *Stack) error
+		DeleteStack(ID StackID) error
+		GetNextIdentifier() int
+	}
+
+	// SwarmStackManager represents a service to manage Swarm stacks
+	SwarmStackManager interface {
+		Login(dockerhub *DockerHub, registries []Registry, endpoint *Endpoint)
+		Logout(endpoint *Endpoint) error
+		Deploy(stack *Stack, prune bool, endpoint *Endpoint) error
+		Remove(stack *Stack, endpoint *Endpoint) error
+	}
+
+	// TagService represents a service for managing tag data
+	TagService interface {
+		Tags() ([]Tag, error)
+		Tag(ID TagID) (*Tag, error)
+		CreateTag(tag *Tag) error
+		DeleteTag(ID TagID) error
+	}
+
+	// TeamService represents a service for managing user data
+	TeamService interface {
+		Team(ID TeamID) (*Team, error)
+		TeamByName(name string) (*Team, error)
+		Teams() ([]Team, error)
+		CreateTeam(team *Team) error
+		UpdateTeam(ID TeamID, team *Team) error
+		DeleteTeam(ID TeamID) error
+	}
+
+	// TeamMembershipService represents a service for managing team membership data
+	TeamMembershipService interface {
+		TeamMembership(ID TeamMembershipID) (*TeamMembership, error)
+		TeamMemberships() ([]TeamMembership, error)
+		TeamMembershipsByUserID(userID UserID) ([]TeamMembership, error)
+		TeamMembershipsByTeamID(teamID TeamID) ([]TeamMembership, error)
+		CreateTeamMembership(membership *TeamMembership) error
+		UpdateTeamMembership(ID TeamMembershipID, membership *TeamMembership) error
+		DeleteTeamMembership(ID TeamMembershipID) error
+		DeleteTeamMembershipByUserID(userID UserID) error
+		DeleteTeamMembershipByTeamID(teamID TeamID) error
+	}
+
+	// TemplateService represents a service for managing template data
+	TemplateService interface {
+		Templates() ([]Template, error)
+		Template(ID TemplateID) (*Template, error)
+		CreateTemplate(template *Template) error
+		UpdateTemplate(ID TemplateID, template *Template) error
+		DeleteTemplate(ID TemplateID) error
+	}
+
+	// TunnelServerService represents a service for managing data associated to the tunnel server
+	TunnelServerService interface {
+		Info() (*TunnelServerInfo, error)
+		UpdateInfo(info *TunnelServerInfo) error
+	}
+
+	// UserService represents a service for managing user data
+	UserService interface {
+		User(ID UserID) (*User, error)
+		UserByUsername(username string) (*User, error)
+		Users() ([]User, error)
+		UsersByRole(role UserRole) ([]User, error)
+		CreateUser(user *User) error
+		UpdateUser(ID UserID, user *User) error
+		DeleteUser(ID UserID) error
+	}
+
+	// VersionService represents a service for managing version data
+	VersionService interface {
+		DBVersion() (int, error)
+		StoreDBVersion(version int) error
+	}
+
+	// WebhookService represents a service for managing webhook data.
+	WebhookService interface {
+		Webhooks() ([]Webhook, error)
+		Webhook(ID WebhookID) (*Webhook, error)
+		CreateWebhook(portainer *Webhook) error
+		WebhookByResourceID(resourceID string) (*Webhook, error)
+		WebhookByToken(token string) (*Webhook, error)
+		DeleteWebhook(serviceID WebhookID) error
+	}
 )
 
 const (
+	// TODO sort
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "1.24.0-dev"
 	// DBVersion is the version number of the Portainer database
