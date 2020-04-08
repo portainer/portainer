@@ -34,7 +34,10 @@ Unlike the public demo, the playground sessions are deleted after 4 hours. Apart
 
 ## Getting help
 
-**NOTE**: You can find more information about Portainer support framework policy here: https://www.portainer.io/2019/04/portainer-support-policy/
+For FORMAL Support, please purchase a support subscription from here: https://www.portainer.io/products-services/portainer-business-support/
+
+For community support: You can find more information about Portainer's community support framework policy here: https://www.portainer.io/2019/04/portainer-support-policy/
+
 
 * Issues: https://github.com/portainer/portainer/issues
 * FAQ: https://portainer.readthedocs.io/en/latest/faq.html
