@@ -2,8 +2,8 @@ import moment from 'moment';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
 angular.module('portainer.docker')
-.controller('ContainerController', ['$q', '$scope', '$state','$transition$', '$filter', '$async', 'ExtensionService', 'Commit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'NetworkService', 'Notifications', 'ModalService', 'ResourceControlService', 'RegistryService', 'ImageService', 'HttpRequestHelper', 'Authentication',
-function ($q, $scope, $state, $transition$, $filter, $async, ExtensionService, Commit, ContainerHelper, ContainerService, ImageHelper, NetworkService, Notifications, ModalService, ResourceControlService, RegistryService, ImageService, HttpRequestHelper, Authentication) {
+.controller('ContainerController', ['$q', '$scope', '$state','$transition$', '$filter', '$async', 'ExtensionService', 'Commit', 'ContainerHelper', 'ContainerService', 'ImageHelper', 'NetworkService', 'Notifications', 'ModalService', 'ResourceControlService', 'RegistryService', 'ImageService', 'HttpRequestHelper', 'Authentication', 'StateManager', 'EndpointProvider',
+function ($q, $scope, $state, $transition$, $filter, $async, ExtensionService, Commit, ContainerHelper, ContainerService, ImageHelper, NetworkService, Notifications, ModalService, ResourceControlService, RegistryService, ImageService, HttpRequestHelper, Authentication, StateManager, EndpointProvider) {
   $scope.activityTime = 0;
   $scope.portBindings = [];
   $scope.displayRecreateButton = false;
@@ -22,9 +22,19 @@ function ($q, $scope, $state, $transition$, $filter, $async, ExtensionService, C
   $scope.updateRestartPolicy = updateRestartPolicy;
 
   var update = function () {
-    var nodeName = $transition$.params().nodeName;
-    HttpRequestHelper.setPortainerAgentTargetHeader(nodeName);
-    $scope.nodeName = nodeName;
+    $scope.nodeName = $transition$.params().nodeName;
+    HttpRequestHelper.setPortainerAgentTargetHeader($scope.nodeName);
+
+    $scope.showBrowseAction = !EndpointProvider.offlineMode() && StateManager.getState().endpoint.mode.agentProxy;
+    ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.RBAC)
+    .then(function success(extensionEnabled) {
+      if (!extensionEnabled) {
+        var isAdmin = Authentication.isAdmin();
+        if (!$scope.applicationState.application.enableVolumeBrowserForNonAdminUsers && !isAdmin) {
+          $scope.showBrowseAction = false;
+        }
+      }
+    });
 
     ContainerService.container($transition$.params().id)
     .then(function success(data) {

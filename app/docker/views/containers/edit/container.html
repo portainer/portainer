@@ -257,7 +257,14 @@
             <tbody>
               <tr ng-repeat="vol in container.Mounts">
                 <td ng-if="vol.Type === 'bind'">{{ vol.Source }}</td>
-                <td ng-if="vol.Type === 'volume'"><a ui-sref="docker.volumes.volume({ id: vol.Name, nodeName: nodeName })">{{ vol.Name }}</a></td>
+                <td ng-if="vol.Type === 'volume'"><a ui-sref="docker.volumes.volume({ id: vol.Name, nodeName: nodeName })">{{ vol.Name }}</a>
+                  <a authorization="DockerAgentBrowseList"
+                    ui-sref="docker.volumes.volume.browse({ id: vol.Name, nodeName: nodeName })"
+                    class="btn btn-xs btn-primary space-left"
+                    ng-if="showBrowseAction">
+                    <i class="fa fa-search"></i> browse</a>
+                  </a>
+                </td>
                 <td>{{ vol.Destination }}</td>
               </tr>
             </tbody>
