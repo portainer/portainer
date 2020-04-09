@@ -7,7 +7,7 @@ class KubernetesNamespaceConverter {
     const res = new KubernetesNamespace();
     res.Id = data.metadata.uid;
     res.Name = data.metadata.name;
-    res.CreatedAt = data.metadata.creationTimestamp;
+    res.CreationDate = data.metadata.creationTimestamp;
     res.Status = data.status.phase;
     res.Yaml = yaml ? yaml.data : '';
     res.ResourcePoolName = data.metadata.labels ? data.metadata.labels[KubernetesPortainerResourcePoolNameLabel] : '';

@@ -12,7 +12,7 @@ class KubernetesApplicationConverter {
     res.ApplicationOwner = data.metadata.labels ? data.metadata.labels[KubernetesPortainerApplicationOwnerLabel] : '';
     res.ResourcePool = data.metadata.namespace;
     res.Image = data.spec.template.spec.containers[0].image;
-    res.CreatedAt = data.metadata.creationTimestamp;
+    res.CreationDate = data.metadata.creationTimestamp;
     res.Pods = data.Pods;
     res.Env = data.spec.template.spec.containers[0].env;
     const limits = {

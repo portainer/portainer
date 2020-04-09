@@ -4,7 +4,7 @@
 const _KubernetesNamespace = Object.freeze({
   Id: '',
   Name: '',
-  CreatedAt: '',
+  CreationDate: '',
   Status: '',
   Yaml: '',
   ResourcePoolName: '',

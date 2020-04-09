@@ -100,7 +100,7 @@
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('PersistentVolumeClaim.CreationDate')">
-                  Creation Date
+                  Created
                   <i class="fa fa-sort-numeric-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'PersistentVolumeClaim.CreationDate' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-numeric-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'PersistentVolumeClaim.CreationDate' && $ctrl.state.reverseOrder"></i>
                 </a>
@@ -130,7 +130,7 @@
                 {{ item.PersistentVolumeClaim.Storage }}
               </td>
               <td>
-                {{ item.PersistentVolumeClaim.CreationDate | getisodate }}
+                {{ item.PersistentVolumeClaim.CreationDate | getisodate }} {{ item.PersistentVolumeClaim.ApplicationOwner ? 'by ' + item.PersistentVolumeClaim.ApplicationOwner : ''}}
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">

@@ -88,10 +88,10 @@
                 </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('CreatedAt')">
-                  Creation Date
-                  <i class="fa fa-sort-numeric-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreatedAt' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-numeric-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreatedAt' && $ctrl.state.reverseOrder"></i>
+                <a ng-click="$ctrl.changeOrderBy('CreationDate')">
+                  Created
+                  <i class="fa fa-sort-numeric-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreationDate' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-numeric-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreationDate' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th ng-if="$ctrl.isAdmin">
@@ -112,7 +112,7 @@
               <td>
                 <i class="fa {{item.Quota ? 'fa-toggle-on' : 'fa-toggle-off'}}" aria-hidden="true" style="margin-right: 2px;"></i> {{ item.Quota ? 'Yes' : 'No' }}
               </td>
-              <td>{{ item.CreatedAt | getisodate }}</td>
+              <td>{{ item.CreationDate | getisodate }} {{ item.Namespace.ResourcePoolOwner ? 'by ' + item.Namespace.ResourcePoolOwner : ''}}</td>
               <td ng-if="$ctrl.isAdmin">
                 <a ng-if="$ctrl.canManageAccess(item)" ui-sref="kubernetes.resourcePools.resourcePool.access({id: item.Namespace.Name})">
                   <i class="fa fa-users" aria-hidden="true"></i> Manage access

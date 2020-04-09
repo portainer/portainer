@@ -41,7 +41,7 @@ const _KubernetesApplication = Object.freeze({
   ApplicationOwner: '',
   ResourcePool: '',
   Image: '',
-  CreatedAt: 0,
+  CreationDate: 0,
   Pods: [],
   Limits: [],
   ServiceType: '',

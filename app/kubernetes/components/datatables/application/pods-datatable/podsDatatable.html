@@ -81,10 +81,10 @@
                 </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('CreatedAt')">
+                <a ng-click="$ctrl.changeOrderBy('CreationDate')">
                   Creation date
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreatedAt' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreatedAt' && $ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreationDate' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreationDate' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>Actions</th>
@@ -103,7 +103,7 @@
                 </span>
                 <span ng-if="!item.Node">-</span>
               </td>
-              <td>{{ item.CreatedAt | getisodate }}</td>
+              <td>{{ item.CreationDate | getisodate }}</td>
               <td>
                 <a ui-sref="kubernetes.applications.application.logs({ pod: item.Name })">
                   <i class="fa fa-file-alt" aria-hidden="true"></i> Logs

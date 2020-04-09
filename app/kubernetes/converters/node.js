@@ -45,7 +45,7 @@ class KubernetesNodeConverter {
   static apiToNodeDetails(data, yaml) {
     let res = new KubernetesNodeDetails();
     res = KubernetesNodeConverter.apiToNode(data, res);
-    res.CreatedAt = data.metadata.creationTimestamp;
+    res.CreationDate = data.metadata.creationTimestamp;
     res.OS.Architecture = data.status.nodeInfo.architecture;
     res.OS.Platform = data.status.nodeInfo.operatingSystem;
     res.OS.Image = data.status.nodeInfo.osImage;

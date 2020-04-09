@@ -6,10 +6,11 @@ import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHel
 
 class KubernetesCreateConfigurationController {
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesConfigurationService, KubernetesResourcePoolService) {
+  constructor($async, $state, Notifications, Authentication, KubernetesConfigurationService, KubernetesResourcePoolService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
+    this.Authentication = Authentication;
     this.KubernetesConfigurationService = KubernetesConfigurationService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesConfigurationTypes = KubernetesConfigurationTypes;
@@ -93,6 +94,7 @@ class KubernetesCreateConfigurationController {
   async createConfigurationAsync() {
     try {
       this.state.actionInProgress = true;
+      this.formValues.ConfigurationOwner = this.Authentication.getUserDetails().username;
       await this.KubernetesConfigurationService.create(this.formValues);
       this.Notifications.success('Configuration succesfully created');
       this.$state.go('kubernetes.configurations');

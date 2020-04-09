@@ -1,3 +1,5 @@
+export const KubernetesPortainerConfigurationOwnerLabel = "io.portainer.kubernetes.configuration.owner";
+
 /**
  * Configuration Model
  */
@@ -7,6 +9,7 @@ const _KubernetesConfiguration = Object.freeze({
   Type: '',
   Namespace: '',
   CreationDate: '',
+  ConfigurationOwner: '',
   Used: false,
   Applications: [],
   Data: {}

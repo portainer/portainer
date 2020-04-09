@@ -3,6 +3,7 @@ import _ from 'lodash-es';
 import { KubernetesPersistentVolumeClaim } from 'Kubernetes/models/volume/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 import { KubernetesPersistentVolumClaimCreatePayload } from 'Kubernetes/models/volume/payloads';
+import { KubernetesPortainerApplicationOwnerLabel } from 'Kubernetes/models/application/models';
 
 class KubernetesPersistentVolumeClaimConverter {
 
@@ -15,6 +16,7 @@ class KubernetesPersistentVolumeClaimConverter {
     res.Storage = data.spec.resources.requests.storage + 'B';
     res.StorageClass = _.find(storageClasses, {Name: data.spec.storageClassName});
     res.Yaml = yaml ? yaml.data : '';
+    res.ApplicationOwner = data.metadata.labels ? data.metadata.labels[KubernetesPortainerApplicationOwnerLabel] : '';
     return res;
   }
 
@@ -29,6 +31,7 @@ class KubernetesPersistentVolumeClaimConverter {
       pvc.Namespace = formValues.ResourcePool.Namespace.Name;
       pvc.Storage = '' + item.Size + item.SizeUnit.charAt(0);
       pvc.StorageClass = item.StorageClass;
+      pvc.ApplicationOwner = formValues.ApplicationOwner;
       return pvc;
     });
     return res;
@@ -40,6 +43,7 @@ class KubernetesPersistentVolumeClaimConverter {
     res.metadata.namespace = data.Namespace;
     res.spec.resources.requests.storage = data.Storage;
     res.spec.storageClassName = data.StorageClass.Name;
+    res.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = data.ApplicationOwner;
     return res;
   }
 }

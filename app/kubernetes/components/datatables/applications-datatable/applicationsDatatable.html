@@ -108,10 +108,10 @@
                   Publishing mode
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('CreatedAt')">
-                  Creation date
-                  <i class="fa fa-sort-numeric-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreatedAt' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-numeric-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreatedAt' && $ctrl.state.reverseOrder"></i>
+                <a ng-click="$ctrl.changeOrderBy('CreationDate')">
+                  Created
+                  <i class="fa fa-sort-numeric-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreationDate' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-numeric-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'CreationDate' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
             </tr>
@@ -147,7 +147,7 @@
                 </span>
                 <span ng-if="item.PublishedPorts.length === 0">-</span>
               </td>
-              <td>{{ item.CreatedAt | getisodate }}</td>
+              <td>{{ item.CreationDate | getisodate }} {{ item.ApplicationOwner ? 'by ' + item.ApplicationOwner : ''}}</td>
             </tr>
             </tr>
             <tr ng-if="!$ctrl.dataset">

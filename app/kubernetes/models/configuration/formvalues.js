@@ -7,6 +7,7 @@ const _KubernetesConfigurationFormValues = Object.freeze({
   Id: '',
   ResourcePool: '',
   Name: '',
+  ConfigurationOwner: '',
   Type: KubernetesConfigurationTypes.CONFIGMAP,
   Data: [],
   DataYaml: '',

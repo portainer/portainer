@@ -22,7 +22,7 @@ export class KubernetesNode {
  * KubernetesNodeDetails Model
  */
  const _KubernetesNodeDetails = Object.freeze({
-  CreatedAt: '',
+  CreationDate: '',
   OS: {
     Architecture: '',
     Platform: '',

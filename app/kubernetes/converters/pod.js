@@ -23,7 +23,7 @@ class KubernetesPodConverter {
     res.Status = KubernetesPodConverter.computeStatus(data.status.containerStatuses);
     res.Restarts = _.sumBy(data.status.containerStatuses, 'restartCount');
     res.Node = data.spec.nodeName;
-    res.CreatedAt = data.status.startTime;
+    res.CreationDate = data.status.startTime;
     res.Containers = data.spec.containers;
     res.Labels = data.metadata.labels;
     return res;

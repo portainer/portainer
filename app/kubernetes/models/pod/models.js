@@ -9,7 +9,7 @@ const _KubernetesPod = Object.freeze({
   Status: '',
   Restarts: 0,
   Node: '',
-  CreatedAt: '',
+  CreationDate: '',
   Containers: [],
   Labels: []
 });
