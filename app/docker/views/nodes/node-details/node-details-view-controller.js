@@ -28,6 +28,7 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
         ctrl.originalNode = node;
         ctrl.hostDetails = buildHostDetails(node);
         ctrl.engineDetails = buildEngineDetails(node);
+        ctrl.engineLabels = node.EngineLabels;
         ctrl.nodeDetails = buildNodeDetails(node);
         ctrl.jobs = data.jobs;
         if (ctrl.state.isAgent) {

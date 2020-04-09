@@ -19,6 +19,7 @@
 ></host-details-panel>
 
 <engine-details-panel engine="$ctrl.engineDetails"></engine-details-panel>
+<engine-labels-panel ng-if="$ctrl.engineLabels" labels="$ctrl.engineLabels"></engine-labels-panel>
 
 <jobs-datatable
   ng-if="$ctrl.isJobEnabled && $ctrl.jobs && !$ctrl.offlineMode && $ctrl.hostFeaturesEnabled"
