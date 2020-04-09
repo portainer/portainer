@@ -42,6 +42,20 @@ angular.module('portainer.app')
     });
   };
 
+  service.loadContainerFiles = function(containerId, file, path) {
+    var endpointID = EndpointProvider.endpointID();
+    return Upload.http({
+      url: 'api/endpoints/' + endpointID + '/docker/containers/' + containerId + '/archive?path=' + path,
+      headers : {
+        'Content-Type': file.type
+      },
+      method: 'PUT',
+      data: file,
+      ignoreLoadingBar: true,
+      transformResponse: genericHandler
+    });
+  };
+
   service.createSchedule = function(payload) {
     return Upload.upload({
       url: 'api/schedules?method=file',

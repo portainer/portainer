@@ -75,6 +75,18 @@ angular.module('portainer.docker', ['portainer.app'])
     }
   };
 
+  var containerFilesImport = {
+    name: 'docker.containers.container.import',
+    url: '/import',
+    views: {
+      'content@': {
+        templateUrl: './views/containers/import/containerImportFiles.html',
+        controller: 'ContainerImportFilesController',
+        controllerAs: 'ctrl'
+      }
+    }
+  };
+
   var containerAttachConsole = {
     name: 'docker.containers.container.attach',
     url: '/attach',
@@ -484,6 +496,7 @@ angular.module('portainer.docker', ['portainer.app'])
   $stateRegistryProvider.register(configCreation);
   $stateRegistryProvider.register(containers);
   $stateRegistryProvider.register(container);
+  $stateRegistryProvider.register(containerFilesImport);
   $stateRegistryProvider.register(containerExecConsole);
   $stateRegistryProvider.register(containerAttachConsole);
   $stateRegistryProvider.register(containerCreation);

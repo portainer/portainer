@@ -1,8 +1,8 @@
 import { ContainerDetailsViewModel, ContainerViewModel, ContainerStatsViewModel } from '../models/container';
 
 angular.module('portainer.docker')
-.factory('ContainerService', ['$q', 'Container', 'ResourceControlService', 'LogHelper', '$timeout',
-function ContainerServiceFactory($q, Container, ResourceControlService, LogHelper, $timeout) {
+.factory('ContainerService', ['$q', 'Container', 'ResourceControlService', 'LogHelper', '$timeout', 'FileUploadService',
+function ContainerServiceFactory($q, Container, ResourceControlService, LogHelper, $timeout, FileUploadService) {
   'use strict';
   var service = {};
 
@@ -207,6 +207,10 @@ function ContainerServiceFactory($q, Container, ResourceControlService, LogHelpe
 
   service.prune = function(filters) {
     return Container.prune({ filters: filters }).$promise;
+  };
+
+  service.uploadFiles = function(containerId, file, path) {
+    return FileUploadService.loadContainerFiles(containerId, file, path);
   };
 
   return service;

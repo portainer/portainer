@@ -6,7 +6,7 @@
   </rd-header-content>
 </rd-header>
 
-  <div class="row" authorization="DockerContainerStart, DockerContainerStop, DockerContainerKill, DockerContainerRestart, DockerContainerPause, DockerContainerUnpause, DockerContainerDelete, DockerContainerCreate">
+  <div class="row" authorization="DockerContainerStart, DockerContainerStop, DockerContainerKill, DockerContainerRestart, DockerContainerPause, DockerContainerUnpause, DockerContainerDelete, DockerContainerCreate, DockerContainerPutContainerArchive">
     <div class="col-lg-12 col-md-12 col-xs-12">
       <rd-widget>
         <rd-widget-header icon="fa-cogs" title-text="Actions"></rd-widget-header>
@@ -26,6 +26,9 @@
               <span ng-show="state.recreateContainerInProgress">Recreation in progress...</span>
             </button>
             <a class="btn btn-primary btn-sm" type="button" ui-sref="docker.containers.new({ from: container.Id, nodeName: nodeName })"><i class="fa fa-copy space-right" aria-hidden="true"></i>Duplicate/Edit</a>
+          </div>
+          <div class="btn-group" role="group" aria-label="...">
+            <a class="btn btn-primary btn-sm" type="button" authorization="DockerContainerPutContainerArchive" ui-sref="docker.containers.container.import({})"><i class="fa fa-upload space-right" aria-hidden="true"></i>Import files</a>
           </div>
         </rd-widget-body>
       </rd-widget>
