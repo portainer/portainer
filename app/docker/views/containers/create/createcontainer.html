@@ -307,8 +307,17 @@
                   </span>
                 </div>
                 <!-- volumes-input-list -->
-                <div class="form-inline" style="margin-top: 10px;">
                   <div ng-repeat="volume in formValues.Volumes">
+                      <div class="form-inline" >
+                              <div class="col-sm-12" style="margin-top: 10px;">
+                                <label class="control-label text-left">
+                                  Inherit SELinux labels from Host system?
+                                  <portainer-tooltip position="bottom" message="By adding the z flag to your mount the SELinux labels, will also be available inside the Container"></portainer-tooltip>
+                                </label>
+                                <label class="switch" style="margin-left: 20px;">
+                                  <input type="checkbox" ng-model="volume.zFlag"><i></i>
+                                </label>
+                              </div>
                     <!-- volume-line1 -->
                     <div class="col-sm-12 form-inline" style="margin-top: 10px;">
                       <!-- container-path -->
@@ -353,7 +362,7 @@
                         <div class="btn-group btn-group-sm">
                           <label class="btn btn-primary" ng-model="volume.readOnly" uib-btn-radio="false">Writable</label>
                           <label class="btn btn-primary" ng-model="volume.readOnly" uib-btn-radio="true">Read-only</label>
-                        </div>
+                        </div> 
                       </div>
                       <!-- !read-only -->
                     </div>

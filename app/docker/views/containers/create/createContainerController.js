@@ -180,8 +180,14 @@ function ($q, $scope, $async, $state, $timeout, $transition$, $filter, Container
       if (name && containerPath) {
         var bind = name + ':' + containerPath;
         volumes[containerPath] = {};
+        if(volume.readOnly || volume.zFlag){
+          bind += ':';
+        }
         if (volume.readOnly) {
-          bind += ':ro';
+          bind += 'ro';
+        }
+        if (volume.zFlag) {
+          bind += 'z';
         }
         binds.push(bind);
       }
