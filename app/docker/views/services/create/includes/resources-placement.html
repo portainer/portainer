@@ -68,6 +68,40 @@
     </div>
   </div>
   <!-- !cpu-limit-input -->
+
+  <!-- Generic-resource -->
+  <div class="form-group">
+    <div class="col-sm-12" style="margin-top: 5px;">
+      <label class="control-label text-left">Generic resources</label>
+      <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addGenericResource()">
+        <i class="fa fa-plus-circle" aria-hidden="true"></i> Generic resources
+      </span>
+    </div>
+    <div class="col-sm-12 form-inline" style="margin-top: 10px;">
+      <div ng-repeat="resource in formValues.GenericResources" style="margin-top: 2px;">
+        <div class="input-group col-sm-2 input-group-sm">
+          <select name="resourceSpec" class="form-control" ng-model="resource.spec">
+            <option value="NamedResourceSpec" ng-selected="true">Named resource spec</option>
+            <option value="DiscreteResourceSpec">Discrete resource spec</option>
+          </select>
+        </div>
+        <div class="input-group col-sm-4 input-group-sm">
+          <span class="input-group-addon">name</span>
+          <input type="text" class="form-control" ng-model="resource.key" placeholder="e.g. gpu">
+        </div>
+        <div class="input-group col-sm-4 input-group-sm">
+          <span class="input-group-addon">value</span>
+          <input type="text" class="form-control" ng-model="resource.value" placeholder="3" ng-if="resource.spec==='DiscreteResourceSpec'">
+          <input type="text" class="form-control" ng-model="resource.value" placeholder="UUID0" ng-if="resource.spec==='NamedResourceSpec'">
+        </div>
+        <button class="btn btn-sm btn-danger" type="button" ng-click="removeGenericResource($index)">
+          <i class="fa fa-trash" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- !Generic-resource -->
+
   <div class="col-sm-12 form-section-title">
     Placement
   </div>

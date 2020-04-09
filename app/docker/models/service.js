@@ -23,12 +23,14 @@ export function ServiceViewModel(data, runningTasks, allTasks) {
   }
   if (data.Spec.TaskTemplate.Resources) {
     if (data.Spec.TaskTemplate.Resources.Limits) {
-    this.LimitNanoCPUs = data.Spec.TaskTemplate.Resources.Limits.NanoCPUs;
-    this.LimitMemoryBytes = data.Spec.TaskTemplate.Resources.Limits.MemoryBytes;
+      this.LimitNanoCPUs = data.Spec.TaskTemplate.Resources.Limits.NanoCPUs;
+      this.LimitMemoryBytes = data.Spec.TaskTemplate.Resources.Limits.MemoryBytes;
+      this.GenericResources = data.Spec.TaskTemplate.Resources.Limits.GenericResources;
     }
     if (data.Spec.TaskTemplate.Resources.Reservations) {
-    this.ReservationNanoCPUs = data.Spec.TaskTemplate.Resources.Reservations.NanoCPUs;
-    this.ReservationMemoryBytes = data.Spec.TaskTemplate.Resources.Reservations.MemoryBytes;
+      this.ReservationNanoCPUs = data.Spec.TaskTemplate.Resources.Reservations.NanoCPUs;
+      this.ReservationMemoryBytes = data.Spec.TaskTemplate.Resources.Reservations.MemoryBytes;
+      this.GenericResources = data.Spec.TaskTemplate.Resources.Reservations.GenericResources;
     }
   }
 
