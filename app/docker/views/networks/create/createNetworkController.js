@@ -25,6 +25,7 @@ angular.module('portainer.docker')
       $scope.availableNetworkDrivers = [];
 
       $scope.config = {
+        Scope: 'local',
         Driver: 'bridge',
         CheckDuplicate: true,
         Internal: false,
@@ -204,12 +205,20 @@ angular.module('portainer.docker')
       function initView() {
         var apiVersion = $scope.applicationState.endpoint.apiVersion;
 
-        PluginService.networkPlugins(apiVersion < 1.25)
+        PluginService.networkDrivers(apiVersion < 1.25)
           .then(function success(data) {
             $scope.availableNetworkDrivers = data;
           })
           .catch(function error(err) {
             Notifications.error('Failure', err, 'Unable to retrieve network drivers');
+          });
+
+        PluginService.networkScopes(apiVersion < 1.30)
+          .then(function success(data) {
+            $scope.availableNetworkScopes = data;
+          })
+          .catch(function error(err) {
+            Notifications.error('Failure', err, 'Unable to retrieve network scopes');
           });
       }
 
