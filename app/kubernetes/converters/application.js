@@ -129,6 +129,7 @@ class KubernetesApplicationConverter {
     res.DataAccessPolicy = KubernetesApplicationDataAccessPolicies.ISOLATED;
     res.RunningPodsCount = data.status.replicas || 0;
     res.TotalPodsCount = data.spec.replicas;
+    res.HeadlessServiceName = data.spec.serviceName;
     return res;
   }
 }

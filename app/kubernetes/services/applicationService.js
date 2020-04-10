@@ -12,7 +12,6 @@ import KubernetesStatefulSetConverter from 'Kubernetes/converters/statefulSet';
 import KubernetesServiceConverter from 'Kubernetes/converters/service';
 import KubernetesApplicationConverter from 'Kubernetes/converters/application';
 import KubernetesPersistentVolumeClaimConverter from 'Kubernetes/converters/persistentVolumeClaim';
-import KubernetesServiceHelper from 'Kubernetes/helpers/serviceHelper';
 
 class KubernetesApplicationService {
   /* @ngInject */
@@ -216,9 +215,8 @@ class KubernetesApplicationService {
         Name: application.Name,
         StackName: application.StackName
       };
-
       const headlessServicePayload = angular.copy(payload);
-      headlessServicePayload.Name = KubernetesServiceHelper.generateHeadlessServiceName(application.Name);
+
       switch (application.ApplicationType) {
         case KubernetesApplicationTypes.DEPLOYMENT:
           await this.KubernetesDeploymentService.patch(payload);
@@ -227,6 +225,7 @@ class KubernetesApplicationService {
           await this.KubernetesDaemonSetService.patch(payload);
           break;
         case KubernetesApplicationTypes.STATEFULSET:
+          headlessServicePayload.Name = application.HeadlessServiceName;
           await this.KubernetesStatefulSetService.patch(payload);
           await this.KubernetesServiceService.patch(headlessServicePayload);
           break;
@@ -255,7 +254,6 @@ class KubernetesApplicationService {
         Name: application.Name
       };
       const headlessServicePayload = angular.copy(payload);
-      headlessServicePayload.Name = KubernetesServiceHelper.generateHeadlessServiceName(application.Name);
 
       switch (application.ApplicationType) {
         case KubernetesApplicationTypes.DEPLOYMENT:
@@ -265,6 +263,7 @@ class KubernetesApplicationService {
           await this.KubernetesDaemonSetService.delete(payload);
           break;
         case KubernetesApplicationTypes.STATEFULSET:
+          headlessServicePayload.Name = application.HeadlessServiceName;
           await this.KubernetesStatefulSetService.delete(payload);
           await this.KubernetesServiceService.delete(headlessServicePayload);
           break;

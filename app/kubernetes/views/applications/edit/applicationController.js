@@ -39,11 +39,11 @@ class KubernetesApplicationController {
   }
 
   hasPersistedFolders() {
-    return this.application.PersistedFolders.length;
+    return this.application && this.application.PersistedFolders.length;
   }
 
   hasVolumeConfiguration() {
-    return this.application.ConfigurationVolumes.length;
+    return this.application && this.application.ConfigurationVolumes.length;
   }
 
   hasEventWarnings() {

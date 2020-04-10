@@ -46,6 +46,7 @@ const _KubernetesApplication = Object.freeze({
   Limits: [],
   ServiceType: '',
   ServiceId: '',
+  HeadlessServiceName: undefined, // only used for StatefulSet
   PublishedPorts: [],
   Volumes: [],
   Env: [],
