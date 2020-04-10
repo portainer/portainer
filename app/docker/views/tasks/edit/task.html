@@ -18,7 +18,9 @@
             </tr>
             <tr>
               <td>State</td>
-              <td><span class="label label-{{ task.Status.State|taskstatusbadge }}">{{ task.Status.State }}</span></td>
+              <td
+                ><span class="label label-{{ task.Status.State | taskstatusbadge }}">{{ task.Status.State }}</span></td
+              >
             </tr>
             <tr>
               <td>State Message</td>
@@ -26,7 +28,9 @@
             </tr>
             <tr ng-if="task.Status.Err">
               <td>Error message</td>
-              <td><code>{{ task.Status.Err }}</code></td>
+              <td
+                ><code>{{ task.Status.Err }}</code></td
+              >
             </tr>
             <tr>
               <td>Image</td>
@@ -38,14 +42,18 @@
             </tr>
             <tr>
               <td>Created</td>
-              <td>{{ task.Created|getisodate }}</td>
+              <td>{{ task.Created | getisodate }}</td>
             </tr>
             <tr ng-if="task.Status.ContainerStatus.ContainerID">
               <td>Container ID</td>
               <td>{{ task.Status.ContainerStatus.ContainerID }}</td>
             </tr>
-            <tr ng-if="applicationState.endpoint.apiVersion >= 1.30 && task.Status.State|taskhaslogs">
-              <td colspan="2"><a class="btn btn-primary btn-sm" type="button" ui-sref="docker.tasks.task.logs({id: task.Id})"><i class="fa fa-file-alt space-right" aria-hidden="true"></i>Task logs</a></td>
+            <tr ng-if="applicationState.endpoint.apiVersion >= 1.3 && task.Status.State | taskhaslogs">
+              <td colspan="2"
+                ><a class="btn btn-primary btn-sm" type="button" ui-sref="docker.tasks.task.logs({id: task.Id})"
+                  ><i class="fa fa-file-alt space-right" aria-hidden="true"></i>Task logs</a
+                ></td
+              >
             </tr>
           </tbody>
         </table>

@@ -1,7 +1,8 @@
 <rd-header>
   <rd-header-title title-text="Snasphot details"></rd-header-title>
   <rd-header-content>
-    <a ui-sref="docker.volumes">Volumes</a> &gt; <a ui-sref="docker.volumes.volume({id: volumeId})">{{ volumeId }}</a> &gt; Snapshots &gt; <a ui-sref="docker.volumes.volume.snapshot({id: snapshot.Id})">{{ snapshot.Id }}</a>
+    <a ui-sref="docker.volumes">Volumes</a> &gt; <a ui-sref="docker.volumes.volume({id: volumeId})">{{ volumeId }}</a> &gt; Snapshots &gt;
+    <a ui-sref="docker.volumes.volume.snapshot({id: snapshot.Id})">{{ snapshot.Id }}</a>
   </rd-header-content>
 </rd-header>
 
@@ -16,9 +17,7 @@
               <td>ID</td>
               <td>
                 {{ snapshot.Id }}
-                <button class="btn btn-xs btn-danger" ng-click="removeSnapshot()">
-                  <i class="fa fa-trash space-right" aria-hidden="true"></i>Remove snapshot
-                </button>
+                <button class="btn btn-xs btn-danger" ng-click="removeSnapshot()"> <i class="fa fa-trash space-right" aria-hidden="true"></i>Remove snapshot </button>
               </td>
             </tr>
             <tr>

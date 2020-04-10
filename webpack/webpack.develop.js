@@ -12,18 +12,18 @@ module.exports = webpackMerge(commonConfig, {
           {
             loader: 'file-loader',
             // options: { limit: 25000 }
-          }
-        ]
-      }
-    ]
+          },
+        ],
+      },
+    ],
   },
   devServer: {
     contentBase: path.join(__dirname, '.tmp'),
     compress: true,
     port: 8999,
-    proxy:{
-      '/api': 'http://localhost:9000'
+    proxy: {
+      '/api': 'http://localhost:9000',
     },
     open: true,
-  }
+  },
 });

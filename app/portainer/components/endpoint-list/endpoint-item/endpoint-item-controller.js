@@ -23,7 +23,7 @@ class EndpointItemController {
     }
 
     const tagNames = PortainerEndpointTagHelper.idsToTagNames(this.tags, this.model.TagIds);
-    return _.join(tagNames, ',')
+    return _.join(tagNames, ',');
   }
 
   $onInit() {

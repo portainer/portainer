@@ -4,9 +4,7 @@
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
-  <rd-header-content>
-    <a ui-sref="docker.swarm">Swarm</a> &gt; <a ui-sref="docker.swarm.visualizer">Cluster visualizer</a>
-  </rd-header-content>
+  <rd-header-content> <a ui-sref="docker.swarm">Swarm</a> &gt; <a ui-sref="docker.swarm.visualizer">Cluster visualizer</a> </rd-header-content>
 </rd-header>
 
 <div class="row">
@@ -45,16 +43,14 @@
                 Only display running tasks
               </label>
               <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" ng-model="state.DisplayOnlyRunningTasks" ng-change="changeDisplayOnlyRunningTasks()"><i></i>
+                <input type="checkbox" ng-model="state.DisplayOnlyRunningTasks" ng-change="changeDisplayOnlyRunningTasks()" /><i></i>
               </label>
             </div>
             <div class="col-sm-12">
               <label class="control-label text-left">
                 Display node labels
               </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" ng-model="state.DisplayNodeLabels" ng-change="changeDisplayNodeLabels()"><i></i>
-              </label>
+              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="state.DisplayNodeLabels" ng-change="changeDisplayNodeLabels()" /><i></i> </label>
             </div>
           </div>
         </form>
@@ -101,22 +97,26 @@
               </div>
               <div>{{ node.Role }}</div>
               <div>CPU: {{ node.CPUs / 1000000000 }}</div>
-              <div>Memory: {{ node.Memory|humansize: 2 }}</div>
-              <div><span class="label label-{{ node.Status | nodestatusbadge }}">{{ node.Status }}</span></div>
+              <div>Memory: {{ node.Memory | humansize: 2 }}</div>
+              <div
+                ><span class="label label-{{ node.Status | nodestatusbadge }}">{{ node.Status }}</span></div
+              >
               <div class="node_labels" ng-if="node.Labels.length > 0 && state.DisplayNodeLabels">
                 <div>Labels</div>
                 <div class="node_label" ng-repeat="label in node.Labels">
                   <span class="label_key">
                     {{ label.key }}
                   </span>
-                  <span class="label_value" ng-if="label.value">
-                    = {{ label.value }}
-                  </span>
+                  <span class="label_value" ng-if="label.value"> = {{ label.value }} </span>
                 </div>
               </div>
             </div>
             <div class="tasks">
-              <div class="task task_{{ task.Status.State | visualizerTask }}" style="border: 2px solid {{ task.ServiceId | visualizerTaskBorderColor }}" ng-repeat="task in node.Tasks | orderBy: 'ServiceName' | filter: (state.DisplayOnlyRunningTasks || '') && { Status: { State: 'running' } }">
+              <div
+                class="task task_{{ task.Status.State | visualizerTask }}"
+                style="border: 2px solid {{ task.ServiceId | visualizerTaskBorderColor }}"
+                ng-repeat="task in node.Tasks | orderBy: 'ServiceName' | filter: (state.DisplayOnlyRunningTasks || '') && { Status: { State: 'running' } }"
+              >
                 <div class="service_name">{{ task.ServiceName }}</div>
                 <div>Image: {{ task.Spec.ContainerSpec.Image | hideshasum }}</div>
                 <div>Status: {{ task.Status.State }}</div>

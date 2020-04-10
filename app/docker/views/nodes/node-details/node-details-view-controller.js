@@ -1,5 +1,11 @@
 angular.module('portainer.docker').controller('NodeDetailsViewController', [
-  '$q', '$stateParams', 'NodeService', 'StateManager', 'AgentService', 'ContainerService', 'Authentication',
+  '$q',
+  '$stateParams',
+  'NodeService',
+  'StateManager',
+  'AgentService',
+  'ContainerService',
+  'Authentication',
   function NodeDetailsViewController($q, $stateParams, NodeService, StateManager, AgentService, ContainerService, Authentication) {
     var ctrl = this;
 
@@ -7,7 +13,7 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
 
     ctrl.state = {
       isAgent: false,
-      isAdmin: false
+      isAdmin: false,
     };
 
     function initView() {
@@ -21,9 +27,8 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
       var nodeId = $stateParams.id;
       $q.all({
         node: NodeService.node(nodeId),
-        jobs: fetchJobs ? ContainerService.containers(true, { label: ['io.portainer.job.endpoint'] }) : []
-      })
-      .then(function (data) {
+        jobs: fetchJobs ? ContainerService.containers(true, { label: ['io.portainer.job.endpoint'] }) : [],
+      }).then(function (data) {
         var node = data.node;
         ctrl.originalNode = node;
         ctrl.hostDetails = buildHostDetails(node);
@@ -37,8 +42,7 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
             return;
           }
 
-          AgentService.hostInfo(node.Hostname)
-          .then(function onHostInfoLoad(agentHostInfo) {
+          AgentService.hostInfo(node.Hostname).then(function onHostInfoLoad(agentHostInfo) {
             ctrl.devices = agentHostInfo.PCIDevices;
             ctrl.disks = agentHostInfo.PhysicalDisks;
           });
@@ -50,11 +54,11 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
       return {
         os: {
           arch: node.PlatformArchitecture,
-          type: node.PlatformOS
+          type: node.PlatformOS,
         },
         name: node.Hostname,
         totalCPU: node.CPUs / 1e9,
-        totalMemory: node.Memory
+        totalMemory: node.Memory,
       };
     }
 
@@ -74,18 +78,18 @@ angular.module('portainer.docker').controller('NodeDetailsViewController', [
         managerAddress: node.ManagerAddr,
         availability: node.Availability,
         status: node.Status,
-        nodeLabels: node.Labels
+        nodeLabels: node.Labels,
       };
     }
 
     function transformPlugins(pluginsList, type) {
       return pluginsList
-      .filter(function(plugin) {
-        return plugin.Type === type;
-      })
-      .map(function(plugin) {
-        return plugin.Name;
-      });
+        .filter(function (plugin) {
+          return plugin.Type === type;
+        })
+        .map(function (plugin) {
+          return plugin.Name;
+        });
     }
-  }
+  },
 ]);

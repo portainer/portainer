@@ -5,6 +5,6 @@ angular.module('portainer.app').component('tagSelector', {
     tags: '<',
     model: '=',
     onCreate: '<',
-    allowCreate: '<'
+    allowCreate: '<',
   },
 });

@@ -1,8 +1,7 @@
 <rd-header>
   <rd-header-title title-text="Node details"></rd-header-title>
   <rd-header-content>
-    <a ui-sref="storidge.cluster">Storidge</a> &gt; <a
-      ui-sref="storidge.cluster.node({id: node.Name})">{{ node.Name }}</a>
+    <a ui-sref="storidge.cluster">Storidge</a> &gt; <a ui-sref="storidge.cluster.node({id: node.Name})">{{ node.Name }}</a>
   </rd-header-content>
 </rd-header>
 
@@ -10,16 +9,13 @@
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
       <rd-widget-header icon="fa-object-group" title-text="Node details">
-        <button type="button" class="btn btn-sm btn-danger"
-          ng-disabled="(node.Status | lowercase) !== 'normal'" ng-click="removeNodeAction()">
+        <button type="button" class="btn btn-sm btn-danger" ng-disabled="(node.Status | lowercase) !== 'normal'" ng-click="removeNodeAction()">
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove node
         </button>
-        <button type="button" class="btn btn-sm btn-primary"
-          ng-disabled="(node.Status | lowercase) !== 'normal'" ng-click="cordonNodeAction()">
+        <button type="button" class="btn btn-sm btn-primary" ng-disabled="(node.Status | lowercase) !== 'normal'" ng-click="cordonNodeAction()">
           <i class="fas fa-wrench space-right" aria-hidden="true"></i>Enter maintenance mode
         </button>
-        <button type="button" class="btn btn-sm btn-primary"
-          ng-disabled="(node.Status | lowercase) !== 'cordoned'" ng-click="uncordonNodeAction()">
+        <button type="button" class="btn btn-sm btn-primary" ng-disabled="(node.Status | lowercase) !== 'cordoned'" ng-click="uncordonNodeAction()">
           <i class="fa fa-power-off space-right" aria-hidden="true"></i>Exit maintenance mode
         </button>
       </rd-widget-header>

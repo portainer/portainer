@@ -3,7 +3,7 @@
   <div class="form-group">
     <label for="job_image" class="col-sm-1 control-label text-left">Image</label>
     <div class="col-sm-11">
-      <input type="text" class="form-control" ng-model="$ctrl.formValues.Image" id="job_image" name="job_image" placeholder="e.g. ubuntu:latest" required auto-focus>
+      <input type="text" class="form-control" ng-model="$ctrl.formValues.Image" id="job_image" name="job_image" placeholder="e.g. ubuntu:latest" required auto-focus />
     </div>
   </div>
   <div class="form-group" ng-show="executeJobForm.job_image.$invalid">
@@ -25,10 +25,10 @@
     Job creation
   </div>
   <div class="form-group"></div>
-  <div class="form-group" style="margin-bottom: 0">
+  <div class="form-group" style="margin-bottom: 0;">
     <div class="boxselector_wrapper">
       <div>
-        <input type="radio" id="method_editor" ng-model="$ctrl.state.Method" value="editor">
+        <input type="radio" id="method_editor" ng-model="$ctrl.state.Method" value="editor" />
         <label for="method_editor">
           <div class="boxselector_header">
             <i class="fa fa-edit" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -38,7 +38,7 @@
         </label>
       </div>
       <div>
-        <input type="radio" id="method_upload" ng-model="$ctrl.state.Method" value="upload">
+        <input type="radio" id="method_upload" ng-model="$ctrl.state.Method" value="upload" />
         <label for="method_upload">
           <div class="boxselector_header">
             <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -57,11 +57,7 @@
     </div>
     <div class="form-group">
       <div class="col-sm-12">
-        <code-editor
-          identifier="execute-job-editor"
-          placeholder="# Define or paste the content of your script file here"
-          on-change="$ctrl.editorUpdate">
-        </code-editor>
+        <code-editor identifier="execute-job-editor" placeholder="# Define or paste the content of your script file here" on-change="($ctrl.editorUpdate)"> </code-editor>
       </div>
     </div>
   </div>
@@ -93,11 +89,14 @@
   </div>
   <div class="form-group">
     <div class="col-sm-12">
-      <button type="button" class="btn btn-primary btn-sm"
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
         ng-disabled="$ctrl.state.actionInProgress || !executeJobForm.$valid
         || ($ctrl.state.Method === 'upload' && !$ctrl.formValues.JobFile)"
         ng-click="$ctrl.executeJob()"
-        button-spinner="$ctrl.state.actionInProgress">
+        button-spinner="$ctrl.state.actionInProgress"
+      >
         <span ng-hide="$ctrl.state.actionInProgress">Execute</span>
         <span ng-show="$ctrl.state.actionInProgress">Starting job...</span>
       </button>
@@ -106,5 +105,5 @@
       </span>
     </div>
   </div>
-<!-- !actions -->
+  <!-- !actions -->
 </form>

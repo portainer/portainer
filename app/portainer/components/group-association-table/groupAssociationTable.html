@@ -2,11 +2,14 @@
   <table class="table table-hover">
     <div class="col-sm-12">
       <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-      <input type="text" class="searchInput"
+      <input
+        type="text"
+        class="searchInput"
         ng-model="$ctrl.paginationState.filter"
         ng-change="$ctrl.onTextFilterChange()"
         ng-model-options="{ debounce: 300 }"
-        placeholder="Search...">
+        placeholder="Search..."
+      />
     </div>
     <thead>
       <tr>
@@ -20,19 +23,23 @@
       </tr>
     </thead>
     <tbody>
-      <tr ng-if="!$ctrl.hasBackendPagination();"
+      <tr
+        ng-if="!$ctrl.hasBackendPagination();"
         ng-click="$ctrl.entryClick(item)"
         class="interactive"
         dir-paginate="item in $ctrl.dataset | filter:$ctrl.paginationState.filter | itemsPerPage: $ctrl.paginationState.limit"
-        pagination-id="$ctrl.tableType">
+        pagination-id="$ctrl.tableType"
+      >
         <td>{{ item.Name }}</td>
       </tr>
-      <tr ng-if="$ctrl.hasBackendPagination();"
+      <tr
+        ng-if="$ctrl.hasBackendPagination();"
         ng-click="$ctrl.entryClick(item)"
         class="interactive"
         dir-paginate="item in $ctrl.dataset | itemsPerPage: $ctrl.paginationState.limit"
         pagination-id="$ctrl.tableType"
-        total-items="$ctrl.paginationState.totalCount">
+        total-items="$ctrl.paginationState.totalCount"
+      >
         <td>{{ item.Name }}</td>
       </tr>
       <tr ng-if="!$ctrl.dataset">

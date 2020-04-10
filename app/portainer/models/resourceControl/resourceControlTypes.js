@@ -1,11 +1,11 @@
 export const ResourceControlTypeString = Object.freeze({
   CONFIG: 'config',
   CONTAINER: 'container',
-  NETWORK:'network',
-  SECRET:'secret',
-  SERVICE:'service',
-  STACK:'stack',
-  VOLUME:'volume'
+  NETWORK: 'network',
+  SECRET: 'secret',
+  SERVICE: 'service',
+  STACK: 'stack',
+  VOLUME: 'volume',
 });
 
 /**
@@ -18,5 +18,5 @@ export const ResourceControlTypeInt = Object.freeze({
   NETWORK: 4,
   SECRET: 5,
   STACK: 6,
-  CONFIG: 7
+  CONFIG: 7,
 });

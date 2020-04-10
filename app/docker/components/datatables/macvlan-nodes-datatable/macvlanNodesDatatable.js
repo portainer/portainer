@@ -10,6 +10,6 @@ angular.module('portainer.docker').component('macvlanNodesDatatable', {
     reverseOrder: '<',
     showIpAddressColumn: '<',
     accessToNodeDetails: '<',
-    state: '='
-  }
+    state: '=',
+  },
 });

@@ -1,12 +1,15 @@
 import _ from 'lodash-es';
 
 angular.module('portainer.agent').controller('HostBrowserController', [
-  'HostBrowserService', 'Notifications', 'FileSaver', 'ModalService',
+  'HostBrowserService',
+  'Notifications',
+  'FileSaver',
+  'ModalService',
   function HostBrowserController(HostBrowserService, Notifications, FileSaver, ModalService) {
     var ctrl = this;
     var ROOT_PATH = '/host';
     ctrl.state = {
-      path: ROOT_PATH
+      path: ROOT_PATH,
     };
 
     ctrl.goToParent = goToParent;
@@ -21,7 +24,7 @@ angular.module('portainer.agent').controller('HostBrowserController', [
 
     function getRelativePath(path) {
       path = path || ctrl.state.path;
-      var rootPathRegex = new RegExp('^' + ROOT_PATH + '\/?');
+      var rootPathRegex = new RegExp('^' + ROOT_PATH + '/?');
       var relativePath = path.replace(rootPathRegex, '/');
       return relativePath;
     }
@@ -71,7 +74,7 @@ angular.module('portainer.agent').controller('HostBrowserController', [
       HostBrowserService.get(filePath)
         .then(function onFileReceived(data) {
           var downloadData = new Blob([data.file], {
-            type: 'text/plain;charset=utf-8'
+            type: 'text/plain;charset=utf-8',
           });
           FileSaver.saveAs(downloadData, file);
         })
@@ -83,15 +86,12 @@ angular.module('portainer.agent').controller('HostBrowserController', [
     function confirmDeleteFile(name) {
       var filePath = buildPath(ctrl.state.path, name);
 
-      ModalService.confirmDeletion(
-        'Are you sure that you want to delete ' + getRelativePath(filePath) + ' ?',
-        function onConfirm(confirmed) {
-          if (!confirmed) {
-            return;
-          }
-          return deleteFile(filePath);
+      ModalService.confirmDeletion('Are you sure that you want to delete ' + getRelativePath(filePath) + ' ?', function onConfirm(confirmed) {
+        if (!confirmed) {
+          return;
         }
-      );
+        return deleteFile(filePath);
+      });
     }
 
     function deleteFile(path) {
@@ -145,5 +145,5 @@ angular.module('portainer.agent').controller('HostBrowserController', [
     function refreshList() {
       getFilesForPath(ctrl.state.path);
     }
-  }
+  },
 ]);

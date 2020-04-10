@@ -3,6 +3,6 @@ angular.module('portainer.app').component('productList', {
   bindings: {
     titleText: '@',
     products: '<',
-    goTo: '<'
-  }
+    goTo: '<',
+  },
 });

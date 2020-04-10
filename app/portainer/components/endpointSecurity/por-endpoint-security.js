@@ -7,6 +7,6 @@ angular.module('portainer.app').component('porEndpointSecurity', {
     formData: '=',
     // The component will use this object to initialize the default values
     // if present.
-    endpoint: '<'
-  }
+    endpoint: '<',
+  },
 });

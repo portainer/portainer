@@ -4,9 +4,7 @@
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
-  <rd-header-content>
-    <a ui-sref="storidge.cluster">Storidge</a> &gt; <a ui-sref="storidge.monitor">Cluster monitoring</a>
-  </rd-header-content>
+  <rd-header-content> <a ui-sref="storidge.cluster">Storidge</a> &gt; <a ui-sref="storidge.monitor">Cluster monitoring</a> </rd-header-content>
 </rd-header>
 
 <div class="row">
@@ -28,7 +26,7 @@
                 <td>Provisioned capacity</td>
                 <td>
                   {{ info.ProvisionedCapacity | humansize }}
-                  <span ng-if="+(info.ProvisionedCapacity) >= +(info.TotalCapacity)">
+                  <span ng-if="+info.ProvisionedCapacity >= +info.TotalCapacity">
                     <i class="fa fa-exclamation-triangle red-icon" aria-hidden="true" style="margin-left: 2px;"></i>
                   </span>
                 </td>
@@ -61,7 +59,7 @@
                 <td>Provisioned IOPS</td>
                 <td>
                   {{ info.ProvisionedIOPS | number }}
-                  <span ng-if="+(info.ProvisionedIOPS) >= +(info.TotalIOPS)">
+                  <span ng-if="+info.ProvisionedIOPS >= +info.TotalIOPS">
                     <i class="fa fa-exclamation-triangle red-icon" aria-hidden="true" style="margin-left: 2px;"></i>
                   </span>
                 </td>
@@ -94,7 +92,7 @@
                 <td>Provisioned bandwidth</td>
                 <td>
                   {{ info.ProvisionedBandwidth | humansize }}
-                  <span ng-if="+(info.ProvisionedBandwidth) >= +(info.TotalBandwidth)">
+                  <span ng-if="+info.ProvisionedBandwidth >= +info.TotalBandwidth">
                     <i class="fa fa-exclamation-triangle red-icon" aria-hidden="true" style="margin-left: 2px;"></i>
                   </span>
                 </td>
@@ -114,9 +112,12 @@
 <div class="row">
   <div class="col-sm-12">
     <storidge-cluster-events-datatable
-    title-text="Cluster events" title-icon="fa-history"
-    dataset="events" table-key="storidge_cluster_events"
-    order-by="Time"  reverse-order="true"
+      title-text="Cluster events"
+      title-icon="fa-history"
+      dataset="events"
+      table-key="storidge_cluster_events"
+      order-by="Time"
+      reverse-order="true"
     ></storidge-cluster-events-datatable>
   </div>
 </div>

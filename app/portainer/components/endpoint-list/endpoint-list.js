@@ -11,8 +11,8 @@ angular.module('portainer.app').component('endpointList', {
     snapshotAction: '<',
     showSnapshotAction: '<',
     editAction: '<',
-    isAdmin:'<',
+    isAdmin: '<',
     totalCount: '<',
-    retrievePage: '<'
-  }
+    retrievePage: '<',
+  },
 });

@@ -1,13 +1,11 @@
-import {EndpointGroupDefaultModel} from '../../../models/group';
+import { EndpointGroupDefaultModel } from '../../../models/group';
 
-angular.module('portainer.app')
-.controller('CreateGroupController', function CreateGroupController($async, $scope, $state, GroupService, TagService, Notifications) {
-
+angular.module('portainer.app').controller('CreateGroupController', function CreateGroupController($async, $scope, $state, GroupService, TagService, Notifications) {
   $scope.state = {
-    actionInProgress: false
+    actionInProgress: false,
   };
 
-  $scope.create = function() {
+  $scope.create = function () {
     var model = $scope.model;
 
     var associatedEndpoints = [];
@@ -18,43 +16,43 @@ angular.module('portainer.app')
 
     $scope.state.actionInProgress = true;
     GroupService.createGroup(model, associatedEndpoints)
-    .then(function success() {
-      Notifications.success('Group successfully created');
-      $state.go('portainer.groups', {}, {reload: true});
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to create group');
-    })
-    .finally(function final() {
-      $scope.state.actionInProgress = false;
-    });
+      .then(function success() {
+        Notifications.success('Group successfully created');
+        $state.go('portainer.groups', {}, { reload: true });
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to create group');
+      })
+      .finally(function final() {
+        $scope.state.actionInProgress = false;
+      });
   };
 
   $scope.onCreateTag = function onCreateTag(tagName) {
     return $async(onCreateTagAsync, tagName);
-  }
-  
+  };
+
   async function onCreateTagAsync(tagName) {
     try {
       const tag = await TagService.createTag(tagName);
       $scope.availableTags = $scope.availableTags.concat(tag);
       $scope.model.TagIds = $scope.model.TagIds.concat(tag.Id);
-    } catch(err) {
+    } catch (err) {
       Notifications.error('Failue', err, 'Unable to create tag');
     }
   }
 
   function initView() {
     TagService.tags()
-    .then((tags) => {
-      $scope.availableTags = tags;
-      $scope.associatedEndpoints = [];
-      $scope.model = new EndpointGroupDefaultModel();
-      $scope.loaded = true;
-    })
-    .catch((err) => {
-      Notifications.error('Failure', err, 'Unable to retrieve tags');
-    });
+      .then((tags) => {
+        $scope.availableTags = tags;
+        $scope.associatedEndpoints = [];
+        $scope.model = new EndpointGroupDefaultModel();
+        $scope.loaded = true;
+      })
+      .catch((err) => {
+        Notifications.error('Failure', err, 'Unable to retrieve tags');
+      });
   }
 
   initView();

@@ -5,14 +5,13 @@ import 'codemirror/addon/lint/lint.js';
 import 'codemirror/addon/lint/yaml-lint.js';
 import 'codemirror/addon/display/placeholder.js';
 
-angular.module('portainer.app')
-.factory('CodeMirrorService', function CodeMirrorService() {
+angular.module('portainer.app').factory('CodeMirrorService', function CodeMirrorService() {
   'use strict';
 
   var service = {};
 
   var codeMirrorGenericOptions = {
-    lineNumbers: true
+    lineNumbers: true,
   };
 
   var codeMirrorYAMLOptions = {
@@ -20,14 +19,14 @@ angular.module('portainer.app')
     gutters: ['CodeMirror-lint-markers'],
     lint: true,
     extraKeys: {
-      Tab: function(cm) {
+      Tab: function (cm) {
         var spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
         cm.replaceSelection(spaces);
-      }
-    }
+      },
+    },
   };
 
-  service.applyCodeMirrorOnElement = function(element, yamlLint, readOnly) {
+  service.applyCodeMirrorOnElement = function (element, yamlLint, readOnly) {
     var options = angular.copy(codeMirrorGenericOptions);
 
     if (yamlLint) {
