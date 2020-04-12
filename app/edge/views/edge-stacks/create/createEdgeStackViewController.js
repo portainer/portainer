@@ -1,8 +1,8 @@
 import angular from 'angular';
 
 class CreateEdgeStackViewController {
-  constructor($state, EdgeStackService, EdgeGroupService, Notifications, FormHelper) {
-    Object.assign(this, { $state, EdgeStackService, EdgeGroupService, Notifications, FormHelper });
+  constructor($state, EdgeStackService, EdgeGroupService, Notifications, FormHelper, $async) {
+    Object.assign(this, { $state, EdgeStackService, EdgeGroupService, Notifications, FormHelper, $async });
 
     this.formValues = {
       Name: '',
@@ -28,6 +28,7 @@ class CreateEdgeStackViewController {
     this.edgeGroups = null;
 
     this.createStack = this.createStack.bind(this);
+    this.createStackAsync = this.createStackAsync.bind(this);
     this.validateForm = this.validateForm.bind(this);
     this.createStackByMethod = this.createStackByMethod.bind(this);
     this.createStackFromFileContent = this.createStackFromFileContent.bind(this);
@@ -40,7 +41,11 @@ class CreateEdgeStackViewController {
     this.edgeGroups = await this.EdgeGroupService.groups();
   }
 
-  async createStack() {
+  createStack() {
+    return this.$async(this.createStackAsync)
+  }
+
+  async createStackAsync() {
     var name = this.formValues.Name;
     var method = this.state.Method;
 

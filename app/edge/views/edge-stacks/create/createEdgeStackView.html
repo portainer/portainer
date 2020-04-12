@@ -247,7 +247,7 @@
               || ($ctrl.state.Method === 'upload' && !$ctrl.formValues.StackFile)
               || ($ctrl.state.Method === 'repository' && ((!$ctrl.formValues.RepositoryURL || !$ctrl.formValues.ComposeFilePathInRepository) || ($ctrl.formValues.RepositoryAuthentication && (!$ctrl.formValues.RepositoryUsername || !$ctrl.formValues.RepositoryPassword))))
               || !$ctrl.formValues.Name"
-                ng-click="$ctrl.deployStack()"
+                ng-click="$ctrl.createStack()"
                 button-spinner="$ctrl.state.actionInProgress"
               >
                 <span ng-hide="$ctrl.state.actionInProgress">Deploy the stack</span>
