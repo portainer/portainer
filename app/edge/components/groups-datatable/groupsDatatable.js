@@ -10,6 +10,6 @@ angular.module('portainer.edge').component('edgeGroupsDatatable', {
     orderBy: '@',
     removeAction: '<',
     updateAction: '<',
-    reverseOrder: '<'
-  }
+    reverseOrder: '<',
+  },
 });
