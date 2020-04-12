@@ -4,15 +4,7 @@
       Name
     </label>
     <div class="col-sm-9 col-lg-10">
-      <input
-        type="text"
-        class="form-control"
-        id="group_name"
-        name="group_name"
-        ng-model="$ctrl.model.Name"
-        required
-        auto-focus
-      />
+      <input type="text" class="form-control" id="group_name" name="group_name" ng-model="$ctrl.model.Name" required auto-focus />
     </div>
   </div>
   <div class="form-group" ng-show="EdgeGroupForm.group_name.$invalid">
@@ -33,13 +25,7 @@
   <div class="form-group" style="margin-bottom: 0;">
     <div class="boxselector_wrapper">
       <div class="boxselector">
-        <input
-          type="radio"
-          id="static-group"
-          ng-model="$ctrl.model.Dynamic"
-          ng-value="false"
-          ng-checked="!$ctrl.model.Dynamic"
-        />
+        <input type="radio" id="static-group" ng-model="$ctrl.model.Dynamic" ng-value="false" ng-checked="!$ctrl.model.Dynamic" />
         <label for="static-group">
           <div class="boxselector_header">
             <i class="fa fa-list-ol" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -49,13 +35,7 @@
         </label>
       </div>
       <div class="boxselector">
-        <input
-          type="radio"
-          id="dynamic-group"
-          ng-model="$ctrl.model.Dynamic"
-          ng-value="true"
-          ng-checked="$ctrl.model.Dynamic"
-        />
+        <input type="radio" id="dynamic-group" ng-model="$ctrl.model.Dynamic" ng-value="true" ng-checked="$ctrl.model.Dynamic" />
         <label for="dynamic-group">
           <div class="boxselector_header">
             <i class="fa fa-tags" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -78,7 +58,7 @@
         endpoints="$ctrl.endpoints"
         groups="$ctrl.groups"
         tags="$ctrl.tags"
-        on-search="$ctrl.searchEndpoints"
+        on-search="($ctrl.searchEndpoints)"
       ></multi-endpoint-selector>
       <div class="form-group" ng-show="!$ctrl.model.Endpoints.length">
         <div class="col-sm-12 small text-warning" style="margin-top: 15px;">
@@ -92,9 +72,7 @@
       </div>
     </div>
     <div class="form-group" ng-if="$ctrl.noEndpoints">
-      <div class="col-sm-12 small text-muted">
-        No Edge endpoints available. Head over the <a ui-sref="portainer.endpoints">Endpoints view</a> to add endpoints.
-      </div>
+      <div class="col-sm-12 small text-muted"> No Edge endpoints available. Head over the <a ui-sref="portainer.endpoints">Endpoints view</a> to add endpoints. </div>
     </div>
   </div>
   <div ng-if="$ctrl.model.Dynamic">
