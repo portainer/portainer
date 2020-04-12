@@ -1,8 +1,7 @@
 <rd-header>
   <rd-header-title title-text="Endpoint access"></rd-header-title>
   <rd-header-content>
-    <a ui-sref="portainer.endpoints">Endpoints</a> &gt; <a
-      ui-sref="portainer.endpoints.endpoint({id: ctrl.endpoint.Id})">{{ ctrl.endpoint.Name }}</a> &gt; Access management
+    <a ui-sref="portainer.endpoints">Endpoints</a> &gt; <a ui-sref="portainer.endpoints.endpoint({id: ctrl.endpoint.Id})">{{ ctrl.endpoint.Name }}</a> &gt; Access management
   </rd-header-content>
 </rd-header>
 
@@ -38,6 +37,12 @@
   </div>
 </div>
 
-<por-access-management ng-if="ctrl.endpoint && ctrl.group" access-controlled-entity="ctrl.endpoint" action-in-progress="ctrl.state.actionInProgress"
-  entity-type="endpoint" inherit-from="ctrl.group" update-access="ctrl.updateAccess">
+<por-access-management
+  ng-if="ctrl.endpoint && ctrl.group"
+  access-controlled-entity="ctrl.endpoint"
+  action-in-progress="ctrl.state.actionInProgress"
+  entity-type="endpoint"
+  inherit-from="ctrl.group"
+  update-access="ctrl.updateAccess"
+>
 </por-access-management>

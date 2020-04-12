@@ -80,31 +80,31 @@
         </tr>
         <tr>
           <td>IP</td>
-          <td>{{ $ctrl.volume.IP}}</td>
+          <td>{{ $ctrl.volume.IP }}</td>
         </tr>
         <tr>
           <td>Drive Type</td>
-          <td>{{ $ctrl.volume.DriveType}}</td>
+          <td>{{ $ctrl.volume.DriveType }}</td>
         </tr>
         <tr>
           <td>Encryption</td>
-          <td>{{ $ctrl.volume.Encryption}}</td>
+          <td>{{ $ctrl.volume.Encryption }}</td>
         </tr>
         <tr>
           <td>Snapshot Enabled</td>
-          <td>{{ $ctrl.volume.SnapshotEnabled}}</td>
+          <td>{{ $ctrl.volume.SnapshotEnabled }}</td>
         </tr>
         <tr>
           <td>Snapshot Interval</td>
-          <td>{{ $ctrl.volume.SnapshotInterval}} minute(s)</td>
+          <td>{{ $ctrl.volume.SnapshotInterval }} minute(s)</td>
         </tr>
         <tr>
           <td>Max Snapshots</td>
-          <td>{{ $ctrl.volume.SnapshotMax}}</td>
+          <td>{{ $ctrl.volume.SnapshotMax }}</td>
         </tr>
         <tr>
           <td>Filesystem</td>
-          <td>{{ $ctrl.volume.Filesystem}}</td>
+          <td>{{ $ctrl.volume.Filesystem }}</td>
         </tr>
         <tr ng-if="$ctrl.volume.Labels">
           <td>Labels</td>
@@ -126,7 +126,7 @@
       <div class="form-group">
         <label for="volume_node" class="col-sm-2 col-lg-1 control-label text-left">Node</label>
         <div class="col-sm-10 col-lg-11">
-          <input type="text" class="form-control" ng-model="$ctrl.formValues.Node" name="volume_node" placeholder="2">
+          <input type="text" class="form-control" ng-model="$ctrl.formValues.Node" name="volume_node" placeholder="2" />
         </div>
       </div>
       <!-- !Node -->
@@ -134,7 +134,7 @@
       <div class="form-group">
         <label for="volume_capacity" class="col-sm-2 col-lg-1 control-label text-left">Capacity</label>
         <div class="col-sm-10 col-lg-11">
-          <input type="text" class="form-control" ng-model="$ctrl.formValues.Capacity" name="volume_capacity" placeholder="2">
+          <input type="text" class="form-control" ng-model="$ctrl.formValues.Capacity" name="volume_capacity" placeholder="2" />
         </div>
       </div>
       <!-- !Capacity -->
@@ -142,13 +142,13 @@
       <div class="form-group">
         <label for="min_iops" class="col-sm-2 col-lg-1 control-label text-left">Min IOPS</label>
         <div class="col-sm-10 col-lg-11">
-          <input type="number" class="form-control" ng-model="$ctrl.formValues.IOPSMin" name="min_iops" placeholder="100">
+          <input type="number" class="form-control" ng-model="$ctrl.formValues.IOPSMin" name="min_iops" placeholder="100" />
         </div>
       </div>
       <div class="form-group">
         <label for="max_iops" class="col-sm-2 col-lg-1 control-label text-left">Max IOPS</label>
         <div class="col-sm-10 col-lg-11">
-          <input type="number" class="form-control" ng-model="$ctrl.formValues.IOPSMax" name="max_iops" placeholder="2000">
+          <input type="number" class="form-control" ng-model="$ctrl.formValues.IOPSMax" name="max_iops" placeholder="2000" />
         </div>
       </div>
       <!-- !IOPS -->
@@ -156,13 +156,13 @@
       <div class="form-group">
         <label for="min_bandwidth" class="col-sm-2 col-lg-1 control-label text-left">Min Bandwidth</label>
         <div class="col-sm-10 col-lg-11">
-          <input type="number" class="form-control" ng-model="$ctrl.formValues.BandwidthMin" name="min_bandwidth" placeholder="100">
+          <input type="number" class="form-control" ng-model="$ctrl.formValues.BandwidthMin" name="min_bandwidth" placeholder="100" />
         </div>
       </div>
       <div class="form-group">
         <label for="max_bandwidth" class="col-sm-2 col-lg-1 control-label text-left">Max Bandwidth</label>
         <div class="col-sm-10 col-lg-11">
-          <input type="number" class="form-control" ng-model="$ctrl.formValues.BandwidthMax" name="max_bandwidth" placeholder="2000">
+          <input type="number" class="form-control" ng-model="$ctrl.formValues.BandwidthMax" name="max_bandwidth" placeholder="2000" />
         </div>
       </div>
       <!-- !Bandwidth -->
@@ -179,11 +179,11 @@
           <div ng-repeat="label in $ctrl.formValues.Labels" style="margin-top: 2px;">
             <div class="input-group col-sm-5 input-group-sm">
               <span class="input-group-addon">name</span>
-              <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. com.example.foo">
+              <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. com.example.foo" />
             </div>
             <div class="input-group col-sm-5 input-group-sm">
               <span class="input-group-addon">value</span>
-              <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar">
+              <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" />
             </div>
             <button class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removeLabel($index)">
               <i class="fa fa-trash" aria-hidden="true"></i>

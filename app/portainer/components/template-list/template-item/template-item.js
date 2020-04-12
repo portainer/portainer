@@ -5,6 +5,6 @@ angular.module('portainer.app').component('templateItem', {
     onSelect: '<',
     onDelete: '<',
     showUpdateAction: '<',
-    showDeleteAction: '<'
-  }
+    showDeleteAction: '<',
+  },
 });

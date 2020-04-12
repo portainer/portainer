@@ -11,6 +11,6 @@ angular.module('portainer.app').component('templateList', {
     showSwarmStacks: '<',
     showAddAction: '<',
     showUpdateAction: '<',
-    showDeleteAction: '<'
-  }
+    showDeleteAction: '<',
+  },
 });

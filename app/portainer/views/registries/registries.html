@@ -10,8 +10,7 @@
 <div class="row" ng-if="dockerhub && (!applicationState.application.authentication || isAdmin)">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-database" title-text="DockerHub">
-      </rd-widget-header>
+      <rd-widget-header icon="fa-database" title-text="DockerHub"> </rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <!-- note -->
@@ -28,9 +27,7 @@
                 Authentication
                 <portainer-tooltip position="bottom" message="Enable this option if you need to specify credentials to connect to push/pull private images."></portainer-tooltip>
               </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" ng-model="dockerhub.Authentication"><i></i>
-              </label>
+              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="dockerhub.Authentication" /><i></i> </label>
             </div>
           </div>
           <!-- !authentication-checkbox -->
@@ -40,7 +37,7 @@
             <div class="form-group">
               <label for="hub_username" class="col-sm-3 col-lg-2 control-label text-left">Username</label>
               <div class="col-sm-9 col-lg-10">
-                <input type="text" class="form-control" id="hub_username" ng-model="dockerhub.Username">
+                <input type="text" class="form-control" id="hub_username" ng-model="dockerhub.Username" />
               </div>
             </div>
             <!-- !credentials-user -->
@@ -48,7 +45,7 @@
             <div class="form-group">
               <label for="hub_password" class="col-sm-3 col-lg-2 control-label text-left">Password</label>
               <div class="col-sm-9 col-lg-10">
-                <input type="password" class="form-control" id="hub_password" ng-model="formValues.dockerHubPassword" placeholder="*******">
+                <input type="password" class="form-control" id="hub_password" ng-model="formValues.dockerHubPassword" placeholder="*******" />
               </div>
             </div>
             <!-- !credentials-password -->
@@ -56,7 +53,13 @@
           <!-- !authentication-credentials -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || dockerhub.Authentication && (!dockerhub.Username || !formValues.dockerHubPassword)" ng-click="updateDockerHub()" button-spinner="state.actionInProgress">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                ng-disabled="state.actionInProgress || dockerhub.Authentication && (!dockerhub.Username || !formValues.dockerHubPassword)"
+                ng-click="updateDockerHub()"
+                button-spinner="state.actionInProgress"
+              >
                 <span ng-hide="state.actionInProgress">Update</span>
                 <span ng-show="state.actionInProgress">Updating DockerHub settings...</span>
               </button>
@@ -71,13 +74,15 @@
 <div class="row">
   <div class="col-sm-12">
     <registries-datatable
-    title-text="Registries" title-icon="fa-database"
-    dataset="registries" table-key="registries"
-    order-by="Name"
-    access-management="!applicationState.application.authentication || isAdmin"
-    remove-action="removeAction"
-    registry-management="registryManagementAvailable"
-    can-browse="canBrowse"
+      title-text="Registries"
+      title-icon="fa-database"
+      dataset="registries"
+      table-key="registries"
+      order-by="Name"
+      access-management="!applicationState.application.authentication || isAdmin"
+      remove-action="removeAction"
+      registry-management="registryManagementAvailable"
+      can-browse="canBrowse"
     ></registries-datatable>
   </div>
 </div>

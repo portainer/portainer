@@ -6,6 +6,6 @@ angular.module('portainer.app').component('accessViewerDatatable', {
     titleIcon: '@',
     tableKey: '@',
     orderBy: '@',
-    dataset: '<'
-  }
+    dataset: '<',
+  },
 });

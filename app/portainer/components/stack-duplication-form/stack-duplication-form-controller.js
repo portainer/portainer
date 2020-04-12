@@ -5,12 +5,12 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
 
     ctrl.state = {
       duplicationInProgress: false,
-      migrationInProgress: false
+      migrationInProgress: false,
     };
 
     ctrl.formValues = {
       endpoint: null,
-      newName: ''
+      newName: '',
     };
 
     ctrl.isFormValidForDuplication = isFormValidForDuplication;
@@ -29,48 +29,38 @@ angular.module('portainer.app').controller('StackDuplicationFormController', [
 
     function duplicateStack() {
       if (!ctrl.formValues.newName) {
-        Notifications.error(
-          'Failure',
-          null,
-          'Stack name is required for duplication'
-        );
+        Notifications.error('Failure', null, 'Stack name is required for duplication');
         return;
       }
       ctrl.state.duplicationInProgress = true;
-      ctrl.onDuplicate({
+      ctrl
+        .onDuplicate({
           endpointId: ctrl.formValues.endpoint.Id,
-          name: ctrl.formValues.newName ? ctrl.formValues.newName : undefined
+          name: ctrl.formValues.newName ? ctrl.formValues.newName : undefined,
         })
-        .finally(function() {
+        .finally(function () {
           ctrl.state.duplicationInProgress = false;
         });
     }
 
     function migrateStack() {
       ctrl.state.migrationInProgress = true;
-      ctrl.onMigrate({
+      ctrl
+        .onMigrate({
           endpointId: ctrl.formValues.endpoint.Id,
-          name: ctrl.formValues.newName ? ctrl.formValues.newName : undefined
+          name: ctrl.formValues.newName ? ctrl.formValues.newName : undefined,
         })
-        .finally(function() {
+        .finally(function () {
           ctrl.state.migrationInProgress = false;
         });
     }
 
     function isMigrationButtonDisabled() {
-      return (
-        !ctrl.isFormValidForMigration() ||
-        ctrl.state.duplicationInProgress ||
-        ctrl.state.migrationInProgress ||
-        isTargetEndpointAndCurrentEquals()
-      );
+      return !ctrl.isFormValidForMigration() || ctrl.state.duplicationInProgress || ctrl.state.migrationInProgress || isTargetEndpointAndCurrentEquals();
     }
 
     function isTargetEndpointAndCurrentEquals() {
-      return (
-        ctrl.formValues.endpoint &&
-        ctrl.formValues.endpoint.Id === ctrl.currentEndpointId
-      );
+      return ctrl.formValues.endpoint && ctrl.formValues.endpoint.Id === ctrl.currentEndpointId;
     }
-  }
+  },
 ]);

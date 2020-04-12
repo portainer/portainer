@@ -7,7 +7,9 @@
           <tbody>
             <tr>
               <td>Version</td>
-              <td>{{ $ctrl.engine.releaseVersion }} <span ng-if="$ctrl.engine.apiVersion">(API: {{ $ctrl.engine.apiVersion }})</span></td>
+              <td
+                >{{ $ctrl.engine.releaseVersion }} <span ng-if="$ctrl.engine.apiVersion">(API: {{ $ctrl.engine.apiVersion }})</span></td
+              >
             </tr>
             <tr ng-if="$ctrl.engine.rootDirectory">
               <td>Root directory</td>
@@ -31,7 +33,7 @@
             </tr>
             <tr ng-if="$ctrl.engine.engineLabels.length">
               <td>Engine Labels</td>
-              <td>{{ $ctrl.engine.engineLabels | labelsToStr:', ' }}</td>
+              <td>{{ $ctrl.engine.engineLabels | labelsToStr: ', ' }}</td>
             </tr>
           </tbody>
         </table>

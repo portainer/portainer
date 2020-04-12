@@ -7,6 +7,6 @@ angular.module('portainer.app').component('codeEditor', {
     yml: '<',
     readOnly: '<',
     onChange: '<',
-    value: '<'
-  }
+    value: '<',
+  },
 });

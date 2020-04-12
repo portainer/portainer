@@ -1,7 +1,6 @@
 import angular from 'angular';
 
 class RolesController {
-
   /* @ngInject */
   constructor(Notifications, RoleService, ExtensionService) {
     this.Notifications = Notifications;

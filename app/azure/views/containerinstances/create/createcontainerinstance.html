@@ -1,8 +1,6 @@
 <rd-header>
   <rd-header-title title-text="Create container instance"></rd-header-title>
-  <rd-header-content>
-    <a ui-sref="azure.containerinstances">Container instances</a> &gt; Add container
-  </rd-header-content>
+  <rd-header-content> <a ui-sref="azure.containerinstances">Container instances</a> &gt; Add container </rd-header-content>
 </rd-header>
 
 <div class="row">
@@ -17,7 +15,13 @@
           <div class="form-group">
             <label for="azure_subscription" class="col-sm-1 control-label text-left">Subscription</label>
             <div class="col-sm-11">
-              <select class="form-control" name="azure_subscription" ng-model="state.selectedSubscription" ng-options="subscription.Name for subscription in subscriptions" ng-change="changeSubscription()"></select>
+              <select
+                class="form-control"
+                name="azure_subscription"
+                ng-model="state.selectedSubscription"
+                ng-options="subscription.Name for subscription in subscriptions"
+                ng-change="changeSubscription()"
+              ></select>
             </div>
           </div>
           <!-- !subscription-input -->
@@ -25,7 +29,12 @@
           <div class="form-group">
             <label for="azure_resourcegroup" class="col-sm-1 control-label text-left">Resource group</label>
             <div class="col-sm-11">
-              <select class="form-control" name="azure_resourcegroup" ng-model="state.selectedResourceGroup" ng-options="resourceGroup.Name for resourceGroup in resourceGroups"></select>
+              <select
+                class="form-control"
+                name="azure_resourcegroup"
+                ng-model="state.selectedResourceGroup"
+                ng-options="resourceGroup.Name for resourceGroup in resourceGroups"
+              ></select>
             </div>
           </div>
           <!-- !resourcegroup-input -->
@@ -44,7 +53,7 @@
           <div class="form-group">
             <label for="container_name" class="col-sm-1 control-label text-left">Name</label>
             <div class="col-sm-11">
-              <input type="text" class="form-control" ng-model="model.Name" name="container_name" placeholder="e.g. myContainer">
+              <input type="text" class="form-control" ng-model="model.Name" name="container_name" placeholder="e.g. myContainer" />
             </div>
           </div>
           <!-- !name-input -->
@@ -52,7 +61,7 @@
           <div class="form-group">
             <label for="image_name" class="col-sm-1 control-label text-left">Image</label>
             <div class="col-sm-11">
-              <input type="text" class="form-control" ng-model="model.Image" name="image_name" placeholder="e.g. nginx:alpine">
+              <input type="text" class="form-control" ng-model="model.Image" name="image_name" placeholder="e.g. nginx:alpine" />
             </div>
           </div>
           <!-- !image-input -->
@@ -81,7 +90,7 @@
                 <!-- host-port -->
                 <div class="input-group col-sm-4 input-group-sm">
                   <span class="input-group-addon">host</span>
-                  <input type="text" class="form-control" ng-model="binding.host" placeholder="e.g. 80">
+                  <input type="text" class="form-control" ng-model="binding.host" placeholder="e.g. 80" />
                 </div>
                 <!-- !host-port -->
                 <span style="margin: 0 10px 0 10px;">
@@ -90,7 +99,7 @@
                 <!-- container-port -->
                 <div class="input-group col-sm-4 input-group-sm">
                   <span class="input-group-addon">container</span>
-                  <input type="text" class="form-control" ng-model="binding.container" placeholder="e.g. 80">
+                  <input type="text" class="form-control" ng-model="binding.container" placeholder="e.g. 80" />
                 </div>
                 <!-- !container-port -->
                 <!-- protocol-actions -->
@@ -115,9 +124,7 @@
               <label for="public_ip" class="control-label text-left">
                 Allocate public IP address
               </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="public_ip" ng-model="model.AllocatePublicIP"><i></i>
-              </label>
+              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" name="public_ip" ng-model="model.AllocatePublicIP" /><i></i> </label>
             </div>
           </div>
           <!-- public-ip -->
@@ -128,7 +135,7 @@
           <div class="form-group">
             <label for="container_cpu" class="col-sm-1 control-label text-left">CPU</label>
             <div class="col-sm-11">
-              <input type="number" class="form-control" ng-model="model.CPU" name="container_cpu" placeholder="1">
+              <input type="number" class="form-control" ng-model="model.CPU" name="container_cpu" placeholder="1" />
             </div>
           </div>
           <!-- !cpu-input -->
@@ -136,7 +143,7 @@
           <div class="form-group">
             <label for="container_memory" class="col-sm-1 control-label text-left">Memory</label>
             <div class="col-sm-11">
-              <input type="number" class="form-control" ng-model="model.Memory" name="container_memory" placeholder="1">
+              <input type="number" class="form-control" ng-model="model.Memory" name="container_memory" placeholder="1" />
             </div>
           </div>
           <!-- !memory-input -->

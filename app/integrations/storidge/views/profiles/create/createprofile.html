@@ -1,8 +1,6 @@
 <rd-header>
   <rd-header-title title-text="Create profile"></rd-header-title>
-  <rd-header-content>
-    <a ui-sref="storidge.cluster">Storidge</a> &gt; <a ui-sref="storidge.profiles">Profiles</a> &gt; Add profile
-  </rd-header-content>
+  <rd-header-content> <a ui-sref="storidge.cluster">Storidge</a> &gt; <a ui-sref="storidge.profiles">Profiles</a> &gt; Add profile </rd-header-content>
 </rd-header>
 
 <div class="row">
@@ -14,7 +12,7 @@
           <div class="form-group" ng-class="{ 'has-error': storidgeCreateProfileForm.profile_name.$invalid }">
             <label for="profile_name" class="col-sm-2 col-lg-1 control-label text-left">Name</label>
             <div class="col-sm-10 col-lg-11">
-              <input type="text" class="form-control" ng-model="model.Name" name="profile_name" placeholder="e.g. myProfile" ng-change="updatedName()" required>
+              <input type="text" class="form-control" ng-model="model.Name" name="profile_name" placeholder="e.g. myProfile" ng-change="updatedName()" required />
             </div>
           </div>
           <div class="form-group" ng-show="storidgeCreateProfileForm.profile_name.$invalid">
@@ -32,7 +30,15 @@
           <div class="form-group" ng-class="{ 'has-error': storidgeCreateProfileForm.profile_directory.$invalid }">
             <label for="profile_directory" class="col-sm-2 col-lg-1 control-label text-left">Directory</label>
             <div class="col-sm-10 col-lg-11">
-              <input type="text" class="form-control" ng-model="model.Directory" name="profile_directory" placeholder="e.g. /cio/myProfile" ng-change="updatedDirectory()" required>
+              <input
+                type="text"
+                class="form-control"
+                ng-model="model.Directory"
+                name="profile_directory"
+                placeholder="e.g. /cio/myProfile"
+                ng-change="updatedDirectory()"
+                required
+              />
             </div>
           </div>
           <div class="form-group" ng-show="storidgeCreateProfileForm.profile_directory.$invalid">
@@ -47,7 +53,7 @@
           <div class="form-group" ng-class="{ 'has-error': storidgeCreateProfileForm.profile_capacity.$invalid }">
             <label for="profile_capacity" class="col-sm-2 col-lg-1 control-label text-left">Capacity</label>
             <div class="col-sm-10 col-lg-11">
-              <input type="number" class="form-control" ng-model="model.Capacity" name="profile_capacity" ng-min="1" ng-max="64000" placeholder="2" required>
+              <input type="number" class="form-control" ng-model="model.Capacity" name="profile_capacity" ng-min="1" ng-max="64000" placeholder="2" required />
             </div>
           </div>
           <div class="form-group" ng-show="storidgeCreateProfileForm.profile_capacity.$invalid">
@@ -64,8 +70,7 @@
           <div class="form-group">
             <label for="profile_redundancy" class="col-sm-2 col-lg-1 control-label text-left">Redundancy</label>
             <div class="col-sm-10 col-lg-11">
-              <select name="profile_redundancy" ng-model="model.Redundancy" ng-options="+(opt.value) as opt.label for opt in RedundancyOptions" class="form-control">
-              </select>
+              <select name="profile_redundancy" ng-model="model.Redundancy" ng-options="+(opt.value) as opt.label for opt in RedundancyOptions" class="form-control"> </select>
             </div>
           </div>
           <!-- !redudancy -->
@@ -108,9 +113,7 @@
             <label for="profile_snapshotEnabled" class="col-sm-2 col-lg-1 control-label text-left">
               Enable snapshots
             </label>
-            <label class="switch" style="margin-left: 20px;">
-              <input name="profile_snapshotEnabled" type="checkbox" ng-model="model.SnapshotEnabled"><i></i>
-            </label>
+            <label class="switch" style="margin-left: 20px;"> <input name="profile_snapshotEnabled" type="checkbox" ng-model="model.SnapshotEnabled" /><i></i> </label>
           </div>
           <!-- !snapshotEnabled -->
           <!-- snapshotMax -->
@@ -122,7 +125,7 @@
               <slider model="model.SnapshotMax" floor="1" ceil="100" step="1"></slider>
             </div>
             <div class="col-sm-2">
-              <input type="number" min="1" class="form-control" ng-model="model.SnapshotMax" id="profile_snapshotMax">
+              <input type="number" min="1" class="form-control" ng-model="model.SnapshotMax" id="profile_snapshotMax" />
             </div>
             <div class="col-sm-4">
               <p class="small text-muted" style="margin-top: 7px;">
@@ -137,7 +140,7 @@
               Enable periodic snapshots
             </label>
             <label class="switch" style="margin-left: 20px;">
-              <input name="profile_recurringSnapshotEnabled" type="checkbox" ng-model="state.RecurringSnapshotEnabled"><i></i>
+              <input name="profile_recurringSnapshotEnabled" type="checkbox" ng-model="state.RecurringSnapshotEnabled" /><i></i>
             </label>
           </div>
           <!-- !snapshotEnabled -->
@@ -150,7 +153,7 @@
               <slider model="model.SnapshotInterval" floor="1" ceil="2880" step="1"></slider>
             </div>
             <div class="col-sm-2">
-              <input type="number" min="1" class="form-control" ng-model="model.SnapshotInterval" id="profile_snapshotInterval">
+              <input type="number" min="1" class="form-control" ng-model="model.SnapshotInterval" id="profile_snapshotInterval" />
             </div>
             <div class="col-sm-4">
               <p class="small text-muted" style="margin-top: 7px;">
@@ -164,9 +167,7 @@
             <label for="profile_encryptionEnabled" class="col-sm-2 col-lg-1 control-label text-left">
               Enable encryption
             </label>
-            <label class="switch" style="margin-left: 20px;">
-              <input name="profile_encryptionEnabled" type="checkbox" ng-model="model.EncryptionEnabled"><i></i>
-            </label>
+            <label class="switch" style="margin-left: 20px;"> <input name="profile_encryptionEnabled" type="checkbox" ng-model="model.EncryptionEnabled" /><i></i> </label>
           </div>
           <!-- !encryptionEnabled -->
           <!-- interfaceType -->
@@ -196,7 +197,7 @@
           <div class="form-group">
             <label for="profile_interfaceNetwork" class="col-sm-2 col-lg-1 control-label text-left">Network name</label>
             <div class="col-sm-10 col-lg-11">
-              <input type="text" class="form-control" ng-model="model.InterfaceNetwork" name="profile_interfaceNetwork" pattern="[a-zA-Z0-9]+">
+              <input type="text" class="form-control" ng-model="model.InterfaceNetwork" name="profile_interfaceNetwork" pattern="[a-zA-Z0-9]+" />
             </div>
           </div>
           <!-- !interfaceNetwork -->
@@ -204,7 +205,7 @@
           <div class="form-group">
             <label for="profile_interfaceConf" class="col-sm-2 col-lg-1 control-label text-left">Interface conf</label>
             <div class="col-sm-10 col-lg-11">
-              <input type="text" class="form-control" ng-model="model.InterfaceConf" name="profile_interfaceConf">
+              <input type="text" class="form-control" ng-model="model.InterfaceConf" name="profile_interfaceConf" />
             </div>
           </div>
           <!-- !interfaceConf -->
@@ -212,20 +213,18 @@
           <div class="form-group">
             <div class="col-sm-12" style="margin-top: 5px;">
               <label class="control-label text-left">Labels</label>
-              <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addLabel()">
-                <i class="fa fa-plus-circle" aria-hidden="true"></i> add label
-              </span>
+              <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addLabel()"> <i class="fa fa-plus-circle" aria-hidden="true"></i> add label </span>
             </div>
             <!-- labels-input-list -->
             <div class="col-sm-12 form-inline" style="margin-top: 10px;">
               <div ng-repeat="label in formValues.Labels" style="margin-top: 2px;">
                 <div class="input-group col-sm-5 input-group-sm">
                   <span class="input-group-addon">name</span>
-                  <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. com.example.foo">
+                  <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. com.example.foo" />
                 </div>
                 <div class="input-group col-sm-5 input-group-sm">
                   <span class="input-group-addon">value</span>
-                  <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar">
+                  <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" />
                 </div>
                 <button class="btn btn-sm btn-danger" type="button" ng-click="removeLabel($index)">
                   <i class="fa fa-trash" aria-hidden="true"></i>
@@ -247,17 +246,17 @@
                 </label>
               </div>
               <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" ng-model="state.LimitIOPS" ng-change="state.NoLimit = (!state.LimitBandwidth && !state.LimitIOPS)"><i></i>
+                <input type="checkbox" ng-model="state.LimitIOPS" ng-change="state.NoLimit = (!state.LimitBandwidth && !state.LimitIOPS)" /><i></i>
               </label>
             </div>
             <div class="form-group" ng-if="state.LimitIOPS">
               <label for="min_iops" class="col-sm-1 control-label text-left">Min</label>
               <div class="col-sm-5" ng-class="{ 'has-error': storidgeCreateProfileForm.min_iops.$invalid }">
-                <input type="number" class="form-control" ng-model="model.MinIOPS" name="min_iops" ng-min="30" ng-max="999999" placeholder="100" required>
+                <input type="number" class="form-control" ng-model="model.MinIOPS" name="min_iops" ng-min="30" ng-max="999999" placeholder="100" required />
               </div>
               <label for="max_iops" class="col-sm-1 control-label text-left">Max</label>
               <div class="col-sm-5" ng-class="{ 'has-error': storidgeCreateProfileForm.max_iops.$invalid }">
-                <input type="number" class="form-control" ng-model="model.MaxIOPS" name="max_iops" ng-min="30" ng-max="999999" placeholder="2000" required>
+                <input type="number" class="form-control" ng-model="model.MaxIOPS" name="max_iops" ng-min="30" ng-max="999999" placeholder="2000" required />
               </div>
             </div>
             <div class="form-group" ng-show="storidgeCreateProfileForm.min_iops.$invalid">
@@ -292,17 +291,17 @@
                 </label>
               </div>
               <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" ng-model="state.LimitBandwidth" ng-change="state.NoLimit = (!state.LimitBandwidth && !state.LimitIOPS)"><i></i>
+                <input type="checkbox" ng-model="state.LimitBandwidth" ng-change="state.NoLimit = (!state.LimitBandwidth && !state.LimitIOPS)" /><i></i>
               </label>
             </div>
             <div class="form-group" ng-if="state.LimitBandwidth">
               <label for="min_bandwidth" class="col-sm-1 control-label text-left">Min</label>
               <div class="col-sm-5" ng-class="{ 'has-error': storidgeCreateProfileForm.min_bandwidth.$invalid }">
-                <input type="number" class="form-control" ng-model="model.MinBandwidth" name="min_bandwidth" ng-min="1" ng-max="5000" placeholder="1" required>
+                <input type="number" class="form-control" ng-model="model.MinBandwidth" name="min_bandwidth" ng-min="1" ng-max="5000" placeholder="1" required />
               </div>
               <label for="max_bandwidth" class="col-sm-1 control-label text-left">Max</label>
               <div class="col-sm-5" ng-class="{ 'has-error': storidgeCreateProfileForm.max_bandwidth.$invalid }">
-                <input type="number" class="form-control" ng-model="model.MaxBandwidth" name="max_bandwidth" ng-min="1" ng-max="5000" placeholder="100" required>
+                <input type="number" class="form-control" ng-model="model.MaxBandwidth" name="max_bandwidth" ng-min="1" ng-max="5000" placeholder="100" required />
               </div>
             </div>
             <div class="form-group" ng-show="storidgeCreateProfileForm.min_bandwidth.$invalid">
@@ -330,7 +329,13 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-click="create()" ng-disabled="state.actionInProgress || !storidgeCreateProfileForm.$valid" button-spinner="state.actionInProgress">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                ng-click="create()"
+                ng-disabled="state.actionInProgress || !storidgeCreateProfileForm.$valid"
+                button-spinner="state.actionInProgress"
+              >
                 <span ng-hide="state.actionInProgress">Create the profile</span>
                 <span ng-show="state.actionInProgress">Creating profile...</span>
               </button>

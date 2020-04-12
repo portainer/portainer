@@ -34,7 +34,10 @@ Unlike the public demo, the playground sessions are deleted after 4 hours. Apart
 
 ## Getting help
 
-**NOTE**: You can find more information about Portainer support framework policy here: https://www.portainer.io/2019/04/portainer-support-policy/
+For FORMAL Support, please purchase a support subscription from here: https://www.portainer.io/products-services/portainer-business-support/
+
+For community support: You can find more information about Portainer's community support framework policy here: https://www.portainer.io/2019/04/portainer-support-policy/
+
 
 * Issues: https://github.com/portainer/portainer/issues
 * FAQ: https://portainer.readthedocs.io/en/latest/faq.html
@@ -51,14 +54,7 @@ Unlike the public demo, the playground sessions are deleted after 4 hours. Apart
 
 ## Limitations
 
-**_Portainer_** has full support for the following Docker versions:
-
-* Docker 1.10 to the latest version
-* Standalone Docker Swarm >= 1.2.3 _(**NOTE:** Use of Standalone Docker Swarm is being discouraged since the introduction of built-in Swarm Mode in Docker. While older versions of Portainer had support for Standalone Docker Swarm, Portainer 1.17.0 and newer **do not** support it. However, the built-in Swarm Mode of Docker is fully supported.)_
-
-Partial support for the following Docker versions (some features may not be available):
-
-* Docker 1.9
+Portainer supports "Current - 2 docker versions only. Prior versions may operate, however these are not supported.
 
 ## Licensing
 

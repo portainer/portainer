@@ -17,6 +17,38 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 	}
 	tagID := portainer.TagID(id)
 
+	endpoints, err := handler.EndpointService.Endpoints()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
+	}
+
+	for _, endpoint := range endpoints {
+		tagIdx := findTagIndex(endpoint.TagIDs, tagID)
+		if tagIdx != -1 {
+			endpoint.TagIDs = removeElement(endpoint.TagIDs, tagIdx)
+			err = handler.EndpointService.UpdateEndpoint(endpoint.ID, &endpoint)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint", err}
+			}
+		}
+	}
+
+	endpointGroups, err := handler.EndpointGroupService.EndpointGroups()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
+	}
+
+	for _, endpointGroup := range endpointGroups {
+		tagIdx := findTagIndex(endpointGroup.TagIDs, tagID)
+		if tagIdx != -1 {
+			endpointGroup.TagIDs = removeElement(endpointGroup.TagIDs, tagIdx)
+			err = handler.EndpointGroupService.UpdateEndpointGroup(endpointGroup.ID, &endpointGroup)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint group", err}
+			}
+		}
+	}
+
 	tag, err := handler.TagService.Tag(tagID)
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a tag with the specified identifier inside the database", err}

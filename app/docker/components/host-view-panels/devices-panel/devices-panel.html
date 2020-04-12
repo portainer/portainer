@@ -12,8 +12,8 @@
           </thead>
           <tbody>
             <tr ng-if="$ctrl.devices && $ctrl.devices.length" ng-repeat="device in $ctrl.devices">
-              <td>{{device.Name}}</td>
-              <td>{{device.Vendor}}</td>
+              <td>{{ device.Name }}</td>
+              <td>{{ device.Vendor }}</td>
             </tr>
             <tr ng-if="!$ctrl.devices">
               <td colspan="2" class="text-center text-muted">Loading...</td>
