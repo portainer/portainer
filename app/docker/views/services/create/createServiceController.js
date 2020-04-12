@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
-import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
+import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
 
 require('./includes/update-restart.html');
 require('./includes/secret.html');

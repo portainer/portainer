@@ -1,8 +1,8 @@
 import _ from 'lodash-es';
+import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 import { ContainerCapabilities, ContainerCapability } from '../../../models/containerCapabilities';
 import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
 import { ContainerDetailsViewModel } from '../../../models/container';
-import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
 angular.module('portainer.docker').controller('CreateContainerController', [
   '$q',
