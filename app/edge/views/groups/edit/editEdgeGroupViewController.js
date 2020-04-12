@@ -19,11 +19,7 @@ class EditEdgeGroupController {
   }
 
   async $onInit() {
-    const [tags, endpointGroups, group] = await Promise.all([
-      this.TagService.tags(),
-      this.GroupService.groups(),
-      this.EdgeGroupService.group(this.$state.params.groupId),
-    ]);
+    const [tags, endpointGroups, group] = await Promise.all([this.TagService.tags(), this.GroupService.groups(), this.EdgeGroupService.group(this.$state.params.groupId)]);
 
     if (!group) {
       this.Notifications.error('Failed to find edge group', {});
@@ -46,7 +42,7 @@ class EditEdgeGroupController {
       this.$state.go('edge.groups');
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to update edge group');
-    } finally { 
+    } finally {
       this.state.actionInProgress = false;
     }
   }
