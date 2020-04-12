@@ -99,6 +99,7 @@
     "css-loader": "^1.0.0",
     "cssnano": "^3.10.0",
     "eslint": "5.16.0",
+    "eslint-config-prettier": "^6.10.1",
     "eslint-loader": "^2.1.2",
     "eslint-plugin-import": "^2.20.2",
     "file-loader": "^1.1.11",

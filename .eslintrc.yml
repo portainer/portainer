@@ -10,6 +10,7 @@ globals:
 
 extends:
   - 'eslint:recommended'
+  - prettier
 
 plugins:
   - import
