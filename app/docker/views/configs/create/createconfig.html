@@ -1,8 +1,6 @@
 <rd-header>
   <rd-header-title title-text="Create config"></rd-header-title>
-  <rd-header-content>
-    <a ui-sref="docker.configs">Configs</a> &gt; Add config
-  </rd-header-content>
+  <rd-header-content> <a ui-sref="docker.configs">Configs</a> &gt; Add config </rd-header-content>
 </rd-header>
 
 <div class="row">
@@ -14,7 +12,7 @@
           <div class="form-group">
             <label for="config_name" class="col-sm-1 control-label text-left">Name</label>
             <div class="col-sm-11">
-              <input type="text" class="form-control" ng-model="ctrl.formValues.Name" id="config_name" placeholder="e.g. myConfig">
+              <input type="text" class="form-control" ng-model="ctrl.formValues.Name" id="config_name" placeholder="e.g. myConfig" />
             </div>
           </div>
           <!-- !name-input -->
@@ -25,7 +23,7 @@
                 identifier="config-creation-editor"
                 placeholder="Define or paste the content of your config here"
                 yml="false"
-                on-change="ctrl.editorUpdate"
+                on-change="(ctrl.editorUpdate)"
                 value="ctrl.formValues.Data"
               ></code-editor>
             </div>
@@ -44,11 +42,11 @@
               <div ng-repeat="label in ctrl.formValues.Labels" style="margin-top: 2px;">
                 <div class="input-group col-sm-5 input-group-sm">
                   <span class="input-group-addon">name</span>
-                  <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. com.example.foo">
+                  <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. com.example.foo" />
                 </div>
                 <div class="input-group col-sm-5 input-group-sm">
                   <span class="input-group-addon">value</span>
-                  <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar">
+                  <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" />
                 </div>
                 <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeLabel($index)">
                   <i class="fa fa-trash" aria-hidden="true"></i>

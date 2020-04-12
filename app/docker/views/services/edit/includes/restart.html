@@ -1,7 +1,6 @@
 <div id="service-restart-policy">
   <rd-widget>
-    <rd-widget-header icon="fa-list-alt" title-text="Restart policy">
-    </rd-widget-header>
+    <rd-widget-header icon="fa-list-alt" title-text="Restart policy"> </rd-widget-header>
     <rd-widget-body classes="no-padding">
       <table class="table">
         <tbody>
@@ -9,7 +8,12 @@
             <td>Restart condition</td>
             <td>
               <div class="input-group input-group-sm">
-                <select class="selectpicker form-control" ng-model="service.RestartCondition" ng-change="updateServiceAttribute(service, 'RestartCondition')" disable-authorization="DockerServiceUpdate">
+                <select
+                  class="selectpicker form-control"
+                  ng-model="service.RestartCondition"
+                  ng-change="updateServiceAttribute(service, 'RestartCondition')"
+                  disable-authorization="DockerServiceUpdate"
+                >
                   <option value="none">None</option>
                   <option value="on-failure">On failure</option>
                   <option value="any">Any</option>
@@ -25,7 +29,14 @@
           <tr>
             <td>Restart delay</td>
             <td>
-              <input class="input-sm" type="text" ng-model="service.RestartDelay" ng-change="updateServiceAttribute(service, 'RestartDelay')" ng-pattern="/^([0-9]+)(h|m|s|ms|us|ns)$/i" disable-authorization="DockerServiceUpdate"/>
+              <input
+                class="input-sm"
+                type="text"
+                ng-model="service.RestartDelay"
+                ng-change="updateServiceAttribute(service, 'RestartDelay')"
+                ng-pattern="/^([0-9]+)(h|m|s|ms|us|ns)$/i"
+                disable-authorization="DockerServiceUpdate"
+              />
             </td>
             <td>
               <p class="small text-muted" style="margin-top: 10px;">
@@ -36,7 +47,13 @@
           <tr>
             <td>Restart max attempts</td>
             <td>
-              <input class="input-sm" type="number" ng-model="service.RestartMaxAttempts" ng-change="updateServiceAttribute(service, 'RestartMaxAttempts')" disable-authorization="DockerServiceUpdate"/>
+              <input
+                class="input-sm"
+                type="number"
+                ng-model="service.RestartMaxAttempts"
+                ng-change="updateServiceAttribute(service, 'RestartMaxAttempts')"
+                disable-authorization="DockerServiceUpdate"
+              />
             </td>
             <td>
               <p class="small text-muted" style="margin-top: 10px;">
@@ -47,7 +64,14 @@
           <tr>
             <td>Restart window</td>
             <td>
-              <input class="input-sm" type="text" ng-model="service.RestartWindow" ng-change="updateServiceAttribute(service, 'RestartWindow')" ng-pattern="/^([0-9]+)(h|m|s|ms|us|ns)$/i" disable-authorization="DockerServiceUpdate"/>
+              <input
+                class="input-sm"
+                type="text"
+                ng-model="service.RestartWindow"
+                ng-change="updateServiceAttribute(service, 'RestartWindow')"
+                ng-pattern="/^([0-9]+)(h|m|s|ms|us|ns)$/i"
+                disable-authorization="DockerServiceUpdate"
+              />
             </td>
             <td>
               <p class="small text-muted" style="margin-top: 10px;">
@@ -61,7 +85,13 @@
     <rd-widget-footer authorization="DockerServiceUpdate">
       <div class="btn-toolbar" role="toolbar">
         <div class="btn-group" role="group">
-          <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['RestartCondition', 'RestartDelay', 'RestartMaxAttempts', 'RestartWindow'])" ng-click="updateService(service)">Apply changes</button>
+          <button
+            type="button"
+            class="btn btn-primary btn-sm"
+            ng-disabled="!hasChanges(service, ['RestartCondition', 'RestartDelay', 'RestartMaxAttempts', 'RestartWindow'])"
+            ng-click="updateService(service)"
+            >Apply changes</button
+          >
           <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="caret"></span>
           </button>

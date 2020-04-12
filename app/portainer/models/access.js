@@ -5,7 +5,7 @@ export function UserAccessViewModel(data) {
   this.Type = 'user';
   this.Inherited = false;
   this.Override = false;
-  this.Role = { Id: 0, Name: "-" };
+  this.Role = { Id: 0, Name: '-' };
   this.icon = '<i class="fa fa-user" aria-hidden="true"></i>';
 }
 
@@ -16,6 +16,6 @@ export function TeamAccessViewModel(data) {
   this.Type = 'team';
   this.Inherited = false;
   this.Override = false;
-  this.Role = { Id: 0, Name: "-" };
+  this.Role = { Id: 0, Name: '-' };
   this.icon = '<i class="fa fa-users" aria-hidden="true"></i>';
 }

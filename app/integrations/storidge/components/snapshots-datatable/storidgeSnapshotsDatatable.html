@@ -2,19 +2,23 @@
   <rd-widget>
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
-        <div class="toolBarTitle">
-          <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }}
-        </div>
+        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
       </div>
       <div class="actionBar">
-        <button type="button" class="btn btn-sm btn-danger"
-          ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
+        <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
       </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" ng-change="$ctrl.onTextFilterChange()" placeholder="Search..." ng-model-options="{ debounce: 300 }">
+        <input
+          type="text"
+          class="searchInput"
+          ng-model="$ctrl.state.textFilter"
+          ng-change="$ctrl.onTextFilterChange()"
+          placeholder="Search..."
+          ng-model-options="{ debounce: 300 }"
+        />
       </div>
       <div class="table-responsive">
         <table class="table table-hover">
@@ -48,10 +52,13 @@
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))" ng-class="{active: item.Checked}">
+            <tr
+              dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))"
+              ng-class="{ active: item.Checked }"
+            >
               <td>
                 <span class="md-checkbox">
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="item.Status === 'normal'"/>
+                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="item.Status === 'normal'" />
                   <label for="select_{{ $index }}"></label>
                 </span>
                 <a ui-sref="docker.volumes.volume.snapshot({snapshotId: item.Id})"> {{ item.Id }}</a>
@@ -69,9 +76,7 @@
         </table>
       </div>
       <div class="footer" ng-if="$ctrl.dataset">
-        <div class="infoBar" ng-if="$ctrl.state.selectedItemCount !== 0">
-          {{ $ctrl.state.selectedItemCount }} item(s) selected
-        </div>
+        <div class="infoBar" ng-if="$ctrl.state.selectedItemCount !== 0"> {{ $ctrl.state.selectedItemCount }} item(s) selected </div>
         <div class="paginationControls">
           <form class="form-inline">
             <span class="limitSelector">

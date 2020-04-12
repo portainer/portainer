@@ -34,7 +34,7 @@ export function StoridgeVolumeUpdateModel(data) {
     iopsmin: data.IOPSMin,
     iopsmax: data.IOPSMax,
     bandwidthmin: data.BandwidthMin,
-    bandwidthmax: data.BandwidthMax
+    bandwidthmax: data.BandwidthMax,
   };
   this.labels = data.Labels;
 }

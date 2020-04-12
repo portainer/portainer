@@ -11,7 +11,7 @@
       <p>There are no placement constraints for this service.</p>
     </rd-widget-body>
     <rd-widget-body ng-if="service.ServiceConstraints.length > 0" classes="no-padding">
-      <table class="table" >
+      <table class="table">
         <thead>
           <tr>
             <th>Name</th>
@@ -23,12 +23,27 @@
           <tr ng-repeat="constraint in service.ServiceConstraints">
             <td>
               <div class="input-group input-group-sm">
-                <input type="text" class="form-control" ng-model="constraint.key" placeholder="e.g. node.role" ng-change="updatePlacementConstraint(service, constraint)" ng-disabled="isUpdating" disable-authorization="DockerServiceUpdate">
+                <input
+                  type="text"
+                  class="form-control"
+                  ng-model="constraint.key"
+                  placeholder="e.g. node.role"
+                  ng-change="updatePlacementConstraint(service, constraint)"
+                  ng-disabled="isUpdating"
+                  disable-authorization="DockerServiceUpdate"
+                />
               </div>
             </td>
             <td>
               <div class="input-group input-group-sm">
-                <select name="constraintOperator" class="form-control" ng-model="constraint.operator" ng-change="updatePlacementConstraint(service, constraint)" ng-disabled="isUpdating" disable-authorization="DockerServiceUpdate">
+                <select
+                  name="constraintOperator"
+                  class="form-control"
+                  ng-model="constraint.operator"
+                  ng-change="updatePlacementConstraint(service, constraint)"
+                  ng-disabled="isUpdating"
+                  disable-authorization="DockerServiceUpdate"
+                >
                   <option value="==">==</option>
                   <option value="!=">!=</option>
                 </select>
@@ -36,7 +51,15 @@
             </td>
             <td>
               <div class="input-group input-group-sm">
-                <input type="text" class="form-control" ng-model="constraint.value" placeholder="e.g. manager" ng-change="updatePlacementConstraint(service, constraint)" ng-disabled="isUpdating" disable-authorization="DockerServiceUpdate">
+                <input
+                  type="text"
+                  class="form-control"
+                  ng-model="constraint.value"
+                  placeholder="e.g. manager"
+                  ng-change="updatePlacementConstraint(service, constraint)"
+                  ng-disabled="isUpdating"
+                  disable-authorization="DockerServiceUpdate"
+                />
                 <span class="input-group-btn" authorization="DockerServiceUpdate">
                   <button class="btn btn-sm btn-danger" type="button" ng-click="removePlacementConstraint(service, $index)" ng-disabled="isUpdating">
                     <i class="fa fa-trash" aria-hidden="true"></i>

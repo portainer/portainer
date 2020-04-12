@@ -11,8 +11,7 @@
             </tr>
             <tr ng-if="$ctrl.host.os">
               <td>OS Information</td>
-              <td>{{ $ctrl.host.os.type }} {{$ctrl.host.os.arch}}
-                {{$ctrl.host.os.name}}</td>
+              <td>{{ $ctrl.host.os.type }} {{ $ctrl.host.os.arch }} {{ $ctrl.host.os.name }}</td>
             </tr>
             <tr ng-if="$ctrl.host.kernelVersion">
               <td>Kernel Version</td>
@@ -28,10 +27,10 @@
             </tr>
             <tr ng-if="$ctrl.isBrowseEnabled || $ctrl.isJobEnabled">
               <td colspan="2">
-                <button class="btn btn-primary btn-sm" title="Browse" ng-if="$ctrl.isBrowseEnabled" ui-sref="{{$ctrl.browseUrl}}">
+                <button class="btn btn-primary btn-sm" title="Browse" ng-if="$ctrl.isBrowseEnabled" ui-sref="{{ $ctrl.browseUrl }}">
                   Browse
                 </button>
-                <button class="btn btn-primary btn-sm" title="Execute job" ng-if="$ctrl.isJobEnabled" ui-sref="{{$ctrl.jobUrl}}">
+                <button class="btn btn-primary btn-sm" title="Execute job" ng-if="$ctrl.isJobEnabled" ui-sref="{{ $ctrl.jobUrl }}">
                   Execute job
                 </button>
               </td>

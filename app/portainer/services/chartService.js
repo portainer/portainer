@@ -1,8 +1,8 @@
 import Chart from 'chart.js';
 import filesize from 'filesize';
 
-angular.module('portainer.app')
-  .factory('ChartService', [function ChartService() {
+angular.module('portainer.app').factory('ChartService', [
+  function ChartService() {
     'use strict';
 
     // Max. number of items to display on a chart
@@ -23,19 +23,21 @@ angular.module('portainer.app')
             label: function (tooltipItem, data) {
               var datasetLabel = data.datasets[tooltipItem.datasetIndex].label;
               return tooltipCallback(datasetLabel, tooltipItem.yLabel);
-            }
-          }
+            },
+          },
         },
         hover: { animationDuration: 0 },
         scales: {
-          yAxes: [{
-            stacked: isStacked,
-            ticks: {
-              beginAtZero: true,
-              callback: scalesCallback
-            }
-          }]
-        }
+          yAxes: [
+            {
+              stacked: isStacked,
+              ticks: {
+                beginAtZero: true,
+                callback: scalesCallback,
+              },
+            },
+          ],
+        },
       };
     }
 
@@ -54,11 +56,11 @@ angular.module('portainer.app')
               pointBackgroundColor: 'rgba(151,187,205,1)',
               pointBorderColor: 'rgba(151,187,205,1)',
               pointRadius: 2,
-              borderWidth: 2
-            }
-          ]
+              borderWidth: 2,
+            },
+          ],
         },
-        options: defaultChartOptions('nearest', tooltipCallback, scalesCallback)
+        options: defaultChartOptions('nearest', tooltipCallback, scalesCallback),
       });
     }
 
@@ -77,7 +79,7 @@ angular.module('portainer.app')
               pointBackgroundColor: 'rgba(151,187,205,1)',
               pointBorderColor: 'rgba(151,187,205,1)',
               pointRadius: 2,
-              borderWidth: 2
+              borderWidth: 2,
             },
             {
               label: 'Cache',
@@ -88,11 +90,11 @@ angular.module('portainer.app')
               pointBackgroundColor: 'rgba(255,180,174,1)',
               pointBorderColor: 'rgba(255,180,174,1)',
               pointRadius: 2,
-              borderWidth: 2
-            }
-          ]
+              borderWidth: 2,
+            },
+          ],
         },
-        options: defaultChartOptions('nearest', tooltipCallback, scalesCallback, true)
+        options: defaultChartOptions('nearest', tooltipCallback, scalesCallback, true),
       });
     }
 
@@ -119,7 +121,7 @@ angular.module('portainer.app')
               pointBackgroundColor: 'rgba(151,187,205,1)',
               pointBorderColor: 'rgba(151,187,205,1)',
               pointRadius: 2,
-              borderWidth: 2
+              borderWidth: 2,
             },
             {
               label: 'TX on eth0',
@@ -130,11 +132,11 @@ angular.module('portainer.app')
               pointBackgroundColor: 'rgba(255,180,174,1)',
               pointBorderColor: 'rgba(255,180,174,1)',
               pointRadius: 2,
-              borderWidth: 2
-            }
-          ]
+              borderWidth: 2,
+            },
+          ],
         },
-        options: defaultChartOptions('average', byteBasedTooltipLabel, byteBasedAxisLabel)
+        options: defaultChartOptions('average', byteBasedTooltipLabel, byteBasedAxisLabel),
       });
     };
 
@@ -161,10 +163,11 @@ angular.module('portainer.app')
     service.UpdateMemoryChart = function UpdateChart(label, memoryValue, cacheValue, chart) {
       chart.data.labels.push(label);
       chart.data.datasets[0].data.push(memoryValue);
-      
-      if(cacheValue) {
+
+      if (cacheValue) {
         chart.data.datasets[1].data.push(cacheValue);
-      } else { // cache values are not available for Windows
+      } else {
+        // cache values are not available for Windows
         chart.data.datasets.splice(1, 1);
       }
 
@@ -219,4 +222,5 @@ angular.module('portainer.app')
     }
 
     return service;
-  }]);
+  },
+]);

@@ -10,9 +10,9 @@ module.exports = webpackMerge(commonConfig, {
         use: [
           {
             loader: 'url-loader',
-            options: { limit: 25000 }
-          }
-        ]
+            options: { limit: 25000 },
+          },
+        ],
       },
       {
         test: /\.(gif|png|jpe?g|svg)$/i,
@@ -20,10 +20,10 @@ module.exports = webpackMerge(commonConfig, {
           'file-loader',
           {
             loader: 'image-webpack-loader',
-            options: {}
-          }
-        ]
-      }
-    ]
-  }
+            options: {},
+          },
+        ],
+      },
+    ],
+  },
 });

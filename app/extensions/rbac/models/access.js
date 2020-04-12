@@ -5,7 +5,7 @@ export default function AccessViewerPolicyModel(policy, endpoint, roles, group, 
   this.RoleName = roles[policy.RoleId].Name;
   if (group) {
     this.GroupId = group.Id;
-    this.GroupName = group.Name
+    this.GroupName = group.Name;
   }
   if (team) {
     this.TeamId = team.Id;

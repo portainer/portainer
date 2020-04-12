@@ -10,6 +10,6 @@ angular.module('portainer.docker').component('secretsDatatable', {
     reverseOrder: '<',
     showOwnershipColumn: '<',
     removeAction: '<',
-    refreshCallback: '<'
-  }
+    refreshCallback: '<',
+  },
 });

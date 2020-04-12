@@ -8,6 +8,6 @@ angular.module('portainer.integrations.storidge').component('storidgeSnapshotsDa
     tableKey: '@',
     orderBy: '@',
     reverseOrder: '<',
-    removeAction: '<'
-  }
+    removeAction: '<',
+  },
 });

@@ -7,6 +7,6 @@ angular.module('portainer.integrations.storidge').component('storidgeNodesDatata
     dataset: '<',
     tableKey: '@',
     orderBy: '@',
-    reverseOrder: '<'
-  }
+    reverseOrder: '<',
+  },
 });

@@ -14,7 +14,7 @@
           <div class="form-group">
             <label for="registry_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
             <div class="col-sm-9 col-lg-10">
-              <input type="text" class="form-control" id="registry_name" ng-model="registry.Name" placeholder="e.g. my-registry">
+              <input type="text" class="form-control" id="registry_name" ng-model="registry.Name" placeholder="e.g. my-registry" />
             </div>
           </div>
           <!-- !name-input -->
@@ -25,7 +25,7 @@
               <portainer-tooltip position="bottom" message="URL or IP address of a Docker registry."></portainer-tooltip>
             </label>
             <div class="col-sm-9 col-lg-10">
-              <input type="text" class="form-control" id="registry_url" ng-model="registry.URL" placeholder="e.g. 10.0.0.10:5000 or myregistry.domain.tld">
+              <input type="text" class="form-control" id="registry_url" ng-model="registry.URL" placeholder="e.g. 10.0.0.10:5000 or myregistry.domain.tld" />
             </div>
           </div>
           <!-- !registry-url-input -->
@@ -36,9 +36,7 @@
                 Authentication
                 <portainer-tooltip position="bottom" message="Enable this option if you need to specify credentials to connect to this registry."></portainer-tooltip>
               </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" ng-model="registry.Authentication"><i></i>
-              </label>
+              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="registry.Authentication" /><i></i> </label>
             </div>
           </div>
           <!-- !authentication-checkbox -->
@@ -48,7 +46,7 @@
             <div class="form-group">
               <label for="credentials_username" class="col-sm-3 col-lg-2 control-label text-left">Username</label>
               <div class="col-sm-9 col-lg-10">
-                <input type="text" class="form-control" id="credentials_username" ng-model="registry.Username">
+                <input type="text" class="form-control" id="credentials_username" ng-model="registry.Username" />
               </div>
             </div>
             <!-- !credentials-user -->
@@ -56,7 +54,7 @@
             <div class="form-group">
               <label for="credentials_password" class="col-sm-3 col-lg-2 control-label text-left">Password</label>
               <div class="col-sm-9 col-lg-10">
-                <input type="password" class="form-control" id="credentials_password" ng-model="formValues.Password" placeholder="*******">
+                <input type="password" class="form-control" id="credentials_password" ng-model="formValues.Password" placeholder="*******" />
               </div>
             </div>
             <!-- !credentials-password -->
@@ -64,7 +62,13 @@
           <!-- !authentication-credentials -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !registry.Name || !registry.URL" ng-click="updateRegistry()" button-spinner="state.actionInProgress">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                ng-disabled="state.actionInProgress || !registry.Name || !registry.URL"
+                ng-click="updateRegistry()"
+                button-spinner="state.actionInProgress"
+              >
                 <span ng-hide="state.actionInProgress">Update registry</span>
                 <span ng-show="state.actionInProgress">Updating registry...</span>
               </button>

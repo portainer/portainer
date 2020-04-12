@@ -15,7 +15,7 @@
             <div class="col-sm-8">
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
-                <input type="password" class="form-control" ng-model="formValues.currentPassword" id="current_password">
+                <input type="password" class="form-control" ng-model="formValues.currentPassword" id="current_password" />
               </div>
             </div>
           </div>
@@ -26,14 +26,14 @@
             <div class="col-sm-8">
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
-                <input type="password" class="form-control" ng-model="formValues.newPassword" id="new_password">
+                <input type="password" class="form-control" ng-model="formValues.newPassword" id="new_password" />
               </div>
             </div>
           </div>
           <!-- !new-password-input -->
           <div class="form-group">
             <div class="col-sm-12">
-              <i ng-class="{true: 'fa fa-check green-icon', false: 'fa fa-times red-icon'}[formValues.newPassword.length >= 8]" aria-hidden="true"></i>
+              <i ng-class="{ true: 'fa fa-check green-icon', false: 'fa fa-times red-icon' }[formValues.newPassword.length >= 8]" aria-hidden="true"></i>
               <span class="small text-muted">Your new password must be at least 8 characters long</span>
             </div>
           </div>
@@ -43,15 +43,28 @@
             <div class="col-sm-8">
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
-                <input type="password" class="form-control" ng-model="formValues.confirmPassword" id="confirm_password">
-                <span class="input-group-addon"><i ng-class="{true: 'fa fa-check green-icon', false: 'fa fa-times red-icon'}[formValues.newPassword !== '' && formValues.newPassword === formValues.confirmPassword]" aria-hidden="true"></i></span>
+                <input type="password" class="form-control" ng-model="formValues.confirmPassword" id="confirm_password" />
+                <span class="input-group-addon"
+                  ><i
+                    ng-class="
+                      { true: 'fa fa-check green-icon', false: 'fa fa-times red-icon' }[formValues.newPassword !== '' && formValues.newPassword === formValues.confirmPassword]
+                    "
+                    aria-hidden="true"
+                  ></i
+                ></span>
               </div>
             </div>
           </div>
           <!-- !confirm-password-input -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="submit" class="btn btn-primary btn-sm" ng-disabled="(AuthenticationMethod !== 1 && userID !== 1) || !formValues.currentPassword || formValues.newPassword.length < 8 || formValues.newPassword !== formValues.confirmPassword" ng-click="updatePassword()">Update password</button>
+              <button
+                type="submit"
+                class="btn btn-primary btn-sm"
+                ng-disabled="(AuthenticationMethod !== 1 && userID !== 1) || !formValues.currentPassword || formValues.newPassword.length < 8 || formValues.newPassword !== formValues.confirmPassword"
+                ng-click="updatePassword()"
+                >Update password</button
+              >
               <span class="text-muted small" style="margin-left: 5px;" ng-if="AuthenticationMethod === 2 && userID !== 1">
                 <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                 You cannot change your password when using LDAP authentication.

@@ -10,8 +10,7 @@
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
-      <rd-widget-header icon="fa-plus" title-text="Add a new tag">
-      </rd-widget-header>
+      <rd-widget-header icon="fa-plus" title-text="Add a new tag"> </rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal" name="tagCreationForm" ng-submit="createTag()">
           <!-- name-input -->
@@ -20,7 +19,16 @@
               Name
             </label>
             <div class="col-sm-10">
-              <input type="text" class="form-control" name="name" ng-model="formValues.Name" ng-change="checkNameValidity(tagCreationForm)" placeholder="org/acme" required auto-focus />
+              <input
+                type="text"
+                class="form-control"
+                name="name"
+                ng-model="formValues.Name"
+                ng-change="checkNameValidity(tagCreationForm)"
+                placeholder="org/acme"
+                required
+                auto-focus
+              />
             </div>
           </div>
           <div class="form-group" ng-show="tagCreationForm.name.$invalid">
@@ -34,7 +42,13 @@
           <!-- !name-input -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !tagCreationForm.$valid" ng-click="createTag()" button-spinner="state.actionInProgress">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                ng-disabled="state.actionInProgress || !tagCreationForm.$valid"
+                ng-click="createTag()"
+                button-spinner="state.actionInProgress"
+              >
                 <span ng-hide="state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Create tag</span>
                 <span ng-show="state.actionInProgress">Creating tag...</span>
               </button>
@@ -46,14 +60,8 @@
   </div>
 </div>
 
-
 <div class="row">
   <div class="col-sm-12">
-    <tags-datatable
-    title-text="Tags" title-icon="fa-tags"
-    dataset="tags" table-key="tags"
-    order-by="Name" 
-    remove-action="removeAction"
-    ></tags-datatable>
+    <tags-datatable title-text="Tags" title-icon="fa-tags" dataset="tags" table-key="tags" order-by="Name" remove-action="removeAction"></tags-datatable>
   </div>
 </div>
