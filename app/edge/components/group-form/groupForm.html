@@ -90,18 +90,38 @@
       </div>
     </div>
 
-    <div class="col-sm-12 form-section-title">
-      <div class="form-group">
-        <div class="col-sm-12">
-          <label for="toggle_mustHaveAllTags" class="control-label text-left">
-            Associated Endpoints must include all tags
+    <div class="form-group" style="margin-bottom: 0;">
+      <div class="boxselector_wrapper">
+        <div class="boxselector">
+          <input
+            type="radio"
+            id="or-selector"
+            ng-model="$ctrl.model.MustHaveAllTags"
+            ng-value="false"
+            ng-checked="!$ctrl.model.MustHaveAllTags"
+          />
+          <label for="or-selector">
+            <div class="boxselector_header">
+              <!-- <i class="fa fa-list-ol" aria-hidden="true" style="margin-right: 2px;"></i> -->
+              At least one
+            </div>
+            <p>Endpoints must have at least one of the selected tags</p>
           </label>
-          <label class="switch" style="margin-left: 20px;">
-            <input
-              type="checkbox"
-              name="toggle_mustHaveAllTags"
-              ng-model="$ctrl.model.MustHaveAllTags"
-            /><i></i>
+        </div>
+        <div class="boxselector">
+          <input
+            type="radio"
+            id="and-selector"
+            ng-model="$ctrl.model.MustHaveAllTags"
+            ng-value="true"
+            ng-checked="$ctrl.model.MustHaveAllTags"
+          />
+          <label for="and-selector">
+            <div class="boxselector_header">
+              <!-- <i class="fa fa-tags" aria-hidden="true" style="margin-right: 2px;"></i> -->
+              All Tags
+            </div>
+            <p>Endpoints must have all the selected tags</p>
           </label>
         </div>
       </div>
