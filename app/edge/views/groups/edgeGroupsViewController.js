@@ -20,10 +20,7 @@ class EdgeGroupsController {
       try {
         await this.EdgeGroupService.remove(item.Id);
 
-        this.Notifications.success(
-          'Edge Group successfully removed',
-          item.Name
-        );
+        this.Notifications.success('Edge Group successfully removed', item.Name);
         const index = this.items.indexOf(item);
         this.items.splice(index, 1);
       } catch (err) {
@@ -38,6 +35,4 @@ class EdgeGroupsController {
   }
 }
 
-angular
-  .module('portainer.edge')
-  .controller('EdgeGroupsController', EdgeGroupsController);
+angular.module('portainer.edge').controller('EdgeGroupsController', EdgeGroupsController);

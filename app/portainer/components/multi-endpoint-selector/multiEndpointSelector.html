@@ -2,7 +2,7 @@
   <ui-select-match placeholder="Select one or multiple endpoint(s)">
     <span>
       {{ $item.Name }}
-      <span ng-if="$item.TagIds.length"> - <i class="fa fa-tags" /> {{ $ctrl.tagIdsToTagNames($item.TagIds) | arraytostr }}</span>
+      <span ng-if="$item.TagIds.length"> - <i class="fa fa-tags"></i> {{ $ctrl.tagIdsToTagNames($item.TagIds) | arraytostr }}</span>
     </span>
   </ui-select-match>
   <ui-select-choices
@@ -13,7 +13,7 @@
   >
     <span>
       {{ endpoint.Name }}
-      <span ng-if="endpoint.TagIds.length"> - <i class="fa fa-tags" /> {{ $ctrl.tagIdsToTagNames(endpoint.TagIds) | arraytostr }}</span>
+      <span ng-if="endpoint.TagIds.length"> - <i class="fa fa-tags"></i> {{ $ctrl.tagIdsToTagNames(endpoint.TagIds) | arraytostr }}</span>
     </span>
   </ui-select-choices>
 </ui-select>
