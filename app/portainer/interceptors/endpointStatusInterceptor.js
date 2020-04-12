@@ -1,7 +1,9 @@
 import _ from 'lodash-es';
 
-angular.module('portainer.app')
-  .factory('EndpointStatusInterceptor', ['$q', 'EndpointProvider', function ($q, EndpointProvider) {
+angular.module('portainer.app').factory('EndpointStatusInterceptor', [
+  '$q',
+  'EndpointProvider',
+  function ($q, EndpointProvider) {
     'use strict';
     var interceptor = {};
 
@@ -9,14 +11,15 @@ angular.module('portainer.app')
     interceptor.responseError = responseErrorInterceptor;
 
     function canBeOffline(url) {
-      return (_.startsWith(url, 'api/') && (
-        _.includes(url, '/containers') ||
-        _.includes(url, '/images') ||
-        _.includes(url, '/volumes') ||
-        _.includes(url, '/networks') ||
-        _.includes(url, '/info') ||
-        _.includes(url, '/version')
-      ));
+      return (
+        _.startsWith(url, 'api/') &&
+        (_.includes(url, '/containers') ||
+          _.includes(url, '/images') ||
+          _.includes(url, '/volumes') ||
+          _.includes(url, '/networks') ||
+          _.includes(url, '/info') ||
+          _.includes(url, '/version'))
+      );
     }
 
     function responseInterceptor(response) {
@@ -36,4 +39,5 @@ angular.module('portainer.app')
     }
 
     return interceptor;
-  }]);
+  },
+]);

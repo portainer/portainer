@@ -1,5 +1,12 @@
 angular.module('portainer.docker').controller('HostViewController', [
-  '$q', 'SystemService', 'Notifications', 'StateManager', 'AgentService', 'ContainerService', 'Authentication', 'EndpointProvider',
+  '$q',
+  'SystemService',
+  'Notifications',
+  'StateManager',
+  'AgentService',
+  'ContainerService',
+  'Authentication',
+  'EndpointProvider',
   function HostViewController($q, SystemService, Notifications, StateManager, AgentService, ContainerService, Authentication, EndpointProvider) {
     var ctrl = this;
 
@@ -7,8 +14,8 @@ angular.module('portainer.docker').controller('HostViewController', [
 
     ctrl.state = {
       isAgent: false,
-      isAdmin : false,
-      offlineMode: false
+      isAdmin: false,
+      offlineMode: false,
     };
 
     this.engineDetails = {};
@@ -27,28 +34,24 @@ angular.module('portainer.docker').controller('HostViewController', [
       $q.all({
         version: SystemService.version(),
         info: SystemService.info(),
-        jobs: ctrl.state.isAdmin ? ContainerService.containers(true, { label: ['io.portainer.job.endpoint'] }) : []
+        jobs: ctrl.state.isAdmin ? ContainerService.containers(true, { label: ['io.portainer.job.endpoint'] }) : [],
       })
-      .then(function success(data) {
-        ctrl.engineDetails = buildEngineDetails(data);
-        ctrl.hostDetails = buildHostDetails(data.info);
-        ctrl.state.offlineMode = EndpointProvider.offlineMode();
-        ctrl.jobs = data.jobs;
+        .then(function success(data) {
+          ctrl.engineDetails = buildEngineDetails(data);
+          ctrl.hostDetails = buildHostDetails(data.info);
+          ctrl.state.offlineMode = EndpointProvider.offlineMode();
+          ctrl.jobs = data.jobs;
 
-        if (ctrl.state.isAgent && agentApiVersion > 1) {
-          return AgentService.hostInfo(data.info.Hostname).then(function onHostInfoLoad(agentHostInfo) {
-            ctrl.devices = agentHostInfo.PCIDevices;
-            ctrl.disks = agentHostInfo.PhysicalDisks;
-          });
-        }
-      })
-      .catch(function error(err) {
-        Notifications.error(
-          'Failure',
-          err,
-          'Unable to retrieve engine details'
-        );
-      });
+          if (ctrl.state.isAgent && agentApiVersion > 1) {
+            return AgentService.hostInfo(data.info.Hostname).then(function onHostInfoLoad(agentHostInfo) {
+              ctrl.devices = agentHostInfo.PCIDevices;
+              ctrl.disks = agentHostInfo.PhysicalDisks;
+            });
+          }
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to retrieve engine details');
+        });
     }
 
     function buildEngineDetails(data) {
@@ -61,7 +64,7 @@ angular.module('portainer.docker').controller('HostViewController', [
         storageDriver: info.Driver,
         loggingDriver: info.LoggingDriver,
         volumePlugins: info.Plugins.Volume,
-        networkPlugins: info.Plugins.Network
+        networkPlugins: info.Plugins.Network,
       };
     }
 
@@ -70,13 +73,13 @@ angular.module('portainer.docker').controller('HostViewController', [
         os: {
           arch: info.Architecture,
           type: info.OSType,
-          name: info.OperatingSystem
+          name: info.OperatingSystem,
         },
         name: info.Name,
         kernelVersion: info.KernelVersion,
         totalCPU: info.NCPU,
-        totalMemory: info.MemTotal
+        totalMemory: info.MemTotal,
       };
     }
-  }
+  },
 ]);

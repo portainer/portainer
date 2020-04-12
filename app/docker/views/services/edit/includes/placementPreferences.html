@@ -11,7 +11,7 @@
       <p>There are no placement preferences for this service.</p>
     </rd-widget-body>
     <rd-widget-body ng-if="service.ServicePreferences.length > 0" classes="no-padding">
-      <table class="table" >
+      <table class="table">
         <thead>
           <tr>
             <th>Strategy</th>
@@ -22,12 +22,28 @@
           <tr ng-repeat="preference in service.ServicePreferences">
             <td>
               <div class="input-group input-group-sm">
-                <input type="text" class="form-control" ng-model="preference.strategy" placeholder="e.g. node.role" ng-change="updatePlacementPreference(service, preference)" ng-disabled="isUpdating" disable-authorization="DockerServiceUpdate">
+                <input
+                  type="text"
+                  class="form-control"
+                  ng-model="preference.strategy"
+                  placeholder="e.g. node.role"
+                  ng-change="updatePlacementPreference(service, preference)"
+                  ng-disabled="isUpdating"
+                  disable-authorization="DockerServiceUpdate"
+                />
               </div>
             </td>
             <td>
               <div class="input-group input-group-sm">
-                <input type="text" class="form-control" ng-model="preference.value" placeholder="e.g. manager" ng-change="updatePlacementPreference(service, preference)" ng-disabled="isUpdating" disable-authorization="DockerServiceUpdate">
+                <input
+                  type="text"
+                  class="form-control"
+                  ng-model="preference.value"
+                  placeholder="e.g. manager"
+                  ng-change="updatePlacementPreference(service, preference)"
+                  ng-disabled="isUpdating"
+                  disable-authorization="DockerServiceUpdate"
+                />
                 <span class="input-group-btn" authorization="DockerServiceUpdate">
                   <button class="btn btn-sm btn-danger" type="button" ng-click="removePlacementPreference(service, $index)" ng-disabled="isUpdating">
                     <i class="fa fa-trash" aria-hidden="true"></i>

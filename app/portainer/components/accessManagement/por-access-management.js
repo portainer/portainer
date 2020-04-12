@@ -7,6 +7,6 @@ angular.module('portainer.app').component('porAccessManagement', {
     inheritFrom: '<',
     entityType: '@',
     updateAccess: '<',
-    actionInProgress: '<'
-  }
+    actionInProgress: '<',
+  },
 });

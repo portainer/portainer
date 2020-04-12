@@ -4,6 +4,6 @@ angular.module('portainer.app').component('registryFormCustom', {
     model: '=',
     formAction: '<',
     formActionLabel: '@',
-    actionInProgress: '<'
-  }
+    actionInProgress: '<',
+  },
 });

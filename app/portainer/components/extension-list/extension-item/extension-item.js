@@ -3,6 +3,6 @@ angular.module('portainer.app').component('extensionItem', {
   controller: 'ExtensionItemController',
   bindings: {
     model: '<',
-    currentDate: '<'
-  }
+    currentDate: '<',
+  },
 });

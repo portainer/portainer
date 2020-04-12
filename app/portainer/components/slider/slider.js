@@ -7,6 +7,6 @@ angular.module('portainer.app').component('slider', {
     floor: '<',
     ceil: '<',
     step: '<',
-    precision: '<'
-  }
+    precision: '<',
+  },
 });

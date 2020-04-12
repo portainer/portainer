@@ -7,6 +7,6 @@ angular.module('portainer.docker').component('eventsDatatable', {
     dataset: '<',
     tableKey: '@',
     orderBy: '@',
-    reverseOrder: '<'
-  }
+    reverseOrder: '<',
+  },
 });

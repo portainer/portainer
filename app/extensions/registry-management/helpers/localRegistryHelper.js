@@ -1,8 +1,8 @@
 import _ from 'lodash-es';
 import { RepositoryTagViewModel } from '../models/repositoryTag';
 
-angular.module('portainer.extensions.registrymanagement')
-  .factory('RegistryV2Helper', [function RegistryV2HelperFactory() {
+angular.module('portainer.extensions.registrymanagement').factory('RegistryV2Helper', [
+  function RegistryV2HelperFactory() {
     'use strict';
 
     var helper = {};
@@ -21,7 +21,7 @@ angular.module('portainer.extensions.registrymanagement')
       var arch = v1.architecture;
       var size = v2.layers.reduce(function (a, b) {
         return {
-          size: a.size + b.size
+          size: a.size + b.size,
         };
       }).size;
       var imageId = v2.config.digest;
@@ -31,4 +31,5 @@ angular.module('portainer.extensions.registrymanagement')
     };
 
     return helper;
-  }]);
+  },
+]);

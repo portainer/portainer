@@ -5,8 +5,7 @@
     </a>
   </rd-header-title>
   <rd-header-content>
-    <a ui-sref="portainer.registries">Registries</a> &gt;
-    <a ui-sref="portainer.registries.registry.repositories()">{{ ctrl.registry.Name }}</a> &gt;
+    <a ui-sref="portainer.registries">Registries</a> &gt; <a ui-sref="portainer.registries.registry.repositories()">{{ ctrl.registry.Name }}</a> &gt;
     <a ui-sref="portainer.registries.registry.repository()">{{ ctrl.context.repository }} </a> &gt;
     {{ ctrl.context.tag }}
   </rd-header-content>
@@ -20,8 +19,8 @@
         <form class="form-horizontal">
           <div class="form-group">
             <div class="row">
-              <div class="pull-left" ng-repeat="tag in ctrl.details.RepoTags" style="display:table">
-                <div class="input-group col-md-1" style="padding:0 15px">
+              <div class="pull-left" ng-repeat="tag in ctrl.details.RepoTags" style="display: table;">
+                <div class="input-group col-md-1" style="padding: 0 15px;">
                   <span class="input-group-addon">{{ tag }}</span>
                 </div>
               </div>
@@ -52,11 +51,11 @@
             </tr>
             <tr>
               <td>Created</td>
-              <td>{{ ctrl.details.Created|getisodate }}</td>
+              <td>{{ ctrl.details.Created | getisodate }}</td>
             </tr>
             <tr>
               <td>Build</td>
-              <td>Docker {{ ctrl.details.DockerVersion }} on {{ ctrl.details.Os}}, {{ ctrl.details.Architecture }}</td>
+              <td>Docker {{ ctrl.details.DockerVersion }} on {{ ctrl.details.Os }}, {{ ctrl.details.Architecture }}</td>
             </tr>
             <tr ng-if="ctrl.details.Author">
               <td>Author</td>
@@ -78,11 +77,15 @@
           <tbody>
             <tr>
               <td>CMD</td>
-              <td><code>{{ ctrl.details.Command|command }}</code></td>
+              <td
+                ><code>{{ ctrl.details.Command | command }}</code></td
+              >
             </tr>
             <tr ng-if="ctrl.details.Entrypoint">
               <td>ENTRYPOINT</td>
-              <td><code>{{ ctrl.details.Entrypoint|command }}</code></td>
+              <td
+                ><code>{{ ctrl.details.Entrypoint | command }}</code></td
+              >
             </tr>
             <tr ng-if="ctrl.details.ExposedPorts.length > 0">
               <td>EXPOSE</td>
@@ -116,7 +119,6 @@
       </rd-widget-body>
     </rd-widget>
   </div>
-
 </div>
 
 <div class="row" ng-if="ctrl.tag">
@@ -126,7 +128,7 @@
       <rd-widget-body classes="no-padding">
         <table id="image-layers" class="table">
           <thead>
-            <th style="white-space:nowrap;">
+            <th style="white-space: nowrap;">
               <a ng-click="ctrl.order('Order')">
                 Order
                 <span ng-show="ctrl.Sort.Type == 'Order' && !ctrl.Sort.Reverse" class="glyphicon glyphicon-chevron-down"></span>
@@ -143,25 +145,25 @@
           </thead>
           <tbody>
             <tr ng-repeat="layer in ctrl.history | orderBy:ctrl.Sort.Type:ctrl.Sort.Reverse">
-              <td style="white-space:nowrap;">
+              <td style="white-space: nowrap;">
                 {{ layer.Order }}
               </td>
               <td class="expand">
                 <div ng-if="layer.CreatedBy.length > 130">
-                  <span id="layer-command-{{$index}}-full" style="display: none">
+                  <span id="layer-command-{{ $index }}-full" style="display: none;">
                     {{ layer.CreatedBy }}
                   </span>
-                  <span id="layer-command-{{$index}}-short">
-                    {{ layer.CreatedBy | truncate:130 }}
+                  <span id="layer-command-{{ $index }}-short">
+                    {{ layer.CreatedBy | truncate: 130 }}
                     <span ng-if="layer.CreatedBy.length > 130" style="margin-left: 5px;">
-                      <a id="layer-command-expander{{$index}}" class="btn" ng-click='ctrl.toggleLayerCommand($index)'>
+                      <a id="layer-command-expander{{ $index }}" class="btn" ng-click="ctrl.toggleLayerCommand($index)">
                         <i class="fa fa-plus-circle" aria-hidden="true"></i>
                       </a>
                     </span>
                   </span>
                 </div>
                 <div ng-if="layer.CreatedBy.length <= 130">
-                  <span id="layer-command-{{$index}}-full">
+                  <span id="layer-command-{{ $index }}-full">
                     {{ layer.CreatedBy }}
                   </span>
                 </div>

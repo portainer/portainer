@@ -23,11 +23,12 @@
               <td colspan="2">
                 <label for="permissions" class="control-label text-left">
                   Administrator
-                  <portainer-tooltip position="bottom" message="Administrators have access to Portainer settings management as well as full control over all defined endpoints and their resources."></portainer-tooltip>
+                  <portainer-tooltip
+                    position="bottom"
+                    message="Administrators have access to Portainer settings management as well as full control over all defined endpoints and their resources."
+                  ></portainer-tooltip>
                 </label>
-                <label class="switch" style="margin-left: 20px;">
-                  <input type="checkbox" ng-model="formValues.Administrator" ng-change="updatePermissions()"><i></i>
-                </label>
+                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.Administrator" ng-change="updatePermissions()" /><i></i> </label>
               </td>
             </tr>
           </tbody>
@@ -49,7 +50,7 @@
             <div class="col-sm-8">
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
-                <input type="password" class="form-control" ng-model="formValues.newPassword" id="new_password">
+                <input type="password" class="form-control" ng-model="formValues.newPassword" id="new_password" />
               </div>
             </div>
           </div>
@@ -60,15 +61,28 @@
             <div class="col-sm-8">
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-lock" aria-hidden="true"></i></span>
-                <input type="password" class="form-control" ng-model="formValues.confirmPassword" id="confirm_password">
-                <span class="input-group-addon"><i ng-class="{true: 'fa fa-check green-icon', false: 'fa fa-times red-icon'}[formValues.newPassword !== '' && formValues.newPassword === formValues.confirmPassword]" aria-hidden="true"></i></span>
+                <input type="password" class="form-control" ng-model="formValues.confirmPassword" id="confirm_password" />
+                <span class="input-group-addon"
+                  ><i
+                    ng-class="
+                      { true: 'fa fa-check green-icon', false: 'fa fa-times red-icon' }[formValues.newPassword !== '' && formValues.newPassword === formValues.confirmPassword]
+                    "
+                    aria-hidden="true"
+                  ></i
+                ></span>
               </div>
             </div>
           </div>
           <!-- !confirm-password-input -->
           <div class="form-group">
             <div class="col-sm-2">
-              <button type="submit" class="btn btn-primary btn-sm" ng-disabled="formValues.newPassword === '' || formValues.newPassword !== formValues.confirmPassword" ng-click="updatePassword()">Update password</button>
+              <button
+                type="submit"
+                class="btn btn-primary btn-sm"
+                ng-disabled="formValues.newPassword === '' || formValues.newPassword !== formValues.confirmPassword"
+                ng-click="updatePassword()"
+                >Update password</button
+              >
             </div>
           </div>
         </form>

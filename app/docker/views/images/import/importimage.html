@@ -1,8 +1,6 @@
 <rd-header>
   <rd-header-title title-text="Import image"></rd-header-title>
-  <rd-header-content>
-    <a ui-sref="docker.images">Images</a> &gt; Import image
-  </rd-header-content>
+  <rd-header-content> <a ui-sref="docker.images">Images</a> &gt; Import image </rd-header-content>
 </rd-header>
 
 <div class="row">
@@ -21,7 +19,9 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button class="btn btn-sm btn-primary" ngf-select ngf-min-size="10" ngf-accept="'application/x-tar,application/x-gzip'" ng-model="formValues.UploadFile">Select file</button>
+              <button class="btn btn-sm btn-primary" ngf-select ngf-min-size="10" ngf-accept="'application/x-tar,application/x-gzip'" ng-model="formValues.UploadFile"
+                >Select file</button
+              >
               <span style="margin-left: 5px;">
                 {{ formValues.UploadFile.name }}
                 <i class="fa fa-times red-icon" ng-if="!formValues.UploadFile" aria-hidden="true"></i>
@@ -34,8 +34,7 @@
               Deployment
             </div>
             <!-- node-selection -->
-            <node-selector model="formValues.NodeName">
-            </node-selector>
+            <node-selector model="formValues.NodeName"> </node-selector>
             <!-- !node-selection -->
           </div>
           <!-- actions -->
@@ -44,8 +43,13 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !formValues.UploadFile"
-                      ng-click="uploadImage()" button-spinner="state.actionInProgress">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                ng-disabled="state.actionInProgress || !formValues.UploadFile"
+                ng-click="uploadImage()"
+                button-spinner="state.actionInProgress"
+              >
                 <span ng-hide="state.actionInProgress">Upload</span>
                 <span ng-show="state.actionInProgress">Images uploading in progress...</span>
               </button>

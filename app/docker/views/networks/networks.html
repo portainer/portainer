@@ -10,14 +10,16 @@
 <div class="row">
   <div class="col-sm-12">
     <networks-datatable
-    title-text="Networks" title-icon="fa-sitemap"
-    dataset="networks" table-key="networks"
-    order-by="Name"
-    remove-action="removeAction"
-    show-ownership-column="applicationState.application.authentication"
-    show-host-column="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'"
-    offline-mode="offlineMode"
-    refresh-callback="getNetworks"
+      title-text="Networks"
+      title-icon="fa-sitemap"
+      dataset="networks"
+      table-key="networks"
+      order-by="Name"
+      remove-action="removeAction"
+      show-ownership-column="applicationState.application.authentication"
+      show-host-column="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'"
+      offline-mode="offlineMode"
+      refresh-callback="getNetworks"
     ></networks-datatable>
   </div>
 </div>

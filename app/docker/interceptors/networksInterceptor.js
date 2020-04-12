@@ -1,5 +1,7 @@
-angular.module('portainer.app')
-  .factory('NetworksInterceptor', ['$q', 'EndpointProvider', function ($q, EndpointProvider) {
+angular.module('portainer.app').factory('NetworksInterceptor', [
+  '$q',
+  'EndpointProvider',
+  function ($q, EndpointProvider) {
     'use strict';
     var interceptor = {};
 
@@ -18,4 +20,5 @@ angular.module('portainer.app')
       return $q.reject(rejection);
     }
     return interceptor;
-  }]);
+  },
+]);

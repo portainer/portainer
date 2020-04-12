@@ -8,6 +8,6 @@ angular.module('portainer.app').component('schedulesDatatable', {
     tableKey: '@',
     orderBy: '@',
     reverseOrder: '<',
-    removeAction: '<'
-  }
+    removeAction: '<',
+  },
 });

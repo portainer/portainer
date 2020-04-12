@@ -12,6 +12,6 @@ angular.module('portainer.docker').component('containerNetworksDatatable', {
     joinNetworkActionInProgress: '<',
     leaveNetworkActionInProgress: '<',
     leaveNetworkAction: '<',
-    nodeName: '<'
-  }
+    nodeName: '<',
+  },
 });

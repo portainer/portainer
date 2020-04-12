@@ -20,9 +20,9 @@ class AccessViewerController {
     this.userRoles = [];
     const userRoles = {};
     const user = this.selectedUser;
-    const userMemberships = _.filter(this.teamMemberships, {UserId: user.Id});
+    const userMemberships = _.filter(this.teamMemberships, { UserId: user.Id });
 
-    for (const [,endpoint] of _.entries(this.endpoints)) {
+    for (const [, endpoint] of _.entries(this.endpoints)) {
       let role = this.getRoleFromUserEndpointPolicy(user, endpoint);
       if (role) {
         userRoles[endpoint.Id] = role;
@@ -57,23 +57,23 @@ class AccessViewerController {
   getRoleFromUserEndpointPolicy(user, endpoint) {
     const policyRoles = [];
     const policy = endpoint.UserAccessPolicies[user.Id];
-      if (policy) {
-        const accessPolicy = new AccessViewerPolicyModel(policy, endpoint, this.roles, null, null);
-        policyRoles.push(accessPolicy);
-      }
+    if (policy) {
+      const accessPolicy = new AccessViewerPolicyModel(policy, endpoint, this.roles, null, null);
+      policyRoles.push(accessPolicy);
+    }
     return this.findLowestRole(policyRoles);
   }
-  
+
   getRoleFromUserEndpointGroupPolicy(user, endpoint) {
     const policyRoles = [];
     const policy = this.groupUserAccessPolicies[endpoint.GroupId][user.Id];
-      if (policy) {
-        const accessPolicy = new AccessViewerPolicyModel(policy, endpoint, this.roles, this.groups[endpoint.GroupId], null);
-        policyRoles.push(accessPolicy);
-      }
+    if (policy) {
+      const accessPolicy = new AccessViewerPolicyModel(policy, endpoint, this.roles, this.groups[endpoint.GroupId], null);
+      policyRoles.push(accessPolicy);
+    }
     return this.findLowestRole(policyRoles);
   }
-  
+
   getRoleFromTeamEndpointPolicies(memberships, endpoint) {
     const policyRoles = [];
     for (const membership of memberships) {
@@ -85,11 +85,11 @@ class AccessViewerController {
     }
     return this.findLowestRole(policyRoles);
   }
-  
+
   getRoleFromTeamEndpointGroupPolicies(memberships, endpoint) {
     const policyRoles = [];
     for (const membership of memberships) {
-      const policy = this.groupTeamAccessPolicies[endpoint.GroupId][membership.TeamId]
+      const policy = this.groupTeamAccessPolicies[endpoint.GroupId][membership.TeamId];
       if (policy) {
         const accessPolicy = new AccessViewerPolicyModel(policy, endpoint, this.roles, this.groups[endpoint.GroupId], this.teams[membership.TeamId]);
         policyRoles.push(accessPolicy);
@@ -107,7 +107,7 @@ class AccessViewerController {
         const groups = await this.GroupService.groups();
         this.groupUserAccessPolicies = {};
         this.groupTeamAccessPolicies = {};
-        _.forEach(groups, group => {
+        _.forEach(groups, (group) => {
           this.groupUserAccessPolicies[group.Id] = group.UserAccessPolicies;
           this.groupTeamAccessPolicies[group.Id] = group.TeamAccessPolicies;
         });
@@ -117,12 +117,10 @@ class AccessViewerController {
         this.teamMemberships = await this.TeamMembershipService.memberships();
       }
     } catch (err) {
-      this.Notifications.error("Failure", err, "Unable to retrieve accesses");
+      this.Notifications.error('Failure', err, 'Unable to retrieve accesses');
     }
   }
 }
 
 export default AccessViewerController;
-angular
-  .module("portainer.app")
-  .controller("AccessViewerController", AccessViewerController);
+angular.module('portainer.app').controller('AccessViewerController', AccessViewerController);

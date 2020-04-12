@@ -1,161 +1,166 @@
 import _ from 'lodash-es';
 
-angular.module('portainer.app')
-.factory('ResourceControlService', ['$q', 'ResourceControl', 'UserService', 'TeamService', 'ResourceControlHelper',
+angular.module('portainer.app').factory('ResourceControlService', [
+  '$q',
+  'ResourceControl',
+  'UserService',
+  'TeamService',
+  'ResourceControlHelper',
   function ResourceControlServiceFactory($q, ResourceControl, UserService, TeamService, ResourceControlHelper) {
-  'use strict';
-  const service = {};
+    'use strict';
+    const service = {};
 
-  service.duplicateResourceControl = duplicateResourceControl;
-  service.applyResourceControlChange = applyResourceControlChange;
-  service.applyResourceControl = applyResourceControl;
-  service.retrieveOwnershipDetails = retrieveOwnershipDetails;
-  service.retrieveUserPermissionsOnResource =retrieveUserPermissionsOnResource;
+    service.duplicateResourceControl = duplicateResourceControl;
+    service.applyResourceControlChange = applyResourceControlChange;
+    service.applyResourceControl = applyResourceControl;
+    service.retrieveOwnershipDetails = retrieveOwnershipDetails;
+    service.retrieveUserPermissionsOnResource = retrieveUserPermissionsOnResource;
 
-  /**
-   * PRIVATE SECTION
-   */
+    /**
+     * PRIVATE SECTION
+     */
 
-  /**
-   * Create a ResourceControl
-   * @param {ResourceControlTypeString} rcType Type of ResourceControl
-   * @param {string} rcID ID of involved resource
-   * @param {ResourceControlOwnershipParameters} ownershipParameters Transcient type from view data to payload
-   */
-   function createResourceControl(rcType, resourceID, ownershipParameters) {
-    var payload = {
-      Type: rcType,
-      Public: ownershipParameters.Public,
-      AdministratorsOnly: ownershipParameters.AdministratorsOnly,
-      ResourceID: resourceID,
-      Users: ownershipParameters.Users,
-      Teams: ownershipParameters.Teams,
-      SubResourceIds: ownershipParameters.SubResourceIDs
-    };
-    return ResourceControl.create({}, payload).$promise;
-  }
+    /**
+     * Create a ResourceControl
+     * @param {ResourceControlTypeString} rcType Type of ResourceControl
+     * @param {string} rcID ID of involved resource
+     * @param {ResourceControlOwnershipParameters} ownershipParameters Transcient type from view data to payload
+     */
+    function createResourceControl(rcType, resourceID, ownershipParameters) {
+      var payload = {
+        Type: rcType,
+        Public: ownershipParameters.Public,
+        AdministratorsOnly: ownershipParameters.AdministratorsOnly,
+        ResourceID: resourceID,
+        Users: ownershipParameters.Users,
+        Teams: ownershipParameters.Teams,
+        SubResourceIds: ownershipParameters.SubResourceIDs,
+      };
+      return ResourceControl.create({}, payload).$promise;
+    }
 
-  /**
-   * Update a ResourceControl
-   * @param {String} rcID ID of involved resource
-   * @param {ResourceControlOwnershipParameters} ownershipParameters Transcient type from view data to payload
-   */
-  function updateResourceControl(rcID, ownershipParameters) {
-    const payload = {
-      AdministratorsOnly: ownershipParameters.AdministratorsOnly,
-      Public: ownershipParameters.Public,
-      Users: ownershipParameters.Users,
-      Teams: ownershipParameters.Teams
-    };
+    /**
+     * Update a ResourceControl
+     * @param {String} rcID ID of involved resource
+     * @param {ResourceControlOwnershipParameters} ownershipParameters Transcient type from view data to payload
+     */
+    function updateResourceControl(rcID, ownershipParameters) {
+      const payload = {
+        AdministratorsOnly: ownershipParameters.AdministratorsOnly,
+        Public: ownershipParameters.Public,
+        Users: ownershipParameters.Users,
+        Teams: ownershipParameters.Teams,
+      };
 
-    return ResourceControl.update({id: rcID}, payload).$promise;
-  }
+      return ResourceControl.update({ id: rcID }, payload).$promise;
+    }
 
-  /**
-   * END PRIVATE SECTION
-   */
+    /**
+     * END PRIVATE SECTION
+     */
 
-  /**
-   * PUBLIC SECTION
-   */
+    /**
+     * PUBLIC SECTION
+     */
 
-   /**
-    * Apply a ResourceControl after Resource creation
-    * @param {int} userId ID of User performing the action
-    * @param {AccessControlFormData} accessControlData ResourceControl to apply
-    * @param {ResourceControlViewModel} resourceControl ResourceControl to update
-    * @param {[]int} subResources SubResources managed by the ResourceControl
-    */
-  function applyResourceControl(userId, accessControlData, resourceControl, subResources=[]) {
-    const ownershipParameters = ResourceControlHelper.RCFormDataToOwnershipParameters(userId, accessControlData, subResources);
-    return updateResourceControl(resourceControl.Id, ownershipParameters);
-  }
-
-  /**
-   * Duplicate an existing ResourceControl (default to AdministratorsOnly if undefined)
-   * @param {int} userId ID of User performing the action
-   * @param {ResourceControlViewModel} oldResourceControl ResourceControl to duplicate
-   * @param {ResourceControlViewModel} newResourceControl ResourceControl to apply duplication to
-   */
-  function duplicateResourceControl(userId, oldResourceControl, newResourceControl) {
-    const ownershipParameters = ResourceControlHelper.RCViewModelToOwnershipParameters(userId, oldResourceControl);
-    return updateResourceControl(newResourceControl.Id, ownershipParameters);
-  }
-
-  /**
-   * Update an existing ResourceControl or create a new one on existing resource without RC
-   * @param {ResourceControlTypeString} rcType Type of ResourceControl
-   * @param {String} resourceId ID of involved Resource
-   * @param {ResourceControlViewModel} resourceControl Previous ResourceControl (can be undefined)
-   * @param {AccessControlPanelData} formValues View data generated by AccessControlPanel
-   */
-  function applyResourceControlChange(rcType, resourceId, resourceControl, formValues) {
-    const ownershipParameters = ResourceControlHelper.RCPanelDataToOwnershipParameters(formValues);
-    if (resourceControl) {
+    /**
+     * Apply a ResourceControl after Resource creation
+     * @param {int} userId ID of User performing the action
+     * @param {AccessControlFormData} accessControlData ResourceControl to apply
+     * @param {ResourceControlViewModel} resourceControl ResourceControl to update
+     * @param {[]int} subResources SubResources managed by the ResourceControl
+     */
+    function applyResourceControl(userId, accessControlData, resourceControl, subResources = []) {
+      const ownershipParameters = ResourceControlHelper.RCFormDataToOwnershipParameters(userId, accessControlData, subResources);
       return updateResourceControl(resourceControl.Id, ownershipParameters);
-    } else {
-      return createResourceControl(rcType, resourceId, ownershipParameters);
-    }
-  }
-
-  /**
-   * Retrive users and team details for ResourceControlViewModel
-   * @param {ResourceControlViewModel} resourceControl ResourceControl view model
-   */
-  function retrieveOwnershipDetails(resourceControl) {
-    var deferred = $q.defer();
-
-    if (!resourceControl) {
-      deferred.resolve({ authorizedUsers: [], authorizedTeams: [] });
-      return deferred.promise;
     }
 
-    $q.all({
-      users: resourceControl.UserAccesses.length > 0 ? UserService.users(false) : [],
-      teams: resourceControl.TeamAccesses.length > 0 ? TeamService.teams() : []
-    })
-    .then(function success(data) {
-      var authorizedUsers = ResourceControlHelper.retrieveAuthorizedUsers(resourceControl, data.users);
-      var authorizedTeams = ResourceControlHelper.retrieveAuthorizedTeams(resourceControl, data.teams);
-      deferred.resolve({ authorizedUsers: authorizedUsers, authorizedTeams: authorizedTeams });
-    })
-    .catch(function error(err) {
-      deferred.reject({ msg: 'Unable to retrieve user and team information', err: err });
-    });
-
-    return deferred.promise;
-  }
-
-  function retrieveUserPermissionsOnResource(userID, isAdministrator, resourceControl) {
-    var deferred = $q.defer();
-
-    if (!resourceControl || isAdministrator) {
-      deferred.resolve({ isPartOfRestrictedUsers: false, isLeaderOfAnyRestrictedTeams: false });
-      return deferred.promise;
+    /**
+     * Duplicate an existing ResourceControl (default to AdministratorsOnly if undefined)
+     * @param {int} userId ID of User performing the action
+     * @param {ResourceControlViewModel} oldResourceControl ResourceControl to duplicate
+     * @param {ResourceControlViewModel} newResourceControl ResourceControl to apply duplication to
+     */
+    function duplicateResourceControl(userId, oldResourceControl, newResourceControl) {
+      const ownershipParameters = ResourceControlHelper.RCViewModelToOwnershipParameters(userId, oldResourceControl);
+      return updateResourceControl(newResourceControl.Id, ownershipParameters);
     }
 
-    var found = _.find(resourceControl.UserAccesses, { UserId: userID });
-    if (found) {
-      deferred.resolve({ isPartOfRestrictedUsers: true, isLeaderOfAnyRestrictedTeams: false });
-    } else {
-      var isTeamLeader = false;
-      UserService.userMemberships(userID)
-      .then(function success(data) {
-        var memberships = data;
-        isTeamLeader = ResourceControlHelper.isLeaderOfAnyRestrictedTeams(memberships, resourceControl);
-        deferred.resolve({ isPartOfRestrictedUsers: false, isLeaderOfAnyRestrictedTeams: isTeamLeader });
+    /**
+     * Update an existing ResourceControl or create a new one on existing resource without RC
+     * @param {ResourceControlTypeString} rcType Type of ResourceControl
+     * @param {String} resourceId ID of involved Resource
+     * @param {ResourceControlViewModel} resourceControl Previous ResourceControl (can be undefined)
+     * @param {AccessControlPanelData} formValues View data generated by AccessControlPanel
+     */
+    function applyResourceControlChange(rcType, resourceId, resourceControl, formValues) {
+      const ownershipParameters = ResourceControlHelper.RCPanelDataToOwnershipParameters(formValues);
+      if (resourceControl) {
+        return updateResourceControl(resourceControl.Id, ownershipParameters);
+      } else {
+        return createResourceControl(rcType, resourceId, ownershipParameters);
+      }
+    }
+
+    /**
+     * Retrive users and team details for ResourceControlViewModel
+     * @param {ResourceControlViewModel} resourceControl ResourceControl view model
+     */
+    function retrieveOwnershipDetails(resourceControl) {
+      var deferred = $q.defer();
+
+      if (!resourceControl) {
+        deferred.resolve({ authorizedUsers: [], authorizedTeams: [] });
+        return deferred.promise;
+      }
+
+      $q.all({
+        users: resourceControl.UserAccesses.length > 0 ? UserService.users(false) : [],
+        teams: resourceControl.TeamAccesses.length > 0 ? TeamService.teams() : [],
       })
-      .catch(function error(err) {
-        deferred.reject({ msg: 'Unable to retrieve user memberships', err: err });
-      });
+        .then(function success(data) {
+          var authorizedUsers = ResourceControlHelper.retrieveAuthorizedUsers(resourceControl, data.users);
+          var authorizedTeams = ResourceControlHelper.retrieveAuthorizedTeams(resourceControl, data.teams);
+          deferred.resolve({ authorizedUsers: authorizedUsers, authorizedTeams: authorizedTeams });
+        })
+        .catch(function error(err) {
+          deferred.reject({ msg: 'Unable to retrieve user and team information', err: err });
+        });
+
+      return deferred.promise;
     }
 
-    return deferred.promise;
-  }
+    function retrieveUserPermissionsOnResource(userID, isAdministrator, resourceControl) {
+      var deferred = $q.defer();
 
-  /**
-   * END PUBLIC SECTION
-   */
+      if (!resourceControl || isAdministrator) {
+        deferred.resolve({ isPartOfRestrictedUsers: false, isLeaderOfAnyRestrictedTeams: false });
+        return deferred.promise;
+      }
 
-  return service;
-}]);
+      var found = _.find(resourceControl.UserAccesses, { UserId: userID });
+      if (found) {
+        deferred.resolve({ isPartOfRestrictedUsers: true, isLeaderOfAnyRestrictedTeams: false });
+      } else {
+        var isTeamLeader = false;
+        UserService.userMemberships(userID)
+          .then(function success(data) {
+            var memberships = data;
+            isTeamLeader = ResourceControlHelper.isLeaderOfAnyRestrictedTeams(memberships, resourceControl);
+            deferred.resolve({ isPartOfRestrictedUsers: false, isLeaderOfAnyRestrictedTeams: isTeamLeader });
+          })
+          .catch(function error(err) {
+            deferred.reject({ msg: 'Unable to retrieve user memberships', err: err });
+          });
+      }
+
+      return deferred.promise;
+    }
+
+    /**
+     * END PUBLIC SECTION
+     */
+
+    return service;
+  },
+]);
