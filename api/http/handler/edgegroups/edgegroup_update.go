@@ -11,11 +11,11 @@ import (
 )
 
 type edgeGroupUpdatePayload struct {
-	Name            string
-	Dynamic         bool
-	TagIDs          []portainer.TagID
-	Endpoints       []portainer.EndpointID
-	MustHaveAllTags *bool
+	Name         string
+	Dynamic      bool
+	TagIDs       []portainer.TagID
+	Endpoints    []portainer.EndpointID
+	PartialMatch *bool
 }
 
 func (payload *edgeGroupUpdatePayload) Validate(r *http.Request) error {
@@ -83,8 +83,8 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 		edgeGroup.Endpoints = endpointIDs
 	}
 
-	if payload.MustHaveAllTags != nil {
-		edgeGroup.MustHaveAllTags = *payload.MustHaveAllTags
+	if payload.PartialMatch != nil {
+		edgeGroup.PartialMatch = *payload.PartialMatch
 	}
 
 	err = handler.EdgeGroupService.UpdateEdgeGroup(edgeGroup.ID, edgeGroup)

@@ -6,7 +6,7 @@ import (
 
 type endpointSetType map[portainer.EndpointID]bool
 
-func (handler *Handler) getEndpointsByTags(tagIDs []portainer.TagID, mustHaveAllTags bool) ([]portainer.EndpointID, error) {
+func (handler *Handler) getEndpointsByTags(tagIDs []portainer.TagID, partialMatch bool) ([]portainer.EndpointID, error) {
 	endpoints, err := handler.EndpointService.Endpoints()
 	if err != nil {
 		return nil, err
@@ -26,10 +26,10 @@ func (handler *Handler) getEndpointsByTags(tagIDs []portainer.TagID, mustHaveAll
 	setsOfEndpoints := mapTagsToEndpoints(tags, groupEndpoints)
 
 	var endpointSet endpointSetType
-	if mustHaveAllTags {
-		endpointSet = setsIntersection(setsOfEndpoints)
-	} else {
+	if partialMatch {
 		endpointSet = setsUnion(setsOfEndpoints)
+	} else {
+		endpointSet = setsIntersection(setsOfEndpoints)
 	}
 
 	results := []portainer.EndpointID{}

@@ -86,12 +86,12 @@ type (
 
 	// EdgeGroup represents an Edge group
 	EdgeGroup struct {
-		ID              EdgeGroupID  `json:"Id"`
-		Name            string       `json:"Name"`
-		Dynamic         bool         `json:"Dynamic"`
-		TagIDs          []TagID      `json:"TagIds"`
-		Endpoints       []EndpointID `json:"Endpoints"`
-		MustHaveAllTags bool         `json:"MustHaveAllTags"`
+		ID           EdgeGroupID  `json:"Id"`
+		Name         string       `json:"Name"`
+		Dynamic      bool         `json:"Dynamic"`
+		TagIDs       []TagID      `json:"TagIds"`
+		Endpoints    []EndpointID `json:"Endpoints"`
+		PartialMatch bool         `json:"PartialMatch"`
 	}
 
 	// EdgeGroupID represents an Edge group identifier
