@@ -287,7 +287,8 @@
                     {{ volume.mountPath }}
                   </td>
                   <td>
-                    <i class="fa fa-key" aria-hidden="true"></i> {{ volume.configurationKey }}
+                    <span ng-if="volume.configurationKey"><i class="fa fa-key" aria-hidden="true"></i> {{ volume.configurationKey }}</span>
+                    <span ng-if="!volume.configurationKey">-</span>
                   </td>
                   <td>
                     <a ui-sref="kubernetes.configurations.configuration({ name: volume.configurationName, namespace: ctrl.application.ResourcePool })"><i class="fa fa-file-code" aria-hidden="true"></i> {{ volume.configurationName }}</a>

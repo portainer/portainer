@@ -84,14 +84,22 @@ class KubernetesApplicationConverter {
             configurationName = volume.secret.secretName;
           }
 
-          _.forEach(items, (item) => {
-            const configurationVolume = new KubernetesApplicationConfigurationVolume();
-            configurationVolume.mountPath = matchingVolumeMount.mountPath + '/' + item.path;
-            configurationVolume.configurationKey = item.key;
-            configurationVolume.configurationName = configurationName;
 
+          if (!items) {
+            const configurationVolume = new KubernetesApplicationConfigurationVolume();
+            configurationVolume.mountPath = matchingVolumeMount.mountPath;
+            configurationVolume.configurationName = configurationName;
             acc.push(configurationVolume);
-          });
+          } else {
+            _.forEach(items, (item) => {
+              const configurationVolume = new KubernetesApplicationConfigurationVolume();
+              configurationVolume.mountPath = matchingVolumeMount.mountPath + '/' + item.path;
+              configurationVolume.configurationKey = item.key;
+              configurationVolume.configurationName = configurationName;
+
+              acc.push(configurationVolume);
+            });
+          }
         }
       }
 
