@@ -19,6 +19,7 @@ class CreateEdgeGroupController {
       Endpoints: [],
       Dynamic: false,
       TagIds: [],
+      PartialMatch: false,
     };
 
     this.createGroup = this.createGroup.bind(this);
