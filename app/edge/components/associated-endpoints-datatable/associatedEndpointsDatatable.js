@@ -11,5 +11,6 @@ angular.module('portainer.edge').component('associatedEndpointsDatatable', {
     accessManagement: '<',
     removeAction: '<',
     retrievePage: '<',
+    updateKey: '<',
   },
 });

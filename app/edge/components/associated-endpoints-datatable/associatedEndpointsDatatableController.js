@@ -56,6 +56,12 @@ class AssociatedEndpointsDatatableController {
     this.paginationChanged();
   }
 
+  $onChanges({ updateKey }) {
+    if (updateKey.currentValue && !updateKey.isFirstChange()) {
+      this.paginationChanged();
+    }
+  }
+
   onPageChange(newPageNumber) {
     this.state.pageNumber = newPageNumber;
     this.paginationChanged();

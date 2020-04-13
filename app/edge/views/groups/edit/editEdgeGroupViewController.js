@@ -2,7 +2,7 @@ import angular from 'angular';
 
 class EditEdgeGroupController {
   /* @ngInject */
-  constructor(EdgeGroupService, GroupService, TagService, Notifications, $state, $async, EndpointService, EndpointHelper) {
+  constructor(EdgeGroupService, GroupService, TagService, Notifications, $state, $async, EndpointService, EndpointHelper, $scope) {
     this.EdgeGroupService = EdgeGroupService;
     this.GroupService = GroupService;
     this.TagService = TagService;
@@ -20,6 +20,12 @@ class EditEdgeGroupController {
     this.updateGroupAsync = this.updateGroupAsync.bind(this);
     this.getPaginatedEndpoints = this.getPaginatedEndpoints.bind(this);
     this.getPaginatedEndpointsAsync = this.getPaginatedEndpointsAsync.bind(this);
+    this.tableUpdateKey = 0;
+    $scope.$watch(
+      () => this.model,
+      () => this.tableUpdateKey++,
+      true
+    );
   }
 
   async $onInit() {
