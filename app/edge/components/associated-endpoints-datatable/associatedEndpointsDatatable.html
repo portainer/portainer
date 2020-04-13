@@ -4,12 +4,6 @@
       <div class="toolBar">
         <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
       </div>
-      <div class="actionBar" ng-if="$ctrl.endpointManagement">
-        <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
-          <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
-        </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.endpoints.new"> <i class="fa fa-plus space-right" aria-hidden="true"></i>Add endpoint </button>
-      </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
         <input
@@ -27,23 +21,13 @@
           <thead>
             <tr>
               <th>
-                <span class="md-checkbox" ng-if="$ctrl.endpointManagement">
-                  <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
-                  <label for="select_all"></label>
-                </span>
                 <a ng-click="$ctrl.changeOrderBy('Name')">
                   Name
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th>
-                <a ng-click="$ctrl.changeOrderBy('Type')">
-                  Type
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Type' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Type' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
+
               <th>
                 <a ng-click="$ctrl.changeOrderBy('URL')">
                   URL
@@ -58,7 +42,6 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'GroupName' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -68,24 +51,11 @@
               ng-class="{ active: item.Checked }"
             >
               <td>
-                <span class="md-checkbox" ng-if="$ctrl.endpointManagement">
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
-                  <label for="select_{{ $index }}"></label>
-                </span>
-                <a ui-sref="portainer.endpoints.endpoint({id: item.Id})" ng-if="$ctrl.endpointManagement">{{ item.Name }}</a>
-                <span ng-if="!$ctrl.endpointManagement">{{ item.Name }}</span>
+                <span>{{ item.Name }}</span>
               </td>
-              <td>
-                <span>
-                  <i ng-class="item.Type | endpointtypeicon" aria-hidden="true" style="margin-right: 2px;"></i>
-                  {{ item.Type | endpointtypename }}
-                </span>
-              </td>
+
               <td>{{ item.URL | stripprotocol }}</td>
               <td>{{ item.GroupName }}</td>
-              <td>
-                <a ui-sref="portainer.endpoints.endpoint.access({id: item.Id})" ng-if="$ctrl.accessManagement"> <i class="fa fa-users" aria-hidden="true"></i> Manage access </a>
-              </td>
             </tr>
             <tr ng-if="$ctrl.state.loading">
               <td colspan="5" class="text-center text-muted">Loading...</td>
