@@ -21,8 +21,7 @@
   <div class="col-sm-12 form-section-title">
     Group type
   </div>
-  <div class="form-group"></div>
-  <div class="form-group" style="margin-bottom: 0;">
+  <div class="form-group col-sm-12">
     <div class="boxselector_wrapper">
       <div class="boxselector">
         <input type="radio" id="static-group" ng-model="$ctrl.model.Dynamic" ng-value="false" ng-checked="!$ctrl.model.Dynamic" />
@@ -53,14 +52,16 @@
   <!-- StaticGroup -->
   <div ng-if="!$ctrl.model.Dynamic">
     <div ng-if="!$ctrl.noEndpoints">
-      <multi-endpoint-selector
-        ng-if="$ctrl.groups"
-        model="$ctrl.model.Endpoints"
-        endpoints="$ctrl.endpoints"
-        groups="$ctrl.groups"
-        tags="$ctrl.tags"
-        on-search="($ctrl.searchEndpoints)"
-      ></multi-endpoint-selector>
+      <div class="form-group col-sm-12" style="margin-bottom: 0;">
+        <multi-endpoint-selector
+          ng-if="$ctrl.groups"
+          model="$ctrl.model.Endpoints"
+          endpoints="$ctrl.endpoints"
+          groups="$ctrl.groups"
+          tags="$ctrl.tags"
+          on-search="($ctrl.searchEndpoints)"
+        ></multi-endpoint-selector>
+      </div>
       <div class="form-group" ng-show="!$ctrl.model.Endpoints.length">
         <div class="col-sm-12 small text-warning" style="margin-top: 15px;">
           <div ng-messages="EdgeGroupForm.group_name.$error">
@@ -83,50 +84,38 @@
     <div class="col-sm-12 form-section-title">
       Tags
     </div>
-    <div class="form-group">
-      <tag-selector ng-if="$ctrl.tags.length" tags="$ctrl.tags" model="$ctrl.model.TagIds"></tag-selector>
-      <div ng-if="$ctrl.tags && !$ctrl.tags.length" class="col-sm-12 small text-muted">
-        No tags available. Head over to the <a ui-sref="portainer.tags">Tags view</a> to add tags
-      </div>
-    </div>
-
-    <div class="form-group" style="margin-bottom: 0;">
+    <div ng-if="$ctrl.tags.length" class="form-group col-sm-12">
       <div class="boxselector_wrapper">
         <div class="boxselector">
-          <input
-            type="radio"
-            id="or-selector"
-            ng-model="$ctrl.model.MustHaveAllTags"
-            ng-value="false"
-            ng-checked="!$ctrl.model.MustHaveAllTags"
-          />
+          <input type="radio" id="or-selector" ng-model="$ctrl.model.MustHaveAllTags" ng-value="false" ng-checked="!$ctrl.model.MustHaveAllTags" />
           <label for="or-selector">
             <div class="boxselector_header">
-              <!-- <i class="fa fa-list-ol" aria-hidden="true" style="margin-right: 2px;"></i> -->
+              <i class="fa fa-tag" aria-hidden="true" style="margin-right: 2px;"></i>
               Partial match
             </div>
             <p>Associate any endpoint matching at least one of the selected tags</p>
           </label>
         </div>
         <div class="boxselector">
-          <input
-            type="radio"
-            id="and-selector"
-            ng-model="$ctrl.model.MustHaveAllTags"
-            ng-value="true"
-            ng-checked="$ctrl.model.MustHaveAllTags"
-          />
+          <input type="radio" id="and-selector" ng-model="$ctrl.model.MustHaveAllTags" ng-value="true" ng-checked="$ctrl.model.MustHaveAllTags" />
           <label for="and-selector">
             <div class="boxselector_header">
-              <!-- <i class="fa fa-tags" aria-hidden="true" style="margin-right: 2px;"></i> -->
-             Full match
+              <i class="fa fa-tag" aria-hidden="true" style="margin-right: 2px;"></i>
+              Full match
             </div>
             <p>Associate any endpoint matching all of the selected tags</p>
           </label>
         </div>
       </div>
     </div>
+    <div class="form-group">
+      <tag-selector ng-if="$ctrl.tags.length" tags="$ctrl.tags" model="$ctrl.model.TagIds"></tag-selector>
+      <div ng-if="$ctrl.tags && !$ctrl.tags.length" class="col-sm-12 small text-muted">
+        No tags available. Head over to the <a ui-sref="portainer.tags">Tags view</a> to add tags
+      </div>
+    </div>
   </div>
+
   <!-- !DynamicGroup -->
 
   <!-- actions -->
