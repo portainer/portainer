@@ -39,10 +39,11 @@ class CreateEdgeStackViewController {
 
   async $onInit() {
     this.edgeGroups = await this.EdgeGroupService.groups();
+    this.noGroups = this.edgeGroups.length === 0;
   }
 
   createStack() {
-    return this.$async(this.createStackAsync)
+    return this.$async(this.createStackAsync);
   }
 
   async createStackAsync() {
@@ -89,11 +90,7 @@ class CreateEdgeStackViewController {
   }
 
   createStackFromFileContent(name) {
-    return this.EdgeStackService.createStackFromFileContent(
-      name,
-      this.formValues.StackFileContent,
-      this.formValues.Groups
-    );
+    return this.EdgeStackService.createStackFromFileContent(name, this.formValues.StackFileContent, this.formValues.Groups);
   }
 
   createStackFromFileUpload(name) {
