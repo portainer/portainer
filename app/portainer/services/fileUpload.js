@@ -85,6 +85,19 @@ angular.module('portainer.app').factory('FileUploadService', [
       });
     };
 
+    service.createEdgeStack = function createEdgeStack(stackName, file, edgeGroups) {
+      return Upload.upload({
+        url: 'api/edge_stacks?method=file',
+        data: {
+          file: file,
+          Name: stackName,
+          EdgeGroups: Upload.json(edgeGroups)
+        },
+        ignoreLoadingBar: true
+      });
+    };
+  
+
     service.configureRegistry = function (registryId, registryManagementConfigurationModel) {
       return Upload.upload({
         url: 'api/registries/' + registryId + '/configure',
