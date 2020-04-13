@@ -22,7 +22,7 @@ func (handler *Handler) edgeGroupInspect(w http.ResponseWriter, r *http.Request)
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an Edge group with the specified identifier inside the database", err}
 	}
 	if edgeGroup.Dynamic {
-		endpoints, err := handler.getEndpointsByTags(edgeGroup.TagIDs)
+		endpoints, err := handler.getEndpointsByTags(edgeGroup.TagIDs, edgeGroup.PartialMatch)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints and endpoint groups for Edge group", err}
 		}
