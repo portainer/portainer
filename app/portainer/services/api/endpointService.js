@@ -11,7 +11,7 @@ angular.module('portainer.app').factory('EndpointService', [
     };
 
     service.endpoints = function (start, limit, { search, type, tagIds, endpointIds } = {}) {
-      return Endpoints.query({ start, limit, search, type, tagIds, endpointIds }).$promise;
+      return Endpoints.query({ start, limit, search, type, tagIds: JSON.stringify(tagIds), endpointIds: JSON.stringify(endpointIds) }).$promise;
     };
 
     service.snapshotEndpoints = function () {

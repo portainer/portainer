@@ -18,4 +18,15 @@
       </rd-widget-body>
     </rd-widget>
   </div>
+
+  <div class="col-sm-12">
+    <associated-endpoints-datatable
+      title-text="Associated Endpoints"
+      title-icon="fa-plug"
+      table-key="associatedEndpoints"
+      order-by="Name"
+      remove-action="$ctrl.removeAction"
+      retrieve-page="$ctrl.getPaginatedEndpoints"
+    ></associated-endpoints-datatable>
+  </div>
 </div>

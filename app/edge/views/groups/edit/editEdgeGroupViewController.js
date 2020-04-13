@@ -2,13 +2,15 @@ import angular from 'angular';
 
 class EditEdgeGroupController {
   /* @ngInject */
-  constructor(EdgeGroupService, GroupService, TagService, Notifications, $state, $async) {
+  constructor(EdgeGroupService, GroupService, TagService, Notifications, $state, $async, EndpointService, EndpointHelper) {
     this.EdgeGroupService = EdgeGroupService;
     this.GroupService = GroupService;
     this.TagService = TagService;
     this.Notifications = Notifications;
     this.$state = $state;
     this.$async = $async;
+    this.EndpointService = EndpointService;
+    this.EndpointHelper = EndpointHelper;
 
     this.state = {
       actionInProgress: false,
@@ -16,6 +18,8 @@ class EditEdgeGroupController {
 
     this.updateGroup = this.updateGroup.bind(this);
     this.updateGroupAsync = this.updateGroupAsync.bind(this);
+    this.getPaginatedEndpoints = this.getPaginatedEndpoints.bind(this);
+    this.getPaginatedEndpointsAsync = this.getPaginatedEndpointsAsync.bind(this);
   }
 
   async $onInit() {
@@ -44,6 +48,26 @@ class EditEdgeGroupController {
       this.Notifications.error('Failure', err, 'Unable to update edge group');
     } finally {
       this.state.actionInProgress = false;
+    }
+  }
+
+  getPaginatedEndpoints(lastId, limit, search) {
+    return this.$async(this.getPaginatedEndpointsAsync, lastId, limit, search);
+  }
+
+  async getPaginatedEndpointsAsync(lastId, limit, search) {
+    try {
+      const query = { search };
+      if (this.model.Dynamic) {
+        query.tagIds = this.model.TagIds;
+      } else {
+        query.endpointIds = this.model.Endpoints;
+      }
+      const { value: endpoints, totalCount } = await this.EndpointService.endpoints(lastId, limit, query);
+      this.EndpointHelper.mapGroupNameToEndpoint(endpoints, this.endpointGroups);
+      return { endpoints, totalCount };
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve endpoint information');
     }
   }
 }
