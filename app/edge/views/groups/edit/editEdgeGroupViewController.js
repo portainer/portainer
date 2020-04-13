@@ -57,9 +57,10 @@ class EditEdgeGroupController {
 
   async getPaginatedEndpointsAsync(lastId, limit, search) {
     try {
-      const query = { search };
+      const query = { search, type: 4 };
       if (this.model.Dynamic) {
         query.tagIds = this.model.TagIds;
+        query.tagsPartialMatch = this.model.PartialMatch;
       } else {
         query.endpointIds = this.model.Endpoints;
       }
