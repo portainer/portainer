@@ -193,6 +193,7 @@ func (payload *swarmStackFromFileUploadPayload) Validate(r *http.Request) error 
 	if err != nil || len(edgeGroups) == 0 {
 		return portainer.Error("Edge Groups are mandatory for an Edge stack")
 	}
+	payload.EdgeGroups = edgeGroups
 	return nil
 }
 
