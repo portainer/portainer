@@ -11,10 +11,11 @@ import (
 )
 
 type edgeGroupCreatePayload struct {
-	Name      string
-	Dynamic   bool
-	TagIDs    []portainer.TagID
-	Endpoints []portainer.EndpointID
+	Name         string
+	Dynamic      bool
+	TagIDs       []portainer.TagID
+	Endpoints    []portainer.EndpointID
+	PartialMatch bool
 }
 
 func (payload *edgeGroupCreatePayload) Validate(r *http.Request) error {
@@ -49,10 +50,11 @@ func (handler *Handler) edgeGroupCreate(w http.ResponseWriter, r *http.Request) 
 	}
 
 	edgeGroup := &portainer.EdgeGroup{
-		Name:      payload.Name,
-		Dynamic:   payload.Dynamic,
-		TagIDs:    []portainer.TagID{},
-		Endpoints: []portainer.EndpointID{},
+		Name:         payload.Name,
+		Dynamic:      payload.Dynamic,
+		TagIDs:       []portainer.TagID{},
+		Endpoints:    []portainer.EndpointID{},
+		PartialMatch: payload.PartialMatch,
 	}
 
 	if edgeGroup.Dynamic {

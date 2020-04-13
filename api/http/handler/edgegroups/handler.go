@@ -34,39 +34,3 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeGroupDelete))).Methods(http.MethodDelete)
 	return h
 }
-
-func (handler *Handler) getEndpointsByTags(tagIDs []portainer.TagID) ([]portainer.EndpointID, error) {
-	endpointsSet := make(map[portainer.EndpointID]bool)
-	endpointGroupsSet := make(map[portainer.EndpointGroupID]bool)
-	for _, tagID := range tagIDs {
-		tag, err := handler.TagService.Tag(tagID)
-		if err != nil {
-			return nil, err
-		}
-
-		for endpointID := range tag.Endpoints {
-			endpointsSet[endpointID] = true
-		}
-
-		for endpointGroupID := range tag.EndpointGroups {
-			endpointGroupsSet[endpointGroupID] = true
-		}
-	}
-
-	endpoints, err := handler.EndpointService.Endpoints()
-	if err != nil {
-		return nil, err
-	}
-
-	results := []portainer.EndpointID{}
-	for _, endpoint := range endpoints {
-		if _, ok := endpointGroupsSet[endpoint.GroupID]; ok {
-			endpointsSet[endpoint.ID] = true
-		}
-		if _, ok := endpointsSet[endpoint.ID]; ok && endpoint.Type == portainer.EdgeAgentEnvironment {
-			results = append(results, endpoint.ID)
-		}
-	}
-
-	return results, nil
-}
