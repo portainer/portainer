@@ -27,14 +27,6 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Name' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-
-              <th>
-                <a ng-click="$ctrl.changeOrderBy('URL')">
-                  URL
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'URL' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'URL' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('GroupName')">
                   Group
@@ -54,7 +46,6 @@
                 <span>{{ item.Name }}</span>
               </td>
 
-              <td>{{ item.URL | stripprotocol }}</td>
               <td>{{ item.GroupName }}</td>
             </tr>
             <tr ng-if="$ctrl.state.loading">
