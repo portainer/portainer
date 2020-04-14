@@ -1,6 +1,6 @@
 angular.module('portainer.edge').component('edgeStacksDatatable', {
   templateUrl: './edgeStacksDatatable.html',
-  controller: 'EdgeStacksDatatableController',
+  controller: 'GenericDatatableController',
   bindings: {
     titleText: '@',
     titleIcon: '@',
