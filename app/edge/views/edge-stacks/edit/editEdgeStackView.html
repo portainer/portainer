@@ -16,4 +16,15 @@
       </rd-widget-body>
     </rd-widget>
   </div>
+  <div class="col-sm-12">
+    <edge-stack-endpoints-datatable
+      title-text="Endpoints Status"
+      dataset="$ctrl.endpoints"
+      title-icon="fa-plug"
+      table-key="edgeStackEndpoints"
+      order-by="Name"
+      retrieve-page="$ctrl.getPaginatedEndpoints"
+    >
+    </edge-stack-endpoints-datatable>
+  </div>
 </div>
