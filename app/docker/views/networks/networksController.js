@@ -1,4 +1,5 @@
 import _ from 'lodash-es';
+import DockerNetworkHelper from 'Docker/helpers/networkHelper';
 
 angular.module('portainer.docker').controller('NetworksController', [
   '$q',
@@ -71,6 +72,12 @@ angular.module('portainer.docker').controller('NetworksController', [
           } else {
             $scope.networks = networks;
           }
+
+          $scope.networks = _.map($scope.networks, (network) => {
+            network.IPAM.IPV4Config = DockerNetworkHelper.getIPV4Configs(network.IPAM.Config);
+            network.IPAM.IPV6Config = DockerNetworkHelper.getIPV6Configs(network.IPAM.Config);
+            return network;
+          })
         })
         .catch((err) => {
           $scope.networks = [];

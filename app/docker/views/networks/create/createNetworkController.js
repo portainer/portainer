@@ -16,10 +16,18 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
   function ($q, $scope, $state, PluginService, Notifications, NetworkService, LabelHelper, Authentication, ResourceControlService, FormValidator, HttpRequestHelper) {
     $scope.formValues = {
       DriverOptions: [],
-      Subnet: '',
-      Gateway: '',
-      IPRange: '',
-      AuxAddress: '',
+      IPV4: {
+        Subnet: '',
+        Gateway: '',
+        IPRange: '',
+        AuxAddress: ''
+      },
+      IPV6: {
+        Subnet: '',
+        Gateway: '',
+        IPRange: '',
+        AuxAddress: ''
+      },
       Labels: [],
       AccessControlData: new AccessControlFormData(),
       NodeName: null,
@@ -38,6 +46,7 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
       CheckDuplicate: true,
       Internal: false,
       Attachable: false,
+      EnableIPv6: false,
       // Force IPAM Driver to 'default', should not be required.
       // See: https://github.com/docker/docker/issues/25735
       IPAM: {
@@ -70,18 +79,33 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
     };
 
     function prepareIPAMConfiguration(config) {
-      if ($scope.formValues.Subnet) {
-        var ipamConfig = {};
-        ipamConfig.Subnet = $scope.formValues.Subnet;
-        if ($scope.formValues.Gateway) {
-          ipamConfig.Gateway = $scope.formValues.Gateway;
+      if ($scope.formValues.IPV4.Subnet) {
+        let ipamConfig = {};
+        ipamConfig.Subnet = $scope.formValues.IPV4.Subnet;
+        if ($scope.formValues.IPV4.Gateway) {
+          ipamConfig.Gateway = $scope.formValues.IPV4.Gateway;
         }
-        if ($scope.formValues.IPRange) {
-          ipamConfig.IPRange = $scope.formValues.IPRange;
+        if ($scope.formValues.IPV4.IPRange) {
+          ipamConfig.IPRange = $scope.formValues.IPV4.IPRange;
         }
-        if ($scope.formValues.AuxAddress) {
-          ipamConfig.AuxAddress = $scope.formValues.AuxAddress;
+        if ($scope.formValues.IPV4.AuxAddress) {
+          ipamConfig.AuxAddress = $scope.formValues.IPV4.AuxAddress;
         }
+        config.IPAM.Config.push(ipamConfig);
+      }
+      if ($scope.formValues.IPV6.Subnet) {
+        let ipamConfig = {};
+        ipamConfig.Subnet = $scope.formValues.IPV6.Subnet;
+        if ($scope.formValues.IPV6.Gateway) {
+          ipamConfig.Gateway = $scope.formValues.IPV6.Gateway;
+        }
+        if ($scope.formValues.IPV6.IPRange) {
+          ipamConfig.IPRange = $scope.formValues.IPV6.IPRange;
+        }
+        if ($scope.formValues.IPV6.AuxAddress) {
+          ipamConfig.AuxAddress = $scope.formValues.IPV6.AuxAddress;
+        }
+        config.EnableIPv6 = true;
         config.IPAM.Config.push(ipamConfig);
       }
     }
