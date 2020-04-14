@@ -10,6 +10,7 @@ angular.module('portainer.edge').factory('EdgeStacks', function EdgeStacksFactor
       get: { method: 'GET', params: { id: '@id' } },
       update: { method: 'PUT', params: { id: '@Id' } },
       remove: { method: 'DELETE', params: { id: '@id' } },
+      file: { method: 'GET', params: { id: '@id', action: 'file' } },
     }
   );
 });
