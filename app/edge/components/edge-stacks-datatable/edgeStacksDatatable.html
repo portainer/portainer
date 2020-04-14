@@ -102,7 +102,7 @@
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="!$ctrl.allowSelection(item)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="edge.stacks.edit({ id: item.Id })">
+                <a ui-sref="edge.stacks.edit({ stackId: item.Id })">
                   {{ item.Name }}
                 </a>
               </td>
