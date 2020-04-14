@@ -33,6 +33,8 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeStackUpdate))).Methods(http.MethodPut)
 	h.Handle("/edge_stacks/{id}",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeStackDelete))).Methods(http.MethodDelete)
+	h.Handle("/edge_stacks/{id}/file",
+		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeStackFile))).Methods(http.MethodGet)
 	h.Handle("/edge_stacks/{id}/status",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeStackStatusUpdate))).Methods(http.MethodPut)
 	return h
