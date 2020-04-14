@@ -606,6 +606,16 @@
                 </div>
               </div>
               <!-- !privileged-mode -->
+              <!-- init -->
+              <div class="form-group" ng-if="applicationState.endpoint.apiVersion >= 1.37">
+                <div class="col-sm-12">
+                  <label for="init" class="control-label text-left">
+                    Init
+                  </label>
+                  <label class="switch" style="margin-left: 20px;"> <input type="checkbox" name="init" ng-model="config.HostConfig.Init" /><i></i> </label>
+                </div>
+              </div>
+              <!-- !init -->
               <!-- runtimes -->
               <div class="form-group">
                 <label for="container_runtime" class="col-sm-1 control-label text-left">Runtime</label>
