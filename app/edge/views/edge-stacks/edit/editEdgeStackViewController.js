@@ -15,7 +15,6 @@ class EditEdgeStackViewController {
       actionInProgress: false,
     };
 
-    this.editorUpdate = this.editorUpdate.bind(this);
     this.deployStack = this.deployStack.bind(this);
     this.deployStackAsync = this.deployStackAsync.bind(this);
   }
@@ -34,10 +33,6 @@ class EditEdgeStackViewController {
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve stack data');
     }
-  }
-
-  editorUpdate(cm) {
-    this.formValues.StackFileContent = cm.getValue();
   }
 
   deployStack() {

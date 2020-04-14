@@ -7,80 +7,12 @@
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-body>
-        <form class="form-horizontal">
-          <div class="col-sm-12 form-section-title">
-            Edge Groups
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <edge-groups-selector model="$ctrl.formValues.EdgeGroups" on-change="(onChangeGroups)" items="$ctrl.edgeGroups"></edge-groups-selector>
-            </div>
-          </div>
-
-          <!-- web-editor -->
-          <div class="col-sm-12 form-section-title">
-            Web editor
-          </div>
-          <div class="form-group">
-            <span class="col-sm-12 text-muted small">
-              You can get more information about Compose file format in the
-              <a href="https://docs.docker.com/compose/compose-file/" target="_blank">
-                official documentation
-              </a>
-              .
-            </span>
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <code-editor
-                value="$ctrl.formValues.StackFileContent"
-                identifier="stack-creation-editor"
-                placeholder="# Define or paste the content of your docker-compose file here"
-                yml="true"
-                on-change="($ctrl.editorUpdate)"
-              ></code-editor>
-            </div>
-          </div>
-          <!-- !web-editor -->
-
-          <div class="col-sm-12 form-section-title">
-            More options
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <label for="EnablePrune" class="control-label text-left">
-                Prune
-              </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="EnablePrune" ng-model="$ctrl.formValues.Prune" />
-                <i></i>
-              </label>
-            </div>
-          </div>
-
-          <!-- actions -->
-          <div class="col-sm-12 form-section-title">
-            Actions
-          </div>
-          <div class="form-group">
-            <div class="col-sm-12">
-              <button
-                type="button"
-                class="btn btn-primary btn-sm"
-                ng-disabled="$ctrl.state.actionInProgress
-                  || !$ctrl.formValues.EdgeGroups.length
-                  || !$ctrl.formValues.StackFileContent"
-                ng-click="$ctrl.deployStack()"
-                button-spinner="$ctrl.state.actionInProgress"
-              >
-                <span ng-hide="$ctrl.state.actionInProgress">Deploy the stack</span>
-                <span ng-show="$ctrl.state.actionInProgress">Deployment in progress...</span>
-              </button>
-              <span class="text-danger" ng-if="$ctrl.state.formValidationError" style="margin-left: 5px;">{{ $ctrl.state.formValidationError }}</span>
-            </div>
-          </div>
-          <!-- !actions -->
-        </form>
+        <edit-edge-stack-form
+          edge-groups="$ctrl.edgeGroups"
+          model="$ctrl.formValues"
+          action-in-progress="$ctrl.state.actionInProgress"
+          submit-action="$ctrl.deployStack"
+        ></edit-edge-stack-form>
       </rd-widget-body>
     </rd-widget>
   </div>
