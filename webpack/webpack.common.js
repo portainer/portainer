@@ -1,5 +1,4 @@
 const path = require('path');
-const pkg = require('../package.json');
 const { ProvidePlugin, IgnorePlugin, DefinePlugin } = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackBuildNotifierPlugin = require('webpack-build-notifier');
@@ -7,7 +6,7 @@ const CleanTerminalPlugin = require('clean-terminal-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
-const npmPackage = require('../package.json');
+const pkg = require('../package.json');
 const projectRoot = path.resolve(__dirname, '..');
 
 module.exports = {
@@ -60,8 +59,8 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './app/index.html',
       templateParameters: {
-        name: npmPackage.name,
-        author: npmPackage.author,
+        name: pkg.name,
+        author: pkg.author,
       },
       manifest: './assets/ico/manifest.json',
     }),

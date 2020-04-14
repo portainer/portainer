@@ -1,8 +1,8 @@
+var os = require('os');
+var loadGruntTasks = require('load-grunt-tasks');
 const webpackDevConfig = require('./webpack/webpack.develop');
 const webpackProdConfig = require('./webpack/webpack.production');
-var loadGruntTasks = require('load-grunt-tasks');
 
-var os = require('os');
 var arch = os.arch();
 if (arch === 'x64') arch = 'amd64';
 
