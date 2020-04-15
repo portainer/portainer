@@ -23,7 +23,6 @@ import (
 	"github.com/portainer/portainer/api/bolt/tag"
 	"github.com/portainer/portainer/api/bolt/team"
 	"github.com/portainer/portainer/api/bolt/teammembership"
-	"github.com/portainer/portainer/api/bolt/template"
 	"github.com/portainer/portainer/api/bolt/user"
 	"github.com/portainer/portainer/api/bolt/version"
 	"github.com/portainer/portainer/api/bolt/webhook"
@@ -52,7 +51,6 @@ type Store struct {
 	TagService             *tag.Service
 	TeamMembershipService  *teammembership.Service
 	TeamService            *team.Service
-	TemplateService        *template.Service
 	TunnelServerService    *tunnelserver.Service
 	UserService            *user.Service
 	VersionService         *version.Service
@@ -130,7 +128,6 @@ func (store *Store) MigrateData() error {
 			StackService:           store.StackService,
 			TagService:             store.TagService,
 			TeamMembershipService:  store.TeamMembershipService,
-			TemplateService:        store.TemplateService,
 			UserService:            store.UserService,
 			VersionService:         store.VersionService,
 			FileService:            store.fileService,
@@ -220,12 +217,6 @@ func (store *Store) initServices() error {
 		return err
 	}
 	store.TeamService = teamService
-
-	templateService, err := template.NewService(store.db)
-	if err != nil {
-		return err
-	}
-	store.TemplateService = templateService
 
 	tunnelServerService, err := tunnelserver.NewService(store.db)
 	if err != nil {

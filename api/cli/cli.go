@@ -19,7 +19,6 @@ const (
 	errInvalidEndpointProtocol       = portainer.Error("Invalid endpoint protocol: Portainer only supports unix://, npipe:// or tcp://")
 	errSocketOrNamedPipeNotFound     = portainer.Error("Unable to locate Unix socket or named pipe")
 	errEndpointsFileNotFound         = portainer.Error("Unable to locate external endpoints file")
-	errTemplateFileNotFound          = portainer.Error("Unable to locate template file on disk")
 	errInvalidSyncInterval           = portainer.Error("Invalid synchronization interval")
 	errInvalidSnapshotInterval       = portainer.Error("Invalid snapshot interval")
 	errEndpointExcludeExternal       = portainer.Error("Cannot use the -H flag mutually with --external-endpoints")
@@ -57,7 +56,6 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 		Labels:            pairs(kingpin.Flag("hide-label", "Hide containers with a specific label in the UI").Short('l')),
 		Logo:              kingpin.Flag("logo", "URL for the logo displayed in the UI").String(),
 		Templates:         kingpin.Flag("templates", "URL to the templates definitions.").Short('t').String(),
-		TemplateFile:      kingpin.Flag("template-file", "Path to the templates (app) definitions on the filesystem").Default(defaultTemplateFile).String(),
 	}
 
 	kingpin.Parse()
@@ -80,12 +78,7 @@ func (*Service) ValidateFlags(flags *portainer.CLIFlags) error {
 		return errEndpointExcludeExternal
 	}
 
-	err := validateTemplateFile(*flags.TemplateFile)
-	if err != nil {
-		return err
-	}
-
-	err = validateEndpointURL(*flags.EndpointURL)
+	err := validateEndpointURL(*flags.EndpointURL)
 	if err != nil {
 		return err
 	}
@@ -144,16 +137,6 @@ func validateExternalEndpoints(externalEndpoints string) error {
 			}
 			return err
 		}
-	}
-	return nil
-}
-
-func validateTemplateFile(templateFile string) error {
-	if _, err := os.Stat(templateFile); err != nil {
-		if os.IsNotExist(err) {
-			return errTemplateFileNotFound
-		}
-		return err
 	}
 	return nil
 }
