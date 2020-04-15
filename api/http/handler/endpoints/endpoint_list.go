@@ -33,6 +33,8 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	var tagIDs []portainer.TagID
 	request.RetrieveJSONQueryParameter(r, "tagIds", &tagIDs, true)
 
+	tagsPartialMatch, _ := request.RetrieveBooleanQueryParameter(r, "tagsPartialMatch", true)
+
 	var endpointIDs []portainer.EndpointID
 	request.RetrieveJSONQueryParameter(r, "endpointIds", &endpointIDs, true)
 
@@ -78,7 +80,7 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	if tagIDs != nil {
-		filteredEndpoints = filteredEndpointsByTags(filteredEndpoints, tagIDs, endpointGroups)
+		filteredEndpoints = filteredEndpointsByTags(filteredEndpoints, tagIDs, endpointGroups, tagsPartialMatch)
 	}
 
 	filteredEndpointCount := len(filteredEndpoints)
@@ -202,28 +204,26 @@ func convertTagIDsToTags(tagsMap map[portainer.TagID]string, tagIDs []portainer.
 	return tags
 }
 
-func filteredEndpointsByTags(endpoints []portainer.Endpoint, tagIDs []portainer.TagID, endpointGroups []portainer.EndpointGroup) []portainer.Endpoint {
+func filteredEndpointsByTags(endpoints []portainer.Endpoint, tagIDs []portainer.TagID, endpointGroups []portainer.EndpointGroup, partialMatch bool) []portainer.Endpoint {
 	filteredEndpoints := make([]portainer.Endpoint, 0)
 
 	for _, endpoint := range endpoints {
-		missingTags := make(map[portainer.TagID]bool)
-		for _, tagID := range tagIDs {
-			missingTags[tagID] = true
+		endpointGroup := getEndpointGroup(endpoint.GroupID, endpointGroups)
+		endpointMatched := false
+		if partialMatch {
+			endpointMatched = endpointPartialMatchTags(endpoint, endpointGroup, tagIDs)
+		} else {
+			endpointMatched = endpointFullMatchTags(endpoint, endpointGroup, tagIDs)
 		}
-		for _, tagID := range endpoint.TagIDs {
-			if missingTags[tagID] {
-				delete(missingTags, tagID)
-			}
-		}
-		missingTags = endpointGroupHasTags(endpoint.GroupID, endpointGroups, missingTags)
-		if len(missingTags) == 0 {
+
+		if endpointMatched {
 			filteredEndpoints = append(filteredEndpoints, endpoint)
 		}
 	}
 	return filteredEndpoints
 }
 
-func endpointGroupHasTags(groupID portainer.EndpointGroupID, groups []portainer.EndpointGroup, missingTags map[portainer.TagID]bool) map[portainer.TagID]bool {
+func getEndpointGroup(groupID portainer.EndpointGroupID, groups []portainer.EndpointGroup) portainer.EndpointGroup {
 	var endpointGroup portainer.EndpointGroup
 	for _, group := range groups {
 		if group.ID == groupID {
@@ -231,12 +231,43 @@ func endpointGroupHasTags(groupID portainer.EndpointGroupID, groups []portainer.
 			break
 		}
 	}
+	return endpointGroup
+}
+
+func endpointPartialMatchTags(endpoint portainer.Endpoint, endpointGroup portainer.EndpointGroup, tagIDs []portainer.TagID) bool {
+	tagSet := make(map[portainer.TagID]bool)
+	for _, tagID := range tagIDs {
+		tagSet[tagID] = true
+	}
+	for _, tagID := range endpoint.TagIDs {
+		if tagSet[tagID] {
+			return true
+		}
+	}
+	for _, tagID := range endpointGroup.TagIDs {
+		if tagSet[tagID] {
+			return true
+		}
+	}
+	return false
+}
+
+func endpointFullMatchTags(endpoint portainer.Endpoint, endpointGroup portainer.EndpointGroup, tagIDs []portainer.TagID) bool {
+	missingTags := make(map[portainer.TagID]bool)
+	for _, tagID := range tagIDs {
+		missingTags[tagID] = true
+	}
+	for _, tagID := range endpoint.TagIDs {
+		if missingTags[tagID] {
+			delete(missingTags, tagID)
+		}
+	}
 	for _, tagID := range endpointGroup.TagIDs {
 		if missingTags[tagID] {
 			delete(missingTags, tagID)
 		}
 	}
-	return missingTags
+	return len(missingTags) == 0
 }
 
 func filteredEndpointsByIds(endpoints []portainer.Endpoint, ids []portainer.EndpointID) []portainer.Endpoint {
