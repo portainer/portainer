@@ -1,58 +1,6 @@
 import _ from 'lodash-es';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
-export function TemplateDefaultModel() {
-  this.Type = 1;
-  this.AdministratorOnly = false;
-  this.Title = '';
-  this.Description = '';
-  this.Volumes = [];
-  this.Ports = [];
-  this.Env = [];
-  this.Labels = [];
-  this.RestartPolicy = 'always';
-  this.RegistryModel = new PorImageRegistryModel();
-}
-
-export function TemplateCreateRequest(model) {
-  this.Type = model.Type;
-  this.Name = model.Name;
-  this.Hostname = model.Hostname;
-  this.Title = model.Title;
-  this.Description = model.Description;
-  this.Note = model.Note;
-  this.Categories = model.Categories;
-  this.Platform = model.Platform;
-  this.Logo = model.Logo;
-  this.Image = model.RegistryModel.Image;
-  this.Registry = model.RegistryModel.Registry.URL;
-  this.Command = model.Command;
-  this.Network = model.Network && model.Network.Name;
-  this.Privileged = model.Privileged;
-  this.Interactive = model.Interactive;
-  this.RestartPolicy = model.RestartPolicy;
-  this.Labels = model.Labels;
-  this.Repository = model.Repository;
-  this.Env = model.Env;
-  this.AdministratorOnly = model.AdministratorOnly;
-
-  this.Ports = [];
-  for (var i = 0; i < model.Ports.length; i++) {
-    var binding = model.Ports[i];
-    if (binding.containerPort && binding.protocol) {
-      var port = binding.hostPort ? binding.hostPort + ':' + binding.containerPort + '/' + binding.protocol : binding.containerPort + '/' + binding.protocol;
-      this.Ports.push(port);
-    }
-  }
-
-  this.Volumes = model.Volumes;
-}
-
-export function TemplateUpdateRequest(model) {
-  TemplateCreateRequest.call(this, model);
-  this.id = model.Id;
-}
-
 export function TemplateViewModel(data) {
   this.Id = data.Id;
   this.Title = data.title;
