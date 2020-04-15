@@ -111,6 +111,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         AutoRemove: false,
         NetworkMode: 'bridge',
         Privileged: false,
+        Init: false,
         Runtime: '',
         ExtraHosts: [],
         Devices: [],
