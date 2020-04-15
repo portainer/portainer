@@ -17,7 +17,6 @@ type publicSettingsResponse struct {
 	AllowVolumeBrowserForRegularUsers  bool                           `json:"AllowVolumeBrowserForRegularUsers"`
 	EnableHostManagementFeatures       bool                           `json:"EnableHostManagementFeatures"`
 	EnableEdgeComputeFeatures          bool                           `json:"EnableEdgeComputeFeatures"`
-	ExternalTemplates                  bool                           `json:"ExternalTemplates"`
 	OAuthLoginURI                      string                         `json:"OAuthLoginURI"`
 }
 
@@ -36,16 +35,11 @@ func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *
 		AllowVolumeBrowserForRegularUsers:  settings.AllowVolumeBrowserForRegularUsers,
 		EnableHostManagementFeatures:       settings.EnableHostManagementFeatures,
 		EnableEdgeComputeFeatures:          settings.EnableEdgeComputeFeatures,
-		ExternalTemplates:                  false,
 		OAuthLoginURI: fmt.Sprintf("%s?response_type=code&client_id=%s&redirect_uri=%s&scope=%s&prompt=login",
 			settings.OAuthSettings.AuthorizationURI,
 			settings.OAuthSettings.ClientID,
 			settings.OAuthSettings.RedirectURI,
 			settings.OAuthSettings.Scopes),
-	}
-
-	if settings.TemplatesURL != "" {
-		publicSettings.ExternalTemplates = true
 	}
 
 	return response.JSON(w, publicSettings)

@@ -49,10 +49,7 @@
         <template-item
           ng-repeat="template in $ctrl.templates | filter: $ctrl.filterByType | filter:$ctrl.filterByCategory | filter:$ctrl.state.textFilter"
           model="template"
-          show-update-action="$ctrl.showUpdateAction"
-          show-delete-action="$ctrl.showDeleteAction"
           on-select="($ctrl.selectAction)"
-          on-delete="($ctrl.deleteAction)"
         ></template-item>
         <div ng-if="!$ctrl.templates" class="text-center text-muted">
           Loading...

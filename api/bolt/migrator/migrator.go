@@ -15,7 +15,6 @@ import (
 	"github.com/portainer/portainer/api/bolt/stack"
 	"github.com/portainer/portainer/api/bolt/tag"
 	"github.com/portainer/portainer/api/bolt/teammembership"
-	"github.com/portainer/portainer/api/bolt/template"
 	"github.com/portainer/portainer/api/bolt/user"
 	"github.com/portainer/portainer/api/bolt/version"
 )
@@ -37,7 +36,6 @@ type (
 		stackService            *stack.Service
 		tagService              *tag.Service
 		teamMembershipService   *teammembership.Service
-		templateService         *template.Service
 		userService             *user.Service
 		versionService          *version.Service
 		fileService             portainer.FileService
@@ -59,7 +57,6 @@ type (
 		StackService            *stack.Service
 		TagService              *tag.Service
 		TeamMembershipService   *teammembership.Service
-		TemplateService         *template.Service
 		UserService             *user.Service
 		VersionService          *version.Service
 		FileService             portainer.FileService
@@ -82,7 +79,6 @@ func NewMigrator(parameters *Parameters) *Migrator {
 		settingsService:         parameters.SettingsService,
 		tagService:              parameters.TagService,
 		teamMembershipService:   parameters.TeamMembershipService,
-		templateService:         parameters.TemplateService,
 		stackService:            parameters.StackService,
 		userService:             parameters.UserService,
 		versionService:          parameters.VersionService,
