@@ -533,28 +533,6 @@ angular.module('portainer.app', []).config([
       },
     };
 
-    var template = {
-      name: 'portainer.templates.template',
-      url: '/:id',
-      views: {
-        'content@': {
-          templateUrl: './views/templates/edit/template.html',
-          controller: 'TemplateController',
-        },
-      },
-    };
-
-    var templateCreation = {
-      name: 'portainer.templates.new',
-      url: '/new',
-      views: {
-        'content@': {
-          templateUrl: './views/templates/create/createtemplate.html',
-          controller: 'CreateTemplateController',
-        },
-      },
-    };
-
     $stateRegistryProvider.register(root);
     $stateRegistryProvider.register(portainer);
     $stateRegistryProvider.register(about);
@@ -595,7 +573,5 @@ angular.module('portainer.app', []).config([
     $stateRegistryProvider.register(teams);
     $stateRegistryProvider.register(team);
     $stateRegistryProvider.register(templates);
-    $stateRegistryProvider.register(template);
-    $stateRegistryProvider.register(templateCreation);
   },
 ]);

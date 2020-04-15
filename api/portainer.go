@@ -881,15 +881,6 @@ type (
 		DeleteTeamMembershipByTeamID(teamID TeamID) error
 	}
 
-	// TemplateService represents a service for managing template data
-	TemplateService interface {
-		Templates() ([]Template, error)
-		Template(ID TemplateID) (*Template, error)
-		CreateTemplate(template *Template) error
-		UpdateTemplate(ID TemplateID, template *Template) error
-		DeleteTemplate(ID TemplateID) error
-	}
-
 	// TunnelServerService represents a service for managing data associated to the tunnel server
 	TunnelServerService interface {
 		Info() (*TunnelServerInfo, error)
@@ -958,6 +949,8 @@ const (
 	DefaultEdgeAgentCheckinIntervalInSeconds = 5
 	// LocalExtensionManifestFile represents the name of the local manifest file for extensions
 	LocalExtensionManifestFile = "/extensions.json"
+	// DefaultTemplatesURL represents the URL to the official templates supported by Portainer
+	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates-2.0.json"
 )
 
 const (

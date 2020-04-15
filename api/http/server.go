@@ -71,7 +71,6 @@ type Server struct {
 	TagService             portainer.TagService
 	TeamService            portainer.TeamService
 	TeamMembershipService  portainer.TeamMembershipService
-	TemplateService        portainer.TemplateService
 	UserService            portainer.UserService
 	WebhookService         portainer.WebhookService
 	Handler                *handler.Handler
@@ -239,7 +238,6 @@ func (server *Server) Start() error {
 	var supportHandler = support.NewHandler(requestBouncer)
 
 	var templatesHandler = templates.NewHandler(requestBouncer)
-	templatesHandler.TemplateService = server.TemplateService
 	templatesHandler.SettingsService = server.SettingsService
 
 	var uploadHandler = upload.NewHandler(requestBouncer)
