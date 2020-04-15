@@ -18,7 +18,7 @@ func (handler *Handler) edgeTemplateList(w http.ResponseWriter, r *http.Request)
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
 	}
 
-	url := portainer.EdgeTemplatesURL
+	url := portainer.DefaultTemplatesURL
 	if settings.TemplatesURL != "" {
 		url = settings.TemplatesURL
 	}

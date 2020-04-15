@@ -538,7 +538,8 @@ type (
 		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
 	}
 
-	// Template represents an application template
+	// Template represents an application template that can be used as an App Template
+	// or an Edge template
 	Template struct {
 		// Mandatory container/stack fields
 		ID                TemplateID   `json:"Id"`
@@ -553,7 +554,7 @@ type (
 		// Mandatory stack fields
 		Repository TemplateRepository `json:"repository"`
 
-		// Mandatory edge stack fields
+		// Mandatory Edge stack fields
 		StackFile string `json:"stackFile"`
 
 		// Optional stack/container fields
@@ -943,15 +944,6 @@ type (
 		DeleteTeamMembershipByTeamID(teamID TeamID) error
 	}
 
-	// TemplateService represents a service for managing template data
-	TemplateService interface {
-		Templates() ([]Template, error)
-		Template(ID TemplateID) (*Template, error)
-		CreateTemplate(template *Template) error
-		UpdateTemplate(ID TemplateID, template *Template) error
-		DeleteTemplate(ID TemplateID) error
-	}
-
 	// TunnelServerService represents a service for managing data associated to the tunnel server
 	TunnelServerService interface {
 		Info() (*TunnelServerInfo, error)
@@ -1039,8 +1031,8 @@ const (
 	DefaultEdgeAgentCheckinIntervalInSeconds = 5
 	// LocalExtensionManifestFile represents the name of the local manifest file for extensions
 	LocalExtensionManifestFile = "/extensions.json"
-	// EdgeTemplatesURL represents the URL used to retrieve Edge templates
-	EdgeTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates-1.20.0.json"
+	// DefaultTemplatesURL represents the URL to the official templates supported by Portainer
+	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates-2.0.json"
 )
 
 const (

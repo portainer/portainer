@@ -28,15 +28,6 @@
             </span>
           </span>
         </span>
-        <span class="text-small">
-          <a ui-sref="portainer.templates.template({ id: $ctrl.model.Id })" class="btn btn-xs btn-primary" ng-click="$event.stopPropagation();" ng-if="$ctrl.showUpdateAction">
-            <i class="fa fa-edit" aria-hidden="true"></i>
-            Update
-          </a>
-          <btn class="btn btn-xs btn-danger" ng-click="$event.stopPropagation(); $ctrl.onDelete($ctrl.model)" ng-if="$ctrl.showDeleteAction">
-            <i class="fa fa-trash" aria-hidden="true"></i> Delete
-          </btn>
-        </span>
       </div>
       <!-- !blocklist-item-line1 -->
       <!-- blocklist-item-line2 -->
