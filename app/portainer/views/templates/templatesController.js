@@ -20,7 +20,6 @@ angular.module('portainer.app').controller('TemplatesController', [
   'SettingsService',
   'StackService',
   'EndpointProvider',
-  'ModalService',
   function (
     $scope,
     $q,
@@ -39,15 +38,13 @@ angular.module('portainer.app').controller('TemplatesController', [
     FormValidator,
     SettingsService,
     StackService,
-    EndpointProvider,
-    ModalService
+    EndpointProvider
   ) {
     $scope.state = {
       selectedTemplate: null,
       showAdvancedOptions: false,
       formValidationError: '',
       actionInProgress: false,
-      templateManagement: true,
     };
 
     $scope.formValues = {
@@ -255,27 +252,6 @@ angular.module('portainer.app').controller('TemplatesController', [
       return TemplateService.createTemplateConfiguration(template, name, network);
     }
 
-    $scope.deleteTemplate = function (template) {
-      ModalService.confirmDeletion('Do you want to delete this template?', function onConfirm(confirmed) {
-        if (!confirmed) {
-          return;
-        }
-        deleteTemplate(template);
-      });
-    };
-
-    function deleteTemplate(template) {
-      TemplateService.delete(template.Id)
-        .then(function success() {
-          Notifications.success('Template successfully deleted');
-          var idx = $scope.templates.indexOf(template);
-          $scope.templates.splice(idx, 1);
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to remove template');
-        });
-    }
-
     function initView() {
       $scope.isAdmin = Authentication.isAdmin();
 
@@ -300,7 +276,6 @@ angular.module('portainer.app').controller('TemplatesController', [
           $scope.availableNetworks = networks;
           var settings = data.settings;
           $scope.allowBindMounts = settings.AllowBindMountsForRegularUsers;
-          $scope.state.templateManagement = !settings.ExternalTemplates;
         })
         .catch(function error(err) {
           $scope.templates = [];
