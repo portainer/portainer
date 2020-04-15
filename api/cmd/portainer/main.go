@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"os"
 	"strings"
@@ -276,6 +275,7 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 			EnableHostManagementFeatures:       false,
 			SnapshotInterval:                   *flags.SnapshotInterval,
 			EdgeAgentCheckinInterval:           portainer.DefaultEdgeAgentCheckinIntervalInSeconds,
+			TemplatesURL:                       portainer.DefaultTemplatesURL,
 		}
 
 		if *flags.Templates != "" {
@@ -291,45 +291,6 @@ func initSettings(settingsService portainer.SettingsService, flags *portainer.CL
 		return settingsService.UpdateSettings(settings)
 	} else if err != nil {
 		return err
-	}
-
-	return nil
-}
-
-func initTemplates(templateService portainer.TemplateService, fileService portainer.FileService, templateURL, templateFile string) error {
-	if templateURL != "" {
-		log.Printf("Portainer started with the --templates flag. Using external templates, template management will be disabled.")
-		return nil
-	}
-
-	existingTemplates, err := templateService.Templates()
-	if err != nil {
-		return err
-	}
-
-	if len(existingTemplates) != 0 {
-		log.Printf("Templates already registered inside the database. Skipping template import.")
-		return nil
-	}
-
-	templatesJSON, err := fileService.GetFileContent(templateFile)
-	if err != nil {
-		log.Println("Unable to retrieve template definitions via filesystem")
-		return err
-	}
-
-	var templates []portainer.Template
-	err = json.Unmarshal(templatesJSON, &templates)
-	if err != nil {
-		log.Println("Unable to parse templates file. Please review your template definition file.")
-		return err
-	}
-
-	for _, template := range templates {
-		err := templateService.CreateTemplate(&template)
-		if err != nil {
-			return err
-		}
 	}
 
 	return nil
@@ -561,11 +522,6 @@ func main() {
 
 	composeStackManager := initComposeStackManager(*flags.Data, reverseTunnelService)
 
-	err = initTemplates(store.TemplateService, fileService, *flags.Templates, *flags.TemplateFile)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	err = initSettings(store.SettingsService, flags)
 	if err != nil {
 		log.Fatal(err)
@@ -671,7 +627,6 @@ func main() {
 		StackService:           store.StackService,
 		ScheduleService:        store.ScheduleService,
 		TagService:             store.TagService,
-		TemplateService:        store.TemplateService,
 		WebhookService:         store.WebhookService,
 		SwarmStackManager:      swarmStackManager,
 		ComposeStackManager:    composeStackManager,

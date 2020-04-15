@@ -3,8 +3,5 @@ angular.module('portainer.app').component('templateItem', {
   bindings: {
     model: '=',
     onSelect: '<',
-    onDelete: '<',
-    showUpdateAction: '<',
-    showDeleteAction: '<',
   },
 });
