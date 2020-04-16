@@ -64,7 +64,7 @@ function ($q, $scope, $state, $transition$, $filter, clipboard, EndpointService,
       AzureAuthenticationKey: endpoint.AzureCredentials.AuthenticationKey
     };
 
-    if ($scope.endpointType !== 'local' && endpoint.Type !== 3 && endpoint.Type !== 6) {
+    if ($scope.endpointType !== 'local' && endpoint.Type !== 3 && endpoint.Type !== 5 && endpoint.Type !== 6) {
       payload.URL = 'tcp://' + endpoint.URL;
     }
 
