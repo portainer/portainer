@@ -235,73 +235,24 @@ func initStatus(endpointManagement, snapshot bool, flags *portainer.CLIFlags) *p
 	}
 }
 
-func initDockerHub(dockerHubService portainer.DockerHubService) error {
-	_, err := dockerHubService.DockerHub()
-	if err == portainer.ErrObjectNotFound {
-		dockerhub := &portainer.DockerHub{
-			Authentication: false,
-			Username:       "",
-			Password:       "",
-		}
-		return dockerHubService.UpdateDockerHub(dockerhub)
-	} else if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func initSettings(settingsService portainer.SettingsService, flags *portainer.CLIFlags) error {
-	_, err := settingsService.Settings()
-	if err == portainer.ErrObjectNotFound {
-		settings := &portainer.Settings{
-			LogoURL:              *flags.Logo,
-			AuthenticationMethod: portainer.AuthenticationInternal,
-			LDAPSettings: portainer.LDAPSettings{
-				AnonymousMode:   true,
-				AutoCreateUsers: true,
-				TLSConfig:       portainer.TLSConfiguration{},
-				SearchSettings: []portainer.LDAPSearchSettings{
-					portainer.LDAPSearchSettings{},
-				},
-				GroupSearchSettings: []portainer.LDAPGroupSearchSettings{
-					portainer.LDAPGroupSearchSettings{},
-				},
-			},
-			OAuthSettings:                      portainer.OAuthSettings{},
-			AllowBindMountsForRegularUsers:     true,
-			AllowPrivilegedModeForRegularUsers: true,
-			AllowVolumeBrowserForRegularUsers:  false,
-			EnableHostManagementFeatures:       false,
-			SnapshotInterval:                   *flags.SnapshotInterval,
-			EdgeAgentCheckinInterval:           portainer.DefaultEdgeAgentCheckinIntervalInSeconds,
-			TemplatesURL:                       portainer.DefaultTemplatesURL,
-		}
-
-		if *flags.Templates != "" {
-			settings.TemplatesURL = *flags.Templates
-		}
-
-		if *flags.Labels != nil {
-			settings.BlackListedLabels = *flags.Labels
-		} else {
-			settings.BlackListedLabels = make([]portainer.Pair, 0)
-		}
-
-		return settingsService.UpdateSettings(settings)
-	} else if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func retrieveFirstEndpointFromDatabase(endpointService portainer.EndpointService) *portainer.Endpoint {
-	endpoints, err := endpointService.Endpoints()
+func updateSettingsFromFlags(settingsService portainer.SettingsService, flags *portainer.CLIFlags) error {
+	settings, err := settingsService.Settings()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	return &endpoints[0]
+
+	settings.LogoURL = *flags.Logo
+	settings.SnapshotInterval = *flags.SnapshotInterval
+
+	if *flags.Templates != "" {
+		settings.TemplatesURL = *flags.Templates
+	}
+
+	if *flags.Labels != nil {
+		settings.BlackListedLabels = *flags.Labels
+	}
+
+	return settingsService.UpdateSettings(settings)
 }
 
 func loadAndParseKeyPair(fileService portainer.FileService, signatureService portainer.DigitalSignatureService) error {
@@ -522,9 +473,11 @@ func main() {
 
 	composeStackManager := initComposeStackManager(*flags.Data, reverseTunnelService)
 
-	err = initSettings(store.SettingsService, flags)
-	if err != nil {
-		log.Fatal(err)
+	if store.IsNew() {
+		err = updateSettingsFromFlags(store.SettingsService, flags)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	jobScheduler := initJobScheduler()
@@ -547,11 +500,6 @@ func main() {
 	}
 
 	jobScheduler.Start()
-
-	err = initDockerHub(store.DockerHubService)
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	applicationStatus := initStatus(endpointManagement, *flags.Snapshot, flags)
 

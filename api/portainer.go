@@ -73,6 +73,7 @@ type (
 		Open() error
 		Init() error
 		Close() error
+		IsNew() bool
 		MigrateData() error
 	}
 
