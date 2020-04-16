@@ -37,7 +37,7 @@ const (
 type Store struct {
 	path                   string
 	db                     *bolt.DB
-	checkForDataMigration  bool
+	isNew                  bool
 	fileService            portainer.FileService
 	RoleService            *role.Service
 	DockerHubService       *dockerhub.Service
@@ -63,6 +63,7 @@ func NewStore(storePath string, fileService portainer.FileService) (*Store, erro
 	store := &Store{
 		path:        storePath,
 		fileService: fileService,
+		isNew:       true,
 	}
 
 	databasePath := path.Join(storePath, databaseFileName)
@@ -71,10 +72,8 @@ func NewStore(storePath string, fileService portainer.FileService) (*Store, erro
 		return nil, err
 	}
 
-	if !databaseFileExists {
-		store.checkForDataMigration = false
-	} else {
-		store.checkForDataMigration = true
+	if databaseFileExists {
+		store.isNew = false
 	}
 
 	return store, nil
@@ -100,9 +99,16 @@ func (store *Store) Close() error {
 	return nil
 }
 
+// IsNew returns true if the database was just created and false if it is re-using
+// existing data.
+func (store *Store) IsNew() bool {
+	return store.isNew
+}
+
 // MigrateData automatically migrate the data based on the DBVersion.
+// This process is only triggered on an existing database, not if the database was just created.
 func (store *Store) MigrateData() error {
-	if !store.checkForDataMigration {
+	if store.isNew {
 		return store.VersionService.StoreDBVersion(portainer.DBVersion)
 	}
 

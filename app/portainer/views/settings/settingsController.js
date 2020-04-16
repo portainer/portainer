@@ -25,7 +25,6 @@ angular.module('portainer.app').controller('SettingsController', [
 
     $scope.formValues = {
       customLogo: false,
-      externalTemplates: false,
       restrictBindMounts: false,
       restrictPrivilegedMode: false,
       labelName: '',
@@ -57,10 +56,6 @@ angular.module('portainer.app').controller('SettingsController', [
 
       if (!$scope.formValues.customLogo) {
         settings.LogoURL = '';
-      }
-
-      if (!$scope.formValues.externalTemplates) {
-        settings.TemplatesURL = '';
       }
 
       settings.AllowBindMountsForRegularUsers = !$scope.formValues.restrictBindMounts;
@@ -95,11 +90,9 @@ angular.module('portainer.app').controller('SettingsController', [
         .then(function success(data) {
           var settings = data;
           $scope.settings = settings;
+
           if (settings.LogoURL !== '') {
             $scope.formValues.customLogo = true;
-          }
-          if (settings.TemplatesURL !== '') {
-            $scope.formValues.externalTemplates = true;
           }
           $scope.formValues.restrictBindMounts = !settings.AllowBindMountsForRegularUsers;
           $scope.formValues.restrictPrivilegedMode = !settings.AllowPrivilegedModeForRegularUsers;
