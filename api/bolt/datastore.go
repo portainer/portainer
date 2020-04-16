@@ -5,16 +5,14 @@ import (
 	"path"
 	"time"
 
-	"github.com/portainer/portainer/api/bolt/edgegroup"
-	"github.com/portainer/portainer/api/bolt/edgestack"
-	"github.com/portainer/portainer/api/bolt/endpointrelation"
-	"github.com/portainer/portainer/api/bolt/tunnelserver"
-
 	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/dockerhub"
+	"github.com/portainer/portainer/api/bolt/edgegroup"
+	"github.com/portainer/portainer/api/bolt/edgestack"
 	"github.com/portainer/portainer/api/bolt/endpoint"
 	"github.com/portainer/portainer/api/bolt/endpointgroup"
+	"github.com/portainer/portainer/api/bolt/endpointrelation"
 	"github.com/portainer/portainer/api/bolt/extension"
 	"github.com/portainer/portainer/api/bolt/migrator"
 	"github.com/portainer/portainer/api/bolt/registry"
@@ -26,6 +24,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/tag"
 	"github.com/portainer/portainer/api/bolt/team"
 	"github.com/portainer/portainer/api/bolt/teammembership"
+	"github.com/portainer/portainer/api/bolt/tunnelserver"
 	"github.com/portainer/portainer/api/bolt/user"
 	"github.com/portainer/portainer/api/bolt/version"
 	"github.com/portainer/portainer/api/bolt/webhook"
@@ -40,7 +39,7 @@ const (
 type Store struct {
 	path                    string
 	db                      *bolt.DB
-	checkForDataMigration   bool
+	isNew                   bool
 	fileService             portainer.FileService
 	RoleService             *role.Service
 	DockerHubService        *dockerhub.Service
@@ -69,6 +68,7 @@ func NewStore(storePath string, fileService portainer.FileService) (*Store, erro
 	store := &Store{
 		path:        storePath,
 		fileService: fileService,
+		isNew:       true,
 	}
 
 	databasePath := path.Join(storePath, databaseFileName)
@@ -77,10 +77,8 @@ func NewStore(storePath string, fileService portainer.FileService) (*Store, erro
 		return nil, err
 	}
 
-	if !databaseFileExists {
-		store.checkForDataMigration = false
-	} else {
-		store.checkForDataMigration = true
+	if databaseFileExists {
+		store.isNew = false
 	}
 
 	return store, nil
@@ -106,9 +104,16 @@ func (store *Store) Close() error {
 	return nil
 }
 
+// IsNew returns true if the database was just created and false if it is re-using
+// existing data.
+func (store *Store) IsNew() bool {
+	return store.isNew
+}
+
 // MigrateData automatically migrate the data based on the DBVersion.
+// This process is only triggered on an existing database, not if the database was just created.
 func (store *Store) MigrateData() error {
-	if !store.checkForDataMigration {
+	if store.isNew {
 		return store.VersionService.StoreDBVersion(portainer.DBVersion)
 	}
 
