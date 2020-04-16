@@ -317,6 +317,7 @@
 <div class="row">
   <div class="col-sm-12">
     <container-networks-datatable
+      ng-if="container.NetworkSettings.Networks"
       title-text="Connected networks"
       title-icon="fa-sitemap"
       dataset="container.NetworkSettings.Networks"

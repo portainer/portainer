@@ -103,11 +103,11 @@
             <div class="form-group">
               <label for="ipv6_network_subnet" class="col-sm-2 col-lg-1 control-label text-left">Subnet</label>
               <div class="col-sm-4 col-lg-5">
-                <input type="text" class="form-control" ng-model="formValues.IPV6.Subnet" id="ipv6_network_subnet" placeholder="e.g. 172.20.0.0/16" />
+                <input type="text" class="form-control" ng-model="formValues.IPV6.Subnet" id="ipv6_network_subnet" placeholder="e.g. 2001:db8::/48" />
               </div>
               <label for="ipv6_network_gateway" class="col-sm-2 col-lg-1 control-label text-left">Gateway</label>
               <div class="col-sm-4 col-lg-5">
-                <input type="text" class="form-control" ng-model="formValues.IPV6.Gateway" id="ipv6_network_gateway" placeholder="e.g. 172.20.10.11" />
+                <input type="text" class="form-control" ng-model="formValues.IPV6.Gateway" id="ipv6_network_gateway" placeholder="e.g. 2001:db8::1" />
               </div>
             </div>
             <!-- !subnet-gateway-inputs -->
@@ -115,11 +115,11 @@
             <div class="form-group">
               <label for="ipv6_network_iprange" class="col-sm-2 col-lg-1 control-label text-left">IP range</label>
               <div class="col-sm-4 col-lg-5">
-                <input type="text" class="form-control" ng-model="formValues.IPV6.IPRange" id="ipv6_network_iprange" placeholder="e.g. 172.20.10.128/25" />
+                <input type="text" class="form-control" ng-model="formValues.IPV6.IPRange" id="ipv6_network_iprange" placeholder="e.g. 2001:db8::/64" />
               </div>
               <label for="ipv6_network_auxaddr" class="col-sm-2 col-lg-1 control-label text-left">Exclude IPs</label>
               <div class="col-sm-4 col-lg-5">
-                <input type="text" class="form-control" ng-model="formValues.IPV6.AuxAddress" id="ipv6_network_auxaddr" placeholder="e.g. my-router=172.20.10.129" />
+                <input type="text" class="form-control" ng-model="formValues.IPV6.AuxAddress" id="ipv6_network_auxaddr" placeholder="e.g. my-router=2001:db8::1" />
               </div>
             </div>
             <!-- !iprange-auxaddr-inputs -->

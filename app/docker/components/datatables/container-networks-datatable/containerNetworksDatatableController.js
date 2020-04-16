@@ -7,7 +7,7 @@ angular.module('portainer.docker')
       angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
       this.state = Object.assign(this.state, {
         expandedItems: [],
-        expandAll: false
+        expandAll: true
       });
 
       this.expandItem = function (item, expanded) {
@@ -18,6 +18,9 @@ angular.module('portainer.docker')
         item.Expanded = expanded;
         if (!expanded) {
           item.Highlighted = false;
+        }
+        if (!item.Expanded) {
+          this.state.expandAll = false;
         }
       };
 
@@ -68,6 +71,11 @@ angular.module('portainer.docker')
           this.settings = storedSettings;
           this.settings.open = false;
         }
+
+        _.forEach(this.dataset, (item) => {
+          item.Expanded = true;
+          item.Highlighted = true;
+        });
       };
     }
   ]);

@@ -41,13 +41,21 @@
               <td>Internal</td>
               <td>{{ network.Internal }}</td>
             </tr>
-            <tr ng-if="network.IPAM.IPV4Config.length > 0" ng-repeat="config in network.IPAM.IPV4Config">
+            <tr ng-if="network.IPAM.IPV4Config.length > 0" ng-repeat-start="config in network.IPAM.IPV4Config">
               <td>IPV4 Subnet - {{ config.Subnet }}</td>
               <td>IPV4 Gateway - {{ config.Gateway }}</td>
             </tr>
-            <tr ng-if="network.IPAM.IPV6Config.length > 0" ng-repeat="config in network.IPAM.IPV6Config">
+            <tr ng-if="network.IPAM.IPV4Config.length > 0" ng-repeat-end>
+              <td>IPV4 IP range - {{ config.IPRange }}</td>
+              <td>IPV4 Excluded Ips - {{ config.AuxAddress }}</td>
+            </tr>
+            <tr ng-if="network.IPAM.IPV6Config.length > 0" ng-repeat-start="config in network.IPAM.IPV6Config">
               <td>IPV6 Subnet - {{ config.Subnet }}</td>
               <td>IPV6 Gateway - {{ config.Gateway }}</td>
+            </tr>
+            <tr ng-if="network.IPAM.IPV6Config.length > 0" ng-repeat-end>
+              <td>IPV6 IP range - {{ config.IPRange }}</td>
+              <td>IPV6 Excluded Ips - {{ config.AuxAddress }}</td>
             </tr>
           </tbody>
         </table>
