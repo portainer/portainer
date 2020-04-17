@@ -8,8 +8,9 @@ angular.module('portainer.edge').factory('EdgeStacks', function EdgeStacksFactor
       create: { method: 'POST', ignoreLoadingBar: true },
       query: { method: 'GET', isArray: true },
       get: { method: 'GET', params: { id: '@id' } },
-      update: { method: 'PUT', params: { id: '@Id' } },
+      update: { method: 'PUT', params: { id: '@id' } },
       remove: { method: 'DELETE', params: { id: '@id' } },
+      file: { method: 'GET', params: { id: '@id', action: 'file' } },
     }
   );
 });
