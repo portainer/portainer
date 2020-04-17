@@ -1,1 +1,43 @@
-editEdgeStackView
+<rd-header>
+  <rd-header-title title-text="Edit edge stack"></rd-header-title>
+  <rd-header-content> <a ui-sref="edge.stack">Edge Stacks</a> &gt; {{ $ctrl.stack.Name }} </rd-header-content>
+</rd-header>
+
+<div class="row" ng-if="$ctrl.stack">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body classes="no-padding">
+
+        <uib-tabset active="state.activeTab" justified="true" type="pills">
+          <uib-tab index="0" classes="btn-sm">
+            <uib-tab-heading> <i class="fa fa-layer-group space-right" aria-hidden="true"></i> Stack</uib-tab-heading>
+
+            <div style="padding: 20px;">
+              <edit-edge-stack-form
+                edge-groups="$ctrl.edgeGroups"
+                model="$ctrl.formValues"
+                action-in-progress="$ctrl.state.actionInProgress"
+                submit-action="$ctrl.deployStack"
+              ></edit-edge-stack-form>
+            </div>
+          </uib-tab>
+          <uib-tab index="1" classes="btn-sm">
+            <uib-tab-heading> <i class="fa fa-plug space-right" aria-hidden="true"></i> Endpoints</uib-tab-heading>
+
+            <div style="margin-top: 25px;">
+              <edge-stack-endpoints-datatable
+                title-text="Endpoints Status"
+                dataset="$ctrl.endpoints"
+                title-icon="fa-plug"
+                table-key="edgeStackEndpoints"
+                order-by="Name"
+                retrieve-page="$ctrl.getPaginatedEndpoints"
+              >
+              </edge-stack-endpoints-datatable>
+            </div>
+          </uib-tab>
+        </uib-tabset>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>
