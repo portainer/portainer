@@ -1,0 +1,74 @@
+<form class="form-horizontal">
+  <div class="col-sm-12 form-section-title">
+    Edge Groups
+  </div>
+  <div class="form-group">
+    <div class="col-sm-12">
+      <edge-groups-selector model="$ctrl.model.EdgeGroups" items="$ctrl.edgeGroups"></edge-groups-selector>
+    </div>
+  </div>
+
+  <!-- web-editor -->
+  <div class="col-sm-12 form-section-title">
+    Web editor
+  </div>
+  <div class="form-group">
+    <span class="col-sm-12 text-muted small">
+      You can get more information about Compose file format in the
+      <a href="https://docs.docker.com/compose/compose-file/" target="_blank">
+        official documentation
+      </a>
+      .
+    </span>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-12">
+      <code-editor
+        value="$ctrl.model.StackFileContent"
+        identifier="stack-creation-editor"
+        placeholder="# Define or paste the content of your docker-compose file here"
+        yml="true"
+        on-change="($ctrl.editorUpdate)"
+      ></code-editor>
+    </div>
+  </div>
+  <!-- !web-editor -->
+
+  <div class="col-sm-12 form-section-title">
+    Options
+  </div>
+  <div class="form-group">
+    <div class="col-sm-12">
+      <label for="EnablePrune" class="control-label text-left">
+        Prune services
+        <portainer-tooltip position="bottom" message="Prune services that are not longer referenced in the stack file."></portainer-tooltip>
+      </label>
+      <label class="switch" style="margin-left: 20px;">
+        <input type="checkbox" name="EnablePrune" ng-model="$ctrl.model.Prune" />
+        <i></i>
+      </label>
+    </div>
+  </div>
+
+  <!-- actions -->
+  <div class="col-sm-12 form-section-title">
+    Actions
+  </div>
+  <div class="form-group">
+    <div class="col-sm-12">
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        ng-disabled="$ctrl.actionInProgress
+                  || !$ctrl.model.EdgeGroups.length
+                  || !$ctrl.model.StackFileContent"
+        ng-click="$ctrl.submitAction()"
+        button-spinner="$ctrl.actionInProgress"
+      >
+        <span ng-hide="$ctrl.actionInProgress">Update the stack</span>
+        <span ng-show="$ctrl.actionInProgress">Update in progress...</span>
+      </button>
+    </div>
+  </div>
+  <!-- !actions -->
+</form>
