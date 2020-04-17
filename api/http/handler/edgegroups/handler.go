@@ -13,6 +13,7 @@ import (
 type Handler struct {
 	*mux.Router
 	EdgeGroupService portainer.EdgeGroupService
+	EdgeStackService portainer.EdgeStackService
 	EndpointService  portainer.EndpointService
 	TagService       portainer.TagService
 }
