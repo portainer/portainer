@@ -35,12 +35,13 @@
   <!-- !web-editor -->
 
   <div class="col-sm-12 form-section-title">
-    More options
+    Options
   </div>
   <div class="form-group">
     <div class="col-sm-12">
       <label for="EnablePrune" class="control-label text-left">
-        Prune
+        Prune services
+        <portainer-tooltip position="bottom" message="Prune services that are not longer referenced in the stack file."></portainer-tooltip>
       </label>
       <label class="switch" style="margin-left: 20px;">
         <input type="checkbox" name="EnablePrune" ng-model="$ctrl.model.Prune" />
@@ -64,8 +65,8 @@
         ng-click="$ctrl.submitAction()"
         button-spinner="$ctrl.actionInProgress"
       >
-        <span ng-hide="$ctrl.actionInProgress">Deploy the stack</span>
-        <span ng-show="$ctrl.actionInProgress">Deployment in progress...</span>
+        <span ng-hide="$ctrl.actionInProgress">Update the stack</span>
+        <span ng-show="$ctrl.actionInProgress">Update in progress...</span>
       </button>
     </div>
   </div>

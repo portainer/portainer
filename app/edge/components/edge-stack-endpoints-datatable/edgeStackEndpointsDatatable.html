@@ -36,7 +36,7 @@
               </th>
               <th>
                 <a ng-click="$ctrl.changeOrderBy('Error')">
-                  Error Message
+                  Error
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Error' && !$ctrl.state.reverseOrder"></i>
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Error' && $ctrl.state.reverseOrder"></i>
                 </a>
@@ -51,7 +51,7 @@
             >
               <td>{{ item.Name }}</td>
               <td>{{ $ctrl.statusMap[item.Status.Type] || 'Pending' }}</td>
-              <td>{{ item.Status.Error }}</td>
+              <td>{{ item.Status.Error ? item.Status.Error : '-' }}</td>
             </tr>
             <tr ng-if="$ctrl.state.loading">
               <td colspan="5" class="text-center text-muted">Loading...</td>
