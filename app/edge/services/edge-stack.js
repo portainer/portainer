@@ -3,8 +3,8 @@ import angular from 'angular';
 angular.module('portainer.edge').factory('EdgeStackService', function EdgeStackServiceFactory(EdgeStacks, FileUploadService) {
   var service = {};
 
-  service.stack = function stack(stackId) {
-    return EdgeStacks.get({ id: stackId }).$promise;
+  service.stack = function stack(id) {
+    return EdgeStacks.get({ id }).$promise;
   };
 
   service.stacks = function stacks() {
@@ -13,6 +13,19 @@ angular.module('portainer.edge').factory('EdgeStackService', function EdgeStackS
 
   service.remove = function remove(id) {
     return EdgeStacks.remove({ id }).$promise;
+  };
+
+  service.stackFile = async function stackFile(id) {
+    try {
+      const { StackFileContent } = await EdgeStacks.file({ id }).$promise;
+      return StackFileContent;
+    } catch (err) {
+      throw { msg: 'Unable to retrieve stack content', err };
+    }
+  };
+
+  service.updateStack = async function updateStack(id, stack) {
+    return EdgeStacks.update({ id }, stack);
   };
 
   service.createStackFromFileContent = async function createStackFromFileContent(name, stackFileContent, edgeGroups) {
