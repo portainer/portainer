@@ -2,7 +2,7 @@ import angular from 'angular';
 
 angular.module('portainer.edge').component('edgeGroupsDatatable', {
   templateUrl: './groupsDatatable.html',
-  controller: 'GenericDatatableController',
+  controller: 'EdgeGroupsDatatableController',
   bindings: {
     dataset: '<',
     titleIcon: '@',
