@@ -15,21 +15,7 @@ For example, if you work on a bugfix for the issue #361, you could name the bran
 
 ## Issues open to contribution
 
-Want to contribute but don't know where to start?
-
-Some of the open issues are labeled with prefix `exp/`, this is used to mark them as available for contributors to work on. All of these have an attributed difficulty level:
-
-* **beginner**: a task that should be accessible with users not familiar with the codebase
-* **intermediate**: a task that require some understanding of the project codebase or some experience in
-either AngularJS or Golang
-* **advanced**: a task that require a deep understanding of the project codebase
-
-You can use Github filters to list these issues:
-
-* beginner labeled issues: https://github.com/portainer/portainer/labels/exp%2Fbeginner
-* intermediate labeled issues: https://github.com/portainer/portainer/labels/exp%2Fintermediate
-* advanced labeled issues: https://github.com/portainer/portainer/labels/exp%2Fadvanced
-
+Want to contribute but don't know where to start? Have a look at the issues labeled with the `good first issue` label: https://github.com/portainer/portainer/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22
 
 ## Commit Message Format
 
