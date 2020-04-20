@@ -8,7 +8,7 @@ export class TemplateViewModel {
         this.setTemplatesV2(data);
         break;
       default:
-        throw new Error('Unknown template version');
+        throw new Error('Unsupported template version');
     }
   }
 
