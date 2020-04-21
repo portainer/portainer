@@ -73,11 +73,10 @@ angular.module('portainer.docker').controller('NetworksController', [
             $scope.networks = networks;
           }
 
-          $scope.networks = _.map($scope.networks, (network) => {
-            network.IPAM.IPV4Config = DockerNetworkHelper.getIPV4Configs(network.IPAM.Config);
-            network.IPAM.IPV6Config = DockerNetworkHelper.getIPV6Configs(network.IPAM.Config);
-            return network;
-          })
+          _.forEach($scope.networks, (network) => {
+            network.IPAM.IPV4Configs = DockerNetworkHelper.getIPV4Configs(network.IPAM.Config);
+            network.IPAM.IPV6Configs = DockerNetworkHelper.getIPV6Configs(network.IPAM.Config);
+          });
         })
         .catch((err) => {
           $scope.networks = [];

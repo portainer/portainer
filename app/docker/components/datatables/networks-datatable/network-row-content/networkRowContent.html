@@ -23,10 +23,10 @@
 <td>{{ item.Driver }}</td>
 <td>{{ item.Attachable }}</td>
 <td>{{ item.IPAM.Driver }}</td>
-<td>{{ item.IPAM.IPV4Config[0].Subnet ? item.IPAM.IPV4Config[0].Subnet : '-' }}</td>
-<td>{{ item.IPAM.IPV4Config[0].Gateway ? item.IPAM.IPV4Config[0].Gateway : '-' }}</td>
-<td>{{ item.IPAM.IPV6Config[0].Subnet ? item.IPAM.IPV6Config[0].Subnet : '-' }}</td>
-<td>{{ item.IPAM.IPV6Config[0].Gateway ? item.IPAM.IPV6Config[0].Gateway : '-' }}</td>
+<td>{{ item.IPAM.IPV4Configs[0].Subnet ? item.IPAM.IPV4Configs[0].Subnet : '-' }}</td>
+<td>{{ item.IPAM.IPV4Configs[0].Gateway ? item.IPAM.IPV4Configs[0].Gateway : '-' }}</td>
+<td>{{ item.IPAM.IPV6Configs[0].Subnet ? item.IPAM.IPV6Configs[0].Subnet : '-' }}</td>
+<td>{{ item.IPAM.IPV6Configs[0].Gateway ? item.IPAM.IPV6Configs[0].Gateway : '-' }}</td>
 <td ng-if="parentCtrl.showHostColumn">{{ item.NodeName ? item.NodeName : '-' }}</td>
 <td ng-if="parentCtrl.showOwnershipColumn">
   <span>
