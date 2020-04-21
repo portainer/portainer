@@ -1,5 +1,5 @@
 ---
-swagger: "2.0"
+swagger: "1.24.1"
 info:
   description: |
     Portainer API is an HTTP API served by Portainer. It is used by the Portainer UI and everything you can do with the UI can be done using the HTTP API.
@@ -54,7 +54,11 @@ info:
 
     **NOTE**: You can find more information on how to query the Docker API in the [Docker official documentation](https://docs.docker.com/engine/api/v1.30/) as well as in [this Portainer example](https://gist.github.com/deviantony/77026d402366b4b43fa5918d41bc42f8).
 
+<<<<<<< HEAD
   version: "1.24.1-dev"
+=======
+  version: "2.0.0-dev"
+>>>>>>> chore(version): bump version number
   title: "Portainer API"
   contact:
     email: "info@portainer.io"
