@@ -37,30 +37,35 @@ class EdgeGroupFormController {
     if (!_.includes(this.model.Endpoints, endpoint.Id)) {
       this.endpoints.associated.push(endpoint);
       this.model.Endpoints.push(endpoint.Id);
+      _.remove(this.endpoints.available, { Id: endpoint.Id });
     }
   }
 
-  dissociateEndpoint({ Id }) {
-    _.remove(this.endpoints.associated, { Id });
-    _.remove(this.model.Endpoints, (eid) => eid === Id);
+  dissociateEndpoint(endpoint) {
+    _.remove(this.endpoints.associated, { Id: endpoint.Id });
+    _.remove(this.model.Endpoints, (id) => id === endpoint.Id);
+    this.endpoints.available.push(endpoint);
   }
 
   getPaginatedEndpoints(pageType, tableType) {
     return this.$async(this.getPaginatedEndpointsAsync, pageType, tableType);
   }
 
-  async getPaginatedEndpointsAsync(_, tableType) {
+  async getPaginatedEndpointsAsync(pageType, tableType) {
     const { pageNumber, limit, search } = this.state[tableType];
     const start = (pageNumber - 1) * limit + 1;
     const query = { search, type: 4 };
     if (tableType === 'associated') {
       query.endpointIds = this.model.Endpoints;
     }
-    const { value, totalCount } = await this.EndpointService.endpoints(start, limit, query);
-    this.endpoints[tableType] = value;
+    const response = await this.EndpointService.endpoints(start, limit, query);
+    const totalCount = parseInt(response.totalCount, 10);
+    this.endpoints[tableType] = response.value;
     this.state[tableType].totalCount = totalCount;
-    if (tableType === 'available' && totalCount === 0) {
-      this.noEndpoints = true;
+
+    if (tableType === 'available') {
+      this.noEndpoints = totalCount === 0;
+      this.endpoints[tableType] = _.filter(response.value, (endpoint) => !_.includes(this.model.Endpoints, endpoint.Id));
     }
   }
 }
