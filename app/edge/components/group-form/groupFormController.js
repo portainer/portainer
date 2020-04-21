@@ -1,4 +1,5 @@
 import angular from 'angular';
+import _ from 'lodash-es';
 
 class EdgeGroupFormController {
   /* @ngInject */
@@ -6,25 +7,61 @@ class EdgeGroupFormController {
     this.EndpointService = EndpointService;
     this.$async = $async;
 
-    this.searchEndpoints = this.searchEndpoints.bind(this);
-    this.searchEndpointsAsync = this.searchEndpointsAsync.bind(this);
+    this.state = {
+      available: {
+        limit: '10',
+        filter: '',
+        pageNumber: 1,
+        totalCount: 0,
+      },
+      associated: {
+        limit: '10',
+        filter: '',
+        pageNumber: 1,
+        totalCount: 0,
+      },
+    };
+
+    this.endpoints = {
+      associated: [],
+      available: null,
+    };
+
+    this.associateEndpoint = this.associateEndpoint.bind(this);
+    this.dissociateEndpoint = this.dissociateEndpoint.bind(this);
+    this.getPaginatedEndpointsAsync = this.getPaginatedEndpointsAsync.bind(this);
+    this.getPaginatedEndpoints = this.getPaginatedEndpoints.bind(this);
   }
 
-  async $onInit() {
-    const endpoints = await this.searchEndpointsAsync();
-    if (!endpoints.length) {
-      this.noEndpoints = true;
+  associateEndpoint(endpoint) {
+    if (!_.includes(this.endpoints.associated, endpoint)) {
+      this.endpoints.associated.push(endpoint);
+      this.model.Endpoints.push(endpoint.Id);
     }
   }
 
-  searchEndpoints(search) {
-    return this.$async(this.searchEndpointsAsync, search);
+  dissociateEndpoint({ Id }) {
+    _.remove(this.endpoints.associated, { Id });
+    _.remove(this.model.Endpoints, Id);
   }
 
-  async searchEndpointsAsync(search) {
-    const response = await this.EndpointService.endpoints(0, 10, { search, type: 4 });
-    this.endpoints = response.value;
-    return this.endpoints;
+  getPaginatedEndpoints(pageType, tableType) {
+    return this.$async(this.getPaginatedEndpointsAsync, pageType, tableType);
+  }
+
+  async getPaginatedEndpointsAsync(_, tableType) {
+    const { pageNumber, limit, search } = this.state[tableType];
+    const start = (pageNumber - 1) * limit + 1;
+    const query = { search, type: 4 };
+    if (tableType === 'associated') {
+      query.endpointIds = this.model.Endpoints;
+    }
+    const { value, totalCount } = await this.EndpointService.endpoints(start, limit, query);
+    this.endpoints[tableType] = value;
+    this.state[tableType].totalCount = totalCount;
+    if (tableType === 'available' && totalCount === 0) {
+      this.noEndpoints = true;
+    }
   }
 }
 

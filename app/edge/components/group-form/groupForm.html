@@ -46,30 +46,53 @@
     </div>
   </div>
 
-  <div class="col-sm-12 form-section-title" ng-if="!$ctrl.model.Dynamic">
-    Endpoints
-  </div>
   <!-- StaticGroup -->
   <div ng-if="!$ctrl.model.Dynamic">
     <div ng-if="!$ctrl.noEndpoints">
-      <div class="form-group col-sm-12" style="margin-bottom: 0;">
-        <multi-endpoint-selector
-          ng-if="$ctrl.groups"
-          model="$ctrl.model.Endpoints"
-          endpoints="$ctrl.endpoints"
-          groups="$ctrl.groups"
-          tags="$ctrl.tags"
-          on-search="($ctrl.searchEndpoints)"
-        ></multi-endpoint-selector>
+      <!-- endpoints -->
+      <div class="col-sm-12 form-section-title">
+        Associated endpoints
       </div>
-      <div class="form-group" ng-show="!$ctrl.model.Endpoints.length">
-        <div class="col-sm-12 small text-warning" style="margin-top: 15px;">
-          <div ng-messages="EdgeGroupForm.group_name.$error">
-            <p ng-message="required">
-              <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-              This field is required.
-            </p>
+      <div class="form-group">
+        <div class="col-sm-12 small text-muted">
+          You can select which endpoint should be part of this group by moving them to the associated endpoints table. Simply click on any endpoint entry to move it from one table
+          to the other.
+        </div>
+        <div class="col-sm-12" style="margin-top: 20px;">
+          <!-- available-endpoints -->
+          <div class="col-sm-6">
+            <div class="text-center small text-muted">Available endpoints</div>
+            <div style="margin-top: 10px;">
+              <group-association-table
+                loaded="$ctrl.loaded"
+                page-type="$ctrl.pageType"
+                table-type="available"
+                retrieve-page="$ctrl.getPaginatedEndpoints"
+                dataset="$ctrl.endpoints.available"
+                entry-click="$ctrl.associateEndpoint"
+                pagination-state="$ctrl.state.available"
+                empty-dataset-message="No endpoint available"
+              ></group-association-table>
+            </div>
           </div>
+          <!-- !available-endpoints -->
+          <!-- associated-endpoints -->
+          <div class="col-sm-6">
+            <div class="text-center small text-muted">Associated endpoints</div>
+            <div style="margin-top: 10px;">
+              <group-association-table
+                loaded="$ctrl.loaded"
+                page-type="$ctrl.pageType"
+                table-type="associated"
+                retrieve-page="$ctrl.getPaginatedEndpoints"
+                dataset="$ctrl.endpoints.associated"
+                entry-click="$ctrl.dissociateEndpoint"
+                pagination-state="$ctrl.state.associated"
+                empty-dataset-message="No associated endpoint"
+              ></group-association-table>
+            </div>
+          </div>
+          <!-- !associated-endpoints -->
         </div>
       </div>
     </div>
