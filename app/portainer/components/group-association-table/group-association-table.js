@@ -18,9 +18,6 @@ angular.module('portainer.app').component('groupAssociationTable', {
       this.state.orderBy = orderField;
     };
 
-    this.hasBackendPagination = function () {
-      return !(this.pageType === 'create' && this.tableType === 'associated');
-    };
     this.onTextFilterChange = function () {
       this.paginationChangedAction();
     };
@@ -66,5 +63,6 @@ angular.module('portainer.app').component('groupAssociationTable', {
     showTags: '<',
     groups: '<',
     showGroups: '<',
+    hasBackendPagination: '<',
   },
 });

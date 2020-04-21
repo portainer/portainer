@@ -23,7 +23,7 @@
     </thead>
     <tbody>
       <tr
-        ng-if="!$ctrl.hasBackendPagination();"
+        ng-if="!$ctrl.hasBackendPagination"
         ng-click="$ctrl.entryClick(item)"
         class="interactive"
         dir-paginate="item in $ctrl.dataset | filter:$ctrl.paginationState.filter | itemsPerPage: $ctrl.paginationState.limit"
@@ -38,7 +38,7 @@
         </td>
       </tr>
       <tr
-        ng-if="$ctrl.hasBackendPagination();"
+        ng-if="$ctrl.hasBackendPagination"
         ng-click="$ctrl.entryClick(item)"
         class="interactive"
         dir-paginate="item in $ctrl.dataset | itemsPerPage: $ctrl.paginationState.limit"
