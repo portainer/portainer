@@ -34,7 +34,7 @@ class EdgeGroupFormController {
   }
 
   associateEndpoint(endpoint) {
-    if (!_.includes(this.endpoints.associated, endpoint)) {
+    if (!_.includes(this.model.Endpoints, endpoint.Id)) {
       this.endpoints.associated.push(endpoint);
       this.model.Endpoints.push(endpoint.Id);
     }
@@ -42,7 +42,7 @@ class EdgeGroupFormController {
 
   dissociateEndpoint({ Id }) {
     _.remove(this.endpoints.associated, { Id });
-    _.remove(this.model.Endpoints, Id);
+    _.remove(this.model.Endpoints, (eid) => eid === Id);
   }
 
   getPaginatedEndpoints(pageType, tableType) {
