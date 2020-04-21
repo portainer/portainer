@@ -103,8 +103,8 @@ angular.module('portainer.docker').controller('NetworkController', [
           if (endpointProvider !== 'VMWARE_VIC') {
             getContainersInNetwork(data);
           }
-          $scope.network.IPAM.IPV4Config = DockerNetworkHelper.getIPV4Configs($scope.network.IPAM.Config);
-          $scope.network.IPAM.IPV6Config = DockerNetworkHelper.getIPV6Configs($scope.network.IPAM.Config);
+          $scope.network.IPAM.IPV4Configs = DockerNetworkHelper.getIPV4Configs($scope.network.IPAM.Config);
+          $scope.network.IPAM.IPV6Configs = DockerNetworkHelper.getIPV6Configs($scope.network.IPAM.Config);
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve network info');
