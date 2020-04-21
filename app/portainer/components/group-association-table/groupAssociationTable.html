@@ -30,7 +30,10 @@
         dir-paginate="item in $ctrl.dataset | filter:$ctrl.paginationState.filter | itemsPerPage: $ctrl.paginationState.limit"
         pagination-id="$ctrl.tableType"
       >
-        <td>{{ item.Name }}</td>
+        <td>
+          {{ item.Name }}
+          <span ng-if="$ctrl.showTags && item.TagIds.length">- <i class="fa fa-tags" title="Tags"></i> {{ $ctrl.tagIdsToTagNames(item.TagIds) | arraytostr }}</span>
+        </td>
       </tr>
       <tr
         ng-if="$ctrl.hasBackendPagination();"
@@ -40,7 +43,10 @@
         pagination-id="$ctrl.tableType"
         total-items="$ctrl.paginationState.totalCount"
       >
-        <td>{{ item.Name }}</td>
+        <td>
+          {{ item.Name }}
+          <span ng-if="$ctrl.showTags && item.TagIds.length">- <i class="fa fa-tags" title="Tags"></i> {{ $ctrl.tagIdsToTagNames(item.TagIds) | arraytostr }}</span>
+        </td>
       </tr>
       <tr ng-if="!$ctrl.dataset">
         <td colspan="2" class="text-center text-muted">Loading...</td>

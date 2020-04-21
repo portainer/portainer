@@ -72,6 +72,8 @@
                 entry-click="$ctrl.associateEndpoint"
                 pagination-state="$ctrl.state.available"
                 empty-dataset-message="No endpoint available"
+                tags="$ctrl.tags"
+                show-tags="true"
               ></group-association-table>
             </div>
           </div>
@@ -89,6 +91,8 @@
                 entry-click="$ctrl.dissociateEndpoint"
                 pagination-state="$ctrl.state.associated"
                 empty-dataset-message="No associated endpoint"
+                tags="$ctrl.tags"
+                show-tags="true"
               ></group-association-table>
             </div>
           </div>

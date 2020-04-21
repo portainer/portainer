@@ -1,3 +1,5 @@
+import PortainerEndpointTagHelper from 'Portainer/helpers/tagHelper';
+
 angular.module('portainer.app').component('groupAssociationTable', {
   templateUrl: './groupAssociationTable.html',
   controller: function () {
@@ -40,6 +42,10 @@ angular.module('portainer.app').component('groupAssociationTable', {
         this.paginationChangedAction();
       }
     };
+
+    this.tagIdsToTagNames = function tagIdsToTagNames(tagIds) {
+      return PortainerEndpointTagHelper.idsToTagNames(this.tags, tagIds);
+    };
   },
   bindings: {
     paginationState: '=',
@@ -50,5 +56,7 @@ angular.module('portainer.app').component('groupAssociationTable', {
     dataset: '<',
     entryClick: '<',
     emptyDatasetMessage: '@',
+    tags: '<',
+    showTags: '<',
   },
 });
