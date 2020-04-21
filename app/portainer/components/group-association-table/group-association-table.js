@@ -1,3 +1,4 @@
+import _ from 'lodash-es';
 import PortainerEndpointTagHelper from 'Portainer/helpers/tagHelper';
 
 angular.module('portainer.app').component('groupAssociationTable', {
@@ -46,6 +47,11 @@ angular.module('portainer.app').component('groupAssociationTable', {
     this.tagIdsToTagNames = function tagIdsToTagNames(tagIds) {
       return PortainerEndpointTagHelper.idsToTagNames(this.tags, tagIds);
     };
+
+    this.groupIdToGroupName = function groupIdToGroupName(groupId) {
+      const group = _.find(this.groups, { Id: groupId });
+      return group ? group.Name : '';
+    };
   },
   bindings: {
     paginationState: '=',
@@ -58,5 +64,7 @@ angular.module('portainer.app').component('groupAssociationTable', {
     emptyDatasetMessage: '@',
     tags: '<',
     showTags: '<',
+    groups: '<',
+    showGroups: '<',
   },
 });

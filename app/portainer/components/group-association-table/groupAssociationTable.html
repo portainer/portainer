@@ -32,6 +32,7 @@
       >
         <td>
           {{ item.Name }}
+          <span ng-if="$ctrl.showGroup && item.GroupId && item.GroupId > 1">({{ $ctrl.groupIdToGroupName(item.GroupId) }})</span>
           <span ng-if="$ctrl.showTags && item.TagIds.length">- <i class="fa fa-tags" title="Tags"></i> {{ $ctrl.tagIdsToTagNames(item.TagIds) | arraytostr }}</span>
         </td>
       </tr>
@@ -45,6 +46,7 @@
       >
         <td>
           {{ item.Name }}
+          <span ng-if="$ctrl.showGroup && item.GroupId && item.GroupId > 1">({{ $ctrl.groupIdToGroupName(item.GroupId) }})</span>
           <span ng-if="$ctrl.showTags && item.TagIds.length">- <i class="fa fa-tags" title="Tags"></i> {{ $ctrl.tagIdsToTagNames(item.TagIds) | arraytostr }}</span>
         </td>
       </tr>
