@@ -305,7 +305,7 @@ func (m *Migrator) Migrate() error {
 		}
 	}
 
-	// Portainer 1.24.0-dev
+	// Portainer 1.24.0
 	if m.currentDBVersion < 23 {
 		err := m.updateTagsToDBVersion23()
 		if err != nil {
