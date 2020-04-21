@@ -20,6 +20,9 @@
             <span ng-show="$ctrl.state.orderBy == 'Name' && $ctrl.state.reverseOrder" class="glyphicon glyphicon-chevron-up"></span>
           </a>
         </th>
+        <th ng-if="$ctrl.showGroups">
+          Group
+        </th>
       </tr>
     </thead>
     <tbody>
@@ -32,8 +35,10 @@
       >
         <td>
           {{ item.Name }}
-          <span ng-if="$ctrl.showGroup && item.GroupId && item.GroupId > 1">({{ $ctrl.groupIdToGroupName(item.GroupId) }})</span>
           <span ng-if="$ctrl.showTags && item.TagIds.length">- <i class="fa fa-tags" title="Tags"></i> {{ $ctrl.tagIdsToTagNames(item.TagIds) | arraytostr }}</span>
+        </td>
+        <td ng-if="$ctrl.showGroups">
+          <span ng-if="item.GroupId && item.GroupId > 1">{{ $ctrl.groupIdToGroupName(item.GroupId) }}</span>
         </td>
       </tr>
       <tr
@@ -46,10 +51,13 @@
       >
         <td>
           {{ item.Name }}
-          <span ng-if="$ctrl.showGroup && item.GroupId && item.GroupId > 1">({{ $ctrl.groupIdToGroupName(item.GroupId) }})</span>
           <span ng-if="$ctrl.showTags && item.TagIds.length">- <i class="fa fa-tags" title="Tags"></i> {{ $ctrl.tagIdsToTagNames(item.TagIds) | arraytostr }}</span>
         </td>
+        <td ng-if="$ctrl.showGroups">
+          <span ng-if="item.GroupId && item.GroupId > 1">{{ $ctrl.groupIdToGroupName(item.GroupId) }}</span>
+        </td>
       </tr>
+
       <tr ng-if="!$ctrl.dataset">
         <td colspan="2" class="text-center text-muted">Loading...</td>
       </tr>
