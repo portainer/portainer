@@ -14,6 +14,7 @@ class EditEdgeGroupController {
 
     this.state = {
       actionInProgress: false,
+      loaded: false,
     };
 
     this.updateGroup = this.updateGroup.bind(this);
@@ -38,6 +39,7 @@ class EditEdgeGroupController {
     this.tags = tags;
     this.endpointGroups = endpointGroups;
     this.model = group;
+    this.state.loaded = true;
   }
 
   updateGroup() {
