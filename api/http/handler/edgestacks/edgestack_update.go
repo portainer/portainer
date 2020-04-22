@@ -13,12 +13,13 @@ import (
 
 type updateEdgeStackPayload struct {
 	StackFileContent string
+	FileWasChanged   bool
 	Prune            *bool
 	EdgeGroups       []portainer.EdgeGroupID
 }
 
 func (payload *updateEdgeStackPayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.StackFileContent) {
+	if payload.FileWasChanged && govalidator.IsNull(payload.StackFileContent) {
 		return portainer.Error("Invalid stack file content")
 	}
 	if payload.EdgeGroups != nil && len(payload.EdgeGroups) == 0 {
@@ -54,10 +55,15 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 		stack.Prune = *payload.Prune
 	}
 
-	stackFolder := strconv.Itoa(int(stack.ID))
-	_, err = handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist updated Compose file on disk", err}
+	if payload.FileWasChanged {
+		stackFolder := strconv.Itoa(int(stack.ID))
+		_, err = handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist updated Compose file on disk", err}
+		}
+
+		stack.Version++
+		stack.Status = map[portainer.EndpointID]portainer.EdgeStackStatus{}
 	}
 
 	err = handler.EdgeStackService.UpdateEdgeStack(stack.ID, stack)
