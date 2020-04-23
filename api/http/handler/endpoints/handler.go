@@ -30,7 +30,6 @@ type Handler struct {
 	authorizeEndpointManagement bool
 	requestBouncer              *security.RequestBouncer
 	AuthorizationService        *portainer.AuthorizationService
-	EdgeStackService            portainer.EdgeStackService
 	EndpointService             portainer.EndpointService
 	EndpointGroupService        portainer.EndpointGroupService
 	FileService                 portainer.FileService
@@ -72,7 +71,5 @@ func NewHandler(bouncer *security.RequestBouncer, authorizeEndpointManagement bo
 		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointSnapshot))).Methods(http.MethodPost)
 	h.Handle("/endpoints/{id}/status",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.endpointStatusInspect))).Methods(http.MethodGet)
-	h.Handle("/endpoints/{id}/edge/stacks/{stackId}",
-		bouncer.PublicAccess(httperror.LoggerHandler(h.endpointEdgeStackInspect))).Methods(http.MethodGet)
 	return h
 }

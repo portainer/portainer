@@ -5,6 +5,7 @@ import (
 
 	"github.com/portainer/portainer/api/http/handler/edgegroups"
 	"github.com/portainer/portainer/api/http/handler/edgestacks"
+	"github.com/portainer/portainer/api/http/handler/endpointedge"
 	"github.com/portainer/portainer/api/http/handler/support"
 
 	"github.com/portainer/portainer/api/http/handler/roles"
@@ -161,7 +162,6 @@ func (server *Server) Start() error {
 
 	var endpointHandler = endpoints.NewHandler(requestBouncer, server.EndpointManagement)
 	endpointHandler.AuthorizationService = authorizationService
-	endpointHandler.EdgeStackService = server.EdgeStackService
 	endpointHandler.EndpointService = server.EndpointService
 	endpointHandler.EndpointGroupService = server.EndpointGroupService
 	endpointHandler.FileService = server.FileService
@@ -171,6 +171,11 @@ func (server *Server) Start() error {
 	endpointHandler.SettingsService = server.SettingsService
 	endpointHandler.Snapshotter = server.Snapshotter
 	endpointHandler.TagService = server.TagService
+
+	var endpointEdgeHandler = endpointedge.NewHandler(requestBouncer)
+	endpointEdgeHandler.EdgeStackService = server.EdgeStackService
+	endpointEdgeHandler.EndpointService = server.EndpointService
+	endpointEdgeHandler.FileService = server.FileService
 
 	var endpointGroupHandler = endpointgroups.NewHandler(requestBouncer)
 	endpointGroupHandler.AuthorizationService = authorizationService
@@ -292,6 +297,7 @@ func (server *Server) Start() error {
 		EdgeStacksHandler:      edgeStacksHandler,
 		EndpointGroupHandler:   endpointGroupHandler,
 		EndpointHandler:        endpointHandler,
+		EndpointEdgeHandler:    endpointEdgeHandler,
 		EndpointProxyHandler:   endpointProxyHandler,
 		FileHandler:            fileHandler,
 		MOTDHandler:            motdHandler,

@@ -1,4 +1,4 @@
-package endpoints
+package endpointedge
 
 import (
 	"net/http"
@@ -30,9 +30,9 @@ func (handler *Handler) endpointEdgeStackInspect(w http.ResponseWriter, r *http.
 	}
 
 	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
-	// if err != nil {
-	// 	return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
-	// }
+	if err != nil {
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
+	}
 
 	edgeStackID, err := request.RetrieveNumericRouteVariableValue(r, "stackId")
 	if err != nil {
