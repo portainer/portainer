@@ -19,6 +19,9 @@
         <th ng-if="$ctrl.showGroups">
           Group
         </th>
+        <th ng-if="$ctrl.showTags">
+          Tags
+        </th>
       </tr>
     </thead>
     <tbody>
@@ -30,11 +33,13 @@
         pagination-id="$ctrl.tableType"
       >
         <td>
-          {{ item.Name }}
-          <span ng-if="$ctrl.showTags && item.TagIds.length">- <i class="fa fa-tags" title="Tags"></i> {{ $ctrl.tagIdsToTagNames(item.TagIds) | arraytostr }}</span>
+          {{ item.Name | truncate: 64 }}
         </td>
         <td ng-if="$ctrl.showGroups">
-          <span ng-if="item.GroupId">{{ $ctrl.groupIdToGroupName(item.GroupId) }}</span>
+          {{ $ctrl.groupIdToGroupName(item.GroupId) | truncate: 64}}
+        </td>
+        <td ng-if="$ctrl.showTags">
+          {{ $ctrl.tagIdsToTagNames(item.TagIds) | arraytostr | truncate: 64}}
         </td>
       </tr>
       <tr
@@ -46,11 +51,13 @@
         total-items="$ctrl.paginationState.totalCount"
       >
         <td>
-          {{ item.Name }}
-          <span ng-if="$ctrl.showTags && item.TagIds.length">- <i class="fa fa-tags" title="Tags"></i> {{ $ctrl.tagIdsToTagNames(item.TagIds) | arraytostr }}</span>
+          {{ item.Name | truncate: 64 }}
         </td>
         <td ng-if="$ctrl.showGroups">
-          <span ng-if="item.GroupId">{{ $ctrl.groupIdToGroupName(item.GroupId) }}</span>
+          {{ $ctrl.groupIdToGroupName(item.GroupId) | truncate: 64}}
+        </td>
+        <td ng-if="$ctrl.showTags">
+          {{ $ctrl.tagIdsToTagNames(item.TagIds) | arraytostr | truncate: 64}}
         </td>
       </tr>
 
