@@ -1,7 +1,6 @@
 package endpoints
 
 import (
-	"errors"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -32,20 +31,14 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
-	if endpoint.Type != portainer.EdgeAgentEnvironment {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Status unavailable for non Edge agent endpoints", errors.New("Status unavailable")}
-	}
-
-	edgeIdentifier := r.Header.Get(portainer.PortainerAgentEdgeIDHeader)
-	if edgeIdentifier == "" {
-		return &httperror.HandlerError{http.StatusForbidden, "Missing Edge identifier", errors.New("missing Edge identifier")}
-	}
-
-	if endpoint.EdgeID != "" && endpoint.EdgeID != edgeIdentifier {
-		return &httperror.HandlerError{http.StatusForbidden, "Invalid Edge identifier", errors.New("invalid Edge identifier")}
+	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
 	}
 
 	if endpoint.EdgeID == "" {
+		edgeIdentifier := r.Header.Get(portainer.PortainerAgentEdgeIDHeader)
+
 		endpoint.EdgeID = edgeIdentifier
 
 		err := handler.EndpointService.UpdateEndpoint(endpoint.ID, endpoint)
