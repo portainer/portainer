@@ -30,6 +30,7 @@ class EditEdgeStackViewController {
       this.edgeGroups = edgeGroups;
       this.stack = model;
       this.stackEndpointIds = this.filterStackEndpoints(model.EdgeGroups, edgeGroups);
+      this.originalFileContent = file;
       this.formValues = {
         StackFileContent: file,
         EdgeGroups: this.stack.EdgeGroups,
@@ -56,6 +57,9 @@ class EditEdgeStackViewController {
   async deployStackAsync() {
     this.state.actionInProgress = true;
     try {
+      if (this.originalFileContent != this.formValues.StackFileContent) {
+        this.formValues.Version = this.stack.Version++;
+      }
       await this.EdgeStackService.updateStack(this.stack.Id, this.formValues);
       this.Notifications.success('Stack successfully deployed');
       this.$state.go('edge.stacks');
