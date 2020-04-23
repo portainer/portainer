@@ -10,12 +10,10 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
-type (
-	configResponse struct {
-		Prune            bool
-		StackFileContent string
-	}
-)
+type configResponse struct {
+	Prune            bool
+	StackFileContent string
+}
 
 // GET request on /api/edge_stacks/:id/config?endpointId
 func (handler *Handler) edgeStackInspectConfig(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
