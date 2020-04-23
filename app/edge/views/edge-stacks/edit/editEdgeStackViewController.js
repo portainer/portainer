@@ -57,7 +57,9 @@ class EditEdgeStackViewController {
   async deployStackAsync() {
     this.state.actionInProgress = true;
     try {
-      this.formValues.FileWasChanged = this.originalFileContent != this.formValues.StackFileContent;
+      if (this.originalFileContent != this.formValues.StackFileContent) {
+        this.formValues.Version = this.stack.Version++;
+      }
       await this.EdgeStackService.updateStack(this.stack.Id, this.formValues);
       this.Notifications.success('Stack successfully deployed');
       this.$state.go('edge.stacks');
