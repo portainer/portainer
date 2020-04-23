@@ -34,7 +34,7 @@
           <span ng-if="$ctrl.showTags && item.TagIds.length">- <i class="fa fa-tags" title="Tags"></i> {{ $ctrl.tagIdsToTagNames(item.TagIds) | arraytostr }}</span>
         </td>
         <td ng-if="$ctrl.showGroups">
-          <span ng-if="item.GroupId && item.GroupId > 1">{{ $ctrl.groupIdToGroupName(item.GroupId) }}</span>
+          <span ng-if="item.GroupId">{{ $ctrl.groupIdToGroupName(item.GroupId) }}</span>
         </td>
       </tr>
       <tr
@@ -50,7 +50,7 @@
           <span ng-if="$ctrl.showTags && item.TagIds.length">- <i class="fa fa-tags" title="Tags"></i> {{ $ctrl.tagIdsToTagNames(item.TagIds) | arraytostr }}</span>
         </td>
         <td ng-if="$ctrl.showGroups">
-          <span ng-if="item.GroupId && item.GroupId > 1">{{ $ctrl.groupIdToGroupName(item.GroupId) }}</span>
+          <span ng-if="item.GroupId">{{ $ctrl.groupIdToGroupName(item.GroupId) }}</span>
         </td>
       </tr>
 
