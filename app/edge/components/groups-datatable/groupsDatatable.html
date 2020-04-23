@@ -61,6 +61,7 @@
                   <label for="select_{{ $index }}"></label>
                 </span>
                 <a ui-sref="edge.groups.edit({groupId: item.Id})">{{ item.Name }}</a>
+                <span ng-if="item.HasEdgeStack" class="label label-info image-tag space-left">in use</span>
               </td>
               <td>{{ item.Endpoints.length }}</td>
               <td>{{ item.Dynamic ? 'Dynamic' : 'Static' }}</td>
