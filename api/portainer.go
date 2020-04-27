@@ -562,6 +562,11 @@ type (
 		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
 	}
 
+	// Telemetry represents telemetry related data
+	Telemetry struct {
+		TelemetryID string `json:"TelemetryID"`
+	}
+
 	// Template represents an application template that can be used as an App Template
 	// or an Edge template
 	Template struct {
@@ -966,6 +971,12 @@ type (
 		DeleteTeamMembership(ID TeamMembershipID) error
 		DeleteTeamMembershipByUserID(userID UserID) error
 		DeleteTeamMembershipByTeamID(teamID TeamID) error
+	}
+
+	// TelemetryService represents a service for managing telemetry data
+	TelemetryService interface {
+		Telemetry() (*Telemetry, error)
+		Update(telemetry *Telemetry) error
 	}
 
 	// TunnelServerService represents a service for managing data associated to the tunnel server

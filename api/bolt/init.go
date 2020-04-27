@@ -1,6 +1,9 @@
 package bolt
 
-import portainer "github.com/portainer/portainer/api"
+import (
+	"github.com/gofrs/uuid"
+	portainer "github.com/portainer/portainer/api"
+)
 
 // Init creates the default data set.
 func (store *Store) Init() error {
@@ -127,6 +130,25 @@ func (store *Store) Init() error {
 		if err != nil {
 			return err
 		}
+	}
+
+	_, err = store.TelemetryService.Telemetry()
+	if err == portainer.ErrObjectNotFound {
+		token, err := uuid.NewV4()
+		if err != nil {
+			return err
+		}
+
+		defaultTelemetry := &portainer.Telemetry{
+			TelemetryID: token.String(),
+		}
+
+		err = store.TelemetryService.Update(defaultTelemetry)
+		if err != nil {
+			return err
+		}
+	} else if err != nil {
+		return err
 	}
 
 	return nil

@@ -5,6 +5,8 @@ import (
 	"path"
 	"time"
 
+
+
 	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/dockerhub"
@@ -24,6 +26,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/tag"
 	"github.com/portainer/portainer/api/bolt/team"
 	"github.com/portainer/portainer/api/bolt/teammembership"
+	"github.com/portainer/portainer/api/bolt/telemetry"
 	"github.com/portainer/portainer/api/bolt/tunnelserver"
 	"github.com/portainer/portainer/api/bolt/user"
 	"github.com/portainer/portainer/api/bolt/version"
@@ -57,6 +60,7 @@ type Store struct {
 	TagService              *tag.Service
 	TeamMembershipService   *teammembership.Service
 	TeamService             *team.Service
+	TelemetryService       *telemetry.Service
 	TunnelServerService     *tunnelserver.Service
 	UserService             *user.Service
 	VersionService          *version.Service
@@ -140,6 +144,7 @@ func (store *Store) MigrateData() error {
 			StackService:            store.StackService,
 			TagService:              store.TagService,
 			TeamMembershipService:   store.TeamMembershipService,
+			TelemetryService:       store.TelemetryService,
 			UserService:             store.UserService,
 			VersionService:          store.VersionService,
 			FileService:             store.fileService,
@@ -248,6 +253,12 @@ func (store *Store) initServices() error {
 		return err
 	}
 	store.TeamService = teamService
+
+	telemetryService, err := telemetry.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.TelemetryService = telemetryService
 
 	tunnelServerService, err := tunnelserver.NewService(store.db)
 	if err != nil {
