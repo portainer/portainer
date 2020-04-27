@@ -14,7 +14,7 @@ import (
 func (handler *Handler) proxyEdgeAgentWebsocketRequest(w http.ResponseWriter, r *http.Request, params *webSocketRequestParams) error {
 	tunnel := handler.ReverseTunnelService.GetTunnelDetails(params.endpoint.ID)
 
-	endpointURL, err := url.Parse(fmt.Sprintf("http://localhost:%d", tunnel.Port))
+	endpointURL, err := url.Parse(fmt.Sprintf("http://127.0.0.1:%d", tunnel.Port))
 	if err != nil {
 		return err
 	}
