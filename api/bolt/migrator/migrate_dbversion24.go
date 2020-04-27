@@ -24,3 +24,14 @@ func (m *Migrator) updateTelemetryToDB24() error {
 
 	return nil
 }
+
+func (m *Migrator) updateSettingsToDB24() error {
+	legacySettings, err := m.settingsService.Settings()
+	if err != nil {
+		return err
+	}
+
+	legacySettings.Analytics = true
+
+	return m.settingsService.UpdateSettings(legacySettings)
+}

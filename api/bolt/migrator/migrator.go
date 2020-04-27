@@ -330,6 +330,11 @@ func (m *Migrator) Migrate() error {
 		if err != nil {
 			return err
 		}
+
+		err = m.updateSettingsToDB24()
+		if err != nil {
+			return err
+		}
 	}
 
 	return m.versionService.StoreDBVersion(portainer.DBVersion)
