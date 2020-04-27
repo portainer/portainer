@@ -107,11 +107,6 @@ gruntfile_cfg.copy = {
     files: [
       {
         dest: '<%= root %>/',
-        src: 'templates.json',
-        cwd: '',
-      },
-      {
-        dest: '<%= root %>/',
         src: 'extensions.json',
         cwd: '',
       },
