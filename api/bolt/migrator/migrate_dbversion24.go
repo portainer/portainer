@@ -31,7 +31,7 @@ func (m *Migrator) updateSettingsToDB24() error {
 		return err
 	}
 
-	legacySettings.Analytics = true
+	legacySettings.Telemetry = true
 
 	return m.settingsService.UpdateSettings(legacySettings)
 }

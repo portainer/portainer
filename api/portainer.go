@@ -457,7 +457,7 @@ type (
 		TemplatesURL                       string               `json:"TemplatesURL"`
 		EnableHostManagementFeatures       bool                 `json:"EnableHostManagementFeatures"`
 		EdgeAgentCheckinInterval           int                  `json:"EdgeAgentCheckinInterval"`
-		Analytics                          bool                 `json:"Analytics"`
+		Telemetry                          bool                 `json:"Telemetry"`
 		EnableEdgeComputeFeatures          bool                 `json:"EnableEdgeComputeFeatures"`
 
 		// Deprecated fields

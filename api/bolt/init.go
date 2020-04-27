@@ -30,7 +30,7 @@ func (store *Store) Init() error {
 			EnableHostManagementFeatures:       false,
 			EdgeAgentCheckinInterval:           portainer.DefaultEdgeAgentCheckinIntervalInSeconds,
 			TemplatesURL:                       portainer.DefaultTemplatesURL,
-			Analytics:                          true,
+			Telemetry:                          true,
 		}
 
 		err = store.SettingsService.UpdateSettings(defaultSettings)
