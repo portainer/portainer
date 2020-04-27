@@ -48,7 +48,6 @@ type (
 		NoAuth            *bool
 		NoAnalytics       *bool
 		Templates         *string
-		TemplateFile      *string
 		TLS               *bool
 		TLSSkipVerify     *bool
 		TLSCacert         *string
