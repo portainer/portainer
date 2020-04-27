@@ -135,10 +135,16 @@ angular.module('portainer.docker').factory('ContainerHelper', [
         let startHostPort = 0;
         let endHostPort = 0;
         if (hostPort) {
-          if (hostPort.indexOf(':') > -1) {
-            const hostAndPort = _.split(hostPort, ':');
-            hostIp = hostAndPort[0];
+          if (hostPort.indexOf('[') > -1) {
+            const hostAndPort = _.split(hostPort, ']:');
+            hostIp = hostAndPort[0].replace('[', '');
             hostPort = hostAndPort[1];
+          } else {
+            if (hostPort.indexOf(':') > -1) {
+              const hostAndPort = _.split(hostPort, ':');
+              hostIp = hostAndPort[0];
+              hostPort = hostAndPort[1];
+            }
           }
 
           const hostPortRange = parsePortRange(hostPort);
