@@ -47,7 +47,6 @@ type (
 		Labels            *[]Pair
 		Logo              *string
 		NoAuth            *bool
-		NoAnalytics       *bool
 		Templates         *string
 		TLS               *bool
 		TLSSkipVerify     *bool
@@ -518,7 +517,6 @@ type (
 	// Status represents the application status
 	Status struct {
 		Authentication bool   `json:"Authentication"`
-		Analytics      bool   `json:"Analytics"`
 		Version        string `json:"Version"`
 	}
 

@@ -9,7 +9,6 @@ const (
 	defaultDataDirectory       = "/data"
 	defaultAssetsDirectory     = "./"
 	defaultNoAuth              = "false"
-	defaultNoAnalytics         = "false"
 	defaultTLS                 = "false"
 	defaultTLSSkipVerify       = "false"
 	defaultTLSCACertPath       = "/certs/ca.pem"
