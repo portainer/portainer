@@ -953,7 +953,7 @@ const (
 	// to be used when communicating with an agent
 	PortainerAgentSignatureMessage = "Portainer-App"
 	// ExtensionServer represents the server used by Portainer to communicate with extensions
-	ExtensionServer = "localhost"
+	ExtensionServer = "127.0.0.1"
 	// DefaultEdgeAgentCheckinIntervalInSeconds represents the default interval (in seconds) used by Edge agents to checkin with the Portainer instance
 	DefaultEdgeAgentCheckinIntervalInSeconds = 5
 	// LocalExtensionManifestFile represents the name of the local manifest file for extensions
