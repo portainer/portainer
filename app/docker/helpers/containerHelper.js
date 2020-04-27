@@ -137,6 +137,11 @@ angular.module('portainer.docker').factory('ContainerHelper', [
         if (hostPort) {
           if (hostPort.indexOf('[') > -1) {
             const hostAndPort = _.split(hostPort, ']:');
+
+            if (hostAndPort.length < 2) {
+              throw new Error('Invalid port specification: ' + portBinding.containerPort);
+            }
+
             hostIp = hostAndPort[0].replace('[', '');
             hostPort = hostAndPort[1];
           } else {
