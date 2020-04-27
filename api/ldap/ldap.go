@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
 
 	"gopkg.in/ldap.v3"
@@ -92,9 +92,11 @@ func (*Service) AuthenticateUser(username, password string, settings *portainer.
 	}
 	defer connection.Close()
 
-	err = connection.Bind(settings.ReaderDN, settings.Password)
-	if err != nil {
-		return err
+	if !settings.AnonymousMode {
+		err = connection.Bind(settings.ReaderDN, settings.Password)
+		if err != nil {
+			return err
+		}
 	}
 
 	userDN, err := searchUser(username, connection, settings.SearchSettings)
@@ -118,9 +120,11 @@ func (*Service) GetUserGroups(username string, settings *portainer.LDAPSettings)
 	}
 	defer connection.Close()
 
-	err = connection.Bind(settings.ReaderDN, settings.Password)
-	if err != nil {
-		return nil, err
+	if !settings.AnonymousMode {
+		err = connection.Bind(settings.ReaderDN, settings.Password)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	userDN, err := searchUser(username, connection, settings.SearchSettings)

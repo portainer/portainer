@@ -13,7 +13,7 @@ import (
 	"github.com/portainer/portainer/api/docker"
 
 	"github.com/docker/docker/client"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
 	"github.com/portainer/portainer/api/http/security"
 )
@@ -432,20 +432,22 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 			return nil, err
 		}
 
+		user, err := transport.userService.User(tokenData.ID)
+		if err != nil {
+			return nil, err
+		}
+
 		if volumeBrowseRestrictionCheck {
 			settings, err := transport.settingsService.Settings()
 			if err != nil {
 				return nil, err
 			}
 
-			if rbacExtension != nil && !settings.AllowVolumeBrowserForRegularUsers {
+			// Return access denied for all roles except endpoint-administrator
+			_, userCanBrowse := user.EndpointAuthorizations[transport.endpoint.ID][portainer.OperationDockerAgentBrowseList]
+			if rbacExtension != nil && !settings.AllowVolumeBrowserForRegularUsers && !userCanBrowse {
 				return responseutils.WriteAccessDeniedResponse()
 			}
-		}
-
-		user, err := transport.userService.User(tokenData.ID)
-		if err != nil {
-			return nil, err
 		}
 
 		endpointResourceAccess := false
@@ -547,12 +549,12 @@ func (transport *Transport) interceptAndRewriteRequest(request *http.Request, op
 // on the resourceIdentifierAttribute parameter then generate a new resource control associated to that resource
 // with a random token and rewrites the response by decorating the original response with a ResourceControl object.
 // The generic Docker API response format is JSON object:
-// https://docs.docker.com/engine/api/v1.40/#operation/ContainerCreate
-// https://docs.docker.com/engine/api/v1.40/#operation/NetworkCreate
-// https://docs.docker.com/engine/api/v1.40/#operation/VolumeCreate
-// https://docs.docker.com/engine/api/v1.40/#operation/ServiceCreate
-// https://docs.docker.com/engine/api/v1.40/#operation/SecretCreate
-// https://docs.docker.com/engine/api/v1.40/#operation/ConfigCreate
+// https://docs.docker.com/engine/api/v1.37/#operation/ContainerCreate
+// https://docs.docker.com/engine/api/v1.37/#operation/NetworkCreate
+// https://docs.docker.com/engine/api/v1.37/#operation/VolumeCreate
+// https://docs.docker.com/engine/api/v1.37/#operation/ServiceCreate
+// https://docs.docker.com/engine/api/v1.37/#operation/SecretCreate
+// https://docs.docker.com/engine/api/v1.37/#operation/ConfigCreate
 func (transport *Transport) decorateGenericResourceCreationResponse(response *http.Response, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType, userID portainer.UserID) error {
 	responseObject, err := responseutils.GetResponseAsJSONOBject(response)
 	if err != nil {

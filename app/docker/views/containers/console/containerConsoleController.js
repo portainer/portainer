@@ -1,41 +1,63 @@
-import {Terminal} from 'xterm';
+import { Terminal } from 'xterm';
 
-angular.module('portainer.docker')
-  .controller('ContainerConsoleController', ['$scope', '$transition$', 'ContainerService', 'ImageService', 'EndpointProvider', 'Notifications', 'ContainerHelper', 'ExecService', 'HttpRequestHelper', 'LocalStorage', 'CONSOLE_COMMANDS_LABEL_PREFIX',
-    function ($scope, $transition$, ContainerService, ImageService, EndpointProvider, Notifications, ContainerHelper, ExecService, HttpRequestHelper, LocalStorage, CONSOLE_COMMANDS_LABEL_PREFIX) {
-      var socket, term;
+angular.module('portainer.docker').controller('ContainerConsoleController', [
+  '$scope',
+  '$transition$',
+  'ContainerService',
+  'ImageService',
+  'EndpointProvider',
+  'Notifications',
+  'ContainerHelper',
+  'ExecService',
+  'HttpRequestHelper',
+  'LocalStorage',
+  'CONSOLE_COMMANDS_LABEL_PREFIX',
+  function (
+    $scope,
+    $transition$,
+    ContainerService,
+    ImageService,
+    EndpointProvider,
+    Notifications,
+    ContainerHelper,
+    ExecService,
+    HttpRequestHelper,
+    LocalStorage,
+    CONSOLE_COMMANDS_LABEL_PREFIX
+  ) {
+    var socket, term;
 
-      let states = Object.freeze({
-        disconnected: 0,
-        connecting: 1,
-        connected: 2,
-      });
+    let states = Object.freeze({
+      disconnected: 0,
+      connecting: 1,
+      connected: 2,
+    });
 
-      $scope.loaded = false;
-      $scope.states = states;
-      $scope.state = states.disconnected;
+    $scope.loaded = false;
+    $scope.states = states;
+    $scope.state = states.disconnected;
 
-      $scope.formValues = {};
-      $scope.containerCommands = [];
+    $scope.formValues = {};
+    $scope.containerCommands = [];
 
-      // Ensure the socket is closed before leaving the view
-      $scope.$on('$stateChangeStart', function () {
-        $scope.disconnect();
-      });
+    // Ensure the socket is closed before leaving the view
+    $scope.$on('$stateChangeStart', function () {
+      $scope.disconnect();
+    });
 
-      $scope.connectAttach = function() {
-        if ($scope.state > states.disconnected) {
-          return;
-        }
+    $scope.connectAttach = function () {
+      if ($scope.state > states.disconnected) {
+        return;
+      }
 
-        $scope.state = states.connecting;
+      $scope.state = states.connecting;
 
-        let attachId = $transition$.params().id;
+      let attachId = $transition$.params().id;
 
-        ContainerService.container(attachId).then((details) => {
-
+      ContainerService.container(attachId)
+        .then((details) => {
           if (!details.State.Running) {
-            Notifications.error("Failure", details, "Container " + attachId + " is not running!");
+            Notifications.error('Failure', details, 'Container ' + attachId + ' is not running!');
             $scope.disconnect();
             return;
           }
@@ -43,173 +65,177 @@ angular.module('portainer.docker')
           const params = {
             token: LocalStorage.getJWT(),
             endpointId: EndpointProvider.endpointID(),
-            id: attachId
+            id: attachId,
           };
 
-          var url = window.location.href.split('#')[0] + 'api/websocket/attach?' + (Object.keys(params).map((k) => k + "=" + params[k]).join("&"));
+          var url =
+            window.location.href.split('#')[0] +
+            'api/websocket/attach?' +
+            Object.keys(params)
+              .map((k) => k + '=' + params[k])
+              .join('&');
 
           initTerm(url, ContainerService.resizeTTY.bind(this, attachId));
         })
-          .catch(function error(err) {
-            Notifications.error('Error', err, 'Unable to retrieve container details');
-            $scope.disconnect();
-          });
-      };
-
-      $scope.connectExec = function () {
-        if ($scope.state > states.disconnected) {
-          return;
-        }
-
-        $scope.state = states.connecting;
-        var command = $scope.formValues.isCustomCommand ?
-          $scope.formValues.customCommand : $scope.formValues.command;
-        var execConfig = {
-          id: $transition$.params().id,
-          AttachStdin: true,
-          AttachStdout: true,
-          AttachStderr: true,
-          Tty: true,
-          User: $scope.formValues.user,
-          Cmd: ContainerHelper.commandStringToArray(command)
-        };
-
-        ContainerService.createExec(execConfig)
-          .then(function success(data) {
-
-            const params = {
-              token: LocalStorage.getJWT(),
-              endpointId: EndpointProvider.endpointID(),
-              id: data.Id
-            };
-
-            var url = window.location.href.split('#')[0] + 'api/websocket/exec?' + (Object.keys(params).map((k) => k + "=" + params[k]).join("&"));
-
-            initTerm(url, ExecService.resizeTTY.bind(this, params.id));
-
-          })
-          .catch(function error(err) {
-            Notifications.error('Failure', err, 'Unable to exec into container');
-            $scope.disconnect();
-          });
-      };
-
-      $scope.disconnect = function () {
-        if (socket) {
-          socket.close();
-        }
-        if ($scope.state > states.disconnected) {
-          $scope.state = states.disconnected;
-          if (term) {
-            term.write("\n\r(connection closed)");
-            term.dispose();
-          }
-        }
-      };
-
-      $scope.autoconnectAttachView = function () {
-        return $scope.initView().then(function success() {
-          if ($scope.container.State.Running) {
-            $scope.connectAttach();
-          }
+        .catch(function error(err) {
+          Notifications.error('Error', err, 'Unable to retrieve container details');
+          $scope.disconnect();
         });
-      };
+    };
 
-      function resize(restcall, add) {
-        add = add || 0;
-
-        term.fit();
-        var termWidth = term.cols;
-        var termHeight = 30;
-        term.resize(termWidth, termHeight);
-
-
-        restcall(termWidth + add, termHeight + add, 1);
+    $scope.connectExec = function () {
+      if ($scope.state > states.disconnected) {
+        return;
       }
 
-      function initTerm(url, resizeRestCall) {
+      $scope.state = states.connecting;
+      var command = $scope.formValues.isCustomCommand ? $scope.formValues.customCommand : $scope.formValues.command;
+      var execConfig = {
+        id: $transition$.params().id,
+        AttachStdin: true,
+        AttachStdout: true,
+        AttachStderr: true,
+        Tty: true,
+        User: $scope.formValues.user,
+        Cmd: ContainerHelper.commandStringToArray(command),
+      };
 
-        let resizefun = resize.bind(this, resizeRestCall);
+      ContainerService.createExec(execConfig)
+        .then(function success(data) {
+          const params = {
+            token: LocalStorage.getJWT(),
+            endpointId: EndpointProvider.endpointID(),
+            id: data.Id,
+          };
 
-        if ($transition$.params().nodeName) {
-          url += '&nodeName=' + $transition$.params().nodeName;
+          var url =
+            window.location.href.split('#')[0] +
+            'api/websocket/exec?' +
+            Object.keys(params)
+              .map((k) => k + '=' + params[k])
+              .join('&');
+
+          initTerm(url, ExecService.resizeTTY.bind(this, params.id));
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to exec into container');
+          $scope.disconnect();
+        });
+    };
+
+    $scope.disconnect = function () {
+      if (socket) {
+        socket.close();
+      }
+      if ($scope.state > states.disconnected) {
+        $scope.state = states.disconnected;
+        if (term) {
+          term.write('\n\r(connection closed)');
+          term.dispose();
         }
-        if (url.indexOf('https') > -1) {
-          url = url.replace('https://', 'wss://');
-        } else {
-          url = url.replace('http://', 'ws://');
+      }
+    };
+
+    $scope.autoconnectAttachView = function () {
+      return $scope.initView().then(function success() {
+        if ($scope.container.State.Running) {
+          $scope.connectAttach();
         }
+      });
+    };
 
-        socket = new WebSocket(url);
+    function resize(restcall, add) {
+      add = add || 0;
 
+      term.fit();
+      var termWidth = term.cols;
+      var termHeight = 30;
+      term.resize(termWidth, termHeight);
 
-        socket.onopen = function () {
-          $scope.state = states.connected;
-          term = new Terminal();
+      restcall(termWidth + add, termHeight + add, 1);
+    }
 
+    function initTerm(url, resizeRestCall) {
+      let resizefun = resize.bind(this, resizeRestCall);
 
-          term.on('data', function (data) {
-            socket.send(data);
-          });
-          var terminal_container = document.getElementById('terminal-container');
-          term.open(terminal_container);
-          term.focus();
-          term.setOption('cursorBlink', true);
+      if ($transition$.params().nodeName) {
+        url += '&nodeName=' + $transition$.params().nodeName;
+      }
+      if (url.indexOf('https') > -1) {
+        url = url.replace('https://', 'wss://');
+      } else {
+        url = url.replace('http://', 'ws://');
+      }
 
-          window.onresize = function () {
-            resizefun();
-            $scope.$apply();
-          };
+      socket = new WebSocket(url);
 
-          $scope.$watch('toggle', function () {
-            setTimeout(resizefun, 400);
-          });
+      socket.onopen = function () {
+        $scope.state = states.connected;
+        term = new Terminal();
 
-          socket.onmessage = function (e) {
-            term.write(e.data);
-          };
-          socket.onerror = function (err) {
-            $scope.disconnect();
-            $scope.$apply();
-            Notifications.error("Failure", err, "Connection error");
-          };
-          socket.onclose = function () {
-            $scope.disconnect();
-            $scope.$apply();
-          };
+        term.on('data', function (data) {
+          socket.send(data);
+        });
+        var terminal_container = document.getElementById('terminal-container');
+        term.open(terminal_container);
+        term.focus();
+        term.setOption('cursorBlink', true);
 
-          resizefun(1);
+        window.onresize = function () {
+          resizefun();
           $scope.$apply();
         };
-      }
 
-      $scope.initView = function () {
-        HttpRequestHelper.setPortainerAgentTargetHeader($transition$.params().nodeName);
-        return ContainerService.container($transition$.params().id)
-          .then(function success(data) {
-            var container = data;
-            $scope.container = container;
-            return ImageService.image(container.Image);
-          })
-          .then(function success(data) {
-            var image = data;
-            var containerLabels = $scope.container.Config.Labels;
-            $scope.imageOS = image.Os;
-            $scope.formValues.command = image.Os === 'windows' ? 'powershell' : 'bash';
-            $scope.containerCommands = Object.keys(containerLabels)
-              .filter(function (label) {
-                return label.indexOf(CONSOLE_COMMANDS_LABEL_PREFIX) === 0;
-              })
-              .map(function (label) {
-                return {
-                  title: label.replace(CONSOLE_COMMANDS_LABEL_PREFIX, ''),
-                  command: containerLabels[label]
-                };
-              });
-            $scope.loaded = true;
-          })
-          .catch(function error(err) {
-            Notifications.error('Error', err, 'Unable to retrieve container details');
-          });
-      }
-    }]);
+        $scope.$watch('toggle', function () {
+          setTimeout(resizefun, 400);
+        });
+
+        socket.onmessage = function (e) {
+          term.write(e.data);
+        };
+        socket.onerror = function (err) {
+          $scope.disconnect();
+          $scope.$apply();
+          Notifications.error('Failure', err, 'Connection error');
+        };
+        socket.onclose = function () {
+          $scope.disconnect();
+          $scope.$apply();
+        };
+
+        resizefun(1);
+        $scope.$apply();
+      };
+    }
+
+    $scope.initView = function () {
+      HttpRequestHelper.setPortainerAgentTargetHeader($transition$.params().nodeName);
+      return ContainerService.container($transition$.params().id)
+        .then(function success(data) {
+          var container = data;
+          $scope.container = container;
+          return ImageService.image(container.Image);
+        })
+        .then(function success(data) {
+          var image = data;
+          var containerLabels = $scope.container.Config.Labels;
+          $scope.imageOS = image.Os;
+          $scope.formValues.command = image.Os === 'windows' ? 'powershell' : 'bash';
+          $scope.containerCommands = Object.keys(containerLabels)
+            .filter(function (label) {
+              return label.indexOf(CONSOLE_COMMANDS_LABEL_PREFIX) === 0;
+            })
+            .map(function (label) {
+              return {
+                title: label.replace(CONSOLE_COMMANDS_LABEL_PREFIX, ''),
+                command: containerLabels[label],
+              };
+            });
+          $scope.loaded = true;
+        })
+        .catch(function error(err) {
+          Notifications.error('Error', err, 'Unable to retrieve container details');
+        });
+    };
+  },
+]);

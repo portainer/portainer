@@ -15,8 +15,8 @@ angular.module('portainer.agent').component('filesDatatable', {
     rename: '&',
     download: '&',
     delete: '&',
-    
+
     isUploadAllowed: '<',
-    onFileSelectedForUpload: '<'
-  }
+    onFileSelectedForUpload: '<',
+  },
 });

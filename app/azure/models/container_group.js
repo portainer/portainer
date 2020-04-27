@@ -8,8 +8,8 @@ export function ContainerGroupDefaultModel() {
     {
       container: 80,
       host: 80,
-      protocol: 'TCP'
-    }
+      protocol: 'TCP',
+    },
   ];
   this.CPU = 1;
   this.Memory = 1;
@@ -32,12 +32,12 @@ export function CreateContainerGroupRequest(model) {
     var binding = model.Ports[i];
 
     containerPorts.push({
-      port: binding.container
+      port: binding.container,
     });
 
     addressPorts.push({
       port: binding.host,
-      protocol: binding.protocol
+      protocol: binding.protocol,
     });
   }
 
@@ -52,15 +52,15 @@ export function CreateContainerGroupRequest(model) {
           resources: {
             requests: {
               cpu: model.CPU,
-              memoryInGB: model.Memory
-            }
-          }
-        }
-      }
+              memoryInGB: model.Memory,
+            },
+          },
+        },
+      },
     ],
     ipAddress: {
-      type: model.AllocatePublicIP ? 'Public': 'Private',
-      ports: addressPorts
-    }
+      type: model.AllocatePublicIP ? 'Public' : 'Private',
+      ports: addressPorts,
+    },
   };
 }

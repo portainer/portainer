@@ -5,13 +5,14 @@ angular.module('portainer.app').component('endpointList', {
     titleText: '@',
     titleIcon: '@',
     endpoints: '<',
+    tags: '<',
     tableKey: '@',
     dashboardAction: '<',
     snapshotAction: '<',
     showSnapshotAction: '<',
     editAction: '<',
-    isAdmin:'<',
+    isAdmin: '<',
     totalCount: '<',
-    retrievePage: '<'
-  }
+    retrievePage: '<',
+  },
 });

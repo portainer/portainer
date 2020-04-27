@@ -1,41 +1,41 @@
 angular.module('portainer.app').component('groupAssociationTable', {
   templateUrl: './groupAssociationTable.html',
-  controller: function() {
+  controller: function () {
     this.state = {
       orderBy: 'Name',
       reverseOrder: false,
       paginatedItemLimit: '10',
       textFilter: '',
-      loading:true,
-      pageNumber: 1
+      loading: true,
+      pageNumber: 1,
     };
 
-    this.changeOrderBy = function(orderField) {
+    this.changeOrderBy = function (orderField) {
       this.state.reverseOrder = this.state.orderBy === orderField ? !this.state.reverseOrder : false;
       this.state.orderBy = orderField;
     };
 
-    this.hasBackendPagination = function() {
+    this.hasBackendPagination = function () {
       return !(this.pageType === 'create' && this.tableType === 'associated');
-    }
-    this.onTextFilterChange = function() {
-      this.paginationChangedAction();
-    }
-
-    this.onPageChanged = function(newPageNumber) {
-      this.paginationState.pageNumber = newPageNumber;
-      this.paginationChangedAction();
-    }
-
-    this.onPaginationLimitChanged = function() {
+    };
+    this.onTextFilterChange = function () {
       this.paginationChangedAction();
     };
 
-    this.paginationChangedAction = function() {
+    this.onPageChanged = function (newPageNumber) {
+      this.paginationState.pageNumber = newPageNumber;
+      this.paginationChangedAction();
+    };
+
+    this.onPaginationLimitChanged = function () {
+      this.paginationChangedAction();
+    };
+
+    this.paginationChangedAction = function () {
       this.retrievePage(this.pageType, this.tableType);
     };
 
-    this.$onChanges = function(changes) {
+    this.$onChanges = function (changes) {
       if (changes.loaded && changes.loaded.currentValue) {
         this.paginationChangedAction();
       }
@@ -49,6 +49,6 @@ angular.module('portainer.app').component('groupAssociationTable', {
     retrievePage: '<',
     dataset: '<',
     entryClick: '<',
-    emptyDatasetMessage: '@'
-  }
+    emptyDatasetMessage: '@',
+  },
 });

@@ -26,6 +26,10 @@ A clear and concise description of what the bug is.
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
+**Portainer Logs**
+Provide the logs of your Portainer container or Service.
+You can see how [here](https://portainer.readthedocs.io/en/stable/faq.html#how-do-i-get-the-logs-from-portainer)
+
 **Steps to reproduce the issue:**
 1. Go to '...'
 2. Click on '....'

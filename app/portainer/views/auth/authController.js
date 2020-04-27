@@ -3,11 +3,29 @@ import uuidv4 from 'uuid/v4';
 
 class AuthenticationController {
   /* @ngInject */
-  constructor($async, $scope, $state, $stateParams, $sanitize, Authentication, UserService, EndpointService, ExtensionService, StateManager, Notifications, SettingsService, URLHelper, LocalStorage, StatusService) {
+  constructor(
+    $async,
+    $scope,
+    $state,
+    $stateParams,
+    $sanitize,
+    $window,
+    Authentication,
+    UserService,
+    EndpointService,
+    ExtensionService,
+    StateManager,
+    Notifications,
+    SettingsService,
+    URLHelper,
+    LocalStorage,
+    StatusService
+  ) {
     this.$async = $async;
     this.$scope = $scope;
     this.$state = $state;
     this.$stateParams = $stateParams;
+    this.$window = $window;
     this.$sanitize = $sanitize;
     this.Authentication = Authentication;
     this.UserService = UserService;
@@ -23,16 +41,15 @@ class AuthenticationController {
     this.logo = this.StateManager.getState().application.logo;
     this.formValues = {
       Username: '',
-      Password: ''
+      Password: '',
     };
     this.state = {
       AuthenticationError: '',
       loginInProgress: true,
-      OAuthProvider: ''
+      OAuthProvider: '',
     };
 
     this.retrieveAndSaveEnabledExtensionsAsync = this.retrieveAndSaveEnabledExtensionsAsync.bind(this);
-    this.retrievePermissionsAsync = this.retrievePermissionsAsync.bind(this);
     this.checkForEndpointsAsync = this.checkForEndpointsAsync.bind(this);
     this.checkForLatestVersionAsync = this.checkForLatestVersionAsync.bind(this);
     this.postLoginSteps = this.postLoginSteps.bind(this);
@@ -52,10 +69,12 @@ class AuthenticationController {
    * UTILS FUNCTIONS SECTION
    */
 
-  logout() {
+  logout(error) {
     this.Authentication.logout();
     this.state.loginInProgress = false;
     this.generateOAuthLoginURI();
+    this.LocalStorage.storeLogoutReason(error);
+    this.$window.location.reload();
   }
 
   error(err, message) {
@@ -70,11 +89,9 @@ class AuthenticationController {
   determineOauthProvider(LoginURI) {
     if (LoginURI.indexOf('login.microsoftonline.com') !== -1) {
       return 'Microsoft';
-    }
-    else if (LoginURI.indexOf('accounts.google.com') !== -1) {
+    } else if (LoginURI.indexOf('accounts.google.com') !== -1) {
       return 'Google';
-    }
-    else if (LoginURI.indexOf('github.com') !== -1) {
+    } else if (LoginURI.indexOf('github.com') !== -1) {
       return 'Github';
     }
     return 'OAuth';
@@ -103,16 +120,6 @@ class AuthenticationController {
    * POST LOGIN STEPS SECTION
    */
 
-  async retrievePermissionsAsync() {
-    try {
-      await this.Authentication.retrievePermissions();
-    } catch (err) {
-      this.state.permissionsError = true;
-      this.logout();
-      this.error(err, 'Unable to retrieve permissions.');
-    }
-  }
-
   async retrieveAndSaveEnabledExtensionsAsync() {
     try {
       await this.ExtensionService.retrieveAndSaveEnabledExtensions();
@@ -139,7 +146,7 @@ class AuthenticationController {
   async checkForLatestVersionAsync() {
     let versionInfo = {
       UpdateAvailable: false,
-      LatestVersion: ''
+      LatestVersion: '',
     };
 
     try {
@@ -154,7 +161,6 @@ class AuthenticationController {
   }
 
   async postLoginSteps() {
-    await this.retrievePermissionsAsync();
     await this.retrieveAndSaveEnabledExtensionsAsync();
     await this.checkForEndpointsAsync(false);
     await this.checkForLatestVersionAsync();
@@ -216,7 +222,7 @@ class AuthenticationController {
   }
 
   authenticateUser() {
-    return this.$async(this.authenticateUserAsync)
+    return this.$async(this.authenticateUserAsync);
   }
 
   /**
@@ -241,7 +247,7 @@ class AuthenticationController {
         this.$state.go('portainer.init.admin');
       }
     } catch (err) {
-      this.error(err, 'Unable to verify administrator account existence')
+      this.error(err, 'Unable to verify administrator account existence');
     }
   }
 
@@ -262,9 +268,13 @@ class AuthenticationController {
       this.generateOAuthLoginURI();
 
       if (this.$stateParams.logout || this.$stateParams.error) {
-        this.logout();
-        this.state.AuthenticationError = this.$stateParams.error;
+        this.logout(this.$stateParams.error);
         return;
+      }
+      const error = this.LocalStorage.getLogoutReason();
+      if (error) {
+        this.state.AuthenticationError = error;
+        this.LocalStorage.cleanLogoutReason();
       }
 
       if (this.Authentication.isAuthenticated()) {

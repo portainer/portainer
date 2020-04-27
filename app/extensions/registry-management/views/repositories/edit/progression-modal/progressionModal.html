@@ -6,8 +6,6 @@
         {{ $ctrl.resolve.message }}
       </p>
     </span>
-    <span>
-      &nbsp; {{ $ctrl.resolve.progressLabel }} : {{ $ctrl.resolve.context.progression }}% - {{ $ctrl.resolve.context.elapsedTime |number:0 }}s
-    </span>
+    <span> &nbsp; {{ $ctrl.resolve.progressLabel }} : {{ $ctrl.resolve.context.progression }}% - {{ $ctrl.resolve.context.elapsedTime | number: 0 }}s </span>
   </rd-widget-body>
 </rd-widget>

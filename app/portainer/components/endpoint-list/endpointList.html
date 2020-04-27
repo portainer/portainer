@@ -1,17 +1,12 @@
 <div class="datatable">
   <rd-widget>
     <rd-widget-body classes="no-padding">
-
       <div class="toolBar">
-        <div class="toolBarTitle">
-          <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }}
-        </div>
+        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
       </div>
 
       <div class="actionBar" ng-if="$ctrl.showSnapshotAction">
-        <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.snapshotAction()">
-          <i class="fa fa-sync space-right" aria-hidden="true"></i>Refresh
-        </button>
+        <button type="button" class="btn btn-sm btn-primary" ng-click="$ctrl.snapshotAction()"> <i class="fa fa-sync space-right" aria-hidden="true"></i>Refresh </button>
       </div>
 
       <div class="searchBar">
@@ -22,24 +17,30 @@
           ng-model="$ctrl.state.textFilter"
           ng-change="$ctrl.onTextFilterChange()"
           ng-model-options="{ debounce: 300 }"
-          placeholder="Search by name, group, tag, status, URL..." auto-focus>
+          placeholder="Search by name, group, tag, status, URL..."
+          auto-focus
+        />
       </div>
 
       <div class="blocklist">
-        <endpoint-item ng-if="$ctrl.hasBackendPagination()"
+        <endpoint-item
+          ng-if="$ctrl.hasBackendPagination()"
           dir-paginate="endpoint in $ctrl.state.filteredEndpoints | itemsPerPage: $ctrl.state.paginatedItemLimit"
           model="endpoint"
           total-items="$ctrl.state.totalFilteredEndpoints"
-          on-select="$ctrl.dashboardAction"
-          on-edit="$ctrl.editAction"
+          on-select="($ctrl.dashboardAction)"
+          on-edit="($ctrl.editAction)"
           is-admin="$ctrl.isAdmin"
+          tags="$ctrl.tags"
         ></endpoint-item>
-        <endpoint-item ng-if="!$ctrl.hasBackendPagination()"
+        <endpoint-item
+          ng-if="!$ctrl.hasBackendPagination()"
           dir-paginate="endpoint in $ctrl.state.filteredEndpoints | itemsPerPage: $ctrl.state.paginatedItemLimit"
           model="endpoint"
-          on-select="$ctrl.dashboardAction"
-          on-edit="$ctrl.editAction"
+          on-select="($ctrl.dashboardAction)"
+          on-edit="($ctrl.editAction)"
           is-admin="$ctrl.isAdmin"
+          tags="$ctrl.tags"
         ></endpoint-item>
         <div ng-if="$ctrl.state.loading" class="text-center text-muted">
           Loading...

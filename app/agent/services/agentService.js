@@ -1,7 +1,12 @@
 import { AgentViewModel } from '../models/agent';
 
 angular.module('portainer.agent').factory('AgentService', [
-  '$q', 'Agent', 'AgentVersion1', 'HttpRequestHelper', 'Host', 'StateManager',
+  '$q',
+  'Agent',
+  'AgentVersion1',
+  'HttpRequestHelper',
+  'Host',
+  'StateManager',
   function AgentServiceFactory($q, Agent, AgentVersion1, HttpRequestHelper, Host, StateManager) {
     'use strict';
     var service = {};
@@ -24,10 +29,11 @@ angular.module('portainer.agent').factory('AgentService', [
 
       var agentVersion = getAgentApiVersion();
       var service = agentVersion > 1 ? Agent : AgentVersion1;
-      
-      service.query({ version: agentVersion })
+
+      service
+        .query({ version: agentVersion })
         .$promise.then(function success(data) {
-          var agents = data.map(function(item) {
+          var agents = data.map(function (item) {
             return new AgentViewModel(item);
           });
           deferred.resolve(agents);
@@ -40,5 +46,5 @@ angular.module('portainer.agent').factory('AgentService', [
     }
 
     return service;
-  }
+  },
 ]);

@@ -7,7 +7,7 @@ import (
 
 	"github.com/portainer/portainer/api/http/handler/roles"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/handler"
 	"github.com/portainer/portainer/api/http/handler/auth"
@@ -71,7 +71,6 @@ type Server struct {
 	TagService             portainer.TagService
 	TeamService            portainer.TeamService
 	TeamMembershipService  portainer.TeamMembershipService
-	TemplateService        portainer.TemplateService
 	UserService            portainer.UserService
 	WebhookService         portainer.WebhookService
 	Handler                *handler.Handler
@@ -136,6 +135,7 @@ func (server *Server) Start() error {
 	authHandler.EndpointGroupService = server.EndpointGroupService
 	authHandler.RoleService = server.RoleService
 	authHandler.ProxyManager = proxyManager
+	authHandler.AuthorizationService = authorizationService
 
 	var roleHandler = roles.NewHandler(requestBouncer)
 	roleHandler.RoleService = server.RoleService
@@ -221,6 +221,8 @@ func (server *Server) Start() error {
 
 	var tagHandler = tags.NewHandler(requestBouncer)
 	tagHandler.TagService = server.TagService
+	tagHandler.EndpointService = server.EndpointService
+	tagHandler.EndpointGroupService = server.EndpointGroupService
 
 	var teamHandler = teams.NewHandler(requestBouncer)
 	teamHandler.TeamService = server.TeamService
@@ -236,7 +238,6 @@ func (server *Server) Start() error {
 	var supportHandler = support.NewHandler(requestBouncer)
 
 	var templatesHandler = templates.NewHandler(requestBouncer)
-	templatesHandler.TemplateService = server.TemplateService
 	templatesHandler.SettingsService = server.SettingsService
 
 	var uploadHandler = upload.NewHandler(requestBouncer)

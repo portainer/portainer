@@ -2,7 +2,7 @@ angular.module('portainer.azure').component('azureEndpointConfig', {
   bindings: {
     applicationId: '=',
     tenantId: '=',
-    authenticationKey: '='
+    authenticationKey: '=',
   },
-  templateUrl: './azureEndpointConfig.html'
+  templateUrl: './azureEndpointConfig.html',
 });

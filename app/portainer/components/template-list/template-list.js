@@ -7,10 +7,6 @@ angular.module('portainer.app').component('templateList', {
     templates: '<',
     tableKey: '@',
     selectAction: '<',
-    deleteAction: '<',
     showSwarmStacks: '<',
-    showAddAction: '<',
-    showUpdateAction: '<',
-    showDeleteAction: '<'
-  }
+  },
 });

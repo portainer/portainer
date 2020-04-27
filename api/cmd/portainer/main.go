@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"os"
 	"strings"
@@ -236,110 +235,24 @@ func initStatus(endpointManagement, snapshot bool, flags *portainer.CLIFlags) *p
 	}
 }
 
-func initDockerHub(dockerHubService portainer.DockerHubService) error {
-	_, err := dockerHubService.DockerHub()
-	if err == portainer.ErrObjectNotFound {
-		dockerhub := &portainer.DockerHub{
-			Authentication: false,
-			Username:       "",
-			Password:       "",
-		}
-		return dockerHubService.UpdateDockerHub(dockerhub)
-	} else if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func initSettings(settingsService portainer.SettingsService, flags *portainer.CLIFlags) error {
-	_, err := settingsService.Settings()
-	if err == portainer.ErrObjectNotFound {
-		settings := &portainer.Settings{
-			LogoURL:              *flags.Logo,
-			AuthenticationMethod: portainer.AuthenticationInternal,
-			LDAPSettings: portainer.LDAPSettings{
-				AutoCreateUsers: true,
-				TLSConfig:       portainer.TLSConfiguration{},
-				SearchSettings: []portainer.LDAPSearchSettings{
-					portainer.LDAPSearchSettings{},
-				},
-				GroupSearchSettings: []portainer.LDAPGroupSearchSettings{
-					portainer.LDAPGroupSearchSettings{},
-				},
-			},
-			OAuthSettings:                      portainer.OAuthSettings{},
-			AllowBindMountsForRegularUsers:     true,
-			AllowPrivilegedModeForRegularUsers: true,
-			AllowVolumeBrowserForRegularUsers:  false,
-			EnableHostManagementFeatures:       false,
-			SnapshotInterval:                   *flags.SnapshotInterval,
-			EdgeAgentCheckinInterval:           portainer.DefaultEdgeAgentCheckinIntervalInSeconds,
-		}
-
-		if *flags.Templates != "" {
-			settings.TemplatesURL = *flags.Templates
-		}
-
-		if *flags.Labels != nil {
-			settings.BlackListedLabels = *flags.Labels
-		} else {
-			settings.BlackListedLabels = make([]portainer.Pair, 0)
-		}
-
-		return settingsService.UpdateSettings(settings)
-	} else if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func initTemplates(templateService portainer.TemplateService, fileService portainer.FileService, templateURL, templateFile string) error {
-	if templateURL != "" {
-		log.Printf("Portainer started with the --templates flag. Using external templates, template management will be disabled.")
-		return nil
-	}
-
-	existingTemplates, err := templateService.Templates()
+func updateSettingsFromFlags(settingsService portainer.SettingsService, flags *portainer.CLIFlags) error {
+	settings, err := settingsService.Settings()
 	if err != nil {
 		return err
 	}
 
-	if len(existingTemplates) != 0 {
-		log.Printf("Templates already registered inside the database. Skipping template import.")
-		return nil
+	settings.LogoURL = *flags.Logo
+	settings.SnapshotInterval = *flags.SnapshotInterval
+
+	if *flags.Templates != "" {
+		settings.TemplatesURL = *flags.Templates
 	}
 
-	templatesJSON, err := fileService.GetFileContent(templateFile)
-	if err != nil {
-		log.Println("Unable to retrieve template definitions via filesystem")
-		return err
+	if *flags.Labels != nil {
+		settings.BlackListedLabels = *flags.Labels
 	}
 
-	var templates []portainer.Template
-	err = json.Unmarshal(templatesJSON, &templates)
-	if err != nil {
-		log.Println("Unable to parse templates file. Please review your template definition file.")
-		return err
-	}
-
-	for _, template := range templates {
-		err := templateService.CreateTemplate(&template)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func retrieveFirstEndpointFromDatabase(endpointService portainer.EndpointService) *portainer.Endpoint {
-	endpoints, err := endpointService.Endpoints()
-	if err != nil {
-		log.Fatal(err)
-	}
-	return &endpoints[0]
+	return settingsService.UpdateSettings(settings)
 }
 
 func loadAndParseKeyPair(fileService portainer.FileService, signatureService portainer.DigitalSignatureService) error {
@@ -396,7 +309,7 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, endpointService portain
 		UserAccessPolicies: portainer.UserAccessPolicies{},
 		TeamAccessPolicies: portainer.TeamAccessPolicies{},
 		Extensions:         []portainer.EndpointExtension{},
-		Tags:               []string{},
+		TagIDs:             []portainer.TagID{},
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.Snapshot{},
 	}
@@ -439,7 +352,7 @@ func createUnsecuredEndpoint(endpointURL string, endpointService portainer.Endpo
 		UserAccessPolicies: portainer.UserAccessPolicies{},
 		TeamAccessPolicies: portainer.TeamAccessPolicies{},
 		Extensions:         []portainer.EndpointExtension{},
-		Tags:               []string{},
+		TagIDs:             []portainer.TagID{},
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.Snapshot{},
 	}
@@ -489,24 +402,9 @@ func initJobService(dockerClientFactory *docker.ClientFactory) portainer.JobServ
 func initExtensionManager(fileService portainer.FileService, extensionService portainer.ExtensionService) (portainer.ExtensionManager, error) {
 	extensionManager := exec.NewExtensionManager(fileService, extensionService)
 
-	extensions, err := extensionService.Extensions()
+	err := extensionManager.StartExtensions()
 	if err != nil {
 		return nil, err
-	}
-
-	for _, extension := range extensions {
-		err := extensionManager.EnableExtension(&extension, extension.License.LicenseKey)
-		if err != nil {
-			log.Printf("Unable to enable extension: %s [extension: %s]", err.Error(), extension.Name)
-			extension.Enabled = false
-			extension.License.Valid = false
-		}
-
-		err = extensionService.Persist(&extension)
-		if err != nil {
-			return nil, err
-		}
-
 	}
 
 	return extensionManager, nil
@@ -575,14 +473,11 @@ func main() {
 
 	composeStackManager := initComposeStackManager(*flags.Data, reverseTunnelService)
 
-	err = initTemplates(store.TemplateService, fileService, *flags.Templates, *flags.TemplateFile)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = initSettings(store.SettingsService, flags)
-	if err != nil {
-		log.Fatal(err)
+	if store.IsNew() {
+		err = updateSettingsFromFlags(store.SettingsService, flags)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	jobScheduler := initJobScheduler()
@@ -605,11 +500,6 @@ func main() {
 	}
 
 	jobScheduler.Start()
-
-	err = initDockerHub(store.DockerHubService)
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	applicationStatus := initStatus(endpointManagement, *flags.Snapshot, flags)
 
@@ -639,7 +529,7 @@ func main() {
 		}
 
 		if len(users) == 0 {
-			log.Printf("Creating admin user with password hash %s", adminPasswordHash)
+			log.Println("Created admin user with the given password.")
 			user := &portainer.User{
 				Username:                "admin",
 				Role:                    portainer.AdministratorRole,
@@ -685,7 +575,6 @@ func main() {
 		StackService:           store.StackService,
 		ScheduleService:        store.ScheduleService,
 		TagService:             store.TagService,
-		TemplateService:        store.TemplateService,
 		WebhookService:         store.WebhookService,
 		SwarmStackManager:      swarmStackManager,
 		ComposeStackManager:    composeStackManager,

@@ -28,7 +28,7 @@
             </tr>
             <tr>
               <td>Total memory</td>
-              <td>{{ totalMemory|humansize: 2 }}</td>
+              <td>{{ totalMemory | humansize: 2 }}</td>
             </tr>
             <tr>
               <td colspan="2">
@@ -47,12 +47,14 @@
 <div class="row">
   <div class="col-sm-12">
     <nodes-datatable
-    title-text="Nodes" title-icon="fa-hdd"
-    dataset="nodes" table-key="nodes"
-    order-by="Hostname" 
-    show-ip-address-column="applicationState.endpoint.apiVersion >= 1.25"
-    access-to-node-details="!applicationState.application.authentication || isAdmin"
-    refresh-callback="getNodes"
+      title-text="Nodes"
+      title-icon="fa-hdd"
+      dataset="nodes"
+      table-key="nodes"
+      order-by="Hostname"
+      show-ip-address-column="applicationState.endpoint.apiVersion >= 1.25"
+      access-to-node-details="!applicationState.application.authentication || isAdmin"
+      refresh-callback="getNodes"
     ></nodes-datatable>
   </div>
 </div>

@@ -1,6 +1,7 @@
 import _ from 'lodash-es';
 
-angular.module('portainer.app').controller('TemplateListController', ['DatatableService',
+angular.module('portainer.app').controller('TemplateListController', [
+  'DatatableService',
   function TemplateListController(DatatableService) {
     var ctrl = this;
 
@@ -8,14 +9,14 @@ angular.module('portainer.app').controller('TemplateListController', ['Datatable
       textFilter: '',
       selectedCategory: '',
       categories: [],
-      showContainerTemplates: true
+      showContainerTemplates: true,
     };
 
-    this.onTextFilterChange = function() {
+    this.onTextFilterChange = function () {
       DatatableService.setDataTableTextFilters(this.tableKey, this.state.textFilter);
-    }
+    };
 
-    this.updateCategories = function() {
+    this.updateCategories = function () {
       var availableCategories = [];
 
       for (var i = 0; i < ctrl.templates.length; i++) {
@@ -28,7 +29,7 @@ angular.module('portainer.app').controller('TemplateListController', ['Datatable
       this.state.categories = _.sortBy(_.uniq(availableCategories));
     };
 
-    this.filterByCategory = function(item) {
+    this.filterByCategory = function (item) {
       if (!ctrl.state.selectedCategory) {
         return true;
       }
@@ -36,14 +37,14 @@ angular.module('portainer.app').controller('TemplateListController', ['Datatable
       return _.includes(item.Categories, ctrl.state.selectedCategory);
     };
 
-    this.filterByType = function(item) {
+    this.filterByType = function (item) {
       if ((item.Type === 1 && ctrl.state.showContainerTemplates) || (item.Type === 2 && ctrl.showSwarmStacks) || (item.Type === 3 && !ctrl.showSwarmStacks)) {
         return true;
       }
       return false;
     };
 
-    this.$onInit = function() {
+    this.$onInit = function () {
       if (this.showSwarmStacks) {
         this.state.showContainerTemplates = false;
       }
@@ -54,5 +55,5 @@ angular.module('portainer.app').controller('TemplateListController', ['Datatable
         this.state.textFilter = textFilter;
       }
     };
-  }
+  },
 ]);

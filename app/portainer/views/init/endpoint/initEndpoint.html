@@ -4,8 +4,8 @@
     <div class="col-sm-12">
       <!-- simple box logo -->
       <div class="row">
-        <img ng-if="logo" ng-src="{{ logo }}" class="simple-box-logo">
-        <img ng-if="!logo" src="../../../../../assets/images/logo_alt.png" class="simple-box-logo" alt="Portainer">
+        <img ng-if="logo" ng-src="{{ logo }}" class="simple-box-logo" />
+        <img ng-if="!logo" src="../../../../../assets/images/logo_alt.png" class="simple-box-logo" alt="Portainer" />
       </div>
       <!-- !simple box logo -->
       <!-- init-endpoint panel -->
@@ -23,10 +23,10 @@
             </div>
             <!-- !note -->
             <!-- endpoint-type -->
-            <div class="form-group" style="margin-bottom: 0">
+            <div class="form-group" style="margin-bottom: 0;">
               <div class="boxselector_wrapper">
                 <div>
-                  <input type="radio" id="local_endpoint" ng-model="formValues.EndpointType" value="local">
+                  <input type="radio" id="local_endpoint" ng-model="formValues.EndpointType" value="local" />
                   <label for="local_endpoint">
                     <div class="boxselector_header">
                       <i class="fab fa-docker" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -36,7 +36,7 @@
                   </label>
                 </div>
                 <div>
-                  <input type="radio" id="remote_endpoint" ng-model="formValues.EndpointType" value="remote">
+                  <input type="radio" id="remote_endpoint" ng-model="formValues.EndpointType" value="remote" />
                   <label for="remote_endpoint">
                     <div class="boxselector_header">
                       <i class="fab fa-docker" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -46,7 +46,7 @@
                   </label>
                 </div>
                 <div>
-                  <input type="radio" id="agent_endpoint" ng-model="formValues.EndpointType" value="agent">
+                  <input type="radio" id="agent_endpoint" ng-model="formValues.EndpointType" value="agent" />
                   <label for="agent_endpoint">
                     <div class="boxselector_header">
                       <i class="fa fa-bolt" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -56,7 +56,7 @@
                   </label>
                 </div>
                 <div>
-                  <input type="radio" id="azure_endpoint" ng-model="formValues.EndpointType" value="azure">
+                  <input type="radio" id="azure_endpoint" ng-model="formValues.EndpointType" value="azure" />
                   <label for="azure_endpoint">
                     <div class="boxselector_header">
                       <i class="fab fa-microsoft" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -82,23 +82,25 @@
                     <p class="text-muted">
                       <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                       Ensure that you have started the Portainer container with the following Docker flag:
-					</p>
-                    <p class="text-muted">
-					  <code>-v "/var/run/docker.sock:/var/run/docker.sock"</code> (Linux).
                     </p>
+                    <p class="text-muted"> <code>-v "/var/run/docker.sock:/var/run/docker.sock"</code> (Linux). </p>
                     <p class="text-muted">
-					  or
+                      or
                     </p>
-                    <p class="text-muted">
-                      <code>-v \\.\pipe\docker_engine:\\.\pipe\docker_engine</code> (Windows).
-                    </p>
+                    <p class="text-muted"> <code>-v \\.\pipe\docker_engine:\\.\pipe\docker_engine</code> (Windows). </p>
                   </span>
                 </div>
               </div>
               <!-- actions -->
               <div class="form-group">
                 <div class="col-sm-12">
-                  <button type="submit" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress" ng-click="createLocalEndpoint()" button-spinner="state.actionInProgress">
+                  <button
+                    type="submit"
+                    class="btn btn-primary btn-sm"
+                    ng-disabled="state.actionInProgress"
+                    ng-click="createLocalEndpoint()"
+                    button-spinner="state.actionInProgress"
+                  >
                     <span ng-hide="state.actionInProgress"><i class="fa fa-bolt" aria-hidden="true"></i> Connect</span>
                     <span ng-show="state.actionInProgress">Connecting...</span>
                   </button>
@@ -120,8 +122,8 @@
                     </p>
                     <p class="text-muted">
                       <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                      If you have started Portainer in the same overlay network as the agent, you can use <code>tasks.AGENT_SERVICE_NAME:AGENT_SERVICE_PORT</code> as the
-                      endpoint URL format.
+                      If you have started Portainer in the same overlay network as the agent, you can use <code>tasks.AGENT_SERVICE_NAME:AGENT_SERVICE_PORT</code> as the endpoint
+                      URL format.
                     </p>
                   </span>
                 </div>
@@ -133,7 +135,7 @@
               <div class="form-group">
                 <label for="endpoint_name" class="col-sm-4 col-lg-3 control-label text-left">Name</label>
                 <div class="col-sm-8 col-lg-9">
-                  <input type="text" class="form-control" id="endpoint_name" ng-model="formValues.Name" placeholder="e.g. docker-prod01">
+                  <input type="text" class="form-control" id="endpoint_name" ng-model="formValues.Name" placeholder="e.g. docker-prod01" />
                 </div>
               </div>
               <!-- !name-input -->
@@ -144,14 +146,20 @@
                   <portainer-tooltip position="bottom" message="URL or IP address of a Portainer agent."></portainer-tooltip>
                 </label>
                 <div class="col-sm-8 col-lg-9">
-                  <input type="text" class="form-control" id="endpoint_url" ng-model="formValues.URL" placeholder="e.g. 10.0.0.10:9001 or tasks.portainer_agent:9001">
+                  <input type="text" class="form-control" id="endpoint_url" ng-model="formValues.URL" placeholder="e.g. 10.0.0.10:9001 or tasks.portainer_agent:9001" />
                 </div>
               </div>
               <!-- !endpoint-url-input -->
               <!-- actions -->
               <div class="form-group">
                 <div class="col-sm-12">
-                  <button type="submit" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !formValues.Name || !formValues.URL" ng-click="createAgentEndpoint()" button-spinner="state.actionInProgress">
+                  <button
+                    type="submit"
+                    class="btn btn-primary btn-sm"
+                    ng-disabled="state.actionInProgress || !formValues.Name || !formValues.URL"
+                    ng-click="createAgentEndpoint()"
+                    button-spinner="state.actionInProgress"
+                  >
                     <span ng-hide="state.actionInProgress"><i class="fa fa-bolt" aria-hidden="true"></i> Connect</span>
                     <span ng-show="state.actionInProgress">Connecting...</span>
                   </button>
@@ -168,16 +176,17 @@
               <div class="form-group">
                 <div class="col-sm-12">
                   <span class="small">
-                    <p class="text-muted">
-                      <i class="fa fa-flask orange-icon" aria-hidden="true" style="margin-right: 2px;"></i> This feature is experimental.
-                    </p>
+                    <p class="text-muted"> <i class="fa fa-flask orange-icon" aria-hidden="true" style="margin-right: 2px;"></i> This feature is experimental. </p>
                     <p class="text-primary">
                       Connect to Microsoft Azure to manage Azure Container Instances (ACI).
                     </p>
                     <p class="text-muted">
                       <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                      Have a look at <a href="https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal" target="_blank">the Azure documentation</a> to retrieve
-                      the credentials required below.
+                      Have a look at
+                      <a href="https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-create-service-principal-portal" target="_blank"
+                        >the Azure documentation</a
+                      >
+                      to retrieve the credentials required below.
                     </p>
                   </span>
                 </div>
@@ -189,7 +198,7 @@
               <div class="form-group">
                 <label for="endpoint_name" class="col-sm-4 col-lg-3 control-label text-left">Name</label>
                 <div class="col-sm-8 col-lg-9">
-                  <input type="text" class="form-control" id="endpoint_name" ng-model="formValues.Name" placeholder="e.g. azure-01">
+                  <input type="text" class="form-control" id="endpoint_name" ng-model="formValues.Name" placeholder="e.g. azure-01" />
                 </div>
               </div>
               <!-- !name-input -->
@@ -200,7 +209,7 @@
               <div class="form-group">
                 <label for="azure_credential_appid" class="col-sm-4 col-lg-3 control-label text-left">Application ID</label>
                 <div class="col-sm-8 col-lg-9">
-                  <input type="text" class="form-control" id="azure_credential_appid" ng-model="formValues.AzureApplicationId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+                  <input type="text" class="form-control" id="azure_credential_appid" ng-model="formValues.AzureApplicationId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" />
                 </div>
               </div>
               <!-- !applicationId-input -->
@@ -208,7 +217,7 @@
               <div class="form-group">
                 <label for="azure_credential_tenantid" class="col-sm-4 col-lg-3 control-label text-left">Tenant ID</label>
                 <div class="col-sm-8 col-lg-9">
-                  <input type="text" class="form-control" id="azure_credential_tenantid" ng-model="formValues.AzureTenantId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+                  <input type="text" class="form-control" id="azure_credential_tenantid" ng-model="formValues.AzureTenantId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" />
                 </div>
               </div>
               <!-- !tenantId-input -->
@@ -216,14 +225,26 @@
               <div class="form-group">
                 <label for="azure_credential_authkey" class="col-sm-4 col-lg-3 control-label text-left">Authentication key</label>
                 <div class="col-sm-8 col-lg-9">
-                  <input type="text" class="form-control" id="azure_credential_authkey" ng-model="formValues.AzureAuthenticationKey" placeholder="cOrXoK/1D35w8YQ8nH1/8ZGwzz45JIYD5jxHKXEQknk=">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="azure_credential_authkey"
+                    ng-model="formValues.AzureAuthenticationKey"
+                    placeholder="cOrXoK/1D35w8YQ8nH1/8ZGwzz45JIYD5jxHKXEQknk="
+                  />
                 </div>
               </div>
               <!-- !authenticationkey-input -->
               <!-- actions -->
               <div class="form-group">
                 <div class="col-sm-12">
-                  <button type="submit" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !formValues.Name || !formValues.AzureApplicationId || !formValues.AzureTenantId || !formValues.AzureAuthenticationKey" ng-click="createAzureEndpoint()" button-spinner="state.actionInProgress">
+                  <button
+                    type="submit"
+                    class="btn btn-primary btn-sm"
+                    ng-disabled="state.actionInProgress || !formValues.Name || !formValues.AzureApplicationId || !formValues.AzureTenantId || !formValues.AzureAuthenticationKey"
+                    ng-click="createAzureEndpoint()"
+                    button-spinner="state.actionInProgress"
+                  >
                     <span ng-hide="state.actionInProgress"><i class="fa fa-bolt" aria-hidden="true"></i> Connect</span>
                     <span ng-show="state.actionInProgress">Connecting...</span>
                   </button>
@@ -245,7 +266,8 @@
                     </p>
                     <p class="text-muted">
                       <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                      The Docker API must be exposed over TCP. You can find more information about how to expose the Docker API over TCP <a href="https://docs.docker.com/engine/security/https/" target="_blank">in the Docker documentation</a>.
+                      The Docker API must be exposed over TCP. You can find more information about how to expose the Docker API over TCP
+                      <a href="https://docs.docker.com/engine/security/https/" target="_blank">in the Docker documentation</a>.
                     </p>
                   </span>
                 </div>
@@ -257,7 +279,7 @@
               <div class="form-group">
                 <label for="endpoint_name" class="col-sm-4 col-lg-3 control-label text-left">Name</label>
                 <div class="col-sm-8 col-lg-9">
-                  <input type="text" class="form-control" id="endpoint_name" ng-model="formValues.Name" placeholder="e.g. docker-prod01">
+                  <input type="text" class="form-control" id="endpoint_name" ng-model="formValues.Name" placeholder="e.g. docker-prod01" />
                 </div>
               </div>
               <!-- !name-input -->
@@ -268,7 +290,7 @@
                   <portainer-tooltip position="bottom" message="URL or IP address of a Docker host with API exposed over TCP."></portainer-tooltip>
                 </label>
                 <div class="col-sm-8 col-lg-9">
-                  <input type="text" class="form-control" id="endpoint_url" ng-model="formValues.URL" placeholder="e.g. 10.0.0.10:2375 or mydocker.mydomain.com:2375">
+                  <input type="text" class="form-control" id="endpoint_url" ng-model="formValues.URL" placeholder="e.g. 10.0.0.10:2375 or mydocker.mydomain.com:2375" />
                 </div>
               </div>
               <!-- !endpoint-url-input -->
@@ -277,11 +299,12 @@
                 <div class="col-sm-12">
                   <label for="tls" class="control-label text-left">
                     TLS
-                    <portainer-tooltip position="bottom" message="Enable this option if you need to specify TLS certificates to connect to the Docker endpoint."></portainer-tooltip>
+                    <portainer-tooltip
+                      position="bottom"
+                      message="Enable this option if you need to specify TLS certificates to connect to the Docker endpoint."
+                    ></portainer-tooltip>
                   </label>
-                  <label class="switch" style="margin-left: 20px;">
-                    <input type="checkbox" ng-model="formValues.TLS"><i></i>
-                  </label>
+                  <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.TLS" /><i></i> </label>
                 </div>
               </div>
               <!-- !tls-checkbox -->
@@ -294,9 +317,7 @@
                       Skip server verification
                       <portainer-tooltip position="bottom" message="Enable this option if you need to authenticate server based on given CA."></portainer-tooltip>
                     </label>
-                    <label class="switch" style="margin-left: 20px;">
-                      <input type="checkbox" ng-model="formValues.TLSSkipVerify"><i></i>
-                    </label>
+                    <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.TLSSkipVerify" /><i></i> </label>
                   </div>
                 </div>
                 <!-- !skip-server-verification -->
@@ -307,9 +328,7 @@
                       Skip client verification
                       <portainer-tooltip position="bottom" message="Enable this option if you need to authenticate with a client certificate."></portainer-tooltip>
                     </label>
-                    <label class="switch" style="margin-left: 20px;">
-                      <input type="checkbox" ng-model="formValues.TLSSKipClientVerify"><i></i>
-                    </label>
+                    <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.TLSSKipClientVerify" /><i></i> </label>
                   </div>
                 </div>
                 <!-- !skip-client-verification -->
@@ -362,7 +381,13 @@
               <!-- actions -->
               <div class="form-group">
                 <div class="col-sm-12">
-                  <button type="submit" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress || !formValues.Name || !formValues.URL || (formValues.TLS && ((formValues.TLSVerify && !formValues.TLSCACert) || (!formValues.TLSSKipClientVerify && (!formValues.TLSCert || !formValues.TLSKey))))" ng-click="createRemoteEndpoint()" button-spinner="state.actionInProgress">
+                  <button
+                    type="submit"
+                    class="btn btn-primary btn-sm"
+                    ng-disabled="state.actionInProgress || !formValues.Name || !formValues.URL || (formValues.TLS && ((formValues.TLSVerify && !formValues.TLSCACert) || (!formValues.TLSSKipClientVerify && (!formValues.TLSCert || !formValues.TLSKey))))"
+                    ng-click="createRemoteEndpoint()"
+                    button-spinner="state.actionInProgress"
+                  >
                     <span ng-hide="state.actionInProgress"><i class="fa fa-bolt" aria-hidden="true"></i> Connect</span>
                     <span ng-show="state.actionInProgress">Connecting...</span>
                   </button>

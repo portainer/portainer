@@ -3,7 +3,7 @@
   <div class="form-group" ng-class="{ 'has-error': templateForm.template_title.$invalid }">
     <label for="template_title" class="col-sm-3 col-lg-2 control-label text-left">Title</label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" name="template_title" ng-model="$ctrl.model.Title" placeholder="e.g. my-template" required auto-focus>
+      <input type="text" class="form-control" name="template_title" ng-model="$ctrl.model.Title" placeholder="e.g. my-template" required auto-focus />
     </div>
   </div>
   <div class="form-group" ng-show="templateForm.template_title.$invalid">
@@ -18,7 +18,7 @@
   <div class="form-group" ng-class="{ 'has-error': templateForm.template_description.$invalid }">
     <label for="template_description" class="col-sm-3 col-lg-2 control-label text-left">Description</label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" name="template_description" ng-model="$ctrl.model.Description" placeholder="e.g. template description..." required>
+      <input type="text" class="form-control" name="template_description" ng-model="$ctrl.model.Description" placeholder="e.g. template description..." required />
     </div>
   </div>
   <div class="form-group" ng-show="templateForm.template_description.$invalid">
@@ -38,13 +38,12 @@
   </div>
   <!-- template-details -->
   <div uib-collapse="$ctrl.state.collapseTemplate">
-
     <div ng-if="$ctrl.showTypeSelector">
       <div class="form-group"></div>
-      <div class="form-group" style="margin-bottom: 0">
+      <div class="form-group" style="margin-bottom: 0;">
         <div class="boxselector_wrapper">
           <div>
-            <input type="radio" id="template_container" ng-model="$ctrl.model.Type" ng-value="1">
+            <input type="radio" id="template_container" ng-model="$ctrl.model.Type" ng-value="1" />
             <label for="template_container">
               <div class="boxselector_header">
                 <i class="fa fa-server" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -54,7 +53,7 @@
             </label>
           </div>
           <div>
-            <input type="radio" id="template_swarm_stack" ng-model="$ctrl.model.Type" ng-value="2">
+            <input type="radio" id="template_swarm_stack" ng-model="$ctrl.model.Type" ng-value="2" />
             <label for="template_swarm_stack">
               <div class="boxselector_header">
                 <i class="fa fa-th-list" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -64,7 +63,7 @@
             </label>
           </div>
           <div>
-            <input type="radio" id="template_compose_stack" ng-model="$ctrl.model.Type" ng-value="3">
+            <input type="radio" id="template_compose_stack" ng-model="$ctrl.model.Type" ng-value="3" />
             <label for="template_compose_stack">
               <div class="boxselector_header">
                 <i class="fa fa-th-list" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -84,7 +83,7 @@
         <portainer-tooltip position="bottom" message="Default name that will be associated to the template"></portainer-tooltip>
       </label>
       <div class="col-sm-9 col-lg-10">
-        <input type="text" class="form-control" name="template_name" ng-model="$ctrl.model.Name" placeholder="e.g. myApp">
+        <input type="text" class="form-control" name="template_name" ng-model="$ctrl.model.Name" placeholder="e.g. myApp" />
       </div>
     </div>
     <!-- !name -->
@@ -95,7 +94,7 @@
         <portainer-tooltip position="bottom" message="Recommended size: 60x60"></portainer-tooltip>
       </label>
       <div class="col-sm-9 col-lg-10">
-        <input type="text" class="form-control" name="template_logo" ng-model="$ctrl.model.Logo" placeholder="e.g. https://portainer.io/images/logos/nginx.png">
+        <input type="text" class="form-control" name="template_logo" ng-model="$ctrl.model.Logo" placeholder="e.g. https://portainer.io/images/logos/nginx.png" />
       </div>
     </div>
     <!-- !logo -->
@@ -103,10 +102,15 @@
     <div class="form-group">
       <label for="template_note" class="col-sm-3 col-lg-2 control-label text-left">
         Note
-        <portainer-tooltip position="bottom" message="Usage / extra information about the template. Supports HTML."></portainer-tooltip>
+        <portainer-tooltip position="bottom" message="Usage/extra information about the template. Supports HTML."></portainer-tooltip>
       </label>
       <div class="col-sm-9 col-lg-10">
-        <textarea class="form-control" name="template_note" ng-model="$ctrl.model.Note" placeholder='You can use this field to specify extra information. <br/> It supports <b>HTML</b>.'></textarea>
+        <textarea
+          class="form-control"
+          name="template_note"
+          ng-model="$ctrl.model.Note"
+          placeholder="You can use this field to specify extra information. <br/> It supports <b>HTML</b>."
+        ></textarea>
       </div>
     </div>
     <!-- !note -->
@@ -144,11 +148,9 @@
       <div class="col-sm-12">
         <label for="tls" class="control-label text-left">
           Administrator template
-          <portainer-tooltip position="bottom" message="Should this template be only available to administrator users."></portainer-tooltip>
+          <portainer-tooltip position="bottom" message="This template will only be available to administrator users."></portainer-tooltip>
         </label>
-        <label class="switch" style="margin-left: 20px;">
-          <input type="checkbox" ng-model="$ctrl.model.AdministratorOnly"><i></i>
-        </label>
+        <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="$ctrl.model.AdministratorOnly" /><i></i> </label>
       </div>
     </div>
     <!-- administrator-only -->
@@ -168,7 +170,14 @@
       <div class="form-group" ng-class="{ 'has-error': templateForm.template_repository_url.$invalid }">
         <label for="template_repository_url" class="col-sm-3 col-lg-2 control-label text-left">Repository URL</label>
         <div class="col-sm-9 col-lg-10">
-          <input type="text" class="form-control" name="template_repository_url" ng-model="$ctrl.model.Repository.url" placeholder="https://github.com/portainer/portainer-compose" required>
+          <input
+            type="text"
+            class="form-control"
+            name="template_repository_url"
+            ng-model="$ctrl.model.Repository.url"
+            placeholder="https://github.com/portainer/portainer-compose"
+            required
+          />
         </div>
       </div>
       <div class="form-group" ng-show="templateForm.template_repository_url.$invalid">
@@ -185,7 +194,7 @@
           Compose file path
         </label>
         <div class="col-sm-9 col-lg-10">
-          <input type="text" class="form-control" name="template_repository_path" ng-model="$ctrl.model.Repository.stackfile" placeholder='docker-compose.yml'>
+          <input type="text" class="form-control" name="template_repository_path" ng-model="$ctrl.model.Repository.stackfile" placeholder="docker-compose.yml" />
         </div>
       </div>
       <!-- !composefile-path -->
@@ -202,20 +211,18 @@
     </div>
     <!-- container-details -->
     <div uib-collapse="$ctrl.state.collapseContainer">
-      <por-image-registry
-        image="$ctrl.model.Image"
-        registry="$ctrl.model.Registry"
-        auto-complete="true"
-        label-class="col-sm-2" input-class="col-sm-10 col-md-4"
-      ></por-image-registry>
+      <por-image-registry model="$ctrl.model.RegistryModel" auto-complete="true" label-class="col-sm-1" input-class="col-sm-11"></por-image-registry>
       <!-- command -->
       <div class="form-group">
         <label for="template_command" class="col-sm-3 col-lg-2 control-label text-left">
           Command
-          <portainer-tooltip position="bottom" message="The command to run in the container. If not specified, the container will use the default command specified in its Dockerfile."></portainer-tooltip>
+          <portainer-tooltip
+            position="bottom"
+            message="The command to run in the container. If not specified, the container will use the default command specified in its Dockerfile."
+          ></portainer-tooltip>
         </label>
         <div class="col-sm-9 col-lg-10">
-          <input type="text" class="form-control" name="template_command" ng-model="$ctrl.model.Command" placeholder='/bin/bash -c \"echo hello\" && exit 777'>
+          <input type="text" class="form-control" name="template_command" ng-model="$ctrl.model.Command" placeholder='/bin/bash -c \"echo hello\" && exit 777' />
         </div>
       </div>
       <!-- !command -->
@@ -226,7 +233,7 @@
           <portainer-tooltip position="bottom" message="Set the hostname of the container. Will use Docker default if not specified."></portainer-tooltip>
         </label>
         <div class="col-sm-9 col-lg-10">
-          <input type="text" class="form-control" name="template_hostname" ng-model="$ctrl.model.Hostname" placeholder='mycontainername'>
+          <input type="text" class="form-control" name="template_hostname" ng-model="$ctrl.model.Hostname" placeholder="mycontainername" />
         </div>
       </div>
       <!-- !hostname -->
@@ -243,14 +250,14 @@
       </div>
       <!-- !network -->
       <!-- port-mapping -->
-      <div class="form-group" >
+      <div class="form-group">
         <div class="col-sm-12" style="margin-top: 5px;">
           <label class="control-label text-left">Port mapping</label>
           <span class="label label-default interactive" style="margin-left: 10px;" ng-click="$ctrl.addPortBinding()">
             <i class="fa fa-plus-circle" aria-hidden="true"></i> map additional port
           </span>
         </div>
-        <div class="col-sm-12" style="margin-top: 10px" ng-if="$ctrl.model.Ports.length > 0">
+        <div class="col-sm-12" style="margin-top: 10px;" ng-if="$ctrl.model.Ports.length > 0">
           <span class="small text-muted">Portainer will automatically assign a port if you leave the host port empty.</span>
         </div>
         <!-- port-mapping-input-list -->
@@ -260,7 +267,7 @@
               <!-- host-port -->
               <div class="input-group col-sm-4 input-group-sm">
                 <span class="input-group-addon">host</span>
-                <input type="text" class="form-control" ng-model="portBinding.hostPort" placeholder="e.g. 80 or 1.2.3.4:80 (optional)">
+                <input type="text" class="form-control" ng-model="portBinding.hostPort" placeholder="e.g. 80 or 1.2.3.4:80 (optional)" />
               </div>
               <!-- !host-port -->
               <span style="margin: 0 10px 0 10px;">
@@ -269,7 +276,7 @@
               <!-- container-port -->
               <div class="input-group col-sm-4 input-group-sm">
                 <span class="input-group-addon">container</span>
-                <input type="text" class="form-control" ng-model="portBinding.containerPort" placeholder="e.g. 80">
+                <input type="text" class="form-control" ng-model="portBinding.containerPort" placeholder="e.g. 80" />
               </div>
               <!-- !container-port -->
               <!-- protocol-actions -->
@@ -290,14 +297,14 @@
       </div>
       <!-- !port-mapping -->
       <!-- volumes -->
-      <div class="form-group" >
+      <div class="form-group">
         <div class="col-sm-12" style="margin-top: 5px;">
           <label class="control-label text-left">Volume mapping</label>
           <span class="label label-default interactive" style="margin-left: 10px;" ng-click="$ctrl.addVolume()">
             <i class="fa fa-plus-circle" aria-hidden="true"></i> map additional volume
           </span>
         </div>
-        <div class="col-sm-12" style="margin-top: 10px" ng-if="$ctrl.model.Volumes.length > 0">
+        <div class="col-sm-12" style="margin-top: 10px;" ng-if="$ctrl.model.Volumes.length > 0">
           <span class="small text-muted">Portainer will automatically create and map a local volume when using the <b>auto</b> option.</span>
         </div>
         <div ng-repeat="volume in $ctrl.model.Volumes">
@@ -307,7 +314,7 @@
               <!-- container-path -->
               <div class="input-group input-group-sm col-sm-6">
                 <span class="input-group-addon">container</span>
-                <input type="text" class="form-control" ng-model="volume.container" placeholder="e.g. /path/in/container">
+                <input type="text" class="form-control" ng-model="volume.container" placeholder="e.g. /path/in/container" />
               </div>
               <!-- !container-path -->
               <!-- volume-type -->
@@ -329,7 +336,7 @@
               <!-- bind -->
               <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'bind'">
                 <span class="input-group-addon">host</span>
-                <input type="text" class="form-control" ng-model="volume.bind" placeholder="e.g. /path/on/host">
+                <input type="text" class="form-control" ng-model="volume.bind" placeholder="e.g. /path/on/host" />
               </div>
               <!-- !bind -->
               <!-- read-only -->
@@ -347,7 +354,7 @@
       </div>
       <!-- !volumes -->
       <!-- labels -->
-      <div class="form-group" >
+      <div class="form-group">
         <div class="col-sm-12" style="margin-top: 5px;">
           <label class="control-label text-left">Labels</label>
           <span class="label label-default interactive" style="margin-left: 10px;" ng-click="$ctrl.addLabel()">
@@ -360,11 +367,11 @@
             <div ng-repeat="label in $ctrl.model.Labels" style="margin-top: 2px;">
               <div class="input-group col-sm-5 input-group-sm">
                 <span class="input-group-addon">name</span>
-                <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. com.example.foo">
+                <input type="text" class="form-control" ng-model="label.name" placeholder="e.g. com.example.foo" />
               </div>
               <div class="input-group col-sm-5 input-group-sm">
                 <span class="input-group-addon">value</span>
-                <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar">
+                <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" />
               </div>
               <button class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removeLabel($index)">
                 <i class="fa fa-trash" aria-hidden="true"></i>
@@ -397,9 +404,7 @@
             Privileged mode
             <portainer-tooltip position="bottom" message="Start the container in privileged mode."></portainer-tooltip>
           </label>
-          <label class="switch" style="margin-left: 20px;">
-            <input type="checkbox" ng-model="$ctrl.model.Privileged"><i></i>
-          </label>
+          <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="$ctrl.model.Privileged" /><i></i> </label>
         </div>
       </div>
       <!-- !privileged-mode -->
@@ -410,9 +415,7 @@
             Interactive mode
             <portainer-tooltip position="bottom" message="Start the container in foreground (equivalent of -i -t flags)."></portainer-tooltip>
           </label>
-          <label class="switch" style="margin-left: 20px;">
-            <input type="checkbox" ng-model="$ctrl.model.Interactive"><i></i>
-          </label>
+          <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="$ctrl.model.Interactive" /><i></i> </label>
         </div>
       </div>
       <!-- !interactive-mode -->
@@ -429,7 +432,7 @@
   <!-- environment-details -->
   <div uib-collapse="$ctrl.state.collapseEnv">
     <!-- env -->
-    <div class="form-group" >
+    <div class="form-group">
       <div class="col-sm-12" style="margin-top: 5px;">
         <label class="control-label text-left">Environment variables</label>
         <span class="label label-default interactive" style="margin-left: 10px;" ng-click="$ctrl.addEnvVar()">
@@ -440,11 +443,11 @@
       <div style="margin-top: 10px;">
         <div class="col-sm-12 template-envvar" ng-repeat="var in $ctrl.model.Env" style="margin-top: 10px;">
           <div class="form-group"></div>
-          <div class="form-group" style="margin-bottom: 0">
+          <div class="form-group" style="margin-bottom: 0;">
             <div class="boxselector_wrapper">
               <div>
-                <input type="radio" id="preset_var_{{$index}}" ng-model="var.type" ng-value="1" ng-change="$ctrl.changeEnvVarType(var)">
-                <label for="preset_var_{{$index}}">
+                <input type="radio" id="preset_var_{{ $index }}" ng-model="var.type" ng-value="1" ng-change="$ctrl.changeEnvVarType(var)" />
+                <label for="preset_var_{{ $index }}">
                   <div class="boxselector_header">
                     <i class="fa fa-user-slash" aria-hidden="true" style="margin-right: 2px;"></i>
                     Preset
@@ -453,8 +456,8 @@
                 </label>
               </div>
               <div>
-                <input type="radio" id="text_var_{{$index}}" ng-model="var.type" ng-value="2" ng-change="$ctrl.changeEnvVarType(var)">
-                <label for="text_var_{{$index}}">
+                <input type="radio" id="text_var_{{ $index }}" ng-model="var.type" ng-value="2" ng-change="$ctrl.changeEnvVarType(var)" />
+                <label for="text_var_{{ $index }}">
                   <div class="boxselector_header">
                     <i class="fa fa-edit" aria-hidden="true" style="margin-right: 2px;"></i>
                     Text
@@ -463,8 +466,8 @@
                 </label>
               </div>
               <div>
-                <input type="radio" id="select_var_{{$index}}" ng-model="var.type" ng-value="3">
-                <label for="select_var_{{$index}}">
+                <input type="radio" id="select_var_{{ $index }}" ng-model="var.type" ng-value="3" />
+                <label for="select_var_{{ $index }}">
                   <div class="boxselector_header">
                     <i class="fa fa-list-ol" aria-hidden="true" style="margin-right: 2px;"></i>
                     Select
@@ -479,7 +482,7 @@
               Name
             </label>
             <div class="col-sm-8">
-              <input type="text" class="form-control" ng-model="var.name" placeholder="env_var">
+              <input type="text" class="form-control" ng-model="var.name" placeholder="env_var" />
             </div>
             <div class="col-sm-2">
               <button class="btn btn-sm btn-danger space-left" type="button" ng-click="$ctrl.removeEnvVar($index)">
@@ -488,20 +491,20 @@
             </div>
           </div>
           <div ng-if="var.type == 2 || var.type == 3">
-            <div  class="form-group">
+            <div class="form-group">
               <label class="col-sm-2 control-label text-left">
                 Label
               </label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" ng-model="var.label" placeholder="Choose a label">
+                <input type="text" class="form-control" ng-model="var.label" placeholder="Choose a label" />
               </div>
             </div>
-            <div  class="form-group">
+            <div class="form-group">
               <label class="col-sm-2 control-label text-left" style="margin-top: 2px;">
                 Description
               </label>
               <div class="col-sm-10" style="margin-top: 2px;">
-                <input type="text" class="form-control" ng-model="var.description" placeholder="Tooltip">
+                <input type="text" class="form-control" ng-model="var.description" placeholder="Tooltip" />
               </div>
             </div>
           </div>
@@ -510,7 +513,7 @@
               Default value
             </label>
             <div class="col-sm-10">
-              <input type="text" class="form-control" ng-model="var.default" placeholder="default_value">
+              <input type="text" class="form-control" ng-model="var.default" placeholder="default_value" />
             </div>
           </div>
           <div ng-if="var.type === 3" style="margin-bottom: 5px;" class="form-group">
@@ -526,17 +529,19 @@
                 <div ng-repeat="val in var.select" style="margin-top: 2px;">
                   <div class="input-group col-sm-5 input-group-sm">
                     <span class="input-group-addon">name</span>
-                    <input type="text" class="form-control" ng-model="val.text" placeholder="Yes, I agree">
+                    <input type="text" class="form-control" ng-model="val.text" placeholder="Yes, I agree" />
                   </div>
                   <div class="input-group col-sm-5 input-group-sm">
                     <span class="input-group-addon">value</span>
-                    <input type="text" class="form-control" ng-model="val.value" placeholder="Y">
+                    <input type="text" class="form-control" ng-model="val.value" placeholder="Y" />
                   </div>
                   <div class="input-group col-sm-1 input-group-sm">
                     <button class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removeEnvVarValue(var, $index)">
                       <i class="fa fa-trash" aria-hidden="true"></i>
                     </button>
-                    <input style="margin-left: 5px;" type="checkbox" ng-model="val.default" id="val_default_{{$index}}"><label for="val_default_{{$index}}" class="space-left">Default</label>
+                    <input style="margin-left: 5px;" type="checkbox" ng-model="val.default" id="val_default_{{ $index }}" /><label for="val_default_{{ $index }}" class="space-left"
+                      >Default</label
+                    >
                   </div>
                 </div>
               </div>
@@ -559,7 +564,13 @@
   </div>
   <div class="form-group">
     <div class="col-sm-12">
-      <button type="button" class="btn btn-primary btn-sm" ng-click="$ctrl.formAction()" ng-disabled="$ctrl.actionInProgress || !templateForm.$valid" button-spinner="$ctrl.actionInProgress">
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        ng-click="$ctrl.formAction()"
+        ng-disabled="$ctrl.actionInProgress || !templateForm.$valid"
+        button-spinner="$ctrl.actionInProgress"
+      >
         <span ng-hide="$ctrl.actionInProgress">{{ $ctrl.formActionLabel }}</span>
         <span ng-show="$ctrl.actionInProgress">In progress...</span>
       </button>

@@ -1,6 +1,8 @@
-angular.module('portainer.extensions.rbac')
-  .directive('disableAuthorization', ['Authentication', 'ExtensionService', '$async', function(Authentication, ExtensionService, $async) {
-
+angular.module('portainer.extensions.rbac').directive('disableAuthorization', [
+  'Authentication',
+  'ExtensionService',
+  '$async',
+  function (Authentication, ExtensionService, $async) {
     async function linkAsync(scope, elem, attrs) {
       try {
         const rbacEnabled = await ExtensionService.extensionEnabled(ExtensionService.EXTENSIONS.RBAC);
@@ -11,13 +13,16 @@ angular.module('portainer.extensions.rbac')
         return;
       }
 
-      var authorizations = attrs.disableAuthorization.split(",");
+      var authorizations = attrs.disableAuthorization.split(',');
       for (var i = 0; i < authorizations.length; i++) {
         authorizations[i] = authorizations[i].trim();
       }
 
       if (!Authentication.hasAuthorizations(authorizations)) {
         elem.attr('disabled', true);
+        if (elem.is('Slider')) {
+          elem.css('pointer-events', 'none');
+        }
       }
     }
 
@@ -25,6 +30,7 @@ angular.module('portainer.extensions.rbac')
       restrict: 'A',
       link: function (scope, elem, attrs) {
         return $async(linkAsync, scope, elem, attrs);
-      }
-    }
-  }]);
+      },
+    };
+  },
+]);

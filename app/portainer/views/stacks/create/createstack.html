@@ -1,8 +1,6 @@
 <rd-header>
   <rd-header-title title-text="Create stack"></rd-header-title>
-  <rd-header-content>
-    <a ui-sref="portainer.stacks">Stacks</a> &gt; Add stack
-  </rd-header-content>
+  <rd-header-content> <a ui-sref="portainer.stacks">Stacks</a> &gt; Add stack </rd-header-content>
 </rd-header>
 
 <div class="row">
@@ -14,7 +12,7 @@
           <div class="form-group">
             <label for="stack_name" class="col-sm-1 control-label text-left">Name</label>
             <div class="col-sm-11">
-              <input type="text" class="form-control" ng-model="formValues.Name" id="stack_name" placeholder="e.g. myStack" auto-focus>
+              <input type="text" class="form-control" ng-model="formValues.Name" id="stack_name" placeholder="e.g. mystack" auto-focus />
             </div>
           </div>
           <!-- !name-input -->
@@ -23,7 +21,9 @@
               This stack will be deployed using the equivalent of the <code>docker stack deploy</code> command.
             </span>
             <span class="col-sm-12 text-muted small" ng-if="state.StackType === 2">
-              This stack will be deployed using the equivalent of <code>docker-compose</code>. Only Compose file format version <b>2</b> is supported at the moment.
+              This stack will be deployed using the equivalent of <code>docker-compose</code>. Only Compose file format version <b>2</b> is supported at the moment. <br /><br />
+              <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
+              Note: Due to a limitation of libcompose, the name of the stack will be standardized to remove all special characters and uppercase letters.
             </span>
           </div>
           <!-- build-method -->
@@ -31,10 +31,10 @@
             Build method
           </div>
           <div class="form-group"></div>
-          <div class="form-group" style="margin-bottom: 0">
+          <div class="form-group" style="margin-bottom: 0;">
             <div class="boxselector_wrapper">
               <div>
-                <input type="radio" id="method_editor" ng-model="state.Method" value="editor">
+                <input type="radio" id="method_editor" ng-model="state.Method" value="editor" />
                 <label for="method_editor">
                   <div class="boxselector_header">
                     <i class="fa fa-edit" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -44,7 +44,7 @@
                 </label>
               </div>
               <div>
-                <input type="radio" id="method_upload" ng-model="state.Method" value="upload">
+                <input type="radio" id="method_upload" ng-model="state.Method" value="upload" />
                 <label for="method_upload">
                   <div class="boxselector_header">
                     <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -54,7 +54,7 @@
                 </label>
               </div>
               <div>
-                <input type="radio" id="method_repository" ng-model="state.Method" value="repository">
+                <input type="radio" id="method_repository" ng-model="state.Method" value="repository" />
                 <label for="method_repository">
                   <div class="boxselector_header">
                     <i class="fab fa-git" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -82,7 +82,7 @@
                   identifier="stack-creation-editor"
                   placeholder="# Define or paste the content of your docker-compose file here"
                   yml="true"
-                  on-change="editorUpdate"
+                  on-change="(editorUpdate)"
                 ></code-editor>
               </div>
             </div>
@@ -122,18 +122,25 @@
             <div class="form-group">
               <label for="stack_repository_url" class="col-sm-2 control-label text-left">Repository URL</label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" ng-model="formValues.RepositoryURL" id="stack_repository_url" placeholder="https://github.com/portainer/portainer-compose">
+                <input
+                  type="text"
+                  class="form-control"
+                  ng-model="formValues.RepositoryURL"
+                  id="stack_repository_url"
+                  placeholder="https://github.com/portainer/portainer-compose"
+                />
               </div>
             </div>
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
-                Specify a reference of the repository using the following syntax: branches with <code>refs/heads/branch_name</code> or tags with <code>refs/tags/tag_name</code>. If not specified, will use the default <code>HEAD</code> reference normally the <code>master</code> branch.
+                Specify a reference of the repository using the following syntax: branches with <code>refs/heads/branch_name</code> or tags with <code>refs/tags/tag_name</code>. If
+                not specified, will use the default <code>HEAD</code> reference normally the <code>master</code> branch.
               </span>
             </div>
             <div class="form-group">
               <label for="stack_repository_url" class="col-sm-2 control-label text-left">Repository reference</label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" ng-model="formValues.RepositoryReferenceName" id="stack_repository_reference_name" placeholder="refs/heads/master">
+                <input type="text" class="form-control" ng-model="formValues.RepositoryReferenceName" id="stack_repository_reference_name" placeholder="refs/heads/master" />
               </div>
             </div>
             <div class="form-group">
@@ -144,7 +151,7 @@
             <div class="form-group">
               <label for="stack_repository_path" class="col-sm-2 control-label text-left">Compose path</label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" ng-model="formValues.ComposeFilePathInRepository" id="stack_repository_path" placeholder="docker-compose.yml">
+                <input type="text" class="form-control" ng-model="formValues.ComposeFilePathInRepository" id="stack_repository_path" placeholder="docker-compose.yml" />
               </div>
             </div>
             <div class="form-group">
@@ -152,21 +159,25 @@
                 <label class="control-label text-left">
                   Authentication
                 </label>
-                <label class="switch" style="margin-left: 20px;">
-                  <input type="checkbox" ng-model="formValues.RepositoryAuthentication"><i></i>
-                </label>
+                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="formValues.RepositoryAuthentication" /><i></i> </label>
               </div>
+            </div>
+            <div class="form-group" ng-if="formValues.RepositoryAuthentication">
+              <span class="col-sm-12 text-muted small">
+                If your git account has 2FA enabled, you may receive an <code>authentication required</code> error when deploying your stack. In this case, you will need to provide
+                a personal-access token instead of your password.
+              </span>
             </div>
             <div class="form-group" ng-if="formValues.RepositoryAuthentication">
               <label for="repository_username" class="col-sm-1 control-label text-left">Username</label>
               <div class="col-sm-11 col-md-5">
-                <input type="text" class="form-control" ng-model="formValues.RepositoryUsername" name="repository_username" placeholder="myGitUser">
+                <input type="text" class="form-control" ng-model="formValues.RepositoryUsername" name="repository_username" placeholder="myGitUser" />
               </div>
-              <label for="repository_password" class="col-sm-1 margin-sm-top control-label text-left">
+              <label for="repository_password" class="col-sm-1 control-label text-left">
                 Password
               </label>
-              <div class="col-sm-11 col-md-5 margin-sm-top">
-                <input type="password" class="form-control" ng-model="formValues.RepositoryPassword" name="repository_password" placeholder="myPassword">
+              <div class="col-sm-11 col-md-5">
+                <input type="password" class="form-control" ng-model="formValues.RepositoryPassword" name="repository_password" placeholder="myPassword" />
               </div>
             </div>
           </div>
@@ -187,11 +198,11 @@
                 <div ng-repeat="variable in formValues.Env" style="margin-top: 2px;">
                   <div class="input-group col-sm-5 input-group-sm">
                     <span class="input-group-addon">name</span>
-                    <input type="text" class="form-control" ng-model="variable.name" placeholder="e.g. FOO">
+                    <input type="text" class="form-control" ng-model="variable.name" placeholder="e.g. FOO" />
                   </div>
                   <div class="input-group col-sm-5 input-group-sm">
                     <span class="input-group-addon">value</span>
-                    <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. bar">
+                    <input type="text" class="form-control" ng-model="variable.value" placeholder="e.g. bar" />
                   </div>
                   <button class="btn btn-sm btn-danger" type="button" ng-click="removeEnvironmentVariable($index)">
                     <i class="fa fa-trash" aria-hidden="true"></i>
@@ -210,10 +221,16 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.actionInProgress
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                ng-disabled="state.actionInProgress
               || (state.Method === 'upload' && !formValues.StackFile)
               || (state.Method === 'repository' && ((!formValues.RepositoryURL || !formValues.ComposeFilePathInRepository) || (formValues.RepositoryAuthentication && (!formValues.RepositoryUsername || !formValues.RepositoryPassword))))
-              || !formValues.Name" ng-click="deployStack()" button-spinner="state.actionInProgress">
+              || !formValues.Name"
+                ng-click="deployStack()"
+                button-spinner="state.actionInProgress"
+              >
                 <span ng-hide="state.actionInProgress">Deploy the stack</span>
                 <span ng-show="state.actionInProgress">Deployment in progress...</span>
               </button>

@@ -1,102 +1,138 @@
 import _ from 'lodash-es';
+import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
+import { RegistryTypes } from 'Extensions/registry-management/models/registryTypes';
 import { RegistryViewModel, RegistryCreateRequest } from '../../models/registry';
 
-angular.module('portainer.app')
-.factory('RegistryService', ['$q', 'Registries', 'DockerHubService', 'RegistryHelper', 'ImageHelper', 'FileUploadService', function RegistryServiceFactory($q, Registries, DockerHubService, RegistryHelper, ImageHelper, FileUploadService) {
-  'use strict';
-  var service = {};
+angular.module('portainer.app').factory('RegistryService', [
+  '$q',
+  '$async',
+  'Registries',
+  'DockerHubService',
+  'ImageHelper',
+  'FileUploadService',
+  function RegistryServiceFactory($q, $async, Registries, DockerHubService, ImageHelper, FileUploadService) {
+    'use strict';
+    var service = {};
 
-  service.registries = function() {
-    var deferred = $q.defer();
+    service.registries = function () {
+      var deferred = $q.defer();
 
-    Registries.query().$promise
-    .then(function success(data) {
-      var registries = data.map(function (item) {
-        return new RegistryViewModel(item);
-      });
-      deferred.resolve(registries);
-    })
-    .catch(function error(err) {
-      deferred.reject({msg: 'Unable to retrieve registries', err: err});
-    });
+      Registries.query()
+        .$promise.then(function success(data) {
+          var registries = data.map(function (item) {
+            return new RegistryViewModel(item);
+          });
+          deferred.resolve(registries);
+        })
+        .catch(function error(err) {
+          deferred.reject({ msg: 'Unable to retrieve registries', err: err });
+        });
 
-    return deferred.promise;
-  };
-
-  service.registry = function(id) {
-    var deferred = $q.defer();
-
-    Registries.get({id: id}).$promise
-    .then(function success(data) {
-      var registry = new RegistryViewModel(data);
-      deferred.resolve(registry);
-    })
-    .catch(function error(err) {
-      deferred.reject({msg: 'Unable to retrieve registry details', err: err});
-    });
-
-    return deferred.promise;
-  };
-
-  service.encodedCredentials = function(registry) {
-    var credentials = {
-      serveraddress: registry.URL
+      return deferred.promise;
     };
-    return btoa(JSON.stringify(credentials));
-  };
 
-  service.updateAccess = function(id, userAccessPolicies, teamAccessPolicies) {
-    return Registries.updateAccess({id: id}, {UserAccessPolicies: userAccessPolicies, TeamAccessPolicies: teamAccessPolicies}).$promise;
-  };
+    service.registry = function (id) {
+      var deferred = $q.defer();
 
-  service.deleteRegistry = function(id) {
-    return Registries.remove({id: id}).$promise;
-  };
+      Registries.get({ id: id })
+        .$promise.then(function success(data) {
+          var registry = new RegistryViewModel(data);
+          deferred.resolve(registry);
+        })
+        .catch(function error(err) {
+          deferred.reject({ msg: 'Unable to retrieve registry details', err: err });
+        });
 
-  service.updateRegistry = function(registry) {
-    return Registries.update({ id: registry.Id }, registry).$promise;
-  };
+      return deferred.promise;
+    };
 
-  service.configureRegistry = function(id, registryManagementConfigurationModel) {
-    return FileUploadService.configureRegistry(id, registryManagementConfigurationModel);
-  };
+    service.encodedCredentials = function (registry) {
+      var credentials = {
+        serveraddress: registry.URL,
+      };
+      return btoa(JSON.stringify(credentials));
+    };
 
-  service.createRegistry = function(model) {
-    var payload = new RegistryCreateRequest(model);
-    return Registries.create(payload).$promise;
-  };
+    service.updateAccess = function (id, userAccessPolicies, teamAccessPolicies) {
+      return Registries.updateAccess({ id: id }, { UserAccessPolicies: userAccessPolicies, TeamAccessPolicies: teamAccessPolicies }).$promise;
+    };
 
-  service.createGitlabRegistries = function(model, projects) {
-    const promises = [];
-    _.forEach(projects, (p) => {
-      const m = model;
-      m.Name = p.PathWithNamespace;
-      m.Gitlab.ProjectId = p.Id;
-      m.Password = m.Token;
-      const payload = new RegistryCreateRequest(m);
-      promises.push(Registries.create(payload).$promise);
-    });
-    return $q.all(promises);
-  };
+    service.deleteRegistry = function (id) {
+      return Registries.remove({ id: id }).$promise;
+    };
 
-  service.retrieveRegistryFromRepository = function(repository) {
-    var deferred = $q.defer();
+    service.updateRegistry = function (registry) {
+      return Registries.update({ id: registry.Id }, registry).$promise;
+    };
 
-    var imageDetails = ImageHelper.extractImageAndRegistryFromRepository(repository);
-    $q.when(imageDetails.registry ? service.registries() : DockerHubService.dockerhub())
-    .then(function success(data) {
-      var registry = data;
-      if (imageDetails.registry) {
-        registry = RegistryHelper.getRegistryByURL(data, imageDetails.registry);
+    service.configureRegistry = function (id, registryManagementConfigurationModel) {
+      return FileUploadService.configureRegistry(id, registryManagementConfigurationModel);
+    };
+
+    service.createRegistry = function (model) {
+      var payload = new RegistryCreateRequest(model);
+      return Registries.create(payload).$promise;
+    };
+
+    service.createGitlabRegistries = function (model, projects) {
+      const promises = [];
+      _.forEach(projects, (p) => {
+        const m = model;
+        m.Name = p.PathWithNamespace;
+        m.Gitlab.ProjectPath = _.toLower(p.PathWithNamespace);
+        m.Gitlab.ProjectId = p.Id;
+        m.Password = m.Token;
+        const payload = new RegistryCreateRequest(m);
+        promises.push(Registries.create(payload).$promise);
+      });
+      return $q.all(promises);
+    };
+
+    service.retrievePorRegistryModelFromRepositoryWithRegistries = retrievePorRegistryModelFromRepositoryWithRegistries;
+
+    function getURL(reg) {
+      let url = reg.URL;
+      if (reg.Type === RegistryTypes.GITLAB) {
+        url = reg.URL + '/' + reg.Gitlab.ProjectPath;
       }
-      deferred.resolve(registry);
-    })
-    .catch(function error(err) {
-      deferred.reject({ msg: 'Unable to retrieve the registry associated to the repository', err: err });
-    });
+      return url;
+    }
 
-    return deferred.promise;
-  };
+    function retrievePorRegistryModelFromRepositoryWithRegistries(repository, registries, dockerhub) {
+      const model = new PorImageRegistryModel();
+      const registry = _.find(registries, (reg) => _.includes(repository, getURL(reg)));
+      if (registry) {
+        const url = getURL(registry);
+        const lastIndex = repository.lastIndexOf(url) + url.length;
+        let image = repository.substring(lastIndex);
+        if (!_.startsWith(image, ':')) {
+          image = image.substring(1);
+        }
+        model.Registry = registry;
+        model.Image = image;
+      } else {
+        if (ImageHelper.imageContainsURL(repository)) {
+          model.UseRegistry = false;
+        }
+        model.Registry = dockerhub;
+        model.Image = repository;
+      }
+      return model;
+    }
 
-  return service;
-}]);
+    async function retrievePorRegistryModelFromRepositoryAsync(repository) {
+      try {
+        let [registries, dockerhub] = await Promise.all([service.registries(), DockerHubService.dockerhub()]);
+        return retrievePorRegistryModelFromRepositoryWithRegistries(repository, registries, dockerhub);
+      } catch (err) {
+        throw { msg: 'Unable to retrieve the registry associated to the repository', err: err };
+      }
+    }
+
+    service.retrievePorRegistryModelFromRepository = function (repository) {
+      return $async(retrievePorRegistryModelFromRepositoryAsync, repository);
+    };
+
+    return service;
+  },
+]);

@@ -4,6 +4,6 @@ angular.module('portainer.app').component('registryFormAzure', {
     model: '=',
     formAction: '<',
     formActionLabel: '@',
-    actionInProgress: '<'
-  }
+    actionInProgress: '<',
+  },
 });
