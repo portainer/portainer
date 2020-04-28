@@ -214,9 +214,9 @@ angular.module('portainer.docker').controller('CreateServiceController', [
     }
 
     function preparePortsConfig(config, input) {
-      var ports = [];
+      let ports = [];
       input.Ports.forEach(function (binding) {
-        var port = {
+        const port = {
           Protocol: binding.Protocol,
           PublishMode: binding.PublishMode,
         };
