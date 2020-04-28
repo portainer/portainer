@@ -57,7 +57,7 @@
           {{ $ctrl.groupIdToGroupName(item.GroupId) | truncate: 64 }}
         </td>
         <td ng-if="$ctrl.showTags">
-          {{ $ctrl.tagIdsToTagNames(item.TagIds) | arraytostr | truncate: 64 }}
+          {{ $ctrl.tagIdsToTagNames(item.TagIds) | truncate: 64 }}
         </td>
       </tr>
 

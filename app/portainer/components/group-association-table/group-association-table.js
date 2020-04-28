@@ -42,7 +42,7 @@ angular.module('portainer.app').component('groupAssociationTable', {
     };
 
     this.tagIdsToTagNames = function tagIdsToTagNames(tagIds) {
-      return PortainerEndpointTagHelper.idsToTagNames(this.tags, tagIds);
+      return PortainerEndpointTagHelper.idsToTagNames(this.tags, tagIds).join(', ') || '-';
     };
 
     this.groupIdToGroupName = function groupIdToGroupName(groupId) {
