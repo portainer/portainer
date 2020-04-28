@@ -20,6 +20,7 @@ func snapshot(cli *client.Client, endpoint *portainer.Endpoint) (*portainer.Snap
 
 	snapshot := &portainer.Snapshot{
 		StackCount: 0,
+		NodeCount:  1,
 	}
 
 	err = snapshotInfo(snapshot, cli)
@@ -95,6 +96,7 @@ func snapshotNodes(snapshot *portainer.Snapshot, cli *client.Client) error {
 	}
 	snapshot.TotalCPU = int(nanoCpus / 1e9)
 	snapshot.TotalMemory = totalMem
+	snapshot.NodeCount = len(nodes)
 	return nil
 }
 

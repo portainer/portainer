@@ -89,6 +89,7 @@ type (
 		Tag() TagService
 		TeamMembership() TeamMembershipService
 		Team() TeamService
+		Telemetry() TelemetryService
 		TunnelServer() TunnelServerService
 		User() UserService
 		Version() VersionService
@@ -426,6 +427,7 @@ type (
 		EdgeSchedule       *EdgeSchedule
 		ScriptExecutionJob *ScriptExecutionJob
 		SnapshotJob        *SnapshotJob
+		TelemetryJob       *TelemetryJob
 
 		// Deprecated fields
 		EndpointSyncJob *EndpointSyncJob
@@ -480,6 +482,7 @@ type (
 		ImageCount              int         `json:"ImageCount"`
 		ServiceCount            int         `json:"ServiceCount"`
 		StackCount              int         `json:"StackCount"`
+		NodeCount               int         `json:"NodeCount"`
 		SnapshotRaw             SnapshotRaw `json:"SnapshotRaw"`
 	}
 
@@ -565,6 +568,9 @@ type (
 	Telemetry struct {
 		TelemetryID string `json:"TelemetryID"`
 	}
+
+	// TelemetryJob represents a scheduled job that send telemetry data to the telemetry server
+	TelemetryJob struct{}
 
 	// Template represents an application template that can be used as an App Template
 	// or an Edge template
@@ -1135,6 +1141,8 @@ const (
 	// EndpointSyncJobType is a system job used to synchronize endpoints from
 	// an external definition store (Deprecated)
 	EndpointSyncJobType
+	// TelemetryJobType is a system job used to send telemetry data
+	TelemetryJobType
 )
 
 const (

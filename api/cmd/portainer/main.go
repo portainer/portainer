@@ -116,6 +116,52 @@ func initJobScheduler() portainer.JobScheduler {
 	return cron.NewJobScheduler()
 }
 
+func loadTelemetrySystemSchedule(jobScheduler portainer.JobScheduler, dataStore portainer.DataStore) error {
+	settings, err := dataStore.Settings().Settings()
+	if err != nil {
+		return err
+	}
+
+	if !settings.Telemetry {
+		return nil
+	}
+
+	schedules, err := dataStore.Schedule().SchedulesByJobType(portainer.TelemetryJobType)
+	if err != nil {
+		return err
+	}
+
+	var telemetrySchedule *portainer.Schedule
+	if len(schedules) == 0 {
+		telemetryJob := &portainer.TelemetryJob{}
+		telemetrySchedule = &portainer.Schedule{
+			ID:             portainer.ScheduleID(dataStore.Schedule().GetNextIdentifier()),
+			Name:           "system_telemetry",
+			CronExpression: "@daily",
+			Recurring:      true,
+			JobType:        portainer.TelemetryJobType,
+			TelemetryJob:   telemetryJob,
+			Created:        time.Now().Unix(),
+		}
+	} else {
+		telemetrySchedule = &schedules[0]
+	}
+
+	telemetryJobContext := cron.NewTelemetryJobContext(dataStore)
+	telemetryJobRunner := cron.NewTelemetryJobRunner(telemetrySchedule, telemetryJobContext)
+
+	err = jobScheduler.ScheduleJob(telemetryJobRunner)
+	if err != nil {
+		return err
+	}
+
+	if len(schedules) == 0 {
+		return dataStore.Schedule().CreateSchedule(telemetrySchedule)
+	}
+
+	return nil
+}
+
 func loadSnapshotSystemSchedule(jobScheduler portainer.JobScheduler, snapshotter portainer.Snapshotter, dataStore portainer.DataStore) error {
 	settings, err := dataStore.Settings().Settings()
 	if err != nil {
@@ -441,6 +487,11 @@ func main() {
 	}
 
 	err = loadSnapshotSystemSchedule(jobScheduler, snapshotter, dataStore)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = loadTelemetrySystemSchedule(jobScheduler, dataStore)
 	if err != nil {
 		log.Fatal(err)
 	}

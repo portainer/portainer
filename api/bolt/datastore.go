@@ -5,8 +5,6 @@ import (
 	"path"
 	"time"
 
-
-
 	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/dockerhub"
@@ -60,7 +58,7 @@ type Store struct {
 	TagService              *tag.Service
 	TeamMembershipService   *teammembership.Service
 	TeamService             *team.Service
-	TelemetryService       *telemetry.Service
+	TelemetryService        *telemetry.Service
 	TunnelServerService     *tunnelserver.Service
 	UserService             *user.Service
 	VersionService          *version.Service
@@ -144,7 +142,7 @@ func (store *Store) MigrateData() error {
 			StackService:            store.StackService,
 			TagService:              store.TagService,
 			TeamMembershipService:   store.TeamMembershipService,
-			TelemetryService:       store.TelemetryService,
+			TelemetryService:        store.TelemetryService,
 			UserService:             store.UserService,
 			VersionService:          store.VersionService,
 			FileService:             store.fileService,
@@ -371,6 +369,11 @@ func (store *Store) TeamMembership() portainer.TeamMembershipService {
 // Team gives access to the Team data management layer
 func (store *Store) Team() portainer.TeamService {
 	return store.TeamService
+}
+
+// Telemetry gives access to the Telemetry data management layer
+func (store *Store) Telemetry() portainer.TelemetryService {
+	return store.TelemetryService
 }
 
 // TunnelServer gives access to the TunnelServer data management layer
