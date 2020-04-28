@@ -12,6 +12,7 @@ class CreateEdgeGroupController {
 
     this.state = {
       actionInProgress: false,
+      loaded: false,
     };
 
     this.model = {
@@ -30,6 +31,7 @@ class CreateEdgeGroupController {
     const [tags, endpointGroups] = await Promise.all([this.TagService.tags(), this.GroupService.groups()]);
     this.tags = tags;
     this.endpointGroups = endpointGroups;
+    this.state.loaded = true;
   }
 
   createGroup() {
