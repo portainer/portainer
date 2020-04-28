@@ -1,3 +1,6 @@
+import _ from 'lodash-es';
+import PortainerEndpointTagHelper from 'Portainer/helpers/tagHelper';
+
 angular.module('portainer.app').component('groupAssociationTable', {
   templateUrl: './groupAssociationTable.html',
   controller: function () {
@@ -15,9 +18,6 @@ angular.module('portainer.app').component('groupAssociationTable', {
       this.state.orderBy = orderField;
     };
 
-    this.hasBackendPagination = function () {
-      return !(this.pageType === 'create' && this.tableType === 'associated');
-    };
     this.onTextFilterChange = function () {
       this.paginationChangedAction();
     };
@@ -40,6 +40,15 @@ angular.module('portainer.app').component('groupAssociationTable', {
         this.paginationChangedAction();
       }
     };
+
+    this.tagIdsToTagNames = function tagIdsToTagNames(tagIds) {
+      return PortainerEndpointTagHelper.idsToTagNames(this.tags, tagIds).join(', ') || '-';
+    };
+
+    this.groupIdToGroupName = function groupIdToGroupName(groupId) {
+      const group = _.find(this.groups, { Id: groupId });
+      return group ? group.Name : '';
+    };
   },
   bindings: {
     paginationState: '=',
@@ -50,5 +59,10 @@ angular.module('portainer.app').component('groupAssociationTable', {
     dataset: '<',
     entryClick: '<',
     emptyDatasetMessage: '@',
+    tags: '<',
+    showTags: '<',
+    groups: '<',
+    showGroups: '<',
+    hasBackendPagination: '<',
   },
 });

@@ -77,6 +77,7 @@
               entry-click="$ctrl.dissociateEndpoint"
               pagination-state="$ctrl.state.associated"
               empty-dataset-message="No associated endpoint"
+              has-backend-pagination="this.pageType !== 'create'"
             ></group-association-table>
           </div>
         </div>
