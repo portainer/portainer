@@ -6,6 +6,7 @@ import (
 
 	"github.com/portainer/portainer/api/http/handler/edgegroups"
 	"github.com/portainer/portainer/api/http/handler/edgestacks"
+	"github.com/portainer/portainer/api/http/handler/endpointedge"
 	"github.com/portainer/portainer/api/http/handler/support"
 
 	"github.com/portainer/portainer/api/http/handler/schedules"
@@ -41,6 +42,7 @@ type Handler struct {
 	DockerHubHandler       *dockerhub.Handler
 	EdgeGroupsHandler      *edgegroups.Handler
 	EdgeStacksHandler      *edgestacks.Handler
+	EndpointEdgeHandler    *endpointedge.Handler
 	EndpointGroupHandler   *endpointgroups.Handler
 	EndpointHandler        *endpoints.Handler
 	EndpointProxyHandler   *endpointproxy.Handler
@@ -86,6 +88,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.StripPrefix("/api/endpoints", h.EndpointProxyHandler).ServeHTTP(w, r)
 		case strings.Contains(r.URL.Path, "/azure/"):
 			http.StripPrefix("/api/endpoints", h.EndpointProxyHandler).ServeHTTP(w, r)
+		case strings.Contains(r.URL.Path, "/edge/"):
+			http.StripPrefix("/api/endpoints", h.EndpointEdgeHandler).ServeHTTP(w, r)
 		default:
 			http.StripPrefix("/api", h.EndpointHandler).ServeHTTP(w, r)
 		}
