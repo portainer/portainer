@@ -71,6 +71,5 @@ func NewHandler(bouncer *security.RequestBouncer, authorizeEndpointManagement bo
 		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointSnapshot))).Methods(http.MethodPost)
 	h.Handle("/endpoints/{id}/status",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.endpointStatusInspect))).Methods(http.MethodGet)
-
 	return h
 }
