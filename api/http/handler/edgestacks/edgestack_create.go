@@ -22,6 +22,46 @@ func (handler *Handler) edgeStackCreate(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: method", err}
 	}
 
+	edgeStack, createSwarmStackError := handler.createSwarmStack(method, w, r)
+	if createSwarmStackError != nil {
+		return createSwarmStackError
+	}
+
+	endpoints, err := handler.EndpointService.Endpoints()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from database", err}
+	}
+
+	endpointGroups, err := handler.EndpointGroupService.EndpointGroups()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint groups from database", err}
+	}
+
+	edgeGroups, err := handler.EdgeGroupService.EdgeGroups()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge groups from database", err}
+	}
+
+	relatedEndpoints, err := portainer.EdgeStackRelatedEndpoints(*edgeStack, endpoints, endpointGroups, edgeGroups)
+
+	for _, endpointID := range relatedEndpoints {
+		relation, err := handler.EndpointRelationService.EndpointRelation(endpointID)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find endpoint relation in database", err}
+		}
+
+		relation.EdgeStacks[edgeStack.ID] = true
+
+		err = handler.EndpointRelationService.UpdateEndpointRelation(endpointID, relation)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint relation in database", err}
+		}
+	}
+
+	return response.JSON(w, edgeStack)
+}
+
+func (handler *Handler) createSwarmStack(method string, w http.ResponseWriter, r *http.Request) (*portainer.EdgeStack, *httperror.HandlerError) {
 	switch method {
 	case "string":
 		return handler.createSwarmStackFromFileContent(w, r)
@@ -30,8 +70,7 @@ func (handler *Handler) edgeStackCreate(w http.ResponseWriter, r *http.Request) 
 	case "file":
 		return handler.createSwarmStackFromFileUpload(w, r)
 	}
-
-	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: method. Value must be one of: string, repository or file", errors.New(request.ErrInvalidQueryParameter)}
+	return nil, &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: method. Value must be one of: string, repository or file", errors.New(request.ErrInvalidQueryParameter)}
 }
 
 type swarmStackFromFileContentPayload struct {
@@ -53,16 +92,16 @@ func (payload *swarmStackFromFileContentPayload) Validate(r *http.Request) error
 	return nil
 }
 
-func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r *http.Request) (*portainer.EdgeStack, *httperror.HandlerError) {
 	var payload swarmStackFromFileContentPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return nil, &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
 	err = handler.validateUniqueName(payload.Name)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return nil, &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
 	stackID := handler.EdgeStackService.GetNextIdentifier()
@@ -79,16 +118,16 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 	stackFolder := strconv.Itoa(int(stack.ID))
 	projectPath, err := handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Stack file on disk", err}
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Stack file on disk", err}
 	}
 	stack.ProjectPath = projectPath
 
 	err = handler.EdgeStackService.CreateEdgeStack(stack)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the edge stack inside the database", err}
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the edge stack inside the database", err}
 	}
 
-	return response.JSON(w, stack)
+	return stack, nil
 }
 
 type swarmStackFromGitRepositoryPayload struct {
@@ -121,16 +160,16 @@ func (payload *swarmStackFromGitRepositoryPayload) Validate(r *http.Request) err
 	return nil
 }
 
-func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter, r *http.Request) (*portainer.EdgeStack, *httperror.HandlerError) {
 	var payload swarmStackFromGitRepositoryPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return nil, &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
 	err = handler.validateUniqueName(payload.Name)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return nil, &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
 	stackID := handler.EdgeStackService.GetNextIdentifier()
@@ -158,15 +197,15 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 
 	err = handler.cloneGitRepository(gitCloneParams)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to clone git repository", err}
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to clone git repository", err}
 	}
 
 	err = handler.EdgeStackService.CreateEdgeStack(stack)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack inside the database", err}
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack inside the database", err}
 	}
 
-	return response.JSON(w, stack)
+	return stack, nil
 }
 
 type swarmStackFromFileUploadPayload struct {
@@ -197,16 +236,16 @@ func (payload *swarmStackFromFileUploadPayload) Validate(r *http.Request) error 
 	return nil
 }
 
-func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r *http.Request) (*portainer.EdgeStack, *httperror.HandlerError) {
 	payload := &swarmStackFromFileUploadPayload{}
 	err := payload.Validate(r)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return nil, &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
 	err = handler.validateUniqueName(payload.Name)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
+		return nil, &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
 	stackID := handler.EdgeStackService.GetNextIdentifier()
@@ -223,16 +262,16 @@ func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r 
 	stackFolder := strconv.Itoa(int(stack.ID))
 	projectPath, err := handler.FileService.StoreEdgeStackFileFromBytes(stackFolder, stack.EntryPoint, []byte(payload.StackFileContent))
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Stack file on disk", err}
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Stack file on disk", err}
 	}
 	stack.ProjectPath = projectPath
 
 	err = handler.EdgeStackService.CreateEdgeStack(stack)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack inside the database", err}
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack inside the database", err}
 	}
 
-	return response.JSON(w, stack)
+	return stack, nil
 }
 
 func (handler *Handler) validateUniqueName(name string) error {
