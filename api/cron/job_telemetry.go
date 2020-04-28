@@ -40,24 +40,44 @@ func (runner *TelemetryJobRunner) GetSchedule() *portainer.Schedule {
 
 type (
 	TelemetryData struct {
-		Identifier         string                  `json:"Identifier"`
-		Version            string                  `json:"Version"`
-		Platform           string                  `json:"Platform"`
-		Arch               string                  `json:"Arch"`
-		AuthenticationMode string                  `json:"AuthenticationMode"`
-		Endpoints          []EndpointTelemetryData `json:"Endpoints"`
-		EndpointGroupCount int                     `json:"EndpointGroupCount"`
+		Identifier       string                       `json:"Identifier"`
+		TelemetryVersion int                          `json:"TelemetryVersion"`
+		DockerHub        DockerHubTelemetryData       `json:"DockerHub"`
+		EdgeCompute      EdgeComputeTelemetryData     `json:"EdgeCompute"`
+		Endpoint         EndpointTelemetryData        `json:"Endpoint"`
+		EndpointGroup    EndpointGroupTelemetryData   `json:"EndpointGroup"`
+		Registry         RegistryTelemetryData        `json:"Registry"`
+		ResourceControl  ResourceControlTelemetryData `json:"ResourceControl"`
+		Runtime          RuntimeTelemetryData         `json:"Runtime"`
+	}
+
+	DockerHubTelemetryData struct {
+		Authentication bool `json:"Authentication"`
+	}
+
+	EdgeComputeTelemetryData struct {
+		Schedule EdgeComputeScheduleTelemetryData `json:"Schedule"`
+	}
+
+	EdgeComputeScheduleTelemetryData struct {
+		Count     int `json:"Count"`
+		Recurring int `json:"Recurring"`
 	}
 
 	EndpointTelemetryData struct {
-		Environment string                          `json:"Environment"`
-		Agent       bool                            `json:"Agent"`
-		Edge        bool                            `json:"Edge"`
-		Docker      EndpointDockerTelemetryData     `json:"Docker"`
-		Kubernetes  EndpointKubernetesTelemetryData `json:"Kubernetes"`
+		Count     int                                `json:"Count"`
+		Endpoints []EndpointEnvironmentTelemetryData `json:"Endpoints"`
 	}
 
-	EndpointDockerTelemetryData struct {
+	EndpointEnvironmentTelemetryData struct {
+		Environment string                                     `json:"Environment"`
+		Agent       bool                                       `json:"Agent"`
+		Edge        bool                                       `json:"Edge"`
+		Docker      EndpointEnvironmentDockerTelemetryData     `json:"Docker"`
+		Kubernetes  EndpointEnvironmentKubernetesTelemetryData `json:"Kubernetes"`
+	}
+
+	EndpointEnvironmentDockerTelemetryData struct {
 		Version    string `json:"Version"`
 		Swarm      bool   `json:"Swarm"`
 		Containers int    `json:"Containers"`
@@ -68,26 +88,59 @@ type (
 		Nodes      int    `json:"Nodes"`
 	}
 
-	EndpointKubernetesTelemetryData struct {
+	EndpointEnvironmentKubernetesTelemetryData struct {
 		Version string `json:"Version"`
 		Nodes   int    `json:"Nodes"`
 	}
+
+	EndpointGroupTelemetryData struct {
+		Count int `json:"Count"`
+	}
+
+	RegistryTelemetryData struct {
+		Count      int                                  `json:"Count"`
+		Registries []RegistryConfigurationTelemetryData `json:"Registries"`
+	}
+
+	RegistryConfigurationTelemetryData struct {
+		Type string `json:"Type"`
+	}
+
+	ResourceControlTelemetryData struct {
+		Count      int `json:"Count"`
+		Containers int `json:"Containers"`
+		Services   int `json:"Services"`
+		Volumes    int `json:"Volumes"`
+		Networks   int `json:"Networks"`
+		Secrets    int `json:"Secrets"`
+		Configs    int `json:"Config"`
+		Stacks     int `json:"Stacks"`
+	}
+
+	RuntimeTelemetryData struct {
+		PortainerVersion string `json:"PortainerVersion"`
+		Platform         string `json:"Platform"`
+		Arch             string `json:"Arch"`
+	}
 )
 
+const TelemetryVersion = 1
 const AuthenticationMethodInternal = "internal"
 const AuthenticationMethodLDAP = "ldap"
 const AuthenticationMethodOAuth = "oauth"
 const EndpointEnvironmentDocker = "docker"
 const EndpointEnvironmentKubernetes = "kubernetes"
+const RegistryConfigurationTypeCustom = "custom"
+const RegistryConfigurationTypeQuay = "quay"
+const RegistryConfigurationTypeAzure = "azure"
+const RegistryConfigurationTypeGitlab = "gitlab"
 
 // Run triggers the execution of the schedule.
 // It will compute the telemetry data using the data available inside the database and send it to the telemetry server.
 func (runner *TelemetryJobRunner) Run() {
 	go func() {
 		telemetryData := &TelemetryData{
-			Version:  portainer.APIVersion,
-			Platform: runtime.GOOS,
-			Arch:     runtime.GOARCH,
+			TelemetryVersion: TelemetryVersion,
 		}
 
 		telemetryConfiguration, err := runner.context.dataStore.Telemetry().Telemetry()
@@ -98,9 +151,15 @@ func (runner *TelemetryJobRunner) Run() {
 
 		telemetryData.Identifier = telemetryConfiguration.TelemetryID
 
-		err = computeSettingsTelemetry(telemetryData, runner.context.dataStore)
+		err = computeDockerHubTelemetry(telemetryData, runner.context.dataStore)
 		if err != nil {
-			log.Printf("background schedule error (telemetry). Unable to compute settings telemetry (err=%s)\n", err)
+			log.Printf("background schedule error (telemetry). Unable to compute dockerhub telemetry (err=%s)\n", err)
+			return
+		}
+
+		err = computeEdgeComputeTelemetry(telemetryData, runner.context.dataStore)
+		if err != nil {
+			log.Printf("background schedule error (telemetry). Unable to compute Edge compute telemetry (err=%s)\n", err)
 			return
 		}
 
@@ -115,22 +174,103 @@ func (runner *TelemetryJobRunner) Run() {
 			log.Printf("background schedule error (telemetry). Unable to compute endpoint group telemetry (err=%s)\n", err)
 			return
 		}
+
+		err = computeRegistryTelemetry(telemetryData, runner.context.dataStore)
+		if err != nil {
+			log.Printf("background schedule error (telemetry). Unable to compute registry telemetry (err=%s)\n", err)
+			return
+		}
+
+		err = computeResourceControlTelemetry(telemetryData, runner.context.dataStore)
+		if err != nil {
+			log.Printf("background schedule error (telemetry). Unable to compute resource control telemetry (err=%s)\n", err)
+			return
+		}
+
+		computeRuntimeTelemetry(telemetryData)
 	}()
 }
 
-func computeEndpointGroupTelemetry(telemetryData *TelemetryData, dataStore portainer.DataStore) error {
-	endpointGroups, err := dataStore.EndpointGroup().EndpointGroups()
+// TODO: add telemetry for Edge compute features (Edge groups, Edge stacks)
+func computeEdgeComputeTelemetry(telemetryData *TelemetryData, dataStore portainer.DataStore) error {
+	telemetryData.EdgeCompute = EdgeComputeTelemetryData{}
+
+	schedules, err := dataStore.Schedule().Schedules()
 	if err != nil {
 		return err
 	}
 
-	telemetryData.EndpointGroupCount = len(endpointGroups)
+	scheduleTelemetryData := EdgeComputeScheduleTelemetryData{
+		Count:     len(schedules),
+		Recurring: 0,
+	}
+
+	for _, schedule := range schedules {
+		if schedule.JobType == portainer.ScriptExecutionJobType && schedule.Recurring {
+			scheduleTelemetryData.Recurring++
+		}
+	}
+
+	telemetryData.EdgeCompute.Schedule = scheduleTelemetryData
 
 	return nil
 }
 
-func computeEndpointDockerTelemetry(endpoint *portainer.Endpoint) EndpointDockerTelemetryData {
-	dockerTelemetryData := EndpointDockerTelemetryData{}
+func computeDockerHubTelemetry(telemetryData *TelemetryData, dataStore portainer.DataStore) error {
+	dockerhub, err := dataStore.DockerHub().DockerHub()
+	if err != nil {
+		return err
+	}
+
+	telemetryData.DockerHub = DockerHubTelemetryData{
+		Authentication: dockerhub.Authentication,
+	}
+
+	return nil
+}
+
+// TODO: add telemetry for Kubernetes endpoints
+func computeEndpointTelemetry(telemetryData *TelemetryData, dataStore portainer.DataStore) error {
+	endpoints, err := dataStore.Endpoint().Endpoints()
+	if err != nil {
+		return err
+	}
+
+	endpointsTelemetry := make([]EndpointEnvironmentTelemetryData, 0)
+	for _, endpoint := range endpoints {
+		endpointTelemetry := EndpointEnvironmentTelemetryData{}
+
+		switch endpoint.Type {
+		case portainer.DockerEnvironment:
+			endpointTelemetry.Environment = EndpointEnvironmentDocker
+			endpointTelemetry.Agent = false
+			endpointTelemetry.Edge = false
+			endpointTelemetry.Docker = computeEndpointEnvironmentDockerTelemetry(&endpoint)
+		case portainer.AgentOnDockerEnvironment:
+			endpointTelemetry.Environment = EndpointEnvironmentDocker
+			endpointTelemetry.Agent = true
+			endpointTelemetry.Edge = false
+			endpointTelemetry.Docker = computeEndpointEnvironmentDockerTelemetry(&endpoint)
+		case portainer.EdgeAgentEnvironment:
+			endpointTelemetry.Environment = EndpointEnvironmentDocker
+			endpointTelemetry.Agent = true
+			endpointTelemetry.Edge = true
+			endpointTelemetry.Docker = computeEndpointEnvironmentDockerTelemetry(&endpoint)
+		}
+
+		endpointsTelemetry = append(endpointsTelemetry, endpointTelemetry)
+	}
+
+	telemetryData.Endpoint = EndpointTelemetryData{
+		Count:     len(endpoints),
+		Endpoints: endpointsTelemetry,
+	}
+
+	return nil
+}
+
+func computeEndpointEnvironmentDockerTelemetry(endpoint *portainer.Endpoint) EndpointEnvironmentDockerTelemetryData {
+	dockerTelemetryData := EndpointEnvironmentDockerTelemetryData{}
 
 	if len(endpoint.Snapshots) > 0 {
 		dockerTelemetryData.Version = endpoint.Snapshots[0].DockerVersion
@@ -149,58 +289,103 @@ func computeEndpointDockerTelemetry(endpoint *portainer.Endpoint) EndpointDocker
 	return dockerTelemetryData
 }
 
-// TODO: add support for Kubernetes endpoints
-func computeEndpointTelemetry(telemetryData *TelemetryData, dataStore portainer.DataStore) error {
-	endpoints, err := dataStore.Endpoint().Endpoints()
+func computeEndpointGroupTelemetry(telemetryData *TelemetryData, dataStore portainer.DataStore) error {
+	endpointGroups, err := dataStore.EndpointGroup().EndpointGroups()
 	if err != nil {
 		return err
 	}
 
-	endpointsTelemetry := make([]EndpointTelemetryData, 0)
-	for _, endpoint := range endpoints {
-		endpointTelemetry := EndpointTelemetryData{}
-
-		switch endpoint.Type {
-		case portainer.DockerEnvironment:
-			endpointTelemetry.Environment = EndpointEnvironmentDocker
-			endpointTelemetry.Agent = false
-			endpointTelemetry.Edge = false
-			endpointTelemetry.Docker = computeEndpointDockerTelemetry(&endpoint)
-		case portainer.AgentOnDockerEnvironment:
-			endpointTelemetry.Environment = EndpointEnvironmentDocker
-			endpointTelemetry.Agent = true
-			endpointTelemetry.Edge = false
-			endpointTelemetry.Docker = computeEndpointDockerTelemetry(&endpoint)
-		case portainer.EdgeAgentEnvironment:
-			endpointTelemetry.Environment = EndpointEnvironmentDocker
-			endpointTelemetry.Agent = true
-			endpointTelemetry.Edge = true
-			endpointTelemetry.Docker = computeEndpointDockerTelemetry(&endpoint)
-		}
-
-		endpointsTelemetry = append(endpointsTelemetry, endpointTelemetry)
+	telemetryData.EndpointGroup = EndpointGroupTelemetryData{
+		Count: len(endpointGroups),
 	}
-
-	telemetryData.Endpoints = endpointsTelemetry
 
 	return nil
 }
 
-func computeSettingsTelemetry(telemetryData *TelemetryData, dataStore portainer.DataStore) error {
-	settings, err := dataStore.Settings().Settings()
+func computeRegistryTelemetry(telemetryData *TelemetryData, dataStore portainer.DataStore) error {
+	registries, err := dataStore.Registry().Registries()
 	if err != nil {
 		return err
 	}
 
-	authenticationMethod := AuthenticationMethodInternal
-	switch settings.AuthenticationMethod {
-	case portainer.AuthenticationLDAP:
-		authenticationMethod = AuthenticationMethodLDAP
-	case portainer.AuthenticationOAuth:
-		authenticationMethod = AuthenticationMethodOAuth
+	registriesTelemetry := make([]RegistryConfigurationTelemetryData, 0)
+	for _, registry := range registries {
+		registryTelemetry := RegistryConfigurationTelemetryData{
+			Type: RegistryConfigurationTypeCustom,
+		}
+
+		switch registry.Type {
+		case portainer.AzureRegistry:
+			registryTelemetry.Type = RegistryConfigurationTypeAzure
+		case portainer.QuayRegistry:
+			registryTelemetry.Type = RegistryConfigurationTypeQuay
+		case portainer.GitlabRegistry:
+			registryTelemetry.Type = RegistryConfigurationTypeGitlab
+		}
+
+		registriesTelemetry = append(registriesTelemetry, registryTelemetry)
 	}
 
-	telemetryData.AuthenticationMode = authenticationMethod
+	telemetryData.Registry = RegistryTelemetryData{
+		Count:      len(registries),
+		Registries: registriesTelemetry,
+	}
+
+	return nil
+}
+
+func computeResourceControlTelemetry(telemetryData *TelemetryData, dataStore portainer.DataStore) error {
+	resourceControls, err := dataStore.ResourceControl().ResourceControls()
+	if err != nil {
+		return err
+	}
+
+	telemetryData.ResourceControl = ResourceControlTelemetryData{
+		Count:      len(resourceControls),
+		Containers: 0,
+		Services:   0,
+		Volumes:    0,
+		Networks:   0,
+		Secrets:    0,
+		Configs:    0,
+		Stacks:     0,
+	}
+
+	for _, resourceControl := range resourceControls {
+		switch resourceControl.Type {
+		case portainer.ContainerResourceControl:
+			telemetryData.ResourceControl.Containers++
+		case portainer.ServiceResourceControl:
+			telemetryData.ResourceControl.Services++
+		case portainer.VolumeResourceControl:
+			telemetryData.ResourceControl.Volumes++
+		case portainer.NetworkResourceControl:
+			telemetryData.ResourceControl.Networks++
+		case portainer.SecretResourceControl:
+			telemetryData.ResourceControl.Secrets++
+		case portainer.ConfigResourceControl:
+			telemetryData.ResourceControl.Configs++
+		case portainer.StackResourceControl:
+			telemetryData.ResourceControl.Stacks++
+		}
+	}
+
+	return nil
+}
+
+func computeRuntimeTelemetry(telemetryData *TelemetryData) {
+	telemetryData.Runtime = RuntimeTelemetryData{
+		PortainerVersion: portainer.APIVersion,
+		Platform:         runtime.GOOS,
+		Arch:             runtime.GOARCH,
+	}
+}
+
+func computeSettingsTelemetry(telemetryData *TelemetryData, dataStore portainer.DataStore) error {
+	_, err := dataStore.Settings().Settings()
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
