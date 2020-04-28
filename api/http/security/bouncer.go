@@ -145,7 +145,7 @@ func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endp
 	return nil
 }
 
-// AuthorizedEdgeEndpointOperation verifies that the request was recieved from a valid Edge endpoint
+// AuthorizedEdgeEndpointOperation verifies that the request was received from a valid Edge endpoint
 func (bouncer *RequestBouncer) AuthorizedEdgeEndpointOperation(r *http.Request, endpoint *portainer.Endpoint) error {
 	if endpoint.Type != portainer.EdgeAgentEnvironment {
 		return errors.New("Invalid endpoint type")
