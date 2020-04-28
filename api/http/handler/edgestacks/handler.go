@@ -12,16 +12,17 @@ import (
 // Handler is the HTTP handler used to handle endpoint group operations.
 type Handler struct {
 	*mux.Router
-	AuthorizationService *portainer.AuthorizationService
-	EdgeStackService     portainer.EdgeStackService
-	FileService          portainer.FileService
-	GitService           portainer.GitService
+	requestBouncer   *security.RequestBouncer
+	EdgeStackService portainer.EdgeStackService
+	FileService      portainer.FileService
+	GitService       portainer.GitService
 }
 
 // NewHandler creates a handler to manage endpoint group operations.
 func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{
-		Router: mux.NewRouter(),
+		Router:         mux.NewRouter(),
+		requestBouncer: bouncer,
 	}
 	h.Handle("/edge_stacks",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeStackCreate))).Methods(http.MethodPost)
