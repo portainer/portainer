@@ -163,8 +163,11 @@ func (server *Server) Start() error {
 
 	var endpointHandler = endpoints.NewHandler(requestBouncer, server.EndpointManagement)
 	endpointHandler.AuthorizationService = authorizationService
+	endpointHandler.EdgeGroupService = server.EdgeGroupService
+	endpointHandler.EdgeStackService = server.EdgeStackService
 	endpointHandler.EndpointService = server.EndpointService
 	endpointHandler.EndpointGroupService = server.EndpointGroupService
+	endpointHandler.EndpointRelationService = server.EndpointRelationService
 	endpointHandler.FileService = server.FileService
 	endpointHandler.JobService = server.JobService
 	endpointHandler.ProxyManager = proxyManager

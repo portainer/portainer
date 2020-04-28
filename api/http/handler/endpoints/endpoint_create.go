@@ -146,6 +146,38 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 		return endpointCreationError
 	}
 
+	endpointGroup, err := handler.EndpointGroupService.EndpointGroup(endpoint.GroupID)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint group inside the database", err}
+	}
+
+	edgeGroups, err := handler.EdgeGroupService.EdgeGroups()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge groups from the database", err}
+	}
+
+	edgeStacks, err := handler.EdgeStackService.EdgeStacks()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge stacks from the database", err}
+	}
+
+	relationObject := &portainer.EndpointRelation{
+		EndpointID: endpoint.ID,
+		EdgeStacks: map[portainer.EdgeStackID]bool{},
+	}
+
+	if endpoint.Type == portainer.EdgeAgentEnvironment {
+		relatedEdgeStacks := portainer.EndpointRelatedEdgeStacks(*endpoint, *endpointGroup, edgeGroups, edgeStacks)
+		for _, stackID := range relatedEdgeStacks {
+			relationObject.EdgeStacks[stackID] = true
+		}
+	}
+
+	err = handler.EndpointRelationService.CreateEndpointRelation(relationObject)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the relation object inside the database", err}
+	}
+
 	return response.JSON(w, endpoint)
 }
 
