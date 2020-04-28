@@ -8,9 +8,10 @@
     <rd-widget>
       <rd-widget-body>
         <edge-group-form
+          loaded="$ctrl.state.loaded"
+          page-type="create"
           form-action-label="Add edge group"
           form-action="$ctrl.createGroup"
-          endpoints="$ctrl.endpoints"
           groups="$ctrl.endpointGroups"
           tags="$ctrl.tags"
           model="$ctrl.model"
