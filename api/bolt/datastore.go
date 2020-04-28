@@ -7,6 +7,7 @@ import (
 
 	"github.com/portainer/portainer/api/bolt/edgegroup"
 	"github.com/portainer/portainer/api/bolt/edgestack"
+	"github.com/portainer/portainer/api/bolt/endpointrelation"
 	"github.com/portainer/portainer/api/bolt/tunnelserver"
 
 	"github.com/boltdb/bolt"
@@ -38,30 +39,31 @@ const (
 // Store defines the implementation of portainer.DataStore using
 // BoltDB as the storage system.
 type Store struct {
-	path                   string
-	db                     *bolt.DB
-	checkForDataMigration  bool
-	fileService            portainer.FileService
-	RoleService            *role.Service
-	DockerHubService       *dockerhub.Service
-	EdgeGroupService       *edgegroup.Service
-	EdgeStackService       *edgestack.Service
-	EndpointGroupService   *endpointgroup.Service
-	EndpointService        *endpoint.Service
-	ExtensionService       *extension.Service
-	RegistryService        *registry.Service
-	ResourceControlService *resourcecontrol.Service
-	SettingsService        *settings.Service
-	StackService           *stack.Service
-	TagService             *tag.Service
-	TeamMembershipService  *teammembership.Service
-	TeamService            *team.Service
-	TemplateService        *template.Service
-	TunnelServerService    *tunnelserver.Service
-	UserService            *user.Service
-	VersionService         *version.Service
-	WebhookService         *webhook.Service
-	ScheduleService        *schedule.Service
+	path                    string
+	db                      *bolt.DB
+	checkForDataMigration   bool
+	fileService             portainer.FileService
+	RoleService             *role.Service
+	DockerHubService        *dockerhub.Service
+	EdgeGroupService        *edgegroup.Service
+	EdgeStackService        *edgestack.Service
+	EndpointGroupService    *endpointgroup.Service
+	EndpointService         *endpoint.Service
+	EndpointRelationService *endpointrelation.Service
+	ExtensionService        *extension.Service
+	RegistryService         *registry.Service
+	ResourceControlService  *resourcecontrol.Service
+	SettingsService         *settings.Service
+	StackService            *stack.Service
+	TagService              *tag.Service
+	TeamMembershipService   *teammembership.Service
+	TeamService             *team.Service
+	TemplateService         *template.Service
+	TunnelServerService     *tunnelserver.Service
+	UserService             *user.Service
+	VersionService          *version.Service
+	WebhookService          *webhook.Service
+	ScheduleService         *schedule.Service
 }
 
 // NewStore initializes a new Store and the associated services
@@ -188,6 +190,12 @@ func (store *Store) initServices() error {
 		return err
 	}
 	store.EndpointService = endpointService
+
+	endpointRelationService, err := endpointrelation.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.EndpointRelationService = endpointRelationService
 
 	extensionService, err := extension.NewService(store.db)
 	if err != nil {
