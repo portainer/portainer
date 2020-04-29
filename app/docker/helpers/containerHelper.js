@@ -89,6 +89,11 @@ angular.module('portainer.docker').factory('ContainerHelper', [
         EndpointsConfig: {},
       };
       config.NetworkingConfig.EndpointsConfig = container.NetworkSettings.Networks;
+
+      if (config.ExposedPorts === undefined) {
+        config.ExposedPorts = {};
+      }
+
       if (mode.indexOf('container:') !== -1) {
         delete config.Hostname;
         delete config.ExposedPorts;
