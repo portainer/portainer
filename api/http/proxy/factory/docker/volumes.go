@@ -1,12 +1,17 @@
 package docker
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/docker/docker/client"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
 )
 
@@ -77,6 +82,40 @@ func (transport *Transport) volumeInspectOperation(response *http.Response, exec
 	}
 
 	return transport.applyAccessControlOnResource(resourceOperationParameters, responseObject, response, executor)
+}
+
+func (transport *Transport) volumeCreationOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
+	var dataObject map[string]interface{}
+	if request.Body != nil {
+		var data interface{}
+
+		body, err := ioutil.ReadAll(request.Body)
+		if err != nil {
+			return nil, err
+		}
+
+		err = json.Unmarshal(body, &data)
+		if err != nil {
+			return nil, err
+		}
+
+		dataObject = data.(map[string]interface{})
+		request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+		fmt.Println(dataObject)
+	}
+
+	resourceControls, err := transport.resourceControlService.ResourceControls()
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	for _, rc := range resourceControls {
+		if rc.ResourceID == dataObject[resourceIdentifierAttribute] {
+			return nil, errors.New("Volume already exists")
+		}
+	}
+
+	return transport.decorateGenericResourceCreationOperation(request, resourceIdentifierAttribute, resourceType)
 }
 
 // selectorVolumeLabels retrieve the labels object associated to the volume object.

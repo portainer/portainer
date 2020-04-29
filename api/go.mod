@@ -30,8 +30,8 @@ require (
 	github.com/robfig/cron/v3 v3.0.0
 	golang.org/x/crypto v0.0.0-20191128160524-b544559bb6d1
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
-	gopkg.in/asn1-ber.v1 v1.0.0-00010101000000-000000000000 // indirect
 	gopkg.in/ldap.v2 v2.5.1
+	gopkg.in/ldap.v3 v3.1.0
 	gopkg.in/src-d/go-git.v4 v4.13.1
 )
 
