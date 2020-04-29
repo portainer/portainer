@@ -3,6 +3,7 @@ package cron
 import (
 	"log"
 	"runtime"
+	"time"
 
 	"github.com/portainer/portainer/api"
 )
@@ -40,15 +41,15 @@ func (runner *TelemetryJobRunner) GetSchedule() *portainer.Schedule {
 
 type (
 	TelemetryData struct {
-		Identifier       string                       `json:"Identifier"`
-		TelemetryVersion int                          `json:"TelemetryVersion"`
-		DockerHub        DockerHubTelemetryData       `json:"DockerHub"`
-		EdgeCompute      EdgeComputeTelemetryData     `json:"EdgeCompute"`
-		Endpoint         EndpointTelemetryData        `json:"Endpoint"`
-		EndpointGroup    EndpointGroupTelemetryData   `json:"EndpointGroup"`
-		Registry         RegistryTelemetryData        `json:"Registry"`
-		ResourceControl  ResourceControlTelemetryData `json:"ResourceControl"`
-		Runtime          RuntimeTelemetryData         `json:"Runtime"`
+		Identifier      string                       `json:"Identifier"`
+		DockerHub       DockerHubTelemetryData       `json:"DockerHub"`
+		EdgeCompute     EdgeComputeTelemetryData     `json:"EdgeCompute"`
+		Endpoint        EndpointTelemetryData        `json:"Endpoint"`
+		EndpointGroup   EndpointGroupTelemetryData   `json:"EndpointGroup"`
+		Registry        RegistryTelemetryData        `json:"Registry"`
+		ResourceControl ResourceControlTelemetryData `json:"ResourceControl"`
+		Runtime         RuntimeTelemetryData         `json:"Runtime"`
+		Settings        SettingsTelemetryData        `json:"Settings"`
 	}
 
 	DockerHubTelemetryData struct {
@@ -122,9 +123,24 @@ type (
 		Platform         string `json:"Platform"`
 		Arch             string `json:"Arch"`
 	}
+
+	// TODO: add EdgeCompute feature switch telemetry
+	SettingsTelemetryData struct {
+		AuthenticationMode   string                      `json:"AuthenticationMode"`
+		UseLogoURL           bool                        `json:"UseLogoURL"`
+		UseBlackListedLabels bool                        `json:"UseBlackListedLabels"`
+		Docker               SettingsDockerTelemetryData `json:"Docker"`
+		HostManagement       bool                        `json:"HostManagement"`
+		SnapshotInterval     float64                     `json:"SnapshotInterval"`
+	}
+
+	SettingsDockerTelemetryData struct {
+		RestrictBindMounts     bool `json:"RestrictBindMounts"`
+		RestrictPrivilegedMode bool `json:"RestrictPrivilegedMode"`
+		RestrictVolumeBrowser  bool `json:"RestrictVolumeBrowser"`
+	}
 )
 
-const TelemetryVersion = 1
 const AuthenticationMethodInternal = "internal"
 const AuthenticationMethodLDAP = "ldap"
 const AuthenticationMethodOAuth = "oauth"
@@ -139,17 +155,11 @@ const RegistryConfigurationTypeGitlab = "gitlab"
 // It will compute the telemetry data using the data available inside the database and send it to the telemetry server.
 func (runner *TelemetryJobRunner) Run() {
 	go func() {
-		telemetryData := &TelemetryData{
-			TelemetryVersion: TelemetryVersion,
-		}
-
-		telemetryConfiguration, err := runner.context.dataStore.Telemetry().Telemetry()
+		telemetryData, err := initTelemetryData(runner.context.dataStore)
 		if err != nil {
-			log.Printf("background schedule error (telemetry). Unable to retrieve telemetry info (err=%s)\n", err)
+			log.Printf("background schedule error (telemetry). Unable to init telemetry data (err=%s)\n", err)
 			return
 		}
-
-		telemetryData.Identifier = telemetryConfiguration.TelemetryID
 
 		err = computeDockerHubTelemetry(telemetryData, runner.context.dataStore)
 		if err != nil {
@@ -187,8 +197,40 @@ func (runner *TelemetryJobRunner) Run() {
 			return
 		}
 
+		err = computeSettingsTelemetry(telemetryData, runner.context.dataStore)
+		if err != nil {
+			log.Printf("background schedule error (telemetry). Unable to compute settings telemetry (err=%s)\n", err)
+			return
+		}
+
 		computeRuntimeTelemetry(telemetryData)
 	}()
+}
+
+func initTelemetryData(dataStore portainer.DataStore) (*TelemetryData, error) {
+	telemetryData := &TelemetryData{}
+
+	telemetryConfiguration, err := dataStore.Telemetry().Telemetry()
+	if err != nil {
+		return nil, err
+	}
+
+	telemetryData.Identifier = telemetryConfiguration.TelemetryID
+
+	return telemetryData, nil
+}
+
+func computeDockerHubTelemetry(telemetryData *TelemetryData, dataStore portainer.DataStore) error {
+	dockerhub, err := dataStore.DockerHub().DockerHub()
+	if err != nil {
+		return err
+	}
+
+	telemetryData.DockerHub = DockerHubTelemetryData{
+		Authentication: dockerhub.Authentication,
+	}
+
+	return nil
 }
 
 // TODO: add telemetry for Edge compute features (Edge groups, Edge stacks)
@@ -212,19 +254,6 @@ func computeEdgeComputeTelemetry(telemetryData *TelemetryData, dataStore portain
 	}
 
 	telemetryData.EdgeCompute.Schedule = scheduleTelemetryData
-
-	return nil
-}
-
-func computeDockerHubTelemetry(telemetryData *TelemetryData, dataStore portainer.DataStore) error {
-	dockerhub, err := dataStore.DockerHub().DockerHub()
-	if err != nil {
-		return err
-	}
-
-	telemetryData.DockerHub = DockerHubTelemetryData{
-		Authentication: dockerhub.Authentication,
-	}
 
 	return nil
 }
@@ -382,9 +411,46 @@ func computeRuntimeTelemetry(telemetryData *TelemetryData) {
 }
 
 func computeSettingsTelemetry(telemetryData *TelemetryData, dataStore portainer.DataStore) error {
-	_, err := dataStore.Settings().Settings()
+	settings, err := dataStore.Settings().Settings()
 	if err != nil {
 		return err
+	}
+
+	telemetryData.Settings = SettingsTelemetryData{
+		AuthenticationMode:   AuthenticationMethodInternal,
+		UseLogoURL:           false,
+		UseBlackListedLabels: false,
+		Docker: SettingsDockerTelemetryData{
+			RestrictBindMounts:     !settings.AllowBindMountsForRegularUsers,
+			RestrictPrivilegedMode: !settings.AllowPrivilegedModeForRegularUsers,
+			RestrictVolumeBrowser:  !settings.AllowVolumeBrowserForRegularUsers,
+		},
+		HostManagement:   settings.EnableHostManagementFeatures,
+		SnapshotInterval: 0,
+	}
+
+	switch settings.AuthenticationMethod {
+	case portainer.AuthenticationLDAP:
+		telemetryData.Settings.AuthenticationMode = AuthenticationMethodLDAP
+	case portainer.AuthenticationOAuth:
+		telemetryData.Settings.AuthenticationMode = AuthenticationMethodOAuth
+	}
+
+	if settings.LogoURL != "" {
+		telemetryData.Settings.UseLogoURL = true
+	}
+
+	if len(settings.BlackListedLabels) > 0 {
+		telemetryData.Settings.UseBlackListedLabels = true
+	}
+
+	if settings.SnapshotInterval != "" {
+		duration, err := time.ParseDuration(settings.SnapshotInterval)
+		if err != nil {
+			log.Printf("background schedule warning (telemetry). Unable to parse snapshot interval duration (err=%s)\n", err)
+		} else {
+			telemetryData.Settings.SnapshotInterval = duration.Seconds()
+		}
 	}
 
 	return nil
