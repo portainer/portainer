@@ -54,6 +54,7 @@ type (
 		Tag             TagTelemetryData             `json:"Tag"`
 		Team            TeamTelemetryData            `json:"Team"`
 		User            UserTelemetryData            `json:"User"`
+		Webhook         WebhookTelemetryData         `json:"Webhook"`
 	}
 
 	DockerHubTelemetryData struct {
@@ -164,6 +165,10 @@ type (
 		AdminUserCount    int `json:"AdminUserCount"`
 		StandardUserCount int `json:"StandardUserCount"`
 	}
+
+	WebhookTelemetryData struct {
+		Count int `json:"Count"`
+	}
 )
 
 const AuthenticationMethodInternal = "internal"
@@ -251,6 +256,12 @@ func (runner *TelemetryJobRunner) Run() {
 		err = computeUserTelemetry(telemetryData, runner.context.dataStore)
 		if err != nil {
 			log.Printf("background schedule error (telemetry). Unable to compute user telemetry (err=%s)\n", err)
+			return
+		}
+
+		err = computeWebhookTelemetry(telemetryData, runner.context.dataStore)
+		if err != nil {
+			log.Printf("background schedule error (telemetry). Unable to compute webhook telemetry (err=%s)\n", err)
 			return
 		}
 	}()
@@ -584,6 +595,19 @@ func computeUserTelemetry(telemetryData *TelemetryData, dataStore portainer.Data
 		} else {
 			telemetryData.User.StandardUserCount++
 		}
+	}
+
+	return nil
+}
+
+func computeWebhookTelemetry(telemetryData *TelemetryData, store *bolt.Store) error {
+	webhooks, err := store.WebhookService.Webhooks()
+	if err != nil {
+		return err
+	}
+
+	telemetryData.Webhook = WebhookTelemetryData{
+		Count: len(webhooks),
 	}
 
 	return nil
