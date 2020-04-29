@@ -51,6 +51,7 @@ type (
 		Runtime         RuntimeTelemetryData         `json:"Runtime"`
 		Settings        SettingsTelemetryData        `json:"Settings"`
 		Stack           StackTelemetryData           `json:"Stack"`
+		Tag             TagTelemetryData             `json:"Tag"`
 		Team            TeamTelemetryData            `json:"Team"`
 	}
 
@@ -148,6 +149,10 @@ type (
 		Swarm      int `json:"Swarm"`
 	}
 
+	TagTelemetryData struct {
+		Count int `json:"Count"`
+	}
+
 	TeamTelemetryData struct {
 		Count           int `json:"Count"`
 		TeamLeaderCount int `json:"TeamLeaderCount"`
@@ -224,12 +229,31 @@ func (runner *TelemetryJobRunner) Run() {
 			return
 		}
 
+		err = computeTagTelemetry(telemetryData, runner.context.dataStore)
+		if err != nil {
+			log.Printf("background schedule error (telemetry). Unable to compute tag telemetry (err=%s)\n", err)
+			return
+		}
+
 		err = computeTeamTelemetry(telemetryData, runner.context.dataStore)
 		if err != nil {
 			log.Printf("background schedule error (telemetry). Unable to compute team telemetry (err=%s)\n", err)
 			return
 		}
 	}()
+}
+
+func computeTagTelemetry(telemetryData *TelemetryData, dataStore portainer.DataStore) error {
+	tags, err := dataStore.Tag().Tags()
+	if err != nil {
+		return err
+	}
+
+	telemetryData.Tag = TagTelemetryData{
+		Count: len(tags),
+	}
+
+	return nil
 }
 
 func initTelemetryData(dataStore portainer.DataStore) (*TelemetryData, error) {
@@ -481,8 +505,8 @@ func computeSettingsTelemetry(telemetryData *TelemetryData, dataStore portainer.
 	return nil
 }
 
-func computeStackTelemetry(telemetryData *TelemetryData, store *bolt.Store) error {
-	stacks, err := store.StackService.Stacks()
+func computeStackTelemetry(telemetryData *TelemetryData, dataStore portainer.DataStore) error {
+	stacks, err := dataStore.Stack().Stacks()
 	if err != nil {
 		return err
 	}
@@ -504,8 +528,8 @@ func computeStackTelemetry(telemetryData *TelemetryData, store *bolt.Store) erro
 	return nil
 }
 
-func computeTeamTelemetry(telemetryData *TelemetryData, store *bolt.Store) error {
-	teams, err := store.TeamService.Teams()
+func computeTeamTelemetry(telemetryData *TelemetryData, dataStore portainer.DataStore) error {
+	teams, err := dataStore.Team().Teams()
 	if err != nil {
 		return err
 	}
@@ -515,7 +539,7 @@ func computeTeamTelemetry(telemetryData *TelemetryData, store *bolt.Store) error
 		TeamLeaderCount: 0,
 	}
 
-	teamMemberships, err := store.TeamMembershipService.TeamMemberships()
+	teamMemberships, err := dataStore.TeamMembership().TeamMemberships()
 	if err != nil {
 		return err
 	}
