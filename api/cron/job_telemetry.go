@@ -50,6 +50,7 @@ type (
 		ResourceControl ResourceControlTelemetryData `json:"ResourceControl"`
 		Runtime         RuntimeTelemetryData         `json:"Runtime"`
 		Settings        SettingsTelemetryData        `json:"Settings"`
+		Stack           StackTelemetryData           `json:"Stack"`
 	}
 
 	DockerHubTelemetryData struct {
@@ -139,6 +140,12 @@ type (
 		RestrictPrivilegedMode bool `json:"RestrictPrivilegedMode"`
 		RestrictVolumeBrowser  bool `json:"RestrictVolumeBrowser"`
 	}
+
+	StackTelemetryData struct {
+		Count      int `json:"Count"`
+		Standalone int `json:"Standalone"`
+		Swarm      int `json:"Swarm"`
+	}
 )
 
 const AuthenticationMethodInternal = "internal"
@@ -197,13 +204,19 @@ func (runner *TelemetryJobRunner) Run() {
 			return
 		}
 
+		computeRuntimeTelemetry(telemetryData)
+
 		err = computeSettingsTelemetry(telemetryData, runner.context.dataStore)
 		if err != nil {
 			log.Printf("background schedule error (telemetry). Unable to compute settings telemetry (err=%s)\n", err)
 			return
 		}
 
-		computeRuntimeTelemetry(telemetryData)
+		err = computeStackTelemetry(telemetryData, runner.context.dataStore)
+		if err != nil {
+			log.Printf("background schedule error (telemetry). Unable to compute stack telemetry (err=%s)\n", err)
+			return
+		}
 	}()
 }
 
@@ -450,6 +463,29 @@ func computeSettingsTelemetry(telemetryData *TelemetryData, dataStore portainer.
 			log.Printf("background schedule warning (telemetry). Unable to parse snapshot interval duration (err=%s)\n", err)
 		} else {
 			telemetryData.Settings.SnapshotInterval = duration.Seconds()
+		}
+	}
+
+	return nil
+}
+
+func computeStackTelemetry(telemetryData *TelemetryData, store *bolt.Store) error {
+	stacks, err := store.StackService.Stacks()
+	if err != nil {
+		return err
+	}
+
+	telemetryData.Stack = StackTelemetryData{
+		Count:      len(stacks),
+		Standalone: 0,
+		Swarm:      0,
+	}
+
+	for _, stack := range stacks {
+		if stack.Type == portainer.DockerComposeStack {
+			telemetryData.Stack.Standalone++
+		} else {
+			telemetryData.Stack.Swarm++
 		}
 	}
 
