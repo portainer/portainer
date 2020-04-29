@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	ldap "github.com/go-ldap/ldap/v3"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
-
-	"gopkg.in/ldap.v3"
 )
 
 const (
