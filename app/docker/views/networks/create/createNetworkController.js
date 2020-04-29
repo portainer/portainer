@@ -1,3 +1,4 @@
+import _ from 'lodash-es';
 import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
 import { MacvlanFormData } from '../../../components/network-macvlan-form/networkMacvlanFormModel';
 
@@ -20,13 +21,13 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
         Subnet: '',
         Gateway: '',
         IPRange: '',
-        AuxAddress: ''
+        AuxAddress: '',
       },
       IPV6: {
         Subnet: '',
         Gateway: '',
         IPRange: '',
-        AuxAddress: ''
+        AuxAddress: '',
       },
       Labels: [],
       AccessControlData: new AccessControlFormData(),
@@ -248,6 +249,7 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
       PluginService.networkPlugins(apiVersion < 1.25)
         .then(function success(data) {
           $scope.availableNetworkDrivers = data;
+          $scope.availableNetworkDrivers = _.filter($scope.availableNetworkDrivers, (driver) => driver !== 'host' && driver !== 'null');
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve network drivers');
