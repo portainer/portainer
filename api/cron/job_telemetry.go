@@ -51,6 +51,7 @@ type (
 		Runtime         RuntimeTelemetryData         `json:"Runtime"`
 		Settings        SettingsTelemetryData        `json:"Settings"`
 		Stack           StackTelemetryData           `json:"Stack"`
+		Team            TeamTelemetryData            `json:"Team"`
 	}
 
 	DockerHubTelemetryData struct {
@@ -146,6 +147,11 @@ type (
 		Standalone int `json:"Standalone"`
 		Swarm      int `json:"Swarm"`
 	}
+
+	TeamTelemetryData struct {
+		Count           int `json:"Count"`
+		TeamLeaderCount int `json:"TeamLeaderCount"`
+	}
 )
 
 const AuthenticationMethodInternal = "internal"
@@ -215,6 +221,12 @@ func (runner *TelemetryJobRunner) Run() {
 		err = computeStackTelemetry(telemetryData, runner.context.dataStore)
 		if err != nil {
 			log.Printf("background schedule error (telemetry). Unable to compute stack telemetry (err=%s)\n", err)
+			return
+		}
+
+		err = computeTeamTelemetry(telemetryData, runner.context.dataStore)
+		if err != nil {
+			log.Printf("background schedule error (telemetry). Unable to compute team telemetry (err=%s)\n", err)
 			return
 		}
 	}()
@@ -486,6 +498,31 @@ func computeStackTelemetry(telemetryData *TelemetryData, store *bolt.Store) erro
 			telemetryData.Stack.Standalone++
 		} else {
 			telemetryData.Stack.Swarm++
+		}
+	}
+
+	return nil
+}
+
+func computeTeamTelemetry(telemetryData *TelemetryData, store *bolt.Store) error {
+	teams, err := store.TeamService.Teams()
+	if err != nil {
+		return err
+	}
+
+	telemetryData.Team = TeamTelemetryData{
+		Count:           len(teams),
+		TeamLeaderCount: 0,
+	}
+
+	teamMemberships, err := store.TeamMembershipService.TeamMemberships()
+	if err != nil {
+		return err
+	}
+
+	for _, membership := range teamMemberships {
+		if membership.Role == portainer.TeamLeader {
+			telemetryData.Team.TeamLeaderCount++
 		}
 	}
 
