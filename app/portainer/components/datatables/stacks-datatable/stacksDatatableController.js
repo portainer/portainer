@@ -2,7 +2,8 @@ angular.module('portainer.app').controller('StacksDatatableController', [
   '$scope',
   '$controller',
   'DatatableService',
-  function ($scope, $controller, DatatableService) {
+  'Authentication',
+  function ($scope, $controller, DatatableService, Authentication) {
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
 
     /**
@@ -13,6 +14,7 @@ angular.module('portainer.app').controller('StacksDatatableController', [
     };
 
     this.$onInit = function () {
+      this.isAdmin = Authentication.isAdmin();
       this.setDefaults();
       this.prepareTableFromDataset();
 

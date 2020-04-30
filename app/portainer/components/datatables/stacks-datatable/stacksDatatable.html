@@ -106,7 +106,7 @@
               ng-class="{ active: item.Checked }"
             >
               <td>
-                <span class="md-checkbox" ng-if="!$ctrl.offlineMode" authorization="PortainerStackCreate, PortainerStackDelete">
+                <span class="md-checkbox" ng-if="!$ctrl.offlineMode" authorization="PortainerStackCreate, PortainerStackDelete" disabled="!$ctrl.isAdmin && item.External">
                   <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="!$ctrl.allowSelection(item)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
