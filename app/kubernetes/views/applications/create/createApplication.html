@@ -156,21 +156,21 @@
             </div>
 
             <!-- config-element -->
-            <div class="form-group" ng-repeat="config in ctrl.formValues.Configurations">
+            <div class="form-group" ng-repeat="(index, config) in ctrl.formValues.Configurations">
               <label for="stack_name" class="col-md-1 col-sm-2 control-label text-left">Configuration</label>
               <div class="col-sm-5">
                 <select class="form-control" ng-model="config.SelectedConfiguration" ng-options="c as c.Name for c in ctrl.configurations"
-                  ng-change="ctrl.resetConfiguration($index)"></select>
+                  ng-change="ctrl.resetConfiguration(index)"></select>
               </div>
               <div class="col-sm-6" style="margin-top: 2px;">
-                <button class="btn btn-sm btn-primary" type="button" ng-if="!config.Overriden" ng-click="ctrl.overrideConfiguration($index)"
+                <button class="btn btn-sm btn-primary" type="button" ng-if="!config.Overriden" ng-click="ctrl.overrideConfiguration(index)"
                   ng-disabled="!config.SelectedConfiguration">
                   <i class="fa fa-list" aria-hidden="true"></i> Override
                 </button>
-                <button class="btn btn-sm btn-primary" type="button" ng-if="config.Overriden" ng-click="ctrl.resetConfiguration($index)">
+                <button class="btn btn-sm btn-primary" type="button" ng-if="config.Overriden" ng-click="ctrl.resetConfiguration(index)">
                   <i class="fa fa-undo" aria-hidden="true"></i> Auto
                 </button>
-                <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeConfiguration($index)">
+                <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeConfiguration(index)">
                   <i class="fa fa-trash" aria-hidden="true"></i> Remove
                 </button>
               </div>
@@ -188,7 +188,7 @@
 
               <!-- has-override -->
               <div class="col-sm-12 form-inline" style="margin-top: 10px;" ng-if="config.Overriden">
-                <div ng-repeat="overridenKey in config.OverridenKeys" style="margin-top: 2px;">
+                <div ng-repeat="(keyIndex, overridenKey) in config.OverridenKeys" style="margin-top: 2px;">
                   <div class="col-md-1 col-sm-2" style="margin-left: 3px;" style="vertical-align: top;"></div>
                   <div class="input-group col-sm-3 input-group-sm" style="vertical-align: top;">
                     <span class="input-group-addon">configuration key</span>
@@ -198,10 +198,10 @@
                   <div class="col-sm-3 input-group input-group-sm" style="vertical-align: top;" ng-if="overridenKey.Type === ctrl.ApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM">
                     <div class="input-group col-sm-12 input-group-sm">
                       <span class="input-group-addon">path on disk</span>
-                      <input type="text" class="form-control" ng-model="overridenKey.Path" placeholder="/etc/myapp/conf.d" name="overriden_key_path_{{$index}}" required>
+                      <input type="text" class="form-control" ng-model="overridenKey.Path" placeholder="/etc/myapp/conf.d" name="overriden_key_path_{{index}}_{{keyIndex}}" required>
                     </div>
-                    <div class="small text-warning" style="margin-top:5px" ng-show="kubernetesApplicationCreationForm['overriden_key_path_' + $index].$invalid">
-                      <ng-messages for="kubernetesApplicationCreationForm['overriden_key_path_' + $index].$error">
+                    <div class="small text-warning" style="margin-top:5px" ng-show="kubernetesApplicationCreationForm['overriden_key_path_' + index + '_' + keyIndex].$invalid">
+                      <ng-messages for="kubernetesApplicationCreationForm['overriden_key_path_' + index + '_' + keyIndex].$error">
                         <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Path is required.</p>
                       </ng-messages>
                     </div>
