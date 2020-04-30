@@ -1,5 +1,7 @@
 package portainer
 
+import "errors"
+
 // EdgeStackRelatedEndpoints returns a list of endpoints related to this Edge stack
 func EdgeStackRelatedEndpoints(edgeStack EdgeStack, endpoints []Endpoint, endpointGroups []EndpointGroup, edgeGroups []EdgeGroup) ([]EndpointID, error) {
 	edgeStackEndpoints := []EndpointID{}
@@ -15,7 +17,7 @@ func EdgeStackRelatedEndpoints(edgeStack EdgeStack, endpoints []Endpoint, endpoi
 		}
 
 		if edgeGroup == nil {
-			return nil, Error("Edge group was not found")
+			return nil, errors.New("Edge group was not found")
 		}
 
 		edgeStackEndpoints = append(edgeStackEndpoints, EdgeGroupRelatedEndpoints(*edgeGroup, endpoints, endpointGroups)...)
