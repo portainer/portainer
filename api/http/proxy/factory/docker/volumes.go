@@ -1,18 +1,15 @@
 package docker
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
-	"fmt"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/docker/docker/client"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 const (
@@ -84,38 +81,41 @@ func (transport *Transport) volumeInspectOperation(response *http.Response, exec
 	return transport.applyAccessControlOnResource(resourceOperationParameters, responseObject, response, executor)
 }
 
-func (transport *Transport) volumeCreationOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
-	var dataObject map[string]interface{}
-	if request.Body != nil {
-		var data interface{}
-
-		body, err := ioutil.ReadAll(request.Body)
-		if err != nil {
-			return nil, err
-		}
-
-		err = json.Unmarshal(body, &data)
-		if err != nil {
-			return nil, err
-		}
-
-		dataObject = data.(map[string]interface{})
-		request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
-		fmt.Println(dataObject)
-	}
-
-	resourceControls, err := transport.resourceControlService.ResourceControls()
+func (transport *Transport) decorateVolumeResourceCreationOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
+	tokenData, err := security.RetrieveTokenData(request)
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
 
-	for _, rc := range resourceControls {
-		if rc.ResourceID == dataObject[resourceIdentifierAttribute] {
-			return nil, errors.New("Volume already exists")
+	volumeID := request.Header.Get("X-Portainer-VolumeName")
+
+	if volumeID != "" {
+		cli := transport.dockerClient
+		agentTargetHeader := request.Header.Get(portainer.PortainerAgentTargetHeader)
+		if agentTargetHeader != "" {
+			dockerClient, err := transport.dockerClientFactory.CreateClient(transport.endpoint, agentTargetHeader)
+			if err != nil {
+				return nil, err
+			}
+			defer dockerClient.Close()
+			cli = dockerClient
+		}
+
+		_, err := cli.VolumeInspect(context.Background(), volumeID)
+		if err == nil {
+			return nil, errors.New("Creation error: volume already exists")
 		}
 	}
 
-	return transport.decorateGenericResourceCreationOperation(request, resourceIdentifierAttribute, resourceType)
+	response, err := transport.executeDockerRequest(request)
+	if err != nil {
+		return response, err
+	}
+
+	if response.StatusCode == http.StatusCreated && volumeID != "" {
+		err = transport.decorateGenericResourceCreationResponse(response, resourceIdentifierAttribute, resourceType, tokenData.ID)
+	}
+	return response, err
 }
 
 // selectorVolumeLabels retrieve the labels object associated to the volume object.

@@ -273,7 +273,7 @@ func (transport *Transport) proxyServiceRequest(request *http.Request) (*http.Re
 func (transport *Transport) proxyVolumeRequest(request *http.Request) (*http.Response, error) {
 	switch requestPath := request.URL.Path; requestPath {
 	case "/volumes/create":
-		return transport.volumeCreationOperation(request, volumeObjectIdentifier, portainer.VolumeResourceControl)
+		return transport.decorateVolumeResourceCreationOperation(request, volumeObjectIdentifier, portainer.VolumeResourceControl)
 
 	case "/volumes/prune":
 		return transport.administratorOperation(request)
