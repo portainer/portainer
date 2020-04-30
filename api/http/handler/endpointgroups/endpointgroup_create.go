@@ -62,34 +62,10 @@ func (handler *Handler) endpointGroupCreate(w http.ResponseWriter, r *http.Reque
 				if err != nil {
 					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint", err}
 				}
-				if endpoint.Type == portainer.EdgeAgentEnvironment {
-					relation, err := handler.EndpointRelationService.EndpointRelation(endpoint.ID)
-					if err != nil {
-						return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find endpoint relation", err}
-					}
 
-					edgeGroups, err := handler.EdgeGroupService.EdgeGroups()
-					if err != nil {
-						return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrive edge groups from database", err}
-					}
-
-					edgeStacks, err := handler.EdgeStackService.EdgeStacks()
-					if err != nil {
-						return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrive edge stacks from database", err}
-					}
-
-					endpointEdgeStacks := portainer.EndpointRelatedEdgeStacks(endpoint, *endpointGroup, edgeGroups, edgeStacks)
-
-					edgeStacksSet := map[portainer.EdgeStackID]bool{}
-					for _, edgeStackID := range endpointEdgeStacks {
-						edgeStacksSet[edgeStackID] = true
-					}
-					relation.EdgeStacks = edgeStacksSet
-
-					err = handler.EndpointRelationService.UpdateEndpointRelation(endpoint.ID, relation)
-					if err != nil {
-						return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint relation", err}
-					}
+				err = handler.updateEndpointRelations(endpoint, *endpointGroup)
+				if err != nil {
+					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint relations changes inside the database", err}
 				}
 
 				break
