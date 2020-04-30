@@ -257,11 +257,12 @@ func (server *Server) Start() error {
 	stackHandler.ExtensionService = server.ExtensionService
 
 	var tagHandler = tags.NewHandler(requestBouncer)
+	tagHandler.EdgeGroupService = server.EdgeGroupService
+	tagHandler.EdgeStackService = server.EdgeStackService
 	tagHandler.EndpointService = server.EndpointService
 	tagHandler.EndpointGroupService = server.EndpointGroupService
+	tagHandler.EndpointRelationService = server.EndpointRelationService
 	tagHandler.TagService = server.TagService
-	tagHandler.EndpointService = server.EndpointService
-	tagHandler.EndpointGroupService = server.EndpointGroupService
 
 	var teamHandler = teams.NewHandler(requestBouncer)
 	teamHandler.TeamService = server.TeamService
