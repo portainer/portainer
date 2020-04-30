@@ -51,9 +51,11 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 	}
 
 	if payload.TagIDs != nil {
-		removeTags := portainer.TagDifference(endpointGroup.TagIDs, payload.TagIDs)
+		payloadTagSet := portainer.TagSet(payload.TagIDs)
+		endpointGroupTagSet := portainer.TagSet((endpointGroup.TagIDs))
+		removeTags := portainer.TagDifference(endpointGroupTagSet, payloadTagSet)
 
-		for _, tagID := range removeTags {
+		for tagID := range removeTags {
 			tag, err := handler.TagService.Tag(tagID)
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a tag inside the database", err}

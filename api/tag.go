@@ -58,22 +58,16 @@ func TagContains(setA tagSet, setB tagSet) bool {
 }
 
 // TagDifference returns the set difference tagsA - tagsB
-func TagDifference(tagsA []TagID, tagsB []TagID) []TagID {
-	tagsNotInB := []TagID{}
+func TagDifference(setA tagSet, setB tagSet) tagSet {
+	set := tagSet{}
 
-	for _, tagAID := range tagsA {
-		tagInB := false
-		for _, tagBID := range tagsB {
-			if tagBID == tagAID {
-				tagInB = true
-				break
-			}
-		}
-		if !tagInB {
-			tagsNotInB = append(tagsNotInB, tagAID)
+	for tag := range setA {
+		if !setB[tag] {
+			set[tag] = true
 		}
 	}
-	return tagsNotInB
+
+	return set
 }
 
 // EndpointsTagSet creates a map between EndpointIDs to their associated tags
