@@ -8,6 +8,10 @@ func EdgeGroupRelatedEndpoints(edgeGroup EdgeGroup, endpoints []Endpoint, endpoi
 
 	endpointIDs := []EndpointID{}
 	for _, endpoint := range endpoints {
+		if endpoint.Type != EdgeAgentEnvironment {
+			continue
+		}
+
 		var endpointGroup EndpointGroup
 		for _, group := range endpointGroups {
 			if endpoint.GroupID == group.ID {
