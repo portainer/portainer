@@ -3,7 +3,7 @@ import _ from 'lodash-es';
 
 class EdgeGroupFormController {
   /* @ngInject */
-  constructor(EndpointService, $async) {
+  constructor(EndpointService, $async, $scope) {
     this.EndpointService = EndpointService;
     this.$async = $async;
 
@@ -31,6 +31,14 @@ class EdgeGroupFormController {
     this.dissociateEndpoint = this.dissociateEndpoint.bind(this);
     this.getPaginatedEndpointsAsync = this.getPaginatedEndpointsAsync.bind(this);
     this.getPaginatedEndpoints = this.getPaginatedEndpoints.bind(this);
+
+    $scope.$watch(
+      () => this.model,
+      () => {
+        this.getPaginatedEndpoints(this.pageType, 'associated');
+      },
+      true
+    );
   }
 
   associateEndpoint(endpoint) {
@@ -56,7 +64,12 @@ class EdgeGroupFormController {
     const start = (pageNumber - 1) * limit + 1;
     const query = { search, type: 4 };
     if (tableType === 'associated') {
-      query.endpointIds = this.model.Endpoints;
+      if (this.model.Dynamic) {
+        query.tagIds = this.model.TagIds;
+        query.tagsPartialMatch = this.model.PartialMatch;
+      } else {
+        query.endpointIds = this.model.Endpoints;
+      }
     }
     const response = await this.EndpointService.endpoints(start, limit, query);
     const totalCount = parseInt(response.totalCount, 10);
