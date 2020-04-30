@@ -205,6 +205,10 @@ func convertTagIDsToTags(tagsMap map[portainer.TagID]string, tagIDs []portainer.
 func filteredEndpointsByTags(endpoints []portainer.Endpoint, tagIDs []portainer.TagID, endpointGroups []portainer.EndpointGroup) []portainer.Endpoint {
 	filteredEndpoints := make([]portainer.Endpoint, 0)
 
+	if len(tagIDs) == 0 {
+		return filteredEndpoints
+	}
+
 	for _, endpoint := range endpoints {
 		missingTags := make(map[portainer.TagID]bool)
 		for _, tagID := range tagIDs {
