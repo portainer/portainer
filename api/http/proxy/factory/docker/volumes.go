@@ -3,7 +3,6 @@ package docker
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/docker/docker/client"
@@ -98,7 +97,6 @@ func (transport *Transport) decorateVolumeResourceCreationOperation(request *htt
 	}
 
 	volumeID := request.Header.Get("X-Portainer-VolumeName")
-	fmt.Println(volumeID)
 
 	if volumeID != "" {
 		cli := transport.dockerClient
@@ -114,7 +112,7 @@ func (transport *Transport) decorateVolumeResourceCreationOperation(request *htt
 
 		_, err = cli.VolumeInspect(context.Background(), volumeID)
 		if err == nil {
-			return nil, errors.New("Creation error: volume already exists")
+			return nil, errors.New("a volume with the same name already exists")
 		}
 	}
 
