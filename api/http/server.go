@@ -154,6 +154,8 @@ func (server *Server) Start() error {
 	edgeGroupsHandler.EdgeGroupService = server.EdgeGroupService
 	edgeGroupsHandler.EdgeStackService = server.EdgeStackService
 	edgeGroupsHandler.EndpointService = server.EndpointService
+	edgeGroupsHandler.EndpointGroupService = server.EndpointGroupService
+	edgeGroupsHandler.EndpointRelationService = server.EndpointRelationService
 	edgeGroupsHandler.TagService = server.TagService
 
 	var edgeStacksHandler = edgestacks.NewHandler(requestBouncer)
