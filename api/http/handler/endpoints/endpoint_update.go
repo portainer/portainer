@@ -69,37 +69,49 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		endpoint.PublicURL = *payload.PublicURL
 	}
 
+	groupIDChanged := false
 	if payload.GroupID != nil {
-		endpoint.GroupID = portainer.EndpointGroupID(*payload.GroupID)
+		groupID := portainer.EndpointGroupID(*payload.GroupID)
+		groupIDChanged = groupID != endpoint.GroupID
+		endpoint.GroupID = groupID
 	}
 
+	tagsChanged := false
 	if payload.TagIDs != nil {
-		removeTags := portainer.TagDifference(endpoint.TagIDs, payload.TagIDs)
+		payloadTagSet := portainer.TagSet(payload.TagIDs)
+		endpointTagSet := portainer.TagSet((endpoint.TagIDs))
+		union := portainer.TagUnion(payloadTagSet, endpointTagSet)
+		intersection := portainer.TagIntersection(payloadTagSet, endpointTagSet)
+		tagsChanged = len(union) > len(intersection)
 
-		for _, tagID := range removeTags {
-			tag, err := handler.TagService.Tag(tagID)
-			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a tag inside the database", err}
+		if tagsChanged {
+			removeTags := portainer.TagDifference(endpoint.TagIDs, payload.TagIDs)
+
+			for _, tagID := range removeTags {
+				tag, err := handler.TagService.Tag(tagID)
+				if err != nil {
+					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a tag inside the database", err}
+				}
+				delete(tag.Endpoints, endpoint.ID)
+				err = handler.TagService.UpdateTag(tag.ID, tag)
+				if err != nil {
+					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist tag changes inside the database", err}
+				}
 			}
-			delete(tag.Endpoints, endpoint.ID)
-			err = handler.TagService.UpdateTag(tag.ID, tag)
-			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist tag changes inside the database", err}
-			}
-		}
 
-		endpoint.TagIDs = payload.TagIDs
-		for _, tagID := range payload.TagIDs {
-			tag, err := handler.TagService.Tag(tagID)
-			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a tag inside the database", err}
-			}
+			endpoint.TagIDs = payload.TagIDs
+			for _, tagID := range payload.TagIDs {
+				tag, err := handler.TagService.Tag(tagID)
+				if err != nil {
+					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a tag inside the database", err}
+				}
 
-			tag.Endpoints[endpoint.ID] = true
+				tag.Endpoints[endpoint.ID] = true
 
-			err = handler.TagService.UpdateTag(tag.ID, tag)
-			if err != nil {
-				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist tag changes inside the database", err}
+				err = handler.TagService.UpdateTag(tag.ID, tag)
+				if err != nil {
+					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist tag changes inside the database", err}
+				}
 			}
 		}
 	}
@@ -211,7 +223,7 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
-	if endpoint.Type == portainer.EdgeAgentEnvironment {
+	if endpoint.Type == portainer.EdgeAgentEnvironment && (groupIDChanged || tagsChanged) {
 		relation, err := handler.EndpointRelationService.EndpointRelation(endpoint.ID)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find endpoint relation inside the database", err}
