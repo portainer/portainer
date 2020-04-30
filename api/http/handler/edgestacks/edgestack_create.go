@@ -42,7 +42,7 @@ func (handler *Handler) edgeStackCreate(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge groups from database", err}
 	}
 
-	relatedEndpoints, err := portainer.EdgeStackRelatedEndpoints(*edgeStack, endpoints, endpointGroups, edgeGroups)
+	relatedEndpoints, err := portainer.EdgeStackRelatedEndpoints(edgeStack.EdgeGroups, endpoints, endpointGroups, edgeGroups)
 
 	for _, endpointID := range relatedEndpoints {
 		relation, err := handler.EndpointRelationService.EndpointRelation(endpointID)

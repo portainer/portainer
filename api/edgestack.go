@@ -3,10 +3,10 @@ package portainer
 import "errors"
 
 // EdgeStackRelatedEndpoints returns a list of endpoints related to this Edge stack
-func EdgeStackRelatedEndpoints(edgeStack EdgeStack, endpoints []Endpoint, endpointGroups []EndpointGroup, edgeGroups []EdgeGroup) ([]EndpointID, error) {
+func EdgeStackRelatedEndpoints(edgeGroupIDs []EdgeGroupID, endpoints []Endpoint, endpointGroups []EndpointGroup, edgeGroups []EdgeGroup) ([]EndpointID, error) {
 	edgeStackEndpoints := []EndpointID{}
 
-	for _, edgeGroupID := range edgeStack.EdgeGroups {
+	for _, edgeGroupID := range edgeGroupIDs {
 		var edgeGroup *EdgeGroup
 
 		for _, group := range edgeGroups {
