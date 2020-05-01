@@ -55,6 +55,9 @@ type (
 		Team            TeamTelemetryData            `json:"Team"`
 		User            UserTelemetryData            `json:"User"`
 		Webhook         WebhookTelemetryData         `json:"Webhook"`
+
+		// TODO: Timestamp only for test purposes
+		Timestamp int64 `json:"Timestamp"`
 	}
 
 	DockerHubTelemetryData struct {
@@ -73,6 +76,21 @@ type (
 	EndpointTelemetryData struct {
 		Count     int                                `json:"Count"`
 		Endpoints []EndpointEnvironmentTelemetryData `json:"Endpoints"`
+
+		// TODO: revamp
+		//TLSEndpointCount      int `json:"TLSEndpointCount"`
+		//AgentEndpointCount    int `json:"AgentEndpointCount"`
+		//EdgeEndpointCount     int `json:"EdgeEndpointCount"`
+		//StandardEndpointCount int `json:"StandardEndpointCount"` // aka unsecured
+		//
+		//DockerEndpoints int      `json:"DockerEndpoints"`
+		//SwarmEndpoints  int      `json:"SwarmEndpoints"`
+		//DockerVersions  []string `json:"DockerVersions"`
+		//
+		//KubernetesEndpoints int      `json:"KubernetesEndpoints"`
+		//KubernetesVersions  []string `json:"KubernetesVersions"`
+
+		// TODO: cluster node count
 	}
 
 	EndpointEnvironmentTelemetryData struct {
@@ -104,8 +122,15 @@ type (
 	}
 
 	RegistryTelemetryData struct {
-		Count      int                                  `json:"Count"`
+		Count int `json:"Count"`
+
 		Registries []RegistryConfigurationTelemetryData `json:"Registries"`
+
+		// TODO: revamp
+		//QuayRegistryCount   int `json:"QuayRegistryCount"`
+		//AzureRegistryCount  int `json:"AzureRegistryCount"`
+		//GitlabRegistryCount int `json:"GitlabRegistryCount"`
+		//CustomRegistryCount int `json:"CustomRegistryCount"`
 	}
 
 	RegistryConfigurationTelemetryData struct {
