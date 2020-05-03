@@ -147,6 +147,25 @@
         No tags available. Head over to the <a ui-sref="portainer.tags">Tags view</a> to add tags
       </div>
     </div>
+    <div class="col-sm-12 form-section-title">
+      Associated endpoints by tags
+    </div>
+    <div class="col-sm-12 form-group">
+      <group-association-table
+        loaded="$ctrl.loaded"
+        page-type="$ctrl.pageType"
+        table-type="associated"
+        retrieve-page="$ctrl.getPaginatedEndpoints"
+        dataset="$ctrl.endpoints.associated"
+        pagination-state="$ctrl.state.associated"
+        empty-dataset-message="No endpoint available"
+        tags="$ctrl.tags"
+        show-tags="true"
+        groups="$ctrl.groups"
+        show-groups="true"
+        has-backend-pagination="true"
+      ></group-association-table>
+    </div>
   </div>
   <!-- !DynamicGroup -->
 
