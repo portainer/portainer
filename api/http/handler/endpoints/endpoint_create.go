@@ -167,7 +167,7 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if endpoint.Type == portainer.EdgeAgentEnvironment {
-		relatedEdgeStacks := portainer.EndpointRelatedEdgeStacks(*endpoint, *endpointGroup, edgeGroups, edgeStacks)
+		relatedEdgeStacks := portainer.EndpointRelatedEdgeStacks(endpoint, endpointGroup, edgeGroups, edgeStacks)
 		for _, stackID := range relatedEdgeStacks {
 			relationObject.EdgeStacks[stackID] = true
 		}

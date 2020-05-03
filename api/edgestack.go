@@ -20,7 +20,7 @@ func EdgeStackRelatedEndpoints(edgeGroupIDs []EdgeGroupID, endpoints []Endpoint,
 			return nil, errors.New("Edge group was not found")
 		}
 
-		edgeStackEndpoints = append(edgeStackEndpoints, EdgeGroupRelatedEndpoints(*edgeGroup, endpoints, endpointGroups)...)
+		edgeStackEndpoints = append(edgeStackEndpoints, EdgeGroupRelatedEndpoints(edgeGroup, endpoints, endpointGroups)...)
 	}
 
 	return edgeStackEndpoints, nil

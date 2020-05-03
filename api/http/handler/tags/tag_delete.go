@@ -99,7 +99,7 @@ func (handler *Handler) updateEndpointRelations(endpoint portainer.Endpoint, edg
 		return err
 	}
 
-	endpointStacks := portainer.EndpointRelatedEdgeStacks(endpoint, *endpointGroup, edgeGroups, edgeStacks)
+	endpointStacks := portainer.EndpointRelatedEdgeStacks(&endpoint, endpointGroup, edgeGroups, edgeStacks)
 	stacksSet := map[portainer.EdgeStackID]bool{}
 	for _, edgeStackID := range endpointStacks {
 		stacksSet[edgeStackID] = true

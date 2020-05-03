@@ -1,7 +1,7 @@
 package portainer
 
 // EdgeGroupRelatedEndpoints returns a list of endpoints related to this Edge group
-func EdgeGroupRelatedEndpoints(edgeGroup EdgeGroup, endpoints []Endpoint, endpointGroups []EndpointGroup) []EndpointID {
+func EdgeGroupRelatedEndpoints(edgeGroup *EdgeGroup, endpoints []Endpoint, endpointGroups []EndpointGroup) []EndpointID {
 	if !edgeGroup.Dynamic {
 		return edgeGroup.Endpoints
 	}
@@ -20,7 +20,7 @@ func EdgeGroupRelatedEndpoints(edgeGroup EdgeGroup, endpoints []Endpoint, endpoi
 			}
 		}
 
-		if edgeGroupRelatedToEndpoint(edgeGroup, endpoint, endpointGroup) {
+		if edgeGroupRelatedToEndpoint(edgeGroup, &endpoint, &endpointGroup) {
 			endpointIDs = append(endpointIDs, endpoint.ID)
 		}
 	}
@@ -29,7 +29,7 @@ func EdgeGroupRelatedEndpoints(edgeGroup EdgeGroup, endpoints []Endpoint, endpoi
 }
 
 // edgeGroupRelatedToEndpoint returns true is edgeGroup is associated with endpoint
-func edgeGroupRelatedToEndpoint(edgeGroup EdgeGroup, endpoint Endpoint, endpointGroup EndpointGroup) bool {
+func edgeGroupRelatedToEndpoint(edgeGroup *EdgeGroup, endpoint *Endpoint, endpointGroup *EndpointGroup) bool {
 	if !edgeGroup.Dynamic {
 		for _, endpointID := range edgeGroup.Endpoints {
 			if endpoint.ID == endpointID {
