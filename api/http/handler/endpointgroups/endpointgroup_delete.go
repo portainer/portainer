@@ -47,12 +47,7 @@ func (handler *Handler) endpointGroupDelete(w http.ResponseWriter, r *http.Reque
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint", err}
 			}
 
-			unassignedGroup, err := handler.EndpointGroupService.EndpointGroup(portainer.EndpointGroupID(1))
-			if err != nil {
-				return &httperror.HandlerError{http.StatusNotFound, "Unable to find unassigned group inside the database", err}
-			}
-
-			err = handler.updateEndpointRelations(endpoint, *unassignedGroup)
+			err = handler.updateEndpointRelations(&endpoint, nil)
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint relations changes inside the database", err}
 			}

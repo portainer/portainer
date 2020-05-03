@@ -122,7 +122,7 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 
 		for _, endpoint := range endpoints {
 			if endpoint.GroupID == endpointGroup.ID {
-				err = handler.updateEndpointRelations(endpoint, *endpointGroup)
+				err = handler.updateEndpointRelations(&endpoint, endpointGroup)
 				if err != nil {
 					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint relations changes inside the database", err}
 				}
