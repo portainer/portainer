@@ -63,6 +63,11 @@ func (handler *Handler) endpointGroupCreate(w http.ResponseWriter, r *http.Reque
 					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint", err}
 				}
 
+				err = handler.updateEndpointRelations(&endpoint, endpointGroup)
+				if err != nil {
+					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint relations changes inside the database", err}
+				}
+
 				break
 			}
 		}

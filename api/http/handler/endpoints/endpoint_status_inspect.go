@@ -9,12 +9,18 @@ import (
 	"github.com/portainer/portainer/api"
 )
 
+type stackStatusResponse struct {
+	ID      portainer.EdgeStackID
+	Version int
+}
+
 type endpointStatusInspectResponse struct {
 	Status          string                   `json:"status"`
 	Port            int                      `json:"port"`
 	Schedules       []portainer.EdgeSchedule `json:"schedules"`
 	CheckinInterval int                      `json:"checkin"`
 	Credentials     string                   `json:"credentials"`
+	Stacks          []stackStatusResponse    `json:"stacks"`
 }
 
 // GET request on /api/endpoints/:id/status
@@ -65,6 +71,28 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 	if tunnel.Status == portainer.EdgeAgentManagementRequired {
 		handler.ReverseTunnelService.SetTunnelStatusToActive(endpoint.ID)
 	}
+
+	relation, err := handler.EndpointRelationService.EndpointRelation(endpoint.ID)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve relation object from the database", err}
+	}
+
+	edgeStacksStatus := []stackStatusResponse{}
+	for stackID := range relation.EdgeStacks {
+		stack, err := handler.EdgeStackService.EdgeStack(stackID)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge stack from the database", err}
+		}
+
+		stackStatus := stackStatusResponse{
+			ID:      stack.ID,
+			Version: stack.Version,
+		}
+
+		edgeStacksStatus = append(edgeStacksStatus, stackStatus)
+	}
+
+	statusResponse.Stacks = edgeStacksStatus
 
 	return response.JSON(w, statusResponse)
 }

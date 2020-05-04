@@ -30,8 +30,11 @@ type Handler struct {
 	authorizeEndpointManagement bool
 	requestBouncer              *security.RequestBouncer
 	AuthorizationService        *portainer.AuthorizationService
+	EdgeGroupService            portainer.EdgeGroupService
+	EdgeStackService            portainer.EdgeStackService
 	EndpointService             portainer.EndpointService
 	EndpointGroupService        portainer.EndpointGroupService
+	EndpointRelationService     portainer.EndpointRelationService
 	FileService                 portainer.FileService
 	JobService                  portainer.JobService
 	ProxyManager                *proxy.Manager

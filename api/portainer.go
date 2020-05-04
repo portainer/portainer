@@ -215,6 +215,12 @@ type (
 	// EndpointType represents the type of an endpoint
 	EndpointType int
 
+	// EndpointRelation represnts a endpoint relation object
+	EndpointRelation struct {
+		EndpointID EndpointID
+		EdgeStacks map[EdgeStackID]bool
+	}
+
 	// Extension represents a Portainer extension
 	Extension struct {
 		ID               ExtensionID        `json:"Id"`
@@ -725,6 +731,14 @@ type (
 		CreateEndpointGroup(group *EndpointGroup) error
 		UpdateEndpointGroup(ID EndpointGroupID, group *EndpointGroup) error
 		DeleteEndpointGroup(ID EndpointGroupID) error
+	}
+
+	// EndpointRelationService represents a service for managing endpoint relations data
+	EndpointRelationService interface {
+		EndpointRelation(EndpointID EndpointID) (*EndpointRelation, error)
+		CreateEndpointRelation(endpointRelation *EndpointRelation) error
+		UpdateEndpointRelation(EndpointID EndpointID, endpointRelation *EndpointRelation) error
+		DeleteEndpointRelation(EndpointID EndpointID) error
 	}
 
 	// ExtensionManager represents a service used to manage extensions

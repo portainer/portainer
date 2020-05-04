@@ -46,6 +46,11 @@ func (handler *Handler) endpointGroupDelete(w http.ResponseWriter, r *http.Reque
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint", err}
 			}
+
+			err = handler.updateEndpointRelations(&endpoint, nil)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint relations changes inside the database", err}
+			}
 		}
 	}
 
