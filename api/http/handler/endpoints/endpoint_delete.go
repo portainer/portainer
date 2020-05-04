@@ -50,5 +50,10 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
+	err = handler.EndpointRelationService.DeleteEndpointRelation(endpoint.ID)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove endpoint relation from the database", err}
+	}
+
 	return response.Empty(w)
 }

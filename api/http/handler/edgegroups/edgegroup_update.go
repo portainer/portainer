@@ -63,6 +63,17 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 
 		edgeGroup.Name = payload.Name
 	}
+	endpoints, err := handler.EndpointService.Endpoints()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from database", err}
+	}
+
+	endpointGroups, err := handler.EndpointGroupService.EndpointGroups()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint groups from database", err}
+	}
+
+	oldRelatedEndpoints := portainer.EdgeGroupRelatedEndpoints(edgeGroup, endpoints, endpointGroups)
 
 	edgeGroup.Dynamic = payload.Dynamic
 	if edgeGroup.Dynamic {
@@ -92,5 +103,53 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Edge group changes inside the database", err}
 	}
 
+	newRelatedEndpoints := portainer.EdgeGroupRelatedEndpoints(edgeGroup, endpoints, endpointGroups)
+	endpointsToUpdate := append(newRelatedEndpoints, oldRelatedEndpoints...)
+
+	for _, endpointID := range endpointsToUpdate {
+		err = handler.updateEndpoint(endpointID)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Endpoint relation changes inside the database", err}
+		}
+	}
+
 	return response.JSON(w, edgeGroup)
+}
+
+func (handler *Handler) updateEndpoint(endpointID portainer.EndpointID) error {
+	relation, err := handler.EndpointRelationService.EndpointRelation(endpointID)
+	if err != nil {
+		return err
+	}
+
+	endpoint, err := handler.EndpointService.Endpoint(endpointID)
+	if err != nil {
+		return err
+	}
+
+	endpointGroup, err := handler.EndpointGroupService.EndpointGroup(endpoint.GroupID)
+	if err != nil {
+		return err
+	}
+
+	edgeGroups, err := handler.EdgeGroupService.EdgeGroups()
+	if err != nil {
+		return err
+	}
+
+	edgeStacks, err := handler.EdgeStackService.EdgeStacks()
+	if err != nil {
+		return err
+	}
+
+	edgeStackSet := map[portainer.EdgeStackID]bool{}
+
+	endpointEdgeStacks := portainer.EndpointRelatedEdgeStacks(endpoint, endpointGroup, edgeGroups, edgeStacks)
+	for _, edgeStackID := range endpointEdgeStacks {
+		edgeStackSet[edgeStackID] = true
+	}
+
+	relation.EdgeStacks = edgeStackSet
+
+	return handler.EndpointRelationService.UpdateEndpointRelation(endpoint.ID, relation)
 }

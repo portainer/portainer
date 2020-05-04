@@ -56,12 +56,57 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 		}
 	}
 
+	endpoints, err := handler.EndpointService.Endpoints()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
+	}
+
+	edgeGroups, err := handler.EdgeGroupService.EdgeGroups()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge groups from the database", err}
+	}
+
+	edgeStacks, err := handler.EdgeStackService.EdgeStacks()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge stacks from the database", err}
+	}
+
+	for _, endpoint := range endpoints {
+		if (tag.Endpoints[endpoint.ID] || tag.EndpointGroups[endpoint.GroupID]) && endpoint.Type == portainer.EdgeAgentEnvironment {
+			err = handler.updateEndpointRelations(endpoint, edgeGroups, edgeStacks)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint relations in the database", err}
+			}
+		}
+	}
+
 	err = handler.TagService.DeleteTag(tagID)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the tag from the database", err}
 	}
 
 	return response.Empty(w)
+}
+
+func (handler *Handler) updateEndpointRelations(endpoint portainer.Endpoint, edgeGroups []portainer.EdgeGroup, edgeStacks []portainer.EdgeStack) error {
+	endpointRelation, err := handler.EndpointRelationService.EndpointRelation(endpoint.ID)
+	if err != nil {
+		return err
+	}
+
+	endpointGroup, err := handler.EndpointGroupService.EndpointGroup(endpoint.GroupID)
+	if err != nil {
+		return err
+	}
+
+	endpointStacks := portainer.EndpointRelatedEdgeStacks(&endpoint, endpointGroup, edgeGroups, edgeStacks)
+	stacksSet := map[portainer.EdgeStackID]bool{}
+	for _, edgeStackID := range endpointStacks {
+		stacksSet[edgeStackID] = true
+	}
+	endpointRelation.EdgeStacks = stacksSet
+
+	return handler.EndpointRelationService.UpdateEndpointRelation(endpoint.ID, endpointRelation)
 }
 
 func findTagIndex(tags []portainer.TagID, searchTagID portainer.TagID) int {
