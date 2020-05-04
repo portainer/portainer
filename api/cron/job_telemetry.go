@@ -74,8 +74,10 @@ type (
 	}
 
 	EndpointTelemetryData struct {
-		Count     int                                `json:"Count"`
-		Endpoints []EndpointEnvironmentTelemetryData `json:"Endpoints"`
+		Count                   int                                `json:"Count"`
+		DockerEndpointCount     int                                `json:"DockerEndpointCount"`
+		KubernetesEndpointCount int                                `json:"KubernetesEndpointCount"`
+		Endpoints               []EndpointEnvironmentTelemetryData `json:"Endpoints"`
 
 		// TODO: revamp
 		//TLSEndpointCount      int `json:"TLSEndpointCount"`
@@ -351,6 +353,7 @@ func computeEndpointTelemetry(telemetryData *TelemetryData, dataStore portainer.
 	}
 
 	endpointsTelemetry := make([]EndpointEnvironmentTelemetryData, 0)
+	dockerEndpoints, kubernetesEndpoints := 0, 0
 	for _, endpoint := range endpoints {
 		endpointTelemetry := EndpointEnvironmentTelemetryData{}
 
@@ -360,24 +363,31 @@ func computeEndpointTelemetry(telemetryData *TelemetryData, dataStore portainer.
 			endpointTelemetry.Agent = false
 			endpointTelemetry.Edge = false
 			endpointTelemetry.Docker = computeEndpointEnvironmentDockerTelemetry(&endpoint)
+			dockerEndpoints++
 		case portainer.AgentOnDockerEnvironment:
 			endpointTelemetry.Environment = EndpointEnvironmentDocker
 			endpointTelemetry.Agent = true
 			endpointTelemetry.Edge = false
 			endpointTelemetry.Docker = computeEndpointEnvironmentDockerTelemetry(&endpoint)
+			dockerEndpoints++
 		case portainer.EdgeAgentEnvironment:
 			endpointTelemetry.Environment = EndpointEnvironmentDocker
 			endpointTelemetry.Agent = true
 			endpointTelemetry.Edge = true
 			endpointTelemetry.Docker = computeEndpointEnvironmentDockerTelemetry(&endpoint)
+			dockerEndpoints++
+		default:
+			kubernetesEndpoints++
 		}
 
 		endpointsTelemetry = append(endpointsTelemetry, endpointTelemetry)
 	}
 
 	telemetryData.Endpoint = EndpointTelemetryData{
-		Count:     len(endpoints),
-		Endpoints: endpointsTelemetry,
+		Count:                   len(endpoints),
+		DockerEndpointCount:     dockerEndpoints,
+		KubernetesEndpointCount: kubernetesEndpoints,
+		Endpoints:               endpointsTelemetry,
 	}
 
 	return nil

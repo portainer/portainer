@@ -13,13 +13,13 @@ import (
 )
 
 // max number of instances
-const instanceCount = 3000
+const instanceCount = 1500
 
 // min date for initial report
-var minInitialReportDate = time.Date(2020, 1, 0, 0, 0, 0, 0, time.UTC).Unix()
+var minInitialReportDate = time.Date(2020, 3, 0, 0, 0, 0, 0, time.UTC).Unix()
 
 // max date for initial report
-var maxInitialReportDate = time.Date(2020, 5, 0, 0, 0, 0, 0, time.UTC).Unix()
+var maxInitialReportDate = time.Date(2020, 4, 0, 0, 0, 0, 0, time.UTC).Unix()
 
 // edge compute
 const edgeComputeMaxScheduleCount = 10
@@ -149,7 +149,7 @@ func TestGenerator(t *testing.T) {
 
 		instanceID := token.String()
 
-		reportsPerInstance := rand.Intn(12) + 1
+		reportsPerInstance := rand.Intn(30) + 1
 		log.Printf("Instance %s (#%d): generating %d reports", instanceID, i, reportsPerInstance)
 
 		reportDateTime := utilsRandDateTime(minInitialReportDate, maxInitialReportDate)
@@ -174,7 +174,7 @@ func TestGenerator(t *testing.T) {
 				t.Fatalf("an error occured: %s", err)
 			}
 
-			reportDateTime = reportDateTime.AddDate(0, 0, 7)
+			reportDateTime = reportDateTime.AddDate(0, 0, 1)
 		}
 	}
 }
@@ -246,23 +246,35 @@ func randomEndpointTelemetryData() EndpointTelemetryData {
 	endpointCount := rand.Intn(endpointMaxCount)
 
 	endpoints := make([]EndpointEnvironmentTelemetryData, 0)
+	dockerEndpoints, KubernetesEndpoints := 0, 0
 	for i := 0; i < endpointCount; i++ {
-		endpointEnvTelemetry := randomEndpointEnvironmentTelemetryData()
+		endpointEnvTelemetry, dockerEnv := randomEndpointEnvironmentTelemetryData()
+
+		if dockerEnv {
+			dockerEndpoints++
+		} else {
+			KubernetesEndpoints++
+		}
+
 		endpoints = append(endpoints, endpointEnvTelemetry)
 	}
 
 	return EndpointTelemetryData{
-		Count:     endpointCount,
-		Endpoints: endpoints,
+		Count:                   endpointCount,
+		Endpoints:               endpoints,
+		DockerEndpointCount:     dockerEndpoints,
+		KubernetesEndpointCount: KubernetesEndpoints,
 	}
 }
 
-func randomEndpointEnvironmentTelemetryData() EndpointEnvironmentTelemetryData {
+func randomEndpointEnvironmentTelemetryData() (EndpointEnvironmentTelemetryData, bool) {
 	endpointEnvTelemetry := EndpointEnvironmentTelemetryData{
 		Environment: EndpointEnvironmentDocker,
 		Agent:       utilsRandBool(),
 		Edge:        false,
 	}
+
+	dockerEnvironment := true
 
 	if utilsRandBool() {
 		endpointEnvTelemetry.Environment = EndpointEnvironmentKubernetes
@@ -291,13 +303,14 @@ func randomEndpointEnvironmentTelemetryData() EndpointEnvironmentTelemetryData {
 		}
 
 	} else {
+		dockerEnvironment = false
 		endpointEnvTelemetry.Kubernetes = EndpointEnvironmentKubernetesTelemetryData{
 			Version: utilsRandChoice(kubernetesVersions),
 			Nodes:   rand.Intn(kubernetesNodeMaxCount) + 1,
 		}
 	}
 
-	return endpointEnvTelemetry
+	return endpointEnvTelemetry, dockerEnvironment
 }
 
 func randomEndpointGroupTelemetryData() EndpointGroupTelemetryData {
