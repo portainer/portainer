@@ -48,6 +48,18 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
+	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(*payload.EndpointID))
+	if err == portainer.ErrObjectNotFound {
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
+	} else if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
+	}
+
+	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
+	}
+
 	stack.Status[*payload.EndpointID] = portainer.EdgeStackStatus{
 		Type:       *payload.Status,
 		Error:      payload.Error,
