@@ -106,7 +106,7 @@
                   {{ item.Name }}
                 </a>
               </td>
-              <td><edge-stack-status status="item.Status"></edge-stack-status></td>
+              <td><edge-stack-status stack-status="item.Status"></edge-stack-status></td>
               <td>{{ item.CreationDate | getisodatefromtimestamp }}</td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
