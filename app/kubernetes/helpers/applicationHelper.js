@@ -1,18 +1,18 @@
 import _ from 'lodash-es';
-import { KubernetesPortMappingPort, KubernetesPortMapping } from 'Kubernetes/models/port/models';
-import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
+import {KubernetesPortMapping, KubernetesPortMappingPort} from 'Kubernetes/models/port/models';
+import {KubernetesServiceTypes} from 'Kubernetes/models/service/models';
 import KubernetesPodConverter from 'Kubernetes/converters/pod';
-import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
-import { KubernetesApplicationConfigurationFormValueOverridenKeyTypes } from 'Kubernetes/models/application/formValues';
+import {KubernetesConfigurationTypes} from 'Kubernetes/models/configuration/models';
+import {KubernetesApplicationConfigurationFormValueOverridenKeyTypes} from 'Kubernetes/models/application/formValues';
 import {
+  KubernetesApplicationEnvConfigMapPayload,
   KubernetesApplicationEnvPayload,
+  KubernetesApplicationEnvSecretPayload,
+  KubernetesApplicationVolumeConfigMapPayload,
+  KubernetesApplicationVolumeEntryPayload,
   KubernetesApplicationVolumeMountPayload,
   KubernetesApplicationVolumePersistentPayload,
-  KubernetesApplicationVolumeConfigMapPayload,
-  KubernetesApplicationVolumeSecretPayload,
-  KubernetesApplicationEnvSecretPayload,
-  KubernetesApplicationEnvConfigMapPayload,
-  KubernetesApplicationVolumeEntryPayload
+  KubernetesApplicationVolumeSecretPayload
 } from 'Kubernetes/models/application/payloads';
 
 class KubernetesApplicationHelper {
@@ -181,6 +181,10 @@ class KubernetesApplicationHelper {
       app.Volumes.push(volume);
     });
     return app;
+  }
+
+  static isExternalApplication(application) {
+    return !application.ApplicationOwner;
   }
 
 }

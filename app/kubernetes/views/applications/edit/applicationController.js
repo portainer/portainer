@@ -1,11 +1,12 @@
 import angular from 'angular';
 import _ from 'lodash-es';
-import { KubernetesApplicationDeploymentTypes } from 'Kubernetes/models/application/models';
+import {KubernetesApplicationDeploymentTypes} from 'Kubernetes/models/application/models';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
+import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 
 class KubernetesApplicationController {
   /* @ngInject */
-  constructor($async, $state, clipboard, Notifications, KubernetesApplicationService, KubernetesEventService, KubernetesStackService) {
+  constructor($async, $state, clipboard, Notifications, KubernetesApplicationService, KubernetesEventService, KubernetesStackService, KubernetesNamespaceHelper) {
     this.$async = $async;
     this.$state = $state;
     this.clipboard = clipboard;
@@ -13,6 +14,7 @@ class KubernetesApplicationController {
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesEventService = KubernetesEventService;
     this.KubernetesStackService = KubernetesStackService;
+    this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
 
     this.onInit = this.onInit.bind(this);
     this.getApplication = this.getApplication.bind(this);
@@ -26,6 +28,14 @@ class KubernetesApplicationController {
 
   showEditor() {
     this.state.showEditorTab = true;
+  }
+
+  isSystemNamespace() {
+    return this.KubernetesNamespaceHelper.isSystemNamespace(this.application.ResourcePool);
+  }
+
+  isExternalApplication() {
+    return KubernetesApplicationHelper.isExternalApplication(this.application);
   }
 
   resetApplicationStackName() {

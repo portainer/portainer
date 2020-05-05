@@ -1,4 +1,5 @@
-import { KubernetesApplicationDeploymentTypes } from 'Kubernetes/models/application/models';
+import {KubernetesApplicationDeploymentTypes} from 'Kubernetes/models/application/models';
+import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 
 angular.module('portainer.docker')
   .controller('KubernetesNodeApplicationsDatatableController', ['$scope', '$controller', 'KubernetesNamespaceHelper', 'DatatableService',
@@ -9,6 +10,10 @@ angular.module('portainer.docker')
       this.isSystemNamespace = function (item) {
         return KubernetesNamespaceHelper.isSystemNamespace(item.ResourcePool);
       };
+
+      this.isExternalApplication = function(item) {
+        return KubernetesApplicationHelper.isExternalApplication(item);
+      }
 
       this.$onInit = function () {
         this.KubernetesApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;

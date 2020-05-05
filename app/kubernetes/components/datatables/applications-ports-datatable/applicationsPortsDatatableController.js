@@ -1,5 +1,6 @@
 import _ from 'lodash-es';
 import {KubernetesApplicationDeploymentTypes} from 'Kubernetes/models/application/models';
+import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 
 angular.module('portainer.docker')
   .controller('KubernetesApplicationsPortsDatatableController', ['$scope', '$controller', 'KubernetesNamespaceHelper', 'DatatableService', 'Authentication',
@@ -20,6 +21,10 @@ angular.module('portainer.docker')
       this.onSettingsShowSystemChange = function() {
         DatatableService.setDataTableSettings(this.tableKey, this.settings);
       };
+
+      this.isExternalApplication = function(item) {
+        return KubernetesApplicationHelper.isExternalApplication(item);
+      }
 
       this.isSystemNamespace = function(item) {
         return KubernetesNamespaceHelper.isSystemNamespace(item.ResourcePool);

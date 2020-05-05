@@ -1,5 +1,6 @@
 import _ from 'lodash-es';
-import { KubernetesApplicationDeploymentTypes } from 'Kubernetes/models/application/models';
+import {KubernetesApplicationDeploymentTypes} from 'Kubernetes/models/application/models';
+import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 
 angular.module('portainer.docker')
   .controller('KubernetesApplicationsStacksDatatableController', ['$scope', '$controller', 'KubernetesNamespaceHelper', 'DatatableService', 'Authentication',
@@ -20,6 +21,10 @@ angular.module('portainer.docker')
       this.onSettingsRepeaterChange = function() {
         DatatableService.setDataTableSettings(this.tableKey, this.settings);
       };
+
+      this.isExternalApplication = function(item) {
+        return KubernetesApplicationHelper.isExternalApplication(item);
+      }
 
       /**
        * Do not allow applications in system namespaces to be selected

@@ -23,7 +23,10 @@
                   <tbody>
                     <tr>
                       <td>Name</td>
-                      <td>{{ ctrl.application.Name }}</td>
+                      <td>
+                          {{ ctrl.application.Name }}
+                        <span style="margin-left: 5px;" class="label label-primary image-tag" ng-if="ctrl.isExternalApplication(item)">external</span>
+                      </td>
                     </tr>
                     <tr>
                       <td>Stack</td>
@@ -54,6 +57,7 @@
                       <td>Resource pool</td>
                       <td>
                         <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.application.ResourcePool })">{{ ctrl.application.ResourcePool }}</a>
+                        <span style="margin-left: 5px;" class="label label-info image-tag" ng-if="ctrl.isSystemNamespace(item)">system</span>
                       </td>
                     </tr>
                     <tr>

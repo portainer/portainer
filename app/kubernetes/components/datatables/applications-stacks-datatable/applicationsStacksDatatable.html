@@ -133,6 +133,7 @@
             <tr dir-paginate-end ng-show="item.Expanded" ng-repeat="app in item.Applications" ng-style="{background: (item.Highlighted ? '#d5e8f3' : '#f5f5f5')}">
               <td colspan="5">
                 <a ui-sref="kubernetes.applications.application({ name: app.Name, namespace: app.ResourcePool })" style="margin-left: 25px;">{{ app.Name }}</a>
+                <span style="margin-left: 5px;" class="label label-primary image-tag" ng-if="!$ctrl.isSystemNamespace(app.ResourcePool) && $ctrl.isExternalApplication(app)">external</span>
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
