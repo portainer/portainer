@@ -29,7 +29,7 @@ class KubernetesPersistentVolumeClaimConverter {
       const pvc = new KubernetesPersistentVolumeClaim();
       pvc.Name = KubernetesApplicationHelper.generateApplicationVolumeName(formValues.Name, item.ContainerPath);
       pvc.Namespace = formValues.ResourcePool.Namespace.Name;
-      pvc.Storage = '' + item.Size + item.SizeUnit.charAt(0);
+      pvc.Storage = '' + item.Size + item.SizeUnit.charAt(0) + 'i';
       pvc.StorageClass = item.StorageClass;
       pvc.ApplicationOwner = formValues.ApplicationOwner;
       return pvc;
