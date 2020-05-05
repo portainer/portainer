@@ -89,6 +89,17 @@
                         </span>
                       </td>
                     </tr>
+                    <tr>
+                      <td colspan="2">
+                        <form class="form-horizontal" name="kubernetesApplicationNoteForm">
+                          <div>
+                            <i class="fa fa-edit" aria-hidden="true"></i> Note
+                          </div>
+                          <textarea style="margin-top: 5px;" class="form-control" name="application_note" id="application_note" ng-model="ctrl.formValues.Note" rows="5" placeholder="Enter a note about this application..."></textarea>
+                          <button class="btn btn-primary btn-sm" type="button" ng-click="ctrl.updateApplication()" ng-disabled="ctrl.formValues.Note === ctrl.application.Note" style="margin-top: 0.5rem; margin-left: 0;">{{ ctrl.application.Note ? 'Update' : 'Save' }} note</button>
+                        </form>
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
               </div>

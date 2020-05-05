@@ -64,6 +64,7 @@ class KubernetesApplicationController {
     try {
       const application = angular.copy(this.application);
       application.StackName = this.formValues.StackName;
+      application.Note = this.formValues.Note;
       await this.KubernetesApplicationService.patch(application);
       this.Notifications.success('Application successfully updated');
       this.$state.reload();
@@ -148,11 +149,13 @@ class KubernetesApplicationController {
     };
 
     this.formValues = {
-      StackName: ''
+      StackName: '',
+      Note: ''
     };
 
     this.KubernetesApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
     await this.getApplication();
+    this.formValues.Note = this.application.Note;
     await this.getEvents();
     await this.getStacks();
     this.state.viewReady = true;

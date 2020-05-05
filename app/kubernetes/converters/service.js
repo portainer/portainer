@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 import { KubernetesServiceCreatePayload, KubernetesServicePatchPayload } from 'Kubernetes/models/service/payloads';
-import { KubernetesPortainerApplicationStackNameLabel, KubernetesPortainerApplicationNameLabel, KubernetesPortainerApplicationOwnerLabel } from 'Kubernetes/models/application/models';
+import { KubernetesPortainerApplicationStackNameLabel, KubernetesPortainerApplicationNameLabel, KubernetesPortainerApplicationOwnerLabel, KubernetesPortainerApplicationNote } from 'Kubernetes/models/application/models';
 import { KubernetesServiceHeadlessClusterIP, KubernetesService, KubernetesServicePort, KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import { KubernetesApplicationPublishingTypes } from 'Kubernetes/models/application/models';
 import KubernetesServiceHelper from 'Kubernetes/helpers/serviceHelper';
@@ -68,6 +68,7 @@ class KubernetesServiceConverter {
     delete payload.metadata.name;
     delete payload.metadata.namespace;
     payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = service.StackName;
+    payload.metadata.annotations[KubernetesPortainerApplicationNote] = service.Note;
     return payload;
   }
 }

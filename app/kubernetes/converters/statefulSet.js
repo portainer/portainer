@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
 import {KubernetesStatefulSet} from 'Kubernetes/models/stateful-set/models';
 import {KubernetesStatefulSetCreatePayload, KubernetesStatefulSetPatchPayload} from 'Kubernetes/models/stateful-set/payloads';
-import {KubernetesPortainerApplicationStackNameLabel, KubernetesPortainerApplicationNameLabel, KubernetesPortainerApplicationOwnerLabel} from 'Kubernetes/models/application/models';
+import {KubernetesPortainerApplicationStackNameLabel, KubernetesPortainerApplicationNameLabel, KubernetesPortainerApplicationOwnerLabel, KubernetesPortainerApplicationNote } from 'Kubernetes/models/application/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 import KubernetesPersistentVolumeClaimConverter from './persistentVolumeClaim';
 
@@ -69,6 +69,7 @@ class KubernetesStatefulSetConverter {
     delete payload.metadata.name;
     delete payload.metadata.namespace;
     payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = statefulSet.StackName;
+    payload.metadata.annotations[KubernetesPortainerApplicationNote] = statefulSet.Note;
     return payload;
   }
 }

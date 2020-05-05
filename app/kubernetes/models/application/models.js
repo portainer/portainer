@@ -31,6 +31,8 @@ export const KubernetesPortainerApplicationNameLabel = 'io.portainer.kubernetes.
 
 export const KubernetesPortainerApplicationOwnerLabel = 'io.portainer.kubernetes.application.owner';
 
+export const KubernetesPortainerApplicationNote = 'io.portainer.kubernetes.application.note';
+
 /**
  * KubernetesApplication Model
  */
@@ -57,7 +59,8 @@ const _KubernetesApplication = Object.freeze({
   ApplicationType: 'Unknown',
   RunningPodsCount: 0,
   TotalPodsCount: 0,
-  Yaml: ''
+  Yaml: '',
+  Note: ''
 });
 
 export class KubernetesApplication {

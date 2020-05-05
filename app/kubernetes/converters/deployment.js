@@ -1,6 +1,6 @@
 import {KubernetesDeployment} from 'Kubernetes/models/deployment/models';
 import {KubernetesDeploymentCreatePayload, KubernetesDeploymentPatchPayload} from 'Kubernetes/models/deployment/payloads';
-import {KubernetesPortainerApplicationStackNameLabel, KubernetesPortainerApplicationNameLabel, KubernetesPortainerApplicationOwnerLabel} from 'Kubernetes/models/application/models';
+import {KubernetesPortainerApplicationStackNameLabel, KubernetesPortainerApplicationNameLabel, KubernetesPortainerApplicationOwnerLabel, KubernetesPortainerApplicationNote } from 'Kubernetes/models/application/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 
 function bytesValue(mem) {
@@ -65,6 +65,7 @@ class KubernetesDeploymentConverter {
     delete payload.metadata.name;
     delete payload.metadata.namespace;
     payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = deployment.StackName;
+    payload.metadata.annotations[KubernetesPortainerApplicationNote] = deployment.Note;
     return payload;
   }
 }

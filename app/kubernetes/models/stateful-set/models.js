@@ -17,6 +17,7 @@ const _KubernetesStatefulSet = Object.freeze({
   ServiceName: '',
   ApplicationName: '',
   ApplicationOwner: '',
+  Note: ''
 });
 
 export class KubernetesStatefulSet {

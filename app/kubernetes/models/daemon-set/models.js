@@ -14,6 +14,7 @@ const _KubernetesDaemonSet = Object.freeze({
   Secret: undefined,
   ApplicationName: '',
   ApplicationOwner: '',
+  Note: ''
 });
 
 export class KubernetesDaemonSet {

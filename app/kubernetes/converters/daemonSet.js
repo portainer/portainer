@@ -1,6 +1,6 @@
 import {KubernetesDaemonSet} from 'Kubernetes/models/daemon-set/models';
 import {KubernetesDaemonSetCreatePayload, KubernetesDaemonSetPatchPayload} from 'Kubernetes/models/daemon-set/payloads';
-import {KubernetesPortainerApplicationStackNameLabel, KubernetesPortainerApplicationNameLabel, KubernetesPortainerApplicationOwnerLabel} from 'Kubernetes/models/application/models';
+import {KubernetesPortainerApplicationStackNameLabel, KubernetesPortainerApplicationNameLabel, KubernetesPortainerApplicationOwnerLabel, KubernetesPortainerApplicationNote } from 'Kubernetes/models/application/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 
 function bytesValue(mem) {
@@ -64,6 +64,7 @@ class KubernetesDaemonSetConverter {
     delete payload.metadata.name;
     delete payload.metadata.namespace;
     payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = daemonSet.StackName;
+    payload.metadata.annotations[KubernetesPortainerApplicationNote] = daemonSet.Note;
     return payload;
   }
 }

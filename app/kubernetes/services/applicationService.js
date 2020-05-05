@@ -213,7 +213,8 @@ class KubernetesApplicationService {
       const payload = {
         Namespace: application.ResourcePool,
         Name: application.Name,
-        StackName: application.StackName
+        StackName: application.StackName,
+        Note: application.Note
       };
       const headlessServicePayload = angular.copy(payload);
 

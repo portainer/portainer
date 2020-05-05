@@ -18,6 +18,7 @@ const _KubernetesService = Object.freeze({
   ClusterIP: '',
   ApplicationName: '',
   ApplicationOwner: '',
+  Note: ''
 });
 
 export class KubernetesService {
