@@ -152,6 +152,10 @@ angular
           if (endpoint.Type === 4) {
             $scope.edgeKeyDetails = decodeEdgeKey(endpoint.EdgeKey);
             $scope.randomEdgeID = uuidv4();
+            $scope.dockerCommands = {
+              standalone: buildStandaloneCommand($scope.randomEdgeID, endpoint.EdgeKey),
+              swarm: buildSwarmCommand($scope.randomEdgeID, endpoint.EdgeKey),
+            };
           }
           $scope.endpoint = endpoint;
           $scope.groups = data.groups;
@@ -160,6 +164,42 @@ angular
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve endpoint details');
         });
+    }
+
+    function buildStandaloneCommand(edgeId, edgeKey) {
+      return `docker run -d -v /var/run/docker.sock:/var/run/docker.sock \\
+  -v /var/lib/docker/volumes:/var/lib/docker/volumes \\
+  -v /:/host \\
+  --restart always \\
+  -e EDGE=1 \\
+  -e EDGE_ID=${edgeId} \\
+  -e EDGE_KEY=${edgeKey} \\
+  -e CAP_HOST_MANAGEMENT=1 \\
+  -v portainer_agent_data:/data \\
+  --name portainer_edge_agent \\
+  portainer/agent`;
+    }
+
+    function buildSwarmCommand(edgeId, edgeKey) {
+      return `docker network create \\
+  --driver overlay \\
+  portainer_agent_network;
+
+docker service create \\
+  --name portainer_edge_agent \\
+  --network portainer_agent_network \\
+  -e AGENT_CLUSTER_ADDR=tasks.portainer_edge_agent \\
+  -e EDGE=1 \\
+  -e EDGE_ID=${edgeId} \\
+  -e EDGE_KEY=${edgeKey} \\
+  -e CAP_HOST_MANAGEMENT=1 \\
+  --mode global \\
+  --constraint 'node.platform.os == linux' \\
+  --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock \\
+  --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volumes \\
+  --mount type=bind,src=//,dst=/host \\
+  --mount type=volume,src=portainer_agent_data,dst=/data \\
+  portainer/agent`;
     }
 
     initView();
