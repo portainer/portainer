@@ -1,14 +1,25 @@
 import _ from 'lodash-es';
-import { KubernetesServiceCreatePayload, KubernetesServicePatchPayload } from 'Kubernetes/models/service/payloads';
-import { KubernetesPortainerApplicationStackNameLabel, KubernetesPortainerApplicationNameLabel, KubernetesPortainerApplicationOwnerLabel, KubernetesPortainerApplicationNote } from 'Kubernetes/models/application/models';
-import { KubernetesServiceHeadlessClusterIP, KubernetesService, KubernetesServicePort, KubernetesServiceTypes } from 'Kubernetes/models/service/models';
+import * as JsonPatch from 'fast-json-patch';
+
+import { KubernetesServiceCreatePayload } from 'Kubernetes/models/service/payloads';
+import {
+  KubernetesPortainerApplicationStackNameLabel,
+  KubernetesPortainerApplicationNameLabel,
+  KubernetesPortainerApplicationOwnerLabel
+} from 'Kubernetes/models/application/models';
+import {
+  KubernetesServiceHeadlessClusterIP,
+  KubernetesService,
+  KubernetesServicePort,
+  KubernetesServiceTypes
+} from 'Kubernetes/models/service/models';
 import { KubernetesApplicationPublishingTypes } from 'Kubernetes/models/application/models';
 import KubernetesServiceHelper from 'Kubernetes/helpers/serviceHelper';
 
 class KubernetesServiceConverter {
   static publishedPortToServicePort(name, publishedPort, type) {
     const res = new KubernetesServicePort();
-    res.name = name + '-' + publishedPort.ContainerPort;
+    res.name = _.toLower(name + '-' + publishedPort.ContainerPort + '-' + publishedPort.Protocol);
     res.port = parseInt(type === KubernetesServiceTypes.LOAD_BALANCER ? publishedPort.LoadBalancerPort : publishedPort.ContainerPort , 10);
     res.targetPort = parseInt(publishedPort.ContainerPort, 10);
     res.protocol = publishedPort.Protocol;
@@ -30,12 +41,20 @@ class KubernetesServiceConverter {
     res.Name = formValues.Name;
     res.StackName = formValues.StackName ? formValues.StackName : formValues.Name;
     res.ApplicationOwner = formValues.ApplicationOwner;
+    res.ApplicationName = formValues.Name;
     if (formValues.PublishingType === KubernetesApplicationPublishingTypes.CLUSTER) {
       res.Type = KubernetesServiceTypes.NODE_PORT;
-    } else if (formValues.PublishingType === KubernetesApplicationPublishingTypes.LOADBALANCER) {
+    } else if (formValues.PublishingType === KubernetesApplicationPublishingTypes.LOAD_BALANCER) {
       res.Type = KubernetesServiceTypes.LOAD_BALANCER;
     }
     res.Ports = _.map(formValues.PublishedPorts, (item) => KubernetesServiceConverter.publishedPortToServicePort(formValues.Name, item, res.Type));
+    return res;
+  }
+
+  static applicationFormValuesToHeadlessService(formValues) {
+    const res = KubernetesServiceConverter.applicationFormValuesToService(formValues);
+    res.Name = KubernetesServiceHelper.generateHeadlessServiceName(formValues.Name);
+    res.Headless = true;
     return res;
   }
 
@@ -48,13 +67,12 @@ class KubernetesServiceConverter {
     payload.metadata.name = service.Name;
     payload.metadata.namespace = service.Namespace;
     payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = service.StackName;
-    payload.metadata.labels[KubernetesPortainerApplicationNameLabel] = service.Name;
+    payload.metadata.labels[KubernetesPortainerApplicationNameLabel] = service.ApplicationName;
     payload.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = service.ApplicationOwner;
     payload.spec.ports = service.Ports;
-    payload.spec.selector.app = service.Name;
+    payload.spec.selector.app = service.ApplicationName;
     if (service.Headless) {
       payload.spec.clusterIP = KubernetesServiceHeadlessClusterIP;
-      payload.metadata.name = KubernetesServiceHelper.generateHeadlessServiceName(payload.metadata.name);
       delete payload.spec.ports;
     } else if (service.Type) {
       payload.spec.type = service.Type;
@@ -62,13 +80,10 @@ class KubernetesServiceConverter {
     return payload;
   }
 
-  static patchPayload(service) {
-    const payload = new KubernetesServicePatchPayload();
-    delete payload.metadata.uid;
-    delete payload.metadata.name;
-    delete payload.metadata.namespace;
-    payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = service.StackName;
-    payload.metadata.annotations[KubernetesPortainerApplicationNote] = service.Note;
+  static patchPayload(oldService, newService) {
+    const oldPayload = KubernetesServiceConverter.createPayload(oldService);
+    const newPayload = KubernetesServiceConverter.createPayload(newService);
+    const payload = JsonPatch.compare(oldPayload, newPayload);
     return payload;
   }
 }

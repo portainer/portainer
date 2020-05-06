@@ -83,12 +83,15 @@ class KubernetesStatefulSetService {
   /**
    * PATCH
    */
-  async patchAsync(statefulSet) {
+  async patchAsync(oldStatefulSet, newStatefulSet) {
     try {
       const params = new KubernetesCommonParams();
-      params.id = statefulSet.Name;
-      const namespace = statefulSet.Namespace;
-      const payload = KubernetesStatefulSetConverter.patchPayload(statefulSet);
+      params.id = newStatefulSet.Name;
+      const namespace = newStatefulSet.Namespace;
+      const payload = KubernetesStatefulSetConverter.patchPayload(oldStatefulSet, newStatefulSet);
+      if (!payload.length) {
+        return;
+      }
       const data = await this.KubernetesStatefulSets(namespace).patch(params, payload).$promise;
       return data;
     } catch (err) {
@@ -96,8 +99,8 @@ class KubernetesStatefulSetService {
     }
   }
 
-  patch(statefulSet) {
-    return this.$async(this.patchAsync, statefulSet);
+  patch(oldStatefulSet, newStatefulSet) {
+    return this.$async(this.patchAsync, oldStatefulSet, newStatefulSet);
   }
 
   /**

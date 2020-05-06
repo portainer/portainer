@@ -17,7 +17,7 @@ export const KubernetesApplicationTypes = Object.freeze({
 export const KubernetesApplicationPublishingTypes = Object.freeze({
   'INTERNAL': 1,
   'CLUSTER': 2,
-  'LOADBALANCER': 3
+  'LOAD_BALANCER': 3
 });
 
 export const KubernetesApplicationQuotaDefaults = {
@@ -41,13 +41,15 @@ const _KubernetesApplication = Object.freeze({
   Name: '',
   StackName: '',
   ApplicationOwner: '',
+  ApplicationName:'',
   ResourcePool: '',
   Image: '',
   CreationDate: 0,
   Pods: [],
-  Limits: [],
+  Limits: {},
   ServiceType: '',
   ServiceId: '',
+  ServiceName: '',
   HeadlessServiceName: undefined, // only used for StatefulSet
   PublishedPorts: [],
   Volumes: [],
@@ -70,12 +72,12 @@ export class KubernetesApplication {
 }
 
 /**
- * _KubernetesApplicationPersistedFolder Model
+ * KubernetesApplicationPersistedFolder Model
  */
 const _KubernetesApplicationPersistedFolder = Object.freeze({
-  mountPath: '',
-  persistentVolumeClaimName: '',
-  hostPath: ''
+  MountPath: '',
+  PersistentVolumeClaimName: '',
+  HostPath: ''
 });
 
 export class KubernetesApplicationPersistedFolder {
@@ -88,7 +90,8 @@ export class KubernetesApplicationPersistedFolder {
  * KubernetesApplicationConfigurationVolume Model
  */
 const _KubernetesApplicationConfigurationVolume = Object.freeze({
-  mountPath: '',
+  fileMountPath: '',
+  rootMountPath: '',
   configurationKey: '',
   configurationName: ''
 });

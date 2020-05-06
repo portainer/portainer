@@ -5,14 +5,6 @@ import { KubernetesResourceQuotaDefaults, KubernetesResourceQuota } from 'Kubern
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 
-function megaBytesValue(mem) {
-  return Math.floor(mem / 1000 / 1000);
-}
-
-function bytesValue(mem) {
-  return mem * 1000 * 1000;
-}
-
 class KubernetesResourcePoolController {
   /* @ngInject */
   constructor($async, $state, Authentication, Notifications, KubernetesNodeService, KubernetesResourceQuotaService, KubernetesResourcePoolService, KubernetesEventService, KubernetesPodService, KubernetesApplicationService) {
@@ -49,8 +41,8 @@ class KubernetesResourcePoolController {
     if (this.formValues.CpuLimit < this.defaults.CpuLimit) {
       this.formValues.CpuLimit = this.defaults.CpuLimit;
     }
-    if (this.formValues.MemoryLimit < megaBytesValue(this.defaults.MemoryLimit)) {
-      this.formValues.MemoryLimit = megaBytesValue(this.defaults.MemoryLimit);
+    if (this.formValues.MemoryLimit < KubernetesResourceReservationHelper.megaBytesValue(this.defaults.MemoryLimit)) {
+      this.formValues.MemoryLimit = KubernetesResourceReservationHelper.megaBytesValue(this.defaults.MemoryLimit);
     }
   }
 
@@ -73,7 +65,7 @@ class KubernetesResourcePoolController {
       this.checkDefaults();
       const namespace = this.pool.Namespace.Name;
       const cpuLimit = this.formValues.CpuLimit;
-      const memoryLimit = bytesValue(this.formValues.MemoryLimit);
+      const memoryLimit = KubernetesResourceReservationHelper.bytesValue(this.formValues.MemoryLimit);
       const owner = this.pool.Namespace.ResourcePoolOwner;
       const quota = this.pool.Quota;
 
@@ -182,16 +174,16 @@ class KubernetesResourcePoolController {
         this.state.sliderMaxMemory += filesizeParser(item.Memory);
         this.state.sliderMaxCpu += item.CPU;
       });
-      this.state.sliderMaxMemory = megaBytesValue(this.state.sliderMaxMemory);
+      this.state.sliderMaxMemory = KubernetesResourceReservationHelper.megaBytesValue(this.state.sliderMaxMemory);
 
       const quota = pool.Quota;
       if (quota) {
         this.formValues.hasQuota = true;
         this.formValues.CpuLimit = quota.CpuLimit;
-        this.formValues.MemoryLimit = megaBytesValue(quota.MemoryLimit);
+        this.formValues.MemoryLimit = KubernetesResourceReservationHelper.megaBytesValue(quota.MemoryLimit);
 
         this.state.cpuUsed = quota.CpuLimitUsed;
-        this.state.memoryUsed = megaBytesValue(quota.MemoryLimitUsed);
+        this.state.memoryUsed = KubernetesResourceReservationHelper.megaBytesValue(quota.MemoryLimitUsed);
       }
 
       await this.getEvents();

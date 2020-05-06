@@ -17,41 +17,19 @@
               <uib-tab-heading>
                 <i class="fa fa-laptop-code space-right" aria-hidden="true"></i> Application
               </uib-tab-heading>
-
               <div style="padding: 20px;">
                 <table class="table">
                   <tbody>
                     <tr>
                       <td>Name</td>
                       <td>
-                          {{ ctrl.application.Name }}
+                        {{ ctrl.application.Name }}
                         <span style="margin-left: 5px;" class="label label-primary image-tag" ng-if="ctrl.isExternalApplication(item)">external</span>
                       </td>
                     </tr>
                     <tr>
                       <td>Stack</td>
-                      <td>
-                        <span ng-if="!ctrl.state.updateStackName">
-                          <span>{{ ctrl.application.StackName }}</span>
-                          <button class="btn btn-xs btn-primary" ng-click="ctrl.state.updateStackName = true;">change stack</button>
-                        </span>
-                        <span ng-if="ctrl.state.updateStackName">
-                          <div class="form-inline">
-                            <div class="input-group input-group-xs">
-                              <input class="form-control input-xs" type="text" placeholder="{{ctrl.application.StackName}}" ng-model="ctrl.formValues.StackName" on-enter-key="ctrl.updateApplication()"
-                                uib-typeahead="stack for stack in ctrl.stacks | filter:$viewValue | limitTo:7" typeahead-show-hint="true" typeahead-min-length="0" />
-                            </div>
-                            <div class="input-group input-group-xs">
-                              <button class="btn btn-xs btn-danger" type="button" ng-click="ctrl.resetApplicationStackName();">
-                                <i class="fa fa-times" aria-hidden="true"></i> reset
-                              </button>
-                              <button class="btn btn-xs btn-success" type="button" ng-click="ctrl.updateApplication();">
-                                <i class="fa fa-check" aria-hidden="true"></i> apply
-                              </button>
-                            </div>
-                          </div>
-                        </span>
-                      </td>
+                      <td>{{ ctrl.application.StackName }}</td>
                     </tr>
                     <tr>
                       <td>Resource pool</td>
@@ -95,9 +73,18 @@
                           <div>
                             <i class="fa fa-edit" aria-hidden="true"></i> Note
                           </div>
-                          <textarea style="margin-top: 5px;" class="form-control" name="application_note" id="application_note" ng-model="ctrl.formValues.Note" rows="5" placeholder="Enter a note about this application..."></textarea>
-                          <button class="btn btn-primary btn-sm" type="button" ng-click="ctrl.updateApplication()" ng-disabled="ctrl.formValues.Note === ctrl.application.Note" style="margin-top: 0.5rem; margin-left: 0;">{{ ctrl.application.Note ? 'Update' : 'Save' }} note</button>
+                          <textarea style="margin-top: 5px;" class="form-control" name="application_note" id="application_note" ng-model="ctrl.formValues.Note" rows="5"
+                            placeholder="Enter a note about this application..."></textarea>
+                          <button class="btn btn-primary btn-sm" type="button" ng-click="ctrl.updateApplication()" ng-disabled="ctrl.formValues.Note === ctrl.application.Note"
+                            style="margin-top: 0.5rem; margin-left: 0;">{{ ctrl.application.Note ? 'Update' : 'Save' }} note</button>
                         </form>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colspan="2">
+                        <button type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.applications.application.edit">
+                          <i class="fa fa-file-code space-right" aria-hidden="true"></i>Edit
+                        </button>
                       </td>
                     </tr>
                   </tbody>
@@ -229,22 +216,26 @@
             <div ng-if="ctrl.application.ServiceType === 'ClusterIP'">
               <div class="small text-muted">
                 <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                This application is only available for internal usage inside the cluster via the application name <code>{{ ctrl.application.Name }}</code> <span class="btn btn-primary btn-xs" ng-click="ctrl.copyApplicationName()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy</span>
-                <span id="copyNotificationApplicationName" style="margin-left: 7px; display: none; color: #23ae89;" class="small"><i class="fa fa-check" aria-hidden="true"></i> copied</span>
+                This application is only available for internal usage inside the cluster via the application name <code>{{ ctrl.application.ServiceName }}</code> <span
+                  class="btn btn-primary btn-xs" ng-click="ctrl.copyApplicationName()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy</span>
+                <span id="copyNotificationApplicationName" style="margin-left: 7px; display: none; color: #23ae89;" class="small"><i class="fa fa-check" aria-hidden="true"></i>
+                  copied</span>
               </div>
               <div class="small text-muted" style="margin-top: 2px;">
                 <p>Refer to the below port configuration to access the application.</p>
               </div>
-              <div style="margin-top: 15px; width: 33%;">
+              <div style="margin-top: 15px; width: 50%;">
                 <table class="table">
                   <tbody>
                     <tr class="text-muted">
-                      <td style="width: 50%;">Container port</td>
-                      <td style="width: 50%;">Application port</td>
+                      <td style="width: 33%;">Container port</td>
+                      <td style="width: 33%;">Application port</td>
+                      <td style="width: 33%;">Protocol</td>
                     </tr>
                     <tr ng-repeat="port in ctrl.application.PublishedPorts track by $index">
                       <td>{{ port.targetPort }}</td>
                       <td>{{ port.port }}</td>
+                      <td>{{ port.protocol }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -277,13 +268,19 @@
                       <span ng-if="envvar.value">{{ envvar.value }}</span>
                       <span ng-if="envvar.valueFrom.configMapKeyRef"><i class="fa fa-key" aria-hidden="true"></i> {{ envvar.valueFrom.configMapKeyRef.key }}</span>
                       <span ng-if="envvar.valueFrom.secretKeyRef"><i class="fa fa-key" aria-hidden="true"></i> {{ envvar.valueFrom.secretKeyRef.key }}</span>
-                      <span ng-if="envvar.valueFrom.fieldRef"><i class="fa fa-asterisk" aria-hidden="true"></i> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a href="https://kubernetes.io/docs/tasks/inject-data-application/downward-api-volume-expose-pod-information/#capabilities-of-the-downward-api" target="_blank">downward API</a>)</span>
+                      <span ng-if="envvar.valueFrom.fieldRef"><i class="fa fa-asterisk" aria-hidden="true"></i> {{ envvar.valueFrom.fieldRef.fieldPath }} (<a
+                          href="https://kubernetes.io/docs/tasks/inject-data-application/downward-api-volume-expose-pod-information/#capabilities-of-the-downward-api"
+                          target="_blank">downward API</a>)</span>
                       <span ng-if="!envvar.value && !envvar.valueFrom.secretKeyRef && !envvar.valueFrom.configMapKeyRef && !envvar.valueFrom.fieldRef">-</span>
                     </td>
                     <td>
                       <span ng-if="envvar.value || envvar.valueFrom.fieldRef || (!envvar.valueFrom.secretKeyRef && !envvar.valueFrom.configMapKeyRef)">-</span>
-                      <span ng-if="envvar.valueFrom.configMapKeyRef"><a ui-sref="kubernetes.configurations.configuration({ name: envvar.valueFrom.configMapKeyRef.name, namespace: ctrl.application.ResourcePool })"><i class="fa fa-file-code" aria-hidden="true"></i> {{ envvar.valueFrom.configMapKeyRef.name }}</a></span>
-                      <span ng-if="envvar.valueFrom.secretKeyRef"><a ui-sref="kubernetes.configurations.configuration({ name: envvar.valueFrom.secretKeyRef.name, namespace: ctrl.application.ResourcePool })"><i class="fa fa-file-code" aria-hidden="true"></i> {{ envvar.valueFrom.secretKeyRef.name }}</a></span>
+                      <span ng-if="envvar.valueFrom.configMapKeyRef"><a
+                          ui-sref="kubernetes.configurations.configuration({ name: envvar.valueFrom.configMapKeyRef.name, namespace: ctrl.application.ResourcePool })"><i
+                            class="fa fa-file-code" aria-hidden="true"></i> {{ envvar.valueFrom.configMapKeyRef.name }}</a></span>
+                      <span ng-if="envvar.valueFrom.secretKeyRef"><a
+                          ui-sref="kubernetes.configurations.configuration({ name: envvar.valueFrom.secretKeyRef.name, namespace: ctrl.application.ResourcePool })"><i
+                            class="fa fa-file-code" aria-hidden="true"></i> {{ envvar.valueFrom.secretKeyRef.name }}</a></span>
                     </td>
                   </tr>
                 </tbody>
@@ -302,14 +299,14 @@
 
                 <tr ng-repeat="volume in ctrl.application.ConfigurationVolumes track by $index" style="border-top: 0">
                   <td>
-                    {{ volume.mountPath }}
+                    {{ volume.fileMountPath }}
                   </td>
                   <td>
-                    <span ng-if="volume.configurationKey"><i class="fa fa-key" aria-hidden="true"></i> {{ volume.configurationKey }}</span>
-                    <span ng-if="!volume.configurationKey">-</span>
+                    <i class="fa fa-key" ng-if="volume.configurationKey" aria-hidden="true"></i> {{ volume.configurationKey ? volume.configurationKey : '-' }}
                   </td>
                   <td>
-                    <a ui-sref="kubernetes.configurations.configuration({ name: volume.configurationName, namespace: ctrl.application.ResourcePool })"><i class="fa fa-file-code" aria-hidden="true"></i> {{ volume.configurationName }}</a>
+                    <a ui-sref="kubernetes.configurations.configuration({ name: volume.configurationName, namespace: ctrl.application.ResourcePool })"><i class="fa fa-file-code"
+                        aria-hidden="true"></i> {{ volume.configurationName }}</a>
                   </td>
                 </tr>
               </tbody>
@@ -327,7 +324,8 @@
 
           <div ng-if="ctrl.hasPersistedFolders()">
             <div class="small text-muted" style="margin-bottom: 15px;">
-              Data access policy: <i class="fa {{ ctrl.application.DataAccessPolicy | kubernetesApplicationDataAccessPolicyIcon}}" aria-hidden="true"></i> {{ ctrl.application.DataAccessPolicy | kubernetesApplicationDataAccessPolicyText }}
+              Data access policy: <i class="fa {{ ctrl.application.DataAccessPolicy | kubernetesApplicationDataAccessPolicyIcon}}" aria-hidden="true"></i>
+              {{ ctrl.application.DataAccessPolicy | kubernetesApplicationDataAccessPolicyText }}
               <portainer-tooltip position="right" message="{{ ctrl.application.DataAccessPolicy | kubernetesApplicationDataAccessPolicyTooltip }}">
               </portainer-tooltip>
             </div>
@@ -340,13 +338,14 @@
                 </tr>
                 <tr ng-repeat="volume in ctrl.application.PersistedFolders track by $index">
                   <td>
-                    {{ volume.mountPath }}
+                    {{ volume.MountPath }}
                   </td>
-                  <td ng-if="volume.persistentVolumeClaimName">
-                    <a ui-sref="kubernetes.volumes.volume({ name: volume.persistentVolumeClaimName, namespace: ctrl.application.ResourcePool })"><i class="fa fa-database" aria-hidden="true"></i> {{ volume.persistentVolumeClaimName }}</a>
+                  <td ng-if="volume.PersistentVolumeClaimName">
+                    <a ui-sref="kubernetes.volumes.volume({ name: volume.PersistentVolumeClaimName, namespace: ctrl.application.ResourcePool })"><i class="fa fa-database"
+                        aria-hidden="true"></i> {{ volume.PersistentVolumeClaimName }}</a>
                   </td>
                   <td ng-if="volume.hostPath">
-                    {{ volume.hostPath }} on host filesystem
+                    {{ volume.HostPath }} on host filesystem
                   </td>
                 </tr>
               </tbody>
@@ -366,13 +365,14 @@
                     {{ pod.Name }}
                   </td>
                   <td>
-                      {{ volume.mountPath }}
+                    {{ volume.MountPath }}
                   </td>
-                  <td ng-if="volume.persistentVolumeClaimName">
-                    <a ui-sref="kubernetes.volumes.volume({ name: volume.persistentVolumeClaimName + '-' + pod.Name, namespace: ctrl.application.ResourcePool })"><i class="fa fa-database" aria-hidden="true"></i> {{ volume.persistentVolumeClaimName + '-' + pod.Name }}</a>
+                  <td ng-if="volume.PersistentVolumeClaimName">
+                    <a ui-sref="kubernetes.volumes.volume({ name: volume.PersistentVolumeClaimName + '-' + pod.Name, namespace: ctrl.application.ResourcePool })">
+                      <i class="fa fa-database" aria-hidden="true"></i> {{ volume.PersistentVolumeClaimName + '-' + pod.Name }}</a>
                   </td>
-                  <td ng-if="volume.hostPath">
-                      {{ volume.hostPath }} on host filesystem
+                  <td ng-if="volume.HostPath">
+                    {{ volume.HostPath }} on host filesystem
                   </td>
                 </tr>
               </tbody>

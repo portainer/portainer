@@ -42,16 +42,3 @@ export class KubernetesDaemonSetCreatePayload {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesDaemonSetCreatePayload)));
   }
 }
-
-/**
- * KubernetesDaemonSetPatchPayload Model
- */
-const _KubernetesDaemonSetPatchPayload = Object.freeze({
-  metadata: new KubernetesCommonMetadataPayload(),
-});
-
-export class KubernetesDaemonSetPatchPayload {
-  constructor() {
-    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesDaemonSetPatchPayload)));
-  }
-}

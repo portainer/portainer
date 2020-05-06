@@ -49,6 +49,16 @@ angular.module('portainer.kubernetes', ['portainer.app'])
     }
   };
 
+  const applicationEdit = {
+    name: 'kubernetes.applications.application.edit',
+    url: '/edit',
+    views: {
+      'content@': {
+        component: 'kubernetesCreateApplicationView'
+      }
+    }
+  };
+
   const applicationConsole = {
     name: 'kubernetes.applications.application.console',
     url: '/:pod/console',
@@ -225,6 +235,7 @@ angular.module('portainer.kubernetes', ['portainer.app'])
   $stateRegistryProvider.register(applications);
   $stateRegistryProvider.register(applicationCreation);
   $stateRegistryProvider.register(application);
+  $stateRegistryProvider.register(applicationEdit);
   $stateRegistryProvider.register(applicationConsole);
   $stateRegistryProvider.register(applicationLogs);
   $stateRegistryProvider.register(stacks);

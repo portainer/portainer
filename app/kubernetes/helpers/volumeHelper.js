@@ -1,4 +1,5 @@
 import _ from 'lodash-es';
+import uuidv4 from 'uuid/v4';
 
 class KubernetesVolumeHelper {
   static getUsingApplications(volume, applications) {
@@ -11,6 +12,10 @@ class KubernetesVolumeHelper {
 
   static isUsed(item) {
     return item.Applications.length !== 0;
+  }
+
+  static generatedApplicationConfigVolumeName(name) {
+    return 'config-' + name + '-' + uuidv4();
   }
 }
 

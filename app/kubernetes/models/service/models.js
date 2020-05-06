@@ -1,4 +1,4 @@
-export const KubernetesServiceHeadlessSuffix = '-headless';
+export const KubernetesServiceHeadlessPrefix = 'headless-';
 export const KubernetesServiceHeadlessClusterIP = 'None';
 export const KubernetesServiceTypes = Object.freeze({
   LOAD_BALANCER: 'LoadBalancer',

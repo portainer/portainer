@@ -90,7 +90,7 @@ class KubernetesStackLogsController {
             const res = {
               Color: colors[index % colors.length],
               Line: line,
-              AppName: app.Application.Name + ' ' + pod.Pod.Name,
+              AppName: pod.Pod.Name,
             };
             return res;
           });

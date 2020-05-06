@@ -1,6 +1,5 @@
 import _ from 'lodash-es';
 import { KubernetesPod } from 'Kubernetes/models/pod/models';
-
 class KubernetesPodConverter {
   static computeStatus(statuses) {
     const containerStatuses = _.map(statuses, 'state');

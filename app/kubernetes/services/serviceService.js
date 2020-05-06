@@ -75,21 +75,24 @@ class KubernetesServiceService {
   /**
    * PATCH
    */
-  async patchAsync(deployment) {
+  async patchAsync(oldService, newService) {
     try {
       const params = new KubernetesCommonParams();
-      params.id = deployment.Name;
-      const namespace = deployment.Namespace;
-      const payload = KubernetesServiceConverter.patchPayload(deployment);
+      params.id = newService.Name;
+      const namespace = newService.Namespace;
+      const payload = KubernetesServiceConverter.patchPayload(oldService, newService);
+      if (!payload.length) {
+        return;
+      }
       const data = await this.KubernetesServices(namespace).patch(params, payload).$promise;
       return data;
     } catch (err) {
-      throw new PortainerError('Unable to patch deployment', err);
+      throw new PortainerError('Unable to patch service', err);
     }
   }
 
-  patch(deployment) {
-    return this.$async(this.patchAsync, deployment);
+  patch(oldService, newService) {
+    return this.$async(this.patchAsync, oldService, newService);
   }
 
   /**

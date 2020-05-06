@@ -80,7 +80,7 @@ class KubernetesApplicationsController {
     _.forEach(this.ports, (item) => {
       item.Expanded = false;
       item.Highlighted = false;
-      if (item.ApplicationName === application.Name) {
+      if (item.Name === application.Name) {
         if (item.Ports.length > 1) {
           item.Expanded = true;
         }

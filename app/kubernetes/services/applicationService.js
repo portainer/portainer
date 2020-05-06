@@ -2,16 +2,12 @@ import _ from 'lodash-es';
 import angular from 'angular';
 import PortainerError from 'Portainer/error';
 
-import { KubernetesApplicationDeploymentTypes, KubernetesApplicationDataAccessPolicies, KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
-
+import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
-
-import KubernetesDeploymentConverter from 'Kubernetes/converters/deployment';
-import KubernetesDaemonSetConverter from 'Kubernetes/converters/daemonSet';
-import KubernetesStatefulSetConverter from 'Kubernetes/converters/statefulSet';
-import KubernetesServiceConverter from 'Kubernetes/converters/service';
 import KubernetesApplicationConverter from 'Kubernetes/converters/application';
-import KubernetesPersistentVolumeClaimConverter from 'Kubernetes/converters/persistentVolumeClaim';
+import { KubernetesDeployment } from 'Kubernetes/models/deployment/models';
+import { KubernetesStatefulSet } from 'Kubernetes/models/stateful-set/models';
+import { KubernetesDaemonSet } from 'Kubernetes/models/daemon-set/models';
 
 class KubernetesApplicationService {
   /* @ngInject */
@@ -33,6 +29,7 @@ class KubernetesApplicationService {
     this.getAllFilteredAsync = this.getAllFilteredAsync.bind(this);
     this.createAsync = this.createAsync.bind(this);
     this.patchAsync = this.patchAsync.bind(this);
+    this.patchPartialAsync = this.patchPartialAsync.bind(this);
     this.deleteAsync = this.deleteAsync.bind(this);
   }
 
@@ -97,7 +94,6 @@ class KubernetesApplicationService {
     }
   }
 
-
   async getAllAsync(namespace) {
     try {
       const [deployments, daemonSets, statefulSets, services, pods] = await Promise.all([
@@ -152,49 +148,28 @@ class KubernetesApplicationService {
   // or should we switch to formValues > Composite > Resource_1 || Resource_2
   async createAsync(formValues) {
     try {
-      const claims = KubernetesPersistentVolumeClaimConverter.applicationFormValuesToVolumeClaims(formValues);
-      const roxrwx = _.find(claims, (item) => _.includes(item.StorageClass.AccessModes, 'ROX') || _.includes(item.StorageClass.AccessModes, 'RWX'));
-      let apiService;
-      let app;
+      let [app, headlessService, service, claims] = KubernetesApplicationConverter.applicationFormValuesToApplication(formValues);
 
-      const deployment = formValues.DeploymentType === KubernetesApplicationDeploymentTypes.REPLICATED &&
-        (claims.length === 0 || (claims.length > 0 && formValues.DataAccessPolicy === KubernetesApplicationDataAccessPolicies.SHARED));
-      const statefulSet = claims.length > 0 && formValues.DataAccessPolicy === KubernetesApplicationDataAccessPolicies.ISOLATED &&
-        formValues.DeploymentType === KubernetesApplicationDeploymentTypes.REPLICATED;
-      const daemonSet = formValues.DeploymentType === KubernetesApplicationDeploymentTypes.GLOBAL &&
-        (claims.length === 0 || (claims.length > 0 && formValues.DataAccessPolicy === KubernetesApplicationDataAccessPolicies.SHARED && roxrwx));
+      const apiService = this._getApplicationApiService(app);
 
-      if (deployment) {
-        app = KubernetesDeploymentConverter.applicationFormValuesToDeployment(formValues);
-        apiService = this.KubernetesDeploymentService;
-      } else if (statefulSet) {
-        app = KubernetesStatefulSetConverter.applicationFormValuesToStatefulSet(formValues);
-        apiService = this.KubernetesStatefulSetService;
-      } else if (daemonSet) {
-        app = KubernetesDaemonSetConverter.applicationFormValuesToDaemonSet(formValues);
-        apiService = this.KubernetesDaemonSetService;
-      } else {
-        throw new PortainerError('Unable to determine which association to use');
-      }
-
-      if (statefulSet) {
+      if (app instanceof KubernetesStatefulSet) {
         app.VolumeClaims = claims;
-        let headlessService = KubernetesServiceConverter.applicationFormValuesToService(formValues);
-        headlessService.Headless = true;
         headlessService = await this.KubernetesServiceService.create(headlessService);
         app.ServiceName = headlessService.metadata.name;
       } else {
-        const claimPromises = _.map(claims, (item) => this.KubernetesPersistentVolumeClaimService.create(item));
-        await Promise.all(claimPromises);
+        const claimPromises = _.map(claims, (item) => {
+          if (!item.PreviousName) {
+            return this.KubernetesPersistentVolumeClaimService.create(item);
+          }
+        });
+        await Promise.all(_.without(claimPromises, undefined));
       }
 
       await apiService.create(app);
 
-      const service = KubernetesServiceConverter.applicationFormValuesToService(formValues);
-      if (service.Ports.length === 0) {
-        return;
+      if (service) {
+        await this.KubernetesServiceService.create(service);
       }
-      await this.KubernetesServiceService.create(service);
     } catch (err) {
       throw err;
     }
@@ -204,45 +179,109 @@ class KubernetesApplicationService {
     return this.$async(this.createAsync, formValues);
   }
 
+  _getApplicationApiService(app) {
+    let apiService;
+    if (app instanceof KubernetesDeployment) {
+      apiService = this.KubernetesDeploymentService;
+    } else if (app instanceof KubernetesStatefulSet) {
+      apiService = this.KubernetesStatefulSetService;
+    } else if (app instanceof KubernetesDaemonSet) {
+      apiService = this.KubernetesDaemonSetService;
+    } else {
+      throw new PortainerError('Unable to determine which association to use');
+    }
+    return apiService;
+  }
+
   /**
    * PATCH
    */
-
-  async patchAsync(application) {
+  // this function accepts KubernetesApplicationFormValues as parameters
+  async patchAsync(oldFormValues, newFormValues) {
     try {
-      const payload = {
-        Namespace: application.ResourcePool,
-        Name: application.Name,
-        StackName: application.StackName,
-        Note: application.Note
-      };
-      const headlessServicePayload = angular.copy(payload);
+      const [oldApp, oldHeadlessService, oldService, oldClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(oldFormValues);
+      const [newApp, newHeadlessService, newService, newClaims] = KubernetesApplicationConverter.applicationFormValuesToApplication(newFormValues);
+      const oldApiService = this._getApplicationApiService(oldApp);
+      const newApiService = this._getApplicationApiService(newApp);
 
-      switch (application.ApplicationType) {
+      if (oldApiService !== newApiService) {
+        await this.delete(oldApp);
+        if (oldService) {
+          await this.KubernetesServiceService.delete(oldService);
+        }
+        return await this.create(newFormValues);
+      }
+
+      if (newApp instanceof KubernetesStatefulSet) {
+        await this.KubernetesServiceService.patch(oldHeadlessService, newHeadlessService);
+      } else {
+        const claimPromises = _.map(newClaims, (newClaim) => {
+          if (!newClaim.PreviousName) {
+            return this.KubernetesPersistentVolumeClaimService.create(newClaim);
+          }
+          const oldClaim = _.find(oldClaims, { Name: newClaim.PreviousName });
+          return this.KubernetesPersistentVolumeClaimService.patch(oldClaim, newClaim)
+        });
+        await Promise.all(claimPromises);
+      }
+
+      await newApiService.patch(oldApp, newApp);
+
+      if (oldService && newService) {
+        await this.KubernetesServiceService.patch(oldService, newService);
+      } else if (!oldService && newService) {
+        await this.KubernetesServiceService.create(newService);
+      } else if (oldService && !newService) {
+        await this.KubernetesServiceService.delete(oldService);
+      }
+
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  // this function accepts KubernetesApplication as parameters
+  async patchPartialAsync(oldApp, newApp) {
+    try {
+      const oldAppPayload = {
+        Name: oldApp.Name,
+        Namespace: oldApp.ResourcePool,
+        StackName: oldApp.StackName,
+        Note: oldApp.Note
+      };
+      const newAppPayload = {
+        Name: newApp.Name,
+        Namespace: newApp.ResourcePool,
+        StackName: newApp.StackName,
+        Note: newApp.Note
+      };
+      switch (oldApp.ApplicationType) {
         case KubernetesApplicationTypes.DEPLOYMENT:
-          await this.KubernetesDeploymentService.patch(payload);
+          await this.KubernetesDeploymentService.patch(oldAppPayload, newAppPayload);
           break;
         case KubernetesApplicationTypes.DAEMONSET:
-          await this.KubernetesDaemonSetService.patch(payload);
+          await this.KubernetesDaemonSetService.patch(oldAppPayload, newAppPayload);
           break;
         case KubernetesApplicationTypes.STATEFULSET:
-          headlessServicePayload.Name = application.HeadlessServiceName;
-          await this.KubernetesStatefulSetService.patch(payload);
-          await this.KubernetesServiceService.patch(headlessServicePayload);
+          await this.KubernetesStatefulSetService.patch(oldAppPayload, newAppPayload);
           break;
         default:
           throw new PortainerError('Unable to determine which association to patch');
-      }
-      if (application.ServiceType) {
-        await this.KubernetesServiceService.patch(payload);
       }
     } catch (err) {
       throw err;
     }
   }
 
-  patch(application) {
-    return this.$async(this.patchAsync, application);
+  // accept either formValues or applications as parameters
+  // depending on partial value
+  // true = KubernetesApplication
+  // false = KubernetesApplicationFormValues
+  patch(oldValues, newValues, partial=false) {
+    if (partial) {
+      return this.$async(this.patchPartialAsync, oldValues, newValues);
+    }
+    return this.$async(this.patchAsync, oldValues, newValues);
   }
 
   /**
@@ -251,10 +290,21 @@ class KubernetesApplicationService {
   async deleteAsync(application) {
     try {
       const payload = {
-        Namespace: application.ResourcePool,
+        Namespace: application.ResourcePool || application.Namespace,
         Name: application.Name
       };
       const headlessServicePayload = angular.copy(payload);
+      const servicePayload = angular.copy(payload);
+      servicePayload.Name = application.Name;
+
+      if (application instanceof KubernetesDeployment) {
+        application.ApplicationType = KubernetesApplicationTypes.DEPLOYMENT;
+      } else if (application instanceof KubernetesDaemonSet) {
+        application.ApplicationType = KubernetesApplicationTypes.DAEMONSET;
+      } else if (application instanceof KubernetesStatefulSet) {
+        application.ApplicationType = KubernetesApplicationTypes.STATEFULSET;
+        application.HeadlessServiceName = application.ServiceName;
+      }
 
       switch (application.ApplicationType) {
         case KubernetesApplicationTypes.DEPLOYMENT:
@@ -272,7 +322,7 @@ class KubernetesApplicationService {
           throw new PortainerError('Unable to determine which association to remove');
       }
       if (application.ServiceType) {
-        await this.KubernetesServiceService.delete(payload);
+        await this.KubernetesServiceService.delete(servicePayload);
       }
     } catch (err) {
       throw err;

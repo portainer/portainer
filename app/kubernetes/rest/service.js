@@ -31,7 +31,7 @@ angular.module('portainer.kubernetes')
             patch: {
               method: 'PATCH',
               headers: {
-                'Content-Type': 'application/merge-patch+json'
+                'Content-Type': 'application/json-patch+json'
               }
             },
             delete: { method: 'DELETE' }

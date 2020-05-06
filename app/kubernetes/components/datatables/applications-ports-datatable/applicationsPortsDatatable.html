@@ -108,7 +108,7 @@
               </a>
             </td>
             <td>
-              <a ui-sref="kubernetes.applications.application({ name: item.ApplicationName, namespace: item.ResourcePool })">{{ item.ApplicationName }}</a>
+              <a ui-sref="kubernetes.applications.application({ name: item.Name, namespace: item.ResourcePool })">{{ item.Name }}</a>
               <span style="margin-left: 5px;" class="label label-info image-tag" ng-if="$ctrl.isSystemNamespace(item)">system</span>
               <span style="margin-left: 5px;" class="label label-primary image-tag" ng-if="!$ctrl.isSystemNamespace(item) && $ctrl.isExternalApplication(item)">external</span>
             </td>

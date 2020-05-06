@@ -4,15 +4,16 @@ import { KubernetesApplicationDeploymentTypes, KubernetesApplicationPublishingTy
  * KubernetesApplicationFormValues Model
  */
 const _KubernetesApplicationFormValues = Object.freeze({
-  ResourcePool: '',
+  ResourcePool: {},
   Name: '',
   StackName: '',
   ApplicationOwner: '',
   Image: '',
   ReplicaCount: 1,
-  EnvironmentVariables: [],
-  PersistedFolders: [],
-  PublishedPorts: [],
+  Note: '',
+  EnvironmentVariables: [], // KubernetesApplicationEnvironmentVariableFormValue list
+  PersistedFolders: [], // KubernetesApplicationPersistedFolderFormValue list
+  PublishedPorts: [], // KubernetesApplicationPublishedPortFormValue list
   MemoryLimit: 0,
   CpuLimit: 0,
   DeploymentType: KubernetesApplicationDeploymentTypes.REPLICATED,
@@ -81,9 +82,11 @@ export class KubernetesApplicationEnvironmentVariableFormValue {
  * KubernetesApplicationPersistedFolderFormValue Model
  */
 const _KubernetesApplicationPersistedFolderFormValue = Object.freeze({
+  PersistentVolumeClaimName: '', // will be empty for new volumes (create/edit app) and filled for existing ones (edit)
+  NeedsDeletion: false,
   ContainerPath: '',
   Size: '',
-  SizeUnit: '',
+  SizeUnit: 'GB',
   StorageClass: {}
 });
 
@@ -91,7 +94,6 @@ export class KubernetesApplicationPersistedFolderFormValue {
   constructor(storageClass) {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesApplicationPersistedFolderFormValue)));
     this.StorageClass = storageClass;
-    this.SizeUnit = 'GB';
   }
 }
 
@@ -100,9 +102,9 @@ export class KubernetesApplicationPersistedFolderFormValue {
  */
 const _KubernetesApplicationPublishedPortFormValue = Object.freeze({
   ContainerPort: '',
-    NodePort: '',
-    LoadBalancerPort: '',
-    Protocol: 'TCP'
+  NodePort: '',
+  LoadBalancerPort: '',
+  Protocol: 'TCP'
 });
 
 export class KubernetesApplicationPublishedPortFormValue {

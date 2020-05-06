@@ -4,54 +4,41 @@ import { KubernetesCommonMetadataPayload } from "Kubernetes/models/common/payloa
  * KubernetesDeploymentCreatePayload Model
  */
  const _KubernetesDeploymentCreatePayload = Object.freeze({
-    metadata: new KubernetesCommonMetadataPayload(),
-    spec: {
-      replicas: 0,
-      selector: {
-        matchLabels: {
+  metadata: new KubernetesCommonMetadataPayload(),
+  spec: {
+    replicas: 0,
+    selector: {
+      matchLabels: {
+        app: ''
+      }
+    },
+    template: {
+      metadata: {
+        labels: {
           app: ''
         }
       },
-      template: {
-        metadata: {
-          labels: {
-            app: ''
+      spec: {
+        containers: [
+          {
+            name: '',
+            image: '',
+            env: [],
+            resources: {
+              limits: {},
+              requests: {}
+            },
+            volumeMounts: []
           }
-        },
-        spec: {
-          containers: [
-            {
-              name: '',
-              image: '',
-              env: [],
-              resources: {
-                limits: {},
-                requests: {}
-              },
-              volumeMounts: []
-            }
-          ],
-          volumes: []
-        }
+        ],
+        volumes: []
       }
     }
+  }
 });
 
 export class KubernetesDeploymentCreatePayload {
   constructor() {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesDeploymentCreatePayload)));
-  }
-}
-
-/**
- * KubernetesDeploymentPatchPayload Model
- */
-const _KubernetesDeploymentPatchPayload = Object.freeze({
-  metadata: new KubernetesCommonMetadataPayload(),
-});
-
-export class KubernetesDeploymentPatchPayload {
-  constructor() {
-    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesDeploymentPatchPayload)));
   }
 }

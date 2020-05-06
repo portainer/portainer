@@ -75,12 +75,15 @@ class KubernetesDeploymentService {
   /**
    * PATCH
    */
-  async patchAsync(deployment) {
+  async patchAsync(oldDeployment, newDeployment) {
     try {
       const params = new KubernetesCommonParams();
-      params.id = deployment.Name;
-      const namespace = deployment.Namespace;
-      const payload = KubernetesDeploymentConverter.patchPayload(deployment);
+      params.id = newDeployment.Name;
+      const namespace = newDeployment.Namespace;
+      const payload = KubernetesDeploymentConverter.patchPayload(oldDeployment, newDeployment);
+      if (!payload.length) {
+        return;
+      }
       const data = await this.KubernetesDeployments(namespace).patch(params, payload).$promise;
       return data;
     } catch (err) {
@@ -88,8 +91,8 @@ class KubernetesDeploymentService {
     }
   }
 
-  patch(deployment) {
-    return this.$async(this.patchAsync, deployment);
+  patch(oldDeployment, newDeployment) {
+    return this.$async(this.patchAsync, oldDeployment, newDeployment);
   }
 
   /**

@@ -44,16 +44,3 @@ export class KubernetesStatefulSetCreatePayload {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesStatefulSetCreatePayload)));
   }
 }
-
-/**
- * KubernetesStatefulSetPatchPayload Model
- */
-const _KubernetesStatefulSetPatchPayload = Object.freeze({
-  metadata: new KubernetesCommonMetadataPayload(),
-});
-
-export class KubernetesStatefulSetPatchPayload {
-  constructor() {
-    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesStatefulSetPatchPayload)));
-  }
-}

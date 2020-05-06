@@ -852,6 +852,16 @@ ul.sidebar .sidebar-list .sidebar-sublist a.active {
   vertical-align: middle;
 }
 
+.striked::after {
+  border-bottom: 0.2em solid #777777;
+  content: "";
+  left: 0;
+  margin-top: calc(0.2em / 2 * -1);
+  position: absolute;
+  right: 0;
+  top: 50%;
+  z-index: 2;
+}
 
 /*bootbox override*/
 .modal-open {

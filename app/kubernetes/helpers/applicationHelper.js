@@ -1,9 +1,16 @@
 import _ from 'lodash-es';
-import {KubernetesPortMapping, KubernetesPortMappingPort} from 'Kubernetes/models/port/models';
-import {KubernetesServiceTypes} from 'Kubernetes/models/service/models';
+import { KubernetesPortMapping, KubernetesPortMappingPort } from 'Kubernetes/models/port/models';
+import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import KubernetesPodConverter from 'Kubernetes/converters/pod';
-import {KubernetesConfigurationTypes} from 'Kubernetes/models/configuration/models';
-import {KubernetesApplicationConfigurationFormValueOverridenKeyTypes} from 'Kubernetes/models/application/formValues';
+import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
+import {
+  KubernetesApplicationConfigurationFormValueOverridenKeyTypes,
+  KubernetesApplicationEnvironmentVariableFormValue,
+  KubernetesApplicationConfigurationFormValue,
+  KubernetesApplicationConfigurationFormValueOverridenKey,
+  KubernetesApplicationPersistedFolderFormValue,
+  KubernetesApplicationPublishedPortFormValue
+} from 'Kubernetes/models/application/formValues';
 import {
   KubernetesApplicationEnvConfigMapPayload,
   KubernetesApplicationEnvPayload,
@@ -14,6 +21,7 @@ import {
   KubernetesApplicationVolumePersistentPayload,
   KubernetesApplicationVolumeSecretPayload
 } from 'Kubernetes/models/application/payloads';
+import KubernetesVolumeHelper from './volumeHelper';
 
 class KubernetesApplicationHelper {
 
@@ -30,24 +38,16 @@ class KubernetesApplicationHelper {
       let envFind;
       let volumeFind;
       if (config.Type === KubernetesConfigurationTypes.CONFIGMAP) {
-        envFind = _.find(application.Env, { valueFrom: { configMapKeyRef: { name: config.Name }}});
-        volumeFind = _.find(application.Volumes, { configMap: { name: config.Name }});
+        envFind = _.find(application.Env, { valueFrom: { configMapKeyRef: { name: config.Name } } });
+        volumeFind = _.find(application.Volumes, { configMap: { name: config.Name } });
       } else {
-        envFind = _.find(application.Env, { valueFrom: { secretKeyRef: { name: config.Name }}});
-        volumeFind = _.find(application.Volumes, { secret: { secretName: config.Name }});
+        envFind = _.find(application.Env, { valueFrom: { secretKeyRef: { name: config.Name } } });
+        volumeFind = _.find(application.Volumes, { secret: { secretName: config.Name } });
       }
       if (envFind || volumeFind) {
         return true;
       }
     });
-  }
-
-  static dnsCompliantString(s) {
-    return s.replace(/[^a-z0-9\-]/gi, '-').toLowerCase();
-  }
-
-  static generateApplicationVolumeName(applicationName, volumePath) {
-    return applicationName + KubernetesApplicationHelper.dnsCompliantString(volumePath);
   }
 
   static associatePodsAndApplication(pods, app) {
@@ -59,7 +59,7 @@ class KubernetesApplicationHelper {
     const res = _.reduce(applications, (acc, app) => {
       if (app.PublishedPorts.length > 0) {
         const mapping = new KubernetesPortMapping();
-        mapping.ApplicationName = app.Name;
+        mapping.Name = app.Name;
         mapping.ResourcePool = app.ResourcePool;
         mapping.ServiceType = app.ServiceType;
         mapping.LoadBalancerIPAddress = app.LoadBalancerIPAddress;
@@ -78,15 +78,17 @@ class KubernetesApplicationHelper {
     return res;
   }
 
-  static generateEnvFromEnvVariables(app, envVariables) {
+  /**
+   * FORMVALUES TO APPLICATION FUNCTIONS
+   */
+  static generateEnvFromEnvVariables(envVariables) {
     const env = _.map(envVariables, (item) => {
       const res = new KubernetesApplicationEnvPayload();
       res.name = item.Name;
       res.value = item.Value;
       return res;
     });
-    app.Env = _.concat(app.Env, env);
-    return app;
+    return env;
   }
 
   static generateEnvOrVolumesFromConfigurations(app, configurations) {
@@ -131,7 +133,7 @@ class KubernetesApplicationHelper {
         const volKeys = _.filter(config.OverridenKeys, (item) => item.Type === KubernetesApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM);
         const groupedVolKeys = _.groupBy(volKeys, 'Path');
         _.forEach(groupedVolKeys, (items, path) => {
-          const volumeName = KubernetesApplicationHelper.dnsCompliantString('volume-' + path);
+          const volumeName = KubernetesVolumeHelper.generatedApplicationConfigVolumeName(app.Name);
           const configurationName = config.SelectedConfiguration.Name;
           const itemsMap = _.map(items, (item) => {
             const entry = new KubernetesApplicationVolumeEntryPayload();
@@ -165,14 +167,14 @@ class KubernetesApplicationHelper {
     return app;
   }
 
-  static generateVolumesFromPersistedFolders(app, persistedFolders) {
+  static generateVolumesFromPersistentVolumClaims(app, volumeClaims) {
     app.VolumeMounts = [];
     app.Volumes = [];
-    _.forEach(persistedFolders, (item) => {
-      const name = KubernetesApplicationHelper.generateApplicationVolumeName(app.Name, item.ContainerPath);
+    _.forEach(volumeClaims, (item) => {
       const volumeMount = new KubernetesApplicationVolumeMountPayload();
+      const name = item.Name;
       volumeMount.name = name;
-      volumeMount.mountPath = item.ContainerPath;
+      volumeMount.mountPath = item.MountPath;
       app.VolumeMounts.push(volumeMount);
 
       const volume = new KubernetesApplicationVolumePersistentPayload();
@@ -180,8 +182,107 @@ class KubernetesApplicationHelper {
       volume.persistentVolumeClaim.claimName = name;
       app.Volumes.push(volume);
     });
-    return app;
   }
+  /**
+   * !FORMVALUES TO APPLICATION FUNCTIONS
+   */
+
+  /**
+   * APPLICATION TO FORMVALUES FUNCTIONS
+   */
+  static generateEnvVariablesFromEnv(env) {
+    const envVariables = _.map(env, (item) => {
+      if (!item.value) {
+        return;
+      }
+      const res = new KubernetesApplicationEnvironmentVariableFormValue();
+      res.Name = item.name;
+      res.Value = item.value;
+      return res;
+    });
+    return _.without(envVariables, undefined);
+  }
+
+  static generateConfigurationFormValuesFromEnvAndVolumes(env, volumes, configurations) {
+    const finalRes = _.flatMap(configurations, (cfg) => {
+      const filterCondition = cfg.Type === KubernetesConfigurationTypes.CONFIGMAP ? 'valueFrom.configMapKeyRef.name' : 'valueFrom.secretKeyRef.name';
+
+      const cfgEnv = _.filter(env, [filterCondition, cfg.Name]);
+      const cfgVol = _.filter(volumes, { configurationName: cfg.Name });
+      if (!cfgEnv.length && !cfgVol.length) {
+        return;
+      }
+      const keys = _.reduce(_.keys(cfg.Data), (acc, k) => {
+        const keyEnv = _.filter(cfgEnv, { name: k });
+        const keyVol = _.filter(cfgVol, { configurationKey: k });
+        const key = {
+          Key: k,
+          Count: keyEnv.length + keyVol.length,
+          Sum: _.concat(keyEnv, keyVol),
+          EnvCount: keyEnv.length,
+          VolCount: keyVol.length
+        };
+        acc.push(key);
+        return acc;
+      }, []);
+
+      const max = _.max(_.map(keys, 'Count'));
+      const overrideThreshold = max - _.max(_.map(keys, 'VolCount'));
+      const res = _.map(new Array(max), () => new KubernetesApplicationConfigurationFormValue());
+      _.forEach(res, (item, index) => {
+        item.SelectedConfiguration = cfg;
+        const overriden = index >= overrideThreshold;
+        if (overriden) {
+          item.Overriden = true;
+          item.OverridenKeys = _.map(keys, (k) => {
+            const fvKey = new KubernetesApplicationConfigurationFormValueOverridenKey();
+            fvKey.Key = k.Key;
+            if (index < k.EnvCount) {
+              fvKey.Type = KubernetesApplicationConfigurationFormValueOverridenKeyTypes.ENVIRONMENT;
+            } else {
+              fvKey.Type = KubernetesApplicationConfigurationFormValueOverridenKeyTypes.FILESYSTEM;
+              fvKey.Path = k.Sum[index].rootMountPath;
+            }
+            return fvKey;
+          });
+        }
+      });
+      return res;
+    });
+    return _.without(finalRes, undefined);
+  }
+
+  static generatePersistedFoldersFormValuesFromPersistedFolders(persistedFolders, persistentVolumeClaims) {
+    const finalRes = _.map(persistedFolders, (folder) => {
+      const pvc = _.find(persistentVolumeClaims, (item) => _.startsWith(item.Name, folder.PersistentVolumeClaimName));
+      const res = new KubernetesApplicationPersistedFolderFormValue(pvc.StorageClass);
+      res.PersistentVolumeClaimName = folder.PersistentVolumeClaimName;
+      res.Size = parseInt(pvc.Storage.slice(0, -2));
+      res.SizeUnit = pvc.Storage.slice(-2);
+      res.ContainerPath = folder.MountPath;
+      return res;
+    });
+    return finalRes;
+  }
+
+  static generatePublishedPortsFormValuesFromPublishedPorts(serviceType, publishedPorts) {
+    const finalRes = _.map(publishedPorts, (port) => {
+      const res = new KubernetesApplicationPublishedPortFormValue();
+      res.Protocol = port.protocol;
+      res.ContainerPort = port.targetPort;
+      if (serviceType === KubernetesServiceTypes.LOAD_BALANCER) {
+        res.LoadBalancerPort = port.port;
+      } else if (serviceType === KubernetesServiceTypes.NODE_PORT) {
+        res.NodePort = port.nodePort;
+      }
+      return res;
+    });
+    return finalRes;
+  }
+
+  /**
+   * !APPLICATION TO FORMVALUES FUNCTIONS
+   */
 
   static isExternalApplication(application) {
     return !application.ApplicationOwner;

@@ -20,16 +20,3 @@ export class KubernetesServiceCreatePayload {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesServiceCreatePayload)));
   }
 }
-
-/**
- * KubernetesServicePatchPayload Model
- */
-const _KubernetesServicePatchPayload = Object.freeze({
-  metadata: new KubernetesCommonMetadataPayload(),
-});
-
-export class KubernetesServicePatchPayload {
-  constructor() {
-    Object.assign(this, JSON.parse(JSON.stringify(_KubernetesServicePatchPayload)));
-  }
-}

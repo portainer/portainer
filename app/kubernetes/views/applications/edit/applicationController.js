@@ -25,7 +25,6 @@ class KubernetesApplicationController {
     this.getApplicationAsync = this.getApplicationAsync.bind(this);
     this.getEvents = this.getEvents.bind(this);
     this.getEventsAsync = this.getEventsAsync.bind(this);
-    this.getStacksAsync = this.getStacksAsync.bind(this);
     this.updateApplicationAsync = this.updateApplicationAsync.bind(this);
     this.copyLoadBalancerIP = this.copyLoadBalancerIP.bind(this);
   }
@@ -40,11 +39,6 @@ class KubernetesApplicationController {
 
   isExternalApplication() {
     return KubernetesApplicationHelper.isExternalApplication(this.application);
-  }
-
-  resetApplicationStackName() {
-    this.formValues.StackName = '';
-    this.state.updateStackName = false;
   }
 
   copyLoadBalancerIP() {
@@ -72,33 +66,17 @@ class KubernetesApplicationController {
   async updateApplicationAsync() {
     try {
       const application = angular.copy(this.application);
-      application.StackName = this.formValues.StackName;
       application.Note = this.formValues.Note;
-      await this.KubernetesApplicationService.patch(application);
+      await this.KubernetesApplicationService.patch(this.application, application, true);
       this.Notifications.success('Application successfully updated');
       this.$state.reload();
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve application related events');
+      this.Notifications.error('Failure', err, 'Unable to update application');
     }
   }
 
   updateApplication() {
     return this.$async(this.updateApplicationAsync);
-  }
-
-  /**
-   * STACKS
-   */
-  async getStacksAsync() {
-    try {
-      this.stacks = await this.KubernetesStackService.get(this.state.params.namespace);
-    } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to retrieve stacks');
-    }
-  }
-
-  getStacks() {
-    return this.$async(this.getStacksAsync);
   }
 
   /**
@@ -130,6 +108,7 @@ class KubernetesApplicationController {
     try {
       this.state.dataLoading = true;
       this.application = await this.KubernetesApplicationService.get(this.state.params.namespace, this.state.params.name);
+      this.formValues.Note = this.application.Note;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve application details');
     } finally {
@@ -154,19 +133,15 @@ class KubernetesApplicationController {
         name: this.$transition$.params().name,
       },
       eventWarningCount: 0,
-      updateStackName: false
     };
 
     this.formValues = {
-      StackName: '',
-      Note: ''
+      Note: '',
     };
 
     this.KubernetesApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;
     await this.getApplication();
-    this.formValues.Note = this.application.Note;
     await this.getEvents();
-    await this.getStacks();
     this.state.viewReady = true;
   }
 

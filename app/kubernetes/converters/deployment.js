@@ -1,30 +1,35 @@
-import {KubernetesDeployment} from 'Kubernetes/models/deployment/models';
-import {KubernetesDeploymentCreatePayload, KubernetesDeploymentPatchPayload} from 'Kubernetes/models/deployment/payloads';
-import {KubernetesPortainerApplicationStackNameLabel, KubernetesPortainerApplicationNameLabel, KubernetesPortainerApplicationOwnerLabel, KubernetesPortainerApplicationNote } from 'Kubernetes/models/application/models';
-import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
+import * as JsonPatch from 'fast-json-patch';
+import { KubernetesDeployment } from 'Kubernetes/models/deployment/models';
+import { KubernetesDeploymentCreatePayload } from 'Kubernetes/models/deployment/payloads';
+import {
+  KubernetesPortainerApplicationStackNameLabel,
+  KubernetesPortainerApplicationNameLabel,
+  KubernetesPortainerApplicationOwnerLabel,
+  KubernetesPortainerApplicationNote
+} from 'Kubernetes/models/application/models';
 
-function bytesValue(mem) {
-  return mem * 1000 * 1000;
-}
+import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
+import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
+import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';
 
 class KubernetesDeploymentConverter {
   /**
    * Generate KubernetesDeployment from KubernetesApplicationFormValues
    * @param {KubernetesApplicationFormValues} formValues
    */
-  static applicationFormValuesToDeployment(formValues) {
+  static applicationFormValuesToDeployment(formValues, volumeClaims) {
     const res = new KubernetesDeployment();
     res.Namespace = formValues.ResourcePool.Namespace.Name;
     res.Name = formValues.Name;
     res.StackName = formValues.StackName ? formValues.StackName : formValues.Name;
     res.ApplicationOwner = formValues.ApplicationOwner;
+    res.ApplicationName = formValues.Name;
     res.ReplicaCount = formValues.ReplicaCount;
     res.Image = formValues.Image;
-    res.Env = [];
     res.CpuLimit = formValues.CpuLimit;
-    res.MemoryLimit = bytesValue(formValues.MemoryLimit);
-    KubernetesApplicationHelper.generateEnvFromEnvVariables(res, formValues.EnvironmentVariables);
-    KubernetesApplicationHelper.generateVolumesFromPersistedFolders(res, formValues.PersistedFolders);
+    res.MemoryLimit = KubernetesResourceReservationHelper.bytesValue(formValues.MemoryLimit);
+    res.Env = KubernetesApplicationHelper.generateEnvFromEnvVariables(formValues.EnvironmentVariables);
+    KubernetesApplicationHelper.generateVolumesFromPersistentVolumClaims(res, volumeClaims);
     KubernetesApplicationHelper.generateEnvOrVolumesFromConfigurations(res, formValues.Configurations);
     return res;
   }
@@ -38,16 +43,18 @@ class KubernetesDeploymentConverter {
     payload.metadata.name = deployment.Name;
     payload.metadata.namespace = deployment.Namespace;
     payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = deployment.StackName;
-    payload.metadata.labels[KubernetesPortainerApplicationNameLabel] = deployment.Name;
+    payload.metadata.labels[KubernetesPortainerApplicationNameLabel] = deployment.ApplicationName;
     payload.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = deployment.ApplicationOwner;
+    payload.metadata.annotations[KubernetesPortainerApplicationNote] = deployment.Note;
     payload.spec.replicas = deployment.ReplicaCount;
     payload.spec.selector.matchLabels.app = deployment.Name;
     payload.spec.template.metadata.labels.app = deployment.Name;
+    payload.spec.template.metadata.labels[KubernetesPortainerApplicationNameLabel] = deployment.ApplicationName;
     payload.spec.template.spec.containers[0].name = deployment.Name;
     payload.spec.template.spec.containers[0].image = deployment.Image;
-    payload.spec.template.spec.containers[0].env = deployment.Env;
-    payload.spec.template.spec.containers[0].volumeMounts = deployment.VolumeMounts;
-    payload.spec.template.spec.volumes = deployment.Volumes;
+    KubernetesCommonHelper.assignOrDeleteIfEmpty(payload, 'spec.template.spec.containers[0].env', deployment.Env);
+    KubernetesCommonHelper.assignOrDeleteIfEmpty(payload, 'spec.template.spec.containers[0].volumeMounts', deployment.VolumeMounts);
+    KubernetesCommonHelper.assignOrDeleteIfEmpty(payload, 'spec.template.spec.volumes', deployment.Volumes);
     if (deployment.MemoryLimit) {
       payload.spec.template.spec.containers[0].resources.limits.memory = deployment.MemoryLimit;
       payload.spec.template.spec.containers[0].resources.requests.memory = deployment.MemoryLimit;
@@ -56,16 +63,16 @@ class KubernetesDeploymentConverter {
       payload.spec.template.spec.containers[0].resources.limits.cpu = deployment.CpuLimit;
       payload.spec.template.spec.containers[0].resources.requests.cpu = deployment.CpuLimit;
     }
+    if (!deployment.CpuLimit && !deployment.MemoryLimit) {
+      delete payload.spec.template.spec.containers[0].resources;
+    }
     return payload;
   }
 
-  static patchPayload(deployment) {
-    const payload = new KubernetesDeploymentPatchPayload();
-    delete payload.metadata.uid;
-    delete payload.metadata.name;
-    delete payload.metadata.namespace;
-    payload.metadata.labels[KubernetesPortainerApplicationStackNameLabel] = deployment.StackName;
-    payload.metadata.annotations[KubernetesPortainerApplicationNote] = deployment.Note;
+  static patchPayload(oldDeployment, newDeployment) {
+    const oldPayload = KubernetesDeploymentConverter.createPayload(oldDeployment);
+    const newPayload = KubernetesDeploymentConverter.createPayload(newDeployment);
+    const payload = JsonPatch.compare(oldPayload, newPayload);
     return payload;
   }
 }

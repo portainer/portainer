@@ -19,7 +19,6 @@ export class KubernetesPortMappingPort {
 const _KubernetesPortMapping = Object.freeze({
   Expanded: false,
   Highlighted: false,
-  ApplicationName: '',
   ResourcePool: '',
   ServiceType: '',
   LoadBalancerIPAddress: '',

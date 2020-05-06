@@ -1,9 +1,9 @@
 import _ from 'lodash-es';
+import * as JsonPatch from 'fast-json-patch';
 
 import { KubernetesPersistentVolumeClaim } from 'Kubernetes/models/volume/models';
-import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 import { KubernetesPersistentVolumClaimCreatePayload } from 'Kubernetes/models/volume/payloads';
-import { KubernetesPortainerApplicationOwnerLabel } from 'Kubernetes/models/application/models';
+import { KubernetesPortainerApplicationOwnerLabel, KubernetesPortainerApplicationNameLabel } from 'Kubernetes/models/application/models';
 
 class KubernetesPersistentVolumeClaimConverter {
 
@@ -17,6 +17,7 @@ class KubernetesPersistentVolumeClaimConverter {
     res.StorageClass = _.find(storageClasses, {Name: data.spec.storageClassName});
     res.Yaml = yaml ? yaml.data : '';
     res.ApplicationOwner = data.metadata.labels ? data.metadata.labels[KubernetesPortainerApplicationOwnerLabel] : '';
+    res.ApplicationName = data.metadata.labels ? data.metadata.labels[KubernetesPortainerApplicationNameLabel] : '';
     return res;
   }
 
@@ -25,26 +26,43 @@ class KubernetesPersistentVolumeClaimConverter {
    * @param {KubernetesApplicationFormValues} formValues
    */
   static applicationFormValuesToVolumeClaims(formValues) {
+    _.remove(formValues.PersistedFolders, (item) => item.NeedsDeletion);
     const res = _.map(formValues.PersistedFolders, (item) => {
       const pvc = new KubernetesPersistentVolumeClaim();
-      pvc.Name = KubernetesApplicationHelper.generateApplicationVolumeName(formValues.Name, item.ContainerPath);
+      if (item.PersistentVolumeClaimName) {
+        pvc.Name = item.PersistentVolumeClaimName;
+        pvc.PreviousName = item.PersistentVolumeClaimName;
+      } else {
+        pvc.Name = formValues.Name + '-' + pvc.Name;
+      }
+      pvc.MountPath = item.ContainerPath;
       pvc.Namespace = formValues.ResourcePool.Namespace.Name;
       pvc.Storage = '' + item.Size + item.SizeUnit.charAt(0) + 'i';
       pvc.StorageClass = item.StorageClass;
       pvc.ApplicationOwner = formValues.ApplicationOwner;
+      pvc.ApplicationName = formValues.Name;
       return pvc;
     });
     return res;
   }
 
-  static createPayload(data) {
+  static createPayload(pvc) {
     const res = new KubernetesPersistentVolumClaimCreatePayload();
-    res.metadata.name = data.Name;
-    res.metadata.namespace = data.Namespace;
-    res.spec.resources.requests.storage = data.Storage;
-    res.spec.storageClassName = data.StorageClass.Name;
-    res.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = data.ApplicationOwner;
+    res.metadata.name = pvc.Name;
+    res.metadata.namespace = pvc.Namespace;
+    res.spec.resources.requests.storage = pvc.Storage;
+    res.spec.storageClassName = pvc.StorageClass.Name;
+    res.metadata.labels.app = pvc.ApplicationName;
+    res.metadata.labels[KubernetesPortainerApplicationOwnerLabel] = pvc.ApplicationOwner;
+    res.metadata.labels[KubernetesPortainerApplicationNameLabel] = pvc.ApplicationName;
     return res;
+  }
+
+  static patchPayload(oldPVC, newPVC) {
+    const oldPayload = KubernetesPersistentVolumeClaimConverter.createPayload(oldPVC);
+    const newPayload = KubernetesPersistentVolumeClaimConverter.createPayload(newPVC);
+    const payload = JsonPatch.compare(oldPayload, newPayload);
+    return payload;
   }
 }
 

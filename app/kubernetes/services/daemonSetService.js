@@ -75,21 +75,24 @@ class KubernetesDaemonSetService {
   /**
    * PATCH
    */
-  async patchAsync(daemonSet) {
+  async patchAsync(oldDaemonSet, newDaemonSet) {
     try {
       const params = new KubernetesCommonParams();
-      params.id = daemonSet.Name;
-      const namespace = daemonSet.Namespace;
-      const payload = KubernetesDaemonSetConverter.patchPayload(daemonSet);
+      params.id = newDaemonSet.Name;
+      const namespace = newDaemonSet.Namespace;
+      const payload = KubernetesDaemonSetConverter.patchPayload(oldDaemonSet, newDaemonSet);
+      if (!payload.length) {
+        return;
+      }
       const data = await this.KubernetesDaemonSets(namespace).patch(params, payload).$promise;
       return data;
     } catch (err) {
-      throw new PortainerError('Unable to patch daemonset', err);
+      throw new PortainerError('Unable to patch daemonSet', err);
     }
   }
 
-  patch(daemonSet) {
-    return this.$async(this.patchAsync, daemonSet);
+  patch(oldDaemonSet, newDaemonSet) {
+    return this.$async(this.patchAsync, oldDaemonSet, newDaemonSet);
   }
 
   /**

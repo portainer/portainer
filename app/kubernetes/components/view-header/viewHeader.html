@@ -1,12 +1,10 @@
-<rd-header>
+<rd-header ng-if="$ctrl.viewReady">
   <rd-header-title title-text="{{ $ctrl.title }}">
     <a data-toggle="tooltip" title="refresh the view" ui-sref="{{ $ctrl.state }}" ui-sref-opts="{reload: true}" ng-if="$ctrl.viewReady">
       <i class="fa fa-sm fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
   <rd-header-content>
-    <div ng-if="$ctrl.viewReady">
-      <ng-transclude></ng-transclude>
-    </div>
+    <ng-transclude></ng-transclude>
   </rd-header-content>
 </rd-header>

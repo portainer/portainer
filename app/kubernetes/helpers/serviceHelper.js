@@ -1,8 +1,9 @@
-import { KubernetesServiceHeadlessSuffix } from 'Kubernetes/models/service/models';
+import { KubernetesServiceHeadlessPrefix } from 'Kubernetes/models/service/models';
 
 class KubernetesServiceHelper {
   static generateHeadlessServiceName(name) {
-    return name + KubernetesServiceHeadlessSuffix;
+    return KubernetesServiceHeadlessPrefix + name;
   }
+
 }
 export default KubernetesServiceHelper;

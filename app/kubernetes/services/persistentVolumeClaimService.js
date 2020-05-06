@@ -16,6 +16,7 @@ class KubernetesPersistentVolumeClaimService {
     this.getAsync = this.getAsync.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);
     this.createAsync = this.createAsync.bind(this);
+    this.patchAsync = this.patchAsync.bind(this);
     this.deleteAsync = this.deleteAsync.bind(this);
   }
 
@@ -66,6 +67,29 @@ class KubernetesPersistentVolumeClaimService {
 
   create(claim) {
     return this.$async(this.createAsync, claim);
+  }
+
+  /**
+   * PATCH
+   */
+  async patchAsync(oldPVC, newPVC) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = newPVC.Name;
+      const namespace = newPVC.Namespace;
+      const payload = KubernetesPersistentVolumeClaimConverter.patchPayload(oldPVC, newPVC);
+      if (!payload.length) {
+        return;
+      }
+      const data = await this.KubernetesPersistentVolumeClaims(namespace).patch(params, payload).$promise;
+      return data;
+    } catch (err) {
+      throw new PortainerError('Unable to patch persistent volume claim', err);
+    }
+  }
+
+  patch(oldPVC, newPVC) {
+    return this.$async(this.patchAsync, oldPVC, newPVC);
   }
 
   /**

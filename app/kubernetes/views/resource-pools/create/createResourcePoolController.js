@@ -2,14 +2,7 @@ import angular from 'angular';
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import {KubernetesResourceQuotaDefaults} from 'Kubernetes/models/resource-quota/models';
-
-function megaBytesValue(mem) {
-  return Math.floor(mem / 1000 / 1000);
-}
-
-function bytesValue(mem) {
-  return mem * 1000 * 1000;
-}
+import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 
 class KubernetesCreateResourcePoolController {
   /* @ngInject */
@@ -48,8 +41,8 @@ class KubernetesCreateResourcePoolController {
     if (this.formValues.CpuLimit < this.defaults.CpuLimit) {
       this.formValues.CpuLimit = this.defaults.CpuLimit;
     }
-    if (this.formValues.MemoryLimit < megaBytesValue(this.defaults.MemoryLimit)) {
-        this.formValues.MemoryLimit = megaBytesValue(this.defaults.MemoryLimit);
+    if (this.formValues.MemoryLimit < KubernetesResourceReservationHelper.megaBytesValue(this.defaults.MemoryLimit)) {
+        this.formValues.MemoryLimit = KubernetesResourceReservationHelper.megaBytesValue(this.defaults.MemoryLimit);
     }
   }
 
@@ -58,7 +51,7 @@ class KubernetesCreateResourcePoolController {
     try {
       this.checkDefaults();
       const owner = this.Authentication.getUserDetails().username;
-      await this.KubernetesResourcePoolService.create(this.formValues.Name, owner, this.formValues.hasQuota, this.formValues.CpuLimit, bytesValue(this.formValues.MemoryLimit));
+      await this.KubernetesResourcePoolService.create(this.formValues.Name, owner, this.formValues.hasQuota, this.formValues.CpuLimit, KubernetesResourceReservationHelper.bytesValue(this.formValues.MemoryLimit));
       this.Notifications.success('Resource pool successfully created', this.formValues.Name);
       this.$state.go('kubernetes.resourcePools');
     } catch (err) {
@@ -108,7 +101,7 @@ class KubernetesCreateResourcePoolController {
         this.state.sliderMaxMemory += filesizeParser(item.Memory);
         this.state.sliderMaxCpu += item.CPU;
       });
-      this.state.sliderMaxMemory = megaBytesValue(this.state.sliderMaxMemory);
+      this.state.sliderMaxMemory = KubernetesResourceReservationHelper.megaBytesValue(this.state.sliderMaxMemory);
       await this.getResourcePools();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
