@@ -52,22 +52,26 @@ class KubernetesApplicationConverter {
       return volume.persistentVolumeClaim || volume.hostPath;
     });
 
-    res.PersistedFolders = _.map(persistedFolders, (volume) => {
-      const matchingVolumeMount = _.find(data.spec.template.spec.containers[0].volumeMounts, { name: volume.name });
+    res.PersistedFolders = [];
+    _.forEach(data.spec.template.spec.containers, (container) => {
+      _.forEach(persistedFolders, (volume) => {
+        const matchingVolumeMount = _.find(container.volumeMounts, { name: volume.name });
 
-      if (matchingVolumeMount) {
-        const persistedFolder = new KubernetesApplicationPersistedFolder();
-        persistedFolder.mountPath = matchingVolumeMount.mountPath;
+        if (matchingVolumeMount) {
+          const persistedFolder = new KubernetesApplicationPersistedFolder();
+          persistedFolder.mountPath = matchingVolumeMount.mountPath;
+          persistedFolder.podName = container.name;
 
-        if (volume.persistentVolumeClaim) {
-          persistedFolder.persistentVolumeClaimName = volume.persistentVolumeClaim.claimName;
-        } else {
-          persistedFolder.hostPath = volume.hostPath.path;
+          if (volume.persistentVolumeClaim) {
+            persistedFolder.persistentVolumeClaimName = volume.persistentVolumeClaim.claimName;
+          } else {
+            persistedFolder.hostPath = volume.hostPath.path;
+          }
+
+          res.PersistedFolders.push(persistedFolder);
         }
-
-        return persistedFolder;
-      }
-    });
+      })
+    })
 
     res.ConfigurationVolumes = _.reduce(data.spec.template.spec.volumes, (acc, volume) => {
       if (volume.configMap || volume.secret) {

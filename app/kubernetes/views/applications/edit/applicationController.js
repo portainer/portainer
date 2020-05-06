@@ -1,6 +1,9 @@
 import angular from 'angular';
 import _ from 'lodash-es';
-import {KubernetesApplicationDeploymentTypes} from 'Kubernetes/models/application/models';
+import {
+  KubernetesApplicationDataAccessPolicies,
+  KubernetesApplicationDeploymentTypes
+} from 'Kubernetes/models/application/models';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 
@@ -15,6 +18,7 @@ class KubernetesApplicationController {
     this.KubernetesEventService = KubernetesEventService;
     this.KubernetesStackService = KubernetesStackService;
     this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
+    this.ApplicationDataAccessPolicies = KubernetesApplicationDataAccessPolicies;
 
     this.onInit = this.onInit.bind(this);
     this.getApplication = this.getApplication.bind(this);

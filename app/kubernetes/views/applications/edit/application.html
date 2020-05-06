@@ -329,7 +329,7 @@
               </portainer-tooltip>
             </div>
 
-            <table class="table">
+            <table class="table" ng-if="ctrl.application.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.SHARED">
               <tbody>
                 <tr class="text-muted">
                   <td style="width: 50%;">Persisted folder</td>
@@ -344,6 +344,32 @@
                   </td>
                   <td ng-if="volume.hostPath">
                     {{ volume.hostPath }} on host filesystem
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <table class="table" ng-if="ctrl.application.DataAccessPolicy === ctrl.ApplicationDataAccessPolicies.ISOLATED">
+              <thead>
+                <tr class="text-muted">
+                  <td style="width: 33%;">Pod</td>
+                  <td style="width: 33%;">Persisted folder</td>
+                  <td style="width: 33%;">Persistence</td>
+                </tr>
+              </thead>
+              <tbody ng-repeat="pod in ctrl.application.Pods track by $index" style="border-top: none">
+                <tr ng-repeat="volume in ctrl.application.PersistedFolders track by $index">
+                  <td>
+                    {{ pod.Name }}
+                  </td>
+                  <td>
+                      {{ volume.mountPath }}
+                  </td>
+                  <td ng-if="volume.persistentVolumeClaimName">
+                    <a ui-sref="kubernetes.volumes.volume({ name: volume.persistentVolumeClaimName + '-' + pod.Name, namespace: ctrl.application.ResourcePool })"><i class="fa fa-database" aria-hidden="true"></i> {{ volume.persistentVolumeClaimName + '-' + pod.Name }}</a>
+                  </td>
+                  <td ng-if="volume.hostPath">
+                      {{ volume.hostPath }} on host filesystem
                   </td>
                 </tr>
               </tbody>
