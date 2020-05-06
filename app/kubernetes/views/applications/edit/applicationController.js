@@ -52,6 +52,11 @@ class KubernetesApplicationController {
     $('#copyNotificationLB').show().fadeOut(2500);
   }
 
+  copyApplicationName() {
+    this.clipboard.copyText(this.application.Name);
+    $('#copyNotificationApplicationName').show().fadeOut(2500);
+  }
+
   hasPersistedFolders() {
     return this.application && this.application.PersistedFolders.length;
   }

@@ -229,8 +229,11 @@
             <div ng-if="ctrl.application.ServiceType === 'ClusterIP'">
               <div class="small text-muted">
                 <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                This application is only available for internal usage inside the cluster. It can be reached through the application name <code>{{ ctrl.application.Name }}</code>
-                using the port configuration below.
+                This application is only available for internal usage inside the cluster via the application name <code>{{ ctrl.application.Name }}</code> <span class="btn btn-primary btn-xs" ng-click="ctrl.copyApplicationName()"><i class="fa fa-copy space-right" aria-hidden="true"></i>Copy</span>
+                <span id="copyNotificationApplicationName" style="margin-left: 7px; display: none; color: #23ae89;" class="small"><i class="fa fa-check" aria-hidden="true"></i> copied</span>
+              </div>
+              <div class="small text-muted" style="margin-top: 2px;">
+                <p>Refer to the below port configuration to access the application.</p>
               </div>
               <div style="margin-top: 15px; width: 33%;">
                 <table class="table">
