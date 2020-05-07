@@ -15,7 +15,8 @@
           </div>
           <div class="form-group">
             <span class="col-sm-12 text-muted small">
-              The following configuration will be used to access this <a href="https://docs.docker.com/registry/spec/api/" target="_blank">registry API</a> to provide Portainer management features.
+              The following configuration will be used to access this <a href="https://docs.docker.com/registry/spec/api/" target="_blank">registry API</a> to provide Portainer
+              management features.
             </span>
           </div>
           <div class="col-sm-12 form-section-title">
@@ -27,7 +28,7 @@
               Registry URL
             </label>
             <div class="col-sm-9 col-lg-10">
-              <input type="text" class="form-control" id="registry_url" ng-model="registry.URL" disabled>
+              <input type="text" class="form-control" id="registry_url" ng-model="registry.URL" disabled />
             </div>
           </div>
           <!-- !registry-url-input -->
@@ -38,9 +39,7 @@
                 Authentication
                 <portainer-tooltip position="bottom" message="Enable this option if you need to specify credentials to connect to this registry."></portainer-tooltip>
               </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" ng-model="model.Authentication"><i></i>
-              </label>
+              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="model.Authentication" /><i></i> </label>
             </div>
           </div>
           <!-- !authentication-checkbox -->
@@ -50,7 +49,7 @@
             <div class="form-group">
               <label for="credentials_username" class="col-sm-3 col-lg-2 control-label text-left">Username</label>
               <div class="col-sm-9 col-lg-10">
-                <input type="text" class="form-control" id="credentials_username" ng-model="model.Username">
+                <input type="text" class="form-control" id="credentials_username" ng-model="model.Username" />
               </div>
             </div>
             <!-- !credentials-user -->
@@ -58,7 +57,7 @@
             <div class="form-group">
               <label for="credentials_password" class="col-sm-3 col-lg-2 control-label text-left">Password</label>
               <div class="col-sm-9 col-lg-10">
-                <input type="password" class="form-control" id="credentials_password" ng-model="model.Password" placeholder="*******">
+                <input type="password" class="form-control" id="credentials_password" ng-model="model.Password" placeholder="*******" />
               </div>
             </div>
             <!-- !credentials-password -->
@@ -73,9 +72,7 @@
                   TLS
                   <portainer-tooltip position="bottom" message="Enable this option if you need to connect to the registry API with TLS."></portainer-tooltip>
                 </label>
-                <label class="switch" style="margin-left: 20px;">
-                  <input type="checkbox" ng-model="model.TLS"><i></i>
-                </label>
+                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="model.TLS" /><i></i> </label>
               </div>
             </div>
             <!-- !tls-checkbox -->
@@ -86,9 +83,7 @@
                   Skip certificate verification
                   <portainer-tooltip position="bottom" message="Skip the verification of the server TLS certificate. Not recommended on unsecured networks."></portainer-tooltip>
                 </label>
-                <label class="switch" style="margin-left: 20px;">
-                  <input type="checkbox" ng-model="model.TLSSkipVerify"><i></i>
-                </label>
+                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="model.TLSSkipVerify" /><i></i> </label>
               </div>
             </div>
             <!-- !tls-skip-verify -->
@@ -104,7 +99,11 @@
                   <button class="btn btn-sm btn-primary" ngf-select ng-model="model.TLSCACertFile">Select file</button>
                   <span style="margin-left: 5px;">
                     {{ model.TLSCACertFile.name }}
-                    <i class="fa fa-check green-icon" ng-if="model.TLSCACertFile && model.TLSCACertFile === registry.ManagementConfiguration.TLSConfig.TLSCACertFile" aria-hidden="true"></i>
+                    <i
+                      class="fa fa-check green-icon"
+                      ng-if="model.TLSCACertFile && model.TLSCACertFile === registry.ManagementConfiguration.TLSConfig.TLSCACertFile"
+                      aria-hidden="true"
+                    ></i>
                     <i class="fa fa-times red-icon" ng-if="!model.TLSCACertFile" aria-hidden="true"></i>
                   </span>
                 </div>
@@ -117,7 +116,11 @@
                   <button class="btn btn-sm btn-primary" ngf-select ng-model="model.TLSCertFile">Select file</button>
                   <span style="margin-left: 5px;">
                     {{ model.TLSCertFile.name }}
-                    <i class="fa fa-check green-icon" ng-if="model.TLSCertFile && model.TLSCertFile === registry.ManagementConfiguration.TLSConfig.TLSCertFile" aria-hidden="true"></i>
+                    <i
+                      class="fa fa-check green-icon"
+                      ng-if="model.TLSCertFile && model.TLSCertFile === registry.ManagementConfiguration.TLSConfig.TLSCertFile"
+                      aria-hidden="true"
+                    ></i>
                     <i class="fa fa-times red-icon" ng-if="!model.TLSCertFile" aria-hidden="true"></i>
                   </span>
                 </div>
@@ -148,7 +151,13 @@
                 <span ng-hide="state.testInProgress">Test configuration</span>
                 <span ng-show="state.testInProgress">Test in progress...</span>
               </button>
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="state.updateInProgress || !state.validConfiguration" ng-click="updateConfiguration()" button-spinner="state.updateInProgress">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                ng-disabled="state.updateInProgress || !state.validConfiguration"
+                ng-click="updateConfiguration()"
+                button-spinner="state.updateInProgress"
+              >
                 <span ng-hide="state.updateInProgress">Save configuration</span>
                 <span ng-show="state.updateInProgress">Saving configuration...</span>
               </button>

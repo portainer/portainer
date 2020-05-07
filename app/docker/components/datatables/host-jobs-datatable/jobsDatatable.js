@@ -7,6 +7,6 @@ angular.module('portainer.docker').component('jobsDatatable', {
     dataset: '<',
     tableKey: '@',
     orderBy: '@',
-    reverseOrder: '<'
-  }
+    reverseOrder: '<',
+  },
 });

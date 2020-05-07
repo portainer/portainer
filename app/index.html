@@ -1,64 +1,64 @@
-<!DOCTYPE html><html lang="en" ng-app="<%= name %>">
-<head>
-  <meta charset="utf-8">
-  <title>Portainer</title>
-  <meta name="description" content="">
-  <meta name="author" content="<%= author %>">
+<!DOCTYPE html
+><html lang="en" ng-app="<%= name %>">
+  <head>
+    <meta charset="utf-8" />
+    <title>Portainer</title>
+    <meta name="description" content="" />
+    <meta name="author" content="<%= author %>" />
 
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
 
-  <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
-  <!--[if lt IE 9]>
-  <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
-  <![endif]-->
+    <!-- Fav and touch icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="${require('../assets/ico/apple-touch-icon.png')}" />
+    <link rel="icon" type="image/png" sizes="32x32" href="${require('../assets/ico/favicon-32x32.png')}" />
+    <link rel="icon" type="image/png" sizes="16x16" href="${require('../assets/ico/favicon-16x16.png')}" />
+    <link rel="mask-icon" href="${require('../assets/ico/safari-pinned-tab.svg')}" color="#5bbad5" />
+    <link rel="shortcut icon" href="${require('../assets/ico/favicon.ico')}" />
+    <meta name="msapplication-config" content="${require('../assets/ico/browserconfig.xml')}" />
+    <meta name="theme-color" content="#ffffff" />
+  </head>
 
+  <body ng-controller="MainController">
+    <div
+      id="page-wrapper"
+      ng-class="{
+        open: toggle && ['portainer.auth', 'portainer.updatePassword', 'portainer.init.admin', 'portainer.init.endpoint'].indexOf($state.current.name) === -1,
+        nopadding: ['portainer.auth', 'portainer.updatePassword', 'portainer.init.admin', 'portainer.init.endpoint'].indexOf($state.current.name) > -1 || applicationState.loading
+      }"
+      ng-cloak
+    >
+      <div id="sideview" ui-view="sidebar" ng-if="!applicationState.loading"></div>
 
-  <!-- Fav and touch icons -->
-  <link rel="apple-touch-icon" sizes="180x180" href="${require('../assets/ico/apple-touch-icon.png')}">
-  <link rel="icon" type="image/png" sizes="32x32" href="${require('../assets/ico/favicon-32x32.png')}">
-  <link rel="icon" type="image/png" sizes="16x16" href="${require('../assets/ico/favicon-16x16.png')}">
-  <link rel="mask-icon" href="${require('../assets/ico/safari-pinned-tab.svg')}" color="#5bbad5">
-  <link rel="shortcut icon" href="${require('../assets/ico/favicon.ico')}">
-  <meta name="msapplication-config" content="${require('../assets/ico/browserconfig.xml')}">
-  <meta name="theme-color" content="#ffffff">
-</head>
-
-<body ng-controller="MainController">
-  <div id="page-wrapper" ng-class="{
-    open: toggle && ['portainer.auth', 'portainer.updatePassword', 'portainer.init.admin', 'portainer.init.endpoint'].indexOf($state.current.name) === -1,
-    nopadding: ['portainer.auth', 'portainer.updatePassword', 'portainer.init.admin', 'portainer.init.endpoint'].indexOf($state.current.name) > -1 || applicationState.loading
-  }"
-  ng-cloak>
-    <div id="sideview" ui-view="sidebar" ng-if="!applicationState.loading"></div>
-
-    <div id="content-wrapper">
-      <div class="page-content">
-
-        <div class="page-wrapper" ng-if="applicationState.loading">
-          <!-- loading box -->
-          <div class="container simple-box">
-            <div class="col-md-6 col-md-offset-3 col-sm-6 col-sm-offset-3">
-              <!-- loading box logo -->
-              <div class="row">
-                <img ng-if="logo" ng-src="{{ logo }}" class="simple-box-logo">
-                <img ng-if="!logo" src="${require('../assets/images/logo_alt.png')}" class="simple-box-logo" alt="Portainer">
+      <div id="content-wrapper">
+        <div class="page-content">
+          <div class="page-wrapper" ng-if="applicationState.loading">
+            <!-- loading box -->
+            <div class="container simple-box">
+              <div class="col-md-6 col-md-offset-3 col-sm-6 col-sm-offset-3">
+                <!-- loading box logo -->
+                <div class="row">
+                  <img ng-if="logo" ng-src="{{ logo }}" class="simple-box-logo" />
+                  <img ng-if="!logo" src="${require('../assets/images/logo_alt.png')}" class="simple-box-logo" alt="Portainer" />
+                </div>
+                <!-- !loading box logo -->
+                <!-- panel -->
+                <div class="row" style="text-align: center;">
+                  Loading Portainer...
+                  <i class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
+                </div>
+                <!-- !panel -->
               </div>
-              <!-- !loading box logo -->
-              <!-- panel -->
-              <div class="row" style="text-align: center">
-                Loading Portainer...
-                <i class="fa fa-cog fa-spin" style="margin-left: 5px"></i>
-              </div>
-              <!-- !panel -->
             </div>
+            <!-- !loading box -->
           </div>
-          <!-- !loading box -->
-        </div>
 
-        <!-- Main Content -->
-        <div id="view" ui-view="content" ng-if="!applicationState.loading"></div>
-
-      </div><!-- End Page Content -->
-    </div><!-- End Content Wrapper -->
-  </div><!-- End Page Wrapper -->
-
-</body></html>
+          <!-- Main Content -->
+          <div id="view" ui-view="content" ng-if="!applicationState.loading"></div> </div
+        ><!-- End Page Content --> </div
+      ><!-- End Content Wrapper --> </div
+    ><!-- End Page Wrapper -->
+  </body></html
+>

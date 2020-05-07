@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import {createStatus} from '../../docker/models/container';
+import { createStatus } from '../../docker/models/container';
 
 export function ScheduleDefaultModel() {
   this.Name = '';

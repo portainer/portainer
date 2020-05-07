@@ -4,6 +4,6 @@ angular.module('portainer.docker').component('nodeAvailabilitySelect', {
   bindings: {
     availability: '<',
     originalValue: '<',
-    onSave: '&'
-  }
+    onSave: '&',
+  },
 });

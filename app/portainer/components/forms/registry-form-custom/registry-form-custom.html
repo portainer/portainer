@@ -4,8 +4,8 @@
   </div>
   <div class="form-group">
     <span class="col-sm-12 text-muted small">
-      Docker requires you to connect to a <a href="https://docs.docker.com/registry/deploying/#running-a-domain-registry" target="_blank">secure registry</a>.
-      You can find more information about how to connect to an insecure registry <a href="https://docs.docker.com/registry/insecure/" target="_blank">in the Docker documentation</a>.
+      Docker requires you to connect to a <a href="https://docs.docker.com/registry/deploying/#running-a-domain-registry" target="_blank">secure registry</a>. You can find more
+      information about how to connect to an insecure registry <a href="https://docs.docker.com/registry/insecure/" target="_blank">in the Docker documentation</a>.
     </span>
   </div>
   <div class="col-sm-12 form-section-title">
@@ -15,7 +15,7 @@
   <div class="form-group">
     <label for="registry_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="registry_name" name="registry_name" ng-model="$ctrl.model.Name" placeholder="my-custom-registry" required auto-focus>
+      <input type="text" class="form-control" id="registry_name" name="registry_name" ng-model="$ctrl.model.Name" placeholder="my-custom-registry" required auto-focus />
     </div>
   </div>
   <div class="form-group" ng-show="registryFormCustom.registry_name.$invalid">
@@ -33,7 +33,7 @@
       <portainer-tooltip position="bottom" message="URL or IP address of a Docker registry. Any protocol will be stripped."></portainer-tooltip>
     </label>
     <div class="col-sm-9 col-lg-10">
-      <input type="text" class="form-control" id="registry_url" name="registry_url" ng-model="$ctrl.model.URL" placeholder="10.0.0.10:5000 or myregistry.domain.tld" required>
+      <input type="text" class="form-control" id="registry_url" name="registry_url" ng-model="$ctrl.model.URL" placeholder="10.0.0.10:5000 or myregistry.domain.tld" required />
     </div>
   </div>
   <div class="form-group" ng-show="registryFormCustom.registry_url.$invalid">
@@ -51,9 +51,7 @@
         Authentication
         <portainer-tooltip position="bottom" message="Enable this option if you need to specify credentials to connect to this registry."></portainer-tooltip>
       </label>
-      <label class="switch" style="margin-left: 20px;">
-        <input type="checkbox" ng-model="$ctrl.model.Authentication"><i></i>
-      </label>
+      <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="$ctrl.model.Authentication" /><i></i> </label>
     </div>
   </div>
   <!-- !authentication-checkbox -->
@@ -62,7 +60,7 @@
     <div class="form-group">
       <label for="registry_username" class="col-sm-3 col-lg-2 control-label text-left">Username</label>
       <div class="col-sm-9 col-lg-10">
-        <input type="text" class="form-control" id="registry_username" name="registry_username" ng-model="$ctrl.model.Username" required>
+        <input type="text" class="form-control" id="registry_username" name="registry_username" ng-model="$ctrl.model.Username" required />
       </div>
     </div>
     <div class="form-group" ng-show="registryFormCustom.registry_username.$invalid">
@@ -77,7 +75,7 @@
     <div class="form-group">
       <label for="registry_password" class="col-sm-3 col-lg-2 control-label text-left">Password</label>
       <div class="col-sm-9 col-lg-10">
-        <input type="password" class="form-control" id="registry_password" name="registry_password" ng-model="$ctrl.model.Password" required>
+        <input type="password" class="form-control" id="registry_password" name="registry_password" ng-model="$ctrl.model.Password" required />
       </div>
     </div>
     <div class="form-group" ng-show="registryFormCustom.registry_password.$invalid">

@@ -16,7 +16,9 @@
               <td>Name</td>
               <td>
                 {{ team.Name }}
-                <button class="btn btn-xs btn-danger" ng-if="isAdmin" ng-click="deleteTeam()"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this team</button>
+                <button class="btn btn-xs btn-danger" ng-if="isAdmin" ng-click="deleteTeam()"
+                  ><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this team</button
+                >
               </td>
             </tr>
             <tr>
@@ -51,7 +53,9 @@
       </rd-widget-header>
       <rd-widget-taskbar classes="col-sm-12 nopadding">
         <div class="col-sm-12 col-md-6 nopadding">
-          <button class="btn btn-primary btn-sm" ng-click="addAllUsers()" ng-if="isAdmin" ng-disabled="users.length ===  0 || filteredUsers.length === 0"><i class="fa fa-user-plus space-right" aria-hidden="true"></i>Add all users</button>
+          <button class="btn btn-primary btn-sm" ng-click="addAllUsers()" ng-if="isAdmin" ng-disabled="users.length ===  0 || filteredUsers.length === 0"
+            ><i class="fa fa-user-plus space-right" aria-hidden="true"></i>Add all users</button
+          >
         </div>
         <div class="col-sm-12 col-md-6 nopadding">
           <input type="text" id="filter" ng-model="state.filterUsers" placeholder="Filter..." class="form-control input-sm" />
@@ -72,7 +76,10 @@
               </tr>
             </thead>
             <tbody>
-              <tr pagination-id="table1" dir-paginate="user in users | filter:state.filterUsers | orderBy:sortTypeUsers:sortReverseUsers | itemsPerPage: state.pagination_count_users">
+              <tr
+                pagination-id="table1"
+                dir-paginate="user in users | filter:state.filterUsers | orderBy:sortTypeUsers:sortReverseUsers | itemsPerPage: state.pagination_count_users"
+              >
                 <td>
                   {{ user.Username }}
                   <span style="margin-left: 5px;">
@@ -83,7 +90,7 @@
               <tr ng-if="!users">
                 <td colspan="2" class="text-center text-muted">Loading...</td>
               </tr>
-              <tr ng-if="users.length === 0 || (users | filter:state.filterUsers).length === 0">
+              <tr ng-if="users.length === 0 || (users | filter: state.filterUsers).length === 0">
                 <td colspan="2" class="text-center text-muted">No users.</td>
               </tr>
             </tbody>
@@ -111,7 +118,9 @@
       </rd-widget-header>
       <rd-widget-taskbar classes="col-sm-12 nopadding">
         <div class="col-sm-12 col-md-6 nopadding">
-          <button class="btn btn-primary btn-sm" ng-click="removeAllUsers()" ng-if="isAdmin" ng-disabled="teamMembers.length ===  0 || filteredGroupMembers.length === 0"><i class="fa fa-user-times space-right" aria-hidden="true"></i>Remove all users</button>
+          <button class="btn btn-primary btn-sm" ng-click="removeAllUsers()" ng-if="isAdmin" ng-disabled="teamMembers.length ===  0 || filteredGroupMembers.length === 0"
+            ><i class="fa fa-user-times space-right" aria-hidden="true"></i>Remove all users</button
+          >
         </div>
         <div class="col-sm-12 col-md-6 nopadding">
           <input type="text" id="filter" ng-model="state.filterGroupMembers" placeholder="Filter..." class="form-control input-sm" />
@@ -139,7 +148,10 @@
               </tr>
             </thead>
             <tbody>
-              <tr pagination-id="table2" dir-paginate="user in teamMembers | filter:state.filterGroupMembers | orderBy:sortTypeGroupMembers:sortReverseGroupMembers | itemsPerPage: state.pagination_count_groupMembers">
+              <tr
+                pagination-id="table2"
+                dir-paginate="user in teamMembers | filter:state.filterGroupMembers | orderBy:sortTypeGroupMembers:sortReverseGroupMembers | itemsPerPage: state.pagination_count_groupMembers"
+              >
                 <td>
                   {{ user.Username }}
                   <span style="margin-left: 5px;" ng-if="isAdmin || user.TeamRole === 'Member'">
@@ -151,15 +163,19 @@
                   <i ng-if="user.TeamRole === 'Member'" class="fa fa-user" aria-hidden="true" style="margin-right: 2px;"></i>
                   {{ user.TeamRole }}
                   <span style="margin-left: 5px;" ng-if="isAdmin">
-                    <a style="margin-left: 5px;" ng-click="promoteToLeader(user)" ng-if="user.TeamRole === 'Member'"><i class="fa fa-user-plus space-right" aria-hidden="true"></i>Leader</a>
-                    <a style="margin-left: 5px;" ng-click="demoteToMember(user)" ng-if="user.TeamRole === 'Leader'"><i class="fa fa-user-times space-right" aria-hidden="true"></i>Member</a>
+                    <a style="margin-left: 5px;" ng-click="promoteToLeader(user)" ng-if="user.TeamRole === 'Member'"
+                      ><i class="fa fa-user-plus space-right" aria-hidden="true"></i>Leader</a
+                    >
+                    <a style="margin-left: 5px;" ng-click="demoteToMember(user)" ng-if="user.TeamRole === 'Leader'"
+                      ><i class="fa fa-user-times space-right" aria-hidden="true"></i>Member</a
+                    >
                   </span>
                 </td>
               </tr>
               <tr ng-if="!teamMembers">
                 <td colspan="2" class="text-center text-muted">Loading...</td>
               </tr>
-              <tr ng-if="teamMembers.length === 0 || (teamMembers | filter:state.filterGroupMembers).length === 0">
+              <tr ng-if="teamMembers.length === 0 || (teamMembers | filter: state.filterGroupMembers).length === 0">
                 <td colspan="2" class="text-center text-muted">No team members.</td>
               </tr>
             </tbody>

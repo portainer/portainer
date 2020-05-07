@@ -3,6 +3,6 @@ angular.module('portainer.docker').component('networkMacvlanForm', {
   controller: 'NetworkMacvlanFormController',
   bindings: {
     data: '=',
-    applicationState: '<'
-  }
+    applicationState: '<',
+  },
 });

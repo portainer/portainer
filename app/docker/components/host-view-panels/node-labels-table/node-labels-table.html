@@ -14,15 +14,13 @@
       <td>
         <div class="input-group input-group-sm">
           <span class="input-group-addon fit-text-size">Name</span>
-          <input type="text" class="form-control" ng-model="label.key" placeholder="e.g. com.example.foo"
-            ng-change="$ctrl.updateLabel(label)">
+          <input type="text" class="form-control" ng-model="label.key" placeholder="e.g. com.example.foo" ng-change="$ctrl.updateLabel(label)" />
         </div>
       </td>
       <td>
         <div class="input-group input-group-sm">
           <span class="input-group-addon fit-text-size">Value</span>
-          <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar"
-            ng-change="$ctrl.updateLabel(label)">
+          <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" ng-change="$ctrl.updateLabel(label)" />
           <span class="input-group-btn">
             <button class="btn btn-sm btn-danger" type="button" ng-click="$ctrl.removeLabel($index)">
               <i class="fa fa-trash" aria-hidden="true"></i>

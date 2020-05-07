@@ -5,7 +5,9 @@
     </a>
   </rd-header-title>
   <rd-header-content>
-    <a ui-sref="portainer.registries">Registries</a> &gt; <a ng-if="isAdmin" ui-sref="portainer.registries.registry({id: registry.Id})" ui-sref-opts="{reload:true}">{{ registry.Name }}</a><span ng-if="!isAdmin">{{ registry.Name}}</span> &gt; Repositories
+    <a ui-sref="portainer.registries">Registries</a> &gt;
+    <a ng-if="isAdmin" ui-sref="portainer.registries.registry({id: registry.Id})" ui-sref-opts="{reload:true}">{{ registry.Name }}</a
+    ><span ng-if="!isAdmin">{{ registry.Name }}</span> &gt; Repositories
   </rd-header-content>
 </rd-header>
 
@@ -16,11 +18,12 @@
         <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
         Portainer was not able to use this registry management features. You might need to update the configuration used by Portainer to access this registry.
       </p>
-      <p>Note: Portainer registry management features are only supported with registries exposing the <a href="https://docs.docker.com/registry/spec/api/" target="_blank">v2 registry API</a>.</p>
+      <p
+        >Note: Portainer registry management features are only supported with registries exposing the
+        <a href="https://docs.docker.com/registry/spec/api/" target="_blank">v2 registry API</a>.</p
+      >
       <div style="margin-top: 7px;">
-        <a ui-sref="portainer.registries.registry.configure({id: registry.Id})">
-          <i class="fa fa-wrench" aria-hidden="true"></i> Configure this registry
-        </a>
+        <a ui-sref="portainer.registries.registry.configure({id: registry.Id})"> <i class="fa fa-wrench" aria-hidden="true"></i> Configure this registry </a>
       </div>
     </span>
   </information-panel>
@@ -29,9 +32,14 @@
 <div class="row" ng-if="repositories">
   <div class="col-sm-12">
     <registry-repositories-datatable
-      title-text="Repositories" title-icon="fa-book"
-      dataset="repositories" table-key="registryRepositories"
-      order-by="Name" pagination-action="paginationAction" loading="state.loading">
+      title-text="Repositories"
+      title-icon="fa-book"
+      dataset="repositories"
+      table-key="registryRepositories"
+      order-by="Name"
+      pagination-action="paginationAction"
+      loading="state.loading"
+    >
     </registry-repositories-datatable>
   </div>
 </div>

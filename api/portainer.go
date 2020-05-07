@@ -3,10 +3,33 @@ package portainer
 import "time"
 
 type (
-	// Pair defines a key/value string pair
-	Pair struct {
-		Name  string `json:"name"`
-		Value string `json:"value"`
+	// AccessPolicy represent a policy that can be associated to a user or team
+	AccessPolicy struct {
+		RoleID RoleID `json:"RoleId"`
+	}
+
+	// APIOperationAuthorizationRequest represent an request for the authorization to execute an API operation
+	APIOperationAuthorizationRequest struct {
+		Path           string
+		Method         string
+		Authorizations Authorizations
+	}
+
+	// AuthenticationMethod represents the authentication method used to authenticate a user
+	AuthenticationMethod int
+
+	// Authorization represents an authorization associated to an operation
+	Authorization string
+
+	// Authorizations represents a set of authorizations associated to a role
+	Authorizations map[Authorization]bool
+
+	// AzureCredentials represents the credentials used to connect to an Azure
+	// environment.
+	AzureCredentials struct {
+		ApplicationID     string `json:"ApplicationID"`
+		TenantID          string `json:"TenantID"`
+		AuthenticationKey string `json:"AuthenticationKey"`
 	}
 
 	// CLIFlags represents the available flags on the CLI
@@ -39,196 +62,18 @@ type (
 		SnapshotInterval  *string
 	}
 
-	// Status represents the application status
-	Status struct {
-		Authentication     bool   `json:"Authentication"`
-		EndpointManagement bool   `json:"EndpointManagement"`
-		Snapshot           bool   `json:"Snapshot"`
-		Analytics          bool   `json:"Analytics"`
-		Version            string `json:"Version"`
+	// CLIService represents a service for managing CLI
+	CLIService interface {
+		ParseFlags(version string) (*CLIFlags, error)
+		ValidateFlags(flags *CLIFlags) error
 	}
 
-	// LDAPSettings represents the settings used to connect to a LDAP server
-	LDAPSettings struct {
-		AnonymousMode       bool                      `json:"AnonymousMode"`
-		ReaderDN            string                    `json:"ReaderDN"`
-		Password            string                    `json:"Password,omitempty"`
-		URL                 string                    `json:"URL"`
-		TLSConfig           TLSConfiguration          `json:"TLSConfig"`
-		StartTLS            bool                      `json:"StartTLS"`
-		SearchSettings      []LDAPSearchSettings      `json:"SearchSettings"`
-		GroupSearchSettings []LDAPGroupSearchSettings `json:"GroupSearchSettings"`
-		AutoCreateUsers     bool                      `json:"AutoCreateUsers"`
-	}
-
-	// OAuthSettings represents the settings used to authorize with an authorization server
-	OAuthSettings struct {
-		ClientID             string `json:"ClientID"`
-		ClientSecret         string `json:"ClientSecret,omitempty"`
-		AccessTokenURI       string `json:"AccessTokenURI"`
-		AuthorizationURI     string `json:"AuthorizationURI"`
-		ResourceURI          string `json:"ResourceURI"`
-		RedirectURI          string `json:"RedirectURI"`
-		UserIdentifier       string `json:"UserIdentifier"`
-		Scopes               string `json:"Scopes"`
-		OAuthAutoCreateUsers bool   `json:"OAuthAutoCreateUsers"`
-		DefaultTeamID        TeamID `json:"DefaultTeamID"`
-	}
-
-	// TLSConfiguration represents a TLS configuration
-	TLSConfiguration struct {
-		TLS           bool   `json:"TLS"`
-		TLSSkipVerify bool   `json:"TLSSkipVerify"`
-		TLSCACertPath string `json:"TLSCACert,omitempty"`
-		TLSCertPath   string `json:"TLSCert,omitempty"`
-		TLSKeyPath    string `json:"TLSKey,omitempty"`
-	}
-
-	// LDAPSearchSettings represents settings used to search for users in a LDAP server
-	LDAPSearchSettings struct {
-		BaseDN            string `json:"BaseDN"`
-		Filter            string `json:"Filter"`
-		UserNameAttribute string `json:"UserNameAttribute"`
-	}
-
-	// LDAPGroupSearchSettings represents settings used to search for groups in a LDAP server
-	LDAPGroupSearchSettings struct {
-		GroupBaseDN    string `json:"GroupBaseDN"`
-		GroupFilter    string `json:"GroupFilter"`
-		GroupAttribute string `json:"GroupAttribute"`
-	}
-
-	// Settings represents the application settings
-	Settings struct {
-		LogoURL                            string               `json:"LogoURL"`
-		BlackListedLabels                  []Pair               `json:"BlackListedLabels"`
-		AuthenticationMethod               AuthenticationMethod `json:"AuthenticationMethod"`
-		LDAPSettings                       LDAPSettings         `json:"LDAPSettings"`
-		OAuthSettings                      OAuthSettings        `json:"OAuthSettings"`
-		AllowBindMountsForRegularUsers     bool                 `json:"AllowBindMountsForRegularUsers"`
-		AllowPrivilegedModeForRegularUsers bool                 `json:"AllowPrivilegedModeForRegularUsers"`
-		AllowVolumeBrowserForRegularUsers  bool                 `json:"AllowVolumeBrowserForRegularUsers"`
-		SnapshotInterval                   string               `json:"SnapshotInterval"`
-		TemplatesURL                       string               `json:"TemplatesURL"`
-		EnableHostManagementFeatures       bool                 `json:"EnableHostManagementFeatures"`
-		EdgeAgentCheckinInterval           int                  `json:"EdgeAgentCheckinInterval"`
-
-		// Deprecated fields
-		DisplayDonationHeader       bool
-		DisplayExternalContributors bool
-	}
-
-	// User represents a user account
-	User struct {
-		ID                      UserID                 `json:"Id"`
-		Username                string                 `json:"Username"`
-		Password                string                 `json:"Password,omitempty"`
-		Role                    UserRole               `json:"Role"`
-		PortainerAuthorizations Authorizations         `json:"PortainerAuthorizations"`
-		EndpointAuthorizations  EndpointAuthorizations `json:"EndpointAuthorizations"`
-	}
-
-	// UserID represents a user identifier
-	UserID int
-
-	// UserRole represents the role of a user. It can be either an administrator
-	// or a regular user
-	UserRole int
-
-	// AuthenticationMethod represents the authentication method used to authenticate a user
-	AuthenticationMethod int
-
-	// Team represents a list of user accounts
-	Team struct {
-		ID   TeamID `json:"Id"`
-		Name string `json:"Name"`
-	}
-
-	// TeamID represents a team identifier
-	TeamID int
-
-	// TeamMembership represents a membership association between a user and a team
-	TeamMembership struct {
-		ID     TeamMembershipID `json:"Id"`
-		UserID UserID           `json:"UserID"`
-		TeamID TeamID           `json:"TeamID"`
-		Role   MembershipRole   `json:"Role"`
-	}
-
-	// TeamMembershipID represents a team membership identifier
-	TeamMembershipID int
-
-	// MembershipRole represents the role of a user within a team
-	MembershipRole int
-
-	// TokenData represents the data embedded in a JWT token
-	TokenData struct {
-		ID       UserID
-		Username string
-		Role     UserRole
-	}
-
-	// StackID represents a stack identifier (it must be composed of Name + "_" + SwarmID to create a unique identifier)
-	StackID int
-
-	// StackType represents the type of the stack (compose v2, stack deploy v3)
-	StackType int
-
-	// Stack represents a Docker stack created via docker stack deploy
-	Stack struct {
-		ID              StackID          `json:"Id"`
-		Name            string           `json:"Name"`
-		Type            StackType        `json:"Type"`
-		EndpointID      EndpointID       `json:"EndpointId"`
-		SwarmID         string           `json:"SwarmId"`
-		EntryPoint      string           `json:"EntryPoint"`
-		Env             []Pair           `json:"Env"`
-		ResourceControl *ResourceControl `json:"ResourceControl"`
-		ProjectPath     string
-	}
-
-	// RegistryID represents a registry identifier
-	RegistryID int
-
-	// RegistryType represents a type of registry
-	RegistryType int
-
-	// GitlabRegistryData represents data required for gitlab registry to work
-	GitlabRegistryData struct {
-		ProjectID   int    `json:"ProjectId"`
-		InstanceURL string `json:"InstanceURL"`
-		ProjectPath string `json:"ProjectPath"`
-	}
-
-	// Registry represents a Docker registry with all the info required
-	// to connect to it
-	Registry struct {
-		ID                      RegistryID                       `json:"Id"`
-		Type                    RegistryType                     `json:"Type"`
-		Name                    string                           `json:"Name"`
-		URL                     string                           `json:"URL"`
-		Authentication          bool                             `json:"Authentication"`
-		Username                string                           `json:"Username"`
-		Password                string                           `json:"Password,omitempty"`
-		ManagementConfiguration *RegistryManagementConfiguration `json:"ManagementConfiguration"`
-		Gitlab                  GitlabRegistryData               `json:"Gitlab"`
-		UserAccessPolicies      UserAccessPolicies               `json:"UserAccessPolicies"`
-		TeamAccessPolicies      TeamAccessPolicies               `json:"TeamAccessPolicies"`
-
-		// Deprecated fields
-		// Deprecated in DBVersion == 18
-		AuthorizedUsers []UserID `json:"AuthorizedUsers"`
-		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
-	}
-
-	// RegistryManagementConfiguration represents a configuration that can be used to query
-	// the registry API via the registry management extension.
-	RegistryManagementConfiguration struct {
-		Type           RegistryType     `json:"Type"`
-		Authentication bool             `json:"Authentication"`
-		Username       string           `json:"Username"`
-		Password       string           `json:"Password"`
-		TLSConfig      TLSConfiguration `json:"TLSConfig"`
+	// DataStore defines the interface to manage the data
+	DataStore interface {
+		Open() error
+		Init() error
+		Close() error
+		MigrateData() error
 	}
 
 	// DockerHub represents all the required information to connect and use the
@@ -239,14 +84,14 @@ type (
 		Password       string `json:"Password,omitempty"`
 	}
 
-	// EndpointID represents an endpoint identifier
-	EndpointID int
-
-	// EndpointType represents the type of an endpoint
-	EndpointType int
-
-	// EndpointStatus represents the status of an endpoint
-	EndpointStatus int
+	// EdgeSchedule represents a scheduled job that can run on Edge environments.
+	EdgeSchedule struct {
+		ID             ScheduleID   `json:"Id"`
+		CronExpression string       `json:"CronExpression"`
+		Script         string       `json:"Script"`
+		Version        int          `json:"Version"`
+		Endpoints      []EndpointID `json:"Endpoints"`
+	}
 
 	// Endpoint represents a Docker endpoint with all the info required
 	// to connect to it
@@ -282,145 +127,19 @@ type (
 		Tags []string `json:"Tags"`
 	}
 
-	// Authorization represents an authorization associated to an operation
-	Authorization string
-
-	// Authorizations represents a set of authorizations associated to a role
-	Authorizations map[Authorization]bool
-
 	// EndpointAuthorizations represents the authorizations associated to a set of endpoints
 	EndpointAuthorizations map[EndpointID]Authorizations
 
-	// APIOperationAuthorizationRequest represent an request for the authorization to execute an API operation
-	APIOperationAuthorizationRequest struct {
-		Path           string
-		Method         string
-		Authorizations Authorizations
+	// EndpointExtension represents a deprecated form of Portainer extension
+	// TODO: legacy extension management
+	EndpointExtension struct {
+		Type EndpointExtensionType `json:"Type"`
+		URL  string                `json:"URL"`
 	}
 
-	// RoleID represents a role identifier
-	RoleID int
-
-	// Role represents a set of authorizations that can be associated to a user or
-	// to a team.
-	Role struct {
-		ID             RoleID         `json:"Id"`
-		Name           string         `json:"Name"`
-		Description    string         `json:"Description"`
-		Authorizations Authorizations `json:"Authorizations"`
-		Priority       int            `json:"Priority"`
-	}
-
-	// AccessPolicy represent a policy that can be associated to a user or team
-	AccessPolicy struct {
-		RoleID RoleID `json:"RoleId"`
-	}
-
-	// UserAccessPolicies represent the association of an access policy and a user
-	UserAccessPolicies map[UserID]AccessPolicy
-	// TeamAccessPolicies represent the association of an access policy and a team
-	TeamAccessPolicies map[TeamID]AccessPolicy
-
-	// ScheduleID represents a schedule identifier.
-	ScheduleID int
-
-	// JobType represents a job type
-	JobType int
-
-	// ScriptExecutionJob represents a scheduled job that can execute a script via a privileged container
-	ScriptExecutionJob struct {
-		Endpoints     []EndpointID
-		Image         string
-		ScriptPath    string
-		RetryCount    int
-		RetryInterval int
-	}
-
-	// SnapshotJob represents a scheduled job that can create endpoint snapshots
-	SnapshotJob struct{}
-
-	// EndpointSyncJob represents a scheduled job that synchronize endpoints based on an external file
-	EndpointSyncJob struct{}
-
-	// Schedule represents a scheduled job.
-	// It only contains a pointer to one of the JobRunner implementations
-	// based on the JobType.
-	// NOTE: The Recurring option is only used by ScriptExecutionJob at the moment
-	Schedule struct {
-		ID                 ScheduleID `json:"Id"`
-		Name               string
-		CronExpression     string
-		Recurring          bool
-		Created            int64
-		JobType            JobType
-		EdgeSchedule       *EdgeSchedule
-		ScriptExecutionJob *ScriptExecutionJob
-		SnapshotJob        *SnapshotJob
-		EndpointSyncJob    *EndpointSyncJob
-	}
-
-	// EdgeSchedule represents a scheduled job that can run on Edge environments.
-	EdgeSchedule struct {
-		ID             ScheduleID   `json:"Id"`
-		CronExpression string       `json:"CronExpression"`
-		Script         string       `json:"Script"`
-		Version        int          `json:"Version"`
-		Endpoints      []EndpointID `json:"Endpoints"`
-	}
-
-	// WebhookID represents a webhook identifier.
-	WebhookID int
-
-	// WebhookType represents the type of resource a webhook is related to
-	WebhookType int
-
-	// Webhook represents a url webhook that can be used to update a service
-	Webhook struct {
-		ID          WebhookID   `json:"Id"`
-		Token       string      `json:"Token"`
-		ResourceID  string      `json:"ResourceId"`
-		EndpointID  EndpointID  `json:"EndpointId"`
-		WebhookType WebhookType `json:"Type"`
-	}
-
-	// AzureCredentials represents the credentials used to connect to an Azure
-	// environment.
-	AzureCredentials struct {
-		ApplicationID     string `json:"ApplicationID"`
-		TenantID          string `json:"TenantID"`
-		AuthenticationKey string `json:"AuthenticationKey"`
-	}
-
-	// Snapshot represents a snapshot of a specific endpoint at a specific time
-	Snapshot struct {
-		Time                    int64       `json:"Time"`
-		DockerVersion           string      `json:"DockerVersion"`
-		Swarm                   bool        `json:"Swarm"`
-		TotalCPU                int         `json:"TotalCPU"`
-		TotalMemory             int64       `json:"TotalMemory"`
-		RunningContainerCount   int         `json:"RunningContainerCount"`
-		StoppedContainerCount   int         `json:"StoppedContainerCount"`
-		HealthyContainerCount   int         `json:"HealthyContainerCount"`
-		UnhealthyContainerCount int         `json:"UnhealthyContainerCount"`
-		VolumeCount             int         `json:"VolumeCount"`
-		ImageCount              int         `json:"ImageCount"`
-		ServiceCount            int         `json:"ServiceCount"`
-		StackCount              int         `json:"StackCount"`
-		SnapshotRaw             SnapshotRaw `json:"SnapshotRaw"`
-	}
-
-	// SnapshotRaw represents all the information related to a snapshot as returned by the Docker API
-	SnapshotRaw struct {
-		Containers interface{} `json:"Containers"`
-		Volumes    interface{} `json:"Volumes"`
-		Networks   interface{} `json:"Networks"`
-		Images     interface{} `json:"Images"`
-		Info       interface{} `json:"Info"`
-		Version    interface{} `json:"Version"`
-	}
-
-	// EndpointGroupID represents an endpoint group identifier
-	EndpointGroupID int
+	// EndpointExtensionType represents the type of an endpoint extension. Only
+	// one extension of each type can be associated to an endpoint
+	EndpointExtensionType int
 
 	// EndpointGroup represents a group of endpoints
 	EndpointGroup struct {
@@ -442,19 +161,151 @@ type (
 		Tags []string `json:"Tags"`
 	}
 
-	// EndpointExtension represents a deprecated form of Portainer extension
-	// TODO: legacy extension management
-	EndpointExtension struct {
-		Type EndpointExtensionType `json:"Type"`
-		URL  string                `json:"URL"`
+	// EndpointGroupID represents an endpoint group identifier
+	EndpointGroupID int
+
+	// EndpointID represents an endpoint identifier
+	EndpointID int
+
+	// EndpointStatus represents the status of an endpoint
+	EndpointStatus int
+
+	// EndpointSyncJob represents a scheduled job that synchronize endpoints based on an external file
+	EndpointSyncJob struct{}
+
+	// EndpointType represents the type of an endpoint
+	EndpointType int
+
+	// Extension represents a Portainer extension
+	Extension struct {
+		ID               ExtensionID        `json:"Id"`
+		Enabled          bool               `json:"Enabled"`
+		Name             string             `json:"Name,omitempty"`
+		ShortDescription string             `json:"ShortDescription,omitempty"`
+		Description      string             `json:"Description,omitempty"`
+		DescriptionURL   string             `json:"DescriptionURL,omitempty"`
+		Price            string             `json:"Price,omitempty"`
+		PriceDescription string             `json:"PriceDescription,omitempty"`
+		Deal             bool               `json:"Deal,omitempty"`
+		Available        bool               `json:"Available,omitempty"`
+		License          LicenseInformation `json:"License,omitempty"`
+		Version          string             `json:"Version"`
+		UpdateAvailable  bool               `json:"UpdateAvailable"`
+		ShopURL          string             `json:"ShopURL,omitempty"`
+		Images           []string           `json:"Images,omitempty"`
+		Logo             string             `json:"Logo,omitempty"`
 	}
 
-	// EndpointExtensionType represents the type of an endpoint extension. Only
-	// one extension of each type can be associated to an endpoint
-	EndpointExtensionType int
+	// ExtensionID represents a extension identifier
+	ExtensionID int
 
-	// ResourceControlID represents a resource control identifier
-	ResourceControlID int
+	// GitlabRegistryData represents data required for gitlab registry to work
+	GitlabRegistryData struct {
+		ProjectID   int    `json:"ProjectId"`
+		InstanceURL string `json:"InstanceURL"`
+		ProjectPath string `json:"ProjectPath"`
+	}
+
+	// JobType represents a job type
+	JobType int
+
+	// LDAPGroupSearchSettings represents settings used to search for groups in a LDAP server
+	LDAPGroupSearchSettings struct {
+		GroupBaseDN    string `json:"GroupBaseDN"`
+		GroupFilter    string `json:"GroupFilter"`
+		GroupAttribute string `json:"GroupAttribute"`
+	}
+
+	// LDAPSearchSettings represents settings used to search for users in a LDAP server
+	LDAPSearchSettings struct {
+		BaseDN            string `json:"BaseDN"`
+		Filter            string `json:"Filter"`
+		UserNameAttribute string `json:"UserNameAttribute"`
+	}
+
+	// LDAPSettings represents the settings used to connect to a LDAP server
+	LDAPSettings struct {
+		AnonymousMode       bool                      `json:"AnonymousMode"`
+		ReaderDN            string                    `json:"ReaderDN"`
+		Password            string                    `json:"Password,omitempty"`
+		URL                 string                    `json:"URL"`
+		TLSConfig           TLSConfiguration          `json:"TLSConfig"`
+		StartTLS            bool                      `json:"StartTLS"`
+		SearchSettings      []LDAPSearchSettings      `json:"SearchSettings"`
+		GroupSearchSettings []LDAPGroupSearchSettings `json:"GroupSearchSettings"`
+		AutoCreateUsers     bool                      `json:"AutoCreateUsers"`
+	}
+
+	// LicenseInformation represents information about an extension license
+	LicenseInformation struct {
+		LicenseKey string `json:"LicenseKey,omitempty"`
+		Company    string `json:"Company,omitempty"`
+		Expiration string `json:"Expiration,omitempty"`
+		Valid      bool   `json:"Valid,omitempty"`
+	}
+
+	// MembershipRole represents the role of a user within a team
+	MembershipRole int
+
+	// OAuthSettings represents the settings used to authorize with an authorization server
+	OAuthSettings struct {
+		ClientID             string `json:"ClientID"`
+		ClientSecret         string `json:"ClientSecret,omitempty"`
+		AccessTokenURI       string `json:"AccessTokenURI"`
+		AuthorizationURI     string `json:"AuthorizationURI"`
+		ResourceURI          string `json:"ResourceURI"`
+		RedirectURI          string `json:"RedirectURI"`
+		UserIdentifier       string `json:"UserIdentifier"`
+		Scopes               string `json:"Scopes"`
+		OAuthAutoCreateUsers bool   `json:"OAuthAutoCreateUsers"`
+		DefaultTeamID        TeamID `json:"DefaultTeamID"`
+	}
+
+	// Pair defines a key/value string pair
+	Pair struct {
+		Name  string `json:"name"`
+		Value string `json:"value"`
+	}
+
+	// Registry represents a Docker registry with all the info required
+	// to connect to it
+	Registry struct {
+		ID                      RegistryID                       `json:"Id"`
+		Type                    RegistryType                     `json:"Type"`
+		Name                    string                           `json:"Name"`
+		URL                     string                           `json:"URL"`
+		Authentication          bool                             `json:"Authentication"`
+		Username                string                           `json:"Username"`
+		Password                string                           `json:"Password,omitempty"`
+		ManagementConfiguration *RegistryManagementConfiguration `json:"ManagementConfiguration"`
+		Gitlab                  GitlabRegistryData               `json:"Gitlab"`
+		UserAccessPolicies      UserAccessPolicies               `json:"UserAccessPolicies"`
+		TeamAccessPolicies      TeamAccessPolicies               `json:"TeamAccessPolicies"`
+
+		// Deprecated fields
+		// Deprecated in DBVersion == 18
+		AuthorizedUsers []UserID `json:"AuthorizedUsers"`
+		AuthorizedTeams []TeamID `json:"AuthorizedTeams"`
+	}
+
+	// RegistryID represents a registry identifier
+	RegistryID int
+
+	// RegistryManagementConfiguration represents a configuration that can be used to query
+	// the registry API via the registry management extension.
+	RegistryManagementConfiguration struct {
+		Type           RegistryType     `json:"Type"`
+		Authentication bool             `json:"Authentication"`
+		Username       string           `json:"Username"`
+		Password       string           `json:"Password"`
+		TLSConfig      TLSConfiguration `json:"TLSConfig"`
+	}
+
+	// RegistryType represents a type of registry
+	RegistryType int
+
+	// ResourceAccessLevel represents the level of control associated to a resource
+	ResourceAccessLevel int
 
 	// ResourceControl represent a reference to a Docker resource with specific access controls
 	ResourceControl struct {
@@ -474,23 +325,132 @@ type (
 		AccessLevel ResourceAccessLevel `json:"AccessLevel,omitempty"`
 	}
 
+	// ResourceControlID represents a resource control identifier
+	ResourceControlID int
+
 	// ResourceControlType represents the type of resource associated to the resource control (volume, container, service...)
 	ResourceControlType int
 
-	// UserResourceAccess represents the level of control on a resource for a specific user
-	UserResourceAccess struct {
-		UserID      UserID              `json:"UserId"`
-		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
+	// Role represents a set of authorizations that can be associated to a user or
+	// to a team.
+	Role struct {
+		ID             RoleID         `json:"Id"`
+		Name           string         `json:"Name"`
+		Description    string         `json:"Description"`
+		Authorizations Authorizations `json:"Authorizations"`
+		Priority       int            `json:"Priority"`
 	}
 
-	// TeamResourceAccess represents the level of control on a resource for a specific team
-	TeamResourceAccess struct {
-		TeamID      TeamID              `json:"TeamId"`
-		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
+	// RoleID represents a role identifier
+	RoleID int
+
+	// Schedule represents a scheduled job.
+	// It only contains a pointer to one of the JobRunner implementations
+	// based on the JobType.
+	// NOTE: The Recurring option is only used by ScriptExecutionJob at the moment
+	Schedule struct {
+		ID                 ScheduleID `json:"Id"`
+		Name               string
+		CronExpression     string
+		Recurring          bool
+		Created            int64
+		JobType            JobType
+		EdgeSchedule       *EdgeSchedule
+		ScriptExecutionJob *ScriptExecutionJob
+		SnapshotJob        *SnapshotJob
+		EndpointSyncJob    *EndpointSyncJob
 	}
 
-	// TagID represents a tag identifier
-	TagID int
+	// ScheduleID represents a schedule identifier.
+	ScheduleID int
+
+	// ScriptExecutionJob represents a scheduled job that can execute a script via a privileged container
+	ScriptExecutionJob struct {
+		Endpoints     []EndpointID
+		Image         string
+		ScriptPath    string
+		RetryCount    int
+		RetryInterval int
+	}
+
+	// Settings represents the application settings
+	Settings struct {
+		LogoURL                            string               `json:"LogoURL"`
+		BlackListedLabels                  []Pair               `json:"BlackListedLabels"`
+		AuthenticationMethod               AuthenticationMethod `json:"AuthenticationMethod"`
+		LDAPSettings                       LDAPSettings         `json:"LDAPSettings"`
+		OAuthSettings                      OAuthSettings        `json:"OAuthSettings"`
+		AllowBindMountsForRegularUsers     bool                 `json:"AllowBindMountsForRegularUsers"`
+		AllowPrivilegedModeForRegularUsers bool                 `json:"AllowPrivilegedModeForRegularUsers"`
+		AllowVolumeBrowserForRegularUsers  bool                 `json:"AllowVolumeBrowserForRegularUsers"`
+		SnapshotInterval                   string               `json:"SnapshotInterval"`
+		TemplatesURL                       string               `json:"TemplatesURL"`
+		EnableHostManagementFeatures       bool                 `json:"EnableHostManagementFeatures"`
+		EdgeAgentCheckinInterval           int                  `json:"EdgeAgentCheckinInterval"`
+
+		// Deprecated fields
+		DisplayDonationHeader       bool
+		DisplayExternalContributors bool
+	}
+
+	// Snapshot represents a snapshot of a specific endpoint at a specific time
+	Snapshot struct {
+		Time                    int64       `json:"Time"`
+		DockerVersion           string      `json:"DockerVersion"`
+		Swarm                   bool        `json:"Swarm"`
+		TotalCPU                int         `json:"TotalCPU"`
+		TotalMemory             int64       `json:"TotalMemory"`
+		RunningContainerCount   int         `json:"RunningContainerCount"`
+		StoppedContainerCount   int         `json:"StoppedContainerCount"`
+		HealthyContainerCount   int         `json:"HealthyContainerCount"`
+		UnhealthyContainerCount int         `json:"UnhealthyContainerCount"`
+		VolumeCount             int         `json:"VolumeCount"`
+		ImageCount              int         `json:"ImageCount"`
+		ServiceCount            int         `json:"ServiceCount"`
+		StackCount              int         `json:"StackCount"`
+		SnapshotRaw             SnapshotRaw `json:"SnapshotRaw"`
+	}
+
+	// SnapshotJob represents a scheduled job that can create endpoint snapshots
+	SnapshotJob struct{}
+
+	// SnapshotRaw represents all the information related to a snapshot as returned by the Docker API
+	SnapshotRaw struct {
+		Containers interface{} `json:"Containers"`
+		Volumes    interface{} `json:"Volumes"`
+		Networks   interface{} `json:"Networks"`
+		Images     interface{} `json:"Images"`
+		Info       interface{} `json:"Info"`
+		Version    interface{} `json:"Version"`
+	}
+
+	// Stack represents a Docker stack created via docker stack deploy
+	Stack struct {
+		ID              StackID          `json:"Id"`
+		Name            string           `json:"Name"`
+		Type            StackType        `json:"Type"`
+		EndpointID      EndpointID       `json:"EndpointId"`
+		SwarmID         string           `json:"SwarmId"`
+		EntryPoint      string           `json:"EntryPoint"`
+		Env             []Pair           `json:"Env"`
+		ResourceControl *ResourceControl `json:"ResourceControl"`
+		ProjectPath     string
+	}
+
+	// StackID represents a stack identifier (it must be composed of Name + "_" + SwarmID to create a unique identifier)
+	StackID int
+
+	// StackType represents the type of the stack (compose v2, stack deploy v3)
+	StackType int
+
+	// Status represents the application status
+	Status struct {
+		Authentication     bool   `json:"Authentication"`
+		EndpointManagement bool   `json:"EndpointManagement"`
+		Snapshot           bool   `json:"Snapshot"`
+		Analytics          bool   `json:"Analytics"`
+		Version            string `json:"Version"`
+	}
 
 	// Tag represents a tag that can be associated to a resource
 	Tag struct {
@@ -498,11 +458,37 @@ type (
 		Name string `json:"Name"`
 	}
 
-	// TemplateID represents a template identifier
-	TemplateID int
+	// TagID represents a tag identifier
+	TagID int
 
-	// TemplateType represents the type of a template
-	TemplateType int
+	// Team represents a list of user accounts
+	Team struct {
+		ID   TeamID `json:"Id"`
+		Name string `json:"Name"`
+	}
+
+	// TeamAccessPolicies represent the association of an access policy and a team
+	TeamAccessPolicies map[TeamID]AccessPolicy
+
+	// TeamID represents a team identifier
+	TeamID int
+
+	// TeamMembership represents a membership association between a user and a team
+	TeamMembership struct {
+		ID     TeamMembershipID `json:"Id"`
+		UserID UserID           `json:"UserID"`
+		TeamID TeamID           `json:"TeamID"`
+		Role   MembershipRole   `json:"Role"`
+	}
+
+	// TeamMembershipID represents a team membership identifier
+	TeamMembershipID int
+
+	// TeamResourceAccess represents the level of control on a resource for a specific team
+	TeamResourceAccess struct {
+		TeamID      TeamID              `json:"TeamId"`
+		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
+	}
 
 	// Template represents an application template
 	Template struct {
@@ -550,19 +536,6 @@ type (
 		Select      []TemplateEnvSelect `json:"select,omitempty"`
 	}
 
-	// TemplateVolume represents a template volume configuration
-	TemplateVolume struct {
-		Container string `json:"container"`
-		Bind      string `json:"bind,omitempty"`
-		ReadOnly  bool   `json:"readonly,omitempty"`
-	}
-
-	// TemplateRepository represents the git repository configuration for a template
-	TemplateRepository struct {
-		URL       string `json:"url"`
-		StackFile string `json:"stackfile"`
-	}
-
 	// TemplateEnvSelect represents text/value pair that will be displayed as a choice for the
 	// template user
 	TemplateEnvSelect struct {
@@ -571,42 +544,43 @@ type (
 		Default bool   `json:"default"`
 	}
 
-	// ResourceAccessLevel represents the level of control associated to a resource
-	ResourceAccessLevel int
+	// TemplateID represents a template identifier
+	TemplateID int
+
+	// TemplateRepository represents the git repository configuration for a template
+	TemplateRepository struct {
+		URL       string `json:"url"`
+		StackFile string `json:"stackfile"`
+	}
+
+	// TemplateType represents the type of a template
+	TemplateType int
+
+	// TemplateVolume represents a template volume configuration
+	TemplateVolume struct {
+		Container string `json:"container"`
+		Bind      string `json:"bind,omitempty"`
+		ReadOnly  bool   `json:"readonly,omitempty"`
+	}
+
+	// TLSConfiguration represents a TLS configuration
+	TLSConfiguration struct {
+		TLS           bool   `json:"TLS"`
+		TLSSkipVerify bool   `json:"TLSSkipVerify"`
+		TLSCACertPath string `json:"TLSCACert,omitempty"`
+		TLSCertPath   string `json:"TLSCert,omitempty"`
+		TLSKeyPath    string `json:"TLSKey,omitempty"`
+	}
 
 	// TLSFileType represents a type of TLS file required to connect to a Docker endpoint.
 	// It can be either a TLS CA file, a TLS certificate file or a TLS key file
 	TLSFileType int
 
-	// ExtensionID represents a extension identifier
-	ExtensionID int
-
-	// Extension represents a Portainer extension
-	Extension struct {
-		ID               ExtensionID        `json:"Id"`
-		Enabled          bool               `json:"Enabled"`
-		Name             string             `json:"Name,omitempty"`
-		ShortDescription string             `json:"ShortDescription,omitempty"`
-		Description      string             `json:"Description,omitempty"`
-		DescriptionURL   string             `json:"DescriptionURL,omitempty"`
-		Price            string             `json:"Price,omitempty"`
-		PriceDescription string             `json:"PriceDescription,omitempty"`
-		Deal             bool               `json:"Deal,omitempty"`
-		Available        bool               `json:"Available,omitempty"`
-		License          LicenseInformation `json:"License,omitempty"`
-		Version          string             `json:"Version"`
-		UpdateAvailable  bool               `json:"UpdateAvailable"`
-		ShopURL          string             `json:"ShopURL,omitempty"`
-		Images           []string           `json:"Images,omitempty"`
-		Logo             string             `json:"Logo,omitempty"`
-	}
-
-	// LicenseInformation represents information about an extension license
-	LicenseInformation struct {
-		LicenseKey string `json:"LicenseKey,omitempty"`
-		Company    string `json:"Company,omitempty"`
-		Expiration string `json:"Expiration,omitempty"`
-		Valid      bool   `json:"Valid,omitempty"`
+	// TokenData represents the data embedded in a JWT token
+	TokenData struct {
+		ID       UserID
+		Username string
+		Role     UserRole
 	}
 
 	// TunnelDetails represents information associated to a tunnel
@@ -623,64 +597,72 @@ type (
 		PrivateKeySeed string `json:"PrivateKeySeed"`
 	}
 
-	// CLIService represents a service for managing CLI
-	CLIService interface {
-		ParseFlags(version string) (*CLIFlags, error)
-		ValidateFlags(flags *CLIFlags) error
+	// User represents a user account
+	User struct {
+		ID                      UserID                 `json:"Id"`
+		Username                string                 `json:"Username"`
+		Password                string                 `json:"Password,omitempty"`
+		Role                    UserRole               `json:"Role"`
+		PortainerAuthorizations Authorizations         `json:"PortainerAuthorizations"`
+		EndpointAuthorizations  EndpointAuthorizations `json:"EndpointAuthorizations"`
 	}
 
-	// DataStore defines the interface to manage the data
-	DataStore interface {
-		Open() error
-		Init() error
-		Close() error
-		MigrateData() error
+	// UserAccessPolicies represent the association of an access policy and a user
+	UserAccessPolicies map[UserID]AccessPolicy
+
+	// UserID represents a user identifier
+	UserID int
+
+	// UserResourceAccess represents the level of control on a resource for a specific user
+	UserResourceAccess struct {
+		UserID      UserID              `json:"UserId"`
+		AccessLevel ResourceAccessLevel `json:"AccessLevel"`
 	}
 
-	// Server defines the interface to serve the API
-	Server interface {
-		Start() error
+	// UserRole represents the role of a user. It can be either an administrator
+	// or a regular user
+	UserRole int
+
+	// Webhook represents a url webhook that can be used to update a service
+	Webhook struct {
+		ID          WebhookID   `json:"Id"`
+		Token       string      `json:"Token"`
+		ResourceID  string      `json:"ResourceId"`
+		EndpointID  EndpointID  `json:"EndpointId"`
+		WebhookType WebhookType `json:"Type"`
 	}
 
-	// UserService represents a service for managing user data
-	UserService interface {
-		User(ID UserID) (*User, error)
-		UserByUsername(username string) (*User, error)
-		Users() ([]User, error)
-		UsersByRole(role UserRole) ([]User, error)
-		CreateUser(user *User) error
-		UpdateUser(ID UserID, user *User) error
-		DeleteUser(ID UserID) error
+	// WebhookID represents a webhook identifier.
+	WebhookID int
+
+	// WebhookType represents the type of resource a webhook is related to
+	WebhookType int
+
+	// ComposeStackManager represents a service to manage Compose stacks
+	ComposeStackManager interface {
+		Up(stack *Stack, endpoint *Endpoint) error
+		Down(stack *Stack, endpoint *Endpoint) error
 	}
 
-	RoleService interface {
-		Role(ID RoleID) (*Role, error)
-		Roles() ([]Role, error)
-		CreateRole(role *Role) error
-		UpdateRole(ID RoleID, role *Role) error
+	// CryptoService represents a service for encrypting/hashing data
+	CryptoService interface {
+		Hash(data string) (string, error)
+		CompareHashAndData(hash string, data string) error
 	}
 
-	// TeamService represents a service for managing user data
-	TeamService interface {
-		Team(ID TeamID) (*Team, error)
-		TeamByName(name string) (*Team, error)
-		Teams() ([]Team, error)
-		CreateTeam(team *Team) error
-		UpdateTeam(ID TeamID, team *Team) error
-		DeleteTeam(ID TeamID) error
+	// DigitalSignatureService represents a service to manage digital signatures
+	DigitalSignatureService interface {
+		ParseKeyPair(private, public []byte) error
+		GenerateKeyPair() ([]byte, []byte, error)
+		EncodedPublicKey() string
+		PEMHeaders() (string, string)
+		CreateSignature(message string) (string, error)
 	}
 
-	// TeamMembershipService represents a service for managing team membership data
-	TeamMembershipService interface {
-		TeamMembership(ID TeamMembershipID) (*TeamMembership, error)
-		TeamMemberships() ([]TeamMembership, error)
-		TeamMembershipsByUserID(userID UserID) ([]TeamMembership, error)
-		TeamMembershipsByTeamID(teamID TeamID) ([]TeamMembership, error)
-		CreateTeamMembership(membership *TeamMembership) error
-		UpdateTeamMembership(ID TeamMembershipID, membership *TeamMembership) error
-		DeleteTeamMembership(ID TeamMembershipID) error
-		DeleteTeamMembershipByUserID(userID UserID) error
-		DeleteTeamMembershipByTeamID(teamID TeamID) error
+	// DockerHubService represents a service for managing the DockerHub object
+	DockerHubService interface {
+		DockerHub() (*DockerHub, error)
+		UpdateDockerHub(registry *DockerHub) error
 	}
 
 	// EndpointService represents a service for managing endpoint data
@@ -703,96 +685,14 @@ type (
 		DeleteEndpointGroup(ID EndpointGroupID) error
 	}
 
-	// RegistryService represents a service for managing registry data
-	RegistryService interface {
-		Registry(ID RegistryID) (*Registry, error)
-		Registries() ([]Registry, error)
-		CreateRegistry(registry *Registry) error
-		UpdateRegistry(ID RegistryID, registry *Registry) error
-		DeleteRegistry(ID RegistryID) error
-	}
-
-	// StackService represents a service for managing stack data
-	StackService interface {
-		Stack(ID StackID) (*Stack, error)
-		StackByName(name string) (*Stack, error)
-		Stacks() ([]Stack, error)
-		CreateStack(stack *Stack) error
-		UpdateStack(ID StackID, stack *Stack) error
-		DeleteStack(ID StackID) error
-		GetNextIdentifier() int
-	}
-
-	// DockerHubService represents a service for managing the DockerHub object
-	DockerHubService interface {
-		DockerHub() (*DockerHub, error)
-		UpdateDockerHub(registry *DockerHub) error
-	}
-
-	// SettingsService represents a service for managing application settings
-	SettingsService interface {
-		Settings() (*Settings, error)
-		UpdateSettings(settings *Settings) error
-	}
-
-	// VersionService represents a service for managing version data
-	VersionService interface {
-		DBVersion() (int, error)
-		StoreDBVersion(version int) error
-	}
-
-	// TunnelServerService represents a service for managing data associated to the tunnel server
-	TunnelServerService interface {
-		Info() (*TunnelServerInfo, error)
-		UpdateInfo(info *TunnelServerInfo) error
-	}
-
-	// WebhookService represents a service for managing webhook data.
-	WebhookService interface {
-		Webhooks() ([]Webhook, error)
-		Webhook(ID WebhookID) (*Webhook, error)
-		CreateWebhook(portainer *Webhook) error
-		WebhookByResourceID(resourceID string) (*Webhook, error)
-		WebhookByToken(token string) (*Webhook, error)
-		DeleteWebhook(serviceID WebhookID) error
-	}
-
-	// ResourceControlService represents a service for managing resource control data
-	ResourceControlService interface {
-		ResourceControl(ID ResourceControlID) (*ResourceControl, error)
-		ResourceControlByResourceIDAndType(resourceID string, resourceType ResourceControlType) (*ResourceControl, error)
-		ResourceControls() ([]ResourceControl, error)
-		CreateResourceControl(rc *ResourceControl) error
-		UpdateResourceControl(ID ResourceControlID, resourceControl *ResourceControl) error
-		DeleteResourceControl(ID ResourceControlID) error
-	}
-
-	// ScheduleService represents a service for managing schedule data
-	ScheduleService interface {
-		Schedule(ID ScheduleID) (*Schedule, error)
-		Schedules() ([]Schedule, error)
-		SchedulesByJobType(jobType JobType) ([]Schedule, error)
-		CreateSchedule(schedule *Schedule) error
-		UpdateSchedule(ID ScheduleID, schedule *Schedule) error
-		DeleteSchedule(ID ScheduleID) error
-		GetNextIdentifier() int
-	}
-
-	// TagService represents a service for managing tag data
-	TagService interface {
-		Tags() ([]Tag, error)
-		Tag(ID TagID) (*Tag, error)
-		CreateTag(tag *Tag) error
-		DeleteTag(ID TagID) error
-	}
-
-	// TemplateService represents a service for managing template data
-	TemplateService interface {
-		Templates() ([]Template, error)
-		Template(ID TemplateID) (*Template, error)
-		CreateTemplate(template *Template) error
-		UpdateTemplate(ID TemplateID, template *Template) error
-		DeleteTemplate(ID TemplateID) error
+	// ExtensionManager represents a service used to manage extensions
+	ExtensionManager interface {
+		FetchExtensionDefinitions() ([]Extension, error)
+		InstallExtension(extension *Extension, licenseKey string, archiveFileName string, extensionArchive []byte) error
+		EnableExtension(extension *Extension, licenseKey string) error
+		DisableExtension(extension *Extension) error
+		UpdateExtension(extension *Extension, version string) error
+		StartExtensions() error
 	}
 
 	// ExtensionService represents a service for managing extension data
@@ -801,27 +701,6 @@ type (
 		Extensions() ([]Extension, error)
 		Persist(extension *Extension) error
 		DeleteExtension(ID ExtensionID) error
-	}
-
-	// CryptoService represents a service for encrypting/hashing data
-	CryptoService interface {
-		Hash(data string) (string, error)
-		CompareHashAndData(hash string, data string) error
-	}
-
-	// DigitalSignatureService represents a service to manage digital signatures
-	DigitalSignatureService interface {
-		ParseKeyPair(private, public []byte) error
-		GenerateKeyPair() ([]byte, []byte, error)
-		EncodedPublicKey() string
-		PEMHeaders() (string, string)
-		CreateSignature(message string) (string, error)
-	}
-
-	// JWTService represents a service for managing JWT tokens
-	JWTService interface {
-		GenerateToken(data *TokenData) (string, error)
-		ParseAndVerifyToken(token string) (*TokenData, error)
 	}
 
 	// FileService represents a service for managing files
@@ -853,6 +732,12 @@ type (
 		ClonePrivateRepositoryWithBasicAuth(repositoryURL, referenceName string, destination, username, password string) error
 	}
 
+	// JobRunner represents a service that can be used to run a job
+	JobRunner interface {
+		Run()
+		GetSchedule() *Schedule
+	}
+
 	// JobScheduler represents a service to run jobs on a periodic basis
 	JobScheduler interface {
 		ScheduleJob(runner JobRunner) error
@@ -862,15 +747,15 @@ type (
 		Start()
 	}
 
-	// JobRunner represents a service that can be used to run a job
-	JobRunner interface {
-		Run()
-		GetSchedule() *Schedule
+	// JobService represents a service to manage job execution on hosts
+	JobService interface {
+		ExecuteScript(endpoint *Endpoint, nodeName, image string, script []byte, schedule *Schedule) error
 	}
 
-	// Snapshotter represents a service used to create endpoint snapshots
-	Snapshotter interface {
-		CreateSnapshot(endpoint *Endpoint) (*Snapshot, error)
+	// JWTService represents a service for managing JWT tokens
+	JWTService interface {
+		GenerateToken(data *TokenData) (string, error)
+		ParseAndVerifyToken(token string) (*TokenData, error)
 	}
 
 	// LDAPService represents a service used to authenticate users against a LDAP/AD
@@ -880,33 +765,23 @@ type (
 		GetUserGroups(username string, settings *LDAPSettings) ([]string, error)
 	}
 
-	// SwarmStackManager represents a service to manage Swarm stacks
-	SwarmStackManager interface {
-		Login(dockerhub *DockerHub, registries []Registry, endpoint *Endpoint)
-		Logout(endpoint *Endpoint) error
-		Deploy(stack *Stack, prune bool, endpoint *Endpoint) error
-		Remove(stack *Stack, endpoint *Endpoint) error
+	// RegistryService represents a service for managing registry data
+	RegistryService interface {
+		Registry(ID RegistryID) (*Registry, error)
+		Registries() ([]Registry, error)
+		CreateRegistry(registry *Registry) error
+		UpdateRegistry(ID RegistryID, registry *Registry) error
+		DeleteRegistry(ID RegistryID) error
 	}
 
-	// ComposeStackManager represents a service to manage Compose stacks
-	ComposeStackManager interface {
-		Up(stack *Stack, endpoint *Endpoint) error
-		Down(stack *Stack, endpoint *Endpoint) error
-	}
-
-	// JobService represents a service to manage job execution on hosts
-	JobService interface {
-		ExecuteScript(endpoint *Endpoint, nodeName, image string, script []byte, schedule *Schedule) error
-	}
-
-	// ExtensionManager represents a service used to manage extensions
-	ExtensionManager interface {
-		FetchExtensionDefinitions() ([]Extension, error)
-		InstallExtension(extension *Extension, licenseKey string, archiveFileName string, extensionArchive []byte) error
-		EnableExtension(extension *Extension, licenseKey string) error
-		DisableExtension(extension *Extension) error
-		UpdateExtension(extension *Extension, version string) error
-		StartExtensions() error
+	// ResourceControlService represents a service for managing resource control data
+	ResourceControlService interface {
+		ResourceControl(ID ResourceControlID) (*ResourceControl, error)
+		ResourceControlByResourceIDAndType(resourceID string, resourceType ResourceControlType) (*ResourceControl, error)
+		ResourceControls() ([]ResourceControl, error)
+		CreateResourceControl(rc *ResourceControl) error
+		UpdateResourceControl(ID ResourceControlID, resourceControl *ResourceControl) error
+		DeleteResourceControl(ID ResourceControlID) error
 	}
 
 	// ReverseTunnelService represensts a service used to manage reverse tunnel connections.
@@ -919,6 +794,133 @@ type (
 		GetTunnelDetails(endpointID EndpointID) *TunnelDetails
 		AddSchedule(endpointID EndpointID, schedule *EdgeSchedule)
 		RemoveSchedule(scheduleID ScheduleID)
+	}
+
+	// RoleService represents a service for managing user roles
+	RoleService interface {
+		Role(ID RoleID) (*Role, error)
+		Roles() ([]Role, error)
+		CreateRole(role *Role) error
+		UpdateRole(ID RoleID, role *Role) error
+	}
+
+	// ScheduleService represents a service for managing schedule data
+	ScheduleService interface {
+		Schedule(ID ScheduleID) (*Schedule, error)
+		Schedules() ([]Schedule, error)
+		SchedulesByJobType(jobType JobType) ([]Schedule, error)
+		CreateSchedule(schedule *Schedule) error
+		UpdateSchedule(ID ScheduleID, schedule *Schedule) error
+		DeleteSchedule(ID ScheduleID) error
+		GetNextIdentifier() int
+	}
+
+	// SettingsService represents a service for managing application settings
+	SettingsService interface {
+		Settings() (*Settings, error)
+		UpdateSettings(settings *Settings) error
+	}
+
+	// Server defines the interface to serve the API
+	Server interface {
+		Start() error
+	}
+
+	// Snapshotter represents a service used to create endpoint snapshots
+	Snapshotter interface {
+		CreateSnapshot(endpoint *Endpoint) (*Snapshot, error)
+	}
+
+	// StackService represents a service for managing stack data
+	StackService interface {
+		Stack(ID StackID) (*Stack, error)
+		StackByName(name string) (*Stack, error)
+		Stacks() ([]Stack, error)
+		CreateStack(stack *Stack) error
+		UpdateStack(ID StackID, stack *Stack) error
+		DeleteStack(ID StackID) error
+		GetNextIdentifier() int
+	}
+
+	// SwarmStackManager represents a service to manage Swarm stacks
+	SwarmStackManager interface {
+		Login(dockerhub *DockerHub, registries []Registry, endpoint *Endpoint)
+		Logout(endpoint *Endpoint) error
+		Deploy(stack *Stack, prune bool, endpoint *Endpoint) error
+		Remove(stack *Stack, endpoint *Endpoint) error
+	}
+
+	// TagService represents a service for managing tag data
+	TagService interface {
+		Tags() ([]Tag, error)
+		Tag(ID TagID) (*Tag, error)
+		CreateTag(tag *Tag) error
+		DeleteTag(ID TagID) error
+	}
+
+	// TeamService represents a service for managing user data
+	TeamService interface {
+		Team(ID TeamID) (*Team, error)
+		TeamByName(name string) (*Team, error)
+		Teams() ([]Team, error)
+		CreateTeam(team *Team) error
+		UpdateTeam(ID TeamID, team *Team) error
+		DeleteTeam(ID TeamID) error
+	}
+
+	// TeamMembershipService represents a service for managing team membership data
+	TeamMembershipService interface {
+		TeamMembership(ID TeamMembershipID) (*TeamMembership, error)
+		TeamMemberships() ([]TeamMembership, error)
+		TeamMembershipsByUserID(userID UserID) ([]TeamMembership, error)
+		TeamMembershipsByTeamID(teamID TeamID) ([]TeamMembership, error)
+		CreateTeamMembership(membership *TeamMembership) error
+		UpdateTeamMembership(ID TeamMembershipID, membership *TeamMembership) error
+		DeleteTeamMembership(ID TeamMembershipID) error
+		DeleteTeamMembershipByUserID(userID UserID) error
+		DeleteTeamMembershipByTeamID(teamID TeamID) error
+	}
+
+	// TemplateService represents a service for managing template data
+	TemplateService interface {
+		Templates() ([]Template, error)
+		Template(ID TemplateID) (*Template, error)
+		CreateTemplate(template *Template) error
+		UpdateTemplate(ID TemplateID, template *Template) error
+		DeleteTemplate(ID TemplateID) error
+	}
+
+	// TunnelServerService represents a service for managing data associated to the tunnel server
+	TunnelServerService interface {
+		Info() (*TunnelServerInfo, error)
+		UpdateInfo(info *TunnelServerInfo) error
+	}
+
+	// UserService represents a service for managing user data
+	UserService interface {
+		User(ID UserID) (*User, error)
+		UserByUsername(username string) (*User, error)
+		Users() ([]User, error)
+		UsersByRole(role UserRole) ([]User, error)
+		CreateUser(user *User) error
+		UpdateUser(ID UserID, user *User) error
+		DeleteUser(ID UserID) error
+	}
+
+	// VersionService represents a service for managing version data
+	VersionService interface {
+		DBVersion() (int, error)
+		StoreDBVersion(version int) error
+	}
+
+	// WebhookService represents a service for managing webhook data.
+	WebhookService interface {
+		Webhooks() ([]Webhook, error)
+		Webhook(ID WebhookID) (*Webhook, error)
+		CreateWebhook(portainer *Webhook) error
+		WebhookByResourceID(resourceID string) (*Webhook, error)
+		WebhookByToken(token string) (*Webhook, error)
+		DeleteWebhook(serviceID WebhookID) error
 	}
 )
 
@@ -951,7 +953,7 @@ const (
 	// to be used when communicating with an agent
 	PortainerAgentSignatureMessage = "Portainer-App"
 	// ExtensionServer represents the server used by Portainer to communicate with extensions
-	ExtensionServer = "localhost"
+	ExtensionServer = "127.0.0.1"
 	// DefaultEdgeAgentCheckinIntervalInSeconds represents the default interval (in seconds) used by Edge agents to checkin with the Portainer instance
 	DefaultEdgeAgentCheckinIntervalInSeconds = 5
 	// LocalExtensionManifestFile represents the name of the local manifest file for extensions
@@ -959,12 +961,61 @@ const (
 )
 
 const (
-	// TLSFileCA represents a TLS CA certificate file
-	TLSFileCA TLSFileType = iota
-	// TLSFileCert represents a TLS certificate file
-	TLSFileCert
-	// TLSFileKey represents a TLS key file
-	TLSFileKey
+	_ AuthenticationMethod = iota
+	// AuthenticationInternal represents the internal authentication method (authentication against Portainer API)
+	AuthenticationInternal
+	// AuthenticationLDAP represents the LDAP authentication method (authentication against a LDAP server)
+	AuthenticationLDAP
+	//AuthenticationOAuth represents the OAuth authentication method (authentication against a authorization server)
+	AuthenticationOAuth
+)
+
+const (
+	_ EndpointExtensionType = iota
+	// StoridgeEndpointExtension represents the Storidge extension
+	StoridgeEndpointExtension
+)
+
+const (
+	_ EndpointStatus = iota
+	// EndpointStatusUp is used to represent an available endpoint
+	EndpointStatusUp
+	// EndpointStatusDown is used to represent an unavailable endpoint
+	EndpointStatusDown
+)
+
+const (
+	_ EndpointType = iota
+	// DockerEnvironment represents an endpoint connected to a Docker environment
+	DockerEnvironment
+	// AgentOnDockerEnvironment represents an endpoint connected to a Portainer agent deployed on a Docker environment
+	AgentOnDockerEnvironment
+	// AzureEnvironment represents an endpoint connected to an Azure environment
+	AzureEnvironment
+	// EdgeAgentEnvironment represents an endpoint connected to an Edge agent
+	EdgeAgentEnvironment
+)
+
+const (
+	_ ExtensionID = iota
+	// RegistryManagementExtension represents the registry management extension
+	RegistryManagementExtension
+	// OAuthAuthenticationExtension represents the OAuth authentication extension
+	OAuthAuthenticationExtension
+	// RBACExtension represents the RBAC extension
+	RBACExtension
+)
+
+const (
+	_ JobType = iota
+	// ScriptExecutionJobType is a non-system job used to execute a script against a list of
+	// endpoints via privileged containers
+	ScriptExecutionJobType
+	// SnapshotJobType is a system job used to create endpoint snapshots
+	SnapshotJobType
+	// EndpointSyncJobType is a system job used to synchronize endpoints from
+	// an external definition store
+	EndpointSyncJobType
 )
 
 const (
@@ -976,21 +1027,15 @@ const (
 )
 
 const (
-	_ UserRole = iota
-	// AdministratorRole represents an administrator user role
-	AdministratorRole
-	// StandardUserRole represents a regular user role
-	StandardUserRole
-)
-
-const (
-	_ AuthenticationMethod = iota
-	// AuthenticationInternal represents the internal authentication method (authentication against Portainer API)
-	AuthenticationInternal
-	// AuthenticationLDAP represents the LDAP authentication method (authentication against a LDAP server)
-	AuthenticationLDAP
-	//AuthenticationOAuth represents the OAuth authentication method (authentication against a authorization server)
-	AuthenticationOAuth
+	_ RegistryType = iota
+	// QuayRegistry represents a Quay.io registry
+	QuayRegistry
+	// AzureRegistry represents an ACR registry
+	AzureRegistry
+	// CustomRegistry represents a custom registry
+	CustomRegistry
+	// GitlabRegistry represents a gitlab registry
+	GitlabRegistry
 )
 
 const (
@@ -1018,24 +1063,6 @@ const (
 )
 
 const (
-	_ EndpointExtensionType = iota
-	// StoridgeEndpointExtension represents the Storidge extension
-	StoridgeEndpointExtension
-)
-
-const (
-	_ EndpointType = iota
-	// DockerEnvironment represents an endpoint connected to a Docker environment
-	DockerEnvironment
-	// AgentOnDockerEnvironment represents an endpoint connected to a Portainer agent deployed on a Docker environment
-	AgentOnDockerEnvironment
-	// AzureEnvironment represents an endpoint connected to an Azure environment
-	AzureEnvironment
-	// EdgeAgentEnvironment represents an endpoint connected to an Edge agent
-	EdgeAgentEnvironment
-)
-
-const (
 	_ StackType = iota
 	// DockerSwarmStack represents a stack managed via docker stack
 	DockerSwarmStack
@@ -1054,51 +1081,26 @@ const (
 )
 
 const (
-	_ EndpointStatus = iota
-	// EndpointStatusUp is used to represent an available endpoint
-	EndpointStatusUp
-	// EndpointStatusDown is used to represent an unavailable endpoint
-	EndpointStatusDown
+	// TLSFileCA represents a TLS CA certificate file
+	TLSFileCA TLSFileType = iota
+	// TLSFileCert represents a TLS certificate file
+	TLSFileCert
+	// TLSFileKey represents a TLS key file
+	TLSFileKey
+)
+
+const (
+	_ UserRole = iota
+	// AdministratorRole represents an administrator user role
+	AdministratorRole
+	// StandardUserRole represents a regular user role
+	StandardUserRole
 )
 
 const (
 	_ WebhookType = iota
 	// ServiceWebhook is a webhook for restarting a docker service
 	ServiceWebhook
-)
-
-const (
-	_ ExtensionID = iota
-	// RegistryManagementExtension represents the registry management extension
-	RegistryManagementExtension
-	// OAuthAuthenticationExtension represents the OAuth authentication extension
-	OAuthAuthenticationExtension
-	// RBACExtension represents the RBAC extension
-	RBACExtension
-)
-
-const (
-	_ JobType = iota
-	// ScriptExecutionJobType is a non-system job used to execute a script against a list of
-	// endpoints via privileged containers
-	ScriptExecutionJobType
-	// SnapshotJobType is a system job used to create endpoint snapshots
-	SnapshotJobType
-	// EndpointSyncJobType is a system job used to synchronize endpoints from
-	// an external definition store
-	EndpointSyncJobType
-)
-
-const (
-	_ RegistryType = iota
-	// QuayRegistry represents a Quay.io registry
-	QuayRegistry
-	// AzureRegistry represents an ACR registry
-	AzureRegistry
-	// CustomRegistry represents a custom registry
-	CustomRegistry
-	// GitlabRegistry represents a gitlab registry
-	GitlabRegistry
 )
 
 const (

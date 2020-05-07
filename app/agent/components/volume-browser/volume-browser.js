@@ -4,6 +4,6 @@ angular.module('portainer.agent').component('volumeBrowser', {
   bindings: {
     volumeId: '<',
     nodeName: '<',
-    isUploadEnabled: '<'
-  }
+    isUploadEnabled: '<',
+  },
 });

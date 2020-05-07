@@ -1,14 +1,14 @@
 angular.module('portainer.app').component('accessTable', {
   templateUrl: './accessTable.html',
-  controller: function() {
+  controller: function () {
     this.state = {
       orderBy: 'Name',
       reverseOrder: false,
       paginatedItemLimit: '10',
-      textFilter: ''
+      textFilter: '',
     };
 
-    this.changeOrderBy = function(orderField) {
+    this.changeOrderBy = function (orderField) {
       this.state.reverseOrder = this.state.orderBy === orderField ? !this.state.reverseOrder : false;
       this.state.orderBy = orderField;
     };
@@ -16,6 +16,6 @@ angular.module('portainer.app').component('accessTable', {
   bindings: {
     dataset: '<',
     entryClick: '<',
-    emptyDatasetMessage: '@'
-  }
+    emptyDatasetMessage: '@',
+  },
 });

@@ -1,11 +1,22 @@
 <div class="actionBar" authorization="DockerServiceUpdate, DockerServiceDelete, DockerServiceCreate">
   <div class="btn-group" role="group" aria-label="...">
-    <button ng-if="$ctrl.showUpdateAction" type="button" class="btn btn-sm btn-primary" authorization="DockerServiceUpdate"
-      ng-disabled="$ctrl.selectedItemCount === 0" ng-click="$ctrl.updateAction($ctrl.selectedItems)">
+    <button
+      ng-if="$ctrl.showUpdateAction"
+      type="button"
+      class="btn btn-sm btn-primary"
+      authorization="DockerServiceUpdate"
+      ng-disabled="$ctrl.selectedItemCount === 0"
+      ng-click="$ctrl.updateAction($ctrl.selectedItems)"
+    >
       <i class="fa fa-sync space-right" aria-hidden="true"></i>Update
     </button>
-    <button type="button" class="btn btn-sm btn-danger" authorization="DockerServiceDelete"
-      ng-disabled="$ctrl.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.selectedItems)">
+    <button
+      type="button"
+      class="btn btn-sm btn-danger"
+      authorization="DockerServiceDelete"
+      ng-disabled="$ctrl.selectedItemCount === 0"
+      ng-click="$ctrl.removeAction($ctrl.selectedItems)"
+    >
       <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
     </button>
   </div>

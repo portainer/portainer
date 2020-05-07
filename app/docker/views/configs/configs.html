@@ -10,12 +10,14 @@
 <div class="row">
   <div class="col-sm-12">
     <configs-datatable
-    title-text="Configs" title-icon="fa-file-code"
-    dataset="ctrl.configs" table-key="configs"
-    order-by="Name" 
-    show-ownership-column="applicationState.application.authentication"
-    remove-action="ctrl.removeAction"
-    refresh-callback="ctrl.getConfigs"
+      title-text="Configs"
+      title-icon="fa-file-code"
+      dataset="ctrl.configs"
+      table-key="configs"
+      order-by="Name"
+      show-ownership-column="applicationState.application.authentication"
+      remove-action="ctrl.removeAction"
+      refresh-callback="ctrl.getConfigs"
     ></configs-datatable>
   </div>
 </div>

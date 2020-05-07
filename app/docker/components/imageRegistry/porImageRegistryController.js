@@ -38,7 +38,7 @@ class porImageRegistryController {
     if (this.isKnownRegistry(registry)) {
       const url = this.getRegistryURL(registry);
       const registryImages = _.filter(this.images, (image) => _.includes(image, url));
-      images = _.map(registryImages, (image) => _.replace(image, new RegExp(url + '\/?'), ''));
+      images = _.map(registryImages, (image) => _.replace(image, new RegExp(url + '/?'), ''));
     } else {
       const registries = _.filter(this.availableRegistries, (reg) => this.isKnownRegistry(reg));
       const registryImages = _.flatMap(registries, (registry) => _.filter(this.images, (image) => _.includes(image, registry.URL)));
@@ -64,7 +64,7 @@ class porImageRegistryController {
       const [registries, dockerhub, images] = await Promise.all([
         this.RegistryService.registries(),
         this.DockerHubService.dockerhub(),
-        this.autoComplete ? this.ImageService.images() : []
+        this.autoComplete ? this.ImageService.images() : [],
       ]);
       this.images = this.ImageService.getUniqueTagListFromImages(images);
       this.availableRegistries = _.concat(dockerhub, registries);
@@ -73,7 +73,7 @@ class porImageRegistryController {
       if (!id) {
         this.model.Registry = dockerhub;
       } else {
-        this.model.Registry = _.find(this.availableRegistries, { 'Id': id });
+        this.model.Registry = _.find(this.availableRegistries, { Id: id });
       }
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve registries');

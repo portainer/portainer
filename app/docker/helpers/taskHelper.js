@@ -1,18 +1,19 @@
-angular.module('portainer.docker')
-.factory('TaskHelper', [function TaskHelperFactory() {
-  'use strict';
+angular.module('portainer.docker').factory('TaskHelper', [
+  function TaskHelperFactory() {
+    'use strict';
 
-  var helper = {};
+    var helper = {};
 
-  helper.associateContainerToTask = function(task, containers) {
-    for (var i = 0; i < containers.length; i++) {
-      var container = containers[i];
-      if (task.ContainerId === container.Id) {
-        task.Container = container;
-        break;
+    helper.associateContainerToTask = function (task, containers) {
+      for (var i = 0; i < containers.length; i++) {
+        var container = containers[i];
+        if (task.ContainerId === container.Id) {
+          task.Container = container;
+          break;
+        }
       }
-    }
-  };
+    };
 
-  return helper;
-}]);
+    return helper;
+  },
+]);

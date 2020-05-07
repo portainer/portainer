@@ -3,6 +3,6 @@ angular.module('portainer.docker').component('nodeLabelsTable', {
   controller: 'NodeLabelsTableController',
   bindings: {
     labels: '<',
-    onChangedLabels: '&'
-  }
+    onChangedLabels: '&',
+  },
 });

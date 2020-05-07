@@ -88,25 +88,25 @@ export function StoridgeCreateProfileRequest(model) {
   if (model.MinIOPS && model.MaxIOPS) {
     this.iops = {
       min: model.MinIOPS,
-      max: model.MaxIOPS
+      max: model.MaxIOPS,
     };
   }
 
   if (model.MinBandwidth && model.MaxBandwidth) {
     this.bandwidth = {
       min: model.MinBandwidth,
-      max: model.MaxBandwidth
+      max: model.MaxBandwidth,
     };
   }
 
   this.filesystem = {
-    type: model.Filesystem
+    type: model.Filesystem,
   };
 
   var service = {};
 
   service.snapshot = {
-    enabled: model.SnapshotEnabled
+    enabled: model.SnapshotEnabled,
   };
   if (model.SnapshotEnabled) {
     service.snapshot.interval = model.SnapshotInterval;
@@ -114,7 +114,7 @@ export function StoridgeCreateProfileRequest(model) {
   }
 
   service.encryption = {
-    enabled: model.EncryptionEnabled
+    enabled: model.EncryptionEnabled,
   };
 
   this.service = service;
@@ -122,7 +122,7 @@ export function StoridgeCreateProfileRequest(model) {
   this.interface = {
     driver: model.InterfaceDriver,
     network: model.InterfaceNetwork,
-    conf: model.InterfaceConf
+    conf: model.InterfaceConf,
   };
 
   if (model.InterfaceType) {

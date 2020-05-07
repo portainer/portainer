@@ -10,7 +10,7 @@ export function NodeViewModel(data) {
 
   var labels = data.Spec.Labels;
   if (labels) {
-    this.Labels = Object.keys(labels).map(function(key) {
+    this.Labels = Object.keys(labels).map(function (key) {
       return { key: key, value: labels[key], originalKey: key, originalValue: labels[key], added: true };
     });
   } else {
@@ -19,7 +19,7 @@ export function NodeViewModel(data) {
 
   var engineLabels = data.Description.Engine.Labels;
   if (engineLabels) {
-    this.EngineLabels = Object.keys(engineLabels).map(function(key) {
+    this.EngineLabels = Object.keys(engineLabels).map(function (key) {
       return { key: key, value: engineLabels[key] };
     });
   } else {

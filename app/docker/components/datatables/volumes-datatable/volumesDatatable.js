@@ -13,6 +13,6 @@ angular.module('portainer.docker').component('volumesDatatable', {
     removeAction: '<',
     showBrowseAction: '<',
     offlineMode: '<',
-    refreshCallback: '<'
-  }
+    refreshCallback: '<',
+  },
 });
