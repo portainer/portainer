@@ -24,7 +24,7 @@
                       <td>Name</td>
                       <td>
                         {{ ctrl.application.Name }}
-                        <span style="margin-left: 5px;" class="label label-primary image-tag" ng-if="ctrl.isExternalApplication(item)">external</span>
+                        <span style="margin-left: 5px;" class="label label-primary image-tag" ng-if="ctrl.isExternalApplication()">external</span>
                       </td>
                     </tr>
                     <tr>
@@ -80,7 +80,7 @@
                         </form>
                       </td>
                     </tr>
-                    <tr>
+                    <tr ng-if="!ctrl.isExternalApplication() && !ctrl.isSystemNamespace()">
                       <td colspan="2">
                         <button type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.applications.application.edit">
                           <i class="fa fa-file-code space-right" aria-hidden="true"></i>Edit
