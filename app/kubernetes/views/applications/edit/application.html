@@ -24,7 +24,7 @@
                       <td>Name</td>
                       <td>
                         {{ ctrl.application.Name }}
-                        <span style="margin-left: 5px;" class="label label-primary image-tag" ng-if="ctrl.isExternalApplication()">external</span>
+                        <span style="margin-left: 5px;" class="label label-primary image-tag" ng-if="!ctrl.isSystemNamespace() && ctrl.isExternalApplication()">external</span>
                       </td>
                     </tr>
                     <tr>
@@ -80,13 +80,6 @@
                         </form>
                       </td>
                     </tr>
-                    <tr ng-if="!ctrl.isExternalApplication() && !ctrl.isSystemNamespace()">
-                      <td colspan="2">
-                        <button type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.applications.application.edit">
-                          <i class="fa fa-file-code space-right" aria-hidden="true"></i>Edit
-                        </button>
-                      </td>
-                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -125,6 +118,11 @@
     <div class="col-sm-12">
       <rd-widget>
         <rd-widget-body>
+          <div ng-if="!ctrl.isExternalApplication() && !ctrl.isSystemNamespace()" style="margin-bottom: 15px;">
+            <button type="button" class="btn btn-sm btn-primary" ui-sref="kubernetes.applications.application.edit" style="margin-left: 0;">
+              <i class="fa fa-file-code space-right" aria-hidden="true"></i>Edit this application
+            </button>
+          </div>
 
           <div class="text-muted" style="margin-bottom: 15px;">
             <i class="fa fa-external-link-alt" aria-hidden="true" style="margin-right: 2px;"></i> Accessing the application
