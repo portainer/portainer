@@ -2,6 +2,7 @@ package users
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
@@ -49,7 +50,9 @@ func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *http
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to create administrator user", portainer.ErrResourceAccessDenied}
 	}
 
-	user, err := handler.UserService.UserByUsername(payload.Username)
+	userName := strings.ToLower(payload.Username)
+
+	user, err := handler.UserService.UserByUsername(userName)
 	if err != nil && err != portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve users from the database", err}
 	}
@@ -58,7 +61,7 @@ func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	user = &portainer.User{
-		Username:                payload.Username,
+		Username:                strings.ToLower(userName),
 		Role:                    portainer.UserRole(payload.Role),
 		PortainerAuthorizations: portainer.DefaultPortainerAuthorizations(),
 	}

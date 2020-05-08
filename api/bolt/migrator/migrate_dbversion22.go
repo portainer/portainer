@@ -1,6 +1,10 @@
 package migrator
 
-import "github.com/portainer/portainer/api"
+import (
+	"strings"
+
+	"github.com/portainer/portainer/api"
+)
 
 func (m *Migrator) updateEndointsAndEndpointsGroupsToDBVersion23() error {
 	tags, err := m.tagService.Tags()
@@ -48,6 +52,24 @@ func (m *Migrator) updateEndointsAndEndpointsGroupsToDBVersion23() error {
 		}
 		endpointGroup.TagIDs = endpointGroupTags
 		err = m.endpointGroupService.UpdateEndpointGroup(endpointGroup.ID, &endpointGroup)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *Migrator) updateUsersToDBVersion23() error {
+	legacyUsers, err := m.userService.Users()
+	if err != nil {
+		return err
+	}
+
+	for _, user := range legacyUsers {
+		user.Username = strings.ToLower(user.Username)
+
+		err = m.userService.UpdateUser(user.ID, &user)
 		if err != nil {
 			return err
 		}

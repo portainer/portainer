@@ -27,21 +27,24 @@ angular.module('portainer.app').controller('UsersController', [
     };
 
     $scope.checkUsernameValidity = function () {
-      var valid = true;
-      for (var i = 0; i < $scope.users.length; i++) {
-        if ($scope.formValues.Username === $scope.users[i].Username) {
-          valid = false;
-          break;
+      const currentUsername = _.toLower($scope.formValues.Username);
+      let validUsername = true;
+
+      _.forEach($scope.users, (user) => {
+        if (user.Username === currentUsername) {
+          validUsername = false;
+          return;
         }
-      }
-      $scope.state.validUsername = valid;
-      $scope.state.userCreationError = valid ? '' : 'Username already taken';
+      });
+
+      $scope.state.validUsername = validUsername;
+      $scope.state.userCreationError = validUsername ? '' : 'Username already taken';
     };
 
     $scope.addUser = function () {
       $scope.state.actionInProgress = true;
       $scope.state.userCreationError = '';
-      var username = $scope.formValues.Username;
+      var username = _.toLower($scope.formValues.Username);
       var password = $scope.formValues.Password;
       var role = $scope.formValues.Administrator ? 1 : 2;
       var teamIds = [];

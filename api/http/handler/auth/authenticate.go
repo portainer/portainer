@@ -47,7 +47,9 @@ func (handler *Handler) authenticate(w http.ResponseWriter, r *http.Request) *ht
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
 	}
 
-	u, err := handler.UserService.UserByUsername(payload.Username)
+	userName := strings.ToLower(payload.Username)
+
+	u, err := handler.UserService.UserByUsername(userName)
 	if err != nil && err != portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a user with the specified username from the database", err}
 	}
@@ -58,7 +60,7 @@ func (handler *Handler) authenticate(w http.ResponseWriter, r *http.Request) *ht
 
 	if settings.AuthenticationMethod == portainer.AuthenticationLDAP {
 		if u == nil && settings.LDAPSettings.AutoCreateUsers {
-			return handler.authenticateLDAPAndCreateUser(w, payload.Username, payload.Password, &settings.LDAPSettings)
+			return handler.authenticateLDAPAndCreateUser(w, userName, payload.Password, &settings.LDAPSettings)
 		} else if u == nil && !settings.LDAPSettings.AutoCreateUsers {
 			return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid credentials", portainer.ErrUnauthorized}
 		}

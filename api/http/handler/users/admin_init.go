@@ -2,6 +2,7 @@ package users
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
@@ -43,7 +44,7 @@ func (handler *Handler) adminInit(w http.ResponseWriter, r *http.Request) *httpe
 	}
 
 	user := &portainer.User{
-		Username:                payload.Username,
+		Username:                strings.ToLower(payload.Username),
 		Role:                    portainer.AdministratorRole,
 		PortainerAuthorizations: portainer.DefaultPortainerAuthorizations(),
 	}
