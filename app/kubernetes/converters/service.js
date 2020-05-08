@@ -20,11 +20,13 @@ class KubernetesServiceConverter {
   static publishedPortToServicePort(name, publishedPort, type) {
     const res = new KubernetesServicePort();
     res.name = _.toLower(name + '-' + publishedPort.ContainerPort + '-' + publishedPort.Protocol);
-    res.port = parseInt(type === KubernetesServiceTypes.LOAD_BALANCER ? publishedPort.LoadBalancerPort : publishedPort.ContainerPort , 10);
-    res.targetPort = parseInt(publishedPort.ContainerPort, 10);
+    res.port = type === KubernetesServiceTypes.LOAD_BALANCER ? publishedPort.LoadBalancerPort : publishedPort.ContainerPort;
+    res.targetPort = publishedPort.ContainerPort;
     res.protocol = publishedPort.Protocol;
     if (type === KubernetesServiceTypes.NODE_PORT && publishedPort.NodePort) {
-      res.nodePort = parseInt(publishedPort.NodePort, 10);
+      res.nodePort = publishedPort.NodePort;
+    } else if (type === KubernetesServiceTypes.LOAD_BALANCER && publishedPort.LoadBalancerNodePort) {
+      res.nodePort = publishedPort.LoadBalancerNodePort;
     } else {
       delete res.nodePort;
     }

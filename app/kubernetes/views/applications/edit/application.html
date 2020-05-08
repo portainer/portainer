@@ -70,13 +70,25 @@
                     <tr>
                       <td colspan="2">
                         <form class="form-horizontal" name="kubernetesApplicationNoteForm">
-                          <div>
-                            <i class="fa fa-edit" aria-hidden="true"></i> Note
+                          <div class="form-group">
+                            <div class="col-sm-12">
+                              <i class="fa fa-edit" aria-hidden="true"></i> Note <button class="btn btn-xs btn-primary"
+                                ng-click="ctrl.state.expandedNote = !ctrl.state.expandedNote;">{{ctrl.state.expandedNote ? 'Collapse' : 'Expand'}}
+                                <i class="fas {{ ctrl.state.expandedNote ? 'fa-angle-up' : 'fa-angle-down'}}" aria-hidden="true"></i></button>
+                            </div>
                           </div>
-                          <textarea style="margin-top: 5px;" class="form-control" name="application_note" id="application_note" ng-model="ctrl.formValues.Note" rows="5"
-                            placeholder="Enter a note about this application..."></textarea>
-                          <button class="btn btn-primary btn-sm" type="button" ng-click="ctrl.updateApplication()" ng-disabled="ctrl.formValues.Note === ctrl.application.Note"
-                            style="margin-top: 0.5rem; margin-left: 0;">{{ ctrl.application.Note ? 'Update' : 'Save' }} note</button>
+                          <div class="form-group" ng-if="ctrl.state.expandedNote">
+                            <div class="col-sm-12">
+                              <textarea class="form-control" name="application_note" id="application_note" ng-model="ctrl.formValues.Note" rows="5"
+                                placeholder="Enter a note about this application..."></textarea>
+                            </div>
+                          </div>
+                          <div class="form-group" ng-if="ctrl.state.expandedNote">
+                            <div class="col-sm-12">
+                              <button class="btn btn-primary btn-sm" style="margin-left: 0px;"type="button" ng-click="ctrl.updateApplication()"
+                                ng-disabled="ctrl.formValues.Note === ctrl.application.Note">{{ ctrl.application.Note ? 'Update' : 'Save' }} note</button>
+                            </div>
+                          </div>
                         </form>
                       </td>
                     </tr>

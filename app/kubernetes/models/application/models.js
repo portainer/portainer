@@ -51,6 +51,7 @@ const _KubernetesApplication = Object.freeze({
   ServiceId: '',
   ServiceName: '',
   HeadlessServiceName: undefined, // only used for StatefulSet
+  LoadBalancerIPAddress: undefined, // only filled when bound service is LoadBalancer and state is available
   PublishedPorts: [],
   Volumes: [],
   Env: [],

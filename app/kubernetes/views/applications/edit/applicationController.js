@@ -109,6 +109,9 @@ class KubernetesApplicationController {
       this.state.dataLoading = true;
       this.application = await this.KubernetesApplicationService.get(this.state.params.namespace, this.state.params.name);
       this.formValues.Note = this.application.Note;
+      if (this.application.Note) {
+        this.state.expandedNote = true;
+      }
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve application details');
     } finally {
@@ -133,6 +136,7 @@ class KubernetesApplicationController {
         name: this.$transition$.params().name,
       },
       eventWarningCount: 0,
+      expandedNote: false
     };
 
     this.formValues = {

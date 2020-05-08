@@ -4,13 +4,14 @@ import { KubernetesStorageClassAccessPolicies, KubernetesStorageClass } from 'Ku
 
 class KubernetesConfigureController {
   /* @ngInject */
-  constructor($async, $state, $stateParams, Notifications, KubernetesStorageService, EndpointService) {
+  constructor($async, $state, $stateParams, Notifications, KubernetesStorageService, EndpointService, EndpointProvider) {
     this.$async = $async;
     this.$state = $state;
     this.$stateParams = $stateParams;
     this.Notifications = Notifications;
     this.KubernetesStorageService = KubernetesStorageService;
     this.EndpointService = EndpointService;
+    this.EndpointProvider = EndpointProvider;
 
     this.onInit = this.onInit.bind(this);
     this.configureAsync = this.configureAsync.bind(this);
@@ -46,6 +47,13 @@ class KubernetesConfigureController {
       this.endpoint.Kubernetes.Configuration.StorageClasses = classes;
       this.endpoint.Kubernetes.Configuration.UseLoadBalancer = this.formValues.UseLoadBalancer;
       await this.EndpointService.updateEndpoint(this.endpoint.Id, this.endpoint);
+      const endpoints = this.EndpointProvider.endpoints();
+      const modifiedEndpoint = _.find(endpoints, (item) => item.Id === this.endpoint.Id);
+      if (modifiedEndpoint) {
+        modifiedEndpoint.Kubernetes.Configuration.StorageClasses = classes;
+        modifiedEndpoint.Kubernetes.Configuration.UseLoadBalancer = this.formValues.UseLoadBalancer;
+        this.EndpointProvider.setEndpoints(endpoints);
+      }
       this.Notifications.success('Configuration successfully applied');
       this.$state.go('portainer.home');
     } catch (err) {

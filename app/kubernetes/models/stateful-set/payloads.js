@@ -3,40 +3,46 @@ import { KubernetesCommonMetadataPayload } from "Kubernetes/models/common/payloa
 /**
  * KubernetesStatefulSetCreatePayload Model
  */
- const _KubernetesStatefulSetCreatePayload = Object.freeze({
-    metadata: new KubernetesCommonMetadataPayload(),
-    spec: {
-      replicas: 0,
-      serviceName: '',
-      selector: {
-        matchLabels: {
+const _KubernetesStatefulSetCreatePayload = Object.freeze({
+  metadata: new KubernetesCommonMetadataPayload(),
+  spec: {
+    replicas: 0,
+    serviceName: '',
+    selector: {
+      matchLabels: {
+        app: ''
+      }
+    },
+    volumeClaimTemplates: [],
+    updateStrategy: {
+      type: 'RollingUpdate',
+      rollingUpdate: {
+        partition: 0
+      }
+    },
+    template: {
+      metadata: {
+        labels: {
           app: ''
         }
       },
-      volumeClaimTemplates: [],
-      template: {
-        metadata: {
-          labels: {
-            app: ''
+      spec: {
+        containers: [
+          {
+            name: '',
+            image: '',
+            env: [],
+            resources: {
+              limits: {},
+              requests: {}
+            },
+            volumeMounts: []
           }
-        },
-        spec: {
-          containers: [
-            {
-              name: '',
-              image: '',
-              env: [],
-              resources: {
-                limits: {},
-                requests: {}
-              },
-              volumeMounts: []
-            }
-          ],
-          volumes: []
-        }
+        ],
+        volumes: []
       }
     }
+  }
 });
 
 export class KubernetesStatefulSetCreatePayload {

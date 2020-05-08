@@ -502,7 +502,7 @@
                 <div style="color: #767676;" ng-if="!ctrl.supportGlobalDeployment()">
                   <input type="radio" id="deployment_global" disabled>
                   <label for="deployment_global" tooltip-append-to-body="true" tooltip-placement="bottom" tooltip-class="portainer-tooltip"
-                    uib-tooltip="The storage used for persisted folders cannot be used with this option" style="cursor:pointer; border-color: #767676">
+                    uib-tooltip="The storage or access policy used for persisted folders cannot be used with this option" style="cursor:pointer; border-color: #767676">
                     <div class="boxselector_header">
                       <i class="fa fa-cubes" aria-hidden="true" style="margin-right: 2px;"></i>
                       Global
@@ -611,7 +611,7 @@
             <div class="form-group">
               <div class="col-sm-12" style="margin-top: 5px;">
                 <label class="control-label text-left">Published ports</label>
-                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addPublishedPort()">
+                <span class="label label-default interactive" style="margin-left: 10px;" ng-click="ctrl.addPublishedPort()" ng-if="!ctrl.disableLoadBalancerEdit()">
                   <i class="fa fa-plus-circle" aria-hidden="true"></i> publish a new port
                 </span>
               </div>
@@ -624,12 +624,14 @@
               </div>
 
               <div class="col-sm-12 form-inline" style="margin-top: 10px;">
-                <div ng-repeat-start="publishedPort in ctrl.formValues.PublishedPorts" style="margin-top: 2px;">
+                <div ng-repeat-start="publishedPort in ctrl.formValues.PublishedPorts" style="margin-top: 2px;" tooltip-append-to-body="true" tooltip-placement="bottom"
+                  tooltip-class="portainer-tooltip" tooltip-enable="ctrl.disableLoadBalancerEdit()"
+                  uib-tooltip="Edition is not allowed while the Load Balancer is in Pending state">
 
                   <div class="col-sm-4 input-group input-group-sm">
                     <span class="input-group-addon">container port</span>
                     <input type="number" class="form-control" name="container_port_{{$index}}" ng-model="publishedPort.ContainerPort" placeholder="80" ng-min="1" ng-max="65535"
-                      required>
+                      required ng-disabled="ctrl.disableLoadBalancerEdit()">
                   </div>
 
                   <div class="input-group input-group-sm col-sm-4" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.CLUSTER">
@@ -641,15 +643,15 @@
                   <div class="col-sm-4 input-group input-group-sm" ng-if="ctrl.formValues.PublishingType === ctrl.ApplicationPublishingTypes.LOAD_BALANCER">
                     <span class="input-group-addon">load balancer port</span>
                     <input type="number" class="form-control" name="load_balancer_port_{{$index}}" ng-model="publishedPort.LoadBalancerPort" placeholder="80" value="8080"
-                      ng-min="1" ng-max="65535" required>
+                      ng-min="1" ng-max="65535" required ng-disabled="ctrl.disableLoadBalancerEdit()">
                   </div>
 
                   <div class="input-group col-sm-3 input-group-sm">
                     <div class="btn-group btn-group-sm">
-                      <label class="btn btn-primary" ng-model="publishedPort.Protocol" uib-btn-radio="'TCP'">TCP</label>
-                      <label class="btn btn-primary" ng-model="publishedPort.Protocol" uib-btn-radio="'UDP'">UDP</label>
+                      <label class="btn btn-primary" ng-model="publishedPort.Protocol" uib-btn-radio="'TCP'" ng-disabled="ctrl.disableLoadBalancerEdit()">TCP</label>
+                      <label class="btn btn-primary" ng-model="publishedPort.Protocol" uib-btn-radio="'UDP'" ng-disabled="ctrl.disableLoadBalancerEdit()">UDP</label>
                     </div>
-                    <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removePublishedPort($index)">
+                    <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removePublishedPort($index)" ng-if="!ctrl.disableLoadBalancerEdit()">
                       <i class="fa fa-times" aria-hidden="true"></i>
                     </button>
                   </div>

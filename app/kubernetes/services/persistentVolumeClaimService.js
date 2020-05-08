@@ -8,8 +8,6 @@ class KubernetesPersistentVolumeClaimService {
   /* @ngInject */
   constructor($async, EndpointProvider, KubernetesPersistentVolumeClaims) {
     this.$async = $async;
-    const endpoint = EndpointProvider.currentEndpoint();
-    this.storageClasses = endpoint.Kubernetes.Configuration.StorageClasses;
     this.EndpointProvider = EndpointProvider;
     this.KubernetesPersistentVolumeClaims = KubernetesPersistentVolumeClaims;
 
@@ -28,7 +26,8 @@ class KubernetesPersistentVolumeClaimService {
         this.KubernetesPersistentVolumeClaims(namespace).get(params).$promise,
         this.KubernetesPersistentVolumeClaims(namespace).getYaml(params).$promise
       ]);
-      return KubernetesPersistentVolumeClaimConverter.apiToPersistentVolumeClaim(raw, this.storageClasses, yaml);
+      const storageClasses = this.EndpointProvider.currentEndpoint().Kubernetes.Configuration.StorageClasses;
+      return KubernetesPersistentVolumeClaimConverter.apiToPersistentVolumeClaim(raw, storageClasses, yaml);
     } catch (err) {
       throw new PortainerError('Unable to retrieve persistent volume claim', err);
     }
@@ -37,7 +36,8 @@ class KubernetesPersistentVolumeClaimService {
   async getAllAsync(namespace) {
     try {
       const data = await this.KubernetesPersistentVolumeClaims(namespace).get().$promise;
-      return _.map(data.items, (item) => KubernetesPersistentVolumeClaimConverter.apiToPersistentVolumeClaim(item, this.storageClasses));
+      const storageClasses = this.EndpointProvider.currentEndpoint().Kubernetes.Configuration.StorageClasses;
+      return _.map(data.items, (item) => KubernetesPersistentVolumeClaimConverter.apiToPersistentVolumeClaim(item, storageClasses));
     } catch (err) {
       throw new PortainerError('Unable to retrieve persistent volume claims', err);
     }

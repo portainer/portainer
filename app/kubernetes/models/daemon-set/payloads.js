@@ -3,38 +3,44 @@ import { KubernetesCommonMetadataPayload } from "Kubernetes/models/common/payloa
 /**
  * KubernetesDaemonSetCreatePayload Model
  */
- const _KubernetesDaemonSetCreatePayload = Object.freeze({
-    metadata: new KubernetesCommonMetadataPayload(),
-    spec: {
-      replicas: 0,
-      selector: {
-        matchLabels: {
+const _KubernetesDaemonSetCreatePayload = Object.freeze({
+  metadata: new KubernetesCommonMetadataPayload(),
+  spec: {
+    replicas: 0,
+    selector: {
+      matchLabels: {
+        app: ''
+      }
+    },
+    updateStrategy: {
+      type: 'RollingUpdate',
+      rollingUpdate: {
+        maxUnavailable: 1
+      }
+    },
+    template: {
+      metadata: {
+        labels: {
           app: ''
         }
       },
-      template: {
-        metadata: {
-          labels: {
-            app: ''
+      spec: {
+        containers: [
+          {
+            name: '',
+            image: '',
+            env: [],
+            resources: {
+              limits: {},
+              requests: {}
+            },
+            volumeMounts: []
           }
-        },
-        spec: {
-          containers: [
-            {
-              name: '',
-              image: '',
-              env: [],
-              resources: {
-                limits: {},
-                requests: {}
-              },
-              volumeMounts: []
-            }
-          ],
-          volumes: []
-        }
+        ],
+        volumes: []
       }
     }
+  }
 });
 
 export class KubernetesDaemonSetCreatePayload {

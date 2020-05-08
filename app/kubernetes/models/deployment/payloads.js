@@ -3,13 +3,20 @@ import { KubernetesCommonMetadataPayload } from "Kubernetes/models/common/payloa
 /**
  * KubernetesDeploymentCreatePayload Model
  */
- const _KubernetesDeploymentCreatePayload = Object.freeze({
+const _KubernetesDeploymentCreatePayload = Object.freeze({
   metadata: new KubernetesCommonMetadataPayload(),
   spec: {
     replicas: 0,
     selector: {
       matchLabels: {
         app: ''
+      }
+    },
+    strategy: {
+      type: 'RollingUpdate',
+      rollingUpdate: {
+        maxSurge: 0,
+        maxUnavailable: '100%'
       }
     },
     template: {

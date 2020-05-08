@@ -21,6 +21,7 @@ import {
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import KubernetesApplicationConverter from 'Kubernetes/converters/application';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
+import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 
 class KubernetesCreateApplicationController {
   /* @ngInject */
@@ -43,6 +44,7 @@ class KubernetesCreateApplicationController {
     this.ApplicationDataAccessPolicies = KubernetesApplicationDataAccessPolicies;
     this.ApplicationPublishingTypes = KubernetesApplicationPublishingTypes;
     this.ApplicationConfigurationFormValueOverridenKeyTypes = KubernetesApplicationConfigurationFormValueOverridenKeyTypes;
+    this.ServiceTypes = KubernetesServiceTypes;
 
     this.onInit = this.onInit.bind(this);
     this.updateApplicationAsync = this.updateApplicationAsync.bind(this);
@@ -197,16 +199,14 @@ class KubernetesCreateApplicationController {
   // * For each persisted folder specified, if one of the storage object only supports the RWO access mode
   // * The data access policy is set to ISOLATED
   supportGlobalDeployment() {
-    if (this.formValues.PersistedFolders.length === 0) {
-      return true;
-    }
-
+    const hasFolders = this.formValues.PersistedFolders.length !== 0;
     const hasRWOOnly = _.find(this.formValues.PersistedFolders, (item) => _.isEqual(item.StorageClass.AccessModes, ["RWO"]));
-    if (hasRWOOnly) {
+    const isIsolated = this.formValues.DataAccessPolicy === this.ApplicationDataAccessPolicies.ISOLATED;
+
+    if ((hasFolders && hasRWOOnly) || isIsolated) {
       return false;
     }
-
-    return this.formValues.DataAccessPolicy !== this.ApplicationDataAccessPolicies.ISOLATED;
+    return true;
   }
 
   // A StatefulSet is defined by DataAccessPolicy === ISOLATED
@@ -219,20 +219,14 @@ class KubernetesCreateApplicationController {
   // * The access policy is set to shared and for each persisted folders specified, all the associated storage objects support at least the ROX or RWX access mode
   // * The access policy is set to isolated
   supportScalableReplicaDeployment() {
-    if (this.formValues.PersistedFolders.length === 0) {
-      return true;
-    }
-
-    if (this.formValues.DataAccessPolicy === this.ApplicationDataAccessPolicies.ISOLATED) {
-      return true;
-    }
-
+    const hasFolders = this.formValues.PersistedFolders.length !== 0;
     const hasRWOOnly = _.find(this.formValues.PersistedFolders, (item) => _.isEqual(item.StorageClass.AccessModes, ["RWO"]));
-    if (hasRWOOnly) {
-      return false;
-    }
+    const isIsolated = this.formValues.DataAccessPolicy === this.ApplicationDataAccessPolicies.ISOLATED;
 
-    return true;
+    if (!hasFolders || isIsolated || (hasFolders && !hasRWOOnly)) {
+      return true;
+    }
+    return false;
   }
 
   // For each persisted folders, returns the non scalable deployments options (storage class that only supports RWO)
@@ -294,14 +288,28 @@ class KubernetesCreateApplicationController {
     return this.state.isEdit && this.formValues.PersistedFolders[index].PersistentVolumeClaimName;
   }
 
-  isEditAndNonScalable() {
-    return this.state.isEdit && !this.supportGlobalDeployment() && this.formValues.ReplicaCount > 1;
+  isNonScalable() {
+    const scalable = this.supportScalableReplicaDeployment();
+    const global = this.supportGlobalDeployment();
+    const replica = this.formValues.ReplicaCount > 1;
+    const replicated = this.formValues.DeploymentType === this.ApplicationDeploymentTypes.REPLICATED;
+    const res = (replicated && !scalable && replica) || (!replicated && !global)
+    return res;
   }
 
   isDeployUpdateButtonDisabled() {
-    return this.resourceReservationsOverflow()
-      || this.state.actionInProgress || !this.isValid()
-      || this.isEditAndNoChangesMade() || this.isEditAndNonScalable();
+    const overflow = this.resourceReservationsOverflow();
+    const inProgress = this.state.actionInProgress;
+    const invalid = !this.isValid();
+    const hasNoChanges = this.isEditAndNoChangesMade();
+    const nonScalable = this.isNonScalable();
+    const res = overflow || inProgress || invalid || hasNoChanges || nonScalable;
+    return res;
+  }
+
+  disableLoadBalancerEdit() {
+    return this.state.isEdit && this.application.ServiceType === this.ServiceTypes.LOAD_BALANCER
+      && !this.application.LoadBalancerIPAddress && this.formValues.PublishingType === this.ApplicationPublishingTypes.LOAD_BALANCER;
   }
   /**
    * !STATE VALIDATION FUNCTIONS
@@ -347,10 +355,8 @@ class KubernetesCreateApplicationController {
       this.state.sliders.memory.max = KubernetesResourceReservationHelper.megaBytesValue(maxMemory);
       this.state.sliders.cpu.min = minCpu;
       this.state.sliders.cpu.max = _.round(maxCpu, 2);
-      if (this.formValues.CpuLimit < minCpu || this.formValues.CpuLimit > maxCpu) {
+      if (!this.state.isEdit) {
         this.formValues.CpuLimit = minCpu;
-      }
-      if (this.formValues.MemoryLimit < minMemory || this.formValues.MemoryLimit > maxMemory) {
         this.formValues.MemoryLimit = minMemory;
       }
     } catch (err) {
@@ -455,7 +461,14 @@ class KubernetesCreateApplicationController {
 
   deployApplication() {
     if (this.state.isEdit) {
-      return this.$async(this.updateApplicationAsync);
+      this.ModalService.confirmUpdate(
+        'Updating the application may cause service interruption. Do you wish to continue?',
+        (confirmed) => {
+          if (confirmed) {
+            return this.$async(this.updateApplicationAsync);
+          }
+        }
+      );
     } else {
       return this.$async(this.deployApplicationAsync);
     }

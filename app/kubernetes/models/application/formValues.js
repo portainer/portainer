@@ -104,6 +104,7 @@ const _KubernetesApplicationPublishedPortFormValue = Object.freeze({
   ContainerPort: '',
   NodePort: '',
   LoadBalancerPort: '',
+  LoadBalancerNodePort: undefined, // only filled to save existing loadbalancer nodePort and drop it when moving app exposure from LB to Internal/NodePort
   Protocol: 'TCP'
 });
 

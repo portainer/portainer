@@ -272,6 +272,7 @@ class KubernetesApplicationHelper {
       res.ContainerPort = port.targetPort;
       if (serviceType === KubernetesServiceTypes.LOAD_BALANCER) {
         res.LoadBalancerPort = port.port;
+        res.LoadBalancerNodePort = port.nodePort;
       } else if (serviceType === KubernetesServiceTypes.NODE_PORT) {
         res.NodePort = port.nodePort;
       }
