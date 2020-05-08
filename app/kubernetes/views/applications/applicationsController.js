@@ -5,13 +5,14 @@ import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 
 class KubernetesApplicationsController {
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesApplicationService, Authentication, ModalService) {
+  constructor($async, $state, Notifications, KubernetesApplicationService, Authentication, ModalService, LocalStorage) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.Authentication = Authentication;
     this.ModalService = ModalService;
+    this.LocalStorage = LocalStorage;
 
     this.onInit = this.onInit.bind(this);
     this.getApplications = this.getApplications.bind(this);
@@ -21,6 +22,10 @@ class KubernetesApplicationsController {
     this.removeStacksAction = this.removeStacksAction.bind(this);
     this.removeStacksActionAsync = this.removeStacksActionAsync.bind(this);
     this.onPublishingModeClick = this.onPublishingModeClick.bind(this);
+  }
+
+  selectTab(index) {
+    this.LocalStorage.storeActiveTab('applications', index);
   }
 
   async removeStacksActionAsync(selectedItems) {
@@ -106,9 +111,12 @@ class KubernetesApplicationsController {
   async onInit() {
     this.state = {
       activeTab: 0,
+      currentName: this.$state.$current.name,
       isAdmin: this.Authentication.isAdmin(),
       viewReady: false
     };
+
+    this.state.activeTab = this.LocalStorage.getActiveTab('applications');
 
     await this.getApplications();
 
@@ -117,6 +125,12 @@ class KubernetesApplicationsController {
 
   $onInit() {
     return this.$async(this.onInit);
+  }
+
+  $onDestroy() {
+    if (this.state.currentName !== this.$state.$current.name) {
+      this.LocalStorage.storeActiveTab('applications', 0);
+    }
   }
 }
 

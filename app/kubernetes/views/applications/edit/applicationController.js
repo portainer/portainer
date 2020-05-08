@@ -9,11 +9,12 @@ import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 
 class KubernetesApplicationController {
   /* @ngInject */
-  constructor($async, $state, clipboard, Notifications, KubernetesApplicationService, KubernetesEventService, KubernetesStackService, KubernetesNamespaceHelper) {
+  constructor($async, $state, clipboard, Notifications, LocalStorage, KubernetesApplicationService, KubernetesEventService, KubernetesStackService, KubernetesNamespaceHelper) {
     this.$async = $async;
     this.$state = $state;
     this.clipboard = clipboard;
     this.Notifications = Notifications;
+    this.LocalStorage = LocalStorage;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesEventService = KubernetesEventService;
     this.KubernetesStackService = KubernetesStackService;
@@ -29,8 +30,13 @@ class KubernetesApplicationController {
     this.copyLoadBalancerIP = this.copyLoadBalancerIP.bind(this);
   }
 
+  selectTab(index) {
+    this.LocalStorage.storeActiveTab('application', index);
+  }
+
   showEditor() {
     this.state.showEditorTab = true;
+    this.selectTab(2);
   }
 
   isSystemNamespace() {
@@ -126,6 +132,7 @@ class KubernetesApplicationController {
   async onInit() {
     this.state = {
       activeTab: 0,
+      currentName: this.$state.$current.name,
       showEditorTab: false,
       DisplayedPanel: 'pods',
       eventsLoading: true,
@@ -139,6 +146,8 @@ class KubernetesApplicationController {
       expandedNote: false
     };
 
+    this.state.activeTab = this.LocalStorage.getActiveTab('application');
+
     this.formValues = {
       Note: '',
     };
@@ -151,6 +160,12 @@ class KubernetesApplicationController {
 
   $onInit() {
     return this.$async(this.onInit);
+  }
+
+  $onDestroy() {
+    if (this.state.currentName !== this.$state.$current.name) {
+      this.LocalStorage.storeActiveTab('application', 0);
+    }
   }
 }
 

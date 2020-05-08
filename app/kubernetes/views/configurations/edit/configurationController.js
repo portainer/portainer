@@ -8,10 +8,11 @@ import _ from 'lodash-es';
 
 class KubernetesConfigurationController {
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesConfigurationService, KubernetesResourcePoolService, ModalService, KubernetesApplicationService, KubernetesEventService) {
+  constructor($async, $state, Notifications, LocalStorage, KubernetesConfigurationService, KubernetesResourcePoolService, ModalService, KubernetesApplicationService, KubernetesEventService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
+    this.LocalStorage = LocalStorage;
     this.ModalService = ModalService;
     this.KubernetesConfigurationService = KubernetesConfigurationService;
     this.KubernetesResourcePoolService = KubernetesResourcePoolService;
@@ -31,6 +32,10 @@ class KubernetesConfigurationController {
     this.editorUpdate = this.editorUpdate.bind(this);
     this.editorUpdateAsync = this.editorUpdateAsync.bind(this);
     this.addEntryFromFileAsync = this.addEntryFromFileAsync.bind(this);
+  }
+
+  selectTab(index) {
+    this.LocalStorage.storeActiveTab('configuration', index);
   }
 
   // TODO: review
@@ -66,6 +71,7 @@ class KubernetesConfigurationController {
 
   showEditor() {
     this.state.showEditorTab = true;
+    this.selectTab(2);
   }
 
   // TODO: review - don't use async function (cf docker/createConfigController for working 'cm' use)
@@ -227,8 +233,12 @@ class KubernetesConfigurationController {
         eventWarningCount: 0,
         isAlreadyExist: false,
         duplicateKeys: {},
-        isDuplicateKeys: false
+        isDuplicateKeys: false,
+        activeTab: 0,
+        currentName: this.$state.$current.name
       };
+
+      this.state.activeTab = this.LocalStorage.getActiveTab('configuration');
 
       this.formValues = new KubernetesConfigurationFormValues();
 
@@ -260,6 +270,12 @@ class KubernetesConfigurationController {
 
   $onInit() {
     return this.$async(this.onInit);
+  }
+
+  $onDestroy() {
+    if (this.state.currentName !== this.$state.$current.name) {
+      this.LocalStorage.storeActiveTab('configuration', 0);
+    }
   }
 }
 

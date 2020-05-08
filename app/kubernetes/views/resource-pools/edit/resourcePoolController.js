@@ -7,11 +7,12 @@ import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 
 class KubernetesResourcePoolController {
   /* @ngInject */
-  constructor($async, $state, Authentication, Notifications, KubernetesNodeService, KubernetesResourceQuotaService, KubernetesResourcePoolService, KubernetesEventService, KubernetesPodService, KubernetesApplicationService) {
+  constructor($async, $state, Authentication, Notifications, LocalStorage, KubernetesNodeService, KubernetesResourceQuotaService, KubernetesResourcePoolService, KubernetesEventService, KubernetesPodService, KubernetesApplicationService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
     this.Authentication = Authentication;
+    this.LocalStorage = LocalStorage;
 
     this.KubernetesNodeService = KubernetesNodeService;
     this.KubernetesResourceQuotaService = KubernetesResourceQuotaService;
@@ -26,6 +27,10 @@ class KubernetesResourcePoolController {
     this.getEvents = this.getEvents.bind(this);
     this.getEventsAsync = this.getEventsAsync.bind(this);
     this.getApplicationsAsync = this.getApplicationsAsync.bind(this);
+  }
+
+  selectTab(index) {
+    this.LocalStorage.storeActiveTab('resourcePool', index);
   }
 
   isQuotaValid() {
@@ -48,6 +53,7 @@ class KubernetesResourcePoolController {
 
   showEditor() {
     this.state.showEditorTab = true;
+    this.selectTab(2);
   }
 
   async createResourceQuotaAsync(namespace, owner, cpuLimit, memoryLimit) {
@@ -154,12 +160,15 @@ class KubernetesResourcePoolController {
         memoryUsage: 0,
         memoryUsed: 0,
         activeTab: 0,
+        currentName: this.$state.$current.name,
         showEditorTab: false,
         eventsLoading: true,
         applicationsLoading: true,
         viewReady: false,
         eventWarningCount: 0
       };
+
+      this.state.activeTab = this.LocalStorage.getActiveTab('resourcePool');
 
       const name = this.$transition$.params().id;
 
@@ -197,6 +206,12 @@ class KubernetesResourcePoolController {
 
   $onInit() {
     return this.$async(this.onInit);
+  }
+
+  $onDestroy() {
+    if (this.state.currentName !== this.$state.$current.name) {
+      this.LocalStorage.storeActiveTab('resourcePool', 0);
+    }
   }
 }
 

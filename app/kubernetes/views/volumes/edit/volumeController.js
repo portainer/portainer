@@ -5,10 +5,11 @@ import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 
 class KubernetesVolumeController {
   /* @ngInject */
-  constructor($async, $state, Notifications, KubernetesVolumeService, KubernetesEventService, KubernetesNamespaceHelper, KubernetesApplicationService) {
+  constructor($async, $state, Notifications, LocalStorage, KubernetesVolumeService, KubernetesEventService, KubernetesNamespaceHelper, KubernetesApplicationService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
+    this.LocalStorage = LocalStorage;
 
     this.KubernetesVolumeService = KubernetesVolumeService;
     this.KubernetesEventService = KubernetesEventService;
@@ -22,8 +23,13 @@ class KubernetesVolumeController {
     this.getEventsAsync = this.getEventsAsync.bind(this);
   }
 
+  selectTab(index) {
+    this.LocalStorage.storeActiveTab('volume', index);
+  }
+
   showEditor() {
     this.state.showEditorTab = true;
+    this.selectTab(2);
   }
 
   isSystemNamespace() {
@@ -84,6 +90,7 @@ class KubernetesVolumeController {
   async onInit() {
     this.state = {
       activeTab: 0,
+      currentName: this.$state.$current.name,
       showEditorTab: false,
       eventsLoading: true,
       viewReady: false,
@@ -91,6 +98,8 @@ class KubernetesVolumeController {
       name: this.$transition$.params().name,
       eventWarningCount: 0
     };
+
+    this.state.activeTab = this.LocalStorage.getActiveTab('volume');
 
     try {
       await this.getVolume();
@@ -104,6 +113,12 @@ class KubernetesVolumeController {
 
   $onInit() {
     return this.$async(this.onInit);
+  }
+
+  $onDestroy() {
+    if (this.state.currentName !== this.$state.$current.name) {
+      this.LocalStorage.storeActiveTab('volume', 0);
+    }
   }
 }
 
