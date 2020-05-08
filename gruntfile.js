@@ -20,7 +20,7 @@ module.exports = function(grunt) {
       dockerLinuxVersion: '18.09.3',
       dockerWindowsVersion: '17.09.0-ce',
       komposeVersion: 'v1.21.0',
-      kubectlVersion: 'v1.17.4'
+      kubectlVersion: 'v1.18.0'
     },
     config: gruntfile_cfg.config,
     env: gruntfile_cfg.env,
