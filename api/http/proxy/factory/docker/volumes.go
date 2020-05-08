@@ -2,12 +2,14 @@ package docker
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"github.com/docker/docker/client"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 const (
@@ -86,4 +88,41 @@ func (transport *Transport) volumeInspectOperation(response *http.Response, exec
 // https://docs.docker.com/engine/api/v1.28/#operation/VolumeList
 func selectorVolumeLabels(responseObject map[string]interface{}) map[string]interface{} {
 	return responseutils.GetJSONObject(responseObject, "Labels")
+}
+
+func (transport *Transport) decorateVolumeResourceCreationOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
+	tokenData, err := security.RetrieveTokenData(request)
+	if err != nil {
+		return nil, err
+	}
+
+	volumeID := request.Header.Get("X-Portainer-VolumeName")
+
+	if volumeID != "" {
+		cli := transport.dockerClient
+		agentTargetHeader := request.Header.Get(portainer.PortainerAgentTargetHeader)
+		if agentTargetHeader != "" {
+			dockerClient, err := transport.dockerClientFactory.CreateClient(transport.endpoint, agentTargetHeader)
+			if err != nil {
+				return nil, err
+			}
+			defer dockerClient.Close()
+			cli = dockerClient
+		}
+
+		_, err = cli.VolumeInspect(context.Background(), volumeID)
+		if err == nil {
+			return nil, errors.New("a volume with the same name already exists")
+		}
+	}
+
+	response, err := transport.executeDockerRequest(request)
+	if err != nil {
+		return response, err
+	}
+
+	if response.StatusCode == http.StatusCreated && volumeID != "" {
+		err = transport.decorateGenericResourceCreationResponse(response, resourceIdentifierAttribute, resourceType, tokenData.ID)
+	}
+	return response, err
 }
