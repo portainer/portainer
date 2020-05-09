@@ -53,7 +53,7 @@ func (runner *SnapshotJobRunner) Run() {
 		}
 
 		for _, endpoint := range endpoints {
-			if endpoint.Type == portainer.AzureEnvironment || endpoint.Type == portainer.EdgeAgentEnvironment {
+			if endpoint.Type == portainer.EdgeAgentEnvironment {
 				continue
 			}
 
