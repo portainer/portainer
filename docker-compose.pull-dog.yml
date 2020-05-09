@@ -2,7 +2,7 @@ version: '3'
 
 services:
   portainer:
-    image: portainerci/portainer:develop
+    image: portainerci/portainer:$PORTAINER_TAG
     command: -H unix:///var/run/docker.sock
     restart: always
     ports:
