@@ -171,11 +171,13 @@ func (transport *Transport) proxyAgentRequest(r *http.Request) (*http.Response, 
 
 	switch {
 	case strings.HasPrefix(requestPath, "/browse"):
+		// host file browser request
 		volumeIDParameter, found := r.URL.Query()["volumeID"]
 		if !found || len(volumeIDParameter) < 1 {
 			return transport.administratorOperation(r)
 		}
 
+		// volume browser request
 		return transport.restrictedResourceOperation(r, volumeIDParameter[0], portainer.VolumeResourceControl, true)
 	}
 
@@ -443,10 +445,16 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 				return nil, err
 			}
 
-			// Return access denied for all roles except endpoint-administrator
-			_, userCanBrowse := user.EndpointAuthorizations[transport.endpoint.ID][portainer.OperationDockerAgentBrowseList]
-			if rbacExtension != nil && !settings.AllowVolumeBrowserForRegularUsers && !userCanBrowse {
-				return responseutils.WriteAccessDeniedResponse()
+			if !settings.AllowVolumeBrowserForRegularUsers {
+				if rbacExtension == nil {
+					return responseutils.WriteAccessDeniedResponse()
+				}
+
+				// Return access denied for all roles except endpoint-administrator
+				_, userCanBrowse := user.EndpointAuthorizations[transport.endpoint.ID][portainer.OperationDockerAgentBrowseList]
+				if !userCanBrowse {
+					return responseutils.WriteAccessDeniedResponse()
+				}
 			}
 		}
 
