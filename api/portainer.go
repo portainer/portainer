@@ -1,6 +1,8 @@
 package portainer
 
-import "time"
+import (
+	"time"
+)
 
 type (
 	// AccessPolicy represent a policy that can be associated to a user or team
@@ -71,6 +73,24 @@ type (
 		Close() error
 		IsNew() bool
 		MigrateData() error
+
+		DockerHub() DockerHubService
+		EndpointGroup() EndpointGroupService
+		Endpoint() EndpointService
+		Extension() ExtensionService
+		Registry() RegistryService
+		ResourceControl() ResourceControlService
+		Role() RoleService
+		Schedule() ScheduleService
+		Settings() SettingsService
+		Stack() StackService
+		Tag() TagService
+		TeamMembership() TeamMembershipService
+		Team() TeamService
+		TunnelServer() TunnelServerService
+		User() UserService
+		Version() VersionService
+		Webhook() WebhookService
 	}
 
 	// DockerHub represents all the required information to connect and use the
