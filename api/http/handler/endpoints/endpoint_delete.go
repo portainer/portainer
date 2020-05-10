@@ -55,5 +55,19 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove endpoint relation from the database", err}
 	}
 
+	for _, tagID := range endpoint.TagIDs {
+		tag, err := handler.TagService.Tag(tagID)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusNotFound, "Unable to find tag inside the database", err}
+		}
+
+		delete(tag.Endpoints, endpoint.ID)
+
+		err = handler.TagService.UpdateTag(tagID, tag)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist tag relation inside the database", err}
+		}
+	}
+
 	return response.Empty(w)
 }
