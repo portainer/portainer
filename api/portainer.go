@@ -553,6 +553,9 @@ type (
 		// Mandatory stack fields
 		Repository TemplateRepository `json:"repository"`
 
+		// Mandatory edge stack fields
+		StackFile string `json:"stackFile"`
+
 		// Optional stack/container fields
 		Name       string        `json:"name,omitempty"`
 		Logo       string        `json:"logo,omitempty"`
@@ -1036,6 +1039,8 @@ const (
 	DefaultEdgeAgentCheckinIntervalInSeconds = 5
 	// LocalExtensionManifestFile represents the name of the local manifest file for extensions
 	LocalExtensionManifestFile = "/extensions.json"
+	// EdgeTemplatesURL represents the URL used to retrieve edge templates
+	EdgeTemplatesURL = "https://raw.githubusercontent.com/chiptus/templates/fix-edge-templates-format/templates-2.0.json"
 )
 
 const (
@@ -1166,6 +1171,8 @@ const (
 	SwarmStackTemplate
 	// ComposeStackTemplate represents a template used to deploy a Compose stack
 	ComposeStackTemplate
+	// EdgeStackTemplate represents a template used to deploy an Edge stack
+	EdgeStackTemplate
 )
 
 const (

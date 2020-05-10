@@ -5,6 +5,7 @@ import (
 
 	"github.com/portainer/portainer/api/http/handler/edgegroups"
 	"github.com/portainer/portainer/api/http/handler/edgestacks"
+	"github.com/portainer/portainer/api/http/handler/edgetemplates"
 	"github.com/portainer/portainer/api/http/handler/endpointedge"
 	"github.com/portainer/portainer/api/http/handler/support"
 
@@ -167,6 +168,8 @@ func (server *Server) Start() error {
 	edgeStacksHandler.FileService = server.FileService
 	edgeStacksHandler.GitService = server.GitService
 
+	var edgeTemplatesHandler = edgetemplates.NewHandler(requestBouncer)
+
 	var endpointHandler = endpoints.NewHandler(requestBouncer, server.EndpointManagement)
 	endpointHandler.AuthorizationService = authorizationService
 	endpointHandler.EdgeGroupService = server.EdgeGroupService
@@ -309,6 +312,7 @@ func (server *Server) Start() error {
 		DockerHubHandler:       dockerHubHandler,
 		EdgeGroupsHandler:      edgeGroupsHandler,
 		EdgeStacksHandler:      edgeStacksHandler,
+		EdgeTemplatesHandler:   edgeTemplatesHandler,
 		EndpointGroupHandler:   endpointGroupHandler,
 		EndpointHandler:        endpointHandler,
 		EndpointEdgeHandler:    endpointEdgeHandler,
