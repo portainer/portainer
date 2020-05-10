@@ -1,8 +1,8 @@
 import angular from 'angular';
 
 class CreateEdgeStackViewController {
-  constructor($state, EdgeStackService, EdgeGroupService, Notifications, FormHelper, $async) {
-    Object.assign(this, { $state, EdgeStackService, EdgeGroupService, Notifications, FormHelper, $async });
+  constructor($state, EdgeStackService, EdgeGroupService, EdgeTemplateService, Notifications, FormHelper, $async) {
+    Object.assign(this, { $state, EdgeStackService, EdgeGroupService, EdgeTemplateService, Notifications, FormHelper, $async });
 
     this.formValues = {
       Name: '',
@@ -35,10 +35,14 @@ class CreateEdgeStackViewController {
     this.createStackFromFileUpload = this.createStackFromFileUpload.bind(this);
     this.createStackFromGitRepository = this.createStackFromGitRepository.bind(this);
     this.editorUpdate = this.editorUpdate.bind(this);
+    this.onChangeTemplate = this.onChangeTemplate.bind(this);
+    this.onChangeTemplateAsync = this.onChangeTemplateAsync.bind(this);
+    this.onChangeMethod = this.onChangeMethod.bind(this);
   }
 
   async $onInit() {
     this.edgeGroups = await this.EdgeGroupService.groups();
+    this.templates = await this.EdgeTemplateService.edgeTemplates();
     this.noGroups = this.edgeGroups.length === 0;
   }
 
@@ -46,9 +50,28 @@ class CreateEdgeStackViewController {
     return this.$async(this.createStackAsync);
   }
 
+  onChangeMethod() {
+    this.formValues.StackFileContent = '';
+    this.selectedTemplate = null;
+  }
+
+  onChangeTemplate(template) {
+    return this.$async(this.onChangeTemplateAsync, template);
+  }
+
+  async onChangeTemplateAsync(template) {
+    this.formValues.StackFileContent = '';
+    const fileContent = await this.EdgeTemplateService.edgeTemplate(template);
+    this.formValues.StackFileContent = fileContent;
+  }
+
   async createStackAsync() {
-    var name = this.formValues.Name;
-    var method = this.state.Method;
+    const name = this.formValues.Name;
+    let method = this.state.Method;
+
+    if (method === 'template') {
+      method = 'editor';
+    }
 
     if (!this.validateForm(method)) {
       return;
