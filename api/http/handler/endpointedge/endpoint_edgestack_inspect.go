@@ -13,6 +13,7 @@ import (
 type configResponse struct {
 	Prune            bool
 	StackFileContent string
+	Name             string
 }
 
 // GET request on api/endpoints/:id/edge/stacks/:stackId
@@ -54,5 +55,6 @@ func (handler *Handler) endpointEdgeStackInspect(w http.ResponseWriter, r *http.
 	return response.JSON(w, configResponse{
 		Prune:            edgeStack.Prune,
 		StackFileContent: string(stackFileContent),
+		Name:             edgeStack.Name,
 	})
 }
