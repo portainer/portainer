@@ -75,7 +75,6 @@ angular.module('portainer.app').factory('StateManager', [
       state.application.authentication = status.Authentication;
       state.application.analytics = status.Analytics;
       state.application.endpointManagement = status.EndpointManagement;
-      state.application.snapshot = status.Snapshot;
       state.application.version = status.Version;
       state.application.logo = settings.LogoURL;
       state.application.snapshotInterval = settings.SnapshotInterval;
