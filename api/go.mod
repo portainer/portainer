@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/Microsoft/go-winio v0.4.14
+	github.com/NYTimes/gziphandler v1.1.1
 	github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a
 	github.com/boltdb/bolt v1.3.1
 	github.com/containerd/containerd v1.3.1 // indirect

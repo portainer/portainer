@@ -11,6 +11,8 @@ import (
 
 	"github.com/portainer/portainer/api/http/handler/roles"
 
+	"github.com/NYTimes/gziphandler"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/handler"
@@ -82,6 +84,7 @@ type Server struct {
 	UserService             portainer.UserService
 	WebhookService          portainer.WebhookService
 	Handler                 *handler.Handler
+	Compression             bool
 	SSL                     bool
 	SSLCert                 string
 	SSLKey                  string
@@ -338,8 +341,13 @@ func (server *Server) Start() error {
 		SchedulesHanlder:       schedulesHandler,
 	}
 
-	if server.SSL {
-		return http.ListenAndServeTLS(server.BindAddress, server.SSLCert, server.SSLKey, server.Handler)
+	var httpHandler http.Handler = server.Handler
+	if server.Compression {
+		httpHandler = gziphandler.GzipHandler(httpHandler)
 	}
-	return http.ListenAndServe(server.BindAddress, server.Handler)
+
+	if server.SSL {
+		return http.ListenAndServeTLS(server.BindAddress, server.SSLCert, server.SSLKey, httpHandler)
+	}
+	return http.ListenAndServe(server.BindAddress, httpHandler)
 }
