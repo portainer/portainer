@@ -71,7 +71,7 @@ class EdgeGroupFormController {
         query.endpointIds = this.model.Endpoints;
       }
     }
-    const response = await this.EndpointService.endpoints(start, limit, query);
+    const response = await this.fetchEndpoints(start, limit, query);
     const totalCount = parseInt(response.totalCount, 10);
     this.endpoints[tableType] = response.value;
     this.state[tableType].totalCount = totalCount;
@@ -80,6 +80,13 @@ class EdgeGroupFormController {
       this.noEndpoints = totalCount === 0;
       this.endpoints[tableType] = _.filter(response.value, (endpoint) => !_.includes(this.model.Endpoints, endpoint.Id));
     }
+  }
+
+  fetchEndpoints(start, limit, query) {
+    if (query.tagIds && !query.tagIds.length) {
+      return { value: [], totalCount: 0 };
+    }
+    return this.EndpointService.endpoints(start, limit, query);
   }
 }
 
