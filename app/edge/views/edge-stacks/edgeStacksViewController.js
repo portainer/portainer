@@ -25,17 +25,16 @@ class EdgeStacksViewController {
   }
 
   async removeActionAsync(stacks) {
-    await Promise.all(
-      _.map(stacks, async (stack) => {
-        try {
-          await this.EdgeStackService.remove(stack.Id);
-          this.Notifications.success('Stack successfully removed', stack.Name);
-          _.remove(this.stacks, stack);
-        } catch (err) {
-          this.Notifications.error('Failure', err, 'Unable to remove stack ' + stack.Name);
-        }
-      })
-    );
+    for (let stack of stacks) {
+      try {
+        await this.EdgeStackService.remove(stack.Id);
+        this.Notifications.success('Stack successfully removed', stack.Name);
+        _.remove(this.stacks, stack);
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to remove stack ' + stack.Name);
+      }
+    }
+
     this.$state.reload();
   }
 
