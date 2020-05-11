@@ -225,12 +225,11 @@ func loadSchedulesFromDatabase(jobScheduler portainer.JobScheduler, jobService p
 	return nil
 }
 
-func initStatus(endpointManagement, snapshot bool, flags *portainer.CLIFlags) *portainer.Status {
+func initStatus(endpointManagement bool, flags *portainer.CLIFlags) *portainer.Status {
 	return &portainer.Status{
 		Analytics:          !*flags.NoAnalytics,
 		Authentication:     !*flags.NoAuth,
 		EndpointManagement: endpointManagement,
-		Snapshot:           snapshot,
 		Version:            portainer.APIVersion,
 	}
 }
@@ -492,16 +491,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if *flags.Snapshot {
-		err = loadSnapshotSystemSchedule(jobScheduler, snapshotter, store.ScheduleService, store.EndpointService, store.SettingsService)
-		if err != nil {
-			log.Fatal(err)
-		}
+	err = loadSnapshotSystemSchedule(jobScheduler, snapshotter, store.ScheduleService, store.EndpointService, store.SettingsService)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	jobScheduler.Start()
 
-	applicationStatus := initStatus(endpointManagement, *flags.Snapshot, flags)
+	applicationStatus := initStatus(endpointManagement, flags)
 
 	err = initEndpoint(flags, store.EndpointService, snapshotter)
 	if err != nil {

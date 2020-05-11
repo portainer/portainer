@@ -57,7 +57,6 @@ type (
 		SSLCert           *string
 		SSLKey            *string
 		SyncInterval      *string
-		Snapshot          *bool
 		SnapshotInterval  *string
 	}
 
@@ -493,7 +492,6 @@ type (
 	Status struct {
 		Authentication     bool   `json:"Authentication"`
 		EndpointManagement bool   `json:"EndpointManagement"`
-		Snapshot           bool   `json:"Snapshot"`
 		Analytics          bool   `json:"Analytics"`
 		Version            string `json:"Version"`
 	}
