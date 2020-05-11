@@ -50,7 +50,6 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 		SSLCert:           kingpin.Flag("sslcert", "Path to the SSL certificate used to secure the Portainer instance").Default(defaultSSLCertPath).String(),
 		SSLKey:            kingpin.Flag("sslkey", "Path to the SSL key used to secure the Portainer instance").Default(defaultSSLKeyPath).String(),
 		SyncInterval:      kingpin.Flag("sync-interval", "Duration between each synchronization via the external endpoints source (deprecated)").Default(defaultSyncInterval).String(),
-		Snapshot:          kingpin.Flag("snapshot", "Start a background job to create endpoint snapshots (deprecated)").Default(defaultSnapshot).Bool(),
 		SnapshotInterval:  kingpin.Flag("snapshot-interval", "Duration between each endpoint snapshot job").Default(defaultSnapshotInterval).String(),
 		AdminPassword:     kingpin.Flag("admin-password", "Hashed admin password").String(),
 		AdminPasswordFile: kingpin.Flag("admin-password-file", "Path to the file containing the password for the admin user").String(),
@@ -123,14 +122,6 @@ func displayDeprecationWarnings(flags *portainer.CLIFlags) {
 
 	if *flags.NoAuth {
 		log.Println("Warning: the --no-auth flag is deprecated and will likely be removed in a future version of Portainer.")
-	}
-
-	if !*flags.Snapshot {
-		log.Println("Warning: the --no-snapshot flag is deprecated and will likely be removed in a future version of Portainer.")
-	}
-
-	if *flags.TemplateFile != "" {
-		log.Println("Warning: the --template-file flag is deprecated and will likely be removed in a future version of Portainer.")
 	}
 }
 
