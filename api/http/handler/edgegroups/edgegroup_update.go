@@ -77,10 +77,8 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 
 	edgeGroup.Dynamic = payload.Dynamic
 	if edgeGroup.Dynamic {
-		edgeGroup.Endpoints = nil
 		edgeGroup.TagIDs = payload.TagIDs
 	} else {
-		edgeGroup.TagIDs = nil
 		endpointIDs := []portainer.EndpointID{}
 		for _, endpointID := range payload.Endpoints {
 			endpoint, err := handler.EndpointService.Endpoint(endpointID)
