@@ -221,7 +221,9 @@
                   ng-model="$ctrl.selectedTemplate"
                   ng-options="template as template.title for template in $ctrl.templates"
                   ng-change="$ctrl.onChangeTemplate($ctrl.selectedTemplate)"
-                ></select>
+                >
+                  <option value="" label="Select an Edge stack template" disabled selected="selected"> </option>
+                </select>
               </div>
             </div>
             <div class="form-group" ng-if="$ctrl.selectedTemplate && $ctrl.formValues.StackFileContent">
