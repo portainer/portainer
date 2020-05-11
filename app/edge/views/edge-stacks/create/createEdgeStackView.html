@@ -226,18 +226,37 @@
                 </select>
               </div>
             </div>
-            <div class="form-group" ng-if="$ctrl.selectedTemplate && $ctrl.formValues.StackFileContent">
-              <div class="col-sm-12">
-                <code-editor
-                  identifier="template-content-editor"
-                  placeholder="# Define or paste the content of your docker-compose file here"
-                  yml="true"
-                  value="$ctrl.formValues.StackFileContent"
-                  on-change="($ctrl.editorUpdate)"
-                ></code-editor>
+            <!-- description -->
+            <div ng-if="$ctrl.selectedTemplate.note">
+              <div class="col-sm-12 form-section-title">
+                Information
+              </div>
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <div class="template-note" ng-bind-html="$ctrl.selectedTemplate.note"></div>
+                </div>
+              </div>
+            </div>
+            <!-- !description -->
+            <!-- editor -->
+            <div ng-if="$ctrl.selectedTemplate && $ctrl.formValues.StackFileContent">
+              <div class="col-sm-12 form-section-title">
+                Web editor
+              </div>
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <code-editor
+                    identifier="template-content-editor"
+                    placeholder="# Define or paste the content of your docker-compose file here"
+                    yml="true"
+                    value="$ctrl.formValues.StackFileContent"
+                    on-change="($ctrl.editorUpdate)"
+                  ></code-editor>
+                </div>
               </div>
             </div>
           </div>
+          <!-- !editor -->
           <!-- !template -->
           <!-- actions -->
           <div class="col-sm-12 form-section-title">
