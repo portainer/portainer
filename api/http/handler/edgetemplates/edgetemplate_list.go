@@ -14,9 +14,18 @@ import (
 
 // GET request on /api/edgetemplates
 func (handler *Handler) edgeTemplateList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	settings, err := handler.SettingsService.Settings()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+	}
+
+	url := portainer.EdgeTemplatesURL
+	if settings.TemplatesURL != "" {
+		url = settings.TemplatesURL
+	}
 
 	var templateData []byte
-	templateData, err := client.Get(portainer.EdgeTemplatesURL, 0)
+	templateData, err = client.Get(url, 0)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve external templates", err}
 	}

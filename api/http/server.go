@@ -169,6 +169,7 @@ func (server *Server) Start() error {
 	edgeStacksHandler.GitService = server.GitService
 
 	var edgeTemplatesHandler = edgetemplates.NewHandler(requestBouncer)
+	edgeTemplatesHandler.SettingsService = server.SettingsService
 
 	var endpointHandler = endpoints.NewHandler(requestBouncer, server.EndpointManagement)
 	endpointHandler.AuthorizationService = authorizationService
