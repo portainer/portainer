@@ -12,15 +12,8 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
-type listResponseType struct {
-	Version   string
-	Templates []portainer.Template
-}
-
 // GET request on /api/edgetemplates
 func (handler *Handler) edgeTemplateList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-
-	var listResponse listResponseType
 
 	var templateData []byte
 	templateData, err := client.Get(portainer.EdgeTemplatesURL, 0)
@@ -28,7 +21,9 @@ func (handler *Handler) edgeTemplateList(w http.ResponseWriter, r *http.Request)
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve external templates", err}
 	}
 
-	err = json.Unmarshal(templateData, &listResponse)
+	var templates []portainer.Template
+
+	err = json.Unmarshal(templateData, &templates)
 	if err != nil {
 		log.Printf("[DEBUG] [http,edge,templates] [failed parsing edge templates] [body: %s]", templateData)
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to parse external templates", err}
@@ -41,7 +36,7 @@ func (handler *Handler) edgeTemplateList(w http.ResponseWriter, r *http.Request)
 
 	filteredTemplates := []portainer.Template{}
 
-	for _, template := range listResponse.Templates {
+	for _, template := range templates {
 		if template.Type == portainer.EdgeStackTemplate {
 			filteredTemplates = append(filteredTemplates, template)
 		}
