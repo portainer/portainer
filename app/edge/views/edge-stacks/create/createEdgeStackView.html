@@ -219,7 +219,7 @@
                 <select
                   class="form-control"
                   ng-model="$ctrl.selectedTemplate"
-                  ng-options="template as template.title for template in $ctrl.templates"
+                  ng-options="template as template.label for template in $ctrl.templates"
                   ng-change="$ctrl.onChangeTemplate($ctrl.selectedTemplate)"
                 >
                   <option value="" label="Select an Edge stack template" disabled selected="selected"> </option>

@@ -1,4 +1,5 @@
 import angular from 'angular';
+import _ from 'lodash-es';
 
 class CreateEdgeStackViewController {
   constructor($state, EdgeStackService, EdgeGroupService, EdgeTemplateService, Notifications, FormHelper, $async) {
@@ -49,7 +50,8 @@ class CreateEdgeStackViewController {
     }
 
     try {
-      this.templates = await this.EdgeTemplateService.edgeTemplates();
+      const templates = await this.EdgeTemplateService.edgeTemplates();
+      this.templates = _.map(templates, (template) => ({ ...template, label: `${template.title} - ${template.description}` }));
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve Templates');
     }
