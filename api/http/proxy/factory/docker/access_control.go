@@ -158,7 +158,7 @@ func (transport *Transport) applyAccessControlOnResource(parameters *resourceOpe
 		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
 	}
 
-	if executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess || portainer.UserCanAccessResource(executor.operationContext.userID, executor.operationContext.userTeamIDs, resourceControl) {
+	if executor.operationContext.isAdmin || executor.operationContext.endpointResourceAccess || (resourceControl != nil && portainer.UserCanAccessResource(executor.operationContext.userID, executor.operationContext.userTeamIDs, resourceControl)) {
 		responseObject = decorateObject(responseObject, resourceControl)
 		return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
 	}
