@@ -1,5 +1,6 @@
 import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
 import { VolumesNFSFormData } from '../../../components/volumesNFSForm/volumesNFSFormModel';
+import { VolumesCIFSFormData } from '../../../components/volumesCIFSForm/volumes-cifs-form-model';
 
 angular.module('portainer.docker').controller('CreateVolumeController', [
   '$q',
@@ -19,6 +20,7 @@ angular.module('portainer.docker').controller('CreateVolumeController', [
       AccessControlData: new AccessControlFormData(),
       NodeName: null,
       NFSData: new VolumesNFSFormData(),
+      CIFSData: new VolumesCIFSFormData(),
     };
 
     $scope.state = {
@@ -48,6 +50,18 @@ angular.module('portainer.docker').controller('CreateVolumeController', [
       return true;
     }
 
+    function prepareCIFSConfiguration(driverOptions) {
+      const data = $scope.formValues.CIFSData;
+
+      driverOptions.push({ name: 'type', value: 'cifs' });
+
+      const device = '//' + data.serverAddress + data.share;
+      driverOptions.push({ name: 'device', value: device });
+
+      const options = 'username=' + data.username + ',password=' + data.password + ',vers=' + data.version;
+      driverOptions.push({ name: 'o', value: options });
+    }
+
     function prepareNFSConfiguration(driverOptions) {
       var data = $scope.formValues.NFSData;
 
@@ -72,6 +86,10 @@ angular.module('portainer.docker').controller('CreateVolumeController', [
 
       if ($scope.formValues.NFSData.useNFS) {
         prepareNFSConfiguration(driverOptions);
+      }
+
+      if ($scope.formValues.CIFSData.useCIFS) {
+        prepareCIFSConfiguration(driverOptions);
       }
 
       var volumeConfiguration = VolumeService.createVolumeConfiguration(name, driver, driverOptions);

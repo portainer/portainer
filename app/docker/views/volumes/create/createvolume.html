@@ -66,6 +66,9 @@
           <!-- nfs-management -->
           <volumes-nfs-form data="formValues.NFSData" ng-show="formValues.Driver === 'local'"></volumes-nfs-form>
           <!-- !nfs-management -->
+          <!-- cifs-management -->
+          <volumes-cifs-form data="formValues.CIFSData" ng-show="formValues.Driver === 'local'"></volumes-cifs-form>
+          <!-- !cifs-management -->
           <!-- storidge -->
           <div ng-if="formValues.Driver === 'cio:latest'">
             <div class="col-sm-12 form-section-title">
@@ -95,7 +98,7 @@
                 type="button"
                 class="btn btn-primary btn-sm"
                 ng-click="create()"
-                ng-disabled="state.actionInProgress || (formValues.NFSData.useNFS && !volumeCreationForm.$valid)"
+                ng-disabled="state.actionInProgress || (formValues.NFSData.useNFS && !volumeCreationForm.nfsInformationForm.$valid) || (formValues.CIFSData.useCIFS && !volumeCreationForm.cifsInformationForm.$valid)"
                 button-spinner="state.actionInProgress"
               >
                 <span ng-hide="state.actionInProgress">Create the volume</span>
