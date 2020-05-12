@@ -41,9 +41,18 @@ class CreateEdgeStackViewController {
   }
 
   async $onInit() {
-    this.edgeGroups = await this.EdgeGroupService.groups();
-    this.templates = await this.EdgeTemplateService.edgeTemplates();
-    this.noGroups = this.edgeGroups.length === 0;
+    try {
+      this.edgeGroups = await this.EdgeGroupService.groups();
+      this.noGroups = this.edgeGroups.length === 0;
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve Edge groups');
+    }
+
+    try {
+      this.templates = await this.EdgeTemplateService.edgeTemplates();
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve Templates');
+    }
   }
 
   createStack() {
@@ -61,8 +70,12 @@ class CreateEdgeStackViewController {
 
   async onChangeTemplateAsync(template) {
     this.formValues.StackFileContent = '';
-    const fileContent = await this.EdgeTemplateService.edgeTemplate(template);
-    this.formValues.StackFileContent = fileContent;
+    try {
+      const fileContent = await this.EdgeTemplateService.edgeTemplate(template);
+      this.formValues.StackFileContent = fileContent;
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve Template');
+    }
   }
 
   async createStackAsync() {

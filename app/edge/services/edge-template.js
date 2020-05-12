@@ -12,6 +12,10 @@ class EdgeTemplateService {
 
   async edgeTemplate(template) {
     const response = await fetch(template.stackFile);
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+
     return response.text();
   }
 }
