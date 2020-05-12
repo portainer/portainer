@@ -69,5 +69,56 @@ func (handler *Handler) endpointDelete(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
+	edgeGroups, err := handler.EdgeGroupService.EdgeGroups()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge groups from the database", err}
+	}
+
+	for idx := range edgeGroups {
+		edgeGroup := &edgeGroups[idx]
+		endpointIdx := findEndpointIndex(edgeGroup.Endpoints, endpoint.ID)
+		if endpointIdx != -1 {
+			edgeGroup.Endpoints = removeElement(edgeGroup.Endpoints, endpointIdx)
+			err = handler.EdgeGroupService.UpdateEdgeGroup(edgeGroup.ID, edgeGroup)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update edge group", err}
+			}
+		}
+	}
+
+	edgeStacks, err := handler.EdgeStackService.EdgeStacks()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge stacks from the database", err}
+	}
+
+	for idx := range edgeStacks {
+		edgeStack := &edgeStacks[idx]
+		if _, ok := edgeStack.Status[endpoint.ID]; ok {
+			delete(edgeStack.Status, endpoint.ID)
+			err = handler.EdgeStackService.UpdateEdgeStack(edgeStack.ID, edgeStack)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update edge stack", err}
+			}
+		}
+	}
+
 	return response.Empty(w)
+}
+
+func findEndpointIndex(tags []portainer.EndpointID, searchEndpointID portainer.EndpointID) int {
+	for idx, tagID := range tags {
+		if searchEndpointID == tagID {
+			return idx
+		}
+	}
+	return -1
+}
+
+func removeElement(arr []portainer.EndpointID, index int) []portainer.EndpointID {
+	if index < 0 {
+		return arr
+	}
+	lastTagIdx := len(arr) - 1
+	arr[index] = arr[lastTagIdx]
+	return arr[:lastTagIdx]
 }

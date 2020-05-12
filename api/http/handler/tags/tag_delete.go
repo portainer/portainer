@@ -80,6 +80,18 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 		}
 	}
 
+	for idx := range edgeGroups {
+		edgeGroup := &edgeGroups[idx]
+		tagIdx := findTagIndex(edgeGroup.TagIDs, tagID)
+		if tagIdx != -1 {
+			edgeGroup.TagIDs = removeElement(edgeGroup.TagIDs, tagIdx)
+			err = handler.EdgeGroupService.UpdateEdgeGroup(edgeGroup.ID, edgeGroup)
+			if err != nil {
+				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint group", err}
+			}
+		}
+	}
+
 	err = handler.TagService.DeleteTag(tagID)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the tag from the database", err}

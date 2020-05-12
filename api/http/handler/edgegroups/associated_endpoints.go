@@ -7,6 +7,10 @@ import (
 type endpointSetType map[portainer.EndpointID]bool
 
 func (handler *Handler) getEndpointsByTags(tagIDs []portainer.TagID, partialMatch bool) ([]portainer.EndpointID, error) {
+	if len(tagIDs) == 0 {
+		return []portainer.EndpointID{}, nil
+	}
+
 	endpoints, err := handler.EndpointService.Endpoints()
 	if err != nil {
 		return nil, err
@@ -70,6 +74,10 @@ func mapTagsToEndpoints(tags []portainer.Tag, groupEndpoints map[portainer.Endpo
 }
 
 func setsIntersection(sets []endpointSetType) endpointSetType {
+	if len(sets) == 0 {
+		return endpointSetType{}
+	}
+
 	intersectionSet := sets[0]
 
 	for _, set := range sets {
