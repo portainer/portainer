@@ -66,6 +66,7 @@ func (handler *Handler) edgeGroupCreate(w http.ResponseWriter, r *http.Request) 
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint from the database", err}
 			}
+
 			if endpoint.Type == portainer.EdgeAgentEnvironment {
 				endpointIDs = append(endpointIDs, endpoint.ID)
 			}
@@ -77,5 +78,6 @@ func (handler *Handler) edgeGroupCreate(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the Edge group inside the database", err}
 	}
+
 	return response.JSON(w, edgeGroup)
 }
