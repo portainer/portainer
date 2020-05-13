@@ -9,6 +9,9 @@ angular.module('portainer.docker').factory('Volume', [
     'use strict';
 
     function addVolumeNameToHeader(config) {
+      if (config.data.Name === undefined) {
+        return '';
+      }
       return config.data.Name;
     }
 

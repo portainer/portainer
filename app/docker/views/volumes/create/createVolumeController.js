@@ -55,7 +55,11 @@ angular.module('portainer.docker').controller('CreateVolumeController', [
 
       driverOptions.push({ name: 'type', value: 'cifs' });
 
-      const device = '//' + data.serverAddress + data.share;
+      let share = data.share.replace('\\', '/');
+      if (share[0] !== '/') {
+        share = '/' + share;
+      }
+      const device = '//' + data.serverAddress + share;
       driverOptions.push({ name: 'device', value: device });
 
       const options = 'username=' + data.username + ',password=' + data.password + ',vers=' + data.version;
