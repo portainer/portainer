@@ -69,26 +69,3 @@ func TagDifference(setA tagSet, setB tagSet) tagSet {
 
 	return set
 }
-
-// EndpointsTagSet creates a map between EndpointIDs to their associated tags
-func EndpointsTagSet(endpoints []Endpoint, endpointGroups []EndpointGroup) map[EndpointID]map[TagID]bool {
-	endpointsTagSet := map[EndpointID]map[TagID]bool{}
-
-	groupMap := map[EndpointGroupID]EndpointGroup{}
-	for _, group := range endpointGroups {
-		groupMap[group.ID] = group
-	}
-
-	for _, endpoint := range endpoints {
-		set := TagSet(endpoint.TagIDs)
-		group, ok := groupMap[endpoint.GroupID]
-		if ok {
-			for _, tagID := range group.TagIDs {
-				set[tagID] = true
-			}
-		}
-		endpointsTagSet[endpoint.ID] = set
-	}
-
-	return endpointsTagSet
-}
