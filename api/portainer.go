@@ -1039,7 +1039,7 @@ const (
 	DefaultEdgeAgentCheckinIntervalInSeconds = 5
 	// LocalExtensionManifestFile represents the name of the local manifest file for extensions
 	LocalExtensionManifestFile = "/extensions.json"
-	// EdgeTemplatesURL represents the URL used to retrieve edge templates
+	// EdgeTemplatesURL represents the URL used to retrieve Edge templates
 	EdgeTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates-1.20.0.json"
 )
 
