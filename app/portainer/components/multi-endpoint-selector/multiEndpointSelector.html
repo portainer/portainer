@@ -6,7 +6,6 @@
     </span>
   </ui-select-match>
   <ui-select-choices
-    refresh="$ctrl.onSearch($select.search)"
     group-by="$ctrl.groupEndpoints"
     group-filter="$ctrl.sortGroups"
     repeat="endpoint.Id as endpoint in $ctrl.endpoints | filter: { Name: $select.search }"

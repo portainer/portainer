@@ -85,6 +85,7 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint from the database", err}
 			}
+
 			if endpoint.Type == portainer.EdgeAgentEnvironment {
 				endpointIDs = append(endpointIDs, endpoint.ID)
 			}
