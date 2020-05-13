@@ -2,17 +2,24 @@ angular.module('portainer.app').controller('StacksDatatableController', [
   '$scope',
   '$controller',
   'DatatableService',
-  function ($scope, $controller, DatatableService) {
+  'Authentication',
+  function ($scope, $controller, DatatableService, Authentication) {
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
 
     /**
      * Do not allow external items
      */
     this.allowSelection = function (item) {
-      return !(item.External && item.Type === 2);
+      if (item.External && item.Type === 2) {
+        return false;
+      }
+
+      return !(item.External && !this.isAdmin && !this.isEndpointAdmin);
     };
 
     this.$onInit = function () {
+      this.isAdmin = Authentication.isAdmin();
+      this.isEndpointAdmin = Authentication.hasAuthorizations(['EndpointResourcesAccess']);
       this.setDefaults();
       this.prepareTableFromDataset();
 
