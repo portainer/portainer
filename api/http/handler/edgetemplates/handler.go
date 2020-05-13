@@ -25,7 +25,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	}
 
 	h.Handle("/edge_templates",
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.edgeTemplateList))).Methods(http.MethodGet)
+		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeTemplateList))).Methods(http.MethodGet)
 
 	return h
 }

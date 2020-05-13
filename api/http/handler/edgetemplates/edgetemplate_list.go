@@ -9,7 +9,6 @@ import (
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/client"
-	"github.com/portainer/portainer/api/http/security"
 )
 
 // GET request on /api/edgetemplates
@@ -38,11 +37,6 @@ func (handler *Handler) edgeTemplateList(w http.ResponseWriter, r *http.Request)
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to parse external templates", err}
 	}
 
-	securityContext, err := security.RetrieveRestrictedRequestContext(r)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
-	}
-
 	filteredTemplates := []portainer.Template{}
 
 	for _, template := range templates {
@@ -50,8 +44,6 @@ func (handler *Handler) edgeTemplateList(w http.ResponseWriter, r *http.Request)
 			filteredTemplates = append(filteredTemplates, template)
 		}
 	}
-
-	security.FilterTemplates(filteredTemplates, securityContext)
 
 	return response.JSON(w, filteredTemplates)
 }
