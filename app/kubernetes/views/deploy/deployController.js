@@ -5,12 +5,12 @@ import {KubernetesDeployManifestTypes} from 'Kubernetes/models/deploy';
 
 class KubernetesDeployController {
   /* @ngInject */
-  constructor($async, $state, Notifications, EndpointProvider, KubernetesNamespaceService, StackService) {
+  constructor($async, $state, Notifications, EndpointProvider, KubernetesResourcePoolService, StackService) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
     this.EndpointProvider = EndpointProvider;
-    this.KubernetesNamespaceService = KubernetesNamespaceService;
+    this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.StackService = StackService;
 
     this.onInit = this.onInit.bind(this);
@@ -59,10 +59,10 @@ class KubernetesDeployController {
     return this.$async(this.deployAsync);
   }
 
-  // TODO: review, use ResourcePools instead of Namespaces
   async getNamespacesAsync() {
     try {
-      this.namespaces = await this.KubernetesNamespaceService.get();
+      const pools = await this.KubernetesResourcePoolService.get();
+      this.namespaces = _.map(pools, 'Namespace');
       this.formValues.Namespace = this.namespaces[0].Name;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load resource pools data');

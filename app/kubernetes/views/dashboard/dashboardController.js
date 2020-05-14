@@ -4,12 +4,12 @@ import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelpe
 
 class KubernetesDashboardController {
   /* @ngInject */
-  constructor($async, Notifications, EndpointService, EndpointProvider, KubernetesNamespaceService, KubernetesApplicationService, KubernetesConfigurationService, KubernetesVolumeService, KubernetesNamespaceHelper, Authentication) {
+  constructor($async, Notifications, EndpointService, EndpointProvider, KubernetesResourcePoolService, KubernetesApplicationService, KubernetesConfigurationService, KubernetesVolumeService, KubernetesNamespaceHelper, Authentication) {
     this.$async = $async;
     this.Notifications = Notifications;
     this.EndpointService = EndpointService;
     this.EndpointProvider = EndpointProvider;
-    this.KubernetesNamespaceService = KubernetesNamespaceService;
+    this.KubernetesResourcePoolService = KubernetesResourcePoolService;
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesConfigurationService = KubernetesConfigurationService;
     this.KubernetesVolumeService = KubernetesVolumeService;
@@ -28,7 +28,7 @@ class KubernetesDashboardController {
       const endpointId = this.EndpointProvider.endpointID();
       const [endpoint, pools, applications, configurations, volumes] = await Promise.all([
         this.EndpointService.endpoint(endpointId),
-        this.KubernetesNamespaceService.get(), // TODO: review, use ResourcePools instead of namespaces
+        this.KubernetesResourcePoolService.get(),
         this.KubernetesApplicationService.get(),
         this.KubernetesConfigurationService.get(),
         this.KubernetesVolumeService.get()
@@ -39,7 +39,7 @@ class KubernetesDashboardController {
 
       if (!isAdmin) {
         this.pools = _.filter(pools, (pool) => {
-          return !this.KubernetesNamespaceHelper.isSystemNamespace(pool.Name);
+          return !this.KubernetesNamespaceHelper.isSystemNamespace(pool.Namespace.Name);
         });
 
         this.configurations = _.filter(configurations, (config) => {

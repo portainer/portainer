@@ -61,7 +61,7 @@ class KubernetesResourcePoolService {
   /**
    * CREATE
    */
-  // TODO: review LR future
+  // TODO: review LimitRange future
   async createAsync(name, owner, hasQuota, cpuLimit, memoryLimit) {
     try {
       const namespace = new KubernetesNamespace();
