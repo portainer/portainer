@@ -34,9 +34,12 @@ class KubernetesStatefulSetService {
       };
       const serviceName = raw.spec.serviceName;
       if (serviceName) {
-        const service = await this.KubernetesServiceService.get(namespace, serviceName);
-        if (service.Yaml) {
+        try {
+          const service = await this.KubernetesServiceService.get(namespace, serviceName);
           res.Yaml += '---\n' + service.Yaml;
+        } catch (error) {
+          // if has error means service not existing
+          // skip error as we don't care in this case
         }
       }
       return res;
