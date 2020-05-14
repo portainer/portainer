@@ -150,6 +150,10 @@ class KubernetesApplicationService {
     try {
       let [app, headlessService, service, claims] = KubernetesApplicationConverter.applicationFormValuesToApplication(formValues);
 
+      if (service) {
+        await this.KubernetesServiceService.create(service);
+      }
+
       const apiService = this._getApplicationApiService(app);
 
       if (app instanceof KubernetesStatefulSet) {
@@ -167,9 +171,6 @@ class KubernetesApplicationService {
 
       await apiService.create(app);
 
-      if (service) {
-        await this.KubernetesServiceService.create(service);
-      }
     } catch (err) {
       throw err;
     }
