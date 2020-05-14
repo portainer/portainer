@@ -1,0 +1,189 @@
+<form class="form-horizontal" name="EdgeGroupForm" ng-submit="$ctrl.formAction()">
+  <div class="form-group">
+    <label for="group_name" class="col-sm-3 col-lg-2 control-label text-left">
+      Name
+    </label>
+    <div class="col-sm-9 col-lg-10">
+      <input type="text" class="form-control" id="group_name" name="group_name" ng-model="$ctrl.model.Name" required auto-focus />
+    </div>
+  </div>
+  <div class="form-group" ng-show="EdgeGroupForm.group_name.$invalid">
+    <div class="col-sm-12 small text-warning">
+      <div ng-messages="EdgeGroupForm.group_name.$error">
+        <p ng-message="required">
+          <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+          This field is required.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-12 form-section-title">
+    Group type
+  </div>
+  <div class="form-group col-sm-12">
+    <div class="boxselector_wrapper">
+      <div class="boxselector">
+        <input type="radio" id="static-group" ng-model="$ctrl.model.Dynamic" ng-value="false" ng-checked="!$ctrl.model.Dynamic" />
+        <label for="static-group">
+          <div class="boxselector_header">
+            <i class="fa fa-list-ol" aria-hidden="true" style="margin-right: 2px;"></i>
+            Static
+          </div>
+          <p>Manually select Edge endpoints</p>
+        </label>
+      </div>
+      <div class="boxselector">
+        <input type="radio" id="dynamic-group" ng-model="$ctrl.model.Dynamic" ng-value="true" ng-checked="$ctrl.model.Dynamic" />
+        <label for="dynamic-group">
+          <div class="boxselector_header">
+            <i class="fa fa-tags" aria-hidden="true" style="margin-right: 2px;"></i>
+            Dynamic
+          </div>
+          <p>Automatically associate endpoints via tags</p>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- StaticGroup -->
+  <div ng-if="!$ctrl.model.Dynamic">
+    <div ng-if="!$ctrl.noEndpoints">
+      <!-- endpoints -->
+      <div class="col-sm-12 form-section-title">
+        Associated endpoints
+      </div>
+      <div class="form-group">
+        <div class="col-sm-12 small text-muted">
+          You can select which endpoint should be part of this group by moving them to the associated endpoints table. Simply click on any endpoint entry to move it from one table
+          to the other.
+        </div>
+        <div class="col-sm-12" style="margin-top: 20px;">
+          <!-- available-endpoints -->
+          <div class="col-sm-6">
+            <div class="text-center small text-muted">Available endpoints</div>
+            <div style="margin-top: 10px;">
+              <group-association-table
+                loaded="$ctrl.loaded"
+                page-type="$ctrl.pageType"
+                table-type="available"
+                retrieve-page="$ctrl.getPaginatedEndpoints"
+                dataset="$ctrl.endpoints.available"
+                entry-click="$ctrl.associateEndpoint"
+                pagination-state="$ctrl.state.available"
+                empty-dataset-message="No endpoint available"
+                tags="$ctrl.tags"
+                show-tags="true"
+                groups="$ctrl.groups"
+                show-groups="true"
+                has-backend-pagination="true"
+              ></group-association-table>
+            </div>
+          </div>
+          <!-- !available-endpoints -->
+          <!-- associated-endpoints -->
+          <div class="col-sm-6">
+            <div class="text-center small text-muted">Associated endpoints</div>
+            <div style="margin-top: 10px;">
+              <group-association-table
+                loaded="$ctrl.loaded"
+                page-type="$ctrl.pageType"
+                table-type="associated"
+                retrieve-page="$ctrl.getPaginatedEndpoints"
+                dataset="$ctrl.endpoints.associated"
+                entry-click="$ctrl.dissociateEndpoint"
+                pagination-state="$ctrl.state.associated"
+                empty-dataset-message="No associated endpoint"
+                tags="$ctrl.tags"
+                show-tags="true"
+                groups="$ctrl.groups"
+                show-groups="true"
+                has-backend-pagination="true"
+              ></group-association-table>
+            </div>
+          </div>
+          <!-- !associated-endpoints -->
+        </div>
+      </div>
+    </div>
+    <div class="form-group" ng-if="$ctrl.noEndpoints">
+      <div class="col-sm-12 small text-muted"> No Edge endpoints available. Head over the <a ui-sref="portainer.endpoints">Endpoints view</a> to add endpoints. </div>
+    </div>
+  </div>
+  <!-- !StaticGroup -->
+
+  <!-- DynamicGroup -->
+  <div ng-if="$ctrl.model.Dynamic">
+    <div class="col-sm-12 form-section-title">
+      Tags
+    </div>
+    <div ng-if="$ctrl.tags.length" class="form-group col-sm-12">
+      <div class="boxselector_wrapper">
+        <div class="boxselector">
+          <input type="radio" id="or-selector" ng-model="$ctrl.model.PartialMatch" ng-value="true" ng-checked="$ctrl.model.PartialMatch" />
+          <label for="or-selector">
+            <div class="boxselector_header">
+              <i class="fa fa-tag" aria-hidden="true" style="margin-right: 2px;"></i>
+              Partial match
+            </div>
+            <p>Associate any endpoint matching at least one of the selected tags</p>
+          </label>
+        </div>
+        <div class="boxselector">
+          <input type="radio" id="and-selector" ng-model="$ctrl.model.PartialMatch" ng-value="false" ng-checked="!$ctrl.model.PartialMatch" />
+          <label for="and-selector">
+            <div class="boxselector_header">
+              <i class="fa fa-tag" aria-hidden="true" style="margin-right: 2px;"></i>
+              Full match
+            </div>
+            <p>Associate any endpoint matching all of the selected tags</p>
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <tag-selector ng-if="$ctrl.tags.length" tags="$ctrl.tags" model="$ctrl.model.TagIds"></tag-selector>
+      <div ng-if="$ctrl.tags && !$ctrl.tags.length" class="col-sm-12 small text-muted">
+        No tags available. Head over to the <a ui-sref="portainer.tags">Tags view</a> to add tags
+      </div>
+    </div>
+    <div class="col-sm-12 form-section-title">
+      Associated endpoints by tags
+    </div>
+    <div class="col-sm-12 form-group">
+      <group-association-table
+        loaded="$ctrl.loaded"
+        page-type="$ctrl.pageType"
+        table-type="associated"
+        retrieve-page="$ctrl.getPaginatedEndpoints"
+        dataset="$ctrl.endpoints.associated"
+        pagination-state="$ctrl.state.associated"
+        empty-dataset-message="No associated endpoint"
+        tags="$ctrl.tags"
+        show-tags="true"
+        groups="$ctrl.groups"
+        show-groups="true"
+        has-backend-pagination="true"
+      ></group-association-table>
+    </div>
+  </div>
+  <!-- !DynamicGroup -->
+
+  <!-- actions -->
+  <div class="col-sm-12 form-section-title">
+    Actions
+  </div>
+  <div class="form-group">
+    <div class="col-sm-12">
+      <button
+        type="submit"
+        class="btn btn-primary btn-sm"
+        ng-disabled="$ctrl.actionInProgress || !EdgeGroupForm.$valid || (!$ctrl.model.Dynamic && !$ctrl.model.Endpoints.length) || ($ctrl.model.Dynamic && !$ctrl.model.TagIds.length)"
+        button-spinner="$ctrl.actionInProgress"
+      >
+        <span ng-hide="$ctrl.actionInProgress">{{ $ctrl.formActionLabel }}</span>
+        <span ng-show="$ctrl.actionInProgress">In progress...</span>
+      </button>
+    </div>
+  </div>
+</form>

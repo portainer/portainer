@@ -3,6 +3,10 @@ package http
 import (
 	"time"
 
+	"github.com/portainer/portainer/api/http/handler/edgegroups"
+	"github.com/portainer/portainer/api/http/handler/edgestacks"
+	"github.com/portainer/portainer/api/http/handler/edgetemplates"
+	"github.com/portainer/portainer/api/http/handler/endpointedge"
 	"github.com/portainer/portainer/api/http/handler/support"
 
 	"github.com/portainer/portainer/api/http/handler/roles"
@@ -41,45 +45,48 @@ import (
 
 // Server implements the portainer.Server interface
 type Server struct {
-	BindAddress            string
-	AssetsPath             string
-	AuthDisabled           bool
-	EndpointManagement     bool
-	Status                 *portainer.Status
-	ReverseTunnelService   portainer.ReverseTunnelService
-	ExtensionManager       portainer.ExtensionManager
-	ComposeStackManager    portainer.ComposeStackManager
-	CryptoService          portainer.CryptoService
-	SignatureService       portainer.DigitalSignatureService
-	JobScheduler           portainer.JobScheduler
-	Snapshotter            portainer.Snapshotter
-	RoleService            portainer.RoleService
-	DockerHubService       portainer.DockerHubService
-	EndpointService        portainer.EndpointService
-	EndpointGroupService   portainer.EndpointGroupService
-	FileService            portainer.FileService
-	GitService             portainer.GitService
-	JWTService             portainer.JWTService
-	LDAPService            portainer.LDAPService
-	ExtensionService       portainer.ExtensionService
-	RegistryService        portainer.RegistryService
-	ResourceControlService portainer.ResourceControlService
-	ScheduleService        portainer.ScheduleService
-	SettingsService        portainer.SettingsService
-	StackService           portainer.StackService
-	SwarmStackManager      portainer.SwarmStackManager
-	TagService             portainer.TagService
-	TeamService            portainer.TeamService
-	TeamMembershipService  portainer.TeamMembershipService
-	TemplateService        portainer.TemplateService
-	UserService            portainer.UserService
-	WebhookService         portainer.WebhookService
-	Handler                *handler.Handler
-	SSL                    bool
-	SSLCert                string
-	SSLKey                 string
-	DockerClientFactory    *docker.ClientFactory
-	JobService             portainer.JobService
+	BindAddress             string
+	AssetsPath              string
+	AuthDisabled            bool
+	EndpointManagement      bool
+	Status                  *portainer.Status
+	ReverseTunnelService    portainer.ReverseTunnelService
+	ExtensionManager        portainer.ExtensionManager
+	ComposeStackManager     portainer.ComposeStackManager
+	CryptoService           portainer.CryptoService
+	SignatureService        portainer.DigitalSignatureService
+	JobScheduler            portainer.JobScheduler
+	Snapshotter             portainer.Snapshotter
+	RoleService             portainer.RoleService
+	DockerHubService        portainer.DockerHubService
+	EdgeGroupService        portainer.EdgeGroupService
+	EdgeStackService        portainer.EdgeStackService
+	EndpointService         portainer.EndpointService
+	EndpointGroupService    portainer.EndpointGroupService
+	EndpointRelationService portainer.EndpointRelationService
+	FileService             portainer.FileService
+	GitService              portainer.GitService
+	JWTService              portainer.JWTService
+	LDAPService             portainer.LDAPService
+	ExtensionService        portainer.ExtensionService
+	RegistryService         portainer.RegistryService
+	ResourceControlService  portainer.ResourceControlService
+	ScheduleService         portainer.ScheduleService
+	SettingsService         portainer.SettingsService
+	StackService            portainer.StackService
+	SwarmStackManager       portainer.SwarmStackManager
+	TagService              portainer.TagService
+	TeamService             portainer.TeamService
+	TeamMembershipService   portainer.TeamMembershipService
+	TemplateService         portainer.TemplateService
+	UserService             portainer.UserService
+	WebhookService          portainer.WebhookService
+	Handler                 *handler.Handler
+	SSL                     bool
+	SSLCert                 string
+	SSLKey                  string
+	DockerClientFactory     *docker.ClientFactory
+	JobService              portainer.JobService
 }
 
 // Start starts the HTTP server
@@ -144,21 +151,54 @@ func (server *Server) Start() error {
 	var dockerHubHandler = dockerhub.NewHandler(requestBouncer)
 	dockerHubHandler.DockerHubService = server.DockerHubService
 
+	var edgeGroupsHandler = edgegroups.NewHandler(requestBouncer)
+	edgeGroupsHandler.EdgeGroupService = server.EdgeGroupService
+	edgeGroupsHandler.EdgeStackService = server.EdgeStackService
+	edgeGroupsHandler.EndpointService = server.EndpointService
+	edgeGroupsHandler.EndpointGroupService = server.EndpointGroupService
+	edgeGroupsHandler.EndpointRelationService = server.EndpointRelationService
+	edgeGroupsHandler.TagService = server.TagService
+
+	var edgeStacksHandler = edgestacks.NewHandler(requestBouncer)
+	edgeStacksHandler.EdgeGroupService = server.EdgeGroupService
+	edgeStacksHandler.EdgeStackService = server.EdgeStackService
+	edgeStacksHandler.EndpointService = server.EndpointService
+	edgeStacksHandler.EndpointGroupService = server.EndpointGroupService
+	edgeStacksHandler.EndpointRelationService = server.EndpointRelationService
+	edgeStacksHandler.FileService = server.FileService
+	edgeStacksHandler.GitService = server.GitService
+
+	var edgeTemplatesHandler = edgetemplates.NewHandler(requestBouncer)
+	edgeTemplatesHandler.SettingsService = server.SettingsService
+
 	var endpointHandler = endpoints.NewHandler(requestBouncer, server.EndpointManagement)
+	endpointHandler.AuthorizationService = authorizationService
+	endpointHandler.EdgeGroupService = server.EdgeGroupService
+	endpointHandler.EdgeStackService = server.EdgeStackService
 	endpointHandler.EndpointService = server.EndpointService
 	endpointHandler.EndpointGroupService = server.EndpointGroupService
+	endpointHandler.EndpointRelationService = server.EndpointRelationService
 	endpointHandler.FileService = server.FileService
-	endpointHandler.ProxyManager = proxyManager
-	endpointHandler.Snapshotter = server.Snapshotter
 	endpointHandler.JobService = server.JobService
+	endpointHandler.ProxyManager = proxyManager
 	endpointHandler.ReverseTunnelService = server.ReverseTunnelService
 	endpointHandler.SettingsService = server.SettingsService
-	endpointHandler.AuthorizationService = authorizationService
+	endpointHandler.Snapshotter = server.Snapshotter
+	endpointHandler.TagService = server.TagService
+
+	var endpointEdgeHandler = endpointedge.NewHandler(requestBouncer)
+	endpointEdgeHandler.EdgeStackService = server.EdgeStackService
+	endpointEdgeHandler.EndpointService = server.EndpointService
+	endpointEdgeHandler.FileService = server.FileService
 
 	var endpointGroupHandler = endpointgroups.NewHandler(requestBouncer)
-	endpointGroupHandler.EndpointGroupService = server.EndpointGroupService
-	endpointGroupHandler.EndpointService = server.EndpointService
 	endpointGroupHandler.AuthorizationService = authorizationService
+	endpointGroupHandler.EdgeGroupService = server.EdgeGroupService
+	endpointGroupHandler.EdgeStackService = server.EdgeStackService
+	endpointGroupHandler.EndpointService = server.EndpointService
+	endpointGroupHandler.EndpointGroupService = server.EndpointGroupService
+	endpointGroupHandler.EndpointRelationService = server.EndpointRelationService
+	endpointGroupHandler.TagService = server.TagService
 
 	var endpointProxyHandler = endpointproxy.NewHandler(requestBouncer)
 	endpointProxyHandler.EndpointService = server.EndpointService
@@ -221,9 +261,12 @@ func (server *Server) Start() error {
 	stackHandler.ExtensionService = server.ExtensionService
 
 	var tagHandler = tags.NewHandler(requestBouncer)
-	tagHandler.TagService = server.TagService
+	tagHandler.EdgeGroupService = server.EdgeGroupService
+	tagHandler.EdgeStackService = server.EdgeStackService
 	tagHandler.EndpointService = server.EndpointService
 	tagHandler.EndpointGroupService = server.EndpointGroupService
+	tagHandler.EndpointRelationService = server.EndpointRelationService
+	tagHandler.TagService = server.TagService
 
 	var teamHandler = teams.NewHandler(requestBouncer)
 	teamHandler.TeamService = server.TeamService
@@ -268,8 +311,12 @@ func (server *Server) Start() error {
 		RoleHandler:            roleHandler,
 		AuthHandler:            authHandler,
 		DockerHubHandler:       dockerHubHandler,
+		EdgeGroupsHandler:      edgeGroupsHandler,
+		EdgeStacksHandler:      edgeStacksHandler,
+		EdgeTemplatesHandler:   edgeTemplatesHandler,
 		EndpointGroupHandler:   endpointGroupHandler,
 		EndpointHandler:        endpointHandler,
+		EndpointEdgeHandler:    endpointEdgeHandler,
 		EndpointProxyHandler:   endpointProxyHandler,
 		FileHandler:            fileHandler,
 		MOTDHandler:            motdHandler,

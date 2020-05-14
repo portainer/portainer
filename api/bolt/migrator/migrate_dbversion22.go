@@ -2,15 +2,32 @@ package migrator
 
 import "github.com/portainer/portainer/api"
 
-func (m *Migrator) updateEndointsAndEndpointsGroupsToDBVersion23() error {
+func (m *Migrator) updateTagsToDBVersion23() error {
 	tags, err := m.tagService.Tags()
 	if err != nil {
 		return err
 	}
 
-	tagsNameMap := make(map[string]portainer.TagID)
 	for _, tag := range tags {
-		tagsNameMap[tag.Name] = tag.ID
+		tag.EndpointGroups = make(map[portainer.EndpointGroupID]bool)
+		tag.Endpoints = make(map[portainer.EndpointID]bool)
+		err = m.tagService.UpdateTag(tag.ID, &tag)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (m *Migrator) updateEndpointsAndEndpointGroupsToDBVersion23() error {
+	tags, err := m.tagService.Tags()
+	if err != nil {
+		return err
+	}
+
+	tagsNameMap := make(map[string]portainer.Tag)
+	for _, tag := range tags {
+		tagsNameMap[tag.Name] = tag
 	}
 
 	endpoints, err := m.endpointService.Endpoints()
@@ -21,13 +38,24 @@ func (m *Migrator) updateEndointsAndEndpointsGroupsToDBVersion23() error {
 	for _, endpoint := range endpoints {
 		endpointTags := make([]portainer.TagID, 0)
 		for _, tagName := range endpoint.Tags {
-			tagID, ok := tagsNameMap[tagName]
+			tag, ok := tagsNameMap[tagName]
 			if ok {
-				endpointTags = append(endpointTags, tagID)
+				endpointTags = append(endpointTags, tag.ID)
+				tag.Endpoints[endpoint.ID] = true
 			}
 		}
 		endpoint.TagIDs = endpointTags
 		err = m.endpointService.UpdateEndpoint(endpoint.ID, &endpoint)
+		if err != nil {
+			return err
+		}
+
+		relation := &portainer.EndpointRelation{
+			EndpointID: endpoint.ID,
+			EdgeStacks: map[portainer.EdgeStackID]bool{},
+		}
+
+		err = m.endpointRelationService.CreateEndpointRelation(relation)
 		if err != nil {
 			return err
 		}
@@ -41,9 +69,10 @@ func (m *Migrator) updateEndointsAndEndpointsGroupsToDBVersion23() error {
 	for _, endpointGroup := range endpointGroups {
 		endpointGroupTags := make([]portainer.TagID, 0)
 		for _, tagName := range endpointGroup.Tags {
-			tagID, ok := tagsNameMap[tagName]
+			tag, ok := tagsNameMap[tagName]
 			if ok {
-				endpointGroupTags = append(endpointGroupTags, tagID)
+				endpointGroupTags = append(endpointGroupTags, tag.ID)
+				tag.EndpointGroups[endpointGroup.ID] = true
 			}
 		}
 		endpointGroup.TagIDs = endpointGroupTags
@@ -53,5 +82,11 @@ func (m *Migrator) updateEndointsAndEndpointsGroupsToDBVersion23() error {
 		}
 	}
 
+	for _, tag := range tagsNameMap {
+		err = m.tagService.UpdateTag(tag.ID, &tag)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }

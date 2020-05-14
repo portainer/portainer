@@ -84,6 +84,19 @@ type (
 		Password       string `json:"Password,omitempty"`
 	}
 
+	// EdgeGroup represents an Edge group
+	EdgeGroup struct {
+		ID           EdgeGroupID  `json:"Id"`
+		Name         string       `json:"Name"`
+		Dynamic      bool         `json:"Dynamic"`
+		TagIDs       []TagID      `json:"TagIds"`
+		Endpoints    []EndpointID `json:"Endpoints"`
+		PartialMatch bool         `json:"PartialMatch"`
+	}
+
+	// EdgeGroupID represents an Edge group identifier
+	EdgeGroupID int
+
 	// EdgeSchedule represents a scheduled job that can run on Edge environments.
 	EdgeSchedule struct {
 		ID             ScheduleID   `json:"Id"`
@@ -92,6 +105,32 @@ type (
 		Version        int          `json:"Version"`
 		Endpoints      []EndpointID `json:"Endpoints"`
 	}
+
+	//EdgeStack represents an edge stack
+	EdgeStack struct {
+		ID           EdgeStackID                    `json:"Id"`
+		Name         string                         `json:"Name"`
+		Status       map[EndpointID]EdgeStackStatus `json:"Status"`
+		CreationDate int64                          `json:"CreationDate"`
+		EdgeGroups   []EdgeGroupID                  `json:"EdgeGroups"`
+		ProjectPath  string                         `json:"ProjectPath"`
+		EntryPoint   string                         `json:"EntryPoint"`
+		Version      int                            `json:"Version"`
+		Prune        bool                           `json:"Prune"`
+	}
+
+	//EdgeStackID represents an edge stack id
+	EdgeStackID int
+
+	//EdgeStackStatus represents an edge stack status
+	EdgeStackStatus struct {
+		Type       EdgeStackStatusType `json:"Type"`
+		Error      string              `json:"Error"`
+		EndpointID EndpointID          `json:"EndpointID"`
+	}
+
+	//EdgeStackStatusType represents an edge stack status type
+	EdgeStackStatusType int
 
 	// Endpoint represents a Docker endpoint with all the info required
 	// to connect to it
@@ -175,6 +214,12 @@ type (
 
 	// EndpointType represents the type of an endpoint
 	EndpointType int
+
+	// EndpointRelation represnts a endpoint relation object
+	EndpointRelation struct {
+		EndpointID EndpointID
+		EdgeStacks map[EdgeStackID]bool
+	}
 
 	// Extension represents a Portainer extension
 	Extension struct {
@@ -387,6 +432,7 @@ type (
 		TemplatesURL                       string               `json:"TemplatesURL"`
 		EnableHostManagementFeatures       bool                 `json:"EnableHostManagementFeatures"`
 		EdgeAgentCheckinInterval           int                  `json:"EdgeAgentCheckinInterval"`
+		EnableEdgeComputeFeatures          bool                 `json:"EnableEdgeComputeFeatures"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
@@ -454,8 +500,10 @@ type (
 
 	// Tag represents a tag that can be associated to a resource
 	Tag struct {
-		ID   TagID
-		Name string `json:"Name"`
+		ID             TagID
+		Name           string                   `json:"Name"`
+		Endpoints      map[EndpointID]bool      `json:"Endpoints"`
+		EndpointGroups map[EndpointGroupID]bool `json:"EndpointGroups"`
 	}
 
 	// TagID represents a tag identifier
@@ -504,6 +552,9 @@ type (
 
 		// Mandatory stack fields
 		Repository TemplateRepository `json:"repository"`
+
+		// Mandatory edge stack fields
+		StackFile string `json:"stackFile"`
 
 		// Optional stack/container fields
 		Name       string        `json:"name,omitempty"`
@@ -685,6 +736,14 @@ type (
 		DeleteEndpointGroup(ID EndpointGroupID) error
 	}
 
+	// EndpointRelationService represents a service for managing endpoint relations data
+	EndpointRelationService interface {
+		EndpointRelation(EndpointID EndpointID) (*EndpointRelation, error)
+		CreateEndpointRelation(endpointRelation *EndpointRelation) error
+		UpdateEndpointRelation(EndpointID EndpointID, endpointRelation *EndpointRelation) error
+		DeleteEndpointRelation(EndpointID EndpointID) error
+	}
+
 	// ExtensionManager represents a service used to manage extensions
 	ExtensionManager interface {
 		FetchExtensionDefinitions() ([]Extension, error)
@@ -714,6 +773,8 @@ type (
 		DeleteTLSFiles(folder string) error
 		GetStackProjectPath(stackIdentifier string) string
 		StoreStackFileFromBytes(stackIdentifier, fileName string, data []byte) (string, error)
+		GetEdgeStackProjectPath(edgeStackIdentifier string) string
+		StoreEdgeStackFileFromBytes(edgeStackIdentifier, fileName string, data []byte) (string, error)
 		StoreRegistryManagementFileFromBytes(folder, fileName string, data []byte) (string, error)
 		KeyPairFilesExist() (bool, error)
 		StoreKeyPair(private, public []byte, privatePEMHeader, publicPEMHeader string) error
@@ -855,6 +916,7 @@ type (
 		Tags() ([]Tag, error)
 		Tag(ID TagID) (*Tag, error)
 		CreateTag(tag *Tag) error
+		UpdateTag(ID TagID, tag *Tag) error
 		DeleteTag(ID TagID) error
 	}
 
@@ -922,6 +984,25 @@ type (
 		WebhookByToken(token string) (*Webhook, error)
 		DeleteWebhook(serviceID WebhookID) error
 	}
+
+	// EdgeGroupService represents a service to manage Edge groups
+	EdgeGroupService interface {
+		EdgeGroups() ([]EdgeGroup, error)
+		EdgeGroup(ID EdgeGroupID) (*EdgeGroup, error)
+		CreateEdgeGroup(group *EdgeGroup) error
+		UpdateEdgeGroup(ID EdgeGroupID, group *EdgeGroup) error
+		DeleteEdgeGroup(ID EdgeGroupID) error
+	}
+
+	// EdgeStackService represents a service to manage Edge stacks
+	EdgeStackService interface {
+		EdgeStacks() ([]EdgeStack, error)
+		EdgeStack(ID EdgeStackID) (*EdgeStack, error)
+		CreateEdgeStack(edgeStack *EdgeStack) error
+		UpdateEdgeStack(ID EdgeStackID, edgeStack *EdgeStack) error
+		DeleteEdgeStack(ID EdgeStackID) error
+		GetNextIdentifier() int
+	}
 )
 
 const (
@@ -958,6 +1039,8 @@ const (
 	DefaultEdgeAgentCheckinIntervalInSeconds = 5
 	// LocalExtensionManifestFile represents the name of the local manifest file for extensions
 	LocalExtensionManifestFile = "/extensions.json"
+	// EdgeTemplatesURL represents the URL used to retrieve Edge templates
+	EdgeTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates-1.20.0.json"
 )
 
 const (
@@ -968,6 +1051,16 @@ const (
 	AuthenticationLDAP
 	//AuthenticationOAuth represents the OAuth authentication method (authentication against a authorization server)
 	AuthenticationOAuth
+)
+
+const (
+	_ EdgeStackStatusType = iota
+	//StatusOk represents a successfully deployed edge stack
+	StatusOk
+	//StatusError represents an edge endpoint which failed to deploy its edge stack
+	StatusError
+	//StatusAcknowledged represents an acknowledged edge stack
+	StatusAcknowledged
 )
 
 const (
@@ -1078,6 +1171,8 @@ const (
 	SwarmStackTemplate
 	// ComposeStackTemplate represents a template used to deploy a Compose stack
 	ComposeStackTemplate
+	// EdgeStackTemplate represents a template used to deploy an Edge stack
+	EdgeStackTemplate
 )
 
 const (
