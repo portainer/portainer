@@ -62,7 +62,8 @@ angular.module('portainer.docker').controller('CreateVolumeController', [
       const device = '//' + data.serverAddress + share;
       driverOptions.push({ name: 'device', value: device });
 
-      const options = 'username=' + data.username + ',password=' + data.password + ',vers=' + data.version;
+      const versionNumber = data.versionsNumber[data.versions.indexOf(data.version)];
+      const options = 'username=' + data.username + ',password=' + data.password + ',vers=' + versionNumber;
       driverOptions.push({ name: 'o', value: options });
     }
 
