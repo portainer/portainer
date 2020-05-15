@@ -1,5 +1,5 @@
 angular.module('portainer.docker').component('volumesCifsForm', {
-  templateUrl: './volumes-cifs-form.html',
+  templateUrl: './volumesCifsForm.html',
   bindings: {
     data: '=',
   },

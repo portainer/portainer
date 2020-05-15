@@ -1,6 +1,6 @@
 import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
 import { VolumesNFSFormData } from '../../../components/volumesNFSForm/volumesNFSFormModel';
-import { VolumesCIFSFormData } from '../../../components/volumesCIFSForm/volumes-cifs-form-model';
+import { VolumesCIFSFormData } from '../../../components/volumesCIFSForm/volumesCifsFormModel';
 
 angular.module('portainer.docker').controller('CreateVolumeController', [
   '$q',
