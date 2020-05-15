@@ -22,6 +22,7 @@ require (
 	github.com/jpillora/chisel v0.0.0-20190724232113-f3a8df20e389
 	github.com/json-iterator/go v1.1.8
 	github.com/koding/websocketproxy v0.0.0-20181220232114-7ed82d81a28c
+	github.com/lpar/gzipped/v2 v2.0.2
 	github.com/mattn/go-shellwords v1.0.6 // indirect
 	github.com/mitchellh/mapstructure v1.1.2 // indirect
 	github.com/orcaman/concurrent-map v0.0.0-20190826125027-8c72a8bb44f6
