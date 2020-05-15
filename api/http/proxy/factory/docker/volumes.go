@@ -121,7 +121,7 @@ func (transport *Transport) decorateVolumeResourceCreationOperation(request *htt
 		return response, err
 	}
 
-	if response.StatusCode == http.StatusCreated && volumeID != "" {
+	if response.StatusCode == http.StatusCreated {
 		err = transport.decorateGenericResourceCreationResponse(response, resourceIdentifierAttribute, resourceType, tokenData.ID)
 	}
 	return response, err
