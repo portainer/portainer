@@ -37,7 +37,7 @@ angular
       $scope.model = new ScheduleDefaultModel();
 
       $q.all({
-        endpoints: EndpointService.endpoints(),
+        endpoints: EndpointService.endpoints(undefined, undefined, { type: 4 }),
         groups: GroupService.groups(),
         tags: TagService.tags(),
       })

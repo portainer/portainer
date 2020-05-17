@@ -86,7 +86,7 @@ angular
         schedule: ScheduleService.schedule(id),
         file: ScheduleService.getScriptFile(id),
         tasks: ScheduleService.scriptExecutionTasks(id),
-        endpoints: EndpointService.endpoints(),
+        endpoints: EndpointService.endpoints(undefined, undefined, { type: 4 }),
         groups: GroupService.groups(),
         tags: TagService.tags(),
       })

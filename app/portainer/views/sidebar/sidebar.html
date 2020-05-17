@@ -85,12 +85,6 @@
           <a ui-sref="storidge.drives" ui-sref-active="active">Drives</a>
         </div>
       </li>
-      <li class="sidebar-title" ng-if="isAdmin && applicationState.application.enableHostManagementFeatures">
-        <span>Scheduler</span>
-      </li>
-      <li class="sidebar-list" ng-if="isAdmin && applicationState.application.enableHostManagementFeatures">
-        <a ui-sref="portainer.schedules" ui-sref-active="active">Host jobs <span class="menu-icon fa fa-clock fa-fw"></span></a>
-      </li>
       <li class="sidebar-title" ng-if="isAdmin && applicationState.application.enableEdgeComputeFeatures">
         <span>Edge Compute</span>
       </li>
@@ -99,6 +93,9 @@
       </li>
       <li class="sidebar-list" ng-if="isAdmin && applicationState.application.enableEdgeComputeFeatures">
         <a ui-sref="edge.stacks" ui-sref-active="active">Edge Stacks <span class="menu-icon fa fa-layer-group fa-fw"></span></a>
+      </li>
+      <li class="sidebar-list" ng-if="isAdmin && applicationState.application.enableEdgeComputeFeatures">
+        <a ui-sref="portainer.schedules" ui-sref-active="active">Host jobs <span class="menu-icon fa fa-clock fa-fw"></span></a>
       </li>
       <li class="sidebar-title">
         <span>Settings</span>

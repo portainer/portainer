@@ -1,15 +1,12 @@
 <form class="form-horizontal" name="scheduleForm">
-  <div class="col-sm-12 form-section-title">
+  <!-- <div class="col-sm-12 form-section-title">
     Information
   </div>
   <div class="form-group">
     <span class="col-sm-12 text-muted small">
-      <p>
-        <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i> Due to how schedules behave differently on Edge endpoints and other
-        endpoints it is recommended to create specific schedules that will only target one type of endpoint.
-      </p>
+      <p></p>
     </span>
-  </div>
+  </div> -->
   <div class="col-sm-12 form-section-title">
     Schedule configuration
   </div>
@@ -125,7 +122,7 @@
         </div>
       </div>
     </div>
-    <div class="form-group">
+    <!-- <div class="form-group">
       <span class="col-sm-12 text-muted small">
         <p>
           You can refer to the <a href="https://godoc.org/github.com/robfig/cron#hdr-CRON_Expression_Format" target="_blank">following documentation</a> to get more information
@@ -136,51 +133,11 @@
           underlying host. You need to use a valid cron expression that is different from the documentation above.
         </p>
       </span>
-    </div>
+    </div> -->
   </div>
   <!-- !advanced-schedule -->
   <!-- !cron-input -->
-  <div class="col-sm-12 form-section-title">
-    Job configuration
-  </div>
-  <div class="form-group">
-    <span class="col-sm-12 text-muted small">
-      <p> <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i> This configuration will be ignored for Edge endpoint schedules. </p>
-    </span>
-  </div>
-  <!-- image-input -->
-  <div class="form-group">
-    <label for="schedule_image" class="col-sm-2 control-label text-left">Image</label>
-    <div class="col-sm-10">
-      <input type="text" class="form-control" ng-model="$ctrl.model.Job.Image" id="schedule_image" name="schedule_image" placeholder="e.g. ubuntu:latest" required />
-    </div>
-  </div>
-  <div class="form-group" ng-show="scheduleForm.schedule_image.$invalid">
-    <div class="col-sm-12 small text-warning">
-      <div ng-messages="scheduleForm.schedule_image.$error">
-        <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
-      </div>
-    </div>
-  </div>
-  <!-- !image-input -->
-  <!-- retry-policy -->
-  <div class="form-group">
-    <label for="retrycount" class="col-sm-2 control-label text-left">
-      Retry count
-      <portainer-tooltip position="bottom" message="Number of retries when it's not possible to reach the endpoint."></portainer-tooltip>
-    </label>
-    <div class="col-sm-10 col-md-4">
-      <input type="number" class="form-control" ng-model="$ctrl.model.Job.RetryCount" id="retrycount" name="retrycount" placeholder="3" />
-    </div>
-    <label for="retryinterval" class="col-sm-2 control-label text-left">
-      Retry interval
-      <portainer-tooltip position="bottom" message="Retry interval in seconds."></portainer-tooltip>
-    </label>
-    <div class="col-sm-10 col-md-4">
-      <input type="number" class="form-control" ng-model="$ctrl.model.Job.RetryInterval" id="retryinterval" name="retryinterval" placeholder="30" />
-    </div>
-  </div>
-  <!-- !retry-policy -->
+  
   <!-- execution-method -->
   <div ng-if="!$ctrl.model.Id">
     <div class="col-sm-12 form-section-title">
@@ -221,12 +178,8 @@
     <div class="form-group">
       <span class="col-sm-12 text-muted small">
         <p>
-          This schedule will be executed via a privileged container on the target hosts. You can access the host filesystem under the
-          <code>/host</code> folder.
-        </p>
-        <p>
           <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i> Edge endpoint schedules are managed by <code>cron</code> on the
-          underlying host. You have full access to the filesystem without having to use the <code>/host</code> folder.
+          underlying host. You have full access to the filesystem.
         </p>
       </span>
     </div>
