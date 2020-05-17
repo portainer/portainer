@@ -7,35 +7,27 @@ class EdgeGroupFormController {
     this.EndpointService = EndpointService;
     this.$async = $async;
 
-    this.state = {
-      available: {
-        limit: '10',
-        filter: '',
-        pageNumber: 1,
-        totalCount: 0,
-      },
-      associated: {
-        limit: '10',
-        filter: '',
-        pageNumber: 1,
-        totalCount: 0,
-      },
-    };
-
     this.endpoints = {
-      associated: [],
-      available: null,
+      state: {
+        limit: '10',
+        filter: '',
+        pageNumber: 1,
+        totalCount: 0,
+      },
+      value: null,
     };
 
     this.associateEndpoint = this.associateEndpoint.bind(this);
     this.dissociateEndpoint = this.dissociateEndpoint.bind(this);
-    this.getPaginatedEndpointsAsync = this.getPaginatedEndpointsAsync.bind(this);
-    this.getPaginatedEndpoints = this.getPaginatedEndpoints.bind(this);
+    this.getDynamicEndpointsAsync = this.getDynamicEndpointsAsync.bind(this);
+    this.getDynamicEndpoints = this.getDynamicEndpoints.bind(this);
 
     $scope.$watch(
       () => this.model,
       () => {
-        this.getPaginatedEndpoints(this.pageType, 'associated');
+        if (this.model.Dynamic) {
+          this.getDynamicEndpoints(this.pageType, 'associated');
+        }
       },
       true
     );
@@ -43,50 +35,28 @@ class EdgeGroupFormController {
 
   associateEndpoint(endpoint) {
     if (!_.includes(this.model.Endpoints, endpoint.Id)) {
-      this.endpoints.associated.push(endpoint);
-      this.model.Endpoints.push(endpoint.Id);
-      _.remove(this.endpoints.available, { Id: endpoint.Id });
+      this.model.Endpoints = [...this.model.Endpoints, endpoint.Id];
     }
   }
 
   dissociateEndpoint(endpoint) {
-    _.remove(this.endpoints.associated, { Id: endpoint.Id });
-    _.remove(this.model.Endpoints, (id) => id === endpoint.Id);
-    this.endpoints.available.push(endpoint);
+    this.model.Endpoints = _.filter(this.model.Endpoints, (id) => id !== endpoint.Id);
   }
 
-  getPaginatedEndpoints(pageType, tableType) {
-    return this.$async(this.getPaginatedEndpointsAsync, pageType, tableType);
+  getDynamicEndpoints(pageType, tableType) {
+    return this.$async(this.getDynamicEndpointsAsync, pageType, tableType);
   }
 
-  async getPaginatedEndpointsAsync(pageType, tableType) {
-    const { pageNumber, limit, search } = this.state[tableType];
+  async getDynamicEndpointsAsync() {
+    const { pageNumber, limit, search } = this.endpoints.state;
     const start = (pageNumber - 1) * limit + 1;
-    const query = { search, type: 4 };
-    if (tableType === 'associated') {
-      if (this.model.Dynamic) {
-        query.tagIds = this.model.TagIds;
-        query.tagsPartialMatch = this.model.PartialMatch;
-      } else {
-        query.endpointIds = this.model.Endpoints;
-      }
-    }
-    const response = await this.fetchEndpoints(start, limit, query);
+    const query = { search, type: 4, tagIds: this.model.TagIds, tagsPartialMatch: this.model.PartialMatch };
+
+    const response = await this.EndpointService.endpoints(start, limit, query);
+
     const totalCount = parseInt(response.totalCount, 10);
-    this.endpoints[tableType] = response.value;
-    this.state[tableType].totalCount = totalCount;
-
-    if (tableType === 'available') {
-      this.noEndpoints = totalCount === 0;
-      this.endpoints[tableType] = _.filter(response.value, (endpoint) => !_.includes(this.model.Endpoints, endpoint.Id));
-    }
-  }
-
-  fetchEndpoints(start, limit, query) {
-    if (query.tagIds && !query.tagIds.length) {
-      return { value: [], totalCount: 0 };
-    }
-    return this.EndpointService.endpoints(start, limit, query);
+    this.endpoints.value = response.value;
+    this.endpoints.state.totalCount = totalCount;
   }
 }
 
