@@ -221,7 +221,7 @@
   </div>
   <!-- node-selection -->
   <associated-endpoints-selector
-    endpoint-ids="$ctrl.model.Job.Endpoints"
+    endpoint-ids="$ctrl.formValues.endpointIds"
     tags="$ctrl.tags"
     groups="$ctrl.groups"
     has-backend-pagination="true"
@@ -239,7 +239,7 @@
         type="button"
         class="btn btn-primary btn-sm"
         ng-disabled="$ctrl.actionInProgress || !scheduleForm.$valid
-        || $ctrl.model.Job.Endpoints.length === 0
+        || $ctrl.formValues.endpointIds.length === 0
         || ($ctrl.model.Job.Method === 'upload' && !$ctrl.model.Job.File)"
         ng-click="$ctrl.action()"
         button-spinner="$ctrl.actionInProgress"

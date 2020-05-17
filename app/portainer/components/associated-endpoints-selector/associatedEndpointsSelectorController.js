@@ -36,7 +36,7 @@ class AssoicatedEndpointsSelectorController {
   }
 
   $onChanges({ endpointIds }) {
-    if (endpointIds.currentValue) {
+    if (endpointIds && endpointIds.currentValue) {
       this.getAssociatedEndpoints();
       this.getEndpoints();
     }
