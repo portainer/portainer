@@ -137,7 +137,7 @@
   </div>
   <!-- !advanced-schedule -->
   <!-- !cron-input -->
-  
+
   <!-- execution-method -->
   <div ng-if="!$ctrl.model.Id">
     <div class="col-sm-12 form-section-title">
@@ -220,14 +220,14 @@
     Target endpoints
   </div>
   <!-- node-selection -->
-  <multi-endpoint-selector
-    ng-if="$ctrl.endpoints && $ctrl.groups && $ctrl.tags"
-    style="margin-top: 55px; display: block;"
-    model="$ctrl.model.Job.Endpoints"
-    endpoints="$ctrl.endpoints"
-    groups="$ctrl.groups"
+  <associated-endpoints-selector
+    endpoint-ids="$ctrl.model.Job.Endpoints"
     tags="$ctrl.tags"
-  ></multi-endpoint-selector>
+    groups="$ctrl.groups"
+    has-backend-pagination="true"
+    on-associate="($ctrl.associateEndpoint)"
+    on-dissociate="($ctrl.dissociateEndpoint)"
+  ></associated-endpoints-selector>
   <!-- !node-selection -->
   <!-- actions -->
   <div class="col-sm-12 form-section-title">

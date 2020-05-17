@@ -1,4 +1,5 @@
 import moment from 'moment';
+import _ from 'lodash';
 
 angular.module('portainer.app').component('scheduleForm', {
   templateUrl: './scheduleForm.html',
@@ -66,6 +67,18 @@ angular.module('portainer.app').component('scheduleForm', {
     this.editorUpdate = function (cm) {
       ctrl.model.Job.FileContent = cm.getValue();
     };
+
+    this.associateEndpoint = associateEndpoint.bind(this);
+    function associateEndpoint(endpoint) {
+      if (!_.includes(this.model.Job.Endpoints, endpoint.Id)) {
+        this.model.Job.Endpoints = [...this.model.Job.Endpoints, endpoint.Id];
+      }
+    }
+
+    this.dissociateEndpoint = dissociateEndpoint.bind(this);
+    function dissociateEndpoint(endpoint) {
+      this.model.Job.Endpoints = _.filter(this.model.Job.Endpoints, (id) => id !== endpoint.Id);
+    }
   },
   bindings: {
     model: '=',
