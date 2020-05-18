@@ -1,5 +1,5 @@
-angular.module('portainer.docker').component('scheduleTasksDatatable', {
-  templateUrl: './scheduleTasksDatatable.html',
+angular.module('portainer.edge').component('edgeJobTasksDatatable', {
+  templateUrl: './edgeJobTasksDatatable.html',
   controller: 'GenericDatatableController',
   bindings: {
     titleText: '@',
