@@ -1,4 +1,4 @@
-import { ScheduleModel, ScheduleCreateRequest, ScheduleUpdateRequest, ScriptExecutionTaskModel } from '../../models/schedule';
+import { ScheduleModel, ScheduleCreateRequest, ScheduleUpdateRequest, ScriptExecutionTaskModel } from 'Portainer/models/schedule';
 
 angular.module('portainer.edge').factory('EdgeJobService', EdgeJobService);
 
