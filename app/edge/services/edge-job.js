@@ -1,14 +1,14 @@
+import angular from 'angular';
+
 import { ScheduleModel, ScheduleCreateRequest, ScheduleUpdateRequest, ScriptExecutionTaskModel } from 'Portainer/models/schedule';
 
-angular.module('portainer.edge').factory('EdgeJobService', EdgeJobService);
-
-function EdgeJobService($q, Schedules, FileUploadService) {
+function EdgeJobService($q, EdgeJobs, FileUploadService) {
   var service = {};
 
   service.schedule = function (scheduleId) {
     var deferred = $q.defer();
 
-    Schedules.get({ id: scheduleId })
+    EdgeJobs.get({ id: scheduleId })
       .$promise.then(function success(data) {
         var schedule = new ScheduleModel(data);
         deferred.resolve(schedule);
@@ -23,7 +23,7 @@ function EdgeJobService($q, Schedules, FileUploadService) {
   service.schedules = function () {
     var deferred = $q.defer();
 
-    Schedules.query()
+    EdgeJobs.query()
       .$promise.then(function success(data) {
         var schedules = data.map(function (item) {
           return new ScheduleModel(item);
@@ -40,7 +40,7 @@ function EdgeJobService($q, Schedules, FileUploadService) {
   service.scriptExecutionTasks = function (scheduleId) {
     var deferred = $q.defer();
 
-    Schedules.tasks({ id: scheduleId })
+    EdgeJobs.tasks({ id: scheduleId })
       .$promise.then(function success(data) {
         var tasks = data.map(function (item) {
           return new ScriptExecutionTaskModel(item);
@@ -56,7 +56,7 @@ function EdgeJobService($q, Schedules, FileUploadService) {
 
   service.createScheduleFromFileContent = function (model) {
     var payload = new ScheduleCreateRequest(model);
-    return Schedules.create({ method: 'string' }, payload).$promise;
+    return EdgeJobs.create({ method: 'string' }, payload).$promise;
   };
 
   service.createScheduleFromFileUpload = function (model) {
@@ -66,16 +66,18 @@ function EdgeJobService($q, Schedules, FileUploadService) {
 
   service.updateSchedule = function (model) {
     var payload = new ScheduleUpdateRequest(model);
-    return Schedules.update(payload).$promise;
+    return EdgeJobs.update(payload).$promise;
   };
 
   service.deleteSchedule = function (scheduleId) {
-    return Schedules.remove({ id: scheduleId }).$promise;
+    return EdgeJobs.remove({ id: scheduleId }).$promise;
   };
 
   service.getScriptFile = function (scheduleId) {
-    return Schedules.file({ id: scheduleId }).$promise;
+    return EdgeJobs.file({ id: scheduleId }).$promise;
   };
 
   return service;
 }
+
+angular.module('portainer.edge').factory('EdgeJobService', EdgeJobService);

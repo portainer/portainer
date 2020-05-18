@@ -2,7 +2,7 @@ import { ScheduleDefaultModel } from 'Portainer/models/schedule';
 
 angular
   .module('portainer.edge')
-  .controller('CreateEdgeJobController', function CreateEdgeJobController($q, $scope, $state, Notifications, EndpointService, GroupService, ScheduleService, TagService) {
+  .controller('CreateEdgeJobController', function CreateEdgeJobController($q, $scope, $state, Notifications, EndpointService, GroupService, EdgeJobService, TagService) {
     $scope.state = {
       actionInProgress: false,
     };
@@ -16,7 +16,7 @@ angular
       createSchedule(model)
         .then(function success() {
           Notifications.success('Schedule successfully created');
-          $state.go('portainer.schedules', {}, { reload: true });
+          $state.go('edge.jobs', {}, { reload: true });
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to create schedule');
@@ -28,9 +28,9 @@ angular
 
     function createSchedule(model) {
       if (model.Job.Method === 'editor') {
-        return ScheduleService.createScheduleFromFileContent(model);
+        return EdgeJobService.createScheduleFromFileContent(model);
       }
-      return ScheduleService.createScheduleFromFileUpload(model);
+      return EdgeJobService.createScheduleFromFileUpload(model);
     }
 
     function initView() {

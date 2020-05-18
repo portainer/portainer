@@ -1,13 +1,13 @@
 <rd-header>
   <rd-header-title title-text="Create schedule"></rd-header-title>
-  <rd-header-content> <a ui-sref="portainer.schedules">Schedules</a> &gt; Add schedule </rd-header-content>
+  <rd-header-content> <a ui-sref="edge.jobs">Schedules</a> &gt; Add schedule </rd-header-content>
 </rd-header>
 
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-body>
-        <schedule-form
+        <edge-job-form
           model="model"
           endpoints="endpoints"
           groups="groups"
@@ -15,7 +15,7 @@
           form-action="create"
           form-action-label="Create schedule"
           action-in-progress="state.actionInProgress"
-        ></schedule-form>
+        ></edge-job-form>
       </rd-widget-body>
     </rd-widget>
   </div>

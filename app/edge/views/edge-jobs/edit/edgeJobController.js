@@ -8,7 +8,7 @@ angular
     Notifications,
     EndpointService,
     GroupService,
-    ScheduleService,
+    EdgeJobService,
     EndpointProvider,
     HostBrowserService,
     FileSaver,
@@ -26,10 +26,10 @@ angular
       var model = $scope.schedule;
 
       $scope.state.actionInProgress = true;
-      ScheduleService.updateSchedule(model)
+      EdgeJobService.updateSchedule(model)
         .then(function success() {
           Notifications.success('Schedule successfully updated');
-          $state.go('portainer.schedules', {}, { reload: true });
+          $state.go('edge.jobs', {}, { reload: true });
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to update schedule');
@@ -83,9 +83,9 @@ angular
       var id = $transition$.params().id;
 
       $q.all({
-        schedule: ScheduleService.schedule(id),
-        file: ScheduleService.getScriptFile(id),
-        tasks: ScheduleService.scriptExecutionTasks(id),
+        schedule: EdgeJobService.schedule(id),
+        file: EdgeJobService.getScriptFile(id),
+        tasks: EdgeJobService.scriptExecutionTasks(id),
         endpoints: EndpointService.endpoints(undefined, undefined, { type: 4 }),
         groups: GroupService.groups(),
         tags: TagService.tags(),

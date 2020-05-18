@@ -1,6 +1,6 @@
-angular.module('portainer.edge').controller('EdgeJobDatatableController', EdgeJobDatatableController);
+angular.module('portainer.edge').controller('EdgeJobsDatatableController', EdgeJobsDatatableController);
 
-function EdgeJobDatatableController($scope, $controller, DatatableService) {
+function EdgeJobsDatatableController($scope, $controller, DatatableService) {
   angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
 
   /**

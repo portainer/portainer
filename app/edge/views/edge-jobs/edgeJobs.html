@@ -1,6 +1,6 @@
 <rd-header>
   <rd-header-title title-text="Schedules list">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.schedules" ui-sref-opts="{reload: true}">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="edge.jobs" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
@@ -9,6 +9,6 @@
 
 <div class="row">
   <div class="col-sm-12">
-    <schedules-datatable title-text="Schedules" title-icon="fa-clock" dataset="schedules" table-key="schedules" order-by="Name" remove-action="removeAction"></schedules-datatable>
+    <edge-jobs-datatable title-text="Schedules" title-icon="fa-clock" dataset="schedules" table-key="schedules" order-by="Name" remove-action="removeAction"></edge-jobs-datatable>
   </div>
 </div>

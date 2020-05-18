@@ -8,7 +8,7 @@
         <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.schedules.new"> <i class="fa fa-plus space-right" aria-hidden="true"></i>Add schedule </button>
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="edge.jobs.new"> <i class="fa fa-plus space-right" aria-hidden="true"></i>Add schedule </button>
       </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
@@ -56,7 +56,7 @@
                   <label for="select_{{ $index }}"></label>
                 </span>
                 <span ng-if="item.JobType !== 1">{{ item.Name }}</span>
-                <a ng-if="item.JobType === 1" ui-sref="portainer.schedules.schedule({id: item.Id})">{{ item.Name }}</a>
+                <a ng-if="item.JobType === 1" ui-sref="edge.jobs.job({id: item.Id})">{{ item.Name }}</a>
               </td>
               <td>
                 {{ item.CronExpression }}

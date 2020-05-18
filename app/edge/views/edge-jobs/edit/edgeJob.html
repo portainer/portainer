@@ -1,10 +1,10 @@
 <rd-header>
   <rd-header-title title-text="Schedule details">
-    <a data-toggle="tooltip" title-text="Refresh" ui-sref="portainer.schedules.schedule({id: schedule.Id})" ui-sref-opts="{reload: true}">
+    <a data-toggle="tooltip" title-text="Refresh" ui-sref="edge.jobs.job({id: schedule.Id})" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
-  <rd-header-content> <a ui-sref="portainer.schedules">Schedules</a> &gt; {{ ::schedule.Name }} </rd-header-content>
+  <rd-header-content> <a ui-sref="edge.jobs">Schedules</a> &gt; {{ ::schedule.Name }} </rd-header-content>
 </rd-header>
 
 <div class="row">
@@ -15,7 +15,7 @@
           <uib-tab index="0">
             <uib-tab-heading> <i class="fa fa-wrench" aria-hidden="true"></i> Configuration </uib-tab-heading>
 
-            <schedule-form
+            <edge-job-form
               ng-if="schedule"
               model="schedule"
               endpoints="endpoints"
@@ -24,7 +24,7 @@
               form-action="update"
               form-action-label="Update schedule"
               action-in-progress="state.actionInProgress"
-            ></schedule-form>
+            ></edge-job-form>
           </uib-tab>
 
           <uib-tab index="1">

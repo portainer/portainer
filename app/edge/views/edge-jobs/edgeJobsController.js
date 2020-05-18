@@ -1,6 +1,6 @@
-angular.module('portainer.edge').controller('EdgeJobController', EdgeJobController);
+import angular from 'angular';
 
-function EdgeJobController($scope, $state, Notifications, ModalService, ScheduleService) {
+function EdgeJobsController($scope, $state, Notifications, ModalService, EdgeJobService) {
   $scope.removeAction = removeAction;
 
   function removeAction(selectedItems) {
@@ -15,7 +15,7 @@ function EdgeJobController($scope, $state, Notifications, ModalService, Schedule
   function deleteSelectedSchedules(schedules) {
     var actionCount = schedules.length;
     angular.forEach(schedules, function (schedule) {
-      ScheduleService.deleteSchedule(schedule.Id)
+      EdgeJobService.deleteSchedule(schedule.Id)
         .then(function success() {
           Notifications.success('Schedule successfully removed', schedule.Name);
           var index = $scope.schedules.indexOf(schedule);
@@ -34,7 +34,7 @@ function EdgeJobController($scope, $state, Notifications, ModalService, Schedule
   }
 
   function initView() {
-    ScheduleService.schedules()
+    EdgeJobService.schedules()
       .then(function success(data) {
         $scope.schedules = data;
       })
@@ -46,3 +46,5 @@ function EdgeJobController($scope, $state, Notifications, ModalService, Schedule
 
   initView();
 }
+
+angular.module('portainer.edge').controller('EdgeJobsController', EdgeJobsController);
