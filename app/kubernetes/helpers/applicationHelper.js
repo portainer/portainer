@@ -63,6 +63,7 @@ class KubernetesApplicationHelper {
         mapping.ResourcePool = app.ResourcePool;
         mapping.ServiceType = app.ServiceType;
         mapping.LoadBalancerIPAddress = app.LoadBalancerIPAddress;
+        mapping.ApplicationOwner = app.ApplicationOwner;
 
         mapping.Ports = _.map(app.PublishedPorts, (item) => {
           const port = new KubernetesPortMappingPort();

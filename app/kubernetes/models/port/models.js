@@ -21,6 +21,7 @@ const _KubernetesPortMapping = Object.freeze({
   Highlighted: false,
   ResourcePool: '',
   ServiceType: '',
+  ApplicationOwner: '',
   LoadBalancerIPAddress: '',
   Ports: []
 });
