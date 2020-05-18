@@ -3168,10 +3168,6 @@ definitions:
         type: "boolean"
         example: true
         description: "Is authentication enabled"
-      EndpointManagement:
-        type: "boolean"
-        example: true
-        description: "Is endpoint management enabled"
       Analytics:
         type: "boolean"
         example: true
