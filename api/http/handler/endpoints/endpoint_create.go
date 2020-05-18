@@ -131,10 +131,6 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 
 // POST request on /api/endpoints
 func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	if !handler.authorizeEndpointManagement {
-		return &httperror.HandlerError{http.StatusServiceUnavailable, "Endpoint management is disabled", ErrEndpointManagementDisabled}
-	}
-
 	payload := &endpointCreatePayload{}
 	err := payload.Validate(r)
 	if err != nil {

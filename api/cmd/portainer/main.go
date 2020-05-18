@@ -188,10 +188,9 @@ func loadSchedulesFromDatabase(jobScheduler portainer.JobScheduler, jobService p
 
 func initStatus(endpointManagement bool, flags *portainer.CLIFlags) *portainer.Status {
 	return &portainer.Status{
-		Analytics:          !*flags.NoAnalytics,
-		Authentication:     !*flags.NoAuth,
-		EndpointManagement: endpointManagement,
-		Version:            portainer.APIVersion,
+		Analytics:      !*flags.NoAnalytics,
+		Authentication: !*flags.NoAuth,
+		Version:        portainer.APIVersion,
 	}
 }
 
@@ -421,8 +420,6 @@ func main() {
 
 	snapshotter := initSnapshotter(clientFactory)
 
-	endpointManagement := true
-
 	swarmStackManager, err := initSwarmStackManager(*flags.Assets, *flags.Data, digitalSignatureService, fileService, reverseTunnelService)
 	if err != nil {
 		log.Fatal(err)
@@ -451,7 +448,7 @@ func main() {
 
 	jobScheduler.Start()
 
-	applicationStatus := initStatus(endpointManagement, flags)
+	applicationStatus := initStatus(flags)
 
 	err = initEndpoint(flags, store.EndpointService, snapshotter)
 	if err != nil {
@@ -510,7 +507,6 @@ func main() {
 		BindAddress:             *flags.Addr,
 		AssetsPath:              *flags.Assets,
 		AuthDisabled:            *flags.NoAuth,
-		EndpointManagement:      endpointManagement,
 		RoleService:             store.RoleService,
 		UserService:             store.UserService,
 		TeamService:             store.TeamService,
