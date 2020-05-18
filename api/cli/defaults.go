@@ -18,6 +18,5 @@ const (
 	defaultSSL                 = "false"
 	defaultSSLCertPath         = "/certs/portainer.crt"
 	defaultSSLKeyPath          = "/certs/portainer.key"
-	defaultSyncInterval        = "60s"
 	defaultSnapshotInterval    = "5m"
 )

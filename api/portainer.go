@@ -42,7 +42,6 @@ type (
 		Assets            *string
 		Data              *string
 		EndpointURL       *string
-		ExternalEndpoints *string
 		Labels            *[]Pair
 		Logo              *string
 		NoAuth            *bool
@@ -56,7 +55,6 @@ type (
 		SSL               *bool
 		SSLCert           *string
 		SSLKey            *string
-		SyncInterval      *string
 		SnapshotInterval  *string
 	}
 
@@ -209,6 +207,8 @@ type (
 	EndpointStatus int
 
 	// EndpointSyncJob represents a scheduled job that synchronize endpoints based on an external file
+	//
+	// Deprecated
 	EndpointSyncJob struct{}
 
 	// EndpointType represents the type of an endpoint
@@ -402,7 +402,9 @@ type (
 		EdgeSchedule       *EdgeSchedule
 		ScriptExecutionJob *ScriptExecutionJob
 		SnapshotJob        *SnapshotJob
-		EndpointSyncJob    *EndpointSyncJob
+
+		// Deprecated fields
+		EndpointSyncJob *EndpointSyncJob
 	}
 
 	// ScheduleID represents a schedule identifier.
@@ -490,10 +492,9 @@ type (
 
 	// Status represents the application status
 	Status struct {
-		Authentication     bool   `json:"Authentication"`
-		EndpointManagement bool   `json:"EndpointManagement"`
-		Analytics          bool   `json:"Analytics"`
-		Version            string `json:"Version"`
+		Authentication bool   `json:"Authentication"`
+		Analytics      bool   `json:"Analytics"`
+		Version        string `json:"Version"`
 	}
 
 	// Tag represents a tag that can be associated to a resource
@@ -1097,7 +1098,7 @@ const (
 	// SnapshotJobType is a system job used to create endpoint snapshots
 	SnapshotJobType
 	// EndpointSyncJobType is a system job used to synchronize endpoints from
-	// an external definition store
+	// an external definition store (Deprecated)
 	EndpointSyncJobType
 )
 
