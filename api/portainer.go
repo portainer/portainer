@@ -117,7 +117,23 @@ type (
 	// EdgeGroupID represents an Edge group identifier
 	EdgeGroupID int
 
+	// EdgeJob represents a job that can run on Edge environments.
+	EdgeJob struct {
+		ID             EdgeJobID    `json:"Id"`
+		Created        int64        `json:"Created"`
+		CronExpression string       `json:"CronExpression"`
+		Endpoints      []EndpointID `json:"Endpoints"`
+		Name           string       `json:"Name"`
+		Script         string       `json:"Script"`
+		Recurring      bool         `json:"Recurring"`
+		Version        int          `json:"Version"`
+	}
+
+	// EdgeJobID represents an Edge job identifier
+	EdgeJobID int
+
 	// EdgeSchedule represents a scheduled job that can run on Edge environments.
+	// Deprecated in favor of EdgeJob
 	EdgeSchedule struct {
 		ID             ScheduleID   `json:"Id"`
 		CronExpression string       `json:"CronExpression"`
@@ -417,6 +433,7 @@ type (
 	// It only contains a pointer to one of the JobRunner implementations
 	// based on the JobType.
 	// NOTE: The Recurring option is only used by ScriptExecutionJob at the moment
+	// Deprecated in favor of EdgeJob
 	Schedule struct {
 		ID                 ScheduleID `json:"Id"`
 		Name               string
@@ -433,6 +450,7 @@ type (
 	}
 
 	// ScheduleID represents a schedule identifier.
+	// Deprecated in favor of EdgeJob
 	ScheduleID int
 
 	// ScriptExecutionJob represents a scheduled job that can execute a script via a privileged container
@@ -741,6 +759,35 @@ type (
 		UpdateDockerHub(registry *DockerHub) error
 	}
 
+	// EdgeGroupService represents a service to manage Edge groups
+	EdgeGroupService interface {
+		EdgeGroups() ([]EdgeGroup, error)
+		EdgeGroup(ID EdgeGroupID) (*EdgeGroup, error)
+		CreateEdgeGroup(group *EdgeGroup) error
+		UpdateEdgeGroup(ID EdgeGroupID, group *EdgeGroup) error
+		DeleteEdgeGroup(ID EdgeGroupID) error
+	}
+
+	// EdgeJobService represents a service to manage Edge jobs
+	EdgeJobService interface {
+		EdgeJobs() ([]EdgeJob, error)
+		EdgeJob(ID EdgeJobID) (*EdgeJob, error)
+		CreateEdgeJob(edgeJob *EdgeJob) error
+		UpdateEdgeJob(ID EdgeJobID, edgeJob *EdgeJob) error
+		DeleteEdgeJob(ID EdgeJobID) error
+		GetNextIdentifier() int
+	}
+
+	// EdgeStackService represents a service to manage Edge stacks
+	EdgeStackService interface {
+		EdgeStacks() ([]EdgeStack, error)
+		EdgeStack(ID EdgeStackID) (*EdgeStack, error)
+		CreateEdgeStack(edgeStack *EdgeStack) error
+		UpdateEdgeStack(ID EdgeStackID, edgeStack *EdgeStack) error
+		DeleteEdgeStack(ID EdgeStackID) error
+		GetNextIdentifier() int
+	}
+
 	// EndpointService represents a service for managing endpoint data
 	EndpointService interface {
 		Endpoint(ID EndpointID) (*Endpoint, error)
@@ -892,6 +939,7 @@ type (
 	}
 
 	// ScheduleService represents a service for managing schedule data
+	// Deprecated in favor of EdgeJobService
 	ScheduleService interface {
 		Schedule(ID ScheduleID) (*Schedule, error)
 		Schedules() ([]Schedule, error)
@@ -1000,25 +1048,6 @@ type (
 		WebhookByResourceID(resourceID string) (*Webhook, error)
 		WebhookByToken(token string) (*Webhook, error)
 		DeleteWebhook(serviceID WebhookID) error
-	}
-
-	// EdgeGroupService represents a service to manage Edge groups
-	EdgeGroupService interface {
-		EdgeGroups() ([]EdgeGroup, error)
-		EdgeGroup(ID EdgeGroupID) (*EdgeGroup, error)
-		CreateEdgeGroup(group *EdgeGroup) error
-		UpdateEdgeGroup(ID EdgeGroupID, group *EdgeGroup) error
-		DeleteEdgeGroup(ID EdgeGroupID) error
-	}
-
-	// EdgeStackService represents a service to manage Edge stacks
-	EdgeStackService interface {
-		EdgeStacks() ([]EdgeStack, error)
-		EdgeStack(ID EdgeStackID) (*EdgeStack, error)
-		CreateEdgeStack(edgeStack *EdgeStack) error
-		UpdateEdgeStack(ID EdgeStackID, edgeStack *EdgeStack) error
-		DeleteEdgeStack(ID EdgeStackID) error
-		GetNextIdentifier() int
 	}
 )
 
