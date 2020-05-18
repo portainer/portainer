@@ -16,7 +16,6 @@ class KubernetesConfigurationService {
 
     this.getAsync = this.getAsync.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);
-    this.getAllFilteredAsync = this.getAllFilteredAsync.bind(this);
     this.createAsync = this.createAsync.bind(this);
     this.updateAsync = this.updateAsync.bind(this);
     this.deleteAsync = this.deleteAsync.bind(this);
@@ -43,32 +42,19 @@ class KubernetesConfigurationService {
     }
   }
 
-  async getAllFilteredAsync(namespace) {
-    try {
-      let namespaces;
-      if (namespace) {
-        const ns = await this.KubernetesNamespaceService.get(namespace);
-        namespaces = [ns];
-      } else {
-        namespaces = await this.KubernetesNamespaceService.get();
-      }
-      const promises = _.map(namespaces, (item) => this.getAllAsync(item.Name));
-      const res = await Promise.all(promises);
-      return _.flatten(res);
-    } catch (err) {
-      throw err;
-    }
-  }
-
   async getAllAsync(namespace) {
     try {
-      const [configMaps, secrets] = await Promise.all([
-        this.KubernetesConfigMapService.get(namespace),
-        this.KubernetesSecretService.get(namespace)
-      ]);
-      const secretsConfigurations = _.map(secrets, secret => KubernetesConfigurationConverter.secretToConfiguration(secret));
-      const configMapsConfigurations = _.map(configMaps, configMap => KubernetesConfigurationConverter.configMapToConfiguration(configMap));
-      return _.concat(configMapsConfigurations, secretsConfigurations);
+      const namespaces = namespace ? [namespace] : _.map(await this.KubernetesNamespaceService.get(), 'Name');
+      const res = await Promise.all(_.map(namespaces, async (ns) => {
+        const [configMaps, secrets] = await Promise.all([
+          this.KubernetesConfigMapService.get(ns),
+          this.KubernetesSecretService.get(ns)
+        ]);
+        const secretsConfigurations = _.map(secrets, secret => KubernetesConfigurationConverter.secretToConfiguration(secret));
+        const configMapsConfigurations = _.map(configMaps, configMap => KubernetesConfigurationConverter.configMapToConfiguration(configMap));
+        return _.concat(configMapsConfigurations, secretsConfigurations);
+      }));
+      return _.flatten(res);
     } catch (err) {
       throw err;
     }
@@ -77,10 +63,6 @@ class KubernetesConfigurationService {
   get(namespace, name) {
     if (name) {
       return this.$async(this.getAsync, namespace, name);
-    }
-    const isAdmin = this.Authentication.isAdmin();
-    if (!isAdmin) {
-      return this.$async(this.getAllFilteredAsync, namespace);
     }
     return this.$async(this.getAllAsync, namespace);
   }
@@ -136,7 +118,7 @@ class KubernetesConfigurationService {
       } else {
         await this.KubernetesSecretService.delete(config);
       }
-    } catch(err) {
+    } catch (err) {
       throw err;
     }
   }

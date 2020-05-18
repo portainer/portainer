@@ -39,12 +39,21 @@ class KubernetesResourcePoolService {
     }
   }
 
-  // TODO: review, unconsistent getAll pattern
   async getAllAsync() {
     try {
       const namespaces = await this.KubernetesNamespaceService.get();
-      const promises = _.map(namespaces, (item) => this.getAsync(item.Name));
-      const pools = await Promise.all(promises);
+      const pools = await Promise.all(_.map(namespaces, async (namespace) => {
+        const name = namespace.Name;
+        const [quotaAttempt] = await Promise.allSettled([
+          this.KubernetesResourceQuotaService.get(name, KubernetesResourceQuotaHelper.generateResourceQuotaName(name)),
+        ]);
+        const pool = KubernetesResourcePoolConverter.apiToResourcePool(namespace);
+        if (quotaAttempt.status === 'fulfilled') {
+          pool.Quota = quotaAttempt.value;
+          pool.Yaml += '---\n' + quotaAttempt.value.Yaml;
+        }
+        return pool;
+      }));
       return pools;
     } catch (err) {
       throw err;

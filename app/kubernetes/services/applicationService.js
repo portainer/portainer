@@ -26,7 +26,6 @@ class KubernetesApplicationService {
 
     this.getAsync = this.getAsync.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);
-    this.getAllFilteredAsync = this.getAllFilteredAsync.bind(this);
     this.createAsync = this.createAsync.bind(this);
     this.patchAsync = this.patchAsync.bind(this);
     this.patchPartialAsync = this.patchPartialAsync.bind(this);
@@ -76,53 +75,38 @@ class KubernetesApplicationService {
     }
   }
 
-  // TODO: review, remove function
-  async getAllFilteredAsync(namespace) {
-    try {
-      let namespaces;
-      if (namespace) {
-        const ns = await this.KubernetesNamespaceService.get(namespace);
-        namespaces = [ns];
-      } else {
-        namespaces = await this.KubernetesNamespaceService.get();
-      }
-      const promises = _.map(namespaces, (item) => this.getAllAsync(item.Name));
-      const res = await Promise.all(promises);
-      return _.flatten(res);
-    } catch (err) {
-      throw err;
-    }
-  }
-
   async getAllAsync(namespace) {
     try {
-      const [deployments, daemonSets, statefulSets, services, pods] = await Promise.all([
-        this.KubernetesDeploymentService.get(namespace),
-        this.KubernetesDaemonSetService.get(namespace),
-        this.KubernetesStatefulSetService.get(namespace),
-        this.KubernetesServiceService.get(namespace),
-        this.KubernetesPods(namespace).get().$promise
-      ]);
-      const deploymentApplications = _.map(deployments, (item) => {
-        const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
-        const application = KubernetesApplicationConverter.apiDeploymentToApplication(item, service);
-        application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods.items, item);
-        return application;
-      });
-      const daemonSetApplications = _.map(daemonSets, (item) => {
-        const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
-        const application = KubernetesApplicationConverter.apiDaemonSetToApplication(item, service);
-        application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods.items, item);
-        return application;
-      });
-      const statefulSetApplications = _.map(statefulSets, (item) => {
-        const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
-        const application = KubernetesApplicationConverter.apiStatefulSetToapplication(item, service);
-        application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods.items, item);
-        return application;
-      });
-      const applications = _.concat(deploymentApplications, daemonSetApplications, statefulSetApplications);
-      return applications;
+      const namespaces = namespace ? [namespace] : _.map(await this.KubernetesNamespaceService.get(), 'Name');
+      const res = await Promise.all(_.map(namespaces, async (ns) => {
+        const [deployments, daemonSets, statefulSets, services, pods] = await Promise.all([
+          this.KubernetesDeploymentService.get(ns),
+          this.KubernetesDaemonSetService.get(ns),
+          this.KubernetesStatefulSetService.get(ns),
+          this.KubernetesServiceService.get(ns),
+          this.KubernetesPods(ns).get().$promise
+        ]);
+        const deploymentApplications = _.map(deployments, (item) => {
+          const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
+          const application = KubernetesApplicationConverter.apiDeploymentToApplication(item, service);
+          application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods.items, item);
+          return application;
+        });
+        const daemonSetApplications = _.map(daemonSets, (item) => {
+          const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
+          const application = KubernetesApplicationConverter.apiDaemonSetToApplication(item, service);
+          application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods.items, item);
+          return application;
+        });
+        const statefulSetApplications = _.map(statefulSets, (item) => {
+          const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
+          const application = KubernetesApplicationConverter.apiStatefulSetToapplication(item, service);
+          application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods.items, item);
+          return application;
+        });
+        return _.concat(deploymentApplications, daemonSetApplications, statefulSetApplications);
+      }));
+      return _.flatten(res);
     } catch (err) {
       throw err;
     }
@@ -131,10 +115,6 @@ class KubernetesApplicationService {
   get(namespace, name) {
     if (name) {
       return this.$async(this.getAsync, namespace, name);
-    }
-    const isAdmin = this.Authentication.isAdmin();
-    if (!isAdmin) {
-      return this.$async(this.getAllFilteredAsync, namespace);
     }
     return this.$async(this.getAllAsync, namespace);
   }
@@ -278,7 +258,7 @@ class KubernetesApplicationService {
   // depending on partial value
   // true = KubernetesApplication
   // false = KubernetesApplicationFormValues
-  patch(oldValues, newValues, partial=false) {
+  patch(oldValues, newValues, partial = false) {
     if (partial) {
       return this.$async(this.patchPartialAsync, oldValues, newValues);
     }

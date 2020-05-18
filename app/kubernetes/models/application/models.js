@@ -34,7 +34,7 @@ export const KubernetesPortainerApplicationOwnerLabel = 'io.portainer.kubernetes
 export const KubernetesPortainerApplicationNote = 'io.portainer.kubernetes.application.note';
 
 /**
- * KubernetesApplication Model
+ * KubernetesApplication Model (Composite)
  */
 const _KubernetesApplication = Object.freeze({
   Id: '',

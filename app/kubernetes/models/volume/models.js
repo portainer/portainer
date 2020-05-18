@@ -24,7 +24,7 @@ export class KubernetesPersistentVolumeClaim {
 }
 
 /**
- * KubernetesVolume Model
+ * KubernetesVolume Model (Composite)
  */
 const _KubernetesVolume = Object.freeze({
   ResourcePool: {}, // KubernetesResourcePool
