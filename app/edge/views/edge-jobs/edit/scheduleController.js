@@ -1,5 +1,5 @@
 angular
-  .module('portainer.app')
+  .module('portainer.edge')
   .controller('ScheduleController', function ScheduleController(
     $q,
     $scope,

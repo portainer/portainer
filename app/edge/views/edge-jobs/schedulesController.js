@@ -1,4 +1,4 @@
-angular.module('portainer.app').controller('SchedulesController', [
+angular.module('portainer.edge').controller('SchedulesController', [
   '$scope',
   '$state',
   'Notifications',

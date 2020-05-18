@@ -1,7 +1,7 @@
-import { ScheduleDefaultModel } from '../../../models/schedule';
+import { ScheduleDefaultModel } from 'Portainer/models/schedule';
 
 angular
-  .module('portainer.app')
+  .module('portainer.edge')
   .controller('CreateScheduleController', function CreateScheduleController($q, $scope, $state, Notifications, EndpointService, GroupService, ScheduleService, TagService) {
     $scope.state = {
       actionInProgress: false,
