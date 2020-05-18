@@ -66,6 +66,9 @@ angular.module('portainer.edge', []).config(function config($stateRegistryProvid
         component: 'editEdgeStackView',
       },
     },
+    params: {
+      tab: 0,
+    },
   };
 
   $stateRegistryProvider.register(edge);

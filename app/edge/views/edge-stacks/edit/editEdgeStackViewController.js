@@ -15,6 +15,7 @@ class EditEdgeStackViewController {
 
     this.state = {
       actionInProgress: false,
+      activeTab: 0,
     };
 
     this.deployStack = this.deployStack.bind(this);
@@ -24,7 +25,8 @@ class EditEdgeStackViewController {
   }
 
   async $onInit() {
-    const { stackId } = this.$state.params;
+    const { stackId, tab } = this.$state.params;
+    this.state.activeTab = tab;
     try {
       const [edgeGroups, model, file] = await Promise.all([this.EdgeGroupService.groups(), this.EdgeStackService.stack(stackId), this.EdgeStackService.stackFile(stackId)]);
       this.edgeGroups = edgeGroups;
