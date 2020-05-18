@@ -48,7 +48,6 @@ type Server struct {
 	BindAddress             string
 	AssetsPath              string
 	AuthDisabled            bool
-	EndpointManagement      bool
 	Status                  *portainer.Status
 	ReverseTunnelService    portainer.ReverseTunnelService
 	ExtensionManager        portainer.ExtensionManager
@@ -170,7 +169,7 @@ func (server *Server) Start() error {
 	var edgeTemplatesHandler = edgetemplates.NewHandler(requestBouncer)
 	edgeTemplatesHandler.SettingsService = server.SettingsService
 
-	var endpointHandler = endpoints.NewHandler(requestBouncer, server.EndpointManagement)
+	var endpointHandler = endpoints.NewHandler(requestBouncer)
 	endpointHandler.AuthorizationService = authorizationService
 	endpointHandler.EdgeGroupService = server.EdgeGroupService
 	endpointHandler.EdgeStackService = server.EdgeStackService

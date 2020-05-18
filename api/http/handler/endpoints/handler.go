@@ -11,12 +11,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const (
-	// ErrEndpointManagementDisabled is an error raised when trying to access the endpoints management endpoints
-	// when the server has been started with the --external-endpoints flag
-	ErrEndpointManagementDisabled = portainer.Error("Endpoint management is disabled")
-)
-
 func hideFields(endpoint *portainer.Endpoint) {
 	endpoint.AzureCredentials = portainer.AzureCredentials{}
 	if len(endpoint.Snapshots) > 0 {
@@ -27,7 +21,6 @@ func hideFields(endpoint *portainer.Endpoint) {
 // Handler is the HTTP handler used to handle endpoint operations.
 type Handler struct {
 	*mux.Router
-	authorizeEndpointManagement bool
 	requestBouncer              *security.RequestBouncer
 	AuthorizationService        *portainer.AuthorizationService
 	EdgeGroupService            portainer.EdgeGroupService
@@ -45,10 +38,9 @@ type Handler struct {
 }
 
 // NewHandler creates a handler to manage endpoint operations.
-func NewHandler(bouncer *security.RequestBouncer, authorizeEndpointManagement bool) *Handler {
+func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{
 		Router:                      mux.NewRouter(),
-		authorizeEndpointManagement: authorizeEndpointManagement,
 		requestBouncer:              bouncer,
 	}
 
