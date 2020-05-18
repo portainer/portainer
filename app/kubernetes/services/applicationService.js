@@ -12,7 +12,7 @@ import { KubernetesDaemonSet } from 'Kubernetes/models/daemon-set/models';
 class KubernetesApplicationService {
   /* @ngInject */
   constructor($async, Authentication, KubernetesDeploymentService, KubernetesDaemonSetService, KubernetesStatefulSetService, KubernetesServiceService,
-    KubernetesSecretService, KubernetesPersistentVolumeClaimService, KubernetesNamespaceService, KubernetesPods) {
+    KubernetesSecretService, KubernetesPersistentVolumeClaimService, KubernetesNamespaceService, KubernetesPodService) {
     this.$async = $async;
     this.Authentication = Authentication;
     this.KubernetesDeploymentService = KubernetesDeploymentService;
@@ -22,7 +22,7 @@ class KubernetesApplicationService {
     this.KubernetesSecretService = KubernetesSecretService;
     this.KubernetesPersistentVolumeClaimService = KubernetesPersistentVolumeClaimService;
     this.KubernetesNamespaceService = KubernetesNamespaceService;
-    this.KubernetesPods = KubernetesPods;
+    this.KubernetesPodService = KubernetesPodService;
 
     this.getAsync = this.getAsync.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);
@@ -42,7 +42,7 @@ class KubernetesApplicationService {
         this.KubernetesDaemonSetService.get(namespace, name),
         this.KubernetesStatefulSetService.get(namespace, name),
         this.KubernetesServiceService.get(namespace, name),
-        this.KubernetesPods(namespace).get().$promise // TODO: review, use service
+        this.KubernetesPodService.get(namespace)
       ]);
       const service = {};
       if (serviceAttempt.status === 'fulfilled') {
@@ -63,7 +63,7 @@ class KubernetesApplicationService {
       } else {
         throw new PortainerError('Unable to determine which association to use');
       }
-      application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods.value.items, item.value.Raw);
+      application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods.value, item.value.Raw);
       application.Yaml = item.value.Yaml;
 
       if (service.Yaml) {
@@ -84,24 +84,24 @@ class KubernetesApplicationService {
           this.KubernetesDaemonSetService.get(ns),
           this.KubernetesStatefulSetService.get(ns),
           this.KubernetesServiceService.get(ns),
-          this.KubernetesPods(ns).get().$promise
+          this.KubernetesPodService.get(ns)
         ]);
         const deploymentApplications = _.map(deployments, (item) => {
           const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
           const application = KubernetesApplicationConverter.apiDeploymentToApplication(item, service);
-          application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods.items, item);
+          application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods, item);
           return application;
         });
         const daemonSetApplications = _.map(daemonSets, (item) => {
           const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
           const application = KubernetesApplicationConverter.apiDaemonSetToApplication(item, service);
-          application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods.items, item);
+          application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods, item);
           return application;
         });
         const statefulSetApplications = _.map(statefulSets, (item) => {
           const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
           const application = KubernetesApplicationConverter.apiStatefulSetToapplication(item, service);
-          application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods.items, item);
+          application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods, item);
           return application;
         });
         return _.concat(deploymentApplications, daemonSetApplications, statefulSetApplications);

@@ -1,7 +1,6 @@
 import _ from 'lodash-es';
 import { KubernetesPortMapping, KubernetesPortMappingPort } from 'Kubernetes/models/port/models';
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
-import KubernetesPodConverter from 'Kubernetes/converters/pod';
 import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
 import {
   KubernetesApplicationConfigurationFormValueOverridenKeyTypes,
@@ -51,8 +50,7 @@ class KubernetesApplicationHelper {
   }
 
   static associatePodsAndApplication(pods, app) {
-    const filteredPods = _.filter(pods, { metadata: { labels: app.spec.selector.matchLabels } });
-    return _.map(filteredPods, (item) => KubernetesPodConverter.apiToPod(item));
+    return _.filter(pods, { Labels: app.spec.selector.matchLabels });
   }
 
   static portMappingsFromApplications(applications) {
