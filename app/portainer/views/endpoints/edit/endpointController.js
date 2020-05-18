@@ -19,10 +19,6 @@ angular
     Notifications,
     Authentication
   ) {
-    if (!$scope.applicationState.application.endpointManagement) {
-      $state.go('portainer.endpoints');
-    }
-
     $scope.state = {
       uploadInProgress: false,
       actionInProgress: false,
