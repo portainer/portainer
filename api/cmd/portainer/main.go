@@ -186,7 +186,7 @@ func loadSchedulesFromDatabase(jobScheduler portainer.JobScheduler, jobService p
 	return nil
 }
 
-func initStatus(endpointManagement bool, flags *portainer.CLIFlags) *portainer.Status {
+func initStatus(flags *portainer.CLIFlags) *portainer.Status {
 	return &portainer.Status{
 		Analytics:      !*flags.NoAnalytics,
 		Authentication: !*flags.NoAuth,
