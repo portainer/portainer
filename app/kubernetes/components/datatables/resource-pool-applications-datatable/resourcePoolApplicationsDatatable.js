@@ -1,6 +1,6 @@
 angular.module('portainer.kubernetes').component('kubernetesResourcePoolApplicationsDatatable', {
-  templateUrl: './resource-pool-applications-datatable.html',
-  controller: 'GenericDatatableController',
+  templateUrl: './resourcePoolApplicationsDatatable.html',
+  controller: 'KubernetesResourcePoolApplicationsDatatableController',
   bindings: {
     titleText: '@',
     titleIcon: '@',
