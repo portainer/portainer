@@ -9,16 +9,22 @@ import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
 
 class KubernetesApplicationController {
   /* @ngInject */
-  constructor($async, $state, clipboard, Notifications, LocalStorage, KubernetesApplicationService, KubernetesEventService, KubernetesStackService, KubernetesNamespaceHelper) {
+  constructor($async, $state, clipboard, Notifications, LocalStorage, ModalService,
+     KubernetesApplicationService, KubernetesEventService, KubernetesStackService, KubernetesPodService, KubernetesNamespaceHelper) {
     this.$async = $async;
     this.$state = $state;
     this.clipboard = clipboard;
     this.Notifications = Notifications;
     this.LocalStorage = LocalStorage;
+    this.ModalService = ModalService;
+
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesEventService = KubernetesEventService;
     this.KubernetesStackService = KubernetesStackService;
+    this.KubernetesPodService = KubernetesPodService;
+
     this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
+
     this.ApplicationDataAccessPolicies = KubernetesApplicationDataAccessPolicies;
 
     this.onInit = this.onInit.bind(this);
@@ -27,6 +33,7 @@ class KubernetesApplicationController {
     this.getEvents = this.getEvents.bind(this);
     this.getEventsAsync = this.getEventsAsync.bind(this);
     this.updateApplicationAsync = this.updateApplicationAsync.bind(this);
+    this.redeployApplicationAsync = this.redeployApplicationAsync.bind(this);
     this.copyLoadBalancerIP = this.copyLoadBalancerIP.bind(this);
   }
 
@@ -68,7 +75,34 @@ class KubernetesApplicationController {
   hasEventWarnings() {
     return this.state.eventWarningCount;
   }
+  /**
+   * REDEPLOY
+   */
+  async redeployApplicationAsync() {
+    try {
+      const promises = _.map(this.application.Pods, (item) => this.KubernetesPodService.delete(item));
+      await Promise.all(promises);
+      this.Notifications.success('Application successfully redeployed');
+      this.$state.reload();
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to redeploy application');
+    }
+  }
 
+  redeployApplication() {
+    this.ModalService.confirmUpdate(
+      'Redeploying the application may cause service interruption. Do you wish to continue?',
+      (confirmed) => {
+        if (confirmed) {
+          return this.$async(this.redeployApplicationAsync);
+        }
+      }
+    );
+  }
+
+  /**
+   * UPDATE
+   */
   async updateApplicationAsync() {
     try {
       const application = angular.copy(this.application);

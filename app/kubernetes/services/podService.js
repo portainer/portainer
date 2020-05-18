@@ -13,6 +13,7 @@ class KubernetesPodService {
 
     this.getAllAsync = this.getAllAsync.bind(this);
     this.logsAsync = this.logsAsync.bind(this);
+    this.deleteAsync = this.deleteAsync.bind(this);
   }
   /**
    * GET ALL
@@ -49,6 +50,24 @@ class KubernetesPodService {
 
   logs(namespace, podName) {
     return this.$async(this.logsAsync, namespace, podName);
+  }
+
+  /**
+   * DELETE
+   */
+  async deleteAsync(pod) {
+    try {
+      const params = new KubernetesCommonParams();
+      params.id = pod.Name;
+      const namespace = pod.Namespace;
+      await this.KubernetesPods(namespace).delete(params).$promise
+    } catch (err) {
+      throw new PortainerError('Unable to remove pod', err);
+    }
+  }
+
+  delete(pod) {
+    return this.$async(this.deleteAsync, pod);
   }
 }
 
