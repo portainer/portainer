@@ -1,5 +1,9 @@
 <rd-header>
-  <rd-header-title title-text="Edit Edge stack"></rd-header-title>
+  <rd-header-title title-text="Edit Edge stack">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="edge.stacks.edit({stackId:$ctrl.stack.Id, tab: $ctrl.state.activeTab})" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
   <rd-header-content> <a ui-sref="edge.stacks">Edge Stacks</a> &gt; {{ $ctrl.stack.Name }} </rd-header-content>
 </rd-header>
 
@@ -7,8 +11,7 @@
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-body classes="no-padding">
-
-        <uib-tabset active="state.activeTab" justified="true" type="pills">
+        <uib-tabset active="$ctrl.state.activeTab" justified="true" type="pills">
           <uib-tab index="0" classes="btn-sm">
             <uib-tab-heading> <i class="fa fa-layer-group space-right" aria-hidden="true"></i> Stack</uib-tab-heading>
 
