@@ -157,45 +157,6 @@ func loadSnapshotSystemSchedule(jobScheduler portainer.JobScheduler, snapshotter
 	return nil
 }
 
-func loadEndpointSyncSystemSchedule(jobScheduler portainer.JobScheduler, scheduleService portainer.ScheduleService, endpointService portainer.EndpointService, flags *portainer.CLIFlags) error {
-	if *flags.ExternalEndpoints == "" {
-		return nil
-	}
-
-	log.Println("Using external endpoint definition. Endpoint management via the API will be disabled.")
-
-	schedules, err := scheduleService.SchedulesByJobType(portainer.EndpointSyncJobType)
-	if err != nil {
-		return err
-	}
-
-	if len(schedules) != 0 {
-		return nil
-	}
-
-	endpointSyncJob := &portainer.EndpointSyncJob{}
-
-	endpointSyncSchedule := &portainer.Schedule{
-		ID:              portainer.ScheduleID(scheduleService.GetNextIdentifier()),
-		Name:            "system_endpointsync",
-		CronExpression:  "@every " + *flags.SyncInterval,
-		Recurring:       true,
-		JobType:         portainer.EndpointSyncJobType,
-		EndpointSyncJob: endpointSyncJob,
-		Created:         time.Now().Unix(),
-	}
-
-	endpointSyncJobContext := cron.NewEndpointSyncJobContext(endpointService, *flags.ExternalEndpoints)
-	endpointSyncJobRunner := cron.NewEndpointSyncJobRunner(endpointSyncSchedule, endpointSyncJobContext)
-
-	err = jobScheduler.ScheduleJob(endpointSyncJobRunner)
-	if err != nil {
-		return err
-	}
-
-	return scheduleService.CreateSchedule(endpointSyncSchedule)
-}
-
 func loadSchedulesFromDatabase(jobScheduler portainer.JobScheduler, jobService portainer.JobService, scheduleService portainer.ScheduleService, endpointService portainer.EndpointService, fileService portainer.FileService, reverseTunnelService portainer.ReverseTunnelService) error {
 	schedules, err := scheduleService.Schedules()
 	if err != nil {
@@ -225,12 +186,11 @@ func loadSchedulesFromDatabase(jobScheduler portainer.JobScheduler, jobService p
 	return nil
 }
 
-func initStatus(endpointManagement bool, flags *portainer.CLIFlags) *portainer.Status {
+func initStatus(flags *portainer.CLIFlags) *portainer.Status {
 	return &portainer.Status{
-		Analytics:          !*flags.NoAnalytics,
-		Authentication:     !*flags.NoAuth,
-		EndpointManagement: endpointManagement,
-		Version:            portainer.APIVersion,
+		Analytics:      !*flags.NoAnalytics,
+		Authentication: !*flags.NoAuth,
+		Version:        portainer.APIVersion,
 	}
 }
 
@@ -460,11 +420,6 @@ func main() {
 
 	snapshotter := initSnapshotter(clientFactory)
 
-	endpointManagement := true
-	if *flags.ExternalEndpoints != "" {
-		endpointManagement = false
-	}
-
 	swarmStackManager, err := initSwarmStackManager(*flags.Assets, *flags.Data, digitalSignatureService, fileService, reverseTunnelService)
 	if err != nil {
 		log.Fatal(err)
@@ -486,11 +441,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = loadEndpointSyncSystemSchedule(jobScheduler, store.ScheduleService, store.EndpointService, flags)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	err = loadSnapshotSystemSchedule(jobScheduler, snapshotter, store.ScheduleService, store.EndpointService, store.SettingsService)
 	if err != nil {
 		log.Fatal(err)
@@ -498,7 +448,7 @@ func main() {
 
 	jobScheduler.Start()
 
-	applicationStatus := initStatus(endpointManagement, flags)
+	applicationStatus := initStatus(flags)
 
 	err = initEndpoint(flags, store.EndpointService, snapshotter)
 	if err != nil {
@@ -557,7 +507,6 @@ func main() {
 		BindAddress:             *flags.Addr,
 		AssetsPath:              *flags.Assets,
 		AuthDisabled:            *flags.NoAuth,
-		EndpointManagement:      endpointManagement,
 		RoleService:             store.RoleService,
 		UserService:             store.UserService,
 		TeamService:             store.TeamService,
