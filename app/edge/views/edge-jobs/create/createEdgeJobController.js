@@ -2,7 +2,7 @@ import { ScheduleDefaultModel } from 'Portainer/models/schedule';
 
 angular
   .module('portainer.edge')
-  .controller('CreateScheduleController', function CreateScheduleController($q, $scope, $state, Notifications, EndpointService, GroupService, ScheduleService, TagService) {
+  .controller('CreateEdgeJobController', function CreateEdgeJobController($q, $scope, $state, Notifications, EndpointService, GroupService, ScheduleService, TagService) {
     $scope.state = {
       actionInProgress: false,
     };

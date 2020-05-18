@@ -1,8 +1,8 @@
-import ScheduleFormController from './scheduleFormController';
+import EdgeJobFormController from './edgeJobFormController';
 
-angular.module('portainer.app').component('scheduleForm', {
-  templateUrl: './scheduleForm.html',
-  controller: ScheduleFormController,
+angular.module('portainer.edge').component('edgeJobForm', {
+  templateUrl: './edgeJobForm.html',
+  controller: EdgeJobFormController,
   bindings: {
     model: '=',
     endpoints: '<',

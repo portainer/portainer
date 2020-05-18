@@ -71,6 +71,39 @@ angular.module('portainer.edge', []).config(function config($stateRegistryProvid
     },
   };
 
+  var edgeJobs = {
+    name: 'portainer.edgeJobs',
+    url: '/edgeJobs',
+    views: {
+      'content@': {
+        templateUrl: './views/edge-jobs/edgeJobs.html',
+        controller: 'EdgeJobsController',
+      },
+    },
+  };
+
+  var edgeJob = {
+    name: 'portainer.edgeJobs.edgeJob',
+    url: '/:id',
+    views: {
+      'content@': {
+        templateUrl: './views/edge-jobs/edit/edgeJob.html',
+        controller: 'EdgeJobController',
+      },
+    },
+  };
+
+  var edgeJobCreation = {
+    name: 'portainer.edgeJobs.new',
+    url: '/new',
+    views: {
+      'content@': {
+        templateUrl: './views/edge-jobs/create/createEdgeJob.html',
+        controller: 'CreateEdgeJobController',
+      },
+    },
+  };
+
   $stateRegistryProvider.register(edge);
 
   $stateRegistryProvider.register(groups);
@@ -80,4 +113,8 @@ angular.module('portainer.edge', []).config(function config($stateRegistryProvid
   $stateRegistryProvider.register(stacks);
   $stateRegistryProvider.register(stacksNew);
   $stateRegistryProvider.register(stacksEdit);
+
+  $stateRegistryProvider.register(edgeJobs);
+  $stateRegistryProvider.register(edgeJob);
+  $stateRegistryProvider.register(edgeJobCreation);
 });

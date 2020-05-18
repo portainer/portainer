@@ -1,6 +1,6 @@
 angular
   .module('portainer.edge')
-  .controller('ScheduleController', function ScheduleController(
+  .controller('EdgeJobController', function EdgeJobController(
     $q,
     $scope,
     $transition$,

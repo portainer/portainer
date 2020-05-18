@@ -1,6 +1,8 @@
-angular.module('portainer.app').component('schedulesDatatable', {
-  templateUrl: './schedulesDatatable.html',
-  controller: 'SchedulesDatatableController',
+import angular from 'angular';
+
+angular.module('portainer.edge').component('edgeJobsDatatable', {
+  templateUrl: './edgeJobsDatatable.html',
+  controller: 'EdgeJobsDatatableController',
   bindings: {
     titleText: '@',
     titleIcon: '@',
