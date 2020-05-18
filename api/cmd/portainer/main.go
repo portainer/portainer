@@ -157,45 +157,6 @@ func loadSnapshotSystemSchedule(jobScheduler portainer.JobScheduler, snapshotter
 	return nil
 }
 
-func loadEndpointSyncSystemSchedule(jobScheduler portainer.JobScheduler, scheduleService portainer.ScheduleService, endpointService portainer.EndpointService, flags *portainer.CLIFlags) error {
-	if *flags.ExternalEndpoints == "" {
-		return nil
-	}
-
-	log.Println("Using external endpoint definition. Endpoint management via the API will be disabled.")
-
-	schedules, err := scheduleService.SchedulesByJobType(portainer.EndpointSyncJobType)
-	if err != nil {
-		return err
-	}
-
-	if len(schedules) != 0 {
-		return nil
-	}
-
-	endpointSyncJob := &portainer.EndpointSyncJob{}
-
-	endpointSyncSchedule := &portainer.Schedule{
-		ID:              portainer.ScheduleID(scheduleService.GetNextIdentifier()),
-		Name:            "system_endpointsync",
-		CronExpression:  "@every " + *flags.SyncInterval,
-		Recurring:       true,
-		JobType:         portainer.EndpointSyncJobType,
-		EndpointSyncJob: endpointSyncJob,
-		Created:         time.Now().Unix(),
-	}
-
-	endpointSyncJobContext := cron.NewEndpointSyncJobContext(endpointService, *flags.ExternalEndpoints)
-	endpointSyncJobRunner := cron.NewEndpointSyncJobRunner(endpointSyncSchedule, endpointSyncJobContext)
-
-	err = jobScheduler.ScheduleJob(endpointSyncJobRunner)
-	if err != nil {
-		return err
-	}
-
-	return scheduleService.CreateSchedule(endpointSyncSchedule)
-}
-
 func loadSchedulesFromDatabase(jobScheduler portainer.JobScheduler, jobService portainer.JobService, scheduleService portainer.ScheduleService, endpointService portainer.EndpointService, fileService portainer.FileService, reverseTunnelService portainer.ReverseTunnelService) error {
 	schedules, err := scheduleService.Schedules()
 	if err != nil {
@@ -461,9 +422,6 @@ func main() {
 	snapshotter := initSnapshotter(clientFactory)
 
 	endpointManagement := true
-	if *flags.ExternalEndpoints != "" {
-		endpointManagement = false
-	}
 
 	swarmStackManager, err := initSwarmStackManager(*flags.Assets, *flags.Data, digitalSignatureService, fileService, reverseTunnelService)
 	if err != nil {
@@ -482,11 +440,6 @@ func main() {
 	jobScheduler := initJobScheduler()
 
 	err = loadSchedulesFromDatabase(jobScheduler, jobService, store.ScheduleService, store.EndpointService, fileService, reverseTunnelService)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = loadEndpointSyncSystemSchedule(jobScheduler, store.ScheduleService, store.EndpointService, flags)
 	if err != nil {
 		log.Fatal(err)
 	}
