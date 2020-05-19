@@ -143,6 +143,7 @@ func (store *Store) MigrateData() error {
 			UserService:             store.UserService,
 			VersionService:          store.VersionService,
 			FileService:             store.fileService,
+			AuthorizationService:    portainer.NewAuthorizationService(store),
 		}
 		migrator := migrator.NewMigrator(migratorParams)
 

@@ -268,7 +268,7 @@ func (handler *Handler) addAndPersistSchedule(schedule *portainer.Schedule, file
 
 	schedule.ScriptExecutionJob.ScriptPath = scriptPath
 
-	jobContext := cron.NewScriptExecutionJobContext(handler.JobService, handler.DataStore.Endpoint(), handler.FileService)
+	jobContext := cron.NewScriptExecutionJobContext(handler.JobService, handler.DataStore, handler.FileService)
 	jobRunner := cron.NewScriptExecutionJobRunner(schedule, jobContext)
 
 	err = handler.JobScheduler.ScheduleJob(jobRunner)

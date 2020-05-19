@@ -55,7 +55,7 @@ func (handler *Handler) registryCreate(w http.ResponseWriter, r *http.Request) *
 		Gitlab:             payload.Gitlab,
 	}
 
-	err = handler.RegistryService.CreateRegistry(registry)
+	err = handler.DataStore.Registry().CreateRegistry(registry)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the registry inside the database", err}
 	}

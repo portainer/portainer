@@ -24,36 +24,22 @@ type (
 	// Transport is a custom transport for Docker API reverse proxy. It allows
 	// interception of requests and rewriting of responses.
 	Transport struct {
-		HTTPTransport          *http.Transport
-		endpoint               *portainer.Endpoint
-		resourceControlService portainer.ResourceControlService
-		userService            portainer.UserService
-		teamService            portainer.TeamService
-		teamMembershipService  portainer.TeamMembershipService
-		registryService        portainer.RegistryService
-		dockerHubService       portainer.DockerHubService
-		settingsService        portainer.SettingsService
-		signatureService       portainer.DigitalSignatureService
-		reverseTunnelService   portainer.ReverseTunnelService
-		extensionService       portainer.ExtensionService
-		dockerClient           *client.Client
-		dockerClientFactory    *docker.ClientFactory
+		HTTPTransport        *http.Transport
+		endpoint             *portainer.Endpoint
+		dataStore            portainer.DataStore
+		signatureService     portainer.DigitalSignatureService
+		reverseTunnelService portainer.ReverseTunnelService
+		dockerClient         *client.Client
+		dockerClientFactory  *docker.ClientFactory
 	}
 
 	// TransportParameters is used to create a new Transport
 	TransportParameters struct {
-		Endpoint               *portainer.Endpoint
-		ResourceControlService portainer.ResourceControlService
-		UserService            portainer.UserService
-		TeamService            portainer.TeamService
-		TeamMembershipService  portainer.TeamMembershipService
-		RegistryService        portainer.RegistryService
-		DockerHubService       portainer.DockerHubService
-		SettingsService        portainer.SettingsService
-		SignatureService       portainer.DigitalSignatureService
-		ReverseTunnelService   portainer.ReverseTunnelService
-		ExtensionService       portainer.ExtensionService
-		DockerClientFactory    *docker.ClientFactory
+		Endpoint             *portainer.Endpoint
+		DataStore            portainer.DataStore
+		SignatureService     portainer.DigitalSignatureService
+		ReverseTunnelService portainer.ReverseTunnelService
+		DockerClientFactory  *docker.ClientFactory
 	}
 
 	restrictedDockerOperationContext struct {
@@ -80,20 +66,13 @@ func NewTransport(parameters *TransportParameters, httpTransport *http.Transport
 	}
 
 	transport := &Transport{
-		endpoint:               parameters.Endpoint,
-		resourceControlService: parameters.ResourceControlService,
-		userService:            parameters.UserService,
-		teamService:            parameters.TeamService,
-		teamMembershipService:  parameters.TeamMembershipService,
-		registryService:        parameters.RegistryService,
-		dockerHubService:       parameters.DockerHubService,
-		settingsService:        parameters.SettingsService,
-		signatureService:       parameters.SignatureService,
-		reverseTunnelService:   parameters.ReverseTunnelService,
-		extensionService:       parameters.ExtensionService,
-		dockerClientFactory:    parameters.DockerClientFactory,
-		HTTPTransport:          httpTransport,
-		dockerClient:           dockerClient,
+		endpoint:             parameters.Endpoint,
+		dataStore:            parameters.DataStore,
+		signatureService:     parameters.SignatureService,
+		reverseTunnelService: parameters.ReverseTunnelService,
+		dockerClientFactory:  parameters.DockerClientFactory,
+		HTTPTransport:        httpTransport,
+		dockerClient:         dockerClient,
 	}
 
 	return transport, nil
@@ -429,18 +408,18 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 	}
 
 	if tokenData.Role != portainer.AdministratorRole {
-		rbacExtension, err := transport.extensionService.Extension(portainer.RBACExtension)
+		rbacExtension, err := transport.dataStore.Extension().Extension(portainer.RBACExtension)
 		if err != nil && err != portainer.ErrObjectNotFound {
 			return nil, err
 		}
 
-		user, err := transport.userService.User(tokenData.ID)
+		user, err := transport.dataStore.User().User(tokenData.ID)
 		if err != nil {
 			return nil, err
 		}
 
 		if volumeBrowseRestrictionCheck {
-			settings, err := transport.settingsService.Settings()
+			settings, err := transport.dataStore.Settings().Settings()
 			if err != nil {
 				return nil, err
 			}
@@ -468,7 +447,7 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 			return transport.executeDockerRequest(request)
 		}
 
-		teamMemberships, err := transport.teamMembershipService.TeamMembershipsByUserID(tokenData.ID)
+		teamMemberships, err := transport.dataStore.TeamMembership().TeamMembershipsByUserID(tokenData.ID)
 		if err != nil {
 			return nil, err
 		}
@@ -478,7 +457,7 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 			userTeamIDs = append(userTeamIDs, membership.TeamID)
 		}
 
-		resourceControls, err := transport.resourceControlService.ResourceControls()
+		resourceControls, err := transport.dataStore.ResourceControl().ResourceControls()
 		if err != nil {
 			return nil, err
 		}
@@ -516,7 +495,7 @@ func (transport *Transport) rewriteOperationWithLabelFiltering(request *http.Req
 		return nil, err
 	}
 
-	settings, err := transport.settingsService.Settings()
+	settings, err := transport.dataStore.Settings().Settings()
 	if err != nil {
 		return nil, err
 	}
@@ -610,13 +589,13 @@ func (transport *Transport) executeGenericResourceDeletionOperation(request *htt
 		return response, err
 	}
 
-	resourceControl, err := transport.resourceControlService.ResourceControlByResourceIDAndType(resourceIdentifierAttribute, resourceType)
+	resourceControl, err := transport.dataStore.ResourceControl().ResourceControlByResourceIDAndType(resourceIdentifierAttribute, resourceType)
 	if err != nil {
 		return response, err
 	}
 
 	if resourceControl != nil {
-		err = transport.resourceControlService.DeleteResourceControl(resourceControl.ID)
+		err = transport.dataStore.ResourceControl().DeleteResourceControl(resourceControl.ID)
 		if err != nil {
 			return response, err
 		}
@@ -661,13 +640,13 @@ func (transport *Transport) createRegistryAccessContext(request *http.Request) (
 		userID:  tokenData.ID,
 	}
 
-	hub, err := transport.dockerHubService.DockerHub()
+	hub, err := transport.dataStore.DockerHub().DockerHub()
 	if err != nil {
 		return nil, err
 	}
 	accessContext.dockerHub = hub
 
-	registries, err := transport.registryService.Registries()
+	registries, err := transport.dataStore.Registry().Registries()
 	if err != nil {
 		return nil, err
 	}
@@ -676,7 +655,7 @@ func (transport *Transport) createRegistryAccessContext(request *http.Request) (
 	if tokenData.Role != portainer.AdministratorRole {
 		accessContext.isAdmin = false
 
-		teamMemberships, err := transport.teamMembershipService.TeamMembershipsByUserID(tokenData.ID)
+		teamMemberships, err := transport.dataStore.TeamMembership().TeamMembershipsByUserID(tokenData.ID)
 		if err != nil {
 			return nil, err
 		}
@@ -694,7 +673,7 @@ func (transport *Transport) createOperationContext(request *http.Request) (*rest
 		return nil, err
 	}
 
-	resourceControls, err := transport.resourceControlService.ResourceControls()
+	resourceControls, err := transport.dataStore.ResourceControl().ResourceControls()
 	if err != nil {
 		return nil, err
 	}
@@ -709,7 +688,7 @@ func (transport *Transport) createOperationContext(request *http.Request) (*rest
 	if tokenData.Role != portainer.AdministratorRole {
 		operationContext.isAdmin = false
 
-		user, err := transport.userService.User(operationContext.userID)
+		user, err := transport.dataStore.User().User(operationContext.userID)
 		if err != nil {
 			return nil, err
 		}
@@ -719,7 +698,7 @@ func (transport *Transport) createOperationContext(request *http.Request) (*rest
 			operationContext.endpointResourceAccess = true
 		}
 
-		teamMemberships, err := transport.teamMembershipService.TeamMembershipsByUserID(tokenData.ID)
+		teamMemberships, err := transport.dataStore.TeamMembership().TeamMembershipsByUserID(tokenData.ID)
 		if err != nil {
 			return nil, err
 		}

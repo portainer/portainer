@@ -296,7 +296,7 @@ func (handler *Handler) createComposeDeployConfig(r *http.Request, stack *portai
 		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve DockerHub details from the database", err}
 	}
 
-	registries, err := handler.RegistryService.Registries()
+	registries, err := handler.DataStore.Registry().Registries()
 	if err != nil {
 		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
 	}

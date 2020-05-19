@@ -17,7 +17,7 @@ func (handler *Handler) proxyRequestsToGitlabAPIWithRegistry(w http.ResponseWrit
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid registry identifier route variable", err}
 	}
 
-	registry, err := handler.RegistryService.Registry(portainer.RegistryID(registryID))
+	registry, err := handler.DataStore.Registry().Registry(portainer.RegistryID(registryID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a registry with the specified identifier inside the database", err}
 	} else if err != nil {

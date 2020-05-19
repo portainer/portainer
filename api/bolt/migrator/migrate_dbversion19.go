@@ -7,17 +7,7 @@ import (
 )
 
 func (m *Migrator) updateUsersToDBVersion20() error {
-	authorizationServiceParameters := &portainer.AuthorizationServiceParameters{
-		EndpointService:       m.endpointService,
-		EndpointGroupService:  m.endpointGroupService,
-		RegistryService:       m.registryService,
-		RoleService:           m.roleService,
-		TeamMembershipService: m.teamMembershipService,
-		UserService:           m.userService,
-	}
-
-	authorizationService := portainer.NewAuthorizationService(authorizationServiceParameters)
-	return authorizationService.UpdateUsersAuthorizations()
+	return m.authorizationService.UpdateUsersAuthorizations()
 }
 
 func (m *Migrator) updateSettingsToDBVersion20() error {
