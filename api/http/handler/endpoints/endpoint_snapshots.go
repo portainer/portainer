@@ -17,10 +17,6 @@ func (handler *Handler) endpointSnapshots(w http.ResponseWriter, r *http.Request
 	}
 
 	for _, endpoint := range endpoints {
-		if endpoint.Type == portainer.AzureEnvironment {
-			continue
-		}
-
 		snapshot, snapshotError := handler.Snapshotter.CreateSnapshot(&endpoint)
 
 		latestEndpointReference, err := handler.EndpointService.Endpoint(endpoint.ID)

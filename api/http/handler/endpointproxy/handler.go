@@ -24,8 +24,6 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		Router:         mux.NewRouter(),
 		requestBouncer: bouncer,
 	}
-	h.PathPrefix("/{id}/azure").Handler(
-		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.proxyRequestsToAzureAPI)))
 	h.PathPrefix("/{id}/docker").Handler(
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.proxyRequestsToDockerAPI)))
 	h.PathPrefix("/{id}/storidge").Handler(

@@ -26,9 +26,7 @@ angular
     };
 
     $scope.goToDashboard = function (endpoint) {
-      if (endpoint.Type === 3) {
-        return switchToAzureEndpoint(endpoint);
-      } else if (endpoint.Type === 4) {
+      if (endpoint.Type === 4) {
         return switchToEdgeEndpoint(endpoint);
       }
 
@@ -87,19 +85,6 @@ angular
         });
 
       return deferred.promise;
-    }
-
-    function switchToAzureEndpoint(endpoint) {
-      EndpointProvider.setEndpointID(endpoint.Id);
-      EndpointProvider.setEndpointPublicURL(endpoint.PublicURL);
-      EndpointProvider.setOfflineModeFromStatus(endpoint.Status);
-      StateManager.updateEndpointState(endpoint, [])
-        .then(function success() {
-          $state.go('azure.dashboard');
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to connect to the Azure endpoint');
-        });
     }
 
     function switchToEdgeEndpoint(endpoint) {
