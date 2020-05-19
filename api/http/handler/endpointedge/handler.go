@@ -13,10 +13,9 @@ import (
 // Handler is the HTTP handler used to handle edge endpoint operations.
 type Handler struct {
 	*mux.Router
-	requestBouncer   *security.RequestBouncer
-	EndpointService  portainer.EndpointService
-	EdgeStackService portainer.EdgeStackService
-	FileService      portainer.FileService
+	requestBouncer *security.RequestBouncer
+	DataStore      portainer.DataStore
+	FileService    portainer.FileService
 }
 
 // NewHandler creates a handler to manage endpoint operations.

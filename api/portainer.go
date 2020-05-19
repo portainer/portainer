@@ -75,8 +75,11 @@ type (
 		MigrateData() error
 
 		DockerHub() DockerHubService
-		EndpointGroup() EndpointGroupService
+		EdgeGroup() EdgeGroupService
+		EdgeStack() EdgeStackService
 		Endpoint() EndpointService
+		EndpointGroup() EndpointGroupService
+		EndpointRelation() EndpointRelationService
 		Extension() ExtensionService
 		Registry() RegistryService
 		ResourceControl() ResourceControlService

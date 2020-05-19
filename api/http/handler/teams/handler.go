@@ -12,9 +12,8 @@ import (
 // Handler is the HTTP handler used to handle team operations.
 type Handler struct {
 	*mux.Router
-	TeamService           portainer.TeamService
-	TeamMembershipService portainer.TeamMembershipService
-	AuthorizationService  *portainer.AuthorizationService
+	DataStore            portainer.DataStore
+	AuthorizationService *portainer.AuthorizationService
 }
 
 // NewHandler creates a handler to manage team operations.

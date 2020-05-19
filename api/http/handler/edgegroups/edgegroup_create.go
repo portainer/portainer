@@ -38,7 +38,7 @@ func (handler *Handler) edgeGroupCreate(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	edgeGroups, err := handler.EdgeGroupService.EdgeGroups()
+	edgeGroups, err := handler.DataStore.EdgeGroup().EdgeGroups()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve Edge groups from the database", err}
 	}
@@ -62,7 +62,7 @@ func (handler *Handler) edgeGroupCreate(w http.ResponseWriter, r *http.Request) 
 	} else {
 		endpointIDs := []portainer.EndpointID{}
 		for _, endpointID := range payload.Endpoints {
-			endpoint, err := handler.EndpointService.Endpoint(endpointID)
+			endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint from the database", err}
 			}
@@ -74,7 +74,7 @@ func (handler *Handler) edgeGroupCreate(w http.ResponseWriter, r *http.Request) 
 		edgeGroup.Endpoints = endpointIDs
 	}
 
-	err = handler.EdgeGroupService.CreateEdgeGroup(edgeGroup)
+	err = handler.DataStore.EdgeGroup().CreateEdgeGroup(edgeGroup)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the Edge group inside the database", err}
 	}

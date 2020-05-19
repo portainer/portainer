@@ -117,7 +117,7 @@ func (payload *scheduleCreateFromFileContentPayload) Validate(r *http.Request) e
 
 // POST /api/schedules?method=file|string
 func (handler *Handler) scheduleCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	settings, err := handler.SettingsService.Settings()
+	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusServiceUnavailable, "Unable to retrieve settings", err}
 	}
@@ -175,7 +175,7 @@ func (handler *Handler) createScheduleFromFile(w http.ResponseWriter, r *http.Re
 }
 
 func (handler *Handler) createScheduleObjectFromFilePayload(payload *scheduleCreateFromFilePayload) *portainer.Schedule {
-	scheduleIdentifier := portainer.ScheduleID(handler.ScheduleService.GetNextIdentifier())
+	scheduleIdentifier := portainer.ScheduleID(handler.DataStore.Schedule().GetNextIdentifier())
 
 	job := &portainer.ScriptExecutionJob{
 		Endpoints:     payload.Endpoints,
@@ -198,7 +198,7 @@ func (handler *Handler) createScheduleObjectFromFilePayload(payload *scheduleCre
 }
 
 func (handler *Handler) createScheduleObjectFromFileContentPayload(payload *scheduleCreateFromFileContentPayload) *portainer.Schedule {
-	scheduleIdentifier := portainer.ScheduleID(handler.ScheduleService.GetNextIdentifier())
+	scheduleIdentifier := portainer.ScheduleID(handler.DataStore.Schedule().GetNextIdentifier())
 
 	job := &portainer.ScriptExecutionJob{
 		Endpoints:     payload.Endpoints,
@@ -231,7 +231,7 @@ func (handler *Handler) addAndPersistSchedule(schedule *portainer.Schedule, file
 
 	for _, ID := range schedule.ScriptExecutionJob.Endpoints {
 
-		endpoint, err := handler.EndpointService.Endpoint(ID)
+		endpoint, err := handler.DataStore.Endpoint().Endpoint(ID)
 		if err != nil {
 			return err
 		}
@@ -268,7 +268,7 @@ func (handler *Handler) addAndPersistSchedule(schedule *portainer.Schedule, file
 
 	schedule.ScriptExecutionJob.ScriptPath = scriptPath
 
-	jobContext := cron.NewScriptExecutionJobContext(handler.JobService, handler.EndpointService, handler.FileService)
+	jobContext := cron.NewScriptExecutionJobContext(handler.JobService, handler.DataStore.Endpoint(), handler.FileService)
 	jobRunner := cron.NewScriptExecutionJobRunner(schedule, jobContext)
 
 	err = handler.JobScheduler.ScheduleJob(jobRunner)
@@ -276,5 +276,5 @@ func (handler *Handler) addAndPersistSchedule(schedule *portainer.Schedule, file
 		return err
 	}
 
-	return handler.ScheduleService.CreateSchedule(schedule)
+	return handler.DataStore.Schedule().CreateSchedule(schedule)
 }

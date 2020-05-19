@@ -286,14 +286,29 @@ func (store *Store) DockerHub() portainer.DockerHubService {
 	return store.DockerHubService
 }
 
-// EndpointGroup gives access to the EndpointGroup data management layer
-func (store *Store) EndpointGroup() portainer.EndpointGroupService {
-	return store.EndpointGroupService
+// EdgeGroup gives access to the EdgeGroup data management layer
+func (store *Store) EdgeGroup() portainer.EdgeGroupService {
+	return store.EdgeGroupService
+}
+
+// EdgeStack gives access to the EdgeStack data management layer
+func (store *Store) EdgeStack() portainer.EdgeStackService {
+	return store.EdgeStackService
 }
 
 // Endpoint gives access to the Endpoint data management layer
 func (store *Store) Endpoint() portainer.EndpointService {
 	return store.EndpointService
+}
+
+// EndpointGroup gives access to the EndpointGroup data management layer
+func (store *Store) EndpointGroup() portainer.EndpointGroupService {
+	return store.EndpointGroupService
+}
+
+// EndpointRelation gives access to the EndpointRelation data management layer
+func (store *Store) EndpointRelation() portainer.EndpointRelationService {
+	return store.EndpointRelationService
 }
 
 // Extension gives access to the Extension data management layer

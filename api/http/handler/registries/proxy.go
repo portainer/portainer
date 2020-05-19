@@ -29,7 +29,7 @@ func (handler *Handler) proxyRequestsToRegistryAPI(w http.ResponseWriter, r *htt
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access registry", portainer.ErrEndpointAccessDenied}
 	}
 
-	extension, err := handler.ExtensionService.Extension(portainer.RegistryManagementExtension)
+	extension, err := handler.DataStore.Extension().Extension(portainer.RegistryManagementExtension)
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Registry management extension is not enabled", err}
 	} else if err != nil {

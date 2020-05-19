@@ -43,12 +43,12 @@ func (handler *Handler) endpointGroupCreate(w http.ResponseWriter, r *http.Reque
 		TagIDs:             payload.TagIDs,
 	}
 
-	err = handler.EndpointGroupService.CreateEndpointGroup(endpointGroup)
+	err = handler.DataStore.EndpointGroup().CreateEndpointGroup(endpointGroup)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the endpoint group inside the database", err}
 	}
 
-	endpoints, err := handler.EndpointService.Endpoints()
+	endpoints, err := handler.DataStore.Endpoint().Endpoints()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
 	}
@@ -58,7 +58,7 @@ func (handler *Handler) endpointGroupCreate(w http.ResponseWriter, r *http.Reque
 			if endpoint.ID == id {
 				endpoint.GroupID = endpointGroup.ID
 
-				err := handler.EndpointService.UpdateEndpoint(endpoint.ID, &endpoint)
+				err := handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, &endpoint)
 				if err != nil {
 					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint", err}
 				}
@@ -74,14 +74,14 @@ func (handler *Handler) endpointGroupCreate(w http.ResponseWriter, r *http.Reque
 	}
 
 	for _, tagID := range endpointGroup.TagIDs {
-		tag, err := handler.TagService.Tag(tagID)
+		tag, err := handler.DataStore.Tag().Tag(tagID)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve tag from the database", err}
 		}
 
 		tag.EndpointGroups[endpointGroup.ID] = true
 
-		err = handler.TagService.UpdateTag(tagID, tag)
+		err = handler.DataStore.Tag().UpdateTag(tagID, tag)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist tag changes inside the database", err}
 		}

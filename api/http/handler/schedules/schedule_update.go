@@ -33,7 +33,7 @@ func (payload *scheduleUpdatePayload) Validate(r *http.Request) error {
 }
 
 func (handler *Handler) scheduleUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	settings, err := handler.SettingsService.Settings()
+	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusServiceUnavailable, "Unable to retrieve settings", err}
 	}
@@ -52,7 +52,7 @@ func (handler *Handler) scheduleUpdate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	schedule, err := handler.ScheduleService.Schedule(portainer.ScheduleID(scheduleID))
+	schedule, err := handler.DataStore.Schedule().Schedule(portainer.ScheduleID(scheduleID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a schedule with the specified identifier inside the database", err}
 	} else if err != nil {
@@ -78,7 +78,7 @@ func (handler *Handler) scheduleUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if updateJobSchedule {
-		jobContext := cron.NewScriptExecutionJobContext(handler.JobService, handler.EndpointService, handler.FileService)
+		jobContext := cron.NewScriptExecutionJobContext(handler.JobService, handler.DataStore.Endpoint(), handler.FileService)
 		jobRunner := cron.NewScriptExecutionJobRunner(schedule, jobContext)
 		err := handler.JobScheduler.UpdateJobSchedule(jobRunner)
 		if err != nil {
@@ -86,7 +86,7 @@ func (handler *Handler) scheduleUpdate(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
-	err = handler.ScheduleService.UpdateSchedule(portainer.ScheduleID(scheduleID), schedule)
+	err = handler.DataStore.Schedule().UpdateSchedule(portainer.ScheduleID(scheduleID), schedule)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist schedule changes inside the database", err}
 	}
@@ -104,7 +104,7 @@ func (handler *Handler) updateEdgeSchedule(schedule *portainer.Schedule, payload
 		edgeEndpointIDs := make([]portainer.EndpointID, 0)
 
 		for _, ID := range payload.Endpoints {
-			endpoint, err := handler.EndpointService.Endpoint(ID)
+			endpoint, err := handler.DataStore.Endpoint().Endpoint(ID)
 			if err != nil {
 				return err
 			}

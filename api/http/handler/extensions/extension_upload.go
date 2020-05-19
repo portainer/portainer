@@ -66,7 +66,7 @@ func (handler *Handler) extensionUpload(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
-	err = handler.ExtensionService.Persist(extension)
+	err = handler.DataStore.Extension().Persist(extension)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist extension status inside the database", err}
 	}
