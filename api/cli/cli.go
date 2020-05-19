@@ -19,7 +19,6 @@ type Service struct{}
 const (
 	errInvalidEndpointProtocol       = portainer.Error("Invalid endpoint protocol: Portainer only supports unix://, npipe:// or tcp://")
 	errSocketOrNamedPipeNotFound     = portainer.Error("Unable to locate Unix socket or named pipe")
-	errEndpointsFileNotFound         = portainer.Error("Unable to locate external endpoints file")
 	errInvalidSnapshotInterval       = portainer.Error("Invalid snapshot interval")
 	errNoAuthExcludeAdminPassword    = portainer.Error("Cannot use --no-auth with --admin-password or --admin-password-file")
 	errAdminPassExcludeAdminPassFile = portainer.Error("Cannot use --admin-password with --admin-password-file")
