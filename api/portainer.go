@@ -25,7 +25,7 @@ type (
 	Authorizations map[Authorization]bool
 
 	// AzureCredentials represents the credentials used to connect to an Azure
-	// environment.
+	// environment (deprecated).
 	AzureCredentials struct {
 		ApplicationID     string `json:"ApplicationID"`
 		TenantID          string `json:"TenantID"`
@@ -140,7 +140,6 @@ type (
 		PublicURL          string              `json:"PublicURL"`
 		TLSConfig          TLSConfiguration    `json:"TLSConfig"`
 		Extensions         []EndpointExtension `json:"Extensions"`
-		AzureCredentials   AzureCredentials    `json:"AzureCredentials,omitempty"`
 		TagIDs             []TagID             `json:"TagIds"`
 		Status             EndpointStatus      `json:"Status"`
 		Snapshots          []Snapshot          `json:"Snapshots"`
@@ -161,6 +160,9 @@ type (
 
 		// Deprecated in DBVersion == 22
 		Tags []string `json:"Tags"`
+
+		// Deprecated in DBVersion == 24
+		AzureCredentials AzureCredentials `json:"AzureCredentials,omitempty"`
 	}
 
 	// EndpointAuthorizations represents the authorizations associated to a set of endpoints
@@ -1000,7 +1002,7 @@ const (
 	// APIVersion is the version number of the Portainer API
 	APIVersion = "1.24.1-dev"
 	// DBVersion is the version number of the Portainer database
-	DBVersion = 23
+	DBVersion = 24
 	// AssetsServerURL represents the URL of the Portainer asset server
 	AssetsServerURL = "https://portainer-io-assets.sfo2.digitaloceanspaces.com"
 	// MessageOfTheDayURL represents the URL where Portainer MOTD message can be retrieved
@@ -1074,7 +1076,7 @@ const (
 	DockerEnvironment
 	// AgentOnDockerEnvironment represents an endpoint connected to a Portainer agent deployed on a Docker environment
 	AgentOnDockerEnvironment
-	// AzureEnvironment represents an endpoint connected to an Azure environment
+	// AzureEnvironment represents an endpoint connected to an Azure environment (deprecated)
 	AzureEnvironment
 	// EdgeAgentEnvironment represents an endpoint connected to an Edge agent
 	EdgeAgentEnvironment
