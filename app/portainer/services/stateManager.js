@@ -168,14 +168,6 @@ angular.module('portainer.app').factory('StateManager', [
     manager.updateEndpointState = function (endpoint, extensions) {
       var deferred = $q.defer();
 
-      if (endpoint.Type === 3) {
-        state.endpoint.name = endpoint.Name;
-        state.endpoint.mode = { provider: 'AZURE' };
-        LocalStorage.storeEndpointState(state.endpoint);
-        deferred.resolve();
-        return deferred.promise;
-      }
-
       $q.all({
         version: endpoint.Status === 1 ? SystemService.version() : $q.when(endpoint.Snapshots[0].SnapshotRaw.Version),
         info: endpoint.Status === 1 ? SystemService.info() : $q.when(endpoint.Snapshots[0].SnapshotRaw.Info),

@@ -236,10 +236,6 @@ a[ng-click] {
   margin: 10px 4px 0 6px;
 }
 
-.blocklist-item-logo.endpoint-item.azure {
-  margin: 0 0 0 10px;
-}
-
 .blocklist-item-title {
   font-size: 1.8em;
   font-weight: bold;

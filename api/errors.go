@@ -39,11 +39,6 @@ const (
 	ErrEndpointAccessDenied = Error("Access denied to endpoint")
 )
 
-// Azure environment errors
-const (
-	ErrAzureInvalidCredentials = Error("Invalid Azure credentials")
-)
-
 // Endpoint group errors.
 const (
 	ErrCannotRemoveDefaultGroup = Error("Cannot remove the default endpoint group")

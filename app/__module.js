@@ -2,7 +2,6 @@ import '../assets/css/app.css';
 import angular from 'angular';
 
 import './agent/_module';
-import './azure/_module';
 import './docker/__module';
 import './edge/__module';
 import './portainer/__module';
@@ -28,7 +27,6 @@ angular.module('portainer', [
   'luegg.directives',
   'portainer.app',
   'portainer.agent',
-  'portainer.azure',
   'portainer.docker',
   'portainer.edge',
   'portainer.extensions',

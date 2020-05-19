@@ -9,24 +9,20 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/client"
 )
 
 type endpointUpdatePayload struct {
-	Name                   *string
-	URL                    *string
-	PublicURL              *string
-	GroupID                *int
-	TLS                    *bool
-	TLSSkipVerify          *bool
-	TLSSkipClientVerify    *bool
-	Status                 *int
-	AzureApplicationID     *string
-	AzureTenantID          *string
-	AzureAuthenticationKey *string
-	TagIDs                 []portainer.TagID
-	UserAccessPolicies     portainer.UserAccessPolicies
-	TeamAccessPolicies     portainer.TeamAccessPolicies
+	Name                *string
+	URL                 *string
+	PublicURL           *string
+	GroupID             *int
+	TLS                 *bool
+	TLSSkipVerify       *bool
+	TLSSkipClientVerify *bool
+	Status              *int
+	TagIDs              []portainer.TagID
+	UserAccessPolicies  portainer.UserAccessPolicies
+	TeamAccessPolicies  portainer.TeamAccessPolicies
 }
 
 func (payload *endpointUpdatePayload) Validate(r *http.Request) error {
@@ -137,26 +133,6 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
-	if endpoint.Type == portainer.AzureEnvironment {
-		credentials := endpoint.AzureCredentials
-		if payload.AzureApplicationID != nil {
-			credentials.ApplicationID = *payload.AzureApplicationID
-		}
-		if payload.AzureTenantID != nil {
-			credentials.TenantID = *payload.AzureTenantID
-		}
-		if payload.AzureAuthenticationKey != nil {
-			credentials.AuthenticationKey = *payload.AzureAuthenticationKey
-		}
-
-		httpClient := client.NewHTTPClient()
-		_, authErr := httpClient.ExecuteAzureAuthenticationRequest(&credentials)
-		if authErr != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to authenticate against Azure", authErr}
-		}
-		endpoint.AzureCredentials = credentials
-	}
-
 	if payload.TLS != nil {
 		folder := strconv.Itoa(endpointID)
 
@@ -201,7 +177,7 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
-	if payload.URL != nil || payload.TLS != nil || endpoint.Type == portainer.AzureEnvironment {
+	if payload.URL != nil || payload.TLS != nil {
 		_, err = handler.ProxyManager.CreateAndRegisterEndpointProxy(endpoint)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to register HTTP proxy for the endpoint", err}

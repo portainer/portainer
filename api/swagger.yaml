@@ -254,7 +254,7 @@ paths:
       - name: "EndpointType"
         in: "formData"
         type: "integer"
-        description: "Environment type. Value must be one of: 1 (Docker environment), 2 (Agent environment), 3 (Azure environment) or 4 (Edge agent environment)"
+        description: "Environment type. Value must be one of: 1 (Docker environment), 2 (Agent environment) or 4 (Edge agent environment)"
         required: true
       - name: "URL"
         in: "formData"
@@ -294,18 +294,6 @@ paths:
         in: "formData"
         type: "file"
         description: "TLS client key file"
-      - name: "AzureApplicationID"
-        in: "formData"
-        type: "string"
-        description: "Azure application ID. Required if endpoint type is set to 3"
-      - name: "AzureTenantID"
-        in: "formData"
-        type: "string"
-        description: "Azure tenant ID. Required if endpoint type is set to 3"
-      - name: "AzureAuthenticationKey"
-        in: "formData"
-        type: "string"
-        description: "Azure authentication key. Required if endpoint type is set to 3"
       responses:
         200:
           description: "Success"
@@ -3221,21 +3209,6 @@ definitions:
         type: "string"
         example: "/data/tls/key.pem"
         description: "Path to the TLS client key file"
-  AzureCredentials:
-    type: "object"
-    properties:
-      ApplicationID:
-        type: "string"
-        example: "eag7cdo9-o09l-9i83-9dO9-f0b23oe78db4"
-        description: "Azure application ID"
-      TenantID:
-        type: "string"
-        example: "34ddc78d-4fel-2358-8cc1-df84c8o839f5"
-        description: "Azure tenant ID"
-      AuthenticationKey:
-        type: "string"
-        example: "cOrXoK/1D35w8YQ8nH1/8ZGwzz45JIYD5jxHKXEQknk="
-        description: "Azure authentication key"
   LDAPSearchSettings:
     type: "object"
     properties:
@@ -3507,7 +3480,7 @@ definitions:
       Type:
         type: "integer"
         example: 1
-        description: "Endpoint environment type. 1 for a Docker environment, 2 for an agent on Docker environment or 3 for an Azure environment."
+        description: "Endpoint environment type. 1 for a Docker environment or 2 for an agent on Docker environment"
       URL:
         type: "string"
         example: "docker.mydomain.tld:2375"
@@ -3536,8 +3509,6 @@ definitions:
           description: "Team identifier"
       TLSConfig:
         $ref: "#/definitions/TLSConfiguration"
-      AzureCredentials:
-        $ref: "#/definitions/AzureCredentials"
   EndpointSubset:
     type: "object"
     properties:
@@ -3552,7 +3523,7 @@ definitions:
       Type:
         type: "integer"
         example: 1
-        description: "Endpoint environment type. 1 for a Docker environment, 2 for an agent on Docker environment, 3 for an Azure environment."
+        description: "Endpoint environment type. 1 for a Docker environment or 2 for an agent on Docker environment"
       URL:
         type: "string"
         example: "docker.mydomain.tld:2375"
@@ -3732,18 +3703,6 @@ definitions:
         type: "boolean"
         example: false
         description: "Skip client verification when using TLS"
-      ApplicationID:
-        type: "string"
-        example: "eag7cdo9-o09l-9i83-9dO9-f0b23oe78db4"
-        description: "Azure application ID"
-      TenantID:
-        type: "string"
-        example: "34ddc78d-4fel-2358-8cc1-df84c8o839f5"
-        description: "Azure tenant ID"
-      AuthenticationKey:
-        type: "string"
-        example: "cOrXoK/1D35w8YQ8nH1/8ZGwzz45JIYD5jxHKXEQknk="
-        description: "Azure authentication key"
       UserAccessPolicies:
         $ref: "#/definitions/UserAccessPolicies"
       TeamAccessPolicies:
