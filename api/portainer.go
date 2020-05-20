@@ -1150,14 +1150,8 @@ const (
 
 const (
 	_ JobType = iota
-	// ScriptExecutionJobType is a non-system job used to execute a script against a list of
-	// endpoints via privileged containers
-	ScriptExecutionJobType
 	// SnapshotJobType is a system job used to create endpoint snapshots
-	SnapshotJobType
-	// EndpointSyncJobType is a system job used to synchronize endpoints from
-	// an external definition store (Deprecated)
-	EndpointSyncJobType
+	SnapshotJobType = 2
 )
 
 const (
