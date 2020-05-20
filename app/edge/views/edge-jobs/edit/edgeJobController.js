@@ -23,16 +23,16 @@ angular
     $scope.getEdgeTaskLogs = getEdgeTaskLogs;
 
     function update() {
-      var model = $scope.schedule;
+      var model = $scope.edgeJob;
 
       $scope.state.actionInProgress = true;
-      EdgeJobService.updateSchedule(model)
+      EdgeJobService.updateEdgeJob(model)
         .then(function success() {
-          Notifications.success('Schedule successfully updated');
+          Notifications.success('Edge job successfully updated');
           $state.go('edge.jobs', {}, { reload: true });
         })
         .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to update schedule');
+          Notifications.error('Failure', err, 'Unable to update Edge job');
         })
         .finally(function final() {
           $scope.state.actionInProgress = false;
@@ -44,17 +44,17 @@ angular
       $state.go('docker.containers.container.logs', { id: containerId });
     }
 
-    function getEdgeTaskLogs(endpointId, scheduleId) {
+    function getEdgeTaskLogs(endpointId, edgeJob) {
       var currentId = EndpointProvider.endpointID();
       EndpointProvider.setEndpointID(endpointId);
-
-      var filePath = '/host/opt/portainer/scripts/' + scheduleId + '.log';
+      const logFileName = `${edgeJob}.log`;
+      var filePath = `/host/opt/portainer/scripts/${logFileName}`;
       HostBrowserService.get(filePath)
         .then(function onFileReceived(data) {
           var downloadData = new Blob([data.file], {
             type: 'text/plain;charset=utf-8',
           });
-          FileSaver.saveAs(downloadData, scheduleId + '.log');
+          FileSaver.saveAs(downloadData, logFileName);
         })
         .catch(function notifyOnError(err) {
           Notifications.error('Failure', err, 'Unable to download file');
@@ -83,7 +83,7 @@ angular
       var id = $transition$.params().id;
 
       $q.all({
-        schedule: EdgeJobService.schedule(id),
+        edgeJob: EdgeJobService.edgeJob(id),
         file: EdgeJobService.getScriptFile(id),
         tasks: EdgeJobService.scriptExecutionTasks(id),
         endpoints: EndpointService.endpoints(undefined, undefined, { type: 4 }),
@@ -91,14 +91,14 @@ angular
         tags: TagService.tags(),
       })
         .then(function success(data) {
-          var schedule = data.schedule;
-          schedule.Job.FileContent = data.file.ScheduleFileContent;
+          var edgeJob = data.edgeJob;
+          edgeJob.FileContent = data.file.FileContent;
 
           var endpoints = data.endpoints.value;
           var tasks = data.tasks;
           associateEndpointsToTasks(tasks, endpoints);
 
-          $scope.schedule = schedule;
+          $scope.edgeJob = edgeJob;
           $scope.tasks = data.tasks;
           $scope.endpoints = data.endpoints.value;
           $scope.groups = data.groups;

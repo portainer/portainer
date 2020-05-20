@@ -4,25 +4,25 @@ function EdgeJobsController($scope, $state, Notifications, ModalService, EdgeJob
   $scope.removeAction = removeAction;
 
   function removeAction(selectedItems) {
-    ModalService.confirmDeletion('Do you want to remove the selected schedule(s) ?', function onConfirm(confirmed) {
+    ModalService.confirmDeletion('Do you want to remove the selected edge job(s) ?', function onConfirm(confirmed) {
       if (!confirmed) {
         return;
       }
-      deleteSelectedSchedules(selectedItems);
+      deleteSelectedEdgeJobs(selectedItems);
     });
   }
 
-  function deleteSelectedSchedules(schedules) {
-    var actionCount = schedules.length;
-    angular.forEach(schedules, function (schedule) {
-      EdgeJobService.deleteSchedule(schedule.Id)
+  function deleteSelectedEdgeJobs(edgeJobs) {
+    var actionCount = edgeJobs.length;
+    angular.forEach(edgeJobs, function (edgeJob) {
+      EdgeJobService.deleteEdgeJob(edgeJob.Id)
         .then(function success() {
-          Notifications.success('Schedule successfully removed', schedule.Name);
-          var index = $scope.schedules.indexOf(schedule);
-          $scope.schedules.splice(index, 1);
+          Notifications.success('Schedule successfully removed', edgeJob.Name);
+          var index = $scope.edgeJobs.indexOf(edgeJob);
+          $scope.edgeJobs.splice(index, 1);
         })
         .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to remove schedule ' + schedule.Name);
+          Notifications.error('Failure', err, 'Unable to remove schedule ' + edgeJob.Name);
         })
         .finally(function final() {
           --actionCount;
@@ -34,13 +34,13 @@ function EdgeJobsController($scope, $state, Notifications, ModalService, EdgeJob
   }
 
   function initView() {
-    EdgeJobService.schedules()
+    EdgeJobService.edgeJobs()
       .then(function success(data) {
-        $scope.schedules = data;
+        $scope.edgeJobs = data;
       })
       .catch(function error(err) {
-        Notifications.error('Failure', err, 'Unable to retrieve schedules');
-        $scope.schedules = [];
+        Notifications.error('Failure', err, 'Unable to retrieve Edge jobs');
+        $scope.edgeJobs = [];
       });
   }
 

@@ -14,13 +14,10 @@ import (
 
 type edgeJobUpdatePayload struct {
 	Name           *string
-	Image          *string
 	CronExpression *string
 	Recurring      *bool
 	Endpoints      []portainer.EndpointID
 	FileContent    *string
-	RetryCount     *int
-	RetryInterval  *int
 }
 
 func (payload *edgeJobUpdatePayload) Validate(r *http.Request) error {
@@ -94,9 +91,10 @@ func (handler *Handler) updateEdgeSchedule(edgeJob *portainer.EdgeJob, payload *
 		edgeJob.Endpoints = endpointIDs
 	}
 
+	updateVersion := false
 	if payload.CronExpression != nil {
 		edgeJob.CronExpression = *payload.CronExpression
-		edgeJob.Version++
+		updateVersion = true
 	}
 
 	if payload.FileContent != nil {
@@ -105,6 +103,15 @@ func (handler *Handler) updateEdgeSchedule(edgeJob *portainer.EdgeJob, payload *
 			return err
 		}
 
+		updateVersion = true
+	}
+
+	if payload.Recurring != nil {
+		edgeJob.Recurring = *payload.Recurring
+		updateVersion = true
+	}
+
+	if updateVersion {
 		edgeJob.Version++
 	}
 

@@ -1,55 +1,55 @@
 import { ScheduleDefaultModel } from 'Portainer/models/schedule';
 
-angular
-  .module('portainer.edge')
-  .controller('CreateEdgeJobController', function CreateEdgeJobController($q, $scope, $state, Notifications, EndpointService, GroupService, EdgeJobService, TagService) {
-    $scope.state = {
-      actionInProgress: false,
-    };
+function CreateEdgeJobController($q, $scope, $state, Notifications, EndpointService, GroupService, EdgeJobService, TagService) {
+  $scope.state = {
+    actionInProgress: false,
+  };
 
-    $scope.create = create;
+  $scope.create = create;
 
-    function create() {
-      var model = $scope.model;
+  function create(method) {
+    const model = $scope.model;
 
-      $scope.state.actionInProgress = true;
-      createSchedule(model)
-        .then(function success() {
-          Notifications.success('Schedule successfully created');
-          $state.go('edge.jobs', {}, { reload: true });
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to create schedule');
-        })
-        .finally(function final() {
-          $scope.state.actionInProgress = false;
-        });
-    }
-
-    function createSchedule(model) {
-      if (model.Job.Method === 'editor') {
-        return EdgeJobService.createScheduleFromFileContent(model);
-      }
-      return EdgeJobService.createScheduleFromFileUpload(model);
-    }
-
-    function initView() {
-      $scope.model = new ScheduleDefaultModel();
-
-      $q.all({
-        endpoints: EndpointService.endpoints(undefined, undefined, { type: 4 }),
-        groups: GroupService.groups(),
-        tags: TagService.tags(),
+    $scope.state.actionInProgress = true;
+    createEdgeJob(method, model)
+      .then(function success() {
+        Notifications.success('Edge job successfully created');
+        $state.go('edge.jobs', {}, { reload: true });
       })
-        .then(function success(data) {
-          $scope.endpoints = data.endpoints.value;
-          $scope.groups = data.groups;
-          $scope.tags = data.tags;
-        })
-        .catch(function error(err) {
-          Notifications.error('Failure', err, 'Unable to retrieve endpoint list');
-        });
-    }
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to create Edge job');
+      })
+      .finally(function final() {
+        $scope.state.actionInProgress = false;
+      });
+  }
 
-    initView();
-  });
+  function createEdgeJob(method, model) {
+    if (method === 'editor') {
+      return EdgeJobService.createEdgeJobFromFileContent(model);
+    }
+    return EdgeJobService.createEdgeJobFromFileUpload(model);
+  }
+
+  function initView() {
+    $scope.model = new ScheduleDefaultModel();
+
+    $q.all({
+      endpoints: EndpointService.endpoints(undefined, undefined, { type: 4 }),
+      groups: GroupService.groups(),
+      tags: TagService.tags(),
+    })
+      .then(function success(data) {
+        $scope.endpoints = data.endpoints.value;
+        $scope.groups = data.groups;
+        $scope.tags = data.tags;
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to retrieve endpoint list');
+      });
+  }
+
+  initView();
+}
+
+angular.module('portainer.edge').controller('CreateEdgeJobController', CreateEdgeJobController);

@@ -1,10 +1,10 @@
 <rd-header>
-  <rd-header-title title-text="Schedule details">
-    <a data-toggle="tooltip" title-text="Refresh" ui-sref="edge.jobs.job({id: schedule.Id})" ui-sref-opts="{reload: true}">
+  <rd-header-title title-text="Edge job details">
+    <a data-toggle="tooltip" title-text="Refresh" ui-sref="edge.jobs.job({id: edgeJob.Id})" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
-  <rd-header-content> <a ui-sref="edge.jobs">Schedules</a> &gt; {{ ::schedule.Name }} </rd-header-content>
+  <rd-header-content> <a ui-sref="edge.jobs">Edge jobs</a> &gt; {{ ::edgeJob.Name }} </rd-header-content>
 </rd-header>
 
 <div class="row">
@@ -16,13 +16,13 @@
             <uib-tab-heading> <i class="fa fa-wrench" aria-hidden="true"></i> Configuration </uib-tab-heading>
 
             <edge-job-form
-              ng-if="schedule"
-              model="schedule"
+              ng-if="edgeJob"
+              model="edgeJob"
               endpoints="endpoints"
               groups="groups"
               tags="tags"
               form-action="update"
-              form-action-label="Update schedule"
+              form-action-label="Update edgeJob"
               action-in-progress="state.actionInProgress"
             ></edge-job-form>
           </uib-tab>
@@ -42,17 +42,17 @@
             <div class="col-sm-12 form-section-title" style="margin-bottom: 20px;">
               Tasks
             </div>
-            <schedule-tasks-datatable
+            <edgeJob-tasks-datatable
               ng-if="tasks"
               title-text="Tasks"
               title-icon="fa-tasks"
               dataset="tasks"
-              table-key="schedule-tasks"
+              table-key="edgeJob-tasks"
               order-by="Status"
               reverse-order="true"
               go-to-container-logs="goToContainerLogs"
               get-edge-task-logs="getEdgeTaskLogs"
-            ></schedule-tasks-datatable>
+            ></edgeJob-tasks-datatable>
           </uib-tab>
         </uib-tabset>
       </rd-widget-body>

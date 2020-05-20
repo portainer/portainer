@@ -3,13 +3,6 @@ angular.module('portainer.edge').controller('EdgeJobsDatatableController', EdgeJ
 function EdgeJobsDatatableController($scope, $controller, DatatableService) {
   angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
 
-  /**
-   * Do not allow items
-   */
-  this.allowSelection = function (item) {
-    return item.JobType === 1;
-  };
-
   this.$onInit = function () {
     this.setDefaults();
     this.prepareTableFromDataset();

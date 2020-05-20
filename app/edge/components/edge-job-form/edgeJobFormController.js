@@ -28,7 +28,7 @@ class EdgeJobFormController {
       datetime: moment(),
       scheduleValue: this.scheduleValues[0],
       cronMethod: 'basic',
-      endpointIds: [],
+      method: 'editor',
     };
 
     this.onChangeModel(this.model);
@@ -39,32 +39,25 @@ class EdgeJobFormController {
     this.dissociateEndpoint = this.dissociateEndpoint.bind(this);
   }
 
-  // $onChange({ model }) {
-  //   if (!model.currentValue) {
-  //     return;
-  //   }
-  //   this.onChangeModel(model.currentValue);
-  // }
-
   onChangeModel(model) {
     this.formValues = {
       datetime: model.CronExpression ? cronToDatetime(model.CronExpression) : moment(),
       scheduleValue: this.formValues.scheduleValue,
       cronMethod: model.Recurring ? 'advanced' : 'basic',
-      endpointIds: model.Job && model.Job.Endpoints ? model.Job.Endpoints : [],
+      method: this.formValues.method,
     };
   }
 
   action() {
     this.state.formValidationError = '';
 
-    if (this.model.Job.Method === 'editor' && this.model.Job.FileContent === '') {
+    if (this.formValues.method === 'editor' && this.model.FileContent === '') {
       this.state.formValidationError = 'Script file content must not be empty';
       return;
     }
 
     if (this.formValues.cronMethod === 'basic') {
-      if (this.model.Recurring === false) {
+      if (!this.model.Recurring) {
         this.model.CronExpression = datetimeToCron(this.formValues.datetime);
       } else {
         this.model.CronExpression = this.formValues.scheduleValue.cron;
@@ -73,23 +66,21 @@ class EdgeJobFormController {
       this.model.Recurring = true;
     }
 
-    this.model.Job.Endpoints = this.formValues.endpointIds;
-
-    this.formAction();
+    this.formAction(this.formValues.method);
   }
 
   editorUpdate(cm) {
-    this.model.Job.FileContent = cm.getValue();
+    this.model.FileContent = cm.getValue();
   }
 
   associateEndpoint(endpoint) {
-    if (!_.includes(this.formValues.endpointIds, endpoint.Id)) {
-      this.formValues.endpointIds = [...this.formValues.endpointIds, endpoint.Id];
+    if (!_.includes(this.model.Endpoints, endpoint.Id)) {
+      this.model.Endpoints = [...this.model.Endpoints, endpoint.Id];
     }
   }
 
   dissociateEndpoint(endpoint) {
-    this.formValues.endpointIds = _.filter(this.formValues.endpointIds, (id) => id !== endpoint.Id);
+    this.model.Endpoints = _.filter(this.model.Endpoints, (id) => id !== endpoint.Id);
   }
 }
 

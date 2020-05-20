@@ -1,34 +1,26 @@
-<form class="form-horizontal" name="scheduleForm">
-  <!-- <div class="col-sm-12 form-section-title">
-    Information
-  </div>
-  <div class="form-group">
-    <span class="col-sm-12 text-muted small">
-      <p></p>
-    </span>
-  </div> -->
+<form class="form-horizontal" name="edgeJobForm">
   <div class="col-sm-12 form-section-title">
-    Schedule configuration
+    Edge job configuration
   </div>
   <!-- name-input -->
   <div class="form-group">
-    <label for="schedule_name" class="col-sm-1 control-label text-left">Name</label>
+    <label for="edgejob_name" class="col-sm-1 control-label text-left">Name</label>
     <div class="col-sm-11">
-      <input type="text" class="form-control" ng-model="$ctrl.model.Name" id="schedule_name" name="schedule_name" placeholder="backup-app-prod" required auto-focus />
+      <input type="text" class="form-control" ng-model="$ctrl.model.Name" id="edgejob_name" name="edgejob_name" placeholder="backup-app-prod" required auto-focus />
     </div>
   </div>
-  <div class="form-group" ng-show="scheduleForm.schedule_name.$invalid">
+  <div class="form-group" ng-show="edgeJobForm.edgejob_name.$invalid">
     <div class="col-sm-12 small text-warning">
-      <div ng-messages="scheduleForm.schedule_name.$error">
+      <div ng-messages="edgeJobForm.edgejob_name.$error">
         <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
       </div>
     </div>
   </div>
   <!-- !name-input -->
   <!-- cron-input -->
-  <!-- schedule-method-select -->
+  <!-- edge-job-method-select -->
   <div class="col-sm-12 form-section-title">
-    Schedule configuration
+    Edge job configuration
   </div>
   <div class="form-group"></div>
   <div class="form-group" style="margin-bottom: 0;">
@@ -55,11 +47,11 @@
       </div>
     </div>
   </div>
-  <!-- !schedule-method-select -->
-  <!-- basic-schedule -->
+  <!-- !edge-job-method-select -->
+  <!-- basic-edge-job -->
   <div ng-if="$ctrl.formValues.cronMethod === 'basic'">
     <div class="form-group">
-      <label for="recurring" class="col-sm-2 control-label text-left">Recurring schedule</label>
+      <label for="recurring" class="col-sm-2 control-label text-left">Recurring Edge job</label>
       <div class="col-sm-10">
         <label class="switch" style="margin-left: 20px;"> <input type="checkbox" name="recurring" ng-model="$ctrl.model.Recurring" /><i></i> </label>
       </div>
@@ -67,13 +59,13 @@
     <!-- not-recurring -->
     <div ng-if="!$ctrl.model.Recurring">
       <div class="form-group">
-        <label for="schedule_cron" class="col-sm-2 control-label text-left">Schedule date</label>
+        <label for="edgejob_cron" class="col-sm-2 control-label text-left">Schedule date</label>
         <div class="col-sm-10">
           <input class="form-control" moment-picker ng-model="$ctrl.formValues.datetime" format="YYYY-MM-DD HH:mm" />
         </div>
-        <div ng-show="scheduleForm.datepicker.$invalid">
+        <div ng-show="edgeJobForm.datepicker.$invalid">
           <div class="col-sm-12 small text-warning">
-            <div ng-messages="scheduleForm.datepicker.$error">
+            <div ng-messages="edgeJobForm.datepicker.$error">
               <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
             </div>
           </div>
@@ -84,20 +76,20 @@
     <!-- recurring -->
     <div ng-if="$ctrl.model.Recurring">
       <div class="form-group">
-        <label for="schedule_value" class="col-sm-2 control-label text-left">Schedule time</label>
+        <label for="edgejob_value" class="col-sm-2 control-label text-left">Edge job time</label>
         <div class="col-sm-10">
           <select
-            id="schedule_value"
-            name="schedule_value"
+            id="edgejob_value"
+            name="edgejob_value"
             class="form-control"
             ng-model="$ctrl.formValues.scheduleValue"
             ng-options="value.displayed for value in $ctrl.scheduleValues"
             required
           ></select>
         </div>
-        <div ng-show="scheduleForm.schedule_value.$invalid">
+        <div ng-show="edgeJobForm.edgejob_value.$invalid">
           <div class="col-sm-12 small text-warning">
-            <div ng-messages="scheduleForm.schedule_value.$error">
+            <div ng-messages="edgeJobForm.edgejob_value.$error">
               <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
             </div>
           </div>
@@ -106,34 +98,22 @@
     </div>
     <!-- !recurring -->
   </div>
-  <!-- !basic-schedule -->
+  <!-- !basic-edge-job -->
   <!-- advanced-schedule -->
   <div ng-if="$ctrl.formValues.cronMethod === 'advanced'">
     <div class="form-group">
-      <label for="schedule_cron" class="col-sm-2 control-label text-left">Cron rule</label>
+      <label for="edgejob_cron" class="col-sm-2 control-label text-left">Cron rule</label>
       <div class="col-sm-10">
-        <input type="text" class="form-control" ng-model="$ctrl.model.CronExpression" id="schedule_cron" name="schedule_cron" placeholder="0 2 * * *" required />
+        <input type="text" class="form-control" ng-model="$ctrl.model.CronExpression" id="edgejob_cron" name="edgejob_cron" placeholder="0 2 * * *" required />
       </div>
     </div>
-    <div class="form-group" ng-show="scheduleForm.schedule_cron.$invalid">
+    <div class="form-group" ng-show="edgeJobForm.edgejob_cron.$invalid">
       <div class="col-sm-12 small text-warning">
-        <div ng-messages="scheduleForm.schedule_cron.$error">
+        <div ng-messages="edgeJobForm.edgejob_cron.$error">
           <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
         </div>
       </div>
     </div>
-    <!-- <div class="form-group">
-      <span class="col-sm-12 text-muted small">
-        <p>
-          You can refer to the <a href="https://godoc.org/github.com/robfig/cron#hdr-CRON_Expression_Format" target="_blank">following documentation</a> to get more information
-          about the supported cron expression format.
-        </p>
-        <p>
-          <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i> Edge endpoint schedules are managed by <code>cron</code> on the
-          underlying host. You need to use a valid cron expression that is different from the documentation above.
-        </p>
-      </span>
-    </div> -->
   </div>
   <!-- !advanced-schedule -->
   <!-- !cron-input -->
@@ -147,7 +127,7 @@
     <div class="form-group" style="margin-bottom: 0;">
       <div class="boxselector_wrapper">
         <div>
-          <input type="radio" id="method_editor" ng-model="$ctrl.model.Job.Method" value="editor" />
+          <input type="radio" id="method_editor" ng-model="$ctrl.formValues.method" value="editor" />
           <label for="method_editor">
             <div class="boxselector_header">
               <i class="fa fa-edit" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -157,7 +137,7 @@
           </label>
         </div>
         <div>
-          <input type="radio" id="method_upload" ng-model="$ctrl.model.Job.Method" value="upload" />
+          <input type="radio" id="method_upload" ng-model="$ctrl.formValues.method" value="upload" />
           <label for="method_upload">
             <div class="boxselector_header">
               <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -171,24 +151,24 @@
   </div>
   <!-- !execution-method -->
   <!-- web-editor -->
-  <div ng-show="$ctrl.model.Job.Method === 'editor'">
+  <div ng-show="$ctrl.formValues.method === 'editor'">
     <div class="col-sm-12 form-section-title">
       Web editor
     </div>
     <div class="form-group">
       <div class="col-sm-12">
         <code-editor
-          identifier="execute-schedule-editor"
+          identifier="execute-edge-job-editor"
           placeholder="# Define or paste the content of your script file here"
           on-change="($ctrl.editorUpdate)"
-          value="$ctrl.model.Job.FileContent"
+          value="$ctrl.model.FileContent"
         ></code-editor>
       </div>
     </div>
   </div>
   <!-- !web-editor -->
   <!-- upload -->
-  <div ng-show="$ctrl.model.Job.Method === 'upload'">
+  <div ng-show="$ctrl.formValues.method === 'upload'">
     <div class="col-sm-12 form-section-title">
       Upload
     </div>
@@ -199,10 +179,10 @@
     </div>
     <div class="form-group">
       <div class="col-sm-12">
-        <button class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.model.Job.File">Select file</button>
+        <button class="btn btn-sm btn-primary" ngf-select ng-model="$ctrl.model.File">Select file</button>
         <span style="margin-left: 5px;">
-          {{ $ctrl.model.Job.File.name }}
-          <i class="fa fa-times red-icon" ng-if="!$ctrl.model.Job.File" aria-hidden="true"></i>
+          {{ $ctrl.model.File.name }}
+          <i class="fa fa-times red-icon" ng-if="!$ctrl.model.File" aria-hidden="true"></i>
         </span>
       </div>
     </div>
@@ -213,7 +193,7 @@
   </div>
   <!-- node-selection -->
   <associated-endpoints-selector
-    endpoint-ids="$ctrl.formValues.endpointIds"
+    endpoint-ids="$ctrl.model.Endpoints"
     tags="$ctrl.tags"
     groups="$ctrl.groups"
     has-backend-pagination="true"
@@ -230,9 +210,9 @@
       <button
         type="button"
         class="btn btn-primary btn-sm"
-        ng-disabled="$ctrl.actionInProgress || !scheduleForm.$valid
-        || $ctrl.formValues.endpointIds.length === 0
-        || ($ctrl.model.Job.Method === 'upload' && !$ctrl.model.Job.File)"
+        ng-disabled="$ctrl.actionInProgress || !edgeJobForm.$valid
+        || $ctrl.model.Endpoints.length === 0
+        || ($ctrl.formValues.method === 'upload' && !$ctrl.model.File)"
         ng-click="$ctrl.action()"
         button-spinner="$ctrl.actionInProgress"
       >

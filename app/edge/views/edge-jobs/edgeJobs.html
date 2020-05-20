@@ -1,14 +1,14 @@
 <rd-header>
-  <rd-header-title title-text="Schedules list">
+  <rd-header-title title-text="Edge Jobs">
     <a data-toggle="tooltip" title="Refresh" ui-sref="edge.jobs" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
-  <rd-header-content>Schedules</rd-header-content>
+  <rd-header-content>Edge Jobs</rd-header-content>
 </rd-header>
 
 <div class="row">
   <div class="col-sm-12">
-    <edge-jobs-datatable title-text="Schedules" title-icon="fa-clock" dataset="schedules" table-key="schedules" order-by="Name" remove-action="removeAction"></edge-jobs-datatable>
+    <edge-jobs-datatable title-text="Edge jobs" title-icon="fa-clock" dataset="edgeJobs" table-key="schedules" order-by="Name" remove-action="removeAction"></edge-jobs-datatable>
   </div>
 </div>

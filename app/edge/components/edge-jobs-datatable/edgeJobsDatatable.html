@@ -8,7 +8,7 @@
         <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="edge.jobs.new"> <i class="fa fa-plus space-right" aria-hidden="true"></i>Add schedule </button>
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="edge.jobs.new"> <i class="fa fa-plus space-right" aria-hidden="true"></i>Add Edge job </button>
       </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
@@ -52,11 +52,10 @@
             >
               <td>
                 <span class="md-checkbox">
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="!$ctrl.allowSelection(item)" />
+                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <span ng-if="item.JobType !== 1">{{ item.Name }}</span>
-                <a ng-if="item.JobType === 1" ui-sref="edge.jobs.job({id: item.Id})">{{ item.Name }}</a>
+                <a ui-sref="edge.jobs.job({id: item.Id})">{{ item.Name }}</a>
               </td>
               <td>
                 {{ item.CronExpression }}
@@ -67,7 +66,7 @@
               <td colspan="3" class="text-center text-muted">Loading...</td>
             </tr>
             <tr ng-if="$ctrl.state.filteredDataSet.length === 0">
-              <td colspan="3" class="text-center text-muted">No schedule available.</td>
+              <td colspan="3" class="text-center text-muted">No Edge job available.</td>
             </tr>
           </tbody>
         </table>

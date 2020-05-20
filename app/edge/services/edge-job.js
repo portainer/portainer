@@ -1,46 +1,36 @@
 import angular from 'angular';
 
-import { ScheduleModel, ScheduleCreateRequest, ScheduleUpdateRequest, ScriptExecutionTaskModel } from 'Portainer/models/schedule';
+import { ScheduleCreateRequest, ScheduleUpdateRequest, ScriptExecutionTaskModel } from 'Portainer/models/schedule';
 
 function EdgeJobService($q, EdgeJobs, FileUploadService) {
   var service = {};
 
-  service.schedule = function (scheduleId) {
-    var deferred = $q.defer();
-
-    EdgeJobs.get({ id: scheduleId })
-      .$promise.then(function success(data) {
-        var schedule = new ScheduleModel(data);
-        deferred.resolve(schedule);
-      })
-      .catch(function error(err) {
-        deferred.reject({ msg: 'Unable to retrieve schedule', err: err });
-      });
-
-    return deferred.promise;
+  service.edgeJob = async function (edgeJobId) {
+    try {
+      return await EdgeJobs.get({ id: edgeJobId }).$promise;
+    } catch (err) {
+      throw { msg: 'Unable to retrieve edgeJob', err: err };
+    }
   };
 
-  service.schedules = function () {
+  service.edgeJobs = function () {
     var deferred = $q.defer();
 
     EdgeJobs.query()
-      .$promise.then(function success(data) {
-        var schedules = data.map(function (item) {
-          return new ScheduleModel(item);
-        });
-        deferred.resolve(schedules);
+      .$promise.then(function success(edgeJobs) {
+        deferred.resolve(edgeJobs);
       })
       .catch(function error(err) {
-        deferred.reject({ msg: 'Unable to retrieve schedules', err: err });
+        deferred.reject({ msg: 'Unable to retrieve edgeJobs', err: err });
       });
 
     return deferred.promise;
   };
 
-  service.scriptExecutionTasks = function (scheduleId) {
+  service.scriptExecutionTasks = function (edgeJobId) {
     var deferred = $q.defer();
 
-    EdgeJobs.tasks({ id: scheduleId })
+    EdgeJobs.tasks({ id: edgeJobId })
       .$promise.then(function success(data) {
         var tasks = data.map(function (item) {
           return new ScriptExecutionTaskModel(item);
@@ -48,33 +38,33 @@ function EdgeJobService($q, EdgeJobs, FileUploadService) {
         deferred.resolve(tasks);
       })
       .catch(function error(err) {
-        deferred.reject({ msg: 'Unable to retrieve tasks associated to the schedule', err: err });
+        deferred.reject({ msg: 'Unable to retrieve tasks associated to the edgeJob', err: err });
       });
 
     return deferred.promise;
   };
 
-  service.createScheduleFromFileContent = function (model) {
+  service.createEdgeJobFromFileContent = function (model) {
     var payload = new ScheduleCreateRequest(model);
     return EdgeJobs.create({ method: 'string' }, payload).$promise;
   };
 
-  service.createScheduleFromFileUpload = function (model) {
+  service.createEdgeJobFromFileUpload = function (model) {
     var payload = new ScheduleCreateRequest(model);
     return FileUploadService.createSchedule(payload);
   };
 
-  service.updateSchedule = function (model) {
+  service.updateEdgeJob = function (model) {
     var payload = new ScheduleUpdateRequest(model);
     return EdgeJobs.update(payload).$promise;
   };
 
-  service.deleteSchedule = function (scheduleId) {
-    return EdgeJobs.remove({ id: scheduleId }).$promise;
+  service.deleteEdgeJob = function (edgeJobId) {
+    return EdgeJobs.remove({ id: edgeJobId }).$promise;
   };
 
-  service.getScriptFile = function (scheduleId) {
-    return EdgeJobs.file({ id: scheduleId }).$promise;
+  service.getScriptFile = function (edgeJobId) {
+    return EdgeJobs.file({ id: edgeJobId }).$promise;
   };
 
   return service;
