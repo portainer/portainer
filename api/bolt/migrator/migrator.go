@@ -3,6 +3,7 @@ package migrator
 import (
 	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/bolt/edgejob"
 	"github.com/portainer/portainer/api/bolt/endpoint"
 	"github.com/portainer/portainer/api/bolt/endpointgroup"
 	"github.com/portainer/portainer/api/bolt/endpointrelation"
@@ -25,6 +26,7 @@ type (
 	Migrator struct {
 		currentDBVersion        int
 		db                      *bolt.DB
+		edgeJobService          *edgejob.Service
 		endpointGroupService    *endpointgroup.Service
 		endpointService         *endpoint.Service
 		endpointRelationService *endpointrelation.Service
@@ -47,6 +49,7 @@ type (
 	Parameters struct {
 		DB                      *bolt.DB
 		DatabaseVersion         int
+		EdgeJobService          *edgejob.Service
 		EndpointGroupService    *endpointgroup.Service
 		EndpointService         *endpoint.Service
 		EndpointRelationService *endpointrelation.Service
@@ -71,6 +74,7 @@ func NewMigrator(parameters *Parameters) *Migrator {
 	return &Migrator{
 		db:                      parameters.DB,
 		currentDBVersion:        parameters.DatabaseVersion,
+		edgeJobService:          parameters.EdgeJobService,
 		endpointGroupService:    parameters.EndpointGroupService,
 		endpointService:         parameters.EndpointService,
 		endpointRelationService: parameters.EndpointRelationService,
@@ -324,6 +328,11 @@ func (m *Migrator) Migrate() error {
 	// Portainer 2.0
 	if m.currentDBVersion < 24 {
 		err := m.updateSettingsToDB24()
+		if err != nil {
+			return err
+		}
+
+		err = m.updateEdgeJobsToDBVersion24()
 		if err != nil {
 			return err
 		}

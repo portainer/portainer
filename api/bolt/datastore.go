@@ -131,6 +131,7 @@ func (store *Store) MigrateData() error {
 		migratorParams := &migrator.Parameters{
 			DB:                      store.db,
 			DatabaseVersion:         version,
+			EdgeJobService:          store.EdgeJobService,
 			EndpointGroupService:    store.EndpointGroupService,
 			EndpointService:         store.EndpointService,
 			EndpointRelationService: store.EndpointRelationService,
@@ -344,11 +345,6 @@ func (store *Store) ResourceControl() portainer.ResourceControlService {
 // Role gives access to the Role data management layer
 func (store *Store) Role() portainer.RoleService {
 	return store.RoleService
-}
-
-// Schedule gives access to the Schedule data management layer
-func (store *Store) Schedule() portainer.ScheduleService {
-	return store.ScheduleService
 }
 
 // Settings gives access to the Settings data management layer
