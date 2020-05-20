@@ -86,7 +86,9 @@ class EdgeJobFormController {
 
 function cronToDatetime(cron) {
   var strings = cron.split(' ');
-  if (strings.length !== 5) {
+  if (strings.length > 5) {
+    strings = strings.slice(0, 5);
+  } else {
     return moment();
   }
   return moment(cron, 's m H D M');
