@@ -8,11 +8,11 @@ import (
 
 	"github.com/portainer/portainer/api/chisel"
 	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/internal/snapshot"
 
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt"
 	"github.com/portainer/portainer/api/cli"
-	"github.com/portainer/portainer/api/cron"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/exec"
@@ -115,49 +115,13 @@ func initSnapshotter(clientFactory *docker.ClientFactory) portainer.Snapshotter 
 	return docker.NewSnapshotter(clientFactory)
 }
 
-func initJobScheduler() portainer.JobScheduler {
-	return cron.NewJobScheduler()
-}
-
-func loadSnapshotSystemSchedule(jobScheduler portainer.JobScheduler, snapshotter portainer.Snapshotter, dataStore portainer.DataStore) error {
+func initSnapshotService(dataStore portainer.DataStore, snapshotter portainer.Snapshotter) (*snapshot.Service, error) {
 	settings, err := dataStore.Settings().Settings()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	schedules, err := dataStore.Schedule().SchedulesByJobType(portainer.SnapshotJobType)
-	if err != nil {
-		return err
-	}
-
-	var snapshotSchedule *portainer.Schedule
-	if len(schedules) == 0 {
-		snapshotJob := &portainer.SnapshotJob{}
-		snapshotSchedule = &portainer.Schedule{
-			ID:             portainer.ScheduleID(dataStore.Schedule().GetNextIdentifier()),
-			Name:           "system_snapshot",
-			CronExpression: "@every " + settings.SnapshotInterval,
-			Recurring:      true,
-			JobType:        portainer.SnapshotJobType,
-			SnapshotJob:    snapshotJob,
-			Created:        time.Now().Unix(),
-		}
-	} else {
-		snapshotSchedule = &schedules[0]
-	}
-
-	snapshotJobContext := cron.NewSnapshotJobContext(dataStore, snapshotter)
-	snapshotJobRunner := cron.NewSnapshotJobRunner(snapshotSchedule, snapshotJobContext)
-
-	err = jobScheduler.ScheduleJob(snapshotJobRunner)
-	if err != nil {
-		return err
-	}
-
-	if len(schedules) == 0 {
-		return dataStore.Schedule().CreateSchedule(snapshotSchedule)
-	}
-	return nil
+	return snapshot.NewService(settings.SnapshotInterval, dataStore, snapshotter)
 }
 
 func loadEdgeJobsFromDatabase(dataStore portainer.DataStore, reverseTunnelService portainer.ReverseTunnelService) error {
@@ -343,10 +307,6 @@ func initEndpoint(flags *portainer.CLIFlags, dataStore portainer.DataStore, snap
 	return createUnsecuredEndpoint(*flags.EndpointURL, dataStore, snapshotter)
 }
 
-func initJobService(dockerClientFactory *docker.ClientFactory) portainer.JobService {
-	return docker.NewJobService(dockerClientFactory)
-}
-
 func initExtensionManager(fileService portainer.FileService, dataStore portainer.DataStore) (portainer.ExtensionManager, error) {
 	extensionManager := exec.NewExtensionManager(fileService, dataStore)
 
@@ -408,9 +368,13 @@ func main() {
 
 	clientFactory := initClientFactory(digitalSignatureService, reverseTunnelService)
 
-	jobService := initJobService(clientFactory)
-
 	snapshotter := initSnapshotter(clientFactory)
+
+	snapshotService, err := initSnapshotService(dataStore, snapshotter)
+	if err != nil {
+		log.Fatal(err)
+	}
+	snapshotService.Start()
 
 	swarmStackManager, err := initSwarmStackManager(*flags.Assets, *flags.Data, digitalSignatureService, fileService, reverseTunnelService)
 	if err != nil {
@@ -426,19 +390,10 @@ func main() {
 		}
 	}
 
-	jobScheduler := initJobScheduler()
-
 	err = loadEdgeJobsFromDatabase(dataStore, reverseTunnelService)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	err = loadSnapshotSystemSchedule(jobScheduler, snapshotter, dataStore)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	jobScheduler.Start()
 
 	applicationStatus := initStatus(flags)
 
@@ -506,13 +461,12 @@ func main() {
 		LDAPService:          ldapService,
 		GitService:           gitService,
 		SignatureService:     digitalSignatureService,
-		JobScheduler:         jobScheduler,
+		SnapshotService:      snapshotService,
 		Snapshotter:          snapshotter,
 		SSL:                  *flags.SSL,
 		SSLCert:              *flags.SSLCert,
 		SSLKey:               *flags.SSLKey,
 		DockerClientFactory:  clientFactory,
-		JobService:           jobService,
 	}
 
 	log.Printf("Starting Portainer %s on %s", portainer.APIVersion, *flags.Addr)

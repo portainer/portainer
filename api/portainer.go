@@ -866,26 +866,6 @@ type (
 		ClonePrivateRepositoryWithBasicAuth(repositoryURL, referenceName string, destination, username, password string) error
 	}
 
-	// JobRunner represents a service that can be used to run a job
-	JobRunner interface {
-		Run()
-		GetSchedule() *Schedule
-	}
-
-	// JobScheduler represents a service to run jobs on a periodic basis
-	JobScheduler interface {
-		ScheduleJob(runner JobRunner) error
-		UpdateJobSchedule(runner JobRunner) error
-		UpdateSystemJobSchedule(jobType JobType, newCronExpression string) error
-		UnscheduleJob(ID ScheduleID)
-		Start()
-	}
-
-	// JobService represents a service to manage job execution on hosts
-	JobService interface {
-		ExecuteScript(endpoint *Endpoint, nodeName, image string, script []byte, schedule *Schedule) error
-	}
-
 	// JWTService represents a service for managing JWT tokens
 	JWTService interface {
 		GenerateToken(data *TokenData) (string, error)
