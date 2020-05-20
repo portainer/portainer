@@ -41,7 +41,6 @@ type Store struct {
 	db                      *bolt.DB
 	isNew                   bool
 	fileService             portainer.FileService
-	RoleService             *role.Service
 	DockerHubService        *dockerhub.Service
 	EdgeGroupService        *edgegroup.Service
 	EdgeStackService        *edgestack.Service
@@ -51,6 +50,8 @@ type Store struct {
 	ExtensionService        *extension.Service
 	RegistryService         *registry.Service
 	ResourceControlService  *resourcecontrol.Service
+	RoleService             *role.Service
+	ScheduleService         *schedule.Service
 	SettingsService         *settings.Service
 	StackService            *stack.Service
 	TagService              *tag.Service
@@ -60,7 +61,6 @@ type Store struct {
 	UserService             *user.Service
 	VersionService          *version.Service
 	WebhookService          *webhook.Service
-	ScheduleService         *schedule.Service
 }
 
 // NewStore initializes a new Store and the associated services
@@ -143,6 +143,7 @@ func (store *Store) MigrateData() error {
 			UserService:             store.UserService,
 			VersionService:          store.VersionService,
 			FileService:             store.fileService,
+			AuthorizationService:    portainer.NewAuthorizationService(store),
 		}
 		migrator := migrator.NewMigrator(migratorParams)
 
@@ -279,4 +280,104 @@ func (store *Store) initServices() error {
 	store.ScheduleService = scheduleService
 
 	return nil
+}
+
+// DockerHub gives access to the DockerHub data management layer
+func (store *Store) DockerHub() portainer.DockerHubService {
+	return store.DockerHubService
+}
+
+// EdgeGroup gives access to the EdgeGroup data management layer
+func (store *Store) EdgeGroup() portainer.EdgeGroupService {
+	return store.EdgeGroupService
+}
+
+// EdgeStack gives access to the EdgeStack data management layer
+func (store *Store) EdgeStack() portainer.EdgeStackService {
+	return store.EdgeStackService
+}
+
+// Endpoint gives access to the Endpoint data management layer
+func (store *Store) Endpoint() portainer.EndpointService {
+	return store.EndpointService
+}
+
+// EndpointGroup gives access to the EndpointGroup data management layer
+func (store *Store) EndpointGroup() portainer.EndpointGroupService {
+	return store.EndpointGroupService
+}
+
+// EndpointRelation gives access to the EndpointRelation data management layer
+func (store *Store) EndpointRelation() portainer.EndpointRelationService {
+	return store.EndpointRelationService
+}
+
+// Extension gives access to the Extension data management layer
+func (store *Store) Extension() portainer.ExtensionService {
+	return store.ExtensionService
+}
+
+// Registry gives access to the Registry data management layer
+func (store *Store) Registry() portainer.RegistryService {
+	return store.RegistryService
+}
+
+// ResourceControl gives access to the ResourceControl data management layer
+func (store *Store) ResourceControl() portainer.ResourceControlService {
+	return store.ResourceControlService
+}
+
+// Role gives access to the Role data management layer
+func (store *Store) Role() portainer.RoleService {
+	return store.RoleService
+}
+
+// Schedule gives access to the Schedule data management layer
+func (store *Store) Schedule() portainer.ScheduleService {
+	return store.ScheduleService
+}
+
+// Settings gives access to the Settings data management layer
+func (store *Store) Settings() portainer.SettingsService {
+	return store.SettingsService
+}
+
+// Stack gives access to the Stack data management layer
+func (store *Store) Stack() portainer.StackService {
+	return store.StackService
+}
+
+// Tag gives access to the Tag data management layer
+func (store *Store) Tag() portainer.TagService {
+	return store.TagService
+}
+
+// TeamMembership gives access to the TeamMembership data management layer
+func (store *Store) TeamMembership() portainer.TeamMembershipService {
+	return store.TeamMembershipService
+}
+
+// Team gives access to the Team data management layer
+func (store *Store) Team() portainer.TeamService {
+	return store.TeamService
+}
+
+// TunnelServer gives access to the TunnelServer data management layer
+func (store *Store) TunnelServer() portainer.TunnelServerService {
+	return store.TunnelServerService
+}
+
+// User gives access to the User data management layer
+func (store *Store) User() portainer.UserService {
+	return store.UserService
+}
+
+// Version gives access to the Version data management layer
+func (store *Store) Version() portainer.VersionService {
+	return store.VersionService
+}
+
+// Webhook gives access to the Webhook data management layer
+func (store *Store) Webhook() portainer.WebhookService {
+	return store.WebhookService
 }

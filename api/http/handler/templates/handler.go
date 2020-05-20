@@ -12,7 +12,7 @@ import (
 // Handler represents an HTTP API handler for managing templates.
 type Handler struct {
 	*mux.Router
-	SettingsService portainer.SettingsService
+	DataStore portainer.DataStore
 }
 
 // NewHandler returns a new instance of Handler.

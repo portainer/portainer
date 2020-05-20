@@ -68,7 +68,7 @@ func (handler *Handler) resourceControlCreate(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid type value. Value must be one of: container, service, volume, network, secret, stack or config", portainer.ErrInvalidResourceControlType}
 	}
 
-	rc, err := handler.ResourceControlService.ResourceControlByResourceIDAndType(payload.ResourceID, resourceControlType)
+	rc, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(payload.ResourceID, resourceControlType)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve resource controls from the database", err}
 	}
@@ -104,7 +104,7 @@ func (handler *Handler) resourceControlCreate(w http.ResponseWriter, r *http.Req
 		TeamAccesses:       teamAccesses,
 	}
 
-	err = handler.ResourceControlService.CreateResourceControl(&resourceControl)
+	err = handler.DataStore.ResourceControl().CreateResourceControl(&resourceControl)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the resource control inside the database", err}
 	}

@@ -49,7 +49,7 @@ func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *http
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to create administrator user", portainer.ErrResourceAccessDenied}
 	}
 
-	user, err := handler.UserService.UserByUsername(payload.Username)
+	user, err := handler.DataStore.User().UserByUsername(payload.Username)
 	if err != nil && err != portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve users from the database", err}
 	}
@@ -63,7 +63,7 @@ func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *http
 		PortainerAuthorizations: portainer.DefaultPortainerAuthorizations(),
 	}
 
-	settings, err := handler.SettingsService.Settings()
+	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
 	}
@@ -75,7 +75,7 @@ func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *http
 		}
 	}
 
-	err = handler.UserService.CreateUser(user)
+	err = handler.DataStore.User().CreateUser(user)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist user inside the database", err}
 	}

@@ -42,7 +42,7 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	stacks, err := handler.StackService.Stacks()
+	stacks, err := handler.DataStore.Stack().Stacks()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve stacks from the database", err}
 	}
@@ -53,7 +53,7 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 		}
 	}
 
-	stackID := handler.StackService.GetNextIdentifier()
+	stackID := handler.DataStore.Stack().GetNextIdentifier()
 	stack := &portainer.Stack{
 		ID:         portainer.StackID(stackID),
 		Name:       payload.Name,
@@ -84,7 +84,7 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
 
-	err = handler.StackService.CreateStack(stack)
+	err = handler.DataStore.Stack().CreateStack(stack)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack inside the database", err}
 	}
@@ -131,7 +131,7 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	stacks, err := handler.StackService.Stacks()
+	stacks, err := handler.DataStore.Stack().Stacks()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve stacks from the database", err}
 	}
@@ -142,7 +142,7 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 		}
 	}
 
-	stackID := handler.StackService.GetNextIdentifier()
+	stackID := handler.DataStore.Stack().GetNextIdentifier()
 	stack := &portainer.Stack{
 		ID:         portainer.StackID(stackID),
 		Name:       payload.Name,
@@ -183,7 +183,7 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
 
-	err = handler.StackService.CreateStack(stack)
+	err = handler.DataStore.Stack().CreateStack(stack)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack inside the database", err}
 	}
@@ -234,7 +234,7 @@ func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r 
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	stacks, err := handler.StackService.Stacks()
+	stacks, err := handler.DataStore.Stack().Stacks()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve stacks from the database", err}
 	}
@@ -245,7 +245,7 @@ func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r 
 		}
 	}
 
-	stackID := handler.StackService.GetNextIdentifier()
+	stackID := handler.DataStore.Stack().GetNextIdentifier()
 	stack := &portainer.Stack{
 		ID:         portainer.StackID(stackID),
 		Name:       payload.Name,
@@ -276,7 +276,7 @@ func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r 
 		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
 
-	err = handler.StackService.CreateStack(stack)
+	err = handler.DataStore.Stack().CreateStack(stack)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack inside the database", err}
 	}
@@ -300,12 +300,12 @@ func (handler *Handler) createSwarmDeployConfig(r *http.Request, stack *portaine
 		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
 
-	dockerhub, err := handler.DockerHubService.DockerHub()
+	dockerhub, err := handler.DataStore.DockerHub().DockerHub()
 	if err != nil {
 		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve DockerHub details from the database", err}
 	}
 
-	registries, err := handler.RegistryService.Registries()
+	registries, err := handler.DataStore.Registry().Registries()
 	if err != nil {
 		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
 	}
@@ -324,7 +324,7 @@ func (handler *Handler) createSwarmDeployConfig(r *http.Request, stack *portaine
 }
 
 func (handler *Handler) deploySwarmStack(config *swarmStackDeploymentConfig) error {
-	settings, err := handler.SettingsService.Settings()
+	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return err
 	}

@@ -3,34 +3,13 @@ package portainer
 // AuthorizationService represents a service used to
 // update authorizations associated to a user or team.
 type AuthorizationService struct {
-	endpointService       EndpointService
-	endpointGroupService  EndpointGroupService
-	registryService       RegistryService
-	roleService           RoleService
-	teamMembershipService TeamMembershipService
-	userService           UserService
-}
-
-// AuthorizationServiceParameters are the required parameters
-// used to create a new AuthorizationService.
-type AuthorizationServiceParameters struct {
-	EndpointService       EndpointService
-	EndpointGroupService  EndpointGroupService
-	RegistryService       RegistryService
-	RoleService           RoleService
-	TeamMembershipService TeamMembershipService
-	UserService           UserService
+	dataStore DataStore
 }
 
 // NewAuthorizationService returns a point to a new AuthorizationService instance.
-func NewAuthorizationService(parameters *AuthorizationServiceParameters) *AuthorizationService {
+func NewAuthorizationService(dataStore DataStore) *AuthorizationService {
 	return &AuthorizationService{
-		endpointService:       parameters.EndpointService,
-		endpointGroupService:  parameters.EndpointGroupService,
-		registryService:       parameters.RegistryService,
-		roleService:           parameters.RoleService,
-		teamMembershipService: parameters.TeamMembershipService,
-		userService:           parameters.UserService,
+		dataStore: dataStore,
 	}
 }
 
@@ -449,7 +428,7 @@ func DefaultPortainerAuthorizations() Authorizations {
 // the authorizations will be dropped for the each role. If removeAuthorizations is set to false, the authorizations
 // will be reset based for each role.
 func (service AuthorizationService) UpdateVolumeBrowsingAuthorizations(remove bool) error {
-	roles, err := service.roleService.Roles()
+	roles, err := service.dataStore.Role().Roles()
 	if err != nil {
 		return err
 	}
@@ -459,7 +438,7 @@ func (service AuthorizationService) UpdateVolumeBrowsingAuthorizations(remove bo
 		if role.ID != RoleID(1) {
 			updateRoleVolumeBrowsingAuthorizations(&role, remove)
 
-			err := service.roleService.UpdateRole(role.ID, &role)
+			err := service.dataStore.Role().UpdateRole(role.ID, &role)
 			if err != nil {
 				return err
 			}
@@ -492,7 +471,7 @@ func updateRoleVolumeBrowsingAuthorizations(role *Role, removeAuthorizations boo
 
 // RemoveTeamAccessPolicies will remove all existing access policies associated to the specified team
 func (service *AuthorizationService) RemoveTeamAccessPolicies(teamID TeamID) error {
-	endpoints, err := service.endpointService.Endpoints()
+	endpoints, err := service.dataStore.Endpoint().Endpoints()
 	if err != nil {
 		return err
 	}
@@ -502,7 +481,7 @@ func (service *AuthorizationService) RemoveTeamAccessPolicies(teamID TeamID) err
 			if policyTeamID == teamID {
 				delete(endpoint.TeamAccessPolicies, policyTeamID)
 
-				err := service.endpointService.UpdateEndpoint(endpoint.ID, &endpoint)
+				err := service.dataStore.Endpoint().UpdateEndpoint(endpoint.ID, &endpoint)
 				if err != nil {
 					return err
 				}
@@ -512,7 +491,7 @@ func (service *AuthorizationService) RemoveTeamAccessPolicies(teamID TeamID) err
 		}
 	}
 
-	endpointGroups, err := service.endpointGroupService.EndpointGroups()
+	endpointGroups, err := service.dataStore.EndpointGroup().EndpointGroups()
 	if err != nil {
 		return err
 	}
@@ -522,7 +501,7 @@ func (service *AuthorizationService) RemoveTeamAccessPolicies(teamID TeamID) err
 			if policyTeamID == teamID {
 				delete(endpointGroup.TeamAccessPolicies, policyTeamID)
 
-				err := service.endpointGroupService.UpdateEndpointGroup(endpointGroup.ID, &endpointGroup)
+				err := service.dataStore.EndpointGroup().UpdateEndpointGroup(endpointGroup.ID, &endpointGroup)
 				if err != nil {
 					return err
 				}
@@ -532,7 +511,7 @@ func (service *AuthorizationService) RemoveTeamAccessPolicies(teamID TeamID) err
 		}
 	}
 
-	registries, err := service.registryService.Registries()
+	registries, err := service.dataStore.Registry().Registries()
 	if err != nil {
 		return err
 	}
@@ -542,7 +521,7 @@ func (service *AuthorizationService) RemoveTeamAccessPolicies(teamID TeamID) err
 			if policyTeamID == teamID {
 				delete(registry.TeamAccessPolicies, policyTeamID)
 
-				err := service.registryService.UpdateRegistry(registry.ID, &registry)
+				err := service.dataStore.Registry().UpdateRegistry(registry.ID, &registry)
 				if err != nil {
 					return err
 				}
@@ -557,7 +536,7 @@ func (service *AuthorizationService) RemoveTeamAccessPolicies(teamID TeamID) err
 
 // RemoveUserAccessPolicies will remove all existing access policies associated to the specified user
 func (service *AuthorizationService) RemoveUserAccessPolicies(userID UserID) error {
-	endpoints, err := service.endpointService.Endpoints()
+	endpoints, err := service.dataStore.Endpoint().Endpoints()
 	if err != nil {
 		return err
 	}
@@ -567,7 +546,7 @@ func (service *AuthorizationService) RemoveUserAccessPolicies(userID UserID) err
 			if policyUserID == userID {
 				delete(endpoint.UserAccessPolicies, policyUserID)
 
-				err := service.endpointService.UpdateEndpoint(endpoint.ID, &endpoint)
+				err := service.dataStore.Endpoint().UpdateEndpoint(endpoint.ID, &endpoint)
 				if err != nil {
 					return err
 				}
@@ -577,7 +556,7 @@ func (service *AuthorizationService) RemoveUserAccessPolicies(userID UserID) err
 		}
 	}
 
-	endpointGroups, err := service.endpointGroupService.EndpointGroups()
+	endpointGroups, err := service.dataStore.EndpointGroup().EndpointGroups()
 	if err != nil {
 		return err
 	}
@@ -587,7 +566,7 @@ func (service *AuthorizationService) RemoveUserAccessPolicies(userID UserID) err
 			if policyUserID == userID {
 				delete(endpointGroup.UserAccessPolicies, policyUserID)
 
-				err := service.endpointGroupService.UpdateEndpointGroup(endpointGroup.ID, &endpointGroup)
+				err := service.dataStore.EndpointGroup().UpdateEndpointGroup(endpointGroup.ID, &endpointGroup)
 				if err != nil {
 					return err
 				}
@@ -597,7 +576,7 @@ func (service *AuthorizationService) RemoveUserAccessPolicies(userID UserID) err
 		}
 	}
 
-	registries, err := service.registryService.Registries()
+	registries, err := service.dataStore.Registry().Registries()
 	if err != nil {
 		return err
 	}
@@ -607,7 +586,7 @@ func (service *AuthorizationService) RemoveUserAccessPolicies(userID UserID) err
 			if policyUserID == userID {
 				delete(registry.UserAccessPolicies, policyUserID)
 
-				err := service.registryService.UpdateRegistry(registry.ID, &registry)
+				err := service.dataStore.Registry().UpdateRegistry(registry.ID, &registry)
 				if err != nil {
 					return err
 				}
@@ -622,7 +601,7 @@ func (service *AuthorizationService) RemoveUserAccessPolicies(userID UserID) err
 
 // UpdateUsersAuthorizations will trigger an update of the authorizations for all the users.
 func (service *AuthorizationService) UpdateUsersAuthorizations() error {
-	users, err := service.userService.Users()
+	users, err := service.dataStore.User().Users()
 	if err != nil {
 		return err
 	}
@@ -638,7 +617,7 @@ func (service *AuthorizationService) UpdateUsersAuthorizations() error {
 }
 
 func (service *AuthorizationService) updateUserAuthorizations(userID UserID) error {
-	user, err := service.userService.User(userID)
+	user, err := service.dataStore.User().User(userID)
 	if err != nil {
 		return err
 	}
@@ -650,7 +629,7 @@ func (service *AuthorizationService) updateUserAuthorizations(userID UserID) err
 
 	user.EndpointAuthorizations = endpointAuthorizations
 
-	return service.userService.UpdateUser(userID, user)
+	return service.dataStore.User().UpdateUser(userID, user)
 }
 
 func (service *AuthorizationService) getAuthorizations(user *User) (EndpointAuthorizations, error) {
@@ -659,22 +638,22 @@ func (service *AuthorizationService) getAuthorizations(user *User) (EndpointAuth
 		return endpointAuthorizations, nil
 	}
 
-	userMemberships, err := service.teamMembershipService.TeamMembershipsByUserID(user.ID)
+	userMemberships, err := service.dataStore.TeamMembership().TeamMembershipsByUserID(user.ID)
 	if err != nil {
 		return endpointAuthorizations, err
 	}
 
-	endpoints, err := service.endpointService.Endpoints()
+	endpoints, err := service.dataStore.Endpoint().Endpoints()
 	if err != nil {
 		return endpointAuthorizations, err
 	}
 
-	endpointGroups, err := service.endpointGroupService.EndpointGroups()
+	endpointGroups, err := service.dataStore.EndpointGroup().EndpointGroups()
 	if err != nil {
 		return endpointAuthorizations, err
 	}
 
-	roles, err := service.roleService.Roles()
+	roles, err := service.dataStore.Role().Roles()
 	if err != nil {
 		return endpointAuthorizations, err
 	}

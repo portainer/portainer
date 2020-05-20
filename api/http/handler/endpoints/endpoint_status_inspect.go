@@ -30,7 +30,7 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint identifier route variable", err}
 	}
 
-	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {
@@ -47,13 +47,13 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 
 		endpoint.EdgeID = edgeIdentifier
 
-		err := handler.EndpointService.UpdateEndpoint(endpoint.ID, endpoint)
+		err := handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to Unable to persist endpoint changes inside the database", err}
 		}
 	}
 
-	settings, err := handler.SettingsService.Settings()
+	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
 	}
@@ -72,14 +72,14 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 		handler.ReverseTunnelService.SetTunnelStatusToActive(endpoint.ID)
 	}
 
-	relation, err := handler.EndpointRelationService.EndpointRelation(endpoint.ID)
+	relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpoint.ID)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve relation object from the database", err}
 	}
 
 	edgeStacksStatus := []stackStatusResponse{}
 	for stackID := range relation.EdgeStacks {
-		stack, err := handler.EdgeStackService.EdgeStack(stackID)
+		stack, err := handler.DataStore.EdgeStack().EdgeStack(stackID)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge stack from the database", err}
 		}

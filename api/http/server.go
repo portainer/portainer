@@ -45,163 +45,87 @@ import (
 
 // Server implements the portainer.Server interface
 type Server struct {
-	BindAddress             string
-	AssetsPath              string
-	AuthDisabled            bool
-	Status                  *portainer.Status
-	ReverseTunnelService    portainer.ReverseTunnelService
-	ExtensionManager        portainer.ExtensionManager
-	ComposeStackManager     portainer.ComposeStackManager
-	CryptoService           portainer.CryptoService
-	SignatureService        portainer.DigitalSignatureService
-	JobScheduler            portainer.JobScheduler
-	Snapshotter             portainer.Snapshotter
-	RoleService             portainer.RoleService
-	DockerHubService        portainer.DockerHubService
-	EdgeGroupService        portainer.EdgeGroupService
-	EdgeStackService        portainer.EdgeStackService
-	EndpointService         portainer.EndpointService
-	EndpointGroupService    portainer.EndpointGroupService
-	EndpointRelationService portainer.EndpointRelationService
-	FileService             portainer.FileService
-	GitService              portainer.GitService
-	JWTService              portainer.JWTService
-	LDAPService             portainer.LDAPService
-	ExtensionService        portainer.ExtensionService
-	RegistryService         portainer.RegistryService
-	ResourceControlService  portainer.ResourceControlService
-	ScheduleService         portainer.ScheduleService
-	SettingsService         portainer.SettingsService
-	StackService            portainer.StackService
-	SwarmStackManager       portainer.SwarmStackManager
-	TagService              portainer.TagService
-	TeamService             portainer.TeamService
-	TeamMembershipService   portainer.TeamMembershipService
-	UserService             portainer.UserService
-	WebhookService          portainer.WebhookService
-	Handler                 *handler.Handler
-	SSL                     bool
-	SSLCert                 string
-	SSLKey                  string
-	DockerClientFactory     *docker.ClientFactory
-	JobService              portainer.JobService
+	BindAddress          string
+	AssetsPath           string
+	AuthDisabled         bool
+	Status               *portainer.Status
+	ReverseTunnelService portainer.ReverseTunnelService
+	ExtensionManager     portainer.ExtensionManager
+	ComposeStackManager  portainer.ComposeStackManager
+	CryptoService        portainer.CryptoService
+	SignatureService     portainer.DigitalSignatureService
+	JobScheduler         portainer.JobScheduler
+	Snapshotter          portainer.Snapshotter
+	FileService          portainer.FileService
+	DataStore            portainer.DataStore
+	GitService           portainer.GitService
+	JWTService           portainer.JWTService
+	LDAPService          portainer.LDAPService
+	SwarmStackManager    portainer.SwarmStackManager
+	Handler              *handler.Handler
+	SSL                  bool
+	SSLCert              string
+	SSLKey               string
+	DockerClientFactory  *docker.ClientFactory
+	JobService           portainer.JobService
 }
 
 // Start starts the HTTP server
 func (server *Server) Start() error {
-	proxyManagerParameters := &proxy.ManagerParams{
-		ResourceControlService: server.ResourceControlService,
-		UserService:            server.UserService,
-		TeamService:            server.TeamService,
-		TeamMembershipService:  server.TeamMembershipService,
-		SettingsService:        server.SettingsService,
-		RegistryService:        server.RegistryService,
-		DockerHubService:       server.DockerHubService,
-		SignatureService:       server.SignatureService,
-		ReverseTunnelService:   server.ReverseTunnelService,
-		ExtensionService:       server.ExtensionService,
-		DockerClientFactory:    server.DockerClientFactory,
-	}
-	proxyManager := proxy.NewManager(proxyManagerParameters)
+	proxyManager := proxy.NewManager(server.DataStore, server.SignatureService, server.ReverseTunnelService, server.DockerClientFactory)
 
-	authorizationServiceParameters := &portainer.AuthorizationServiceParameters{
-		EndpointService:       server.EndpointService,
-		EndpointGroupService:  server.EndpointGroupService,
-		RegistryService:       server.RegistryService,
-		RoleService:           server.RoleService,
-		TeamMembershipService: server.TeamMembershipService,
-		UserService:           server.UserService,
-	}
-	authorizationService := portainer.NewAuthorizationService(authorizationServiceParameters)
+	authorizationService := portainer.NewAuthorizationService(server.DataStore)
 
-	requestBouncerParameters := &security.RequestBouncerParams{
-		JWTService:            server.JWTService,
-		UserService:           server.UserService,
-		TeamMembershipService: server.TeamMembershipService,
-		EndpointService:       server.EndpointService,
-		EndpointGroupService:  server.EndpointGroupService,
-		ExtensionService:      server.ExtensionService,
-		RBACExtensionURL:      proxyManager.GetExtensionURL(portainer.RBACExtension),
-		AuthDisabled:          server.AuthDisabled,
-	}
-	requestBouncer := security.NewRequestBouncer(requestBouncerParameters)
+	rbacExtensionURL := proxyManager.GetExtensionURL(portainer.RBACExtension)
+	requestBouncer := security.NewRequestBouncer(server.DataStore, server.JWTService, server.AuthDisabled, rbacExtensionURL)
 
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
 
 	var authHandler = auth.NewHandler(requestBouncer, rateLimiter, server.AuthDisabled)
-	authHandler.UserService = server.UserService
+	authHandler.DataStore = server.DataStore
 	authHandler.CryptoService = server.CryptoService
 	authHandler.JWTService = server.JWTService
 	authHandler.LDAPService = server.LDAPService
-	authHandler.SettingsService = server.SettingsService
-	authHandler.TeamService = server.TeamService
-	authHandler.TeamMembershipService = server.TeamMembershipService
-	authHandler.ExtensionService = server.ExtensionService
-	authHandler.EndpointService = server.EndpointService
-	authHandler.EndpointGroupService = server.EndpointGroupService
-	authHandler.RoleService = server.RoleService
 	authHandler.ProxyManager = proxyManager
 	authHandler.AuthorizationService = authorizationService
 
 	var roleHandler = roles.NewHandler(requestBouncer)
-	roleHandler.RoleService = server.RoleService
+	roleHandler.DataStore = server.DataStore
 
 	var dockerHubHandler = dockerhub.NewHandler(requestBouncer)
-	dockerHubHandler.DockerHubService = server.DockerHubService
+	dockerHubHandler.DataStore = server.DataStore
 
 	var edgeGroupsHandler = edgegroups.NewHandler(requestBouncer)
-	edgeGroupsHandler.EdgeGroupService = server.EdgeGroupService
-	edgeGroupsHandler.EdgeStackService = server.EdgeStackService
-	edgeGroupsHandler.EndpointService = server.EndpointService
-	edgeGroupsHandler.EndpointGroupService = server.EndpointGroupService
-	edgeGroupsHandler.EndpointRelationService = server.EndpointRelationService
-	edgeGroupsHandler.TagService = server.TagService
+	edgeGroupsHandler.DataStore = server.DataStore
 
 	var edgeStacksHandler = edgestacks.NewHandler(requestBouncer)
-	edgeStacksHandler.EdgeGroupService = server.EdgeGroupService
-	edgeStacksHandler.EdgeStackService = server.EdgeStackService
-	edgeStacksHandler.EndpointService = server.EndpointService
-	edgeStacksHandler.EndpointGroupService = server.EndpointGroupService
-	edgeStacksHandler.EndpointRelationService = server.EndpointRelationService
+	edgeStacksHandler.DataStore = server.DataStore
 	edgeStacksHandler.FileService = server.FileService
 	edgeStacksHandler.GitService = server.GitService
 
 	var edgeTemplatesHandler = edgetemplates.NewHandler(requestBouncer)
-	edgeTemplatesHandler.SettingsService = server.SettingsService
+	edgeTemplatesHandler.DataStore = server.DataStore
 
 	var endpointHandler = endpoints.NewHandler(requestBouncer)
+	endpointHandler.DataStore = server.DataStore
 	endpointHandler.AuthorizationService = authorizationService
-	endpointHandler.EdgeGroupService = server.EdgeGroupService
-	endpointHandler.EdgeStackService = server.EdgeStackService
-	endpointHandler.EndpointService = server.EndpointService
-	endpointHandler.EndpointGroupService = server.EndpointGroupService
-	endpointHandler.EndpointRelationService = server.EndpointRelationService
 	endpointHandler.FileService = server.FileService
 	endpointHandler.JobService = server.JobService
 	endpointHandler.ProxyManager = proxyManager
 	endpointHandler.ReverseTunnelService = server.ReverseTunnelService
-	endpointHandler.SettingsService = server.SettingsService
 	endpointHandler.Snapshotter = server.Snapshotter
-	endpointHandler.TagService = server.TagService
 
 	var endpointEdgeHandler = endpointedge.NewHandler(requestBouncer)
-	endpointEdgeHandler.EdgeStackService = server.EdgeStackService
-	endpointEdgeHandler.EndpointService = server.EndpointService
+	endpointEdgeHandler.DataStore = server.DataStore
 	endpointEdgeHandler.FileService = server.FileService
 
 	var endpointGroupHandler = endpointgroups.NewHandler(requestBouncer)
+	endpointGroupHandler.DataStore = server.DataStore
 	endpointGroupHandler.AuthorizationService = authorizationService
-	endpointGroupHandler.EdgeGroupService = server.EdgeGroupService
-	endpointGroupHandler.EdgeStackService = server.EdgeStackService
-	endpointGroupHandler.EndpointService = server.EndpointService
-	endpointGroupHandler.EndpointGroupService = server.EndpointGroupService
-	endpointGroupHandler.EndpointRelationService = server.EndpointRelationService
-	endpointGroupHandler.TagService = server.TagService
 
 	var endpointProxyHandler = endpointproxy.NewHandler(requestBouncer)
-	endpointProxyHandler.EndpointService = server.EndpointService
+	endpointProxyHandler.DataStore = server.DataStore
 	endpointProxyHandler.ProxyManager = proxyManager
-	endpointProxyHandler.SettingsService = server.SettingsService
 	endpointProxyHandler.ReverseTunnelService = server.ReverseTunnelService
 
 	var fileHandler = file.NewHandler(filepath.Join(server.AssetsPath, "public"))
@@ -209,70 +133,48 @@ func (server *Server) Start() error {
 	var motdHandler = motd.NewHandler(requestBouncer)
 
 	var extensionHandler = extensions.NewHandler(requestBouncer)
-	extensionHandler.ExtensionService = server.ExtensionService
+	extensionHandler.DataStore = server.DataStore
 	extensionHandler.ExtensionManager = server.ExtensionManager
-	extensionHandler.EndpointGroupService = server.EndpointGroupService
-	extensionHandler.EndpointService = server.EndpointService
-	extensionHandler.RegistryService = server.RegistryService
 	extensionHandler.AuthorizationService = authorizationService
 
 	var registryHandler = registries.NewHandler(requestBouncer)
-	registryHandler.RegistryService = server.RegistryService
-	registryHandler.ExtensionService = server.ExtensionService
+	registryHandler.DataStore = server.DataStore
 	registryHandler.FileService = server.FileService
 	registryHandler.ProxyManager = proxyManager
 
 	var resourceControlHandler = resourcecontrols.NewHandler(requestBouncer)
-	resourceControlHandler.ResourceControlService = server.ResourceControlService
+	resourceControlHandler.DataStore = server.DataStore
 
 	var schedulesHandler = schedules.NewHandler(requestBouncer)
-	schedulesHandler.ScheduleService = server.ScheduleService
-	schedulesHandler.EndpointService = server.EndpointService
+	schedulesHandler.DataStore = server.DataStore
 	schedulesHandler.FileService = server.FileService
 	schedulesHandler.JobService = server.JobService
 	schedulesHandler.JobScheduler = server.JobScheduler
-	schedulesHandler.SettingsService = server.SettingsService
 	schedulesHandler.ReverseTunnelService = server.ReverseTunnelService
 
 	var settingsHandler = settings.NewHandler(requestBouncer)
-	settingsHandler.SettingsService = server.SettingsService
+	settingsHandler.DataStore = server.DataStore
 	settingsHandler.LDAPService = server.LDAPService
 	settingsHandler.FileService = server.FileService
 	settingsHandler.JobScheduler = server.JobScheduler
-	settingsHandler.ScheduleService = server.ScheduleService
-	settingsHandler.RoleService = server.RoleService
-	settingsHandler.ExtensionService = server.ExtensionService
 	settingsHandler.AuthorizationService = authorizationService
 
 	var stackHandler = stacks.NewHandler(requestBouncer)
+	stackHandler.DataStore = server.DataStore
 	stackHandler.FileService = server.FileService
-	stackHandler.StackService = server.StackService
-	stackHandler.EndpointService = server.EndpointService
-	stackHandler.ResourceControlService = server.ResourceControlService
 	stackHandler.SwarmStackManager = server.SwarmStackManager
 	stackHandler.ComposeStackManager = server.ComposeStackManager
 	stackHandler.GitService = server.GitService
-	stackHandler.RegistryService = server.RegistryService
-	stackHandler.DockerHubService = server.DockerHubService
-	stackHandler.SettingsService = server.SettingsService
-	stackHandler.UserService = server.UserService
-	stackHandler.ExtensionService = server.ExtensionService
 
 	var tagHandler = tags.NewHandler(requestBouncer)
-	tagHandler.EdgeGroupService = server.EdgeGroupService
-	tagHandler.EdgeStackService = server.EdgeStackService
-	tagHandler.EndpointService = server.EndpointService
-	tagHandler.EndpointGroupService = server.EndpointGroupService
-	tagHandler.EndpointRelationService = server.EndpointRelationService
-	tagHandler.TagService = server.TagService
+	tagHandler.DataStore = server.DataStore
 
 	var teamHandler = teams.NewHandler(requestBouncer)
-	teamHandler.TeamService = server.TeamService
-	teamHandler.TeamMembershipService = server.TeamMembershipService
+	teamHandler.DataStore = server.DataStore
 	teamHandler.AuthorizationService = authorizationService
 
 	var teamMembershipHandler = teammemberships.NewHandler(requestBouncer)
-	teamMembershipHandler.TeamMembershipService = server.TeamMembershipService
+	teamMembershipHandler.DataStore = server.DataStore
 	teamMembershipHandler.AuthorizationService = authorizationService
 
 	var statusHandler = status.NewHandler(requestBouncer, server.Status)
@@ -280,28 +182,23 @@ func (server *Server) Start() error {
 	var supportHandler = support.NewHandler(requestBouncer)
 
 	var templatesHandler = templates.NewHandler(requestBouncer)
-	templatesHandler.SettingsService = server.SettingsService
+	templatesHandler.DataStore = server.DataStore
 
 	var uploadHandler = upload.NewHandler(requestBouncer)
 	uploadHandler.FileService = server.FileService
 
 	var userHandler = users.NewHandler(requestBouncer, rateLimiter)
-	userHandler.UserService = server.UserService
-	userHandler.TeamService = server.TeamService
-	userHandler.TeamMembershipService = server.TeamMembershipService
+	userHandler.DataStore = server.DataStore
 	userHandler.CryptoService = server.CryptoService
-	userHandler.ResourceControlService = server.ResourceControlService
-	userHandler.SettingsService = server.SettingsService
 	userHandler.AuthorizationService = authorizationService
 
 	var websocketHandler = websocket.NewHandler(requestBouncer)
-	websocketHandler.EndpointService = server.EndpointService
+	websocketHandler.DataStore = server.DataStore
 	websocketHandler.SignatureService = server.SignatureService
 	websocketHandler.ReverseTunnelService = server.ReverseTunnelService
 
 	var webhookHandler = webhooks.NewHandler(requestBouncer)
-	webhookHandler.WebhookService = server.WebhookService
-	webhookHandler.EndpointService = server.EndpointService
+	webhookHandler.DataStore = server.DataStore
 	webhookHandler.DockerClientFactory = server.DockerClientFactory
 
 	server.Handler = &handler.Handler{

@@ -10,7 +10,7 @@ import (
 
 // GET request on /api/registries
 func (handler *Handler) registryList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	registries, err := handler.RegistryService.Registries()
+	registries, err := handler.DataStore.Registry().Registries()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
 	}

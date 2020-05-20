@@ -51,7 +51,7 @@ func (handler *Handler) teamMembershipUpdate(w http.ResponseWriter, r *http.Requ
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update the membership", portainer.ErrResourceAccessDenied}
 	}
 
-	membership, err := handler.TeamMembershipService.TeamMembership(portainer.TeamMembershipID(membershipID))
+	membership, err := handler.DataStore.TeamMembership().TeamMembership(portainer.TeamMembershipID(membershipID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a team membership with the specified identifier inside the database", err}
 	} else if err != nil {
@@ -66,7 +66,7 @@ func (handler *Handler) teamMembershipUpdate(w http.ResponseWriter, r *http.Requ
 	membership.TeamID = portainer.TeamID(payload.TeamID)
 	membership.Role = portainer.MembershipRole(payload.Role)
 
-	err = handler.TeamMembershipService.UpdateTeamMembership(membership.ID, membership)
+	err = handler.DataStore.TeamMembership().UpdateTeamMembership(membership.ID, membership)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist membership changes inside the database", err}
 	}

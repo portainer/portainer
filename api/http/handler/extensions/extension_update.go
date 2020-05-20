@@ -35,7 +35,7 @@ func (handler *Handler) extensionUpdate(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	extension, err := handler.ExtensionService.Extension(extensionID)
+	extension, err := handler.DataStore.Extension().Extension(extensionID)
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a extension with the specified identifier inside the database", err}
 	} else if err != nil {
@@ -47,7 +47,7 @@ func (handler *Handler) extensionUpdate(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update extension", err}
 	}
 
-	err = handler.ExtensionService.Persist(extension)
+	err = handler.DataStore.Extension().Persist(extension)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist extension status inside the database", err}
 	}

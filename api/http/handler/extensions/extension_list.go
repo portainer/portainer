@@ -12,7 +12,7 @@ import (
 func (handler *Handler) extensionList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	fetchManifestInformation, _ := request.RetrieveBooleanQueryParameter(r, "store", true)
 
-	extensions, err := handler.ExtensionService.Extensions()
+	extensions, err := handler.DataStore.Extension().Extensions()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve extensions from the database", err}
 	}

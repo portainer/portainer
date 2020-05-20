@@ -21,7 +21,7 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusInternalServerError, "Invalid service id parameter", err}
 	}
 
-	webhook, err := handler.WebhookService.WebhookByToken(webhookToken)
+	webhook, err := handler.DataStore.Webhook().WebhookByToken(webhookToken)
 
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a webhook with this token", err}
@@ -33,7 +33,7 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 	endpointID := webhook.EndpointID
 	webhookType := webhook.WebhookType
 
-	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {

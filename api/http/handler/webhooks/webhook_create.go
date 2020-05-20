@@ -37,7 +37,7 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	webhook, err := handler.WebhookService.WebhookByResourceID(payload.ResourceID)
+	webhook, err := handler.DataStore.Webhook().WebhookByResourceID(payload.ResourceID)
 	if err != nil && err != portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "An error occurred retrieving webhooks from the database", err}
 	}
@@ -57,7 +57,7 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 		WebhookType: portainer.WebhookType(payload.WebhookType),
 	}
 
-	err = handler.WebhookService.CreateWebhook(webhook)
+	err = handler.DataStore.Webhook().CreateWebhook(webhook)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the webhook inside the database", err}
 	}

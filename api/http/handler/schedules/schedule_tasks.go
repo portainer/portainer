@@ -24,7 +24,7 @@ type taskContainer struct {
 
 // GET request on /api/schedules/:id/tasks
 func (handler *Handler) scheduleTasks(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	settings, err := handler.SettingsService.Settings()
+	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusServiceUnavailable, "Unable to retrieve settings", err}
 	}
@@ -37,7 +37,7 @@ func (handler *Handler) scheduleTasks(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid schedule identifier route variable", err}
 	}
 
-	schedule, err := handler.ScheduleService.Schedule(portainer.ScheduleID(scheduleID))
+	schedule, err := handler.DataStore.Schedule().Schedule(portainer.ScheduleID(scheduleID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a schedule with the specified identifier inside the database", err}
 	} else if err != nil {
@@ -51,7 +51,7 @@ func (handler *Handler) scheduleTasks(w http.ResponseWriter, r *http.Request) *h
 	tasks := make([]taskContainer, 0)
 
 	for _, endpointID := range schedule.ScriptExecutionJob.Endpoints {
-		endpoint, err := handler.EndpointService.Endpoint(endpointID)
+		endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
 		if err == portainer.ErrObjectNotFound {
 			continue
 		} else if err != nil {
