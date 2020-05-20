@@ -34,17 +34,17 @@ var extensionBinaryMap = map[portainer.ExtensionID]string{
 // ExtensionManager represents a service used to
 // manage extension processes.
 type ExtensionManager struct {
-	processes        cmap.ConcurrentMap
-	fileService      portainer.FileService
-	extensionService portainer.ExtensionService
+	processes   cmap.ConcurrentMap
+	fileService portainer.FileService
+	dataStore   portainer.DataStore
 }
 
 // NewExtensionManager returns a pointer to an ExtensionManager
-func NewExtensionManager(fileService portainer.FileService, extensionService portainer.ExtensionService) *ExtensionManager {
+func NewExtensionManager(fileService portainer.FileService, dataStore portainer.DataStore) *ExtensionManager {
 	return &ExtensionManager{
-		processes:        cmap.New(),
-		fileService:      fileService,
-		extensionService: extensionService,
+		processes:   cmap.New(),
+		fileService: fileService,
+		dataStore:   dataStore,
 	}
 }
 
@@ -188,7 +188,7 @@ func (manager *ExtensionManager) DisableExtension(extension *portainer.Extension
 // The purpose of this function is to be ran at startup, as such most of the error handling won't block the program execution
 // and will log warning messages instead.
 func (manager *ExtensionManager) StartExtensions() error {
-	extensions, err := manager.extensionService.Extensions()
+	extensions, err := manager.dataStore.Extension().Extensions()
 	if err != nil {
 		return err
 	}
@@ -224,7 +224,7 @@ func (manager *ExtensionManager) updateAndStartExtensions(extensions []portainer
 					}
 				}
 
-				err := manager.extensionService.Persist(&extension)
+				err := manager.dataStore.Extension().Persist(&extension)
 				if err != nil {
 					return err
 				}

@@ -14,12 +14,12 @@ type decoratedEdgeGroup struct {
 }
 
 func (handler *Handler) edgeGroupList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	edgeGroups, err := handler.EdgeGroupService.EdgeGroups()
+	edgeGroups, err := handler.DataStore.EdgeGroup().EdgeGroups()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve Edge groups from the database", err}
 	}
 
-	edgeStacks, err := handler.EdgeStackService.EdgeStacks()
+	edgeStacks, err := handler.DataStore.EdgeStack().EdgeStacks()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve Edge stacks from the database", err}
 	}

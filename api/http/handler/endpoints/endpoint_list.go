@@ -38,12 +38,12 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	var endpointIDs []portainer.EndpointID
 	request.RetrieveJSONQueryParameter(r, "endpointIds", &endpointIDs, true)
 
-	endpointGroups, err := handler.EndpointGroupService.EndpointGroups()
+	endpointGroups, err := handler.DataStore.EndpointGroup().EndpointGroups()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint groups from the database", err}
 	}
 
-	endpoints, err := handler.EndpointService.Endpoints()
+	endpoints, err := handler.DataStore.Endpoint().Endpoints()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
 	}
@@ -64,7 +64,7 @@ func (handler *Handler) endpointList(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	if search != "" {
-		tags, err := handler.TagService.Tags()
+		tags, err := handler.DataStore.Tag().Tags()
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve tags from the database", err}
 		}

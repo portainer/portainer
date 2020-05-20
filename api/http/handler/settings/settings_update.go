@@ -48,7 +48,7 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	settings, err := handler.SettingsService.Settings()
+	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve the settings from the database", err}
 	}
@@ -130,7 +130,7 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		return tlsError
 	}
 
-	err = handler.SettingsService.UpdateSettings(settings)
+	err = handler.DataStore.Settings().UpdateSettings(settings)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist settings changes inside the database", err}
 	}
@@ -151,7 +151,7 @@ func (handler *Handler) updateVolumeBrowserSetting(settings *portainer.Settings)
 		return err
 	}
 
-	extension, err := handler.ExtensionService.Extension(portainer.RBACExtension)
+	extension, err := handler.DataStore.Extension().Extension(portainer.RBACExtension)
 	if err != nil && err != portainer.ErrObjectNotFound {
 		return err
 	}
@@ -169,7 +169,7 @@ func (handler *Handler) updateVolumeBrowserSetting(settings *portainer.Settings)
 func (handler *Handler) updateSnapshotInterval(settings *portainer.Settings, snapshotInterval string) error {
 	settings.SnapshotInterval = snapshotInterval
 
-	schedules, err := handler.ScheduleService.SchedulesByJobType(portainer.SnapshotJobType)
+	schedules, err := handler.DataStore.Schedule().SchedulesByJobType(portainer.SnapshotJobType)
 	if err != nil {
 		return err
 	}
@@ -183,7 +183,7 @@ func (handler *Handler) updateSnapshotInterval(settings *portainer.Settings, sna
 			return err
 		}
 
-		err = handler.ScheduleService.UpdateSchedule(snapshotSchedule.ID, &snapshotSchedule)
+		err = handler.DataStore.Schedule().UpdateSchedule(snapshotSchedule.ID, &snapshotSchedule)
 		if err != nil {
 			return err
 		}

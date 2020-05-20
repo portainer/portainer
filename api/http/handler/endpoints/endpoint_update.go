@@ -42,7 +42,7 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {
@@ -80,13 +80,13 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 			removeTags := portainer.TagDifference(endpointTagSet, payloadTagSet)
 
 			for tagID := range removeTags {
-				tag, err := handler.TagService.Tag(tagID)
+				tag, err := handler.DataStore.Tag().Tag(tagID)
 				if err != nil {
 					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a tag inside the database", err}
 				}
 
 				delete(tag.Endpoints, endpoint.ID)
-				err = handler.TagService.UpdateTag(tag.ID, tag)
+				err = handler.DataStore.Tag().UpdateTag(tag.ID, tag)
 				if err != nil {
 					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist tag changes inside the database", err}
 				}
@@ -94,14 +94,14 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 
 			endpoint.TagIDs = payload.TagIDs
 			for _, tagID := range payload.TagIDs {
-				tag, err := handler.TagService.Tag(tagID)
+				tag, err := handler.DataStore.Tag().Tag(tagID)
 				if err != nil {
 					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a tag inside the database", err}
 				}
 
 				tag.Endpoints[endpoint.ID] = true
 
-				err = handler.TagService.UpdateTag(tag.ID, tag)
+				err = handler.DataStore.Tag().UpdateTag(tag.ID, tag)
 				if err != nil {
 					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist tag changes inside the database", err}
 				}
@@ -184,7 +184,7 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
-	err = handler.EndpointService.UpdateEndpoint(endpoint.ID, endpoint)
+	err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint changes inside the database", err}
 	}
@@ -197,22 +197,22 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if endpoint.Type == portainer.EdgeAgentEnvironment && (groupIDChanged || tagsChanged) {
-		relation, err := handler.EndpointRelationService.EndpointRelation(endpoint.ID)
+		relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpoint.ID)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find endpoint relation inside the database", err}
 		}
 
-		endpointGroup, err := handler.EndpointGroupService.EndpointGroup(endpoint.GroupID)
+		endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(endpoint.GroupID)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find endpoint group inside the database", err}
 		}
 
-		edgeGroups, err := handler.EdgeGroupService.EdgeGroups()
+		edgeGroups, err := handler.DataStore.EdgeGroup().EdgeGroups()
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge groups from the database", err}
 		}
 
-		edgeStacks, err := handler.EdgeStackService.EdgeStacks()
+		edgeStacks, err := handler.DataStore.EdgeStack().EdgeStacks()
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge stacks from the database", err}
 		}
@@ -226,7 +226,7 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 
 		relation.EdgeStacks = edgeStackSet
 
-		err = handler.EndpointRelationService.UpdateEndpointRelation(endpoint.ID, relation)
+		err = handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpoint.ID, relation)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint relation changes inside the database", err}
 		}

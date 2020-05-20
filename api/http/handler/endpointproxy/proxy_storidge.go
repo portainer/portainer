@@ -18,7 +18,7 @@ func (handler *Handler) proxyRequestsToStoridgeAPI(w http.ResponseWriter, r *htt
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint identifier route variable", err}
 	}
 
-	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {

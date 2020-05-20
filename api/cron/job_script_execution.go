@@ -16,17 +16,17 @@ type ScriptExecutionJobRunner struct {
 
 // ScriptExecutionJobContext represents the context of execution of a ScriptExecutionJob
 type ScriptExecutionJobContext struct {
-	jobService      portainer.JobService
-	endpointService portainer.EndpointService
-	fileService     portainer.FileService
+	dataStore   portainer.DataStore
+	jobService  portainer.JobService
+	fileService portainer.FileService
 }
 
 // NewScriptExecutionJobContext returns a new context that can be used to execute a ScriptExecutionJob
-func NewScriptExecutionJobContext(jobService portainer.JobService, endpointService portainer.EndpointService, fileService portainer.FileService) *ScriptExecutionJobContext {
+func NewScriptExecutionJobContext(jobService portainer.JobService, dataStore portainer.DataStore, fileService portainer.FileService) *ScriptExecutionJobContext {
 	return &ScriptExecutionJobContext{
-		jobService:      jobService,
-		endpointService: endpointService,
-		fileService:     fileService,
+		jobService:  jobService,
+		dataStore:   dataStore,
+		fileService: fileService,
 	}
 }
 
@@ -56,7 +56,7 @@ func (runner *ScriptExecutionJobRunner) Run() {
 
 	targets := make([]*portainer.Endpoint, 0)
 	for _, endpointID := range runner.schedule.ScriptExecutionJob.Endpoints {
-		endpoint, err := runner.context.endpointService.Endpoint(endpointID)
+		endpoint, err := runner.context.dataStore.Endpoint().Endpoint(endpointID)
 		if err != nil {
 			log.Printf("scheduled job error (script execution). Unable to retrieve information about endpoint (id=%d) (err=%s)\n", endpointID, err)
 			return

@@ -43,7 +43,7 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: endpointId", err}
 	}
 
-	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {
@@ -135,7 +135,7 @@ func (handler *Handler) isValidStackFile(stackFileContent []byte) (bool, error) 
 func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *portainer.Stack, userID portainer.UserID) *httperror.HandlerError {
 	resourceControl := portainer.NewPrivateResourceControl(stack.Name, portainer.StackResourceControl, userID)
 
-	err := handler.ResourceControlService.CreateResourceControl(resourceControl)
+	err := handler.DataStore.ResourceControl().CreateResourceControl(resourceControl)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist resource control inside the database", err}
 	}

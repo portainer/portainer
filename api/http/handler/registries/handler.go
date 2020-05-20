@@ -18,11 +18,10 @@ func hideFields(registry *portainer.Registry) {
 // Handler is the HTTP handler used to handle registry operations.
 type Handler struct {
 	*mux.Router
-	requestBouncer   *security.RequestBouncer
-	RegistryService  portainer.RegistryService
-	ExtensionService portainer.ExtensionService
-	FileService      portainer.FileService
-	ProxyManager     *proxy.Manager
+	requestBouncer *security.RequestBouncer
+	DataStore      portainer.DataStore
+	FileService    portainer.FileService
+	ProxyManager   *proxy.Manager
 }
 
 // NewHandler creates a handler to manage registry operations.

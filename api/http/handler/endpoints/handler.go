@@ -20,27 +20,21 @@ func hideFields(endpoint *portainer.Endpoint) {
 // Handler is the HTTP handler used to handle endpoint operations.
 type Handler struct {
 	*mux.Router
-	requestBouncer              *security.RequestBouncer
-	AuthorizationService        *portainer.AuthorizationService
-	EdgeGroupService            portainer.EdgeGroupService
-	EdgeStackService            portainer.EdgeStackService
-	EndpointService             portainer.EndpointService
-	EndpointGroupService        portainer.EndpointGroupService
-	EndpointRelationService     portainer.EndpointRelationService
-	FileService                 portainer.FileService
-	JobService                  portainer.JobService
-	ProxyManager                *proxy.Manager
-	ReverseTunnelService        portainer.ReverseTunnelService
-	SettingsService             portainer.SettingsService
-	Snapshotter                 portainer.Snapshotter
-	TagService                  portainer.TagService
+	requestBouncer       *security.RequestBouncer
+	DataStore            portainer.DataStore
+	AuthorizationService *portainer.AuthorizationService
+	FileService          portainer.FileService
+	JobService           portainer.JobService
+	ProxyManager         *proxy.Manager
+	ReverseTunnelService portainer.ReverseTunnelService
+	Snapshotter          portainer.Snapshotter
 }
 
 // NewHandler creates a handler to manage endpoint operations.
 func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{
-		Router:                      mux.NewRouter(),
-		requestBouncer:              bouncer,
+		Router:         mux.NewRouter(),
+		requestBouncer: bouncer,
 	}
 
 	h.Handle("/endpoints",

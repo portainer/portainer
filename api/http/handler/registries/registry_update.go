@@ -36,7 +36,7 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	registry, err := handler.RegistryService.Registry(portainer.RegistryID(registryID))
+	registry, err := handler.DataStore.Registry().Registry(portainer.RegistryID(registryID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a registry with the specified identifier inside the database", err}
 	} else if err != nil {
@@ -48,7 +48,7 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if payload.URL != nil {
-		registries, err := handler.RegistryService.Registries()
+		registries, err := handler.DataStore.Registry().Registries()
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
 		}
@@ -88,7 +88,7 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 		registry.TeamAccessPolicies = payload.TeamAccessPolicies
 	}
 
-	err = handler.RegistryService.UpdateRegistry(registry.ID, registry)
+	err = handler.DataStore.Registry().UpdateRegistry(registry.ID, registry)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist registry changes inside the database", err}
 	}

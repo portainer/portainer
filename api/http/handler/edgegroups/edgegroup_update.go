@@ -43,7 +43,7 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	edgeGroup, err := handler.EdgeGroupService.EdgeGroup(portainer.EdgeGroupID(edgeGroupID))
+	edgeGroup, err := handler.DataStore.EdgeGroup().EdgeGroup(portainer.EdgeGroupID(edgeGroupID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an Edge group with the specified identifier inside the database", err}
 	} else if err != nil {
@@ -51,7 +51,7 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 	}
 
 	if payload.Name != "" {
-		edgeGroups, err := handler.EdgeGroupService.EdgeGroups()
+		edgeGroups, err := handler.DataStore.EdgeGroup().EdgeGroups()
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve Edge groups from the database", err}
 		}
@@ -63,12 +63,12 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 
 		edgeGroup.Name = payload.Name
 	}
-	endpoints, err := handler.EndpointService.Endpoints()
+	endpoints, err := handler.DataStore.Endpoint().Endpoints()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from database", err}
 	}
 
-	endpointGroups, err := handler.EndpointGroupService.EndpointGroups()
+	endpointGroups, err := handler.DataStore.EndpointGroup().EndpointGroups()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint groups from database", err}
 	}
@@ -81,7 +81,7 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 	} else {
 		endpointIDs := []portainer.EndpointID{}
 		for _, endpointID := range payload.Endpoints {
-			endpoint, err := handler.EndpointService.Endpoint(endpointID)
+			endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint from the database", err}
 			}
@@ -97,7 +97,7 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 		edgeGroup.PartialMatch = *payload.PartialMatch
 	}
 
-	err = handler.EdgeGroupService.UpdateEdgeGroup(edgeGroup.ID, edgeGroup)
+	err = handler.DataStore.EdgeGroup().UpdateEdgeGroup(edgeGroup.ID, edgeGroup)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Edge group changes inside the database", err}
 	}
@@ -116,27 +116,27 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 }
 
 func (handler *Handler) updateEndpoint(endpointID portainer.EndpointID) error {
-	relation, err := handler.EndpointRelationService.EndpointRelation(endpointID)
+	relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpointID)
 	if err != nil {
 		return err
 	}
 
-	endpoint, err := handler.EndpointService.Endpoint(endpointID)
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
 	if err != nil {
 		return err
 	}
 
-	endpointGroup, err := handler.EndpointGroupService.EndpointGroup(endpoint.GroupID)
+	endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(endpoint.GroupID)
 	if err != nil {
 		return err
 	}
 
-	edgeGroups, err := handler.EdgeGroupService.EdgeGroups()
+	edgeGroups, err := handler.DataStore.EdgeGroup().EdgeGroups()
 	if err != nil {
 		return err
 	}
 
-	edgeStacks, err := handler.EdgeStackService.EdgeStacks()
+	edgeStacks, err := handler.DataStore.EdgeStack().EdgeStacks()
 	if err != nil {
 		return err
 	}
@@ -150,5 +150,5 @@ func (handler *Handler) updateEndpoint(endpointID portainer.EndpointID) error {
 
 	relation.EdgeStacks = edgeStackSet
 
-	return handler.EndpointRelationService.UpdateEndpointRelation(endpoint.ID, relation)
+	return handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpoint.ID, relation)
 }

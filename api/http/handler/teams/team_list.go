@@ -10,7 +10,7 @@ import (
 
 // GET request on /api/teams
 func (handler *Handler) teamList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	teams, err := handler.TeamService.Teams()
+	teams, err := handler.DataStore.Team().Teams()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve teams from the database", err}
 	}

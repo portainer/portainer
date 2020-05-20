@@ -17,7 +17,7 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 	}
 	tagID := portainer.TagID(id)
 
-	tag, err := handler.TagService.Tag(tagID)
+	tag, err := handler.DataStore.Tag().Tag(tagID)
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a tag with the specified identifier inside the database", err}
 	} else if err != nil {
@@ -25,7 +25,7 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 	}
 
 	for endpointID := range tag.Endpoints {
-		endpoint, err := handler.EndpointService.Endpoint(endpointID)
+		endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint from the database", err}
 		}
@@ -33,7 +33,7 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 		tagIdx := findTagIndex(endpoint.TagIDs, tagID)
 		if tagIdx != -1 {
 			endpoint.TagIDs = removeElement(endpoint.TagIDs, tagIdx)
-			err = handler.EndpointService.UpdateEndpoint(endpoint.ID, endpoint)
+			err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint", err}
 			}
@@ -41,7 +41,7 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 	}
 
 	for endpointGroupID := range tag.EndpointGroups {
-		endpointGroup, err := handler.EndpointGroupService.EndpointGroup(endpointGroupID)
+		endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(endpointGroupID)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint group from the database", err}
 		}
@@ -49,24 +49,24 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 		tagIdx := findTagIndex(endpointGroup.TagIDs, tagID)
 		if tagIdx != -1 {
 			endpointGroup.TagIDs = removeElement(endpointGroup.TagIDs, tagIdx)
-			err = handler.EndpointGroupService.UpdateEndpointGroup(endpointGroup.ID, endpointGroup)
+			err = handler.DataStore.EndpointGroup().UpdateEndpointGroup(endpointGroup.ID, endpointGroup)
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint group", err}
 			}
 		}
 	}
 
-	endpoints, err := handler.EndpointService.Endpoints()
+	endpoints, err := handler.DataStore.Endpoint().Endpoints()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
 	}
 
-	edgeGroups, err := handler.EdgeGroupService.EdgeGroups()
+	edgeGroups, err := handler.DataStore.EdgeGroup().EdgeGroups()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge groups from the database", err}
 	}
 
-	edgeStacks, err := handler.EdgeStackService.EdgeStacks()
+	edgeStacks, err := handler.DataStore.EdgeStack().EdgeStacks()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge stacks from the database", err}
 	}
@@ -85,14 +85,14 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 		tagIdx := findTagIndex(edgeGroup.TagIDs, tagID)
 		if tagIdx != -1 {
 			edgeGroup.TagIDs = removeElement(edgeGroup.TagIDs, tagIdx)
-			err = handler.EdgeGroupService.UpdateEdgeGroup(edgeGroup.ID, edgeGroup)
+			err = handler.DataStore.EdgeGroup().UpdateEdgeGroup(edgeGroup.ID, edgeGroup)
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint group", err}
 			}
 		}
 	}
 
-	err = handler.TagService.DeleteTag(tagID)
+	err = handler.DataStore.Tag().DeleteTag(tagID)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the tag from the database", err}
 	}
@@ -101,12 +101,12 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 }
 
 func (handler *Handler) updateEndpointRelations(endpoint portainer.Endpoint, edgeGroups []portainer.EdgeGroup, edgeStacks []portainer.EdgeStack) error {
-	endpointRelation, err := handler.EndpointRelationService.EndpointRelation(endpoint.ID)
+	endpointRelation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpoint.ID)
 	if err != nil {
 		return err
 	}
 
-	endpointGroup, err := handler.EndpointGroupService.EndpointGroup(endpoint.GroupID)
+	endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(endpoint.GroupID)
 	if err != nil {
 		return err
 	}
@@ -118,7 +118,7 @@ func (handler *Handler) updateEndpointRelations(endpoint portainer.Endpoint, edg
 	}
 	endpointRelation.EdgeStacks = stacksSet
 
-	return handler.EndpointRelationService.UpdateEndpointRelation(endpoint.ID, endpointRelation)
+	return handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpoint.ID, endpointRelation)
 }
 
 func findTagIndex(tags []portainer.TagID, searchTagID portainer.TagID) int {

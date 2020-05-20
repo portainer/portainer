@@ -15,7 +15,7 @@ func (handler *Handler) edgeStackInspect(w http.ResponseWriter, r *http.Request)
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid edge stack identifier route variable", err}
 	}
 
-	edgeStack, err := handler.EdgeStackService.EdgeStack(portainer.EdgeStackID(edgeStackID))
+	edgeStack, err := handler.DataStore.EdgeStack().EdgeStack(portainer.EdgeStackID(edgeStackID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an edge stack with the specified identifier inside the database", err}
 	} else if err != nil {

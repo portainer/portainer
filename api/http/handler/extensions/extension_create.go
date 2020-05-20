@@ -36,7 +36,7 @@ func (handler *Handler) extensionCreate(w http.ResponseWriter, r *http.Request) 
 	}
 	extensionID := portainer.ExtensionID(extensionIdentifier)
 
-	extensions, err := handler.ExtensionService.Extensions()
+	extensions, err := handler.DataStore.Extension().Extensions()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve extensions status from the database", err}
 	}
@@ -77,7 +77,7 @@ func (handler *Handler) extensionCreate(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
-	err = handler.ExtensionService.Persist(extension)
+	err = handler.DataStore.Extension().Persist(extension)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist extension status inside the database", err}
 	}

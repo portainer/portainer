@@ -10,7 +10,7 @@ import (
 
 // GET request on /api/users
 func (handler *Handler) userList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	users, err := handler.UserService.Users()
+	users, err := handler.DataStore.User().Users()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve users from the database", err}
 	}

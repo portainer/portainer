@@ -47,7 +47,7 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	stacks, err := handler.StackService.Stacks()
+	stacks, err := handler.DataStore.Stack().Stacks()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve stacks from the database", err}
 	}
@@ -58,7 +58,7 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 		}
 	}
 
-	stackID := handler.StackService.GetNextIdentifier()
+	stackID := handler.DataStore.Stack().GetNextIdentifier()
 	stack := &portainer.Stack{
 		ID:         portainer.StackID(stackID),
 		Name:       payload.Name,
@@ -88,7 +88,7 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
 
-	err = handler.StackService.CreateStack(stack)
+	err = handler.DataStore.Stack().CreateStack(stack)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack inside the database", err}
 	}
@@ -132,7 +132,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	stacks, err := handler.StackService.Stacks()
+	stacks, err := handler.DataStore.Stack().Stacks()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve stacks from the database", err}
 	}
@@ -143,7 +143,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 		}
 	}
 
-	stackID := handler.StackService.GetNextIdentifier()
+	stackID := handler.DataStore.Stack().GetNextIdentifier()
 	stack := &portainer.Stack{
 		ID:         portainer.StackID(stackID),
 		Name:       payload.Name,
@@ -183,7 +183,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
 
-	err = handler.StackService.CreateStack(stack)
+	err = handler.DataStore.Stack().CreateStack(stack)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack inside the database", err}
 	}
@@ -227,7 +227,7 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	stacks, err := handler.StackService.Stacks()
+	stacks, err := handler.DataStore.Stack().Stacks()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve stacks from the database", err}
 	}
@@ -238,7 +238,7 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 		}
 	}
 
-	stackID := handler.StackService.GetNextIdentifier()
+	stackID := handler.DataStore.Stack().GetNextIdentifier()
 	stack := &portainer.Stack{
 		ID:         portainer.StackID(stackID),
 		Name:       payload.Name,
@@ -268,7 +268,7 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 		return &httperror.HandlerError{http.StatusInternalServerError, err.Error(), err}
 	}
 
-	err = handler.StackService.CreateStack(stack)
+	err = handler.DataStore.Stack().CreateStack(stack)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack inside the database", err}
 	}
@@ -291,12 +291,12 @@ func (handler *Handler) createComposeDeployConfig(r *http.Request, stack *portai
 		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
 
-	dockerhub, err := handler.DockerHubService.DockerHub()
+	dockerhub, err := handler.DataStore.DockerHub().DockerHub()
 	if err != nil {
 		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve DockerHub details from the database", err}
 	}
 
-	registries, err := handler.RegistryService.Registries()
+	registries, err := handler.DataStore.Registry().Registries()
 	if err != nil {
 		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
 	}
@@ -319,7 +319,7 @@ func (handler *Handler) createComposeDeployConfig(r *http.Request, stack *portai
 // clean it. Hence the use of the mutex.
 // We should contribute to libcompose to support authentication without using the config.json file.
 func (handler *Handler) deployComposeStack(config *composeStackDeploymentConfig) error {
-	settings, err := handler.SettingsService.Settings()
+	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return err
 	}

@@ -28,7 +28,7 @@ func (handler *Handler) teamCreate(w http.ResponseWriter, r *http.Request) *http
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	team, err := handler.TeamService.TeamByName(payload.Name)
+	team, err := handler.DataStore.Team().TeamByName(payload.Name)
 	if err != nil && err != portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve teams from the database", err}
 	}
@@ -40,7 +40,7 @@ func (handler *Handler) teamCreate(w http.ResponseWriter, r *http.Request) *http
 		Name: payload.Name,
 	}
 
-	err = handler.TeamService.CreateTeam(team)
+	err = handler.DataStore.Team().CreateTeam(team)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the team inside the database", err}
 	}

@@ -11,7 +11,7 @@ import (
 // Handler is the HTTP handler used to handle websocket operations.
 type Handler struct {
 	*mux.Router
-	EndpointService      portainer.EndpointService
+	DataStore            portainer.DataStore
 	SignatureService     portainer.DigitalSignatureService
 	ReverseTunnelService portainer.ReverseTunnelService
 	requestBouncer       *security.RequestBouncer

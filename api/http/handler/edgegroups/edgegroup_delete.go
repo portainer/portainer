@@ -15,14 +15,14 @@ func (handler *Handler) edgeGroupDelete(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid Edge group identifier route variable", err}
 	}
 
-	_, err = handler.EdgeGroupService.EdgeGroup(portainer.EdgeGroupID(edgeGroupID))
+	_, err = handler.DataStore.EdgeGroup().EdgeGroup(portainer.EdgeGroupID(edgeGroupID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an Edge group with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an Edge group with the specified identifier inside the database", err}
 	}
 
-	edgeStacks, err := handler.EdgeStackService.EdgeStacks()
+	edgeStacks, err := handler.DataStore.EdgeStack().EdgeStacks()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve Edge stacks from the database", err}
 	}
@@ -35,7 +35,7 @@ func (handler *Handler) edgeGroupDelete(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
-	err = handler.EdgeGroupService.DeleteEdgeGroup(portainer.EdgeGroupID(edgeGroupID))
+	err = handler.DataStore.EdgeGroup().DeleteEdgeGroup(portainer.EdgeGroupID(edgeGroupID))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the Edge group from the database", err}
 	}

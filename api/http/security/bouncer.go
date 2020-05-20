@@ -13,26 +13,10 @@ import (
 type (
 	// RequestBouncer represents an entity that manages API request accesses
 	RequestBouncer struct {
-		jwtService            portainer.JWTService
-		userService           portainer.UserService
-		teamMembershipService portainer.TeamMembershipService
-		endpointService       portainer.EndpointService
-		endpointGroupService  portainer.EndpointGroupService
-		extensionService      portainer.ExtensionService
-		rbacExtensionClient   *rbacExtensionClient
-		authDisabled          bool
-	}
-
-	// RequestBouncerParams represents the required parameters to create a new RequestBouncer instance.
-	RequestBouncerParams struct {
-		JWTService            portainer.JWTService
-		UserService           portainer.UserService
-		TeamMembershipService portainer.TeamMembershipService
-		EndpointService       portainer.EndpointService
-		EndpointGroupService  portainer.EndpointGroupService
-		ExtensionService      portainer.ExtensionService
-		RBACExtensionURL      string
-		AuthDisabled          bool
+		dataStore           portainer.DataStore
+		jwtService          portainer.JWTService
+		rbacExtensionClient *rbacExtensionClient
+		authDisabled        bool
 	}
 
 	// RestrictedRequestContext is a data structure containing information
@@ -46,16 +30,12 @@ type (
 )
 
 // NewRequestBouncer initializes a new RequestBouncer
-func NewRequestBouncer(parameters *RequestBouncerParams) *RequestBouncer {
+func NewRequestBouncer(dataStore portainer.DataStore, jwtService portainer.JWTService, authenticationDisabled bool, rbacExtensionURL string) *RequestBouncer {
 	return &RequestBouncer{
-		jwtService:            parameters.JWTService,
-		userService:           parameters.UserService,
-		teamMembershipService: parameters.TeamMembershipService,
-		endpointService:       parameters.EndpointService,
-		endpointGroupService:  parameters.EndpointGroupService,
-		extensionService:      parameters.ExtensionService,
-		rbacExtensionClient:   newRBACExtensionClient(parameters.RBACExtensionURL),
-		authDisabled:          parameters.AuthDisabled,
+		dataStore:           dataStore,
+		jwtService:          jwtService,
+		rbacExtensionClient: newRBACExtensionClient(rbacExtensionURL),
+		authDisabled:        authenticationDisabled,
 	}
 }
 
@@ -121,12 +101,12 @@ func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endp
 		return nil
 	}
 
-	memberships, err := bouncer.teamMembershipService.TeamMembershipsByUserID(tokenData.ID)
+	memberships, err := bouncer.dataStore.TeamMembership().TeamMembershipsByUserID(tokenData.ID)
 	if err != nil {
 		return err
 	}
 
-	group, err := bouncer.endpointGroupService.EndpointGroup(endpoint.GroupID)
+	group, err := bouncer.dataStore.EndpointGroup().EndpointGroup(endpoint.GroupID)
 	if err != nil {
 		return err
 	}
@@ -173,14 +153,14 @@ func (bouncer *RequestBouncer) checkEndpointOperationAuthorization(r *http.Reque
 		return nil
 	}
 
-	extension, err := bouncer.extensionService.Extension(portainer.RBACExtension)
+	extension, err := bouncer.dataStore.Extension().Extension(portainer.RBACExtension)
 	if err == portainer.ErrObjectNotFound {
 		return nil
 	} else if err != nil {
 		return err
 	}
 
-	user, err := bouncer.userService.User(tokenData.ID)
+	user, err := bouncer.dataStore.User().User(tokenData.ID)
 	if err != nil {
 		return err
 	}
@@ -208,7 +188,7 @@ func (bouncer *RequestBouncer) RegistryAccess(r *http.Request, registry *portain
 		return nil
 	}
 
-	memberships, err := bouncer.teamMembershipService.TeamMembershipsByUserID(tokenData.ID)
+	memberships, err := bouncer.dataStore.TeamMembership().TeamMembershipsByUserID(tokenData.ID)
 	if err != nil {
 		return err
 	}
@@ -244,7 +224,7 @@ func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler,
 			return
 		}
 
-		extension, err := bouncer.extensionService.Extension(portainer.RBACExtension)
+		extension, err := bouncer.dataStore.Extension().Extension(portainer.RBACExtension)
 		if err == portainer.ErrObjectNotFound {
 			if administratorOnly {
 				httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrUnauthorized)
@@ -258,7 +238,7 @@ func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler,
 			return
 		}
 
-		user, err := bouncer.userService.User(tokenData.ID)
+		user, err := bouncer.dataStore.User().User(tokenData.ID)
 		if err != nil && err == portainer.ErrObjectNotFound {
 			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", portainer.ErrUnauthorized)
 			return
@@ -335,7 +315,7 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 				return
 			}
 
-			_, err = bouncer.userService.User(tokenData.ID)
+			_, err = bouncer.dataStore.User().User(tokenData.ID)
 			if err != nil && err == portainer.ErrObjectNotFound {
 				httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", portainer.ErrUnauthorized)
 				return
@@ -372,7 +352,7 @@ func (bouncer *RequestBouncer) newRestrictedContextRequest(userID portainer.User
 
 	if userRole != portainer.AdministratorRole {
 		requestContext.IsAdmin = false
-		memberships, err := bouncer.teamMembershipService.TeamMembershipsByUserID(userID)
+		memberships, err := bouncer.dataStore.TeamMembership().TeamMembershipsByUserID(userID)
 		if err != nil {
 			return nil, err
 		}
