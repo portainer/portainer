@@ -8,7 +8,7 @@ import _ from 'lodash-es';
 
 class KubernetesConfigurationController {
   /* @ngInject */
-  constructor($async, $state, Notifications, LocalStorage, KubernetesConfigurationService, KubernetesResourcePoolService, ModalService, KubernetesApplicationService, KubernetesEventService) {
+  constructor($async, $state, Notifications, LocalStorage, KubernetesConfigurationService, KubernetesResourcePoolService, ModalService, KubernetesApplicationService, KubernetesEventService, KubernetesNamespaceHelper) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
@@ -19,6 +19,7 @@ class KubernetesConfigurationController {
     this.KubernetesApplicationService = KubernetesApplicationService;
     this.KubernetesEventService = KubernetesEventService;
     this.KubernetesConfigurationTypes = KubernetesConfigurationTypes;
+    this.KubernetesNamespaceHelper = KubernetesNamespaceHelper;
 
     this.onInit = this.onInit.bind(this);
     this.getConfigurationAsync = this.getConfigurationAsync.bind(this);
@@ -33,6 +34,10 @@ class KubernetesConfigurationController {
     this.editorUpdateAsync = this.editorUpdateAsync.bind(this);
     this.onFileLoad = this.onFileLoad.bind(this);
     this.onFileLoadAsync = this.onFileLoadAsync.bind(this);
+  }
+
+  isSystemNamespace() {
+    return this.KubernetesNamespaceHelper.isSystemNamespace(this.configuration.Namespace);
   }
 
   selectTab(index) {

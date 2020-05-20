@@ -26,7 +26,8 @@
                   <tr>
                     <td>Resource Pool</td>
                     <td>
-                        {{ ctrl.configuration.Namespace }}
+                      <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.configuration.Namespace })">{{ ctrl.configuration.Namespace }}</a>
+                      <span style="margin-left: 5px;" class="label label-info image-tag" ng-if="ctrl.isSystemNamespace()">system</span>
                     </td>
                   </tr>
                   <tr>
