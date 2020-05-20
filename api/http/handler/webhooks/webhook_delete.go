@@ -16,7 +16,7 @@ func (handler *Handler) webhookDelete(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid webhook id", err}
 	}
 
-	err = handler.WebhookService.DeleteWebhook(portainer.WebhookID(id))
+	err = handler.DataStore.Webhook().DeleteWebhook(portainer.WebhookID(id))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the webhook from the database", err}
 	}

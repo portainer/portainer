@@ -39,6 +39,7 @@ type (
 		userService             *user.Service
 		versionService          *version.Service
 		fileService             portainer.FileService
+		authorizationService    *portainer.AuthorizationService
 	}
 
 	// Parameters represents the required parameters to create a new Migrator instance.
@@ -60,6 +61,7 @@ type (
 		UserService             *user.Service
 		VersionService          *version.Service
 		FileService             portainer.FileService
+		AuthorizationService    *portainer.AuthorizationService
 	}
 )
 
@@ -83,12 +85,12 @@ func NewMigrator(parameters *Parameters) *Migrator {
 		userService:             parameters.UserService,
 		versionService:          parameters.VersionService,
 		fileService:             parameters.FileService,
+		authorizationService:    parameters.AuthorizationService,
 	}
 }
 
 // Migrate checks the database version and migrate the existing data to the most recent data model.
 func (m *Migrator) Migrate() error {
-
 	// Portainer < 1.12
 	if m.currentDBVersion < 1 {
 		err := m.updateAdminUserToDBVersion1()

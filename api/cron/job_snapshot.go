@@ -14,15 +14,15 @@ type SnapshotJobRunner struct {
 
 // SnapshotJobContext represents the context of execution of a SnapshotJob
 type SnapshotJobContext struct {
-	endpointService portainer.EndpointService
-	snapshotter     portainer.Snapshotter
+	dataStore   portainer.DataStore
+	snapshotter portainer.Snapshotter
 }
 
 // NewSnapshotJobContext returns a new context that can be used to execute a SnapshotJob
-func NewSnapshotJobContext(endpointService portainer.EndpointService, snapshotter portainer.Snapshotter) *SnapshotJobContext {
+func NewSnapshotJobContext(dataStore portainer.DataStore, snapshotter portainer.Snapshotter) *SnapshotJobContext {
 	return &SnapshotJobContext{
-		endpointService: endpointService,
-		snapshotter:     snapshotter,
+		dataStore:   dataStore,
+		snapshotter: snapshotter,
 	}
 }
 
@@ -46,7 +46,7 @@ func (runner *SnapshotJobRunner) GetSchedule() *portainer.Schedule {
 // retrieve the latest version of the endpoint right after a snapshot.
 func (runner *SnapshotJobRunner) Run() {
 	go func() {
-		endpoints, err := runner.context.endpointService.Endpoints()
+		endpoints, err := runner.context.dataStore.Endpoint().Endpoints()
 		if err != nil {
 			log.Printf("background schedule error (endpoint snapshot). Unable to retrieve endpoint list (err=%s)\n", err)
 			return
@@ -59,7 +59,7 @@ func (runner *SnapshotJobRunner) Run() {
 
 			snapshot, snapshotError := runner.context.snapshotter.CreateSnapshot(&endpoint)
 
-			latestEndpointReference, err := runner.context.endpointService.Endpoint(endpoint.ID)
+			latestEndpointReference, err := runner.context.dataStore.Endpoint().Endpoint(endpoint.ID)
 			if latestEndpointReference == nil {
 				log.Printf("background schedule error (endpoint snapshot). Endpoint not found inside the database anymore (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
 				continue
@@ -75,7 +75,7 @@ func (runner *SnapshotJobRunner) Run() {
 				latestEndpointReference.Snapshots = []portainer.Snapshot{*snapshot}
 			}
 
-			err = runner.context.endpointService.UpdateEndpoint(latestEndpointReference.ID, latestEndpointReference)
+			err = runner.context.dataStore.Endpoint().UpdateEndpoint(latestEndpointReference.ID, latestEndpointReference)
 			if err != nil {
 				log.Printf("background schedule error (endpoint snapshot). Unable to update endpoint (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
 				return

@@ -33,7 +33,7 @@ func (handler *Handler) adminInit(w http.ResponseWriter, r *http.Request) *httpe
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	users, err := handler.UserService.UsersByRole(portainer.AdministratorRole)
+	users, err := handler.DataStore.User().UsersByRole(portainer.AdministratorRole)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve users from the database", err}
 	}
@@ -53,7 +53,7 @@ func (handler *Handler) adminInit(w http.ResponseWriter, r *http.Request) *httpe
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to hash user password", portainer.ErrCryptoHashFailure}
 	}
 
-	err = handler.UserService.CreateUser(user)
+	err = handler.DataStore.User().CreateUser(user)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist user inside the database", err}
 	}

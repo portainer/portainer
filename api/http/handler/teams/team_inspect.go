@@ -26,7 +26,7 @@ func (handler *Handler) teamInspect(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusForbidden, "Access denied to team", portainer.ErrResourceAccessDenied}
 	}
 
-	team, err := handler.TeamService.Team(portainer.TeamID(teamID))
+	team, err := handler.DataStore.Team().Team(portainer.TeamID(teamID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a team with the specified identifier inside the database", err}
 	} else if err != nil {

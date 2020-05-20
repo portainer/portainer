@@ -17,7 +17,7 @@ func updateTeamAccessPolicyToReadOnlyRole(policies portainer.TeamAccessPolicies,
 }
 
 func (handler *Handler) upgradeRBACData() error {
-	endpointGroups, err := handler.EndpointGroupService.EndpointGroups()
+	endpointGroups, err := handler.DataStore.EndpointGroup().EndpointGroups()
 	if err != nil {
 		return err
 	}
@@ -31,13 +31,13 @@ func (handler *Handler) upgradeRBACData() error {
 			updateTeamAccessPolicyToReadOnlyRole(endpointGroup.TeamAccessPolicies, key)
 		}
 
-		err := handler.EndpointGroupService.UpdateEndpointGroup(endpointGroup.ID, &endpointGroup)
+		err := handler.DataStore.EndpointGroup().UpdateEndpointGroup(endpointGroup.ID, &endpointGroup)
 		if err != nil {
 			return err
 		}
 	}
 
-	endpoints, err := handler.EndpointService.Endpoints()
+	endpoints, err := handler.DataStore.Endpoint().Endpoints()
 	if err != nil {
 		return err
 	}
@@ -51,7 +51,7 @@ func (handler *Handler) upgradeRBACData() error {
 			updateTeamAccessPolicyToReadOnlyRole(endpoint.TeamAccessPolicies, key)
 		}
 
-		err := handler.EndpointService.UpdateEndpoint(endpoint.ID, &endpoint)
+		err := handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, &endpoint)
 		if err != nil {
 			return err
 		}
@@ -73,7 +73,7 @@ func updateTeamAccessPolicyToNoRole(policies portainer.TeamAccessPolicies, key p
 }
 
 func (handler *Handler) downgradeRBACData() error {
-	endpointGroups, err := handler.EndpointGroupService.EndpointGroups()
+	endpointGroups, err := handler.DataStore.EndpointGroup().EndpointGroups()
 	if err != nil {
 		return err
 	}
@@ -87,13 +87,13 @@ func (handler *Handler) downgradeRBACData() error {
 			updateTeamAccessPolicyToNoRole(endpointGroup.TeamAccessPolicies, key)
 		}
 
-		err := handler.EndpointGroupService.UpdateEndpointGroup(endpointGroup.ID, &endpointGroup)
+		err := handler.DataStore.EndpointGroup().UpdateEndpointGroup(endpointGroup.ID, &endpointGroup)
 		if err != nil {
 			return err
 		}
 	}
 
-	endpoints, err := handler.EndpointService.Endpoints()
+	endpoints, err := handler.DataStore.Endpoint().Endpoints()
 	if err != nil {
 		return err
 	}
@@ -107,7 +107,7 @@ func (handler *Handler) downgradeRBACData() error {
 			updateTeamAccessPolicyToNoRole(endpoint.TeamAccessPolicies, key)
 		}
 
-		err := handler.EndpointService.UpdateEndpoint(endpoint.ID, &endpoint)
+		err := handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, &endpoint)
 		if err != nil {
 			return err
 		}

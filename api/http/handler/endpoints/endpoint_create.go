@@ -118,17 +118,17 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 		return endpointCreationError
 	}
 
-	endpointGroup, err := handler.EndpointGroupService.EndpointGroup(endpoint.GroupID)
+	endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(endpoint.GroupID)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint group inside the database", err}
 	}
 
-	edgeGroups, err := handler.EdgeGroupService.EdgeGroups()
+	edgeGroups, err := handler.DataStore.EdgeGroup().EdgeGroups()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge groups from the database", err}
 	}
 
-	edgeStacks, err := handler.EdgeStackService.EdgeStacks()
+	edgeStacks, err := handler.DataStore.EdgeStack().EdgeStacks()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge stacks from the database", err}
 	}
@@ -145,7 +145,7 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
-	err = handler.EndpointRelationService.CreateEndpointRelation(relationObject)
+	err = handler.DataStore.EndpointRelation().CreateEndpointRelation(relationObject)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the relation object inside the database", err}
 	}
@@ -166,7 +166,7 @@ func (handler *Handler) createEndpoint(payload *endpointCreatePayload) (*portain
 
 func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
 	endpointType := portainer.EdgeAgentEnvironment
-	endpointID := handler.EndpointService.GetNextIdentifier()
+	endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
 
 	portainerURL, err := url.Parse(payload.URL)
 	if err != nil {
@@ -228,7 +228,7 @@ func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) 
 		}
 	}
 
-	endpointID := handler.EndpointService.GetNextIdentifier()
+	endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
 		ID:        portainer.EndpointID(endpointID),
 		Name:      payload.Name,
@@ -271,7 +271,7 @@ func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload)
 		endpointType = portainer.AgentOnDockerEnvironment
 	}
 
-	endpointID := handler.EndpointService.GetNextIdentifier()
+	endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
 	endpoint := &portainer.Endpoint{
 		ID:        portainer.EndpointID(endpointID),
 		Name:      payload.Name,
@@ -327,12 +327,12 @@ func (handler *Handler) snapshotAndPersistEndpoint(endpoint *portainer.Endpoint)
 }
 
 func (handler *Handler) saveEndpointAndUpdateAuthorizations(endpoint *portainer.Endpoint) error {
-	err := handler.EndpointService.CreateEndpoint(endpoint)
+	err := handler.DataStore.Endpoint().CreateEndpoint(endpoint)
 	if err != nil {
 		return err
 	}
 
-	group, err := handler.EndpointGroupService.EndpointGroup(endpoint.GroupID)
+	group, err := handler.DataStore.EndpointGroup().EndpointGroup(endpoint.GroupID)
 	if err != nil {
 		return err
 	}
@@ -342,14 +342,14 @@ func (handler *Handler) saveEndpointAndUpdateAuthorizations(endpoint *portainer.
 	}
 
 	for _, tagID := range endpoint.TagIDs {
-		tag, err := handler.TagService.Tag(tagID)
+		tag, err := handler.DataStore.Tag().Tag(tagID)
 		if err != nil {
 			return err
 		}
 
 		tag.Endpoints[endpoint.ID] = true
 
-		err = handler.TagService.UpdateTag(tagID, tag)
+		err = handler.DataStore.Tag().UpdateTag(tagID, tag)
 		if err != nil {
 			return err
 		}

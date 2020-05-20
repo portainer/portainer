@@ -10,7 +10,7 @@ import (
 
 // GET request on /api/schedules
 func (handler *Handler) scheduleList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	settings, err := handler.SettingsService.Settings()
+	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusServiceUnavailable, "Unable to retrieve settings", err}
 	}
@@ -18,7 +18,7 @@ func (handler *Handler) scheduleList(w http.ResponseWriter, r *http.Request) *ht
 		return &httperror.HandlerError{http.StatusServiceUnavailable, "Host management features are disabled", portainer.ErrHostManagementFeaturesDisabled}
 	}
 
-	schedules, err := handler.ScheduleService.Schedules()
+	schedules, err := handler.DataStore.Schedule().Schedules()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve schedules from the database", err}
 	}

@@ -35,7 +35,7 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid stack identifier route variable", err}
 	}
 
-	stack, err := handler.EdgeStackService.EdgeStack(portainer.EdgeStackID(stackID))
+	stack, err := handler.DataStore.EdgeStack().EdgeStack(portainer.EdgeStackID(stackID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a stack with the specified identifier inside the database", err}
 	} else if err != nil {
@@ -48,7 +48,7 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(*payload.EndpointID))
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(*payload.EndpointID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {
@@ -66,7 +66,7 @@ func (handler *Handler) edgeStackStatusUpdate(w http.ResponseWriter, r *http.Req
 		EndpointID: *payload.EndpointID,
 	}
 
-	err = handler.EdgeStackService.UpdateEdgeStack(stack.ID, stack)
+	err = handler.DataStore.EdgeStack().UpdateEdgeStack(stack.ID, stack)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the stack changes inside the database", err}
 	}

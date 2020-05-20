@@ -27,17 +27,17 @@ func (handler *Handler) edgeStackCreate(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create Edge stack", err}
 	}
 
-	endpoints, err := handler.EndpointService.Endpoints()
+	endpoints, err := handler.DataStore.Endpoint().Endpoints()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from database", err}
 	}
 
-	endpointGroups, err := handler.EndpointGroupService.EndpointGroups()
+	endpointGroups, err := handler.DataStore.EndpointGroup().EndpointGroups()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint groups from database", err}
 	}
 
-	edgeGroups, err := handler.EdgeGroupService.EdgeGroups()
+	edgeGroups, err := handler.DataStore.EdgeGroup().EdgeGroups()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge groups from database", err}
 	}
@@ -45,14 +45,14 @@ func (handler *Handler) edgeStackCreate(w http.ResponseWriter, r *http.Request) 
 	relatedEndpoints, err := portainer.EdgeStackRelatedEndpoints(edgeStack.EdgeGroups, endpoints, endpointGroups, edgeGroups)
 
 	for _, endpointID := range relatedEndpoints {
-		relation, err := handler.EndpointRelationService.EndpointRelation(endpointID)
+		relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpointID)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find endpoint relation in database", err}
 		}
 
 		relation.EdgeStacks[edgeStack.ID] = true
 
-		err = handler.EndpointRelationService.UpdateEndpointRelation(endpointID, relation)
+		err = handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpointID, relation)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint relation in database", err}
 		}
@@ -104,7 +104,7 @@ func (handler *Handler) createSwarmStackFromFileContent(r *http.Request) (*porta
 		return nil, err
 	}
 
-	stackID := handler.EdgeStackService.GetNextIdentifier()
+	stackID := handler.DataStore.EdgeStack().GetNextIdentifier()
 	stack := &portainer.EdgeStack{
 		ID:           portainer.EdgeStackID(stackID),
 		Name:         payload.Name,
@@ -122,7 +122,7 @@ func (handler *Handler) createSwarmStackFromFileContent(r *http.Request) (*porta
 	}
 	stack.ProjectPath = projectPath
 
-	err = handler.EdgeStackService.CreateEdgeStack(stack)
+	err = handler.DataStore.EdgeStack().CreateEdgeStack(stack)
 	if err != nil {
 		return nil, err
 	}
@@ -172,7 +172,7 @@ func (handler *Handler) createSwarmStackFromGitRepository(r *http.Request) (*por
 		return nil, err
 	}
 
-	stackID := handler.EdgeStackService.GetNextIdentifier()
+	stackID := handler.DataStore.EdgeStack().GetNextIdentifier()
 	stack := &portainer.EdgeStack{
 		ID:           portainer.EdgeStackID(stackID),
 		Name:         payload.Name,
@@ -200,7 +200,7 @@ func (handler *Handler) createSwarmStackFromGitRepository(r *http.Request) (*por
 		return nil, err
 	}
 
-	err = handler.EdgeStackService.CreateEdgeStack(stack)
+	err = handler.DataStore.EdgeStack().CreateEdgeStack(stack)
 	if err != nil {
 		return nil, err
 	}
@@ -248,7 +248,7 @@ func (handler *Handler) createSwarmStackFromFileUpload(r *http.Request) (*portai
 		return nil, err
 	}
 
-	stackID := handler.EdgeStackService.GetNextIdentifier()
+	stackID := handler.DataStore.EdgeStack().GetNextIdentifier()
 	stack := &portainer.EdgeStack{
 		ID:           portainer.EdgeStackID(stackID),
 		Name:         payload.Name,
@@ -266,7 +266,7 @@ func (handler *Handler) createSwarmStackFromFileUpload(r *http.Request) (*portai
 	}
 	stack.ProjectPath = projectPath
 
-	err = handler.EdgeStackService.CreateEdgeStack(stack)
+	err = handler.DataStore.EdgeStack().CreateEdgeStack(stack)
 	if err != nil {
 		return nil, err
 	}
@@ -275,7 +275,7 @@ func (handler *Handler) createSwarmStackFromFileUpload(r *http.Request) (*portai
 }
 
 func (handler *Handler) validateUniqueName(name string) error {
-	edgeStacks, err := handler.EdgeStackService.EdgeStacks()
+	edgeStacks, err := handler.DataStore.EdgeStack().EdgeStacks()
 	if err != nil {
 		return err
 	}

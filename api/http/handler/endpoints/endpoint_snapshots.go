@@ -11,7 +11,7 @@ import (
 
 // POST request on /api/endpoints/snapshot
 func (handler *Handler) endpointSnapshots(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	endpoints, err := handler.EndpointService.Endpoints()
+	endpoints, err := handler.DataStore.Endpoint().Endpoints()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
 	}
@@ -19,7 +19,7 @@ func (handler *Handler) endpointSnapshots(w http.ResponseWriter, r *http.Request
 	for _, endpoint := range endpoints {
 		snapshot, snapshotError := handler.Snapshotter.CreateSnapshot(&endpoint)
 
-		latestEndpointReference, err := handler.EndpointService.Endpoint(endpoint.ID)
+		latestEndpointReference, err := handler.DataStore.Endpoint().Endpoint(endpoint.ID)
 		if latestEndpointReference == nil {
 			log.Printf("background schedule error (endpoint snapshot). Endpoint not found inside the database anymore (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
 			continue
@@ -35,7 +35,7 @@ func (handler *Handler) endpointSnapshots(w http.ResponseWriter, r *http.Request
 			latestEndpointReference.Snapshots = []portainer.Snapshot{*snapshot}
 		}
 
-		err = handler.EndpointService.UpdateEndpoint(latestEndpointReference.ID, latestEndpointReference)
+		err = handler.DataStore.Endpoint().UpdateEndpoint(latestEndpointReference.ID, latestEndpointReference)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint changes inside the database", err}
 		}

@@ -12,7 +12,7 @@ import (
 // Handler is the HTTP handler used to handle resource control operations.
 type Handler struct {
 	*mux.Router
-	ResourceControlService portainer.ResourceControlService
+	DataStore portainer.DataStore
 }
 
 // NewHandler creates a handler to manage resource control operations.
