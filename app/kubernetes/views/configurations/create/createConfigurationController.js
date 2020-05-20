@@ -19,8 +19,9 @@ class KubernetesCreateConfigurationController {
     this.createConfigurationAsync = this.createConfigurationAsync.bind(this);
     this.editorUpdate = this.editorUpdate.bind(this);
     this.editorUpdateAsync = this.editorUpdateAsync.bind(this);
-    this.addEntryFromFileAsync = this.addEntryFromFileAsync.bind(this);
     this.getConfigurationsAsync = this.getConfigurationsAsync.bind(this);
+    this.onFileLoad = this.onFileLoad.bind(this);
+    this.onFileLoadAsync = this.onFileLoadAsync.bind(this);
   }
 
   // TODO: review : use
@@ -67,28 +68,25 @@ class KubernetesCreateConfigurationController {
     return uniqueCheck;
   }
 
-  // TODO: review - refactor fileReader usage
-  readUploadedFileAsText(file) {
-    const temporaryFileReader = new FileReader();
-
-    return new Promise((resolve) => {
-      temporaryFileReader.onload = () => {
-        resolve(temporaryFileReader.result);
-      };
-      temporaryFileReader.readAsText(file);
-    });
+  async onFileLoadAsync(event) {
+    const entry = new KubernetesConfigurationFormValuesDataEntry();
+    entry.Key = event.target.fileName;
+    entry.Value = event.target.result;
+    this.formValues.Data.push(entry);
+    this.onChangeKey();
   }
 
-  // TODO: review - refactor without async function
-  async addEntryFromFileAsync(file) {
-    const entry = new KubernetesConfigurationFormValuesDataEntry();
-    entry.Key = file.name;
-    entry.Value = await this.readUploadedFileAsText(file);
-    this.formValues.Data.push(entry);
+  onFileLoad(event) {
+    return this.$async(this.onFileLoadAsync, event);
   }
 
   addEntryFromFile(file) {
-    return this.$async(this.addEntryFromFileAsync, file);
+    if (file) {
+      const temporaryFileReader = new FileReader();
+      temporaryFileReader.fileName = file.name;
+      temporaryFileReader.onload = this.onFileLoad;
+      temporaryFileReader.readAsText(file);
+    }
   }
 
   async createConfigurationAsync() {
