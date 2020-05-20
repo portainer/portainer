@@ -45,8 +45,8 @@ class KubernetesConfigurationController {
   }
 
   onChangeKey() {
-    this.state.duplicateKeys = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.Data, (data) => data.Key));
-    this.state.isDuplicateKeys = Object.keys(this.state.duplicateKeys).length > 0;
+    this.state.duplicateKeys = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.Data, 'Key'));
+    this.state.hasDuplicateKeys = Object.keys(this.state.duplicateKeys).length > 0;
   }
 
   addEntry() {
@@ -55,8 +55,7 @@ class KubernetesConfigurationController {
 
   removeEntry(index) {
     this.formValues.Data.splice(index, 1);
-    this.state.duplicateKeys = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.Data, (data) => data.Key));
-    this.state.isDuplicateKeys = Object.keys(this.state.duplicateKeys).length > 0;
+    this.onChangeKey();
   }
 
   showEditor() {
@@ -75,9 +74,9 @@ class KubernetesConfigurationController {
 
   isFormValid() {
     if (this.formValues.IsSimple) {
-      return this.formValues.Data.length > 0 && !this.state.isDuplicateKeys;
+      return this.formValues.Data.length > 0 && !this.state.hasDuplicateKeys;
     }
-    return !this.state.isDuplicateKeys;
+    return !this.state.hasDuplicateKeys;
   }
 
   async onFileLoadAsync(event) {
@@ -218,7 +217,7 @@ class KubernetesConfigurationController {
         viewReady: false,
         eventWarningCount: 0,
         duplicateKeys: {},
-        isDuplicateKeys: false,
+        hasDuplicateKeys: false,
         activeTab: 0,
         currentName: this.$state.$current.name
       };

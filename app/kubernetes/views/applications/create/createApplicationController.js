@@ -58,7 +58,7 @@ class KubernetesCreateApplicationController {
   }
 
   isValid() {
-    return !this.state.alreadyExists && !this.state.isDuplicateEnvironmentVariables && !this.state.isDuplicatePersistedFolderPaths;
+    return !this.state.alreadyExists && !this.state.hasDuplicateEnvironmentVariables && !this.state.hasDuplicatePersistedFolderPaths;
   }
 
   onChangeName() {
@@ -105,13 +105,9 @@ class KubernetesCreateApplicationController {
     this.formValues.EnvironmentVariables.push(new KubernetesApplicationEnvironmentVariableFormValue());
   }
 
-  // TODO: review
-  // change isDuplicateEnvironmentVariables to hasDuplicateEnvironmentVariables
-  // and all occurences like that
   removeEnvironmentVariable(index) {
     this.formValues.EnvironmentVariables.splice(index, 1);
-    this.state.duplicateEnvironmentVariables = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.EnvironmentVariables, (env) => env.Name));
-    this.state.isDuplicateEnvironmentVariables = Object.keys(this.state.duplicateEnvironmentVariables).length > 0;
+    this.onChangeEnvironmentName();
   }
 
   hasEnvironmentVariables() {
@@ -119,8 +115,8 @@ class KubernetesCreateApplicationController {
   }
 
   onChangeEnvironmentName() {
-    this.state.duplicateEnvironmentVariables = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.EnvironmentVariables, (env) => env.Name));
-    this.state.isDuplicateEnvironmentVariables = Object.keys(this.state.duplicateEnvironmentVariables).length > 0;
+    this.state.duplicateEnvironmentVariables = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.EnvironmentVariables, 'Name'));
+    this.state.hasDuplicateEnvironmentVariables = Object.keys(this.state.duplicateEnvironmentVariables).length > 0;
   }
   /**
    * !ENVIRONMENT UI MANAGEMENT
@@ -140,8 +136,8 @@ class KubernetesCreateApplicationController {
   }
 
   onChangePersistedFolderPath() {
-    this.state.duplicatePersistedFolderPaths = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.PersistedFolders, (item) => item.ContainerPath));
-    this.state.isDuplicatePersistedFolderPaths = Object.keys(this.state.duplicatePersistedFolderPaths).length > 0;
+    this.state.duplicatePersistedFolderPaths = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.PersistedFolders, 'ContainerPath'));
+    this.state.hasDuplicatePersistedFolderPaths = Object.keys(this.state.duplicatePersistedFolderPaths).length > 0;
   }
 
   restorePersistedFolder(index) {
@@ -523,9 +519,9 @@ class KubernetesCreateApplicationController {
         availableSizeUnits: ['MB', 'GB', 'TB'],
         alreadyExists: false,
         duplicateEnvironmentVariables: {},
-        isDuplicateEnvironmentVariables: false,
+        hasDuplicateEnvironmentVariables: false,
         duplicatePersistedFolderPaths: {},
-        isDuplicatePersistedFolderPaths: false,
+        hasDuplicatePersistedFolderPaths: false,
         isEdit: false,
         params: {
           namespace: this.$transition$.params().namespace,

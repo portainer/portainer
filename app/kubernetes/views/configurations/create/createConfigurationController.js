@@ -24,21 +24,14 @@ class KubernetesCreateConfigurationController {
     this.onFileLoadAsync = this.onFileLoadAsync.bind(this);
   }
 
-  // TODO: review : use
-  // and change this.state.isAlreadyExist to this.state.alreadyExists
-  // onChangeName() {
-  //   this.state.isAlreadyExist = _.fin(this.configurations, (config) => config.Namespace === this.formValues.ResourcePool.Namespace.Name && config.Name === this.formValues.Name) !== undefined;
-  // }
   onChangeName() {
     const filteredConfigurations = _.filter(this.configurations, (config) => config.Namespace === this.formValues.ResourcePool.Namespace.Name);
-    this.state.isAlreadyExist = _.find(filteredConfigurations, (config) => config.Name === this.formValues.Name) !== undefined;
+    this.state.alreadyExist = _.find(filteredConfigurations, (config) => config.Name === this.formValues.Name) !== undefined;
   }
 
-  // TODO: review
-  // change isDuplicateKeys to hasDuplicateKeys
   onChangeKey() {
-    this.state.duplicateKeys = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.Data, (data) => data.Key));
-    this.state.isDuplicateKeys = Object.keys(this.state.duplicateKeys).length > 0;
+    this.state.duplicateKeys = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.Data, 'Key'));
+    this.state.hasDuplicateKeys = Object.keys(this.state.duplicateKeys).length > 0;
   }
 
   addEntry() {
@@ -47,8 +40,7 @@ class KubernetesCreateConfigurationController {
 
   removeEntry(index) {
     this.formValues.Data.splice(index, 1);
-    this.state.duplicateKeys = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.Data, (data) => data.Key));
-    this.state.isDuplicateKeys = Object.keys(this.state.duplicateKeys).length > 0;
+    this.onChangeKey();
   }
 
   // TODO: review - don't use async function (cf docker/createConfigController for working 'cm' use)
@@ -61,7 +53,7 @@ class KubernetesCreateConfigurationController {
   }
 
   isFormValid() {
-    const uniqueCheck = !this.state.isAlreadyExist && !this.state.isDuplicateKeys;
+    const uniqueCheck = !this.state.alreadyExist && !this.state.hasDuplicateKeys;
     if (this.formValues.IsSimple) {
       return this.formValues.Data.length > 0 && uniqueCheck;
     }
@@ -123,9 +115,9 @@ class KubernetesCreateConfigurationController {
     this.state = {
       actionInProgress: false,
       viewReady: false,
-      isAlreadyExist: false,
+      alreadyExist: false,
       duplicateKeys: {},
-      isDuplicateKeys: false
+      hasDuplicateKeys: false
     };
 
     this.formValues = new KubernetesConfigurationFormValues();
