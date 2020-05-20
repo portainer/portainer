@@ -1,4 +1,4 @@
-package schedules
+package edgejobs
 
 import (
 	"encoding/base64"
@@ -32,13 +32,14 @@ func (payload *scheduleUpdatePayload) Validate(r *http.Request) error {
 	return nil
 }
 
-func (handler *Handler) scheduleUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+func (handler *Handler) edgeJobUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusServiceUnavailable, "Unable to retrieve settings", err}
 	}
-	if !settings.EnableHostManagementFeatures {
-		return &httperror.HandlerError{http.StatusServiceUnavailable, "Host management features are disabled", portainer.ErrHostManagementFeaturesDisabled}
+
+	if !settings.EnableEdgeComputeFeatures {
+		return &httperror.HandlerError{http.StatusServiceUnavailable, "Edge compute features are disabled", portainer.ErrHostManagementFeaturesDisabled}
 	}
 
 	scheduleID, err := request.RetrieveNumericRouteVariableValue(r, "id")

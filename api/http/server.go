@@ -16,6 +16,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler"
 	"github.com/portainer/portainer/api/http/handler/auth"
 	"github.com/portainer/portainer/api/http/handler/dockerhub"
+	"github.com/portainer/portainer/api/http/handler/edgejobs"
 	"github.com/portainer/portainer/api/http/handler/endpointgroups"
 	"github.com/portainer/portainer/api/http/handler/endpointproxy"
 	"github.com/portainer/portainer/api/http/handler/endpoints"
@@ -24,7 +25,6 @@ import (
 	"github.com/portainer/portainer/api/http/handler/motd"
 	"github.com/portainer/portainer/api/http/handler/registries"
 	"github.com/portainer/portainer/api/http/handler/resourcecontrols"
-	"github.com/portainer/portainer/api/http/handler/schedules"
 	"github.com/portainer/portainer/api/http/handler/settings"
 	"github.com/portainer/portainer/api/http/handler/stacks"
 	"github.com/portainer/portainer/api/http/handler/status"
@@ -98,6 +98,13 @@ func (server *Server) Start() error {
 	var edgeGroupsHandler = edgegroups.NewHandler(requestBouncer)
 	edgeGroupsHandler.DataStore = server.DataStore
 
+	var edgeJobsHandler = edgejobs.NewHandler(requestBouncer)
+	edgeJobsHandler.DataStore = server.DataStore
+	edgeJobsHandler.FileService = server.FileService
+	edgeJobsHandler.JobService = server.JobService
+	edgeJobsHandler.JobScheduler = server.JobScheduler
+	edgeJobsHandler.ReverseTunnelService = server.ReverseTunnelService
+
 	var edgeStacksHandler = edgestacks.NewHandler(requestBouncer)
 	edgeStacksHandler.DataStore = server.DataStore
 	edgeStacksHandler.FileService = server.FileService
@@ -144,13 +151,6 @@ func (server *Server) Start() error {
 
 	var resourceControlHandler = resourcecontrols.NewHandler(requestBouncer)
 	resourceControlHandler.DataStore = server.DataStore
-
-	var schedulesHandler = schedules.NewHandler(requestBouncer)
-	schedulesHandler.DataStore = server.DataStore
-	schedulesHandler.FileService = server.FileService
-	schedulesHandler.JobService = server.JobService
-	schedulesHandler.JobScheduler = server.JobScheduler
-	schedulesHandler.ReverseTunnelService = server.ReverseTunnelService
 
 	var settingsHandler = settings.NewHandler(requestBouncer)
 	settingsHandler.AuthorizationService = authorizationService
@@ -207,6 +207,7 @@ func (server *Server) Start() error {
 		AuthHandler:            authHandler,
 		DockerHubHandler:       dockerHubHandler,
 		EdgeGroupsHandler:      edgeGroupsHandler,
+		EdgeJobsHandler:        edgeJobsHandler,
 		EdgeStacksHandler:      edgeStacksHandler,
 		EdgeTemplatesHandler:   edgeTemplatesHandler,
 		EndpointGroupHandler:   endpointGroupHandler,
@@ -230,7 +231,6 @@ func (server *Server) Start() error {
 		UserHandler:            userHandler,
 		WebSocketHandler:       websocketHandler,
 		WebhookHandler:         webhookHandler,
-		SchedulesHanlder:       schedulesHandler,
 	}
 
 	if server.SSL {
