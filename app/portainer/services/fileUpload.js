@@ -104,17 +104,6 @@ angular.module('portainer.app').factory('FileUploadService', [
       });
     };
 
-    service.executeEndpointJob = function (imageName, file, endpointId, nodeName) {
-      return Upload.upload({
-        url: 'api/endpoints/' + endpointId + '/job?method=file&nodeName=' + nodeName,
-        data: {
-          File: file,
-          Image: imageName,
-        },
-        ignoreLoadingBar: true,
-      });
-    };
-
     service.createEndpoint = function (name, type, URL, PublicURL, groupID, tagIds, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile, checkinInterval) {
       return Upload.upload({
         url: 'api/endpoints',
