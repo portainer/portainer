@@ -15,12 +15,12 @@ type stackStatusResponse struct {
 }
 
 type endpointStatusInspectResponse struct {
-	Status          string                   `json:"status"`
-	Port            int                      `json:"port"`
-	Schedules       []portainer.EdgeSchedule `json:"schedules"`
-	CheckinInterval int                      `json:"checkin"`
-	Credentials     string                   `json:"credentials"`
-	Stacks          []stackStatusResponse    `json:"stacks"`
+	Status          string                `json:"status"`
+	Port            int                   `json:"port"`
+	Jobs            []portainer.EdgeJob   `json:"jobs"`
+	CheckinInterval int                   `json:"checkin"`
+	Credentials     string                `json:"credentials"`
+	Stacks          []stackStatusResponse `json:"stacks"`
 }
 
 // GET request on /api/endpoints/:id/status
@@ -68,7 +68,7 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 	statusResponse := endpointStatusInspectResponse{
 		Status:          tunnel.Status,
 		Port:            tunnel.Port,
-		Schedules:       tunnel.Schedules,
+		Jobs:            tunnel.Jobs,
 		CheckinInterval: checkinInterval,
 		Credentials:     tunnel.Credentials,
 	}

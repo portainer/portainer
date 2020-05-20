@@ -47,11 +47,11 @@ func (service *Service) GetTunnelDetails(endpointID portainer.EndpointID) *porta
 		return tunnelDetails
 	}
 
-	schedules := make([]portainer.EdgeSchedule, 0)
+	jobs := make([]portainer.EdgeJob, 0)
 	return &portainer.TunnelDetails{
 		Status:      portainer.EdgeAgentIdle,
 		Port:        0,
-		Schedules:   schedules,
+		Jobs:        jobs,
 		Credentials: "",
 	}
 }

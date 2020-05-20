@@ -6,42 +6,42 @@ import (
 	portainer "github.com/portainer/portainer/api"
 )
 
-// AddSchedule register a schedule inside the tunnel details associated to an endpoint.
-func (service *Service) AddSchedule(endpointID portainer.EndpointID, schedule *portainer.EdgeSchedule) {
+// AddEdgeJob register an EdgeJob inside the tunnel details associated to an endpoint.
+func (service *Service) AddEdgeJob(endpointID portainer.EndpointID, edgeJob *portainer.EdgeJob) {
 	tunnel := service.GetTunnelDetails(endpointID)
 
-	existingScheduleIndex := -1
-	for idx, existingSchedule := range tunnel.Schedules {
-		if existingSchedule.ID == schedule.ID {
-			existingScheduleIndex = idx
+	existingJobIndex := -1
+	for idx, existingSchedule := range tunnel.Jobs {
+		if existingSchedule.ID == edgeJob.ID {
+			existingJobIndex = idx
 			break
 		}
 	}
 
-	if existingScheduleIndex == -1 {
-		tunnel.Schedules = append(tunnel.Schedules, *schedule)
+	if existingJobIndex == -1 {
+		tunnel.Jobs = append(tunnel.Jobs, *edgeJob)
 	} else {
-		tunnel.Schedules[existingScheduleIndex] = *schedule
+		tunnel.Jobs[existingJobIndex] = *edgeJob
 	}
 
 	key := strconv.Itoa(int(endpointID))
 	service.tunnelDetailsMap.Set(key, tunnel)
 }
 
-// RemoveSchedule will remove the specified schedule from each tunnel it was registered with.
-func (service *Service) RemoveSchedule(scheduleID portainer.ScheduleID) {
+// RemoveEdgeJob will remove the specified Edge job from each tunnel it was registered with.
+func (service *Service) RemoveEdgeJob(edgeJobID portainer.EdgeJobID) {
 	for item := range service.tunnelDetailsMap.IterBuffered() {
 		tunnelDetails := item.Val.(*portainer.TunnelDetails)
 
-		updatedSchedules := make([]portainer.EdgeSchedule, 0)
-		for _, schedule := range tunnelDetails.Schedules {
-			if schedule.ID == scheduleID {
+		updatedJobs := make([]portainer.EdgeJob, 0)
+		for _, edgeJob := range tunnelDetails.Jobs {
+			if edgeJob.ID == edgeJobID {
 				continue
 			}
-			updatedSchedules = append(updatedSchedules, schedule)
+			updatedJobs = append(updatedJobs, edgeJob)
 		}
 
-		tunnelDetails.Schedules = updatedSchedules
+		tunnelDetails.Jobs = updatedJobs
 		service.tunnelDetailsMap.Set(item.Key, tunnelDetails)
 	}
 }

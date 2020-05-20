@@ -1,7 +1,6 @@
 package edgejobs
 
 import (
-	"errors"
 	"net/http"
 	"strconv"
 
@@ -21,35 +20,29 @@ func (handler *Handler) edgeJobDelete(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{http.StatusServiceUnavailable, "Edge compute features are disabled", portainer.ErrHostManagementFeaturesDisabled}
 	}
 
-	scheduleID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	edgeJobID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid schedule identifier route variable", err}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid Edge job identifier route variable", err}
 	}
 
-	schedule, err := handler.DataStore.Schedule().Schedule(portainer.ScheduleID(scheduleID))
+	edgeJob, err := handler.DataStore.EdgeJob().EdgeJob(portainer.EdgeJobID(edgeJobID))
 	if err == portainer.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a schedule with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an Edge job with the specified identifier inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a schedule with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an Edge job with the specified identifier inside the database", err}
 	}
 
-	if schedule.JobType == portainer.SnapshotJobType || schedule.JobType == portainer.EndpointSyncJobType {
-		return &httperror.HandlerError{http.StatusBadRequest, "Cannot remove system schedules", errors.New("Cannot remove system schedule")}
-	}
-
-	scheduleFolder := handler.FileService.GetScheduleFolder(strconv.Itoa(scheduleID))
-	err = handler.FileService.RemoveDirectory(scheduleFolder)
+	edgeJobFolder := handler.FileService.GetEdgeJobFolder(strconv.Itoa(edgeJobID))
+	err = handler.FileService.RemoveDirectory(edgeJobFolder)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the files associated to the schedule on the filesystem", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the files associated to the Edge job on the filesystem", err}
 	}
 
-	handler.ReverseTunnelService.RemoveSchedule(schedule.ID)
+	handler.ReverseTunnelService.RemoveEdgeJob(edgeJob.ID)
 
-	handler.JobScheduler.UnscheduleJob(schedule.ID)
-
-	err = handler.DataStore.Schedule().DeleteSchedule(portainer.ScheduleID(scheduleID))
+	err = handler.DataStore.EdgeJob().DeleteEdgeJob(edgeJob.ID)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the schedule from the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove the Edge job from the database", err}
 	}
 
 	return response.Empty(w)

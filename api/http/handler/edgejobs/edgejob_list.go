@@ -8,7 +8,7 @@ import (
 	"github.com/portainer/portainer/api"
 )
 
-// GET request on /api/schedules
+// GET request on /api/edge_jobs
 func (handler *Handler) edgeJobList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
@@ -19,10 +19,10 @@ func (handler *Handler) edgeJobList(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusServiceUnavailable, "Edge compute features are disabled", portainer.ErrHostManagementFeaturesDisabled}
 	}
 
-	schedules, err := handler.DataStore.Schedule().Schedules()
+	edgeJobs, err := handler.DataStore.EdgeJob().EdgeJobs()
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve schedules from the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve Edge jobs from the database", err}
 	}
 
-	return response.JSON(w, schedules)
+	return response.JSON(w, edgeJobs)
 }

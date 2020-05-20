@@ -20,17 +20,17 @@ func (handler *Handler) edgeJobInspect(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusServiceUnavailable, "Edge compute features are disabled", portainer.ErrHostManagementFeaturesDisabled}
 	}
 
-	scheduleID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	edgeJobID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid schedule identifier route variable", err}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid Edge job identifier route variable", err}
 	}
 
-	schedule, err := handler.DataStore.Schedule().Schedule(portainer.ScheduleID(scheduleID))
+	edgeJob, err := handler.DataStore.EdgeJob().EdgeJob(portainer.EdgeJobID(edgeJobID))
 	if err == portainer.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a schedule with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an Edge job with the specified identifier inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a schedule with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an Edge job with the specified identifier inside the database", err}
 	}
 
-	return response.JSON(w, schedule)
+	return response.JSON(w, edgeJob)
 }

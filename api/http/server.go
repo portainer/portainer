@@ -101,8 +101,6 @@ func (server *Server) Start() error {
 	var edgeJobsHandler = edgejobs.NewHandler(requestBouncer)
 	edgeJobsHandler.DataStore = server.DataStore
 	edgeJobsHandler.FileService = server.FileService
-	edgeJobsHandler.JobService = server.JobService
-	edgeJobsHandler.JobScheduler = server.JobScheduler
 	edgeJobsHandler.ReverseTunnelService = server.ReverseTunnelService
 
 	var edgeStacksHandler = edgestacks.NewHandler(requestBouncer)

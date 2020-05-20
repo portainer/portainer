@@ -9,17 +9,15 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
-// Handler is the HTTP handler used to handle schedule operations.
+// Handler is the HTTP handler used to handle Edge job operations.
 type Handler struct {
 	*mux.Router
 	DataStore            portainer.DataStore
 	FileService          portainer.FileService
-	JobService           portainer.JobService
-	JobScheduler         portainer.JobScheduler
 	ReverseTunnelService portainer.ReverseTunnelService
 }
 
-// NewHandler creates a handler to manage schedule operations.
+// NewHandler creates a handler to manage Edge job operations.
 func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{
 		Router: mux.NewRouter(),

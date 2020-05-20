@@ -160,30 +160,16 @@ func loadSnapshotSystemSchedule(jobScheduler portainer.JobScheduler, snapshotter
 	return nil
 }
 
-func loadSchedulesFromDatabase(jobScheduler portainer.JobScheduler, jobService portainer.JobService, dataStore portainer.DataStore, fileService portainer.FileService, reverseTunnelService portainer.ReverseTunnelService) error {
-	schedules, err := dataStore.Schedule().Schedules()
+func loadEdgeJobsFromDatabase(jobScheduler portainer.JobScheduler, jobService portainer.JobService, dataStore portainer.DataStore, fileService portainer.FileService, reverseTunnelService portainer.ReverseTunnelService) error {
+	edgeJobs, err := dataStore.EdgeJob().EdgeJobs()
 	if err != nil {
 		return err
 	}
 
-	for _, schedule := range schedules {
-
-		if schedule.JobType == portainer.ScriptExecutionJobType {
-			jobContext := cron.NewScriptExecutionJobContext(jobService, dataStore, fileService)
-			jobRunner := cron.NewScriptExecutionJobRunner(&schedule, jobContext)
-
-			err = jobScheduler.ScheduleJob(jobRunner)
-			if err != nil {
-				return err
-			}
+	for _, edgeJob := range edgeJobs {
+		for _, endpointID := range edgeJob.Endpoints {
+			reverseTunnelService.AddEdgeJob(endpointID, &edgeJob)
 		}
-
-		if schedule.EdgeSchedule != nil {
-			for _, endpointID := range schedule.EdgeSchedule.Endpoints {
-				reverseTunnelService.AddSchedule(endpointID, schedule.EdgeSchedule)
-			}
-		}
-
 	}
 
 	return nil
@@ -442,7 +428,7 @@ func main() {
 
 	jobScheduler := initJobScheduler()
 
-	err = loadSchedulesFromDatabase(jobScheduler, jobService, dataStore, fileService, reverseTunnelService)
+	err = loadEdgeJobsFromDatabase(jobScheduler, jobService, dataStore, fileService, reverseTunnelService)
 	if err != nil {
 		log.Fatal(err)
 	}

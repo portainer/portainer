@@ -76,6 +76,7 @@ type (
 
 		DockerHub() DockerHubService
 		EdgeGroup() EdgeGroupService
+		EdgeJob() EdgeJobService
 		EdgeStack() EdgeStackService
 		Endpoint() EndpointService
 		EndpointGroup() EndpointGroupService
@@ -124,7 +125,7 @@ type (
 		CronExpression string       `json:"CronExpression"`
 		Endpoints      []EndpointID `json:"Endpoints"`
 		Name           string       `json:"Name"`
-		Script         string       `json:"Script"`
+		ScriptPath     string       `json:"Script"`
 		Recurring      bool         `json:"Recurring"`
 		Version        int          `json:"Version"`
 	}
@@ -682,7 +683,7 @@ type (
 		Status       string
 		LastActivity time.Time
 		Port         int
-		Schedules    []EdgeSchedule
+		Jobs         []EdgeJob
 		Credentials  string
 	}
 
@@ -853,8 +854,8 @@ type (
 		LoadKeyPair() ([]byte, []byte, error)
 		WriteJSONToFile(path string, content interface{}) error
 		FileExists(path string) (bool, error)
-		StoreScheduledJobFileFromBytes(identifier string, data []byte) (string, error)
-		GetScheduleFolder(identifier string) string
+		StoreEdgeJobFileFromBytes(identifier string, data []byte) (string, error)
+		GetEdgeJobFolder(identifier string) string
 		ExtractExtensionArchive(data []byte) error
 		GetBinaryFolder() string
 	}
@@ -926,8 +927,8 @@ type (
 		SetTunnelStatusToRequired(endpointID EndpointID) error
 		SetTunnelStatusToIdle(endpointID EndpointID)
 		GetTunnelDetails(endpointID EndpointID) *TunnelDetails
-		AddSchedule(endpointID EndpointID, schedule *EdgeSchedule)
-		RemoveSchedule(scheduleID ScheduleID)
+		AddEdgeJob(endpointID EndpointID, edgeJob *EdgeJob)
+		RemoveEdgeJob(edgeJobID EdgeJobID)
 	}
 
 	// RoleService represents a service for managing user roles

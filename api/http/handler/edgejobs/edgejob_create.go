@@ -1,7 +1,6 @@
 package edgejobs
 
 import (
-	"encoding/base64"
 	"errors"
 	"net/http"
 	"strconv"
@@ -13,47 +12,34 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/cron"
 )
 
-type scheduleCreateFromFilePayload struct {
+type edgeJobCreateFromFilePayload struct {
 	Name           string
-	Image          string
 	CronExpression string
 	Recurring      bool
 	Endpoints      []portainer.EndpointID
 	File           []byte
-	RetryCount     int
-	RetryInterval  int
 }
 
-type scheduleCreateFromFileContentPayload struct {
+type edgeJobCreateFromFileContentPayload struct {
 	Name           string
 	CronExpression string
 	Recurring      bool
-	Image          string
 	Endpoints      []portainer.EndpointID
 	FileContent    string
-	RetryCount     int
-	RetryInterval  int
 }
 
-func (payload *scheduleCreateFromFilePayload) Validate(r *http.Request) error {
+func (payload *edgeJobCreateFromFilePayload) Validate(r *http.Request) error {
 	name, err := request.RetrieveMultiPartFormValue(r, "Name", false)
 	if err != nil {
-		return errors.New("Invalid schedule name")
+		return errors.New("Invalid Edge job name")
 	}
 
 	if !govalidator.Matches(name, `^[a-zA-Z0-9][a-zA-Z0-9_.-]+$`) {
-		return errors.New("Invalid schedule name format. Allowed characters are: [a-zA-Z0-9_.-]")
+		return errors.New("Invalid Edge job name format. Allowed characters are: [a-zA-Z0-9_.-]")
 	}
 	payload.Name = name
-
-	image, err := request.RetrieveMultiPartFormValue(r, "Image", false)
-	if err != nil {
-		return errors.New("Invalid schedule image")
-	}
-	payload.Image = image
 
 	cronExpression, err := request.RetrieveMultiPartFormValue(r, "CronExpression", false)
 	if err != nil {
@@ -74,26 +60,16 @@ func (payload *scheduleCreateFromFilePayload) Validate(r *http.Request) error {
 	}
 	payload.File = file
 
-	retryCount, _ := request.RetrieveNumericMultiPartFormValue(r, "RetryCount", true)
-	payload.RetryCount = retryCount
-
-	retryInterval, _ := request.RetrieveNumericMultiPartFormValue(r, "RetryInterval", true)
-	payload.RetryInterval = retryInterval
-
 	return nil
 }
 
-func (payload *scheduleCreateFromFileContentPayload) Validate(r *http.Request) error {
+func (payload *edgeJobCreateFromFileContentPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
-		return portainer.Error("Invalid schedule name")
+		return portainer.Error("Invalid Edge job name")
 	}
 
 	if !govalidator.Matches(payload.Name, `^[a-zA-Z0-9][a-zA-Z0-9_.-]+$`) {
-		return errors.New("Invalid schedule name format. Allowed characters are: [a-zA-Z0-9_.-]")
-	}
-
-	if govalidator.IsNull(payload.Image) {
-		return portainer.Error("Invalid schedule image")
+		return errors.New("Invalid Edge job name format. Allowed characters are: [a-zA-Z0-9_.-]")
 	}
 
 	if govalidator.IsNull(payload.CronExpression) {
@@ -108,14 +84,10 @@ func (payload *scheduleCreateFromFileContentPayload) Validate(r *http.Request) e
 		return portainer.Error("Invalid script file content")
 	}
 
-	if payload.RetryCount != 0 && payload.RetryInterval == 0 {
-		return portainer.Error("RetryInterval must be set")
-	}
-
 	return nil
 }
 
-// POST /api/schedules?method=file|string
+// POST /api/edge_jobs?method=file|string
 func (handler *Handler) edgeJobCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
@@ -133,149 +105,116 @@ func (handler *Handler) edgeJobCreate(w http.ResponseWriter, r *http.Request) *h
 
 	switch method {
 	case "string":
-		return handler.createScheduleFromFileContent(w, r)
+		return handler.createEdgeJobFromFileContent(w, r)
 	case "file":
-		return handler.createScheduleFromFile(w, r)
+		return handler.createEdgeJobFromFile(w, r)
 	default:
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: method. Valid values are: file or string", errors.New(request.ErrInvalidQueryParameter)}
 	}
 }
 
-func (handler *Handler) createScheduleFromFileContent(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	var payload scheduleCreateFromFileContentPayload
+func (handler *Handler) createEdgeJobFromFileContent(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	var payload edgeJobCreateFromFileContentPayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	schedule := handler.createScheduleObjectFromFileContentPayload(&payload)
+	edgeJob := handler.createEdgeJobObjectFromFileContentPayload(&payload)
 
-	err = handler.addAndPersistSchedule(schedule, []byte(payload.FileContent))
+	err = handler.addAndPersistEdgeJob(edgeJob, []byte(payload.FileContent))
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to schedule script job", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to schedule Edge job", err}
 	}
 
-	return response.JSON(w, schedule)
+	return response.JSON(w, edgeJob)
 }
 
-func (handler *Handler) createScheduleFromFile(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	payload := &scheduleCreateFromFilePayload{}
+func (handler *Handler) createEdgeJobFromFile(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+	payload := &edgeJobCreateFromFilePayload{}
 	err := payload.Validate(r)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	schedule := handler.createScheduleObjectFromFilePayload(payload)
+	edgeJob := handler.createEdgeJobObjectFromFilePayload(payload)
 
-	err = handler.addAndPersistSchedule(schedule, payload.File)
+	err = handler.addAndPersistEdgeJob(edgeJob, payload.File)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to schedule script job", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to schedule Edge job", err}
 	}
 
-	return response.JSON(w, schedule)
+	return response.JSON(w, edgeJob)
 }
 
-func (handler *Handler) createScheduleObjectFromFilePayload(payload *scheduleCreateFromFilePayload) *portainer.Schedule {
-	scheduleIdentifier := portainer.ScheduleID(handler.DataStore.Schedule().GetNextIdentifier())
+func (handler *Handler) createEdgeJobObjectFromFilePayload(payload *edgeJobCreateFromFilePayload) *portainer.EdgeJob {
+	edgeJobIdentifier := portainer.EdgeJobID(handler.DataStore.EdgeJob().GetNextIdentifier())
 
-	job := &portainer.ScriptExecutionJob{
-		Endpoints:     payload.Endpoints,
-		Image:         payload.Image,
-		RetryCount:    payload.RetryCount,
-		RetryInterval: payload.RetryInterval,
+	edgeJob := &portainer.EdgeJob{
+		ID:             edgeJobIdentifier,
+		Name:           payload.Name,
+		CronExpression: payload.CronExpression,
+		Recurring:      payload.Recurring,
+		Created:        time.Now().Unix(),
+		Endpoints:      payload.Endpoints,
+		Version:        1,
 	}
 
-	schedule := &portainer.Schedule{
-		ID:                 scheduleIdentifier,
-		Name:               payload.Name,
-		CronExpression:     payload.CronExpression,
-		Recurring:          payload.Recurring,
-		JobType:            portainer.ScriptExecutionJobType,
-		ScriptExecutionJob: job,
-		Created:            time.Now().Unix(),
-	}
-
-	return schedule
+	return edgeJob
 }
 
-func (handler *Handler) createScheduleObjectFromFileContentPayload(payload *scheduleCreateFromFileContentPayload) *portainer.Schedule {
-	scheduleIdentifier := portainer.ScheduleID(handler.DataStore.Schedule().GetNextIdentifier())
+func (handler *Handler) createEdgeJobObjectFromFileContentPayload(payload *edgeJobCreateFromFileContentPayload) *portainer.EdgeJob {
+	edgeJobIdentifier := portainer.EdgeJobID(handler.DataStore.EdgeJob().GetNextIdentifier())
 
-	job := &portainer.ScriptExecutionJob{
-		Endpoints:     payload.Endpoints,
-		Image:         payload.Image,
-		RetryCount:    payload.RetryCount,
-		RetryInterval: payload.RetryInterval,
+	edgeJob := &portainer.EdgeJob{
+		ID:             edgeJobIdentifier,
+		Name:           payload.Name,
+		CronExpression: payload.CronExpression,
+		Recurring:      payload.Recurring,
+		Created:        time.Now().Unix(),
+		Endpoints:      payload.Endpoints,
+		Version:        1,
 	}
 
-	schedule := &portainer.Schedule{
-		ID:                 scheduleIdentifier,
-		Name:               payload.Name,
-		CronExpression:     payload.CronExpression,
-		Recurring:          payload.Recurring,
-		JobType:            portainer.ScriptExecutionJobType,
-		ScriptExecutionJob: job,
-		Created:            time.Now().Unix(),
-	}
-
-	return schedule
+	return edgeJob
 }
 
-func (handler *Handler) addAndPersistSchedule(schedule *portainer.Schedule, file []byte) error {
-	nonEdgeEndpointIDs := make([]portainer.EndpointID, 0)
-	edgeEndpointIDs := make([]portainer.EndpointID, 0)
+func (handler *Handler) addAndPersistEdgeJob(edgeJob *portainer.EdgeJob, file []byte) error {
+	endpointIDs := make([]portainer.EndpointID, 0)
 
-	edgeCronExpression := strings.Split(schedule.CronExpression, " ")
+	edgeCronExpression := strings.Split(edgeJob.CronExpression, " ")
 	if len(edgeCronExpression) == 6 {
 		edgeCronExpression = edgeCronExpression[1:]
 	}
+	edgeJob.CronExpression = strings.Join(edgeCronExpression, " ")
 
-	for _, ID := range schedule.ScriptExecutionJob.Endpoints {
-
+	for _, ID := range edgeJob.Endpoints {
 		endpoint, err := handler.DataStore.Endpoint().Endpoint(ID)
 		if err != nil {
 			return err
 		}
 
-		if endpoint.Type != portainer.EdgeAgentEnvironment {
-			nonEdgeEndpointIDs = append(nonEdgeEndpointIDs, endpoint.ID)
-		} else {
-			edgeEndpointIDs = append(edgeEndpointIDs, endpoint.ID)
+		if endpoint.Type == portainer.EdgeAgentEnvironment {
+			endpointIDs = append(endpointIDs, endpoint.ID)
 		}
 	}
 
-	if len(edgeEndpointIDs) > 0 {
-		edgeSchedule := &portainer.EdgeSchedule{
-			ID:             schedule.ID,
-			CronExpression: strings.Join(edgeCronExpression, " "),
-			Script:         base64.RawStdEncoding.EncodeToString(file),
-			Endpoints:      edgeEndpointIDs,
-			Version:        1,
-		}
-
-		for _, endpointID := range edgeEndpointIDs {
-			handler.ReverseTunnelService.AddSchedule(endpointID, edgeSchedule)
-		}
-
-		schedule.EdgeSchedule = edgeSchedule
+	if len(endpointIDs) == 0 {
+		return errors.New("Endpoints are mandatory for an Edge job")
 	}
 
-	schedule.ScriptExecutionJob.Endpoints = nonEdgeEndpointIDs
+	edgeJob.Endpoints = endpointIDs
 
-	scriptPath, err := handler.FileService.StoreScheduledJobFileFromBytes(strconv.Itoa(int(schedule.ID)), file)
+	for _, endpointID := range endpointIDs {
+		handler.ReverseTunnelService.AddEdgeJob(endpointID, edgeJob)
+	}
+
+	scriptPath, err := handler.FileService.StoreEdgeJobFileFromBytes(strconv.Itoa(int(edgeJob.ID)), file)
 	if err != nil {
 		return err
 	}
 
-	schedule.ScriptExecutionJob.ScriptPath = scriptPath
+	edgeJob.ScriptPath = scriptPath
 
-	jobContext := cron.NewScriptExecutionJobContext(handler.JobService, handler.DataStore, handler.FileService)
-	jobRunner := cron.NewScriptExecutionJobRunner(schedule, jobContext)
-
-	err = handler.JobScheduler.ScheduleJob(jobRunner)
-	if err != nil {
-		return err
-	}
-
-	return handler.DataStore.Schedule().CreateSchedule(schedule)
+	return handler.DataStore.EdgeJob().CreateEdgeJob(edgeJob)
 }

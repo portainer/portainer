@@ -1,7 +1,6 @@
 package edgejobs
 
 import (
-	"encoding/base64"
 	"errors"
 	"net/http"
 	"strconv"
@@ -11,10 +10,9 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/cron"
 )
 
-type scheduleUpdatePayload struct {
+type edgeJobUpdatePayload struct {
 	Name           *string
 	Image          *string
 	CronExpression *string
@@ -25,9 +23,9 @@ type scheduleUpdatePayload struct {
 	RetryInterval  *int
 }
 
-func (payload *scheduleUpdatePayload) Validate(r *http.Request) error {
+func (payload *edgeJobUpdatePayload) Validate(r *http.Request) error {
 	if payload.Name != nil && !govalidator.Matches(*payload.Name, `^[a-zA-Z0-9][a-zA-Z0-9_.-]+$`) {
-		return errors.New("Invalid schedule name format. Allowed characters are: [a-zA-Z0-9_.-]")
+		return errors.New("Invalid Edge job name format. Allowed characters are: [a-zA-Z0-9_.-]")
 	}
 	return nil
 }
@@ -42,67 +40,45 @@ func (handler *Handler) edgeJobUpdate(w http.ResponseWriter, r *http.Request) *h
 		return &httperror.HandlerError{http.StatusServiceUnavailable, "Edge compute features are disabled", portainer.ErrHostManagementFeaturesDisabled}
 	}
 
-	scheduleID, err := request.RetrieveNumericRouteVariableValue(r, "id")
+	edgeJobID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid schedule identifier route variable", err}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid Edge job identifier route variable", err}
 	}
 
-	var payload scheduleUpdatePayload
+	var payload edgeJobUpdatePayload
 	err = request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	schedule, err := handler.DataStore.Schedule().Schedule(portainer.ScheduleID(scheduleID))
+	edgeJob, err := handler.DataStore.EdgeJob().EdgeJob(portainer.EdgeJobID(edgeJobID))
 	if err == portainer.ErrObjectNotFound {
-		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a schedule with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an Edge job with the specified identifier inside the database", err}
 	} else if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a schedule with the specified identifier inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an Edge job with the specified identifier inside the database", err}
 	}
 
-	updateJobSchedule := false
-	if schedule.EdgeSchedule != nil {
-		err := handler.updateEdgeSchedule(schedule, &payload)
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update Edge schedule", err}
-		}
-	} else {
-		updateJobSchedule = updateSchedule(schedule, &payload)
-	}
-
-	if payload.FileContent != nil {
-		_, err := handler.FileService.StoreScheduledJobFileFromBytes(strconv.Itoa(scheduleID), []byte(*payload.FileContent))
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist script file changes on the filesystem", err}
-		}
-		updateJobSchedule = true
-	}
-
-	if updateJobSchedule {
-		jobContext := cron.NewScriptExecutionJobContext(handler.JobService, handler.DataStore, handler.FileService)
-		jobRunner := cron.NewScriptExecutionJobRunner(schedule, jobContext)
-		err := handler.JobScheduler.UpdateJobSchedule(jobRunner)
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update job scheduler", err}
-		}
-	}
-
-	err = handler.DataStore.Schedule().UpdateSchedule(portainer.ScheduleID(scheduleID), schedule)
+	err = handler.updateEdgeSchedule(edgeJob, &payload)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist schedule changes inside the database", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update Edge job", err}
 	}
 
-	return response.JSON(w, schedule)
+	err = handler.DataStore.EdgeJob().UpdateEdgeJob(edgeJob.ID, edgeJob)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Edge job changes inside the database", err}
+	}
+
+	return response.JSON(w, edgeJob)
 }
 
-func (handler *Handler) updateEdgeSchedule(schedule *portainer.Schedule, payload *scheduleUpdatePayload) error {
+func (handler *Handler) updateEdgeSchedule(edgeJob *portainer.EdgeJob, payload *edgeJobUpdatePayload) error {
 	if payload.Name != nil {
-		schedule.Name = *payload.Name
+		edgeJob.Name = *payload.Name
 	}
 
 	if payload.Endpoints != nil {
 
-		edgeEndpointIDs := make([]portainer.EndpointID, 0)
+		endpointIDs := make([]portainer.EndpointID, 0)
 
 		for _, ID := range payload.Endpoints {
 			endpoint, err := handler.DataStore.Endpoint().Endpoint(ID)
@@ -111,66 +87,30 @@ func (handler *Handler) updateEdgeSchedule(schedule *portainer.Schedule, payload
 			}
 
 			if endpoint.Type == portainer.EdgeAgentEnvironment {
-				edgeEndpointIDs = append(edgeEndpointIDs, endpoint.ID)
+				endpointIDs = append(endpointIDs, endpoint.ID)
 			}
 		}
 
-		schedule.EdgeSchedule.Endpoints = edgeEndpointIDs
+		edgeJob.Endpoints = endpointIDs
 	}
 
 	if payload.CronExpression != nil {
-		schedule.EdgeSchedule.CronExpression = *payload.CronExpression
-		schedule.EdgeSchedule.Version++
+		edgeJob.CronExpression = *payload.CronExpression
+		edgeJob.Version++
 	}
 
 	if payload.FileContent != nil {
-		schedule.EdgeSchedule.Script = base64.RawStdEncoding.EncodeToString([]byte(*payload.FileContent))
-		schedule.EdgeSchedule.Version++
+		_, err := handler.FileService.StoreEdgeJobFileFromBytes(strconv.Itoa(int(edgeJob.ID)), []byte(*payload.FileContent))
+		if err != nil {
+			return err
+		}
+
+		edgeJob.Version++
 	}
 
-	for _, endpointID := range schedule.EdgeSchedule.Endpoints {
-		handler.ReverseTunnelService.AddSchedule(endpointID, schedule.EdgeSchedule)
+	for _, endpointID := range edgeJob.Endpoints {
+		handler.ReverseTunnelService.AddEdgeJob(endpointID, edgeJob)
 	}
 
 	return nil
-}
-
-func updateSchedule(schedule *portainer.Schedule, payload *scheduleUpdatePayload) bool {
-	updateJobSchedule := false
-
-	if payload.Name != nil {
-		schedule.Name = *payload.Name
-	}
-
-	if payload.Endpoints != nil {
-		schedule.ScriptExecutionJob.Endpoints = payload.Endpoints
-		updateJobSchedule = true
-	}
-
-	if payload.CronExpression != nil {
-		schedule.CronExpression = *payload.CronExpression
-		updateJobSchedule = true
-	}
-
-	if payload.Recurring != nil {
-		schedule.Recurring = *payload.Recurring
-		updateJobSchedule = true
-	}
-
-	if payload.Image != nil {
-		schedule.ScriptExecutionJob.Image = *payload.Image
-		updateJobSchedule = true
-	}
-
-	if payload.RetryCount != nil {
-		schedule.ScriptExecutionJob.RetryCount = *payload.RetryCount
-		updateJobSchedule = true
-	}
-
-	if payload.RetryInterval != nil {
-		schedule.ScriptExecutionJob.RetryInterval = *payload.RetryInterval
-		updateJobSchedule = true
-	}
-
-	return updateJobSchedule
 }

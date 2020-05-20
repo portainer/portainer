@@ -155,7 +155,7 @@ func (service *Service) checkTunnels() {
 			}
 		}
 
-		if len(tunnel.Schedules) > 0 {
+		if len(tunnel.Jobs) > 0 {
 			endpointID, err := strconv.Atoi(item.Key)
 			if err != nil {
 				log.Printf("[ERROR] [chisel,conversion] Invalid endpoint identifier (id: %s): %s", item.Key, err)
