@@ -11,8 +11,8 @@ func (service *Service) AddEdgeJob(endpointID portainer.EndpointID, edgeJob *por
 	tunnel := service.GetTunnelDetails(endpointID)
 
 	existingJobIndex := -1
-	for idx, existingSchedule := range tunnel.Jobs {
-		if existingSchedule.ID == edgeJob.ID {
+	for idx, existingJob := range tunnel.Jobs {
+		if existingJob.ID == edgeJob.ID {
 			existingJobIndex = idx
 			break
 		}
