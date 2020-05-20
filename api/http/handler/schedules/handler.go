@@ -12,9 +12,7 @@ import (
 // Handler is the HTTP handler used to handle schedule operations.
 type Handler struct {
 	*mux.Router
-	ScheduleService      portainer.ScheduleService
-	EndpointService      portainer.EndpointService
-	SettingsService      portainer.SettingsService
+	DataStore            portainer.DataStore
 	FileService          portainer.FileService
 	JobService           portainer.JobService
 	JobScheduler         portainer.JobScheduler

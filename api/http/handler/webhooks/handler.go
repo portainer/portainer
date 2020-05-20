@@ -13,8 +13,7 @@ import (
 // Handler is the HTTP handler used to handle webhook operations.
 type Handler struct {
 	*mux.Router
-	WebhookService      portainer.WebhookService
-	EndpointService     portainer.EndpointService
+	DataStore           portainer.DataStore
 	DockerClientFactory *docker.ClientFactory
 }
 

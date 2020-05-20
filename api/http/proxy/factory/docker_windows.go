@@ -13,18 +13,11 @@ import (
 
 func (factory ProxyFactory) newOSBasedLocalProxy(path string, endpoint *portainer.Endpoint) (http.Handler, error) {
 	transportParameters := &docker.TransportParameters{
-		Endpoint:               endpoint,
-		ResourceControlService: factory.resourceControlService,
-		UserService:            factory.userService,
-		TeamService:            factory.teamService,
-		TeamMembershipService:  factory.teamMembershipService,
-		RegistryService:        factory.registryService,
-		DockerHubService:       factory.dockerHubService,
-		SettingsService:        factory.settingsService,
-		ReverseTunnelService:   factory.reverseTunnelService,
-		ExtensionService:       factory.extensionService,
-		SignatureService:       factory.signatureService,
-		DockerClientFactory:    factory.dockerClientFactory,
+		Endpoint:             endpoint,
+		DataStore:            factory.dataStore,
+		ReverseTunnelService: factory.reverseTunnelService,
+		SignatureService:     factory.signatureService,
+		DockerClientFactory:  factory.dockerClientFactory,
 	}
 
 	proxy := &dockerLocalProxy{}

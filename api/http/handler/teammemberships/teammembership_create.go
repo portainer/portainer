@@ -46,7 +46,7 @@ func (handler *Handler) teamMembershipCreate(w http.ResponseWriter, r *http.Requ
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to manage team memberships", portainer.ErrResourceAccessDenied}
 	}
 
-	memberships, err := handler.TeamMembershipService.TeamMembershipsByUserID(portainer.UserID(payload.UserID))
+	memberships, err := handler.DataStore.TeamMembership().TeamMembershipsByUserID(portainer.UserID(payload.UserID))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve team memberships from the database", err}
 	}
@@ -65,7 +65,7 @@ func (handler *Handler) teamMembershipCreate(w http.ResponseWriter, r *http.Requ
 		Role:   portainer.MembershipRole(payload.Role),
 	}
 
-	err = handler.TeamMembershipService.CreateTeamMembership(membership)
+	err = handler.DataStore.TeamMembership().CreateTeamMembership(membership)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist team memberships inside the database", err}
 	}

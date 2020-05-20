@@ -27,7 +27,7 @@ func (handler *Handler) userInspect(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied inspect user", portainer.ErrResourceAccessDenied}
 	}
 
-	user, err := handler.UserService.User(portainer.UserID(userID))
+	user, err := handler.DataStore.User().User(portainer.UserID(userID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a user with the specified identifier inside the database", err}
 	} else if err != nil {

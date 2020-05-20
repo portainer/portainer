@@ -26,7 +26,7 @@ func (handler *Handler) teamMemberships(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusForbidden, "Access denied to team", portainer.ErrResourceAccessDenied}
 	}
 
-	memberships, err := handler.TeamMembershipService.TeamMembershipsByTeamID(portainer.TeamID(teamID))
+	memberships, err := handler.DataStore.TeamMembership().TeamMembershipsByTeamID(portainer.TeamID(teamID))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve associated team memberships from the database", err}
 	}

@@ -20,44 +20,15 @@ type (
 		extensionProxies       cmap.ConcurrentMap
 		legacyExtensionProxies cmap.ConcurrentMap
 	}
-
-	// ManagerParams represents the required parameters to create a new Manager instance.
-	ManagerParams struct {
-		ResourceControlService portainer.ResourceControlService
-		UserService            portainer.UserService
-		TeamService            portainer.TeamService
-		TeamMembershipService  portainer.TeamMembershipService
-		SettingsService        portainer.SettingsService
-		RegistryService        portainer.RegistryService
-		DockerHubService       portainer.DockerHubService
-		SignatureService       portainer.DigitalSignatureService
-		ReverseTunnelService   portainer.ReverseTunnelService
-		ExtensionService       portainer.ExtensionService
-		DockerClientFactory    *docker.ClientFactory
-	}
 )
 
 // NewManager initializes a new proxy Service
-func NewManager(parameters *ManagerParams) *Manager {
-	proxyFactoryParameters := &factory.ProxyFactoryParameters{
-		ResourceControlService: parameters.ResourceControlService,
-		UserService:            parameters.UserService,
-		TeamService:            parameters.TeamService,
-		TeamMembershipService:  parameters.TeamMembershipService,
-		SettingsService:        parameters.SettingsService,
-		RegistryService:        parameters.RegistryService,
-		DockerHubService:       parameters.DockerHubService,
-		SignatureService:       parameters.SignatureService,
-		ReverseTunnelService:   parameters.ReverseTunnelService,
-		ExtensionService:       parameters.ExtensionService,
-		DockerClientFactory:    parameters.DockerClientFactory,
-	}
-
+func NewManager(dataStore portainer.DataStore, signatureService portainer.DigitalSignatureService, tunnelService portainer.ReverseTunnelService, clientFactory *docker.ClientFactory) *Manager {
 	return &Manager{
 		endpointProxies:        cmap.New(),
 		extensionProxies:       cmap.New(),
 		legacyExtensionProxies: cmap.New(),
-		proxyFactory:           factory.NewProxyFactory(proxyFactoryParameters),
+		proxyFactory:           factory.NewProxyFactory(dataStore, signatureService, tunnelService, clientFactory),
 	}
 }
 

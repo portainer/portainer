@@ -32,7 +32,7 @@ func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject m
 	if labelsObject[resourceLabelForPortainerPublicResourceControl] != nil {
 		resourceControl := portainer.NewPublicResourceControl(resourceID, resourceType)
 
-		err := transport.resourceControlService.CreateResourceControl(resourceControl)
+		err := transport.dataStore.ResourceControl().CreateResourceControl(resourceControl)
 		if err != nil {
 			return nil, err
 		}
@@ -57,7 +57,7 @@ func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject m
 		userIDs := make([]portainer.UserID, 0)
 
 		for _, name := range teamNames {
-			team, err := transport.teamService.TeamByName(name)
+			team, err := transport.dataStore.Team().TeamByName(name)
 			if err != nil {
 				log.Printf("[WARN] [http,proxy,docker] [message: unknown team name in access control label, ignoring access control rule for this team] [name: %s] [resource_id: %s]", name, resourceID)
 				continue
@@ -67,7 +67,7 @@ func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject m
 		}
 
 		for _, name := range userNames {
-			user, err := transport.userService.UserByUsername(name)
+			user, err := transport.dataStore.User().UserByUsername(name)
 			if err != nil {
 				log.Printf("[WARN] [http,proxy,docker] [message: unknown user name in access control label, ignoring access control rule for this user] [name: %s] [resource_id: %s]", name, resourceID)
 				continue
@@ -78,7 +78,7 @@ func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject m
 
 		resourceControl := portainer.NewRestrictedResourceControl(resourceID, resourceType, userIDs, teamIDs)
 
-		err := transport.resourceControlService.CreateResourceControl(resourceControl)
+		err := transport.dataStore.ResourceControl().CreateResourceControl(resourceControl)
 		if err != nil {
 			return nil, err
 		}
@@ -92,7 +92,7 @@ func (transport *Transport) newResourceControlFromPortainerLabels(labelsObject m
 func (transport *Transport) createPrivateResourceControl(resourceIdentifier string, resourceType portainer.ResourceControlType, userID portainer.UserID) (*portainer.ResourceControl, error) {
 	resourceControl := portainer.NewPrivateResourceControl(resourceIdentifier, resourceType, userID)
 
-	err := transport.resourceControlService.CreateResourceControl(resourceControl)
+	err := transport.dataStore.ResourceControl().CreateResourceControl(resourceControl)
 	if err != nil {
 		log.Printf("[ERROR] [http,proxy,docker,transport] [message: unable to persist resource control] [resource: %s] [err: %s]", resourceIdentifier, err)
 		return nil, err

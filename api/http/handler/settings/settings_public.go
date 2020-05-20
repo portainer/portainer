@@ -22,7 +22,7 @@ type publicSettingsResponse struct {
 
 // GET request on /api/settings/public
 func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	settings, err := handler.SettingsService.Settings()
+	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve the settings from the database", err}
 	}

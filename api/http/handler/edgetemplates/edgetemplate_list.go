@@ -17,7 +17,7 @@ type templateFileFormat struct {
 
 // GET request on /api/edgetemplates
 func (handler *Handler) edgeTemplateList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	settings, err := handler.SettingsService.Settings()
+	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
 	}

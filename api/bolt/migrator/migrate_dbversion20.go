@@ -74,16 +74,9 @@ func (m *Migrator) updateUsersAndRolesToDBVersion22() error {
 	readOnlyUserRole.Authorizations = portainer.DefaultEndpointAuthorizationsForReadOnlyUserRole(settings.AllowVolumeBrowserForRegularUsers)
 
 	err = m.roleService.UpdateRole(readOnlyUserRole.ID, readOnlyUserRole)
-
-	authorizationServiceParameters := &portainer.AuthorizationServiceParameters{
-		EndpointService:       m.endpointService,
-		EndpointGroupService:  m.endpointGroupService,
-		RegistryService:       m.registryService,
-		RoleService:           m.roleService,
-		TeamMembershipService: m.teamMembershipService,
-		UserService:           m.userService,
+	if err != nil {
+		return err
 	}
 
-	authorizationService := portainer.NewAuthorizationService(authorizationServiceParameters)
-	return authorizationService.UpdateUsersAuthorizations()
+	return m.authorizationService.UpdateUsersAuthorizations()
 }

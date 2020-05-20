@@ -48,7 +48,7 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update user to administrator role", portainer.ErrResourceAccessDenied}
 	}
 
-	user, err := handler.UserService.User(portainer.UserID(userID))
+	user, err := handler.DataStore.User().User(portainer.UserID(userID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a user with the specified identifier inside the database", err}
 	} else if err != nil {
@@ -66,7 +66,7 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 		user.Role = portainer.UserRole(payload.Role)
 	}
 
-	err = handler.UserService.UpdateUser(user.ID, user)
+	err = handler.DataStore.User().UpdateUser(user.ID, user)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist user changes inside the database", err}
 	}

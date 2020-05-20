@@ -25,7 +25,7 @@ func (handler *Handler) extensionInspect(w http.ResponseWriter, r *http.Request)
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve extensions informations", err}
 	}
 
-	localExtension, err := handler.ExtensionService.Extension(extensionID)
+	localExtension, err := handler.DataStore.Extension().Extension(extensionID)
 	if err != nil && err != portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve extension information from the database", err}
 	}

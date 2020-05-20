@@ -29,7 +29,7 @@ func (handler *Handler) tagCreate(w http.ResponseWriter, r *http.Request) *httpe
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	tags, err := handler.TagService.Tags()
+	tags, err := handler.DataStore.Tag().Tags()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve tags from the database", err}
 	}
@@ -46,7 +46,7 @@ func (handler *Handler) tagCreate(w http.ResponseWriter, r *http.Request) *httpe
 		Endpoints:      map[portainer.EndpointID]bool{},
 	}
 
-	err = handler.TagService.CreateTag(tag)
+	err = handler.DataStore.Tag().CreateTag(tag)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the tag inside the database", err}
 	}

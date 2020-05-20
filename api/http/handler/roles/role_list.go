@@ -9,7 +9,7 @@ import (
 
 // GET request on /api/Role
 func (handler *Handler) roleList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	roles, err := handler.RoleService.Roles()
+	roles, err := handler.DataStore.Role().Roles()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve authorization sets from the database", err}
 	}
