@@ -38,22 +38,6 @@ class KubernetesConfigurationController {
     this.LocalStorage.storeActiveTab('configuration', index);
   }
 
-  // TODO: review
-  // change this.state.isAlreadyExist to this.state.alreadyExists
-  // and use
-  // onChangeName() {
-  //   this.state.isAlreadyExist = _.fin(this.configurations, (app) => config.Namespace === this.formValues.ResourcePool.Namespace.Name && config.Name === this.formValues.Name) !== undefined;
-  // }
-  onChangeName() {
-    if (this.formValues.Name === this.configuration.Name) {
-      this.state.isAlreadyExist = false;
-      return;
-    }
-
-    const filteredConfigurations = _.filter(this.configurations, (config) => config.Namespace === this.formValues.ResourcePool.Namespace.Name);
-    this.state.isAlreadyExist = _.find(filteredConfigurations, (config) => config.Name === this.formValues.Name) !== undefined;
-  }
-
   onChangeKey() {
     this.state.duplicateKeys = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.Data, (data) => data.Key));
     this.state.isDuplicateKeys = Object.keys(this.state.duplicateKeys).length > 0;
@@ -84,11 +68,10 @@ class KubernetesConfigurationController {
   }
 
   isFormValid() {
-    const uniqueCheck = !this.state.isAlreadyExist && !this.state.isDuplicateKeys;
     if (this.formValues.IsSimple) {
-      return this.formValues.Data.length > 0 && uniqueCheck;
+      return this.formValues.Data.length > 0 && !this.state.isDuplicateKeys;
     }
-    return uniqueCheck;
+    return !this.state.isDuplicateKeys;
   }
 
   // TODO: review - refactor fileReader usage
@@ -231,7 +214,6 @@ class KubernetesConfigurationController {
         showEditorTab: false,
         viewReady: false,
         eventWarningCount: 0,
-        isAlreadyExist: false,
         duplicateKeys: {},
         isDuplicateKeys: false,
         activeTab: 0,
