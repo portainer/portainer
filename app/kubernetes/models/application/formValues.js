@@ -4,6 +4,7 @@ import { KubernetesApplicationDeploymentTypes, KubernetesApplicationPublishingTy
  * KubernetesApplicationFormValues Model
  */
 const _KubernetesApplicationFormValues = Object.freeze({
+  ApplicationType: undefined, // will only exist for formValues generated from Application (app edit situation)
   ResourcePool: {},
   Name: '',
   StackName: '',

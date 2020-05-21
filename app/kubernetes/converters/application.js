@@ -165,6 +165,7 @@ class KubernetesApplicationConverter {
 
   static applicationToFormValues(app, resourcePools, configurations, persistentVolumeClaims) {
     const res = new KubernetesApplicationFormValues();
+    res.ApplicationType = app.ApplicationType;
     res.ResourcePool = _.find(resourcePools, ['Namespace.Name', app.ResourcePool]);
     res.Name = app.Name;
     res.StackName = app.StackName;
@@ -192,16 +193,19 @@ class KubernetesApplicationConverter {
 
   static applicationFormValuesToApplication(formValues) {
     const claims = KubernetesPersistentVolumeClaimConverter.applicationFormValuesToVolumeClaims(formValues);
-    const roxrwx = _.find(claims, (item) => _.includes(item.StorageClass.AccessModes, 'ROX') || _.includes(item.StorageClass.AccessModes, 'RWX'));
+    const roxrwx = _.find(claims, (item) => _.includes(item.StorageClass.AccessModes, 'ROX') || _.includes(item.StorageClass.AccessModes, 'RWX')) !== undefined;
 
-    const deployment = formValues.DeploymentType === KubernetesApplicationDeploymentTypes.REPLICATED &&
-      (claims.length === 0 || (claims.length > 0 && formValues.DataAccessPolicy === KubernetesApplicationDataAccessPolicies.SHARED));
+    const deployment = (formValues.DeploymentType === KubernetesApplicationDeploymentTypes.REPLICATED &&
+      (claims.length === 0 || (claims.length > 0 && formValues.DataAccessPolicy === KubernetesApplicationDataAccessPolicies.SHARED)))
+      || (formValues.ApplicationType === KubernetesApplicationTypes.DEPLOYMENT);
 
-    const statefulSet = formValues.DeploymentType === KubernetesApplicationDeploymentTypes.REPLICATED &&
-      claims.length > 0 && formValues.DataAccessPolicy === KubernetesApplicationDataAccessPolicies.ISOLATED;
+    const statefulSet = (formValues.DeploymentType === KubernetesApplicationDeploymentTypes.REPLICATED &&
+      claims.length > 0 && formValues.DataAccessPolicy === KubernetesApplicationDataAccessPolicies.ISOLATED)
+      || (formValues.ApplicationType === KubernetesApplicationTypes.STATEFULSET);
 
-    const daemonSet = formValues.DeploymentType === KubernetesApplicationDeploymentTypes.GLOBAL &&
-      (claims.length === 0 || (claims.length > 0 && formValues.DataAccessPolicy === KubernetesApplicationDataAccessPolicies.SHARED && roxrwx));
+    const daemonSet = (formValues.DeploymentType === KubernetesApplicationDeploymentTypes.GLOBAL &&
+      (claims.length === 0 || (claims.length > 0 && formValues.DataAccessPolicy === KubernetesApplicationDataAccessPolicies.SHARED && roxrwx)))
+      || (formValues.ApplicationType === KubernetesApplicationTypes.DAEMONSET);
 
     let app;
     if (deployment) {

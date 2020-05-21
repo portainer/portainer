@@ -276,7 +276,7 @@ class KubernetesCreateApplicationController {
   isEditAndNoChangesMade() {
     if (!this.state.isEdit) return false;
     const changes = JsonPatch.compare(this.savedFormValues, this.formValues);
-    this.editChanges = _.filter(changes, (change) => !_.includes(change.path, '$$hashKey'));
+    this.editChanges = _.filter(changes, (change) => !_.includes(change.path, '$$hashKey') && change.path !== '/ApplicationType');
     return !this.editChanges.length;
   }
 
@@ -561,6 +561,7 @@ class KubernetesCreateApplicationController {
         await this.getApplication();
         this.formValues = KubernetesApplicationConverter.applicationToFormValues(this.application, this.resourcePools, this.configurations, this.persistentVolumeClaims);
         this.savedFormValues = angular.copy(this.formValues);
+        delete this.formValues.ApplicationType;
       }
 
       await this.updateSliders();
