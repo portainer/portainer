@@ -115,15 +115,6 @@ func initSnapshotter(clientFactory *docker.ClientFactory) portainer.Snapshotter 
 	return docker.NewSnapshotter(clientFactory)
 }
 
-func initSnapshotService(dataStore portainer.DataStore, snapshotter portainer.Snapshotter) (*snapshot.Service, error) {
-	settings, err := dataStore.Settings().Settings()
-	if err != nil {
-		return nil, err
-	}
-
-	return snapshot.NewService(settings.SnapshotInterval, dataStore, snapshotter)
-}
-
 func loadEdgeJobsFromDatabase(dataStore portainer.DataStore, reverseTunnelService portainer.ReverseTunnelService) error {
 	edgeJobs, err := dataStore.EdgeJob().EdgeJobs()
 	if err != nil {
@@ -370,7 +361,7 @@ func main() {
 
 	snapshotter := initSnapshotter(clientFactory)
 
-	snapshotService, err := initSnapshotService(dataStore, snapshotter)
+	snapshotService, err := snapshot.NewService(*flags.SnapshotInterval, dataStore, snapshotter)
 	if err != nil {
 		log.Fatal(err)
 	}
