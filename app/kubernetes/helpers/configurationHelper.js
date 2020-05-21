@@ -31,6 +31,10 @@ class KubernetesConfigurationHelper {
       KubernetesConfigurationHelper.setConfigurationUsed(config);
     });
   }
+
+  static isExternalConfiguration(configuration) {
+    return !configuration.ConfigurationOwner;
+  }
 }
 
 export default KubernetesConfigurationHelper;

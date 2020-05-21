@@ -36,6 +36,10 @@ class KubernetesVolumesDatatableController {
     return !this.isSystemNamespace(item) || this.showSystem;
   }
 
+  isExternalVolume(item) {
+    return KubernetesVolumeHelper.isExternalVolume(item);
+  }
+
   allowSelection(item) {
     return !this.disableRemove(item);
   }

@@ -17,6 +17,10 @@ class KubernetesVolumeHelper {
   static generatedApplicationConfigVolumeName(name) {
     return 'config-' + name + '-' + uuidv4();
   }
+
+  static isExternalVolume(volume) {
+    return !volume.PersistentVolumeClaim.ApplicationOwner;
+  }
 }
 
 export default KubernetesVolumeHelper;

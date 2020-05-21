@@ -121,7 +121,7 @@
               </td>
               <td>
                 <a ui-sref="kubernetes.resourcePools.resourcePool({ id: item.ResourcePool })" ng-click="$event.stopPropagation();">{{ item.ResourcePool }}</a>
-                <span style="margin-left: 5px;" class="label label-info image-tag" ng-if="$ctrl.isSystemNamespace(item)">system</span>
+                <span class="label label-info image-tag label-margins" ng-if="$ctrl.isSystemNamespace(item)">system</span>
               </td>
               <td>{{ item.Applications.length }}</td>
               <td>

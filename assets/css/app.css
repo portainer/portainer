@@ -126,6 +126,11 @@ a[ng-click]{
   margin-right: 5px;
 }
 
+.widget .widget-body table tbody .label-margins {
+  margin-left: 5px;
+  margin-right: 0;
+}
+
 .widget .widget-body table tbody .fit-text-size {
   font-size: 90% !important;
 }

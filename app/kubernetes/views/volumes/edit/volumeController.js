@@ -32,6 +32,10 @@ class KubernetesVolumeController {
     this.selectTab(2);
   }
 
+  isExternalVolume() {
+    return KubernetesVolumeHelper.isExternalVolume(this.volume);
+  }
+
   isSystemNamespace() {
     return this.KubernetesNamespaceHelper.isSystemNamespace(this.volume.ResourcePool.Namespace.Name);
   }

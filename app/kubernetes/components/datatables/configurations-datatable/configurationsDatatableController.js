@@ -28,6 +28,10 @@ angular.module('portainer.docker')
         return ctrl.isSystemNamespace(item) || ctrl.isSystemToken(item);
       }
 
+      this.isExternalConfiguration = function(item) {
+        return KubernetesConfigurationHelper.isExternalConfiguration(item);
+      }
+
       this.isDisplayed = function(item) {
         return !ctrl.isSystemConfig(item) || (ctrl.settings.showSystem && ctrl.isAdmin);
       };
