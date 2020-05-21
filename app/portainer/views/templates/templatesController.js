@@ -88,27 +88,6 @@ angular.module('portainer.app').controller('TemplatesController', [
       $scope.state.selectedTemplate.Labels.splice(index, 1);
     };
 
-    $scope.checkVolumes = function () {
-      $scope.state.isSelectedVolumesValid = [];
-      _.forEach($scope.state.selectedTemplate.Volumes, (volume, index) => {
-        if (volume.type === 'volume') {
-          const findVolume = _.find($scope.availableVolumes, { Name: volume.bind });
-          $scope.state.isSelectedVolumesValid[index] = findVolume !== undefined;
-        }
-      });
-    };
-
-    $scope.isFormValid = function () {
-      $scope.checkVolumes();
-      return _.reduce(
-        $scope.state.isSelectedVolumesValid,
-        (res, value) => {
-          return res && value;
-        },
-        true
-      );
-    };
-
     function validateForm(accessControlData, isAdmin) {
       $scope.state.formValidationError = '';
       var error = '';
@@ -298,7 +277,6 @@ angular.module('portainer.app').controller('TemplatesController', [
     }
 
     function initView() {
-      $scope.state.isSelectedVolumesValid = [];
       $scope.isAdmin = Authentication.isAdmin();
 
       var endpointMode = $scope.applicationState.endpoint.mode;
@@ -317,7 +295,7 @@ angular.module('portainer.app').controller('TemplatesController', [
         .then(function success(data) {
           var templates = data.templates;
           $scope.templates = templates;
-          $scope.availableVolumes = data.volumes.Volumes;
+          $scope.availableVolumes = _.orderBy(data.volumes.Volumes, [(volume) => volume.Name.toLowerCase()], ['asc']);
           var networks = data.networks;
           $scope.availableNetworks = networks;
           var settings = data.settings;

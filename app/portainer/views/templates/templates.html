@@ -238,22 +238,13 @@
                     <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'volume'">
                       <div class="col-sm-12 input-group">
                         <span class="input-group-addon">volume</span>
-                        <input
-                          type="text"
-                          name="volume_{{ $index }}"
-                          ng-model="volume.bind"
-                          id="container_volumes"
-                          class="form-control"
-                          placeholder="Select a volume"
-                          typeahead-min-length="0"
-                          uib-typeahead="vol.Name as vol.Name for vol in availableVolumes | filter:$viewValue"
-                          ng-change="checkVolumes($index)"
-                        />
+                        <div class="col-sm-12 input-group">
+                          <select class="form-control" ng-model="volume.bind" ng-options="vol.Name as vol.Name for vol in availableVolumes">
+                            <option value="" disabled selected>Select a volume</option>
+                          </select>
+                        </div>
                       </div>
                     </div>
-                    <p class="input-group input-group-sm col-sm-12 text-warning" ng-if="!state.isSelectedVolumesValid[$index]">
-                      This volume does not exist.
-                    </p>
                     <!-- !volume -->
                     <!-- bind -->
                     <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'bind'">
@@ -347,7 +338,7 @@
               <button
                 type="button"
                 class="btn btn-primary btn-sm"
-                ng-disabled="state.actionInProgress || !formValues.network || !isFormValid()"
+                ng-disabled="state.actionInProgress || !formValues.network"
                 ng-click="createTemplate()"
                 button-spinner="state.actionInProgress"
               >
