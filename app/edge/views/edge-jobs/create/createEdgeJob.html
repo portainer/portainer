@@ -8,12 +8,12 @@
     <rd-widget>
       <rd-widget-body>
         <edge-job-form
-          model="model"
-          groups="groups"
-          tags="tags"
-          form-action="create"
+          model="$ctrl.model"
+          groups="$ctrl.groups"
+          tags="$ctrl.tags"
+          form-action="$ctrl.create"
           form-action-label="Create edge job"
-          action-in-progress="state.actionInProgress"
+          action-in-progress="$ctrl.state.actionInProgress"
         ></edge-job-form>
       </rd-widget-body>
     </rd-widget>

@@ -77,7 +77,7 @@ angular.module('portainer.edge', []).config(function config($stateRegistryProvid
     views: {
       'content@': {
         templateUrl: './views/edge-jobs/edgeJobs.html',
-        controller: 'EdgeJobsController',
+        controller: 'EdgeJobsController as $ctrl',
       },
     },
   };
@@ -88,7 +88,7 @@ angular.module('portainer.edge', []).config(function config($stateRegistryProvid
     views: {
       'content@': {
         templateUrl: './views/edge-jobs/edit/edgeJob.html',
-        controller: 'EdgeJobController',
+        controller: 'EdgeJobController as $ctrl',
       },
     },
   };
@@ -99,7 +99,7 @@ angular.module('portainer.edge', []).config(function config($stateRegistryProvid
     views: {
       'content@': {
         templateUrl: './views/edge-jobs/create/createEdgeJob.html',
-        controller: 'CreateEdgeJobController',
+        controller: 'CreateEdgeJobController as $ctrl',
       },
     },
   };

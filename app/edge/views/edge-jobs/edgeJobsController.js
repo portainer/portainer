@@ -1,7 +1,7 @@
 import angular from 'angular';
 
-function EdgeJobsController($scope, $state, Notifications, ModalService, EdgeJobService) {
-  $scope.removeAction = removeAction;
+function EdgeJobsController($state, Notifications, ModalService, EdgeJobService) {
+  this.removeAction = removeAction;
 
   function removeAction(selectedItems) {
     ModalService.confirmDeletion('Do you want to remove the selected edge job(s) ?', function onConfirm(confirmed) {
@@ -16,10 +16,10 @@ function EdgeJobsController($scope, $state, Notifications, ModalService, EdgeJob
     var actionCount = edgeJobs.length;
     angular.forEach(edgeJobs, function (edgeJob) {
       EdgeJobService.deleteEdgeJob(edgeJob.Id)
-        .then(function success() {
+        .then(() => {
           Notifications.success('Schedule successfully removed', edgeJob.Name);
-          var index = $scope.edgeJobs.indexOf(edgeJob);
-          $scope.edgeJobs.splice(index, 1);
+          var index = this.edgeJobs.indexOf(edgeJob);
+          this.edgeJobs.splice(index, 1);
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to remove schedule ' + edgeJob.Name);
@@ -32,19 +32,17 @@ function EdgeJobsController($scope, $state, Notifications, ModalService, EdgeJob
         });
     });
   }
-
-  function initView() {
+  this.$onInit = $onInit;
+  function $onInit() {
     EdgeJobService.edgeJobs()
-      .then(function success(data) {
-        $scope.edgeJobs = data;
+      .then((data) => {
+        this.edgeJobs = data;
       })
-      .catch(function error(err) {
+      .catch((err) => {
         Notifications.error('Failure', err, 'Unable to retrieve Edge jobs');
-        $scope.edgeJobs = [];
+        this.edgeJobs = [];
       });
   }
-
-  initView();
 }
 
 angular.module('portainer.edge').controller('EdgeJobsController', EdgeJobsController);

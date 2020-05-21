@@ -1,29 +1,29 @@
 <rd-header>
   <rd-header-title title-text="Edge job details">
-    <a data-toggle="tooltip" title-text="Refresh" ui-sref="edge.jobs.job({id: edgeJob.Id})" ui-sref-opts="{reload: true}">
+    <a data-toggle="tooltip" title-text="Refresh" ui-sref="edge.jobs.job({id: $ctrl.edgeJob.Id})" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
-  <rd-header-content> <a ui-sref="edge.jobs">Edge jobs</a> &gt; {{ ::edgeJob.Name }} </rd-header-content>
+  <rd-header-content> <a ui-sref="edge.jobs">Edge jobs</a> &gt; {{ ::$ctrl.$ctrl.edgeJob.Name }} </rd-header-content>
 </rd-header>
 
 <div class="row">
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-body>
-        <uib-tabset active="state.activeTab">
+        <uib-tabset active="$ctrl.state.activeTab">
           <uib-tab index="0">
             <uib-tab-heading> <i class="fa fa-wrench" aria-hidden="true"></i> Configuration </uib-tab-heading>
 
             <edge-job-form
-              ng-if="edgeJob"
-              model="edgeJob"
+              ng-if="$ctrl.edgeJob"
+              model="$ctrl.edgeJob"
               endpoints="endpoints"
-              groups="groups"
-              tags="tags"
-              form-action="update"
-              form-action-label="Update edgeJob"
-              action-in-progress="state.actionInProgress"
+              groups="$ctrl.groups"
+              tags="$ctrl.tags"
+              form-action="$ctrl.update"
+              form-action-label="Update Edge job"
+              action-in-progress="$ctrl.state.actionInProgress"
             ></edge-job-form>
           </uib-tab>
 
@@ -43,15 +43,14 @@
               Tasks
             </div>
             <edge-job-tasks-datatable
-              ng-if="tasks"
+              ng-if="$ctrl.tasks"
               title-text="Tasks"
               title-icon="fa-tasks"
-              dataset="tasks"
+              dataset="$ctrl.tasks"
               table-key="edge-job-tasks"
               order-by="Status"
               reverse-order="true"
-              go-to-container-logs="goToContainerLogs"
-              get-edge-task-logs="getEdgeTaskLogs"
+              get-edge-task-logs="$ctrl.getEdgeTaskLogs"
             ></edge-job-tasks-datatable>
           </uib-tab>
         </uib-tabset>

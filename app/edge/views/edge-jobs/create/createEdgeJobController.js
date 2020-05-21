@@ -1,24 +1,24 @@
-function CreateEdgeJobController($q, $scope, $state, Notifications, EndpointService, GroupService, EdgeJobService, TagService) {
-  $scope.state = {
+function CreateEdgeJobController($q, $state, Notifications, GroupService, EdgeJobService, TagService) {
+  this.state = {
     actionInProgress: false,
   };
 
-  $scope.create = create;
+  this.create = create.bind(this);
 
   function create(method) {
-    const model = $scope.model;
+    const model = this.model;
 
-    $scope.state.actionInProgress = true;
+    this.state.actionInProgress = true;
     createEdgeJob(method, model)
-      .then(function success() {
+      .then(() => {
         Notifications.success('Edge job successfully created');
         $state.go('edge.jobs', {}, { reload: true });
       })
-      .catch(function error(err) {
+      .catch((err) => {
         Notifications.error('Failure', err, 'Unable to create Edge job');
       })
-      .finally(function final() {
-        $scope.state.actionInProgress = false;
+      .finally(() => {
+        this.state.actionInProgress = false;
       });
   }
 
@@ -29,8 +29,10 @@ function CreateEdgeJobController($q, $scope, $state, Notifications, EndpointServ
     return EdgeJobService.createEdgeJobFromFileUpload(model);
   }
 
-  function initView() {
-    $scope.model = {
+  this.$onInit = $onInit;
+
+  function $onInit() {
+    this.model = {
       Name: '',
       Recurring: false,
       CronExpression: '',
@@ -43,16 +45,14 @@ function CreateEdgeJobController($q, $scope, $state, Notifications, EndpointServ
       groups: GroupService.groups(),
       tags: TagService.tags(),
     })
-      .then(function success(data) {
-        $scope.groups = data.groups;
-        $scope.tags = data.tags;
+      .then((data) => {
+        this.groups = data.groups;
+        this.tags = data.tags;
       })
-      .catch(function error(err) {
+      .catch((err) => {
         Notifications.error('Failure', err, 'Unable to retrieve endpoint list');
       });
   }
-
-  initView();
 }
 
 angular.module('portainer.edge').controller('CreateEdgeJobController', CreateEdgeJobController);

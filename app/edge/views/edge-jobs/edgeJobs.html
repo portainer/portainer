@@ -9,6 +9,13 @@
 
 <div class="row">
   <div class="col-sm-12">
-    <edge-jobs-datatable title-text="Edge jobs" title-icon="fa-clock" dataset="edgeJobs" table-key="schedules" order-by="Name" remove-action="removeAction"></edge-jobs-datatable>
+    <edge-jobs-datatable
+      title-text="Edge jobs"
+      title-icon="fa-clock"
+      dataset="$ctrl.edgeJobs"
+      table-key="edgeJobs"
+      order-by="Name"
+      remove-action="$ctrl.removeAction"
+    ></edge-jobs-datatable>
   </div>
 </div>
