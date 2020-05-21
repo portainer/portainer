@@ -46,7 +46,11 @@
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate-start="(key, value) in $ctrl.dataset | itemsPerPage: $ctrl.state.paginatedItemLimit" ng-class="{active: item.Checked}" ng-click="$ctrl.expandItem(value, !value.Expanded)">
+            <tr
+              dir-paginate-start="(key, value) in $ctrl.dataset | itemsPerPage: $ctrl.state.paginatedItemLimit"
+              ng-class="{ active: item.Checked }"
+              ng-click="$ctrl.expandItem(value, !value.Expanded)"
+            >
               <td>
                 <a ng-if="$ctrl.itemCanExpand(value)">
                   <i ng-class="{ 'fas fa-angle-down': value.Expanded, 'fas fa-angle-right': !value.Expanded }" class="space-right" aria-hidden="true"></i>
@@ -69,7 +73,7 @@
                 </button>
               </td>
             </tr>
-            <tr dir-paginate-end ng-show="value.Expanded" ng-style="{background: (value.Highlighted ? '#d5e8f3' : '#f5f5f5')}">
+            <tr dir-paginate-end ng-show="$ctrl.itemCanExpand(value) && value.Expanded" ng-style="{ background: value.Highlighted ? '#d5e8f3' : '#f5f5f5' }">
               <td colspan="1"></td>
               <td colspan="1">
                 {{ value.GlobalIPv6Address }}
