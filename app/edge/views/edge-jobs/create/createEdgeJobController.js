@@ -35,12 +35,10 @@ function CreateEdgeJobController($q, $scope, $state, Notifications, EndpointServ
     $scope.model = new ScheduleDefaultModel();
 
     $q.all({
-      endpoints: EndpointService.endpoints(undefined, undefined, { type: 4 }),
       groups: GroupService.groups(),
       tags: TagService.tags(),
     })
       .then(function success(data) {
-        $scope.endpoints = data.endpoints.value;
         $scope.groups = data.groups;
         $scope.tags = data.tags;
       })

@@ -35,11 +35,19 @@ class AssoicatedEndpointsSelectorController {
     this.dissociateEndpoint = this.dissociateEndpoint.bind(this);
   }
 
+  $onInit() {
+    this.loadData();
+  }
+
   $onChanges({ endpointIds }) {
     if (endpointIds && endpointIds.currentValue) {
-      this.getAssociatedEndpoints();
-      this.getEndpoints();
+      this.loadData();
     }
+  }
+
+  loadData() {
+    this.getAssociatedEndpoints();
+    this.getEndpoints();
   }
 
   getEndpoints() {
@@ -62,10 +70,14 @@ class AssoicatedEndpointsSelectorController {
   }
 
   async getAssociatedEndpointsAsync() {
-    const { start, search, limit } = this.getPaginationData('associated');
-    const query = { search, type: 4, endpointIds: this.endpointIds };
+    let response = { value: [], totalCount: 0 };
+    if (this.endpointIds.length > 0) {
+      const { start, search, limit } = this.getPaginationData('associated');
+      const query = { search, type: 4, endpointIds: this.endpointIds };
 
-    const response = await this.EndpointService.endpoints(start, limit, query);
+      response = await this.EndpointService.endpoints(start, limit, query);
+    }
+
     this.setTableData('associated', response.value, response.totalCount);
   }
 

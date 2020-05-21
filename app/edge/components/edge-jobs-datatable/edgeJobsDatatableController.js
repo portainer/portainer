@@ -1,4 +1,4 @@
-angular.module('portainer.edge').controller('EdgeJobsDatatableController', EdgeJobsDatatableController);
+import angular from 'angular';
 
 function EdgeJobsDatatableController($scope, $controller, DatatableService) {
   angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
@@ -36,3 +36,6 @@ function EdgeJobsDatatableController($scope, $controller, DatatableService) {
     this.onSettingsRepeaterChange();
   };
 }
+
+angular.module('portainer.edge').controller('EdgeJobsDatatableController', EdgeJobsDatatableController);
+export default EdgeJobsDatatableController;

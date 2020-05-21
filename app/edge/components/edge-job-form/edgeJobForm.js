@@ -5,7 +5,6 @@ angular.module('portainer.edge').component('edgeJobForm', {
   controller: EdgeJobFormController,
   bindings: {
     model: '=',
-    endpoints: '<',
     groups: '<',
     tags: '<',
     addLabelAction: '<',
