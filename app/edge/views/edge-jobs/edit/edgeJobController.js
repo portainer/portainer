@@ -86,3 +86,4 @@ function EdgeJobController($q, $state, Notifications, GroupService, EdgeJobServi
 }
 
 angular.module('portainer.edge').controller('EdgeJobController', EdgeJobController);
+export default EdgeJobController;
