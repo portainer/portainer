@@ -88,6 +88,27 @@ angular.module('portainer.app').controller('TemplatesController', [
       $scope.state.selectedTemplate.Labels.splice(index, 1);
     };
 
+    $scope.checkVolumes = function () {
+      $scope.state.isSelectedVolumesValid = [];
+      _.forEach($scope.state.selectedTemplate.Volumes, (volume, index) => {
+        if (volume.type === 'volume') {
+          const findVolume = _.find($scope.availableVolumes, { Name: volume.bind });
+          $scope.state.isSelectedVolumesValid[index] = findVolume !== undefined;
+        }
+      });
+    };
+
+    $scope.isFormValid = function () {
+      $scope.checkVolumes();
+      return _.reduce(
+        $scope.state.isSelectedVolumesValid,
+        (res, value) => {
+          return res && value;
+        },
+        true
+      );
+    };
+
     function validateForm(accessControlData, isAdmin) {
       $scope.state.formValidationError = '';
       var error = '';
@@ -277,6 +298,7 @@ angular.module('portainer.app').controller('TemplatesController', [
     }
 
     function initView() {
+      $scope.state.isSelectedVolumesValid = [];
       $scope.isAdmin = Authentication.isAdmin();
 
       var endpointMode = $scope.applicationState.endpoint.mode;
