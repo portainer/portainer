@@ -212,7 +212,9 @@
         class="btn btn-primary btn-sm"
         ng-disabled="$ctrl.actionInProgress || !edgeJobForm.$valid
         || $ctrl.model.Endpoints.length === 0
-        || ($ctrl.formValues.method === 'upload' && !$ctrl.model.File)"
+        || ($ctrl.formValues.method === 'upload' && !$ctrl.model.File)
+        || ($ctrl.formValues.method === 'editor' && !$ctrl.model.FileContent)
+        "
         ng-click="$ctrl.action()"
         button-spinner="$ctrl.actionInProgress"
       >

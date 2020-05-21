@@ -1,5 +1,3 @@
-import { ScheduleDefaultModel } from 'Portainer/models/schedule';
-
 function CreateEdgeJobController($q, $scope, $state, Notifications, EndpointService, GroupService, EdgeJobService, TagService) {
   $scope.state = {
     actionInProgress: false,
@@ -32,7 +30,14 @@ function CreateEdgeJobController($q, $scope, $state, Notifications, EndpointServ
   }
 
   function initView() {
-    $scope.model = new ScheduleDefaultModel();
+    $scope.model = {
+      Name: '',
+      Recurring: false,
+      CronExpression: '',
+      Endpoints: [],
+      FileContent: '',
+      File: null,
+    };
 
     $q.all({
       groups: GroupService.groups(),

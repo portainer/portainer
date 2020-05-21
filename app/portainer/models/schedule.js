@@ -1,21 +1,5 @@
 import { createStatus } from '../../docker/models/container';
 
-export function ScheduleDefaultModel() {
-  this.Name = '';
-  this.Recurring = false;
-  this.CronExpression = '';
-  this.JobType = 1;
-  this.Job = new ScriptExecutionDefaultJobModel();
-}
-
-function ScriptExecutionDefaultJobModel() {
-  this.Image = 'ubuntu:latest';
-  this.Endpoints = [];
-  this.FileContent = '';
-  this.File = null;
-  this.Method = 'editor';
-}
-
 export function ScriptExecutionTaskModel(data) {
   this.Id = data.Id;
   this.EndpointId = data.EndpointId;
