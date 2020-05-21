@@ -71,7 +71,7 @@ angular.module('portainer.edge', []).config(function config($stateRegistryProvid
     },
   };
 
-  var edgeJobs = {
+  const edgeJobs = {
     name: 'edge.jobs',
     url: '/edgeJobs',
     views: {
@@ -82,7 +82,7 @@ angular.module('portainer.edge', []).config(function config($stateRegistryProvid
     },
   };
 
-  var edgeJob = {
+  const edgeJob = {
     name: 'edge.jobs.job',
     url: '/:id',
     views: {
@@ -93,7 +93,7 @@ angular.module('portainer.edge', []).config(function config($stateRegistryProvid
     },
   };
 
-  var edgeJobCreation = {
+  const edgeJobCreation = {
     name: 'edge.jobs.new',
     url: '/new',
     views: {
