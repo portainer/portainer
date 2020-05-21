@@ -1,37 +1,45 @@
-function CreateEdgeJobController($q, $state, Notifications, GroupService, EdgeJobService, TagService) {
-  this.state = {
-    actionInProgress: false,
-  };
+import angular from 'angular';
 
-  this.create = create.bind(this);
+class CreateEdgeJobController {
+  constructor($q, $state, EdgeJobService, GroupService, Notifications, TagService) {
+    this.state = {
+      actionInProgress: false,
+    };
 
-  function create(method) {
+    this.$q = $q;
+    this.$state = $state;
+    this.Notifications = Notifications;
+    this.GroupService = GroupService;
+    this.EdgeJobService = EdgeJobService;
+    this.TagService = TagService;
+
+    this.create = this.create.bind(this);
+  }
+
+  create(method) {
     const model = this.model;
-
     this.state.actionInProgress = true;
-    createEdgeJob(method, model)
+    this.createEdgeJob(method, model)
       .then(() => {
-        Notifications.success('Edge job successfully created');
-        $state.go('edge.jobs', {}, { reload: true });
+        this.Notifications.success('Edge job successfully created');
+        this.$state.go('edge.jobs', {}, { reload: true });
       })
       .catch((err) => {
-        Notifications.error('Failure', err, 'Unable to create Edge job');
+        this.Notifications.error('Failure', err, 'Unable to create Edge job');
       })
       .finally(() => {
         this.state.actionInProgress = false;
       });
   }
 
-  function createEdgeJob(method, model) {
+  createEdgeJob(method, model) {
     if (method === 'editor') {
-      return EdgeJobService.createEdgeJobFromFileContent(model);
+      return this.EdgeJobService.createEdgeJobFromFileContent(model);
     }
-    return EdgeJobService.createEdgeJobFromFileUpload(model);
+    return this.EdgeJobService.createEdgeJobFromFileUpload(model);
   }
 
-  this.$onInit = $onInit;
-
-  function $onInit() {
+  $onInit() {
     this.model = {
       Name: '',
       Recurring: false,
@@ -40,17 +48,17 @@ function CreateEdgeJobController($q, $state, Notifications, GroupService, EdgeJo
       FileContent: '',
       File: null,
     };
-
-    $q.all({
-      groups: GroupService.groups(),
-      tags: TagService.tags(),
-    })
+    this.$q
+      .all({
+        groups: this.GroupService.groups(),
+        tags: this.TagService.tags(),
+      })
       .then((data) => {
         this.groups = data.groups;
         this.tags = data.tags;
       })
       .catch((err) => {
-        Notifications.error('Failure', err, 'Unable to retrieve endpoint list');
+        this.Notifications.error('Failure', err, 'Unable to retrieve endpoint list');
       });
   }
 }
