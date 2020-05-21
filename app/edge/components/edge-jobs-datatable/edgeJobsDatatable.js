@@ -1,9 +1,8 @@
 import angular from 'angular';
-import EdgeJobsDatatableController from './edgeJobsDatatableController';
 
 angular.module('portainer.edge').component('edgeJobsDatatable', {
   templateUrl: './edgeJobsDatatable.html',
-  controller: EdgeJobsDatatableController,
+  controller: 'GenericDatatableController',
   bindings: {
     titleText: '@',
     titleIcon: '@',
