@@ -295,7 +295,7 @@ angular.module('portainer.app').controller('TemplatesController', [
         .then(function success(data) {
           var templates = data.templates;
           $scope.templates = templates;
-          $scope.availableVolumes = data.volumes.Volumes;
+          $scope.availableVolumes = _.orderBy(data.volumes.Volumes, [(volume) => volume.Name.toLowerCase()], ['asc']);
           var networks = data.networks;
           $scope.availableNetworks = networks;
           var settings = data.settings;
