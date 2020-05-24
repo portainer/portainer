@@ -26,7 +26,7 @@ class EdgeGroupFormController {
       () => this.model,
       () => {
         if (this.model.Dynamic) {
-          this.getDynamicEndpoints(this.pageType, 'associated');
+          this.getDynamicEndpoints();
         }
       },
       true
@@ -43,8 +43,8 @@ class EdgeGroupFormController {
     this.model.Endpoints = _.filter(this.model.Endpoints, (id) => id !== endpoint.Id);
   }
 
-  getDynamicEndpoints(pageType, tableType) {
-    return this.$async(this.getDynamicEndpointsAsync, pageType, tableType);
+  getDynamicEndpoints() {
+    return this.$async(this.getDynamicEndpointsAsync);
   }
 
   async getDynamicEndpointsAsync() {

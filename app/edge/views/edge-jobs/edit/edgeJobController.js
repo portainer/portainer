@@ -81,7 +81,7 @@ class EdgeJobController {
       const [edgeJob, file, tasks, groups, tags] = await Promise.all([
         this.EdgeJobService.edgeJob(id),
         this.EdgeJobService.getScriptFile(id),
-        this.EdgeJobService.scriptExecutionTasks(id),
+        this.EdgeJobService.tasks(id),
         this.GroupService.groups(),
         this.TagService.tags(),
       ]);

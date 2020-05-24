@@ -13,36 +13,26 @@ function EdgeJobService($q, EdgeJobs, FileUploadService) {
     }
   };
 
-  service.edgeJobs = function () {
-    var deferred = $q.defer();
+  service.edgeJobs = edgeJobs;
+  async function edgeJobs() {
+    try {
+      return await EdgeJobs.query().$promise;
+    } catch (err) {
+      throw { msg: 'Unable to retrieve edgeJobs', err: err };
+    }
+  }
 
-    EdgeJobs.query()
-      .$promise.then(function success(edgeJobs) {
-        deferred.resolve(edgeJobs);
-      })
-      .catch(function error(err) {
-        deferred.reject({ msg: 'Unable to retrieve edgeJobs', err: err });
+  service.tasks = tasks;
+  async function tasks(edgeJobId) {
+    try {
+      const tasks = await EdgeJobs.tasks({ id: edgeJobId }).$promise;
+      return tasks.map(function (item) {
+        return new ScriptExecutionTaskModel(item);
       });
-
-    return deferred.promise;
-  };
-
-  service.scriptExecutionTasks = function (edgeJobId) {
-    var deferred = $q.defer();
-
-    EdgeJobs.tasks({ id: edgeJobId })
-      .$promise.then(function success(data) {
-        var tasks = data.map(function (item) {
-          return new ScriptExecutionTaskModel(item);
-        });
-        deferred.resolve(tasks);
-      })
-      .catch(function error(err) {
-        deferred.reject({ msg: 'Unable to retrieve tasks associated to the edgeJob', err: err });
-      });
-
-    return deferred.promise;
-  };
+    } catch (err) {
+      throw { msg: 'Unable to retrieve tasks associated to the edgeJob', err: err };
+    }
+  }
 
   service.createEdgeJobFromFileContent = function (model) {
     var payload = new ScheduleCreateRequest(model);
