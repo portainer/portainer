@@ -23,6 +23,7 @@ type endpointUpdatePayload struct {
 	TagIDs              []portainer.TagID
 	UserAccessPolicies  portainer.UserAccessPolicies
 	TeamAccessPolicies  portainer.TeamAccessPolicies
+	CheckinInterval     *int
 }
 
 func (payload *endpointUpdatePayload) Validate(r *http.Request) error {
@@ -59,6 +60,10 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.PublicURL != nil {
 		endpoint.PublicURL = *payload.PublicURL
+	}
+
+	if payload.CheckinInterval != nil {
+		endpoint.CheckinInterval = *payload.CheckinInterval
 	}
 
 	groupIDChanged := false
