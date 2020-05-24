@@ -24,6 +24,24 @@ angular
       actionInProgress: false,
       deploymentTab: 0,
       allowCreate: Authentication.isAdmin(),
+      availableEdgeAgentCheckinOptions: [
+        { key: 'Use default inteval', value: 0 },
+        {
+          key: '5 seconds',
+          value: 5,
+        },
+        {
+          key: '10 seconds',
+          value: 10,
+        },
+        {
+          key: '30 seconds',
+          value: 30,
+        },
+        { key: '5 minutes', value: 300 },
+        { key: '1 hour', value: 3600 },
+        { key: '1 day', value: 86400 },
+      ],
     };
 
     $scope.formValues = {
@@ -83,6 +101,7 @@ angular
         PublicURL: endpoint.PublicURL,
         GroupID: endpoint.GroupId,
         TagIds: endpoint.TagIds,
+        CheckinInterval: endpoint.CheckinInterval,
         TLS: TLS,
         TLSSkipVerify: TLSSkipVerify,
         TLSSkipClientVerify: TLSSkipClientVerify,
