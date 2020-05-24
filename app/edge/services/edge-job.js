@@ -59,7 +59,7 @@ function EdgeJobService($q, EdgeJobs, FileUploadService) {
     return EdgeJobs.update(payload).$promise;
   };
 
-  service.deleteEdgeJob = function (edgeJobId) {
+  service.remove = function (edgeJobId) {
     return EdgeJobs.remove({ id: edgeJobId }).$promise;
   };
 

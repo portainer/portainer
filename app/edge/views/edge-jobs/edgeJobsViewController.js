@@ -1,14 +1,17 @@
 import angular from 'angular';
+import _ from 'lodash-es';
 
 class EdgeJobsController {
-  constructor($state, EdgeJobService, ModalService, Notifications) {
+  constructor($async, $state, EdgeJobService, ModalService, Notifications) {
+    this.$async = $async;
     this.$state = $state;
     this.EdgeJobService = EdgeJobService;
     this.ModalService = ModalService;
     this.Notifications = Notifications;
 
     this.removeAction = this.removeAction.bind(this);
-    this.deleteSelectedEdgeJobs = this.deleteSelectedEdgeJobs.bind(this);
+    this.deleteJobsAsync = this.deleteJobsAsync.bind(this);
+    this.deleteJobs = this.deleteJobs.bind(this);
   }
 
   removeAction(selectedItems) {
@@ -16,40 +19,36 @@ class EdgeJobsController {
       if (!confirmed) {
         return;
       }
-      this.deleteSelectedEdgeJobs(selectedItems);
+      this.deleteJobs(selectedItems);
     });
   }
 
-  deleteSelectedEdgeJobs(edgeJobs) {
-    var actionCount = edgeJobs.length;
-    angular.forEach(edgeJobs, (edgeJob) => {
-      this.EdgeJobService.deleteEdgeJob(edgeJob.Id)
-        .then(() => {
-          this.Notifications.success('Schedule successfully removed', edgeJob.Name);
-          var index = this.edgeJobs.indexOf(edgeJob);
-          this.edgeJobs.splice(index, 1);
-        })
-        .catch((err) => {
-          this.Notifications.error('Failure', err, 'Unable to remove schedule ' + edgeJob.Name);
-        })
-        .finally(() => {
-          --actionCount;
-          if (actionCount === 0) {
-            this.$state.reload();
-          }
-        });
-    });
+  deleteJobs(edgeJobs) {
+    return this.$async(this.deleteJobsAsync, edgeJobs);
   }
 
-  $onInit() {
-    this.EdgeJobService.edgeJobs()
-      .then((data) => {
-        this.edgeJobs = data;
-      })
-      .catch((err) => {
-        this.Notifications.error('Failure', err, 'Unable to retrieve Edge jobs');
-        this.edgeJobs = [];
-      });
+  async deleteJobsAsync(edgeJobs) {
+    for (let edgeJob of edgeJobs) {
+      try {
+        await this.EdgeJobService.remove(edgeJob.Id);
+        this.Notifications.success('Stack successfully removed', edgeJob.Name);
+        _.remove(this.edgeJobs, edgeJob);
+      } catch (err) {
+        this.Notifications.error('Failure', err, 'Unable to remove Edge job ' + edgeJob.Name);
+      }
+    }
+
+    this.$state.reload();
+  }
+
+  async $onInit() {
+    try {
+      const edgeJobs = await this.EdgeJobService.edgeJobs();
+      this.edgeJobs = edgeJobs;
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to retrieve Edge jobs');
+      this.edgeJobs = [];
+    }
   }
 }
 
