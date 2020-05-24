@@ -170,6 +170,8 @@ type (
 		TeamAccessPolicies TeamAccessPolicies  `json:"TeamAccessPolicies"`
 		EdgeID             string              `json:"EdgeID,omitempty"`
 		EdgeKey            string              `json:"EdgeKey"`
+		CheckinInterval    int                 `json:"CheckinInterval"`
+
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
 		TLS           bool   `json:"TLS,omitempty"`
