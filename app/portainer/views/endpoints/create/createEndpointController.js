@@ -20,7 +20,7 @@ angular
       actionInProgress: false,
       allowCreateTag: Authentication.isAdmin(),
       availableEdgeAgentCheckinOptions: [
-        { key: 'Use default inteval', value: 0 },
+        { key: 'Use default interval', value: 0 },
         {
           key: '5 seconds',
           value: 5,
