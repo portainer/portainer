@@ -68,7 +68,7 @@ func (payload *edgeJobCreateFromFileContentPayload) Validate(r *http.Request) er
 		return portainer.Error("Invalid Edge job name")
 	}
 
-	if !govalidator.Matches(payload.Name, `^[a-zA-Z0-9][a-zA-Z0-9_.-]+$`) {
+	if !govalidator.Matches(payload.Name, `^[a-zA-Z0-9][a-zA-Z0-9_.-]*$`) {
 		return errors.New("Invalid Edge job name format. Allowed characters are: [a-zA-Z0-9_.-]")
 	}
 
