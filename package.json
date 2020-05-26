@@ -25,9 +25,11 @@
     "build:client": "grunt clean:client && grunt build:client",
     "clean": "grunt clean:all",
     "start": "grunt clean:all && grunt start",
+    "start:localserver": "grunt start:localserver",
     "start:server": "grunt clean:server && grunt start:server",
     "start:client": "grunt clean:client && grunt start:client",
     "dev:client": "grunt clean:client && webpack-dev-server --config=./webpack/webpack.develop.js",
+    "start:toolkit": "grunt start:toolkit",
     "build:server:offline": "cd ./api/cmd/portainer && CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags '-s' && mv -f portainer ../../../dist/portainer",
     "clean:all": "grunt clean:all",
     "format": "prettier --loglevel warn --write \"**/*.{js,css,html}\""
@@ -37,8 +39,9 @@
     "build:server": "Build the backend",
     "build:client": "Build the frontend (development mode)",
     "clean": "Clean the entire dist folder",
-    "start": "Build the entire app (backend/frontend) in development mode, run it inside a container locally and start a watch process for the frontend files",
+    "start": "Build the entire app (backend/frontend) in development mode, run backend inside a container and start a watch process locally for the frontend files",
     "start:server": "Build the backend and run it inside a container",
+    "start:toolkit": "Build the entire app (backend/frontend) in development mode, run backend locally and start a watch process for the frontend files",
     "clean:all": "Deprecated. Use the clean script instead",
     "build:server:offline": "Deprecated. Use the build:server script instead",
     "format": "Should be removed before pr is merged"

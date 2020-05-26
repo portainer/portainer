@@ -38,9 +38,13 @@ module.exports = function (grunt) {
 
   grunt.registerTask('start:server', ['build:server', 'copy:assets', 'shell:run_container']);
 
+  grunt.registerTask('start:localserver', ['shell:build_binary:linux:' + arch, 'shell:run_localserver']);
+
   grunt.registerTask('start:client', ['config:dev', 'env:dev', 'webpack:devWatch']);
 
   grunt.registerTask('start', ['start:server', 'start:client']);
+
+  grunt.registerTask('start:toolkit', ['start:localserver', 'start:client']);
 
   grunt.task.registerTask('release', 'release:<platform>:<arch>', function (p = 'linux', a = arch) {
     grunt.task.run(['config:prod', 'env:prod', 'clean:all', 'copy:assets', 'shell:build_binary:' + p + ':' + a, 'shell:download_docker_binary:' + p + ':' + a, 'webpack:prod']);
@@ -119,6 +123,7 @@ gruntfile_cfg.shell = {
   build_binary_azuredevops: { command: shell_build_binary_azuredevops },
   download_docker_binary: { command: shell_download_docker_binary },
   run_container: { command: shell_run_container },
+  run_localserver: { command: shell_run_localserver },
 };
 
 function shell_build_binary(p, a) {
@@ -151,6 +156,11 @@ function shell_run_container() {
       portainer_data +
       ':/data -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer portainer/base /app/portainer --no-analytics',
   ].join(';');
+}
+
+function shell_run_localserver() {
+  // return 'cd /src/portainer/api && go run cmd/portainer/main.go --template-file /src/portainer/templates.json -a /src/portainer/dist'
+  return './dist/portainer --no-analytics --template-file templates.json';
 }
 
 function shell_download_docker_binary(p, a) {
