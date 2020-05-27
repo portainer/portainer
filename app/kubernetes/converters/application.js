@@ -69,6 +69,32 @@ class KubernetesApplicationConverter {
 
     res.Volumes = data.spec.template.spec.volumes ? data.spec.template.spec.volumes : [];
 
+    // TODO: review
+    // this if() fixs direct use of PVC reference inside spec.template.spec.containers[0].volumeMounts
+    // instead of referencing the PVC the "good way" using spec.template.spec.volumes array
+    // Basically it creates an "in-memory" reference for the PVC, as if it was saved in
+    // spec.template.spec.volumes and retrieved from here.
+    //
+    // FIX FOR SFS ONLY ; as far as we know it's not possible to do this with DEPLOYMENTS/DAEMONSETS
+    //
+    // This may lead to destructing behaviours when we will allow external apps to be edited.
+    // E.G. if we try to generate the formValues and patch the app, SFS reference will be created under
+    // spec.template.spec.volumes and not be referenced directly inside spec.template.spec.containers[0].volumeMounts
+    // As we preserve original SFS name and try to build around it, it SHOULD be fine, but we definitely need to test this
+    // before allowing external apps modification
+    if (data.spec.volumeClaimTemplates) {
+      const vcTemplates = _.map(data.spec.volumeClaimTemplates, (vc) => {
+        return {
+          name: vc.metadata.name,
+          persistentVolumeClaim: { claimName: vc.metadata.name }
+        };
+      });
+      const inexistingPVC = _.filter(vcTemplates, (vc) => {
+        return !_.find(res.Volumes, { persistentVolumeClaim: { claimName: vc.persistentVolumeClaim.claimName } });
+      });
+      res.Volumes = _.concat(res.Volumes, inexistingPVC);
+    }
+
     const persistedFolders = _.filter(res.Volumes, (volume) => volume.persistentVolumeClaim || volume.hostPath);
 
     res.PersistedFolders = _.map(persistedFolders, (volume) => {
