@@ -129,11 +129,6 @@ class KubernetesCreateApplicationController {
     this.formValues.EnvironmentVariables.push(new KubernetesApplicationEnvironmentVariableFormValue());
   }
 
-  removeEnvironmentVariable(index) {
-    this.formValues.EnvironmentVariables.splice(index, 1);
-    this.onChangeEnvironmentName();
-  }
-
   hasEnvironmentVariables() {
     return this.formValues.EnvironmentVariables.length > 0;
   }
@@ -141,6 +136,19 @@ class KubernetesCreateApplicationController {
   onChangeEnvironmentName() {
     this.state.duplicateEnvironmentVariables = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.EnvironmentVariables, 'Name'));
     this.state.hasDuplicateEnvironmentVariables = Object.keys(this.state.duplicateEnvironmentVariables).length > 0;
+  }
+
+  restoreEnvironmentVariable(index) {
+    this.formValues.EnvironmentVariables[index].NeedsDeletion = false;
+  }
+
+  removeEnvironmentVariable(index) {
+    if (this.state.isEdit && !this.formValues.EnvironmentVariables[index].IsNew) {
+      this.formValues.EnvironmentVariables[index].NeedsDeletion = true;
+    } else {
+      this.formValues.EnvironmentVariables.splice(index, 1);
+    }
+    this.onChangeEnvironmentName();
   }
   /**
    * !ENVIRONMENT UI MANAGEMENT

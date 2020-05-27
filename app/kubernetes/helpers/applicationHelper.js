@@ -56,6 +56,7 @@ class KubernetesApplicationHelper {
    * FORMVALUES TO APPLICATION FUNCTIONS
    */
   static generateEnvFromEnvVariables(envVariables) {
+    _.remove(envVariables, (item) => item.NeedsDeletion);
     const env = _.map(envVariables, (item) => {
       const res = new KubernetesApplicationEnvPayload();
       res.name = item.Name;
@@ -172,6 +173,7 @@ class KubernetesApplicationHelper {
       const res = new KubernetesApplicationEnvironmentVariableFormValue();
       res.Name = item.name;
       res.Value = item.value;
+      res.IsNew = false;
       return res;
     });
     return _.without(envVariables, undefined);

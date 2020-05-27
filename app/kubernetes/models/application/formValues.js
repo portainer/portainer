@@ -70,7 +70,9 @@ export class KubernetesApplicationConfigurationFormValue {
 const _KubernetesApplicationEnvironmentVariableFormValue = Object.freeze({
   Name: '',
   Value: '',
-  IsSecret: false
+  IsSecret: false,
+  NeedsDeletion: false,
+  IsNew: true
 });
 
 export class KubernetesApplicationEnvironmentVariableFormValue {

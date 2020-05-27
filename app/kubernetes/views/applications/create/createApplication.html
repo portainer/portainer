@@ -117,7 +117,7 @@
                 <div ng-repeat="envVar in ctrl.formValues.EnvironmentVariables" style="margin-top: 2px;">
 
                   <div class="col-sm-4 input-group input-group-sm" style="vertical-align: top;">
-                    <div class="input-group col-sm-12 input-group-sm">
+                    <div class="input-group col-sm-12 input-group-sm" ng-class="{striked: envVar.NeedsDeletion}">
                       <span class="input-group-addon">name</span>
                       <input type="text" name="environment_variable_name_{{$index}}" class="form-control" ng-model="envVar.Name" ng-change="ctrl.onChangeEnvironmentName($index)"
                         placeholder="foo" required>
@@ -132,14 +132,17 @@
                     </div>
                   </div>
 
-                  <div class="input-group col-sm-4 input-group-sm">
+                  <div class="input-group col-sm-4 input-group-sm" ng-class="{striked: envVar.NeedsDeletion}">
                     <span class="input-group-addon">value</span>
                     <input type="text" name="environment_variable_value_{{$index}}" class="form-control" ng-model="envVar.Value" placeholder="bar">
                   </div>
 
                   <div class="input-group col-sm-2 input-group-sm">
-                    <button class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeEnvironmentVariable($index)">
+                    <button ng-if="!envVar.NeedsDeletion" class="btn btn-sm btn-danger" type="button" ng-click="ctrl.removeEnvironmentVariable($index)">
                       <i class="fa fa-times" aria-hidden="true"></i>
+                    </button>
+                    <button ng-if="envVar.NeedsDeletion" class="btn btn-sm btn-primary" type="button" ng-click="ctrl.restoreEnvironmentVariable($index)">
+                      Restore
                     </button>
                   </div>
 
