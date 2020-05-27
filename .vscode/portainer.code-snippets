@@ -21,7 +21,7 @@
     "description": "Dummy Angularjs Component",
     "body": [
       "import angular from 'angular';",
-      "import ${TM_FILENAME_BASE/(.*)/${1:/capitalize}/}Controller from './${TM_FILENAME_BASE}Controller",
+      "import ${TM_FILENAME_BASE/(.*)/${1:/capitalize}/}Controller from './${TM_FILENAME_BASE}Controller'",
       "",
       "angular.module('portainer.${TM_DIRECTORY/.*\\/app\\/([^\\/]*)(\\/.*)?$/$1/}').component('$TM_FILENAME_BASE', {",
       "  templateUrl: './$TM_FILENAME_BASE.html',",
@@ -34,23 +34,13 @@
     "scope": "javascript",
     "prefix": "mycontroller",
     "body": [
-      "class ${TM_FILENAME_BASE} {",
+      "class ${TM_FILENAME_BASE/(.*)/${1:/capitalize}/} {",
       "\t/* @ngInject */",
-      "\tconstructor(\\$async, $0) {",
-      "\t\tthis.\\$async = \\$async;",
-      "",
-      "\t\tthis.onInit = this.onInit.bind(this);",
-      "\t}",
-      "",
-      "\tasync onInit() {",
-      "\t}",
-      "",
-      "\t\\$onInit() {",
-      "\t\treturn this.\\$async(this.onInit);",
+      "\tconstructor($0) {",
       "\t}",
       "}",
       "",
-      "export default ${TM_FILENAME_BASE};"
+      "export default ${TM_FILENAME_BASE/(.*)/${1:/capitalize}/};"
     ],
     "description": "Dummy ES6+ controller"
   },
