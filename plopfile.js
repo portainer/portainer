@@ -39,7 +39,7 @@ module.exports = function (plop) {
 
 function getCurrentPortainerModule(cwd) {
   const match = cwd.match(/\/app\/([^\/]*)(\/.*)?$/);
-  if (!match) {
+  if (!match || !match.length || match[1] === 'portainer') {
     return 'app';
   }
   return match[1];
