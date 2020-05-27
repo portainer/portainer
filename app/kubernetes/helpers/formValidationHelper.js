@@ -5,7 +5,7 @@ class KubernetesFormValidationHelper {
     const groupped = _.groupBy(names);
     const res = {};
     _.forEach(names, (name, index) => {
-      if (groupped[name].length > 1) {
+      if (groupped[name].length > 1 && name) {
         res[index] = name;
       }
     });

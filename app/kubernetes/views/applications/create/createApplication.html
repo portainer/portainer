@@ -213,12 +213,13 @@
                     <div class="input-group col-sm-12 input-group-sm">
                       <span class="input-group-addon">path on disk</span>
                       <input type="text" class="form-control" ng-model="overridenKey.Path" placeholder="/etc/myapp/conf.d" name="overriden_key_path_{{index}}_{{keyIndex}}"
-                        required>
+                        required ng-change="ctrl.onChangeConfigurationPath()">
                     </div>
-                    <div class="small text-warning" style="margin-top:5px" ng-show="kubernetesApplicationCreationForm['overriden_key_path_' + index + '_' + keyIndex].$invalid">
+                    <div class="small text-warning" style="margin-top:5px" ng-show="kubernetesApplicationCreationForm['overriden_key_path_' + index + '_' + keyIndex].$invalid  || ctrl.state.duplicateConfigurationPaths[index + '_' + keyIndex] !== undefined">
                       <ng-messages for="kubernetesApplicationCreationForm['overriden_key_path_' + index + '_' + keyIndex].$error">
                         <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Path is required.</p>
                       </ng-messages>
+                      <p ng-if="ctrl.state.duplicateConfigurationPaths[index + '_' + keyIndex] !== undefined"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This path is already used.</p>
                     </div>
                   </div>
 

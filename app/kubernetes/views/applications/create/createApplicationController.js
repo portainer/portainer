@@ -58,7 +58,7 @@ class KubernetesCreateApplicationController {
   }
 
   isValid() {
-    return !this.state.alreadyExists && !this.state.hasDuplicateEnvironmentVariables && !this.state.hasDuplicatePersistedFolderPaths;
+    return !this.state.alreadyExists && !this.state.hasDuplicateEnvironmentVariables && !this.state.hasDuplicatePersistedFolderPaths && !this.state.hasDuplicateConfigurationPaths;
   }
 
   onChangeName() {
@@ -77,6 +77,7 @@ class KubernetesCreateApplicationController {
 
   removeConfiguration(index) {
     this.formValues.Configurations.splice(index, 1);
+    this.onChangeConfigurationPath();
   }
 
   overrideConfiguration(index) {
@@ -93,6 +94,29 @@ class KubernetesCreateApplicationController {
     const config = this.formValues.Configurations[index];
     config.Overriden = false;
     config.OverridenKeys = [];
+    this.onChangeConfigurationPath();
+  }
+
+  onChangeConfigurationPath() {
+    this.state.duplicateConfigurationPaths = [];
+    
+    const paths = _.reduce(this.formValues.Configurations, (result, config) => {
+      const uniqOverridenKeysPath = _.uniq(_.map(config.OverridenKeys, 'Path'));
+      return _.concat(result, uniqOverridenKeysPath);
+    }, []);
+    
+    const duplicatePaths = KubernetesFormValidationHelper.getDuplicates(paths);
+    
+    _.forEach(this.formValues.Configurations, (config, index) => {
+      _.forEach(config.OverridenKeys, (overridenKey, keyIndex) => {
+        const findPath = _.find(duplicatePaths, (path) => path === overridenKey.Path);
+        if (findPath) {
+          this.state.duplicateConfigurationPaths[index + '_' + keyIndex] = findPath;
+        }
+      });
+    });
+    
+    this.state.hasDuplicateConfigurationPaths = Object.keys(this.state.duplicateConfigurationPaths).length > 0;
   }
   /**
    * !CONFIGURATION UI MANAGEMENT
@@ -522,6 +546,8 @@ class KubernetesCreateApplicationController {
         hasDuplicateEnvironmentVariables: false,
         duplicatePersistedFolderPaths: {},
         hasDuplicatePersistedFolderPaths: false,
+        duplicateConfigurationPaths: {},
+        hasDuplicateConfigurationPaths: false,
         isEdit: false,
         params: {
           namespace: this.$transition$.params().namespace,
