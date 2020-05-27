@@ -2,7 +2,6 @@ import angular from 'angular';
 import _ from 'lodash-es';
 import {KubernetesConfigurationFormValues, KubernetesConfigurationFormValuesDataEntry} from 'Kubernetes/models/configuration/formvalues';
 import {KubernetesConfigurationTypes} from 'Kubernetes/models/configuration/models';
-import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 
 class KubernetesCreateConfigurationController {
   /* @ngInject */
@@ -17,11 +16,7 @@ class KubernetesCreateConfigurationController {
 
     this.onInit = this.onInit.bind(this);
     this.createConfigurationAsync = this.createConfigurationAsync.bind(this);
-    this.editorUpdate = this.editorUpdate.bind(this);
-    this.editorUpdateAsync = this.editorUpdateAsync.bind(this);
     this.getConfigurationsAsync = this.getConfigurationsAsync.bind(this);
-    this.onFileLoad = this.onFileLoad.bind(this);
-    this.onFileLoadAsync = this.onFileLoadAsync.bind(this);
   }
 
   onChangeName() {
@@ -29,56 +24,12 @@ class KubernetesCreateConfigurationController {
     this.state.alreadyExist = _.find(filteredConfigurations, (config) => config.Name === this.formValues.Name) !== undefined;
   }
 
-  onChangeKey() {
-    this.state.duplicateKeys = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.Data, 'Key'));
-    this.state.hasDuplicateKeys = Object.keys(this.state.duplicateKeys).length > 0;
-  }
-
-  addEntry() {
-    this.formValues.Data.push(new KubernetesConfigurationFormValuesDataEntry());
-  }
-
-  removeEntry(index) {
-    this.formValues.Data.splice(index, 1);
-    this.onChangeKey();
-  }
-
-  // TODO: review - don't use async function (cf docker/createConfigController for working 'cm' use)
-  async editorUpdateAsync(cm) {
-    this.formValues.DataYaml = await cm.getValue();
-  }
-
-  editorUpdate(cm) {
-    return this.$async(this.editorUpdateAsync, cm);
-  }
-
   isFormValid() {
-    const uniqueCheck = !this.state.alreadyExist && !this.state.hasDuplicateKeys;
+    const uniqueCheck = !this.state.alreadyExist && this.state.isDataValid;
     if (this.formValues.IsSimple) {
       return this.formValues.Data.length > 0 && uniqueCheck;
     }
     return uniqueCheck;
-  }
-
-  async onFileLoadAsync(event) {
-    const entry = new KubernetesConfigurationFormValuesDataEntry();
-    entry.Key = event.target.fileName;
-    entry.Value = event.target.result;
-    this.formValues.Data.push(entry);
-    this.onChangeKey();
-  }
-
-  onFileLoad(event) {
-    return this.$async(this.onFileLoadAsync, event);
-  }
-
-  addEntryFromFile(file) {
-    if (file) {
-      const temporaryFileReader = new FileReader();
-      temporaryFileReader.fileName = file.name;
-      temporaryFileReader.onload = this.onFileLoad;
-      temporaryFileReader.readAsText(file);
-    }
   }
 
   async createConfigurationAsync() {
@@ -116,8 +67,7 @@ class KubernetesCreateConfigurationController {
       actionInProgress: false,
       viewReady: false,
       alreadyExist: false,
-      duplicateKeys: {},
-      hasDuplicateKeys: false
+      isDataValid: true
     };
 
     this.formValues = new KubernetesConfigurationFormValues();

@@ -3,7 +3,6 @@ import {KubernetesConfigurationFormValues, KubernetesConfigurationFormValuesData
 import {KubernetesConfigurationTypes} from 'Kubernetes/models/configuration/models';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
-import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import _ from 'lodash-es';
 
 class KubernetesConfigurationController {
@@ -30,10 +29,6 @@ class KubernetesConfigurationController {
     this.getConfigurationsAsync = this.getConfigurationsAsync.bind(this);
     this.updateConfiguration = this.updateConfiguration.bind(this);
     this.updateConfigurationAsync = this.updateConfigurationAsync.bind(this);
-    this.editorUpdate = this.editorUpdate.bind(this);
-    this.editorUpdateAsync = this.editorUpdateAsync.bind(this);
-    this.onFileLoad = this.onFileLoad.bind(this);
-    this.onFileLoadAsync = this.onFileLoadAsync.bind(this);
   }
 
   isSystemNamespace() {
@@ -44,60 +39,16 @@ class KubernetesConfigurationController {
     this.LocalStorage.storeActiveTab('configuration', index);
   }
 
-  onChangeKey() {
-    this.state.duplicateKeys = KubernetesFormValidationHelper.getDuplicates(_.map(this.formValues.Data, 'Key'));
-    this.state.hasDuplicateKeys = Object.keys(this.state.duplicateKeys).length > 0;
-  }
-
-  addEntry() {
-    this.formValues.Data.push(new KubernetesConfigurationFormValuesDataEntry());
-  }
-
-  removeEntry(index) {
-    this.formValues.Data.splice(index, 1);
-    this.onChangeKey();
-  }
-
   showEditor() {
     this.state.showEditorTab = true;
     this.selectTab(2);
   }
 
-  // TODO: review - don't use async function (cf docker/createConfigController for working 'cm' use)
-  async editorUpdateAsync(cm) {
-    this.formValues.DataYaml = await cm.getValue();
-  }
-
-  editorUpdate(cm) {
-    return this.$async(this.editorUpdateAsync, cm);
-  }
-
   isFormValid() {
     if (this.formValues.IsSimple) {
-      return this.formValues.Data.length > 0 && !this.state.hasDuplicateKeys;
+      return this.formValues.Data.length > 0 && this.state.isDataValid;
     }
-    return !this.state.hasDuplicateKeys;
-  }
-
-  async onFileLoadAsync(event) {
-    const entry = new KubernetesConfigurationFormValuesDataEntry();
-    entry.Key = event.target.fileName;
-    entry.Value = event.target.result;
-    this.formValues.Data.push(entry);
-    this.onChangeKey();
-  }
-
-  onFileLoad(event) {
-    return this.$async(this.onFileLoadAsync, event);
-  }
-
-  addEntryFromFile(file) {
-    if (file) {
-      const temporaryFileReader = new FileReader();
-      temporaryFileReader.fileName = file.name;
-      temporaryFileReader.onload = this.onFileLoad;
-      temporaryFileReader.readAsText(file);
-    }
+    return this.state.isDataValid;
   }
 
   async updateConfigurationAsync() {
@@ -216,10 +167,9 @@ class KubernetesConfigurationController {
         showEditorTab: false,
         viewReady: false,
         eventWarningCount: 0,
-        duplicateKeys: {},
-        hasDuplicateKeys: false,
         activeTab: 0,
-        currentName: this.$state.$current.name
+        currentName: this.$state.$current.name,
+        isDataValid: true
       };
 
       this.state.activeTab = this.LocalStorage.getActiveTab('configuration');
