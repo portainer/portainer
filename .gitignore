@@ -4,7 +4,7 @@ dist
 portainer-checksum.txt
 api/cmd/portainer/portainer*
 .tmp
-/**/.vscode/settings.json
-/**/.vscode/tasks.json
+**/.vscode/settings.json
+**/.vscode/tasks.json
 
 .eslintcache
