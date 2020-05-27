@@ -21,17 +21,17 @@ module.exports = function (plop) {
       {
         type: 'add',
         path: `{{cwd}}/{{dashCase name}}/index.js`,
-        templateFile: './plop-templates/component.js.hbs',
+        templateFile: './app/plop-templates/component.js.hbs',
       },
       {
         type: 'add',
         path: `{{cwd}}/{{dashCase name}}/{{camelCase name}}Controller.js`,
-        templateFile: './plop-templates/component-controller.js.hbs',
+        templateFile: './app/plop-templates/component-controller.js.hbs',
       },
       {
         type: 'add',
         path: `{{cwd}}/{{dashCase name}}/{{camelCase name}}.html`,
-        templateFile: './plop-templates/component.html.hbs',
+        templateFile: './app/plop-templates/component.html.hbs',
       },
     ], // array of actions
   });
