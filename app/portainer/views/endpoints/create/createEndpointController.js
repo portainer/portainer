@@ -12,6 +12,7 @@ angular
     EndpointService,
     GroupService,
     TagService,
+    SettingsService,
     Notifications,
     Authentication
   ) {
@@ -152,10 +153,14 @@ angular
       $q.all({
         groups: GroupService.groups(),
         tags: TagService.tags(),
+        settings: SettingsService.settings(),
       })
         .then(function success(data) {
           $scope.groups = data.groups;
           $scope.availableTags = data.tags;
+
+          const settings = data.settings;
+          $scope.state.availableEdgeAgentCheckinOptions[0].key += ` (${settings.EdgeAgentCheckinInterval} seconds)`;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to load groups');

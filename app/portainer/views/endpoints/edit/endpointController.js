@@ -17,7 +17,8 @@ angular
     TagService,
     EndpointProvider,
     Notifications,
-    Authentication
+    Authentication,
+    SettingsService
   ) {
     $scope.state = {
       uploadInProgress: false,
@@ -152,6 +153,7 @@ angular
         endpoint: EndpointService.endpoint($transition$.params().id),
         groups: GroupService.groups(),
         tags: TagService.tags(),
+        settings: SettingsService.settings(),
       })
         .then(function success(data) {
           var endpoint = data.endpoint;
@@ -168,6 +170,9 @@ angular
               standalone: buildStandaloneCommand($scope.randomEdgeID, endpoint.EdgeKey),
               swarm: buildSwarmCommand($scope.randomEdgeID, endpoint.EdgeKey),
             };
+
+            const settings = data.settings;
+            $scope.state.availableEdgeAgentCheckinOptions[0].key += ` (${settings.EdgeAgentCheckinInterval} seconds)`;
           }
           $scope.endpoint = endpoint;
           $scope.groups = data.groups;
