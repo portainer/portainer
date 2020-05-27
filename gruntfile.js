@@ -159,8 +159,7 @@ function shell_run_container() {
 }
 
 function shell_run_localserver() {
-  // return 'cd /src/portainer/api && go run cmd/portainer/main.go --template-file /src/portainer/templates.json -a /src/portainer/dist'
-  return './dist/portainer --no-analytics --template-file templates.json';
+  return './dist/portainer --no-analytics --template-file dist/templates.json';
 }
 
 function shell_download_docker_binary(p, a) {
