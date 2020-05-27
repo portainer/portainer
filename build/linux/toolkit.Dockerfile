@@ -3,7 +3,7 @@ FROM ubuntu
 # Expose port for the Portainer UI
 EXPOSE 9000
 
-WORKDIR /src
+WORKDIR /src/portainer
 
 # Set TERM as noninteractive to suppress debconf errors
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
@@ -16,8 +16,7 @@ RUN apt-get update --fix-missing && apt-get install -qq \
     build-essential \
     nodejs \
     git \
-    wget \
-    supervisor
+    wget
 
 # Install Yarn
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
@@ -35,6 +34,3 @@ ENV PATH "$PATH:/usr/local/go/bin"
 
 # Confirm installation
 RUN go version && node -v && yarn -v
-
-# Default command when running the container
-CMD cd portainer && yarn && yarn start:toolkit

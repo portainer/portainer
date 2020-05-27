@@ -40,7 +40,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('start:localserver', ['shell:build_binary:linux:' + arch, 'shell:run_localserver']);
 
-  grunt.registerTask('start:client', ['config:dev', 'env:dev', 'webpack:devWatch']);
+  grunt.registerTask('start:client', ['shell:install_yarndeps', 'config:dev', 'env:dev', 'webpack:devWatch']);
 
   grunt.registerTask('start', ['start:server', 'start:client']);
 
@@ -124,6 +124,7 @@ gruntfile_cfg.shell = {
   download_docker_binary: { command: shell_download_docker_binary },
   run_container: { command: shell_run_container },
   run_localserver: { command: shell_run_localserver },
+  install_yarndeps: { command: shell_install_yarndeps },
 };
 
 function shell_build_binary(p, a) {
@@ -159,7 +160,11 @@ function shell_run_container() {
 }
 
 function shell_run_localserver() {
-  return './dist/portainer --no-analytics --template-file dist/templates.json';
+  return './dist/portainer --no-analytics';
+}
+
+function shell_install_yarndeps() {
+  return 'yarn';
 }
 
 function shell_download_docker_binary(p, a) {
