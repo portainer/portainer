@@ -63,13 +63,13 @@ func (service *Service) SetSnapshotInterval(snapshotInterval string) error {
 }
 
 func (service *Service) startSnapshotLoop() error {
-	err := service.takeSnapshot()
-	if err != nil {
-		return err
-	}
-
 	ticker := time.NewTicker(time.Duration(service.snapshotIntervalInSeconds) * time.Second)
 	go func() {
+		err := service.takeSnapshot()
+		if err != nil {
+			log.Printf("[ERROR] [internal,snapshot] [message: background schedule error (endpoint snapshot).] [error: %s]", err)
+		}
+
 		for {
 			select {
 			case <-ticker.C:
