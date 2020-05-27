@@ -5,17 +5,12 @@ const _KubernetesStorageClassAccessPolicies = Object.freeze(
 [
   {
     Name: "RWO",
-    Description: "Allow read-write access from a single pod only",
+    Description: "Allow read-write from a single pod only (RWO)",
     selected: true,
   },
   {
-    Name: "ROX",
-    Description: "Allow read-only access from one or more pods simultaneously",
-    selected: false,
-  },
-  {
     Name: "RWX",
-    Description: "Allow read-write access from one or more pods simultaneously",
+    Description: "Allow read-write access from one or more pods concurrently (RWX)",
     selected: false,
   }
 ]);

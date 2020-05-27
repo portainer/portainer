@@ -219,7 +219,7 @@ class KubernetesApplicationConverter {
 
   static applicationFormValuesToApplication(formValues) {
     const claims = KubernetesPersistentVolumeClaimConverter.applicationFormValuesToVolumeClaims(formValues);
-    const roxrwx = _.find(claims, (item) => _.includes(item.StorageClass.AccessModes, 'ROX') || _.includes(item.StorageClass.AccessModes, 'RWX')) !== undefined;
+    const rwx = _.find(claims, (item) => _.includes(item.StorageClass.AccessModes, 'RWX')) !== undefined;
 
     const deployment = (formValues.DeploymentType === KubernetesApplicationDeploymentTypes.REPLICATED &&
       (claims.length === 0 || (claims.length > 0 && formValues.DataAccessPolicy === KubernetesApplicationDataAccessPolicies.SHARED)))
@@ -230,7 +230,7 @@ class KubernetesApplicationConverter {
       || (formValues.ApplicationType === KubernetesApplicationTypes.STATEFULSET);
 
     const daemonSet = (formValues.DeploymentType === KubernetesApplicationDeploymentTypes.GLOBAL &&
-      (claims.length === 0 || (claims.length > 0 && formValues.DataAccessPolicy === KubernetesApplicationDataAccessPolicies.SHARED && roxrwx)))
+      (claims.length === 0 || (claims.length > 0 && formValues.DataAccessPolicy === KubernetesApplicationDataAccessPolicies.SHARED && rwx)))
       || (formValues.ApplicationType === KubernetesApplicationTypes.DAEMONSET);
 
     let app;

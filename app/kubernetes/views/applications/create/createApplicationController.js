@@ -236,7 +236,8 @@ class KubernetesCreateApplicationController {
 
   // A scalable deployment is available when either:
   // * No persisted folders are specified
-  // * The access policy is set to shared and for each persisted folders specified, all the associated storage objects support at least the ROX or RWX access mode
+  // * The access policy is set to shared and for each persisted folders specified, all the associated
+  //   storage objects support at least RWX access mode (no RWO only)
   // * The access policy is set to isolated
   supportScalableReplicaDeployment() {
     const hasFolders = this.formValues.PersistedFolders.length !== 0;
