@@ -36,7 +36,12 @@ func NewService() (*Service, error) {
 
 // GenerateToken generates a new JWT token.
 func (service *Service) GenerateToken(data *portainer.TokenData) (string, error) {
-	expireToken := time.Now().Add(time.Hour * 8).Unix()
+	userSessionTimeout, err := time.ParseDuration(portainer.DefaultUserSessionTimeout)
+	if err != nil {
+		return "", err
+	}
+
+	expireToken := time.Now().Add(userSessionTimeout).Unix()
 	cl := claims{
 		UserID:   int(data.ID),
 		Username: data.Username,

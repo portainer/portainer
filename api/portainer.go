@@ -1057,6 +1057,8 @@ const (
 	LocalExtensionManifestFile = "/extensions.json"
 	// DefaultTemplatesURL represents the URL to the official templates supported by Portainer
 	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates-2.0.json"
+	// DefaultUserSessionTimeout represents the default timeout after which the user session is cleared
+	DefaultUserSessionTimeout = "8h"
 )
 
 const (
