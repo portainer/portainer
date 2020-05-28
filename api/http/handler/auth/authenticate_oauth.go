@@ -140,5 +140,5 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 		}
 	}
 
-	return handler.writeToken(w, user)
+	return handler.writeToken(w, user, settings.UserSessionTimeout)
 }
