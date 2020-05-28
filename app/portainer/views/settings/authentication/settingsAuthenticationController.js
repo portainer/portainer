@@ -27,8 +27,8 @@ angular.module('portainer.app').controller('SettingsAuthenticationController', [
           key: '24 hours',
           value: '24h',
         },
-        { key: '2 days', value: '2d' },
-        { key: '1 week', value: '1w' },
+        { key: '2 days', value: '48h' },
+        { key: '1 week', value: '168h' },
       ],
     };
 
