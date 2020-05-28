@@ -14,9 +14,26 @@ angular.module('portainer.app').controller('SettingsAuthenticationController', [
       uploadInProgress: false,
       connectivityCheckInProgress: false,
       actionInProgress: false,
+      availableUserSessionTimeoutOptions: [
+        {
+          key: 'Use default (8 hours)',
+          value: '',
+        },
+        {
+          key: '1 hour',
+          value: '1h',
+        },
+        {
+          key: '24 hours',
+          value: '24h',
+        },
+        { key: '2 days', value: '2d' },
+        { key: '1 week', value: '1w' },
+      ],
     };
 
     $scope.formValues = {
+      UserSessionTimeout: $scope.state.availableUserSessionTimeoutOptions[0],
       TLSCACert: '',
       LDAPSettings: {
         AnonymousMode: true,
