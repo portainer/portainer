@@ -459,6 +459,7 @@ type (
 		EnableHostManagementFeatures       bool                 `json:"EnableHostManagementFeatures"`
 		EdgeAgentCheckinInterval           int                  `json:"EdgeAgentCheckinInterval"`
 		EnableEdgeComputeFeatures          bool                 `json:"EnableEdgeComputeFeatures"`
+		UserSessionTimeout                 string               `json:"UserSessionTimeout"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool

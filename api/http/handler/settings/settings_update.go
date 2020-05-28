@@ -2,6 +2,7 @@ package settings
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
@@ -25,6 +26,7 @@ type settingsUpdatePayload struct {
 	TemplatesURL                       *string
 	EdgeAgentCheckinInterval           *int
 	EnableEdgeComputeFeatures          *bool
+	UserSessionTimeout                 *string
 }
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
@@ -37,6 +39,14 @@ func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 	if payload.TemplatesURL != nil && *payload.TemplatesURL != "" && !govalidator.IsURL(*payload.TemplatesURL) {
 		return portainer.Error("Invalid external templates URL. Must correspond to a valid URL format")
 	}
+
+	if payload.UserSessionTimeout != nil {
+		_, err := time.ParseDuration(*payload.UserSessionTimeout)
+		if err != nil {
+			return portainer.Error("Invalid user session timeout")
+		}
+	}
+
 	return nil
 }
 
@@ -123,6 +133,10 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.EdgeAgentCheckinInterval != nil {
 		settings.EdgeAgentCheckinInterval = *payload.EdgeAgentCheckinInterval
+	}
+
+	if payload.UserSessionTimeout != nil {
+		settings.UserSessionTimeout = *payload.UserSessionTimeout
 	}
 
 	tlsError := handler.updateTLS(settings)
