@@ -46,7 +46,6 @@ type (
 		EndpointURL       *string
 		Labels            *[]Pair
 		Logo              *string
-		NoAuth            *bool
 		NoAnalytics       *bool
 		Templates         *string
 		TLS               *bool

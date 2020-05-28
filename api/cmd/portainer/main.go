@@ -77,15 +77,12 @@ func initSwarmStackManager(assetsPath string, dataStorePath string, signatureSer
 	return exec.NewSwarmStackManager(assetsPath, dataStorePath, signatureService, fileService, reverseTunnelService)
 }
 
-func initJWTService(authenticationEnabled bool) portainer.JWTService {
-	if authenticationEnabled {
-		jwtService, err := jwt.NewService()
-		if err != nil {
-			log.Fatal(err)
-		}
-		return jwtService
+func initJWTService() portainer.JWTService {
+	jwtService, err := jwt.NewService()
+	if err != nil {
+		log.Fatal(err)
 	}
-	return nil
+	return jwtService
 }
 
 func initDigitalSignatureService() portainer.DigitalSignatureService {
@@ -189,7 +186,7 @@ func loadSchedulesFromDatabase(jobScheduler portainer.JobScheduler, jobService p
 func initStatus(flags *portainer.CLIFlags) *portainer.Status {
 	return &portainer.Status{
 		Analytics:      !*flags.NoAnalytics,
-		Authentication: !*flags.NoAuth,
+		Authentication: true,
 		Version:        portainer.APIVersion,
 	}
 }
@@ -392,7 +389,7 @@ func main() {
 	dataStore := initDataStore(*flags.Data, fileService)
 	defer dataStore.Close()
 
-	jwtService := initJWTService(!*flags.NoAuth)
+	jwtService := initJWTService()
 
 	ldapService := initLDAPService()
 
@@ -492,9 +489,7 @@ func main() {
 		}
 	}
 
-	if !*flags.NoAuth {
-		go terminateIfNoAdminCreated(dataStore)
-	}
+	go terminateIfNoAdminCreated(dataStore)
 
 	err = reverseTunnelService.StartTunnelServer(*flags.TunnelAddr, *flags.TunnelPort, snapshotter)
 	if err != nil {
@@ -506,7 +501,7 @@ func main() {
 		Status:               applicationStatus,
 		BindAddress:          *flags.Addr,
 		AssetsPath:           *flags.Assets,
-		AuthDisabled:         *flags.NoAuth,
+		AuthDisabled:         false,
 		DataStore:            dataStore,
 		SwarmStackManager:    swarmStackManager,
 		ComposeStackManager:  composeStackManager,
