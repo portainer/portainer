@@ -840,7 +840,7 @@ type (
 
 	// JWTService represents a service for managing JWT tokens
 	JWTService interface {
-		GenerateToken(data *TokenData) (string, error)
+		GenerateToken(data *TokenData, timeout string) (string, error)
 		ParseAndVerifyToken(token string) (*TokenData, error)
 	}
 

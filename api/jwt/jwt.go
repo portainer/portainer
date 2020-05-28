@@ -35,8 +35,8 @@ func NewService() (*Service, error) {
 }
 
 // GenerateToken generates a new JWT token.
-func (service *Service) GenerateToken(data *portainer.TokenData) (string, error) {
-	userSessionTimeout, err := time.ParseDuration(portainer.DefaultUserSessionTimeout)
+func (service *Service) GenerateToken(data *portainer.TokenData, timeout string) (string, error) {
+	userSessionTimeout, err := time.ParseDuration(timeout)
 	if err != nil {
 		return "", err
 	}

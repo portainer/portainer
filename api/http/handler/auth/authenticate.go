@@ -137,7 +137,7 @@ func (handler *Handler) writeToken(w http.ResponseWriter, user *portainer.User) 
 }
 
 func (handler *Handler) persistAndWriteToken(w http.ResponseWriter, tokenData *portainer.TokenData) *httperror.HandlerError {
-	token, err := handler.JWTService.GenerateToken(tokenData)
+	token, err := handler.JWTService.GenerateToken(tokenData, portainer.DefaultUserSessionTimeout)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to generate JWT token", err}
 	}
