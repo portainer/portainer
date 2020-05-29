@@ -1,20 +1,13 @@
 <div class="datatable">
   <rd-widget>
     <rd-widget-body classes="no-padding">
-
       <div class="toolBar">
-        <div class="toolBarTitle">
-          <i class="fa fa-bolt" aria-hidden="true" style="margin-right: 2px;"></i> Available extensions
-        </div>
+        <div class="toolBarTitle"> <i class="fa fa-bolt" aria-hidden="true" style="margin-right: 2px;"></i> Available extensions </div>
       </div>
 
       <div class="blocklist">
-        <extension-item ng-repeat="extension in $ctrl.extensions"
-          model="extension"
-          current-date="$ctrl.currentDate"
-        ></extension-item>
+        <extension-item ng-repeat="extension in $ctrl.extensions" model="extension" current-date="$ctrl.currentDate"></extension-item>
       </div>
-
     </rd-widget-body>
   </rd-widget>
 </div>

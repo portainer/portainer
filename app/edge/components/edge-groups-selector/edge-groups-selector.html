@@ -1,0 +1,18 @@
+<ui-select
+  multiple
+  ng-model="$ctrl.model"
+  close-on-select="false"
+>
+  <ui-select-match placeholder="Select one or multiple group(s)">
+    <span>
+      {{ $item.Name }}
+    </span>
+  </ui-select-match>
+  <ui-select-choices
+    repeat="item.Id as item in $ctrl.items | filter: { Name: $select.search }"
+  >
+    <span>
+      {{ item.Name }}
+    </span>
+  </ui-select-choices>
+</ui-select>

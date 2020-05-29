@@ -3,8 +3,7 @@
 // This functions simply creates a response object and assign
 // the data to a field.
 export function imageGetResponse(data) {
-    var response = {};
-    response.file = data;
-    return response;
-  }
-  
+  var response = {};
+  response.file = data;
+  return response;
+}

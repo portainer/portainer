@@ -11,6 +11,6 @@ angular.module('portainer.app').component('registriesDatatable', {
     accessManagement: '<',
     removeAction: '<',
     registryManagement: '<',
-    canBrowse: '<'
-  }
+    canBrowse: '<',
+  },
 });

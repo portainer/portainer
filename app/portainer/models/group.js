@@ -1,14 +1,14 @@
 export function EndpointGroupDefaultModel() {
   this.Name = '';
   this.Description = '';
-  this.Tags = [];
+  this.TagIds = [];
 }
 
 export function EndpointGroupModel(data) {
   this.Id = data.Id;
   this.Name = data.Name;
   this.Description = data.Description;
-  this.Tags = data.Tags;
+  this.TagIds = data.TagIds;
   this.AuthorizedUsers = data.AuthorizedUsers;
   this.AuthorizedTeams = data.AuthorizedTeams;
   this.UserAccessPolicies = data.UserAccessPolicies;
@@ -18,7 +18,7 @@ export function EndpointGroupModel(data) {
 export function EndpointGroupCreateRequest(model, endpoints) {
   this.Name = model.Name;
   this.Description = model.Description;
-  this.Tags = model.Tags;
+  this.TagIds = model.TagIds;
   this.AssociatedEndpoints = endpoints;
 }
 
@@ -26,7 +26,7 @@ export function EndpointGroupUpdateRequest(model, endpoints) {
   this.id = model.Id;
   this.Name = model.Name;
   this.Description = model.Description;
-  this.Tags = model.Tags;
+  this.TagIds = model.TagIds;
   this.AssociatedEndpoints = endpoints;
   this.UserAccessPolicies = model.UserAccessPolicies;
   this.TeamAccessPolicies = model.TeamAccessPolicies;

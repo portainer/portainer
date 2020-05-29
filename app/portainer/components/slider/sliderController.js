@@ -1,5 +1,4 @@
-angular.module('portainer.app')
-.controller('SliderController', function () {
+angular.module('portainer.app').controller('SliderController', function () {
   var ctrl = this;
 
   ctrl.options = {
@@ -9,14 +8,14 @@ angular.module('portainer.app')
     precision: ctrl.precision,
     showSelectionBar: true,
     enforceStep: false,
-    translate: function(value, sliderId, label) {
+    translate: function (value, sliderId, label) {
       if ((label === 'floor' && ctrl.floor === 0) || value === 0) {
         return 'unlimited';
       }
       return value;
     },
-    onChange: function() {
+    onChange: function () {
       ctrl.onChange();
-    }
+    },
   };
 });

@@ -12,7 +12,12 @@ import (
 // Handler is the HTTP handler used to handle tag operations.
 type Handler struct {
 	*mux.Router
-	TagService portainer.TagService
+	TagService              portainer.TagService
+	EdgeGroupService        portainer.EdgeGroupService
+	EdgeStackService        portainer.EdgeStackService
+	EndpointService         portainer.EndpointService
+	EndpointGroupService    portainer.EndpointGroupService
+	EndpointRelationService portainer.EndpointRelationService
 }
 
 // NewHandler creates a handler to manage tag operations.
@@ -23,7 +28,7 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h.Handle("/tags",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.tagCreate))).Methods(http.MethodPost)
 	h.Handle("/tags",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.tagList))).Methods(http.MethodGet)
+		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.tagList))).Methods(http.MethodGet)
 	h.Handle("/tags/{id}",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.tagDelete))).Methods(http.MethodDelete)
 

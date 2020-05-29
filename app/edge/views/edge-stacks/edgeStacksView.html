@@ -1,0 +1,21 @@
+<rd-header>
+  <rd-header-title title-text="Edge Stacks list">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="edge.stacks" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>Edge Stacks</rd-header-content>
+</rd-header>
+<div class="row">
+  <div class="col-sm-12">
+    <edge-stacks-datatable
+      title-text="Edge Stacks"
+      title-icon="fa-th-list"
+      dataset="$ctrl.stacks"
+      table-key="edgeStacks"
+      order-by="Name"
+      remove-action="$ctrl.removeAction"
+      refresh-callback="$ctrl.getStacks"
+    ></edge-stacks-datatable>
+  </div>
+</div>

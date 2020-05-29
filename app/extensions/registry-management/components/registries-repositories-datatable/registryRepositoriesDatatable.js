@@ -9,6 +9,6 @@ angular.module('portainer.extensions.registrymanagement').component('registryRep
     orderBy: '@',
     reverseOrder: '<',
     paginationAction: '<',
-    loading: '<'
-  }
+    loading: '<',
+  },
 });

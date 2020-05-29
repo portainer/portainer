@@ -1,15 +1,14 @@
 function isJSONArray(jsonString) {
-    return Object.prototype.toString.call(jsonString) === '[object Array]';
+  return Object.prototype.toString.call(jsonString) === '[object Array]';
 }
 
 function isJSON(jsonString) {
   try {
     var o = JSON.parse(jsonString);
     if (o && typeof o === 'object') {
-        return o;
+      return o;
     }
-  }
-  catch (e) {
+  } catch (e) {
     //empty
   }
   return false;
@@ -50,7 +49,7 @@ export function genericHandler(data) {
 // This handler wraps the data in a JSON object under the "logs" property.
 export function logsHandler(data) {
   return {
-    logs: data
+    logs: data,
   };
 }
 
@@ -63,7 +62,7 @@ export function deleteImageHandler(data) {
   // A string is returned on failure (Docker < 1.12)
   var response = [];
   if (!isJSON(data)) {
-    response.push({message: data});
+    response.push({ message: data });
   }
   // A JSON object is returned on failure (Docker = 1.12)
   else if (!isJSONArray(data)) {

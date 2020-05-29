@@ -1,8 +1,9 @@
 import _ from 'lodash-es';
 
-angular.module('portainer.app')
-.controller('RegistryRepositoriesTagsDatatableController', ['$scope', '$controller',
-  function($scope, $controller) {
+angular.module('portainer.app').controller('RegistryRepositoriesTagsDatatableController', [
+  '$scope',
+  '$controller',
+  function ($scope, $controller) {
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
     var ctrl = this;
     this.state.orderBy = this.orderBy;
@@ -20,12 +21,17 @@ angular.module('portainer.app')
       return namesA.join(',') !== namesB.join(',');
     }
 
-    $scope.$watch(function() { return ctrl.state.filteredDataSet;},
-      function(newValue, oldValue) {
+    $scope.$watch(
+      function () {
+        return ctrl.state.filteredDataSet;
+      },
+      function (newValue, oldValue) {
         if (newValue && newValue.length && areDifferent(oldValue, newValue)) {
-          ctrl.paginationAction(_.filter(newValue, {'ImageId': ''}));
+          ctrl.paginationAction(_.filter(newValue, { ImageId: '' }));
           ctrl.resetSelectionState();
         }
-      }, true);
-  }
+      },
+      true
+    );
+  },
 ]);

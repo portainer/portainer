@@ -1,7 +1,8 @@
 import { NodeViewModel } from '../models/node';
 
 angular.module('portainer.docker').factory('NodeService', [
-  '$q', 'Node',
+  '$q',
+  'Node',
   function NodeServiceFactory($q, Node) {
     'use strict';
     var service = {};
@@ -30,7 +31,7 @@ angular.module('portainer.docker').factory('NodeService', [
 
       Node.query({})
         .$promise.then(function success(data) {
-          var nodes = data.map(function(item) {
+          var nodes = data.map(function (item) {
             return new NodeViewModel(item);
           });
           deferred.resolve(nodes);
@@ -49,7 +50,8 @@ angular.module('portainer.docker').factory('NodeService', [
     function getActiveManager() {
       var deferred = $q.defer();
 
-      service.nodes()
+      service
+        .nodes()
         .then(function success(data) {
           for (var i = 0; i < data.length; ++i) {
             var node = data[i];
@@ -67,5 +69,5 @@ angular.module('portainer.docker').factory('NodeService', [
     }
 
     return service;
-  }
+  },
 ]);

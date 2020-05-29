@@ -14,15 +14,15 @@ type endpointGroupCreatePayload struct {
 	Name                string
 	Description         string
 	AssociatedEndpoints []portainer.EndpointID
-	Tags                []string
+	TagIDs              []portainer.TagID
 }
 
 func (payload *endpointGroupCreatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
 		return portainer.Error("Invalid endpoint group name")
 	}
-	if payload.Tags == nil {
-		payload.Tags = []string{}
+	if payload.TagIDs == nil {
+		payload.TagIDs = []portainer.TagID{}
 	}
 	return nil
 }
@@ -40,7 +40,7 @@ func (handler *Handler) endpointGroupCreate(w http.ResponseWriter, r *http.Reque
 		Description:        payload.Description,
 		UserAccessPolicies: portainer.UserAccessPolicies{},
 		TeamAccessPolicies: portainer.TeamAccessPolicies{},
-		Tags:               payload.Tags,
+		TagIDs:             payload.TagIDs,
 	}
 
 	err = handler.EndpointGroupService.CreateEndpointGroup(endpointGroup)
@@ -63,8 +63,27 @@ func (handler *Handler) endpointGroupCreate(w http.ResponseWriter, r *http.Reque
 					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint", err}
 				}
 
+				err = handler.updateEndpointRelations(&endpoint, endpointGroup)
+				if err != nil {
+					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint relations changes inside the database", err}
+				}
+
 				break
 			}
+		}
+	}
+
+	for _, tagID := range endpointGroup.TagIDs {
+		tag, err := handler.TagService.Tag(tagID)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve tag from the database", err}
+		}
+
+		tag.EndpointGroups[endpointGroup.ID] = true
+
+		err = handler.TagService.UpdateTag(tagID, tag)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist tag changes inside the database", err}
 		}
 	}
 

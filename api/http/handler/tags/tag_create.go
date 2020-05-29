@@ -41,7 +41,9 @@ func (handler *Handler) tagCreate(w http.ResponseWriter, r *http.Request) *httpe
 	}
 
 	tag := &portainer.Tag{
-		Name: payload.Name,
+		Name:           payload.Name,
+		EndpointGroups: map[portainer.EndpointGroupID]bool{},
+		Endpoints:      map[portainer.EndpointID]bool{},
 	}
 
 	err = handler.TagService.CreateTag(tag)

@@ -5,6 +5,6 @@ angular.module('portainer.docker').component('hostDetailsPanel', {
     isJobEnabled: '<',
     isBrowseEnabled: '<',
     browseUrl: '@',
-    jobUrl: '@'
-  }
+    jobUrl: '@',
+  },
 });

@@ -1,38 +1,40 @@
-angular.module('portainer.app')
-.controller('GroupsController', ['$scope', '$state', '$filter',  'GroupService', 'Notifications',
-function ($scope, $state, $filter, GroupService, Notifications) {
+import angular from 'angular';
+import _ from 'lodash-es';
 
-  $scope.removeAction = function (selectedItems) {
-    var actionCount = selectedItems.length;
-    angular.forEach(selectedItems, function (group) {
-      GroupService.deleteGroup(group.Id)
-      .then(function success() {
+angular.module('portainer.app').controller('GroupsController', GroupsController);
+
+function GroupsController($scope, $state, $async, GroupService, Notifications) {
+  $scope.removeAction = removeAction;
+
+  function removeAction(selectedItems) {
+    return $async(removeActionAsync, selectedItems);
+  }
+
+  async function removeActionAsync(selectedItems) {
+    for (let group of selectedItems) {
+      try {
+        await GroupService.deleteGroup(group.Id);
+
         Notifications.success('Endpoint group successfully removed', group.Name);
-        var index = $scope.groups.indexOf(group);
-        $scope.groups.splice(index, 1);
-      })
-      .catch(function error(err) {
+        _.remove($scope.groups, group);
+      } catch (err) {
         Notifications.error('Failure', err, 'Unable to remove group');
-      })
-      .finally(function final() {
-        --actionCount;
-        if (actionCount === 0) {
-          $state.reload();
-        }
-      });
-    });
-  };
+      }
+    }
+
+    $state.reload();
+  }
 
   function initView() {
     GroupService.groups()
-    .then(function success(data) {
-      $scope.groups = data;
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to retrieve endpoint groups');
-      $scope.groups = [];
-    });
+      .then(function success(data) {
+        $scope.groups = data;
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to retrieve endpoint groups');
+        $scope.groups = [];
+      });
   }
 
   initView();
-}]);
+}

@@ -22,7 +22,8 @@
             </tr>
             <tr>
               <td>Condition</td>
-              <td><i class="fa fa-heartbeat space-right {{ clusterInfo.Condition | storidgeClusterConditionBadge }}"></i>
+              <td
+                ><i class="fa fa-heartbeat space-right {{ clusterInfo.Condition | storidgeClusterConditionBadge }}"></i>
                 {{ clusterInfo.Condition }}
               </td>
             </tr>
@@ -56,10 +57,6 @@
 
 <div class="row">
   <div class="col-sm-12">
-    <storidge-nodes-datatable
-    title-text="Storage nodes" title-icon="fa-object-group"
-    dataset="clusterNodes" table-key="storidge_nodes"
-    order-by="Name"
-    ></storidge-nodes-datatable>
+    <storidge-nodes-datatable title-text="Storage nodes" title-icon="fa-object-group" dataset="clusterNodes" table-key="storidge_nodes" order-by="Name"></storidge-nodes-datatable>
   </div>
 </div>

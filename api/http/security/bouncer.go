@@ -1,6 +1,8 @@
 package security
 
 import (
+	"errors"
+
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer/api"
 
@@ -138,6 +140,24 @@ func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endp
 		if err != nil {
 			return portainer.ErrAuthorizationRequired
 		}
+	}
+
+	return nil
+}
+
+// AuthorizedEdgeEndpointOperation verifies that the request was received from a valid Edge endpoint
+func (bouncer *RequestBouncer) AuthorizedEdgeEndpointOperation(r *http.Request, endpoint *portainer.Endpoint) error {
+	if endpoint.Type != portainer.EdgeAgentEnvironment {
+		return errors.New("Invalid endpoint type")
+	}
+
+	edgeIdentifier := r.Header.Get(portainer.PortainerAgentEdgeIDHeader)
+	if edgeIdentifier == "" {
+		return errors.New("missing Edge identifier")
+	}
+
+	if endpoint.EdgeID != "" && endpoint.EdgeID != edgeIdentifier {
+		return errors.New("invalid Edge identifier")
 	}
 
 	return nil

@@ -10,8 +10,10 @@
 <div class="row">
   <div class="col-sm-12" ng-if="containers">
     <containers-datatable
-      title-text="Containers" title-icon="fa-server"
-      dataset="containers" table-key="containers"
+      title-text="Containers"
+      title-icon="fa-server"
+      dataset="containers"
+      table-key="containers"
       order-by="Status"
       show-ownership-column="applicationState.application.authentication"
       show-host-column="applicationState.endpoint.mode.agentProxy && applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE'"

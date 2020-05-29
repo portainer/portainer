@@ -1,3 +1,1 @@
-angular.module('portainer.integrations', [
-  'portainer.integrations.storidge'
-]);
+angular.module('portainer.integrations', ['portainer.integrations.storidge']);

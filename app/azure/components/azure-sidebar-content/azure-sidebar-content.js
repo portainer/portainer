@@ -1,3 +1,3 @@
 angular.module('portainer.azure').component('azureSidebarContent', {
-  templateUrl: './azureSidebarContent.html'
+  templateUrl: './azureSidebarContent.html',
 });

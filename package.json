@@ -2,7 +2,7 @@
   "author": "Portainer.io",
   "name": "portainer",
   "homepage": "http://portainer.io",
-  "version": "1.23.2",
+  "version": "1.24.0",
   "repository": {
     "type": "git",
     "url": "git@github.com:portainer/portainer.git"
@@ -27,8 +27,10 @@
     "start": "grunt clean:all && grunt start",
     "start:server": "grunt clean:server && grunt start:server",
     "start:client": "grunt clean:client && grunt start:client",
+    "dev:client": "grunt clean:client && webpack-dev-server --config=./webpack/webpack.develop.js",
     "build:server:offline": "cd ./api/cmd/portainer && CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags '-s' && mv -f portainer ../../../dist/portainer",
-    "clean:all": "grunt clean:all"
+    "clean:all": "grunt clean:all",
+    "format": "prettier --loglevel warn --write \"**/*.{js,css,html}\""
   },
   "scriptsComments": {
     "build": "Build the entire app (backend/frontend) in development mode",
@@ -38,7 +40,8 @@
     "start": "Build the entire app (backend/frontend) in development mode, run it inside a container locally and start a watch process for the frontend files",
     "start:server": "Build the backend and run it inside a container",
     "clean:all": "Deprecated. Use the clean script instead",
-    "build:server:offline": "Deprecated. Use the build:server script instead"
+    "build:server:offline": "Deprecated. Use the build:server script instead",
+    "format": "Should be removed before pr is merged"
   },
   "engines": {
     "node": ">= 0.8.4"
@@ -46,7 +49,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.2.5",
     "@fortawesome/fontawesome-free": "^5.11.2",
-    "@uirouter/angularjs": "~1.0.6",
+    "@uirouter/angularjs": "1.0.11",
     "angular": "~1.5.0",
     "angular-clipboard": "^1.6.2",
     "angular-cookies": "~1.5.0",
@@ -96,7 +99,9 @@
     "css-loader": "^1.0.0",
     "cssnano": "^3.10.0",
     "eslint": "5.16.0",
+    "eslint-config-prettier": "^6.10.1",
     "eslint-loader": "^2.1.2",
+    "eslint-plugin-import": "^2.20.2",
     "file-loader": "^1.1.11",
     "grunt": "~0.4.0",
     "grunt-cli": "^1.2.0",
@@ -119,12 +124,15 @@
     "gruntify-eslint": "^3.1.0",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
+    "husky": ">=4",
     "image-webpack-loader": "^4.5.0",
+    "lint-staged": ">=10",
     "load-grunt-tasks": "^3.5.2",
     "lodash-webpack-plugin": "^0.11.5",
     "mini-css-extract-plugin": "^0.4.4",
     "ngtemplate-loader": "^2.0.1",
     "postcss-loader": "^3.0.0",
+    "prettier": "^2.0.2",
     "speed-measure-webpack-plugin": "^1.2.3",
     "style-loader": "^0.23.1",
     "url-loader": "^1.1.1",
@@ -136,5 +144,14 @@
   },
   "resolutions": {
     "jquery": "^3.3.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.js": "eslint --cache --fix",
+    "*.{js,css,md,html}": "prettier --write"
   }
 }

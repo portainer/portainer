@@ -1,12 +1,11 @@
-angular.module('portainer.app')
-.directive('rdWidget', function rdWidget() {
+angular.module('portainer.app').directive('rdWidget', function rdWidget() {
   var directive = {
     scope: {
-      'ngModel': '='
+      ngModel: '=',
     },
     transclude: true,
     template: '<div class="widget" ng-transclude></div>',
-    restrict: 'EA'
+    restrict: 'EA',
   };
   return directive;
 });

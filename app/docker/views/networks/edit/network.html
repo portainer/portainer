@@ -20,7 +20,9 @@
               <td>ID</td>
               <td>
                 {{ network.Id }}
-                <button authorization="DockerNetworkDelete" ng-if="allowRemove()" class="btn btn-xs btn-danger" ng-click="removeNetwork(network.Id)"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this network</button>
+                <button authorization="DockerNetworkDelete" ng-if="allowRemove()" class="btn btn-xs btn-danger" ng-click="removeNetwork(network.Id)"
+                  ><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this network</button
+                >
               </td>
             </tr>
             <tr>
@@ -39,9 +41,21 @@
               <td>Internal</td>
               <td>{{ network.Internal }}</td>
             </tr>
-            <tr ng-if="network.IPAM.Config.length > 0" ng-repeat="config in network.IPAM.Config">
-              <td>Subnet - {{ config.Subnet }}</td>
-              <td>Gateway - {{ config.Gateway }}</td>
+            <tr ng-if="network.IPAM.IPV4Configs.length > 0" ng-repeat-start="config in network.IPAM.IPV4Configs">
+              <td>IPV4 Subnet - {{ config.Subnet }}</td>
+              <td>IPV4 Gateway - {{ config.Gateway }}</td>
+            </tr>
+            <tr ng-if="network.IPAM.IPV4Configs.length > 0" ng-repeat-end>
+              <td>IPV4 IP range - {{ config.IPRange }}</td>
+              <td>IPV4 Excluded Ips - {{ config.AuxAddress }}</td>
+            </tr>
+            <tr ng-if="network.IPAM.IPV6Configs.length > 0" ng-repeat-start="config in network.IPAM.IPV6Configs">
+              <td>IPV6 Subnet - {{ config.Subnet }}</td>
+              <td>IPV6 Gateway - {{ config.Gateway }}</td>
+            </tr>
+            <tr ng-if="network.IPAM.IPV6Configs.length > 0" ng-repeat-end>
+              <td>IPV6 IP range - {{ config.IPRange }}</td>
+              <td>IPV6 Excluded Ips - {{ config.AuxAddress }}</td>
             </tr>
           </tbody>
         </table>
@@ -56,7 +70,8 @@
   resource-id="network.Id"
   resource-control="network.ResourceControl"
   resource-type="'network'"
-  disable-ownership-change="isSystemNetwork()">
+  disable-ownership-change="isSystemNetwork()"
+>
 </por-access-control-panel>
 <!-- !access-control-panel -->
 
@@ -78,7 +93,6 @@
   </div>
 </div>
 
-
 <div class="row" ng-if="containersInNetwork.length > 0">
   <div class="col-lg-12 col-md-12 col-xs-12">
     <rd-widget>
@@ -94,12 +108,16 @@
           </thead>
           <tbody>
             <tr ng-repeat="container in containersInNetwork">
-              <td><a ui-sref="docker.containers.container({ id: container.Id, nodeName: nodeName })">{{ container.Name }}</a></td>
+              <td
+                ><a ui-sref="docker.containers.container({ id: container.Id, nodeName: nodeName })">{{ container.Name }}</a></td
+              >
               <td>{{ container.IPv4Address || '-' }}</td>
               <td>{{ container.IPv6Address || '-' }}</td>
               <td>{{ container.MacAddress || '-' }}</td>
               <td authorization="DockerNetworkDisconnect">
-                <button type="button" class="btn btn-xs btn-danger" ng-click="containerLeaveNetwork(network, container)"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Leave Network</button>
+                <button type="button" class="btn btn-xs btn-danger" ng-click="containerLeaveNetwork(network, container)"
+                  ><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Leave Network</button
+                >
               </td>
             </tr>
           </tbody>

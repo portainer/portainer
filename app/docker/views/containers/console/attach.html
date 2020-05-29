@@ -1,7 +1,7 @@
 <rd-header>
   <rd-header-title title-text="Container console"></rd-header-title>
   <rd-header-content>
-    <a ui-sref="docker.containers">Containers</a> &gt; <a ui-sref="docker.containers.container({id: container.Id})">{{ container.Name|trimcontainername }}</a> &gt; Console
+    <a ui-sref="docker.containers">Containers</a> &gt; <a ui-sref="docker.containers.container({id: container.Id})">{{ container.Name | trimcontainername }}</a> &gt; Console
   </rd-header-content>
 </rd-header>
 
@@ -10,7 +10,6 @@
     <rd-widget>
       <rd-widget-header icon="fa-terminal" title-text="Attach"></rd-widget-header>
       <rd-widget-body>
-
         <div class="small text-warning" ng-if="!container.Config.OpenStdin">
           <p>
             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
@@ -32,12 +31,16 @@
           </p>
         </div>
 
-        <button type="button" class="btn btn-primary" ng-disabled="state === states.connecting || !container.State.Running" ng-click="state == states.disconnected ? connectAttach() : disconnect()">
+        <button
+          type="button"
+          class="btn btn-primary"
+          ng-disabled="state === states.connecting || !container.State.Running"
+          ng-click="state == states.disconnected ? connectAttach() : disconnect()"
+        >
           <span ng-show="state === states.disconnected">Attach to Container</span>
           <span ng-show="state === states.connected">Detach</span>
           <span ng-show="state === states.connecting">Attaching...</span>
         </button>
-
       </rd-widget-body>
     </rd-widget>
   </div>
