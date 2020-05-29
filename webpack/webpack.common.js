@@ -6,6 +6,7 @@ const CleanTerminalPlugin = require('clean-terminal-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
+const CompressionPlugin = require('compression-webpack-plugin');
 const pkg = require('../package.json');
 const projectRoot = path.resolve(__dirname, '..');
 
@@ -70,6 +71,7 @@ module.exports = {
       suppressSuccess: true,
     }),
     new CleanTerminalPlugin(),
+    new CompressionPlugin(),
     new ProvidePlugin({
       $: 'jquery',
       jQuery: 'jquery',

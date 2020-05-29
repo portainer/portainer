@@ -49,6 +49,7 @@ type (
 		NoAnalytics       *bool
 		Templates         *string
 		TemplateFile      *string
+		Compression       *bool
 		TLS               *bool
 		TLSSkipVerify     *bool
 		TLSCacert         *string

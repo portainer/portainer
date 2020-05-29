@@ -687,6 +687,7 @@ func main() {
 		SignatureService:        digitalSignatureService,
 		JobScheduler:            jobScheduler,
 		Snapshotter:             snapshotter,
+		Compression:             *flags.Compression,
 		SSL:                     *flags.SSL,
 		SSLCert:                 *flags.SSLCert,
 		SSLKey:                  *flags.SSLKey,

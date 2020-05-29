@@ -1,7 +1,10 @@
 package file
 
 import (
+	"github.com/lpar/gzipped/v2"
+
 	"net/http"
+	"path"
 	"strings"
 )
 
@@ -13,9 +16,19 @@ type Handler struct {
 // NewHandler creates a handler to serve static files.
 func NewHandler(assetPublicPath string) *Handler {
 	h := &Handler{
-		Handler: http.FileServer(http.Dir(assetPublicPath)),
+		Handler: withIndexHTML(gzipped.FileServer(gzipped.Dir(assetPublicPath))),
 	}
 	return h
+}
+
+func withIndexHTML(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasSuffix(r.URL.Path, "/") {
+			newpath := path.Join(r.URL.Path, "index.html")
+			r.URL.Path = newpath
+		}
+		h.ServeHTTP(w, r)
+	})
 }
 
 func isHTML(acceptContent []string) bool {
