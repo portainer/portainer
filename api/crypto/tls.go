@@ -11,6 +11,7 @@ import (
 func CreateTLSConfigurationFromBytes(caCert, cert, key []byte, skipClientVerification, skipServerVerification bool) (*tls.Config, error) {
 	config := &tls.Config{}
 	config.InsecureSkipVerify = skipServerVerification
+	config.MinVersion = tls.VersionTLS12
 
 	if !skipClientVerification {
 		certificate, err := tls.X509KeyPair(cert, key)
@@ -34,6 +35,7 @@ func CreateTLSConfigurationFromBytes(caCert, cert, key []byte, skipClientVerific
 func CreateTLSConfigurationFromDisk(caCertPath, certPath, keyPath string, skipServerVerification bool) (*tls.Config, error) {
 	config := &tls.Config{}
 	config.InsecureSkipVerify = skipServerVerification
+	config.MinVersion = tls.VersionTLS12
 
 	if certPath != "" && keyPath != "" {
 		cert, err := tls.LoadX509KeyPair(certPath, keyPath)
