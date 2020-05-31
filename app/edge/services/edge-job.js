@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-import { ScheduleCreateRequest, ScheduleUpdateRequest, ScriptExecutionTaskModel } from 'Portainer/models/schedule';
+import { ScheduleCreateRequest, ScheduleUpdateRequest } from 'Portainer/models/schedule';
 
 function EdgeJobService($q, EdgeJobs, FileUploadService) {
   var service = {};
@@ -25,10 +25,7 @@ function EdgeJobService($q, EdgeJobs, FileUploadService) {
   service.tasks = tasks;
   async function tasks(edgeJobId) {
     try {
-      const tasks = await EdgeJobs.tasks({ id: edgeJobId }).$promise;
-      return tasks.map(function (item) {
-        return new ScriptExecutionTaskModel(item);
-      });
+      return await EdgeJobs.tasks({ id: edgeJobId }).$promise;
     } catch (err) {
       throw { msg: 'Unable to retrieve tasks associated to the edgeJob', err: err };
     }

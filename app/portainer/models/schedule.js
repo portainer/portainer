@@ -1,13 +1,3 @@
-import { createStatus } from '../../docker/models/container';
-
-export function ScriptExecutionTaskModel(data) {
-  this.Id = data.Id;
-  this.EndpointId = data.EndpointId;
-  this.Status = createStatus(data.Status);
-  this.Created = data.Created;
-  this.Edge = data.Edge;
-}
-
 export function ScheduleCreateRequest(model) {
   this.Name = model.Name;
   this.Recurring = model.Recurring;
