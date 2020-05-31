@@ -16,11 +16,11 @@ type stackStatusResponse struct {
 }
 
 type edgeSchedule struct {
-	ID             portainer.EdgeJobID    `json:"Id"`
-	CronExpression string                 `json:"CronExpression"`
-	Script         string                 `json:"Script"`
-	Version        int                    `json:"Version"`
-	Endpoints      []portainer.EndpointID `json:"Endpoints"`
+	ID             portainer.EdgeJobID `json:"Id"`
+	CollectLogs    bool                `json:"CollectLogs"`
+	CronExpression string              `json:"CronExpression"`
+	Script         string              `json:"Script"`
+	Version        int                 `json:"Version"`
 }
 
 type endpointStatusInspectResponse struct {
@@ -79,7 +79,7 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 		schedule := edgeSchedule{
 			ID:             job.ID,
 			CronExpression: job.CronExpression,
-			Endpoints:      job.Endpoints,
+			CollectLogs:    job.Endpoints[endpoint.ID].CollectLogs,
 			Version:        job.Version,
 		}
 

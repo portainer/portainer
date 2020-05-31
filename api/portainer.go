@@ -119,18 +119,27 @@ type (
 
 	// EdgeJob represents a job that can run on Edge environments.
 	EdgeJob struct {
-		ID             EdgeJobID    `json:"Id"`
-		Created        int64        `json:"Created"`
-		CronExpression string       `json:"CronExpression"`
-		Endpoints      []EndpointID `json:"Endpoints"`
-		Name           string       `json:"Name"`
-		ScriptPath     string       `json:"Script"`
-		Recurring      bool         `json:"Recurring"`
-		Version        int          `json:"Version"`
+		ID             EdgeJobID                          `json:"Id"`
+		Created        int64                              `json:"Created"`
+		CronExpression string                             `json:"CronExpression"`
+		Endpoints      map[EndpointID]EdgeJobEndpointMeta `json:"Endpoints"`
+		Name           string                             `json:"Name"`
+		ScriptPath     string                             `json:"Script"`
+		Recurring      bool                               `json:"Recurring"`
+		Version        int                                `json:"Version"`
+	}
+
+	// EdgeJobEndpointMeta represents a meta data object for an Edge job and Endpoint relation
+	EdgeJobEndpointMeta struct {
+		LogsStatus  EdgeJobLogsStatus
+		CollectLogs bool
 	}
 
 	// EdgeJobID represents an Edge job identifier
 	EdgeJobID int
+
+	// EdgeJobLogsStatus represent status of logs collection job
+	EdgeJobLogsStatus int
 
 	// EdgeSchedule represents a scheduled job that can run on Edge environments.
 	// Deprecated in favor of EdgeJob
@@ -1059,6 +1068,16 @@ const (
 	AuthenticationLDAP
 	//AuthenticationOAuth represents the OAuth authentication method (authentication against a authorization server)
 	AuthenticationOAuth
+)
+
+const (
+	_ EdgeJobLogsStatus = iota
+	// EdgeJobLogsStatusIdle represents an idle log collection job
+	EdgeJobLogsStatusIdle
+	// EdgeJobLogsStatusPending represents a pending log collection job
+	EdgeJobLogsStatusPending
+	// EdgeJobLogsStatusCollected represents a completed log collection job
+	EdgeJobLogsStatusCollected
 )
 
 const (

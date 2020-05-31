@@ -45,11 +45,16 @@ func (m *Migrator) updateEdgeJobsToDBVersion24() error {
 			return err
 		}
 
+		endpoints := map[portainer.EndpointID]portainer.EdgeJobEndpointMeta{}
+		for _, endpointID := range schedule.EdgeSchedule.Endpoints {
+			endpoints[endpointID] = portainer.EdgeJobEndpointMeta{}
+		}
+
 		edgeJob := &portainer.EdgeJob{
 			ID:             portainer.EdgeJobID(id),
 			Created:        schedule.Created,
 			CronExpression: schedule.CronExpression,
-			Endpoints:      schedule.EdgeSchedule.Endpoints,
+			Endpoints:      endpoints,
 			Recurring:      schedule.Recurring,
 			Name:           schedule.Name,
 			Version:        schedule.EdgeSchedule.Version,

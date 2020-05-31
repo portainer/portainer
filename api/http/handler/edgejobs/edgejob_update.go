@@ -74,21 +74,26 @@ func (handler *Handler) updateEdgeSchedule(edgeJob *portainer.EdgeJob, payload *
 	}
 
 	if payload.Endpoints != nil {
+		endpointsMap := map[portainer.EndpointID]portainer.EdgeJobEndpointMeta{}
 
-		endpointIDs := make([]portainer.EndpointID, 0)
-
-		for _, ID := range payload.Endpoints {
-			endpoint, err := handler.DataStore.Endpoint().Endpoint(ID)
+		for _, endpointID := range payload.Endpoints {
+			endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointID)
 			if err != nil {
 				return err
 			}
 
-			if endpoint.Type == portainer.EdgeAgentEnvironment {
-				endpointIDs = append(endpointIDs, endpoint.ID)
+			if endpoint.Type != portainer.EdgeAgentEnvironment {
+				continue
+			}
+
+			if meta, ok := edgeJob.Endpoints[endpointID]; ok {
+				endpointsMap[endpointID] = meta
+			} else {
+				endpointsMap[endpointID] = portainer.EdgeJobEndpointMeta{}
 			}
 		}
 
-		edgeJob.Endpoints = endpointIDs
+		edgeJob.Endpoints = endpointsMap
 	}
 
 	updateVersion := false
@@ -115,7 +120,7 @@ func (handler *Handler) updateEdgeSchedule(edgeJob *portainer.EdgeJob, payload *
 		edgeJob.Version++
 	}
 
-	for _, endpointID := range edgeJob.Endpoints {
+	for endpointID := range edgeJob.Endpoints {
 		handler.ReverseTunnelService.AddEdgeJob(endpointID, edgeJob)
 	}
 

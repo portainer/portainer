@@ -122,7 +122,7 @@ func loadEdgeJobsFromDatabase(dataStore portainer.DataStore, reverseTunnelServic
 	}
 
 	for _, edgeJob := range edgeJobs {
-		for _, endpointID := range edgeJob.Endpoints {
+		for endpointID := range edgeJob.Endpoints {
 			reverseTunnelService.AddEdgeJob(endpointID, &edgeJob)
 		}
 	}
