@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"encoding/pem"
+	"fmt"
 	"io/ioutil"
 
 	"github.com/portainer/portainer/api"
@@ -419,4 +420,50 @@ func (service *Service) StoreEdgeJobFileFromBytes(identifier string, data []byte
 
 func createEdgeJobFileName(identifier string) string {
 	return "job_" + identifier + ".sh"
+}
+
+// ClearEdgeJobTaskLogs clears the Edge job task logs
+func (service *Service) ClearEdgeJobTaskLogs(edgeJobID string, taskID string) error {
+	path := service.getEdgeJobTaskLogPath(edgeJobID, taskID)
+
+	err := os.Remove(path)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// GetEdgeJobTaskLogFileContent fetches the Edge job task logs
+func (service *Service) GetEdgeJobTaskLogFileContent(edgeJobID string, taskID string) (string, error) {
+	path := service.getEdgeJobTaskLogPath(edgeJobID, taskID)
+
+	fileContent, err := ioutil.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+
+	return string(fileContent), nil
+}
+
+// StoreEdgeJobTaskLogFileFromBytes stores the log file
+func (service *Service) StoreEdgeJobTaskLogFileFromBytes(edgeJobID, taskID string, data []byte) error {
+	edgeJobStorePath := path.Join(EdgeJobStorePath, edgeJobID)
+	err := service.createDirectoryInStore(edgeJobStorePath)
+	if err != nil {
+		return err
+	}
+
+	filePath := service.getEdgeJobTaskLogPath(edgeJobID, taskID)
+	r := bytes.NewReader(data)
+	err = service.createFileInStore(filePath, r)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (service *Service) getEdgeJobTaskLogPath(edgeJobID string, taskID string) string {
+	return fmt.Sprintf("%s/logs_%s", service.GetEdgeJobFolder(edgeJobID), taskID)
 }

@@ -856,6 +856,9 @@ type (
 		FileExists(path string) (bool, error)
 		StoreEdgeJobFileFromBytes(identifier string, data []byte) (string, error)
 		GetEdgeJobFolder(identifier string) string
+		ClearEdgeJobTaskLogs(edgeJobID, taskID string) error
+		GetEdgeJobTaskLogFileContent(edgeJobID, taskID string) (string, error)
+		StoreEdgeJobTaskLogFileFromBytes(edgeJobID, taskID string, data []byte) error
 		ExtractExtensionArchive(data []byte) error
 		GetBinaryFolder() string
 	}
