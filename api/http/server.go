@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/portainer/portainer/api/http/handler/edgegroups"
+	"github.com/portainer/portainer/api/http/handler/edgejobtasks"
 	"github.com/portainer/portainer/api/http/handler/edgestacks"
 	"github.com/portainer/portainer/api/http/handler/edgetemplates"
 	"github.com/portainer/portainer/api/http/handler/endpointedge"
@@ -102,6 +103,10 @@ func (server *Server) Start() error {
 	edgeJobsHandler.DataStore = server.DataStore
 	edgeJobsHandler.FileService = server.FileService
 	edgeJobsHandler.ReverseTunnelService = server.ReverseTunnelService
+
+	var edgeJobTasksHandler = edgejobtasks.NewHandler(requestBouncer)
+	edgeJobTasksHandler.DataStore = server.DataStore
+	edgeJobTasksHandler.FileService = server.FileService
 
 	var edgeStacksHandler = edgestacks.NewHandler(requestBouncer)
 	edgeStacksHandler.DataStore = server.DataStore
@@ -205,6 +210,7 @@ func (server *Server) Start() error {
 		DockerHubHandler:       dockerHubHandler,
 		EdgeGroupsHandler:      edgeGroupsHandler,
 		EdgeJobsHandler:        edgeJobsHandler,
+		EdgeJobTasksHandler:    edgeJobTasksHandler,
 		EdgeStacksHandler:      edgeStacksHandler,
 		EdgeTemplatesHandler:   edgeTemplatesHandler,
 		EndpointGroupHandler:   endpointGroupHandler,

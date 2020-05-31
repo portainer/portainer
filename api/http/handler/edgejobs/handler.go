@@ -35,7 +35,5 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeJobDelete))).Methods(http.MethodDelete)
 	h.Handle("/edge_jobs/{id}/file",
 		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeJobFile))).Methods(http.MethodGet)
-	h.Handle("/edge_jobs/{id}/tasks",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeJobTasks))).Methods(http.MethodGet)
 	return h
 }
