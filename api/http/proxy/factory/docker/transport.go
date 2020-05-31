@@ -264,14 +264,7 @@ func (transport *Transport) proxyVolumeRequest(request *http.Request) (*http.Res
 
 	default:
 		// assume /volumes/{name}
-		volumeID := path.Base(requestPath)
-
-		if request.Method == http.MethodGet {
-			return transport.rewriteOperation(request, transport.volumeInspectOperation)
-		} else if request.Method == http.MethodDelete {
-			return transport.executeGenericResourceDeletionOperation(request, volumeID, portainer.VolumeResourceControl)
-		}
-		return transport.restrictedResourceOperation(request, volumeID, portainer.VolumeResourceControl, false)
+		return transport.volumeDetailOperation(requestPath, request)
 	}
 }
 
