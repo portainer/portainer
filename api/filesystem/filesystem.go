@@ -454,7 +454,7 @@ func (service *Service) StoreEdgeJobTaskLogFileFromBytes(edgeJobID, taskID strin
 		return err
 	}
 
-	filePath := service.getEdgeJobTaskLogPath(edgeJobID, taskID)
+	filePath := path.Join(edgeJobStorePath, fmt.Sprintf("logs_%s", taskID))
 	r := bytes.NewReader(data)
 	err = service.createFileInStore(filePath, r)
 	if err != nil {
