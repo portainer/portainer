@@ -10,6 +10,11 @@ import (
 	"github.com/portainer/libhttp/request"
 )
 
+type edgeJobInspectResponse struct {
+	*portainer.EdgeJob
+	Endpoints []portainer.EndpointID
+}
+
 func (handler *Handler) edgeJobInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
@@ -32,5 +37,16 @@ func (handler *Handler) edgeJobInspect(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an Edge job with the specified identifier inside the database", err}
 	}
 
-	return response.JSON(w, edgeJob)
+	endpointIDs := []portainer.EndpointID{}
+
+	for endpointID := range edgeJob.Endpoints {
+		endpointIDs = append(endpointIDs, endpointID)
+	}
+
+	responseObj := edgeJobInspectResponse{
+		EdgeJob:   edgeJob,
+		Endpoints: endpointIDs,
+	}
+
+	return response.JSON(w, responseObj)
 }
