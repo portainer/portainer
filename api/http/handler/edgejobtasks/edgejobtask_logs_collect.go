@@ -39,10 +39,12 @@ func (handler *Handler) edgeJobTasksCollect(w http.ResponseWriter, r *http.Reque
 
 	endpointID := portainer.EndpointID(taskID)
 
-	edgeJob.Endpoints[endpointID] = portainer.EdgeJobEndpointMeta{
-		CollectLogs: true,
-		LogsStatus:  portainer.EdgeJobLogsStatusPending,
-	}
+	meta := edgeJob.Endpoints[endpointID]
+	meta.CollectLogs = true
+	meta.LogsStatus = portainer.EdgeJobLogsStatusPending
+	edgeJob.Endpoints[endpointID] = meta
+
+	handler.ReverseTunnelService.AddEdgeJob(endpointID, edgeJob)
 
 	err = handler.DataStore.EdgeJob().UpdateEdgeJob(edgeJob.ID, edgeJob)
 	if err != nil {

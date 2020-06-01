@@ -40,15 +40,17 @@ func (handler *Handler) edgeJobTasksClear(w http.ResponseWriter, r *http.Request
 
 	endpointID := portainer.EndpointID(taskID)
 
-	edgeJob.Endpoints[endpointID] = portainer.EdgeJobEndpointMeta{
-		CollectLogs: false,
-		LogsStatus:  portainer.EdgeJobLogsStatusIdle,
-	}
+	meta := edgeJob.Endpoints[endpointID]
+	meta.CollectLogs = false
+	meta.LogsStatus = portainer.EdgeJobLogsStatusIdle
+	edgeJob.Endpoints[endpointID] = meta
 
 	err = handler.FileService.ClearEdgeJobTaskLogs(strconv.Itoa(edgeJobID), strconv.Itoa(taskID))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to clear log file from disk", err}
 	}
+
+	handler.ReverseTunnelService.AddEdgeJob(endpointID, edgeJob)
 
 	err = handler.DataStore.EdgeJob().UpdateEdgeJob(edgeJob.ID, edgeJob)
 	if err != nil {

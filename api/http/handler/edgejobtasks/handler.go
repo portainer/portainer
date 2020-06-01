@@ -12,8 +12,9 @@ import (
 // Handler is the HTTP handler used to handle Edge job operations.
 type Handler struct {
 	*mux.Router
-	DataStore   portainer.DataStore
-	FileService portainer.FileService
+	DataStore            portainer.DataStore
+	FileService          portainer.FileService
+	ReverseTunnelService portainer.ReverseTunnelService
 }
 
 // NewHandler creates a handler to manage Edge job operations.
