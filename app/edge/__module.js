@@ -73,7 +73,7 @@ angular.module('portainer.edge', []).config(function config($stateRegistryProvid
 
   const edgeJobs = {
     name: 'edge.jobs',
-    url: '/edgeJobs',
+    url: '/jobs',
     views: {
       'content@': {
         component: 'edgeJobsView',
