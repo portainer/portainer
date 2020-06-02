@@ -89,6 +89,9 @@ angular.module('portainer.edge', []).config(function config($stateRegistryProvid
         component: 'edgeJobView',
       },
     },
+    params: {
+      tab: 0,
+    },
   };
 
   const edgeJobCreation = {

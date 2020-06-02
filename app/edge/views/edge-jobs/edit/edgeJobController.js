@@ -99,7 +99,8 @@ class EdgeJobController {
   }
 
   async $onInit() {
-    const { id } = this.$state.params;
+    const { id, tab } = this.$state.params;
+    this.state.activeTab = tab;
     try {
       const [edgeJob, file, tasks, groups, tags] = await Promise.all([
         this.EdgeJobService.edgeJob(id),
