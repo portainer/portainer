@@ -50,7 +50,9 @@
               table-key="edge-job-tasks"
               order-by="Status"
               reverse-order="true"
-              get-task-logs="$ctrl.getTaskLogs"
+              on-download-logs-click="($ctrl.downloadLogs)"
+              on-collect-logs-click="($ctrl.collectLogs)"
+              on-clear-logs-click="($ctrl.clearLogs)"
             ></edge-job-tasks-datatable>
           </uib-tab>
         </uib-tabset>

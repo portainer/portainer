@@ -8,6 +8,8 @@ angular.module('portainer.edge').component('edgeJobTasksDatatable', {
     tableKey: '@',
     orderBy: '@',
     reverseOrder: '<',
-    getTaskLogs: '<',
+    onDownloadLogsClick: '<',
+    onCollectLogsClick: '<',
+    onClearLogsClick: '<',
   },
 });

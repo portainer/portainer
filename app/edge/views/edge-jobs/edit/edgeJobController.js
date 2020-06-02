@@ -2,7 +2,7 @@ import angular from 'angular';
 import _ from 'lodash-es';
 
 class EdgeJobController {
-  constructor($async, $q, $state, EdgeJobService, EndpointProvider, EndpointService, FileSaver, GroupService, HostBrowserService, Notifications, TagService) {
+  constructor($async, $q, $state, EdgeJobService, EndpointService, FileSaver, GroupService, HostBrowserService, Notifications, TagService) {
     this.state = {
       actionInProgress: false,
     };
@@ -11,7 +11,6 @@ class EdgeJobController {
     this.$q = $q;
     this.$state = $state;
     this.EdgeJobService = EdgeJobService;
-    this.EndpointProvider = EndpointProvider;
     this.EndpointService = EndpointService;
     this.FileSaver = FileSaver;
     this.GroupService = GroupService;
@@ -21,8 +20,12 @@ class EdgeJobController {
 
     this.update = this.update.bind(this);
     this.updateAsync = this.updateAsync.bind(this);
-    this.getTaskLogs = this.getTaskLogs.bind(this);
-    this.getTaskLogsAsync = this.getTaskLogsAsync.bind(this);
+    this.downloadLogs = this.downloadLogs.bind(this);
+    this.downloadLogsAsync = this.downloadLogsAsync.bind(this);
+    this.collectLogs = this.collectLogs.bind(this);
+    this.collectLogsAsync = this.collectLogsAsync.bind(this);
+    this.clearLogs = this.clearLogs.bind(this);
+    this.clearLogsAsync = this.clearLogsAsync.bind(this);
   }
 
   update() {
@@ -44,27 +47,20 @@ class EdgeJobController {
     this.state.actionInProgress = false;
   }
 
-  getTaskLogs(endpointId, edgeJob) {
-    return this.$async(this.getTaskLogsAsync, endpointId, edgeJob);
+  downloadLogs(endpointId) {
+    return this.$async(this.downloadLogsAsync, endpointId);
   }
-
-  async getTaskLogsAsync(endpointId, edgeJob) {
-    const currentId = this.EndpointProvider.endpointID();
-    this.EndpointProvider.setEndpointID(endpointId);
-    const logFileName = `${edgeJob}.log`;
-    const filePath = `/host/opt/portainer/scripts/${logFileName}`;
-
+  async downloadLogsAsync(endpointId) {
     try {
-      const data = await this.HostBrowserService.get(filePath);
-      const downloadData = new Blob([data.file], {
+      const data = await this.EdgeJobService.logFile(this.edgeJob.Id, endpointId);
+      const downloadData = new Blob([data.FileContent], {
         type: 'text/plain;charset=utf-8',
       });
+      const logFileName = `job_${this.edgeJob.Id}_task_${endpointId}.log`;
       this.FileSaver.saveAs(downloadData, logFileName);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to download file');
     }
-
-    this.EndpointProvider.setEndpointID(currentId);
   }
 
   associateEndpointsToTasks(tasks, endpoints) {
@@ -73,6 +69,33 @@ class EdgeJobController {
       task.Endpoint = endpoint;
       return task;
     });
+  }
+
+  collectLogs(endpointId) {
+    return this.$async(this.collectLogsAsync, endpointId);
+  }
+
+  async collectLogsAsync(endpointId) {
+    try {
+      await this.EdgeJobService.collectLogs(this.edgeJob.Id, endpointId);
+      const task = _.find(this.tasks, (task) => task.EndpointId === endpointId);
+      task.LogsStatus = 2;
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to collect logs');
+    }
+  }
+
+  clearLogs(endpointId) {
+    return this.$async(this.clearLogsAsync, endpointId);
+  }
+  async clearLogsAsync(endpointId) {
+    try {
+      await this.EdgeJobService.clearLogs(this.edgeJob.Id, endpointId);
+      const task = _.find(this.tasks, (task) => task.EndpointId === endpointId);
+      task.LogsStatus = 1;
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to clear logs');
+    }
   }
 
   async $onInit() {

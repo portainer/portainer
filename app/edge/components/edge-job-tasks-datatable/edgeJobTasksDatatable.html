@@ -25,25 +25,7 @@
                     </a>
                   </th>
                   <th>
-                    <a ng-click="$ctrl.changeOrderBy('Id')">
-                      Id
-                      <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Id' && !$ctrl.state.reverseOrder"></i>
-                      <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Id' && $ctrl.state.reverseOrder"></i>
-                    </a>
-                  </th>
-                  <th>
-                    <a ng-click="$ctrl.changeOrderBy('Status')">
-                      State
-                      <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status' && !$ctrl.state.reverseOrder"></i>
-                      <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Status' && $ctrl.state.reverseOrder"></i>
-                    </a>
-                  </th>
-                  <th>
-                    <a ng-click="$ctrl.changeOrderBy('Created')">
-                      <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Created' && !$ctrl.state.reverseOrder"></i>
-                      <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Created' && $ctrl.state.reverseOrder"></i>
-                      Created
-                    </a>
+                    Actions
                   </th>
                 </tr>
               </thead>
@@ -53,18 +35,17 @@
                 >
                   <td>
                     {{ item.Endpoint.Name }}
-                    <a ng-click="$ctrl.getTaskLogs(item.EndpointId, item.Id)">
-                      <i class="fa fa-download" aria-hidden="true" style="margin-left: 5px; margin-right: 2px;"></i> Download logs
-                    </a>
                   </td>
                   <td>
-                    <span>-</span>
-                  </td>
-                  <td>
-                    <span>-</span>
-                  </td>
-                  <td>
-                    <span>-</span>
+                    <button ng-if="item.LogsStatus === 0 || item.LogsStatus === 1" class="btn btn-sm btn-primary" ng-click="$ctrl.onCollectLogsClick(item.EndpointId)">
+                      Retrieve logs
+                    </button>
+                    <button ng-if="item.LogsStatus === 3" class="btn btn-sm btn-primary" ng-click="$ctrl.onDownloadLogsClick(item.EndpointId)">
+                      Download logs
+                    </button>
+                    <button ng-if="item.LogsStatus === 3" class="btn btn-sm btn-primary" ng-click="$ctrl.onClearLogsClick(item.EndpointId)">
+                      Clear logs
+                    </button>
                   </td>
                 </tr>
                 <tr ng-if="!$ctrl.dataset">
