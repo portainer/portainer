@@ -30,19 +30,8 @@
           <uib-tab index="1">
             <uib-tab-heading> <i class="fa fa-tasks" aria-hidden="true"></i> Tasks </uib-tab-heading>
 
-            <div class="col-sm-12 form-section-title">
-              Information
-            </div>
-            <div class="form-group">
-              <span class="col-sm-12 text-muted small">
-                Tasks are retrieved across all endpoints via snapshots. Data available in this view might not be up-to-date.
-              </span>
-            </div>
-
-            <div class="col-sm-12 form-section-title" style="margin-bottom: 20px;">
-              Tasks
-            </div>
             <edge-job-tasks-datatable
+              style="display: block; margin-top: 10px;"
               ng-if="$ctrl.tasks"
               title-text="Tasks"
               title-icon="fa-tasks"
