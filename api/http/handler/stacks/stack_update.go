@@ -59,11 +59,12 @@ func (handler *Handler) stackUpdate(w http.ResponseWriter, r *http.Request) *htt
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: endpointId", err}
 	}
-	if endpointID != int(stack.EndpointID) {
-		stack.EndpointID = portainer.EndpointID(endpointID)
+	endpointIdentifier := stack.EndpointID
+	if endpointID != 0 {
+		endpointIdentifier = portainer.EndpointID(endpointID)
 	}
 
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(stack.EndpointID)
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointIdentifier)
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the endpoint associated to the stack inside the database", err}
 	} else if err != nil {

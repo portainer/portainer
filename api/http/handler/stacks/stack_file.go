@@ -15,7 +15,7 @@ type stackFileResponse struct {
 	StackFileContent string `json:"StackFileContent"`
 }
 
-// GET request on /api/stacks/:id/file
+// GET request on /api/stacks/:id/file?endpointId=<endpointId>
 func (handler *Handler) stackFile(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	stackID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
@@ -29,7 +29,16 @@ func (handler *Handler) stackFile(w http.ResponseWriter, r *http.Request) *httpe
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a stack with the specified identifier inside the database", err}
 	}
 
-	endpoint, err := handler.DataStore.Endpoint().Endpoint(stack.EndpointID)
+	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", true)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: endpointId", err}
+	}
+	endpointIdentifier := stack.EndpointID
+	if endpointID != 0 {
+		endpointIdentifier = portainer.EndpointID(endpointID)
+	}
+
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointIdentifier)
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {

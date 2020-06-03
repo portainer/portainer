@@ -199,7 +199,7 @@ angular.module('portainer.app').controller('StackController', [
         });
 
       $q.all({
-        stack: StackService.stack(id),
+        stack: StackService.stack(id, EndpointProvider.endpointID()),
         groups: GroupService.groups(),
       })
         .then(function success(data) {
@@ -208,7 +208,7 @@ angular.module('portainer.app').controller('StackController', [
           $scope.stack = stack;
 
           return $q.all({
-            stackFile: StackService.getStackFile(id),
+            stackFile: StackService.getStackFile(id, EndpointProvider.endpointID()),
             resources: stack.Type === 1 ? retrieveSwarmStackResources(stack.Name, agentProxy) : retrieveComposeStackResources(stack.Name),
           });
         })
