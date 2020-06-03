@@ -1,4 +1,4 @@
-import '../assets/css';
+import './assets/css';
 import angular from 'angular';
 
 import './agent/_module';
