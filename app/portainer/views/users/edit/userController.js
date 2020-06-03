@@ -14,6 +14,7 @@ angular.module('portainer.app').controller('UserController', [
     };
 
     $scope.formValues = {
+      username: '',
       newPassword: '',
       confirmPassword: '',
       Administrator: false,
@@ -28,12 +29,13 @@ angular.module('portainer.app').controller('UserController', [
       });
     };
 
-    $scope.updatePermissions = function () {
-      var role = $scope.formValues.Administrator ? 1 : 2;
-      UserService.updateUser($scope.user.Id, undefined, role, 0)
+    $scope.updateUser = function () {
+      const role = $scope.formValues.Administrator ? 1 : 2;
+      const username = $scope.formValues.username;
+      UserService.updateUser($scope.user.Id, { role, username })
         .then(function success() {
-          var newRole = role === 1 ? 'administrator' : 'user';
-          Notifications.success('Permissions successfully updated', $scope.user.Username + ' is now ' + newRole);
+          const newRole = role === 1 ? 'administrator' : 'user';
+          Notifications.success('User successfully updated', `${username} is now ${newRole}`);
           $state.reload();
         })
         .catch(function error(err) {
@@ -42,7 +44,7 @@ angular.module('portainer.app').controller('UserController', [
     };
 
     $scope.updatePassword = function () {
-      UserService.updateUser($scope.user.Id, $scope.formValues.newPassword, undefined, -1)
+      UserService.updateUser($scope.user.Id, { password: $scope.formValues.newPassword })
         .then(function success() {
           Notifications.success('Password successfully updated');
           $state.reload();
@@ -74,6 +76,7 @@ angular.module('portainer.app').controller('UserController', [
           var user = data.user;
           $scope.user = user;
           $scope.formValues.Administrator = user.Role === 1;
+          $scope.formValues.username = user.Username;
           $scope.AuthenticationMethod = data.settings.AuthenticationMethod;
         })
         .catch(function error(err) {
