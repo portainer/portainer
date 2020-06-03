@@ -47,7 +47,6 @@ import (
 type Server struct {
 	BindAddress          string
 	AssetsPath           string
-	AuthDisabled         bool
 	Status               *portainer.Status
 	ReverseTunnelService portainer.ReverseTunnelService
 	ExtensionManager     portainer.ExtensionManager
@@ -77,11 +76,11 @@ func (server *Server) Start() error {
 	authorizationService := portainer.NewAuthorizationService(server.DataStore)
 
 	rbacExtensionURL := proxyManager.GetExtensionURL(portainer.RBACExtension)
-	requestBouncer := security.NewRequestBouncer(server.DataStore, server.JWTService, server.AuthDisabled, rbacExtensionURL)
+	requestBouncer := security.NewRequestBouncer(server.DataStore, server.JWTService, rbacExtensionURL)
 
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
 
-	var authHandler = auth.NewHandler(requestBouncer, rateLimiter, server.AuthDisabled)
+	var authHandler = auth.NewHandler(requestBouncer, rateLimiter)
 	authHandler.DataStore = server.DataStore
 	authHandler.CryptoService = server.CryptoService
 	authHandler.JWTService = server.JWTService

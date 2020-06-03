@@ -32,10 +32,6 @@ func (payload *authenticatePayload) Validate(r *http.Request) error {
 }
 
 func (handler *Handler) authenticate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	if handler.authDisabled {
-		return &httperror.HandlerError{http.StatusServiceUnavailable, "Cannot authenticate user. Portainer was started with the --no-auth flag", ErrAuthDisabled}
-	}
-
 	var payload authenticatePayload
 	err := request.DecodeAndValidateJSONPayload(r, &payload)
 	if err != nil {
@@ -58,20 +54,20 @@ func (handler *Handler) authenticate(w http.ResponseWriter, r *http.Request) *ht
 
 	if settings.AuthenticationMethod == portainer.AuthenticationLDAP {
 		if u == nil && settings.LDAPSettings.AutoCreateUsers {
-			return handler.authenticateLDAPAndCreateUser(w, payload.Username, payload.Password, &settings.LDAPSettings, settings.UserSessionTimeout)
+			return handler.authenticateLDAPAndCreateUser(w, payload.Username, payload.Password, &settings.LDAPSettings)
 		} else if u == nil && !settings.LDAPSettings.AutoCreateUsers {
 			return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid credentials", portainer.ErrUnauthorized}
 		}
-		return handler.authenticateLDAP(w, u, payload.Password, &settings.LDAPSettings, settings.UserSessionTimeout)
+		return handler.authenticateLDAP(w, u, payload.Password, &settings.LDAPSettings)
 	}
 
-	return handler.authenticateInternal(w, u, payload.Password, settings.UserSessionTimeout)
+	return handler.authenticateInternal(w, u, payload.Password)
 }
 
-func (handler *Handler) authenticateLDAP(w http.ResponseWriter, user *portainer.User, password string, ldapSettings *portainer.LDAPSettings, userSessionTimeout string) *httperror.HandlerError {
+func (handler *Handler) authenticateLDAP(w http.ResponseWriter, user *portainer.User, password string, ldapSettings *portainer.LDAPSettings) *httperror.HandlerError {
 	err := handler.LDAPService.AuthenticateUser(user.Username, password, ldapSettings)
 	if err != nil {
-		return handler.authenticateInternal(w, user, password, userSessionTimeout)
+		return handler.authenticateInternal(w, user, password)
 	}
 
 	err = handler.addUserIntoTeams(user, ldapSettings)
@@ -84,19 +80,19 @@ func (handler *Handler) authenticateLDAP(w http.ResponseWriter, user *portainer.
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
 	}
 
-	return handler.writeToken(w, user, userSessionTimeout)
+	return handler.writeToken(w, user)
 }
 
-func (handler *Handler) authenticateInternal(w http.ResponseWriter, user *portainer.User, password, userSessionTimeout string) *httperror.HandlerError {
+func (handler *Handler) authenticateInternal(w http.ResponseWriter, user *portainer.User, password string) *httperror.HandlerError {
 	err := handler.CryptoService.CompareHashAndData(user.Password, password)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid credentials", portainer.ErrUnauthorized}
 	}
 
-	return handler.writeToken(w, user, userSessionTimeout)
+	return handler.writeToken(w, user)
 }
 
-func (handler *Handler) authenticateLDAPAndCreateUser(w http.ResponseWriter, username, password string, ldapSettings *portainer.LDAPSettings, userSessionTimeout string) *httperror.HandlerError {
+func (handler *Handler) authenticateLDAPAndCreateUser(w http.ResponseWriter, username, password string, ldapSettings *portainer.LDAPSettings) *httperror.HandlerError {
 	err := handler.LDAPService.AuthenticateUser(username, password, ldapSettings)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid credentials", err}
@@ -123,25 +119,21 @@ func (handler *Handler) authenticateLDAPAndCreateUser(w http.ResponseWriter, use
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
 	}
 
-	return handler.writeToken(w, user, userSessionTimeout)
+	return handler.writeToken(w, user)
 }
 
-func (handler *Handler) writeToken(w http.ResponseWriter, user *portainer.User, userSessionTimeout string) *httperror.HandlerError {
-	if userSessionTimeout == "" {
-		userSessionTimeout = portainer.DefaultUserSessionTimeout
-	}
-
+func (handler *Handler) writeToken(w http.ResponseWriter, user *portainer.User) *httperror.HandlerError {
 	tokenData := &portainer.TokenData{
 		ID:       user.ID,
 		Username: user.Username,
 		Role:     user.Role,
 	}
 
-	return handler.persistAndWriteToken(w, tokenData, userSessionTimeout)
+	return handler.persistAndWriteToken(w, tokenData)
 }
 
-func (handler *Handler) persistAndWriteToken(w http.ResponseWriter, tokenData *portainer.TokenData, userSessionTimeout string) *httperror.HandlerError {
-	token, err := handler.JWTService.GenerateToken(tokenData, userSessionTimeout)
+func (handler *Handler) persistAndWriteToken(w http.ResponseWriter, tokenData *portainer.TokenData) *httperror.HandlerError {
+	token, err := handler.JWTService.GenerateToken(tokenData)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to generate JWT token", err}
 	}

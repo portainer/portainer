@@ -77,8 +77,18 @@ func initSwarmStackManager(assetsPath string, dataStorePath string, signatureSer
 	return exec.NewSwarmStackManager(assetsPath, dataStorePath, signatureService, fileService, reverseTunnelService)
 }
 
-func initJWTService() portainer.JWTService {
-	jwtService, err := jwt.NewService()
+func initJWTService(dataStore portainer.DataStore) portainer.JWTService {
+	settings, err := dataStore.Settings().Settings()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	userSessionTimeout := settings.UserSessionTimeout
+	if userSessionTimeout == "" {
+		userSessionTimeout = portainer.DefaultUserSessionTimeout
+	}
+
+	jwtService, err := jwt.NewService(userSessionTimeout)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -185,9 +195,8 @@ func loadSchedulesFromDatabase(jobScheduler portainer.JobScheduler, jobService p
 
 func initStatus(flags *portainer.CLIFlags) *portainer.Status {
 	return &portainer.Status{
-		Analytics:      !*flags.NoAnalytics,
-		Authentication: true,
-		Version:        portainer.APIVersion,
+		Analytics: !*flags.NoAnalytics,
+		Version:   portainer.APIVersion,
 	}
 }
 
@@ -389,7 +398,7 @@ func main() {
 	dataStore := initDataStore(*flags.Data, fileService)
 	defer dataStore.Close()
 
-	jwtService := initJWTService()
+	jwtService := initJWTService(dataStore)
 
 	ldapService := initLDAPService()
 
@@ -501,7 +510,6 @@ func main() {
 		Status:               applicationStatus,
 		BindAddress:          *flags.Addr,
 		AssetsPath:           *flags.Assets,
-		AuthDisabled:         false,
 		DataStore:            dataStore,
 		SwarmStackManager:    swarmStackManager,
 		ComposeStackManager:  composeStackManager,
