@@ -60,16 +60,16 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 
 	tunnel := handler.ReverseTunnelService.GetTunnelDetails(endpoint.ID)
 
-	checkinInteval := settings.EdgeAgentCheckinInterval
-	if endpoint.CheckinInterval != 0 {
-		checkinInteval = endpoint.CheckinInterval
+	checkinInterval := settings.EdgeAgentCheckinInterval
+	if endpoint.EdgeCheckinInterval != 0 {
+		checkinInterval = endpoint.EdgeCheckinInterval
 	}
 
 	statusResponse := endpointStatusInspectResponse{
 		Status:          tunnel.Status,
 		Port:            tunnel.Port,
 		Schedules:       tunnel.Schedules,
-		CheckinInterval: checkinInteval,
+		CheckinInterval: checkinInterval,
 		Credentials:     tunnel.Credentials,
 	}
 

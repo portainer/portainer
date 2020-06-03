@@ -102,7 +102,7 @@ angular
         PublicURL: endpoint.PublicURL,
         GroupID: endpoint.GroupId,
         TagIds: endpoint.TagIds,
-        CheckinInterval: endpoint.CheckinInterval,
+        EdgeCheckinInterval: endpoint.EdgeCheckinInterval,
         TLS: TLS,
         TLSSkipVerify: TLSSkipVerify,
         TLSSkipClientVerify: TLSSkipClientVerify,

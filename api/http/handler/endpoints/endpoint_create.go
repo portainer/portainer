@@ -30,7 +30,7 @@ type endpointCreatePayload struct {
 	TLSCertFile         []byte
 	TLSKeyFile          []byte
 	TagIDs              []portainer.TagID
-	CheckinInteval      int
+	EdgeCheckinInterval int
 }
 
 func (payload *endpointCreatePayload) Validate(r *http.Request) error {
@@ -103,8 +103,8 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 	publicURL, _ := request.RetrieveMultiPartFormValue(r, "PublicURL", true)
 	payload.PublicURL = publicURL
 
-	checkinInteval, _ := request.RetrieveNumericMultiPartFormValue(r, "CheckinInterval", true)
-	payload.CheckinInteval = checkinInteval
+	checkinInterval, _ := request.RetrieveNumericMultiPartFormValue(r, "CheckinInterval", true)
+	payload.EdgeCheckinInterval = checkinInterval
 
 	return nil
 }
@@ -197,14 +197,14 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		TLSConfig: portainer.TLSConfiguration{
 			TLS: false,
 		},
-		AuthorizedUsers: []portainer.UserID{},
-		AuthorizedTeams: []portainer.TeamID{},
-		Extensions:      []portainer.EndpointExtension{},
-		TagIDs:          payload.TagIDs,
-		Status:          portainer.EndpointStatusUp,
-		Snapshots:       []portainer.Snapshot{},
-		EdgeKey:         edgeKey,
-		CheckinInterval: payload.CheckinInteval,
+		AuthorizedUsers:     []portainer.UserID{},
+		AuthorizedTeams:     []portainer.TeamID{},
+		Extensions:          []portainer.EndpointExtension{},
+		TagIDs:              payload.TagIDs,
+		Status:              portainer.EndpointStatusUp,
+		Snapshots:           []portainer.Snapshot{},
+		EdgeKey:             edgeKey,
+		EdgeCheckinInterval: payload.EdgeCheckinInterval,
 	}
 
 	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
