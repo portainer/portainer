@@ -83,12 +83,7 @@ func initJWTService(dataStore portainer.DataStore) portainer.JWTService {
 		log.Fatal(err)
 	}
 
-	userSessionTimeout := settings.UserSessionTimeout
-	if userSessionTimeout == "" {
-		userSessionTimeout = portainer.DefaultUserSessionTimeout
-	}
-
-	jwtService, err := jwt.NewService(userSessionTimeout)
+	jwtService, err := jwt.NewService(settings.UserSessionTimeout)
 	if err != nil {
 		log.Fatal(err)
 	}
