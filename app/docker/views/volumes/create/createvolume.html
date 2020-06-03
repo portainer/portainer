@@ -72,9 +72,7 @@
               <input type="checkbox" name="useNFS" ng-model="formValues.NFSData.useNFS" ng-click="formValues.CIFSData.useCIFS = false" />
               <i></i>
             </label>
-            <div ng-if="formValues.NFSData.useNFS" class="small text-muted" style="margin-top: 10px;">
-              Ensure <code>nfs-utils</code> are installed on your hosts.
-            </div>
+            <div ng-if="formValues.NFSData.useNFS" class="small text-muted" style="margin-top: 10px;"> Ensure <code>nfs-utils</code> are installed on your hosts. </div>
           </div>
           <volumes-nfs-form data="formValues.NFSData" ng-show="formValues.Driver === 'local'"></volumes-nfs-form>
           <!-- !nfs-management -->
@@ -87,9 +85,7 @@
               <input type="checkbox" name="useCIFS" ng-model="formValues.CIFSData.useCIFS" ng-click="formValues.NFSData.useNFS = false" />
               <i></i>
             </label>
-            <div ng-if="formValues.CIFSData.useCIFS" class="small text-muted" style="margin-top: 10px;">
-              Ensure <code>cifs-utils</code> are installed on your hosts.
-            </div>
+            <div ng-if="formValues.CIFSData.useCIFS" class="small text-muted" style="margin-top: 10px;"> Ensure <code>cifs-utils</code> are installed on your hosts. </div>
           </div>
           <volumes-cifs-form data="formValues.CIFSData" ng-show="formValues.Driver === 'local'"></volumes-cifs-form>
           <!-- !cifs-management -->
@@ -110,7 +106,7 @@
             <!-- !node-selection -->
           </div>
           <!-- access-control -->
-          <por-access-control-form form-data="formValues.AccessControlData" ng-if="applicationState.application.authentication"></por-access-control-form>
+          <por-access-control-form form-data="formValues.AccessControlData"></por-access-control-form>
           <!-- !access-control -->
           <!-- actions -->
           <div class="col-sm-12 form-section-title">

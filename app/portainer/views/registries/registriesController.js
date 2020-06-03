@@ -81,10 +81,7 @@ angular.module('portainer.app').controller('RegistriesController', [
           $scope.registries = data.registries;
           $scope.dockerhub = data.dockerhub;
           $scope.registryManagementAvailable = data.registryManagement;
-          var authenticationEnabled = $scope.applicationState.application.authentication;
-          if (authenticationEnabled) {
-            $scope.isAdmin = Authentication.isAdmin();
-          }
+          $scope.isAdmin = Authentication.isAdmin();
         })
         .catch(function error(err) {
           $scope.registries = [];

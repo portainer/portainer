@@ -99,7 +99,6 @@
               <td colspan="2">
                 <p class="small text-muted" authorization="DockerServiceUpdate">
                   Note: you can only rollback one level of changes. Clicking the rollback button without making a new change will undo your previous rollback </p
-
                 ><p>
                   <a
                     authorization="DockerServiceLogs"
@@ -199,13 +198,7 @@
 </div>
 
 <!-- access-control-panel -->
-<por-access-control-panel
-  ng-if="service && applicationState.application.authentication"
-  resource-id="service.Id"
-  resource-control="service.ResourceControl"
-  resource-type="'service'"
->
-</por-access-control-panel>
+<por-access-control-panel ng-if="service" resource-id="service.Id" resource-control="service.ResourceControl" resource-type="'service'"> </por-access-control-panel>
 <!-- !access-control-panel -->
 
 <div class="row">

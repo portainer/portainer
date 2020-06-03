@@ -28,7 +28,7 @@
 <td>{{ item.IPAM.IPV6Configs[0].Subnet ? item.IPAM.IPV6Configs[0].Subnet : '-' }}</td>
 <td>{{ item.IPAM.IPV6Configs[0].Gateway ? item.IPAM.IPV6Configs[0].Gateway : '-' }}</td>
 <td ng-if="parentCtrl.showHostColumn">{{ item.NodeName ? item.NodeName : '-' }}</td>
-<td ng-if="parentCtrl.showOwnershipColumn">
+<td>
   <span>
     <i ng-class="item.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
     {{ item.ResourceControl.Ownership ? item.ResourceControl.Ownership : item.ResourceControl.Ownership = RCO.ADMINISTRATORS }}

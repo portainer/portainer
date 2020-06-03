@@ -42,10 +42,7 @@ angular.module('portainer.extensions.registrymanagement').controller('RegistryRe
     function initView() {
       const registryId = $transition$.params().id;
 
-      var authenticationEnabled = $scope.applicationState.application.authentication;
-      if (authenticationEnabled) {
-        $scope.isAdmin = Authentication.isAdmin();
-      }
+      $scope.isAdmin = Authentication.isAdmin();
 
       RegistryService.registry(registryId)
         .then(function success(data) {
