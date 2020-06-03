@@ -65,6 +65,11 @@ class KubernetesApplicationConverter {
         }
       }
       res.PublishedPorts = service.spec.ports;
+      _.forEach(res.PublishedPorts, (publishedPort) => {
+        if (isNaN(publishedPort.targetPort)) {
+          publishedPort.targetPort = _.find(res.PublishedPorts, {'name': publishedPort.targetPort}).port;
+        }
+      })
     }
 
     res.Volumes = data.spec.template.spec.volumes ? data.spec.template.spec.volumes : [];
