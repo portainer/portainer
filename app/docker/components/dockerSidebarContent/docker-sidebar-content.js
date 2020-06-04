@@ -6,5 +6,7 @@ angular.module('portainer.docker').component('dockerSidebarContent', {
     standaloneManagement: '<',
     adminAccess: '<',
     offlineMode: '<',
+    toggle: '<',
+    currentRouteName: '<',
   },
 });

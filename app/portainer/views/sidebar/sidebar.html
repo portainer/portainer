@@ -18,6 +18,8 @@
       <azure-sidebar-content ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider === 'AZURE'"> </azure-sidebar-content>
       <docker-sidebar-content
         ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider !== 'AZURE' && applicationState.endpoint.mode.provider !== 'KUBERNETES'"
+        current-route-name="$state.current.name"
+        toggle="toggle"
         endpoint-api-version="applicationState.endpoint.apiVersion"
         swarm-management="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'"
         standalone-management="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE'"

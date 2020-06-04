@@ -3,6 +3,10 @@
 </li>
 <li class="sidebar-list" ng-if="!$ctrl.offlineMode" authorization="DockerContainerCreate, PortainerStackCreate">
   <a ui-sref="portainer.templates" ui-sref-active="active">App Templates <span class="menu-icon fa fa-rocket fa-fw"></span></a>
+
+  <div class="sidebar-sublist" ng-if="$ctrl.toggle && $ctrl.currentRouteName.includes('portainer.templates')">
+    <a ui-sref="portainer.templates.custom" ui-sref-active="active">Custom Templates</a></div
+  >
 </li>
 <li class="sidebar-list">
   <a ui-sref="portainer.stacks" ui-sref-active="active">Stacks <span class="menu-icon fa fa-th-list fa-fw"></span></a>
