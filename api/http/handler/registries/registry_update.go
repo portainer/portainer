@@ -53,7 +53,7 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
 		}
 		for _, r := range registries {
-			if r.URL == *payload.URL && r.ID != registry.ID {
+			if r.ID != registry.ID && hasSameURL(&r, registry) {
 				return &httperror.HandlerError{http.StatusConflict, "Another registry with the same URL already exists", portainer.ErrRegistryAlreadyExists}
 			}
 		}
@@ -94,4 +94,12 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	return response.JSON(w, registry)
+}
+
+func hasSameURL(r1, r2 *portainer.Registry) bool {
+	if r1.Type != portainer.GitlabRegistry || r2.Type != portainer.GitlabRegistry {
+		return r1.URL == r2.URL
+	}
+
+	return r1.URL == r2.URL && r1.Gitlab.ProjectPath == r2.Gitlab.ProjectPath
 }
