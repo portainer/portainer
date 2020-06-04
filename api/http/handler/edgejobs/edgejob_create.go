@@ -205,16 +205,15 @@ func (handler *Handler) addAndPersistEdgeJob(edgeJob *portainer.EdgeJob, file []
 		return errors.New("Endpoints are mandatory for an Edge job")
 	}
 
-	for endpointID := range edgeJob.Endpoints {
-		handler.ReverseTunnelService.AddEdgeJob(endpointID, edgeJob)
-	}
-
 	scriptPath, err := handler.FileService.StoreEdgeJobFileFromBytes(strconv.Itoa(int(edgeJob.ID)), file)
 	if err != nil {
 		return err
 	}
-
 	edgeJob.ScriptPath = scriptPath
+
+	for endpointID := range edgeJob.Endpoints {
+		handler.ReverseTunnelService.AddEdgeJob(endpointID, edgeJob)
+	}
 
 	return handler.DataStore.EdgeJob().CreateEdgeJob(edgeJob)
 }
