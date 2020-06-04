@@ -2,22 +2,25 @@
   <rd-widget>
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
-        <div class="toolBarTitle">
-          <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }}
-        </div>
+        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
       </div>
       <div class="actionBar" ng-if="$ctrl.accessManagement">
-        <button type="button" class="btn btn-sm btn-danger"
-          ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
+        <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.registries.new">
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add registry
-        </button>
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.registries.new"> <i class="fa fa-plus space-right" aria-hidden="true"></i>Add registry </button>
       </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" ng-change="$ctrl.onTextFilterChange()" placeholder="Search..." auto-focus ng-model-options="{ debounce: 300 }">
+        <input
+          type="text"
+          class="searchInput"
+          ng-model="$ctrl.state.textFilter"
+          ng-change="$ctrl.onTextFilterChange()"
+          placeholder="Search..."
+          auto-focus
+          ng-model-options="{ debounce: 300 }"
+        />
       </div>
       <div class="table-responsive">
         <table class="table table-hover nowrap-cells">
@@ -45,10 +48,13 @@
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))" ng-class="{active: item.Checked}">
+            <tr
+              dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))"
+              ng-class="{ active: item.Checked }"
+            >
               <td>
                 <span class="md-checkbox" ng-if="$ctrl.accessManagement">
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)"/>
+                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
                 <a ui-sref="portainer.registries.registry({id: item.Id})" ng-if="$ctrl.accessManagement">{{ item.Name }}</a>
@@ -59,13 +65,20 @@
                 {{ item.URL }}
               </td>
               <td>
-                <a ui-sref="portainer.registries.registry.access({id: item.Id})" ng-if="$ctrl.accessManagement">
-                  <i class="fa fa-users" aria-hidden="true"></i> Manage access
-                </a>
+                <a ui-sref="portainer.registries.registry.access({id: item.Id})" ng-if="$ctrl.accessManagement"> <i class="fa fa-users" aria-hidden="true"></i> Manage access </a>
                 <a ui-sref="portainer.registries.registry.repositories({id: item.Id})" ng-if="$ctrl.registryManagement && $ctrl.canBrowse(item)" class="space-left">
                   <i class="fa fa-search" aria-hidden="true"></i> Browse
                 </a>
-                <a ui-sref="portainer.extensions.extension({id: 1})" ng-if="!$ctrl.registryManagement && $ctrl.canBrowse(item)" class="space-left" style="color: #767676" tooltip-append-to-body="true" tooltip-placement="bottom" tooltip-class="portainer-tooltip" uib-tooltip="Feature available via an extension">
+                <a
+                  ui-sref="portainer.extensions.extension({id: 1})"
+                  ng-if="!$ctrl.registryManagement && $ctrl.canBrowse(item)"
+                  class="space-left"
+                  style="color: #767676;"
+                  tooltip-append-to-body="true"
+                  tooltip-placement="bottom"
+                  tooltip-class="portainer-tooltip"
+                  uib-tooltip="Feature available via an extension"
+                >
                   <i class="fa fa-search" aria-hidden="true"></i> Browse (extension)
                 </a>
               </td>
@@ -80,9 +93,7 @@
         </table>
       </div>
       <div class="footer" ng-if="$ctrl.dataset">
-        <div class="infoBar" ng-if="$ctrl.state.selectedItemCount !== 0">
-          {{ $ctrl.state.selectedItemCount }} item(s) selected
-        </div>
+        <div class="infoBar" ng-if="$ctrl.state.selectedItemCount !== 0"> {{ $ctrl.state.selectedItemCount }} item(s) selected </div>
         <div class="paginationControls">
           <form class="form-inline">
             <span class="limitSelector">

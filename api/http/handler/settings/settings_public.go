@@ -16,6 +16,7 @@ type publicSettingsResponse struct {
 	AllowPrivilegedModeForRegularUsers bool                           `json:"AllowPrivilegedModeForRegularUsers"`
 	AllowVolumeBrowserForRegularUsers  bool                           `json:"AllowVolumeBrowserForRegularUsers"`
 	EnableHostManagementFeatures       bool                           `json:"EnableHostManagementFeatures"`
+	EnableEdgeComputeFeatures          bool                           `json:"EnableEdgeComputeFeatures"`
 	ExternalTemplates                  bool                           `json:"ExternalTemplates"`
 	OAuthLoginURI                      string                         `json:"OAuthLoginURI"`
 }
@@ -34,6 +35,7 @@ func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *
 		AllowPrivilegedModeForRegularUsers: settings.AllowPrivilegedModeForRegularUsers,
 		AllowVolumeBrowserForRegularUsers:  settings.AllowVolumeBrowserForRegularUsers,
 		EnableHostManagementFeatures:       settings.EnableHostManagementFeatures,
+		EnableEdgeComputeFeatures:          settings.EnableEdgeComputeFeatures,
 		ExternalTemplates:                  false,
 		OAuthLoginURI: fmt.Sprintf("%s?response_type=code&client_id=%s&redirect_uri=%s&scope=%s&prompt=login",
 			settings.OAuthSettings.AuthorizationURI,

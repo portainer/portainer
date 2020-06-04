@@ -12,6 +12,7 @@ export function SettingsViewModel(data) {
   this.ExternalTemplates = data.ExternalTemplates;
   this.EnableHostManagementFeatures = data.EnableHostManagementFeatures;
   this.EdgeAgentCheckinInterval = data.EdgeAgentCheckinInterval;
+  this.EnableEdgeComputeFeatures = data.EnableEdgeComputeFeatures;
 }
 
 export function PublicSettingsViewModel(settings) {
@@ -21,6 +22,7 @@ export function PublicSettingsViewModel(settings) {
   this.AuthenticationMethod = settings.AuthenticationMethod;
   this.EnableHostManagementFeatures = settings.EnableHostManagementFeatures;
   this.ExternalTemplates = settings.ExternalTemplates;
+  this.EnableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
   this.LogoURL = settings.LogoURL;
   this.OAuthLoginURI = settings.OAuthLoginURI;
 }

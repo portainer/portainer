@@ -2,6 +2,6 @@ angular.module('portainer.integrations.storidge').component('storidgeProfileSele
   templateUrl: './storidgeProfileSelector.html',
   controller: 'StoridgeProfileSelectorController',
   bindings: {
-    'storidgeProfile': '='
-  }
+    storidgeProfile: '=',
+  },
 });

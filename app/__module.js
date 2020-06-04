@@ -4,6 +4,7 @@ import angular from 'angular';
 import './agent/_module';
 import './azure/_module';
 import './docker/__module';
+import './edge/__module';
 import './portainer/__module';
 
 angular.module('portainer', [
@@ -29,15 +30,16 @@ angular.module('portainer', [
   'portainer.agent',
   'portainer.azure',
   'portainer.docker',
+  'portainer.edge',
   'portainer.extensions',
   'portainer.integrations',
   'rzModule',
-  'moment-picker'
+  'moment-picker',
 ]);
 
 if (require) {
   var req = require.context('./', true, /^(.*\.(js$))[^.]*$/im);
-  req.keys().forEach(function(key) {
+  req.keys().forEach(function (key) {
     req(key);
   });
 }

@@ -1,42 +1,44 @@
-angular.module('portainer.app')
-.controller('EndpointsController', ['$q', '$scope', '$state', 'EndpointService', 'GroupService', 'EndpointHelper', 'Notifications',
-function ($q, $scope, $state, EndpointService, GroupService, EndpointHelper, Notifications) {
+import angular from 'angular';
 
-  $scope.removeAction = function (selectedItems) {
-    var actionCount = selectedItems.length;
-    angular.forEach(selectedItems, function (endpoint) {
-      EndpointService.deleteEndpoint(endpoint.Id)
-      .then(function success() {
+angular.module('portainer.app').controller('EndpointsController', EndpointsController);
+
+function EndpointsController($q, $scope, $state, $async, EndpointService, GroupService, EndpointHelper, Notifications) {
+  $scope.removeAction = removeAction;
+
+  function removeAction(endpoints) {
+    return $async(removeActionAsync, endpoints);
+  }
+
+  async function removeActionAsync(endpoints) {
+    for (let endpoint of endpoints) {
+      try {
+        await EndpointService.deleteEndpoint(endpoint.Id);
+
         Notifications.success('Endpoint successfully removed', endpoint.Name);
-      })
-      .catch(function error(err) {
+      } catch (err) {
         Notifications.error('Failure', err, 'Unable to remove endpoint');
-      })
-      .finally(function final() {
-        --actionCount;
-        if (actionCount === 0) {
-          $state.reload();
-        }
-      });
-    });
-  };
+      }
+    }
+
+    $state.reload();
+  }
 
   $scope.getPaginatedEndpoints = getPaginatedEndpoints;
-  function getPaginatedEndpoints(lastId, limit, filter) {
+  function getPaginatedEndpoints(lastId, limit, search) {
     const deferred = $q.defer();
     $q.all({
-      endpoints: EndpointService.endpoints(lastId, limit, filter),
-      groups: GroupService.groups()
+      endpoints: EndpointService.endpoints(lastId, limit, { search }),
+      groups: GroupService.groups(),
     })
-    .then(function success(data) {
-      var endpoints = data.endpoints.value;
-      var groups = data.groups;
-      EndpointHelper.mapGroupNameToEndpoint(endpoints, groups);
-      deferred.resolve({endpoints: endpoints, totalCount: data.endpoints.totalCount});
-    })
-    .catch(function error(err) {
-      Notifications.error('Failure', err, 'Unable to retrieve endpoint information');
-    });
+      .then(function success(data) {
+        var endpoints = data.endpoints.value;
+        var groups = data.groups;
+        EndpointHelper.mapGroupNameToEndpoint(endpoints, groups);
+        deferred.resolve({ endpoints: endpoints, totalCount: data.endpoints.totalCount });
+      })
+      .catch(function error(err) {
+        Notifications.error('Failure', err, 'Unable to retrieve endpoint information');
+      });
     return deferred.promise;
   }
-}]);
+}

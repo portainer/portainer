@@ -15,7 +15,6 @@ import 'angular-moment-picker/dist/angular-moment-picker.min.css';
 import 'angular-multiselect/isteven-multi-select.css';
 
 import angular from 'angular';
-window.angular = angular;
 import 'moment';
 import '@uirouter/angularjs';
 import 'ui-select';
@@ -35,7 +34,9 @@ import 'angular-file-saver';
 import 'angularjs-scroll-glue';
 import 'angularjs-slider';
 import 'bootstrap/dist/js/bootstrap.js';
-import 'js-yaml/dist/js-yaml.js'
+import 'js-yaml/dist/js-yaml.js';
 import 'angular-ui-bootstrap';
 import 'angular-moment-picker';
 import 'angular-multiselect/isteven-multi-select.js';
+
+window.angular = angular;

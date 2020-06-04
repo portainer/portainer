@@ -10,6 +10,6 @@ angular.module('portainer.docker').component('serviceTasksDatatable', {
     nodes: '<',
     agentProxy: '<',
     textFilter: '=',
-    showTaskLogsButton: '<'
-  }
+    showTaskLogsButton: '<',
+  },
 });

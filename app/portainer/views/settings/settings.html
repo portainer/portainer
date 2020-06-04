@@ -10,7 +10,7 @@
       </rd-widget-header>
       <rd-widget-body>
         <span class="small text-muted">You cannot change the password of this account in the demo version of Portainer.</span>
-      </rd-wigdet-body>
+      </rd-widget-body>
     </rd-widget>
   </div>
 </div>
@@ -25,7 +25,7 @@
           <div class="form-group">
             <label for="snapshot_interval" class="col-sm-2 control-label text-left">Snapshot interval</label>
             <div class="col-sm-10">
-              <input type="text" class="form-control" ng-model="settings.SnapshotInterval" id="snapshot_interval" placeholder="e.g. 15m">
+              <input type="text" class="form-control" ng-model="settings.SnapshotInterval" id="snapshot_interval" placeholder="e.g. 15m" />
             </div>
           </div>
           <!-- !snapshot-interval -->
@@ -54,7 +54,7 @@
                 URL
               </label>
               <div class="col-sm-11">
-                <input type="text" class="form-control" ng-model="settings.LogoURL" id="logo_url" placeholder="https://mycompany.com/logo.png">
+                <input type="text" class="form-control" ng-model="settings.LogoURL" id="logo_url" placeholder="https://mycompany.com/logo.png" />
               </div>
             </div>
           </div>
@@ -69,23 +69,22 @@
                 Use external templates
                 <portainer-tooltip position="bottom" message="When using external templates, in-app template management will be disabled."></portainer-tooltip>
               </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="toggle_templates" ng-model="formValues.externalTemplates"><i></i>
-              </label>
+              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" name="toggle_templates" ng-model="formValues.externalTemplates" /><i></i> </label>
             </div>
           </div>
           <div ng-if="formValues.externalTemplates">
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
-                You can specify the URL to your own template definitions file here. See <a href="https://portainer.readthedocs.io/en/stable/templates.html" target="_blank">Portainer documentation</a> for more details.
+                You can specify the URL to your own template definitions file here. See
+                <a href="https://portainer.readthedocs.io/en/stable/templates.html" target="_blank">Portainer documentation</a> for more details.
               </span>
             </div>
-            <div class="form-group" >
+            <div class="form-group">
               <label for="templates_url" class="col-sm-1 control-label text-left">
                 URL
               </label>
               <div class="col-sm-11">
-                <input type="text" class="form-control" ng-model="settings.TemplatesURL" id="templates_url" placeholder="https://myserver.mydomain/templates.json">
+                <input type="text" class="form-control" ng-model="settings.TemplatesURL" id="templates_url" placeholder="https://myserver.mydomain/templates.json" />
               </div>
             </div>
           </div>
@@ -100,9 +99,7 @@
                 Disable bind mounts for non-administrators
                 <portainer-tooltip position="bottom" message="When enabled, regular users will not be able to use bind mounts when creating containers."></portainer-tooltip>
               </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="toggle_allowbindmounts" ng-model="formValues.restrictBindMounts"><i></i>
-              </label>
+              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" name="toggle_allowbindmounts" ng-model="formValues.restrictBindMounts" /><i></i> </label>
             </div>
           </div>
           <div class="form-group">
@@ -111,54 +108,75 @@
                 Disable privileged mode for non-administrators
                 <portainer-tooltip position="bottom" message="When enabled, regular users will not be able to use privileged mode when creating containers."></portainer-tooltip>
               </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="toggle_allowbindmounts" ng-model="formValues.restrictPrivilegedMode"><i></i>
-              </label>
+              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" name="toggle_allowbindmounts" ng-model="formValues.restrictPrivilegedMode" /><i></i> </label>
             </div>
           </div>
           <div class="form-group">
             <div class="col-sm-12">
               <label for="toggle_allowvolumebrowser" class="control-label text-left">
                 Enable volume management for non-administrators
-                <portainer-tooltip position="bottom" message="When enabled, non-admin users & users with helpdesk, standard and read-only roles from the RBAC extension will be able to use Portainer volume management features."></portainer-tooltip>
+                <portainer-tooltip
+                  position="bottom"
+                  message="When enabled, non-admin users & users with helpdesk, standard and read-only roles from the RBAC extension will be able to use Portainer volume management features."
+                ></portainer-tooltip>
               </label>
-              <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="toggle_allowvolumebrowser" ng-model="formValues.enableVolumeBrowser"><i></i>
-              </label>
+              <label class="switch" style="margin-left: 20px;"> <input type="checkbox" name="toggle_allowvolumebrowser" ng-model="formValues.enableVolumeBrowser" /><i></i> </label>
             </div>
           </div>
           <div class="form-group">
             <div class="col-sm-12">
               <label for="toggle_enableHostManagementFeatures" class="control-label text-left">
                 Enable host management features
-                <portainer-tooltip position="bottom" message="Enables host management features: host scheduler, host browsing and command execution. You'll need to set the CAP_HOST_MANAGEMENT variable when deploying the Portainer agent to use some of these features."></portainer-tooltip>
+                <portainer-tooltip
+                  position="bottom"
+                  message="Enables host management features: host scheduler, host browsing and command execution. You'll need to set the CAP_HOST_MANAGEMENT variable when deploying the Portainer agent to use some of these features."
+                ></portainer-tooltip>
               </label>
               <label class="switch" style="margin-left: 20px;">
-                <input type="checkbox" name="toggle_enableHostManagementFeatures" ng-model="formValues.enableHostManagementFeatures"><i></i>
+                <input type="checkbox" name="toggle_enableHostManagementFeatures" ng-model="formValues.enableHostManagementFeatures" /><i></i>
               </label>
             </div>
           </div>
           <!-- !security -->
           <!-- edge -->
           <div class="col-sm-12 form-section-title">
-            Edge
+            Edge Compute
+          </div>
+          <div class="form-group">
+            <label for="edge_checkin" class="col-sm-2 control-label text-left">
+              Edge agent poll frequency
+              <portainer-tooltip position="bottom" message="Specify the interval used by each Edge agent to checkin with the Portainer instance"></portainer-tooltip>
+            </label>
+            <div class="col-sm-10">
+              <select
+                id="edge_checkin"
+                class="form-control"
+                ng-model="settings.EdgeAgentCheckinInterval"
+                ng-options="+(opt.value) as opt.key for opt in state.availableEdgeAgentCheckinOptions"
+              ></select>
+            </div>
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <label for="edge_checkin" class="col-sm-3 control-label text-left">
-                Edge agent poll frequency
-                <portainer-tooltip position="bottom" message="Specify the interval used by each Edge agent to checkin with the Portainer instance"></portainer-tooltip>
+              <label for="toggle_enableEdgeComputeFeatures" class="control-label text-left">
+                Enable edge compute features
               </label>
-              <div class="col-sm-9">
-                <select id="edge_checkin" class="form-control" ng-model="settings.EdgeAgentCheckinInterval" ng-options="+(opt.value) as opt.key for opt in state.availableEdgeAgentCheckinOptions"></select>
-              </div>
+              <label class="switch" style="margin-left: 20px;">
+                <input type="checkbox" name="toggle_enableEdgeComputeFeatures" ng-model="formValues.enableEdgeComputeFeatures" /><i></i>
+              </label>
             </div>
           </div>
           <!-- !edge -->
           <!-- actions -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-click="saveApplicationSettings()" ng-disabled="state.actionInProgress" button-spinner="state.actionInProgress">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                ng-click="saveApplicationSettings()"
+                ng-disabled="state.actionInProgress"
+                button-spinner="state.actionInProgress"
+              >
                 <span ng-hide="state.actionInProgress">Save settings</span>
                 <span ng-show="state.actionInProgress">Saving...</span>
               </button>
@@ -185,11 +203,11 @@
           <div class="form-group">
             <label for="header_name" class="col-sm-1 control-label text-left">Name</label>
             <div class="col-sm-11 col-md-4">
-              <input type="text" required class="form-control" id="header_name" name="label_name" ng-model="formValues.labelName" placeholder="e.g. com.example.foo">
+              <input type="text" required class="form-control" id="header_name" name="label_name" ng-model="formValues.labelName" placeholder="e.g. com.example.foo" />
             </div>
             <label for="header_value" class="col-sm-1 margin-sm-top control-label text-left">Value</label>
             <div class="col-sm-11 col-md-4 margin-sm-top">
-              <input type="text" class="form-control" id="header_value" ng-model="formValues.labelValue" placeholder="e.g. bar">
+              <input type="text" class="form-control" id="header_value" ng-model="formValues.labelValue" placeholder="e.g. bar" />
             </div>
             <div class="col-sm-12 col-md-2 margin-sm-top">
               <button type="submit" class="btn btn-primary btn-sm" ng-disabled="!formValues.labelName"><i class="fa fa-plus space-right" aria-hidden="true"></i>Add filter</button>
@@ -209,7 +227,11 @@
                   <tr ng-repeat="label in settings.BlackListedLabels">
                     <td>{{ label.name }}</td>
                     <td>{{ label.value }}</td>
-                    <td><button type="button" class="btn btn-danger btn-xs" ng-click="removeFilteredContainerLabel($index)"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove</button></td>
+                    <td
+                      ><button type="button" class="btn btn-danger btn-xs" ng-click="removeFilteredContainerLabel($index)"
+                        ><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove</button
+                      ></td
+                    >
                   </tr>
                   <tr ng-if="settings.BlackListedLabels.length === 0">
                     <td colspan="3" class="text-center text-muted">No filter available.</td>

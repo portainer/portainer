@@ -1,6 +1,6 @@
 angular.module('portainer.docker').component('containerNetworksDatatable', {
   templateUrl: './containerNetworksDatatable.html',
-  controller: 'GenericDatatableController',
+  controller: 'ContainerNetworksDatatableController',
   bindings: {
     titleText: '@',
     titleIcon: '@',
@@ -12,6 +12,6 @@ angular.module('portainer.docker').component('containerNetworksDatatable', {
     joinNetworkActionInProgress: '<',
     leaveNetworkActionInProgress: '<',
     leaveNetworkAction: '<',
-    nodeName: '<'
-  }
+    nodeName: '<',
+  },
 });

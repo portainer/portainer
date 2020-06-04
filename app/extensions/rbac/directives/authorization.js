@@ -1,6 +1,8 @@
-angular.module('portainer.extensions.rbac').directive('authorization', ['Authentication', 'ExtensionService', '$async',
-  function(Authentication, ExtensionService, $async) {
-
+angular.module('portainer.extensions.rbac').directive('authorization', [
+  'Authentication',
+  'ExtensionService',
+  '$async',
+  function (Authentication, ExtensionService, $async) {
     async function linkAsync(scope, elem, attrs) {
       elem.hide();
       try {
@@ -13,7 +15,7 @@ angular.module('portainer.extensions.rbac').directive('authorization', ['Authent
         elem.show();
         return;
       }
-      var authorizations = attrs.authorization.split(",");
+      var authorizations = attrs.authorization.split(',');
       for (var i = 0; i < authorizations.length; i++) {
         authorizations[i] = authorizations[i].trim();
       }
@@ -30,8 +32,9 @@ angular.module('portainer.extensions.rbac').directive('authorization', ['Authent
 
     return {
       restrict: 'A',
-      link: function(scope, elem, attrs) {
+      link: function (scope, elem, attrs) {
         return $async(linkAsync, scope, elem, attrs);
-      }
-    }
-  }]);
+      },
+    };
+  },
+]);

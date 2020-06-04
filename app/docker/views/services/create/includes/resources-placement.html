@@ -11,7 +11,7 @@
       <slider model="formValues.MemoryReservation" floor="0" ceil="state.sliderMaxMemory" step="256" ng-if="state.sliderMaxMemory"></slider>
     </div>
     <div class="col-sm-2">
-      <input type="number" min="0" class="form-control" ng-model="formValues.MemoryReservation">
+      <input type="number" min="0" class="form-control" ng-model="formValues.MemoryReservation" />
     </div>
     <div class="col-sm-4">
       <p class="small text-muted" style="margin-top: 7px;">
@@ -29,7 +29,7 @@
       <slider model="formValues.MemoryLimit" floor="0" ceil="state.sliderMaxMemory" step="256" ng-if="state.sliderMaxMemory"></slider>
     </div>
     <div class="col-sm-2">
-      <input type="number" min="0" class="form-control" ng-model="formValues.MemoryLimit">
+      <input type="number" min="0" class="form-control" ng-model="formValues.MemoryLimit" />
     </div>
     <div class="col-sm-4" style="margin-top: 7px;">
       <p class="small text-muted">
@@ -83,7 +83,7 @@
       <div ng-repeat="constraint in formValues.PlacementConstraints" style="margin-top: 2px;">
         <div class="input-group col-sm-4 input-group-sm">
           <span class="input-group-addon">name</span>
-          <input type="text" class="form-control" ng-model="constraint.key" placeholder="e.g. node.role">
+          <input type="text" class="form-control" ng-model="constraint.key" placeholder="e.g. node.role" />
         </div>
         <div class="input-group col-sm-1 input-group-sm">
           <select name="constraintOperator" class="form-control" ng-model="constraint.operator">
@@ -93,7 +93,7 @@
         </div>
         <div class="input-group col-sm-5 input-group-sm">
           <span class="input-group-addon">value</span>
-          <input type="text" class="form-control" ng-model="constraint.value" placeholder="e.g. manager">
+          <input type="text" class="form-control" ng-model="constraint.value" placeholder="e.g. manager" />
         </div>
         <button class="btn btn-sm btn-danger" type="button" ng-click="removePlacementConstraint($index)">
           <i class="fa fa-trash" aria-hidden="true"></i>
@@ -103,7 +103,7 @@
   </div>
   <!-- !placement-constraints -->
   <!-- placement-preferences -->
-  <div class="form-group" ng-if="applicationState.endpoint.apiVersion >= 1.30">
+  <div class="form-group" ng-if="applicationState.endpoint.apiVersion >= 1.3">
     <div class="col-sm-12" style="margin-top: 5px;">
       <label class="control-label text-left">Placement preferences</label>
       <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addPlacementPreference()">
@@ -114,11 +114,11 @@
       <div ng-repeat="preference in formValues.PlacementPreferences" style="margin-top: 2px;">
         <div class="input-group col-sm-4 input-group-sm">
           <span class="input-group-addon">strategy</span>
-          <input type="text" class="form-control" ng-model="preference.strategy" placeholder="e.g. spread">
+          <input type="text" class="form-control" ng-model="preference.strategy" placeholder="e.g. spread" />
         </div>
         <div class="input-group col-sm-5 input-group-sm">
           <span class="input-group-addon">value</span>
-          <input type="text" class="form-control" ng-model="preference.value" placeholder="e.g. node.labels.datacenter">
+          <input type="text" class="form-control" ng-model="preference.value" placeholder="e.g. node.labels.datacenter" />
         </div>
         <button class="btn btn-sm btn-danger" type="button" ng-click="removePlacementPreference($index)">
           <i class="fa fa-trash" aria-hidden="true"></i>

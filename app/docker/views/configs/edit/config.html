@@ -24,8 +24,12 @@
               <td>ID</td>
               <td>
                 {{ config.Id }}
-                <button authorization="DockerConfigDelete" class="btn btn-xs btn-danger" ng-click="removeConfig(config.Id)"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this config</button>
-                <button authorization="DockerConfigCreate"class="btn btn-xs btn-primary" ui-sref="docker.configs.new({id: config.Id})"><i class="fa fa-copy space-right" aria-hidden="true"></i>Clone config</button>
+                <button authorization="DockerConfigDelete" class="btn btn-xs btn-danger" ng-click="removeConfig(config.Id)"
+                  ><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this config</button
+                >
+                <button authorization="DockerConfigCreate" class="btn btn-xs btn-primary" ui-sref="docker.configs.new({id: config.Id})"
+                  ><i class="fa fa-copy space-right" aria-hidden="true"></i>Clone config</button
+                >
               </td>
             </tr>
             <tr>
@@ -55,11 +59,7 @@
 </div>
 
 <!-- access-control-panel -->
-<por-access-control-panel
-  ng-if="config && applicationState.application.authentication"
-  resource-id="config.Id"
-  resource-control="config.ResourceControl"
-  resource-type="'config'">
+<por-access-control-panel ng-if="config && applicationState.application.authentication" resource-id="config.Id" resource-control="config.ResourceControl" resource-type="'config'">
 </por-access-control-panel>
 <!-- !access-control-panel -->
 
@@ -71,12 +71,7 @@
         <form class="form-horizontal">
           <div class="form-group">
             <div class="col-sm-12">
-              <code-editor
-                identifier="config-editor"
-                yml="false"
-                read-only="true"
-                value="config.Data"
-              ></code-editor>
+              <code-editor identifier="config-editor" yml="false" read-only="true" value="config.Data"></code-editor>
             </div>
           </div>
         </form>

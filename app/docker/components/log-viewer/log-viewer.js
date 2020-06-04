@@ -6,6 +6,6 @@ angular.module('portainer.docker').component('logViewer', {
     displayTimestamps: '=',
     logCollectionChange: '<',
     sinceTimestamp: '=',
-    lineCount: '='
-  }
+    lineCount: '=',
+  },
 });

@@ -7,6 +7,6 @@ angular.module('portainer.integrations.storidge').component('storidgeClusterEven
     dataset: '<',
     tableKey: '@',
     orderBy: '@',
-    reverseOrder: '<'
-  }
+    reverseOrder: '<',
+  },
 });

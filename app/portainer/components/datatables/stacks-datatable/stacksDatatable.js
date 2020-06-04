@@ -11,6 +11,6 @@ angular.module('portainer.app').component('stacksDatatable', {
     showOwnershipColumn: '<',
     removeAction: '<',
     offlineMode: '<',
-    refreshCallback: '<'
-  }
+    refreshCallback: '<',
+  },
 });

@@ -6,7 +6,7 @@
  * @param {[]int} teams Authorized TeamIDs array
  * @param {[]int} subResources subResourceIDs array
  */
-export function ResourceControlOwnershipParameters(adminOnly=false, publicOnly=false, users=[], teams=[], subResources=[]) {
+export function ResourceControlOwnershipParameters(adminOnly = false, publicOnly = false, users = [], teams = [], subResources = []) {
   this.AdministratorsOnly = adminOnly;
   this.Public = publicOnly;
   this.Users = users;

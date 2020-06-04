@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
+import {PorImageRegistryModel} from 'Docker/models/porImageRegistry';
 
 export function TemplateDefaultModel() {
   this.Type = 1;
@@ -40,7 +40,7 @@ export function TemplateCreateRequest(model) {
   for (var i = 0; i < model.Ports.length; i++) {
     var binding = model.Ports[i];
     if (binding.containerPort && binding.protocol) {
-      var port = binding.hostPort ? binding.hostPort + ':' + binding.containerPort + '/' + binding.protocol: binding.containerPort + '/' + binding.protocol;
+      var port = binding.hostPort ? binding.hostPort + ':' + binding.containerPort + '/' + binding.protocol : binding.containerPort + '/' + binding.protocol;
       this.Ports.push(port);
     }
   }
@@ -92,7 +92,7 @@ function templatePorts(data) {
       return {
         hostPort: hostAndContainerPort.length > 1 ? hostAndContainerPort[0] : undefined,
         containerPort: hostAndContainerPort.length > 1 ? hostAndContainerPort[1] : hostAndContainerPort[0],
-        protocol: portAndProtocol[1]
+        protocol: portAndProtocol[1],
       };
     });
   }
@@ -109,7 +109,7 @@ function templateVolumes(data) {
         container: v.container,
         readonly: v.readonly || false,
         type: v.bind ? 'bind' : 'auto',
-        bind : v.bind ? v.bind : null
+        bind: v.bind ? v.bind : null,
       };
     });
   }
@@ -121,7 +121,7 @@ function templateEnv(data) {
   var env = [];
 
   if (data.env) {
-    env = data.env.map(function(envvar) {
+    env = data.env.map(function (envvar) {
       envvar.type = 2;
       envvar.value = envvar.default ? envvar.default : '';
 

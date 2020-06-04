@@ -29,15 +29,19 @@ type Handler struct {
 	*mux.Router
 	authorizeEndpointManagement bool
 	requestBouncer              *security.RequestBouncer
+	AuthorizationService        *portainer.AuthorizationService
+	EdgeGroupService            portainer.EdgeGroupService
+	EdgeStackService            portainer.EdgeStackService
 	EndpointService             portainer.EndpointService
 	EndpointGroupService        portainer.EndpointGroupService
+	EndpointRelationService     portainer.EndpointRelationService
 	FileService                 portainer.FileService
-	ProxyManager                *proxy.Manager
-	Snapshotter                 portainer.Snapshotter
 	JobService                  portainer.JobService
+	ProxyManager                *proxy.Manager
 	ReverseTunnelService        portainer.ReverseTunnelService
 	SettingsService             portainer.SettingsService
-	AuthorizationService        *portainer.AuthorizationService
+	Snapshotter                 portainer.Snapshotter
+	TagService                  portainer.TagService
 }
 
 // NewHandler creates a handler to manage endpoint operations.
@@ -70,6 +74,5 @@ func NewHandler(bouncer *security.RequestBouncer, authorizeEndpointManagement bo
 		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointSnapshot))).Methods(http.MethodPost)
 	h.Handle("/endpoints/{id}/status",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.endpointStatusInspect))).Methods(http.MethodGet)
-
 	return h
 }

@@ -1,0 +1,23 @@
+<rd-header>
+  <rd-header-title title-text="Create edge group"></rd-header-title>
+  <rd-header-content> <a ui-sref="edge.groups">Edge groups</a> &gt; Add edge group </rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+        <edge-group-form
+          loaded="$ctrl.state.loaded"
+          page-type="create"
+          form-action-label="Add edge group"
+          form-action="$ctrl.createGroup"
+          groups="$ctrl.endpointGroups"
+          tags="$ctrl.tags"
+          model="$ctrl.model"
+          on-change-tags="($ctrl.onChangeTags)"
+        ></edge-group-form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

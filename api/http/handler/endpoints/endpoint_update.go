@@ -24,7 +24,7 @@ type endpointUpdatePayload struct {
 	AzureApplicationID     *string
 	AzureTenantID          *string
 	AzureAuthenticationKey *string
-	Tags                   []string
+	TagIDs                 []portainer.TagID
 	UserAccessPolicies     portainer.UserAccessPolicies
 	TeamAccessPolicies     portainer.TeamAccessPolicies
 }
@@ -69,12 +69,52 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		endpoint.PublicURL = *payload.PublicURL
 	}
 
+	groupIDChanged := false
 	if payload.GroupID != nil {
-		endpoint.GroupID = portainer.EndpointGroupID(*payload.GroupID)
+		groupID := portainer.EndpointGroupID(*payload.GroupID)
+		groupIDChanged = groupID != endpoint.GroupID
+		endpoint.GroupID = groupID
 	}
 
-	if payload.Tags != nil {
-		endpoint.Tags = payload.Tags
+	tagsChanged := false
+	if payload.TagIDs != nil {
+		payloadTagSet := portainer.TagSet(payload.TagIDs)
+		endpointTagSet := portainer.TagSet((endpoint.TagIDs))
+		union := portainer.TagUnion(payloadTagSet, endpointTagSet)
+		intersection := portainer.TagIntersection(payloadTagSet, endpointTagSet)
+		tagsChanged = len(union) > len(intersection)
+
+		if tagsChanged {
+			removeTags := portainer.TagDifference(endpointTagSet, payloadTagSet)
+
+			for tagID := range removeTags {
+				tag, err := handler.TagService.Tag(tagID)
+				if err != nil {
+					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a tag inside the database", err}
+				}
+
+				delete(tag.Endpoints, endpoint.ID)
+				err = handler.TagService.UpdateTag(tag.ID, tag)
+				if err != nil {
+					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist tag changes inside the database", err}
+				}
+			}
+
+			endpoint.TagIDs = payload.TagIDs
+			for _, tagID := range payload.TagIDs {
+				tag, err := handler.TagService.Tag(tagID)
+				if err != nil {
+					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a tag inside the database", err}
+				}
+
+				tag.Endpoints[endpoint.ID] = true
+
+				err = handler.TagService.UpdateTag(tag.ID, tag)
+				if err != nil {
+					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist tag changes inside the database", err}
+				}
+			}
+		}
 	}
 
 	updateAuthorizations := false
@@ -181,6 +221,42 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		err = handler.AuthorizationService.UpdateUsersAuthorizations()
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
+		}
+	}
+
+	if endpoint.Type == portainer.EdgeAgentEnvironment && (groupIDChanged || tagsChanged) {
+		relation, err := handler.EndpointRelationService.EndpointRelation(endpoint.ID)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find endpoint relation inside the database", err}
+		}
+
+		endpointGroup, err := handler.EndpointGroupService.EndpointGroup(endpoint.GroupID)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find endpoint group inside the database", err}
+		}
+
+		edgeGroups, err := handler.EdgeGroupService.EdgeGroups()
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge groups from the database", err}
+		}
+
+		edgeStacks, err := handler.EdgeStackService.EdgeStacks()
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge stacks from the database", err}
+		}
+
+		edgeStackSet := map[portainer.EdgeStackID]bool{}
+
+		endpointEdgeStacks := portainer.EndpointRelatedEdgeStacks(endpoint, endpointGroup, edgeGroups, edgeStacks)
+		for _, edgeStackID := range endpointEdgeStacks {
+			edgeStackSet[edgeStackID] = true
+		}
+
+		relation.EdgeStacks = edgeStackSet
+
+		err = handler.EndpointRelationService.UpdateEndpointRelation(endpoint.ID, relation)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint relation changes inside the database", err}
 		}
 	}
 

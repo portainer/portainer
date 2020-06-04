@@ -2,15 +2,7 @@
 basePath = '../..';
 
 // list of files / patterns to load in the browser
-files = [
-    JASMINE,
-    JASMINE_ADAPTER,
-    'dist/angular.js',
-    'dist/vendor.js',
-    'dist/portainer.js',
-    'bower_components/angular-mocks/angular-mocks.js',
-    'test/unit/**/*.spec.js'
-];
+files = [JASMINE, JASMINE_ADAPTER, 'dist/angular.js', 'dist/vendor.js', 'dist/portainer.js', 'bower_components/angular-mocks/angular-mocks.js', 'test/unit/**/*.spec.js'];
 
 // use dots reporter, as travis terminal does not support escaping sequences
 // possible values: 'dots' || 'progress'

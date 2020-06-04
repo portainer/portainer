@@ -179,7 +179,7 @@ func (service *Service) snapshotEnvironment(endpointID portainer.EndpointID, tun
 	}
 
 	endpointURL := endpoint.URL
-	endpoint.URL = fmt.Sprintf("tcp://localhost:%d", tunnelPort)
+	endpoint.URL = fmt.Sprintf("tcp://127.0.0.1:%d", tunnelPort)
 	snapshot, err := service.snapshotter.CreateSnapshot(endpoint)
 	if err != nil {
 		return err

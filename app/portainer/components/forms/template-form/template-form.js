@@ -8,6 +8,6 @@ angular.module('portainer.app').component('templateForm', {
     formAction: '<',
     formActionLabel: '@',
     actionInProgress: '<',
-    showTypeSelector: '<'
-  }
+    showTypeSelector: '<',
+  },
 });

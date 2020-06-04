@@ -1,8 +1,6 @@
 <rd-header>
   <rd-header-title title-text="Create schedule"></rd-header-title>
-  <rd-header-content>
-    <a ui-sref="portainer.schedules">Schedules</a> &gt; Add schedule
-  </rd-header-content>
+  <rd-header-content> <a ui-sref="portainer.schedules">Schedules</a> &gt; Add schedule </rd-header-content>
 </rd-header>
 
 <div class="row">
@@ -13,6 +11,7 @@
           model="model"
           endpoints="endpoints"
           groups="groups"
+          tags="tags"
           form-action="create"
           form-action-label="Create schedule"
           action-in-progress="state.actionInProgress"

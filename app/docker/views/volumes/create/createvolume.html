@@ -1,8 +1,6 @@
 <rd-header>
   <rd-header-title title-text="Create volume"></rd-header-title>
-  <rd-header-content>
-    <a ui-sref="docker.volumes">Volumes</a> &gt; Add volume
-  </rd-header-content>
+  <rd-header-content> <a ui-sref="docker.volumes">Volumes</a> &gt; Add volume </rd-header-content>
 </rd-header>
 
 <div class="row">
@@ -14,7 +12,7 @@
           <div class="form-group">
             <label for="volume_name" class="col-sm-2 col-md-1 control-label text-left">Name</label>
             <div class="col-sm-10 col-md-11">
-              <input type="text" class="form-control" ng-model="formValues.Name" id="volume_name" placeholder="e.g. myVolume">
+              <input type="text" class="form-control" ng-model="formValues.Name" id="volume_name" placeholder="e.g. myVolume" />
             </div>
           </div>
           <!-- !name-input -->
@@ -28,16 +26,19 @@
               <select class="form-control" ng-options="driver for driver in availableVolumeDrivers" ng-model="formValues.Driver" ng-if="availableVolumeDrivers.length > 0">
                 <option disabled hidden value="">Select a driver</option>
               </select>
-              <input type="text" class="form-control" ng-model="formValues.Driver" id="volume_driver" placeholder="e.g. driverName" ng-if="availableVolumeDrivers.length === 0">
+              <input type="text" class="form-control" ng-model="formValues.Driver" id="volume_driver" placeholder="e.g. driverName" ng-if="availableVolumeDrivers.length === 0" />
             </div>
           </div>
           <!-- !driver-input -->
           <!-- driver-options -->
-          <div class="form-group">
+          <div class="form-group" ng-hide="formValues.CIFSData.useCIFS || formValues.NFSData.useNFS">
             <div class="col-sm-12" style="margin-top: 5px;">
               <label class="control-label text-left">
                 Driver options
-                <portainer-tooltip position="bottom" message="Driver options are specific to the selected driver. Please refer to the selected driver documentation."></portainer-tooltip>
+                <portainer-tooltip
+                  position="bottom"
+                  message="Driver options are specific to the selected driver. Please refer to the selected driver documentation."
+                ></portainer-tooltip>
               </label>
               <span class="label label-default interactive" style="margin-left: 10px;" ng-click="addDriverOption()">
                 <i class="fa fa-plus-circle" aria-hidden="true"></i> add driver option
@@ -48,11 +49,11 @@
               <div ng-repeat="option in formValues.DriverOptions" style="margin-top: 2px;">
                 <div class="input-group col-sm-5 input-group-sm">
                   <span class="input-group-addon">name</span>
-                  <input type="text" class="form-control" ng-model="option.name" placeholder="e.g. mountpoint">
+                  <input type="text" class="form-control" ng-model="option.name" placeholder="e.g. mountpoint" />
                 </div>
                 <div class="input-group col-sm-5 input-group-sm">
                   <span class="input-group-addon">value</span>
-                  <input type="text" class="form-control" ng-model="option.value" placeholder="e.g. /path/on/host">
+                  <input type="text" class="form-control" ng-model="option.value" placeholder="e.g. /path/on/host" />
                 </div>
                 <button class="btn btn-sm btn-danger" type="button" ng-click="removeDriverOption($index)">
                   <i class="fa fa-trash" aria-hidden="true"></i>
@@ -63,8 +64,31 @@
           </div>
           <!-- !driver-options -->
           <!-- nfs-management -->
+          <div class="form-group col-md-12">
+            <label for="useNFS" class="control-label text-left">
+              Use NFS volume
+            </label>
+            <label class="switch" style="margin-left: 20px;">
+              <input type="checkbox" name="useNFS" ng-model="formValues.NFSData.useNFS" ng-click="formValues.CIFSData.useCIFS = false" />
+              <i></i>
+            </label>
+            <div ng-if="formValues.NFSData.useNFS" class="small text-muted" style="margin-top: 10px;"> Ensure <code>nfs-utils</code> are installed on your hosts. </div>
+          </div>
           <volumes-nfs-form data="formValues.NFSData" ng-show="formValues.Driver === 'local'"></volumes-nfs-form>
           <!-- !nfs-management -->
+          <!-- cifs-management -->
+          <div class="form-group col-md-12">
+            <label for="useCIFS" class="control-label text-left">
+              Use CIFS volume
+            </label>
+            <label class="switch" style="margin-left: 20px;">
+              <input type="checkbox" name="useCIFS" ng-model="formValues.CIFSData.useCIFS" ng-click="formValues.NFSData.useNFS = false" />
+              <i></i>
+            </label>
+            <div ng-if="formValues.CIFSData.useCIFS" class="small text-muted" style="margin-top: 10px;"> Ensure <code>cifs-utils</code> are installed on your hosts. </div>
+          </div>
+          <volumes-cifs-form data="formValues.CIFSData" ng-show="formValues.Driver === 'local'"></volumes-cifs-form>
+          <!-- !cifs-management -->
           <!-- storidge -->
           <div ng-if="formValues.Driver === 'cio:latest'">
             <div class="col-sm-12 form-section-title">
@@ -78,9 +102,7 @@
               Deployment
             </div>
             <!-- node-selection -->
-            <node-selector
-              model="formValues.NodeName">
-            </node-selector>
+            <node-selector model="formValues.NodeName"> </node-selector>
             <!-- !node-selection -->
           </div>
           <!-- access-control -->
@@ -92,7 +114,13 @@
           </div>
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-click="create()" ng-disabled="state.actionInProgress || (formValues.NFSData.useNFS && !volumeCreationForm.$valid)" button-spinner="state.actionInProgress">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                ng-click="create()"
+                ng-disabled="state.actionInProgress || (formValues.NFSData.useNFS && !volumeCreationForm.nfsInformationForm.$valid) || (formValues.CIFSData.useCIFS && !volumeCreationForm.cifsInformationForm.$valid)"
+                button-spinner="state.actionInProgress"
+              >
                 <span ng-hide="state.actionInProgress">Create the volume</span>
                 <span ng-show="state.actionInProgress">Creating volume...</span>
               </button>

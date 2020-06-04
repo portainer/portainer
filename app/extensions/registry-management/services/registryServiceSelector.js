@@ -1,82 +1,84 @@
-import { RegistryTypes } from 'Extensions/registry-management/models/registryTypes';
+import {RegistryTypes} from 'Extensions/registry-management/models/registryTypes';
 
-angular.module('portainer.extensions.registrymanagement')
-.factory('RegistryServiceSelector', ['$q', 'RegistryV2Service', 'RegistryGitlabService',
-function RegistryServiceSelector($q, RegistryV2Service, RegistryGitlabService) {
-  'use strict';
-  const service = {};
+angular.module('portainer.extensions.registrymanagement').factory('RegistryServiceSelector', [
+  '$q',
+  'RegistryV2Service',
+  'RegistryGitlabService',
+  function RegistryServiceSelector($q, RegistryV2Service, RegistryGitlabService) {
+    'use strict';
+    const service = {};
 
-  service.ping = ping;
-  service.repositories = repositories;
-  service.getRepositoriesDetails = getRepositoriesDetails;
-  service.tags = tags;
-  service.getTagsDetails = getTagsDetails;
-  service.tag = tag;
-  service.addTag = addTag;
-  service.deleteManifest = deleteManifest;
+    service.ping = ping;
+    service.repositories = repositories;
+    service.getRepositoriesDetails = getRepositoriesDetails;
+    service.tags = tags;
+    service.getTagsDetails = getTagsDetails;
+    service.tag = tag;
+    service.addTag = addTag;
+    service.deleteManifest = deleteManifest;
 
-  service.shortTagsWithProgress = shortTagsWithProgress;
-  service.deleteTagsWithProgress = deleteTagsWithProgress;
-  service.retagWithProgress = retagWithProgress;
+    service.shortTagsWithProgress = shortTagsWithProgress;
+    service.deleteTagsWithProgress = deleteTagsWithProgress;
+    service.retagWithProgress = retagWithProgress;
 
-  function ping(registry, forceNewConfig) {
-    let service = RegistryV2Service;
-    return service.ping(registry, forceNewConfig)
-  }
-
-  function repositories(registry) {
-    let service = RegistryV2Service;
-    if (registry.Type === RegistryTypes.GITLAB) {
-      service = RegistryGitlabService;
+    function ping(registry, forceNewConfig) {
+      let service = RegistryV2Service;
+      return service.ping(registry, forceNewConfig);
     }
-    return service.repositories(registry);
-  }
 
-  function getRepositoriesDetails(registry, repositories) {
-    let service = RegistryV2Service;
-    return service.getRepositoriesDetails(registry, repositories);
-  }
+    function repositories(registry) {
+      let service = RegistryV2Service;
+      if (registry.Type === RegistryTypes.GITLAB) {
+        service = RegistryGitlabService;
+      }
+      return service.repositories(registry);
+    }
 
-  function tags(registry, repository) {
-    let service = RegistryV2Service;
-    return service.tags(registry, repository);
-  }
+    function getRepositoriesDetails(registry, repositories) {
+      let service = RegistryV2Service;
+      return service.getRepositoriesDetails(registry, repositories);
+    }
 
-  function getTagsDetails(registry, repository, tags) {
-    let service = RegistryV2Service;
-    return service.getTagsDetails(registry, repository, tags);
-  }
+    function tags(registry, repository) {
+      let service = RegistryV2Service;
+      return service.tags(registry, repository);
+    }
 
-  function tag(registry, repository, tag) {
-    let service = RegistryV2Service;
-    return service.tag(registry, repository, tag);
-  }
+    function getTagsDetails(registry, repository, tags) {
+      let service = RegistryV2Service;
+      return service.getTagsDetails(registry, repository, tags);
+    }
 
-  function addTag(registry, repository, tag, manifest) {
-    let service = RegistryV2Service;
-    return service.addTag(registry, repository, tag, manifest);
-  }
+    function tag(registry, repository, tag) {
+      let service = RegistryV2Service;
+      return service.tag(registry, repository, tag);
+    }
 
-  function deleteManifest(registry, repository, digest) {
-    let service = RegistryV2Service;
-    return service.deleteManifest(registry, repository, digest);
-  }
+    function addTag(registry, repository, tag, manifest) {
+      let service = RegistryV2Service;
+      return service.addTag(registry, repository, tag, manifest);
+    }
 
-  function shortTagsWithProgress(registry, repository, tagsList) {
-    let service = RegistryV2Service;
-    return service.shortTagsWithProgress(registry, repository, tagsList);
-  }
+    function deleteManifest(registry, repository, digest) {
+      let service = RegistryV2Service;
+      return service.deleteManifest(registry, repository, digest);
+    }
 
-  function deleteTagsWithProgress(registry, repository, modifiedDigests, impactedTags) {
-    let service = RegistryV2Service;
-    return service.deleteTagsWithProgress(registry, repository, modifiedDigests, impactedTags);
-  }
+    function shortTagsWithProgress(registry, repository, tagsList) {
+      let service = RegistryV2Service;
+      return service.shortTagsWithProgress(registry, repository, tagsList);
+    }
 
-  function retagWithProgress(registry, repository, modifiedTags, modifiedDigests, impactedTags) {
-    let service = RegistryV2Service;
-    return service.retagWithProgress(registry, repository, modifiedTags, modifiedDigests, impactedTags);
-  }
+    function deleteTagsWithProgress(registry, repository, modifiedDigests, impactedTags) {
+      let service = RegistryV2Service;
+      return service.deleteTagsWithProgress(registry, repository, modifiedDigests, impactedTags);
+    }
 
-  return service;
-}
+    function retagWithProgress(registry, repository, modifiedTags, modifiedDigests, impactedTags) {
+      let service = RegistryV2Service;
+      return service.retagWithProgress(registry, repository, modifiedTags, modifiedDigests, impactedTags);
+    }
+
+    return service;
+  },
 ]);

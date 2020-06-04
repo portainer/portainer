@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  portainer:
+    image: portainerci/portainer:$PORTAINER_TAG
+    command: -H unix:///var/run/docker.sock --admin-password $$2y$$05$$cQ4zB2SEdP4U3kkNhUV.Gu/xPdE4wSKEo1ncBFfKeERMI6IiXbg8y
+    restart: always
+    ports:
+      - 8999:9000
+      - 8000:8000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
+volumes:
+  portainer_data:

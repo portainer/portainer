@@ -32,7 +32,7 @@ type endpointCreatePayload struct {
 	AzureApplicationID     string
 	AzureTenantID          string
 	AzureAuthenticationKey string
-	Tags                   []string
+	TagIDs                 []portainer.TagID
 }
 
 func (payload *endpointCreatePayload) Validate(r *http.Request) error {
@@ -54,14 +54,14 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 	}
 	payload.GroupID = groupID
 
-	var tags []string
-	err = request.RetrieveMultiPartFormJSONValue(r, "Tags", &tags, true)
+	var tagIDs []portainer.TagID
+	err = request.RetrieveMultiPartFormJSONValue(r, "TagIds", &tagIDs, true)
 	if err != nil {
-		return portainer.Error("Invalid Tags parameter")
+		return portainer.Error("Invalid TagIds parameter")
 	}
-	payload.Tags = tags
-	if payload.Tags == nil {
-		payload.Tags = make([]string, 0)
+	payload.TagIDs = tagIDs
+	if payload.TagIDs == nil {
+		payload.TagIDs = make([]portainer.TagID, 0)
 	}
 
 	useTLS, _ := request.RetrieveBooleanMultiPartFormValue(r, "TLS", true)
@@ -146,6 +146,38 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 		return endpointCreationError
 	}
 
+	endpointGroup, err := handler.EndpointGroupService.EndpointGroup(endpoint.GroupID)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint group inside the database", err}
+	}
+
+	edgeGroups, err := handler.EdgeGroupService.EdgeGroups()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge groups from the database", err}
+	}
+
+	edgeStacks, err := handler.EdgeStackService.EdgeStacks()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge stacks from the database", err}
+	}
+
+	relationObject := &portainer.EndpointRelation{
+		EndpointID: endpoint.ID,
+		EdgeStacks: map[portainer.EdgeStackID]bool{},
+	}
+
+	if endpoint.Type == portainer.EdgeAgentEnvironment {
+		relatedEdgeStacks := portainer.EndpointRelatedEdgeStacks(endpoint, endpointGroup, edgeGroups, edgeStacks)
+		for _, stackID := range relatedEdgeStacks {
+			relationObject.EdgeStacks[stackID] = true
+		}
+	}
+
+	err = handler.EndpointRelationService.CreateEndpointRelation(relationObject)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist the relation object inside the database", err}
+	}
+
 	return response.JSON(w, endpoint)
 }
 
@@ -187,7 +219,7 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 		TeamAccessPolicies: portainer.TeamAccessPolicies{},
 		Extensions:         []portainer.EndpointExtension{},
 		AzureCredentials:   credentials,
-		Tags:               payload.Tags,
+		TagIDs:             payload.TagIDs,
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.Snapshot{},
 	}
@@ -232,7 +264,7 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		AuthorizedUsers: []portainer.UserID{},
 		AuthorizedTeams: []portainer.TeamID{},
 		Extensions:      []portainer.EndpointExtension{},
-		Tags:            payload.Tags,
+		TagIDs:          payload.TagIDs,
 		Status:          portainer.EndpointStatusUp,
 		Snapshots:       []portainer.Snapshot{},
 		EdgeKey:         edgeKey,
@@ -278,7 +310,7 @@ func (handler *Handler) createUnsecuredEndpoint(payload *endpointCreatePayload) 
 		UserAccessPolicies: portainer.UserAccessPolicies{},
 		TeamAccessPolicies: portainer.TeamAccessPolicies{},
 		Extensions:         []portainer.EndpointExtension{},
-		Tags:               payload.Tags,
+		TagIDs:             payload.TagIDs,
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.Snapshot{},
 	}
@@ -322,7 +354,7 @@ func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload)
 		UserAccessPolicies: portainer.UserAccessPolicies{},
 		TeamAccessPolicies: portainer.TeamAccessPolicies{},
 		Extensions:         []portainer.EndpointExtension{},
-		Tags:               payload.Tags,
+		TagIDs:             payload.TagIDs,
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.Snapshot{},
 	}
@@ -375,6 +407,20 @@ func (handler *Handler) saveEndpointAndUpdateAuthorizations(endpoint *portainer.
 
 	if len(group.UserAccessPolicies) > 0 || len(group.TeamAccessPolicies) > 0 {
 		return handler.AuthorizationService.UpdateUsersAuthorizations()
+	}
+
+	for _, tagID := range endpoint.TagIDs {
+		tag, err := handler.TagService.Tag(tagID)
+		if err != nil {
+			return err
+		}
+
+		tag.Endpoints[endpoint.ID] = true
+
+		err = handler.TagService.UpdateTag(tagID, tag)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

@@ -8,6 +8,6 @@ angular.module('portainer.azure').component('containergroupsDatatable', {
     tableKey: '@',
     orderBy: '@',
     reverseOrder: '<',
-    removeAction: '<'
-  }
+    removeAction: '<',
+  },
 });
