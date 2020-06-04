@@ -3,7 +3,6 @@ package docker
 import (
 	"context"
 	"errors"
-	"log"
 	"net/http"
 	"path"
 
@@ -48,6 +47,9 @@ func (transport *Transport) volumeListOperation(response *http.Response, executo
 
 		for _, volumeObject := range volumeData {
 			volume := volumeObject.(map[string]interface{})
+			if volume["Name"] == nil || volume["CreatedAt"] == nil {
+				return errors.New("missing identifier in Docker resource list response")
+			}
 			volume[volumeObjectIdentifier] = volume["Name"].(string) + volume["CreatedAt"].(string)
 		}
 
@@ -76,6 +78,10 @@ func (transport *Transport) volumeInspectOperation(response *http.Response, exec
 	responseObject, err := responseutils.GetResponseAsJSONOBject(response)
 	if err != nil {
 		return err
+	}
+
+	if responseObject["Name"] == nil || responseObject["CreatedAt"] == nil {
+		return errors.New("missing identifier in Docker resource detail response")
 	}
 	responseObject[volumeObjectIdentifier] = responseObject["Name"].(string) + responseObject["CreatedAt"].(string)
 
@@ -140,11 +146,9 @@ func (transport *Transport) decorateVolumeCreationResponse(response *http.Respon
 		return err
 	}
 
-	if responseObject["Name"] == nil {
-		log.Printf("[ERROR] [proxy,docker]")
+	if responseObject["Name"] == nil || responseObject["CreatedAt"] == nil {
 		return errors.New("missing identifier in Docker resource creation response")
 	}
-
 	resourceID := responseObject["Name"].(string) + responseObject["CreatedAt"].(string)
 
 	resourceControl, err := transport.createPrivateResourceControl(resourceID, resourceType, userID)
@@ -157,7 +161,7 @@ func (transport *Transport) decorateVolumeCreationResponse(response *http.Respon
 	return responseutils.RewriteResponse(response, responseObject, http.StatusOK)
 }
 
-func (transport *Transport) volumeDetailOperation(requestPath string, request *http.Request) (*http.Response, error) {
+func (transport *Transport) restrictedVolumeOperation(requestPath string, request *http.Request) (*http.Response, error) {
 
 	if request.Method == http.MethodGet {
 		return transport.rewriteOperation(request, transport.volumeInspectOperation)

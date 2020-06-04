@@ -264,7 +264,7 @@ func (transport *Transport) proxyVolumeRequest(request *http.Request) (*http.Res
 
 	default:
 		// assume /volumes/{name}
-		return transport.volumeDetailOperation(requestPath, request)
+		return transport.restrictedVolumeOperation(requestPath, request)
 	}
 }
 
