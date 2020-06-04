@@ -165,7 +165,6 @@ a[ng-click] {
 
 .widget .widget-body table tbody td {
   white-space: normal;
-  word-break: break-word;
 }
 
 .widget .widget-body table.description-table {
