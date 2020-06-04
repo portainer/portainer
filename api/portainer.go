@@ -124,7 +124,7 @@ type (
 		CronExpression string                             `json:"CronExpression"`
 		Endpoints      map[EndpointID]EdgeJobEndpointMeta `json:"Endpoints"`
 		Name           string                             `json:"Name"`
-		ScriptPath     string                             `json:"Script"`
+		ScriptPath     string                             `json:"ScriptPath"`
 		Recurring      bool                               `json:"Recurring"`
 		Version        int                                `json:"Version"`
 	}
