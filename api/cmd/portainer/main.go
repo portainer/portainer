@@ -77,17 +77,17 @@ func initSwarmStackManager(assetsPath string, dataStorePath string, signatureSer
 	return exec.NewSwarmStackManager(assetsPath, dataStorePath, signatureService, fileService, reverseTunnelService)
 }
 
-func initJWTService(dataStore portainer.DataStore) portainer.JWTService {
+func initJWTService(dataStore portainer.DataStore) (portainer.JWTService, error) {
 	settings, err := dataStore.Settings().Settings()
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	jwtService, err := jwt.NewService(settings.UserSessionTimeout)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	return jwtService
+	return jwtService, nil
 }
 
 func initDigitalSignatureService() portainer.DigitalSignatureService {
@@ -393,7 +393,10 @@ func main() {
 	dataStore := initDataStore(*flags.Data, fileService)
 	defer dataStore.Close()
 
-	jwtService := initJWTService(dataStore)
+	jwtService, err := initJWTService(dataStore)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	ldapService := initLDAPService()
 
@@ -403,7 +406,7 @@ func main() {
 
 	digitalSignatureService := initDigitalSignatureService()
 
-	err := initKeyPair(fileService, digitalSignatureService)
+	err = initKeyPair(fileService, digitalSignatureService)
 	if err != nil {
 		log.Fatal(err)
 	}
