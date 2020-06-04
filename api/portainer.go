@@ -155,21 +155,23 @@ type (
 	// Endpoint represents a Docker endpoint with all the info required
 	// to connect to it
 	Endpoint struct {
-		ID                 EndpointID          `json:"Id"`
-		Name               string              `json:"Name"`
-		Type               EndpointType        `json:"Type"`
-		URL                string              `json:"URL"`
-		GroupID            EndpointGroupID     `json:"GroupId"`
-		PublicURL          string              `json:"PublicURL"`
-		TLSConfig          TLSConfiguration    `json:"TLSConfig"`
-		Extensions         []EndpointExtension `json:"Extensions"`
-		TagIDs             []TagID             `json:"TagIds"`
-		Status             EndpointStatus      `json:"Status"`
-		Snapshots          []Snapshot          `json:"Snapshots"`
-		UserAccessPolicies UserAccessPolicies  `json:"UserAccessPolicies"`
-		TeamAccessPolicies TeamAccessPolicies  `json:"TeamAccessPolicies"`
-		EdgeID             string              `json:"EdgeID,omitempty"`
-		EdgeKey            string              `json:"EdgeKey"`
+		ID                  EndpointID          `json:"Id"`
+		Name                string              `json:"Name"`
+		Type                EndpointType        `json:"Type"`
+		URL                 string              `json:"URL"`
+		GroupID             EndpointGroupID     `json:"GroupId"`
+		PublicURL           string              `json:"PublicURL"`
+		TLSConfig           TLSConfiguration    `json:"TLSConfig"`
+		Extensions          []EndpointExtension `json:"Extensions"`
+		TagIDs              []TagID             `json:"TagIds"`
+		Status              EndpointStatus      `json:"Status"`
+		Snapshots           []Snapshot          `json:"Snapshots"`
+		UserAccessPolicies  UserAccessPolicies  `json:"UserAccessPolicies"`
+		TeamAccessPolicies  TeamAccessPolicies  `json:"TeamAccessPolicies"`
+		EdgeID              string              `json:"EdgeID,omitempty"`
+		EdgeKey             string              `json:"EdgeKey"`
+		EdgeCheckinInterval int                 `json:"EdgeCheckinInterval"`
+
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
 		TLS           bool   `json:"TLS,omitempty"`

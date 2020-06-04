@@ -91,12 +91,11 @@ angular.module('portainer.app').factory('FileUploadService', [
         data: {
           file: file,
           Name: stackName,
-          EdgeGroups: Upload.json(edgeGroups)
+          EdgeGroups: Upload.json(edgeGroups),
         },
-        ignoreLoadingBar: true
+        ignoreLoadingBar: true,
       });
     };
-  
 
     service.configureRegistry = function (registryId, registryManagementConfigurationModel) {
       return Upload.upload({
@@ -116,7 +115,7 @@ angular.module('portainer.app').factory('FileUploadService', [
       });
     };
 
-    service.createEndpoint = function (name, type, URL, PublicURL, groupID, tagIds, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
+    service.createEndpoint = function (name, type, URL, PublicURL, groupID, tagIds, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile, checkinInterval) {
       return Upload.upload({
         url: 'api/endpoints',
         data: {
@@ -132,6 +131,7 @@ angular.module('portainer.app').factory('FileUploadService', [
           TLSCACertFile: TLSCAFile,
           TLSCertFile: TLSCertFile,
           TLSKeyFile: TLSKeyFile,
+          CheckinInterval: checkinInterval,
         },
         ignoreLoadingBar: true,
       });

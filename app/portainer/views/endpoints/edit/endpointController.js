@@ -17,13 +17,32 @@ angular
     TagService,
     EndpointProvider,
     Notifications,
-    Authentication
+    Authentication,
+    SettingsService
   ) {
     $scope.state = {
       uploadInProgress: false,
       actionInProgress: false,
       deploymentTab: 0,
       allowCreate: Authentication.isAdmin(),
+      availableEdgeAgentCheckinOptions: [
+        { key: 'Use default interval', value: 0 },
+        {
+          key: '5 seconds',
+          value: 5,
+        },
+        {
+          key: '10 seconds',
+          value: 10,
+        },
+        {
+          key: '30 seconds',
+          value: 30,
+        },
+        { key: '5 minutes', value: 300 },
+        { key: '1 hour', value: 3600 },
+        { key: '1 day', value: 86400 },
+      ],
     };
 
     $scope.formValues = {
@@ -83,6 +102,7 @@ angular
         PublicURL: endpoint.PublicURL,
         GroupID: endpoint.GroupId,
         TagIds: endpoint.TagIds,
+        EdgeCheckinInterval: endpoint.EdgeCheckinInterval,
         TLS: TLS,
         TLSSkipVerify: TLSSkipVerify,
         TLSSkipClientVerify: TLSSkipClientVerify,
@@ -133,6 +153,7 @@ angular
         endpoint: EndpointService.endpoint($transition$.params().id),
         groups: GroupService.groups(),
         tags: TagService.tags(),
+        settings: SettingsService.settings(),
       })
         .then(function success(data) {
           var endpoint = data.endpoint;
@@ -149,6 +170,9 @@ angular
               standalone: buildStandaloneCommand($scope.randomEdgeID, endpoint.EdgeKey),
               swarm: buildSwarmCommand($scope.randomEdgeID, endpoint.EdgeKey),
             };
+
+            const settings = data.settings;
+            $scope.state.availableEdgeAgentCheckinOptions[0].key += ` (${settings.EdgeAgentCheckinInterval} seconds)`;
           }
           $scope.endpoint = endpoint;
           $scope.groups = data.groups;
