@@ -170,6 +170,12 @@ func (store *Store) initServices() error {
 	}
 	store.RoleService = authorizationsetService
 
+	customTemplateService, err := customtemplate.NewService(store.db)
+	if err != nil {
+		return err
+	}
+	store.CustomTemplateService = customTemplateService
+
 	dockerhubService, err := dockerhub.NewService(store.db)
 	if err != nil {
 		return err

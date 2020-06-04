@@ -81,9 +81,6 @@ func (service *Service) CreateCustomTemplate(customTemplate *portainer.CustomTem
 	return service.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(BucketName))
 
-		id, _ := bucket.NextSequence()
-		customTemplate.ID = portainer.CustomTemplateID(id)
-
 		data, err := internal.MarshalObject(customTemplate)
 		if err != nil {
 			return err
@@ -91,4 +88,9 @@ func (service *Service) CreateCustomTemplate(customTemplate *portainer.CustomTem
 
 		return bucket.Put(internal.Itob(int(customTemplate.ID)), data)
 	})
+}
+
+// GetNextIdentifier returns the next identifier for a custom template.
+func (service *Service) GetNextIdentifier() int {
+	return internal.GetNextIdentifier(service.db, BucketName)
 }
