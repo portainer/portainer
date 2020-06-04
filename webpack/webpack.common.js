@@ -115,6 +115,7 @@ module.exports = {
       Docker: path.resolve(projectRoot, 'app/docker'),
       Extensions: path.resolve(projectRoot, 'app/extensions'),
       Portainer: path.resolve(projectRoot, 'app/portainer'),
+      '@': path.resolve(projectRoot, 'app'),
     },
   },
 };
