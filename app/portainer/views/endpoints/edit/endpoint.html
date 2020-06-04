@@ -36,10 +36,10 @@
       <div style="margin-top: 10px;">
         <uib-tabset active="state.deploymentTab">
           <uib-tab index="0" heading="Standalone">
-            <code style="display: block; white-space: pre-wrap; padding: 16px 90px;">{{dockerCommands.standalone}}</code>
+            <code style="display: block; white-space: pre-wrap; padding: 16px 90px;">{{ dockerCommands.standalone }}</code>
           </uib-tab>
           <uib-tab index="1" heading="Swarm">
-            <code style="display: block; white-space: pre-wrap; padding: 16px 90px;">{{dockerCommands.swarm}}</code>
+            <code style="display: block; white-space: pre-wrap; padding: 16px 90px;">{{ dockerCommands.swarm }}</code>
           </uib-tab>
         </uib-tabset>
         <div style="margin-top: 10px;">
@@ -116,6 +116,23 @@
             </label>
             <div class="col-sm-9 col-lg-10">
               <input type="text" class="form-control" id="endpoint_public_url" ng-model="endpoint.PublicURL" placeholder="e.g. 10.0.0.10 or mydocker.mydomain.com" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="edge_checkin" class="col-sm-2 control-label text-left">
+              Poll frequency
+              <portainer-tooltip
+                position="bottom"
+                message="Interval used by this Edge agent to check in with the Portainer instance. Affects Edge endpoint management and Edge compute features."
+              ></portainer-tooltip>
+            </label>
+            <div class="col-sm-10">
+              <select
+                id="edge_checkin"
+                class="form-control"
+                ng-model="endpoint.EdgeCheckinInterval"
+                ng-options="+(opt.value) as opt.key for opt in state.availableEdgeAgentCheckinOptions"
+              ></select>
             </div>
           </div>
           <!-- !endpoint-public-url-input -->

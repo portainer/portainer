@@ -65,7 +65,21 @@ angular.module('portainer.app').factory('EndpointService', [
       return deferred.promise;
     };
 
-    service.createRemoteEndpoint = function (name, type, URL, PublicURL, groupID, tagIds, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
+    service.createRemoteEndpoint = function (
+      name,
+      type,
+      URL,
+      PublicURL,
+      groupID,
+      tagIds,
+      TLS,
+      TLSSkipVerify,
+      TLSSkipClientVerify,
+      TLSCAFile,
+      TLSCertFile,
+      TLSKeyFile,
+      checkinInterval
+    ) {
       var deferred = $q.defer();
 
       var endpointURL = URL;
@@ -73,7 +87,21 @@ angular.module('portainer.app').factory('EndpointService', [
         endpointURL = 'tcp://' + URL;
       }
 
-      FileUploadService.createEndpoint(name, type, endpointURL, PublicURL, groupID, tagIds, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
+      FileUploadService.createEndpoint(
+        name,
+        type,
+        endpointURL,
+        PublicURL,
+        groupID,
+        tagIds,
+        TLS,
+        TLSSkipVerify,
+        TLSSkipClientVerify,
+        TLSCAFile,
+        TLSCertFile,
+        TLSKeyFile,
+        checkinInterval
+      )
         .then(function success(response) {
           deferred.resolve(response.data);
         })
