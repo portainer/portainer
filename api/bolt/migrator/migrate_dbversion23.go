@@ -7,20 +7,12 @@ func (m *Migrator) updateSettingsToDB24() error {
 	if err != nil {
 		return err
 	}
-	updateSettings := false
+
 	if legacySettings.TemplatesURL == "" {
 		legacySettings.TemplatesURL = portainer.DefaultTemplatesURL
-		updateSettings = true
 	}
 
-	if legacySettings.UserSessionTimeout == "" {
-		legacySettings.UserSessionTimeout = portainer.DefaultUserSessionTimeout
-		updateSettings = true
-	}
+	legacySettings.UserSessionTimeout = portainer.DefaultUserSessionTimeout
 
-	if updateSettings {
-		return m.settingsService.UpdateSettings(legacySettings)
-	}
-
-	return nil
+	return m.settingsService.UpdateSettings(legacySettings)
 }
