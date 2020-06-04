@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
-import {UserViewModel} from '../../models/user';
-import {TeamMembershipModel} from '../../models/teamMembership';
+import { UserViewModel } from '../../models/user';
+import { TeamMembershipModel } from '../../models/teamMembership';
 
 angular.module('portainer.app').factory('UserService', [
   '$q',

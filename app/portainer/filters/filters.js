@@ -2,7 +2,7 @@ import moment from 'moment';
 import _ from 'lodash-es';
 import filesize from 'filesize';
 
-import {ResourceControlOwnership as RCO} from 'Portainer/models/resourceControl/resourceControlOwnership';
+import { ResourceControlOwnership as RCO } from 'Portainer/models/resourceControl/resourceControlOwnership';
 
 angular
   .module('portainer.app')

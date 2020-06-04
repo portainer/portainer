@@ -1,4 +1,4 @@
-import {StatusVersionViewModel, StatusViewModel} from '../../models/status';
+import { StatusVersionViewModel, StatusViewModel } from '../../models/status';
 
 angular.module('portainer.app').factory('StatusService', [
   '$q',

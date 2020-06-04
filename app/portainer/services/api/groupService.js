@@ -1,4 +1,4 @@
-import {EndpointGroupCreateRequest, EndpointGroupModel, EndpointGroupUpdateRequest} from '../../models/group';
+import { EndpointGroupCreateRequest, EndpointGroupModel, EndpointGroupUpdateRequest } from '../../models/group';
 
 angular.module('portainer.app').factory('GroupService', [
   '$q',

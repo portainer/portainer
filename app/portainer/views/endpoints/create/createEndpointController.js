@@ -1,4 +1,4 @@
-import {EndpointSecurityFormData} from '../../../components/endpointSecurity/porEndpointSecurityModel';
+import { EndpointSecurityFormData } from '../../../components/endpointSecurity/porEndpointSecurityModel';
 
 angular
   .module('portainer.app')

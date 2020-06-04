@@ -1,4 +1,4 @@
-import {StoridgeSnapshotModel} from '../models/snapshot';
+import { StoridgeSnapshotModel } from '../models/snapshot';
 
 angular.module('portainer.integrations.storidge').factory('StoridgeSnapshotService', [
   '$q',

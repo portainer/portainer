@@ -1,5 +1,5 @@
-import {StoridgeInfoModel} from '../models/info';
-import {StoridgeEventModel} from '../models/events';
+import { StoridgeInfoModel } from '../models/info';
+import { StoridgeEventModel } from '../models/events';
 
 angular.module('portainer.integrations.storidge').factory('StoridgeClusterService', [
   '$q',

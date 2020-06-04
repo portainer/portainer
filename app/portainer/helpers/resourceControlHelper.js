@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
 import angular from 'angular';
-import {ResourceControlOwnership as RCO} from 'Portainer/models/resourceControl/resourceControlOwnership';
-import {ResourceControlOwnershipParameters} from '../models/resourceControl/resourceControlOwnershipParameters';
+import { ResourceControlOwnership as RCO } from 'Portainer/models/resourceControl/resourceControlOwnership';
+import { ResourceControlOwnershipParameters } from '../models/resourceControl/resourceControlOwnershipParameters';
 
 class ResourceControlHelper {
   /**

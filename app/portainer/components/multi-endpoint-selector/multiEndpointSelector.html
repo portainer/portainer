@@ -5,11 +5,7 @@
       <span ng-if="$item.TagIds.length"> - <i class="fa fa-tags"></i> {{ $ctrl.tagIdsToTagNames($item.TagIds) | arraytostr }}</span>
     </span>
   </ui-select-match>
-  <ui-select-choices
-    group-by="$ctrl.groupEndpoints"
-    group-filter="$ctrl.sortGroups"
-    repeat="endpoint.Id as endpoint in $ctrl.endpoints | filter: { Name: $select.search }"
-  >
+  <ui-select-choices group-by="$ctrl.groupEndpoints" group-filter="$ctrl.sortGroups" repeat="endpoint.Id as endpoint in $ctrl.endpoints | filter: { Name: $select.search }">
     <span>
       {{ endpoint.Name }}
       <span ng-if="endpoint.TagIds.length"> - <i class="fa fa-tags"></i> {{ $ctrl.tagIdsToTagNames(endpoint.TagIds) | arraytostr }}</span>

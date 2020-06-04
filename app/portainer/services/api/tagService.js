@@ -1,4 +1,4 @@
-import {TagViewModel} from '../../models/tag';
+import { TagViewModel } from '../../models/tag';
 
 angular.module('portainer.app').factory('TagService', [
   '$q',

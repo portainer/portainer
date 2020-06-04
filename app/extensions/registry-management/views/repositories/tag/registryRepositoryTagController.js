@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
 import angular from 'angular';
-import {RegistryImageLayerViewModel} from 'Extensions/registry-management/models/registryImageLayer';
-import {RegistryImageDetailsViewModel} from 'Extensions/registry-management/models/registryImageDetails';
+import { RegistryImageLayerViewModel } from 'Extensions/registry-management/models/registryImageLayer';
+import { RegistryImageDetailsViewModel } from 'Extensions/registry-management/models/registryImageDetails';
 
 class RegistryRepositoryTagController {
   /* @ngInject */

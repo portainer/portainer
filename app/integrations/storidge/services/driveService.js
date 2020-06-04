@@ -1,4 +1,4 @@
-import {StoridgeDriveModel} from '../models/drive';
+import { StoridgeDriveModel } from '../models/drive';
 
 angular.module('portainer.integrations.storidge').factory('StoridgeDriveService', [
   '$q',

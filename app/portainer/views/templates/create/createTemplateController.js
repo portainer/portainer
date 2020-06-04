@@ -1,4 +1,4 @@
-import {TemplateDefaultModel} from '../../../models/template';
+import { TemplateDefaultModel } from '../../../models/template';
 
 angular.module('portainer.app').controller('CreateTemplateController', [
   '$q',

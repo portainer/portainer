@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 
-import {RegistryTypes} from 'Extensions/registry-management/models/registryTypes';
+import { RegistryTypes } from 'Extensions/registry-management/models/registryTypes';
 
 angular.module('portainer.extensions.registrymanagement').controller('RegistryRepositoriesController', [
   '$transition$',

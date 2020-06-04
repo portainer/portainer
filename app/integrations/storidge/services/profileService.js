@@ -1,4 +1,4 @@
-import {StoridgeCreateProfileRequest, StoridgeProfileListModel, StoridgeProfileModel} from '../models/profile';
+import { StoridgeCreateProfileRequest, StoridgeProfileListModel, StoridgeProfileModel } from '../models/profile';
 
 angular.module('portainer.integrations.storidge').factory('StoridgeProfileService', [
   '$q',

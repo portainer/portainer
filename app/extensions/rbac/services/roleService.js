@@ -1,4 +1,4 @@
-import {RoleViewModel} from '../models/role';
+import { RoleViewModel } from '../models/role';
 
 angular.module('portainer.extensions.rbac').factory('RoleService', [
   '$q',

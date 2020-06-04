@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import {TeamAccessViewModel, UserAccessViewModel} from '../../models/access';
+import { TeamAccessViewModel, UserAccessViewModel } from '../../models/access';
 
 angular.module('portainer.app').factory('AccessService', [
   '$q',

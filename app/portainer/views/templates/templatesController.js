@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import {AccessControlFormData} from '../../components/accessControlForm/porAccessControlFormModel';
+import { AccessControlFormData } from '../../components/accessControlForm/porAccessControlFormModel';
 
 angular.module('portainer.app').controller('TemplatesController', [
   '$scope',

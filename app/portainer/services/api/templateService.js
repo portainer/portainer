@@ -1,4 +1,4 @@
-import {TemplateCreateRequest, TemplateUpdateRequest, TemplateViewModel} from '../../models/template';
+import { TemplateCreateRequest, TemplateUpdateRequest, TemplateViewModel } from '../../models/template';
 
 angular.module('portainer.app').factory('TemplateService', [
   '$q',

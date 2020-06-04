@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import {RepositoryShortTag, RepositoryTagViewModel} from '../../../models/repositoryTag';
+import { RepositoryShortTag, RepositoryTagViewModel } from '../../../models/repositoryTag';
 
 angular.module('portainer.app').controller('RegistryRepositoryController', [
   '$q',

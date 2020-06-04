@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import {RegistryTypes} from 'Extensions/registry-management/models/registryTypes';
+import { RegistryTypes } from 'Extensions/registry-management/models/registryTypes';
 
 export function RegistryViewModel(data) {
   this.Id = data.Id;

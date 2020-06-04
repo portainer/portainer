@@ -1,4 +1,4 @@
-import {TeamMembershipModel} from '../../models/teamMembership';
+import { TeamMembershipModel } from '../../models/teamMembership';
 
 angular.module('portainer.app').factory('TeamMembershipService', [
   '$q',

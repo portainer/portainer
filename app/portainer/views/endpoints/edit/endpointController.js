@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 import uuidv4 from 'uuid/v4';
-import {EndpointSecurityFormData} from '../../../components/endpointSecurity/porEndpointSecurityModel';
+import { EndpointSecurityFormData } from '../../../components/endpointSecurity/porEndpointSecurityModel';
 
 angular
   .module('portainer.app')

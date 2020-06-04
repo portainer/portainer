@@ -1,4 +1,4 @@
-import {AccessControlFormData} from '../../../components/accessControlForm/porAccessControlFormModel';
+import { AccessControlFormData } from '../../../components/accessControlForm/porAccessControlFormModel';
 
 angular.module('portainer.app').controller('CreateStackController', [
   '$scope',

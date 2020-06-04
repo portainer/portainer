@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
-import {RepositoryAddTagPayload, RepositoryShortTag} from '../models/repositoryTag';
-import {RegistryRepositoryViewModel} from '../models/registryRepository';
+import { RepositoryAddTagPayload, RepositoryShortTag } from '../models/repositoryTag';
+import { RegistryRepositoryViewModel } from '../models/registryRepository';
 import genericAsyncGenerator from './genericAsyncGenerator';
 
 angular.module('portainer.extensions.registrymanagement').factory('RegistryV2Service', [

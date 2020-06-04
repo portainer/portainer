@@ -1,4 +1,4 @@
-import {genericHandler, jsonObjectsToArrayHandler} from '../../docker/rest/response/handlers';
+import { genericHandler, jsonObjectsToArrayHandler } from '../../docker/rest/response/handlers';
 
 angular.module('portainer.app').factory('FileUploadService', [
   '$q',
@@ -91,12 +91,11 @@ angular.module('portainer.app').factory('FileUploadService', [
         data: {
           file: file,
           Name: stackName,
-          EdgeGroups: Upload.json(edgeGroups)
+          EdgeGroups: Upload.json(edgeGroups),
         },
-        ignoreLoadingBar: true
+        ignoreLoadingBar: true,
       });
     };
-  
 
     service.configureRegistry = function (registryId, registryManagementConfigurationModel) {
       return Upload.upload({

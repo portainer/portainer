@@ -1,4 +1,4 @@
-import {DockerHubViewModel} from '../../models/dockerhub';
+import { DockerHubViewModel } from '../../models/dockerhub';
 
 angular.module('portainer.app').factory('DockerHubService', [
   '$q',

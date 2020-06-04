@@ -1,4 +1,4 @@
-import {EndpointGroupDefaultModel} from '../../../models/group';
+import { EndpointGroupDefaultModel } from '../../../models/group';
 
 angular.module('portainer.app').controller('CreateGroupController', function CreateGroupController($async, $scope, $state, GroupService, TagService, Notifications) {
   $scope.state = {

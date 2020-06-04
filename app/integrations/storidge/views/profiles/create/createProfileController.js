@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import {StoridgeProfileDefaultModel} from '../../../models/profile';
+import { StoridgeProfileDefaultModel } from '../../../models/profile';
 
 angular.module('portainer.integrations.storidge').controller('StoridgeCreateProfileController', [
   '$scope',

@@ -1,5 +1,5 @@
-import {TeamViewModel} from '../../models/team';
-import {TeamMembershipModel} from '../../models/teamMembership';
+import { TeamViewModel } from '../../models/team';
+import { TeamMembershipModel } from '../../models/teamMembership';
 
 angular.module('portainer.app').factory('TeamService', [
   '$q',

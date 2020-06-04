@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import {PorImageRegistryModel} from 'Docker/models/porImageRegistry';
+import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
 export function TemplateDefaultModel() {
   this.Type = 1;

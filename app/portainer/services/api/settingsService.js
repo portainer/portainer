@@ -1,4 +1,4 @@
-import {PublicSettingsViewModel, SettingsViewModel} from '../../models/settings';
+import { PublicSettingsViewModel, SettingsViewModel } from '../../models/settings';
 
 angular.module('portainer.app').factory('SettingsService', [
   '$q',

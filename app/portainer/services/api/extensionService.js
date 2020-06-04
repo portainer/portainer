@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import {ExtensionViewModel} from '../../models/extension';
+import { ExtensionViewModel } from '../../models/extension';
 
 angular.module('portainer.app').factory('ExtensionService', [
   '$q',

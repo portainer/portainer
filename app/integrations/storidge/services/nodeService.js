@@ -1,4 +1,4 @@
-import {StoridgeNodeDetailedModel, StoridgeNodeModel} from '../models/node';
+import { StoridgeNodeDetailedModel, StoridgeNodeModel } from '../models/node';
 
 angular.module('portainer.integrations.storidge').factory('StoridgeNodeService', [
   '$q',

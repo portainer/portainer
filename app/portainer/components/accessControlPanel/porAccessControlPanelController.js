@@ -1,10 +1,7 @@
 import _ from 'lodash-es';
-import {ResourceControlOwnership as RCO} from 'Portainer/models/resourceControl/resourceControlOwnership';
-import {
-  ResourceControlTypeInt as RCTI,
-  ResourceControlTypeString as RCTS
-} from 'Portainer/models/resourceControl/resourceControlTypes';
-import {AccessControlPanelData} from './porAccessControlPanelModel';
+import { ResourceControlOwnership as RCO } from 'Portainer/models/resourceControl/resourceControlOwnership';
+import { ResourceControlTypeInt as RCTI, ResourceControlTypeString as RCTS } from 'Portainer/models/resourceControl/resourceControlTypes';
+import { AccessControlPanelData } from './porAccessControlPanelModel';
 
 angular.module('portainer.app').controller('porAccessControlPanelController', [
   '$q',

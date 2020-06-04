@@ -1,9 +1,4 @@
-import {
-  ScheduleCreateRequest,
-  ScheduleModel,
-  ScheduleUpdateRequest,
-  ScriptExecutionTaskModel
-} from '../../models/schedule';
+import { ScheduleCreateRequest, ScheduleModel, ScheduleUpdateRequest, ScriptExecutionTaskModel } from '../../models/schedule';
 
 angular.module('portainer.app').factory('ScheduleService', [
   '$q',

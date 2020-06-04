@@ -1,4 +1,4 @@
-import {MotdViewModel} from '../../models/motd';
+import { MotdViewModel } from '../../models/motd';
 
 angular.module('portainer.app').factory('MotdService', [
   '$q',

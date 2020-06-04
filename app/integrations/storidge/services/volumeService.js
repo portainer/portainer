@@ -1,4 +1,4 @@
-import {StoridgeVolumeModel, StoridgeVolumeUpdateModel} from '../models/volume';
+import { StoridgeVolumeModel, StoridgeVolumeUpdateModel } from '../models/volume';
 
 angular.module('portainer.integrations.storidge').factory('StoridgeVolumeService', [
   '$q',
