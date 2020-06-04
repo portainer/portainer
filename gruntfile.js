@@ -123,7 +123,7 @@ gruntfile_cfg.shell = {
   build_binary_azuredevops: { command: shell_build_binary_azuredevops },
   download_docker_binary: { command: shell_download_docker_binary },
   run_container: { command: shell_run_container },
-  run_localserver: { command: shell_run_localserver },
+  run_localserver: { command: shell_run_localserver, options: { async: true } },
   install_yarndeps: { command: shell_install_yarndeps },
 };
 
