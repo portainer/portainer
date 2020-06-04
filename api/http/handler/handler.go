@@ -90,6 +90,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.StripPrefix("/api/endpoints", h.EndpointProxyHandler).ServeHTTP(w, r)
 		case strings.Contains(r.URL.Path, "/storidge/"):
 			http.StripPrefix("/api/endpoints", h.EndpointProxyHandler).ServeHTTP(w, r)
+		case strings.Contains(r.URL.Path, "/azure/"):
+			http.StripPrefix("/api/endpoints", h.EndpointProxyHandler).ServeHTTP(w, r)
 		case strings.Contains(r.URL.Path, "/edge/"):
 			http.StripPrefix("/api/endpoints", h.EndpointEdgeHandler).ServeHTTP(w, r)
 		default:

@@ -18,19 +18,22 @@ import (
 )
 
 type endpointCreatePayload struct {
-	Name                string
-	URL                 string
-	EndpointType        int
-	PublicURL           string
-	GroupID             int
-	TLS                 bool
-	TLSSkipVerify       bool
-	TLSSkipClientVerify bool
-	TLSCACertFile       []byte
-	TLSCertFile         []byte
-	TLSKeyFile          []byte
-	TagIDs              []portainer.TagID
-	EdgeCheckinInterval int
+	Name                   string
+	URL                    string
+	EndpointType           int
+	PublicURL              string
+	GroupID                int
+	TLS                    bool
+	TLSSkipVerify          bool
+	TLSSkipClientVerify    bool
+	TLSCACertFile          []byte
+	TLSCertFile            []byte
+	TLSKeyFile             []byte
+	AzureApplicationID     string
+	AzureTenantID          string
+	AzureAuthenticationKey string
+	TagIDs                 []portainer.TagID
+	EdgeCheckinInterval    int
 }
 
 func (payload *endpointCreatePayload) Validate(r *http.Request) error {
@@ -42,7 +45,7 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 
 	endpointType, err := request.RetrieveNumericMultiPartFormValue(r, "EndpointType", false)
 	if err != nil || endpointType == 0 {
-		return portainer.Error("Invalid endpoint type value. Value must be one of: 1 (Docker environment), 2 (Agent environment) or 4 (Edge Agent environment)")
+		return portainer.Error("Invalid endpoint type value. Value must be one of: 1 (Docker environment), 2 (Agent environment), 3 (Azure environment) or 4 (Edge Agent environment)")
 	}
 	payload.EndpointType = endpointType
 
@@ -94,14 +97,35 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 		}
 	}
 
-	endpointURL, err := request.RetrieveMultiPartFormValue(r, "URL", true)
-	if err != nil {
-		return portainer.Error("Invalid endpoint URL")
-	}
-	payload.URL = endpointURL
+	switch portainer.EndpointType(payload.EndpointType) {
+	case portainer.AzureEnvironment:
+		azureApplicationID, err := request.RetrieveMultiPartFormValue(r, "AzureApplicationID", false)
+		if err != nil {
+			return portainer.Error("Invalid Azure application ID")
+		}
+		payload.AzureApplicationID = azureApplicationID
 
-	publicURL, _ := request.RetrieveMultiPartFormValue(r, "PublicURL", true)
-	payload.PublicURL = publicURL
+		azureTenantID, err := request.RetrieveMultiPartFormValue(r, "AzureTenantID", false)
+		if err != nil {
+			return portainer.Error("Invalid Azure tenant ID")
+		}
+		payload.AzureTenantID = azureTenantID
+
+		azureAuthenticationKey, err := request.RetrieveMultiPartFormValue(r, "AzureAuthenticationKey", false)
+		if err != nil {
+			return portainer.Error("Invalid Azure authentication key")
+		}
+		payload.AzureAuthenticationKey = azureAuthenticationKey
+	default:
+		url, err := request.RetrieveMultiPartFormValue(r, "URL", true)
+		if err != nil {
+			return portainer.Error("Invalid endpoint URL")
+		}
+		payload.URL = url
+
+		publicURL, _ := request.RetrieveMultiPartFormValue(r, "PublicURL", true)
+		payload.PublicURL = publicURL
+	}
 
 	checkinInterval, _ := request.RetrieveNumericMultiPartFormValue(r, "CheckinInterval", true)
 	payload.EdgeCheckinInterval = checkinInterval
@@ -158,7 +182,9 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 }
 
 func (handler *Handler) createEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
-	if portainer.EndpointType(payload.EndpointType) == portainer.EdgeAgentEnvironment {
+	if portainer.EndpointType(payload.EndpointType) == portainer.AzureEnvironment {
+		return handler.createAzureEndpoint(payload)
+	} else if portainer.EndpointType(payload.EndpointType) == portainer.EdgeAgentEnvironment {
 		return handler.createEdgeAgentEndpoint(payload)
 	}
 
@@ -166,6 +192,44 @@ func (handler *Handler) createEndpoint(payload *endpointCreatePayload) (*portain
 		return handler.createTLSSecuredEndpoint(payload)
 	}
 	return handler.createUnsecuredEndpoint(payload)
+}
+
+func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
+	credentials := portainer.AzureCredentials{
+		ApplicationID:     payload.AzureApplicationID,
+		TenantID:          payload.AzureTenantID,
+		AuthenticationKey: payload.AzureAuthenticationKey,
+	}
+
+	httpClient := client.NewHTTPClient()
+	_, err := httpClient.ExecuteAzureAuthenticationRequest(&credentials)
+	if err != nil {
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "Unable to authenticate against Azure", err}
+	}
+
+	endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
+	endpoint := &portainer.Endpoint{
+		ID:                 portainer.EndpointID(endpointID),
+		Name:               payload.Name,
+		URL:                "https://management.azure.com",
+		Type:               portainer.AzureEnvironment,
+		GroupID:            portainer.EndpointGroupID(payload.GroupID),
+		PublicURL:          payload.PublicURL,
+		UserAccessPolicies: portainer.UserAccessPolicies{},
+		TeamAccessPolicies: portainer.TeamAccessPolicies{},
+		Extensions:         []portainer.EndpointExtension{},
+		AzureCredentials:   credentials,
+		TagIDs:             payload.TagIDs,
+		Status:             portainer.EndpointStatusUp,
+		Snapshots:          []portainer.Snapshot{},
+	}
+
+	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
+	if err != nil {
+		return nil, &httperror.HandlerError{http.StatusInternalServerError, "An error occured while trying to create the endpoint", err}
+	}
+
+	return endpoint, nil
 }
 
 func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {

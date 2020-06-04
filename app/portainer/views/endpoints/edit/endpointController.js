@@ -109,6 +109,9 @@ angular
         TLSCACert: TLSSkipVerify || securityData.TLSCACert === endpoint.TLSConfig.TLSCACert ? null : securityData.TLSCACert,
         TLSCert: TLSSkipClientVerify || securityData.TLSCert === endpoint.TLSConfig.TLSCert ? null : securityData.TLSCert,
         TLSKey: TLSSkipClientVerify || securityData.TLSKey === endpoint.TLSConfig.TLSKey ? null : securityData.TLSKey,
+        AzureApplicationID: endpoint.AzureCredentials.ApplicationID,
+        AzureTenantID: endpoint.AzureCredentials.TenantID,
+        AzureAuthenticationKey: endpoint.AzureCredentials.AuthenticationKey,
       };
 
       if ($scope.endpointType !== 'local' && endpoint.Type !== 3) {
