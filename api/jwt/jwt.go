@@ -85,3 +85,15 @@ func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData,
 
 	return nil, portainer.ErrInvalidJWTToken
 }
+
+// SetUserSessionDuration sets the user session duration
+func (service *Service) SetUserSessionDuration(userSessionDuration string) error {
+	userSessionTimeout, err := time.ParseDuration(userSessionDuration)
+	if err != nil {
+		return err
+	}
+
+	service.userSessionTimeout = userSessionTimeout
+
+	return nil
+}

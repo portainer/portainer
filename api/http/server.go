@@ -152,11 +152,12 @@ func (server *Server) Start() error {
 	schedulesHandler.ReverseTunnelService = server.ReverseTunnelService
 
 	var settingsHandler = settings.NewHandler(requestBouncer)
+	settingsHandler.AuthorizationService = authorizationService
 	settingsHandler.DataStore = server.DataStore
-	settingsHandler.LDAPService = server.LDAPService
 	settingsHandler.FileService = server.FileService
 	settingsHandler.JobScheduler = server.JobScheduler
-	settingsHandler.AuthorizationService = authorizationService
+	settingsHandler.JWTService = server.JWTService
+	settingsHandler.LDAPService = server.LDAPService
 
 	var stackHandler = stacks.NewHandler(requestBouncer)
 	stackHandler.DataStore = server.DataStore

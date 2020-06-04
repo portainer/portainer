@@ -137,6 +137,11 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 
 	if payload.UserSessionTimeout != nil {
 		settings.UserSessionTimeout = *payload.UserSessionTimeout
+
+		err = handler.JWTService.SetUserSessionDuration(settings.UserSessionTimeout)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user session timeout", err}
+		}
 	}
 
 	tlsError := handler.updateTLS(settings)
