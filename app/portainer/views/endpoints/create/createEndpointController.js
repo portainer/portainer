@@ -12,6 +12,7 @@ angular
     EndpointService,
     GroupService,
     TagService,
+    SettingsService,
     Notifications,
     Authentication
   ) {
@@ -19,6 +20,24 @@ angular
       EnvironmentType: 'agent',
       actionInProgress: false,
       allowCreateTag: Authentication.isAdmin(),
+      availableEdgeAgentCheckinOptions: [
+        { key: 'Use default interval', value: 0 },
+        {
+          key: '5 seconds',
+          value: 5,
+        },
+        {
+          key: '10 seconds',
+          value: 10,
+        },
+        {
+          key: '30 seconds',
+          value: 30,
+        },
+        { key: '5 minutes', value: 300 },
+        { key: '1 hour', value: 3600 },
+        { key: '1 day', value: 86400 },
+      ],
     };
 
     $scope.formValues = {
@@ -28,6 +47,7 @@ angular
       GroupId: 1,
       SecurityFormData: new EndpointSecurityFormData(),
       TagIds: [],
+      CheckinInterval: $scope.state.availableEdgeAgentCheckinOptions[0].value,
     };
 
     $scope.copyAgentCommand = function () {
@@ -79,7 +99,7 @@ angular
       var tagIds = $scope.formValues.TagIds;
       var URL = $scope.formValues.URL;
 
-      addEndpoint(name, 4, URL, '', groupId, tagIds, false, false, false, null, null, null);
+      addEndpoint(name, 4, URL, '', groupId, tagIds, false, false, false, null, null, null, $scope.formValues.CheckinInterval);
     };
 
     $scope.onCreateTag = function onCreateTag(tagName) {
@@ -96,9 +116,23 @@ angular
       }
     }
 
-    function addEndpoint(name, type, URL, PublicURL, groupId, tagIds, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
+    function addEndpoint(name, type, URL, PublicURL, groupId, tagIds, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile, CheckinInterval) {
       $scope.state.actionInProgress = true;
-      EndpointService.createRemoteEndpoint(name, type, URL, PublicURL, groupId, tagIds, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
+      EndpointService.createRemoteEndpoint(
+        name,
+        type,
+        URL,
+        PublicURL,
+        groupId,
+        tagIds,
+        TLS,
+        TLSSkipVerify,
+        TLSSkipClientVerify,
+        TLSCAFile,
+        TLSCertFile,
+        TLSKeyFile,
+        CheckinInterval
+      )
         .then(function success(data) {
           Notifications.success('Endpoint created', name);
           if (type === 4) {
@@ -119,10 +153,14 @@ angular
       $q.all({
         groups: GroupService.groups(),
         tags: TagService.tags(),
+        settings: SettingsService.settings(),
       })
         .then(function success(data) {
           $scope.groups = data.groups;
           $scope.availableTags = data.tags;
+
+          const settings = data.settings;
+          $scope.state.availableEdgeAgentCheckinOptions[0].key += ` (${settings.EdgeAgentCheckinInterval} seconds)`;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to load groups');
