@@ -46,6 +46,9 @@
                     <button ng-if="item.LogsStatus === 3" class="btn btn-sm btn-primary" ng-click="$ctrl.onClearLogsClick(item.EndpointId)">
                       Clear logs
                     </button>
+                    <span ng-if="item.LogsStatus === 2">
+                      Retrieving Logs, please refresh in a few moments
+                    </span>
                   </td>
                 </tr>
                 <tr ng-if="!$ctrl.dataset">
