@@ -8,6 +8,9 @@ WORKDIR /src/portainer
 # Set TERM as noninteractive to suppress debconf errors
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
+# Set default go version
+ARG GO_VERSION=go1.13.11.linux-amd64
+
 # Install packages
 RUN apt-get update --fix-missing && apt-get install -qq \
     dialog \
@@ -25,8 +28,8 @@ RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
 
 # Install Golang
 RUN cd /tmp \
-    && wget -q https://dl.google.com/go/go1.13.11.linux-amd64.tar.gz \
-    && tar -xf go1.13.11.linux-amd64.tar.gz \
+    && wget -q https://dl.google.com/go/${GO_VERSION}.tar.gz \
+    && tar -xf ${GO_VERSION}.tar.gz \
     && mv go /usr/local
 
 # Configure Go
