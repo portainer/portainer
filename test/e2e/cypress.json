@@ -1,4 +1,8 @@
 {
   "projectId": "cgz5j5",
-  "video": false
+  "video": false,
+  "testFiles": [
+    "init.spec.js",
+    "rbac.spec.js"
+  ]
 }
