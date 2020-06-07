@@ -11,7 +11,7 @@ import (
 )
 
 type fileResponse struct {
-	FileContent string `json:"StackFileContent"`
+	FileContent string
 }
 
 // GET request on /api/custom_templates/:id/file

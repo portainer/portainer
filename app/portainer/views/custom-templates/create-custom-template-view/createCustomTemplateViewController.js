@@ -31,8 +31,6 @@ class CreateCustomTemplateViewController {
     this.onChangeMethod = this.onChangeMethod.bind(this);
   }
 
-  async $onInit() {}
-
   createCustomTemplate() {
     return this.$async(this.createCustomTemplateAsync);
   }

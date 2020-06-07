@@ -1,1 +1,75 @@
-editCustomTemplateView
+<rd-header>
+  <rd-header-title title-text="Edit Custom Template">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.templates.custom.edit({id:$ctrl.template.id})" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content> <a ui-sref="portainer.templates.custom">Custom templates</a> &gt; {{ $ctrl.template.name }} </rd-header-content>
+</rd-header>
+
+<div class="row" ng-if="$ctrl.template">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+        <form class="form-horizontal">
+          <!-- name-input -->
+          <div class="form-group">
+            <label for="template_name" class="col-sm-1 control-label text-left">
+              Name
+            </label>
+            <div class="col-sm-11">
+              <input type="text" class="form-control" ng-model="$ctrl.template.name" id="template_name" placeholder="e.g. mytemplate" auto-focus />
+            </div>
+          </div>
+          <!-- !name-input -->
+
+          <!-- web-editor -->
+          <div class="col-sm-12 form-section-title">
+            Web editor
+          </div>
+          <div class="form-group">
+            <span class="col-sm-12 text-muted small">
+              You can get more information about Compose file format in the
+              <a href="https://docs.docker.com/compose/compose-file/" target="_blank">
+                official documentation
+              </a>
+              .
+            </span>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <code-editor
+                identifier="custom-template-creation-editor"
+                placeholder="# Define or paste the content of your docker-compose file here"
+                yml="true"
+                value="$ctrl.template.fileContent"
+                on-change="($ctrl.editorUpdate)"
+              ></code-editor>
+            </div>
+          </div>
+          <!-- !web-editor -->
+
+          <div class="col-sm-12 form-section-title">
+            Actions
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                ng-disabled="$ctrl.actionInProgress
+                  || !$ctrl.template.name
+                  || !$ctrl.template.fileContent"
+                ng-click="$ctrl.submitAction()"
+                button-spinner="$ctrl.actionInProgress"
+              >
+                <span ng-hide="$ctrl.actionInProgress">Update the template</span>
+                <span ng-show="$ctrl.actionInProgress">Update in progress...</span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

@@ -8,7 +8,9 @@
         <button type="button" class="btn btn-sm btn-danger" ng-disabled="$ctrl.state.selectedItemCount === 0" ng-click="$ctrl.removeAction($ctrl.state.selectedItems)">
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
-        <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.groups.new"> <i class="fa fa-plus space-right" aria-hidden="true"></i>Add group </button>
+        <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.templates.custom.new">
+          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add Custom Template</button
+        >
       </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
