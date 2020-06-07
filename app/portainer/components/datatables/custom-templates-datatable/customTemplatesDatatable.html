@@ -9,8 +9,8 @@
           <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove
         </button>
         <button type="button" class="btn btn-sm btn-primary" ui-sref="portainer.templates.custom.new">
-          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add Custom Template</button
-        >
+          <i class="fa fa-plus space-right" aria-hidden="true"></i>Add Custom Template
+        </button>
       </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
@@ -48,10 +48,11 @@
             >
               <td>
                 <span class="md-checkbox">
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
+                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="!$ctrl.allowSelection(item)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
-                <a ui-sref="portainer.templates.custom.edit({id: item.id})">{{ item.name }}</a>
+                <a ng-if="$ctrl.allowSelection(item)" ui-sref="portainer.templates.custom.edit({id: item.id})">{{ item.name }}</a>
+                <span ng-if="!$ctrl.allowSelection(item)">{{ item.name }}</span>
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">

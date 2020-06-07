@@ -9,6 +9,8 @@
 <div class="row">
   <div class="col-sm-12">
     <custom-templates-datatable
+      is-admin="$ctrl.isAdmin"
+      current-user-id="$ctrl.currentUserId"
       title-text="Custom templates"
       title-icon="fa-th-list"
       dataset="$ctrl.templates"

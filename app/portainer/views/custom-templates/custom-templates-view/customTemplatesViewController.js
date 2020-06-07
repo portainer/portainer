@@ -2,8 +2,9 @@ import _ from 'lodash-es';
 
 class CustomTemplatesViewController {
   /* @ngInject */
-  constructor($async, CustomTemplateService, Notifications) {
+  constructor($async, Authentication, CustomTemplateService, Notifications) {
     this.$async = $async;
+    this.Authentication = Authentication;
     this.CustomTemplateService = CustomTemplateService;
     this.Notifications = Notifications;
 
@@ -41,6 +42,10 @@ class CustomTemplatesViewController {
 
   $onInit() {
     this.getTemplates();
+
+    this.isAdmin = this.Authentication.isAdmin();
+    const user = this.Authentication.getUserDetails();
+    this.currentUserId = user.ID;
   }
 }
 
