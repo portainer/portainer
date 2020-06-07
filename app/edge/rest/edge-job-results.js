@@ -1,10 +1,11 @@
-angular.module('portainer.edge').factory('EdgeJobTasks', EdgeJobTasksFactory);
+angular.module('portainer.edge').factory('EdgeJobResults', EdgeJobResultsFactory);
 
-function EdgeJobTasksFactory($resource, API_ENDPOINT_EDGE_JOBS) {
+function EdgeJobResultsFactory($resource, API_ENDPOINT_EDGE_JOBS) {
   return $resource(
     API_ENDPOINT_EDGE_JOBS + '/:id/tasks/:taskId/:action',
     {},
     {
+      query: { method: 'GET', isArray: true, params: { id: '@id' } },
       logFile: { method: 'GET', params: { id: '@id', taskId: '@taskId', action: 'logs' } },
       clearLogs: { method: 'DELETE', params: { id: '@id', taskId: '@taskId', action: 'logs' } },
       collectLogs: { method: 'POST', params: { id: '@id', taskId: '@taskId', action: 'logs' } },

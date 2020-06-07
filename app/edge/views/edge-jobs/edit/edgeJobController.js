@@ -63,11 +63,11 @@ class EdgeJobController {
     }
   }
 
-  associateEndpointsToTasks(tasks, endpoints) {
-    return _.map(tasks, (task) => {
-      const endpoint = _.find(endpoints, (endpoint) => endpoint.Id === task.EndpointId);
-      task.Endpoint = endpoint;
-      return task;
+  associateEndpointsToResults(results, endpoints) {
+    return _.map(results, (result) => {
+      const endpoint = _.find(endpoints, (endpoint) => endpoint.Id === result.EndpointId);
+      result.Endpoint = endpoint;
+      return result;
     });
   }
 
@@ -78,8 +78,8 @@ class EdgeJobController {
   async collectLogsAsync(endpointId) {
     try {
       await this.EdgeJobService.collectLogs(this.edgeJob.Id, endpointId);
-      const task = _.find(this.tasks, (task) => task.EndpointId === endpointId);
-      task.LogsStatus = 2;
+      const result = _.find(this.results, (result) => result.EndpointId === endpointId);
+      result.LogsStatus = 2;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to collect logs');
     }
@@ -91,8 +91,8 @@ class EdgeJobController {
   async clearLogsAsync(endpointId) {
     try {
       await this.EdgeJobService.clearLogs(this.edgeJob.Id, endpointId);
-      const task = _.find(this.tasks, (task) => task.EndpointId === endpointId);
-      task.LogsStatus = 1;
+      const result = _.find(this.results, (result) => result.EndpointId === endpointId);
+      result.LogsStatus = 1;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to clear logs');
     }
@@ -102,10 +102,10 @@ class EdgeJobController {
     const { id, tab } = this.$state.params;
     this.state.activeTab = tab;
     try {
-      const [edgeJob, file, tasks, groups, tags] = await Promise.all([
+      const [edgeJob, file, results, groups, tags] = await Promise.all([
         this.EdgeJobService.edgeJob(id),
         this.EdgeJobService.getScriptFile(id),
-        this.EdgeJobService.tasks(id),
+        this.EdgeJobService.jobResults(id),
         this.GroupService.groups(),
         this.TagService.tags(),
       ]);
@@ -115,12 +115,12 @@ class EdgeJobController {
       this.groups = groups;
       this.tags = tags;
 
-      if (tasks.length > 0) {
-        const endpointIds = _.map(tasks, (task) => task.EndpointId);
+      if (results.length > 0) {
+        const endpointIds = _.map(results, (result) => result.EndpointId);
         const endpoints = await this.EndpointService.endpoints(undefined, undefined, { endpointIds });
-        this.tasks = this.associateEndpointsToTasks(tasks, endpoints.value);
+        this.results = this.associateEndpointsToResults(results, endpoints.value);
       } else {
-        this.tasks = tasks;
+        this.results = results;
       }
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve endpoint list');

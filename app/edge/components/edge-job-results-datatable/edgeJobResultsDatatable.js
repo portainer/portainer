@@ -1,5 +1,5 @@
-angular.module('portainer.edge').component('edgeJobTasksDatatable', {
-  templateUrl: './edgeJobTasksDatatable.html',
+angular.module('portainer.edge').component('edgeJobResultsDatatable', {
+  templateUrl: './edgeJobResultsDatatable.html',
   controller: 'GenericDatatableController',
   bindings: {
     titleText: '@',

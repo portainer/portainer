@@ -28,21 +28,21 @@
           </uib-tab>
 
           <uib-tab index="1">
-            <uib-tab-heading> <i class="fa fa-tasks" aria-hidden="true"></i> Tasks </uib-tab-heading>
+            <uib-tab-heading> <i class="fa fa-tasks" aria-hidden="true"></i> Results </uib-tab-heading>
 
-            <edge-job-tasks-datatable
+            <edge-job-results-datatable
               style="display: block; margin-top: 10px;"
-              ng-if="$ctrl.tasks"
-              title-text="Tasks"
+              ng-if="$ctrl.results"
+              title-text="Results"
               title-icon="fa-tasks"
-              dataset="$ctrl.tasks"
-              table-key="edge-job-tasks"
+              dataset="$ctrl.results"
+              table-key="edge-job-results"
               order-by="Status"
               reverse-order="true"
               on-download-logs-click="($ctrl.downloadLogs)"
               on-collect-logs-click="($ctrl.collectLogs)"
               on-clear-logs-click="($ctrl.clearLogs)"
-            ></edge-job-tasks-datatable>
+            ></edge-job-results-datatable>
           </uib-tab>
         </uib-tabset>
       </rd-widget-body>

@@ -2,7 +2,7 @@ import angular from 'angular';
 
 import { ScheduleCreateRequest, ScheduleUpdateRequest } from 'Portainer/models/schedule';
 
-function EdgeJobService(EdgeJobs, EdgeJobTasks, FileUploadService) {
+function EdgeJobService(EdgeJobs, EdgeJobResults, FileUploadService) {
   var service = {};
 
   service.edgeJob = edgeJob;
@@ -23,28 +23,28 @@ function EdgeJobService(EdgeJobs, EdgeJobTasks, FileUploadService) {
     }
   }
 
-  service.tasks = tasks;
-  async function tasks(edgeJobId) {
+  service.jobResults = jobResults;
+  async function jobResults(edgeJobId) {
     try {
-      return await EdgeJobs.tasks({ id: edgeJobId }).$promise;
+      return await EdgeJobResults.query({ id: edgeJobId }).$promise;
     } catch (err) {
-      throw { msg: 'Unable to retrieve tasks associated to the edgeJob', err: err };
+      throw { msg: 'Unable to retrieve results associated to the edgeJob', err: err };
     }
   }
 
   service.logFile = logFile;
   function logFile(id, taskId) {
-    return EdgeJobTasks.logFile({ id, taskId }).$promise;
+    return EdgeJobResults.logFile({ id, taskId }).$promise;
   }
 
   service.collectLogs = collectLogs;
   function collectLogs(id, taskId) {
-    return EdgeJobTasks.collectLogs({ id, taskId }).$promise;
+    return EdgeJobResults.collectLogs({ id, taskId }).$promise;
   }
 
   service.clearLogs = clearLogs;
   function clearLogs(id, taskId) {
-    return EdgeJobTasks.clearLogs({ id, taskId }).$promise;
+    return EdgeJobResults.clearLogs({ id, taskId }).$promise;
   }
 
   service.createEdgeJobFromFileContent = function (model) {
