@@ -34,8 +34,7 @@ angular.module('portainer.app').controller('UserController', [
       const username = $scope.formValues.username;
       UserService.updateUser($scope.user.Id, { role, username })
         .then(function success() {
-          const newRole = role === 1 ? 'administrator' : 'user';
-          Notifications.success('User successfully updated', `${username} is now ${newRole}`);
+          Notifications.success('User successfully updated');
           $state.reload();
         })
         .catch(function error(err) {
