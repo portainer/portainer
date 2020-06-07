@@ -1,1 +1,21 @@
-customTemplatesView
+<rd-header>
+  <rd-header-title title-text="Custom Templates">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.templates.custom" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>Custom Templates</rd-header-content>
+</rd-header>
+<div class="row">
+  <div class="col-sm-12">
+    <custom-templates-datatable
+      title-text="Custom templates"
+      title-icon="fa-th-list"
+      dataset="$ctrl.templates"
+      table-key="customTemplates"
+      order-by="Name"
+      remove-action="$ctrl.removeTemplates"
+      refresh-callback="$ctrl.getTemplates"
+    ></custom-templates-datatable>
+  </div>
+</div>
