@@ -1,6 +1,6 @@
 class CreateCustomTemplateViewController {
-  constructor($async, $state, CustomTemplateService, Notifications, FormHelper) {
-    Object.assign(this, { $async, $state, CustomTemplateService, Notifications, FormHelper });
+  constructor($async, $state, CustomTemplateService, Notifications, StackService) {
+    Object.assign(this, { $async, $state, CustomTemplateService, Notifications, StackService });
 
     this.formValues = {
       Name: '',
@@ -109,6 +109,14 @@ class CreateCustomTemplateViewController {
 
   editorUpdate(cm) {
     this.formValues.FileContent = cm.getValue();
+  }
+
+  async $onInit() {
+    const { stackId } = this.$state.params;
+    if (stackId) {
+      const file = await this.StackService.getStackFile(stackId);
+      this.formValues.FileContent = file;
+    }
   }
 }
 
