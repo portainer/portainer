@@ -63,6 +63,16 @@
                   <p>Use a git repository</p>
                 </label>
               </div>
+              <div>
+                <input type="radio" id="method_template" ng-model="state.Method" value="template" />
+                <label for="method_template">
+                  <div class="boxselector_header">
+                    <i class="fa fa-rocket" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Custom template
+                  </div>
+                  <p>Use a custom template</p>
+                </label>
+              </div>
             </div>
           </div>
           <!-- !build-method -->
@@ -181,6 +191,55 @@
               </div>
             </div>
           </div>
+          <!-- !repository -->
+          <!-- custom-template -->
+          <div ng-show="state.Method === 'template'">
+            <div class="form-group">
+              <label for="stack_template" class="col-sm-1 control-label text-left">
+                Template
+              </label>
+              <div class="col-sm-11">
+                <select
+                  class="form-control"
+                  ng-model="selectedTemplate"
+                  ng-options="template as template.name for template in templates"
+                  ng-change="onChangeTemplate(selectedTemplate)"
+                >
+                  <option value="" label="Select a Custom template" disabled selected="selected"> </option>
+                </select>
+              </div>
+            </div>
+            <!-- description -->
+            <div ng-if="selectedTemplate.note">
+              <div class="col-sm-12 form-section-title">
+                Information
+              </div>
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <div class="template-note" ng-bind-html="selectedTemplate.note"></div>
+                </div>
+              </div>
+            </div>
+            <!-- !description -->
+            <!-- editor -->
+            <div ng-if="selectedTemplate && formValues.StackFileContent">
+              <div class="col-sm-12 form-section-title">
+                Web editor
+              </div>
+              <div class="form-group">
+                <div class="col-sm-12">
+                  <code-editor
+                    identifier="template-content-editor"
+                    placeholder="# Define or paste the content of your docker-compose file here"
+                    yml="true"
+                    value="formValues.StackFileContent"
+                    on-change="(editorUpdate)"
+                  ></code-editor>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- !custom-template -->
           <!-- environment-variables -->
           <div>
             <div class="col-sm-12 form-section-title">
@@ -213,7 +272,6 @@
             </div>
           </div>
           <!-- !environment-variables -->
-          <!-- !repository -->
           <por-access-control-form form-data="formValues.AccessControlData"></por-access-control-form>
           <!-- actions -->
           <div class="col-sm-12 form-section-title">
