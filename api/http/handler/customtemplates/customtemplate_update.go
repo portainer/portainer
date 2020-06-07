@@ -1,6 +1,7 @@
 package customtemplates
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -52,7 +53,7 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 	}
 
 	if tokenData.ID != customTemplate.CreatedByUserID && tokenData.Role != portainer.AdministratorRole {
-		return &httperror.HandlerError{http.StatusUnauthorized, "Unauthorized", err}
+		return &httperror.HandlerError{http.StatusUnauthorized, "Unauthorized", errors.New("Unauthorized")}
 	}
 
 	templateFolder := strconv.Itoa(customTemplateID)
