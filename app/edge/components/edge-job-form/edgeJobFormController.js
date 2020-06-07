@@ -86,17 +86,17 @@ class EdgeJobFormController {
 
 function cronToDatetime(cron) {
   var strings = cron.split(' ');
-  if (strings.length > 5) {
-    strings = strings.slice(0, 5);
+  if (strings.length > 4) {
+    strings = strings.slice(0, 4);
   } else {
     return moment();
   }
-  return moment(cron, 's m H D M');
+  return moment(cron, 'm H D M');
 }
 
 function datetimeToCron(datetime) {
   var date = moment(datetime);
-  return '0 '.concat(date.minutes(), ' ', date.hours(), ' ', date.date(), ' ', date.month() + 1, ' *');
+  return [date.minutes(), date.hours(), date.date(), date.month() + 1, '*'].join(' ');
 }
 
 angular.module('portainer.edge').controller('EdgeJobFormController', EdgeJobFormController);
