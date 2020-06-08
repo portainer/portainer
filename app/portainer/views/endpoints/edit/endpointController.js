@@ -64,7 +64,7 @@ angular
             $scope.randomEdgeID +
             ' -e EDGE_KEY=' +
             $scope.endpoint.EdgeKey +
-            " -e CAP_HOST_MANAGEMENT=1 --mode global --constraint 'node.platform.os == linux' --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volume --mount type=bind,src=//,dst=/host --mount type=volume,src=portainer_agent_data,dst=/data portainer/agent"
+            " -e CAP_HOST_MANAGEMENT=1 --mode global --constraint 'node.platform.os == linux' --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volumes --mount type=bind,src=//,dst=/host --mount type=volume,src=portainer_agent_data,dst=/data portainer/agent"
         );
       }
       $('#copyNotificationDeploymentCommand').show().fadeOut(2500);
