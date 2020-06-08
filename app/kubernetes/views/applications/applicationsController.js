@@ -1,7 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import KubernetesStackHelper from 'Kubernetes/helpers/stackHelper';
-import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
+import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 
 class KubernetesApplicationsController {
   /* @ngInject */

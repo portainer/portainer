@@ -20,7 +20,7 @@ import {
   KubernetesApplicationVolumePersistentPayload,
   KubernetesApplicationVolumeSecretPayload
 } from 'Kubernetes/models/application/payloads';
-import KubernetesVolumeHelper from './volumeHelper';
+import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
 
 class KubernetesApplicationHelper {
 

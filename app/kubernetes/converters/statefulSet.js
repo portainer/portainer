@@ -9,7 +9,7 @@ import {
   KubernetesPortainerApplicationOwnerLabel,
   KubernetesPortainerApplicationNote
 } from 'Kubernetes/models/application/models';
-import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
+import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import KubernetesPersistentVolumeClaimConverter from './persistentVolumeClaim';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import KubernetesCommonHelper from 'Kubernetes/helpers/commonHelper';

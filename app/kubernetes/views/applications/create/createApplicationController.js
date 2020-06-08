@@ -99,14 +99,14 @@ class KubernetesCreateApplicationController {
 
   onChangeConfigurationPath() {
     this.state.duplicateConfigurationPaths = [];
-    
+
     const paths = _.reduce(this.formValues.Configurations, (result, config) => {
       const uniqOverridenKeysPath = _.uniq(_.map(config.OverridenKeys, 'Path'));
       return _.concat(result, uniqOverridenKeysPath);
     }, []);
-    
+
     const duplicatePaths = KubernetesFormValidationHelper.getDuplicates(paths);
-    
+
     _.forEach(this.formValues.Configurations, (config, index) => {
       _.forEach(config.OverridenKeys, (overridenKey, keyIndex) => {
         const findPath = _.find(duplicatePaths, (path) => path === overridenKey.Path);
@@ -115,7 +115,7 @@ class KubernetesCreateApplicationController {
         }
       });
     });
-    
+
     this.state.hasDuplicateConfigurationPaths = Object.keys(this.state.duplicateConfigurationPaths).length > 0;
   }
   /**
@@ -491,7 +491,7 @@ class KubernetesCreateApplicationController {
   deployApplication() {
     if (this.state.isEdit) {
       this.ModalService.confirmUpdate(
-        'Updating the application may cause service interruption. Do you wish to continue?',
+        'Updating the application may cause a service interruption. Do you wish to continue?',
         (confirmed) => {
           if (confirmed) {
             return this.$async(this.updateApplicationAsync);

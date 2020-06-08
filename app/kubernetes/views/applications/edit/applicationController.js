@@ -5,12 +5,12 @@ import {
   KubernetesApplicationDeploymentTypes
 } from 'Kubernetes/models/application/models';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
-import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
+import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 
 class KubernetesApplicationController {
   /* @ngInject */
   constructor($async, $state, clipboard, Notifications, LocalStorage, ModalService,
-     KubernetesApplicationService, KubernetesEventService, KubernetesStackService, KubernetesPodService, KubernetesNamespaceHelper) {
+    KubernetesApplicationService, KubernetesEventService, KubernetesStackService, KubernetesPodService, KubernetesNamespaceHelper) {
     this.$async = $async;
     this.$state = $state;
     this.clipboard = clipboard;
@@ -34,6 +34,7 @@ class KubernetesApplicationController {
     this.getEventsAsync = this.getEventsAsync.bind(this);
     this.updateApplicationAsync = this.updateApplicationAsync.bind(this);
     this.redeployApplicationAsync = this.redeployApplicationAsync.bind(this);
+    this.rollbackApplicationAsync = this.rollbackApplicationAsync.bind(this);
     this.copyLoadBalancerIP = this.copyLoadBalancerIP.bind(this);
   }
 
@@ -75,6 +76,33 @@ class KubernetesApplicationController {
   hasEventWarnings() {
     return this.state.eventWarningCount;
   }
+
+  /**
+   * ROLLBACK
+   */
+
+  async rollbackApplicationAsync() {
+    try {
+      // await this.KubernetesApplicationService.rollback(this.application, this.formValues.SelectedRevision);
+      const revision = _.nth(this.application.Revisions, -2);
+      await this.KubernetesApplicationService.rollback(this.application, revision);
+      this.Notifications.success('Application successfully rolled back');
+      this.$state.reload();
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Unable to rollback the application');
+    }
+  }
+
+  rollbackApplication() {
+    this.ModalService.confirmUpdate(
+      'Rolling back the application to a previous configuration may cause a service interruption. Do you wish to continue?',
+      (confirmed) => {
+        if (confirmed) {
+          return this.$async(this.rollbackApplicationAsync);
+        }
+      }
+    );
+  }
   /**
    * REDEPLOY
    */
@@ -85,13 +113,13 @@ class KubernetesApplicationController {
       this.Notifications.success('Application successfully redeployed');
       this.$state.reload();
     } catch (err) {
-      this.Notifications.error('Failure', err, 'Unable to redeploy application');
+      this.Notifications.error('Failure', err, 'Unable to redeploy the application');
     }
   }
 
   redeployApplication() {
     this.ModalService.confirmUpdate(
-      'Redeploying the application may cause service interruption. Do you wish to continue?',
+      'Redeploying the application may cause a service interruption. Do you wish to continue?',
       (confirmed) => {
         if (confirmed) {
           return this.$async(this.redeployApplicationAsync);
@@ -152,6 +180,9 @@ class KubernetesApplicationController {
       if (this.application.Note) {
         this.state.expandedNote = true;
       }
+      if (this.application.CurrentRevision) {
+        this.formValues.SelectedRevision = _.find(this.application.Revisions, { revision: this.application.CurrentRevision.revision });
+      }
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve application details');
     } finally {
@@ -184,6 +215,7 @@ class KubernetesApplicationController {
 
     this.formValues = {
       Note: '',
+      SelectedRevision: undefined
     };
 
     this.KubernetesApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;

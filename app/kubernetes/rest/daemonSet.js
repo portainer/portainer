@@ -34,6 +34,12 @@ angular.module('portainer.kubernetes')
               'Content-Type': 'application/json-patch+json'
             }
           },
+          rollback: {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/strategic-merge-patch+json'
+            }
+          },
           delete: { method: 'DELETE' }
         }
       );

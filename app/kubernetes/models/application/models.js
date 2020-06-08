@@ -63,7 +63,10 @@ const _KubernetesApplication = Object.freeze({
   RunningPodsCount: 0,
   TotalPodsCount: 0,
   Yaml: '',
-  Note: ''
+  Note: '',
+  Revisions: undefined,
+  CurrentRevision: undefined,
+  Raw: undefined, // only filled when inspecting app details / create / edit view (never filled in multiple-apps views)
 });
 
 export class KubernetesApplication {

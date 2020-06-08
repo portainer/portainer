@@ -3,16 +3,18 @@ import angular from 'angular';
 import PortainerError from 'Portainer/error';
 
 import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
-import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
+import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
+import KubernetesApplicationRollbackHelper from 'Kubernetes/helpers/application/rollback';
 import KubernetesApplicationConverter from 'Kubernetes/converters/application';
 import { KubernetesDeployment } from 'Kubernetes/models/deployment/models';
 import { KubernetesStatefulSet } from 'Kubernetes/models/stateful-set/models';
 import { KubernetesDaemonSet } from 'Kubernetes/models/daemon-set/models';
+import { KubernetesApplication } from 'Kubernetes/models/application/models';
 
 class KubernetesApplicationService {
   /* @ngInject */
   constructor($async, Authentication, KubernetesDeploymentService, KubernetesDaemonSetService, KubernetesStatefulSetService, KubernetesServiceService,
-    KubernetesSecretService, KubernetesPersistentVolumeClaimService, KubernetesNamespaceService, KubernetesPodService) {
+    KubernetesSecretService, KubernetesPersistentVolumeClaimService, KubernetesNamespaceService, KubernetesPodService, KubernetesHistoryService) {
     this.$async = $async;
     this.Authentication = Authentication;
     this.KubernetesDeploymentService = KubernetesDeploymentService;
@@ -23,13 +25,32 @@ class KubernetesApplicationService {
     this.KubernetesPersistentVolumeClaimService = KubernetesPersistentVolumeClaimService;
     this.KubernetesNamespaceService = KubernetesNamespaceService;
     this.KubernetesPodService = KubernetesPodService;
+    this.KubernetesHistoryService = KubernetesHistoryService;
 
     this.getAsync = this.getAsync.bind(this);
     this.getAllAsync = this.getAllAsync.bind(this);
     this.createAsync = this.createAsync.bind(this);
     this.patchAsync = this.patchAsync.bind(this);
     this.patchPartialAsync = this.patchPartialAsync.bind(this);
+    this.rollbackAsync = this.rollbackAsync.bind(this);
     this.deleteAsync = this.deleteAsync.bind(this);
+  }
+
+  /**
+   * UTILS
+   */
+  _getApplicationApiService(app) {
+    let apiService;
+    if (app instanceof KubernetesDeployment || (app instanceof KubernetesApplication && app.ApplicationType === KubernetesApplicationTypes.DEPLOYMENT)) {
+      apiService = this.KubernetesDeploymentService;
+    } else if (app instanceof KubernetesDaemonSet || (app instanceof KubernetesApplication && app.ApplicationType === KubernetesApplicationTypes.DAEMONSET)) {
+      apiService = this.KubernetesDaemonSetService;
+    } else if (app instanceof KubernetesStatefulSet || (app instanceof KubernetesApplication && app.ApplicationType === KubernetesApplicationTypes.STATEFULSET)) {
+      apiService = this.KubernetesStatefulSetService;
+    } else {
+      throw new PortainerError('Unable to determine which association to use');
+    }
+    return apiService;
   }
 
   /**
@@ -42,7 +63,7 @@ class KubernetesApplicationService {
         this.KubernetesDaemonSetService.get(namespace, name),
         this.KubernetesStatefulSetService.get(namespace, name),
         this.KubernetesServiceService.get(namespace, name),
-        this.KubernetesPodService.get(namespace)
+        this.KubernetesPodService.get(namespace),
       ]);
       const service = {};
       if (serviceAttempt.status === 'fulfilled') {
@@ -63,8 +84,10 @@ class KubernetesApplicationService {
       } else {
         throw new PortainerError('Unable to determine which association to use');
       }
-      application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods.value, item.value.Raw);
+      application.Raw = item.value.Raw;
       application.Yaml = item.value.Yaml;
+      application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods.value, application.Raw);
+      await this.KubernetesHistoryService.get(application);
 
       if (service.Yaml) {
         application.Yaml += '---\n' + service.Yaml;
@@ -84,7 +107,7 @@ class KubernetesApplicationService {
           this.KubernetesDaemonSetService.get(ns),
           this.KubernetesStatefulSetService.get(ns),
           this.KubernetesServiceService.get(ns),
-          this.KubernetesPodService.get(ns)
+          this.KubernetesPodService.get(ns),
         ]);
         const deploymentApplications = _.map(deployments, (item) => {
           const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
@@ -160,20 +183,6 @@ class KubernetesApplicationService {
     return this.$async(this.createAsync, formValues);
   }
 
-  _getApplicationApiService(app) {
-    let apiService;
-    if (app instanceof KubernetesDeployment) {
-      apiService = this.KubernetesDeploymentService;
-    } else if (app instanceof KubernetesStatefulSet) {
-      apiService = this.KubernetesStatefulSetService;
-    } else if (app instanceof KubernetesDaemonSet) {
-      apiService = this.KubernetesDaemonSetService;
-    } else {
-      throw new PortainerError('Unable to determine which association to use');
-    }
-    return apiService;
-  }
-
   /**
    * PATCH
    */
@@ -236,19 +245,8 @@ class KubernetesApplicationService {
         StackName: newApp.StackName,
         Note: newApp.Note
       };
-      switch (oldApp.ApplicationType) {
-        case KubernetesApplicationTypes.DEPLOYMENT:
-          await this.KubernetesDeploymentService.patch(oldAppPayload, newAppPayload);
-          break;
-        case KubernetesApplicationTypes.DAEMONSET:
-          await this.KubernetesDaemonSetService.patch(oldAppPayload, newAppPayload);
-          break;
-        case KubernetesApplicationTypes.STATEFULSET:
-          await this.KubernetesStatefulSetService.patch(oldAppPayload, newAppPayload);
-          break;
-        default:
-          throw new PortainerError('Unable to determine which association to patch');
-      }
+      const apiService = this._getApplicationApiService(oldApp);
+      await apiService.patch(oldAppPayload, newAppPayload);
     } catch (err) {
       throw err;
     }
@@ -274,34 +272,18 @@ class KubernetesApplicationService {
         Namespace: application.ResourcePool || application.Namespace,
         Name: application.Name
       };
-      const headlessServicePayload = angular.copy(payload);
       const servicePayload = angular.copy(payload);
       servicePayload.Name = application.Name;
 
-      if (application instanceof KubernetesDeployment) {
-        application.ApplicationType = KubernetesApplicationTypes.DEPLOYMENT;
-      } else if (application instanceof KubernetesDaemonSet) {
-        application.ApplicationType = KubernetesApplicationTypes.DAEMONSET;
-      } else if (application instanceof KubernetesStatefulSet) {
-        application.ApplicationType = KubernetesApplicationTypes.STATEFULSET;
-        application.HeadlessServiceName = application.ServiceName;
+      const apiService = this._getApplicationApiService(application);
+      await apiService.delete(payload);
+
+      if (apiService === this.KubernetesStatefulSetService) {
+        const headlessServicePayload = angular.copy(payload);
+        headlessServicePayload.Name = application instanceof KubernetesStatefulSet ? application.ServiceName : application.HeadlessServiceName;
+        await this.KubernetesServiceService.delete(headlessServicePayload);
       }
 
-      switch (application.ApplicationType) {
-        case KubernetesApplicationTypes.DEPLOYMENT:
-          await this.KubernetesDeploymentService.delete(payload);
-          break;
-        case KubernetesApplicationTypes.DAEMONSET:
-          await this.KubernetesDaemonSetService.delete(payload);
-          break;
-        case KubernetesApplicationTypes.STATEFULSET:
-          headlessServicePayload.Name = application.HeadlessServiceName;
-          await this.KubernetesStatefulSetService.delete(payload);
-          await this.KubernetesServiceService.delete(headlessServicePayload);
-          break;
-        default:
-          throw new PortainerError('Unable to determine which association to remove');
-      }
       if (application.ServiceType) {
         await this.KubernetesServiceService.delete(servicePayload);
       }
@@ -312,6 +294,23 @@ class KubernetesApplicationService {
 
   delete(application) {
     return this.$async(this.deleteAsync, application);
+  }
+
+  /**
+   * ROLLBACK
+   */
+  async rollbackAsync(application, targetRevision) {
+    try {
+      const payload = KubernetesApplicationRollbackHelper.getPatchPayload(application, targetRevision);
+      const apiService = this._getApplicationApiService(application);
+      await apiService.rollback(application.ResourcePool, application.Name, payload);
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  rollback(application, targetRevision) {
+    return this.$async(this.rollbackAsync, application, targetRevision);
   }
 }
 

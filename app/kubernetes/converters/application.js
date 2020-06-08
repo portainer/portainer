@@ -17,7 +17,7 @@ import {
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 import { KubernetesApplicationFormValues } from 'Kubernetes/models/application/formValues';
-import KubernetesApplicationHelper from 'Kubernetes/helpers/applicationHelper';
+import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 
 import KubernetesDeploymentConverter from 'Kubernetes/converters/deployment';
 import KubernetesDaemonSetConverter from 'Kubernetes/converters/daemonSet';
