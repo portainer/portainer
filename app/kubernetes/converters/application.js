@@ -53,6 +53,20 @@ class KubernetesApplicationConverter {
       return acc;
     }, limits);
 
+    const requests = {
+      Cpu: 0,
+      Memory: 0
+    };
+    res.Requests = _.reduce(data.spec.template.spec.containers, (acc, item) => {
+      if (item.resources.requests && item.resources.requests.cpu) {
+        acc.Cpu += KubernetesResourceReservationHelper.parseCPU(item.resources.requests.cpu);
+      }
+      if (item.resources.requests && item.resources.requests.memory) {
+        acc.Memory += filesizeParser(item.resources.requests.memory, { base: 10 });
+      }
+      return acc;
+    }, requests);
+
     if (service) {
       const serviceType = service.spec.type;
       res.ServiceType = serviceType;

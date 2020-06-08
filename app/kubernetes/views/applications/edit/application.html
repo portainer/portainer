@@ -46,14 +46,14 @@
                         <code>{{ ctrl.application.RunningPodsCount }}</code> / <code>{{ ctrl.application.TotalPodsCount }}</code>
                       </td>
                     </tr>
-                    <tr ng-if="ctrl.application.Limits.Cpu || ctrl.application.Limits.Memory">
+                    <tr ng-if="ctrl.application.Requests.Cpu || ctrl.application.Requests.Memory">
                       <td>
                         <div>Resource reservations</div>
                         <div class="text-muted small">per instance</div>
                       </td>
                       <td>
-                        <div ng-if="ctrl.application.Limits.Cpu">CPU {{ ctrl.application.Limits.Cpu | kubernetesApplicationCPUValue }}</div>
-                        <div ng-if="ctrl.application.Limits.Memory">Memory {{ ctrl.application.Limits.Memory | humansize }}</div>
+                        <div ng-if="ctrl.application.Requests.Cpu">CPU {{ ctrl.application.Requests.Cpu | kubernetesApplicationCPUValue }}</div>
+                        <div ng-if="ctrl.application.Requests.Memory">Memory {{ ctrl.application.Requests.Memory | humansize }}</div>
                       </td>
                     </tr>
                     <tr>
