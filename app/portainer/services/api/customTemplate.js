@@ -2,6 +2,7 @@ import angular from 'angular';
 
 angular.module('portainer.app').factory('CustomTemplateService', CustomTemplateServiceFactory);
 
+/* @ngInject */
 function CustomTemplateServiceFactory(CustomTemplates, FileUploadService) {
   var service = {};
 

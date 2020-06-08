@@ -1,4 +1,5 @@
 class CreateCustomTemplateViewController {
+  /* @ngInject */
   constructor($async, $state, CustomTemplateService, Notifications, StackService) {
     Object.assign(this, { $async, $state, CustomTemplateService, Notifications, StackService });
 

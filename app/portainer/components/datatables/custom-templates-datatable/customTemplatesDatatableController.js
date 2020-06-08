@@ -1,4 +1,5 @@
 class CustomTemplatesDatatableController {
+  /* @ngInject */
   constructor($scope, $controller) {
     const allowSelection = this.allowSelection;
     angular.extend(this, $controller('GenericDatatableController', { $scope: $scope }));
