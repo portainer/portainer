@@ -16,23 +16,25 @@ angular.module('portainer.app').controller('SettingsAuthenticationController', [
       actionInProgress: false,
       availableUserSessionTimeoutOptions: [
         {
-          key: 'Use default (8 hours)',
-          value: '',
-        },
-        {
           key: '1 hour',
           value: '1h',
         },
         {
-          key: '8 hour',
+          key: '4 hours',
+          value: '4h',
+        },
+        {
+          key: '8 hours',
           value: '8h',
         },
         {
           key: '24 hours',
           value: '24h',
         },
-        { key: '2 days', value: '48h' },
-        { key: '1 week', value: '168h' },
+        { key: '1 week', value: `${24 * 7}h` },
+        { key: '1 month', value: `${24 * 30}h` },
+        { key: '6 months', value: `${24 * 30 * 6}h` },
+        { key: '1 year', value: `${24 * 30 * 12}h` },
       ],
     };
 
