@@ -19,7 +19,7 @@
           </div>
 
           <div class="form-group" ng-if="isAdmin">
-            <div class="col-sm-2">
+            <div class="col-sm-4">
               <label for="permissions" class="control-label text-left">
                 Administrator
                 <portainer-tooltip
@@ -32,8 +32,8 @@
           </div>
 
           <div class="form-group">
-            <div class="col-sm-2">
-              <button class="btn btn-primary btn-sm" ng-click="updateUser()">Save</button>
+            <div class="col-sm-4">
+              <button class="btn btn-primary btn-sm" ng-disabled="!isSubmitEnabled()" ng-click="updateUser()">Save</button>
               <button class="btn btn-danger btn-sm" ng-click="deleteUser()"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this user</button>
             </div>
           </div>

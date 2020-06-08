@@ -64,6 +64,12 @@ angular.module('portainer.app').controller('UserController', [
         });
     }
 
+    $scope.isSubmitEnabled = isSubmitEnabled;
+    function isSubmitEnabled() {
+      const { user, formValues } = $scope;
+      return user && (user.Username !== formValues.username || (formValues.Administrator && user.Role !== 1) || (!formValues.Administrator && user.Role === 1));
+    }
+
     function initView() {
       $scope.isAdmin = Authentication.isAdmin();
 
