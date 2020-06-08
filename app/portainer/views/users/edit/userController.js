@@ -29,9 +29,30 @@ angular.module('portainer.app').controller('UserController', [
       });
     };
 
-    $scope.updateUser = function () {
+    $scope.updateUser = async function () {
       const role = $scope.formValues.Administrator ? 1 : 2;
+      const oldUsername = $scope.user.Username;
       const username = $scope.formValues.username;
+      let promise = Promise.resolve(true);
+      if (username != oldUsername) {
+        promise = new Promise((resolve) =>
+          ModalService.confirm({
+            title: 'Are you sure?',
+            message: `Are you sure you want to rename the user ${oldUsername} to ${username}?`,
+            buttons: {
+              confirm: {
+                label: 'Remove',
+                className: 'btn-danger',
+              },
+            },
+            callback: resolve,
+          })
+        );
+      }
+      const confirmed = await promise;
+      if (!confirmed) {
+        return;
+      }
       UserService.updateUser($scope.user.Id, { role, username })
         .then(function success() {
           Notifications.success('User successfully updated');
