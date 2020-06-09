@@ -41,8 +41,8 @@ angular.module('portainer.app').controller('UserController', [
             message: `Are you sure you want to rename the user ${oldUsername} to ${username}?`,
             buttons: {
               confirm: {
-                label: 'Remove',
-                className: 'btn-danger',
+                label: 'Update',
+                className: 'btn-primary',
               },
             },
             callback: resolve,
