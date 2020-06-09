@@ -98,7 +98,6 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -133,9 +132,6 @@
                   <i ng-class="item.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
                   {{ item.ResourceControl.Ownership ? item.ResourceControl.Ownership : item.ResourceControl.Ownership = $ctrl.RCO.ADMINISTRATORS }}
                 </span>
-              </td>
-              <td>
-                <button class="btn btn-primary btn-xs" ng-if="!item.External" ui-sref="portainer.templates.custom.new({ stackId: item.Id })">Create template from stack</button>
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">

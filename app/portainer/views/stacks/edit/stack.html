@@ -38,9 +38,10 @@
                 </div>
                 <div class="form-group">
                   {{ stackName }}
-                  <button authorization="PortainerStackDelete" class="btn btn-xs btn-danger" ng-click="removeStack()" ng-if="!state.externalStack || stack.Type === 1"
-                    ><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this stack</button
-                  >
+                  <button authorization="PortainerStackDelete" class="btn btn-xs btn-danger" ng-click="removeStack()" ng-if="!state.externalStack || stack.Type === 1">
+                    <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>
+                    Delete this stack
+                  </button>
                 </div>
               </div>
               <!-- !stack-details -->
