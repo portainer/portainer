@@ -200,6 +200,7 @@
               </label>
               <div class="col-sm-11">
                 <select
+                  ng-if="templates.length"
                   class="form-control"
                   ng-model="selectedTemplate"
                   ng-options="template as template.name for template in templates"
@@ -207,6 +208,9 @@
                 >
                   <option value="" label="Select a Custom template" disabled selected="selected"> </option>
                 </select>
+                <span ng-if="!templates.length">
+                  No custom template are available. Head over the <a ui-sref="portainer.templates.custom.new">custom template view</a> to create one.
+                </span>
               </div>
             </div>
             <!-- description -->
