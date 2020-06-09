@@ -55,9 +55,7 @@ angular.module('portainer.app', []).config([
                   if (state.application.analytics) {
                     initAnalytics(Analytics, $rootScope);
                   }
-                  if (state.application.authentication) {
-                    return $async(initAuthentication, authManager, Authentication, $rootScope, $state);
-                  }
+                  return $async(initAuthentication, authManager, Authentication, $rootScope, $state);
                 })
                 .then(() => deferred.resolve())
                 .catch(function error(err) {

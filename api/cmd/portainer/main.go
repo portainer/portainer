@@ -77,15 +77,17 @@ func initSwarmStackManager(assetsPath string, dataStorePath string, signatureSer
 	return exec.NewSwarmStackManager(assetsPath, dataStorePath, signatureService, fileService, reverseTunnelService)
 }
 
-func initJWTService(authenticationEnabled bool) portainer.JWTService {
-	if authenticationEnabled {
-		jwtService, err := jwt.NewService()
-		if err != nil {
-			log.Fatal(err)
-		}
-		return jwtService
+func initJWTService(dataStore portainer.DataStore) (portainer.JWTService, error) {
+	settings, err := dataStore.Settings().Settings()
+	if err != nil {
+		return nil, err
 	}
-	return nil
+
+	jwtService, err := jwt.NewService(settings.UserSessionTimeout)
+	if err != nil {
+		return nil, err
+	}
+	return jwtService, nil
 }
 
 func initDigitalSignatureService() portainer.DigitalSignatureService {
@@ -188,9 +190,8 @@ func loadSchedulesFromDatabase(jobScheduler portainer.JobScheduler, jobService p
 
 func initStatus(flags *portainer.CLIFlags) *portainer.Status {
 	return &portainer.Status{
-		Analytics:      !*flags.NoAnalytics,
-		Authentication: !*flags.NoAuth,
-		Version:        portainer.APIVersion,
+		Analytics: !*flags.NoAnalytics,
+		Version:   portainer.APIVersion,
 	}
 }
 
@@ -392,7 +393,10 @@ func main() {
 	dataStore := initDataStore(*flags.Data, fileService)
 	defer dataStore.Close()
 
-	jwtService := initJWTService(!*flags.NoAuth)
+	jwtService, err := initJWTService(dataStore)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	ldapService := initLDAPService()
 
@@ -402,7 +406,7 @@ func main() {
 
 	digitalSignatureService := initDigitalSignatureService()
 
-	err := initKeyPair(fileService, digitalSignatureService)
+	err = initKeyPair(fileService, digitalSignatureService)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -492,9 +496,7 @@ func main() {
 		}
 	}
 
-	if !*flags.NoAuth {
-		go terminateIfNoAdminCreated(dataStore)
-	}
+	go terminateIfNoAdminCreated(dataStore)
 
 	err = reverseTunnelService.StartTunnelServer(*flags.TunnelAddr, *flags.TunnelPort, snapshotter)
 	if err != nil {
@@ -506,7 +508,6 @@ func main() {
 		Status:               applicationStatus,
 		BindAddress:          *flags.Addr,
 		AssetsPath:           *flags.Assets,
-		AuthDisabled:         *flags.NoAuth,
 		DataStore:            dataStore,
 		SwarmStackManager:    swarmStackManager,
 		ComposeStackManager:  composeStackManager,

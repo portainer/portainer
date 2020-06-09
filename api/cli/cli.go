@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"log"
 	"time"
 
 	"github.com/portainer/portainer/api"
@@ -20,7 +19,6 @@ const (
 	errInvalidEndpointProtocol       = portainer.Error("Invalid endpoint protocol: Portainer only supports unix://, npipe:// or tcp://")
 	errSocketOrNamedPipeNotFound     = portainer.Error("Unable to locate Unix socket or named pipe")
 	errInvalidSnapshotInterval       = portainer.Error("Invalid snapshot interval")
-	errNoAuthExcludeAdminPassword    = portainer.Error("Cannot use --no-auth with --admin-password or --admin-password-file")
 	errAdminPassExcludeAdminPassFile = portainer.Error("Cannot use --admin-password with --admin-password-file")
 )
 
@@ -35,7 +33,6 @@ func (*Service) ParseFlags(version string) (*portainer.CLIFlags, error) {
 		Assets:            kingpin.Flag("assets", "Path to the assets").Default(defaultAssetsDirectory).Short('a').String(),
 		Data:              kingpin.Flag("data", "Path to the folder where the data is stored").Default(defaultDataDirectory).Short('d').String(),
 		EndpointURL:       kingpin.Flag("host", "Endpoint URL").Short('H').String(),
-		NoAuth:            kingpin.Flag("no-auth", "Disable authentication (deprecated)").Default(defaultNoAuth).Bool(),
 		NoAnalytics:       kingpin.Flag("no-analytics", "Disable Analytics in app").Default(defaultNoAnalytics).Bool(),
 		TLS:               kingpin.Flag("tlsverify", "TLS support").Default(defaultTLS).Bool(),
 		TLSSkipVerify:     kingpin.Flag("tlsskipverify", "Disable TLS server verification").Default(defaultTLSSkipVerify).Bool(),
@@ -81,10 +78,6 @@ func (*Service) ValidateFlags(flags *portainer.CLIFlags) error {
 		return err
 	}
 
-	if *flags.NoAuth && (*flags.AdminPassword != "" || *flags.AdminPasswordFile != "") {
-		return errNoAuthExcludeAdminPassword
-	}
-
 	if *flags.AdminPassword != "" && *flags.AdminPasswordFile != "" {
 		return errAdminPassExcludeAdminPassFile
 	}
@@ -93,9 +86,7 @@ func (*Service) ValidateFlags(flags *portainer.CLIFlags) error {
 }
 
 func displayDeprecationWarnings(flags *portainer.CLIFlags) {
-	if *flags.NoAuth {
-		log.Println("Warning: the --no-auth flag is deprecated and will likely be removed in a future version of Portainer.")
-	}
+
 }
 
 func validateEndpointURL(endpointURL string) error {

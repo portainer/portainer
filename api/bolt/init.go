@@ -27,6 +27,7 @@ func (store *Store) Init() error {
 			EnableHostManagementFeatures:       false,
 			EdgeAgentCheckinInterval:           portainer.DefaultEdgeAgentCheckinIntervalInSeconds,
 			TemplatesURL:                       portainer.DefaultTemplatesURL,
+			UserSessionTimeout:                 portainer.DefaultUserSessionTimeout,
 		}
 
 		err = store.SettingsService.UpdateSettings(defaultSettings)

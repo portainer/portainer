@@ -23,10 +23,9 @@ angular.module('portainer.docker').controller('NetworkMacvlanFormController', [
     };
 
     function initComponent() {
-      if (StateManager.getState().application.authentication) {
-        var isAdmin = Authentication.isAdmin();
-        ctrl.isAdmin = isAdmin;
-      }
+      var isAdmin = Authentication.isAdmin();
+      ctrl.isAdmin = isAdmin;
+
       var provider = ctrl.applicationState.endpoint.mode.provider;
       var apiVersion = ctrl.applicationState.endpoint.apiVersion;
       $q.all({

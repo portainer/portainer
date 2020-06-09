@@ -46,7 +46,6 @@ type (
 		EndpointURL       *string
 		Labels            *[]Pair
 		Logo              *string
-		NoAuth            *bool
 		NoAnalytics       *bool
 		Templates         *string
 		TLS               *bool
@@ -459,6 +458,7 @@ type (
 		EnableHostManagementFeatures       bool                 `json:"EnableHostManagementFeatures"`
 		EdgeAgentCheckinInterval           int                  `json:"EdgeAgentCheckinInterval"`
 		EnableEdgeComputeFeatures          bool                 `json:"EnableEdgeComputeFeatures"`
+		UserSessionTimeout                 string               `json:"UserSessionTimeout"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
@@ -517,9 +517,8 @@ type (
 
 	// Status represents the application status
 	Status struct {
-		Authentication bool   `json:"Authentication"`
-		Analytics      bool   `json:"Analytics"`
-		Version        string `json:"Version"`
+		Analytics bool   `json:"Analytics"`
+		Version   string `json:"Version"`
 	}
 
 	// Tag represents a tag that can be associated to a resource
@@ -842,6 +841,7 @@ type (
 	JWTService interface {
 		GenerateToken(data *TokenData) (string, error)
 		ParseAndVerifyToken(token string) (*TokenData, error)
+		SetUserSessionDuration(userSessionDuration time.Duration)
 	}
 
 	// LDAPService represents a service used to authenticate users against a LDAP/AD
@@ -1057,6 +1057,8 @@ const (
 	LocalExtensionManifestFile = "/extensions.json"
 	// DefaultTemplatesURL represents the URL to the official templates supported by Portainer
 	DefaultTemplatesURL = "https://raw.githubusercontent.com/portainer/templates/master/templates-2.0.json"
+	// DefaultUserSessionTimeout represents the default timeout after which the user session is cleared
+	DefaultUserSessionTimeout = "8h"
 )
 
 const (

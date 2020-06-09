@@ -83,7 +83,7 @@
               <td>{{ item.URL | stripprotocol }}</td>
               <td>{{ item.GroupName }}</td>
               <td>
-                <a ui-sref="portainer.endpoints.endpoint.access({id: item.Id})" ng-if="$ctrl.accessManagement"> <i class="fa fa-users" aria-hidden="true"></i> Manage access </a>
+                <a ui-sref="portainer.endpoints.endpoint.access({id: item.Id})"> <i class="fa fa-users" aria-hidden="true"></i> Manage access </a>
               </td>
             </tr>
             <tr ng-if="$ctrl.state.loading">

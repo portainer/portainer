@@ -16,7 +16,6 @@ type (
 		dataStore           portainer.DataStore
 		jwtService          portainer.JWTService
 		rbacExtensionClient *rbacExtensionClient
-		authDisabled        bool
 	}
 
 	// RestrictedRequestContext is a data structure containing information
@@ -30,12 +29,11 @@ type (
 )
 
 // NewRequestBouncer initializes a new RequestBouncer
-func NewRequestBouncer(dataStore portainer.DataStore, jwtService portainer.JWTService, authenticationDisabled bool, rbacExtensionURL string) *RequestBouncer {
+func NewRequestBouncer(dataStore portainer.DataStore, jwtService portainer.JWTService, rbacExtensionURL string) *RequestBouncer {
 	return &RequestBouncer{
 		dataStore:           dataStore,
 		jwtService:          jwtService,
 		rbacExtensionClient: newRBACExtensionClient(rbacExtensionURL),
-		authDisabled:        authenticationDisabled,
 	}
 }
 
@@ -289,44 +287,38 @@ func (bouncer *RequestBouncer) mwUpgradeToRestrictedRequest(next http.Handler) h
 func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var tokenData *portainer.TokenData
-		if !bouncer.authDisabled {
-			var token string
+		var token string
 
-			// Optionally, token might be set via the "token" query parameter.
-			// For example, in websocket requests
-			token = r.URL.Query().Get("token")
+		// Optionally, token might be set via the "token" query parameter.
+		// For example, in websocket requests
+		token = r.URL.Query().Get("token")
 
-			// Get token from the Authorization header
-			tokens, ok := r.Header["Authorization"]
-			if ok && len(tokens) >= 1 {
-				token = tokens[0]
-				token = strings.TrimPrefix(token, "Bearer ")
-			}
+		// Get token from the Authorization header
+		tokens, ok := r.Header["Authorization"]
+		if ok && len(tokens) >= 1 {
+			token = tokens[0]
+			token = strings.TrimPrefix(token, "Bearer ")
+		}
 
-			if token == "" {
-				httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", portainer.ErrUnauthorized)
-				return
-			}
+		if token == "" {
+			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", portainer.ErrUnauthorized)
+			return
+		}
 
-			var err error
-			tokenData, err = bouncer.jwtService.ParseAndVerifyToken(token)
-			if err != nil {
-				httperror.WriteError(w, http.StatusUnauthorized, "Invalid JWT token", err)
-				return
-			}
+		var err error
+		tokenData, err = bouncer.jwtService.ParseAndVerifyToken(token)
+		if err != nil {
+			httperror.WriteError(w, http.StatusUnauthorized, "Invalid JWT token", err)
+			return
+		}
 
-			_, err = bouncer.dataStore.User().User(tokenData.ID)
-			if err != nil && err == portainer.ErrObjectNotFound {
-				httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", portainer.ErrUnauthorized)
-				return
-			} else if err != nil {
-				httperror.WriteError(w, http.StatusInternalServerError, "Unable to retrieve user details from the database", err)
-				return
-			}
-		} else {
-			tokenData = &portainer.TokenData{
-				Role: portainer.AdministratorRole,
-			}
+		_, err = bouncer.dataStore.User().User(tokenData.ID)
+		if err != nil && err == portainer.ErrObjectNotFound {
+			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", portainer.ErrUnauthorized)
+			return
+		} else if err != nil {
+			httperror.WriteError(w, http.StatusInternalServerError, "Unable to retrieve user details from the database", err)
+			return
 		}
 
 		ctx := storeTokenData(r, tokenData)
