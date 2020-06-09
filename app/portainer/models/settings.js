@@ -12,6 +12,7 @@ export function SettingsViewModel(data) {
   this.EnableHostManagementFeatures = data.EnableHostManagementFeatures;
   this.EdgeAgentCheckinInterval = data.EdgeAgentCheckinInterval;
   this.EnableEdgeComputeFeatures = data.EnableEdgeComputeFeatures;
+  this.UserSessionTimeout = data.UserSessionTimeout;
 }
 
 export function PublicSettingsViewModel(settings) {

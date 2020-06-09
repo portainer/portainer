@@ -20,20 +20,17 @@ angular.module('portainer.app').controller('SidebarController', [
       $scope.uiVersion = StateManager.getState().application.version;
       $scope.logo = StateManager.getState().application.logo;
 
-      var authenticationEnabled = $scope.applicationState.application.authentication;
-      if (authenticationEnabled) {
-        let userDetails = Authentication.getUserDetails();
-        let isAdmin = Authentication.isAdmin();
-        $scope.isAdmin = isAdmin;
+      let userDetails = Authentication.getUserDetails();
+      let isAdmin = Authentication.isAdmin();
+      $scope.isAdmin = isAdmin;
 
-        $q.when(!isAdmin ? UserService.userMemberships(userDetails.ID) : [])
-          .then(function success(data) {
-            checkPermissions(data);
-          })
-          .catch(function error(err) {
-            Notifications.error('Failure', err, 'Unable to retrieve user memberships');
-          });
-      }
+      $q.when(!isAdmin ? UserService.userMemberships(userDetails.ID) : [])
+        .then(function success(data) {
+          checkPermissions(data);
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to retrieve user memberships');
+        });
     }
 
     initView();

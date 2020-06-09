@@ -7,7 +7,7 @@
   <rd-header-content>Registry management</rd-header-content>
 </rd-header>
 
-<div class="row" ng-if="dockerhub && (!applicationState.application.authentication || isAdmin)">
+<div class="row" ng-if="dockerhub && isAdmin">
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-header icon="fa-database" title-text="DockerHub"> </rd-widget-header>
@@ -79,7 +79,7 @@
       dataset="registries"
       table-key="registries"
       order-by="Name"
-      access-management="!applicationState.application.authentication || isAdmin"
+      access-management="isAdmin"
       remove-action="removeAction"
       registry-management="registryManagementAvailable"
       can-browse="canBrowse"

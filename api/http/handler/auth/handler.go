@@ -10,16 +10,9 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
-const (
-	// ErrAuthDisabled is an error raised when trying to access the authentication endpoints
-	// when the server has been started with the --no-auth flag
-	ErrAuthDisabled = portainer.Error("Authentication is disabled")
-)
-
 // Handler is the HTTP handler used to handle authentication operations.
 type Handler struct {
 	*mux.Router
-	authDisabled         bool
 	DataStore            portainer.DataStore
 	CryptoService        portainer.CryptoService
 	JWTService           portainer.JWTService
@@ -29,10 +22,9 @@ type Handler struct {
 }
 
 // NewHandler creates a handler to manage authentication operations.
-func NewHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimiter, authDisabled bool) *Handler {
+func NewHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimiter) *Handler {
 	h := &Handler{
-		Router:       mux.NewRouter(),
-		authDisabled: authDisabled,
+		Router: mux.NewRouter(),
 	}
 
 	h.Handle("/auth/oauth/validate",

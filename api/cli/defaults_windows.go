@@ -6,7 +6,6 @@ const (
 	defaultTunnelServerPort    = "8000"
 	defaultDataDirectory       = "C:\\data"
 	defaultAssetsDirectory     = "./"
-	defaultNoAuth              = "false"
 	defaultNoAnalytics         = "false"
 	defaultTLS                 = "false"
 	defaultTLSSkipVerify       = "false"

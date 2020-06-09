@@ -7,7 +7,6 @@ angular.module('portainer.app').component('endpointsDatatable', {
     tableKey: '@',
     orderBy: '@',
     reverseOrder: '<',
-    accessManagement: '<',
     removeAction: '<',
     retrievePage: '<',
   },
