@@ -1,7 +1,6 @@
 package settings
 
 import (
-	"errors"
 	"net/http"
 	"time"
 
