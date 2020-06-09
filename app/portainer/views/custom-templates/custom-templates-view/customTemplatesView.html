@@ -7,17 +7,25 @@
   <rd-header-content>Custom Templates</rd-header-content>
 </rd-header>
 <div class="row">
+  <stack-from-template-form
+    ng-if="$ctrl.state.selectedTemplate"
+    template="$ctrl.state.selectedTemplate"
+    form-values="$ctrl.formValues"
+    state="$ctrl.state"
+    create-template="$ctrl.createStack"
+    unselect-template="$ctrl.unselectTemplate"
+  >
+  </stack-from-template-form>
+</div>
+<div class="row">
   <div class="col-sm-12">
-    <custom-templates-datatable
-      is-admin="$ctrl.isAdmin"
-      current-user-id="$ctrl.currentUserId"
-      title-text="Custom templates"
-      title-icon="fa-th-list"
+    <custom-templates-list
+      ng-if="$ctrl.templates"
+      title-text="Templates"
+      title-icon="fa-rocket"
       templates="$ctrl.templates"
-      table-key="customTemplates"
-      order-by="Name"
-      remove-action="$ctrl.removeTemplates"
-      refresh-callback="$ctrl.getTemplates"
-    ></custom-templates-datatable>
+      table-key="templates"
+      select-action="$ctrl.selectTemplate"
+    ></custom-templates-list>
   </div>
 </div>
