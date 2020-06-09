@@ -1,5 +1,5 @@
 {
   "packageName": "portainer",
-  "packageVersion": "1.0.0-k8s-beta",
+  "packageVersion": "1.0.0-k8s-rc",
   "projectName": "portainer"
 }
