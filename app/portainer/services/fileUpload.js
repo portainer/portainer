@@ -137,6 +137,22 @@ angular.module('portainer.app').factory('FileUploadService', [
       });
     };
 
+    service.createAzureEndpoint = function (name, applicationId, tenantId, authenticationKey, groupId, tagIds) {
+      return Upload.upload({
+        url: 'api/endpoints',
+        data: {
+          Name: name,
+          EndpointType: 3,
+          GroupID: groupId,
+          TagIds: Upload.json(tagIds),
+          AzureApplicationID: applicationId,
+          AzureTenantID: tenantId,
+          AzureAuthenticationKey: authenticationKey,
+        },
+        ignoreLoadingBar: true,
+      });
+    };
+
     service.uploadLDAPTLSFiles = function (TLSCAFile, TLSCertFile, TLSKeyFile) {
       var queue = [];
 

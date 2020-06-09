@@ -5,6 +5,7 @@
     "baseUrl": "app",
     "paths": {
       "Agent/*": ["agent/*"],
+      "Azure/*": ["azure/*"],
       "Docker/*": ["docker/*"],
       "Extensions/*": ["extensions/*"],
       "Portainer/*": ["portainer/*"]
