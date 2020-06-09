@@ -246,7 +246,7 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Ports' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th ng-if="$ctrl.showOwnershipColumn" ng-show="$ctrl.columnVisibility.columns.ownership.display">
+              <th ng-show="$ctrl.columnVisibility.columns.ownership.display">
                 <a ng-click="$ctrl.changeOrderBy('ResourceControl.Ownership')">
                   Ownership
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && !$ctrl.state.reverseOrder"></i>
@@ -319,7 +319,7 @@
                 </a>
                 <span ng-if="item.Ports.length == 0">-</span>
               </td>
-              <td ng-if="$ctrl.showOwnershipColumn" ng-show="$ctrl.columnVisibility.columns.ownership.display">
+              <td ng-show="$ctrl.columnVisibility.columns.ownership.display">
                 <span>
                   <i ng-class="item.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
                   {{ item.ResourceControl.Ownership ? item.ResourceControl.Ownership : item.ResourceControl.Ownership = $ctrl.RCO.ADMINISTRATORS }}

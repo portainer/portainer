@@ -77,7 +77,6 @@ angular.module('portainer.app').factory('StateManager', [
     };
 
     function assignStateFromStatusAndSettings(status, settings) {
-      state.application.authentication = status.Authentication;
       state.application.analytics = status.Analytics;
       state.application.version = status.Version;
       state.application.logo = settings.LogoURL;

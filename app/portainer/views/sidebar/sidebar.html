@@ -19,7 +19,7 @@
         endpoint-api-version="applicationState.endpoint.apiVersion"
         swarm-management="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'"
         standalone-management="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE' || applicationState.endpoint.mode.provider === 'VMWARE_VIC'"
-        admin-access="!applicationState.application.authentication || isAdmin"
+        admin-access="isAdmin"
         offline-mode="endpointState.OfflineMode"
       ></docker-sidebar-content>
       <li class="sidebar-title" authorization="IntegrationStoridgeAdmin" ng-if="applicationState.endpoint.mode && applicationState.endpoint.extensions.length > 0">
@@ -85,10 +85,10 @@
           <a ui-sref="storidge.drives" ui-sref-active="active">Drives</a>
         </div>
       </li>
-      <li class="sidebar-title" ng-if="(!applicationState.application.authentication || isAdmin) && applicationState.application.enableHostManagementFeatures">
+      <li class="sidebar-title" ng-if="isAdmin && applicationState.application.enableHostManagementFeatures">
         <span>Scheduler</span>
       </li>
-      <li class="sidebar-list" ng-if="(!applicationState.application.authentication || isAdmin) && applicationState.application.enableHostManagementFeatures">
+      <li class="sidebar-list" ng-if="isAdmin && applicationState.application.enableHostManagementFeatures">
         <a ui-sref="portainer.schedules" ui-sref-active="active">Host jobs <span class="menu-icon fa fa-clock fa-fw"></span></a>
       </li>
       <li class="sidebar-title" ng-if="isAdmin && applicationState.application.enableEdgeComputeFeatures">
@@ -103,10 +103,10 @@
       <li class="sidebar-title">
         <span>Settings</span>
       </li>
-      <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
+      <li class="sidebar-list" ng-if="isAdmin">
         <a ui-sref="portainer.extensions" ui-sref-active="active">Extensions <span class="menu-icon fa fa-bolt fa-fw"></span></a>
       </li>
-      <li class="sidebar-list" ng-if="applicationState.application.authentication && (isAdmin || isTeamLeader)">
+      <li class="sidebar-list" ng-if="isAdmin || isTeamLeader">
         <a ui-sref="portainer.users" ui-sref-active="active">Users <span class="menu-icon fa fa-users fa-fw"></span></a>
         <div
           class="sidebar-sublist"
@@ -139,7 +139,7 @@
           <a ui-sref="portainer.roles" ui-sref-active="active">Roles</a>
         </div>
       </li>
-      <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
+      <li class="sidebar-list" ng-if="isAdmin">
         <a ui-sref="portainer.endpoints" ui-sref-active="active">Endpoints <span class="menu-icon fa fa-plug fa-fw"></span></a>
         <div
           class="sidebar-sublist"
@@ -179,14 +179,13 @@
       <li class="sidebar-list">
         <a ui-sref="portainer.registries" ui-sref-active="active">Registries <span class="menu-icon fa fa-database fa-fw"></span></a>
       </li>
-      <li class="sidebar-list" ng-if="!applicationState.application.authentication || isAdmin">
+      <li class="sidebar-list" ng-if="isAdmin">
         <a ui-sref="portainer.settings" ui-sref-active="active">Settings <span class="menu-icon fa fa-cogs fa-fw"></span></a>
         <div
           class="sidebar-sublist"
           ng-if="
             toggle &&
             ($state.current.name === 'portainer.settings' || $state.current.name === 'portainer.settings.authentication' || $state.current.name === 'portainer.about') &&
-            applicationState.application.authentication &&
             isAdmin
           "
         >
