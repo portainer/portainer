@@ -54,6 +54,14 @@
                 on-migrate="migrateStack(name, endpointId)"
               >
               </stack-duplication-form>
+              <div ng-if="!state.externalStack && stackFileContent">
+                <div class="col-sm-12 form-section-title">
+                  Custom template
+                </div>
+                <div class="form-group">
+                  <a class="btn btn-primary btn-xs" ui-sref="portainer.templates.custom.new({stackId:stack.Id})">Create template from stack</a>
+                </div>
+              </div>
             </div>
           </uib-tab>
           <!-- !tab-info -->
