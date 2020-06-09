@@ -10,6 +10,8 @@ import (
 	"github.com/portainer/portainer/api/docker"
 )
 
+const azureAPIBaseURL = "https://management.azure.com"
+
 var extensionPorts = map[portainer.ExtensionID]string{
 	portainer.RegistryManagementExtension:  "7001",
 	portainer.OAuthAuthenticationExtension: "7002",
@@ -69,6 +71,11 @@ func (factory *ProxyFactory) NewLegacyExtensionProxy(extensionAPIURL string) (ht
 
 // NewEndpointProxy returns a new reverse proxy (filesystem based or HTTP) to an endpoint API server
 func (factory *ProxyFactory) NewEndpointProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
+	switch endpoint.Type {
+	case portainer.AzureEnvironment:
+		return newAzureProxy(endpoint)
+	}
+
 	return factory.newDockerProxy(endpoint)
 }
 

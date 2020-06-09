@@ -13,8 +13,9 @@
         <a ui-sref="portainer.home" ui-sref-active="active">Home <span class="menu-icon fa fa-home fa-fw"></span></a>
       </li>
       <li class="sidebar-title endpoint-name" ng-if="applicationState.endpoint.name"> <span class="fa fa-plug space-right"></span>{{ applicationState.endpoint.name }} </li>
+      <azure-sidebar-content ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider === 'AZURE'"> </azure-sidebar-content>
       <docker-sidebar-content
-        ng-if="applicationState.endpoint.mode"
+        ng-if="applicationState.endpoint.mode && applicationState.endpoint.mode.provider !== 'AZURE'"
         endpoint-api-version="applicationState.endpoint.apiVersion"
         swarm-management="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER'"
         standalone-management="applicationState.endpoint.mode.provider === 'DOCKER_STANDALONE' || applicationState.endpoint.mode.provider === 'VMWARE_VIC'"

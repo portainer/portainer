@@ -28,6 +28,9 @@ angular.module('portainer.app').controller('InitEndpointController', [
       TLSCACert: null,
       TLSCert: null,
       TLSKey: null,
+      AzureApplicationId: '',
+      AzureTenantId: '',
+      AzureAuthenticationKey: '',
     };
 
     $scope.createLocalEndpoint = function () {
@@ -42,6 +45,15 @@ angular.module('portainer.app').controller('InitEndpointController', [
         .finally(function final() {
           $scope.state.actionInProgress = false;
         });
+    };
+
+    $scope.createAzureEndpoint = function () {
+      var name = $scope.formValues.Name;
+      var applicationId = $scope.formValues.AzureApplicationId;
+      var tenantId = $scope.formValues.AzureTenantId;
+      var authenticationKey = $scope.formValues.AzureAuthenticationKey;
+
+      createAzureEndpoint(name, applicationId, tenantId, authenticationKey);
     };
 
     $scope.createAgentEndpoint = function () {
@@ -65,6 +77,20 @@ angular.module('portainer.app').controller('InitEndpointController', [
 
       createRemoteEndpoint(name, 1, URL, PublicURL, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile);
     };
+
+    function createAzureEndpoint(name, applicationId, tenantId, authenticationKey) {
+      $scope.state.actionInProgress = true;
+      EndpointService.createAzureEndpoint(name, applicationId, tenantId, authenticationKey, 1, [])
+        .then(function success() {
+          $state.go('portainer.home');
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to connect to the Azure environment');
+        })
+        .finally(function final() {
+          $scope.state.actionInProgress = false;
+        });
+    }
 
     function createRemoteEndpoint(name, type, URL, PublicURL, TLS, TLSSkipVerify, TLSSKipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
       $scope.state.actionInProgress = true;

@@ -23,6 +23,10 @@ func (handler *Handler) endpointSnapshot(w http.ResponseWriter, r *http.Request)
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
+	if endpoint.Type == portainer.AzureEnvironment {
+		return &httperror.HandlerError{http.StatusBadRequest, "Snapshots not supported for Azure endpoints", err}
+	}
+
 	snapshot, snapshotError := handler.Snapshotter.CreateSnapshot(endpoint)
 
 	latestEndpointReference, err := handler.DataStore.Endpoint().Endpoint(endpoint.ID)

@@ -46,6 +46,9 @@ angular
       PublicURL: '',
       GroupId: 1,
       SecurityFormData: new EndpointSecurityFormData(),
+      AzureApplicationId: '',
+      AzureTenantId: '',
+      AzureAuthenticationKey: '',
       TagIds: [],
       CheckinInterval: $scope.state.availableEdgeAgentCheckinOptions[0].value,
     };
@@ -102,6 +105,17 @@ angular
       addEndpoint(name, 4, URL, '', groupId, tagIds, false, false, false, null, null, null, $scope.formValues.CheckinInterval);
     };
 
+    $scope.addAzureEndpoint = function () {
+      var name = $scope.formValues.Name;
+      var applicationId = $scope.formValues.AzureApplicationId;
+      var tenantId = $scope.formValues.AzureTenantId;
+      var authenticationKey = $scope.formValues.AzureAuthenticationKey;
+      var groupId = $scope.formValues.GroupId;
+      var tagIds = $scope.formValues.TagIds;
+
+      createAzureEndpoint(name, applicationId, tenantId, authenticationKey, groupId, tagIds);
+    };
+
     $scope.onCreateTag = function onCreateTag(tagName) {
       return $async(onCreateTagAsync, tagName);
     };
@@ -114,6 +128,21 @@ angular
       } catch (err) {
         Notifications.error('Failue', err, 'Unable to create tag');
       }
+    }
+
+    function createAzureEndpoint(name, applicationId, tenantId, authenticationKey, groupId, tagIds) {
+      $scope.state.actionInProgress = true;
+      EndpointService.createAzureEndpoint(name, applicationId, tenantId, authenticationKey, groupId, tagIds)
+        .then(function success() {
+          Notifications.success('Endpoint created', name);
+          $state.go('portainer.endpoints', {}, { reload: true });
+        })
+        .catch(function error(err) {
+          Notifications.error('Failure', err, 'Unable to create endpoint');
+        })
+        .finally(function final() {
+          $scope.state.actionInProgress = false;
+        });
     }
 
     function addEndpoint(name, type, URL, PublicURL, groupId, tagIds, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile, CheckinInterval) {

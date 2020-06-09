@@ -128,6 +128,8 @@ angular
         return 'Docker';
       } else if (type === 2) {
         return 'Agent';
+      } else if (type === 3) {
+        return 'Azure ACI';
       } else if (type === 4) {
         return 'Edge Agent';
       }

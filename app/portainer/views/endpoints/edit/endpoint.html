@@ -118,7 +118,7 @@
               <input type="text" class="form-control" id="endpoint_public_url" ng-model="endpoint.PublicURL" placeholder="e.g. 10.0.0.10 or mydocker.mydomain.com" />
             </div>
           </div>
-          <div class="form-group">
+          <div class="form-group" ng-if="endpoint.Type === 4">
             <label for="edge_checkin" class="col-sm-2 control-label text-left">
               Poll frequency
               <portainer-tooltip
@@ -135,6 +135,12 @@
               ></select>
             </div>
           </div>
+          <azure-endpoint-config
+            ng-if="endpoint.Type === 3"
+            application-id="endpoint.AzureCredentials.ApplicationID"
+            tenant-id="endpoint.AzureCredentials.TenantID"
+            authentication-key="endpoint.AzureCredentials.AuthenticationKey"
+          ></azure-endpoint-config>
           <!-- !endpoint-public-url-input -->
           <div class="col-sm-12 form-section-title">
             Metadata
