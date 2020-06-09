@@ -78,12 +78,8 @@ angular.module('portainer.app').factory('UserService', [
       return Users.remove({ id: id }).$promise;
     };
 
-    service.updateUser = function (id, password, role) {
-      var query = {
-        password: password,
-        role: role,
-      };
-      return Users.update({ id: id }, query).$promise;
+    service.updateUser = function (id, { password, role, username }) {
+      return Users.update({ id }, { password, role, username }).$promise;
     };
 
     service.updateUserPassword = function (id, currentPassword, newPassword) {
