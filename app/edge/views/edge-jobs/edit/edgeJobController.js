@@ -26,6 +26,8 @@ class EdgeJobController {
     this.collectLogsAsync = this.collectLogsAsync.bind(this);
     this.clearLogs = this.clearLogs.bind(this);
     this.clearLogsAsync = this.clearLogsAsync.bind(this);
+    this.refresh = this.refresh.bind(this);
+    this.refreshAsync = this.refreshAsync.bind(this);
   }
 
   update() {
@@ -95,6 +97,21 @@ class EdgeJobController {
       result.LogsStatus = 1;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to clear logs');
+    }
+  }
+
+  refresh() {
+    return this.$async(this.refreshAsync);
+  }
+  async refreshAsync() {
+    const { id } = this.$state.params;
+    const results = await this.EdgeJobService.jobResults(id);
+    if (results.length > 0) {
+      const endpointIds = _.map(results, (result) => result.EndpointId);
+      const endpoints = await this.EndpointService.endpoints(undefined, undefined, { endpointIds });
+      this.results = this.associateEndpointsToResults(results, endpoints.value);
+    } else {
+      this.results = results;
     }
   }
 

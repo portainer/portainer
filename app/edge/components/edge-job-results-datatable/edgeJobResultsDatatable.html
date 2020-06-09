@@ -37,7 +37,7 @@
                     {{ item.Endpoint.Name }}
                   </td>
                   <td>
-                    <button ng-if="item.LogsStatus === 0 || item.LogsStatus === 1" class="btn btn-sm btn-primary" ng-click="$ctrl.onCollectLogsClick(item.EndpointId)">
+                    <button ng-if="item.LogsStatus === 0 || item.LogsStatus === 1" class="btn btn-sm btn-primary" ng-click="$ctrl.collectLogs(item.EndpointId)">
                       Retrieve logs
                     </button>
                     <button ng-if="item.LogsStatus === 3" class="btn btn-sm btn-primary" ng-click="$ctrl.onDownloadLogsClick(item.EndpointId)">
@@ -47,7 +47,7 @@
                       Clear logs
                     </button>
                     <span ng-if="item.LogsStatus === 2">
-                      Retrieving Logs, please refresh in a few moments
+                      Logs marked for collection, please wait until the logs are available.
                     </span>
                   </td>
                 </tr>

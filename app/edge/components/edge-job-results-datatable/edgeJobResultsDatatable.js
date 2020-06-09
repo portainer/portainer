@@ -1,6 +1,9 @@
+import angular from 'angular';
+import EdgeJobResultsDatatableController from './edgeJobResultsDatatableController';
+
 angular.module('portainer.edge').component('edgeJobResultsDatatable', {
   templateUrl: './edgeJobResultsDatatable.html',
-  controller: 'GenericDatatableController',
+  controller: EdgeJobResultsDatatableController,
   bindings: {
     titleText: '@',
     titleIcon: '@',
@@ -11,5 +14,6 @@ angular.module('portainer.edge').component('edgeJobResultsDatatable', {
     onDownloadLogsClick: '<',
     onCollectLogsClick: '<',
     onClearLogsClick: '<',
+    refreshCallback: '<',
   },
 });

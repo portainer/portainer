@@ -39,6 +39,7 @@
               table-key="edge-job-results"
               order-by="Status"
               reverse-order="true"
+              refresh-callback="$ctrl.refresh"
               on-download-logs-click="($ctrl.downloadLogs)"
               on-collect-logs-click="($ctrl.collectLogs)"
               on-clear-logs-click="($ctrl.clearLogs)"
