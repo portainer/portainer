@@ -33,13 +33,13 @@ class KubernetesStatefulSetService {
         Raw: raw,
         Yaml: yaml.data
       };
-      const serviceName = raw.spec.serviceName;
-      if (serviceName) {
+      const headlessServiceName = raw.spec.serviceName;
+      if (headlessServiceName) {
         try {
-          const service = await this.KubernetesServiceService.get(namespace, serviceName);
-          res.Yaml += '---\n' + service.Yaml;
+          const headlessService = await this.KubernetesServiceService.get(namespace, headlessServiceName);
+          res.Yaml += '---\n' + headlessService.Yaml;
         } catch (error) {
-          // if has error means service not existing
+          // if has error means headless service does not exist
           // skip error as we don't care in this case
         }
       }

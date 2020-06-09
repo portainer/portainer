@@ -58,34 +58,34 @@ class KubernetesApplicationService {
    */
   async getAsync(namespace, name) {
     try {
-      const [deployment, daemonSet, statefulSet, serviceAttempt, pods] = await Promise.allSettled([
+      const [deployment, daemonSet, statefulSet, pods] = await Promise.allSettled([
         this.KubernetesDeploymentService.get(namespace, name),
         this.KubernetesDaemonSetService.get(namespace, name),
         this.KubernetesStatefulSetService.get(namespace, name),
-        this.KubernetesServiceService.get(namespace, name),
-        this.KubernetesPodService.get(namespace),
+        this.KubernetesPodService.get(namespace)
       ]);
-      const service = {};
-      if (serviceAttempt.status === 'fulfilled') {
-        service.Raw = serviceAttempt.value.Raw;
-        service.Yaml = serviceAttempt.value.Yaml;
-      }
-      let item;
-      let application;
+
+      let rootItem;
+      let converterFunction;
       if (deployment.status === 'fulfilled') {
-        item = deployment;
-        application = KubernetesApplicationConverter.apiDeploymentToApplication(deployment.value.Raw, service.Raw);
+        rootItem = deployment;
+        converterFunction = KubernetesApplicationConverter.apiDeploymentToApplication;
       } else if (daemonSet.status === 'fulfilled') {
-        item = daemonSet;
-        application = KubernetesApplicationConverter.apiDaemonSetToApplication(daemonSet.value.Raw, service.Raw);
+        rootItem = daemonSet;
+        converterFunction = KubernetesApplicationConverter.apiDaemonSetToApplication;
       } else if (statefulSet.status === 'fulfilled') {
-        item = statefulSet;
-        application = KubernetesApplicationConverter.apiStatefulSetToapplication(statefulSet.value.Raw, service.Raw);
+        rootItem = statefulSet;
+        converterFunction = KubernetesApplicationConverter.apiStatefulSetToapplication;
       } else {
         throw new PortainerError('Unable to determine which association to use');
       }
-      application.Raw = item.value.Raw;
-      application.Yaml = item.value.Yaml;
+
+      const services = await this.KubernetesServiceService.get(namespace);
+      const boundService = _.find(services, (item) => _.isMatch(rootItem.value.Raw.spec.template.metadata.labels, item.spec.selector));
+      const service = boundService ? await this.KubernetesServiceService.get(namespace, boundService.metadata.name) : {};
+      const application = converterFunction(rootItem.value.Raw, service.Raw);
+      application.Yaml = rootItem.value.Yaml;
+      application.Raw = rootItem.value.Raw;
       application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods.value, application.Raw);
       await this.KubernetesHistoryService.get(application);
 
