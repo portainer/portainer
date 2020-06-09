@@ -14,6 +14,7 @@ angular.module('portainer.app').controller('UserController', [
     };
 
     $scope.formValues = {
+      username: '',
       newPassword: '',
       confirmPassword: '',
       Administrator: false,
@@ -28,12 +29,33 @@ angular.module('portainer.app').controller('UserController', [
       });
     };
 
-    $scope.updatePermissions = function () {
-      var role = $scope.formValues.Administrator ? 1 : 2;
-      UserService.updateUser($scope.user.Id, undefined, role, 0)
+    $scope.updateUser = async function () {
+      const role = $scope.formValues.Administrator ? 1 : 2;
+      const oldUsername = $scope.user.Username;
+      const username = $scope.formValues.username;
+      let promise = Promise.resolve(true);
+      if (username != oldUsername) {
+        promise = new Promise((resolve) =>
+          ModalService.confirm({
+            title: 'Are you sure?',
+            message: `Are you sure you want to rename the user ${oldUsername} to ${username}?`,
+            buttons: {
+              confirm: {
+                label: 'Update',
+                className: 'btn-primary',
+              },
+            },
+            callback: resolve,
+          })
+        );
+      }
+      const confirmed = await promise;
+      if (!confirmed) {
+        return;
+      }
+      UserService.updateUser($scope.user.Id, { role, username })
         .then(function success() {
-          var newRole = role === 1 ? 'administrator' : 'user';
-          Notifications.success('Permissions successfully updated', $scope.user.Username + ' is now ' + newRole);
+          Notifications.success('User successfully updated');
           $state.reload();
         })
         .catch(function error(err) {
@@ -42,7 +64,7 @@ angular.module('portainer.app').controller('UserController', [
     };
 
     $scope.updatePassword = function () {
-      UserService.updateUser($scope.user.Id, $scope.formValues.newPassword, undefined, -1)
+      UserService.updateUser($scope.user.Id, { password: $scope.formValues.newPassword })
         .then(function success() {
           Notifications.success('Password successfully updated');
           $state.reload();
@@ -63,6 +85,12 @@ angular.module('portainer.app').controller('UserController', [
         });
     }
 
+    $scope.isSubmitEnabled = isSubmitEnabled;
+    function isSubmitEnabled() {
+      const { user, formValues } = $scope;
+      return user && (user.Username !== formValues.username || (formValues.Administrator && user.Role !== 1) || (!formValues.Administrator && user.Role === 1));
+    }
+
     function initView() {
       $scope.isAdmin = Authentication.isAdmin();
 
@@ -74,6 +102,7 @@ angular.module('portainer.app').controller('UserController', [
           var user = data.user;
           $scope.user = user;
           $scope.formValues.Administrator = user.Role === 1;
+          $scope.formValues.username = user.Username;
           $scope.AuthenticationMethod = data.settings.AuthenticationMethod;
         })
         .catch(function error(err) {
