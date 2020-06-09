@@ -841,7 +841,7 @@ type (
 	JWTService interface {
 		GenerateToken(data *TokenData) (string, error)
 		ParseAndVerifyToken(token string) (*TokenData, error)
-		SetUserSessionDuration(userSessionDuration string) error
+		SetUserSessionDuration(userSessionDuration time.Duration)
 	}
 
 	// LDAPService represents a service used to authenticate users against a LDAP/AD
