@@ -63,11 +63,12 @@ type (
 
 	// CustomTemplate represents a custom template
 	CustomTemplate struct {
-		ID              CustomTemplateID `json:"id"`
-		Name            string           `json:"name"`
-		ProjectPath     string           `json:"projectPath"`
-		EntryPoint      string           `json:"entryPoint"`
-		CreatedByUserID UserID           `json:"createdByUserId"`
+		ID              CustomTemplateID `json:"Id"`
+		Title           string           `json:"Title"`
+		Description     string           `json:"Description"`
+		ProjectPath     string           `json:"ProjectPath"`
+		EntryPoint      string           `json:"EntryPoint"`
+		CreatedByUserID UserID           `json:"CreatedByUserId"`
 	}
 
 	// CustomTemplateID represents a custom template identifier

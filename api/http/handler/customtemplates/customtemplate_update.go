@@ -14,13 +14,13 @@ import (
 )
 
 type customTemplateUpdatePayload struct {
-	Name        string
+	Title       string
 	FileContent string
 }
 
 func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.Name) {
-		return portainer.Error("Invalid custom template name")
+	if govalidator.IsNull(payload.Title) {
+		return portainer.Error("Invalid custom template title")
 	}
 	if govalidator.IsNull(payload.FileContent) {
 		return portainer.Error("Invalid file content")
@@ -62,7 +62,7 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist updated custom template file on disk", err}
 	}
 
-	customTemplate.Name = payload.Name
+	customTemplate.Title = payload.Title
 
 	err = handler.DataStore.CustomTemplate().UpdateCustomTemplate(customTemplate.ID, customTemplate)
 	if err != nil {

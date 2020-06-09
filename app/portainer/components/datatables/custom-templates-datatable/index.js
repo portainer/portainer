@@ -9,7 +9,7 @@ angular.module('portainer.app').component('customTemplatesDatatable', {
     currentUserId: '<',
     titleText: '@',
     titleIcon: '@',
-    dataset: '<',
+    templates: '<',
     tableKey: '@',
     orderBy: '@',
     reverseOrder: '<',

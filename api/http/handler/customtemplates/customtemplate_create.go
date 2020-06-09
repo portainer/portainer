@@ -54,13 +54,13 @@ func (handler *Handler) createCustomTemplate(method string, r *http.Request) (*p
 }
 
 type customTemplateFromFileContentPayload struct {
-	Name        string
+	Title       string
 	FileContent string
 }
 
 func (payload *customTemplateFromFileContentPayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.Name) {
-		return portainer.Error("Invalid custom template name")
+	if govalidator.IsNull(payload.Title) {
+		return portainer.Error("Invalid custom template title")
 	}
 	if govalidator.IsNull(payload.FileContent) {
 		return portainer.Error("Invalid file content")
@@ -78,7 +78,7 @@ func (handler *Handler) createCustomTemplateFromFileContent(r *http.Request) (*p
 	customTemplateID := handler.DataStore.CustomTemplate().GetNextIdentifier()
 	customTemplate := &portainer.CustomTemplate{
 		ID:         portainer.CustomTemplateID(customTemplateID),
-		Name:       payload.Name,
+		Title:      payload.Title,
 		EntryPoint: filesystem.ComposeFileDefaultName,
 	}
 
@@ -93,7 +93,7 @@ func (handler *Handler) createCustomTemplateFromFileContent(r *http.Request) (*p
 }
 
 type customTemplateFromGitRepositoryPayload struct {
-	Name                        string
+	Title                       string
 	RepositoryURL               string
 	RepositoryReferenceName     string
 	RepositoryAuthentication    bool
@@ -103,8 +103,8 @@ type customTemplateFromGitRepositoryPayload struct {
 }
 
 func (payload *customTemplateFromGitRepositoryPayload) Validate(r *http.Request) error {
-	if govalidator.IsNull(payload.Name) {
-		return portainer.Error("Invalid stack name")
+	if govalidator.IsNull(payload.Title) {
+		return portainer.Error("Invalid custom template title")
 	}
 	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
 		return portainer.Error("Invalid repository URL. Must correspond to a valid URL format")
@@ -128,7 +128,7 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 	customTemplateID := handler.DataStore.CustomTemplate().GetNextIdentifier()
 	customTemplate := &portainer.CustomTemplate{
 		ID:         portainer.CustomTemplateID(customTemplateID),
-		Name:       payload.Name,
+		Title:      payload.Title,
 		EntryPoint: payload.ComposeFilePathInRepository,
 	}
 
@@ -153,16 +153,16 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 }
 
 type customTemplateFromFileUploadPayload struct {
-	Name        string
+	Title       string
 	FileContent []byte
 }
 
 func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) error {
-	name, err := request.RetrieveMultiPartFormValue(r, "Name", false)
+	title, err := request.RetrieveMultiPartFormValue(r, "Title", false)
 	if err != nil {
-		return portainer.Error("Invalid custom template name")
+		return portainer.Error("Invalid custom template title")
 	}
-	payload.Name = name
+	payload.Title = title
 
 	composeFileContent, _, err := request.RetrieveMultiPartFormFile(r, "file")
 	if err != nil {
@@ -183,7 +183,7 @@ func (handler *Handler) createCustomTemplateFromFileUpload(r *http.Request) (*po
 	customTemplateID := handler.DataStore.CustomTemplate().GetNextIdentifier()
 	customTemplate := &portainer.CustomTemplate{
 		ID:         portainer.CustomTemplateID(customTemplateID),
-		Name:       payload.Name,
+		Title:      payload.Title,
 		EntryPoint: filesystem.ComposeFileDefaultName,
 	}
 

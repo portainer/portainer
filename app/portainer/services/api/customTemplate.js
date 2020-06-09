@@ -31,9 +31,9 @@ function CustomTemplateServiceFactory(CustomTemplates, FileUploadService) {
     return CustomTemplates.update({ id }, customTemplate);
   };
 
-  service.createCustomTemplateFromFileContent = async function createCustomTemplateFromFileContent(name, fileContent) {
+  service.createCustomTemplateFromFileContent = async function createCustomTemplateFromFileContent(title, fileContent) {
     var payload = {
-      Name: name,
+      Title: title,
       FileContent: fileContent,
     };
     try {
@@ -43,17 +43,17 @@ function CustomTemplateServiceFactory(CustomTemplates, FileUploadService) {
     }
   };
 
-  service.createCustomTemplateFromFileUpload = async function createCustomTemplateFromFileUpload(name, customTemplateFile) {
+  service.createCustomTemplateFromFileUpload = async function createCustomTemplateFromFileUpload(title, customTemplateFile) {
     try {
-      return await FileUploadService.createCustomTemplate(name, customTemplateFile);
+      return await FileUploadService.createCustomTemplate(title, customTemplateFile);
     } catch (err) {
       throw { msg: 'Unable to create the customTemplate', err };
     }
   };
 
-  service.createCustomTemplateFromGitRepository = async function createCustomTemplateFromGitRepository(name, repositoryOptions) {
+  service.createCustomTemplateFromGitRepository = async function createCustomTemplateFromGitRepository(title, repositoryOptions) {
     var payload = {
-      Name: name,
+      Title: title,
       RepositoryURL: repositoryOptions.RepositoryURL,
       RepositoryReferenceName: repositoryOptions.RepositoryReferenceName,
       ComposeFilePathInRepository: repositoryOptions.ComposeFilePathInRepository,

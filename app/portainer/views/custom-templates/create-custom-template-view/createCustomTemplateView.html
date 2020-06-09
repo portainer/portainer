@@ -8,16 +8,16 @@
     <rd-widget>
       <rd-widget-body>
         <form class="form-horizontal">
-          <!-- name-input -->
+          <!-- title-input -->
           <div class="form-group">
-            <label for="template_name" class="col-sm-1 control-label text-left">
-              Name
+            <label for="template_title" class="col-sm-1 control-label text-left">
+              Title
             </label>
             <div class="col-sm-11">
-              <input type="text" class="form-control" ng-model="$ctrl.formValues.Name" id="template_name" placeholder="e.g. mytemplate" auto-focus />
+              <input type="text" class="form-control" ng-model="$ctrl.formValues.Title" id="template_title" placeholder="e.g. mytemplate" auto-focus />
             </div>
           </div>
-          <!-- !name-input -->
+          <!-- !title-input -->
 
           <!-- build-method -->
           <div class="col-sm-12 form-section-title">
@@ -203,7 +203,7 @@
               || ($ctrl.state.Method === 'editor' && !$ctrl.formValues.FileContent)
               || ($ctrl.state.Method === 'upload' && !$ctrl.formValues.File)
               || ($ctrl.state.Method === 'repository' && ((!$ctrl.formValues.RepositoryURL || !$ctrl.formValues.ComposeFilePathInRepository) || ($ctrl.formValues.RepositoryAuthentication && (!$ctrl.formValues.RepositoryUsername || !$ctrl.formValues.RepositoryPassword))))
-              || !$ctrl.formValues.Name"
+              || !$ctrl.formValues.Title"
                 ng-click="$ctrl.createCustomTemplate()"
                 button-spinner="$ctrl.state.actionInProgress"
               >

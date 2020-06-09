@@ -4,7 +4,7 @@ class CreateCustomTemplateViewController {
     Object.assign(this, { $async, $state, CustomTemplateService, Notifications, StackService });
 
     this.formValues = {
-      Name: '',
+      Title: '',
       FileContent: '',
       File: null,
       RepositoryURL: '',
@@ -42,7 +42,7 @@ class CreateCustomTemplateViewController {
   }
 
   async createCustomTemplateAsync() {
-    const name = this.formValues.Name;
+    const title = this.formValues.Title;
     let method = this.state.Method;
 
     if (method === 'template') {
@@ -55,7 +55,7 @@ class CreateCustomTemplateViewController {
 
     this.state.actionInProgress = true;
     try {
-      await this.createCustomTemplateByMethod(name, method);
+      await this.createCustomTemplateByMethod(title, method);
 
       this.Notifications.success('Custom template successfully created');
       this.$state.go('portainer.templates.custom');
@@ -77,26 +77,26 @@ class CreateCustomTemplateViewController {
     return true;
   }
 
-  createCustomTemplateByMethod(name, method) {
+  createCustomTemplateByMethod(title, method) {
     switch (method) {
       case 'editor':
-        return this.createCustomTemplateFromFileContent(name);
+        return this.createCustomTemplateFromFileContent(title);
       case 'upload':
-        return this.createCustomTemplateFromFileUpload(name);
+        return this.createCustomTemplateFromFileUpload(title);
       case 'repository':
-        return this.createCustomTemplateFromGitRepository(name);
+        return this.createCustomTemplateFromGitRepository(title);
     }
   }
 
-  createCustomTemplateFromFileContent(name) {
-    return this.CustomTemplateService.createCustomTemplateFromFileContent(name, this.formValues.FileContent, this.formValues.Groups);
+  createCustomTemplateFromFileContent(title) {
+    return this.CustomTemplateService.createCustomTemplateFromFileContent(title, this.formValues.FileContent, this.formValues.Groups);
   }
 
-  createCustomTemplateFromFileUpload(name) {
-    return this.CustomTemplateService.createCustomTemplateFromFileUpload(name, this.formValues.File, this.formValues.Groups);
+  createCustomTemplateFromFileUpload(title) {
+    return this.CustomTemplateService.createCustomTemplateFromFileUpload(title, this.formValues.File, this.formValues.Groups);
   }
 
-  createCustomTemplateFromGitRepository(name) {
+  createCustomTemplateFromGitRepository(title) {
     const repositoryOptions = {
       RepositoryURL: this.formValues.RepositoryURL,
       RepositoryReferenceName: this.formValues.RepositoryReferenceName,
@@ -105,7 +105,7 @@ class CreateCustomTemplateViewController {
       RepositoryUsername: this.formValues.RepositoryUsername,
       RepositoryPassword: this.formValues.RepositoryPassword,
     };
-    return this.CustomTemplateService.createCustomTemplateFromGitRepository(name, repositoryOptions, this.formValues.Groups);
+    return this.CustomTemplateService.createCustomTemplateFromGitRepository(title, repositoryOptions, this.formValues.Groups);
   }
 
   editorUpdate(cm) {
