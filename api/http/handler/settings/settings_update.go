@@ -40,6 +40,12 @@ func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 	if payload.TemplatesURL != nil && *payload.TemplatesURL != "" && !govalidator.IsURL(*payload.TemplatesURL) {
 		return portainer.Error("Invalid external templates URL. Must correspond to a valid URL format")
 	}
+	if payload.UserSessionTimeout != nil {
+		_, err := time.ParseDuration(*payload.UserSessionTimeout)
+		if err != nil {
+			return portainer.Error("Invalid user session timeout")
+		}
+	}
 
 	return nil
 }
@@ -132,10 +138,8 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 	if payload.UserSessionTimeout != nil {
 		settings.UserSessionTimeout = *payload.UserSessionTimeout
 
-		userSessionDuration, err := time.ParseDuration(*payload.UserSessionTimeout)
-		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user session duration", errors.New("Invalid user session timeout")}
-		}
+		userSessionDuration, _ := time.ParseDuration(*payload.UserSessionTimeout)
+
 		handler.JWTService.SetUserSessionDuration(userSessionDuration)
 	}
 
