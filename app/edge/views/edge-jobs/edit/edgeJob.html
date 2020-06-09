@@ -12,11 +12,11 @@
     <rd-widget>
       <rd-widget-body>
         <uib-tabset active="$ctrl.state.activeTab">
-          <uib-tab index="0">
+          <uib-tab index="0" select="$ctrl.showEditor()">
             <uib-tab-heading> <i class="fa fa-wrench" aria-hidden="true"></i> Configuration </uib-tab-heading>
 
             <edge-job-form
-              ng-if="$ctrl.edgeJob"
+              ng-if="$ctrl.edgeJob && $ctrl.state.showEditorTab"
               model="$ctrl.edgeJob"
               endpoints="endpoints"
               groups="$ctrl.groups"

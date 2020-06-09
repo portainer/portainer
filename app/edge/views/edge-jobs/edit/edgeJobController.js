@@ -5,6 +5,7 @@ class EdgeJobController {
   constructor($async, $q, $state, EdgeJobService, EndpointService, FileSaver, GroupService, HostBrowserService, Notifications, TagService) {
     this.state = {
       actionInProgress: false,
+      showEditorTab: false,
     };
 
     this.$async = $async;
@@ -28,6 +29,7 @@ class EdgeJobController {
     this.clearLogsAsync = this.clearLogsAsync.bind(this);
     this.refresh = this.refresh.bind(this);
     this.refreshAsync = this.refreshAsync.bind(this);
+    this.showEditor = this.showEditor.bind(this);
   }
 
   update() {
@@ -115,9 +117,17 @@ class EdgeJobController {
     }
   }
 
+  showEditor() {
+    this.state.showEditorTab = true;
+  }
+
   async $onInit() {
     const { id, tab } = this.$state.params;
     this.state.activeTab = tab;
+    if (!tab || tab === 0) {
+      this.state.showEditorTab = true;
+    }
+
     try {
       const [edgeJob, file, results, groups, tags] = await Promise.all([
         this.EdgeJobService.edgeJob(id),
