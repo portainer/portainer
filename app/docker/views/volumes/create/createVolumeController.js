@@ -130,9 +130,8 @@ angular.module('portainer.docker').controller('CreateVolumeController', [
 
     function initView() {
       var apiVersion = $scope.applicationState.endpoint.apiVersion;
-      var endpointProvider = $scope.applicationState.endpoint.mode.provider;
 
-      PluginService.volumePlugins(apiVersion < 1.25 || endpointProvider === 'VMWARE_VIC')
+      PluginService.volumePlugins(apiVersion < 1.25)
         .then(function success(data) {
           $scope.availableVolumeDrivers = data;
         })
