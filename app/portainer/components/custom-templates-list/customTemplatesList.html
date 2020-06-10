@@ -24,7 +24,21 @@
       </div>
 
       <div class="blocklist">
-        <template-item ng-repeat="template in $ctrl.templates | filter:$ctrl.state.textFilter" model="template" on-select="($ctrl.selectAction)"></template-item>
+        <template-item
+          ng-repeat="template in $ctrl.templates | filter:$ctrl.state.textFilter"
+          model="template"
+          type-label="{{ template.Type === 1 ? 'swarm' : 'standalone' }}"
+          on-select="($ctrl.onSelectClick)"
+        >
+          <template-item-actions>
+            <div style="display: flex;">
+              <a ui-sref="portainer.templates.custom.edit({id: template.Id})" ng-click="$event.stopPropagation();" class="btn btn-primary btn-xs" style="margin-right: 10px;">
+                Edit
+              </a>
+              <button class="btn btn-danger btn-xs" ng-click="$ctrl.onDeleteClick(template.Id); $event.stopPropagation();">Delete</button>
+            </div>
+          </template-item-actions>
+        </template-item>
         <div ng-if="!$ctrl.templates" class="text-center text-muted">
           Loading...
         </div>

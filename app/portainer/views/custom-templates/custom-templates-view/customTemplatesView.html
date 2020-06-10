@@ -25,7 +25,8 @@
       title-icon="fa-rocket"
       templates="$ctrl.templates"
       table-key="templates"
-      select-action="$ctrl.selectTemplate"
+      on-select-click="($ctrl.selectTemplate)"
+      on-delete-click="($ctrl.confirmDelete)"
     ></custom-templates-list>
   </div>
 </div>

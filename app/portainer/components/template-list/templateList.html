@@ -49,6 +49,7 @@
         <template-item
           ng-repeat="template in $ctrl.templates | filter: $ctrl.filterByType | filter:$ctrl.filterByCategory | filter:$ctrl.state.textFilter"
           model="template"
+          type-label="{{ template.Type === 1 ? 'container' : 'stack' }}"
           on-select="($ctrl.selectAction)"
         ></template-item>
         <div ng-if="!$ctrl.templates" class="text-center text-muted">

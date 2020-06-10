@@ -7,7 +7,8 @@ angular.module('portainer.app').component('customTemplatesList', {
     titleIcon: '@',
     templates: '<',
     tableKey: '@',
-    selectAction: '<',
+    onSelectClick: '<',
     showSwarmStacks: '<',
+    onDeleteClick: '<',
   },
 });

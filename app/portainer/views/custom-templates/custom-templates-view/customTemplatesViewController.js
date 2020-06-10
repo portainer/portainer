@@ -12,6 +12,7 @@ class CustomTemplatesViewController {
     CustomTemplateService,
     EndpointProvider,
     FormValidator,
+    ModalService,
     NetworkService,
     Notifications,
     ResourceControlService,
@@ -26,6 +27,7 @@ class CustomTemplatesViewController {
     this.CustomTemplateService = CustomTemplateService;
     this.EndpointProvider = EndpointProvider;
     this.FormValidator = FormValidator;
+    this.ModalService = ModalService;
     this.NetworkService = NetworkService;
     this.Notifications = Notifications;
     this.ResourceControlService = ResourceControlService;
@@ -56,6 +58,8 @@ class CustomTemplatesViewController {
     this.unselectTemplate = this.unselectTemplate.bind(this);
     this.getNetworks = this.getNetworks.bind(this);
     this.getNetworksAsync = this.getNetworksAsync.bind(this);
+    this.confirmDelete = this.confirmDelete.bind(this);
+    this.confirmDeleteAsync = this.confirmDeleteAsync.bind(this);
   }
 
   getTemplates() {
@@ -174,6 +178,23 @@ class CustomTemplatesViewController {
       this.availableNetworks = networks;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Failed to load networks.');
+    }
+  }
+
+  confirmDelete(templateId) {
+    return this.$async(this.confirmDeleteAsync, templateId);
+  }
+  async confirmDeleteAsync(templateId) {
+    const confirmed = await this.ModalService.confirmDeletionAsync('Are you sure that you want to delete this template?');
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await this.CustomTemplateService.remove(templateId);
+      _.remove(this.templates, { Id: templateId });
+    } catch (err) {
+      this.Notifications.error('Failure', err, 'Failed to delete template');
     }
   }
 

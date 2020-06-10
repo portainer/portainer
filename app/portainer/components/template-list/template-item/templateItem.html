@@ -24,7 +24,7 @@
               <i class="fab fa-windows" aria-hidden="true" ng-if="$ctrl.model.Platform === 'windows' || !$ctrl.model.Platform"></i>
             </span>
             <span>
-              {{ $ctrl.model.Type === 1 ? 'container' : 'stack' }}
+              {{ $ctrl.typeLabel }}
             </span>
           </span>
         </span>
@@ -41,6 +41,7 @@
       </div>
       <!-- !blocklist-item-line2 -->
     </span>
+    <span class="blocklist-item-actions" ng-transclude="actions"></span>
     <!-- !template-details -->
   </div>
   <!-- !template -->

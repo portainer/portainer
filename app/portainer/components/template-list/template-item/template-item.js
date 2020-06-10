@@ -1,7 +1,11 @@
 angular.module('portainer.app').component('templateItem', {
   templateUrl: './templateItem.html',
   bindings: {
-    model: '=',
+    model: '<',
+    typeLabel: '@',
     onSelect: '<',
+  },
+  transclude: {
+    actions: '?templateItemActions',
   },
 });
