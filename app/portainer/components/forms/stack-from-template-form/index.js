@@ -9,4 +9,7 @@ angular.module('portainer.app').component('stackFromTemplateForm', {
     createTemplate: '<',
     unselectTemplate: '<',
   },
+  transclude: {
+    advanced: '?advancedForm',
+  },
 });

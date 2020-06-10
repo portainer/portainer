@@ -15,6 +15,45 @@
     create-template="$ctrl.createStack"
     unselect-template="$ctrl.unselectTemplate"
   >
+    <advanced-form>
+      <div class="form-group">
+        <div class="col-sm-12">
+          <a class="small interactive" ng-show="!$ctrl.state.showAdvancedOptions" ng-click="$ctrl.state.showAdvancedOptions = true;">
+            <i class="fa fa-plus space-right" aria-hidden="true"></i> Customize stack
+          </a>
+          <a class="small interactive" ng-show="$ctrl.state.showAdvancedOptions" ng-click="$ctrl.state.showAdvancedOptions = false;">
+            <i class="fa fa-minus space-right" aria-hidden="true"></i> Hide custom stack
+          </a>
+        </div>
+      </div>
+      <div ng-if="$ctrl.state.showAdvancedOptions">
+        <!-- web-editor -->
+        <div class="col-sm-12 form-section-title">
+          Web editor
+        </div>
+        <div class="form-group">
+          <span class="col-sm-12 text-muted small">
+            You can get more information about Compose file format in the
+            <a href="https://docs.docker.com/compose/compose-file/" target="_blank">
+              official documentation
+            </a>
+            .
+          </span>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-12">
+            <code-editor
+              identifier="custom-template-creation-editor"
+              placeholder="# Define or paste the content of your docker-compose file here"
+              yml="true"
+              value="$ctrl.formValues.fileContent"
+              on-change="($ctrl.editorUpdate)"
+            ></code-editor>
+          </div>
+        </div>
+        <!-- !web-editor -->
+      </div>
+    </advanced-form>
   </stack-from-template-form>
 </div>
 <div class="row">

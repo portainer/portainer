@@ -39,11 +39,13 @@ class CustomTemplatesViewController {
       showAdvancedOptions: false,
       formValidationError: '',
       actionInProgress: false,
+      isEditorVisible: false,
     };
 
     this.formValues = {
       network: '',
       name: '',
+      fileContent: '',
       AccessControlData: new AccessControlFormData(),
     };
 
@@ -55,11 +57,13 @@ class CustomTemplatesViewController {
     this.createStack = this.createStack.bind(this);
     this.createStackAsync = this.createStackAsync.bind(this);
     this.selectTemplate = this.selectTemplate.bind(this);
+    this.selectTemplateAsync = this.selectTemplateAsync.bind(this);
     this.unselectTemplate = this.unselectTemplate.bind(this);
     this.getNetworks = this.getNetworks.bind(this);
     this.getNetworksAsync = this.getNetworksAsync.bind(this);
     this.confirmDelete = this.confirmDelete.bind(this);
     this.confirmDeleteAsync = this.confirmDeleteAsync.bind(this);
+    this.editorUpdate = this.editorUpdate.bind(this);
   }
 
   getTemplates() {
@@ -110,31 +114,18 @@ class CustomTemplatesViewController {
     if (!this.validateForm(accessControlData, this.isAdmin)) {
       return;
     }
-    const template = this.state.selectedTemplate;
-
     const stackName = this.formValues.name;
-    // const env = _.filter(
-    //   _.map(template.Env, function transformEnvVar(envvar) {
-    //     return {
-    //       name: envvar.name,
-    //       value: envvar.preset || !envvar.value ? envvar.default : envvar.value,
-    //     };
-    //   }),
-    //   function removeUndefinedVars(envvar) {
-    //     return envvar.value && envvar.name;
-    //   }
-    // );
 
     const endpointId = this.EndpointProvider.endpointID();
 
     try {
-      const file = await this.CustomTemplateService.customTemplateFile(template.Id);
+      const file = this.formValues.fileContent;
       const { ResourceControl: resourceControl } = await this.StackService.createComposeStackFromFileContent(stackName, file, [], endpointId);
       await this.ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
       this.Notifications.success('Stack successfully deployed');
       this.$state.go('portainer.stacks');
     } catch (err) {
-      this.Notifications.warning('Deployment error', err.data.err);
+      this.Notifications.error('Deployment error', err, 'Failed to deploy stack');
     } finally {
       this.state.actionInProgress = false;
     }
@@ -143,9 +134,19 @@ class CustomTemplatesViewController {
   unselectTemplate(template) {
     template.Selected = false;
     this.state.selectedTemplate = null;
+
+    this.formValues = {
+      network: '',
+      name: '',
+      fileContent: '',
+      AccessControlData: new AccessControlFormData(),
+    };
   }
 
   selectTemplate(template) {
+    return this.$async(this.selectTemplateAsync, template);
+  }
+  async selectTemplateAsync(template) {
     if (this.state.selectedTemplate) {
       this.unselectTemplate(this.state.selectedTemplate);
     }
@@ -159,6 +160,9 @@ class CustomTemplatesViewController {
     this.formValues.name = template.Name ? template.Name : '';
     this.state.selectedTemplate = template;
     this.$anchorScroll('view-top');
+
+    const file = await this.CustomTemplateService.customTemplateFile(template.Id);
+    this.formValues.fileContent = file;
   }
 
   getNetworks() {
@@ -196,6 +200,10 @@ class CustomTemplatesViewController {
     } catch (err) {
       this.Notifications.error('Failure', err, 'Failed to delete template');
     }
+  }
+
+  editorUpdate(cm) {
+    this.formValues.fileContent = cm.getValue();
   }
 
   $onInit() {
