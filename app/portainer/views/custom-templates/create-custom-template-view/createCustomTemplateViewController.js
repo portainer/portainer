@@ -23,6 +23,8 @@ class CreateCustomTemplateViewController {
       Method: 'editor',
       formValidationError: '',
       actionInProgress: false,
+      fromStack: false,
+      loading: true,
     };
 
     this.createCustomTemplate = this.createCustomTemplate.bind(this);
@@ -110,9 +112,13 @@ class CreateCustomTemplateViewController {
   async $onInit() {
     const { stackId } = this.$state.params;
     if (stackId) {
-      const file = await this.StackService.getStackFile(stackId);
+      this.state.fromStack = true;
+      const [stack, file] = await Promise.all([this.StackService.stack(stackId), this.StackService.getStackFile(stackId)]);
+
       this.formValues.FileContent = file;
+      this.formValues.Type = stack.Type;
     }
+    this.state.loading = false;
   }
 }
 

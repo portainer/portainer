@@ -3,7 +3,7 @@
   <rd-header-content> <a ui-sref="portainer.templates.custom">Custom Templates</a> &gt; Create Custom template </rd-header-content>
 </rd-header>
 
-<div class="row">
+<div class="row" ng-if="!$ctrl.state.loading">
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-body>
@@ -11,41 +11,43 @@
           <custom-template-common-fields form-values="$ctrl.formValues"></custom-template-common-fields>
 
           <!-- build-method -->
-          <div class="col-sm-12 form-section-title">
-            Build method
-          </div>
-          <div class="form-group"></div>
-          <div class="form-group" style="margin-bottom: 0;">
-            <div class="boxselector_wrapper">
-              <div>
-                <input type="radio" id="method_editor" ng-model="$ctrl.state.Method" value="editor" ng-change="$ctrl.onChangeMethod()" />
-                <label for="method_editor">
-                  <div class="boxselector_header">
-                    <i class="fa fa-edit" aria-hidden="true" style="margin-right: 2px;"></i>
-                    Web editor
-                  </div>
-                  <p>Use our Web editor</p>
-                </label>
-              </div>
-              <div>
-                <input type="radio" id="method_upload" ng-model="$ctrl.state.Method" value="upload" ng-change="$ctrl.onChangeMethod()" />
-                <label for="method_upload">
-                  <div class="boxselector_header">
-                    <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px;"></i>
-                    Upload
-                  </div>
-                  <p>Upload from your computer</p>
-                </label>
-              </div>
-              <div>
-                <input type="radio" id="method_repository" ng-model="$ctrl.state.Method" value="repository" ng-change="$ctrl.onChangeMethod()" />
-                <label for="method_repository">
-                  <div class="boxselector_header">
-                    <i class="fab fa-git" aria-hidden="true" style="margin-right: 2px;"></i>
-                    Repository
-                  </div>
-                  <p>Use a git repository</p>
-                </label>
+          <div ng-if="!$ctrl.state.fromStack">
+            <div class="col-sm-12 form-section-title">
+              Build method
+            </div>
+            <div class="form-group"></div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <div class="boxselector_wrapper">
+                <div>
+                  <input type="radio" id="method_editor" ng-model="$ctrl.state.Method" value="editor" ng-change="$ctrl.onChangeMethod()" />
+                  <label for="method_editor">
+                    <div class="boxselector_header">
+                      <i class="fa fa-edit" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Web editor
+                    </div>
+                    <p>Use our Web editor</p>
+                  </label>
+                </div>
+                <div>
+                  <input type="radio" id="method_upload" ng-model="$ctrl.state.Method" value="upload" ng-change="$ctrl.onChangeMethod()" />
+                  <label for="method_upload">
+                    <div class="boxselector_header">
+                      <i class="fa fa-upload" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Upload
+                    </div>
+                    <p>Upload from your computer</p>
+                  </label>
+                </div>
+                <div>
+                  <input type="radio" id="method_repository" ng-model="$ctrl.state.Method" value="repository" ng-change="$ctrl.onChangeMethod()" />
+                  <label for="method_repository">
+                    <div class="boxselector_header">
+                      <i class="fab fa-git" aria-hidden="true" style="margin-right: 2px;"></i>
+                      Repository
+                    </div>
+                    <p>Use a git repository</p>
+                  </label>
+                </div>
               </div>
             </div>
           </div>

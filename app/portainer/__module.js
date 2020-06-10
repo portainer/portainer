@@ -527,7 +527,7 @@ angular.module('portainer.app', []).config([
 
     const customTemplatesNew = {
       name: 'portainer.templates.custom.new',
-      url: '/new',
+      url: '/new?stackId',
 
       views: {
         'content@': {
