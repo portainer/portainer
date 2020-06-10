@@ -1,6 +1,9 @@
+import angular from 'angular';
+import UsersDatatableController from './usersDatatableController';
+
 angular.module('portainer.app').component('usersDatatable', {
   templateUrl: './usersDatatable.html',
-  controller: 'GenericDatatableController',
+  controller: UsersDatatableController,
   bindings: {
     titleText: '@',
     titleIcon: '@',
