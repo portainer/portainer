@@ -6,13 +6,24 @@
   <div class="form-group">
     <label for="edgejob_name" class="col-sm-1 control-label text-left">Name</label>
     <div class="col-sm-11">
-      <input type="text" class="form-control" ng-model="$ctrl.model.Name" id="edgejob_name" name="edgejob_name" placeholder="backup-app-prod" required auto-focus />
+      <input
+        type="text"
+        class="form-control"
+        ng-model="$ctrl.model.Name"
+        ng-pattern="/^[a-zA-Z0-9][a-zA-Z0-9_.-]+$/"
+        id="edgejob_name"
+        name="edgejob_name"
+        placeholder="backup-app-prod"
+        required
+        auto-focus
+      />
     </div>
   </div>
   <div class="form-group" ng-show="edgeJobForm.edgejob_name.$invalid">
     <div class="col-sm-12 small text-warning">
       <div ng-messages="edgeJobForm.edgejob_name.$error">
         <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+        <p ng-message="pattern"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Allowed characters are: [a-zA-Z0-9_.-]</p>
       </div>
     </div>
   </div>
