@@ -28,14 +28,10 @@ function CustomTemplateServiceFactory(CustomTemplates, FileUploadService) {
   };
 
   service.updateCustomTemplate = async function updateCustomTemplate(id, customTemplate) {
-    return CustomTemplates.update({ id }, customTemplate);
+    return CustomTemplates.update({ id }, customTemplate).$promise;
   };
 
-  service.createCustomTemplateFromFileContent = async function createCustomTemplateFromFileContent(title, fileContent) {
-    var payload = {
-      Title: title,
-      FileContent: fileContent,
-    };
+  service.createCustomTemplateFromFileContent = async function createCustomTemplateFromFileContent(payload) {
     try {
       return await CustomTemplates.create({ method: 'string' }, payload).$promise;
     } catch (err) {
@@ -43,33 +39,20 @@ function CustomTemplateServiceFactory(CustomTemplates, FileUploadService) {
     }
   };
 
-  service.createCustomTemplateFromFileUpload = async function createCustomTemplateFromFileUpload(title, customTemplateFile) {
+  service.createCustomTemplateFromFileUpload = async function createCustomTemplateFromFileUpload(payload) {
     try {
-      return await FileUploadService.createCustomTemplate(title, customTemplateFile);
+      return await FileUploadService.createCustomTemplate(payload);
     } catch (err) {
       throw { msg: 'Unable to create the customTemplate', err };
     }
   };
 
-  service.createCustomTemplateFromGitRepository = async function createCustomTemplateFromGitRepository(title, repositoryOptions) {
-    var payload = {
-      Title: title,
-      RepositoryURL: repositoryOptions.RepositoryURL,
-      RepositoryReferenceName: repositoryOptions.RepositoryReferenceName,
-      ComposeFilePathInRepository: repositoryOptions.ComposeFilePathInRepository,
-      RepositoryAuthentication: repositoryOptions.RepositoryAuthentication,
-      RepositoryUsername: repositoryOptions.RepositoryUsername,
-      RepositoryPassword: repositoryOptions.RepositoryPassword,
-    };
+  service.createCustomTemplateFromGitRepository = async function createCustomTemplateFromGitRepository(payload) {
     try {
       return await CustomTemplates.create({ method: 'repository' }, payload).$promise;
     } catch (err) {
       throw { msg: 'Unable to create the customTemplate', err };
     }
-  };
-
-  service.update = function update(customTemplate) {
-    return CustomTemplates.update(customTemplate).$promise;
   };
 
   return service;

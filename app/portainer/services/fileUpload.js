@@ -97,13 +97,10 @@ angular.module('portainer.app').factory('FileUploadService', [
       });
     };
 
-    service.createCustomTemplate = function createEdgeStack(name, file) {
+    service.createCustomTemplate = function createCustomTemplate(data) {
       return Upload.upload({
         url: 'api/custom_templates?method=file',
-        data: {
-          file: file,
-          Name: name,
-        },
+        data,
         ignoreLoadingBar: true,
       });
     };

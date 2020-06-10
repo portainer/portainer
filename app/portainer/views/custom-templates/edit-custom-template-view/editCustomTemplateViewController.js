@@ -1,7 +1,7 @@
 class EditCustomTemplateViewController {
   /* @ngInject */
   constructor($async, $state, CustomTemplateService, Notifications) {
-    this.template = null;
+    this.formValues = null;
 
     this.$async = $async;
     this.$state = $state;
@@ -24,8 +24,8 @@ class EditCustomTemplateViewController {
         this.CustomTemplateService.customTemplate(this.$state.params.id),
         this.CustomTemplateService.customTemplateFile(this.$state.params.id),
       ]);
-      template.fileContent = file;
-      this.template = template;
+      template.FileContent = file;
+      this.formValues = template;
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve custom template data');
     }
@@ -37,7 +37,7 @@ class EditCustomTemplateViewController {
   async submitActionAsync() {
     this.actionInProgress = true;
     try {
-      await this.CustomTemplateService.updateCustomTemplate(this.template.id, this.template);
+      await this.CustomTemplateService.updateCustomTemplate(this.formValues.Id, this.formValues);
       this.Notifications.success('Custom template successfully updated');
       this.$state.go('portainer.templates.custom');
     } catch (err) {
@@ -48,7 +48,7 @@ class EditCustomTemplateViewController {
   }
 
   editorUpdate(cm) {
-    this.template.fileContent = cm.getValue();
+    this.formValues.fileContent = cm.getValue();
   }
 
   $onInit() {

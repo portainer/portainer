@@ -1,27 +1,18 @@
 <rd-header>
   <rd-header-title title-text="Edit Custom Template">
-    <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.templates.custom.edit({id:$ctrl.template.id})" ui-sref-opts="{reload: true}">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="portainer.templates.custom.edit({id:$ctrl.formValues.Id})" ui-sref-opts="{reload: true}">
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
-  <rd-header-content> <a ui-sref="portainer.templates.custom">Custom templates</a> &gt; {{ $ctrl.template.name }} </rd-header-content>
+  <rd-header-content> <a ui-sref="portainer.templates.custom">Custom templates</a> &gt; {{ $ctrl.formValues.Title }} </rd-header-content>
 </rd-header>
 
-<div class="row" ng-if="$ctrl.template">
+<div class="row" ng-if="$ctrl.formValues">
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-body>
         <form class="form-horizontal">
-          <!-- name-input -->
-          <div class="form-group">
-            <label for="template_name" class="col-sm-1 control-label text-left">
-              Name
-            </label>
-            <div class="col-sm-11">
-              <input type="text" class="form-control" ng-model="$ctrl.template.name" id="template_name" placeholder="e.g. mytemplate" auto-focus />
-            </div>
-          </div>
-          <!-- !name-input -->
+          <custom-template-common-fields form-values="$ctrl.formValues"></custom-template-common-fields>
 
           <!-- web-editor -->
           <div class="col-sm-12 form-section-title">
@@ -42,7 +33,7 @@
                 identifier="custom-template-creation-editor"
                 placeholder="# Define or paste the content of your docker-compose file here"
                 yml="true"
-                value="$ctrl.template.fileContent"
+                value="$ctrl.formValues.FileContent"
                 on-change="($ctrl.editorUpdate)"
               ></code-editor>
             </div>
@@ -58,8 +49,8 @@
                 type="button"
                 class="btn btn-primary btn-sm"
                 ng-disabled="$ctrl.actionInProgress
-                  || !$ctrl.template.name
-                  || !$ctrl.template.fileContent"
+                  || !$ctrl.formValues.Title
+                  || !$ctrl.formValues.FileContent"
                 ng-click="$ctrl.submitAction()"
                 button-spinner="$ctrl.actionInProgress"
               >

@@ -8,16 +8,7 @@
     <rd-widget>
       <rd-widget-body>
         <form class="form-horizontal">
-          <!-- title-input -->
-          <div class="form-group">
-            <label for="template_title" class="col-sm-1 control-label text-left">
-              Title
-            </label>
-            <div class="col-sm-11">
-              <input type="text" class="form-control" ng-model="$ctrl.formValues.Title" id="template_title" placeholder="e.g. mytemplate" auto-focus />
-            </div>
-          </div>
-          <!-- !title-input -->
+          <custom-template-common-fields form-values="$ctrl.formValues"></custom-template-common-fields>
 
           <!-- build-method -->
           <div class="col-sm-12 form-section-title">

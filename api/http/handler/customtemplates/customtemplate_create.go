@@ -54,8 +54,13 @@ func (handler *Handler) createCustomTemplate(method string, r *http.Request) (*p
 }
 
 type customTemplateFromFileContentPayload struct {
+	Logo        string
 	Title       string
 	FileContent string
+	Description string
+	Note        string
+	Platform    portainer.CustomTemplatePlatform
+	Type        portainer.CustomTemplateType
 }
 
 func (payload *customTemplateFromFileContentPayload) Validate(r *http.Request) error {
@@ -64,6 +69,12 @@ func (payload *customTemplateFromFileContentPayload) Validate(r *http.Request) e
 	}
 	if govalidator.IsNull(payload.FileContent) {
 		return portainer.Error("Invalid file content")
+	}
+	if payload.Platform != portainer.CustomTemplatePlatformLinux && payload.Platform != portainer.CustomTemplatePlatformWindows {
+		return portainer.Error("Invalid custom template platform")
+	}
+	if payload.Type != portainer.CustomTemplateTypeStandalone && payload.Type != portainer.CustomTemplateTypeSwarm {
+		return portainer.Error("Invalid custom template type")
 	}
 	return nil
 }
@@ -77,9 +88,14 @@ func (handler *Handler) createCustomTemplateFromFileContent(r *http.Request) (*p
 
 	customTemplateID := handler.DataStore.CustomTemplate().GetNextIdentifier()
 	customTemplate := &portainer.CustomTemplate{
-		ID:         portainer.CustomTemplateID(customTemplateID),
-		Title:      payload.Title,
-		EntryPoint: filesystem.ComposeFileDefaultName,
+		ID:          portainer.CustomTemplateID(customTemplateID),
+		Title:       payload.Title,
+		EntryPoint:  filesystem.ComposeFileDefaultName,
+		Description: payload.Description,
+		Note:        payload.Note,
+		Platform:    (payload.Platform),
+		Type:        (payload.Type),
+		Logo:        payload.Logo,
 	}
 
 	templateFolder := strconv.Itoa(customTemplateID)
@@ -93,7 +109,12 @@ func (handler *Handler) createCustomTemplateFromFileContent(r *http.Request) (*p
 }
 
 type customTemplateFromGitRepositoryPayload struct {
+	Logo                        string
 	Title                       string
+	Description                 string
+	Note                        string
+	Platform                    portainer.CustomTemplatePlatform
+	Type                        portainer.CustomTemplateType
 	RepositoryURL               string
 	RepositoryReferenceName     string
 	RepositoryAuthentication    bool
@@ -115,6 +136,12 @@ func (payload *customTemplateFromGitRepositoryPayload) Validate(r *http.Request)
 	if govalidator.IsNull(payload.ComposeFilePathInRepository) {
 		payload.ComposeFilePathInRepository = filesystem.ComposeFileDefaultName
 	}
+	if payload.Platform != portainer.CustomTemplatePlatformLinux && payload.Platform != portainer.CustomTemplatePlatformWindows {
+		return portainer.Error("Invalid custom template platform")
+	}
+	if payload.Type != portainer.CustomTemplateTypeStandalone && payload.Type != portainer.CustomTemplateTypeSwarm {
+		return portainer.Error("Invalid custom template type")
+	}
 	return nil
 }
 
@@ -127,9 +154,14 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 
 	customTemplateID := handler.DataStore.CustomTemplate().GetNextIdentifier()
 	customTemplate := &portainer.CustomTemplate{
-		ID:         portainer.CustomTemplateID(customTemplateID),
-		Title:      payload.Title,
-		EntryPoint: payload.ComposeFilePathInRepository,
+		ID:          portainer.CustomTemplateID(customTemplateID),
+		Title:       payload.Title,
+		EntryPoint:  payload.ComposeFilePathInRepository,
+		Description: payload.Description,
+		Note:        payload.Note,
+		Platform:    payload.Platform,
+		Type:        payload.Type,
+		Logo:        payload.Logo,
 	}
 
 	projectPath := handler.FileService.GetCustomTemplateProjectPath(strconv.Itoa(customTemplateID))
@@ -153,7 +185,12 @@ func (handler *Handler) createCustomTemplateFromGitRepository(r *http.Request) (
 }
 
 type customTemplateFromFileUploadPayload struct {
+	Logo        string
 	Title       string
+	Description string
+	Note        string
+	Platform    portainer.CustomTemplatePlatform
+	Type        portainer.CustomTemplateType
 	FileContent []byte
 }
 
@@ -163,6 +200,26 @@ func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) er
 		return portainer.Error("Invalid custom template title")
 	}
 	payload.Title = title
+
+	description, _ := request.RetrieveMultiPartFormValue(r, "Description", true)
+	payload.Description = description
+
+	note, _ := request.RetrieveMultiPartFormValue(r, "Note", true)
+	payload.Note = note
+
+	platform, _ := request.RetrieveNumericMultiPartFormValue(r, "Platform", true)
+	templatePlatform := portainer.CustomTemplatePlatform(platform)
+	if templatePlatform != portainer.CustomTemplatePlatformLinux && templatePlatform != portainer.CustomTemplatePlatformWindows {
+		return portainer.Error("Invalid custom template platform")
+	}
+	payload.Platform = templatePlatform
+
+	typeNumeral, _ := request.RetrieveNumericMultiPartFormValue(r, "Type", true)
+	templateType := portainer.CustomTemplateType(typeNumeral)
+	if templateType != portainer.CustomTemplateTypeStandalone && templateType != portainer.CustomTemplateTypeSwarm {
+		return portainer.Error("Invalid custom template type")
+	}
+	payload.Type = templateType
 
 	composeFileContent, _, err := request.RetrieveMultiPartFormFile(r, "file")
 	if err != nil {
@@ -182,9 +239,14 @@ func (handler *Handler) createCustomTemplateFromFileUpload(r *http.Request) (*po
 
 	customTemplateID := handler.DataStore.CustomTemplate().GetNextIdentifier()
 	customTemplate := &portainer.CustomTemplate{
-		ID:         portainer.CustomTemplateID(customTemplateID),
-		Title:      payload.Title,
-		EntryPoint: filesystem.ComposeFileDefaultName,
+		ID:          portainer.CustomTemplateID(customTemplateID),
+		Title:       payload.Title,
+		Description: payload.Description,
+		Note:        payload.Note,
+		Platform:    payload.Platform,
+		Type:        payload.Type,
+		Logo:        payload.Logo,
+		EntryPoint:  filesystem.ComposeFileDefaultName,
 	}
 
 	templateFolder := strconv.Itoa(customTemplateID)

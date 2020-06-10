@@ -14,7 +14,12 @@ import (
 )
 
 type customTemplateUpdatePayload struct {
+	Logo        string
 	Title       string
+	Description string
+	Note        string
+	Platform    portainer.CustomTemplatePlatform
+	Type        portainer.CustomTemplateType
 	FileContent string
 }
 
@@ -24,6 +29,12 @@ func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
 	}
 	if govalidator.IsNull(payload.FileContent) {
 		return portainer.Error("Invalid file content")
+	}
+	if payload.Platform != portainer.CustomTemplatePlatformLinux && payload.Platform != portainer.CustomTemplatePlatformWindows {
+		return portainer.Error("Invalid custom template platform")
+	}
+	if payload.Type != portainer.CustomTemplateTypeStandalone && payload.Type != portainer.CustomTemplateTypeSwarm {
+		return portainer.Error("Invalid custom template type")
 	}
 	return nil
 }
@@ -63,6 +74,11 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 	}
 
 	customTemplate.Title = payload.Title
+	customTemplate.Logo = payload.Logo
+	customTemplate.Description = payload.Description
+	customTemplate.Note = payload.Note
+	customTemplate.Platform = payload.Platform
+	customTemplate.Type = payload.Type
 
 	err = handler.DataStore.CustomTemplate().UpdateCustomTemplate(customTemplate.ID, customTemplate)
 	if err != nil {
