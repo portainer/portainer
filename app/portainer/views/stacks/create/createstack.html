@@ -203,7 +203,7 @@
                   ng-if="templates.length"
                   class="form-control"
                   ng-model="selectedTemplate"
-                  ng-options="template as template.name for template in templates"
+                  ng-options="template as template.label for template in templates"
                   ng-change="onChangeTemplate(selectedTemplate)"
                 >
                   <option value="" label="Select a Custom template" disabled selected="selected"> </option>

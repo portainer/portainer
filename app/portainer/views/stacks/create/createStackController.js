@@ -158,7 +158,8 @@ angular
 
     $scope.onChangeTemplate = async function onChangeTemplate(template) {
       try {
-        $scope.formValues.StackFileContent = await CustomTemplateService.customTemplateFile(template.id);
+        $scope.selectedTemplate = template;
+        $scope.formValues.StackFileContent = await CustomTemplateService.customTemplateFile(template.Id);
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to retrieve Custom Template file');
       }
@@ -173,7 +174,7 @@ angular
 
       try {
         const templates = await CustomTemplateService.customTemplates();
-        $scope.templates = _.map(templates, (template) => ({ ...template, label: `${template.title} - ${template.description}` }));
+        $scope.templates = _.map(templates, (template) => ({ ...template, label: `${template.Title} - ${template.Description}` }));
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to retrieve Custom Templates');
       }
