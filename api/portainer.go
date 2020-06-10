@@ -72,7 +72,7 @@ type (
 		Note            string                 `json:"Note"`
 		Platform        CustomTemplatePlatform `json:"Platform"`
 		Logo            string                 `json:"Logo"`
-		Type            CustomTemplateType     `json:"Type"`
+		Type            StackType              `json:"Type"`
 	}
 
 	// CustomTemplateID represents a custom template identifier
@@ -80,9 +80,6 @@ type (
 
 	// CustomTemplatePlatform represents a custom template platform
 	CustomTemplatePlatform int
-
-	// CustomTemplateType represents a custom template type
-	CustomTemplateType int
 
 	// DockerHub represents all the required information to connect and use the
 	// Docker Hub
@@ -1182,14 +1179,6 @@ const (
 	CustomTemplatePlatformLinux
 	// CustomTemplatePlatformWindows represents a custom template for windows
 	CustomTemplatePlatformWindows
-)
-
-const (
-	_ CustomTemplateType = iota
-	// CustomTemplateTypeStandalone represents custom template for a standalone stack
-	CustomTemplateTypeStandalone
-	// CustomTemplateTypeSwarm represents custom template for a swarm stack
-	CustomTemplateTypeSwarm
 )
 
 const (

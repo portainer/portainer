@@ -19,7 +19,7 @@ type customTemplateUpdatePayload struct {
 	Description string
 	Note        string
 	Platform    portainer.CustomTemplatePlatform
-	Type        portainer.CustomTemplateType
+	Type        portainer.StackType
 	FileContent string
 }
 
@@ -33,7 +33,7 @@ func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
 	if payload.Platform != portainer.CustomTemplatePlatformLinux && payload.Platform != portainer.CustomTemplatePlatformWindows {
 		return portainer.Error("Invalid custom template platform")
 	}
-	if payload.Type != portainer.CustomTemplateTypeStandalone && payload.Type != portainer.CustomTemplateTypeSwarm {
+	if payload.Type != portainer.DockerComposeStack && payload.Type != portainer.DockerSwarmStack {
 		return portainer.Error("Invalid custom template type")
 	}
 	return nil

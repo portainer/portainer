@@ -60,7 +60,7 @@ type customTemplateFromFileContentPayload struct {
 	Description string
 	Note        string
 	Platform    portainer.CustomTemplatePlatform
-	Type        portainer.CustomTemplateType
+	Type        portainer.StackType
 }
 
 func (payload *customTemplateFromFileContentPayload) Validate(r *http.Request) error {
@@ -73,7 +73,7 @@ func (payload *customTemplateFromFileContentPayload) Validate(r *http.Request) e
 	if payload.Platform != portainer.CustomTemplatePlatformLinux && payload.Platform != portainer.CustomTemplatePlatformWindows {
 		return portainer.Error("Invalid custom template platform")
 	}
-	if payload.Type != portainer.CustomTemplateTypeStandalone && payload.Type != portainer.CustomTemplateTypeSwarm {
+	if payload.Type != portainer.DockerSwarmStack && payload.Type != portainer.DockerComposeStack {
 		return portainer.Error("Invalid custom template type")
 	}
 	return nil
@@ -114,7 +114,7 @@ type customTemplateFromGitRepositoryPayload struct {
 	Description                 string
 	Note                        string
 	Platform                    portainer.CustomTemplatePlatform
-	Type                        portainer.CustomTemplateType
+	Type                        portainer.StackType
 	RepositoryURL               string
 	RepositoryReferenceName     string
 	RepositoryAuthentication    bool
@@ -139,7 +139,7 @@ func (payload *customTemplateFromGitRepositoryPayload) Validate(r *http.Request)
 	if payload.Platform != portainer.CustomTemplatePlatformLinux && payload.Platform != portainer.CustomTemplatePlatformWindows {
 		return portainer.Error("Invalid custom template platform")
 	}
-	if payload.Type != portainer.CustomTemplateTypeStandalone && payload.Type != portainer.CustomTemplateTypeSwarm {
+	if payload.Type != portainer.DockerSwarmStack && payload.Type != portainer.DockerComposeStack {
 		return portainer.Error("Invalid custom template type")
 	}
 	return nil
@@ -190,7 +190,7 @@ type customTemplateFromFileUploadPayload struct {
 	Description string
 	Note        string
 	Platform    portainer.CustomTemplatePlatform
-	Type        portainer.CustomTemplateType
+	Type        portainer.StackType
 	FileContent []byte
 }
 
@@ -215,8 +215,8 @@ func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) er
 	payload.Platform = templatePlatform
 
 	typeNumeral, _ := request.RetrieveNumericMultiPartFormValue(r, "Type", true)
-	templateType := portainer.CustomTemplateType(typeNumeral)
-	if templateType != portainer.CustomTemplateTypeStandalone && templateType != portainer.CustomTemplateTypeSwarm {
+	templateType := portainer.StackType(typeNumeral)
+	if templateType != portainer.DockerComposeStack && templateType != portainer.DockerSwarmStack {
 		return portainer.Error("Invalid custom template type")
 	}
 	payload.Type = templateType

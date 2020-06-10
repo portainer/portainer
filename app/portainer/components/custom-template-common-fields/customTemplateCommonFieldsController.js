@@ -7,8 +7,8 @@ class CustomTemplateCommonFieldsController {
     ];
 
     this.templateTypes = [
-      { label: 'Standalone', value: 1 },
-      { label: 'Swarm', value: 2 },
+      { label: 'Swarm', value: 1 },
+      { label: 'Standalone', value: 2 },
     ];
   }
 }
