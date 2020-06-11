@@ -67,6 +67,9 @@ func (payload *customTemplateFromFileContentPayload) Validate(r *http.Request) e
 	if govalidator.IsNull(payload.Title) {
 		return portainer.Error("Invalid custom template title")
 	}
+	if govalidator.IsNull(payload.Description) {
+		return portainer.Error("Invalid custom template description")
+	}
 	if govalidator.IsNull(payload.FileContent) {
 		return portainer.Error("Invalid file content")
 	}
@@ -126,6 +129,9 @@ type customTemplateFromGitRepositoryPayload struct {
 func (payload *customTemplateFromGitRepositoryPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Title) {
 		return portainer.Error("Invalid custom template title")
+	}
+	if govalidator.IsNull(payload.Description) {
+		return portainer.Error("Invalid custom template description")
 	}
 	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
 		return portainer.Error("Invalid repository URL. Must correspond to a valid URL format")
@@ -201,7 +207,11 @@ func (payload *customTemplateFromFileUploadPayload) Validate(r *http.Request) er
 	}
 	payload.Title = title
 
-	description, _ := request.RetrieveMultiPartFormValue(r, "Description", true)
+	description, err := request.RetrieveMultiPartFormValue(r, "Description", false)
+	if err != nil {
+		return portainer.Error("Invalid custom template description")
+	}
+
 	payload.Description = description
 
 	note, _ := request.RetrieveMultiPartFormValue(r, "Note", true)

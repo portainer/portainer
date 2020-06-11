@@ -1,55 +1,71 @@
-<!-- title-input -->
-<div class="form-group">
-  <label for="template_title" class="col-sm-3 col-lg-2 control-label text-left">
-    Title
-  </label>
-  <div class="col-sm-9 col-lg-10">
-    <input type="text" class="form-control" ng-model="$ctrl.formValues.Title" id="template_title" placeholder="e.g. mytemplate" auto-focus />
+<ng-form name="commonCustomTemplateForm">
+  <!-- title-input -->
+  <div class="form-group">
+    <label for="template_title" class="col-sm-3 col-lg-2 control-label text-left">
+      Title
+    </label>
+    <div class="col-sm-9 col-lg-10">
+      <input type="text" class="form-control" ng-model="$ctrl.formValues.Title" id="template_title" name="template_title" placeholder="e.g. mytemplate" auto-focus required />
+    </div>
   </div>
-</div>
-<!-- !title-input -->
+  <div class="form-group" ng-show="commonCustomTemplateForm.template_title.$dirty && commonCustomTemplateForm.template_title.$invalid">
+    <div class="col-sm-12 small text-warning">
+      <div ng-messages="commonCustomTemplateForm.template_title.$error">
+        <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Title is required.</p>
+      </div>
+    </div>
+  </div>
+  <!-- !title-input -->
 
-<!-- description-input -->
-<div class="form-group">
-  <label for="description" class="col-sm-3 col-lg-2 control-label text-left">Description</label>
-  <div class="col-sm-9 col-lg-10">
-    <input type="text" class="form-control" id="description" ng-model="$ctrl.formValues.Description" />
+  <!-- description-input -->
+  <div class="form-group">
+    <label for="description" class="col-sm-3 col-lg-2 control-label text-left">Description</label>
+    <div class="col-sm-9 col-lg-10">
+      <input type="text" class="form-control" id="description" ng-model="$ctrl.formValues.Description" name="description" required />
+    </div>
   </div>
-</div>
-<!-- !description-input -->
+  <div class="form-group" ng-show="commonCustomTemplateForm.description.$dirty && commonCustomTemplateForm.description.$invalid">
+    <div class="col-sm-12 small text-warning">
+      <div ng-messages="commonCustomTemplateForm.description.$error">
+        <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Description is required.</p>
+      </div>
+    </div>
+  </div>
+  <!-- !description-input -->
 
-<!-- note-input -->
-<div class="form-group">
-  <label for="note" class="col-sm-3 col-lg-2 control-label text-left">Note</label>
-  <div class="col-sm-9 col-lg-10">
-    <input type="text" class="form-control" id="note" ng-model="$ctrl.formValues.Note" />
+  <!-- note-input -->
+  <div class="form-group">
+    <label for="note" class="col-sm-3 col-lg-2 control-label text-left">Note</label>
+    <div class="col-sm-9 col-lg-10">
+      <input type="text" class="form-control" id="note" ng-model="$ctrl.formValues.Note" />
+    </div>
   </div>
-</div>
-<!-- !note-input -->
+  <!-- !note-input -->
 
-<!-- icon-url-input -->
-<div class="form-group">
-  <label for="icon-url" class="col-sm-3 col-lg-2 control-label text-left">Icon Url</label>
-  <div class="col-sm-9 col-lg-10">
-    <input type="text" class="form-control" id="icon-url" ng-model="$ctrl.formValues.Logo" />
+  <!-- icon-url-input -->
+  <div class="form-group">
+    <label for="icon-url" class="col-sm-3 col-lg-2 control-label text-left">Icon URL</label>
+    <div class="col-sm-9 col-lg-10">
+      <input type="text" class="form-control" id="icon-url" ng-model="$ctrl.formValues.Logo" />
+    </div>
   </div>
-</div>
-<!-- !icon-url-input -->
+  <!-- !icon-url-input -->
 
-<!-- platform-input -->
-<div class="form-group">
-  <label for="platform" class="col-sm-3 col-lg-2 control-label text-left">Platform</label>
-  <div class="col-sm-9 col-lg-10">
-    <select class="form-control" ng-model="$ctrl.formValues.Platform" ng-options="+(opt.value) as opt.label for opt in $ctrl.platformTypes"> </select>
+  <!-- platform-input -->
+  <div class="form-group">
+    <label for="platform" class="col-sm-3 col-lg-2 control-label text-left">Platform</label>
+    <div class="col-sm-9 col-lg-10">
+      <select class="form-control" ng-model="$ctrl.formValues.Platform" ng-options="+(opt.value) as opt.label for opt in $ctrl.platformTypes"> </select>
+    </div>
   </div>
-</div>
-<!-- !platform-input -->
+  <!-- !platform-input -->
 
-<!-- platform-input -->
-<div class="form-group">
-  <label for="platform" class="col-sm-3 col-lg-2 control-label text-left">Type</label>
-  <div class="col-sm-9 col-lg-10">
-    <select class="form-control" ng-model="$ctrl.formValues.Type" ng-options="+(opt.value) as opt.label for opt in $ctrl.templateTypes"> </select>
+  <!-- platform-input -->
+  <div class="form-group">
+    <label for="platform" class="col-sm-3 col-lg-2 control-label text-left">Type</label>
+    <div class="col-sm-9 col-lg-10">
+      <select class="form-control" ng-model="$ctrl.formValues.Type" ng-options="+(opt.value) as opt.label for opt in $ctrl.templateTypes"> </select>
+    </div>
   </div>
-</div>
-<!-- !platform-input -->
+  <!-- !platform-input -->
+</ng-form>

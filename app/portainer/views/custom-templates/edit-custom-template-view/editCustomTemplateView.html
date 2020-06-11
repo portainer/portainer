@@ -11,7 +11,7 @@
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-body>
-        <form class="form-horizontal">
+        <form class="form-horizontal" name="customTemplateForm">
           <custom-template-common-fields form-values="$ctrl.formValues"></custom-template-common-fields>
 
           <!-- web-editor -->
@@ -48,7 +48,7 @@
               <button
                 type="button"
                 class="btn btn-primary btn-sm"
-                ng-disabled="$ctrl.actionInProgress
+                ng-disabled="$ctrl.actionInProgress || customTemplateForm.$invalid
                   || !$ctrl.formValues.Title
                   || !$ctrl.formValues.FileContent"
                 ng-click="$ctrl.submitAction()"

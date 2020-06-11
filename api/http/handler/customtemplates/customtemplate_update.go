@@ -36,6 +36,9 @@ func (payload *customTemplateUpdatePayload) Validate(r *http.Request) error {
 	if payload.Type != portainer.DockerComposeStack && payload.Type != portainer.DockerSwarmStack {
 		return portainer.Error("Invalid custom template type")
 	}
+	if govalidator.IsNull(payload.Description) {
+		return portainer.Error("Invalid custom template description")
+	}
 	return nil
 }
 
