@@ -40,8 +40,9 @@ class EdgeJobFormController {
   }
 
   onChangeModel(model) {
+    const defaultTime = moment().add('hours', 1);
     this.formValues = {
-      datetime: model.CronExpression ? cronToDatetime(model.CronExpression) : moment(),
+      datetime: model.CronExpression ? cronToDatetime(model.CronExpression, defaultTime) : defaultTime,
       scheduleValue: this.formValues.scheduleValue,
       cronMethod: model.Recurring ? 'advanced' : 'basic',
       method: this.formValues.method,
@@ -84,12 +85,12 @@ class EdgeJobFormController {
   }
 }
 
-function cronToDatetime(cron) {
+function cronToDatetime(cron, defaultTime = moment()) {
   var strings = cron.split(' ');
   if (strings.length > 4) {
     strings = strings.slice(0, 4);
   } else {
-    return moment();
+    return defaultTime;
   }
   return moment(cron, 'm H D M');
 }
