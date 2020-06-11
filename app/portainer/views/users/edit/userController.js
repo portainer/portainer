@@ -91,6 +91,12 @@ angular.module('portainer.app').controller('UserController', [
       return user && (user.Username !== formValues.username || (formValues.Administrator && user.Role !== 1) || (!formValues.Administrator && user.Role === 1));
     }
 
+    $scope.isDeleteDisabled = isDeleteDisabled;
+    function isDeleteDisabled() {
+      const { user } = $scope;
+      return user && user.Id === 1;
+    }
+
     function initView() {
       $scope.isAdmin = Authentication.isAdmin();
 
