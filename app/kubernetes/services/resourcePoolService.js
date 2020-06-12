@@ -25,9 +25,7 @@ class KubernetesResourcePoolService {
   async getAsync(name) {
     try {
       const namespace = await this.KubernetesNamespaceService.get(name);
-      const [quotaAttempt] = await Promise.allSettled([
-        this.KubernetesResourceQuotaService.get(name, KubernetesResourceQuotaHelper.generateResourceQuotaName(name)),
-      ]);
+      const [quotaAttempt] = await Promise.allSettled([this.KubernetesResourceQuotaService.get(name, KubernetesResourceQuotaHelper.generateResourceQuotaName(name))]);
       const pool = KubernetesResourcePoolConverter.apiToResourcePool(namespace);
       if (quotaAttempt.status === 'fulfilled') {
         pool.Quota = quotaAttempt.value;
@@ -42,18 +40,18 @@ class KubernetesResourcePoolService {
   async getAllAsync() {
     try {
       const namespaces = await this.KubernetesNamespaceService.get();
-      const pools = await Promise.all(_.map(namespaces, async (namespace) => {
-        const name = namespace.Name;
-        const [quotaAttempt] = await Promise.allSettled([
-          this.KubernetesResourceQuotaService.get(name, KubernetesResourceQuotaHelper.generateResourceQuotaName(name)),
-        ]);
-        const pool = KubernetesResourcePoolConverter.apiToResourcePool(namespace);
-        if (quotaAttempt.status === 'fulfilled') {
-          pool.Quota = quotaAttempt.value;
-          pool.Yaml += '---\n' + quotaAttempt.value.Yaml;
-        }
-        return pool;
-      }));
+      const pools = await Promise.all(
+        _.map(namespaces, async (namespace) => {
+          const name = namespace.Name;
+          const [quotaAttempt] = await Promise.allSettled([this.KubernetesResourceQuotaService.get(name, KubernetesResourceQuotaHelper.generateResourceQuotaName(name))]);
+          const pool = KubernetesResourcePoolConverter.apiToResourcePool(namespace);
+          if (quotaAttempt.status === 'fulfilled') {
+            pool.Quota = quotaAttempt.value;
+            pool.Yaml += '---\n' + quotaAttempt.value.Yaml;
+          }
+          return pool;
+        })
+      );
       return pools;
     } catch (err) {
       throw err;

@@ -1,6 +1,6 @@
 import angular from 'angular';
 import _ from 'lodash-es';
-import {KubernetesConfigurationFormValuesDataEntry} from 'Kubernetes/models/configuration/formvalues';
+import { KubernetesConfigurationFormValuesDataEntry } from 'Kubernetes/models/configuration/formvalues';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 
 class KubernetesConfigurationDataController {
@@ -59,7 +59,7 @@ class KubernetesConfigurationDataController {
 
   $onInit() {
     this.state = {
-      duplicateKeys: {}
+      duplicateKeys: {},
     };
   }
 }

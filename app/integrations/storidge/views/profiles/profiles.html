@@ -4,23 +4,20 @@
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
-  <rd-header-content>
-    <a ui-sref="storidge.cluster">Storidge</a> &gt; <a ui-sref="storidge.profiles">Profiles</a>
-  </rd-header-content>
+  <rd-header-content> <a ui-sref="storidge.cluster">Storidge</a> &gt; <a ui-sref="storidge.profiles">Profiles</a> </rd-header-content>
 </rd-header>
 
 <div class="row">
   <div class="col-md-12">
     <rd-widget>
-      <rd-widget-header icon="fa-plus" title-text="Add a profile">
-      </rd-widget-header>
+      <rd-widget-header icon="fa-plus" title-text="Add a profile"> </rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <!-- name-input -->
           <div class="form-group">
             <label for="profile_name" class="col-sm-1 control-label text-left">Name</label>
             <div class="col-sm-11">
-              <input type="text" class="form-control" ng-model="formValues.Name" id="profile_name" placeholder="e.g. myProfile">
+              <input type="text" class="form-control" ng-model="formValues.Name" id="profile_name" placeholder="e.g. myProfile" />
             </div>
           </div>
           <!-- !name-input -->
@@ -33,11 +30,19 @@
           <!-- !tag-note -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="button" class="btn btn-primary btn-sm" ng-click="create()" ng-disabled="state.actionInProgress || !formValues.Name" button-spinner="state.actionInProgress">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                ng-click="create()"
+                ng-disabled="state.actionInProgress || !formValues.Name"
+                button-spinner="state.actionInProgress"
+              >
                 <span ng-hide="state.actionInProgress">Create the profile</span>
                 <span ng-show="state.actionInProgress">Creating profile...</span>
               </button>
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.Name" ui-sref="storidge.profiles.new({ profileName: formValues.Name })">Modify defaults...</button>
+              <button type="button" class="btn btn-primary btn-sm" ng-disabled="!formValues.Name" ui-sref="storidge.profiles.new({ profileName: formValues.Name })"
+                >Modify defaults...</button
+              >
             </div>
           </div>
         </form>
@@ -49,14 +54,15 @@
 <div class="row">
   <div class="col-sm-12">
     <storidge-profiles-datatable
-    title-text="Profiles" title-icon="fa-sticky-note"
-    dataset="profiles" table-key="storidge_profiles"
-    order-by="Name" 
-    remove-action="removeAction"
+      title-text="Profiles"
+      title-icon="fa-sticky-note"
+      dataset="profiles"
+      table-key="storidge_profiles"
+      order-by="Name"
+      remove-action="removeAction"
     ></storidge-profiles-datatable>
   </div>
 </div>
-
 
 <!-- <div class="row">
   <div class="col-md-12">

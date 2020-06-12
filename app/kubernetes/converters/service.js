@@ -5,14 +5,9 @@ import { KubernetesServiceCreatePayload } from 'Kubernetes/models/service/payloa
 import {
   KubernetesPortainerApplicationStackNameLabel,
   KubernetesPortainerApplicationNameLabel,
-  KubernetesPortainerApplicationOwnerLabel
+  KubernetesPortainerApplicationOwnerLabel,
 } from 'Kubernetes/models/application/models';
-import {
-  KubernetesServiceHeadlessClusterIP,
-  KubernetesService,
-  KubernetesServicePort,
-  KubernetesServiceTypes
-} from 'Kubernetes/models/service/models';
+import { KubernetesServiceHeadlessClusterIP, KubernetesService, KubernetesServicePort, KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import { KubernetesApplicationPublishingTypes } from 'Kubernetes/models/application/models';
 import KubernetesServiceHelper from 'Kubernetes/helpers/serviceHelper';
 
@@ -34,9 +29,9 @@ class KubernetesServiceConverter {
   }
 
   /**
-  * Generate KubernetesService from KubernetesApplicationFormValues
-  * @param {KubernetesApplicationFormValues} formValues
-  */
+   * Generate KubernetesService from KubernetesApplicationFormValues
+   * @param {KubernetesApplicationFormValues} formValues
+   */
   static applicationFormValuesToService(formValues) {
     const res = new KubernetesService();
     res.Namespace = formValues.ResourcePool.Namespace.Name;

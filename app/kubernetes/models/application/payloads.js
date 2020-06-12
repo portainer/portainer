@@ -5,7 +5,7 @@
 const _KubernetesApplicationVolumeMount = Object.freeze({
   name: '',
   mountPath: '',
-  readOnly: false
+  readOnly: false,
 });
 
 export class KubernetesApplicationVolumeMountPayload {
@@ -26,8 +26,8 @@ export class KubernetesApplicationVolumeMountPayload {
 const _KubernetesApplicationVolumePersistentPayload = Object.freeze({
   name: '',
   persistentVolumeClaim: {
-    claimName: ''
-  }
+    claimName: '',
+  },
 });
 
 export class KubernetesApplicationVolumePersistentPayload {
@@ -44,8 +44,8 @@ const _KubernetesApplicationVolumeConfigMapPayload = Object.freeze({
   name: '',
   configMap: {
     name: '',
-    items: [] // KubernetesApplicationVolumeEntryPayload
-  }
+    items: [], // KubernetesApplicationVolumeEntryPayload
+  },
 });
 
 export class KubernetesApplicationVolumeConfigMapPayload {
@@ -62,8 +62,8 @@ const _KubernetesApplicationVolumeSecretPayload = Object.freeze({
   name: '',
   secret: {
     secretName: '',
-    items: [] // KubernetesApplicationVolumeEntryPayload
-  }
+    items: [], // KubernetesApplicationVolumeEntryPayload
+  },
 });
 
 export class KubernetesApplicationVolumeSecretPayload {
@@ -77,7 +77,7 @@ export class KubernetesApplicationVolumeSecretPayload {
  */
 const _KubernetesApplicationVolumeEntryPayload = Object.freeze({
   key: '',
-  path: ''
+  path: '',
 });
 
 export class KubernetesApplicationVolumeEntryPayload {
@@ -92,7 +92,7 @@ export class KubernetesApplicationVolumeEntryPayload {
  */
 const _KubernetesApplicationEnvPayload = Object.freeze({
   name: '',
-  value: ''
+  value: '',
 });
 
 export class KubernetesApplicationEnvPayload {
@@ -110,9 +110,9 @@ const _KubernetesApplicationEnvConfigMapPayload = Object.freeze({
   valueFrom: {
     configMapKeyRef: {
       name: '',
-      key: ''
-    }
-  }
+      key: '',
+    },
+  },
 });
 
 export class KubernetesApplicationEnvConfigMapPayload {
@@ -130,9 +130,9 @@ const _KubernetesApplicationEnvSecretPayload = Object.freeze({
   valueFrom: {
     secretKeyRef: {
       name: '',
-      key: ''
-    }
-  }
+      key: '',
+    },
+  },
 });
 
 export class KubernetesApplicationEnvSecretPayload {

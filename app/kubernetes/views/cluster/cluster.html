@@ -10,9 +10,13 @@
       <rd-widget>
         <rd-widget-body>
           <form class="form-horizontal">
-            <kubernetes-resource-reservation cpu="ctrl.resourceReservation.CPU" cpu-limit="ctrl.CPULimit"
-              memory="ctrl.resourceReservation.Memory" memory-limit="ctrl.MemoryLimit"
-              description="Resource reservation represents the total amount of resource assigned to all the applications inside the cluster.">
+            <kubernetes-resource-reservation
+              cpu="ctrl.resourceReservation.CPU"
+              cpu-limit="ctrl.CPULimit"
+              memory="ctrl.resourceReservation.Memory"
+              memory-limit="ctrl.MemoryLimit"
+              description="Resource reservation represents the total amount of resource assigned to all the applications inside the cluster."
+            >
             </kubernetes-resource-reservation>
           </form>
         </rd-widget-body>
@@ -22,8 +26,15 @@
 
   <div class="row">
     <div class="col-sm-12">
-      <kubernetes-nodes-datatable title-text="Nodes" title-icon="fa-hdd" dataset="ctrl.nodes" table-key="kubernetes.nodes"
-        order-by="Name" refresh-callback="ctrl.getNodes" is-admin="ctrl.isAdmin"></kubernetes-nodes-datatable>
+      <kubernetes-nodes-datatable
+        title-text="Nodes"
+        title-icon="fa-hdd"
+        dataset="ctrl.nodes"
+        table-key="kubernetes.nodes"
+        order-by="Name"
+        refresh-callback="ctrl.getNodes"
+        is-admin="ctrl.isAdmin"
+      ></kubernetes-nodes-datatable>
     </div>
   </div>
 </div>

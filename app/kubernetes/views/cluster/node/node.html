@@ -11,9 +11,7 @@
         <rd-widget-body classes="no-padding">
           <uib-tabset active="ctrl.state.activeTab" justified="true" type="pills">
             <uib-tab index="0" classes="btn-sm" select="ctrl.selectTab(0)">
-              <uib-tab-heading>
-                <i class="fa fa-hdd space-right" aria-hidden="true"></i> Node
-              </uib-tab-heading>
+              <uib-tab-heading> <i class="fa fa-hdd space-right" aria-hidden="true"></i> Node </uib-tab-heading>
 
               <form class="form-horizontal" style="padding: 20px;">
                 <table class="table">
@@ -37,7 +35,7 @@
                     <tr>
                       <td>Status</td>
                       <td>
-                        <span class="label label-{{ctrl.node.Status | kubernetesNodeStatusColor}}">
+                        <span class="label label-{{ ctrl.node.Status | kubernetesNodeStatusColor }}">
                           {{ ctrl.node.Status }}
                         </span>
                         <span ng-if="ctrl.node.Status == 'Warning'" class="text text-warning">
@@ -48,9 +46,14 @@
                   </tbody>
                 </table>
                 <div style="padding: 8px;">
-                  <kubernetes-resource-reservation ng-if="ctrl.resourceReservation" cpu="ctrl.resourceReservation.CPU" cpu-limit="ctrl.node.CPU"
-                    memory="ctrl.resourceReservation.Memory" memory-limit="ctrl.memoryLimit"
-                    description="Resource reservation represents the total amount of resource assigned to all the applications running on this node.">
+                  <kubernetes-resource-reservation
+                    ng-if="ctrl.resourceReservation"
+                    cpu="ctrl.resourceReservation.CPU"
+                    cpu-limit="ctrl.node.CPU"
+                    memory="ctrl.resourceReservation.Memory"
+                    memory-limit="ctrl.memoryLimit"
+                    description="Resource reservation represents the total amount of resource assigned to all the applications running on this node."
+                  >
                   </kubernetes-resource-reservation>
                 </div>
               </form>
@@ -63,18 +66,22 @@
                   {{ ctrl.state.eventWarningCount }} warning(s)
                 </div>
               </uib-tab-heading>
-              <kubernetes-events-datatable title-text="Events" title-icon="fa-history" dataset="ctrl.events"
-                table-key="kubernetes.node.events" order-by="Date" reverse-order="true" loading="ctrl.state.eventsLoading"
-                refresh-callback="ctrl.getEvents">
+              <kubernetes-events-datatable
+                title-text="Events"
+                title-icon="fa-history"
+                dataset="ctrl.events"
+                table-key="kubernetes.node.events"
+                order-by="Date"
+                reverse-order="true"
+                loading="ctrl.state.eventsLoading"
+                refresh-callback="ctrl.getEvents"
+              >
               </kubernetes-events-datatable>
             </uib-tab>
             <uib-tab index="2" ng-if="ctrl.node.Yaml" select="ctrl.showEditor()" classes="btn-sm">
-              <uib-tab-heading>
-                <i class="fa fa-code space-right" aria-hidden="true"></i> YAML
-              </uib-tab-heading>
+              <uib-tab-heading> <i class="fa fa-code space-right" aria-hidden="true"></i> YAML </uib-tab-heading>
               <div style="padding-right: 25px;" ng-if="ctrl.state.showEditorTab">
-                <kubernetes-yaml-inspector key="node-yaml" data="ctrl.node.Yaml">
-                </kubernetes-yaml-inspector>
+                <kubernetes-yaml-inspector key="node-yaml" data="ctrl.node.Yaml"> </kubernetes-yaml-inspector>
               </div>
             </uib-tab>
           </uib-tabset>
@@ -85,9 +92,15 @@
 
   <div class="row" ng-if="ctrl.applications && ctrl.applications.length > 0">
     <div class="col-sm-12">
-      <kubernetes-node-applications-datatable dataset="ctrl.applications" table-key="kubernetes.node.applications"
-        order-by="Name" refresh-callback="ctrl.getApplications" loading="ctrl.state.applicationsLoading"
-        title-text="Applications running on this node" title-icon="fa-laptop-code">
+      <kubernetes-node-applications-datatable
+        dataset="ctrl.applications"
+        table-key="kubernetes.node.applications"
+        order-by="Name"
+        refresh-callback="ctrl.getApplications"
+        loading="ctrl.state.applicationsLoading"
+        title-text="Applications running on this node"
+        title-icon="fa-laptop-code"
+      >
       </kubernetes-node-applications-datatable>
     </div>
   </div>

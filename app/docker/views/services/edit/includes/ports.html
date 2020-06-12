@@ -11,7 +11,7 @@
       <p>This service has no ports published.</p>
     </rd-widget-body>
     <rd-widget-body ng-if="service.Ports && service.Ports.length > 0" classes="no-padding">
-      <table class="table" >
+      <table class="table">
         <thead>
           <tr>
             <th>Host port</th>
@@ -26,13 +26,27 @@
             <td>
               <div class="input-group input-group-sm">
                 <span class="input-group-addon">host</span>
-                <input type="number" class="form-control" ng-model="portBinding.PublishedPort" placeholder="e.g. 8080" ng-change="updatePublishedPort(service, mapping)" ng-disabled="isUpdating">
+                <input
+                  type="number"
+                  class="form-control"
+                  ng-model="portBinding.PublishedPort"
+                  placeholder="e.g. 8080"
+                  ng-change="updatePublishedPort(service, mapping)"
+                  ng-disabled="isUpdating"
+                />
               </div>
             </td>
             <td>
               <div class="input-group input-group-sm">
                 <span class="input-group-addon">container</span>
-                <input type="number" class="form-control" ng-model="portBinding.TargetPort" placeholder="e.g. 80" ng-change="updatePublishedPort(service, mapping)" ng-disabled="isUpdating">
+                <input
+                  type="number"
+                  class="form-control"
+                  ng-model="portBinding.TargetPort"
+                  placeholder="e.g. 80"
+                  ng-change="updatePublishedPort(service, mapping)"
+                  ng-disabled="isUpdating"
+                />
               </div>
             </td>
             <td>

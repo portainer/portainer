@@ -7,8 +7,13 @@
 <div ng-if="ctrl.state.viewReady">
   <div class="row">
     <div class="col-sm-12">
-      <kubernetes-volumes-datatable dataset="ctrl.volumes" table-key="kubernetes.volumes"
-        order-by="PersistentVolumeClaim.Name" remove-action="ctrl.removeAction" refresh-callback="ctrl.getVolumes">
+      <kubernetes-volumes-datatable
+        dataset="ctrl.volumes"
+        table-key="kubernetes.volumes"
+        order-by="PersistentVolumeClaim.Name"
+        remove-action="ctrl.removeAction"
+        refresh-callback="ctrl.getVolumes"
+      >
       </kubernetes-volumes-datatable>
     </div>
   </div>

@@ -6,7 +6,7 @@ import {
   KubernetesPortainerApplicationStackNameLabel,
   KubernetesPortainerApplicationNameLabel,
   KubernetesPortainerApplicationNote,
-  KubernetesPortainerApplicationOwnerLabel
+  KubernetesPortainerApplicationOwnerLabel,
 } from 'Kubernetes/models/application/models';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';

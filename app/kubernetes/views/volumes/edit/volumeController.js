@@ -51,7 +51,7 @@ class KubernetesVolumeController {
     try {
       const [volume, applications] = await Promise.all([
         this.KubernetesVolumeService.get(this.state.namespace, this.state.name),
-        this.KubernetesApplicationService.get(this.state.namespace)
+        this.KubernetesApplicationService.get(this.state.namespace),
       ]);
       volume.Applications = KubernetesVolumeHelper.getUsingApplications(volume, applications);
       this.volume = volume;
@@ -100,7 +100,7 @@ class KubernetesVolumeController {
       viewReady: false,
       namespace: this.$transition$.params().namespace,
       name: this.$transition$.params().name,
-      eventWarningCount: 0
+      eventWarningCount: 0,
     };
 
     this.state.activeTab = this.LocalStorage.getActiveTab('volume');

@@ -2,7 +2,7 @@
  * Generic params
  */
 const _KubernetesCommonParams = Object.freeze({
-  id: ''
+  id: '',
 });
 export class KubernetesCommonParams {
   constructor() {

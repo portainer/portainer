@@ -1,4 +1,4 @@
-import { KubernetesCommonMetadataPayload } from "Kubernetes/models/common/payloads";
+import { KubernetesCommonMetadataPayload } from 'Kubernetes/models/common/payloads';
 
 /**
  * KubernetesDaemonSetCreatePayload Model
@@ -9,20 +9,20 @@ const _KubernetesDaemonSetCreatePayload = Object.freeze({
     replicas: 0,
     selector: {
       matchLabels: {
-        app: ''
-      }
+        app: '',
+      },
     },
     updateStrategy: {
       type: 'RollingUpdate',
       rollingUpdate: {
-        maxUnavailable: 1
-      }
+        maxUnavailable: 1,
+      },
     },
     template: {
       metadata: {
         labels: {
-          app: ''
-        }
+          app: '',
+        },
       },
       spec: {
         containers: [
@@ -32,15 +32,15 @@ const _KubernetesDaemonSetCreatePayload = Object.freeze({
             env: [],
             resources: {
               limits: {},
-              requests: {}
+              requests: {},
             },
-            volumeMounts: []
-          }
+            volumeMounts: [],
+          },
         ],
-        volumes: []
-      }
-    }
-  }
+        volumes: [],
+      },
+    },
+  },
 });
 
 export class KubernetesDaemonSetCreatePayload {

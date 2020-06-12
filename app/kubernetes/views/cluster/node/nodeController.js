@@ -1,7 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
-import {KubernetesResourceReservation} from 'Kubernetes/models/resource-reservation/models';
+import { KubernetesResourceReservation } from 'Kubernetes/models/resource-reservation/models';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 
 class KubernetesNodeController {
@@ -110,7 +110,7 @@ class KubernetesNodeController {
       applicationsLoading: true,
       showEditorTab: false,
       viewReady: false,
-      eventWarningCount: 0
+      eventWarningCount: 0,
     };
 
     this.state.activeTab = this.LocalStorage.getActiveTab('node');

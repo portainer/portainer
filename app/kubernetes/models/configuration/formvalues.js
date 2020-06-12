@@ -1,4 +1,4 @@
-import {KubernetesConfigurationTypes} from './models';
+import { KubernetesConfigurationTypes } from './models';
 
 /**
  * KubernetesConfigurationFormValues Model
@@ -11,7 +11,7 @@ const _KubernetesConfigurationFormValues = Object.freeze({
   Type: KubernetesConfigurationTypes.CONFIGMAP,
   Data: [],
   DataYaml: '',
-  IsSimple: true
+  IsSimple: true,
 });
 
 export class KubernetesConfigurationFormValues {
@@ -25,7 +25,7 @@ export class KubernetesConfigurationFormValues {
  */
 const _KubernetesConfigurationFormValuesDataEntry = Object.freeze({
   Key: '',
-  Value: ''
+  Value: '',
 });
 
 export class KubernetesConfigurationFormValuesDataEntry {

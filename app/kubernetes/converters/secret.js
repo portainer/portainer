@@ -40,10 +40,14 @@ class KubernetesSecretConverter {
     res.Namespace = formValues.ResourcePool.Namespace.Name;
     res.ConfigurationOwner = formValues.ConfigurationOwner;
     if (formValues.IsSimple) {
-      res.Data = _.reduce(formValues.Data, (acc, entry) => {
-        acc[entry.Key] = entry.Value;
-        return acc;
-      }, {});
+      res.Data = _.reduce(
+        formValues.Data,
+        (acc, entry) => {
+          acc[entry.Key] = entry.Value;
+          return acc;
+        },
+        {}
+      );
     } else {
       res.Data = YAML.parse(formValues.DataYaml);
     }

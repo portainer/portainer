@@ -3,6 +3,6 @@ angular.module('portainer.kubernetes').component('kubernetesConfigurationData', 
   controller: 'KubernetesConfigurationDataController',
   bindings: {
     formValues: '=',
-    isValid: '='
-  }
+    isValid: '=',
+  },
 });

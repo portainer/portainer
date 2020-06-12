@@ -1,7 +1,6 @@
-import {KubernetesConfiguration, KubernetesConfigurationTypes} from 'Kubernetes/models/configuration/models';
+import { KubernetesConfiguration, KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
 
 class KubernetesConfigurationConverter {
-
   static secretToConfiguration(secret) {
     const res = new KubernetesConfiguration();
     res.Type = KubernetesConfigurationTypes.SECRET;

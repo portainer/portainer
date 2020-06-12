@@ -3,6 +3,6 @@ angular.module('portainer.kubernetes').component('kubernetesApplicationView', {
   controller: 'KubernetesApplicationController',
   controllerAs: 'ctrl',
   bindings: {
-    $transition$: '<'
-  }
+    $transition$: '<',
+  },
 });

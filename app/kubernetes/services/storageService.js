@@ -18,7 +18,7 @@ class KubernetesStorageService {
   async getAsync(endpointId) {
     try {
       const params = {
-        endpointId: endpointId
+        endpointId: endpointId,
       };
       const classes = await this.KubernetesStorage().get(params).$promise;
       const res = _.map(classes.items, (item) => KubernetesStorageClassConverter.apiToStorageClass(item));

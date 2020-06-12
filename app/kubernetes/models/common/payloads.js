@@ -6,8 +6,8 @@ const _KubernetesCommonMetadataPayload = Object.freeze({
   name: '',
   namespace: '',
   labels: {},
-  annotations: {}
-})
+  annotations: {},
+});
 export class KubernetesCommonMetadataPayload {
   constructor() {
     Object.assign(this, JSON.parse(JSON.stringify(_KubernetesCommonMetadataPayload)));

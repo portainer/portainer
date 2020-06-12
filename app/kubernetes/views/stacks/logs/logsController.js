@@ -2,22 +2,7 @@ import _ from 'lodash-es';
 import angular from 'angular';
 import $allSettled from 'Portainer/services/allSettled';
 
-const colors = [
-  'red',
-  'orange',
-  'lime',
-  'green',
-  'darkgreen',
-  'cyan',
-  'turquoise',
-  'teal',
-  'deepskyblue',
-  'blue',
-  'darkblue',
-  'slateblue',
-  'magenta',
-  'darkviolet'
-]
+const colors = ['red', 'orange', 'lime', 'green', 'darkgreen', 'cyan', 'turquoise', 'teal', 'deepskyblue', 'blue', 'darkblue', 'slateblue', 'magenta', 'darkviolet'];
 
 class KubernetesStackLogsController {
   /* @ngInject */
@@ -59,7 +44,7 @@ class KubernetesStackLogsController {
   async generateLogsPromise(pod) {
     const res = {
       Pod: pod,
-      Logs: []
+      Logs: [],
     };
     res.Logs = await this.KubernetesPodService.logs(pod.Namespace, pod.Name);
     return res;
@@ -68,7 +53,7 @@ class KubernetesStackLogsController {
   async generateAppPromise(app) {
     const res = {
       Application: app,
-      Pods: []
+      Pods: [],
     };
 
     const promises = _.map(app.Pods, this.generateLogsPromise);
@@ -76,7 +61,6 @@ class KubernetesStackLogsController {
     res.Pods = result.fulfilled;
     return res;
   }
-
 
   async getStackLogsAsync() {
     try {
@@ -111,8 +95,8 @@ class KubernetesStackLogsController {
       viewReady: false,
       transition: {
         namespace: this.$transition$.params().namespace,
-        name: this.$transition$.params().name
-      }
+        name: this.$transition$.params().name,
+      },
     };
 
     this.stackLogs = [];

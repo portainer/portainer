@@ -12,7 +12,7 @@ import {
   KubernetesPortainerApplicationOwnerLabel,
   KubernetesPortainerApplicationNote,
   KubernetesApplicationPublishingTypes,
-  KubernetesPortainerApplicationNameLabel
+  KubernetesPortainerApplicationNameLabel,
 } from 'Kubernetes/models/application/models';
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
@@ -41,31 +41,39 @@ class KubernetesApplicationConverter {
     res.Env = data.spec.template.spec.containers[0].env;
     const limits = {
       Cpu: 0,
-      Memory: 0
+      Memory: 0,
     };
-    res.Limits = _.reduce(data.spec.template.spec.containers, (acc, item) => {
-      if (item.resources.limits && item.resources.limits.cpu) {
-        acc.Cpu += KubernetesResourceReservationHelper.parseCPU(item.resources.limits.cpu);
-      }
-      if (item.resources.limits && item.resources.limits.memory) {
-        acc.Memory += filesizeParser(item.resources.limits.memory, { base: 10 });
-      }
-      return acc;
-    }, limits);
+    res.Limits = _.reduce(
+      data.spec.template.spec.containers,
+      (acc, item) => {
+        if (item.resources.limits && item.resources.limits.cpu) {
+          acc.Cpu += KubernetesResourceReservationHelper.parseCPU(item.resources.limits.cpu);
+        }
+        if (item.resources.limits && item.resources.limits.memory) {
+          acc.Memory += filesizeParser(item.resources.limits.memory, { base: 10 });
+        }
+        return acc;
+      },
+      limits
+    );
 
     const requests = {
       Cpu: 0,
-      Memory: 0
+      Memory: 0,
     };
-    res.Requests = _.reduce(data.spec.template.spec.containers, (acc, item) => {
-      if (item.resources.requests && item.resources.requests.cpu) {
-        acc.Cpu += KubernetesResourceReservationHelper.parseCPU(item.resources.requests.cpu);
-      }
-      if (item.resources.requests && item.resources.requests.memory) {
-        acc.Memory += filesizeParser(item.resources.requests.memory, { base: 10 });
-      }
-      return acc;
-    }, requests);
+    res.Requests = _.reduce(
+      data.spec.template.spec.containers,
+      (acc, item) => {
+        if (item.resources.requests && item.resources.requests.cpu) {
+          acc.Cpu += KubernetesResourceReservationHelper.parseCPU(item.resources.requests.cpu);
+        }
+        if (item.resources.requests && item.resources.requests.memory) {
+          acc.Memory += filesizeParser(item.resources.requests.memory, { base: 10 });
+        }
+        return acc;
+      },
+      requests
+    );
 
     if (service) {
       const serviceType = service.spec.type;
@@ -81,9 +89,9 @@ class KubernetesApplicationConverter {
       res.PublishedPorts = service.spec.ports;
       _.forEach(res.PublishedPorts, (publishedPort) => {
         if (isNaN(publishedPort.targetPort)) {
-          publishedPort.targetPort = _.find(res.PublishedPorts, {'name': publishedPort.targetPort}).port;
+          publishedPort.targetPort = _.find(res.PublishedPorts, { name: publishedPort.targetPort }).port;
         }
-      })
+      });
     }
 
     res.Volumes = data.spec.template.spec.volumes ? data.spec.template.spec.volumes : [];
@@ -105,7 +113,7 @@ class KubernetesApplicationConverter {
       const vcTemplates = _.map(data.spec.volumeClaimTemplates, (vc) => {
         return {
           name: vc.metadata.name,
-          persistentVolumeClaim: { claimName: vc.metadata.name }
+          persistentVolumeClaim: { claimName: vc.metadata.name },
         };
       });
       const inexistingPVC = _.filter(vcTemplates, (vc) => {
@@ -133,45 +141,49 @@ class KubernetesApplicationConverter {
       }
     });
 
-    res.ConfigurationVolumes = _.reduce(data.spec.template.spec.volumes, (acc, volume) => {
-      if (volume.configMap || volume.secret) {
-        const matchingVolumeMount = _.find(data.spec.template.spec.containers[0].volumeMounts, { name: volume.name });
+    res.ConfigurationVolumes = _.reduce(
+      data.spec.template.spec.volumes,
+      (acc, volume) => {
+        if (volume.configMap || volume.secret) {
+          const matchingVolumeMount = _.find(data.spec.template.spec.containers[0].volumeMounts, { name: volume.name });
 
-        if (matchingVolumeMount) {
-          let items = [];
-          let configurationName = '';
+          if (matchingVolumeMount) {
+            let items = [];
+            let configurationName = '';
 
-          if (volume.configMap) {
-            items = volume.configMap.items;
-            configurationName = volume.configMap.name;
-          } else {
-            items = volume.secret.items;
-            configurationName = volume.secret.secretName;
-          }
+            if (volume.configMap) {
+              items = volume.configMap.items;
+              configurationName = volume.configMap.name;
+            } else {
+              items = volume.secret.items;
+              configurationName = volume.secret.secretName;
+            }
 
-          if (!items) {
-            const configurationVolume = new KubernetesApplicationConfigurationVolume();
-            configurationVolume.fileMountPath = matchingVolumeMount.mountPath;
-            configurationVolume.rootMountPath = matchingVolumeMount.mountPath;
-            configurationVolume.configurationName = configurationName;
-
-            acc.push(configurationVolume);
-          } else {
-            _.forEach(items, (item) => {
+            if (!items) {
               const configurationVolume = new KubernetesApplicationConfigurationVolume();
-              configurationVolume.fileMountPath = matchingVolumeMount.mountPath + '/' + item.path;
+              configurationVolume.fileMountPath = matchingVolumeMount.mountPath;
               configurationVolume.rootMountPath = matchingVolumeMount.mountPath;
-              configurationVolume.configurationKey = item.key;
               configurationVolume.configurationName = configurationName;
 
               acc.push(configurationVolume);
-            });
+            } else {
+              _.forEach(items, (item) => {
+                const configurationVolume = new KubernetesApplicationConfigurationVolume();
+                configurationVolume.fileMountPath = matchingVolumeMount.mountPath + '/' + item.path;
+                configurationVolume.rootMountPath = matchingVolumeMount.mountPath;
+                configurationVolume.configurationKey = item.key;
+                configurationVolume.configurationName = configurationName;
+
+                acc.push(configurationVolume);
+              });
+            }
           }
         }
-      }
 
-      return acc;
-    }, []);
+        return acc;
+      },
+      []
+    );
   }
 
   static apiDeploymentToApplication(data, service) {
@@ -240,17 +252,21 @@ class KubernetesApplicationConverter {
     const claims = KubernetesPersistentVolumeClaimConverter.applicationFormValuesToVolumeClaims(formValues);
     const rwx = _.find(claims, (item) => _.includes(item.StorageClass.AccessModes, 'RWX')) !== undefined;
 
-    const deployment = (formValues.DeploymentType === KubernetesApplicationDeploymentTypes.REPLICATED &&
-      (claims.length === 0 || (claims.length > 0 && formValues.DataAccessPolicy === KubernetesApplicationDataAccessPolicies.SHARED)))
-      || (formValues.ApplicationType === KubernetesApplicationTypes.DEPLOYMENT);
+    const deployment =
+      (formValues.DeploymentType === KubernetesApplicationDeploymentTypes.REPLICATED &&
+        (claims.length === 0 || (claims.length > 0 && formValues.DataAccessPolicy === KubernetesApplicationDataAccessPolicies.SHARED))) ||
+      formValues.ApplicationType === KubernetesApplicationTypes.DEPLOYMENT;
 
-    const statefulSet = (formValues.DeploymentType === KubernetesApplicationDeploymentTypes.REPLICATED &&
-      claims.length > 0 && formValues.DataAccessPolicy === KubernetesApplicationDataAccessPolicies.ISOLATED)
-      || (formValues.ApplicationType === KubernetesApplicationTypes.STATEFULSET);
+    const statefulSet =
+      (formValues.DeploymentType === KubernetesApplicationDeploymentTypes.REPLICATED &&
+        claims.length > 0 &&
+        formValues.DataAccessPolicy === KubernetesApplicationDataAccessPolicies.ISOLATED) ||
+      formValues.ApplicationType === KubernetesApplicationTypes.STATEFULSET;
 
-    const daemonSet = (formValues.DeploymentType === KubernetesApplicationDeploymentTypes.GLOBAL &&
-      (claims.length === 0 || (claims.length > 0 && formValues.DataAccessPolicy === KubernetesApplicationDataAccessPolicies.SHARED && rwx)))
-      || (formValues.ApplicationType === KubernetesApplicationTypes.DAEMONSET);
+    const daemonSet =
+      (formValues.DeploymentType === KubernetesApplicationDeploymentTypes.GLOBAL &&
+        (claims.length === 0 || (claims.length > 0 && formValues.DataAccessPolicy === KubernetesApplicationDataAccessPolicies.SHARED && rwx))) ||
+      formValues.ApplicationType === KubernetesApplicationTypes.DAEMONSET;
 
     let app;
     if (deployment) {

@@ -25,10 +25,7 @@ class KubernetesResourceQuotaService {
     try {
       const params = new KubernetesCommonParams();
       params.id = name;
-      const [raw, yaml] = await Promise.all([
-        this.KubernetesResourceQuotas(namespace).get(params).$promise,
-        this.KubernetesResourceQuotas(namespace).getYaml(params).$promise
-      ]);
+      const [raw, yaml] = await Promise.all([this.KubernetesResourceQuotas(namespace).get(params).$promise, this.KubernetesResourceQuotas(namespace).getYaml(params).$promise]);
       return KubernetesResourceQuotaConverter.apiToResourceQuota(raw, yaml);
     } catch (err) {
       throw new PortainerError('Unable to retrieve resource quota', err);

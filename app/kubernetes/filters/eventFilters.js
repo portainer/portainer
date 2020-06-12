@@ -1,7 +1,6 @@
 import _ from 'lodash-es';
 
-angular.module('portainer.kubernetes')
-.filter('kubernetesEventTypeColor', function () {
+angular.module('portainer.kubernetes').filter('kubernetesEventTypeColor', function () {
   'use strict';
   return function (text) {
     var status = _.toLower(text);
@@ -14,4 +13,4 @@ angular.module('portainer.kubernetes')
         return 'danger';
     }
   };
-})
+});

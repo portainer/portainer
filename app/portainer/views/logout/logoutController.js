@@ -28,7 +28,7 @@ class LogoutController {
       await this.Authentication.logout(performApiLogout);
     } finally {
       this.LocalStorage.storeLogoutReason(error);
-      this.$state.go('portainer.auth', {reload: true});
+      this.$state.go('portainer.auth', { reload: true });
     }
   }
 

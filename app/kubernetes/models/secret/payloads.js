@@ -1,4 +1,4 @@
-import { KubernetesCommonMetadataPayload } from "Kubernetes/models/common/payloads";
+import { KubernetesCommonMetadataPayload } from 'Kubernetes/models/common/payloads';
 
 /**
  * KubernetesSecretCreatePayload Model
@@ -6,7 +6,7 @@ import { KubernetesCommonMetadataPayload } from "Kubernetes/models/common/payloa
 const _KubernetesSecretCreatePayload = Object.freeze({
   metadata: new KubernetesCommonMetadataPayload(),
   type: 'Opaque',
-  data: {}
+  data: {},
 });
 
 export class KubernetesSecretCreatePayload {
@@ -21,7 +21,7 @@ export class KubernetesSecretCreatePayload {
 const _KubernetesSecretUpdatePayload = Object.freeze({
   metadata: new KubernetesCommonMetadataPayload(),
   type: 'Opaque',
-  data: {}
+  data: {},
 });
 
 export class KubernetesSecretUpdatePayload {

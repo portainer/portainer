@@ -1,8 +1,8 @@
 <rd-header>
-  <rd-header-title title-text="Container inspect">
-  </rd-header-title>
+  <rd-header-title title-text="Container inspect"> </rd-header-title>
   <rd-header-content>
-    <a ui-sref="docker.containers">Containers</a> &gt; <a ui-sref="docker.containers.container({id: containerInfo.Id})">{{ containerInfo.Name|trimcontainername }}</a> &gt; Inspect
+    <a ui-sref="docker.containers">Containers</a> &gt; <a ui-sref="docker.containers.container({id: containerInfo.Id})">{{ containerInfo.Name | trimcontainername }}</a> &gt;
+    Inspect
   </rd-header-content>
 </rd-header>
 
@@ -16,7 +16,7 @@
         </span>
       </rd-widget-header>
       <rd-widget-body>
-        <pre ng-show="state.DisplayTextView">{{ containerInfo|json:4 }}</pre>
+        <pre ng-show="state.DisplayTextView">{{ containerInfo | json: 4 }}</pre>
         <json-tree ng-hide="state.DisplayTextView" object="containerInfo" root-name="containerInfo.Id" start-expanded="true"></json-tree>
       </rd-widget-body>
     </rd-widget>

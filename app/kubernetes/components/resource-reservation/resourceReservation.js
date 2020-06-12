@@ -6,6 +6,6 @@ angular.module('portainer.kubernetes').component('kubernetesResourceReservation'
     cpu: '<',
     cpuLimit: '<',
     memory: '<',
-    memoryLimit: '<'
-  }
+    memoryLimit: '<',
+  },
 });

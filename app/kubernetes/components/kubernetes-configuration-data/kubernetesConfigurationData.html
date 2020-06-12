@@ -37,11 +37,23 @@
 
   <div ng-repeat="(index, entry) in $ctrl.formValues.Data" ng-if="$ctrl.formValues.IsSimple">
     <div class="form-group">
-      <label for="configuration_data_key_{{index}}" class="col-sm-1 control-label text-left">Key</label>
+      <label for="configuration_data_key_{{ index }}" class="col-sm-1 control-label text-left">Key</label>
       <div class="col-sm-11">
-        <input type="text" class="form-control" id="configuration_data_key_{{index}}" name="configuration_data_key_{{index}}" ng-model="$ctrl.formValues.Data[index].Key" required ng-change="$ctrl.onChangeKey()">
+        <input
+          type="text"
+          class="form-control"
+          id="configuration_data_key_{{ index }}"
+          name="configuration_data_key_{{ index }}"
+          ng-model="$ctrl.formValues.Data[index].Key"
+          required
+          ng-change="$ctrl.onChangeKey()"
+        />
       </div>
-      <div class="col-sm-11 small text-warning" style="margin-top: 5px;" ng-show="kubernetesConfigurationDataCreationForm['configuration_data_key_' + index].$invalid || $ctrl.state.duplicateKeys[index] !== undefined">
+      <div
+        class="col-sm-11 small text-warning"
+        style="margin-top: 5px;"
+        ng-show="kubernetesConfigurationDataCreationForm['configuration_data_key_' + index].$invalid || $ctrl.state.duplicateKeys[index] !== undefined"
+      >
         <ng-messages for="kubernetesConfigurationDataCreationForm['configuration_data_key_' + index].$error">
           <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
         </ng-messages>
@@ -50,9 +62,16 @@
     </div>
 
     <div class="form-group" ng-if="$ctrl.formValues.IsSimple">
-      <label for="configuration_data_value_{{index}}" class="col-sm-1 control-label text-left">Value</label>
+      <label for="configuration_data_value_{{ index }}" class="col-sm-1 control-label text-left">Value</label>
       <div class="col-sm-11">
-        <textarea class="form-control" rows="5" id="configuration_data_value_{{index}}" name="configuration_data_value_{{index}}" ng-model="$ctrl.formValues.Data[index].Value" required ></textarea>
+        <textarea
+          class="form-control"
+          rows="5"
+          id="configuration_data_value_{{ index }}"
+          name="configuration_data_value_{{ index }}"
+          ng-model="$ctrl.formValues.Data[index].Value"
+          required
+        ></textarea>
       </div>
       <div class="col-sm-11 small text-warning" style="margin-top: 5px;" ng-show="kubernetesConfigurationDataCreationForm['configuration_data_value_' + index].$invalid">
         <ng-messages for="kubernetesConfigurationDataCreationForm['configuration_data_value_' + index].$error">
@@ -72,7 +91,7 @@
   </div>
 
   <div class="form-group" ng-if="!$ctrl.formValues.IsSimple">
-    <input type="text" ng-model="$ctrl.formValues.DataYaml" required style="display:none;">
-    <code-editor identifier="kubernetes-configuration-editor" value="$ctrl.formValues.DataYaml" read-only="false" yml="true" on-change="$ctrl.editorUpdate"></code-editor>
+    <input type="text" ng-model="$ctrl.formValues.DataYaml" required style="display: none;" />
+    <code-editor identifier="kubernetes-configuration-editor" value="$ctrl.formValues.DataYaml" read-only="false" yml="true" on-change="($ctrl.editorUpdate)"></code-editor>
   </div>
 </ng-form>

@@ -1,4 +1,4 @@
-import { KubernetesApplicationDeploymentTypes, KubernetesApplicationPublishingTypes, KubernetesApplicationDataAccessPolicies } from "./models";
+import { KubernetesApplicationDeploymentTypes, KubernetesApplicationPublishingTypes, KubernetesApplicationDataAccessPolicies } from './models';
 
 /**
  * KubernetesApplicationFormValues Model
@@ -30,8 +30,8 @@ export class KubernetesApplicationFormValues {
 }
 
 export const KubernetesApplicationConfigurationFormValueOverridenKeyTypes = Object.freeze({
-  'ENVIRONMENT': 1,
-  'FILESYSTEM': 2,
+  ENVIRONMENT: 1,
+  FILESYSTEM: 2,
 });
 
 /**
@@ -40,7 +40,7 @@ export const KubernetesApplicationConfigurationFormValueOverridenKeyTypes = Obje
 const _KubernetesApplicationConfigurationFormValueOverridenKey = Object.freeze({
   Key: '',
   Path: '',
-  Type: KubernetesApplicationConfigurationFormValueOverridenKeyTypes.ENVIRONMENT
+  Type: KubernetesApplicationConfigurationFormValueOverridenKeyTypes.ENVIRONMENT,
 });
 
 export class KubernetesApplicationConfigurationFormValueOverridenKey {
@@ -55,7 +55,7 @@ export class KubernetesApplicationConfigurationFormValueOverridenKey {
 const _KubernetesApplicationConfigurationFormValue = Object.freeze({
   SelectedConfiguration: undefined,
   Overriden: false,
-  OverridenKeys: [] // KubernetesApplicationConfigurationFormValueOverridenKey list
+  OverridenKeys: [], // KubernetesApplicationConfigurationFormValueOverridenKey list
 });
 
 export class KubernetesApplicationConfigurationFormValue {
@@ -72,7 +72,7 @@ const _KubernetesApplicationEnvironmentVariableFormValue = Object.freeze({
   Value: '',
   IsSecret: false,
   NeedsDeletion: false,
-  IsNew: true
+  IsNew: true,
 });
 
 export class KubernetesApplicationEnvironmentVariableFormValue {
@@ -90,7 +90,7 @@ const _KubernetesApplicationPersistedFolderFormValue = Object.freeze({
   ContainerPath: '',
   Size: '',
   SizeUnit: 'GB',
-  StorageClass: {}
+  StorageClass: {},
 });
 
 export class KubernetesApplicationPersistedFolderFormValue {
@@ -108,7 +108,7 @@ const _KubernetesApplicationPublishedPortFormValue = Object.freeze({
   NodePort: '',
   LoadBalancerPort: '',
   LoadBalancerNodePort: undefined, // only filled to save existing loadbalancer nodePort and drop it when moving app exposure from LB to Internal/NodePort
-  Protocol: 'TCP'
+  Protocol: 'TCP',
 });
 
 export class KubernetesApplicationPublishedPortFormValue {

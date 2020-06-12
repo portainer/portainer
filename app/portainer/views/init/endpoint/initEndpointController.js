@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
 import angular from 'angular';
-import {InitEndpointFormValues} from 'Portainer/models/formValues/initEndpointFormValues';
-import {InitEndpointEndpointTypes} from 'Portainer/models/formValues/initEndpointEndpointTypes';
+import { InitEndpointFormValues } from 'Portainer/models/formValues/initEndpointFormValues';
+import { InitEndpointEndpointTypes } from 'Portainer/models/formValues/initEndpointEndpointTypes';
 
 class InitEndpointController {
   /* @ngInject */
@@ -10,7 +10,7 @@ class InitEndpointController {
     this.$scope = $scope;
     this.$state = $state;
     this.EndpointService = EndpointService;
-    this.EndpointProvider = EndpointProvider
+    this.EndpointProvider = EndpointProvider;
     this.StateManager = StateManager;
     this.Notifications = Notifications;
 
@@ -21,13 +21,13 @@ class InitEndpointController {
 
   $onInit() {
     if (!_.isEmpty(this.$scope.applicationState.endpoint)) {
-      this.$state.go("portainer.home");
+      this.$state.go('portainer.home');
     }
     this.logo = this.StateManager.getState().application.logo;
 
     this.state = {
       uploadInProgress: false,
-      actionInProgress: false
+      actionInProgress: false,
     };
 
     this.formValues = new InitEndpointFormValues();
@@ -38,9 +38,9 @@ class InitEndpointController {
     try {
       this.state.actionInProgress = true;
       await this.EndpointService.createLocalEndpoint();
-      this.$state.go("portainer.home");
+      this.$state.go('portainer.home');
     } catch (err) {
-      this.Notifications.error("Failure", err, "Unable to connect to the Docker environment");
+      this.Notifications.error('Failure', err, 'Unable to connect to the Docker environment');
     } finally {
       this.state.actionInProgress = false;
     }
@@ -54,9 +54,9 @@ class InitEndpointController {
     try {
       this.state.actionInProgress = true;
       const endpoint = await this.EndpointService.createLocalKubernetesEndpoint();
-      this.$state.go("portainer.endpoints.endpoint.kubernetesConfig", {id: endpoint.Id});
+      this.$state.go('portainer.endpoints.endpoint.kubernetesConfig', { id: endpoint.Id });
     } catch (err) {
-      this.Notifications.error("Failure", err, "Unable to connect to the Kubernetes environment");
+      this.Notifications.error('Failure', err, 'Unable to connect to the Kubernetes environment');
     } finally {
       this.state.actionInProgress = false;
     }
@@ -71,13 +71,13 @@ class InitEndpointController {
       this.state.actionInProgress = true;
       const name = this.formValues.Name;
       const URL = this.formValues.URL;
-      const PublicURL = URL.split(":")[0];
+      const PublicURL = URL.split(':')[0];
       // TODO: k8s merge - change type ID for agent on kube (6) or agent on swarm (2)
       const endpoint = await this.EndpointService.createRemoteEndpoint(name, 6, URL, PublicURL, 1, [], true, true, true, null, null, null);
       // TODO: k8s merge - go on home whith agent on swarm (2)
-      this.$state.go("portainer.endpoints.endpoint.kubernetesConfig", {id: endpoint.Id});
+      this.$state.go('portainer.endpoints.endpoint.kubernetesConfig', { id: endpoint.Id });
     } catch (err) {
-      this.Notifications.error("Failure", err, "Unable to connect to the Docker environment");
+      this.Notifications.error('Failure', err, 'Unable to connect to the Docker environment');
     } finally {
       this.state.actionInProgress = false;
     }
@@ -89,4 +89,4 @@ class InitEndpointController {
 }
 
 export default InitEndpointController;
-angular.module("portainer.app").controller("InitEndpointController", InitEndpointController);
+angular.module('portainer.app').controller('InitEndpointController', InitEndpointController);

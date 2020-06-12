@@ -7,8 +7,13 @@
 <div ng-if="ctrl.state.viewReady">
   <div class="row">
     <div class="col-sm-12">
-      <kubernetes-configurations-datatable dataset="ctrl.configurations" table-key="kubernetes.configurations"
-        order-by="Name" refresh-callback="ctrl.refreshCallback" remove-action="ctrl.removeAction"></kubernetes-configurations-datatable>
+      <kubernetes-configurations-datatable
+        dataset="ctrl.configurations"
+        table-key="kubernetes.configurations"
+        order-by="Name"
+        refresh-callback="ctrl.refreshCallback"
+        remove-action="ctrl.removeAction"
+      ></kubernetes-configurations-datatable>
     </div>
   </div>
 </div>

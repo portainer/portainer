@@ -1,4 +1,4 @@
-import {ResourceControlOwnership} from 'Portainer/models/resourceControl/resourceControlOwnership';
+import { ResourceControlOwnership } from 'Portainer/models/resourceControl/resourceControlOwnership';
 
 export function AccessControlPanelData() {
   this.Ownership = ResourceControlOwnership.ADMINISTRATORS;

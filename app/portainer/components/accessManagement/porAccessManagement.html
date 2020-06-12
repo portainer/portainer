@@ -12,10 +12,18 @@
               <span class="small text-muted" ng-if="ctrl.availableUsersAndTeams.length === 0">
                 No user nor team available.
               </span>
-              <span isteven-multi-select ng-if="ctrl.availableUsersAndTeams.length > 0" input-model="ctrl.availableUsersAndTeams"
-                output-model="ctrl.formValues.multiselectOutput" button-label="icon '-' Name" item-label="icon '-' Name"
-                tick-property="ticked" helper-elements="filter" search-property="Name"
-                translation="{nothingSelected: 'Select one or more users and/or teams', search: 'Search...'}">
+              <span
+                isteven-multi-select
+                ng-if="ctrl.availableUsersAndTeams.length > 0"
+                input-model="ctrl.availableUsersAndTeams"
+                output-model="ctrl.formValues.multiselectOutput"
+                button-label="icon '-' Name"
+                item-label="icon '-' Name"
+                tick-property="ticked"
+                helper-elements="filter"
+                search-property="Name"
+                translation="{nothingSelected: 'Select one or more users and/or teams', search: 'Search...'}"
+              >
               </span>
             </div>
           </div>
@@ -23,10 +31,14 @@
           <!-- actions -->
           <div class="form-group">
             <div class="col-sm-12">
-              <button type="submit" class="btn btn-primary btn-sm" ng-disabled="(ctrl.availableUsersAndTeams | filter:{ticked:true}).length === 0 || ctrl.actionInProgress"
-                ng-click="ctrl.authorizeAccess()" button-spinner="ctrl.actionInProgress">
-                <span ng-hide="ctrl.state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Create
-                  access</span>
+              <button
+                type="submit"
+                class="btn btn-primary btn-sm"
+                ng-disabled="(ctrl.availableUsersAndTeams | filter:{ticked:true}).length === 0 || ctrl.actionInProgress"
+                ng-click="ctrl.authorizeAccess()"
+                button-spinner="ctrl.actionInProgress"
+              >
+                <span ng-hide="ctrl.state.actionInProgress"><i class="fa fa-plus" aria-hidden="true"></i> Create access</span>
                 <span ng-show="ctrl.state.actionInProgress">Creating access...</span>
               </button>
             </div>
@@ -39,13 +51,19 @@
 </div>
 <div class="row">
   <div class="col-sm-12">
-    <access-datatable ng-if="ctrl.authorizedUsersAndTeams"
-      title-text="Access" title-icon="fa-user-lock"
-      table-key="{{ 'access_' + ctrl.entityType}}" order-by="Name"
-      rbac-enabled="ctrl.rbacEnabled && ctrl.entityType !== 'registry'" inherit-from="ctrl.inheritFrom"
-      dataset="ctrl.authorizedUsersAndTeams" roles="ctrl.roles"
-      update-action="ctrl.updateAction" remove-action="ctrl.unauthorizeAccess"
-      >
+    <access-datatable
+      ng-if="ctrl.authorizedUsersAndTeams"
+      title-text="Access"
+      title-icon="fa-user-lock"
+      table-key="{{ 'access_' + ctrl.entityType }}"
+      order-by="Name"
+      rbac-enabled="ctrl.rbacEnabled && ctrl.entityType !== 'registry'"
+      inherit-from="ctrl.inheritFrom"
+      dataset="ctrl.authorizedUsersAndTeams"
+      roles="ctrl.roles"
+      update-action="ctrl.updateAction"
+      remove-action="ctrl.unauthorizeAccess"
+    >
     </access-datatable>
   </div>
 </div>

@@ -1,4 +1,4 @@
-import { KubernetesCommonMetadataPayload } from "Kubernetes/models/common/payloads";
+import { KubernetesCommonMetadataPayload } from 'Kubernetes/models/common/payloads';
 
 /**
  * KubernetesDeploymentCreatePayload Model
@@ -9,21 +9,21 @@ const _KubernetesDeploymentCreatePayload = Object.freeze({
     replicas: 0,
     selector: {
       matchLabels: {
-        app: ''
-      }
+        app: '',
+      },
     },
     strategy: {
       type: 'RollingUpdate',
       rollingUpdate: {
         maxSurge: 0,
-        maxUnavailable: '100%'
-      }
+        maxUnavailable: '100%',
+      },
     },
     template: {
       metadata: {
         labels: {
-          app: ''
-        }
+          app: '',
+        },
       },
       spec: {
         containers: [
@@ -33,15 +33,15 @@ const _KubernetesDeploymentCreatePayload = Object.freeze({
             env: [],
             resources: {
               limits: {},
-              requests: {}
+              requests: {},
             },
-            volumeMounts: []
-          }
+            volumeMounts: [],
+          },
         ],
-        volumes: []
-      }
-    }
-  }
+        volumes: [],
+      },
+    },
+  },
 });
 
 export class KubernetesDeploymentCreatePayload {

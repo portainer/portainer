@@ -26,10 +26,7 @@ class KubernetesNamespaceService {
       const params = new KubernetesCommonParams();
       params.id = name;
       await this.KubernetesNamespaces().status(params).$promise;
-      const [raw, yaml] = await Promise.all([
-        this.KubernetesNamespaces().get(params).$promise,
-        this.KubernetesNamespaces().getYaml(params).$promise
-      ]);
+      const [raw, yaml] = await Promise.all([this.KubernetesNamespaces().get(params).$promise, this.KubernetesNamespaces().getYaml(params).$promise]);
       return KubernetesNamespaceConverter.apiToNamespace(raw, yaml);
     } catch (err) {
       throw new PortainerError('Unable to retrieve namespace', err);
@@ -39,7 +36,7 @@ class KubernetesNamespaceService {
   async getAllAsync() {
     try {
       const data = await this.KubernetesNamespaces().get().$promise;
-      const promises = _.map(data.items, (item) => this.KubernetesNamespaces().status({id: item.metadata.name}).$promise);
+      const promises = _.map(data.items, (item) => this.KubernetesNamespaces().status({ id: item.metadata.name }).$promise);
       const namespaces = await $allSettled(promises);
       const visibleNamespaces = _.map(namespaces.fulfilled, (item) => {
         if (item.status.phase !== 'Terminating') {
@@ -66,7 +63,7 @@ class KubernetesNamespaceService {
     try {
       const payload = KubernetesNamespaceConverter.createPayload(namespace);
       const params = {};
-      const data = await this.KubernetesNamespaces().create(params, payload).$promise
+      const data = await this.KubernetesNamespaces().create(params, payload).$promise;
       return data;
     } catch (err) {
       throw new PortainerError('Unable to create namespace', err);
@@ -84,7 +81,7 @@ class KubernetesNamespaceService {
     try {
       const params = new KubernetesCommonParams();
       params.id = namespace.Name;
-      await this.KubernetesNamespaces().delete(params).$promise
+      await this.KubernetesNamespaces().delete(params).$promise;
     } catch (err) {
       throw new PortainerError('Unable to delete namespace', err);
     }

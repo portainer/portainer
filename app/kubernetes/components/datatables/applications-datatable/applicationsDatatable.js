@@ -10,6 +10,6 @@ angular.module('portainer.kubernetes').component('kubernetesApplicationsDatatabl
     reverseOrder: '<',
     removeAction: '<',
     refreshCallback: '<',
-    onPublishingModeClick: '<'
-  }
+    onPublishingModeClick: '<',
+  },
 });

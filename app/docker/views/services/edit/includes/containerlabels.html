@@ -11,7 +11,7 @@
       <p>There are no container labels for this service.</p>
     </rd-widget-body>
     <rd-widget-body ng-if="service.ServiceContainerLabels.length > 0" classes="no-padding">
-      <table class="table" >
+      <table class="table">
         <thead>
           <tr>
             <th>Label</th>
@@ -23,13 +23,20 @@
             <td>
               <div class="input-group input-group-sm">
                 <span class="input-group-addon fit-text-size">name</span>
-                <input type="text" class="form-control" ng-model="label.key" placeholder="e.g. com.example.foo" ng-change="updateContainerLabel(service, label)" ng-disabled="isUpdating">
+                <input
+                  type="text"
+                  class="form-control"
+                  ng-model="label.key"
+                  placeholder="e.g. com.example.foo"
+                  ng-change="updateContainerLabel(service, label)"
+                  ng-disabled="isUpdating"
+                />
               </div>
             </td>
             <td>
               <div class="input-group input-group-sm">
                 <span class="input-group-addon fit-text-size">value</span>
-                <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" ng-change="updateContainerLabel(service, label)" ng-disabled="isUpdating">
+                <input type="text" class="form-control" ng-model="label.value" placeholder="e.g. bar" ng-change="updateContainerLabel(service, label)" ng-disabled="isUpdating" />
                 <span class="input-group-btn" authorization="DockerServiceUpdate">
                   <button class="btn btn-sm btn-danger" type="button" ng-click="removeContainerLabel(service, $index)" ng-disabled="isUpdating">
                     <i class="fa fa-trash" aria-hidden="true"></i>
@@ -44,7 +51,9 @@
     <rd-widget-footer authorization="DockerServiceUpdate">
       <div class="btn-toolbar" role="toolbar">
         <div class="btn-group" role="group">
-          <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['ServiceContainerLabels'])" ng-click="updateService(service)">Apply changes</button>
+          <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['ServiceContainerLabels'])" ng-click="updateService(service)"
+            >Apply changes</button
+          >
           <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="caret"></span>
           </button>

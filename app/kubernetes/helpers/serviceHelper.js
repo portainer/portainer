@@ -4,6 +4,5 @@ class KubernetesServiceHelper {
   static generateHeadlessServiceName(name) {
     return KubernetesServiceHeadlessPrefix + name;
   }
-
 }
 export default KubernetesServiceHelper;

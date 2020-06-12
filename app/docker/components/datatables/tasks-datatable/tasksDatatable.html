@@ -2,13 +2,18 @@
   <rd-widget>
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
-        <div class="toolBarTitle">
-          <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }}
-        </div>
+        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
       </div>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" ng-change="$ctrl.onTextFilterChange()" placeholder="Search..." ng-model-options="{ debounce: 300 }">
+        <input
+          type="text"
+          class="searchInput"
+          ng-model="$ctrl.state.textFilter"
+          ng-change="$ctrl.onTextFilterChange()"
+          placeholder="Search..."
+          ng-model-options="{ debounce: 300 }"
+        />
       </div>
       <div class="table-responsive">
         <table class="table table-hover nowrap-cells">
@@ -53,15 +58,36 @@
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))" ng-class="{active: item.Checked}">
-              <td><span class="label label-{{ item.Status.State | taskstatusbadge }}">{{ item.Status.State }}</span></td>
+            <tr
+              dir-paginate="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))"
+              ng-class="{ active: item.Checked }"
+            >
+              <td
+                ><span class="label label-{{ item.Status.State | taskstatusbadge }}">{{ item.Status.State }}</span></td
+              >
               <td>
-                <a ng-if="!$ctrl.agentProxy || !item.Container" ui-sref="docker.tasks.task({id: item.Id})" class="monospaced">{{ item.ServiceName }}{{ item.Slot ? '.' + item.Slot : '' }}{{ '.' + item.Id }}</a>
-                <a ng-if="$ctrl.agentProxy && item.Container" ui-sref="docker.containers.container({ id: item.Container.Id, nodeName: item.Container.NodeName })" class="monospaced">{{ item.ServiceName }}{{ item.Slot ? '.' + item.Slot : '' }}{{ '.' + item.Id }}</a>
+                <a ng-if="!$ctrl.agentProxy || !item.Container" ui-sref="docker.tasks.task({id: item.Id})" class="monospaced"
+                  >{{ item.ServiceName }}{{ item.Slot ? '.' + item.Slot : '' }}{{ '.' + item.Id }}</a
+                >
+                <a ng-if="$ctrl.agentProxy && item.Container" ui-sref="docker.containers.container({ id: item.Container.Id, nodeName: item.Container.NodeName })" class="monospaced"
+                  >{{ item.ServiceName }}{{ item.Slot ? '.' + item.Slot : '' }}{{ '.' + item.Id }}</a
+                >
               </td>
               <td>
-                <container-quick-actions ng-if="!$ctrl.agentProxy || !item.Container" container-id="item.ContainerId" task-id="item.Id" status="item.Status.State" state="$ctrl.state"></container-quick-actions>
-                <container-quick-actions ng-if="$ctrl.agentProxy && item.Container" container-id="item.Container.Id" node-name="item.Container.NodeName" status="item.Status.State" state="$ctrl.state"></container-quick-actions>
+                <container-quick-actions
+                  ng-if="!$ctrl.agentProxy || !item.Container"
+                  container-id="item.ContainerId"
+                  task-id="item.Id"
+                  status="item.Status.State"
+                  state="$ctrl.state"
+                ></container-quick-actions>
+                <container-quick-actions
+                  ng-if="$ctrl.agentProxy && item.Container"
+                  container-id="item.Container.Id"
+                  node-name="item.Container.NodeName"
+                  status="item.Status.State"
+                  state="$ctrl.state"
+                ></container-quick-actions>
               </td>
               <td ng-if="$ctrl.showSlotColumn">{{ item.Slot ? item.Slot : '-' }}</td>
               <td>{{ item.NodeId | tasknodename: $ctrl.nodes }}</td>

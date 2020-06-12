@@ -1,6 +1,6 @@
 import _ from 'lodash-es';
 
-import {KubernetesNode, KubernetesNodeDetails} from 'Kubernetes/models/node/models';
+import { KubernetesNode, KubernetesNodeDetails } from 'Kubernetes/models/node/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 
 class KubernetesNodeConverter {
@@ -23,13 +23,13 @@ class KubernetesNodeConverter {
       MemoryPressure: memoryPressure && memoryPressure.status === 'True',
       PIDPressure: PIDPressure && PIDPressure.status === 'True',
       DiskPressure: diskPressure && diskPressure.status === 'True',
-      NetworkUnavailable: networkUnavailable && networkUnavailable.status === 'True'
+      NetworkUnavailable: networkUnavailable && networkUnavailable.status === 'True',
     };
 
     if (ready.status === 'False') {
       res.Status = 'Unhealthy';
     } else if (ready.status === 'Unknown' || res.Conditions.MemoryPressure || res.Conditions.PIDPressure || res.Conditions.DiskPressure || res.Conditions.NetworkUnavailable) {
-        res.Status = 'Warning';
+      res.Status = 'Warning';
     } else {
       res.Status = 'Ready';
     }
@@ -59,7 +59,7 @@ export const KubernetesNodeConditionTypes = Object.freeze({
   MEMORY_PRESSURE: 'MemoryPressure',
   PID_PRESSURE: 'PIDPressure',
   DISK_PRESSURE: 'DiskPressure',
-  NETWORK_UNAVAILABLE: 'NetworkUnavailable'
+  NETWORK_UNAVAILABLE: 'NetworkUnavailable',
 });
 
 export default KubernetesNodeConverter;

@@ -25,13 +25,10 @@ class KubernetesStatefulSetService {
     try {
       const params = new KubernetesCommonParams();
       params.id = name;
-      const [raw, yaml] = await Promise.all([
-        this.KubernetesStatefulSets(namespace).get(params).$promise,
-        this.KubernetesStatefulSets(namespace).getYaml(params).$promise,
-      ]);
+      const [raw, yaml] = await Promise.all([this.KubernetesStatefulSets(namespace).get(params).$promise, this.KubernetesStatefulSets(namespace).getYaml(params).$promise]);
       const res = {
         Raw: raw,
-        Yaml: yaml.data
+        Yaml: yaml.data,
       };
       const headlessServiceName = raw.spec.serviceName;
       if (headlessServiceName) {
@@ -48,7 +45,7 @@ class KubernetesStatefulSetService {
       throw new PortainerError('Unable to retrieve StatefulSet', err);
     }
   }
-  
+
   async getAllAsync(namespace) {
     try {
       const data = await this.KubernetesStatefulSets(namespace).get().$promise;
@@ -115,7 +112,7 @@ class KubernetesStatefulSetService {
       const params = new KubernetesCommonParams();
       params.id = statefulSet.Name;
       const namespace = statefulSet.Namespace;
-      await this.KubernetesStatefulSets(namespace).delete(params).$promise
+      await this.KubernetesStatefulSets(namespace).delete(params).$promise;
     } catch (err) {
       throw new PortainerError('Unable to remove statefulSet', err);
     }

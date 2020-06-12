@@ -4,7 +4,7 @@
 const _KubernetesStack = Object.freeze({
   Name: '',
   ResourcePool: '',
-  Applications: []
+  Applications: [],
 });
 
 export class KubernetesStack {

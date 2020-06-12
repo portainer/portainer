@@ -39,39 +39,33 @@ class KubernetesVolumesController {
   }
 
   removeAction(selectedItems) {
-    this.ModalService.confirmDeletion(
-      'Do you want to remove the selected volume(s)?',
-      (confirmed) => {
-        if (confirmed) {
-          return this.$async(this.removeActionAsync, selectedItems);
-        }
-      });
+    this.ModalService.confirmDeletion('Do you want to remove the selected volume(s)?', (confirmed) => {
+      if (confirmed) {
+        return this.$async(this.removeActionAsync, selectedItems);
+      }
+    });
   }
 
   async getVolumesAsync() {
     try {
-      const [volumes, applications] = await Promise.all([
-        this.KubernetesVolumeService.get(),
-        this.KubernetesApplicationService.get()
-      ]);
+      const [volumes, applications] = await Promise.all([this.KubernetesVolumeService.get(), this.KubernetesApplicationService.get()]);
 
       this.volumes = _.map(volumes, (volume) => {
         volume.Applications = KubernetesVolumeHelper.getUsingApplications(volume, applications);
         return volume;
       });
-
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retreive resource pools');
     }
   }
 
   getVolumes() {
-    return this.$async(this.getVolumesAsync)
+    return this.$async(this.getVolumesAsync);
   }
 
   async onInit() {
     this.state = {
-      viewReady: false
+      viewReady: false,
     };
 
     await this.getVolumes();

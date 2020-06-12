@@ -87,7 +87,7 @@ class KubernetesConfigurationsController {
     this.state = {
       configurationsLoading: true,
       applicationsLoading: true,
-      viewReady: false
+      viewReady: false,
     };
 
     await this.getApplications();

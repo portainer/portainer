@@ -1,7 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import stripAnsi from 'strip-ansi';
-import {KubernetesDeployManifestTypes} from 'Kubernetes/models/deploy';
+import { KubernetesDeployManifestTypes } from 'Kubernetes/models/deploy';
 
 class KubernetesDeployController {
   /* @ngInject */
@@ -78,7 +78,7 @@ class KubernetesDeployController {
       DeployType: KubernetesDeployManifestTypes.KUBERNETES,
       tabLogsDisabled: true,
       activeTab: 0,
-      viewReady: false
+      viewReady: false,
     };
 
     this.formValues = {};

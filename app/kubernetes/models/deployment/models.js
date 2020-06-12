@@ -15,7 +15,7 @@ const _KubernetesDeployment = Object.freeze({
   Secret: undefined,
   ApplicationName: '',
   ApplicationOwner: '',
-  Note: ''
+  Note: '',
 });
 
 export class KubernetesDeployment {

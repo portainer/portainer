@@ -13,7 +13,7 @@ const _KubernetesPersistentVolumeClaim = Object.freeze({
   ApplicationOwner: '',
   ApplicationName: '',
   MountPath: '', // used for Application creation from ApplicationFormValues | not used from API conversion
-  Yaml: ''
+  Yaml: '',
 });
 
 export class KubernetesPersistentVolumeClaim {
@@ -29,7 +29,7 @@ export class KubernetesPersistentVolumeClaim {
 const _KubernetesVolume = Object.freeze({
   ResourcePool: {}, // KubernetesResourcePool
   PersistentVolumeClaim: {}, // KubernetesPersistentVolumeClaim
-  Applications: [] // KubernetesApplication
+  Applications: [], // KubernetesApplication
 });
 
 export class KubernetesVolume {

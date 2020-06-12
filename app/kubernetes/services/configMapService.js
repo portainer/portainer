@@ -24,10 +24,7 @@ class KubernetesConfigMapService {
     try {
       const params = new KubernetesCommonParams();
       params.id = name;
-      const [raw, yaml] = await Promise.all([
-        this.KubernetesConfigMaps(namespace).get(params).$promise,
-        this.KubernetesConfigMaps(namespace).getYaml(params).$promise
-      ]);
+      const [raw, yaml] = await Promise.all([this.KubernetesConfigMaps(namespace).get(params).$promise, this.KubernetesConfigMaps(namespace).getYaml(params).$promise]);
       const configMap = KubernetesConfigMapConverter.apiToConfigMap(raw, yaml);
       return configMap;
     } catch (err) {
@@ -104,7 +101,7 @@ class KubernetesConfigMapService {
       params.id = config.Name;
       const namespace = config.Namespace;
       await this.KubernetesConfigMaps(namespace).delete(params).$promise;
-    } catch(err) {
+    } catch (err) {
       throw new PortainerError('Unable to delete config map', err);
     }
   }

@@ -32,7 +32,7 @@ class SliderController {
       showSelectionBar: true,
       enforceStep: false,
       translate: this.translate,
-      onChange: () => this.onChange()
+      onChange: () => this.onChange(),
     };
   }
 

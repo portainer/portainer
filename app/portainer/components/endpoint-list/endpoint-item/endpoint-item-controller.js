@@ -8,5 +8,5 @@ angular.module('portainer.app').controller('EndpointItemController', [
       event.stopPropagation();
       ctrl.onEdit(ctrl.model.Id);
     }
-  }
+  },
 ]);

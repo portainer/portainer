@@ -8,7 +8,7 @@ import {
   KubernetesApplicationConfigurationFormValue,
   KubernetesApplicationConfigurationFormValueOverridenKey,
   KubernetesApplicationPersistedFolderFormValue,
-  KubernetesApplicationPublishedPortFormValue
+  KubernetesApplicationPublishedPortFormValue,
 } from 'Kubernetes/models/application/formValues';
 import {
   KubernetesApplicationEnvConfigMapPayload,
@@ -18,37 +18,40 @@ import {
   KubernetesApplicationVolumeEntryPayload,
   KubernetesApplicationVolumeMountPayload,
   KubernetesApplicationVolumePersistentPayload,
-  KubernetesApplicationVolumeSecretPayload
+  KubernetesApplicationVolumeSecretPayload,
 } from 'Kubernetes/models/application/payloads';
 import KubernetesVolumeHelper from 'Kubernetes/helpers/volumeHelper';
 
 class KubernetesApplicationHelper {
-
   static associatePodsAndApplication(pods, app) {
     return _.filter(pods, { Labels: app.spec.selector.matchLabels });
   }
 
   static portMappingsFromApplications(applications) {
-    const res = _.reduce(applications, (acc, app) => {
-      if (app.PublishedPorts.length > 0) {
-        const mapping = new KubernetesPortMapping();
-        mapping.Name = app.Name;
-        mapping.ResourcePool = app.ResourcePool;
-        mapping.ServiceType = app.ServiceType;
-        mapping.LoadBalancerIPAddress = app.LoadBalancerIPAddress;
-        mapping.ApplicationOwner = app.ApplicationOwner;
+    const res = _.reduce(
+      applications,
+      (acc, app) => {
+        if (app.PublishedPorts.length > 0) {
+          const mapping = new KubernetesPortMapping();
+          mapping.Name = app.Name;
+          mapping.ResourcePool = app.ResourcePool;
+          mapping.ServiceType = app.ServiceType;
+          mapping.LoadBalancerIPAddress = app.LoadBalancerIPAddress;
+          mapping.ApplicationOwner = app.ApplicationOwner;
 
-        mapping.Ports = _.map(app.PublishedPorts, (item) => {
-          const port = new KubernetesPortMappingPort();
-          port.Port = mapping.ServiceType === KubernetesServiceTypes.NODE_PORT ? item.nodePort : item.port;
-          port.TargetPort = item.targetPort;
-          port.Protocol = item.protocol;
-          return port;
-        });
-        acc.push(mapping);
-      }
-      return acc;
-    }, []);
+          mapping.Ports = _.map(app.PublishedPorts, (item) => {
+            const port = new KubernetesPortMappingPort();
+            port.Port = mapping.ServiceType === KubernetesServiceTypes.NODE_PORT ? item.nodePort : item.port;
+            port.TargetPort = item.targetPort;
+            port.Protocol = item.protocol;
+            return port;
+          });
+          acc.push(mapping);
+        }
+        return acc;
+      },
+      []
+    );
     return res;
   }
 
@@ -88,9 +91,7 @@ class KubernetesApplicationHelper {
           }
           finalEnv.push(res);
         });
-
       } else {
-
         const envKeys = _.filter(config.OverridenKeys, (item) => item.Type === KubernetesApplicationConfigurationFormValueOverridenKeyTypes.ENVIRONMENT);
         _.forEach(envKeys, (item) => {
           const res = isBasic ? new KubernetesApplicationEnvConfigMapPayload() : new KubernetesApplicationEnvSecretPayload();
@@ -188,19 +189,23 @@ class KubernetesApplicationHelper {
       if (!cfgEnv.length && !cfgVol.length) {
         return;
       }
-      const keys = _.reduce(_.keys(cfg.Data), (acc, k) => {
-        const keyEnv = _.filter(cfgEnv, { name: k });
-        const keyVol = _.filter(cfgVol, { configurationKey: k });
-        const key = {
-          Key: k,
-          Count: keyEnv.length + keyVol.length,
-          Sum: _.concat(keyEnv, keyVol),
-          EnvCount: keyEnv.length,
-          VolCount: keyVol.length
-        };
-        acc.push(key);
-        return acc;
-      }, []);
+      const keys = _.reduce(
+        _.keys(cfg.Data),
+        (acc, k) => {
+          const keyEnv = _.filter(cfgEnv, { name: k });
+          const keyVol = _.filter(cfgVol, { configurationKey: k });
+          const key = {
+            Key: k,
+            Count: keyEnv.length + keyVol.length,
+            Sum: _.concat(keyEnv, keyVol),
+            EnvCount: keyEnv.length,
+            VolCount: keyVol.length,
+          };
+          acc.push(key);
+          return acc;
+        },
+        []
+      );
 
       const max = _.max(_.map(keys, 'Count'));
       const overrideThreshold = max - _.max(_.map(keys, 'VolCount'));
@@ -264,6 +269,5 @@ class KubernetesApplicationHelper {
   static isExternalApplication(application) {
     return !application.ApplicationOwner;
   }
-
 }
 export default KubernetesApplicationHelper;

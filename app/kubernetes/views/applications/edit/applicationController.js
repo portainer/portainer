@@ -1,16 +1,24 @@
 import angular from 'angular';
 import _ from 'lodash-es';
-import {
-  KubernetesApplicationDataAccessPolicies,
-  KubernetesApplicationDeploymentTypes
-} from 'Kubernetes/models/application/models';
+import { KubernetesApplicationDataAccessPolicies, KubernetesApplicationDeploymentTypes } from 'Kubernetes/models/application/models';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 import KubernetesApplicationHelper from 'Kubernetes/helpers/application';
 
 class KubernetesApplicationController {
   /* @ngInject */
-  constructor($async, $state, clipboard, Notifications, LocalStorage, ModalService,
-    KubernetesApplicationService, KubernetesEventService, KubernetesStackService, KubernetesPodService, KubernetesNamespaceHelper) {
+  constructor(
+    $async,
+    $state,
+    clipboard,
+    Notifications,
+    LocalStorage,
+    ModalService,
+    KubernetesApplicationService,
+    KubernetesEventService,
+    KubernetesStackService,
+    KubernetesPodService,
+    KubernetesNamespaceHelper
+  ) {
     this.$async = $async;
     this.$state = $state;
     this.clipboard = clipboard;
@@ -94,14 +102,11 @@ class KubernetesApplicationController {
   }
 
   rollbackApplication() {
-    this.ModalService.confirmUpdate(
-      'Rolling back the application to a previous configuration may cause a service interruption. Do you wish to continue?',
-      (confirmed) => {
-        if (confirmed) {
-          return this.$async(this.rollbackApplicationAsync);
-        }
+    this.ModalService.confirmUpdate('Rolling back the application to a previous configuration may cause a service interruption. Do you wish to continue?', (confirmed) => {
+      if (confirmed) {
+        return this.$async(this.rollbackApplicationAsync);
       }
-    );
+    });
   }
   /**
    * REDEPLOY
@@ -118,14 +123,11 @@ class KubernetesApplicationController {
   }
 
   redeployApplication() {
-    this.ModalService.confirmUpdate(
-      'Redeploying the application may cause a service interruption. Do you wish to continue?',
-      (confirmed) => {
-        if (confirmed) {
-          return this.$async(this.redeployApplicationAsync);
-        }
+    this.ModalService.confirmUpdate('Redeploying the application may cause a service interruption. Do you wish to continue?', (confirmed) => {
+      if (confirmed) {
+        return this.$async(this.redeployApplicationAsync);
       }
-    );
+    });
   }
 
   /**
@@ -154,9 +156,13 @@ class KubernetesApplicationController {
     try {
       this.state.eventsLoading = true;
       const events = await this.KubernetesEventService.get(this.state.params.namespace);
-      this.events = _.filter(events, (event) => event.Involved.uid === this.application.Id
-        || event.Involved.uid === this.application.ServiceId
-        || _.find(this.application.Pods, (pod) => pod.Id === event.Involved.uid) !== undefined);
+      this.events = _.filter(
+        events,
+        (event) =>
+          event.Involved.uid === this.application.Id ||
+          event.Involved.uid === this.application.ServiceId ||
+          _.find(this.application.Pods, (pod) => pod.Id === event.Involved.uid) !== undefined
+      );
       this.state.eventWarningCount = KubernetesEventHelper.warningCount(this.events);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve application related events');
@@ -208,14 +214,14 @@ class KubernetesApplicationController {
         name: this.$transition$.params().name,
       },
       eventWarningCount: 0,
-      expandedNote: false
+      expandedNote: false,
     };
 
     this.state.activeTab = this.LocalStorage.getActiveTab('application');
 
     this.formValues = {
       Note: '',
-      SelectedRevision: undefined
+      SelectedRevision: undefined,
     };
 
     this.KubernetesApplicationDeploymentTypes = KubernetesApplicationDeploymentTypes;

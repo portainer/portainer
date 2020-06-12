@@ -4,7 +4,18 @@ import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelpe
 
 class KubernetesDashboardController {
   /* @ngInject */
-  constructor($async, Notifications, EndpointService, EndpointProvider, KubernetesResourcePoolService, KubernetesApplicationService, KubernetesConfigurationService, KubernetesVolumeService, KubernetesNamespaceHelper, Authentication) {
+  constructor(
+    $async,
+    Notifications,
+    EndpointService,
+    EndpointProvider,
+    KubernetesResourcePoolService,
+    KubernetesApplicationService,
+    KubernetesConfigurationService,
+    KubernetesVolumeService,
+    KubernetesNamespaceHelper,
+    Authentication
+  ) {
     this.$async = $async;
     this.Notifications = Notifications;
     this.EndpointService = EndpointService;
@@ -31,7 +42,7 @@ class KubernetesDashboardController {
         this.KubernetesResourcePoolService.get(),
         this.KubernetesApplicationService.get(),
         this.KubernetesConfigurationService.get(),
-        this.KubernetesVolumeService.get()
+        this.KubernetesVolumeService.get(),
       ]);
       this.endpoint = endpoint;
       this.applications = applications;
@@ -49,7 +60,6 @@ class KubernetesDashboardController {
         this.pools = pools;
         this.configurations = configurations;
       }
-
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load dashboard data');
     }
@@ -61,7 +71,7 @@ class KubernetesDashboardController {
 
   async onInit() {
     this.state = {
-      viewReady: false
+      viewReady: false,
     };
 
     await this.getAll();

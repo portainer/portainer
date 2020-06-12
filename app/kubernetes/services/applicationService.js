@@ -13,8 +13,19 @@ import { KubernetesApplication } from 'Kubernetes/models/application/models';
 
 class KubernetesApplicationService {
   /* @ngInject */
-  constructor($async, Authentication, KubernetesDeploymentService, KubernetesDaemonSetService, KubernetesStatefulSetService, KubernetesServiceService,
-    KubernetesSecretService, KubernetesPersistentVolumeClaimService, KubernetesNamespaceService, KubernetesPodService, KubernetesHistoryService) {
+  constructor(
+    $async,
+    Authentication,
+    KubernetesDeploymentService,
+    KubernetesDaemonSetService,
+    KubernetesStatefulSetService,
+    KubernetesServiceService,
+    KubernetesSecretService,
+    KubernetesPersistentVolumeClaimService,
+    KubernetesNamespaceService,
+    KubernetesPodService,
+    KubernetesHistoryService
+  ) {
     this.$async = $async;
     this.Authentication = Authentication;
     this.KubernetesDeploymentService = KubernetesDeploymentService;
@@ -62,7 +73,7 @@ class KubernetesApplicationService {
         this.KubernetesDeploymentService.get(namespace, name),
         this.KubernetesDaemonSetService.get(namespace, name),
         this.KubernetesStatefulSetService.get(namespace, name),
-        this.KubernetesPodService.get(namespace)
+        this.KubernetesPodService.get(namespace),
       ]);
 
       let rootItem;
@@ -101,34 +112,36 @@ class KubernetesApplicationService {
   async getAllAsync(namespace) {
     try {
       const namespaces = namespace ? [namespace] : _.map(await this.KubernetesNamespaceService.get(), 'Name');
-      const res = await Promise.all(_.map(namespaces, async (ns) => {
-        const [deployments, daemonSets, statefulSets, services, pods] = await Promise.all([
-          this.KubernetesDeploymentService.get(ns),
-          this.KubernetesDaemonSetService.get(ns),
-          this.KubernetesStatefulSetService.get(ns),
-          this.KubernetesServiceService.get(ns),
-          this.KubernetesPodService.get(ns),
-        ]);
-        const deploymentApplications = _.map(deployments, (item) => {
-          const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
-          const application = KubernetesApplicationConverter.apiDeploymentToApplication(item, service);
-          application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods, item);
-          return application;
-        });
-        const daemonSetApplications = _.map(daemonSets, (item) => {
-          const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
-          const application = KubernetesApplicationConverter.apiDaemonSetToApplication(item, service);
-          application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods, item);
-          return application;
-        });
-        const statefulSetApplications = _.map(statefulSets, (item) => {
-          const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
-          const application = KubernetesApplicationConverter.apiStatefulSetToapplication(item, service);
-          application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods, item);
-          return application;
-        });
-        return _.concat(deploymentApplications, daemonSetApplications, statefulSetApplications);
-      }));
+      const res = await Promise.all(
+        _.map(namespaces, async (ns) => {
+          const [deployments, daemonSets, statefulSets, services, pods] = await Promise.all([
+            this.KubernetesDeploymentService.get(ns),
+            this.KubernetesDaemonSetService.get(ns),
+            this.KubernetesStatefulSetService.get(ns),
+            this.KubernetesServiceService.get(ns),
+            this.KubernetesPodService.get(ns),
+          ]);
+          const deploymentApplications = _.map(deployments, (item) => {
+            const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
+            const application = KubernetesApplicationConverter.apiDeploymentToApplication(item, service);
+            application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods, item);
+            return application;
+          });
+          const daemonSetApplications = _.map(daemonSets, (item) => {
+            const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
+            const application = KubernetesApplicationConverter.apiDaemonSetToApplication(item, service);
+            application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods, item);
+            return application;
+          });
+          const statefulSetApplications = _.map(statefulSets, (item) => {
+            const service = _.find(services, (serv) => item.metadata.name === serv.metadata.name);
+            const application = KubernetesApplicationConverter.apiStatefulSetToapplication(item, service);
+            application.Pods = KubernetesApplicationHelper.associatePodsAndApplication(pods, item);
+            return application;
+          });
+          return _.concat(deploymentApplications, daemonSetApplications, statefulSetApplications);
+        })
+      );
       return _.flatten(res);
     } catch (err) {
       throw err;
@@ -173,7 +186,6 @@ class KubernetesApplicationService {
       }
 
       await apiService.create(app);
-
     } catch (err) {
       throw err;
     }
@@ -210,7 +222,7 @@ class KubernetesApplicationService {
             return this.KubernetesPersistentVolumeClaimService.create(newClaim);
           }
           const oldClaim = _.find(oldClaims, { Name: newClaim.PreviousName });
-          return this.KubernetesPersistentVolumeClaimService.patch(oldClaim, newClaim)
+          return this.KubernetesPersistentVolumeClaimService.patch(oldClaim, newClaim);
         });
         await Promise.all(claimPromises);
       }
@@ -224,7 +236,6 @@ class KubernetesApplicationService {
       } else if (oldService && !newService) {
         await this.KubernetesServiceService.delete(oldService);
       }
-
     } catch (err) {
       throw err;
     }
@@ -237,13 +248,13 @@ class KubernetesApplicationService {
         Name: oldApp.Name,
         Namespace: oldApp.ResourcePool,
         StackName: oldApp.StackName,
-        Note: oldApp.Note
+        Note: oldApp.Note,
       };
       const newAppPayload = {
         Name: newApp.Name,
         Namespace: newApp.ResourcePool,
         StackName: newApp.StackName,
-        Note: newApp.Note
+        Note: newApp.Note,
       };
       const apiService = this._getApplicationApiService(oldApp);
       await apiService.patch(oldAppPayload, newAppPayload);
@@ -270,7 +281,7 @@ class KubernetesApplicationService {
     try {
       const payload = {
         Namespace: application.ResourcePool || application.Namespace,
-        Name: application.Name
+        Name: application.Name,
       };
       const servicePayload = angular.copy(payload);
       servicePayload.Name = application.Name;

@@ -18,19 +18,16 @@ class KubernetesSecretService {
   }
 
   /**
-   * GET 
+   * GET
    */
   async getAsync(namespace, name) {
     try {
       const params = new KubernetesCommonParams();
       params.id = name;
-      const [raw, yaml] = await Promise.all([
-        this.KubernetesSecrets(namespace).get(params).$promise,
-        this.KubernetesSecrets(namespace).getYaml(params).$promise
-      ]);
+      const [raw, yaml] = await Promise.all([this.KubernetesSecrets(namespace).get(params).$promise, this.KubernetesSecrets(namespace).getYaml(params).$promise]);
       const secret = KubernetesSecretConverter.apiToSecret(raw, yaml);
       return secret;
-    } catch(err) {
+    } catch (err) {
       throw new PortainerError('Unable to retrieve secret', err);
     }
   }
@@ -99,7 +96,7 @@ class KubernetesSecretService {
       params.id = secret.Name;
       const namespace = secret.Namespace;
       await this.KubernetesSecrets(namespace).delete(params).$promise;
-    } catch(err) {
+    } catch (err) {
       throw new PortainerError('Unable to delete secret', err);
     }
   }
@@ -111,4 +108,3 @@ class KubernetesSecretService {
 
 export default KubernetesSecretService;
 angular.module('portainer.kubernetes').service('KubernetesSecretService', KubernetesSecretService);
-

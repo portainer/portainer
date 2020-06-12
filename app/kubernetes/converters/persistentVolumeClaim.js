@@ -6,7 +6,6 @@ import { KubernetesPersistentVolumClaimCreatePayload } from 'Kubernetes/models/v
 import { KubernetesPortainerApplicationOwnerLabel, KubernetesPortainerApplicationNameLabel } from 'Kubernetes/models/application/models';
 
 class KubernetesPersistentVolumeClaimConverter {
-
   static apiToPersistentVolumeClaim(data, storageClasses, yaml) {
     const res = new KubernetesPersistentVolumeClaim();
     res.Id = data.metadata.uid;
@@ -14,7 +13,7 @@ class KubernetesPersistentVolumeClaimConverter {
     res.Namespace = data.metadata.namespace;
     res.CreationDate = data.metadata.creationTimestamp;
     res.Storage = data.spec.resources.requests.storage.replace('i', '') + 'B';
-    res.StorageClass = _.find(storageClasses, {Name: data.spec.storageClassName});
+    res.StorageClass = _.find(storageClasses, { Name: data.spec.storageClassName });
     res.Yaml = yaml ? yaml.data : '';
     res.ApplicationOwner = data.metadata.labels ? data.metadata.labels[KubernetesPortainerApplicationOwnerLabel] : '';
     res.ApplicationName = data.metadata.labels ? data.metadata.labels[KubernetesPortainerApplicationNameLabel] : '';

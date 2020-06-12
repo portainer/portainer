@@ -3,6 +3,6 @@ angular.module('portainer.kubernetes').component('kubernetesConfigurationView', 
   controller: 'KubernetesConfigurationController',
   controllerAs: 'ctrl',
   bindings: {
-    $transition$: '<'
-  }
+    $transition$: '<',
+  },
 });

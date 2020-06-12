@@ -2,9 +2,7 @@
   <rd-widget>
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
-        <div class="toolBarTitle">
-          <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }}
-        </div>
+        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
       </div>
       <div class="actionBar">
         <form class="form-horizontal">
@@ -17,7 +15,13 @@
               </select>
             </div>
             <div class="col-sm-1">
-              <button type="button" class="btn btn-primary btn-sm" ng-disabled="$ctrl.joinNetworkActionInProgress || !$ctrl.selectedNetwork" ng-click="$ctrl.joinNetworkAction($ctrl.container, $ctrl.selectedNetwork)" button-spinner="$ctrl.joinNetworkActionInProgress">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                ng-disabled="$ctrl.joinNetworkActionInProgress || !$ctrl.selectedNetwork"
+                ng-click="$ctrl.joinNetworkAction($ctrl.container, $ctrl.selectedNetwork)"
+                button-spinner="$ctrl.joinNetworkActionInProgress"
+              >
                 <span ng-hide="$ctrl.joinNetworkActionInProgress">Join network</span>
                 <span ng-show="$ctrl.joinNetworkActionInProgress">Joining network...</span>
               </button>
@@ -37,13 +41,21 @@
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="(key, value) in $ctrl.dataset | itemsPerPage: $ctrl.state.paginatedItemLimit" ng-class="{active: item.Checked}">
-              <td><a ui-sref="docker.networks.network({ id: key, nodeName: $ctrl.nodeName })">{{ key }}</a></td>
+            <tr dir-paginate="(key, value) in $ctrl.dataset | itemsPerPage: $ctrl.state.paginatedItemLimit" ng-class="{ active: item.Checked }">
+              <td
+                ><a ui-sref="docker.networks.network({ id: key, nodeName: $ctrl.nodeName })">{{ key }}</a></td
+              >
               <td>{{ value.IPAddress || '-' }}</td>
               <td>{{ value.Gateway || '-' }}</td>
               <td>{{ value.MacAddress || '-' }}</td>
               <td authorization="DockerNetworkDisconnect">
-                <button type="button" class="btn btn-xs btn-danger" ng-disabled="$ctrl.leaveNetworkActionInProgress" button-spinner="$ctrl.leaveNetworkActionInProgress" ng-click="$ctrl.leaveNetworkAction($ctrl.container, key)">
+                <button
+                  type="button"
+                  class="btn btn-xs btn-danger"
+                  ng-disabled="$ctrl.leaveNetworkActionInProgress"
+                  button-spinner="$ctrl.leaveNetworkActionInProgress"
+                  ng-click="$ctrl.leaveNetworkAction($ctrl.container, key)"
+                >
                   <span ng-hide="$ctrl.leaveNetworkActionInProgress"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i> Leave network</span>
                   <span ng-show="$ctrl.leaveNetworkActionInProgress">Leaving network...</span>
                 </button>

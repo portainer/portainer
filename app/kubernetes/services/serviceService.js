@@ -23,13 +23,10 @@ class KubernetesServiceService {
     try {
       const params = new KubernetesCommonParams();
       params.id = name;
-      const [raw, yaml] = await Promise.all([
-        this.KubernetesServices(namespace).get(params).$promise,
-        this.KubernetesServices(namespace).getYaml(params).$promise
-      ]);
+      const [raw, yaml] = await Promise.all([this.KubernetesServices(namespace).get(params).$promise, this.KubernetesServices(namespace).getYaml(params).$promise]);
       const res = {
         Raw: raw,
-        Yaml: yaml.data
+        Yaml: yaml.data,
       };
       return res;
     } catch (err) {
@@ -103,7 +100,7 @@ class KubernetesServiceService {
       const params = new KubernetesCommonParams();
       params.id = service.Name;
       const namespace = service.Namespace;
-      await this.KubernetesServices(namespace).delete(params).$promise
+      await this.KubernetesServices(namespace).delete(params).$promise;
     } catch (err) {
       throw new PortainerError('Unable to remove service', err);
     }

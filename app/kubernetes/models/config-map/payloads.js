@@ -5,7 +5,7 @@ import { KubernetesCommonMetadataPayload } from 'Kubernetes/models/common/payloa
  */
 const _KubernetesConfigMapCreatePayload = Object.freeze({
   metadata: new KubernetesCommonMetadataPayload(),
-  data: {}
+  data: {},
 });
 export class KubernetesConfigMapCreatePayload {
   constructor() {
@@ -18,7 +18,7 @@ export class KubernetesConfigMapCreatePayload {
  */
 const _KubernetesConfigMapUpdatePayload = Object.freeze({
   metadata: new KubernetesCommonMetadataPayload(),
-  data: {}
+  data: {},
 });
 export class KubernetesConfigMapUpdatePayload {
   constructor() {

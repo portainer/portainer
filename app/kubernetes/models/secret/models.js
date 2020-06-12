@@ -8,7 +8,7 @@ const _KubernetesApplicationSecret = Object.freeze({
   CreationDate: '',
   ConfigurationOwner: '',
   Yaml: '',
-  Data: {}
+  Data: {},
 });
 
 export class KubernetesApplicationSecret {

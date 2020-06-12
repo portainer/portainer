@@ -4,8 +4,8 @@
     <div class="col-sm-12">
       <!-- simple box logo -->
       <div class="row">
-        <img ng-if="ctrl.logo" ng-src="{{ ctrl.logo }}" class="simple-box-logo">
-        <img ng-if="!ctrl.logo" src="../../../../../assets/images/logo_alt.png" class="simple-box-logo" alt="Portainer">
+        <img ng-if="ctrl.logo" ng-src="{{ ctrl.logo }}" class="simple-box-logo" />
+        <img ng-if="!ctrl.logo" src="../../../../../assets/images/logo_alt.png" class="simple-box-logo" alt="Portainer" />
       </div>
       <!-- !simple box logo -->
       <!-- init-endpoint panel -->
@@ -23,11 +23,11 @@
             </div>
             <!-- !note -->
             <!-- endpoint-type -->
-            <div class="form-group" style="margin-bottom: 0">
+            <div class="form-group" style="margin-bottom: 0;">
               <div class="boxselector_wrapper">
                 <div ng-repeat="type in ctrl.endpointTypes">
-                  <input type="radio" id="{{type.Id}}" ng-model="ctrl.formValues.EndpointType" ng-value="type.Value">
-                  <label for="{{type.Id}}">
+                  <input type="radio" id="{{ type.Id }}" ng-model="ctrl.formValues.EndpointType" ng-value="type.Value" />
+                  <label for="{{ type.Id }}">
                     <div class="boxselector_header">
                       <i ng-class="type.Classes" aria-hidden="true" style="margin-right: 2px;"></i>
                       {{ type.Title }}
@@ -53,23 +53,24 @@
                       <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
                       Ensure that you have started the Portainer container with the following Docker flag:
                     </p>
-                    <p class="text-muted">
-                      <code>-v "/var/run/docker.sock:/var/run/docker.sock"</code> (Linux).
-                    </p>
+                    <p class="text-muted"> <code>-v "/var/run/docker.sock:/var/run/docker.sock"</code> (Linux). </p>
                     <p class="text-muted">
                       or
                     </p>
-                    <p class="text-muted">
-                      <code>-v \\.\pipe\docker_engine:\\.\pipe\docker_engine</code> (Windows).
-                    </p>
+                    <p class="text-muted"> <code>-v \\.\pipe\docker_engine:\\.\pipe\docker_engine</code> (Windows). </p>
                   </span>
                 </div>
               </div>
               <!-- actions -->
               <div class="form-group">
                 <div class="col-sm-12">
-                  <button type="submit" class="btn btn-primary btn-sm" ng-disabled="ctrl.state.actionInProgress"
-                    ng-click="ctrl.createLocalEndpoint()" button-spinner="ctrl.state.actionInProgress">
+                  <button
+                    type="submit"
+                    class="btn btn-primary btn-sm"
+                    ng-disabled="ctrl.state.actionInProgress"
+                    ng-click="ctrl.createLocalEndpoint()"
+                    button-spinner="ctrl.state.actionInProgress"
+                  >
                     <span ng-hide="ctrl.state.actionInProgress"><i class="fa fa-bolt" aria-hidden="true"></i> Connect</span>
                     <span ng-show="ctrl.state.actionInProgress">Connecting...</span>
                   </button>
@@ -95,8 +96,13 @@
               <!-- actions -->
               <div class="form-group">
                 <div class="col-sm-12">
-                  <button type="submit" class="btn btn-primary btn-sm" ng-disabled="ctrl.state.actionInProgress"
-                    ng-click="ctrl.createLocalKubernetesEndpoint()" button-spinner="ctrl.state.actionInProgress">
+                  <button
+                    type="submit"
+                    class="btn btn-primary btn-sm"
+                    ng-disabled="ctrl.state.actionInProgress"
+                    ng-click="ctrl.createLocalKubernetesEndpoint()"
+                    button-spinner="ctrl.state.actionInProgress"
+                  >
                     <span ng-hide="ctrl.state.actionInProgress"><i class="fa fa-bolt" aria-hidden="true"></i> Connect</span>
                     <span ng-show="ctrl.state.actionInProgress">Connecting...</span>
                   </button>
@@ -126,8 +132,7 @@
               <div class="form-group">
                 <label for="endpoint_name" class="col-sm-4 col-lg-3 control-label text-left">Name</label>
                 <div class="col-sm-8 col-lg-9">
-                  <input type="text" class="form-control" id="endpoint_name" ng-model="ctrl.formValues.Name"
-                    placeholder="e.g. prod-cluster-01">
+                  <input type="text" class="form-control" id="endpoint_name" ng-model="ctrl.formValues.Name" placeholder="e.g. prod-cluster-01" />
                 </div>
               </div>
               <!-- !name-input -->
@@ -135,21 +140,23 @@
               <div class="form-group">
                 <label for="endpoint_url" class="col-sm-4 col-lg-3 control-label text-left">
                   Agent URL
-                  <portainer-tooltip position="bottom" message="URL or IP address of a Portainer agent.">
-                  </portainer-tooltip>
+                  <portainer-tooltip position="bottom" message="URL or IP address of a Portainer agent."> </portainer-tooltip>
                 </label>
                 <div class="col-sm-8 col-lg-9">
-                  <input type="text" class="form-control" id="endpoint_url" ng-model="ctrl.formValues.URL"
-                    placeholder="e.g. 10.0.0.10:9001">
+                  <input type="text" class="form-control" id="endpoint_url" ng-model="ctrl.formValues.URL" placeholder="e.g. 10.0.0.10:9001" />
                 </div>
               </div>
               <!-- !endpoint-url-input -->
               <!-- actions -->
               <div class="form-group">
                 <div class="col-sm-12">
-                  <button type="submit" class="btn btn-primary btn-sm"
+                  <button
+                    type="submit"
+                    class="btn btn-primary btn-sm"
                     ng-disabled="ctrl.state.actionInProgress || !ctrl.formValues.Name || !ctrl.formValues.URL"
-                    ng-click="ctrl.createAgentEndpoint()" button-spinner="ctrl.state.actionInProgress">
+                    ng-click="ctrl.createAgentEndpoint()"
+                    button-spinner="ctrl.state.actionInProgress"
+                  >
                     <span ng-hide="ctrl.state.actionInProgress"><i class="fa fa-bolt" aria-hidden="true"></i> Connect</span>
                     <span ng-show="ctrl.state.actionInProgress">Connecting...</span>
                   </button>

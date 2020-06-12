@@ -14,11 +14,8 @@
       Memory reservation
     </label>
     <div class="col-sm-9" style="margin-top: 4px;">
-      <uib-progressbar animate="false" value="$ctrl.memoryUsage"
-        type="{{ $ctrl.memoryUsage | kubernetesUsageLevelInfo }}">
-        <b style="white-space:nowrap;">
-          {{ $ctrl.memory }} / {{ $ctrl.memoryLimit }} MB - {{ $ctrl.memoryUsage }}%
-        </b>
+      <uib-progressbar animate="false" value="$ctrl.memoryUsage" type="{{ $ctrl.memoryUsage | kubernetesUsageLevelInfo }}">
+        <b style="white-space: nowrap;"> {{ $ctrl.memory }} / {{ $ctrl.memoryLimit }} MB - {{ $ctrl.memoryUsage }}% </b>
       </uib-progressbar>
     </div>
   </div>
@@ -27,11 +24,8 @@
       CPU reservation
     </label>
     <div class="col-sm-9" style="margin-top: 4px;">
-      <uib-progressbar animate="false" value="$ctrl.cpuUsage"
-        type="{{ $ctrl.cpuUsage | kubernetesUsageLevelInfo }}">
-        <b style="white-space:nowrap;">
-          {{ $ctrl.cpu | kubernetesApplicationCPUValue }} / {{ $ctrl.cpuLimit }} - {{ $ctrl.cpuUsage }}%
-        </b>
+      <uib-progressbar animate="false" value="$ctrl.cpuUsage" type="{{ $ctrl.cpuUsage | kubernetesUsageLevelInfo }}">
+        <b style="white-space: nowrap;"> {{ $ctrl.cpu | kubernetesApplicationCPUValue }} / {{ $ctrl.cpuLimit }} - {{ $ctrl.cpuUsage }}% </b>
       </uib-progressbar>
     </div>
   </div>

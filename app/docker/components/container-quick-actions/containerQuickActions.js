@@ -5,6 +5,6 @@ angular.module('portainer.docker').component('containerQuickActions', {
     nodeName: '<',
     status: '<',
     state: '<',
-    taskId: '<'
-  }
+    taskId: '<',
+  },
 });

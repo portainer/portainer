@@ -3,6 +3,6 @@ angular.module('portainer.kubernetes').component('kubernetesResourcePoolAccessVi
   controller: 'KubernetesResourcePoolAccessController',
   controllerAs: 'ctrl',
   bindings: {
-    $transition$: '<'
-  }
+    $transition$: '<',
+  },
 });

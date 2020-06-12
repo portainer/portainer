@@ -5,15 +5,28 @@
       Registry
     </label>
     <div ng-class="$ctrl.inputClass">
-      <select ng-options="registry as registry.Name for registry in $ctrl.availableRegistries track by registry.Name" ng-model="$ctrl.model.Registry" id="image_registry"
-        selected-item-id="ctrl.selectedItemId" class="form-control"></select>
+      <select
+        ng-options="registry as registry.Name for registry in $ctrl.availableRegistries track by registry.Name"
+        ng-model="$ctrl.model.Registry"
+        id="image_registry"
+        selected-item-id="ctrl.selectedItemId"
+        class="form-control"
+      ></select>
     </div>
     <label for="image_name" ng-class="$ctrl.labelClass" class="margin-sm-top control-label text-left">Image</label>
     <div ng-class="$ctrl.inputClass" class="margin-sm-top">
       <div class="input-group">
-        <span class="input-group-addon" id="registry-name">{{$ctrl.displayedRegistryURL()}}</span>
-        <input type="text" class="form-control" aria-describedby="registry-name" uib-typeahead="image for image in $ctrl.availableImages | filter:$viewValue | limitTo:5"
-        ng-model="$ctrl.model.Image" name="image_name" placeholder="e.g. myImage:myTag" required>
+        <span class="input-group-addon" id="registry-name">{{ $ctrl.displayedRegistryURL() }}</span>
+        <input
+          type="text"
+          class="form-control"
+          aria-describedby="registry-name"
+          uib-typeahead="image for image in $ctrl.availableImages | filter:$viewValue | limitTo:5"
+          ng-model="$ctrl.model.Image"
+          name="image_name"
+          placeholder="e.g. myImage:myTag"
+          required
+        />
       </div>
     </div>
   </div>
@@ -22,11 +35,12 @@
 <!-- don't use registry -->
 <div ng-if="!$ctrl.model.UseRegistry">
   <div class="form-group">
-    <label for="image_name" ng-class="$ctrl.labelClass" class="control-label text-left">Image
+    <label for="image_name" ng-class="$ctrl.labelClass" class="control-label text-left"
+      >Image
       <portainer-tooltip position="bottom" message="Image and repository should be publicly available."></portainer-tooltip>
     </label>
     <div ng-class="$ctrl.inputClass">
-      <input type="text" class="form-control" ng-model="$ctrl.model.Image" name="image_name" placeholder="e.g. registry:port/myImage:myTag" required>
+      <input type="text" class="form-control" ng-model="$ctrl.model.Image" name="image_name" placeholder="e.g. registry:port/myImage:myTag" required />
     </div>
   </div>
 </div>
@@ -35,7 +49,10 @@
 <div class="form-group" ng-show="$ctrl.form.image_name.$invalid">
   <div class="col-sm-12 small text-warning">
     <div ng-messages="$ctrl.form.image_name.$error">
-      <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Image name is required. <span ng-if="$ctrl.canPull">Tag must be specified otherwise Portainer will pull all tags associated to the image.</span></p>
+      <p ng-message="required"
+        ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Image name is required.
+        <span ng-if="$ctrl.canPull">Tag must be specified otherwise Portainer will pull all tags associated to the image.</span></p
+      >
     </div>
   </div>
 </div>

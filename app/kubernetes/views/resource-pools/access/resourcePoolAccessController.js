@@ -41,11 +41,11 @@ class KubernetesResourcePoolAccessController {
   async onInit() {
     this.state = {
       actionInProgress: false,
-      viewReady: false
+      viewReady: false,
     };
 
     this.formValues = {
-      multiselectOutput: []
+      multiselectOutput: [],
     };
 
     this.endpointId = this.EndpointProvider.endpointID();
@@ -55,7 +55,7 @@ class KubernetesResourcePoolAccessController {
       let [endpoint, pool, configMap] = await Promise.all([
         this.EndpointService.endpoint(this.endpointId),
         this.KubernetesResourcePoolService.get(name),
-        this.KubernetesConfigMapService.get(KubernetesPortainerConfigMapNamespace, KubernetesPortainerConfigMapConfigName)
+        this.KubernetesConfigMapService.get(KubernetesPortainerConfigMapNamespace, KubernetesPortainerConfigMapConfigName),
       ]);
       const group = await this.GroupService.group(endpoint.GroupId);
       const roles = [];
@@ -70,19 +70,18 @@ class KubernetesResourcePoolAccessController {
       this.accessConfigMap = configMap;
       const poolAccesses = configMap.Data[KubernetesPortainerConfigMapAccessKey][name];
       if (poolAccesses) {
-        this.authorizedUsersAndTeams = _.filter(endpointAccesses.authorizedUsersAndTeams,
-          (item) => {
-            if (item instanceof UserAccessViewModel && poolAccesses.UserAccessPolicies) {
-              return poolAccesses.UserAccessPolicies[item.Id] !== undefined;
-            } else if (item instanceof TeamAccessViewModel && poolAccesses.TeamAccessPolicies) {
-              return poolAccesses.TeamAccessPolicies[item.Id] !== undefined;
-            }
-            return false;
-          });
+        this.authorizedUsersAndTeams = _.filter(endpointAccesses.authorizedUsersAndTeams, (item) => {
+          if (item instanceof UserAccessViewModel && poolAccesses.UserAccessPolicies) {
+            return poolAccesses.UserAccessPolicies[item.Id] !== undefined;
+          } else if (item instanceof TeamAccessViewModel && poolAccesses.TeamAccessPolicies) {
+            return poolAccesses.TeamAccessPolicies[item.Id] !== undefined;
+          }
+          return false;
+        });
       }
       this.availableUsersAndTeams = _.without(endpointAccesses.authorizedUsersAndTeams, ...this.authorizedUsersAndTeams);
     } catch (err) {
-      this.Notifications.error("Failure", err, "Unable to retrieve resource pool information");
+      this.Notifications.error('Failure', err, 'Unable to retrieve resource pool information');
     } finally {
       this.state.viewReady = true;
     }
@@ -101,15 +100,15 @@ class KubernetesResourcePoolAccessController {
       const newAccesses = _.concat(this.authorizedUsersAndTeams, this.formValues.multiselectOutput);
       const accessConfigMap = KubernetesConfigMapHelper.modifiyNamespaceAccesses(angular.copy(this.accessConfigMap), this.pool.Namespace.Name, newAccesses);
       await this.KubernetesConfigMapService.update(accessConfigMap);
-      this.Notifications.success("Access successfully created");
+      this.Notifications.success('Access successfully created');
       this.$state.reload();
     } catch (err) {
-      this.Notifications.error("Failure", err, "Unable to create accesses");
+      this.Notifications.error('Failure', err, 'Unable to create accesses');
     }
   }
 
   authorizeAccess() {
-    return this.$async(this.authorizeAccessAsync)
+    return this.$async(this.authorizeAccessAsync);
   }
 
   /**
@@ -121,10 +120,10 @@ class KubernetesResourcePoolAccessController {
       const newAccesses = _.without(this.authorizedUsersAndTeams, ...selectedItems);
       const accessConfigMap = KubernetesConfigMapHelper.modifiyNamespaceAccesses(angular.copy(this.accessConfigMap), this.pool.Namespace.Name, newAccesses);
       await this.KubernetesConfigMapService.update(accessConfigMap);
-      this.Notifications.success("Access successfully removed");
+      this.Notifications.success('Access successfully removed');
       this.$state.reload();
     } catch (err) {
-      this.Notifications.error("Failure", err, "Unable to remove accesses");
+      this.Notifications.error('Failure', err, 'Unable to remove accesses');
     } finally {
       this.state.actionInProgress = false;
     }
@@ -133,10 +132,7 @@ class KubernetesResourcePoolAccessController {
   unauthorizeAccess(selectedItems) {
     return this.$async(this.unauthorizeAccessAsync, selectedItems);
   }
-
 }
 
 export default KubernetesResourcePoolAccessController;
-angular
-  .module("portainer.kubernetes")
-  .controller("KubernetesResourcePoolAccessController", KubernetesResourcePoolAccessController);
+angular.module('portainer.kubernetes').controller('KubernetesResourcePoolAccessController', KubernetesResourcePoolAccessController);

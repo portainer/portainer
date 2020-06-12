@@ -1,11 +1,8 @@
 <div class="datatable">
   <rd-widget>
     <rd-widget-body classes="no-padding">
-
       <div class="toolBar">
-        <div class="toolBarTitle">
-          <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }}
-        </div>
+        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
       </div>
 
       <div class="actionBar">
@@ -30,14 +27,22 @@
             Show container templates
           </label>
           <label class="switch" style="margin-left: 20px;">
-            <input type="checkbox" name="show_stacks" ng-model="$ctrl.state.showContainerTemplates" ng-change="$ctrl.updateCategories()"><i></i>
+            <input type="checkbox" name="show_stacks" ng-model="$ctrl.state.showContainerTemplates" ng-change="$ctrl.updateCategories()" /><i></i>
           </label>
         </div>
       </div>
 
       <div class="searchBar" style="border-top: 2px solid #f6f6f6;">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" ng-change="$ctrl.onTextFilterChange()" placeholder="Search..." auto-focus ng-model-options="{ debounce: 300 }">
+        <input
+          type="text"
+          class="searchInput"
+          ng-model="$ctrl.state.textFilter"
+          ng-change="$ctrl.onTextFilterChange()"
+          placeholder="Search..."
+          auto-focus
+          ng-model-options="{ debounce: 300 }"
+        />
       </div>
 
       <div class="blocklist">
@@ -46,17 +51,16 @@
           model="template"
           show-update-action="$ctrl.showUpdateAction"
           show-delete-action="$ctrl.showDeleteAction"
-          on-select="$ctrl.selectAction"
-          on-delete="$ctrl.deleteAction"
+          on-select="($ctrl.selectAction)"
+          on-delete="($ctrl.deleteAction)"
         ></template-item>
         <div ng-if="!$ctrl.templates" class="text-center text-muted">
           Loading...
         </div>
-        <div ng-if="($ctrl.templates | filter: $ctrl.filterByType | filter:$ctrl.filterByCategory | filter:$ctrl.state.textFilter).length === 0" class="text-center text-muted">
+        <div ng-if="($ctrl.templates | filter: $ctrl.filterByType | filter: $ctrl.filterByCategory | filter: $ctrl.state.textFilter).length === 0" class="text-center text-muted">
           No templates available.
         </div>
       </div>
-
     </rd-widget-body>
   </rd-widget>
 </div>

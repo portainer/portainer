@@ -35,7 +35,7 @@ class KubernetesApplicationsController {
         const promises = _.map(stack.Applications, (app) => this.KubernetesApplicationService.delete(app));
         await Promise.all(promises);
         this.Notifications.success('Stack successfully removed', stack.Name);
-        _.remove(this.stacks, {Name: stack.Name});
+        _.remove(this.stacks, { Name: stack.Name });
       } catch (err) {
         this.Notifications.error('Failure', err, 'Unable to remove stack');
       } finally {
@@ -54,7 +54,8 @@ class KubernetesApplicationsController {
         if (confirmed) {
           return this.$async(this.removeStacksActionAsync, selectedItems);
         }
-      });
+      }
+    );
   }
 
   async removeActionAsync(selectedItems) {
@@ -113,7 +114,7 @@ class KubernetesApplicationsController {
       activeTab: 0,
       currentName: this.$state.$current.name,
       isAdmin: this.Authentication.isAdmin(),
-      viewReady: false
+      viewReady: false,
     };
 
     this.state.activeTab = this.LocalStorage.getActiveTab('applications');

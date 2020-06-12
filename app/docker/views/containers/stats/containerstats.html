@@ -1,22 +1,21 @@
 <rd-header>
   <rd-header-title title-text="Container statistics"></rd-header-title>
   <rd-header-content>
-    <a ui-sref="docker.containers">Containers</a> &gt; <a ui-sref="docker.containers.container({id: container.Id})">{{ container.Name|trimcontainername }}</a> &gt; Stats
+    <a ui-sref="docker.containers">Containers</a> &gt; <a ui-sref="docker.containers.container({id: container.Id})">{{ container.Name | trimcontainername }}</a> &gt; Stats
   </rd-header-content>
 </rd-header>
 
 <div class="row">
   <div class="col-md-12">
     <rd-widget>
-      <rd-widget-header icon="fa-info-circle" title-text="About statistics">
-      </rd-widget-header>
+      <rd-widget-header icon="fa-info-circle" title-text="About statistics"> </rd-widget-header>
       <rd-widget-body>
         <form class="form-horizontal">
           <div class="form-group">
             <div class="col-sm-12">
               <span class="small text-muted">
-                This view displays real-time statistics about the container <b>{{ container.Name|trimcontainername }}</b> as well as a list of the running processes
-                inside this container.
+                This view displays real-time statistics about the container <b>{{ container.Name | trimcontainername }}</b> as well as a list of the running processes inside this
+                container.
               </span>
             </div>
           </div>
@@ -40,9 +39,7 @@
           </div>
           <div class="form-group" ng-if="state.networkStatsUnavailable">
             <div class="col-sm-12">
-              <span class="small text-muted">
-                <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true"></i> Network stats are unavailable for this container.
-              </span>
+              <span class="small text-muted"> <i class="fa fa-exclamation-triangle orange-icon" aria-hidden="true"></i> Network stats are unavailable for this container. </span>
             </div>
           </div>
         </form>
@@ -52,7 +49,7 @@
 </div>
 
 <div class="row">
-  <div ng-class="{true: 'col-md-6 col-sm-12', false: 'col-lg-4 col-md-6 col-sm-12'}[state.networkStatsUnavailable]">
+  <div ng-class="{ true: 'col-md-6 col-sm-12', false: 'col-lg-4 col-md-6 col-sm-12' }[state.networkStatsUnavailable]">
     <rd-widget>
       <rd-widget-header icon="fa-chart-area" title-text="Memory usage"></rd-widget-header>
       <rd-widget-body>
@@ -62,7 +59,7 @@
       </rd-widget-body>
     </rd-widget>
   </div>
-  <div ng-class="{true: 'col-md-6 col-sm-12', false: 'col-lg-4 col-md-6 col-sm-12'}[state.networkStatsUnavailable]">
+  <div ng-class="{ true: 'col-md-6 col-sm-12', false: 'col-lg-4 col-md-6 col-sm-12' }[state.networkStatsUnavailable]">
     <rd-widget>
       <rd-widget-header icon="fa-chart-area" title-text="CPU usage"></rd-widget-header>
       <rd-widget-body>
@@ -85,9 +82,11 @@
 
   <div class="col-sm-12" ng-if="applicationState.endpoint.mode.provider !== 'VMWARE_VIC'">
     <container-processes-datatable
-    title-text="Processes" title-icon="fa-tasks"
-    dataset="processInfo.Processes" headerset="processInfo.Titles"
-    table-key="container-processes"
+      title-text="Processes"
+      title-icon="fa-tasks"
+      dataset="processInfo.Processes"
+      headerset="processInfo.Titles"
+      table-key="container-processes"
     ></container-processes-datatable>
   </div>
 </div>

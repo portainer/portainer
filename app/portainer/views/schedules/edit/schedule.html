@@ -5,7 +5,7 @@
     </a>
   </rd-header-title>
   <rd-header-content>
-    <a ui-sref="portainer.schedules">Schedules</a> &gt; {{ ::schedule.Name }}</a>
+    <a ui-sref="portainer.schedules">Schedules &gt; {{ ::schedule.Name }}</a>
   </rd-header-content>
 </rd-header>
 
@@ -13,12 +13,9 @@
   <div class="col-sm-12">
     <rd-widget>
       <rd-widget-body>
-
         <uib-tabset active="state.activeTab">
           <uib-tab index="0">
-            <uib-tab-heading>
-              <i class="fa fa-wrench" aria-hidden="true"></i> Configuration
-            </uib-tab-heading>
+            <uib-tab-heading> <i class="fa fa-wrench" aria-hidden="true"></i> Configuration </uib-tab-heading>
 
             <schedule-form
               ng-if="schedule"
@@ -31,11 +28,8 @@
             ></schedule-form>
           </uib-tab>
 
-
           <uib-tab index="1">
-            <uib-tab-heading>
-              <i class="fa fa-tasks" aria-hidden="true"></i> Tasks
-            </uib-tab-heading>
+            <uib-tab-heading> <i class="fa fa-tasks" aria-hidden="true"></i> Tasks </uib-tab-heading>
 
             <div class="col-sm-12 form-section-title">
               Information
@@ -51,15 +45,16 @@
             </div>
             <schedule-tasks-datatable
               ng-if="tasks"
-              title-text="Tasks" title-icon="fa-tasks"
+              title-text="Tasks"
+              title-icon="fa-tasks"
               dataset="tasks"
               table-key="schedule-tasks"
-              order-by="Status" reverse-order="true"
+              order-by="Status"
+              reverse-order="true"
               go-to-container-logs="goToContainerLogs"
               get-edge-task-logs="getEdgeTaskLogs"
             ></schedule-tasks-datatable>
           </uib-tab>
-
         </uib-tabset>
       </rd-widget-body>
     </rd-widget>

@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import {AccessControlFormData} from 'Portainer/components/accessControlForm/porAccessControlFormModel';
+import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
 
 import angular from 'angular';
 
@@ -16,14 +16,14 @@ class CreateConfigController {
     this.$async = $async;
 
     this.formValues = {
-      Name: "",
+      Name: '',
       Labels: [],
       AccessControlData: new AccessControlFormData(),
-      ConfigContent: ""
+      ConfigContent: '',
     };
 
     this.state = {
-      formValidationError: ""
+      formValidationError: '',
     };
 
     this.editorUpdate = this.editorUpdate.bind(this);
@@ -38,7 +38,7 @@ class CreateConfigController {
 
     try {
       let data = await this.ConfigService.config(this.$transition$.params().id);
-      this.formValues.Name = data.Name + "_copy";
+      this.formValues.Name = data.Name + '_copy';
       this.formValues.Data = data.Data;
       let labels = _.keys(data.Labels);
       for (let i = 0; i < labels.length; i++) {
@@ -49,12 +49,12 @@ class CreateConfigController {
       this.formValues.displayCodeEditor = true;
     } catch (err) {
       this.formValues.displayCodeEditor = true;
-      this.Notifications.error("Failure", err, "Unable to clone config");
+      this.Notifications.error('Failure', err, 'Unable to clone config');
     }
   }
 
   addLabel() {
-    this.formValues.Labels.push({ name: "", value: "" });
+    this.formValues.Labels.push({ name: '', value: '' });
   }
 
   removeLabel(index) {
@@ -63,7 +63,7 @@ class CreateConfigController {
 
   prepareLabelsConfig(config) {
     let labels = {};
-    this.formValues.Labels.forEach(function(label) {
+    this.formValues.Labels.forEach(function (label) {
       if (label.name && label.value) {
         labels[label.name] = label.value;
       }
@@ -85,12 +85,9 @@ class CreateConfigController {
   }
 
   validateForm(accessControlData, isAdmin) {
-    this.state.formValidationError = "";
-    let error = "";
-    error = this.FormValidator.validateAccessControl(
-      accessControlData,
-      isAdmin
-    );
+    this.state.formValidationError = '';
+    let error = '';
+    error = this.FormValidator.validateAccessControl(accessControlData, isAdmin);
 
     if (error) {
       this.state.formValidationError = error;
@@ -108,8 +105,8 @@ class CreateConfigController {
     const userDetails = this.Authentication.getUserDetails();
     const isAdmin = this.Authentication.isAdmin();
 
-    if (this.formValues.ConfigContent === "") {
-      this.state.formValidationError = "Config content must not be empty";
+    if (this.formValues.ConfigContent === '') {
+      this.state.formValidationError = 'Config content must not be empty';
       return;
     }
 
@@ -124,10 +121,10 @@ class CreateConfigController {
       const resourceControl = data.Portainer.ResourceControl;
       const userId = userDetails.ID;
       await this.ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
-      this.Notifications.success("Config successfully created");
-      this.$state.go("docker.configs", {}, { reload: true });
+      this.Notifications.success('Config successfully created');
+      this.$state.go('docker.configs', {}, { reload: true });
     } catch (err) {
-      this.Notifications.error("Failure", err, "Unable to create config");
+      this.Notifications.error('Failure', err, 'Unable to create config');
     }
   }
 
@@ -137,6 +134,4 @@ class CreateConfigController {
 }
 
 export default CreateConfigController;
-angular
-  .module("portainer.docker")
-  .controller("CreateConfigController", CreateConfigController);
+angular.module('portainer.docker').controller('CreateConfigController', CreateConfigController);

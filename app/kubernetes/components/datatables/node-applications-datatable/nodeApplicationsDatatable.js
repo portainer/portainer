@@ -8,6 +8,6 @@ angular.module('portainer.kubernetes').component('kubernetesNodeApplicationsData
     tableKey: '@',
     orderBy: '@',
     reverseOrder: '<',
-    refreshCallback: '<'
-  }
+    refreshCallback: '<',
+  },
 });

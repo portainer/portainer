@@ -60,7 +60,7 @@ class KubernetesPodService {
       const params = new KubernetesCommonParams();
       params.id = pod.Name;
       const namespace = pod.Namespace;
-      await this.KubernetesPods(namespace).delete(params).$promise
+      await this.KubernetesPods(namespace).delete(params).$promise;
     } catch (err) {
       throw new PortainerError('Unable to remove pod', err);
     }

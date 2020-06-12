@@ -9,6 +9,6 @@ angular.module('portainer.kubernetes').component('kubernetesApplicationsStacksDa
     orderBy: '@',
     reverseOrder: '<',
     refreshCallback: '<',
-    removeAction: '<'
-  }
+    removeAction: '<',
+  },
 });

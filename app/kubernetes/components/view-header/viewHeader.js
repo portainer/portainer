@@ -4,6 +4,6 @@ angular.module('portainer.kubernetes').component('kubernetesViewHeader', {
   bindings: {
     viewReady: '<',
     title: '@',
-    state: '@'
-  }
+    state: '@',
+  },
 });

@@ -1,7 +1,6 @@
 import _ from 'lodash-es';
 
 class KubernetesDaemonSetHistoryHelper {
-
   static _isControlledBy(daemonSet) {
     return (item) => _.find(item.metadata.ownerReferences, { uid: daemonSet.metadata.uid }) !== undefined;
   }

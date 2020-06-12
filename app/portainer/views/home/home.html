@@ -7,17 +7,12 @@
   <rd-header-content>Endpoints</rd-header-content>
 </rd-header>
 
-<motd-panel
-  ng-if="motd && motd.Message !== '' && applicationState.UI.dismissedInfoHash !== motd.Hash"
-  motd="motd"
-  dismiss-action="dismissImportantInformation(motd.Hash)">
+<motd-panel ng-if="motd && motd.Message !== '' && applicationState.UI.dismissedInfoHash !== motd.Hash" motd="motd" dismiss-action="dismissImportantInformation(motd.Hash)">
 </motd-panel>
 
 <kubernetes-feedback-panel></kubernetes-feedback-panel>
 
-<information-panel
-  ng-if="!isAdmin && endpoints.length === 0"
-  title-text="Information">
+<information-panel ng-if="!isAdmin && endpoints.length === 0" title-text="Information">
   <span class="small text-muted">
     <p>
       <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -26,16 +21,22 @@
   </span>
 </information-panel>
 
-<div class="row" style="width:100%; height:100%; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;" ng-if="state.connectingToEdgeEndpoint">
+<div
+  class="row"
+  style="width: 100%; height: 100%; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;"
+  ng-if="state.connectingToEdgeEndpoint"
+>
   Connecting to the Edge endpoint...
-  <i class="fa fa-cog fa-spin" style="margin-left: 5px"></i>
+  <i class="fa fa-cog fa-spin" style="margin-left: 5px;"></i>
 </div>
 
 <div class="row" ng-if="!state.connectingToEdgeEndpoint">
   <div class="col-sm-12">
     <endpoint-list
-      title-text="Endpoints" title-icon="fa-plug"
-      endpoints="endpoints" table-key="home_endpoints"
+      title-text="Endpoints"
+      title-icon="fa-plug"
+      endpoints="endpoints"
+      table-key="home_endpoints"
       dashboard-action="goToDashboard"
       show-snapshot-action="!applicationState.application.authentication || isAdmin"
       snapshot-action="triggerSnapshot"

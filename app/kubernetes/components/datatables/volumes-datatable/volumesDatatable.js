@@ -9,6 +9,6 @@ angular.module('portainer.kubernetes').component('kubernetesVolumesDatatable', {
     orderBy: '@',
     reverseOrder: '<',
     removeAction: '<',
-    refreshCallback: '<'
-  }
+    refreshCallback: '<',
+  },
 });

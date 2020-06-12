@@ -1,5 +1,5 @@
 import angular from 'angular';
-import {Terminal} from 'xterm';
+import { Terminal } from 'xterm';
 
 class KubernetesApplicationConsoleController {
   /* @ngInject */
@@ -21,7 +21,7 @@ class KubernetesApplicationConsoleController {
   }
 
   configureSocketAndTerminal(socket, term) {
-    socket.onopen = function() {
+    socket.onopen = function () {
       const terminal_container = document.getElementById('terminal-container');
       term.open(terminal_container);
       term.setOption('cursorBlink', true);
@@ -38,7 +38,7 @@ class KubernetesApplicationConsoleController {
 
     socket.onerror = function (err) {
       this.disconnect();
-      this.Notifications.error("Failure", err, "Websocket connection error");
+      this.Notifications.error('Failure', err, 'Websocket connection error');
     }.bind(this);
 
     this.state.socket.onclose = function () {
@@ -55,10 +55,15 @@ class KubernetesApplicationConsoleController {
       namespace: this.application.ResourcePool,
       podName: this.podName,
       containerName: this.application.Pods[0].Containers[0].name,
-      command: this.state.command
+      command: this.state.command,
     };
 
-    let url = window.location.href.split('#')[0] + 'api/websocket/pod?' + (Object.keys(params).map((k) => k + "=" + params[k]).join("&"));
+    let url =
+      window.location.href.split('#')[0] +
+      'api/websocket/pod?' +
+      Object.keys(params)
+        .map((k) => k + '=' + params[k])
+        .join('&');
     if (url.indexOf('https') > -1) {
       url = url.replace('https://', 'wss://');
     } else {
@@ -81,7 +86,7 @@ class KubernetesApplicationConsoleController {
       connected: false,
       socket: null,
       term: null,
-      viewReady: false
+      viewReady: false,
     };
 
     const podName = this.$transition$.params().pod;

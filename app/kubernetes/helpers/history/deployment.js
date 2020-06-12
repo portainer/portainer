@@ -3,7 +3,6 @@ import angular from 'angular';
 import { KubernetesSystem_DefaultDeploymentUniqueLabelKey, KubernetesSystem_RevisionAnnotation } from 'Kubernetes/models/history/models';
 
 class KubernetesDeploymentHistoryHelper {
-
   static _isControlledBy(deployment) {
     return (item) => _.find(item.metadata.ownerReferences, { uid: deployment.metadata.uid }) !== undefined;
   }

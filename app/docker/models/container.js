@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import {ResourceControlViewModel} from 'Portainer/models/resourceControl/resourceControl';
+import { ResourceControlViewModel } from 'Portainer/models/resourceControl/resourceControl';
 
 export function createStatus(statusText) {
   var status = _.toLower(statusText);
@@ -68,12 +68,14 @@ export function ContainerViewModel(data) {
 export function ContainerStatsViewModel(data) {
   this.read = data.read;
   this.preread = data.preread;
-  if(data.memory_stats.privateworkingset !== undefined) { // Windows
+  if (data.memory_stats.privateworkingset !== undefined) {
+    // Windows
     this.MemoryUsage = data.memory_stats.privateworkingset;
     this.MemoryCache = 0;
     this.NumProcs = data.num_procs;
     this.isWindows = true;
-  } else { // Linux
+  } else {
+    // Linux
     if (data.memory_stats.stats === undefined || data.memory_stats.usage === undefined) {
       this.MemoryUsage = this.MemoryCache = 0;
     } else {

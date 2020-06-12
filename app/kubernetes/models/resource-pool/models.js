@@ -1,6 +1,6 @@
-export const KubernetesPortainerResourcePoolNameLabel = "io.portainer.kubernetes.resourcepool.name";
+export const KubernetesPortainerResourcePoolNameLabel = 'io.portainer.kubernetes.resourcepool.name';
 
-export const KubernetesPortainerResourcePoolOwnerLabel = "io.portainer.kubernetes.resourcepool.owner";
+export const KubernetesPortainerResourcePoolOwnerLabel = 'io.portainer.kubernetes.resourcepool.owner';
 
 /**
  * KubernetesResourcePool Model (Composite)
@@ -10,7 +10,7 @@ export const KubernetesPortainerResourcePoolOwnerLabel = "io.portainer.kubernete
 const _KubernetesResourcePool = Object.freeze({
   Namespace: {}, // KubernetesNamespace
   Quota: undefined, // KubernetesResourceQuota
-  Yaml: ''
+  Yaml: '',
 });
 
 export class KubernetesResourcePool {

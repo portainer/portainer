@@ -1,10 +1,10 @@
-import { KubernetesCommonMetadataPayload } from "../common/payloads";
+import { KubernetesCommonMetadataPayload } from '../common/payloads';
 
 /**
  * KubernetesNamespaceCreatePayload Model
  */
 const _KubernetesNamespaceCreatePayload = Object.freeze({
-  metadata: new KubernetesCommonMetadataPayload()
+  metadata: new KubernetesCommonMetadataPayload(),
 });
 
 export class KubernetesNamespaceCreatePayload {

@@ -1,7 +1,6 @@
 import _ from 'lodash-es';
 
 class KubernetesStatefulSetHistoryHelper {
-
   static _isControlledBy(statefulSet) {
     return (item) => _.find(item.metadata.ownerReferences, { uid: statefulSet.metadata.uid }) !== undefined;
   }

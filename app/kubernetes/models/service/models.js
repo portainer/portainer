@@ -2,7 +2,7 @@ export const KubernetesServiceHeadlessPrefix = 'headless-';
 export const KubernetesServiceHeadlessClusterIP = 'None';
 export const KubernetesServiceTypes = Object.freeze({
   LOAD_BALANCER: 'LoadBalancer',
-  NODE_PORT: 'NodePort'
+  NODE_PORT: 'NodePort',
 });
 
 /**
@@ -18,7 +18,7 @@ const _KubernetesService = Object.freeze({
   ClusterIP: '',
   ApplicationName: '',
   ApplicationOwner: '',
-  Note: ''
+  Note: '',
 });
 
 export class KubernetesService {
@@ -35,7 +35,7 @@ const _KubernetesServicePort = Object.freeze({
   port: 0,
   targetPort: 0,
   protocol: '',
-  nodePort: 0
+  nodePort: 0,
 });
 
 export class KubernetesServicePort {

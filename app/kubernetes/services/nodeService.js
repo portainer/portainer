@@ -22,10 +22,7 @@ class KubernetesNodeService {
     try {
       const params = new KubernetesCommonParams();
       params.id = name;
-      const [details, yaml] = await Promise.all([
-        this.KubernetesNodes().get(params).$promise,
-        this.KubernetesNodes().getYaml(params).$promise
-      ]);
+      const [details, yaml] = await Promise.all([this.KubernetesNodes().get(params).$promise, this.KubernetesNodes().getYaml(params).$promise]);
       return KubernetesNodeConverter.apiToNodeDetails(details, yaml);
     } catch (err) {
       throw new PortainerError('Unable to retrieve node details', err);
@@ -37,7 +34,7 @@ class KubernetesNodeService {
       const data = await this.KubernetesNodes().get().$promise;
       return _.map(data.items, (item) => KubernetesNodeConverter.apiToNode(item));
     } catch (err) {
-      throw {msg: 'Unable to retrieve nodes', err:err};
+      throw { msg: 'Unable to retrieve nodes', err: err };
     }
   }
 

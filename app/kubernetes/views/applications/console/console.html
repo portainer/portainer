@@ -1,5 +1,9 @@
 <kubernetes-view-header title="Application console" state="kubernetes.applications.application.console" view-ready="ctrl.state.viewReady">
-  <a ui-sref="kubernetes.resourcePools">Resource pools</a> &gt; <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.application.ResourcePool })">{{ ctrl.application.ResourcePool }}</a> &gt; <a ui-sref="kubernetes.applications">Applications</a> &gt; <a ui-sref="kubernetes.applications.application({ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool })">{{ ctrl.application.Name }}</a> &gt; Pods &gt; {{ ctrl.podName }} &gt; Console
+  <a ui-sref="kubernetes.resourcePools">Resource pools</a> &gt;
+  <a ui-sref="kubernetes.resourcePools.resourcePool({ id: ctrl.application.ResourcePool })">{{ ctrl.application.ResourcePool }}</a> &gt;
+  <a ui-sref="kubernetes.applications">Applications</a> &gt;
+  <a ui-sref="kubernetes.applications.application({ name: ctrl.application.Name, namespace: ctrl.application.ResourcePool })">{{ ctrl.application.Name }}</a> &gt; Pods &gt;
+  {{ ctrl.podName }} &gt; Console
 </kubernetes-view-header>
 
 <kubernetes-view-loading view-ready="ctrl.state.viewReady"></kubernetes-view-loading>
@@ -27,7 +31,8 @@
                   ng-model="ctrl.state.command"
                   name="console_command"
                   uib-typeahead="command for command in ctrl.state.availableCommands | filter:$viewValue | limitTo:5"
-                  typeahead-show-hint="true" typeahead-min-length="0"
+                  typeahead-show-hint="true"
+                  typeahead-min-length="0"
                   auto-focus
                 />
               </div>
@@ -35,16 +40,19 @@
             <!-- !command -->
             <div class="form-group">
               <div class="col-sm-12">
-                <button type="button" class="btn btn-primary btn-sm" style="margin: 0;"
-                        ng-if="!ctrl.state.connected"
-                        ng-disabled="!ctrl.state.command || ctrl.state.connected"
-                        ng-click="ctrl.connectConsole()" button-spinner="ctrl.state.actionInProgress">
+                <button
+                  type="button"
+                  class="btn btn-primary btn-sm"
+                  style="margin: 0;"
+                  ng-if="!ctrl.state.connected"
+                  ng-disabled="!ctrl.state.command || ctrl.state.connected"
+                  ng-click="ctrl.connectConsole()"
+                  button-spinner="ctrl.state.actionInProgress"
+                >
                   <span ng-hide="ctrl.state.actionInProgress">Connect</span>
                   <span ng-show="ctrl.state.actionInProgress">Connection in progress...</span>
                 </button>
-                <button type="button" class="btn btn-primary btn-sm" style="margin: 0;"
-                        ng-if="ctrl.state.connected"
-                        ng-click="ctrl.disconnect()">
+                <button type="button" class="btn btn-primary btn-sm" style="margin: 0;" ng-if="ctrl.state.connected" ng-click="ctrl.disconnect()">
                   Disconnect
                 </button>
               </div>

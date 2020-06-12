@@ -18,7 +18,7 @@ class KubernetesConfigMapHelper {
   static modifiyNamespaceAccesses(configMap, namespace, accesses) {
     configMap.Data[KubernetesPortainerConfigMapAccessKey][namespace] = {
       UserAccessPolicies: {},
-      TeamAccessPolicies: {}
+      TeamAccessPolicies: {},
     };
     _.forEach(accesses, (item) => {
       if (item instanceof UserAccessViewModel) {

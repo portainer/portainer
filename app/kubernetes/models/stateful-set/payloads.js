@@ -1,4 +1,4 @@
-import { KubernetesCommonMetadataPayload } from "Kubernetes/models/common/payloads";
+import { KubernetesCommonMetadataPayload } from 'Kubernetes/models/common/payloads';
 
 /**
  * KubernetesStatefulSetCreatePayload Model
@@ -10,21 +10,21 @@ const _KubernetesStatefulSetCreatePayload = Object.freeze({
     serviceName: '',
     selector: {
       matchLabels: {
-        app: ''
-      }
+        app: '',
+      },
     },
     volumeClaimTemplates: [],
     updateStrategy: {
       type: 'RollingUpdate',
       rollingUpdate: {
-        partition: 0
-      }
+        partition: 0,
+      },
     },
     template: {
       metadata: {
         labels: {
-          app: ''
-        }
+          app: '',
+        },
       },
       spec: {
         containers: [
@@ -34,15 +34,15 @@ const _KubernetesStatefulSetCreatePayload = Object.freeze({
             env: [],
             resources: {
               limits: {},
-              requests: {}
+              requests: {},
             },
-            volumeMounts: []
-          }
+            volumeMounts: [],
+          },
         ],
-        volumes: []
-      }
-    }
-  }
+        volumes: [],
+      },
+    },
+  },
 });
 
 export class KubernetesStatefulSetCreatePayload {

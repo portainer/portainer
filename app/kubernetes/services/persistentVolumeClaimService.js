@@ -24,7 +24,7 @@ class KubernetesPersistentVolumeClaimService {
       params.id = name;
       const [raw, yaml] = await Promise.all([
         this.KubernetesPersistentVolumeClaims(namespace).get(params).$promise,
-        this.KubernetesPersistentVolumeClaims(namespace).getYaml(params).$promise
+        this.KubernetesPersistentVolumeClaims(namespace).getYaml(params).$promise,
       ]);
       const storageClasses = this.EndpointProvider.currentEndpoint().Kubernetes.Configuration.StorageClasses;
       return KubernetesPersistentVolumeClaimConverter.apiToPersistentVolumeClaim(raw, storageClasses, yaml);

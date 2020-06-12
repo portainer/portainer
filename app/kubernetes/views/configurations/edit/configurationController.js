@@ -1,13 +1,24 @@
 import angular from 'angular';
-import {KubernetesConfigurationFormValues, KubernetesConfigurationFormValuesDataEntry} from 'Kubernetes/models/configuration/formvalues';
-import {KubernetesConfigurationTypes} from 'Kubernetes/models/configuration/models';
+import { KubernetesConfigurationFormValues, KubernetesConfigurationFormValuesDataEntry } from 'Kubernetes/models/configuration/formvalues';
+import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
 import KubernetesConfigurationHelper from 'Kubernetes/helpers/configurationHelper';
 import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 import _ from 'lodash-es';
 
 class KubernetesConfigurationController {
   /* @ngInject */
-  constructor($async, $state, Notifications, LocalStorage, KubernetesConfigurationService, KubernetesResourcePoolService, ModalService, KubernetesApplicationService, KubernetesEventService, KubernetesNamespaceHelper) {
+  constructor(
+    $async,
+    $state,
+    Notifications,
+    LocalStorage,
+    KubernetesConfigurationService,
+    KubernetesResourcePoolService,
+    ModalService,
+    KubernetesApplicationService,
+    KubernetesEventService,
+    KubernetesNamespaceHelper
+  ) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
@@ -54,20 +65,28 @@ class KubernetesConfigurationController {
   async updateConfigurationAsync() {
     try {
       this.state.actionInProgress = true;
-      if (this.formValues.Type !== this.configuration.Type || this.formValues.ResourcePool.Namespace.Name !== this.configuration.Namespace || this.formValues.Name !== this.configuration.Name) {
+      if (
+        this.formValues.Type !== this.configuration.Type ||
+        this.formValues.ResourcePool.Namespace.Name !== this.configuration.Namespace ||
+        this.formValues.Name !== this.configuration.Name
+      ) {
         await this.KubernetesConfigurationService.create(this.formValues);
         await this.KubernetesConfigurationService.delete(this.configuration);
         this.Notifications.success('Configuration succesfully updated');
-        this.$state.go('kubernetes.configurations.configuration', {
-          namespace: this.formValues.ResourcePool.Namespace.Name,
-          name: this.formValues.Name
-        }, {reload: true});
+        this.$state.go(
+          'kubernetes.configurations.configuration',
+          {
+            namespace: this.formValues.ResourcePool.Namespace.Name,
+            name: this.formValues.Name,
+          },
+          { reload: true }
+        );
       } else {
         await this.KubernetesConfigurationService.update(this.formValues);
         this.Notifications.success('Configuration succesfully updated');
         this.$state.reload();
       }
-    } catch(err) {
+    } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to update configuration');
     } finally {
       this.state.actionInProgress = false;
@@ -96,7 +115,7 @@ class KubernetesConfigurationController {
       const name = this.$transition$.params().name;
       const namespace = this.$transition$.params().namespace;
       this.configuration = await this.KubernetesConfigurationService.get(namespace, name);
-    } catch(err) {
+    } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve configuration');
     } finally {
       this.state.configurationLoading = false;
@@ -110,10 +129,10 @@ class KubernetesConfigurationController {
   async getApplicationsAsync(namespace) {
     try {
       this.state.applicationsLoading = true;
-      const applications  = await this.KubernetesApplicationService.get(namespace);
+      const applications = await this.KubernetesApplicationService.get(namespace);
       this.configuration.Applications = KubernetesConfigurationHelper.getUsingApplications(this.configuration, applications);
       KubernetesConfigurationHelper.setConfigurationUsed(this.configuration);
-    } catch(err) {
+    } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve applications');
     } finally {
       this.state.applicationsLoading = false;
@@ -134,7 +153,7 @@ class KubernetesConfigurationController {
       this.events = await this.KubernetesEventService.get(namespace);
       this.events = _.filter(this.events, (event) => event.Involved.uid === this.configuration.Id);
       this.state.eventWarningCount = KubernetesEventHelper.warningCount(this.events);
-    } catch(err) {
+    } catch (err) {
       this.Notifications('Failure', err, 'Unable to retrieve events');
     } finally {
       this.state.eventsLoading = false;
@@ -154,7 +173,7 @@ class KubernetesConfigurationController {
   }
 
   getConfigurations() {
-    return this.$async(this.getConfigurationsAsync)
+    return this.$async(this.getConfigurationsAsync);
   }
 
   async onInit() {
@@ -169,7 +188,7 @@ class KubernetesConfigurationController {
         eventWarningCount: 0,
         activeTab: 0,
         currentName: this.$state.$current.name,
-        isDataValid: true
+        isDataValid: true,
       };
 
       this.state.activeTab = this.LocalStorage.getActiveTab('configuration');
@@ -195,7 +214,7 @@ class KubernetesConfigurationController {
         return entry;
       });
       await this.getConfigurations();
-    } catch(err) {
+    } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
     } finally {
       this.state.viewReady = true;

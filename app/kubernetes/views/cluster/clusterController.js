@@ -2,7 +2,7 @@ import angular from 'angular';
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
-import {KubernetesResourceReservation} from 'Kubernetes/models/resource-reservation/models';
+import { KubernetesResourceReservation } from 'Kubernetes/models/resource-reservation/models';
 
 class KubernetesClusterController {
   /* @ngInject */
@@ -22,7 +22,7 @@ class KubernetesClusterController {
   async getNodesAsync() {
     try {
       const nodes = await this.KubernetesNodeService.get();
-      _.forEach(nodes, (node) => node.Memory = filesizeParser(node.Memory));
+      _.forEach(nodes, (node) => (node.Memory = filesizeParser(node.Memory)));
       this.nodes = nodes;
       this.CPULimit = _.reduce(this.nodes, (acc, node) => node.CPU + acc, 0);
       this.MemoryLimit = _.reduce(this.nodes, (acc, node) => KubernetesResourceReservationHelper.megaBytesValue(node.Memory) + acc, 0);
@@ -40,15 +40,19 @@ class KubernetesClusterController {
       this.state.applicationsLoading = true;
       this.applications = await this.KubernetesApplicationService.get();
       const nodeNames = _.map(this.nodes, (node) => node.Name);
-      this.resourceReservation = _.reduce(this.applications, (acc, app) => {
-        app.Pods = _.filter(app.Pods, (pod) => nodeNames.includes(pod.Node));
-        const resourceReservation = KubernetesResourceReservationHelper.computeResourceReservation(app.Pods);
-        acc.CPU += resourceReservation.CPU;
-        acc.Memory += resourceReservation.Memory;
-        return acc;
-      }, new KubernetesResourceReservation());
+      this.resourceReservation = _.reduce(
+        this.applications,
+        (acc, app) => {
+          app.Pods = _.filter(app.Pods, (pod) => nodeNames.includes(pod.Node));
+          const resourceReservation = KubernetesResourceReservationHelper.computeResourceReservation(app.Pods);
+          acc.CPU += resourceReservation.CPU;
+          acc.Memory += resourceReservation.Memory;
+          return acc;
+        },
+        new KubernetesResourceReservation()
+      );
       this.resourceReservation.Memory = KubernetesResourceReservationHelper.megaBytesValue(this.resourceReservation.Memory);
-    } catch(err) {
+    } catch (err) {
       this.Notifications.error('Failure', 'Unable to retrieve applications', err);
     } finally {
       this.state.applicationsLoading = false;
@@ -62,7 +66,7 @@ class KubernetesClusterController {
   async onInit() {
     this.state = {
       applicationsLoading: true,
-      viewReady: false
+      viewReady: false,
     };
 
     this.isAdmin = this.Authentication.isAdmin();

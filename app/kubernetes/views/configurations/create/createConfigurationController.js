@@ -1,7 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
-import {KubernetesConfigurationFormValues, KubernetesConfigurationFormValuesDataEntry} from 'Kubernetes/models/configuration/formvalues';
-import {KubernetesConfigurationTypes} from 'Kubernetes/models/configuration/models';
+import { KubernetesConfigurationFormValues, KubernetesConfigurationFormValuesDataEntry } from 'Kubernetes/models/configuration/formvalues';
+import { KubernetesConfigurationTypes } from 'Kubernetes/models/configuration/models';
 
 class KubernetesCreateConfigurationController {
   /* @ngInject */
@@ -39,7 +39,7 @@ class KubernetesCreateConfigurationController {
       await this.KubernetesConfigurationService.create(this.formValues);
       this.Notifications.success('Configuration succesfully created');
       this.$state.go('kubernetes.configurations');
-    } catch(err) {
+    } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to create configuration');
     } finally {
       this.state.actionInProgress = false;
@@ -59,7 +59,7 @@ class KubernetesCreateConfigurationController {
   }
 
   getConfigurations() {
-    return this.$async(this.getConfigurationsAsync)
+    return this.$async(this.getConfigurationsAsync);
   }
 
   async onInit() {
@@ -67,7 +67,7 @@ class KubernetesCreateConfigurationController {
       actionInProgress: false,
       viewReady: false,
       alreadyExist: false,
-      isDataValid: true
+      isDataValid: true,
     };
 
     this.formValues = new KubernetesConfigurationFormValues();
@@ -77,7 +77,7 @@ class KubernetesCreateConfigurationController {
       this.resourcePools = await this.KubernetesResourcePoolService.get();
       this.formValues.ResourcePool = this.resourcePools[0];
       await this.getConfigurations();
-    } catch(err) {
+    } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to load view data');
     } finally {
       this.state.viewReady = true;

@@ -12,18 +12,16 @@ var patterns = {
     nodeHostname: 'node.hostname',
     nodeRole: 'node.role',
     nodeLabels: 'node.labels.',
-    engineLabels: 'engine.labels.'
+    engineLabels: 'engine.labels.',
   },
   op: {
     eq: '==',
-    neq: '!='
-  }
+    neq: '!=',
+  },
 };
 
 function matchesConstraint(value, constraint) {
-  if (!constraint ||
-    (constraint.op === patterns.op.eq && value === constraint.value) ||
-    (constraint.op === patterns.op.neq && value !== constraint.value)) {
+  if (!constraint || (constraint.op === patterns.op.eq && value === constraint.value) || (constraint.op === patterns.op.neq && value !== constraint.value)) {
     return true;
   }
   return false;
@@ -47,8 +45,8 @@ function extractCustomLabelKey(constraint, op, baseLabelKey) {
   return constraint.split(op).shift().trim().replace(baseLabelKey, '');
 }
 
-angular.module('portainer.docker')
-  .factory('ConstraintsHelper', [function ConstraintsHelperFactory() {
+angular.module('portainer.docker').factory('ConstraintsHelper', [
+  function ConstraintsHelperFactory() {
     'use strict';
     return {
       transformConstraints: function (constraints) {
@@ -94,7 +92,8 @@ angular.module('portainer.docker')
           return true;
         }
         var constraints = this.transformConstraints(angular.copy(service.Constraints));
-        if (matchesConstraint(node.Id, constraints.nodeId) &&
+        if (
+          matchesConstraint(node.Id, constraints.nodeId) &&
           matchesConstraint(node.Hostname, constraints.nodeHostname) &&
           matchesConstraint(node.Role, constraints.nodeRole) &&
           matchesLabel(node.Labels, constraints.nodeLabels) &&
@@ -103,6 +102,7 @@ angular.module('portainer.docker')
           return true;
         }
         return false;
-      }
+      },
     };
-  }]);
+  },
+]);

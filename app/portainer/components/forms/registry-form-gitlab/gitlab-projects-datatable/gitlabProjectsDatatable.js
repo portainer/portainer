@@ -8,6 +8,6 @@ angular.module('portainer.app').component('gitlabProjectsDatatable', {
     tableKey: '@',
     orderBy: '@',
     reverseOrder: '<',
-    state: '='
-  }
+    state: '=',
+  },
 });

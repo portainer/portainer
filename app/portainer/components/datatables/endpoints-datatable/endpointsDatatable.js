@@ -10,6 +10,6 @@ angular.module('portainer.app').component('endpointsDatatable', {
     endpointManagement: '<',
     accessManagement: '<',
     removeAction: '<',
-    retrievePage: '<'
-  }
+    retrievePage: '<',
+  },
 });

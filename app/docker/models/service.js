@@ -1,4 +1,4 @@
-import {ResourceControlViewModel} from 'Portainer/models/resourceControl/resourceControl';
+import { ResourceControlViewModel } from 'Portainer/models/resourceControl/resourceControl';
 
 export function ServiceViewModel(data, runningTasks, allTasks) {
   this.Model = data;
@@ -10,7 +10,7 @@ export function ServiceViewModel(data, runningTasks, allTasks) {
   this.Image = data.Spec.TaskTemplate.ContainerSpec.Image;
   this.Version = data.Version.Index;
   if (data.Spec.Mode.Replicated) {
-    this.Mode = 'replicated' ;
+    this.Mode = 'replicated';
     this.Replicas = data.Spec.Mode.Replicated.Replicas;
   } else {
     this.Mode = 'global';
@@ -23,12 +23,12 @@ export function ServiceViewModel(data, runningTasks, allTasks) {
   }
   if (data.Spec.TaskTemplate.Resources) {
     if (data.Spec.TaskTemplate.Resources.Limits) {
-    this.LimitNanoCPUs = data.Spec.TaskTemplate.Resources.Limits.NanoCPUs;
-    this.LimitMemoryBytes = data.Spec.TaskTemplate.Resources.Limits.MemoryBytes;
+      this.LimitNanoCPUs = data.Spec.TaskTemplate.Resources.Limits.NanoCPUs;
+      this.LimitMemoryBytes = data.Spec.TaskTemplate.Resources.Limits.MemoryBytes;
     }
     if (data.Spec.TaskTemplate.Resources.Reservations) {
-    this.ReservationNanoCPUs = data.Spec.TaskTemplate.Resources.Reservations.NanoCPUs;
-    this.ReservationMemoryBytes = data.Spec.TaskTemplate.Resources.Reservations.MemoryBytes;
+      this.ReservationNanoCPUs = data.Spec.TaskTemplate.Resources.Reservations.NanoCPUs;
+      this.ReservationMemoryBytes = data.Spec.TaskTemplate.Resources.Reservations.MemoryBytes;
     }
   }
 
@@ -92,7 +92,7 @@ export function ServiceViewModel(data, runningTasks, allTasks) {
   this.VirtualIPs = data.Endpoint ? data.Endpoint.VirtualIPs : [];
 
   if (data.Spec.UpdateConfig) {
-    this.UpdateParallelism = (typeof data.Spec.UpdateConfig.Parallelism !== undefined) ? data.Spec.UpdateConfig.Parallelism || 0 : 1;
+    this.UpdateParallelism = typeof data.Spec.UpdateConfig.Parallelism !== undefined ? data.Spec.UpdateConfig.Parallelism || 0 : 1;
     this.UpdateDelay = data.Spec.UpdateConfig.Delay || 0;
     this.UpdateFailureAction = data.Spec.UpdateConfig.FailureAction || 'pause';
     this.UpdateOrder = data.Spec.UpdateConfig.Order || 'stop-first';

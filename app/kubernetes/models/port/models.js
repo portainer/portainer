@@ -4,7 +4,7 @@
 const _KubernetesPortMappingPort = Object.freeze({
   Port: 0,
   TargetPort: 0,
-  Protocol: ''
+  Protocol: '',
 });
 
 export class KubernetesPortMappingPort {
@@ -23,7 +23,7 @@ const _KubernetesPortMapping = Object.freeze({
   ServiceType: '',
   ApplicationOwner: '',
   LoadBalancerIPAddress: '',
-  Ports: []
+  Ports: [],
 });
 
 export class KubernetesPortMapping {

@@ -1,18 +1,17 @@
 /**
  * KubernetesStorageClassAccessPolicies Model
  */
-const _KubernetesStorageClassAccessPolicies = Object.freeze(
-[
+const _KubernetesStorageClassAccessPolicies = Object.freeze([
   {
-    Name: "RWO",
-    Description: "Allow read-write from a single pod only (RWO)",
+    Name: 'RWO',
+    Description: 'Allow read-write from a single pod only (RWO)',
     selected: true,
   },
   {
-    Name: "RWX",
-    Description: "Allow read-write access from one or more pods concurrently (RWX)",
+    Name: 'RWX',
+    Description: 'Allow read-write access from one or more pods concurrently (RWX)',
     selected: false,
-  }
+  },
 ]);
 
 export function KubernetesStorageClassAccessPolicies() {
@@ -24,7 +23,7 @@ export function KubernetesStorageClassAccessPolicies() {
  */
 const _KubernetesStorageClass = Object.freeze({
   Name: '',
-  AccessModes: []
+  AccessModes: [],
 });
 
 export class KubernetesStorageClass {

@@ -12,6 +12,6 @@ angular.module('portainer.integrations.storidge').component('storidgeDrivesDatat
     addAction: '<',
     rescanAction: '<',
     actionInProgress: '<',
-    additionInProgress: '<'
-  }
+    additionInProgress: '<',
+  },
 });

@@ -49,7 +49,7 @@ class KubernetesApplicationLogsController {
       autoRefresh: false,
       refreshRate: 5000, // 5 seconds
       search: '',
-      viewReady: false
+      viewReady: false,
     };
 
     const podName = this.$transition$.params().pod;
@@ -62,7 +62,7 @@ class KubernetesApplicationLogsController {
     try {
       const [application, applicationLogs] = await Promise.all([
         this.KubernetesApplicationService.get(namespace, applicationName),
-        this.KubernetesPodService.logs(namespace, podName)
+        this.KubernetesPodService.logs(namespace, podName),
       ]);
 
       this.application = application;

@@ -11,7 +11,7 @@
       <p>There are no environment variables for this service.</p>
     </rd-widget-body>
     <rd-widget-body ng-if="service.EnvironmentVariables.length > 0" classes="no-padding">
-      <table class="table" >
+      <table class="table">
         <thead>
           <tr>
             <th>Name</th>
@@ -23,13 +23,13 @@
             <td>
               <div class="input-group input-group-sm">
                 <span class="input-group-addon fit-text-size">name</span>
-                <input type="text" class="form-control" ng-model="var.key" ng-disabled="var.added || isUpdating" placeholder="e.g. FOO">
+                <input type="text" class="form-control" ng-model="var.key" ng-disabled="var.added || isUpdating" placeholder="e.g. FOO" />
               </div>
             </td>
             <td>
               <div class="input-group input-group-sm">
                 <span class="input-group-addon fit-text-size">value</span>
-                <input type="text" class="form-control" ng-model="var.value" ng-change="updateEnvironmentVariable(service, var)" placeholder="e.g. bar" ng-disabled="isUpdating">
+                <input type="text" class="form-control" ng-model="var.value" ng-change="updateEnvironmentVariable(service, var)" placeholder="e.g. bar" ng-disabled="isUpdating" />
                 <span class="input-group-btn" authorization="DockerServiceUpdate">
                   <button class="btn btn-sm btn-danger" type="button" ng-click="removeEnvironmentVariable(service, $index)" ng-disabled="isUpdating">
                     <i class="fa fa-trash" aria-hidden="true"></i>

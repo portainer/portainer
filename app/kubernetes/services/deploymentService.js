@@ -24,20 +24,17 @@ class KubernetesDeploymentService {
     try {
       const params = new KubernetesCommonParams();
       params.id = name;
-      const [raw, yaml] = await Promise.all([
-        this.KubernetesDeployments(namespace).get(params).$promise,
-        this.KubernetesDeployments(namespace).getYaml(params).$promise
-      ]);
+      const [raw, yaml] = await Promise.all([this.KubernetesDeployments(namespace).get(params).$promise, this.KubernetesDeployments(namespace).getYaml(params).$promise]);
       const res = {
         Raw: raw,
-        Yaml: yaml.data
+        Yaml: yaml.data,
       };
       return res;
     } catch (err) {
       throw new PortainerError('Unable to retrieve Deployment', err);
     }
   }
-  
+
   async getAllAsync(namespace) {
     try {
       const data = await this.KubernetesDeployments(namespace).get().$promise;
@@ -104,7 +101,7 @@ class KubernetesDeploymentService {
       const params = new KubernetesCommonParams();
       params.id = deployment.Name;
       const namespace = deployment.Namespace;
-      await this.KubernetesDeployments(namespace).delete(params).$promise
+      await this.KubernetesDeployments(namespace).delete(params).$promise;
     } catch (err) {
       throw new PortainerError('Unable to remove deployment', err);
     }

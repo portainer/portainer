@@ -42,7 +42,8 @@ class KubernetesResourcePoolsController {
         if (confirmed) {
           return this.$async(this.removeActionAsync, selectedItems);
         }
-      });
+      }
+    );
   }
 
   async getResourcePoolsAsync() {
@@ -54,12 +55,12 @@ class KubernetesResourcePoolsController {
   }
 
   getResourcePools() {
-    return this.$async(this.getResourcePoolsAsync)
+    return this.$async(this.getResourcePoolsAsync);
   }
 
   async onInit() {
     this.state = {
-      viewReady: false
+      viewReady: false,
     };
 
     await this.getResourcePools();

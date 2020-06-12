@@ -35,14 +35,17 @@ class KubernetesConfigureController {
   async configureAsync() {
     try {
       this.state.actionInProgress = true;
-      const classes = _.without(_.map(this.StorageClasses, (item) => {
-        if (item.selected) {
-          const res = new KubernetesStorageClass();
-          res.Name = item.Name;
-          res.AccessModes = _.map(item.AccessModes, "Name");
-          return res;
-        }
-      }), undefined);
+      const classes = _.without(
+        _.map(this.StorageClasses, (item) => {
+          if (item.selected) {
+            const res = new KubernetesStorageClass();
+            res.Name = item.Name;
+            res.AccessModes = _.map(item.AccessModes, 'Name');
+            return res;
+          }
+        }),
+        undefined
+      );
 
       this.endpoint.Kubernetes.Configuration.StorageClasses = classes;
       this.endpoint.Kubernetes.Configuration.UseLoadBalancer = this.formValues.UseLoadBalancer;
@@ -71,11 +74,11 @@ class KubernetesConfigureController {
     this.state = {
       actionInProgress: false,
       displayConfigureClassPanel: {},
-      viewReady: false
+      viewReady: false,
     };
 
     this.formValues = {
-      UseLoadBalancer: false
+      UseLoadBalancer: false,
     };
 
     try {
@@ -87,7 +90,7 @@ class KubernetesConfigureController {
         if (storage) {
           item.selected = true;
           _.forEach(storage.AccessModes, (access) => {
-            const mode = _.find(item.availableAccessModes, {Name: access});
+            const mode = _.find(item.availableAccessModes, { Name: access });
             if (mode) {
               mode.selected = true;
             }

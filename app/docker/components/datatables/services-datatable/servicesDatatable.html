@@ -2,9 +2,7 @@
   <rd-widget>
     <rd-widget-body classes="no-padding">
       <div class="toolBar">
-        <div class="toolBarTitle">
-          <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }}
-        </div>
+        <div class="toolBarTitle"> <i class="fa" ng-class="$ctrl.titleIcon" aria-hidden="true" style="margin-right: 2px;"></i> {{ $ctrl.titleText }} </div>
         <div class="settings">
           <span class="setting" ng-class="{ 'setting-active': $ctrl.settings.open }" uib-dropdown dropdown-append-to-body auto-close="disabled" is-open="$ctrl.settings.open">
             <span uib-dropdown-toggle><i class="fa fa-cog" aria-hidden="true"></i> Settings</span>
@@ -16,7 +14,7 @@
                 <div class="menuContent">
                   <div>
                     <div class="md-checkbox">
-                      <input id="setting_auto_refresh" type="checkbox" ng-model="$ctrl.settings.repeater.autoRefresh" ng-change="$ctrl.onSettingsRepeaterChange()"/>
+                      <input id="setting_auto_refresh" type="checkbox" ng-model="$ctrl.settings.repeater.autoRefresh" ng-change="$ctrl.onSettingsRepeaterChange()" />
                       <label for="setting_auto_refresh">Auto refresh</label>
                     </div>
                     <div ng-if="$ctrl.settings.repeater.autoRefresh">
@@ -52,13 +50,21 @@
       ></services-datatable-actions>
       <div class="searchBar">
         <i class="fa fa-search searchIcon" aria-hidden="true"></i>
-        <input type="text" class="searchInput" ng-model="$ctrl.state.textFilter" ng-change="$ctrl.onTextFilterChange()" placeholder="Search..." auto-focus ng-model-options="{ debounce: 300 }">
+        <input
+          type="text"
+          class="searchInput"
+          ng-model="$ctrl.state.textFilter"
+          ng-change="$ctrl.onTextFilterChange()"
+          placeholder="Search..."
+          auto-focus
+          ng-model-options="{ debounce: 300 }"
+        />
       </div>
       <div class="table-responsive">
         <table class="table table-hover nowrap-cells">
           <thead>
             <tr>
-              <th style="width:55px;">
+              <th style="width: 55px;">
                 <span class="md-checkbox" authorization="DockerServiceUpdate, DockerServiceDelete, DockerServiceCreate">
                   <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                   <label for="select_all"></label>
@@ -119,10 +125,15 @@
             </tr>
           </thead>
           <tbody>
-            <tr ng-click="$ctrl.expandItem(item, !item.Expanded)" dir-paginate-start="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))" ng-class="{active: item.Checked}" class="interactive">
+            <tr
+              ng-click="$ctrl.expandItem(item, !item.Expanded)"
+              dir-paginate-start="item in ($ctrl.state.filteredDataSet = ($ctrl.dataset | filter:$ctrl.state.textFilter | orderBy:$ctrl.state.orderBy:$ctrl.state.reverseOrder | itemsPerPage: $ctrl.state.paginatedItemLimit))"
+              ng-class="{ active: item.Checked }"
+              class="interactive"
+            >
               <td>
                 <span class="md-checkbox" authorization="DockerServiceUpdate, DockerServiceDelete, DockerServiceCreate">
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)"/>
+                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
                 <a><i ng-class="{ 'fas fa-angle-down': item.Expanded, 'fas fa-angle-right': !item.Expanded }" class="space-right" aria-hidden="true"></i></a>
@@ -134,20 +145,27 @@
               <td>{{ item.Image | hideshasum }}</td>
               <td ng-controller="ServicesDatatableActionsController as actionCtrl">
                 {{ item.Mode }}
-                <code>{{ item.Tasks | runningtaskscount }}</code> / <code>{{ item.Mode === 'replicated' ? item.Replicas : ($ctrl.nodes | availablenodecount:item) }}</code>
+                <code>{{ item.Tasks | runningtaskscount }}</code> / <code>{{ item.Mode === 'replicated' ? item.Replicas : ($ctrl.nodes | availablenodecount: item) }}</code>
                 <span ng-if="item.Mode === 'replicated' && !item.Scale" authorization="DockerServiceUpdate">
                   <a class="interactive" ng-click="item.Scale = true; item.ReplicaCount = item.Replicas; $event.stopPropagation();">
                     <i class="fa fa-arrows-alt-v" aria-hidden="true"></i> Scale
                   </a>
                 </span>
                 <span ng-if="item.Mode === 'replicated' && item.Scale">
-                  <input class="input-sm" type="number" ng-model="item.Replicas" on-enter-key="actionCtrl.scaleAction(item)" auto-focus ng-click="$event.stopPropagation();"/>
+                  <input class="input-sm" type="number" ng-model="item.Replicas" on-enter-key="actionCtrl.scaleAction(item)" auto-focus ng-click="$event.stopPropagation();" />
                   <a class="interactive" ng-click="item.Scale = false; $event.stopPropagation();"><i class="fa fa-times"></i></a>
                   <a class="interactive" ng-click="actionCtrl.scaleAction(item); $event.stopPropagation();"><i class="fa fa-check-square"></i></a>
                 </span>
               </td>
               <td>
-                <a ng-if="item.Ports && item.Ports.length > 0 && p.PublishedPort" ng-repeat="p in item.Ports" class="image-tag" ng-href="http://{{ $ctrl.state.publicURL }}:{{ p.PublishedPort }}" target="_blank" ng-click="$event.stopPropagation();">
+                <a
+                  ng-if="item.Ports && item.Ports.length > 0 && p.PublishedPort"
+                  ng-repeat="p in item.Ports"
+                  class="image-tag"
+                  ng-href="http://{{ $ctrl.state.publicURL }}:{{ p.PublishedPort }}"
+                  target="_blank"
+                  ng-click="$event.stopPropagation();"
+                >
                   <i class="fa fa-external-link-alt" aria-hidden="true"></i> {{ p.PublishedPort }}:{{ p.TargetPort }}
                 </a>
                 <span ng-if="!item.Ports || item.Ports.length === 0">-</span>
@@ -172,7 +190,7 @@
                   agent-proxy="$ctrl.agentProxy"
                   show-task-logs-button="$ctrl.showTaskLogsButton"
                   text-filter="$ctrl.state.textFilter"
-                ><service-tasks-datatable>
+                ></service-tasks-datatable>
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">
@@ -185,9 +203,7 @@
         </table>
       </div>
       <div class="footer" ng-if="$ctrl.dataset">
-        <div class="infoBar" ng-if="$ctrl.state.selectedItemCount !== 0">
-          {{ $ctrl.state.selectedItemCount }} item(s) selected
-        </div>
+        <div class="infoBar" ng-if="$ctrl.state.selectedItemCount !== 0"> {{ $ctrl.state.selectedItemCount }} item(s) selected </div>
         <div class="paginationControls">
           <form class="form-inline">
             <span class="limitSelector">

@@ -7,7 +7,7 @@ import {
   KubernetesApplicationDataAccessPolicies,
   KubernetesApplicationDeploymentTypes,
   KubernetesApplicationPublishingTypes,
-  KubernetesApplicationQuotaDefaults
+  KubernetesApplicationQuotaDefaults,
 } from 'Kubernetes/models/application/models';
 import {
   KubernetesApplicationConfigurationFormValue,
@@ -16,7 +16,7 @@ import {
   KubernetesApplicationEnvironmentVariableFormValue,
   KubernetesApplicationFormValues,
   KubernetesApplicationPersistedFolderFormValue,
-  KubernetesApplicationPublishedPortFormValue
+  KubernetesApplicationPublishedPortFormValue,
 } from 'Kubernetes/models/application/formValues';
 import KubernetesFormValidationHelper from 'Kubernetes/helpers/formValidationHelper';
 import KubernetesApplicationConverter from 'Kubernetes/converters/application';
@@ -25,8 +25,20 @@ import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 
 class KubernetesCreateApplicationController {
   /* @ngInject */
-  constructor($async, $state, Notifications, EndpointProvider, Authentication, ModalService, KubernetesResourcePoolService, KubernetesApplicationService,
-    KubernetesStackService, KubernetesConfigurationService, KubernetesNodeService, KubernetesPersistentVolumeClaimService) {
+  constructor(
+    $async,
+    $state,
+    Notifications,
+    EndpointProvider,
+    Authentication,
+    ModalService,
+    KubernetesResourcePoolService,
+    KubernetesApplicationService,
+    KubernetesStackService,
+    KubernetesConfigurationService,
+    KubernetesNodeService,
+    KubernetesPersistentVolumeClaimService
+  ) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
@@ -84,7 +96,7 @@ class KubernetesCreateApplicationController {
     const config = this.formValues.Configurations[index];
     config.Overriden = true;
     config.OverridenKeys = _.map(_.keys(config.SelectedConfiguration.Data), (key) => {
-      const res = new KubernetesApplicationConfigurationFormValueOverridenKey()
+      const res = new KubernetesApplicationConfigurationFormValueOverridenKey();
       res.Key = key;
       return res;
     });
@@ -100,10 +112,14 @@ class KubernetesCreateApplicationController {
   onChangeConfigurationPath() {
     this.state.duplicateConfigurationPaths = [];
 
-    const paths = _.reduce(this.formValues.Configurations, (result, config) => {
-      const uniqOverridenKeysPath = _.uniq(_.map(config.OverridenKeys, 'Path'));
-      return _.concat(result, uniqOverridenKeysPath);
-    }, []);
+    const paths = _.reduce(
+      this.formValues.Configurations,
+      (result, config) => {
+        const uniqOverridenKeysPath = _.uniq(_.map(config.OverridenKeys, 'Path'));
+        return _.concat(result, uniqOverridenKeysPath);
+      },
+      []
+    );
 
     const duplicatePaths = KubernetesFormValidationHelper.getDuplicates(paths);
 
@@ -228,7 +244,7 @@ class KubernetesCreateApplicationController {
   // * The data access policy is set to ISOLATED
   supportGlobalDeployment() {
     const hasFolders = this.formValues.PersistedFolders.length !== 0;
-    const hasRWOOnly = _.find(this.formValues.PersistedFolders, (item) => _.isEqual(item.StorageClass.AccessModes, ["RWO"]));
+    const hasRWOOnly = _.find(this.formValues.PersistedFolders, (item) => _.isEqual(item.StorageClass.AccessModes, ['RWO']));
     const isIsolated = this.formValues.DataAccessPolicy === this.ApplicationDataAccessPolicies.ISOLATED;
 
     if ((hasFolders && hasRWOOnly) || isIsolated) {
@@ -249,7 +265,7 @@ class KubernetesCreateApplicationController {
   // * The access policy is set to isolated
   supportScalableReplicaDeployment() {
     const hasFolders = this.formValues.PersistedFolders.length !== 0;
-    const hasRWOOnly = _.find(this.formValues.PersistedFolders, (item) => _.isEqual(item.StorageClass.AccessModes, ["RWO"]));
+    const hasRWOOnly = _.find(this.formValues.PersistedFolders, (item) => _.isEqual(item.StorageClass.AccessModes, ['RWO']));
     const isIsolated = this.formValues.DataAccessPolicy === this.ApplicationDataAccessPolicies.ISOLATED;
 
     if (!hasFolders || isIsolated || (hasFolders && !hasRWOOnly)) {
@@ -265,13 +281,12 @@ class KubernetesCreateApplicationController {
     for (let i = 0; i < this.formValues.PersistedFolders.length; i++) {
       const folder = this.formValues.PersistedFolders[i];
 
-      if (_.isEqual(folder.StorageClass.AccessModes, ["RWO"])) {
+      if (_.isEqual(folder.StorageClass.AccessModes, ['RWO'])) {
         storageOptions.push(folder.StorageClass.Name);
       }
-
     }
 
-    return _.uniq(storageOptions).join(", ");
+    return _.uniq(storageOptions).join(', ');
   }
 
   enforceReplicaCountMinimum() {
@@ -322,7 +337,7 @@ class KubernetesCreateApplicationController {
     const global = this.supportGlobalDeployment();
     const replica = this.formValues.ReplicaCount > 1;
     const replicated = this.formValues.DeploymentType === this.ApplicationDeploymentTypes.REPLICATED;
-    const res = (replicated && !scalable && replica) || (!replicated && !global)
+    const res = (replicated && !scalable && replica) || (!replicated && !global);
     return res;
   }
 
@@ -337,8 +352,12 @@ class KubernetesCreateApplicationController {
   }
 
   disableLoadBalancerEdit() {
-    return this.state.isEdit && this.application.ServiceType === this.ServiceTypes.LOAD_BALANCER
-      && !this.application.LoadBalancerIPAddress && this.formValues.PublishingType === this.ApplicationPublishingTypes.LOAD_BALANCER;
+    return (
+      this.state.isEdit &&
+      this.application.ServiceType === this.ServiceTypes.LOAD_BALANCER &&
+      !this.application.LoadBalancerIPAddress &&
+      this.formValues.PublishingType === this.ApplicationPublishingTypes.LOAD_BALANCER
+    );
   }
   /**
    * !STATE VALIDATION FUNCTIONS
@@ -350,14 +369,17 @@ class KubernetesCreateApplicationController {
   async updateSlidersAsync() {
     try {
       const quota = this.formValues.ResourcePool.Quota;
-      let minCpu, maxCpu, minMemory, maxMemory = 0;
+      let minCpu,
+        maxCpu,
+        minMemory,
+        maxMemory = 0;
       if (quota) {
         this.state.resourcePoolHasQuota = true;
         if (quota.CpuLimit) {
           minCpu = KubernetesApplicationQuotaDefaults.CpuLimit;
           maxCpu = quota.CpuLimit - quota.CpuLimitUsed;
           if (this.state.isEdit && this.savedFormValues.CpuLimit) {
-            maxCpu += (this.savedFormValues.CpuLimit * this.savedFormValues.ReplicaCount);
+            maxCpu += this.savedFormValues.CpuLimit * this.savedFormValues.ReplicaCount;
           }
         } else {
           minCpu = 0;
@@ -367,7 +389,7 @@ class KubernetesCreateApplicationController {
           minMemory = KubernetesApplicationQuotaDefaults.MemoryLimit;
           maxMemory = quota.MemoryLimit - quota.MemoryLimitUsed;
           if (this.state.isEdit && this.savedFormValues.MemoryLimit) {
-            maxMemory += (KubernetesResourceReservationHelper.bytesValue(this.savedFormValues.MemoryLimit) * this.savedFormValues.ReplicaCount);
+            maxMemory += KubernetesResourceReservationHelper.bytesValue(this.savedFormValues.MemoryLimit) * this.savedFormValues.ReplicaCount;
           }
         } else {
           minMemory = 0;
@@ -434,11 +456,7 @@ class KubernetesCreateApplicationController {
   }
 
   async refreshStacksConfigsAppsAsync(namespace) {
-    await Promise.all([
-      this.refreshStacks(namespace),
-      this.refreshConfigurations(namespace),
-      this.refreshApplications(namespace)
-    ]);
+    await Promise.all([this.refreshStacks(namespace), this.refreshConfigurations(namespace), this.refreshApplications(namespace)]);
     this.onChangeName();
   }
 
@@ -455,7 +473,6 @@ class KubernetesCreateApplicationController {
   /**
    * !DATA AUTO REFRESH
    */
-
 
   /**
    * ACTIONS
@@ -480,7 +497,7 @@ class KubernetesCreateApplicationController {
       this.state.actionInProgress = true;
       await this.KubernetesApplicationService.patch(this.savedFormValues, this.formValues);
       this.Notifications.success('Application successfully updated');
-      this.$state.go('kubernetes.applications.application', { name: this.application.Name, namespace: this.application.ResourcePool })
+      this.$state.go('kubernetes.applications.application', { name: this.application.Name, namespace: this.application.ResourcePool });
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve application related events');
     } finally {
@@ -490,14 +507,11 @@ class KubernetesCreateApplicationController {
 
   deployApplication() {
     if (this.state.isEdit) {
-      this.ModalService.confirmUpdate(
-        'Updating the application may cause a service interruption. Do you wish to continue?',
-        (confirmed) => {
-          if (confirmed) {
-            return this.$async(this.updateApplicationAsync);
-          }
+      this.ModalService.confirmUpdate('Updating the application may cause a service interruption. Do you wish to continue?', (confirmed) => {
+        if (confirmed) {
+          return this.$async(this.updateApplicationAsync);
         }
-      );
+      });
     } else {
       return this.$async(this.deployApplicationAsync);
     }
@@ -514,7 +528,7 @@ class KubernetesCreateApplicationController {
       const namespace = this.state.params.namespace;
       [this.application, this.persistentVolumeClaims] = await Promise.all([
         this.KubernetesApplicationService.get(namespace, this.state.params.name),
-        this.KubernetesPersistentVolumeClaimService.get(namespace)
+        this.KubernetesPersistentVolumeClaimService.get(namespace),
       ]);
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve application details');
@@ -536,7 +550,7 @@ class KubernetesCreateApplicationController {
         sliders: {
           cpu: {
             min: 0,
-            max: 0
+            max: 0,
           },
           memory: {
             min: 0,
@@ -545,7 +559,7 @@ class KubernetesCreateApplicationController {
         },
         nodes: {
           memory: 0,
-          cpu: 0
+          cpu: 0,
         },
         resourcePoolHasQuota: false,
         viewReady: false,
@@ -576,10 +590,7 @@ class KubernetesCreateApplicationController {
 
       this.formValues = new KubernetesApplicationFormValues();
 
-      const [resourcePools, nodes] = await Promise.all([
-        this.KubernetesResourcePoolService.get(),
-        this.KubernetesNodeService.get()
-      ]);
+      const [resourcePools, nodes] = await Promise.all([this.KubernetesResourcePoolService.get(), this.KubernetesNodeService.get()]);
 
       this.resourcePools = resourcePools;
       this.formValues.ResourcePool = this.resourcePools[0];

@@ -27,7 +27,7 @@ class KubernetesConfigMapConverter {
    */
   static defaultConfigMap(namespace, name) {
     const res = new KubernetesConfigMap();
-    res.Name = name
+    res.Name = name;
     res.Namespace = namespace;
     return res;
   }
@@ -63,10 +63,14 @@ class KubernetesConfigMapConverter {
     res.Namespace = formValues.ResourcePool.Namespace.Name;
     res.ConfigurationOwner = formValues.ConfigurationOwner;
     if (formValues.IsSimple) {
-      res.Data = _.reduce(formValues.Data, (acc, entry) => {
-        acc[entry.Key] = entry.Value;
-        return acc;
-      }, {});
+      res.Data = _.reduce(
+        formValues.Data,
+        (acc, entry) => {
+          acc[entry.Key] = entry.Value;
+          return acc;
+        },
+        {}
+      );
     } else {
       res.Data = YAML.parse(formValues.DataYaml);
     }

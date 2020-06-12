@@ -1,10 +1,10 @@
-import KubernetesResourceQuotaHelper from "Kubernetes/helpers/resourceQuotaHelper";
+import KubernetesResourceQuotaHelper from 'Kubernetes/helpers/resourceQuotaHelper';
 
 export const KubernetesPortainerResourceQuotaPrefix = 'portainer-rq-';
 
 export const KubernetesResourceQuotaDefaults = {
   CpuLimit: 0,
-  MemoryLimit: 0
+  MemoryLimit: 0,
 };
 
 /**

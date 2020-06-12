@@ -1,4 +1,4 @@
-import {ResourceControlOwnership as RCO} from 'Portainer/models/resourceControl/resourceControlOwnership';
+import { ResourceControlOwnership as RCO } from 'Portainer/models/resourceControl/resourceControlOwnership';
 
 export function AccessControlFormData() {
   this.AccessControlEnabled = true;

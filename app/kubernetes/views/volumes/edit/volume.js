@@ -3,6 +3,6 @@ angular.module('portainer.kubernetes').component('kubernetesVolumeView', {
   controller: 'KubernetesVolumeController',
   controllerAs: 'ctrl',
   bindings: {
-    $transition$: '<'
-  }
+    $transition$: '<',
+  },
 });

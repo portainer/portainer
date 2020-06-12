@@ -1,4 +1,4 @@
-import { KubernetesCommonMetadataPayload } from "Kubernetes/models/common/payloads";
+import { KubernetesCommonMetadataPayload } from 'Kubernetes/models/common/payloads';
 
 /**
  * KubernetesServiceCreatePayload Model
@@ -8,11 +8,11 @@ const _KubernetesServiceCreatePayload = Object.freeze({
   spec: {
     ports: [],
     selector: {
-      app: ''
+      app: '',
     },
     type: '',
-    clusterIP: ''
-  }
+    clusterIP: '',
+  },
 });
 
 export class KubernetesServiceCreatePayload {

@@ -1,4 +1,4 @@
-import { KubernetesCommonMetadataPayload } from "Kubernetes/models/common/payloads";
+import { KubernetesCommonMetadataPayload } from 'Kubernetes/models/common/payloads';
 
 /**
  * KubernetesResourceQuotaCreatePayload Model
@@ -11,8 +11,8 @@ const _KubernetesResourceQuotaCreatePayload = Object.freeze({
       'requests.memory': 0,
       'limits.cpu': 0,
       'limits.memory': 0,
-    }
-  }
+    },
+  },
 });
 
 export class KubernetesResourceQuotaCreatePayload {
@@ -32,8 +32,8 @@ const _KubernetesResourceQuotaUpdatePayload = Object.freeze({
       'requests.memory': 0,
       'limits.cpu': 0,
       'limits.memory': 0,
-    }
-  }
+    },
+  },
 });
 
 export class KubernetesResourceQuotaUpdatePayload {

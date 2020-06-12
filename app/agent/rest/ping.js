@@ -1,11 +1,14 @@
 angular.module('portainer.agent').factory('AgentPing', [
-  '$resource', 'API_ENDPOINT_ENDPOINTS', 'EndpointProvider', '$q',
+  '$resource',
+  'API_ENDPOINT_ENDPOINTS',
+  'EndpointProvider',
+  '$q',
   function AgentPingFactory($resource, API_ENDPOINT_ENDPOINTS, EndpointProvider, $q) {
     'use strict';
     return $resource(
       API_ENDPOINT_ENDPOINTS + '/:endpointId/docker/ping',
-      { 
-        endpointId: EndpointProvider.endpointID
+      {
+        endpointId: EndpointProvider.endpointID,
       },
       {
         ping: {
@@ -13,8 +16,7 @@ angular.module('portainer.agent').factory('AgentPing', [
           interceptor: {
             response: function versionInterceptor(response) {
               var instance = response.resource;
-              var version =
-                response.headers('Portainer-Agent-Api-Version') || 1;
+              var version = response.headers('Portainer-Agent-Api-Version') || 1;
               instance.version = Number(version);
               return instance;
             },
@@ -24,10 +26,10 @@ angular.module('portainer.agent').factory('AgentPing', [
                 return { version: 1 };
               }
               return $q.reject(error);
-            }
-          }
-        }
+            },
+          },
+        },
       }
     );
-  }
+  },
 ]);

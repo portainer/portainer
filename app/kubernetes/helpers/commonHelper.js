@@ -5,7 +5,7 @@ class KubernetesCommonHelper {
     if (!value || (value instanceof Array && !value.length)) {
       _.unset(obj, path);
     } else {
-      _.set(obj, path, value)
+      _.set(obj, path, value);
     }
   }
 }

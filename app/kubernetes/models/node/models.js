@@ -1,7 +1,7 @@
 /**
  * KubernetesNode Model
  */
- const _KubernetesNode = Object.freeze({
+const _KubernetesNode = Object.freeze({
   Id: '',
   Name: '',
   Role: '',
@@ -9,7 +9,7 @@
   CPU: 0,
   Memory: '',
   Version: '',
-  IPAddress: ''
+  IPAddress: '',
 });
 
 export class KubernetesNode {
@@ -21,15 +21,15 @@ export class KubernetesNode {
 /**
  * KubernetesNodeDetails Model
  */
- const _KubernetesNodeDetails = Object.freeze({
+const _KubernetesNodeDetails = Object.freeze({
   CreationDate: '',
   OS: {
     Architecture: '',
     Platform: '',
-    Image: ''
+    Image: '',
   },
   Conditions: [],
-  Yaml: ''
+  Yaml: '',
 });
 
 export class KubernetesNodeDetails {

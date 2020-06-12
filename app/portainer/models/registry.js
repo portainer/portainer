@@ -1,5 +1,5 @@
 import _ from 'lodash-es';
-import {RegistryTypes} from 'Extensions/registry-management/models/registryTypes';
+import { RegistryTypes } from 'Extensions/registry-management/models/registryTypes';
 
 export function RegistryViewModel(data) {
   this.Id = data.Id;
@@ -26,7 +26,7 @@ export function RegistryManagementConfigurationDefaultModel(registry) {
   this.TLSCertFile = null;
   this.TLSKeyFile = null;
 
-  if (registry.Type === RegistryTypes.QUAY || registry.Type === RegistryTypes.AZURE ) {
+  if (registry.Type === RegistryTypes.QUAY || registry.Type === RegistryTypes.AZURE) {
     this.Authentication = true;
     this.Username = registry.Username;
     this.TLS = true;
@@ -60,7 +60,7 @@ export function RegistryCreateRequest(model) {
     this.Gitlab = {
       ProjectId: model.Gitlab.ProjectId,
       InstanceURL: model.Gitlab.InstanceURL,
-      ProjectPath: model.Gitlab.ProjectPath
-    }
+      ProjectPath: model.Gitlab.ProjectPath,
+    };
   }
 }

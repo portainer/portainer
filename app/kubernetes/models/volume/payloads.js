@@ -9,11 +9,11 @@ const _KubernetesPersistentVolumClaimCreatePayload = Object.freeze({
     accessModes: ['ReadWriteOnce'],
     resources: {
       requests: {
-        storage: ''
-      }
+        storage: '',
+      },
     },
-    storageClassName: ''
-  }
+    storageClassName: '',
+  },
 });
 
 export class KubernetesPersistentVolumClaimCreatePayload {

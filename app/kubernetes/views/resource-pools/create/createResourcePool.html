@@ -14,14 +14,27 @@
             <div class="form-group">
               <label for="pool_name" class="col-sm-1 control-label text-left">Name</label>
               <div class="col-sm-11">
-                <input type="text" class="form-control" name="pool_name" ng-model="ctrl.formValues.Name" ng-pattern="/^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/" ng-change="ctrl.onChangeName()" placeholder="my-project" required auto-focus>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="pool_name"
+                  ng-model="ctrl.formValues.Name"
+                  ng-pattern="/^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/"
+                  ng-change="ctrl.onChangeName()"
+                  placeholder="my-project"
+                  required
+                  auto-focus
+                />
               </div>
             </div>
             <div class="form-group" ng-show="resourcePoolCreationForm.pool_name.$invalid || ctrl.state.isAlreadyExist">
               <div class="col-sm-12 small text-warning">
                 <div ng-messages="resourcePoolCreationForm.pool_name.$error">
                   <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
-                  <p ng-message="pattern"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character.</p>
+                  <p ng-message="pattern"
+                    ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field must consist of lower case alphanumeric characters, '-' or '.', and must start and end
+                    with an alphanumeric character.</p
+                  >
                 </div>
                 <p ng-if="ctrl.state.isAlreadyExist"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> A resource pool with the same name already exists.</p>
               </div>
@@ -35,23 +48,20 @@
               <div class="col-sm-12 small text-muted">
                 <p>
                   <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                    A resource pool segments the underyling physical Kubernetes cluster into smaller virtual clusters. You should assign a capped limit of resources to this pool or disable for the safe operation of your platform.
+                  A resource pool segments the underyling physical Kubernetes cluster into smaller virtual clusters. You should assign a capped limit of resources to this pool or
+                  disable for the safe operation of your platform.
                 </p>
               </div>
               <div class="col-sm-12">
                 <label class="control-label text-left">
                   Resource assignment
                 </label>
-                <label class="switch" style="margin-left: 20px;">
-                  <input type="checkbox" ng-model="ctrl.formValues.hasQuota"><i></i>
-                </label>
+                <label class="switch" style="margin-left: 20px;"> <input type="checkbox" ng-model="ctrl.formValues.hasQuota" /><i></i> </label>
               </div>
             </div>
             <div class="form-group" ng-if="ctrl.formValues.hasQuota && !ctrl.isQuotaValid()">
               <span class="col-sm-12 text-warning small">
-                <p>
-                  <i class="fa fa-exclamation-triangle" aria-hidden="true" style="margin-right: 2px;"></i> At least a single limit must be set for the quota to be valid.
-                </p>
+                <p> <i class="fa fa-exclamation-triangle" aria-hidden="true" style="margin-right: 2px;"></i> At least a single limit must be set for the quota to be valid. </p>
               </span>
             </div>
             <!-- !quotas-switch -->
@@ -66,10 +76,25 @@
                     Memory
                   </label>
                   <div class="col-sm-3">
-                    <slider model="ctrl.formValues.MemoryLimit" floor="ctrl.defaults.MemoryLimit" ceil="ctrl.state.sliderMaxMemory" step="128" ng-if="ctrl.state.sliderMaxMemory"></slider>
+                    <slider
+                      model="ctrl.formValues.MemoryLimit"
+                      floor="ctrl.defaults.MemoryLimit"
+                      ceil="ctrl.state.sliderMaxMemory"
+                      step="128"
+                      ng-if="ctrl.state.sliderMaxMemory"
+                    ></slider>
                   </div>
                   <div class="col-sm-2">
-                    <input name="memory_limit" type="number" min="{{ctrl.defaults.MemoryLimit}}" max="{{ctrl.state.sliderMaxMemory}}" class="form-control" ng-model="ctrl.formValues.MemoryLimit" id="memory-limit" required>
+                    <input
+                      name="memory_limit"
+                      type="number"
+                      min="{{ ctrl.defaults.MemoryLimit }}"
+                      max="{{ ctrl.state.sliderMaxMemory }}"
+                      class="form-control"
+                      ng-model="ctrl.formValues.MemoryLimit"
+                      id="memory-limit"
+                      required
+                    />
                   </div>
                   <div class="col-sm-4">
                     <p class="small text-muted" style="margin-top: 7px;">
@@ -80,7 +105,9 @@
                 <div class="form-group" ng-show="resourcePoolCreationForm.memory_limit.$invalid">
                   <div class="col-sm-12 small text-warning">
                     <div ng-messages="resourcePoolCreationForm.pool_name.$error">
-                      <p><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Value must be between {{ ctrl.defaults.MemoryLimit }} and {{ ctrl.state.sliderMaxMemory }}</p>
+                      <p
+                        ><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Value must be between {{ ctrl.defaults.MemoryLimit }} and {{ ctrl.state.sliderMaxMemory }}</p
+                      >
                     </div>
                   </div>
                 </div>
@@ -91,7 +118,14 @@
                     CPU
                   </label>
                   <div class="col-sm-5">
-                    <slider model="ctrl.formValues.CpuLimit" floor="ctrl.defaults.CpuLimit" ceil="ctrl.state.sliderMaxCpu" step="0.1" precision="2" ng-if="ctrl.state.sliderMaxCpu"></slider>
+                    <slider
+                      model="ctrl.formValues.CpuLimit"
+                      floor="ctrl.defaults.CpuLimit"
+                      ceil="ctrl.state.sliderMaxCpu"
+                      step="0.1"
+                      precision="2"
+                      ng-if="ctrl.state.sliderMaxCpu"
+                    ></slider>
                   </div>
                   <div class="col-sm-4" style="margin-top: 20px;">
                     <p class="small text-muted">
@@ -108,9 +142,13 @@
             </div>
             <div class="form-group">
               <div class="col-sm-12">
-                <button type="button" class="btn btn-primary btn-sm"
+                <button
+                  type="button"
+                  class="btn btn-primary btn-sm"
                   ng-disabled="!resourcePoolCreationForm.$valid || ctrl.state.actionInProgress || (ctrl.formValues.hasQuota && !ctrl.isQuotaValid()) || !ctrl.isValid()"
-                  ng-click="ctrl.createResourcePool()" button-spinner="ctrl.state.actionInProgress">
+                  ng-click="ctrl.createResourcePool()"
+                  button-spinner="ctrl.state.actionInProgress"
+                >
                   <span ng-hide="ctrl.state.actionInProgress">Create resource pool</span>
                   <span ng-show="ctrl.state.actionInProgress">Creation in progress...</span>
                 </button>

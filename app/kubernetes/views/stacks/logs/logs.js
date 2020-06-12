@@ -3,6 +3,6 @@ angular.module('portainer.kubernetes').component('kubernetesStackLogsView', {
   controller: 'KubernetesStackLogsController',
   controllerAs: 'ctrl',
   bindings: {
-    $transition$: '<'
-  }
+    $transition$: '<',
+  },
 });

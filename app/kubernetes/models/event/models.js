@@ -6,7 +6,7 @@ const _KubernetesEvent = Object.freeze({
   Date: 0,
   Type: '',
   Message: '',
-  Involved: {}
+  Involved: {},
 });
 
 export class KubernetesEvent {

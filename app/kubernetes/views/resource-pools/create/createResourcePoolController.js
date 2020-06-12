@@ -1,7 +1,7 @@
 import angular from 'angular';
 import _ from 'lodash-es';
 import filesizeParser from 'filesize-parser';
-import {KubernetesResourceQuotaDefaults} from 'Kubernetes/models/resource-quota/models';
+import { KubernetesResourceQuotaDefaults } from 'Kubernetes/models/resource-quota/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
 
 class KubernetesCreateResourcePoolController {
@@ -29,9 +29,11 @@ class KubernetesCreateResourcePoolController {
   }
 
   isQuotaValid() {
-    if (this.state.sliderMaxCpu < this.formValues.CpuLimit
-      || this.state.sliderMaxMemory < this.formValues.MemoryLimit
-      || (this.formValues.CpuLimit === 0 && this.formValues.MemoryLimit === 0)) {
+    if (
+      this.state.sliderMaxCpu < this.formValues.CpuLimit ||
+      this.state.sliderMaxMemory < this.formValues.MemoryLimit ||
+      (this.formValues.CpuLimit === 0 && this.formValues.MemoryLimit === 0)
+    ) {
       return false;
     }
     return true;
@@ -42,7 +44,7 @@ class KubernetesCreateResourcePoolController {
       this.formValues.CpuLimit = this.defaults.CpuLimit;
     }
     if (this.formValues.MemoryLimit < KubernetesResourceReservationHelper.megaBytesValue(this.defaults.MemoryLimit)) {
-        this.formValues.MemoryLimit = KubernetesResourceReservationHelper.megaBytesValue(this.defaults.MemoryLimit);
+      this.formValues.MemoryLimit = KubernetesResourceReservationHelper.megaBytesValue(this.defaults.MemoryLimit);
     }
   }
 
@@ -51,7 +53,13 @@ class KubernetesCreateResourcePoolController {
     try {
       this.checkDefaults();
       const owner = this.Authentication.getUserDetails().username;
-      await this.KubernetesResourcePoolService.create(this.formValues.Name, owner, this.formValues.hasQuota, this.formValues.CpuLimit, KubernetesResourceReservationHelper.bytesValue(this.formValues.MemoryLimit));
+      await this.KubernetesResourcePoolService.create(
+        this.formValues.Name,
+        owner,
+        this.formValues.hasQuota,
+        this.formValues.CpuLimit,
+        KubernetesResourceReservationHelper.bytesValue(this.formValues.MemoryLimit)
+      );
       this.Notifications.success('Resource pool successfully created', this.formValues.Name);
       this.$state.go('kubernetes.resourcePools');
     } catch (err) {
@@ -84,7 +92,7 @@ class KubernetesCreateResourcePoolController {
       this.formValues = {
         MemoryLimit: this.defaults.MemoryLimit,
         CpuLimit: this.defaults.CpuLimit,
-        hasQuota: true
+        hasQuota: true,
       };
 
       this.state = {
@@ -92,7 +100,7 @@ class KubernetesCreateResourcePoolController {
         sliderMaxMemory: 0,
         sliderMaxCpu: 0,
         viewReady: false,
-        isAlreadyExist: false
+        isAlreadyExist: false,
       };
 
       const nodes = await this.KubernetesNodeService.get();

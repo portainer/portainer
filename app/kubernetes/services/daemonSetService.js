@@ -24,13 +24,10 @@ class KubernetesDaemonSetService {
     try {
       const params = new KubernetesCommonParams();
       params.id = name;
-      const [raw, yaml] = await Promise.all([
-        this.KubernetesDaemonSets(namespace).get(params).$promise,
-        this.KubernetesDaemonSets(namespace).getYaml(params).$promise
-      ]);
+      const [raw, yaml] = await Promise.all([this.KubernetesDaemonSets(namespace).get(params).$promise, this.KubernetesDaemonSets(namespace).getYaml(params).$promise]);
       const res = {
         Raw: raw,
-        Yaml: yaml.data
+        Yaml: yaml.data,
       };
       return res;
     } catch (err) {
@@ -104,7 +101,7 @@ class KubernetesDaemonSetService {
       const params = new KubernetesCommonParams();
       params.id = daemonSet.Name;
       const namespace = daemonSet.Namespace;
-      await this.KubernetesDaemonSets(namespace).delete(params).$promise
+      await this.KubernetesDaemonSets(namespace).delete(params).$promise;
     } catch (err) {
       throw new PortainerError('Unable to remove daemonset', err);
     }

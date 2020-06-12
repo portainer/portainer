@@ -6,7 +6,6 @@ import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models
 import { KubernetesSystem_DefaultDeploymentUniqueLabelKey, KubernetesSystem_AnnotationsToSkip } from 'Kubernetes/models/history/models';
 
 class KubernetesApplicationRollbackHelper {
-
   static getPatchPayload(application, targetRevision) {
     let result;
 
@@ -47,15 +46,18 @@ class KubernetesApplicationRollbackHelper {
       }
     });
     // Create a patch of the Deployment that replaces spec.template
-    const patch = [{
-      "op": "replace",
-      "path": "/spec/template",
-      "value": target.spec.template,
-    }, {
-      "op": "replace",
-      "path": "/metadata/annotations",
-      "value": annotations,
-    }];
+    const patch = [
+      {
+        op: 'replace',
+        path: '/spec/template',
+        value: target.spec.template,
+      },
+      {
+        op: 'replace',
+        path: '/metadata/annotations',
+        value: annotations,
+      },
+    ];
 
     return patch;
   }

@@ -1,16 +1,13 @@
-<form ng-if="applicationState.endpoint.apiVersion >= 1.30" id="service-configs" ng-submit="updateService(service)">
+<form ng-if="applicationState.endpoint.apiVersion >= 1.3" id="service-configs" ng-submit="updateService(service)">
   <rd-widget>
-    <rd-widget-header icon="fa-tasks" title-text="Configs">
-    </rd-widget-header>
+    <rd-widget-header icon="fa-tasks" title-text="Configs"> </rd-widget-header>
     <rd-widget-body classes="no-padding">
       <div class="form-inline" style="padding: 10px;" authorization="DockerServiceUpdate">
         Add a config:
         <select class="form-control" ng-options="config.Name for config in configs | orderBy: 'Name'" ng-model="newConfig">
           <option selected disabled hidden value="">Select a config</option>
         </select>
-        <a class="btn btn-default btn-sm" ng-click="addConfig(service, newConfig)">
-          <i class="fa fa-plus-circle" aria-hidden="true"></i> add config
-        </a>
+        <a class="btn btn-default btn-sm" ng-click="addConfig(service, newConfig)"> <i class="fa fa-plus-circle" aria-hidden="true"></i> add config </a>
       </div>
       <table class="table" style="margin-top: 5px;">
         <thead>
@@ -25,7 +22,9 @@
         </thead>
         <tbody>
           <tr ng-repeat="config in service.ServiceConfigs">
-            <td><a ui-sref="docker.configs.config({id: config.Id})">{{ config.Name }}</a></td>
+            <td
+              ><a ui-sref="docker.configs.config({id: config.Id})">{{ config.Name }}</a></td
+            >
             <td>
               <input class="form-control" ng-model="config.FileName" ng-change="updateConfig(service)" placeholder="e.g. /path/in/container" required />
             </td>

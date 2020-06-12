@@ -3,8 +3,8 @@
  */
 const _KubernetesResourceReservation = Object.freeze({
   Memory: 0,
-  CPU: 0
-})
+  CPU: 0,
+});
 
 export class KubernetesResourceReservation {
   constructor() {

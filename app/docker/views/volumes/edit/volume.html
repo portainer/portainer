@@ -16,7 +16,9 @@
               <td>ID</td>
               <td>
                 {{ volume.Id }}
-                <button authorization="DockerVolumeDelete" class="btn btn-xs btn-danger" ng-click="removeVolume()"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove this volume</button>
+                <button authorization="DockerVolumeDelete" class="btn btn-xs btn-danger" ng-click="removeVolume()"
+                  ><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Remove this volume</button
+                >
               </td>
             </tr>
             <tr>
@@ -51,35 +53,32 @@
 
 <div class="row" ng-if="isCioDriver">
   <div class="col-sm-12">
-    <volume-storidge-info volume="storidgeVolume">
-    </volume-storidge-info>
+    <volume-storidge-info volume="storidgeVolume"> </volume-storidge-info>
   </div>
 </div>
 
 <div class="row" ng-if="isCioDriver">
   <div class="col-sm-12">
-    <storidge-snapshot-creation volume-id="storidgeVolume.Vdisk" ng-if="storidgeVolume.SnapshotEnabled">
-    </storidge-snapshot-creation>
+    <storidge-snapshot-creation volume-id="storidgeVolume.Vdisk" ng-if="storidgeVolume.SnapshotEnabled"> </storidge-snapshot-creation>
   </div>
 </div>
 
 <div class="row" ng-if="isCioDriver && storidgeVolume.SnapshotEnabled">
   <div class="col-sm-12">
     <storidge-snapshots-datatable
-      title-text="Snapshots" title-icon="fa-camera"
-      dataset="storidgeSnapshots" table-key="storidgeSnapshots"
+      title-text="Snapshots"
+      title-icon="fa-camera"
+      dataset="storidgeSnapshots"
+      table-key="storidgeSnapshots"
       order-by="Id"
-      remove-action="removeSnapshot">
+      remove-action="removeSnapshot"
+    >
     </storidge-snapshots-datatable>
   </div>
 </div>
 
 <!-- access-control-panel -->
-<por-access-control-panel
-  ng-if="volume && applicationState.application.authentication"
-  resource-id="volume.Id"
-  resource-control="volume.ResourceControl"
-  resource-type="'volume'">
+<por-access-control-panel ng-if="volume && applicationState.application.authentication" resource-id="volume.Id" resource-control="volume.ResourceControl" resource-type="'volume'">
 </por-access-control-panel>
 <!-- !access-control-panel -->
 
@@ -113,7 +112,9 @@
           </thead>
           <tbody>
             <tr ng-repeat="container in containersUsingVolume">
-              <td><a ui-sref="docker.containers.container({ id: container.Id, nodeName: container.NodeName })">{{ container | containername }}</a></td>
+              <td
+                ><a ui-sref="docker.containers.container({ id: container.Id, nodeName: container.NodeName })">{{ container | containername }}</a></td
+              >
               <td>{{ container.volumeData.Destination }}</td>
               <td>{{ !container.volumeData.RW }}</td>
             </tr>

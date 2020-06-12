@@ -6,9 +6,7 @@ import KubernetesDaemonSetHistoryHelper from 'Kubernetes/helpers/history/daemons
 import KubernetesStatefulSetHistoryHelper from 'Kubernetes/helpers/history/statefulset';
 import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
 
-
 class KubernetesHistoryHelper {
-
   static getRevisions(rawRevisions, application) {
     let currentRevision, revisionsList;
 

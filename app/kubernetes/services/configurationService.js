@@ -26,10 +26,7 @@ class KubernetesConfigurationService {
    */
   async getAsync(namespace, name) {
     try {
-      const [configMap, secret] = await Promise.allSettled([
-        this.KubernetesConfigMapService.get(namespace, name),
-        this.KubernetesSecretService.get(namespace, name)
-      ]);
+      const [configMap, secret] = await Promise.allSettled([this.KubernetesConfigMapService.get(namespace, name), this.KubernetesSecretService.get(namespace, name)]);
       let configuration;
       if (secret.status === 'fulfilled') {
         configuration = KubernetesConfigurationConverter.secretToConfiguration(secret.value);
@@ -45,15 +42,14 @@ class KubernetesConfigurationService {
   async getAllAsync(namespace) {
     try {
       const namespaces = namespace ? [namespace] : _.map(await this.KubernetesNamespaceService.get(), 'Name');
-      const res = await Promise.all(_.map(namespaces, async (ns) => {
-        const [configMaps, secrets] = await Promise.all([
-          this.KubernetesConfigMapService.get(ns),
-          this.KubernetesSecretService.get(ns)
-        ]);
-        const secretsConfigurations = _.map(secrets, secret => KubernetesConfigurationConverter.secretToConfiguration(secret));
-        const configMapsConfigurations = _.map(configMaps, configMap => KubernetesConfigurationConverter.configMapToConfiguration(configMap));
-        return _.concat(configMapsConfigurations, secretsConfigurations);
-      }));
+      const res = await Promise.all(
+        _.map(namespaces, async (ns) => {
+          const [configMaps, secrets] = await Promise.all([this.KubernetesConfigMapService.get(ns), this.KubernetesSecretService.get(ns)]);
+          const secretsConfigurations = _.map(secrets, (secret) => KubernetesConfigurationConverter.secretToConfiguration(secret));
+          const configMapsConfigurations = _.map(configMaps, (configMap) => KubernetesConfigurationConverter.configMapToConfiguration(configMap));
+          return _.concat(configMapsConfigurations, secretsConfigurations);
+        })
+      );
       return _.flatten(res);
     } catch (err) {
       throw err;

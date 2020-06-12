@@ -3,7 +3,6 @@ import uuidv4 from 'uuid/v4';
 import { KubernetesApplicationTypes } from 'Kubernetes/models/application/models';
 
 class KubernetesVolumeHelper {
-
   // TODO: review
   // the following condition
   // && (app.ApplicationType === KubernetesApplicationTypes.STATEFULSET ? _.includes(volume.PersistentVolumeClaim.Name, app.Name) : true);
@@ -14,8 +13,11 @@ class KubernetesVolumeHelper {
     return _.filter(applications, (app) => {
       const names = _.without(_.map(app.Volumes, 'persistentVolumeClaim.claimName'), undefined);
       const matchingNames = _.filter(names, (name) => _.startsWith(volume.PersistentVolumeClaim.Name, name));
-      return volume.ResourcePool.Namespace.Name === app.ResourcePool && matchingNames.length
-        && (app.ApplicationType === KubernetesApplicationTypes.STATEFULSET ? _.includes(volume.PersistentVolumeClaim.Name, app.Name) : true);
+      return (
+        volume.ResourcePool.Namespace.Name === app.ResourcePool &&
+        matchingNames.length &&
+        (app.ApplicationType === KubernetesApplicationTypes.STATEFULSET ? _.includes(volume.PersistentVolumeClaim.Name, app.Name) : true)
+      );
     });
   }
 

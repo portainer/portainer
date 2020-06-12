@@ -7,7 +7,19 @@ import KubernetesEventHelper from 'Kubernetes/helpers/eventHelper';
 
 class KubernetesResourcePoolController {
   /* @ngInject */
-  constructor($async, $state, Authentication, Notifications, LocalStorage, KubernetesNodeService, KubernetesResourceQuotaService, KubernetesResourcePoolService, KubernetesEventService, KubernetesPodService, KubernetesApplicationService) {
+  constructor(
+    $async,
+    $state,
+    Authentication,
+    Notifications,
+    LocalStorage,
+    KubernetesNodeService,
+    KubernetesResourceQuotaService,
+    KubernetesResourcePoolService,
+    KubernetesEventService,
+    KubernetesPodService,
+    KubernetesApplicationService
+  ) {
     this.$async = $async;
     this.$state = $state;
     this.Notifications = Notifications;
@@ -34,9 +46,11 @@ class KubernetesResourcePoolController {
   }
 
   isQuotaValid() {
-    if (this.state.sliderMaxCpu < this.formValues.CpuLimit
-      || this.state.sliderMaxMemory < this.formValues.MemoryLimit
-      || (this.formValues.CpuLimit === 0 && this.formValues.MemoryLimit === 0)) {
+    if (
+      this.state.sliderMaxCpu < this.formValues.CpuLimit ||
+      this.state.sliderMaxMemory < this.formValues.MemoryLimit ||
+      (this.formValues.CpuLimit === 0 && this.formValues.MemoryLimit === 0)
+    ) {
       return false;
     }
     return true;
@@ -148,7 +162,7 @@ class KubernetesResourcePoolController {
       this.formValues = {
         MemoryLimit: this.defaults.MemoryLimit,
         CpuLimit: this.defaults.CpuLimit,
-        hasQuota: false
+        hasQuota: false,
       };
 
       this.state = {
@@ -165,17 +179,14 @@ class KubernetesResourcePoolController {
         eventsLoading: true,
         applicationsLoading: true,
         viewReady: false,
-        eventWarningCount: 0
+        eventWarningCount: 0,
       };
 
       this.state.activeTab = this.LocalStorage.getActiveTab('resourcePool');
 
       const name = this.$transition$.params().id;
 
-      const [nodes, pool] = await Promise.all([
-        this.KubernetesNodeService.get(),
-        this.KubernetesResourcePoolService.get(name)
-      ]);
+      const [nodes, pool] = await Promise.all([this.KubernetesNodeService.get(), this.KubernetesResourcePoolService.get(name)]);
 
       this.pool = pool;
 
