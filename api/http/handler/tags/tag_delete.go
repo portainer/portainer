@@ -1,6 +1,7 @@
 package tags
 
 import (
+	"github.com/portainer/portainer/api/internal/edge"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -111,7 +112,7 @@ func (handler *Handler) updateEndpointRelations(endpoint portainer.Endpoint, edg
 		return err
 	}
 
-	endpointStacks := portainer.EndpointRelatedEdgeStacks(&endpoint, endpointGroup, edgeGroups, edgeStacks)
+	endpointStacks := edge.EndpointRelatedEdgeStacks(&endpoint, endpointGroup, edgeGroups, edgeStacks)
 	stacksSet := map[portainer.EdgeStackID]bool{}
 	for _, edgeStackID := range endpointStacks {
 		stacksSet[edgeStackID] = true

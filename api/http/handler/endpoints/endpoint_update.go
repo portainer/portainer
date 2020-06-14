@@ -1,6 +1,7 @@
 package endpoints
 
 import (
+	"github.com/portainer/portainer/api/internal/edge"
 	"net/http"
 	"reflect"
 	"strconv"
@@ -248,7 +249,7 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 
 		edgeStackSet := map[portainer.EdgeStackID]bool{}
 
-		endpointEdgeStacks := portainer.EndpointRelatedEdgeStacks(endpoint, endpointGroup, edgeGroups, edgeStacks)
+		endpointEdgeStacks := edge.EndpointRelatedEdgeStacks(endpoint, endpointGroup, edgeGroups, edgeStacks)
 		for _, edgeStackID := range endpointEdgeStacks {
 			edgeStackSet[edgeStackID] = true
 		}

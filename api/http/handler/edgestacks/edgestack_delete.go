@@ -1,6 +1,7 @@
 package edgestacks
 
 import (
+	"github.com/portainer/portainer/api/internal/edge"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -42,7 +43,7 @@ func (handler *Handler) edgeStackDelete(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge groups from database", err}
 	}
 
-	relatedEndpoints, err := portainer.EdgeStackRelatedEndpoints(edgeStack.EdgeGroups, endpoints, endpointGroups, edgeGroups)
+	relatedEndpoints, err := edge.EdgeStackRelatedEndpoints(edgeStack.EdgeGroups, endpoints, endpointGroups, edgeGroups)
 
 	for _, endpointID := range relatedEndpoints {
 		relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpointID)
