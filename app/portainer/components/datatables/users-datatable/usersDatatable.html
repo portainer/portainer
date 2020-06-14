@@ -58,7 +58,7 @@
             >
               <td>
                 <span class="md-checkbox">
-                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" />
+                  <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-click="$ctrl.selectItem(item, $event)" ng-disabled="!$ctrl.allowSelection(item)" />
                   <label for="select_{{ $index }}"></label>
                 </span>
                 <a ui-sref="portainer.users.user({id: item.Id})">{{ item.Username }}</a>
