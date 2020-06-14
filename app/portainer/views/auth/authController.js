@@ -8,7 +8,6 @@ class AuthenticationController {
     $scope,
     $state,
     $stateParams,
-    $sanitize,
     $window,
     Authentication,
     UserService,
@@ -26,7 +25,6 @@ class AuthenticationController {
     this.$state = $state;
     this.$stateParams = $stateParams;
     this.$window = $window;
-    this.$sanitize = $sanitize;
     this.Authentication = Authentication;
     this.UserService = UserService;
     this.EndpointService = EndpointService;
@@ -55,7 +53,6 @@ class AuthenticationController {
     this.postLoginSteps = this.postLoginSteps.bind(this);
 
     this.oAuthLoginAsync = this.oAuthLoginAsync.bind(this);
-    this.retryLoginSanitizeAsync = this.retryLoginSanitizeAsync.bind(this);
     this.internalLoginAsync = this.internalLoginAsync.bind(this);
 
     this.authenticateUserAsync = this.authenticateUserAsync.bind(this);
@@ -182,15 +179,6 @@ class AuthenticationController {
     }
   }
 
-  async retryLoginSanitizeAsync(username, password) {
-    try {
-      await this.internalLoginAsync(this.$sanitize(username), this.$sanitize(password));
-      this.$state.go('portainer.updatePassword');
-    } catch (err) {
-      this.error(err, 'Invalid credentials');
-    }
-  }
-
   async internalLoginAsync(username, password) {
     await this.Authentication.login(username, password);
     await this.postLoginSteps();
@@ -211,13 +199,7 @@ class AuthenticationController {
       this.state.loginInProgress = true;
       await this.internalLoginAsync(username, password);
     } catch (err) {
-      if (this.state.permissionsError) {
-        return;
-      }
-      // This login retry is necessary to avoid conflicts with databases
-      // containing users created before Portainer 1.19.2
-      // See https://github.com/portainer/portainer/issues/2199 for more info
-      await this.retryLoginSanitizeAsync(username, password);
+      this.error(err, 'Unable to login');
     }
   }
 
