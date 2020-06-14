@@ -34,7 +34,9 @@
           <div class="form-group">
             <div class="col-sm-4">
               <button class="btn btn-primary btn-sm" ng-disabled="!isSubmitEnabled()" ng-click="updateUser()">Save</button>
-              <button class="btn btn-danger btn-sm" ng-click="deleteUser()"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this user</button>
+              <button class="btn btn-danger btn-sm" ng-disabled="isDeleteDisabled()" ng-click="deleteUser()"
+                ><i class="fa fa-trash-alt space-right" aria-hidden="true"></i>Delete this user</button
+              >
             </div>
           </div>
         </form>

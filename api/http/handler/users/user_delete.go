@@ -1,6 +1,7 @@
 package users
 
 import (
+	"errors"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -15,6 +16,10 @@ func (handler *Handler) userDelete(w http.ResponseWriter, r *http.Request) *http
 	userID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid user identifier route variable", err}
+	}
+
+	if userID == 1 {
+		return &httperror.HandlerError{http.StatusForbidden, "Cannot remove the initial admin account", errors.New("Cannot remove the initial admin account")}
 	}
 
 	tokenData, err := security.RetrieveTokenData(r)
