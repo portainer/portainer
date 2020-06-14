@@ -2,6 +2,7 @@ package stacks
 
 import (
 	"errors"
+	"github.com/portainer/portainer/api/internal/authorization"
 	"log"
 	"net/http"
 
@@ -133,7 +134,7 @@ func (handler *Handler) isValidStackFile(stackFileContent []byte) (bool, error) 
 }
 
 func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *portainer.Stack, userID portainer.UserID) *httperror.HandlerError {
-	resourceControl := portainer.NewPrivateResourceControl(stack.Name, portainer.StackResourceControl, userID)
+	resourceControl := authorization.NewPrivateResourceControl(stack.Name, portainer.StackResourceControl, userID)
 
 	err := handler.DataStore.ResourceControl().CreateResourceControl(resourceControl)
 	if err != nil {

@@ -1,6 +1,7 @@
 package extensions
 
 import (
+	"github.com/portainer/portainer/api/internal/authorization"
 	"net/http"
 
 	"github.com/coreos/go-semver/semver"
@@ -16,7 +17,7 @@ type Handler struct {
 	*mux.Router
 	DataStore            portainer.DataStore
 	ExtensionManager     portainer.ExtensionManager
-	AuthorizationService *portainer.AuthorizationService
+	AuthorizationService *authorization.Service
 }
 
 // NewHandler creates a handler to manage extension operations.

@@ -1,6 +1,7 @@
 package stacks
 
 import (
+	"github.com/portainer/portainer/api/internal/authorization"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -39,7 +40,7 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
 
-	stacks = portainer.DecorateStacks(stacks, resourceControls)
+	stacks = authorization.DecorateStacks(stacks, resourceControls)
 
 	if !securityContext.IsAdmin {
 		rbacExtensionEnabled := true
@@ -60,7 +61,7 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 			userTeamIDs = append(userTeamIDs, membership.TeamID)
 		}
 
-		stacks = portainer.FilterAuthorizedStacks(stacks, user, userTeamIDs, rbacExtensionEnabled)
+		stacks = authorization.FilterAuthorizedStacks(stacks, user, userTeamIDs, rbacExtensionEnabled)
 	}
 
 	return response.JSON(w, stacks)

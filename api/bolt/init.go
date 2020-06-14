@@ -1,6 +1,9 @@
 package bolt
 
-import portainer "github.com/portainer/portainer/api"
+import (
+	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/authorization"
+)
 
 // Init creates the default data set.
 func (store *Store) Init() error {
@@ -85,7 +88,7 @@ func (store *Store) Init() error {
 			Name:           "Endpoint administrator",
 			Description:    "Full control of all resources in an endpoint",
 			Priority:       1,
-			Authorizations: portainer.DefaultEndpointAuthorizationsForEndpointAdministratorRole(),
+			Authorizations: authorization.DefaultEndpointAuthorizationsForEndpointAdministratorRole(),
 		}
 
 		err = store.RoleService.CreateRole(environmentAdministratorRole)
@@ -97,7 +100,7 @@ func (store *Store) Init() error {
 			Name:           "Helpdesk",
 			Description:    "Read-only access of all resources in an endpoint",
 			Priority:       2,
-			Authorizations: portainer.DefaultEndpointAuthorizationsForHelpDeskRole(false),
+			Authorizations: authorization.DefaultEndpointAuthorizationsForHelpDeskRole(false),
 		}
 
 		err = store.RoleService.CreateRole(environmentReadOnlyUserRole)
@@ -109,7 +112,7 @@ func (store *Store) Init() error {
 			Name:           "Standard user",
 			Description:    "Full control of assigned resources in an endpoint",
 			Priority:       3,
-			Authorizations: portainer.DefaultEndpointAuthorizationsForStandardUserRole(false),
+			Authorizations: authorization.DefaultEndpointAuthorizationsForStandardUserRole(false),
 		}
 
 		err = store.RoleService.CreateRole(standardUserRole)
@@ -121,7 +124,7 @@ func (store *Store) Init() error {
 			Name:           "Read-only user",
 			Description:    "Read-only access of assigned resources in an endpoint",
 			Priority:       4,
-			Authorizations: portainer.DefaultEndpointAuthorizationsForReadOnlyUserRole(false),
+			Authorizations: authorization.DefaultEndpointAuthorizationsForReadOnlyUserRole(false),
 		}
 
 		err = store.RoleService.CreateRole(readOnlyUserRole)

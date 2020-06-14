@@ -2,6 +2,7 @@ package auth
 
 import (
 	"encoding/json"
+	"github.com/portainer/portainer/api/internal/authorization"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -113,7 +114,7 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 		user = &portainer.User{
 			Username:                username,
 			Role:                    portainer.StandardUserRole,
-			PortainerAuthorizations: portainer.DefaultPortainerAuthorizations(),
+			PortainerAuthorizations: authorization.DefaultPortainerAuthorizations(),
 		}
 
 		err = handler.DataStore.User().CreateUser(user)

@@ -1,6 +1,7 @@
 package users
 
 import (
+	"github.com/portainer/portainer/api/internal/authorization"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -60,7 +61,7 @@ func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *http
 	user = &portainer.User{
 		Username:                payload.Username,
 		Role:                    portainer.UserRole(payload.Role),
-		PortainerAuthorizations: portainer.DefaultPortainerAuthorizations(),
+		PortainerAuthorizations: authorization.DefaultPortainerAuthorizations(),
 	}
 
 	settings, err := handler.DataStore.Settings().Settings()

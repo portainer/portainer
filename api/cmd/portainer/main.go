@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/portainer/portainer/api/chisel"
+	"github.com/portainer/portainer/api/internal/authorization"
 
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt"
@@ -485,7 +486,7 @@ func main() {
 				Username:                "admin",
 				Role:                    portainer.AdministratorRole,
 				Password:                adminPasswordHash,
-				PortainerAuthorizations: portainer.DefaultPortainerAuthorizations(),
+				PortainerAuthorizations: authorization.DefaultPortainerAuthorizations(),
 			}
 			err := dataStore.User().CreateUser(user)
 			if err != nil {

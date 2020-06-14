@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"github.com/portainer/portainer/api/internal/authorization"
 	"log"
 	"net/http"
 	"path"
@@ -462,7 +463,7 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 			return nil, err
 		}
 
-		resourceControl := portainer.GetResourceControlByResourceIDAndType(resourceID, resourceType, resourceControls)
+		resourceControl := authorization.GetResourceControlByResourceIDAndType(resourceID, resourceType, resourceControls)
 		if resourceControl == nil {
 			agentTargetHeader := request.Header.Get(portainer.PortainerAgentTargetHeader)
 
@@ -473,12 +474,12 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 				return nil, err
 			}
 
-			if inheritedResourceControl == nil || !portainer.UserCanAccessResource(tokenData.ID, userTeamIDs, inheritedResourceControl) {
+			if inheritedResourceControl == nil || !authorization.UserCanAccessResource(tokenData.ID, userTeamIDs, inheritedResourceControl) {
 				return responseutils.WriteAccessDeniedResponse()
 			}
 		}
 
-		if resourceControl != nil && !portainer.UserCanAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
+		if resourceControl != nil && !authorization.UserCanAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
 			return responseutils.WriteAccessDeniedResponse()
 		}
 	}

@@ -1,6 +1,7 @@
 package http
 
 import (
+	"github.com/portainer/portainer/api/internal/authorization"
 	"time"
 
 	"github.com/portainer/portainer/api/http/handler/edgegroups"
@@ -73,7 +74,7 @@ type Server struct {
 func (server *Server) Start() error {
 	proxyManager := proxy.NewManager(server.DataStore, server.SignatureService, server.ReverseTunnelService, server.DockerClientFactory)
 
-	authorizationService := portainer.NewAuthorizationService(server.DataStore)
+	authorizationService := authorization.NewService(server.DataStore)
 
 	rbacExtensionURL := proxyManager.GetExtensionURL(portainer.RBACExtension)
 	requestBouncer := security.NewRequestBouncer(server.DataStore, server.JWTService, rbacExtensionURL)

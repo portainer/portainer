@@ -2,6 +2,7 @@ package docker
 
 import (
 	"context"
+	"github.com/portainer/portainer/api/internal/authorization"
 	"net/http"
 
 	"github.com/docker/docker/api/types"
@@ -25,7 +26,7 @@ func getInheritedResourceControlFromNetworkLabels(dockerClient *client.Client, n
 
 	swarmStackName := network.Labels[resourceLabelForDockerSwarmStackName]
 	if swarmStackName != "" {
-		return portainer.GetResourceControlByResourceIDAndType(swarmStackName, portainer.StackResourceControl, resourceControls), nil
+		return authorization.GetResourceControlByResourceIDAndType(swarmStackName, portainer.StackResourceControl, resourceControls), nil
 	}
 
 	return nil, nil
@@ -85,7 +86,7 @@ func findSystemNetworkResourceControl(networkObject map[string]interface{}) *por
 	networkName := networkObject[networkObjectName].(string)
 
 	if networkName == "bridge" || networkName == "host" || networkName == "none" {
-		return portainer.NewSystemResourceControl(networkID, portainer.NetworkResourceControl)
+		return authorization.NewSystemResourceControl(networkID, portainer.NetworkResourceControl)
 	}
 
 	return nil

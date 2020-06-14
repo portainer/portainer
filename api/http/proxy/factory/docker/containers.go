@@ -2,6 +2,7 @@ package docker
 
 import (
 	"context"
+	"github.com/portainer/portainer/api/internal/authorization"
 	"net/http"
 
 	"github.com/docker/docker/client"
@@ -21,7 +22,7 @@ func getInheritedResourceControlFromContainerLabels(dockerClient *client.Client,
 
 	serviceName := container.Config.Labels[resourceLabelForDockerServiceID]
 	if serviceName != "" {
-		serviceResourceControl := portainer.GetResourceControlByResourceIDAndType(serviceName, portainer.ServiceResourceControl, resourceControls)
+		serviceResourceControl := authorization.GetResourceControlByResourceIDAndType(serviceName, portainer.ServiceResourceControl, resourceControls)
 		if serviceResourceControl != nil {
 			return serviceResourceControl, nil
 		}
@@ -29,12 +30,12 @@ func getInheritedResourceControlFromContainerLabels(dockerClient *client.Client,
 
 	swarmStackName := container.Config.Labels[resourceLabelForDockerSwarmStackName]
 	if swarmStackName != "" {
-		return portainer.GetResourceControlByResourceIDAndType(swarmStackName, portainer.StackResourceControl, resourceControls), nil
+		return authorization.GetResourceControlByResourceIDAndType(swarmStackName, portainer.StackResourceControl, resourceControls), nil
 	}
 
 	composeStackName := container.Config.Labels[resourceLabelForDockerComposeStackName]
 	if composeStackName != "" {
-		return portainer.GetResourceControlByResourceIDAndType(composeStackName, portainer.StackResourceControl, resourceControls), nil
+		return authorization.GetResourceControlByResourceIDAndType(composeStackName, portainer.StackResourceControl, resourceControls), nil
 	}
 
 	return nil, nil

@@ -3,6 +3,7 @@ package docker
 import (
 	"context"
 	"errors"
+	"github.com/portainer/portainer/api/internal/authorization"
 	"net/http"
 
 	"github.com/docker/docker/client"
@@ -24,7 +25,7 @@ func getInheritedResourceControlFromVolumeLabels(dockerClient *client.Client, vo
 
 	swarmStackName := volume.Labels[resourceLabelForDockerSwarmStackName]
 	if swarmStackName != "" {
-		return portainer.GetResourceControlByResourceIDAndType(swarmStackName, portainer.StackResourceControl, resourceControls), nil
+		return authorization.GetResourceControlByResourceIDAndType(swarmStackName, portainer.StackResourceControl, resourceControls), nil
 	}
 
 	return nil, nil

@@ -1,6 +1,7 @@
 package stacks
 
 import (
+	"github.com/portainer/portainer/api/internal/authorization"
 	"net/http"
 	"sync"
 
@@ -58,7 +59,7 @@ func (handler *Handler) userCanAccessStack(securityContext *security.RestrictedR
 		userTeamIDs = append(userTeamIDs, membership.TeamID)
 	}
 
-	if resourceControl != nil && portainer.UserCanAccessResource(securityContext.UserID, userTeamIDs, resourceControl) {
+	if resourceControl != nil && authorization.UserCanAccessResource(securityContext.UserID, userTeamIDs, resourceControl) {
 		return true, nil
 	}
 
