@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"github.com/portainer/portainer/api/internal/edge"
+	"github.com/portainer/portainer/api/internal/tag"
 	"net/http"
 	"reflect"
 	"strconv"
@@ -80,14 +81,14 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 
 	tagsChanged := false
 	if payload.TagIDs != nil {
-		payloadTagSet := portainer.TagSet(payload.TagIDs)
-		endpointTagSet := portainer.TagSet((endpoint.TagIDs))
-		union := portainer.TagUnion(payloadTagSet, endpointTagSet)
-		intersection := portainer.TagIntersection(payloadTagSet, endpointTagSet)
+		payloadTagSet := tag.Set(payload.TagIDs)
+		endpointTagSet := tag.Set((endpoint.TagIDs))
+		union := tag.Union(payloadTagSet, endpointTagSet)
+		intersection := tag.Intersection(payloadTagSet, endpointTagSet)
 		tagsChanged = len(union) > len(intersection)
 
 		if tagsChanged {
-			removeTags := portainer.TagDifference(endpointTagSet, payloadTagSet)
+			removeTags := tag.Difference(endpointTagSet, payloadTagSet)
 
 			for tagID := range removeTags {
 				tag, err := handler.DataStore.Tag().Tag(tagID)

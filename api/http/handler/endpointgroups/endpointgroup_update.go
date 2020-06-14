@@ -1,6 +1,7 @@
 package endpointgroups
 
 import (
+	"github.com/portainer/portainer/api/internal/tag"
 	"net/http"
 	"reflect"
 
@@ -52,14 +53,14 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 
 	tagsChanged := false
 	if payload.TagIDs != nil {
-		payloadTagSet := portainer.TagSet(payload.TagIDs)
-		endpointGroupTagSet := portainer.TagSet((endpointGroup.TagIDs))
-		union := portainer.TagUnion(payloadTagSet, endpointGroupTagSet)
-		intersection := portainer.TagIntersection(payloadTagSet, endpointGroupTagSet)
+		payloadTagSet := tag.Set(payload.TagIDs)
+		endpointGroupTagSet := tag.Set((endpointGroup.TagIDs))
+		union := tag.Union(payloadTagSet, endpointGroupTagSet)
+		intersection := tag.Intersection(payloadTagSet, endpointGroupTagSet)
 		tagsChanged = len(union) > len(intersection)
 
 		if tagsChanged {
-			removeTags := portainer.TagDifference(endpointGroupTagSet, payloadTagSet)
+			removeTags := tag.Difference(endpointGroupTagSet, payloadTagSet)
 
 			for tagID := range removeTags {
 				tag, err := handler.DataStore.Tag().Tag(tagID)

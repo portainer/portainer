@@ -1,6 +1,9 @@
 package edge
 
-import "github.com/portainer/portainer/api"
+import (
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/tag"
+)
 
 // EdgeGroupRelatedEndpoints returns a list of endpoints related to this Edge group
 func EdgeGroupRelatedEndpoints(edgeGroup *portainer.EdgeGroup, endpoints []portainer.Endpoint, endpointGroups []portainer.EndpointGroup) []portainer.EndpointID {
@@ -41,16 +44,16 @@ func edgeGroupRelatedToEndpoint(edgeGroup *portainer.EdgeGroup, endpoint *portai
 		return false
 	}
 
-	endpointTags := portainer.TagSet(endpoint.TagIDs)
+	endpointTags := tag.Set(endpoint.TagIDs)
 	if endpointGroup.TagIDs != nil {
-		endpointTags = portainer.TagUnion(endpointTags, portainer.TagSet(endpointGroup.TagIDs))
+		endpointTags = tag.Union(endpointTags, tag.Set(endpointGroup.TagIDs))
 	}
-	edgeGroupTags := portainer.TagSet(edgeGroup.TagIDs)
+	edgeGroupTags := tag.Set(edgeGroup.TagIDs)
 
 	if edgeGroup.PartialMatch {
-		intersection := portainer.TagIntersection(endpointTags, edgeGroupTags)
+		intersection := tag.Intersection(endpointTags, edgeGroupTags)
 		return len(intersection) != 0
 	}
 
-	return portainer.TagContains(edgeGroupTags, endpointTags)
+	return tag.Contains(edgeGroupTags, endpointTags)
 }
