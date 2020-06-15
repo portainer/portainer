@@ -1,11 +1,13 @@
 package version
 
 import (
+	"errors"
+
 	"strconv"
 
 	"github.com/boltdb/bolt"
-	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
+	portainererrors "github.com/portainer/portainer/api/internal/errors"
 )
 
 const (
@@ -40,7 +42,8 @@ func (service *Service) DBVersion() (int, error) {
 
 		value := bucket.Get([]byte(versionKey))
 		if value == nil {
-			return portainer.ErrObjectNotFound
+			return errors.New(portainererrors.ErrObjectNotFound)
+
 		}
 
 		data = make([]byte, len(value))

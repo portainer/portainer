@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"errors"
 	"time"
 
 	"github.com/portainer/portainer/api"
@@ -16,10 +17,10 @@ import (
 type Service struct{}
 
 const (
-	errInvalidEndpointProtocol       = portainer.Error("Invalid endpoint protocol: Portainer only supports unix://, npipe:// or tcp://")
-	errSocketOrNamedPipeNotFound     = portainer.Error("Unable to locate Unix socket or named pipe")
-	errInvalidSnapshotInterval       = portainer.Error("Invalid snapshot interval")
-	errAdminPassExcludeAdminPassFile = portainer.Error("Cannot use --admin-password with --admin-password-file")
+	errInvalidEndpointProtocol       = "Invalid endpoint protocol: Portainer only supports unix://, npipe:// or tcp://"
+	errSocketOrNamedPipeNotFound     = "Unable to locate Unix socket or named pipe"
+	errInvalidSnapshotInterval       = "Invalid snapshot interval"
+	errAdminPassExcludeAdminPassFile = "Cannot use --admin-password with --admin-password-file"
 )
 
 // ParseFlags parse the CLI flags and return a portainer.Flags struct
@@ -79,7 +80,7 @@ func (*Service) ValidateFlags(flags *portainer.CLIFlags) error {
 	}
 
 	if *flags.AdminPassword != "" && *flags.AdminPasswordFile != "" {
-		return errAdminPassExcludeAdminPassFile
+		return errors.New(errAdminPassExcludeAdminPassFile)
 	}
 
 	return nil
@@ -92,7 +93,7 @@ func displayDeprecationWarnings(flags *portainer.CLIFlags) {
 func validateEndpointURL(endpointURL string) error {
 	if endpointURL != "" {
 		if !strings.HasPrefix(endpointURL, "unix://") && !strings.HasPrefix(endpointURL, "tcp://") && !strings.HasPrefix(endpointURL, "npipe://") {
-			return errInvalidEndpointProtocol
+			return errors.New(errInvalidEndpointProtocol)
 		}
 
 		if strings.HasPrefix(endpointURL, "unix://") || strings.HasPrefix(endpointURL, "npipe://") {
@@ -100,7 +101,7 @@ func validateEndpointURL(endpointURL string) error {
 			socketPath = strings.TrimPrefix(socketPath, "npipe://")
 			if _, err := os.Stat(socketPath); err != nil {
 				if os.IsNotExist(err) {
-					return errSocketOrNamedPipeNotFound
+					return errors.New(errSocketOrNamedPipeNotFound)
 				}
 				return err
 			}
@@ -113,7 +114,7 @@ func validateSnapshotInterval(snapshotInterval string) error {
 	if snapshotInterval != defaultSnapshotInterval {
 		_, err := time.ParseDuration(snapshotInterval)
 		if err != nil {
-			return errInvalidSnapshotInterval
+			return errors.New(errInvalidSnapshotInterval)
 		}
 	}
 	return nil

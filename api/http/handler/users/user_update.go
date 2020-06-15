@@ -1,6 +1,7 @@
 package users
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -9,6 +10,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
+	portainererrors "github.com/portainer/portainer/api/internal/errors"
 )
 
 type userUpdatePayload struct {
@@ -19,11 +21,11 @@ type userUpdatePayload struct {
 
 func (payload *userUpdatePayload) Validate(r *http.Request) error {
 	if govalidator.Contains(payload.Username, " ") {
-		return portainer.Error("Invalid username. Must not contain any whitespace")
+		return errors.New("Invalid username. Must not contain any whitespace")
 	}
 
 	if payload.Role != 0 && payload.Role != 1 && payload.Role != 2 {
-		return portainer.Error("Invalid role value. Value must be one of: 1 (administrator) or 2 (regular user)")
+		return errors.New("Invalid role value. Value must be one of: 1 (administrator) or 2 (regular user)")
 	}
 	return nil
 }
@@ -41,7 +43,7 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	if tokenData.Role != portainer.AdministratorRole && tokenData.ID != portainer.UserID(userID) {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update user", portainer.ErrUnauthorized}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update user", errors.New(portainererrors.ErrUnauthorized)}
 	}
 
 	var payload userUpdatePayload
@@ -51,11 +53,11 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	if tokenData.Role != portainer.AdministratorRole && payload.Role != 0 {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update user to administrator role", portainer.ErrResourceAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update user to administrator role", errors.New(portainererrors.ErrResourceAccessDenied)}
 	}
 
 	user, err := handler.DataStore.User().User(portainer.UserID(userID))
-	if err == portainer.ErrObjectNotFound {
+	if err.Error() == portainererrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a user with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a user with the specified identifier inside the database", err}
@@ -63,11 +65,11 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 
 	if payload.Username != "" && payload.Username != user.Username {
 		sameNameUser, err := handler.DataStore.User().UserByUsername(payload.Username)
-		if err != nil && err != portainer.ErrObjectNotFound {
+		if err != nil && err.Error() != portainererrors.ErrObjectNotFound {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve users from the database", err}
 		}
 		if sameNameUser != nil && sameNameUser.ID != portainer.UserID(userID) {
-			return &httperror.HandlerError{http.StatusConflict, "Another user with the same username already exists", portainer.ErrUserAlreadyExists}
+			return &httperror.HandlerError{http.StatusConflict, "Another user with the same username already exists", errors.New(portainererrors.ErrUserAlreadyExists)}
 		}
 
 		user.Username = payload.Username
@@ -76,7 +78,7 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 	if payload.Password != "" {
 		user.Password, err = handler.CryptoService.Hash(payload.Password)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to hash user password", portainer.ErrCryptoHashFailure}
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to hash user password", errors.New(portainererrors.ErrCryptoHashFailure)}
 		}
 	}
 

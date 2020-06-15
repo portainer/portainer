@@ -1,6 +1,7 @@
 package users
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -9,6 +10,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
+	portainererrors "github.com/portainer/portainer/api/internal/errors"
 )
 
 type userUpdatePasswordPayload struct {
@@ -18,10 +20,10 @@ type userUpdatePasswordPayload struct {
 
 func (payload *userUpdatePasswordPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Password) {
-		return portainer.Error("Invalid current password")
+		return errors.New("Invalid current password")
 	}
 	if govalidator.IsNull(payload.NewPassword) {
-		return portainer.Error("Invalid new password")
+		return errors.New("Invalid new password")
 	}
 	return nil
 }
@@ -39,7 +41,7 @@ func (handler *Handler) userUpdatePassword(w http.ResponseWriter, r *http.Reques
 	}
 
 	if tokenData.Role != portainer.AdministratorRole && tokenData.ID != portainer.UserID(userID) {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update user", portainer.ErrUnauthorized}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update user", errors.New(portainererrors.ErrUnauthorized)}
 	}
 
 	var payload userUpdatePasswordPayload
@@ -49,7 +51,7 @@ func (handler *Handler) userUpdatePassword(w http.ResponseWriter, r *http.Reques
 	}
 
 	user, err := handler.DataStore.User().User(portainer.UserID(userID))
-	if err == portainer.ErrObjectNotFound {
+	if err.Error() == portainererrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a user with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a user with the specified identifier inside the database", err}
@@ -57,12 +59,12 @@ func (handler *Handler) userUpdatePassword(w http.ResponseWriter, r *http.Reques
 
 	err = handler.CryptoService.CompareHashAndData(user.Password, payload.Password)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Specified password do not match actual password", portainer.ErrUnauthorized}
+		return &httperror.HandlerError{http.StatusForbidden, "Specified password do not match actual password", errors.New(portainererrors.ErrUnauthorized)}
 	}
 
 	user.Password, err = handler.CryptoService.Hash(payload.NewPassword)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to hash user password", portainer.ErrCryptoHashFailure}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to hash user password", errors.New(portainererrors.ErrCryptoHashFailure)}
 	}
 
 	err = handler.DataStore.User().UpdateUser(user.ID, user)

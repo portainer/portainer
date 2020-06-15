@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
+	portainererrors "github.com/portainer/portainer/api/internal/errors"
 )
 
 // DELETE request on /api/users/:id
@@ -28,11 +29,11 @@ func (handler *Handler) userDelete(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	if tokenData.ID == portainer.UserID(userID) {
-		return &httperror.HandlerError{http.StatusForbidden, "Cannot remove your own user account. Contact another administrator", portainer.ErrAdminCannotRemoveSelf}
+		return &httperror.HandlerError{http.StatusForbidden, "Cannot remove your own user account. Contact another administrator", errors.New(portainererrors.ErrAdminCannotRemoveSelf)}
 	}
 
 	user, err := handler.DataStore.User().User(portainer.UserID(userID))
-	if err == portainer.ErrObjectNotFound {
+	if err.Error() == portainererrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a user with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a user with the specified identifier inside the database", err}
@@ -63,7 +64,7 @@ func (handler *Handler) deleteAdminUser(w http.ResponseWriter, user *portainer.U
 	}
 
 	if localAdminCount < 2 {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Cannot remove local administrator user", portainer.ErrCannotRemoveLastLocalAdmin}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Cannot remove local administrator user", errors.New(portainererrors.ErrCannotRemoveLastLocalAdmin)}
 	}
 
 	return handler.deleteUser(w, user)

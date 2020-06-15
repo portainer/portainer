@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/errors"
 )
 
 // DELETE request on /api/tags/:id
@@ -18,7 +19,7 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 	tagID := portainer.TagID(id)
 
 	tag, err := handler.DataStore.Tag().Tag(tagID)
-	if err == portainer.ErrObjectNotFound {
+	if err.Error() == errors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a tag with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a tag with the specified identifier inside the database", err}

@@ -1,8 +1,11 @@
 package stack
 
 import (
+	"errors"
+
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
+	portainererrors "github.com/portainer/portainer/api/internal/errors"
 
 	"github.com/boltdb/bolt"
 )
@@ -64,7 +67,7 @@ func (service *Service) StackByName(name string) (*portainer.Stack, error) {
 		}
 
 		if stack == nil {
-			return portainer.ErrObjectNotFound
+			return errors.New(portainererrors.ErrObjectNotFound)
 		}
 
 		return nil

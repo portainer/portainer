@@ -2,9 +2,11 @@ package security
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"github.com/portainer/portainer/api"
+	portainererrors "github.com/portainer/portainer/api/internal/errors"
 )
 
 type (
@@ -25,7 +27,7 @@ func storeTokenData(request *http.Request, tokenData *portainer.TokenData) conte
 func RetrieveTokenData(request *http.Request) (*portainer.TokenData, error) {
 	contextData := request.Context().Value(contextAuthenticationKey)
 	if contextData == nil {
-		return nil, portainer.ErrMissingContextData
+		return nil, errors.New(portainererrors.ErrMissingContextData)
 	}
 
 	tokenData := contextData.(*portainer.TokenData)
@@ -42,7 +44,7 @@ func storeRestrictedRequestContext(request *http.Request, requestContext *Restri
 func RetrieveRestrictedRequestContext(request *http.Request) (*RestrictedRequestContext, error) {
 	contextData := request.Context().Value(contextRestrictedRequest)
 	if contextData == nil {
-		return nil, portainer.ErrMissingSecurityContext
+		return nil, errors.New(portainererrors.ErrMissingSecurityContext)
 	}
 
 	requestContext := contextData.(*RestrictedRequestContext)

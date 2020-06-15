@@ -3,6 +3,7 @@ package client
 import (
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -12,10 +13,11 @@ import (
 	"time"
 
 	"github.com/portainer/portainer/api"
+	portainererrors "github.com/portainer/portainer/api/internal/errors"
 )
 
 const (
-	errInvalidResponseStatus = portainer.Error("Invalid response status (expecting 200)")
+	errInvalidResponseStatus = "Invalid response status (expecting 200)"
 	defaultHTTPTimeout       = 5
 )
 
@@ -56,7 +58,7 @@ func (client *HTTPClient) ExecuteAzureAuthenticationRequest(credentials *portain
 	}
 
 	if response.StatusCode != http.StatusOK {
-		return nil, portainer.ErrAzureInvalidCredentials
+		return nil, errors.New(portainererrors.ErrAzureInvalidCredentials)
 	}
 
 	var token AzureAuthenticationResponse
@@ -89,7 +91,7 @@ func Get(url string, timeout int) ([]byte, error) {
 
 	if response.StatusCode != http.StatusOK {
 		log.Printf("[ERROR] [http,client] [message: unexpected status code] [status_code: %d]", response.StatusCode)
-		return nil, errInvalidResponseStatus
+		return nil, errors.New(errInvalidResponseStatus)
 	}
 
 	body, err := ioutil.ReadAll(response.Body)

@@ -2,10 +2,12 @@ package security
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"time"
 
 	portainer "github.com/portainer/portainer/api"
+	portainererrors "github.com/portainer/portainer/api/internal/errors"
 )
 
 const (
@@ -52,7 +54,7 @@ func (client *rbacExtensionClient) checkAuthorization(authRequest *portainer.API
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusNoContent {
-		return portainer.ErrAuthorizationRequired
+		return errors.New(portainererrors.ErrAuthorizationRequired)
 	}
 
 	return nil

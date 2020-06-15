@@ -1,18 +1,20 @@
 package ldap
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
 	ldap "github.com/go-ldap/ldap/v3"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
+	portainererrors "github.com/portainer/portainer/api/internal/errors"
 )
 
-const (
+var (
 	// ErrUserNotFound defines an error raised when the user is not found via LDAP search
 	// or that too many entries (> 1) are returned.
-	ErrUserNotFound = portainer.Error("User not found or too many entries returned")
+	ErrUserNotFound = errors.New("User not found or too many entries returned")
 )
 
 // Service represents a service used to authenticate users against a LDAP/AD.
@@ -105,7 +107,7 @@ func (*Service) AuthenticateUser(username, password string, settings *portainer.
 
 	err = connection.Bind(userDN, password)
 	if err != nil {
-		return portainer.ErrUnauthorized
+		return errors.New(portainererrors.ErrUnauthorized)
 	}
 
 	return nil

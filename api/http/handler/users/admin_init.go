@@ -1,6 +1,7 @@
 package users
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -8,6 +9,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	portainererrors "github.com/portainer/portainer/api/internal/errors"
 )
 
 type adminInitPayload struct {
@@ -17,10 +19,10 @@ type adminInitPayload struct {
 
 func (payload *adminInitPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Username) || govalidator.Contains(payload.Username, " ") {
-		return portainer.Error("Invalid username. Must not contain any whitespace")
+		return errors.New("Invalid username. Must not contain any whitespace")
 	}
 	if govalidator.IsNull(payload.Password) {
-		return portainer.Error("Invalid password")
+		return errors.New("Invalid password")
 	}
 	return nil
 }
@@ -39,7 +41,7 @@ func (handler *Handler) adminInit(w http.ResponseWriter, r *http.Request) *httpe
 	}
 
 	if len(users) != 0 {
-		return &httperror.HandlerError{http.StatusConflict, "Unable to create administrator user", portainer.ErrAdminAlreadyInitialized}
+		return &httperror.HandlerError{http.StatusConflict, "Unable to create administrator user", errors.New(portainererrors.ErrAdminAlreadyInitialized)}
 	}
 
 	user := &portainer.User{
@@ -50,7 +52,7 @@ func (handler *Handler) adminInit(w http.ResponseWriter, r *http.Request) *httpe
 
 	user.Password, err = handler.CryptoService.Hash(payload.Password)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to hash user password", portainer.ErrCryptoHashFailure}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to hash user password", errors.New(portainererrors.ErrCryptoHashFailure)}
 	}
 
 	err = handler.DataStore.User().CreateUser(user)

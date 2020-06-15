@@ -5,6 +5,7 @@ import (
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer/api"
+	portainererrors "github.com/portainer/portainer/api/internal/errors"
 
 	"net/http"
 	"strings"
@@ -110,13 +111,13 @@ func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endp
 	}
 
 	if !authorizedEndpointAccess(endpoint, group, tokenData.ID, memberships) {
-		return portainer.ErrEndpointAccessDenied
+		return errors.New(portainererrors.ErrEndpointAccessDenied)
 	}
 
 	if authorizationCheck {
 		err = bouncer.checkEndpointOperationAuthorization(r, endpoint)
 		if err != nil {
-			return portainer.ErrAuthorizationRequired
+			return errors.New(portainererrors.ErrAuthorizationRequired)
 		}
 	}
 
@@ -152,7 +153,7 @@ func (bouncer *RequestBouncer) checkEndpointOperationAuthorization(r *http.Reque
 	}
 
 	extension, err := bouncer.dataStore.Extension().Extension(portainer.RBACExtension)
-	if err == portainer.ErrObjectNotFound {
+	if err.Error() == portainererrors.ErrObjectNotFound {
 		return nil
 	} else if err != nil {
 		return err
@@ -192,7 +193,7 @@ func (bouncer *RequestBouncer) RegistryAccess(r *http.Request, registry *portain
 	}
 
 	if !AuthorizedRegistryAccess(registry, tokenData.ID, memberships) {
-		return portainer.ErrEndpointAccessDenied
+		return errors.New(portainererrors.ErrEndpointAccessDenied)
 	}
 
 	return nil
@@ -213,7 +214,7 @@ func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler,
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tokenData, err := RetrieveTokenData(r)
 		if err != nil {
-			httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrUnauthorized)
+			httperror.WriteError(w, http.StatusForbidden, "Access denied", errors.New(portainererrors.ErrUnauthorized))
 			return
 		}
 
@@ -223,9 +224,9 @@ func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler,
 		}
 
 		extension, err := bouncer.dataStore.Extension().Extension(portainer.RBACExtension)
-		if err == portainer.ErrObjectNotFound {
+		if err.Error() == portainererrors.ErrObjectNotFound {
 			if administratorOnly {
-				httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrUnauthorized)
+				httperror.WriteError(w, http.StatusForbidden, "Access denied", errors.New(portainererrors.ErrUnauthorized))
 				return
 			}
 
@@ -237,8 +238,8 @@ func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler,
 		}
 
 		user, err := bouncer.dataStore.User().User(tokenData.ID)
-		if err != nil && err == portainer.ErrObjectNotFound {
-			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", portainer.ErrUnauthorized)
+		if err != nil && err.Error() == portainererrors.ErrObjectNotFound {
+			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", errors.New(portainererrors.ErrUnauthorized))
 			return
 		} else if err != nil {
 			httperror.WriteError(w, http.StatusInternalServerError, "Unable to retrieve user details from the database", err)
@@ -254,7 +255,7 @@ func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler,
 		bouncer.rbacExtensionClient.setLicenseKey(extension.License.LicenseKey)
 		err = bouncer.rbacExtensionClient.checkAuthorization(apiOperation)
 		if err != nil {
-			httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrAuthorizationRequired)
+			httperror.WriteError(w, http.StatusForbidden, "Access denied", errors.New(portainererrors.ErrAuthorizationRequired))
 			return
 		}
 
@@ -268,7 +269,7 @@ func (bouncer *RequestBouncer) mwUpgradeToRestrictedRequest(next http.Handler) h
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tokenData, err := RetrieveTokenData(r)
 		if err != nil {
-			httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrResourceAccessDenied)
+			httperror.WriteError(w, http.StatusForbidden, "Access denied", errors.New(portainererrors.ErrResourceAccessDenied))
 			return
 		}
 
@@ -301,7 +302,7 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 		}
 
 		if token == "" {
-			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", portainer.ErrUnauthorized)
+			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", errors.New(portainererrors.ErrUnauthorized))
 			return
 		}
 
@@ -313,8 +314,8 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 		}
 
 		_, err = bouncer.dataStore.User().User(tokenData.ID)
-		if err != nil && err == portainer.ErrObjectNotFound {
-			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", portainer.ErrUnauthorized)
+		if err != nil && err.Error() == portainererrors.ErrObjectNotFound {
+			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", errors.New(portainererrors.ErrUnauthorized))
 			return
 		} else if err != nil {
 			httperror.WriteError(w, http.StatusInternalServerError, "Unable to retrieve user details from the database", err)

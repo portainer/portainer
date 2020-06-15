@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
+	portainererrors "github.com/portainer/portainer/api/internal/errors"
 )
 
 type resourceControlUpdatePayload struct {
@@ -43,7 +44,7 @@ func (handler *Handler) resourceControlUpdate(w http.ResponseWriter, r *http.Req
 	}
 
 	resourceControl, err := handler.DataStore.ResourceControl().ResourceControl(portainer.ResourceControlID(resourceControlID))
-	if err == portainer.ErrObjectNotFound {
+	if err.Error() == portainererrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a resource control with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a resource control with with the specified identifier inside the database", err}
@@ -55,7 +56,7 @@ func (handler *Handler) resourceControlUpdate(w http.ResponseWriter, r *http.Req
 	}
 
 	if !security.AuthorizedResourceControlAccess(resourceControl, securityContext) {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access the resource control", portainer.ErrResourceAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access the resource control", errors.New(portainererrors.ErrResourceAccessDenied)}
 	}
 
 	resourceControl.Public = payload.Public
@@ -82,7 +83,7 @@ func (handler *Handler) resourceControlUpdate(w http.ResponseWriter, r *http.Req
 	resourceControl.TeamAccesses = teamAccesses
 
 	if !security.AuthorizedResourceControlUpdate(resourceControl, securityContext) {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update the resource control", portainer.ErrResourceAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update the resource control", errors.New(portainererrors.ErrResourceAccessDenied)}
 	}
 
 	err = handler.DataStore.ResourceControl().UpdateResourceControl(resourceControl.ID, resourceControl)

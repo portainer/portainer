@@ -1,12 +1,14 @@
 package endpointgroups
 
 import (
+	"errors"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	portainererrors "github.com/portainer/portainer/api/internal/errors"
 )
 
 // DELETE request on /api/endpoint_groups/:id
@@ -17,11 +19,11 @@ func (handler *Handler) endpointGroupDelete(w http.ResponseWriter, r *http.Reque
 	}
 
 	if endpointGroupID == 1 {
-		return &httperror.HandlerError{http.StatusForbidden, "Unable to remove the default 'Unassigned' group", portainer.ErrCannotRemoveDefaultGroup}
+		return &httperror.HandlerError{http.StatusForbidden, "Unable to remove the default 'Unassigned' group", errors.New(portainererrors.ErrCannotRemoveDefaultGroup)}
 	}
 
 	endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(portainer.EndpointGroupID(endpointGroupID))
-	if err == portainer.ErrObjectNotFound {
+	if err.Error() == portainererrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint group with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint group with the specified identifier inside the database", err}

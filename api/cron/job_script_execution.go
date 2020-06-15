@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/errors"
 )
 
 // ScriptExecutionJobRunner is used to run a ScriptExecutionJob
@@ -73,7 +74,7 @@ func (runner *ScriptExecutionJobRunner) executeAndRetry(endpoints []*portainer.E
 
 	for _, endpoint := range endpoints {
 		err := runner.context.jobService.ExecuteScript(endpoint, "", runner.schedule.ScriptExecutionJob.Image, script, runner.schedule)
-		if err == portainer.ErrUnableToPingEndpoint {
+		if err.Error() == errors.ErrUnableToPingEndpoint {
 			retryTargets = append(retryTargets, endpoint)
 		} else if err != nil {
 			log.Printf("scheduled job error (script execution). Unable to execute script (endpoint=%s) (err=%s)\n", endpoint.Name, err)

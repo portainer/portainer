@@ -28,6 +28,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/user"
 	"github.com/portainer/portainer/api/bolt/version"
 	"github.com/portainer/portainer/api/bolt/webhook"
+	"github.com/portainer/portainer/api/internal/errors"
 )
 
 const (
@@ -118,7 +119,7 @@ func (store *Store) MigrateData() error {
 	}
 
 	version, err := store.VersionService.DBVersion()
-	if err == portainer.ErrObjectNotFound {
+	if err.Error() == errors.ErrObjectNotFound {
 		version = 0
 	} else if err != nil {
 		return err

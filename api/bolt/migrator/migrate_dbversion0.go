@@ -4,6 +4,7 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/user"
+	"github.com/portainer/portainer/api/internal/errors"
 )
 
 func (m *Migrator) updateAdminUserToDBVersion1() error {
@@ -22,7 +23,7 @@ func (m *Migrator) updateAdminUserToDBVersion1() error {
 		if err != nil {
 			return err
 		}
-	} else if err != nil && err != portainer.ErrObjectNotFound {
+	} else if err != nil && err.Error() != errors.ErrObjectNotFound {
 		return err
 	}
 	return nil

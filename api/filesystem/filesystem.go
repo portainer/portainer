@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"encoding/pem"
+	"errors"
 	"io/ioutil"
 
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/archive"
+	portainererrors "github.com/portainer/portainer/api/internal/errors"
 
 	"io"
 	"os"
@@ -188,7 +190,7 @@ func (service *Service) StoreTLSFileFromBytes(folder string, fileType portainer.
 	case portainer.TLSFileKey:
 		fileName = TLSKeyFile
 	default:
-		return "", portainer.ErrUndefinedTLSFileType
+		return "", errors.New(portainererrors.ErrUndefinedTLSFileType)
 	}
 
 	tlsFilePath := path.Join(storePath, fileName)
@@ -211,7 +213,7 @@ func (service *Service) GetPathForTLSFile(folder string, fileType portainer.TLSF
 	case portainer.TLSFileKey:
 		fileName = TLSKeyFile
 	default:
-		return "", portainer.ErrUndefinedTLSFileType
+		return "", errors.New(portainererrors.ErrUndefinedTLSFileType)
 	}
 	return path.Join(service.fileStorePath, TLSStorePath, folder, fileName), nil
 }
@@ -237,7 +239,7 @@ func (service *Service) DeleteTLSFile(folder string, fileType portainer.TLSFileT
 	case portainer.TLSFileKey:
 		fileName = TLSKeyFile
 	default:
-		return portainer.ErrUndefinedTLSFileType
+		return errors.New(portainererrors.ErrUndefinedTLSFileType)
 	}
 
 	filePath := path.Join(service.fileStorePath, TLSStorePath, folder, fileName)

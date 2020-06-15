@@ -8,6 +8,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/errors"
 )
 
 // Handler is the HTTP handler used to handle stack operations.
@@ -63,9 +64,9 @@ func (handler *Handler) userCanAccessStack(securityContext *security.RestrictedR
 	}
 
 	_, err := handler.DataStore.Extension().Extension(portainer.RBACExtension)
-	if err == portainer.ErrObjectNotFound {
+	if err.Error() == errors.ErrObjectNotFound {
 		return false, nil
-	} else if err != nil && err != portainer.ErrObjectNotFound {
+	} else if err != nil && err.Error() != errors.ErrObjectNotFound {
 		return false, err
 	}
 

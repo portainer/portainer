@@ -2,7 +2,9 @@ package jwt
 
 import (
 	"github.com/portainer/portainer/api"
+	portainererrors "github.com/portainer/portainer/api/internal/errors"
 
+	"errors"
 	"fmt"
 	"time"
 
@@ -32,7 +34,7 @@ func NewService(userSessionDuration string) (*Service, error) {
 
 	secret := securecookie.GenerateRandomKey(32)
 	if secret == nil {
-		return nil, portainer.ErrSecretGeneration
+		return nil, errors.New(portainererrors.ErrSecretGeneration)
 	}
 
 	service := &Service{
@@ -83,7 +85,7 @@ func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData,
 		}
 	}
 
-	return nil, portainer.ErrInvalidJWTToken
+	return nil, errors.New(portainererrors.ErrInvalidJWTToken)
 }
 
 // SetUserSessionDuration sets the user session duration

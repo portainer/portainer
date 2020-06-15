@@ -16,6 +16,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
 	"github.com/portainer/portainer/api/http/security"
+	portainererrors "github.com/portainer/portainer/api/internal/errors"
 )
 
 var apiVersionRe = regexp.MustCompile(`(/v[0-9]\.[0-9]*)?`)
@@ -409,7 +410,7 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 
 	if tokenData.Role != portainer.AdministratorRole {
 		rbacExtension, err := transport.dataStore.Extension().Extension(portainer.RBACExtension)
-		if err != nil && err != portainer.ErrObjectNotFound {
+		if err != nil && err.Error() != portainererrors.ErrObjectNotFound {
 			return nil, err
 		}
 

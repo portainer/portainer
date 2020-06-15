@@ -3,6 +3,7 @@ package docker
 import (
 	"bytes"
 	"context"
+	"errors"
 	"io"
 	"io/ioutil"
 	"strconv"
@@ -14,6 +15,7 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/archive"
+	portainererrors "github.com/portainer/portainer/api/internal/errors"
 )
 
 // JobService represents a service that handles the execution of jobs
@@ -44,7 +46,7 @@ func (service *JobService) ExecuteScript(endpoint *portainer.Endpoint, nodeName,
 
 	_, err = cli.Ping(context.Background())
 	if err != nil {
-		return portainer.ErrUnableToPingEndpoint
+		return errors.New(portainererrors.ErrUnableToPingEndpoint)
 	}
 
 	err = pullImage(cli, image)

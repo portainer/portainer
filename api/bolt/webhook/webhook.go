@@ -1,8 +1,11 @@
 package webhook
 
 import (
+	"errors"
+
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/bolt/internal"
+	portainererrors "github.com/portainer/portainer/api/internal/errors"
 
 	"github.com/boltdb/bolt"
 )
@@ -87,7 +90,8 @@ func (service *Service) WebhookByResourceID(ID string) (*portainer.Webhook, erro
 		}
 
 		if webhook == nil {
-			return portainer.ErrObjectNotFound
+			return errors.New(portainererrors.ErrObjectNotFound)
+
 		}
 
 		return nil
@@ -118,7 +122,8 @@ func (service *Service) WebhookByToken(token string) (*portainer.Webhook, error)
 		}
 
 		if webhook == nil {
-			return portainer.ErrObjectNotFound
+			return errors.New(portainererrors.ErrObjectNotFound)
+
 		}
 
 		return nil

@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/errors"
 )
 
 type stackFileResponse struct {
@@ -22,7 +23,7 @@ func (handler *Handler) edgeStackFile(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	stack, err := handler.DataStore.EdgeStack().EdgeStack(portainer.EdgeStackID(stackID))
-	if err == portainer.ErrObjectNotFound {
+	if err.Error() == errors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an edge stack with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an edge stack with the specified identifier inside the database", err}

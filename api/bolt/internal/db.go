@@ -2,9 +2,10 @@ package internal
 
 import (
 	"encoding/binary"
+	"errors"
 
 	"github.com/boltdb/bolt"
-	"github.com/portainer/portainer/api"
+	portainererrors "github.com/portainer/portainer/api/internal/errors"
 )
 
 // Itob returns an 8-byte big endian representation of v.
@@ -36,7 +37,7 @@ func GetObject(db *bolt.DB, bucketName string, key []byte, object interface{}) e
 
 		value := bucket.Get(key)
 		if value == nil {
-			return portainer.ErrObjectNotFound
+			return errors.New(portainererrors.ErrObjectNotFound)
 		}
 
 		data = make([]byte, len(value))

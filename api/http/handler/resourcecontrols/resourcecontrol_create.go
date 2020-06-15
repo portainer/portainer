@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	portainererrors "github.com/portainer/portainer/api/internal/errors"
 )
 
 type resourceControlCreatePayload struct {
@@ -65,7 +66,7 @@ func (handler *Handler) resourceControlCreate(w http.ResponseWriter, r *http.Req
 	case "config":
 		resourceControlType = portainer.ConfigResourceControl
 	default:
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid type value. Value must be one of: container, service, volume, network, secret, stack or config", portainer.ErrInvalidResourceControlType}
+		return &httperror.HandlerError{http.StatusBadRequest, "Invalid type value. Value must be one of: container, service, volume, network, secret, stack or config", errors.New(portainererrors.ErrInvalidResourceControlType)}
 	}
 
 	rc, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(payload.ResourceID, resourceControlType)
@@ -73,7 +74,7 @@ func (handler *Handler) resourceControlCreate(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve resource controls from the database", err}
 	}
 	if rc != nil {
-		return &httperror.HandlerError{http.StatusConflict, "A resource control is already associated to this resource", portainer.ErrResourceControlAlreadyExists}
+		return &httperror.HandlerError{http.StatusConflict, "A resource control is already associated to this resource", errors.New(portainererrors.ErrResourceControlAlreadyExists)}
 	}
 
 	var userAccesses = make([]portainer.UserResourceAccess, 0)

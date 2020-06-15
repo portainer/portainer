@@ -3,6 +3,7 @@ package exec
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -103,7 +104,7 @@ func runCommandAndCaptureStdErr(command string, args []string, env []string, wor
 
 	err := cmd.Run()
 	if err != nil {
-		return portainer.Error(stderr.String())
+		return errors.New(stderr.String())
 	}
 
 	return nil

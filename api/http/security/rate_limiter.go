@@ -1,13 +1,14 @@
 package security
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/g07cha/defender"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api"
+	portainererrors "github.com/portainer/portainer/api/internal/errors"
 )
 
 // RateLimiter represents an entity that manages request rate limiting
@@ -30,7 +31,7 @@ func (limiter *RateLimiter) LimitAccess(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ip := StripAddrPort(r.RemoteAddr)
 		if banned := limiter.Inc(ip); banned == true {
-			httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrResourceAccessDenied)
+			httperror.WriteError(w, http.StatusForbidden, "Access denied", errors.New(portainererrors.ErrResourceAccessDenied))
 			return
 		}
 		next.ServeHTTP(w, r)
