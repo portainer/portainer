@@ -27,60 +27,55 @@ Cypress.Commands.add('initEndpoint', () => {
   cy.get('[type=submit]').click();
 });
 
-Cypress.Commands.add('apiAuth', (username, password) => {
-  cy.request({
-    method: 'POST',
-    url: 'http://e2e-portainer:9000/api/auth',
-    body: {
-      username: username,
-      password: password,
-    },
-  })
-    .its('body')
-    .then((body) => {
-      cy.setLocalStorage('portainer.JWT', body.jwt);
-    });
-});
-
 Cypress.Commands.add('frontendAuth', (username, password) => {
-  cy.visit('/#/auth');
+  cy.route('POST', '**/auth').as('postAuth');
 
+  cy.visit('/#/auth');
   cy.get('#username').click();
   cy.get('#username').type(username);
   cy.get('#password').type(password);
   cy.get('ng-transclude > .ng-scope:nth-child(1)').click();
+  cy.wait('@postAuth');
 });
 
-Cypress.Commands.add('createUser', (username, password) => {
-  cy.visit('/#/users');
+Cypress.Commands.add('frontendEnableExtension', (licenseKey) => {
+  cy.route('POST', '**/extensions').as('postExtensions');
 
-  cy.wait(500);
+  cy.visit('/#/extensions');
+  cy.get('[name="extension_license"]').type(licenseKey);
+  cy.contains('button', 'Enable extension').click();
+  cy.wait('@postExtensions');
+});
+
+Cypress.Commands.add('frontendCreateUser', (username, password) => {
+  // Setup user route to wait for response
+  cy.route('POST', '**/users').as('users');
+
   cy.get('#username').click();
   cy.get('#username').type(username);
   cy.get('#password').type(password);
   cy.get('#confirm_password').type(password);
   cy.get('.btn-primary').click();
-  cy.wait(1000);
+  cy.wait('@users');
 });
 
-Cypress.Commands.add('createTeam', (teamName) => {
-  cy.visit('/#/teams');
+Cypress.Commands.add('frontendCreateTeam', (teamName) => {
+  // Setup team route to wait for response
+  cy.route('POST', '**/teams').as('teams');
 
-  cy.wait(500);
+  cy.visit('/#/teams');
   cy.get('#team_name').click();
   cy.get('#team_name').type(teamName);
   cy.get('.btn-primary').click();
-  cy.wait(1000);
+  cy.wait('@teams');
 });
 
 // Navigate to teams view and assign a user to a team
 Cypress.Commands.add('assignToTeam', (username, teamName) => {
   cy.visit('/#/teams');
-  cy.wait(500);
 
   // Click team to browse to related team details view
   cy.clickLink(teamName);
-  cy.wait(500);
 
   // Get users table and execute within
   cy.contains('.widget', 'Users').within(() => {
@@ -93,7 +88,7 @@ Cypress.Commands.add('assignToTeam', (username, teamName) => {
 // Navigate to the endpoints view and give the user/team access
 Cypress.Commands.add('assignAccess', (entityName, entityType, role) => {
   cy.visit('/#/endpoints');
-  cy.wait(1000);
+  cy.wait(500);
 
   // Click Manage Access in endpoint row
   cy.clickLink('Manage access');
@@ -112,14 +107,16 @@ Cypress.Commands.add('assignAccess', (entityName, entityType, role) => {
     .parent()
     .contains(entityName)
     .click();
-
   cy.get('.multiSelect > .ng-binding').click();
+
   // Click role dropdown and select role
   cy.get('.form-control:nth-child(1)').select(role);
+
   // Click Create access button
   cy.get('button[type=submit]').click();
 });
 
 Cypress.Commands.add('clickLink', (label) => {
-  cy.get('a').contains(label).click();
+  // Timeout included to wait for element to be rendered
+  cy.contains('a', label, { timeout: 60000 }).click();
 });
