@@ -2,13 +2,13 @@ package docker
 
 import (
 	"context"
-	"github.com/portainer/portainer/api/internal/authorization"
 	"net/http"
 
 	"github.com/docker/docker/client"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
+	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 const (

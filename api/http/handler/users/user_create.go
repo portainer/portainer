@@ -1,7 +1,6 @@
 package users
 
 import (
-	"github.com/portainer/portainer/api/internal/authorization"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -10,6 +9,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 type userCreatePayload struct {

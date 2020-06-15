@@ -1,7 +1,6 @@
 package edgestacks
 
 import (
-	"github.com/portainer/portainer/api/internal/edge"
 	"net/http"
 	"strconv"
 
@@ -10,6 +9,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/edge"
 )
 
 type updateEdgeStackPayload struct {

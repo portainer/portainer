@@ -2,7 +2,6 @@ package edgestacks
 
 import (
 	"errors"
-	"github.com/portainer/portainer/api/internal/edge"
 	"net/http"
 	"strconv"
 	"strings"
@@ -14,6 +13,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
+	"github.com/portainer/portainer/api/internal/edge"
 )
 
 // POST request on /api/endpoint_groups

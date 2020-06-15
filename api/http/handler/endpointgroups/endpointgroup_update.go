@@ -1,7 +1,6 @@
 package endpointgroups
 
 import (
-	"github.com/portainer/portainer/api/internal/tag"
 	"net/http"
 	"reflect"
 
@@ -9,6 +8,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/tag"
 )
 
 type endpointGroupUpdatePayload struct {

@@ -1,7 +1,6 @@
 package stacks
 
 import (
-	"github.com/portainer/portainer/api/internal/authorization"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -9,6 +8,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 type stackListOperationFilters struct {

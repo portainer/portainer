@@ -2,7 +2,6 @@ package stacks
 
 import (
 	"errors"
-	"github.com/portainer/portainer/api/internal/authorization"
 	"log"
 	"net/http"
 
@@ -13,6 +12,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 func (handler *Handler) cleanUp(stack *portainer.Stack, doCleanUp *bool) error {

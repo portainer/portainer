@@ -11,7 +11,6 @@ import (
 	"github.com/portainer/portainer/api/internal/authorization"
 )
 
-
 // Handler is the HTTP handler used to handle authentication operations.
 type Handler struct {
 	*mux.Router

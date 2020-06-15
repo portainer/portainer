@@ -2,7 +2,6 @@ package endpoints
 
 import (
 	"errors"
-	"github.com/portainer/portainer/api/internal/edge"
 	"net"
 	"net/http"
 	"net/url"
@@ -16,6 +15,7 @@ import (
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
 	"github.com/portainer/portainer/api/http/client"
+	"github.com/portainer/portainer/api/internal/edge"
 )
 
 type endpointCreatePayload struct {

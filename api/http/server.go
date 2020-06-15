@@ -1,7 +1,6 @@
 package http
 
 import (
-	"github.com/portainer/portainer/api/internal/authorization"
 	"time"
 
 	"github.com/portainer/portainer/api/http/handler/edgegroups"
@@ -39,6 +38,7 @@ import (
 	"github.com/portainer/portainer/api/http/handler/websocket"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
 
 	"net/http"
 	"path/filepath"

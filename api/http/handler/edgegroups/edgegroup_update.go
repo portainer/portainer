@@ -1,14 +1,14 @@
 package edgegroups
 
 import (
-	"github.com/portainer/portainer/api/internal/edge"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/edge"
 )
 
 type edgeGroupUpdatePayload struct {

@@ -1,7 +1,6 @@
 package stacks
 
 import (
-	"github.com/portainer/portainer/api/internal/authorization"
 	"net/http"
 	"sync"
 
@@ -9,6 +8,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 // Handler is the HTTP handler used to handle stack operations.
