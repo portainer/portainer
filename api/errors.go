@@ -1,10 +1,5 @@
 package portainer
 
-// File errors.
-const (
-	ErrUndefinedTLSFileType = Error("Undefined TLS file type")
-)
-
 // Error represents an application error.
 type Error string
 
