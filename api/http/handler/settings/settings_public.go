@@ -19,6 +19,7 @@ type publicSettingsResponse struct {
 	EnableEdgeComputeFeatures          bool                           `json:"EnableEdgeComputeFeatures"`
 	ExternalTemplates                  bool                           `json:"ExternalTemplates"`
 	OAuthLoginURI                      string                         `json:"OAuthLoginURI"`
+	PreventUserRoleStackCreation       bool                           `json:"PreventUserRoleStackCreation"`
 }
 
 // GET request on /api/settings/public
@@ -42,6 +43,7 @@ func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *
 			settings.OAuthSettings.ClientID,
 			settings.OAuthSettings.RedirectURI,
 			settings.OAuthSettings.Scopes),
+		PreventUserRoleStackCreation: settings.PreventUserRoleStackCreation,
 	}
 
 	if settings.TemplatesURL != "" {

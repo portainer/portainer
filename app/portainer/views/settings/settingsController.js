@@ -33,6 +33,7 @@ angular.module('portainer.app').controller('SettingsController', [
       enableHostManagementFeatures: false,
       enableVolumeBrowser: false,
       enableEdgeComputeFeatures: false,
+      preventUserRoleStackCreation: false,
     };
 
     $scope.removeFilteredContainerLabel = function (index) {
@@ -69,6 +70,7 @@ angular.module('portainer.app').controller('SettingsController', [
       settings.AllowVolumeBrowserForRegularUsers = $scope.formValues.enableVolumeBrowser;
       settings.EnableHostManagementFeatures = $scope.formValues.enableHostManagementFeatures;
       settings.EnableEdgeComputeFeatures = $scope.formValues.enableEdgeComputeFeatures;
+      settings.PreventUserRoleStackCreation = $scope.formValues.preventUserRoleStackCreation;
 
       $scope.state.actionInProgress = true;
       updateSettings(settings);
@@ -109,6 +111,7 @@ angular.module('portainer.app').controller('SettingsController', [
           $scope.formValues.enableVolumeBrowser = settings.AllowVolumeBrowserForRegularUsers;
           $scope.formValues.enableHostManagementFeatures = settings.EnableHostManagementFeatures;
           $scope.formValues.enableEdgeComputeFeatures = settings.EnableEdgeComputeFeatures;
+          $scope.formValues.preventUserRoleStackCreation = settings.PreventUserRoleStackCreation;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve application settings');
