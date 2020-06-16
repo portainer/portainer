@@ -28,7 +28,6 @@ func (handler *Handler) cleanUp(stack *portainer.Stack, doCleanUp *bool) error {
 
 // POST request on /api/stacks?type=<type>&method=<method>&endpointId=<endpointId>
 func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-
 	stackType, err := request.RetrieveNumericQueryParameter(r, "type", false)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: type", err}
