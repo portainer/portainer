@@ -3,6 +3,7 @@ package client
 import (
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -56,7 +57,7 @@ func (client *HTTPClient) ExecuteAzureAuthenticationRequest(credentials *portain
 	}
 
 	if response.StatusCode != http.StatusOK {
-		return nil, portainer.ErrAzureInvalidCredentials
+		return nil, errors.New("Invalid Azure credentials")
 	}
 
 	var token AzureAuthenticationResponse

@@ -1,6 +1,7 @@
 package stacks
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -9,7 +10,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	portainer "github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
-	"github.com/portainer/portainer/api/http/errors"
+	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -79,7 +80,7 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify user authorizations to validate stack access", err}
 	}
 	if !access {
-		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", errors.ErrResourceAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", httperrors.ErrResourceAccessDenied}
 	}
 
 	err = handler.deleteStack(stack, endpoint)
@@ -131,11 +132,11 @@ func (handler *Handler) deleteExternalStack(r *http.Request, w http.ResponseWrit
 
 	if rbacExtension != nil {
 		if !securityContext.IsAdmin && !endpointResourceAccess {
-			return &httperror.HandlerError{http.StatusUnauthorized, "Permission denied to delete the stack", errors.ErrUnauthorized}
+			return &httperror.HandlerError{http.StatusUnauthorized, "Permission denied to delete the stack", httperrors.ErrUnauthorized}
 		}
 	} else {
 		if !securityContext.IsAdmin {
-			return &httperror.HandlerError{http.StatusUnauthorized, "Permission denied to delete the stack", errors.ErrUnauthorized}
+			return &httperror.HandlerError{http.StatusUnauthorized, "Permission denied to delete the stack", httperrors.ErrUnauthorized}
 		}
 	}
 
@@ -144,7 +145,7 @@ func (handler *Handler) deleteExternalStack(r *http.Request, w http.ResponseWrit
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for stack existence inside the database", err}
 	}
 	if stack != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "A stack with this name exists inside the database. Cannot use external delete method", portainer.ErrStackNotExternal}
+		return &httperror.HandlerError{http.StatusBadRequest, "A stack with this name exists inside the database. Cannot use external delete method", errors.New("A tag already exists with this name")}
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))

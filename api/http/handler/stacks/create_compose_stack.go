@@ -54,7 +54,7 @@ func (handler *Handler) createComposeStackFromFileContent(w http.ResponseWriter,
 
 	for _, stack := range stacks {
 		if strings.EqualFold(stack.Name, payload.Name) {
-			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", portainer.ErrStackAlreadyExists}
+			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", errStackAlreadyExists}
 		}
 	}
 
@@ -139,7 +139,7 @@ func (handler *Handler) createComposeStackFromGitRepository(w http.ResponseWrite
 
 	for _, stack := range stacks {
 		if strings.EqualFold(stack.Name, payload.Name) {
-			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", portainer.ErrStackAlreadyExists}
+			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", errStackAlreadyExists}
 		}
 	}
 
@@ -234,7 +234,7 @@ func (handler *Handler) createComposeStackFromFileUpload(w http.ResponseWriter, 
 
 	for _, stack := range stacks {
 		if strings.EqualFold(stack.Name, payload.Name) {
-			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", portainer.ErrStackAlreadyExists}
+			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", errStackAlreadyExists}
 		}
 	}
 

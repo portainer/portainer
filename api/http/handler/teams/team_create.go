@@ -1,7 +1,7 @@
 package teams
 
 import (
-	"github.com/portainer/portainer/api/bolt/errors"
+	"errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
 type teamCreatePayload struct {
@@ -30,11 +31,11 @@ func (handler *Handler) teamCreate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	team, err := handler.DataStore.Team().TeamByName(payload.Name)
-	if err != nil && err != errors.ErrObjectNotFound {
+	if err != nil && err != bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve teams from the database", err}
 	}
 	if team != nil {
-		return &httperror.HandlerError{http.StatusConflict, "A team with the same name already exists", portainer.ErrTeamAlreadyExists}
+		return &httperror.HandlerError{http.StatusConflict, "A team with the same name already exists", errors.New("Team already exists")}
 	}
 
 	team = &portainer.Team{

@@ -1,6 +1,8 @@
 package jwt
 
 import (
+	"errors"
+
 	"github.com/portainer/portainer/api"
 
 	"fmt"
@@ -23,6 +25,11 @@ type claims struct {
 	jwt.StandardClaims
 }
 
+var (
+	errSecretGeneration = errors.New("Unable to generate secret key")
+	errInvalidJWTToken  = errors.New("Invalid JWT token")
+)
+
 // NewService initializes a new service. It will generate a random key that will be used to sign JWT tokens.
 func NewService(userSessionDuration string) (*Service, error) {
 	userSessionTimeout, err := time.ParseDuration(userSessionDuration)
@@ -32,7 +39,7 @@ func NewService(userSessionDuration string) (*Service, error) {
 
 	secret := securecookie.GenerateRandomKey(32)
 	if secret == nil {
-		return nil, portainer.ErrSecretGeneration
+		return nil, errSecretGeneration
 	}
 
 	service := &Service{
@@ -83,7 +90,7 @@ func (service *Service) ParseAndVerifyToken(token string) (*portainer.TokenData,
 		}
 	}
 
-	return nil, portainer.ErrInvalidJWTToken
+	return nil, errInvalidJWTToken
 }
 
 // SetUserSessionDuration sets the user session duration

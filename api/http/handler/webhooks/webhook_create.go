@@ -1,7 +1,7 @@
 package webhooks
 
 import (
-	"github.com/portainer/portainer/api/bolt/errors"
+	"errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -10,6 +10,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
 type webhookCreatePayload struct {
@@ -39,11 +40,11 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	webhook, err := handler.DataStore.Webhook().WebhookByResourceID(payload.ResourceID)
-	if err != nil && err != errors.ErrObjectNotFound {
+	if err != nil && err != bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "An error occurred retrieving webhooks from the database", err}
 	}
 	if webhook != nil {
-		return &httperror.HandlerError{http.StatusConflict, "A webhook for this resource already exists", portainer.ErrWebhookAlreadyExists}
+		return &httperror.HandlerError{http.StatusConflict, "A webhook for this resource already exists", errors.New("A webhook for this resource already exists")}
 	}
 
 	token, err := uuid.NewV4()

@@ -2,7 +2,7 @@ package webhooks
 
 import (
 	"context"
-	"github.com/portainer/portainer/api/bolt/errors"
+	"errors"
 	"net/http"
 	"strings"
 
@@ -11,6 +11,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
 // Acts on a passed in token UUID to restart the docker service
@@ -24,7 +25,7 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 
 	webhook, err := handler.DataStore.Webhook().WebhookByToken(webhookToken)
 
-	if err == errors.ErrObjectNotFound {
+	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a webhook with this token", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve webhook from the database", err}
@@ -35,7 +36,7 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 	webhookType := webhook.WebhookType
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == errors.ErrObjectNotFound {
+	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
@@ -47,7 +48,7 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 	case portainer.ServiceWebhook:
 		return handler.executeServiceWebhook(w, endpoint, resourceID, imageTag)
 	default:
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unsupported webhook type", portainer.ErrUnsupportedWebhookType}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unsupported webhook type", errors.New("Webhooks for this resource are not currently supported")}
 	}
 }
 

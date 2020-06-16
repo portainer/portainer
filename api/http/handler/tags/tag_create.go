@@ -1,6 +1,7 @@
 package tags
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -36,7 +37,7 @@ func (handler *Handler) tagCreate(w http.ResponseWriter, r *http.Request) *httpe
 
 	for _, tag := range tags {
 		if tag.Name == payload.Name {
-			return &httperror.HandlerError{http.StatusConflict, "This name is already associated to a tag", portainer.ErrTagAlreadyExists}
+			return &httperror.HandlerError{http.StatusConflict, "This name is already associated to a tag", errors.New("A tag already exists with this name")}
 		}
 	}
 

@@ -1,6 +1,7 @@
 package extensions
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -43,7 +44,7 @@ func (handler *Handler) extensionCreate(w http.ResponseWriter, r *http.Request) 
 
 	for _, existingExtension := range extensions {
 		if existingExtension.ID == extensionID && existingExtension.Enabled {
-			return &httperror.HandlerError{http.StatusConflict, "Unable to enable extension", portainer.ErrExtensionAlreadyEnabled}
+			return &httperror.HandlerError{http.StatusConflict, "Unable to enable extension", errors.New("This extension is already enabled")}
 		}
 	}
 

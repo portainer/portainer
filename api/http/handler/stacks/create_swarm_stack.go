@@ -49,7 +49,7 @@ func (handler *Handler) createSwarmStackFromFileContent(w http.ResponseWriter, r
 
 	for _, stack := range stacks {
 		if strings.EqualFold(stack.Name, payload.Name) {
-			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", portainer.ErrStackAlreadyExists}
+			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", errStackAlreadyExists}
 		}
 	}
 
@@ -138,7 +138,7 @@ func (handler *Handler) createSwarmStackFromGitRepository(w http.ResponseWriter,
 
 	for _, stack := range stacks {
 		if strings.EqualFold(stack.Name, payload.Name) {
-			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", portainer.ErrStackAlreadyExists}
+			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", errStackAlreadyExists}
 		}
 	}
 
@@ -241,7 +241,7 @@ func (handler *Handler) createSwarmStackFromFileUpload(w http.ResponseWriter, r 
 
 	for _, stack := range stacks {
 		if strings.EqualFold(stack.Name, payload.Name) {
-			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", portainer.ErrStackAlreadyExists}
+			return &httperror.HandlerError{http.StatusConflict, "A stack with this name already exists", errStackAlreadyExists}
 		}
 	}
 
