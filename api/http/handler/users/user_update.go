@@ -53,7 +53,7 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	if tokenData.Role != portainer.AdministratorRole && payload.Role != 0 {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update user to administrator role", portainer.ErrResourceAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update user to administrator role", errors.ErrResourceAccessDenied}
 	}
 
 	user, err := handler.DataStore.User().User(portainer.UserID(userID))

@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -56,7 +57,7 @@ func (handler *Handler) resourceControlUpdate(w http.ResponseWriter, r *http.Req
 	}
 
 	if !security.AuthorizedResourceControlAccess(resourceControl, securityContext) {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access the resource control", portainer.ErrResourceAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access the resource control", httperrors.ErrResourceAccessDenied}
 	}
 
 	resourceControl.Public = payload.Public
@@ -83,7 +84,7 @@ func (handler *Handler) resourceControlUpdate(w http.ResponseWriter, r *http.Req
 	resourceControl.TeamAccesses = teamAccesses
 
 	if !security.AuthorizedResourceControlUpdate(resourceControl, securityContext) {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update the resource control", portainer.ErrResourceAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update the resource control", httperrors.ErrResourceAccessDenied}
 	}
 
 	err = handler.DataStore.ResourceControl().UpdateResourceControl(resourceControl.ID, resourceControl)

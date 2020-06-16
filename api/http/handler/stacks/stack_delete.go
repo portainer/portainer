@@ -79,7 +79,7 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify user authorizations to validate stack access", err}
 	}
 	if !access {
-		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", errors.ErrResourceAccessDenied}
 	}
 
 	err = handler.deleteStack(stack, endpoint)

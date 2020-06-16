@@ -2,7 +2,6 @@ package portainer
 
 // General errors.
 const (
-	ErrResourceAccessDenied   = Error("Access denied to resource")
 	ErrAuthorizationRequired  = Error("Authorization required for this operation")
 	ErrMissingSecurityContext = Error("Unable to find security details in request context")
 )

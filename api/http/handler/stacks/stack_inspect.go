@@ -1,13 +1,14 @@
 package stacks
 
 import (
-	"github.com/portainer/portainer/api/bolt/errors"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -19,14 +20,14 @@ func (handler *Handler) stackInspect(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	stack, err := handler.DataStore.Stack().Stack(portainer.StackID(stackID))
-	if err == errors.ErrObjectNotFound {
+	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a stack with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a stack with the specified identifier inside the database", err}
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(stack.EndpointID)
-	if err == errors.ErrObjectNotFound {
+	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
@@ -52,7 +53,7 @@ func (handler *Handler) stackInspect(w http.ResponseWriter, r *http.Request) *ht
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify user authorizations to validate stack access", err}
 	}
 	if !access {
-		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", errors.ErrResourceAccessDenied}
 	}
 
 	if resourceControl != nil {

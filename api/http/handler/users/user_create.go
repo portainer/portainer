@@ -1,7 +1,6 @@
 package users
 
 import (
-	"github.com/portainer/portainer/api/bolt/errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -9,6 +8,8 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
@@ -44,15 +45,15 @@ func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	if !securityContext.IsAdmin && !securityContext.IsTeamLeader {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to create user", portainer.ErrResourceAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to create user", errors.ErrResourceAccessDenied}
 	}
 
 	if securityContext.IsTeamLeader && payload.Role == 1 {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to create administrator user", portainer.ErrResourceAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to create administrator user", errors.ErrResourceAccessDenied}
 	}
 
 	user, err := handler.DataStore.User().UserByUsername(payload.Username)
-	if err != nil && err != errors.ErrObjectNotFound {
+	if err != nil && err != bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve users from the database", err}
 	}
 	if user != nil {

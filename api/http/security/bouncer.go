@@ -269,7 +269,7 @@ func (bouncer *RequestBouncer) mwUpgradeToRestrictedRequest(next http.Handler) h
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tokenData, err := RetrieveTokenData(r)
 		if err != nil {
-			httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrResourceAccessDenied)
+			httperror.WriteError(w, http.StatusForbidden, "Access denied", httperrors.ErrResourceAccessDenied)
 			return
 		}
 

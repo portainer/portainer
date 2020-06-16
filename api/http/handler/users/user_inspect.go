@@ -1,15 +1,15 @@
 package users
 
 import (
-	"github.com/portainer/portainer/api/bolt/errors"
 	"net/http"
-
-	"github.com/portainer/portainer/api/http/security"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/http/errors"
+	"github.com/portainer/portainer/api/http/security"
 )
 
 // GET request on /api/users/:id
@@ -25,11 +25,11 @@ func (handler *Handler) userInspect(w http.ResponseWriter, r *http.Request) *htt
 	}
 
 	if !securityContext.IsAdmin && securityContext.UserID != portainer.UserID(userID) {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied inspect user", portainer.ErrResourceAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied inspect user", errors.ErrResourceAccessDenied}
 	}
 
 	user, err := handler.DataStore.User().User(portainer.UserID(userID))
-	if err == errors.ErrObjectNotFound {
+	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a user with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a user with the specified identifier inside the database", err}
