@@ -28,6 +28,7 @@ func (handler *Handler) cleanUp(stack *portainer.Stack, doCleanUp *bool) error {
 
 // POST request on /api/stacks?type=<type>&method=<method>&endpointId=<endpointId>
 func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+
 	stackType, err := request.RetrieveNumericQueryParameter(r, "type", false)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: type", err}
@@ -41,6 +42,29 @@ func (handler *Handler) stackCreate(w http.ResponseWriter, r *http.Request) *htt
 	endpointID, err := request.RetrieveNumericQueryParameter(r, "endpointId", false)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: endpointId", err}
+	}
+
+	settings, err := handler.SettingsService.Settings()
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve settings from the database", err}
+	}
+
+	if settings.PreventUserRoleStackCreation {
+		securityContext, err := security.RetrieveRestrictedRequestContext(r)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user info from request context", err}
+		}
+
+		canCreate, err := handler.userCanCreateStack(securityContext, portainer.EndpointID(endpointID))
+
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify user authorizations to validate stack creation", err}
+		}
+
+		if !canCreate {
+			errMsg := "Stack creation is disabled for non-admin users"
+			return &httperror.HandlerError{http.StatusForbidden, errMsg, errors.New(errMsg)}
+		}
 	}
 
 	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
