@@ -1,6 +1,7 @@
 package stacks
 
 import (
+	"github.com/portainer/portainer/api/bolt/errors"
 	"net/http"
 	"sync"
 
@@ -65,9 +66,9 @@ func (handler *Handler) userCanAccessStack(securityContext *security.RestrictedR
 	}
 
 	_, err := handler.DataStore.Extension().Extension(portainer.RBACExtension)
-	if err == portainer.ErrObjectNotFound {
+	if err == errors.ErrObjectNotFound {
 		return false, nil
-	} else if err != nil && err != portainer.ErrObjectNotFound {
+	} else if err != nil && err != errors.ErrObjectNotFound {
 		return false, err
 	}
 

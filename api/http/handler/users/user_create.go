@@ -1,6 +1,7 @@
 package users
 
 import (
+	"github.com/portainer/portainer/api/bolt/errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -51,7 +52,7 @@ func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	user, err := handler.DataStore.User().UserByUsername(payload.Username)
-	if err != nil && err != portainer.ErrObjectNotFound {
+	if err != nil && err != errors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve users from the database", err}
 	}
 	if user != nil {

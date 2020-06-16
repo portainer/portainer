@@ -1,6 +1,7 @@
 package settings
 
 import (
+	"github.com/portainer/portainer/api/bolt/errors"
 	"net/http"
 	"time"
 
@@ -169,7 +170,7 @@ func (handler *Handler) updateVolumeBrowserSetting(settings *portainer.Settings)
 	}
 
 	extension, err := handler.DataStore.Extension().Extension(portainer.RBACExtension)
-	if err != nil && err != portainer.ErrObjectNotFound {
+	if err != nil && err != errors.ErrObjectNotFound {
 		return err
 	}
 

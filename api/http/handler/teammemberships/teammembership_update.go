@@ -1,6 +1,7 @@
 package teammemberships
 
 import (
+	"github.com/portainer/portainer/api/bolt/errors"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -52,7 +53,7 @@ func (handler *Handler) teamMembershipUpdate(w http.ResponseWriter, r *http.Requ
 	}
 
 	membership, err := handler.DataStore.TeamMembership().TeamMembership(portainer.TeamMembershipID(membershipID))
-	if err == portainer.ErrObjectNotFound {
+	if err == errors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a team membership with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a team membership with the specified identifier inside the database", err}

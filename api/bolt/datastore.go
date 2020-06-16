@@ -1,6 +1,7 @@
 package bolt
 
 import (
+	"github.com/portainer/portainer/api/bolt/errors"
 	"log"
 	"path"
 	"time"
@@ -121,7 +122,7 @@ func (store *Store) MigrateData() error {
 	}
 
 	version, err := store.VersionService.DBVersion()
-	if err == portainer.ErrObjectNotFound {
+	if err == errors.ErrObjectNotFound {
 		version = 0
 	} else if err != nil {
 		return err

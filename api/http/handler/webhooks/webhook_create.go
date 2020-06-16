@@ -1,6 +1,7 @@
 package webhooks
 
 import (
+	"github.com/portainer/portainer/api/bolt/errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -38,7 +39,7 @@ func (handler *Handler) webhookCreate(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	webhook, err := handler.DataStore.Webhook().WebhookByResourceID(payload.ResourceID)
-	if err != nil && err != portainer.ErrObjectNotFound {
+	if err != nil && err != errors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "An error occurred retrieving webhooks from the database", err}
 	}
 	if webhook != nil {

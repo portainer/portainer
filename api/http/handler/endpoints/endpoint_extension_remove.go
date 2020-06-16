@@ -3,6 +3,7 @@ package endpoints
 // TODO: legacy extension management
 
 import (
+	"github.com/portainer/portainer/api/bolt/errors"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -19,7 +20,7 @@ func (handler *Handler) endpointExtensionRemove(w http.ResponseWriter, r *http.R
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == portainer.ErrObjectNotFound {
+	if err == errors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}

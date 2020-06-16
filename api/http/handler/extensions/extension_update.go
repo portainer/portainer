@@ -1,6 +1,7 @@
 package extensions
 
 import (
+	"github.com/portainer/portainer/api/bolt/errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -36,7 +37,7 @@ func (handler *Handler) extensionUpdate(w http.ResponseWriter, r *http.Request) 
 	}
 
 	extension, err := handler.DataStore.Extension().Extension(extensionID)
-	if err == portainer.ErrObjectNotFound {
+	if err == errors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a extension with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a extension with the specified identifier inside the database", err}

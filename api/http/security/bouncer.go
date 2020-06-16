@@ -2,12 +2,12 @@ package security
 
 import (
 	"errors"
+	"net/http"
+	"strings"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer/api"
-
-	"net/http"
-	"strings"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 )
 
 type (
@@ -152,7 +152,7 @@ func (bouncer *RequestBouncer) checkEndpointOperationAuthorization(r *http.Reque
 	}
 
 	extension, err := bouncer.dataStore.Extension().Extension(portainer.RBACExtension)
-	if err == portainer.ErrObjectNotFound {
+	if err == bolterrors.ErrObjectNotFound {
 		return nil
 	} else if err != nil {
 		return err
@@ -223,7 +223,7 @@ func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler,
 		}
 
 		extension, err := bouncer.dataStore.Extension().Extension(portainer.RBACExtension)
-		if err == portainer.ErrObjectNotFound {
+		if err == bolterrors.ErrObjectNotFound {
 			if administratorOnly {
 				httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrUnauthorized)
 				return
@@ -237,7 +237,7 @@ func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler,
 		}
 
 		user, err := bouncer.dataStore.User().User(tokenData.ID)
-		if err != nil && err == portainer.ErrObjectNotFound {
+		if err != nil && err == bolterrors.ErrObjectNotFound {
 			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", portainer.ErrUnauthorized)
 			return
 		} else if err != nil {
@@ -313,7 +313,7 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 		}
 
 		_, err = bouncer.dataStore.User().User(tokenData.ID)
-		if err != nil && err == portainer.ErrObjectNotFound {
+		if err != nil && err == bolterrors.ErrObjectNotFound {
 			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", portainer.ErrUnauthorized)
 			return
 		} else if err != nil {

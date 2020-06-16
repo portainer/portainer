@@ -1,6 +1,7 @@
 package teams
 
 import (
+	"github.com/portainer/portainer/api/bolt/errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -29,7 +30,7 @@ func (handler *Handler) teamCreate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	team, err := handler.DataStore.Team().TeamByName(payload.Name)
-	if err != nil && err != portainer.ErrObjectNotFound {
+	if err != nil && err != errors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve teams from the database", err}
 	}
 	if team != nil {

@@ -2,6 +2,7 @@ package chisel
 
 import (
 	"fmt"
+	"github.com/portainer/portainer/api/bolt/errors"
 	"log"
 	"strconv"
 	"time"
@@ -11,7 +12,7 @@ import (
 	cmap "github.com/orcaman/concurrent-map"
 
 	chserver "github.com/jpillora/chisel/server"
-	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api"
 )
 
 const (
@@ -88,7 +89,7 @@ func (service *Service) retrievePrivateKeySeed() (string, error) {
 	var serverInfo *portainer.TunnelServerInfo
 
 	serverInfo, err := service.dataStore.TunnelServer().Info()
-	if err == portainer.ErrObjectNotFound {
+	if err == errors.ErrObjectNotFound {
 		keySeed := uniuri.NewLen(16)
 
 		serverInfo = &portainer.TunnelServerInfo{

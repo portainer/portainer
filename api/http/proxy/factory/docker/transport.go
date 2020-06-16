@@ -12,6 +12,7 @@ import (
 
 	"github.com/docker/docker/client"
 	"github.com/portainer/portainer/api"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
 	"github.com/portainer/portainer/api/http/security"
@@ -409,7 +410,7 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 
 	if tokenData.Role != portainer.AdministratorRole {
 		rbacExtension, err := transport.dataStore.Extension().Extension(portainer.RBACExtension)
-		if err != nil && err != portainer.ErrObjectNotFound {
+		if err != nil && err != bolterrors.ErrObjectNotFound {
 			return nil, err
 		}
 

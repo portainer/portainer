@@ -1,6 +1,7 @@
 package registries
 
 import (
+	"github.com/portainer/portainer/api/bolt/errors"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -17,7 +18,7 @@ func (handler *Handler) registryInspect(w http.ResponseWriter, r *http.Request) 
 	}
 
 	registry, err := handler.DataStore.Registry().Registry(portainer.RegistryID(registryID))
-	if err == portainer.ErrObjectNotFound {
+	if err == errors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a registry with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a registry with the specified identifier inside the database", err}

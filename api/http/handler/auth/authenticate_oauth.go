@@ -2,6 +2,7 @@ package auth
 
 import (
 	"encoding/json"
+	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/internal/authorization"
 	"io/ioutil"
 	"log"
@@ -89,7 +90,7 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	extension, err := handler.DataStore.Extension().Extension(portainer.OAuthAuthenticationExtension)
-	if err == portainer.ErrObjectNotFound {
+	if err == errors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Oauth authentication extension is not enabled", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a extension with the specified identifier inside the database", err}
@@ -102,7 +103,7 @@ func (handler *Handler) validateOAuth(w http.ResponseWriter, r *http.Request) *h
 	}
 
 	user, err := handler.DataStore.User().UserByUsername(username)
-	if err != nil && err != portainer.ErrObjectNotFound {
+	if err != nil && err != errors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a user with the specified username from the database", err}
 	}
 

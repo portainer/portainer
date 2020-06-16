@@ -1,6 +1,7 @@
 package resourcecontrols
 
 import (
+	"github.com/portainer/portainer/api/bolt/errors"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -17,7 +18,7 @@ func (handler *Handler) resourceControlDelete(w http.ResponseWriter, r *http.Req
 	}
 
 	_, err = handler.DataStore.ResourceControl().ResourceControl(portainer.ResourceControlID(resourceControlID))
-	if err == portainer.ErrObjectNotFound {
+	if err == errors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a resource control with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a resource control with with the specified identifier inside the database", err}

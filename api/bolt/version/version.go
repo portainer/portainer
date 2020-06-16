@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"github.com/boltdb/bolt"
-	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/bolt/internal"
 )
 
@@ -40,7 +40,7 @@ func (service *Service) DBVersion() (int, error) {
 
 		value := bucket.Get([]byte(versionKey))
 		if value == nil {
-			return portainer.ErrObjectNotFound
+			return errors.ErrObjectNotFound
 		}
 
 		data = make([]byte, len(value))

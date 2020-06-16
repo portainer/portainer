@@ -1,6 +1,7 @@
 package stacks
 
 import (
+	"github.com/portainer/portainer/api/bolt/errors"
 	"net/http"
 	"strconv"
 
@@ -37,7 +38,7 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 	}
 
 	stack, err := handler.DataStore.Stack().Stack(portainer.StackID(id))
-	if err == portainer.ErrObjectNotFound {
+	if err == errors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a stack with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a stack with the specified identifier inside the database", err}
@@ -57,7 +58,7 @@ func (handler *Handler) stackDelete(w http.ResponseWriter, r *http.Request) *htt
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(endpointIdentifier)
-	if err == portainer.ErrObjectNotFound {
+	if err == errors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the endpoint associated to the stack inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the endpoint associated to the stack inside the database", err}
@@ -118,7 +119,7 @@ func (handler *Handler) deleteExternalStack(r *http.Request, w http.ResponseWrit
 	}
 
 	rbacExtension, err := handler.DataStore.Extension().Extension(portainer.RBACExtension)
-	if err != nil && err != portainer.ErrObjectNotFound {
+	if err != nil && err != errors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify if RBAC extension is loaded", err}
 	}
 
@@ -139,7 +140,7 @@ func (handler *Handler) deleteExternalStack(r *http.Request, w http.ResponseWrit
 	}
 
 	stack, err := handler.DataStore.Stack().StackByName(stackName)
-	if err != nil && err != portainer.ErrObjectNotFound {
+	if err != nil && err != errors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check for stack existence inside the database", err}
 	}
 	if stack != nil {
@@ -147,7 +148,7 @@ func (handler *Handler) deleteExternalStack(r *http.Request, w http.ResponseWrit
 	}
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == portainer.ErrObjectNotFound {
+	if err == errors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find the endpoint associated to the stack inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find the endpoint associated to the stack inside the database", err}

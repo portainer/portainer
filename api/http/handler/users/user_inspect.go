@@ -1,6 +1,7 @@
 package users
 
 import (
+	"github.com/portainer/portainer/api/bolt/errors"
 	"net/http"
 
 	"github.com/portainer/portainer/api/http/security"
@@ -28,7 +29,7 @@ func (handler *Handler) userInspect(w http.ResponseWriter, r *http.Request) *htt
 	}
 
 	user, err := handler.DataStore.User().User(portainer.UserID(userID))
-	if err == portainer.ErrObjectNotFound {
+	if err == errors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a user with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a user with the specified identifier inside the database", err}

@@ -2,6 +2,7 @@ package webhooks
 
 import (
 	"context"
+	"github.com/portainer/portainer/api/bolt/errors"
 	"net/http"
 	"strings"
 
@@ -23,7 +24,7 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 
 	webhook, err := handler.DataStore.Webhook().WebhookByToken(webhookToken)
 
-	if err == portainer.ErrObjectNotFound {
+	if err == errors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a webhook with this token", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve webhook from the database", err}
@@ -34,7 +35,7 @@ func (handler *Handler) webhookExecute(w http.ResponseWriter, r *http.Request) *
 	webhookType := webhook.WebhookType
 
 	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
-	if err == portainer.ErrObjectNotFound {
+	if err == errors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}

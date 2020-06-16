@@ -1,6 +1,7 @@
 package teams
 
 import (
+	"github.com/portainer/portainer/api/bolt/errors"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -17,7 +18,7 @@ func (handler *Handler) teamDelete(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	_, err = handler.DataStore.Team().Team(portainer.TeamID(teamID))
-	if err == portainer.ErrObjectNotFound {
+	if err == errors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a team with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a team with the specified identifier inside the database", err}
