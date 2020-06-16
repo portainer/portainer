@@ -69,7 +69,7 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve users from the database", err}
 		}
 		if sameNameUser != nil && sameNameUser.ID != portainer.UserID(userID) {
-			return &httperror.HandlerError{http.StatusConflict, "Another user with the same username already exists", portainer.ErrUserAlreadyExists}
+			return &httperror.HandlerError{http.StatusConflict, "Another user with the same username already exists", errUserAlreadyExists}
 		}
 
 		user.Username = payload.Username
@@ -78,7 +78,7 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 	if payload.Password != "" {
 		user.Password, err = handler.CryptoService.Hash(payload.Password)
 		if err != nil {
-			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to hash user password", portainer.ErrCryptoHashFailure}
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to hash user password", errCryptoHashFailure}
 		}
 	}
 

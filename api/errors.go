@@ -1,14 +1,5 @@
 package portainer
 
-// User errors.
-const (
-	ErrUserAlreadyExists          = Error("User already exists")
-	ErrInvalidUsername            = Error("Invalid username. White spaces are not allowed")
-	ErrAdminAlreadyInitialized    = Error("An administrator user already exists")
-	ErrAdminCannotRemoveSelf      = Error("Cannot remove your own user account. Contact another administrator")
-	ErrCannotRemoveLastLocalAdmin = Error("Cannot remove the last local administrator account")
-)
-
 // Team errors.
 const (
 	ErrTeamAlreadyExists = Error("Team already exists")
@@ -59,13 +50,7 @@ const (
 
 // Endpoint extensions error
 const (
-	ErrEndpointExtensionNotSupported      = Error("This extension is not supported")
-	ErrEndpointExtensionAlreadyAssociated = Error("This extension is already associated to the endpoint")
-)
-
-// Crypto errors.
-const (
-	ErrCryptoHashFailure = Error("Unable to hash data")
+	ErrEndpointExtensionNotSupported = Error("This extension is not supported")
 )
 
 // JWT errors.

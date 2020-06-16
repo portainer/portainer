@@ -29,7 +29,7 @@ func (handler *Handler) userDelete(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	if tokenData.ID == portainer.UserID(userID) {
-		return &httperror.HandlerError{http.StatusForbidden, "Cannot remove your own user account. Contact another administrator", portainer.ErrAdminCannotRemoveSelf}
+		return &httperror.HandlerError{http.StatusForbidden, "Cannot remove your own user account. Contact another administrator", errAdminCannotRemoveSelf}
 	}
 
 	user, err := handler.DataStore.User().User(portainer.UserID(userID))
@@ -64,7 +64,7 @@ func (handler *Handler) deleteAdminUser(w http.ResponseWriter, user *portainer.U
 	}
 
 	if localAdminCount < 2 {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Cannot remove local administrator user", portainer.ErrCannotRemoveLastLocalAdmin}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Cannot remove local administrator user", errCannotRemoveLastLocalAdmin}
 	}
 
 	return handler.deleteUser(w, user)

@@ -64,7 +64,7 @@ func (handler *Handler) userUpdatePassword(w http.ResponseWriter, r *http.Reques
 
 	user.Password, err = handler.CryptoService.Hash(payload.NewPassword)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to hash user password", portainer.ErrCryptoHashFailure}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to hash user password", errCryptoHashFailure}
 	}
 
 	err = handler.DataStore.User().UpdateUser(user.ID, user)

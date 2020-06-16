@@ -1,6 +1,8 @@
 package users
 
 import (
+	"errors"
+
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
@@ -9,6 +11,14 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+)
+
+var (
+	errUserAlreadyExists          = errors.New("User already exists")
+	errAdminAlreadyInitialized    = errors.New("An administrator user already exists")
+	errAdminCannotRemoveSelf      = errors.New("Cannot remove your own user account. Contact another administrator")
+	errCannotRemoveLastLocalAdmin = errors.New("Cannot remove the last local administrator account")
+	errCryptoHashFailure          = errors.New("Unable to hash data")
 )
 
 func hideFields(user *portainer.User) {

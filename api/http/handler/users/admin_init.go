@@ -40,7 +40,7 @@ func (handler *Handler) adminInit(w http.ResponseWriter, r *http.Request) *httpe
 	}
 
 	if len(users) != 0 {
-		return &httperror.HandlerError{http.StatusConflict, "Unable to create administrator user", portainer.ErrAdminAlreadyInitialized}
+		return &httperror.HandlerError{http.StatusConflict, "Unable to create administrator user", errAdminAlreadyInitialized}
 	}
 
 	user := &portainer.User{
@@ -51,7 +51,7 @@ func (handler *Handler) adminInit(w http.ResponseWriter, r *http.Request) *httpe
 
 	user.Password, err = handler.CryptoService.Hash(payload.Password)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to hash user password", portainer.ErrCryptoHashFailure}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to hash user password", errCryptoHashFailure}
 	}
 
 	err = handler.DataStore.User().CreateUser(user)
