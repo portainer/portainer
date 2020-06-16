@@ -203,6 +203,7 @@ func updateSettingsFromFlags(dataStore portainer.DataStore, flags *portainer.CLI
 
 	settings.LogoURL = *flags.Logo
 	settings.SnapshotInterval = *flags.SnapshotInterval
+	settings.EnableEdgeComputeFeatures = *flags.EnableEdgeComputeFeatures
 
 	if *flags.Templates != "" {
 		settings.TemplatesURL = *flags.Templates
