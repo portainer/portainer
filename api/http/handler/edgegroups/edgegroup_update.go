@@ -7,7 +7,8 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/edge"
 )
 
 type edgeGroupUpdatePayload struct {
@@ -73,7 +74,7 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoint groups from database", err}
 	}
 
-	oldRelatedEndpoints := portainer.EdgeGroupRelatedEndpoints(edgeGroup, endpoints, endpointGroups)
+	oldRelatedEndpoints := edge.EdgeGroupRelatedEndpoints(edgeGroup, endpoints, endpointGroups)
 
 	edgeGroup.Dynamic = payload.Dynamic
 	if edgeGroup.Dynamic {
@@ -102,7 +103,7 @@ func (handler *Handler) edgeGroupUpdate(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Edge group changes inside the database", err}
 	}
 
-	newRelatedEndpoints := portainer.EdgeGroupRelatedEndpoints(edgeGroup, endpoints, endpointGroups)
+	newRelatedEndpoints := edge.EdgeGroupRelatedEndpoints(edgeGroup, endpoints, endpointGroups)
 	endpointsToUpdate := append(newRelatedEndpoints, oldRelatedEndpoints...)
 
 	for _, endpointID := range endpointsToUpdate {
@@ -143,7 +144,7 @@ func (handler *Handler) updateEndpoint(endpointID portainer.EndpointID) error {
 
 	edgeStackSet := map[portainer.EdgeStackID]bool{}
 
-	endpointEdgeStacks := portainer.EndpointRelatedEdgeStacks(endpoint, endpointGroup, edgeGroups, edgeStacks)
+	endpointEdgeStacks := edge.EndpointRelatedEdgeStacks(endpoint, endpointGroup, edgeGroups, edgeStacks)
 	for _, edgeStackID := range endpointEdgeStacks {
 		edgeStackSet[edgeStackID] = true
 	}

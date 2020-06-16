@@ -1,6 +1,7 @@
 package settings
 
 import (
+	"github.com/portainer/portainer/api/internal/authorization"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -17,7 +18,7 @@ func hideFields(settings *portainer.Settings) {
 // Handler is the HTTP handler used to handle settings operations.
 type Handler struct {
 	*mux.Router
-	AuthorizationService *portainer.AuthorizationService
+	AuthorizationService *authorization.Service
 	DataStore            portainer.DataStore
 	FileService          portainer.FileService
 	JobScheduler         portainer.JobScheduler
