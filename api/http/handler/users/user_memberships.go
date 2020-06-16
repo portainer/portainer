@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -23,7 +24,7 @@ func (handler *Handler) userMemberships(w http.ResponseWriter, r *http.Request) 
 	}
 
 	if tokenData.Role != portainer.AdministratorRole && tokenData.ID != portainer.UserID(userID) {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update user memberships", portainer.ErrUnauthorized}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update user memberships", errors.ErrUnauthorized}
 	}
 
 	memberships, err := handler.DataStore.TeamMembership().TeamMembershipsByUserID(portainer.UserID(userID))

@@ -1,7 +1,6 @@
 package users
 
 import (
-	"github.com/portainer/portainer/api/bolt/errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -9,6 +8,8 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -40,7 +41,7 @@ func (handler *Handler) userUpdatePassword(w http.ResponseWriter, r *http.Reques
 	}
 
 	if tokenData.Role != portainer.AdministratorRole && tokenData.ID != portainer.UserID(userID) {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update user", portainer.ErrUnauthorized}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update user", errors.ErrUnauthorized}
 	}
 
 	var payload userUpdatePasswordPayload
@@ -50,7 +51,7 @@ func (handler *Handler) userUpdatePassword(w http.ResponseWriter, r *http.Reques
 	}
 
 	user, err := handler.DataStore.User().User(portainer.UserID(userID))
-	if err == errors.ErrObjectNotFound {
+	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a user with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a user with the specified identifier inside the database", err}
@@ -58,7 +59,7 @@ func (handler *Handler) userUpdatePassword(w http.ResponseWriter, r *http.Reques
 
 	err = handler.CryptoService.CompareHashAndData(user.Password, payload.Password)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Specified password do not match actual password", portainer.ErrUnauthorized}
+		return &httperror.HandlerError{http.StatusForbidden, "Specified password do not match actual password", errors.ErrUnauthorized}
 	}
 
 	user.Password, err = handler.CryptoService.Hash(payload.NewPassword)

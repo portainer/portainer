@@ -7,6 +7,7 @@ import (
 	ldap "github.com/go-ldap/ldap/v3"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/crypto"
+	"github.com/portainer/portainer/api/http/errors"
 )
 
 const (
@@ -105,7 +106,7 @@ func (*Service) AuthenticateUser(username, password string, settings *portainer.
 
 	err = connection.Bind(userDN, password)
 	if err != nil {
-		return portainer.ErrUnauthorized
+		return errors.ErrUnauthorized
 	}
 
 	return nil

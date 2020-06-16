@@ -1,7 +1,6 @@
 package users
 
 import (
-	"github.com/portainer/portainer/api/bolt/errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -9,6 +8,8 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -42,7 +43,7 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	if tokenData.Role != portainer.AdministratorRole && tokenData.ID != portainer.UserID(userID) {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update user", portainer.ErrUnauthorized}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update user", errors.ErrUnauthorized}
 	}
 
 	var payload userUpdatePayload
@@ -56,7 +57,7 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	user, err := handler.DataStore.User().User(portainer.UserID(userID))
-	if err == errors.ErrObjectNotFound {
+	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a user with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a user with the specified identifier inside the database", err}
@@ -64,7 +65,7 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 
 	if payload.Username != "" && payload.Username != user.Username {
 		sameNameUser, err := handler.DataStore.User().UserByUsername(payload.Username)
-		if err != nil && err != errors.ErrObjectNotFound {
+		if err != nil && err != bolterrors.ErrObjectNotFound {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve users from the database", err}
 		}
 		if sameNameUser != nil && sameNameUser.ID != portainer.UserID(userID) {

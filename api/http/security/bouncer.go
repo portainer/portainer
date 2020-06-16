@@ -8,6 +8,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	httperrors "github.com/portainer/portainer/api/http/errors"
 )
 
 type (
@@ -213,7 +214,7 @@ func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler,
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tokenData, err := RetrieveTokenData(r)
 		if err != nil {
-			httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrUnauthorized)
+			httperror.WriteError(w, http.StatusForbidden, "Access denied", httperrors.ErrUnauthorized)
 			return
 		}
 
@@ -225,7 +226,7 @@ func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler,
 		extension, err := bouncer.dataStore.Extension().Extension(portainer.RBACExtension)
 		if err == bolterrors.ErrObjectNotFound {
 			if administratorOnly {
-				httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrUnauthorized)
+				httperror.WriteError(w, http.StatusForbidden, "Access denied", httperrors.ErrUnauthorized)
 				return
 			}
 
@@ -238,7 +239,7 @@ func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler,
 
 		user, err := bouncer.dataStore.User().User(tokenData.ID)
 		if err != nil && err == bolterrors.ErrObjectNotFound {
-			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", portainer.ErrUnauthorized)
+			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", httperrors.ErrUnauthorized)
 			return
 		} else if err != nil {
 			httperror.WriteError(w, http.StatusInternalServerError, "Unable to retrieve user details from the database", err)
@@ -301,7 +302,7 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 		}
 
 		if token == "" {
-			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", portainer.ErrUnauthorized)
+			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", httperrors.ErrUnauthorized)
 			return
 		}
 
@@ -314,7 +315,7 @@ func (bouncer *RequestBouncer) mwCheckAuthentication(next http.Handler) http.Han
 
 		_, err = bouncer.dataStore.User().User(tokenData.ID)
 		if err != nil && err == bolterrors.ErrObjectNotFound {
-			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", portainer.ErrUnauthorized)
+			httperror.WriteError(w, http.StatusUnauthorized, "Unauthorized", httperrors.ErrUnauthorized)
 			return
 		} else if err != nil {
 			httperror.WriteError(w, http.StatusInternalServerError, "Unable to retrieve user details from the database", err)
