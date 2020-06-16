@@ -117,7 +117,7 @@ func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endp
 	if authorizationCheck {
 		err = bouncer.checkEndpointOperationAuthorization(r, endpoint)
 		if err != nil {
-			return portainer.ErrAuthorizationRequired
+			return ErrAuthorizationRequired
 		}
 	}
 
@@ -255,7 +255,7 @@ func (bouncer *RequestBouncer) mwCheckPortainerAuthorizations(next http.Handler,
 		bouncer.rbacExtensionClient.setLicenseKey(extension.License.LicenseKey)
 		err = bouncer.rbacExtensionClient.checkAuthorization(apiOperation)
 		if err != nil {
-			httperror.WriteError(w, http.StatusForbidden, "Access denied", portainer.ErrAuthorizationRequired)
+			httperror.WriteError(w, http.StatusForbidden, "Access denied", ErrAuthorizationRequired)
 			return
 		}
 

@@ -1,11 +1,5 @@
 package portainer
 
-// General errors.
-const (
-	ErrAuthorizationRequired  = Error("Authorization required for this operation")
-	ErrMissingSecurityContext = Error("Unable to find security details in request context")
-)
-
 // User errors.
 const (
 	ErrUserAlreadyExists          = Error("User already exists")
@@ -76,9 +70,8 @@ const (
 
 // JWT errors.
 const (
-	ErrSecretGeneration   = Error("Unable to generate secret key")
-	ErrInvalidJWTToken    = Error("Invalid JWT token")
-	ErrMissingContextData = Error("Unable to find JWT data in request context")
+	ErrSecretGeneration = Error("Unable to generate secret key")
+	ErrInvalidJWTToken  = Error("Invalid JWT token")
 )
 
 // File errors.
