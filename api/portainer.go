@@ -433,6 +433,7 @@ type (
 		EnableHostManagementFeatures       bool                 `json:"EnableHostManagementFeatures"`
 		EdgeAgentCheckinInterval           int                  `json:"EdgeAgentCheckinInterval"`
 		EnableEdgeComputeFeatures          bool                 `json:"EnableEdgeComputeFeatures"`
+		PreventUserRoleStackCreation       bool                 `json:"PreventUserRoleStackCreation"`
 
 		// Deprecated fields
 		DisplayDonationHeader       bool
