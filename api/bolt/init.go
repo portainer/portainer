@@ -8,7 +8,11 @@ import (
 // Init creates the default data set.
 func (store *Store) Init() error {
 	_, err := store.SettingsService.Settings()
-	if err.Error() == errors.ErrObjectNotFound {
+	if err != nil {
+		if err.Error() != errors.ErrObjectNotFound {
+			return err
+		}
+
 		defaultSettings := &portainer.Settings{
 			AuthenticationMethod: portainer.AuthenticationInternal,
 			BlackListedLabels:    make([]portainer.Pair, 0),
@@ -37,8 +41,6 @@ func (store *Store) Init() error {
 		if err != nil {
 			return err
 		}
-	} else if err != nil {
-		return err
 	}
 
 	_, err = store.DockerHubService.DockerHub()

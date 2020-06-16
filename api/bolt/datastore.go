@@ -119,10 +119,12 @@ func (store *Store) MigrateData() error {
 	}
 
 	version, err := store.VersionService.DBVersion()
-	if err.Error() == errors.ErrObjectNotFound {
+	if err != nil {
+		if err.Error() != errors.ErrObjectNotFound {
+			return err
+		}
+
 		version = 0
-	} else if err != nil {
-		return err
 	}
 
 	if version < portainer.DBVersion {
