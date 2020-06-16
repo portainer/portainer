@@ -8,6 +8,7 @@ import (
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 // Handler is the HTTP handler used to handle authentication operations.
@@ -18,7 +19,7 @@ type Handler struct {
 	JWTService           portainer.JWTService
 	LDAPService          portainer.LDAPService
 	ProxyManager         *proxy.Manager
-	AuthorizationService *portainer.AuthorizationService
+	AuthorizationService *authorization.Service
 }
 
 // NewHandler creates a handler to manage authentication operations.

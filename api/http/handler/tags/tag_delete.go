@@ -7,6 +7,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/edge"
 )
 
 // DELETE request on /api/tags/:id
@@ -111,7 +112,7 @@ func (handler *Handler) updateEndpointRelations(endpoint portainer.Endpoint, edg
 		return err
 	}
 
-	endpointStacks := portainer.EndpointRelatedEdgeStacks(&endpoint, endpointGroup, edgeGroups, edgeStacks)
+	endpointStacks := edge.EndpointRelatedEdgeStacks(&endpoint, endpointGroup, edgeGroups, edgeStacks)
 	stacksSet := map[portainer.EdgeStackID]bool{}
 	for _, edgeStackID := range endpointStacks {
 		stacksSet[edgeStackID] = true

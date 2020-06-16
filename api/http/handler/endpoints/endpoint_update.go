@@ -10,6 +10,8 @@ import (
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/client"
+	"github.com/portainer/portainer/api/internal/edge"
+	"github.com/portainer/portainer/api/internal/tag"
 )
 
 type endpointUpdatePayload struct {
@@ -79,14 +81,14 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 
 	tagsChanged := false
 	if payload.TagIDs != nil {
-		payloadTagSet := portainer.TagSet(payload.TagIDs)
-		endpointTagSet := portainer.TagSet((endpoint.TagIDs))
-		union := portainer.TagUnion(payloadTagSet, endpointTagSet)
-		intersection := portainer.TagIntersection(payloadTagSet, endpointTagSet)
+		payloadTagSet := tag.Set(payload.TagIDs)
+		endpointTagSet := tag.Set((endpoint.TagIDs))
+		union := tag.Union(payloadTagSet, endpointTagSet)
+		intersection := tag.Intersection(payloadTagSet, endpointTagSet)
 		tagsChanged = len(union) > len(intersection)
 
 		if tagsChanged {
-			removeTags := portainer.TagDifference(endpointTagSet, payloadTagSet)
+			removeTags := tag.Difference(endpointTagSet, payloadTagSet)
 
 			for tagID := range removeTags {
 				tag, err := handler.DataStore.Tag().Tag(tagID)
@@ -248,7 +250,7 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 
 		edgeStackSet := map[portainer.EdgeStackID]bool{}
 
-		endpointEdgeStacks := portainer.EndpointRelatedEdgeStacks(endpoint, endpointGroup, edgeGroups, edgeStacks)
+		endpointEdgeStacks := edge.EndpointRelatedEdgeStacks(endpoint, endpointGroup, edgeGroups, edgeStacks)
 		for _, edgeStackID := range endpointEdgeStacks {
 			edgeStackSet[edgeStackID] = true
 		}
