@@ -28,6 +28,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/user"
 	"github.com/portainer/portainer/api/bolt/version"
 	"github.com/portainer/portainer/api/bolt/webhook"
+	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 const (
@@ -143,7 +144,7 @@ func (store *Store) MigrateData() error {
 			UserService:             store.UserService,
 			VersionService:          store.VersionService,
 			FileService:             store.fileService,
-			AuthorizationService:    portainer.NewAuthorizationService(store),
+			AuthorizationService:    authorization.NewService(store),
 		}
 		migrator := migrator.NewMigrator(migratorParams)
 

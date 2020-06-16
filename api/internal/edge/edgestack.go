@@ -1,13 +1,16 @@
-package portainer
+package edge
 
-import "errors"
+import (
+	"errors"
+	"github.com/portainer/portainer/api"
+)
 
 // EdgeStackRelatedEndpoints returns a list of endpoints related to this Edge stack
-func EdgeStackRelatedEndpoints(edgeGroupIDs []EdgeGroupID, endpoints []Endpoint, endpointGroups []EndpointGroup, edgeGroups []EdgeGroup) ([]EndpointID, error) {
-	edgeStackEndpoints := []EndpointID{}
+func EdgeStackRelatedEndpoints(edgeGroupIDs []portainer.EdgeGroupID, endpoints []portainer.Endpoint, endpointGroups []portainer.EndpointGroup, edgeGroups []portainer.EdgeGroup) ([]portainer.EndpointID, error) {
+	edgeStackEndpoints := []portainer.EndpointID{}
 
 	for _, edgeGroupID := range edgeGroupIDs {
-		var edgeGroup *EdgeGroup
+		var edgeGroup *portainer.EdgeGroup
 
 		for _, group := range edgeGroups {
 			if group.ID == edgeGroupID {
