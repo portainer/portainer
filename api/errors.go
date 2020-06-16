@@ -1,10 +1,5 @@
 package portainer
 
-// Endpoint errors.
-const (
-	ErrEndpointAccessDenied = Error("Access denied to endpoint")
-)
-
 // File errors.
 const (
 	ErrUndefinedTLSFileType = Error("Undefined TLS file type")

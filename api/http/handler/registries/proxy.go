@@ -2,13 +2,14 @@ package registries
 
 import (
 	"encoding/json"
-	"github.com/portainer/portainer/api/bolt/errors"
 	"net/http"
 	"strconv"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/portainer/api"
+	bolterrors "github.com/portainer/portainer/api/bolt/errors"
+	"github.com/portainer/portainer/api/http/errors"
 )
 
 // request on /api/registries/:id/v2
@@ -19,7 +20,7 @@ func (handler *Handler) proxyRequestsToRegistryAPI(w http.ResponseWriter, r *htt
 	}
 
 	registry, err := handler.DataStore.Registry().Registry(portainer.RegistryID(registryID))
-	if err == errors.ErrObjectNotFound {
+	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a registry with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a registry with the specified identifier inside the database", err}
@@ -27,11 +28,11 @@ func (handler *Handler) proxyRequestsToRegistryAPI(w http.ResponseWriter, r *htt
 
 	err = handler.requestBouncer.RegistryAccess(r, registry)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access registry", portainer.ErrEndpointAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access registry", errors.ErrEndpointAccessDenied}
 	}
 
 	extension, err := handler.DataStore.Extension().Extension(portainer.RegistryManagementExtension)
-	if err == errors.ErrObjectNotFound {
+	if err == bolterrors.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Registry management extension is not enabled", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a extension with the specified identifier inside the database", err}

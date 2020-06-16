@@ -111,7 +111,7 @@ func (bouncer *RequestBouncer) AuthorizedEndpointOperation(r *http.Request, endp
 	}
 
 	if !authorizedEndpointAccess(endpoint, group, tokenData.ID, memberships) {
-		return portainer.ErrEndpointAccessDenied
+		return httperrors.ErrEndpointAccessDenied
 	}
 
 	if authorizationCheck {
@@ -193,7 +193,7 @@ func (bouncer *RequestBouncer) RegistryAccess(r *http.Request, registry *portain
 	}
 
 	if !AuthorizedRegistryAccess(registry, tokenData.ID, memberships) {
-		return portainer.ErrEndpointAccessDenied
+		return httperrors.ErrEndpointAccessDenied
 	}
 
 	return nil

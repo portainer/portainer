@@ -2,8 +2,11 @@ package errors
 
 import "errors"
 
-// General errors.
 var (
-	ErrUnauthorized         = errors.New("Unauthorized")
+	// ErrEndpointAccessDenied Access denied to endpoint error
+	ErrEndpointAccessDenied = errors.New("Access denied to endpoint")
+	// ErrUnauthorized Unauthorized error
+	ErrUnauthorized = errors.New("Unauthorized")
+	// ErrResourceAccessDenied Access denied to resource error
 	ErrResourceAccessDenied = errors.New("Access denied to resource")
 )
