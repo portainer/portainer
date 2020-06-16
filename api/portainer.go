@@ -36,27 +36,28 @@ type (
 
 	// CLIFlags represents the available flags on the CLI
 	CLIFlags struct {
-		Addr              *string
-		TunnelAddr        *string
-		TunnelPort        *string
-		AdminPassword     *string
-		AdminPasswordFile *string
-		Assets            *string
-		Data              *string
-		EndpointURL       *string
-		Labels            *[]Pair
-		Logo              *string
-		NoAnalytics       *bool
-		Templates         *string
-		TLS               *bool
-		TLSSkipVerify     *bool
-		TLSCacert         *string
-		TLSCert           *string
-		TLSKey            *string
-		SSL               *bool
-		SSLCert           *string
-		SSLKey            *string
-		SnapshotInterval  *string
+		Addr                      *string
+		TunnelAddr                *string
+		TunnelPort                *string
+		AdminPassword             *string
+		AdminPasswordFile         *string
+		Assets                    *string
+		Data                      *string
+		EnableEdgeComputeFeatures *bool
+		EndpointURL               *string
+		Labels                    *[]Pair
+		Logo                      *string
+		NoAnalytics               *bool
+		Templates                 *string
+		TLS                       *bool
+		TLSSkipVerify             *bool
+		TLSCacert                 *string
+		TLSCert                   *string
+		TLSKey                    *string
+		SSL                       *bool
+		SSLCert                   *string
+		SSLKey                    *string
+		SnapshotInterval          *string
 	}
 
 	// CLIService represents a service for managing CLI
