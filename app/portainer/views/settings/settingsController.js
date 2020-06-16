@@ -85,6 +85,7 @@ angular.module('portainer.app').controller('SettingsController', [
           StateManager.updateEnableHostManagementFeatures(settings.EnableHostManagementFeatures);
           StateManager.updateEnableVolumeBrowserForNonAdminUsers(settings.AllowVolumeBrowserForRegularUsers);
           StateManager.updateEnableEdgeComputeFeatures(settings.EnableEdgeComputeFeatures);
+          StateManager.updatePreventUserRoleStackCreation(settings.PreventUserRoleStackCreation);
           $state.reload();
         })
         .catch(function error(err) {
