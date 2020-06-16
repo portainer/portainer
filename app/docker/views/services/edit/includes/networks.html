@@ -1,6 +1,12 @@
 <div id="service-network-specs">
   <rd-widget>
-    <rd-widget-header icon="fa-tasks" title-text="Networks"></rd-widget-header>
+    <rd-widget-header icon="fa-tasks" title-text="Networks">
+      <div class="nopadding" authorization="DockerServiceUpdate">
+        <a class="btn btn-default btn-sm pull-right" ng-click="isUpdating ||addNetwork(service)" ng-disabled="isUpdating">
+          <i class="fa fa-plus-circle" aria-hidden="true"></i> network
+        </a>
+      </div>
+    </rd-widget-header>
     <rd-widget-body ng-if="!service.VirtualIPs || service.VirtualIPs.length === 0">
       <p>This service is not connected to any networks.</p>
     </rd-widget-body>
@@ -10,17 +16,50 @@
           <tr>
             <th>ID</th>
             <th>IP address</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr ng-repeat="network in service.VirtualIPs">
+          <tr ng-repeat="network in networks">
             <td>
-              <a ui-sref="docker.networks.network({id: network.NetworkID})">{{ network.NetworkID }}</a>
+              <select
+                class="form-control"
+                ng-model="network.Name"
+                ng-init="network.Name"
+                ng-options="net.Name for net in availableNetworks"
+                disable-authorization="DockerServiceUpdate"
+              >
+                <option disabled hidden value="">Select a network</option>
+              </select>
+              <!-- <a ui-sref="docker.networks.network({id: network.NetworkID})">{{ network.NetworkID }}</a> -->
             </td>
-            <td>{{ network.Addr }}</td>
+            <td>
+              {{ network.Addr }}
+            </td>
+            <td authorization="DockerServiceUpdate">
+              <span class="input-group-btn">
+                <button class="btn btn-sm btn-danger" type="button" ng-click="removeNetwork(service, $index)" ng-disabled="isUpdating">
+                  <i class="fa fa-trash" aria-hidden="true"></i>
+                </button>
+              </span>
+            </td>
           </tr>
         </tbody>
       </table>
     </rd-widget-body>
+    <rd-widget-footer authorization="DockerServiceUpdate">
+      <div class="btn-toolbar" role="toolbar">
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['VirtualIPs'])" ng-click="updateService(service)">Apply changes</button>
+          <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a ng-click="cancelChanges(service, ['VirtualIPs'])">Reset changes</a></li>
+            <li><a ng-click="cancelChanges(service)">Reset all changes</a></li>
+          </ul>
+        </div>
+      </div>
+    </rd-widget-footer>
   </rd-widget>
 </div>

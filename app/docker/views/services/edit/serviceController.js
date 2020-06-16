@@ -17,6 +17,7 @@ require('./includes/servicelabels.html');
 require('./includes/tasks.html');
 require('./includes/updateconfig.html');
 
+import _ from 'lodash-es';
 import { PorImageRegistryModel } from 'Docker/models/porImageRegistry';
 
 angular.module('portainer.docker').controller('ServiceController', [
@@ -51,6 +52,7 @@ angular.module('portainer.docker').controller('ServiceController', [
   'EndpointProvider',
   'clipboard',
   'WebhookHelper',
+  'NetworkService',
   function (
     $q,
     $scope,
@@ -82,7 +84,8 @@ angular.module('portainer.docker').controller('ServiceController', [
     WebhookService,
     EndpointProvider,
     clipboard,
-    WebhookHelper
+    WebhookHelper,
+    NetworkService
   ) {
     $scope.state = {
       updateInProgress: false,
@@ -210,6 +213,21 @@ angular.module('portainer.docker').controller('ServiceController', [
     $scope.updateMount = function updateMount(service) {
       updateServiceArray(service, 'ServiceMounts', service.ServiceMounts);
     };
+
+    $scope.addNetwork = function addNetwork(service) {
+      service.VirtualIPs.push({ NetworkID: '' });
+      updateServiceArray(service, 'VirtualIPs', service.VirtualIPs);
+    };
+    $scope.removeNetwork = function removeNetwork(service, index) {
+      var removedElement = service.VirtualIPs.splice(index, 1);
+      if (removedElement !== null) {
+        updateServiceArray(service, 'VirtualIPs', service.VirtualIPs);
+      }
+    };
+    $scope.updateNetwork = function updateNetwork(service) {
+      updateServiceArray(service, 'VirtualIPs', service.VirtualIPs);
+    };
+
     $scope.addPlacementConstraint = function addPlacementConstraint(service) {
       service.ServiceConstraints.push({ key: '', operator: '==', value: '' });
       updateServiceArray(service, 'ServiceConstraints', service.ServiceConstraints);
@@ -629,6 +647,7 @@ angular.module('portainer.docker').controller('ServiceController', [
             configs: apiVersion >= 1.3 ? ConfigService.configs() : [],
             availableImages: ImageService.images(),
             availableLoggingDrivers: PluginService.loggingPlugins(apiVersion < 1.25),
+            availableNetworks: NetworkService.networks(true, true, apiVersion >= 1.25),
             settings: SettingsService.publicSettings(),
             webhooks: WebhookService.webhooks(service.Id, EndpointProvider.endpointID()),
           });
@@ -642,6 +661,13 @@ angular.module('portainer.docker').controller('ServiceController', [
           $scope.availableVolumes = data.volumes;
           $scope.allowBindMounts = data.settings.AllowBindMountsForRegularUsers;
           $scope.isAdmin = Authentication.isAdmin();
+          $scope.availableNetworks = data.availableNetworks;
+          $scope.networks = _.filter($scope.availableNetworks, (network) => {
+            const find = _.find($scope.service.VirtualIPs, (vip) => {
+              return vip.NetworkID === network.Id;
+            });
+            return find;
+          });
 
           if (data.webhooks.length > 0) {
             var webhook = data.webhooks[0];
