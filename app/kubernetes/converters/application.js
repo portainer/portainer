@@ -78,10 +78,15 @@ class KubernetesApplicationConverter {
           res.LoadBalancerIPAddress = service.status.loadBalancer.ingress[0].ip || service.status.loadBalancer.ingress[0].hostname;
         }
       }
+
+      const ports = _.concat(..._.map(data.spec.template.spec.containers, (container) => container.ports));
       res.PublishedPorts = service.spec.ports;
       _.forEach(res.PublishedPorts, (publishedPort) => {
         if (isNaN(publishedPort.targetPort)) {
-          publishedPort.targetPort = _.find(res.PublishedPorts, {'name': publishedPort.targetPort}).port;
+          const targetPort = _.find(ports, {'name': publishedPort.targetPort});
+          if (targetPort) {
+            publishedPort.targetPort = targetPort.containerPort;
+          }
         }
       })
     }
