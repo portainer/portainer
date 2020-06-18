@@ -2,17 +2,15 @@ package chisel
 
 import (
 	"fmt"
-	"github.com/portainer/portainer/api/bolt/errors"
 	"log"
 	"strconv"
 	"time"
 
 	"github.com/dchest/uniuri"
-
-	cmap "github.com/orcaman/concurrent-map"
-
 	chserver "github.com/jpillora/chisel/server"
+	cmap "github.com/orcaman/concurrent-map"
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/bolt/errors"
 )
 
 const (
