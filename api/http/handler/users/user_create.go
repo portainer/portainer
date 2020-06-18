@@ -1,6 +1,7 @@
 package users
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -9,7 +10,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
-	"github.com/portainer/portainer/api/http/errors"
+	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
@@ -22,11 +23,11 @@ type userCreatePayload struct {
 
 func (payload *userCreatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Username) || govalidator.Contains(payload.Username, " ") {
-		return portainer.Error("Invalid username. Must not contain any whitespace")
+		return errors.New("Invalid username. Must not contain any whitespace")
 	}
 
 	if payload.Role != 1 && payload.Role != 2 {
-		return portainer.Error("Invalid role value. Value must be one of: 1 (administrator) or 2 (regular user)")
+		return errors.New("Invalid role value. Value must be one of: 1 (administrator) or 2 (regular user)")
 	}
 	return nil
 }
@@ -45,11 +46,11 @@ func (handler *Handler) userCreate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	if !securityContext.IsAdmin && !securityContext.IsTeamLeader {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to create user", errors.ErrResourceAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to create user", httperrors.ErrResourceAccessDenied}
 	}
 
 	if securityContext.IsTeamLeader && payload.Role == 1 {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to create administrator user", errors.ErrResourceAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to create administrator user", httperrors.ErrResourceAccessDenied}
 	}
 
 	user, err := handler.DataStore.User().UserByUsername(payload.Username)

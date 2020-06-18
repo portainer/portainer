@@ -15,9 +15,10 @@ import (
 	"github.com/portainer/portainer/api"
 )
 
+var errInvalidResponseStatus = errors.New("Invalid response status (expecting 200)")
+
 const (
-	errInvalidResponseStatus = portainer.Error("Invalid response status (expecting 200)")
-	defaultHTTPTimeout       = 5
+	defaultHTTPTimeout = 5
 )
 
 // HTTPClient represents a client to send HTTP requests.

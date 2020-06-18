@@ -17,7 +17,7 @@ type tagCreatePayload struct {
 
 func (payload *tagCreatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
-		return portainer.Error("Invalid tag name")
+		return errors.New("Invalid tag name")
 	}
 	return nil
 }

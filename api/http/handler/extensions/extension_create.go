@@ -18,7 +18,7 @@ type extensionCreatePayload struct {
 
 func (payload *extensionCreatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.License) {
-		return portainer.Error("Invalid license")
+		return errors.New("Invalid license")
 	}
 
 	return nil

@@ -1,7 +1,6 @@
 package edgestacks
 
 import (
-	"github.com/portainer/portainer/api/bolt/errors"
 	"net/http"
 	"path"
 
@@ -9,6 +8,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/bolt/errors"
 )
 
 type stackFileResponse struct {

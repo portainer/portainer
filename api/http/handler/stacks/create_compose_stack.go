@@ -31,11 +31,11 @@ type composeStackFromFileContentPayload struct {
 
 func (payload *composeStackFromFileContentPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
-		return portainer.Error("Invalid stack name")
+		return errors.New("Invalid stack name")
 	}
 	payload.Name = normalizeStackName(payload.Name)
 	if govalidator.IsNull(payload.StackFileContent) {
-		return portainer.Error("Invalid stack file content")
+		return errors.New("Invalid stack file content")
 	}
 	return nil
 }
@@ -110,14 +110,14 @@ type composeStackFromGitRepositoryPayload struct {
 
 func (payload *composeStackFromGitRepositoryPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
-		return portainer.Error("Invalid stack name")
+		return errors.New("Invalid stack name")
 	}
 	payload.Name = normalizeStackName(payload.Name)
 	if govalidator.IsNull(payload.RepositoryURL) || !govalidator.IsURL(payload.RepositoryURL) {
-		return portainer.Error("Invalid repository URL. Must correspond to a valid URL format")
+		return errors.New("Invalid repository URL. Must correspond to a valid URL format")
 	}
 	if payload.RepositoryAuthentication && (govalidator.IsNull(payload.RepositoryUsername) || govalidator.IsNull(payload.RepositoryPassword)) {
-		return portainer.Error("Invalid repository credentials. Username and password must be specified when authentication is enabled")
+		return errors.New("Invalid repository credentials. Username and password must be specified when authentication is enabled")
 	}
 	if govalidator.IsNull(payload.ComposeFilePathInRepository) {
 		payload.ComposeFilePathInRepository = filesystem.ComposeFileDefaultName
@@ -201,20 +201,20 @@ type composeStackFromFileUploadPayload struct {
 func (payload *composeStackFromFileUploadPayload) Validate(r *http.Request) error {
 	name, err := request.RetrieveMultiPartFormValue(r, "Name", false)
 	if err != nil {
-		return portainer.Error("Invalid stack name")
+		return errors.New("Invalid stack name")
 	}
 	payload.Name = normalizeStackName(name)
 
 	composeFileContent, _, err := request.RetrieveMultiPartFormFile(r, "file")
 	if err != nil {
-		return portainer.Error("Invalid Compose file. Ensure that the Compose file is uploaded correctly")
+		return errors.New("Invalid Compose file. Ensure that the Compose file is uploaded correctly")
 	}
 	payload.StackFileContent = composeFileContent
 
 	var env []portainer.Pair
 	err = request.RetrieveMultiPartFormJSONValue(r, "Env", &env, true)
 	if err != nil {
-		return portainer.Error("Invalid Env parameter")
+		return errors.New("Invalid Env parameter")
 	}
 	payload.Env = env
 	return nil

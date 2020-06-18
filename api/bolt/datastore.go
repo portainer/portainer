@@ -1,7 +1,6 @@
 package bolt
 
 import (
-	"github.com/portainer/portainer/api/bolt/errors"
 	"log"
 	"path"
 	"time"
@@ -15,6 +14,7 @@ import (
 	"github.com/portainer/portainer/api/bolt/endpoint"
 	"github.com/portainer/portainer/api/bolt/endpointgroup"
 	"github.com/portainer/portainer/api/bolt/endpointrelation"
+	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/bolt/extension"
 	"github.com/portainer/portainer/api/bolt/migrator"
 	"github.com/portainer/portainer/api/bolt/registry"

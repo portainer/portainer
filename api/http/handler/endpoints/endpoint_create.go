@@ -39,13 +39,13 @@ type endpointCreatePayload struct {
 func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 	name, err := request.RetrieveMultiPartFormValue(r, "Name", false)
 	if err != nil {
-		return portainer.Error("Invalid endpoint name")
+		return errors.New("Invalid endpoint name")
 	}
 	payload.Name = name
 
 	endpointType, err := request.RetrieveNumericMultiPartFormValue(r, "EndpointType", false)
 	if err != nil || endpointType == 0 {
-		return portainer.Error("Invalid endpoint type value. Value must be one of: 1 (Docker environment), 2 (Agent environment), 3 (Azure environment) or 4 (Edge Agent environment)")
+		return errors.New("Invalid endpoint type value. Value must be one of: 1 (Docker environment), 2 (Agent environment), 3 (Azure environment) or 4 (Edge Agent environment)")
 	}
 	payload.EndpointType = endpointType
 
@@ -58,7 +58,7 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 	var tagIDs []portainer.TagID
 	err = request.RetrieveMultiPartFormJSONValue(r, "TagIds", &tagIDs, true)
 	if err != nil {
-		return portainer.Error("Invalid TagIds parameter")
+		return errors.New("Invalid TagIds parameter")
 	}
 	payload.TagIDs = tagIDs
 	if payload.TagIDs == nil {
@@ -77,7 +77,7 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 		if !payload.TLSSkipVerify {
 			caCert, _, err := request.RetrieveMultiPartFormFile(r, "TLSCACertFile")
 			if err != nil {
-				return portainer.Error("Invalid CA certificate file. Ensure that the file is uploaded correctly")
+				return errors.New("Invalid CA certificate file. Ensure that the file is uploaded correctly")
 			}
 			payload.TLSCACertFile = caCert
 		}
@@ -85,13 +85,13 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 		if !payload.TLSSkipClientVerify {
 			cert, _, err := request.RetrieveMultiPartFormFile(r, "TLSCertFile")
 			if err != nil {
-				return portainer.Error("Invalid certificate file. Ensure that the file is uploaded correctly")
+				return errors.New("Invalid certificate file. Ensure that the file is uploaded correctly")
 			}
 			payload.TLSCertFile = cert
 
 			key, _, err := request.RetrieveMultiPartFormFile(r, "TLSKeyFile")
 			if err != nil {
-				return portainer.Error("Invalid key file. Ensure that the file is uploaded correctly")
+				return errors.New("Invalid key file. Ensure that the file is uploaded correctly")
 			}
 			payload.TLSKeyFile = key
 		}
@@ -101,25 +101,25 @@ func (payload *endpointCreatePayload) Validate(r *http.Request) error {
 	case portainer.AzureEnvironment:
 		azureApplicationID, err := request.RetrieveMultiPartFormValue(r, "AzureApplicationID", false)
 		if err != nil {
-			return portainer.Error("Invalid Azure application ID")
+			return errors.New("Invalid Azure application ID")
 		}
 		payload.AzureApplicationID = azureApplicationID
 
 		azureTenantID, err := request.RetrieveMultiPartFormValue(r, "AzureTenantID", false)
 		if err != nil {
-			return portainer.Error("Invalid Azure tenant ID")
+			return errors.New("Invalid Azure tenant ID")
 		}
 		payload.AzureTenantID = azureTenantID
 
 		azureAuthenticationKey, err := request.RetrieveMultiPartFormValue(r, "AzureAuthenticationKey", false)
 		if err != nil {
-			return portainer.Error("Invalid Azure authentication key")
+			return errors.New("Invalid Azure authentication key")
 		}
 		payload.AzureAuthenticationKey = azureAuthenticationKey
 	default:
 		endpointURL, err := request.RetrieveMultiPartFormValue(r, "URL", true)
 		if err != nil {
-			return portainer.Error("Invalid endpoint URL")
+			return errors.New("Invalid endpoint URL")
 		}
 		payload.URL = endpointURL
 

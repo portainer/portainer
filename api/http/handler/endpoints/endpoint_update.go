@@ -1,7 +1,6 @@
 package endpoints
 
 import (
-	"github.com/portainer/portainer/api/bolt/errors"
 	"net/http"
 	"reflect"
 	"strconv"
@@ -10,6 +9,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/bolt/errors"
 	"github.com/portainer/portainer/api/http/client"
 	"github.com/portainer/portainer/api/internal/edge"
 	"github.com/portainer/portainer/api/internal/tag"

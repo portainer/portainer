@@ -1,6 +1,7 @@
 package extensions
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -19,13 +20,13 @@ type extensionUploadPayload struct {
 func (payload *extensionUploadPayload) Validate(r *http.Request) error {
 	license, err := request.RetrieveMultiPartFormValue(r, "License", false)
 	if err != nil {
-		return portainer.Error("Invalid license")
+		return errors.New("Invalid license")
 	}
 	payload.License = license
 
 	fileData, fileName, err := request.RetrieveMultiPartFormFile(r, "file")
 	if err != nil {
-		return portainer.Error("Invalid extension archive file. Ensure that the file is uploaded correctly")
+		return errors.New("Invalid extension archive file. Ensure that the file is uploaded correctly")
 	}
 	payload.ExtensionArchive = fileData
 	payload.ArchiveFileName = fileName

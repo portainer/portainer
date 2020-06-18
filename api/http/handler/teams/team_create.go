@@ -18,7 +18,7 @@ type teamCreatePayload struct {
 
 func (payload *teamCreatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
-		return portainer.Error("Invalid team name")
+		return errors.New("Invalid team name")
 	}
 	return nil
 }

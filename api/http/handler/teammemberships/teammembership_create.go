@@ -20,13 +20,13 @@ type teamMembershipCreatePayload struct {
 
 func (payload *teamMembershipCreatePayload) Validate(r *http.Request) error {
 	if payload.UserID == 0 {
-		return portainer.Error("Invalid UserID")
+		return errors.New("Invalid UserID")
 	}
 	if payload.TeamID == 0 {
-		return portainer.Error("Invalid TeamID")
+		return errors.New("Invalid TeamID")
 	}
 	if payload.Role != 1 && payload.Role != 2 {
-		return portainer.Error("Invalid role value. Value must be one of: 1 (leader) or 2 (member)")
+		return errors.New("Invalid role value. Value must be one of: 1 (leader) or 2 (member)")
 	}
 	return nil
 }

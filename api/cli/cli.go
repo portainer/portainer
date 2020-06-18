@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"errors"
 	"time"
 
 	"github.com/portainer/portainer/api"
@@ -15,11 +16,11 @@ import (
 // Service implements the CLIService interface
 type Service struct{}
 
-const (
-	errInvalidEndpointProtocol       = portainer.Error("Invalid endpoint protocol: Portainer only supports unix://, npipe:// or tcp://")
-	errSocketOrNamedPipeNotFound     = portainer.Error("Unable to locate Unix socket or named pipe")
-	errInvalidSnapshotInterval       = portainer.Error("Invalid snapshot interval")
-	errAdminPassExcludeAdminPassFile = portainer.Error("Cannot use --admin-password with --admin-password-file")
+var (
+	errInvalidEndpointProtocol       = errors.New("Invalid endpoint protocol: Portainer only supports unix://, npipe:// or tcp://")
+	errSocketOrNamedPipeNotFound     = errors.New("Unable to locate Unix socket or named pipe")
+	errInvalidSnapshotInterval       = errors.New("Invalid snapshot interval")
+	errAdminPassExcludeAdminPassFile = errors.New("Cannot use --admin-password with --admin-password-file")
 )
 
 // ParseFlags parse the CLI flags and return a portainer.Flags struct

@@ -41,7 +41,7 @@ type edgeJobCreateFromFileContentPayload struct {
 
 func (payload *edgeJobCreateFromFileContentPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Name) {
-		return portainer.Error("Invalid Edge job name")
+		return errors.New("Invalid Edge job name")
 	}
 
 	if !govalidator.Matches(payload.Name, `^[a-zA-Z0-9][a-zA-Z0-9_.-]*$`) {
@@ -49,15 +49,15 @@ func (payload *edgeJobCreateFromFileContentPayload) Validate(r *http.Request) er
 	}
 
 	if govalidator.IsNull(payload.CronExpression) {
-		return portainer.Error("Invalid cron expression")
+		return errors.New("Invalid cron expression")
 	}
 
 	if payload.Endpoints == nil || len(payload.Endpoints) == 0 {
-		return portainer.Error("Invalid endpoints payload")
+		return errors.New("Invalid endpoints payload")
 	}
 
 	if govalidator.IsNull(payload.FileContent) {
-		return portainer.Error("Invalid script file content")
+		return errors.New("Invalid script file content")
 	}
 
 	return nil
@@ -114,7 +114,7 @@ func (payload *edgeJobCreateFromFilePayload) Validate(r *http.Request) error {
 
 	file, _, err := request.RetrieveMultiPartFormFile(r, "file")
 	if err != nil {
-		return portainer.Error("Invalid script file. Ensure that the file is uploaded correctly")
+		return errors.New("Invalid script file. Ensure that the file is uploaded correctly")
 	}
 	payload.File = file
 

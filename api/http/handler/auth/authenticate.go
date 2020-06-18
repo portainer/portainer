@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"errors"
 	"log"
 	"net/http"
 	"strings"
@@ -11,7 +12,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
-	"github.com/portainer/portainer/api/http/errors"
+	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
 
@@ -26,10 +27,10 @@ type authenticateResponse struct {
 
 func (payload *authenticatePayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Username) {
-		return portainer.Error("Invalid username")
+		return errors.New("Invalid username")
 	}
 	if govalidator.IsNull(payload.Password) {
-		return portainer.Error("Invalid password")
+		return errors.New("Invalid password")
 	}
 	return nil
 }
@@ -52,14 +53,14 @@ func (handler *Handler) authenticate(w http.ResponseWriter, r *http.Request) *ht
 	}
 
 	if err == bolterrors.ErrObjectNotFound && (settings.AuthenticationMethod == portainer.AuthenticationInternal || settings.AuthenticationMethod == portainer.AuthenticationOAuth) {
-		return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid credentials", errors.ErrUnauthorized}
+		return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid credentials", httperrors.ErrUnauthorized}
 	}
 
 	if settings.AuthenticationMethod == portainer.AuthenticationLDAP {
 		if u == nil && settings.LDAPSettings.AutoCreateUsers {
 			return handler.authenticateLDAPAndCreateUser(w, payload.Username, payload.Password, &settings.LDAPSettings)
 		} else if u == nil && !settings.LDAPSettings.AutoCreateUsers {
-			return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid credentials", errors.ErrUnauthorized}
+			return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid credentials", httperrors.ErrUnauthorized}
 		}
 		return handler.authenticateLDAP(w, u, payload.Password, &settings.LDAPSettings)
 	}
@@ -89,7 +90,7 @@ func (handler *Handler) authenticateLDAP(w http.ResponseWriter, user *portainer.
 func (handler *Handler) authenticateInternal(w http.ResponseWriter, user *portainer.User, password string) *httperror.HandlerError {
 	err := handler.CryptoService.CompareHashAndData(user.Password, password)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid credentials", errors.ErrUnauthorized}
+		return &httperror.HandlerError{http.StatusUnprocessableEntity, "Invalid credentials", httperrors.ErrUnauthorized}
 	}
 
 	return handler.writeToken(w, user)

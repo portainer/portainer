@@ -1,6 +1,7 @@
 package users
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -9,7 +10,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
-	"github.com/portainer/portainer/api/http/errors"
+	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -21,11 +22,11 @@ type userUpdatePayload struct {
 
 func (payload *userUpdatePayload) Validate(r *http.Request) error {
 	if govalidator.Contains(payload.Username, " ") {
-		return portainer.Error("Invalid username. Must not contain any whitespace")
+		return errors.New("Invalid username. Must not contain any whitespace")
 	}
 
 	if payload.Role != 0 && payload.Role != 1 && payload.Role != 2 {
-		return portainer.Error("Invalid role value. Value must be one of: 1 (administrator) or 2 (regular user)")
+		return errors.New("Invalid role value. Value must be one of: 1 (administrator) or 2 (regular user)")
 	}
 	return nil
 }
@@ -43,7 +44,7 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	if tokenData.Role != portainer.AdministratorRole && tokenData.ID != portainer.UserID(userID) {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update user", errors.ErrUnauthorized}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update user", httperrors.ErrUnauthorized}
 	}
 
 	var payload userUpdatePayload
@@ -53,7 +54,7 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 	}
 
 	if tokenData.Role != portainer.AdministratorRole && payload.Role != 0 {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update user to administrator role", errors.ErrResourceAccessDenied}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update user to administrator role", httperrors.ErrResourceAccessDenied}
 	}
 
 	user, err := handler.DataStore.User().User(portainer.UserID(userID))

@@ -1,6 +1,7 @@
 package users
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -18,10 +19,10 @@ type adminInitPayload struct {
 
 func (payload *adminInitPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Username) || govalidator.Contains(payload.Username, " ") {
-		return portainer.Error("Invalid username. Must not contain any whitespace")
+		return errors.New("Invalid username. Must not contain any whitespace")
 	}
 	if govalidator.IsNull(payload.Password) {
-		return portainer.Error("Invalid password")
+		return errors.New("Invalid password")
 	}
 	return nil
 }

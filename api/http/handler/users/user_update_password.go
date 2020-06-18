@@ -1,6 +1,7 @@
 package users
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/asaskevich/govalidator"
@@ -9,7 +10,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
 	bolterrors "github.com/portainer/portainer/api/bolt/errors"
-	"github.com/portainer/portainer/api/http/errors"
+	httperrors "github.com/portainer/portainer/api/http/errors"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -20,10 +21,10 @@ type userUpdatePasswordPayload struct {
 
 func (payload *userUpdatePasswordPayload) Validate(r *http.Request) error {
 	if govalidator.IsNull(payload.Password) {
-		return portainer.Error("Invalid current password")
+		return errors.New("Invalid current password")
 	}
 	if govalidator.IsNull(payload.NewPassword) {
-		return portainer.Error("Invalid new password")
+		return errors.New("Invalid new password")
 	}
 	return nil
 }
@@ -41,7 +42,7 @@ func (handler *Handler) userUpdatePassword(w http.ResponseWriter, r *http.Reques
 	}
 
 	if tokenData.Role != portainer.AdministratorRole && tokenData.ID != portainer.UserID(userID) {
-		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update user", errors.ErrUnauthorized}
+		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update user", httperrors.ErrUnauthorized}
 	}
 
 	var payload userUpdatePasswordPayload
@@ -59,7 +60,7 @@ func (handler *Handler) userUpdatePassword(w http.ResponseWriter, r *http.Reques
 
 	err = handler.CryptoService.CompareHashAndData(user.Password, payload.Password)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusForbidden, "Specified password do not match actual password", errors.ErrUnauthorized}
+		return &httperror.HandlerError{http.StatusForbidden, "Specified password do not match actual password", httperrors.ErrUnauthorized}
 	}
 
 	user.Password, err = handler.CryptoService.Hash(payload.NewPassword)
