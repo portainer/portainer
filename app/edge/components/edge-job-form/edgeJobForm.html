@@ -115,19 +115,28 @@
     <div class="form-group">
       <label for="edgejob_cron" class="col-sm-2 control-label text-left">Cron rule</label>
       <div class="col-sm-10">
-        <input type="text" class="form-control" ng-model="$ctrl.model.CronExpression" id="edgejob_cron" name="edgejob_cron" placeholder="0 2 * * *" required />
+        <input
+          type="text"
+          class="form-control"
+          ng-model="$ctrl.model.CronExpression"
+          id="edgejob_cron"
+          name="edgejob_cron"
+          placeholder="0 2 * * *"
+          required
+          ng-pattern="$ctrl.cronRegex"
+        />
       </div>
     </div>
-    <div class="form-group" ng-show="edgeJobForm.edgejob_cron.$invalid">
+    <div class="form-group" ng-show="edgeJobForm.edgejob_cron.$invalid && edgeJobForm.edgejob_cron.$dirty">
       <div class="col-sm-12 small text-warning">
         <div ng-messages="edgeJobForm.edgejob_cron.$error">
           <p ng-message="required"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field is required.</p>
+          <p ng-message="pattern"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This field format is invalid.</p>
         </div>
       </div>
     </div>
   </div>
   <!-- !advanced-schedule -->
-  <!-- !cron-input -->
 
   <!-- execution-method -->
   <div ng-if="!$ctrl.model.Id">
