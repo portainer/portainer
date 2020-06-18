@@ -377,7 +377,7 @@
                     <a ui-sref="kubernetes.volumes.volume({ name: volume.PersistentVolumeClaimName, namespace: ctrl.application.ResourcePool })"><i class="fa fa-database"
                         aria-hidden="true"></i> {{ volume.PersistentVolumeClaimName }}</a>
                   </td>
-                  <td ng-if="volume.hostPath">
+                  <td ng-if="volume.HostPath">
                     {{ volume.HostPath }} on host filesystem
                   </td>
                 </tr>

@@ -138,6 +138,8 @@ class KubernetesApplicationConverter {
       }
     });
 
+    res.PersistedFolders = _.reject(res.PersistedFolders, _.isUndefined);
+
     res.ConfigurationVolumes = _.reduce(data.spec.template.spec.volumes, (acc, volume) => {
       if (volume.configMap || volume.secret) {
         const matchingVolumeMount = _.find(data.spec.template.spec.containers[0].volumeMounts, { name: volume.name });
