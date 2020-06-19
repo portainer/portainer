@@ -1,12 +1,17 @@
 package docker
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"errors"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/docker/docker/client"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
+	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
 
@@ -147,4 +152,52 @@ func containerHasBlackListedLabel(containerLabels map[string]interface{}, labelB
 	}
 
 	return false
+}
+
+func (transport *Transport) decorateContainerCreationOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
+	type PartialContainer struct {
+		HostConfig struct {
+			PidMode string `json:"PidMode"`
+		} `json:"HostConfig"`
+	}
+
+	tokenData, err := security.RetrieveTokenData(request)
+	if err != nil {
+		return nil, err
+	}
+
+	settings, err := transport.dataStore.Settings().Settings()
+	if err != nil {
+		return nil, err
+	}
+
+	if tokenData.Role != portainer.AdministratorRole && !settings.EnableHostNamespaceUse {
+		body, err := ioutil.ReadAll(request.Body)
+		if err != nil {
+			return nil, err
+		}
+
+		partialContainer := &PartialContainer{}
+		err = json.Unmarshal(body, partialContainer)
+		if err != nil {
+			return nil, err
+		}
+
+		if partialContainer.HostConfig.PidMode == "host" {
+			return nil, errors.New("forbidden to use pid host namespace")
+		}
+
+		request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+	}
+
+	response, err := transport.executeDockerRequest(request)
+	if err != nil {
+		return response, err
+	}
+
+	if response.StatusCode == http.StatusCreated {
+		err = transport.decorateGenericResourceCreationResponse(response, resourceIdentifierAttribute, resourceType, tokenData.ID)
+	}
+
+	return response, err
 }
