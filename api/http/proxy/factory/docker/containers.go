@@ -1,7 +1,11 @@
 package docker
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"errors"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/docker/docker/client"
@@ -151,9 +155,61 @@ func containerHasBlackListedLabel(containerLabels map[string]interface{}, labelB
 }
 
 func (transport *Transport) decorateContainerCreationOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
+	type PartialContainer struct {
+		HostConfig struct {
+			Privileged bool `json:"Privileged"`
+		} `json:"HostConfig"`
+	}
+
 	tokenData, err := security.RetrieveTokenData(request)
 	if err != nil {
 		return nil, err
+	}
+
+	if tokenData.Role != portainer.AdministratorRole {
+		user, err := transport.dataStore.User().User(tokenData.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		rbacExtension, err := transport.dataStore.Extension().Extension(portainer.RBACExtension)
+		if err != nil && err != portainer.ErrObjectNotFound {
+			return nil, err
+		}
+
+		endpointResourceAccess := false
+		_, ok := user.EndpointAuthorizations[portainer.EndpointID(transport.endpoint.ID)][portainer.EndpointResourcesAccess]
+		if ok {
+			endpointResourceAccess = true
+		}
+
+		if rbacExtension != nil && !endpointResourceAccess {
+			return nil, errors.New("Permission denied to create container")
+		}
+
+		settings, err := transport.dataStore.Settings().Settings()
+		if err != nil {
+			return nil, err
+		}
+
+		if !settings.AllowPrivilegedModeForRegularUsers {
+			body, err := ioutil.ReadAll(request.Body)
+			if err != nil {
+				return nil, err
+			}
+
+			partialContainer := &PartialContainer{}
+			err = json.Unmarshal(body, partialContainer)
+			if err != nil {
+				return nil, err
+			}
+
+			if partialContainer.HostConfig.Privileged {
+				return nil, errors.New("forbidden to use privileged mode")
+			}
+
+			request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+		}
 	}
 
 	response, err := transport.executeDockerRequest(request)
