@@ -7,6 +7,7 @@ import (
 	"github.com/docker/docker/client"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
+	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
 
@@ -147,4 +148,22 @@ func containerHasBlackListedLabel(containerLabels map[string]interface{}, labelB
 	}
 
 	return false
+}
+
+func (transport *Transport) decorateContainerCreationOperation(request *http.Request, resourceIdentifierAttribute string, resourceType portainer.ResourceControlType) (*http.Response, error) {
+	tokenData, err := security.RetrieveTokenData(request)
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := transport.executeDockerRequest(request)
+	if err != nil {
+		return response, err
+	}
+
+	if response.StatusCode == http.StatusCreated {
+		err = transport.decorateGenericResourceCreationResponse(response, resourceIdentifierAttribute, resourceType, tokenData.ID)
+	}
+
+	return response, err
 }
