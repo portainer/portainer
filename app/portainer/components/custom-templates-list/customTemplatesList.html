@@ -31,7 +31,7 @@
           on-select="($ctrl.onSelectClick)"
         >
           <template-item-actions>
-            <div style="display: flex;">
+            <div ng-if="$ctrl.isEditAllowed(template)" style="display: flex;">
               <a ui-sref="portainer.templates.custom.edit({id: template.Id})" ng-click="$event.stopPropagation();" class="btn btn-primary btn-xs" style="margin-right: 10px;">
                 Edit
               </a>

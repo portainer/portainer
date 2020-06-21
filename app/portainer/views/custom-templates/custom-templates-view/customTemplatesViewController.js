@@ -42,6 +42,11 @@ class CustomTemplatesViewController {
       isEditorVisible: false,
     };
 
+    this.currentUser = {
+      isAdmin: false,
+      id: null,
+    };
+
     this.formValues = {
       network: '',
       name: '',
@@ -64,6 +69,11 @@ class CustomTemplatesViewController {
     this.confirmDelete = this.confirmDelete.bind(this);
     this.confirmDeleteAsync = this.confirmDeleteAsync.bind(this);
     this.editorUpdate = this.editorUpdate.bind(this);
+    this.isEditAllowed = this.isEditAllowed.bind(this);
+  }
+
+  isEditAllowed(template) {
+    return this.currentUser.isAdmin || this.currentUser.id === template.CreatedByUserId;
   }
 
   getTemplates() {
@@ -107,11 +117,10 @@ class CustomTemplatesViewController {
     return this.$async(this.createStackAsync);
   }
   async createStackAsync() {
-    const userDetails = this.Authentication.getUserDetails();
-    const userId = userDetails.ID;
+    const userId = this.currentUser.id;
     const accessControlData = this.formValues.AccessControlData;
 
-    if (!this.validateForm(accessControlData, this.isAdmin)) {
+    if (!this.validateForm(accessControlData, this.currentUser.isAdmin)) {
       return;
     }
     const stackName = this.formValues.name;
@@ -212,9 +221,9 @@ class CustomTemplatesViewController {
     this.getTemplates();
     this.getNetworks();
 
-    this.isAdmin = this.Authentication.isAdmin();
+    this.currentUser.isAdmin = this.Authentication.isAdmin();
     const user = this.Authentication.getUserDetails();
-    this.currentUserId = user.ID;
+    this.currentUser.id = user.ID;
   }
 }
 
