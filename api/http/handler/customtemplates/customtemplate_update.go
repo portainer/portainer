@@ -60,20 +60,12 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a custom template with the specified identifier inside the database", err}
 	}
 
-	resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(strconv.Itoa(customTemplateID), portainer.CustomTemplateResourceControl)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a resource control associated to the custom template", err}
-	}
-
 	securityContext, err := security.RetrieveRestrictedRequestContext(r)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
 	}
 
-	access, err := handler.userCanAccessTemplate(securityContext, resourceControl)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify user authorizations to validate custom template access", err}
-	}
+	access := userCanEditTemplate(customTemplate, securityContext)
 	if !access {
 		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
 	}

@@ -34,10 +34,7 @@ func (handler *Handler) customTemplateDelete(w http.ResponseWriter, r *http.Requ
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a resource control associated to the custom template", err}
 	}
 
-	access, err := handler.userCanAccessTemplate(securityContext, resourceControl)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify user authorizations to validate custom template access", err}
-	}
+	access := userCanEditTemplate(customTemplate, securityContext)
 	if !access {
 		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
 	}

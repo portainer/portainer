@@ -9,7 +9,6 @@ import (
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
-	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 func (handler *Handler) customTemplateInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -35,10 +34,7 @@ func (handler *Handler) customTemplateInspect(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a resource control associated to the custom template", err}
 	}
 
-	access, err := handler.userCanAccessTemplate(securityContext, resourceControl)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify user authorizations to validate custom template access", err}
-	}
+	access := userCanEditTemplate(customTemplate, securityContext)
 	if !access {
 		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
 	}
@@ -48,21 +44,4 @@ func (handler *Handler) customTemplateInspect(w http.ResponseWriter, r *http.Req
 	}
 
 	return response.JSON(w, customTemplate)
-}
-
-func (handler *Handler) userCanAccessTemplate(securityContext *security.RestrictedRequestContext, resourceControl *portainer.ResourceControl) (bool, error) {
-	if securityContext.IsAdmin {
-		return true, nil
-	}
-
-	userTeamIDs := make([]portainer.TeamID, 0)
-	for _, membership := range securityContext.UserMemberships {
-		userTeamIDs = append(userTeamIDs, membership.TeamID)
-	}
-
-	if resourceControl != nil && authorization.UserCanAccessResource(securityContext.UserID, userTeamIDs, resourceControl) {
-		return true, nil
-	}
-
-	return false, nil
 }

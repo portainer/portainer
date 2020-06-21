@@ -7,6 +7,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 // Handler is the HTTP handler used to handle endpoint group operations.
@@ -35,4 +36,25 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h.Handle("/custom_templates/{id}",
 		bouncer.AuthenticatedAccess(httperror.LoggerHandler(h.customTemplateDelete))).Methods(http.MethodDelete)
 	return h
+}
+
+func userCanEditTemplate(customTemplate *portainer.CustomTemplate, securityContext *security.RestrictedRequestContext) bool {
+	return securityContext.IsAdmin || customTemplate.CreatedByUserID == securityContext.UserID
+}
+
+func userCanAccessTemplate(customTemplate portainer.CustomTemplate, securityContext *security.RestrictedRequestContext, resourceControl *portainer.ResourceControl) bool {
+	if securityContext.IsAdmin || customTemplate.CreatedByUserID == securityContext.UserID {
+		return true
+	}
+
+	userTeamIDs := make([]portainer.TeamID, 0)
+	for _, membership := range securityContext.UserMemberships {
+		userTeamIDs = append(userTeamIDs, membership.TeamID)
+	}
+
+	if resourceControl != nil && authorization.UserCanAccessResource(securityContext.UserID, userTeamIDs, resourceControl) {
+		return true
+	}
+
+	return false
 }

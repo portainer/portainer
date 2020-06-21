@@ -141,9 +141,9 @@ func FilterAuthorizedStacks(stacks []portainer.Stack, user *portainer.User, user
 func FilterAuthorizedCustomTemplates(customTemplates []portainer.CustomTemplate, user *portainer.User, userTeamIDs []portainer.TeamID) []portainer.CustomTemplate {
 	authorizedTemplates := make([]portainer.CustomTemplate, 0)
 
-	for _, stack := range customTemplates {
-		if stack.ResourceControl != nil && UserCanAccessResource(user.ID, userTeamIDs, stack.ResourceControl) {
-			authorizedTemplates = append(authorizedTemplates, stack)
+	for _, customTemplate := range customTemplates {
+		if customTemplate.CreatedByUserID == user.ID || (customTemplate.ResourceControl != nil && UserCanAccessResource(user.ID, userTeamIDs, customTemplate.ResourceControl)) {
+			authorizedTemplates = append(authorizedTemplates, customTemplate)
 		}
 	}
 
