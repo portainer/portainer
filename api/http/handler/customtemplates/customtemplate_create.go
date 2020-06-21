@@ -12,6 +12,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 func (handler *Handler) customTemplateCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
@@ -37,8 +38,16 @@ func (handler *Handler) customTemplateCreate(w http.ResponseWriter, r *http.Requ
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to create custom template", err}
 	}
 
-	return response.JSON(w, customTemplate)
+	resourceControl := authorization.NewPrivateResourceControl(strconv.Itoa(int(customTemplate.ID)), portainer.CustomTemplateResourceControl, tokenData.ID)
 
+	err = handler.DataStore.ResourceControl().CreateResourceControl(resourceControl)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist resource control inside the database", err}
+	}
+
+	customTemplate.ResourceControl = resourceControl
+
+	return response.JSON(w, customTemplate)
 }
 
 func (handler *Handler) createCustomTemplate(method string, r *http.Request) (*portainer.CustomTemplate, error) {

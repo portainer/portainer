@@ -1,6 +1,10 @@
 package authorization
 
-import "github.com/portainer/portainer/api"
+import (
+	"strconv"
+
+	"github.com/portainer/portainer/api"
+)
 
 // NewPrivateResourceControl will create a new private resource control associated to the resource specified by the
 // identifier and type parameters. It automatically assigns it to the user specified by the userID parameter.
@@ -100,6 +104,20 @@ func DecorateStacks(stacks []portainer.Stack, resourceControls []portainer.Resou
 	return stacks
 }
 
+// DecorateCustomTemplates will iterate through a list of custom templates, check for an associated resource control for each
+// template and decorate the template element if a resource control is found.
+func DecorateCustomTemplates(templates []portainer.CustomTemplate, resourceControls []portainer.ResourceControl) []portainer.CustomTemplate {
+	for idx, template := range templates {
+
+		resourceControl := GetResourceControlByResourceIDAndType(strconv.Itoa(int(template.ID)), portainer.CustomTemplateResourceControl, resourceControls)
+		if resourceControl != nil {
+			templates[idx].ResourceControl = resourceControl
+		}
+	}
+
+	return templates
+}
+
 // FilterAuthorizedStacks returns a list of decorated stacks filtered through resource control access checks.
 func FilterAuthorizedStacks(stacks []portainer.Stack, user *portainer.User, userTeamIDs []portainer.TeamID, rbacEnabled bool) []portainer.Stack {
 	authorizedStacks := make([]portainer.Stack, 0)
@@ -117,6 +135,19 @@ func FilterAuthorizedStacks(stacks []portainer.Stack, user *portainer.User, user
 	}
 
 	return authorizedStacks
+}
+
+// FilterAuthorizedCustomTemplates returns a list of decorated custom templates filtered through resource control access checks.
+func FilterAuthorizedCustomTemplates(customTemplates []portainer.CustomTemplate, user *portainer.User, userTeamIDs []portainer.TeamID) []portainer.CustomTemplate {
+	authorizedTemplates := make([]portainer.CustomTemplate, 0)
+
+	for _, stack := range customTemplates {
+		if stack.ResourceControl != nil && UserCanAccessResource(user.ID, userTeamIDs, stack.ResourceControl) {
+			authorizedTemplates = append(authorizedTemplates, stack)
+		}
+	}
+
+	return authorizedTemplates
 }
 
 // UserCanAccessResource will valide that a user has permissions defined in the specified resource control

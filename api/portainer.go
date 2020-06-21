@@ -73,6 +73,7 @@ type (
 		Platform        CustomTemplatePlatform `json:"Platform"`
 		Logo            string                 `json:"Logo"`
 		Type            StackType              `json:"Type"`
+		ResourceControl *ResourceControl       `json:"ResourceControl"`
 	}
 
 	// CustomTemplateID represents a custom template identifier
@@ -1281,6 +1282,8 @@ const (
 	StackResourceControl
 	// ConfigResourceControl represents a resource control associated to a Docker config
 	ConfigResourceControl
+	// CustomTemplateResourceControl  represents a resource control associated to a custom template
+	CustomTemplateResourceControl
 )
 
 const (

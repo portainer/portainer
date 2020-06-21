@@ -1,7 +1,6 @@
 package customtemplates
 
 import (
-	"errors"
 	"net/http"
 	"strconv"
 
@@ -61,13 +60,22 @@ func (handler *Handler) customTemplateUpdate(w http.ResponseWriter, r *http.Requ
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a custom template with the specified identifier inside the database", err}
 	}
 
-	tokenData, err := security.RetrieveTokenData(r)
+	resourceControl, err := handler.DataStore.ResourceControl().ResourceControlByResourceIDAndType(strconv.Itoa(customTemplateID), portainer.CustomTemplateResourceControl)
 	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user details from authentication token", err}
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve a resource control associated to the custom template", err}
 	}
 
-	if tokenData.ID != customTemplate.CreatedByUserID && tokenData.Role != portainer.AdministratorRole {
-		return &httperror.HandlerError{http.StatusUnauthorized, "Unauthorized", errors.New("Unauthorized")}
+	securityContext, err := security.RetrieveRestrictedRequestContext(r)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve info from request context", err}
+	}
+
+	access, err := handler.userCanAccessTemplate(securityContext, resourceControl)
+	if err != nil {
+		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to verify user authorizations to validate custom template access", err}
+	}
+	if !access {
+		return &httperror.HandlerError{http.StatusForbidden, "Access denied to resource", portainer.ErrResourceAccessDenied}
 	}
 
 	templateFolder := strconv.Itoa(customTemplateID)

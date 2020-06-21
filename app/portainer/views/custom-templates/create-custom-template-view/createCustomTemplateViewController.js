@@ -1,7 +1,9 @@
+import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
+
 class CreateCustomTemplateViewController {
   /* @ngInject */
-  constructor($async, $state, CustomTemplateService, Notifications, StackService) {
-    Object.assign(this, { $async, $state, CustomTemplateService, Notifications, StackService });
+  constructor($async, $state, Authentication, CustomTemplateService, FormValidator, Notifications, ResourceControlService, StackService) {
+    Object.assign(this, { $async, $state, Authentication, CustomTemplateService, FormValidator, Notifications, ResourceControlService, StackService });
 
     this.formValues = {
       Title: '',
@@ -17,6 +19,7 @@ class CreateCustomTemplateViewController {
       Note: '',
       Platform: 1,
       Type: 1,
+      AccessControlData: new AccessControlFormData(),
     };
 
     this.state = {
@@ -60,7 +63,12 @@ class CreateCustomTemplateViewController {
 
     this.state.actionInProgress = true;
     try {
-      await this.createCustomTemplateByMethod(method);
+      const { ResourceControl } = await this.createCustomTemplateByMethod(method);
+
+      const accessControlData = this.formValues.AccessControlData;
+      const userDetails = this.Authentication.getUserDetails();
+      const userId = userDetails.ID;
+      await this.ResourceControlService.applyResourceControl(userId, accessControlData, ResourceControl);
 
       this.Notifications.success('Custom template successfully created');
       this.$state.go('portainer.templates.custom');
@@ -76,7 +84,16 @@ class CreateCustomTemplateViewController {
 
     if (method === 'editor' && this.formValues.FileContent === '') {
       this.state.formValidationError = 'Template file content must not be empty';
-      return;
+      return false;
+    }
+
+    const isAdmin = this.Authentication.isAdmin();
+    const accessControlData = this.formValues.AccessControlData;
+    const error = this.FormValidator.validateAccessControl(accessControlData, isAdmin);
+
+    if (error) {
+      this.state.formValidationError = error;
+      return false;
     }
 
     return true;
