@@ -118,6 +118,8 @@ class CustomTemplatesViewController {
 
     const endpointId = this.EndpointProvider.endpointID();
 
+    this.state.actionInProgress = true;
+
     try {
       const file = this.formValues.fileContent;
       const { ResourceControl: resourceControl } = await this.StackService.createComposeStackFromFileContent(stackName, file, [], endpointId);
