@@ -137,7 +137,8 @@ class CustomTemplatesViewController {
 
     try {
       const file = this.formValues.fileContent;
-      const { ResourceControl: resourceControl } = await this.StackService.createComposeStackFromFileContent(stackName, file, [], endpointId);
+      const createAction = this.state.selectedTemplate.Type === 1 ? this.StackService.createSwarmStackFromFileContent : this.StackService.createComposeStackFromFileContent;
+      const { ResourceControl: resourceControl } = await createAction(stackName, file, [], endpointId);
       await this.ResourceControlService.applyResourceControl(userId, accessControlData, resourceControl);
       this.Notifications.success('Stack successfully deployed');
       this.$state.go('portainer.stacks');
@@ -174,7 +175,7 @@ class CustomTemplatesViewController {
       return o.Name === 'bridge';
     });
 
-    this.formValues.name = template.Name ? template.Name : '';
+    this.formValues.name = template.Title ? template.Title : '';
     this.state.selectedTemplate = template;
     this.$anchorScroll('view-top');
 
