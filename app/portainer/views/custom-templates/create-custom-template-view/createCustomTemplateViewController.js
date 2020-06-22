@@ -2,8 +2,8 @@ import { AccessControlFormData } from 'Portainer/components/accessControlForm/po
 
 class CreateCustomTemplateViewController {
   /* @ngInject */
-  constructor($async, $state, Authentication, CustomTemplateService, FormValidator, Notifications, ResourceControlService, StackService) {
-    Object.assign(this, { $async, $state, Authentication, CustomTemplateService, FormValidator, Notifications, ResourceControlService, StackService });
+  constructor($async, $state, Authentication, CustomTemplateService, FormValidator, Notifications, ResourceControlService, StackService, StateManager) {
+    Object.assign(this, { $async, $state, Authentication, CustomTemplateService, FormValidator, Notifications, ResourceControlService, StackService, StateManager });
 
     this.formValues = {
       Title: '',
@@ -127,6 +127,17 @@ class CreateCustomTemplateViewController {
   }
 
   async $onInit() {
+    const applicationState = this.StateManager.getState();
+
+    this.state.endpointMode = applicationState.endpoint.mode;
+    let stackType = 0;
+    if (this.state.endpointMode.provider === 'DOCKER_STANDALONE') {
+      stackType = 2;
+    } else if (this.state.endpointMode.provider === 'DOCKER_SWARM_MODE') {
+      stackType = 1;
+    }
+    this.formValues.Type = stackType;
+
     const { stackId } = this.$state.params;
     if (stackId) {
       this.state.fromStack = true;

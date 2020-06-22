@@ -76,12 +76,18 @@ class CustomTemplatesViewController {
     return this.currentUser.isAdmin || this.currentUser.id === template.CreatedByUserId;
   }
 
-  getTemplates() {
-    return this.$async(this.getTemplatesAsync);
+  getTemplates(provider) {
+    return this.$async(this.getTemplatesAsync, provider);
   }
-  async getTemplatesAsync() {
+  async getTemplatesAsync(provider) {
     try {
-      this.templates = await this.CustomTemplateService.customTemplates();
+      let stackType = 0;
+      if (provider === 'DOCKER_STANDALONE') {
+        stackType = 2;
+      } else if (provider === 'DOCKER_SWARM_MODE') {
+        stackType = 1;
+      }
+      this.templates = await this.CustomTemplateService.customTemplates(stackType);
     } catch (err) {
       this.Notifications.error('Failed loading templates', err, 'Unable to load custom templates');
     }
@@ -176,19 +182,15 @@ class CustomTemplatesViewController {
     this.formValues.fileContent = file;
   }
 
-  getNetworks() {
-    return this.$async(this.getNetworksAsync);
+  getNetworks(provider, apiVersion) {
+    return this.$async(this.getNetworksAsync, provider, apiVersion);
   }
-  async getNetworksAsync() {
-    const applicationState = this.StateManager.getState();
-
-    const endpointMode = applicationState.endpoint.mode;
-    const apiVersion = applicationState.endpoint.apiVersion;
+  async getNetworksAsync(provider, apiVersion) {
     try {
       const networks = await this.NetworkService.networks(
-        endpointMode.provider === 'DOCKER_STANDALONE' || endpointMode.provider === 'DOCKER_SWARM_MODE',
+        provider === 'DOCKER_STANDALONE' || provider === 'DOCKER_SWARM_MODE',
         false,
-        endpointMode.provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25
+        provider === 'DOCKER_SWARM_MODE' && apiVersion >= 1.25
       );
       this.availableNetworks = networks;
     } catch (err) {
@@ -218,8 +220,17 @@ class CustomTemplatesViewController {
   }
 
   $onInit() {
-    this.getTemplates();
-    this.getNetworks();
+    const applicationState = this.StateManager.getState();
+
+    const {
+      endpoint: {
+        mode: { provider },
+      },
+      apiVersion,
+    } = applicationState;
+
+    this.getTemplates(provider);
+    this.getNetworks(provider, apiVersion);
 
     this.currentUser.isAdmin = this.Authentication.isAdmin();
     const user = this.Authentication.getUserDetails();

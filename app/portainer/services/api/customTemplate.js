@@ -10,8 +10,8 @@ function CustomTemplateServiceFactory(CustomTemplates, FileUploadService) {
     return CustomTemplates.get({ id }).$promise;
   };
 
-  service.customTemplates = function customTemplates() {
-    return CustomTemplates.query({}).$promise;
+  service.customTemplates = function customTemplates(type) {
+    return CustomTemplates.query({ type }).$promise;
   };
 
   service.remove = function remove(id) {
