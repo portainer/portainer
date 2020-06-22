@@ -173,7 +173,7 @@ angular
       }
 
       try {
-        const templates = await CustomTemplateService.customTemplates();
+        const templates = await CustomTemplateService.customTemplates($scope.state.StackType);
         $scope.templates = _.map(templates, (template) => ({ ...template, label: `${template.Title} - ${template.Description}` }));
       } catch (err) {
         Notifications.error('Failure', err, 'Unable to retrieve Custom Templates');

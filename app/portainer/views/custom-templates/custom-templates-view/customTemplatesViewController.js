@@ -76,15 +76,13 @@ class CustomTemplatesViewController {
     return this.currentUser.isAdmin || this.currentUser.id === template.CreatedByUserId;
   }
 
-  getTemplates(provider) {
-    return this.$async(this.getTemplatesAsync, provider);
+  getTemplates(endpointMode) {
+    return this.$async(this.getTemplatesAsync, endpointMode);
   }
-  async getTemplatesAsync(provider) {
+  async getTemplatesAsync({ provider, role }) {
     try {
-      let stackType = 0;
-      if (provider === 'DOCKER_STANDALONE') {
-        stackType = 2;
-      } else if (provider === 'DOCKER_SWARM_MODE') {
+      let stackType = 2;
+      if (provider === 'DOCKER_SWARM_MODE' && role === 'MANAGER') {
         stackType = 1;
       }
       this.templates = await this.CustomTemplateService.customTemplates(stackType);
@@ -224,14 +222,12 @@ class CustomTemplatesViewController {
     const applicationState = this.StateManager.getState();
 
     const {
-      endpoint: {
-        mode: { provider },
-      },
+      endpoint: { mode: endpointMode },
       apiVersion,
     } = applicationState;
 
-    this.getTemplates(provider);
-    this.getNetworks(provider, apiVersion);
+    this.getTemplates(endpointMode);
+    this.getNetworks(endpointMode.provider, apiVersion);
 
     this.currentUser.isAdmin = this.Authentication.isAdmin();
     const user = this.Authentication.getUserDetails();
