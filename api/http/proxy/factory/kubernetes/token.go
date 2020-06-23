@@ -10,24 +10,23 @@ import (
 const defaultServiceAccountTokenFile = "/var/run/secrets/kubernetes.io/serviceaccount/token"
 
 type tokenManager struct {
-	tokenCache            *tokenCache
-	kubecli               portainer.KubeClient
-	teamMemberShipService portainer.TeamMembershipService
-	mutex                 sync.Mutex
-	adminToken            string
+	tokenCache *tokenCache
+	kubecli    portainer.KubeClient
+	dataStore  portainer.DataStore
+	mutex      sync.Mutex
+	adminToken string
 }
 
 // NewTokenManager returns a pointer to a new instance of tokenManager.
 // If the useLocalAdminToken parameter is set to true, it will search for the local admin service account
 // and associate it to the manager.
-// TODO: refactor - probably want to inject the datastore instead of teamMembershipService
-func NewTokenManager(kubecli portainer.KubeClient, teamMembershipService portainer.TeamMembershipService, cache *tokenCache, setLocalAdminToken bool) (*tokenManager, error) {
+func NewTokenManager(kubecli portainer.KubeClient, dataStore portainer.DataStore, cache *tokenCache, setLocalAdminToken bool) (*tokenManager, error) {
 	tokenManager := &tokenManager{
-		tokenCache:            cache,
-		kubecli:               kubecli,
-		teamMemberShipService: teamMembershipService,
-		mutex:                 sync.Mutex{},
-		adminToken:            "",
+		tokenCache: cache,
+		kubecli:    kubecli,
+		dataStore:  dataStore,
+		mutex:      sync.Mutex{},
+		adminToken: "",
 	}
 
 	if setLocalAdminToken {
@@ -52,7 +51,7 @@ func (manager *tokenManager) getUserServiceAccountToken(userID int, username str
 
 	token, ok := manager.tokenCache.getToken(userID)
 	if !ok {
-		memberships, err := manager.teamMemberShipService.TeamMembershipsByUserID(portainer.UserID(userID))
+		memberships, err := manager.dataStore.TeamMembership().TeamMembershipsByUserID(portainer.UserID(userID))
 		if err != nil {
 			return "", err
 		}

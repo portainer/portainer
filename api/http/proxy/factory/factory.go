@@ -35,7 +35,6 @@ type (
 )
 
 // NewProxyFactory returns a pointer to a new instance of a ProxyFactory
-// TODO: refactor - too many parameters
 func NewProxyFactory(dataStore portainer.DataStore, signatureService portainer.DigitalSignatureService, tunnelService portainer.ReverseTunnelService, clientFactory *docker.ClientFactory, kubernetesClientFactory *cli.ClientFactory, kubernetesTokenCacheManager *kubernetes.TokenCacheManager) *ProxyFactory {
 	return &ProxyFactory{
 		dataStore:                   dataStore,

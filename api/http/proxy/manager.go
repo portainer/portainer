@@ -27,7 +27,6 @@ type (
 )
 
 // NewManager initializes a new proxy Service
-// TODO: refactor - too many parameters
 func NewManager(dataStore portainer.DataStore, signatureService portainer.DigitalSignatureService, tunnelService portainer.ReverseTunnelService, clientFactory *docker.ClientFactory, kubernetesClientFactory *cli.ClientFactory, kubernetesTokenCacheManager *kubernetes.TokenCacheManager) *Manager {
 	return &Manager{
 		endpointProxies:        cmap.New(),
