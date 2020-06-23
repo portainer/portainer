@@ -1,7 +1,6 @@
 package stacks
 
 import (
-	"errors"
 	"net/http"
 	"path"
 	"strconv"
@@ -10,7 +9,7 @@ import (
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
 	"github.com/portainer/portainer/api/http/security"
 )
@@ -337,12 +336,9 @@ func (handler *Handler) deploySwarmStack(config *swarmStackDeploymentConfig) err
 			return err
 		}
 
-		valid, err := handler.isValidStackFile(stackContent)
+		err = handler.isValidStackFile(stackContent, settings)
 		if err != nil {
 			return err
-		}
-		if !valid {
-			return errors.New("bind-mount disabled for non administrator users")
 		}
 	}
 

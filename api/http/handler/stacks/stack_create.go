@@ -10,7 +10,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 	"github.com/portainer/portainer/api/internal/authorization"
 )
@@ -98,10 +98,10 @@ func (handler *Handler) createSwarmStack(w http.ResponseWriter, r *http.Request,
 	return &httperror.HandlerError{http.StatusBadRequest, "Invalid value for query parameter: method. Value must be one of: string, repository or file", errors.New(request.ErrInvalidQueryParameter)}
 }
 
-func (handler *Handler) isValidStackFile(stackFileContent []byte) (bool, error) {
+func (handler *Handler) isValidStackFile(stackFileContent []byte, settings *portainer.Settings) error {
 	composeConfigYAML, err := loader.ParseYAML(stackFileContent)
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	composeConfigFile := types.ConfigFile{
@@ -118,19 +118,25 @@ func (handler *Handler) isValidStackFile(stackFileContent []byte) (bool, error) 
 		options.SkipInterpolation = true
 	})
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	for key := range composeConfig.Services {
 		service := composeConfig.Services[key]
-		for _, volume := range service.Volumes {
-			if volume.Type == "bind" {
-				return false, nil
+		if !settings.AllowBindMountsForRegularUsers {
+			for _, volume := range service.Volumes {
+				if volume.Type == "bind" {
+					return errors.New("bind-mount disabled for non administrator users")
+				}
 			}
+		}
+
+		if !settings.AllowPrivilegedModeForRegularUsers && service.Privileged == true {
+			return errors.New("privileged mode disabled for non administrator users")
 		}
 	}
 
-	return true, nil
+	return nil
 }
 
 func (handler *Handler) decorateStackResponse(w http.ResponseWriter, stack *portainer.Stack, userID portainer.UserID) *httperror.HandlerError {
