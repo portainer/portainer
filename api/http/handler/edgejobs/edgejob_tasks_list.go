@@ -1,8 +1,8 @@
-package edgejobtasks
+package edgejobs
 
 import (
+	"fmt"
 	"net/http"
-	"strconv"
 
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
@@ -10,8 +10,14 @@ import (
 	"github.com/portainer/portainer/api"
 )
 
-// DELETE request on /api/edge_jobs/:id/tasks/:taskID/logs
-func (handler *Handler) edgeJobTasksClear(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
+type taskContainer struct {
+	ID         string                      `json:"Id"`
+	EndpointID portainer.EndpointID        `json:"EndpointId"`
+	LogsStatus portainer.EdgeJobLogsStatus `json:"LogsStatus"`
+}
+
+// GET request on /api/edge_jobs/:id/tasks
+func (handler *Handler) edgeJobTasksList(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
 	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusServiceUnavailable, "Unable to retrieve settings", err}
@@ -26,11 +32,6 @@ func (handler *Handler) edgeJobTasksClear(w http.ResponseWriter, r *http.Request
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid Edge job identifier route variable", err}
 	}
 
-	taskID, err := request.RetrieveNumericRouteVariableValue(r, "taskID")
-	if err != nil {
-		return &httperror.HandlerError{http.StatusBadRequest, "Invalid Task identifier route variable", err}
-	}
-
 	edgeJob, err := handler.DataStore.EdgeJob().EdgeJob(portainer.EdgeJobID(edgeJobID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an Edge job with the specified identifier inside the database", err}
@@ -38,24 +39,18 @@ func (handler *Handler) edgeJobTasksClear(w http.ResponseWriter, r *http.Request
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an Edge job with the specified identifier inside the database", err}
 	}
 
-	endpointID := portainer.EndpointID(taskID)
+	tasks := make([]taskContainer, 0)
 
-	meta := edgeJob.Endpoints[endpointID]
-	meta.CollectLogs = false
-	meta.LogsStatus = portainer.EdgeJobLogsStatusIdle
-	edgeJob.Endpoints[endpointID] = meta
+	for endpointID, meta := range edgeJob.Endpoints {
 
-	err = handler.FileService.ClearEdgeJobTaskLogs(strconv.Itoa(edgeJobID), strconv.Itoa(taskID))
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to clear log file from disk", err}
+		cronTask := taskContainer{
+			ID:         fmt.Sprintf("edgejob_task_%d_%d", edgeJob.ID, endpointID),
+			EndpointID: endpointID,
+			LogsStatus: meta.LogsStatus,
+		}
+
+		tasks = append(tasks, cronTask)
 	}
 
-	handler.ReverseTunnelService.AddEdgeJob(endpointID, edgeJob)
-
-	err = handler.DataStore.EdgeJob().UpdateEdgeJob(edgeJob.ID, edgeJob)
-	if err != nil {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist Edge job changes in the database", err}
-	}
-
-	return response.Empty(w)
+	return response.JSON(w, tasks)
 }

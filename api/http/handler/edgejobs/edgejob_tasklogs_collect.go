@@ -1,4 +1,4 @@
-package edgejobtasks
+package edgejobs
 
 import (
 	"net/http"
