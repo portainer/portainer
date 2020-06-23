@@ -3,7 +3,7 @@ package cron
 import (
 	"log"
 
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 // SnapshotJobRunner is used to run a SnapshotJob
@@ -14,27 +14,15 @@ type SnapshotJobRunner struct {
 
 // SnapshotJobContext represents the context of execution of a SnapshotJob
 type SnapshotJobContext struct {
-<<<<<<< HEAD
-	endpointService portainer.EndpointService
+	dataStore       portainer.DataStore
 	snapshotManager *portainer.SnapshotManager
 }
 
 // NewSnapshotJobContext returns a new context that can be used to execute a SnapshotJob
-func NewSnapshotJobContext(endpointService portainer.EndpointService, snapshotManager *portainer.SnapshotManager) *SnapshotJobContext {
+func NewSnapshotJobContext(dataStore portainer.DataStore, snapshotManager *portainer.SnapshotManager) *SnapshotJobContext {
 	return &SnapshotJobContext{
-		endpointService: endpointService,
+		dataStore:       dataStore,
 		snapshotManager: snapshotManager,
-=======
-	dataStore   portainer.DataStore
-	snapshotter portainer.Snapshotter
-}
-
-// NewSnapshotJobContext returns a new context that can be used to execute a SnapshotJob
-func NewSnapshotJobContext(dataStore portainer.DataStore, snapshotter portainer.Snapshotter) *SnapshotJobContext {
-	return &SnapshotJobContext{
-		dataStore:   dataStore,
-		snapshotter: snapshotter,
->>>>>>> origin/develop
 	}
 }
 

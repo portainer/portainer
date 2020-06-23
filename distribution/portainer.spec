@@ -1,9 +1,5 @@
 Name:           portainer
-<<<<<<< HEAD
-Version:        1.0.0-k8s-rc
-=======
 Version:        2.0.0-dev
->>>>>>> origin/develop
 Release:        0
 License:        Zlib
 Summary:        A lightweight docker management UI

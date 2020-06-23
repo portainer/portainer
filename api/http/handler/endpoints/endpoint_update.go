@@ -8,7 +8,6 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/client"
 )
 
@@ -27,11 +26,8 @@ type endpointUpdatePayload struct {
 	TagIDs                 []portainer.TagID
 	UserAccessPolicies     portainer.UserAccessPolicies
 	TeamAccessPolicies     portainer.TeamAccessPolicies
-<<<<<<< HEAD
-	Kubernetes             *portainer.KubernetesData
-=======
 	EdgeCheckinInterval    *int
->>>>>>> origin/develop
+	Kubernetes             *portainer.KubernetesData
 }
 
 func (payload *endpointUpdatePayload) Validate(r *http.Request) error {

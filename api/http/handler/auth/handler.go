@@ -3,11 +3,11 @@ package auth
 import (
 	"net/http"
 
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/security"
 )
@@ -15,30 +15,13 @@ import (
 // Handler is the HTTP handler used to handle authentication operations.
 type Handler struct {
 	*mux.Router
-<<<<<<< HEAD
-	authDisabled                bool
-	UserService                 portainer.UserService
+	DataStore                   portainer.DataStore
 	CryptoService               portainer.CryptoService
 	JWTService                  portainer.JWTService
 	LDAPService                 portainer.LDAPService
-	SettingsService             portainer.SettingsService
-	TeamService                 portainer.TeamService
-	TeamMembershipService       portainer.TeamMembershipService
-	ExtensionService            portainer.ExtensionService
-	EndpointService             portainer.EndpointService
-	EndpointGroupService        portainer.EndpointGroupService
-	RoleService                 portainer.RoleService
 	ProxyManager                *proxy.Manager
 	AuthorizationService        *portainer.AuthorizationService
 	KubernetesTokenCacheManager *kubernetes.TokenCacheManager
-=======
-	DataStore            portainer.DataStore
-	CryptoService        portainer.CryptoService
-	JWTService           portainer.JWTService
-	LDAPService          portainer.LDAPService
-	ProxyManager         *proxy.Manager
-	AuthorizationService *portainer.AuthorizationService
->>>>>>> origin/develop
 }
 
 // NewHandler creates a handler to manage authentication operations.

@@ -24,22 +24,12 @@ const (
 // It is used to start a reverse tunnel server and to manage the connection status of each tunnel
 // connected to the tunnel server.
 type Service struct {
-<<<<<<< HEAD
-	serverFingerprint   string
-	serverPort          string
-	tunnelDetailsMap    cmap.ConcurrentMap
-	endpointService     portainer.EndpointService
-	tunnelServerService portainer.TunnelServerService
-	snapshotManager     *portainer.SnapshotManager
-	chiselServer        *chserver.Server
-=======
 	serverFingerprint string
 	serverPort        string
 	tunnelDetailsMap  cmap.ConcurrentMap
 	dataStore         portainer.DataStore
-	snapshotter       portainer.Snapshotter
+	snapshotManager   *portainer.SnapshotManager
 	chiselServer      *chserver.Server
->>>>>>> origin/develop
 }
 
 // NewService returns a pointer to a new instance of Service
@@ -181,24 +171,15 @@ func (service *Service) checkTunnels() {
 }
 
 func (service *Service) snapshotEnvironment(endpointID portainer.EndpointID, tunnelPort int) error {
-<<<<<<< HEAD
-	endpoint, err := service.endpointService.Endpoint(endpointID)
-=======
 	endpoint, err := service.dataStore.Endpoint().Endpoint(endpointID)
->>>>>>> origin/develop
 	if err != nil {
 		return err
 	}
 
 	endpointURL := endpoint.URL
-<<<<<<< HEAD
-	endpoint.URL = fmt.Sprintf("tcp://localhost:%d", tunnelPort)
 
-	err = service.snapshotManager.SnapshotEndpoint(endpoint)
-=======
 	endpoint.URL = fmt.Sprintf("tcp://127.0.0.1:%d", tunnelPort)
-	snapshot, err := service.snapshotter.CreateSnapshot(endpoint)
->>>>>>> origin/develop
+	err = service.snapshotManager.SnapshotEndpoint(endpoint)
 	if err != nil {
 		return err
 	}

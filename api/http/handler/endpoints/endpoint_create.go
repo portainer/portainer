@@ -12,7 +12,6 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/client"
 )
 
@@ -240,14 +239,8 @@ func (handler *Handler) createAzureEndpoint(payload *endpointCreatePayload) (*po
 	return endpoint, nil
 }
 
-<<<<<<< HEAD
 func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload, endpointType portainer.EndpointType) (*portainer.Endpoint, *httperror.HandlerError) {
-	endpointID := handler.EndpointService.GetNextIdentifier()
-=======
-func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) (*portainer.Endpoint, *httperror.HandlerError) {
-	endpointType := portainer.EdgeAgentEnvironment
 	endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
->>>>>>> origin/develop
 
 	portainerURL, err := url.Parse(payload.URL)
 	if err != nil {
@@ -274,25 +267,15 @@ func (handler *Handler) createEdgeAgentEndpoint(payload *endpointCreatePayload) 
 		TLSConfig: portainer.TLSConfiguration{
 			TLS: false,
 		},
-<<<<<<< HEAD
-		AuthorizedUsers: []portainer.UserID{},
-		AuthorizedTeams: []portainer.TeamID{},
-		Extensions:      []portainer.EndpointExtension{},
-		Tags:            payload.Tags,
-		Status:          portainer.EndpointStatusUp,
-		Snapshots:       []portainer.DockerSnapshot{},
-		EdgeKey:         edgeKey,
-		Kubernetes:      portainer.KubernetesDefault(),
-=======
 		AuthorizedUsers:     []portainer.UserID{},
 		AuthorizedTeams:     []portainer.TeamID{},
 		Extensions:          []portainer.EndpointExtension{},
 		TagIDs:              payload.TagIDs,
 		Status:              portainer.EndpointStatusUp,
-		Snapshots:           []portainer.Snapshot{},
+		Snapshots:           []portainer.DockerSnapshot{},
 		EdgeKey:             edgeKey,
 		EdgeCheckinInterval: payload.EdgeCheckinInterval,
->>>>>>> origin/develop
+		Kubernetes:          portainer.KubernetesDefault(),
 	}
 
 	err = handler.saveEndpointAndUpdateAuthorizations(endpoint)
@@ -373,15 +356,11 @@ func (handler *Handler) createKubernetesEndpoint(payload *endpointCreatePayload)
 		return nil, err
 	}
 
-<<<<<<< HEAD
 	return endpoint, nil
 }
 
 func (handler *Handler) createTLSSecuredEndpoint(payload *endpointCreatePayload, endpointType portainer.EndpointType) (*portainer.Endpoint, *httperror.HandlerError) {
-	endpointID := handler.EndpointService.GetNextIdentifier()
-=======
 	endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
->>>>>>> origin/develop
 	endpoint := &portainer.Endpoint{
 		ID:        portainer.EndpointID(endpointID),
 		Name:      payload.Name,

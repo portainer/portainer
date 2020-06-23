@@ -2,7 +2,7 @@ package endpoints
 
 import (
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/security"
 
@@ -21,19 +21,6 @@ func hideFields(endpoint *portainer.Endpoint) {
 // Handler is the HTTP handler used to handle endpoint operations.
 type Handler struct {
 	*mux.Router
-<<<<<<< HEAD
-	authorizeEndpointManagement bool
-	requestBouncer              *security.RequestBouncer
-	EndpointService             portainer.EndpointService
-	EndpointGroupService        portainer.EndpointGroupService
-	FileService                 portainer.FileService
-	ProxyManager                *proxy.Manager
-	SnapshotManager             *portainer.SnapshotManager
-	JobService                  portainer.JobService
-	ReverseTunnelService        portainer.ReverseTunnelService
-	SettingsService             portainer.SettingsService
-	AuthorizationService        *portainer.AuthorizationService
-=======
 	requestBouncer       *security.RequestBouncer
 	DataStore            portainer.DataStore
 	AuthorizationService *portainer.AuthorizationService
@@ -41,8 +28,7 @@ type Handler struct {
 	JobService           portainer.JobService
 	ProxyManager         *proxy.Manager
 	ReverseTunnelService portainer.ReverseTunnelService
-	Snapshotter          portainer.Snapshotter
->>>>>>> origin/develop
+	SnapshotManager      *portainer.SnapshotManager
 }
 
 // NewHandler creates a handler to manage endpoint operations.

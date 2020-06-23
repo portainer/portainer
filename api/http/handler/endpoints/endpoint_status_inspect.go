@@ -6,7 +6,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 )
 
 type stackStatusResponse struct {
@@ -37,23 +37,9 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
 
-<<<<<<< HEAD
-	if endpoint.Type != portainer.EdgeAgentOnDockerEnvironment && endpoint.Type != portainer.EdgeAgentOnKubernetesEnvironment {
-		return &httperror.HandlerError{http.StatusInternalServerError, "Status unavailable for non Edge agent endpoints", errors.New("Status unavailable")}
-	}
-
-	edgeIdentifier := r.Header.Get(portainer.PortainerAgentEdgeIDHeader)
-	if edgeIdentifier == "" {
-		return &httperror.HandlerError{http.StatusForbidden, "Missing Edge identifier", errors.New("missing Edge identifier")}
-	}
-
-	if endpoint.EdgeID != "" && endpoint.EdgeID != edgeIdentifier {
-		return &httperror.HandlerError{http.StatusForbidden, "Invalid Edge identifier", errors.New("invalid Edge identifier")}
-=======
 	err = handler.requestBouncer.AuthorizedEdgeEndpointOperation(r, endpoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to access endpoint", err}
->>>>>>> origin/develop
 	}
 
 	if endpoint.EdgeID == "" {

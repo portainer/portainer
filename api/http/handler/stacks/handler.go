@@ -6,7 +6,7 @@ import (
 
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
-	"github.com/portainer/portainer/api"
+	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
 )
 
@@ -16,27 +16,12 @@ type Handler struct {
 	stackDeletionMutex *sync.Mutex
 	requestBouncer     *security.RequestBouncer
 	*mux.Router
-<<<<<<< HEAD
-	FileService            portainer.FileService
-	GitService             portainer.GitService
-	StackService           portainer.StackService
-	EndpointService        portainer.EndpointService
-	ResourceControlService portainer.ResourceControlService
-	RegistryService        portainer.RegistryService
-	DockerHubService       portainer.DockerHubService
-	SwarmStackManager      portainer.SwarmStackManager
-	ComposeStackManager    portainer.ComposeStackManager
-	SettingsService        portainer.SettingsService
-	UserService            portainer.UserService
-	ExtensionService       portainer.ExtensionService
-	KubernetesDeployer     portainer.KubernetesDeployer
-=======
 	DataStore           portainer.DataStore
 	FileService         portainer.FileService
 	GitService          portainer.GitService
 	SwarmStackManager   portainer.SwarmStackManager
 	ComposeStackManager portainer.ComposeStackManager
->>>>>>> origin/develop
+	KubernetesDeployer  portainer.KubernetesDeployer
 }
 
 // NewHandler creates a handler to manage stack operations.

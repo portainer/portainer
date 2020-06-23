@@ -81,24 +81,14 @@ func initSwarmStackManager(assetsPath string, dataStorePath string, signatureSer
 	return exec.NewSwarmStackManager(assetsPath, dataStorePath, signatureService, fileService, reverseTunnelService)
 }
 
-<<<<<<< HEAD
 func initKubernetesDeployer(assetsPath string) portainer.KubernetesDeployer {
 	return exec.NewKubernetesDeployer(assetsPath)
 }
 
-func initJWTService(authenticationEnabled bool) portainer.JWTService {
-	if authenticationEnabled {
-		jwtService, err := jwt.NewService()
-		if err != nil {
-			log.Fatal(err)
-		}
-		return jwtService
-=======
 func initJWTService(dataStore portainer.DataStore) (portainer.JWTService, error) {
 	settings, err := dataStore.Settings().Settings()
 	if err != nil {
 		return nil, err
->>>>>>> origin/develop
 	}
 
 	jwtService, err := jwt.NewService(settings.UserSessionTimeout)
@@ -143,13 +133,8 @@ func initJobScheduler() portainer.JobScheduler {
 	return cron.NewJobScheduler()
 }
 
-<<<<<<< HEAD
-func loadSnapshotSystemSchedule(jobScheduler portainer.JobScheduler, snapshotManager *portainer.SnapshotManager, scheduleService portainer.ScheduleService, endpointService portainer.EndpointService, settingsService portainer.SettingsService) error {
-	settings, err := settingsService.Settings()
-=======
-func loadSnapshotSystemSchedule(jobScheduler portainer.JobScheduler, snapshotter portainer.Snapshotter, dataStore portainer.DataStore) error {
+func loadSnapshotSystemSchedule(jobScheduler portainer.JobScheduler, snapshotManager *portainer.SnapshotManager, dataStore portainer.DataStore) error {
 	settings, err := dataStore.Settings().Settings()
->>>>>>> origin/develop
 	if err != nil {
 		return err
 	}
@@ -175,11 +160,7 @@ func loadSnapshotSystemSchedule(jobScheduler portainer.JobScheduler, snapshotter
 		snapshotSchedule = &schedules[0]
 	}
 
-<<<<<<< HEAD
-	snapshotJobContext := cron.NewSnapshotJobContext(endpointService, snapshotManager)
-=======
-	snapshotJobContext := cron.NewSnapshotJobContext(dataStore, snapshotter)
->>>>>>> origin/develop
+	snapshotJobContext := cron.NewSnapshotJobContext(dataStore, snapshotManager)
 	snapshotJobRunner := cron.NewSnapshotJobRunner(snapshotSchedule, snapshotJobContext)
 
 	err = jobScheduler.ScheduleJob(snapshotJobRunner)
@@ -278,11 +259,7 @@ func initKeyPair(fileService portainer.FileService, signatureService portainer.D
 	return generateAndStoreKeyPair(fileService, signatureService)
 }
 
-<<<<<<< HEAD
-func createTLSSecuredEndpoint(flags *portainer.CLIFlags, endpointService portainer.EndpointService, snapshotManager *portainer.SnapshotManager) error {
-=======
-func createTLSSecuredEndpoint(flags *portainer.CLIFlags, dataStore portainer.DataStore, snapshotter portainer.Snapshotter) error {
->>>>>>> origin/develop
+func createTLSSecuredEndpoint(flags *portainer.CLIFlags, dataStore portainer.DataStore, snapshotManager *portainer.SnapshotManager) error {
 	tlsConfiguration := portainer.TLSConfiguration{
 		TLS:           *flags.TLS,
 		TLSSkipVerify: *flags.TLSSkipVerify,
@@ -329,7 +306,6 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, dataStore portainer.Dat
 		}
 	}
 
-<<<<<<< HEAD
 	err := snapshotManager.SnapshotEndpoint(endpoint)
 	if err != nil {
 		log.Printf("http error: endpoint snapshot error (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
@@ -338,13 +314,7 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, dataStore portainer.Dat
 	return endpointService.CreateEndpoint(endpoint)
 }
 
-func createUnsecuredEndpoint(endpointURL string, endpointService portainer.EndpointService, snapshotManager *portainer.SnapshotManager) error {
-=======
-	return snapshotAndPersistEndpoint(endpoint, dataStore, snapshotter)
-}
-
-func createUnsecuredEndpoint(endpointURL string, dataStore portainer.DataStore, snapshotter portainer.Snapshotter) error {
->>>>>>> origin/develop
+func createUnsecuredEndpoint(endpointURL string, dataStore portainer.DataStore, snapshotManager *portainer.SnapshotManager) error {
 	if strings.HasPrefix(endpointURL, "tcp://") {
 		_, err := client.ExecutePingOperation(endpointURL, nil)
 		if err != nil {
@@ -369,35 +339,15 @@ func createUnsecuredEndpoint(endpointURL string, dataStore portainer.DataStore, 
 		Kubernetes:         portainer.KubernetesDefault(),
 	}
 
-<<<<<<< HEAD
 	err := snapshotManager.SnapshotEndpoint(endpoint)
-=======
-	return snapshotAndPersistEndpoint(endpoint, dataStore, snapshotter)
-}
-
-func snapshotAndPersistEndpoint(endpoint *portainer.Endpoint, dataStore portainer.DataStore, snapshotter portainer.Snapshotter) error {
-	snapshot, err := snapshotter.CreateSnapshot(endpoint)
-	endpoint.Status = portainer.EndpointStatusUp
->>>>>>> origin/develop
 	if err != nil {
 		log.Printf("http error: endpoint snapshot error (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
-	}
-
-<<<<<<< HEAD
-	return endpointService.CreateEndpoint(endpoint)
-}
-
-func initEndpoint(flags *portainer.CLIFlags, endpointService portainer.EndpointService, snapshotManager *portainer.SnapshotManager) error {
-=======
-	if snapshot != nil {
-		endpoint.Snapshots = []portainer.Snapshot{*snapshot}
 	}
 
 	return dataStore.Endpoint().CreateEndpoint(endpoint)
 }
 
-func initEndpoint(flags *portainer.CLIFlags, dataStore portainer.DataStore, snapshotter portainer.Snapshotter) error {
->>>>>>> origin/develop
+func initEndpoint(flags *portainer.CLIFlags, dataStore portainer.DataStore, snapshotManager *portainer.SnapshotManager) error {
 	if *flags.EndpointURL == "" {
 		return nil
 	}
@@ -413,15 +363,9 @@ func initEndpoint(flags *portainer.CLIFlags, dataStore portainer.DataStore, snap
 	}
 
 	if *flags.TLS || *flags.TLSSkipVerify {
-<<<<<<< HEAD
-		return createTLSSecuredEndpoint(flags, endpointService, snapshotManager)
+		return createTLSSecuredEndpoint(flags, dataStore, snapshotManager)
 	}
-	return createUnsecuredEndpoint(*flags.EndpointURL, endpointService, snapshotManager)
-=======
-		return createTLSSecuredEndpoint(flags, dataStore, snapshotter)
-	}
-	return createUnsecuredEndpoint(*flags.EndpointURL, dataStore, snapshotter)
->>>>>>> origin/develop
+	return createUnsecuredEndpoint(*flags.EndpointURL, dataStore, snapshotManager)
 }
 
 func initJobService(dockerClientFactory *docker.ClientFactory) portainer.JobService {
@@ -501,24 +445,13 @@ func main() {
 
 	composeStackManager := initComposeStackManager(*flags.Data, reverseTunnelService)
 
-<<<<<<< HEAD
 	kubernetesDeployer := initKubernetesDeployer(*flags.Assets)
 
-	err = initTemplates(store.TemplateService, fileService, *flags.Templates, *flags.TemplateFile)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = initSettings(store.SettingsService, flags)
-	if err != nil {
-		log.Fatal(err)
-=======
 	if dataStore.IsNew() {
 		err = updateSettingsFromFlags(dataStore, flags)
 		if err != nil {
 			log.Fatal(err)
 		}
->>>>>>> origin/develop
 	}
 
 	jobScheduler := initJobScheduler()
@@ -528,32 +461,16 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = loadSnapshotSystemSchedule(jobScheduler, snapshotter, dataStore)
+	err = loadSnapshotSystemSchedule(jobScheduler, snapshotManager, dataStore)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-<<<<<<< HEAD
-	if *flags.Snapshot {
-		err = loadSnapshotSystemSchedule(jobScheduler, snapshotManager, store.ScheduleService, store.EndpointService, store.SettingsService)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-
-=======
->>>>>>> origin/develop
 	jobScheduler.Start()
 
 	applicationStatus := initStatus(flags)
 
-<<<<<<< HEAD
-	applicationStatus := initStatus(endpointManagement, *flags.Snapshot, flags)
-
-	err = initEndpoint(flags, store.EndpointService, snapshotManager)
-=======
-	err = initEndpoint(flags, dataStore, snapshotter)
->>>>>>> origin/develop
+	err = initEndpoint(flags, dataStore, snapshotManager)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -603,29 +520,11 @@ func main() {
 	}
 
 	var server portainer.Server = &http.Server{
-<<<<<<< HEAD
 		ReverseTunnelService:    reverseTunnelService,
 		Status:                  applicationStatus,
 		BindAddress:             *flags.Addr,
 		AssetsPath:              *flags.Assets,
-		AuthDisabled:            *flags.NoAuth,
-		EndpointManagement:      endpointManagement,
-		RoleService:             store.RoleService,
-		UserService:             store.UserService,
-		TeamService:             store.TeamService,
-		TeamMembershipService:   store.TeamMembershipService,
-		EndpointService:         store.EndpointService,
-		EndpointGroupService:    store.EndpointGroupService,
-		ExtensionService:        store.ExtensionService,
-		ResourceControlService:  store.ResourceControlService,
-		SettingsService:         store.SettingsService,
-		RegistryService:         store.RegistryService,
-		DockerHubService:        store.DockerHubService,
-		StackService:            store.StackService,
-		ScheduleService:         store.ScheduleService,
-		TagService:              store.TagService,
-		TemplateService:         store.TemplateService,
-		WebhookService:          store.WebhookService,
+		DataStore:               dataStore,
 		SwarmStackManager:       swarmStackManager,
 		ComposeStackManager:     composeStackManager,
 		KubernetesDeployer:      kubernetesDeployer,
@@ -637,36 +536,13 @@ func main() {
 		GitService:              gitService,
 		SignatureService:        digitalSignatureService,
 		JobScheduler:            jobScheduler,
-		SnapshotManager:         snapshotManager,
+		Snapshotter:             snapshotter,
 		SSL:                     *flags.SSL,
 		SSLCert:                 *flags.SSLCert,
 		SSLKey:                  *flags.SSLKey,
-		DockerClientFactory:     dockerClientFactory,
+		DockerClientFactory:     clientFactory,
 		KubernetesClientFactory: kubernetesClientFactory,
 		JobService:              jobService,
-=======
-		ReverseTunnelService: reverseTunnelService,
-		Status:               applicationStatus,
-		BindAddress:          *flags.Addr,
-		AssetsPath:           *flags.Assets,
-		DataStore:            dataStore,
-		SwarmStackManager:    swarmStackManager,
-		ComposeStackManager:  composeStackManager,
-		ExtensionManager:     extensionManager,
-		CryptoService:        cryptoService,
-		JWTService:           jwtService,
-		FileService:          fileService,
-		LDAPService:          ldapService,
-		GitService:           gitService,
-		SignatureService:     digitalSignatureService,
-		JobScheduler:         jobScheduler,
-		Snapshotter:          snapshotter,
-		SSL:                  *flags.SSL,
-		SSLCert:              *flags.SSLCert,
-		SSLKey:               *flags.SSLKey,
-		DockerClientFactory:  clientFactory,
-		JobService:           jobService,
->>>>>>> origin/develop
 	}
 
 	log.Printf("Starting Portainer %s on %s", portainer.APIVersion, *flags.Addr)

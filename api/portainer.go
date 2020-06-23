@@ -1,10 +1,7 @@
 package portainer
 
 import (
-<<<<<<< HEAD
 	"io"
-=======
->>>>>>> origin/develop
 	"time"
 )
 
@@ -63,58 +60,40 @@ type (
 		SnapshotInterval  *string
 	}
 
-<<<<<<< HEAD
-	// Status represents the application status
-	Status struct {
-		Authentication     bool   `json:"Authentication"`
-		EndpointManagement bool   `json:"EndpointManagement"`
-		Snapshot           bool   `json:"DockerSnapshot"`
-		Analytics          bool   `json:"Analytics"`
-		Version            string `json:"Version"`
-=======
-	// CLIService represents a service for managing CLI
-	CLIService interface {
-		ParseFlags(version string) (*CLIFlags, error)
-		ValidateFlags(flags *CLIFlags) error
->>>>>>> origin/develop
-	}
-
-	// DataStore defines the interface to manage the data
-	DataStore interface {
-		Open() error
-		Init() error
-		Close() error
-		IsNew() bool
-		MigrateData() error
-
-		DockerHub() DockerHubService
-		EdgeGroup() EdgeGroupService
-		EdgeStack() EdgeStackService
-		Endpoint() EndpointService
-		EndpointGroup() EndpointGroupService
-		EndpointRelation() EndpointRelationService
-		Extension() ExtensionService
-		Registry() RegistryService
-		ResourceControl() ResourceControlService
-		Role() RoleService
-		Schedule() ScheduleService
-		Settings() SettingsService
-		Stack() StackService
-		Tag() TagService
-		TeamMembership() TeamMembershipService
-		Team() TeamService
-		TunnelServer() TunnelServerService
-		User() UserService
-		Version() VersionService
-		Webhook() WebhookService
-	}
-
 	// DockerHub represents all the required information to connect and use the
 	// Docker Hub
 	DockerHub struct {
 		Authentication bool   `json:"Authentication"`
 		Username       string `json:"Username"`
 		Password       string `json:"Password,omitempty"`
+	}
+
+	// DockerSnapshot represents a snapshot of a specific Docker endpoint at a specific time
+	DockerSnapshot struct {
+		Time                    int64             `json:"Time"`
+		DockerVersion           string            `json:"DockerVersion"`
+		Swarm                   bool              `json:"Swarm"`
+		TotalCPU                int               `json:"TotalCPU"`
+		TotalMemory             int64             `json:"TotalMemory"`
+		RunningContainerCount   int               `json:"RunningContainerCount"`
+		StoppedContainerCount   int               `json:"StoppedContainerCount"`
+		HealthyContainerCount   int               `json:"HealthyContainerCount"`
+		UnhealthyContainerCount int               `json:"UnhealthyContainerCount"`
+		VolumeCount             int               `json:"VolumeCount"`
+		ImageCount              int               `json:"ImageCount"`
+		ServiceCount            int               `json:"ServiceCount"`
+		StackCount              int               `json:"StackCount"`
+		SnapshotRaw             DockerSnapshotRaw `json:"DockerSnapshotRaw"`
+	}
+
+	// DockerSnapshotRaw represents all the information related to a snapshot as returned by the Docker API
+	DockerSnapshotRaw struct {
+		Containers interface{} `json:"Containers"`
+		Volumes    interface{} `json:"Volumes"`
+		Networks   interface{} `json:"Networks"`
+		Images     interface{} `json:"Images"`
+		Info       interface{} `json:"Info"`
+		Version    interface{} `json:"Version"`
 	}
 
 	// EdgeGroup represents an Edge group
@@ -179,12 +158,13 @@ type (
 		AzureCredentials    AzureCredentials    `json:"AzureCredentials,omitempty"`
 		TagIDs              []TagID             `json:"TagIds"`
 		Status              EndpointStatus      `json:"Status"`
-		Snapshots           []Snapshot          `json:"Snapshots"`
+		Snapshots           []DockerSnapshot    `json:"Snapshots"`
 		UserAccessPolicies  UserAccessPolicies  `json:"UserAccessPolicies"`
 		TeamAccessPolicies  TeamAccessPolicies  `json:"TeamAccessPolicies"`
 		EdgeID              string              `json:"EdgeID,omitempty"`
 		EdgeKey             string              `json:"EdgeKey"`
 		EdgeCheckinInterval int                 `json:"EdgeCheckinInterval"`
+		Kubernetes          KubernetesData      `json:"Kubernetes"`
 
 		// Deprecated fields
 		// Deprecated in DBVersion == 4
@@ -245,7 +225,6 @@ type (
 	EndpointStatus int
 
 	// EndpointSyncJob represents a scheduled job that synchronize endpoints based on an external file
-	//
 	// Deprecated
 	EndpointSyncJob struct{}
 
@@ -290,6 +269,33 @@ type (
 
 	// JobType represents a job type
 	JobType int
+
+	// KubernetesData contains all the Kubernetes related endpoint information
+	KubernetesData struct {
+		Snapshots     []KubernetesSnapshot    `json:"Snapshots"`
+		Configuration KubernetesConfiguration `json:"Configuration"`
+	}
+
+	// KubernetesSnapshot represents a snapshot of a specific Kubernetes endpoint at a specific time
+	KubernetesSnapshot struct {
+		Time              int64  `json:"Time"`
+		KubernetesVersion string `json:"KubernetesVersion"`
+		NodeCount         int    `json:"NodeCount"`
+		TotalCPU          int64  `json:"TotalCPU"`
+		TotalMemory       int64  `json:"TotalMemory"`
+	}
+
+	// KubernetesConfiguration represents the configuration of a Kubernetes endpoint
+	KubernetesConfiguration struct {
+		UseLoadBalancer bool                           `json:"UseLoadBalancer"`
+		StorageClasses  []KubernetesStorageClassConfig `json:"StorageClasses"`
+	}
+
+	// KubernetesStorageClassConfig represents a Kubernetes Storage Class configuration
+	KubernetesStorageClassConfig struct {
+		Name        string   `json:"Name"`
+		AccessModes []string `json:"AccessModes"`
+	}
 
 	// LDAPGroupSearchSettings represents settings used to search for groups in a LDAP server
 	LDAPGroupSearchSettings struct {
@@ -401,82 +407,14 @@ type (
 		AdministratorsOnly bool                 `json:"AdministratorsOnly"`
 		System             bool                 `json:"System"`
 
-<<<<<<< HEAD
-	// Endpoint represents a Docker endpoint with all the info required
-	// to connect to it
-	Endpoint struct {
-		ID                 EndpointID          `json:"Id"`
-		Name               string              `json:"Name"`
-		Type               EndpointType        `json:"Type"`
-		URL                string              `json:"URL"`
-		GroupID            EndpointGroupID     `json:"GroupId"`
-		PublicURL          string              `json:"PublicURL"`
-		TLSConfig          TLSConfiguration    `json:"TLSConfig"`
-		Extensions         []EndpointExtension `json:"Extensions"`
-		AzureCredentials   AzureCredentials    `json:"AzureCredentials,omitempty"`
-		Tags               []string            `json:"Tags"`
-		Status             EndpointStatus      `json:"Status"`
-		Snapshots          []DockerSnapshot    `json:"Snapshots"`
-		UserAccessPolicies UserAccessPolicies  `json:"UserAccessPolicies"`
-		TeamAccessPolicies TeamAccessPolicies  `json:"TeamAccessPolicies"`
-		EdgeID             string              `json:"EdgeID,omitempty"`
-		EdgeKey            string              `json:"EdgeKey"`
-		Kubernetes         KubernetesData      `json:"Kubernetes"`
-=======
->>>>>>> origin/develop
 		// Deprecated fields
 		// Deprecated in DBVersion == 2
 		OwnerID     UserID              `json:"OwnerId,omitempty"`
 		AccessLevel ResourceAccessLevel `json:"AccessLevel,omitempty"`
 	}
 
-<<<<<<< HEAD
-	// KubernetesData contains all the Kubernetes related endpoint information
-	KubernetesData struct {
-		Snapshots     []KubernetesSnapshot    `json:"Snapshots"`
-		Configuration KubernetesConfiguration `json:"Configuration"`
-	}
-
-	// KubernetesSnapshot represents a snapshot of a specific Kubernetes endpoint at a specific time
-	KubernetesSnapshot struct {
-		Time              int64  `json:"Time"`
-		KubernetesVersion string `json:"KubernetesVersion"`
-		NodeCount         int    `json:"NodeCount"`
-		TotalCPU          int64  `json:"TotalCPU"`
-		TotalMemory       int64  `json:"TotalMemory"`
-	}
-
-	// KubernetesConfiguration represents the configuration of a Kubernetes endpoint
-	KubernetesConfiguration struct {
-		UseLoadBalancer bool                           `json:"UseLoadBalancer"`
-		StorageClasses  []KubernetesStorageClassConfig `json:"StorageClasses"`
-	}
-
-	// KubernetesStorageClassConfig represents a Kubernetes Storage Class configuration
-	KubernetesStorageClassConfig struct {
-		Name        string   `json:"Name"`
-		AccessModes []string `json:"AccessModes"`
-	}
-
-	// Authorization represents an authorization associated to an operation
-	Authorization string
-
-	// Authorizations represents a set of authorizations associated to a role
-	Authorizations map[Authorization]bool
-
-	// EndpointAuthorizations represents the authorizations associated to a set of endpoints
-	EndpointAuthorizations map[EndpointID]Authorizations
-
-	// APIOperationAuthorizationRequest represent an request for the authorization to execute an API operation
-	APIOperationAuthorizationRequest struct {
-		Path           string
-		Method         string
-		Authorizations Authorizations
-	}
-=======
 	// ResourceControlID represents a resource control identifier
 	ResourceControlID int
->>>>>>> origin/develop
 
 	// ResourceControlType represents the type of resource associated to the resource control (volume, container, service...)
 	ResourceControlType int
@@ -547,57 +485,8 @@ type (
 		DisplayExternalContributors bool
 	}
 
-<<<<<<< HEAD
-	// DockerSnapshot represents a snapshot of a specific Docker endpoint at a specific time
-	DockerSnapshot struct {
-		Time                  int64             `json:"Time"`
-		DockerVersion         string            `json:"DockerVersion"`
-		Swarm                 bool              `json:"Swarm"`
-		TotalCPU              int               `json:"TotalCPU"`
-		TotalMemory           int64             `json:"TotalMemory"`
-		RunningContainerCount int               `json:"RunningContainerCount"`
-		StoppedContainerCount int               `json:"StoppedContainerCount"`
-		VolumeCount           int               `json:"VolumeCount"`
-		ImageCount            int               `json:"ImageCount"`
-		ServiceCount          int               `json:"ServiceCount"`
-		StackCount            int               `json:"StackCount"`
-		SnapshotRaw           DockerSnapshotRaw `json:"DockerSnapshotRaw"`
-	}
-
-	// DockerSnapshotRaw represents all the information related to a snapshot as returned by the Docker API
-	DockerSnapshotRaw struct {
-=======
-	// Snapshot represents a snapshot of a specific endpoint at a specific time
-	Snapshot struct {
-		Time                    int64       `json:"Time"`
-		DockerVersion           string      `json:"DockerVersion"`
-		Swarm                   bool        `json:"Swarm"`
-		TotalCPU                int         `json:"TotalCPU"`
-		TotalMemory             int64       `json:"TotalMemory"`
-		RunningContainerCount   int         `json:"RunningContainerCount"`
-		StoppedContainerCount   int         `json:"StoppedContainerCount"`
-		HealthyContainerCount   int         `json:"HealthyContainerCount"`
-		UnhealthyContainerCount int         `json:"UnhealthyContainerCount"`
-		VolumeCount             int         `json:"VolumeCount"`
-		ImageCount              int         `json:"ImageCount"`
-		ServiceCount            int         `json:"ServiceCount"`
-		StackCount              int         `json:"StackCount"`
-		SnapshotRaw             SnapshotRaw `json:"SnapshotRaw"`
-	}
-
 	// SnapshotJob represents a scheduled job that can create endpoint snapshots
 	SnapshotJob struct{}
-
-	// SnapshotRaw represents all the information related to a snapshot as returned by the Docker API
-	SnapshotRaw struct {
->>>>>>> origin/develop
-		Containers interface{} `json:"Containers"`
-		Volumes    interface{} `json:"Volumes"`
-		Networks   interface{} `json:"Networks"`
-		Images     interface{} `json:"Images"`
-		Info       interface{} `json:"Info"`
-		Version    interface{} `json:"Version"`
-	}
 
 	// Stack represents a Docker stack created via docker stack deploy
 	Stack struct {
@@ -816,6 +705,12 @@ type (
 	// WebhookType represents the type of resource a webhook is related to
 	WebhookType int
 
+	// CLIService represents a service for managing CLI
+	CLIService interface {
+		ParseFlags(version string) (*CLIFlags, error)
+		ValidateFlags(flags *CLIFlags) error
+	}
+
 	// ComposeStackManager represents a service to manage Compose stacks
 	ComposeStackManager interface {
 		Up(stack *Stack, endpoint *Endpoint) error
@@ -826,6 +721,36 @@ type (
 	CryptoService interface {
 		Hash(data string) (string, error)
 		CompareHashAndData(hash string, data string) error
+	}
+
+	// DataStore defines the interface to manage the data
+	DataStore interface {
+		Open() error
+		Init() error
+		Close() error
+		IsNew() bool
+		MigrateData() error
+
+		DockerHub() DockerHubService
+		EdgeGroup() EdgeGroupService
+		EdgeStack() EdgeStackService
+		Endpoint() EndpointService
+		EndpointGroup() EndpointGroupService
+		EndpointRelation() EndpointRelationService
+		Extension() ExtensionService
+		Registry() RegistryService
+		ResourceControl() ResourceControlService
+		Role() RoleService
+		Schedule() ScheduleService
+		Settings() SettingsService
+		Stack() StackService
+		Tag() TagService
+		TeamMembership() TeamMembershipService
+		Team() TeamService
+		TunnelServer() TunnelServerService
+		User() UserService
+		Version() VersionService
+		Webhook() WebhookService
 	}
 
 	// DigitalSignatureService represents a service to manage digital signatures
@@ -920,6 +845,11 @@ type (
 		ClonePrivateRepositoryWithBasicAuth(repositoryURL, referenceName string, destination, username, password string) error
 	}
 
+	// KubernetesDeployer represents a service to deploy a manifest inside a Kubernetes endpoint
+	KubernetesDeployer interface {
+		Deploy(endpoint *Endpoint, data string, composeFormat bool, namespace string) ([]byte, error)
+	}
+
 	// JobRunner represents a service that can be used to run a job
 	JobRunner interface {
 		Run()
@@ -975,7 +905,7 @@ type (
 
 	// ReverseTunnelService represensts a service used to manage reverse tunnel connections.
 	ReverseTunnelService interface {
-		StartTunnelServer(addr, port string, snapshotter Snapshotter) error
+		StartTunnelServer(addr, port string, snapshotManager *SnapshotManager) error
 		GenerateEdgeKey(url, host string, endpointIdentifier int) string
 		SetTunnelStatusToActive(endpointID EndpointID)
 		SetTunnelStatusToRequired(endpointID EndpointID) error
@@ -1044,16 +974,6 @@ type (
 		Remove(stack *Stack, endpoint *Endpoint) error
 	}
 
-<<<<<<< HEAD
-	KubernetesDeployer interface {
-		Deploy(endpoint *Endpoint, data string, composeFormat bool, namespace string) ([]byte, error)
-	}
-
-	// ComposeStackManager represents a service to manage Compose stacks
-	ComposeStackManager interface {
-		Up(stack *Stack, endpoint *Endpoint) error
-		Down(stack *Stack, endpoint *Endpoint) error
-=======
 	// TagService represents a service for managing tag data
 	TagService interface {
 		Tags() ([]Tag, error)
@@ -1061,7 +981,6 @@ type (
 		CreateTag(tag *Tag) error
 		UpdateTag(ID TagID, tag *Tag) error
 		DeleteTag(ID TagID) error
->>>>>>> origin/develop
 	}
 
 	// TeamService represents a service for managing user data
@@ -1087,18 +1006,6 @@ type (
 		DeleteTeamMembershipByTeamID(teamID TeamID) error
 	}
 
-<<<<<<< HEAD
-	// ReverseTunnelService represents a service used to manage reverse tunnel connections
-	ReverseTunnelService interface {
-		StartTunnelServer(addr, port string, snapshotManager *SnapshotManager) error
-		GenerateEdgeKey(url, host string, endpointIdentifier int) string
-		SetTunnelStatusToActive(endpointID EndpointID)
-		SetTunnelStatusToRequired(endpointID EndpointID) error
-		SetTunnelStatusToIdle(endpointID EndpointID)
-		GetTunnelDetails(endpointID EndpointID) *TunnelDetails
-		AddSchedule(endpointID EndpointID, schedule *EdgeSchedule)
-		RemoveSchedule(scheduleID ScheduleID)
-=======
 	// TunnelServerService represents a service for managing data associated to the tunnel server
 	TunnelServerService interface {
 		Info() (*TunnelServerInfo, error)
@@ -1149,7 +1056,6 @@ type (
 		UpdateEdgeStack(ID EdgeStackID, edgeStack *EdgeStack) error
 		DeleteEdgeStack(ID EdgeStackID) error
 		GetNextIdentifier() int
->>>>>>> origin/develop
 	}
 
 	// KubeClient represents a service used to query a Kubernetes environment
@@ -1162,11 +1068,7 @@ type (
 
 const (
 	// APIVersion is the version number of the Portainer API
-<<<<<<< HEAD
-	APIVersion = "1.0.0-k8s-rc"
-=======
 	APIVersion = "2.0.0-dev"
->>>>>>> origin/develop
 	// DBVersion is the version number of the Portainer database
 	DBVersion = 24
 	// AssetsServerURL represents the URL of the Portainer asset server
@@ -1241,18 +1143,6 @@ const (
 )
 
 const (
-	_ EndpointType = iota
-	// DockerEnvironment represents an endpoint connected to a Docker environment
-	DockerEnvironment
-	// AgentOnDockerEnvironment represents an endpoint connected to a Portainer agent deployed on a Docker environment
-	AgentOnDockerEnvironment
-	// AzureEnvironment represents an endpoint connected to an Azure environment
-	AzureEnvironment
-	// EdgeAgentEnvironment represents an endpoint connected to an Edge agent
-	EdgeAgentEnvironment
-)
-
-const (
 	_ ExtensionID = iota
 	// RegistryManagementExtension represents the registry management extension
 	RegistryManagementExtension
@@ -1319,13 +1209,6 @@ const (
 )
 
 const (
-<<<<<<< HEAD
-	_ EndpointExtensionType = iota
-	// StoridgeEndpointExtension represents the Storidge extension
-	StoridgeEndpointExtension
-)
-
-const (
 	_ EndpointType = iota
 	// DockerEnvironment represents an endpoint connected to a Docker environment
 	DockerEnvironment
@@ -1344,8 +1227,6 @@ const (
 )
 
 const (
-=======
->>>>>>> origin/develop
 	_ StackType = iota
 	// DockerSwarmStack represents a stack managed via docker stack
 	DockerSwarmStack

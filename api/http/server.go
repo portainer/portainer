@@ -3,16 +3,6 @@ package http
 import (
 	"time"
 
-<<<<<<< HEAD
-	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
-=======
-	"github.com/portainer/portainer/api/http/handler/edgegroups"
-	"github.com/portainer/portainer/api/http/handler/edgestacks"
-	"github.com/portainer/portainer/api/http/handler/edgetemplates"
-	"github.com/portainer/portainer/api/http/handler/endpointedge"
-	"github.com/portainer/portainer/api/http/handler/support"
->>>>>>> origin/develop
-
 	"github.com/portainer/portainer/api/kubernetes/cli"
 
 	"net/http"
@@ -23,6 +13,10 @@ import (
 	"github.com/portainer/portainer/api/http/handler"
 	"github.com/portainer/portainer/api/http/handler/auth"
 	"github.com/portainer/portainer/api/http/handler/dockerhub"
+	"github.com/portainer/portainer/api/http/handler/edgegroups"
+	"github.com/portainer/portainer/api/http/handler/edgestacks"
+	"github.com/portainer/portainer/api/http/handler/edgetemplates"
+	"github.com/portainer/portainer/api/http/handler/endpointedge"
 	"github.com/portainer/portainer/api/http/handler/endpointgroups"
 	"github.com/portainer/portainer/api/http/handler/endpointproxy"
 	"github.com/portainer/portainer/api/http/handler/endpoints"
@@ -46,130 +40,48 @@ import (
 	"github.com/portainer/portainer/api/http/handler/webhooks"
 	"github.com/portainer/portainer/api/http/handler/websocket"
 	"github.com/portainer/portainer/api/http/proxy"
+	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/http/security"
 )
 
 // Server implements the portainer.Server interface
 type Server struct {
-<<<<<<< HEAD
 	BindAddress             string
 	AssetsPath              string
-	AuthDisabled            bool
-	EndpointManagement      bool
 	Status                  *portainer.Status
 	ReverseTunnelService    portainer.ReverseTunnelService
 	ExtensionManager        portainer.ExtensionManager
 	ComposeStackManager     portainer.ComposeStackManager
-	SwarmStackManager       portainer.SwarmStackManager
-	KubernetesDeployer      portainer.KubernetesDeployer
 	CryptoService           portainer.CryptoService
 	SignatureService        portainer.DigitalSignatureService
 	JobScheduler            portainer.JobScheduler
-	RoleService             portainer.RoleService
-	DockerHubService        portainer.DockerHubService
-	EndpointService         portainer.EndpointService
-	EndpointGroupService    portainer.EndpointGroupService
 	FileService             portainer.FileService
+	DataStore               portainer.DataStore
 	GitService              portainer.GitService
 	JWTService              portainer.JWTService
 	LDAPService             portainer.LDAPService
-	ExtensionService        portainer.ExtensionService
-	RegistryService         portainer.RegistryService
-	ResourceControlService  portainer.ResourceControlService
-	ScheduleService         portainer.ScheduleService
-	SettingsService         portainer.SettingsService
-	StackService            portainer.StackService
-	TagService              portainer.TagService
-	TeamService             portainer.TeamService
-	TeamMembershipService   portainer.TeamMembershipService
-	TemplateService         portainer.TemplateService
-	UserService             portainer.UserService
-	WebhookService          portainer.WebhookService
+	SwarmStackManager       portainer.SwarmStackManager
+	KubernetesDeployer      portainer.KubernetesDeployer
 	Handler                 *handler.Handler
 	SSL                     bool
 	SSLCert                 string
 	SSLKey                  string
 	DockerClientFactory     *docker.ClientFactory
 	KubernetesClientFactory *cli.ClientFactory
-	SnapshotManager         *portainer.SnapshotManager
 	JobService              portainer.JobService
-=======
-	BindAddress          string
-	AssetsPath           string
-	Status               *portainer.Status
-	ReverseTunnelService portainer.ReverseTunnelService
-	ExtensionManager     portainer.ExtensionManager
-	ComposeStackManager  portainer.ComposeStackManager
-	CryptoService        portainer.CryptoService
-	SignatureService     portainer.DigitalSignatureService
-	JobScheduler         portainer.JobScheduler
-	Snapshotter          portainer.Snapshotter
-	FileService          portainer.FileService
-	DataStore            portainer.DataStore
-	GitService           portainer.GitService
-	JWTService           portainer.JWTService
-	LDAPService          portainer.LDAPService
-	SwarmStackManager    portainer.SwarmStackManager
-	Handler              *handler.Handler
-	SSL                  bool
-	SSLCert              string
-	SSLKey               string
-	DockerClientFactory  *docker.ClientFactory
-	JobService           portainer.JobService
->>>>>>> origin/develop
+	SnapshotManager         *portainer.SnapshotManager
 }
 
 // Start starts the HTTP server
 func (server *Server) Start() error {
-<<<<<<< HEAD
 	kubernetesTokenCacheManager := kubernetes.NewTokenCacheManager()
 
-	proxyManagerParameters := &proxy.ManagerParams{
-		ResourceControlService:      server.ResourceControlService,
-		UserService:                 server.UserService,
-		TeamService:                 server.TeamService,
-		TeamMembershipService:       server.TeamMembershipService,
-		SettingsService:             server.SettingsService,
-		RegistryService:             server.RegistryService,
-		DockerHubService:            server.DockerHubService,
-		SignatureService:            server.SignatureService,
-		ReverseTunnelService:        server.ReverseTunnelService,
-		ExtensionService:            server.ExtensionService,
-		DockerClientFactory:         server.DockerClientFactory,
-		KubernetesClientFactory:     server.KubernetesClientFactory,
-		KubernetesTokenCacheManager: kubernetesTokenCacheManager,
-	}
-	proxyManager := proxy.NewManager(proxyManagerParameters)
-
-	authorizationServiceParameters := &portainer.AuthorizationServiceParameters{
-		EndpointService:       server.EndpointService,
-		EndpointGroupService:  server.EndpointGroupService,
-		RegistryService:       server.RegistryService,
-		RoleService:           server.RoleService,
-		TeamMembershipService: server.TeamMembershipService,
-		UserService:           server.UserService,
-	}
-	authorizationService := portainer.NewAuthorizationService(authorizationServiceParameters)
-
-	requestBouncerParameters := &security.RequestBouncerParams{
-		JWTService:            server.JWTService,
-		UserService:           server.UserService,
-		TeamMembershipService: server.TeamMembershipService,
-		EndpointService:       server.EndpointService,
-		EndpointGroupService:  server.EndpointGroupService,
-		ExtensionService:      server.ExtensionService,
-		RBACExtensionURL:      proxyManager.GetExtensionURL(portainer.RBACExtension),
-		AuthDisabled:          server.AuthDisabled,
-	}
-	requestBouncer := security.NewRequestBouncer(requestBouncerParameters)
-=======
 	proxyManager := proxy.NewManager(server.DataStore, server.SignatureService, server.ReverseTunnelService, server.DockerClientFactory)
 
 	authorizationService := portainer.NewAuthorizationService(server.DataStore)
 
 	rbacExtensionURL := proxyManager.GetExtensionURL(portainer.RBACExtension)
 	requestBouncer := security.NewRequestBouncer(server.DataStore, server.JWTService, rbacExtensionURL)
->>>>>>> origin/develop
 
 	rateLimiter := security.NewRateLimiter(10, 1*time.Second, 1*time.Hour)
 
@@ -203,11 +115,8 @@ func (server *Server) Start() error {
 	endpointHandler.DataStore = server.DataStore
 	endpointHandler.AuthorizationService = authorizationService
 	endpointHandler.FileService = server.FileService
-<<<<<<< HEAD
 	endpointHandler.ProxyManager = proxyManager
 	endpointHandler.SnapshotManager = server.SnapshotManager
-=======
->>>>>>> origin/develop
 	endpointHandler.JobService = server.JobService
 	endpointHandler.ProxyManager = proxyManager
 	endpointHandler.ReverseTunnelService = server.ReverseTunnelService
