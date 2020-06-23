@@ -8,7 +8,7 @@ func EdgeGroupRelatedEndpoints(edgeGroup *EdgeGroup, endpoints []Endpoint, endpo
 
 	endpointIDs := []EndpointID{}
 	for _, endpoint := range endpoints {
-		if endpoint.Type != EdgeAgentEnvironment {
+		if endpoint.Type != EdgeAgentOnKubernetesEnvironment && endpoint.Type != EdgeAgentOnDockerEnvironment {
 			continue
 		}
 

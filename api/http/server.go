@@ -76,8 +76,7 @@ type Server struct {
 func (server *Server) Start() error {
 	kubernetesTokenCacheManager := kubernetes.NewTokenCacheManager()
 
-	proxyManager := proxy.NewManager(server.DataStore, server.SignatureService, server.ReverseTunnelService, server.DockerClientFactory)
-
+	proxyManager := proxy.NewManager(server.DataStore, server.SignatureService, server.ReverseTunnelService, server.DockerClientFactory, server.KubernetesClientFactory, kubernetesTokenCacheManager)
 	authorizationService := portainer.NewAuthorizationService(server.DataStore)
 
 	rbacExtensionURL := proxyManager.GetExtensionURL(portainer.RBACExtension)
@@ -120,7 +119,6 @@ func (server *Server) Start() error {
 	endpointHandler.JobService = server.JobService
 	endpointHandler.ProxyManager = proxyManager
 	endpointHandler.ReverseTunnelService = server.ReverseTunnelService
-	endpointHandler.Snapshotter = server.Snapshotter
 
 	var endpointEdgeHandler = endpointedge.NewHandler(requestBouncer)
 	endpointEdgeHandler.DataStore = server.DataStore

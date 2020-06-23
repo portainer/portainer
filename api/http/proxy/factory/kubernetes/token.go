@@ -20,6 +20,7 @@ type tokenManager struct {
 // NewTokenManager returns a pointer to a new instance of tokenManager.
 // If the useLocalAdminToken parameter is set to true, it will search for the local admin service account
 // and associate it to the manager.
+// TODO: refactor - probably want to inject the datastore instead of teamMembershipService
 func NewTokenManager(kubecli portainer.KubeClient, teamMembershipService portainer.TeamMembershipService, cache *tokenCache, setLocalAdminToken bool) (*tokenManager, error) {
 	tokenManager := &tokenManager{
 		tokenCache:            cache,

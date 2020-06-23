@@ -4,6 +4,11 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
+
+	cmap "github.com/orcaman/concurrent-map"
+	"github.com/portainer/portainer/api/kubernetes/cli"
+
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/proxy/factory"
@@ -22,12 +27,13 @@ type (
 )
 
 // NewManager initializes a new proxy Service
-func NewManager(dataStore portainer.DataStore, signatureService portainer.DigitalSignatureService, tunnelService portainer.ReverseTunnelService, clientFactory *docker.ClientFactory) *Manager {
+// TODO: refactor - too many parameters
+func NewManager(dataStore portainer.DataStore, signatureService portainer.DigitalSignatureService, tunnelService portainer.ReverseTunnelService, clientFactory *docker.ClientFactory, kubernetesClientFactory *cli.ClientFactory, kubernetesTokenCacheManager *kubernetes.TokenCacheManager) *Manager {
 	return &Manager{
 		endpointProxies:        cmap.New(),
 		extensionProxies:       cmap.New(),
 		legacyExtensionProxies: cmap.New(),
-		proxyFactory:           factory.NewProxyFactory(dataStore, signatureService, tunnelService, clientFactory),
+		proxyFactory:           factory.NewProxyFactory(dataStore, signatureService, tunnelService, clientFactory, kubernetesClientFactory, kubernetesTokenCacheManager),
 	}
 }
 

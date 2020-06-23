@@ -311,7 +311,7 @@ func createTLSSecuredEndpoint(flags *portainer.CLIFlags, dataStore portainer.Dat
 		log.Printf("http error: endpoint snapshot error (endpoint=%s, URL=%s) (err=%s)\n", endpoint.Name, endpoint.URL, err)
 	}
 
-	return endpointService.CreateEndpoint(endpoint)
+	return dataStore.Endpoint().CreateEndpoint(endpoint)
 }
 
 func createUnsecuredEndpoint(endpointURL string, dataStore portainer.DataStore, snapshotManager *portainer.SnapshotManager) error {
@@ -536,11 +536,11 @@ func main() {
 		GitService:              gitService,
 		SignatureService:        digitalSignatureService,
 		JobScheduler:            jobScheduler,
-		Snapshotter:             snapshotter,
+		SnapshotManager:         snapshotManager,
 		SSL:                     *flags.SSL,
 		SSLCert:                 *flags.SSLCert,
 		SSLKey:                  *flags.SSLKey,
-		DockerClientFactory:     clientFactory,
+		DockerClientFactory:     dockerClientFactory,
 		KubernetesClientFactory: kubernetesClientFactory,
 		JobService:              jobService,
 	}

@@ -3,7 +3,7 @@ package endpointgroups
 import portainer "github.com/portainer/portainer/api"
 
 func (handler *Handler) updateEndpointRelations(endpoint *portainer.Endpoint, endpointGroup *portainer.EndpointGroup) error {
-	if endpoint.Type != portainer.EdgeAgentEnvironment {
+	if endpoint.Type != portainer.EdgeAgentOnKubernetesEnvironment && endpoint.Type != portainer.EdgeAgentOnDockerEnvironment {
 		return nil
 	}
 

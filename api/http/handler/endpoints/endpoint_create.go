@@ -12,6 +12,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
+	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/client"
 )
 
@@ -164,7 +165,7 @@ func (handler *Handler) endpointCreate(w http.ResponseWriter, r *http.Request) *
 		EdgeStacks: map[portainer.EdgeStackID]bool{},
 	}
 
-	if endpoint.Type == portainer.EdgeAgentEnvironment {
+	if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment {
 		relatedEdgeStacks := portainer.EndpointRelatedEdgeStacks(endpoint, endpointGroup, edgeGroups, edgeStacks)
 		for _, stackID := range relatedEdgeStacks {
 			relationObject.EdgeStacks[stackID] = true
@@ -329,7 +330,7 @@ func (handler *Handler) createKubernetesEndpoint(payload *endpointCreatePayload)
 		payload.URL = "https://kubernetes.default.svc"
 	}
 
-	endpointID := handler.EndpointService.GetNextIdentifier()
+	endpointID := handler.DataStore.Endpoint().GetNextIdentifier()
 
 	endpoint := &portainer.Endpoint{
 		ID:        portainer.EndpointID(endpointID),
@@ -345,7 +346,7 @@ func (handler *Handler) createKubernetesEndpoint(payload *endpointCreatePayload)
 		UserAccessPolicies: portainer.UserAccessPolicies{},
 		TeamAccessPolicies: portainer.TeamAccessPolicies{},
 		Extensions:         []portainer.EndpointExtension{},
-		Tags:               payload.Tags,
+		TagIDs:             payload.TagIDs,
 		Status:             portainer.EndpointStatusUp,
 		Snapshots:          []portainer.DockerSnapshot{},
 		Kubernetes:         portainer.KubernetesDefault(),

@@ -72,7 +72,7 @@ func (handler *Handler) tagDelete(w http.ResponseWriter, r *http.Request) *httpe
 	}
 
 	for _, endpoint := range endpoints {
-		if (tag.Endpoints[endpoint.ID] || tag.EndpointGroups[endpoint.GroupID]) && endpoint.Type == portainer.EdgeAgentEnvironment {
+		if (tag.Endpoints[endpoint.ID] || tag.EndpointGroups[endpoint.GroupID]) && (endpoint.Type == portainer.EdgeAgentOnDockerEnvironment || endpoint.Type == portainer.EdgeAgentOnKubernetesEnvironment) {
 			err = handler.updateEndpointRelations(endpoint, edgeGroups, edgeStacks)
 			if err != nil {
 				return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update endpoint relations in the database", err}
