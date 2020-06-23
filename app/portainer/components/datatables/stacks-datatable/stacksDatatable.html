@@ -91,7 +91,7 @@
                 </a>
               </th>
               <th>Control</th>
-              <th ng-if="$ctrl.showOwnershipColumn">
+              <th>
                 <a ng-click="$ctrl.changeOrderBy('ResourceControl.Ownership')">
                   Ownership
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && !$ctrl.state.reverseOrder"></i>
@@ -127,7 +127,7 @@
                 </span>
                 <span ng-if="!item.External">Total</span>
               </td>
-              <td ng-if="$ctrl.showOwnershipColumn">
+              <td>
                 <span>
                   <i ng-class="item.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
                   {{ item.ResourceControl.Ownership ? item.ResourceControl.Ownership : item.ResourceControl.Ownership = $ctrl.RCO.ADMINISTRATORS }}

@@ -1,0 +1,23 @@
+<rd-header>
+  <rd-header-title title-text="Edit edge group"></rd-header-title>
+  <rd-header-content> <a ui-sref="edge.groups">Edge Groups</a> &gt; {{ $ctrl.model.Name }} </rd-header-content>
+</rd-header>
+
+<div class="row" ng-if="$ctrl.model">
+  <div class="col-sm-12">
+    <rd-widget>
+      <rd-widget-body>
+        <edge-group-form
+          loaded="$ctrl.state.loaded"
+          page-type="edit"
+          form-action-label="Save edge group"
+          form-action="$ctrl.updateGroup"
+          endpoints="$ctrl.endpoints"
+          groups="$ctrl.endpointGroups"
+          tags="$ctrl.tags"
+          model="$ctrl.model"
+        ></edge-group-form>
+      </rd-widget-body>
+    </rd-widget>
+  </div>
+</div>

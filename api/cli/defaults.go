@@ -8,7 +8,6 @@ const (
 	defaultTunnelServerPort    = "8000"
 	defaultDataDirectory       = "/data"
 	defaultAssetsDirectory     = "./"
-	defaultNoAuth              = "false"
 	defaultNoAnalytics         = "false"
 	defaultTLS                 = "false"
 	defaultTLSSkipVerify       = "false"
@@ -18,8 +17,5 @@ const (
 	defaultSSL                 = "false"
 	defaultSSLCertPath         = "/certs/portainer.crt"
 	defaultSSLKeyPath          = "/certs/portainer.key"
-	defaultSyncInterval        = "60s"
-	defaultSnapshot            = "true"
 	defaultSnapshotInterval    = "5m"
-	defaultTemplateFile        = "/templates.json"
 )

@@ -4,9 +4,7 @@
       <i class="fa fa-sync" aria-hidden="true"></i>
     </a>
   </rd-header-title>
-  <rd-header-content>
-    <a ui-sref="portainer.schedules">Schedules &gt; {{ ::schedule.Name }}</a>
-  </rd-header-content>
+  <rd-header-content> <a ui-sref="portainer.schedules">Schedules</a> &gt; {{ ::schedule.Name }} </rd-header-content>
 </rd-header>
 
 <div class="row">
@@ -22,6 +20,7 @@
               model="schedule"
               endpoints="endpoints"
               groups="groups"
+              tags="tags"
               form-action="update"
               form-action-label="Update schedule"
               action-in-progress="state.actionInProgress"

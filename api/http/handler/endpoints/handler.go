@@ -11,12 +11,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const (
-	// ErrEndpointManagementDisabled is an error raised when trying to access the endpoints management endpoints
-	// when the server has been started with the --external-endpoints flag
-	ErrEndpointManagementDisabled = portainer.Error("Endpoint management is disabled")
-)
-
 func hideFields(endpoint *portainer.Endpoint) {
 	endpoint.AzureCredentials = portainer.AzureCredentials{}
 	if len(endpoint.Snapshots) > 0 {
@@ -27,6 +21,7 @@ func hideFields(endpoint *portainer.Endpoint) {
 // Handler is the HTTP handler used to handle endpoint operations.
 type Handler struct {
 	*mux.Router
+<<<<<<< HEAD
 	authorizeEndpointManagement bool
 	requestBouncer              *security.RequestBouncer
 	EndpointService             portainer.EndpointService
@@ -38,14 +33,23 @@ type Handler struct {
 	ReverseTunnelService        portainer.ReverseTunnelService
 	SettingsService             portainer.SettingsService
 	AuthorizationService        *portainer.AuthorizationService
+=======
+	requestBouncer       *security.RequestBouncer
+	DataStore            portainer.DataStore
+	AuthorizationService *portainer.AuthorizationService
+	FileService          portainer.FileService
+	JobService           portainer.JobService
+	ProxyManager         *proxy.Manager
+	ReverseTunnelService portainer.ReverseTunnelService
+	Snapshotter          portainer.Snapshotter
+>>>>>>> origin/develop
 }
 
 // NewHandler creates a handler to manage endpoint operations.
-func NewHandler(bouncer *security.RequestBouncer, authorizeEndpointManagement bool) *Handler {
+func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	h := &Handler{
-		Router:                      mux.NewRouter(),
-		authorizeEndpointManagement: authorizeEndpointManagement,
-		requestBouncer:              bouncer,
+		Router:         mux.NewRouter(),
+		requestBouncer: bouncer,
 	}
 
 	h.Handle("/endpoints",
@@ -70,6 +74,5 @@ func NewHandler(bouncer *security.RequestBouncer, authorizeEndpointManagement bo
 		bouncer.AdminAccess(httperror.LoggerHandler(h.endpointSnapshot))).Methods(http.MethodPost)
 	h.Handle("/endpoints/{id}/status",
 		bouncer.PublicAccess(httperror.LoggerHandler(h.endpointStatusInspect))).Methods(http.MethodGet)
-
 	return h
 }

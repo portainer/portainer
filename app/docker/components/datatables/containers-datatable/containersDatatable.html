@@ -59,6 +59,9 @@
                 <div>
                   <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.columnVisibility.state.open = false;">Close</a>
                 </div>
+                <div>
+                  <a type="button" class="btn btn-default btn-sm" ng-click="$ctrl.columnVisibility.state.open = false;">Close</a>
+                </div>
               </div>
             </div>
           </span>
@@ -232,13 +235,6 @@
                   Created
                 </a>
               </th>
-              <th ng-show="$ctrl.columnVisibility.columns.ip.display">
-                <a ng-click="$ctrl.changeOrderBy('IP')">
-                  IP Address
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IP' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IP' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
               <th ng-if="$ctrl.showHostColumn" ng-show="$ctrl.columnVisibility.columns.host.display">
                 <a ng-click="$ctrl.changeOrderBy('NodeName')">
                   Host
@@ -253,7 +249,7 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Ports' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th ng-if="$ctrl.showOwnershipColumn" ng-show="$ctrl.columnVisibility.columns.ownership.display">
+              <th ng-show="$ctrl.columnVisibility.columns.ownership.display">
                 <a ng-click="$ctrl.changeOrderBy('ResourceControl.Ownership')">
                   Ownership
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && !$ctrl.state.reverseOrder"></i>
@@ -313,7 +309,6 @@
               <td ng-show="$ctrl.columnVisibility.columns.created.display">
                 {{ item.Created | getisodatefromtimestamp }}
               </td>
-              <td ng-show="$ctrl.columnVisibility.columns.ip.display">{{ item.IP ? item.IP : '-' }}</td>
               <td ng-if="$ctrl.showHostColumn" ng-show="$ctrl.columnVisibility.columns.host.display">{{ item.NodeName ? item.NodeName : '-' }}</td>
               <td ng-show="$ctrl.columnVisibility.columns.ports.display">
                 <a
@@ -327,7 +322,7 @@
                 </a>
                 <span ng-if="item.Ports.length == 0">-</span>
               </td>
-              <td ng-if="$ctrl.showOwnershipColumn" ng-show="$ctrl.columnVisibility.columns.ownership.display">
+              <td ng-show="$ctrl.columnVisibility.columns.ownership.display">
                 <span>
                   <i ng-class="item.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
                   {{ item.ResourceControl.Ownership ? item.ResourceControl.Ownership : item.ResourceControl.Ownership = $ctrl.RCO.ADMINISTRATORS }}

@@ -97,7 +97,7 @@ func (service *Service) SetTunnelStatusToRequired(endpointID portainer.EndpointI
 	tunnel := service.GetTunnelDetails(endpointID)
 
 	if tunnel.Port == 0 {
-		endpoint, err := service.endpointService.Endpoint(endpointID)
+		endpoint, err := service.dataStore.Endpoint().Endpoint(endpointID)
 		if err != nil {
 			return err
 		}

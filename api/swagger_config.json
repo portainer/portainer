@@ -1,5 +1,9 @@
 {
   "packageName": "portainer",
+<<<<<<< HEAD
   "packageVersion": "1.0.0-k8s-rc",
+=======
+  "packageVersion": "2.0.0-dev",
+>>>>>>> origin/develop
   "projectName": "portainer"
 }

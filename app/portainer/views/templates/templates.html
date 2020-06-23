@@ -53,7 +53,7 @@
           </div>
           <!-- !env -->
           <!-- access-control -->
-          <por-access-control-form form-data="formValues.AccessControlData" ng-if="applicationState.application.authentication"></por-access-control-form>
+          <por-access-control-form form-data="formValues.AccessControlData"></por-access-control-form>
           <!-- !access-control -->
           <!-- actions -->
           <div class="col-sm-12 form-section-title">
@@ -86,7 +86,7 @@
     <rd-widget>
       <rd-widget-custom-header icon="state.selectedTemplate.Logo" title-text="state.selectedTemplate.Image"></rd-widget-custom-header>
       <rd-widget-body classes="padding">
-        <form class="form-horizontal">
+        <form class="form-horizontal" name="selectedTemplateType1">
           <!-- description -->
           <div ng-if="state.selectedTemplate.Note">
             <div class="col-sm-12 form-section-title">
@@ -136,7 +136,7 @@
           </div>
           <!-- !env -->
           <!-- access-control -->
-          <por-access-control-form form-data="formValues.AccessControlData" ng-if="applicationState.application.authentication"></por-access-control-form>
+          <por-access-control-form form-data="formValues.AccessControlData"></por-access-control-form>
           <!-- !access-control -->
           <div class="form-group">
             <div class="col-sm-12">
@@ -236,16 +236,14 @@
                     <i class="fa fa-long-arrow-alt-right" aria-hidden="true"></i>
                     <!-- volume -->
                     <div class="input-group input-group-sm col-sm-6" ng-if="volume.type === 'volume'">
-                      <span class="input-group-addon">volume</span>
-                      <input
-                        type="text"
-                        ng-model="volume.bind"
-                        id="container_volumes"
-                        class="form-control"
-                        placeholder="Select a volume"
-                        typeahead-min-length="0"
-                        uib-typeahead="vol as vol.Name for vol in availableVolumes | filter:$viewValue"
-                      />
+                      <div class="col-sm-12 input-group">
+                        <span class="input-group-addon">volume</span>
+                        <div class="col-sm-12 input-group">
+                          <select class="form-control" ng-model="volume.bind" ng-options="vol.Name as vol.Name for vol in availableVolumes">
+                            <option value="" disabled selected>Select a volume</option>
+                          </select>
+                        </div>
+                      </div>
                     </div>
                     <!-- !volume -->
                     <!-- bind -->
@@ -368,10 +366,6 @@
       templates="templates"
       table-key="templates"
       select-action="selectTemplate"
-      delete-action="deleteTemplate"
-      show-add-action="state.templateManagement && isAdmin"
-      show-update-action="state.templateManagement && isAdmin"
-      show-delete-action="state.templateManagement && isAdmin"
       show-swarm-stacks="applicationState.endpoint.mode.provider === 'DOCKER_SWARM_MODE' && applicationState.endpoint.mode.role === 'MANAGER' && applicationState.endpoint.apiVersion >= 1.25"
     ></template-list>
   </div>

@@ -16,7 +16,7 @@ func hideFields(dockerHub *portainer.DockerHub) {
 // Handler is the HTTP handler used to handle DockerHub operations.
 type Handler struct {
 	*mux.Router
-	DockerHubService portainer.DockerHubService
+	DataStore portainer.DataStore
 }
 
 // NewHandler creates a handler to manage Dockerhub operations.

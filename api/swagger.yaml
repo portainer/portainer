@@ -54,7 +54,11 @@ info:
 
     **NOTE**: You can find more information on how to query the Docker API in the [Docker official documentation](https://docs.docker.com/engine/api/v1.30/) as well as in [this Portainer example](https://gist.github.com/deviantony/77026d402366b4b43fa5918d41bc42f8).
 
+<<<<<<< HEAD
   version: "1.0.0-k8s-rc"
+=======
+  version: "2.0.0-dev"
+>>>>>>> origin/develop
   title: "Portainer API"
   contact:
     email: "info@portainer.io"
@@ -3164,17 +3168,17 @@ definitions:
         type: "boolean"
         example: true
         description: "Is authentication enabled"
-      EndpointManagement:
-        type: "boolean"
-        example: true
-        description: "Is endpoint management enabled"
       Analytics:
         type: "boolean"
         example: true
         description: "Is analytics enabled"
       Version:
         type: "string"
+<<<<<<< HEAD
         example: "1.0.0-k8s-rc"
+=======
+        example: "2.0.0-dev"
+>>>>>>> origin/develop
         description: "Portainer API version"
   PublicSettingsInspectResponse:
     type: "object"
@@ -3296,6 +3300,10 @@ definitions:
   LDAPSettings:
     type: "object"
     properties:
+      AnonymousMode:
+        type: "boolean"
+        example: true
+        description: "Enable this option if the server is configured for Anonymous access. When enabled, ReaderDN and Password will not be used."
       ReaderDN:
         type: "string"
         example: "cn=readonly-account,dc=ldap,dc=domain,dc=tld"

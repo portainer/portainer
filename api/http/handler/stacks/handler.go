@@ -16,6 +16,7 @@ type Handler struct {
 	stackDeletionMutex *sync.Mutex
 	requestBouncer     *security.RequestBouncer
 	*mux.Router
+<<<<<<< HEAD
 	FileService            portainer.FileService
 	GitService             portainer.GitService
 	StackService           portainer.StackService
@@ -29,6 +30,13 @@ type Handler struct {
 	UserService            portainer.UserService
 	ExtensionService       portainer.ExtensionService
 	KubernetesDeployer     portainer.KubernetesDeployer
+=======
+	DataStore           portainer.DataStore
+	FileService         portainer.FileService
+	GitService          portainer.GitService
+	SwarmStackManager   portainer.SwarmStackManager
+	ComposeStackManager portainer.ComposeStackManager
+>>>>>>> origin/develop
 }
 
 // NewHandler creates a handler to manage stack operations.
@@ -70,14 +78,14 @@ func (handler *Handler) userCanAccessStack(securityContext *security.RestrictedR
 		return true, nil
 	}
 
-	_, err := handler.ExtensionService.Extension(portainer.RBACExtension)
+	_, err := handler.DataStore.Extension().Extension(portainer.RBACExtension)
 	if err == portainer.ErrObjectNotFound {
 		return false, nil
 	} else if err != nil && err != portainer.ErrObjectNotFound {
 		return false, err
 	}
 
-	user, err := handler.UserService.User(securityContext.UserID)
+	user, err := handler.DataStore.User().User(securityContext.UserID)
 	if err != nil {
 		return false, err
 	}

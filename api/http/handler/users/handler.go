@@ -17,13 +17,9 @@ func hideFields(user *portainer.User) {
 // Handler is the HTTP handler used to handle user operations.
 type Handler struct {
 	*mux.Router
-	UserService            portainer.UserService
-	TeamService            portainer.TeamService
-	TeamMembershipService  portainer.TeamMembershipService
-	ResourceControlService portainer.ResourceControlService
-	CryptoService          portainer.CryptoService
-	SettingsService        portainer.SettingsService
-	AuthorizationService   *portainer.AuthorizationService
+	DataStore            portainer.DataStore
+	CryptoService        portainer.CryptoService
+	AuthorizationService *portainer.AuthorizationService
 }
 
 // NewHandler creates a handler to manage user operations.

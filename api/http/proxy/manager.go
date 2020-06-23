@@ -24,6 +24,7 @@ type (
 		extensionProxies       cmap.ConcurrentMap
 		legacyExtensionProxies cmap.ConcurrentMap
 	}
+<<<<<<< HEAD
 
 	// ManagerParams represents the required parameters to create a new Manager instance.
 	ManagerParams struct {
@@ -61,11 +62,17 @@ func NewManager(parameters *ManagerParams) *Manager {
 		KubernetesTokenCacheManager: parameters.KubernetesTokenCacheManager,
 	}
 
+=======
+)
+
+// NewManager initializes a new proxy Service
+func NewManager(dataStore portainer.DataStore, signatureService portainer.DigitalSignatureService, tunnelService portainer.ReverseTunnelService, clientFactory *docker.ClientFactory) *Manager {
+>>>>>>> origin/develop
 	return &Manager{
 		endpointProxies:        cmap.New(),
 		extensionProxies:       cmap.New(),
 		legacyExtensionProxies: cmap.New(),
-		proxyFactory:           factory.NewProxyFactory(proxyFactoryParameters),
+		proxyFactory:           factory.NewProxyFactory(dataStore, signatureService, tunnelService, clientFactory),
 	}
 }
 

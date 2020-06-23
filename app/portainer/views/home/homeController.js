@@ -1,25 +1,10 @@
-angular.module('portainer.app').controller('HomeController', [
-  '$q',
-  '$scope',
-  '$state',
-  '$interval',
-  'Authentication',
-  'EndpointService',
-  'EndpointHelper',
-  'GroupService',
-  'Notifications',
-  'EndpointProvider',
-  'StateManager',
-  'LegacyExtensionManager',
-  'ModalService',
-  'MotdService',
-  'SystemService',
-  'KubernetesHealthService',
-  function (
+angular
+  .module('portainer.app')
+  .controller('HomeController', function (
     $q,
     $scope,
     $state,
-    $interval,
+    TagService,
     Authentication,
     EndpointService,
     EndpointHelper,
@@ -215,10 +200,10 @@ angular.module('portainer.app').controller('HomeController', [
     }
 
     $scope.getPaginatedEndpoints = getPaginatedEndpoints;
-    function getPaginatedEndpoints(lastId, limit, filter) {
+    function getPaginatedEndpoints(lastId, limit, search) {
       const deferred = $q.defer();
       $q.all({
-        endpoints: EndpointService.endpoints(lastId, limit, filter),
+        endpoints: EndpointService.endpoints(lastId, limit, { search }),
         groups: GroupService.groups(),
       })
         .then(function success(data) {
@@ -234,7 +219,7 @@ angular.module('portainer.app').controller('HomeController', [
       return deferred.promise;
     }
 
-    function initView() {
+    async function initView() {
       $scope.isAdmin = Authentication.isAdmin();
 
       MotdService.motd().then(function success(data) {
@@ -250,8 +235,13 @@ angular.module('portainer.app').controller('HomeController', [
           $scope.endpoints = data.endpoints;
         }
       });
+
+      try {
+        $scope.tags = await TagService.tags();
+      } catch (e) {
+        Notifications.error('Failed loading tags', e);
+      }
     }
 
     initView();
-  },
-]);
+  });

@@ -3,6 +3,7 @@ package docker
 import (
 	"context"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/docker/docker/api/types"
@@ -149,12 +150,20 @@ func snapshotContainers(snapshot *portainer.DockerSnapshot, cli *client.Client) 
 
 	runningContainers := 0
 	stoppedContainers := 0
+	healthyContainers := 0
+	unhealthyContainers := 0
 	stacks := make(map[string]struct{})
 	for _, container := range containers {
 		if container.State == "exited" {
 			stoppedContainers++
 		} else if container.State == "running" {
 			runningContainers++
+		}
+
+		if strings.Contains(container.Status, "(healthy)") {
+			healthyContainers++
+		} else if strings.Contains(container.Status, "(unhealthy)") {
+			unhealthyContainers++
 		}
 
 		for k, v := range container.Labels {
@@ -166,6 +175,8 @@ func snapshotContainers(snapshot *portainer.DockerSnapshot, cli *client.Client) 
 
 	snapshot.RunningContainerCount = runningContainers
 	snapshot.StoppedContainerCount = stoppedContainers
+	snapshot.HealthyContainerCount = healthyContainers
+	snapshot.UnhealthyContainerCount = unhealthyContainers
 	snapshot.StackCount += len(stacks)
 	snapshot.SnapshotRaw.Containers = containers
 	return nil

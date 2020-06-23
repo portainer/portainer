@@ -24,10 +24,14 @@ type endpointUpdatePayload struct {
 	AzureApplicationID     *string
 	AzureTenantID          *string
 	AzureAuthenticationKey *string
-	Tags                   []string
+	TagIDs                 []portainer.TagID
 	UserAccessPolicies     portainer.UserAccessPolicies
 	TeamAccessPolicies     portainer.TeamAccessPolicies
+<<<<<<< HEAD
 	Kubernetes             *portainer.KubernetesData
+=======
+	EdgeCheckinInterval    *int
+>>>>>>> origin/develop
 }
 
 func (payload *endpointUpdatePayload) Validate(r *http.Request) error {
@@ -36,10 +40,6 @@ func (payload *endpointUpdatePayload) Validate(r *http.Request) error {
 
 // PUT request on /api/endpoints/:id
 func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	if !handler.authorizeEndpointManagement {
-		return &httperror.HandlerError{http.StatusServiceUnavailable, "Endpoint management is disabled", ErrEndpointManagementDisabled}
-	}
-
 	endpointID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint identifier route variable", err}
@@ -51,7 +51,7 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {
@@ -70,12 +70,56 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		endpoint.PublicURL = *payload.PublicURL
 	}
 
-	if payload.GroupID != nil {
-		endpoint.GroupID = portainer.EndpointGroupID(*payload.GroupID)
+	if payload.EdgeCheckinInterval != nil {
+		endpoint.EdgeCheckinInterval = *payload.EdgeCheckinInterval
 	}
 
-	if payload.Tags != nil {
-		endpoint.Tags = payload.Tags
+	groupIDChanged := false
+	if payload.GroupID != nil {
+		groupID := portainer.EndpointGroupID(*payload.GroupID)
+		groupIDChanged = groupID != endpoint.GroupID
+		endpoint.GroupID = groupID
+	}
+
+	tagsChanged := false
+	if payload.TagIDs != nil {
+		payloadTagSet := portainer.TagSet(payload.TagIDs)
+		endpointTagSet := portainer.TagSet((endpoint.TagIDs))
+		union := portainer.TagUnion(payloadTagSet, endpointTagSet)
+		intersection := portainer.TagIntersection(payloadTagSet, endpointTagSet)
+		tagsChanged = len(union) > len(intersection)
+
+		if tagsChanged {
+			removeTags := portainer.TagDifference(endpointTagSet, payloadTagSet)
+
+			for tagID := range removeTags {
+				tag, err := handler.DataStore.Tag().Tag(tagID)
+				if err != nil {
+					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a tag inside the database", err}
+				}
+
+				delete(tag.Endpoints, endpoint.ID)
+				err = handler.DataStore.Tag().UpdateTag(tag.ID, tag)
+				if err != nil {
+					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist tag changes inside the database", err}
+				}
+			}
+
+			endpoint.TagIDs = payload.TagIDs
+			for _, tagID := range payload.TagIDs {
+				tag, err := handler.DataStore.Tag().Tag(tagID)
+				if err != nil {
+					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a tag inside the database", err}
+				}
+
+				tag.Endpoints[endpoint.ID] = true
+
+				err = handler.DataStore.Tag().UpdateTag(tag.ID, tag)
+				if err != nil {
+					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist tag changes inside the database", err}
+				}
+			}
+		}
 	}
 
 	if payload.Kubernetes != nil {
@@ -177,7 +221,7 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		}
 	}
 
-	err = handler.EndpointService.UpdateEndpoint(endpoint.ID, endpoint)
+	err = handler.DataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint changes inside the database", err}
 	}
@@ -186,6 +230,42 @@ func (handler *Handler) endpointUpdate(w http.ResponseWriter, r *http.Request) *
 		err = handler.AuthorizationService.UpdateUsersAuthorizations()
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
+		}
+	}
+
+	if endpoint.Type == portainer.EdgeAgentEnvironment && (groupIDChanged || tagsChanged) {
+		relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpoint.ID)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find endpoint relation inside the database", err}
+		}
+
+		endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(endpoint.GroupID)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find endpoint group inside the database", err}
+		}
+
+		edgeGroups, err := handler.DataStore.EdgeGroup().EdgeGroups()
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge groups from the database", err}
+		}
+
+		edgeStacks, err := handler.DataStore.EdgeStack().EdgeStacks()
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge stacks from the database", err}
+		}
+
+		edgeStackSet := map[portainer.EdgeStackID]bool{}
+
+		endpointEdgeStacks := portainer.EndpointRelatedEdgeStacks(endpoint, endpointGroup, edgeGroups, edgeStacks)
+		for _, edgeStackID := range endpointEdgeStacks {
+			edgeStackSet[edgeStackID] = true
+		}
+
+		relation.EdgeStacks = edgeStackSet
+
+		err = handler.DataStore.EndpointRelation().UpdateEndpointRelation(endpoint.ID, relation)
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint relation changes inside the database", err}
 		}
 	}
 

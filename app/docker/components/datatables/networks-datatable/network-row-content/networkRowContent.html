@@ -1,9 +1,15 @@
 <td ng-if="allowCheckbox">
-  <span class="md-checkbox" ng-if="!parentCtrl.offlineMode">
-    <input id="select_{{ $index }}" type="checkbox" ng-model="item.Checked" ng-change="parentCtrl.selectItem(item)" ng-disabled="parentCtrl.disableRemove(item)" />
+  <span class="md-checkbox" ng-if="!parentCtrl.offlineMode" authorization="DockerNetworkDelete, DockerNetworkCreate">
+    <input
+      id="select_{{ $index }}"
+      type="checkbox"
+      ng-model="item.Checked"
+      ng-click="parentCtrl.selectItem(item, $event); $event.stopPropagation()"
+      ng-disabled="parentCtrl.disableRemove(item)"
+    />
     <label for="select_{{ $index }}"></label>
   </span>
-  <a ng-if="parentCtrl.itemCanExpand(item)" ng-click="parentCtrl.expandItem(item, !item.Expanded)"
+  <a ng-if="parentCtrl.itemCanExpand(item)"
     ><i ng-class="{ 'fas fa-angle-down': item.Expanded, 'fas fa-angle-right': !item.Expanded }" class="space-right" aria-hidden="true"></i
   ></a>
 </td>
@@ -14,15 +20,15 @@
   <span style="margin-left: 10px;" class="label label-info image-tag space-left" ng-if="item.ResourceControl.System">System</span>
 </td>
 <td>{{ item.StackName ? item.StackName : '-' }}</td>
-<td>{{ item.Scope }}</td>
 <td>{{ item.Driver }}</td>
 <td>{{ item.Attachable }}</td>
-<td>{{ item.Internal }}</td>
 <td>{{ item.IPAM.Driver }}</td>
-<td>{{ item.IPAM.Config[0].Subnet ? item.IPAM.Config[0].Subnet : '-' }}</td>
-<td>{{ item.IPAM.Config[0].Gateway ? item.IPAM.Config[0].Gateway : '-' }}</td>
+<td>{{ item.IPAM.IPV4Configs[0].Subnet ? item.IPAM.IPV4Configs[0].Subnet : '-' }}</td>
+<td>{{ item.IPAM.IPV4Configs[0].Gateway ? item.IPAM.IPV4Configs[0].Gateway : '-' }}</td>
+<td>{{ item.IPAM.IPV6Configs[0].Subnet ? item.IPAM.IPV6Configs[0].Subnet : '-' }}</td>
+<td>{{ item.IPAM.IPV6Configs[0].Gateway ? item.IPAM.IPV6Configs[0].Gateway : '-' }}</td>
 <td ng-if="parentCtrl.showHostColumn">{{ item.NodeName ? item.NodeName : '-' }}</td>
-<td ng-if="parentCtrl.showOwnershipColumn">
+<td>
   <span>
     <i ng-class="item.ResourceControl.Ownership | ownershipicon" aria-hidden="true"></i>
     {{ item.ResourceControl.Ownership ? item.ResourceControl.Ownership : item.ResourceControl.Ownership = RCO.ADMINISTRATORS }}

@@ -11,7 +11,7 @@ import (
 )
 
 func (handler *Handler) scheduleInspect(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	settings, err := handler.SettingsService.Settings()
+	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusServiceUnavailable, "Unable to retrieve settings", err}
 	}
@@ -24,7 +24,7 @@ func (handler *Handler) scheduleInspect(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid schedule identifier route variable", err}
 	}
 
-	schedule, err := handler.ScheduleService.Schedule(portainer.ScheduleID(scheduleID))
+	schedule, err := handler.DataStore.Schedule().Schedule(portainer.ScheduleID(scheduleID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a schedule with the specified identifier inside the database", err}
 	} else if err != nil {

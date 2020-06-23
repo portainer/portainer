@@ -56,6 +56,10 @@ class PorAccessManagementController {
     try {
       const entity = this.accessControlledEntity;
       const parent = this.inheritFrom;
+      // TODO: refactor
+      // extract this code and locate it in AccessService.accesses() function
+      // see resourcePoolAccessController for another usage of AccessService.accesses()
+      // which needs RBAC support
       this.roles = [];
       this.rbacEnabled = await this.ExtensionService.extensionEnabled(this.ExtensionService.EXTENSIONS.RBAC);
       if (this.rbacEnabled) {
@@ -65,7 +69,7 @@ class PorAccessManagementController {
         };
       }
       const data = await this.AccessService.accesses(entity, parent, this.roles);
-      this.availableUsersAndTeams = data.availableUsersAndTeams;
+      this.availableUsersAndTeams = _.orderBy(data.availableUsersAndTeams, 'Name', 'asc');
       this.authorizedUsersAndTeams = data.authorizedUsersAndTeams;
     } catch (err) {
       this.availableUsersAndTeams = [];

@@ -1,3 +1,5 @@
+import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
+
 angular.module('portainer.app').factory('EndpointService', [
   '$q',
   'Endpoints',
@@ -10,8 +12,8 @@ angular.module('portainer.app').factory('EndpointService', [
       return Endpoints.get({ id: endpointID }).$promise;
     };
 
-    service.endpoints = function (start, limit, search) {
-      return Endpoints.query({ start, limit, search }).$promise;
+    service.endpoints = function (start, limit, { search, type, tagIds, endpointIds, tagsPartialMatch } = {}) {
+      return Endpoints.query({ start, limit, search, type, tagIds: JSON.stringify(tagIds), endpointIds: JSON.stringify(endpointIds), tagsPartialMatch }).$promise;
     };
 
     service.snapshotEndpoints = function () {
@@ -54,7 +56,58 @@ angular.module('portainer.app').factory('EndpointService', [
     service.createLocalEndpoint = function () {
       var deferred = $q.defer();
 
-      FileUploadService.createEndpoint('local', 1, '', '', 1, [], false)
+      FileUploadService.createEndpoint('local', PortainerEndpointTypes.DockerEnvironment, '', '', 1, [], false)
+        .then(function success(response) {
+          deferred.resolve(response.data);
+        })
+        .catch(function error(err) {
+          deferred.reject({ msg: 'Unable to create endpoint', err: err });
+        });
+
+      return deferred.promise;
+    };
+
+    service.createRemoteEndpoint = function (
+      name,
+      type,
+      URL,
+      PublicURL,
+      groupID,
+      tagIds,
+      TLS,
+      TLSSkipVerify,
+      TLSSkipClientVerify,
+      TLSCAFile,
+      TLSCertFile,
+      TLSKeyFile,
+      checkinInterval
+    ) {
+      var deferred = $q.defer();
+
+      var endpointURL = URL;
+      if (
+        type !== PortainerEndpointTypes.EdgeAgentOnDockerEnvironment &&
+        type !== PortainerEndpointTypes.AgentOnKubernetesEnvironment &&
+        type !== PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment
+      ) {
+        endpointURL = 'tcp://' + URL;
+      }
+
+      FileUploadService.createEndpoint(
+        name,
+        type,
+        endpointURL,
+        PublicURL,
+        groupID,
+        tagIds,
+        TLS,
+        TLSSkipVerify,
+        TLSSkipClientVerify,
+        TLSCAFile,
+        TLSCertFile,
+        TLSKeyFile,
+        checkinInterval
+      )
         .then(function success(response) {
           deferred.resolve(response.data);
         })
@@ -79,20 +132,15 @@ angular.module('portainer.app').factory('EndpointService', [
       return deferred.promise;
     };
 
-    service.createRemoteEndpoint = function (name, type, URL, PublicURL, groupID, tags, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
+    service.createAzureEndpoint = function (name, applicationId, tenantId, authenticationKey, groupId, tagIds) {
       var deferred = $q.defer();
 
-      var endpointURL = URL;
-      if (type !== 6 && type !== 7) {
-        endpointURL = 'tcp://' + URL;
-      }
-
-      FileUploadService.createEndpoint(name, type, endpointURL, PublicURL, groupID, tags, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile)
+      FileUploadService.createAzureEndpoint(name, applicationId, tenantId, authenticationKey, groupId, tagIds)
         .then(function success(response) {
           deferred.resolve(response.data);
         })
         .catch(function error(err) {
-          deferred.reject({ msg: 'Unable to create endpoint', err: err });
+          deferred.reject({ msg: 'Unable to connect to Azure', err: err });
         });
 
       return deferred.promise;

@@ -34,7 +34,7 @@ func (factory *ProxyFactory) newDockerLocalProxy(endpoint *portainer.Endpoint) (
 func (factory *ProxyFactory) newDockerHTTPProxy(endpoint *portainer.Endpoint) (http.Handler, error) {
 	if endpoint.Type == portainer.EdgeAgentOnDockerEnvironment {
 		tunnel := factory.reverseTunnelService.GetTunnelDetails(endpoint.ID)
-		endpoint.URL = fmt.Sprintf("http://localhost:%d", tunnel.Port)
+		endpoint.URL = fmt.Sprintf("http://127.0.0.1:%d", tunnel.Port)
 	}
 
 	endpointURL, err := url.Parse(endpoint.URL)
@@ -56,18 +56,11 @@ func (factory *ProxyFactory) newDockerHTTPProxy(endpoint *portainer.Endpoint) (h
 	}
 
 	transportParameters := &docker.TransportParameters{
-		Endpoint:               endpoint,
-		ResourceControlService: factory.resourceControlService,
-		UserService:            factory.userService,
-		TeamService:            factory.teamService,
-		TeamMembershipService:  factory.teamMembershipService,
-		RegistryService:        factory.registryService,
-		DockerHubService:       factory.dockerHubService,
-		SettingsService:        factory.settingsService,
-		ReverseTunnelService:   factory.reverseTunnelService,
-		ExtensionService:       factory.extensionService,
-		SignatureService:       factory.signatureService,
-		DockerClientFactory:    factory.dockerClientFactory,
+		Endpoint:             endpoint,
+		DataStore:            factory.dataStore,
+		ReverseTunnelService: factory.reverseTunnelService,
+		SignatureService:     factory.signatureService,
+		DockerClientFactory:  factory.dockerClientFactory,
 	}
 
 	dockerTransport, err := docker.NewTransport(transportParameters, httpTransport)

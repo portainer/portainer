@@ -73,7 +73,7 @@
           <thead>
             <tr>
               <th style="width: 55px;">
-                <span class="md-checkbox" ng-if="!$ctrl.offlineMode">
+                <span class="md-checkbox" ng-if="!$ctrl.offlineMode" authorization="DockerNetworkDelete, DockerNetworkCreate">
                   <input id="select_all" type="checkbox" ng-model="$ctrl.state.selectAll" ng-change="$ctrl.selectAll()" />
                   <label for="select_all"></label>
                 </span>
@@ -96,13 +96,6 @@
                 </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Scope')">
-                  Scope
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Scope' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Scope' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
-              <th>
                 <a ng-click="$ctrl.changeOrderBy('Driver')">
                   Driver
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Driver' && !$ctrl.state.reverseOrder"></i>
@@ -117,13 +110,6 @@
                 </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('Internal')">
-                  Internal
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Internal' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'Internal' && $ctrl.state.reverseOrder"></i>
-                </a>
-              </th>
-              <th>
                 <a ng-click="$ctrl.changeOrderBy('IPAM.Driver')">
                   IPAM Driver
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAM.Driver' && !$ctrl.state.reverseOrder"></i>
@@ -131,17 +117,31 @@
                 </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('IPAM.Config[0].Subnet')">
-                  IPAM Subnet
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAM.Config[0].Subnet' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAM.Config[0].Subnet' && $ctrl.state.reverseOrder"></i>
+                <a ng-click="$ctrl.changeOrderBy('IPAM.IPV4Configs[0].Subnet')">
+                  IPV4 IPAM Subnet
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAM.IPV4Configs[0].Subnet' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAM.IPV4Configs[0].Subnet' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th>
-                <a ng-click="$ctrl.changeOrderBy('IPAM.Config[0].Gateway')">
-                  IPAM Gateway
-                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAM.Config[0].Gateway' && !$ctrl.state.reverseOrder"></i>
-                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAM.Config[0].Gateway' && $ctrl.state.reverseOrder"></i>
+                <a ng-click="$ctrl.changeOrderBy('IPAM.IPV4Configs[0].Gateway')">
+                  IPV4 IPAM Gateway
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAM.IPV4Configs[0].Gateway' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAM.IPV4Configs[0].Gateway' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('IPAM.IPV6Configs[0].Subnet')">
+                  IPV6 IPAM Subnet
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAM.IPV6Configs[0].Subnet' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAM.IPV6Configs[0].Subnet' && $ctrl.state.reverseOrder"></i>
+                </a>
+              </th>
+              <th>
+                <a ng-click="$ctrl.changeOrderBy('IPAM.IPV6Configs[0].Gateway')">
+                  IPV6 IPAM Gateway
+                  <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAM.IPV6Configs[0].Gateway' && !$ctrl.state.reverseOrder"></i>
+                  <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'IPAM.IPV6Configs[0].Gateway' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
               <th ng-if="$ctrl.showHostColumn">
@@ -151,7 +151,7 @@
                   <i class="fa fa-sort-alpha-up" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'NodeName' && $ctrl.state.reverseOrder"></i>
                 </a>
               </th>
-              <th ng-if="$ctrl.showOwnershipColumn">
+              <th>
                 <a ng-click="$ctrl.changeOrderBy('ResourceControl.Ownership')">
                   Ownership
                   <i class="fa fa-sort-alpha-down" aria-hidden="true" ng-if="$ctrl.state.orderBy === 'ResourceControl.Ownership' && !$ctrl.state.reverseOrder"></i>
@@ -167,6 +167,7 @@
               network-row-content
               item="item"
               parent-ctrl="$ctrl"
+              ng-click="$ctrl.expandItem(item, !item.Expanded)"
               allow-checkbox="true"
             >
             </tr>

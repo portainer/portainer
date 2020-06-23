@@ -251,6 +251,22 @@ angular
       }).length;
     };
   })
+  .filter('healthycontainers', function () {
+    'use strict';
+    return function healthyContainersFilter(containers) {
+      return containers.filter(function (container) {
+        return container.Status === 'healthy';
+      }).length;
+    };
+  })
+  .filter('unhealthycontainers', function () {
+    'use strict';
+    return function unhealthyContainersFilter(containers) {
+      return containers.filter(function (container) {
+        return container.Status === 'unhealthy';
+      }).length;
+    };
+  })
   .filter('imagestotalsize', function () {
     'use strict';
     return function (images) {

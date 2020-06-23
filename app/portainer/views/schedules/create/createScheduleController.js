@@ -1,14 +1,8 @@
 import { ScheduleDefaultModel } from '../../../models/schedule';
 
-angular.module('portainer.app').controller('CreateScheduleController', [
-  '$q',
-  '$scope',
-  '$state',
-  'Notifications',
-  'EndpointService',
-  'GroupService',
-  'ScheduleService',
-  function ($q, $scope, $state, Notifications, EndpointService, GroupService, ScheduleService) {
+angular
+  .module('portainer.app')
+  .controller('CreateScheduleController', function CreateScheduleController($q, $scope, $state, Notifications, EndpointService, GroupService, ScheduleService, TagService) {
     $scope.state = {
       actionInProgress: false,
     };
@@ -45,10 +39,12 @@ angular.module('portainer.app').controller('CreateScheduleController', [
       $q.all({
         endpoints: EndpointService.endpoints(),
         groups: GroupService.groups(),
+        tags: TagService.tags(),
       })
         .then(function success(data) {
           $scope.endpoints = data.endpoints.value;
           $scope.groups = data.groups;
+          $scope.tags = data.tags;
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve endpoint list');
@@ -56,5 +52,4 @@ angular.module('portainer.app').controller('CreateScheduleController', [
     }
 
     initView();
-  },
-]);
+  });

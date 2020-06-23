@@ -24,6 +24,7 @@ const (
 // It is used to start a reverse tunnel server and to manage the connection status of each tunnel
 // connected to the tunnel server.
 type Service struct {
+<<<<<<< HEAD
 	serverFingerprint   string
 	serverPort          string
 	tunnelDetailsMap    cmap.ConcurrentMap
@@ -31,14 +32,21 @@ type Service struct {
 	tunnelServerService portainer.TunnelServerService
 	snapshotManager     *portainer.SnapshotManager
 	chiselServer        *chserver.Server
+=======
+	serverFingerprint string
+	serverPort        string
+	tunnelDetailsMap  cmap.ConcurrentMap
+	dataStore         portainer.DataStore
+	snapshotter       portainer.Snapshotter
+	chiselServer      *chserver.Server
+>>>>>>> origin/develop
 }
 
 // NewService returns a pointer to a new instance of Service
-func NewService(endpointService portainer.EndpointService, tunnelServerService portainer.TunnelServerService) *Service {
+func NewService(dataStore portainer.DataStore) *Service {
 	return &Service{
-		tunnelDetailsMap:    cmap.New(),
-		endpointService:     endpointService,
-		tunnelServerService: tunnelServerService,
+		tunnelDetailsMap: cmap.New(),
+		dataStore:        dataStore,
 	}
 }
 
@@ -89,7 +97,7 @@ func (service *Service) StartTunnelServer(addr, port string, snapshotManager *po
 func (service *Service) retrievePrivateKeySeed() (string, error) {
 	var serverInfo *portainer.TunnelServerInfo
 
-	serverInfo, err := service.tunnelServerService.Info()
+	serverInfo, err := service.dataStore.TunnelServer().Info()
 	if err == portainer.ErrObjectNotFound {
 		keySeed := uniuri.NewLen(16)
 
@@ -97,7 +105,7 @@ func (service *Service) retrievePrivateKeySeed() (string, error) {
 			PrivateKeySeed: keySeed,
 		}
 
-		err := service.tunnelServerService.UpdateInfo(serverInfo)
+		err := service.dataStore.TunnelServer().UpdateInfo(serverInfo)
 		if err != nil {
 			return "", err
 		}
@@ -173,19 +181,28 @@ func (service *Service) checkTunnels() {
 }
 
 func (service *Service) snapshotEnvironment(endpointID portainer.EndpointID, tunnelPort int) error {
+<<<<<<< HEAD
 	endpoint, err := service.endpointService.Endpoint(endpointID)
+=======
+	endpoint, err := service.dataStore.Endpoint().Endpoint(endpointID)
+>>>>>>> origin/develop
 	if err != nil {
 		return err
 	}
 
 	endpointURL := endpoint.URL
+<<<<<<< HEAD
 	endpoint.URL = fmt.Sprintf("tcp://localhost:%d", tunnelPort)
 
 	err = service.snapshotManager.SnapshotEndpoint(endpoint)
+=======
+	endpoint.URL = fmt.Sprintf("tcp://127.0.0.1:%d", tunnelPort)
+	snapshot, err := service.snapshotter.CreateSnapshot(endpoint)
+>>>>>>> origin/develop
 	if err != nil {
 		return err
 	}
 
 	endpoint.URL = endpointURL
-	return service.endpointService.UpdateEndpoint(endpoint.ID, endpoint)
+	return service.dataStore.Endpoint().UpdateEndpoint(endpoint.ID, endpoint)
 }

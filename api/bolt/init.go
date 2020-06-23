@@ -4,6 +4,56 @@ import portainer "github.com/portainer/portainer/api"
 
 // Init creates the default data set.
 func (store *Store) Init() error {
+	_, err := store.SettingsService.Settings()
+	if err == portainer.ErrObjectNotFound {
+		defaultSettings := &portainer.Settings{
+			AuthenticationMethod: portainer.AuthenticationInternal,
+			BlackListedLabels:    make([]portainer.Pair, 0),
+			LDAPSettings: portainer.LDAPSettings{
+				AnonymousMode:   true,
+				AutoCreateUsers: true,
+				TLSConfig:       portainer.TLSConfiguration{},
+				SearchSettings: []portainer.LDAPSearchSettings{
+					portainer.LDAPSearchSettings{},
+				},
+				GroupSearchSettings: []portainer.LDAPGroupSearchSettings{
+					portainer.LDAPGroupSearchSettings{},
+				},
+			},
+			OAuthSettings:                      portainer.OAuthSettings{},
+			AllowBindMountsForRegularUsers:     true,
+			AllowPrivilegedModeForRegularUsers: true,
+			AllowVolumeBrowserForRegularUsers:  false,
+			EnableHostManagementFeatures:       false,
+			EdgeAgentCheckinInterval:           portainer.DefaultEdgeAgentCheckinIntervalInSeconds,
+			TemplatesURL:                       portainer.DefaultTemplatesURL,
+			UserSessionTimeout:                 portainer.DefaultUserSessionTimeout,
+		}
+
+		err = store.SettingsService.UpdateSettings(defaultSettings)
+		if err != nil {
+			return err
+		}
+	} else if err != nil {
+		return err
+	}
+
+	_, err = store.DockerHubService.DockerHub()
+	if err == portainer.ErrObjectNotFound {
+		defaultDockerHub := &portainer.DockerHub{
+			Authentication: false,
+			Username:       "",
+			Password:       "",
+		}
+
+		err := store.DockerHubService.UpdateDockerHub(defaultDockerHub)
+		if err != nil {
+			return err
+		}
+	} else if err != nil {
+		return err
+	}
+
 	groups, err := store.EndpointGroupService.EndpointGroups()
 	if err != nil {
 		return err
@@ -16,7 +66,7 @@ func (store *Store) Init() error {
 			Labels:             []portainer.Pair{},
 			UserAccessPolicies: portainer.UserAccessPolicies{},
 			TeamAccessPolicies: portainer.TeamAccessPolicies{},
-			Tags:               []string{},
+			TagIDs:             []portainer.TagID{},
 		}
 
 		err = store.EndpointGroupService.CreateEndpointGroup(unassignedGroup)

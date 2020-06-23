@@ -18,7 +18,7 @@
             <th>Container port</th>
             <th>Protocol</th>
             <th>Publish mode</th>
-            <th>Actions</th>
+            <th authorization="DockerServiceUpdate">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -33,6 +33,7 @@
                   placeholder="e.g. 8080"
                   ng-change="updatePublishedPort(service, mapping)"
                   ng-disabled="isUpdating"
+                  disable-authorization="DockerServiceUpdate"
                 />
               </div>
             </td>
@@ -46,12 +47,19 @@
                   placeholder="e.g. 80"
                   ng-change="updatePublishedPort(service, mapping)"
                   ng-disabled="isUpdating"
+                  disable-authorization="DockerServiceUpdate"
                 />
               </div>
             </td>
             <td>
               <div class="input-group input-group-sm">
-                <select class="selectpicker form-control" ng-model="portBinding.Protocol" ng-change="updatePublishedPort(service, mapping)" ng-disabled="isUpdating">
+                <select
+                  class="selectpicker form-control"
+                  ng-model="portBinding.Protocol"
+                  ng-change="updatePublishedPort(service, mapping)"
+                  ng-disabled="isUpdating"
+                  disable-authorization="DockerServiceUpdate"
+                >
                   <option value="tcp">tcp</option>
                   <option value="udp">udp</option>
                 </select>
@@ -59,7 +67,13 @@
             </td>
             <td>
               <div class="input-group input-group-sm">
-                <select class="selectpicker form-control" ng-model="portBinding.PublishMode" ng-change="updatePublishedPort(service, mapping)" ng-disabled="isUpdating">
+                <select
+                  class="selectpicker form-control"
+                  ng-model="portBinding.PublishMode"
+                  ng-change="updatePublishedPort(service, mapping)"
+                  ng-disabled="isUpdating"
+                  disable-authorization="DockerServiceUpdate"
+                >
                   <option value="ingress">ingress</option>
                   <option value="host">host</option>
                 </select>

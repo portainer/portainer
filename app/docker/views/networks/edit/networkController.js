@@ -1,3 +1,5 @@
+import DockerNetworkHelper from 'Docker/helpers/networkHelper';
+
 angular.module('portainer.docker').controller('NetworkController', [
   '$scope',
   '$state',
@@ -97,10 +99,9 @@ angular.module('portainer.docker').controller('NetworkController', [
       NetworkService.network($transition$.params().id)
         .then(function success(data) {
           $scope.network = data;
-          var endpointProvider = $scope.applicationState.endpoint.mode.provider;
-          if (endpointProvider !== 'VMWARE_VIC') {
-            getContainersInNetwork(data);
-          }
+          getContainersInNetwork(data);
+          $scope.network.IPAM.IPV4Configs = DockerNetworkHelper.getIPV4Configs($scope.network.IPAM.Config);
+          $scope.network.IPAM.IPV6Configs = DockerNetworkHelper.getIPV6Configs($scope.network.IPAM.Config);
         })
         .catch(function error(err) {
           Notifications.error('Failure', err, 'Unable to retrieve network info');

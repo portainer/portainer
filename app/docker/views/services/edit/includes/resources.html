@@ -61,6 +61,7 @@
                 precision="2"
                 ng-if="service && state.sliderMaxCpu"
                 on-change="updateServiceAttribute(service, 'ReservationNanoCPUs')"
+                disable-authorization="DockerServiceUpdate"
               ></slider>
             </td>
             <td style="vertical-align: middle;">
@@ -84,6 +85,7 @@
                 precision="2"
                 ng-if="service && state.sliderMaxCpu"
                 on-change="updateServiceAttribute(service, 'LimitNanoCPUs')"
+                disable-authorization="DockerServiceUpdate"
               ></slider>
             </td>
             <td style="vertical-align: middle;">

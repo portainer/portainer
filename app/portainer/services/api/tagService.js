@@ -2,8 +2,9 @@ import { TagViewModel } from '../../models/tag';
 
 angular.module('portainer.app').factory('TagService', [
   '$q',
+  '$async',
   'Tags',
-  function TagServiceFactory($q, Tags) {
+  function TagServiceFactory($q, $async, Tags) {
     'use strict';
     var service = {};
 
@@ -37,13 +38,22 @@ angular.module('portainer.app').factory('TagService', [
       return deferred.promise;
     };
 
-    service.createTag = function (name) {
+    async function createTagAsync(name) {
       var payload = {
         Name: name,
       };
+      try {
+        const tag = await Tags.create({}, payload).$promise;
+        return new TagViewModel(tag);
+      } catch (err) {
+        throw { msg: 'Unable to create tag', err };
+      }
+    }
 
-      return Tags.create({}, payload).$promise;
-    };
+    function createTag(name) {
+      return $async(createTagAsync, name);
+    }
+    service.createTag = createTag;
 
     service.deleteTag = function (id) {
       return Tags.remove({ id: id }).$promise;

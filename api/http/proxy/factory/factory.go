@@ -25,6 +25,7 @@ var extensionPorts = map[portainer.ExtensionID]string{
 type (
 	// ProxyFactory is a factory to create reverse proxies to Docker endpoints and extensions
 	ProxyFactory struct {
+<<<<<<< HEAD
 		resourceControlService      portainer.ResourceControlService
 		userService                 portainer.UserService
 		teamService                 portainer.TeamService
@@ -55,12 +56,19 @@ type (
 		DockerClientFactory         *docker.ClientFactory
 		KubernetesClientFactory     *cli.ClientFactory
 		KubernetesTokenCacheManager *kubernetes.TokenCacheManager
+=======
+		dataStore            portainer.DataStore
+		signatureService     portainer.DigitalSignatureService
+		reverseTunnelService portainer.ReverseTunnelService
+		dockerClientFactory  *docker.ClientFactory
+>>>>>>> origin/develop
 	}
 )
 
 // NewProxyFactory returns a pointer to a new instance of a ProxyFactory
-func NewProxyFactory(parameters *ProxyFactoryParameters) *ProxyFactory {
+func NewProxyFactory(dataStore portainer.DataStore, signatureService portainer.DigitalSignatureService, tunnelService portainer.ReverseTunnelService, clientFactory *docker.ClientFactory) *ProxyFactory {
 	return &ProxyFactory{
+<<<<<<< HEAD
 		resourceControlService:      parameters.ResourceControlService,
 		userService:                 parameters.UserService,
 		teamService:                 parameters.TeamService,
@@ -74,6 +82,12 @@ func NewProxyFactory(parameters *ProxyFactoryParameters) *ProxyFactory {
 		dockerClientFactory:         parameters.DockerClientFactory,
 		kubernetesClientFactory:     parameters.KubernetesClientFactory,
 		kubernetesTokenCacheManager: parameters.KubernetesTokenCacheManager,
+=======
+		dataStore:            dataStore,
+		signatureService:     signatureService,
+		reverseTunnelService: tunnelService,
+		dockerClientFactory:  clientFactory,
+>>>>>>> origin/develop
 	}
 }
 

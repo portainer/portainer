@@ -36,7 +36,7 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	registry, err := handler.RegistryService.Registry(portainer.RegistryID(registryID))
+	registry, err := handler.DataStore.Registry().Registry(portainer.RegistryID(registryID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a registry with the specified identifier inside the database", err}
 	} else if err != nil {
@@ -48,12 +48,12 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if payload.URL != nil {
-		registries, err := handler.RegistryService.Registries()
+		registries, err := handler.DataStore.Registry().Registries()
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve registries from the database", err}
 		}
 		for _, r := range registries {
-			if r.URL == *payload.URL && r.ID != registry.ID {
+			if r.ID != registry.ID && hasSameURL(&r, registry) {
 				return &httperror.HandlerError{http.StatusConflict, "Another registry with the same URL already exists", portainer.ErrRegistryAlreadyExists}
 			}
 		}
@@ -88,10 +88,18 @@ func (handler *Handler) registryUpdate(w http.ResponseWriter, r *http.Request) *
 		registry.TeamAccessPolicies = payload.TeamAccessPolicies
 	}
 
-	err = handler.RegistryService.UpdateRegistry(registry.ID, registry)
+	err = handler.DataStore.Registry().UpdateRegistry(registry.ID, registry)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist registry changes inside the database", err}
 	}
 
 	return response.JSON(w, registry)
+}
+
+func hasSameURL(r1, r2 *portainer.Registry) bool {
+	if r1.Type != portainer.GitlabRegistry || r2.Type != portainer.GitlabRegistry {
+		return r1.URL == r2.URL
+	}
+
+	return r1.URL == r2.URL && r1.Gitlab.ProjectPath == r2.Gitlab.ProjectPath
 }

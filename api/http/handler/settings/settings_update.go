@@ -2,6 +2,7 @@ package settings
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
@@ -24,6 +25,8 @@ type settingsUpdatePayload struct {
 	SnapshotInterval                   *string
 	TemplatesURL                       *string
 	EdgeAgentCheckinInterval           *int
+	EnableEdgeComputeFeatures          *bool
+	UserSessionTimeout                 *string
 }
 
 func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
@@ -36,6 +39,13 @@ func (payload *settingsUpdatePayload) Validate(r *http.Request) error {
 	if payload.TemplatesURL != nil && *payload.TemplatesURL != "" && !govalidator.IsURL(*payload.TemplatesURL) {
 		return portainer.Error("Invalid external templates URL. Must correspond to a valid URL format")
 	}
+	if payload.UserSessionTimeout != nil {
+		_, err := time.ParseDuration(*payload.UserSessionTimeout)
+		if err != nil {
+			return portainer.Error("Invalid user session timeout")
+		}
+	}
+
 	return nil
 }
 
@@ -47,7 +57,7 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	settings, err := handler.SettingsService.Settings()
+	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve the settings from the database", err}
 	}
@@ -69,11 +79,16 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 	}
 
 	if payload.LDAPSettings != nil {
+		ldapReaderDN := settings.LDAPSettings.ReaderDN
 		ldapPassword := settings.LDAPSettings.Password
+		if payload.LDAPSettings.ReaderDN != "" {
+			ldapReaderDN = payload.LDAPSettings.ReaderDN
+		}
 		if payload.LDAPSettings.Password != "" {
 			ldapPassword = payload.LDAPSettings.Password
 		}
 		settings.LDAPSettings = *payload.LDAPSettings
+		settings.LDAPSettings.ReaderDN = ldapReaderDN
 		settings.LDAPSettings.Password = ldapPassword
 	}
 
@@ -104,6 +119,10 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		settings.EnableHostManagementFeatures = *payload.EnableHostManagementFeatures
 	}
 
+	if payload.EnableEdgeComputeFeatures != nil {
+		settings.EnableEdgeComputeFeatures = *payload.EnableEdgeComputeFeatures
+	}
+
 	if payload.SnapshotInterval != nil && *payload.SnapshotInterval != settings.SnapshotInterval {
 		err := handler.updateSnapshotInterval(settings, *payload.SnapshotInterval)
 		if err != nil {
@@ -115,12 +134,20 @@ func (handler *Handler) settingsUpdate(w http.ResponseWriter, r *http.Request) *
 		settings.EdgeAgentCheckinInterval = *payload.EdgeAgentCheckinInterval
 	}
 
+	if payload.UserSessionTimeout != nil {
+		settings.UserSessionTimeout = *payload.UserSessionTimeout
+
+		userSessionDuration, _ := time.ParseDuration(*payload.UserSessionTimeout)
+
+		handler.JWTService.SetUserSessionDuration(userSessionDuration)
+	}
+
 	tlsError := handler.updateTLS(settings)
 	if tlsError != nil {
 		return tlsError
 	}
 
-	err = handler.SettingsService.UpdateSettings(settings)
+	err = handler.DataStore.Settings().UpdateSettings(settings)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist settings changes inside the database", err}
 	}
@@ -141,7 +168,7 @@ func (handler *Handler) updateVolumeBrowserSetting(settings *portainer.Settings)
 		return err
 	}
 
-	extension, err := handler.ExtensionService.Extension(portainer.RBACExtension)
+	extension, err := handler.DataStore.Extension().Extension(portainer.RBACExtension)
 	if err != nil && err != portainer.ErrObjectNotFound {
 		return err
 	}
@@ -159,7 +186,7 @@ func (handler *Handler) updateVolumeBrowserSetting(settings *portainer.Settings)
 func (handler *Handler) updateSnapshotInterval(settings *portainer.Settings, snapshotInterval string) error {
 	settings.SnapshotInterval = snapshotInterval
 
-	schedules, err := handler.ScheduleService.SchedulesByJobType(portainer.SnapshotJobType)
+	schedules, err := handler.DataStore.Schedule().SchedulesByJobType(portainer.SnapshotJobType)
 	if err != nil {
 		return err
 	}
@@ -173,7 +200,7 @@ func (handler *Handler) updateSnapshotInterval(settings *portainer.Settings, sna
 			return err
 		}
 
-		err = handler.ScheduleService.UpdateSchedule(snapshotSchedule.ID, &snapshotSchedule)
+		err = handler.DataStore.Schedule().UpdateSchedule(snapshotSchedule.ID, &snapshotSchedule)
 		if err != nil {
 			return err
 		}

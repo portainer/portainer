@@ -30,6 +30,7 @@
                   placeholder="e.g. node.role"
                   ng-change="updatePlacementConstraint(service, constraint)"
                   ng-disabled="isUpdating"
+                  disable-authorization="DockerServiceUpdate"
                 />
               </div>
             </td>
@@ -41,6 +42,7 @@
                   ng-model="constraint.operator"
                   ng-change="updatePlacementConstraint(service, constraint)"
                   ng-disabled="isUpdating"
+                  disable-authorization="DockerServiceUpdate"
                 >
                   <option value="==">==</option>
                   <option value="!=">!=</option>
@@ -56,6 +58,7 @@
                   placeholder="e.g. manager"
                   ng-change="updatePlacementConstraint(service, constraint)"
                   ng-disabled="isUpdating"
+                  disable-authorization="DockerServiceUpdate"
                 />
                 <span class="input-group-btn" authorization="DockerServiceUpdate">
                   <button class="btn btn-sm btn-danger" type="button" ng-click="removePlacementConstraint(service, $index)" ng-disabled="isUpdating">

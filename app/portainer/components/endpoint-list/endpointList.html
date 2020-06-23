@@ -31,6 +31,7 @@
           on-select="($ctrl.dashboardAction)"
           on-edit="($ctrl.editAction)"
           is-admin="$ctrl.isAdmin"
+          tags="$ctrl.tags"
         ></endpoint-item>
         <endpoint-item
           ng-if="!$ctrl.hasBackendPagination()"
@@ -39,6 +40,7 @@
           on-select="($ctrl.dashboardAction)"
           on-edit="($ctrl.editAction)"
           is-admin="$ctrl.isAdmin"
+          tags="$ctrl.tags"
         ></endpoint-item>
         <div ng-if="$ctrl.state.loading" class="text-center text-muted">
           Loading...

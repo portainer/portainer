@@ -31,7 +31,7 @@
           </div>
           <!-- !driver-input -->
           <!-- driver-options -->
-          <div class="form-group">
+          <div class="form-group" ng-hide="formValues.CIFSData.useCIFS || formValues.NFSData.useNFS">
             <div class="col-sm-12" style="margin-top: 5px;">
               <label class="control-label text-left">
                 Driver options
@@ -64,8 +64,31 @@
           </div>
           <!-- !driver-options -->
           <!-- nfs-management -->
+          <div class="form-group col-md-12">
+            <label for="useNFS" class="control-label text-left">
+              Use NFS volume
+            </label>
+            <label class="switch" style="margin-left: 20px;">
+              <input type="checkbox" name="useNFS" ng-model="formValues.NFSData.useNFS" ng-click="formValues.CIFSData.useCIFS = false" />
+              <i></i>
+            </label>
+            <div ng-if="formValues.NFSData.useNFS" class="small text-muted" style="margin-top: 10px;"> Ensure <code>nfs-utils</code> are installed on your hosts. </div>
+          </div>
           <volumes-nfs-form data="formValues.NFSData" ng-show="formValues.Driver === 'local'"></volumes-nfs-form>
           <!-- !nfs-management -->
+          <!-- cifs-management -->
+          <div class="form-group col-md-12">
+            <label for="useCIFS" class="control-label text-left">
+              Use CIFS volume
+            </label>
+            <label class="switch" style="margin-left: 20px;">
+              <input type="checkbox" name="useCIFS" ng-model="formValues.CIFSData.useCIFS" ng-click="formValues.NFSData.useNFS = false" />
+              <i></i>
+            </label>
+            <div ng-if="formValues.CIFSData.useCIFS" class="small text-muted" style="margin-top: 10px;"> Ensure <code>cifs-utils</code> are installed on your hosts. </div>
+          </div>
+          <volumes-cifs-form data="formValues.CIFSData" ng-show="formValues.Driver === 'local'"></volumes-cifs-form>
+          <!-- !cifs-management -->
           <!-- storidge -->
           <div ng-if="formValues.Driver === 'cio:latest'">
             <div class="col-sm-12 form-section-title">
@@ -83,7 +106,7 @@
             <!-- !node-selection -->
           </div>
           <!-- access-control -->
-          <por-access-control-form form-data="formValues.AccessControlData" ng-if="applicationState.application.authentication"></por-access-control-form>
+          <por-access-control-form form-data="formValues.AccessControlData"></por-access-control-form>
           <!-- !access-control -->
           <!-- actions -->
           <div class="col-sm-12 form-section-title">
@@ -95,7 +118,7 @@
                 type="button"
                 class="btn btn-primary btn-sm"
                 ng-click="create()"
-                ng-disabled="state.actionInProgress || (formValues.NFSData.useNFS && !volumeCreationForm.$valid)"
+                ng-disabled="state.actionInProgress || (formValues.NFSData.useNFS && !volumeCreationForm.nfsInformationForm.$valid) || (formValues.CIFSData.useCIFS && !volumeCreationForm.cifsInformationForm.$valid)"
                 button-spinner="state.actionInProgress"
               >
                 <span ng-hide="state.actionInProgress">Create the volume</span>

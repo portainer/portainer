@@ -5,14 +5,13 @@ angular.module('portainer.app').factory('StackService', [
   '$q',
   '$async',
   'Stack',
-  'ResourceControlService',
   'FileUploadService',
   'StackHelper',
   'ServiceService',
   'ContainerService',
   'SwarmService',
   'EndpointProvider',
-  function StackServiceFactory($q, $async, Stack, ResourceControlService, FileUploadService, StackHelper, ServiceService, ContainerService, SwarmService, EndpointProvider) {
+  function StackServiceFactory($q, $async, Stack, FileUploadService, StackHelper, ServiceService, ContainerService, SwarmService, EndpointProvider) {
     'use strict';
     var service = {};
 
@@ -253,7 +252,6 @@ angular.module('portainer.app').factory('StackService', [
 
       return deferred.promise;
     };
-
     service.createComposeStackFromFileContent = function (name, stackFileContent, env, endpointId) {
       var payload = {
         Name: name,

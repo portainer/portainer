@@ -1,6 +1,7 @@
 package users
 
 import (
+	"errors"
 	"net/http"
 
 	httperror "github.com/portainer/libhttp/error"
@@ -17,6 +18,10 @@ func (handler *Handler) userDelete(w http.ResponseWriter, r *http.Request) *http
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid user identifier route variable", err}
 	}
 
+	if userID == 1 {
+		return &httperror.HandlerError{http.StatusForbidden, "Cannot remove the initial admin account", errors.New("Cannot remove the initial admin account")}
+	}
+
 	tokenData, err := security.RetrieveTokenData(r)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user authentication token", err}
@@ -26,7 +31,7 @@ func (handler *Handler) userDelete(w http.ResponseWriter, r *http.Request) *http
 		return &httperror.HandlerError{http.StatusForbidden, "Cannot remove your own user account. Contact another administrator", portainer.ErrAdminCannotRemoveSelf}
 	}
 
-	user, err := handler.UserService.User(portainer.UserID(userID))
+	user, err := handler.DataStore.User().User(portainer.UserID(userID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a user with the specified identifier inside the database", err}
 	} else if err != nil {
@@ -45,7 +50,7 @@ func (handler *Handler) deleteAdminUser(w http.ResponseWriter, user *portainer.U
 		return handler.deleteUser(w, user)
 	}
 
-	users, err := handler.UserService.Users()
+	users, err := handler.DataStore.User().Users()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve users from the database", err}
 	}
@@ -65,12 +70,12 @@ func (handler *Handler) deleteAdminUser(w http.ResponseWriter, user *portainer.U
 }
 
 func (handler *Handler) deleteUser(w http.ResponseWriter, user *portainer.User) *httperror.HandlerError {
-	err := handler.UserService.DeleteUser(user.ID)
+	err := handler.DataStore.User().DeleteUser(user.ID)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove user from the database", err}
 	}
 
-	err = handler.TeamMembershipService.DeleteTeamMembershipByUserID(user.ID)
+	err = handler.DataStore.TeamMembership().DeleteTeamMembershipByUserID(user.ID)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to remove user memberships from the database", err}
 	}

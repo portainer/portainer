@@ -12,17 +12,10 @@ import (
 	"github.com/portainer/portainer/api/http/security"
 )
 
-const (
-	// ErrInvalidCredentials is an error raised when credentials for a user are invalid
-	ErrInvalidCredentials = portainer.Error("Invalid credentials")
-	// ErrAuthDisabled is an error raised when trying to access the authentication endpoints
-	// when the server has been started with the --no-auth flag
-	ErrAuthDisabled = portainer.Error("Authentication is disabled")
-)
-
 // Handler is the HTTP handler used to handle authentication operations.
 type Handler struct {
 	*mux.Router
+<<<<<<< HEAD
 	authDisabled                bool
 	UserService                 portainer.UserService
 	CryptoService               portainer.CryptoService
@@ -38,13 +31,20 @@ type Handler struct {
 	ProxyManager                *proxy.Manager
 	AuthorizationService        *portainer.AuthorizationService
 	KubernetesTokenCacheManager *kubernetes.TokenCacheManager
+=======
+	DataStore            portainer.DataStore
+	CryptoService        portainer.CryptoService
+	JWTService           portainer.JWTService
+	LDAPService          portainer.LDAPService
+	ProxyManager         *proxy.Manager
+	AuthorizationService *portainer.AuthorizationService
+>>>>>>> origin/develop
 }
 
 // NewHandler creates a handler to manage authentication operations.
-func NewHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimiter, authDisabled bool) *Handler {
+func NewHandler(bouncer *security.RequestBouncer, rateLimiter *security.RateLimiter) *Handler {
 	h := &Handler{
-		Router:       mux.NewRouter(),
-		authDisabled: authDisabled,
+		Router: mux.NewRouter(),
 	}
 
 	h.Handle("/auth/oauth/validate",

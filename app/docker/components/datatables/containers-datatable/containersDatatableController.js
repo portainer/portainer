@@ -132,7 +132,6 @@ angular.module('portainer.docker').controller('ContainersDatatableController', [
         }
       }
       this.filters.state.enabled = filtered;
-      DatatableService.setDataTableFilters(this.tableKey, this.filters);
     };
 
     this.onSettingsContainerNameTruncateChange = function () {

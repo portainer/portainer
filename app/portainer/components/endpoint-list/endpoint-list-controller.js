@@ -31,12 +31,12 @@ angular.module('portainer.app').controller('EndpointListController', [
       if (this.hasBackendPagination()) {
         this.paginationChangedAction();
       } else {
-        this.state.filteredEndpoints = frontEndpointFilter(this.endpoints, filterValue);
+        this.state.filteredEndpoints = frontEndpointFilter(this.endpoints, this.tags, filterValue);
         this.state.loading = false;
       }
     };
 
-    function frontEndpointFilter(endpoints, filterValue) {
+    function frontEndpointFilter(endpoints, tags, filterValue) {
       if (!endpoints || !endpoints.length || !filterValue) {
         return endpoints;
       }
@@ -49,8 +49,12 @@ angular.module('portainer.app').controller('EndpointListController', [
             _.includes(endpoint.Name.toLowerCase(), lowerCaseKeyword) ||
             _.includes(endpoint.GroupName.toLowerCase(), lowerCaseKeyword) ||
             _.includes(endpoint.URL.toLowerCase(), lowerCaseKeyword) ||
-            _.some(endpoint.Tags, function (tag) {
-              return _.includes(tag.toLowerCase(), lowerCaseKeyword);
+            _.some(endpoint.TagIds, (tagId) => {
+              const tag = tags.find((t) => t.Id === tagId);
+              if (!tag) {
+                return false;
+              }
+              return _.includes(tag.Name.toLowerCase(), lowerCaseKeyword);
             }) ||
             _.includes(statusString, keyword)
           );

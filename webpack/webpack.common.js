@@ -7,7 +7,6 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 const pkg = require('../package.json');
-const npmPackage = require('../package.json');
 const projectRoot = path.resolve(__dirname, '..');
 
 module.exports = {
@@ -60,8 +59,8 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './app/index.html',
       templateParameters: {
-        name: npmPackage.name,
-        author: npmPackage.author,
+        name: pkg.name,
+        author: pkg.author,
       },
       manifest: './assets/ico/manifest.json',
     }),
@@ -118,6 +117,7 @@ module.exports = {
       Kubernetes: path.resolve(projectRoot, 'app/kubernetes'),
       Extensions: path.resolve(projectRoot, 'app/extensions'),
       Portainer: path.resolve(projectRoot, 'app/portainer'),
+      '@': path.resolve(projectRoot, 'app'),
     },
   },
 };

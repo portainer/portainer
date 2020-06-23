@@ -13,7 +13,7 @@ import (
 type endpointGroupUpdatePayload struct {
 	Name               string
 	Description        string
-	Tags               []string
+	TagIDs             []portainer.TagID
 	UserAccessPolicies portainer.UserAccessPolicies
 	TeamAccessPolicies portainer.TeamAccessPolicies
 }
@@ -35,7 +35,7 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid request payload", err}
 	}
 
-	endpointGroup, err := handler.EndpointGroupService.EndpointGroup(portainer.EndpointGroupID(endpointGroupID))
+	endpointGroup, err := handler.DataStore.EndpointGroup().EndpointGroup(portainer.EndpointGroupID(endpointGroupID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint group with the specified identifier inside the database", err}
 	} else if err != nil {
@@ -50,8 +50,44 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 		endpointGroup.Description = payload.Description
 	}
 
-	if payload.Tags != nil {
-		endpointGroup.Tags = payload.Tags
+	tagsChanged := false
+	if payload.TagIDs != nil {
+		payloadTagSet := portainer.TagSet(payload.TagIDs)
+		endpointGroupTagSet := portainer.TagSet((endpointGroup.TagIDs))
+		union := portainer.TagUnion(payloadTagSet, endpointGroupTagSet)
+		intersection := portainer.TagIntersection(payloadTagSet, endpointGroupTagSet)
+		tagsChanged = len(union) > len(intersection)
+
+		if tagsChanged {
+			removeTags := portainer.TagDifference(endpointGroupTagSet, payloadTagSet)
+
+			for tagID := range removeTags {
+				tag, err := handler.DataStore.Tag().Tag(tagID)
+				if err != nil {
+					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a tag inside the database", err}
+				}
+				delete(tag.EndpointGroups, endpointGroup.ID)
+				err = handler.DataStore.Tag().UpdateTag(tag.ID, tag)
+				if err != nil {
+					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist tag changes inside the database", err}
+				}
+			}
+
+			endpointGroup.TagIDs = payload.TagIDs
+			for _, tagID := range payload.TagIDs {
+				tag, err := handler.DataStore.Tag().Tag(tagID)
+				if err != nil {
+					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a tag inside the database", err}
+				}
+
+				tag.EndpointGroups[endpointGroup.ID] = true
+
+				err = handler.DataStore.Tag().UpdateTag(tag.ID, tag)
+				if err != nil {
+					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist tag changes inside the database", err}
+				}
+			}
+		}
 	}
 
 	updateAuthorizations := false
@@ -65,7 +101,7 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 		updateAuthorizations = true
 	}
 
-	err = handler.EndpointGroupService.UpdateEndpointGroup(endpointGroup.ID, endpointGroup)
+	err = handler.DataStore.EndpointGroup().UpdateEndpointGroup(endpointGroup.ID, endpointGroup)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint group changes inside the database", err}
 	}
@@ -74,6 +110,23 @@ func (handler *Handler) endpointGroupUpdate(w http.ResponseWriter, r *http.Reque
 		err = handler.AuthorizationService.UpdateUsersAuthorizations()
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to update user authorizations", err}
+		}
+	}
+
+	if tagsChanged {
+		endpoints, err := handler.DataStore.Endpoint().Endpoints()
+		if err != nil {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve endpoints from the database", err}
+
+		}
+
+		for _, endpoint := range endpoints {
+			if endpoint.GroupID == endpointGroup.ID {
+				err = handler.updateEndpointRelations(&endpoint, endpointGroup)
+				if err != nil {
+					return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint relations changes inside the database", err}
+				}
+			}
 		}
 	}
 

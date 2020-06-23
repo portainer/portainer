@@ -1,0 +1,14 @@
+<rd-header>
+  <rd-header-title title-text="Edge Groups">
+    <a data-toggle="tooltip" title="Refresh" ui-sref="edge.groups" ui-sref-opts="{reload: true}">
+      <i class="fa fa-sync" aria-hidden="true"></i>
+    </a>
+  </rd-header-title>
+  <rd-header-content>Edge Groups</rd-header-content>
+</rd-header>
+
+<div class="row">
+  <div class="col-sm-12">
+    <edge-groups-datatable title-icon="fa-object-group" table-key="EdgeGroups" order-by="Name" dataset="$ctrl.items" remove-action="$ctrl.removeAction"></edge-groups-datatable>
+  </div>
+</div>

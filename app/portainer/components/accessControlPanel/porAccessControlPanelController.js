@@ -115,14 +115,14 @@ angular.module('portainer.app').controller('porAccessControlPanelController', [
           });
         })
         .then(function success(data) {
-          ctrl.availableUsers = data.availableUsers;
+          ctrl.availableUsers = _.orderBy(data.availableUsers, 'Username', 'asc');
           angular.forEach(ctrl.availableUsers, function (user) {
             var found = _.find(ctrl.authorizedUsers, { Id: user.Id });
             if (found) {
               user.selected = true;
             }
           });
-          ctrl.availableTeams = data.availableTeams;
+          ctrl.availableTeams = _.orderBy(data.availableTeams, 'Name', 'asc');
           angular.forEach(data.availableTeams, function (team) {
             var found = _.find(ctrl.authorizedTeams, { Id: team.Id });
             if (found) {

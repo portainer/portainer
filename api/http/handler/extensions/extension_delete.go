@@ -17,7 +17,7 @@ func (handler *Handler) extensionDelete(w http.ResponseWriter, r *http.Request) 
 	}
 	extensionID := portainer.ExtensionID(extensionIdentifier)
 
-	extension, err := handler.ExtensionService.Extension(extensionID)
+	extension, err := handler.DataStore.Extension().Extension(extensionID)
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a extension with the specified identifier inside the database", err}
 	} else if err != nil {
@@ -36,7 +36,7 @@ func (handler *Handler) extensionDelete(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 
-	err = handler.ExtensionService.DeleteExtension(extensionID)
+	err = handler.DataStore.Extension().DeleteExtension(extensionID)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to delete the extension from the database", err}
 	}

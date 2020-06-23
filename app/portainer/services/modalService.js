@@ -144,6 +144,7 @@ angular.module('portainer.app').factory('ModalService', [
     };
 
     service.confirmContainerDeletion = function (title, callback) {
+      title = $sanitize(title);
       prompt({
         title: title,
         inputType: 'checkbox',
@@ -217,6 +218,7 @@ angular.module('portainer.app').factory('ModalService', [
     };
 
     service.confirmServiceForceUpdate = function (message, callback) {
+      message = $sanitize(message);
       customPrompt(
         {
           title: 'Are you sure ?',

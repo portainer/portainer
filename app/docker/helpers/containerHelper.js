@@ -89,6 +89,11 @@ angular.module('portainer.docker').factory('ContainerHelper', [
         EndpointsConfig: {},
       };
       config.NetworkingConfig.EndpointsConfig = container.NetworkSettings.Networks;
+
+      if (config.ExposedPorts === undefined) {
+        config.ExposedPorts = {};
+      }
+
       if (mode.indexOf('container:') !== -1) {
         delete config.Hostname;
         delete config.ExposedPorts;
@@ -135,10 +140,21 @@ angular.module('portainer.docker').factory('ContainerHelper', [
         let startHostPort = 0;
         let endHostPort = 0;
         if (hostPort) {
-          if (hostPort.indexOf(':') > -1) {
-            const hostAndPort = _.split(hostPort, ':');
-            hostIp = hostAndPort[0];
+          if (hostPort.indexOf('[') > -1) {
+            const hostAndPort = _.split(hostPort, ']:');
+
+            if (hostAndPort.length < 2) {
+              throw new Error('Invalid port specification: ' + portBinding.containerPort);
+            }
+
+            hostIp = hostAndPort[0].replace('[', '');
             hostPort = hostAndPort[1];
+          } else {
+            if (hostPort.indexOf(':') > -1) {
+              const hostAndPort = _.split(hostPort, ':');
+              hostIp = hostAndPort[0];
+              hostPort = hostAndPort[1];
+            }
           }
 
           const hostPortRange = parsePortRange(hostPort);

@@ -5,5 +5,6 @@ angular.module('portainer.app').component('multiEndpointSelector', {
     model: '=',
     endpoints: '<',
     groups: '<',
+    tags: '<',
   },
 });

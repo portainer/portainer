@@ -3,6 +3,7 @@ package users
 import (
 	"net/http"
 
+	"github.com/asaskevich/govalidator"
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
@@ -11,11 +12,16 @@ import (
 )
 
 type userUpdatePayload struct {
+	Username string
 	Password string
 	Role     int
 }
 
 func (payload *userUpdatePayload) Validate(r *http.Request) error {
+	if govalidator.Contains(payload.Username, " ") {
+		return portainer.Error("Invalid username. Must not contain any whitespace")
+	}
+
 	if payload.Role != 0 && payload.Role != 1 && payload.Role != 2 {
 		return portainer.Error("Invalid role value. Value must be one of: 1 (administrator) or 2 (regular user)")
 	}
@@ -48,11 +54,23 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update user to administrator role", portainer.ErrResourceAccessDenied}
 	}
 
-	user, err := handler.UserService.User(portainer.UserID(userID))
+	user, err := handler.DataStore.User().User(portainer.UserID(userID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find a user with the specified identifier inside the database", err}
 	} else if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to find a user with the specified identifier inside the database", err}
+	}
+
+	if payload.Username != "" && payload.Username != user.Username {
+		sameNameUser, err := handler.DataStore.User().UserByUsername(payload.Username)
+		if err != nil && err != portainer.ErrObjectNotFound {
+			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve users from the database", err}
+		}
+		if sameNameUser != nil && sameNameUser.ID != portainer.UserID(userID) {
+			return &httperror.HandlerError{http.StatusConflict, "Another user with the same username already exists", portainer.ErrUserAlreadyExists}
+		}
+
+		user.Username = payload.Username
 	}
 
 	if payload.Password != "" {
@@ -66,7 +84,7 @@ func (handler *Handler) userUpdate(w http.ResponseWriter, r *http.Request) *http
 		user.Role = portainer.UserRole(payload.Role)
 	}
 
-	err = handler.UserService.UpdateUser(user.ID, user)
+	err = handler.DataStore.User().UpdateUser(user.ID, user)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist user changes inside the database", err}
 	}

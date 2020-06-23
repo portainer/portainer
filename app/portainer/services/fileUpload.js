@@ -85,6 +85,18 @@ angular.module('portainer.app').factory('FileUploadService', [
       });
     };
 
+    service.createEdgeStack = function createEdgeStack(stackName, file, edgeGroups) {
+      return Upload.upload({
+        url: 'api/edge_stacks?method=file',
+        data: {
+          file: file,
+          Name: stackName,
+          EdgeGroups: Upload.json(edgeGroups),
+        },
+        ignoreLoadingBar: true,
+      });
+    };
+
     service.configureRegistry = function (registryId, registryManagementConfigurationModel) {
       return Upload.upload({
         url: 'api/registries/' + registryId + '/configure',
@@ -103,7 +115,7 @@ angular.module('portainer.app').factory('FileUploadService', [
       });
     };
 
-    service.createEndpoint = function (name, type, URL, PublicURL, groupID, tags, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile) {
+    service.createEndpoint = function (name, type, URL, PublicURL, groupID, tagIds, TLS, TLSSkipVerify, TLSSkipClientVerify, TLSCAFile, TLSCertFile, TLSKeyFile, checkinInterval) {
       return Upload.upload({
         url: 'api/endpoints',
         data: {
@@ -112,26 +124,27 @@ angular.module('portainer.app').factory('FileUploadService', [
           URL: URL,
           PublicURL: PublicURL,
           GroupID: groupID,
-          Tags: Upload.json(tags),
+          TagIds: Upload.json(tagIds),
           TLS: TLS,
           TLSSkipVerify: TLSSkipVerify,
           TLSSkipClientVerify: TLSSkipClientVerify,
           TLSCACertFile: TLSCAFile,
           TLSCertFile: TLSCertFile,
           TLSKeyFile: TLSKeyFile,
+          CheckinInterval: checkinInterval,
         },
         ignoreLoadingBar: true,
       });
     };
 
-    service.createAzureEndpoint = function (name, applicationId, tenantId, authenticationKey, groupId, tags) {
+    service.createAzureEndpoint = function (name, applicationId, tenantId, authenticationKey, groupId, tagIds) {
       return Upload.upload({
         url: 'api/endpoints',
         data: {
           Name: name,
           EndpointType: 3,
           GroupID: groupId,
-          Tags: Upload.json(tags),
+          TagIds: Upload.json(tagIds),
           AzureApplicationID: applicationId,
           AzureTenantID: tenantId,
           AzureAuthenticationKey: authenticationKey,

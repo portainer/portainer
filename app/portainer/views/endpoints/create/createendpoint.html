@@ -21,7 +21,7 @@
                     <i class="fa fa-bolt" aria-hidden="true" style="margin-right: 2px;"></i>
                     Agent
                   </div>
-                  <p>Portainer agent for Kubernetes</p>
+                  <p>Portainer agent</p>
                 </label>
               </div>
               <div ng-click="setDefaultPortainerInstanceURL()">
@@ -31,9 +31,40 @@
                     <i class="fa fa-cloud" aria-hidden="true" style="margin-right: 2px;"></i>
                     Edge Agent
                   </div>
-                  <p>Portainer Edge agent for Kubernetes</p>
+                  <p>Portainer Edge agent</p>
                 </label>
               </div>
+              <div ng-click="resetEndpointURL()">
+                <input type="radio" id="docker_endpoint" ng-model="state.EnvironmentType" value="docker" />
+                <label for="docker_endpoint">
+                  <div class="boxselector_header">
+                    <i class="fab fa-docker" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Docker
+                  </div>
+                  <p>Directly connect to the Docker API</p>
+                </label>
+              </div>
+              <div>
+                <input type="radio" id="azure_endpoint" ng-model="state.EnvironmentType" value="azure" />
+                <label for="azure_endpoint">
+                  <div class="boxselector_header">
+                    <i class="fab fa-microsoft" aria-hidden="true" style="margin-right: 2px;"></i>
+                    Azure
+                  </div>
+                  <p>Connect to Microsoft Azure ACI</p>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div ng-if="state.EnvironmentType === 'docker'">
+            <div class="col-sm-12 form-section-title">
+              Important notice
+            </div>
+            <div class="form-group">
+              <span class="col-sm-12 text-muted small">
+                The Docker API must be exposed over TCP. You can find more information about how to expose the Docker API over TCP
+                <a href="https://docs.docker.com/engine/security/https/" target="_blank">in the Docker documentation</a>.
+              </span>
             </div>
           </div>
           <div ng-if="state.EnvironmentType === 'agent'">
@@ -42,12 +73,18 @@
             </div>
             <div class="form-group">
               <span class="col-sm-12 text-muted small">
-                Ensure that you have deployed the Portainer agent in your cluster first. You can use execute the following command to deploy it.
+                Ensure that you have deployed the Portainer agent in your cluster first. You can use execute the following command on any manager node to deploy it.
                 <div style="margin-top: 10px;">
                   <uib-tabset active="state.deploymentTab">
                     <uib-tab index="0" heading="Kubernetes">
                       <code style="display: block; white-space: pre-wrap;">
                         curl -L https://downloads.portainer.io/portainer-agent-k8s.yaml -o portainer-agent-k8s.yaml; kubectl apply -f portainer-agent-k8s.yaml
+                      </code>
+                    </uib-tab>
+
+                    <uib-tab index="0" heading="Docker">
+                      <code>
+                        curl -L https://downloads.portainer.io/agent-stack.yml -o agent-stack.yml && docker stack deploy --compose-file=agent-stack.yml portainer-agent
                       </code>
                     </uib-tab>
                   </uib-tabset>
@@ -105,7 +142,15 @@
           <div class="form-group">
             <label for="container_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
             <div class="col-sm-9 col-lg-10">
-              <input type="text" class="form-control" name="container_name" ng-model="formValues.Name" placeholder="e.g. kubernetes-cluster01" required auto-focus />
+              <input
+                type="text"
+                class="form-control"
+                name="container_name"
+                ng-model="formValues.Name"
+                placeholder="e.g. docker-prod01 / kubernetes-cluster01"
+                required
+                auto-focus
+              />
             </div>
           </div>
           <div class="form-group" ng-show="endpointCreationForm.container_name.$invalid">
@@ -121,6 +166,11 @@
             <div class="form-group">
               <label for="endpoint_url" class="col-sm-3 col-lg-2 control-label text-left">
                 Endpoint URL
+                <portainer-tooltip
+                  position="bottom"
+                  message="URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it."
+                >
+                </portainer-tooltip>
               </label>
               <div class="col-sm-9 col-lg-10">
                 <input
@@ -138,7 +188,7 @@
                   class="form-control"
                   name="endpoint_url"
                   ng-model="formValues.URL"
-                  placeholder="e.g. 10.0.0.10:9001"
+                  placeholder="e.g. 10.0.0.10:9001 or tasks.portainer_agent:9001"
                   required
                 />
               </div>
@@ -170,8 +220,43 @@
                 </div>
               </div>
             </div>
+            <!-- !portainer-instance-input -->
+            <div class="form-group">
+              <label for="edge_checkin" class="col-sm-2 control-label text-left">
+                Poll frequency
+                <portainer-tooltip
+                  position="bottom"
+                  message="Interval used by this Edge agent to check in with the Portainer instance. Affects Edge endpoint management and Edge compute features."
+                >
+                </portainer-tooltip>
+              </label>
+              <div class="col-sm-10">
+                <select
+                  id="edge_checkin"
+                  class="form-control"
+                  ng-model="formValues.CheckinInterval"
+                  ng-options="+(opt.value) as opt.key for opt in state.availableEdgeAgentCheckinOptions"
+                ></select>
+              </div>
+            </div>
           </div>
-          <!-- !portainer-instance-input -->
+          <!-- endpoint-public-url-input -->
+          <div ng-if="state.EnvironmentType === 'docker' || state.EnvironmentType === 'agent'">
+            <div class="form-group">
+              <label for="endpoint_public_url" class="col-sm-3 col-lg-2 control-label text-left">
+                Public IP
+                <portainer-tooltip
+                  position="bottom"
+                  message="URL or IP address where exposed containers will be reachable. This field is optional and will default to the endpoint URL."
+                >
+                </portainer-tooltip>
+              </label>
+              <div class="col-sm-9 col-lg-10">
+                <input type="text" class="form-control" id="endpoint_public_url" ng-model="formValues.PublicURL" placeholder="e.g. 10.0.0.10 or mydocker.mydomain.com" />
+              </div>
+            </div>
+          </div>
+          <!-- !endpoint-public-url-input -->
           <!-- azure-details -->
           <div ng-if="state.EnvironmentType === 'azure'">
             <!-- applicationId-input -->
@@ -260,7 +345,8 @@
           <!-- !group -->
           <!-- tags -->
           <div class="form-group">
-            <tag-selector tags="availableTags" model="formValues.Tags"></tag-selector>
+            <tag-selector ng-if="formValues && availableTags" tags="availableTags" model="formValues.TagIds" allow-create="state.allowCreateTag" on-create="(onCreateTag)">
+            </tag-selector>
           </div>
           <!-- !tags -->
           <div class="col-sm-12 form-section-title">

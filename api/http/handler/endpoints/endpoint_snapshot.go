@@ -16,7 +16,7 @@ func (handler *Handler) endpointSnapshot(w http.ResponseWriter, r *http.Request)
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid endpoint identifier route variable", err}
 	}
 
-	endpoint, err := handler.EndpointService.Endpoint(portainer.EndpointID(endpointID))
+	endpoint, err := handler.DataStore.Endpoint().Endpoint(portainer.EndpointID(endpointID))
 	if err == portainer.ErrObjectNotFound {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	} else if err != nil {
@@ -29,7 +29,7 @@ func (handler *Handler) endpointSnapshot(w http.ResponseWriter, r *http.Request)
 
 	snapshotError := handler.SnapshotManager.SnapshotEndpoint(endpoint)
 
-	latestEndpointReference, err := handler.EndpointService.Endpoint(endpoint.ID)
+	latestEndpointReference, err := handler.DataStore.Endpoint().Endpoint(endpoint.ID)
 	if latestEndpointReference == nil {
 		return &httperror.HandlerError{http.StatusNotFound, "Unable to find an endpoint with the specified identifier inside the database", err}
 	}
@@ -42,7 +42,7 @@ func (handler *Handler) endpointSnapshot(w http.ResponseWriter, r *http.Request)
 	latestEndpointReference.Snapshots = endpoint.Snapshots
 	latestEndpointReference.Kubernetes.Snapshots = endpoint.Kubernetes.Snapshots
 
-	err = handler.EndpointService.UpdateEndpoint(latestEndpointReference.ID, latestEndpointReference)
+	err = handler.DataStore.Endpoint().UpdateEndpoint(latestEndpointReference.ID, latestEndpointReference)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist endpoint changes inside the database", err}
 	}

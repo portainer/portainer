@@ -5,7 +5,7 @@
       <!-- simple box logo -->
       <div class="row">
         <img ng-if="ctrl.logo" ng-src="{{ ctrl.logo }}" class="simple-box-logo" />
-        <img ng-if="!ctrl.logo" src="../../../../../assets/images/logo_alt.png" class="simple-box-logo" alt="Portainer" />
+        <img ng-if="!ctrl.logo" src="~@/assets/images/logo_alt.png" class="simple-box-logo" alt="Portainer" />
       </div>
       <!-- !simple box logo -->
       <!-- init-endpoint panel -->
@@ -25,8 +25,8 @@
             <!-- endpoint-type -->
             <div class="form-group" style="margin-bottom: 0;">
               <div class="boxselector_wrapper">
-                <div ng-repeat="type in ctrl.endpointTypes">
-                  <input type="radio" id="{{ type.Id }}" ng-model="ctrl.formValues.EndpointType" ng-value="type.Value" />
+                <div ng-repeat="type in ctrl.endpointSections">
+                  <input type="radio" id="{{ type.Id }}" ng-model="ctrl.formValues.ConnectionType" ng-value="type.Value" />
                   <label for="{{ type.Id }}">
                     <div class="boxselector_header">
                       <i ng-class="type.Classes" aria-hidden="true" style="margin-right: 2px;"></i>
@@ -38,133 +38,39 @@
               </div>
             </div>
             <!-- !endpoint-type  -->
-            <!-- local-endpoint -->
-            <div ng-if="ctrl.formValues.EndpointType === 'docker'">
-              <div class="col-sm-12 form-section-title">
-                Information
-              </div>
-              <div class="form-group">
-                <div class="col-sm-12">
-                  <span class="small">
-                    <p class="text-primary">
-                      Manage the Docker environment where Portainer is running.
-                    </p>
-                    <p class="text-muted">
-                      <i class="fa fa-exclamation-circle orange-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-                      Ensure that you have started the Portainer container with the following Docker flag:
-                    </p>
-                    <p class="text-muted"> <code>-v "/var/run/docker.sock:/var/run/docker.sock"</code> (Linux). </p>
-                    <p class="text-muted">
-                      or
-                    </p>
-                    <p class="text-muted"> <code>-v \\.\pipe\docker_engine:\\.\pipe\docker_engine</code> (Windows). </p>
-                  </span>
-                </div>
-              </div>
-              <!-- actions -->
-              <div class="form-group">
-                <div class="col-sm-12">
-                  <button
-                    type="submit"
-                    class="btn btn-primary btn-sm"
-                    ng-disabled="ctrl.state.actionInProgress"
-                    ng-click="ctrl.createLocalEndpoint()"
-                    button-spinner="ctrl.state.actionInProgress"
-                  >
-                    <span ng-hide="ctrl.state.actionInProgress"><i class="fa fa-bolt" aria-hidden="true"></i> Connect</span>
-                    <span ng-show="ctrl.state.actionInProgress">Connecting...</span>
-                  </button>
-                </div>
-              </div>
-              <!-- !actions -->
+            <!-- endpoint-type-details -->
+            <div ng-if="ctrl.formValues.ConnectionType === ctrl.PortainerEndpointConnectionTypes.DOCKER_LOCAL">
+              <ng-include src="'app/portainer/views/init/endpoint/includes/localDocker.html'"></ng-include>
             </div>
-            <!-- !local-endpoint -->
-            <!-- local-endpoint-kubernetes -->
-            <div ng-if="ctrl.formValues.EndpointType === 'kubernetes'">
-              <div class="col-sm-12 form-section-title">
-                Information
-              </div>
-              <div class="form-group">
-                <div class="col-sm-12">
-                  <span class="small">
-                    <p class="text-primary">
-                      Manage the Kubernetes environment where Portainer is running.
-                    </p>
-                  </span>
-                </div>
-              </div>
-              <!-- actions -->
-              <div class="form-group">
-                <div class="col-sm-12">
-                  <button
-                    type="submit"
-                    class="btn btn-primary btn-sm"
-                    ng-disabled="ctrl.state.actionInProgress"
-                    ng-click="ctrl.createLocalKubernetesEndpoint()"
-                    button-spinner="ctrl.state.actionInProgress"
-                  >
-                    <span ng-hide="ctrl.state.actionInProgress"><i class="fa fa-bolt" aria-hidden="true"></i> Connect</span>
-                    <span ng-show="ctrl.state.actionInProgress">Connecting...</span>
-                  </button>
-                </div>
-              </div>
-              <!-- !actions -->
+            <div ng-if="ctrl.formValues.ConnectionType === ctrl.PortainerEndpointConnectionTypes.KUBERNETES_LOCAL">
+              <ng-include src="'app/portainer/views/init/endpoint/includes/localKubernetes.html'"></ng-include>
             </div>
-            <!-- !local-endpoint-kubernetes -->
-            <!-- agent-endpoint -->
-            <div ng-if="ctrl.formValues.EndpointType === 'agent'">
-              <div class="col-sm-12 form-section-title">
-                Information
-              </div>
-              <div class="form-group">
-                <div class="col-sm-12">
-                  <span class="small">
-                    <p class="text-primary">
-                      Connect directly to a Portainer agent running inside a Docker or Kubernetes environment.
-                    </p>
-                  </span>
-                </div>
-              </div>
-              <div class="col-sm-12 form-section-title">
-                Environment
-              </div>
-              <!-- name-input -->
-              <div class="form-group">
-                <label for="endpoint_name" class="col-sm-4 col-lg-3 control-label text-left">Name</label>
-                <div class="col-sm-8 col-lg-9">
-                  <input type="text" class="form-control" id="endpoint_name" ng-model="ctrl.formValues.Name" placeholder="e.g. prod-cluster-01" />
-                </div>
-              </div>
-              <!-- !name-input -->
-              <!-- endpoint-url-input -->
-              <div class="form-group">
-                <label for="endpoint_url" class="col-sm-4 col-lg-3 control-label text-left">
-                  Agent URL
-                  <portainer-tooltip position="bottom" message="URL or IP address of a Portainer agent."> </portainer-tooltip>
-                </label>
-                <div class="col-sm-8 col-lg-9">
-                  <input type="text" class="form-control" id="endpoint_url" ng-model="ctrl.formValues.URL" placeholder="e.g. 10.0.0.10:9001" />
-                </div>
-              </div>
-              <!-- !endpoint-url-input -->
-              <!-- actions -->
-              <div class="form-group">
-                <div class="col-sm-12">
-                  <button
-                    type="submit"
-                    class="btn btn-primary btn-sm"
-                    ng-disabled="ctrl.state.actionInProgress || !ctrl.formValues.Name || !ctrl.formValues.URL"
-                    ng-click="ctrl.createAgentEndpoint()"
-                    button-spinner="ctrl.state.actionInProgress"
-                  >
-                    <span ng-hide="ctrl.state.actionInProgress"><i class="fa fa-bolt" aria-hidden="true"></i> Connect</span>
-                    <span ng-show="ctrl.state.actionInProgress">Connecting...</span>
-                  </button>
-                </div>
-              </div>
-              <!-- !actions -->
+            <div ng-if="ctrl.formValues.ConnectionType === ctrl.PortainerEndpointConnectionTypes.REMOTE">
+              <ng-include src="'app/portainer/views/init/endpoint/includes/remote.html'"></ng-include>
             </div>
-            <!-- !agent-endpoint -->
+            <div ng-if="ctrl.formValues.ConnectionType === ctrl.PortainerEndpointConnectionTypes.AZURE">
+              <ng-include src="'app/portainer/views/init/endpoint/includes/azure.html'"></ng-include>
+            </div>
+            <div ng-if="ctrl.formValues.ConnectionType === ctrl.PortainerEndpointConnectionTypes.AGENT">
+              <ng-include src="'app/portainer/views/init/endpoint/includes/agent.html'"></ng-include>
+            </div>
+            <!-- !endpoint-type-details -->
+            <!-- actions -->
+            <div class="form-group">
+              <div class="col-sm-12">
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-sm"
+                  ng-disabled="ctrl.isConnectButtonDisabled()"
+                  ng-click="ctrl.createEndpoint()"
+                  button-spinner="ctrl.state.actionInProgress"
+                >
+                  <span ng-hide="ctrl.state.actionInProgress"><i class="fa fa-bolt" aria-hidden="true"></i> Connect</span>
+                  <span ng-show="ctrl.state.actionInProgress">Connecting...</span>
+                </button>
+              </div>
+            </div>
+            <!-- !actions -->
           </form>
           <!-- !init-endpoint form -->
         </div>

@@ -1,5 +1,6 @@
 import { AccessControlFormData } from '../../../../portainer/components/accessControlForm/porAccessControlFormModel';
 import { VolumesNFSFormData } from '../../../components/volumesNFSForm/volumesNFSFormModel';
+import { VolumesCIFSFormData } from '../../../components/volumesCIFSForm/volumesCifsFormModel';
 
 angular.module('portainer.docker').controller('CreateVolumeController', [
   '$q',
@@ -19,6 +20,7 @@ angular.module('portainer.docker').controller('CreateVolumeController', [
       AccessControlData: new AccessControlFormData(),
       NodeName: null,
       NFSData: new VolumesNFSFormData(),
+      CIFSData: new VolumesCIFSFormData(),
     };
 
     $scope.state = {
@@ -48,6 +50,23 @@ angular.module('portainer.docker').controller('CreateVolumeController', [
       return true;
     }
 
+    function prepareCIFSConfiguration(driverOptions) {
+      const data = $scope.formValues.CIFSData;
+
+      driverOptions.push({ name: 'type', value: 'cifs' });
+
+      let share = data.share.replace('\\', '/');
+      if (share[0] !== '/') {
+        share = '/' + share;
+      }
+      const device = '//' + data.serverAddress + share;
+      driverOptions.push({ name: 'device', value: device });
+
+      const versionNumber = data.versionsNumber[data.versions.indexOf(data.version)];
+      const options = 'username=' + data.username + ',password=' + data.password + ',vers=' + versionNumber;
+      driverOptions.push({ name: 'o', value: options });
+    }
+
     function prepareNFSConfiguration(driverOptions) {
       var data = $scope.formValues.NFSData;
 
@@ -72,6 +91,10 @@ angular.module('portainer.docker').controller('CreateVolumeController', [
 
       if ($scope.formValues.NFSData.useNFS) {
         prepareNFSConfiguration(driverOptions);
+      }
+
+      if ($scope.formValues.CIFSData.useCIFS) {
+        prepareCIFSConfiguration(driverOptions);
       }
 
       var volumeConfiguration = VolumeService.createVolumeConfiguration(name, driver, driverOptions);
@@ -107,9 +130,8 @@ angular.module('portainer.docker').controller('CreateVolumeController', [
 
     function initView() {
       var apiVersion = $scope.applicationState.endpoint.apiVersion;
-      var endpointProvider = $scope.applicationState.endpoint.mode.provider;
 
-      PluginService.volumePlugins(apiVersion < 1.25 || endpointProvider === 'VMWARE_VIC')
+      PluginService.volumePlugins(apiVersion < 1.25)
         .then(function success(data) {
           $scope.availableVolumeDrivers = data;
         })

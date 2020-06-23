@@ -53,6 +53,7 @@ module.exports = function (grunt) {
       'clean:all',
       'copy:assets',
       'shell:build_binary:' + p + ':' + a,
+      'shell:download_docker_binary:' + p + ':' + a,
       'shell:download_kompose_binary:' + p + ':' + a,
       'shell:download_kubectl_binary:' + p + ':' + a,
       'webpack:prod',
@@ -66,6 +67,7 @@ module.exports = function (grunt) {
       'clean:all',
       'copy:assets',
       'shell:build_binary_azuredevops:' + p + ':' + a,
+      'shell:download_docker_binary:' + p + ':' + a,
       'shell:download_kompose_binary:' + p + ':' + a,
       'shell:download_kubectl_binary:' + p + ':' + a,
       'webpack:prod',
@@ -120,11 +122,6 @@ gruntfile_cfg.copy = {
     files: [
       {
         dest: '<%= root %>/',
-        src: 'templates.json',
-        cwd: '',
-      },
-      {
-        dest: '<%= root %>/',
         src: 'extensions.json',
         cwd: '',
       },
@@ -169,7 +166,7 @@ function shell_run_container() {
     'docker rm -f portainer',
     'docker run -d -p 8000:8000 -p 9000:9000 -v $(pwd)/dist:/app -v ' +
       portainer_data +
-      ':/data -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer portainer/base /app/portainer --no-analytics --template-file /app/templates.json',
+      ':/data -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer portainer/base /app/portainer --no-analytics',
   ].join(';');
 }
 

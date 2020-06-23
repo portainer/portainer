@@ -120,10 +120,10 @@ class AuthenticationController {
     }
   }
 
-  async checkForEndpointsAsync(noAuth) {
+  async checkForEndpointsAsync() {
     try {
       const endpoints = await this.EndpointService.endpoints(0, 1);
-      const isAdmin = noAuth || this.Authentication.isAdmin();
+      const isAdmin = this.Authentication.isAdmin();
 
       if (endpoints.value.length === 0 && isAdmin) {
         return this.$state.go('portainer.init.endpoint');
@@ -154,7 +154,7 @@ class AuthenticationController {
 
   async postLoginSteps() {
     await this.retrieveAndSaveEnabledExtensionsAsync();
-    await this.checkForEndpointsAsync(false);
+    await this.checkForEndpointsAsync();
     await this.checkForLatestVersionAsync();
   }
   /**
@@ -274,12 +274,7 @@ class AuthenticationController {
       }
       this.state.loginInProgress = false;
 
-      const authenticationEnabled = this.$scope.applicationState.application.authentication;
-      if (!authenticationEnabled) {
-        await this.checkForEndpointsAsync(true);
-      } else {
-        await this.authEnabledFlowAsync();
-      }
+      await this.authEnabledFlowAsync();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve public settings');
     }

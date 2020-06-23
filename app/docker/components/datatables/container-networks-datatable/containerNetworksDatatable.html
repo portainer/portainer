@@ -34,17 +34,29 @@
           <thead>
             <tr>
               <th>Network</th>
-              <th>IP Address</th>
+              <th>
+                IP Address
+                <a ng-click="$ctrl.expandAll()" ng-if="$ctrl.hasExpandableItems()">
+                  <i ng-class="{ 'fas fa-angle-down': $ctrl.state.expandAll, 'fas fa-angle-right': !$ctrl.state.expandAll }" aria-hidden="true"></i>
+                </a>
+              </th>
               <th>Gateway</th>
               <th>MAC Address</th>
-              <th>Actions</th>
+              <th authorization="DockerNetworkDisconnect">Actions</th>
             </tr>
           </thead>
           <tbody>
-            <tr dir-paginate="(key, value) in $ctrl.dataset | itemsPerPage: $ctrl.state.paginatedItemLimit" ng-class="{ active: item.Checked }">
-              <td
-                ><a ui-sref="docker.networks.network({ id: key, nodeName: $ctrl.nodeName })">{{ key }}</a></td
-              >
+            <tr
+              dir-paginate-start="(key, value) in $ctrl.dataset | itemsPerPage: $ctrl.state.paginatedItemLimit"
+              ng-class="{ active: item.Checked }"
+              ng-click="$ctrl.expandItem(value, !value.Expanded)"
+            >
+              <td>
+                <a ng-if="$ctrl.itemCanExpand(value)">
+                  <i ng-class="{ 'fas fa-angle-down': value.Expanded, 'fas fa-angle-right': !value.Expanded }" class="space-right" aria-hidden="true"></i>
+                </a>
+                <a ui-sref="docker.networks.network({ id: key, nodeName: $ctrl.nodeName })">{{ key }}</a>
+              </td>
               <td>{{ value.IPAddress || '-' }}</td>
               <td>{{ value.Gateway || '-' }}</td>
               <td>{{ value.MacAddress || '-' }}</td>
@@ -59,6 +71,15 @@
                   <span ng-hide="$ctrl.leaveNetworkActionInProgress"><i class="fa fa-trash-alt space-right" aria-hidden="true"></i> Leave network</span>
                   <span ng-show="$ctrl.leaveNetworkActionInProgress">Leaving network...</span>
                 </button>
+              </td>
+            </tr>
+            <tr dir-paginate-end ng-show="$ctrl.itemCanExpand(value) && value.Expanded" ng-style="{ background: value.Highlighted ? '#d5e8f3' : '#f5f5f5' }">
+              <td colspan="1"></td>
+              <td colspan="1">
+                {{ value.GlobalIPv6Address }}
+              </td>
+              <td colspan="3">
+                {{ value.IPv6Gateway || '-' }}
               </td>
             </tr>
             <tr ng-if="!$ctrl.dataset">

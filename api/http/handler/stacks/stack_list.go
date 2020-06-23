@@ -23,13 +23,13 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: filters", err}
 	}
 
-	stacks, err := handler.StackService.Stacks()
+	stacks, err := handler.DataStore.Stack().Stacks()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve stacks from the database", err}
 	}
 	stacks = filterStacks(stacks, &filters)
 
-	resourceControls, err := handler.ResourceControlService.ResourceControls()
+	resourceControls, err := handler.DataStore.ResourceControl().ResourceControls()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve resource controls from the database", err}
 	}
@@ -43,14 +43,14 @@ func (handler *Handler) stackList(w http.ResponseWriter, r *http.Request) *httpe
 
 	if !securityContext.IsAdmin {
 		rbacExtensionEnabled := true
-		_, err := handler.ExtensionService.Extension(portainer.RBACExtension)
+		_, err := handler.DataStore.Extension().Extension(portainer.RBACExtension)
 		if err == portainer.ErrObjectNotFound {
 			rbacExtensionEnabled = false
 		} else if err != nil && err != portainer.ErrObjectNotFound {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to check if RBAC extension is enabled", err}
 		}
 
-		user, err := handler.UserService.User(securityContext.UserID)
+		user, err := handler.DataStore.User().User(securityContext.UserID)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve user information from the database", err}
 		}

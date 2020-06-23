@@ -1,24 +1,26 @@
 import _ from 'lodash-es';
 import uuidv4 from 'uuid/v4';
+import { PortainerEndpointTypes } from 'Portainer/models/endpoint/models';
 import { EndpointSecurityFormData } from '../../../components/endpointSecurity/porEndpointSecurityModel';
 
-angular.module('portainer.app').controller('EndpointController', [
-  '$q',
-  '$scope',
-  '$state',
-  '$transition$',
-  '$filter',
-  'clipboard',
-  'EndpointService',
-  'GroupService',
-  'TagService',
-  'EndpointProvider',
-  'Notifications',
-  function ($q, $scope, $state, $transition$, $filter, clipboard, EndpointService, GroupService, TagService, EndpointProvider, Notifications) {
-    if (!$scope.applicationState.application.endpointManagement) {
-      $state.go('portainer.endpoints');
-    }
-
+angular
+  .module('portainer.app')
+  .controller('EndpointController', function EndpointController(
+    $async,
+    $q,
+    $scope,
+    $state,
+    $transition$,
+    $filter,
+    clipboard,
+    EndpointService,
+    GroupService,
+    TagService,
+    EndpointProvider,
+    Notifications,
+    Authentication,
+    SettingsService
+  ) {
     $scope.state = {
       uploadInProgress: false,
       actionInProgress: false,
@@ -27,6 +29,25 @@ angular.module('portainer.app').controller('EndpointController', [
       kubernetesEndpoint: false,
       agentEndpoint: false,
       edgeEndpoint: false,
+      allowCreate: Authentication.isAdmin(),
+      availableEdgeAgentCheckinOptions: [
+        { key: 'Use default interval', value: 0 },
+        {
+          key: '5 seconds',
+          value: 5,
+        },
+        {
+          key: '10 seconds',
+          value: 10,
+        },
+        {
+          key: '30 seconds',
+          value: 30,
+        },
+        { key: '5 minutes', value: 300 },
+        { key: '1 hour', value: 3600 },
+        { key: '1 day', value: 86400 },
+      ],
     };
 
     $scope.formValues = {
@@ -40,7 +61,7 @@ angular.module('portainer.app').controller('EndpointController', [
             $scope.randomEdgeID +
             ' -e EDGE_KEY=' +
             $scope.endpoint.EdgeKey +
-            ' -e CAP_HOST_MANAGEMENT=1 -p 8000:80 -v portainer_agent_data:/data --name portainer_edge_agent portainer/agent'
+            ' -e CAP_HOST_MANAGEMENT=1 -v portainer_agent_data:/data --name portainer_edge_agent portainer/agent'
         );
       } else if ($scope.state.deploymentTab === 1) {
         clipboard.copyText(
@@ -48,7 +69,7 @@ angular.module('portainer.app').controller('EndpointController', [
             $scope.randomEdgeID +
             ' -e EDGE_KEY=' +
             $scope.endpoint.EdgeKey +
-            " -e CAP_HOST_MANAGEMENT=1 --mode global --publish mode=host,published=8000,target=80 --constraint 'node.platform.os == linux' --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volume --mount type=bind,src=//,dst=/host --mount type=volume,src=portainer_agent_data,dst=/data portainer/agent"
+            " -e CAP_HOST_MANAGEMENT=1 --mode global --constraint 'node.platform.os == linux' --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volumes --mount type=bind,src=//,dst=/host --mount type=volume,src=portainer_agent_data,dst=/data portainer/agent"
         );
       } else {
         clipboard.copyText('curl https://downloads.portainer.io/portainer-edge-agent-setup.sh | bash -s -- ' + $scope.randomEdgeID + ' ' + $scope.endpoint.EdgeKey);
@@ -60,6 +81,20 @@ angular.module('portainer.app').controller('EndpointController', [
       clipboard.copyText($scope.endpoint.EdgeKey);
       $('#copyNotificationEdgeKey').show().fadeOut(2500);
     };
+
+    $scope.onCreateTag = function onCreateTag(tagName) {
+      return $async(onCreateTagAsync, tagName);
+    };
+
+    async function onCreateTagAsync(tagName) {
+      try {
+        const tag = await TagService.createTag(tagName);
+        $scope.availableTags = $scope.availableTags.concat(tag);
+        $scope.endpoint.TagIds = $scope.endpoint.TagIds.concat(tag.Id);
+      } catch (err) {
+        Notifications.error('Failue', err, 'Unable to create tag');
+      }
+    }
 
     $scope.updateEndpoint = function () {
       var endpoint = $scope.endpoint;
@@ -73,7 +108,8 @@ angular.module('portainer.app').controller('EndpointController', [
         Name: endpoint.Name,
         PublicURL: endpoint.PublicURL,
         GroupID: endpoint.GroupId,
-        Tags: endpoint.Tags,
+        TagIds: endpoint.TagIds,
+        EdgeCheckinInterval: endpoint.EdgeCheckinInterval,
         TLS: TLS,
         TLSSkipVerify: TLSSkipVerify,
         TLSSkipClientVerify: TLSSkipClientVerify,
@@ -85,7 +121,12 @@ angular.module('portainer.app').controller('EndpointController', [
         AzureAuthenticationKey: endpoint.AzureCredentials.AuthenticationKey,
       };
 
-      if ($scope.endpointType !== 'local' && endpoint.Type !== 3 && endpoint.Type !== 5 && endpoint.Type !== 6) {
+      if (
+        $scope.endpointType !== 'local' &&
+        endpoint.Type !== PortainerEndpointTypes.AzureEnvironment &&
+        endpoint.Type !== PortainerEndpointTypes.KubernetesLocalEnvironment &&
+        endpoint.Type !== PortainerEndpointTypes.AgentOnKubernetesEnvironment
+      ) {
         payload.URL = 'tcp://' + endpoint.URL;
       }
 
@@ -123,16 +164,25 @@ angular.module('portainer.app').controller('EndpointController', [
     }
 
     function configureState() {
-      if ($scope.endpoint.Type === 5 || $scope.endpoint.Type === 6 || $scope.endpoint.Type === 7) {
+      if (
+        $scope.endpoint.Type === PortainerEndpointTypes.KubernetesLocalEnvironment ||
+        $scope.endpoint.Type === PortainerEndpointTypes.AgentOnKubernetesEnvironment ||
+        $scope.endpoint.Type === PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment
+      ) {
         $scope.state.kubernetesEndpoint = true;
       }
-      if ($scope.endpoint.Type === 4 || $scope.endpoint.Type === 7) {
+      if ($scope.endpoint.Type === PortainerEndpointTypes.EdgeAgentOnDockerEnvironment || $scope.endpoint.Type === PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment) {
         $scope.state.edgeEndpoint = true;
       }
-      if ($scope.endpoint.Type === 3) {
+      if ($scope.endpoint.Type === PortainerEndpointTypes.AzureEnvironment) {
         $scope.state.azureEndpoint = true;
       }
-      if ($scope.endpoint.Type === 2 || $scope.endpoint.Type === 4 || $scope.endpoint.Type === 6 || $scope.endpoint.Type === 7) {
+      if (
+        $scope.endpoint.Type === PortainerEndpointTypes.AgentOnDockerEnvironment ||
+        $scope.endpoint.Type === PortainerEndpointTypes.EdgeAgentOnDockerEnvironment ||
+        $scope.endpoint.Type === PortainerEndpointTypes.AgentOnKubernetesEnvironment ||
+        $scope.endpoint.Type === PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment
+      ) {
         $scope.state.agentEndpoint = true;
       }
     }
@@ -141,7 +191,8 @@ angular.module('portainer.app').controller('EndpointController', [
       $q.all({
         endpoint: EndpointService.endpoint($transition$.params().id),
         groups: GroupService.groups(),
-        tags: TagService.tagNames(),
+        tags: TagService.tags(),
+        settings: SettingsService.settings(),
       })
         .then(function success(data) {
           var endpoint = data.endpoint;
@@ -151,9 +202,16 @@ angular.module('portainer.app').controller('EndpointController', [
             $scope.endpointType = 'remote';
           }
           endpoint.URL = $filter('stripprotocol')(endpoint.URL);
-          if (endpoint.Type === 7) {
+          if (endpoint.Type === PortainerEndpointTypes.EdgeAgentOnDockerEnvironment || endpoint.Type === PortainerEndpointTypes.EdgeAgentOnKubernetesEnvironment) {
             $scope.edgeKeyDetails = decodeEdgeKey(endpoint.EdgeKey);
             $scope.randomEdgeID = uuidv4();
+            $scope.dockerCommands = {
+              standalone: buildStandaloneCommand($scope.randomEdgeID, endpoint.EdgeKey),
+              swarm: buildSwarmCommand($scope.randomEdgeID, endpoint.EdgeKey),
+            };
+
+            const settings = data.settings;
+            $scope.state.availableEdgeAgentCheckinOptions[0].key += ` (${settings.EdgeAgentCheckinInterval} seconds)`;
           }
           $scope.endpoint = endpoint;
           $scope.groups = data.groups;
@@ -165,6 +223,41 @@ angular.module('portainer.app').controller('EndpointController', [
         });
     }
 
+    function buildStandaloneCommand(edgeId, edgeKey) {
+      return `docker run -d -v /var/run/docker.sock:/var/run/docker.sock \\
+  -v /var/lib/docker/volumes:/var/lib/docker/volumes \\
+  -v /:/host \\
+  --restart always \\
+  -e EDGE=1 \\
+  -e EDGE_ID=${edgeId} \\
+  -e EDGE_KEY=${edgeKey} \\
+  -e CAP_HOST_MANAGEMENT=1 \\
+  -v portainer_agent_data:/data \\
+  --name portainer_edge_agent \\
+  portainer/agent`;
+    }
+
+    function buildSwarmCommand(edgeId, edgeKey) {
+      return `docker network create \\
+  --driver overlay \\
+  portainer_agent_network;
+
+docker service create \\
+  --name portainer_edge_agent \\
+  --network portainer_agent_network \\
+  -e AGENT_CLUSTER_ADDR=tasks.portainer_edge_agent \\
+  -e EDGE=1 \\
+  -e EDGE_ID=${edgeId} \\
+  -e EDGE_KEY=${edgeKey} \\
+  -e CAP_HOST_MANAGEMENT=1 \\
+  --mode global \\
+  --constraint 'node.platform.os == linux' \\
+  --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock \\
+  --mount type=bind,src=//var/lib/docker/volumes,dst=/var/lib/docker/volumes \\
+  --mount type=bind,src=//,dst=/host \\
+  --mount type=volume,src=portainer_agent_data,dst=/data \\
+  portainer/agent`;
+    }
+
     initView();
-  },
-]);
+  });

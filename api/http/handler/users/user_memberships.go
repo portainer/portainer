@@ -26,7 +26,7 @@ func (handler *Handler) userMemberships(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusForbidden, "Permission denied to update user memberships", portainer.ErrUnauthorized}
 	}
 
-	memberships, err := handler.TeamMembershipService.TeamMembershipsByUserID(portainer.UserID(userID))
+	memberships, err := handler.DataStore.TeamMembership().TeamMembershipsByUserID(portainer.UserID(userID))
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to persist membership changes inside the database", err}
 	}

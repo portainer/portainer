@@ -1,9 +1,10 @@
-import '../assets/css/app.css';
+import './assets/css';
 import angular from 'angular';
 
 import './agent/_module';
 import './azure/_module';
 import './docker/__module';
+import './edge/__module';
 import './portainer/__module';
 
 angular.module('portainer', [
@@ -30,6 +31,7 @@ angular.module('portainer', [
   'portainer.azure',
   'portainer.docker',
   'portainer.kubernetes',
+  'portainer.edge',
   'portainer.extensions',
   'portainer.integrations',
   'rzModule',

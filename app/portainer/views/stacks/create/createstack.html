@@ -163,14 +163,20 @@
               </div>
             </div>
             <div class="form-group" ng-if="formValues.RepositoryAuthentication">
+              <span class="col-sm-12 text-muted small">
+                If your git account has 2FA enabled, you may receive an <code>authentication required</code> error when deploying your stack. In this case, you will need to provide
+                a personal-access token instead of your password.
+              </span>
+            </div>
+            <div class="form-group" ng-if="formValues.RepositoryAuthentication">
               <label for="repository_username" class="col-sm-1 control-label text-left">Username</label>
               <div class="col-sm-11 col-md-5">
                 <input type="text" class="form-control" ng-model="formValues.RepositoryUsername" name="repository_username" placeholder="myGitUser" />
               </div>
-              <label for="repository_password" class="col-sm-1 margin-sm-top control-label text-left">
+              <label for="repository_password" class="col-sm-1 control-label text-left">
                 Password
               </label>
-              <div class="col-sm-11 col-md-5 margin-sm-top">
+              <div class="col-sm-11 col-md-5">
                 <input type="password" class="form-control" ng-model="formValues.RepositoryPassword" name="repository_password" placeholder="myPassword" />
               </div>
             </div>
@@ -208,7 +214,7 @@
           </div>
           <!-- !environment-variables -->
           <!-- !repository -->
-          <por-access-control-form form-data="formValues.AccessControlData" ng-if="applicationState.application.authentication"></por-access-control-form>
+          <por-access-control-form form-data="formValues.AccessControlData"></por-access-control-form>
           <!-- actions -->
           <div class="col-sm-12 form-section-title">
             Actions

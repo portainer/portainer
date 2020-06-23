@@ -16,13 +16,13 @@ type publicSettingsResponse struct {
 	AllowPrivilegedModeForRegularUsers bool                           `json:"AllowPrivilegedModeForRegularUsers"`
 	AllowVolumeBrowserForRegularUsers  bool                           `json:"AllowVolumeBrowserForRegularUsers"`
 	EnableHostManagementFeatures       bool                           `json:"EnableHostManagementFeatures"`
-	ExternalTemplates                  bool                           `json:"ExternalTemplates"`
+	EnableEdgeComputeFeatures          bool                           `json:"EnableEdgeComputeFeatures"`
 	OAuthLoginURI                      string                         `json:"OAuthLoginURI"`
 }
 
 // GET request on /api/settings/public
 func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	settings, err := handler.SettingsService.Settings()
+	settings, err := handler.DataStore.Settings().Settings()
 	if err != nil {
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve the settings from the database", err}
 	}
@@ -34,16 +34,12 @@ func (handler *Handler) settingsPublic(w http.ResponseWriter, r *http.Request) *
 		AllowPrivilegedModeForRegularUsers: settings.AllowPrivilegedModeForRegularUsers,
 		AllowVolumeBrowserForRegularUsers:  settings.AllowVolumeBrowserForRegularUsers,
 		EnableHostManagementFeatures:       settings.EnableHostManagementFeatures,
-		ExternalTemplates:                  false,
+		EnableEdgeComputeFeatures:          settings.EnableEdgeComputeFeatures,
 		OAuthLoginURI: fmt.Sprintf("%s?response_type=code&client_id=%s&redirect_uri=%s&scope=%s&prompt=login",
 			settings.OAuthSettings.AuthorizationURI,
 			settings.OAuthSettings.ClientID,
 			settings.OAuthSettings.RedirectURI,
 			settings.OAuthSettings.Scopes),
-	}
-
-	if settings.TemplatesURL != "" {
-		publicSettings.ExternalTemplates = true
 	}
 
 	return response.JSON(w, publicSettings)

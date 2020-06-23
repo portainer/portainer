@@ -28,13 +28,19 @@
     <span class="small text-muted">
       <p>
         <i class="fa fa-info-circle blue-icon" aria-hidden="true" style="margin-right: 2px;"></i>
-        Deploy the Edge agent on your remote Kubernetes environment using the following command(s)
+        Deploy the Edge agent on your remote Docker/Kubernetes environment using the following command(s)
       </p>
       <p>
         The agent will communicate with Portainer via <u>{{ edgeKeyDetails.instanceURL }}</u> and <u>tcp://{{ edgeKeyDetails.tunnelServerAddr }}</u>
       </p>
       <div style="margin-top: 10px;">
         <uib-tabset active="state.deploymentTab">
+          <uib-tab index="0" heading="Standalone">
+            <code style="display: block; white-space: pre-wrap; padding: 16px 90px;">{{ dockerCommands.standalone }}</code>
+          </uib-tab>
+          <uib-tab index="1" heading="Swarm">
+            <code style="display: block; white-space: pre-wrap; padding: 16px 90px;">{{ dockerCommands.swarm }}</code>
+          </uib-tab>
           <uib-tab index="0" heading="Kubernetes">
             <code style="display: block; white-space: pre-wrap;">
               curl https://downloads.portainer.io/portainer-edge-agent-setup.sh | sudo bash -s -- {{ randomEdgeID }} {{ endpoint.EdgeKey }}
@@ -86,7 +92,7 @@
           <div class="form-group">
             <label for="container_name" class="col-sm-3 col-lg-2 control-label text-left">Name</label>
             <div class="col-sm-9 col-lg-10">
-              <input type="text" class="form-control" id="container_name" ng-model="endpoint.Name" placeholder="e.g. kubernetes-cluster01" />
+              <input type="text" class="form-control" id="container_name" ng-model="endpoint.Name" placeholder="e.g. kubernetes-cluster01 / docker-prod01" />
             </div>
           </div>
           <!-- !name-input -->
@@ -94,6 +100,11 @@
           <div class="form-group" ng-if="!state.edgeEndpoint">
             <label for="endpoint_url" class="col-sm-3 col-lg-2 control-label text-left">
               Endpoint URL
+              <portainer-tooltip
+                position="bottom"
+                message="URL or IP address of a Docker host. The Docker API must be exposed over a TCP port. Please refer to the Docker documentation to configure it."
+              >
+              </portainer-tooltip>
             </label>
             <div class="col-sm-9 col-lg-10">
               <input
@@ -107,13 +118,44 @@
             </div>
           </div>
           <!-- !endpoint-url-input -->
+          <!-- endpoint-public-url-input -->
+          <div class="form-group" ng-if="!state.azureEndpoint">
+            <label for="endpoint_public_url" class="col-sm-3 col-lg-2 control-label text-left">
+              Public IP
+              <portainer-tooltip
+                position="bottom"
+                message="URL or IP address where exposed containers will be reachable. This field is optional and will default to the endpoint URL."
+              >
+              </portainer-tooltip>
+            </label>
+            <div class="col-sm-9 col-lg-10">
+              <input type="text" class="form-control" id="endpoint_public_url" ng-model="endpoint.PublicURL" placeholder="e.g. 10.0.0.10 or mydocker.mydomain.com" />
+            </div>
+          </div>
+          <div class="form-group" ng-if="state.edgeEndpoint">
+            <label for="edge_checkin" class="col-sm-2 control-label text-left">
+              Poll frequency
+              <portainer-tooltip
+                position="bottom"
+                message="Interval used by this Edge agent to check in with the Portainer instance. Affects Edge endpoint management and Edge compute features."
+              ></portainer-tooltip>
+            </label>
+            <div class="col-sm-10">
+              <select
+                id="edge_checkin"
+                class="form-control"
+                ng-model="endpoint.EdgeCheckinInterval"
+                ng-options="+(opt.value) as opt.key for opt in state.availableEdgeAgentCheckinOptions"
+              ></select>
+            </div>
+          </div>
+          <!-- !endpoint-public-url-input -->
           <azure-endpoint-config
             ng-if="state.azureEndpoint"
             application-id="endpoint.AzureCredentials.ApplicationID"
             tenant-id="endpoint.AzureCredentials.TenantID"
             authentication-key="endpoint.AzureCredentials.AuthenticationKey"
           ></azure-endpoint-config>
-          <!-- !endpoint-public-url-input -->
           <div class="col-sm-12 form-section-title">
             Metadata
           </div>
@@ -129,7 +171,7 @@
           <!-- !group -->
           <!-- tags -->
           <div class="form-group">
-            <tag-selector tags="availableTags" model="endpoint.Tags"></tag-selector>
+            <tag-selector ng-if="endpoint && availableTags" tags="availableTags" model="endpoint.TagIds" on-create="(onCreateTag)" allow-create="state.allowCreate"></tag-selector>
           </div>
           <!-- !tags -->
           <!-- endpoint-security -->

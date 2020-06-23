@@ -69,6 +69,8 @@ angular.module('portainer.docker').controller('CreateContainerController', [
       MacAddress: '',
       IPv4: '',
       IPv6: '',
+      DnsPrimary: '',
+      DnsSecondary: '',
       AccessControlData: new AccessControlFormData(),
       CpuLimit: 0,
       MemoryLimit: 0,
@@ -109,6 +111,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         AutoRemove: false,
         NetworkMode: 'bridge',
         Privileged: false,
+        Init: false,
         Runtime: '',
         ExtraHosts: [],
         Devices: [],
@@ -264,6 +267,15 @@ angular.module('portainer.docker').controller('CreateContainerController', [
           return !_.startsWith($scope.fromContainer.Id, o);
         });
       }
+
+      var dnsServers = [];
+      if ($scope.formValues.DnsPrimary) {
+        dnsServers.push($scope.formValues.DnsPrimary);
+      }
+      if ($scope.formValues.DnsSecondary) {
+        dnsServers.push($scope.formValues.DnsSecondary);
+      }
+      config.HostConfig.Dns = dnsServers;
 
       $scope.formValues.ExtraHosts.forEach(function (v) {
         if (v.value) {
@@ -440,6 +452,13 @@ angular.module('portainer.docker').controller('CreateContainerController', [
         delete $scope.extraNetworks[Object.keys(d.NetworkSettings.Networks)[0]];
       }
       $scope.formValues.MacAddress = d.Config.MacAddress;
+
+      if (d.HostConfig.Dns && d.HostConfig.Dns[0]) {
+        $scope.formValues.DnsPrimary = d.HostConfig.Dns[0];
+        if (d.HostConfig.Dns[1]) {
+          $scope.formValues.DnsSecondary = d.HostConfig.Dns[1];
+        }
+      }
 
       // ExtraHosts
       if ($scope.config.HostConfig.ExtraHosts) {
@@ -634,7 +653,7 @@ angular.module('portainer.docker').controller('CreateContainerController', [
 
       SystemService.info()
         .then(function success(data) {
-          $scope.availableRuntimes = Object.keys(data.Runtimes);
+          $scope.availableRuntimes = data.Runtimes ? Object.keys(data.Runtimes) : [];
           $scope.config.HostConfig.Runtime = '';
           $scope.state.sliderMaxCpu = 32;
           if (data.NCPU) {
