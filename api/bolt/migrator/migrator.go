@@ -332,7 +332,7 @@ func (m *Migrator) Migrate() error {
 			return err
 		}
 
-		err = m.updateEdgeJobsToDBVersion24()
+		err = m.migrateSchedulestoEdgeJobs()
 		if err != nil {
 			return err
 		}

@@ -22,7 +22,7 @@ func (m *Migrator) updateSettingsToDB24() error {
 	return m.settingsService.UpdateSettings(legacySettings)
 }
 
-func (m *Migrator) updateEdgeJobsToDBVersion24() error {
+func (m *Migrator) migrateSchedulestoEdgeJobs() error {
 	schedules, err := m.scheduleService.Schedules()
 	if err != nil {
 		return err
