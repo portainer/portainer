@@ -15,7 +15,7 @@ type stackStatusResponse struct {
 	Version int
 }
 
-type edgeSchedule struct {
+type edgeJobResponse struct {
 	ID             portainer.EdgeJobID `json:"Id"`
 	CollectLogs    bool                `json:"CollectLogs"`
 	CronExpression string              `json:"CronExpression"`
@@ -26,7 +26,7 @@ type edgeSchedule struct {
 type endpointStatusInspectResponse struct {
 	Status          string                `json:"status"`
 	Port            int                   `json:"port"`
-	Schedules       []edgeSchedule        `json:"schedules"`
+	Schedules       []edgeJobResponse     `json:"schedules"`
 	CheckinInterval int                   `json:"checkin"`
 	Credentials     string                `json:"credentials"`
 	Stacks          []stackStatusResponse `json:"stacks"`
@@ -74,9 +74,9 @@ func (handler *Handler) endpointStatusInspect(w http.ResponseWriter, r *http.Req
 		checkinInterval = endpoint.EdgeCheckinInterval
 	}
 
-	schedules := []edgeSchedule{}
+	schedules := []edgeJobResponse{}
 	for _, job := range tunnel.Jobs {
-		schedule := edgeSchedule{
+		schedule := edgeJobResponse{
 			ID:             job.ID,
 			CronExpression: job.CronExpression,
 			CollectLogs:    job.Endpoints[endpoint.ID].CollectLogs,
