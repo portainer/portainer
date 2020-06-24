@@ -3,16 +3,16 @@ import filesizeParser from 'filesize-parser';
 
 import {
   KubernetesApplication,
-  KubernetesApplicationPersistedFolder,
   KubernetesApplicationConfigurationVolume,
-  KubernetesPortainerApplicationStackNameLabel,
-  KubernetesApplicationDeploymentTypes,
   KubernetesApplicationDataAccessPolicies,
-  KubernetesApplicationTypes,
-  KubernetesPortainerApplicationOwnerLabel,
-  KubernetesPortainerApplicationNote,
+  KubernetesApplicationDeploymentTypes,
+  KubernetesApplicationPersistedFolder,
   KubernetesApplicationPublishingTypes,
+  KubernetesApplicationTypes,
   KubernetesPortainerApplicationNameLabel,
+  KubernetesPortainerApplicationNote,
+  KubernetesPortainerApplicationOwnerLabel,
+  KubernetesPortainerApplicationStackNameLabel,
 } from 'Kubernetes/models/application/models';
 import { KubernetesServiceTypes } from 'Kubernetes/models/service/models';
 import KubernetesResourceReservationHelper from 'Kubernetes/helpers/resourceReservationHelper';
@@ -86,10 +86,15 @@ class KubernetesApplicationConverter {
           res.LoadBalancerIPAddress = service.status.loadBalancer.ingress[0].ip || service.status.loadBalancer.ingress[0].hostname;
         }
       }
+
+      const ports = _.concat(..._.map(data.spec.template.spec.containers, (container) => container.ports));
       res.PublishedPorts = service.spec.ports;
       _.forEach(res.PublishedPorts, (publishedPort) => {
         if (isNaN(publishedPort.targetPort)) {
-          publishedPort.targetPort = _.find(res.PublishedPorts, { name: publishedPort.targetPort }).port;
+          const targetPort = _.find(ports, { name: publishedPort.targetPort });
+          if (targetPort) {
+            publishedPort.targetPort = targetPort.containerPort;
+          }
         }
       });
     }
@@ -140,6 +145,8 @@ class KubernetesApplicationConverter {
         return persistedFolder;
       }
     });
+
+    res.PersistedFolders = _.reject(res.PersistedFolders, _.isUndefined);
 
     res.ConfigurationVolumes = _.reduce(
       data.spec.template.spec.volumes,
