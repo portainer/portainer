@@ -12,6 +12,7 @@ import (
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/chisel"
+	"github.com/portainer/portainer/api/internal/authorization"
 
 	"github.com/portainer/portainer/api/bolt"
 	"github.com/portainer/portainer/api/cli"
@@ -218,6 +219,7 @@ func updateSettingsFromFlags(dataStore portainer.DataStore, flags *portainer.CLI
 
 	settings.LogoURL = *flags.Logo
 	settings.SnapshotInterval = *flags.SnapshotInterval
+	settings.EnableEdgeComputeFeatures = *flags.EnableEdgeComputeFeatures
 
 	if *flags.Templates != "" {
 		settings.TemplatesURL = *flags.Templates
@@ -501,7 +503,7 @@ func main() {
 				Username:                "admin",
 				Role:                    portainer.AdministratorRole,
 				Password:                adminPasswordHash,
-				PortainerAuthorizations: portainer.DefaultPortainerAuthorizations(),
+				PortainerAuthorizations: authorization.DefaultPortainerAuthorizations(),
 			}
 			err := dataStore.User().CreateUser(user)
 			if err != nil {

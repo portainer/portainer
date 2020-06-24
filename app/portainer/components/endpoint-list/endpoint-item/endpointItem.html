@@ -51,7 +51,7 @@
               {{ $ctrl.model.Snapshots[0].ServiceCount === 1 ? 'service' : 'services' }}
             </span>
             <span style="padding: 0 7px 0 7px;">
-              <i class="fa fa-server space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].RunningContainerCount + $ctrl.model.Snapshots[0].StoppedContainerCount }}
+              <i class="fa fa-cubes space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].RunningContainerCount + $ctrl.model.Snapshots[0].StoppedContainerCount }}
               {{ $ctrl.model.Snapshots[0].RunningContainerCount + $ctrl.model.Snapshots[0].StoppedContainerCount === 1 ? 'container' : 'containers' }}
               <span ng-if="$ctrl.model.Snapshots[0].RunningContainerCount > 0 || $ctrl.model.Snapshots[0].StoppedContainerCount > 0">
                 -
@@ -63,7 +63,7 @@
               </span>
             </span>
             <span style="padding: 0 7px 0 7px;">
-              <i class="fa fa-cubes space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].VolumeCount }}
+              <i class="fa fa-hdd space-right" aria-hidden="true"></i>{{ $ctrl.model.Snapshots[0].VolumeCount }}
               {{ $ctrl.model.Snapshots[0].VolumeCount === 1 ? 'volume' : 'volumes' }}
             </span>
             <span style="padding: 0 7px 0 7px;">

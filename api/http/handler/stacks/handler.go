@@ -8,6 +8,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 // Handler is the HTTP handler used to handle stack operations.
@@ -59,7 +60,7 @@ func (handler *Handler) userCanAccessStack(securityContext *security.RestrictedR
 		userTeamIDs = append(userTeamIDs, membership.TeamID)
 	}
 
-	if resourceControl != nil && portainer.UserCanAccessResource(securityContext.UserID, userTeamIDs, resourceControl) {
+	if resourceControl != nil && authorization.UserCanAccessResource(securityContext.UserID, userTeamIDs, resourceControl) {
 		return true, nil
 	}
 

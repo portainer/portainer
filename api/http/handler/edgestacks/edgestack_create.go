@@ -13,6 +13,7 @@ import (
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/filesystem"
+	"github.com/portainer/portainer/api/internal/edge"
 )
 
 // POST request on /api/endpoint_groups
@@ -42,7 +43,7 @@ func (handler *Handler) edgeStackCreate(w http.ResponseWriter, r *http.Request) 
 		return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge groups from database", err}
 	}
 
-	relatedEndpoints, err := portainer.EdgeStackRelatedEndpoints(edgeStack.EdgeGroups, endpoints, endpointGroups, edgeGroups)
+	relatedEndpoints, err := edge.EdgeStackRelatedEndpoints(edgeStack.EdgeGroups, endpoints, endpointGroups, edgeGroups)
 
 	for _, endpointID := range relatedEndpoints {
 		relation, err := handler.DataStore.EndpointRelation().EndpointRelation(endpointID)

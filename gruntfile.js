@@ -42,9 +42,13 @@ module.exports = function (grunt) {
 
   grunt.registerTask('start:server', ['build:server', 'copy:assets', 'shell:run_container']);
 
-  grunt.registerTask('start:client', ['config:dev', 'env:dev', 'webpack:devWatch']);
+  grunt.registerTask('start:localserver', ['shell:build_binary:linux:' + arch, 'shell:run_localserver']);
+
+  grunt.registerTask('start:client', ['shell:install_yarndeps', 'config:dev', 'env:dev', 'webpack:devWatch']);
 
   grunt.registerTask('start', ['start:server', 'start:client']);
+
+  grunt.registerTask('start:toolkit', ['start:localserver', 'start:client']);
 
   grunt.task.registerTask('release', 'release:<platform>:<arch>', function (p = 'linux', a = arch) {
     grunt.task.run([
@@ -136,6 +140,8 @@ gruntfile_cfg.shell = {
   download_kompose_binary: { command: shell_download_kompose_binary },
   download_kubectl_binary: { command: shell_download_kubectl_binary },
   run_container: { command: shell_run_container },
+  run_localserver: { command: shell_run_localserver, options: { async: true } },
+  install_yarndeps: { command: shell_install_yarndeps },
 };
 
 function shell_build_binary(p, a) {
@@ -168,6 +174,14 @@ function shell_run_container() {
       portainer_data +
       ':/data -v /var/run/docker.sock:/var/run/docker.sock:z --name portainer portainer/base /app/portainer --no-analytics',
   ].join(';');
+}
+
+function shell_run_localserver() {
+  return './dist/portainer --no-analytics';
+}
+
+function shell_install_yarndeps() {
+  return 'yarn';
 }
 
 function shell_download_docker_binary(p, a) {

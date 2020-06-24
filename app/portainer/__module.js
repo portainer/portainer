@@ -480,18 +480,6 @@ angular.module('portainer.app', []).config([
       },
     };
 
-    var updatePassword = {
-      name: 'portainer.updatePassword',
-      url: '/update-password',
-      views: {
-        'content@': {
-          templateUrl: './views/update-password/updatePassword.html',
-          controller: 'UpdatePasswordController',
-        },
-        'sidebar@': {},
-      },
-    };
-
     var users = {
       name: 'portainer.users',
       url: '/users',
@@ -595,7 +583,6 @@ angular.module('portainer.app', []).config([
     $stateRegistryProvider.register(support);
     $stateRegistryProvider.register(supportProduct);
     $stateRegistryProvider.register(tags);
-    $stateRegistryProvider.register(updatePassword);
     $stateRegistryProvider.register(users);
     $stateRegistryProvider.register(user);
     $stateRegistryProvider.register(teams);

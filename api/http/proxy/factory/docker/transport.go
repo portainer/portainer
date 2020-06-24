@@ -10,12 +10,12 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/portainer/portainer/api/docker"
-
 	"github.com/docker/docker/client"
-	portainer "github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/docker"
 	"github.com/portainer/portainer/api/http/proxy/factory/responseutils"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 var apiVersionRe = regexp.MustCompile(`(/v[0-9]\.[0-9]*)?`)
@@ -462,7 +462,7 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 			return nil, err
 		}
 
-		resourceControl := portainer.GetResourceControlByResourceIDAndType(resourceID, resourceType, resourceControls)
+		resourceControl := authorization.GetResourceControlByResourceIDAndType(resourceID, resourceType, resourceControls)
 		if resourceControl == nil {
 			agentTargetHeader := request.Header.Get(portainer.PortainerAgentTargetHeader)
 
@@ -473,12 +473,12 @@ func (transport *Transport) restrictedResourceOperation(request *http.Request, r
 				return nil, err
 			}
 
-			if inheritedResourceControl == nil || !portainer.UserCanAccessResource(tokenData.ID, userTeamIDs, inheritedResourceControl) {
+			if inheritedResourceControl == nil || !authorization.UserCanAccessResource(tokenData.ID, userTeamIDs, inheritedResourceControl) {
 				return responseutils.WriteAccessDeniedResponse()
 			}
 		}
 
-		if resourceControl != nil && !portainer.UserCanAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
+		if resourceControl != nil && !authorization.UserCanAccessResource(tokenData.ID, userTeamIDs, resourceControl) {
 			return responseutils.WriteAccessDeniedResponse()
 		}
 	}

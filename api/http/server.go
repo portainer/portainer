@@ -1,12 +1,9 @@
 package http
 
 import (
-	"time"
-
-	"github.com/portainer/portainer/api/kubernetes/cli"
-
 	"net/http"
 	"path/filepath"
+	"time"
 
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/docker"
@@ -42,6 +39,8 @@ import (
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
+	"github.com/portainer/portainer/api/kubernetes/cli"
 )
 
 // Server implements the portainer.Server interface
@@ -61,23 +60,22 @@ type Server struct {
 	JWTService              portainer.JWTService
 	LDAPService             portainer.LDAPService
 	SwarmStackManager       portainer.SwarmStackManager
-	KubernetesDeployer      portainer.KubernetesDeployer
 	Handler                 *handler.Handler
 	SSL                     bool
 	SSLCert                 string
 	SSLKey                  string
 	DockerClientFactory     *docker.ClientFactory
-	KubernetesClientFactory *cli.ClientFactory
 	JobService              portainer.JobService
 	SnapshotManager         *portainer.SnapshotManager
+	KubernetesClientFactory *cli.ClientFactory
+	KubernetesDeployer      portainer.KubernetesDeployer
 }
 
 // Start starts the HTTP server
 func (server *Server) Start() error {
+	authorizationService := authorization.NewService(server.DataStore)
 	kubernetesTokenCacheManager := kubernetes.NewTokenCacheManager()
-
 	proxyManager := proxy.NewManager(server.DataStore, server.SignatureService, server.ReverseTunnelService, server.DockerClientFactory, server.KubernetesClientFactory, kubernetesTokenCacheManager)
-	authorizationService := portainer.NewAuthorizationService(server.DataStore)
 
 	rbacExtensionURL := proxyManager.GetExtensionURL(portainer.RBACExtension)
 	requestBouncer := security.NewRequestBouncer(server.DataStore, server.JWTService, rbacExtensionURL)

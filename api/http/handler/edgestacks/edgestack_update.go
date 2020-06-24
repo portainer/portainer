@@ -9,6 +9,7 @@ import (
 	"github.com/portainer/libhttp/request"
 	"github.com/portainer/libhttp/response"
 	"github.com/portainer/portainer/api"
+	"github.com/portainer/portainer/api/internal/edge"
 )
 
 type updateEdgeStackPayload struct {
@@ -63,12 +64,12 @@ func (handler *Handler) edgeStackUpdate(w http.ResponseWriter, r *http.Request) 
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge groups from database", err}
 		}
 
-		oldRelated, err := portainer.EdgeStackRelatedEndpoints(stack.EdgeGroups, endpoints, endpointGroups, edgeGroups)
+		oldRelated, err := edge.EdgeStackRelatedEndpoints(stack.EdgeGroups, endpoints, endpointGroups, edgeGroups)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge stack related endpoints from database", err}
 		}
 
-		newRelated, err := portainer.EdgeStackRelatedEndpoints(payload.EdgeGroups, endpoints, endpointGroups, edgeGroups)
+		newRelated, err := edge.EdgeStackRelatedEndpoints(payload.EdgeGroups, endpoints, endpointGroups, edgeGroups)
 		if err != nil {
 			return &httperror.HandlerError{http.StatusInternalServerError, "Unable to retrieve edge stack related endpoints from database", err}
 		}

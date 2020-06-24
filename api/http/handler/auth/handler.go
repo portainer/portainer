@@ -3,13 +3,13 @@ package auth
 import (
 	"net/http"
 
-	portainer "github.com/portainer/portainer/api"
-	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
-
 	"github.com/gorilla/mux"
 	httperror "github.com/portainer/libhttp/error"
+	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy"
+	"github.com/portainer/portainer/api/http/proxy/factory/kubernetes"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
 )
 
 // Handler is the HTTP handler used to handle authentication operations.
@@ -20,7 +20,7 @@ type Handler struct {
 	JWTService                  portainer.JWTService
 	LDAPService                 portainer.LDAPService
 	ProxyManager                *proxy.Manager
-	AuthorizationService        *portainer.AuthorizationService
+	AuthorizationService        *authorization.Service
 	KubernetesTokenCacheManager *kubernetes.TokenCacheManager
 }
 

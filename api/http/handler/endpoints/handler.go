@@ -5,6 +5,7 @@ import (
 	portainer "github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/proxy"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
 
 	"net/http"
 
@@ -23,7 +24,7 @@ type Handler struct {
 	*mux.Router
 	requestBouncer       *security.RequestBouncer
 	DataStore            portainer.DataStore
-	AuthorizationService *portainer.AuthorizationService
+	AuthorizationService *authorization.Service
 	FileService          portainer.FileService
 	JobService           portainer.JobService
 	ProxyManager         *proxy.Manager

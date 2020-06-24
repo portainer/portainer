@@ -4,6 +4,7 @@ import (
 	httperror "github.com/portainer/libhttp/error"
 	"github.com/portainer/portainer/api"
 	"github.com/portainer/portainer/api/http/security"
+	"github.com/portainer/portainer/api/internal/authorization"
 
 	"net/http"
 
@@ -14,7 +15,7 @@ import (
 type Handler struct {
 	*mux.Router
 	DataStore            portainer.DataStore
-	AuthorizationService *portainer.AuthorizationService
+	AuthorizationService *authorization.Service
 }
 
 // NewHandler creates a handler to manage team membership operations.
