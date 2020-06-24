@@ -15,15 +15,6 @@ type edgeJobFileResponse struct {
 
 // GET request on /api/edge_jobs/:id/file
 func (handler *Handler) edgeJobFile(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	settings, err := handler.DataStore.Settings().Settings()
-	if err != nil {
-		return &httperror.HandlerError{http.StatusServiceUnavailable, "Unable to retrieve settings", err}
-	}
-
-	if !settings.EnableEdgeComputeFeatures {
-		return &httperror.HandlerError{http.StatusServiceUnavailable, "Edge compute features are disabled", portainer.ErrHostManagementFeaturesDisabled}
-	}
-
 	edgeJobID, err := request.RetrieveNumericRouteVariableValue(r, "id")
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid Edge job identifier route variable", err}

@@ -16,15 +16,6 @@ import (
 
 // POST /api/edge_jobs?method=file|string
 func (handler *Handler) edgeJobCreate(w http.ResponseWriter, r *http.Request) *httperror.HandlerError {
-	settings, err := handler.DataStore.Settings().Settings()
-	if err != nil {
-		return &httperror.HandlerError{http.StatusServiceUnavailable, "Unable to retrieve settings", err}
-	}
-
-	if !settings.EnableEdgeComputeFeatures {
-		return &httperror.HandlerError{http.StatusServiceUnavailable, "Edge compute features are disabled", portainer.ErrHostManagementFeaturesDisabled}
-	}
-
 	method, err := request.RetrieveQueryParameter(r, "method", false)
 	if err != nil {
 		return &httperror.HandlerError{http.StatusBadRequest, "Invalid query parameter: method. Valid values are: file or string", err}

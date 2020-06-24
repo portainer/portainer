@@ -24,24 +24,24 @@ func NewHandler(bouncer *security.RequestBouncer) *Handler {
 	}
 
 	h.Handle("/edge_jobs",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeJobList))).Methods(http.MethodGet)
+		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeJobList)))).Methods(http.MethodGet)
 	h.Handle("/edge_jobs",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeJobCreate))).Methods(http.MethodPost)
+		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeJobCreate)))).Methods(http.MethodPost)
 	h.Handle("/edge_jobs/{id}",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeJobInspect))).Methods(http.MethodGet)
+		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeJobInspect)))).Methods(http.MethodGet)
 	h.Handle("/edge_jobs/{id}",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeJobUpdate))).Methods(http.MethodPut)
+		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeJobUpdate)))).Methods(http.MethodPut)
 	h.Handle("/edge_jobs/{id}",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeJobDelete))).Methods(http.MethodDelete)
+		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeJobDelete)))).Methods(http.MethodDelete)
 	h.Handle("/edge_jobs/{id}/file",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeJobFile))).Methods(http.MethodGet)
+		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeJobFile)))).Methods(http.MethodGet)
 	h.Handle("/edge_jobs/{id}/tasks",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeJobTasksList))).Methods(http.MethodGet)
+		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeJobTasksList)))).Methods(http.MethodGet)
 	h.Handle("/edge_jobs/{id}/tasks/{taskID}/logs",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeJobTaskLogsInspect))).Methods(http.MethodGet)
+		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeJobTaskLogsInspect)))).Methods(http.MethodGet)
 	h.Handle("/edge_jobs/{id}/tasks/{taskID}/logs",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeJobTasksCollect))).Methods(http.MethodPost)
+		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeJobTasksCollect)))).Methods(http.MethodPost)
 	h.Handle("/edge_jobs/{id}/tasks/{taskID}/logs",
-		bouncer.AdminAccess(httperror.LoggerHandler(h.edgeJobTasksClear))).Methods(http.MethodDelete)
+		bouncer.AdminAccess(bouncer.EdgeComputeOperation(httperror.LoggerHandler(h.edgeJobTasksClear)))).Methods(http.MethodDelete)
 	return h
 }
