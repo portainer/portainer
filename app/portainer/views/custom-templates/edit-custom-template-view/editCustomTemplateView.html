@@ -59,6 +59,9 @@
                 <span ng-hide="$ctrl.actionInProgress">Update the template</span>
                 <span ng-show="$ctrl.actionInProgress">Update in progress...</span>
               </button>
+              <span class="text-danger" ng-if="$ctrl.state.formValidationError" style="margin-left: 5px;">
+                {{ $ctrl.state.formValidationError }}
+              </span>
             </div>
           </div>
         </form>

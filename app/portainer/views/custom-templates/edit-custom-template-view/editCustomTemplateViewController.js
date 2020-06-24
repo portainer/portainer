@@ -3,10 +3,13 @@ import { ResourceControlViewModel } from 'Portainer/models/resourceControl/resou
 
 class EditCustomTemplateViewController {
   /* @ngInject */
-  constructor($async, $state, Authentication, CustomTemplateService, Notifications, ResourceControlService) {
-    this.formValues = null;
+  constructor($async, $state, Authentication, CustomTemplateService, FormValidator, Notifications, ResourceControlService) {
+    Object.assign(this, { $async, $state, Authentication, CustomTemplateService, FormValidator, Notifications, ResourceControlService });
 
-    Object.assign(this, { $async, $state, Authentication, CustomTemplateService, Notifications, ResourceControlService });
+    this.formValues = null;
+    this.state = {
+      formValidationError: '',
+    };
 
     this.getTemplate = this.getTemplate.bind(this);
     this.getTemplateAsync = this.getTemplateAsync.bind(this);
@@ -33,10 +36,34 @@ class EditCustomTemplateViewController {
     }
   }
 
+  validateForm() {
+    this.state.formValidationError = '';
+
+    if (!this.formValues.FileContent) {
+      this.state.formValidationError = 'Template file content must not be empty';
+      return false;
+    }
+
+    const isAdmin = this.Authentication.isAdmin();
+    const accessControlData = this.formValues.AccessControlData;
+    const error = this.FormValidator.validateAccessControl(accessControlData, isAdmin);
+
+    if (error) {
+      this.state.formValidationError = error;
+      return false;
+    }
+
+    return true;
+  }
+
   submitAction() {
     return this.$async(this.submitActionAsync);
   }
   async submitActionAsync() {
+    if (!this.validateForm()) {
+      return;
+    }
+
     this.actionInProgress = true;
     try {
       await this.CustomTemplateService.updateCustomTemplate(this.formValues.Id, this.formValues);
