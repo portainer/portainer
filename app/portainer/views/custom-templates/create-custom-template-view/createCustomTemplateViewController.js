@@ -138,14 +138,13 @@ class CreateCustomTemplateViewController {
     }
     this.formValues.Type = stackType;
 
-    const { stackId } = this.$state.params;
-    if (stackId) {
-      this.state.fromStack = true;
-      const [stack, file] = await Promise.all([this.StackService.stack(stackId), this.StackService.getStackFile(stackId)]);
+    const { fileContent, type } = this.$state.params;
 
-      this.formValues.FileContent = file;
-      this.formValues.Type = stack.Type;
+    this.formValues.FileContent = fileContent;
+    if (type) {
+      this.formValues.Type = +type;
     }
+
     this.state.loading = false;
   }
 }

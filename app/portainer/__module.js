@@ -527,7 +527,7 @@ angular.module('portainer.app', []).config([
 
     const customTemplatesNew = {
       name: 'portainer.templates.custom.new',
-      url: '/new?stackId',
+      url: '/new?fileContent&type',
 
       views: {
         'content@': {
@@ -535,7 +535,8 @@ angular.module('portainer.app', []).config([
         },
       },
       params: {
-        stackId: '',
+        fileContent: '',
+        type: '',
       },
     };
 

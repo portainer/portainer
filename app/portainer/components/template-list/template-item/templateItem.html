@@ -1,5 +1,5 @@
 <!-- template -->
-<div ng-class="{ 'blocklist-item--selected': $ctrl.model.Selected }" class="blocklist-item" ng-click="$ctrl.onSelect($ctrl.model)">
+<div ng-class="{ 'blocklist-item--selected': $ctrl.model.Selected }" class="blocklist-item template-item" ng-click="$ctrl.onSelect($ctrl.model)">
   <div class="blocklist-item-box">
     <!-- template-image -->
     <span ng-if="$ctrl.model.Logo">
@@ -10,7 +10,7 @@
     </span>
     <!-- !template-image -->
     <!-- template-details -->
-    <span class="col-sm-12">
+    <div class="col-sm-12 template-item-details">
       <!-- blocklist-item-line1 -->
       <div class="blocklist-item-line">
         <span>
@@ -30,8 +30,9 @@
         </span>
       </div>
       <!-- !blocklist-item-line1 -->
+      <span class="blocklist-item-actions" ng-transclude="actions"></span>
       <!-- blocklist-item-line2 -->
-      <div class="blocklist-item-line">
+      <div class="blocklist-item-line template-item-details-sub">
         <span class="blocklist-item-desc">
           {{ $ctrl.model.Description }}
         </span>
@@ -40,8 +41,7 @@
         </span>
       </div>
       <!-- !blocklist-item-line2 -->
-    </span>
-    <span class="blocklist-item-actions" ng-transclude="actions"></span>
+    </div>
     <!-- !template-details -->
   </div>
   <!-- !template -->
