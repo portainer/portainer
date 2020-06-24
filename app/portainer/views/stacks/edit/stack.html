@@ -38,7 +38,10 @@
                 </div>
                 <div class="form-group">
                   {{ stackName }}
-                  <a class="btn btn-primary btn-xs" ui-sref="portainer.templates.custom.new({stackId:stack.Id})">Create template from stack</a>
+
+                  <a ng-if="!state.externalStack && stackFileContent" class="btn btn-primary btn-xs" ui-sref="portainer.templates.custom.new({stackId:stack.Id})"
+                    >Create template from stack</a
+                  >
 
                   <button authorization="PortainerStackDelete" class="btn btn-xs btn-danger" ng-click="removeStack()" ng-if="!state.externalStack || stack.Type === 1">
                     <i class="fa fa-trash-alt space-right" aria-hidden="true"></i>
