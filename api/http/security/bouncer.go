@@ -370,10 +370,12 @@ func (bouncer *RequestBouncer) EdgeComputeOperation(next http.Handler) http.Hand
 		settings, err := bouncer.dataStore.Settings().Settings()
 		if err != nil {
 			httperror.WriteError(w, http.StatusServiceUnavailable, "Unable to retrieve settings", err)
+			return
 		}
 
 		if !settings.EnableEdgeComputeFeatures {
 			httperror.WriteError(w, http.StatusServiceUnavailable, "Edge compute features are disabled", errors.New("Edge compute features are disabled"))
+			return
 		}
 
 		next.ServeHTTP(w, r)
