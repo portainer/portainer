@@ -1,12 +1,12 @@
+import { AccessControlFormData } from 'Portainer/components/accessControlForm/porAccessControlFormModel';
+import { ResourceControlViewModel } from 'Portainer/models/resourceControl/resourceControl';
+
 class EditCustomTemplateViewController {
   /* @ngInject */
-  constructor($async, $state, CustomTemplateService, Notifications) {
+  constructor($async, $state, Authentication, CustomTemplateService, Notifications, ResourceControlService) {
     this.formValues = null;
 
-    this.$async = $async;
-    this.$state = $state;
-    this.CustomTemplateService = CustomTemplateService;
-    this.Notifications = Notifications;
+    Object.assign(this, { $async, $state, Authentication, CustomTemplateService, Notifications, ResourceControlService });
 
     this.getTemplate = this.getTemplate.bind(this);
     this.getTemplateAsync = this.getTemplateAsync.bind(this);
@@ -26,6 +26,8 @@ class EditCustomTemplateViewController {
       ]);
       template.FileContent = file;
       this.formValues = template;
+      this.formValues.ResourceControl = new ResourceControlViewModel(template.ResourceControl);
+      this.formValues.AccessControlData = new AccessControlFormData();
     } catch (err) {
       this.Notifications.error('Failure', err, 'Unable to retrieve custom template data');
     }
@@ -38,6 +40,11 @@ class EditCustomTemplateViewController {
     this.actionInProgress = true;
     try {
       await this.CustomTemplateService.updateCustomTemplate(this.formValues.Id, this.formValues);
+
+      const userDetails = this.Authentication.getUserDetails();
+      const userId = userDetails.ID;
+      await this.ResourceControlService.applyResourceControl(userId, this.formValues.AccessControlData, this.formValues.ResourceControl);
+
       this.Notifications.success('Custom template successfully updated');
       this.$state.go('portainer.templates.custom');
     } catch (err) {
