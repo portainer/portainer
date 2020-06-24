@@ -215,17 +215,20 @@ angular.module('portainer.docker').controller('ServiceController', [
     };
 
     $scope.addNetwork = function addNetwork(service) {
-      service.VirtualIPs.push({ NetworkID: '' });
-      updateServiceArray(service, 'VirtualIPs', service.VirtualIPs);
+      if (!service.Networks) {
+        service.Networks = [];
+      }
+      service.Networks.push({ Id: '', Name: '', Addr: '' });
+      updateServiceArray(service, 'Networks', service.Networks);
     };
     $scope.removeNetwork = function removeNetwork(service, index) {
-      var removedElement = service.VirtualIPs.splice(index, 1);
+      var removedElement = service.Networks.splice(index, 1);
       if (removedElement !== null) {
-        updateServiceArray(service, 'VirtualIPs', service.VirtualIPs);
+        updateServiceArray(service, 'Networks', service.Networks);
       }
     };
     $scope.updateNetwork = function updateNetwork(service) {
-      updateServiceArray(service, 'VirtualIPs', service.VirtualIPs);
+      updateServiceArray(service, 'Networks', service.Networks);
     };
 
     $scope.addPlacementConstraint = function addPlacementConstraint(service) {
@@ -386,6 +389,11 @@ angular.module('portainer.docker').controller('ServiceController', [
         config.TaskTemplate.ContainerSpec.Image = image.fromImage;
       } else {
         config.TaskTemplate.ContainerSpec.Image = service.Image;
+      }
+
+      if ($scope.hasChanges(service, ['Networks'])) {
+        config.Networks = _.map(service.Networks, (item) => ({ Target: item.Id }));
+        config.TaskTemplate.Networks = config.Networks;
       }
 
       config.TaskTemplate.ContainerSpec.Secrets = service.ServiceSecrets ? service.ServiceSecrets.map(SecretHelper.secretConfig) : [];
@@ -662,12 +670,19 @@ angular.module('portainer.docker').controller('ServiceController', [
           $scope.allowBindMounts = data.settings.AllowBindMountsForRegularUsers;
           $scope.isAdmin = Authentication.isAdmin();
           $scope.availableNetworks = data.availableNetworks;
-          $scope.networks = _.filter($scope.availableNetworks, (network) => {
-            const find = _.find($scope.service.VirtualIPs, (vip) => {
-              return vip.NetworkID === network.Id;
-            });
-            return find;
-          });
+          $scope.service.Networks = _.map(
+            _.filter(data.availableNetworks, (item) => {
+              return _.find($scope.service.Model.Spec.Networks, { Target: item.Id });
+            }),
+            (item) => {
+              let addr = '';
+              if (item.IPAM.Config.length) {
+                addr = item.IPAM.Config[0].Subnet;
+              }
+              return { Id: item.Id, Name: item.Name, Addr: addr };
+            }
+          );
+          originalService.Networks = angular.copy($scope.service.Networks);
 
           if (data.webhooks.length > 0) {
             var webhook = data.webhooks[0];

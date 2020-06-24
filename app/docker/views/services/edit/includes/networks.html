@@ -7,31 +7,28 @@
         </a>
       </div>
     </rd-widget-header>
-    <rd-widget-body ng-if="!service.VirtualIPs || service.VirtualIPs.length === 0">
+    <rd-widget-body ng-if="!service.Networks || service.Networks.length === 0">
       <p>This service is not connected to any networks.</p>
     </rd-widget-body>
-    <rd-widget-body ng-if="service.VirtualIPs && service.VirtualIPs.length > 0" classes="no-padding">
+    <rd-widget-body ng-if="service.Networks && service.Networks.length > 0" classes="no-padding">
       <table class="table">
         <thead>
           <tr>
+            <th>Name</th>
             <th>ID</th>
             <th>IP address</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr ng-repeat="network in networks">
+          <tr ng-repeat="network in service.Networks">
             <td>
-              <select
-                class="form-control"
-                ng-model="network.Name"
-                ng-init="network.Name"
-                ng-options="net.Name for net in availableNetworks"
-                disable-authorization="DockerServiceUpdate"
-              >
-                <option disabled hidden value="">Select a network</option>
+              <select class="form-control" ng-model="network.Id" ng-options="net.Id as net.Name for net in availableNetworks" disable-authorization="DockerServiceUpdate">
+                <option disabled hidden value="" selected>Select a network</option>
               </select>
-              <!-- <a ui-sref="docker.networks.network({id: network.NetworkID})">{{ network.NetworkID }}</a> -->
+            </td>
+            <td>
+              <a ui-sref="docker.networks.network({id: network.Id})">{{ network.Id }}</a>
             </td>
             <td>
               {{ network.Addr }}
@@ -50,12 +47,12 @@
     <rd-widget-footer authorization="DockerServiceUpdate">
       <div class="btn-toolbar" role="toolbar">
         <div class="btn-group" role="group">
-          <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['VirtualIPs'])" ng-click="updateService(service)">Apply changes</button>
+          <button type="button" class="btn btn-primary btn-sm" ng-disabled="!hasChanges(service, ['Networks'])" ng-click="updateService(service)">Apply changes</button>
           <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="caret"></span>
           </button>
           <ul class="dropdown-menu">
-            <li><a ng-click="cancelChanges(service, ['VirtualIPs'])">Reset changes</a></li>
+            <li><a ng-click="cancelChanges(service, ['Networks'])">Reset changes</a></li>
             <li><a ng-click="cancelChanges(service)">Reset all changes</a></li>
           </ul>
         </div>
