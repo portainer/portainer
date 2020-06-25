@@ -8,7 +8,7 @@
       <input type="text" class="form-control" ng-model="$ctrl.formValues.Title" id="template_title" name="template_title" placeholder="e.g. mytemplate" auto-focus required />
     </div>
   </div>
-  <div class="form-group" ng-show="commonCustomTemplateForm.template_title.$dirty && commonCustomTemplateForm.template_title.$invalid">
+  <div class="form-group" ng-show="commonCustomTemplateForm.template_title.$invalid">
     <div class="col-sm-12 small text-warning">
       <div ng-messages="commonCustomTemplateForm.template_title.$error">
         <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Title is required.</p>
@@ -24,7 +24,7 @@
       <input type="text" class="form-control" id="description" ng-model="$ctrl.formValues.Description" name="description" required />
     </div>
   </div>
-  <div class="form-group" ng-show="commonCustomTemplateForm.description.$dirty && commonCustomTemplateForm.description.$invalid">
+  <div class="form-group" ng-show="commonCustomTemplateForm.description.$invalid">
     <div class="col-sm-12 small text-warning">
       <div ng-messages="commonCustomTemplateForm.description.$error">
         <p ng-message="required"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Description is required.</p>
