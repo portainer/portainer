@@ -1,6 +1,6 @@
 import angular from 'angular';
 
-class AssociatedEndpointsDatatableController {
+export default class AssociatedEndpointsDatatableController {
   constructor($scope, $controller, DatatableService, PaginationService) {
     this.extendGenericController($controller, $scope);
     this.DatatableService = DatatableService;
@@ -98,6 +98,3 @@ class AssociatedEndpointsDatatableController {
       });
   }
 }
-
-angular.module('portainer.edge').controller('AssociatedEndpointsDatatableController', AssociatedEndpointsDatatableController);
-export default AssociatedEndpointsDatatableController;

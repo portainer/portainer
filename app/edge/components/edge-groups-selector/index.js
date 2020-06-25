@@ -1,5 +1,7 @@
+import angular from 'angular';
+
 angular.module('portainer.edge').component('edgeGroupsSelector', {
-  templateUrl: './edge-groups-selector.html',
+  templateUrl: './edgeGroupsSelector.html',
   bindings: {
     model: '=',
     items: '<',

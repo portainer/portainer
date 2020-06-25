@@ -1,3 +1,4 @@
+import angular from 'angular';
 import _ from 'lodash-es';
 
 export default class EdgeJobResultsDatatableController {

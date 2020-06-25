@@ -1,4 +1,5 @@
 import angular from 'angular';
+
 import EdgeJobResultsDatatableController from './edgeJobResultsDatatableController';
 import './edgeJobResultsDatatable.css';
 

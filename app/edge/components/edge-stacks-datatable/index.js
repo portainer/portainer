@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 angular.module('portainer.edge').component('edgeStacksDatatable', {
   templateUrl: './edgeStacksDatatable.html',
   controller: 'GenericDatatableController',

@@ -1,7 +1,6 @@
-import angular from 'angular';
 import _ from 'lodash-es';
 
-class EdgeGroupFormController {
+export default class EdgeGroupFormController {
   /* @ngInject */
   constructor(EndpointService, $async, $scope) {
     this.EndpointService = EndpointService;
@@ -59,6 +58,3 @@ class EdgeGroupFormController {
     this.endpoints.state.totalCount = totalCount;
   }
 }
-
-angular.module('portainer.edge').controller('EdgeGroupFormController', EdgeGroupFormController);
-export default EdgeGroupFormController;

@@ -1,8 +1,7 @@
-import angular from 'angular';
 import _ from 'lodash-es';
 import moment from 'moment';
 
-class EdgeJobFormController {
+export default class EdgeJobFormController {
   /* @ngInject */
   constructor() {
     this.state = {
@@ -102,6 +101,3 @@ function datetimeToCron(datetime) {
   var date = moment(datetime);
   return [date.minutes(), date.hours(), date.date(), date.month() + 1, '*'].join(' ');
 }
-
-angular.module('portainer.edge').controller('EdgeJobFormController', EdgeJobFormController);
-export default EdgeJobFormController;
