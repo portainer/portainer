@@ -1,7 +1,6 @@
-import angular from 'angular';
 import _ from 'lodash-es';
 
-class CreateEdgeStackViewController {
+export default class CreateEdgeStackViewController {
   constructor($state, EdgeStackService, EdgeGroupService, EdgeTemplateService, Notifications, FormHelper, $async) {
     Object.assign(this, { $state, EdgeStackService, EdgeGroupService, EdgeTemplateService, Notifications, FormHelper, $async });
 
@@ -151,6 +150,3 @@ class CreateEdgeStackViewController {
     this.formValues.StackFileContent = cm.getValue();
   }
 }
-
-angular.module('portainer.edge').controller('CreateEdgeStackViewController', CreateEdgeStackViewController);
-export default CreateEdgeStackViewController;

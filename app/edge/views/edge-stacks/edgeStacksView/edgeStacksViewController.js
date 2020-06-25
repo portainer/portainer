@@ -1,7 +1,6 @@
-import angular from 'angular';
 import _ from 'lodash-es';
 
-class EdgeStacksViewController {
+export default class EdgeStacksViewController {
   constructor($state, Notifications, EdgeStackService, $scope, $async) {
     this.$state = $state;
     this.Notifications = Notifications;
@@ -47,6 +46,3 @@ class EdgeStacksViewController {
     }
   }
 }
-
-angular.module('portainer.edge').controller('EdgeStacksViewController', EdgeStacksViewController);
-export default EdgeStacksViewController;

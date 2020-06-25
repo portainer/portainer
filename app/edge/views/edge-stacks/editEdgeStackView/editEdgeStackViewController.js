@@ -1,7 +1,6 @@
-import angular from 'angular';
 import _ from 'lodash-es';
 
-class EditEdgeStackViewController {
+export default class EditEdgeStackViewController {
   constructor($async, $state, EdgeGroupService, EdgeStackService, EndpointService, Notifications) {
     this.$async = $async;
     this.$state = $state;
@@ -91,6 +90,3 @@ class EditEdgeStackViewController {
     }
   }
 }
-
-angular.module('portainer.edge').controller('EditEdgeStackViewController', EditEdgeStackViewController);
-export default EditEdgeStackViewController;
