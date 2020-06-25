@@ -21,13 +21,13 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
         Subnet: '',
         Gateway: '',
         IPRange: '',
-        AuxAddress: '',
+        AuxiliaryAddresses: [],
       },
       IPV6: {
         Subnet: '',
         Gateway: '',
         IPRange: '',
-        AuxAddress: '',
+        AuxiliaryAddresses: [],
       },
       Labels: [],
       AccessControlData: new AccessControlFormData(),
@@ -79,6 +79,34 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
       $scope.formValues.Labels.splice(index, 1);
     };
 
+    $scope.addIPV4AuxAddress = function () {
+      $scope.formValues.IPV4.AuxiliaryAddresses.push('');
+    };
+
+    $scope.addIPV6AuxAddress = function () {
+      $scope.formValues.IPV6.AuxiliaryAddresses.push('');
+    };
+
+    $scope.removeIPV4AuxAddress = function (index) {
+      $scope.formValues.IPV4.AuxiliaryAddresses.splice(index, 1);
+    };
+
+    $scope.removeIPV6AuxAddress = function (index) {
+      $scope.formValues.IPV6.AuxiliaryAddresses.splice(index, 1);
+    };
+
+    function prepareAuxiliaryAddresses(ipamConfig, auxAddresses) {
+      ipamConfig.AuxiliaryAddresses = {};
+      _.forEach(auxAddresses, (auxAddress) => {
+        const split = _.split(auxAddress, '=');
+        if (split.length === 2) {
+          ipamConfig.AuxiliaryAddresses[split[0]] = split[1];
+        } else {
+          throw new Error('Auxiliary address bad format');
+        }
+      });
+    }
+
     function prepareIPAMConfiguration(config) {
       if ($scope.formValues.IPV4.Subnet) {
         let ipamConfig = {};
@@ -89,8 +117,8 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
         if ($scope.formValues.IPV4.IPRange) {
           ipamConfig.IPRange = $scope.formValues.IPV4.IPRange;
         }
-        if ($scope.formValues.IPV4.AuxAddress) {
-          ipamConfig.AuxAddress = $scope.formValues.IPV4.AuxAddress;
+        if ($scope.formValues.IPV4.AuxiliaryAddresses.length) {
+          prepareAuxiliaryAddresses(ipamConfig, $scope.formValues.IPV4.AuxiliaryAddresses);
         }
         config.IPAM.Config.push(ipamConfig);
       }
@@ -103,8 +131,8 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
         if ($scope.formValues.IPV6.IPRange) {
           ipamConfig.IPRange = $scope.formValues.IPV6.IPRange;
         }
-        if ($scope.formValues.IPV6.AuxAddress) {
-          ipamConfig.AuxAddress = $scope.formValues.IPV6.AuxAddress;
+        if ($scope.formValues.IPV6.AuxiliaryAddresses.length) {
+          prepareAuxiliaryAddresses(ipamConfig, $scope.formValues.IPV6.AuxiliaryAddresses);
         }
         config.EnableIPv6 = true;
         config.IPAM.Config.push(ipamConfig);
@@ -194,7 +222,12 @@ angular.module('portainer.docker').controller('CreateNetworkController', [
     }
 
     $scope.create = function () {
-      var networkConfiguration = prepareConfiguration();
+      try {
+        var networkConfiguration = prepareConfiguration();
+      } catch (err) {
+        Notifications.error('Failure', err, 'An error occured during network creation');
+        return;
+      }
       var accessControlData = $scope.formValues.AccessControlData;
       var userDetails = Authentication.getUserDetails();
       var isAdmin = Authentication.isAdmin();
