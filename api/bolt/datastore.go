@@ -131,7 +131,6 @@ func (store *Store) MigrateData() error {
 		migratorParams := &migrator.Parameters{
 			DB:                      store.db,
 			DatabaseVersion:         version,
-			EdgeJobService:          store.EdgeJobService,
 			EndpointGroupService:    store.EndpointGroupService,
 			EndpointService:         store.EndpointService,
 			EndpointRelationService: store.EndpointRelationService,
